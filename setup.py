@@ -130,7 +130,7 @@ def _getInstallRequires():
 
     #for Python older than 2.7
     if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
-        base.append('argparse')
+        base += ['argparse', 'ordereddict']
 
     return base
 

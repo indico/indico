@@ -17,4 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from indico.util.patches import apply_patches
+
+# monkey-patches for older Python versions
+apply_patches()
+
 __import__('pkg_resources').declare_namespace(__name__)
