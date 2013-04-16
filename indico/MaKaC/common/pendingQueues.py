@@ -197,7 +197,7 @@ class PendingConfSubmittersHolder(PendingHolder):
 
     def __init__(self):
         """Index by email of all the request to add Chairpersons or Speakers"""
-        self._id="Submitters"
+        self._id="ConfSubmitters"
         self._idx = indexes.IndexesHolder().getById("pendingConfSubmitters") # All the Conference Chairpersons/Speakers
         self._tasksIdx=indexes.IndexesHolder().getById("pendingConfSubmittersTasks") # Tasks which send reminder emails periodically asking for the creation of one indico account
         self._reminder=PendingConfSubmitterReminder
@@ -220,8 +220,8 @@ class PendingConfSubmittersHolder(PendingHolder):
             notif = _PendingConfSubmitterNotification( sb )
             mail.GenericMailer.send( notif )
         else:
-            psList=self.getPendingByEmail(sb.getEmail())
-            if psList != [] and psList is not None:
+            psList = self.getPendingByEmail(sb.getEmail())
+            if psList:
                 notif = _PendingConfSubmitterNotification( psList )
                 mail.GenericMailer.send( notif )
 
@@ -255,24 +255,18 @@ class _PendingConfSubmitterNotification(_PendingNotification):
 class PendingConfSubmitterReminder(PendingReminder):
 
     def run(self):
-        hasAccount=PendingReminder.run(self)
-        if not hasAccount:
-            psh=PendingConfSubmittersHolder()
-            psl=psh.getPendingByEmail(self._email)
-            if psl != [] and psl is not None:
-                notif = _PendingConfSubmitterNotification( psl )
-                mail.GenericMailer.send( notif )
+        if not PendingReminder.run(self):
+            psl = PendingConfSubmittersHolder().getPendingByEmail(self._email)
+            if psl:
+                mail.GenericMailer.send(_PendingConfSubmitterNotification(psl))
 
     def tearDown(self):
-        psh=PendingConfSubmittersHolder()
-        psl=psh.getPendingByEmail(self._email)
-        for e in psl:
-            e.getConference().getPendingQueuesMgr().removePendingConfSubmitter(e)
+        for submitter in PendingConfSubmittersHolder().getPendingByEmail(self._email):
+            submitter.getConference().getPendingQueuesMgr().removePendingConfSubmitter(submitter)
 
     def getPendings(self):
-        psh=PendingConfSubmittersHolder()
         try:
-            return psh.getPendingByEmail(self._email)
+            return PendingConfSubmittersHolder().getPendingByEmail(self._email)
         except:
             return None
 
@@ -586,8 +580,7 @@ class PendingCoordinatorsHolder(PendingHolder):
         """Index by email of all the requests"""
         self._id="Coordinators"
         self._idx = indexes.IndexesHolder().getById("pendingCoordinators") # All the pending coordinators
-        self._tasksIdx=indexes.IndexesHolder().getById("pendingCoordinatorsTasks") # Tasks which send reminder emails periodically asking
-                                                                               # for the creation of one indico account
+        self._tasksIdx=indexes.IndexesHolder().getById("pendingCoordinatorsTasks") # Tasks which send reminder emails periodically asking for the creation of one indico account
         self._reminder=PendingCoordinatorReminder
 
     def grantRights(self, av):

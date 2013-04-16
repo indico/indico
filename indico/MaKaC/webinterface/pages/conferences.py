@@ -1671,7 +1671,7 @@ class WConfModifMainData(wcomponents.WTemplated):
             chair['showManagerCB'] = True
             chair['showSubmitterCB'] = True
             if not av:
-                if chair['email'] in self._conf.getAccessController().getSubmitterEmailList():
+                if self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(chair['email']):
                     chair['showSubmitterCB'] = False
             elif (av[0] in self._conf.getAccessController().getSubmitterList()):
                 chair['showSubmitterCB'] = False

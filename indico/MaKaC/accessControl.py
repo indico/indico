@@ -82,7 +82,6 @@ class AccessController( Persistent, Observable ):
         self.owner = owner
         self.contactInfo = ""
         self.submitters = []
-        self.submittersEmail = []
         self.nonInheritingChildren = set()
 
     def getOwner(self):
@@ -382,18 +381,14 @@ class AccessController( Persistent, Observable ):
         """Grants submission privileges for the specified user
         """
         av = self._getAvatarByEmail(sb.getEmail())
-        if av is not None and av.isActivated():
+        if av and av.isActivated():
             self._grantSubmission(av)
-        elif sb.getEmail() != "":
-            self.getOwner().getPendingQueuesMgr().addPendingConfSubmitter(sb, False)
-            submissionEmailGranted = self._grantSubmissionEmail(sb.getEmail())
-            if submissionEmailGranted:
+        elif sb.getEmail():
+            if isinstance(self.getOwner(), Conference):
+                self.getOwner().getPendingQueuesMgr().addPendingConfSubmitter(sb, False)
                 from MaKaC.common import pendingQueues
-                notif = pendingQueues._PendingConfSubmitterNotification([sb])
                 from MaKaC.common import mail
-                mail.GenericMailer.sendAndLog(notif, self.getOwner())
-                if self.getOwner() is not None:
-                    self.getOwner()._getSubmitterIdx().indexEmail(sb.getEmail(), self.getOwner())
+                mail.GenericMailer.sendAndLog(pendingQueues._PendingConfSubmitterNotification([sb]), self.getOwner())
 
     def _revokeSubmission(self, av):
         if av in self.getSubmitterList():
@@ -404,7 +399,7 @@ class AccessController( Persistent, Observable ):
         """Removes submission privileges for the specified user
         """
         av = self._getAvatarByEmail(sb.getEmail())
-        self._revokeSubmissionEmail(sb.getEmail())
+        self.getOwner().getPendingQueuesMgr().removePendingConfSubmitter(sb)
         self._revokeSubmission(av)
 
     def _getAvatarByEmail(self, email):
@@ -430,30 +425,7 @@ class AccessController( Persistent, Observable ):
     def canUserSubmit(self, user):
         """Tells whether a user can submit material
         """
-        if user is None:
-            return False
         return user in self.getSubmitterList()
-
-    def _grantSubmissionEmail(self, email):
-        """Returns True if submission email was granted. False if email was already in the list.
-        """
-        if not email.lower() in map(lambda x: x.lower(), self.getSubmitterEmailList()):
-            self.getSubmitterEmailList().append(email)
-            self._p_changed = 1
-            return True
-        return False
-
-    def _revokeSubmissionEmail(self, email):
-        if email in self.getSubmitterEmailList():
-            self.getSubmitterEmailList().remove(email)
-            self._p_changed = 1
-
-    def getSubmitterEmailList(self):
-        try:
-            return self.submittersEmail
-        except:
-            self.submittersEmail = []
-        return self.submittersEmail
 
     def addNonInheritingChildren(self, obj):
         self.nonInheritingChildren.add(obj)
