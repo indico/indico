@@ -893,13 +893,13 @@ Calendar.prototype.create = function (_par) {
 			var pm = (hrs > 12);
 			if (t12 && pm) hrs -= 12;
 			var H = makeTimePart("hour", hrs, t12 ? 1 : 0, t12 ? 12 : 23, cal.hourStep);
-            
+
             var span = Calendar.createElement("span", cell);
 			span.innerHTML = ":";
 			span.className = "colon";
 
 			var M = makeTimePart("minute", mins, 0, 59, cal.minuteStep);
-            
+
 			var AP = null;
 			cell = Calendar.createElement("td", row);
 			cell.className = "time";
@@ -1339,7 +1339,7 @@ Calendar.prototype.callCloseHandler = function () {
 Calendar.prototype.destroy = function () {
 	var el = this.element.parentNode;
 	el.removeChild(this.element);
-	Calendar._C = null;var calendar = 
+	Calendar._C = null;var calendar =
 	window._dynarch_popupCalendar = null;
 };
 
@@ -1840,14 +1840,16 @@ Date.prototype.print = function (str) {
 	return str;
 };
 
-Date.prototype.__msh_oldSetFullYear = Date.prototype.setFullYear;
-Date.prototype.setFullYear = function(y) {
-	var d = new Date(this);
-	d.__msh_oldSetFullYear(y);
-	if (d.getMonth() != this.getMonth())
-		this.setDate(28);
-	this.__msh_oldSetFullYear(y);
-};
+// TODO: Get rid of this library
+// It overloads a native method causing Moment.js not to work properly
+//Date.prototype.__msh_oldSetFullYear = Date.prototype.setFullYear;
+//Date.prototype.setFullYear = function(y) {
+//	var d = new Date(this);
+//	d.__msh_oldSetFullYear(y);
+//	if (d.getMonth() != this.getMonth())
+//		this.setDate(28);
+//	this.__msh_oldSetFullYear(y);
+//};
 
 // END: DATE OBJECT PATCHES
 

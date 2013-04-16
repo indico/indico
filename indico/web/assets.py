@@ -198,13 +198,16 @@ presentation = Bundle('js/jquery/underscore.js',
                       'js/presentation/Ui/Widgets/WidgetGrid.js',
                       filters='rjsmin', output='presentation_%(version)s.min.js')
 
-
 selectivizr = Bundle('js/selectivizr/selectivizr.js',
                      filters='rjsmin', output='selectivizr_%(version)s.min.js')
 
+moment = Bundle('js/moment/moment.js',
+                'js/moment/lang/es.js',
+                'js/moment/lang/fr.js',
+                filters='rjsmin', output='moment_%(version)s.min.js')
 
 base_js = Bundle(jquery, presentation, indico_core,
-                 indico_legacy, indico_common, indico_jquery)
+                 indico_legacy, indico_common, indico_jquery, moment)
 
 
 def register_all_js(env):
