@@ -56,7 +56,8 @@ class PSession( base.Session, Persistent ):
             return self._csrf_token
 
     def reset_csrf_token(self):
-        del self._csrf_token
+        if hasattr(self, '_csrf_token'):
+            del self._csrf_token
 
     def has_info (self):
         """has_info() -> boolean

@@ -64,12 +64,12 @@ def lookupHandler(method):
     return handler
 
 
-def processRequest(method, params, req):
+def processRequest(method, params, req, internal=False):
     # lookup handler
     handler = lookupHandler(method)
     websession = getSession(req)
 
-    if Config.getInstance().getCSRFLevel() >= 1:
+    if not internal and Config.getInstance().getCSRFLevel() >= 1:
         if websession.csrf_token != req.headers_in.get('X-CSRF-Token'):
             raise RequestError('ERR-R4', _('Invalid CSRF token'))
 

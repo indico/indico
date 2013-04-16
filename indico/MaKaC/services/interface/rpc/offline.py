@@ -24,7 +24,7 @@ from indico.util.json import dumps
 import MaKaC
 
 def offlineRequest(rh, method, params = {}):
-    return dumps(processRequest(method, params, rh._req))
+    return dumps(processRequest(method, params, rh._req, True))
 
 def jsonDescriptor(object):
 
