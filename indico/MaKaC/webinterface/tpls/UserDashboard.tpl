@@ -72,8 +72,14 @@
 
 <script>
 $(document).ready(function(log_view){
-    $.getJSON("http://pcuds43.cern.ch:8000/indico/export/categ/favorites.json?ak=368612c2-7029-4d28-a54b-8eb036b8f114&limit=10&from=today&order=start", function(data) {
-        $.each(data.results, function(i, item) {
+    var api_opts = {
+            limit: "10",
+            start: "today",
+            order: "start"
+    };
+
+    apiRequest("/categ/favorites", api_opts).done(function(resp) {
+        $.each(resp.results, function(i, item) {
             $("#happeningCategories ol").append(
                     '<li class="truncate"><a href="' + item.url + '" class="truncate"> \
                         <span class="event-date">' + item.startDate.date + '</span> \
