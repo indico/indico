@@ -28,7 +28,6 @@ from persistent import Persistent
 from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat
 from MaKaC.common.Configuration import Config
 ###---------------------------- General Pending Queues ---------------------------------
 
@@ -133,7 +132,7 @@ class _PendingNotification(object):
         return []
 
     def getSubject( self ):
-        return _("[Indico] User account creation required")
+        return "[Indico] User account creation required"
 
     def getBody( self ):
         """We must implement the body of the email depending of the type of queue"""
@@ -326,7 +325,7 @@ class _PendingSubmitterNotification(_PendingNotification):
     def getBody( self ):
         url = urlHandlers.UHUserCreation.getURL()
         url.addParam("cpEmail",self._psList[0].getEmail())
-        return _("""
+        return """
     You have been added as author/speaker of the following contributions:%s
     and material submission rights have been granted to you.
     Please create an account in Indico in order to use these rights. You can create your account at the following URL:
@@ -338,23 +337,22 @@ class _PendingSubmitterNotification(_PendingNotification):
     Best Regards.
 
     --
-    Indico project <http://indico-software.org/>
-                """)%( self._getParticipations(), url, self._psList[0].getEmail() )
+    Indico"""%( self._getParticipations(), url, self._psList[0].getEmail() )
 
     def _getParticipations(self):
         participations="\n\n"
         for conf in self._participationsByConf.keys():
-            participations+=i18nformat("""\t\t\t- _("Event") \"%s\":\n""")%conf.getTitle()
+            participations+="""\t\t\t- "Event" \"%s\":\n"""%conf.getTitle()
             for ps in self._participationsByConf[conf]:
                 contrib=ps.getContribution()
                 typeAuthor=""
                 if contrib.isPrimaryAuthor(ps):
-                    typeAuthor=_("Primary Author")
+                    typeAuthor="Primary Author"
                 elif contrib.isCoAuthor(ps):
-                    typeAuthor=_("Co-author")
+                    typeAuthor="Co-author"
                 elif contrib.isSpeaker(ps):
-                    typeAuthor=_("Speaker")
-                participations+=i18nformat("""\t\t\t\t - _("Contribution") \"%s\" (%s)\n""")%(contrib.getTitle(), typeAuthor)
+                    typeAuthor="Speaker"
+                participations+="""\t\t\t\t - "Contribution" \"%s\" (%s)\n"""%(contrib.getTitle(), typeAuthor)
                 accessURL = urlHandlers.UHContributionDisplay.getURL(contrib)
                 participations+="\t\t\t\t - Access: %s\n" % accessURL
         return participations
@@ -434,7 +432,7 @@ class _PendingManagerNotification(_PendingNotification):
     def getBody( self ):
         url = urlHandlers.UHUserCreation.getURL()
         url.addParam("cpEmail",self._psList[0].getEmail())
-        return _("""
+        return """
     You have been added as convener of the following sessions:%s
     And session modification rights have been granted to you.
     Please create an account in Indico in order to use these rights. You can create your account at the following URL:
@@ -446,16 +444,15 @@ class _PendingManagerNotification(_PendingNotification):
     Best Regards.
 
     --
-    Indico project <http://indico-software.org/>
-                """)%( self._getParticipations(), url, self._psList[0].getEmail() )
+    Indico"""%( self._getParticipations(), url, self._psList[0].getEmail() )
 
     def _getParticipations(self):
         participations="\n\n"
         for conf in self._participationsByConf.keys():
-            participations+=i18nformat("""\t\t\t- _("Event") \"%s\":\n""")%conf.getTitle()
+            participations+="""\t\t\t- "Event" \"%s\":\n"""%conf.getTitle()
             for ps in self._participationsByConf[conf]:
                 session=ps.getSession()
-                participations+=i18nformat("""\t\t\t\t - _("Session") \"%s\"\n""")%(session.getTitle())
+                participations+="""\t\t\t\t - "Session" \"%s\"\n"""%(session.getTitle())
                 accessURL = urlHandlers.UHSessionDisplay.getURL(session)
                 participations+="\t\t\t\t - Access: %s\n" % accessURL
         return participations
@@ -532,7 +529,7 @@ class _PendingConfManagerNotification(_PendingNotification):
     def getBody( self ):
         url = urlHandlers.UHUserCreation.getURL()
         url.addParam("cpEmail",self._psList[0].getEmail())
-        return _("""
+        return """
     You have been added as manager of the following Event:%s
     And modification rights have been granted to you.
     Please create an account in Indico in order to use these rights. You can create your account at the following URL:
@@ -544,13 +541,12 @@ class _PendingConfManagerNotification(_PendingNotification):
     Best Regards.
 
     --
-    Indico project <http://indico-software.org/>
-                """)%( self._getParticipations(), url, self._psList[0].getEmail() )
+    Indico"""%( self._getParticipations(), url, self._psList[0].getEmail() )
 
     def _getParticipations(self):
         participations="\n\n"
         for conf in self._participationsByConf.keys():
-            participations+=i18nformat("""\t\t\t- _("Event") \"%s\":\n""")%conf.getTitle()
+            participations+="""\t\t\t- "Event" \"%s\":\n"""%conf.getTitle()
             accessURL = urlHandlers.UHConferenceDisplay.getURL(conf)
             participations+="\t\t\t- Access: %s\n" % accessURL
         return participations
@@ -626,7 +622,7 @@ class _PendingCoordinatorNotification(_PendingNotification):
     def getBody( self ):
         url = urlHandlers.UHUserCreation.getURL()
         url.addParam("cpEmail",self._psList[0].getEmail())
-        return _("""
+        return """
     You have been added as convener of the following sessions:%s
     And session coordination rights have been granted to you.
     Please create an account in Indico in order to use these rights. You can create your account at the following URL:
@@ -638,16 +634,15 @@ class _PendingCoordinatorNotification(_PendingNotification):
     Best Regards.
 
     --
-    Indico project <http://indico-software.org/>
-                """)%( self._getParticipations(), url, self._psList[0].getEmail() )
+    Indico"""%( self._getParticipations(), url, self._psList[0].getEmail() )
 
     def _getParticipations(self):
         participations="\n\n"
         for conf in self._participationsByConf.keys():
-            participations+=i18nformat("""\t\t\t- _("Event") \"%s\":\n""")%conf.getTitle()
+            participations+="""\t\t\t- "Event" \"%s\":\n"""%conf.getTitle()
             for ps in self._participationsByConf[conf]:
                 session=ps.getSession()
-                participations+=i18nformat("""\t\t\t\t - _("Session") \"%s\"\n""")%(session.getTitle())
+                participations+="""\t\t\t\t - "Session" \"%s\"\n"""%(session.getTitle())
                 accessURL = urlHandlers.UHSessionDisplay.getURL(session)
                 participations+="\t\t\t\t - Access: %s\n" % accessURL
         return participations
