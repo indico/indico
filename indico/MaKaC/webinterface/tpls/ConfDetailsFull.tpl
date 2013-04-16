@@ -48,12 +48,9 @@
   % endif
 
   % if material:
-  <div class="info_line material highlighted_area">
+  <div class="info_line material">
       <span title="${_("Materials")}" class="icon icon-material-download" aria-hidden="true"></span>
-      % if isSubmitter:
-        <span title="${_("Manage materials")}" class="right i-button icon-edit icon-only" id="manageMaterials" aria-hidden="true" ></span>
-      % endif
-      <ul class="text">
+      <ul class="text" style="float: left; padding: 0">
         % for mat in material:
           <li>${mat}</li>
         % endfor
@@ -82,7 +79,11 @@ ${ actions }
          });
 
 % if isSubmitter:
+    $('.info_line.material').addClass('highlighted_area');
     $('.info_line.material').css('background-color', '#eee');
+    $('.info_line.material').append('<span title="${_("Manage materials")}" class="right i-button icon-edit icon-only" style="float: right" id="manageMaterials" aria-hidden="true" ></span>');
+
+
     $("#manageMaterials").click(function(){
       IndicoUI.Dialogs.Material.editor(${conf.getId() |n,j}, '','','',
                                        ${conf.getAccessController().isProtected() |n,j},
