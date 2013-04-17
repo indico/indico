@@ -384,11 +384,7 @@ class AccessController( Persistent, Observable ):
         if av and av.isActivated():
             self._grantSubmission(av)
         elif sb.getEmail():
-            if isinstance(self.getOwner(), Conference):
-                self.getOwner().getPendingQueuesMgr().addPendingConfSubmitter(sb, False)
-                from MaKaC.common import pendingQueues
-                from MaKaC.common import mail
-                mail.GenericMailer.sendAndLog(pendingQueues._PendingConfSubmitterNotification([sb]), self.getOwner())
+            self.getOwner().getConference().getPendingQueuesMgr().addSubmitter(sb, self.getOwner(), False)
 
     def _revokeSubmission(self, av):
         if av in self.getSubmitterList():
@@ -399,7 +395,7 @@ class AccessController( Persistent, Observable ):
         """Removes submission privileges for the specified user
         """
         av = self._getAvatarByEmail(sb.getEmail())
-        self.getOwner().getPendingQueuesMgr().removePendingConfSubmitter(sb)
+        self.getOwner().getConference().getPendingQueuesMgr().removeSubmitter(sb, self.getOwner())
         self._revokeSubmission(av)
 
     def _getAvatarByEmail(self, email):

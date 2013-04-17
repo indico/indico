@@ -29,6 +29,7 @@ from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
 from MaKaC.common.Configuration import Config
+from MaKaC.common import mail
 ###---------------------------- General Pending Queues ---------------------------------
 
 #---GENERAL----
@@ -291,6 +292,10 @@ class PendingSubmittersHolder(PendingHolder):
             # We must grant the new avatar with submission rights
             contrib = e.getContribution()
             contrib.grantSubmission(av)
+
+            for email in av.getEmails():
+                if email.lower() in contrib.getSubmitterEmailList():
+                    contrib.revokeSubmissionEmail(email)
 
             # the Conference method "removePendingSubmitter" will remove the Submitter
             # (type-ContributionParticipation) objects from the conference pending submitter
@@ -748,6 +753,17 @@ class ConfPendingQueuesMgr(Persistent):
         else:
             keys=self.getPendingConfSubmitters().keys()
         return keys
+
+    def addSubmitter(self, ps, owner, sendEmail=True, sendPeriodicEmail=False):
+        from MaKaC.conference import Conference
+        if isinstance(owner, Conference):
+            self.addPendingConfSubmitter(ps, sendEmail=True, sendPeriodicEmail=False)
+            mail.GenericMailer.sendAndLog(_PendingConfSubmitterNotification([ps]), owner)
+
+    def removeSubmitter(self, ps, owner):
+        from MaKaC.conference import Conference
+        if isinstance(owner, Conference):
+            self.removePendingConfSubmitter(ps)
 
     def addPendingConfSubmitter(self, ps, sendEmail=True, sendPeriodicEmail=False):
         email=ps.getEmail().lower().strip()

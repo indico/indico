@@ -7887,7 +7887,7 @@ class Contribution(CommonObjectBase, Locatable):
             data["co-author %s"%ca.getId()] = ca.getFullName()
         for sp in self._speakers :
             data["speaker %s"%sp.getId()] = sp.getFullName()
-        for s in self._submitters :
+        for s in self.getSubmitterList():
             if isinstance(s, MaKaC.user.Avatar):
                 data["submitter"] = s.getFullName()
             else:
@@ -9490,22 +9490,21 @@ class Contribution(CommonObjectBase, Locatable):
             self.getCurrentStatus().withdraw(resp,comment)
 
 
-    def _initSubmissionPrivileges(self):
-        """Initialises submission privileges list for a contribution.
+    def getSubmitterList(self):
+        """Gives the list of users with submission privileges
 
             This is a temporary function used for creating the attribute in the
             case it does not exist into the DB
         """
         try:
-            if self._submitters:
-                pass
+            return self._submitters
         except AttributeError:
             self._submitters=[] #create the attribute
             self.notifyModification(raiseEvent = False)
 
     def _grantSubmission(self,av):
-        if av not in self._submitters:
-            self._submitters.append(av)
+        if av not in self.getSubmitterList():
+            self.getSubmitterList().append(av)
         if self.getConference() is not None:
             self.getConference().addContribSubmitter(self,av)
         if isinstance(av, MaKaC.user.Avatar):
@@ -9529,7 +9528,6 @@ class Contribution(CommonObjectBase, Locatable):
         """Grants a user with submission privileges for the contribution
            - sb: can be an Avatar or an Author (primary author, co-author, speaker)
         """
-        self._initSubmissionPrivileges()
         if isinstance(sb, ContributionParticipation) or isinstance(sb, SubContribParticipation):
             ah = AvatarHolder()
             results=ah.match({"email":sb.getEmail()}, exact=1, forceWithoutExtAuth=True)
@@ -9540,23 +9538,23 @@ class Contribution(CommonObjectBase, Locatable):
                 if i.hasEmail(sb.getEmail()):
                     r=i
                     break
-            if r is not None and r.isActivated():
+            if r and r.isActivated():
                 self._grantSubmission(r)
-            elif sb.getEmail() != "":
+            elif sb.getEmail():
                 self.getConference().getPendingQueuesMgr().addPendingSubmitter(sb, False)
                 submissionEmailGranted = self._grantSubmissionEmail(sb.getEmail())
                 if submissionEmailGranted and sendEmail:
                     notif = pendingQueues._PendingSubmitterNotification( [sb] )
                     mail.GenericMailer.sendAndLog( notif, self.getConference() )
-                    if self.getConference() is not None:
-                        self.getConference()._getSubmitterIdx().indexEmail(sb.getEmail(),self)
+                    if self.getConference():
+                        self.getConference().addContribSubmitter(self,sb)
         else:
             self._grantSubmission(sb)
 
     def _revokeSubmission(self, av):
-        if av in self._submitters:
-            self._submitters.remove(av)
-        if self.getConference() is not None:
+        if av in self.getSubmitterList():
+            self.getSubmitterList().remove(av)
+        if self.getConference():
             self.getConference().removeContribSubmitter(self, av)
         if isinstance(av, MaKaC.user.Avatar):
             av.unlinkTo(self, "submission")
@@ -9566,7 +9564,6 @@ class Contribution(CommonObjectBase, Locatable):
         """Removes submission privileges for the specified user
             - sb: can be an Avatar or an Author (primary author, co-author, speaker)
         """
-        self._initSubmissionPrivileges()
         if isinstance(sb, ContributionParticipation) or isinstance(sb, SubContribParticipation):
             ah = AvatarHolder()
             results = ah.match({"email":sb.getEmail()}, exact=1, forceWithoutExtAuth=True)
@@ -9585,12 +9582,6 @@ class Contribution(CommonObjectBase, Locatable):
     def revokeAllSubmitters(self):
         self._submitters = []
         self.notifyModification(raiseEvent = False)
-
-    def getSubmitterList(self):
-        """Gives the list of users granted with submission privileges
-        """
-        self._initSubmissionPrivileges()
-        return self._submitters
 
     def getSubmitterEmailList(self):
         try:
@@ -9615,13 +9606,6 @@ class Contribution(CommonObjectBase, Locatable):
             if principal != None and principal.containsUser(sb):
                 return True
 
-        #TODO: Remove this and use pending list
-        if isinstance(sb, MaKaC.user.Avatar):
-            for email in sb.getEmails():
-                if email.lower() in self.getSubmitterEmailList():
-                    self.grantSubmission(sb)
-                    self.revokeSubmissionEmail(email)
-                    return True
         return False
 
     def getAccessController(self):
@@ -9706,7 +9690,7 @@ class AcceptedContribution( Contribution ):
     def setAbstract(self, abs):
         self._abstract = abs
 
-    def _initSubmissionPrivileges(self):
+    def getSubmitterList(self):
         """Initialises submission privileges list for a contribution.
 
             In the case of an AcceptedContribution, the list of submitters
@@ -9716,8 +9700,7 @@ class AcceptedContribution( Contribution ):
             case it does not exist into the DB
         """
         try:
-            if self._submitters:
-                pass
+            return self._submitters
         except AttributeError:
             self._submitters=[]#create the attribute
             self._grantSubmission(self.getAbstract().getSubmitter().getUser())
