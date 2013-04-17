@@ -716,10 +716,31 @@ class Avatar(Persistent, Fossilizable):
                 'categ': categ,
                 'favorite': categ in favorites,
                 'managed': categ in managed,
-                'path': " >> ".join(categ.getCategoryPathTitles())
+                'path': self._truncatePath(categ.getCategoryPathTitles())
             }
         categ_dict = OrderedDict(sorted(res.items(), key=lambda t: t[0]))
         return categ_dict
+
+    def _truncatePath(self, full_path):
+        path = full_path[1:-1]
+
+        if len(path) > 2:
+            first = path[:1]
+            last = path[-1:]
+            inner = path[1:-1]
+
+            truncated = False
+            chars = "".join(inner)
+
+            while len(chars) > 30:
+                truncated = True
+                inner = inner[1:]
+                chars = "".join(inner)
+            if truncated:
+                inner = ["..."] + inner
+            path = first + inner + last
+
+        return " >> ".join(path)
 
     def resetLinkedTo(self):
         self.linkedTo = deepcopy(self.linkedToBase)

@@ -28,33 +28,6 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
              }
          },
 
-         _truncateList: function(list) {
-
-             // truncate the category path, if it is too long
-
-             var first = list.slice(0,1);
-             var last = list.length>1?list.slice(-1):[];
-             list = list.slice(1,-1);
-
-             var truncated = false;
-
-             var chars = list.join('');
-             while(chars.length > 10) {
-                 truncated = true;
-                 list = list.slice(1);
-                 chars = list.join('');
-             }
-
-             if (truncated) {
-                 list = concat(['...'], list);
-             }
-
-             return translate(concat(first,list,last),
-                        function(val) {
-                            return escapeHTML(val);
-                        });
-         },
-
          _truncateTitle: function(title) {
              var max = 27;
              if (title.length > max) {
@@ -112,7 +85,7 @@ type('IntelligentSearchBox', ['RealtimeTextBox'],
 
                     var title = Html.span('searchSuggestionTitle');
                     title.dom.innerHTML = titleHtml;
-                    var pathText = self._truncateList(elem.path).join(' >> ');
+                    var pathText = Util.truncateCategPath(elem.path).join(' >> ');
                     var path = Html.div('searchSuggestionPath', pathText);
                     var liItem = Html.li({}, title, path);
 

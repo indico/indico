@@ -47,7 +47,9 @@
                             <span title="You have favorited this category" class="icon-star contextHelp active"></span>
                             % endif:
                         </span>
-                        <span class="category-path">${category["path"]}</span>
+                        % if len(category["path"]) > 0:
+                            <span class="category-path">${category["path"]}</span>
+                        % endif
                     </a></li>
                 % endfor
                 % endif
@@ -56,14 +58,11 @@
             <div id="happeningCategories" class="dashboard-box">
                 <h3>${_("Happening in your categories")}</h3>
                 <ol>
-                <%doc>
-                % if len(events) != 0:
+                % if len(categories) == 0:
                     <li class="no-event"><a>
                         <span class="event-title italic text-superfluous">${_("You have no categories.")}</span>
                     </a></li>
-                % else:
                 % endif
-                </%doc>
                 </ol>
             </div>
         </div>
