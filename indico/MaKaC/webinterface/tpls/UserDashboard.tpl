@@ -72,9 +72,47 @@
 
 <script>
 $(document).ready(function(log_view){
+
+    /* Time formatting */
+    if (currentLanguage === "fr_FR") {
+        moment.lang("fr", {
+            calendar: {
+                lastDay : '[Hier]',
+                sameDay : "[Aujourd'hui]",
+                nextDay : '[Demain]',
+                nextWeek : 'dddd',
+                lastWeek : 'DD MMM YYYY',
+                sameElse : 'DD MMM YYYY'
+            }
+        });
+    } else if (currentLanguage === "es_ES") {
+        moment.lang("es", {
+            calendar: {
+                lastDay : '[Ayer]',
+                sameDay : "[Hoy]",
+                nextDay : '[Mañana]',
+                nextWeek : 'dddd',
+                lastWeek : 'DD MMM YYYY',
+                sameElse : 'DD MMM YYYY'
+            }
+        });
+    } else {
+        moment.lang("en", {
+            calendar: {
+                lastDay : '[Yesterday]',
+                sameDay : '[Today]',
+                nextDay : '[Tomorrow]',
+                nextWeek : 'dddd',
+                lastWeek : 'DD MMM YYYY',
+                sameElse : 'DD MMM YYYY'
+            }
+        });
+    }
+
+    /* AJAX query */
     var api_opts = {
             limit: "10",
-            start: "today",
+            from: "today",
             order: "start"
     };
 
@@ -82,13 +120,14 @@ $(document).ready(function(log_view){
         $.each(resp.results, function(i, item) {
             $("#happeningCategories ol").append(
                     '<li class="truncate"><a href="' + item.url + '" class="truncate"> \
-                        <span class="event-date">' + item.startDate.date + '</span> \
+                        <span class="event-date">' + moment(item.startDate.date).calendar() + '</span> \
                         <span class="event-title truncate-target">' + item.title + '</span> \
                         <span class="event-category">' + item.category + '</span> \
                      </a></li>');
         });
     });
 
+    /* Interface */
     $(".contextHelp[title]").qtip("disable");
     $(".contextHelp[title].active").qtip("enable");
 });
