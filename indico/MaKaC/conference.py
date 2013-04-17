@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 # fossil classes
+from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.plugins import PluginsHolder, Observable
 from MaKaC.common.utils import formatDateTime
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
@@ -2932,6 +2933,9 @@ class Conference(CommonObjectBase, Locatable):
     def getStartDate(self):
         """returns (datetime) the starting date of the conference"""
         return self.startDate
+
+    def getUnixStartDate(self):
+        return datetimeToUnixTimeInt(self.startDate)
 
     ###################################
     # Fermi timezone awareness        #

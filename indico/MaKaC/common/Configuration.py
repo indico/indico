@@ -440,6 +440,7 @@ class Config:
         'DBUserName'                : '',
         'DBPassword'                : '',
         'DBRealm'                   : '',
+        'RedisConnectionURL'        : None,
         'SanitizationLevel'         : 1,
         'CSRFLevel'                 : 2,
         'BaseURL'                   : 'http://localhost/',
@@ -609,6 +610,17 @@ class Config:
 
         if self.getCSRFLevel() not in range(4):
             raise MaKaCError("Invalid CSRFLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['CSRFLevel']))
+
+        if self.getRedisConnectionURL():
+            # Rest if redis is available and if we can connect
+            try:
+                import redis
+                redis.StrictRedis.from_url(self.getRedisConnectionURL()).ping()
+            except ImportError, e:
+                raise MaKaCError('Could not import redis: %s' % e.message)
+            except Exception, e:
+                raise MaKaCError('Could not connect to redis: %s' % e.message)
+
 
     def __getattr__(self, attr):
         """Dynamic finder for values defined in indico.conf
