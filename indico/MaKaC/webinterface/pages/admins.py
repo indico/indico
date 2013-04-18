@@ -1403,63 +1403,9 @@ class WUserDashboard(wcomponents.WTemplated):
         html_vars = wcomponents.WTemplated.getVars(self)
         user = self._avatar
 
-        html_vars["events"] = self._getEvents()
         html_vars["categories"] = user.getRelatedCategories()
 
         return html_vars
-
-    def _getEvents(self):
-        events_dict = OrderedDict()
-
-        self._fetchEventsFromManagement(events_dict)
-        # TODO self._fetchEventsPaperReview(events_dict)
-        # TODO self._fetchEventsAttendance(events_dict)
-
-        return events_dict
-
-    def _fetchEventsFromManagement(self, events_dict):
-        user = self._avatar
-
-        filters = {"conference": ["creator", "chair", "manager", "registrar"],
-                   "session" : ["manager", "coordinator"],
-                   "contribution": ["manager"]}
-
-        for event_kind in filters.keys():
-            for role in filters[event_kind]:
-                for event in user.getLinkTo(event_kind, role):
-                    if event_kind is "conference":
-                        try:
-                            event_id = event.getId()
-                            event_date = event.getAdjustedStartDate()
-                            event_title = event.getTitle()
-                            event_url = urlHandlers.UHConferenceDisplay.getURL(event)
-                            events_dict[(event_date, event_id)] = {"date": event_date,
-                                                                   "title": event_title,
-                                                                   "url": event_url}
-                            # TODO add rights to dict
-                        except:
-                            pass
-                    elif event_kind is "session":
-                        pass
-                        # TODO get conference
-                        # TODO add rights to dict
-                    elif event_kind is "contribution":
-                        pass
-                        # TODO get conference
-                        # TODO add rights to dict
-
-    def _fetchEventsFromPaperReview(self, events_dict):
-        filters = {"conference": ["paperReviewManager", "referee", "editor",
-                                   "reviewer"],
-                   "contribution": ["referee", "editor", "reviewer"],
-                   "track": ["coordinator"]}
-
-    def _fetchEventsAttendance(self, events_dict):
-        filters = {"conference": ["participant"],
-                   "contribution": ["submission"],
-                   "abstract": ["submitter"],
-                   "registration": ["registrant"],
-                   "evaluation": ["submitter"]}
 
 class WUserBaskets(wcomponents.WTemplated):
 
