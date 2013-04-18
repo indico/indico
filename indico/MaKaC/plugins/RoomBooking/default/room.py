@@ -234,7 +234,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
             if location != None:
                 if room.locationName != location:
                     continue
-            if onlyPublic and hasattr(room, "customAtts") and room.hasBookingACL():
+            if onlyPublic and (not room.isReservable or room.hasBookingACL()):
                     continue
             if roomEx != None:
                 if not qbeMatch( roomEx, room, Room.__attrSpecialEqual, minCapacity = minCapacity ):
