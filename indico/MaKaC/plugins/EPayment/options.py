@@ -21,10 +21,10 @@
 
 globalOptions = [
 
-    ("customCurrency", {"description": _("Add the currencies you want to manage"),
-                            "type": 'currency',
-                            "defaultValue": [{'name': 'Swiss Franc', 'abbreviation': 'CHF'},  {'name': 'Euro', 'abbreviation': 'EUR'}, {'name': 'US dollar', 'abbreviation': 'USD'}],
-                            "editable": True,
-                            "visible": False}),
+    ("customCurrency", {"description": "Add the currencies you want to manage",
+                        "type": 'currency',
+                        "defaultValue": [{'name': 'Swiss Franc', 'abbreviation': 'CHF'},  {'name': 'Euro', 'abbreviation': 'EUR'}, {'name': 'US dollar', 'abbreviation': 'USD'}],
+                        "editable": True,
+                        "visible": False}),
 
 ]
