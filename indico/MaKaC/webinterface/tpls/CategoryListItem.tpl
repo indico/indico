@@ -1,7 +1,7 @@
 <%page args="lItem=None, categoryDisplayURLGen=None"/>
 <li>
       <span>
-          <a href="${ categoryDisplayURLGen(lItem) }">${ escape(lItem.getName().strip()) or _("[no title]") }</a>
+          <a href="${ categoryDisplayURLGen(lItem) }">${ lItem.getName().strip() or _("[no title]") | remove_tags, h }</a>
 
        <% nconf = lItem.getNumConferences() %>
        <span class="num_events">
