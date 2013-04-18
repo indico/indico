@@ -707,6 +707,21 @@ def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
             dbi.commit()
     dbi.commit()
 
+@since('1.1')
+def indexConferenceTitle(dbi, withRBDB, prevVersion):
+    """
+    Indexing Conference Title
+    """
+    ch = ConferenceHolder()
+    nameIdx = IndexesHolder().getIndex('conferenceTitle')
+    i = 0
+
+    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
+        nameIdx.index(conf.getId(), conf.getTitle().decode('utf-8'))
+        i += 1
+        if i % 10000 == 0:
+            dbi.commit()
+
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
                  specified=[]):
 

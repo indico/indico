@@ -30,6 +30,7 @@ import types
 import urllib
 from ZODB.POSException import ConflictError
 from datetime import datetime, timedelta, time
+from zope.index.text import parsetree
 
 # indico imports
 from indico.util.date_time import nowutc
@@ -434,7 +435,11 @@ class EventSearchHook(HTTPAPIHook):
     def export_event(self, aw):
         ch = ConferenceHolder()
         index = IndexesHolder().getIndex('conferenceTitle')
-        results = index.search(self._search)
+        try:
+            query = ' AND '.join(map(lambda y: "*%s*" % y, filter(lambda x: len(x) > 0, self._search.split(' '))))
+            results = index.search(query)
+        except parsetree.ParseError:
+            results = []
         d = []
         for id, v in results:
             event = ch.getById(id)

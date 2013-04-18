@@ -165,7 +165,7 @@ class SearchCategoryNames(ServiceBase):
 
 
 #################################
-# Category search
+# Conference search
 #################################
 
 class SearchConferenceTitles(ServiceBase):
