@@ -51,6 +51,8 @@ from indico.util.contextManager import ContextManager
 from indico.util.caching import order_dict
 from indico.util.i18n import i18nformat
 from indico.util.decorators import cached_classproperty
+from indico.util.redis import write_client as redis_write_client
+import indico.util.redis.avatar_links as avatar_links
 
 """Contains the classes that implement the user management subsystem
 """
@@ -766,6 +768,10 @@ class Avatar(Persistent, Fossilizable):
                     raise ValueError('role %s is not allowed for %s objects' % (role, type(obj).__name__))
                 self.linkedTo[field][role].add(obj)
                 self._p_changed = 1
+                if redis_write_client:
+                    event = avatar_links.event_from_obj(obj)
+                    if event:
+                        avatar_links.add_link(redis_write_client, self, event, field + '_' + role)
                 break
 
     def getLinkTo(self, field, role):
@@ -781,6 +787,10 @@ class Avatar(Persistent, Fossilizable):
                 if obj in self.linkedTo[field][role]:
                     self.linkedTo[field][role].remove(obj)
                     self._p_changed = 1
+                    if redis_write_client:
+                        event = avatar_links.event_from_obj(obj)
+                        if event:
+                            avatar_links.del_link(redis_write_client, self, event, field + '_' + role)
                 break
 
     def getStatus( self ):

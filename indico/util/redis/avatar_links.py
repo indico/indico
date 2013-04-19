@@ -59,17 +59,10 @@ def init_links(client, avatar):
     for key, roleDict in avatar.linkedTo.iteritems():
         for role, items in roleDict.iteritems():
             for item in items:
-                event = None
-                if isinstance(item, MaKaC.conference.Conference):
-                    event = item
-                elif hasattr(item, 'getConference'):
-                    event = item.getConference()
-                if event is None:
-                    continue
-                elif event.getId() == 'default':  # DefaultConference
-                    continue
-                all_events.add(event)
-                event_roles[event].add(key + '_' + role)
+                event = event_from_obj(item)
+                if event:
+                    all_events.add(event)
+                    event_roles[event].add(key + '_' + role)
 
     # Add avatar to event avatar lists
     for event in all_events:
@@ -81,3 +74,13 @@ def init_links(client, avatar):
     # Add roles to avatar-event role lists
     for event, roles in event_roles.iteritems():
         client.sadd('avatar-event-links/avatar_event_roles:%s:%s' % (avatar.getId(), event.getId()), *roles)
+
+
+def event_from_obj(obj):
+    event = None
+    if isinstance(obj, MaKaC.conference.Conference):
+        event = obj
+    elif hasattr(obj, 'getConference'):
+        event = obj.getConference()
+    if event and event.getId() != 'default':
+        return event
