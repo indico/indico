@@ -2,12 +2,12 @@
 
 h2 {
     font-size: 1.5em;
-    font-family: Georgia, Times, Serif;
+   font-family: "Helvetica Neue", Helvetica, Verdana, Arial, Sans-serif;
 }
 
 h2.page_title {
     margin-top: 0.8em;
-    font-family: Georgia, Times, Serif;
+    font-family: "Helvetica Neue", Helvetica, Verdana, Arial, Sans-serif;
     font-size: 2em;
     color: #B14300;
 }

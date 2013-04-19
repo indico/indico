@@ -1021,13 +1021,19 @@ a.confSubSection:hover {
 
 .groupTitle, .groupTitleNoBorder, .groupSubTitle {
 /*    font-family: Georgia, Times, "Times New Roman"; */
+   display: block;
+   width: 100%;
+   font-family: "Helvetica Neue", Helvetica, Verdana, Arial, Sans-serif;
    font-size: 24px;
-   font-weight: bold;
-   color: #4E4C46;
-   letter-spacing: 1px;
+   font-weight: normal;
+   color: #4a4a4a;
    padding: 3px 3px 5px 3px;
    border-bottom: 1px solid #AAA;
-   margin-bottom: 10px;
+   margin-bottom: 1em;
+}
+
+td.groupTitle, td.groupTitleNoBorder, td.groupSubTitle {
+  display: table-cell;
 }
 
 .groupTitle > [class*="icon-"],
@@ -3743,6 +3749,7 @@ div.ACUserListDiv ul.UIPeopleList {
 
 .bannerTitle
 {
+    font-family: "Helvetica Neue", Helvetica, Verdana, Arial, Sans-serif;
     color: #777777;
 }
 
