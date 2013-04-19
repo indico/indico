@@ -18,11 +18,12 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os
+from indico.util.contextManager import ContextManager
 from indico.util.redis.scripts import LazyScriptLoader
 from indico.util.proxy import LocalProxy
 from MaKaC.common import Config
 
-__all__ = ['scripts', 'client', 'set_redis_client']
+__all__ = ['scripts', 'client', 'pipeline', 'set_redis_client']
 
 _client = None
 
@@ -49,8 +50,24 @@ def _get_redis_client():
     return _client
 
 
+def _get_redis_pipeline():
+    rh = ContextManager.get('currentRH', None)
+    if not rh:
+        # If you are reading this because you tried to use this e.g. in a migration script
+        # or somewhere else outside a RH context: Use `with client.pipeline() as pipe:` and
+        # execute it on your own. The sole reason why this pipeline accessor exists is that
+        # the pipeline can be properly executed/discarded in case of a DB commit/conflict.
+        raise Exception('Cannot get Redis pipeline outside a request')
+    if rh._redisPipeline:
+        return rh._redisPipeline
+    rh._redisPipeline = client.pipeline(transaction=False)
+    return rh._redisPipeline
+
+
 # The client is proxied since we do not want to actually get it until we need it.
 # This has the advantage of allowing e.g. tests to set their own redis client.
 client = LocalProxy(_get_redis_client)
+# The pipeline is stored per request handler and only available if we actually have one
+pipeline = LocalProxy(_get_redis_pipeline)
 script_dir = os.path.join(os.path.dirname(__file__), 'lua_scripts')
 scripts = LazyScriptLoader(client, script_dir)

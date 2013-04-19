@@ -235,6 +235,7 @@ class RH(RequestHandlerBase):
         self._startTime = None
         self._endTime = None
         self._tempFilesToDelete = []
+        self._redisPipeline = None
         self._doProcess = True  #Flag which indicates whether the RH process
                                 #   must be carried out; this is useful for
                                 #   the checkProtection methods when they
@@ -542,6 +543,9 @@ class RH(RequestHandlerBase):
                         fossilize.clearCache()
                         # delete all queued emails
                         GenericMailer.flushQueue(False)
+                        # clear the existing redis pipeline
+                        if self._redisPipeline:
+                            self._redisPipeline.reset()
 
                         DBMgr.getInstance().sync()
                         # keep a link to the web session in the access wrapper
@@ -600,6 +604,9 @@ class RH(RequestHandlerBase):
                         except:
                             Logger.get('mail').exception('Mail sending operation failed')
                             pass
+                        # execute redis pipeline if we have one
+                        if self._redisPipeline:
+                            self._redisPipeline.execute()
                         break
                     except MaKaCError, e:
                         #DBMgr.getInstance().endRequest(False)
