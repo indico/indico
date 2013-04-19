@@ -1118,6 +1118,7 @@ class Category(CommonObjectBase):
         conf = Conference( creator, id, creationDate, modificationDate )
         ConferenceHolder().add( conf )
         self._addConference( conf )
+        conf.linkCreator()
 
         conf._notify('created', self)
 
@@ -2025,9 +2026,8 @@ class Conference(CommonObjectBase, Locatable):
         #IndexedObject.__init__(self)
         if creator == None:
             raise MaKaCError( _("A creator must be specified when creating a new Event"), _("Event"))
-        self.id = id
         self.__creator = creator
-        self.__creator.linkTo(self, "creator")
+        self.id = id
         self.title = ""
         self.description = ""
         self.places = []
@@ -2636,6 +2636,9 @@ class Conference(CommonObjectBase, Locatable):
             self.__creator.unlinkTo(self, "creator")
         creator.linkTo(self, "creator")
         self.__creator = creator
+
+    def linkCreator(self):
+        self.__creator.linkTo(self, "creator")
 
     def getId( self ):
         """returns (string) the unique identifier of the conference"""
