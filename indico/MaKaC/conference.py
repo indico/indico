@@ -2891,6 +2891,10 @@ class Conference(CommonObjectBase, Locatable):
         # update the time for the alarms to be sent
         self._updateAlarms()
 
+        # Update redis link timestamp
+        if redis_write_client:
+            avatar_links.update_event_time(redis_write_client, self)
+
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
             try:
