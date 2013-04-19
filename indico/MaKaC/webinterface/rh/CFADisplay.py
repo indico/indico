@@ -196,6 +196,10 @@ _("The following email has been sent to %s"):
 
 class RHAbstractModificationAction(RHAbstractSubmissionBase, AbstractParam):
 
+    def __init__(self, req):
+        RHAbstractSubmissionBase.__init__(self, req)
+        AbstractParam.__init__(self)
+
     def _checkParams( self, params ):
         RHAbstractSubmissionBase._checkParams(self, params)
         #if the user is not logged in we return immediately as this form needs
@@ -203,11 +207,9 @@ class RHAbstractModificationAction(RHAbstractSubmissionBase, AbstractParam):
         #   necessary
         if self._getUser() == None:
             return
-        try:
-            headerSize = self._req.headers_in["content-length"]
-        except KeyError:
-            headerSize = -1
-        AbstractParam._checkParams(self, params, self._conf, headerSize)
+
+        header_size = self._req.headers_in["content-length"]
+        AbstractParam._checkParams(self, params, self._conf, header_size)
 
 
 class RHAbstractSubmission( RHAbstractModificationAction ):
