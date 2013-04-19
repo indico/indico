@@ -723,19 +723,20 @@ def indexConferenceTitle(dbi, withRBDB, prevVersion):
             dbi.commit()
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
-                 specified=[]):
+                 specified=[], dryRun=False):
 
-    print "\nExecuting migration...\n"
+    if not dryRun:
+        print "\nExecuting migration...\n"
 
-    dbi = DBMgr.getInstance()
+        dbi = DBMgr.getInstance()
 
-    print "Probing DB connection...",
+        print "Probing DB connection...",
 
-    # probe DB connection
-    dbi.startRequest()
-    dbi.endRequest(False)
+        # probe DB connection
+        dbi.startRequest()
+        dbi.endRequest(False)
 
-    print "DONE!\n"
+        print "DONE!\n"
 
     # go from older to newer version and execute corresponding tasks
     for version, task, always in MIGRATION_TASKS:
@@ -745,6 +746,8 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
             print console.colored("#", 'green', attrs=['bold']), \
                   task.__doc__.replace('\n', '').strip(),
             print console.colored("(%s)" % version, 'yellow')
+            if dryRun:
+                continue
             dbi.startRequest()
             if withRBDB:
                 DALManager.connect()
@@ -757,8 +760,9 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
 
             print console.colored("  DONE\n", 'green', attrs=['bold'])
 
-    print console.colored("Database Migration successful!\n",
-                          'green', attrs=['bold'])
+    if not dryRun:
+        print console.colored("Database Migration successful!\n",
+                              'green', attrs=['bold'])
 
 
 def main():
@@ -771,6 +775,8 @@ this operation be executed while the web server is down, in order to avoid
 concurrency problems and DB conflicts.\n\n""", 'yellow')
 
     parser = argparse.ArgumentParser(description='Execute migration')
+    parser.add_argument('--dry-run', '-n', dest='dry_run', action='store_true',
+                        help='Only show which migration tasks would be executed')
     parser.add_argument('--with-rb', dest='useRBDB', action='store_true',
                         help='Use the Room Booking DB')
     parser.add_argument('--run-only', dest='specified', default='',
@@ -780,8 +786,7 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
 
     args = parser.parse_args()
 
-    if console.yesno("Are you sure you want to execute the "
-                     "migration now?"):
+    if args.dry_run or console.yesno("Are you sure you want to execute the migration now?"):
         try:
             if args.profile:
                 import profile, random, os
@@ -789,13 +794,15 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
                 result = None
                 profile.runctx("""result=runMigration(withRBDB=args.useRBDB,
                                   prevVersion=parse_version(args.prevVersion),
-                                  specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))))""",
+                                  specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))),
+                                  dryRun=args.dry_run)""",
                                   globals(), locals(), proffilename)
                 return result
             else:
                 return runMigration(withRBDB=args.useRBDB,
                                     prevVersion=parse_version(args.prevVersion),
-                                    specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))))
+                                    specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))),
+                                    dryRun=args.dry_run)
         except:
             print console.colored("\nMigration failed! DB may be in "
                                   " an inconsistent state:", 'red', attrs=['bold'])
