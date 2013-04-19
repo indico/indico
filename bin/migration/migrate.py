@@ -36,6 +36,7 @@ from MaKaC.common import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
 from MaKaC.common.Configuration import Config
+from MaKaC.common.dvdCreation import OfflineWebsiteCreator
 from MaKaC.conference import ConferenceHolder, CategoryManager, Conference, CustomLocation, CustomRoom
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
@@ -55,8 +56,8 @@ from indico.util import console, i18n
 from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
      CategoryStatisticsUpdaterTask
 from indico.modules import ModuleHolder
-from MaKaC.common.dvdCreation import OfflineWebsiteCreator
-
+from indico.util.redis import avatar_links
+from indico.util.redis import client as redis_client
 
 from indico.modules.scheduler import Client
 
@@ -725,7 +726,7 @@ def indexConferenceTitle(dbi, withRBDB, prevVersion):
 
 @since('1.1')
 def convertLinkedTo(dbi, withRBDB, prevVersion):
-    """Convert Avatar.linkedTo stcuture to use OOSets"""
+    """Convert Avatar.linkedTo structure to use OOSets"""
     for i, avatar in enumerate(AvatarHolder()._getIdx().itervalues()):
         avatar.updateLinkedTo()  # just in case some avatars do not have all fields
         linkedTo = avatar.linkedTo
@@ -736,6 +737,19 @@ def convertLinkedTo(dbi, withRBDB, prevVersion):
         if i % 1000 == 0:
             dbi.commit()
     dbi.commit()
+
+
+@since('1.1')
+def redisLinkedTo(dbi, withRBDB, prevVersion):
+    """Import linkedTo information into Redis"""
+    if not Config.getInstance().getRedisConnectionURL():
+        print console.colored("  Redis not configured, skipping", 'yellow')
+        return
+
+    with redis_client.pipeline(transaction=False) as pipe:
+        for avatar in AvatarHolder()._getIdx().itervalues():
+            avatar_links.init_links(pipe, avatar)
+        pipe.execute()
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),

@@ -1434,6 +1434,12 @@ class Submission(Persistent):
             self._evaluation = None
         return self._evaluation
 
+    def getConference(self):
+        """gets the conference to which this submission's evaluation is bound."""
+        evaluation = self.getEvaluation()
+        if evaluation:
+            return evaluation.getConference()
+
     def setAnonymous(self, anonymous):
         """if True, submission is anonymous."""
         self.anonymous = utils._bool(anonymous)

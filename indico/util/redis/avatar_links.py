@@ -19,6 +19,7 @@
 
 import itertools
 from collections import defaultdict, OrderedDict
+import MaKaC
 from indico.util.redis import scripts
 
 
@@ -53,8 +54,24 @@ def delete_event(client, event):
 
 def init_links(client, avatar):
     """Initializes the links based on the existing linked_to data."""
-    avatar_links = avatar.linkedTo['conference']
-    all_events = set(itertools.chain(*avatar_links.itervalues()))
+
+    all_events = set()
+    event_roles = defaultdict(set)
+    for key, roleDict in avatar.linkedTo.iteritems():
+        for role, items in roleDict.iteritems():
+            for item in items:
+                event = None
+                if isinstance(item, MaKaC.conference.Conference):
+                    event = item
+                elif hasattr(item, 'getConference'):
+                    event = item.getConference()
+                if event is None:
+                    continue
+                elif event.getId() == 'default':  # DefaultConference
+                    continue
+                all_events.add(event)
+                event_roles[event].add(key + '_' + role)
+
     # Add avatar to event avatar lists
     for event in all_events:
         client.sadd('avatar-event-links/event_avatars:%s' % event.getId(), avatar.getId())
@@ -63,9 +80,5 @@ def init_links(client, avatar):
     if zdata:
         client.zadd('avatar-event-links/avatar_events:%s' % avatar.getId(), **zdata)
     # Add roles to avatar-event role lists
-    event_roles = defaultdict(set)
-    for role, events in avatar_links.iteritems():
-        for event in events:
-            event_roles[event].add('conference_' + role)
     for event, roles in event_roles.iteritems():
         client.sadd('avatar-event-links/avatar_event_roles:%s:%s' % (avatar.getId(), event.getId()), *roles)
