@@ -120,6 +120,7 @@ class ServiceRunner(Observable):
                         result = processRequest(method, copy.deepcopy(params), req)
                     except MaKaC.errors.NoReportError, e:
                         raise NoReportError(e.getMsg())
+                    rh = ContextManager.get('currentRH')
 
                     # notify components that the request has ended
                     self._notify('requestFinished', req)
@@ -129,6 +130,8 @@ class ServiceRunner(Observable):
                     _endRequestSpecific2RH( True )
                     DBMgr.getInstance().endRequest(True)
                     GenericMailer.flushQueue(True) # send emails
+                    if rh._redisPipeline:
+                        rh._redisPipeline.execute()
                     break
                 except ConflictError:
                     _abortSpecific2RH()

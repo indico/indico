@@ -164,7 +164,7 @@ class ServiceBase(RequestHandlerBase):
 
     def __init__(self, params, session, req):
         """
-        Constructor.  Initializes provate variables
+        Constructor.  Initializes private variables
         @param req: HTTP Request provided by the previous layer
         """
         RequestHandlerBase.__init__(self, req)
@@ -184,6 +184,7 @@ class ServiceBase(RequestHandlerBase):
                                 #   must be carried out; this is useful for
                                 #   the checkProtection methods
         self._tempFilesToDelete = []
+        self._redisPipeline = None
 
     # Methods =============================================================
 
