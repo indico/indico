@@ -1642,6 +1642,10 @@ class AvatarHolder( ObjectHolder ):
                                 #prin ditn't answered to the same evaluation as merger's.
                                 submission.setSubmitter(prin)
 
+        # Merge avatars in redis
+        if redis_write_client:
+            avatar_links.merge_avatars(redis_write_client, prin, merged)
+
         # remove merged from holder
         self.remove(merged)
         idxs = indexes.IndexesHolder()
