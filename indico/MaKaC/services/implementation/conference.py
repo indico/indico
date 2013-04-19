@@ -1452,6 +1452,8 @@ class ConferenceEditChairPerson(ConferenceChairPersonBase):
         chair.setFirstName(self._userData.get("firstName", ""))
         chair.setFamilyName(self._userData.get("familyName", ""))
         chair.setAffiliation(self._userData.get("affiliation", ""))
+        if self._userData.get("email", "").lower().strip() != chair.getEmail().lower().strip():
+            self._conf.getPendingQueuesMgr().removePendingConfSubmitter(chair)
         chair.setEmail(self._userData.get("email", ""))
         chair.setAddress(self._userData.get("address", ""))
         chair.setPhone(self._userData.get("phone", ""))
