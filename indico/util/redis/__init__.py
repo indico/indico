@@ -66,10 +66,18 @@ def _get_redis_pipeline():
     return rh._redisPipeline
 
 
+def _get_redis_write_client():
+    if ContextManager.get('currentRH', None):
+        return _get_redis_pipeline()
+    return _get_redis_client()
+
+
 # The client is proxied since we do not want to actually get it until we need it.
 # This has the advantage of allowing e.g. tests to set their own redis client.
 client = LocalProxy(_get_redis_client)
 # The pipeline is stored per request handler and only available if we actually have one
 pipeline = LocalProxy(_get_redis_pipeline)
+# For convenience, write_client is either a normal client or a pipeline inside a RH
+write_client = LocalProxy(_get_redis_write_client)
 script_dir = os.path.join(os.path.dirname(__file__), 'lua_scripts')
 scripts = LazyScriptLoader(client, script_dir)
