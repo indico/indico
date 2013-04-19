@@ -216,7 +216,6 @@ class PendingConfSubmittersHolder(PendingHolder):
             e.getConference().getPendingQueuesMgr().removePendingConfSubmitter(e)
 
     def _sendReminderEmail(self, sb):
-        DBMgr.getInstance().commit()
         if type(sb)==list:
             notif = _PendingConfSubmitterNotification( sb )
             mail.GenericMailer.send( notif )
@@ -294,8 +293,7 @@ class PendingSubmittersHolder(PendingHolder):
             contrib.grantSubmission(av)
 
             for email in av.getEmails():
-                if email.lower() in contrib.getSubmitterEmailList():
-                    contrib.revokeSubmissionEmail(email)
+                contrib.revokeSubmissionEmail(email.lower())
 
             # the Conference method "removePendingSubmitter" will remove the Submitter
             # (type-ContributionParticipation) objects from the conference pending submitter
@@ -304,7 +302,6 @@ class PendingSubmittersHolder(PendingHolder):
 
     def _sendReminderEmail(self, sb):
         from MaKaC.conference import ContributionParticipation
-        DBMgr.getInstance().commit()
         if type(sb)==list:
             # Sending email just about the contribution participations of the list "sb" (normally
             # they are contributions from one event)
@@ -412,7 +409,6 @@ class PendingManagersHolder(PendingHolder):
 
     def _sendReminderEmail(self, sb):
         from MaKaC.conference import SessionChair
-        DBMgr.getInstance().commit()
         if type(sb)==list:
             # Sending email just about the participations of the list "sb" (normally
             # they are sessions from one event)
@@ -510,7 +506,6 @@ class PendingConfManagersHolder(PendingHolder):
 
     def _sendReminderEmail(self, sb):
         from MaKaC.conference import SessionChair
-        DBMgr.getInstance().commit()
         if type(sb)==list:
             # Sending email just about the participations of the list "sb" (normally
             # they are sessions from one event)
@@ -601,7 +596,6 @@ class PendingCoordinatorsHolder(PendingHolder):
 
     def _sendReminderEmail(self, sb):
         from MaKaC.conference import SessionChair
-        DBMgr.getInstance().commit()
         if type(sb)==list:
             # Sending email just about the participations of the list "sb" (normally
             # they are sessions from one event)
@@ -738,6 +732,7 @@ class ConfPendingQueuesMgr(Persistent):
 
     def getPendingConfSubmittersKeys(self, sort=False):
         if sort:
+            from MaKaC.conference import ConferenceChair
             # return keys of contribution participants sorted by name
             keys=[]
             vl=[]
@@ -745,6 +740,7 @@ class ConfPendingQueuesMgr(Persistent):
             for v in self.getPendingConfSubmitters().values()[:]:
                 vl.extend(v)
             # sort
+            vl.sort(ConferenceChair._cmpFamilyName)
             for v in vl:
                 email=v.getEmail().lower().strip()
                 if email not in keys:
@@ -823,6 +819,8 @@ class ConfPendingQueuesMgr(Persistent):
         return keys
 
     def removePendingSubmitter(self, ps):
+        # Used only from contributions.
+        # TODO: when refactoring, this method should be renamed and called only from self.removeSubmitter
         email=ps.getEmail().lower().strip()
         if self.getPendingSubmitters().has_key(email):
             if ps in self._pendingSubmitters[email]:
@@ -834,6 +832,8 @@ class ConfPendingQueuesMgr(Persistent):
             self.notifyModification()
 
     def addPendingSubmitter(self, ps, sendEmail=True, sendPeriodicEmail=False):
+        # Used only from contributions.
+        # TODO: when refactoring, this method should be renamed and called only from self.addSubmitter
         email=ps.getEmail().lower().strip()
         if self.getPendingSubmitters().has_key(email):
             if not ps in self._pendingSubmitters[email]:

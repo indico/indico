@@ -18,34 +18,6 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 
-from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
-                            IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
-from MaKaC.common.fossilize import Fossilizable, fossilizes
-from random import random
-from indico.util.i18n import i18nformat
-
-import ZODB
-from persistent import Persistent
-from accessControl import AdminList
-import MaKaC
-from MaKaC.common import filters, indexes, logger
-from MaKaC.common.Configuration import Config
-from MaKaC.common.Locators import Locator
-from MaKaC.common.ObjectHolders import ObjectHolder, IndexHolder
-from MaKaC.errors import UserError, MaKaCError
-from MaKaC.authentication.LocalAuthentication import LocalIdentity
-from MaKaC.trashCan import TrashCanManager
-from MaKaC.externUsers import ExtUserHolder
-from MaKaC.common.db import DBMgr
-import MaKaC.common.info as info
-from MaKaC.i18n import _
-from MaKaC.authentication.LDAPAuthentication import LDAPAuthenticator, ldapFindGroups, ldapUserInGroup
-
-from datetime import datetime, timedelta
-
-from MaKaC.common.PickleJar import Updates
-from MaKaC.common.logger import Logger
-
 #import ldap
 from pytz import all_timezones
 import httplib
@@ -53,10 +25,31 @@ import urllib
 import base64
 from xml.dom.minidom import parseString
 from copy import deepcopy
+from datetime import datetime, timedelta
+from persistent import Persistent
+
+import MaKaC
+import MaKaC.common.info as info
+from MaKaC.accessControl import AdminList
+from MaKaC.common import filters, indexes, logger
+from MaKaC.common.Configuration import Config
+from MaKaC.common.Locators import Locator
+from MaKaC.common.ObjectHolders import ObjectHolder
+from MaKaC.errors import UserError, MaKaCError
+from MaKaC.trashCan import TrashCanManager
+from MaKaC.externUsers import ExtUserHolder
+from MaKaC.i18n import _
+from MaKaC.authentication.LDAPAuthentication import ldapFindGroups, ldapUserInGroup
 from MaKaC.plugins.base import PluginsHolder
+from MaKaC.common.logger import Logger
+from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
+                            IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+
 
 from indico.util.contextManager import ContextManager
 from indico.util.caching import order_dict
+from indico.util.i18n import i18nformat
 
 """Contains the classes that implement the user management subsystem
 """
@@ -942,8 +935,12 @@ class Avatar(Persistent, Fossilizable):
         self._p_changed = 1
         statIdx.indexUser( self )
 
-    def activateAccount( self ):
+    def activateAccount(self, checkPending=True):
         self.setStatus("activated")
+        if checkPending:
+            #----Grant rights if any
+            from MaKaC.common import pendingQueues
+            pendingQueues.PendingQueuesHolder().grantRights(self)
 
     def disabledAccount( self ):
         self.setStatus("disabled")

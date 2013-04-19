@@ -1,9 +1,10 @@
 <%page args="item, manageLink=False, bgColor='#ECECEC', alignRight=False"/>
+
 <%
     info = extractInfoForButton(item)
     menuName = 'menu%(confId)s%(sessId)s%(slotId)s%(contId)s%(subContId)s' % info
 %>
-% if not conf.isClosed() and any(x in info for x in ['modifyLink', 'materialLink', 'minutesLink', 'submitter']):
+% if not conf.isClosed() and any(x in info for x in ['modifyLink', 'materialLink', 'minutesLink']):
 
     % if manageLink:
         <div class="manageLink" style="background: ${bgColor};">
@@ -52,7 +53,7 @@
             % endif
 
             <% item2CheckMins = item.getSession() if getItemType(item) == 'Session' else item %>
-            % if item2CheckMins.getMinutes() and item2CheckMins.getMinutes().getText() and 'submitter' not in info:
+            % if item2CheckMins.getMinutes() and item2CheckMins.getMinutes().getText():
                 menuOptions['deleteMinutes'] = {action: function(m) {
                     var popupHandler = function(action){
                         if(action){
@@ -65,7 +66,7 @@
                     return false;}, display: $T('Delete minutes')};
             % endif
 
-            % if getItemType(item) == 'Conference' and item.getVerboseType() != "Lecture" and 'submitter' not in info:
+            % if getItemType(item) == 'Conference' and item.getVerboseType() != "Lecture":
                 menuOptions['compileMinutes'] = {action: function(m) {
                     var popupHandler = function(action){
                         if(action){
@@ -77,7 +78,7 @@
                     return false;}, display: $T('Compile minutes')};
             % endif
 
-            % if 'materialLink' in info or 'submitter' in info:
+            % if 'materialLink' in info:
                 menuOptions['addMaterial'] = {action: function(m) {
                     IndicoUI.Dialogs.Material.editor('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
                         ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, true);

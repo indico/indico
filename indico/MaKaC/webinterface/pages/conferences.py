@@ -1061,7 +1061,8 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
                 info["materialLink"] = True
                 info["cloneLink"] = urlHandlers.UHConfClone.getURL(item)
             if item.getAccessController().canUserSubmit(self._rh._aw.getUser()):
-                info["submitter"] = True
+                info["minutesLink"] = True
+                info["materialLink"] = True
 
         elif itemType == 'Session':
             session = item.getSession()

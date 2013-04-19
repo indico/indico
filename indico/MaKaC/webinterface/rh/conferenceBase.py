@@ -212,6 +212,8 @@ class RHSubmitMaterialBase(object):
         self._loggedIn = True
         if self._getUser() == None and (isinstance(self._target, Category) or not self._target.getConference().canKeyModify(self._aw)):
             self._loggedIn = False
+        elif self._getUser() and isinstance(self._target, Conference) and self._target.getAccessController().canUserSubmit(self._getUser()):
+            self._loggedIn = True
         else:
             super(RHSubmitMaterialBase, self)._checkProtection()
 

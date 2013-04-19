@@ -9491,16 +9491,12 @@ class Contribution(CommonObjectBase, Locatable):
 
 
     def getSubmitterList(self):
-        """Gives the list of users with submission privileges
-
-            This is a temporary function used for creating the attribute in the
-            case it does not exist into the DB
-        """
         try:
             return self._submitters
         except AttributeError:
             self._submitters=[] #create the attribute
             self.notifyModification(raiseEvent = False)
+            return self._submitters
 
     def _grantSubmission(self,av):
         if av not in self.getSubmitterList():
@@ -9515,7 +9511,7 @@ class Contribution(CommonObjectBase, Locatable):
         """Returns True if submission email was granted. False if email was already in the list.
         """
         if not email.lower() in map(lambda x: x.lower(), self.getSubmitterEmailList()):
-            self.getSubmitterEmailList().append(email)
+            self.getSubmitterEmailList().append(email.lower().strip())
             return True
         return False
 
@@ -9691,19 +9687,12 @@ class AcceptedContribution( Contribution ):
         self._abstract = abs
 
     def getSubmitterList(self):
-        """Initialises submission privileges list for a contribution.
-
-            In the case of an AcceptedContribution, the list of submitters
-            must be initialised with the abstract's one.
-
-            This is a temporary function used for creating the attribute in the
-            case it does not exist into the DB
-        """
         try:
             return self._submitters
         except AttributeError:
             self._submitters=[]#create the attribute
             self._grantSubmission(self.getAbstract().getSubmitter().getUser())
+            return self._submitters
 
     def delete( self ):
         """deletes a contribution and all of their subitems

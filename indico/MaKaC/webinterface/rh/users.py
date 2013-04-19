@@ -339,10 +339,6 @@ class RHUserActive( RHUserBase ):
 
     def _process( self ):
         self._avatar.activateAccount()
-        #----Grant rights if anything
-        ph=pendingQueues.PendingQueuesHolder()
-        ph.grantRights(self._avatar)
-        #-----
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getModerateAccountCreation():
             mail.sendAccountActivated(self._avatar).send()

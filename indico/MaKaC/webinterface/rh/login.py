@@ -156,10 +156,6 @@ class RHActive( base.RH ):
             #return "your account is disabled. please, ask to enable it"
         elif self._key == av.getKey():
             av.activateAccount()
-            #----Grant any kind of rights if anything
-            ph=pendingQueues.PendingQueuesHolder()
-            ph.grantRights(av)
-            #-----
             p = signIn.WPAccountActivated( self, av )
             return p.display()
             #return "Your account is activate now"
