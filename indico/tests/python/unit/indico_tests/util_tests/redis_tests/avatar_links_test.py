@@ -48,8 +48,8 @@ class MockEvent(object):
 class MockAvatar(object):
     def __init__(self, aid):
         self.id = str(aid)
-        self.linkedTo = {'conference': {'manager': [],
-                                        'participant': []}}
+        self.linkedTo = {'conference': {'manager': set(),
+                                        'participant': set()}}
 
     def getId(self):
         return self.id
@@ -66,9 +66,9 @@ class TestLinks(IndicoTestCase):
         self._event3 = MockEvent(3, 200000)
         self._event4 = MockEvent(4, 150000)
 
-        self._avatar1.linkedTo['conference']['manager'] += [self._event3, self._event4]
-        self._avatar1.linkedTo['conference']['participant'] += [self._event1, self._event2, self._event4]
-        self._avatar2.linkedTo['conference']['manager'] += [self._event1, self._event3, self._event4]
+        self._avatar1.linkedTo['conference']['manager'] |= set([self._event3, self._event4])
+        self._avatar1.linkedTo['conference']['participant'] |= set([self._event1, self._event2, self._event4])
+        self._avatar2.linkedTo['conference']['manager'] |= set([self._event1, self._event3, self._event4])
 
     def testImport(self):
         self.assertFalse(self._redis.keys())

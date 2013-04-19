@@ -18,16 +18,15 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-
-#import ldap
 from pytz import all_timezones
 import httplib
 import urllib
 import base64
+import operator
 from xml.dom.minidom import parseString
-from copy import deepcopy
 from datetime import datetime, timedelta
 from persistent import Persistent
+from BTrees.OOBTree import OOSet, union
 
 import MaKaC
 import MaKaC.common.info as info
@@ -51,6 +50,7 @@ from MaKaC.common.fossilize import Fossilizable, fossilizes
 from indico.util.contextManager import ContextManager
 from indico.util.caching import order_dict
 from indico.util.i18n import i18nformat
+from indico.util.decorators import cached_classproperty
 
 """Contains the classes that implement the user management subsystem
 """
@@ -496,39 +496,37 @@ class Avatar(Persistent, Fossilizable):
     """
     fossilizes(IAvatarFossil, IAvatarAllDetailsFossil, IAvatarMinimalFossil)
 
-    linkedToBase = {"category":{"creator":[],
-                                "manager":[],
-                                "access":[],
-                                "favorite":[]},
-                    "conference":{"creator":[],
-                                "chair":[],
-                                "participant":[],
-                                "manager":[],
-                                "access":[],
-                                "registrar":[],
-                                "abstractSubmitter":[],
-                                "paperReviewManager":[],
-                                "referee":[],
-                                "editor":[],
-                                "reviewer":[]},
-                    "session":{"manager":[],
-                                "access":[],
-                                "coordinator":[]},
-                    "contribution":{"manager":[],
-                                "submission":[],
-                                "access":[],
-                                "referee":[],
-                                "editor":[],
-                                "reviewer":[]},
-                    "track":{"coordinator":[]},
-                    "material":{"access":[]},
-                    "resource":{"access":[]},
-                    "abstract":{"submitter":[]},
-                    "registration":{"registrant":[]},
-                    "alarm":{"to":[]},
-                    "group":{"member":[]},
-                    "evaluation":{"submitter":[]}
-                    }
+    # When this class is defined MaKaC.conference etc. are not available yet
+    @cached_classproperty
+    @classmethod
+    def linkedToMap(cls):
+        return {
+            'category': {'cls': MaKaC.conference.Category,
+                         'roles': set(['access', 'creator', 'favorite', 'manager'])},
+            'conference': {'cls': MaKaC.conference.Conference,
+                           'roles': set(['abstractSubmitter', 'access', 'chair', 'creator', 'editor', 'manager',
+                                         'paperReviewManager', 'participant', 'referee', 'registrar', 'reviewer'])},
+            'session': {'cls': MaKaC.conference.Session,
+                        'roles': set(['access', 'coordinator', 'manager'])},
+            'contribution': {'cls': MaKaC.conference.Contribution,
+                             'roles': set(['access', 'editor', 'manager', 'referee', 'reviewer', 'submission'])},
+            'track': {'cls': MaKaC.conference.Track,
+                      'roles': set(['coordinator'])},
+            'material': {'cls': MaKaC.conference.Material,
+                         'roles': set(['access'])},
+            'resource': {'cls': MaKaC.conference.Resource,
+                         'roles': set(['access'])},
+            'abstract': {'cls': MaKaC.review.Abstract,
+                         'roles': set(['submitter'])},
+            'registration': {'cls': MaKaC.registration.Registrant,
+                             'roles': set(['registrant'])},
+            'group': {'cls': MaKaC.user.Group,
+                      'roles': set(['member'])},
+            'evaluation': {'cls': MaKaC.evaluation.Submission,
+                           'roles': set(['submitter'])},
+            'alarm': {'cls': MaKaC.common.timerExec.Alarm,
+                      'roles': set(['to'])}
+        }
 
     def __init__(self, userData=None):
         """Class constructor.
@@ -708,18 +706,17 @@ class Avatar(Persistent, Fossilizable):
         self.apiKey = apiKey
 
     def getRelatedCategories(self):
-        favorites = set(self.getLinkTo('category', 'favorite'))
-        managed = set(self.getLinkTo('category', 'manager'))
+        favorites = self.getLinkTo('category', 'favorite')
+        managed = self.getLinkTo('category', 'manager')
         res = {}
-        for categ in favorites | managed:
+        for categ in union(favorites, managed):
             res[(categ.getTitle(), categ.getId())] = {
                 'categ': categ,
                 'favorite': categ in favorites,
                 'managed': categ in managed,
                 'path': self._truncatePath(categ.getCategoryPathTitles())
             }
-        categ_dict = OrderedDict(sorted(res.items(), key=lambda t: t[0]))
-        return categ_dict
+        return OrderedDict(sorted(res.items(), key=operator.itemgetter(0)))
 
     def _truncatePath(self, full_path):
         path = full_path[1:-1]
@@ -743,209 +740,48 @@ class Avatar(Persistent, Fossilizable):
         return " >> ".join(path)
 
     def resetLinkedTo(self):
-        self.linkedTo = deepcopy(self.linkedToBase)
+        self.linkedTo = {}
+        self.updateLinkedTo()
         self._p_changed = 1
 
     def getLinkedTo(self):
         try:
             return self.linkedTo
-        except:
+        except AttributeError:
             self.resetLinkedTo()
             return self.linkedTo
 
     def updateLinkedTo(self):
-        self.getLinkedTo() #Create attribute if not exist
-        for type in self.linkedToBase.keys():
-            if type not in self.linkedTo.keys():
-                self.linkedTo[type] = {}
-            for role in self.linkedToBase[type].keys():
-                if role not in self.linkedTo[type].keys():
-                    self.linkedTo[type][role] = []
+        self.getLinkedTo()  # Create attribute if does not exist
+        for field, data in self.linkedToMap.iteritems():
+            self.linkedTo.setdefault(field, {})
+            for role in data['roles']:
+                self.linkedTo[field].setdefault(role, OOSet())
 
     def linkTo(self, obj, role):
         self.updateLinkedTo()
-        if isinstance(obj, MaKaC.conference.Category):
-            if not role in self.linkedTo["category"].keys():
-                    raise  _("""role "%s" not allowed for categories""")%role
-            else:
-                if not obj in self.linkedTo["category"][role]:
-                    self.linkedTo["category"][role].append(obj)
-                    self._p_changed = 1
+        for field, data in self.linkedToMap.iteritems():
+            if isinstance(obj, data['cls']):
+                if role not in data['roles']:
+                    raise ValueError('role %s is not allowed for %s objects' % (role, type(obj).__name__))
+                self.linkedTo[field][role].add(obj)
+                self._p_changed = 1
+                break
 
-        elif isinstance(obj, MaKaC.conference.Conference):
-            if not role in self.linkedTo["conference"].keys():
-                    raise  _("""role "%s" not allowed for conferences""")%role
-            else:
-                if not obj in self.linkedTo["conference"][role]:
-                    self.linkedTo["conference"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Session):
-            if not role in self.linkedTo["session"].keys():
-                    raise  _("""role "%s" not allowed for sessions""")%role
-            else:
-                if not obj in self.linkedTo["session"][role]:
-                    self.linkedTo["session"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Contribution):
-            if not role in self.linkedTo["contribution"].keys():
-                    raise  _("""role "%s" not allowed for contributions""")%role
-            else:
-                if not obj in self.linkedTo["contribution"][role]:
-                    self.linkedTo["contribution"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Track):
-            if not role in self.linkedTo["track"].keys():
-                    raise  _("""role "%s" not allowed for tracks""")%role
-            else:
-                if not obj in self.linkedTo["track"][role]:
-                    self.linkedTo["track"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Material):
-            if not role in self.linkedTo["material"].keys():
-                    raise  _("""role "%s" not allowed for materials""")%role
-            else:
-                if not obj in self.linkedTo["material"][role]:
-                    self.linkedTo["material"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Resource):
-            if not role in self.linkedTo["resource"].keys():
-                    raise  _("""role "%s" not allowed for resources""")%role
-            else:
-                if not obj in self.linkedTo["resource"][role]:
-                    self.linkedTo["resource"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.review.Abstract):
-            if not role in self.linkedTo["abstract"].keys():
-                    raise  _("""role "%s" not allowed for abstracts""")%role
-            else:
-                if not obj in self.linkedTo["abstract"][role]:
-                    self.linkedTo["abstract"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.registration.Registrant):
-            if not role in self.linkedTo["registration"].keys():
-                    raise  _("""role "%s" not allowed for registrants""")%role
-            else:
-                if not obj in self.linkedTo["registration"][role]:
-                    self.linkedTo["registration"][role].append(obj)
-
-                     # add directly to the time-ordered list
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.user.Group):
-            if not role in self.linkedTo["group"].keys():
-                    raise  _("""role "%s" not allowed for groups""")%role
-            else:
-                if not obj in self.linkedTo["group"][role]:
-                    self.linkedTo["group"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.evaluation.Submission):
-            if not role in self.linkedTo["evaluation"].keys():
-                    raise  _("""role "%s" not allowed for submissions""")%role
-            else:
-                if not obj in self.linkedTo["evaluation"][role]:
-                    self.linkedTo["evaluation"][role].append(obj)
-                    self._p_changed = 1
-
-    def getLinkTo( self, type, role ):
+    def getLinkTo(self, field, role):
         self.updateLinkedTo()
-        if self.linkedTo.has_key(type):
-            if self.linkedTo[type].has_key(role):
-                return self.linkedTo[type][role]
-        return []
+        return self.linkedTo[field][role]
 
     def unlinkTo(self, obj, role):
         self.updateLinkedTo()
-        if isinstance(obj, MaKaC.conference.Category):
-            if not role in self.linkedTo["category"].keys():
-                    raise  _("""role "%s" not allowed for categories""")%role
-            else:
-                if obj in self.linkedTo["category"][role]:
-                    self.linkedTo["category"][role].remove(obj)
+        for field, data in self.linkedToMap.iteritems():
+            if isinstance(obj, data['cls']):
+                if role not in data['roles']:
+                    raise ValueError('role %s is not allowed for %s objects' % (role, type(obj).__name__))
+                if obj in self.linkedTo[field][role]:
+                    self.linkedTo[field][role].remove(obj)
                     self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Conference):
-            if not role in self.linkedTo["conference"].keys():
-                    raise  _("""role "%s" not allowed for conferences""")%role
-            else:
-                if obj in self.linkedTo["conference"][role]:
-                    self.linkedTo["conference"][role].remove(obj)
-
-                    # remove from the time-ordered list
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Session):
-            if not role in self.linkedTo["session"].keys():
-                    raise  _("""role "%s" not allowed for sessions""")%role
-            else:
-                if obj in self.linkedTo["session"][role]:
-                    self.linkedTo["session"][role].remove(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Contribution):
-            if not role in self.linkedTo["contribution"].keys():
-                    raise  _("""role "%s" not allowed for contributions""")%role
-            else:
-                if obj in self.linkedTo["contribution"][role]:
-                    self.linkedTo["contribution"][role].remove(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Track):
-            if not role in self.linkedTo["track"].keys():
-                    raise  _("""role "%s" not allowed for tracks""")%role
-            else:
-                if obj in self.linkedTo["track"][role]:
-                    self.linkedTo["track"][role].remove(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Material):
-            if not role in self.linkedTo["material"].keys():
-                    raise  _("""role "%s" not allowed for materials""")%role
-            else:
-                if obj in self.linkedTo["material"][role]:
-                    self.linkedTo["material"][role].remove(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.review.Abstract):
-            if not role in self.linkedTo["abstract"].keys():
-                    raise  _("""role "%s" not allowed for abstracts""")%role
-            else:
-                if obj in self.linkedTo["abstract"][role]:
-                    self.linkedTo["abstract"][role].remove(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.registration.Registrant):
-            if not role in self.linkedTo["registration"].keys():
-                    raise  _("""role "%s" not allowed for registrations""")%role
-            else:
-                if obj in self.linkedTo["registration"][role]:
-                    self.linkedTo["registration"][role].remove(obj)
-
-                    # remove from the time-ordered list
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.user.Group):
-            if not role in self.linkedTo["group"].keys():
-                    raise  _("""role "%s" not allowed for groups""")%role
-            else:
-                if obj in self.linkedTo["group"][role]:
-                    self.linkedTo["group"][role].remove(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.evaluation.Submission):
-            if not role in self.linkedTo["evaluation"].keys():
-                    raise  _("""role "%s" not allowed for submissions""")%role
-            else:
-                if obj in self.linkedTo["evaluation"][role]:
-                    self.linkedTo["evaluation"][role].remove(obj)
-                    self._p_changed = 1
+                break
 
     def getStatus( self ):
         try:

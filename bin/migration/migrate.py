@@ -722,6 +722,22 @@ def indexConferenceTitle(dbi, withRBDB, prevVersion):
         if i % 10000 == 0:
             dbi.commit()
 
+
+@since('1.1')
+def convertLinkedTo(dbi, withRBDB, prevVersion):
+    """Convert Avatar.linkedTo stcuture to use OOSets"""
+    for i, avatar in enumerate(AvatarHolder()._getIdx().itervalues()):
+        avatar.updateLinkedTo()  # just in case some avatars do not have all fields
+        linkedTo = avatar.linkedTo
+        avatar.resetLinkedTo()  # nuke old links
+        for field, data in avatar.linkedToMap.iteritems():
+            for role in data['roles']:
+                avatar.linkedTo[field][role].update(linkedTo[field][role])
+        if i % 1000 == 0:
+            dbi.commit()
+    dbi.commit()
+
+
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
                  specified=[], dryRun=False):
 
