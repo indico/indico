@@ -291,27 +291,34 @@ class AbstractData(object):
 
 class AbstractParam:
 
+    def __init__(self):
+        self._abstract = None
+
     def _checkParams(self, params, conf, headerSize):
         if params.has_key("abstractId"): # we are in modify
             self._abstract = self._target =  conf.getAbstractMgr().getAbstractById(params["abstractId"])
+
         self._action = ""
         if "cancel" in params:
             self._action = "CANCEL"
             return
+
         typeId = params.get("type", "")
+        display_values = False
+
         params["type"] = conf.getContribTypeById(typeId)
-        if not params.has_key("prAuthors") or not params.has_key("coAuthors"): # loading form (with or without values)
-            try: # if the the abstract exists, get the current values to show them
-                params["prAuthors"] = self._abstract.getPrimaryAuthorList()
-                params["coAuthors"] = self._abstract.getCoAuthorList()
-                params["file"] = self._abstract.getAttachments().values()
-                self._abstractData = AbstractData(conf.getAbstractMgr(), params, headerSize, displayValues=True)
-            except AttributeError: # first call to submit a new abstract
-                self._abstractData = AbstractData(self._conf.getAbstractMgr(), params, headerSize, displayValues=False)
-        else:
-            # we are submitting a new abstract or modifying
-            self._abstractData = AbstractData(conf.getAbstractMgr(), params, headerSize, displayValues=False)
+
+        if ("prAuthors" not in params or "coAuthors" not in params) and self._abstract:
+            params.update({
+                "prAuthors": self._abstract.getPrimaryAuthorList(),
+                "coAuthors": self._abstract.getCoAuthorList(),
+                "file": self._abstract.getAttachments().values()
+            })
+            display_values = True
+
+        self._abstractData = AbstractData(conf.getAbstractMgr(), params, headerSize, displayValues=display_values)
         self._doNotSanitizeFields = self._abstractData.getFieldNames()
         self._doNotSanitizeFields.append('title')
+
         if "validate" in params:
             self._action = "VALIDATE"
