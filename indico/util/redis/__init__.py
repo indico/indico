@@ -60,6 +60,8 @@ def _get_redis_pipeline():
         raise Exception('Cannot get Redis pipeline outside a request')
     if rh._redisPipeline:
         return rh._redisPipeline
+    if not client:
+        return None
     rh._redisPipeline = client.pipeline(transaction=False)
     return rh._redisPipeline
 
