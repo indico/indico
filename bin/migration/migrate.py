@@ -15,7 +15,6 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-
 """
 Migration script
 
@@ -56,6 +55,7 @@ from indico.util import console, i18n
 from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
      CategoryStatisticsUpdaterTask
 from indico.modules import ModuleHolder
+from MaKaC.common.dvdCreation import OfflineWebsiteCreator
 
 
 from indico.modules.scheduler import Client
@@ -281,6 +281,8 @@ def taskMigration(dbi, withRBDB, prevVersion):
     for t in HelperTaskList().getTaskListInstance().getTasks():
         for obj in t.listObj.values():
             print console.colored("   * %s" % obj.__class__.__name__, 'blue')
+            if isinstance(obj, OfflineWebsiteCreator):
+                continue
             if obj.__class__.__name__ == 'FoundationSync':
                 c.enqueue(
                     FoundationSyncTask(rrule.DAILY, byhour=0, byminute=0))
