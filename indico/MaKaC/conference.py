@@ -2025,9 +2025,9 @@ class Conference(CommonObjectBase, Locatable):
         #IndexedObject.__init__(self)
         if creator == None:
             raise MaKaCError( _("A creator must be specified when creating a new Event"), _("Event"))
+        self.id = id
         self.__creator = creator
         self.__creator.linkTo(self, "creator")
-        self.id = id
         self.title = ""
         self.description = ""
         self.places = []
