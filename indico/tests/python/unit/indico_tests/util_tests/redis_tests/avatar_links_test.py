@@ -17,8 +17,20 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from collections import OrderedDict
+import os
 from indico.tests.python.unit.util import IndicoTestCase
 import indico.util.redis.avatar_links as avatar_links
+
+
+# skip tests if redis is not available
+def setup_module():
+    import nose
+    if not os.path.exists('/usr/sbin/redis-server'):
+        raise nose.SkipTest
+    try:
+        import redis
+    except ImportError:
+        raise nose.SkipTest
 
 
 class MockEvent(object):
