@@ -104,6 +104,8 @@ from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Cata
 from indico.core.db.event import SupportInfo
 from MaKaC.schedule import ScheduleToJson
 
+from indico.util.redis import write_client as redis_write_client
+import indico.util.redis.avatar_links as avatar_links
 
 class CoreObject(Persistent):
     """
@@ -2752,6 +2754,10 @@ class Conference(CommonObjectBase, Locatable):
         for manager in self.getManagerList():
             if isinstance(manager, MaKaC.user.Avatar):
                 manager.unlinkTo(self, "manager")
+
+        # Remove all links in redis
+        if redis_write_client:
+            avatar_links.delete_event(redis_write_client, self)
 
         # Remote short URL mappings
         sum = ShortURLMapper()
