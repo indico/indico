@@ -7578,7 +7578,6 @@ class ContributionParticipation(Persistent, Fossilizable):
             return False
         return self.getContribution().canUserSubmit(self)
 
-
     def isPendingSubmitter(self):
         if self.getContribution() is None:
             return False
@@ -9490,12 +9489,16 @@ class Contribution(CommonObjectBase, Locatable):
             self.getCurrentStatus().withdraw(resp,comment)
 
 
-    def getSubmitterList(self):
+    def getSubmitterList(self, no_groups=False):
         try:
-            return self._submitters
+            if self._submitters:
+                pass
         except AttributeError:
             self._submitters=[] #create the attribute
             self.notifyModification(raiseEvent = False)
+        if no_groups:
+            return filter(lambda s: not isinstance(s, MaKaC.user.Group), self._submitters)
+        else:
             return self._submitters
 
     def _grantSubmission(self,av):
@@ -9595,7 +9598,11 @@ class Contribution(CommonObjectBase, Locatable):
 
         if isinstance(sb, ContributionParticipation) or isinstance(sb, SubContribParticipation):
             sbEmail = sb.getEmail()
-            return any(submitter.hasEmail(sbEmail) for submitter in self.getSubmitterList()) or \
+
+            # Normally, we shouldn't get here unless we're adding someone as a Speaker or similar.
+            # `no_groups` is used so that we do not consider group membership, as to not confuse the
+            # user (since there will be speakers with "implicit" privileges) and avoid that hasEmail breaks
+            return any(submitter.hasEmail(sbEmail) for submitter in self.getSubmitterList(no_groups=True)) or \
                    any(submitterEmail == sbEmail for submitterEmail in self.getSubmitterEmailList())
 
         for principal in self.getSubmitterList():
