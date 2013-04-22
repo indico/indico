@@ -68,7 +68,7 @@
     border: 0;
 }
 
-.dashboard-box ol li a {
+.dashboard-box ol li a, .dashboard-box ol li.no-event span {
     border-bottom: 1px solid #E5E5E5;
     display: block;
     font-size: 14px;
@@ -84,19 +84,9 @@
     -ms-user-select: none;
 }
 
-.dashboard-box ol li:last-child a {
+.dashboard-box ol li:last-child a, .dashboard-box ol li.no-event:last-child span {
     border-bottom: none;
 }
-
-.dashboard-box ol li.no-event a {
-    cursor: default;
-}
-
-.dashboard-box ol li.no-event a .event-title,
-.dashboard-box ol li.no-event a .category-title {
-    text-decoration: none !important;
-}
-
 
 .dashboard-box ol li a:hover .event-title,
 .dashboard-box ol li a:hover .category-title {

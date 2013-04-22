@@ -9,10 +9,10 @@
                 <h3>${_("Your events")}</h3>
                 <ol>
                 <%doc>
-                % if len(events) == 0:
-                    <li class="no-event"><a>
+                % if events:
+                    <li class="no-event">
                         <span class="event-title italic text-superfluous">${_("You have no events.")}</span>
-                    </a></li>
+                    </li>
                 % else:
                 % for event in events.values():
                     <li><a href="${event["url"]}" class="truncate">
@@ -34,22 +34,22 @@
             <div id="yourCategories" class="dashboard-box">
                 <h3>${_("Your categories")}</h3>
                 <ol>
-                % if len(categories) == 0:
-                    <li class="no-event"><a>
+                % if not categories:
+                    <li class="no-event">
                         <span class="event-title italic text-superfluous">${_("You have no categories.")}</span>
-                    </a></li>
+                    </li>
                 % else:
-                % for category in categories.values():
+                % for category in categories.itervalues():
                     <li><a href="${urlHandlers.UHCategoryDisplay.getURL(category["categ"])}" class="truncate">
                         <span class="category-title truncate-target">${category["categ"].getTitle()}</span>
                         <span class="item-legend">
-                            % if category["managed"] is True:
+                            % if category["managed"]:
                             <span title="You have management rights" class="icon-medal contextHelp active"></span>
                             % else:
                             <span title="You have favorited this category" class="icon-star contextHelp active"></span>
-                            % endif:
+                            % endif
                         </span>
-                        % if len(category["path"]) > 0:
+                        % if category["path"]:
                             <span class="category-path">${category["path"]}</span>
                         % endif
                     </a></li>
@@ -60,10 +60,10 @@
             <div id="happeningCategories" class="dashboard-box">
                 <h3>${_("Happening in your categories")}</h3>
                 <ol>
-                % if len(categories) == 0:
-                    <li class="no-event"><a>
+                % if not categories:
+                    <li class="no-event">
                         <span class="event-title italic text-superfluous">${_("You have no categories.")}</span>
-                    </a></li>
+                    </li>
                 % endif
                 </ol>
             </div>
@@ -129,44 +129,50 @@ $(document).ready(function(){
             order: "start"
     };
 
-    apiRequest("/user/linked_events", api_opts).done(function(resp) {
+    apiRequest("/user/linked_events", api_opts).done(function (resp) {
+        var html = '';
         if (resp.count === 0) {
-            $("#yourEvents ol").append(
-                    '<li class="no-event"><a> \
-                        <span class="event-title italic text-superfluous">' + $T("You have no events.") + '</span> \
-                </a></li>');
+            html += '<li class="no-event"> \
+                         <span class="event-title italic text-superfluous">' + $T("You have no events.") + '</span> \
+                     </li>';
         } else {
-            $.each(resp.results, function(i, item) {
-                $("#yourEvents ol").append(
-                        '<li id="event-' + item.id + '" class="truncate"><a href="' + item.url + '" class="truncate"> \
-                        <span class="event-date">' + getDate(item.startDate, item.endDate) + '</span> \
-                        <span class="event-title truncate-target">' + item.title + '</span> \
-                        <span class="item-legend"> \
-                            <span title="You have management rights" class="icon-medal contextHelp ' + hasRights(item.roles, managementFilter) + '"></span> \
-                            <span title="You are a reviewer" class="icon-reading contextHelp ' + hasRights(item.roles, reviewFilter) + '"></span> \
-                            <span title="You are an attendee" class="icon-ticket contextHelp ' + hasRights(item.roles, attendanceFilter) + '"></span> \
-                        </span> \
-                   </a></li>');
+            $.each(resp.results, function (i, item) {
+                html += '<li id="event-' + item.id + '" class="truncate"> \
+                             <a href="' + item.url + '" class="truncate"> \
+                                 <span class="event-date">' + getDate(item.startDate, item.endDate) + '</span> \
+                                 <span class="event-title truncate-target">' + item.title + '</span> \
+                                 <span class="item-legend"> \
+                                     <span title="You have management rights" class="icon-medal contextHelp ' + hasRights(item.roles, managementFilter) + '"></span> \
+                                     <span title="You are a reviewer" class="icon-reading contextHelp ' + hasRights(item.roles, reviewFilter) + '"></span> \
+                                     <span title="You are an attendee" class="icon-ticket contextHelp ' + hasRights(item.roles, attendanceFilter) + '"></span> \
+                                 </span> \
+                             </a>\
+                         </li>';
             });
         }
+        var list = $("#yourEvents ol");
+        list.append(html);
+        // Enable tooltips for active roles and delete them for inactive ones
+        list.find('.contextHelp[title].active').qtip();
+        list.find('.contextHelp[title]:not(.active)').removeAttr('title');
     });
 
     apiRequest("/user/categ_events", api_opts).done(function(resp) {
+        var html = '';
         if (resp.count === 0) {
-            $("#happeningCategories ol").append(
-                    '<li class="no-event"><a> \
-                        <span class="event-title italic text-superfluous">' + $T("Nothing happening in your categories.") + '</span> \
-                     </a></li>');
+            html += '<li class="no-event"> \
+                         <span class="event-title italic text-superfluous">' + $T("Nothing happening in your categories.") + '</span> \
+                     </li>';
         } else {
             $.each(resp.results, function(i, item) {
-                $("#happeningCategories ol").append(
-                        '<li class="truncate"><a href="' + item.url + '" class="truncate"> \
+                html += '<li class="truncate"><a href="' + item.url + '" class="truncate"> \
                             <span class="event-date">' + getDate(item.startDate, item.endDate) + '</span> \
                             <span class="event-title truncate-target">' + item.title + '</span> \
                             <span class="event-category">' + item.category + '</span> \
-                         </a></li>');
+                         </a></li>';
             });
         }
+        $("#happeningCategories ol").append(html);
     });
 
     var getDate = function(startDate, endDate) {
@@ -187,9 +193,5 @@ $(document).ready(function(){
         }
         return "";
     };
-
-    /* Interface */
-    $(".contextHelp[title]").qtip("disable");
-    $(".contextHelp[title].active").qtip("enable");
 });
 </script>
