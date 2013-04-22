@@ -1396,9 +1396,6 @@ class WUserDashboard(wcomponents.WTemplated):
     def __init__(self, av):
         self._avatar = av
 
-    def getHTML(self, currentUser, params):
-        return wcomponents.WTemplated.getHTML(self, params)
-
     def getVars(self):
         html_vars = wcomponents.WTemplated.getVars(self)
         user = self._avatar
@@ -1534,7 +1531,7 @@ class WPUserDashboard(WPPersonalArea):
 
     def _getTabContent(self, params):
         c = WUserDashboard(self._avatar)
-        return c.getHTML(self._getAW().getUser(), params)
+        return c.getHTML(params)
 
     def _setActiveTab(self):
         self._tabRights.setActive()
