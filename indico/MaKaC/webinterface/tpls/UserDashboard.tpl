@@ -124,9 +124,10 @@ $(document).ready(function(){
                              "evaluation_submitter"];
 
     var api_opts = {
-            limit: "10",
-            from: "today",
-            order: "start"
+        limit: "10",
+        from: "today",
+        order: "start",
+        userid: "${ rh._avatar.getId() }"
     };
 
     apiRequest("/user/linked_events", api_opts).done(function (resp) {

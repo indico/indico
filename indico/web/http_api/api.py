@@ -65,6 +65,7 @@ from MaKaC.rb_tools import Period, datespan
 from MaKaC.schedule import ScheduleToJson
 from MaKaC.common.logger import Logger
 from MaKaC.errors import NoReportError
+from MaKaC.user import AvatarHolder
 
 utc = pytz.timezone('UTC')
 MAX_DATETIME = utc.localize(datetime(2099, 12, 31, 23, 59, 0))
@@ -725,18 +726,35 @@ class UserEventHook(HTTPAPIHook):
     def _getParams(self):
         super(UserEventHook, self)._getParams()
         self._what = self._pathParams['what']
+        self._avatar = None
+        # User-specified avatar
+        userId = get_query_parameter(self._queryParams, ['uid', 'userid'])
+        if userId is not None:
+            self._avatar = AvatarHolder().getById(userId)
+            if not self._avatar:
+                raise HTTPAPIError('Avatar does not exist')
 
     def _getMethodName(self):
         return self.PREFIX + '_' + self._what
 
+    def _checkProtection(self, aw):
+        if not self._avatar:
+            # No avatar specified => use self. No need to check any permissinos.
+            self._avatar = aw.getUser()
+            return
+        elif not self._avatar.canUserModify(aw.getUser()):
+            raise HTTPAPIError('Access denied')
+
     def export_linked_events(self, aw):
         if not redis_client:
             raise HTTPAPIError('This API is only available when using Redis')
-        links = avatar_links.get_links(redis_client, aw.getUser())
+        self._checkProtection(aw)
+        links = avatar_links.get_links(redis_client, self._avatar)
         return UserRelatedEventFetcher(aw, self, links).events(links.keys())
 
     def export_categ_events(self, aw):
-        catIds = [item['categ'].getId() for item in aw.getUser().getRelatedCategories().itervalues()]
+        self._checkProtection(aw)
+        catIds = [item['categ'].getId() for item in self._avatar.getRelatedCategories().itervalues()]
         return UserCategoryEventFetcher(aw, self).category_events(catIds)
 
 
