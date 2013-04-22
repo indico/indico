@@ -6,110 +6,6 @@
         var maxRoomCapacity = ${ max(room.capacity for room in rooms) };
     % endif
 
-    // Save calendar data
-    function saveCalendarData(finishDate) {
-        $("#sDay").val($("#sDatePlace").datepicker('getDate').getDate());
-        $("#sMonth").val(parseInt($("#sDatePlace").datepicker('getDate').getMonth() + 1));
-        $("#sYear").val($("#sDatePlace").datepicker('getDate').getFullYear());
-        if (finishDate == 'true') {
-            $("#eDay").val($("#eDatePlace").datepicker('getDate').getDate());
-            $("#eMonth").val(parseInt($("#eDatePlace").datepicker('getDate').getMonth() + 1));
-            $("#eYear").val($("#eDatePlace").datepicker('getDate').getFullYear());
-        } else {
-            $("#eDay").val($("#sDatePlace").datepicker('getDate').getDate());
-            $("#eMonth").val(parseInt($("#sDatePlace").datepicker('getDate').getMonth() + 1));
-            $("#eYear").val($("#sDatePlace").datepicker('getDate').getFullYear());
-        }
-    }
-
-    // Store all fields in local storage
-    function saveFormData() {
-        // Prepare selected rooms
-        var selectedRooms = new Array();
-        $('.ui-multiselect-menu input:checkbox').each(function(index) {
-            if ($(this).attr('aria-selected') == "true") {
-                selectedRooms.push(index);
-            }
-        });
-
-        saveCalendarData($('#finishDate').val());
-
-        $.jStorage.set("sDay", $("#sDay").val());
-        $.jStorage.set("sMonth", $("#sMonth").val());
-        $.jStorage.set("sYear", $("#sYear").val());
-        $.jStorage.set("eDay", $("#eDay").val());
-        $.jStorage.set("eMonth", $("#eMonth").val());
-        $.jStorage.set("eYear", $("#eYear").val());
-        $.jStorage.set("sTime", $('#sTime').val());
-        $.jStorage.set("eTime", $('#eTime').val());
-        $.jStorage.set("capacity", $('#capacity').val());
-        $.jStorage.set("videoconference", $('#videoconference').is(':checked'));
-        $.jStorage.set("webcast", $('#webcast').is(':checked'));
-        $.jStorage.set("publicroom", $('#publicroom').is(':checked'));
-        $.jStorage.set("filter",  $('.ui-multiselect-filter :input').val());
-        $.jStorage.set("selectedRooms",  selectedRooms);
-        $.jStorage.set("showAdvancedOptions",  $('#advancedOptions').is(":visible"));
-        $.jStorage.set("finishDate", $('#finishDate').val());
-        $.jStorage.set("flexibleDates", $('#flexibleDates').is(':checked'));
-        $.jStorage.set("flexibleDatesRange", $('#flexibleDatesRange').val());
-        $.jStorage.set("repeatability", $('#repeatability').val());
-
-        var ttl = 7200000; // 2 hours
-        $.jStorage.setTTL("sDay", ttl);
-        $.jStorage.setTTL("sMonth", ttl);
-        $.jStorage.setTTL("sYear", ttl);
-        $.jStorage.setTTL("eDay", ttl);
-        $.jStorage.setTTL("eMonth", ttl);
-        $.jStorage.setTTL("eYear", ttl);
-        $.jStorage.setTTL("sTime", ttl);
-        $.jStorage.setTTL("eTime", ttl);
-        $.jStorage.setTTL("capacity", ttl);
-        $.jStorage.setTTL("videoconference", ttl);
-        $.jStorage.setTTL("webcast", ttl);
-        $.jStorage.setTTL("publicroom", ttl);
-        $.jStorage.setTTL("filter", ttl);
-        $.jStorage.setTTL("selectedRooms", ttl);
-        $.jStorage.setTTL("showAdvancedOptions", ttl);
-        $.jStorage.setTTL("finishDate", ttl);
-        $.jStorage.setTTL("flexibleDates", ttl);
-        $.jStorage.setTTL("flexibleDatesRange", ttl);
-        $.jStorage.setTTL("repeatability", ttl);
-    }
-
-    // Restore selected rooms from local Storage
-    function restoreSelection(selectedRooms) {
-         if ($("#roomGUID").multiselect("getChecked").length == 0)
-             $("#roomGUID").multiselect("widget").find(":checkbox").each(function(index) {
-                 if (jQuery.inArray(index, selectedRooms) != -1) {
-                     this.click();
-                 }
-             });
-    }
-    // Show advanced option search menu
-    function showAdvancedOptions() {
-        if ($('#advancedOptions').is(":visible")) {
-            $("#advancedOptions input:checkbox").attr("checked", false);
-            $("#advancedOptions input:text").val('');
-            $('#advancedOptions').hide();
-            $('#advancedOptionsText').css('color', '#0B63A5');
-            $('#advancedOptionsText').html($T('Show advanced'));
-            advancedFilter();
-        } else {
-            $('#advancedOptions').show();
-            $('#advancedOptionsText').html($T('Hide advanced'));
-            updateCapacitySlider();
-        }
-    }
-
-    // Trigger filter basic or advanced filter
-    function advancedFilter() {
-        $('.ui-multiselect-filter :input').watermark('');
-
-        var filterString = $("#videoconference").is(':checked') + ":" + $("#webcast").is(':checked') + ":" + $("#publicroom").is(':checked') + ":" + $("#capacity").val();
-        $('#roomGUID').multiselectfilter('advancedFilter', filterString);
-        $('.ui-multiselect-filter :input').watermark('Search: name, number, location...');
-    }
-
     // Reds out the invalid textboxes and returns false if something is invalid.
     // Returns true if form may be submited.
     function validateForm(onSubmit) {
@@ -133,7 +29,7 @@
             var holidaysWarning = indicoSource('roomBooking.getDateWarning', searchForm.serializeObject());
             holidaysWarning.state.observe(function(state) {
                 if (state == SourceState.Loaded) {
-                    $('#holidays-warning').html("<strong>Info: </strong>" + holidaysWarning.get());
+                    $('#holidays-warning').html($T("<strong>Info: </strong>") + holidaysWarning.get());
                     if (holidaysWarning.get() == '')
                         $('#holidays-warning').hide();
                     else
@@ -168,64 +64,6 @@
         }
 
         return isValid;
-    }
-
-    // Converting from time string to seconds
-    function getTime(time) {
-        var minutes = parseInt(time % 60);
-        var hours = parseInt(time / 60 % 24);
-        minutes = minutes + "";
-        if (minutes.length == 1) {
-            minutes = "0" + minutes;
-        }
-        return hours + ":" + minutes;
-    }
-
-    // Refresh time slider
-    function updateTimeSlider(event, ui) {
-        if (event && event.type != "slidecreate" ) {
-            $("#sTime").val(getTime(ui.values[0]));
-            $("#eTime").val(getTime(ui.values[1]));
-        }
-        var sTime = parseInt($("#sTime").val().split(":")[0] * 60) + parseInt($("#sTime").val().split(":")[1]);
-        var eTime = parseInt($("#eTime").val().split(":")[0] * 60) + parseInt($("#eTime").val().split(":")[1]);
-        if (sTime && eTime || sTime == 0) {
-            $('#timeRange').slider('values', 0, sTime).slider('values', 1, eTime);
-        }
-        $('#sTimeBubble').text($("#sTime").val()).css({'left':$('#timeRange .ui-slider-handle:first').offset().left});
-        $('#eTimeBubble').text($("#eTime").val()).css({'left':$('#timeRange .ui-slider-handle:last').offset().left});
-    }
-
-    // Refresh capacity slider
-    function updateCapacitySlider(event, ui) {
-        if (event && event.type != "slidecreate" ) {
-            $("#capacity").val(ui.value);
-        }
-        $('#capacityRange').slider('value', $("#capacity").val());
-    }
-
-    // Multiselect style modification
-    function changeSelectedStyle(selector) {
-        if(selector.attr('checked') === undefined) {
-            selector.parent().removeClass('ui-state-selected');
-        } else {
-            selector.parent().addClass('ui-state-selected');
-        }
-
-    };
-
-    function changeSelectedStyleAll() {
-        $('.RoomBooking.ui-multiselect-menu input:checkbox').each(function() {
-            changeSelectedStyle($(this));
-        });
-        updateSelectionCounter();
-    };
-
-    function updateSelectionCounter() {
-        var o = $("#roomGUID").multiselect("option");
-        if (o.autoOpen){
-            $('.RoomBooking .ui-multiselect-selection-counter').text(o.selectedText.replace('#', $(".RoomBooking.ui-multiselect-menu input:checked").length));
-        }
     }
 
     $(window).load(function() {
@@ -417,7 +255,7 @@
         advancedFilter();
 
         // Set watermarks
-        $('.ui-multiselect-filter :input').watermark('Search: name, number, location...');
+        $('.ui-multiselect-filter :input').watermark($T('Search: name, number, location...'));
         $('#capacity').watermark('0');
 
         // CSS and text
@@ -494,15 +332,15 @@
         <tr>
             <td>
                 <ul id="breadcrumbs" style="margin:0px 0px 0px -15px; padding: 0; list-style: none;">
-                    <li><span class="current">Specify Search Criteria</span></li>
-                    <li><span>Select Available Period</span></li>
-                    <li><span>Confirm Reservation</span></li>
+                    <li><span class="current">${_("Specify Search Criteria")}</span></li>
+                    <li><span>${_("Select Available Period")}</span></li>
+                    <li><span>${_("Confirm Reservation")}</span></li>
                 </ul>
             </td>
         </tr>
         <tr>
             <td>
-                <div class="groupTitle bookingTitle" style="padding-top: 0px">${ _("Choose rooms") }</div>
+                <div class="groupTitle bookingTitle">${ _("Choose rooms") }</div>
             </td>
         </tr>
         <!-- ROOMS -->
@@ -590,12 +428,12 @@
         <!-- DATES -->
         <tr>
             <td>
-                <div class="groupTitle bookingTitle">${ _("Select date range") }</div>
+                <div class="groupTitle bookingTitle" style="padding-top: 20px;">${ _("Select date range") }</div>
             </td>
         </tr>
         <tr>
             <td style="text-align: center;" >
-                <div style="float: left; clear: both; padding-bottom: 20px;">
+                <div style="float: left; clear: both; padding-bottom: 30px;">
                     ${ _("Type")}
                     <select name="repeatability" id="repeatability" style=" width: 230px;">
                         <option value="None"> ${ _("Single reservation")}</option>
@@ -606,11 +444,11 @@
                         <option value="4"> ${ _("Repeat every month")}</option>
                     </select>
                 </div>
-                <div id="sDatePlaceDiv" class="titleCellFormat" style="clear: both; float: left; padding-right: 35px;" >
+                <div id="sDatePlaceDiv" class="titleCellFormat bookDateDiv" style="clear: both;" >
                     <span id='sDatePlaceTitle' class='label'>${ _("Booking date")}</span>
                     <div id="sDatePlace"></div>
                 </div>
-                <div id="eDatePlaceDiv" class="titleCellFormat" style="float: left; display: none" >
+                <div id="eDatePlaceDiv" class="titleCellFormat bookDateDiv" style="display: none;" >
                     <span id='eDatePlaceTitle' class='label'>${ _("End date")}</span>
                     <div id="eDatePlace"></div>
                 </div>
@@ -636,7 +474,7 @@
         <!-- TIME -->
         <tr>
             <td>
-                <div class="groupTitle bookingTitle">${ _("Select time range") }</div>
+                <div class="groupTitle bookingTitle" style="padding-top: 30px;">${ _("Select time range") }</div>
             </td>
         </tr>
         <tr>
@@ -650,7 +488,7 @@
         <!-- TIME SLIDER-->
         <tr>
             <td>
-                <div style="margin: 13px 0px 32px 8px">
+                <div style="margin: 13px 0px 32px 0px; padding-top: 10px;">
                     <div id="minHour" style="float: left; color: gray; padding-right: 12px">0:00</div>
                     <div id="timeRange" style="width: 390px; float: left;"></div>
                     <div id="maxHour" style="float: left; color: gray; padding-left: 12px">23:59</div>
@@ -673,6 +511,7 @@
                   </li>
                   <li style="display: none"></li>
                 </ul>
+                <span style="float: right;"><a href=${quoteattr(str(urlHandlers.UHRoomBookingSearch4Rooms.getURL( forNewBooking = True )))}>${_("Former booking interface")}</a></span>
             </td>
         </tr>
     </table>

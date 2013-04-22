@@ -83,6 +83,7 @@ indico_management = Bundle('js/indico/Management/ConfModifDisplay.js',
                            filters='rjsmin', output='indico_management_%(version)s.min.js')
 
 indico_room_booking = Bundle('js/indico/RoomBooking/MapOfRooms.js',
+                             'js/indico/RoomBooking/BookingForm.js',
                              'js/indico/RoomBooking/RoomBookingCalendar.js',
 							 'js/indico/jquery/multiselect.js',
                              filters='rjsmin', output='indico_room_booking_%(version)s.min.js')

@@ -120,6 +120,7 @@ class WPRoomBookingBase( WPMainBase ):
         self._bookARoomOpt = wcomponents.SideMenuItem(_("Book a Room (Old)"), \
                                         urlHandlers.UHRoomBookingSearch4Rooms.getURL( forNewBooking = True ),
                                         enabled=True)
+        self._bookARoomOpt.setVisible(False)
         self._myBookingListOpt = wcomponents.SideMenuItem(_("My bookings"),
                                         urlHandlers.UHRoomBookingBookingList.getURL( onlyMy = True, autoCriteria = True ),
                                         enabled=True)
@@ -243,13 +244,13 @@ class WPRoomBookingSearch4Bookings( WPRoomBookingBase ):
 
 class WPRoomBookingBookRoom( WPRoomBookingBase ):
 
-    def getJSFiles(self):
-        return WPRoomBookingBase.getJSFiles(self) + \
-               self._includeJSPackage('RoomBooking')
-
     def __init__( self, rh ):
         self._rh = rh
         WPRoomBookingBase.__init__( self, rh )
+
+    def getJSFiles(self):
+        return WPRoomBookingBase.getJSFiles(self) + \
+               self._includeJSPackage('RoomBooking')
 
     def _getTitle(self):
         return WPRoomBookingBase._getTitle(self) + " - " + _("Book a Room")

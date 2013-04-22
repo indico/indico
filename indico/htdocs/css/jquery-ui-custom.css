@@ -134,11 +134,11 @@
     border-bottom: 1px solid #AAAAAA;
 }
 
-.ui-tabs .ui-state-default {
+.ui-tabs li.ui-state-default {
     background: #FFFFFF !important;
 }
 
-.ui-tabs .ui-corner-top, .ui-tabs .ui-corner-all {
+.ui-tabs li.ui-corner-top, .ui-tabs li.ui-corner-all {
     -moz-border-radius-topleft: 0px;
     -webkit-border-top-left-radius: 0px;
     border-top-left-radius: 0px;

@@ -1384,6 +1384,8 @@ class ReservationBase( Fossilizable ):
                 return periods
             lastDT = period.startDT
             periods.append( period )
+
+
     # ==== Private ===================================================
 
     # datetime (DT) converters --------

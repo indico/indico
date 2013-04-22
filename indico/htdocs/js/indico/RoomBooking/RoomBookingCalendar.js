@@ -569,7 +569,7 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
 
             drawHeader: function(){
                 if( this.room )
-                    var singleDayHeader = Html.div({className:"bookingTitle", style:{marginBottom: pixels(20), marginTop: pixels(28)}}, Html.span({className:"groupTitle bookingTitle", style:{borderBottom: pixels(0), paddingTop: pixels(0)}},
+                    var singleDayHeader = Html.div({className:"bookingTitle", style:{marginBottom: pixels(20), marginTop: pixels(18)}}, Html.span({className:"groupTitle bookingTitle", style:{borderBottom: pixels(0), paddingTop: pixels(0)}},
                                           $T("Availability for "), this.data.days[0].rooms[0].room.getFullName(false)), Html.a({href:this.room.getDetailsUrl(), style:{paddingLeft: pixels(5), fontSize:"x-small"}}, $T("( show 3 months preview )" )));
                 return Html.div({}, singleDayHeader, calendarLegend, this.RoomBookingCalendarDrawer.prototype.drawHeader.call(this));
             },

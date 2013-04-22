@@ -79,13 +79,15 @@ class Room( Persistent, RoomBase, Fossilizable ):
         self._dailyBookablePeriods = []
         self._p_changed = 1
 
-    def getNonBookableDates(self):
+    def getNonBookableDates(self, skipPast=False):
         try:
             if self._nonBookableDates:
                 pass
         except AttributeError:
             self._nonBookableDates = []
             self._p_changed = 1
+        if skipPast:
+            return [d for d in self._nonBookableDates if not d.isPast()]
         return self._nonBookableDates
 
     def addNonBookableDates(self, startDate, endDate):
@@ -544,6 +546,9 @@ class NonBookableDate(Persistent):
         if self.getEndDate() <= startDate or endDate <= self.getStartDate():
             return False
         return True
+
+    def isPast(self):
+        return self.getEndDate() <= datetime.datetime.now()
 
 class DailyBookablePeriod(Persistent):
 

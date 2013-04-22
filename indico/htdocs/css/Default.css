@@ -1418,10 +1418,6 @@ span.horizontalSeparator {
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
-    /*text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-    box-shadow: 1px 1px 1px 1px #ccc;
-    -moz-box-shadow: 1px 1px 1px 1px #ccc;
-    -webkit-box-shadow: 1px 1px 1px 1px #ccc;*/
     border: 1px solid #CCC;
     filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0);
     filter: progid:dximagetransform.microsoft.gradient(enabled=false);
@@ -1488,7 +1484,6 @@ span.horizontalSeparator {
 }
 
 .barPreB { /* Bar representing PRE-booking */
-    /*background-color: #eff23a;*/
     background-color: #dbd00d;
     background-image: -ms-linear-gradient(top, #ffe500, #dbd00d);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffe500), to(#dbd00d));
@@ -8830,7 +8825,6 @@ ul.speaker_list > li .contributions li {
 .infoMessage {
     color: #3A87AD;
     background-color: #D9EDF7;
-    border-color: #BCE8F1;
     padding: 8px 14px 8px 14px;
     margin-bottom: 18px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
@@ -8842,13 +8836,38 @@ ul.speaker_list > li .contributions li {
 }
 
 .errorMessage {
-    color: #B94A48;
+    color: #A76766;
     background-color: #F2DEDE;
-    border-color: #EED3D7;
     padding: 8px 14px 8px 14px;
     margin-bottom: 18px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    border: 1px solid #FBEED5;
+    border: 1px solid #A76766;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.warningMessage {
+    color: #BE9056;
+    background-color: #FFF3E2;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #BE9056;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.successMessage {
+    color: #638864;
+    background-color: #DBEED3;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #638864;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -8921,3 +8940,21 @@ ul.speaker_list > li .contributions li {
 }
 
 
+#sDatePlace .ui-datepicker-inline, #eDatePlaceDiv .ui-datepicker-inline {
+	background-color: transparent;
+}
+
+.bookDateDiv {
+    float: left;
+    margin-right: 35px;
+    padding: 10px;
+    background-color: #FAFAFA;
+}
+
+.bookDateDiv span {
+	color: #777;
+}
+
+#flexibleDatesDiv {
+	margin-top: 20px;
+}

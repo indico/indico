@@ -1,24 +1,6 @@
 <%page args="repeatability=None, form=None, unavailableDates=None, maxAdvanceDays=None"/>
 <script type="text/javascript">
 
-    // Comments the repeatition for user, to make it clear
-    function set_repeatition_comment() {
-        var s = '';
-        var repType = parseInt($('#repeatability').val(), 10);
-        if(repType > 0) {
-            var date = new Date(parseInt($('#sYear').val(), 10), parseInt($('#sMonth').val()-1, 10), parseInt($('#sDay').val(), 10));
-            var weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            s = 'on ' + weekDays[date.getDay()];
-            if(repType == 4) {
-                weekNr = Math.floor( date.getDate() / 7 ) + 1;
-                postfix = ['st', 'nd', 'rd', 'th', 'th'];
-                weekNrStr = 'the ' + weekNr + postfix[weekNr-1] + ' ';
-                s = 'on ' + weekNrStr + weekDays[date.getDay()] + ' of a month';
-            }
-        }
-        $('#repComment').html(s);
-    }
-
     IndicoUI.executeOnLoad(function()
     {
         var startDate = IndicoUI.Widgets.Generic.dateField_sdate(false,null,['sDay', 'sMonth', 'sYear']);
@@ -60,6 +42,14 @@
         <td class="subFieldWidth" align="right" valign="top" >${ _("Unavailability") }</td>
         <td class="blacktext">
         <span style="color:#881122">${ _("This room cannot be booked during the following dates due to maintenance reasons") }:<ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartDate().strftime('%d/%m/%Y'), x.getEndDate().strftime('%d/%m/%Y')), unavailableDates )) }</li></ul></span>
+        </td>
+    </tr>
+    % endif
+    % if availableDayPeriods:
+    <tr id="sdatesTR" >
+        <td class="subFieldWidth" align="right" valign="top" ><small>${ _("Available day periods") }</small></td>
+        <td class="blacktext">
+        <span style="color:#881122">${ _("This room can only be booked during the following time periods") }:<ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartTime(), x.getEndTime()), availableDayPeriods )) }</li></ul></span>
         </td>
     </tr>
     % endif

@@ -8,6 +8,20 @@
         return obj;
     };
 
+    var __gotoToday = $.datepicker._gotoToday;
+
+    $.extend($.datepicker, {
+        /* Select the current date, don't just show it ### */
+        _gotoToday: function(id) {
+
+            _.bind(__gotoToday, this)(id);
+
+            var target = $(id);
+            this._setDateDatepicker(target, new Date());
+            this._selectDate(id, this._getDateDatepicker(target));
+        }
+    });
+
     $.extend($.ui, {
         'sticky' : function(arg1, arg2) {
 

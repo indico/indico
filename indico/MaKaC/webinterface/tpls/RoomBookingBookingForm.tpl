@@ -47,7 +47,7 @@
         } else {
             isValid = required_fields(['bookedForName', 'contactEmail']) && isValid;
         }
-        % if not (user.isRBAdmin() or user.getId() == candResv.room.responsibleId) and candResv.room.maxAdvanceDays > 0:
+        % if not infoBookingMode and not (user.isRBAdmin() or user.getId() == candResv.room.responsibleId) and candResv.room.maxAdvanceDays > 0:
             isValid = validate_allow(${candResv.room.maxAdvanceDays}) && isValid;
         % endif
         if (!Util.Validation.isEmailList($('#contactEmail').val())) {
@@ -100,8 +100,8 @@
                         $("#bookingForm").submit();
                     } else {
                         //bookButtonWrapper.set(bookButton);
-                        var popup = new AlertPopup('Booking Not Allowed',
-                                "You're not allowed to book this room");
+                        var popup = new AlertPopup($T('Booking Not Allowed'),
+                                $T("You're not allowed to book this room"));
                         popup.open();
                     }
                 } else {
@@ -119,7 +119,7 @@
     }
 
     function checkBooking() {
-        $('#bookingForm').attr('action', '${bookingFormURL.getURL(conf)}');
+        $('#bookingForm').attr('action', '${bookingFormURL.getURL(conf)}#conflicts');
         $('#bookingForm').submit();
     };
 
@@ -151,7 +151,7 @@
 
             popup.open();
         % elif candResv.room.needsAVCSetup:
-            var popup = new AlertPopup("Video equipment", "The conference room you have chosen is equipped\nfor video-conferencing and video-projection.\nIf you need this equipment, DO NOT FORGET to select it.\nIf you don't need any of this equipment please choose\nanother room, if a suitable one is free on a suitable\nlocation for your meeting.\n\n\nThank you for your understanding.")
+            var popup = new AlertPopup($T("Video equipment"), $T("The conference room you have chosen is equipped\nfor video-conferencing and video-projection.\nIf you need this equipment, DO NOT FORGET to select it.\nIf you don't need any of this equipment please choose\nanother room, if a suitable one is free on a suitable\nlocation for your meeting.\n\n\nThank you for your understanding."))
             popup.open();
 
             $('.videoConferenceOption, #needsAVCSupport').change(function() {
@@ -209,7 +209,7 @@
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
 
-    <form id="bookingForm" action="${bookingFormURL.getURL(conf)}#" method="post">
+    <form id="bookingForm" name="bookingForm" action="${bookingFormURL.getURL(conf)}#" method="post">
     <input type="hidden" id="afterCalPreview" name="afterCalPreview" value="True" />
 
     <table style="width: 100%; padding-left: 20px;">
@@ -233,9 +233,9 @@
                     <input type="hidden" value="${ startT }" name="sTime" id="sTime"/>
                     <input type="hidden" value="${ endT }" name="eTime" id="eTime"/>
                     <ul id="breadcrumbs" style="margin:0px 0px 0px -15px; padding: 0; list-style: none;">
-                        <li><span><a href="${ urlHandlers.UHRoomBookingBookRoom.getURL() }">Specify Search Criteria</a></span></li>
-                        <li><span><a href="javascript:history.back(-1)">Select Available Period</a></span></li>
-                        <li><span class="current">Confirm Reservation</span></li>
+                        <li><span><a href="${ urlHandlers.UHRoomBookingBookRoom.getURL() }">${_("Specify Search Criteria")}</a></span></li>
+                        <li><span><a href="javascript:history.back(-1)">${_("Select Available Period")}</a></span></li>
+                        <li><span class="current">${_("Confirm Reservation")}</span></li>
                     </ul>
                 % elif formMode == FormMode.NEW:
                     <span class="groupTitle bookingTitle" style="border-bottom-width: 0px; font-weight: bold">
@@ -259,7 +259,7 @@
                   <tr>
                     <td>
                         <table id="roomBookingTable">
-                            <%include file="RoomBookingPeriodForm.tpl" args="repeatability = candResv.repeatability, form = 0, unavailableDates = candResv.room.getNonBookableDates(), maxAdvanceDays = candResv.room.maxAdvanceDays"/>
+                            <%include file="RoomBookingPeriodForm.tpl" args="repeatability = candResv.repeatability, form = 0, unavailableDates = candResv.room.getNonBookableDates(skipPast=True), availableDayPeriods = candResv.room.getDailyBookablePeriods(), maxAdvanceDays = candResv.room.maxAdvanceDays"/>
                         </table>
                     </td>
                 </tr>

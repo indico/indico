@@ -1,7 +1,7 @@
 /* jshint forin:true, noarg:true, noempty:true, eqeqeq:true, boss:true, undef:true, curly:true, browser:true, jquery:true */
 /*
- * jQuery MultiSelect UI Widget 1.12
- * Copyright (c) 2011 Eric Hynds
+ * jQuery MultiSelect UI Widget 1.13
+ * Copyright (c) 2012 Eric Hynds
  *
  * http://www.erichynds.com/jquery/jquery-ui-multiselect-widget/
  *
@@ -35,8 +35,8 @@ $.widget("ech.multiselect", {
 		noneSelectedText: 'Select options',
 		selectedText: '# selected',
 		selectedList: 0,
-		show: '',
-		hide: '',
+		show: null,
+		hide: null,
 		autoOpen: false,
 		multiple: true,
 		position: {}
@@ -130,10 +130,11 @@ $.widget("ech.multiselect", {
 				title = this.innerHTML,
 				description = this.title,
 				value = this.value,
-				inputID = this.id || 'ui-multiselect-' + id + '-option-' + i,
+				inputID = 'ui-multiselect-' + (this.id || id + '-option-' + i),
 				isDisabled = this.disabled,
 				isSelected = this.selected,
 				labelClasses = [ 'ui-corner-all' ],
+				liClasses = (isDisabled ? 'ui-multiselect-disabled ' : ' ') + this.className,
 				optLabel;
 
 			// is this an optgroup?
@@ -142,7 +143,7 @@ $.widget("ech.multiselect", {
 
 				// has this optgroup been added already?
 				if( $.inArray(optLabel, optgroups) === -1 ){
-					html += '<li class="ui-multiselect-optgroup-label"><a href="#">' + optLabel + '</a></li>';
+					html += '<li class="ui-multiselect-optgroup-label ' + parent.className + '"><a href="#">' + optLabel + '</a></li>';
 					optgroups.push( optLabel );
 				}
 			}
@@ -157,7 +158,7 @@ $.widget("ech.multiselect", {
 				labelClasses.push( 'ui-state-active' );
 			}
 
-			html += '<li class="' + (isDisabled ? 'ui-multiselect-disabled' : '') + '">';
+			html += '<li class="' + liClasses + '">';
 
 			// create the label
 			html += '<label for="' + inputID + '" title="' + description + '" class="' + labelClasses.join(' ') + '">';
@@ -203,7 +204,7 @@ $.widget("ech.multiselect", {
 	update: function(){
 		var o = this.options,
 			$inputs = this.inputs,
-			$checked = $inputs.filter('[checked]'),
+			$checked = $inputs.filter(':checked'),
 			numChecked = $checked.length,
 			value;
 
@@ -502,9 +503,22 @@ $.widget("ech.multiselect", {
 		this.button
 			.attr({ 'disabled':flag, 'aria-disabled':flag })[ flag ? 'addClass' : 'removeClass' ]('ui-state-disabled');
 
-		this.menu
-			.find('input')
-			.attr({ 'disabled':flag, 'aria-disabled':flag })
+		var inputs = this.menu.find('input');
+		var key = "ech-multiselect-disabled";
+
+		if(flag) {
+			// remember which elements this widget disabled (not pre-disabled)
+			// elements, so that they can be restored if the widget is re-enabled.
+			inputs = inputs.filter(':enabled')
+				.data(key, true)
+		} else {
+			inputs = inputs.filter(function() {
+				return $.data(this, key) === true;
+			}).removeData(key);
+		}
+
+		inputs
+			.attr({ 'disabled':flag, 'arial-disabled':flag })
 			.parent()[ flag ? 'addClass' : 'removeClass' ]('ui-state-disabled');
 
 		this.element
@@ -517,7 +531,8 @@ $.widget("ech.multiselect", {
 			button = this.button,
 			menu = this.menu,
 			speed = this.speed,
-			o = this.options;
+			o = this.options,
+			args = [];
 
 		// bail if the multiselectopen event returns false, this widget is disabled, or is already open
 		if( this._trigger('beforeopen') === false || button.hasClass('ui-state-disabled') || this._isOpen ){
@@ -534,6 +549,12 @@ $.widget("ech.multiselect", {
 			speed = o.show[1] || self.speed;
 		}
 
+		// if there's an effect, assume jQuery UI is in use
+		// build the arguments to pass to show()
+		if( effect ) {
+      args = [ effect, speed ];
+		}
+
 		// set the scroll of the checkbox container
 		$container.scrollTop(0).height(o.height);
 
@@ -544,16 +565,18 @@ $.widget("ech.multiselect", {
 			menu
 				.show()
 				.position( o.position )
-				.hide()
-				.show( effect, speed );
+				.hide();
 
 		// if position utility is not available...
 		} else {
 			menu.css({
 				top: pos.top + button.outerHeight(),
 				left: pos.left
-			}).show( effect, speed );
+			});
 		}
+
+		// show the menu, maybe with a speed/effect combo
+		$.fn.show.apply(menu, args);
 
 		// select the first option
 		// triggering both mouseover and mouseover because 1.4.2+ has a bug where triggering mouseover
@@ -571,7 +594,10 @@ $.widget("ech.multiselect", {
 			return;
 		}
 
-		var o = this.options, effect = o.hide, speed = this.speed;
+		var o = this.options,
+		    effect = o.hide,
+		    speed = this.speed,
+		    args = [];
 
 		// figure out opening effects/speeds
 		if( $.isArray(o.hide) ){
@@ -579,7 +605,11 @@ $.widget("ech.multiselect", {
 			speed = o.hide[1] || this.speed;
 		}
 
-		this.menu.hide(effect, speed);
+    if( effect ) {
+      args = [ effect, speed ];
+    }
+
+    $.fn.hide.apply(this.menu, args);
 		this.button.removeClass('ui-state-active').trigger('blur').trigger('mouseleave');
 		this._isOpen = false;
 		this._trigger('close');
@@ -604,7 +634,7 @@ $.widget("ech.multiselect", {
 	},
 
 	getChecked: function(){
-		return this.menu.find('input').filter('[checked]');
+		return this.menu.find('input').filter(':checked');
 	},
 
 	destroy: function(){
@@ -661,6 +691,11 @@ $.widget("ech.multiselect", {
 			case 'classes':
 				menu.add(this.button).removeClass(this.options.classes).addClass(value);
 				break;
+			case 'multiple':
+				menu.toggleClass('ui-multiselect-single', !value);
+				this.options.multiple = value;
+				this.element[0].multiple = value;
+				this.refresh();
 		}
 
 		$.Widget.prototype._setOption.apply( this, arguments );
@@ -668,3 +703,4 @@ $.widget("ech.multiselect", {
 });
 
 })(jQuery);
+

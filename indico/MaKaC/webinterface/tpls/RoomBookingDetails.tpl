@@ -261,7 +261,7 @@
                             <tr>
                                 <td class="bookingDisplayTitleCell"><span class="titleCellFormat"> ${ _("Actions")}</span></td>
                                 <td>
-                                    <form name="submits" action="" method="post">
+                                    <form id="submits" name="submits" action="" method="post">
                                         <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0 " style="float:left; padding-top: 15px">
                                         % if canCancel  and  not reservation.isCancelled and not reservation.isRejected:
                                             <li class="button" style="margin-left: 10px" onclick="submit_cancel();return false;">

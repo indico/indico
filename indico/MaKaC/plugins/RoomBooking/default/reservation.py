@@ -23,19 +23,18 @@ from ZODB.DB import DB, transaction
 from ZODB.PersistentMapping import PersistentMapping
 from persistent import Persistent
 from pytz import timezone
+from datetime import datetime
 
-from MaKaC.rb_factory import Factory
-from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum, WeekDayEnum
-from MaKaC.rb_tools import qbeMatch, doesPeriodOverlap, iterdays, overlap, weekNumber, containsExactly_OR_containsAny, fromUTC
+from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
+from MaKaC.rb_tools import qbeMatch, containsExactly_OR_containsAny, fromUTC
 from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.plugins.RoomBooking.default.factory import Factory
-from indico.modules.scheduler import Client, tasks
-
-from datetime import datetime
 from MaKaC.common.logger import Logger
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.base import Observable
 from MaKaC.plugins.RoomBooking.notifications import ReservationStartEndNotification
+
+from indico.modules.scheduler import Client, tasks
 
 # Branch name in ZODB root
 _RESERVATIONS = 'Reservations'
@@ -256,7 +255,6 @@ class Reservation( Persistent, ReservationBase, Observable ):
         heavy = kwargs.get( 'heavy' )
         location = kwargs.get( 'location' )
         days = kwargs.get( 'days' )
-        repeatability = kwargs.get( 'repeatability' )
 
         ret_lst = []
         counter = 0

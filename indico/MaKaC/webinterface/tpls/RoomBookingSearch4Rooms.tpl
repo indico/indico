@@ -295,7 +295,7 @@
                                                             ${contextHelp('availabilityHelp' )}
                                                         </td>
                                                     </tr>
-                                                    <%include file="RoomBookingPeriodFormOld.tpl" args="form = 1, unavailableDates = [] "/>
+                                                    <%include file="RoomBookingPeriodFormOld.tpl" args="form = 1, unavailableDates = [], availableDayPeriods = [] "/>
                                                     <tr id='includePrebookingsTR'>
                                                         <td class="subFieldWidth" align="right" ><small> ${ _("PRE-Bookings")}</small></td>
                                                         <td align="left" class="blacktext">

@@ -26,7 +26,7 @@
                       <option data-location="${roomItem.locationName}" data-id="${roomItem.id}" ${ selected } class="${roomClass( roomItem )}">${ roomItem.locationName + ": &nbsp; " + roomItem.getFullName() }</option>
                     % endfor
                     </select>
-                    <a href="${roomDetailsUH.getURL( room )}">${ _("Full details")}</a>
+                    <a target="_blank" href="${roomDetailsUH.getURL( room )}">${ _("Full details")}</a>
                 % endif
                 </td>
             </tr>

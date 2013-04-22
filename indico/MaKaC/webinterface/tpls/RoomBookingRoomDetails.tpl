@@ -172,6 +172,14 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <td class="subFieldWidth" align="right" valign="top"> ${ _("Daily availability periods")}&nbsp;&nbsp;</td>
+                                            <td align="left" class="blacktext">
+                                            % if room.getDailyBookablePeriods():
+                                                <ul><li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartTime(), x.getEndTime()), room.getDailyBookablePeriods() )) }</li></ul>
+                                            % endif
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <td class="subFieldWidth" align="right" valign="top"> ${ _("Maximum advance time")}&nbsp;&nbsp;</td>
                                             <td align="left" class="blacktext">
                                                 ${ (_("%s days") % room.maxAdvanceDays) if room.maxAdvanceDays else _("Not set")}

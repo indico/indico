@@ -1,69 +1,6 @@
 <%page args="repeatability=None, form=None, unavailableDates=None, availableDayPeriods=None, maxAdvanceDays=None"/>
 <script type="text/javascript">
 
-    // Comments the repeatition for user, to make it clear
-    function set_repeatition_comment() {
-        var s = '';
-        var repType = parseInt($('#repeatability').val(), 10);
-        if(repType > 0) {
-            var date = new Date(parseInt($('#sYear').val(), 10), parseInt($('#sMonth').val()-1, 10), parseInt($('#sDay').val(), 10));
-            var weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            s = 'on ' + weekDays[date.getDay()];
-            if(repType == 4) {
-                weekNr = Math.floor( date.getDate() / 7 ) + 1;
-                postfix = ['st', 'nd', 'rd', 'th', 'th'];
-                weekNrStr = 'the ' + weekNr + postfix[weekNr-1] + ' ';
-                s = 'on ' + weekNrStr + weekDays[date.getDay()] + ' of a month';
-            }
-        }
-        $('#repComment').html(s);
-    }
-
-    // Converting from time string to seconds
-    function getTime(time) {
-        var minutes = parseInt(time % 60);
-        var hours = parseInt(time / 60 % 24);
-        minutes = minutes + "";
-        if (minutes.length == 1) {
-            minutes = "0" + minutes;
-        }
-        return hours + ":" + minutes;
-    }
-
-    // Refresh time slider
-    function updateTimeSlider(event, ui) {
-        if (event && event.type != "slidecreate" ) {
-            $("#sTime").val(getTime(ui.values[0]));
-            $("#eTime").val(getTime(ui.values[1]));
-        }
-        var sTime = parseInt($("#sTime").val().split(":")[0] * 60) + parseInt($("#sTime").val().split(":")[1]);
-        var eTime = parseInt($("#eTime").val().split(":")[0] * 60) + parseInt($("#eTime").val().split(":")[1]);
-        if (sTime && eTime || sTime == 0) {
-            $('#timeRange').slider('values', 0, sTime).slider('values', 1, eTime);
-        }
-        $('#sTimeBubble').text($("#sTime").val()).css({'left':$('#timeRange .ui-slider-handle:first').offset().left});
-        $('#eTimeBubble').text($("#eTime").val()).css({'left':$('#timeRange .ui-slider-handle:last').offset().left});
-    }
-
-    // Refresh datapicker's dates
-    function refreshDates(){
-        if ($("#sDatePlace").datepicker('getDate') > $("#eDatePlace").datepicker('getDate')) {
-            $("#eDatePlace").datepicker('setDate', $("#sDatePlace").datepicker('getDate'));
-        }
-        $("#sDay").val($("#sDatePlace").datepicker('getDate').getDate());
-        $("#sMonth").val(parseInt($("#sDatePlace").datepicker('getDate').getMonth() + 1));
-        $("#sYear").val($("#sDatePlace").datepicker('getDate').getFullYear());
-        if ($('#finishDate').val() == 'true') {
-            $("#eDay").val($("#eDatePlace").datepicker('getDate').getDate());
-            $("#eMonth").val(parseInt($("#eDatePlace").datepicker('getDate').getMonth() + 1));
-            $("#eYear").val($("#eDatePlace").datepicker('getDate').getFullYear()); }
-        else {
-            $("#eDay").val($("#sDatePlace").datepicker('getDate').getDate());
-            $("#eMonth").val(parseInt($("#sDatePlace").datepicker('getDate').getMonth() + 1));
-            $("#eYear").val($("#sDatePlace").datepicker('getDate').getFullYear());
-        }
-    }
-
     IndicoUI.executeOnLoad(function()
     {
         % if not infoBookingMode:
@@ -147,7 +84,23 @@
     <td colspan="2">
         <div class="infoMessage" style="float: left;">
             <strong>${ _("Unavailability") }: </strong>
-            ${ _("This room cannot be booked during the following dates due to maintenance reasons") }:<ul><li style='float: left'>${ "</li><li style='float: left'>".join(map(lambda x: 'from %s to %s'%(x.getStartDate().strftime('%d/%m/%Y'), x.getEndDate().strftime('%d/%m/%Y')), unavailableDates )) }</li></ul>
+            ${ _("This room cannot be booked during the following dates due to maintenance reasons") }:
+            <ul style="text-align: left">
+                <li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartDate().strftime('%d/%m/%Y'), x.getEndDate().strftime('%d/%m/%Y')), unavailableDates )) }</li>
+            </ul>
+        </div>
+    </td>
+</tr>
+% endif
+% if availableDayPeriods:
+<tr>
+    <td colspan="2">
+        <div class="infoMessage" style="float: left;">
+            <strong>${ _("Available day periods") }: </strong>
+            ${ _("This room can only be booked during the following time periods") }:
+            <ul style="text-align: left">
+                <li>${ "</li><li>".join(map(lambda x: 'from %s to %s'%(x.getStartTime(), x.getEndTime()), availableDayPeriods )) }</li>
+            </ul>
         </div>
     </td>
 </tr>
@@ -194,11 +147,11 @@
 % if not infoBookingMode:
 <tr style="text-align: center;" >
     <td colspan="2">
-        <div id="sDatePlaceDiv" class="titleCellFormat" style="clear: both; float: left; padding-right: 14px;">
+        <div id="sDatePlaceDiv" class="titleCellFormat bookDateDiv" style="clear: both;">
             <span id='sDatePlaceTitle' class='label'>${ _("Booking date")}</span>
             <div id="sDatePlace"></div>
         </div>
-        <div id="eDatePlaceDiv" class="titleCellFormat" style="float: left;">
+        <div id="eDatePlaceDiv" class="titleCellFormat bookDateDiv">
             <span id='eDatePlaceTitle' class='label'>${ _("End date")}</span>
             <div id="eDatePlace"></div>
         </div>
@@ -207,7 +160,7 @@
 </tr>
 <tr>
     <td colspan="2">
-        <div style="float: left; clear: both; padding-top: 10px;">
+        <div style="float: left; clear: both; padding: 20px 32px; background-color: #FAFAFA; margin-top: 10px;">
         ${ _("Booking time from")}&nbsp;&nbsp;
         <input name="sTime" id="sTime" style="width: 43px;" type="text" />
         ${ _("to")}&nbsp;
@@ -223,15 +176,14 @@
     </td>
 </tr>
 <tr>
-    <td colspan="2">
-        <div class="groupTitle bookingTitle"></div>
-    </td>
+    <td>&nbsp;</td>
 </tr>
 <tr>
     <td colspan="2">
+        <a name="conflicts"></a>
         <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0 " style="float:left;">
           <li class="button" onclick="checkBooking()">
-            <a href="#" onClick="return false;">${ _("Check again for conflicts")}</a>
+            <a href="#" onClick="return false;">${ _("Check for conflicts")}</a>
           </li>
           <li style="display: none"></li>
         </ul>

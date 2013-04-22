@@ -9122,10 +9122,6 @@ $.extend(Datepicker.prototype, {
 		}
 		this._notifyChange(inst);
 		this._adjustDate(target);
-
-	    /* ### CUSTOMIZATION: Actually select the current date, don't just show it ### */
-	    this._setDateDatepicker(target, new Date());
-	    this._selectDate(id, this._getDateDatepicker(target));
 	},
 
 	/* Action for selecting a new month/year. */
