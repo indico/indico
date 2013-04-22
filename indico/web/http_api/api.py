@@ -743,7 +743,7 @@ class UserEventHook(HTTPAPIHook):
             self._avatar = aw.getUser()
             return
         elif not self._avatar.canUserModify(aw.getUser()):
-            raise HTTPAPIError('Access denied')
+            raise HTTPAPIError('Access denied', 403)
 
     def export_linked_events(self, aw):
         if not redis_client:
