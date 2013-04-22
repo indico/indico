@@ -29,11 +29,11 @@ from MaKaC.services.implementation.base import ExportToICalBase
 from MaKaC.services.implementation.base import LoggedOnlyService
 
 import MaKaC.conference as conference
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 import MaKaC.webinterface.locators as locators
 from MaKaC.webinterface.wcomponents import WConferenceListItem
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import PrincipalHolder, Avatar, Group
+from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
 from indico.core.index import Catalog
 from indico.web.http_api.util import generate_public_auth_request
 import MaKaC.common.info as info
@@ -364,18 +364,54 @@ class CategoryProtectionToggleDomains(CategoryModifBase):
             self._target.freeDomain(d)
 
 
-class CategoryFavoriteAdd(LoggedOnlyService, CategoryDisplayBase):
+class CategoryBasketBase(LoggedOnlyService, CategoryDisplayBase):
+
+    def _checkParams(self):
+        LoggedOnlyService._checkParams(self)
+        CategoryDisplayBase._checkParams(self)
+        userId = ParameterManager(self._params).extract('userId', pType=str, allowEmpty=True)
+        if userId is not None:
+            self._avatar = AvatarHolder().getById(userId)
+        else:
+            self._avatar = self._aw.getUser()
+
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
+        CategoryDisplayBase._checkProtection(self)
+        if not self._avatar.canUserModify(self._aw.getUser()):
+            raise ServiceAccessError('Access denied')
+
+
+class CategoryFavoriteAdd(CategoryBasketBase):
 
     def _getAnswer(self):
         if self._categ is conference.CategoryManager().getRoot():
             raise ServiceError('ERR-U0', _('Cannot add root category as favorite'))
-        self._getUser().linkTo(self._categ, 'favorite')
+        self._avatar.linkTo(self._categ, 'favorite')
+
+    def _checkParams(self):
+        CategoryDisplayBase._checkParams(self)
+        CategoryBasketBase._checkParams(self)
+
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
+        CategoryBasketBase._checkProtection(self)
+        CategoryDisplayBase._checkProtection(self)
 
 
-class CategoryFavoriteDel(LoggedOnlyService, CategoryDisplayBase):
+class CategoryFavoriteDel(CategoryBasketBase):
 
     def _getAnswer(self):
-        self._getUser().unlinkTo(self._categ, 'favorite')
+        self._avatar.unlinkTo(self._categ, 'favorite')
+
+    def _checkParams(self):
+        CategoryDisplayBase._checkParams(self)
+        CategoryBasketBase._checkParams(self)
+
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
+        CategoryBasketBase._checkProtection(self)
+        CategoryDisplayBase._checkProtection(self)
 
 
 methodMap = {

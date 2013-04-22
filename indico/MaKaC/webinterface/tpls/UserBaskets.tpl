@@ -80,6 +80,7 @@
         var $this = $(this);
         $('.toggle', this).css('cursor', 'pointer').on('click', function() {
             indicoRequest('category.favorites.delCategory', {
+                userId: '${user.getId()}',
                 categId: $this.data('categId').toString()
             }, function(result, error) {
                 if(error) {
