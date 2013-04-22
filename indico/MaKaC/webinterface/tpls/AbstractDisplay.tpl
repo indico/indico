@@ -10,7 +10,7 @@
         % if isinstance(abstract.getCurrentStatus(), AbstractStatusWithdrawn):
             <a href="${recoverURL}">${_("Recover")}</a> |
         % elif not withdrawDisabled:
-            <a href="${withdrawURL}" ">${_("Withdraw")}</a> |
+            <a href="${withdrawURL}">${_("Withdraw")}</a> |
         % endif
     % endif
     <a href="${str(urlHandlers.UHAbstractDisplayPDF.getURL(abstract))}" target="_blank">${_("PDF")}</a>
@@ -77,6 +77,11 @@
             <div>
                 <div class="abstractStatus ${statusClass}">${statusText}</div>
             </div>
+            %if isinstance(abstract.getCurrentStatus(), AbstractStatusAccepted):
+            <div class="abstractStatusSection">
+                <a href = "${str(urlHandlers.UHContributionDisplay.getURL(abstract.getContribution()))}"> ${_("Accepted")} </a>
+            </div>
+            % endif
         </div>
         % if abstract.getPrimaryAuthorList():
             <div class="abstractRightPanelSection">
