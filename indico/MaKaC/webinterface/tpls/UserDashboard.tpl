@@ -111,17 +111,17 @@ $(document).ready(function(log_view){
     }
 
     /* AJAX query */
-    var managementFilter = ["conferenceCreator", "conferenceChair",
-                             "conferenceManager", "conferenceRegistrar",
-                             "sessionManager", "sessionCoordinator",
-                             "contributionManager"];
-    var reviewFilter = ["conferencePaperReviewManager", "conferenceReferee",
-                         "conferenceEditor", "conferenceReviewer",
-                         "contributionReferee", "contributionEditor",
-                         "contributionReviewer", "trackCoordinator"];
-    var attendanceFilter = ["conferenceParticipant", "contributionSubmission",
-                             "abstractSubmitter", "registrationRegistrant",
-                             "evaluationSubmitter"];
+    var managementFilter = ["conference_creator", "conference_chair",
+                             "conference_manager", "conference_registrar",
+                             "session_manager", "session_coordinator",
+                             "contribution_manager"];
+    var reviewFilter = ["conference_paperReviewManager", "conference_referee",
+                         "conference_editor", "conference_reviewer",
+                         "contribution_referee", "contribution_editor",
+                         "contribution_reviewer", "track_coordinator"];
+    var attendanceFilter = ["conference_participant", "contribution_submission",
+                             "abstract_submitter", "registration_registrant",
+                             "evaluation_submitter"];
 
     var api_opts = {
             limit: "10",
@@ -129,30 +129,29 @@ $(document).ready(function(log_view){
             order: "start"
     };
 
-//     var resp = $.parseJSON('{"count": 1, "additionalInfo": {"eventCategories": [{"path": [{"url": "http:\/\/pcuds43.cern.ch:8000\/indico\/categoryDisplay.py?categId=0", "_fossil": "categoryMetadata", "_type": "Category", "name": "Home", "id": "0"}, {"url": "http:\/\/pcuds43.cern.ch:8000\/indico\/categoryDisplay.py?categId=1l27", "_fossil": "categoryMetadata", "_type": "Category", "name": "Departments", "id": "1l27"}, {"url": "http:\/\/pcuds43.cern.ch:8000\/indico\/categoryDisplay.py?categId=2340", "_fossil": "categoryMetadata", "_type": "Category", "name": "BE", "id": "2340"}, {"url": "http:\/\/pcuds43.cern.ch:8000\/indico\/categoryDisplay.py?categId=2342", "_fossil": "categoryMetadata", "_type": "Category", "name": "Groups", "id": "2342"}, {"url": "http:\/\/pcuds43.cern.ch:8000\/indico\/categoryDisplay.py?categId=2348", "_fossil": "categoryMetadata", "_type": "Category", "name": "RF", "id": "2348"}, {"visibility": {"name": "Everywhere"}}], "_type": "CategoryPath", "categoryId": "2348"}]}, "_type": "HTTPAPIResult", "complete": true, "url": "\/export\/categ\/favorites.json?ak=368612c2-7029-4d28-a54b-8eb036b8f114&limit=1&from=today&order=start", "ts": 1366211328, "results": [{"category": "RF", "startDate": {"date": "2012-07-25", "tz": "Europe\/Zurich", "time": "10:00:00"}, "_type": "Conference", "endDate": {"date": "2014-09-24", "tz": "Europe\/Zurich", "time": "10:00:00"}, "description": "", "roomMapURL": "https:\/\/maps.cern.ch\/mapsearch\/mapsearch.htm?loc=[\'864\/1-C02\']", "title": "ADT Performance Meeting", "chairs": [{"_type": "ConferenceChair", "id": 0, "affiliation": "CERN", "_fossil": "conferenceChairMetadata", "fullName": "Hofle, Wolfgang", "email": "wolfgang.hofle@cern.ch"}], "material": [], "visibility": {"id": "", "name": "Everywhere"}, "categoryId": "2348", "url": "http:\/\/pcuds43.cern.ch:8000\/indico\/conferenceDisplay.py?confId=201800", "location": "CERN", "_fossil": "conferenceMetadata", "timezone": "Europe\/Zurich", "type": "meeting", "id": "201800", "room": "864-1-C02", "rights": ["conferenceChair"]}]}');
-    apiRequest("/user/linkedEvents", api_opts).done(function(resp) {
-    if (resp.count === 0) {
-        $("#yourEvents ol").append(
-                '<li class="no-event"><a> \
-                    <span class="event-title italic text-superfluous">' + $T("You have no events.") + '</span> \
+    apiRequest("/user/linked_events", api_opts).done(function(resp) {
+        if (resp.count === 0) {
+            $("#yourEvents ol").append(
+                    '<li class="no-event"><a> \
+                        <span class="event-title italic text-superfluous">' + $T("You have no events.") + '</span> \
                 </a></li>');
-    } else {
-       $.each(resp.results, function(i, item) {
-           $("#yourEvents ol").append(
-                   '<li id="event-' + item.id + '" class="truncate"><a href="' + item.url + '" class="truncate"> \
+        } else {
+            $.each(resp.results, function(i, item) {
+                $("#yourEvents ol").append(
+                        '<li id="event-' + item.id + '" class="truncate"><a href="' + item.url + '" class="truncate"> \
                         <span class="event-date">' + getDate(item.startDate, item.endDate) + '</span> \
                         <span class="event-title truncate-target">' + item.title + '</span> \
                         <span class="item-legend"> \
-                            <span title="You have management rights" class="icon-medal contextHelp ' + hasRights(item.rights, managementFilter) + '"></span> \
-                            <span title="You are a reviewer" class="icon-reading contextHelp ' + hasRights(item.rights, reviewFilter) + '"></span> \
-                            <span title="You are an atendee" class="icon-ticket contextHelp ' + hasRights(item.rights, attendanceFilter) + '"></span> \
+                            <span title="You have management rights" class="icon-medal contextHelp ' + hasRights(item.roles, managementFilter) + '"></span> \
+                            <span title="You are a reviewer" class="icon-reading contextHelp ' + hasRights(item.roles, reviewFilter) + '"></span> \
+                            <span title="You are an attendee" class="icon-ticket contextHelp ' + hasRights(item.roles, attendanceFilter) + '"></span> \
                         </span> \
                    </a></li>');
-           });
-       }
+            });
+        }
     });
 
-    apiRequest("/categ/favorites", api_opts).done(function(resp) {
+    apiRequest("/user/categ_events", api_opts).done(function(resp) {
         if (resp.count === 0) {
             $("#happeningCategories ol").append(
                     '<li class="no-event"><a> \

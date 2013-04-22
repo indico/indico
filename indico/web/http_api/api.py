@@ -718,25 +718,25 @@ class ContributionFetcher(SessionContribFetcher):
 @HTTPAPIHook.register
 class UserEventHook(HTTPAPIHook):
     TYPES = ('user',)
-    RE = r'(?P<what>events|categ/events)'
+    RE = r'(?P<what>linked_events|categ_events)'
     DEFAULT_DETAIL = 'basic_events'
     GUEST_ALLOWED = False
 
     def _getParams(self):
         super(UserEventHook, self)._getParams()
-        self._what = self._pathParams['what'].replace('/', '_')
+        self._what = self._pathParams['what']
 
     def _getMethodName(self):
         return self.PREFIX + '_' + self._what
 
-    def export_events(self, aw):
+    def export_linked_events(self, aw):
         if not redis_client:
             raise HTTPAPIError('This API is only available when using Redis')
         links = avatar_links.get_links(redis_client, aw.getUser())
         return UserRelatedEventFetcher(aw, self, links).events(links.keys())
 
     def export_categ_events(self, aw):
-        catIds = [item['categ'].getId() for item in aw.getUser().getRelatedCategories()]
+        catIds = [item['categ'].getId() for item in aw.getUser().getRelatedCategories().itervalues()]
         return UserCategoryEventFetcher(aw, self).category_events(catIds)
 
 
