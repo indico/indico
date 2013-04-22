@@ -376,6 +376,17 @@ function apiRequest(path, payload, opts) {
             type: 'noReport'
         });
     }).done(function(resp) {
+        if (resp._type == 'HTTPAPIError') {
+            dfd.reject(resp.message);
+            if(!opts.silentErrors) {
+                IndicoUtil.errorReport({
+                    title: $T('Error'),
+                    message: $T('API request failed:') + ' ' + resp.message,
+                    type: 'noReport'
+                });
+            }
+            return;
+        }
         dfd.resolve(resp);
     });
 
