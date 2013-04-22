@@ -136,6 +136,10 @@ class UserBasketBase:
         else:
             self._target = self._aw.getUser()
 
+    def _checkProtection(self):
+        if not self._target.canUserModify(self._aw.getUser()):
+            raise ServiceAccessError('Access denied')
+
 class UserAddToBasket(LoggedOnlyService, UserBasketBase):
 
     def _checkParams(self):
@@ -160,6 +164,7 @@ class UserAddToBasket(LoggedOnlyService, UserBasketBase):
 
     def _checkProtection(self):
         LoggedOnlyService._checkProtection(self)
+        UserBasketBase._checkProtection(self)
 
 
 class UserRemoveFromBasket(LoggedOnlyService, UserBasketBase):
@@ -174,6 +179,7 @@ class UserRemoveFromBasket(LoggedOnlyService, UserBasketBase):
 
     def _checkProtection(self):
         LoggedOnlyService._checkProtection(self)
+        UserBasketBase._checkProtection(self)
 
 class UserListBasket(UserBasketBase, ServiceBase):
 
