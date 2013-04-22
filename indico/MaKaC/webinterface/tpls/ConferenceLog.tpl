@@ -104,7 +104,7 @@
 
 
 <script>
-$(document).ready(function(log_view){
+$(document).ready(function(){
 
     /* Initializations */
     if ($("[id*=log-table-]").length === 0) {

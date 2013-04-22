@@ -72,7 +72,7 @@
 </div>
 
 <script>
-$(document).ready(function(log_view){
+$(document).ready(function(){
 
     /* Time formatting */
     if (currentLanguage === "fr_FR") {
