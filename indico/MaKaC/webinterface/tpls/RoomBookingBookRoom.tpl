@@ -219,8 +219,12 @@
 
         $("#finishDate").val($.jStorage.get("finishDate"));
         $("#flexibleDates").attr('checked',($.jStorage.get("flexibleDates")));
-        $("#flexibleDatesRange").val($.jStorage.get("flexibleDatesRange"));
-        $("#repeatability").val($.jStorage.get("repeatability"));
+        if ($.jStorage.get("flexibleDatesRange")) {
+            $("#flexibleDatesRange").val($.jStorage.get("flexibleDatesRange"));
+        }
+        if ($.jStorage.get("repeatability")) {
+            $("#repeatability").val($.jStorage.get("repeatability"));
+        }
 
         // Time slider init
         $('#timeRange').slider({
