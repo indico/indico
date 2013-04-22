@@ -20,7 +20,6 @@
 import glob
 import os
 import re
-import redis
 from collections import OrderedDict
 
 import indico.util.json as json
@@ -81,6 +80,7 @@ class RedisScript(object):
         if len(args) != self._args:
             raise TypeError('Script takes exactly %d argument (%d given)' % (self._args, len(args)))
         client = kwargs.get('client', self._script.registered_client)
+        import redis
         if isinstance(client, redis.client.BasePipeline) and self._process_result:
             raise ValueError('Script with result conversion cannot be called on a pipeline')
         res = self._script(args=args, client=client)
