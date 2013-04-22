@@ -36,6 +36,8 @@ from zope.index.text import parsetree
 # indico imports
 from indico.util.date_time import nowutc
 from indico.util.fossilize import fossilize
+from indico.util.redis import client as redis_client
+import indico.util.redis.avatar_links as avatar_links
 
 from indico.web.http_api.metadata import Serializer
 from indico.web.http_api.metadata.html import HTML4Serializer
@@ -47,7 +49,7 @@ from indico.web.http_api.fossils import IConferenceMetadataFossil,\
     IConferenceMetadataWithSessionsFossil, IPeriodFossil, ICategoryMetadataFossil,\
     ICategoryProtectedMetadataFossil, ISessionMetadataFossil, ISessionMetadataWithContributionsFossil,\
     ISessionMetadataWithSubContribsFossil, IContributionMetadataFossil,\
-    IContributionMetadataWithSubContribsFossil
+    IContributionMetadataWithSubContribsFossil, IBasicConferenceMetadataFossil
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 from indico.web.wsgi import webinterface_handler_config as apache
@@ -403,8 +405,11 @@ class IteratedDataFetcher(DataFetcher):
             if iface is None:
                 raise HTTPAPIError('Invalid detail level: %s' % self._detail, apache.HTTP_BAD_REQUEST)
         for obj in self._iterateOver(iterator, self._offset, self._limit, self._orderBy, self._descending, filter):
-            yield self._postprocess(obj, fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
-                                                   filters={'access': self._userAccessFilter}, mapClassType={'AcceptedContribution':'Contribution'}), iface)
+            yield self._postprocess(obj,
+                                    fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
+                                              filters={'access': self._userAccessFilter},
+                                              mapClassType={'AcceptedContribution': 'Contribution'}),
+                                    iface)
 
 
 @HTTPAPIHook.register
@@ -709,6 +714,68 @@ class ContributionFetcher(SessionContribFetcher):
 
         return self._process(_iterate_objs(idlist))
 
+
+@HTTPAPIHook.register
+class UserEventHook(HTTPAPIHook):
+    TYPES = ('user',)
+    RE = r'(?P<what>events|categ/events)'
+    DEFAULT_DETAIL = 'basic_events'
+    GUEST_ALLOWED = False
+
+    def _getParams(self):
+        super(UserEventHook, self)._getParams()
+        self._what = self._pathParams['what'].replace('/', '_')
+
+    def _getMethodName(self):
+        return self.PREFIX + '_' + self._what
+
+    def export_events(self, aw):
+        if not redis_client:
+            raise HTTPAPIError('This API is only available when using Redis')
+        links = avatar_links.get_links(redis_client, aw.getUser())
+        return UserRelatedEventFetcher(aw, self, links).events(links.keys())
+
+    def export_categ_events(self, aw):
+        catIds = [item['categ'].getId() for item in aw.getUser().getRelatedCategories()]
+        return UserCategoryEventFetcher(aw, self).category_events(catIds)
+
+
+class UserCategoryEventFetcher(IteratedDataFetcher):
+
+    DETAIL_INTERFACES = {
+        'basic_events': IBasicConferenceMetadataFossil
+    }
+
+    def category_events(self, catIds):
+        idx = IndexesHolder().getById('categoryDateAll')
+        iters = itertools.chain(*(idx.iterateObjectsIn(catId, self._fromDT, self._toDT) for catId in catIds))
+        return self._process(iters)
+
+
+class UserRelatedEventFetcher(IteratedDataFetcher):
+
+    DETAIL_INTERFACES = {
+        'basic_events': IBasicConferenceMetadataFossil
+    }
+
+    def __init__(self, aw, hook, roles):
+        super(UserRelatedEventFetcher, self).__init__(aw, hook)
+        self._roles = roles
+
+    def _postprocess(self, obj, fossil, iface):
+        fossil['roles'] = list(self._roles[obj.getId()])
+        return fossil
+
+    def events(self, eventIds):
+        ch = ConferenceHolder()
+
+        def _iterate_objs(objIds):
+            for objId in objIds:
+                obj = ch.getById(objId, True)
+                if obj is not None:
+                    yield obj
+
+        return self._process(_iterate_objs(eventIds))
 
 Serializer.register('html', HTML4Serializer)
 Serializer.register('jsonp', JSONPSerializer)

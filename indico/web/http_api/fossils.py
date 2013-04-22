@@ -381,3 +381,37 @@ class IConferenceMetadataWithSessionsFossil(_IncludeMaterialFossil, IConferenceM
     getContributionListWithoutSessions.result = IContributionMetadataWithSubContribsFossil
     getContributionListWithoutSessions.name = 'contributions'
     getContributionListWithoutSessions.filterBy = 'access'
+
+
+class IBasicConferenceMetadataFossil(IFossil):
+
+    def getId(self):
+        pass
+
+    def getStartDate(self):
+        pass
+    getStartDate.convert = Conversion.datetime
+
+    def getEndDate(self):
+        pass
+    getEndDate.convert = Conversion.datetime
+
+    def getTitle(self):
+        pass
+
+    def getType(self):
+        pass
+
+    def getOwner(self):
+        pass
+    getOwner.convert = lambda x: x.getTitle()
+    getOwner.name = 'category'
+
+    def getCategoryId(self):
+        pass
+    getCategoryId.produce = lambda x: x.getOwner().getId()
+
+    def getLocator(self):
+        pass
+    getLocator.convert = Conversion.url(urlHandlers.UHConferenceDisplay)
+    getLocator.name = 'url'
