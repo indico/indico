@@ -22,6 +22,11 @@
 }
 
 /* Use the following CSS code if you want to have a class per icon */
+/*
+Instead of a list of all class selectors,
+you can use the generic selector below, but it's slower:
+[class*="icon-"] {
+*/
 [class^="icon-"]:before, [class*=" icon-"]:before {
 	font-family: 'icomoon-ultimate';
     speak: none;
@@ -152,4 +157,7 @@
 }
 .icon-trust:before {
     content: "\35";
+}
+.icon-mobile:before {
+    content: "\36";
 }

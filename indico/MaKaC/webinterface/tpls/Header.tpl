@@ -1,3 +1,6 @@
+% if self_._rh.getRequestURL().find("signIn.py") == -1 and Config.getInstance().getMobileURL()!="":
+    <%include file="MobileDetection.tpl"/>
+% endif
 <%include file="Announcement.tpl"/>
 
 <div class="pageHeader pageHeaderMainPage clearfix">
@@ -124,5 +127,6 @@ helpMenu.observeClick(function(e) {
     helpPopupMenu.open(pos.x, pos.y + 30);
     return false;
 });
+
 </script>
 

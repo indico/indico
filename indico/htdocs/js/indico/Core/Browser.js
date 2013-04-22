@@ -70,3 +70,9 @@ type("BrowserHistoryBroker", [],
          // btw, IE7 not supported
 
      });
+
+
+function isMobile() {
+    var agent = navigator.userAgent.toLowerCase();
+    return agent.indexOf("iphone") != -1 || (agent.indexOf("android") != -1 && agent.indexOf("mobile") !=-1);
+}

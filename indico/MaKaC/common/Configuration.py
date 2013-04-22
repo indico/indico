@@ -483,6 +483,7 @@ class Config:
         'MaxUploadFileSize' : '0',
         'ForceConflicts' : 0,
         'OAuthAccessTokenTTL' : 10000,
+        'MobileURL' : '',
         # Authentication
         'LDAPConfig': {'host': 'myldapserver.example.com',
                        'useTLS': True,

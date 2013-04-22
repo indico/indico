@@ -2909,6 +2909,30 @@ div.pageOverHeader
     font-weight: bold;
 }
 
+/* Mobile Header */
+
+div.mobile-device-header{
+    position: absolute;
+    display: none;
+    width:480px;
+    z-index: 10;
+    padding: 5px;
+    border: 1px solid #AAA;
+    background-color: #F4F4F4;
+    color: #666;
+    margin: auto;
+    text-align: center;
+    left: 50%;
+    margin-left: -240px;
+    border-radius: 0 0 10px 10px;
+    border-top: none;
+    box-shadow: 0 0 8px rgba(100, 100, 100, 0.4);
+}
+
+div.mobile-device-header > .text{
+    display: block;
+    margin-bottom: 10px;
+}
 /* Styles for the main menu */
 
 div.globalMenu
@@ -3708,6 +3732,20 @@ ul.listCompact {
 .footer img
 {
     vertical-align: middle;
+}
+
+.mobile-footer {
+    text-align: center;
+    font-size:11px !important;
+    font-weight: normal;
+}
+.footerDark .mobile-footer {
+    color: white;
+}
+
+.footerDark .mobile-footer a {
+    color: #BBBBBB;
+    text-shadow: 1px 1px 1px #555555;
 }
 
 /* TODO: remove permanently? */
