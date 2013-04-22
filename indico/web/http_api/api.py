@@ -184,6 +184,9 @@ class HTTPAPIHook(object):
     def _hasAccess(self, aw):
         return True
 
+    def _getMethodName(self):
+        return self.PREFIX + '_' + self._type
+
     def _performCall(self, func, aw):
         resultList = []
         complete = True
@@ -210,9 +213,10 @@ class HTTPAPIHook(object):
         if not self._hasAccess(aw):
             raise HTTPAPIError('Access to this resource is restricted.', apache.HTTP_FORBIDDEN)
 
-        func = getattr(self, self.PREFIX + '_' + self._type, None)
+        method_name = self._getMethodName()
+        func = getattr(self, method_name, None)
         if not func:
-            raise NotImplementedError(self.PREFIX + '_' + self._type)
+            raise NotImplementedError(method_name)
 
         if not self.COMMIT:
             # Just execute the function, we'll never have to repeat it
@@ -232,7 +236,7 @@ class HTTPAPIHook(object):
             else:
                 raise HTTPAPIError('An unresolvable database conflict has occured', apache.HTTP_INTERNAL_SERVER_ERROR)
 
-        extraFunc = getattr(self, self.PREFIX + '_' + self._type + '_extra', None)
+        extraFunc = getattr(self, method_name + '_extra', None)
         extra = extraFunc(aw, resultList) if extraFunc else None
         return resultList, extra, complete, self.SERIALIZER_TYPE_MAP
 
