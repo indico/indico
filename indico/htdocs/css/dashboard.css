@@ -32,12 +32,13 @@
     width: 1%;
 }
 
-.dashboard-col:first-child {
-    padding: 0 10px 0 0;
+.dashboard-col:last-child {
+    padding-left: 10px;
 }
 
-.dashboard-col:last-child {
-    padding: 0 0 0 10px;
+.dashboard-col:first-child {
+    padding-right: 10px;
+    padding-left: 0; /* overwrite :last-child value in case there is only one column */
 }
 
 .dashboard-box {

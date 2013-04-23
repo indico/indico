@@ -49,6 +49,7 @@ from cgi import escape
 import re
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.util.redis import client as redis_client
 from MaKaC.plugins import PluginLoader, PluginsHolder
 
 from MaKaC.common.fossilize import fossilize
@@ -1401,6 +1402,7 @@ class WUserDashboard(wcomponents.WTemplated):
         user = self._avatar
 
         html_vars["categories"] = user.getRelatedCategories()
+        html_vars["redisEnabled"] = bool(redis_client)
 
         return html_vars
 
