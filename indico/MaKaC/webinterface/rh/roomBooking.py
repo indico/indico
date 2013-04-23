@@ -1009,8 +1009,8 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         self._roomGUIDs = []
         self._candResvs = []
         self._allRooms = False
-        self._dayLimit = 400
-        self._resvLimit = 400
+        self._dayLimit = 500
+        self._resvLimit = 5000
         roomGUIDs = params.get( "roomGUID" )
         if isinstance( roomGUIDs, list ) and 'allRooms' in roomGUIDs:
             roomGUIDs = 'allRooms'
