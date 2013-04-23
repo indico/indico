@@ -66,4 +66,6 @@ jQuery Extra Selectors <https://github.com/keithclark/JQuery-Extended-Selectors>
 
 selectivizr (http://selectivizr.com/) is freely distributed under MIT license.
 
+Werkzeug (http://werkzeug.pocoo.org) is a BSD-licensed WSGI utility library providing nice things like LocalProxy.
+
 See also the AUTHORS and ChangeLog files.
