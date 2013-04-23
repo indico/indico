@@ -60,9 +60,6 @@ Underscore is a utility-belt library for JavaScript that provides a lot of the f
 that you would expect in Prototype.js (or Ruby), but without extending any of the built-in JavaScript objects. Underscore is freely distributable under the MIT license.
 http://documentcloud.github.com/underscore/>
 
-Prototype is a Javascript framework that aims to ease development of dynamics web applications. It is freely distributable under the terms of an MIT-style license.
-<http://prototypejs.org>
-
 jQuery TypeWatch <github.com/dennyferra/TypeWatch>: Dual licensed under the MIT and GPL licenses.
 
 jQuery Extra Selectors <https://github.com/keithclark/JQuery-Extended-Selectors>: Released under MIT license.
