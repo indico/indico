@@ -97,13 +97,16 @@ HtdocsDir            = "/opt/indico/htdocs"
 LogDir               = "/opt/indico/log"
 UploadedFilesTempDir = "/opt/indico/tmp"
 XMLCacheDir          = "/opt/indico/cache"
-# You can use 'memcached' or 'files'. The files backend caches objects in
-# XMLCacheDir while the Memcached backend uses one or more memcached servers
+# You can use 'redis', 'memcached' or 'files'. The files backend caches objects in
+# XMLCacheDir while the Memcached backend uses one or more memcached servers. The
+# Redis backend uses
 #CacheBackend         = 'files'
 # When using memcached, provide a tuple containing 'ip:port' entries for the
 # memcached servers. Do not forget to firewall those servers as memcached has no
 # authentication at all!
 #MemcachedServers     = ('127.0.0.1:11211',)
+# When using redis, provide a redis connection string for the Redis server.
+#RedisCacheURL = 'redis://unused:password@localhost:6379/1'
 
 #------------------------------------------------------------------------------
 # SMTP

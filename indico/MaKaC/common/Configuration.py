@@ -460,6 +460,7 @@ class Config:
         'XMLCacheDir'               : "/opt/indico/cache",
         'CacheBackend'              : 'files',
         'MemcachedServers'          : [],
+        'RedisCacheURL'             : None,
         'SmtpServer'                : ('localhost', 25),
         'SmtpLogin'                 : '',
         'SmtpPassword'              : '',

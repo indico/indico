@@ -215,6 +215,31 @@ class MemcachedCacheStorage(CacheStorage):
         self._connect().delete(self._makeKey(path, name))
 
 
+@CacheStorage.register()
+class RedisCacheStorage(CacheStorage):
+    STORAGE_NAME = 'redis'
+
+    def __init__(self, cache):
+        super(RedisCacheStorage, self).__init__(cache)
+
+    def _connect(self):
+        import redis
+        return redis.StrictRedis.from_url(Config.getInstance().getRedisCacheURL())
+
+    def _makeKey(self, path, name):
+        return 'cache/ml/' + os.path.join(self._name, path, name)
+
+    def save(self, path, name, data):
+        self._connect().setex(self._makeKey(path, name), data, self.getTTL())
+
+    def load(self, path, name, default=None):
+        obj = self._connect().get(self._makeKey(path, name))
+        return obj, None
+
+    def remove(self, path, name):
+        self._connect().delete(self._makeKey(path, name))
+
+
 class MultiLevelCacheEntry(object):
     """
     An entry(line) for a multilevel cache
@@ -336,11 +361,8 @@ class MultiLevelCache(object):
 class CacheClient(object):
 
     def set_multi(self, mapping, ttl=0):
-        notstored = []
         for key, val in mapping.iteritems():
-            if self.set(key, val, ttl) == 0:
-                notstored.append(key)
-        return notstored
+            self.set(key, val, ttl)
 
     def get_multi(self, keys):
         values = {}
@@ -353,7 +375,6 @@ class CacheClient(object):
     def delete_multi(self, keys):
         for key in keys:
             self.delete(key)
-        return 1
 
 
 class NullCacheClient(CacheClient):
@@ -362,13 +383,56 @@ class NullCacheClient(CacheClient):
     """
 
     def set(self, key, val, ttl=0):
-        return 1
+        pass
 
     def get(self, key):
         return None
 
     def delete(self, key):
-        return
+        pass
+
+
+class RedisCacheClient(CacheClient):
+    """Redis-based cache client with a simple API"""
+
+    key_prefix = 'cache/gen/'
+
+    def __init__(self, url):
+        import redis
+        self._client = redis.StrictRedis.from_url(url)
+
+    def _unpickle(self, val):
+        if val is None:
+            return None
+        return pickle.loads(val)
+
+    def hash_key(self, key):
+        # Redis keys are even binary-safe, no need to hash anything
+        return key
+
+    def set_multi(self, mapping, ttl=0):
+        self._client.mset(dict((k, pickle.dumps(v)) for k, v in mapping.iteritems()))
+        if ttl:
+            for key in mapping:
+                self._client.expire(key, ttl)
+
+    def get_multi(self, keys):
+        return dict(zip(keys, map(self._unpickle, self._client.mget(keys))))
+
+    def delete_multi(self, keys):
+        self._client.delete(*keys)
+
+    def set(self, key, val, ttl=0):
+        if ttl:
+            self._client.setex(key, ttl, pickle.dumps(val))
+        else:
+            self._client.set(key, pickle.dumps(val))
+
+    def get(self, key):
+        return self._unpickle(self._client.get(key))
+
+    def delete(self, key):
+        self._client.delete(key)
 
 
 class FileCacheClient(CacheClient):
@@ -463,6 +527,8 @@ class GenericCache(object):
         if backend == 'memcached':
             import memcache
             self._client = memcache.Client(Config.getInstance().getMemcachedServers())
+        elif backend == 'redis':
+            self._client = RedisCacheClient(Config.getInstance().getRedisCacheURL())
         elif backend == 'files':
             self._client = FileCacheClient(Config.getInstance().getXMLCacheDir())
         else:
@@ -471,6 +537,8 @@ class GenericCache(object):
         ContextManager.set('GenericCacheClient', self._client)
 
     def _hashKey(self, key):
+        if hasattr(self._client, 'hash_key'):
+            return self._client.hash_key(key)
         return hashlib.sha256(key).hexdigest()
 
     def _makeKey(self, key):
@@ -479,7 +547,7 @@ class GenericCache(object):
             key = repr(key)
         # Hashlib doesn't allow unicode so let's ensure it's not!
         key = key.encode('utf-8')
-        return '%s.%s' % (self._namespace, self._hashKey(key))
+        return '%s%s.%s' % (getattr(self._client, 'key_prefix', ''), self._namespace, self._hashKey(key))
 
     def _processTime(self, ts):
         if isinstance(ts, datetime.timedelta):
