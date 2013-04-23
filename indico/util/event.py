@@ -22,12 +22,13 @@ Event-related utils
 """
 
 import re
-from MaKaC import conference
 
 UID_RE = re.compile(r'^(?P<event>\w+)(?:\.s(?P<session>\w+))?(?:\.(?P<contrib>\w+))?(?:\.(?P<subcont>\w+))?$')
 
 
 def uniqueId(obj):
+    from MaKaC import conference
+
     ret = obj.getId()
 
     if isinstance(obj, conference.Contribution):
@@ -49,6 +50,8 @@ def uniqueId(obj):
 
 
 def uid_to_obj(uid):
+    from MaKaC import conference
+
     m = UID_RE.match(uid)
     if not m:
         return m
@@ -63,3 +66,32 @@ def uid_to_obj(uid):
             obj = obj.getSubContributionById(d['subcont'])
 
         return obj
+
+
+def truncate_path(full_path, inner_chars=30, last_node=True):
+    """ Truncate inner nodes of a given path until they take less than
+        'inner_chars'. Top node is removed and last node can be removed as well.
+    """
+
+    if (last_node):
+        path = full_path[1:]
+    else:
+        path = full_path[1:-1]
+
+    if len(path) > 2:
+        first = path[:1]
+        last = path[-1:]
+        inner = path[1:-1]
+
+        truncated = False
+        chars = "".join(inner)
+
+        while len(chars) > inner_chars:
+            truncated = True
+            inner = inner[1:]
+            chars = "".join(inner)
+        if truncated:
+            inner = ["..."] + inner
+        path = first + inner + last
+
+    return " >> ".join(path)

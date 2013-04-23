@@ -1,36 +1,12 @@
-<%
-    from indico.util.date_time import format_human_date
-%>
-
 <div class="dashboard-tab">
     <div class="quick-access-pane">
         % if redisEnabled:
-            <div class="dashboard-col">
-                <div id="yourEvents" class="dashboard-box">
-                    <h3>${_("Your events")}</h3>
-                    <ol>
-                    <%doc>
-                    % if events:
-                        <li class="no-event">
-                            <span class="event-title italic text-superfluous">${_("You have no events.")}</span>
-                        </li>
-                    % else:
-                    % for event in events.values():
-                        <li><a href="${event["url"]}" class="truncate">
-                            <span class="event-date">${format_human_date(event["date"]).title()}</span>
-                            <span class="event-title truncate-target">${event["title"]}</span>
-                            <span class="item-legend">
-                                <span title="You have management rights" class="icon-medal contextHelp"></span>
-                                <span title="You are a reviewer" class="icon-reading contextHelp"></span>
-                                <span title="You are an atendee" class="icon-ticket contextHelp"></span>
-                            </span>
-                        </a></li>
-                    % endfor
-                    % endif
-                    </%doc>
-                    </ol>
-                </div>
+        <div class="dashboard-col">
+            <div id="yourEvents" class="dashboard-box">
+                <h3>${_("Your events")}</h3>
+                <ol></ol>
             </div>
+        </div>
         % endif
         <div class="dashboard-col">
             <div id="yourCategories" class="dashboard-box">
@@ -132,35 +108,33 @@ $(document).ready(function(){
         userid: "${ rh._avatar.getId() }"
     };
 
-    % if redisEnabled:
-        apiRequest("/user/linked_events", api_opts).done(function (resp) {
-            var html = '';
-            if (resp.count === 0) {
-                html += '<li class="no-event"> \
-                             <span class="event-title italic text-superfluous">' + $T("You have no events.") + '</span> \
+    apiRequest("/user/linked_events", api_opts).done(function (resp) {
+        var html = '';
+        if (resp.count === 0) {
+            html += '<li class="no-event"> \
+                         <span class="event-title italic text-superfluous">' + $T("You have no events.") + '</span> \
+                     </li>';
+        } else {
+            $.each(resp.results, function (i, item) {
+                html += '<li id="event-' + item.id + '" class="truncate"> \
+                             <a href="' + item.url + '" class="truncate"> \
+                                 <span class="event-date">' + getDate(item.startDate, item.endDate) + '</span> \
+                                 <span class="event-title truncate-target">' + item.title + '</span> \
+                                 <span class="item-legend"> \
+                                     <span title="' + $T("You have management rights") + 'class="icon-medal contextHelp ' + hasRights(item.roles, managementFilter) + '"></span> \
+                                     <span title="' + $T("You are a reviewer") + '" class="icon-reading contextHelp ' + hasRights(item.roles, reviewFilter) + '"></span> \
+                                     <span title="' + $T("You are an attendee") + '" class="icon-ticket contextHelp ' + hasRights(item.roles, attendanceFilter) + '"></span> \
+                                 </span> \
+                             </a>\
                          </li>';
-            } else {
-                $.each(resp.results, function (i, item) {
-                    html += '<li id="event-' + item.id + '" class="truncate"> \
-                                 <a href="' + item.url + '" class="truncate"> \
-                                     <span class="event-date">' + getDate(item.startDate, item.endDate) + '</span> \
-                                     <span class="event-title truncate-target">' + item.title + '</span> \
-                                     <span class="item-legend"> \
-                                         <span title="You have management rights" class="icon-medal contextHelp ' + hasRights(item.roles, managementFilter) + '"></span> \
-                                         <span title="You are a reviewer" class="icon-reading contextHelp ' + hasRights(item.roles, reviewFilter) + '"></span> \
-                                         <span title="You are an attendee" class="icon-ticket contextHelp ' + hasRights(item.roles, attendanceFilter) + '"></span> \
-                                     </span> \
-                                 </a>\
-                             </li>';
-                });
-            }
-            var list = $("#yourEvents ol");
-            list.append(html);
-            // Enable tooltips for active roles and delete them for inactive ones
-            list.find('.contextHelp[title].active').qtip();
-            list.find('.contextHelp[title]:not(.active)').removeAttr('title');
-        });
-    %endif
+            });
+        }
+        var list = $("#yourEvents ol");
+        list.append(html);
+        // Enable tooltips for active roles and delete them for inactive ones
+        list.find('.contextHelp[title].active').qtip();
+        list.find('.contextHelp[title]:not(.active)').removeAttr('title');
+    });
 
     apiRequest("/user/categ_events", api_opts).done(function(resp) {
         var html = '';

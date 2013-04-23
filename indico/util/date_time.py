@@ -66,27 +66,6 @@ def format_time(t, format='short', locale=None, timezone=None):
     return _format_time(t, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
 
 
-def format_human_date(dt, format='medium', locale=None):
-    """
-    Return the date in a human-like format for yesterday, today and tomorrow.
-    Format the date otherwise.
-    """
-    today = nowutc().date()
-    oneday = timedelta(days=1)
-
-    if not locale:
-        locale = currentLocale()
-
-    if dt == today - oneday:
-        return _("yesterday")
-    elif dt == today:
-        return _("today")
-    elif dt == today + oneday:
-        return _("tomorrow")
-    else:
-        return format_date(dt, format, locale=locale)
-
-
 def format_number(number, locale=None):
     if not locale:
         locale = currentLocale()

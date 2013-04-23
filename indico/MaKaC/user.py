@@ -51,6 +51,7 @@ from indico.util.contextManager import ContextManager
 from indico.util.caching import order_dict
 from indico.util.i18n import i18nformat
 from indico.util.decorators import cached_classproperty
+from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 import indico.util.redis.avatar_links as avatar_links
 
@@ -725,30 +726,9 @@ class Avatar(Persistent, Fossilizable):
                 'categ': categ,
                 'favorite': categ in favorites,
                 'managed': categ in managed,
-                'path': self._truncatePath(categ.getCategoryPathTitles())
+                'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
             }
         return OrderedDict(sorted(res.items(), key=operator.itemgetter(0)))
-
-    def _truncatePath(self, full_path):
-        path = full_path[1:-1]
-
-        if len(path) > 2:
-            first = path[:1]
-            last = path[-1:]
-            inner = path[1:-1]
-
-            truncated = False
-            chars = "".join(inner)
-
-            while len(chars) > 30:
-                truncated = True
-                inner = inner[1:]
-                chars = "".join(inner)
-            if truncated:
-                inner = ["..."] + inner
-            path = first + inner + last
-
-        return " >> ".join(path)
 
     def resetLinkedTo(self):
         self.linkedTo = {}
