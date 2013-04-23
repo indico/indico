@@ -107,46 +107,28 @@ function saveFormData() {
 
     saveCalendarData($('#finishDate').val());
 
-    $.jStorage.set("sDay", $("#sDay").val());
-    $.jStorage.set("sMonth", $("#sMonth").val());
-    $.jStorage.set("sYear", $("#sYear").val());
-    $.jStorage.set("eDay", $("#eDay").val());
-    $.jStorage.set("eMonth", $("#eMonth").val());
-    $.jStorage.set("eYear", $("#eYear").val());
-    $.jStorage.set("sTime", $('#sTime').val());
-    $.jStorage.set("eTime", $('#eTime').val());
-    $.jStorage.set("capacity", $('#capacity').val());
-    $.jStorage.set("videoconference", $('#videoconference').is(':checked'));
-    $.jStorage.set("webcast", $('#webcast').is(':checked'));
-    $.jStorage.set("publicroom", $('#publicroom').is(':checked'));
-    $.jStorage.set("filter",  $('.ui-multiselect-filter :input').val());
-    $.jStorage.set("selectedRooms",  selectedRooms);
-    $.jStorage.set("showAdvancedOptions",  $('#advancedOptions').is(":visible"));
-    $.jStorage.set("finishDate", $('#finishDate').val());
-    $.jStorage.set("flexibleDates", $('#flexibleDates').is(':checked'));
-    $.jStorage.set("flexibleDatesRange", $('#flexibleDatesRange').val());
-    $.jStorage.set("repeatability", $('#repeatability').val());
+    var rbDict = {"sDay": $("#sDay").val(),
+                  "sMonth": $("#sMonth").val(),
+                  "sYear": $("#sYear").val(),
+                  "eDay": $("#eDay").val(),
+                  "eMonth": $("#eMonth").val(),
+                  "eYear": $("#eYear").val(),
+                  "sTime": $('#sTime').val(),
+                  "eTime": $('#eTime').val(),
+                  "capacity": $('#capacity').val(),
+                  "videoconference": $('#videoconference').is(':checked'),
+                  "webcast": $('#webcast').is(':checked'),
+                  "publicroom": $('#publicroom').is(':checked'),
+                  "filter":  $('.ui-multiselect-filter :input').val(),
+                  "selectedRooms":  selectedRooms,
+                  "showAdvancedOptions":  $('#advancedOptions').is(":visible"),
+                  "finishDate": $('#finishDate').val(),
+                  "flexibleDates": $('#flexibleDates').is(':checked'),
+                  "flexibleDatesRange": $('#flexibleDatesRange').val(),
+                  "repeatability": $('#repeatability').val()};
 
-    var ttl = 7200000; // 2 hours
-    $.jStorage.setTTL("sDay", ttl);
-    $.jStorage.setTTL("sMonth", ttl);
-    $.jStorage.setTTL("sYear", ttl);
-    $.jStorage.setTTL("eDay", ttl);
-    $.jStorage.setTTL("eMonth", ttl);
-    $.jStorage.setTTL("eYear", ttl);
-    $.jStorage.setTTL("sTime", ttl);
-    $.jStorage.setTTL("eTime", ttl);
-    $.jStorage.setTTL("capacity", ttl);
-    $.jStorage.setTTL("videoconference", ttl);
-    $.jStorage.setTTL("webcast", ttl);
-    $.jStorage.setTTL("publicroom", ttl);
-    $.jStorage.setTTL("filter", ttl);
-    $.jStorage.setTTL("selectedRooms", ttl);
-    $.jStorage.setTTL("showAdvancedOptions", ttl);
-    $.jStorage.setTTL("finishDate", ttl);
-    $.jStorage.setTTL("flexibleDates", ttl);
-    $.jStorage.setTTL("flexibleDatesRange", ttl);
-    $.jStorage.setTTL("repeatability", ttl);
+    $.jStorage.set(userId, rbDict);
+    $.jStorage.setTTL(userId, 7200000); // 2 hours
 }
 
 // Restore selected rooms from local Storage

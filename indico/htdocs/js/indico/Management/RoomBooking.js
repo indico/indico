@@ -348,7 +348,7 @@ type("RoomBookingReservationWidget", ["RoomBookingWidget"],
                             if(this._isInsideBooking(elem))
                                 li = Html.li('bottomLine bookedItem', elem);
                             else{
-                                var infoDiv = Html.div({}, "This room is booked for this conference during");
+                                var infoDiv = Html.div({}, $T("This room is booked for this conference during"));
                                 for(var resvId in this.bookedRooms.get(elem)){
                                     var resv = this.bookedRooms.get(elem)[resvId];
                                     infoDiv.append(Html.br());

@@ -1,5 +1,7 @@
 <script type="text/javascript">
 
+    var userId = "rb-user-${user.getId() if user else 'not-logged'}";
+
     var maxRoomCapacity = 0;
 
     % if rooms:
@@ -200,30 +202,31 @@
         % endif
 
         // Restore saved form data
-        if ($.jStorage.get("sDay")) {
-            $("#sDatePlace").datepicker('setDate', new Date ($.jStorage.get("sYear") + "/" + $.jStorage.get("sMonth") + "/" + $.jStorage.get("sDay")));
-            $("#eDatePlace").datepicker('setDate', new Date ($.jStorage.get("eYear") + "/" + $.jStorage.get("eMonth") + "/" + $.jStorage.get("eDay")));
+        var rbUserData = $.jStorage.get(userId, {});
+        if (rbUserData.sDay) {
+            $("#sDatePlace").datepicker('setDate', new Date (rbUserData.sYear + "/" + rbUserData.sMonth + "/" + rbUserData.sDay));
+            $("#eDatePlace").datepicker('setDate', new Date (rbUserData.eYear + "/" + rbUserData.eMonth + "/" + rbUserData.eDay));
         }
-        if ($.jStorage.get("sTime")) {
-            $("#sTime").val($.jStorage.get("sTime"));
-            $("#eTime").val($.jStorage.get("eTime"));
+        if (rbUserData.sTime) {
+            $("#sTime").val(rbUserData.sTime);
+            $("#eTime").val(rbUserData.eTime);
         } else  {
             $("#sTime").val("8:30");
             $("#eTime").val("17:30");
         }
 
-        $("#capacity").val($.jStorage.get("capacity"));
-        $("#videoconference").attr('checked',($.jStorage.get("videoconference")));
-        $("#webcast").attr('checked',($.jStorage.get("webcast")));
-        $("#publicroom").attr('checked',($.jStorage.get("publicroom")));
+        $("#capacity").val(rbUserData.capacity);
+        $("#videoconference").attr('checked',(rbUserData.videoconference));
+        $("#webcast").attr('checked',(rbUserData.webcast));
+        $("#publicroom").attr('checked',(rbUserData.publicroom));
 
-        $("#finishDate").val($.jStorage.get("finishDate"));
-        $("#flexibleDates").attr('checked',($.jStorage.get("flexibleDates")));
-        if ($.jStorage.get("flexibleDatesRange")) {
-            $("#flexibleDatesRange").val($.jStorage.get("flexibleDatesRange"));
+        $("#finishDate").val(rbUserData.finishDate);
+        $("#flexibleDates").attr('checked',(rbUserData.flexibleDates));
+        if (rbUserData.flexibleDatesRange) {
+            $("#flexibleDatesRange").val(rbUserData.flexibleDatesRange);
         }
-        if ($.jStorage.get("repeatability")) {
-            $("#repeatability").val($.jStorage.get("repeatability"));
+        if (rbUserData.repeatability) {
+            $("#repeatability").val(rbUserData.repeatability);
         }
 
         // Time slider init
@@ -248,14 +251,14 @@
             },
           });
 
-        restoreSelection($.jStorage.get("selectedRooms"));
+        restoreSelection(rbUserData.selectedRooms);
         $("#roomGUID").multiselect("refresh");
 
         // Restore filter and advanced filter
-        $('#advancedOptions').toggle(!$.jStorage.get("showAdvancedOptions"));
+        $('#advancedOptions').toggle(!rbUserData.showAdvancedOptions);
         showAdvancedOptions();
 
-        $('.ui-multiselect-filter :input').val($.jStorage.get("filter"));
+        $('.ui-multiselect-filter :input').val(rbUserData.filter);
         advancedFilter();
 
         // Set watermarks
