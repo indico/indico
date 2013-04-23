@@ -67,7 +67,7 @@ def delete_event(event, client=None):
     scripts.avatar_event_links_delete_event(event.getId(), client=client)
 
 
-def init_links(avatar, client=None):
+def init_links(avatar, client=None, assumeEvents=False):
     """Initializes the links based on the existing linked_to data."""
 
     if client is None:
@@ -78,7 +78,7 @@ def init_links(avatar, client=None):
     for key, roleDict in avatar.linkedTo.iteritems():
         for role, items in roleDict.iteritems():
             for item in items:
-                event = event_from_obj(item)
+                event = event_from_obj(item) if not assumeEvents else item
                 if event:
                     all_events.add(event)
                     event_roles[event].add(key + '_' + role)
