@@ -331,6 +331,13 @@ function apiRequest(path, payload, opts) {
     });
 
     var dfd = $.Deferred();
+    var requestInfo = {
+        origin: 'unknown',
+        params: payload,
+        method: opts.method,
+        path: path
+    };
+
     $.ajax({
         url: Indico.Urls.APIBase + path + '.json',
         data: payload,
@@ -342,7 +349,7 @@ function apiRequest(path, payload, opts) {
         }
     }).fail(function(xhr, status, error) {
         var errorMessage = 'Unknown Error';
-        var resp;
+        var resp, code = '';
 
         try {
             // Maybe we have JSON
@@ -357,6 +364,7 @@ function apiRequest(path, payload, opts) {
                 errorMessage = error;
             }
             dfd.reject(errorMessage);
+            code = 'HTTP-' + error;
         }
 
         // Handle JSON error
@@ -368,12 +376,15 @@ function apiRequest(path, payload, opts) {
             if(resp.message) {
                 errorMessage = resp.message;
             }
+            code = 'APIError';
         }
 
         IndicoUtil.errorReport({
             title: $T('Error'),
             message: $T('API request failed:') + ' ' + errorMessage,
-            type: 'noReport'
+            inner: [],
+            requestInfo: requestInfo,
+            code: code
         });
     }).done(function(resp) {
         if (resp._type == 'HTTPAPIError') {
@@ -382,7 +393,9 @@ function apiRequest(path, payload, opts) {
                 IndicoUtil.errorReport({
                     title: $T('Error'),
                     message: $T('API request failed:') + ' ' + resp.message,
-                    type: 'noReport'
+                    inner: [],
+                    requestInfo: requestInfo,
+                    code: 'APIError'
                 });
             }
             return;
