@@ -748,7 +748,7 @@ def redisLinkedTo(dbi, withRBDB, prevVersion):
 
     with redis_client.pipeline(transaction=False) as pipe:
         for avatar in AvatarHolder()._getIdx().itervalues():
-            avatar_links.init_links(pipe, avatar)
+            avatar_links.init_links(avatar, client=pipe)
         pipe.execute()
 
 

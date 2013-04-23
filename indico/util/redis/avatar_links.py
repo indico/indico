@@ -20,39 +20,58 @@
 from collections import defaultdict, OrderedDict
 import MaKaC
 from indico.util.redis import scripts
+from indico.util.redis import client as redis_client
+from indico.util.redis import write_client as redis_write_client
 
 
-def add_link(client, avatar, event, role):
+def add_link(avatar, event, role, client=None):
+    if client is None:
+        client = redis_write_client
     scripts.avatar_event_links_add_link(avatar.getId(), event.getId(), event.getUnixStartDate(), role, client=client)
 
 
-def del_link(client, avatar, event, role):
+def del_link(avatar, event, role, client=None):
+    if client is None:
+        client = redis_write_client
     scripts.avatar_event_links_del_link(avatar.getId(), event.getId(), role, client=client)
 
 
-def get_links(client, avatar):
+def get_links(avatar, client=None):
+    if client is None:
+        client = redis_client
     return OrderedDict((eid, set(roles)) for eid, roles in
                        scripts.avatar_event_links_get_links(avatar.getId(), client=client).iteritems())
 
 
-def merge_avatars(client, destination, source):
+def merge_avatars(destination, source, client=None):
+    if client is None:
+        client = redis_write_client
     scripts.avatar_event_links_merge_avatars(destination.getId(), source.getId(), client=client)
 
 
-def delete_avatar(client, avatar):
+def delete_avatar(avatar, client=None):
+    if client is None:
+        client = redis_write_client
     scripts.avatar_event_links_delete_avatar(avatar.getId(), client=client)
 
 
-def update_event_time(client, event):
+def update_event_time(event, client=None):
+    if client is None:
+        client = redis_write_client
     scripts.avatar_event_links_update_event_time(event.getId(), event.getUnixStartDate(), client=client)
 
 
-def delete_event(client, event):
+def delete_event(event, client=None):
+    if client is None:
+        client = redis_write_client
     scripts.avatar_event_links_delete_event(event.getId(), client=client)
 
 
-def init_links(client, avatar):
+def init_links(avatar, client=None):
     """Initializes the links based on the existing linked_to data."""
+
+    if client is None:
+        client = redis_write_client
 
     all_events = set()
     event_roles = defaultdict(set)

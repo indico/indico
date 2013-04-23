@@ -771,7 +771,7 @@ class Avatar(Persistent, Fossilizable):
                 if redis_write_client:
                     event = avatar_links.event_from_obj(obj)
                     if event:
-                        avatar_links.add_link(redis_write_client, self, event, field + '_' + role)
+                        avatar_links.add_link(self, event, field + '_' + role)
                 break
 
     def getLinkTo(self, field, role):
@@ -790,7 +790,7 @@ class Avatar(Persistent, Fossilizable):
                     if redis_write_client:
                         event = avatar_links.event_from_obj(obj)
                         if event:
-                            avatar_links.del_link(redis_write_client, self, event, field + '_' + role)
+                            avatar_links.del_link(self, event, field + '_' + role)
                 break
 
     def getStatus( self ):
@@ -1644,7 +1644,7 @@ class AvatarHolder( ObjectHolder ):
 
         # Merge avatars in redis
         if redis_write_client:
-            avatar_links.merge_avatars(redis_write_client, prin, merged)
+            avatar_links.merge_avatars(prin, merged)
 
         # remove merged from holder
         self.remove(merged)

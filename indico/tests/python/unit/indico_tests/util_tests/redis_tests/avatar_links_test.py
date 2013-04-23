@@ -74,7 +74,7 @@ class TestLinks(IndicoTestCase):
         self.assertFalse(self._redis.keys())
         self._createDummies()
 
-        avatar_links.init_links(self._redis, self._avatar1)
+        avatar_links.init_links(self._avatar1, client=self._redis)
         self.assertEqual(frozenset(self._redis.keys()),
                          frozenset(['avatar-event-links/avatar_events:1', 'avatar-event-links/event_avatars:2',
                                     'avatar-event-links/event_avatars:3', 'avatar-event-links/event_avatars:1',
@@ -83,7 +83,7 @@ class TestLinks(IndicoTestCase):
                                     'avatar-event-links/avatar_event_roles:1:2',
                                     'avatar-event-links/avatar_event_roles:1:1']))
 
-        avatar_links.init_links(self._redis, self._avatar2)
+        avatar_links.init_links(self._avatar2, client=self._redis)
         self.assertEqual(frozenset(self._redis.keys()),
                          frozenset(['avatar-event-links/avatar_events:1', 'avatar-event-links/avatar_events:2',
                                     'avatar-event-links/event_avatars:2', 'avatar-event-links/event_avatars:3',
@@ -96,52 +96,52 @@ class TestLinks(IndicoTestCase):
                                     'avatar-event-links/avatar_event_roles:2:3',
                                     'avatar-event-links/avatar_event_roles:2:1']))
 
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar1),
+        self.assertEqual(avatar_links.get_links(self._avatar1, client=self._redis),
                          OrderedDict([('2', set(['conference_participant'])),
                                       ('1', set(['conference_participant'])),
                                       ('4', set(['conference_manager', 'conference_participant'])),
                                       ('3', set(['conference_manager']))]))
 
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar2),
+        self.assertEqual(avatar_links.get_links(self._avatar2, client=self._redis),
                          OrderedDict([('1', set(['conference_manager'])),
                                       ('4', set(['conference_manager'])),
                                       ('3', set(['conference_manager']))]))
 
     def testLinkModificationsOnlyAffectCorrectAvatar(self):
         self._createDummies()
-        avatar_links.init_links(self._redis, self._avatar1)
-        avatar_links.init_links(self._redis, self._avatar2)
+        avatar_links.init_links(self._avatar1, client=self._redis)
+        avatar_links.init_links(self._avatar2, client=self._redis)
 
         # No change may touch other avatars
-        links = avatar_links.get_links(self._redis, self._avatar2)
-        avatar_links.add_link(self._redis, self._avatar1, self._event1, 'foo')
-        self.assertEqual(links, avatar_links.get_links(self._redis, self._avatar2))
-        avatar_links.del_link(self._redis, self._avatar1, self._event4, 'conference_manager')
-        self.assertEqual(links, avatar_links.get_links(self._redis, self._avatar2))
-        avatar_links.del_link(self._redis, self._avatar1, self._event4, 'conference_participant')
-        self.assertEqual(links, avatar_links.get_links(self._redis, self._avatar2))
-        avatar_links.delete_avatar(self._redis, self._avatar1)
-        self.assertEqual(links, avatar_links.get_links(self._redis, self._avatar2))
+        links = avatar_links.get_links(self._avatar2, client=self._redis)
+        avatar_links.add_link(self._avatar1, self._event1, 'foo', client=self._redis)
+        self.assertEqual(links, avatar_links.get_links(self._avatar2, client=self._redis))
+        avatar_links.del_link(self._avatar1, self._event4, 'conference_manager', client=self._redis)
+        self.assertEqual(links, avatar_links.get_links(self._avatar2, client=self._redis))
+        avatar_links.del_link(self._avatar1, self._event4, 'conference_participant', client=self._redis)
+        self.assertEqual(links, avatar_links.get_links(self._avatar2, client=self._redis))
+        avatar_links.delete_avatar(self._avatar1, client=self._redis)
+        self.assertEqual(links, avatar_links.get_links(self._avatar2, client=self._redis))
 
     def testDeleteAvatar(self):
         self._createDummies()
-        avatar_links.init_links(self._redis, self._avatar1)
+        avatar_links.init_links(self._avatar1, client=self._redis)
         keys = frozenset(self._redis.keys())
-        links = avatar_links.get_links(self._redis, self._avatar1)
-        avatar_links.init_links(self._redis, self._avatar2)
-        avatar_links.delete_avatar(self._redis, self._avatar2)
+        links = avatar_links.get_links(self._avatar1, client=self._redis)
+        avatar_links.init_links(self._avatar2, client=self._redis)
+        avatar_links.delete_avatar(self._avatar2, client=self._redis)
         self.assertEqual(keys, frozenset(self._redis.keys()))
-        self.assertEqual(links, avatar_links.get_links(self._redis, self._avatar1))
+        self.assertEqual(links, avatar_links.get_links(self._avatar1, client=self._redis))
 
     def testMergeAvatars(self):
         self._createDummies()
-        avatar_links.init_links(self._redis, self._avatar1)
+        avatar_links.init_links(self._avatar1, client=self._redis)
         keys = frozenset(self._redis.keys())
-        avatar_links.init_links(self._redis, self._avatar2)
-        avatar_links.merge_avatars(self._redis, self._avatar1, self._avatar2)
+        avatar_links.init_links(self._avatar2, client=self._redis)
+        avatar_links.merge_avatars(self._avatar1, self._avatar2, client=self._redis)
         self.assertEqual(keys, frozenset(self._redis.keys()))
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar2), OrderedDict())
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar1),
+        self.assertEqual(avatar_links.get_links(self._avatar2, client=self._redis), OrderedDict())
+        self.assertEqual(avatar_links.get_links(self._avatar1, client=self._redis),
                          OrderedDict([('2', set(['conference_participant'])),
                                       ('1', set(['conference_manager', 'conference_participant'])),
                                       ('4', set(['conference_manager', 'conference_participant'])),
@@ -149,35 +149,35 @@ class TestLinks(IndicoTestCase):
 
     def testModifyLinks(self):
         self._createDummies()
-        avatar_links.init_links(self._redis, self._avatar1)
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar1),
+        avatar_links.init_links(self._avatar1, client=self._redis)
+        self.assertEqual(avatar_links.get_links(self._avatar1, client=self._redis),
                          OrderedDict([('2', set(['conference_participant'])),
                                       ('1', set(['conference_participant'])),
                                       ('4', set(['conference_manager', 'conference_participant'])),
                                       ('3', set(['conference_manager']))]))
         # Add a new role for an existing event
-        avatar_links.add_link(self._redis, self._avatar1, self._event1, 'conference_manager')
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar1),
+        avatar_links.add_link(self._avatar1, self._event1, 'conference_manager', client=self._redis)
+        self.assertEqual(avatar_links.get_links(self._avatar1, client=self._redis),
                          OrderedDict([('2', set(['conference_participant'])),
                                       ('1', set(['conference_manager', 'conference_participant'])),
                                       ('4', set(['conference_manager', 'conference_participant'])),
                                       ('3', set(['conference_manager']))]))
         # Delete a role from an event with multiple roles
-        avatar_links.del_link(self._redis, self._avatar1, self._event1, 'conference_participant')
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar1),
+        avatar_links.del_link(self._avatar1, self._event1, 'conference_participant', client=self._redis)
+        self.assertEqual(avatar_links.get_links(self._avatar1, client=self._redis),
                          OrderedDict([('2', set(['conference_participant'])),
                                       ('1', set(['conference_manager'])),
                                       ('4', set(['conference_manager', 'conference_participant'])),
                                       ('3', set(['conference_manager']))]))
         # Delete a role from an event with just one role
-        avatar_links.del_link(self._redis, self._avatar1, self._event1, 'conference_manager')
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar1),
+        avatar_links.del_link(self._avatar1, self._event1, 'conference_manager', client=self._redis)
+        self.assertEqual(avatar_links.get_links(self._avatar1, client=self._redis),
                          OrderedDict([('2', set(['conference_participant'])),
                                       ('4', set(['conference_manager', 'conference_participant'])),
                                       ('3', set(['conference_manager']))]))
         # Add a role for a new event
-        avatar_links.add_link(self._redis, self._avatar1, self._event1, 'conference_manager')
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar1),
+        avatar_links.add_link(self._avatar1, self._event1, 'conference_manager', client=self._redis)
+        self.assertEqual(avatar_links.get_links(self._avatar1, client=self._redis),
                          OrderedDict([('2', set(['conference_participant'])),
                                       ('1', set(['conference_manager'])),
                                       ('4', set(['conference_manager', 'conference_participant'])),
@@ -185,37 +185,37 @@ class TestLinks(IndicoTestCase):
 
     def testModifyEvent(self):
         self._createDummies()
-        avatar_links.init_links(self._redis, self._avatar1)
-        avatar_links.init_links(self._redis, self._avatar2)
+        avatar_links.init_links(self._avatar1, client=self._redis)
+        avatar_links.init_links(self._avatar2, client=self._redis)
 
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar1),
+        self.assertEqual(avatar_links.get_links(self._avatar1, client=self._redis),
                          OrderedDict([('2', set(['conference_participant'])),
                                       ('1', set(['conference_participant'])),
                                       ('4', set(['conference_manager', 'conference_participant'])),
                                       ('3', set(['conference_manager']))]))
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar2),
+        self.assertEqual(avatar_links.get_links(self._avatar2, client=self._redis),
                          OrderedDict([('1', set(['conference_manager'])),
                                       ('4', set(['conference_manager'])),
                                       ('3', set(['conference_manager']))]))
 
         # Delete whole event
-        avatar_links.delete_event(self._redis, self._event1)
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar1),
+        avatar_links.delete_event(self._event1, client=self._redis)
+        self.assertEqual(avatar_links.get_links(self._avatar1, client=self._redis),
                          OrderedDict([('2', set(['conference_participant'])),
                                       ('4', set(['conference_manager', 'conference_participant'])),
                                       ('3', set(['conference_manager']))]))
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar2),
+        self.assertEqual(avatar_links.get_links(self._avatar2, client=self._redis),
                          OrderedDict([('4', set(['conference_manager'])),
                                       ('3', set(['conference_manager']))]))
 
         # Modify event start time so the order changes
         self._event4.start_date = self._event3.start_date + 10
-        avatar_links.update_event_time(self._redis, self._event4)
+        avatar_links.update_event_time(self._event4, client=self._redis)
 
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar1),
+        self.assertEqual(avatar_links.get_links(self._avatar1, client=self._redis),
                          OrderedDict([('2', set(['conference_participant'])),
                                       ('3', set(['conference_manager'])),
                                       ('4', set(['conference_manager', 'conference_participant']))]))
-        self.assertEqual(avatar_links.get_links(self._redis, self._avatar2),
+        self.assertEqual(avatar_links.get_links(self._avatar2, client=self._redis),
                          OrderedDict([('3', set(['conference_manager'])),
                                       ('4', set(['conference_manager']))]))

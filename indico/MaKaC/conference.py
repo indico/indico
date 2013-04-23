@@ -2757,7 +2757,7 @@ class Conference(CommonObjectBase, Locatable):
 
         # Remove all links in redis
         if redis_write_client:
-            avatar_links.delete_event(redis_write_client, self)
+            avatar_links.delete_event(self)
 
         # Remote short URL mappings
         sum = ShortURLMapper()
@@ -2893,7 +2893,7 @@ class Conference(CommonObjectBase, Locatable):
 
         # Update redis link timestamp
         if redis_write_client:
-            avatar_links.update_event_time(redis_write_client, self)
+            avatar_links.update_event_time(self)
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
