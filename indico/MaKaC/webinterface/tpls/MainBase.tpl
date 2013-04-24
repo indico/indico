@@ -28,32 +28,11 @@
     % else:
 
        % if sideMenu:
-
            <div class="emptyVerticalGap"></div>
            ${ sideMenu }
-
        % endif
 
-        % if isFrontPage:
-            <div class="frontPageSideBarContainer">
-              <div class="sideBar">
-                % if isNewsActive:
-                <div class="smallSideBox" style="margin-bottom: 20px;">
-                    <h1>${ _("News") }</h1>
-                    <%include file="WelcomeHeader.tpl" args="tz = timezone"/>
-                </div>
-                % endif
-                % if upcomingEvents:
-                <div class="smallSideBox" style="margin-bottom: 20px;">
-                    <h1>${ _("Upcoming events") }</h1>
-                        ${ upcomingEvents }
-                </div>
-                % endif
-              </div>
-            </div>
-        % endif
-
-        <div class="body clearfix${" bodyWithSideMenu" if sideMenu else ""}${" bodyWithSideBar" if isFrontPage else ""}">
+        <div class="body clearfix${" bodyWithSideMenu" if sideMenu else ""}">
             ${ body }
         </div>
     % endif

@@ -2874,15 +2874,10 @@ class WConferenceListItem(WTemplated):
 
         return vars
 
+
 class WEmptyCategory(WTemplated):
-
-    def __init__(self, materialList):
-        self._materialList = materialList
-
     def getVars(self):
-        vars = {}
-        vars["material"] = self._materialList
-        return vars
+        return {}
 
 
 class WConferenceList(WTemplated):

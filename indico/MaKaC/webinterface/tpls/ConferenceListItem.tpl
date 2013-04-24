@@ -42,9 +42,14 @@ if lItem.getType() == "simple_event":
 
           <span class="protected">
             <% prot = getProtection(lItem) %>
-            % if prot != "":
-                (${prot})
+            % if prot[0]:
+                % if prot[0] == "domain":
+                    <span data-type="domain" data-domain="${prot[1] | n, j, h}">(${_("protected: ") + ", ".join(prot[1])})</span>
+                % else:
+                    <span data-type="restricted">(${_("protected")})</span>
+                % endif
             % endif
+
             % if creatDate > nowutc() - timedelta(weeks = 1):
                    <img src="${ systemIcon('new') }" style="vertical-align:middle" alt="New" title="${ _("This event is New")}" />
             % endif

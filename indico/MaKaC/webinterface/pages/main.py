@@ -17,17 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import datetime
 import MaKaC.webinterface.pages.base as base
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.accessControl as accessControl
 from MaKaC.common import timezoneUtils
-import MaKaC.common.info as info
-from MaKaC.common.utils import formatTime, formatDateTime
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.conference import Category, Conference
-from indico.modules import ModuleHolder
 
 class WPMainBase(base.WPDecorated):
 
@@ -164,38 +160,6 @@ class WPMainBase(base.WPDecorated):
     def _getBody( self, params ):
         return _("nothing yet")
 
-class WUpcomingEvents(wcomponents.WTemplated):
-
-    def formatDateTime(self, dateTime):
-        now = timezoneUtils.nowutc().astimezone(self._timezone)
-
-        if dateTime.date() == now.date():
-            return _("today") + " " + formatTime(dateTime.time())
-        elif dateTime.date() == (now + datetime.timedelta(days=1)).date():
-            return _("tomorrow") + " " + formatTime(dateTime.time())
-        elif dateTime < (now + datetime.timedelta(days=6)):
-            return formatDateTime(dateTime, format="EEEE H:mm")
-        elif dateTime.date().year == now.date().year:
-            return formatDateTime(dateTime, format="d MMM")
-        else:
-            return formatDateTime(dateTime, format="d MMM yyyy")
-
-    def _getUpcomingEvents(self):
-        # Just convert UTC to display timezone
-
-        return map(lambda x: (x[0], x[1].astimezone(self._timezone), x[2], x[3]),
-                   self._list)
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars['upcomingEvents'] = self._getUpcomingEvents()
-        return vars
-
-    def __init__(self, timezone, upcoming_list):
-        self._timezone = timezone
-        self._list = upcoming_list
-        wcomponents.WTemplated.__init__(self)
-
 class WMainBase(wcomponents.WTemplated):
 
     def __init__(self, page, timezone, navigation=None, isFrontPage=False, isRoomBooking= False, sideMenu=None):
@@ -208,7 +172,6 @@ class WMainBase(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
         vars['body'] = self._escapeChars(self._page)
         vars["isFrontPage"] = self._isFrontPage
@@ -218,23 +181,11 @@ class WMainBase(wcomponents.WTemplated):
         if self._sideMenu:
             vars["sideMenu"] = self._sideMenu.getHTML()
 
-        upcoming = ModuleHolder().getById('upcoming_events')
-
-        # if this is the front page, include the
-        # upcoming event information (if there are any)
-        if self._isFrontPage:
-            upcoming_list = upcoming.getUpcomingEventList()
-            if upcoming_list:
-                vars["upcomingEvents"] = WUpcomingEvents(self._timezone, upcoming_list).getHTML(vars)
-            else:
-                vars["upcomingEvents"] = ''
-
         vars["navigation"] = ""
         if self._navigation:
             vars["navigation"] = self._navigation.getHTML(vars)
 
         vars["timezone"] = self._timezone
-        vars["isNewsActive"] = minfo.isNewsActive()
 
         return vars
 

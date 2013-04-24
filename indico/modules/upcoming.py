@@ -32,9 +32,10 @@ from MaKaC.fossils.modules import IObservedObjectFossil
 import MaKaC.conference as conference
 
 from MaKaC.common.logger import Logger
+from MaKaC.common.utils import formatTime, formatDateTime
+import MaKaC.webinterface.wcomponents as wcomponents
 
 from indico.modules import Module
-
 
 
 class ObservedObject(Persistent, Fossilizable):
@@ -207,3 +208,36 @@ class UpcomingEventsModule(Module):
         Logger.get('upcoming_events').info("Regenerated upcoming event cache")
 
         return resultList
+
+
+class WUpcomingEvents(wcomponents.WTemplated):
+
+    def formatDateTime(self, dateTime):
+        now = timezoneUtils.nowutc().astimezone(self._timezone)
+
+        if dateTime.date() == now.date():
+            return _("today") + " " + formatTime(dateTime.time())
+        elif dateTime.date() == (now + datetime.timedelta(days=1)).date():
+            return _("tomorrow") + " " + formatTime(dateTime.time())
+        elif dateTime < (now + datetime.timedelta(days=6)):
+            return formatDateTime(dateTime, format="EEEE H:mm")
+        elif dateTime.date().year == now.date().year:
+            return formatDateTime(dateTime, format="d MMM")
+        else:
+            return formatDateTime(dateTime, format="d MMM yyyy")
+
+    def _getUpcomingEvents(self):
+        # Just convert UTC to display timezone
+
+        return map(lambda x: (x[0], x[1].astimezone(self._timezone), x[2], x[3]),
+                   self._list)
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars['upcomingEvents'] = self._getUpcomingEvents()
+        return vars
+
+    def __init__(self, timezone, upcoming_list):
+        self._timezone = timezone
+        self._list = upcoming_list
+        wcomponents.WTemplated.__init__(self)

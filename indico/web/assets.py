@@ -232,6 +232,7 @@ def register_all_js(env):
 def register_all_css(env, main_css_file):
     env.register('indico_badges_css', indico_badges_css)
     env.register('base_css', Bundle('css/{0}'.format(main_css_file),
+                                    'css/category_display.css',
                                     'css/core.css',
                                     'css/dashboard.css',
                                     'css/buttons.css',

@@ -312,13 +312,13 @@ a.img:active {
     padding: 0;
 }
 
+
 .categoryHeader {
     margin-bottom: 0px;
 }
 
 .categoryHeader a {
     font-size: 14px;
-    margin: 0 10px;
 }
 
 .categoryHeader ul {
@@ -332,7 +332,6 @@ a.img:active {
     display: inline;
     padding: 3px 0;
 }
-
 
 .categoryMap {
 }
@@ -1211,13 +1210,6 @@ td.groupTitle, td.groupTitleNoBorder, td.groupSubTitle {
    width:60%;
    background:#F6F6F6;
 }*/
-
-.categoryInfo {
-    font-size: 13px;
-    font-style: italic;
-    color: #444;
-    margin-top: 5px;
-}
 
 .categoryManagers {
     font-size: 13px;
@@ -2627,11 +2619,6 @@ a.meetingHeaderSearchBox
     border-bottom: 1px solid #777777;
 }
 
-/*.container
-{
-    overflow: hidden;
-}*/
-
 .leftFloat
 {
     float: left;
@@ -3272,6 +3259,7 @@ div.filterDiv
     overflow: hidden;
 }
 
+
 .body
 {
 }
@@ -3302,8 +3290,6 @@ div.filterDiv
 .sideBar {
     float: right;
     font-size: 14px;
-    width: 340px;
-    float: right;
     width: 340px;
 }
 
@@ -3412,29 +3398,6 @@ div.filterDiv
     list-style-type: none;
 }
 
-.sideBar ul.items li {
-    margin-bottom: 5px;
-    list-style-type: none;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #e4e4e4;
-}
-
-.sideBar ul.items li .title {
-    font-family: Verdana, Arial, Serif;
-    font-size: 1em;
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
-}
-
-.sideBar ul.items li:last-child {
-    border-bottom: 0px none;
-    padding-bottom: 0px;
-}
-
-
 .sideMenu li {
     margin-bottom: 10px;
 }
@@ -3462,14 +3425,6 @@ div.filterDiv
 .sideBar a.subLink {
     font-style: italic;
     font-size: 14px;
-}
-
-.sideBar .timing {
-    font-size: 13px;
-    display: block;
-    margin-top: 3px;
-    color: #777;
-    text-shadow: 1px 1px 0px #FEFEFE;
 }
 
 .leftMenu
@@ -3610,10 +3565,6 @@ ul.listCompact {
 .evtShortDate
 {
         margin-right: 10px;
-}
-
-.eventList {
-    padding-top: 15px;
 }
 
 .eventList h3 {
@@ -8004,6 +7955,8 @@ ul.buttonMenuPopupList li a:hover {
 }
 
 #sessionBar.scrolling {
+    background-color: transparent;
+    box-shadow: none;
     right: 0;
     padding: 0 0 5px 5px;
     z-index:999;

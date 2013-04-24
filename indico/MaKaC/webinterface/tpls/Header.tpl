@@ -17,12 +17,6 @@
             <img class="headerLogo" src="${ imgLogo }" />
         </a>
 
-        % if isFrontPage:
-            <div class="headerAboutIndico">
-                ${ _("The Indico tool allows you to manage complex conferences, workshops and meetings.") }
-            </div>
-        % endif
-
     <div class="globalMenu">
         <ul>
             <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHWelcome.getURL() }">${ _("Home") }</a></li>

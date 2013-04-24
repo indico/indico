@@ -156,6 +156,29 @@ button::-moz-focus-inner {
 }
 
 
+.fav-button {
+    font-size: 2em;
+}
+
+.fav-button.enabled:hover {
+    color: #F5F1C5 !important;
+}
+
+.fav-button.enabled {
+    background-color: #FAD74C;
+    background-image: -ms-linear-gradient(top, #FAD74C, #DAC34A);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#FAD74C), to(#DAC34A));
+    background-image: -webkit-linear-gradient(top, #FAD74C, #DAC34A);
+    background-image: -o-linear-gradient(top, #FAD74C, #DAC34A);
+    background-image: -moz-linear-gradient(top, #FAD74C, #DAC34A);
+    background-image: linear-gradient(top, #FAD74C, #DAC34A);
+
+    border-color: #B6AD6F;
+    color: #E2E28B !important;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 6px #E6DB64;
+}
+
 .i-button.label,
 .i-button.label:hover {
     background: transparent;

@@ -45,13 +45,16 @@ from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
 from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
 
-from indico.core.index import Catalog
 from MaKaC.common.fossilize import fossilize
+from MaKaC.user import CERNGroup, Avatar
 
+from indico.core.index import Catalog
+from indico.modules import ModuleHolder
+from indico.modules.upcoming import WUpcomingEvents
 from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.http_api.auth import APIKey
 from indico.web.http_api.util import generate_public_auth_request
-from MaKaC.user import CERNGroup
+
 
 class WPCategoryBase ( main.WPMainBase ):
 
@@ -116,22 +119,18 @@ class WPCategoryDisplayBase( WPCategoryBase ):
 
 class WCategoryDisplay(WICalExportBase):
 
-    def __init__( self, target, wfReg ):
+    def __init__(self, target, wfReg, tz):
         self._target = target
         self._wfReg = wfReg
+        self._timezone = timezone(tz)
 
-    def _getMaterialHTML( self ):
+    def _getMaterials(self):
         l = []
-        temp = wcomponents.WMaterialDisplayItem()
         for mat in self._target.getAllMaterialList():
-            url = urlHandlers.UHMaterialDisplay.getURL( mat )
-            l.append( temp.getHTML( self._aw, mat, url ) )
-        res = ""
-        if l:
-            res =   i18nformat("""
-                        <span style="color:#444"> _("Material"): %s</span>
-                    """)%", ".join( l )
-        return res
+            if mat.canView(self._aw):
+                url = urlHandlers.UHMaterialDisplay.getURL(mat)
+                l.append((mat, url))
+        return l
 
     def getHTML( self, aw, params ):
         self._aw = aw
@@ -139,38 +138,41 @@ class WCategoryDisplay(WICalExportBase):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+        isRootCategory = self._target.getId() == "0"
+
         vars["name"] = self._target.getName()
         vars["description"] = self._target.getDescription()
         vars["img"] = self._target.getIconURL()
         vars["categ"] = vars["target"] = self._target;
         vars["urlICSFile"] = urlHandlers.UHCategoryToiCal.getURL(self._target)
-        subcats = self._target.subcategories
+        vars["isRootCategory"] = isRootCategory
+        vars["timezone"] = self._timezone
+        vars["materials"] = self._getMaterials()
 
+        subcats = self._target.subcategories
         confs = self._target.conferences
         if subcats:
-            cl=wcomponents.WCategoryList( self._target )
-            params = {"categoryDisplayURLGen": vars["categDisplayURLGen"], "material": self._getMaterialHTML()}
+            cl = wcomponents.WCategoryList(self._target)
+            params = {"categoryDisplayURLGen": vars["categDisplayURLGen"]}
             vars["contents"] = cl.getHTML( self._aw, params )
         elif confs:
             pastEvents = self._aw.getSession().getVar("fetchPastEventsFrom")
             showPastEvents = pastEvents and self._target.getId() in pastEvents or self._aw.getUser() and self._aw.getUser().getPersonalInfo().getShowPastEvents()
             cl = wcomponents.WConferenceList( self._target, self._wfReg, showPastEvents)
-            params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"], "material": self._getMaterialHTML()}
+            params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"]}
             vars["contents"] = cl.getHTML( self._aw, params )
         else:
-            cl = wcomponents.WEmptyCategory( self._getMaterialHTML() )
+            cl = wcomponents.WEmptyCategory()
             vars["contents"] = cl.getHTML( self._aw )
-        mgrs=[]
-        from MaKaC.user import Avatar
+
+        mgrs = []
         for mgr in self._target.getManagerList():
             if isinstance(mgr, Avatar):
-                mgrs.append(mgr.getAbrName())
+                mgrs.append(("avatar", mgr.getAbrName()))
             elif isinstance(mgr, CERNGroup):
-                mgrs.append(mgr.getName() + " (e-group)")
+                mgrs.append(("group", mgr.getName()))
 
-        vars["managers"]=""
-        if mgrs != []:
-            vars["managers"]= "; ".join(mgrs)
+        vars["managers"] = sorted(mgrs)
 
         # Export ICS
         if self._target.conferences:
@@ -178,6 +180,19 @@ class WCategoryDisplay(WICalExportBase):
 
         vars["isLoggedIn"] = self._aw.getUser() is not None
         vars["favoriteCategs"] = self._aw.getUser().getLinkTo('category', 'favorite') if self._aw.getUser() else []
+
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        vars["isNewsActive"] = minfo.isNewsActive()
+
+        # if this is the front page, include the
+        # upcoming event information (if there are any)
+        if isRootCategory:
+            upcoming = ModuleHolder().getById('upcoming_events')
+            upcoming_list = upcoming.getUpcomingEventList()
+            if upcoming_list:
+                vars["upcomingEvents"] = WUpcomingEvents(self._timezone, upcoming_list).getHTML(vars)
+            else:
+                vars["upcomingEvents"] = ''
 
         return vars
 
@@ -187,9 +202,8 @@ class WPCategoryDisplay(WPCategoryDisplayBase):
     def __init__( self, rh, target, wfReg ):
         WPCategoryDisplayBase.__init__( self, rh, target )
         self._wfReg = wfReg
-        if len(self._target.getSubCategoryList())==0:
-            tzUtil = DisplayTZ(self._getAW(),target)#None,useServerTZ=1)
-            self._locTZ = tzUtil.getDisplayTZ()
+        tzUtil = DisplayTZ(self._getAW(),target)#None,useServerTZ=1)
+        self._locTZ = tzUtil.getDisplayTZ()
 
     def _getHeadContent( self ):
         # add RSS feed
@@ -206,7 +220,7 @@ class WPCategoryDisplay(WPCategoryDisplayBase):
             page = cache.getCachePage()
             if page != "":
                 return page
-        wc = WCategoryDisplay( self._target, self._wfReg )
+        wc = WCategoryDisplay(self._target, self._wfReg, self._locTZ)
         pars = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
                 "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL, \
                 "allowUserModif": self._target.canModify( self._getAW() ), \

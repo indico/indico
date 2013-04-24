@@ -6,7 +6,7 @@ newsModule = ModuleHolder().getById("news")
 newsList = newsModule.getNewsItemsList()
 %>
 
-<ul class="items">
+<ul id="news-list" class="main-page-list">
     % for newItem in newsList[:2]:
         <li>
             <a class="title" href="${ urlHandlers.UHIndicoNews.getURL()}">

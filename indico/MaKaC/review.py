@@ -1663,7 +1663,7 @@ class Abstract(Persistent):
             self._submissionDate=nowutc()
         return self._submissionDate
 
-    def getConference(self):
+    def getConference( self ):
         return self.getOwner().getOwner()
 
     def _newAuthor( self, **data ):

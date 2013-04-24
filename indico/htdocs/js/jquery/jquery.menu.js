@@ -68,31 +68,41 @@ $(function() {
         _menuize: function(elem) {
             var self = this;
 
-            elem.find('.i-button').click(function(e) {
+            elem.find('.i-button').each(function() {
                 var $this = $(this);
-                if ($this.data('toggle') == 'dropdown') {
-                    if ($this.data('on')) {
-                        self._close($this);
-                    } else {
-                        self._open($this);
-                    }
-                    e.preventDefault();
-                } else {
-                    var result = $this.triggerHandler('menu_select', self.element);
-                    if(!result) {
-                        self._close_all();
-                    }
-                    e.preventDefault();
+                if (!$this.attr('href') || $this.attr('href') == "#") {
+                    $this.click(function(e) {
+                        if ($this.data('toggle') == 'dropdown') {
+                            if ($this.data('on')) {
+                                self._close($this);
+                            } else {
+                                self._open($this);
+                            }
+                            e.preventDefault();
+                        } else {
+                            var result = $this.triggerHandler('menu_select', self.element);
+                            if(!result) {
+                                self._close_all();
+                            }
+                            e.preventDefault();
+                        }
+                    });
                 }
             });
 
-            elem.find('ul.dropdown > li > a').click(function(e) {
-                    var result = $(this).triggerHandler('menu_select', self.element);
-                    if(!result) {
-                        self._close_all();
-                    }
-                    e.preventDefault();
+            elem.find('ul.dropdown > li > a').each(function() {
+                var $this = $(this);
+                if (!$this.attr('href') || $this.attr('href') == "#") {
+                    $this.click(function(e) {
+                        var result = $this.triggerHandler('menu_select', self.element);
+                        if(!result) {
+                            self._close_all();
+                        }
+                        e.preventDefault();
+                    });
+                }
             });
+
         },
 
         _create: function() {

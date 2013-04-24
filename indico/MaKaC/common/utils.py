@@ -717,14 +717,14 @@ def getLocationInfo(item, roomLink=True, fullName=False):
 def getProtectionText(target):
     if target.hasAnyProtection():
         if target.isItselfProtected():
-            return _("protected")
+            return "protected_own", None
         elif target.hasProtectedOwner():
-            return _("protected by parent category")
+            return "protected_parent", None
         elif target.getDomainList() != []:
-            return _("%s domain only"%(", ".join(map(lambda x: x.getName(), target.getDomainList()))))
+            return "domain", list(x.getName() for x in target.getDomainList())
         else:
             return getProtectionText(target.getOwner())
-    return ""
+    return "", None
 
 
 def getReportNumberItems(obj):
