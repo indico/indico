@@ -173,3 +173,15 @@ you can use the generic selector below, but it's slower:
 .icon-ticket:before {
     content: "\40";
 }
+.icon-calendar:before {
+    content: "\41";
+}
+.icon-eye:before {
+    content: "\42";
+}
+.icon-bookmark:before {
+    content: "\43";
+}
+.icon-arrow-right:before {
+    content: "\44";
+}
