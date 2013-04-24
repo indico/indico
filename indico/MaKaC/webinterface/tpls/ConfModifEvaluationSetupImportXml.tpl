@@ -58,7 +58,10 @@ $("#importedXML").click(function(){
     if ($("[name=configOption][value=imported]").attr("checked") == "checked" || $("[name=questionsOption][value=imported]").attr("checked") == "checked" ){
         new ConfirmPopup($T("Import evaluation"),$T("You will lose some data from your current evaluation! Are you sure you want to proceed?"), function(confirmed) {
             if(confirmed) {
-                $("[name=ResultsSubmitters]").submit();
+                var form = $("[name=ResultsSubmitters]");
+                var input = $("<input>").attr("type", "hidden").attr("name", "importedXML").val("import");
+                form.append($(input)
+                form.submit();
             }
         }).open();
         return false;
