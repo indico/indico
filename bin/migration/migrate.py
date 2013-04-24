@@ -726,7 +726,7 @@ def indexConferenceTitle(dbi, withRBDB, prevVersion):
 
 @since('1.1')
 def convertLinkedTo(dbi, withRBDB, prevVersion):
-    """Convert Avatar.linkedTo structure to use OOSets"""
+    """Convert Avatar.linkedTo structure to use OOTreeSets"""
     for i, avatar in enumerate(AvatarHolder()._getIdx().itervalues()):
         avatar.updateLinkedTo()  # just in case some avatars do not have all fields
         linkedTo = avatar.linkedTo

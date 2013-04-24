@@ -26,7 +26,7 @@ import operator
 from xml.dom.minidom import parseString
 from datetime import datetime, timedelta
 from persistent import Persistent
-from BTrees.OOBTree import OOSet, union
+from BTrees.OOBTree import OOTreeSet, union
 
 import MaKaC
 import MaKaC.common.info as info
@@ -758,7 +758,7 @@ class Avatar(Persistent, Fossilizable):
         for field, data in self.linkedToMap.iteritems():
             self.linkedTo.setdefault(field, {})
             for role in data['roles']:
-                self.linkedTo[field].setdefault(role, OOSet())
+                self.linkedTo[field].setdefault(role, OOTreeSet())
 
     def linkTo(self, obj, role):
         self.updateLinkedTo()
