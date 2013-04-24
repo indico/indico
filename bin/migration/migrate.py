@@ -751,7 +751,7 @@ def convertLinkedTo(dbi, withRBDB, prevVersion):
             dbi.commit()
         print '\r  %d' % i,
         sys.stdout.flush()
-    print '\r  Done'
+    print '\r  Done   '
     dbi.commit()
 
 
@@ -765,10 +765,12 @@ def redisLinkedTo(dbi, withRBDB, prevVersion):
     with redis_client.pipeline(transaction=False) as pipe:
         for i, avatar in enumerate(AvatarHolder()._getIdx().itervalues()):
             avatar_links.init_links(avatar, client=pipe)
+            if i % 250 == 0:
+                pipe.execute()
             print '\r  %d' % i,
             sys.stdout.flush()
-        print '\r  Queued all redis commands, executing them now.'
         pipe.execute()
+    print '\r  Done   '
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
