@@ -59,12 +59,6 @@ class TempRequestTokenHolder(ObjectHolder):
     idxName = "temp_request_tokens"
     counterName = "TEMP_REQUEST_TOKEN"
 
-    def add(self, token):
-        ObjectHolder.add(self, token)
-
-    def remove(self, token):
-        ObjectHolder.remove(self, token)
-
 
 class RequestTokenHolder(ObjectHolder):
     idxName = "request_tokens"

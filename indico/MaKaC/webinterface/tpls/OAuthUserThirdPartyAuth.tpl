@@ -35,7 +35,7 @@ $(function() {
 $("body").on("click",".icon-remove", function(){
     var self = $(this);
     var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting..."));
-    jsonRpc(Indico.Urls.JsonRpcService, "oauth.deauthorizeConsumer" ,
+    jsonRpc(Indico.Urls.JsonRpcService, "oauth.unauthorizeConsumer" ,
             {'third_party_app': self.data("third-party-app"),
              'userId': '${user.getId()}'},
             function(result, error){

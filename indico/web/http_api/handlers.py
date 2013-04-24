@@ -54,7 +54,6 @@ from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.cache import GenericCache
 from MaKaC.plugins.RoomBooking.default.factory import Factory
-from MaKaC.user import AvatarHolder
 
 
 # Remove the extension at the end or before the querystring
@@ -143,8 +142,6 @@ def handler(req, **params):
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
     if minfo.getRoomBookingModuleActive():
         Factory.getDALManager().connect()
-
-    mode = path.split('/')[1]
 
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
     cookieAuth = get_query_parameter(queryParams, ['ca', 'cookieauth'], 'no') == 'yes'

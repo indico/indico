@@ -71,8 +71,6 @@ $("body").on("click",".icon-trust, .icon-untrust", function(){
             });
 });
 
-//$(".icon-trust").qtip({content: $T('By trusting the consumer (icon in green), the user does not need to grant access.')});
-
 $('.icon-trust').on('mouseover', function(event) {
     var msg = $T("The consumer is not trusted. That means that every time a user asks for the token an acceptance form will appear in order to give access to the application to get its events.");
     if($(this).hasClass("trusted")){

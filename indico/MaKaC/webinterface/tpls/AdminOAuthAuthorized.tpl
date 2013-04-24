@@ -15,7 +15,7 @@
                 <td class="CRLabstractDataCell">${token.getConsumer().getName()}</td>
                 <td class="CRLabstractDataCell">${token.getUniqueId()}</td>
                 <td class="CRLabstractDataCell">${formatTimestamp(token.getTimestamp())}</td>
-                <td class="CRLabstractDataCell"><a href="${urlHandlers.UHOAuthUserThirdPartyAuth.getURL(token.getUser())}">${_('Details')}</a></td>
+                <td class="CRLabstractDataCell"><a href=${quoteattr(urlHandlers.UHOAuthUserThirdPartyAuth.getURL(token.getUser()))}>${_('Details')}</a></td>
             </tr>
         % endfor
     </tbody>

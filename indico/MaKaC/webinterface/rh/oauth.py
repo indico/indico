@@ -31,7 +31,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.webinterface.rh import base
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.urlHandlers import UHOAuthThirdPartyAuth
-from MaKaC.errors import AccessControlError
+from MaKaC.errors import AccessControlError, MaKaCError
 from MaKaC.common.Configuration import Config
 from MaKaC.webinterface.rh.services import RHServicesBase
 from MaKaC.webinterface.rh.users import RHUserBase
@@ -43,12 +43,12 @@ class RHOAuth(base.RH):
     def send_oauth_error(self, error_code):
         self._req.status = error_code
         header = oauth.build_authenticate_header(realm=Config.getInstance().getBaseSecureURL())
-        for k, v in header.iteritems():
-            self._req.headers_out[k] = v
+        self._req.headers_out.update(header)
 
     def _checkParams(self, params):
         self._oauth_request = oauth.Request.from_request(self._req.get_method(),
-                                                self._req.construct_url(self._req.get_uri()), headers=self._req.headers_in,
+                                                self._req.construct_url(self._req.get_uri()),
+                                                headers=self._req.headers_in,
                                                 query_string=urlencode(params))
     def _process( self ):
         try:
@@ -57,6 +57,7 @@ class RHOAuth(base.RH):
             self.send_oauth_error(e.code)
 
 class RHOAuthRequestToken(RHOAuth):
+
     def _checkParams(self, params):
         try:
             RHOAuth._checkParams(self, params)
@@ -110,17 +111,15 @@ class RHOAuthAuthorization(RHOAuth, base.RHProtected):
             RequestTokenHolder().update(old_request_token, self._request_token)
         else:
             RequestTokenHolder().add(self._request_token)
-        if self._request_token.getConsumer().isTrusted():
-            self._redirect(self._request_token.getToken().get_callback_url())
-        else:
-            redirectURL = '%s?userId=%s&returnURL=%s&callback=%s&third_party_app=%s' %\
-            (UHOAuthThirdPartyAuth.getURL(),
-            user.getId(),
-            urllib2.quote(str(urlHandlers.UHOAuthAuthorizeConsumer.getURL())),
-            urllib2.quote(self._request_token.getToken().get_callback_url()),
-            urllib2.quote(self._request_token.getConsumer().getName()))
-            self._redirect(redirectURL)
-        return
+            if not self._request_token.getConsumer().isTrusted():
+                redirectURL = UHOAuthThirdPartyAuth.getURL()
+                redirectURL.addParams({'userId': user.getId(),
+                                       'callback': self._request_token.getToken().get_callback_url(),
+                                       #'returnURL': str(urlHandlers.UHOAuthAuthorizeConsumer.getURL()),
+                                       'third_party_app': self._request_token.getConsumer().getName()})
+                self._redirect(redirectURL)
+                return
+        self._redirect(self._request_token.getToken().get_callback_url())
 
     def _checkThirdPartyAuthPermissible(self, consumer, user_id):
         request_token = Catalog.getIdx('user_oauth_request_token').get(user_id)
@@ -130,39 +129,44 @@ class RHOAuthAuthorization(RHOAuth, base.RHProtected):
                     return token
         return None
 
-
 class RHOAuthAuthorizeConsumer(RHOAuth, base.RHProtected):
+
     def _checkParams(self, params):
         RHOAuth._checkParams(self, params)
         base.RHProtected._checkParams(self, params)
         try:
             self.user_id = self._oauth_request.get_parameter('userId')
             self.response = self._oauth_request.get_parameter('response')
-            self.verifier = self._oauth_request.get_parameter('oauth_verifier')
             self.callback = self._oauth_request.get_parameter('callback')
         except oauth.Error, err:
             raise OAuthError(err.message, 400)
 
     def process_req(self):
-        request_tokens = list(Catalog.getIdx('user_oauth_request_token').get(self.user_id))
-        for request_token in request_tokens:
-            if request_token.getToken().verifier == self.verifier:
+        request_tokens = Catalog.getIdx('user_oauth_request_token').get(self.user_id)
+        if request_tokens:
+            for request_token in request_tokens:
                 if self.response == 'accept':
-                    self._redirect(self.callback+'&oauth_verifier='+self.verifier)
+                    self._redirect(self.callback)
                 else:
                     RequestTokenHolder().remove(request_token)
-                    self._redirect(self.callback)
+                    self._redirect(Config.getInstance().getMobileURL())
+        else:
+            raise MaKaCError(_("There was a problem while authenticating. Please, start again the login process from the beginning"))
+
 
 class RHOAuthAccessTokenURL(RHOAuth):
     def _checkParams(self, params):
         RHOAuth._checkParams(self, params)
         try:
             request_token_key = self._oauth_request.get_parameter('oauth_token')
+            self.verifier = self._oauth_request.get_parameter('oauth_verifier')
             if not RequestTokenHolder().hasKey(request_token_key):
-                return OAuthError("Invalid Token", 401)
+                raise OAuthError("Invalid Token", 401)
             self._request_token = RequestTokenHolder().getById(request_token_key)
+            if self._request_token.getToken().verifier != self.verifier:
+                raise OAuthError("Invalid Token", 401)
             if not ConsumerHolder().hasKey(self._request_token.getConsumer().getId()):
-                return OAuthError("Invalid Consumer Key", 401)
+                raise OAuthError("Invalid Consumer Key", 401)
             consumer = oauth.Consumer(self._request_token.getConsumer().getId(), self._request_token.getConsumer().getSecret())
             OAuthServer.getInstance().verify_request(self._oauth_request, consumer, self._request_token.getToken())
         except oauth.Error, err:
@@ -173,8 +177,6 @@ class RHOAuthAccessTokenURL(RHOAuth):
             user = self._request_token.getUser()
             access_tokens = Catalog.getIdx('user_oauth_access_token').get(user.getId())
             timestamp = time.time()
-            access_token_key = OAuthUtils.gen_random_string()
-            access_token_secret = OAuthUtils.gen_random_string()
             if access_tokens is not None:
                 for access_token in list(access_tokens):
                     if access_token.getConsumer().getName() == self._request_token.getConsumer().getName():
@@ -183,6 +185,8 @@ class RHOAuthAccessTokenURL(RHOAuth):
                                     'oauth_token_secret': access_token.getToken().secret,
                                     'user_id': user.getId()}
                         return urlencode(response)
+            access_token_key = OAuthUtils.gen_random_string()
+            access_token_secret = OAuthUtils.gen_random_string()
             access_token = Token(access_token_key, oauth.Token(access_token_key, access_token_secret),
                 timestamp, self._request_token.getConsumer(), user)
             AccessTokenHolder().add(access_token)

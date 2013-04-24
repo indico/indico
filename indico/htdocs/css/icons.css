@@ -150,14 +150,14 @@ you can use the generic selector below, but it's slower:
     content: "\3b";
 }
 .icon-grid:before {
-	content: "\35";
-}
-.icon-list:before {
-	content: "\36";
-}
-.icon-trust:before {
     content: "\35";
 }
-.icon-mobile:before {
+.icon-list:before {
     content: "\36";
+}
+.icon-trust:before {
+    content: "\3d";
+}
+.icon-mobile:before {
+    content: "\3e";
 }

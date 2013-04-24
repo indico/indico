@@ -3,11 +3,7 @@
  * Simple local storage wrapper to save data on the browser side, supporting
  * all major browsers - IE6+, Firefox2+, Safari4+, Chrome4+ and Opera 10.5+
  *
-<<<<<<< HEAD
- * Copyright (c) 2010 Andris Reinman, andris.reinman@gmail.com
-=======
  * Copyright (c) 2010 - 2012 Andris Reinman, andris.reinman@gmail.com
->>>>>>> [IMP] Added message to Header when mobile
  * Project homepage: www.jstorage.info
  *
  * Licensed under MIT-style license:
@@ -28,54 +24,6 @@
  * SOFTWARE.
  */
 
-<<<<<<< HEAD
-/**
- * $.jStorage
- *
- * USAGE:
- *
- * jStorage requires Prototype, MooTools or jQuery! If jQuery is used, then
- * jQuery-JSON (http://code.google.com/p/jquery-json/) is also needed.
- * (jQuery-JSON needs to be loaded BEFORE jStorage!)
- *
- * Methods:
- *
- * -set(key, value)
- * $.jStorage.set(key, value) -> saves a value
- *
- * -get(key[, default])
- * value = $.jStorage.get(key [, default]) ->
- *    retrieves value if key exists, or default if it doesn't
- *
- * -deleteKey(key)
- * $.jStorage.deleteKey(key) -> removes a key from the storage
- *
- * -flush()
- * $.jStorage.flush() -> clears the cache
- *
- * -storageObj()
- * $.jStorage.storageObj() -> returns a read-ony copy of the actual storage
- *
- * -storageSize()
- * $.jStorage.storageSize() -> returns the size of the storage in bytes
- *
- * -index()
- * $.jStorage.index() -> returns the used keys as an array
- *
- * -storageAvailable()
- * $.jStorage.storageAvailable() -> returns true if storage is available
- *
- * -reInit()
- * $.jStorage.reInit() -> reloads the data from browser storage
- *
- * <value> can be any JSON-able value, including objects and arrays.
- *
- **/
-
-(function($){
-    if(!$ || !($.toJSON || Object.toJSON || window.JSON)){
-        throw new Error("jQuery, MooTools or Prototype needs to be loaded before jStorage!");
-=======
  (function(){
     var
         /* jStorage version */
@@ -100,16 +48,11 @@
     // Break if no JSON support was found
     if(!JSON.parse || !JSON.stringify){
         throw new Error("No JSON support found, include //cdnjs.cloudflare.com/ajax/libs/json2/20110223/json2.js to page");
->>>>>>> [IMP] Added message to Header when mobile
     }
 
     var
         /* This is the object, that holds the cached values */
-<<<<<<< HEAD
-        _storage = {},
-=======
         _storage = {__jstorage_meta:{CRC32:{}}},
->>>>>>> [IMP] Added message to Header when mobile
 
         /* Actual browser storage (localStorage or globalStorage['domain']) */
         _storage_service = {jStorage:"{}"},
@@ -120,19 +63,6 @@
         /* How much space does the storage take */
         _storage_size = 0,
 
-<<<<<<< HEAD
-        /* function to encode objects to JSON strings */
-        json_encode = $.toJSON || Object.toJSON || (window.JSON && (JSON.encode || JSON.stringify)),
-
-        /* function to decode objects from JSON strings */
-        json_decode = $.evalJSON || (window.JSON && (JSON.decode || JSON.parse)) || function(str){
-            return String(str).evalJSON();
-        },
-
-        /* which backend is currently used */
-        _backend = false,
-
-=======
         /* which backend is currently used */
         _backend = false,
 
@@ -151,7 +81,6 @@
         /* skip published items older than current timestamp */
         _pubsub_last = +new Date(),
 
->>>>>>> [IMP] Added message to Header when mobile
         /* Next check for TTL */
         _ttl_timeout,
 
@@ -213,19 +142,12 @@
             }
         };
 
-<<<<<<< HEAD
-=======
 
->>>>>>> [IMP] Added message to Header when mobile
     ////////////////////////// PRIVATE METHODS ////////////////////////
 
     /**
      * Initialization function. Detects if the browser supports DOM Storage
      * or userData behavior and behaves accordingly.
-<<<<<<< HEAD
-     * @returns undefined
-=======
->>>>>>> [IMP] Added message to Header when mobile
      */
     function _init(){
         /* Check if browser supports localStorage */
@@ -240,19 +162,13 @@
                 // QUOTA_EXCEEDED_ERRROR DOM Exception 22.
             }
         }
-<<<<<<< HEAD
-=======
 
->>>>>>> [IMP] Added message to Header when mobile
         if(localStorageReallyWorks){
             try {
                 if(window.localStorage) {
                     _storage_service = window.localStorage;
                     _backend = "localStorage";
-<<<<<<< HEAD
-=======
                     _observer_update = _storage_service.jStorage_update;
->>>>>>> [IMP] Added message to Header when mobile
                 }
             } catch(E3) {/* Firefox fails when touching localStorage and cookies are disabled */}
         }
@@ -262,10 +178,7 @@
                 if(window.globalStorage) {
                     _storage_service = window.globalStorage[window.location.hostname];
                     _backend = "globalStorage";
-<<<<<<< HEAD
-=======
                     _observer_update = _storage_service.jStorage_update;
->>>>>>> [IMP] Added message to Header when mobile
                 }
             } catch(E4) {/* Firefox fails when touching localStorage and cookies are disabled */}
         }
@@ -280,9 +193,6 @@
                 /* userData element needs to be inserted into the DOM! */
                 document.getElementsByTagName('head')[0].appendChild(_storage_elm);
 
-<<<<<<< HEAD
-                _storage_elm.load("jStorage");
-=======
                 try{
                     _storage_elm.load("jStorage");
                 }catch(E){
@@ -292,19 +202,15 @@
                     _storage_elm.load("jStorage");
                 }
 
->>>>>>> [IMP] Added message to Header when mobile
                 var data = "{}";
                 try{
                     data = _storage_elm.getAttribute("jStorage");
                 }catch(E5){}
-<<<<<<< HEAD
-=======
 
                 try{
                     _observer_update = _storage_elm.getAttribute("jStorage_update");
                 }catch(E6){}
 
->>>>>>> [IMP] Added message to Header when mobile
                 _storage_service.jStorage = data;
                 _backend = "userDataBehavior";
             }else{
@@ -313,8 +219,6 @@
             }
         }
 
-<<<<<<< HEAD
-=======
         // Load data from storage
         _load_storage();
 
@@ -357,13 +261,10 @@
             _storage_service.jStorage = data;
         }
 
->>>>>>> [IMP] Added message to Header when mobile
         _load_storage();
 
         // remove dead keys
         _handleTTL();
-<<<<<<< HEAD
-=======
 
         _handlePubSub();
     }
@@ -493,32 +394,21 @@
         }
 
         _storageObserver();
->>>>>>> [IMP] Added message to Header when mobile
     }
 
     /**
      * Loads the data from the storage based on the supported mechanism
-<<<<<<< HEAD
-     * @returns undefined
-=======
->>>>>>> [IMP] Added message to Header when mobile
      */
     function _load_storage(){
         /* if jStorage string is retrieved, then decode it */
         if(_storage_service.jStorage){
             try{
-<<<<<<< HEAD
-                _storage = json_decode(String(_storage_service.jStorage));
-=======
                 _storage = JSON.parse(String(_storage_service.jStorage));
->>>>>>> [IMP] Added message to Header when mobile
             }catch(E6){_storage_service.jStorage = "{}";}
         }else{
             _storage_service.jStorage = "{}";
         }
         _storage_size = _storage_service.jStorage?String(_storage_service.jStorage).length:0;
-<<<<<<< HEAD
-=======
 
         if(!_storage.__jstorage_meta){
             _storage.__jstorage_meta = {};
@@ -526,24 +416,15 @@
         if(!_storage.__jstorage_meta.CRC32){
             _storage.__jstorage_meta.CRC32 = {};
         }
->>>>>>> [IMP] Added message to Header when mobile
     }
 
     /**
      * This functions provides the "save" mechanism to store the jStorage object
-<<<<<<< HEAD
-     * @returns undefined
-     */
-    function _save(){
-        try{
-            _storage_service.jStorage = json_encode(_storage);
-=======
      */
     function _save(){
         _dropOldEvents(); // remove expired events
         try{
             _storage_service.jStorage = JSON.stringify(_storage);
->>>>>>> [IMP] Added message to Header when mobile
             // If userData is used as the storage engine, additional
             if(_storage_elm) {
                 _storage_elm.setAttribute("jStorage",_storage_service.jStorage);
@@ -555,11 +436,8 @@
 
     /**
      * Function checks if a key is set and is string or numberic
-<<<<<<< HEAD
-=======
      *
      * @param {String} key Key name
->>>>>>> [IMP] Added message to Header when mobile
      */
     function _checkKey(key){
         if(!key || (typeof key != "string" && typeof key != "number")){
@@ -575,11 +453,7 @@
      * Removes expired keys
      */
     function _handleTTL(){
-<<<<<<< HEAD
-        var curtime, i, TTL, nextExpire = Infinity, changed = false;
-=======
         var curtime, i, TTL, CRC32, nextExpire = Infinity, changed = false, deleted = [];
->>>>>>> [IMP] Added message to Header when mobile
 
         clearTimeout(_ttl_timeout);
 
@@ -590,24 +464,16 @@
 
         curtime = +new Date();
         TTL = _storage.__jstorage_meta.TTL;
-<<<<<<< HEAD
-=======
 
         CRC32 = _storage.__jstorage_meta.CRC32;
->>>>>>> [IMP] Added message to Header when mobile
         for(i in TTL){
             if(TTL.hasOwnProperty(i)){
                 if(TTL[i] <= curtime){
                     delete TTL[i];
-<<<<<<< HEAD
-                    delete _storage[i];
-                    changed = true;
-=======
                     delete CRC32[i];
                     delete _storage[i];
                     changed = true;
                     deleted.push(i);
->>>>>>> [IMP] Added message to Header when mobile
                 }else if(TTL[i] < nextExpire){
                     nextExpire = TTL[i];
                 }
@@ -622,9 +488,6 @@
         // save changes
         if(changed){
             _save();
-<<<<<<< HEAD
-        }
-=======
             _publishChange();
             _fireObservers(deleted, "deleted");
         }
@@ -763,42 +626,17 @@
         h ^= h >>> 15;
 
         return h >>> 0;
->>>>>>> [IMP] Added message to Header when mobile
     }
 
     ////////////////////////// PUBLIC INTERFACE /////////////////////////
 
     $.jStorage = {
         /* Version number */
-<<<<<<< HEAD
-        version: "0.1.6.1",
-=======
         version: JSTORAGE_VERSION,
->>>>>>> [IMP] Added message to Header when mobile
 
         /**
          * Sets a key's value.
          *
-<<<<<<< HEAD
-         * @param {String} key - Key to set. If this value is not set or not
-         *              a string an exception is raised.
-         * @param value - Value to set. This can be any value that is JSON
-         *              compatible (Numbers, Strings, Objects etc.).
-         * @returns the used value
-         */
-        set: function(key, value){
-            _checkKey(key);
-            if(_XMLService.isXML(value)){
-                value = {_is_xml:true,xml:_XMLService.encode(value)};
-            }else if(typeof value == "function"){
-                value = null; // functions can't be saved!
-            }else if(value && typeof value == "object"){
-                // clone the object before saving to _storage tree
-                value = json_decode(json_encode(value));
-            }
-            _storage[key] = value;
-            _save();
-=======
          * @param {String} key Key to set. If this value is not set or not
          *              a string an exception is raised.
          * @param {Mixed} value Value to set. This can be any value that is JSON
@@ -834,7 +672,6 @@
             this.setTTL(key, options.TTL || 0); // also handles saving and _publishChange
 
             _fireObservers(key, "updated");
->>>>>>> [IMP] Added message to Header when mobile
             return value;
         },
 
@@ -843,22 +680,12 @@
          *
          * @param {String} key - Key to look up.
          * @param {mixed} def - Default value to return, if key didn't exist.
-<<<<<<< HEAD
-         * @returns the key value, default value or <null>
-=======
          * @return {Mixed} the key value, default value or null
->>>>>>> [IMP] Added message to Header when mobile
          */
         get: function(key, def){
             _checkKey(key);
             if(key in _storage){
-<<<<<<< HEAD
-                if(_storage[key] && typeof _storage[key] == "object" &&
-                        _storage[key]._is_xml &&
-                            _storage[key]._is_xml){
-=======
                 if(_storage[key] && typeof _storage[key] == "object" && _storage[key]._is_xml) {
->>>>>>> [IMP] Added message to Header when mobile
                     return _XMLService.decode(_storage[key].xml);
                 }else{
                     return _storage[key];
@@ -871,25 +698,13 @@
          * Deletes a key from cache.
          *
          * @param {String} key - Key to delete.
-<<<<<<< HEAD
-         * @returns true if key existed or false if it didn't
-=======
          * @return {Boolean} true if key existed or false if it didn't
->>>>>>> [IMP] Added message to Header when mobile
          */
         deleteKey: function(key){
             _checkKey(key);
             if(key in _storage){
                 delete _storage[key];
                 // remove from TTL list
-<<<<<<< HEAD
-                if(_storage.__jstorage_meta &&
-                  typeof _storage.__jstorage_meta.TTL == "object" &&
-                  key in _storage.__jstorage_meta.TTL){
-                    delete _storage.__jstorage_meta.TTL[key];
-                }
-                _save();
-=======
                 if(typeof _storage.__jstorage_meta.TTL == "object" &&
                   key in _storage.__jstorage_meta.TTL){
                     delete _storage.__jstorage_meta.TTL[key];
@@ -900,7 +715,6 @@
                 _save();
                 _publishChange();
                 _fireObservers(key, "deleted");
->>>>>>> [IMP] Added message to Header when mobile
                 return true;
             }
             return false;
@@ -911,11 +725,7 @@
          *
          * @param {String} key - key to set the TTL for
          * @param {Number} ttl - TTL timeout in milliseconds
-<<<<<<< HEAD
-         * @returns true if key existed or false if it didn't
-=======
          * @return {Boolean} true if key existed or false if it didn't
->>>>>>> [IMP] Added message to Header when mobile
          */
         setTTL: function(key, ttl){
             var curtime = +new Date();
@@ -923,12 +733,6 @@
             ttl = Number(ttl) || 0;
             if(key in _storage){
 
-<<<<<<< HEAD
-                if(!_storage.__jstorage_meta){
-                    _storage.__jstorage_meta = {};
-                }
-=======
->>>>>>> [IMP] Added message to Header when mobile
                 if(!_storage.__jstorage_meta.TTL){
                     _storage.__jstorage_meta.TTL = {};
                 }
@@ -943,26 +747,14 @@
                 _save();
 
                 _handleTTL();
-<<<<<<< HEAD
-=======
 
                 _publishChange();
->>>>>>> [IMP] Added message to Header when mobile
                 return true;
             }
             return false;
         },
 
         /**
-<<<<<<< HEAD
-         * Deletes everything in cache.
-         *
-         * @return true
-         */
-        flush: function(){
-            _storage = {};
-            _save();
-=======
          * Gets remaining TTL (in milliseconds) for a key or 0 when no TTL has been set
          *
          * @param {String} key Key to check
@@ -988,18 +780,13 @@
             _save();
             _publishChange();
             _fireObservers(null, "flushed");
->>>>>>> [IMP] Added message to Header when mobile
             return true;
         },
 
         /**
          * Returns a read-only copy of _storage
          *
-<<<<<<< HEAD
-         * @returns Object
-=======
          * @return {Object} Read-only copy of _storage
->>>>>>> [IMP] Added message to Header when mobile
         */
         storageObj: function(){
             function F() {}
@@ -1011,11 +798,7 @@
          * Returns an index of all used keys as an array
          * ['key1', 'key2',..'keyN']
          *
-<<<<<<< HEAD
-         * @returns Array
-=======
          * @return {Array} Used keys
->>>>>>> [IMP] Added message to Header when mobile
         */
         index: function(){
             var index = [], i;
@@ -1030,12 +813,8 @@
         /**
          * How much space in bytes does the storage take?
          *
-<<<<<<< HEAD
-         * @returns Number
-=======
          * @return {Number} Storage size in chars (not the same as in bytes,
          *                  since some chars may take several bytes)
->>>>>>> [IMP] Added message to Header when mobile
          */
         storageSize: function(){
             return _storage_size;
@@ -1044,11 +823,7 @@
         /**
          * Which backend is currently in use?
          *
-<<<<<<< HEAD
-         * @returns String
-=======
          * @return {String} Backend name
->>>>>>> [IMP] Added message to Header when mobile
          */
         currentBackend: function(){
             return _backend;
@@ -1057,47 +832,13 @@
         /**
          * Test if storage is available
          *
-<<<<<<< HEAD
-         * @returns Boolean
-=======
          * @return {Boolean} True if storage can be used
->>>>>>> [IMP] Added message to Header when mobile
          */
         storageAvailable: function(){
             return !!_backend;
         },
 
         /**
-<<<<<<< HEAD
-         * Reloads the data from browser storage
-         *
-         * @returns undefined
-         */
-        reInit: function(){
-            var new_storage_elm, data;
-            if(_storage_elm && _storage_elm.addBehavior){
-                new_storage_elm = document.createElement('link');
-
-                _storage_elm.parentNode.replaceChild(new_storage_elm, _storage_elm);
-                _storage_elm = new_storage_elm;
-
-                /* Use a DOM element to act as userData storage */
-                _storage_elm.style.behavior = 'url(#default#userData)';
-
-                /* userData element needs to be inserted into the DOM! */
-                document.getElementsByTagName('head')[0].appendChild(_storage_elm);
-
-                _storage_elm.load("jStorage");
-                data = "{}";
-                try{
-                    data = _storage_elm.getAttribute("jStorage");
-                }catch(E5){}
-                _storage_service.jStorage = data;
-                _backend = "userDataBehavior";
-            }
-
-            _load_storage();
-=======
          * Register change listeners
          *
          * @param {String} key Key name
@@ -1173,15 +914,10 @@
          */
         reInit: function(){
             _reloadData();
->>>>>>> [IMP] Added message to Header when mobile
         }
     };
 
     // Initialize jStorage
     _init();
 
-<<<<<<< HEAD
-})(window.jQuery || window.$);
-=======
 })();
->>>>>>> [IMP] Added message to Header when mobile

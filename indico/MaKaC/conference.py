@@ -2446,8 +2446,11 @@ class Conference(CommonObjectBase, Locatable):
         catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
         catDateIdx.indexConf(self)
         catDateAllIdx.indexConf(self)
+        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
+        nameIdx.index(self.getId(), self.getTitle().decode('utf-8'))
 
         Catalog.getIdx('categ_conf_sd').index_obj(self)
+
 
     def unindexConf( self ):
         calIdx = indexes.IndexesHolder().getIndex('calendar')
@@ -2456,8 +2459,11 @@ class Conference(CommonObjectBase, Locatable):
         catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
         catDateIdx.unindexConf(self)
         catDateAllIdx.unindexConf(self)
+        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
+        nameIdx.unindex(self.getId())
 
         Catalog.getIdx('categ_conf_sd').unindex_obj(self)
+
 
     def __generateNewContribTypeId( self ):
         """Returns a new unique identifier for the current conference sessions
@@ -4994,22 +5000,6 @@ class ConferenceHolder( ObjectHolder ):
     """
     idxName = "conferences"
     counterName = "CONFERENCE"
-
-    def updateIndex(self, conference):
-        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
-        nameIdx.index(conference.getId(), conference.getTitle().decode('utf-8'))
-
-    def add(self, conference):
-        ObjectHolder.add(self, conference)
-        # Add conference to the name index
-        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
-        nameIdx.index(conference.getId(), conference.getTitle().decode('utf-8'))
-
-    def remove(self, conference):
-        ObjectHolder.remove(self, conference)
-        # remove conference from the name index
-        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
-        nameIdx.unindex(conference.getId())
 
     def _newId( self ):
         id = ObjectHolder._newId( self )

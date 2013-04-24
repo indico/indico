@@ -22,7 +22,7 @@ if dark is not UNDEFINED:
 else:
     dark_ = False;
 %>
-% if Config.getInstance().getMobileURL() != "":
+% if Config.getInstance().getMobileURL():
     <%include file="MobileDetection.tpl"/>
 % endif
 <%include file="Announcement.tpl"/>

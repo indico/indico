@@ -213,8 +213,8 @@ class UHOAuthResourceURL(URLHandler):
 class UHOAuthAuthorizeConsumer(URLHandler):
     _relativeURL = "oauth.py/authorize_consumer"
 
-class UHOAuthDeauthorizeConsumer(URLHandler):
-    _relativeURL = "oauth.py/deauthorize_consumer"
+class UHOAuthUnauthorizeConsumer(URLHandler):
+    _relativeURL = "oauth.py/unauthorize_consumer"
 
 class UHOAuthThirdPartyAuth( URLHandler ):
     _relativeURL = "oauth.py/thirdPartyAuth"

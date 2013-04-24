@@ -6,7 +6,7 @@ else:
 %>
 <div id="footer" class="${"longFooter " if shortURL != "" and not isFrontPage else ""}footer${" footerDark" if dark_ == True else ""}">
 
-% if Config.getInstance().getMobileURL() !="":
+% if Config.getInstance().getMobileURL():
     <div class="mobile-footer">
         ${_("Classic")} | <a style="font-size:11px !important" href="${Config.getInstance().getMobileURL()}"><span class="icon icon-mobile"></span>${_("Mobile")}</a>
     </div>

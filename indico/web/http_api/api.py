@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from MaKaC.user import AvatarHolder
 
 """
 Main export interface
@@ -104,7 +105,7 @@ class HTTPAPIHook(object):
         path = urllib.unquote(path)
         hooks = itertools.chain(cls.HOOK_LIST, cls._getPluginHooks())
         for expCls in hooks:
-            Logger.get('HTTPAPIHook.parseRequest').info(expCls)
+            Logger.get('HTTPAPIHook.parseRequest').debug(expCls)
             m = expCls._matchPath(path)
             if m:
                 gd = m.groupdict()
@@ -418,7 +419,7 @@ class EventTimeTableHook(HTTPAPIHook):
         for cid in self._idList:
             conf = ch.getById(cid)
             d[cid] = ScheduleToJson.process(conf.getSchedule(), self._tz.tzname(None),
-                                           None, days = None, mgmtMode = False)
+                                           aw, days = None, mgmtMode = False)
         return d
 
 
@@ -459,12 +460,15 @@ class UserInfoHook(HTTPAPIHook):
 
 
     def export_user(self, aw):
+        requested_user = AvatarHolder().getById(self._user_id)
         user = aw.getUser()
+        if not requested_user:
+            raise HTTPAPIError('Requested user not found', apache.HTTP_NOT_FOUND)
         if user:
-            if user.getId() == self._user_id:
-                return user.fossilize()
+            if requested_user.canUserModify(user):
+                return requested_user.fossilize()
             raise HTTPAPIError('You do not have access to that info', apache.HTTP_FORBIDDEN)
-        raise HTTPAPIError('You need to be logged in.', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('You need to be logged in', apache.HTTP_FORBIDDEN)
 
 
 @HTTPAPIHook.register

@@ -31,3 +31,4 @@ zope.event==4.0.0
 zope.index==3.6.4
 zope.interface==4.0.1
 ujson==1.19
+oauth2==1.5.211

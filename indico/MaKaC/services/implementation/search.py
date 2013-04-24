@@ -145,7 +145,7 @@ class SearchCategoryNames(ServiceBase):
 
         number = len(foundEntries)
 
-        # get only the first 10 results
+        # get only the first results
         foundEntries = foundEntries[:7]
 
         entryNames = []

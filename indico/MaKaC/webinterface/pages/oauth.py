@@ -26,6 +26,7 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.pages.admins import WPServicesCommon, WPPersonalArea
 from MaKaC.webinterface.wcomponents import WTemplated
+from MaKaC.common.url import URL
 
 class WPAdminOAuthConsumers(WPServicesCommon):
 
@@ -85,14 +86,23 @@ class WPOAuthThirdPartyAuth( WPDecorated ):
 class WOAuthThirdPartyAuth(WTemplated):
 
     def getVars(self):
-        vars = WTemplated.getVars(self)
-        vars["allowURL"] = vars["returnURL"]+ "?userId=%s&response=accept&third_party_app=%s&callback=%s"%(vars["userId"],
-                                                                                                            vars["third_party_app"],
-                                                                                                            vars["callback"])
-        vars["refuseURL"] = vars["returnURL"]+ "?userId=%s&response=refuse&third_party_app=%s&callback=%s"%(vars["userId"],
-                                                                                                            vars["third_party_app"],
-                                                                                                            vars["callback"])
-        return vars
+        wvars = WTemplated.getVars(self)
+#        returnURL = URL(wvars['returnURL'])
+        urlParams = {'userId': wvars["userId"],
+                    'callback': wvars["callback"],
+                    'third_party_app': wvars["third_party_app"]}
+
+        allowURL = urlHandlers.UHOAuthAuthorizeConsumer.getURL()
+        allowURL.addParams(urlParams)
+        allowURL.addParam('response', 'accept')
+        refuseURL = urlHandlers.UHOAuthAuthorizeConsumer.getURL()
+        refuseURL.addParams(urlParams)
+        refuseURL.addParam('response', 'refuse')
+
+        wvars["allowURL"] = str(allowURL)
+        wvars["refuseURL"] = str(refuseURL)
+
+        return wvars
 
 class WPOAuthUserThirdPartyAuth( WPPersonalArea ):
 
@@ -109,7 +119,7 @@ class WOAuthUserThirdPartyAuth(WTemplated):
         self._avatar = av
 
     def _getDeAuthorizeURL(self, token, user):
-        url = urlHandlers.UHOAuthDeauthorizeConsumer.getURL(user)
+        url = urlHandlers.UHOAuthUnauthorizeConsumer.getURL(user)
         url.addParams({"third_party_app": token.getConsumer().getName()})
         return url
 

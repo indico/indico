@@ -44,7 +44,7 @@ class OAuthConsumerEditBase(AdminService):
         self._pm = ParameterManager(self._params)
         consumerKey = self._pm.extract("consumer_key", pType=str, allowEmpty=False)
         if not ConsumerHolder().hasKey(consumerKey):
-            raise Exception("aaaa")
+            raise ServiceError("", _("Consumer key not found"))
         self._consumer = ConsumerHolder().getById(consumerKey)
 
 class OAuthRemoveConsumer(OAuthConsumerEditBase):
@@ -59,7 +59,7 @@ class OAuthToogleConsumerTrusted(OAuthConsumerEditBase):
         self._consumer.setTrusted(not self._consumer.isTrusted())
         return self._consumer.isTrusted()
 
-class OAuthDeauthorizeConsumer(UserModifyBase):
+class OAuthUnauthorizeConsumer(UserModifyBase):
 
     def _checkParams(self):
         UserModifyBase._checkParams(self)
@@ -85,5 +85,5 @@ methodMap = {
     "addConsumer": OAuthAddConsumer,
     "removeConsumer": OAuthRemoveConsumer,
     "toogleCosumerTrusted": OAuthToogleConsumerTrusted,
-    "deauthorizeConsumer": OAuthDeauthorizeConsumer,
+    "unauthorizeConsumer": OAuthUnauthorizeConsumer,
 }

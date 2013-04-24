@@ -60,6 +60,7 @@ def utcdate(datet):
     return utc2server(d)
 
 class RoomBookingHook(HTTPAPIHook):
+    GUEST_ALLOWED = False
 
     def _getParams(self):
         super(RoomBookingHook, self)._getParams()
@@ -102,11 +103,6 @@ class RoomHook(RoomBookingHook):
         expInt = RoomFetcher(aw, self)
         return expInt.room(self._location, self._idList)
 
-    def _hasAccess(self, aw):
-        if self._detail == 'reservations':
-            return super(RoomNameHook, self)._hasAccess(aw)
-        return True
-
 
 class RoomNameHook(RoomBookingHook):
     TYPES = ('roomName', )
@@ -131,14 +127,8 @@ class RoomNameHook(RoomBookingHook):
         expInt = RoomFetcher(aw, self)
         return expInt.search(self._location, self._room_name)
 
-    def _hasAccess(self, aw):
-        if self._detail == 'reservations':
-            return super(RoomNameHook, self)._hasAccess(aw)
-        return True
-
 
 class ReservationHook(RoomBookingHook):
-    GUEST_ALLOWED = False
     TYPES = ('reservation', )
     RE = r'(?P<loclist>[\w\s]+(?:-[\w\s]+)*)'
     DEFAULT_DETAIL = 'reservations'
