@@ -1408,6 +1408,17 @@ class Submission(Persistent):
         self.modificationDate = None
         self.anonymous = evaluation.isAnonymous()
 
+    def __cmp__(self, other):
+        if type(self) is not type(other):
+            # This is actually dangerous and the ZODB manual says not to do this
+            # because it relies on memory order. However, this branch should never
+            # be taken anyway since we do not store different types in the same set
+            # or use them as keys.
+            return cmp(hash(self), hash(other))
+        if self.getConference() == other.getConference():
+            return cmp(self.getId(), other.getId())
+        return cmp(self.getConference(), other.getConference())
+
     def removeReferences(self):
         """remove all pointers to other objects."""
         self._evaluation = None

@@ -363,6 +363,15 @@ class Category(CommonObjectBase):
         self.__materialGenerator = Counter()
         self._notifyCreationList = ""
 
+    def __cmp__(self, other):
+        if type(self) is not type(other):
+            # This is actually dangerous and the ZODB manual says not to do this
+            # because it relies on memory order. However, this branch should never
+            # be taken anyway since we do not store different types in the same set
+            # or use them as keys.
+            return cmp(hash(self), hash(other))
+        return cmp(self.getId(), other.getId())
+
     def __str__(self):
         return "<Category %s@%s>" % (self.getId(), hex(id(self)))
 
@@ -5429,6 +5438,17 @@ class Session(CommonObjectBase, Locatable):
         self._modificationDS = nowutc()
         self._keywords = ""
 
+    def __cmp__(self, other):
+        if type(self) is not type(other):
+            # This is actually dangerous and the ZODB manual says not to do this
+            # because it relies on memory order. However, this branch should never
+            # be taken anyway since we do not store different types in the same set
+            # or use them as keys.
+            return cmp(hash(self), hash(other))
+        if self.getConference() == other.getConference():
+            return cmp(self.getId(), other.getId())
+        return cmp(self.getConference(), other.getConference())
+
     def getTimezone( self ):
         return self.getConference().getTimezone()
 
@@ -7811,6 +7831,17 @@ class Contribution(CommonObjectBase, Locatable):
         self._modificationDS = nowutc()
         self._keywords = ""
         self._reviewManager = ReviewManager(self)
+
+    def __cmp__(self, other):
+        if type(self) is not type(other):
+            # This is actually dangerous and the ZODB manual says not to do this
+            # because it relies on memory order. However, this branch should never
+            # be taken anyway since we do not store different types in the same set
+            # or use them as keys.
+            return cmp(hash(self), hash(other))
+        if self.getConference() == other.getConference():
+            return cmp(self.getId(), other.getId())
+        return cmp(self.getConference(), other.getConference())
 
     def __str__(self):
         if self.parent:
@@ -10731,6 +10762,17 @@ class Material(CommonObjectBase):
         self.__ac = AccessController(self)
         self._mainResource = None
 
+    def __cmp__(self, other):
+        if type(self) is not type(other):
+            # This is actually dangerous and the ZODB manual says not to do this
+            # because it relies on memory order. However, this branch should never
+            # be taken anyway since we do not store different types in the same set
+            # or use them as keys.
+            return cmp(hash(self), hash(other))
+        if self.getConference() == other.getConference():
+            return cmp(self.getId(), other.getId())
+        return cmp(self.getConference(), other.getConference())
+
     def updateNonInheritingChildren(self, elem, delete=False):
         self.getAccessController().updateNonInheritingChildren(elem, delete)
         self.notify_protection_to_owner(elem, delete)
@@ -11353,6 +11395,17 @@ class Resource(CommonObjectBase):
         self.__ac = AccessController(self)
         self.pdfConversionRequestDate = None
 
+    def __cmp__(self, other):
+        if type(self) is not type(other):
+            # This is actually dangerous and the ZODB manual says not to do this
+            # because it relies on memory order. However, this branch should never
+            # be taken anyway since we do not store different types in the same set
+            # or use them as keys.
+            return cmp(hash(self), hash(other))
+        if self.getConference() == other.getConference():
+            return cmp(self.getId(), other.getId())
+        return cmp(self.getConference(), other.getConference())
+
     def clone( self, conf, protection=True ):
         res = self.__class__()
         res.setName(self.getName())
@@ -11883,6 +11936,17 @@ class Track(CoreObject):
         self._coordinators = []
         self._contributions = OOBTree()
         self._code=""
+
+    def __cmp__(self, other):
+        if type(self) is not type(other):
+            # This is actually dangerous and the ZODB manual says not to do this
+            # because it relies on memory order. However, this branch should never
+            # be taken anyway since we do not store different types in the same set
+            # or use them as keys.
+            return cmp(hash(self), hash(other))
+        if self.getConference() == other.getConference():
+            return cmp(self.getId(), other.getId())
+        return cmp(self.getConference(), other.getConference())
 
     def clone(self, conference):
         tr = Track()
