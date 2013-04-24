@@ -733,7 +733,18 @@ def convertLinkedTo(dbi, withRBDB, prevVersion):
         avatar.resetLinkedTo()  # nuke old links
         for field, data in avatar.linkedToMap.iteritems():
             for role in data['roles']:
-                avatar.linkedTo[field][role].update(linkedTo[field][role])
+                if not linkedTo[field][role]:
+                    continue
+                todo = set(linkedTo[field][role])
+                # We have broken objects in the database which will fail in the getConference() call. If the current
+                # object type has such a method call it on each object and skip it in case it raises an AttributeError
+                if hasattr(linkedTo[field][role][0], 'getConference'):
+                    for obj in linkedTo[field][role]:
+                        try:
+                            obj.getConference()
+                        except AttributeError, e:
+                            todo.remove(obj)
+                avatar.linkedTo[field][role].update(todo)
         if i % 1000 == 0:
             dbi.commit()
     dbi.commit()
