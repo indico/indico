@@ -727,6 +727,7 @@ def indexConferenceTitle(dbi, withRBDB, prevVersion):
 @since('1.1')
 def convertLinkedTo(dbi, withRBDB, prevVersion):
     """Convert Avatar.linkedTo structure to use OOTreeSets"""
+    print 'Note: Some links might point to broken objects which will be skipped automatically.'
     for i, avatar in enumerate(AvatarHolder()._getIdx().itervalues()):
         avatar.updateLinkedTo()  # just in case some avatars do not have all fields
         linkedTo = avatar.linkedTo
@@ -743,10 +744,14 @@ def convertLinkedTo(dbi, withRBDB, prevVersion):
                         try:
                             obj.getConference()
                         except AttributeError, e:
+                            print '  \tSkipping broken object in %s/%s/%s: %r' % (avatar.getId(), field, role, obj)
                             todo.remove(obj)
                 avatar.linkedTo[field][role].update(todo)
         if i % 1000 == 0:
             dbi.commit()
+        print '\r  %d' % i,
+        sys.stdout.flush()
+    print '\r  Done'
     dbi.commit()
 
 
@@ -758,8 +763,10 @@ def redisLinkedTo(dbi, withRBDB, prevVersion):
         return
 
     with redis_client.pipeline(transaction=False) as pipe:
-        for avatar in AvatarHolder()._getIdx().itervalues():
+        for i, avatar in enumerate(AvatarHolder()._getIdx().itervalues()):
             avatar_links.init_links(avatar, client=pipe)
+            print '\r  %d' % i,
+        print '\r  Queued all redis commands, executing them now.'
         pipe.execute()
 
 
