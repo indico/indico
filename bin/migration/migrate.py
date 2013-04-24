@@ -766,6 +766,7 @@ def redisLinkedTo(dbi, withRBDB, prevVersion):
         for i, avatar in enumerate(AvatarHolder()._getIdx().itervalues()):
             avatar_links.init_links(avatar, client=pipe)
             print '\r  %d' % i,
+            sys.stdout.flush()
         print '\r  Queued all redis commands, executing them now.'
         pipe.execute()
 
