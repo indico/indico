@@ -692,7 +692,6 @@ class RH(RequestHandlerBase):
             res = self._processGeneralError( e )
             DBMgr.getInstance().endRequest(False)
         except OAuthError, e:
-            res = e.fossilize()
             from indico.util import json
             res = json.dumps(e.fossilize())
             header = oauth.build_authenticate_header(realm=Config.getInstance().getBaseSecureURL())
