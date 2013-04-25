@@ -141,12 +141,12 @@
 }
 
 #manager-list li.avatar:before {
-    content: "\46";
+    content: "\48";
     font-family: 'icomoon-ultimate';
 }
 
 #manager-list li.group:before {
-    content: "\45";
+    content: "\47";
     font-family: 'icomoon-ultimate';
 }
 
@@ -233,7 +233,7 @@ ul.category-list li:hover:before {
 ul.category-list li:before {
     color: #ccc;
     float: right;
-    content: "\44";
+    content: "\46";
     font-family: 'icomoon-ultimate';
     margin-right: 1em;
     margin-left: 1em;

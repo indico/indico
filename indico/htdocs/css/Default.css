@@ -7908,18 +7908,6 @@ ul.UIAuthorList li.UIAuthorMove {
     background: white url("../images/drag.png") left top no-repeat;
 }
 
-.arrow {
-    background: #ECECEC;
-    background-image: url("../images/menu_arrow_black.png") !important;
-    background-image: url("../images/menu_arrow_black.png"), -webkit-gradient(linear, 0% 40%, 0% 70%, from(#F5F5F5), to(#F1F1F1)) !important;
-    background-image: url("../images/menu_arrow_black.png"), -moz-linear-gradient(linear, 0% 40%, 0% 70%, from(#F5F5F5), to(#F1F1F1)) !important;
-    background-repeat: no-repeat !important;
-    background-position: right center !important;
-}
-
-.arrow a {
-    padding-right: 20px !important;
-}
 
 ul.buttonMenuPopupList {
     background-color: #ECECEC;

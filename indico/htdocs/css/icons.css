@@ -162,35 +162,35 @@ you can use the generic selector below, but it's slower:
     content: "\3e";
 }
 .icon-reading:before {
-    content: "\3d";
-}
-.icon-medal:before {
-    content: "\3e";
-}
-.icon-star:before {
     content: "\3f";
 }
-.icon-ticket:before {
+.icon-medal:before {
     content: "\40";
 }
-.icon-calendar:before {
+.icon-star:before {
     content: "\41";
 }
-.icon-eye:before {
+.icon-ticket:before {
     content: "\42";
 }
-.icon-bookmark:before {
+.icon-calendar:before {
     content: "\43";
 }
-.icon-arrow-right:before {
+.icon-eye:before {
     content: "\44";
 }
-.icon-users:before {
+.icon-bookmark:before {
     content: "\45";
 }
-.icon-user:before {
+.icon-arrow-right:before {
     content: "\46";
 }
-.icon-bullhorn:before {
+.icon-users:before {
     content: "\47";
+}
+.icon-user:before {
+    content: "\48";
+}
+.icon-bullhorn:before {
+    content: "\49";
 }
