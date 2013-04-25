@@ -20,6 +20,8 @@
 */
 
 .category-container {
+    font-family: 'Helvetica Neue', Helvetica, Verdana, Arial, Sans;
+
     background: #FFFFFF;
     margin-bottom: 10px;
     overflow: hidden;
@@ -50,8 +52,8 @@
 }
 
 .category-content {
-    margin: auto;
     max-width: 850px;
+    margin: auto;
     overflow: hidden;
     padding: 0 1em 0 1em;
 }
@@ -65,16 +67,17 @@
 }
 
 .category-sidebar {
-    background-image: linear-gradient(top, rgb(250,250,250) 95%, rgb(255,255,255) 100%);
-    background-image: -o-linear-gradient(top, rgb(250,250,250) 95%, rgb(255,255,255) 100%);
-    background-image: -moz-linear-gradient(top, rgb(250,250,250) 95%, rgb(255,255,255) 100%);
-    background-image: -webkit-linear-gradient(top, rgb(250,250,250) 95%, rgb(255,255,255) 100%);
-    background-image: -ms-linear-gradient(top, rgb(250,250,250) 95%, rgb(255,255,255) 100%);
+    background-color: #fafafa;
+    background-image: linear-gradient(top, #fafafa 95%, #fff 100%);
+    background-image: -o-linear-gradient(top, #fafafa 95%, #fff 100%);
+    background-image: -moz-linear-gradient(top, #fafafa 95%, #fff 100%);
+    background-image: -webkit-linear-gradient(top, #fafafa 95%, #fff 100%);
+    background-image: -ms-linear-gradient(top, #fafafa 95%, #fff 100%);
     background-image: -webkit-gradient(
         linear,
         left top,
         left bottom,
-        color-stop(0.95, rgb(250,250,250)),
+        color-stop(0.95, #fafafa),
         color-stop(1, rgb(255,255,255))
     );
 
@@ -86,7 +89,6 @@
     float: right;
     height: 100%;
     padding: 1em;
-/*     margin-left: 1em; */
     width: 340px;
 }
 
@@ -115,7 +117,6 @@
 }
 
 .main-page-list li .title {
-    font-family: Verdana, Arial, Serif;
     font-size: 1em;
     display: block;
     overflow: hidden;
@@ -182,9 +183,9 @@ ul.category-list li {
     background-image: -moz-linear-gradient(top, #F7F7F7, #F2F2F2);
     background-image: linear-gradient(top, #F7F7F7, #F2F2F2);
 
-    transition: color .5s ease-out;
-    -webkit-transition: color .5s ease-out;
-    -moz-transition: color .5s ease-out;
+    transition: color .25s ease-out;
+    -webkit-transition: color .25s ease-out;
+    -moz-transition: color .25s ease-out;
 
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -238,7 +239,7 @@ ul.category-list li:before {
     margin-right: 1em;
     margin-left: 1em;
 
-    transition: color .5s ease-out;
-    -webkit-transition: color .5s ease-out;
-    -moz-transition: color .5s ease-out;
+    transition: color .25s ease-out;
+    -webkit-transition: color .25s ease-out;
+    -moz-transition: color .25s ease-out;
 }

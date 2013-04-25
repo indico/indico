@@ -153,19 +153,28 @@ $(document).ready(function(){
 </script>
 
 % if isLoggedIn:
-    <script>
-    $(document).ready(function(){
-        $('.i-button.fav-button').click(function() {
-            $(this).toggleClass('enabled');
-            indicoRequest('category.favorites.' + ($(this).hasClass("enabled") ? 'addCategory' : 'delCategory'), {
-                categId: '${ categ.getId() }'
-            }, function(result, error) {
-                if(error) {
-                    IndicoUtil.errorReport(error);
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.i-button.fav-button').click(function() {
+                var $this = $(this);
+
+                if ($this.hasClass('disabled')) {
                     return;
+                } else {
+                    $this.addClass('disabled');
+                    indicoRequest('category.favorites.' + ($this.hasClass("enabled") ? 'delCategory' : 'addCategory'), {
+                        categId: '${ categ.getId() }'
+                    }, function(result, error) {
+                        if(error) {
+                            $this.qtip({content: {text: $T('There has been an error. Please reload the page.')}});
+                            IndicoUtil.errorReport(error);
+                        } else {
+                            $(this).toggleClass('enabled');
+                            $this.removeClass('disabled');
+                        }
+                    });
                 }
             });
         });
-    });
     </script>
 % endif

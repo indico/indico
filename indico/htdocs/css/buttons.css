@@ -246,6 +246,7 @@ button::-moz-focus-inner {
 }
 
 .i-button:disabled,
+.i-button.disabled,
 .group.selection > input[type=checkbox]:disabled + label,
 .group.selection > input[type=radio]:disabled + label {
     border: 1px solid #BBB;
