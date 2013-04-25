@@ -114,12 +114,13 @@ class Token(Persistent):
 
     implements(IUniqueIdProvider, IIndexableByUserId)
 
-    def __init__(self, key, token, timestamp, consumer, user):
+    def __init__(self, key, token, timestamp, consumer, user, authorized=False):
         self._key = key
         self._token = token
         self._timestamp = timestamp
         self._consumer = consumer
         self._user = user
+        self._authorized = authorized
 
     def getId(self):
         return self._key
@@ -147,6 +148,12 @@ class Token(Persistent):
 
     def getConsumer(self):
         return self._consumer
+
+    def setAuthorized(self, authorized):
+        self._authorized = authorized
+
+    def isAuthorized(self):
+        return self._authorized
 
     def __conform__(self, proto):
         if proto == IIndexableByUserId:

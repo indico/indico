@@ -92,8 +92,6 @@ class RHOAuthAuthorization(RHOAuth, base.RHProtected):
             if not TempRequestTokenHolder().hasKey(request_token_key):
                 raise OAuthError("Invalid Token", 401)
             self._request_token = TempRequestTokenHolder().getById(request_token_key)
-            verifier = OAuthUtils.gen_random_string()
-            self._request_token.getToken().set_verifier(verifier)
             if not ConsumerHolder().getById(self._request_token.getConsumer().getId()):
                 raise OAuthError("Invalid Consumer Key", 401)
         except oauth.Error, err:
@@ -108,17 +106,21 @@ class RHOAuthAuthorization(RHOAuth, base.RHProtected):
         TempRequestTokenHolder().remove(self._request_token)
         self._request_token.setUser(user)
         if old_request_token is not None:
+            self._request_token.setAuthorized(True)
             RequestTokenHolder().update(old_request_token, self._request_token)
         else:
             RequestTokenHolder().add(self._request_token)
-            if not self._request_token.getConsumer().isTrusted():
-                redirectURL = UHOAuthThirdPartyAuth.getURL()
-                redirectURL.addParams({'userId': user.getId(),
-                                       'callback': self._request_token.getToken().get_callback_url(),
-                                       #'returnURL': str(urlHandlers.UHOAuthAuthorizeConsumer.getURL()),
-                                       'third_party_app': self._request_token.getConsumer().getName()})
-                self._redirect(redirectURL)
-                return
+        if not self._request_token.getConsumer().isTrusted() and not self._request_token.isAuthorized():
+            redirectURL = UHOAuthThirdPartyAuth.getURL()
+            redirectURL.addParams({'userId': user.getId(),
+                                   'callback': self._request_token.getToken().get_callback_url(),
+                                   #'returnURL': str(urlHandlers.UHOAuthAuthorizeConsumer.getURL()),
+                                   'third_party_app': self._request_token.getConsumer().getName()})
+            self._redirect(redirectURL)
+            return
+        verifier = OAuthUtils.gen_random_string()
+        self._request_token.getToken().set_verifier(verifier)
+        self._request_token._p_changed = 1
         self._redirect(self._request_token.getToken().get_callback_url())
 
     def _checkThirdPartyAuthPermissible(self, consumer, user_id):
@@ -146,10 +148,13 @@ class RHOAuthAuthorizeConsumer(RHOAuth, base.RHProtected):
         if request_tokens:
             for request_token in request_tokens:
                 if self.response == 'accept':
-                    self._redirect(self.callback)
+                    verifier = OAuthUtils.gen_random_string()
+                    request_token.getToken().set_verifier(verifier)
+                    request_token.setAuthorized(True)
+                    request_token._p_changed = 1
                 else:
                     RequestTokenHolder().remove(request_token)
-                    self._redirect(Config.getInstance().getMobileURL())
+                self._redirect(request_token.getToken().get_callback_url())
         else:
             raise MaKaCError(_("There was a problem while authenticating. Please, start again the login process from the beginning"))
 
