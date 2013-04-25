@@ -548,6 +548,10 @@ class RHAC(RHAbstractModifBase):
 
 class RHEditData(RHAbstractModifBase, AbstractParam):
 
+    def __init__(self, req):
+        RHAbstractModifBase.__init__(self, req)
+        AbstractParam.__init__(self)
+
     def _checkParams(self, params):
         RHAbstractModifBase._checkParams(self,params)
         if self._getUser() == None:

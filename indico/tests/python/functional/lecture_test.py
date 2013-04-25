@@ -118,7 +118,7 @@ class LectureBase(object):
         self.click(css="#inPlaceEditType > div > div > span > div > a")
         self.click(css="button")
         self.click(css="#addNewChairLink")
-        self.click(css="#add_new")
+        self.click(css="#addNew")
         self.select(css="div.popUpTdContent > select", label="Mr.")
         self.type(xpath="//td[2]/div/input", text="dummy")
         self.type(xpath="//tr[3]/td[2]/div/input", text="Dummy")

@@ -3290,6 +3290,10 @@ class RHAbstractsParticipantList(RHConfModifCFABase):
 
 class RHNewAbstract(RHConfModifCFABase, AbstractParam):
 
+    def __init__(self, req):
+        RHConfModifCFABase.__init__(self, req)
+        AbstractParam.__init__(self)
+
     def _checkParams(self, params):
         RHConfModifCFABase._checkParams(self, params)
         #if the user is not logged in we return immediately as this form needs
