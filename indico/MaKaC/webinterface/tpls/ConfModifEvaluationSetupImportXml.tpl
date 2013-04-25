@@ -8,7 +8,7 @@
 </div>
 
 <br/><br/>
-<form action="${actionUrl}" name="ResultsSubmitters" method="POST" enctype="multipart/form-data">
+<form action="${actionUrl}" id="ResultsSubmitters" method="POST" enctype="multipart/form-data">
   <table width="50%" align="center" class="evalationSetupImportXml">
     <tr>
       <td class="groupTitle"> ${ _("Evaluation importation")}</td>
@@ -49,22 +49,25 @@
   </table>
 </form>
 <script type="text/javascript">
-$("#importedXML").click(function(){
-    var self = this;
-    if (document.ResultsSubmitters.xmlFile.value==""){
+$("#importedXML").on('click', function (e){
+    if (!$('input[name="xmlFile"]').val()){
         new AlertPopup($T("Warning"), $T("Please select a file before importing.")).open();
-        return false;
+        e.preventDefault();
+        return;
     }
-    if ($("[name=configOption][value=imported]").attr("checked") == "checked" || $("[name=questionsOption][value=imported]").attr("checked") == "checked" ){
-        new ConfirmPopup($T("Import evaluation"),$T("You will lose some data from your current evaluation! Are you sure you want to proceed?"), function(confirmed) {
+    if ($('input[name="configOption"]:checked').val() == 'imported' || $('input[name="questionsOption:checked"]').val() == 'imported' ){
+        e.preventDefault();
+        new ConfirmPopup($T("Import evaluation"), $T("You will lose some data from your current evaluation! Are you sure you want to proceed?"), function(confirmed) {
             if(confirmed) {
-                var form = $("[name=ResultsSubmitters]");
-                var input = $("<input>").attr("type", "hidden").attr("name", "importedXML").val("import");
-                form.append($(input)
+                var form = $('#ResultsSubmitters');
+                $('<input/>', {
+                    type: 'hidden',
+                    name: 'importedXML',
+                    value: 'import'
+                }).appendTo(form);
                 form.submit();
             }
         }).open();
-        return false;
     }
 });
 </script>
