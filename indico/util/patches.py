@@ -79,6 +79,21 @@ def ordered_dict():
         pass
 
 
+@always
+def redis_pipeline_nonzero():
+    """
+    py-redis added a __len__ method to its BasePipeline class recently.
+    For our magic to work we need redis objects to be always considered
+    nonzero - no matter if it's a redis client or a redis pipeline.
+    """
+    try:
+        import redis.client
+    except ImportError:
+        pass
+    else:
+        redis.client.BasePipeline.__nonzero__ = lambda self: True
+
+
 def apply_patches():
     for version_data, func in PATCHES:
         if version_data is not None:
