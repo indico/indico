@@ -17,14 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.services.interface.rpc.process import processRequest
-
 from indico.util.json import dumps
 
 import MaKaC
-
-def offlineRequest(rh, method, params = {}):
-    return dumps(processRequest(method, params, rh._req, True))
 
 def jsonDescriptor(object):
 

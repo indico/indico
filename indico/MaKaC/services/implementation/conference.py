@@ -237,20 +237,10 @@ class ConferenceBookingModification( ConferenceTextModificationBase ):
 
         loc = self._target.getLocation()
         room = self._target.getRoom()
-        if loc:
-            locName = loc.getName()
-            locAddress = loc.getAddress()
-        else:
-            locName = ''
-            locAddress = ''
-        if room:
-            roomName = room.name
-        else:
-            roomName = ''
 
-        return { 'location': locName,
-                 'room': roomName,
-                 'address': locAddress }
+        return { 'location': loc.getName() if loc else "",
+                 'room': room.name if room else "",
+                 'address': loc.getAddress() if loc else "" }
 
 class ConferenceBookingDisplay( ConferenceDisplayBase ):
     """

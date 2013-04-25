@@ -1,4 +1,4 @@
-% if self_._rh.getRequestURL().find("signIn.py") == -1 and Config.getInstance().getMobileURL()!="":
+% if self_._rh.isMobile() and Config.getInstance().getMobileURL():
     <%include file="MobileDetection.tpl"/>
 % endif
 <%include file="Announcement.tpl"/>

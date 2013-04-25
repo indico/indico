@@ -63,6 +63,7 @@ class RHRegistrationForm( RHBaseRegistrationForm ):
 class RHRegistrationFormSignIn( RHBaseRegistrationForm ):
     _uh = urlHandlers.UHConfRegistrationFormSignIn
     _tohttps = True
+    _isMobile = False
 
     def _checkParams( self, params ):
         RHBaseRegistrationForm._checkParams( self, params )

@@ -1,3 +1,4 @@
+% if tokens:
 <ol class="ordered-list" style="border-top: 1px solid #DDDDDD">
     % for token in tokens:
     <li>
@@ -22,6 +23,7 @@
     </li>
     % endfor
 </ol>
+% endif
 
 <h4 id="no_third_apps" style="display:none">${_("No third party application authorized yet.")}</h4>
 

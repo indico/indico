@@ -36,8 +36,7 @@
 </table>
 
 <script type="text/javascript">
-
-    var favouriteUserList = ${ offlineRequest(self_._rh, 'user.favorites.listUsers',dict(userId=user.getId())) };
+    var favouriteUserList = ${favoriteUsers | n,j};
 
     var removeUser = function(user, setResult){
         jsonRpc(Indico.Urls.JsonRpcService, "user.favorites.removeUser",

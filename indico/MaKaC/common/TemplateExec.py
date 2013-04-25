@@ -357,9 +357,6 @@ def registerHelpers(objDict):
         objDict['Config'] = MaKaC.common.Configuration.Config
     if not 'jsBoolean' in objDict:
         objDict['jsBoolean'] = jsBoolean
-    if not 'offlineRequest' in objDict:
-        from MaKaC.services.interface.rpc.offline import offlineRequest
-        objDict['offlineRequest'] = offlineRequest
     if not 'jsonDescriptor' in objDict:
         from MaKaC.services.interface.rpc.offline import jsonDescriptor
         objDict['jsonDescriptor'] = jsonDescriptor

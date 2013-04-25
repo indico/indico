@@ -54,6 +54,7 @@ from indico.web.http_api.api import CategoryEventHook
 class RHConfSignIn( conferenceBase.RHConferenceBase ):
 
     _tohttps = True
+    _isMobile = False
 
     def _checkParams( self, params ):
         conferenceBase.RHConferenceBase._checkParams( self, params )
@@ -113,6 +114,8 @@ class RHConfSignIn( conferenceBase.RHConferenceBase ):
 
 
 class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
+
+    _isMobile = False
 
     def _checkParams( self, params ):
         conferenceBase.RHConferenceBase._checkParams(self, params )

@@ -26,7 +26,7 @@
 
         <script type="text/javascript">
 
-            var allowedList = ${ offlineRequest(self_._rh, 'category.protection.getAllowedUsersList', dict(category=self_._rh._target.getId())) };
+            var allowedList = ${fossilize(self_._rh._target.getAllowedToAccessList()) | n,j};
 
             var removeUser = function(user, setResult){
                 jsonRpc(Indico.Urls.JsonRpcService, "category.protection.removeAllowedUser",

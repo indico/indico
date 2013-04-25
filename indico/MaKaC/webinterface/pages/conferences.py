@@ -1755,6 +1755,12 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["screenDates"] = "%s -> %s" % (ssdate, sedate)
         vars["timezoneList"] = TimezoneRegistry.getList()
         vars["chairpersons"] = self._getChairPersonsList()
+
+        loc = self._conf.getLocation()
+        room = self._conf.getRoom()
+        vars["currentLocation"] = { 'location': loc.getName() if loc else "",
+                                    'room': room.name if room else "",
+                                    'address': loc.getAddress() if loc else "" }
         return vars
 
 class WPConferenceModificationClosed( WPConferenceModifBase ):

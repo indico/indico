@@ -36,6 +36,7 @@ import MaKaC.common.info as info
 class RHSignIn( base.RH ):
 
     _tohttps = True
+    _isMobile = False
 
     def _checkParams( self, params ):
         self._signIn = params.get("signIn", "").strip()
@@ -95,6 +96,8 @@ class RHSignIn( base.RH ):
 
 class RHSignOut( base.RH ):
 
+    _isMobile = False
+
     def _checkParams( self, params ):
         self._returnURL = params.get( "returnURL", "").strip()
         if self._returnURL == "":
@@ -116,6 +119,8 @@ class RHSignOut( base.RH ):
 
 class RHLogoutSSOHook( base.RH):
 
+    _isMobile = False
+
     def _process(self):
         """Script triggered by the display of the centralized SSO logout
         dialog. It logouts the user from CDS Invenio and stream back the
@@ -136,6 +141,8 @@ class RHLogoutSSOHook( base.RH):
 
 
 class RHActive( base.RH ):
+
+    _isMobile = False
 
     def _checkParams( self, params ):
         base.RH._checkParams(self, params )
@@ -166,6 +173,8 @@ class RHActive( base.RH ):
 
 class RHSendLogin( base.RH ):
 
+    _isMobile = False
+
     def _checkParams( self, params ):
         self._userId = params.get( "userId", "" ).strip()
         self._email = params.get("email", "").strip()
@@ -187,6 +196,8 @@ class RHSendLogin( base.RH ):
 
 class RHSendActivation( base.RH ):
 
+    _isMobile = False
+
     def _checkProtection( self ):
         base.RH._checkProtection(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -207,6 +218,8 @@ class RHSendActivation( base.RH ):
 
 class RHDisabledAccount( base.RH ):
 
+    _isMobile = False
+
     def _checkParams( self, params ):
         base.RH._checkParams(self, params )
         self._userId = params.get( "userId", "" ).strip()
@@ -217,6 +230,8 @@ class RHDisabledAccount( base.RH ):
         return p.display()
 
 class RHUnactivatedAccount( base.RH ):
+
+    _isMobile = False
 
     def _checkParams( self, params ):
         base.RH._checkParams(self, params )

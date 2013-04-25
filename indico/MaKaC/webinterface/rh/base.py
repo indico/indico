@@ -216,6 +216,7 @@ class RH(RequestHandlerBase):
     """
     _tohttps = False # set this value to True for the RH that must be HTTPS when there is a BaseSecureURL
     _doNotSanitizeFields = []
+    _isMobile = True # this value means that the generated web page can be mobile
 
     def __init__( self, req ):
         """Constructor. Initialises the rh setting up basic attributes so it is
@@ -244,6 +245,9 @@ class RH(RequestHandlerBase):
 
     def getTarget( self ):
         return self._target
+
+    def isMobile(self):
+        return self._isMobile
 
     def _setSession( self ):
         """Sets up a reference to the corresponding web session. It uses the
@@ -682,8 +686,11 @@ class RH(RequestHandlerBase):
             DBMgr.getInstance().endRequest(False)
         except OAuthError, e:
             res = e.fossilize()
+            from indico.util import json
+            res = json.dumps(e.fossilize())
             header = oauth.build_authenticate_header(realm=Config.getInstance().getBaseSecureURL())
             self._req.headers_out.update(header)
+            self._req.headers_out["content-type"] = 'application/json'
             self._req.status = e.code
             DBMgr.getInstance().endRequest(False)
         except Exception, e: #Generic error treatment

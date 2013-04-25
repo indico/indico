@@ -59,6 +59,8 @@ class RHLoginStatus( RHXMLHandlerBase ):
 
 class RHSignIn( RHXMLHandlerBase ):
 
+    _isMobile = False
+
     def _checkParams( self, params ):
 
         self._login = params.get( "login", "" ).strip()

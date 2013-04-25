@@ -56,6 +56,7 @@ from indico.modules import ModuleHolder
 from MaKaC.errors import MaKaCError
 from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.locators import CategoryWebLocator
+from MaKaC.services.implementation.user import UserComparator
 
 class WPAdminsBase( WPMainBase ):
 
@@ -1399,6 +1400,9 @@ class WUserBaskets(wcomponents.WTemplated):
         params['user'] = self._avatar
         params['favoriteCategs'] = [dict(id=c.getId(), title=c.getTitle()) for c in
                                     self._avatar.getLinkTo('category', 'favorite')]
+        users = self._avatar.getPersonalInfo().getBasket().getUsers().values()
+        fossilizedUsers = sorted(fossilize(users), cmp=UserComparator.cmpUsers)
+        params['favoriteUsers'] = fossilizedUsers
         return wcomponents.WTemplated.getHTML( self, params )
 
 

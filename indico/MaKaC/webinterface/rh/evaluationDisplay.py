@@ -75,6 +75,7 @@ class RHEvaluationSignIn( RHBaseEvaluation ):
     """Invite user to login/signin."""
     _uh = urlHandlers.UHConfEvaluationSignIn
     _tohttps = True
+    _isMobile = False
 
 
     def _processIfActive( self ):

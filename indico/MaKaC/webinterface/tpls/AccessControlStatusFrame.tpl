@@ -134,11 +134,8 @@ from MaKaC.conference import Category
 
 % if privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED') :
     new IndicoUI.Widgets.Generic.textField($E('inPlaceEditContact'), '${termsDict[type]['name'] + '.protection.changeContactInfo'}', ${dict([(termsDict[type]['paramsKey'], target.getId())])}, '${contactInfo or _("no contact info defined")}');
-    % if type != 'Category' and type!= 'Home' and type != 'Event':
-    var allowedList = ${ offlineRequest(self_._rh, termsDict[type]['name'] + '.protection.getAllowedUsersList', dict([(termsDict[type]['paramsKey'], target.getId()), ('confId', target.getConference().getId())])) };
-    % else :
-    var allowedList = ${ offlineRequest(self_._rh, termsDict[type]['name'] + '.protection.getAllowedUsersList', dict([(termsDict[type]['paramsKey'], target.getId())])) };
-    % endif
+
+    var allowedList = ${fossilize(target.getAllowedToAccessList()) | n,j};
 
     var removeUser = function(user, setResult){
         // This operation may be very expensive for categories

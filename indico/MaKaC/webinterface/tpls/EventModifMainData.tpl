@@ -288,7 +288,7 @@ $E('inPlaceEditLocation').set([
       }
     };
     }
-  )(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, 'event.main.changeBooking',{conference: '${ conferenceId }'}, $O(${ offlineRequest(self_._rh,'event.main.changeBooking',dict(conference="%s"%conferenceId))})), context),
+  )(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, 'event.main.changeBooking',{conference: '${ conferenceId }'}, $O(${currentLocation | n,j})), context),
     IndicoUI.Aux.defaultEditMenu(context)]);
 
 // Search chairpersons/speakers
