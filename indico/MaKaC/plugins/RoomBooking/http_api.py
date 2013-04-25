@@ -105,27 +105,33 @@ class RoomHook(RoomBookingHook):
 
 
 class RoomNameHook(RoomBookingHook):
+    GUEST_ALLOWED = True
     TYPES = ('roomName', )
     RE = r'(?P<location>[\w\s]+)/(?P<room_name>[\w\s\-]+)'
     DEFAULT_DETAIL = 'rooms'
     MAX_RECORDS = {
-        'rooms': 500,
-        'reservations': 10
+        'rooms': 500
     }
     SERIALIZER_TYPE_MAP = {
-        'RoomCERN': 'Room',
-        'ReservationCERN': 'Reservation'
+        'RoomCERN': 'Room'
     }
     VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
+
         super(RoomNameHook, self)._getParams()
         self._location = self._pathParams['location']
         self._room_name = self._pathParams['room_name']
 
     def export_roomName(self, aw):
-        expInt = RoomFetcher(aw, self)
+        expInt = RoomNameFetcher(aw, self)
         return expInt.search(self._location, self._room_name)
+
+    def _hasAccess(self, aw):
+        """
+        Access to RB data (no reservations) is public
+        """
+        return True
 
 
 class ReservationHook(RoomBookingHook):
@@ -456,6 +462,10 @@ class RoomFetcher(RoomBookingFetcher):
         Factory.getDALManager().disconnect()
 
 
+class RoomNameFetcher(RoomFetcher):
+    DETAIL_INTERFACES = {
+        'rooms': IRoomMetadataFossil
+    }
 
 class ReservationFetcher(RoomBookingFetcher):
     DETAIL_INTERFACES = {
