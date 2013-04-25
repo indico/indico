@@ -114,7 +114,7 @@ type("ErrorReportDialog", ["ServiceDialogWithButtons"],
              this.error.userMail = email.get();
 
              if (!$.isArray(this.error.inner)) {
-                 this.error.inner = [this.error.inner];
+                 this.error.inner = this.error.inner ? [this.error.inner] : [];
              }
 
              // make sure the HTML sanitization filter won't ruin everything
