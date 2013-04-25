@@ -101,20 +101,23 @@ containsCategories = len(categ.getSubCategoryList()) > 0
     </div>
     % endif
 
-    <div class="category-content">
-        <div class="category-info">
+    <div class="category-content-wrapper">
+        <div class="category-content">
+            <div class="category-info">
 
-        % if isRootCategory:
-            ${_("Welcome to Indico. The Indico tool allows you to manage complex conferences, workshops and meetings.<br/> In order to start browsing, please select one of the categories below.")}
-        % elif description:
-            ${description}
-        % endif
-        </div>
+            % if isRootCategory:
+                ${_("Welcome to Indico. The Indico tool allows you to manage complex conferences, workshops and meetings.<br/> In order to start browsing, please select one of the categories below.")}
+            % elif description:
+                ${description}
+            % endif
+            </div>
 
-        <div>
-            ${ contents }
+            <div>
+                ${ contents }
+            </div>
         </div>
     </div>
+
 </div>
 
 <script>

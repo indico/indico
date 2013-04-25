@@ -198,8 +198,7 @@ presentation = Bundle('js/jquery/underscore.js',
                       'js/presentation/Ui/Widgets/WidgetGrid.js',
                       filters='rjsmin', output='presentation_%(version)s.min.js')
 
-ie_compatibility = Bundle('js/css3-mediaqueries.js',
-                          'js/selectivizr.js',
+ie_compatibility = Bundle('js/selectivizr.js',
                           filters='rjsmin', output='ie_compatibility_%(version)s.min.js')
 
 moment = Bundle('js/moment/moment.js',

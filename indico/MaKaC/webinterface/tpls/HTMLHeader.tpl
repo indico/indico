@@ -33,9 +33,6 @@
         % for JSFile in assets["ie_compatibility"].urls():
             ${'<script src="'+ baseurl + JSFile +'" type="text/javascript"></script>\n'}
         % endfor
-
-        <link rel="stylesheet" type="text/css" href="${baseurl}/css/ie8.css">
-
         <![endif]-->
 
     <script type="text/javascript">

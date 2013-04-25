@@ -51,26 +51,24 @@
     padding-right: 340px;
 }
 
+.category-content-wrapper {
+    overflow: hidden;
+    padding: 2em 2em;
+}
+
 .category-content {
     width: 100%;
     max-width: 850px;
-    overflow: hidden;
-    padding: 0 1em 0 1em;
+    padding: 0 1em 0 0;
     margin: auto;
-}
-
-@media all and (max-width: 1215px) {
-  .category-content {
-    width: inherit;
-  }
 }
 
 .category-info {
     color: #888;
     font-size: 1.2em;
     font-family: Georgia, Times, Serif;
-    margin: 2em 0;
     min-height: 0.3em;
+    margin: auto;
 }
 
 .category-sidebar {
@@ -220,6 +218,8 @@ ul.category-list li a {
     display: block;
     color: #3fa9f5;
     padding: 0 0 0 1em;
+
+    outline: none;
 
     transition: color .25s ease-out;
     -webkit-transition: color .25s ease-out;
