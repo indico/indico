@@ -35,6 +35,7 @@ except ImportError:
     pass
 from ZODB.POSException import ConflictError, POSKeyError
 from ZEO.Exceptions import ClientDisconnected
+import oauth2 as oauth
 
 from MaKaC.common import fossilize
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
@@ -48,6 +49,7 @@ from MaKaC.common.general import *
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import DBMgr, Config, security
 from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlScriptError, HtmlForbiddenTag, ConferenceClosedError, HostnameResolveError, BadRefererError
+from indico.modules.oauth.errors import OAuthError
 from MaKaC.webinterface.mail import GenericMailer
 from xml.sax.saxutils import escape
 
@@ -677,6 +679,12 @@ class RH(RequestHandlerBase):
             DBMgr.getInstance().endRequest(False)
         except ValueError, e:
             res = self._processGeneralError( e )
+            DBMgr.getInstance().endRequest(False)
+        except OAuthError, e:
+            res = e.fossilize()
+            header = oauth.build_authenticate_header(realm=Config.getInstance().getBaseSecureURL())
+            self._req.headers_out.update(header)
+            self._req.status = e.code
             DBMgr.getInstance().endRequest(False)
         except Exception, e: #Generic error treatment
             res = self._processUnexpectedError( e )

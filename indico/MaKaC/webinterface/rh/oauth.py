@@ -40,21 +40,11 @@ from MaKaC.webinterface.pages.oauth import WPAdminOAuthConsumers, WPAdminOAuthAu
 
 class RHOAuth(base.RH):
 
-    def send_oauth_error(self, error_code):
-        self._req.status = error_code
-        header = oauth.build_authenticate_header(realm=Config.getInstance().getBaseSecureURL())
-        self._req.headers_out.update(header)
-
     def _checkParams(self, params):
         self._oauth_request = oauth.Request.from_request(self._req.get_method(),
                                                 self._req.construct_url(self._req.get_uri()),
                                                 headers=self._req.headers_in,
                                                 query_string=urlencode(params))
-    def _process( self ):
-        try:
-            return self.process_req()
-        except OAuthError, e:
-            self.send_oauth_error(e.code)
 
 class RHOAuthRequestToken(RHOAuth):
 
@@ -72,7 +62,7 @@ class RHOAuthRequestToken(RHOAuth):
         except oauth.Error, err:
             raise OAuthError(err.message, 401)
 
-    def process_req(self):
+    def _process(self):
         # TODO: Token should have flag authorized=False
         token = oauth.Token(OAuthUtils.gen_random_string(), OAuthUtils.gen_random_string())
         token.set_callback(self._oauth_request.get_parameter('oauth_callback'))
@@ -100,7 +90,7 @@ class RHOAuthAuthorization(RHOAuth, base.RHProtected):
     def _checkProtection(self):
         base.RHProtected._checkProtection(self)
 
-    def process_req(self):
+    def _process(self):
         user = self.getAW().getUser()
         old_request_token = self._checkThirdPartyAuthPermissible(self._request_token.getConsumer().getName(), user.getId())
         TempRequestTokenHolder().remove(self._request_token)
@@ -143,7 +133,7 @@ class RHOAuthAuthorizeConsumer(RHOAuth, base.RHProtected):
         except oauth.Error, err:
             raise OAuthError(err.message, 400)
 
-    def process_req(self):
+    def _process(self):
         request_tokens = Catalog.getIdx('user_oauth_request_token').get(self.user_id)
         if request_tokens:
             for request_token in request_tokens:
@@ -177,7 +167,7 @@ class RHOAuthAccessTokenURL(RHOAuth):
         except oauth.Error, err:
             raise OAuthError(err.message, 401)
 
-    def process_req(self):
+    def _process(self):
         try:
             user = self._request_token.getUser()
             access_tokens = Catalog.getIdx('user_oauth_access_token').get(user.getId())
