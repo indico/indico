@@ -8,12 +8,12 @@
       <tr>
         <td>
           <br/><br/>
-          <a class="greyLink" href="javascript:check(document.ResultsSubmitters.${inputCheckboxName}, true)"> ${ _("all")}</a>
+          <a class="greyLink checkAllSubmitters" data-state="true" href="#"> ${ _("all")}</a>
           /
-          <a class="greyLink" href="javascript:check(document.ResultsSubmitters.${inputCheckboxName}, false)"> ${ _("none")}</a>
+          <a class="greyLink checkAllSubmitters" data-state="false" href="#"> ${ _("none")}</a>
           <br/><br/>
           % for s in submissions:
-            <input type="checkbox" name="${inputCheckboxName}" value="${s.getId()}"
+            <input type="checkbox" class="submitter" name="${inputCheckboxName}" value="${s.getId()}"
               ${'checked="checked"' if isModeSelect and (len(selectedSubmissions)<1 or s in selectedSubmissions) else ""}/>
             ${s.getSubmissionDate(str)} - <b>${s.getSubmitterName()}</b>
             ${" (modified on "+s.getModificationDate(str)+")" if s.getModificationDate()!=None else ""}
@@ -38,10 +38,9 @@ $("#resultsAction").click(function(){
     return false;
     });
 
-  <!--check/uncheck a group of checkboxes-->
-  function check(field, isChecked){
-    for (i=0; i < field.length; i++)
-      field[i].checked = isChecked ;
-  }
+  $('.checkAllSubmitters').on('click', function(e) {
+      e.preventDefault();
+      $('.submitter').prop('checked', $(this).data('state'));
+  });
 </script>
 <br/><br/>
