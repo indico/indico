@@ -22,14 +22,9 @@
 .category-container {
     font-family: 'Helvetica Neue', Helvetica, Verdana, Arial, Sans;
 
-    text-align: center;
     background: #FFFFFF;
     margin-bottom: 10px;
     overflow: hidden;
-}
-
-.category-container > * {
-    text-align: left;
 }
 
 .category-header {
