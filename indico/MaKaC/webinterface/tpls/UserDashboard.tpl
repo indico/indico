@@ -19,7 +19,7 @@
                 % else:
                 % for category in categories.itervalues():
                     <li><a href="${urlHandlers.UHCategoryDisplay.getURL(category["categ"])}" class="truncate">
-                        <span class="category-title truncate-target">${category["categ"].getTitle()}</span>
+                        <span class="category-name truncate-target">${category["categ"].getTitle()}</span>
                         <span class="item-legend">
                             % if category["managed"]:
                             <span title="You have management rights" class="icon-medal contextHelp active"></span>

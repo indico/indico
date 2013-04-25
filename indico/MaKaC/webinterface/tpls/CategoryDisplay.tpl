@@ -172,7 +172,7 @@ $(document).ready(function(){
                             $this.qtip({content: {text: $T('There has been an error. Please reload the page.')}});
                             IndicoUtil.errorReport(error);
                         } else {
-                            $(this).toggleClass('enabled');
+                            $this.toggleClass('enabled');
                             $this.removeClass('disabled');
                         }
                     });

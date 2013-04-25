@@ -90,12 +90,12 @@
 }
 
 .dashboard-box ol li a:hover .event-title,
-.dashboard-box ol li a:hover .category-title {
+.dashboard-box ol li a:hover .category-name {
     text-decoration: underline;
 }
 
 .dashboard-box ol .event-title,
-.dashboard-box ol .category-title {
+.dashboard-box ol .category-name {
     vertical-align: middle;
 }
 
@@ -141,7 +141,7 @@
     max-width: 300px;
 }
 
-.dashboard-box .category-title.truncate-target {
+.dashboard-box .category-name.truncate-target {
     max-width: 445px;
 }
 
