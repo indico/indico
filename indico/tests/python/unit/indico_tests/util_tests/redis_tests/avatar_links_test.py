@@ -107,6 +107,34 @@ class TestLinks(IndicoTestCase):
                                       ('4', set(['conference_manager'])),
                                       ('3', set(['conference_manager']))]))
 
+    def testTimeFilter(self):
+        self._createDummies()
+        avatar_links.init_links(self._avatar1, client=self._redis, assumeEvents=True)
+
+        # Stupid values that always result in no results
+        self.assertEqual(avatar_links.get_links(self._avatar1, minDT=99999999, client=self._redis),
+                         OrderedDict())
+        self.assertEqual(avatar_links.get_links(self._avatar1, maxDT=0, client=self._redis),
+                         OrderedDict())
+        self.assertEqual(avatar_links.get_links(self._avatar1, minDT=200000, maxDT=0, client=self._redis),
+                         OrderedDict())
+        # Only a minimum
+        self.assertEqual(avatar_links.get_links(self._avatar1, minDT=150000, client=self._redis),
+                         OrderedDict([('4', set(['conference_manager', 'conference_participant'])),
+                                      ('3', set(['conference_manager']))]))
+        # Only a maximum
+        self.assertEqual(avatar_links.get_links(self._avatar1, maxDT=150000, client=self._redis),
+                         OrderedDict([('2', set(['conference_participant'])),
+                                      ('1', set(['conference_participant'])),
+                                      ('4', set(['conference_manager', 'conference_participant']))]))
+        # Both minimum and maximum
+        self.assertEqual(avatar_links.get_links(self._avatar1, minDT=100000, maxDT=150000, client=self._redis),
+                         OrderedDict([('1', set(['conference_participant'])),
+                                      ('4', set(['conference_manager', 'conference_participant']))]))
+        # Same value for both
+        self.assertEqual(avatar_links.get_links(self._avatar1, minDT=150000, maxDT=150000, client=self._redis),
+                         OrderedDict([('4', set(['conference_manager', 'conference_participant']))]))
+
     def testLinkModificationsOnlyAffectCorrectAvatar(self):
         self._createDummies()
         avatar_links.init_links(self._avatar1, client=self._redis, assumeEvents=True)

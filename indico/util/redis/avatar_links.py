@@ -19,6 +19,7 @@
 
 from collections import defaultdict, OrderedDict
 import MaKaC
+from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from indico.util.redis import scripts
 from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
@@ -36,11 +37,13 @@ def del_link(avatar, event, role, client=None):
     scripts.avatar_event_links_del_link(avatar.getId(), event.getId(), role, client=client)
 
 
-def get_links(avatar, client=None):
+def get_links(avatar, minDT=None, maxDT=None, client=None):
     if client is None:
         client = redis_client
+    minTS = minDT if isinstance(minDT, int) else datetimeToUnixTimeInt(minDT) if minDT else ''
+    maxTS = maxDT if isinstance(maxDT, int) else datetimeToUnixTimeInt(maxDT) if maxDT else ''
     return OrderedDict((eid, set(roles)) for eid, roles in
-                       scripts.avatar_event_links_get_links(avatar.getId(), client=client).iteritems())
+                       scripts.avatar_event_links_get_links(avatar.getId(), minTS, maxTS, client=client).iteritems())
 
 
 def merge_avatars(destination, source, client=None):

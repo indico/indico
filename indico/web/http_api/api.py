@@ -749,7 +749,7 @@ class UserEventHook(HTTPAPIHook):
         if not redis_client:
             raise HTTPAPIError('This API is only available when using Redis')
         self._checkProtection(aw)
-        links = avatar_links.get_links(self._avatar)
+        links = avatar_links.get_links(self._avatar, self._fromDT, self._toDT)
         return UserRelatedEventFetcher(aw, self, links).events(links.keys())
 
     def export_categ_events(self, aw):
