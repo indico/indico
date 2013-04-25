@@ -26,7 +26,7 @@ class classproperty(property):
 class cached_classproperty(property):
     def __get__(self, obj, type=None):
         # The property name is the function's name
-        name = self.fget.__func__.__name__
+        name = self.fget.__get__(True).im_func.__name__
         value = object.__getattribute__(type, name)
         # We we have a cached_classproperty, the value has not been resolved yet
         if isinstance(value, cached_classproperty):
