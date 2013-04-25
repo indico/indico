@@ -3,7 +3,7 @@
         % if redisEnabled:
         <div class="dashboard-col">
             <div id="yourEvents" class="dashboard-box">
-                <h3>${_("Your events")}</h3>
+                <h3>${_("Your upcoming events")}</h3>
                 <ol></ol>
             </div>
         </div>
@@ -121,7 +121,7 @@ $(document).ready(function(){
                                  <span class="event-date">' + getDate(item.startDate, item.endDate) + '</span> \
                                  <span class="event-title truncate-target">' + item.title + '</span> \
                                  <span class="item-legend"> \
-                                     <span title="' + $T("You have management rights") + 'class="icon-medal contextHelp ' + hasRights(item.roles, managementFilter) + '"></span> \
+                                     <span title="' + $T("You have management rights") + '" class="icon-medal contextHelp ' + hasRights(item.roles, managementFilter) + '"></span> \
                                      <span title="' + $T("You are a reviewer") + '" class="icon-reading contextHelp ' + hasRights(item.roles, reviewFilter) + '"></span> \
                                      <span title="' + $T("You are an attendee") + '" class="icon-ticket contextHelp ' + hasRights(item.roles, attendanceFilter) + '"></span> \
                                  </span> \
