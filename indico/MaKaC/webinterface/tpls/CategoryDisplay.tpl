@@ -101,7 +101,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
     </div>
     % endif
 
-    <div class="clearfix category-content">
+    <div class="category-content">
         <div class="category-info">
 
         % if isRootCategory:

@@ -198,8 +198,9 @@ presentation = Bundle('js/jquery/underscore.js',
                       'js/presentation/Ui/Widgets/WidgetGrid.js',
                       filters='rjsmin', output='presentation_%(version)s.min.js')
 
-selectivizr = Bundle('js/selectivizr/selectivizr.js',
-                     filters='rjsmin', output='selectivizr_%(version)s.min.js')
+ie_compatibility = Bundle('js/css3-mediaqueries.js',
+                          'js/selectivizr.js',
+                          filters='rjsmin', output='ie_compatibility_%(version)s.min.js')
 
 moment = Bundle('js/moment/moment.js',
                 'js/moment/lang/es.js',
@@ -227,7 +228,8 @@ def register_all_js(env):
     env.register('indico_authors', indico_jquery_authors)
     env.register('indico_badges_js', indico_badges_js)
     env.register('base_js', base_js)
-    env.register('selectivizr', selectivizr)
+    env.register('ie_compatibility', ie_compatibility)
+
 
 def register_all_css(env, main_css_file):
     env.register('indico_badges_css', indico_badges_css)

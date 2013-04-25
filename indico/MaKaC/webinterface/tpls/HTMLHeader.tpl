@@ -30,10 +30,12 @@
         % endfor
 
         <!--[if (gte IE 6)&(lte IE 8)]>
-        % for JSFile in assets["selectivizr"].urls():
+        % for JSFile in assets["ie_compatibility"].urls():
             ${'<script src="'+ baseurl + JSFile +'" type="text/javascript"></script>\n'}
-            <noscript><link rel="stylesheet" href="[fallback css]" /></noscript>
         % endfor
+
+        <link rel="stylesheet" type="text/css" href="${baseurl}/css/ie8.css">
+
         <![endif]-->
 
     <script type="text/javascript">

@@ -22,9 +22,14 @@
 .category-container {
     font-family: 'Helvetica Neue', Helvetica, Verdana, Arial, Sans;
 
+    text-align: center;
     background: #FFFFFF;
     margin-bottom: 10px;
     overflow: hidden;
+}
+
+.category-container > * {
+    text-align: left;
 }
 
 .category-header {
@@ -48,14 +53,21 @@
 }
 
 .category-title.sidebar-padding {
-    padding-right: 340px;
+    padding-right: 240px;
 }
 
 .category-content {
+    width: 100%;
     max-width: 850px;
-    margin: auto;
     overflow: hidden;
     padding: 0 1em 0 1em;
+    margin: auto;
+}
+
+@media all and (max-width: 1215px) {
+  .category-content {
+    width: inherit;
+  }
 }
 
 .category-info {
