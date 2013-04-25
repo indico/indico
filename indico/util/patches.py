@@ -21,6 +21,8 @@
 Some "monkey patches" for old Python versions
 """
 
+from __future__ import absolute_import
+
 import sys
 import re
 import operator as ops
@@ -57,6 +59,10 @@ def version(ver):
     return wrapper
 
 
+def always(f):
+    PATCHES.append((None, f))
+
+
 @version('2.6')
 def ordered_dict():
     """
@@ -74,6 +80,9 @@ def ordered_dict():
 
 
 def apply_patches():
-    for (op, maj, minor), func in PATCHES:
-        if _version_matches((maj, minor), op, sys.version_info[:2]):
-            func()
+    for version_data, func in PATCHES:
+        if version_data is not None:
+            op, maj, minor = version_data
+            if not _version_matches((maj, minor), op, sys.version_info[:2]):
+                continue
+        func()
