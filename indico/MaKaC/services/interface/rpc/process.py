@@ -70,7 +70,7 @@ def processRequest(method, params, req, internal=False):
     websession = getSession(req)
 
     if not internal and Config.getInstance().getCSRFLevel() >= 1:
-        if websession.csrf_token != req.headers_in.get('X-CSRF-Token'):
+        if websession.csrf_protected and websession.csrf_token != req.headers_in.get('X-CSRF-Token'):
             raise RequestError('ERR-R4', _('Invalid CSRF token'))
 
     # invoke handler

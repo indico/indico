@@ -59,6 +59,11 @@ class PSession( base.Session, Persistent ):
         if hasattr(self, '_csrf_token'):
             del self._csrf_token
 
+    @property
+    def csrf_protected(self):
+        """Does the session need CSRF protection?"""
+        return self.user is not None
+
     def has_info (self):
         """has_info() -> boolean
 

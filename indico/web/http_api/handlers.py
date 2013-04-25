@@ -198,7 +198,7 @@ def handler(req, **params):
             # We authenticated using a session cookie.
             if Config.getInstance().getCSRFLevel() >= 2:
                 token = req.headers_in.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
-                if session.csrf_token != token:
+                if session.csrf_protected and session.csrf_token != token:
                     raise HTTPAPIError('Invalid CSRF token', apache.HTTP_FORBIDDEN)
             aw = AccessWrapper()
             if not onlyPublic:
