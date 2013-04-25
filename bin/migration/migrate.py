@@ -66,9 +66,9 @@ MIGRATION_TASKS = []
 
 i18n.setLocale('en_GB')
 
-def since(version, always=False):
+def since(version, always=False, never=False):
     def _since(f):
-        MIGRATION_TASKS.append((version, f, always))
+        MIGRATION_TASKS.append((version, f, always, never))
         return f
     return _since
 
@@ -726,8 +726,15 @@ def indexConferenceTitle(dbi, withRBDB, prevVersion):
 
 @since('1.1')
 def convertLinkedTo(dbi, withRBDB, prevVersion):
-    """Convert Avatar.linkedTo structure to use OOTreeSets"""
+    """Convert Avatar.linkedTo structure to use OOTreeSets
+       and import linkedTo information into Redis (if enabled)"""
     print 'Note: Some links might point to broken objects which will be skipped automatically.'
+
+    use_redis = Config.getInstance().getRedisConnectionURL()
+
+    if use_redis:
+        pipe = redis_client.pipeline(transaction=False)
+
     for i, avatar in enumerate(AvatarHolder()._getIdx().itervalues()):
         avatar.updateLinkedTo()  # just in case some avatars do not have all fields
         linkedTo = avatar.linkedTo
@@ -747,7 +754,11 @@ def convertLinkedTo(dbi, withRBDB, prevVersion):
                             print '  \tSkipping broken object in %s/%s/%s: %r' % (avatar.getId(), field, role, obj)
                             todo.remove(obj)
                 avatar.linkedTo[field][role].update(todo)
+        if use_redis:
+            avatar_links.init_links(avatar, client=pipe)
         if i % 1000 == 0:
+            if use_redis:
+                pipe.execute()
             dbi.commit()
         print '\r  %d' % i,
         sys.stdout.flush()
@@ -755,7 +766,7 @@ def convertLinkedTo(dbi, withRBDB, prevVersion):
     dbi.commit()
 
 
-@since('1.1')
+@since('1.1', never=True)
 def redisLinkedTo(dbi, withRBDB, prevVersion):
     """Import linkedTo information into Redis"""
     if not Config.getInstance().getRedisConnectionURL():
@@ -791,12 +802,14 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
         print "DONE!\n"
 
     # go from older to newer version and execute corresponding tasks
-    for version, task, always in MIGRATION_TASKS:
+    for version, task, always, never in MIGRATION_TASKS:
+        if never and task.__name__ not in specified:
+            continue
         if specified and task.__name__ not in specified:
             continue
         if parse_version(version) > prevVersion or always:
             print console.colored("#", 'green', attrs=['bold']), \
-                  task.__doc__.replace('\n', '').strip(),
+                  task.__doc__.replace('\n', '').replace('  ', '').strip(),
             print console.colored("(%s)" % version, 'yellow')
             if dryRun:
                 continue
