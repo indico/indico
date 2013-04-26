@@ -80,6 +80,8 @@ class IContributionFossil(IFossil):
 
     def getAddress(self):
         pass
+    getAddress.produce = lambda s: s.getLocation()
+    getAddress.convert = Conversion.locationAddress
 
     def getProtectionURL(self):
         """Contribution protection URL"""
