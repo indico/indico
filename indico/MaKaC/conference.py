@@ -9754,12 +9754,16 @@ class AcceptedContribution( Contribution ):
     def setAbstract(self, abs):
         self._abstract = abs
 
-    def getSubmitterList(self):
+    def getSubmitterList(self, no_groups=False):
         try:
-            return self._submitters
+            if self._submitters:
+                pass
         except AttributeError:
             self._submitters=[]#create the attribute
             self._grantSubmission(self.getAbstract().getSubmitter().getUser())
+        if no_groups:
+            return filter(lambda s: not isinstance(s, MaKaC.user.Group), self._submitters)
+        else:
             return self._submitters
 
     def delete( self ):
