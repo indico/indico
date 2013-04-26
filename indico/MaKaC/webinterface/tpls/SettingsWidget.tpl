@@ -16,7 +16,7 @@
         </form>
     </div>
     % if currentUser:
-        <div class="settingsWidgetSection"><a href="${ urlHandlers.UHUserDetails.getURL(currentUser) }">${ _("My profile") }</a></div>
+        <div class="settingsWidgetSection"><a href="${ urlHandlers.UHUserDashboard.getURL(currentUser) }">${ _("My profile") }</a></div>
         <div class="settingsWidgetSection"><a href="${ urlHandlers.UHUserPreferences.getURL(currentUser) }">${ _("My preferences") }</a></div>
         % if currentUser.isAdmin():
             <div class="settingsWidgetSection"><a href="#" onclick="loginAs();">${ _("Login as...") }</a></div>
