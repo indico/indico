@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.services.implementation.base import LoggedOnlyService
+from MaKaC.services.implementation.base import LoggedOnlyService, AdminService
 from MaKaC.services.implementation.base import ServiceBase
 
 import MaKaC.user as user
@@ -37,6 +37,7 @@ from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 import MaKaC.common.indexes as indexes
 from MaKaC.common.utils import validMail
+from indico.util.redis import avatar_links
 from indico.web.http_api.auth import APIKey
 
 class UserComparator(object):
@@ -490,6 +491,23 @@ class UserCreateKeyEnablePersistent(LoggedOnlyService):
             ak.setPersistentAllowed(True)
         return True
 
+
+class UserRefreshRedisLinks(AdminService):
+    def _checkParams(self):
+        AdminService._checkParams(self)
+        self._pm = ParameterManager(self._params)
+        userId = self._pm.extract("userId", pType=str, allowEmpty=True)
+        if userId is not None:
+            ah = user.AvatarHolder()
+            self._avatar = ah.getById(userId)
+        else:
+            self._avatar = self._aw.getUser()
+
+    def _getAnswer(self):
+        avatar_links.delete_avatar(self._avatar)  # clean start
+        avatar_links.init_links(self._avatar)
+
+
 methodMap = {
     "event.list": UserListEvents,
     "favorites.addUsers": UserAddToBasket,
@@ -511,5 +529,6 @@ methodMap = {
     "setPersonalData": UserSetPersonalData,
     "syncPersonalData": UserSyncPersonalData,
     "togglePersistentSignatures": UserSetPersistentSignatures,
-    "createKeyAndEnablePersistent": UserCreateKeyEnablePersistent
+    "createKeyAndEnablePersistent": UserCreateKeyEnablePersistent,
+    "refreshRedisLinks": UserRefreshRedisLinks
 }

@@ -3,7 +3,28 @@
         % if redisEnabled:
         <div class="dashboard-col">
             <div id="yourEvents" class="dashboard-box">
-                <h3>${_("Your upcoming events")}</h3>
+                <h3>
+                    ${_("Your upcoming events")}
+                    % if user.isAdmin():
+                        <a href="#" id="refreshRedisLinks" style="float: right;"><span class="icon-refresh" title="${_("ADMIN: Refresh Redis links")}}"></span></a>
+                        <script>
+                            $('#refreshRedisLinks').on('click', function(e) {
+                                e.preventDefault();
+                                var killProgress = IndicoUI.Dialogs.Util.progress();
+                                indicoRequest('user.refreshRedisLinks', {
+                                    userId: '${ rh._avatar.getId() }'
+                                }, function(result, error) {
+                                    if(error) {
+                                        killProgress();
+                                        IndicoUtil.errorReport(error);
+                                        return;
+                                    }
+                                    location.reload();
+                                });
+                            });
+                        </script>
+                    % endif
+                </h3>
                 <ol></ol>
             </div>
         </div>
