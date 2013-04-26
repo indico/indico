@@ -2233,9 +2233,6 @@ class Conference(CommonObjectBase, Locatable):
     def setKeywords(self, keywords):
         self._keywords = keywords
 
-    def _setCreator(self, av):
-        self.__creator = av
-
     # Room booking related ===================================================
 
     def getRoomBookingList( self ):

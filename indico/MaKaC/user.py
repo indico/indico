@@ -1522,7 +1522,7 @@ class AvatarHolder( ObjectHolder ):
                                 (conf, prin.getId(), role))
                             continue
                         elif role == "creator":
-                            conf._setCreator(prin)
+                            conf.setCreator(prin)
                         elif role == "chair":
                             conf.removeChair(merged)
                             conf.addChair(prin)
