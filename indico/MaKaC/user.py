@@ -1216,7 +1216,7 @@ class Avatar(Persistent, Fossilizable):
         rooms = Room.getUserRooms(self)
 
         roomList = [ RoomGUID.parse( str(rg) ).getRoom() for rg in rooms ] if rooms else []
-        return [room for room in roomList if room.isActive]
+        return [room for room in roomList if room and room.isActive]
 
     def getReservations(self):
         """
