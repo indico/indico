@@ -206,8 +206,8 @@ moment = Bundle('js/moment/moment.js',
                 'js/moment/lang/fr.js',
                 filters='rjsmin', output='moment_%(version)s.min.js')
 
-base_js = Bundle(jquery, presentation, indico_core,
-                 indico_legacy, indico_common, indico_jquery, moment)
+base_js = Bundle(jquery, presentation, indico_jquery, moment, indico_core,
+                 indico_legacy, indico_common)
 
 
 def register_all_js(env):

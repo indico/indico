@@ -236,38 +236,52 @@ type("ExportIcalInterface", [], {
 
 var exportPopups= {};
 
-$(function() {
-    $(".exportIcal").qtip({
+$(document).ready(function() {
 
-        style: {
-            width: '350px',
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
-            tip: {
-                corner: true,
-                width: 20,
-                height: 15
-            }
-        },
-        position: {
-            my: 'top center',
-            at: 'bottom center'
-        },
-        content: function(api){
-            return $('#icalExportPopup'+this[0].getAttribute("data-id"));
-            },
-        show: {
-            event: "click",
-            effect: function() {
-                $(this).fadeIn(300);
-            }
-        },
-        hide: {
-            event: 'unfocus click',
-            fixed: true,
-            effect: function() {
-                $(this).fadeOut(300);
-            }
+    $(".exportIcal").on('menu_select', function() {
+        var $button = $(this);
+
+        if ($button.hasClass('open')) {
+            return;
+        } else {
+            $button.addClass('open');
+
+            $("<a/>").appendTo($button).qtip({
+                style: {
+                    width: '350px',
+                    classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
+                    tip: {
+                        corner: true,
+                        width: 20,
+                        height: 15
+                    }
+                },
+                position: {
+                    my: 'top center',
+                    at: 'bottom center',
+                    target: $button
+                },
+                content: function(api) {
+                    return $('#icalExportPopup' + $button.data("id"));
+                },
+                show: {
+                    ready: true,
+                    effect: function() {
+                        $(this).fadeIn(300);
+                    }
+                },
+                hide: {
+                    event: 'unfocus',
+                    fixed: true,
+                    target: $button,
+                    effect: function() {
+                        $(this).fadeOut(300);
+                    }
+                }
+            });
         }
+
+        return true;
     });
 
     $('body').delegate('.apiURL','click',function(e){

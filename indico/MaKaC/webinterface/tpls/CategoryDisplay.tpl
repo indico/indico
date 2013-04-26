@@ -17,7 +17,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
 
             % if isLoggedIn and not isRootCategory:
             <div id="categFavorite" class="group right">
-                <a class="i-button fav-button icon-only icon-bookmark ${"enabled" if categ in favoriteCategs else ""}" href="#"></a>
+                <a class="i-button fav-button icon-only icon-bookmark ${"enabled" if categ in favoriteCategs else ""}" href="#" title="${_("Add to favorites")}"></a>
             </div>
             % endif
 
@@ -29,11 +29,11 @@ containsCategories = len(categ.getSubCategoryList()) > 0
                 % endif
 
                 % if categ.conferences:
-                    <a id="exportIcal${categ.getUniqueId()}" class="i-button icon-calendar arrow exportIcal" data-id="${categ.getUniqueId()}"></a>
+                    <a id="exportIcal${categ.getUniqueId()}" class="i-button icon-calendar arrow exportIcal" data-id="${categ.getUniqueId()}" title="${_("Export to scheduling tool")}"></a>
                     <span><%include file="CategoryICalExport.tpl" args="item=categ"/></span>
                 % endif
 
-                <a id="moreLink" class="i-button icon-eye arrow" data-toggle="dropdown"></a>
+                <a id="moreLink" class="i-button icon-eye arrow" data-toggle="dropdown" title="${_("View")}"></a>
                 <ul class="dropdown">
                     <li><a href="${urlHandlers.UHCategoryOverview.getURL(categ)}">${_("Today's events")}</a></li>
                     <li><a href="${urlHandlers.UHCategoryOverview.getWeekOverviewUrl(categ)}">${_("Week's events")}</a></li>
@@ -41,7 +41,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
                     <li><a href="${urlHandlers.UHCategoryMap.getURL(categ)}">${_("Category map")}</a></li>
                     <li><a href="${urlHandlers.UHCategoryStatistics.getURL(categ)}">${_("Category statistics")}</a></li>
                 </ul>
-                <a id="createEventLink" class="i-button icon-plus arrow" data-toggle="dropdown"></a>
+                <a id="createEventLink" class="i-button icon-plus arrow" data-toggle="dropdown" title="${_("Create new event")}"></a>
                 <ul class="dropdown">
                     <li><a href="${urlLecture}">${_("Lecture")}</a></li>
                     <li><a href="${urlMeeting}">${_("Meeting")}</a></li>
@@ -49,7 +49,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
                 </ul>
 
                 % if allowUserModif:
-                <a id="manageLink" class="i-button icon-edit arrow" data-toggle="dropdown"></a>
+                <a id="manageLink" class="i-button icon-edit arrow" data-toggle="dropdown" title="${_("Management options")}"></a>
                 <ul class="dropdown">
                     <li><a href="${urlHandlers.UHCategoryModification.getURL(categ)}">${_("Edit category")}</a></li>
                     <li><a href="${urlHandlers.UHCategoryCreation.getURL(categ)}">${_("Add subcategory")}</a></li>
