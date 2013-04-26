@@ -45,6 +45,15 @@ class RoomBlocking(Persistent, RoomBlockingBase):
         self.blockedRooms = PersistentList()
         self.allowed = PersistentList()
 
+    def __cmp__(self, other):
+        if type(self) is not type(other):
+            # This is actually dangerous and the ZODB manual says not to do this
+            # because it relies on memory order. However, this branch should never
+            # be taken anyway since we do not store different types in the same set
+            # or use them as keys.
+            return cmp(hash(self), hash(other))
+        return cmp(self.id, other.id)
+
     @staticmethod
     def getRoot():
         return RoomBlocking.__dalManager.getRoot(_ROOMBLOCKING)
