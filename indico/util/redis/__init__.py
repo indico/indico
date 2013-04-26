@@ -23,7 +23,19 @@ from indico.util.redis.scripts import LazyScriptLoader
 from indico.util.proxy import LocalProxy
 from MaKaC.common import Config
 
-__all__ = ['scripts', 'client', 'pipeline', 'set_redis_client']
+try:
+    import redis
+    RedisError = redis.RedisError
+    ConnectionError = redis.ConnectionError
+except ImportError:
+    redis = None
+    class RedisError(object):
+        pass
+    class ConnectionError(object):
+        pass
+
+
+__all__ = ['redis', 'RedisError', 'ConnectionError', 'scripts', 'client', 'pipeline', 'set_redis_client']
 
 _client = None
 
@@ -45,7 +57,6 @@ def _get_redis_client():
         return _client
     url = Config.getInstance().getRedisConnectionURL()
     if url:
-        import redis
         _client = redis.StrictRedis.from_url(url)
         _client.connection_pool.connection_kwargs['socket_timeout'] = 5
     return _client

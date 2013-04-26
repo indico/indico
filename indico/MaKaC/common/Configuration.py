@@ -616,13 +616,10 @@ class Config:
             # Rest if redis is available and if we can connect
             try:
                 import redis
-                client = redis.StrictRedis.from_url(self.getRedisConnectionURL())
-                client.connection_pool.connection_kwargs['socket_timeout'] = 5
-                client.ping()
+                redis.StrictRedis.from_url(self.getRedisConnectionURL())
+                # a redis ping here would be nice but we do not have a working logger yet
             except ImportError, e:
                 raise MaKaCError('Could not import redis: %s' % e.message)
-            except Exception, e:
-                raise MaKaCError('Could not connect to redis: %s' % e.message)
 
 
     def __getattr__(self, attr):

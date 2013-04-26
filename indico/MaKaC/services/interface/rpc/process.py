@@ -22,6 +22,7 @@ import sys, traceback
 
 from ZODB.POSException import ConflictError
 from ZEO.Exceptions import ClientDisconnected
+from MaKaC.common.logger import Logger
 
 from MaKaC.webinterface import session
 from MaKaC.services.interface import rpc
@@ -38,6 +39,7 @@ from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
 
 import copy
+from indico.util.redis import RedisError
 
 
 def lookupHandler(method):
@@ -131,7 +133,10 @@ class ServiceRunner(Observable):
                     DBMgr.getInstance().endRequest(True)
                     GenericMailer.flushQueue(True) # send emails
                     if rh._redisPipeline:
-                        rh._redisPipeline.execute()
+                        try:
+                            rh._redisPipeline.execute()
+                        except RedisError:
+                            Logger.get('redis').exception('Could not execute pipeline')
                     break
                 except ConflictError:
                     _abortSpecific2RH()

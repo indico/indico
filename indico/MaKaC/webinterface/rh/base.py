@@ -63,6 +63,7 @@ from MaKaC.plugins.base import OldObservable
 from MaKaC.plugins.RoomBooking.common import rb_check_user_access
 
 from indico.util.network import _get_remote_ip
+from indico.util.redis import RedisError
 
 
 class RequestHandlerBase(OldObservable):
@@ -606,7 +607,10 @@ class RH(RequestHandlerBase):
                             pass
                         # execute redis pipeline if we have one
                         if self._redisPipeline:
-                            self._redisPipeline.execute()
+                            try:
+                                self._redisPipeline.execute()
+                            except RedisError:
+                                Logger.get('redis').exception('Could not execute pipeline')
                         break
                     except MaKaCError, e:
                         #DBMgr.getInstance().endRequest(False)

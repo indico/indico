@@ -24,6 +24,7 @@ from MaKaC.common import timezoneUtils
 from MaKaC.common.utils import OSSpecific
 from MaKaC.common.contextManager import ContextManager
 from indico.util.fs import silentremove
+from indico.util.redis import redis
 
 import hashlib, os, shutil, datetime, time
 import cPickle as pickle
@@ -223,23 +224,32 @@ class RedisCacheStorage(CacheStorage):
         super(RedisCacheStorage, self).__init__(cache)
 
     def _connect(self):
-        import redis
         client = redis.StrictRedis.from_url(Config.getInstance().getRedisCacheURL())
-        client.connection_pool.connection_kwargs['socket_timeout'] = 5
+        client.connection_pool.connection_kwargs['socket_timeout'] = 1
         return client
 
     def _makeKey(self, path, name):
         return 'cache/ml/' + os.path.join(self._name, path, name)
 
     def save(self, path, name, data):
-        self._connect().setex(self._makeKey(path, name), data, self.getTTL())
+        try:
+            self._connect().setex(self._makeKey(path, name), data, self.getTTL())
+        except redis.RedisError:
+            Logger.get('redisCache').exception('save failed')
 
     def load(self, path, name, default=None):
-        obj = self._connect().get(self._makeKey(path, name))
+        try:
+            obj = self._connect().get(self._makeKey(path, name))
+        except redis.RedisError:
+            Logger.get('redisCache').exception('load failed')
+            return None, None
         return obj, None
 
     def remove(self, path, name):
-        self._connect().delete(self._makeKey(path, name))
+        try:
+            self._connect().delete(self._makeKey(path, name))
+        except redis.RedisError:
+            Logger.get('redisCache').exception('remove failed')
 
 
 class MultiLevelCacheEntry(object):
@@ -400,9 +410,8 @@ class RedisCacheClient(CacheClient):
     key_prefix = 'cache/gen/'
 
     def __init__(self, url):
-        import redis
         self._client = redis.StrictRedis.from_url(url)
-        self._client.connection_pool.connection_kwargs['socket_timeout'] = 5
+        self._client.connection_pool.connection_kwargs['socket_timeout'] = 1
 
     def _unpickle(self, val):
         if val is None:
@@ -414,28 +423,46 @@ class RedisCacheClient(CacheClient):
         return key
 
     def set_multi(self, mapping, ttl=0):
-        self._client.mset(dict((k, pickle.dumps(v)) for k, v in mapping.iteritems()))
-        if ttl:
-            for key in mapping:
-                self._client.expire(key, ttl)
+        try:
+            self._client.mset(dict((k, pickle.dumps(v)) for k, v in mapping.iteritems()))
+            if ttl:
+                for key in mapping:
+                    self._client.expire(key, ttl)
+        except redis.RedisError:
+            Logger.get('redisCache').exception('set_multi failed')
 
     def get_multi(self, keys):
-        return dict(zip(keys, map(self._unpickle, self._client.mget(keys))))
+        try:
+            return dict(zip(keys, map(self._unpickle, self._client.mget(keys))))
+        except redis.RedisError:
+            Logger.get('redisCache').exception('get_multi failed')
 
     def delete_multi(self, keys):
-        self._client.delete(*keys)
+        try:
+            self._client.delete(*keys)
+        except redis.RedisError:
+            Logger.get('redisCache').exception('delete_multi failed')
 
     def set(self, key, val, ttl=0):
-        if ttl:
-            self._client.setex(key, ttl, pickle.dumps(val))
-        else:
-            self._client.set(key, pickle.dumps(val))
+        try:
+            if ttl:
+                self._client.setex(key, ttl, pickle.dumps(val))
+            else:
+                self._client.set(key, pickle.dumps(val))
+        except redis.RedisError:
+            Logger.get('redisCache').exception('set failed')
 
     def get(self, key):
-        return self._unpickle(self._client.get(key))
+        try:
+            return self._unpickle(self._client.get(key))
+        except redis.RedisError:
+            Logger.get('redisCache').exception('get failed')
 
     def delete(self, key):
-        self._client.delete(key)
+        try:
+            self._client.delete(key)
+        except redis.RedisError:
+            Logger.get('redisCache').exception('delete failed')
 
 
 class FileCacheClient(CacheClient):

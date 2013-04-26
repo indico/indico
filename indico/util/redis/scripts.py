@@ -21,6 +21,7 @@ import glob
 import os
 import re
 from collections import OrderedDict
+from MaKaC.common.logger import Logger
 
 import indico.util.json as json
 
@@ -66,7 +67,12 @@ class RedisScript(object):
     def __init__(self, client, name, metadata, code):
         self.name = name
         self._check_metadata(metadata)
-        self._script = client.register_script(code)
+        from indico.util.redis import ConnectionError
+        try:
+            self._script = client.register_script(code)
+        except ConnectionError:
+            Logger.get('redis').exception('Could not load script %s' % name)
+            self._script = _BrokenScript(name, client)
 
     def _check_metadata(self, metadata):
         result_type = metadata.get('result')
@@ -83,11 +89,28 @@ class RedisScript(object):
         import redis
         if isinstance(client, redis.client.BasePipeline) and self._process_result:
             raise ValueError('Script with result conversion cannot be called on a pipeline')
-        res = self._script(args=args, client=client)
+        try:
+            res = self._script(args=args, client=client)
+        except redis.RedisError, e:
+            # If we are not on a pipeline and the execution fails, log it with arguments
+            Logger.get('redis').exception('Executing %s(%r) failed', self.name, args)
+            return None
+        if isinstance(self._script, _BrokenScript):
+            # If we "called" a broken script it logged itself being broken but we need to bail out early
+            return None
         return self._process_result(res) if self._process_result else res
 
     def __repr__(self):
         return '<RedisScript(%s, %d arguments)>' % (self.name, self._args)
+
+
+class _BrokenScript(object):
+    def __init__(self, name, client):
+        self.name = name
+        self.registered_client = client
+
+    def __call__(self, args, client):
+        Logger.get('redis').error('Tried to call unavailable redis script: %s(%r)', self.name, args)
 
 
 class LazyScriptLoader(object):

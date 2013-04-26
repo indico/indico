@@ -42,8 +42,11 @@ def get_links(avatar, minDT=None, maxDT=None, client=None):
         client = redis_client
     minTS = minDT if isinstance(minDT, int) else datetimeToUnixTimeInt(minDT) if minDT else ''
     maxTS = maxDT if isinstance(maxDT, int) else datetimeToUnixTimeInt(maxDT) if maxDT else ''
-    return OrderedDict((eid, set(roles)) for eid, roles in
-                       scripts.avatar_event_links_get_links(avatar.getId(), minTS, maxTS, client=client).iteritems())
+    res = scripts.avatar_event_links_get_links(avatar.getId(), minTS, maxTS, client=client)
+    if res is None:
+        # Execution failed
+        return OrderedDict()
+    return OrderedDict((eid, set(roles)) for eid, roles in res.iteritems())
 
 
 def merge_avatars(destination, source, client=None):
