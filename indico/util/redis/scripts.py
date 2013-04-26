@@ -38,7 +38,7 @@ class RedisScript(object):
     }
 
     @classmethod
-    def from_file(cls, client, filename, name=None):
+    def from_file(cls, client, filename, name=None, _broken=False):
         """Load script and metadata from a file.
 
         Metadata syntax: comma-separated key=value pairs in the first line.
@@ -51,7 +51,7 @@ class RedisScript(object):
                 metadata = dict(re.search(r'(\S+)=(\S+)', item).groups() for item in metadata_line.split(','))
             except AttributeError:
                 raise ValueError('Invalid metadata line: %s' % metadata_line)
-            return cls(client, name, metadata, f.read())
+            return cls(client, name, metadata, f.read(), _broken)
 
     @classmethod
     def load_directory(cls, client, path='.'):
@@ -59,20 +59,32 @@ class RedisScript(object):
 
         Scripts must have a .lua extension and will be named like the file."""
         scripts = {}
+        failed = False
         for filename in glob.iglob(os.path.join(path, '*.lua')):
-            script = cls.from_file(client, filename)
+            # If one script fails to laod because of a ConnectionError we don't even try
+            # to load other scripts to avoid long timeouts
+            script = cls.from_file(client, filename, _broken=failed)
+            failed = script.broken
             scripts[script.name] = script
         return scripts
 
-    def __init__(self, client, name, metadata, code):
+    def __init__(self, client, name, metadata, code, _broken=False):
+        self.broken = False
         self.name = name
         self._check_metadata(metadata)
+        if _broken:
+            # If we already know that redis is broken we can keep things fast
+            # by not even trynig to send the script to redis
+            self._script = _BrokenScript(name, client)
+            self.broken = True
+            return
         from indico.util.redis import ConnectionError
         try:
             self._script = client.register_script(code)
         except ConnectionError:
             Logger.get('redis').exception('Could not load script %s' % name)
             self._script = _BrokenScript(name, client)
+            self.broken = True
 
     def _check_metadata(self, metadata):
         result_type = metadata.get('result')
