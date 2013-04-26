@@ -108,6 +108,7 @@ $(document).ready(function(){
         userid: "${ rh._avatar.getId() }"
     };
 
+    // Your events
     apiRequest("/user/linked_events", api_opts).done(function (resp) {
         var html = '';
         if (resp.count === 0) {
@@ -136,6 +137,8 @@ $(document).ready(function(){
         list.find('.contextHelp[title]:not(.active)').removeAttr('title');
     });
 
+    % if categories:
+    // Happening in your categories query
     apiRequest("/user/categ_events", api_opts).done(function(resp) {
         var html = '';
         if (resp.count === 0) {
@@ -153,6 +156,7 @@ $(document).ready(function(){
         }
         $("#happeningCategories ol").append(html);
     });
+    % endif
 
     var getDate = function(startDate, endDate) {
         if (moment(startDate.date) < moment() && moment() < moment(endDate.date)) {
