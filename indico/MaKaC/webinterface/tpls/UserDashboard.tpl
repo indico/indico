@@ -6,7 +6,7 @@
                 <h3>
                     ${_("Your upcoming events")}
                     % if user.isAdmin():
-                        <a href="#" id="refreshRedisLinks" style="float: right;"><span class="icon-refresh" title="${_("ADMIN: Refresh Redis links")}}"></span></a>
+                        <a href="#" id="refreshRedisLinks" style="float: right;"><span class="icon-refresh contextHelp" title="${_("Admin tool: Refresh Redis links")}"></span></a>
                         <script>
                             $('#refreshRedisLinks').on('click', function(e) {
                                 e.preventDefault();
