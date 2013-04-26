@@ -224,7 +224,9 @@ class RedisCacheStorage(CacheStorage):
 
     def _connect(self):
         import redis
-        return redis.StrictRedis.from_url(Config.getInstance().getRedisCacheURL())
+        client = redis.StrictRedis.from_url(Config.getInstance().getRedisCacheURL())
+        client.connection_pool.connection_kwargs['socket_timeout'] = 5
+        return client
 
     def _makeKey(self, path, name):
         return 'cache/ml/' + os.path.join(self._name, path, name)
@@ -400,6 +402,7 @@ class RedisCacheClient(CacheClient):
     def __init__(self, url):
         import redis
         self._client = redis.StrictRedis.from_url(url)
+        self._client.connection_pool.connection_kwargs['socket_timeout'] = 5
 
     def _unpickle(self, val):
         if val is None:

@@ -616,7 +616,9 @@ class Config:
             # Rest if redis is available and if we can connect
             try:
                 import redis
-                redis.StrictRedis.from_url(self.getRedisConnectionURL()).ping()
+                client = redis.StrictRedis.from_url(self.getRedisConnectionURL())
+                client.connection_pool.connection_kwargs['socket_timeout'] = 5
+                client.ping()
             except ImportError, e:
                 raise MaKaCError('Could not import redis: %s' % e.message)
             except Exception, e:

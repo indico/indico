@@ -47,6 +47,7 @@ def _get_redis_client():
     if url:
         import redis
         _client = redis.StrictRedis.from_url(url)
+        _client.connection_pool.connection_kwargs['socket_timeout'] = 5
     return _client
 
 
