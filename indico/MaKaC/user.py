@@ -512,6 +512,7 @@ class Avatar(Persistent, Fossilizable):
     @cached_classproperty
     @classmethod
     def linkedToMap(cls):
+        # Hey, when adding new roles don't forget to handle them in AvatarHolder.mergeAvatar, too!
         return {
             'category': {'cls': MaKaC.conference.Category,
                          'roles': set(['access', 'creator', 'favorite', 'manager'])},
@@ -1509,6 +1510,9 @@ class AvatarHolder( ObjectHolder ):
                         elif role == "access":
                             cat.revokeAccess(merged)
                             cat.grantAccess(prin)
+                        elif role == "favorite":
+                            merged.unlinkTo(cat, 'favorite')
+                            prin.linkTo(cat, 'favorite')
 
             elif objType == "conference":
                 confHolderIdx = MaKaC.conference.ConferenceHolder()._getIdx()
