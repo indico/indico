@@ -73,7 +73,10 @@ else:
             <%include file="MeetingFilter.tpl"/>
         % endif
         % if showExportToICal:
-            <a id="exportIcal${self_._conf.getUniqueId()}" href="#" class="exportIcal" data-id="${self_._conf.getUniqueId()}">${ _("iCal export") }</a>
+            <a id="exportIcal${self_._conf.getUniqueId()}" href="#" class="exportIcal" data-id="${self_._conf.getUniqueId()}">
+                ${ _("iCal export") }
+                <div class="leftCorner"></div>
+            </a>
                 <%include file="ConferenceICalExport.tpl" args="item=self_._conf"/>
         % endif
 
