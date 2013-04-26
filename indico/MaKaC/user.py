@@ -1493,7 +1493,7 @@ class AvatarHolder( ObjectHolder ):
         for objType in links.keys():
             if objType == "category":
                 for role in links[objType].keys():
-                    for cat in links[objType][role]:
+                    for cat in set(links[objType][role]):
                         # if the category has been deleted
                         if cat.getOwner() == None and cat.getId() != '0':
                             Logger.get('user.merge').warning(
@@ -1514,7 +1514,7 @@ class AvatarHolder( ObjectHolder ):
                 confHolderIdx = MaKaC.conference.ConferenceHolder()._getIdx()
 
                 for role in links[objType].keys():
-                    for conf in links[objType][role]:
+                    for conf in set(links[objType][role]):
                         # if the conference has been deleted
                         if conf.getId() not in confHolderIdx:
                             Logger.get('user.merge').warning(
@@ -1538,7 +1538,7 @@ class AvatarHolder( ObjectHolder ):
 
             if objType == "session":
                 for role in links[objType].keys():
-                    for ses in links[objType][role]:
+                    for ses in set(links[objType][role]):
                         owner = ses.getOwner()
                         # tricky, as conference containing it may have been deleted
                         if owner == None or owner.getOwner() == None:
@@ -1557,7 +1557,7 @@ class AvatarHolder( ObjectHolder ):
 
             if objType == "contribution":
                 for role in links[objType].keys():
-                    for contrib in links[objType][role]:
+                    for contrib in set(links[objType][role]):
                         if contrib.getOwner() == None:
                                 Logger.get('user.merge').warning(
                                     "Trying to remove %s from %s (%s) but it seems to have been deleted" % \
@@ -1575,55 +1575,55 @@ class AvatarHolder( ObjectHolder ):
             if objType == "track":
                 for role in links[objType].keys():
                     if role == "coordinator":
-                        for track in links[objType][role]:
+                        for track in set(links[objType][role]):
                             track.removeCoordinator(merged)
                             track.addCoordinator(prin)
 
             if objType == "material":
                 for role in links[objType].keys():
                     if role == "access":
-                        for mat in links[objType][role]:
+                        for mat in set(links[objType][role]):
                             mat.revokeAccess(merged)
                             mat.grantAccess(prin)
 
             if objType == "file":
                 for role in links[objType].keys():
                     if role == "access":
-                        for mat in links[objType][role]:
+                        for mat in set(links[objType][role]):
                             mat.revokeAccess(merged)
                             mat.grantAccess(prin)
 
             if objType == "abstract":
                 for role in links[objType].keys():
                     if role == "submitter":
-                        for abstract in links[objType][role]:
+                        for abstract in set(links[objType][role]):
                             abstract.setSubmitter(prin)
 
             if objType == "registration":
                 for role in links[objType].keys():
                     if role == "registrant":
-                        for reg in links[objType][role]:
+                        for reg in set(links[objType][role]):
                             reg.setAvatar(prin)
                             prin.addRegistrant(reg)
 
             if objType == "alarm":
                 for role in links[objType].keys():
                     if role == "to":
-                        for alarm in links[objType][role]:
+                        for alarm in set(links[objType][role]):
                             alarm.removeToUser(merged)
                             alarm.addToUser(prin)
 
             if objType == "group":
                 for role in links[objType].keys():
                     if role == "member":
-                        for group in links[objType][role]:
+                        for group in set(links[objType][role]):
                             group.removeMember(merged)
                             group.addMember(prin)
 
             if objType == "evaluation":
                 for role in links[objType].keys():
                     if role == "submitter":
-                        for submission in links[objType][role]:
+                        for submission in set(links[objType][role]):
                             if len([s for s in submission.getEvaluation().getSubmissions() if s.getSubmitter()==prin]) >0 :
                                 #prin has also answered to the same evaluation as merger's.
                                 submission.setSubmitter(None)
