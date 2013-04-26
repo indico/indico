@@ -139,7 +139,7 @@ class UserBasketBase:
 
     def _checkProtection(self):
         if not self._aw.getUser():
-            raise ServiceAccessError("", _("You are currently not authenticated. Please log in again."))
+            raise ServiceAccessError(_("You are currently not authenticated. Please log in again."))
         if not self._target.canUserModify(self._aw.getUser()):
             raise ServiceAccessError('Access denied')
 
