@@ -415,23 +415,23 @@ type("ManageListOfElements", [],
                     for (var i=0; i < result.length; i++) {
                         tr = Html.tr({className: 'infoTR'});
                         tdElement = Html.td({className: 'questionContent'}, result[i].text);
-                        tdElement.dom.id = "TEID_"+result[i].id;
+                        tdElement.dom.id = "TEID_"+this.divsIdRoot+"_"+result[i].id;
 
                         // 'Edit' elements and functionality
                         tdEdit = Html.td({className: 'content'});
                         var spanEdit = Html.span({className: 'link'},'Edit');
-                        spanEdit.dom.id = "QEID_"+result[i].id; // Set the span id with the question id included
+                        spanEdit.dom.id = "QEID_"+this.divsIdRoot+"_"+result[i].id; // Set the span id with the question id included
                         spanEdit.dom.name = result[i].text;
                         spanEditList.push(spanEdit);
                         tdEdit.append(spanEdit);
 
                         spanEditList[i].observeClick(function(event) {
                             if (event.target) { // Firefox
-                                var spanId = event.target.id.split('_')[1];
+                                var spanId = event.target.id.split('_')[2];
                             } else { // IE
-                                var spanId = event.srcElement.id.split('_')[1];
+                                var spanId = event.srcElement.id.split('_')[2];
                             }
-                            var previousText = $E('TEID_'+spanId).dom.innerHTML;
+                            var previousText = $E('TEID_'+self.divsIdRoot+"_"+spanId).dom.innerHTML;
                             var popupContent = Html.textarea({id:'modifyArea', cols:'40', rows:'7'}, previousText);
                             var popup = self._createConfirmPopup(self.methods.edit, spanId, previousText, popupContent, 'Edit '+self.kindOfElement, 'Save');
                             popup.open();
@@ -440,15 +440,15 @@ type("ManageListOfElements", [],
                         // 'Remove' elements and functionality
                         tdRemove = Html.td({className: 'content'});
                         var spanRemove = Html.span({className: 'link'},'Remove');
-                        spanRemove.dom.id = "QRID_"+result[i].id; // Set the span id with the question id included
+                        spanRemove.dom.id = "QRID_"+this.divsIdRoot+"_"+result[i].id; // Set the span id with the question id included
                         spanRemoveList.push(spanRemove);
                         tdRemove.append(spanRemove);
 
                         spanRemoveList[i].observeClick(function(event){
                             if (event.target) { // Firefox
-                                var spanId = event.target.id.split('_')[1];
+                                var spanId = event.target.id.split('_')[2];
                             } else { // IE
-                                var spanId = event.srcElement.id.split('_')[1];
+                                var spanId = event.srcElement.id.split('_')[2];
                             }
                             var attr = self.attributes;
                             attr['value'] = spanId;
