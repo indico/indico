@@ -19,6 +19,7 @@
 
 from collections import OrderedDict
 
+import datetime
 from pytz import timezone
 from MaKaC.user import CERNGroup
 from MaKaC.fossils.user import IAvatarFossil
@@ -59,6 +60,7 @@ from MaKaC.errors import MaKaCError
 from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.locators import CategoryWebLocator
 from MaKaC.services.implementation.user import UserComparator
+
 
 class WPAdminsBase( WPMainBase ):
 
@@ -1394,13 +1396,22 @@ class WUserIdentitiesTable(wcomponents.WTemplated):
 
 class WUserDashboard(wcomponents.WTemplated):
 
-    def __init__(self, av):
+    def __init__(self, av, aw):
         self._avatar = av
+        self._aw = aw
 
     def getVars(self):
         html_vars = wcomponents.WTemplated.getVars(self)
         user = self._avatar
 
+        now = datetime.datetime.now()
+
+        tzUtil = timezoneUtils.DisplayTZ(self._aw)
+        tz = timezone(tzUtil.getDisplayTZ())
+
+        html_vars["timezone"] = tz
+        html_vars["offset"] = ''.join('{0:02d}'.format(int(part)) \
+                for part in str(tz.utcoffset(now)).split(':')[:2])
         html_vars["categories"] = user.getRelatedCategories()
         html_vars["redisEnabled"] = bool(redis_client)
 
@@ -1532,7 +1543,7 @@ class WPPersonalArea(WPUserBase):
 class WPUserDashboard(WPPersonalArea):
 
     def _getTabContent(self, params):
-        c = WUserDashboard(self._avatar)
+        c = WUserDashboard(self._avatar, self._getAW())
         return c.getHTML(params)
 
     def _setActiveTab(self):

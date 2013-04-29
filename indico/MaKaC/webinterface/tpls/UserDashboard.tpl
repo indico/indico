@@ -126,8 +126,11 @@ $(document).ready(function(){
         limit: "10",
         from: "-7d",
         order: "start",
-        userid: "${ rh._avatar.getId() }"
+        userid: ${ rh._avatar.getId() | n,j },
+        tz: "${timezone}"
     };
+
+    var TIMEZONE_OFFSET = "+${offset}";
 
     // Your events
     % if redisEnabled:
@@ -183,8 +186,11 @@ $(document).ready(function(){
     % endif
 
     var getDate = function(startDate, endDate) {
-        if (moment(startDate.date + " " + startDate.time) < moment()
-            && moment() < moment(endDate.date + " " + endDate.time)) {
+        var now = moment(),
+            start_date = moment(startDate.date + " " + startDate.time + " " + TIMEZONE_OFFSET),
+            end_date = moment(endDate.date + " " + endDate.time + " " + TIMEZONE_OFFSET);
+
+        if (start_date < now && now < end_date) {
             return $T("Now");
         } else {
             return moment(startDate.date).calendar();
