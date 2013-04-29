@@ -751,6 +751,9 @@ class Avatar(Persistent, Fossilizable):
                 self.linkedTo[field].setdefault(role, OOTreeSet())
 
     def linkTo(self, obj, role):
+        # to avoid issues with zombie avatars
+        if not AvatarHolder().hasKey(self.getId()):
+            return
         self.updateLinkedTo()
         for field, data in self.linkedToMap.iteritems():
             if isinstance(obj, data['cls']):
@@ -769,6 +772,9 @@ class Avatar(Persistent, Fossilizable):
         return self.linkedTo[field][role]
 
     def unlinkTo(self, obj, role):
+        # to avoid issues with zombie avatars
+        if not AvatarHolder().hasKey(self.getId()):
+            return
         self.updateLinkedTo()
         for field, data in self.linkedToMap.iteritems():
             if isinstance(obj, data['cls']):
