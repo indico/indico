@@ -326,6 +326,7 @@ class DataFetcher(object):
 
 class IteratedDataFetcher(DataFetcher):
     DETAIL_INTERFACES = {}
+    FULL_SORTING_TIMEFRAME = timedelta(weeks=4)
 
     def __init__(self, aw, hook):
         super(IteratedDataFetcher, self).__init__(aw, hook)
@@ -362,13 +363,18 @@ class IteratedDataFetcher(DataFetcher):
         exceeded = False
         if orderBy or descending:
             sortingKey = self._sortingKeys.get(orderBy)
-            try:
-                limitedIterable = sorted(self._limitIterator(iterator, limit),
-                                         key=sortingKey, reverse=descending)
-            except LimitExceededException:
-                exceeded = True
-                limitedIterable = sorted(self._intermediateResults,
-                                         key=sortingKey, reverse=descending)
+            if self._toDT and self._fromDT and self._toDT - self._fromDT <= self.FULL_SORTING_TIMEFRAME:
+                # If the timeframe is not too big we sort the whole dataset and limit it afterwards. Ths results in
+                # better results but worse performance.
+                limitedIterable = self._limitIterator(sorted(iterator, key=sortingKey, reverse=descending), limit)
+            else:
+                try:
+                    limitedIterable = sorted(self._limitIterator(iterator, limit),
+                                             key=sortingKey, reverse=descending)
+                except LimitExceededException:
+                    exceeded = True
+                    limitedIterable = sorted(self._intermediateResults,
+                                             key=sortingKey, reverse=descending)
         else:
             limitedIterable = self._limitIterator(iterator, limit)
 
