@@ -200,7 +200,7 @@ class CollaborationIndex(Persistent):
         if pickle:
             # ATTENTION: this call silently changes the fossil map
             CollaborationTools.updateIndexingFossilsDict()
-            return fossilize(finalResult, IQueryResultFossil, tz = tz)
+            return fossilize(finalResult, IQueryResultFossil, tz=tz)
         else:
             return finalResult
 

@@ -323,7 +323,7 @@ class CollaborationTools(object):
         """
         fossilDict = {"%s.%s" % (Conference.__module__, Conference.__name__): IConferenceFossil,
                       'MaKaC.plugins.Collaboration.indexes.CSBookingInstanceWrapper': ICSBookingInstanceIndexingFossil}
-        for pluginName in cls.getCollaborationPluginType().getPlugins():
+        for pluginName in cls.getCollaborationPluginType().getPlugins(includeNonActive=True):
             classObject = cls.getCSBookingClass(pluginName)
             fossilClassObject = cls.getIndexingFossil(pluginName)
             fossilDict["%s.%s" % (classObject.__module__, classObject.__name__)] = fossilClassObject
