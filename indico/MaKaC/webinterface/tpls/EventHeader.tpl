@@ -147,6 +147,10 @@ else:
         setMouseEvents($E('printButton'), '${ _("Printable version")}');
     }
 
+    $(".exportIcal").click(function(){
+        $(this).trigger('menu_select');
+    });
+
     setMouseEvents($E('manageEventButton'), '${ _("Switch to management area for this event")}');
 
 </script>

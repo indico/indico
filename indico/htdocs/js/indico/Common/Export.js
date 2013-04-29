@@ -246,7 +246,7 @@ $(document).ready(function() {
         } else {
             $button.addClass('open');
 
-            $("<a/>").appendTo($button).qtip({
+            $("<a/>").qtip({
                 style: {
                     width: '350px',
                     classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
