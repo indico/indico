@@ -1,6 +1,5 @@
 <iframe src="${ mapOfRoomsWidgetURL }"
-    frameborder="0"
-    width="100%"
-    height="680px"
-    style="margin-top: -10px;overflow:hidden;">
+    frameborder="no"
+    seamless="seamless"
+    style="margin-top: -10px; overflow: hidden; width: 100%; min-height: 710px;">
 </iframe>
