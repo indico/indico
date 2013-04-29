@@ -184,7 +184,7 @@ $(document).ready(function(){
 
     var getDate = function(startDate, endDate) {
         if (moment(startDate.date) < moment() && moment() < moment(endDate.date)) {
-            return $T("Now");
+            return $T("Today");
         } else {
             return moment(startDate.date).calendar();
         }
