@@ -77,7 +77,6 @@ class PSession( base.Session, Persistent ):
         if newUser:
             self._lang = newUser.getLang()
         self.user = newUser
-        self.reset_csrf_token()
         self._v_modified = True
 
     def getUser( self ):
