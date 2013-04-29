@@ -35,6 +35,7 @@ from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
 from MaKaC.common import Configuration
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
+from MaKaC.review import AbstractStatusSubmitted
 
 
 class WConfCFADeactivated(wcomponents.WTemplated):
@@ -210,6 +211,11 @@ class WAbstractCannotBeModified( wcomponents.WTemplated ):
 
     def __init__( self, abstract ):
         self._abstract = abstract
+
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars['underReview'] = not isinstance( self._abstract.getCurrentStatus(), AbstractStatusSubmitted)
+        return wvars
 
 
 class WPAbstractCannotBeModified( WPAbstractDisplayBase ):
