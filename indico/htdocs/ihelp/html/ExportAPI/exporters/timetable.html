@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>5. Files &mdash; Indico 0.98 documentation</title>
+    <title>3. Timetable &mdash; Indico 0.98 documentation</title>
     
     <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -27,8 +27,8 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="top" title="Indico 0.98 documentation" href="../../index.html" />
     <link rel="up" title="3. API Resources" href="index.html" />
-    <link rel="next" title="6. User" href="user.html" />
-    <link rel="prev" title="4. Event Search" href="eventsearch.html" />
+    <link rel="next" title="4. Event Search" href="eventsearch.html" />
+    <link rel="prev" title="2. Events" href="event.html" />
    <link type="text/css" href="../../_static/indico.css" rel="stylesheet"/> 
 
   </head>
@@ -40,10 +40,10 @@
           <a href="../../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="user.html" title="6. User"
+          <a href="eventsearch.html" title="4. Event Search"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="eventsearch.html" title="4. Event Search"
+          <a href="event.html" title="2. Events"
              accesskey="P">previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     
@@ -59,37 +59,57 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="files">
-<h1>5. Files<a class="headerlink" href="#files" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="general-information">
-<h2>5.1. General Information<a class="headerlink" href="#general-information" title="Permalink to this headline">¶</a></h2>
-<p>The file export is only available for authenticated users, i.e. when
-using an API key and a signature (if enabled).</p>
-</div>
+  <div class="section" id="timetable">
+<h1>3. Timetable<a class="headerlink" href="#timetable" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="url-format">
-<h2>5.2. URL Format<a class="headerlink" href="#url-format" title="Permalink to this headline">¶</a></h2>
-<p><em>/export/event/EVENT_ID/session/SESSION_ID/contrib/CONTRIBUTION_ID/subcontrib/SUBCONTRIBUTION_ID/material/MATERIAL_ID/RESOURCE_ID.TYPE</em></p>
-<p>All ID&#8217;s should be single ID, not separated list.</p>
-<div class="line-block">
-<div class="line">The <em>EVENT_ID</em> should be the event ID, e.g. <em>123</em>.</div>
-<div class="line">The <em>SESSION_ID</em>  <em>(optional)</em> should be the session ID, e.g. <em>4</em>.</div>
-<div class="line">The <em>CONTRIBUTION_ID</em> <em>(optional)</em> should be the contribution ID, e.g. <em>3</em>.</div>
-<div class="line">The <em>SUBCONTRIBUTION_ID</em> <em>(optional)</em> should be the sub-contribution ID, e.g. <em>1</em>.</div>
-<div class="line">The <em>MATERIAL_ID</em> should by the material name if it came default group e.g. <em>Slides</em> or material ID if not, e.g. <em>2</em>.</div>
-<div class="line">The <em>RESOURCE_ID</em> should by the resource ID.</div>
-<div class="line">Only supported <em>TYPE</em> for files is <em>bin</em> (binary data).</div>
+<h2>3.1. URL Format<a class="headerlink" href="#url-format" title="Permalink to this headline">¶</a></h2>
+<p><em>/export/timetable/ID.TYPE</em></p>
+<p>The ID should be the event ID, e.g. <em>123</em>.</p>
 </div>
-</div>
-<div class="section" id="parameters">
-<h2>5.3. Parameters<a class="headerlink" href="#parameters" title="Permalink to this headline">¶</a></h2>
-<p>None</p>
-</div>
-<div class="section" id="detail-levels">
-<h2>5.4. Detail Levels<a class="headerlink" href="#detail-levels" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="file">
-<h3>5.4.1. file<a class="headerlink" href="#file" title="Permalink to this headline">¶</a></h3>
-<p>Returns file (or an error in <em>JSON</em> format).</p>
-<p>For example: <a class="reference external" href="https://indico.server/export/event/23/session/0/contrib/3/material/slides/3.bin?ak=00000000-0000-0000-0000-000000000000">https://indico.server/export/event/23/session/0/contrib/3/material/slides/3.bin?ak=00000000-0000-0000-0000-000000000000</a></p>
+<div class="section" id="results">
+<h2>3.2. Results<a class="headerlink" href="#results" title="Permalink to this headline">¶</a></h2>
+<p>Returns the timetable of the event.</p>
+<p>Result for <a class="reference external" href="https://indico.server/export/timetable/137346.json?ak=00000000-0000-0000-0000-000000000000&amp;pretty=yes">https://indico.server/export/timetable/137346.json?ak=00000000-0000-0000-0000-000000000000&amp;pretty=yes</a>:</p>
+<div class="highlight-python"><pre>{
+    "count": 1,
+    "additionalInfo": {},
+    "_type": "HTTPAPIResult",
+    "complete": true,
+    "url": "https:\/\/indico.server\/export\/timetable\/137346.json?ak=00000000-0000-0000-0000-000000000000&amp;pretty=yes",
+    "ts": 1367242732,
+    "results": {
+        "137346": {
+            "20130429": {
+                "c0": {
+                    "startDate": {
+                        "date": "2013-04-29",
+                        "tz": "Europe\/Zurich",
+                        "time": "16:00:00"
+                    },
+                    "_type": "ContribSchEntry",
+                    "material": [],
+                    "endDate": {
+                        "date": "2013-04-29",
+                        "tz": "Europe\/Zurich",
+                        "time": "16:30:00"
+                    },
+                    "description": "",
+                    "title": "Contrib 1",
+                    "id": "c0",
+                    "contributionId": "0",
+                    "sessionSlotId": null,
+                    "conferenceId": "137346",
+                    "presenters": [],
+                    "sessionId": null,
+                    "location": "CERN",
+                    "uniqueId": "a137346t0",
+                    "_fossil": "contribSchEntryDisplay",
+                    "sessionCode": null,
+                    "entryType": "Contribution",
+                    "room": "160-1-009"
+                }
+            }
+        }</pre>
 </div>
 </div>
 </div>
@@ -104,24 +124,19 @@ using an API key and a signature (if enabled).</p>
 
   <h3><a href="../../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">5. Files</a><ul>
-<li><a class="reference internal" href="#general-information">5.1. General Information</a></li>
-<li><a class="reference internal" href="#url-format">5.2. URL Format</a></li>
-<li><a class="reference internal" href="#parameters">5.3. Parameters</a></li>
-<li><a class="reference internal" href="#detail-levels">5.4. Detail Levels</a><ul>
-<li><a class="reference internal" href="#file">5.4.1. file</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">3. Timetable</a><ul>
+<li><a class="reference internal" href="#url-format">3.1. URL Format</a></li>
+<li><a class="reference internal" href="#results">3.2. Results</a></li>
 </ul>
 </li>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="eventsearch.html"
-                        title="previous chapter">4. Event Search</a></p>
+  <p class="topless"><a href="event.html"
+                        title="previous chapter">2. Events</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="user.html"
-                        title="next chapter">6. User</a></p>
+  <p class="topless"><a href="eventsearch.html"
+                        title="next chapter">4. Event Search</a></p>
 <div id="searchbox" style="display: none">
   <h3>Quick search</h3>
     <form class="search" action="../../search.html" method="get">
@@ -146,10 +161,10 @@ using an API key and a signature (if enabled).</p>
           <a href="../../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="user.html" title="6. User"
+          <a href="eventsearch.html" title="4. Event Search"
              >next</a> |</li>
         <li class="right" >
-          <a href="eventsearch.html" title="4. Event Search"
+          <a href="event.html" title="2. Events"
              >previous</a> |</li>
     <li><a href="http://indico.cern.ch/">Indico Homepage</a> &raquo;</li>
     

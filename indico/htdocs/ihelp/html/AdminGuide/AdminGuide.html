@@ -310,9 +310,10 @@ The calendar notification is updated every time the event details are changed.</
 <p>This plugin is enabled by default for each user but the user can disable it from the <em>User Personal Preferences</em> page.
 The Synchronization is run at a specific interval by the indico-scheduler.</p>
 <p>To run the scheduler task for synchronizing events witch the calendar, you have to put following commands in <em>incidico_shell</em>:</p>
-<blockquote>
-<div>from indico.ext.calendaring.outlook.tasks import OutlookTaskRegistry
-OutlookTaskRegistry.register()</div></blockquote>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">indico.ext.calendaring.outlook.tasks</span> <span class="kn">import</span> <span class="n">OutlookTaskRegistry</span>
+<span class="n">OutlookTaskRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">()</span>
+</pre></div>
+</div>
 <p><img alt="image14" src="../_images/admin12.png" /></p>
 </div>
 <div class="section" id="id2">

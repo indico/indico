@@ -13,7 +13,7 @@ for instance, among other functionalities you can setup:
 * the programme definition (with themes/topics/tracks)
 * a registration form with e-payment capabilities
 * possibility to print badges; from the list of participants, Indico initializes badges for each of them
-* a call for abstracts to be submitted
+* abstracts to be submitted
 * an abstract review process
 * a timetable with many sessions and presentations
 * slides and papers submission by authors
@@ -63,7 +63,7 @@ setting up the conference from the Management Area.
 * Set up your Access Control to restrict or allow users the rights to access or modify the conference `(see Access Control Management) <#protection-management>`_.
 * Look at customizing the look of your conference when users come to view it `(see Layout Management) <#layout-management>`_.
 * Start adding Tracks to your conference to define areas to help with organisation. A Track Manager can be assigned to each track to co-ordinate which abstracts to accept into these tracks `(see Programme Management) <#programme-management>`_.
-* Start calling for abstracts. Abstracts are proposed contributions to your conference. By default, when you first create a conference, calling for abstracts is disabled. You can enable this in *Abstracts* `(see Abstracts Management) <#abstracts-management>`_.
+* Starting abstract submission process. Abstracts are proposed contributions to your conference. By default, when you first create a conference, abstracts management is disabled. You can enable this in *Abstracts* `(see Abstracts Management) <#abstracts-management>`_.
 * Start looking at which submitted abstracts you wish to accept into your conference, they will then become contributions `(see Contributions Management) <#contributions-management>`_.
 * Start setting up a Timetable to organize what will be happening where, and when, and what contributions, materials, etc. will be included `(see Timetable Management) <#timetable-management>`_.
 * If those that will attend your conference need to register, give details concerning their needs while at the conference or pay the fees; you can set up a registration form `(see Registration Management) <#registration-management>`_.
@@ -762,9 +762,9 @@ and the currency to use. See in the image below all the options.
 Abstracts Management
 ~~~~~~~~~~~~~~~~~~~~
 
-The Call For Abstracts option has 5 tabs:
+The Abstracts option has 5 tabs:
 
-* **Setup**: Where you can enable/disable the call for abstracts, change the start/end submission dates, set a modification deadline, enable email notifications etc
+* **Setup**: Where you can enable/disable the abstract submission process, change the start/end submission dates, set a modification deadline, enable email notifications etc
 
 * **Preview**: Preview of the submission form, with the content, the author and co-author, but also other options such as track classification etc.
 
@@ -774,18 +774,18 @@ The Call For Abstracts option has 5 tabs:
 
 * **Reviewing**: Where you can set questions, assign reviewers by track and set notification templates
 
-See below for more details about each tab, :ref:`call_for_abstracts_setup`
+See below for more details about each tab, :ref:`abstracts_setup`
 
 --------------
 
-Call for Abstracts
+Abstracts
 ^^^^^^^^^^^^^^^^^^
 
-The Call for Abstracts process works in the following way:
+The Abstracts process works in the following way:
 
-1.	The event organizer needs to enable the call for abstracts. You can do in the *Call for Abstracts* option, in the tab *Setup* ; see :ref:`call_for_abstracts_setup`
+1.	The event organizer needs to enable the abstract submission process. You can do in the *Abstracts* option, in the tab *Setup* ; see :ref:`abstracts_setup`
 
-2.	All the authors submit their abstract. To do so, they need to go to the event page. If the Call for Abstracts has been enabled, under the *Call for Abstracts* option there will be a sub-option *Submit a new abstract*. Click on this link, complete the form and then click on *Submit*. The abstract will need to belong to a track if you want to use the review process
+2.	All the authors submit their abstract. To do so, they need to go to the event page. If the abstract submission process has been enabled, under the *Call for Abstracts* option there will be a sub-option *Submit a new abstract*. Click on this link, complete the form and then click on *Submit*. The abstract will need to belong to a track if you want to use the review process
 
 3.	The abstracts are now reviewed by the track coordinators. Each Track Coordinator has a list of abstracts to review. He will propose to accept, merge or reject each abstract
 
@@ -795,9 +795,9 @@ The Call for Abstracts process works in the following way:
 
 --------------
 
-.. _call_for_abstracts_setup:
+.. _abstracts_setup:
 
-Call for Abstracts Setup
+Abstracts Setup
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 |image23|
@@ -811,7 +811,7 @@ Setup
 
 The options you can find inside the setup tab are the following:
 
-* **Current status**: From here you can enable and disable the call for abtracts
+* **Current status**: From here you can enable and disable the abstract submission
 
 * **Dates**:  Choose the submission start and end dates
 
@@ -954,7 +954,7 @@ circumstances (when an abstract is accepted, rejected or merged).
 
 In order to create a Notification Template you have to:
 
-* Go to call for abstracts menu, click on the tab *Reviewing* and then on the option *notification templates* beneath it.
+* Go to *Abstracts* menu, click on the tab *Reviewing* and then on the option *notification templates* beneath it.
 
 * Click on the *add* button and fill the form as following:
 
@@ -1580,8 +1580,18 @@ found the picture in your documents, click on *Upload*.
 Logs Management
 ~~~~~~~~~~~~~~~
 
-This shows you a list of all the actions performed on the whole of the
-conference. It shows the date, subject, responsible and module.
+The Event Log presents a summary of the most relevant actions performed on the
+whole of the conference along with filtering options for easily finding
+specific ones.
+
+The list contains actions grouped by day and each row displays the type of a
+single action (icon), the module in which it was performed, a brief
+description, and the person who triggered it. By clicking a row extended
+information can be displayed.
+
+The toolbar allows to filter by kind of action and the search box to filter by
+match with any of the relevant content. There are also two buttons
+for expanding and collapsing extended information of all rows.
 
 |image134|
 
