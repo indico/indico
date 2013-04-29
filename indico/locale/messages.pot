@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-04-29 12:07+0200\n"
+"POT-Creation-Date: 2013-04-29 16:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2161,14 +2161,14 @@ msgstr ""
 #: MaKaC/PDFinterface/conference.py:2848 MaKaC/PDFinterface/conference.py:2863
 #: MaKaC/PDFinterface/conference.py:2865 MaKaC/PDFinterface/conference.py:3081
 #: MaKaC/PDFinterface/conference.py:3107 MaKaC/PDFinterface/conference.py:3109
-#: MaKaC/services/implementation/conference.py:871
+#: MaKaC/services/implementation/conference.py:872
 #: indico/MaKaC/PDFinterface/conference.py:2848
 #: indico/MaKaC/PDFinterface/conference.py:2863
 #: indico/MaKaC/PDFinterface/conference.py:2865
 #: indico/MaKaC/PDFinterface/conference.py:3081
 #: indico/MaKaC/PDFinterface/conference.py:3107
 #: indico/MaKaC/PDFinterface/conference.py:3109
-#: indico/MaKaC/services/implementation/conference.py:871
+#: indico/MaKaC/services/implementation/conference.py:872
 msgid "Error"
 msgstr ""
 
@@ -5050,12 +5050,12 @@ msgid "Main"
 msgstr ""
 
 #: MaKaC/plugins/EPayment/worldPay/tpls/ConfModifEPaymentWorldPayDataModif.tpl:30
-#: MaKaC/services/implementation/conference.py:435
-#: MaKaC/services/implementation/conference.py:489
+#: MaKaC/services/implementation/conference.py:434
+#: MaKaC/services/implementation/conference.py:488
 #: MaKaC/webinterface/tpls/ConfModifEPaymentWorldPayDataModif.tpl:31
 #: indico/MaKaC/plugins/EPayment/worldPay/tpls/ConfModifEPaymentWorldPayDataModif.tpl:30
-#: indico/MaKaC/services/implementation/conference.py:435
-#: indico/MaKaC/services/implementation/conference.py:489
+#: indico/MaKaC/services/implementation/conference.py:434
+#: indico/MaKaC/services/implementation/conference.py:488
 #: indico/MaKaC/webinterface/tpls/ConfModifEPaymentWorldPayDataModif.tpl:31
 msgid "Warning"
 msgstr ""
@@ -5626,108 +5626,113 @@ msgstr ""
 msgid "No 'service' paramater in CollaborationPluginService"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:109
-#: indico/MaKaC/services/implementation/conference.py:109
+#: MaKaC/services/implementation/conference.py:108
+#: indico/MaKaC/services/implementation/conference.py:108
 msgid "It seems that the entry has been deleted or moved, please refresh the page"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:274
-#: indico/MaKaC/services/implementation/conference.py:274
+#: MaKaC/services/implementation/conference.py:273
+#: indico/MaKaC/services/implementation/conference.py:273
 #, python-format
 msgid "Short URL tag already used: '%s'. Please select another one."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:424
-#: indico/MaKaC/services/implementation/conference.py:424
+#: MaKaC/services/implementation/conference.py:423
+#: indico/MaKaC/services/implementation/conference.py:423
 msgid "Cannot set event dates"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:435
-#: indico/MaKaC/services/implementation/conference.py:435
+#: MaKaC/services/implementation/conference.py:434
+#: indico/MaKaC/services/implementation/conference.py:434
 msgid ""
 "The start date of your event was changed correctly. However, there were the "
 "following problems:"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:489
-#: indico/MaKaC/services/implementation/conference.py:489
+#: MaKaC/services/implementation/conference.py:488
+#: indico/MaKaC/services/implementation/conference.py:488
 msgid "The end date of your event was changed correctly."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:490
-#: indico/MaKaC/services/implementation/conference.py:490
+#: MaKaC/services/implementation/conference.py:489
+#: indico/MaKaC/services/implementation/conference.py:489
 msgid "However, there were the following problems:"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:616
-#: indico/MaKaC/services/implementation/conference.py:616
+#: MaKaC/services/implementation/conference.py:615
+#: indico/MaKaC/services/implementation/conference.py:615
 #, python-format
 msgid ""
 "The contribution \"%s\" cannot be deleted because it is inside of the session"
 " \"%s\" that is closed"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:753
-#: indico/MaKaC/services/implementation/conference.py:753
+#: MaKaC/services/implementation/conference.py:738
+#: indico/MaKaC/services/implementation/conference.py:738
+msgid "User has neither First Name or Family Name."
+msgstr ""
+
+#: MaKaC/services/implementation/conference.py:754
+#: indico/MaKaC/services/implementation/conference.py:754
 #, python-format
 msgid ""
 "The participant identified by email %s\n"
 "                        is already in the %s participants' list."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:757
-#: indico/MaKaC/services/implementation/conference.py:757
+#: MaKaC/services/implementation/conference.py:758
+#: indico/MaKaC/services/implementation/conference.py:758
 #, python-format
 msgid ""
 "The participants identified by email %s\n"
 "                        are already in the %s participants' list."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:762
-#: indico/MaKaC/services/implementation/conference.py:762
+#: MaKaC/services/implementation/conference.py:763
+#: indico/MaKaC/services/implementation/conference.py:763
 msgid ""
 "Selected participant(s) did not confirm invitation. Until then you can not "
 "change presence status"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:814
-#: indico/MaKaC/services/implementation/conference.py:814
+#: MaKaC/services/implementation/conference.py:815
+#: indico/MaKaC/services/implementation/conference.py:815
 msgid "The value of the maximum numbers of participants cannot be empty."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:818
-#: indico/MaKaC/services/implementation/conference.py:818
+#: MaKaC/services/implementation/conference.py:819
+#: indico/MaKaC/services/implementation/conference.py:819
 msgid "The value of the maximum numbers of participants has to be a positive number."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:835
-#: indico/MaKaC/services/implementation/conference.py:835
+#: MaKaC/services/implementation/conference.py:836
+#: indico/MaKaC/services/implementation/conference.py:836
 #, python-format
 msgid ""
 "This event began on %s, you cannot apply for\n"
 "                                         participation after the event began."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:835
-#: indico/MaKaC/services/implementation/conference.py:835
+#: MaKaC/services/implementation/conference.py:836
+#: indico/MaKaC/services/implementation/conference.py:836
 msgid "Event started"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:839
-#: indico/MaKaC/services/implementation/conference.py:839
+#: MaKaC/services/implementation/conference.py:840
+#: indico/MaKaC/services/implementation/conference.py:840
 msgid ""
 "Participation in this event is restricted to persons invited.\n"
 "                                           If you insist on taking part in "
 "this event, please contact the event manager."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:840
-#: indico/MaKaC/services/implementation/conference.py:840
+#: MaKaC/services/implementation/conference.py:841
+#: indico/MaKaC/services/implementation/conference.py:841
 msgid "Application restricted"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:842
-#: indico/MaKaC/services/implementation/conference.py:842
+#: MaKaC/services/implementation/conference.py:843
+#: indico/MaKaC/services/implementation/conference.py:843
 msgid ""
 "You cannot apply for participation in this event because the maximum numbers "
 "of participants has been reached.\n"
@@ -5735,88 +5740,88 @@ msgid ""
 "this event, please contact the event manager."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:843
-#: indico/MaKaC/services/implementation/conference.py:843
+#: MaKaC/services/implementation/conference.py:844
+#: indico/MaKaC/services/implementation/conference.py:844
 msgid "Maximum number of participants reached"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:850
-#: MaKaC/services/implementation/conference.py:917
-#: indico/MaKaC/services/implementation/conference.py:850
-#: indico/MaKaC/services/implementation/conference.py:917
+#: MaKaC/services/implementation/conference.py:851
+#: MaKaC/services/implementation/conference.py:918
+#: indico/MaKaC/services/implementation/conference.py:851
+#: indico/MaKaC/services/implementation/conference.py:918
 #, python-format
 msgid ""
 "The participant can not be added to the meeting because there is already a "
 "participant with the email address '%s'."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:850
-#: MaKaC/services/implementation/conference.py:917
-#: indico/MaKaC/services/implementation/conference.py:850
-#: indico/MaKaC/services/implementation/conference.py:917
+#: MaKaC/services/implementation/conference.py:851
+#: MaKaC/services/implementation/conference.py:918
+#: indico/MaKaC/services/implementation/conference.py:851
+#: indico/MaKaC/services/implementation/conference.py:918
 msgid "Already registered participant"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:853
-#: MaKaC/services/implementation/conference.py:920
-#: indico/MaKaC/services/implementation/conference.py:853
-#: indico/MaKaC/services/implementation/conference.py:920
+#: MaKaC/services/implementation/conference.py:854
+#: MaKaC/services/implementation/conference.py:921
+#: indico/MaKaC/services/implementation/conference.py:854
+#: indico/MaKaC/services/implementation/conference.py:921
 #, python-format
 msgid ""
 "The participant can not be added to the meeting because there is already a "
 "pending participant with the email address '%s'."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:853
-#: MaKaC/services/implementation/conference.py:920
-#: indico/MaKaC/services/implementation/conference.py:853
-#: indico/MaKaC/services/implementation/conference.py:920
+#: MaKaC/services/implementation/conference.py:854
+#: MaKaC/services/implementation/conference.py:921
+#: indico/MaKaC/services/implementation/conference.py:854
+#: indico/MaKaC/services/implementation/conference.py:921
 msgid "Already pending participant"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:857
-#: indico/MaKaC/services/implementation/conference.py:857
+#: MaKaC/services/implementation/conference.py:858
+#: indico/MaKaC/services/implementation/conference.py:858
 msgid "The request for participation has been accepted"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:869
-#: indico/MaKaC/services/implementation/conference.py:869
+#: MaKaC/services/implementation/conference.py:870
+#: indico/MaKaC/services/implementation/conference.py:870
 #, python-format
 msgid ""
 "The participant identified by email '%s' has been added to the list of "
 "pending participants"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:871
-#: indico/MaKaC/services/implementation/conference.py:871
+#: MaKaC/services/implementation/conference.py:872
+#: indico/MaKaC/services/implementation/conference.py:872
 msgid "The participant cannot be added."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:934
-#: indico/MaKaC/services/implementation/conference.py:934
+#: MaKaC/services/implementation/conference.py:935
+#: indico/MaKaC/services/implementation/conference.py:935
 msgid "The participant that you are trying to edit does not exist."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:954
-#: indico/MaKaC/services/implementation/conference.py:954
+#: MaKaC/services/implementation/conference.py:955
+#: indico/MaKaC/services/implementation/conference.py:955
 msgid "The pending participant that you are trying to edit does not exist."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:978
-#: indico/MaKaC/services/implementation/conference.py:978
+#: MaKaC/services/implementation/conference.py:979
+#: indico/MaKaC/services/implementation/conference.py:979
 msgid "No users were selected to be added as participants."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:990
-#: MaKaC/services/implementation/conference.py:1363
-#: MaKaC/services/implementation/conference.py:1573
+#: MaKaC/services/implementation/conference.py:991
+#: MaKaC/services/implementation/conference.py:1364
+#: MaKaC/services/implementation/conference.py:1574
 #: MaKaC/services/implementation/contribution.py:327
 #: MaKaC/services/implementation/contribution.py:752
 #: MaKaC/services/implementation/contribution.py:874
 #: MaKaC/services/implementation/session.py:268 MaKaC/webinterface/user.py:84
-#: indico/MaKaC/services/implementation/conference.py:990
-#: indico/MaKaC/services/implementation/conference.py:1363
-#: indico/MaKaC/services/implementation/conference.py:1573
+#: indico/MaKaC/services/implementation/conference.py:991
+#: indico/MaKaC/services/implementation/conference.py:1364
+#: indico/MaKaC/services/implementation/conference.py:1574
 #: indico/MaKaC/services/implementation/contribution.py:327
 #: indico/MaKaC/services/implementation/contribution.py:752
 #: indico/MaKaC/services/implementation/contribution.py:874
@@ -5828,123 +5833,123 @@ msgid ""
 "database"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1031
-#: indico/MaKaC/services/implementation/conference.py:1031
+#: MaKaC/services/implementation/conference.py:1032
+#: indico/MaKaC/services/implementation/conference.py:1032
 msgid "No users were selected to be invited as participants."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1078
-#: indico/MaKaC/services/implementation/conference.py:1078
+#: MaKaC/services/implementation/conference.py:1079
+#: indico/MaKaC/services/implementation/conference.py:1079
 msgid "No participants were selected to be removed."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1087
-#: indico/MaKaC/services/implementation/conference.py:1087
+#: MaKaC/services/implementation/conference.py:1088
+#: indico/MaKaC/services/implementation/conference.py:1088
 msgid "No participants were selected to be marked as presents."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1098
-#: indico/MaKaC/services/implementation/conference.py:1098
+#: MaKaC/services/implementation/conference.py:1099
+#: indico/MaKaC/services/implementation/conference.py:1099
 msgid "No participants were selected to be marked as absents."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1109
-#: indico/MaKaC/services/implementation/conference.py:1109
+#: MaKaC/services/implementation/conference.py:1110
+#: indico/MaKaC/services/implementation/conference.py:1110
 msgid "No participants were selected to be excused."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1117
-#: indico/MaKaC/services/implementation/conference.py:1117
+#: MaKaC/services/implementation/conference.py:1118
+#: indico/MaKaC/services/implementation/conference.py:1118
 #, python-format
 msgid ""
 "You cannot excuse absence of %s - this participant was present\n"
 "                in the event"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1120
-#: indico/MaKaC/services/implementation/conference.py:1120
+#: MaKaC/services/implementation/conference.py:1121
+#: indico/MaKaC/services/implementation/conference.py:1121
 #, python-format
 msgid ""
 "You cannot excuse absence of %s - these participants were present\n"
 "                in the event"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1129
-#: indico/MaKaC/services/implementation/conference.py:1129
+#: MaKaC/services/implementation/conference.py:1130
+#: indico/MaKaC/services/implementation/conference.py:1130
 msgid "No participants were selected."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1153
-#: indico/MaKaC/services/implementation/conference.py:1153
+#: MaKaC/services/implementation/conference.py:1154
+#: indico/MaKaC/services/implementation/conference.py:1154
 msgid "No pending participants were selected to be accepted."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1163
-#: MaKaC/services/implementation/conference.py:1174
-#: indico/MaKaC/services/implementation/conference.py:1163
-#: indico/MaKaC/services/implementation/conference.py:1174
+#: MaKaC/services/implementation/conference.py:1164
+#: MaKaC/services/implementation/conference.py:1175
+#: indico/MaKaC/services/implementation/conference.py:1164
+#: indico/MaKaC/services/implementation/conference.py:1175
 msgid "No pending participants were selected to be rejected."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1292
-#: indico/MaKaC/services/implementation/conference.py:1292
+#: MaKaC/services/implementation/conference.py:1293
+#: indico/MaKaC/services/implementation/conference.py:1293
 msgid "Please choose a \"FROM\" address for the test alarm"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1298
-#: indico/MaKaC/services/implementation/conference.py:1298
+#: MaKaC/services/implementation/conference.py:1299
+#: indico/MaKaC/services/implementation/conference.py:1299
 msgid "You must be logged in to use this feature"
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1342
-#: indico/MaKaC/services/implementation/conference.py:1342
+#: MaKaC/services/implementation/conference.py:1343
+#: indico/MaKaC/services/implementation/conference.py:1343
 #, python-format
 msgid ""
 "A user with the email address %s is already in the Chairpersons list. "
 "Chairperson(s) not added."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1376
-#: indico/MaKaC/services/implementation/conference.py:1376
+#: MaKaC/services/implementation/conference.py:1377
+#: indico/MaKaC/services/implementation/conference.py:1377
 msgid ""
 "The email address is already used by another chairperson. Chairperson not "
 "added."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1401
-#: MaKaC/services/implementation/conference.py:1464
+#: MaKaC/services/implementation/conference.py:1402
+#: MaKaC/services/implementation/conference.py:1465
 #: MaKaC/services/implementation/contribution.py:456
-#: indico/MaKaC/services/implementation/conference.py:1401
-#: indico/MaKaC/services/implementation/conference.py:1464
+#: indico/MaKaC/services/implementation/conference.py:1402
+#: indico/MaKaC/services/implementation/conference.py:1465
 #: indico/MaKaC/services/implementation/contribution.py:456
 msgid ""
 "It is necessary to enter the email of the user if you want to add him as "
 "submitter."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1431
-#: indico/MaKaC/services/implementation/conference.py:1431
+#: MaKaC/services/implementation/conference.py:1432
+#: indico/MaKaC/services/implementation/conference.py:1432
 msgid ""
 "The email address is already used by another chairperson. Chairperson not "
 "modified."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1489
+#: MaKaC/services/implementation/conference.py:1490
 #: MaKaC/services/implementation/contribution.py:286
-#: indico/MaKaC/services/implementation/conference.py:1489
+#: indico/MaKaC/services/implementation/conference.py:1490
 #: indico/MaKaC/services/implementation/contribution.py:286
 msgid "The user that you are trying to delete does not exist."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1491
-#: indico/MaKaC/services/implementation/conference.py:1491
+#: MaKaC/services/implementation/conference.py:1492
+#: indico/MaKaC/services/implementation/conference.py:1492
 msgid ""
 "It is not possible to grant submission rights to a participant without an "
 "email address. Please set an email address."
 msgstr ""
 
-#: MaKaC/services/implementation/conference.py:1534
-#: indico/MaKaC/services/implementation/conference.py:1534
+#: MaKaC/services/implementation/conference.py:1535
+#: indico/MaKaC/services/implementation/conference.py:1535
 #, python-format
 msgid ""
 "The email address (%s) of a participant you are trying to add is already used"
