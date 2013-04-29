@@ -46,7 +46,7 @@ class WPAdminCollaboration(WPMainBase):
         WPMainBase.__init__(self, rh)
         self._queryParams = queryParams
         self._user = self._rh.getAW().getUser()
-        self._pluginsWithIndexing = CollaborationTools.pluginsWithIndexing() # list of names
+        self._pluginsWithIndexing = CollaborationTools.pluginsWithIndexing(True)  # list of names
         self._buildExtraJS()
 
     def getJSFiles(self):

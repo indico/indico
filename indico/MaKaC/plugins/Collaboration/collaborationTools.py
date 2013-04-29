@@ -296,12 +296,12 @@ class CollaborationTools(object):
         return l
 
     @classmethod
-    def pluginsWithIndexing(cls):
+    def pluginsWithIndexing(cls, includeNonActive=False):
         """ Utility function that returns a list of strings with the names
             of the collaboration plugins that want to be indexed
         """
         l = []
-        for plugin in cls.getCollaborationPluginType().getPlugins().values():
+        for plugin in cls.getCollaborationPluginType().getPlugins(includeNonActive=includeNonActive).values():
             if plugin.getModule().collaboration.CSBooking._shouldBeIndexed:
                 l.append(plugin)
         return l
