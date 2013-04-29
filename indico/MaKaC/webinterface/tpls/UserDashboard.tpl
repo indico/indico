@@ -4,7 +4,7 @@
         <div class="dashboard-col">
             <div id="yourEvents" class="dashboard-box">
                 <h3>
-                    ${_("Your upcoming events")}
+                    ${_("Your events at hand")}
                     % if user.isAdmin():
                         <a href="#" id="refreshRedisLinks" style="float: right;"><span class="icon-refresh contextHelp" title="${_("Admin tool: Refresh Redis links")}"></span></a>
                         <script>
@@ -124,7 +124,7 @@ $(document).ready(function(){
 
     var api_opts = {
         limit: "10",
-        from: "today",
+        from: "-7d",
         order: "start",
         userid: "${ rh._avatar.getId() }"
     };
@@ -162,6 +162,7 @@ $(document).ready(function(){
 
     % if categories:
     // Happening in your categories query
+    api_opts["from"] = "today"
     apiRequest("/user/categ_events", api_opts).done(function(resp) {
         var html = '';
         if (resp.count === 0) {
