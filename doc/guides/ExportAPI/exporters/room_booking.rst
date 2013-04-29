@@ -202,11 +202,13 @@ For example, https://indico.server/export/room/CERN/120.json?ak=00000000-0000-00
                 "_type": "RoomCERN",
                 "name": "Mezzanine",
                 "floor": "1",
+                "longitude": "6.05427049127",
                 "vcList": [],
                 "equipment": [],
                 "roomNr": "201",
                 "location": "CERN",
                 "_fossil": "roomMetadata",
+                "latitude": "46.2314139466",
                 "fullName": "500-1-201 - Mezzanine",
                 "id": 120,
                 "bookingUrl": "http://indico.server/roomBooking.py/bookingForm?roomLocation=CERN&roomID=120",
@@ -235,6 +237,7 @@ Output for https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000
                 "_type": "RoomCERN",
                 "name": "Mezzanine",
                 "floor": "1",
+                "longitude": "6.05427049127",
                 "reservations": [
                     {
                         "endDT": {
@@ -266,6 +269,63 @@ Output for https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000
                 "roomNr": "201",
                 "location": "CERN",
                 "_fossil": "roomMetadataWithReservations",
+                "latitude": "46.2314139466",
+                "fullName": "500-1-201 - Mezzanine",
+                "id": 120,
+                "bookingUrl": "http://indico.server/roomBooking.py/bookingForm?roomLocation=CERN&roomID=120",
+                "avc": false
+            }
+        ]
+    }
+
+Get room by room name
+=====================
+
+General Information
+
+The search room export is guest allowed because the room data is public (no the reservations).
+
+
+URL Format
+**********
+*/export/roomName/LOCATION/ROOMNAME.TYPE*
+
+The *LOCATION* should be the room location, e.g. *CERN*.
+The *ROOMNAME* is a single ROOMNAME.
+
+
+Parameters
+**********
+
+No parameters needed.
+
+
+Results
+*************
+
+Returns basic data about the rooms.
+
+For example, https://indico.server/export/roomName/CERN/Mezzanine.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes::
+
+    {
+        "count": 1,
+        "_type": "HTTPAPIResult",
+        "complete": true,
+        "url": "https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes",
+        "ts": 1308921960,
+        "results": [
+            {
+                "building": 500,
+                "_type": "RoomCERN",
+                "name": "Mezzanine",
+                "floor": "1",
+                "longitude": "6.05427049127",
+                "vcList": [],
+                "equipment": [],
+                "roomNr": "201",
+                "location": "CERN",
+                "_fossil": "roomMetadata",
+                "latitude": "46.2314139466",
                 "fullName": "500-1-201 - Mezzanine",
                 "id": 120,
                 "bookingUrl": "http://indico.server/roomBooking.py/bookingForm?roomLocation=CERN&roomID=120",

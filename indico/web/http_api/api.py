@@ -476,7 +476,7 @@ class UserInfoHook(HTTPAPIHook):
             raise HTTPAPIError('Requested user not found', apache.HTTP_NOT_FOUND)
         if user:
             if requested_user.canUserModify(user):
-                return requested_user.fossilize()
+                return [requested_user.fossilize()]
             raise HTTPAPIError('You do not have access to that info', apache.HTTP_FORBIDDEN)
         raise HTTPAPIError('You need to be logged in', apache.HTTP_FORBIDDEN)
 
