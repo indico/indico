@@ -250,6 +250,12 @@ var viewByObs = function(viewBySelected, firstTime) {
         orderByObs('descending', true); // we put true because we don't want to trigger another request
     }
 
+    if (viewBySelected == 'startDate') {
+        // startDate view does not support "only pending"
+        queryParams.showOnlyPending = false;
+        $('#pendingCB').prop('checked', false);
+    }
+
     set_view_by(viewBySelected);
 
     if (!firstTime) {
@@ -293,8 +299,12 @@ var confIdObs = function() {
 }
 
 var updateFilterButton = function() {
-    $('#filterButton').attr('value', $T("Apply Filter"));
-}
+    $('#filterButton').val($T("Apply Filter"));
+    if ($('#pendingCB').prop('checked') && queryParams.viewBy == 'startDate') {
+        // startDate view does not support "only pending"
+        set_view_by('modificationDate');
+    }
+};
 
 var refresh = function() {
     if (!queryParams.indexName) {
