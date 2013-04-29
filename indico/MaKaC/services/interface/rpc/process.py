@@ -34,7 +34,7 @@ from MaKaC.common import DBMgr, Config
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.mail import GenericMailer
 
-from MaKaC.services.interface.rpc.common import CausedError, NoReportError
+from MaKaC.services.interface.rpc.common import CausedError, NoReportError, CSRFError
 from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
 
@@ -73,7 +73,7 @@ def processRequest(method, params, req, internal=False):
 
     if not internal and Config.getInstance().getCSRFLevel() >= 1:
         if websession.csrf_protected and websession.csrf_token != req.headers_in.get('X-CSRF-Token'):
-            raise RequestError('ERR-R4', _('Invalid CSRF token'))
+            raise CSRFError()
 
     # invoke handler
     if hasattr(handler, "process"):

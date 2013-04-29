@@ -81,6 +81,11 @@ class NoReportError(CausedError):
     def getExplanation(self):
         return self._explanation
 
+class CSRFError(NoReportError):
+    def __init__(self):
+        NoReportError.__init__(self, _('Oops, looks like there was a problem with your current session. Please refresh the page and try again.'))
+        self.code = 'ERR-CSRF'
+
 class RequestError(CausedError):
     pass
 
