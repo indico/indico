@@ -57,7 +57,6 @@ from MaKaC.services.implementation.base import ProtectedModificationService, Lis
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, Warning, \
         ResultWithWarning, TimingNoReportError, NoReportError
 
-
 # indico imports
 from indico.modules.scheduler import tasks
 from indico.util.i18n import i18nformat
@@ -733,8 +732,10 @@ class ConferenceAddEditParticipantBase(ConferenceParticipantBase):
         pm = ParameterManager(self._params)
         self._id = pm.extract("id", pType=str, allowEmpty=True)
         self._title = pm.extract("title", pType=str, allowEmpty=True, defaultValue="")
-        self._familyName = pm.extract("surName", pType=str, allowEmpty=False)
-        self._firstName = pm.extract("name", pType=str, allowEmpty=False)
+        self._familyName = pm.extract("surName", pType=str, allowEmpty=True)
+        self._firstName = pm.extract("name", pType=str, allowEmpty=True)
+        if self._familyName.strip() == "" and self._firstName.strip() == "":
+            raise NoReportError(_("User has neither First Name or Family Name."))
         self._email = pm.extract("email", pType=str, allowEmpty=False)
         self._affiliation = pm.extract("affiliation", pType=str, allowEmpty=True, defaultValue="")
         self._address = pm.extract("address", pType=str, allowEmpty=True, defaultValue="")
@@ -757,7 +758,7 @@ class ConferenceParticipantListBase(ConferenceModifBase):
             return _("""The participants identified by email %s
                         are already in the %s participants' list.""")%(typeList ,", ".join(list))
 
-    def _checkParticipantConfirmed(slef, participant):
+    def _checkParticipantConfirmed(self, participant):
         if not participant.isConfirmed():
             raise NoReportError(_("Selected participant(s) did not confirm invitation. Until then you can not change presence status"))
 
