@@ -163,14 +163,14 @@ var queryParams = {
     orderBy: '',
     resultsPerPage: '${ InitialResultsPerPage }',
     page: '${ InitialPage }'
-}
+};
 
 var dateParameterManager = new IndicoUtil.parameterManager();
 var resultsPerPageParameterManager = new IndicoUtil.parameterManager();
 
 var codes = {
 ${ ",\n". join(['"' + pluginName + '" \x3a ' + code for pluginName, code in JSCodes.items()]) }
-}
+};
 
 var initialize_index_tabs = function() {
         $('ul.CAIndexList a').on('mouseover', function(event) {
@@ -182,13 +182,13 @@ var initialize_index_tabs = function() {
             var index = $(this).data('index');
             indexSelectedObs(index, false);
         });
-}
+};
 
 var alertNoIndexSelected = function() {
     var popup = new AlertPopup($T("No index selected"), Html.span({},$T("Please select an index name")), Html.br(),
             Html.span(indexNames.join(', ')));
     popup.open();
-}
+};
 
 var indexSelectedObs = function(selectedIndexName, firstTime) {
     $('.CAIndexList a').removeClass("CAIndexSelected");
@@ -218,8 +218,8 @@ var indexSelectedObs = function(selectedIndexName, firstTime) {
 
     if (!firstTime) {
         refresh();
-    };
-}
+    }
+};
 
 function set_view_by(viewBy) {
     $('.CAViewByLink').removeClass("CAViewBySelected");
@@ -260,8 +260,8 @@ var viewByObs = function(viewBySelected, firstTime) {
 
     if (!firstTime) {
         refresh();
-    };
-}
+    }
+};
 
 var updateDateFilterType = function() {
     if ($E('sinceToDateRadio').dom.checked) {
@@ -275,7 +275,7 @@ var updateDateFilterType = function() {
         $E('fromDays').dom.disabled = false;
         $E('toDays').dom.disabled = false;
     }
-}
+};
 
 var orderByObs = function(orderBySelected, firstTime) {
 
@@ -291,12 +291,12 @@ var orderByObs = function(orderBySelected, firstTime) {
 
     if (!firstTime) {
         refresh();
-    };
-}
+    }
+};
 
 var confIdObs = function() {
     $E('categoryId').dom.disabled = ($E('conferenceId').get() != '')
-}
+};
 
 var updateFilterButton = function() {
     $('#filterButton').val($T("Apply Filter"));
@@ -313,7 +313,7 @@ var refresh = function() {
         applyFilter();
         query();
     }
-}
+};
 
 var applyFilter = function(){
 
@@ -345,8 +345,7 @@ var applyFilter = function(){
     queryParams.resultsPerPage = $E('resultsPerPage').get();
     queryParams.page = 1;
     $E('filterButton').dom.value = $T('Refresh');
-
-}
+};
 
 var query = function() {
 
@@ -392,8 +391,7 @@ var query = function() {
             }
         }
     );
-
-}
+};
 
 var updateStaticURL = function() {
     var url = '${ BaseURL }' +
@@ -416,7 +414,7 @@ var updateStaticURL = function() {
 
     $('#staticURL').attr('value', url);
     $('#staticURLLink').attr('href', url);
-}
+};
 
 /** Static URL qTip event handler **/
 $('#CAStaticURLLink').qtip({
@@ -461,7 +459,7 @@ var confTitleGroupTemplate = function(group, isFirst){
     });
 
     return result;
-}
+};
 
 var confTitleBookingTemplate = function(booking) {
     var row = Html.tr("ACBookingLine");
@@ -488,7 +486,7 @@ var confTitleBookingTemplate = function(booking) {
     row.append(cell);
 
     return row;
-}
+};
 
 var dateBookingTemplate = function(booking, viewBy) {
     var row = $('<tr class="ACBookingLine"></tr>');
@@ -526,7 +524,7 @@ var dateBookingTemplate = function(booking, viewBy) {
         $('<a></a>').html($T('Event Display')).attr('href', buildVideoServicesDisplayUrl(booking.conference))
     ));
     return row;
-}
+};
 
 var dateGroupTemplate = function(group, isFirst, viewBy) {
     var date = group[0];
@@ -541,12 +539,12 @@ var dateGroupTemplate = function(group, isFirst, viewBy) {
     });
 
     return result;
-}
+};
 
 var updateList = function() {
     updateResults();
     updatePageNumberList();
-}
+};
 
 var updateResults = function() {
 
@@ -571,17 +569,17 @@ var updateResults = function() {
             }
         }
     }
-}
+};
 
 var updatePageNumberList = function() {
     pf.setNumberOfPages(nPages);
     pf.selectPage(queryParams.page);
-}
+};
 
 var pageSelectedHandler = function(page) {
     queryParams.page = page;
     query();
-}
+};
 
 var pf = new PageFooter('${ InitialNumberOfPages }', '${ InitialPage }', 4, pageSelectedHandler)
 
@@ -620,7 +618,7 @@ $(function(){
         if (value < 1) {
             return $T("Please input number higher than 0");
         }
-    })
+    });
 
     if (bookings) {
         updateResults();
