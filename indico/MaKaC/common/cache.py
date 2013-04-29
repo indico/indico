@@ -233,7 +233,7 @@ class RedisCacheStorage(CacheStorage):
 
     def save(self, path, name, data):
         try:
-            self._connect().setex(self._makeKey(path, name), data, self.getTTL())
+            self._connect().setex(self._makeKey(path, name), self.getTTL(), data)
         except redis.RedisError:
             Logger.get('redisCache').exception('save failed')
 
