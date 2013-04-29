@@ -90,7 +90,9 @@ class WAdminCollaboration(wcomponents.WTemplated):
 
         #dictionary where the keys are names of false "indexes" for the user, and the values are IndexInformation objects
         indexes = CollaborationTools.getCollaborationPluginType().getOption("pluginsPerIndex").getValue()
-        vars["Indexes"] = ['all', None, 'Vidyo', 'EVO', 'CERNMCU', 'All Videoconference', None, 'WebcastRequest', 'RecordingRequest', 'All Requests']
+        indexNames = set(i.getName() for i in indexes)
+        indexList = ['all', None, 'Vidyo', 'EVO', 'CERNMCU', 'All Videoconference', None, 'WebcastRequest', 'RecordingRequest', 'All Requests']
+        vars["Indexes"] = [x for x in indexList if x is None or x in indexNames]
         vars["IndexInformation"] = fossilize(dict([(i.getName(), i) for i in indexes]), IIndexInformationFossil)
         vars["InitialIndex"] = self._queryParams["indexName"]
         vars["InitialViewBy"] = self._queryParams["viewBy"]
