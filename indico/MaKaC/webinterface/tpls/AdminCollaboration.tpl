@@ -130,6 +130,7 @@
     <div id="pageNumberList">
     </div>
 </div>
+</div>
 <script type="text/javascript">
 
 //hack for IE
