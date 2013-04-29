@@ -260,8 +260,10 @@ class _UserUtils:
 class RHUserBase( RHProtected ):
 
     def _checkParams( self, params ):
+
         if "userId" not in params or params["userId"].strip() == "":
             raise MaKaCError( _("user id not specified"))
+
         ah = user.AvatarHolder()
         self._target = self._avatar = ah.getById( params["userId"] )
         if self._avatar == None:
@@ -277,9 +279,28 @@ class RHUserBase( RHProtected ):
 class RHUserDashboard(RHUserBase):
     _uh = urlHandlers.UHUserDashboard
 
+    def __init__(self, req):
+        RHUserBase.__init__(self, req)
+
+    def _checkParams( self, params ):
+        user = self._getUser()
+
+        # if no user id was specified and we're logged in
+        # assume user wants to see their own profile
+        if "userId" not in params and user:
+            params["userId"] = user.getId()
+            self._doProcess = False
+
+            # just set so that _checkProtection doesn't fail
+            self._avatar = user
+            self._redirect(self._uh.getURL(**params))
+            return
+        RHUserBase._checkParams(self, params)
+
     def _process(self):
         p = adminPages.WPUserDashboard(self, self._avatar)
         return p.display()
+
 
 class RHUserDetails( RHUserBase):
     _uh = urlHandlers.UHUserDetails

@@ -68,7 +68,7 @@
     font-size: 1.2em;
     font-family: Georgia, Times, Serif;
     min-height: 0.3em;
-    margin: auto;
+    margin: 0 0 2em 0;
 }
 
 .category-sidebar {
@@ -100,6 +100,7 @@
 .category-sidebar ul {
     list-style-type: none;
     padding: 0;
+    font-size: 1.1em;
 }
 
 .category-sidebar h2 {
@@ -109,6 +110,12 @@
     font-weight: normal;
     margin-top: 20px;
     padding-bottom: 0.2em;
+}
+
+.category-sidebar h2 .more-icon {
+    float: right;
+    font-size: 0.6em;
+    margin: 0.8em 1em 0 0;
 }
 
 .category-sidebar h2:before {
@@ -164,6 +171,7 @@ a.invisible-block {
 }
 
 ul.category-list {
+    font-size: 1.2em;
     list-style-type: none;
     padding: 0;
 
@@ -216,7 +224,7 @@ ul.category-list li .protection[data-type="domain"] {
 
 ul.category-list li a {
     display: block;
-    color: #3fa9f5;
+    color: #2C95E0;
     padding: 0 0 0 1em;
 
     outline: none;

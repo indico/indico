@@ -33,16 +33,20 @@ $(document).ready(function() {
     });
 
     // Use qtip for context help
-    $('.contextHelp[title]').qtip();
 
-    $('.i-button[title]').qtip({
+    $.fn.qtip.defaults = $.extend(true, {}, $.fn.qtip.defaults, {
         position: {
             my: 'top center',
             at: 'bottom center'
         },
         hide: {
             event: 'click mouseout'
-        },
+        }
+    });
+
+    $('.contextHelp[title]').qtip();
+
+    $('.i-button[title]').qtip({
         events: {
             show: function(event) {
                 if ($(event.originalEvent.target).hasClass('open')) {

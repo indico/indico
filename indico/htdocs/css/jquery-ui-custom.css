@@ -193,10 +193,12 @@
 /* Indico styled tooltips USED WITH qTip2 */
 
 .ui-tooltip-default{
-    border: solid 1px #888;
-    color: #222;
-    background-color: #F0F0F0;
-    font-size: 11px;
+    border: solid 1px #b6c1c9;
+    color: #888;
+    background-color: #f0f5fa;
+    font-size: 0.8em;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2), 0 0 4px #fcffff inset;
+    border-radius: 4px;
 }
 
 .ui-tooltip-default .ui-tooltip-titlebar {
@@ -220,6 +222,11 @@
 .ui-tooltip-timezone {
     min-width: 320px;
     font-size: 13px;
+}
+
+.ui-tooltip-content h3 {
+    font-size: 1.2em;
+    margin: 0.5em 0 0 0;
 }
 
  /* Indico styled multiselect */

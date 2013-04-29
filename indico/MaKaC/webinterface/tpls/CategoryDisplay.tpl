@@ -17,7 +17,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
 
             % if isLoggedIn and not isRootCategory:
             <div id="categFavorite" class="group right">
-                <a class="i-button fav-button icon-only icon-bookmark ${"enabled" if categ in favoriteCategs else ""}" href="#" title="${_("Add to favorites")}"></a>
+                <a class="i-button fav-button icon-only icon-bookmark ${"enabled" if categ in favoriteCategs else ""}" href="#"></a>
             </div>
             % endif
 
@@ -73,7 +73,10 @@ containsCategories = len(categ.getSubCategoryList()) > 0
     <div class="category-sidebar">
         % if isRootCategory:
             % if isNewsActive:
-                <h2 class="icon-bullhorn">${_("News")}</h2>
+                <h2 class="icon-bullhorn">
+                    ${_("News")}
+                    <a href="${ urlHandlers.UHIndicoNews.getURL()}" class="more-icon">${ _("more...") }</a>
+                </h2>
                 <%include file="WelcomeHeader.tpl" args="tz = timezone"/>
             % endif
             % if upcomingEvents:
@@ -158,6 +161,14 @@ $(document).ready(function(){
 % if isLoggedIn:
     <script type="text/javascript">
         $(document).ready(function(){
+
+            $('.toolbar .i-button').qtip({
+                position: {
+                    my: 'bottom center',
+                    at: 'top center'
+                }
+            });
+
             $('.i-button.fav-button').click(function() {
                 var $this = $(this);
 
@@ -177,7 +188,21 @@ $(document).ready(function(){
                         }
                     });
                 }
-            });
+            }).qtip({
+                hide: {
+                        fixed: true,
+                        delay: 500
+                    },
+                content: {
+                    text: function() {
+                        if ($(this).hasClass('enabled')) {
+                            return $T("Remove from your favorites");
+                        } else {
+                            return format($T('<h3>Add to your favorites</h3><p>This will make events in this category visible on your <a href="{0}">Dashboard</a>.</p>'), [${str(urlHandlers.UHUserDashboard().getURL()) | n,j}]);
+                        }
+                    }
+                }
+            })
         });
     </script>
 % endif

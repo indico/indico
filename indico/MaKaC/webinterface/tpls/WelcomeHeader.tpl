@@ -16,6 +16,3 @@ newsList = newsModule.getNewsItemsList()
         </li>
     % endfor
 </ul>
-<div style="margin-top:10px; text-align: right;">
-    <a href="${ urlHandlers.UHIndicoNews.getURL()}" class="subLink">${ _("View news history") }</a>
-</div>
