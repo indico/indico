@@ -7498,14 +7498,6 @@ table.infoQuestionsTable td.dataBold {
     text-align:center;
 }
 
-.errorMessage {
-    color: #b94a48;
-    background-color: #f2dede;
-    border: 1px solid #eed3d7;
-    border-radius: 4px;
-    padding: 5px;
-}
-
 .abstract.selected {
     background: #CDEB8B;
 }
