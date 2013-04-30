@@ -346,8 +346,8 @@ def getOrphans():
         try:
             cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
             # Query Lectures table for all records in which IndicoID is blank or NULL
-            cursor.execute("""SELECT L.idLecture AS idLecture, L.LOID AS LOID, L.IndicoID AS IndicoID, M.Hostname AS Hostname, V.RoomName AS RoomName, L.Duration AS Duration
-                FROM Lectures L, LectureLatestStatus LS, Status S, Machines M, Venues V
+            cursor.execute("""SELECT L.idLecture AS idLecture, L.LOID AS LOID, L.IndicoID AS IndicoID, M.hostname AS Hostname, V.roomName AS RoomName, L.duration AS Duration
+                FROM lectures L, lectureLatestStatus LS, status S, machines M, venues V
                 WHERE LS.idLecture = L.idLecture
                 AND LS.idTask = %s
                 AND LS.idStatus = S.idStatus
