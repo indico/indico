@@ -1,7 +1,9 @@
 <form action=${ postURL } method="POST" onsubmit="return parameterManager.check();">
 <table width="90%" cellspacing="0" align="center" border="0" style="padding-left:2px; padding-bottom: 5px; border-bottom: 1px solid #BBBBBB;">
 <tr>
-  <td colspan="3" class="groupTitle">${ action }  a Field</td>
+  <td colspan="3" class="groupTitle">${ action } a Field</td>
+</tr>
+<tr>
   <td nowrap class="titleCellTD" style="padding-top: 10px;"><span class="titleCellFormat"> ${ _("Type")}</span></td>
   <td colspan="2" bgcolor="white" width="100%"  style="padding-top: 10px;">&nbsp;
     <select name="fieldType">

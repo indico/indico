@@ -8596,7 +8596,7 @@ table#currencies td, table#currencies th {
     padding: 5px;
 }
 
-.warning {
+div.warning {
     background-color: #fcf8e3;
     border: 1px solid #fbeed5;
     border-radius: 4px;
@@ -8604,7 +8604,7 @@ table#currencies td, table#currencies th {
     padding: 5px;
 }
 
-.warning h3 {
+div.warning h3 {
     margin-top: 0px;
     color: #c09853;
     font-weight: bold;
