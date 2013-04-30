@@ -855,15 +855,13 @@ msgstr ""
 
 #: MaKaC/webinterface/tpls/RoomBookingDetails.tpl:13
 #: indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:13
-#, fuzzy
 msgid "Accept booking"
-msgstr "réservation?"
+msgstr "Accepter réservation"
 
 #: MaKaC/webinterface/tpls/RoomBookingDetails.tpl:13
 #: indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:13
-#, fuzzy
 msgid "Are you sure you want to ACCEPT your booking?"
-msgstr "Êtes-vous sûr de vouloir REJETER la réservation pour ?"
+msgstr "Êtes-vous sûr de vouloir ACCEPTER la réservation pour ?"
 
 #: MaKaC/webinterface/tpls/RoomBookingDetails.tpl:22
 #: indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:22
