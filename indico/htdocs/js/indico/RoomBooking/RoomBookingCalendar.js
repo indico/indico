@@ -56,9 +56,16 @@ type ("RoomBookingRoom", [],
             /**
              * Return booking form url for the specified dates.
              */
-            getBookingFormUrl: function(date, repeatability, flexibleDatesRange, minutes, finishDate, startD, endD){
-                url = Indico.Urls.RoomBookingForm + "?roomLocation=" + this.location + "&roomID=" + this.id +
-                "&ignoreSession=1&repeatability=" + repeatability + "&infoBookingMode=True";
+            getBookingFormUrl: function(date, repeatability, flexibleDatesRange, minutes, finishDate, startD, endD, ignoreSession){
+                var ignSession = any(ignoreSession, false);
+                var url = Indico.Urls.RoomBookingForm + "?roomLocation=" + this.location + "&roomID=" + this.id +
+                "&ignoreSession=1&repeatability=" + repeatability;
+                if (ignSession) {
+                    url = url + "&ignoreSession=1";
+                }else {
+                    url = url + "&infoBookingMode=True";
+                }
+
                 if (minutes) {
                     url += "&hour=" + date.substr(11,2) + "&minute=" + date.substr(14,2) + "&hourEnd=" + date.substr(16,2) + "&minuteEnd=" + date.substr(19,2);
                 }
@@ -304,7 +311,7 @@ type ("RoomBookingCalendarDrawer", [],
                                 bookingImposible = false;
                             }
                         });
-                        url = bar.room.getBookingFormUrl(bar.startDT.print("%Y/%m/%d %H:%M") + bar.endDT.print("%H:%M"), self.data.repeatability, self.data.flexibleDatesRange, true, self.data.finishDate, self.data.startD, self.data.endD);
+                        var url = bar.room.getBookingFormUrl(bar.startDT.print("%Y/%m/%d %H:%M") + bar.endDT.print("%H:%M"), self.data.repeatability, self.data.flexibleDatesRange, true, self.data.finishDate, self.data.startD, self.data.endD);
                         if (bookingImposible) {
                             var popup = new ExclusivePopupWithButtons($T('Booking conflict'), function(){popup.close();}, false, false, true);
 
@@ -546,7 +553,7 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                     if(tt) {
                         tt = tt.replace(/\n/g, '<br>');
                     }
-                    var link = Html.a({href:this.room.getBookingFormUrl(day.date, this.data.repeatability, this.data.flexibleDatesRange, false, false, null, null),  className : 'dateLink ' + dateClass},
+                    var link = Html.a({href:this.room.getBookingFormUrl(day.date, this.data.repeatability, this.data.flexibleDatesRange, false, false, null, null, true),  className : 'dateLink ' + dateClass},
                                       Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d"));
                     var div = Html.div({style:{clear:'both', paddingTop:pixels(5)}},
                         Html.div({style:{display:'block', cssFloat:'left', width:pixels(125)}}, link),
