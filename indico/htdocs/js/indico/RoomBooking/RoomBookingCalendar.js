@@ -398,12 +398,12 @@ type ("RoomBookingCalendarDrawer", [],
              * Draws a row containing hours for a room
              */
             drawSmallHours: function(){
-                var hours = [];
+                var hours = $('<div/>');
                 for(var i = START_H; i < 25; i += 2 ){
                     var left = (i - START_H) / 24 * DAY_WIDTH_PX;
-                    hours.push(Html.div({className : "calHour", style:{left:left}},i));
+                    hours.append($('<div class="calHour" />').css('left', left).text(i));
                 }
-                return hours;
+                return hours.children();
             },
             /**
              * Draws a calendar header
@@ -420,7 +420,7 @@ type ("RoomBookingCalendarDrawer", [],
                     var left = (i - START_H) / 24 * DAY_WIDTH_PX;
                     hours.push(Html.div({className : 'calHour', style:{'left':left, fontSize:pixels(10)}},i, Html.span({style:{fontSize: pixels(8)}}, ":00")));
                 }
-                return Html.div({className:'dayCalendarDivHeader', style:{marginLeft: pixels(120)}}, hours);
+                return Html.div('dayCalendarDivHeader', hours);
             },
             /**
              * Draws content of the drawer. Need to be overloaded.
@@ -465,12 +465,19 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                 var self = this;
                 var roomLink = Html.a({href:roomInfo.room.bookingUrl, className : 'roomLink ' + roomInfo.room.type},
                         roomInfo.room.getFullNameHtml(true));
-                var bars = [];
-                each(roomInfo.bars,
-                        function(bar){
-                            bars.push(self.drawBar(bar, true));
+                var day_content = $('<div class="dayCalendarDiv">').append($('<div class="time-bar"/>'));
+
+                $.each(roomInfo.bars,
+                        function(i, bar){
+                            day_content.append(self.drawBar(bar, true).dom);
                         });
-                return Html.div({style:{clear:'both', width:pixels(120), paddingTop:pixels(5)}}, Html.div({style:{cssFloat:'left', paddingLeft: pixels(5)}},roomLink), Html.div('dayCalendarDiv',bars, this.drawSmallHours()));
+
+                var container = $('<div class="room-row">').append(
+                    $('<div class="link">').append(roomLink.dom),
+                    day_content);
+
+                return new XElement(container.get(0))
+
             },
 
             /**
@@ -486,17 +493,12 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                         if(roomDiv)
                             rooms.push(roomDiv);
                 });
-                highlight ? wholeDayCalendarDayTitle = 'wholeDayCalendarDayHighlight' : wholeDayCalendarDayTitle = '';
-                if(_.size(rooms) > 0)
-                    if (highlight)
-                        return Html.div({className:"wholeDayCalendarDiv", style:{border: '2px solid #D9EDF7'}},
-                                    Html.div({className:'wholeDayCalendarDayHighlight', style:{width:pixels(800), height:pixels(20), borderBottom: "1px solid #eaeaea", clear: "both"}},
-                                        Html.div({style:{cssFloat:'left', fontWeight: 'bold'}}, $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('yy-mm-dd', day.date)))), this.drawHours(), rooms);
-                    else
-                        return Html.div({className:"wholeDayCalendarDiv"},
-                                Html.div({style:{width:pixels(800), height:pixels(20), borderBottom: "1px solid #eaeaea", clear: "both"}},
-                                        Html.div({style:{cssFloat:'left', fontWeight: 'bold'}}, $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('yy-mm-dd', day.date)))), this.drawHours(), rooms);
 
+                if(_.size(rooms) > 0) {
+                    return Html.div({className:"wholeDayCalendarDiv", style: (highlight ? {border: '2px solid #D9EDF7'} : {})},
+                                Html.div({className: (highlight ? 'wholeDayCalendarDayHighlight' : ''), style: {width: pixels(800), height: pixels(20), borderBottom: "1px solid #eaeaea", clear: "both"}},
+                                        Html.div({style:{cssFloat:'left', fontWeight: 'bold'}}, $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('yy-mm-dd', day.date)))), this.drawHours(), rooms);
+                }
             },
 
             /**
@@ -531,10 +533,11 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
         {
             drawDay: function(day){
                 var self = this;
-                var bars = [];
-                each(day.rooms[0].bars,
-                        function(bar){
-                    bars.push(self.drawBar(bar, false));
+                var day_content = $('<div class="dayCalendarDiv">').append($('<div class="time-bar"/>'));
+
+                $.each(day.rooms[0].bars,
+                    function(i, bar){
+                        day_content.append(self.drawBar(bar, false).dom);
                 });
 
                 var dateClass = "weekday";
@@ -555,10 +558,11 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                     }
                     var link = Html.a({href:this.room.getBookingFormUrl(day.date, this.data.repeatability, this.data.flexibleDatesRange, false, false, null, null, true),  className : 'dateLink ' + dateClass},
                                       Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d"));
-                    var div = Html.div({style:{clear:'both', paddingTop:pixels(5)}},
-                        Html.div({style:{display:'block', cssFloat:'left', width:pixels(125)}}, link),
-                        Html.div({style:{cssFloat:'left'}},
-                        Html.div('dayCalendarDiv',bars, this.drawSmallHours())));
+
+                    var container = $('<div class="room-row">').append(
+                        $('<div class="link">').append(link.dom),
+                        day_content);
+
                     if(tt) {
                         $(link.dom).qtip({
                             content: {
@@ -570,7 +574,7 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                             }
                         });
                     }
-                    return div;
+                    return new XElement(container.get(0));
                 }
             },
 
