@@ -542,8 +542,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
             roomLocation = roomLocation[0]
         if not candResv:
             candResv = Location.parse( roomLocation ).factory.newReservation() # The same location as room
-        if not candResv.room:
-            candResv.room = CrossLocationQueries.getRooms( roomID = roomID, location = roomLocation )
+        candResv.room = CrossLocationQueries.getRooms( roomID = roomID, location = roomLocation )
         self._checkParamsRepeatingPeriod( params )
         candResv.startDT = self._startDT
         candResv.endDT = self._endDT
