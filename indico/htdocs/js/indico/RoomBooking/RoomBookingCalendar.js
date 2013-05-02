@@ -472,7 +472,7 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                             day_content.append(self.drawBar(bar, true).dom);
                         });
 
-                var container = $('<div class="room-row">').append(
+                var container = $('<div class="room-row">').toggleClass('room-row-empty', !roomInfo.bars.length).append(
                     $('<div class="link">').append(roomLink.dom),
                     day_content);
 
@@ -487,15 +487,19 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
             drawDay: function(day, highlight){
                 var self = this;
                 var rooms = [];
-                each(day.rooms,
-                    function(room){
-                        roomDiv = self.drawRoom(room);
-                        if(roomDiv)
-                            rooms.push(roomDiv);
+                var hasNonEmpty = false;
+                each(day.rooms, function (room) {
+                    var roomDiv = self.drawRoom(room);
+                    if (roomDiv) {
+                        rooms.push(roomDiv);
+                        if(room.bars.length) {
+                            hasNonEmpty = true;
+                        }
+                    }
                 });
 
                 if(_.size(rooms) > 0) {
-                    return Html.div({className:"wholeDayCalendarDiv", style: (highlight ? {border: '2px solid #D9EDF7'} : {})},
+                    return Html.div({className:"wholeDayCalendarDiv " + (hasNonEmpty ? '' : 'day-empty'), style: (highlight ? {border: '2px solid #D9EDF7'} : {})},
                                 Html.div({className: (highlight ? 'wholeDayCalendarDayHighlight' : ''), style: {width: pixels(800), height: pixels(20), borderBottom: "1px solid #eaeaea", clear: "both"}},
                                         Html.div({style:{cssFloat:'left', fontWeight: 'bold'}}, $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('yy-mm-dd', day.date)))), this.drawHours(), rooms);
                 }
