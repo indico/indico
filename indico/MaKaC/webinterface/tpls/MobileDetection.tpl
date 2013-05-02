@@ -13,7 +13,7 @@
          if(confId){
              url += "/event/"+confId;
          }
-         window.location.replace(url);
+         window.location.href=url;
      });
 
      $("#useFullVersion").click(function(){

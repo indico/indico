@@ -2880,26 +2880,29 @@ div.pageOverHeader
 /* Mobile Header */
 
 div.mobile-device-header{
-    position: absolute;
     display: none;
-    width:480px;
+    width:100%;
     z-index: 10;
-    padding: 5px;
+    padding: 15px 5px;
     border: 1px solid #AAA;
     background-color: #F4F4F4;
     color: #666;
-    margin: auto;
     text-align: center;
-    left: 50%;
-    margin-left: -240px;
-    border-radius: 0 0 10px 10px;
     border-top: none;
-    box-shadow: 0 0 8px rgba(100, 100, 100, 0.4);
+    box-shadow: 0 1px 8px rgba(100, 100, 100, 0.4);
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
 
 div.mobile-device-header > .text{
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 1em;
+    font-size: 3em;
+}
+
+div.mobile-device-header .i-button{
+    font-size: 3em;
 }
 /* Styles for the main menu */
 
