@@ -7,11 +7,6 @@
 </div>
 
  <script type="text/javascript">
-     $.urlParam = function(name){
-         var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
-         if (!results) { return null; }
-         return results[1] || null;
-     }
      $("#useMobile").click(function(){
          var url = "${Config.getInstance().getMobileURL()}";
          var confId = $.urlParam("confId");
