@@ -369,7 +369,7 @@ def getOrphans():
                 lecture["time"] = formatLOID(lecture["LOID"])[0]
                 lecture["date"] = formatLOID(lecture["LOID"])[1]
                 lecture["box"]  = formatLOID(lecture["LOID"])[2]
-                lecture["niceDuration"] = formatDuration(lecture["Duration"])
+                lecture["niceDuration"] = formatDuration(lecture["duration"])
                 idLecture = MicalaCommunication.getIdLecture(lecture["LOID"])
                 idTaskPreview = MicalaCommunication.getIdTask("building preview")
                 lecture["preview"] = MicalaCommunication.isTaskComplete(idLecture, idTaskPreview)

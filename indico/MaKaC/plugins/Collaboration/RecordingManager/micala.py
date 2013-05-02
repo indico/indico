@@ -265,7 +265,7 @@ class MicalaCommunication(object):
             # Also, it shouldn't ever happen, but ignore records in the micala DB with ContentType WEBLECTURE
             # that don't have a LOID.
             # LOID = NULL in the MySQL database translates in Python to being None.
-            if row["ContentType"] == 'WEBLECTURE' and row["LOID"] is not None:
+            if row["contentType"] == 'WEBLECTURE' and row["LOID"] is not None:
                 match_array[row["IndicoID"]] = row["LOID"]
 
         return (match_array)
