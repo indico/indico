@@ -194,3 +194,12 @@ you can use the generic selector below, but it's slower:
 .icon-bullhorn:before {
     content: "\49";
 }
+.icon-filter:before {
+	content: "\4a";
+}
+.icon-prev:before {
+	content: "\4b";
+}
+.icon-next:before {
+	content: "\4c";
+}
