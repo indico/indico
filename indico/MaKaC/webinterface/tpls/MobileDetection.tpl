@@ -20,7 +20,10 @@
          $.jStorage.set("useIndicoDesktop", true, {TTL: 604800000}); //1 week TTL
          $(".mobile-device-header").hide();
      });
-     if(isMobile() && !$.jStorage.get("useIndicoDesktop")){
-         $(".mobile-device-header").show();
-     }
+
+     $(function() {
+        if($.browser.mobile && !$.jStorage.get("useIndicoDesktop")){
+            $(".mobile-device-header").show();
+        }
+     });
  </script>

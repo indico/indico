@@ -1,6 +1,7 @@
 % if self_._rh.isMobile() and Config.getInstance().getMobileURL():
     <%include file="MobileDetection.tpl"/>
 % endif
+
 <%include file="Announcement.tpl"/>
 
 <div class="pageHeader pageHeaderMainPage clearfix">

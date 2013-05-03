@@ -15,7 +15,7 @@ else:
          if(confId){
             $("#mobileURL").prop("href", $("#mobileURL").prop("href") + "/event/"+confId);
          }
-         if(isMobile()){
+         if($.browser.mobile) {
                 $(".mobile-footer").show();
          }
      </script>
