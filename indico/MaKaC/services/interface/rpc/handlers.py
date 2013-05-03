@@ -23,7 +23,6 @@ from MaKaC.services.implementation import error
 
 from MaKaC.services.interface.rpc import description
 from MaKaC.plugins import PluginsHolder
-from MaKaC.common import DBMgr
 
 
 def importModule(name):
@@ -32,6 +31,7 @@ def importModule(name):
     for comp in components[1:]:
         mod = getattr(mod, comp)
     return mod
+
 
 def updateMethodMapWithPlugins():
     methodMap.update(PluginsHolder().getById("ajaxMethodMap").getAJAXDict())
@@ -42,9 +42,9 @@ methodMap = {
     "roomBooking.rooms.list": roomBooking.RoomBookingListRooms,
     "roomBooking.rooms.availabilitySearch": roomBooking.RoomBookingAvailabilitySearchRooms,
     "roomBooking.rooms.fullNameList": roomBooking.RoomBookingFullNameListRooms,
-    "roomBooking.locationsAndRooms.list" :roomBooking.RoomBookingListLocationsAndRooms,
-    "roomBooking.locationsAndRooms.listWithGuids" :roomBooking.RoomBookingListLocationsAndRoomsWithGuids,
-    "roomBooking.getDateWarning" :roomBooking.GetDateWarning,
+    "roomBooking.locationsAndRooms.list": roomBooking.RoomBookingListLocationsAndRooms,
+    "roomBooking.locationsAndRooms.listWithGuids": roomBooking.RoomBookingListLocationsAndRoomsWithGuids,
+    "roomBooking.getDateWarning": roomBooking.GetDateWarning,
 
     "roomBooking.mapaspects.create": roomBooking.RoomBookingMapCreateAspect,
     "roomBooking.mapaspects.update": roomBooking.RoomBookingMapUpdateAspect,
@@ -53,6 +53,7 @@ methodMap = {
     "roomBooking.locationsAndRooms.getLink": roomBooking.RoomBookingLocationsAndRoomsGetLink,
     "roombooking.blocking.approve": roomBooking.RoomBookingBlockingApprove,
     "roombooking.blocking.reject": roomBooking.RoomBookingBlockingReject,
+    "roomBooking.room.bookingPermission": roomBooking.BookingPermission,
 
     "resources.timezones.getAll": resources.GetTimezones,
 

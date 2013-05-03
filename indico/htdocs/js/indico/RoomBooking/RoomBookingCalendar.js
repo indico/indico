@@ -37,7 +37,7 @@ function compareRooms(elem1, elem2){
     return 0;
 }
 
-var calendarLegend = Html.div({style:{cssFloat: 'left', clear: 'both', padding: pixels(5), marginBottom: pixels(10), border: "1px solid #eaeaea", textAlign: "center", borderRadius: pixels(10)}},
+var calendarLegend = Html.div({style:{cssFloat: 'left', clear: 'both', padding: pixels(5), marginBottom: pixels(20), border: "1px solid #eaeaea", textAlign: "center", borderRadius: pixels(10)}},
         Html.div( {className:'barLegend', style:{color: 'black'}}, $T('Legend:')),
         Html.div( {className:'barLegend barCand'}, $T('Available')),
         Html.div( {className:'barLegend barUnaval'}, $T('Booked')),
@@ -487,19 +487,15 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
             drawDay: function(day, highlight){
                 var self = this;
                 var rooms = [];
-                var hasNonEmpty = false;
-                each(day.rooms, function (room) {
-                    var roomDiv = self.drawRoom(room);
-                    if (roomDiv) {
-                        rooms.push(roomDiv);
-                        if(room.bars.length) {
-                            hasNonEmpty = true;
-                        }
-                    }
+                each(day.rooms,
+                    function(room){
+                        roomDiv = self.drawRoom(room);
+                        if(roomDiv)
+                            rooms.push(roomDiv);
                 });
 
                 if(_.size(rooms) > 0) {
-                    return Html.div({className:"wholeDayCalendarDiv " + (hasNonEmpty ? '' : 'day-empty'), style: (highlight ? {border: '2px solid #D9EDF7'} : {})},
+                    return Html.div({className:"wholeDayCalendarDiv", style: (highlight ? {border: '2px solid #D9EDF7'} : {})},
                                 Html.div({className: (highlight ? 'wholeDayCalendarDayHighlight' : ''), style: {width: pixels(800), height: pixels(20), borderBottom: "1px solid #eaeaea", clear: "both"}},
                                         Html.div({style:{cssFloat:'left', fontWeight: 'bold'}}, $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('yy-mm-dd', day.date)))), this.drawHours(), rooms);
                 }
@@ -862,112 +858,38 @@ type("RoomBookingPrevNext", [],
              */
             draw: function(firstHeader){
                 var self = this;
-                var verbosePeriod = (this.startD == this.endD)
-                    ? $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('dd/mm/yy', this.endD))
-                    : $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('dd/mm/yy', this.startD)) + " -> " + $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('dd/mm/yy', this.endD));
-
-                function showDateSelector() {
+                var newBooking = this.newBooking;
+                var prevLink = Html.a({href:this.prevURL, style:{fontSize:'xx-small', cssFloat: 'left', width:"15%"}}, "< " + $T('previous') + " " + this.periodName);
+                var nextLink = Html.a({href:this.nextURL, style:{fontSize:'xx-small', cssFloat: 'right'}}, $T('next') + " " + this.periodName + " >");
+                var calendarButton = Html.span("fakeLink", $T("change period"));
+                calendarButton.observeClick(function() {
                     var dlg = new DateRangeSelector(self.startD, self.endD, function(startDate, endDate) {
-                        var redirectUrl =  self.formUrl + "?" + (self.search ? 'search=on&' : '') + "sDay=" + startDate.getDate() +"&sMonth=" + (startDate.getMonth() + 1) + "&sYear=" + startDate.getFullYear() + "&eDay=" + endDate.getDate() +"&eMonth=" + (endDate.getMonth() + 1) + "&eYear=" + endDate.getFullYear();
+                        var redirectUrl =  self.formUrl + "?" + (self.search ? 'search=on&' : '') + "sDay=" + startDate.getDate() +"&sMonth=" + (startDate.getMonth() + 1) + "&sYear=" + startDate.getFullYear() +
+                        "&eDay=" + endDate.getDate() +"&eMonth=" + (endDate.getMonth() + 1) + "&eYear=" + endDate.getFullYear();
 
-                        for (var param in self.params) {
+
+                        for (var param in self.params)
                             redirectUrl += "&" + param + "=" + self.params[param];
-                        }
 
-                        location.href = redirectUrl;
+                        window.location = redirectUrl;
+
                     }, $T("Choose Period"), true);
                     dlg.open();
-                }
-
-                // empty row filter
-                var keyHideEmpty = 'rb-hide-empty-rows-' + $('body').data('userId');
-                function toggleHideEmpty(e, state) {
-                    $('.room-row-empty, .day-empty').toggle(!state);
-                    $.jStorage.set(keyHideEmpty, state);
-                }
-                _.defer(function() {
-                    // Execute the handler function after we have rendered the rows
-                    toggleHideEmpty(undefined, $.jStorage.get(keyHideEmpty, false));
                 });
 
-                // toolbar buttons
-                var calendarButton = $('<a>', {
-                    'href': '#',
-                    'title': self.newBooking ? undefined : $T('Change period'),
-                    'class': 'i-button icon-calendar ' + (self.newBooking ? '' : 'arrow'),
-                    'html': verbosePeriod,
-                    'css': {
-                        'fontWeight': 'normal'
-                    },
-                    'click': function(e) {
-                        e.preventDefault();
-                        if(!self.newBooking) {
-                            showDateSelector();
-                        }
-                    }
-                });
-                var prevButton = $('<a>', {
-                    'href': this.prevURL,
-                    'title': $T('Previous') + ' ' + this.periodName,
-                    'class': 'i-button icon-only icon-prev'
-                });
-                var nextButton = $('<a>', {
-                    'href': this.nextURL,
-                    'title': $T('Next') + ' ' + this.periodName,
-                    'class': 'i-button icon-only icon-next'
-                });
-                var filterButton = $('<a>', {
-                    'href': '#',
-                    'title': 'Filters',
-                    'class': 'i-button icon-only arrow icon-filter',
-                    'data': {
-                        'toggle': 'dropdown'
-                    }
-                });
-                var filterDropdown = $('<ul class="dropdown">');
-                $('<li>', {
-                    'class': 'toggle',
-                    'text': $T('Hide empty rooms/days'),
-                    'data': {
-                        'state': $.jStorage.get(keyHideEmpty, false)
-                    }
-                }).on('menu_toggle', toggleHideEmpty).appendTo(filterDropdown);
-
-                // toolbar
-                var toolbarContainer = $('<div>', {
-                    'class': 'clearfix',
-                    css: {
-                        'marginBottom': '15px'
-                    }
-                });
-                var toolbar = $('<div>', {
-                    'class': 'toolbar left',
-                    'css': {
-                        'width': '810px'
-                    }
-                }).appendTo(toolbarContainer);
-                var toolbarGroup = $('<div class="group left">').appendTo(toolbar);
-                if(self.newBooking) {
-                    toolbarGroup.append(calendarButton);
-                }
-                else {
-                    toolbarGroup.append(prevButton);
-                    toolbarGroup.append(calendarButton);
-                    toolbarGroup.append(nextButton);
-                    if(firstHeader) {
-                        toolbarGroup = $('<div class="group right">').appendTo(toolbar);
-                        toolbarGroup.append(filterButton);
-                        toolbarGroup.append(filterDropdown);
-                        toolbar.dropdown();
-                    }
-                }
-
-                if(firstHeader) {
-                    return Html.div({}, calendarLegend, toolbarContainer[0]);
-                }
-                else {
-                    return Html.div({}, toolbarContainer[0]);
-                }
+                var verbosePeriod = this.startD == this.endD ? $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('dd/mm/yy', this.endD)) : $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('dd/mm/yy', this.startD)) + " -> " + $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('dd/mm/yy', this.endD));
+                if (newBooking && firstHeader)
+                        return Html.div({}, calendarLegend, Html.div({style:{height:pixels(24), width:pixels(800), clear:"both", borderBottom:"1px solid #eaeaea", paddingTop: pixels(5), marginBottom: pixels(10)}},
+                            Html.div({style:{width:"100%", textAlign:"center", cssFloat:"left"}}, verbosePeriod)));
+                if (newBooking && this.data.days.length)
+                        return Html.div({}, Html.div({style:{height:pixels(24), width:pixels(800), clear:"both", borderTop:"1px solid #eaeaea", paddingTop: pixels(5), marginBottom: pixels(10)}},
+                            Html.div({style:{width:"100%", textAlign:"center", cssFloat:"left"}}, verbosePeriod)));
+                if (firstHeader)
+                        return Html.div({}, calendarLegend, Html.div({style:{height:pixels(24), width:pixels(800), clear:"both", borderBottom:"1px solid #eaeaea", paddingTop: pixels(5), paddingBottom: pixels(12), marginBottom: pixels(10)}},
+                            prevLink, Html.div({style:{width:"70%", textAlign:"center", cssFloat:"left"}}, verbosePeriod, Html.br(), calendarButton), nextLink));
+                if (this.data.days.length)
+                        return Html.div({}, Html.div({style:{height:pixels(24), width:pixels(800), clear:"both", borderTop:"1px solid #eaeaea", paddingTop: pixels(5), marginBottom: pixels(10)}},
+                            prevLink, Html.div({style:{width:"70%", textAlign:"center", cssFloat:"left"}}, verbosePeriod, Html.br()), nextLink));
             }
         },
         function(prevNextBarArgs, data){
