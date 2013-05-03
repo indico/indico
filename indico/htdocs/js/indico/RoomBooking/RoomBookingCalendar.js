@@ -901,6 +901,9 @@ type("RoomBookingPrevNext", [],
                     'title': self.newBooking ? undefined : $T('Change period'),
                     'class': 'i-button icon-calendar ' + (self.newBooking ? '' : 'arrow'),
                     'html': verbosePeriod,
+                    'css': {
+                        'fontWeight': 'normal'
+                    },
                     'click': function(e) {
                         e.preventDefault();
                         if(!self.newBooking) {
