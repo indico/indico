@@ -38,6 +38,10 @@ you can use the generic selector below, but it's slower:
     -webkit-font-smoothing: antialiased;
 }
 
+.inactive[class^="icon-"]:before, .inactive[class*=" icon-"]:before {
+    opacity: 0.15;
+}
+
 .icon-phone:before {
     content: "\70";
 }
@@ -202,4 +206,7 @@ you can use the generic selector below, but it's slower:
 }
 .icon-next:before {
 	content: "\4c";
+}
+.icon-checkmark:before {
+	content: "\4d";
 }

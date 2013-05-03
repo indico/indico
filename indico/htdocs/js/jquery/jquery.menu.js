@@ -18,7 +18,7 @@
 
 (function($) {
 
-    $.widget( "ui.dropdown", {
+    $.widget('ui.dropdown', {
         options: {
             effect_on: 'slideDown',
             effect_off: 'fadeOut',
@@ -104,13 +104,30 @@
                 }
             });
 
+            elem.find('ul.dropdown > li.toggle').each(function() {
+                var li = $(this);
+                var link = $('<a>', {
+                    'href': '#',
+                    'text': li.text(),
+                    'class': 'icon-checkmark ' + (li.data('state') ? '' : 'inactive'),
+                    'click': function(e) {
+                        e.preventDefault();
+                        var $this = $(this);
+                        var newState = !li.data('state');
+                        $this.toggleClass('inactive', !newState);
+                        li.data('state', newState);
+                        li.triggerHandler('menu_toggle', [newState]);
+                    }
+                });
+                li.html(link);
+            });
         },
 
         _create: function() {
             var self = this;
             this._menuize(this.element);
-            $('html').live('click', function(e){
-                // click ourside? close menus.
+            $(document).on('click', function(e){
+                // click outside? close menus.
                 if ($(self.element).has(e.target).length == 0) {
                     self._close_all();
                 }
@@ -118,11 +135,7 @@
         },
 
         _effect: function(st, elem, effect) {
-            if (effect === undefined) {
-                var func = this.options['effect_' + st];
-            } else {
-                var func = effect;
-            }
+            var func = effect === undefined ? this.options['effect_' + st] : effect;
 
             if (func === null) {
                 // no pretty effects
@@ -130,7 +143,8 @@
             }
             else if (typeof func == 'function') {
                 func.call(elem, this);
-            } else {
+            }
+            else {
                 elem[func].call(elem, this.options['time_' + st]);
             }
         },

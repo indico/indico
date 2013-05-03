@@ -880,19 +880,14 @@ type("RoomBookingPrevNext", [],
                 }
 
                 // empty row filter
-                var key = 'rb-hide-empty-rows-' + $('body').data('userId');
-                var hideEmptyRows = $('<label>', { text: 'Hide empty rows' });
-                var toggleHideEmpty = $('<input>', {
-                    type: 'checkbox',
-                    checked: $.jStorage.get(key, false),
-                    click: function() {
-                        $('.room-row-empty, .day-empty').toggle(!this.checked);
-                        $.jStorage.set(key, this.checked);
-                    }
-                }).prependTo(hideEmptyRows);
+                var keyHideEmpty = 'rb-hide-empty-rows-' + $('body').data('userId');
+                function toggleHideEmpty(e, state) {
+                    $('.room-row-empty, .day-empty').toggle(!state);
+                    $.jStorage.set(keyHideEmpty, state);
+                }
                 _.defer(function() {
                     // Execute the handler function after we have rendered the rows
-                    toggleHideEmpty.triggerHandler('click');
+                    toggleHideEmpty(undefined, $.jStorage.get(keyHideEmpty, false));
                 });
 
                 // toolbar buttons
@@ -930,7 +925,13 @@ type("RoomBookingPrevNext", [],
                     }
                 });
                 var filterDropdown = $('<ul class="dropdown">');
-                $('<li>').append(hideEmptyRows).appendTo(filterDropdown);
+                $('<li>', {
+                    'class': 'toggle',
+                    'text': $T('Hide empty rooms/days'),
+                    'data': {
+                        'state': $.jStorage.get(keyHideEmpty, false)
+                    }
+                }).on('menu_toggle', toggleHideEmpty).appendTo(filterDropdown);
 
                 // toolbar
                 var toolbarContainer = $('<div>', {
