@@ -365,7 +365,7 @@ class VidyoOperations(object):
     def disconnectRoom(cls, booking, roomIp, serviceType):
         try:
             answer = RavemApi.disconnectRoom(roomIp, serviceType)
-            if not answer.ok or answer.json.has_key("error"):
+            if not answer.ok or "error" in answer.json():
                 Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Ravem API's disconnectRoom operation not successfull: %s""" %
                         (booking.getConference().getId(), booking.getId(), answer.text))
                 return VidyoError("disconnectFailed", "disconnect", _("There was a problem with the videoconference disconnection. ") + VidyoTools.getContactSupportText())
@@ -378,7 +378,7 @@ class VidyoOperations(object):
         try:
             answer =  RavemApi.isRoomConnected(roomIp)
 
-            if not answer.ok or answer.json().has_key("error"):
+            if not answer.ok or "error" in answer.json():
                 Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Ravem API's isRoomConnected operation not successfull: %s""" %
                         (booking.getConference().getId(), booking.getId(), answer.text))
                 return VidyoError("roomCheckFailed", "roomConnected", _("There was a problem obtaining the room status. ") + VidyoTools.getContactSupportText())
