@@ -378,12 +378,12 @@ class VidyoOperations(object):
         try:
             answer =  RavemApi.isRoomConnected(roomIp)
 
-            if not answer.ok or answer.json.has_key("error"):
+            if not answer.ok or answer.json().has_key("error"):
                 Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Ravem API's isRoomConnected operation not successfull: %s""" %
                         (booking.getConference().getId(), booking.getId(), answer.text))
                 return VidyoError("roomCheckFailed", "roomConnected", _("There was a problem obtaining the room status. ") + VidyoTools.getContactSupportText())
             result = {"roomName": None, "isConnected": False, "service": None}
-            answer =  answer.json
+            answer =  answer.json()
             if answer.has_key("result"):
                 for service in answer.get("result").get("services"):
                     if service.get("name","") == "videoconference":
