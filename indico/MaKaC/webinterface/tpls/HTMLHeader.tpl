@@ -68,7 +68,7 @@
         <!-- Other Page Specific -->
         ${ page._getHeadContent() }
     </head>
-    <body>
+    <body data-user-id="${ user.getId() if user else 'null' }">
         ${ page._getWarningMessage() }
     % if analyticsActive and analyticsCodeLocation == "body":
         ${analyticsCode}
