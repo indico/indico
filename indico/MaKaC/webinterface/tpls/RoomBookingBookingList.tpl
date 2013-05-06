@@ -38,6 +38,13 @@
     </tr>
 </table>
 
+<!--  Container for popup content -->
+<div style="display:none; visibility: false;">
+    <div id='booking-dialog'>
+        <div id="booking-dialog-content" class="dialog-content"></div>
+    </div>
+</div>
+
 <script type="text/javascript">
 var roomBookingCalendar = new RoomBookingCalendar(${ jsonEncode(barsFossil) }, ${ jsonEncode(dayAttrs) }, ${ str(dayLimit).lower() }, ${ str(overload).lower() },
         {"prevURL" : "${ prevURL }", "nextURL" : "${ nextURL }", "formUrl" : "${ calendarFormUrl }",

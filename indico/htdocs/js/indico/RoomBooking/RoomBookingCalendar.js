@@ -263,7 +263,7 @@ type ("RoomBookingCalendarData", [],
                 this.startD = this.days[0].date;
             }
         }
-        )
+        );
 
 type ("RoomBookingCalendarDrawer", [],
         {
@@ -294,68 +294,9 @@ type ("RoomBookingCalendarDrawer", [],
                     });
                 }
                 if(bar.type == 'barCand' && showCandidateTip) {
-                    barDiv.observeClick(function(){
-                        var bookingImposible = true;
-                        var generalConflict = false;
-                        $.each($('.dayCalendarDivHover').parent(), function () {
-                            var conflict = false;
-                            $.each ($(this).find('.barDefault'), function () {
-                                if ($(this).hasClass('barConf')) {
-                                    conflict = true;
-                                    return false;
-                                }
-                            });
-                            if (conflict) {
-                                generalConflict = true;
-                            } else {
-                                bookingImposible = false;
-                            }
-                        });
+                    $(barDiv.dom).click(function(){
                         var url = bar.room.getBookingFormUrl(bar.startDT.print("%Y/%m/%d %H:%M") + bar.endDT.print("%H:%M"), self.data.repeatability, self.data.flexibleDatesRange, true, self.data.finishDate, self.data.startD, self.data.endD);
-                        if (bookingImposible) {
-                            var popup = new ExclusivePopupWithButtons($T('Booking conflict'), function(){popup.close();}, false, false, true);
-
-                            popup._getButtons = function() {
-                                var self = this;
-                                return [
-                                    [$T('Search again'), function() {
-                                        window.location = Indico.Urls.RoomBookingBookRoom;
-                                        self.close();
-                                    }],
-                                    [$T('Close'), function() {
-                                        self.close();
-                                    }],
-                                ];
-                            };
-                            popup.draw = function(){
-                                var span1 = Html.span('', $T("This room cannot be booked at the time requested due a conflict with an existing reservation"));
-                                return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block([span1, Html.br()]));
-                            };
-                            popup.open();
-                        } else if (generalConflict) {
-                            var popup = new ExclusivePopupWithButtons($T('Booking Conflict'), function(){popup.close();}, false, false, true);
-
-                            popup._getButtons = function() {
-                                var self = this;
-                                return [
-                                    [$T('Skip conflicting days'), function() {
-                                        url += "&skipConflicting=on";
-                                        window.location = url;
-                                        self.close();
-                                    }],
-                                    [$T('Close'), function() {
-                                        self.close();
-                                    }],
-                                ];
-                            };
-                            popup.draw = function(){
-                                var span1 = Html.span('', $T("You can continue booking for only the available dates..."));
-                                return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block([span1, Html.br()]));
-                            };
-                            popup.open();
-                        } else {
-                            window.location = url;
-                        }
+                        self._ajaxClick(bar, url, $(this));
                     });
                     $(barDiv.dom).qtip({
                         content: {
@@ -376,7 +317,7 @@ type ("RoomBookingCalendarDrawer", [],
                                 if ((navigator.platform.indexOf("iPad") != -1) || (navigator.platform.indexOf("iPhone") != -1)) {
                                     event.preventDefault();
                                 }
-                            },
+                            }
                         }
                     });
                 }
@@ -394,6 +335,124 @@ type ("RoomBookingCalendarDrawer", [],
 
                 return barDiv;
             },
+
+            /**
+             * Checks if the bar corresponds to a protected room. In that case, checks if the user has permission to book it.
+             * @param  {RoomBookingCalendarBar} bar  The bar containing the information of the room.
+             * @param  {Integer} user User ID.
+             * @return {Boolean}      True if the booking is protected, false otherwise.
+             */
+            _ajaxClick: function(bar, url, element) {
+                var self = this;
+
+                if (bar.room.type != "privateRoom") {
+                    self._handleClick(url, "");
+                } else {
+                    indicoRequest("roomBooking.room.bookingPermission",
+                        {
+                            room_id: bar.room.id
+                        },
+                        function(result, error) {
+                            if (!error) {
+                                if (!exists(result.error)) {
+                                    if (result) {
+                                        element.addClass("barProt");
+                                    }
+                                    self._handleClick(url, result);
+                                }
+                            } else {
+                                IndicoUtil.errorReport(error);
+                            }
+                        }
+                    );
+                }
+            },
+
+            _handleClick: function(url, bookingProtected) {
+                var self = this;
+                var bookingImposible = true;
+                var generalConflict = false;
+
+                // Checks booking problems
+                $.each($('.dayCalendarDivHover').parent(), function () {
+                    var conflict = false;
+                    $.each ($(this).find('.barDefault'), function () {
+                        if ($(this).hasClass('barConf')) {
+                            conflict = true;
+                            return false;
+                        }
+                    });
+                    if (conflict) {
+                        generalConflict = true;
+                    } else {
+                        bookingImposible = false;
+                    }
+                });
+
+                if (bookingImposible) {
+                    self._setDialog("search-again");
+                    $('#booking-dialog-content').html($T("This room cannot be booked at the time requested due a conflict with an existing reservation."));
+                    $('#booking-dialog').dialog("open");
+                } else if (generalConflict) {
+                    self._setDialog("search-again");
+                    $('#booking-dialog-content').html($T("You can continue booking for only the available dates..."));
+                    $('#booking-dialog').dialog("open");
+                } else if (bookingProtected !== "") {
+                    self._setDialog("search-again");
+                    var protection = '<strong>' +bookingProtected+ '</strong>';
+                    $('#booking-dialog-content').html(format($T("Bookings of this room are limited to members of {0}."), [protection]));
+                    $('#booking-dialog').dialog("open");
+                } else {
+                    window.location = url;
+                }
+            },
+
+            _setDialog: function(type) {
+                $('#booking-dialog').dialog({
+                    modal: true,
+                    resizable: false,
+                    autoOpen: false,
+                    show: "fade",
+                    title: $T("Unable to book")
+                });
+
+                switch(type) {
+                    case "search-again":
+                        $('#booking-dialog').dialog({
+                            buttons: {
+                                "Search again": function() {
+                                    window.location = Indico.Urls.RoomBookingBookRoom;
+                                },
+                                Close: function() {
+                                    $(this).dialog('close');
+                                }
+                            }
+                        });
+                    break;
+                    case "skip-conflict":
+                        $('#booking-dialog').dialog({
+                            buttons: {
+                                "Skip conflicting days": function() {
+                                    url += "&skipConflicting=on";
+                                    window.location = url;
+                                },
+                                Close: function() {
+                                    $(this).dialog('close');
+                                }
+                            }
+                        });
+                    break;
+                    default:
+                        $('#booking-dialog').dialog({
+                            buttons: {
+                                Close: function() {
+                                    $(this).dialog('close');
+                                }
+                            }
+                        });
+                }
+            },
+
             /**
              * Draws a row containing hours for a room
              */
@@ -472,12 +531,11 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                             day_content.append(self.drawBar(bar, true).dom);
                         });
 
-                var container = $('<div class="room-row">').toggleClass('room-row-empty', !roomInfo.bars.length).append(
+                var container = $('<div class="room-row" data-protected=' + roomInfo.room.type + '>').append(
                     $('<div class="link">').append(roomLink.dom),
                     day_content);
 
-                return new XElement(container.get(0))
-
+                return new XElement(container.get(0));
             },
 
             /**
@@ -959,8 +1017,7 @@ type ("RoomBookingCalendar", [],
                         $('.barCand').removeClass("dayCalendarDivHover");
                     });
                 });
-            },
-
+            }
         },
 
         function(reservationBars, dayAttrs, dayLimit, overload, prevNextBarArgs, manyRooms, repeatability, finishDate, flexibleDatesRange, rejectAllLink){
