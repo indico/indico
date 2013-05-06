@@ -85,7 +85,7 @@ indico_management = Bundle('js/indico/Management/ConfModifDisplay.js',
 indico_room_booking = Bundle('js/indico/RoomBooking/MapOfRooms.js',
                              'js/indico/RoomBooking/BookingForm.js',
                              'js/indico/RoomBooking/RoomBookingCalendar.js',
-							 'js/indico/jquery/multiselect.js',
+                             'js/indico/jquery/multiselect.js',
                              filters='rjsmin', output='indico_room_booking_%(version)s.min.js')
 
 indico_admin = Bundle('js/indico/Admin/News.js',
@@ -125,7 +125,7 @@ indico_display = Bundle('js/indico/Display/Dialogs.js',
 indico_jquery = Bundle('js/indico/jquery/defaults.js',
                        'js/indico/jquery/global.js',
                        'js/indico/jquery/multiselect.js',
-                        filters='rjsmin', output='indico_jquery_%(version)s.min.js')
+                       filters='rjsmin', output='indico_jquery_%(version)s.min.js')
 
 indico_jquery_authors = Bundle('js/indico/jquery/authors.js',
                                filters='rjsmin', output='indico_jquery_authors_%(version)s.min.js')
