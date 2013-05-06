@@ -77,7 +77,7 @@ WidgetEditable.getSelectViewTemplate = function(items) {
 		return null;
 	}
 	return splitter(items);
-}
+};
 
 /**
  * 

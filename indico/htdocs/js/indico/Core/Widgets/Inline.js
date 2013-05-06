@@ -1637,7 +1637,7 @@ type("SelectEditWidget", ["InlineEditWidget"],
                 else{
                     jQuery.each(this.options, functionDict);
                 }
-                content.append(this.select)
+                content.append(this.select);
                 return content;
             },
 

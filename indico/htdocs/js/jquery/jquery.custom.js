@@ -105,7 +105,7 @@
     $.widget("ui.super_droppable", $.extend({}, $.ui.droppable.prototype, {
         disable: function() {
             // "artificially" set `isover` to 0, so that if a draggable comes over again we fire `over`
-            var data = this.element.data('droppable')
+            var data = this.element.data('droppable');
             data.isover = 0;
             data.isout = 1;
             // do as if the draggable was out

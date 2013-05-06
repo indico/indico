@@ -76,7 +76,7 @@ type("TimezoneSelector", ["RemoteWidget"], {
         container.append(select);
 
         // Add all the timezones to the select list
-        this.RemoteWidget('timezone.getTimezones', {}, false)
+        this.RemoteWidget('timezone.getTimezones', {}, false);
         this.RemoteWidget.prototype.draw.call(self, select);
 
         select.dom.onchange = function(){

@@ -623,7 +623,7 @@ extend(IndicoUI.Dialogs,
                            req.set(rtWidget.get());
                        }
                        killProgress();
-               }
+               };
 
                popup.commitChangesAndClose = function() {
                        saveAndClose = true;

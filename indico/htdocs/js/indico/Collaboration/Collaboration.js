@@ -51,7 +51,7 @@ var CSErrorList = function(errors, style) {
     }
     var errorList;
     if (errors.length > 1) {
-        errorList = Html.ul("errorList")
+        errorList = Html.ul("errorList");
         each(errors, function(e) {
             errorList.append(Html.li('', e));
         });
@@ -114,7 +114,7 @@ var callFunction = function(pluginName, functionName, arguments) {
  */
 var beforeNow = function(date) {
     var elapsedSinceLoad = new Date().getTime() - clientLoadTime.getTime();
-    var eventNow = new Date()
+    var eventNow = new Date();
     eventNow.setTime(eventLoadTime.getTime() + elapsedSinceLoad);
     return date < eventNow;
 };
@@ -194,7 +194,7 @@ type("CSParameterManager", [], {
 
 
 var formatDateStringCS = function(dateString) {
-    var dt = dateString.split(' ')
+    var dt = dateString.split(' ');
     return (dt[0] + ' at ' + dt[1]);
 };
 
@@ -260,7 +260,7 @@ var refreshTableHead = function() {
         actionsCell.set(actionsSpan);
         headRow.append(actionsCell);
 
-        var lastCell = Html.td({width: "100%", colspan: 1, colSpan: 1})
+        var lastCell = Html.td({width: "100%", colspan: 1, colSpan: 1});
         headRow.append(lastCell);
     }
 };
@@ -482,9 +482,9 @@ var bookingTemplateM = function(booking) {
 
 var bookingTemplateS = function(booking) {
 
-    var list = Html.ul({id:"bookingUl" + booking.id, className: "singleBooking"})
+    var list = Html.ul({id: "bookingUl" + booking.id, className: "singleBooking"});
 
-    var liState = Html.li("singleBooking")
+    var liState = Html.li("singleBooking");
     var span = Html.span("statusMessage " + booking.statusClass, booking.statusMessage);
     liState.append(span);
     if (booking.hasCheckStatus) {
@@ -968,7 +968,7 @@ var sanitizationError = function(invalidFields) {
             IndicoUtil.markInvalidField(field, $T("Tags in the <tag> form are not allowed. Please remove any '<' and '>' characters."));
         });
     });
-}
+};
 
 /**
  * -A modal dialog will emerge to request the booking parameters to the user.
@@ -1248,7 +1248,7 @@ var createBooking = function(pluginName, conferenceId) {
     popup.afterDraw();
 
     return true;
-}
+};
 
 /**
  * Function that will be called when the user presses the "Attach" button when tried to create.
@@ -1320,7 +1320,7 @@ var editBooking = function(booking, conferenceId) {
         codes[booking.type].onEdit(booking, popup);
     }
     popup.afterDraw();
-}
+};
 
 /**
  * -Function that will be called when the user presses the "Remove" button for a plugin.
@@ -1355,7 +1355,7 @@ var removeBooking = function(booking, conferenceId) {
                         codes[booking.type].errorHandler('remove', result, booking);
                     } else {
                         hideAllInfoRows(false);
-                        bookings.removeAt(getBookingIndexById(booking.id))
+                        bookings.removeAt(getBookingIndexById(booking.id));
                         showAllInfoRows(false);
                         removeIFrame(booking);
                         refreshStartAllStopAllButtons();
@@ -1430,7 +1430,7 @@ var startAll = function(){
  * It will be equivalent to pressing each of the bookings' "Stop" button in intervals of 1 second.
  */
 var stopAll = function(){
-    var length = bookings.length.get()
+    var length = bookings.length.get();
     for (var i=0; i < length; i++) {
         setTimeout("stop(bookings.item(" + i + "))", i*1000);
     }
@@ -1477,7 +1477,7 @@ var refreshPlugin = function(name) {
 var sendRequest = function(pluginName, conferenceId) {
 
     // We retrieve the values from the form
-    var formNodes = IndicoUtil.findFormFields($E(pluginName + 'Form'))
+    var formNodes = IndicoUtil.findFormFields($E(pluginName + 'Form'));
     var values = IndicoUtil.getFormValues(formNodes);
 
     var needsCheck = pluginHasFunction (pluginName, "checkParams");
@@ -1510,7 +1510,7 @@ var sendRequest = function(pluginName, conferenceId) {
                         }
                     }
                 } else {
-                 // If the server found no problems, a booking object is returned in the result.
+                    // If the server found no problems, a booking object is returned in the result.
                     // We add it to the watchlist and create an iframe.
                     singleBookings[pluginName] = result;
                     refreshPlugin(pluginName);
@@ -1531,7 +1531,7 @@ var sendRequest = function(pluginName, conferenceId) {
                 killProgress();
                 IndicoUtil.errorReport(error);
             }
-        }
+        };
 
         if (exists(singleBookings[pluginName])) {
             indicoRequest(
@@ -2005,7 +2005,7 @@ var rejectElectronicAgreement = function(confId, authKey, redirectionLink) {
                 self.close();
             }]
         ];
-    }
+    };
 
     popup.draw = function(){
         var span1 = Html.span('', $T("Please write the reason of your rejection (short):"));

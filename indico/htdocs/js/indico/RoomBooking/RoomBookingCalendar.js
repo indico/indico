@@ -105,7 +105,7 @@ type ("RoomBookingRoom", [],
              * @param {bool} breakLine if true there will be a breakline between room number and room name
              */
             getFullName: function(){
-                fullName = this.building + "-" + this.floor + "-" + this.number;
+                var fullName = this.building + "-" + this.floor + "-" + this.number;
                 if( fullName == this.name)
                     return fullName;
                 else
@@ -116,7 +116,7 @@ type ("RoomBookingRoom", [],
              * @param {bool} breakLine if true there will be a breakline between room number and room name
              */
             getFullNameHtml: function( breakLine ){
-                fullName = this.building + "-" + this.floor + "-" + this.number;
+                var fullName = this.building + "-" + this.floor + "-" + this.number;
                 if( fullName == this.name)
                     return Html.div({},fullName);
                 else
@@ -132,7 +132,7 @@ type ("RoomBookingRoom", [],
             this.bookingUrl = roomData["bookingUrl"] + '&day=' + date.substring(8,10) + '&month=' + date.substring(5,7) + '&year=' + date.substring(0,4) + '&ignoreSession=1';
             this.id = roomData["id"];
             this.location = roomData["locationName"];
-        })
+        });
 
 /**
  * Represents single reservation (bar)
@@ -153,7 +153,7 @@ type ("RoomBookingCalendarBar", [],
             this.inDB = barInfo.forReservation.id !== null;
             this.type = barClasses[parseInt(barInfo["type"])];
         }
-        )
+        );
 
 /**
  * Represents a single room and all its reservations for a specified day.
@@ -183,7 +183,7 @@ type ("RoomBookingCalendarRoom", [],
                 this.room = new RoomBookingRoom(roomInfo, date);
             }
         }
-        )
+        );
 
 /**
  * Represents a single day
@@ -213,7 +213,7 @@ type ("RoomBookingCalendarDay", [],
             });
             this.rooms.sort(compareRooms);
         }
-        )
+        );
 
 /**
  * Contains data about all reservations made in specified period
@@ -500,7 +500,7 @@ type ("RoomBookingCalendarDrawer", [],
          */
         function(data){
             this.data = data;
-        })
+        });
 
 type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
         {
@@ -580,7 +580,7 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
          */
         function(data){
             this.RoomBookingCalendarDrawer(data);
-        })
+        });
 
 type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
         {
@@ -668,7 +668,7 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
         function(data){
             this.RoomBookingCalendarDrawer(data);
             this.room = this.data.days.length > 0?this.data.days[0].rooms[0].room:null;
-        })
+        });
 
 /**
  * Object used to draw roombooking summary out of reservation data.
@@ -890,7 +890,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
             this.data = data;
             this.rejectAllLink = rejectAllLink;
             this.bars = this.data.getBars();
-        })
+        });
 
 /**
  * A bar used to change calendar date. It supports going to next and previous period
@@ -1030,7 +1030,7 @@ type("RoomBookingPrevNext", [],
             this.params = prevNextBarArgs.params;
             this.search = prevNextBarArgs.search;
             this.data = data;
-        })
+        });
 
 /**
  * Widget drawing room booking calendar and its summary.
@@ -1091,7 +1091,7 @@ type ("RoomBookingCalendar", [],
 
         function(reservationBars, dayAttrs, dayLimit, overload, prevNextBarArgs, manyRooms, repeatability, finishDate, flexibleDatesRange, rejectAllLink){
            this.data = new RoomBookingCalendarData(reservationBars, dayAttrs, repeatability, finishDate, flexibleDatesRange, dayLimit, overload);
-           this.prevNextBarArgs = prevNextBarArgs
+           this.prevNextBarArgs = prevNextBarArgs;
            if(manyRooms || (prevNextBarArgs && prevNextBarArgs.newBooking)) {
                this.roomBookingCalendarContent = new RoomBookingManyRoomsCalendarDrawer(this.data);
            }
@@ -1100,4 +1100,4 @@ type ("RoomBookingCalendar", [],
            }
            this.roomBookingCalendarSummary = new RoomBookingCalendarSummaryDrawer(this.data, rejectAllLink);
         }
-        )
+);

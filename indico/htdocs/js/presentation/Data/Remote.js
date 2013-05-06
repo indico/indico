@@ -3,7 +3,7 @@
  * @author Tom
  */
 
-var activeWebRequests = 0
+var activeWebRequests = 0;
 
 /**
  * Ready state enumeration.
@@ -251,7 +251,7 @@ function webRequest(url, contentType, body, handler) {
                         } else {
                                 handler(transport.responseText, [status, transport.statusText]);
                         }
-                }
+                };
                 transport.send(body);
                 activeWebRequests++;
         } catch (e) {

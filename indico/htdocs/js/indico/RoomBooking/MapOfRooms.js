@@ -520,7 +520,7 @@ type ("RoomMap", ["IWidget"],
             var top = Html.div({}, mainCheckbox, label);
 
             filter.widgets = widgets;
-            filter.mainCheckbox = mainCheckbox
+            filter.mainCheckbox = mainCheckbox;
             return Html.div({}, top, widgets);
         },
 

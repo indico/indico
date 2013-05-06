@@ -157,7 +157,7 @@ IndicoUI.Effect = {
 
     fade: function(element, TimeToFade) {
         if (!exists(TimeToFade))
-            TimeToFade = 500.0
+            TimeToFade = 500.0;
 
         if (typeof element == "string")
             element = $E(element);

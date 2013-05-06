@@ -17,4 +17,4 @@ Exception.prototype.toString = function() {
 		text += " < " + this.inner;
 	}
 	return text;
-}
+};

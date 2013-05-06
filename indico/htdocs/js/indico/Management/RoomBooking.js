@@ -148,7 +148,7 @@ type("RoomBookingWidget", ["IWidget"],
      },
      function(locations, info, parent, inheritDefault, eventFavorites, defaultLocation, parentName) {
          var self = this;
-         var rbActive = Indico.Settings.RoomBookingModuleActive
+         var rbActive = Indico.Settings.RoomBookingModuleActive;
 
          this.defaultLocation = defaultLocation;
          this.parentName = parentName || '';
@@ -411,7 +411,7 @@ type("RoomBookingReservationWidget", ["RoomBookingWidget"],
 type("RoomBookingVerticalReservationWidget", ["RoomBookingReservationWidget"],
         {
             draw: function() {
-                var rbActive = Indico.Settings.RoomBookingModuleActive
+                var rbActive = Indico.Settings.RoomBookingModuleActive;
 
                 this.inheritText = this.parentInfo?Html.span(
                     {},
@@ -494,7 +494,7 @@ type("RoomListField", ["IWidget"], {
         var chooserDiv = Html.div({style:{marginTop: pixels(10)}});
         var callback = function(){
             chooserDiv.set(roomChooser.draw(),addRoomButton);
-        }
+        };
 
         if(this.allowNew) {
             var roomChooser = new SelectRemoteWidget('roomBooking.locationsAndRooms.listWithGuids', {}, callback, null, null, null, false);

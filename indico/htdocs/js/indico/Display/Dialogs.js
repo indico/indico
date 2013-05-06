@@ -208,7 +208,7 @@ type("ParticipantsEmailPopup", ["BasicEmailPopup"],{
         var self = this;
         self.toParticipants = toParticipants;
         self.from = from;
-        self.toUserIds = any(self.toUserIds,_.keys(toParticipants))
+        self.toUserIds = any(self.toUserIds,_.keys(toParticipants));
         this.sendFunction=function(){
             var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending email..."));
             jsonRpc(Indico.Urls.JsonRpcService, method,

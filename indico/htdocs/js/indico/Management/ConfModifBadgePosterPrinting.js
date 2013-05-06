@@ -45,7 +45,7 @@ $(document).ready(function() {
       if ($(this).attr('checked')) {
         has_checked = true;
       }
-    })
+    });
 
     return has_checked;
   };

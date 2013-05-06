@@ -128,11 +128,11 @@ function getInputPosition () {
 
 function checkID() {
     if (currentArea == null)
-        return false
-        else if (currentArea.dom.id == 'notificationTplBody' || currentArea.dom.id == 'notificationTplSubject')
-            return true;
-        else
-            return false;
+        return false;
+    else if (currentArea.dom.id == 'notificationTplBody' || currentArea.dom.id == 'notificationTplSubject')
+        return true;
+    else
+        return false;
 }
 
 

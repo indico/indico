@@ -50,6 +50,6 @@
         "nth-last-of-type": function(elm, i, match) {
             return isNthOf(elm, match[3], "nextSibling");
         }
-    }
+    };
     $.extend($.expr[':'], pseudos);
 }(jQuery));

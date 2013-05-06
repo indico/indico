@@ -123,7 +123,7 @@ type("TimeTable", ["HistoryListener"], {
         $('body').one('timetable_ready', function() {
             dfr.resolve();
         });
-        this.JLookupTabWidget.prototype.setSelectedTab.call(this, val)
+        this.JLookupTabWidget.prototype.setSelectedTab.call(this, val);
         return dfr.promise();
     },
 
@@ -329,7 +329,7 @@ type("DisplayTimeTable", ["TimeTable"], {
             /* Draw legend or "undraw" legend (getLegend() returns an empty div)
                when toggling for detailed view. */
             legend = this._getLegend();
-            this.legend.replaceWith(legend)
+            this.legend.replaceWith(legend);
 
             if (this._legendActive) {
                 self._toggleLegend(true);
@@ -1085,12 +1085,12 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
         });
 
         var sessions = self.legendSessionInfo[this.currentDay];
-        var container = $('<div id="timeTableLegend" class="timeTableLegend ui-follow-scroll">').append(closeButton)
+        var container = $('<div id="timeTableLegend" class="timeTableLegend ui-follow-scroll">').append(closeButton);
 
         if (sessions.length) {
             // Returns a div with each color + session name element
             var legendElements = self._generateLegendDivItems(sessions);
-            container.append($('<div id="legendItemContainer"/>').append(legendElements))
+            container.append($('<div id="legendItemContainer"/>').append(legendElements));
             if (sessions.length > self._maxLegendItemsShownInitially) {
                 container.append(showMoreLink);
             }
@@ -1111,7 +1111,7 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
                 append($('<div class="timeTableItemColour" />').css('background', l[2]),
                        $('<span/>').text(l[1]));
 
-            container.append(div)
+            container.append(div);
 
             if (idx >= self._maxLegendItemsShownInitially){
                 div.hide();

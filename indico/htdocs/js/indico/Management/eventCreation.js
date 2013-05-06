@@ -284,7 +284,7 @@ type("CategoryChooser", ["ExclusivePopup"], {
 
         var handler = function(categ, protection) {
             self.categ = categ;
-            self.protection = protection
+            self.protection = protection;
             self.close();
             self.categoryChooserHandler(categ, protection);
         };
@@ -476,7 +476,7 @@ type("ReportNumberEditor", ["IWidget"], {
             if(response){
                 self.reportNumberList.set(response.id, response);
             }
-        }
+        };
         new AddReportNumberPopup(self.uploadAction, self.reportNumberSystems, onSuccess, self.params).open();
     },
 
@@ -526,7 +526,7 @@ type("ReportNumberEditorForForm", ["ReportNumberEditor"], {
             if(response){
                 self.reportNumberList.set(response.id, response);
             }
-        }
+        };
         new AddReportNumberPopupForForm(self.reportNumberSystems, onSuccess, self.params).open();
     }
 },

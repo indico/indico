@@ -84,4 +84,4 @@ Util.truncateCategPath = function(list) {
                function(val) {
                    return escapeHTML(val);
                });
-}
+};

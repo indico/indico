@@ -716,8 +716,8 @@ type("AuthorsPopup", ["ExclusivePopup"], {
             var infoDiv = $("<div/>").css("width", self.width +"px").css("border-bottom", "1px solid #EAEAEA").css("paddingBottom","5px").css("color", "#888").css("font-size", "12px");
             var emailDiv = $("<div/>").append($("<a/>").attr("href", emailUrl).text($T("Email author")));
             var affiliationDiv = $("<div/>").append($("<span/>").css("font-weight", "bold").text($T("Affiliation") + ": ")).append($("<span/>").text(author.affiliation));
-            infoDiv.append(affiliationDiv)
-            infoDiv.append(emailDiv)
+            infoDiv.append(affiliationDiv);
+            infoDiv.append(emailDiv);
             authorElem.append(title);
             authorElem.append(infoDiv);
             container.append(authorElem);
@@ -771,7 +771,7 @@ type("SubmitPopup", ["ExclusivePopupWithButtons"], {
         warningDiv.css("padding-left", "3px");
         warningDiv.css("margin-top", "5px");
         warningDiv.css("display", "none");
-        warningDiv.text("Note that you cannot modify the reviewing material after submitting it.")
+        warningDiv.text("Note that you cannot modify the reviewing material after submitting it.");
         this.saveButton = this.buttons.eq(0);
         this.saveButton.disabledButtonWithTooltip({
             tooltip: $T('First you should add the materials and then by clicking on this button you will submit them for reviewing. They will be locked until the end of the process.'),

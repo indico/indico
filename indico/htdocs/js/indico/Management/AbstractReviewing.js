@@ -25,7 +25,7 @@ type("ScaleEditWidget", ["InlineEditWidget"],
             __buildStructure: function(minValue, maxValue, warning) {
 
                 var div = Html.div({style:{paddingLeft:'2px'}});
-                var spanTitle = Html.span({className:'dataCaptionFormat'},"Scale for each answer: ")
+                var spanTitle = Html.span({className:'dataCaptionFormat'},"Scale for each answer: ");
                 var structure = Html.table({},
                                     Html.tbody({},
                                         Html.tr({},Html.td("supportEntry", "From :"),
@@ -33,7 +33,7 @@ type("ScaleEditWidget", ["InlineEditWidget"],
                                         Html.tr({},Html.td("supportEntry", "To :"),
                                             Html.td({}, maxValue))));
                 div.append(spanTitle);
-                div.append(structure)
+                div.append(structure);
                 if (warning) { // edit mode
                     div.append(warning);
                 }

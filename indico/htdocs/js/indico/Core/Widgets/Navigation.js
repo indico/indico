@@ -38,7 +38,7 @@ var makePageList = function(nPages, selectedPage, around) {
     while (remaining > 0 && (min > 1 || max < nPages)) {
         if (selectedPage - i > 0) {
         	min = selectedPage - i;
-            result.push(min)
+            result.push(min);
             remaining--;
         }
         if (selectedPage + i <= nPages) {
@@ -52,8 +52,8 @@ var makePageList = function(nPages, selectedPage, around) {
     // create the far pages
     var roundTo10 = function(n) {
         var remainder = n % 10;
-        return (n-remainder);
-    }
+        return (n - remainder);
+    };
     
     min = roundTo10(min - 1);
     max = roundTo10(max + 10);
@@ -83,7 +83,7 @@ var makePageList = function(nPages, selectedPage, around) {
     }
     
     return result;
-}
+};
 
 /**
  * Builds a widget with page numbers, to put at the bottom of paginated results.

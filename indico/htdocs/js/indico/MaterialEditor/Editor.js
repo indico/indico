@@ -643,7 +643,7 @@ type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {
     },
 
     _fileUpload: function() {
-        var self = this
+        var self = this;
         var pm = self.pm = new IndicoUtil.parameterManager();
         var uploadType = Html.input('hidden', {name: 'uploadType'});
         var selector = this._showFormatChooser(pm);

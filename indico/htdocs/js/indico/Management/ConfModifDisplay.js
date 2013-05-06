@@ -46,7 +46,7 @@ type("PicList", ["WatchList"], {
      function(picslist, web_container, uploadAction, confId) {
          this.WatchList();
          this.uploadAction = uploadAction;
-         this.confId = confId
+         this.confId = confId;
          var self = this;
          each(picslist, function(item){
              self.append(new PicItem(self, 'display', item));

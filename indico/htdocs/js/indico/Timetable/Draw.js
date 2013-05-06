@@ -410,9 +410,9 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                             if(self.presentersDiv)
                                 width += self.presentersDiv.dom.offsetWidth;
 
-                            self._postDraw()
+                            self._postDraw();
                             return width;
-                        }
+                        };
 
                         // Truncate title based on a ratio: div height / content height
                         title = this.truncateTitle(Math.ceil(title.length * ((parentDivHeight) / contentHeight())), title);
@@ -989,7 +989,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             var buttonsDiv = Html.div({style:{textAlign:'center', display:'none', padding:'5px'}}, saveButton, cancelButton);
 
             saveButton.observeClick(function(){
-                self.saveRoomLocationFunction()
+                self.saveRoomLocationFunction();
                 if (self.saveTimeFunction()) {
                     self.close();
                 }
@@ -1437,8 +1437,8 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
                                           top: pixels(TimetableDefaults.topMargin)
                                       }
                                      });
-             this.blocks = []
-             this._blockMap = {}
+             this.blocks = [];
+             this._blockMap = {};
 
              each(blocks, function(blockData) {
 
@@ -1513,7 +1513,7 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
              this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
 
              this.grid.length = 0;
-             $.merge(this.grid, dayData[1])
+             $.merge(this.grid, dayData[1]);
 
              var gridElems = this._drawGrid(this.grid);
              var blocks = this._drawBlocks(dayFiltered, dayData[2], dayData[3]);

@@ -1765,7 +1765,7 @@ type("AddItemWidget", [],
                                 } else {
                                     killProgress();
                                     self.addHandler(result);
-                                    input.val("")
+                                    input.val("");
                                     addContainer.hide();
                                     addButton.show();
                                 }

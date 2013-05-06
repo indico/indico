@@ -94,7 +94,7 @@ function builder(construct, build) {
         var result = construct();
         var iterator = function(value, key) {
                 build(result, key, value);
-        }
+        };
         iterator.result = result;
         return iterator;
 }

@@ -313,26 +313,26 @@ IndicoUI.Buttons = {
         // val - if true, show the "expand" option, else show "hide"
 
         var showTabs = function(){
-            tabs = document.getElementById('tabList').childNodes;
-            for (i in tabs) {
-                tab = tabs[i];
+            var tabs = document.getElementById('tabList').childNodes;
+            for (var i in tabs) {
+                var tab = tabs[i];
                 if (tab.tagName == 'LI') {
                     if (contains(tab.className, 'hiddenTab')) {
                         tab.style.display = 'inline';
                     }
                 }
             }
-        }
+        };
 
         var hideTabs = function() {
-            tabs = document.getElementById('tabList').childNodes;
-            for (i in tabs) {
-                tab = tabs[i];
+            var tabs = document.getElementById('tabList').childNodes;
+            for (var i in tabs) {
+                var tab = tabs[i];
                 if (tab.tagName == 'LI' && contains(tab.className, 'hiddenTab')) {
                     tab.style.display = 'none';
                 }
             }
-        }
+        };
 
         var option = new Chooser({
             showLink: command(function(){

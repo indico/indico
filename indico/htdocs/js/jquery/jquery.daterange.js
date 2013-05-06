@@ -94,7 +94,7 @@
         },
 
         destroy: function() {
-            this.element.removeClass('ui-daterange')
+            this.element.removeClass('ui-daterange');
             if(this.startDateField) {
                 this.startDateField.remove();
             }

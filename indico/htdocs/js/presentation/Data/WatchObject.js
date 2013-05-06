@@ -175,7 +175,7 @@ watchType.init = function(target, values) {
 		});
 	});
 	return target;
-}
+};
 
 /**
  * 
@@ -200,7 +200,7 @@ watchType.load = function(target, object) {
 		});
 	}
 	return target;
-}
+};
 
 /**
  * Attaches watch getters created from the properties from the object to the target and returns the object.

@@ -12,7 +12,7 @@ $(function() {
         } else {
             var items = resultCache[searchString];
         }
-        items.removeClass('visibility_hidden')
+        items.removeClass('visibility_hidden');
 
         $("#numberFiltered").text(items.length);
         $("#numberFilteredText").text(items.length == 1 ? $T("author") : $T("authors"));

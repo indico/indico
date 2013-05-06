@@ -445,9 +445,9 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var self = this;
 
         if( self.timetable )
-            var ttdata = self.timetable.parentTimetable?self.timetable.parentTimetable.getData():self.timetable.getData()
+            var ttdata = self.timetable.parentTimetable?self.timetable.parentTimetable.getData():self.timetable.getData();
         else
-            var ttdata = null
+            var ttdata = null;
 
         var parentName = {
             Event: $T('event'),
@@ -539,14 +539,14 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
 
         if (!this.isConference || !this.isCFAEnabled) {
             // if it's a meeting, just add a description
-            if(self.isEdit) info.set("field_content", info.get("fields")["content"])
+            if(self.isEdit) info.set("field_content", info.get("fields")["content"]);
             fields = [[$T('Description'),$B(Html.textarea({cols: 50,rows: 2}),
                                             info.accessor('field_content'))]];
         } else {
             // otherwise, add the abstract fields (conferences)
             fields = translate(self.fields,
                                function(value, key) {
-                                   if(self.isEdit) info.set("field_"+key, info.get("fields")[key])
+                                   if(self.isEdit) info.set("field_"+key, info.get("fields")[key]);
                                    return [value, $B(Html.textarea({cols: 50,rows: 2}),
                                                      info.accessor('field_'+key))];
                                });

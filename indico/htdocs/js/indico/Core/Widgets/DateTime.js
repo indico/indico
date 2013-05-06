@@ -317,7 +317,7 @@ type("DateTimeDurationWidget", ["IWidget"],
 type("DateTimeSelectorWFields", ["DateTimeSelector"],
      {
          _setHiddenFields: function(value) {
-             var dtValue = Util.parseJSDateTime(value, IndicoDateTimeFormats.Server)
+             var dtValue = Util.parseJSDateTime(value, IndicoDateTimeFormats.Server);
 
              if (!dtValue) {
                  // in case the value can't be parsed, set it to empty

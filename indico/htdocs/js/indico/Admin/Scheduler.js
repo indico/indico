@@ -23,7 +23,7 @@ type('TaskActions', [],
 
              indicoRequest(method, args,
                            function(result,error){
-                               killProgress()
+                               killProgress();
                                if(error) {
                                    IndicoUtil.errorReport(error);
                                } else {

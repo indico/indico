@@ -256,5 +256,4 @@ Dom.Style.set = function(dom, key, value) {
 		dom.style[key] = "";
 	}
 	return dom;
-}
-
+};

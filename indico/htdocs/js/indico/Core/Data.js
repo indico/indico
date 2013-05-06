@@ -16,7 +16,7 @@
  */
 
 // Place where to put page-wide Indico-related global variables
-var IndicoGlobalVars = {}
+var IndicoGlobalVars = {};
 
 var Util = {
     parseId: function(id){

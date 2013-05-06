@@ -170,7 +170,7 @@ type("DataStore", ["DataReference"], {
 				newIdsWanted += count;
 			}
 			schedule(commit);
-		}
+		};
 		store.submit = function(id, data) {
 			toSubmit[id] = data;
 			schedule(commit);

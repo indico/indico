@@ -23,7 +23,7 @@ extend(Html.prototype, {
 		var style = {
 			overflow: "auto",
 			height: height
-		}
+		};
 		if (exists(width)) {
 			style.width = width;
 		}

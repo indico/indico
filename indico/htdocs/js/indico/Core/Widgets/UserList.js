@@ -284,7 +284,7 @@ type("ListOfUsersManager", [], {
             if (user._type == 'Group')
                 elemStyle = "UIGroup";
 
-            var row = $('<li/>').attr('class', elemStyle)
+            var row = $('<li/>').attr('class', elemStyle);
 
             _(self._component_order).each(function(opt, idx) {
                 if (self.userOptions[opt]) {

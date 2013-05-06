@@ -17,9 +17,9 @@
 
 function is_valid_int( s )
 {
-    var i = parseInt( s, 10 )
+    var i = parseInt(s, 10);
     if ( i.toString() == 'NaN'  ||  ((i.toString() != s) && ('0'+i.toString() != s ) ) )
-        return false
+        return false;
     return true
 }
 
@@ -28,19 +28,19 @@ function is_valid_int( s )
 function is_valid_date( day, month, year )
 {
     if ( !is_valid_int( day )  ||  !is_valid_int( month )  ||  !is_valid_int( year ) )
-        return false
+        return false;
     var dayl = parseInt( day, 10 );
     var monthl = parseInt( month, 10 ) - 1;
-    var yearl = parseInt( year, 10 )
-    var dteDate = new Date( yearl, monthl, dayl )
+    var yearl = parseInt(year, 10);
+    var dteDate = new Date(yearl, monthl, dayl);
     if ( dteDate.valueOf().toString() == 'NaN' )
-        return false
+        return false;
     if (
         ( dayl != dteDate.getDate() ) ||
         ( monthl != dteDate.getMonth() ) ||
         ( yearl != dteDate.getFullYear() )
        )
-        return false
+        return false;
     return true
 }
 // Returns true if and only if specified time (string) represents
@@ -49,46 +49,46 @@ function is_valid_time( time )
 {
     var TIME_PATTERN = /^(\d){1,2}\:(\d){1,2}$/;
     if ( ( time ).match( TIME_PATTERN ) == null )
-        return false
-    var ix = time.indexOf( ':' )
-    var hour = time.substr( 0, ix )
-    var minute = time.substr( ix+1, 2 )
-    var hour = parseInt( hour, 10 )
-    var minute = parseInt( minute, 10 )
+        return false;
+    var ix = time.indexOf(':');
+    var hour = time.substr(0, ix);
+    var minute = time.substr(ix + 1, 2);
+    var hour = parseInt(hour, 10);
+    var minute = parseInt(minute, 10);
     if ( hour < 0 || hour > 23 )
-        return false
+        return false;
     if ( minute < 0 || minute > 59 )
-        return false
+        return false;
     return true
 }
 // Returns true if and only if sTime is before eTime.
 // Pass it two strings of hh:mm format.
 function isBefore( sTime, eTime )
 {
-    var sDTime = new Date()
-    var eDTime = new Date()
+    var sDTime = new Date();
+    var eDTime = new Date();
 
     // sTime
-    var ix = sTime.indexOf( ':' )
-    var hour = sTime.substr( 0, ix )
-    var minute = sTime.substr( ix+1, 2 )
+    var ix = sTime.indexOf(':');
+    var hour = sTime.substr(0, ix);
+    var minute = sTime.substr(ix + 1, 2);
 
-    var hour = parseInt( hour, 10 )
-    var minute = parseInt( minute, 10 )
-    sDTime.setHours( hour )
-    sDTime.setMinutes( minute )
-    sDTime.setSeconds( 0 )
+    var hour = parseInt(hour, 10);
+    var minute = parseInt(minute, 10);
+    sDTime.setHours(hour);
+    sDTime.setMinutes(minute);
+    sDTime.setSeconds(0);
 
     // eTime
-    ix = eTime.indexOf( ':' )
-    hour = eTime.substr( 0, ix )
-    minute = eTime.substr( ix+1, 2 )
+    ix = eTime.indexOf(':');
+    hour = eTime.substr(0, ix);
+    minute = eTime.substr(ix + 1, 2);
 
-    hour = parseInt( hour, 10 )
-    minute = parseInt( minute, 10 )
-    eDTime.setHours( hour )
-    eDTime.setMinutes( minute )
-    eDTime.setSeconds( 0 )
+    hour = parseInt(hour, 10);
+    minute = parseInt(minute, 10);
+    eDTime.setHours(hour);
+    eDTime.setMinutes(minute);
+    eDTime.setSeconds(0);
 
     return sDTime.valueOf() < eDTime.valueOf()
 }
@@ -117,10 +117,10 @@ function valid_email( emailString )
 function findPos(obj) {
         var curleft = curtop = 0;
         if (obj.offsetParent) {
-                curleft = obj.offsetLeft
-                curtop = obj.offsetTop
+                curleft = obj.offsetLeft;
+                curtop = obj.offsetTop;
                 while (obj = obj.offsetParent) {
-                        curleft += obj.offsetLeft
+                        curleft += obj.offsetLeft;
                         curtop += obj.offsetTop
                 }
         }

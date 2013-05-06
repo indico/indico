@@ -282,7 +282,7 @@ type("inlineCSSParser",[],
                 var errorList = [];
 
                 // disallow urls
-                this.css = this.css.replace(/url\s*\(\s*[^\s)]+?\s*\)\s*/, ' ')
+                this.css = this.css.replace(/url\s*\(\s*[^\s)]+?\s*\)\s*/, ' ');
                 // gauntlet
                 if (!(/^([\-:,;#%.\sa-zA-Z0-9!]|\w-\w|'[\s\w]+'|"[\s\w]+"|\([\d,\s]+\))*$/).test(this.css))
                     throw "Parse Error: " + this.css;
@@ -294,7 +294,7 @@ type("inlineCSSParser",[],
                     if( parts[i].replace(/\s/g,'') != ""){
                         property = parts[i].split(/:/g)[0].replace(/\s/g,'');
                         values = parts[i].split(/:/g)[1].split(/\s/g);
-                        value = ""
+                        value = "";
                         for( j in values)
                             value += " " + values[j].replace(/\s/g,'')
                         if (this.propertyWhitelist[property.toLowerCase()] && value)
@@ -327,7 +327,7 @@ var defaultAttribWhitelist = makeMap( Indico.Security.allowedAttributes );
 
 var defaultAllowedProtocols = makeMap( Indico.Security.allowedProtocols );
 
-var urlProperties = makeMap( Indico.Security.urlProperties )
+var urlProperties = makeMap(Indico.Security.urlProperties);
 
 /**Cleans text from scripts, styles and potentialy harmful html.
  * @param (String) html Text to be parsed.
@@ -367,7 +367,7 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
         for (protocol in allowedProtocols)
             urlRegexpStr += "|" + protocol;
         urlRegexpStr += ")://[^<>.][^<>]*$";
-        var urlRegexp = new RegExp(urlRegexpStr)
+        var urlRegexp = new RegExp(urlRegexpStr);
 
         function isEmail(value) {
             return eMail.test(value);
@@ -406,7 +406,7 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
                     else if(attribWhitelist[ attrs[i].name.toLowerCase() ] || unary && attrs[i].name == '/') {
                         if(urlProperties[attrs[i].name.toLowerCase()]){
                             attrs[i].escaped = attrs[i].escaped.replace(/[`\000-\040\177-\240\s]+/g, '');
-                            attrs[i].escaped = attrs[i].escaped.replace(/\ufffd/g, "")
+                            attrs[i].escaped = attrs[i].escaped.replace(/\ufffd/g, "");
                             if (/^[a-z0-9][-+.a-z0-9]*:/.test(attrs[i].escaped) && !allowedProtocols[attrs[i].escaped.split(':')[0].toLowerCase()]) {
                                 security = 1;
                                 errorList.push(attrs[i].escaped);

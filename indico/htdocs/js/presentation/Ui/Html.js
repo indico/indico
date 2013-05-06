@@ -67,13 +67,13 @@ type("Html", ["XElement", "WatchAccessor", "CanGet"], {
                 } else {
                         var self = this;
                         var notify = function(evt) {
-                                observer(self.get());
-                        }
+                            observer(self.get());
+                        };
                         if (!exists(this.observers)) {
                                 this.observers = commands();
                                 var notify = function(evt) {
-                                        self.observers(self.get());
-                                }
+                                    self.observers(self.get());
+                                };
                                 if (checkField) {
                                         this.observeClick(notify);
                                 } else {

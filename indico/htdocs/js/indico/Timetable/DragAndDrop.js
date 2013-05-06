@@ -186,7 +186,7 @@ type("TimeDisplacementManager", [],
 
              var height = elem.height();
              var newPos = elem.offset().top + (type == 'drag' ? 0 : height);
-             var otherTip = newPos + (type == 'drag' ? height : height)
+             var otherTip = newPos + (type == 'drag' ? height : height);
 
              var curBestDiff = Number.MAX_VALUE;
              var curHour = null;
@@ -359,7 +359,7 @@ type("DraggableBlockMixin", [],
 
              draggable.data('eventData', this.eventData);
          }
-     })
+     });
 
 
 type("ResizableBlockMixin", [],
@@ -479,7 +479,7 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
              });
        }
      }, function(timetable) {
-         this.TimeDisplacementManager(this.timetable)
+         this.TimeDisplacementManager(this.timetable);
          if (this.managementMode) {
              this._shiftKeyListener();
          }
