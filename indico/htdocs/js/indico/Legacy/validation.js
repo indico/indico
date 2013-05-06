@@ -58,11 +58,9 @@ function isBefore( sTime, eTime )
 
     // sTime
     var ix = sTime.indexOf(':');
-    var hour = sTime.substr(0, ix);
-    var minute = sTime.substr(ix + 1, 2);
+    var hour = parseInt(sTime.substr(0, ix), 10);
+    var minute = parseInt(sTime.substr(ix + 1, 2), 10);
 
-    var hour = parseInt(hour, 10);
-    var minute = parseInt(minute, 10);
     sDTime.setHours(hour);
     sDTime.setMinutes(minute);
     sDTime.setSeconds(0);
