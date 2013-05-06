@@ -414,7 +414,7 @@ type("DateDeadlineWidget", ["DateWidget"],
                     new SpecialRemovePopup($T("Changing deadline"), $T("Do you want to apply this deadline to all the papers and replace their previous deadlines?"),
                             function(action) {
                                 if (action > 0) {
-                                    self.applyToContributions = action == 1?false:true;
+                                    self.applyToContributions = action != 1;
                                     self._save();
                                 }
                            }, $T("Save deadline only"), $T("Save and apply")).open();
