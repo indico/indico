@@ -83,9 +83,8 @@
                             var result = $this.triggerHandler('menu_select', self.element);
                             if (!result) {
                                 self._close_all();
-                            } else {
-                                e.preventDefault();
                             }
+                            e.preventDefault();
                         }
                     });
                 }
