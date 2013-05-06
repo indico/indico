@@ -501,7 +501,7 @@ type("DroppableBlockMixin", [],
 
              function isTouchingWall(ui) {
                  return $(ui.draggable).position().left == 0;
-             };
+             }
 
              function removeBottomMove(ui) {
                  $('#tt_bottom_move').fadeOut(500, function() {

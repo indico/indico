@@ -298,7 +298,7 @@ var refreshStartAllStopAllButtons = function() {
                     nTypesStop++;
                 }
             }
-        };
+        }
 
         startShouldAppear = nTypesStart > 1 || nCanStart > 1 ;
         stopShouldAppear = nTypesStop > 1 || nCanStop > 1 ;
@@ -399,7 +399,7 @@ var bookingTemplateM = function(booking) {
     cellEditRemove.append(removeButton);
     row.append(cellEditRemove);
 
-    var cellButtons = Html.td({className : "collaborationCellNarrow"});;
+    var cellButtons = Html.td({className : "collaborationCellNarrow"});
 
     if (booking.hasStart) {
         if (booking.canBeStarted) {
@@ -474,7 +474,7 @@ var bookingTemplateM = function(booking) {
         ));
         cellReject.set(rejectButton);
         row.append(cellReject);
-    };
+    }
 
     return row;
 };
@@ -498,7 +498,7 @@ var bookingTemplateS = function(booking) {
             })
         ));
         liState.append(checkStatusButton);
-    };
+    }
     list.append(liState);
 
     if (pluginHasFunction(booking.type, "customText")) {
@@ -563,7 +563,7 @@ var bookingTemplateS = function(booking) {
                 })
             ));
             liActions.append(Html.div("actionButton", rejectButton));
-        };
+        }
 
         list.append(liActions);
     }

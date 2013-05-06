@@ -181,14 +181,14 @@ function changeSelectedStyle(selector) {
         selector.parent().addClass('ui-state-selected');
     }
 
-};
+}
 
 function changeSelectedStyleAll() {
     $('.RoomBooking.ui-multiselect-menu input:checkbox').each(function() {
         changeSelectedStyle($(this));
     });
     updateSelectionCounter();
-};
+}
 
 function updateSelectionCounter() {
     var o = $("#roomGUID").multiselect("option");

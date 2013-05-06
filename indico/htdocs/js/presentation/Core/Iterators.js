@@ -216,11 +216,11 @@ function processing(action, template) {
         }
         iterator.result = action.result;
         return iterator;
-};
+}
 
 function keyGetter(value, key) {
         return key;
-};
+}
 
 /**
  * Specifies that item was found.

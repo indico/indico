@@ -123,7 +123,7 @@ function withoutProperties(object) {
 
 function keys(source) {
 	return translate(source, keyGetter);
-};
+}
 var values = translate;
 
 /**

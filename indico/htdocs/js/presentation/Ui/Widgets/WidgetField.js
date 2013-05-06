@@ -12,7 +12,7 @@ function Field(name, caption, editor) {
 	this.name = name;
 	this.caption = caption;
 	this.editor = editor;
-};
+}
 
 /**
  * 

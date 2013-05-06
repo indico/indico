@@ -30,7 +30,7 @@ function WidgetEditor(target, template) {
 		}
 		return bind.accessor(element, source, templator);
 	};
-};
+}
 
 Widget.timeTemplate = {
 	toTarget: formatTime,

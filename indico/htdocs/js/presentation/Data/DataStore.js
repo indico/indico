@@ -114,7 +114,7 @@ type("DataStore", ["DataReference"], {
 				  	});
 				  }
 				}
-	  	};
+	  	}
 			if (!exists(revision)) {
 				latestReferences[id] = reference;
 				latestReferencesUpdate[id] = update;

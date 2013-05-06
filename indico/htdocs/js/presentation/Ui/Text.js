@@ -12,7 +12,7 @@ function loadDictionary(language) {
 }
 
 var defaultLanguage = "en_US";
-var languageDictionaryPath = isDefined("TextRoot") ? TextRoot : "texts";;
+var languageDictionaryPath = isDefined("TextRoot") ? TextRoot : "texts";
 var json_locale_data = {};
 
 var currentLanguage = null;
