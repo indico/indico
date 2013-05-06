@@ -119,10 +119,7 @@ type("TimetableLayoutManager", [],
 
              // Returns number of previously processed session slots
              var numAssignedBlocks = function(sessionId) {
-                 var blocks = lastAssigned[sessionId].blocks;
-                 var keyss = keys(blocks);
-                 var length = keyss.length;
-                 return length;
+                 return keys(lastAssigned[sessionId].blocks).length;
              };
 
              // Adds/updates a block in the lastAssigned dictionary

@@ -282,8 +282,7 @@ type("SessionSectionPopupMenu", ["SectionPopupMenu"], {
                                   });
 
                                   IndicoUtil.onclickHandlerRemove(self.handler);
-                                  var target = value;
-                                  target.open(pos.x + (target.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
+                                  value.open(pos.x + (value.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
 
                                   return false;
                               }:

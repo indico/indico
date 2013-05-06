@@ -845,10 +845,9 @@ type ("RoomMap", ["IWidget"],
         },
 
         showResultsInfo: function() {
-            var info = $T('Total') + ' '
+            this.resultsInfo.dom.innerHTML = $T('Total') + ' '
                         + this.visibleRoomsCount + ' ' + $T('room(s)')
                         + ' / ' + this.visibleBuildingsCount + ' ' + $T('building(s)');
-            this.resultsInfo.dom.innerHTML = info;
         },
 
         initializeBounds: function() {

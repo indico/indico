@@ -6,11 +6,12 @@ $(function() {
         var searchString = $(this).attr('value');
 
         allItems.addClass('visibility_hidden');
-        if (resultCache[searchString] == undefined) {
-            var items = $(".index .item .text:contains('"+ searchString +"')").parent().parent();
+        var items;
+        if (resultCache[searchString] === undefined) {
+            items = $(".index .item .text:contains('"+ searchString +"')").parent().parent();
             resultCache[searchString] = items;
         } else {
-            var items = resultCache[searchString];
+            items = resultCache[searchString];
         }
         items.removeClass('visibility_hidden');
 

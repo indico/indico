@@ -67,9 +67,7 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
              var selected = false;
 
              var id = Html.em({'data-id': elem.get('id'), style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
-             var item = Html.div({}, id, " - ", elem.get('title') + ( speakers ? (' (' + speakers + ')') : ''));
-
-             return item;
+             return Html.div({}, id, " - ", elem.get('title') + ( speakers ? (' (' + speakers + ')') : ''));
          },
 
          _sortList: function(type, second_click){
@@ -331,8 +329,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         function(hook) {
             var self = this;
 
-            var parameterManager = new IndicoUtil.parameterManager();
-            this.parameterManager = parameterManager;
+            this.parameterManager = new IndicoUtil.parameterManager();
             if (this.isConference) {
 
                 indicoRequest('event.getFieldsAndContribTypes', self.args ,
@@ -356,8 +353,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         function(hook) {
             var self = this;
 
-            var parameterManager = new IndicoUtil.parameterManager();
-            this.parameterManager = parameterManager;
+            this.parameterManager = new IndicoUtil.parameterManager();
             indicoRequest('reportNumbers.get', {} ,
                           function(result, error){
                               if (error) {
@@ -1092,8 +1088,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              };
          this.startTimeField = IndicoUI.Widgets.Generic.timeField(attributes);
          this.timeField = IndicoUI.Widgets.Generic.durationField(20);
-         var parameterManager = new IndicoUtil.parameterManager();
-         this.parameterManager = parameterManager;
+         this.parameterManager = new IndicoUtil.parameterManager();
          this.originalArgs = {};
          //flag to know if the selected day changed
          this.dayChanged = false;
@@ -1763,13 +1758,12 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
     __getContent: function() {
         var type;
 
-        var content = Html.div("fitInnerTimetableDialog",
+        return Html.div("fitInnerTimetableDialog",
                 $T("This will change the starting and ending times of the Session "),
                 this.__getSessionTitle(),
                 $T(" so that it encompasses all entries defined in its timetable."),
                 Html.br(),
                 $T("Are you sure you want to proceed?"));
-        return content;
     },
 
     /**

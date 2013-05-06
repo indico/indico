@@ -78,9 +78,7 @@ type("TimetableBlockBase", [],
                          description: item.description};
                  });
              });
-             var menu = new SectionPopupMenu(sections, [triggerElement], null, null, true, closeHandler);
-
-             return menu;
+             return new SectionPopupMenu(sections, [triggerElement], null, null, true, closeHandler);
          },
 
          getMaterialMenu: function (materials) {

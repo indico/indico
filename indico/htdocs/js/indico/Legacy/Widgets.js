@@ -979,8 +979,7 @@ IndicoUI.Widgets = {
 
         timeField: function(attributes, hiddenFields){
             attributes = attributes || {};
-            var elem = Html.input("text",attributes);
-            return elem;
+            return Html.input("text", attributes);
         },
 
         dateEditor: function(elem, method, attributes, cachedValue){

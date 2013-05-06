@@ -559,7 +559,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
         this.visibility.set(0);
         this.password.set('');
 
-        var privateInfoDiv = IndicoUtil.createFormFromMap(
+        return IndicoUtil.createFormFromMap(
                             [
                                 [
                                     $T('Allowed users and groups'),
@@ -574,8 +574,6 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                                     this.password
                                 ]
                             ]);
-
-        return privateInfoDiv;
     },
 
     draw: function() {
@@ -615,13 +613,10 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
     this.pm = new IndicoUtil.parameterManager();
 
-    var typeSelector = new TypeSelector(this.types,
+    this.typeSelector = new TypeSelector(this.types,
                                         {style:{width: '150px'}},
                                         {style:{width: '150px'}, maxlength: '50'});
-    // make typeSelector available to the object
-    this.typeSelector = typeSelector;
     this.typeSelector.plugParameterManager(this.pm);
-
 });
 
 type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {

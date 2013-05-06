@@ -1503,9 +1503,7 @@ type("SessionRenameWidget", ["InlineWidget"],
 
                 // if the widget is set to load on startup,
                 // the content will be a 'loading' message
-                var wcanvas = Html.div({}, content);
-
-                return wcanvas;
+                return Html.div({}, content);
             },
 
             _handleContent: function(mode) {

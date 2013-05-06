@@ -109,8 +109,7 @@ type("NumberAnswersEditWidget", ["InlineEditWidget"],
                 this.__parameterManager.add(this.num, 'unsigned_int', false, function(value){
 
                     if (value > 20 || value < 2) {
-                        var error = Html.span({}, "Number must be in a range between 2 and 20");
-                        return error;
+                        return Html.span({}, "Number must be in a range between 2 and 20");
                     } else {
                         return null;
                     }
@@ -342,7 +341,7 @@ type("ManageListOfElements", [],
 
                 var self = this;
 
-                var popup = new ConfirmPopup(title, popupContent,
+                return new ConfirmPopup(title, popupContent,
                         function(action) {
                             if (action) {
                                 var attr = self.attributes;
@@ -353,14 +352,13 @@ type("ManageListOfElements", [],
                                 self._buildStructure(method, attr);
                             }
                         }, buttonText);
-                return popup;
             },
 
             _createSpecialRemovePopup: function(method, spanId, popupContent, title, button1, button2) {
 
                 var self = this;
 
-                var popup = new SpecialRemovePopup(title, popupContent,
+                return new SpecialRemovePopup(title, popupContent,
                         function(option) {
                             if (option == 0) {
                                 // close popup option
@@ -380,8 +378,6 @@ type("ManageListOfElements", [],
                                 self._buildStructure(method, attr);
                             }
                         }, button1, button2);
-
-                return popup;
             },
 
 
