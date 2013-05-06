@@ -10,7 +10,7 @@
 
     // Reds out the invalid textboxes and returns false if something is invalid.
     // Returns true if form may be submited.
-    function validateForm(onSubmit) {
+    function validateForm(onlyLocal) {
 
         // Clean up - make all textboxes white again
         var searchForm = $('#searchForm');
@@ -27,7 +27,7 @@
         }
 
         // Holidays warning
-        if (!onSubmit) {
+        if (!onlyLocal) {
             saveCalendarData($('#finishDate').val());
             var holidaysWarning = indicoSource('roomBooking.getDateWarning', searchForm.serializeObject());
             holidaysWarning.state.observe(function(state) {
@@ -187,7 +187,7 @@
             },
 
             slide: function(event, ui) {
-                validateForm(false);
+                validateForm(true);
                 updateCapacitySlider(event,ui);
             },
 
@@ -248,7 +248,6 @@
             slide: function(event, ui) {
                 validateForm(false);
                 updateTimeSlider(event,ui);
-
             }
           });
 
