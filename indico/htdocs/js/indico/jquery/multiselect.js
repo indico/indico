@@ -104,6 +104,6 @@ $.extend($.ech.multiselectfilter.prototype, {
 
             $this[ isVisible ? 'show' : 'hide' ]();
         });
-    },
+    }
 });
 

@@ -22,7 +22,7 @@ $(function() {
     $(".material_icon").each(function() {
         $(this).qtip({
             style: {
-                classes: 'material_tip',
+                classes: 'material_tip'
             },
             content: {
                 text: $(this).siblings('.material_list')
