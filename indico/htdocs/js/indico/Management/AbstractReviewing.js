@@ -360,10 +360,7 @@ type("ManageListOfElements", [],
 
                 return new SpecialRemovePopup(title, popupContent,
                         function(option) {
-                            if (option == 0) {
-                                // close popup option
-                                null;
-                            } else {
+                            if (option != 0) { // == 0 means close popup
                                 var attr = self.attributes;
                                 attr['id'] = spanId;
 

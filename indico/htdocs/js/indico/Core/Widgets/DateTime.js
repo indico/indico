@@ -109,7 +109,6 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
 
          this.RealtimeTextBox(args);
 
-         this.input;
          this.trigger = Html.img({src: imageSrc("calendarWidget")});
          this.tab = Html.div("dateField", this.input, this.trigger);
          var self = this;
