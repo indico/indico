@@ -82,10 +82,10 @@
             beforeclose: function (event, ui) {
                 return false;
             },
-            classes : "RoomBooking",
+            classes : "RoomBooking"
         }).multiselectfilter({
             label: "",
-            placeholder: "",
+            placeholder: ""
         });
 
         $("#roomGUID").bind("multiselectclick", function(event, ui) {
@@ -104,7 +104,7 @@
         $("#roomGUID").multiselect("widget").bind( {
             mouseleave: function(){
                 $("#roomGUID").multiselect("widget").find('label').removeClass('ui-state-hover');
-            },
+            }
         });
 
         $("#roomGUID").bind("multiselectrefresh", function(event, ui) {
@@ -193,7 +193,7 @@
 
             stop: function(event, ui) {
                 $('#capacity').keyup();
-            },
+            }
           });
 
         // Default date
@@ -249,7 +249,7 @@
                 validateForm(false);
                 updateTimeSlider(event,ui);
 
-            },
+            }
           });
 
         restoreSelection(rbUserData.selectedRooms);
@@ -287,7 +287,7 @@
             },
             show: {
 
-            },
+            }
         });
 
         // Listeners
