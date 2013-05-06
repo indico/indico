@@ -340,7 +340,7 @@ type("RoomBookingReservationWidget", ["RoomBookingWidget"],
                 var li;
                 if( this.bookedRooms.get(elem) ){
                     if( this.timetableData) {
-                        conflict = this._findConflict(key);
+                        var conflict = this._findConflict(key);
                         if( !conflict ){
                             if(this._isInsideBooking(elem))
                                 li = Html.li('bottomLine bookedItem', elem);

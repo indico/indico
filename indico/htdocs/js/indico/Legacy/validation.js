@@ -83,7 +83,7 @@ function required_fields( fieldNames )
 {
     var isValid = true;
     for (var i = 0; i < fieldNames.length; ++i) {
-        fieldName = fieldNames[i];
+        var fieldName = fieldNames[i];
         if (trim($('#' + fieldName).val()).length == 0) {
             $('#' + fieldName).addClass('invalid');
             isValid = false;
@@ -101,7 +101,7 @@ function valid_email( emailString )
 // GENERAL PURPOSE => LATER WILL GO TO ANOTHER JS FILE
 
 function findPos(obj) {
-        var curleft = curtop = 0;
+        var curleft = 0, curtop = 0;
         if (obj.offsetParent) {
                 curleft = obj.offsetLeft;
                 curtop = obj.offsetTop;
@@ -175,9 +175,9 @@ function validate_period(withRepeatability, allowPast, what )
         var eDate = new Date( parseInt( $('#eYear').val(), 10 ), parseInt( $('#eMonth').val(), 10 ) - 1, parseInt( $('#eDay').val(), 10 ) );
         if ( isValid )
         {
-            todayDate = new Date();
+            var todayDate = new Date();
             todayDate.setHours( 0, 0, 0, 0 );
-            if ( !allowPast && ( sDate.valueOf() < (todayDate).valueOf()) )
+            if ( !allowPast && ( sDate.valueOf() < todayDate.valueOf()) )
             {
                 $('#sDay').addClass('invalid');
                 $('#sMonth').addClass('invalid');

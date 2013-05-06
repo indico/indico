@@ -892,7 +892,7 @@ type("SingleUserField", ["IWidget"], {
      * @param {Object} user a dictionary with the user info.
      */
     __userChosenObserver: function() {
-        user = this.user.getAll();
+        var user = this.user.getAll();
 
         this.variableButtonsDiv.clear();
         if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && user._type === "Avatar") {
@@ -1279,7 +1279,7 @@ type("UserListWidget", ["ListWidget"],
             var userData = user.get();
 
             var editButton = Widget.link(command(function() {
-                 editPopup = new UserDataPopup(
+                 var editPopup = new UserDataPopup(
                      'Change user data',
                      userData.clone(),
                      function(newData, suicideHook) {
@@ -1446,7 +1446,7 @@ type("UserListField", ["IWidget"], {
                 var newUserId = 'newUser' + self.newUserCounter++;
                 var newUser = $O({'id': newUserId});
 
-                newUserPopup = new UserDataPopup(
+                var newUserPopup = new UserDataPopup(
                     $T('New user'),
                     newUser,
                     function(newData, suicideHook) {

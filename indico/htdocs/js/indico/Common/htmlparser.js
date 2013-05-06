@@ -84,8 +84,8 @@ type("HTMLParser", [],
                 var self = this;
                 var index, chars, match, last = this.html;
 
-                parseStartTag = function ( tag, tagName, rest, unary ) {
-                    tagNameLower = tagName.toLowerCase();
+                var parseStartTag = function ( tag, tagName, rest, unary ) {
+                    var tagNameLower = tagName.toLowerCase();
                     if ( self.block[ tagNameLower ] ) {
                         while ( self.stack.last() && self.inline[ self.stack.last() ] ) {
                             parseEndTag( "", self.stack.last() );
@@ -121,19 +121,16 @@ type("HTMLParser", [],
                     }
                 };
 
-                parseEndTag = function( tag, tagName ) {
-                    if(tagName)
-                        tagNameLower = tagName.toLowerCase();
+                var parseEndTag = function( tag, tagName ) {
+                    var tagNameLower = tagName ? tagName.toLowerCase() : undefined;
+                    var pos = 0;
 
-                    // If no tag name is provided, clean shop
-                    if ( !tagName )
-                        var pos = 0;
-
-                    // Find the closest opened tag of the same type
-                    else
-                        for ( var pos = self.stack.length - 1; pos >= 0; pos-- )
+                    if ( tagName ) {
+                        // Find the closest opened tag of the same type
+                        for ( pos = self.stack.length - 1; pos >= 0; pos-- )
                             if ( self.stack[ pos ].toLowerCase() == tagNameLower )
                                 break;
+                    }
 
                     if ( pos >= 0 ) {
                         // Close all the open elements, up the stack
@@ -289,13 +286,13 @@ type("inlineCSSParser",[],
                 if (!(/^\s*([-\w]+\s*:[^:;]*(;\s*|$))*$/).test(this.css))
                     throw "Parse Error: " + this.css;
 
-                parts = this.css.split(/;/g);
-                for( i in parts)
+                var parts = this.css.split(/;/g);
+                for(var i in parts)
                     if( parts[i].replace(/\s/g,'') != ""){
-                        property = parts[i].split(/:/g)[0].replace(/\s/g,'');
-                        values = parts[i].split(/:/g)[1].split(/\s/g);
-                        value = "";
-                        for( j in values)
+                        var property = parts[i].split(/:/g)[0].replace(/\s/g,'');
+                        var values = parts[i].split(/:/g)[1].split(/\s/g);
+                        var value = "";
+                        for(var j in values)
                             value += " " + values[j].replace(/\s/g,'')
                         if (this.propertyWhitelist[property.toLowerCase()] && value)
                             result += property + ':' + value + ';';
@@ -364,7 +361,7 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
         var allowedProtocols = params && params.allowedProtocols ? params.allowedProtocols : defaultAllowedProtocols;
 
         var urlRegexpStr = "^(";
-        for (protocol in allowedProtocols)
+        for (var protocol in allowedProtocols)
             urlRegexpStr += "|" + protocol;
         urlRegexpStr += ")://[^<>.][^<>]*$";
         var urlRegexp = new RegExp(urlRegexpStr);
@@ -381,7 +378,7 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
 
         var errorList = [];
 
-        parser = new HTMLParser(html, {
+        var parser = new HTMLParser(html, {
             start: function( tag, attrs, unary ) {
             if( tagWhitelist[tag.toLowerCase()] ) {
                 results += "<" + tag;
@@ -535,7 +532,7 @@ function HTMLtoDOM( html, doc ) {
     // the body element
     var curParentNode = one.body;
 
-    parser = new HTMLParser( html, {
+    var parser = new HTMLParser( html, {
         start: function( tagName, attrs, unary ) {
         // If it's a pre-built element, then we can ignore
         // its construction

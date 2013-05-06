@@ -267,7 +267,7 @@ type("RadioButtonSimpleField", ["ErrorAware"],
                     row2.append(cell2);
                 }
 
-                cellMessage = Html.td();
+                var cellMessage = Html.td();
                 cellMessage.dom.style.verticalAlign = "middle";
                 cellMessage.dom.rowSpan = 2;
 
@@ -404,7 +404,7 @@ type("ManageListOfElements", [],
 
                     for (var i=0; i < result.length; i++) {
                         tr = Html.tr({className: 'infoTR'});
-                        tdElement = Html.td({className: 'questionContent'}, result[i].text);
+                        var tdElement = Html.td({className: 'questionContent'}, result[i].text);
                         tdElement.dom.id = "TEID_"+this.divsIdRoot+"_"+result[i].id;
 
                         // 'Edit' elements and functionality

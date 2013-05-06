@@ -135,7 +135,7 @@ type("BasicEmailPopup", ["ExclusivePopupWithButtons"],{
             return null;
         }
         var legendFields = [];
-        for(legend in self.legends){
+        for(var legend in self.legends){
             legendFields.push(Html.tr({}, Html.td({}, "{"+legend+"} :"), Html.td({}, self.legends[legend])));
         }
         return Html.div({style:{marginLeft: '20px',
@@ -241,7 +241,7 @@ type("ParticipantsInvitePopup", ["ParticipantsEmailPopup"],{
     _drawToAddress: function(){
         var self = this;
         var to = [];
-        for (p in self.toParticipants){
+        for (var p in self.toParticipants){
             to.push(self.toParticipants[p].name);
         }
         var toField = Html.tr({},

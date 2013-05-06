@@ -34,7 +34,7 @@ Util.postRequest = function(url, getArguments, postArguments, method, separator)
     var getUrl = url;
 
     if (exists(getArguments)) {
-        first = true;
+        var first = true;
         each(getArguments, function(value, key) {
             if(first) {
                 getUrl += "?";

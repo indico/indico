@@ -322,8 +322,8 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 var contentHeight = function() {
                     var h = 0;
                     if (!self.compactMode) {
-                        locationHeight = self.locationDiv.dom.style.display != 'none' ? self.locationDiv.dom.offsetHeight : 0;
-                        timeHeight = self.timeDiv.dom.style.display != 'none' ? self.timeDiv.dom.offsetHeight : 0;
+                        var locationHeight = self.locationDiv.dom.style.display != 'none' ? self.locationDiv.dom.offsetHeight : 0;
+                        var timeHeight = self.timeDiv.dom.style.display != 'none' ? self.timeDiv.dom.offsetHeight : 0;
 
                         h = Math.max(locationHeight, timeHeight);
                     }
@@ -502,7 +502,7 @@ type("TimetableBlockWholeDayBase", ["TimetableBlockBase"],
                     'Break': 'timetableBreak '
                 };
 
-                block = Html.div({style: {
+                var block = Html.div({style: {
                             backgroundColor: this.eventData.color,
                             color: this.eventData.textColor,
                             maxHeight : '30px',
@@ -1169,7 +1169,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             if (self.eventData.entryType != 'Session') {
                 menu.insert(" | ");
 
-                moveEntryLink = Html.a('fakeLink', Html.span({}, $T("Move")));
+                var moveEntryLink = Html.a('fakeLink', Html.span({}, $T("Move")));
                 moveEntryLink.observeClick(function(){
                   self.close();
                   self.managementActions.moveEntry(self.eventData);
@@ -1226,7 +1226,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             this._setInfo();
             this._setParentInfo();
 
-            roomLocationDiv = Html.div({},Html.div('roomPopupTitle', 'Location: '),
+            var roomLocationDiv = Html.div({},Html.div('roomPopupTitle', 'Location: '),
                     self.eventData.location, Html.br(), Html.div('roomPopupTitle', 'Room: '),
                     self.eventData.room, Html.img({src: imageSrc("edit_16.png")}), Html.br());
 
@@ -1361,11 +1361,11 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
                    top: pixels(TimetableDefaults.topMargin)
                }});
 
-             last = scale[scale.length-1][0];
+             var last = scale[scale.length-1][0];
 
              for (var n=0; n < scale.length; ++n){
-                 hour = scale[n][0];
-                 px = scale[n][1];
+                 var hour = scale[n][0];
+                 var px = scale[n][1];
 
                  if (scale[n].length > 2) {
                    scaleDiv.append(Html.div({style:
@@ -1461,7 +1461,7 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
                  var block;
 
                  var empty = _(eventData.entries).size() > 0;
-                 compactMode = false;
+                 var compactMode = false;
                  // For now don't use the compact mode. Activating it makes short entries displaying less
                  // information in the block (only time and title).
                  //if (blockData.collapsed || (blockData.end - blockData.start < TimetableDefaults.layouts.proportional.values.pxPerHour))

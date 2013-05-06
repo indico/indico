@@ -866,16 +866,16 @@ Calendar.prototype.create = function (_par) {
 						if (i < 10 && range_end >= 10) txt = '0' + i;
 						else txt = '' + i;
 						part._range[part._range.length] = txt;
-                        opt = Calendar.createElement("option", part)
+                        var opt = Calendar.createElement("option", part);
                         opt.value = txt;
                         opt.innerHTML = txt;
                         if (range_end == 59) { // especial case for minutes: e.g. if step == 5 and value ==  32, we must display it.
-                            ms = cal.date.getMinutes()
+                            var ms = cal.date.getMinutes()
                             if (ms > i && ms < i+step) {
                                 //part._range[part._range.length] = txt;
                                 if (ms < 10) txt = '0' + ms;
                                 else txt = '' + ms;
-                                opt = Calendar.createElement("option", part)
+                                opt = Calendar.createElement("option", part);
                                 opt.value = txt;
                                 opt.innerHTML = txt;
                             }

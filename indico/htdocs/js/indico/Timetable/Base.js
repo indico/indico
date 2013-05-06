@@ -110,7 +110,7 @@ type("TimeTable", ["HistoryListener"], {
             throw 'unrecognized id!';
         }
 
-        for (day in this.data) {
+        for (var day in this.data) {
             if (this.data[day][compositeId]) {
                 return this.data[day][compositeId];
             }
@@ -558,7 +558,7 @@ type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
 
              return [key, function() {
 
-                 detailed = self.inDetailedMode?'.detailed':'';
+                 var detailed = self.inDetailedMode?'.detailed':'';
 
                  self.currentDay = key;
                  // each time one tab is clicked,
@@ -797,6 +797,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         var type = Util.parseId(entry[2])[0];
 
+        var conference = null;
         var slot = null;
         var title = "";
 
@@ -953,7 +954,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
 
         var customLinks = $();
-        for(linkName in this.customLinks){
+        for(var linkName in this.customLinks){
             var link = $('<a href="#"/>').text(linkName).bind('menu_select', function(event) {
                 var elem = event.srcElement?event.srcElement:event.currentTarget;
                 var func = eval(self.customLinks[elem.innerHTML]);
@@ -1366,10 +1367,10 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
 
         var data = this.getData();
 
-        for (day in data) {
-            for (entry in data[day]) {
+        for (var day in data) {
+            for (var entry in data[day]) {
                 if ( data[day][entry]["entryType"] == "Session" && data[day][entry]["sessionId"] == sessionId ) {
-                    for (i = 0 ; i < fields.length ; ++i) {
+                    for (var i = 0 ; i < fields.length ; ++i) {
                         data[day][entry][fields[i]] = newValues[i];
                     }
                 }

@@ -25,7 +25,7 @@ function WidgetTable(rows, headers, footers) {
 }
 
 WidgetTable.cell = function(item, target, isHeader) {
-	constructor = isHeader ? Html.th : Html.td;
+	var constructor = isHeader ? Html.th : Html.td;
 	if (exists(item)) {
 		if (item.XElement) {
 			switch (item.getTag()) {

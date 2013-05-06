@@ -181,8 +181,8 @@ var Util = {
     },
 
     dateTimeIndicoToJS: function(obj) {
-        m1 = obj.date.match(/(\d+)[\-\/](\d+)[\-\/](\d+)/);
-        m2 = obj.time.match(/(\d+):(\d+)(?::(\d+))?/);
+        var m1 = obj.date.match(/(\d+)[\-\/](\d+)[\-\/](\d+)/);
+        var m2 = obj.time.match(/(\d+):(\d+)(?::(\d+))?/);
 
 
         var date = new Date(m1[1],m1[2] - 1,m1[3]||0);

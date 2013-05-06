@@ -176,13 +176,14 @@ var IndicoUtil = {
         if (!document.styleSheets) {
             return;
         }
+        var css;
         if (document.styleSheets[0].cssRules) {
             css = document.styleSheets[0].cssRules;
         }
         else {
             css = document.styleSheets[0].rules;
         }
-        for (i = 0; i < css.length; i++) {
+        for (var i = 0; i < css.length; i++) {
             if (css[i].selectorText.toLowerCase() == cls.toLowerCase()) {
                 css[i].style.cssText = style;
             }

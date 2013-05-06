@@ -43,7 +43,7 @@ type("DebugWindow", [],
      }
     );
 
-debugWindow = null;
+var debugWindow = null;
 
 function createDebugWindow() {
     debugWindow = new DebugWindow();

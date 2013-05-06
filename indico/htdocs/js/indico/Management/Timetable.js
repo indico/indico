@@ -1545,7 +1545,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
             var h = Math.floor(minutes / 60);
             var m = minutes % 60;
 
-            intervalExplanationText = $T("Entries will be separated by gaps of ");
+            var intervalExplanationText = $T("Entries will be separated by gaps of ");
             if (h === 1) {
                 intervalExplanationText += $T("1 hour ");
             } else if (h > 0) {

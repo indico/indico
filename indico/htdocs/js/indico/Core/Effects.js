@@ -120,7 +120,7 @@ IndicoUI.Effect = {
      * Utility function used by highLight to remove the highlight safely (the element may have disappeared during the timeout)
      */
     removeHighLight: function(elementId) {
-        element = $E(elementId);
+        var element = $E(elementId);
         if (exists(element)) {
             element.dom.style.color = '';
         }
@@ -186,7 +186,7 @@ IndicoUI.Effect = {
             setTimeout(function() {animateFade(new Date().getTime(), element);}, 33);
         }
 
-        animateFade = function(lastTick, element) {
+        var animateFade = function(lastTick, element) {
             var curTick = new Date().getTime();
             var elapsedTicks = curTick - lastTick;
 

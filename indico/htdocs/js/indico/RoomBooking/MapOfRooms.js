@@ -681,7 +681,7 @@ type ("RoomMap", ["IWidget"],
 
         addFiltersToCriteria: function(filters, buildingCriteria, roomCriteria) {
             for (var i = 0; i < filters.length; i++) {
-                filter = filters[i];
+                var filter = filters[i];
                 // check if the filter is a group of filters
                 if (filter.group !== undefined) {
                     var value = filter.mainCheckbox.dom.checked;

@@ -412,7 +412,7 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, to
 function cleanText(text, target){
     try{
         var self = target;
-        killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
+        var killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
         var parsingResult = escapeHarmfulHTML(text);
         if( parsingResult[1] > 0) {
 

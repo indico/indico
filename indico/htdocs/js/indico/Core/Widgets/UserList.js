@@ -231,7 +231,7 @@ type("ListOfUsersManager", [], {
         var params = this.userListParams;
         params['userList'] = userList;
         extraParams = any(extraParams, {});
-        for(param in extraParams){
+        for(var param in extraParams){
             params[param] = extraParams[param]();
         }
         return params;

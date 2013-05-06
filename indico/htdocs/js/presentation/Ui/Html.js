@@ -145,7 +145,7 @@ extend(Html, {
                 } else {
                         attribs = exists(other) ? other : {};
                 }
-                for (key in attribs) {
+                for (var key in attribs) {
                         if (attribs[key] === undefined) {
                                         delete attribs[key];
                         }

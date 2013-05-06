@@ -806,7 +806,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
         var inheritanceText = Html.unescaped.span({className: 'strongRed', style: {fontStyle: 'italic'}},
                 Protection.ParentRestrictionMessages[self.protection]);
 
-        text = Html.span({}, $T("Please select who will be able to access "), " ",Html.span({style:{fontWeight: 'bold'}}, self.protectionName), " :");
+        var text = Html.span({}, $T("Please select who will be able to access "), " ",Html.span({style:{fontWeight: 'bold'}}, self.protectionName), " :");
 
         self.protectionSelector  = new RadioFieldWidget([
             [0, self._parentText(this.args)],
@@ -1222,7 +1222,7 @@ type("ResourceListWidget", ["ListWidget"], {
                         } else {
                             killProgress();
                             //Crude way to redraw widget
-                            temp = self.getAll();
+                            var temp = self.getAll();
                             self.clear();
                             self.update(temp);
                         }
@@ -1243,7 +1243,7 @@ type("ResourceListWidget", ["ListWidget"], {
                         } else {
                             killProgress();
                             //Crude way to redraw widget
-                            temp = self.getAll();
+                            var temp = self.getAll();
                             self.clear();
                             self.update(temp);
                         }
@@ -1319,6 +1319,7 @@ type("ResourceListWidget", ["ListWidget"], {
             }
         }
 
+        var informationTitle;
         if (resource.get('type') == 'converting') {
             informationTitle = Html.span({style: {paddingLeft: '5px', color: 'gray'}}, resource.get('name'));
         }
@@ -1337,6 +1338,7 @@ type("ResourceListWidget", ["ListWidget"], {
             Html.div("descriptionLine", resource.get('description'))
         ];
 
+        var resourceNode;
         if (resource.get('type') == 'stored') {
             var fileData = storedDataInfo(resource.get('file'));
             resourceNode = Widget.block(concat([IndicoUI.Buttons.arrowExpandIcon(fileData)], information));

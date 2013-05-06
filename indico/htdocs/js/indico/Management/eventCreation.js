@@ -67,8 +67,8 @@ type("ShowConcurrentEvents", ["ExclusivePopup", "PreLoadHandler"], {
                 confListUL.append(Html.li({}, evtTxt));
 
             });
-            categSpan = Html.span({style:{fontSize:pixels(12)}}, categ);
-
+            var categSpan = Html.span({style:{fontSize:pixels(12)}}, categ);
+            var color;
             if (pair) {
                 color = "#F5F5F5";
             }else {
@@ -230,7 +230,7 @@ type("CategoryChooserWidget", [], {
             return;
         }
         for (var i=0; i<this.currentCateg.breadcrumb.length; i++) {
-            cat = this.currentCateg.breadcrumb[i];
+            var cat = this.currentCateg.breadcrumb[i];
             if ((i+1) == this.currentCateg.breadcrumb.length) {
                 this.breadcrumbs.append(cat);
             }else {
@@ -338,7 +338,7 @@ type("AddReportNumberPopupBase", [], {
 
     _drawSelectReportNumberSystems: function(){
         var options = [Html.option({value: ""}, $T("Select system"))];
-        for(system in this.reportNumberSystems){
+        for(var system in this.reportNumberSystems){
             options.push(Html.option({value: system}, this.reportNumberSystems[system]));
         }
         return Html.select({}, options);

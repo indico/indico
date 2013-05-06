@@ -539,7 +539,7 @@ IndicoUI.Widgets = {
                     }
                 }
             } else { // if there is no initial value, we retrieve it from the server and set the appropiate radio button to checked
-                initialValueHandler = function(result,error) {
+                var initialValueHandler = function(result,error) {
                     if (!error) {
                         radioButtons[result].dom.checked = true;
                     }
@@ -590,7 +590,7 @@ IndicoUI.Widgets = {
                     row2.append(cell2);
                 }
 
-                cellMessage = Html.td();
+                var cellMessage = Html.td();
                 cellMessage.dom.style.verticalAlign = "middle";
                 cellMessage.dom.rowSpan = 2;
                 cellMessage.append(message);

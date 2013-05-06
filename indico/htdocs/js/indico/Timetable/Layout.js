@@ -20,7 +20,7 @@ type("TimetableLayoutManager", [],
      {
          _buildCheckpointTable: function(data) {
              /* Checkpoints are time points where events either start or end */
-             checkpoints = {};
+             var checkpoints = {};
              var addCheckpoint = function(key, time, type, sessionId) {
 
                  if (!checkpoints[time]) {
@@ -52,8 +52,8 @@ type("TimetableLayoutManager", [],
 
              each(orderedKeys, function(key){
                  var value = data[key];
-                 sTime = value.startDate.time.replace(/:/g,'');
-                 eTime = value.endDate.time.replace(/:/g,'');
+                 var sTime = value.startDate.time.replace(/:/g,'');
+                 var eTime = value.endDate.time.replace(/:/g,'');
 
                  // If a poster session with a duration of > 7h then don't place
                  // it in the grid but rather on the top as a whole day event
@@ -96,7 +96,7 @@ type("TimetableLayoutManager", [],
              var ks = keys(assigned);
              ks.sort();
 
-             for (key in ks) {
+             for (var key in ks) {
                  if (!assigned[key]) {
                      block.assigned = key;
                      assigned[key] = block;
@@ -149,7 +149,7 @@ type("TimetableLayoutManager", [],
                  assigned[block1.assigned] = block1;
              };
 
-             for (key in currentGroup) {
+             for (var key in currentGroup) {
                  var block = currentGroup[key];
 
                  // If this is not a session slot (that is a block
@@ -211,7 +211,7 @@ type("TimetableLayoutManager", [],
          },
 
          addWholeDayBlock: function(blocks, key) {
-             block = blocks[key] = {id: key};
+             blocks[key] = {id: key};
          },
 
          getNumColumnsForGroup: function(group) {
@@ -574,7 +574,7 @@ type("RoomLayoutManager", ["CompactLayoutManager"],
                 counter++;
             });
 
-            for (key in currentGroup) {
+            for (var key in currentGroup) {
                 var block = currentGroup[key];
                 var roomName = this.eventData[block.id].room;
              // If there is no room name, the block will be in the column 0 (and take all the available width)

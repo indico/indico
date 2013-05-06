@@ -251,8 +251,6 @@ extend(IndicoUI.Dialogs,
                var dateArgs = clone(params);
                dateArgs.selectedDay = dayStartDate;
                var info = new WatchObject();
-               var parentRoomData;
-               previousDay = dateArgs.selectedDay;
 
                var killLoadProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
 
@@ -469,6 +467,7 @@ extend(IndicoUI.Dialogs,
                            }
                            var startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(info.get('startDateTime').substr(11,5), info.get('endDateTime').substr(11,5), {style: {width: '50px'}}, {style: {width: '50px'}}, timezoneMsg);
                            var startEndTimeComponent;
+                           var sessionRenameComponent;
                            var timeTranslation = {
                                    toTarget: function (value) {
                                        var aux = conferenceDays.get();

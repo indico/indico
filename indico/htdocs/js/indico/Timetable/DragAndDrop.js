@@ -73,8 +73,6 @@ type("TimeDisplacementManager", [],
 
              // snapping blocks to tooltip "grid"
 
-             type = type || 'resize';
-
              var hourline = $('#hourLine_' + parseFloat(time[0]));
              var hourHeight = hourline.height();
 

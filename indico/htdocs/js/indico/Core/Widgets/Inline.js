@@ -1447,7 +1447,7 @@ type("SupportEditWidget", ["InlineEditWidget"],
                 // for formatting the list when saving support emails asynchronously
 
                 // removes separators at the beginning and at the end
-                emaillist = this.email.get().replace(/(^[ ,;]+)|([ ,;]+$)/g, '');
+                var emaillist = this.email.get().replace(/(^[ ,;]+)|([ ,;]+$)/g, '');
                 // replaces all the other groups of separators by commas
                 emaillist = emaillist.replace(/[ ,;]+/g, ',');
 

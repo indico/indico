@@ -556,7 +556,7 @@ type("ColorPicker", ["WatchValue", "ChainedPopupWidget"], {
         var currentColors = this.get();
         var showCustom = true;
         for (var i in this.defaultColors) {
-            colors = this.defaultColors[i];
+            var colors = this.defaultColors[i];
             if (colors.textColor == currentColors.textColor &&
                 colors.bgColor == currentColors.bgColor) {
                 showCustom = false;

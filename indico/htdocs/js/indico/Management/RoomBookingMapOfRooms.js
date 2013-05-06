@@ -103,7 +103,7 @@ type("MapAspectListWidget", ["ListWidget"],
              var aspectData = aspect.get();
 
              var editButton = Widget.link(command(function() {
-                 editPopup = new MapAspectDataPopup(
+                 var editPopup = new MapAspectDataPopup(
                      'Change map aspect data',
                      aspectData.clone(),
                      function(newData, suicideHook) {
@@ -189,7 +189,7 @@ type("MapAspectListField", ["IWidget"], {
             var newAspectId = self.newAspectCounter++;
             var newAspect = $O({'id': newAspectId});
 
-            newAspectPopup = new MapAspectDataPopup(
+            var newAspectPopup = new MapAspectDataPopup(
                 $T('New map aspect'),
                 newAspect,
                 function(newData, suicideHook) {

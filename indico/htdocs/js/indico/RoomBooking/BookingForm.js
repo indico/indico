@@ -25,9 +25,9 @@ function set_repeatition_comment() {
         var weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         s = 'on ' + weekDays[date.getDay()];
         if(repType == 4) {
-            weekNr = Math.floor( date.getDate() / 7 ) + 1;
-            postfix = ['st', 'nd', 'rd', 'th', 'th'];
-            weekNrStr = 'the ' + weekNr + postfix[weekNr-1] + ' ';
+            var weekNr = Math.floor( date.getDate() / 7 ) + 1;
+            var postfix = ['st', 'nd', 'rd', 'th', 'th'];
+            var weekNrStr = 'the ' + weekNr + postfix[weekNr-1] + ' ';
             s = 'on ' + weekNrStr + weekDays[date.getDay()] + ' of a month';
         }
     }

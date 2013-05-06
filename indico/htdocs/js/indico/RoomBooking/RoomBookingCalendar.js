@@ -70,14 +70,15 @@ type ("RoomBookingRoom", [],
                     url += "&hour=" + date.substr(11,2) + "&minute=" + date.substr(14,2) + "&hourEnd=" + date.substr(16,2) + "&minuteEnd=" + date.substr(19,2);
                 }
                 if (typeof repeatability != 'undefined' && repeatability != 'None' && flexibleDatesRange > 0) {
+                    var repeatabilityDays;
                     if (repeatability == 0)
                         repeatabilityDays = 1;
                     else if (repeatability < 4)
                         repeatabilityDays = 7 * repeatability;
                     else
                         repeatabilityDays = 35;
-                    roomStartDate = new Date(date.substr(0,4), date.substr(5,2) - 1, date.substr(8,2));
-                    calendarStartDate = new Date(startD.substr(0,4), startD.substr(5,2) - 1, startD.substr(8,2));
+                    var roomStartDate = new Date(date.substr(0,4), date.substr(5,2) - 1, date.substr(8,2));
+                    var calendarStartDate = new Date(startD.substr(0,4), startD.substr(5,2) - 1, startD.substr(8,2));
                     while (roomStartDate >= calendarStartDate)
                         roomStartDate.setDate(roomStartDate.getDate() - repeatabilityDays);
                     roomStartDate.setDate(roomStartDate.getDate() + repeatabilityDays);
@@ -842,8 +843,8 @@ type ("RoomBookingCalendarSummaryDrawer", [],
             draw: function(){
                 if( _.size(this.bars) > 0 ){
                     var self = this;
-                    contentLoaded = false;
-                    showContent = false;
+                    var contentLoaded = false;
+                    var showContent = false;
                     var arrowDown = Html.img({src:imageSrc("menu_arrow_black.png"), style:{display:"inline"}});
                     var toggleSummary = Html.span({className:"fakeLink", style:{paddingRight:pixels(2)}},
                             $T("Display room booking summary "));
@@ -864,8 +865,8 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                             toggleSummary.dom.innerHTML = $T("Hide room booking summary");
                             arrowDown.dom.style.display = 'none';
                         }
-                    })
-                    content = Html.div({});
+                    });
+                    var content = Html.div({});
                     var rejectAllDiv = null;
                     if (this.rejectAllLink) {
                         rejectAllDiv = Html.div({className:"fakeLink", style:{width:pixels(800), textAlign:"center", paddingBottom:pixels(10)}},
@@ -1047,16 +1048,16 @@ type ("RoomBookingCalendar", [],
         {
             draw: function(){
                 if (this.data.overload)
-                    return [new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(firstHeader = true),
+                    return [new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(true),
                             this.roomBookingCalendarContent.draw()];
                 if (this.prevNextBarArgs && this.prevNextBarArgs.newBooking)
-                    return [new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(firstHeader = true),
+                    return [new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(true),
                             this.roomBookingCalendarContent.draw(),
-                            new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(firstHeader = false)];
+                            new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(false)];
                 else if ( this.prevNextBarArgs )
-                    return [new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(firstHeader = true),
+                    return [new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(true),
                             this.roomBookingCalendarContent.draw(),
-                            new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(firstHeader = false),
+                            new RoomBookingPrevNext(this.prevNextBarArgs, this.data).draw(false),
                             this.roomBookingCalendarSummary.draw()];
                 else
                     return [this.roomBookingCalendarContent.draw(),
