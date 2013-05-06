@@ -45,8 +45,8 @@ $(function(){
     refresh_state();
 });
 
-$('input:checkbox', '.domain_control').live('change', function(){
-    $this = $(this);
+$('.domain_control input:checkbox').on('change', function(){
+   var $this = $(this);
    var params = {
                   targetId: '${target.getId()}',
                   domainId: $this.val(),

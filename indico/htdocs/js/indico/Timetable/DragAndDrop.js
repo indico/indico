@@ -455,8 +455,9 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
                  tolerance: 'touch',
                  accept: '.ui-draggable.timetableBlock',
                  over: function(event, ui) {
-                     $('.ui-draggable.timetableBlock').live(
+                     $('#timetableDiv').on(
                          thisDragSpaceName,
+                         '.ui-draggable.timetableBlock',
                          function(event, ui)
                          {
                              if (element.droppable("option", "disabled")) {
@@ -472,7 +473,7 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
                          });
                  },
                  out: function(event, ui) {
-                     $('.ui-draggable.timetableBlock').die(thisDragSpaceName);
+                     $('#timetableDiv').off(thisDragSpaceName, '.ui-draggable.timetableBlock');
                  }
              });
        }

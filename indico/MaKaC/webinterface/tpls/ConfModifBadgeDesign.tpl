@@ -531,12 +531,10 @@
             $('#removeBackground').removeClass('hidden');
         }
 
-        // select items on mousedown
-        $('#templateDiv > div').live('mousedown', function() {
+        // select and inline edit
+        $('#templateDiv').on('mousedown', 'div', function() {
             markSelected($(this));
-        });
-        // Handle double clicking on elements
-        $('#templateDiv > div').live('dblclick', function() {
+        }).on('dblclick', 'div', function() {
             inlineEdit($(this));
         });
 
