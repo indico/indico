@@ -29,7 +29,13 @@
                                 <p style="margin-left: 6px;">${ description }</p>
                             % endif
                         % endif
-                        <div id="roomBookingCal" style="margin-bottom: 20px"></div>
+                        <div id="roomBookingCal" style="margin-bottom: 20px">
+                        </div>
+                        % if numRooms == 0 and ofMyRooms:
+                            <div class="infoMessage" style="margin:40px  0 auto; width: 700px">
+                                <span class="bold">${_("Info")}:</span> ${_("You are not responsible for any room")}
+                            </div>
+                        % endif
                         </div>
                     </td>
                 </tr>
@@ -39,11 +45,13 @@
 </table>
 
 <script type="text/javascript">
-var roomBookingCalendar = new RoomBookingCalendar(${ jsonEncode(barsFossil) }, ${ jsonEncode(dayAttrs) }, ${ str(dayLimit).lower() }, ${ str(overload).lower() },
-        {"prevURL" : "${ prevURL }", "nextURL" : "${ nextURL }", "formUrl" : "${ calendarFormUrl }",
-        "startD" : "${ startD }", "endD" : "${ endD }", "periodName" : "${ periodName }", "search" : ${jsonEncode(search)},
-        "params" : ${ jsonEncode(calendarParams)}, "newBooking" : ${ str(newBooking).lower()}}, ${ str(manyRooms).lower() }, '${ repeatability }', '${ str(finishDate).lower() }', '${ flexibleDatesRange }'
-        ${',"' + str(urlHandlers.UHRoomBookingRejectAllConflicting.getURL()) + '"' if showRejectAllButton else ''});
-$E("roomBookingCal").set(roomBookingCalendar.draw());
-roomBookingCalendar.addRepeatabilityBarsHovers();
+% if numRooms != 0 or not ofMyRooms:
+    var roomBookingCalendar = new RoomBookingCalendar(${ jsonEncode(barsFossil) }, ${ jsonEncode(dayAttrs) }, ${ str(dayLimit).lower() }, ${ str(overload).lower() },
+            {"prevURL" : "${ prevURL }", "nextURL" : "${ nextURL }", "formUrl" : "${ calendarFormUrl }",
+            "startD" : "${ startD }", "endD" : "${ endD }", "periodName" : "${ periodName }", "search" : ${jsonEncode(search)},
+            "params" : ${ jsonEncode(calendarParams)}, "newBooking" : ${ str(newBooking).lower()}}, ${ str(manyRooms).lower() }, '${ repeatability }', '${ str(finishDate).lower() }', '${ flexibleDatesRange }'
+            ${',"' + str(urlHandlers.UHRoomBookingRejectAllConflicting.getURL()) + '"' if showRejectAllButton else ''});
+    $E("roomBookingCal").set(roomBookingCalendar.draw());
+    roomBookingCalendar.addRepeatabilityBarsHovers();
+% endif
 </script>

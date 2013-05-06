@@ -4898,8 +4898,11 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
             ed = rh._resvEx.endDT.date()
         else:
             ed = sd + timedelta(7)
+
+        if rh._ofMyRooms and not rh._rooms:
+            rh._resvs = []
         # autoCriteria - dates are calculated based on the next reservation
-        if rh._autoCriteria and not rh._resvs:
+        elif rh._autoCriteria and not rh._resvs:
             # reservation not found for the next 7 days, change search period to 30 days
             ed = sd + timedelta(30)
             rh._resvEx.startDT = datetime(sd.year, sd.month, sd.day, 0, 0)
@@ -5117,6 +5120,8 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         vars["repeatability"] = rh._repeatability
         vars["flexibleDatesRange"] = rh._flexibleDatesRange
         vars["calendarFormUrl"] = urlHandlers.UHRoomBookingBookingList.getURL()
+        vars["numRooms"] = len(rh._rooms) if rh._rooms else 0
+        vars["ofMyRooms"] = rh._ofMyRooms
 
         return vars
 
