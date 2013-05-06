@@ -435,7 +435,7 @@ $.widget('ui.search_tag', {
                 my: 'top center'
             },
             style: {
-                classes: 'ui-tooltip-shadow'
+                classes: 'qtip-shadow'
             },
             show: {
                 event: event.type,

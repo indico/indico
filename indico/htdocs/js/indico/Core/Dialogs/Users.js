@@ -1190,7 +1190,7 @@ $(function() {
 
             this.element.qtip({
                 style: {
-                    classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
+                    classes: 'qtip-rounded qtip-shadow qtip-popup',
                     tip: {
                         corner: true,
                         width: 15,

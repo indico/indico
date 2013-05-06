@@ -30,7 +30,7 @@ $("#protectionLink").qtip({
 
     style: {
         width: '280px',
-        classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
+        classes: 'qtip-rounded qtip-shadow qtip-popup',
         tip: {
             corner: true,
             width: 20,

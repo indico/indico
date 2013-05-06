@@ -1557,7 +1557,7 @@ div.room-row div.link {
     padding: 5px 0px 0px 5px;
 }
 
-.ui-tooltip-bold {
+.qtip-bold {
     font-weight: bold;
 }
 
@@ -7646,22 +7646,22 @@ div#social img#social_button:hover{
     color: #000;
 }
 
-.social_share_tooltip.ui-tooltip-dark h3 {
+.social_share_tooltip.qtip-dark h3 {
     color: #aaa;
     font-size: 15px;
 }
 
-.social_share_tooltip.ui-tooltip-blue h3 {
+.social_share_tooltip.qtip-blue h3 {
     color: #1F8DD1;
     font-size: 15px;
 }
 
-.social_share_tooltip.ui-tooltip-dark h4 {
+.social_share_tooltip.qtip-dark h4 {
     margin-bottom: 5px;
     color: #aaa;
 }
 
-.social_share_tooltip.ui-tooltip-blue h4 {
+.social_share_tooltip.qtip-blue h4 {
     margin-bottom: 5px;
     color: #1F8DD1;
 }
@@ -7672,20 +7672,20 @@ div#social img#social_button:hover{
     float: right;
 }
 
-.social_share_tooltip.ui-tooltip-dark .note {
+.social_share_tooltip.qtip-dark .note {
     color: #555;
 }
 
-.social_share_tooltip.ui-tooltip-blue .note {
+.social_share_tooltip.qtip-blue .note {
     color: #999;
 }
 
-.social_share_tooltip.ui-tooltip-dark .ui-tooltip-content{
+.social_share_tooltip.qtip-dark .qtip-content{
     background: rgba(40,40,40,0.96);
     border-color: #303030;
 }
 
-.social_share_tooltip.ui-tooltip-blue .ui-tooltip-content{
+.social_share_tooltip.qtip-blue .qtip-content{
     background: #E5F6FE;
     border-color: #ADD9ED;
     color: #5E99BD;
@@ -7711,11 +7711,11 @@ div#social img#social_button:hover{
     height: 25px;
 }
 
-.social_share_tooltip.ui-tooltip-dark .social_site {
+.social_share_tooltip.qtip-dark .social_site {
     background: rgba(0,0,0,0.15);
 }
 
-.social_share_tooltip.ui-tooltip-blue .social_site {
+.social_share_tooltip.qtip-blue .social_site {
     background: rgba(255,255,255,0.6);
 }
 
@@ -8603,7 +8603,7 @@ div.warning h3 {
     box-shadow: 1px 1px 5px rgba(100, 100, 100, 0.2);
 }
 
-.material_tip .ui-tooltip-content {
+.material_tip .qtip-content {
     background: #f8f8f8;
 }
 

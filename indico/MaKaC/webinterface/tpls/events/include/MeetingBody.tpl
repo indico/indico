@@ -94,7 +94,7 @@ var videoServiceInfo = {};
             at: 'top middle'
         },
         style: {
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-light'
+            classes: 'qtip-rounded qtip-shadow qtip-light'
         }
     });
 
@@ -125,7 +125,7 @@ var videoServiceInfo = {};
             }
         },
         style: {
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup'
+            classes: 'qtip-rounded qtip-shadow qtip-popup'
         }
     });
 
@@ -138,7 +138,7 @@ var videoServiceInfo = {};
             at: 'top middle'
         },
         style: {
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-light'
+            classes: 'qtip-rounded qtip-shadow qtip-light'
         }
     });
 

@@ -249,6 +249,7 @@ def register_all_css(env, main_css_file):
                                     'css/jquery.qtip.css',
                                     'css/jquery.colorbox.css',
                                     'css/jquery-ui-custom.css',
+                                    'css/jquery.qtip-custom.css',
                                     'css/jquery.colorpicker.css',
                                     'css/jquery.multiselect.filter.css',
                                     'css/jquery.multiselect.css',

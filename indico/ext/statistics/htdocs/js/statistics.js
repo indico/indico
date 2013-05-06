@@ -46,7 +46,7 @@ $(function() {
             at: 'bottom middle'
         },
         style: {
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-light'
+            classes: 'qtip-rounded qtip-shadow qtip-light'
         }
     });
 

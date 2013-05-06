@@ -304,7 +304,7 @@ type ("RoomBookingCalendarDrawer", [],
                             text: newResvInfo
                         },
                         style: {
-                            classes: "ui-tooltip-bold"
+                            classes: "qtip-bold"
                         },
                         position: {
                             target: 'mouse',

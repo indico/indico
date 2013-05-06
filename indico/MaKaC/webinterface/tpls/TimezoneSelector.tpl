@@ -18,7 +18,7 @@ $("#timezoneSelectorLink").qtip({
 
     style: {
         width: '300px',
-        classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup ui-tooltip-timezone',
+        classes: 'qtip-rounded qtip-shadow qtip-popup qtip-timezone',
         tip: {
             corner: true,
             width: 20,

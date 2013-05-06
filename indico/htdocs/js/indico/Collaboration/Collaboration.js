@@ -1907,7 +1907,7 @@ var makeMeModerator = function(videoLink, confId, bookingId, successFunction) {
                   if (exists(error)) {
                       IndicoUtil.errorReport(error);
                   } else if (exists(result.error) && result.error) {
-                      $('.ui-tooltip').qtip('hide');
+                      $('.qtip').qtip('hide');
                       new WarningPopup($T("Cannot become moderator"), result.userMessage).open();
                   } else {
                       successFunction(videoLink, result);

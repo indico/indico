@@ -249,7 +249,7 @@ $(document).ready(function() {
             $("<a/>").qtip({
                 style: {
                     width: '350px',
-                    classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
+                    classes: 'qtip-rounded qtip-shadow qtip-popup',
                     tip: {
                         corner: true,
                         width: 20,

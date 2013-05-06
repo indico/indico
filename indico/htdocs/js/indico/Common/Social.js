@@ -38,7 +38,7 @@ $(function() {
 
         style: {
             width: '420px',
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow social_share_tooltip' + (theme=='dark'?' ui-tooltip-dark':' ui-tooltip-blue')
+            classes: 'qtip-rounded qtip-shadow social_share_tooltip' + (theme=='dark'?' qtip-dark':' qtip-blue')
         },
         position: {
             my: 'bottom right',

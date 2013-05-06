@@ -248,7 +248,7 @@
             },
             style: {
                 width: 'auto',
-                classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-blue'
+                classes: 'qtip-rounded qtip-shadow qtip-blue'
             }
         },{
             beforeRender: updateStaticURL()

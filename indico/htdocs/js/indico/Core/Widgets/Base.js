@@ -804,7 +804,7 @@ type("JTabWidget", ["IWidget"], {
                 event: 'unfocus'
             },
             style: {
-                classes: 'ui-tooltip-rounded ui-tooltip-balloon',
+                classes: 'qtip-rounded qtip-balloon',
                 tip: {
                     corner: true,
                     width: 20,
