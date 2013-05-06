@@ -415,7 +415,6 @@ type("TimetableManagementActions", [], {
             params = this._addParams('Contribution');
         }
 
-        params.parentType = params.parentType;
         var dialog = new AddContributionDialog(
             this.methods[params.type].add,
             this.methods[params.parentType].dayEndDate,
