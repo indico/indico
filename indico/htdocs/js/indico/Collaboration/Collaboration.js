@@ -278,8 +278,8 @@ var refreshStartAllStopAllButtons = function() {
         var nTypesStart = 0;
         var nTypesStop = 0;
 
-        for (i=0; i < length; i++) {
-            booking = bookings.item(i);
+        for (var i=0; i < length; i++) {
+            var booking = bookings.item(i);
             if (booking.hasStart && booking.canBeStarted) {
                 if (booking.hasStartStopAll) {
                     nCanStart++;
@@ -334,7 +334,7 @@ var bookingTemplateM = function(booking) {
     var cellShowInfo;
     if (pluginHasFunction(booking.type, "showInfo")) {
         cellShowInfo = Html.td({className : "collaborationCellNarrow"});
-        showInfoButton = IndicoUI.Buttons.customImgSwitchButton(
+        var showInfoButton = IndicoUI.Buttons.customImgSwitchButton(
             showInfo[booking.id],
             Html.img({
                 alt: "Show info",
@@ -863,7 +863,7 @@ var displayBookings = function() {
  */
 var getBookingIndexById = function(id) {
     for (var i=0; i < bookings.length.get(); i++) {
-        booking = bookings.item(i);
+        var booking = bookings.item(i);
         if (booking.id == id) {
             return i;
         }
@@ -1558,7 +1558,7 @@ var sendRequest = function(pluginName, conferenceId) {
         var allErrors = [];
         var checks = codes[pluginName]["checkParams"]();
         each(checks, function(value, key){
-            customCheckFunction = value[2];
+            var customCheckFunction = value[2];
             if (exists(customCheckFunction)) {
                 var errors = customCheckFunction(values[key], values);
                 each (errors, function(error){
@@ -1692,7 +1692,7 @@ type("EditSpeakerEmail", ["ExclusivePopupWithButtons"],{
             var self = this;
             var div = Html.div("", $T("Email Address of "+self.fullName));
 
-            var text = Html.input('text', {style:{width:'100%'}}, value=self.email);
+            var text = Html.input('text', {style:{width:'100%'}}, self.email);
             text.setAttribute('id', 'emailField');
             return Html.div({}, div, text);
         },
@@ -1809,8 +1809,8 @@ type("SpeakersEmailPopup", ["BasicEmailPopup"],{
     _drawFromAddress: function(){
         var self = this;
         // drop down list with senders
-        optionList = Array();
-        for(i in self.fromList){
+        var optionList = [];
+        for(var i in self.fromList){
             optionList.push(Html.option({value: self.fromList[i].email}, self.fromList[i].name + " <"+self.fromList[i].email+">"));
         }
         var selectFromAddress = Html.select({id:"fromEmailAddress"}, optionList);
@@ -1876,9 +1876,9 @@ type("SpeakersEmailPopup", ["BasicEmailPopup"],{
                             IndicoUI.Dialogs.Util.alert($T("Email Format Error"), $T("The {talkTitle} field is missing in your email. This is a mandatory field thus, this email cannot be sent."));
                         }else{
                             self.close();
-                            span1 = Html.div({}, $T("Email sent successfully !"));
-                            span2 = Html.div({}, $T("The Electronic Agreement email has been sent to:"));
-                            span3 = Html.div({}, $T(""+result));
+                            var span1 = Html.div({}, $T("Email sent successfully !"));
+                            var span2 = Html.div({}, $T("The Electronic Agreement email has been sent to:"));
+                            var span3 = Html.div({}, $T(""+result));
 
                             informationPopup(Html.div({}, span1, span2, span3), null);
                         }
@@ -1887,8 +1887,7 @@ type("SpeakersEmailPopup", ["BasicEmailPopup"],{
             );
             //self.close();
         };
-        title = $T("Send Email to Speakers");
-        this.BasicEmailPopup(title, confTitle, confId, subject, defaultText, legends);
+        this.BasicEmailPopup($T("Send Email to Speakers"), confTitle, confId, subject, defaultText, legends);
     }
 );
 
@@ -1935,9 +1934,10 @@ var successMakeEventModerator = function(videoLink, result){
 
 var drawBookingPopup = function (videoInformation, confId, bookingId, displayModeratorLink) {
     var divWrapper = Html.div({className:"videoServiceInlinePopup"});
-    for(section in videoInformation){
+    for(var section in videoInformation){
         var leftCol = Html.div({className:"leftCol"}, videoInformation[section]["title"]);
         var rightCol = Html.div({className:"rightCol", id: videoInformation[section]["title"]});
+        var line;
         for(line in videoInformation[section]["lines"]){
             rightCol.append(Html.div({}, videoInformation[section]["lines"][line]));
         }

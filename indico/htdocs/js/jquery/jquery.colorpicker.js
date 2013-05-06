@@ -150,8 +150,8 @@
                                 return false;
                         },
                         changeHue = function(ev) {
-                                y = $(this).offset().top;
-                                preview = ev.data.cal.data('colorpicker').livePreview;
+                                var y = $(this).offset().top;
+                                var preview = ev.data.cal.data('colorpicker').livePreview;
                                 change.apply(
                                         ev.data.cal.data('colorpicker')
                                                 .fields
@@ -160,7 +160,7 @@
                                                 .get(0),
                                         [preview]
                                 );
-                        };
+                        },
                         downSelector = function (ev) {
                                 var current = {
                                         cal: $(this).parent(),
