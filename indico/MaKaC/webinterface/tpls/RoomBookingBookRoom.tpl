@@ -20,8 +20,9 @@
         var isValid = true;
 
         // Capacity validator
-        if ($('#capacity').val() != '' && ($('#capacity').val() < 0 || $('#capacity').val() > maxRoomCapacity || parseInt($('#capacity').val(), 10).toString() == 'NaN')) {
-            $('#capacity').addClass('invalid');
+        var capacity = $('#capacity').val();
+        if (capacity != '' && (capacity < 0 || capacity > maxRoomCapacity || parseInt(capacity, 10).toString() == 'NaN')) {
+            capacity.addClass('invalid');
             isValid = false;
         }
 
