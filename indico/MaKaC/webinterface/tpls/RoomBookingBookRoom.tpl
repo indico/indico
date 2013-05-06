@@ -112,7 +112,7 @@
            var o = $("#roomGUID").multiselect("option");
            var menu = $("#roomGUID").multiselect("widget");
 
-           $('.RoomBooking .ui-widget-header .ui-helper-reset').html('<li><span style="font-size: 13px">Select: </span><a class="ui-multiselect-all" href="#"><span class="ui-icon ui-icon-check"></span><span>' + o.checkAllText + '</span></a></li><li>, <a class="ui-multiselect-none" href="#"><span class="ui-icon ui-icon-close"></span><span>' + o.uncheckAllText + '</span></a>');
+           $('.RoomBooking .ui-widget-header .ui-helper-reset').html('<li><span>Select: </span> <a class="ui-multiselect-all" href="#"><span class="ui-icon ui-icon-check"></span><span>' + o.checkAllText + '</span></a></li><li>, <a class="ui-multiselect-none" href="#"><span class="ui-icon ui-icon-close"></span><span>' + o.uncheckAllText + '</span></a>');
 
            $('<div />').addClass('ui-multiselect-search-advanced')
                 .html(function(){
