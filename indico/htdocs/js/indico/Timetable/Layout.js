@@ -80,7 +80,7 @@ type("TimetableLayoutManager", [],
          pointsBetween: function(hStart, hEnd) {
              var result = [];
 
-             each(checkpoints, function(points, time) {
+             each(this.checkpoints, function(points, time) {
                  if ((hStart == 'nextday' && time == 'nextday') ||
                      (hStart != 'nextday' && time > hStart && time < hEnd))
                  {
