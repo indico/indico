@@ -111,17 +111,9 @@ var IndicoUtil = {
             if (isDom(component)) {
                 var node = component;
                 if (node.type == "checkbox") {
-                    if (node.name in values && exists($L(values[node.name]).indexOf(node.value))) {
-                        node.checked = true;
-                    } else {
-                        node.checked = false;
-                    }
+                    node.checked = node.name in values && exists($L(values[node.name]).indexOf(node.value));
                 } else if (node.type == "radio") {
-                    if (node.name in values && values[node.name] == node.value) {
-                        node.checked = true;
-                    } else {
-                        node.checked = false;
-                    }
+                    node.checked = node.name in values && values[node.name] == node.value;
                 } else {
                     node.value = values[node.name];
                 }

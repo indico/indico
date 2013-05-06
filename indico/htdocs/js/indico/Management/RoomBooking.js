@@ -294,13 +294,10 @@ type("RoomBookingReservationWidget", ["RoomBookingWidget"],
                 if(end.length == 7)
                     end = "0" + end;
 
-                if(this.sTime > start && this.sTime < end ||
-                   this.eTime > start && this.eTime < end ||
-                   this.sTime <= start && this.eTime >= end ||
-                   this.sTime >= start && this.eTime <= end)
-                    return true;
-                else
-                    return false;
+                return (this.sTime > start && this.sTime < end) ||
+                       (this.eTime > start && this.eTime < end) ||
+                       (this.sTime <= start && this.eTime >= end) ||
+                       (this.sTime >= start && this.eTime <= end);
             },
 
             _isInsideBooking: function(elem) {

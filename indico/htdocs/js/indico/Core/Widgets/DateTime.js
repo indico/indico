@@ -392,10 +392,8 @@ type("DateWidget", ["InlineEditWidget"],
             },
 
             _verifyInput: function() {
-                if (!Util.parseDateTime(this.date.get())) {
-                    return false;
-                }
-                return true;
+                return !!Util.parseDateTime(this.date.get());
+
             }
         },
         function(method, attributes, initValue) {

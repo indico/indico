@@ -761,11 +761,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
         var self = this;
 
         var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
-        if (IndicoGlobalVars.isUserAuthenticated && !exists(IndicoGlobalVars['favorite-user-ids'])) {
-            self.args.includeFavList = true;
-        } else {
-            self.args.includeFavList = false;
-        }
+        self.args.includeFavList = IndicoGlobalVars.isUserAuthenticated && !exists(IndicoGlobalVars['favorite-user-ids']);
         var users = indicoSource(method, self.args);
 
         users.state.observe(function(state) {
@@ -1284,9 +1280,7 @@ type("ResourceListWidget", ["ListWidget"], {
         var protectionIcon;
 
         if (resource.get('reviewingState') < 3 || (resource.get('reviewingState') == 3 && self.canReviewModify)) {
-            if(resource.get('reviewingState') == 3){
-                flag = true;
-            } else { flag = false;}
+            flag = resource.get('reviewingState') == 3;
             var protection = Protection.resolveProtection(resource.get('protection'),self.matParams.materialProtection);
 
             protectionIcon = Html.span({}, protection==1?

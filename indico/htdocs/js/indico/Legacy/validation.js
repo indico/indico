@@ -18,9 +18,8 @@
 function is_valid_int( s )
 {
     var i = parseInt(s, 10);
-    if ( i.toString() == 'NaN'  ||  ((i.toString() != s) && ('0'+i.toString() != s ) ) )
-        return false;
-    return true
+    return !(i.toString() == 'NaN' || ((i.toString() != s) && ('0' + i.toString() != s ) ));
+
 }
 
 // Returns true if and only if specified values create a valid date.
@@ -35,13 +34,7 @@ function is_valid_date( day, month, year )
     var dteDate = new Date(yearl, monthl, dayl);
     if ( dteDate.valueOf().toString() == 'NaN' )
         return false;
-    if (
-        ( dayl != dteDate.getDate() ) ||
-        ( monthl != dteDate.getMonth() ) ||
-        ( yearl != dteDate.getFullYear() )
-       )
-        return false;
-    return true
+    return dayl == dteDate.getDate() && monthl == dteDate.getMonth() && yearl == dteDate.getFullYear();
 }
 // Returns true if and only if specified time (string) represents
 // a valid hh:mm time, where hh in <0,24> and mm in <0,59>.
@@ -51,15 +44,10 @@ function is_valid_time( time )
     if ( ( time ).match( TIME_PATTERN ) == null )
         return false;
     var ix = time.indexOf(':');
-    var hour = time.substr(0, ix);
-    var minute = time.substr(ix + 1, 2);
-    var hour = parseInt(hour, 10);
-    var minute = parseInt(minute, 10);
-    if ( hour < 0 || hour > 23 )
-        return false;
-    if ( minute < 0 || minute > 59 )
-        return false;
-    return true
+    var hour = parseInt(time.substr(0, ix), 10);
+    var minute = parseInt(time.substr(ix + 1, 2), 10);
+    return (hour >= 0 && hour <= 23 && minute >= 0 && minute < 60);
+
 }
 // Returns true if and only if sTime is before eTime.
 // Pass it two strings of hh:mm format.

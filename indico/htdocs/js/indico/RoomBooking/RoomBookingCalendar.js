@@ -561,9 +561,7 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                 var self = this;
                 var days = [];
                 $.each(this.data.days, function(index, day){
-                    highlight = false;
-                    if (self.data.repeatability == '0' || (index == self.data.flexibleDatesRange || (index - self.data.flexibleDatesRange) %  (2 * self.data.flexibleDatesRange + 1) == 0))
-                        highlight = true;
+                    var highlight = self.data.repeatability == '0' || (index == self.data.flexibleDatesRange || (index - self.data.flexibleDatesRange) % (2 * self.data.flexibleDatesRange + 1) == 0);
                     days.push(self.drawDay(day, highlight));
                 });
 

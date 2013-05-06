@@ -130,10 +130,7 @@ type("NumberAnswersEditWidget", ["InlineEditWidget"],
             },
 
             _verifyInput: function() {
-                if (!this.__parameterManager.check()) {
-                    return false;
-                }
-                return true;
+                return this.__parameterManager.check();
             },
 
             _handleSuccess: function() {
