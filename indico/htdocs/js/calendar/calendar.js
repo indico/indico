@@ -253,7 +253,6 @@ Calendar.showMonthsCombo = function () {
 	if (!cal) {
 		return false;
 	}
-	var cal = cal;
 	var cd = cal.activeDiv;
 	var mc = cal.monthsCombo;
 	if (cal.hilitedMonth) {
@@ -284,7 +283,6 @@ Calendar.showYearsCombo = function (fwd) {
 	if (!cal) {
 		return false;
 	}
-	var cal = cal;
 	var cd = cal.activeDiv;
 	var yc = cal.yearsCombo;
 	if (cal.hilitedYear) {
