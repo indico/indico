@@ -95,7 +95,7 @@
             });
     }
 
-    $(window).load(function() {
+    $(window).on('load', function() {
         $('#searchForm').delegate(':input', 'keyup change', function() {
             forms_are_valid();
         }).submit(function(e) {

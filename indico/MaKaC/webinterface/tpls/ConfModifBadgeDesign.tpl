@@ -494,7 +494,7 @@
             height: templateDimensions.height + 'px',
             width: templateDimensions.width + 'px',
             zIndex: 5
-        }).load(function() {
+        }).on('load', function() {
             $('#loadingIcon').hide();
             $('#removeBackground').removeClass('hidden');
             setBackgroundPos(backgroundPos);

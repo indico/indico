@@ -123,7 +123,7 @@
         $('#bookingForm').submit();
     };
 
-    $(window).load(function() {
+    $(window).on('load', function() {
 
         % if showErrors:
             var popup = new ExclusivePopupWithButtons($T('Booking failed'), function(){popup.close();}, false, false, true);

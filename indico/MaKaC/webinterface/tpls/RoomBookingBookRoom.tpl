@@ -69,7 +69,7 @@
         return isValid;
     }
 
-    $(window).load(function() {
+    $(window).on('load', function() {
 
         // Multiselect widget init
         $('#roomGUID').multiselect({
