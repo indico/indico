@@ -635,6 +635,4 @@ def registerException(errorText=""):
     """
     Write down the error in the error log file
     """
-    Logger.get('wsgi').exception('WSGI Exception')
-
-
+    Logger.get('wsgi').exception(errorText or 'WSGI Exception')
