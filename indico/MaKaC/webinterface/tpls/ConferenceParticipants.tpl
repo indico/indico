@@ -125,11 +125,11 @@ var actionParticipantRows = function(){
     });
 
     $("tr[id^=participant]").hover(function () {
-        if($(this).find('input:checkbox:checked[id^=checkParticipant]').size() == 0){
+        if($(this).find('input:checkbox:checked[id^=checkParticipant]').length == 0){
             $(this).css({'background-color' : 'rgb(255, 246, 223)'});
         }}
         , function () {
-          if($(this).find('input:checkbox:checked[id^=checkParticipant]').size() > 0){
+          if($(this).find('input:checkbox:checked[id^=checkParticipant]').length > 0){
               $(this).css('background-color',"#CDEB8B");
           }else{
               $(this).css('background-color',"transparent");

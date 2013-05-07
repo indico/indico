@@ -86,11 +86,11 @@ var actionPendingRows = function(){
     });
 
     $("tr[id^=pending]").hover(function () {
-        if($(this).find('input:checkbox:checked[id^=checkPending]').size() == 0){
+        if($(this).find('input:checkbox:checked[id^=checkPending]').length == 0){
             $(this).css({'background-color' : 'rgb(255, 246, 223)'});
         }}
         , function () {
-          if($(this).find('input:checkbox:checked[id^=checkPending]').size() > 0){
+          if($(this).find('input:checkbox:checked[id^=checkPending]').length > 0){
               $(this).css('background-color',"#CDEB8B");
           }else{
               $(this).css('background-color',"transparent");
