@@ -1457,10 +1457,7 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
                  }
 
                  var eventData = data[blockData.id];
-
                  var block;
-
-                 var empty = _(eventData.entries).size() > 0;
                  var compactMode = false;
                  // For now don't use the compact mode. Activating it makes short entries displaying less
                  // information in the block (only time and title).
