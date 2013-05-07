@@ -217,12 +217,12 @@
         }
 
         $("#capacity").val(rbUserData.capacity);
-        $("#videoconference").attr('checked',(rbUserData.videoconference));
-        $("#webcast").attr('checked',(rbUserData.webcast));
-        $("#publicroom").attr('checked',(rbUserData.publicroom));
+        $("#videoconference").prop('checked', rbUserData.videoconference);
+        $("#webcast").prop('checked', rbUserData.webcast);
+        $("#publicroom").prop('checked', rbUserData.publicroom);
 
         $("#finishDate").val(rbUserData.finishDate);
-        $("#flexibleDates").attr('checked',(rbUserData.flexibleDates));
+        $("#flexibleDates").prop('checked', rbUserData.flexibleDates);
         if (rbUserData.flexibleDatesRange) {
             $("#flexibleDatesRange").val(rbUserData.flexibleDatesRange);
         }
@@ -271,7 +271,7 @@
         $('#bookingLegend').width($('.ui-multiselect-menu').width());
         $("#advancedOptionsText").addClass('fakeLink');
         $("#maxRoomCapacity").text(maxRoomCapacity);
-        $('#flexibleDatesRange').attr('disabled', !$("#flexibleDates").attr('checked'));
+        $('#flexibleDatesRange').prop('disabled', !$("#flexibleDates").prop('checked'));
         if ($("#finishDate").val() == 'true')
             $('#eDatePlaceDiv').show();
 
@@ -323,7 +323,7 @@
             }
             if ($(this).val() == '0') {
                 $('#flexibleDatesDiv').hide();
-                $('#flexibleDates').attr('checked', false);
+                $('#flexibleDates').prop('checked', false);
             } else {
                 $('#flexibleDatesDiv').show();
             }
@@ -331,6 +331,10 @@
         });
 
         $('#repeatability').change();
+
+        $('#flexibleDates').on('change', function() {
+            $('#flexibleDatesRange').prop('disabled', !this.checked);
+        });
  });
 </script>
 
@@ -461,7 +465,7 @@
                 </div>
                 <div class="infoMessage" id="holidays-warning" style="float: left; display: none"></div>
                 <div id="flexibleDatesDiv" style="float: left; clear: both; ">
-                    <input name="flexibleDates" type="checkbox" id="flexibleDates" onclick="if ($(this).attr('checked')) {$('#flexibleDatesRange').attr('disabled', false);} else {$('#flexibleDatesRange').attr('disabled', true);}" />
+                    <input name="flexibleDates" type="checkbox" id="flexibleDates" />
                    ${ _("Flexible on dates") }
                     <select name="flexibleDatesRange" id="flexibleDatesRange">
                       <option value="1">${ _("+/- 1 day")}</option>

@@ -139,12 +139,12 @@ var actionParticipantRows = function(){
 };
 
 var selectAll = function () {
-    $('input:checkbox[id^=checkParticipant]').attr('checked', 'checked');
+    $('input:checkbox[id^=checkParticipant]').prop('checked', true);
     $('input:checkbox[id^=checkParticipant]').parents('tr[id^=participant]').css('background-color',"#CDEB8B");
 };
 
 var deselectAll = function () {
-    $('input:checkbox[id^=checkParticipant]').removeAttr('checked');
+    $('input:checkbox[id^=checkParticipant]').prop('checked', false);
     $('input:checkbox[id^=checkParticipant]').parents('tr[id^=participant]').css('background-color',"transparent");
 };
 

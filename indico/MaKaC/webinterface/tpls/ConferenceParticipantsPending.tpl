@@ -121,11 +121,11 @@ IndicoUI.executeOnLoad(function(){
     checkNumberPending();
 
     $("#selectPending").click(function(){
-        if($(this).attr('checked')){
-            $('input:checkbox[id^=checkPending]').attr('checked', 'checked');
+        if($(this).prop('checked')){
+            $('input:checkbox[id^=checkPending]').prop('checked', true);
             $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"#CDEB8B");
         }else{
-            $('input:checkbox[id^=checkPending]').removeAttr('checked');
+            $('input:checkbox[id^=checkPending]').prop('checked', false);
             $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"transparent");
         }
     });
@@ -185,12 +185,12 @@ IndicoUI.executeOnLoad(function(){
     };
 
     $('#selectAll').click(function () {
-        $('input:checkbox[id^=checkPending]').attr('checked', 'checked');
+        $('input:checkbox[id^=checkPending]').prop('checked', true);
         $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"#CDEB8B");
     });
 
     $('#deselectAll').click(function () {
-        $('input:checkbox[id^=checkPending]').removeAttr('checked');
+        $('input:checkbox[id^=checkPending]').prop('checked', false);
         $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"transparent");
     });
 

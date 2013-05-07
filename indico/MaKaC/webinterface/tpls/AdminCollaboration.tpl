@@ -413,7 +413,7 @@ var updateStaticURL = function() {
         url = url + '&fromTitle=' + queryParams.fromTitle + '&toTitle=' + queryParams.toTitle;
     }
 
-    $('#staticURL').attr('value', url);
+    $('#staticURL').val(url);
     $('#staticURLLink').attr('href', url);
 };
 

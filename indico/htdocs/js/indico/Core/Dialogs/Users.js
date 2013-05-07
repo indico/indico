@@ -1233,7 +1233,7 @@ $(function() {
 
             if (this.options.submission) {
                 var submissionCheckbox = $("<input type='checkbox'>")
-                                            .attr('checked', this.options.userData.get('isSubmitter') ? true : false)
+                                            .prop('checked', !!this.options.userData.get('isSubmitter'))
                                             .css('marginRight', '8px').css('verticalAlign', 'middle');
 
                 submissionCheckbox.click(function(){

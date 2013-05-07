@@ -242,43 +242,43 @@
     var newAbst = false;
 
     function selectAllTracks() {
-        $("#filterOptionForm #Tracks input:checkbox").attr("checked", true)
+        $("#filterOptionForm #Tracks input:checkbox").prop("checked", true)
     }
 
     function unselectAllTracks() {
-        $("#filterOptionForm #Tracks input:checkbox").attr("checked", false)
+        $("#filterOptionForm #Tracks input:checkbox").prop("checked", false)
     }
 
     function selectAllTypes() {
-        $("#filterOptionForm #Types input:checkbox").attr("checked", true)
+        $("#filterOptionForm #Types input:checkbox").prop("checked", true)
     }
 
     function unselectAllTypes() {
-        $("#filterOptionForm #Types input:checkbox").attr("checked", false)
+        $("#filterOptionForm #Types input:checkbox").prop("checked", false)
     }
 
     function selectAllStatus() {
-        $("#filterOptionForm #Status input:checkbox").attr("checked", true)
+        $("#filterOptionForm #Status input:checkbox").prop("checked", true)
     };
 
     function unselectAllStatus() {
-        $("#filterOptionForm #Status input:checkbox").attr("checked", false)
+        $("#filterOptionForm #Status input:checkbox").prop("checked", false)
     }
 
     function selectAllAccTracks() {
-        $("#filterOptionForm #AccTracks input:checkbox").attr("checked", true)
+        $("#filterOptionForm #AccTracks input:checkbox").prop("checked", true)
     }
 
     function unselectAllAccTracks() {
-        $("#filterOptionForm #AccTracks input:checkbox").attr("checked", false)
+        $("#filterOptionForm #AccTracks input:checkbox").prop("checked", false)
     }
 
     function selectAllAccTypes() {
-        $("#filterOptionForm #AccTypes input:checkbox").attr("checked", true)
+        $("#filterOptionForm #AccTypes input:checkbox").prop("checked", true)
     }
 
     function unselectAllAccTypes() {
-        $("#filterOptionForm #AccTypes input:checkbox").attr("checked", false)
+        $("#filterOptionForm #AccTypes input:checkbox").prop("checked", false)
     }
 
     function atLeastOneSelected() {
@@ -326,12 +326,12 @@
     }
 
     function selectAll() {
-        $('tr[id^=abstracts] input:checkbox').attr('checked', true);
+        $('tr[id^=abstracts] input:checkbox').prop('checked', true);
         $('tr[id^=abstracts]').css('background-color',"#CDEB8B");
     }
 
     function selectNone() {
-        $('tr[id^=abstracts] input:checkbox').attr('checked', false);
+        $('tr[id^=abstracts] input:checkbox').prop('checked', false);
         $('tr[id^=abstracts]').css('background-color',"transparent");
     }
 
@@ -422,14 +422,14 @@ $(function(){
     // Cleanup previous actions
     var CleanupHiddenFields = function (){
         $("#abstractsForm input[type=hidden]").remove();
-    }
+    };
 
     // Insert hidden field to the form
     var InsertHiddenField = function (name, array){
         for (var index in array){
             $('#abstractsForm').append($("<input>").attr("type", "hidden").attr("name", name).val(array[index]));
         }
-    }
+    };
 
     _({
       "#accept_abstracts": {"acceptMultiple": [$T("Accept")]},
@@ -458,11 +458,11 @@ $(function(){
     });
 
     $("#selectDisplay").click(function(){
-      $("#displayMenu input[type=checkbox]").attr("checked",true);
+      $("#displayMenu input[type=checkbox]").prop("checked",true);
     });
 
     $("#unselectDisplay").click(function(){
-      $("#displayMenu input[type=checkbox]").attr("checked",false);
+      $("#displayMenu input[type=checkbox]").prop("checked",false);
     });
 
     $("#selectAll").click(function(){

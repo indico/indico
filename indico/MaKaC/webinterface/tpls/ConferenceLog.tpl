@@ -111,8 +111,8 @@ $(document).ready(function(){
         $("#emptyLog").removeClass("hidden");
     }
 
-    if ($("#searchInput").attr("value") !== "") {
-        $("#searchInput").attr("value", "");
+    if ($("#searchInput").val() !== "") {
+        $("#searchInput").val("");
     }
 
     /* UI animations */
@@ -205,7 +205,7 @@ $(document).ready(function(){
 
     $("#searchBox .reset-input").click(function(e) {
         e.preventDefault();
-        $("#searchInput").attr("value", "");
+        $("#searchInput").val("");
         applyFilters();
         updateResetButton();
     });
@@ -234,7 +234,7 @@ $(document).ready(function(){
     };
 
     var getSearchFilteredItems = function() {
-        var term = $("#searchInput").attr("value");
+        var term = $("#searchInput").val();
 
         if (resultCache[term] == undefined) {
             var items = $("h3.i-table.searchable:contains('"+ term +"')").next().find("tr.i-table.interactive");
@@ -287,7 +287,7 @@ $(document).ready(function(){
     };
 
     var updateResetButton = function() {
-        if ($("#searchInput").attr("value") === "") {
+        if ($("#searchInput").val() === "") {
             $(".reset-input").css('visibility', 'hidden');
         } else {
             $(".reset-input").css('visibility', 'visible');

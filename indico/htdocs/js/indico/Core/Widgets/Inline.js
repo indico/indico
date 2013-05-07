@@ -128,7 +128,7 @@ type("SwitchOptionButton", ["InlineWidget"],
              checkbox.prop('disabled', this.disabled);
 
              if(this.initState !== null){
-                 checkbox.attr("checked", this.initState);
+                 checkbox.prop("checked", this.initState);
              } else{
                  request(self.attributes, false);
              }

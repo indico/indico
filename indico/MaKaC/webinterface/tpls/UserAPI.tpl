@@ -134,7 +134,7 @@
                             IndicoUI.Dialogs.Util.error(error);
                         }
                         else{
-                            $('#enablePersistentSignatures').attr('value', (result == true ? $T('Disable') : $T('Enable')) + $T(' persistent signatures') )
+                            $('#enablePersistentSignatures').val((result ? $T('Disable') : $T('Enable')) + $T(' persistent signatures'));
                             $('#enablePersistentSignatures').data("enabled", result == true ? "1" : "0");
                         }
                     });

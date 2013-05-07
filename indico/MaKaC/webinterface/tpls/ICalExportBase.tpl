@@ -24,16 +24,12 @@
 <%block name="script" args="item">
 <script type="text/javascript">
 var setURLs = function(urls){
-    if($('#detailExport${item.getUniqueId()}').attr("checked") === "checked"){
-        $('#publicLink${item.getUniqueId()}').attr('value', urls["publicRequestDetailedURL"]);
-        $('#publicLink${item.getUniqueId()}').attr('title', urls["publicRequestDetailedURL"]);
-        $('#authLink${item.getUniqueId()}').attr('value', urls["authRequestDetailedURL"]);
-        $('#authLink${item.getUniqueId()}').attr('title', urls["authRequestDetailedURL"]);
+    if($('#detailExport${item.getUniqueId()}').prop("checked")){
+        $('#publicLink${item.getUniqueId()}').val(urls["publicRequestDetailedURL"]).attr('title', urls["publicRequestDetailedURL"]);
+        $('#authLink${item.getUniqueId()}').val(urls["authRequestDetailedURL"]).attr('title', urls["authRequestDetailedURL"]);
     }else{
-        $('#publicLink${item.getUniqueId()}').attr('value', urls["publicRequestURL"]);
-        $('#publicLink${item.getUniqueId()}').attr('title', urls["publicRequestURL"]);
-        $('#authLink${item.getUniqueId()}').attr('value', urls["authRequestURL"]);
-        $('#authLink${item.getUniqueId()}').attr('title', urls["authRequestURL"]);
+        $('#publicLink${item.getUniqueId()}').val(urls["publicRequestURL"]).attr('title', urls["publicRequestURL"]);
+        $('#authLink${item.getUniqueId()}').val(urls["authRequestURL"]).attr('title', urls["authRequestURL"]);
     }
 };
 </script>

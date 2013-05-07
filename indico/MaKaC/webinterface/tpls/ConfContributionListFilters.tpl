@@ -83,7 +83,7 @@
         $(".contributionListContribItem").hide();
         var selector= [];
 
-        var term = $("#filterContribs").attr('value');
+        var term = $("#filterContribs").val();
         allItems.css('display', 'none');
         if (resultCache[term] == undefined) {
             var items = $(".contributionListContribItem:contains('"+ term +"')");
@@ -156,12 +156,12 @@
         if (query !=""){
             query = "&filter=yes" + query;
         }
-        var term = $("#filterContribs").attr('value');
+        var term = $("#filterContribs").val();
         if(term != ""){
             query += "&filterText=" + term;
         }
         url += query;
-        $('#staticURL').attr('value', url);
+        $('#staticURL').val(url);
     };
 
     var createMultiselect = function(place, kind){
@@ -199,7 +199,7 @@
         });
 
         $("#resetFilters").click(function(){
-            $("#filterContribs").attr("value","");
+            $("#filterContribs").val('');
             $("#contribTypeSelector, #sessionSelector , #trackSelector").multiselect("checkAll");
             verifyFilters();
             $("#resetFiltersContainer").hide();
@@ -215,7 +215,7 @@
                     $("div.contributionListContribItem:visible").each(function(){
                         $('<input />').attr('type', 'hidden')
                         .attr('name', "contributions")
-                        .attr('value', $(this).data("id"))
+                        .val($(this).data("id"))
                         .appendTo('#formContrib');
                     });
                     return true;

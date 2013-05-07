@@ -42,7 +42,7 @@ $(document).ready(function() {
     var has_checked = false;
 
     buttons.map(function() {
-      if ($(this).attr('checked')) {
+      if ($(this).prop('checked')) {
         has_checked = true;
       }
     });
@@ -51,13 +51,7 @@ $(document).ready(function() {
   };
 
   var ascertain_dl_button_status = function() {
-    var download_button = $('#downloadPDF');
-
-    if (! has_template_selected()) {
-      download_button.attr('disabled', 'disabled');
-    } else {
-      download_button.removeAttr('disabled');
-    }
+    $('#downloadPDF').prop('disabled', !has_template_selected());
   };
 
   $('input[name=templateId]:radio').change(function() {

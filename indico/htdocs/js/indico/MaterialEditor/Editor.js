@@ -958,7 +958,7 @@ type("EditMaterialDialog", ["EditMaterialResourceBase"], {
         self.pm.add(self.materialTitle, 'text', false);
 
         if (self.material.get('isBuiltin')) {
-            $(self.materialTitle.dom).attr('readonly', 'readonly').css('color', '#888').qtip(
+            $(self.materialTitle.dom).prop('readonly', true).css('color', '#888').qtip(
                 {content: $T("This is a default material type and its name cannot be changed. You should create a new type instead."),
                  position: {my: 'bottom center', at: 'top center'}});
         }

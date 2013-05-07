@@ -20,7 +20,7 @@
 
             <script type="text/javascript">
                 $('#setAccessKey').click(function(e) {
-                    var accessKey = $('#accessKey').prop("value");
+                    var accessKey = $('#accessKey').val();
                     new ConfirmPopup($T("Set access key"), $T("Please note that it is more secure to make the event private instead of using an access key."), function(confirmed){
                         if(confirmed){
                             indicoRequest('event.protection.setAccessKey', {

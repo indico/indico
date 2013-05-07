@@ -146,13 +146,8 @@ var sendTestAlarm = function ()
 
 IndicoUI.executeOnLoad(function()
 {
-    $("#defineRecipients").click(function ()
-    {
-        if ($("#email").is(":disabled")){
-            $("#email").removeAttr("disabled");
-        } else {
-            $("#email").attr("disabled",true);
-        }
+    $("#defineRecipients").on('change', function () {
+        $('#email').prop('disabled', !this.checked);
     });
     var dateAlarm = IndicoUI.Widgets.Generic.dateField(true,null,['day', 'month', 'year','hour', 'minute']);
     $('#datePlace').append($(dateAlarm.dom));
@@ -160,7 +155,7 @@ IndicoUI.executeOnLoad(function()
         dateAlarm.set('${alarm_date.strftime(date_format)}');
     % endif
     var checkRecipients = function(){
-        if((!$('#toAllParticipants').attr('checked') && !$('#defineRecipients').attr('checked')) || ($('#defineRecipients').attr('checked') && !Util.Validation.isEmailList($("#email").val())) ){
+        if((!$('#toAllParticipants').prop('checked') && !$('#defineRecipients').prop('checked')) || ($('#defineRecipients').prop('checked') && !Util.Validation.isEmailList($("#email").val())) ){
             return Html.span({}, $T("Please select the checkbox 'Send to all participants' or 'Define recipients' with a list of emails."));
         }
         return null;
@@ -173,7 +168,7 @@ IndicoUI.executeOnLoad(function()
     parameterManager.add($E('defineRecipients'),'checkbox',true,checkRecipients);
     parameterManager.add($E('email'),'text',true,checkRecipients);
     parameterManager.add($E('timeBefore'),'int',true,function(){
-        if($('[name=dateType]:checked').val() == "2" && (!IndicoUtil.isInteger($('#timeBefore').attr("value")) || $('#timeBefore').attr("value")<=0)){
+        if($('[name=dateType]:checked').val() == "2" && (!IndicoUtil.isInteger($('#timeBefore').val()) || $('#timeBefore').val()<=0)){
             return Html.span({}, $T("The time before must be a positive number"));
         }
         return null;

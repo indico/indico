@@ -3,7 +3,7 @@ $(function() {
     var allItems = $(".index .item");
 
     $("#filter_text").keyup(function(){
-        var searchString = $(this).attr('value');
+        var searchString = $(this).val();
 
         allItems.addClass('visibility_hidden');
         var items;

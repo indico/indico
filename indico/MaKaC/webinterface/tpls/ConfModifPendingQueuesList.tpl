@@ -69,7 +69,7 @@
 
 function verifyFilters() {
     $(".speaker_list > li").hide();
-    var term = $("#filterSpeakers").attr('value');
+    var term = $("#filterSpeakers").val();
     var items = $("ol.contributions li:contains('"+ term +"'), " +
                   ".speaker_list li .name:contains('"+ term +"')").closest('.speaker_list > li');
 

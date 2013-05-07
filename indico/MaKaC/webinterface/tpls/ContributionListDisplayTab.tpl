@@ -23,8 +23,7 @@
 <script type="text/javascript">
 var verifyFilters = function() {
     $(".contributionListContribItem").hide();
-    var selector= [];
-    var term = $("#filterContribs").attr('value');
+    var term = $("#filterContribs").val();
     var items = $(".contributionListContribItem:contains('"+ term +"')");
 
     items.show();
@@ -43,7 +42,7 @@ var verifyFiltersAndReset = function() {
 
 $(document).ready(function(){
     $("#resetFilters").click(function() {
-        $("#filterContribs").attr("value", "");
+        $("#filterContribs").val("");
         verifyFiltersAndReset();
     });
 

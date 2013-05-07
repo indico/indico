@@ -143,7 +143,7 @@ function restoreSelection(selectedRooms) {
 // Show advanced option search menu
 function showAdvancedOptions() {
     if ($('#advancedOptions').is(":visible")) {
-        $("#advancedOptions input:checkbox").attr("checked", false);
+        $("#advancedOptions input:checkbox").prop("checked", false);
         $("#advancedOptions input:text").val('');
         $('#advancedOptions').hide();
         $('#advancedOptionsText').css('color', '#0B63A5');
@@ -175,12 +175,7 @@ function updateCapacitySlider(event, ui) {
 
 // Multiselect style modification
 function changeSelectedStyle(selector) {
-    if(selector.attr('checked') === undefined) {
-        selector.parent().removeClass('ui-state-selected');
-    } else {
-        selector.parent().addClass('ui-state-selected');
-    }
-
+    selector.parent().toggleClass('ui-state-selected', selector.prop('checked'));
 }
 
 function changeSelectedStyleAll() {
