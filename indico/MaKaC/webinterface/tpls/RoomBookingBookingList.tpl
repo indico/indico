@@ -33,7 +33,7 @@
                         </div>
                         % if numRooms == 0 and ofMyRooms:
                             <div class="infoMessage" style="margin:40px  0 auto; width: 700px">
-                                <span class="bold">${_("Info")}:</span> ${_("You are not responsible for any room")}
+                                ${_("You are not responsible for any rooms")}
                             </div>
                         % endif
                         </div>

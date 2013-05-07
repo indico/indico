@@ -22,7 +22,7 @@
 
                 holidaysWarning.state.observe(function(state) {
                     if (state == SourceState.Loaded) {
-                        $('#holidays-warning').html("<strong>Info: </strong>" + holidaysWarning.get());
+                        $('#holidays-warning').html(holidaysWarning.get());
                         if (holidaysWarning.get() == '')
                             $('#holidays-warning').hide();
                         else

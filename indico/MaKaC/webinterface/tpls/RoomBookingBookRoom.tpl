@@ -31,7 +31,7 @@
             var holidaysWarning = indicoSource('roomBooking.getDateWarning', searchForm.serializeObject());
             holidaysWarning.state.observe(function(state) {
                 if (state == SourceState.Loaded) {
-                    $('#holidays-warning').html($T("<strong>Info: </strong>") + holidaysWarning.get());
+                    $('#holidays-warning').html(holidaysWarning.get());
                     if (holidaysWarning.get() == '')
                         $('#holidays-warning').hide();
                     else
