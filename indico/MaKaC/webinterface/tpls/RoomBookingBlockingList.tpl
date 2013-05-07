@@ -40,16 +40,14 @@
     </table>
 
     <script type="text/javascript">
-        $('.blockingShowRooms').toggle(function(e) {
+        $('.blockingShowRooms').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
-            $this.text('Hide rooms').closest('tr').next('.blockingRoomList').show();
-            $this.closest('tbody').addClass('hasRoomList');
-        }, function(e) {
-            e.preventDefault();
-            var $this = $(this);
-            $this.text('Show rooms').closest('tr').next('.blockingRoomList').hide();
-            $this.closest('tbody').removeClass('hasRoomList');
+            var roomList = $this.closest('tr').next('.blockingRoomList');
+            var show = roomList.is(':hidden');
+            $this.text(show ? $T('Hide rooms') : $T('Show rooms'));
+            roomList.toggle(show);
+            $this.closest('tbody').toggleClass('hasRoomList', show);
         });
     </script>
 % else:
