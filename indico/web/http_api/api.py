@@ -443,26 +443,16 @@ class EventTimeTableHook(HTTPAPIHook):
 class EventSearchHook(HTTPAPIHook):
     TYPES = ('event',)
     RE = r'search/(?P<search_term>[^\/]+)'
+    DEFAULT_DETAIL = 'events'
 
     def _getParams(self):
         super(EventSearchHook, self)._getParams()
-        self._search = self._pathParams['search_term']
-
+        search = self._pathParams['search_term']
+        self._query = ' AND '.join(map(lambda y: "*%s*" % y, filter(lambda x: len(x) > 0, search.split(' '))))
 
     def export_event(self, aw):
-        ch = ConferenceHolder()
-        index = IndexesHolder().getIndex('conferenceTitle')
-        try:
-            query = ' AND '.join(map(lambda y: "*%s*" % y, filter(lambda x: len(x) > 0, self._search.split(' '))))
-            results = index.search(query)
-        except parsetree.ParseError:
-            results = []
-        d = []
-        for id, v in results:
-            event = ch.getById(id)
-            if event.canAccess(aw):
-                d.append({'id': id, 'title': event.getTitle(), 'startDate': event.getStartDate(), 'hasAnyProtection': event.hasAnyProtection()})
-        return d
+        expInt = EventSearchFetcher(aw, self)
+        return expInt.event(self._query)
 
 
 @HTTPAPIHook.register
@@ -721,6 +711,26 @@ class ContributionFetcher(SessionContribFetcher):
 
         return self._process(_iterate_objs(idlist))
 
+class EventSearchFetcher(IteratedDataFetcher):
+    DETAIL_INTERFACES = {
+        'events': IConferenceMetadataFossil,
+    }
+
+    def event(self, query):
+        ch = ConferenceHolder()
+        index = IndexesHolder().getById("conferenceTitle")
+        def _iterate_objs(query):
+            try:
+                results = index.search(query)
+            except parsetree.ParseError:
+                results = []
+            for id, _ in results:
+                event = ch.getById(id)
+                if event is not None and event.canAccess(self._aw):
+                    yield event
+
+        for event in sorted(itertools.islice(_iterate_objs(query), self._offset, self._offset + self._limit), key=self._sortingKeys.get(self._orderBy), reverse=self._descending):
+            yield {'id': event.getId(), 'title': event.getTitle(), 'startDate': event.getStartDate(), 'hasAnyProtection': event.hasAnyProtection()}
 
 @HTTPAPIHook.register
 class UserEventHook(HTTPAPIHook):
