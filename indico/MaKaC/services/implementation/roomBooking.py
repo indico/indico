@@ -362,3 +362,12 @@ class RoomBookingBlockingReject(RoomBookingBlockingProcessBase):
     def _getAnswer(self):
         self._roomBlocking.reject(self._getUser(), self._reason)
         return { "active": self._roomBlocking.getActiveString() }
+
+
+class BookingPermission(ServiceBase):
+    def _checkParams(self):
+        self._room = CrossLocationQueries.getRooms(roomID=self._params["room_id"])[0]
+
+    def _getAnswer(self):
+        user = self._aw.getUser()
+        return "" if self._room.canBook(user) else self._room.customAtts.get('Booking Simba List')
