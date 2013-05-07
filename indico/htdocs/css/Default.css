@@ -7513,15 +7513,15 @@ table.infoQuestionsTable td.dataBold {
     text-align:center;
 }
 
-.abstract.selected {
+.abstract.selected, .participant.selected {
     background: #CDEB8B;
 }
 
-.abstract:hover {
-    background: rgb(255, 246, 223);
+.abstract:hover, .participant:hover {
+    background: #FFF6DF;
 }
 
-.abstract.selected:hover {
+.abstract.selected:hover, .participant.selected:hover {
     background: #CDEB8B;
 }
 

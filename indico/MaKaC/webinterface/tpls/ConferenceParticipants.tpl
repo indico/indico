@@ -116,36 +116,17 @@
 
 <script type="text/javascript">
 var actionParticipantRows = function(){
-    $("[id^=checkParticipant]").click(function(){
-        if(this.checked){
-            $(this).parents('tr[id^=participant]').css('background-color',"#CDEB8B");
-        }else{
-            $(this).parents('tr[id^=participant]').css('background-color',"transparent");
-        }
-    });
-
-    $("tr[id^=participant]").hover(function () {
-        if($(this).find('input:checkbox:checked[id^=checkParticipant]').length == 0){
-            $(this).css({'background-color' : 'rgb(255, 246, 223)'});
-        }}
-        , function () {
-          if($(this).find('input:checkbox:checked[id^=checkParticipant]').length > 0){
-              $(this).css('background-color',"#CDEB8B");
-          }else{
-              $(this).css('background-color',"transparent");
-          }
-    });
-    $('input:checkbox:checked[id^=checkParticipant]').parents('tr[id^=participant]').css('background-color',"#CDEB8B");
+    $("input:checkbox[id^=checkParticipant]").on('change', function(){
+        $(this).closest('tr').toggleClass('selected', this.checked);
+    }).trigger('change');
 };
 
 var selectAll = function () {
-    $('input:checkbox[id^=checkParticipant]').prop('checked', true);
-    $('input:checkbox[id^=checkParticipant]').parents('tr[id^=participant]').css('background-color',"#CDEB8B");
+    $('input:checkbox[id^=checkParticipant]').prop('checked', true).trigger('change');
 };
 
 var deselectAll = function () {
-    $('input:checkbox[id^=checkParticipant]').prop('checked', false);
-    $('input:checkbox[id^=checkParticipant]').parents('tr[id^=participant]').css('background-color',"transparent");
+    $('input:checkbox[id^=checkParticipant]').prop('checked', false).trigger('change');
 };
 
 var checkNumberParticipants = function(){

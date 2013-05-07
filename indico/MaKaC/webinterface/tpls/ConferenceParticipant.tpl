@@ -1,6 +1,6 @@
 <%page args="participant, conference"/>
 <% from MaKaC.common.timezoneUtils import nowutc %>
-<tr id="participant${participant.getId()}">
+<tr id="participant${participant.getId()}" class="participant">
     <td class="CRLabstractDataCell" width="3%" valign="top" align="right">
         <input type="checkbox" name="participants" id="checkParticipant${participant.getId()}" value="${participant.getId()}"/>
     </td>

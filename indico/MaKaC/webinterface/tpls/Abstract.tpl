@@ -20,7 +20,7 @@ from indico.util.i18n import i18nformat
     <%  detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s)" style="cursor: pointer;">"""% (imgIcon, questionNames, ["%.2f" % i for i in answers]) %>
 % endif
 
-<tr id="abstracts${abstract.getId()}">
+<tr id="abstracts${abstract.getId()}" class="abstract">
     <td><input type="checkbox" name="abstracts" value="${abstract.getId()}"></td>
       % if "ID" in display:
         <td class="CRLabstractLeftDataCell">

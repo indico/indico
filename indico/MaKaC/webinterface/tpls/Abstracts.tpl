@@ -303,36 +303,17 @@
     }
 
     function actionAbstractsRows() {
-        $("tr[id^=abstracts] input:checkbox").click(function(){
-            if(this.checked){
-                $(this).parents('tr[id^=abstracts]').css('background-color',"#CDEB8B");
-            }else{
-                $(this).parents('tr[id^=abstracts]').css('background-color',"transparent");
-            }
-        });
-
-        $("tr[id^=abstracts]").hover(function () {
-            if($(this).find('input:checkbox:checked').length == 0){
-                $(this).css({'background-color' : 'rgb(255, 246, 223)'});
-            }}
-            , function () {
-              if($(this).find('input:checkbox:checked').length > 0){
-                  $(this).css('background-color',"#CDEB8B");
-              }else{
-                  $(this).css('background-color',"transparent");
-              }
-        });
-        $('tr[id^=abstracts] input:checkbox:checked').parents('tr[id^=abstracts]').css('background-color',"#CDEB8B");
+        $("tr[id^=abstracts] input:checkbox").on('change', function(){
+            $(this).closest('tr').toggleClass('selected', this.checked);
+        }).trigger('change');
     }
 
     function selectAll() {
-        $('tr[id^=abstracts] input:checkbox').prop('checked', true);
-        $('tr[id^=abstracts]').css('background-color',"#CDEB8B");
+        $('tr[id^=abstracts] input:checkbox').prop('checked', true).trigger('change');
     }
 
     function selectNone() {
-        $('tr[id^=abstracts] input:checkbox').prop('checked', false);
-        $('tr[id^=abstracts]').css('background-color',"transparent");
+        $('tr[id^=abstracts] input:checkbox').prop('checked', false).trigger('change');
     }
 
 

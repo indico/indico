@@ -77,25 +77,9 @@ $(function() {
 });
 
 var actionPendingRows = function(){
-    $("input:checkbox[id^=checkPending]").click(function(){
-        if(this.checked){
-            $(this).parents('tr[id^=pending]').css('background-color',"#CDEB8B");
-        }else{
-            $(this).parents('tr[id^=pending]').css('background-color',"transparent");
-        }
-    });
-
-    $("tr[id^=pending]").hover(function () {
-        if($(this).find('input:checkbox:checked[id^=checkPending]').length == 0){
-            $(this).css({'background-color' : 'rgb(255, 246, 223)'});
-        }}
-        , function () {
-          if($(this).find('input:checkbox:checked[id^=checkPending]').length > 0){
-              $(this).css('background-color',"#CDEB8B");
-          }else{
-              $(this).css('background-color',"transparent");
-          }
-    });
+    $("input:checkbox[id^=checkPending]").on('change', function(){
+        $(this).closest('tr[id^=pending]').toggleClass('selected', this.checked);
+    }).trigger('change');
 };
 
 var checkNumberPending = function(){
@@ -119,17 +103,6 @@ IndicoUI.executeOnLoad(function(){
 
     actionPendingRows();
     checkNumberPending();
-
-    $("#selectPending").click(function(){
-        if($(this).prop('checked')){
-            $('input:checkbox[id^=checkPending]').prop('checked', true);
-            $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"#CDEB8B");
-        }else{
-            $('input:checkbox[id^=checkPending]').prop('checked', false);
-            $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"transparent");
-        }
-    });
-
 
     var atLeastOneParticipantSelected = function(){
         if ($('input:checkbox:checked').length>0){
@@ -185,13 +158,11 @@ IndicoUI.executeOnLoad(function(){
     };
 
     $('#selectAll').click(function () {
-        $('input:checkbox[id^=checkPending]').prop('checked', true);
-        $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"#CDEB8B");
+        $('input:checkbox[id^=checkPending]').prop('checked', true).trigger('change');
     });
 
     $('#deselectAll').click(function () {
-        $('input:checkbox[id^=checkPending]').prop('checked', false);
-        $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"transparent");
+        $('input:checkbox[id^=checkPending]').prop('checked', false).trigger('change');
     });
 
     $('#accept').bind('menu_select', function(){
