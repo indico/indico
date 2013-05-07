@@ -56,7 +56,8 @@ class APIKey(Persistent):
 
     def setKey(self, key):
         akh = APIKeyHolder()
-        akh.remove(self)
+        if self.getId() is not None:
+            akh.remove(self)
         if self.getKey():
             self._oldKeys.append(self.getKey())
         self._key = key
