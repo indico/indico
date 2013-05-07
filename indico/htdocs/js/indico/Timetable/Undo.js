@@ -87,7 +87,7 @@ function undo_action() {
 
 
 function goto_slot(slotId) {
-    return activeTT.switchToInterval(slotId).pipe(function() {
+    return activeTT.switchToInterval(slotId).then(function() {
         return undo_action();
     });
 }
@@ -111,7 +111,7 @@ function goto_origin(data) {
 
         if (parentTT.currentDay != day) {
             // wrong day? change it.
-            return parentTT.setSelectedTab(day).pipe(next_step);
+            return parentTT.setSelectedTab(day).then(next_step);
         } else {
             return next_step();
         }
@@ -124,7 +124,7 @@ function goto_origin(data) {
         } else {
             // otherwise, we are still in a slot but we want to go somewhere else
             // first step, go up to top level
-            return parentTT.switchToTopLevel().pipe(function() {
+            return parentTT.switchToTopLevel().then(function() {
                 // then go to desired day
                 return goto_day(ordinalStartDate);
             });
