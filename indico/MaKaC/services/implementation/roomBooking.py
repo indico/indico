@@ -26,7 +26,7 @@ from MaKaC.services.interface.rpc.common import ServiceError
 
 import time
 from datetime import datetime
-from MaKaC.services.implementation.base import ServiceBase
+from MaKaC.services.implementation.base import ServiceBase, LoggedOnlyService
 
 from MaKaC.rb_reservation import ReservationBase
 from MaKaC.rb_location import Location, MapAspect, RoomGUID
@@ -38,9 +38,10 @@ from MaKaC.webinterface.rh.roomBooking import RoomBookingAvailabilityParamsMixin
 import MaKaC.webinterface.linking as linking
 from MaKaC.rb_factory import Factory
 
-class RoomBookingListLocations( ServiceBase ):
 
-    def _getAnswer( self ):
+class RoomBookingListLocations(ServiceBase):
+
+    def _getAnswer(self):
         """
         Calls _handle() on the derived classes, in order to make it happen. Provides
         them with self._value.
@@ -48,10 +49,10 @@ class RoomBookingListLocations( ServiceBase ):
 
         result = {}
 
-        locationNames = map(lambda l: l.friendlyName, Location.allLocations);
+        locationNames = map(lambda l: l.friendlyName, Location.allLocations)
 
         for name in locationNames:
-            result[name] = name;
+            result[name] = name
 
         return result
 
@@ -364,10 +365,13 @@ class RoomBookingBlockingReject(RoomBookingBlockingProcessBase):
         return { "active": self._roomBlocking.getActiveString() }
 
 
-class BookingPermission(ServiceBase):
+class BookingPermission(LoggedOnlyService):
     def _checkParams(self):
         self._room = CrossLocationQueries.getRooms(roomID=self._params["room_id"])[0]
 
     def _getAnswer(self):
         user = self._aw.getUser()
-        return "" if self._room.canBook(user) else self._room.customAtts.get('Booking Simba List')
+        return {
+            'can_book': self._room.canBook(user),
+            'group': self._room.customAtts.get('Booking Simba List')
+            }

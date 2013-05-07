@@ -343,71 +343,59 @@ type ("RoomBookingCalendarDrawer", [],
              * @return {Boolean}      True if the booking is protected, false otherwise.
              */
             _ajaxClick: function(bar, url, element) {
-                var self = this;
-
-                if (bar.room.type != "privateRoom") {
-                    self._handleClick(url, "");
-                } else {
-                    indicoRequest("roomBooking.room.bookingPermission",
-                        {
-                            room_id: bar.room.id
-                        },
-                        function(result, error) {
-                            if (!error) {
-                                if (!exists(result.error)) {
-                                    if (result) {
-                                        element.addClass("barProt");
-                                    }
-                                    self._handleClick(url, result);
-                                }
-                            } else {
-                                IndicoUtil.errorReport(error);
-                            }
-                        }
-                    );
-                }
-            },
-
-            _handleClick: function(url, bookingProtected) {
-                var self = this;
-                var bookingImposible = true;
-                var generalConflict = false;
-
-                // Checks booking problems
-                $.each($('.dayCalendarDivHover').parent(), function () {
-                    var conflict = false;
-                    $.each ($(this).find('.barDefault'), function () {
-                        if ($(this).hasClass('barConf')) {
-                            conflict = true;
-                            return false;
-                        }
-                    });
-                    if (conflict) {
-                        generalConflict = true;
-                    } else {
-                        bookingImposible = false;
-                    }
+                // get conflicts per occurrence
+                var conflicts = $('.dayCalendarDivHover').closest('.dayCalendarDiv').map(function() {
+                    return $(this).find('.barDefault.barConf').length;
                 });
 
-                if (bookingImposible) {
-                    self._setDialog("search-again");
+                var any_conflict = _.any(conflicts);
+                var all_conflicts = conflicts.length && _.every(conflicts, function(e) { return !!e; });
+
+                if (all_conflicts) {
+                    this._setDialog("search-again");
                     $('#booking-dialog-content').html($T("This room cannot be booked at the time requested due a conflict with an existing reservation."));
                     $('#booking-dialog').dialog("open");
-                } else if (generalConflict) {
-                    self._setDialog("search-again");
-                    $('#booking-dialog-content').html($T("You can continue booking for only the available dates..."));
-                    $('#booking-dialog').dialog("open");
-                } else if (bookingProtected !== "") {
-                    self._setDialog("search-again");
-                    var protection = '<strong>' +bookingProtected+ '</strong>';
-                    $('#booking-dialog-content').html(format($T("Bookings of this room are limited to members of {0}."), [protection]));
+                } else if (any_conflict) {
+                    this._setDialog("skip-conflict", url);
+                    $('#booking-dialog-content').html($T("This booking conflicts with existing reservations on some of the days"));
                     $('#booking-dialog').dialog("open");
                 } else {
-                    window.location = url;
+                    if (bar.room.type != "privateRoom") {
+                        window.location = url;
+                    } else {
+                        this._handleProtected(element, bar.room.id, url);
+                    }
                 }
             },
 
-            _setDialog: function(type) {
+            _handleProtected: function(element, room_id, url) {
+                var self = this;
+
+                indicoRequest("roomBooking.room.bookingPermission", {
+                    room_id: room_id
+                }, function(result, error) {
+                    if (!error && !exists(result.error)) {
+                        if (!result.can_book) {
+                            element.addClass("barProt");
+                            self._setDialog("search-again");
+
+                            if (result.group) {
+                                var protection = '<strong>' + result.group + '</strong>';
+                                $('#booking-dialog-content').html(format($T("Bookings of this room are limited to members of {0}."), [protection]));
+                            } else {
+                                $('#booking-dialog-content').html($T("You are not authorized to book this room"));
+                            }
+                            $('#booking-dialog').dialog("open");
+                        } else {
+                            window.location = url;
+                        }
+                    } else {
+                        IndicoUtil.errorReport(error || result.error);
+                    }
+                });
+            },
+
+            _setDialog: function(type, url) {
                 $('#booking-dialog').dialog({
                     modal: true,
                     resizable: false,
