@@ -40,7 +40,7 @@ class RHCalendar(base.RHProtected):
             self._checkSessionUser()
         categNoAccess = []
 
-        for item in self._categList:
+        for item in self._categList[:]:
             if not item.canAccess(self.getAW()):
                 categNoAccess.append(item)
                 self._categList.remove(item)
