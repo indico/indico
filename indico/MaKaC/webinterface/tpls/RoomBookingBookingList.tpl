@@ -45,7 +45,7 @@
 </table>
 
 <!--  Container for popup content -->
-<div style="display:none; visibility: false;">
+<div style="display:none;">
     <div id='booking-dialog'>
         <div id="booking-dialog-content" class="dialog-content"></div>
     </div>
