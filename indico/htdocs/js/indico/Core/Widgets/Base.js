@@ -547,7 +547,17 @@ type("JTabWidget", ["IWidget"], {
         var id = _.uniqueId('x-tab-');
         $(content).css('display', '').find('script').remove();
         var container = $('<div/>', { id: id }).data(data || {}).html(content);
-        this.widget.append(container).tabs('add', '#' + id, this._titleTemplate(label));
+        var navLink = $('<a>', {
+            href: '#' + id,
+            text: this._titleTemplate(label)
+        });
+        this.widget.append(container);
+        this.widget.find('.ui-tabs-nav').append($('<li>').append(navLink));
+        this.widget.tabs('refresh');
+        if(this.widget.tabs('option', 'active') === false) {
+            // focus first tab
+            this.widget.tabs('option', 'active', 0);
+        }
     },
     _titleTemplate: function(text) {
         return text;
@@ -567,7 +577,7 @@ type("JTabWidget", ["IWidget"], {
     },
     enable: function() {
         this.widget.tabs('enable');
-        for(var i = 0, num = this.widget.tabs('length'); i < num; i++) {
+        for(var i = 0, num = this.widget.data('uiTabs').anchors.length; i < num; i++) {
             this.enableTab(i);
         }
         if(this.scrollable) {
@@ -576,7 +586,7 @@ type("JTabWidget", ["IWidget"], {
     },
     disable: function() {
         this.widget.tabs('disable');
-        for(var i = 0, num = this.widget.tabs('length'); i < num; i++) {
+        for(var i = 0, num = this.widget.data('uiTabs').anchors.length; i < num; i++) {
             this.disableTab(i);
         }
         if(this.scrollable) {
@@ -599,23 +609,18 @@ type("JTabWidget", ["IWidget"], {
         }).eq(0).index();
     },
     getSelectedIndex: function() {
-        return this.widget.tabs('option', 'selected');
+        return this.widget.tabs('option', 'active');
     },
     getSelectedTab: function() {
         return this.getLabel(this.getSelectedIndex());
     },
     setSelectedTab: function(labelOrIndex){
-        if(_.isNumber(labelOrIndex)) {
-            var idx = labelOrIndex;
-        }
-        else {
-            var idx = this.getTabIndex(labelOrIndex);
-        }
-        this.widget.tabs('select', idx);
+        var idx = _.isNumber(labelOrIndex) ? labelOrIndex : this.getTabIndex(labelOrIndex);
+        this.widget.tabs('option', 'active', idx);
         this.scrollToTab(idx, true);
     },
     getSelectedPanel: function() {
-        var index = this.widget.tabs('option', 'selected');
+        var index = this.widget.tabs('option', 'active');
         return $('> div.ui-tabs-panel', this.widget).eq(index);
     },
     heightToTallestTab: function() {
@@ -631,6 +636,7 @@ type("JTabWidget", ["IWidget"], {
         }
         self.scrollable = true;
         var nav = $('> .ui-tabs-nav', self.widget); // the ul containing the tabs
+        nav.css('padding', 0);
         // by wrapping the div and disabling floating for tabs we ensure tabs do not wrap into another line
         nav.wrap($('<div/>').css({
             whiteSpace: 'nowrap',
@@ -855,7 +861,7 @@ type("JTabWidget", ["IWidget"], {
         self._drawExtraButtons();
     }
     self.widget.tabs({
-        select: function(e, ui) {
+        beforeActivate: function(e, ui) {
             self._notifyTabChange();
         }
     });
@@ -894,8 +900,8 @@ type("JLookupTabWidget", ["JTabWidget"], {
 }, function(tabs, width, height, initialSelection, extraButtons, canvas) {
     var self = this;
     self.JTabWidget(tabs, width, height, initialSelection, extraButtons, canvas);
-    self.widget.bind('tabsshow', function(e, ui) {
-        self._generateContent(ui.panel);
+    self.widget.bind('tabsactivate', function(e, ui) {
+        self._generateContent(ui.newPanel);
     });
     self._generateContent(self.getSelectedPanel());
 });

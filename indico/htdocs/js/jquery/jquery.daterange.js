@@ -16,7 +16,7 @@
                 firstDay: 1,
                 showOtherMonths: true,
                 selectOtherMonths: true,
-                unifyNumRows: true,
+                unifyNumRows: true, // non-standard. see jquery-ui-changes.diff and http://bugs.jqueryui.com/ticket/7210
                 yearRange: '-0:+2'
             },
             startPickerOptions: {},

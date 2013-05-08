@@ -28,7 +28,7 @@
 		_create: function(){
 			var self = this,
 				opts = this.options,
-				instance = (this.instance = $(this.element).data("multiselect")),
+				instance = (this.instance = $(this.element).data("echMultiselect")),
 				
 				// store header; add filter class so the close/check all/uncheck all links can be positioned correctly
 				header = (this.header = instance.menu.find(".ui-multiselect-header").addClass("ui-multiselect-hasfilter")),

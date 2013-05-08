@@ -22,13 +22,13 @@ $(document).ready(function() {
     $('.static-tabs').each(function() {
         var tabCtrl = $(this);
         tabCtrl.tabs({
-            selected: tabCtrl.data('active')
+            active: tabCtrl.data('active')
         });
         // Turn tabs into plain links and fix urls (needed for the active tab)
         $('> .ui-tabs-nav a', this).each(function() {
             var $this = $(this);
+            tabCtrl.data('uiTabs')._off($this, 'click');
             $this.attr('href', $this.data('href'));
-            $this.unbind('click.tabs');
         });
     });
 

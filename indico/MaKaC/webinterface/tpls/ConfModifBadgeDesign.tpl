@@ -147,7 +147,7 @@
             lastSelectedDiv = null;
             $('#modify_panel').hide();
             $('#tab_format').hide();
-            controlTabs.tabs('select', 0);
+            controlTabs.tabs('option', 'active', 0);
 
         }
     }
@@ -158,7 +158,7 @@
         $('#selection_text').html(translate[items[id].key]);
 
         // Bring highlight to the element modification tab.
-        if (controlTabs) controlTabs.tabs('select', 1);
+        if (controlTabs) controlTabs.tabs('option', 'active', 1);
 
         // TODO: add check to see if there's a table inside and not an image
 

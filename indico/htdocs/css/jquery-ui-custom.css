@@ -106,18 +106,23 @@
 
 .ui-dialog-titlebar {
     border-bottom: 1px solid #CCCCCC !important;
-    border-radius: 0px !important;
     font-weight: normal;
     font-size: 17px;
     background-color: #FCFCFC !important;
+}
+
+.ui-dialog-titlebar-close:not(.ui-state-hover) {
+    border: none !important;
+    background: none !important;
 }
 
 .ui-tabs a {
     outline: none;
 }
 
-.ui-tabs .ui-tabs-nav {
+.ui-tabs .ui-tabs-nav li {
     padding: 0;
+    outline: none;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-disabled {

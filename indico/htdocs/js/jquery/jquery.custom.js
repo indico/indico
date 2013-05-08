@@ -75,7 +75,12 @@
 
 
     // Simple solution for updating containment on resize
-    $.widget("ui.reset_resizable", $.extend({}, $.ui.resizable.prototype, {
+    $.widget("indico.reset_resizable", $.ui.resizable, {
+        widgetEventPrefix: 'resize',
+        _create: function() {
+            this.element.data('ui-resizable', this);
+            this._super();
+        },
         resetContainment: function() {
             var element = this.containerElement, p = [];
 
@@ -90,32 +95,42 @@
             this.parentData.width = this.containerSize.width;
             this.parentData.height = this.containerSize.height;
         }
-    }));
+    });
 
-    $.widget("ui.super_draggable", $.extend({}, $.ui.draggable.prototype, {
+    $.widget("indico.super_draggable", $.ui.draggable, {
+        widgetEventPrefix: 'drag',
+        _create: function() {
+            this.element.data('ui-draggable', this);
+            this._super();
+        },
         _setContainment: function(newWidth, newHeight) {
             this.helperProportions.width = newWidth || $(this.element).width();
             //this.helperProportions.height = newHeight || $(this.element).height();
             $.ui.draggable.prototype._setContainment.call(this);
         }
-    }));
+    });
 
     // Extension of `droppable` that better handles enabling/disabling droppables while a draggable
     // is on top
-    $.widget("ui.super_droppable", $.extend({}, $.ui.droppable.prototype, {
+    $.widget("indico.super_droppable", $.ui.droppable, {
+        widgetEventPrefix: 'drop',
+        _create: function() {
+            this.element.data('ui-droppable', this);
+            this._super();
+        },
         disable: function() {
             // "artificially" set `isover` to 0, so that if a draggable comes over again we fire `over`
-            var data = this.element.data('droppable');
+            var data = this.element.data('ui-droppable');
             data.isover = 0;
             data.isout = 1;
             // do as if the draggable was out
             this._out();
-	    return this._setOption("disabled", true);
+            return this._setOption("disabled", true);
         },
         enable: function() {
-	    return this._setOption("disabled", false);
+            return this._setOption("disabled", false);
         }
-    }));
+    });
 
     // Extension of selector 'contains' in order to allow no case sensitive
     $.extend($.expr[':'], {

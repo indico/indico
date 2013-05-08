@@ -98,11 +98,12 @@ type("TimeDisplacementManager", [],
                  { 'date': eventData.startDate.date,
                    'time': startHour + ":" + startMinute };
 
+             var endDT;
              if (endHour === null) {
-                 var endDT = new Date(Util.dateTimeIndicoToJS(startDT).getTime() + eventData.duration*60000);
+                 endDT = new Date(Util.dateTimeIndicoToJS(startDT).getTime() + eventData.duration*60000);
              } else {
-                 var endDT = { 'date': eventData.endDate.date,
-                               'time': endHour + ":" + endMinute };
+                 endDT = { 'date': eventData.endDate.date,
+                           'time': endHour + ":" + endMinute };
              }
 
              self.managementActions.editEntryStartEndDate(
@@ -200,9 +201,9 @@ type("TimeDisplacementManager", [],
                      this._cache_set('heightLimits'); // set as dirty
 
                      if (type == 'drag') {
-                         elem.data('draggable')._setContainment();
+                         elem.data('ui-draggable')._setContainment();
                      } else {
-                         elem.data('resizable').resetContainment();
+                         elem.data('ui-resizable').resetContainment();
                      }
 
                  }
@@ -325,7 +326,7 @@ type("DraggableBlockMixin", [],
                      ui.helper.animate({width: newWidth});
                      ui.helper.height(newHeight);
 
-                     $(this).data('draggable')._setContainment(newWidth, newHeight);
+                     $(this).data('ui-draggable')._setContainment(newWidth, newHeight);
 
                      self._initializeTooltip();
 
@@ -449,7 +450,7 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
                  drop: function(event, ui) {
                      // execute making sure click events on blocks are disabled
                      self._withNoEvents(function() {
-                         self.release(hour, minute, null, null, ui.draggable.data("eventData"), ui.helper, "placementChange");
+                         self.release(hour, minute, null, null, $(ui.draggable.context).data("eventData"), ui.helper, "placementChange");
                      });
                  },
                  tolerance: 'touch',
@@ -553,7 +554,7 @@ type("DroppableBlockMixin", [],
                          ui.draggable.animate({width: newWidth});
                          ui.draggable.height({height: newHeight});
 
-                         ui.draggable.data('draggable')._setContainment(newWidth, newHeight);
+                         ui.draggable.data('ui-draggable')._setContainment(newWidth, newHeight);
 
                          $('.timetableBlock.ui-droppable').not(this).super_droppable('disable');
                          $('.hourLine.ui-droppable').droppable('disable');
