@@ -519,11 +519,14 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                             day_content.append(self.drawBar(bar, true).dom);
                         });
 
-                var container = $('<div class="room-row" data-protected=' + roomInfo.room.type + '>').append(
-                    $('<div class="link">').append(roomLink.dom),
-                    day_content);
+                var container = $('<div class="room-row">')
+                    .data('protected', roomInfo.room.type)
+                    .toggleClass('room-row-empty', !roomInfo.bars.length).append(
+                        $('<div class="link">').append(roomLink.dom),
+                        day_content);
 
                 return new XElement(container.get(0));
+
             },
 
             /**
