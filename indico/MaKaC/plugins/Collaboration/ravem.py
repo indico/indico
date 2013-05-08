@@ -28,12 +28,13 @@ class RavemClient(object):
     """
     _instance = None
 
-    def __init__(self, auth, url):
-        self._auth = auth
+    def __init__(self, username, password, url):
+        self._username = username
+        self._password = password
         self._url = url
 
     def performOperation(self, operation):
-        data = requests.get(self._url + operation, auth=self._auth, verify=False)
+        data = requests.get(self._url + operation, auth=HTTPDigestAuth(self._username, self._password), verify=False)
         return data
 
     @classmethod
@@ -49,7 +50,7 @@ class RavemClient(object):
                 password = CollaborationTools.getCollaborationOptionValue('ravemPassword')
 
             try:
-                cls._instance = RavemClient(HTTPDigestAuth(username, password), ravemAPIUrl)
+                cls._instance = RavemClient(username, password, ravemAPIUrl)
             except Exception:
                 Logger.get("Ravem").exception("Problem building RavemClient")
                 raise
