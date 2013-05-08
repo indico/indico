@@ -297,7 +297,7 @@ def taskMigration(dbi, withRBDB, prevVersion):
                 alarm = t.conf.alarmList[t.id]
                 c.enqueue(alarm)
             else:
-                raise Exception("Unknown task type!")
+                print console.colored("WARNING: Unknown task type!", 'yellow')
 
     if withRBDB:
         DALManager.commit()
