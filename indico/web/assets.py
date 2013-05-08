@@ -26,8 +26,10 @@ import os
 
 # 3rd party libs
 from webassets import Bundle, Environment
+from webassets.filter import Filter
 
 # legacy imports
+from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.Configuration import Config
 
 
@@ -137,8 +139,35 @@ indico_badges_css = Bundle('css/badges.css',
                            filters='cssmin', output='indico_badges_%(version)s.min.css')
 
 
+class DebugLevelFilter(Filter):
+    name = 'debug_level'
+    max_debug_level = None
+
+    def __init__(self, required_level):
+        super(DebugLevelFilter, self).__init__()
+        self.required_level = required_level
+
+    def input(self, in_, out, **kw):
+        if self.required_level == self.env.debug:
+            out.write(in_.read())
+        else:
+            skip_msg = '/* Skipped {} because of debug level */'.format(os.path.basename(kw['source_path']))
+            out.write(skip_msg)
+
+    def id(self):
+        # We cannot have self.env available here so we take the debug flag from makacinfo instead.
+        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
+        return hash((self.name, debug))
+
+    def output(self, in_, out, **kw):
+        out.write(in_.read())
+
+
 jquery = Bundle('js/jquery/underscore.js',
                 'js/jquery/jquery.js',
+                Bundle('js/jquery/jquery-migrate-silencer.js', filters=DebugLevelFilter(required_level=False),
+                       output='jquery_migrate_silencer_%(version)s.js'),
+                'js/jquery/jquery-migrate.js',
                 'js/jquery/jquery-ui.js',
                 'js/jquery/jquery.form.js',
                 'js/jquery/jquery.custom.js',
