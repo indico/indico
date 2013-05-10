@@ -231,12 +231,6 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             req.headers_out["Content-MD5"] = base64.encodestring(binascii.unhexlify(md5.upper()))[:-1]
         req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
         size = os.path.getsize(fullpath)
-        if not size:
-            try:
-                raise Exception, '%s exists but is empty' % fullpath
-            except Exception:
-                raise SERVER_RETURN, HTTP_NOT_FOUND
-            raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
         if headers['if-modified-since'] and headers['if-modified-since'] >= mtime:
             raise apache.SERVER_RETURN, apache.HTTP_NOT_MODIFIED
         if headers['if-none-match']:
