@@ -22,7 +22,7 @@
      });
 
      $(function() {
-        if($.browser.mobile && !$.jStorage.get("useIndicoDesktop")){
+        if($.mobileBrowser && !$.jStorage.get("useIndicoDesktop")){
             $(".mobile-device-header").show();
         }
      });
