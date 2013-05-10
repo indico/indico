@@ -85,11 +85,12 @@
 
         var term = $("#filterContribs").val();
         allItems.css('display', 'none');
+        var items;
         if (resultCache[term] == undefined) {
-            var items = $(".contributionListContribItem:contains('"+ term +"')");
+            items = $(".contributionListContribItem").filterText(term);
             resultCache[term] = items;
         } else {
-            var items = resultCache[term];
+            items = resultCache[term];
         }
 
         % if len(conf.getContribTypeList()) > 0:

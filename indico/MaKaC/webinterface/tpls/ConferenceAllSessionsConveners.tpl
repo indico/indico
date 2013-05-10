@@ -54,12 +54,10 @@
 function verifyFilters() {
     $(".speaker_list > li").hide();
     var term = $("#filterSpeakers").val();
-    var items = $("ul.contributions li:contains('"+ term +"'), " +
-                  ".speaker_list li input[value*='"+ term +"'], " +
-                  ".speaker_list li .name:contains('"+ term +"')").closest('.speaker_list > li');
-
-    items.show();
-};
+    var items = $('ul.contributions li, .speaker_list li .name').textContains(term);
+    items.add($('.speaker_list li input').valueContains(term));
+    items.closest('.speaker_list > li').show();
+}
 
 $(function() {
     $('#actions').dropdown();

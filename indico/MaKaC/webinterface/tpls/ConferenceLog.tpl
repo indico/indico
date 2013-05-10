@@ -60,7 +60,7 @@
     <% value = day_entry[1] %>
 
     <h3 class="i-table searchable">${format_human_date(key).title()}</h3>
-    <table id="log-table-${key}" class="i-table">
+    <table id="log-table-${key}" class="i-table log-table">
         % for line in value:
         <tr class="i-table interactive ${line.getLogType()}" >
                 <td class="i-table ${get_icon(line.getLogType())}" aria-hidden="true"></td>
@@ -107,7 +107,7 @@
 $(document).ready(function(){
 
     /* Initializations */
-    if ($("[id*=log-table-]").length === 0) {
+    if ($(".log-table").length === 0) {
         $("#emptyLog").removeClass("hidden");
     }
 
@@ -185,23 +185,21 @@ $(document).ready(function(){
     });
 
     /* Search behavior */
-    $("#searchBox input").focus(function() {
-        $("#searchBox .text-input").addClass("active");
-    });
-
-    $("#searchBox input").focusout(function() {
-        $("#searchBox .text-input").removeClass("active");
+    $("#searchBox input").on('focus', function() {
+        $(this).closest('.text-input').addClass('active');
+    }).on('focusout', function() {
+        $(this).closest('.text-input').removeClass('active');
     });
 
     $("#searchInput").typeWatch({
-                            callback: function(){
-                                            applyFilters();
-                                            updateResetButton();
-                                          },
-                            wait: 250,
-                            highlight: true,
-                            captureLength: 0
-                        });
+        callback: function() {
+            applyFilters();
+            updateResetButton();
+        },
+        wait: 250,
+        highlight: true,
+        captureLength: 0
+    });
 
     $("#searchBox .reset-input").click(function(e) {
         e.preventDefault();
@@ -212,12 +210,12 @@ $(document).ready(function(){
 
     var resultCache = [];
     var allTableTitles = $("h3.i-table");
-    var allTables = $("[id*=log-table-]");
+    var allTables = $(".log-table");
     var allRows = $("tr.i-table.interactive");
     var allContentRows = $("tr.i-table.content-wrapper");
 
     var applyFilters = function(){
-        var checkboxes = $(".group.selection input[type=checkbox]:checked");
+        var checkboxes = $(".group.selection input:checkbox:checked");
         var items = getSearchFilteredItems().filter(getCheckboxFilteredItems(checkboxes));
 
         allTableTitles.show();
@@ -235,15 +233,12 @@ $(document).ready(function(){
 
     var getSearchFilteredItems = function() {
         var term = $("#searchInput").val();
-
-        if (resultCache[term] == undefined) {
-            var items = $("h3.i-table.searchable:contains('"+ term +"')").next().find("tr.i-table.interactive");
-            items = items.add($("tr.i-table.interactive .searchable:contains('"+ term +"')").parents("tr.i-table.interactive"));
-            resultCache[term] = items;
-        } else {
-            var items = resultCache[term];
+        if (resultCache[term] !== undefined) {
+            return resultCache[term];
         }
-
+        var items = $("h3.i-table.searchable").textContains(term).next().find("tr.i-table.interactive");
+        items = items.add($("tr.i-table.interactive .searchable").textContains(term).parents("tr.i-table.interactive"));
+        resultCache[term] = items;
         return items;
     };
 
@@ -253,7 +248,7 @@ $(document).ready(function(){
             var flag = false;
 
             checkboxes.each(function(){
-                if ($this.is("tr.i-table." + $(this).attr("id"))) {
+                if ($this.is("tr.i-table." + this.id)) {
                     flag = true;
                 }
             });
@@ -265,7 +260,7 @@ $(document).ready(function(){
     var showRows = function(items) {
         items.show();
         items.each(function() {
-            if ($(this).hasClass("active") === true) {
+            if ($(this).hasClass("active")) {
                 $(this).next(".content-wrapper").removeClass("weak-hidden");
             } else {
                 $(this).next(".content-wrapper").addClass("weak-hidden");
@@ -278,8 +273,8 @@ $(document).ready(function(){
         $emptyTables.hide();
         $emptyTables.prev().hide();
 
-        if ($("[id*=log-table-]").length > 0 &&
-            $("[id*=log-table-]:visible").length === 0) {
+        if ($(".log-table").length > 0 &&
+            $(".log-table:visible").length === 0) {
             $("#nothingToShow").removeClass("hidden");
         } else {
             $("#nothingToShow").addClass("hidden");

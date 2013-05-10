@@ -70,11 +70,9 @@
 function verifyFilters() {
     $(".speaker_list > li").hide();
     var term = $("#filterSpeakers").val();
-    var items = $("ol.contributions li:contains('"+ term +"'), " +
-                  ".speaker_list li .name:contains('"+ term +"')").closest('.speaker_list > li');
-
-    items.show();
-};
+    var items = $('ol.contributions li, .speaker_list li .name').textContains(term);
+    items.closest('.speaker_list > li').show();
+}
 
 $(document).ready(function() {
     $('#actions').dropdown();

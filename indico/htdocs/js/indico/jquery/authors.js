@@ -8,7 +8,7 @@ $(function() {
         allItems.addClass('visibility_hidden');
         var items;
         if (resultCache[searchString] === undefined) {
-            items = $(".index .item .text:contains('"+ searchString +"')").parent().parent();
+            items = $(".index .item .text").textContains(searchString).parent().parent();
             resultCache[searchString] = items;
         } else {
             items = resultCache[searchString];

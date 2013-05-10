@@ -8,6 +8,18 @@
         return obj;
     };
 
+    $.fn.textContains = function(term) {
+        return this.filter(function() {
+            return $(this).text().indexOf(term) > -1;
+        });
+    };
+
+    $.fn.valueContains = function(term) {
+        return this.filter(function() {
+            return $(this).val().indexOf(term) > -1;
+        });
+    };
+
     var __gotoToday = $.datepicker._gotoToday;
 
     $.extend($.datepicker, {

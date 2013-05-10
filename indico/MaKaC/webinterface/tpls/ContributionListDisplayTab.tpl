@@ -24,7 +24,7 @@
 var verifyFilters = function() {
     $(".contributionListContribItem").hide();
     var term = $("#filterContribs").val();
-    var items = $(".contributionListContribItem:contains('"+ term +"')");
+    var items = $(".contributionListContribItem").textContains(term);
 
     items.show();
 
