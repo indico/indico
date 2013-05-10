@@ -1,18 +1,16 @@
-/*!
- * qTip2 - Pretty powerful tooltips - v2.0.1
+/*
+ * qTip2 - Pretty powerful tooltips - v2.0.1-94-
  * http://qtip2.com
  *
- * Copyright (c) 2012 Craig Michael Thompson
+ * Copyright (c) 2013 Craig Michael Thompson
  * Released under the MIT, GPL licenses
  * http://jquery.org/license
  *
- * Date: Mon Dec 31 2012 02:55 GMT+0000
- * Plugins: svg ajax tips modal viewport imagemap ie6
+ * Date: Thu May 9 2013 04:46 UTC+0000
+ * Plugins: tips modal viewport svg imagemap ie6
  * Styles: basic css3
  */
-
-/* Core qTip styles */
-.qtip, .qtip{
+.qtip{
 	position: absolute;
 	left: -28000px;
 	top: -28000px;
@@ -25,6 +23,9 @@
 	line-height: 12px;
 
 	direction: ltr;
+
+	box-shadow: none;
+	padding: 0;
 }
 
 	.qtip-content{
@@ -72,7 +73,6 @@
 			display: block;
 			text-indent: -1000em;
 			direction: ltr;
-			vertical-align: middle;
 		}
 
 		.qtip-icon, .qtip-icon .ui-icon{
@@ -86,6 +86,7 @@
 				width: 18px;
 				height: 14px;
 
+				line-height: 14px;
 				text-align: center;
 				text-indent: 0;
 				font: normal bold 10px/13px Tahoma,sans-serif;
@@ -93,7 +94,6 @@
 				color: inherit;
 				background: transparent none no-repeat -100em -100em;
 			}
-
 
 /* Applied to 'focused' tooltips e.g. most recently displayed/interacted with */
 .qtip-focus{}
@@ -125,6 +125,7 @@
 		border-color: #AAA;
 		color: #111;
 	}
+
 
 
 /*! Light tooltip style */
@@ -231,7 +232,7 @@
 	}
 
 
-/* Add shadows to your tooltips in: FF3+, Chrome 2+, Opera 10.6+, IE9+, Safari 2+ */
+
 .qtip-shadow{
 	-webkit-box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.15);
 	-moz-box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.15);
@@ -245,6 +246,12 @@
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border-radius: 5px;
+}
+
+.qtip-rounded .qtip-titlebar{
+	-moz-border-radius: 4px 4px 0 0;
+	-webkit-border-radius: 4px 4px 0 0;
+	border-radius: 4px 4px 0 0;
 }
 
 /* Youtube tooltip style */
@@ -555,15 +562,23 @@
 }
 
 
-/* Tips plugin */
+
 .qtip .qtip-tip{
 	margin: 0 auto;
 	overflow: hidden;
 	z-index: 10;
+	
 }
 
+	/* Opera bug #357 - Incorrect tip position
+	https://github.com/Craga89/qTip2/issues/367 */
+	x:-o-prefocus, .qtip .qtip-tip{
+		visibility: hidden;
+	}
+
 	.qtip .qtip-tip,
-	.qtip .qtip-tip .qtip-vml{
+	.qtip .qtip-tip .qtip-vml,
+	.qtip .qtip-tip canvas{
 		position: absolute;
 
 		color: #123456;
@@ -578,7 +593,7 @@
 		display: inline-block;
 		visibility: visible;
 	}
-/* Modal plugin */
+
 #qtip-overlay{
 	position: fixed;
 	left: -10000em;
@@ -602,7 +617,7 @@
 	}
 
 
-/* IE6 Modal plugin fix */
+
 .qtipmodal-ie6fix{
 	position: absolute !important;
 }
