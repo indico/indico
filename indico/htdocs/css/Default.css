@@ -5848,6 +5848,8 @@ td.timetablePopupContributionTitle{
     border: none;
     font-size: 11px;
     background: transparent;
+    outline: none;
+    height: 1em;
 }
 
 .colorPicker input {
