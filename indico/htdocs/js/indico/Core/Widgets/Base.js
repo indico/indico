@@ -625,9 +625,14 @@ type("JTabWidget", ["IWidget"], {
     },
     heightToTallestTab: function() {
         var maxHeight = 0;
-        $('> div.ui-tabs-panel', this.widget).each(function() {
+        var panel = $('> div.ui-tabs-panel', this.widget);
+        panel.each(function() {
             maxHeight = Math.max(maxHeight, $(this).height());
-        }).height(maxHeight);
+        });
+        // Chrome sometimes shows scrollbars until a tab change if we don't wait a moment with applying the height
+        _.defer(function() {
+            panel.height(maxHeight);
+        });
     },
     makeScrollable: function() {
         var self = this;
