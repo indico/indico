@@ -181,8 +181,7 @@ jquery = Bundle('js/jquery/underscore.js',
                 'js/jquery/jquery.watermark.js',
                 filters='rjsmin', output='jquery_code_%(version)s.min.js')
 
-presentation = Bundle('js/jquery/underscore.js',
-                      'js/presentation/Core/Primitives.js',
+presentation = Bundle('js/presentation/Core/Primitives.js',
                       'js/presentation/Core/Iterators.js',
                       'js/presentation/Core/Tools.js',
                       'js/presentation/Core/String.js',
