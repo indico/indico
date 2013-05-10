@@ -203,7 +203,7 @@ var IndicoUtil = {
             labelStyle = "style='white-space:nowrap;'";
             fieldStyle = "style='width:100%;'";
         }
-        var table = $("<table></table");
+        var table = $("<table></table>");
         $(map).each(function(key, item) {
             // if the key is an int, do not print the label
             if (item.length == 2) {
