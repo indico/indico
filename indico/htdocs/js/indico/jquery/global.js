@@ -75,4 +75,29 @@ $(document).ready(function() {
         }).open();
         return false;
     });
+
+    // jQuery UI prevents anything outside modal dialogs from gaining focus.
+    // This breaks e.g. the session color date selector. To fix this we prevent
+    // the focus trap (focusin event bound on document) from ever receiving the
+    // event in case the z-index of the focused event is higher than the dialog's.
+    function getMaxZ(elem) {
+        var maxZ = 0;
+        elem.parents().addBack().each(function() {
+            var z = +$(this).css('zIndex');
+            if (!isNaN(z)) {
+                maxZ = Math.max(z, maxZ);
+            }
+        });
+        return maxZ;
+    }
+
+    $('body').on('focusin', function(e) {
+        if(!$.ui.dialog.overlayInstances) {
+            return;
+        }
+
+        if(getMaxZ($(e.target)) > getMaxZ($('.ui-dialog:visible:last'))) {
+            e.stopPropagation();
+        }
+    });
 });
