@@ -147,20 +147,14 @@ class DebugLevelFilter(Filter):
         super(DebugLevelFilter, self).__init__()
         self.required_level = required_level
 
-    def input(self, in_, out, **kw):
-        if self.required_level == self.env.debug:
-            out.write(in_.read())
-        else:
-            skip_msg = '/* Skipped {} because of debug level */'.format(os.path.basename(kw['source_path']))
-            out.write(skip_msg)
-
-    def id(self):
+    def unique(self):
         # We cannot have self.env available here so we take the debug flag from makacinfo instead.
         debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
-        return hash((self.name, debug))
+        return self.name, self.required_level, debug
 
     def output(self, in_, out, **kw):
-        out.write(in_.read())
+        if self.required_level == self.env.debug:
+            out.write(in_.read())
 
 
 jquery = Bundle('js/jquery/underscore.js',
