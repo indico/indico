@@ -1400,13 +1400,13 @@ class Submission(Persistent):
                 submitter -- [Avatar/None] submitter who submitted this submission.
         """
         self._evaluation = evaluation
-        self._evaluation.insertSubmission(self)
         self.setSubmitter(submitter)
         self._id = str( evaluation._getSubmissionCounter().newCount() )
         self._answers = []
         self.submissionDate = nowutc()
         self.modificationDate = None
         self.anonymous = evaluation.isAnonymous()
+        self._evaluation.insertSubmission(self)
 
     def __cmp__(self, other):
         if type(self) is not type(other):
