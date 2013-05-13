@@ -1427,9 +1427,10 @@ class Submission(Persistent):
 
     def setId(self, id):
         self._id = str(id)
+
     def getId(self):
         if not hasattr(self, "_id"):
-            self._id = str( evaluation._getSubmissionCounter().newCount() )
+            self._id = str( self._evaluation._getSubmissionCounter().newCount() )
         return self._id
 
     def notifyModification(self):
