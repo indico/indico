@@ -4,7 +4,7 @@
     <li>
         <div class="list-item-title">
             ${consumer.getName()}
-            <div data-consumer-key="${consumer.getId()}" aria-hidden="true" style="margin:0" class="i-button i-button-mini icon-remove icon-only right"></div>
+            <div data-consumer-key="${consumer.getId()}" aria-hidden="true" style="margin:0" class="i-button i-button-mini icon-remove icon-only right" title="${_("Delete this consumer.")}"></div>
             <div data-consumer-key="${consumer.getId()}" aria-hidden="true" style="margin:0" class="i-button i-button-mini icon-trust ${'trusted' if consumer.isTrusted() else ''} icon-only right"></div>
         </div>
 
@@ -35,20 +35,27 @@ function addHandler(result){
 
 $("#inPlaceAddConsumer").html(new AddItemWidget("consumer_name", "oauth.addConsumer", addHandler).draw());
 
-$("body").on("click",".icon-remove", function(){
+$("body").on("click", ".icon-remove", function() {
     var self = $(this);
-    var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting..."));
-    jsonRpc(Indico.Urls.JsonRpcService, "oauth.removeConsumer" ,
-            {'consumer_key': self.data("consumer-key")},
-            function(result, error){
-                if (exists(error)) {
-                    killProgress();
-                    IndicoUtil.errorReport(error);
-                } else {
-                    killProgress();
-                    self.closest("li").remove();
-                }
-            });
+
+    new ConfirmPopup($T("Delete consumer"), $T("Do you want to delete this consumer? Please note that this action cannot be undone."), function(confirmed) {
+        if (!confirmed) {
+            return;
+        }
+
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting..."));
+        jsonRpc(Indico.Urls.JsonRpcService, "oauth.removeConsumer",
+                {'consumer_key': self.data("consumer-key")},
+                function(result, error) {
+                    if (exists(error)) {
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    } else {
+                        killProgress();
+                        self.closest("li").remove();
+                    }
+                });
+    }).open();
 });
 
 $("body").on("click",".icon-trust, .icon-untrust", function(){
