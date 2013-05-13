@@ -130,7 +130,7 @@ $(document).ready(function(){
         tz: "${timezone}"
     };
 
-    var TIMEZONE_OFFSET = "+${offset}";
+    var TIMEZONE_OFFSET = "${offset}";
 
     // Your events
     % if redisEnabled:

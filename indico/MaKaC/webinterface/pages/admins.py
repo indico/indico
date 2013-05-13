@@ -49,8 +49,6 @@ import MaKaC.webinterface.personalization as personalization
 from cgi import escape
 import re
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat
-from indico.util.redis import client as redis_client
 from MaKaC.plugins import PluginLoader, PluginsHolder
 
 from MaKaC.common.fossilize import fossilize
@@ -60,6 +58,10 @@ from MaKaC.errors import MaKaCError
 from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.locators import CategoryWebLocator
 from MaKaC.services.implementation.user import UserComparator
+
+from indico.util.i18n import i18nformat
+from indico.util.redis import client as redis_client
+from indico.util.date_time import timedelta_split
 
 
 class WPAdminsBase( WPMainBase ):
@@ -1410,8 +1412,11 @@ class WUserDashboard(wcomponents.WTemplated):
         tz = timezone(tzUtil.getDisplayTZ())
 
         html_vars["timezone"] = tz
-        html_vars["offset"] = ''.join('{0:02d}'.format(int(part)) \
-                for part in str(tz.utcoffset(now)).split(':')[:2])
+
+        # split offset in hours and minutes
+        hours, minutes, __ = timedelta_split(tz.utcoffset(now))
+
+        html_vars["offset"] = '{0:+02d}:{1:02d}'.format(hours, minutes)
         html_vars["categories"] = user.getRelatedCategories()
         html_vars["redisEnabled"] = bool(redis_client)
 

@@ -100,6 +100,17 @@ def is_same_month(date_1, date_2):
     return date_1.month == date_2.month and  date_1.year == date_2.year
 
 
+def timedelta_split(delta):
+    """
+    Decomposes a timedelta into hours, minutes and seconds
+    (timedelta only stores days and seconds)n
+    """
+    sec = delta.seconds + delta.days * 24 * 3600
+    hours, remainder = divmod(sec, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return hours, minutes, seconds
+
+
 ## ATTENTION: Do not use this one for new developments ##
 # It is flawed, as even though the returned value is DST-safe,
 # it is in the _local timezone_, meaning that the number of seconds
