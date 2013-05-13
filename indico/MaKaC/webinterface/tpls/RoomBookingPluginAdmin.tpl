@@ -62,7 +62,7 @@
         <tr>
           <td>
             ${ _("You can use the main Indico ZODB backend simply by entering the same Host and Port.")}
-            <form action="${ urlHandlers.UHRoomBookingPlugAdminZODBSave.getURL() }" method="post">
+            <form action="${ urlHandlers.UHRoomBookingPlugAdminZODBSave.getURL() }" method="post" autocomplete="off">
             <table width="100%">
             <tr>
               <td class="titleCellTD"><span class="titleCellFormat">${ _("Host")}</span></td>
