@@ -420,7 +420,7 @@ var updateStaticURL = function() {
 /** Static URL qTip event handler **/
 $('#CAStaticURLLink').qtip({
     content: {
-        text: function() { return $('#CAStatucURLContentContainer').html(); }
+        text: function() { return $('#CAStatucURLContentContainer'); }
     },
     position: {
         my: 'bottom middle',

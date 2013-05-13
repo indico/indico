@@ -2,7 +2,7 @@
     <div id="staticURLContainer" style="display:none">
         <div id="staticURLContent">
             <div>${ _("You can use this link for bookmarks:")}</div>
-            <input readonly="readonly" type="text" id="staticURL" size="31" name="staticURL" />
+            <input readonly="readonly" type="text" id="staticURL" style="width: 100%;" name="staticURL" />
             <div class="staticURLNote">${_('Please use <strong>CTRL + C</strong> to copy this URL')}</div>
         </div>
     </div>
@@ -231,7 +231,7 @@
 
         $('#staticURLLink').qtip({
             content: {
-                text: function() { return $('#staticURLContainer').html(); }
+                text: function() { return $('#staticURLContainer'); }
             },
             position: {
                 my: 'bottom middle',
@@ -256,7 +256,8 @@
         });
 
         $('body').delegate('#staticURL', 'click', function(e){
-            $(this).select();});
+            $(this).select();
+        });
 
         if(verifyFilters()){
             $("#showFilters").text('Hide filters');
