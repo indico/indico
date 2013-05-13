@@ -52,7 +52,7 @@ function remove_currency(name) {
 
 function edit_currency(oldName, oldAbbreviation){
     var edit_popup = new CurrencyDialog(
-        popupTitle,
+        $T('Edit currency'),
         function(value){
             if(value){
                 request('epayment.editCurrency', {
