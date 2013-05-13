@@ -186,9 +186,7 @@ var initialize_index_tabs = function() {
 };
 
 var alertNoIndexSelected = function() {
-    var popup = new AlertPopup($T("No index selected"), Html.span({},$T("Please select an index name")), Html.br(),
-            Html.span(indexNames.join(', ')));
-    popup.open();
+    new AlertPopup($T("No index selected"), $T("Please select an index name")).open();
 };
 
 var indexSelectedObs = function(selectedIndexName, firstTime) {
