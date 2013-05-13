@@ -203,7 +203,7 @@
                     <script type="text/javascript">
                         var addPaymentMethodText = $T('New payment method');
                         var noPaymentMethodsMsg = $T('No payment methods created yet. Click in New payment method if you want to do so!');
-                        var popupTitle = $T('Enter the name of the payment method and its Extra Fee');
+                        var popupTitle = $T('Enter the payment method data');
                         var paymentMethodNameLabel = $T('Payment method name');
                         var paymentMethodNameHeader = $T('Payment method name');
                         var info = '';
