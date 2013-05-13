@@ -705,6 +705,9 @@ class RH(RequestHandlerBase):
             DBMgr.getInstance().endRequest(False)
         except Exception, e: #Generic error treatment
             res = self._processUnexpectedError( e )
+            if Config.getInstance().getEmbeddedWebserver():
+                # Re-raise to get the nice werkzeug exception view
+                raise
             #DBMgr.getInstance().endRequest(False)
             #self._endRequestSpecific2RH( False )
 

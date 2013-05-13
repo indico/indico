@@ -154,7 +154,8 @@ class WerkzeugServer(object):
             ssl_context = SSL.Context(SSL.SSLv23_METHOD)
             ssl_context.use_privatekey_file(self.ssl_key)
             ssl_context.use_certificate_file(self.ssl_cert)
-        werkzeug.serving.run_simple(self.host, self.port, self.app, threaded=True, ssl_context=ssl_context)
+        werkzeug.serving.run_simple(self.host, self.port, self.app, threaded=True, ssl_context=ssl_context,
+                                    use_debugger=True, use_evalex=False)
 
 
 def setupNamespace(dbi):
@@ -204,6 +205,7 @@ def main():
 
     if 'web_server' in args and args.web_server:
         config = Config.getInstance()
+        config._configVars['EmbeddedWebserver'] = True
         if args.with_ssl:
             # We have only HTTPS!
             config._configVars['BaseURL'] = config.getBaseSecureURL()

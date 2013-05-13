@@ -133,6 +133,9 @@ def application(environ, start_response):
         # If we reach this block, there was probably
         # an error importing a legacy python module
         except Exception:
+            if Config.getInstance().getEmbeddedWebserver():
+                # Re-raise to get the nice werkzeug exception view
+                raise
             req.status = HTTP_INTERNAL_SERVER_ERROR
             req.headers_out['content-type'] = 'text/html'
             start_response(req.get_wsgi_status(),
