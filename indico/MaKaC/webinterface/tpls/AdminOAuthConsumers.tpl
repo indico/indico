@@ -71,19 +71,14 @@ $("body").on("click",".icon-trust, .icon-untrust", function(){
             });
 });
 
-$('.icon-trust').on('mouseover', function(event) {
-    var msg = $T("The consumer is not trusted. That means that every time a user asks for the token an acceptance form will appear in order to give access to the application to get its events.");
-    if($(this).hasClass("trusted")){
-        msg = $T("The consumer is trusted. That means that every time a user asks for the token the consumer will have access to the user events without asking for permission.");
-
-    }
-    $(this).qtip({
-        overwrite: true, // Make sure the tooltip won't be overridden once created
-        content: msg,
-        show: {
-            event: event.type,
-            ready: true
+$('.icon-trust').qtip({
+    content: {
+        text: function() {
+            if ($(this).hasClass('trusted')) {
+                return $T("The consumer is trusted. That means that every time a user asks for the token the consumer will have access to the user events without asking for permission.");
+            }
+            return $T("The consumer is not trusted. That means that every time a user asks for the token an acceptance form will appear in order to give access to the application to get its events.");
         }
-    }, event);
+    }
 });
 </script>
