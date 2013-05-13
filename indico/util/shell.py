@@ -17,16 +17,26 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import sys, getopt, logging, argparse, urlparse, re, socket
+import logging
+import argparse
+import urlparse
+import re
+import socket
+import sys
+from SocketServer import TCPServer
 
-from wsgiref.simple_server import make_server, WSGIServer, WSGIRequestHandler
-from wsgiref.util import shift_path_info
-from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
-from SocketServer import ThreadingMixIn
+try:
+    import werkzeug.serving
+except ImportError:
+    werkzeug = None
+
+try:
+    from OpenSSL import SSL
+except ImportError:
+    SSL = None
 
 from indico.web.wsgi.indico_wsgi_handler import application
 from indico.core.index import Catalog
-from indico.util.network import resolve_host
 
 ## indico legacy imports
 import MaKaC
@@ -69,21 +79,20 @@ def add(namespace, element, name=None, doc=None):
         print
 
 
-class ThreadedWSGIServer(ThreadingMixIn, WSGIServer):
-    pass
+class WerkzeugServer(object):
 
-
-class ThreadedWSGIServerIPV6(ThreadedWSGIServer):
-    address_family = socket.AF_INET6
-
-
-class RefServer(object):
-
-    def __init__(self, host='localhost', port=8000, enable_ipv6=False):
+    def __init__(self, host='localhost', port=8000, enable_ssl=False, ssl_key=None, ssl_cert=None):
         """
         Run an Indico WSGI ref server instance
         Very simple dispatching app
         """
+
+        if not werkzeug:
+            print 'Please install werkzeug to use the builtin dev server'
+            sys.exit(1)
+        elif not SSL and enable_ssl:
+            print 'You need pyopenssl to use SSL'
+            sys.exit(1)
 
         config = Config.getInstance()
 
@@ -102,21 +111,50 @@ class RefServer(object):
                 start_response("404 NOT FOUND", [])
                 yield 'Not found'
 
-        # if there is an IPv6 address, use it
-        if enable_ipv6 and (socket.AF_INET6 in resolve_host(host, per_family=True)):
-            server = ThreadedWSGIServerIPV6
-        else:
-            server = ThreadedWSGIServer
+        self.app = fake_app
+        self.host = host
+        self.port = port
+        self.ssl = enable_ssl
+        self.ssl_key = ssl_key
+        self.ssl_cert = ssl_cert
 
-        self.httpd = make_server(host, port, fake_app,
-                                 server_class=server,
-                                 handler_class=WSGIRequestHandler)
-        self.addr = self.httpd.socket.getsockname()[:2]
+        logger = logging.getLogger('werkzeug')
+        logger.setLevel(logging.DEBUG)
+        logger.addHandler(logging.StreamHandler(sys.stderr))
+
+    @staticmethod
+    def _patch_shutdown_request():
+        # Fix SocketServer's shutdown not working with pyopenssl
+        def my_shutdown_request(self, request):
+            """Called to shutdown and close an individual request."""
+            try:
+                #explicitly shutdown.  socket.close() merely releases
+                #the socket and waits for GC to perform the actual close.
+                try:
+                    request.shutdown(socket.SHUT_WR)
+                except TypeError:
+                    # ssl sockets don't support an argument
+                    try:
+                        request.shutdown()
+                    except SSL.Error:
+                        pass
+            except socket.error:
+                pass  # some platforms may raise ENOTCONN here
+            self.close_request(request)
+        TCPServer.shutdown_request = my_shutdown_request
 
     def run(self):
-        print "Serving at %s : %s..." % self.addr
-        # Serve until process is killed
-        self.httpd.serve_forever()
+        if not self.ssl:
+            ssl_context = None
+        elif not self.ssl_cert and not self.ssl_key:
+            self._patch_shutdown_request()
+            ssl_context = 'adhoc'
+        else:
+            self._patch_shutdown_request()
+            ssl_context = SSL.Context(SSL.SSLv23_METHOD)
+            ssl_context.use_privatekey_file(self.ssl_key)
+            ssl_context.use_certificate_file(self.ssl_cert)
+        werkzeug.serving.run_simple(self.host, self.port, self.app, threaded=True, ssl_context=ssl_context)
 
 
 def setupNamespace(dbi):
@@ -149,8 +187,10 @@ def main():
     parser.add_argument('--web-server', action='store_true',
                         help='run a standalone WSGI web server with Indico')
 
-    parser.add_argument('--with-ipv6', action='store_true',
-                        help='enable ipv6 support for web server')
+    parser.add_argument('--with-ssl', action='store_true',
+                        help='enable ssl support for web server')
+    parser.add_argument('--ssl-key', help='path to the ssl private key file')
+    parser.add_argument('--ssl-cert', help='path to the ssl certificate file')
 
 
     args, remainingArgs = parser.parse_known_args()
@@ -164,8 +204,16 @@ def main():
 
     if 'web_server' in args and args.web_server:
         config = Config.getInstance()
-        refserver = RefServer(config.getHostNameURL(), int(config.getPortURL()), enable_ipv6=args.with_ipv6)
-        refserver.run()
+        if args.with_ssl:
+            # We have only HTTPS!
+            config._configVars['BaseURL'] = config.getBaseSecureURL()
+        else:
+            # Do not break if secure url is set
+            config._configVars['BaseSecureURL'] = ''
+        config._deriveOptions()
+        server = WerkzeugServer(config.getHostNameURL(), int(config.getPortURL()), enable_ssl=args.with_ssl,
+                                ssl_cert=args.ssl_cert, ssl_key=args.ssl_key)
+        server.run()
     else:
         dbi = DBMgr.getInstance()
         dbi.startRequest()

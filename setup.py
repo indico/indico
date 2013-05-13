@@ -50,7 +50,7 @@ except ImportError:
 
 DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras"]
 
-DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor']
+DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor', 'werkzeug']
 
 if sys.platform == 'linux2':
     import pwd
