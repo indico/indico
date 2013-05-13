@@ -9,14 +9,16 @@
     };
 
     $.fn.textContains = function(term) {
+        term = term.toLowerCase();
         return this.filter(function() {
-            return $(this).text().indexOf(term) > -1;
+            return $(this).text().toLowerCase().indexOf(term) > -1;
         });
     };
 
     $.fn.valueContains = function(term) {
+        term = term.toLowerCase();
         return this.filter(function() {
-            return $(this).val().indexOf(term) > -1;
+            return $(this).val().toLowerCase().indexOf(term) > -1;
         });
     };
 
