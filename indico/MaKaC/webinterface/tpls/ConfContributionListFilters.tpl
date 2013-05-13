@@ -87,7 +87,7 @@
         allItems.css('display', 'none');
         var items;
         if (resultCache[term] == undefined) {
-            items = $(".contributionListContribItem").filterText(term);
+            items = $(".contributionListContribItem").textContains(term);
             resultCache[term] = items;
         } else {
             items = resultCache[term];
