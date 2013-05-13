@@ -151,9 +151,6 @@
 
             popup.open();
         % elif candResv.room.needsAVCSetup:
-            var popup = new AlertPopup($T("Video equipment"), $T("The conference room you have chosen is equipped\nfor video-conferencing and video-projection.\nIf you need this equipment, DO NOT FORGET to select it.\nIf you don't need any of this equipment please choose\nanother room, if a suitable one is free on a suitable\nlocation for your meeting.\n\n\nThank you for your understanding."))
-            popup.open();
-
             $('.videoConferenceOption, #needsAVCSupport').change(function() {
                 if(this.checked) {
                     $('#usesAVC').prop('checked', true);
