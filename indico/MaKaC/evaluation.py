@@ -1400,13 +1400,13 @@ class Submission(Persistent):
                 submitter -- [Avatar/None] submitter who submitted this submission.
         """
         self._evaluation = evaluation
-        self._evaluation.insertSubmission(self)
         self.setSubmitter(submitter)
         self._id = str( evaluation._getSubmissionCounter().newCount() )
         self._answers = []
         self.submissionDate = nowutc()
         self.modificationDate = None
         self.anonymous = evaluation.isAnonymous()
+        self._evaluation.insertSubmission(self)
 
     def __cmp__(self, other):
         if type(self) is not type(other):
@@ -1427,9 +1427,10 @@ class Submission(Persistent):
 
     def setId(self, id):
         self._id = str(id)
+
     def getId(self):
         if not hasattr(self, "_id"):
-            self._id = str( evaluation._getSubmissionCounter().newCount() )
+            self._id = str( self._evaluation._getSubmissionCounter().newCount() )
         return self._id
 
     def notifyModification(self):

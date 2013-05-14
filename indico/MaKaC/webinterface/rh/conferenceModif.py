@@ -4649,6 +4649,9 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
         elif self._confirmAdditionFirst:
             p = conferences.WPConfModifRoomBookingConfirmBooking( self )
             return p.display()
+        elif self._answer == 'No':
+            url = urlHandlers.UHConfModifRoomBookingBookingForm.getURL(self._candResv.room)
+            self._redirect(url)
         else:
             if self._formMode == FormMode.NEW:
                 # Add it to event reservations list

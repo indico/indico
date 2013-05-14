@@ -213,6 +213,10 @@ class WPRoomBookingSearch4Rooms( WPRoomBookingBase ):
         self._forNewBooking = forNewBooking
         WPRoomBookingBase.__init__( self, rh )
 
+    def getJSFiles(self):
+        return WPRoomBookingBase.getJSFiles(self) + \
+               self._includeJSPackage('RoomBooking')
+
     def _getTitle(self):
         return WPRoomBookingBase._getTitle(self) + " - " + _("Search for rooms")
 
