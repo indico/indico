@@ -711,6 +711,7 @@ class ContributionFetcher(SessionContribFetcher):
 
         return self._process(_iterate_objs(idlist))
 
+
 class EventSearchFetcher(IteratedDataFetcher):
     DETAIL_INTERFACES = {
         'events': IConferenceMetadataFossil,
@@ -719,6 +720,7 @@ class EventSearchFetcher(IteratedDataFetcher):
     def event(self, query):
         ch = ConferenceHolder()
         index = IndexesHolder().getById("conferenceTitle")
+
         def _iterate_objs(query):
             try:
                 results = index.search(query)
@@ -729,8 +731,15 @@ class EventSearchFetcher(IteratedDataFetcher):
                 if event is not None and event.canAccess(self._aw):
                     yield event
 
-        for event in sorted(itertools.islice(_iterate_objs(query), self._offset, self._offset + self._limit), key=self._sortingKeys.get(self._orderBy), reverse=self._descending):
-            yield {'id': event.getId(), 'title': event.getTitle(), 'startDate': event.getStartDate(), 'hasAnyProtection': event.hasAnyProtection()}
+        for event in sorted(itertools.islice(_iterate_objs(query), self._offset, self._offset + self._limit),
+                            key=self._sortingKeys.get(self._orderBy), reverse=self._descending):
+            yield {
+                'id': event.getId(),
+                'title': event.getTitle(),
+                'startDate': event.getStartDate(),
+                'hasAnyProtection': event.hasAnyProtection()
+            }
+
 
 @HTTPAPIHook.register
 class UserEventHook(HTTPAPIHook):
