@@ -115,7 +115,7 @@ else:
 
 
 <script type="text/javascript">
-
+$(function() {
     function setMouseEvents(element, tooltipText) {
         var tooltipText = "<span style='padding:3px'>" + tooltipText + "</span>";
         element.dom.onmouseover = function(event) {
@@ -152,5 +152,6 @@ else:
     });
 
     setMouseEvents($E('manageEventButton'), '${ _("Switch to management area for this event")}');
+});
 
 </script>
