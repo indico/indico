@@ -236,6 +236,11 @@ def main():
         config._configVars['EmbeddedWebserver'] = True
         # Get appropriate base url and defaults
         base_url = config.getBaseSecureURL() if args.with_ssl else config.getBaseURL()
+        if not base_url:
+            base_url = config.getBaseURL() or 'http://localhost'
+            print ' * You should set {0}; falling back to {1}'.format(
+                'BaseSecureURL' if args.with_ssl else 'BaseURL',
+                base_url)
         default_port = 443 if args.with_ssl else 80
         url_data = urlparse.urlparse(base_url)
         # commandline data has priority, fallback to data from base url (or default in case of port)
