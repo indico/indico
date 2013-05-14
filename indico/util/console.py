@@ -66,8 +66,6 @@ def conferenceHolderIterator(ch, verbose=True, deepness='subcontrib'):
 
 # Coloring
 
-# pylint: disable-msg=W0611
-
 try:
     from termcolor import colored
 except ImportError:
@@ -77,3 +75,33 @@ except ImportError:
         (in case termcolor is not available)
         """
         return text
+
+
+# Error/warning/info message util methods
+
+def error(message):
+    """
+    Print a red error message
+    """
+    print colored(message, 'red')
+
+
+def warning(message):
+    """
+    Print a yellow warning message
+    """
+    print colored(message, 'yellow')
+
+
+def info(message):
+    """
+    Print a blue information message
+    """
+    print colored(message, 'cyan', attrs=['bold'])
+
+
+def success(message):
+    """
+    Print a green success message
+    """
+    print colored(message, 'green')

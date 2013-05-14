@@ -38,6 +38,7 @@ except ImportError:
 
 from indico.web.wsgi.indico_wsgi_handler import application
 from indico.core.index import Catalog
+from indico.util import console
 
 ## indico legacy imports
 import MaKaC
@@ -64,7 +65,7 @@ except ImportError:
         import code
         HAS_IPYTHON = False
 
-SHELL_BANNER = '\nindico {0}\n'.format(MaKaC.__version__)
+SHELL_BANNER = console.colored('\nindico {0}\n'.format(MaKaC.__version__), 'yellow')
 
 
 def add(namespace, element, name=None, doc=None):
@@ -74,9 +75,9 @@ def add(namespace, element, name=None, doc=None):
     namespace[name] = element
 
     if doc:
-        print '+ {0} : {1}'.format(name, doc)
+        print console.colored('+ {0} : {1}'.format(name, doc), 'green')
     else:
-        print '+ {0}'.format(name)
+        print console.colored('+ {0}'.format(name), 'green')
 
 
 class WerkzeugServer(object):
@@ -88,10 +89,10 @@ class WerkzeugServer(object):
         """
 
         if not werkzeug:
-            print 'Please install werkzeug to use the builtin dev server'
+            console.error('Please install werkzeug to use the builtin dev server')
             sys.exit(1)
         elif not SSL and enable_ssl:
-            print 'You need pyopenssl to use SSL'
+            console.error('You need pyopenssl to use SSL')
             sys.exit(1)
 
         config = Config.getInstance()
@@ -154,6 +155,7 @@ class WerkzeugServer(object):
             ssl_context = SSL.Context(SSL.SSLv23_METHOD)
             ssl_context.use_privatekey_file(self.ssl_key)
             ssl_context.use_certificate_chain_file(self.ssl_cert)
+
         # In case anyone wonders why evalex is disabled:
         # 1. It's a huge security hole when open to the public. To use it properly we'd need a way to
         #    restrict it by IP address (or disable it when not listening on localhost)
@@ -197,8 +199,83 @@ def _can_bind_port(port):
     return True
 
 
-def main():
+def setup_logging(level):
     formatter = logging.Formatter("%(asctime)s %(name)-16s: %(levelname)-8s - %(message)s")
+    logger = Logger.get()
+    handler = logging.StreamHandler()
+    handler.setLevel(getattr(logging, level))
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+
+def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=True, ssl_cert=None, ssl_key=None):
+    """
+    Sets up a Werkzeug-based web server based on the parameters provided
+    """
+
+    config = Config.getInstance()
+    # Let Indico know that we are using the embedded server. This causes it to re-raise exceptions so they
+    # end up in the Werkzeug debugger.
+    config._configVars['EmbeddedWebserver'] = True
+
+    # Get appropriate base url and defaults
+    base_url = config.getBaseSecureURL() if with_ssl else config.getBaseURL()
+    if not base_url:
+        base_url = config.getBaseURL() or 'http://localhost'
+        if with_ssl:
+            port = 443
+        console.warning(' * You should set {0}; retrieving host information from {1}'.format(
+            'BaseSecureURL' if with_ssl else 'BaseURL',
+            base_url))
+    default_port = 443 if with_ssl else 80
+    url_data = urlparse.urlparse(base_url)
+
+    # commandline data has priority, fallback to data from base url (or default in case of port)
+    host = host or url_data.netloc.partition(':')[0]
+    requested_port = used_port = port or url_data.port or default_port
+
+    # Don't let people bind on a port they cannot use.
+    if used_port < 1024 and not _can_bind_port(used_port):
+        used_port += 8000
+        console.warning(' * You cannot open a socket on port {0}, using {1} instead.'.format(requested_port, used_port))
+
+    # By default we update the base URL with the actual host/port. The user has the option to
+    # disable this though in case he wants different values, e.g. to use iptables to make his
+    # development server available via port 443 while listening on a non-privileged port:
+    # iptables -t nat -A PREROUTING -d YOURIP/32 -p tcp -m tcp --dport 443 -j REDIRECT --to-port 8443
+    if not keep_base_url:
+        scheme = 'https' if with_ssl else 'http'
+        netloc = host
+        if used_port != default_port:
+            netloc += ':%d' % used_port
+        base_url = '{0}://{1}{2}'.format(scheme, netloc, url_data.path)
+    # However, if we had to change the port to avoid a permission issue we always rewrite BaseURL.
+    # In this case it is somewhat safe to assume that the user is not actually trying to use the iptables hack
+    # mentioned above but simply did not consider using a non-privileged port.
+    elif requested_port != used_port:
+        netloc = '{0}:{1}'.format(url_data.netloc.partition(':')[0], used_port)
+        base_url = '{0}://{1}{2}' % (url_data.scheme, netloc, url_data.path)
+
+    # We update both BaseURL and BaseSecureURL to something that actually works.
+    # In case of SSL-only we need both URLs to be set to the same SSL url to prevent some stuff being "loaded"
+    # from an URL that is not available.
+    # In case of not using SSL we clear the BaseSecureURL so the user does not need to update the config during
+    # development if he needs to disable SSL for some reason.
+    if with_ssl:
+        config._configVars['BaseURL'] = base_url
+        config._configVars['BaseSecureURL'] = base_url
+    else:
+        config._configVars['BaseURL'] = base_url
+        config._configVars['BaseSecureURL'] = ''
+    config._deriveOptions()
+
+    console.info(' * Using BaseURL {0}'.format(base_url))
+    server = WerkzeugServer(host, used_port, enable_ssl=with_ssl,
+                            ssl_cert=ssl_cert, ssl_key=ssl_key)
+    server.run()
+
+
+def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--logging', action='store',
@@ -218,71 +295,18 @@ def main():
     parser.add_argument('--ssl-key', help='path to the ssl private key file')
     parser.add_argument('--ssl-cert', help='path to the ssl certificate file')
 
-
     args, remainingArgs = parser.parse_known_args()
 
     if 'logging' in args and args.logging:
-        logger = Logger.get()
-        handler = logging.StreamHandler()
-        handler.setLevel(getattr(logging, args.logging))
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
+        setup_logging(args.logging)
 
     if 'web_server' in args and args.web_server:
-        config = Config.getInstance()
-        # Let Indico know that we are using the embedded server. This causes it to re-raise exceptions so they
-        # end up in the Werkzeug debugger.
-        config._configVars['EmbeddedWebserver'] = True
-        # Get appropriate base url and defaults
-        base_url = config.getBaseSecureURL() if args.with_ssl else config.getBaseURL()
-        if not base_url:
-            base_url = config.getBaseURL() or 'http://localhost'
-            print ' * You should set {0}; falling back to {1}'.format(
-                'BaseSecureURL' if args.with_ssl else 'BaseURL',
-                base_url)
-        default_port = 443 if args.with_ssl else 80
-        url_data = urlparse.urlparse(base_url)
-        # commandline data has priority, fallback to data from base url (or default in case of port)
-        host = args.host or url_data.netloc.partition(':')[0]
-        requested_port = port = args.port or url_data.port or default_port
-        # Don't let people bind on a port they cannot use.
-        if port < 1024 and not _can_bind_port(port):
-            port += 8000
-            print ' * You cannot open a socket on port {0}, using {1} instead.'.format(requested_port, port)
-        # By default we update the base URL with the actual host/port. The user has the option to
-        # disable this though in case he wants different values, e.g. to use iptables to make his
-        # development server available via port 443 while listening on a non-privileged port:
-        # iptables -t nat -A PREROUTING -d YOURIP/32 -p tcp -m tcp --dport 443 -j REDIRECT --to-port 8443
-        if not args.keep_base_url:
-            scheme = 'https' if args.with_ssl else 'http'
-            netloc = host
-            if port != default_port:
-                netloc += ':{0}'.format(port)
-            base_url = '{0}://{1}{2}'.format(scheme, netloc, url_data.path)
-        # However, if we had to change the port to avoid a permission issue we always rewrite BaseURL.
-        # In this case it is somewhat safe to assume that the user is not actually trying to use the iptables hack
-        # mentioned above but simply did not consider using a non-privileged port.
-        elif requested_port != port:
-            netloc = '{0}:{1}'.format(url_data.netloc.partition(':')[0], port)
-            base_url = '{0}://{1}{2}'.format(url_data.scheme, netloc, url_data.path)
-
-        # We update both BaseURL and BaseSecureURL to something that actually works.
-        # In case of SSL-only we need both URLs to be set to the same SSL url to prevent some stuff being "loaded"
-        # from an URL that is not available.
-        # In case of not using SSL we clear the BaseSecureURL so the user does not need to update the config during
-        # development if he needs to disable SSL for some reason.
-        if args.with_ssl:
-            config._configVars['BaseURL'] = base_url
-            config._configVars['BaseSecureURL'] = base_url
-        else:
-            config._configVars['BaseURL'] = base_url
-            config._configVars['BaseSecureURL'] = ''
-        config._deriveOptions()
-
-        print ' * Using BaseURL ' + base_url
-        server = WerkzeugServer(host, port, enable_ssl=args.with_ssl,
-                                ssl_cert=args.ssl_cert, ssl_key=args.ssl_key)
-        server.run()
+        start_web_server(host=args.host,
+                         port=args.port,
+                         with_ssl=args.with_ssl,
+                         keep_base_url=args.keep_base_url,
+                         ssl_cert=args.ssl_cert,
+                         ssl_key=args.ssl_key)
     else:
         dbi = DBMgr.getInstance()
         dbi.startRequest()
@@ -292,20 +316,20 @@ def main():
         if HAS_IPYTHON:
             if OLD_IPYTHON:
                 ipshell = IPShellEmbed(remainingArgs,
-                                   banner=SHELL_BANNER,
-                                   exit_msg='Good luck',
-                                   user_ns=namespace)
+                                       banner=SHELL_BANNER,
+                                       exit_msg='Good luck',
+                                       user_ns=namespace)
             else:
                 config = IPConfig()
                 ipshell = InteractiveShellEmbed(config=config,
-                                            banner1=SHELL_BANNER,
-                                            exit_msg='Good luck',
-                                            user_ns=namespace)
+                                                banner1=SHELL_BANNER,
+                                                exit_msg='Good luck',
+                                                user_ns=namespace)
 
             ipshell()
         else:
-            console = code.InteractiveConsole(namespace)
-            console.interact(SHELL_BANNER)
+            iconsole = code.InteractiveConsole(namespace)
+            iconsole.interact(SHELL_BANNER)
 
         dbi.abort()
         dbi.endRequest()
