@@ -22,6 +22,7 @@ import argparse
 import errno
 import urlparse
 import re
+import signal
 import socket
 import sys
 from SocketServer import TCPServer
@@ -199,6 +200,15 @@ def _can_bind_port(port):
     return True
 
 
+def _sigint(sig, frame):
+    print
+    # Sometimes a request hangs and prevents the interpreter from existing.
+    # By setting an 1-second alarm we avoid this
+    if hasattr(signal, 'alarm'):
+        signal.alarm(1)
+    sys.exit(0)
+
+
 def setup_logging(level):
     formatter = logging.Formatter("%(asctime)s %(name)-16s: %(levelname)-8s - %(message)s")
     logger = Logger.get()
@@ -272,6 +282,7 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
     console.info(' * Using BaseURL {0}'.format(base_url))
     server = WerkzeugServer(host, used_port, enable_ssl=with_ssl,
                             ssl_cert=ssl_cert, ssl_key=ssl_key)
+    signal.signal(signal.SIGINT, _sigint)
     server.run()
 
 
