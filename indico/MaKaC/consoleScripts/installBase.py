@@ -157,7 +157,7 @@ def updateIndicoConfPathInsideMaKaCConfig(indico_conf_path, makacconfigpy_path):
     '''Modifies the location of indico.conf referenced inside makacconfigpy_path to
     point to indico_conf_path'''
     fdata = open(makacconfigpy_path).read()
-    fdata = re.sub('indico_conf[ ]*=[ ]*[\'"]{1}([^\'"]*)[\'"]{1}', "indico_conf = \"%s\"" % indico_conf_path, fdata)
+    fdata = re.sub(r'indico_conf\s*=\s*[\'"]([^\'"]*)[\'"]', "indico_conf = \"%s\"" % indico_conf_path, fdata)
     open(makacconfigpy_path, 'w').write(fdata)
 
 def _updateMaKaCEggCache(file, path):
@@ -337,21 +337,23 @@ def _replacePrefixInConf(filePath, prefix):
     fdata = re.sub('\/opt\/indico', prefix, fdata)
     open(filePath, 'w').write(fdata)
 
-def _updateDbConfigFiles(dbDir, logDir, cfgDir, tmpDir, uid):
-    filePath = os.path.join(cfgDir, 'zodb.conf')
-    fdata = open(filePath).read()
-    fdata = re.sub('\/opt\/indico\/db', dbDir, fdata)
-    fdata = re.sub('\/opt\/indico\/log', logDir, fdata)
-    open(filePath, 'w').write(fdata)
+def _updateDbConfigFiles(cfg_dir, uid=None, port=None, **kwargs):
+    """
+    Update parameters inside DB config files
+    """
+    kwargs['etc'] = cfg_dir
 
-    filePath = os.path.join(cfgDir, 'zdctl.conf')
-    fdata = open(filePath).read()
-    fdata = re.sub('\/opt\/indico\/db', dbDir, fdata)
-    fdata = re.sub('\/opt\/indico\/etc', cfgDir, fdata)
-    fdata = re.sub('\/opt\/indico\/tmp', tmpDir, fdata)
-    fdata = re.sub('(\s+user\s+)apache', '\g<1>%s' % uid, fdata)
-    open(filePath, 'w').write(fdata)
-
+    for fname in ['zodb.conf', 'zdctl.conf']:
+        with open(os.path.join(cfg_dir, fname), 'r+') as f:
+            fdata = f.read()
+            for dirname in ['db', 'log', 'tmp', 'etc']:
+                fdata = re.sub(r'\/opt\/indico\/{0}'.format(dirname), kwargs.get(dirname, dirname), fdata)
+            if uid:
+                fdata = re.compile(r'^(\s*user\s+)apache\s*', re.MULTILINE).sub(r'\g<1>{0}'.format(uid), fdata)
+            if port is not None:
+                fdata = re.compile(r'^(\s*address\s+localhost:)\d+\s*', re.MULTILINE).sub(r'\g<1>{0}'.format(port), fdata)
+            f.seek(0)
+            f.write(fdata)
 
 def indico_pre_install(defaultPrefix, force_upgrade=False, existingConfig=None):
     """

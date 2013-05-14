@@ -24,6 +24,7 @@ ez_setup.use_setuptools()
 import commands
 import getopt
 import os
+import getpass
 import re
 import shutil
 import string
@@ -190,10 +191,16 @@ class develop_config(develop_indico):
     description = "prepares the current directory for Indico development"
     user_options = (develop.develop.user_options +
                     [('www-uid=', None, "Set user for cache/log/db (typically apache user)"),
-                     ('www-gid=', None, "Set group for cache/log/db (typically apache group)")])
+                     ('www-gid=', None, "Set group for cache/log/db (typically apache group)"),
+                     ('http-port=', None, "Set port used by HTTP server"),
+                     ('zodb-port=', None, "Set port used by ZODB"),
+                     ('use-apache', None, "Use apache (will chmod directories accordingly)")])
 
     www_uid = None
     www_gid = None
+    http_port = 8000
+    zodb_port = 9675
+    use_apache = False
 
     def run(self):
         # dependencies, links, etc...
@@ -206,7 +213,10 @@ class develop_config(develop_indico):
         local = 'etc/indico.conf'
         if os.path.exists(local):
             print 'Upgrading existing etc/indico.conf..'
-            upgrade_indico_conf(local, 'etc/indico.conf.sample')
+            upgrade_indico_conf(local, 'etc/indico.conf.sample', {
+                'BaseURL': 'http://localhost:{0}/indico'.format(self.http_port),
+                'DBConnectionParams': ("localhost", int(self.zodb_port))
+            })
         else:
             print 'Creating new etc/indico.conf..'
             shutil.copy('etc/indico.conf.sample', local)
@@ -218,7 +228,7 @@ class develop_config(develop_indico):
 Please specify the directory where you'd like it to be placed.
 (Note that putting it outside of your sourcecode tree is recommended)"""
         prefixDirDefault = os.path.dirname(os.getcwd())
-        prefixDir = raw_input('[%s]: ' % prefixDirDefault).strip()
+        prefixDir = raw_input('Full path [%s]: ' % prefixDirDefault).strip()
 
         if prefixDir == '':
             prefixDir = prefixDirDefault
@@ -232,10 +242,8 @@ Please specify the directory where you'd like it to be placed.
                 os.makedirs(d)
         print 'Done!'
 
-        directories['htdocs'] = os.path.join(os.getcwd(), 'indico', 'htdocs')
-        directories['bin'] = os.path.join(os.getcwd(), 'bin')
-        directories['etc'] = os.path.join(os.getcwd(), 'etc')
-        directories['doc'] = os.path.join(os.getcwd(), 'doc')
+        # add existing dirs
+        directories.update(dict((d, os.path.join(os.getcwd(), 'indico', d)) for d in ['htdocs', 'bin', 'etc', 'doc']))
 
         self._update_conf_dir_paths(local, directories)
 
@@ -245,22 +253,24 @@ Please specify the directory where you'd like it to be placed.
         from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions, \
             _updateDbConfigFiles, _updateMaKaCEggCache
 
-        user = ''
-
+        user = getpass.getuser()
         sourcePath = os.getcwd()
 
-        # find the apache user/group
-        user, group = _findApacheUserGroup(self.www_uid, self.www_gid)
-        _checkDirPermissions(directories, dbInstalledBySetupPy=directories['db'], accessuser=user, accessgroup=group)
+        if self.use_apache:
+            # find the apache user/group
+            user, group = _findApacheUserGroup(self.www_uid, self.www_gid)
+            _checkDirPermissions(directories, dbInstalledBySetupPy=directories['db'], accessuser=user, accessgroup=group)
 
-        _updateDbConfigFiles(directories['db'], directories['log'], os.path.join(sourcePath, 'etc'),
-                             directories['tmp'], user)
+        _updateDbConfigFiles(os.path.join(sourcePath, 'etc'),
+                             db=directories['db'],
+                             log=directories['log'],
+                             tmp=directories['tmp'],
+                             port=self.zodb_port,
+                             uid=user)
 
         _updateMaKaCEggCache(os.path.join(os.path.dirname(__file__), 'indico', 'MaKaC', '__init__.py'),
                              directories['tmp'])
 
-        updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), ''),
-                                              'indico/MaKaC/common/MaKaCConfig.py')
         compileAllLanguages(self)
         print '''
 %s
