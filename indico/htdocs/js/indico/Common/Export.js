@@ -276,6 +276,7 @@ $(document).ready(function() {
                     target: $button,
                     effect: function() {
                         $(this).fadeOut(300);
+                        $button.removeClass('open');
                     }
                 }
             });
