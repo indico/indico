@@ -153,7 +153,7 @@ class WerkzeugServer(object):
             self._patch_shutdown_request()
             ssl_context = SSL.Context(SSL.SSLv23_METHOD)
             ssl_context.use_privatekey_file(self.ssl_key)
-            ssl_context.use_certificate_file(self.ssl_cert)
+            ssl_context.use_certificate_chain_file(self.ssl_cert)
         werkzeug.serving.run_simple(self.host, self.port, self.app, threaded=True, ssl_context=ssl_context,
                                     use_debugger=True, use_evalex=False)
 
