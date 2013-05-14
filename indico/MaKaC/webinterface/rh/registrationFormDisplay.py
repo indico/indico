@@ -166,10 +166,7 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
             if self._conf.hasRegistrantByEmail(email):
                 raise FormValuesError("There is already a user with the email \"%s\". Please choose another one"%email)
         else:
-            if user.isRegisteredInConf(self._conf):
-                self._redirect(urlHandlers.UHConfRegistrationForm.getURL(self._conf))
-                return
-            if self._conf.hasRegistrantByEmail(email):
+            if user.isRegisteredInConf(self._conf) or self._conf.hasRegistrantByEmail(email):
                 if canManageRegistration:
                     raise FormValuesError("There is already a user with the email \"%s\". Please choose another one"%email)
                 else:
