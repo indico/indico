@@ -155,6 +155,13 @@ class WerkzeugServer(object):
             ssl_context = SSL.Context(SSL.SSLv23_METHOD)
             ssl_context.use_privatekey_file(self.ssl_key)
             ssl_context.use_certificate_chain_file(self.ssl_cert)
+        # In case anyone wonders why evalex is disabled:
+        # 1. It's a huge security hole when open to the public. To use it properly we'd need a way to
+        #    restrict it by IP address (or disable it when not listening on localhost)
+        # 2. ZODB uses a thread-local field to store the connection. So anything accessing the DB will not work
+        #    when accessed from the debugger shell.
+        # So the best solution is not using that part of the werkzeug debugger at all.
+        # Simply use e.g. pydev or rpdb2 if you want a debugger.
         werkzeug.serving.run_simple(self.host, self.port, self.app, threaded=True, ssl_context=ssl_context,
                                     use_debugger=True, use_evalex=False)
 
