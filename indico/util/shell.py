@@ -64,7 +64,7 @@ except ImportError:
         import code
         HAS_IPYTHON = False
 
-SHELL_BANNER = '\nindico %s\n' % MaKaC.__version__
+SHELL_BANNER = '\nindico {0}\n'.format(MaKaC.__version__)
 
 
 def add(namespace, element, name=None, doc=None):
@@ -73,11 +73,10 @@ def add(namespace, element, name=None, doc=None):
         name = element.__name__
     namespace[name] = element
 
-    print "+ '%s'" % name,
     if doc:
-        print ": %s" % doc
+        print '+ {0} : {1}'.format(name, doc)
     else:
-        print
+        print '+ {0}'.format(name)
 
 
 class WerkzeugServer(object):
@@ -102,7 +101,7 @@ class WerkzeugServer(object):
 
         def fake_app(environ, start_response):
             rpath = environ['PATH_INFO']
-            m = re.match(r'^%s(.*)$' % path, rpath)
+            m = re.match(r'^{0}(.*)$'.format(path), rpath)
             if m:
                 environ['PATH_INFO'] = m.group(1)
                 environ['SCRIPT_NAME'] = path
@@ -249,7 +248,7 @@ def main():
         # Don't let people bind on a port they cannot use.
         if port < 1024 and not _can_bind_port(port):
             port += 8000
-            print ' * You cannot open a socket on port %d, using %d instead.' % (requested_port, port)
+            print ' * You cannot open a socket on port {0}, using {1} instead.'.format(requested_port, port)
         # By default we update the base URL with the actual host/port. The user has the option to
         # disable this though in case he wants different values, e.g. to use iptables to make his
         # development server available via port 443 while listening on a non-privileged port:
@@ -258,14 +257,14 @@ def main():
             scheme = 'https' if args.with_ssl else 'http'
             netloc = host
             if port != default_port:
-                netloc += ':%d' % port
-            base_url = '%s://%s%s' % (scheme, netloc, url_data.path)
+                netloc += ':{0}'.format(port)
+            base_url = '{0}://{1}{2}'.format(scheme, netloc, url_data.path)
         # However, if we had to change the port to avoid a permission issue we always rewrite BaseURL.
         # In this case it is somewhat safe to assume that the user is not actually trying to use the iptables hack
         # mentioned above but simply did not consider using a non-privileged port.
         elif requested_port != port:
-            netloc = '%s:%d' % (url_data.netloc.partition(':')[0], port)
-            base_url = '%s://%s%s' % (url_data.scheme, netloc, url_data.path)
+            netloc = '{0}:{1}'.format(url_data.netloc.partition(':')[0], port)
+            base_url = '{0}://{1}{2}'.format(url_data.scheme, netloc, url_data.path)
 
         # We update both BaseURL and BaseSecureURL to something that actually works.
         # In case of SSL-only we need both URLs to be set to the same SSL url to prevent some stuff being "loaded"
@@ -280,7 +279,7 @@ def main():
             config._configVars['BaseSecureURL'] = ''
         config._deriveOptions()
 
-        print ' * Using BaseURL %s' % base_url
+        print ' * Using BaseURL ' + base_url
         server = WerkzeugServer(host, port, enable_ssl=args.with_ssl,
                                 ssl_cert=args.ssl_cert, ssl_key=args.ssl_key)
         server.run()
