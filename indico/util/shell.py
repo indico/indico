@@ -19,6 +19,7 @@
 
 import logging
 import argparse
+import errno
 import urlparse
 import re
 import socket
@@ -178,15 +179,33 @@ def setupNamespace(dbi):
 
     return namespace
 
+
+def _can_bind_port(port):
+    s = socket.socket()
+    try:
+        s.bind(('', port))
+    except socket.error, e:
+        if e.errno == errno.EACCES:
+            return False
+    s.close()
+    return True
+
+
 def main():
     formatter = logging.Formatter("%(asctime)s %(name)-16s: %(levelname)-8s - %(message)s")
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser()
 
     parser.add_argument('--logging', action='store',
                         help='display logging messages for specified level')
 
     parser.add_argument('--web-server', action='store_true',
                         help='run a standalone WSGI web server with Indico')
+    parser.add_argument('--host',
+                        help='use a different host than the one in indico.conf')
+    parser.add_argument('--port', type=int,
+                        help='use a different port than the one in indico.conf')
+    parser.add_argument('--keep-base-url', action='store_true',
+                        help='do not update the base url with the given host/port')
 
     parser.add_argument('--with-ssl', action='store_true',
                         help='enable ssl support for web server')
@@ -206,14 +225,39 @@ def main():
     if 'web_server' in args and args.web_server:
         config = Config.getInstance()
         config._configVars['EmbeddedWebserver'] = True
+        # Get appropriate base url and defaults
+        base_url = config.getBaseSecureURL() if args.with_ssl else config.getBaseURL()
+        default_port = 443 if args.with_ssl else 80
+        url_data = urlparse.urlparse(base_url)
+        # commandline data hae priority, fallback to data from base url (or default in case of port)
+        host = args.host or url_data.netloc.partition(':')[0]
+        requested_port = port = args.port or url_data.port or default_port
+        # Don't let people bind on a port they cannot use.
+        if port < 1024 and not _can_bind_port(port):
+            port += 8000
+            print ' * You cannot open a socket on port %d, using %d instead.' % (requested_port, port)
+        if not args.keep_base_url:
+            scheme = 'https' if args.with_ssl else 'http'
+            netloc = host
+            if port != default_port:
+                netloc += ':%d' % port
+            base_url = '%s://%s%s' % (scheme, netloc, url_data.path)
+        elif requested_port != port:  # port changed because of EACCESS
+            netloc = '%s:%d' % (url_data.netloc.partition(':')[0], port)
+            base_url = '%s://%s%s' % (url_data.scheme, netloc, url_data.path)
+
         if args.with_ssl:
-            # We have only HTTPS!
-            config._configVars['BaseURL'] = config.getBaseSecureURL()
+            # We have only HTTPS! Use the same URL for both
+            config._configVars['BaseURL'] = base_url
+            config._configVars['BaseSecureURL'] = base_url
         else:
-            # Do not break if secure url is set
+            # We have no HTTPS and don't want to break things if a secure url is set in the config anyway
+            config._configVars['BaseURL'] = base_url
             config._configVars['BaseSecureURL'] = ''
         config._deriveOptions()
-        server = WerkzeugServer(config.getHostNameURL(), int(config.getPortURL()), enable_ssl=args.with_ssl,
+
+        print ' * Using BaseURL %s' % base_url
+        server = WerkzeugServer(host, port, enable_ssl=args.with_ssl,
                                 ssl_cert=args.ssl_cert, ssl_key=args.ssl_key)
         server.run()
     else:
