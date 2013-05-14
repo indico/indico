@@ -224,34 +224,46 @@ def main():
 
     if 'web_server' in args and args.web_server:
         config = Config.getInstance()
+        # Let Indico know that we are using the embedded server. This causes it to re-raise exceptions so they
+        # end up in the Werkzeug debugger.
         config._configVars['EmbeddedWebserver'] = True
         # Get appropriate base url and defaults
         base_url = config.getBaseSecureURL() if args.with_ssl else config.getBaseURL()
         default_port = 443 if args.with_ssl else 80
         url_data = urlparse.urlparse(base_url)
-        # commandline data hae priority, fallback to data from base url (or default in case of port)
+        # commandline data has priority, fallback to data from base url (or default in case of port)
         host = args.host or url_data.netloc.partition(':')[0]
         requested_port = port = args.port or url_data.port or default_port
         # Don't let people bind on a port they cannot use.
         if port < 1024 and not _can_bind_port(port):
             port += 8000
             print ' * You cannot open a socket on port %d, using %d instead.' % (requested_port, port)
+        # By default we update the base URL with the actual host/port. The user has the option to
+        # disable this though in case he wants different values, e.g. to use iptables to make his
+        # development server available via port 443 while listening on a non-privileged port:
+        # iptables -t nat -A PREROUTING -d YOURIP/32 -p tcp -m tcp --dport 443 -j DNAT --to-destination YOURIP:8443
         if not args.keep_base_url:
             scheme = 'https' if args.with_ssl else 'http'
             netloc = host
             if port != default_port:
                 netloc += ':%d' % port
             base_url = '%s://%s%s' % (scheme, netloc, url_data.path)
-        elif requested_port != port:  # port changed because of EACCESS
+        # However, if we had to change the port to avoid a permission issue we always rewrite BaseURL.
+        # In this case it is somewhat safe to assume that the user is not actually trying to use the iptables hack
+        # mentioned above but simply did not consider using a non-privileged port.
+        elif requested_port != port:
             netloc = '%s:%d' % (url_data.netloc.partition(':')[0], port)
             base_url = '%s://%s%s' % (url_data.scheme, netloc, url_data.path)
 
+        # We update both BaseURL and BaseSecureURL to something that actually works.
+        # In case of SSL-only we need both URLs to be set to the same SSL url to prevent some stuff being "loaded"
+        # from an URL that is not available.
+        # In case of not using SSL we clear the BaseSecureURL so the user does not need to update the config during
+        # development if he needs to disable SSL for some reason.
         if args.with_ssl:
-            # We have only HTTPS! Use the same URL for both
             config._configVars['BaseURL'] = base_url
             config._configVars['BaseSecureURL'] = base_url
         else:
-            # We have no HTTPS and don't want to break things if a secure url is set in the config anyway
             config._configVars['BaseURL'] = base_url
             config._configVars['BaseSecureURL'] = ''
         config._deriveOptions()
