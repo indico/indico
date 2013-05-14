@@ -248,7 +248,7 @@ def main():
         # By default we update the base URL with the actual host/port. The user has the option to
         # disable this though in case he wants different values, e.g. to use iptables to make his
         # development server available via port 443 while listening on a non-privileged port:
-        # iptables -t nat -A PREROUTING -d YOURIP/32 -p tcp -m tcp --dport 443 -j DNAT --to-destination YOURIP:8443
+        # iptables -t nat -A PREROUTING -d YOURIP/32 -p tcp -m tcp --dport 443 -j REDIRECT --to-port 8443
         if not args.keep_base_url:
             scheme = 'https' if args.with_ssl else 'http'
             netloc = host
