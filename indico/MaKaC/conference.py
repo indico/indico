@@ -375,6 +375,10 @@ class Category(CommonObjectBase):
             return cmp(hash(self), hash(other))
         return cmp(self.getId(), other.getId())
 
+    def __repr__(self):
+        path = '/'.join(self.getCategoryPathTitles()[:-1])
+        return '<Category({0}, {1}, {2})>'.format(self.getId(), self.getName(), path)
+
     def __str__(self):
         return "<Category %s@%s>" % (self.getId(), hex(id(self)))
 
@@ -2105,6 +2109,9 @@ class Conference(CommonObjectBase, Locatable):
         self._sortUrlTag = ""
 
         self._observers = []
+
+    def __repr__(self):
+        return '<Conference({0}, {1}, {2})'.format(self.getId(), self.getTitle(), self.getStartDate())
 
     def __str__(self):
         return "<Conference %s@%s>" % (self.getId(), hex(id(self)))

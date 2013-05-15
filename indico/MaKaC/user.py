@@ -409,6 +409,9 @@ class Avatar(Persistent, Fossilizable):
 
             self.setDisplayTZMode(userData.get("displayTZMode", "Event Timezone"))
 
+    def __repr__(self):
+        return '<Avatar({0}, {1})>'.format(self.getId(), self.getFullName())
+
     def mergeTo(self, av):
         if av:
             av.mergeFrom(self)
