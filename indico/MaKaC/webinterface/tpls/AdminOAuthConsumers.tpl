@@ -1,5 +1,5 @@
-<div id="inPlaceAddConsumer"></div>
-<ol class="ordered-list" style="border-top: 1px solid #DDDDDD">
+<div id="inPlaceAddConsumer" style="margin-bottom: 1em;"></div>
+<ol class="ordered-list consumer-list" style="border-top: 1px solid #DDDDDD">
     % for consumer in consumers:
     <li>
         <div class="list-item-title">
@@ -33,59 +33,68 @@ function addHandler(result){
     $(".ordered-list").append(consumerItem);
 }
 
-$("#inPlaceAddConsumer").html(new AddItemWidget("consumer_name", "oauth.addConsumer", addHandler).draw());
+$(function() {
+    $("#inPlaceAddConsumer").html(new AddItemWidget("consumer_name", "oauth.addConsumer", addHandler).draw());
 
-$("body").on("click", ".icon-remove", function() {
-    var self = $(this);
+    $("body").on("click", ".icon-remove", function() {
+        var self = $(this);
 
-    new ConfirmPopup($T("Delete consumer"), $T("Do you want to delete this consumer? Please note that this action cannot be undone."), function(confirmed) {
-        if (!confirmed) {
-            return;
-        }
+        new ConfirmPopup($T("Delete consumer"), $T("Do you want to delete this consumer? Please note that this action cannot be undone."), function(confirmed) {
+            if (!confirmed) {
+                return;
+            }
 
-        var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting..."));
-        jsonRpc(Indico.Urls.JsonRpcService, "oauth.removeConsumer",
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting..."));
+            jsonRpc(Indico.Urls.JsonRpcService, "oauth.removeConsumer",
+                    {'consumer_key': self.data("consumer-key")},
+                    function(result, error) {
+                        if (exists(error)) {
+                            killProgress();
+                            IndicoUtil.errorReport(error);
+                        } else {
+                            killProgress();
+                            self.closest("li").remove();
+                        }
+                    });
+        }).open();
+    });
+
+    $("body").on("click",".icon-trust, .icon-untrust", function(){
+        var self = $(this);
+        var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving..."));
+        jsonRpc(Indico.Urls.JsonRpcService, "oauth.toogleCosumerTrusted" ,
                 {'consumer_key': self.data("consumer-key")},
-                function(result, error) {
+                function(result, error){
                     if (exists(error)) {
                         killProgress();
                         IndicoUtil.errorReport(error);
                     } else {
                         killProgress();
-                        self.closest("li").remove();
+                        if(result ==false){
+                            self.removeClass("trusted");
+                        } else {
+                            self.addClass("trusted");
+                        }
                     }
                 });
-    }).open();
-});
+    });
 
-$("body").on("click",".icon-trust, .icon-untrust", function(){
-    var self = $(this);
-    var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving..."));
-    jsonRpc(Indico.Urls.JsonRpcService, "oauth.toogleCosumerTrusted" ,
-            {'consumer_key': self.data("consumer-key")},
-            function(result, error){
-                if (exists(error)) {
-                    killProgress();
-                    IndicoUtil.errorReport(error);
-                } else {
-                    killProgress();
-                    if(result ==false){
-                        self.removeClass("trusted");
-                    } else {
-                        self.addClass("trusted");
+    $('.consumer-list').on('mouseover', '.icon-trust', function(event) {
+        $(this).qtip({
+            content: {
+                text: function() {
+                    if ($(this).hasClass('trusted')) {
+                        return $T("The consumer is trusted. That means that every time a user asks for the token the consumer will have access to the user events without asking for permission.");
                     }
+                    return $T("The consumer is not trusted. That means that every time a user asks for the token an acceptance form will appear in order to give access to the application to get its events.");
                 }
-            });
-});
-
-$('.icon-trust').qtip({
-    content: {
-        text: function() {
-            if ($(this).hasClass('trusted')) {
-                return $T("The consumer is trusted. That means that every time a user asks for the token the consumer will have access to the user events without asking for permission.");
+            },
+            overwrite: false,
+            show: {
+                ready: true,
+                event: event.type
             }
-            return $T("The consumer is not trusted. That means that every time a user asks for the token an acceptance form will appear in order to give access to the application to get its events.");
-        }
-    }
-});
+        });
+    });
+})
 </script>
