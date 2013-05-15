@@ -83,7 +83,8 @@ def add(namespace, element, name=None, doc=None):
 
 class WerkzeugServer(object):
 
-    def __init__(self, host='localhost', port=8000, enable_ssl=False, ssl_key=None, ssl_cert=None):
+    def __init__(self, host='localhost', port=8000, enable_ssl=False, ssl_key=None, ssl_cert=None,
+                 reload_on_change=False):
         """
         Run an Indico WSGI ref server instance
         Very simple dispatching app
@@ -119,6 +120,7 @@ class WerkzeugServer(object):
         self.ssl = enable_ssl
         self.ssl_key = ssl_key
         self.ssl_cert = ssl_cert
+        self.reload_on_change = reload_on_change
 
         logger = logging.getLogger('werkzeug')
         logger.setLevel(logging.DEBUG)
@@ -165,7 +167,7 @@ class WerkzeugServer(object):
         # So the best solution is not using that part of the werkzeug debugger at all.
         # Simply use e.g. pydev or rpdb2 if you want a debugger.
         werkzeug.serving.run_simple(self.host, self.port, self.app, threaded=True, ssl_context=ssl_context,
-                                    use_debugger=True, use_evalex=False)
+                                    use_debugger=True, use_evalex=False, use_reloader=self.reload_on_change)
 
 
 def setupNamespace(dbi):
@@ -218,7 +220,8 @@ def setup_logging(level):
     logger.addHandler(handler)
 
 
-def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=True, ssl_cert=None, ssl_key=None):
+def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=True, ssl_cert=None, ssl_key=None,
+                     reload_on_change=False):
     """
     Sets up a Werkzeug-based web server based on the parameters provided
     """
@@ -280,8 +283,8 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
     config._deriveOptions()
 
     console.info(' * Using BaseURL {0}'.format(base_url))
-    server = WerkzeugServer(host, used_port, enable_ssl=with_ssl,
-                            ssl_cert=ssl_cert, ssl_key=ssl_key)
+    server = WerkzeugServer(host, used_port, reload_on_change=reload_on_change,
+                            enable_ssl=with_ssl, ssl_cert=ssl_cert, ssl_key=ssl_key)
     signal.signal(signal.SIGINT, _sigint)
     server.run()
 
@@ -305,6 +308,9 @@ def main():
                         help='enable ssl support for web server')
     parser.add_argument('--ssl-key', help='path to the ssl private key file')
     parser.add_argument('--ssl-cert', help='path to the ssl certificate file')
+    parser.add_argument('--reload-on-change', action='store_true',
+                        help='restart the server whenever a file changes (does not work for legacy code)')
+
 
     args, remainingArgs = parser.parse_known_args()
 
@@ -317,7 +323,8 @@ def main():
                          with_ssl=args.with_ssl,
                          keep_base_url=args.keep_base_url,
                          ssl_cert=args.ssl_cert,
-                         ssl_key=args.ssl_key)
+                         ssl_key=args.ssl_key,
+                         reload_on_change=args.reload_on_change)
     else:
         dbi = DBMgr.getInstance()
         dbi.startRequest()
