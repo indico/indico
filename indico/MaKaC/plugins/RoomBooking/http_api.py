@@ -198,7 +198,7 @@ class BookRoomHook(HTTPAPIHook):
         """
         self._user = aw.getUser()
 
-        if self._room.resvsNeedConfirmation:
+        if self._room.resvsNeedConfirmation and self._user and not self._user.isAdmin(): # Admins can book, even if only pre-booking enabled.
             raise HTTPAPIError('This room does not accept direct bookings and it '
                                'is not possible to pre-book rooms through the API.')
 
