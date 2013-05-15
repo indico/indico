@@ -578,9 +578,9 @@ class Category(CommonObjectBase):
 
     def removeMaterial( self, mat ):
         if mat.getId() in self.materials.keys():
+            mat.delete()
             self.materials[mat.getId()].setOwner(None)
             del self.materials[ mat.getId() ]
-            mat.delete()
             self.notifyModification()
             return "done: %s"%mat.getId()
         elif mat.getId().lower() == 'minutes':
