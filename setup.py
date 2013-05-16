@@ -193,12 +193,14 @@ class develop_config(develop_indico):
                     [('www-uid=', None, "Set user for cache/log/db (typically apache user)"),
                      ('www-gid=', None, "Set group for cache/log/db (typically apache group)"),
                      ('http-port=', None, "Set port used by HTTP server"),
+                     ('https-port=', None, "Set port used by HTTP server in HTTPS mode"),
                      ('zodb-port=', None, "Set port used by ZODB"),
                      ('use-apache', None, "Use apache (will chmod directories accordingly)")])
 
     www_uid = None
     www_gid = None
     http_port = 8000
+    https_port = 8443
     zodb_port = 9675
     use_apache = False
 
@@ -212,14 +214,16 @@ class develop_config(develop_indico):
 
         local = 'etc/indico.conf'
         if os.path.exists(local):
-            print 'Upgrading existing etc/indico.conf..'
-            upgrade_indico_conf(local, 'etc/indico.conf.sample', {
-                'BaseURL': 'http://localhost:{0}/indico'.format(self.http_port),
-                'DBConnectionParams': ("localhost", int(self.zodb_port))
-            })
+            print 'Upgrading existing etc/indico.conf...'
         else:
             print 'Creating new etc/indico.conf..'
             shutil.copy('etc/indico.conf.sample', local)
+
+        upgrade_indico_conf(local, 'etc/indico.conf.sample', {
+                'BaseURL': 'http://localhost:{0}/indico'.format(self.http_port),
+                'BaseSecureURL': 'https://localhost:{0}/indico'.format(self.https_port),
+                'DBConnectionParams': ("localhost", int(self.zodb_port))
+                })
 
         for f in [x for x in ('etc/zdctl.conf', 'etc/zodb.conf', 'etc/logging.conf') if not os.path.exists(x)]:
             shutil.copy('%s.sample' % f, f)

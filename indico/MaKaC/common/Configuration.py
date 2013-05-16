@@ -480,7 +480,6 @@ class Config:
         'Profile'                   : 'no',
         'UseXSendFile'              : 'no',
         'AuthenticatedEnforceSecure': 'no',
-        'ExportACL'           : {},
         'MaxUploadFilesTotalSize' : '0',
         'MaxUploadFileSize' : '0',
         'ForceConflicts' : 0,

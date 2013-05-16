@@ -55,11 +55,11 @@ CSRFLevel = 2
 #------------------------------------------------------------------------------
 # BaseURL is the url where Indico will be accessed:
 
-BaseURL              = "http://localhost/indico"
+BaseURL              = "http://localhost:8000/indico"
 
 # BaseSecureURL is the HTTPS location of Indico. Set empty string if you want to use http.
 
-BaseSecureURL        = "https://localhost/indico"
+BaseSecureURL        = "https://localhost:8443/indico"
 
 
 # If you are using a custom user authentication system (see below) uncomment
@@ -270,13 +270,6 @@ CssStylesheetName    = "Default"
 
 # PublicFolder         = "/opt/indico/htdocs/results"
 
-
-#------------------------------------------------------------------------------
-# DATA EXPORT PARAMETERS
-#------------------------------------------------------------------------------
-
-# Categories that you want to limit to certain IPs (RSS, iCal, export.py)
-ExportACL = {}
 
 #------------------------------------------------------------------------------
 # OAUTH PARAMETERS
