@@ -349,9 +349,9 @@ def _updateDbConfigFiles(cfg_dir, uid=None, port=None, **kwargs):
             for dirname in ['db', 'log', 'tmp', 'etc']:
                 fdata = re.sub(r'\/opt\/indico\/{0}'.format(dirname), kwargs.get(dirname, dirname), fdata)
             if uid:
-                fdata = re.compile(r'^(\s*user\s+)apache\s*', re.MULTILINE).sub(r'\g<1>{0}'.format(uid), fdata)
+                fdata = re.compile(r'^(\s*user\s+)apache[^\S\n]*', re.MULTILINE).sub(r'\g<1>{0}'.format(uid), fdata)
             if port is not None:
-                fdata = re.compile(r'^(\s*address\s+localhost:)\d+\s*', re.MULTILINE).sub(r'\g<1>{0}'.format(port), fdata)
+                fdata = re.compile(r'^(\s*address\s+localhost:)\d+[^\S\n]*', re.MULTILINE).sub(r'\g<1>{0}'.format(port), fdata)
             f.seek(0)
             f.write(fdata)
 
