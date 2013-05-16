@@ -210,7 +210,7 @@ class WPCategoryDisplay(WPCategoryDisplayBase):
         url = urlHandlers.UHCategoryToAtom.getURL(self._target)
 
         return WPCategoryDisplayBase._getHeadContent( self ) + \
-        i18nformat("""<link rel="alternate" type="application/atom+xml" title= _("Indico Atom Feed") href="%s">""") % url
+        i18nformat("""<link rel="alternate" type="application/atom+xml" title="_('Indico Atom Feed')" href="%s">""") % url
 
     def _getBody( self, params ):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
