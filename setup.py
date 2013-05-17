@@ -195,6 +195,7 @@ class develop_config(develop_indico):
                      ('http-port=', None, "Set port used by HTTP server"),
                      ('https-port=', None, "Set port used by HTTP server in HTTPS mode"),
                      ('zodb-port=', None, "Set port used by ZODB"),
+                     ('smtp-port=', None, "Set port used for SMTP (e-mail sending)")
                      ('use-apache', None, "Use apache (will chmod directories accordingly)")])
 
     www_uid = None
@@ -203,6 +204,7 @@ class develop_config(develop_indico):
     https_port = 8443
     zodb_port = 9675
     use_apache = False
+    smtp_port = 8025
 
     def run(self):
         # dependencies, links, etc...
@@ -222,7 +224,8 @@ class develop_config(develop_indico):
         upgrade_indico_conf(local, 'etc/indico.conf.sample', {
                 'BaseURL': 'http://localhost:{0}/indico'.format(self.http_port),
                 'BaseSecureURL': 'https://localhost:{0}/indico'.format(self.https_port),
-                'DBConnectionParams': ("localhost", int(self.zodb_port))
+                'DBConnectionParams': ("localhost", int(self.zodb_port)),
+                'SmtpServer': ("localhost", int(self.smtp_port))
                 })
 
         for f in [x for x in ('etc/zdctl.conf', 'etc/zodb.conf', 'etc/logging.conf') if not os.path.exists(x)]:
