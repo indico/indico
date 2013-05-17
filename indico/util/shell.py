@@ -339,6 +339,7 @@ def main():
                                        user_ns=namespace)
             else:
                 config = IPConfig()
+                config.TerminalInteractiveShell.confirm_exit = False
                 ipshell = InteractiveShellEmbed(config=config,
                                                 banner1=SHELL_BANNER,
                                                 exit_msg='Good luck',
