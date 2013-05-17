@@ -195,7 +195,7 @@ class develop_config(develop_indico):
                      ('http-port=', None, "Set port used by HTTP server"),
                      ('https-port=', None, "Set port used by HTTP server in HTTPS mode"),
                      ('zodb-port=', None, "Set port used by ZODB"),
-                     ('smtp-port=', None, "Set port used for SMTP (e-mail sending)")
+                     ('smtp-port=', None, "Set port used for SMTP (e-mail sending)"),
                      ('use-apache', None, "Use apache (will chmod directories accordingly)")])
 
     www_uid = None
