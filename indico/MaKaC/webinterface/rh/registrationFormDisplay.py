@@ -183,10 +183,10 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
         email = self._regForm.getNotification().createEmailNewRegistrant(self._regForm, rp)
         if email:
             GenericMailer.send(email)
-        if not canManageRegistration:
-            self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp))
-        else:
+        if canManageRegistration and user != self._getUser():
             self._redirect(RHRegistrantListModif._uh.getURL(self._conf))
+        else:
+            self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp))
 
 class RHRegistrationFormRegistrantBase( RHRegistrationFormDisplayBase ):
     def _checkParams(self, params):
