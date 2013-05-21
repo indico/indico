@@ -1664,7 +1664,8 @@ class Abstract(Persistent):
         return self._submissionDate
 
     def getConference( self ):
-        return self.getOwner().getOwner()
+        mgr = self.getOwner()
+        return mgr.getOwner() if mgr else None
 
     def _newAuthor( self, **data ):
         author = Author( self, **data )
@@ -1986,9 +1987,11 @@ class Abstract(Persistent):
     def isProtected(self):
         return self.getConference().isProtected()
 
-    def delete( self ):
+    def delete(self):
         if self._owner:
-            self.getSubmitter().delete()
+            self.getOwner().unregisterParticipation(self._submitter)
+            self._submitter.getUser().unlinkTo(self, "submitter")
+            self._submitter.delete()
             self._submitter = None
             self.clearAuthors()
             self.clearSpeakers()
