@@ -425,7 +425,7 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
         session.setBgColor(self._bgColor)
 
         slot = conference.SessionSlot(session)
-
+        slot.setScheduleType(self._scheduleType)
         slot.setTitle(self._subtitle or "")
         slot.setStartDate(session.getStartDate())
 
