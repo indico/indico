@@ -980,7 +980,13 @@ class Category(CommonObjectBase):
         for conference in self.getConferenceList():
             self.removeConference( conference, delete = True )
         self.getOwner()._removeSubCategory( self )
-        CategoryManager().remove( self )
+        CategoryManager().remove(self)
+        for prin in self.__ac.getAccessList():
+            if isinstance(prin, MaKaC.user.Avatar):
+                prin.unlinkTo(self, "access")
+        for prin in self.__ac.getModifierList():
+            if isinstance(prin, MaKaC.user.Avatar):
+                prin.unlinkTo(self, "manager")
         TrashCanManager().add(self)
 
         self._notify('deleted', oldOwner)
