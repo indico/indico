@@ -19,11 +19,27 @@
 
 from __future__ import absolute_import
 
+import os
 from flask import Flask
 
 
+def fix_root_path(app):
+    """Fix the app's root path when using namespace packages.
+
+    Flask's get_root_path is not reliable in this case so we derive it from
+    __name__ and __file__ instead."""
+
+    # __name__:       'indico.web.flask.app'
+    # __file__:  '..../indico/web/flask/app.py'
+    # For each dot in the module name we go up one path segment
+    up_segments = ['..'] * __name__.count('.')
+    app.root_path = os.path.normpath(os.path.join(__file__, *up_segments))
+
+
 def make_app():
-    return Flask('indico')
+    app = Flask('indico')
+    fix_root_path(app)
+    return app
 
 
 app = make_app()
