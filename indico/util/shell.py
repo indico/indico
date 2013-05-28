@@ -41,7 +41,8 @@ try:
 except ImportError:
     SSL = None
 
-from indico.web.wsgi.indico_wsgi_handler import application
+from indico.web.wsgi.indico_wsgi_handler import application as legacy_app
+from indico.web.flask.app import app as flask_app
 from indico.core.index import Catalog
 from indico.util import console
 
@@ -264,7 +265,7 @@ def setup_logging(level):
 
 
 def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=True, ssl_cert=None, ssl_key=None,
-                     reload_on_change=False):
+                     reload_on_change=False, use_flask=False):
     """
     Sets up a Werkzeug-based web server based on the parameters provided
     """
@@ -326,7 +327,7 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
     config._deriveOptions()
 
     console.info(' * Using BaseURL {0}'.format(base_url))
-    app = make_indico_dispatcher(application)
+    app = make_indico_dispatcher(flask_app if use_flask else legacy_app)
     server = WerkzeugServer(app, host, used_port, reload_on_change=reload_on_change,
                             enable_ssl=with_ssl, ssl_cert=ssl_cert, ssl_key=ssl_key)
     signal.signal(signal.SIGINT, _sigint)
@@ -341,6 +342,8 @@ def main():
 
     parser.add_argument('--web-server', action='store_true',
                         help='run a standalone WSGI web server with Indico')
+    parser.add_argument('--flask', action='store_true',
+                        help='use the new flask backend')
     parser.add_argument('--host',
                         help='use a different host than the one in indico.conf')
     parser.add_argument('--port', type=int,
@@ -368,7 +371,8 @@ def main():
                          keep_base_url=args.keep_base_url,
                          ssl_cert=args.ssl_cert,
                          ssl_key=args.ssl_key,
-                         reload_on_change=args.reload_on_change)
+                         reload_on_change=args.reload_on_change,
+                         use_flask=args.flask)
     else:
         dbi = DBMgr.getInstance()
         dbi.startRequest()
