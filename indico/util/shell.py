@@ -27,6 +27,8 @@ import signal
 import socket
 import sys
 from SocketServer import TCPServer
+from werkzeug.exceptions import NotFound
+from werkzeug.wsgi import DispatcherMiddleware
 
 try:
     import werkzeug.serving
@@ -83,13 +85,25 @@ def add(namespace, element, name=None, doc=None):
         print console.colored('+ {0}'.format(name), 'green')
 
 
+def make_indico_dispatcher(wsgi_app):
+    config = Config.getInstance()
+    baseURL = config.getBaseURL()
+    path = urlparse.urlparse(baseURL)[2].rstrip('/')
+    if not path:
+        # Nothing to dispatch
+        return wsgi_app
+    else:
+        return DispatcherMiddleware(NotFound(), {
+            path: wsgi_app
+        })
+
+
 class WerkzeugServer(object):
 
-    def __init__(self, host='localhost', port=8000, enable_ssl=False, ssl_key=None, ssl_cert=None,
+    def __init__(self, app, host='localhost', port=8000, enable_ssl=False, ssl_key=None, ssl_cert=None,
                  reload_on_change=False, use_debugger=True):
         """
-        Run an Indico WSGI ref server instance
-        Very simple dispatching app
+        Run an Indico server based on the Werkzeug server
         """
 
         if not werkzeug:
@@ -99,24 +113,7 @@ class WerkzeugServer(object):
             console.error('You need pyopenssl to use SSL')
             sys.exit(1)
 
-        config = Config.getInstance()
-
-        baseURL = config.getBaseURL()
-        path = urlparse.urlparse(baseURL)[2].rstrip('/')
-
-        def fake_app(environ, start_response):
-            rpath = environ['PATH_INFO']
-            m = re.match(r'^{0}(.*)$'.format(path), rpath)
-            if m:
-                environ['PATH_INFO'] = m.group(1)
-                environ['SCRIPT_NAME'] = path
-                for msg in application(environ, start_response):
-                    yield msg
-            else:
-                start_response("404 NOT FOUND", [])
-                yield 'Not found'
-
-        self.app = fake_app
+        self.app = app
         self.host = host
         self.port = port
         self.ssl = enable_ssl
@@ -329,7 +326,8 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
     config._deriveOptions()
 
     console.info(' * Using BaseURL {0}'.format(base_url))
-    server = WerkzeugServer(host, used_port, reload_on_change=reload_on_change,
+    app = make_indico_dispatcher(application)
+    server = WerkzeugServer(app, host, used_port, reload_on_change=reload_on_change,
                             enable_ssl=with_ssl, ssl_cert=ssl_cert, ssl_key=ssl_key)
     signal.signal(signal.SIGINT, _sigint)
     server.run()
