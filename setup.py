@@ -529,6 +529,7 @@ if __name__ == '__main__':
             importer = indico.ext.importer
             calendaring = indico.ext.calendaring
             search = indico.ext.search
+            shorturl = indico.ext.shorturl
 
             [indico.ext]
 
@@ -561,6 +562,8 @@ if __name__ == '__main__':
             calendaring.outlook = indico.ext.calendaring.outlook
 
             search.invenio = indico.ext.search.invenio
+
+            shorturl.google = indico.ext.shorturl.google
 
             """,
           zip_safe=False,
