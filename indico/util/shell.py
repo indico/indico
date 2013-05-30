@@ -26,15 +26,11 @@ import re
 import signal
 import socket
 import sys
+import werkzeug.serving
 from SocketServer import TCPServer
+from werkzeug.debug import DebuggedApplication
 from werkzeug.exceptions import NotFound
 from werkzeug.wsgi import DispatcherMiddleware
-
-try:
-    import werkzeug.serving
-    from werkzeug.debug import DebuggedApplication
-except ImportError:
-    werkzeug = None
 
 try:
     from OpenSSL import SSL
@@ -107,10 +103,7 @@ class WerkzeugServer(object):
         Run an Indico server based on the Werkzeug server
         """
 
-        if not werkzeug:
-            console.error('Please install werkzeug to use the builtin dev server')
-            sys.exit(1)
-        elif not SSL and enable_ssl:
+        if not SSL and enable_ssl:
             console.error('You need pyopenssl to use SSL')
             sys.exit(1)
 
