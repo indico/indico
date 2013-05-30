@@ -64,7 +64,7 @@
   <subfield code="a"><xsl:value-of select="./category"/></subfield>
 </datafield>
 <datafield tag="490" ind1=" " ind2=" ">
-  <subfield code="a"><xsl:value-of select="./title" disable-output-escaping="yes"/></subfield>
+  <subfield code="a"><xsl:value-of select="./title" /></subfield>
 </datafield>
 <datafield tag="518" ind1=" " ind2=" ">
   <subfield code="d"><xsl:value-of select="./contribution/startDate" disable-output-escaping="yes"/></subfield>
