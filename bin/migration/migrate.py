@@ -718,7 +718,9 @@ def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
     dbi.commit()
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
-                 specified=[]):
+                 specified=[], run_from=None):
+
+    global MIGRATION_TASKS
 
     print "\nExecuting migration...\n"
 
@@ -732,6 +734,14 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
 
     print "DONE!\n"
 
+    if run_from:
+        try:
+            mig_tasks_names = map(lambda x:x[1].__name__, MIGRATION_TASKS)
+            mti= mig_tasks_names.index(run_from)
+            MIGRATION_TASKS = MIGRATION_TASKS[mti:]
+        except ValueError:
+           print "The task {0} does not exist".format(run_from)
+           return 1
     # go from older to newer version and execute corresponding tasks
     for version, task, always in MIGRATION_TASKS:
         if specified and task.__name__ not in specified:
@@ -770,6 +780,8 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
                         help='Use the Room Booking DB')
     parser.add_argument('--run-only', dest='specified', default='',
                         help='Specify which step(s) to run (comma-separated)')
+    parser.add_argument('--run-from', dest='run_from', default='',
+                        help='Specify FROM which step to run')
     parser.add_argument('--prev-version', dest='prevVersion', help='Previous version of Indico (used by DB)', default=__version__)
     parser.add_argument('--profile', dest='profile', help='Use profiling during the migration', action='store_true')
 
@@ -784,13 +796,13 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
                 result = None
                 profile.runctx("""result=runMigration(withRBDB=args.useRBDB,
                                   prevVersion=parse_version(args.prevVersion),
-                                  specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))))""",
+                                  specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))), run_from=args.run_from)""",
                                   globals(), locals(), proffilename)
                 return result
             else:
                 return runMigration(withRBDB=args.useRBDB,
                                     prevVersion=parse_version(args.prevVersion),
-                                    specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))))
+                                    specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))), run_from=args.run_from)
         except:
             print console.colored("\nMigration failed! DB may be in "
                                   " an inconsistent state:", 'red', attrs=['bold'])
