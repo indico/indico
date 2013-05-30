@@ -19,11 +19,9 @@
 
 from datetime import datetime
 from pytz import timezone
-from MaKaC.plugins import PluginsHolder
 
-from MaKaC.common.logger import Logger
 
-import string,re
+import string
 from indico.util.json import dumps
 import StringIO
 
@@ -33,16 +31,13 @@ import MaKaC.conference as conference
 import MaKaC.schedule as schedule
 import MaKaC.webcast as webcast
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.displayMgr as displayMgr
-from MaKaC.common.general import DEVELOPMENT
 from MaKaC.webinterface.linking import RoomLinker
 from Configuration import Config
 from xmlGen import XMLGen
-import os, time
+import os
 from math import ceil
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat
-from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
+from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
@@ -279,17 +274,6 @@ class outputGenerator(Observable):
                    out                    = None,
                    recordingManagerTags   = None):
 
-#        Logger.get('RecMan').info("in _confToXML()")
-#        Logger.get('RecMan').info(" conf = %s" % conf)
-#        Logger.get('RecMan').info(" includeSession = %s" % includeSession)
-#        Logger.get('RecMan').info(" includeContribution = %s" % includeContribution)
-#        Logger.get('RecMan').info(" includeSubContribution = %s" % includeSubContribution)
-#        if recordingManagerTags is not None:
-#            Logger.get('RecMan').info(" talkType    = %s" % recordingManagerTags["talkType"])
-#            Logger.get('RecMan').info(" talkId      = %s" % recordingManagerTags["talkId"])
-#            Logger.get('RecMan').info(" contentType = %s" % recordingManagerTags["contentType"])
-#            Logger.get('RecMan').info(" videoFormat = %s" % recordingManagerTags["videoFormat"])
-
         if not out:
             out = self._XMLGen
         if vars and vars.has_key("frame") and vars["frame"] == "no":
@@ -307,31 +291,7 @@ class outputGenerator(Observable):
         out.writeTag("parentProtection", dumps(conf.getAccessController().isProtected()))
         out.writeTag("materialList", dumps(self._generateMaterialList(conf)))
 
-#        Logger.get('RecMan').info('showContribution: ' + str(showContribution))
-
-        # MARC tags added by the Recording Manager (041, 300, 506, 693, 980)
-        # Check to make sure this request is coming from the Recording Manager.
-        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters,
-        # And we don't want to try to import a module that's not there.
-        if recordingManagerTags is not None:
-            # Also check to make sure that the RecordingManager plugin is installed and active
-            if (PluginsHolder().hasPluginType("Collaboration") and
-                PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
-                PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
-
-                # Only create these tags if this conference is the desired talk.
-                if recordingManagerTags["talkType"] == "conference" and recordingManagerTags["talkId"] == conf.getId():
-#                    Logger.get('RecMan').info('Called _confToXML() with RecordingManager')
-
-                    # Now we know it's safe to import the necessary methods,
-                    # because we have verified that the RecordingManager plugin is installed.
-                    from MaKaC.plugins.Collaboration.RecordingManager.output import RecordingManagerMarcTagGenerator
-
-                    RecordingManagerMarcTagGenerator.generateAccessListXML(out, conf)                # MARC 506__a,d,f,2,5
-                    RecordingManagerMarcTagGenerator.generateVideoXML(out, recordingManagerTags)     # MARC 300__a,b
-                    RecordingManagerMarcTagGenerator.generateLanguagesXML(out, recordingManagerTags) # MARC 041__a
-                    RecordingManagerMarcTagGenerator.generateCDSCategoryXML(out, conf)               # MARC 980__a
-                    RecordingManagerMarcTagGenerator.generateExperimentXML(out, conf)                # MARC 693__e
+        self._notify('addXMLMetadata', {'out': out, 'obj': conf, 'type':"conference", 'recordingManagerTags':recordingManagerTags})
 
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("modifyLink",vars["modifyURL"])
@@ -429,8 +389,6 @@ class outputGenerator(Observable):
             out.closeTag("chair")
 
 
-#            Logger.get('RecMan').info('HEY now calling _contribToXML()...')
-
         # Keep track of days that have some slots that will be displayed
         nonEmptyDays = set()
 
@@ -484,7 +442,6 @@ class outputGenerator(Observable):
             sessionList = conf.getSessionList()
             for session in sessionList: # here is the part that displays all the sessions (for the RecordingManager, anyway). It should be changed to check if showSession has been set.
                 if session.canAccess(self.__aw) and includeSession and (showSession == 'all' or str(session.getId()) == str(showSession)):
-#                    Logger.get('RecMan').info("session id = %s" % session.getId())
                     self._sessionToXML(session, vars, includeContribution, includeMaterial, showWithdrawed=showWithdrawed, useSchedule=False, out=out, recordingManagerTags=recordingManagerTags)
                     nonEmptyDays.add(session.getStartDate().date())
 
@@ -559,11 +516,7 @@ class outputGenerator(Observable):
         out.openTag("plugins")
         #we add all the information to be displayed by the plugins
         self._notify('meetingAndLectureDisplay', {'out': out, 'conf': conf})
-        if PluginsHolder().hasPluginType("Collaboration"):
-            from MaKaC.plugins.Collaboration.output import OutputGenerator
-            OutputGenerator.collaborationToXML(out, conf, tz)
         out.closeTag("plugins")
-
 
 
     def _sessionToXML(self,
@@ -578,13 +531,6 @@ class outputGenerator(Observable):
                       useSchedule            = True,
                       out                    = None,
                       recordingManagerTags   = None):
-
-#        Logger.get('RecMan').info("in _sessionToXML()")
-#        if recordingManagerTags is not None:
-#            Logger.get('RecMan').info(" talkType    = %s" % recordingManagerTags["talkType"])
-#            Logger.get('RecMan').info(" talkId      = %s" % recordingManagerTags["talkId"])
-#            Logger.get('RecMan').info(" contentType = %s" % recordingManagerTags["contentType"])
-#            Logger.get('RecMan').info(" videoFormat = %s" % recordingManagerTags["videoFormat"])
 
         if not out:
             out = self._XMLGen
@@ -665,30 +611,7 @@ class outputGenerator(Observable):
         for mat in mList:
             self._materialToXML(mat, vars, out=out)
 
-        # MARC tags added by the Recording Manager (041, 300, 506, 693, 980)
-        # Check to make sure this request is coming from the Recording Manager.
-        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters,
-        # And we don't want to try to import a module that's not there.
-        if recordingManagerTags is not None:
-            # Also check to make sure that the RecordingManager plugin is installed and active
-            if (PluginsHolder().hasPluginType("Collaboration") and
-                PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
-                PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
-
-                # Only create these tags if this conference is the desired talk.
-                if recordingManagerTags["talkType"] == "session" and recordingManagerTags["talkId"] == session.getId():
-#                    Logger.get('RecMan').info('Called _confToXML() with RecordingManager')
-
-                    # Now we know it's safe to import the necessary methods,
-                    # because we have verified that the RecordingManager plugin is installed.
-                    from MaKaC.plugins.Collaboration.RecordingManager.output import RecordingManagerMarcTagGenerator
-
-                    RecordingManagerMarcTagGenerator.generateAccessListXML(out, session)             # MARC 506__a,d,f,2,5
-                    RecordingManagerMarcTagGenerator.generateVideoXML(out, recordingManagerTags)     # MARC 300__a,b
-                    RecordingManagerMarcTagGenerator.generateLanguagesXML(out, recordingManagerTags) # MARC 041__a
-                    RecordingManagerMarcTagGenerator.generateCDSCategoryXML(out, session)            # MARC 980__a
-                    RecordingManagerMarcTagGenerator.generateExperimentXML(out, session)             # MARC 693__e
-
+        self._notify('addXMLMetadata', {'out': out, 'obj': session, 'type':"session", 'recordingManagerTags':recordingManagerTags})
         out.closeTag("session")
 
 
@@ -788,22 +711,6 @@ class outputGenerator(Observable):
                       showSubContribution  = "all",
                       out                  = None,
                       recordingManagerTags = None):
-
-#        Logger.get('RecMan').info('in _contribToXML')
-#        Logger.get('RecMan').info(" conf: %s" % conf)
-##        Logger.get('RecMan').info(" conf.getTimezone(): %s" % conf.getTimezone())
-#        Logger.get('RecMan').info(" contribution: %s" % contribution)
-#        Logger.get('RecMan').info(" vars: %s" % vars)
-#        Logger.get('RecMan').info(" includeSubContribution: %s" % includeSubContribution)
-#        Logger.get('RecMan').info(" includeMaterial: %s" % includeMaterial)
-#        Logger.get('RecMan').info(" showSubContribution: %s" % showSubContribution)
-#        Logger.get('RecMan').info(" out: %s" % out)
-#        if recordingManagerTags is not None:
-#            Logger.get('RecMan').info(" talkType:    %s" % recordingManagerTags["talkType"])
-#            Logger.get('RecMan').info(" talkId:      %s" % recordingManagerTags["talkId"])
-#            Logger.get('RecMan').info(" contentType: %s" % recordingManagerTags["contentType"])
-#            Logger.get('RecMan').info(" videoFormat: %s" % recordingManagerTags["videoFormat"])
-
         if not out:
             out = self._XMLGen
         if vars and vars.has_key("frame") and vars["frame"] == "no":
@@ -905,36 +812,11 @@ class outputGenerator(Observable):
                 else:
                     out.writeTag("material",out.writeTag("id",mat.id))
         for subC in contribution.getSubContributionList():
-#            Logger.get('RecMan').info("subC.getId = %s, " % (subC.getId()))
             if includeSubContribution:
                 if showSubContribution == 'all' or str(showSubContribution) == str(subC.getId()):
                     self._subContributionToXML(subC,vars,includeMaterial, out=out, recordingManagerTags=recordingManagerTags)
 
-        # MARC tags added by the Recording Manager (041, 300, 506, 693, 980)
-        # Check to make sure this request is coming from the Recording Manager.
-        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters,
-        # And we don't want to try to import a module that's not there.
-        if recordingManagerTags is not None:
-            # Also check to make sure that the RecordingManager plugin is installed and active
-            if (PluginsHolder().hasPluginType("Collaboration") and
-                PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
-                PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
-
-                # Only create these tags if this conference is the desired talk.
-                if recordingManagerTags["talkType"] == "contribution" and recordingManagerTags["talkId"] == contribution.getId():
-#                    Logger.get('RecMan').info('Called _confToXML() with RecordingManager')
-#                    Logger.get('RecMan').info('showContribution: ' + str(showContribution))
-
-                    # Now we know it's safe to import the necessary methods,
-                    # because we have verified that the RecordingManager plugin is installed.
-                    from MaKaC.plugins.Collaboration.RecordingManager.output import RecordingManagerMarcTagGenerator
-
-                    RecordingManagerMarcTagGenerator.generateAccessListXML(out, contribution)        # MARC 506__a,d,f,2,5
-                    RecordingManagerMarcTagGenerator.generateVideoXML(out, recordingManagerTags)     # MARC 300__a,b
-                    RecordingManagerMarcTagGenerator.generateLanguagesXML(out, recordingManagerTags) # MARC 041__a
-                    RecordingManagerMarcTagGenerator.generateCDSCategoryXML(out, contribution)       # MARC 980__a
-                    RecordingManagerMarcTagGenerator.generateExperimentXML(out, contribution)        # MARC 693__e
-
+        self._notify('addXMLMetadata', {'out': out, 'obj': contribution, 'type':"contribution", 'recordingManagerTags':recordingManagerTags})
         out.closeTag("contribution")
 
 
@@ -944,17 +826,6 @@ class outputGenerator(Observable):
                               includeMaterial,
                               out         = None,
                               recordingManagerTags = None):
-
-#        Logger.get('RecMan').info('in _subContributionToXML')
-#        Logger.get('RecMan').info(" subCont: %s" % subCont)
-#        Logger.get('RecMan').info(" vars: %s" % vars)
-#        Logger.get('RecMan').info(" includeMaterial: %s" % includeMaterial)
-#        Logger.get('RecMan').info(" out: %s" % out)
-#        if recordingManagerTags is not None:
-#            Logger.get('RecMan').info(" talkType:    %s" % recordingManagerTags["talkType"])
-#            Logger.get('RecMan').info(" talkId:      %s" % recordingManagerTags["talkId"])
-#            Logger.get('RecMan').info(" contentType: %s" % recordingManagerTags["contentType"])
-#            Logger.get('RecMan').info(" videoFormat: %s" % recordingManagerTags["videoFormat"])
 
         if not out:
             out = self._XMLGen
@@ -1000,31 +871,7 @@ class outputGenerator(Observable):
                 if includeMaterial:
                     self._materialToXML(mat, vars, out=out)
 
-        # MARC tags added by the Recording Manager (041, 300, 506, 693, 980)
-        # Check to make sure this request is coming from the Recording Manager.
-        # We don't want to provide CERN-specific access list information to external sources like OAI harvesters,
-        # And we don't want to try to import a module that's not there.
-        if recordingManagerTags is not None:
-            # Also check to make sure that the RecordingManager plugin is installed and active
-            if (PluginsHolder().hasPluginType("Collaboration") and
-                PluginsHolder().getPluginType("Collaboration").hasPlugin("RecordingManager") and
-                PluginsHolder().getPluginType("Collaboration").getPlugin("RecordingManager").isActive()):
-
-                # Only create these tags if this conference is the desired talk.
-                if recordingManagerTags["talkType"] == "subcontribution" and recordingManagerTags["talkId"] == subCont.getId():
-#                    Logger.get('RecMan').info('Called _subContributionToXML() with RecordingManager')
-#                    Logger.get('RecMan').info('showSubContribution: ' + str(showSubContribution))
-
-                    # Now we know it's safe to import the necessary methods,
-                    # because we have verified that the RecordingManager plugin is installed.
-                    from MaKaC.plugins.Collaboration.RecordingManager.output import RecordingManagerMarcTagGenerator
-
-                    RecordingManagerMarcTagGenerator.generateAccessListXML(out, subCont)             # MARC 506__a,d,f,2,5
-                    RecordingManagerMarcTagGenerator.generateVideoXML(out, recordingManagerTags)     # MARC 300__a,b
-                    RecordingManagerMarcTagGenerator.generateLanguagesXML(out, recordingManagerTags) # MARC 041__a
-                    RecordingManagerMarcTagGenerator.generateCDSCategoryXML(out, subCont)            # MARC 980__a
-                    RecordingManagerMarcTagGenerator.generateExperimentXML(out, subCont)             # MARC 693__e
-
+        self._notify('addXMLMetadata', {'out': out, 'obj': subCont, 'type':"subcontribution", 'recordingManagerTags':recordingManagerTags})
         out.closeTag("subcontribution")
 
     def _materialToXML(self,mat, vars, out=None):
@@ -1220,12 +1067,8 @@ class outputGenerator(Observable):
                             recordingManagerTags = recordingManagerTags)
             xml = temp.getXml()
             self.cache.cacheObject(version, xml, conf)
-        #    out.writeTag("cache", "not found in cache")
-        #else:
-        #    out.writeTag("cache", "found in cache")
 
         out.writeXML(xml)
-        #return xml
 
 
     def confToXMLMarc21(self,conf,includeSession=1,includeContribution=1,includeMaterial=1,out=None, overrideCache=False):
@@ -1275,12 +1118,6 @@ class outputGenerator(Observable):
             if l.getName() != "":
                 out.writeTag("subfield",loc,[["code","c"]])
 
-
-        #out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(conf.getStartDate().year, string.zfill(conf.getStartDate().month,2), string.zfill(conf.getStartDate().day,2), string.zfill(conf.getStartDate().hour,2), string.zfill(conf.getStartDate().minute,2)),[["code","9"]])
-        #out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(conf.getEndDate().year, string.zfill(conf.getEndDate().month,2), string.zfill(conf.getEndDate().day,2), string.zfill(conf.getEndDate().hour,2), string.zfill(conf.getEndDate().minute,2)),[["code","z"]])
-        #tz = conf.getTimezone()
-        #sd = conf.getAdjustedStartDate(tz)
-        #ed = conf.getAdjustedEndDate(tz)
         sd = conf.getStartDate()
         ed = conf.getEndDate()
         out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","9"]])
@@ -1328,7 +1165,6 @@ class outputGenerator(Observable):
         for keyword in keywords.split("\n"):
             out.writeTag("subfield",keyword,[["code","a"]])
         out.closeTag("datafield")
-
 
         import MaKaC.webinterface.simple_event as simple_event
         import MaKaC.webinterface.meeting as meeting
@@ -1427,12 +1263,11 @@ class outputGenerator(Observable):
         if not out:
             out = self._XMLGen
 
-        #out.writeTag("controlfield","SzGeCERN",[["tag","003"]])
         out.writeTag("leader", "00000nmm  2200000uu 4500")
         out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
         out.writeTag("subfield","INDICO.%s" % uniqueId(cont), [["code","a"]])
         out.closeTag("datafield")
-    #
+
         out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
         out.writeTag("subfield", uniqueId(cont), [["code","a"]])
         out.writeTag("subfield","Indico",[["code","9"]])
@@ -1465,7 +1300,7 @@ class outputGenerator(Observable):
                 out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(cont.getStartDate().year, string.zfill(cont.getStartDate().month,2), string.zfill(cont.getStartDate().day,2), string.zfill(cont.getStartDate().hour,2), string.zfill(cont.getStartDate().minute,2)),[["code","d"]])
                 out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(cont.getEndDate().year, string.zfill(cont.getEndDate().month,2), string.zfill(cont.getEndDate().day,2), string.zfill(cont.getEndDate().hour,2), string.zfill(cont.getEndDate().minute,2)),[["code","h"]])
             out.closeTag("datafield")
-    #
+
         out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
         out.writeTag("subfield",cont.getDescription(),[["code","a"]])
         out.closeTag("datafield")
@@ -1481,7 +1316,6 @@ class outputGenerator(Observable):
                 out.writeTag("subfield",report[1],[["code","a"]])
             out.closeTag("datafield")
 
-
         out.openTag("datafield",[["tag","653"],["ind1","1"],["ind2"," "]])
         keywords = cont.getKeywords()
         keywords = keywords.replace("\r\n", "\n")
@@ -1489,14 +1323,11 @@ class outputGenerator(Observable):
             out.writeTag("subfield",keyword,[["code","a"]])
         out.closeTag("datafield")
 
-
-    #
         out.openTag("datafield",[["tag","650"],["ind1","1"],["ind2","7"]])
         out.writeTag("subfield","SzGeCERN",[["code","2"]])
         if cont.getTrack():
             out.writeTag("subfield",cont.getTrack().getTitle(),[["code","a"]])
         out.closeTag("datafield")
-
 
         # tag 700 Speaker name
         aList = cont.getAuthorList()
@@ -1592,7 +1423,6 @@ class outputGenerator(Observable):
         if not out:
             out = self._XMLGen
 
-        #out.writeTag("controlfield","SzGeCERN",[["tag","003"]])
         out.writeTag("leader", "00000nmm  2200000uu 4500")
         out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
         out.writeTag("subfield","INDICO.%s" % (uniqueId(subCont)), [["code","a"]])
@@ -1643,7 +1473,6 @@ class outputGenerator(Observable):
                     out.writeTag("subfield",l.getName(),[["code","r"]])
             if subCont.getContribution().getStartDate() is not None:
                 out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(subCont.getContribution().getStartDate().year, string.zfill(subCont.getContribution().getStartDate().month,2), string.zfill(subCont.getContribution().getStartDate().day,2), string.zfill(subCont.getContribution().getStartDate().hour,2), string.zfill(subCont.getContribution().getStartDate().minute,2)),[["code","d"]])
-                #out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(subCont.getEndDate().year, string.zfill(subCont.getEndDate().month,2), string.zfill(subCont.getEndDate().day,2), string.zfill(subCont.getEndDate().hour,2), string.zfill(subCont.getEndDate().minute,2)),[["code","h"]])
             out.closeTag("datafield")
     #
         out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
@@ -1702,21 +1531,11 @@ class outputGenerator(Observable):
             out.writeTag("subfield",user.getAffiliation(),[["code","u"]])
             out.closeTag("datafield")
 
-
-
-
-
         matList = subCont.getAllMaterialList()
         for mat in matList:
-            #out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
             if mat.canView(self.__aw):
                 if includeMaterial:
                     self.materialToXMLMarc21(mat, out=out)
-            #    else:
-            #        out.writeTag("material",out.writeTag("id",mat.id))
-
-
-
 
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
         out.writeTag("subfield","INDICO.%s"%uniqueId(subCont.getConference()),[["code","b"]])
@@ -1742,14 +1561,8 @@ class outputGenerator(Observable):
     def materialToXMLMarc21(self,mat, out=None):
         if not out:
             out = self._XMLGen
-        #out.openTag("material")
-        #out.writeTag("ID",mat.getId())
-        #out.writeTag("title",mat.title)
-        #out.writeTag("description",mat.description)
-        #out.writeTag("type",mat.type)
         rList = mat.getResourceList()
         self.resourcesToXMLMarc21(rList, out=out)
-        #out.closeTag("material")
 
     def resourcesToXMLMarc21(self, rList, out=None):
         if not out:
@@ -1772,11 +1585,8 @@ class outputGenerator(Observable):
         if not out:
             out = self._XMLGen
 
-        #out.writeTag("name",res.getName())
         out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
         out.writeTag("subfield",res.getDescription(),[["code","a"]])
-        #out.writeTag("description",res.getDescription())
-        #out.writeTag("url",res.getURL())
         out.writeTag("subfield",res.getURL(),[["code","u"]])
         out.writeTag("subfield", "INDICO.%s" % \
                      uniqueId(res), [["code", "3"]])
@@ -1789,18 +1599,13 @@ class outputGenerator(Observable):
         if not out:
             out = self._XMLGen
 
-        #out.writeTag("name",res.getName())
-        #out.writeTag("description",res.getDescription())
-        #out.writeTag("type",res.fileType)
         out.openTag("datafield",[["tag","856"],["ind1","4"],["ind2"," "]])
         out.writeTag("subfield",res.getDescription(),[["code","a"]])
         try:
             out.writeTag("subfield",res.getSize(),[["code","s"]])
         except:
             pass
-        #out.writeTag("subfield",res.getURL(),[["code","u"]])
 
-        #out.writeTag("subfield",res.getFileName(),[["code","q"]])
         url = str(urlHandlers.UHFileAccess.getURL( res ))
         out.writeTag("subfield",url,[["code","u"]])
         out.writeTag("subfield", "INDICO.%s" % \
@@ -1809,10 +1614,6 @@ class outputGenerator(Observable):
         out.writeTag("subfield", "stored", [["code","z"]])
         out.writeTag("subfield", "resource", [["code","x"]])
         out.closeTag("datafield")
-        #out.writeTag("duration","1")#TODO:DURATION ISN'T ESTABLISHED
-        #cDate = res.getCreationDate()
-        #creationDateStr = "%d-%s-%sT%s:%s:00Z" %(cDate.year, string.zfill(cDate.month,2), string.zfill(cDate.day,2), string.zfill(cDate.hour,2), string.zfill(cDate.minute,2))
-        #out.writeTag("creationDate",creationDateStr)
 
 class XMLCacheEntry(MultiLevelCacheEntry):
     def __init__(self, objId):

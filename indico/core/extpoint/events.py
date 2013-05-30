@@ -262,6 +262,11 @@ class IEventDisplayContributor(IContributor):
         Returns the info that the plugins want to add to the Sessions and Contributions
         """
 
+    def addXMLMetadata(self, obj, params):
+        """
+        Adds to the output generator the XML we want to add
+        """
+
 class IUserAreaContributor(IContributor):
     """
     Aggregates extension points that relate to the user area pages

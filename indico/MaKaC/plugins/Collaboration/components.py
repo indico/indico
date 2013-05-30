@@ -22,19 +22,17 @@
 
 import zope.interface
 
-from MaKaC.common.utils import daysBetween
 from MaKaC.conference import Conference, Contribution
-from MaKaC.plugins.Collaboration.base import CSBookingManager
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.indexes import CSBookingInstanceWrapper, BookingManagerConferenceIndex
 from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationDisplay, UHConfModifCollaboration
 from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin, RCVideoServicesManager
-from MaKaC.plugins.Collaboration.output import OutputGenerator
 from MaKaC.plugins.Collaboration.pages import WEventDetailBanner, WVideoService
-
+from MaKaC.plugins.Collaboration.output import OutputGenerator
+from MaKaC.plugins.Collaboration.base import CSBookingManager
 from MaKaC.plugins import Collaboration
-
 from MaKaC.common.logger import Logger
+from MaKaC.common.utils import daysBetween
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.webinterface import wcomponents
 
@@ -82,7 +80,7 @@ class CSBookingInstanceIndex(OOIndex):
 
         idx = IndexesHolder().getById('collaboration')
 
-        for conf, bks in idx.getBookings(self.index_name, 'conferenceStartDate', None, None, None).getResults():
+        for _, bks in idx.getBookings(self.index_name, 'conferenceStartDate', None, None, None).getResults():
             for bk in bks:
                 self.index_booking(bk)
 
@@ -146,7 +144,7 @@ class CSBookingInstanceIndex(OOIndex):
         # go over possible wrappers
         conf = bk.getConference()
 
-        for dt, bkw in self.iteritems((fromDT or conf.getStartDate()).replace(hour=0, minute=0, second=0),
+        for _, bkw in self.iteritems((fromDT or conf.getStartDate()).replace(hour=0, minute=0, second=0),
                                       (toDT or conf.getEndDate()).replace(hour=23, minute=59, second=59)):
             if bkw.getOriginalBooking() == bk:
                 to_unindex.add(bkw)
@@ -180,8 +178,8 @@ class IMEventDisplayComponent(Component):
         return ['/Collaboration/js/bookings.js', '/Collaboration/js/Collaboration.js']
 
     def eventDetailBanner(self, obj, conf):
-        vars = OutputGenerator.getCollaborationParams(conf)
-        return WEventDetailBanner.forModule(Collaboration).getHTML(vars)
+        params = CollaborationTools.getCollaborationParams(conf)
+        return WEventDetailBanner.forModule(Collaboration).getHTML(params)
 
     def detailSessionContribs(self, obj, conf, params):
         manager = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
@@ -207,7 +205,8 @@ class EventCollaborationListener(Component):
     zope.interface.implements(IObjectLifeCycleListener,
                               ITimeActionListener,
                               ILocationActionListener,
-                              IMetadataChangeListener)
+                              IMetadataChangeListener,
+                              INavigationContributor)
 
     """In this case, obj is a conference object. Since all we
        need is already programmed in CSBookingManager, we get the
@@ -296,7 +295,7 @@ class EventCollaborationListener(Component):
             if not bookingManager:
                 return
             try:
-                    bookingManager.notifyInfoChange()
+                bookingManager.notifyInfoChange()
             except Exception, e:
                 Logger.get('PluginNotifier').error("Exception while trying to access the info changes " + str(e))
 
@@ -357,24 +356,21 @@ class NavigationContributor(Component):
     def fillManagementSideMenu(cls, obj, params={}):
         csbm = Catalog.getIdx("cs_bookingmanager_conference").get(obj._conf.getConference().getId())
         if csbm is not None and csbm.isCSAllowed(obj._rh.getAW().getUser()) and \
-        (obj._conf.canModify(obj._rh.getAW()) or RCVideoServicesManager.hasRights(obj._rh, 'any') or
-         RCCollaborationAdmin.hasRights(obj._rh) or RCCollaborationPluginAdmin.hasRights(obj._rh, plugins = 'any')):
-            params['Video Services'] = wcomponents.SideMenuItem(_("Video Services"),
-                                                               UHConfModifCollaboration.getURL(obj._conf, secure = obj._rh.use_https()))
+            (obj._conf.canModify(obj._rh.getAW()) or RCVideoServicesManager.hasRights(obj._rh, 'any') or
+                RCCollaborationAdmin.hasRights(obj._rh) or RCCollaborationPluginAdmin.hasRights(obj._rh, plugins='any')):
+            params['Video Services'] = wcomponents.SideMenuItem(_("Video Services"), UHConfModifCollaboration.getURL(obj._conf, secure=obj._rh.use_https()))
 
     @classmethod
     def confDisplaySMFillDict(cls, obj, params):
         sideMenuItemsDict = params['dict']
-        conf = params['conf']
-
         sideMenuItemsDict["collaboration"] =  {
                 "caption": "Video Services",
                 "URL": UHCollaborationDisplay,
                 "staticURL": "",
                 "parent": ""}
     @classmethod
-    def confDisplaySMFillOrderedKeys(cls, obj, list):
-        list.append("collaboration")
+    def confDisplaySMFillOrderedKeys(cls, obj, linkDataOrderedKeys):
+        linkDataOrderedKeys.append("collaboration")
 
     @classmethod
     def confDisplaySMShow(cls, obj, params):
@@ -382,6 +378,16 @@ class NavigationContributor(Component):
         csbm = Catalog.getIdx("cs_bookingmanager_conference").get(obj._conf.getConference().getId())
         if csbm is not None and (not csbm.hasBookings() or not csbm.isCSAllowed()):
             obj._collaborationOpt.setVisible(False)
+
+    @classmethod
+    def meetingAndLectureDisplay(cls, obj, params):
+        """ Generates the xml corresponding to the collaboration plugin system
+            for an event.
+        """
+        out = params['out']
+        conf = params['conf']
+        tz = params['tz']
+        OutputGenerator.collaborationToXML(out, conf, tz)
 
 class PluginSettingsContributor(Component):
     """
@@ -391,6 +397,7 @@ class PluginSettingsContributor(Component):
 
     zope.interface.implements(IPluginSettingsContributor, IIndexHolderProvider)
 
+    @classmethod
     def indexHolderProvider(self, obj, dictIdx, typeIdx):
         from MaKaC.plugins.Collaboration.indexes import CollaborationIndex
         if typeIdx == "collaboration":

@@ -17,10 +17,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.plugins.Collaboration.base import CSErrorBase, CSBookingManager
+from MaKaC.plugins.Collaboration.base import CSErrorBase
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
 from MaKaC.webinterface.common.contribFilters import PosterFilterField
-from MaKaC.conference import ConferenceHolder, Contribution
+from MaKaC.conference import ConferenceHolder
 from MaKaC.common.logger import Logger
 from MaKaC.errors import MaKaCError, NoReportError
 try:
@@ -609,7 +609,7 @@ def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, content
     try:
         f = urlopen(req)
         cds_response = f.read()
- #        cds_response = "testing" # uncomment for debugging
+        # cds_response = "testing" # uncomment for debugging
         # Successful operations should result in a one-line message that looks like this:
         # [INFO] Some message here
         # anything else means there was an error
@@ -735,7 +735,7 @@ def submitMicalaMetadata(aw, IndicoID, contentType, LODBID, LOID, videoFormat, l
             if request_result == 'no data':
                 result += _("micala web upload returned an unknown error when submitting to ") + "%s\n" % \
                     (CollaborationTools.getOptionValue("RecordingManager", "micalaUploadURL"))
- #            Logger.get('RecMan').debug("micala result = %s" % str(request_result))
+            # Logger.get('RecMan').debug("micala result = %s" % str(request_result))
         except HTTPError, e:
             flagSuccess = False
             result += _("micala web upload returned an error when submitting to ") + "%s: %s\n" % \

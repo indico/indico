@@ -21,9 +21,8 @@ import pkg_resources, sys
 from MaKaC.plugins import PluginsHolder, Plugin
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.common.contribFilters import PosterFilterField
-from MaKaC.common.utils import formatDateTime, formatTwoDates, formatTime, \
-    formatDuration
-from MaKaC.common.timezoneUtils import getAdjustedDate, isSameDay
+from MaKaC.common.utils import formatDateTime, formatTwoDates, formatTime, formatDuration
+from MaKaC.common.timezoneUtils import getAdjustedDate, isSameDay, minDatetime
 from MaKaC.common.Configuration import Config
 from MaKaC.conference import Contribution, Conference
 from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseIndexingFossil, \
@@ -76,8 +75,7 @@ class CollaborationTools(object):
             pluginName: a string with the name of the plugin
             optionName: a string with the name of the option
         """
-        ph = PluginsHolder()
-        return ph.getPluginType("Collaboration").getPlugin(pluginId).getOption(optionName).getValue()
+        return cls.getCollaborationPluginType().getPlugin(pluginId).getOption(optionName).getValue()
 
     @classmethod
     def getOptionValueRooms(cls, pluginId, optionName):
@@ -85,8 +83,7 @@ class CollaborationTools(object):
             pluginName: a string with the name of the plugin
             optionName: a string with the name of the option
         """
-        ph = PluginsHolder()
-        return ph.getPluginType("Collaboration").getPlugin(pluginId).getOption(optionName).getRooms()
+        return cls.getCollaborationPluginType().getPlugin(pluginId).getOption(optionName).getRooms()
 
     @classmethod
     def hasCollaborationOption(cls, optionName):
@@ -164,15 +161,16 @@ class CollaborationTools(object):
         csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conference.getId())
 
         # we get the list of Plugin objects allowed for this kind of event
-        allowedForThisEvent = csbm.getAllowedPlugins()
+        if csbm is not None:
+            allowedForThisEvent = csbm.getAllowedPlugins()
 
-        for plugin in allowedForThisEvent:
+            for plugin in allowedForThisEvent:
 
-            if cls.canUserManagePlugin(conference, plugin, user):
-                tabNamesSet.add(cls.getPluginTab(plugin))
-                EATab = cls.getEATab(plugin)
-                if EATab is not None:
-                    tabNamesSet.add(EATab)
+                if cls.canUserManagePlugin(conference, plugin, user):
+                    tabNamesSet.add(cls.getPluginTab(plugin))
+                    EATab = cls.getEATab(plugin)
+                    if EATab is not None:
+                        tabNamesSet.add(EATab)
 
         tabNames = list(tabNamesSet)
         return tabNames
@@ -458,6 +456,20 @@ class CollaborationTools(object):
         if isinstance(obj, Contribution):
             isAble = isAble and obj.isScheduled()
         return isAble
+
+    @classmethod
+    def getCollaborationParams(cls, conf):
+        params = {}
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
+        pluginNames = csbm.getEventDisplayPlugins()
+        bookingData = {}
+        for pluginName in pluginNames:
+            bookingData[pluginName] = CollaborationTools.getServiceInformation(pluginName)
+        bookings = csbm.getBookingList(filterByType=pluginNames, notify=True, onlyPublic=True)
+        bookings.sort(key=lambda b: b.getStartDate() or minDatetime())
+        params['bookings'] = bookings
+        params['bookingData'] = bookingData
+        return params
 
 
 class MailTools(object):
