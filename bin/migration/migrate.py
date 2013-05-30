@@ -587,9 +587,18 @@ def removeOldCSSTemplates(dbi, withRBDB, prevVersion):
 
     mod = ModuleHolder().getById('cssTpls')
 
-    del mod._cssTpls['template1.css']
-    del mod._cssTpls['template2.css']
-    del mod._cssTpls['top_menu.css']
+    try:
+        del mod._cssTpls['template1.css']
+    except KeyError, e:
+        print 'info: %s'%e
+    try:
+        del mod._cssTpls['template2.css']
+    except KeyError, e:
+        print 'info: %s'%e
+    try:
+        del mod._cssTpls['top_menu.css']
+    except KeyError, e:
+        print 'info: %s'%e
 
     mod._p_changed = 1
     dbi.commit()
@@ -650,25 +659,27 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
             for subContrib in contrib.getSubContributionList():
                 _updateMaterial(subContrib)
 
-    def updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex, pluginActive):
-        ######################
-        #Update Vidyo indexes:
-        ######################
-        if not pluginActive:
-            return
+    def updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex):
+        ####################################
+        #Update vidyo indexes:
+        ####################################
         csbm = conf.getCSBookingManager()
         for booking in csbm.getBookingList():
             if booking.getType() == "Vidyo" and booking.isCreated():
                 endDateIndex.indexBooking(booking)
                 vidyoRoomIndex.indexBooking(booking)
 
-    endDateIndex = VidyoTools.getEventEndDateIndex()
-    vidyoRoomIndex = VidyoTools.getIndexByVidyoRoom()
-    endDateIndex.clear()
-    vidyoRoomIndex.clear()
     ph = PluginsHolder()
     collaboration_pt = ph.getPluginType("Collaboration")
-    pluginActive = collaboration_pt.isActive() and collaboration_pt.getPlugin("Vidyo").isActive()
+    vidyoPluginActive = collaboration_pt.isActive() and collaboration_pt.getPlugin("Vidyo").isActive()
+    if vidyoPluginActive:
+        endDateIndex = VidyoTools.getEventEndDateIndex()
+        vidyoRoomIndex = VidyoTools.getIndexByVidyoRoom()
+        endDateIndex.clear()
+        vidyoRoomIndex.clear()
+
+
+
 
     ch = ConferenceHolder()
     i = 0
@@ -677,7 +688,8 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
 
         updateSupport(conf)
         updateNonInheritedChildren(conf)
-        updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex, pluginActive)
+        if vidyoPluginActive:
+            updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex)
 
         if i % 10000 == 9999:
             dbi.commit()
