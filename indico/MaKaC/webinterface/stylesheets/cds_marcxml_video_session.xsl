@@ -73,7 +73,7 @@
   <subfield code="a"><xsl:value-of select="./category"/></subfield>
 </datafield>
 <datafield tag="490" ind1=" " ind2=" ">
-  <subfield code="a"><xsl:value-of select="./title" disable-output-escaping="yes"/></subfield>
+  <subfield code="a"><xsl:value-of select="./title" /></subfield>
 </datafield>
 <xsl:if test="./session/allowedAccessGroups != '' and count(./session/allowedAccessGroups) != 0">
 <datafield tag="506" ind1="1" ind2=" ">
