@@ -45,7 +45,12 @@ def make_app():
     return app
 
 
+def configure_app(app):
+    app.config['PROPAGATE_EXCEPTIONS'] = True
+    app.config['SESSION_COOKIE_NAME'] = 'indico_session'
+
+
 app = make_app()
-app.config['PROPAGATE_EXCEPTIONS'] = True
+configure_app(app)
 app.add_url_rule('/', view_func=lambda: redirect(url_for('mp-index-index')))
 create_modpython_rules(app)

@@ -24,6 +24,7 @@ from flask.wrappers import Request
 from werkzeug.utils import cached_property
 
 from MaKaC.common import HelperMaKaCInfo
+from indico.web.flask.session import IndicoSessionInterface
 
 
 class IndicoRequest(Request):
@@ -38,3 +39,4 @@ class IndicoRequest(Request):
 
 class IndicoFlask(Flask):
     request_class = IndicoRequest
+    session_interface = IndicoSessionInterface()
