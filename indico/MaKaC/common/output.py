@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
+from flask import request
 from pytz import timezone
 
 
@@ -130,7 +131,7 @@ class outputGenerator(Observable):
         """
         self.getOutput(conf, stylesheet, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession, showDate, showContribution)
         html = self.text
-        if rh._req.is_https():
+        if request.is_secure:
             imagesBaseURL = Config.getInstance().getImagesBaseURL()
             imagesBaseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL())
             baseURL = Config.getInstance().getBaseURL()

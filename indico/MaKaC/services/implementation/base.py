@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 from MaKaC.conference import Category
 
@@ -178,7 +179,7 @@ class ServiceBase(RequestHandlerBase):
         self._aw.setUser(session.getUser())
         self._target = None
         self._startTime = None
-        self._tohttps = self._req.is_https()
+        self._tohttps = request.is_secure
         self._endTime = None
         self._doProcess = True  #Flag which indicates whether the RH process
                                 #   must be carried out; this is useful for

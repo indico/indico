@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.rb_reservation import Collision
@@ -33,8 +34,6 @@ from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 from MaKaC.common.utils import parseDate
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
-from indico.util.network import _get_remote_ip
-
 """
 TODO: This must be refactor to be done with RH???
 """
@@ -48,7 +47,7 @@ def index(req, **params):
 
     # check if it is a machine that belongs to the CERN domain
     cernDomain = DomainHolder().getById(0) # id 0 means CERN
-    if not cernDomain.belongsTo(_get_remote_ip(req)):
+    if not cernDomain.belongsTo(request.remote_addr):
         return "Only CERN users can access to this export resource"
 
     ################### checking params ###################

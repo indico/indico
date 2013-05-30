@@ -24,6 +24,7 @@ from new import classobj
 from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
+from flask import request
 
 """
 This file contains classes representing url handlers which are objects which
@@ -64,11 +65,9 @@ class URLHandler(object):
             Parameters:
                 params - (Dict) parameters to be added to the URL.
         """
-
         rh = ContextManager.get('currentRH', None)
-        req = rh._req if rh else ContextManager.get('currentReq', None)
 
-        if req and req.is_https() and Config.getInstance().getBaseSecureURL():
+        if rh and request.is_secure and Config.getInstance().getBaseSecureURL():
             baseURL = Config.getInstance().getBaseSecureURL()
         else:
             baseURL = Config.getInstance().getBaseURL()

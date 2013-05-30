@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 from urlparse import urljoin
 
 """Base definitions for the request handlers (rh). A rh is a class which
@@ -62,7 +63,6 @@ from MaKaC.plugins import PluginsHolder
 from MaKaC.plugins.base import OldObservable
 from MaKaC.plugins.RoomBooking.common import rb_check_user_access
 
-from indico.util.network import _get_remote_ip
 from indico.util.redis import RedisError
 
 
@@ -71,9 +71,9 @@ class RequestHandlerBase(OldObservable):
     _uh = None
 
     def __init__(self, req):
-        if req == None:
-            raise Exception("Request object not initialised")
-        self._req = req
+        if req is not None:
+            raise Exception("Received request object")
+        self._req = None
 
     def _checkProtection( self ):
         """
@@ -120,14 +120,14 @@ class RequestHandlerBase(OldObservable):
             return ""
         return self._uh.getURL( self._target )
 
-    def getRequestURL( self, secure=False ):
+    def getRequestURL(self, secure=False):
         """
         Reconstructs the request URL
         """
         if secure:
-            return  urljoin(Config.getInstance().getBaseSecureURL(), self._req.unparsed_uri)
+            return urljoin(Config.getInstance().getBaseSecureURL(), request.path)
         else:
-            return self._req.construct_url(self._req.unparsed_uri)
+            return request.url
 
     def use_https(self):
         """
@@ -159,8 +159,7 @@ class RequestHandlerBase(OldObservable):
         setLocale(lang)
 
     def getHostIP(self):
-        return _get_remote_ip(self._req)
-
+        return request.remote_addr
 
     def _getTruncatedParams(self):
         """ Truncates params, so that file objects do not show up in the logs """
@@ -321,7 +320,7 @@ class RH(RequestHandlerBase):
         """
         If HTTPS must be used but it is not, redirect!
         """
-        if self.use_https() and not self._req.is_https():
+        if self.use_https() and not request.is_secure:
             self._redirect(self.getRequestURL(secure=True))
             return True
         else:
@@ -523,8 +522,9 @@ class RH(RequestHandlerBase):
 
         DBMgr.getInstance().startRequest()
         self._startRequestSpecific2RH()     # I.e. implemented by Room Booking request handlers
-        textLog.append("%s : Database request started"%(datetime.now() - self._startTime))
-        Logger.get('requestHandler').info('[pid=%s] Request %s started (%s)' % (os.getpid(),id(self._req), self._req.unparsed_uri))
+        textLog.append("%s : Database request started" % (datetime.now() - self._startTime))
+        Logger.get('requestHandler').info('[pid=%s] Request %s started (%s)' % (
+            os.getpid(), id(self._req), request.path))
 
         # notify components that the request has started
         self._notify('requestStarted', self._req)

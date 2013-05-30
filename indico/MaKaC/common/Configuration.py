@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 from indico.util.contextManager import ContextManager
 
 """Contains the machinery that allows to access and modify in a more comfortable
@@ -722,7 +723,7 @@ class Config:
     def getCssConfTemplateBaseURL(self):
         rh = ContextManager.get('currentRH', None)
 
-        if rh and rh._req.is_https() and self.getBaseSecureURL():
+        if rh and request.is_secure and self.getBaseSecureURL():
             baseURL = self.getBaseSecureURL()
         else:
             baseURL = self.getBaseURL()
@@ -824,7 +825,7 @@ class Config:
     def getPluginIconURL( self, pluginName, iconId ):
         rh = ContextManager.get('currentRH', None)
 
-        if rh and rh._req.is_https() and self.getBaseSecureURL():
+        if rh and request.is_secure and self.getBaseSecureURL():
             baseURL = self.getBaseSecureURL()
         else:
             baseURL = self.getBaseURL()

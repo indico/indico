@@ -2563,7 +2563,7 @@ class WRegistrationFormconfirmBooking(wcomponents.WTemplated):
         vars["registrant"] = self._registrant
         vars["conf"] = self._conf
         vars["lang"] = self._rh._getSession().getLang()
-        vars["secure"] = self._rh._req.is_https()
+        vars["secure"] = request.is_secure
         return vars
 
 class WPRegistrationFormSignIn( conferences.WPConferenceDefaultDisplayBase ):

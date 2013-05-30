@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 from urlparse import urlparse
 from webassets import Environment
@@ -86,7 +87,7 @@ class WPBase(OldObservable):
         self._extraJS = []
 
     def _getBaseURL( self ):
-        if self._rh._req.is_https() and Config.getInstance().getBaseSecureURL():
+        if request.is_secure and Config.getInstance().getBaseSecureURL():
             baseurl = Config.getInstance().getBaseSecureURL()
         else:
             baseurl = Config.getInstance().getBaseURL()

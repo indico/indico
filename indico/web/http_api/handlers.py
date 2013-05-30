@@ -27,6 +27,7 @@ import hmac
 import re
 import time
 import urllib
+from flask import request
 from urlparse import parse_qs
 from ZODB.POSException import ConflictError
 import oauth2 as oauth
@@ -41,7 +42,6 @@ from indico.web.http_api import API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLY
 from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.wsgi import webinterface_handler_config as apache
 from indico.web.http_api.metadata.serializer import Serializer
-from indico.util.network import _get_remote_ip
 from indico.util.contextManager import ContextManager
 from indico.modules.oauth.errors import OAuthError
 from indico.modules.oauth.components import OAuthUtils
@@ -118,7 +118,7 @@ def buildAW(ak, req, onlyPublic=False):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         # Dirty hack: Google calendar converts HTTP API requests from https to http
         # Therefore, not working with Indico setup (requiring https for HTTP API authenticated)
-        if not req.is_https() and minfo.isAPIHTTPSRequired() and req.get_user_agent().find("Googlebot") == -1:
+        if not request.is_secure and minfo.isAPIHTTPSRequired() and req.get_user_agent().find("Googlebot") == -1:
             raise HTTPAPIError('HTTPS is required', apache.HTTP_FORBIDDEN)
         aw.setUser(ak.getUser())
     return aw
@@ -254,7 +254,7 @@ def handler(req, **params):
                 if minfo.getRoomBookingModuleActive():
                     Factory.getDALManager().sync()
                 normPath, normQuery = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
-                ak.used(_get_remote_ip(req), normPath, normQuery, not onlyPublic)
+                ak.used(request.remote_addr, normPath, normQuery, not onlyPublic)
                 try:
                     if minfo.getRoomBookingModuleActive():
                         Factory.getDALManager().disconnect()

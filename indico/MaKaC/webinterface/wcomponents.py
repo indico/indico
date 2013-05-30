@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 
 from MaKaC.plugins import OldObservable
@@ -198,7 +199,7 @@ class WTemplated(OldObservable):
 
         tempHTML = templateEngine.render(self.tplFile, vars, self)
 
-        if self._rh and self._rh._req.is_https():
+        if self._rh and request.is_secure:
             imagesBaseURL = Config.getInstance().getImagesBaseURL()
             imagesBaseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL())
             tempHTML = tempHTML.replace(imagesBaseURL, imagesBaseSecureURL)
