@@ -1108,17 +1108,22 @@ td.groupTitle, td.groupTitleNoBorder, td.groupSubTitle {
     color: black;
 }
 
+.contentCellTDHFill {
+    width: 100%;
+    vertical-align: top;
+}
+
 .subgroupTitle, .subgroupTitleNoBorder {
-   font-weight: bold;
-   font-size: 18px;
-   color: #888888;
-   padding: 3px;
-   border-bottom: 2px solid #777777;
-   vertical-align: bottom;
+    font-weight: bold;
+    font-size: 18px;
+    color: #888888;
+    padding: 3px;
+    border-bottom: 2px solid #777777;
+    vertical-align: bottom;
 }
 
 .subgroupTitleNoBorder {
-   border-bottom: none;
+    border-bottom: none;
 }
 
 .abstractLeftDataCell {
