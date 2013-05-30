@@ -70,4 +70,4 @@ class Redis_Feature(IndicoTestFeature):
         self._redis_pipeline_result = pipe.execute()
 
     def destroy(self, obj):
-        self._redis_process.terminate()
+        self._redis_process.kill()
