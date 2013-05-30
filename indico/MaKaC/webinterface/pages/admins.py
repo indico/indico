@@ -2525,10 +2525,10 @@ class WPMaintenance(WPMaintenanceBase):
 
 
 class WAdminMaintenance(wcomponents.WTemplated):
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        return vars
+    """
+    Page for maintenance overview.
+    """
+    pass
 
 
 class WPMaintenanceTmpCleanup(WPMaintenanceBase):
@@ -2537,23 +2537,16 @@ class WPMaintenanceTmpCleanup(WPMaintenanceBase):
         WPMaintenanceBase.__init__(self, rh)
 
     def _getTabContent(self, params):
-        msg = """Are you sure you want to delete the temporary directory
-        (note that all the files in that directory will be deleted)?"""
         wc = wcomponents.WConfirmation()
-        url = urlHandlers.UHMaintenancePerformTmpCleanup.getURL()
-        return """
-                <table align="center" width="95%%">
-                    <tr>
-                        <td class="formTitle">Maintenance: Cleaning-up temporary directory</td>
-                    </tr>
-                    <tr>
-                        <td>
-                    <br>
-                            %s
-                        </td>
-                    </tr>
-                </table>
-                """ % wc.getHTML(msg, url, {})
+
+        msg = {'challenge': wcomponents.WConfirmation.DEFAULT_CHALLENGE,
+               'target': _('Clearing the temporary directory.'),
+               'important': True,
+               'subtext': _('Note that all files in the directory will be deleted.')
+               }
+
+        postURL = urlHandlers.UHMaintenancePerformTmpCleanup.getURL()
+        return wc.getHTML(msg, postURL, {})
 
 
 class WPMaintenancePack(WPMaintenanceBase):
@@ -2563,21 +2556,15 @@ class WPMaintenancePack(WPMaintenanceBase):
 
     def _getTabContent(self, params):
         wc = wcomponents.WConfirmation()
-        msg = """Are you sure you want to pack the database?"""
-        url = urlHandlers.UHMaintenancePerformPack.getURL()
-        return """
-                <table align="center" width="95%%">
-                    <tr>
-                        <td class="formTitle">Maintenance: Database packing</td>
-                    </tr>
-                    <tr>
-                        <td>
-                    <br>
-                            %s
-                        </td>
-                    </tr>
-                </table>
-                """ % wc.getHTML(msg, url, {})
+
+        msg = {'challenge': wcomponents.WConfirmation.DEFAULT_CHALLENGE,
+               'target': _('Pack the database.'),
+               'important': True,
+               'subtext': None
+               }
+
+        postURL = urlHandlers.UHMaintenancePerformPack.getURL()
+        return wc.getHTML(msg, postURL, {})
 
 
 class WPMaintenanceWebsessionCleanup(WPMaintenanceBase):
@@ -2587,21 +2574,15 @@ class WPMaintenanceWebsessionCleanup(WPMaintenanceBase):
 
     def _getTabContent(self, params):
         wc = wcomponents.WConfirmation()
-        msg = """Are you sure you want to delete all the web sessions?"""
-        url = urlHandlers.UHMaintenancePerformWebsessionCleanup.getURL()
-        return """
-                <table align="center" width="95%%">
-                    <tr>
-                        <td class="formTitle">Maintenance: Cleaning-up websession</td>
-                    </tr>
-                    <tr>
-                        <td>
-                    <br>
-                            %s
-                        </td>
-                    </tr>
-                </table>
-                """ % wc.getHTML(msg, url, {})
+
+        msg = {'challenge': wcomponents.WConfirmation.DEFAULT_CHALLENGE,
+               'target': _('Delete all web sessions.'),
+               'important': True,
+               'subtext': None
+               }
+
+        postURL = urlHandlers.UHMaintenancePerformWebsessionCleanup.getURL()
+        return wc.getHTML(msg, postURL, {})
 
 
 class WPTaskManagerBase(WPAdminsSystemBase):
