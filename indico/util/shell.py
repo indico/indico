@@ -21,6 +21,7 @@ import logging
 import argparse
 import errno
 import urlparse
+import os
 import re
 import signal
 import socket
@@ -29,6 +30,7 @@ from SocketServer import TCPServer
 
 try:
     import werkzeug.serving
+    from werkzeug.debug import DebuggedApplication
 except ImportError:
     werkzeug = None
 
@@ -84,7 +86,7 @@ def add(namespace, element, name=None, doc=None):
 class WerkzeugServer(object):
 
     def __init__(self, host='localhost', port=8000, enable_ssl=False, ssl_key=None, ssl_cert=None,
-                 reload_on_change=False):
+                 reload_on_change=False, use_debugger=True):
         """
         Run an Indico WSGI ref server instance
         Very simple dispatching app
@@ -121,10 +123,76 @@ class WerkzeugServer(object):
         self.ssl_key = ssl_key
         self.ssl_cert = ssl_cert
         self.reload_on_change = reload_on_change
+        self.use_debugger = use_debugger
 
         logger = logging.getLogger('werkzeug')
         logger.setLevel(logging.DEBUG)
         logger.addHandler(logging.StreamHandler(sys.stderr))
+
+        self._setup_ssl()
+        self._server = None
+
+    def _setup_ssl(self):
+        if not self.ssl:
+            self.ssl_context = None
+        elif not self.ssl_cert and not self.ssl_key:
+            self._patch_shutdown_request()
+            self.ssl_context = 'adhoc'
+        else:
+            self._patch_shutdown_request()
+            self.ssl_context = SSL.Context(SSL.SSLv23_METHOD)
+            self.ssl_context.use_privatekey_file(self.ssl_key)
+            self.ssl_context.use_certificate_chain_file(self.ssl_cert)
+
+    def make_server(self):
+        assert self._server is None
+        app = self.app
+        if self.use_debugger:
+            # In case anyone wonders why evalex is disabled:
+            # 1. It's a huge security hole when open to the public. To use it properly we'd need a way to
+            #    restrict it by IP address (or disable it when not listening on localhost)
+            # 2. ZODB uses a thread-local field to store the connection. So anything accessing the DB will not work
+            #    when accessed from the debugger shell.
+            # So the best solution is not using that part of the werkzeug debugger at all.
+            # Simply use e.g. pydev or rpdb2 if you want a debugger.
+            app = DebuggedApplication(app, False)
+        self._server = werkzeug.serving.make_server(self.host, self.port, app, threaded=True,
+                                                    ssl_context=self.ssl_context)
+        self.addr = self._server.socket.getsockname()[:2]
+        return self._server
+
+    def _test_socket(self):
+        # Create and destroy a socket so that any exceptions are raised before
+        # we spawn a separate Python interpreter and lose this ability.
+        # (taken from werkzeug.serving.run_simple)
+        address_family = werkzeug.serving.select_ip_version(self.host, self.port)
+        test_socket = socket.socket(address_family, socket.SOCK_STREAM)
+        test_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        test_socket.bind((self.host, self.port))
+        test_socket.close()
+
+    def _run_new_server(self):
+        # The werkzeug reloader needs a callable which creates and starts a new server
+        self.make_server().serve_forever()
+
+    def _display_host(self):
+        if os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
+            display_hostname = self.host != '*' and self.host or 'localhost'
+            if ':' in display_hostname:
+                display_hostname = '[%s]' % display_hostname
+            console.info(' * Running on {0}://{1}:{2}'.format('https' if self.ssl_context else 'http',
+                                                              display_hostname, self.port))
+
+    def run(self):
+        self._display_host()
+        if not self.reload_on_change:
+            if self._server is None:
+                self.make_server()
+            self._server.serve_forever()
+        else:
+            assert self._server is None  # otherwise the socket is already bound
+            self._test_socket()
+            werkzeug.serving.run_with_reloader(self._run_new_server)
 
     @staticmethod
     def _patch_shutdown_request():
@@ -146,28 +214,6 @@ class WerkzeugServer(object):
                 pass  # some platforms may raise ENOTCONN here
             self.close_request(request)
         TCPServer.shutdown_request = my_shutdown_request
-
-    def run(self):
-        if not self.ssl:
-            ssl_context = None
-        elif not self.ssl_cert and not self.ssl_key:
-            self._patch_shutdown_request()
-            ssl_context = 'adhoc'
-        else:
-            self._patch_shutdown_request()
-            ssl_context = SSL.Context(SSL.SSLv23_METHOD)
-            ssl_context.use_privatekey_file(self.ssl_key)
-            ssl_context.use_certificate_chain_file(self.ssl_cert)
-
-        # In case anyone wonders why evalex is disabled:
-        # 1. It's a huge security hole when open to the public. To use it properly we'd need a way to
-        #    restrict it by IP address (or disable it when not listening on localhost)
-        # 2. ZODB uses a thread-local field to store the connection. So anything accessing the DB will not work
-        #    when accessed from the debugger shell.
-        # So the best solution is not using that part of the werkzeug debugger at all.
-        # Simply use e.g. pydev or rpdb2 if you want a debugger.
-        werkzeug.serving.run_simple(self.host, self.port, self.app, threaded=True, ssl_context=ssl_context,
-                                    use_debugger=True, use_evalex=False, use_reloader=self.reload_on_change)
 
 
 def setupNamespace(dbi):
