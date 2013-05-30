@@ -20,7 +20,10 @@
 from __future__ import absolute_import
 
 import os
-from flask import Flask
+from flask import redirect, url_for
+
+from indico.web.flask.util import create_modpython_rules
+from indico.web.flask.wrappers import IndicoFlask
 
 
 def fix_root_path(app):
@@ -37,9 +40,12 @@ def fix_root_path(app):
 
 
 def make_app():
-    app = Flask('indico')
+    app = IndicoFlask('indico')
     fix_root_path(app)
     return app
 
 
 app = make_app()
+app.config['PROPAGATE_EXCEPTIONS'] = True
+app.add_url_rule('/', view_func=lambda: redirect(url_for('mp-index-index')))
+create_modpython_rules(app)
