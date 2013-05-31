@@ -54,7 +54,16 @@ class WPCFAInactive( WPConferenceDefaultDisplayBase ):
 
 
 class WCFANotYetOpened(wcomponents.WTemplated):
-    pass
+
+    def __init__(self, aw, conf):
+        self._conf = conf
+        self._aw = aw
+
+    def getVars(self):
+        cfaMgr = self._conf.getAbstractMgr()
+        tpl_vars = wcomponents.WTemplated.getVars(self)
+        tpl_vars["start_date"] = format_date(cfaMgr.getStartSubmissionDate(), "long")
+        return tpl_vars
 
 
 class WPCFANotYetOpened(WPConferenceDefaultDisplayBase):
@@ -65,13 +74,22 @@ class WPCFANotYetOpened(WPConferenceDefaultDisplayBase):
 
 
 class WCFAClosed(wcomponents.WTemplated):
-    pass
+
+    def __init__(self, aw, conf):
+        self._conf = conf
+        self._aw = aw
+
+    def getVars(self):
+        cfaMgr = self._conf.getAbstractMgr()
+        tpl_vars = wcomponents.WTemplated.getVars(self)
+        tpl_vars["end_date"] = format_date(cfaMgr.getEndSubmissionDate(), "long")
+        return tpl_vars
 
 
 class WPCFAClosed(WPConferenceDefaultDisplayBase):
 
     def _getBody(self, params):
-        wc = WCFAClosed()
+        wc = WCFAClosed(self._getAW(), self._conf)
         return wc.getHTML()
 
 
