@@ -1,21 +1,20 @@
-<div class="groupTitle">${ _("General Admin Data")} - ${ _("Modify System General Information")}</div>
-
+<div class="groupTitle">${ _("General Admin Data") } - ${ _("Modify System General Information") }</div>
 <form action="${ postURL }" method="POST">
   <table>
     <tr>
       <td nowrap class="titleCellTD">
-        <span class="titleCellFormat">${ _("Proxy")}</span>
+        <span class="titleCellFormat">${ _("Proxy") }</span>
       </td>
-      <td bgcolor="white" width="100%">&nbsp;
+      <td class="titleCellTDHFill"
         <input type="checkbox" size="50" name="proxy" value="True" ${ ("", "checked")[minfo.useProxy()] } />
-        <small>${ _("Check this if users access Indico via proxy (load balancing)")}</small>
+        <small>${ _("Check this if users access Indico via proxy (load balancing)") }</small>
       </td>
     </tr>
     <tr>
       <td nowrap class="titleCellTD">
-        <span class="titleCellFormat">${ _("Archiving Volume")}</span>
+        <span class="titleCellFormat">${ _("Archiving Volume") }</span>
       </td>
-      <td bgcolor="white" width="100%">&nbsp;
+      <td class="titleCellTDHFill">
         <input type="text" size="50" name="volume" value="${ minfo.getArchivingVolume() }" />
       </td>
     </tr>
@@ -24,10 +23,10 @@
         <table align="center">
         <tr>
           <td>
-            <input type="submit" class="btn" name="action" value="${ _('OK')}">
+            <input type="submit" class="btn" name="action" value="${ _('OK')}" />
           </td>
           <td>
-            <input type="submit" class="btn" name="action" value="${ _('Cancel')}">
+            <input type="submit" class="btn" name="action" value="${ _('Cancel')}" />
           </td>
         </tr>
         </table>
