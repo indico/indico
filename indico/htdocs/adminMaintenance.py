@@ -33,9 +33,3 @@ def pack(req, **params):
 
 def performPack(req, **params):
     return maintenance.RHMaintenancePerformPack(req).process(params)
-
-def websessionCleanup(req, **params):
-    return maintenance.RHMaintenanceWebsessionCleanup(req).process(params)
-
-def performWebsessionCleanup(req, **params):
-    return maintenance.RHMaintenancePerformWebsessionCleanup(req).process(params)

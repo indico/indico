@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 import os, string, copy
 import logging.handlers, logging.config, logging
@@ -45,9 +46,9 @@ class IndicoMailFormatter(logging.Formatter):
         info = ['Additional information:']
         info.append('URL: %s' % rh.getRequestURL())
         info.append('Params: %s' % rh._getTruncatedParams())
-        info.append('IP: %s' % rh._req.remote_ip)
-        info.append('User Agent: %s' % rh._req.headers_in.get('User-Agent', 'n/a'))
-        info.append('Referer: %s' % rh._req.headers_in.get('Referer', 'n/a'))
+        info.append('IP: %s' % request.remote_addr)
+        info.append('User Agent: %s' % request.user_agent)
+        info.append('Referer: %s' % request.referrer or 'n/a')
         return '\n\n%s' % '\n'.join(info)
 
 

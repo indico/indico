@@ -18,6 +18,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from datetime import timedelta,datetime, time
+from flask import session
 import os, re, pytz
 import MaKaC.common.info as info
 import MaKaC.webinterface.rh.base as base
@@ -94,10 +95,10 @@ class RHConfSignIn( conferenceBase.RHConferenceBase ):
                 return "your account is not active\nPlease activate it and retry"
             else:
                 url = self._returnURL
-                self._getSession().setUser( av )
+                session.user = av
                 tzUtil = timezoneUtils.SessionTZ(av)
                 tz = tzUtil.getSessionTZ()
-                self._getSession().setVar("ActiveTimezone",tz)
+                session.timezone = tz
             if Config.getInstance().getBaseSecureURL().startswith('https://'):
                 url = str(url).replace('http://', 'https://')
             self._redirect( url )

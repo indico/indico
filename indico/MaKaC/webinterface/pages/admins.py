@@ -2505,11 +2505,10 @@ class WPMaintenanceBase(WPAdminsSystemBase):
 
 class WPMaintenance(WPMaintenanceBase):
 
-    def __init__(self, rh, s, dbSize, nWebsessions):
+    def __init__(self, rh, s, dbSize):
         WPMaintenanceBase.__init__(self, rh)
         self._stat = s
         self._dbSize = dbSize
-        self._nWebsessions = nWebsessions
 
     def _getTabContent(self, params):
         wc = WAdminMaintenance()
@@ -2518,9 +2517,7 @@ class WPMaintenance(WPMaintenanceBase):
                  "nFiles": "%s files" % self._stat[1], \
                  "nDirs": "%s folders" % self._stat[2], \
                  "packURL": urlHandlers.UHMaintenancePack.getURL(), \
-                 "dbSize": self._dbSize, \
-                 "websessionCleanupURL": urlHandlers.UHMaintenanceWebsessionCleanup.getURL(), \
-                 "nWebsessions": self._nWebsessions}
+                 "dbSize": self._dbSize}
         return wc.getHTML(pars)
 
 
@@ -2569,30 +2566,6 @@ class WPMaintenancePack(WPMaintenanceBase):
                 <table align="center" width="95%%">
                     <tr>
                         <td class="formTitle">Maintenance: Database packing</td>
-                    </tr>
-                    <tr>
-                        <td>
-                    <br>
-                            %s
-                        </td>
-                    </tr>
-                </table>
-                """ % wc.getHTML(msg, url, {})
-
-
-class WPMaintenanceWebsessionCleanup(WPMaintenanceBase):
-
-    def __init__(self, rh):
-        WPMaintenanceBase.__init__(self, rh)
-
-    def _getTabContent(self, params):
-        wc = wcomponents.WConfirmation()
-        msg = """Are you sure you want to delete all the web sessions?"""
-        url = urlHandlers.UHMaintenancePerformWebsessionCleanup.getURL()
-        return """
-                <table align="center" width="95%%">
-                    <tr>
-                        <td class="formTitle">Maintenance: Cleaning-up websession</td>
                     </tr>
                     <tr>
                         <td>

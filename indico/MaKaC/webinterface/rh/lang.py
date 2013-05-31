@@ -32,4 +32,4 @@ class RHChangeLang(base.RH):
         # Remove lang param from referer
         referer = re.sub(r'(?<=[&?])lang=[^&]*&?', '', params['REFERER_URL'])
         referer = re.sub(r'[?&]$', '', referer)
-        self._redirect(referer, noCache=True)
+        self._redirect(referer)

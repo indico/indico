@@ -53,7 +53,7 @@ class RequestListener(Component):
 
     # IServerRequestListener
 
-    def requestFinished(self, obj, req):
+    def requestFinished(self, obj):
 
         sm = SyncManager.getDBInstance()
         cm = ContextManager.get('indico.ext.livesync:actions')
@@ -76,12 +76,12 @@ class RequestListener(Component):
                 sm.add(timestamp,
                        ActionWrapper(timestamp, obj, actions, objId))
 
-    def requestRetry(self, obj, req, nretry):
+    def requestRetry(self, obj, nretry):
         # reset the context manager
         ContextManager.set('indico.ext.livesync:actions', {})
         ContextManager.set('indico.ext.livesync:ids', {})
 
-    def requestStarted(self, obj, req):
+    def requestStarted(self, obj):
         # reset the context manager
         ContextManager.set('indico.ext.livesync:actions', {})
         ContextManager.set('indico.ext.livesync:ids', {})
@@ -95,10 +95,10 @@ class RequestListenerContext(object):
         self._reqListener = RequestListener()
 
     def __enter__(self):
-        self._reqListener.requestStarted(None, None)
+        self._reqListener.requestStarted(None)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self._reqListener.requestFinished(None, None)
+        self._reqListener.requestFinished(None)
 
 
 class ObjectChangeListener(Component):

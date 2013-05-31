@@ -40,21 +40,6 @@
                     </td>
                 </tr>
             </table>
-            <br>
-            <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
-                <tr>
-                    <td colspan="5" class="groupTitle"> ${ _("Websession")}</td>
-                </tr>
-                <tr>
-                    <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Approximate number of sessions")}</span></td>
-                    <td bgcolor="white" width="100%" valign="top" class="blacktext">${ nWebsessions }</td>
-                    <td rowspan="4" valign="top">
-                        <form action="${ websessionCleanupURL }" method="POST">
-                            <input type="submit" class="btn" value="${ _("cleanup")}">
-                        </form>
-                    </td>
-                </tr>
-            </table>
         </td>
     </tr>
 </table>

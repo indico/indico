@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 from pytz import timezone, all_timezones
 from datetime import datetime, timedelta
@@ -170,25 +171,15 @@ def minDatetime():
 class DisplayTZ:
 
     def __init__(self,aw,conf=None,useServerTZ=0):
-        websession = aw.getSession()
-        minfo =  info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        try:
-            sessTimezone = websession.getVar("ActiveTimezone")
-        except:
-            #sessTimezone = minfo.getTimezone()
-            sessTimezone = "LOCAL"
-        if sessTimezone == None:
-            #sessTimezone = minfo.getTimezone()
-            sessTimezone = "LOCAL"
-            websession.setVar("ActiveTimezone",sessTimezone)
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        sessTimezone = session.timezone
         if sessTimezone == 'LOCAL':
-            if useServerTZ == 0 and conf!=None:
+            if useServerTZ == 0 and conf is not None:
                 sessTimezone = conf.getTimezone()
             else:
-                minfo =  info.HelperMaKaCInfo.getMaKaCInfoInstance()
                 sessTimezone = minfo.getTimezone()
         self._displayTZ = sessTimezone
-        if self._displayTZ in ["",None]:
+        if not self._displayTZ:
             self._displayTZ = minfo.getTimezone()
 
     def getDisplayTZ(self):

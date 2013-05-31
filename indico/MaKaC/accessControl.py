@@ -541,7 +541,6 @@ class AccessWrapper:
     def __init__( self, user=None ):
         self._currentUser = user
         self._ip = ""
-        self._session = None
 
     def setUser( self, newAvatar ):
         self._currentUser = newAvatar
@@ -555,13 +554,3 @@ class AccessWrapper:
 
     def getIP( self ):
         return self._ip
-
-    def setSession( self, newSession ):
-        self._session = newSession
-
-    def getSession( self ):
-        return self._session
-
-
-if __name__ == "__main__":
-    pass

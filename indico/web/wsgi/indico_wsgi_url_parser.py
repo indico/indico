@@ -22,13 +22,11 @@ Some apache rewrites managed with mod_wsgi.
 
 import os
 from MaKaC.common import Config
-from MaKaC.services import handler
 
 from indico.util.caching import cached_property
 from indico.web.http_api import handlers as export_handlers
 
 
-DIR_SERVICES = os.path.dirname(handler.__file__)
 DIR_MODULES = os.path.dirname(export_handlers.__file__)
 
 
@@ -48,13 +46,13 @@ class ServerConfig(object):
         Add pages that need url parsing here.
         """
         return {'': ((self.htdocs_dir, 'index.py'), 'index', '', None), \
-                    'services':     ((DIR_SERVICES, 'handler.py'), 'handler', '', None), \
+                    #'services':     ((DIR_SERVICES, 'handler.py'), 'handler', '', None), \
                     'event':        ((self.htdocs_dir, 'events.py'), 'index', 'genericRewrite', \
                                          {'queryReplacement': 'tag'}), \
                     'categ':        ((self.htdocs_dir, 'categoryDisplay.py'), 'index', 'genericRewrite', \
                                          {'queryReplacement': 'categId'}),
-                'export':       ((DIR_MODULES, 'wsgi_handler.py'), 'handler', '', None),
-                'api':          ((DIR_MODULES, 'wsgi_handler.py'), 'handler', '', None)
+                #'export':       ((DIR_MODULES, 'wsgi_handler.py'), 'handler', '', None),
+                #'api':          ((DIR_MODULES, 'wsgi_handler.py'), 'handler', '', None)
                 }
 
     @cached_property

@@ -67,11 +67,11 @@ class RHMaterialDisplayCommon:
                     self._redirect( urlwmv )
                 elif url.find(".flv") != -1 or url.find(".f4v") != -1 or url.find("rtmp://") != -1:
                     urlflash = urlHandlers.UHVideoFlashAccess().getURL(res)
-                    self._redirect( urlflash, noCache=True)
+                    self._redirect(urlflash)
                 else:
-                    self._redirect( res.getURL(), noCache=True )
+                    self._redirect(res.getURL())
             elif isinstance(res, conference.LocalFile):
-                self._redirect( urlHandlers.UHFileAccess.getURL( res ), noCache=True )
+                self._redirect(urlHandlers.UHFileAccess.getURL( res ))
         else:
             return self._processManyMaterials()
 

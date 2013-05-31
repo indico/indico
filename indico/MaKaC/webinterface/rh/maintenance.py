@@ -35,8 +35,7 @@ class RHMaintenance( RHMaintenanceBase ):
     def _process( self ):
         s = MaintenanceMng.getStat(Config.getInstance().getTempDir())
         dbSize = MaintenanceMng.humanReadableSize(DBMgr.getInstance().getDBSize(), 'm')
-        nWebsession = MaintenanceMng.getWebsessionNum()
-        p = adminPages.WPMaintenance( self, s, dbSize, nWebsession)
+        p = adminPages.WPMaintenance( self, s, dbSize)
         return p.display()
 
 class RHMaintenanceTmpCleanup( RHMaintenanceBase ):
@@ -83,27 +82,4 @@ class RHMaintenancePerformPack( RHMaintenanceBase ):
                 p=RHMaintenancePack(self)
                 return p.display()
             DBMgr.getInstance().pack()
-        self._redirect(urlHandlers.UHMaintenance.getURL())
-
-class RHMaintenanceWebsessionCleanup( RHMaintenanceBase ):
-    _uh = urlHandlers.UHMaintenancePack
-    
-    def _process( self ):
-        p = adminPages.WPMaintenanceWebsessionCleanup( self )
-        return p.display()
-
-class RHMaintenancePerformWebsessionCleanup( RHMaintenanceBase ):
-    _uh = urlHandlers.UHMaintenancePerformPack
-
-    def _checkParams(self, params):
-        RHMaintenanceBase._checkParams(self, params)
-        self._confirmed=params.has_key("confirm")
-        self._cancel=params.has_key("cancel")
-    
-    def _process( self ):
-        if not self._cancel:
-            if not self._confirmed:
-                p=RHMaintenancePack(self)
-                return p.display()
-            MaintenanceMng.cleanupWebsession()
         self._redirect(urlHandlers.UHMaintenance.getURL())

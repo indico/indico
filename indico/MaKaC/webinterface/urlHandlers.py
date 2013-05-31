@@ -2510,12 +2510,6 @@ class UHMaintenancePack( URLHandler ):
 class UHMaintenancePerformPack( URLHandler ):
     _relativeURL = "adminMaintenance.py/performPack"
 
-class UHMaintenanceWebsessionCleanup( URLHandler ):
-    _relativeURL = "adminMaintenance.py/websessionCleanup"
-
-class UHMaintenancePerformWebsessionCleanup( URLHandler ):
-    _relativeURL = "adminMaintenance.py/performWebsessionCleanup"
-
 class UHAdminLayoutGeneral( URLHandler ):
     _relativeURL = "adminLayout.py"
 

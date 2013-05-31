@@ -194,6 +194,18 @@ class DBMgr:
         yield self.getDBConnection()
         self.commit()
 
+    @contextmanager
+    def global_connection(self, commit=False):
+        """Helper if you NEED a connection and don't know if one is available or not.
+
+        Useful e.g. in flask code that runs outside a request"""
+        if self.isConnected():
+            yield
+        else:
+            self.startRequest()
+            yield
+            self.endRequest(commit)
+
     # ZODB version check
     try:
         zodbPkg = pkg_resources.require('ZODB3')[0]

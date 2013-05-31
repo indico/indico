@@ -20,16 +20,20 @@
 from __future__ import absolute_import
 
 import cPickle
-from flask import request
 import uuid
 from datetime import timedelta
+from flask import request
 from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
+from werkzeug.utils import cached_property
 
 from MaKaC.common.cache import GenericCache
+from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.user import AvatarHolder
+from indico.util.decorators import cached_writable_property
 
 
-class IndicoSession(CallbackDict, SessionMixin):
+class BaseSession(CallbackDict, SessionMixin):
     def __init__(self, initial=None, sid=None, new=False):
         def on_update(self):
             self.modified = True
@@ -37,6 +41,67 @@ class IndicoSession(CallbackDict, SessionMixin):
         self.sid = sid
         self.new = new
         self.modified = False
+        defaults = self._get_defaults()
+        if defaults:
+            self.update(defaults)
+
+    def _get_defaults(self):
+        # Note: This is called before there is a DB connection available!
+        return None
+
+
+# Hey, if you intend on adding a custom property to this class:
+# - Only do it if you need logic behind it. Otherwise use the dict API!
+# - Even if you do need logic, keep it to core stuff. Otherwise it probably does not belong here!
+# - Always prefix the dict keys backing a property with an underscore (to prevent clashes with externally-set items)
+# - When you store something like the avatar that involves a DB lookup, use cached_writable_property
+class IndicoSession(BaseSession):
+    @cached_writable_property('_avatar')
+    def user(self):
+        avatarId = self.get('_avatarId')
+        if not avatarId:
+            return None
+        return AvatarHolder().getById(avatarId)
+
+    @user.setter
+    def user(self, avatar):
+        if avatar is None:
+            self.pop('_avatarId', None)
+        else:
+            self['_avatarId'] = avatar.getId()
+
+    @property
+    def lang(self):
+        if '_lang' in self:
+            return self['_lang']
+        elif self.user:
+            return self.user.getLang()
+        else:
+            return HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
+
+    @lang.setter
+    def lang(self, lang):
+        self['_lang'] = lang
+
+    @cached_property
+    def csrf_token(self):
+        if '_csrf_token' not in self:
+            self['_csrf_token'] = str(uuid.uuid4())
+        return self['_csrf_token']
+
+    @property
+    def csrf_protected(self):
+        return self.user is not None
+
+    @property
+    def timezone(self):
+        if '_timezone' in self:
+            return self['_timezone']
+        return HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+
+    @timezone.setter
+    def timezone(self, tz):
+        self['_timezone'] = tz
 
 
 class IndicoSessionInterface(SessionInterface):
@@ -77,7 +142,7 @@ class IndicoSessionInterface(SessionInterface):
 
     def save_session(self, app, session, response):
         domain = self.get_cookie_domain(app)
-        if not session:  # empty session, delete it from storage and cookie
+        if not session and not session.new:  # empty session, delete it from storage and cookie
             self.storage.delete(session.sid)
             response.delete_cookie(app.session_cookie_name, domain=domain)
             return

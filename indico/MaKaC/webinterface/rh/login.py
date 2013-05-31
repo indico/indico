@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 import os
 from MaKaC.common import Configuration, Config
@@ -56,11 +57,11 @@ class RHSignIn( base.RH ):
             url = self._returnURL
             tzUtil = timezoneUtils.SessionTZ(av)
             tz = tzUtil.getSessionTZ()
-            self._getSession().setVar("ActiveTimezone",tz)
-            self._getSession().setUser( av )
+            session.timezone = tz
+            session.user = av
             if Config.getInstance().getBaseSecureURL().startswith('https://'):
                 url = str(url).replace('http://', 'https://')
-            self._redirect( url, noCache = True )
+            self._redirect(url)
         if not self._signIn:
             p = signIn.WPSignIn( self )
             return p.display( returnURL = self._returnURL )
@@ -78,11 +79,10 @@ class RHSignIn( base.RH ):
                 return _("your account is not activate\nPlease active it and retry")
             else:
                 url = self._returnURL
-                #raise(str(dir(av)))
-                self._getSession().setUser( av )
+                session.user = av
                 tzUtil = timezoneUtils.SessionTZ(av)
                 tz = tzUtil.getSessionTZ()
-                self._getSession().setVar("ActiveTimezone",tz)
+                session.timezone = tz
 
             if self._userId != "":
                 if "?" in url:
@@ -91,7 +91,7 @@ class RHSignIn( base.RH ):
                     url += "?userId=%s"%self._userId
             if Config.getInstance().getBaseSecureURL().startswith('https://'):
                 url = str(url).replace('http://', 'https://')
-            self._redirect( url, noCache = True )
+            self._redirect(url)
 
 
 class RHSignOut( base.RH ):
@@ -108,9 +108,8 @@ class RHSignOut( base.RH ):
         if self._getUser():
             auth = AuthenticatorMgr()
             autoLogoutRedirect = auth.autoLogout(self)
-            self._getSession().removeVar("ActiveTimezone")
-            self._getSession().setUser( None )
-            self._setUser( None )
+            session.clear()
+            self._setUser(None)
         if autoLogoutRedirect:
             self._redirect(autoLogoutRedirect)
         else:
@@ -128,9 +127,8 @@ class RHLogoutSSOHook( base.RH):
         if self._getUser():
             auth = AuthenticatorMgr()
             autoLogoutRedirect = auth.autoLogout(self)
-            self._getSession().removeVar("ActiveTimezone")
-            self._getSession().setUser( None )
-            self._setUser( None )
+            session.clear()
+            self._setUser(None)
         self._req.content_type = 'image/gif'
         self._req.encoding = None
         self._req.filename = 'wsignout.gif'

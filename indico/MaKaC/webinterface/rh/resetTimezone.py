@@ -18,13 +18,13 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 #import syslog
+from flask import session
 import MaKaC.webinterface.rh.base as base
 import MaKaC.common.info as info
 
 class RHResetTZ(base.RH):
 
     def _process(self):
-        sess = self._aw.getSession()
         #syslog.syslog("In RHResetTZ id: " + str(sess.id))
         parms = self._getRequestParams()
 
@@ -39,7 +39,7 @@ class RHResetTZ(base.RH):
 
         try:
             if parms["saveToProfile"] == "on":
-                user = sess.getUser()
+                user = session.user
                 if tz == "LOCAL":
                     user.setDisplayTZMode("Event Timezone")
                 else:
@@ -48,7 +48,7 @@ class RHResetTZ(base.RH):
         except:
             pass
 
-        sess.setVar("ActiveTimezone", tz)
+        session.timezone = tz
         # redirect to the calling URL with the new session tz.
         #DBMgr.getInstance().endRequest(True)
         #util.redirect(self._req,parms['REFERER_URL'])

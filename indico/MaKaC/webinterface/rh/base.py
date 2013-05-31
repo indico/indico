@@ -16,8 +16,9 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import request
+from flask import request, session
 from urlparse import urljoin
+from indico.web.flask.util import ResponseUtil
 
 """Base definitions for the request handlers (rh). A rh is a class which
 complies to a well defined interface and which from a mod_python request knows
@@ -31,7 +32,6 @@ from datetime import datetime, timedelta
 
 try:
     from indico.web.wsgi.indico_wsgi_handler_utils import Field
-    from indico.web.wsgi import webinterface_handler_config as apache
 except ImportError:
     pass
 from ZODB.POSException import ConflictError, POSKeyError
@@ -41,7 +41,6 @@ import oauth2 as oauth
 from MaKaC.common import fossilize
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 
-import MaKaC.webinterface.session as session
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
 from MaKaC.webinterface.common.baseNotificator import Notification
@@ -70,10 +69,9 @@ class RequestHandlerBase(OldObservable):
 
     _uh = None
 
-    def __init__(self, req):
+    def __init__(self, req=None):
         if req is not None:
             raise Exception("Received request object")
-        self._req = None
 
     def _checkProtection( self ):
         """
@@ -82,17 +80,9 @@ class RequestHandlerBase(OldObservable):
 
     def _getAuth(self):
         """
-        Returns True if current user is a user or has either a modification
-        or access key in their session.
-        auth_keys is the set of permissible session keys which do not require user login.
+        Returns True if current user is a user or has either a modification key in their session.
         """
-        auth_keys = ["modifKeys"]#, "accessKeys"]  Cookie would stay forever and force https
-
-        for key in auth_keys:
-            if self._websession.getVar(key):
-                return True
-
-        return self._getUser()
+        return bool(session.get('modifKeys')) or bool(self._getUser())
 
     def getAW( self ):
         """
@@ -139,7 +129,7 @@ class RequestHandlerBase(OldObservable):
         return self._params
 
     def getRequestHTTPHeaders( self ):
-        return self._req.headers_in
+        return request.headers
 
     def _setLang(self, params=None):
 
@@ -148,11 +138,11 @@ class RequestHandlerBase(OldObservable):
             newLang = params.get('lang', '')
             for lang in availableLocales:
                 if newLang.lower() == lang.lower():
-                    self._websession.setLang(lang)
+                    session.lang = lang
                     break
 
-        lang=self._websession.getLang()
-        Logger.get('i18n').debug("lang:%s"%lang)
+        lang = session.lang
+        Logger.get('i18n').debug("lang:%s" % lang)
         if lang is None:
             lang = "en_GB"
         from indico.util.i18n import setLocale
@@ -201,8 +191,6 @@ class RH(RequestHandlerBase):
                 current rh.
             _requestStarted - (bool) Flag which tells whether a DB transaction
                 has been started or not.
-            _websession - ( webinterface.session.sessionManagement.PSession )
-                Web session associated to the HTTP request.
             _aw - (AccessWrapper) Current access information for the rh.
             _target - (Locable) Reference to an object which is the destination
                 of the operations needed to carry out the rh. If set it must
@@ -227,8 +215,8 @@ class RH(RequestHandlerBase):
                     current rh.
         """
         RequestHandlerBase.__init__(self, req)
+        self._responseUtil = ResponseUtil()
         self._requestStarted = False
-        self._websession = None
         self._aw = AccessWrapper()  #Fill in the aw instance with the current information
         self._target = None
         self._reqParams = {}
@@ -250,31 +238,14 @@ class RH(RequestHandlerBase):
     def isMobile(self):
         return self._isMobile
 
-    def _setSession( self ):
-        """Sets up a reference to the corresponding web session. It uses the
-            session manager to retrieve the session corresponding to the
-            received request and makes sure it is a valid one. In case of having
-            an invalid session it reset client settings and creates a new one.
-       """
-        if not self._websession:
-            self._websession = session.getSessionForReq(self._req)
-
-    def _getSession( self ):
-        """Returns the web session associated to the received mod_python
-            request.
-        """
-        if not self._websession:
-            self._setSession()
-        return self._websession
-
     def _setSessionUser( self ):
         """
         """
-        self._aw.setUser( self._getSession().getUser() )
+        self._aw.setUser(session.user)
 
     @property
     def csrf_token(self):
-        return self._getSession().csrf_token
+        return session.csrf_token
 
     def _getRequestParams( self ):
         return self._reqParams
@@ -288,33 +259,19 @@ class RH(RequestHandlerBase):
         """
 
         # IE doesn't seem to like 'no-cache' Cache-Control headers...
-        if (re.match(r'.*MSIE.*', self._req.headers_in.get("User-Agent",""))):
+        if request.user_agent.browser == 'msie':
             # actually, the only way to safely disable caching seems to be this one
-            self._req.headers_out["Cache-Control"] = "private"
-            self._req.headers_out["Expires"] = "-1"
+            self._responseUtil.headers["Cache-Control"] = "private"
+            self._responseUtil.headers["Expires"] = "-1"
         else:
-            self._req.headers_out["Cache-Control"] = "no-store, no-cache, must-revalidate"
-            self._req.headers_out["Pragma"] = "no-cache"
+            self._responseUtil.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+            self._responseUtil.headers["Pragma"] = "no-cache"
 
-    def _redirect( self, targetURL, noCache=False, status=apache.HTTP_SEE_OTHER ):
-        """Utility for redirecting the client web browser to the specified
-            URL.
-            Params:
-                newURL - Target URL of the redirection
-        """
-        #check if there is no \r\n character to avoid http header injection
-
-        if str(targetURL):
-            if "\r" in str(targetURL) or "\n" in str(targetURL):
-                raise MaKaCError(_("http header CRLF injection detected"))
-        self._req.headers_out["Location"] = str(targetURL)
-
-        if noCache:
-            self._disableCaching()
-        try:
-            self._req.status = status
-        except NameError:
-            pass
+    def _redirect(self, targetURL, status=303):
+        targetURL = str(targetURL)
+        if "\r" in targetURL or "\n" in targetURL:
+            raise MaKaCError(_("http header CRLF injection detected"))
+        self._responseUtil.redirect = (targetURL, status)
 
     def _checkHttpsRedirect(self):
         """
@@ -348,9 +305,9 @@ class RH(RequestHandlerBase):
 
     def _checkCSRF(self):
         # Check referer for POST requests. We do it here so we can properly use indico's error handling
-        if Config.getInstance().getCSRFLevel() < 3 or self._req.method != 'POST':
+        if Config.getInstance().getCSRFLevel() < 3 or request.method != 'POST':
             return
-        referer = self._req.headers_in.get('Referer')
+        referer = request.referrer
         # allow empty - otherwise we might lock out paranoid users blocking referers
         if not referer:
             return
@@ -367,7 +324,7 @@ class RH(RequestHandlerBase):
         """Treats general errors occured during the process of a RH.
         """
 
-        Logger.get('requestHandler').info('Request %s finished with: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').info('Request %s finished with: "%s"' % (request, e))
 
         p=errors.WPGenericError(self)
         return p.display()
@@ -376,7 +333,7 @@ class RH(RequestHandlerBase):
         """Unexpected errors
         """
 
-        Logger.get('requestHandler').exception('Request %s failed: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').exception('Request %s failed: "%s"' % (request, e))
         p=errors.WPUnexpectedError(self)
         return p.display()
 
@@ -384,7 +341,7 @@ class RH(RequestHandlerBase):
         """Unexpected errors
         """
 
-        Logger.get('requestHandler').exception('Request %s failed: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').exception('Request %s failed: "%s"' % (request, e))
         p=errors.WPHostnameResolveError(self)
         return p.display()
 
@@ -392,16 +349,16 @@ class RH(RequestHandlerBase):
     def _processAccessError(self,e):
         """Treats access errors occured during the process of a RH.
         """
-        Logger.get('requestHandler').info('Request %s finished with AccessError: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').info('Request %s finished with AccessError: "%s"' % (request, e))
 
-        self._req.status = apache.HTTP_FORBIDDEN
+        self._responseUtil.status = 403
         p=errors.WPAccessError(self)
         return p.display()
 
     def _processKeyAccessError(self,e):
         """Treats access errors occured during the process of a RH.
         """
-        Logger.get('requestHandler').info('Request %s finished with KeyAccessError: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').info('Request %s finished with KeyAccessError: "%s"' % (request, e))
 
         # We are going to redirect to the page asking for access key
         # and so it must be https if there is a BaseSecureURL. And that's
@@ -416,7 +373,7 @@ class RH(RequestHandlerBase):
         """Treats modification errors occured during the process of a RH.
         """
 
-        Logger.get('requestHandler').info('Request %s finished with ModificationError: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').info('Request %s finished with ModificationError: "%s"' % (request, e))
 
         p=errors.WPModificationError(self)
         return p.display()
@@ -431,7 +388,7 @@ class RH(RequestHandlerBase):
         """Treats timing errors occured during the process of a RH.
         """
 
-        Logger.get('requestHandler').info('Request %s finished with TimingError: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').info('Request %s finished with TimingError: "%s"' % (request, e))
 
         p=errors.WPTimingError(self,e)
         return p.display()
@@ -440,7 +397,7 @@ class RH(RequestHandlerBase):
         """Process errors without reporting
         """
 
-        Logger.get('requestHandler').info('Request %s finished with NoReportError: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').info('Request %s finished with NoReportError: "%s"' % (request, e))
 
         p=errors.WPNoReportError(self,e)
         return p.display()
@@ -449,13 +406,9 @@ class RH(RequestHandlerBase):
         """Process not found error; uses NoReportError template
         """
 
-        Logger.get('requestHandler').info('Request %s finished with NotFoundError: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').info('Request %s finished with NotFoundError: "%s"' % (request, e))
 
-        try:
-            self._req.status = apache.HTTP_NOT_FOUND
-        except NameError:
-            pass
-
+        self._responseUtil.status = 404
         p=errors.WPNoReportError(self,e)
         return p.display()
 
@@ -463,7 +416,7 @@ class RH(RequestHandlerBase):
         """Treats timing errors occured during the process of a RH.
         """
 
-        Logger.get('requestHandler').info('Request %s finished with ParentTimingError: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').info('Request %s finished with ParentTimingError: "%s"' % (request, e))
 
         p=errors.WPParentTimingError(self,e)
         return p.display()
@@ -472,7 +425,7 @@ class RH(RequestHandlerBase):
         """Treats timing errors occured during the process of a RH.
         """
 
-        Logger.get('requestHandler').info('Request %s finished with EntryTimingError: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').info('Request %s finished with EntryTimingError: "%s"' % (request, e))
 
         p=errors.WPEntryTimingError(self,e)
         return p.display()
@@ -481,28 +434,26 @@ class RH(RequestHandlerBase):
         """Treats user input related errors occured during the process of a RH.
         """
 
-        Logger.get('requestHandler').info('Request %s finished with FormValuesError: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').info('Request %s finished with FormValuesError: "%s"' % (request, e))
 
         p=errors.WPFormValuesError(self,e)
         return p.display()
 
     def _processHtmlScriptError(self, e):
 
-        Logger.get('requestHandler').info('Request %s finished with ProcessHtmlScriptError: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').info('Request %s finished with ProcessHtmlScriptError: "%s"' % (request, e))
 
         p=errors.WPHtmlScriptError(self, escape(str(e)))
         return p.display()
 
     def _processRestrictedHTML(self, e):
 
-        Logger.get('requestHandler').info('Request %s finished with ProcessRestrictedHTMLError: "%s"' % (id(self._req), e))
+        Logger.get('requestHandler').info('Request %s finished with ProcessRestrictedHTMLError: "%s"' % (request, e))
 
         p=errors.WPRestrictedHTML(self, escape(str(e)))
         return p.display()
 
-    def process( self, params ):
-        """
-        """
+    def process(self, params):
         profile = Config.getInstance().getProfile()
         proffilename = ""
         res = ""
@@ -517,17 +468,17 @@ class RH(RequestHandlerBase):
 
         #redirect to https if necessary
         if self._checkHttpsRedirect():
-            return
+            return self._responseUtil.make_redirect()
 
 
         DBMgr.getInstance().startRequest()
         self._startRequestSpecific2RH()     # I.e. implemented by Room Booking request handlers
         textLog.append("%s : Database request started" % (datetime.now() - self._startTime))
         Logger.get('requestHandler').info('[pid=%s] Request %s started (%s)' % (
-            os.getpid(), id(self._req), request.path))
+            os.getpid(), request, request.path))
 
         # notify components that the request has started
-        self._notify('requestStarted', self._req)
+        self._notify('requestStarted')
 
         forcedConflicts = Config.getInstance().getForceConflicts()
         try:
@@ -535,7 +486,7 @@ class RH(RequestHandlerBase):
 
                 if retry < MAX_RETRIES:
                     # notify components that the request is being retried
-                    self._notify('requestRetry', self._req, MAX_RETRIES - retry)
+                    self._notify('requestRetry', MAX_RETRIES - retry)
 
                 try:
                     Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), self.getHostIP()))
@@ -552,18 +503,17 @@ class RH(RequestHandlerBase):
                         # keep a link to the web session in the access wrapper
                         # this is used for checking access/modification key existence
                         # in the user session
-                        self._aw.setIP( self.getHostIP() )
-                        self._aw.setSession(self._getSession())
-                        #raise(str(dir(self._websession)))
+                        self._aw.setIP(self.getHostIP())
                         self._setSessionUser()
                         self._setLang(params)
                         if self._getAuth():
                             if self._getUser():
-                                Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (id(self._req), self._getUser().getFullName(), self._getUser().getId()))
+                                Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (
+                                    request, self._getUser().getFullName(), self._getUser().getId()))
                             if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
                                 self._tohttps = True
                                 if self._checkHttpsRedirect():
-                                    return
+                                    return self._responseUtil.make_redirect()
 
                         self._checkCSRF()
                         #if self._getUser() != None and self._getUser().getId() == "893":
@@ -585,19 +535,15 @@ class RH(RequestHandlerBase):
                             else:
                                 res = self._process()
 
-                        # Save web session, just when needed
-                        sm = session.getSessionManager()
-                        sm.maintain_session(self._req, self._websession)
-
                         # notify components that the request has finished
-                        self._notify('requestFinished', self._req)
+                        self._notify('requestFinished')
                         # Raise a conflict error if enabled. This allows detecting conflict-related issues easily.
                         if retry > (MAX_RETRIES - forcedConflicts):
                             raise ConflictError
                         self._endRequestSpecific2RH( True ) # I.e. implemented by Room Booking request handlers
                         DBMgr.getInstance().endRequest( True )
 
-                        Logger.get('requestHandler').info('Request %s successful' % (id(self._req)))
+                        Logger.get('requestHandler').info('Request %s successful' % request)
                         #request succesfull, now, doing tas that must be done only once
                         try:
                             GenericMailer.flushQueue(True) # send emails
@@ -619,13 +565,13 @@ class RH(RequestHandlerBase):
                     import traceback
                     # only log conflict if it wasn't forced
                     if retry <= (MAX_RETRIES - forcedConflicts):
-                        Logger.get('requestHandler').warning('Conflict in Database! (Request %s)\n%s' % (id(self._req), traceback.format_exc()))
+                        Logger.get('requestHandler').warning('Conflict in Database! (Request %s)\n%s' % (request, traceback.format_exc()))
                     self._abortSpecific2RH()
                     DBMgr.getInstance().abort()
                     retry -= 1
                     continue
                 except ClientDisconnected:
-                    Logger.get('requestHandler').warning('Client Disconnected! (Request %s)' % id(self._req) )
+                    Logger.get('requestHandler').warning('Client Disconnected! (Request %s)' % request)
                     self._abortSpecific2RH()
                     DBMgr.getInstance().abort()
                     retry -= 1
@@ -699,9 +645,9 @@ class RH(RequestHandlerBase):
             from indico.util import json
             res = json.dumps(e.fossilize())
             header = oauth.build_authenticate_header(realm=Config.getInstance().getBaseSecureURL())
-            self._req.headers_out.update(header)
-            self._req.headers_out["content-type"] = 'application/json'
-            self._req.status = e.code
+            self._responseUtil.headers.update(header)
+            self._responseUtil.content_type = 'application/json'
+            self._responseUtil.status = e.code
             DBMgr.getInstance().endRequest(False)
         except Exception, e: #Generic error treatment
             res = self._processUnexpectedError( e )
@@ -712,14 +658,8 @@ class RH(RequestHandlerBase):
             #self._endRequestSpecific2RH( False )
 
             #cancels any redirection
-            try:
-                del self._req.headers_out["Location"]
-            except AttributeError:
-                pass
-            try:
-                self._req.status=apache.HTTP_INTERNAL_SERVER_ERROR
-            except NameError:
-                pass
+            self._responseUtil.redirect = None
+            self._responseUtil.status = 500
 
         totalTime = (datetime.now() - self._startTime)
         textLog.append("%s : Request ended"%totalTime)
@@ -738,7 +678,7 @@ class RH(RequestHandlerBase):
             s = output.getvalue()
             f = file(os.path.join(rep, "IndicoRequest.log"), 'a+')
             f.write("--------------------------------\n")
-            f.write("URL     : " + self._req.construct_url(self._req.unparsed_uri) + "\n")
+            f.write("URL     : " + request.url + "\n")
             f.write("%s : start request\n"%self._startTime)
             f.write("params:%s"%params)
             f.write("\n".join(textLog))
@@ -752,13 +692,10 @@ class RH(RequestHandlerBase):
 
         # In case of no process needed, we should return empty string to avoid erroneous ouput
         # specially with getVars breaking the JS files.
-        if not self._doProcess:
-            return ""
+        if not self._doProcess or res is None:
+            return self._responseUtil.make_empty()
 
-        if res is None:
-            return ""
-
-        return res
+        return self._responseUtil.make_response(res)
 
     def _deleteTempFiles( self ):
         if len(self._tempFilesToDelete) > 0:

@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request, session
 
 import time
 import sys, traceback
@@ -24,7 +25,6 @@ from ZODB.POSException import ConflictError
 from ZEO.Exceptions import ClientDisconnected
 from MaKaC.common.logger import Logger
 
-from MaKaC.webinterface import session
 from MaKaC.services.interface import rpc
 from MaKaC.services.interface.rpc import handlers
 from MaKaC.plugins.base import Observable
@@ -66,30 +66,26 @@ def lookupHandler(method):
     return handler
 
 
-def processRequest(method, params, req, internal=False):
+def processRequest(method, params, internal=False):
     # lookup handler
     handler = lookupHandler(method)
-    websession = getSession(req)
 
     if not internal and Config.getInstance().getCSRFLevel() >= 1:
-        if websession.csrf_protected and websession.csrf_token != req.headers_in.get('X-CSRF-Token'):
+        if session.csrf_protected and session.csrf_token != request.headers.get('X-CSRF-Token'):
             raise CSRFError()
 
     # invoke handler
     if hasattr(handler, "process"):
-        result = handler(params, websession, req).process()
+        result = handler(params).process()
     else:
-        result = handler(params, websession, req)
-
-    # commit session if necessary
-    session.getSessionManager().maintain_session(req, websession)
+        result = handler(params)
 
     return result
 
 
 class ServiceRunner(Observable):
 
-    def invokeMethod(self, method, params, req):
+    def invokeMethod(self, method, params):
 
         MAX_RETRIES = 10
 
@@ -102,7 +98,7 @@ class ServiceRunner(Observable):
         _startRequestSpecific2RH()
 
         # notify components that the request has started
-        self._notify('requestStarted', req)
+        self._notify('requestStarted')
 
         forcedConflicts = Config.getInstance().getForceConflicts()
         retry = MAX_RETRIES
@@ -110,7 +106,7 @@ class ServiceRunner(Observable):
             while retry > 0:
                 if retry < MAX_RETRIES:
                     # notify components that the request is being retried
-                    self._notify('requestRetry', req, MAX_RETRIES - retry)
+                    self._notify('requestRetry', MAX_RETRIES - retry)
 
                 try:
                     # delete all queued emails
@@ -119,13 +115,13 @@ class ServiceRunner(Observable):
                     DBMgr.getInstance().sync()
 
                     try:
-                        result = processRequest(method, copy.deepcopy(params), req)
+                        result = processRequest(method, copy.deepcopy(params))
                     except MaKaC.errors.NoReportError, e:
                         raise NoReportError(e.getMsg())
                     rh = ContextManager.get('currentRH')
 
                     # notify components that the request has ended
-                    self._notify('requestFinished', req)
+                    self._notify('requestFinished')
                     # Raise a conflict error if enabled. This allows detecting conflict-related issues easily.
                     if retry > (MAX_RETRIES - forcedConflicts):
                         raise ConflictError
@@ -155,15 +151,6 @@ class ServiceRunner(Observable):
             raise ProcessError("ERR-P0", "Error processing method.")
 
         return result
-
-def getSession(req):
-    sm = session.getSessionManager()
-    try:
-        websession = sm.get_session(req)
-    except session.SessionError:
-        sm.revoke_session_cookie(req)
-        websession = sm.get_session(req)
-    return websession
 
 from MaKaC.rb_location import CrossLocationDB
 import MaKaC.common.info as info

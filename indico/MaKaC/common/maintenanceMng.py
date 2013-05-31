@@ -19,14 +19,12 @@
 
 import os, shutil, re, time
 from os.path import isdir, getsize, join, isfile
-from MaKaC.webinterface.session.sessionManagement import getSessionManager
 from MaKaC.i18n import _
 
 class MaintenanceMng:
     dirMatch = ""
     fileMatch = "((^Indico.*)|(.*\.tmp$))"
     tmpDelay = 3*3600
-    websessionDelay = float(24 * 3600)
 
     def humanReadableSize(bytes, units="b"):
             if units == 'k':
@@ -68,19 +66,3 @@ class MaintenanceMng:
                         cls.fileMatch != "" and cls._match(cls.fileMatch, filename):
                     os.remove(file)
     cleanupTmp = classmethod(cleanupTmp)
-
-    def getWebsessionNum():
-        return len(getSessionManager().keys())
-    getWebsessionNum = staticmethod(getWebsessionNum)
-
-    def cleanupWebsession( cls ):
-        sm = getSessionManager()
-        aux = {}
-        for key in sm.keys():
-            aux[key] = sm[key]
-        for key in aux.keys():
-            value = sm[key]
-            if value.get_creation_age() > cls.websessionDelay:
-                sm.delete_session(key)
-    cleanupWebsession = classmethod(cleanupWebsession)
-

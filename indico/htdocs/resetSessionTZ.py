@@ -16,10 +16,11 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 import MaKaC.webinterface.rh.resetTimezone as resetTimezone
 from MaKaC.common import Config
 def index(req, **args):
-    args['REFERER_URL'] = (str(req.headers_in.get('Referer', Config.getInstance().getBaseURL())))
+    args['REFERER_URL'] = request.referrer or Config.getInstance().getBaseURL()
     return resetTimezone.RHResetTZ(req).process(args)
 

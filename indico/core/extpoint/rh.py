@@ -25,17 +25,17 @@ class IServerRequestListener(IListener):
     Used for handling events related to server requests
     """
 
-    def requestStarted(self, req, rh):
+    def requestStarted(self, rh):
         """
         Sent when a request is started, rh object passed
         """
 
-    def requestRetry(self, req, nretry):
+    def requestRetry(self, nretry):
         """
         Sent when a request is retried, rh object passed as well as retry number
         """
 
-    def requestFinished(self, req):
+    def requestFinished(self):
         """
         Sent when a request is finished, rh object passed
         """

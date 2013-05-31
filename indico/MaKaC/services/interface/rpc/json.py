@@ -16,14 +16,11 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request, current_app as app
 from MaKaC.common.security import Sanitization
 
 from MaKaC.common.fossilize import fossilize, NonFossilizableException
 from MaKaC.fossils.error import ICausedErrorFossil
-try:
-    from indico.web.wsgi import webinterface_handler_config as apache
-except ImportError:
-    pass
 
 from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
@@ -75,7 +72,8 @@ def unicodeToUtf8(obj):
 
     return obj
 
-def process(req):
+
+def process():
 
     responseBody = {
         "version": "1.1",
@@ -89,7 +87,7 @@ def process(req):
         #    raise RequestError("Invalid content type. It must be 'application/json'.")
 
         # read request
-        requestText = req.read()
+        requestText = request.data  # TODO: use request.json!
 
         Logger.get('rpc').info('json rpc request. request text= ' + str(requestText))
 
@@ -105,13 +103,12 @@ def process(req):
         if "id" in requestBody:
             responseBody["id"] = requestBody["id"]
 
-        result = ServiceRunner().invokeMethod(str(requestBody["method"]),
-                                              requestBody.get("params", []), req)
+        result = ServiceRunner().invokeMethod(str(requestBody["method"]), requestBody.get("params", []))
 
         # serialize result
         try:
             responseBody["result"] = result
-        except Exception, e:
+        except Exception:
             raise ProcessError("ERR-P1", "Error during serialization.")
 
     except CausedError, e:
@@ -149,6 +146,4 @@ def process(req):
         responseBody["result"] = responseBody["result"].decode('iso-8859-1').encode('utf-8')
         jsonResponse = encode(responseBody)
 
-    req.content_type = "application/json"
-    req.write(jsonResponse)
-    return apache.HTTP_OK
+    return app.response_class(jsonResponse, mimetype='application/json')

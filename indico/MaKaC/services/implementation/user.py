@@ -15,6 +15,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 from MaKaC.services.implementation.base import LoggedOnlyService, AdminService
 from MaKaC.services.implementation.base import ServiceBase
@@ -239,8 +240,7 @@ class UserGetTimezone(ServiceBase):
 class UserGetSessionTimezone(ServiceBase):
 
     def _getAnswer(self):
-        tz = self.getAW().getSession().getVar("ActiveTimezone")
-        return tz
+        return session.timezone
 
 
 class UserGetSessionLanguage(ServiceBase):

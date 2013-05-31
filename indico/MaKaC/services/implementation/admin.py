@@ -15,6 +15,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 from MaKaC.services.implementation.base import AdminService, TextModificationBase
 
@@ -79,8 +80,8 @@ class AdminLoginAs(AdminService):
     def _getAnswer(self):
         tzUtil = timezoneUtils.SessionTZ(self._av)
         tz = tzUtil.getSessionTZ()
-        self._getSession().setVar("ActiveTimezone", tz)
-        self._getSession().setUser(self._av)
+        session.user = self._av
+        session.timezone = tz
         return True
 
 

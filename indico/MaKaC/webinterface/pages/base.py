@@ -16,7 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import request
+from flask import request, session
 
 from urlparse import urlparse
 from webassets import Environment
@@ -161,11 +161,6 @@ class WPBase(OldObservable):
             area=i18nformat(""" - _("Administrator area")""")
 
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
-        websession = self._getAW().getSession()
-        if websession:
-            language = websession.getLang()
-        else:
-            language = info.getLang()
 
         return wcomponents.WHTMLHeader().getHTML({
             "area": area,
@@ -175,10 +170,10 @@ class WPBase(OldObservable):
             "extraCSS": self.getCSSFiles(),
             "extraJSFiles": self.getJSFiles(),
             "extraJS": self._extraJS,
-            "language": language,
+            "language": session.lang,
             "social": info.getSocialAppConfig(),
             "assets": self._asset_env
-            })
+        })
 
     def _getHTMLFooter( self ):
         return """

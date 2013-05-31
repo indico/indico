@@ -16,7 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import request
+from flask import request, session
 
 from MaKaC.conference import Category
 
@@ -163,20 +163,14 @@ class ServiceBase(RequestHandlerBase):
     The ServiceBase class is the basic class for services.
     """
 
-    def __init__(self, params, session, req):
-        """
-        Constructor.  Initializes private variables
-        @param req: HTTP Request provided by the previous layer
-        """
-        RequestHandlerBase.__init__(self, req)
+    def __init__(self, params):
+        RequestHandlerBase.__init__(self)
         self._reqParams = self._params = params
         self._requestStarted = False
-        self._websession = session
         # Fill in the aw instance with the current information
         self._aw = AccessWrapper()
         self._aw.setIP(self.getHostIP())
-        self._aw.setSession(session)
-        self._aw.setUser(session.getUser())
+        self._aw.setUser(session.user)
         self._target = None
         self._startTime = None
         self._tohttps = request.is_secure
@@ -188,13 +182,6 @@ class ServiceBase(RequestHandlerBase):
         self._redisPipeline = None
 
     # Methods =============================================================
-
-    def _getSession( self ):
-        """
-        Returns the web session associated to the received mod_python
-        request.
-        """
-        return self._websession
 
     def _checkParams(self):
         """

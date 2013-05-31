@@ -27,13 +27,13 @@ import hmac
 import re
 import time
 import urllib
-from flask import request
+from flask import request, session
 from urlparse import parse_qs
 from ZODB.POSException import ConflictError
 import oauth2 as oauth
 
 # indico imports
-from MaKaC.webinterface.session import getSessionForReq
+from werkzeug.exceptions import NotFound
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.auth import APIKeyHolder
 from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
@@ -111,26 +111,26 @@ def checkAK(apiKey, signature, timestamp, path, query):
         onlyPublic = True
     return ak, onlyPublic
 
-def buildAW(ak, req, onlyPublic=False):
+def buildAW(ak, onlyPublic=False):
     aw = AccessWrapper()
     if ak and not onlyPublic:
         # If we have an authenticated request, require HTTPS
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         # Dirty hack: Google calendar converts HTTP API requests from https to http
         # Therefore, not working with Indico setup (requiring https for HTTP API authenticated)
-        if not request.is_secure and minfo.isAPIHTTPSRequired() and req.get_user_agent().find("Googlebot") == -1:
+        if not request.is_secure and minfo.isAPIHTTPSRequired() and request.user_agent.browser != 'google':
             raise HTTPAPIError('HTTPS is required', apache.HTTP_FORBIDDEN)
         aw.setUser(ak.getUser())
     return aw
 
-def handler(req, **params):
+def handler(path):
     ContextManager.destroy()
     ContextManager.set('currentReq', req)
     logger = Logger.get('httpapi')
-    path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
-    if req.method == 'POST':
+    query = request.query_string
+    if request.method == 'POST':
         # Convert POST data to a query string
-        queryParams = dict(req.form)
+        queryParams = dict(request.form)
         for key, value in queryParams.iteritems():
             queryParams[key] = [str(value)]
         query = urllib.urlencode(remove_lists(queryParams))
@@ -152,38 +152,38 @@ def handler(req, **params):
     pretty = get_query_parameter(queryParams, ['p', 'pretty'], 'no') == 'yes'
     onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
     onlyAuthed = get_query_parameter(queryParams, ['oa', 'onlyauthed'], 'no') == 'yes'
-    oauthToken = queryParams.has_key("oauth_token")
+    oauthToken = 'oauth_token' in queryParams
 
     # Get our handler function and its argument and response type
     hook, dformat = HTTPAPIHook.parseRequest(path, queryParams)
     if hook is None or dformat is None:
-        raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+        raise NotFound
 
     # Disable caching if we are not just retrieving data (or the hook requires it)
-    if req.method == 'POST' or hook.NO_CACHE:
+    if request.method == 'POST' or hook.NO_CACHE:
         noCache = True
 
     ak = at = error = result = None
     ts = int(time.time())
     typeMap = {}
     try:
-        session = None
+        used_session = None
         if cookieAuth:
-            session = getSessionForReq(req)
-            if not session.getUser():  # ignore guest sessions
-                session = None
+            used_session = session
+            if not used_session.user:  # ignore guest sessions
+                used_session = None
 
-        if apiKey or oauthToken or not session:
+        if apiKey or oauthToken or not used_session:
             if not oauthToken:
                 # Validate the API key (and its signature)
                 ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
                 if enforceOnlyPublic:
                     onlyPublic = True
                 # Create an access wrapper for the API key's user
-                aw = buildAW(ak, req, onlyPublic)
+                aw = buildAW(ak, onlyPublic)
             else: # Access Token (OAuth)
                 at = OAuthUtils.OAuthCheckAccessResource(req, remove_lists(parse_qs(query)))
-                aw = buildAW(at, req, onlyPublic)
+                aw = buildAW(at, onlyPublic)
             # Get rid of API key in cache key if we did not impersonate a user
             if ak and aw.getUser() is None:
                 cacheKey = normalizeQuery(path, query,
@@ -198,13 +198,13 @@ def handler(req, **params):
         else:
             # We authenticated using a session cookie.
             if Config.getInstance().getCSRFLevel() >= 2:
-                token = req.headers_in.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
-                if session.csrf_protected and session.csrf_token != token:
+                token = request.headers.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
+                if used_session.csrf_protected and used_session.csrf_token != token:
                     raise HTTPAPIError('Invalid CSRF token', apache.HTTP_FORBIDDEN)
             aw = AccessWrapper()
             if not onlyPublic:
-                aw.setUser(session.getUser())
-            userPrefix = 'user-' + session.getUser().getId() + '_'
+                aw.setUser(used_session.user)
+            userPrefix = 'user-' + used_session.user.getId() + '_'
             cacheKey = userPrefix + normalizeQuery(path, query,
                                                    remove=('_', 'nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed',
                                                            'csrftoken'))
@@ -224,7 +224,7 @@ def handler(req, **params):
                 addToCache = False
         if result is None:
             # Perform the actual exporting
-            res = hook(aw, req)
+            res = hook(aw)
             if isinstance(res, tuple) and len(res) == 4:
                 result, extra, complete, typeMap = res
             else:
@@ -245,7 +245,7 @@ def handler(req, **params):
 
     if result is None and error is None:
         # TODO: usage page
-        raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+        raise NotFound
     else:
         if ak and error is None:
             # Commit only if there was an API key and no error
@@ -272,7 +272,7 @@ def handler(req, **params):
             dbi.endRequest(False)
 
         # Log successful POST api requests
-        if error is None and req.method == 'POST':
+        if error is None and request.method == 'POST':
             logger.info('API request: %s?%s' % (path, query))
 
         serializer = Serializer.create(dformat, pretty=pretty, typeMap=typeMap,
@@ -291,7 +291,7 @@ def handler(req, **params):
 
         try:
             data = serializer(result)
-            serializer.set_headers(req)
+            serializer.set_headers(request)
 
             return data
         except:

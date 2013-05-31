@@ -23,7 +23,8 @@ import glob
 import os
 import re
 
-from flask import request
+from flask import request, current_app as app, redirect
+from werkzeug.datastructures import Headers
 
 
 def _to_utf8(x):
@@ -52,3 +53,43 @@ def create_modpython_rules(app):
             rule = base_url if func_name == 'index' else base_url + '/' + func_name
             endpoint = 'mp-%s-%s' % (re.sub(r'\.py$', '', name), func_name)
             app.add_url_rule(rule, endpoint, view_func=create_flask_mp_wrapper(func), methods=('GET', 'POST'))
+
+
+class ResponseUtil(object):
+    """This class allows an indico RH to modify the response object"""
+    def __init__(self):
+        self.headers = Headers()
+        self._redirect = None
+        self.status = 200
+        self.content_type = None
+
+    @property
+    def redirect(self):
+        return self._redirect
+
+    @redirect.setter
+    def redirect(self, value):
+        if value is None:
+            pass
+        elif isinstance(value, tuple) and len(value) == 2:
+            pass
+        else:
+            raise ValueError('redirect must be None or a 2-tuple containing URL and status code')
+        self._redirect = value
+
+    def make_empty(self):
+        return self.make_response('')
+
+    def make_redirect(self):
+        if not self._redirect:
+            raise Exception('Cannot create a redirect response without a redirect')
+        return redirect(*self.redirect)
+
+    def make_response(self, res):
+        if self._redirect:
+            return self.make_redirect()
+
+        res = app.make_response((res, self.status, self.headers))
+        if self.content_type:
+            res.content_type = self.content_type
+        return res

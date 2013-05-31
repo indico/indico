@@ -16,7 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import request
+from flask import request, session
 
 
 from MaKaC.plugins import OldObservable
@@ -266,17 +266,6 @@ class WHeader(WTemplated):
         self.__currentCategory = currentCategory
 
     """
-        Returns the current active timezone.
-    """
-    def _getActiveTimezone(self):
-        if self._aw.getSession():
-            tz = self._aw.getSession().getVar("ActiveTimezone")
-        else:
-            tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
-
-        return tz
-
-    """
         Returns timezone string that is show to the user.
     """
     def _getTimezoneDisplay( self, timezone ):
@@ -324,13 +313,8 @@ class WHeader(WTemplated):
         vars["isFrontPage"] = self._isFrontPage
         vars["target"] = vars["currentCategory"] = self.__currentCategory
 
-        if self._aw.getSession():
-            selLang = self._aw.getSession().getLang()
-        else:
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            selLang = minfo.getLang()
-
-        vars["ActiveTimezone"] = self._getActiveTimezone();
+        selLang = session.lang
+        vars["ActiveTimezone"] = session.timezone
         """
             Get the timezone for displaying on top of the page.
             1. If the user has "LOCAL" timezone then show the timezone

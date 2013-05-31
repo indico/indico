@@ -20,10 +20,18 @@
 from __future__ import absolute_import
 
 import os
-from flask import redirect, url_for
+from flask import redirect, url_for, send_from_directory, request
+from werkzeug.exceptions import NotFound
+from MaKaC.common.db import DBMgr
+from MaKaC.common.info import HelperMaKaCInfo
+
+from MaKaC.i18n import _
+from MaKaC.webinterface.pages.error import WErrorWSGI
+from MaKaC.services.interface.rpc.json import process as jsonrpc_handler
 
 from indico.web.flask.util import create_modpython_rules
 from indico.web.flask.wrappers import IndicoFlask
+from indico.web.http_api.handlers import handler as api_handler
 
 
 def fix_root_path(app):
@@ -40,7 +48,7 @@ def fix_root_path(app):
 
 
 def make_app():
-    app = IndicoFlask('indico')
+    app = IndicoFlask('indico', static_folder=None)
     fix_root_path(app)
     return app
 
@@ -50,7 +58,33 @@ def configure_app(app):
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
 
 
+def add_handlers(app):
+    app.add_url_rule('/', view_func=lambda: redirect(url_for('mp-index-index')))
+    app.add_url_rule('/services/json-rpc', view_func=jsonrpc_handler, methods=('POST',))
+    app.add_url_rule('/export/<path:path>', view_func=api_handler)
+    app.add_url_rule('/api/<path:path>', view_func=api_handler, methods=('POST',))
+    app.register_error_handler(404, handle_404)
+    app.register_error_handler(Exception, handle_exception)
+
+
+def handle_404(exception):
+    folder = os.path.abspath(os.path.join(app.root_path, 'htdocs'))
+    try:
+        return send_from_directory(folder, request.path[1:])
+    except NotFound:
+        msg = (_("Page not found"), _("The page you were looking for doesn't exist."))
+        return WErrorWSGI(msg).getHTML(), 404
+
+
+def handle_exception(exception):
+    with DBMgr.getInstance().global_connection():
+        if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
+            raise
+    msg = (str(exception), _("An unexpected error ocurred."))
+    return WErrorWSGI(msg).getHTML(), 500
+
+
 app = make_app()
 configure_app(app)
-app.add_url_rule('/', view_func=lambda: redirect(url_for('mp-index-index')))
+add_handlers(app)
 create_modpython_rules(app)

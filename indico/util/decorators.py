@@ -33,3 +33,32 @@ class cached_classproperty(property):
             value = self.fget.__get__(None, type)()
             setattr(type, name, value)
         return value
+
+
+def cached_writable_property(cache_attr, cache_on_set=True):
+    class _cached_writable_property(property):
+        def __get__(self, obj, objtype=None):
+            if obj is not None and self.fget and hasattr(obj, cache_attr):
+                return getattr(obj, cache_attr)
+            value = property.__get__(self, obj, objtype)
+            setattr(obj, cache_attr, value)
+            return value
+
+        def __set__(self, obj, value):
+            property.__set__(self, obj, value)
+            if cache_on_set:
+                setattr(obj, cache_attr, value)
+            else:
+                try:
+                    delattr(obj, cache_attr)
+                except AttributeError:
+                    pass
+
+        def __delete__(self, obj):
+            property.__delete__(self, obj)
+            try:
+                delattr(obj, cache_attr)
+            except AttributeError:
+                pass
+
+    return _cached_writable_property

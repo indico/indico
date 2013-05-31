@@ -16,10 +16,9 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 import os, datetime, time, hashlib
-
-from indico.web.wsgi import webinterface_handler_config as apache
 
 from MaKaC.common import Config
 from MaKaC.common.logger import Logger
@@ -52,16 +51,14 @@ class RHTemplateContentJS(base.RH):
     def _setHeaders(self):
         # send out the Etag and Last-Modified headers
         creationTime = datetime.datetime.fromtimestamp(os.path.getctime(self._htmlPath))
-        self._req.headers_out["Etag"] = self._generateEtag(creationTime)
-        self._req.headers_out["Last-Modified"] = formatdate(time.mktime(creationTime.timetuple()))
-        self._req.content_type = "application/x-javascript"
+        self._responseUtil.headers["Etag"] = self._generateEtag(creationTime)
+        self._responseUtil.headers["Last-Modified"] = formatdate(time.mktime(creationTime.timetuple()))
+        self._responseUtil.content_type = "application/x-javascript"
 
     def process( self, params ):
 
         # Check incoming headers
-        self._etag = self._req.headers_in.get("If-None-Match", None)
-        # (not used)
-        self._modifiedSince = self._req.headers_in.get("If-Modified-Since", None)
+        self._etag = request.if_none_match
 
         cfg = Config.getInstance()
         dirName = "js"
@@ -81,7 +78,7 @@ class RHTemplateContentJS(base.RH):
             creationTime = datetime.datetime.fromtimestamp(os.path.getctime(self._htmlPath))
             if not self._needsRefresh(creationTime):
                 # if the etag the same, send NOT_MODIFIED
-                self._req.status = apache.HTTP_NOT_MODIFIED
+                self._responseUtil.status = 304
                 return
             else:
                 # Read and send the file
