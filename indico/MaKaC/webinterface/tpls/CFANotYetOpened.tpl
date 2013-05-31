@@ -1,7 +1,7 @@
-
-<table width="90%" align="center">
-    <tr>
-        <td align="center"><font size="+2" color="red"> ${ _("Abstract submission is NOT YET OPENED for this conference")}</font>
-        </td>
-    </tr>
-</table>
+<div class="groupTitle">
+    ${_('Abstract Submission')}
+</div>
+<div class="warningMessage">
+    <p>${_("The submission period is not open yet.")}</p>
+    <p>${_('If you have further queries, please contact the event organizer.')}</p>
+</div>

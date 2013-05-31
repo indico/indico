@@ -1,7 +1,6 @@
-
-<table width="90%" align="center">
-    <tr>
-        <td align="center"><font size="+2" color="red"> ${ _("Abstract submission is DEACTIVATED for this conference")}</font>
-        </td>
-    </tr>
-</table>
+<div class="groupTitle">
+    ${_('Abstract Submission')}
+</div>
+<div class="errorMessage">
+    <p>${_("Sorry, abstract submission is disabled for this conference.")}</p>
+</div>

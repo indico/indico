@@ -1,6 +1,6 @@
-<table width="90%" align="center">
-    <tr>
-        <td align="center"><font size="+1" color="red">${ _("<i>Registration form</i> is DEACTIVATED for this conference")}</font>
-        </td>
-    </tr>
-</table>
+<div class="groupTitle">
+    ${_('Registration')}
+</div>
+<div class="errorMessage">
+    <p>${_("Sorry, the registration form is disabled for this conference.")}</p>
+</div>
