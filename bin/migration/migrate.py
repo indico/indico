@@ -717,6 +717,7 @@ def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
             dbi.commit()
     dbi.commit()
 
+
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
                  specified=[], run_from=None):
 
@@ -736,19 +737,19 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
 
     if run_from:
         try:
-            mig_tasks_names = map(lambda x:x[1].__name__, MIGRATION_TASKS)
-            mti= mig_tasks_names.index(run_from)
+            mig_tasks_names = list(t.__name__ for (__, t, __) in MIGRATION_TASKS)
+            mti = mig_tasks_names.index(run_from)
             MIGRATION_TASKS = MIGRATION_TASKS[mti:]
         except ValueError:
-           print "The task {0} does not exist".format(run_from)
-           return 1
+            print console.colored("The task {0} does not exist".format(run_from), 'red')
+            return 1
     # go from older to newer version and execute corresponding tasks
     for version, task, always in MIGRATION_TASKS:
         if specified and task.__name__ not in specified:
             continue
         if parse_version(version) > prevVersion or always:
             print console.colored("#", 'green', attrs=['bold']), \
-                  task.__doc__.replace('\n', '').strip(),
+                task.__doc__.replace('\n', '').strip(),
             print console.colored("(%s)" % version, 'yellow')
             dbi.startRequest()
             if withRBDB:
@@ -781,7 +782,7 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
     parser.add_argument('--run-only', dest='specified', default='',
                         help='Specify which step(s) to run (comma-separated)')
     parser.add_argument('--run-from', dest='run_from', default='',
-                        help='Specify FROM which step to run')
+                        help='Specify FROM which step to run (inclusive)')
     parser.add_argument('--prev-version', dest='prevVersion', help='Previous version of Indico (used by DB)', default=__version__)
     parser.add_argument('--profile', dest='profile', help='Use profiling during the migration', action='store_true')
 
