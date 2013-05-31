@@ -1197,15 +1197,25 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
         // get an a dictionary where the keys are days and the values are lists
         // of [id, title, color] tuples (sessions only)
         var days = {};
-        _(data).each(function(entries, day){
+
+        _(data).each(function(entries, day) {
             days[day] = _(entries).chain().
-                select(function(e){ return e.entryType == 'Session' }).
-                map(function(s){ return [s.id, s.title, s.color] }).
-                sortBy(function(l){return l[0]}).value();
+                select(function(e) { return e.entryType == 'Session'; }).
+                groupBy(function(e) { return e.sessionId; }).
+                reduce(function(l, s) { return l.concat(s[0]); }, []).
+                map(function(e){ return [e.id, e.title, e.color, e.sessionId]; }).
+                sortBy(function(e){ return e[1]; }).
+                value();
         });
+
         // for "all days", put it all together
-        days['all'] = _(days).chain().map(function(entries, day){ return entries }).
-            reduce(function(l, elem){ return l.concat(elem); }, []).uniq().value();
+        days['all'] = _(days).chain().
+            flatten(true).
+            groupBy(function(e) { return e[3]; }).
+            reduce(function(l, s) { return l.concat([s[0]]); }, []).
+            sortBy(function(e){ return e[1]; }).
+            value();
+
         return days;
     }
 },
