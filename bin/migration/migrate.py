@@ -803,7 +803,7 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
 
     global MIGRATION_TASKS
 
-    if not dryRun:
+    if not dry_run:
         print "\nExecuting migration...\n"
 
         dbi = DBMgr.getInstance()
@@ -818,7 +818,7 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
 
     if run_from:
         try:
-            mig_tasks_names = list(t.__name__ for (__, t, __) in MIGRATION_TASKS)
+            mig_tasks_names = list(t.__name__ for (__, t, __, __) in MIGRATION_TASKS)
             mti = mig_tasks_names.index(run_from)
             MIGRATION_TASKS = MIGRATION_TASKS[mti:]
         except ValueError:
@@ -848,7 +848,7 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
 
             print console.colored("  DONE\n", 'green', attrs=['bold'])
 
-    if not dryRun:
+    if not dry_run:
         print console.colored("Database Migration successful!\n",
                               'green', attrs=['bold'])
 
