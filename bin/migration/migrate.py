@@ -590,9 +590,18 @@ def removeOldCSSTemplates(dbi, withRBDB, prevVersion):
 
     mod = ModuleHolder().getById('cssTpls')
 
-    del mod._cssTpls['template1.css']
-    del mod._cssTpls['template2.css']
-    del mod._cssTpls['top_menu.css']
+    try:
+        del mod._cssTpls['template1.css']
+    except KeyError, e:
+        print 'info: %s'%e
+    try:
+        del mod._cssTpls['template2.css']
+    except KeyError, e:
+        print 'info: %s'%e
+    try:
+        del mod._cssTpls['top_menu.css']
+    except KeyError, e:
+        print 'info: %s'%e
 
     mod._p_changed = 1
     dbi.commit()
@@ -653,25 +662,27 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
             for subContrib in contrib.getSubContributionList():
                 _updateMaterial(subContrib)
 
-    def updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex, pluginActive):
-        ######################
-        #Update Vidyo indexes:
-        ######################
-        if not pluginActive:
-            return
+    def updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex):
+        ####################################
+        #Update vidyo indexes:
+        ####################################
         csbm = conf.getCSBookingManager()
         for booking in csbm.getBookingList():
             if booking.getType() == "Vidyo" and booking.isCreated():
                 endDateIndex.indexBooking(booking)
                 vidyoRoomIndex.indexBooking(booking)
 
-    endDateIndex = VidyoTools.getEventEndDateIndex()
-    vidyoRoomIndex = VidyoTools.getIndexByVidyoRoom()
-    endDateIndex.clear()
-    vidyoRoomIndex.clear()
     ph = PluginsHolder()
     collaboration_pt = ph.getPluginType("Collaboration")
-    pluginActive = collaboration_pt.isActive() and collaboration_pt.getPlugin("Vidyo").isActive()
+    vidyoPluginActive = collaboration_pt.isActive() and collaboration_pt.getPlugin("Vidyo").isActive()
+    if vidyoPluginActive:
+        endDateIndex = VidyoTools.getEventEndDateIndex()
+        vidyoRoomIndex = VidyoTools.getIndexByVidyoRoom()
+        endDateIndex.clear()
+        vidyoRoomIndex.clear()
+
+
+
 
     ch = ConferenceHolder()
     i = 0
@@ -680,7 +691,8 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
 
         updateSupport(conf)
         updateNonInheritedChildren(conf)
-        updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex, pluginActive)
+        if vidyoPluginActive:
+            updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex)
 
         if i % 10000 == 9999:
             dbi.commit()
@@ -707,6 +719,7 @@ def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
         if i % 10000 == 0:
             dbi.commit()
     dbi.commit()
+
 
 @since('1.1')
 def indexConferenceTitle(dbi, withRBDB, prevVersion):
@@ -786,7 +799,9 @@ def redisLinkedTo(dbi, withRBDB, prevVersion):
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
-                 specified=[], dryRun=False):
+                 specified=[], dry_run=False, run_from=None):
+
+    global MIGRATION_TASKS
 
     if not dryRun:
         print "\nExecuting migration...\n"
@@ -801,6 +816,14 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
 
         print "DONE!\n"
 
+    if run_from:
+        try:
+            mig_tasks_names = list(t.__name__ for (__, t, __) in MIGRATION_TASKS)
+            mti = mig_tasks_names.index(run_from)
+            MIGRATION_TASKS = MIGRATION_TASKS[mti:]
+        except ValueError:
+            print console.colored("The task {0} does not exist".format(run_from), 'red')
+            return 1
     # go from older to newer version and execute corresponding tasks
     for version, task, always, never in MIGRATION_TASKS:
         if never and task.__name__ not in specified:
@@ -809,9 +832,9 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
             continue
         if parse_version(version) > prevVersion or always:
             print console.colored("#", 'green', attrs=['bold']), \
-                  task.__doc__.replace('\n', '').replace('  ', '').strip(),
+                task.__doc__.replace('\n', '').replace('  ', '').strip(),
             print console.colored("(%s)" % version, 'yellow')
-            if dryRun:
+            if dry_run:
                 continue
             dbi.startRequest()
             if withRBDB:
@@ -846,6 +869,8 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
                         help='Use the Room Booking DB')
     parser.add_argument('--run-only', dest='specified', default='',
                         help='Specify which step(s) to run (comma-separated)')
+    parser.add_argument('--run-from', dest='run_from', default='',
+                        help='Specify FROM which step to run (inclusive)')
     parser.add_argument('--prev-version', dest='prevVersion', help='Previous version of Indico (used by DB)', default=__version__)
     parser.add_argument('--profile', dest='profile', help='Use profiling during the migration', action='store_true')
 
@@ -860,14 +885,16 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
                 profile.runctx("""result=runMigration(withRBDB=args.useRBDB,
                                   prevVersion=parse_version(args.prevVersion),
                                   specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))),
-                                  dryRun=args.dry_run)""",
+                                  run_from=args.run_from,
+                                  dry_run=args.dry_run)""",
                                   globals(), locals(), proffilename)
                 return result
             else:
                 return runMigration(withRBDB=args.useRBDB,
                                     prevVersion=parse_version(args.prevVersion),
                                     specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))),
-                                    dryRun=args.dry_run)
+                                    run_from=args.run_from,
+                                    dry_run=args.dry_run)
         except:
             print console.colored("\nMigration failed! DB may be in "
                                   " an inconsistent state:", 'red', attrs=['bold'])
