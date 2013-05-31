@@ -57,9 +57,9 @@ class WCFANotYetOpened(wcomponents.WTemplated):
     pass
 
 
-class WPCFANotYetOpened( WPConferenceDefaultDisplayBase ):
+class WPCFANotYetOpened(WPConferenceDefaultDisplayBase):
 
-    def _getBody( self, params ):
+    def _getBody(self, params):
         wc = WCFANotYetOpened()
         return wc.getHTML()
 
@@ -68,9 +68,9 @@ class WCFAClosed(wcomponents.WTemplated):
     pass
 
 
-class WPCFAClosed( WPConferenceDefaultDisplayBase ):
+class WPCFAClosed(WPConferenceDefaultDisplayBase):
 
-    def _getBody( self, params ):
+    def _getBody(self, params):
         wc = WCFAClosed()
         return wc.getHTML()
 

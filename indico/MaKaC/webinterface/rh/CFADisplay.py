@@ -69,18 +69,18 @@ class RHConferenceCFA( RHBaseCFA ):
         return p.display()
 
 
-class RHAbstractSubmissionBase( RHBaseCFA ):
+class RHAbstractSubmissionBase(RHBaseCFA):
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         self._checkSessionUser()
-        RHBaseCFA._checkProtection( self )
+        RHBaseCFA._checkProtection(self)
 
-    def _processIfOpened( self ):
+    def _processIfOpened(self):
         """only override this method if the submission period must be opened
             for the request handling"""
         return "cfa opened"
 
-    def _processIfActive( self ):
+    def _processIfActive(self):
         cfaMgr = self._conf.getAbstractMgr()
         #if the user is in the autorized list, don't check period
         if self._getUser() in cfaMgr.getAuthorizedSubmitterList():
@@ -90,10 +90,10 @@ class RHAbstractSubmissionBase( RHBaseCFA ):
         if timezoneUtils.nowutc() < cfaMgr.getStartSubmissionDate():
         #if the submission period is already closed we show up a form informing
         #   about that.
-            p = abstracts.WPCFANotYetOpened( self, self._conf )
+            p = abstracts.WPCFANotYetOpened(self, self._conf)
             return p.display()
-        elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate() :
-            p = abstracts.WPCFAClosed( self, self._conf )
+        elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate():
+            p = abstracts.WPCFAClosed(self, self._conf)
             return p.display()
         else:
             return self._processIfOpened()
@@ -255,17 +255,15 @@ class RHAbstractSubmission( RHAbstractModificationAction ):
             return p.display( **pars )
 
 
-
 class RHAbstractModify(RHAbstractModificationAction, RHModificationBaseProtected):
     _uh = urlHandlers.UHAbstractModify
 
-    def _checkProtection( self ):
-        RHModificationBaseProtected._checkProtection( self )
+    def _checkProtection(self):
+        RHModificationBaseProtected._checkProtection(self)
 
-
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         RHAbstractModificationAction._checkParams(self, params)
-        if self._getUser() == None:
+        if self._getUser() is None:
             return
         if self._action == "":
             #First call
@@ -281,8 +279,7 @@ class RHAbstractModify(RHAbstractModificationAction, RHModificationBaseProtected
             self._abstractData.tracks = trackIds
             self._abstractData.comments = self._abstract.getComments()
 
-
-    def _processIfActive( self ):
+    def _processIfActive(self):
         #We overload this method to allow modification after the CFA is closed if the modification deadline is after the submission deadline
         cfaMgr = self._conf.getAbstractMgr()
         modifDeadLine = cfaMgr.getModificationDeadline()
@@ -296,46 +293,46 @@ class RHAbstractModify(RHAbstractModificationAction, RHModificationBaseProtected
         if timezoneUtils.nowutc() < cfaMgr.getStartSubmissionDate():
         #if the submission period is already closed we show up a form informing
         #   about that.
-            p = abstracts.WPCFANotYetOpened( self, self._conf )
+            p = abstracts.WPCFANotYetOpened(self, self._conf)
             return p.display()
         #elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate() :
         elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate() and timezoneUtils.nowutc() > modifDeadLine:
-            p = abstracts.WPCFAClosed( self, self._conf )
+            p = abstracts.WPCFAClosed(self, self._conf)
             return p.display()
         else:
             return self._processIfOpened()
 
-    def _doValidate( self ):
+    def _doValidate(self):
         #First, one must validate that the information is fine
         errors = self._abstractData.check()
         if errors:
-            p = abstracts.WPAbstractModify( self, self._target )
+            p = abstracts.WPAbstractModify(self, self._target)
             pars = self._abstractData.toDict()
             pars["action"] = self._action
             # restart the current value of the param attachments to show the existing files
             pars["attachments"] = self._abstract.getAttachments().values()
-            return p.display( **pars )
+            return p.display(**pars)
         self._abstract.clearAuthors()
         self._abstractData.setAbstractData(self._abstract)
-        self._redirect( urlHandlers.UHAbstractDisplay.getURL( self._abstract ) )
+        self._redirect(urlHandlers.UHAbstractDisplay.getURL(self._abstract))
 
-    def _processIfOpened( self ):
+    def _processIfOpened(self):
         #check if the modification period is not over or if the abstract
         #   is in a different status than Submitted
         if not self._conf.getAbstractMgr().inModificationPeriod() or \
-                not isinstance( self._abstract.getCurrentStatus(), \
-                                                AbstractStatusSubmitted ):
-            wp = abstracts.WPAbstractCannotBeModified( self, self._abstract )
+                not isinstance(self._abstract.getCurrentStatus(),
+                               AbstractStatusSubmitted):
+            wp = abstracts.WPAbstractCannotBeModified(self, self._abstract)
             return wp.display()
         if self._action == "CANCEL":
-            self._redirect( urlHandlers.UHAbstractDisplay.getURL( self._abstract ) )
+            self._redirect(urlHandlers.UHAbstractDisplay.getURL(self._abstract))
         elif self._action == "VALIDATE":
             return self._doValidate()
         else:
-            p = abstracts.WPAbstractModify( self, self._target )
+            p = abstracts.WPAbstractModify(self, self._target)
             pars = self._abstractData.toDict()
             pars["action"] = self._action
-            return p.display( **pars )
+            return p.display(**pars)
 
 
 class RHUserAbstracts( RHAbstractSubmissionBase ):
@@ -403,13 +400,12 @@ class RHUserAbstractsPDF(RHAbstractSubmissionBase):
         return send_file('my-abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF')
 
 
-class RHAbstractModificationBase( RHAbstractDisplayBase, RHModificationBaseProtected ):
+class RHAbstractModificationBase(RHAbstractDisplayBase, RHModificationBaseProtected):
 
-    def _checkProtection( self ):
-        RHModificationBaseProtected._checkProtection( self )
+    def _checkProtection(self):
+        RHModificationBaseProtected._checkProtection(self)
 
-
-    def _processIfActive( self ):
+    def _processIfActive(self):
         #We overload this method to alow modification after the CFA is closed if the modification deadline is after the submission deadline
         cfaMgr = self._conf.getAbstractMgr()
         modifDeadLine = cfaMgr.getModificationDeadline()
@@ -423,11 +419,11 @@ class RHAbstractModificationBase( RHAbstractDisplayBase, RHModificationBaseProte
         if timezoneUtils.nowutc() < cfaMgr.getStartSubmissionDate():
         #if the submission period is already closed we show up a form informing
         #   about that.
-            p = abstracts.WPCFANotYetOpened( self, self._conf )
+            p = abstracts.WPCFANotYetOpened(self, self._conf)
             return p.display()
         #elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate() :
         elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate() and timezoneUtils.nowutc() > modifDeadLine:
-            p = abstracts.WPCFAClosed( self, self._conf )
+            p = abstracts.WPCFAClosed(self, self._conf)
             return p.display()
         else:
             return self._processIfOpened()
