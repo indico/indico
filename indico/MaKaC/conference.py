@@ -578,9 +578,9 @@ class Category(CommonObjectBase):
 
     def removeMaterial( self, mat ):
         if mat.getId() in self.materials.keys():
+            mat.delete()
             self.materials[mat.getId()].setOwner(None)
             del self.materials[ mat.getId() ]
-            mat.delete()
             self.notifyModification()
             return "done: %s"%mat.getId()
         elif mat.getId().lower() == 'minutes':
@@ -980,7 +980,13 @@ class Category(CommonObjectBase):
         for conference in self.getConferenceList():
             self.removeConference( conference, delete = True )
         self.getOwner()._removeSubCategory( self )
-        CategoryManager().remove( self )
+        CategoryManager().remove(self)
+        for prin in self.__ac.getAccessList():
+            if isinstance(prin, MaKaC.user.Avatar):
+                prin.unlinkTo(self, "access")
+        for prin in self.__ac.getModifierList():
+            if isinstance(prin, MaKaC.user.Avatar):
+                prin.unlinkTo(self, "manager")
         TrashCanManager().add(self)
 
         self._notify('deleted', oldOwner)

@@ -59,5 +59,10 @@
             </tr>
             % endif
         </table>
+        % if room.needsAVCSetup:
+            <div class="warningMessage" style="text-align: left; max-width: 600px; margin: 3em 1em 1em 1em;">
+                ${ _("The conference room you have chosen is equipped for video-conferencing and video-projection. If you need this equipment, <strong>do not forget</strong> to select it. If you don't need any of this equipment please <strong>choose another room</strong>, if a suitable one is free on a suitable location for your meeting. Thank you for your understanding.") }
+            </div>
+        % endif
     </td>
   </tr>

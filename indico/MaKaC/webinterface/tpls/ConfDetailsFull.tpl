@@ -47,14 +47,19 @@
   </div>
   % endif
 
-  % if material:
+  % if material or isSubmitter:
   <div class="info_line material">
       <span title="${_("Materials")}" class="icon icon-material-download" aria-hidden="true"></span>
-      <ul class="text" style="float: left; padding: 0">
-        % for mat in material:
-          <li>${mat}</li>
-        % endfor
-      </ul>
+      % if material:
+          <ul class="text" style="float: left; padding: 0">
+            % for mat in material:
+              <li>${mat}</li>
+            % endfor
+          </ul>
+      % else:
+          <span class="text" style="float: left; font-style: italic; padding: 10px 0px 0px">${_("No material yet")}</span>
+      % endif
+
   </div>
   % endif
 

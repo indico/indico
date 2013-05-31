@@ -874,7 +874,8 @@ class PosterSlotSchedule(SlotSchedule):
 
     def reSchedule(self):
         for e in self._entries:
-            e.setStartDate(self.getStartDate())
+            if e.getStartDate() != self.getStartDate():
+                e.setStartDate(self.getStartDate())
 
 class SlotSchTypeFactory:
     _sch={"standard":SlotSchedule,"poster":PosterSlotSchedule}

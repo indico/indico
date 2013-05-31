@@ -5,7 +5,7 @@
 # pythonbrew required
 
 DATEOPT=
-VERSIONS="2.7.3 2.6.8"
+VERSIONS="2.7 2.6"
 
 while getopts "d" Option
 do

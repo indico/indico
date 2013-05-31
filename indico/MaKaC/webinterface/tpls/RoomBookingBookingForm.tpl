@@ -151,9 +151,6 @@
 
             popup.open();
         % elif candResv.room.needsAVCSetup:
-            var popup = new AlertPopup($T("Video equipment"), $T("The conference room you have chosen is equipped\nfor video-conferencing and video-projection.\nIf you need this equipment, DO NOT FORGET to select it.\nIf you don't need any of this equipment please choose\nanother room, if a suitable one is free on a suitable\nlocation for your meeting.\n\n\nThank you for your understanding."))
-            popup.open();
-
             $('.videoConferenceOption, #needsAVCSupport').change(function() {
                 if(this.checked) {
                     $('#usesAVC').prop('checked', true);
@@ -234,7 +231,7 @@
                     <input type="hidden" value="${ endT }" name="eTime" id="eTime"/>
                     <ul id="breadcrumbs" style="margin:0px 0px 0px -15px; padding: 0; list-style: none;">
                         <li><span><a href="${ urlHandlers.UHRoomBookingBookRoom.getURL() }">${_("Specify Search Criteria")}</a></span></li>
-                        <li><span><a href="javascript:history.back(-1)">${_("Select Available Period")}</a></span></li>
+                        <li><span><a href="#" onclick="history.back(); return false;">${_("Select Available Period")}</a></span></li>
                         <li><span class="current">${_("Confirm Reservation")}</span></li>
                     </ul>
                 % elif formMode == FormMode.NEW:

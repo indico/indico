@@ -1532,7 +1532,8 @@ class UHConfSignIn( SecureURLHandler ):
             url = URL(Config.getInstance().getLoginURL())
         else:
             url = cls._getURL()
-        url.setParams( conf.getLocator() )
+        if conf is not None:
+            url.setParams( conf.getLocator() )
         if str(returnURL).strip() != "":
             url.addParam( "returnURL", returnURL )
         return url
@@ -1554,7 +1555,8 @@ class UHConfUserCreation( URLHandler ):
             url = URL(Config.getInstance().getRegistrationURL())
         else:
             url = cls._getURL()
-        url.setParams( conf.getLocator() )
+        if conf is not None:
+            url.setParams( conf.getLocator() )
         if str(returnURL).strip() != "":
             url.addParam( "returnURL", returnURL )
         return url
