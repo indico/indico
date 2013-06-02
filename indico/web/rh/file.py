@@ -18,34 +18,25 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import time
-from MaKaC.common import Config
 from email.Utils import formatdate
+from flask import request
+
+from MaKaC.common import Config
 
 
-def set_file_headers(req, fname, fpath, last_modified, ftype, data, size):
+def set_file_headers(response, fname, fpath, last_modified, ftype, data, size):
     cfg = Config.getInstance()
 
-    mimetype = cfg.getFileTypeMimeType(ftype)
-    req.content_type = str(mimetype)
+    response.content_type = str(cfg.getFileTypeMimeType(ftype))
 
-    if 'User-Agent' in req.headers_in and \
-            req.headers_in['User-Agent'].find('Android') != -1:
-        dispos = "attachment"
-    else:
-        dispos = "inline"
+    dispos = 'attachment' if request.user_agent.platform == 'android' else 'inline'
 
-    req.headers_out.update({
-            "Content-Length": str(size),
-            "Last-Modified": formatdate(time.mktime(last_modified.timetuple())),
-            "Content-Disposition": '{0}; filename="{1}"'.format(dispos, fname)
-            })
+    response.headers['Content-Length'] = str(size)
+    response.headers['Last-Modified'] = formatdate(time.mktime(last_modified.timetuple()))
+    response.headers['Content-Disposition'] = '{0}; filename="{1}"'.format(dispos, fname)
 
-    if cfg.getUseXSendFile() and req.headers_in['User-Agent'].find('Android') == -1:
-        # X-Send-File support makes it easier, just let the web server
-        # do all the heavy lifting
-
-        # send_x_file only sets headers
-        req.send_x_file(fpath)
+    if cfg.getUseXSendFile() and request.user_agent.platform != 'android':
+        pass  # TODO - xsf with fpath
 
 
 def send_file(req, fdata):

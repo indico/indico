@@ -16,7 +16,6 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from MaKaC.user import AvatarHolder
 
 """
 Main export interface
@@ -29,8 +28,9 @@ import pytz
 import re
 import types
 import urllib
-from ZODB.POSException import ConflictError
 from datetime import datetime, timedelta, time
+from flask import request
+from ZODB.POSException import ConflictError
 from zope.index.text import parsetree
 
 # indico imports
@@ -44,15 +44,14 @@ from indico.web.http_api.metadata.html import HTML4Serializer
 from indico.web.http_api.metadata.jsonp import JSONPSerializer
 from indico.web.http_api.metadata.ical import ICalSerializer
 from indico.web.http_api.metadata.atom import AtomSerializer
-from indico.web.http_api.fossils import IConferenceMetadataFossil,\
-    IConferenceMetadataWithContribsFossil, IConferenceMetadataWithSubContribsFossil,\
-    IConferenceMetadataWithSessionsFossil, IPeriodFossil, ICategoryMetadataFossil,\
-    ICategoryProtectedMetadataFossil, ISessionMetadataFossil, ISessionMetadataWithContributionsFossil,\
-    ISessionMetadataWithSubContribsFossil, IContributionMetadataFossil,\
-    IContributionMetadataWithSubContribsFossil, IBasicConferenceMetadataFossil
+from indico.web.http_api.fossils import IConferenceMetadataFossil, \
+IConferenceMetadataWithContribsFossil, IConferenceMetadataWithSubContribsFossil, \
+IConferenceMetadataWithSessionsFossil, IPeriodFossil, ICategoryMetadataFossil, \
+ICategoryProtectedMetadataFossil, ISessionMetadataWithContributionsFossil, \
+ISessionMetadataWithSubContribsFossil, IContributionMetadataFossil, \
+IContributionMetadataWithSubContribsFossil, IBasicConferenceMetadataFossil
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
-from indico.web.wsgi import webinterface_handler_config as apache
 
 # indico legacy imports
 from MaKaC.common.db import DBMgr
@@ -60,12 +59,11 @@ from MaKaC.conference import CategoryManager
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.conference import ConferenceHolder
+from MaKaC.user import AvatarHolder
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.rb_tools import Period, datespan
 from MaKaC.schedule import ScheduleToJson
 from MaKaC.common.logger import Logger
-from MaKaC.errors import NoReportError
-from MaKaC.user import AvatarHolder
 
 utc = pytz.timezone('UTC')
 MAX_DATETIME = utc.localize(datetime(2099, 12, 31, 23, 59, 0))
@@ -164,12 +162,12 @@ class HTTPAPIHook(object):
         try:
             self._tz = pytz.timezone(tzName)
         except pytz.UnknownTimeZoneError, e:
-            raise HTTPAPIError("Bad timezone: '%s'" % e.message, apache.HTTP_BAD_REQUEST)
+            raise HTTPAPIError("Bad timezone: '%s'" % e.message, 400)
         max = self.MAX_RECORDS.get(self._detail, 1000)
         self._userLimit = get_query_parameter(self._queryParams, ['n', 'limit'], 0, integer=True)
         if self._userLimit > max:
             raise HTTPAPIError("You can only request up to %d records per request with the detail level '%s'" %
-                (max, self._detail), apache.HTTP_BAD_REQUEST)
+                (max, self._detail), 400)
         self._limit = self._userLimit if self._userLimit > 0 else max
 
         fromDT = get_query_parameter(self._queryParams, ['f', 'from'])
@@ -177,7 +175,7 @@ class HTTPAPIHook(object):
         dayDT = get_query_parameter(self._queryParams, ['day'])
 
         if (fromDT or toDT) and dayDT:
-            raise HTTPAPIError("'day' can only be used without 'from' and 'to'", apache.HTTP_BAD_REQUEST)
+            raise HTTPAPIError("'day' can only be used without 'from' and 'to'", 400)
         elif dayDT:
             fromDT = toDT = dayDT
 
@@ -204,17 +202,15 @@ class HTTPAPIHook(object):
             complete = (self._limit == self._userLimit)
         return resultList, complete
 
-    def __call__(self, aw, req):
+    def __call__(self, aw):
         """Perform the actual exporting"""
-        if self.HTTP_POST != (req.method == 'POST'):
-            raise HTTPAPIError('This action requires %s' % ('POST' if self.HTTP_POST else 'GET'), apache.HTTP_METHOD_NOT_ALLOWED)
-        self._req = req
+        if self.HTTP_POST != (request.method == 'POST'):
+            raise HTTPAPIError('This action requires %s' % ('POST' if self.HTTP_POST else 'GET'), 405)
         self._getParams()
-        req = self._req
         if not self.GUEST_ALLOWED and not aw.getUser():
-            raise HTTPAPIError('Guest access to this resource is forbidden.', apache.HTTP_FORBIDDEN)
+            raise HTTPAPIError('Guest access to this resource is forbidden.', 403)
         if not self._hasAccess(aw):
-            raise HTTPAPIError('Access to this resource is restricted.', apache.HTTP_FORBIDDEN)
+            raise HTTPAPIError('Access to this resource is restricted.', 403)
 
         method_name = self._getMethodName()
         func = getattr(self, method_name, None)
@@ -237,7 +233,7 @@ class HTTPAPIHook(object):
                 else:
                     break
             else:
-                raise HTTPAPIError('An unresolvable database conflict has occured', apache.HTTP_INTERNAL_SERVER_ERROR)
+                raise HTTPAPIError('An unresolvable database conflict has occured', 500)
 
         extraFunc = getattr(self, method_name + '_extra', None)
         extra = extraFunc(aw, resultList) if extraFunc else None
@@ -310,7 +306,7 @@ class DataFetcher(object):
         try:
             rel, value = cls._parseDateTime(dateTime, ctx=='from')
         except ArgumentParseError, e:
-            raise HTTPAPIError(e.message, apache.HTTP_BAD_REQUEST)
+            raise HTTPAPIError(e.message, 400)
 
         if rel == 'abs':
             return tz.localize(value) if not value.tzinfo else value
@@ -410,7 +406,7 @@ class IteratedDataFetcher(DataFetcher):
         if iface is None:
             iface = self.DETAIL_INTERFACES.get(self._detail)
             if iface is None:
-                raise HTTPAPIError('Invalid detail level: %s' % self._detail, apache.HTTP_BAD_REQUEST)
+                raise HTTPAPIError('Invalid detail level: %s' % self._detail, 400)
         for obj in self._iterateOver(iterator, self._offset, self._limit, self._orderBy, self._descending, filter):
             yield self._postprocess(obj,
                                     fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
@@ -469,12 +465,12 @@ class UserInfoHook(HTTPAPIHook):
         requested_user = AvatarHolder().getById(self._user_id)
         user = aw.getUser()
         if not requested_user:
-            raise HTTPAPIError('Requested user not found', apache.HTTP_NOT_FOUND)
+            raise HTTPAPIError('Requested user not found', 404)
         if user:
             if requested_user.canUserModify(user):
                 return [requested_user.fossilize()]
-            raise HTTPAPIError('You do not have access to that info', apache.HTTP_FORBIDDEN)
-        raise HTTPAPIError('You need to be logged in', apache.HTTP_FORBIDDEN)
+            raise HTTPAPIError('You do not have access to that info', 403)
+        raise HTTPAPIError('You need to be logged in', 403)
 
 
 @HTTPAPIHook.register

@@ -24,13 +24,13 @@ HTTP API - Handlers
 # python stdlib imports
 import hashlib
 import hmac
+import posixpath
 import re
 import time
 import urllib
 from flask import request, session
 from urlparse import parse_qs
 from ZODB.POSException import ConflictError
-import oauth2 as oauth
 
 # indico imports
 from werkzeug.exceptions import NotFound
@@ -40,8 +40,8 @@ from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
 from indico.web.http_api.util import remove_lists, get_query_parameter
 from indico.web.http_api import API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
-from indico.web.wsgi import webinterface_handler_config as apache
 from indico.web.http_api.metadata.serializer import Serializer
+from indico.web.flask.util import ResponseUtil
 from indico.util.contextManager import ContextManager
 from indico.modules.oauth.errors import OAuthError
 from indico.modules.oauth.components import OAuthUtils
@@ -78,38 +78,41 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
     else:
         return path
 
+
 def validateSignature(ak, minfo, signature, timestamp, path, query):
     ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPISignatureTTL()
     if not timestamp and not (ak.isPersistentAllowed() and minfo.isAPIPersistentAllowed()):
-        raise HTTPAPIError('Signature invalid (no timestamp)', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('Signature invalid (no timestamp)', 403)
     elif timestamp and abs(timestamp - int(time.time())) > ttl:
-        raise HTTPAPIError('Signature invalid (bad timestamp)', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('Signature invalid (bad timestamp)', 403)
     digest = hmac.new(ak.getSignKey(), normalizeQuery(path, query), hashlib.sha1).hexdigest()
     if signature != digest:
-        raise HTTPAPIError('Signature invalid', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('Signature invalid', 403)
+
 
 def checkAK(apiKey, signature, timestamp, path, query):
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
     apiMode = minfo.getAPIMode()
     if not apiKey:
         if apiMode in (API_MODE_ONLYKEY, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED):
-            raise HTTPAPIError('API key is missing', apache.HTTP_FORBIDDEN)
+            raise HTTPAPIError('API key is missing', 403)
         return None, True
     akh = APIKeyHolder()
     if not akh.hasKey(apiKey):
-        raise HTTPAPIError('Invalid API key', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('Invalid API key', 403)
     ak = akh.getById(apiKey)
     if ak.isBlocked():
-        raise HTTPAPIError('API key is blocked', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('API key is blocked', 403)
     # Signature validation
     onlyPublic = False
     if signature:
         validateSignature(ak, minfo, signature, timestamp, path, query)
     elif apiMode in (API_MODE_SIGNED, API_MODE_ALL_SIGNED):
-        raise HTTPAPIError('Signature missing', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('Signature missing', 403)
     elif apiMode == API_MODE_ONLYKEY_SIGNED:
         onlyPublic = True
     return ak, onlyPublic
+
 
 def buildAW(ak, onlyPublic=False):
     aw = AccessWrapper()
@@ -119,24 +122,24 @@ def buildAW(ak, onlyPublic=False):
         # Dirty hack: Google calendar converts HTTP API requests from https to http
         # Therefore, not working with Indico setup (requiring https for HTTP API authenticated)
         if not request.is_secure and minfo.isAPIHTTPSRequired() and request.user_agent.browser != 'google':
-            raise HTTPAPIError('HTTPS is required', apache.HTTP_FORBIDDEN)
+            raise HTTPAPIError('HTTPS is required', 403)
         aw.setUser(ak.getUser())
     return aw
 
-def handler(path):
+
+def handler(prefix, path):
+    path = posixpath.join(prefix, path)
     ContextManager.destroy()
     ContextManager.set('currentReq', req)
     logger = Logger.get('httpapi')
-    query = request.query_string
     if request.method == 'POST':
         # Convert POST data to a query string
-        queryParams = dict(request.form)
-        for key, value in queryParams.iteritems():
-            queryParams[key] = [str(value)]
-        query = urllib.urlencode(remove_lists(queryParams))
+        queryParams = dict((key, value.encode('utf-8')) for key, value in request.form.iteritems())
+        query = urllib.urlencode(queryParams)
     else:
         # Parse the actual query string
-        queryParams = parse_qs(query)
+        queryParams = dict((key, value.encode('utf-8')) for key, value in request.args.iteritems())
+        query = request.query_string
 
     dbi = DBMgr.getInstance()
     dbi.startRequest()
@@ -163,9 +166,10 @@ def handler(path):
     if request.method == 'POST' or hook.NO_CACHE:
         noCache = True
 
-    ak = at = error = result = None
+    ak = error = result = None
     ts = int(time.time())
     typeMap = {}
+    responseUtil = ResponseUtil()
     try:
         used_session = None
         if cookieAuth:
@@ -200,7 +204,7 @@ def handler(path):
             if Config.getInstance().getCSRFLevel() >= 2:
                 token = request.headers.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
                 if used_session.csrf_protected and used_session.csrf_token != token:
-                    raise HTTPAPIError('Invalid CSRF token', apache.HTTP_FORBIDDEN)
+                    raise HTTPAPIError('Invalid CSRF token', 403)
             aw = AccessWrapper()
             if not onlyPublic:
                 aw.setUser(used_session.user)
@@ -211,9 +215,8 @@ def handler(path):
 
         # Bail out if the user requires authentication but is not authenticated
         if onlyAuthed and not aw.getUser():
-            raise HTTPAPIError('Not authenticated', apache.HTTP_FORBIDDEN)
+            raise HTTPAPIError('Not authenticated', 403)
 
-        obj = None
         addToCache = not hook.NO_CACHE
         cache = GenericCache('HTTPAPI')
         cacheKey = RE_REMOVE_EXTENSION.sub('', cacheKey)
@@ -235,13 +238,13 @@ def handler(path):
     except HTTPAPIError, e:
         error = e
         if e.getCode():
-            req.status = e.getCode()
-            if req.status == apache.HTTP_METHOD_NOT_ALLOWED:
-                req.headers_out['Allow'] = 'GET' if req.method == 'POST' else 'POST'
+            responseUtil.status = e.getCode()
+            if responseUtil.status == 405:
+                responseUtil.headers['Allow'] = 'GET' if request.method == 'POST' else 'POST'
     except OAuthError, e:
         error = e
         if e.getCode():
-            req.status = e.getCode()
+            responseUtil.status = e.getCode()
 
     if result is None and error is None:
         # TODO: usage page
@@ -291,9 +294,8 @@ def handler(path):
 
         try:
             data = serializer(result)
-            serializer.set_headers(request)
-
-            return data
+            serializer.set_headers(responseUtil)
+            return responseUtil.make_response(data)
         except:
             logger.exception('Serialization error in request %s?%s' % (path, query))
             raise

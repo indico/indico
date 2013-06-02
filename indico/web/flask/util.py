@@ -56,7 +56,12 @@ def create_modpython_rules(app):
 
 
 class ResponseUtil(object):
-    """This class allows an indico RH to modify the response object"""
+    """This class allows "modifying" a Response object before it is actually created.
+
+    The purpose of this is to allow e.g. an Indico RH to trigger a redirect but revoke
+    it later in case of an error or to simply have something to pass around to functions
+    which want to modify headers while there is no response available.
+    """
     def __init__(self):
         self.headers = Headers()
         self._redirect = None

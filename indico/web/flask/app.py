@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import absolute_import
+from functools import partial
 
 import os
 from flask import redirect, url_for, send_from_directory, request
@@ -60,9 +61,9 @@ def configure_app(app):
 
 def add_handlers(app):
     app.add_url_rule('/', view_func=lambda: redirect(url_for('mp-index-index')))
-    app.add_url_rule('/services/json-rpc', view_func=jsonrpc_handler, methods=('POST',))
-    app.add_url_rule('/export/<path:path>', view_func=api_handler)
-    app.add_url_rule('/api/<path:path>', view_func=api_handler, methods=('POST',))
+    app.add_url_rule('/services/json-rpc', view_func=jsonrpc_handler, endpoint='services', methods=('POST',))
+    app.add_url_rule('/export/<path:path>', view_func=partial(api_handler, '/export'), endpoint='export')
+    app.add_url_rule('/api/<path:path>', view_func=partial(api_handler, '/api'), endpoint='api', methods=('POST',))
     app.register_error_handler(404, handle_404)
     app.register_error_handler(Exception, handle_exception)
 

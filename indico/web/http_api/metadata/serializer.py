@@ -55,9 +55,8 @@ class Serializer(object):
     def getMIMEType(self):
         return self._mime
 
-    def set_headers(self, req):
-        req.headers_out['Content-Length'] = str(len(self._data))
-        req.headers_out['Content-Type'] = self.getMIMEType()
+    def set_headers(self, response):
+        response.content_type = self.getMIMEType()
 
     def __call__(self, obj, *args, **kwargs):
         self._obj = obj

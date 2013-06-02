@@ -16,35 +16,26 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from indico.web.http_api.responses import HTTPAPIError
-from indico.web.wsgi import webinterface_handler_config as apache
 import urllib, hmac, hashlib, time
-from indico.web.http_api.auth import APIKey
 from MaKaC.common.Configuration import Config
-
-"""
-Utility functions
-"""
 
 
 def get_query_parameter(queryParams, keys, default=None, integer=False):
-    if type(keys) != list:
-        keys = [keys]
+    if not isinstance(keys, (list, tuple, set)):
+        keys = (keys,)
     for k in keys:
-        paramlist = queryParams.get(k)
-        if paramlist:
-            if len(paramlist) == 1:
-                val = paramlist[0]
-                if integer:
-                    val = int(val)
-                del queryParams[k]
-                return val
-            else:
-                raise HTTPAPIError("duplicate argument '%s'" % k, apache.HTTP_BAD_REQUEST)
+        if k not in queryParams:
+            continue
+        val = queryParams.pop(k)
+        if integer:
+            val = int(val)
+        return val
     return default
+
 
 def remove_lists(data):
     return dict((k, v[0]) for (k, v) in data.iteritems() if v != None)
+
 
 def build_indico_request(path, params, api_key=None, secret_key=None, persistent=False):
     items = params.items() if hasattr(params, 'items') else list(params)

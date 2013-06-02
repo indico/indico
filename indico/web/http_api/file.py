@@ -108,9 +108,9 @@ class FileSerializer(Serializer):
         else:
             return fdata['data']
 
-    def set_headers(self, req):
-        super(FileSerializer, self).set_headers(req)
-        set_file_headers(req, **self._obj)
+    def set_headers(self, response):
+        super(FileSerializer, self).set_headers(response)
+        set_file_headers(response, **self._obj)
 
 
 Serializer.register('bin', FileSerializer)
