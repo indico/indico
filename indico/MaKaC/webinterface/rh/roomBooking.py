@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 from MaKaC.plugins.base import pluginId
 # Most of the following imports are probably not necessary - to clean
@@ -858,7 +859,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 
     def _process(self):
         params = self._getRequestParams()
-        params["lang"] = self._aw.getSession().getLang()
+        params["lang"] = session.lang
         html = self._cache.get(params)
         if not html:
             self._businessLogic()

@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from copy import copy
+from flask import session
 from xml.sax.saxutils import quoteattr
 from datetime import timedelta, datetime
 import time
@@ -156,9 +157,10 @@ class WCategoryDisplay(WICalExportBase):
             params = {"categoryDisplayURLGen": vars["categDisplayURLGen"]}
             vars["contents"] = cl.getHTML( self._aw, params )
         elif confs:
-            pastEvents = self._aw.getSession().getVar("fetchPastEventsFrom")
-            showPastEvents = pastEvents and self._target.getId() in pastEvents or self._aw.getUser() and self._aw.getUser().getPersonalInfo().getShowPastEvents()
-            cl = wcomponents.WConferenceList( self._target, self._wfReg, showPastEvents)
+            pastEvents = session.get('fetchPastEventsFrom', set())
+            showPastEvents = (self._target.getId() in pastEvents or
+                             (self._aw.getUser() and self._aw.getUser().getPersonalInfo().getShowPastEvents()))
+            cl = wcomponents.WConferenceList(self._target, self._wfReg, showPastEvents)
             params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"]}
             vars["contents"] = cl.getHTML( self._aw, params )
         else:
@@ -1251,7 +1253,6 @@ class WPConferenceCreationMainData( WPCategoryDisplayBase ):
         else:
             pars = {"target": self._target, "isModif": False}
             return wcomponents.WNavigationDrawer( pars )
-        return wcomponents.WNavigationDrawer( pars )
 
     def _getWComponent( self ):
         return WConferenceCreation( self._target, self._rh._event_type, self._rh )

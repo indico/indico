@@ -21,6 +21,7 @@ Asynchronous request handlers for category-related services.
 """
 
 from datetime import datetime
+from flask import session
 from itertools import islice
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.services.implementation.base import ProtectedDisplayService
@@ -189,22 +190,15 @@ class SetShowPastEventsForCateg(CategoryDisplayBase):
         CategoryDisplayBase._checkParams(self)
         self._showPastEvents = bool(self._params.get("showPastEvents",False))
 
-    def _getAnswer( self ):
-        session = self._aw.getSession()
-        if not session.getVar("fetchPastEventsFrom"):
-            session.setVar("fetchPastEventsFrom",set())
-
-        fpef = session.getVar("fetchPastEventsFrom")
+    def _getAnswer(self):
+        fpef = session.setdefault('fetchPastEventsFrom', set())
         cid = self._categ.getId()
 
         if self._showPastEvents:
-            # check to avoid unnecessary session write (and db write)
-            if cid not in fpef:
-                fpef.add(cid)
-                session.setVar("fetchPastEventsFrom", fpef)
+            fpef.add(cid)
         else:
             fpef.remove(cid)
-            session.setVar("fetchPastEventsFrom", fpef)
+        session.modified = True
 
 class CategoryProtectionUserList(CategoryModifBase):
     def _getAnswer(self):

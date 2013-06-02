@@ -48,6 +48,7 @@ import tempfile
 import copy
 import stat
 from datetime import datetime, timedelta, time
+from flask import session
 
 from MaKaC.contributionReviewing import ReviewManager
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
@@ -3846,29 +3847,17 @@ class Conference(CommonObjectBase, Locatable):
             # Domain control is triggered just for PUBLIC events
             return self.canIPAccess(aw.getIP())
 
-    def canKeyAccess( self, aw, key=None ):
-        sess = aw.getSession()
+    def canKeyAccess(self, aw, key=None):
         accessKey = self.getAccessKey()
-        if accessKey != "" and sess:
-            if key and key == accessKey:
-                return True
-            keys = sess.getVar("accessKeys")
-            if keys != None:
-                if keys.has_key(self.getUniqueId()):
-                    if keys[self.getUniqueId()] == accessKey:
-                        return True
-        return False
+        if not accessKey:
+            return False
+        return key == accessKey or session.get('accessKeys', {}).get(self.getUniqueId()) == accessKey
 
-    def canKeyModify( self, aw ):
-        sess = aw.getSession()
+    def canKeyModify(self, aw):
         modifKey = self.getModifKey()
-        if modifKey != "" and sess:
-            keys = sess.getVar("modifKeys")
-            if keys != None:
-                if keys.has_key(self.id):
-                    if keys[self.id] == modifKey:
-                        return True
-        return False
+        if not modifKey:
+            return False
+        return session.get('modifKeys', {}).get(self.id) == modifKey
 
     def grantModification( self, prin, sendEmail=True ):
         email = None
@@ -11115,17 +11104,14 @@ class Material(CommonObjectBase):
             canKeyAccess = self.canKeyAccess(aw)
             return canUserAccess or canKeyAccess
 
-    def canKeyAccess( self, aw ):
-        sess = aw.getSession()
-        if not sess:
+    def canKeyAccess(self, aw):
+        key = session.get('accessKeys', {}).get(self.getUniqueId())
+        if not key:
             return False
-        keys = sess.getVar("accessKeys")
-        if keys != None:
-            key = keys.get(self.getUniqueId(),"")
-            if self.getAccessKey() != "":
-                return self.__ac.canKeyAccess(key)
-            elif self.getConference() != None:
-                return self.getConference().canKeyAccess(aw, key)
+        elif self.getAccessKey():
+            return self.__ac.canKeyAccess(key)
+        elif self.getConference():
+            return self.getConference().canKeyAccess(aw, key)
         return False
 
     def grantModification( self, prin ):
@@ -11614,16 +11600,15 @@ class Resource(CommonObjectBase):
             return self.getOwner().getAccessKey()
         return ""
 
-    def canKeyAccess( self, aw ):
-        sess = aw.getSession()
-        if not sess:
-            return False
+    def canKeyAccess(self, aw):
         accessKey = self.getAccessKey()
-        keys = sess.getVar("accessKeys")
-        if keys != None:
-            if keys.has_key(self.getUniqueId()):
-                if (accessKey != "" and keys[self.getUniqueId()] == accessKey) or (accessKey == "" and self.getConference().getAccessKey() != "" and keys[self.getUniqueId()] == self.getConference().getAccessKey()):
-                    return True
+        key = session.get('accessKeys', {}).get(self.getUniqueId())
+        if not key:
+            return False
+        elif accessKey and key == accessKey:
+            return True
+        elif not accessKey and key == self.getConference().getAccessKey():
+            return True
         return False
 
     def getReviewingState(self):
