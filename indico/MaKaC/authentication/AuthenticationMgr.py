@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 from MaKaC.common.general import *
 
@@ -150,19 +151,17 @@ class AuthenticatorMgr:
         return None
 
     def autoLogin(self, rh):
-        #Try to login from request handler
-        i = 0
+        # Try to login from request handler
         for auth in self.AuthenticatorList:
             av = auth.autoLogin(rh)
             if av:
-                rh._getSession().setVar("autoLogin", auth.getId())
+                session['autoLogin'] = auth.getId()
                 return av
         return None
 
     def autoLogout(self, rh):
-        authId = rh._getSession().getVar("autoLogin")
+        authId = session.pop('autoLogin', None)
         if authId:
-            rh._getSession().removeVar("autoLogin")
             auth = self.getById(authId)
             return auth.autoLogout(rh)
 
