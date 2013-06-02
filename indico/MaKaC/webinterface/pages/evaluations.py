@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from datetime                       import datetime
+from flask import session
 from MaKaC.webinterface             import wcomponents,urlHandlers
 from MaKaC.webinterface.wcomponents import WUtils
 from MaKaC.webinterface.pages       import conferences
@@ -48,8 +49,8 @@ class WPEvaluationMainInformation( WPEvaluationBase ):
     """[DisplayArea] display evaluation general information."""
     navigationEntry = NEEvaluationMainInformation
 
-    def _getBody( self, params ):
-        pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
+    def _getBody(self, params):
+        pars = {'menuStatus': session.get('menuStatus', 'open')}
         return WEvaluationMainInformation(self._conf, self._getAW().getUser()).getHTML(pars)
 
     def _defineSectionMenu( self ):
@@ -88,10 +89,11 @@ class WPEvaluationDisplay( WPEvaluationBase ):
     """[DisplayArea] Evaluation default display."""
     navigationEntry = NEEvaluationDisplay
 
-    def _getBody( self, params ):
-        pars = {}
-        pars["menuStatus"] = self._rh._getSession().getVar("menuStatus") or "open"
-        pars["user"] = self._rh._getUser()
+    def _getBody(self, params):
+        pars = {
+            'menuStatus': session.get('menuStatus', 'open'),
+            'user': self._rh._getUser()
+        }
         return WEvaluationDisplay(self._conf).getHTML(pars)
 
     def _defineSectionMenu( self ):
@@ -117,10 +119,11 @@ class WPEvaluationDisplayModif( WPEvaluationBase ):
     """[DisplayArea] The user modifies his already submitted evaluation."""
     navigationEntry = NEEvaluationDisplayModif
 
-    def _getBody( self, params ):
-        pars = {}
-        pars["menuStatus"] = self._rh._getSession().getVar("menuStatus") or "open"
-        pars["user"] = self._rh._getUser()
+    def _getBody(self, params):
+        pars = {
+            'menuStatus': session.get('menuStatus', 'open'),
+            'user': self._rh._getUser()
+        }
         return WEvaluationDisplayModif(self._conf).getHTML(pars)
 
     def _defineSectionMenu( self ):
@@ -147,12 +150,14 @@ class WPEvaluationSubmitted( WPEvaluationBase ):
         self._mode = mode
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
 
-    def _getBody( self, params ):
-        pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
-        #redirection
-        if self._rh.getWebFactory()!=None : #Event == Meeting/Lecture
+    def _getBody(self, params):
+        pars = {
+            'menuStatus': session.get('menuStatus', 'open')
+        }
+        # redirection
+        if self._rh.getWebFactory() is not None:  #Event == Meeting/Lecture
             pars["redirection"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        else : #Event == Conference
+        else:  #Event == Conference
             pars["redirection"] = None
         return WEvaluationSubmitted(self._conf, self._mode).getHTML(pars)
 
@@ -800,9 +805,10 @@ class WConfModifEvaluationEditQuestion( wcomponents.WTemplated ):
 class WPConfModifEvaluationPreview( WPConfModifEvaluationBase ):
     """[ManagementArea] Preview of an Evaluation."""
     def _getTabContent( self, params ):
-        pars = {}
-        pars["menuStatus"] = self._rh._getSession().getVar("menuStatus") or "open"
-        pars["user"] = self._rh._getUser()
+        pars = {
+            'menuStatus': session.get('menuStatus', 'open'),
+            'user': self._rh._getUser()
+        }
         return WConfModifEvaluationPreview(self._conf).getHTML(pars)
     def _setActiveTab( self ):
         self._tabEvaluationPreview.setActive()

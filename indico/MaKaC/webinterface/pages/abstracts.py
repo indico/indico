@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 from xml.sax.saxutils import quoteattr
 import urllib
@@ -117,10 +118,10 @@ class WConfCFA(wcomponents.WTemplated):
 class WPConferenceCFA( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEConferenceCFA
 
-    def _getBody( self, params ):
-        wc = WConfCFA( self._getAW(), self._conf )
-        pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
-        return wc.getHTML( pars )
+    def _getBody(self, params):
+        wc = WConfCFA(self._getAW(), self._conf)
+        pars = {'menuStatus': session.get('menuStatus', 'open')}
+        return wc.getHTML(pars)
 
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )

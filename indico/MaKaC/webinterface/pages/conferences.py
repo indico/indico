@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import collections
+from flask import session
 import os
 import random
 import urllib
@@ -329,7 +330,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         urlClose.addParam("currentURL",self._rh.getCurrentURL())
         urlOpen = urlHandlers.UHConferenceDisplayMenuOpen.getURL(self._conf)
         urlOpen.addParam("currentURL",self._rh.getCurrentURL())
-        menuStatus = self._rh._getSession().getVar("menuStatus") or "open"
+        menuStatus = session.get('menuStatus', 'open')
 
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
 
@@ -720,7 +721,7 @@ class WPConferenceDisplay( WPConferenceDefaultDisplayBase ):
     "contribModifyURLGen": urlHandlers.UHContributionModification.getURL, \
     "subContribModifyURLGen":  urlHandlers.UHSubContribModification.getURL, \
     "materialURLGen": urlHandlers.UHMaterialDisplay.getURL, \
-    "menuStatus": self._rh._getSession().getVar("menuStatus") or "open"}
+    "menuStatus": session.get('menuStatus', 'open')}
         return wc.getHTML( pars )
 
     def _getHeadContent( self ):

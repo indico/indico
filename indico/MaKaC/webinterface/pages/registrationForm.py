@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -1486,9 +1487,9 @@ class WConfModifRegFormStatusModif( wcomponents.WTemplated ):
 class WPRegistrationForm( conferences.WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NERegistrationForm
 
-    def _getBody( self, params ):
-        wc = WConfRegistrationForm( self._conf, self._getAW().getUser() )
-        pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
+    def _getBody(self, params):
+        wc = WConfRegistrationForm(self._conf, self._getAW().getUser())
+        pars = {'menuStatus': session.get('menuStatus', 'open')}
         return wc.getHTML(pars)
 
     def _defineSectionMenu( self ):
@@ -1557,9 +1558,9 @@ class WPRegistrationFormDisplay( conferences.WPConferenceDefaultDisplayBase ):
         return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
                self._includeJSPackage('Management')
 
-    def _getBody( self, params ):
-        wc = WConfRegistrationFormDisplay( self._conf, self._rh._getUser() )
-        pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
+    def _getBody(self, params):
+        wc = WConfRegistrationFormDisplay(self._conf, self._rh._getUser())
+        pars = {'menuStatus': session.get('menuStatus', 'open')}
         return wc.getHTML(pars)
 
     def _defineSectionMenu( self ):
@@ -2605,9 +2606,9 @@ class WPRegistrationFormModify( conferences.WPConferenceDefaultDisplayBase ):
         return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
                self._includeJSPackage('Management')
 
-    def _getBody( self, params ):
-        wc = WConfRegistrationFormModify( self._conf, self._rh._getUser() )
-        pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
+    def _getBody(self, params):
+        wc = WConfRegistrationFormModify(self._conf, self._rh._getUser())
+        pars = {'menuStatus': session.get('menuStatus', 'open')}
         return wc.getHTML(pars)
 
     def _defineSectionMenu( self ):
