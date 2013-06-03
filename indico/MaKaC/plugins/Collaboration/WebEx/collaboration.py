@@ -44,6 +44,7 @@ from MaKaC.common.fossilize import fossilizes, fossilize
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
+from indico.util.date_time import format_datetime
 
 from cgi import escape
 
@@ -533,7 +534,7 @@ class CSBooking(CSBookingBase):
     def _getLaunchDisplayInfo(self):
         return {'launchText' : _("Join Now!"),
                 'launchLink' : str(self.getUrl()),
-                'launchTooltip': _("Click here to join the WebEx meeting!")}
+                'launchTooltip': _("Click here to join the WebEx meeting!") if self.canBeStarted() else _('This meeting starts on %s so you cannot join it yet')%format_datetime(self.getStartDate())}
 
     def getCreateModifyArguments(self):
         arguments = {

@@ -25,15 +25,13 @@ from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, parseEVOAnswer, EVOException, \
     getMinStartDate, getMaxEndDate, OverlappedError, EVOError, ChangesFromEVOError, getRequestURL, EVOWarning, getEVOOptionValueByName
 from MaKaC.plugins.Collaboration.EVO.mail import NewEVOMeetingNotificationAdmin, EVOMeetingModifiedNotificationAdmin, EVOMeetingRemovalNotificationAdmin
-#    NewEVOMeetingNotificationManager, EVOMeetingModifiedNotificationManager,\
-#    EVOMeetingRemovalNotificationManager
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
-from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.plugins.Collaboration.EVO.fossils import ICSBookingConfModifFossil,\
     ICSBookingIndexingFossil
 from MaKaC.common.fossilize import fossilizes
+from indico.util.date_time import format_datetime
 
 class CSBooking(CSBookingBase): #already Fossilizable
     fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil)
@@ -350,7 +348,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
     def _getLaunchDisplayInfo(self):
         return {'launchText' : _("Join Now!"),
                 'launchLink' : str(self.getUrl()),
-                'launchTooltip': _("Click here to join the EVO meeting!")}
+                'launchTooltip': _("Click here to join the EVO meeting!") if self.canBeStarted() else _('This meeting starts on %s so you cannot join it yet')%format_datetime(self.getStartDate())}
 
     ## end of overrigind methods
 

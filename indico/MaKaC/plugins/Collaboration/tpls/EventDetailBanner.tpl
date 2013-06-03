@@ -69,9 +69,13 @@
         % endif
 
         % if launchInfo:
-        <a target="_blank" href="${launchInfo['launchLink']}" class="bookingLaunchLink" data-id="${bookingId}">
-            ${launchInfo['launchText']}
-        </a>
+            % if launchInfo['launchLink']:
+                <a target="_blank" href="${launchInfo['launchLink']}" class="bookingLaunchLink" data-id="${bookingId}">
+                    ${launchInfo['launchText']}
+                </a>
+            % else:
+                <span style="font-weight:bold; color:#888" class="bookingLaunchLink"  data-id="${bookingId}" >${launchInfo['launchText']}</span>
+            % endif
         <script type="text/javascript">
             videoServiceLaunchInfo["${bookingId}"] = ${jsonEncode(launchInfo['launchTooltip'])};
         </script>

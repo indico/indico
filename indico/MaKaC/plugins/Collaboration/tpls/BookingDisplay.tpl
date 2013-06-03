@@ -77,14 +77,19 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
         <span class="collaborationDisplayMoreInfo" id="collaborationBookingMoreInfo${id}">${ _("More Info") }</span>
     % endif
 
-    % if displayInfo and ((Kind == 'ongoing' and launchInfo) or Booking.getType()=="Vidyo"):
+    % if displayInfo and ((Kind in ['ongoing', 'scheduled'] and launchInfo) or Booking.getType()=="Vidyo"):
         <span style="margin-left: 5px; margin-right:5px;">|</span>
     % endif
 
-    % if (Kind == 'ongoing' and launchInfo) or Booking.getType()=="Vidyo":
-        <a href="${ launchInfo['launchLink'] }" id="bookingLink${id}">
-            ${ launchInfo['launchText'] }
-        </a>
+    % if (Kind in ['ongoing', 'scheduled'] and launchInfo) or Booking.getType()=="Vidyo":
+        % if Kind == 'ongoing' or Booking.getType()=="Vidyo":
+            <a href="${ launchInfo['launchLink'] }" id="bookingLink${id}">
+                ${ launchInfo['launchText'] }
+            </a>
+        % else:
+            <span style="color:#888" id="bookingLink${id}" >${launchInfo['launchText']}</span>
+        % endif
+
         <script type="text/javascript">
             $E('bookingLink${id}').dom.onmouseover = function (event) {
                 IndicoUI.Widgets.Generic.tooltip($E('bookingLink${id}').dom, event,

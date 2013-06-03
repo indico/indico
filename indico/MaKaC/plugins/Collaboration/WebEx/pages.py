@@ -25,17 +25,20 @@ from MaKaC.plugins.Collaboration.pages import WAdvancedTabBase
 
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCSSBase
 from MaKaC.plugins.Collaboration.WebEx.common import getMinStartDate, getMaxEndDate
+from MaKaC.common.timezoneUtils import nowutc
+from indico.util.date_time import format_datetime
 
 from MaKaC.i18n import _
 
 import re
 
+
 class WNewBookingForm(WCSPageTemplateBase):
 
     def getVars(self):
-        vars = WCSPageTemplateBase.getVars( self )
+        vars = WCSPageTemplateBase.getVars(self)
         vars["EventTitle"] = self._conf.getTitle()
-        vars["EventDescription"] = unescape_html(strip_ml_tags( self._conf.getDescription())).strip()
+        vars["EventDescription"] = unescape_html(strip_ml_tags(self._conf.getDescription())).strip()
 
         vars["DefaultStartDate"] = formatDateTime(self._conf.getAdjustedStartDate())
         vars["DefaultEndDate"] = formatDateTime(self._conf.getAdjustedEndDate())
@@ -46,13 +49,14 @@ class WNewBookingForm(WCSPageTemplateBase):
         sessions = "<select name='session' id='session' onchange='updateSessionTimes()'><option value=''>None</option>"
         count = 0
         sessionList = self._conf.getSessionList()
-        for session  in sessionList:
+        for session in sessionList:
             count = count + 1
-            sessions = sessions + "<option value='%s'>%s</option>" % (str(session.getId()), session.getTitle() )
+            sessions = sessions + "<option value='%s'>%s</option>" % (str(session.getId()), session.getTitle())
         sessions += "</select>"
         vars["SessionList"] = sessions
 
         return vars
+
 
 class WAdvancedTab(WAdvancedTabBase):
 
@@ -60,43 +64,47 @@ class WAdvancedTab(WAdvancedTabBase):
         variables = WAdvancedTabBase.getVars(self)
         return variables
 
+
 class WMain (WJSBase):
 
     def getVars(self):
-        vars = WJSBase.getVars( self )
+        vars = WJSBase.getVars(self)
 
         vars["AllowedStartMinutes"] = self._WebExOptions["allowedPastMinutes"].getValue()
         vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf))
         vars["MaxEndDate"] = formatDateTime(getMaxEndDate(self._conf))
         vars["AllowedMarginMinutes"] = self._WebExOptions["allowedMinutes"].getValue()
-#        from MaKaC.common.logger import Logger
+        # from MaKaC.common.logger import Logger
         vars["LoggedInEmail"] = self._user.getEmail()
-#        Logger.get('WebEx').error(self._user.getEmail())
+        # Logger.get('WebEx').error(self._user.getEmail())
         return vars
+
 
 class WExtra (WJSBase):
 
     def getVars(self):
-        vars = WJSBase.getVars( self )
+        vars = WJSBase.getVars(self)
         vars["SessionTimes"] = "{}"
         vars["MinStartDate"] = ''
         vars["MaxEndDate"] = ''
         vars["AllowedStartMinutes"] = self._WebExOptions["allowedPastMinutes"].getValue()
         vars["LoggedInEmail"] = self._user.getEmail()
         sessionTimes = ""
-        if not hasattr(self, "_conf") or self._conf == None:
+        if not hasattr(self, "_conf") or self._conf is None:
             return vars
         sessionList = self._conf.getSessionList()
-        for session  in sessionList:
-            sessionTimes = sessionTimes + """{"id":"%s", "start":"%s", "end":"%s" },""" % (str(session.getId()), formatDateTime(session.getAdjustedStartDate()), formatDateTime(session.getAdjustedEndDate()) )
+        for session in sessionList:
+            sessionTimes = sessionTimes + """{"id":"%s", "start":"%s", "end":"%s" },""" % (str(session.getId()), formatDateTime(session.getAdjustedStartDate()), formatDateTime(session.getAdjustedEndDate()))
         vars["SessionTimes"] = '{ "sessions": [' + sessionTimes[:-1] + ']}'
         if self._conf:
-            vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf), format = "%a %d/%m %H:%M")
-            vars["MaxEndDate"] = formatDateTime(getMaxEndDate(self._conf), format = "%a %d/%m %H:%M")
+            vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf), format="%a %d/%m %H:%M")
+            vars["MaxEndDate"] = formatDateTime(getMaxEndDate(self._conf), format="%a %d/%m %H:%M")
         return vars
+
 
 class WIndexing(WJSBase):
     pass
+
 
 class WInformationDisplay(WCSPageTemplateBase):
 
@@ -106,17 +114,20 @@ class WInformationDisplay(WCSPageTemplateBase):
         self._displayTz = displayTz
 
     def getVars(self):
-        vars = WCSPageTemplateBase.getVars( self )
+        vars = WCSPageTemplateBase.getVars(self)
         vars["Booking"] = self._booking
         return vars
 
+
 class WStyle(WCSCSSBase):
     pass
+
 
 class XMLGenerator(object):
     @classmethod
     def getFirstLineInfo(cls, booking, displayTz):
         return booking._bookingParams["meetingTitle"]
+
     @classmethod
     def getDisplayName(cls):
         return "WebEx"
@@ -167,9 +178,10 @@ class XMLGenerator(object):
         out.closeTag("section")
         out.openTag("section")
         out.writeTag("title", _('Access code:'))
-        out.writeTag("line", re.sub(r'(\d{3})(?=\d)',r'\1 ', str(booking._webExKey)[::-1])[::-1])
+        out.writeTag("line", re.sub(r'(\d{3})(?=\d)', r'\1 ', str(booking._webExKey)[::-1])[::-1])
         out.closeTag("section")
         out.closeTag("information")
+
 
 class ServiceInformation(object):
     @classmethod
@@ -182,47 +194,53 @@ class ServiceInformation(object):
 
     @classmethod
     def getLaunchInfo(cls, booking, displayTz=None):
+        launchInfo = {
+            "launchText":  _("Join Now!"),
+            "launchLink": ""
+        }
         if (booking.canBeStarted()):
-            return {
-                "launchText" : _("Join Now!"),
-                "launchLink" : booking.getUrl(),
-                "launchTooltip" : _("Click here to join the WebEx meeting!")
-            }
-        return None
+                launchInfo["launchLink"] = booking.getURL()
+                launchInfo["launchTooltip"] = _('Click here to join the WebEx meeting!')
+        else:
+            if booking.getStartDate() > nowutc():
+                launchInfo["launchTooltip"] = _('This meeting starts at %s so you cannot join it yet')%format_datetime(booking.getStartDate())
+            else:
+                launchInfo["launchTooltip"] = _('This meeting has already took place')
+        return launchInfo
 
     @classmethod
     def getInformation(cls, booking, displayTz=None):
         sections = []
         sections.append({
-            "title" : _('Title:'),
-            "lines" : [booking._bookingParams["meetingTitle"]]
+            "title": _('Title:'),
+            "lines": [booking._bookingParams["meetingTitle"]]
         })
 
         if booking.getHasAccessPassword():
             if not booking.showAccessPassword():
                 sections.append({
-                    "title" : _('Password:'),
-                    "lines" : [_('This WebEx meeting is protected by a password')]
+                    "title": _('Password:'),
+                    "lines": [_('This WebEx meeting is protected by a password')]
                 })
             else:
                 sections.append({
-                    "title" : _('Password:'),
-                    "lines" : [booking.getAccessPassword()]
+                    "title": _('Password:'),
+                    "lines": [booking.getAccessPassword()]
                 })
         sections.append({
-            "title" : _("Auto-join URL:"),
-            "linkLines" : [(booking.getUrl(), booking.getUrl())]
+            "title": _("Auto-join URL:"),
+            "linkLines": [(booking.getUrl(), booking.getUrl())]
         })
         sections.append({
-            "title" : _("Call-in toll free number (US/Canada):"),
-            "lines" : [booking.getPhoneNum()]
+            "title": _("Call-in toll free number (US/Canada):"),
+            "lines": [booking.getPhoneNum()]
         })
         sections.append({
-            "title" : _("Call-in toll number: (US/Canada):"),
-            "lines" : [booking.getPhoneNumToll()]
+            "title": _("Call-in toll number: (US/Canada):"),
+            "lines": [booking.getPhoneNumToll()]
         })
         sections.append({
-            "title" : _("Access code:"),
-            "lines" : [re.sub(r'(\d{3})(?=\d)',r'\1 ', str(booking._webExKey)[::-1])[::-1]]
+            "title": _("Access code:"),
+            "lines": [re.sub(r'(\d{3})(?=\d)', r'\1 ', str(booking._webExKey)[::-1])[::-1]]
         })
         return sections
