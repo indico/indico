@@ -27,23 +27,31 @@ import time
 from flask import request, redirect
 from flask import current_app as app
 from flask import send_file as _send_file
+from types import ClassType
 from werkzeug.datastructures import Headers
+from werkzeug.routing import BaseConverter
 
 from MaKaC.common import Config
+from MaKaC.plugins.base import RHMapMemory
+from indico.web.rh import RHHtdocs
 
 
 def _to_utf8(x):
     return x.encode('utf-8')
 
 
+def create_flat_args():
+    args = request.args.copy()
+    args.update(request.form)
+    flat_args = {}
+    for key, item in args.iterlists():
+        flat_args[key] = map(_to_utf8, item) if len(item) > 1 else _to_utf8(item[0])
+    return flat_args
+
+
 def create_flask_mp_wrapper(func):
     def wrapper():
-        args = request.args.copy()
-        args.update(request.form)
-        flat_args = {}
-        for key, item in args.iterlists():
-            flat_args[key] = map(_to_utf8, item) if len(item) > 1 else _to_utf8(item[0])
-        return func(None, **flat_args)
+        return func(None, **create_flat_args())
     return wrapper
 
 
@@ -58,6 +66,24 @@ def create_modpython_rules(app):
             rule = base_url if func_name == 'index' else base_url + '/' + func_name
             endpoint = 'mp-%s-%s' % (re.sub(r'\.py$', '', name), func_name)
             app.add_url_rule(rule, endpoint, view_func=create_flask_mp_wrapper(func), methods=('GET', 'POST'))
+
+
+def create_flask_rh_wrapper(rh):
+    def wrapper(**kwargs):
+        return rh(None).process(create_flat_args())
+    return wrapper
+
+
+def create_plugin_rules(app):
+    for regex, rh in RHMapMemory()._map.iteritems():
+        if hasattr(rh, 'mro') and RHHtdocs in rh.mro():
+            # TODO: handle RHHtdocs somehow
+            continue
+        print regex.pattern[2:]
+        assert regex.pattern[:2] == '^/'
+        rule = '/<regex("%s"):unused>' % regex.pattern[2:]
+        endpoint = 'plugin-%s' % rh.__name__
+        app.add_url_rule(rule, endpoint, view_func=create_flask_rh_wrapper(rh), methods=('GET', 'POST'))
 
 
 def send_file(name, path, ftype, last_modified=None, no_cache=True):
@@ -75,6 +101,12 @@ def send_file(name, path, ftype, last_modified=None, no_cache=True):
         rv.cache_control.private = True
         rv.cache_control.no_cache = True
     return rv
+
+
+class RegexConverter(BaseConverter):
+    def __init__(self, url_map, *items):
+        super(RegexConverter, self).__init__(url_map)
+        self.regex = items[0]
 
 
 class ResponseUtil(object):

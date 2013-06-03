@@ -32,7 +32,7 @@ from MaKaC.i18n import _
 from MaKaC.webinterface.pages.error import WErrorWSGI
 from MaKaC.services.interface.rpc.json import process as jsonrpc_handler
 
-from indico.web.flask.util import create_modpython_rules, XAccelMiddleware
+from indico.web.flask.util import create_modpython_rules, create_plugin_rules, XAccelMiddleware, RegexConverter
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.http_api.handlers import handler as api_handler
 
@@ -65,6 +65,10 @@ def configure_app(app):
             app.wsgi_app = XAccelMiddleware(app.wsgi_app, args)
         else:
             raise ValueError('Invalid static file method: %s' % method)
+
+
+def extend_url_map(app):
+    app.url_map.converters['regex'] = RegexConverter
 
 
 def add_handlers(app):
@@ -101,6 +105,8 @@ def make_app():
     app = IndicoFlask('indico', static_folder=None)
     fix_root_path(app)
     configure_app(app)
+    extend_url_map(app)
     add_handlers(app)
     create_modpython_rules(app)
+    create_plugin_rules(app)
     return app
