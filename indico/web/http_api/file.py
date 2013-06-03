@@ -23,10 +23,9 @@ import re
 # indico imports
 from indico.web.http_api.metadata.serializer import Serializer
 
-from indico.web.http_api.api import HTTPAPIHook, DataFetcher
+from indico.web.http_api.api import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.rh.file import set_file_headers
-from indico.web.wsgi import webinterface_handler_config as apache
 
 # legacy imports
 from MaKaC.conference import LocalFile
@@ -36,7 +35,7 @@ from MaKaC.common import Config
 @HTTPAPIHook.register
 class FileHook(HTTPAPIHook):
     """
-    Example: /export/file/conference/1/session/2/contrib/3/subcontrib/4/material/Slides/5.bin?ak=00000000-0000-0000-0000-000000000000
+    Example: /export/event/1/session/2/contrib/3/subcontrib/4/material/Slides/5.bin?ak=00000000-0000-0000-0000-000000000000
     """
     TYPES = ('file',)
     DEFAULT_DETAIL = 'bin'
@@ -56,8 +55,14 @@ class FileHook(HTTPAPIHook):
         self._material = self._pathParams['material']
         self._res = self._pathParams['res']
 
-        self._params = {'confId': self._event, 'sessionId': self._session, 'contribId': self._contrib,
-                  'subContId': self._subcontrib, 'materialId': self._material, 'resId': self._res}
+        self._params = {
+            'confId': self._event,
+            'sessionId': self._session,
+            'contribId': self._contrib,
+            'subContId': self._subcontrib,
+            'materialId': self._material,
+            'resId': self._res
+        }
 
         import MaKaC.webinterface.locators as locators
         l = locators.WebLocator()
@@ -65,14 +70,13 @@ class FileHook(HTTPAPIHook):
             l.setResource(self._params)
             self._file = l.getObject()
         except (KeyError, AttributeError):
-            raise HTTPAPIError("File not found", apache.HTTP_NOT_FOUND)
-
+            raise HTTPAPIError("File not found", 404)
 
     def export_file(self, aw):
         cfg = Config.getInstance()
 
         if not isinstance(self._file, LocalFile):
-            raise HTTPAPIError("Resource is not a file", apache.HTTP_NOT_FOUND)
+            raise HTTPAPIError("Resource is not a file", 404)
 
         return {
             "fname": self._file.getFileName(),
@@ -81,7 +85,7 @@ class FileHook(HTTPAPIHook):
             "data": "" if cfg.getUseXSendFile() else self._file.readBin(),
             "ftype": self._file.getFileType(),
             "fpath": self._file.getFilePath()
-            }
+        }
 
     def _hasAccess(self, aw):
         return self._file.canAccess(aw)
