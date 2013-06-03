@@ -75,7 +75,7 @@ class WPConfModifChat(WPConferenceModifBase):
         self._setActiveTab()
 
     def _setActiveSideMenuItem(self):
-        if self._pluginsDictMenuItem.has_key('Instant Messaging'):
+        if self._pluginsDictMenuItem.has_key('InstantMessaging'):
             self._pluginsDictMenuItem['Instant Messaging'].setActive(True)
 
     def _setActiveTab(self):
