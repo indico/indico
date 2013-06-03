@@ -91,6 +91,10 @@ class ResponseUtil(object):
         self.content_type = None
 
     @property
+    def modified(self):
+        return bool(self.headers) or self._redirect or self.status != 200 or self.content_type
+
+    @property
     def redirect(self):
         return self._redirect
 
@@ -113,6 +117,13 @@ class ResponseUtil(object):
         return redirect(*self.redirect)
 
     def make_response(self, res):
+        if isinstance(res, app.response_class):
+            if self.modified:
+                # If we receive a response - most likely one created by send_file - we do not allow any
+                # external modifications.
+                raise Exception('Cannot combine response object with custom modifications')
+            return res
+
         if self._redirect:
             return self.make_redirect()
 
