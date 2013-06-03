@@ -104,14 +104,7 @@ class SendElectronicAgreement(ConferenceModifBase):
         return permissive_format(self.content, mailEnv)
 
     def _getAnswer(self):
-        report = ""
-        i = 0
-        for email in self.emailToList:
-            i += 1
-            if i != len(self.emailToList):
-                report += "%s, "%email
-            else:
-                report += "%s."%email
+        report = ', '.join(self.emailToList) + '.'
 
         #{url} and {talkTitle} are mandatory to send the EA link
         if self.content.find('{url}') == -1:

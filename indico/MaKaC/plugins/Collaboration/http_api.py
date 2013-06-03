@@ -285,4 +285,3 @@ class VideoEventFetcher(IteratedDataFetcher):
 
         for booking in self._process(self.iter_bookings(idList, categ_id=categ_id), _filter, iface):
             yield booking
-
