@@ -73,8 +73,6 @@ class FileHook(HTTPAPIHook):
             raise HTTPAPIError("File not found", 404)
 
     def export_file(self, aw):
-        cfg = Config.getInstance()
-
         if not isinstance(self._file, LocalFile):
             raise HTTPAPIError("Resource is not a file", 404)
 
@@ -82,7 +80,6 @@ class FileHook(HTTPAPIHook):
             "fname": self._file.getFileName(),
             "last_modified": self._file.getCreationDate(),
             "size": self._file.getSize(),
-            "data": "" if cfg.getStaticFileMethod() else self._file.readBin(),
             "ftype": self._file.getFileType(),
             "fpath": self._file.getFilePath()
         }
@@ -103,9 +100,13 @@ class FileSerializer(Serializer):
     schemaless = False
 
     def _execute(self, fdata):
-        cfg = Config.getInstance()
-        self._mime = cfg.getFileTypeMimeType(fdata['ftype'])
         return send_file(fdata['fname'], fdata['fpath'], fdata['ftype'], fdata['last_modified'])
+
+    def set_headers(self, response):
+        # Usually the serializer would set the mime type on the ResponseUtil. however, this would trigger
+        # the fail-safe that prevents us from returning a response_class while setting custom headers.
+        # Besides that we don't need it since the send_file response already has the correct mime type.
+        pass
 
 
 Serializer.register('bin', FileSerializer)

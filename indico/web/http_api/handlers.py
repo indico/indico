@@ -295,8 +295,6 @@ def handler(prefix, path):
 
         try:
             data = serializer(result)
-            if isinstance(data, app.response_class):
-                return data
             serializer.set_headers(responseUtil)
             return responseUtil.make_response(data)
         except:
