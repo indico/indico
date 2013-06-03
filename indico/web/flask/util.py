@@ -22,9 +22,14 @@ from __future__ import absolute_import
 import glob
 import os
 import re
+import time
 
-from flask import request, current_app as app, redirect
+from flask import request, redirect
+from flask import current_app as app
+from flask import send_file as _send_file
 from werkzeug.datastructures import Headers
+
+from MaKaC.common import Config
 
 
 def _to_utf8(x):
@@ -53,6 +58,23 @@ def create_modpython_rules(app):
             rule = base_url if func_name == 'index' else base_url + '/' + func_name
             endpoint = 'mp-%s-%s' % (re.sub(r'\.py$', '', name), func_name)
             app.add_url_rule(rule, endpoint, view_func=create_flask_mp_wrapper(func), methods=('GET', 'POST'))
+
+
+def send_file(name, path, ftype, last_modified=None, no_cache=True):
+    as_attachment = request.user_agent.platform == 'android'  # is this still necessary?
+    mimetype = Config.getInstance().getFileTypeMimeType(ftype)  # ftype is e.g. "JPG"
+    rv = _send_file(path, mimetype=mimetype, as_attachment=as_attachment, attachment_filename=name)
+    if last_modified:
+        if not isinstance(last_modified, int):
+            last_modified = int(time.mktime(last_modified.timetuple()))
+        rv.last_modified = last_modified
+    if no_cache:
+        del rv.expires
+        del rv.cache_control.max_age
+        rv.cache_control.public = False
+        rv.cache_control.private = True
+        rv.cache_control.no_cache = True
+    return rv
 
 
 class ResponseUtil(object):
@@ -98,3 +120,38 @@ class ResponseUtil(object):
         if self.content_type:
             res.content_type = self.content_type
         return res
+
+
+class XAccelMiddleware(object):
+    """A WSGI Middleware that converts X-Sendfile headers to X-Accel-Redirect
+    headers if possible.
+
+    If the path is not mapped to a URI usable for X-Sendfile we abort with an
+    error since it likely means there is a misconfiguration.
+    """
+
+    def __init__(self, app, mapping):
+        self.app = app
+        self.mapping = mapping.items()
+
+    def __call__(self, environ, start_response):
+        def _start_response(status, headers, exc_info=None):
+            xsf_path = None
+            new_headers = []
+            for name, value in headers:
+                if name.lower() == 'x-sendfile':
+                    xsf_path = value
+                else:
+                    new_headers.append((name, value))
+            if xsf_path:
+                uri = self.make_x_accel_header(xsf_path)
+                if not uri:
+                    raise ValueError('Could not map %s to an URI' % xsf_path)
+                new_headers.append(('X-Accel-Redirect', uri))
+            return start_response(status, new_headers, exc_info)
+        return self.app(environ, _start_response)
+
+    def make_x_accel_header(self, path):
+        for base, uri in self.mapping:
+            if path.startswith(base + '/'):
+                return uri + path[len(base):]

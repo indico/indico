@@ -17,4 +17,5 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from indico.web.flask.app import app as application
+from indico.web.flask.app import make_app
+application = make_app()

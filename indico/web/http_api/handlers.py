@@ -29,6 +29,7 @@ import re
 import time
 import urllib
 from flask import request, session
+from flask import current_app as app
 from urlparse import parse_qs
 from ZODB.POSException import ConflictError
 
@@ -294,6 +295,8 @@ def handler(prefix, path):
 
         try:
             data = serializer(result)
+            if isinstance(data, app.response_class):
+                return data
             serializer.set_headers(responseUtil)
             return responseUtil.make_response(data)
         except:

@@ -183,7 +183,6 @@ class TestManager(object):
         defaults = {
             'BaseURL': 'http://localhost:8000/indico',
             'BaseSecureURL': '',
-            'UseXSendFile': False,
             'AuthenticatorList': ['Local'],
             'SmtpServer': ('localhost', 58025),
             'SmtpUseTLS': 'no',

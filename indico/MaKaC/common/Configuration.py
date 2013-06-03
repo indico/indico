@@ -479,7 +479,7 @@ class Config:
         'ApacheUser'                : 'nobody',
         'ApacheGroup'               : 'nogroup',
         'Profile'                   : 'no',
-        'UseXSendFile'              : 'no',
+        'StaticFileMethod'          : None,
         'AuthenticatedEnforceSecure': 'no',
         'MaxUploadFilesTotalSize' : '0',
         'MaxUploadFileSize' : '0',
@@ -622,6 +622,8 @@ class Config:
             except ImportError, e:
                 raise MaKaCError('Could not import redis: %s' % e.message)
 
+        if self.getStaticFileMethod() is not None and len(self.getStaticFileMethod()) != 2:
+            raise MaKaCError('StaticFileMethod must be None, a string or a 2-tuple')
 
     def __getattr__(self, attr):
         """Dynamic finder for values defined in indico.conf
@@ -660,7 +662,18 @@ class Config:
         return self._yesOrNoVariable('Profile')
 
     def getUseXSendFile(self):
-        return self._yesOrNoVariable('UseXSendFile')
+        raise NotImplementedError('Deprecated Method')
+
+    def getStaticFileMethod(self):
+        val = self._configVars['StaticFileMethod']
+        if not val:
+            return None
+        elif isinstance(val, basestring):
+            return val, None
+        elif not val[0]:
+            return None
+        else:
+            return val
 
     def getAuthenticatedEnforceSecure(self):
         return self._yesOrNoVariable('AuthenticatedEnforceSecure') and self.getBaseSecureURL()

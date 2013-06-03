@@ -21,11 +21,11 @@
 import re
 
 # indico imports
+from indico.web.flask.util import send_file
 from indico.web.http_api.metadata.serializer import Serializer
 
 from indico.web.http_api.api import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
-from indico.web.rh.file import set_file_headers
 
 # legacy imports
 from MaKaC.conference import LocalFile
@@ -82,7 +82,7 @@ class FileHook(HTTPAPIHook):
             "fname": self._file.getFileName(),
             "last_modified": self._file.getCreationDate(),
             "size": self._file.getSize(),
-            "data": "" if cfg.getUseXSendFile() else self._file.readBin(),
+            "data": "" if cfg.getStaticFileMethod() else self._file.readBin(),
             "ftype": self._file.getFileType(),
             "fpath": self._file.getFilePath()
         }
@@ -104,17 +104,8 @@ class FileSerializer(Serializer):
 
     def _execute(self, fdata):
         cfg = Config.getInstance()
-
         self._mime = cfg.getFileTypeMimeType(fdata['ftype'])
-
-        if cfg.getUseXSendFile():
-            return ""
-        else:
-            return fdata['data']
-
-    def set_headers(self, response):
-        super(FileSerializer, self).set_headers(response)
-        set_file_headers(response, **self._obj)
+        return send_file(fdata['fname'], fdata['fpath'], fdata['ftype'], fdata['last_modified'])
 
 
 Serializer.register('bin', FileSerializer)

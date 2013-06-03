@@ -37,7 +37,7 @@ try:
 except ImportError:
     SSL = None
 
-from indico.web.flask.app import app as flask_app
+from indico.web.flask.app import make_app
 from indico.core.index import Catalog
 from indico.util import console
 
@@ -266,6 +266,8 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
     # Let Indico know that we are using the embedded server. This causes it to re-raise exceptions so they
     # end up in the Werkzeug debugger.
     config._configVars['EmbeddedWebserver'] = True
+    # We obviously do not have X-Sendfile or X-Accel-Redirect support in the embedded server
+    config._configVars['StaticFileMethod'] = None
 
     # Get appropriate base url and defaults
     base_url = config.getBaseSecureURL() if with_ssl else config.getBaseURL()
@@ -319,7 +321,7 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
     config._deriveOptions()
 
     console.info(' * Using BaseURL {0}'.format(base_url))
-    app = make_indico_dispatcher(flask_app)
+    app = make_indico_dispatcher(make_app())
     server = WerkzeugServer(app, host, used_port, reload_on_change=reload_on_change,
                             enable_ssl=with_ssl, ssl_cert=ssl_cert, ssl_key=ssl_key)
     signal.signal(signal.SIGINT, _sigint)

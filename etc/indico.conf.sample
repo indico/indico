@@ -183,18 +183,33 @@ MaxUploadFileSize = 0
 
 
 #------------------------------------------------------------------------------
-# X-SENDFILE
+# STATIC FILE DELIVERY
 #------------------------------------------------------------------------------
-# Indico supports the use of the X-Sendfile header:
+# Indico supports the use of the X-Sendfile and X-Accel-Redirect headers:
 #
 # http://blog.lighttpd.net/articles/2006/07/02/x-sendfile
+# http://wiki.nginx.org/X-accel
 #
 # If your webserver supports this feature and you want to activate it,
-# you should set it to 'yes'. Default value is 'no'
+# you should enable it here
 #
-#     UseXSendFile = "yes"
+# X-Sendfile (apache with mod_xsendfile, lighttpd):
+# StaticFileMethod = 'xsendfile'
+#
+# X-Accel-Redirect (nginx):
+# StaticFileMethod = ('xaccelredirect', {
+#     '/opt/indico/archive': '/.xsf/archive',
+#     '/opt/indico/htdocs': '/.xsf/htdocs'
+# })
+# Because of the way nginx works (using URLs instead of paths) you also need to map the .xsf urls to
+# the paths in your nginx config (for each entry in the dict above):
+# location /.xsf/archive/ {
+#     internal;
+#     alias /opt/indico/archive/;
+# }
+# DO NOT forget the "internal;" statement - it prevents users from accessing those URLs directly.
 
-UseXSendFile = "no"
+StaticFileMethod = None
 
 
 #------------------------------------------------------------------------------

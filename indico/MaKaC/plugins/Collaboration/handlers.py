@@ -27,6 +27,8 @@ import os, tempfile, time
 
 # indico api imports
 from indico.util import json
+from indico.web.flask.util import send_file
+from indico.web.rh import RHHtdocs
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.conference import LocalFile
@@ -307,30 +309,12 @@ class RHElectronicAgreementGetFile(RHConfModifCSBookings):
     def _process(self):
         manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         sw = manager.getSpeakerWrapperByUniqueId(self.spkUniqueId)
-        if sw:
-            self.file = sw.getLocalFile()
-            self._req.headers_out["Content-Length"] = "%s"%self.file.getSize()
-            self._req.headers_out["Last-Modified"] = "%s"%time.mktime(self.file.getCreationDate().timetuple())
-            cfg = Config.getInstance()
-            mimetype = cfg.getFileTypeMimeType( self.file.getFileType() )
-            print self.file.getFilePath()
-            self._req.content_type = """%s"""%(mimetype)
-            dispos = "inline"
-            try:
-                if self._req.headers_in['User-Agent'].find('Android') != -1:
-                    dispos = "attachment"
-            except KeyError:
-                pass
-            self._req.headers_out["Content-Disposition"] = '%s; filename="%s"' % (dispos, cleanHTMLHeaderFilename(self.file.getFileName()))
-
-            if cfg.getUseXSendFile():
-                # X-Send-File support makes it easier, just let the web server
-                # do all the heavy lifting
-                return self._req.send_x_file(self.file.getFilePath())
-            else:
-                return self.file.readBin()
-        else:
+        if not sw:
             raise MaKaCError("The speaker wrapper id does not match any existing speaker.")
+        self.file = sw.getLocalFile()
+        return send_file(self.file.getFileName(), self.file.getFilePath(), self.file.getFileType(),
+                         self.file.getCreationDate())
+
 
 class RHElectronicAgreementForm(RHConferenceBaseDisplay):
     _url = r'^/Collaboration/elecAgreeForm/?$'

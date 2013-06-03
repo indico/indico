@@ -28,7 +28,7 @@ from MaKaC.conference import Reviewing, Link
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
 from copy import copy
 
-from indico.web.rh.file import set_file_headers, send_file
+from indico.web.flask.util import send_file
 
 
 class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
@@ -59,14 +59,8 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
             p = files.WPMinutesDisplay(self, self._file )
             return p.display()
         else:
-            set_file_headers(self._req,
-                             fname=self._file.getFileName(),
-                             last_modified=self._file.getCreationDate(),
-                             size=self._file.getSize(),
-                             data=self._file.readBin(),
-                             ftype=self._file.getFileType(),
-                             fpath=self._file.getFilePath())
-            return send_file(self._req, self._file)
+            return send_file(self._file.getFileName(), self._file.getFilePath(), self._file.getFileType(),
+                             self._file.getCreationDate())
 
 
 class RHFileAccessStoreAccessKey( RHFileBase ):
