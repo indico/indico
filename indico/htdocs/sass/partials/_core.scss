@@ -1,23 +1,5 @@
 /* Basic elements */
 
-h1, h2, h3, h4 {
-   font-family: "Helvetica Neue", Helvetica, Verdana, Arial, Sans-serif;
-}
-
-h2 {
-    font-size: 1.5em;
-}
-
-h3 {
-    font-size: 1.3em;
-}
-
-h2.page_title {
-    margin-top: 0.8em;
-    font-size: 2em;
-    color: #B14300;
-}
-
 .right {
     float: right;
 }
@@ -45,50 +27,6 @@ h2.page_title {
 
 .weak-hidden {
     display: none;
-}
-
-.overflow {
-    overflow: auto;
-}
-
-.nohtml {
-    white-space: pre-line;
-}
-
-.bold {
-    font-weight: bold;
-}
-
-.italic {
-    font-style: italic;
-}
-
-.text-right {
-    text-align: right;
-}
-
-.text-important {
-    color: #111;
-}
-
-.text-normal {
-    color: #444;
-}
-
-.text-not-important {
-    color: #777;
-}
-
-.text-superfluous {
-    color: #BBB;
-}
-
-.quotation {
-    margin: 10px;
-    padding-left: 10px;
-    color: #777;
-    border-left: 4px solid #ddd;
-    font-family: Georgia, Times, Serif;
 }
 
 .icon-medium{

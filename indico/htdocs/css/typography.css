@@ -1,0 +1,91 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+h1 {
+   font-family: "Roboto", "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+}
+
+h2, h3, h4 {
+    font-family: "Roboto Light", "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+}
+
+h2 {
+    font-size: 1.5em;
+}
+
+h3 {
+    font-size: 1.3em;
+}
+
+/* Elements */
+
+.page_title {
+    margin-top: 0;
+    font-size: 2em;
+    font-weight: normal;
+    color: #B14300;
+}
+
+.quotation {
+    margin: 10px;
+    padding-left: 10px;
+    color: #777;
+    border-left: 4px solid #ddd;
+    font-family: Georgia, Times, Serif;
+}
+
+/* Quick rules */
+
+.nohtml {
+    white-space: pre-line;
+}
+
+.overflow {
+    overflow: auto;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-important {
+    color: #111;
+}
+
+.text-normal {
+    color: #444;
+}
+
+.text-not-important {
+    color: #777;
+}
+
+.text-superfluous {
+    color: #BBB;
+}
