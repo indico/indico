@@ -16,10 +16,12 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 from textwrap import TextWrapper
 
 from BTrees.IOBTree import IOBTree
+from cStringIO import StringIO
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.mail as mail
@@ -34,6 +36,7 @@ from MaKaC.errors import MaKaCError, NoReportError
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.web.flask.util import send_file
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 from MaKaC.webinterface.rh.fileAccess import RHFileAccess
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
@@ -208,8 +211,7 @@ class RHAbstractModificationAction(RHAbstractSubmissionBase, AbstractParam):
         if self._getUser() == None:
             return
 
-        header_size = self._req.headers_in["content-length"]
-        AbstractParam._checkParams(self, params, self._conf, header_size)
+        AbstractParam._checkParams(self, params, self._conf, request.content_length)
 
 
 class RHAbstractSubmission( RHAbstractModificationAction ):
@@ -379,18 +381,11 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
         if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
             raise MaKaCError( _("The Call For Abstracts was disabled by the conference managers"))
 
-    def _process( self ):
-        tz = timezoneUtils.DisplayTZ(self._aw,self._conf).getDisplayTZ()
-        filename = "%s - Abstract.pdf"%self._target.getTitle()
-        pdf = AbstractToPDF(self._conf, self._target,tz=tz)
-        data = pdf.getPDFBin()
-        #self._req.headers_out["Accept-Ranges"] = "bytes"
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+    def _process(self):
+        tz = timezoneUtils.DisplayTZ(self._aw, self._conf).getDisplayTZ()
+        filename = '%s - Abstract.pdf' % self._target.getTitle()
+        pdf = AbstractToPDF(self._conf, self._target, tz=tz)
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
 
 class RHUserAbstractsPDF(RHAbstractSubmissionBase):
@@ -404,15 +399,8 @@ class RHUserAbstractsPDF(RHAbstractSubmissionBase):
         if not self._abstractIds:
             return _("No abstract to print")
 
-        filename = "Abstracts.pdf"
-        pdf = AbstractsToPDF(self._conf, self._abstractIds,tz=tz)
-        data = pdf.getPDFBin()
-        self._req.set_content_length(len(data))
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+        pdf = AbstractsToPDF(self._conf, self._abstractIds, tz=tz)
+        return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
 
 class RHAbstractModificationBase( RHAbstractDisplayBase, RHModificationBaseProtected ):
