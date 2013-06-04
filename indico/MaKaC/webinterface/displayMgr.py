@@ -851,15 +851,15 @@ class SystemLinkData(Observable):
                     "URL": 'UHConferenceCFA',
                     "parent": ""},
                 "ViewAbstracts": {
-                    "caption": N_("View my abstracts"),
+                    "caption": N_("View my Abstracts"),
                     "URL": 'UHUserAbstracts',
                     "parent": "CFA"},
                 "SubmitAbstract": {
-                    "caption": N_("Submit a new abstract"),
+                    "caption": N_("Submit Abstract"),
                     "URL": 'UHAbstractSubmission',
                     "parent": "CFA"},
                 "manageTrack": {
-                    "caption": N_("Manage my tracks"),
+                    "caption": N_("Manage my Tracks"),
                     "URL": 'UHConfMyStuffMyTracks',
                     "parent": "programme"},
                 "timetable": {
@@ -871,28 +871,28 @@ class SystemLinkData(Observable):
                     "URL": 'UHContributionList',
                     "parent": ""},
                 "authorIndex": {
-                    "caption": N_("Author index"),
+                    "caption": N_("Author List"),
                     "URL": 'UHConfAuthorIndex',
                     "parent": ""},
                 "speakerIndex": {
-                    "caption": N_("Speaker index"),
+                    "caption": N_("Speaker List"),
                     "URL": 'UHConfSpeakerIndex',
                     "parent": "",
                     "visibilityByDefault": False},
                 "mystuff": {
-                    "caption": N_("My conference"),
+                    "caption": N_("My Conference"),
                     "URL": 'UHConfMyStuff',
                     "parent": ""},
                 "mytracks": {
-                    "caption": N_("My tracks"),
+                    "caption": N_("My Tracks"),
                     "URL": 'UHConfMyStuffMyTracks',
                     "parent": "mystuff"},
                 "mysessions": {
-                    "caption": N_("My sessions"),
+                    "caption": N_("My Sessions"),
                     "URL": 'UHConfMyStuffMySessions',
                     "parent": "mystuff"},
                 "mycontribs": {
-                    "caption": N_("My contributions"),
+                    "caption": N_("My Contributions"),
                     "URL": 'UHConfMyStuffMyContributions',
                     "parent": "mystuff"},
                 "paperreviewing": {
@@ -904,7 +904,7 @@ class SystemLinkData(Observable):
                     "URL": 'UHConfModifReviewingPaperSetup',
                     "parent": "paperreviewing"},
                 "assigncontributions": {
-                    "caption": N_("Assign papers"),
+                    "caption": N_("Assign Papers"),
                     "URL": 'UHConfModifReviewingAssignContributionsList',
                     "parent": "paperreviewing"},
                 "judgelist": {
@@ -920,15 +920,15 @@ class SystemLinkData(Observable):
                     "URL": 'UHConfModifListContribToJudgeAsEditor',
                     "parent": "paperreviewing"},
                 "uploadpaper": {
-                    "caption": N_("Upload paper"),
+                    "caption": N_("Upload Paper"),
                     "URL": 'UHUploadPaper',
                     "parent": "paperreviewing"},
                 "downloadtemplate": {
-                    "caption": N_("Download template"),
+                    "caption": N_("Download Template"),
                     "URL": 'UHDownloadPRTemplate',
                     "parent": "paperreviewing"},
                 "abstractsBook": {
-                    "caption": N_("Book of abstracts"),
+                    "caption": N_("Book of Abstracts"),
                     "URL": 'UHConfAbstractBook',
                     "parent": "",
                     "displayTarget": "_blank"},
@@ -937,7 +937,7 @@ class SystemLinkData(Observable):
                     "URL": 'UHConfRegistrationForm',
                     "parent": ""},
                 "ViewMyRegistration": {
-                    "caption": N_("Modify my registration"),
+                    "caption": N_("Modify my Registration"),
                     "URL": 'UHConfRegistrationFormModify',
                     "parent": "registrationForm"},
                 "NewRegistration": {
@@ -945,7 +945,7 @@ class SystemLinkData(Observable):
                     "URL": 'UHConfRegistrationFormDisplay',
                     "parent": "registrationForm"},
                 "registrants": {
-                    "caption": N_("List of registrants"),
+                    "caption": N_("Participant List"),
                     "URL": 'UHConfRegistrantsList',
                     "parent": "",
                     "visibilityByDefault": False},
@@ -958,7 +958,7 @@ class SystemLinkData(Observable):
                     "URL": 'UHConfEvaluationDisplay',
                     "parent": "evaluation"},
                 "viewMyEvaluation": {
-                    "caption": N_("Modify my evaluation"),
+                    "caption": N_("Modify my Evaluation"),
                     "URL": 'UHConfEvaluationDisplayModif',
                     "parent": "evaluation"}
             }
