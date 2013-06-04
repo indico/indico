@@ -638,9 +638,13 @@ class RH(RequestHandlerBase):
         except MaKaCError, e:
             res = self._processGeneralError( e )
             DBMgr.getInstance().endRequest(False)
+            if Config.getInstance().getPropagateAllExceptions():
+                raise
         except ValueError, e:
             res = self._processGeneralError( e )
             DBMgr.getInstance().endRequest(False)
+            if Config.getInstance().getPropagateAllExceptions():
+                raise
         except OAuthError, e:
             from indico.util import json
             res = json.dumps(e.fossilize())
@@ -651,7 +655,7 @@ class RH(RequestHandlerBase):
             DBMgr.getInstance().endRequest(False)
         except Exception, e: #Generic error treatment
             res = self._processUnexpectedError( e )
-            if Config.getInstance().getEmbeddedWebserver():
+            if Config.getInstance().getEmbeddedWebserver() or Config.getInstance().getPropagateAllExceptions():
                 # Re-raise to get the nice werkzeug exception view
                 raise
             #DBMgr.getInstance().endRequest(False)

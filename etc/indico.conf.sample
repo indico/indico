@@ -49,6 +49,18 @@ AuthenticatedEnforceSecure = "yes"
 #    3: The above & require an empty or valid referer for normal POST requests
 CSRFLevel = 2
 
+#------------------------------------------------------------------------------
+# Development
+#------------------------------------------------------------------------------
+# You can force a certain number of (simulated) database conflicts on every
+# by setting ForceConflicts to the number of conflict errors you want:
+#ForceConflicts = 0
+#
+# You can cause all error-like exceptions (i.e. not something like AccessError)
+# to be propagated outside the Indico WSGI app by enabling this option. This has
+# the advantage of triggering the Werkzeug debugger of the embedded server even
+# in case of e.g. a MaKaCError.
+#PropagateAllExceptions = False
 
 #------------------------------------------------------------------------------
 # URLs

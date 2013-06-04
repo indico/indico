@@ -482,6 +482,7 @@ class Config:
         'MaxUploadFilesTotalSize' : '0',
         'MaxUploadFileSize' : '0',
         'ForceConflicts' : 0,
+        'PropagateAllExceptions' : False,
         'EmbeddedWebserver' : False,
         'OAuthAccessTokenTTL' : 10000,
         'MobileURL' : '',
