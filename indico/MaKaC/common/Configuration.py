@@ -476,8 +476,6 @@ class Config:
         'CssStylesheetName'         : 'indico.css',
         'PublicFolder'              : "/opt/indico/htdocs/results",
         'ReportNumberSystems'       : {},
-        'ApacheUser'                : 'nobody',
-        'ApacheGroup'               : 'nogroup',
         'Profile'                   : 'no',
         'StaticFileMethod'          : None,
         'AuthenticatedEnforceSecure': 'no',

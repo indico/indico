@@ -548,10 +548,6 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
     # find the apache user/group
     user, group = _findApacheUserGroup(uid, gid)
 
-    # change indico.conf
-    modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheUser', user)
-    modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheGroup', group)
-
     # set the directory for the egg cache
     _updateMaKaCEggCache(os.path.join(package_dir, 'MaKaC', '__init__.py'), targetDirs['tmp'])
 

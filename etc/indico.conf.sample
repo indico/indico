@@ -140,22 +140,6 @@ NoReplyEmail	     = "noreply-root@localhost"
 
 
 #------------------------------------------------------------------------------
-# APACHE
-#------------------------------------------------------------------------------
-# If you change either ApacheUser or ApacheGroup after installation and you
-# are on Linux you need to chown -R the directories pointed at by
-#   - LogDir
-#   - UploadedFilesTempDir
-
-# ApacheUser is the user that Apache runs as (Look for "User" inside httpd.conf)
-
-ApacheUser = "nobody"
-
-# ApacheGroup is the group that Apache runs as (Look for "Group" inside httpd.conf)
-
-ApacheGroup = "nogroup"
-
-#------------------------------------------------------------------------------
 # FILE UPLOAD
 #------------------------------------------------------------------------------
 # Here you can limit the maximum size of all the uploaded files (in MB) in a
