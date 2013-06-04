@@ -1169,6 +1169,14 @@ class WText(wcomponents.WTemplated):
         wcomponents.WTemplated("events/Text")
 
 
+class WConfDisplayBodyBase(wcomponents.WTemplated):
+
+    def _getTitle(self):
+        default_caption = displayMgr.SystemLinkData().getLinkData()[self._linkname]["caption"]
+        caption = self._conf.getDisplayMgr().getMenu().getLinkByName(self._linkname).getCaption()
+        return _(caption) if caption == default_caption else caption
+
+
 class WConfProgram(wcomponents.WTemplated):
 
     def __init__(self, aw, conf):
@@ -5081,17 +5089,22 @@ class WConfContributionList ( wcomponents.WTemplated ):
         return vars
 
 
-class WConfAuthorIndex(wcomponents.WTemplated):
+class WConfAuthorIndex(WConfDisplayBodyBase):
 
     def __init__(self, conf):
         self._conf = conf
-
+        self._linkname = "authorIndex"
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        res = []
-        for key, authors in self._conf.getAuthorIndex().iteritems():
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        wvars["items"] = dict(enumerate(self._getItems()))
+        return wvars
 
+    def _getItems(self):
+        res = []
+
+        for key, authors in self._conf.getAuthorIndex().iteritems():
             # get the first identity that matches the author
             if len(authors) == 0:
                 continue
@@ -5111,13 +5124,11 @@ class WConfAuthorIndex(wcomponents.WTemplated):
                 contrib = auth.getContribution()
                 if contrib is not None:
                     contribs.append({
-                            'title': contrib.getTitle(),
-                            'url': str(urlHandlers.UHContributionDisplay.getURL(auth.getContribution())),
-                            'materials': fossilize(contrib.getAllMaterialList())
-                            })
-
-        vars["items"] = dict(enumerate(res))
-        return vars
+                        'title': contrib.getTitle(),
+                        'url': str(urlHandlers.UHContributionDisplay.getURL(auth.getContribution())),
+                        'materials': fossilize(contrib.getAllMaterialList())
+                    })
+        return res
 
 
 class WPAuthorIndex(WPConferenceDefaultDisplayBase):
@@ -5127,12 +5138,12 @@ class WPAuthorIndex(WPConferenceDefaultDisplayBase):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
             self._asset_env['indico_authors'].urls()
 
-    def _getBody(self,params):
+    def _getBody(self, params):
         wc = WConfAuthorIndex(self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ):
-        WPConferenceDefaultDisplayBase._defineSectionMenu( self )
+    def _defineSectionMenu(self):
+        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._authorIndexOpt)
 
 class WConfSpeakerIndex(wcomponents.WTemplated):
