@@ -206,10 +206,12 @@ class MemcachedCacheStorage(CacheStorage):
         return hashlib.sha256(os.path.join(self._name, path, name)).hexdigest()
 
     def save(self, path, name, data):
-        self._connect().set(self._makeKey(path, name), data, self.getTTL())
+        self._connect().set(self._makeKey(path, name), pickle.dumps(data), self.getTTL())
 
     def load(self, path, name, default=None):
         obj = self._connect().get(self._makeKey(path, name))
+        if obj:
+            obj = pickle.loads(obj)
         return obj, None
 
     def remove(self, path, name):
@@ -233,7 +235,7 @@ class RedisCacheStorage(CacheStorage):
 
     def save(self, path, name, data):
         try:
-            self._connect().setex(self._makeKey(path, name), self.getTTL(), data)
+            self._connect().setex(self._makeKey(path, name), self.getTTL(), pickle.dumps(data))
         except redis.RedisError:
             Logger.get('redisCache').exception('save failed')
 
@@ -243,6 +245,8 @@ class RedisCacheStorage(CacheStorage):
         except redis.RedisError:
             Logger.get('redisCache').exception('load failed')
             return None, None
+        if obj:
+            obj = pickle.loads(obj)
         return obj, None
 
     def remove(self, path, name):
