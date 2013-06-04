@@ -187,7 +187,7 @@ def handler(prefix, path):
                 # Create an access wrapper for the API key's user
                 aw = buildAW(ak, onlyPublic)
             else: # Access Token (OAuth)
-                at = OAuthUtils.OAuthCheckAccessResource(req, remove_lists(parse_qs(query)))
+                at = OAuthUtils.OAuthCheckAccessResource()
                 aw = buildAW(at, onlyPublic)
             # Get rid of API key in cache key if we did not impersonate a user
             if ak and aw.getUser() is None:

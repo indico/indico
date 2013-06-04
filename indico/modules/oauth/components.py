@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 from zope.interface import Interface
 import time
@@ -23,6 +24,7 @@ import oauth2 as oauth
 from random import choice
 from string import ascii_letters, digits
 from indico.core.index import OOIndex
+from indico.web.flask.util import create_flat_args
 from indico.web.wsgi import webinterface_handler_config as apache
 from indico.modules.oauth.errors import OAuthError
 from urllib import urlencode
@@ -53,10 +55,11 @@ class UserOAuthAccessTokenIndex(OOIndex):
 
 class OAuthUtils:
     @classmethod
-    def OAuthCheckAccessResource(cls, req, query_string):
-        from indico.modules.oauth.db import  ConsumerHolder, AccessTokenHolder, OAuthServer
+    def OAuthCheckAccessResource(cls):
+        from indico.modules.oauth.db import ConsumerHolder, AccessTokenHolder, OAuthServer
 
-        oauth_request = oauth.Request.from_request(req.get_method(),req.construct_url(req.get_uri()), headers=req.headers_in, query_string=urlencode(query_string))
+        oauth_request = oauth.Request.from_request(request.method, request.base_url, request.headers,
+                                                   parameters=create_flat_args())
         Logger.get('oauth.resource').info(oauth_request)
         try:
             now = time.time()

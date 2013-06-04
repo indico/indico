@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 import time
 from urllib import urlencode
@@ -41,10 +42,8 @@ from MaKaC.webinterface.pages.oauth import WPAdminOAuthConsumers, WPAdminOAuthAu
 class RHOAuth(base.RH):
 
     def _checkParams(self, params):
-        self._oauth_request = oauth.Request.from_request(self._req.get_method(),
-                                                self._req.construct_url(self._req.get_uri()),
-                                                headers=self._req.headers_in,
-                                                query_string=urlencode(params))
+        self._oauth_request = oauth.Request.from_request(request.method, request.base_url, headers=request.headers,
+                                                         parameters=params)
 
 class RHOAuthRequestToken(RHOAuth):
 
@@ -191,7 +190,6 @@ class RHOAuthAccessTokenURL(RHOAuth):
             return urlencode(response)
         except oauth.Error, err:
             raise OAuthError(err.message, 401)
-        return
 
 # ADMINISTRATION SERVICES
 

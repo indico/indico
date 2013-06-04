@@ -649,7 +649,7 @@ class RH(RequestHandlerBase):
             from indico.util import json
             res = json.dumps(e.fossilize())
             header = oauth.build_authenticate_header(realm=Config.getInstance().getBaseSecureURL())
-            self._responseUtil.headers.update(header)
+            self._responseUtil.headers.extend(header)
             self._responseUtil.content_type = 'application/json'
             self._responseUtil.status = e.code
             DBMgr.getInstance().endRequest(False)
