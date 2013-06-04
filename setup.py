@@ -51,7 +51,7 @@ except ImportError:
 
 DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras"]
 
-DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor', 'werkzeug']
+DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor', 'werkzeug', 'nodeenv', 'fabric']
 
 if sys.platform == 'linux2':
     import pwd
@@ -127,7 +127,7 @@ def _getInstallRequires():
             'pytz', 'lxml', 'cds-indico-extras', 'zc.queue',
             'python-dateutil<2.0', 'pypdf', 'mako>=0.4.1', 'babel',
             'icalendar>=3.2', 'pyatom', 'jsmin', 'cssmin', 'webassets', 'pojson>=0.4',
-            'requests>=1.2.0', 'simplejson>=2.1.0', 'reportlab', 'PIL', 'oauth2']
+            'requests>=1.2.0', 'simplejson>=2.1.0', 'reportlab', 'PIL', 'oauth2', 'pyscss']
 
     #for Python older than 2.7
     if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
@@ -282,6 +282,7 @@ Please specify the directory where you'd like it to be placed.
         print '''
 %s
         ''' % _databaseText('etc')
+
 
     def _update_conf_dir_paths(self, filePath, dirs):
         fdata = open(filePath).read()

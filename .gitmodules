@@ -1,0 +1,9 @@
+[submodule "ext_modules/jquery"]
+	path = ext_modules/jquery
+	url = git://github.com/jquery/jquery.git
+[submodule "ext_modules/compass"]
+	path = ext_modules/compass
+	url = git://github.com/chriseppstein/compass.git
+[submodule "ext_modules/qtip2"]
+	path = ext_modules/qtip2
+	url = git://github.com/Craga89/qTip2.git

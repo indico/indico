@@ -158,7 +158,7 @@ class DebugLevelFilter(Filter):
 
 
 jquery = Bundle('js/jquery/underscore.js',
-                'js/jquery/jquery.js',
+                'js/lib/jquery.js',
                 Bundle('js/jquery/jquery-migrate-silencer.js', filters=DebugLevelFilter(required_level=False),
                        output='jquery_migrate_silencer_%(version)s.js'),
                 'js/jquery/jquery-migrate.js',
@@ -167,7 +167,7 @@ jquery = Bundle('js/jquery/underscore.js',
                 'js/jquery/jquery.custom.js',
                 'js/jquery/jquery.daterange.js',
                 'js/jquery/jquery.form.js',
-                'js/jquery/jquery.qtip.js',
+                'js/lib/jquery.qtip.js',
                 'js/jquery/jquery.dttbutton.js',
                 'js/jquery/jquery.colorbox.js',
                 'js/jquery/jquery.menu.js',
@@ -231,6 +231,17 @@ moment = Bundle('js/moment/moment.js',
 base_js = Bundle(jquery, presentation, indico_jquery, moment, indico_core,
                  indico_legacy, indico_common)
 
+base_sass = Bundle('sass/core.scss',
+                   'sass/dashboard.scss',
+                   'sass/buttons.scss',
+                   'sass/dialogs.scss',
+                   'sass/icons.scss',
+                   'sass/inputs.scss',
+                   'sass/tables.scss',
+                   'sass/toolbars.scss',
+                   'sass/lists.scss',
+                   filters="pyscss", output="scss/base_sass_%(version)s.css")
+
 
 def register_all_js(env):
     env.register('jquery', jquery)
@@ -253,27 +264,21 @@ def register_all_js(env):
 
 
 def register_all_css(env, main_css_file):
-    env.register('indico_badges_css', indico_badges_css)
-    env.register('base_css', Bundle('css/{0}'.format(main_css_file),
-                                    'css/category_display.css',
-                                    'css/core.css',
-                                    'css/dashboard.css',
-                                    'css/buttons.css',
-                                    'css/dialogs.css',
-                                    'css/icons.css',
-                                    'css/inputs.css',
-                                    'css/tables.css',
-                                    'css/toolbars.css',
-                                    'css/lists.css',
 
-                                    'css/calendar-blue.css',
-                                    'css/jquery-ui.css',
-                                    'css/jquery.qtip.css',
-                                    'css/jquery.colorbox.css',
-                                    'css/jquery-ui-custom.css',
-                                    'css/jquery.qtip-custom.css',
-                                    'css/jquery.colorpicker.css',
-                                    'css/jquery.multiselect.filter.css',
-                                    'css/jquery.multiselect.css',
-                                    filters=('cssmin', 'cssrewrite'),
-                                    output='base_%(version)s.min.css'))
+    base_css = Bundle('css/{0}'.format(main_css_file),
+                      'css/category_display.css',
+                      'css/calendar-blue.css',
+                      'css/jquery-ui.css',
+                      'css/lib/jquery.qtip.css',
+                      'css/jquery.colorbox.css',
+                      'css/jquery-ui-custom.css',
+                      'css/jquery.qtip-custom.css',
+                      'css/jquery.colorpicker.css',
+                      'css/jquery.multiselect.filter.css',
+                      'css/jquery.multiselect.css',
+                      filters='cssmin',
+                      output='css/base_%(version)s.min.css')
+
+    env.register('indico_badges_css', indico_badges_css)
+    env.register('base_css', base_css)
+    env.register('base_sass', base_sass)

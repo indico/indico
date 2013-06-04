@@ -1,0 +1,37 @@
+# temporary/bytecode files
+*~
+.*.swp
+*.pyc
+*.pyo
+
+# makac symlink
+/MaKaC
+
+# configs
+/etc/*.conf
+
+# python packaging
+/dist
+*.egg-info
+*.egg/
+
+# assets and generated stuff
+.webassets-cache
+*.min.css
+*.min.js
+jquery_migrate_silencer_*.js
+indico/htdocs/js/indico/i18n/*.js
+*.mo
+
+# fetched external dependencies
+indico/htdocs/*/lib/
+node_env
+
+# IDE files
+.idea
+*.sublime-*
+
+# testing
+.noseids
+indico/tests/report/*.txt
+test.txt

@@ -90,7 +90,8 @@ class WPBase(OldObservable):
         self._title = newTitle.strip()
 
     def getCSSFiles(self):
-        return self._asset_env['base_css'].urls()
+        return self._asset_env['base_css'].urls() + \
+            self._asset_env['base_sass'].urls()
 
     def _getJavaScriptInclude(self, scriptPath):
         return '<script src="'+ scriptPath +'" type="text/javascript"></script>\n'

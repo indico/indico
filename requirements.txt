@@ -33,3 +33,4 @@ zope.interface==4.0.1
 ujson==1.19
 oauth2==1.5.211
 requests==1.2.0
+pyScss==1.1.5
