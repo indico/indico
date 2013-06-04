@@ -38,3 +38,15 @@ class IPluginRightsContributor(IContributor):
 
     def isAllowedToAccess(self, obj):
         pass
+
+    def isPluginTypeAdmin(self, obj, params):
+        pass
+
+    def isPluginAdmin(self, obj, params):
+        pass
+
+    def isPluginManager(self, obj, params):
+        pass
+
+    def isPluginUser(self, obj, params):
+        pass

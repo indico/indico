@@ -25,6 +25,7 @@ from MaKaC.conference import Contribution
 from MaKaC.common.timezoneUtils import isSameDay
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.Conversion import Conversion
+from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
 from MaKaC.plugins.Collaboration.RecordingRequest.fossils import IContributionRRFossil
 from MaKaC.plugins.Collaboration import urlHandlers as collaborationUrlHandlers
 from MaKaC.plugins.Collaboration.RecordingRequest.common import getCommonTalkInformation
@@ -45,7 +46,8 @@ class WNewBookingForm(WCSPageTemplateBase):
         underTheLimit = self._conf.getNumberOfContributions() <= self._RecordingRequestOptions["contributionLoadLimit"].getValue()
         manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         user = self._rh._getUser()
-        isManager = user.isAdmin() or RCCollaborationAdmin.hasRights(user=user) or RCCollaborationPluginAdmin.hasRights(user=user, plugins=['RecordingRequest'])
+        isManager = user.isAdmin() or self._notify("isPluginTypeAdmin", {"user": user}) or self._notify("isPluginAdmin", {"user": user, "plugins": ["RecordingRequest"]})
+
         booking = manager.getSingleBooking('RecordingRequest')
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
         initialDisplay = (self._conf.getNumberOfContributions() > 0 and underTheLimit) or (booking is not None and initialChoose)

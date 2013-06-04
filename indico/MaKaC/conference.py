@@ -2462,7 +2462,6 @@ class Conference(CommonObjectBase, Locatable):
 
         Catalog.getIdx('categ_conf_sd').index_obj(self)
 
-
     def unindexConf( self ):
         calIdx = indexes.IndexesHolder().getIndex('calendar')
         calIdx.unindexConf(self)
@@ -2474,7 +2473,6 @@ class Conference(CommonObjectBase, Locatable):
         nameIdx.unindex(self.getId())
 
         Catalog.getIdx('categ_conf_sd').unindex_obj(self)
-
 
     def __generateNewContribTypeId( self ):
         """Returns a new unique identifier for the current conference sessions
@@ -6357,12 +6355,10 @@ class Session(CommonObjectBase, Locatable):
         """
         if self.canAccess( aw ):
             return True
-        ### TODO: Replace this code when plugins allow extension points+notifications ##################
-        from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
-        if RCCollaborationAdmin.hasRights(user = aw.getUser()) or \
-            RCCollaborationPluginAdmin.hasRights(user = aw.getUser(), plugins = "any"):
+
+        if self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) or self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"}):
             return True
-        ################################################################################################
+
         for contrib in self.getContributionList():
             if contrib.canView( aw ):
                 return True
@@ -9075,10 +9071,8 @@ class Contribution(CommonObjectBase, Locatable):
         """
         if self.canAccess( aw ):
             return True
-        ### TODO: Replace this code when plugins allow extension points+notifications ##################
-        from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
-        if RCCollaborationAdmin.hasRights(user=aw.getUser()) or \
-            RCCollaborationPluginAdmin.hasRights(user=aw.getUser(), plugins='any'):
+        if self._notify("isPluginAdmin", {"user": self.getUser(), "plugins": "any"}) or \
+                self._notify("isPluginTypeAdmin", {"user": aw.getUser()}):
             return True
         ################################################################################################
         for sc in self.getSubContributionList():
@@ -11105,9 +11099,7 @@ class Material(CommonObjectBase):
             return True
         #####################################################
 
-        from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
-        if RCCollaborationAdmin.hasRights(user = aw.getUser()) or \
-            RCCollaborationPluginAdmin.hasRights(user=aw.getUser(), plugins='any'):
+        if self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) or self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"}):
             return True
 
         canUserAccess = self.isAllowedToAccess( aw.getUser() )
@@ -11559,9 +11551,7 @@ class Resource(CommonObjectBase):
             return True
         #####################################################
 
-        from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
-        if RCCollaborationAdmin.hasRights(user = aw.getUser()) or \
-            RCCollaborationPluginAdmin.hasRights(user=aw.getUser(), plugins='any'):
+        if self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) or self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"}):
             return True
 
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):

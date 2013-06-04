@@ -197,16 +197,12 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
     def _checkParams(self, params):
         RHConferenceModifKey._checkParams(self, params)
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
-        from MaKaC.plugins.Collaboration.handlers import RCVideoServicesManager
-        from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin
-        from MaKaC.plugins.Collaboration.handlers import RCCollaborationPluginAdmin
         self._isRegistrar = self._target.isRegistrar( self._getUser() )
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
-        self._isVideoServicesManagerOrAdmin = (RCVideoServicesManager.hasRights(self, 'any') or
-                                               RCCollaborationAdmin.hasRights(self) or
-                                               RCCollaborationPluginAdmin.hasRights(self, plugins = 'any'))
-
+        self._isVideoServicesManagerOrAdmin =  (self._notify("isPluginTypeAdmin", {"user": self._getUser()}) or
+            self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"}) or
+            self._notify("isPluginManager", {"user": self._getUser(), "plugins": "any"}))
 
     def _checkProtection(self):
         if not (self._isRegistrar or self._isPRM or self._isReferee or self._isVideoServicesManagerOrAdmin):

@@ -26,14 +26,18 @@ from MaKaC.conference import Conference, Contribution
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.indexes import CSBookingInstanceWrapper, BookingManagerConferenceIndex
 from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationDisplay, UHConfModifCollaboration
-from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin, RCVideoServicesManager
-from MaKaC.plugins.Collaboration.pages import WEventDetailBanner, WVideoService
+from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin, RCVideoServicesManager, RCVideoServicesUser
 from MaKaC.plugins.Collaboration.output import OutputGenerator
 from MaKaC.plugins.Collaboration.base import CSBookingManager
-from MaKaC.plugins import Collaboration
+from MaKaC.plugins.Collaboration.pages import WEventDetailBanner, WVideoService
+
+from MaKaC.plugins import Collaboration, Plugin
+
+from MaKaC.user import Group, Avatar
 from MaKaC.common.logger import Logger
 from MaKaC.common.utils import daysBetween
 from MaKaC.common.indexes import IndexesHolder
+from MaKaC.webinterface.rh.admins import RCAdmin
 from MaKaC.webinterface import wcomponents
 
 from indico.core.index import OOIndex, Index, Catalog
@@ -356,8 +360,8 @@ class NavigationContributor(Component):
     def fillManagementSideMenu(cls, obj, params={}):
         csbm = Catalog.getIdx("cs_bookingmanager_conference").get(obj._conf.getConference().getId())
         if csbm is not None and csbm.isCSAllowed(obj._rh.getAW().getUser()) and \
-            (obj._conf.canModify(obj._rh.getAW()) or RCVideoServicesManager.hasRights(obj._rh, 'any') or
-                RCCollaborationAdmin.hasRights(obj._rh) or RCCollaborationPluginAdmin.hasRights(obj._rh, plugins='any')):
+            (obj._conf.canModify(obj._rh.getAW()) or RCVideoServicesManager.hasRights(obj._rh._getUser(), obj._conf, 'any') or
+                RCCollaborationAdmin.hasRights(obj._rh._getUser()) or RCCollaborationPluginAdmin.hasRights(obj._rh._getUser(), plugins='any')):
             params['Video Services'] = wcomponents.SideMenuItem(_("Video Services"), UHConfModifCollaboration.getURL(obj._conf, secure=obj._rh.use_https()))
 
     @classmethod
@@ -412,3 +416,42 @@ class PluginRightsContributor(Component):
         user = params["user"]
         return Catalog.getIdx("cs_bookingmanager_conference").get(params["conf"].getId()).isPluginManagerOfAnyPlugin(user) or \
             RCCollaborationAdmin.hasRights(user=user) or RCCollaborationPluginAdmin.hasRights(user=user, plugins ='any')
+
+
+    @classmethod
+    def isPluginTypeAdmin(self, obj, params={}):
+        """ Returns True if the user is a Server Admin or a Collaboration admin
+            user: an Avatar object
+        """
+        user = params.get("user", None)
+
+        if user:
+            return RCAdmin.hasRights(None, user) or user in CollaborationTools.getCollaborationOptionValue('collaborationAdmins')
+        return False
+
+
+    @classmethod
+    def isPluginAdmin(self, obj, params={}):
+        """ Returns True if the user is an admin of one of the plugins corresponding to pluginNames
+        """
+
+        return RCCollaborationPluginAdmin.hasRights(params.get("user", None), params.get("plugins", []))
+
+
+    @classmethod
+    def isPluginManager(self, obj, params):
+        """ Returns True if the logged in user has rights to operate with bookings of at least one of a list of plugins, for an event.
+            This is true if:
+                -the user is a Video Services manager (can operate with all plugins)
+                -the user is a plugin manager of one of the plugins
+        """
+
+        return RCVideoServicesManager.hasRights(params.get("user", None), params.get("conf", None), params.get("plugins", []))
+
+
+    @classmethod
+    def isPluginAuthorisedUser(self, obj, params):
+        """ Returns True if the logged in user is an authorised user to create bookings.
+        """
+
+        return RCVideoServicesUser(params.get("user", None), params.get("pluginName"))

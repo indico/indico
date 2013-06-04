@@ -26,7 +26,6 @@ from MaKaC.common.utils import formatTwoDates
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
-from MaKaC.plugins.Collaboration.output import OutputGenerator
 from indico.core.index import Catalog
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.simple_event import WPSimpleEventDisplay
@@ -356,7 +355,8 @@ class WConfModifCollaboration(wcomponents.WTemplated):
         vars["EventDate"] = formatDateTime(getAdjustedDate(nowutc(), self._conf))
 
         from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin, RCVideoServicesUser
-        vars["UserIsAdmin"] = RCCollaborationAdmin.hasRights(user = self._user) or RCCollaborationPluginAdmin.hasRights(user = self._user, plugins = self._tabPlugins)
+
+        vars["UserIsAdmin"] = vars["UserIsAdmin"] = RCCollaborationAdmin.hasRights(self._user) or RCCollaborationPluginAdmin.hasRights(self._user, plugins = self._tabPlugins)
 
         hasCreatePermissions = {}
         videoServSupport = {}

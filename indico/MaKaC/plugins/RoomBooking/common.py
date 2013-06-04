@@ -20,7 +20,6 @@
 # legacy imports
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.accessControl import AdminList
-from MaKaC.plugins import PluginsHolder
 from MaKaC import user as user_mod
 
 

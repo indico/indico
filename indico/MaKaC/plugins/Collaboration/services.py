@@ -20,7 +20,6 @@
 Services for Collaboration plugins
 """
 
-from MaKaC.common import log
 from MaKaC.services.implementation.contribution import ContributionDisplayBase
 from MaKaC.services.implementation.conference import ConferenceModifBase, ConferenceDisplayBase
 from MaKaC.services.implementation.base import TextModificationBase, ParameterManager, AdminService
@@ -39,7 +38,6 @@ from MaKaC.plugins.Collaboration.base import CollaborationException, Collaborati
 from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin, RCVideoServicesManager, RCVideoServicesUser
 from MaKaC.i18n import _
 from MaKaC.common.indexes import IndexesHolder
-from MaKaC.plugins import PluginsHolder
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.webinterface.user import UserListModificationBase,\
@@ -57,25 +55,17 @@ class CollaborationBase(ConferenceModifBase):
     """
     def _checkParams(self):
         ConferenceModifBase._checkParams(self) #sets self._target = self._conf = the Conference object
-        self._checkCollaborationEnabled()
         self._CSBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
-
-    def _checkCollaborationEnabled(self):
-        """ Checks if the Collaboration plugin system is active
-        """
-        if not PluginsHolder().hasPluginType("Collaboration"):
-            raise CollaborationServiceException("Collaboration plugin system is not active")
 
     def _checkCanManagePlugin(self, plugin):
         isAdminOnlyPlugin = CollaborationTools.isAdminOnlyPlugin(plugin)
 
-        hasAdminRights = RCCollaborationAdmin.hasRights(self) or \
-                         RCCollaborationPluginAdmin.hasRights(self, None, [plugin])
+        hasAdminRights = RCCollaborationAdmin.hasRights(self._getUser()) or RCCollaborationPluginAdmin.hasRights(self._getUser(), [plugin])
 
         if not hasAdminRights and isAdminOnlyPlugin:
             raise CollaborationException(_("Cannot acces service of admin-only plugin if user is not admin, for event: ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
 
-        elif not hasAdminRights and not RCVideoServicesManager.hasRights(self, [plugin]):
+        elif not hasAdminRights and not RCVideoServicesManager.hasRights(self._getUser(), self._conf, [plugin]):
             #we check if it's an event creator / manager (this will call ConferenceModifBase._checkProtection)
             CollaborationBase._checkProtection(self)
 
@@ -112,20 +102,15 @@ class CollaborationAdminBookingModifBase(CollaborationBookingModifBase):
     """
 
     def _checkProtection(self):
-        if not RCCollaborationAdmin.hasRights(self) and not RCCollaborationPluginAdmin.hasRights(self, None, [self._bookingPlugin]):
+        if not RCCollaborationAdmin.hasRights(self._getUser()) and not RCCollaborationPluginAdmin.hasRights(self._getUser() [self._bookingPlugin]):
             raise CollaborationException(_("You don't have the rights to perform this operation on this booking"))
 
 class AdminCollaborationBase(AdminService):
     """ Base class for admin services in the Video Services Overview page, not directed towards a specific booking.
     """
 
-    def _checkParams(self):
-        AdminService._checkParams(self)
-        if not PluginsHolder().hasPluginType("Collaboration"):
-            raise CollaborationServiceException(_("Collaboration plugin system is not active"))
-
     def _checkProtection(self):
-        if not RCCollaborationAdmin.hasRights(self, None):
+        if not RCCollaborationAdmin.hasRights(self._getUser()):
             AdminService._checkProtection(self)
 
 ##! End of base classes
@@ -257,7 +242,7 @@ class CollaborationChangePluginManagersBase(CollaborationBase):
             raise CollaborationException(_("Tried to add or remove a manager for an admin-only plugin on event : ") + str(self._conf.getId()) + _(" with the service ") + str(self.__class__) )
 
     def _checkProtection(self):
-        if not RCVideoServicesManager.hasRights(self):
+        if not RCVideoServicesManager.hasRights(self._getUser(), self._conf):
             CollaborationBase._checkProtection(self)
 
 class CollaborationAddPluginManager(CollaborationChangePluginManagersBase, UserListModificationBase):
@@ -295,7 +280,7 @@ class CollaborationBookingIndexQuery(AdminCollaborationBase):
     """
 
     def _checkProtection(self):
-        if not RCCollaborationPluginAdmin.hasRights(self, None, "any"):
+        if not RCCollaborationPluginAdmin.hasRights(self._getUser(), "any"):
             AdminCollaborationBase._checkProtection(self)
 
     def _checkParams(self):

@@ -372,10 +372,8 @@ class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
         RHConferenceBase._checkParams( self, params )
 
     def _checkProtection( self ):
-
-        from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
-        if not RCCollaborationAdmin.hasRights(self, None) and \
-            not RCCollaborationPluginAdmin.hasRights(self, plugins = "any"):
+        if not(self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"}) or
+                self._notify("isPluginTypeAdmin", {"user": self._getUser()})):
             RHDisplayBaseProtected._checkProtection( self )
 
 
