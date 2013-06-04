@@ -29,7 +29,6 @@ import re
 import time
 import urllib
 from flask import request, session
-from flask import current_app as app
 from urlparse import parse_qs
 from ZODB.POSException import ConflictError
 

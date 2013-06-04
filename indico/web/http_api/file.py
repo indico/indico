@@ -29,7 +29,6 @@ from indico.web.http_api.responses import HTTPAPIError
 
 # legacy imports
 from MaKaC.conference import LocalFile
-from MaKaC.common import Config
 
 
 @HTTPAPIHook.register

@@ -29,7 +29,7 @@ from indico.web.http_api.fossils import IHTTPAPIErrorFossil, IHTTPAPIResultFossi
 
 # indico legacy imports
 from MaKaC.common.Configuration import Config
-from MaKaC.common.fossilize import fossilizes, fossilize, Fossilizable
+from MaKaC.common.fossilize import fossilizes, Fossilizable
 
 class HTTPAPIError(Exception, Fossilizable):
     fossilizes(IHTTPAPIErrorFossil)
