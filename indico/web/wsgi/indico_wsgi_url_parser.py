@@ -47,10 +47,10 @@ class ServerConfig(object):
         """
         return {'': ((self.htdocs_dir, 'index.py'), 'index', '', None), \
                     #'services':     ((DIR_SERVICES, 'handler.py'), 'handler', '', None), \
-                    'event':        ((self.htdocs_dir, 'events.py'), 'index', 'genericRewrite', \
-                                         {'queryReplacement': 'tag'}), \
-                    'categ':        ((self.htdocs_dir, 'categoryDisplay.py'), 'index', 'genericRewrite', \
-                                         {'queryReplacement': 'categId'}),
+                    #'event':        ((self.htdocs_dir, 'events.py'), 'index', 'genericRewrite', \
+                    #                     {'queryReplacement': 'tag'}), \
+                    #'categ':        ((self.htdocs_dir, 'categoryDisplay.py'), 'index', 'genericRewrite', \
+                    #                     {'queryReplacement': 'categId'}),
                 #'export':       ((DIR_MODULES, 'wsgi_handler.py'), 'handler', '', None),
                 #'api':          ((DIR_MODULES, 'wsgi_handler.py'), 'handler', '', None)
                 }

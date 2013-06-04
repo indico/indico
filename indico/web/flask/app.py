@@ -32,7 +32,7 @@ from MaKaC.i18n import _
 from MaKaC.webinterface.pages.error import WErrorWSGI
 from MaKaC.services.interface.rpc.json import process as jsonrpc_handler
 
-from indico.web.flask.util import create_modpython_rules, create_plugin_rules, XAccelMiddleware
+from indico.web.flask.util import create_modpython_rules, create_plugin_rules, shorturl_handler, XAccelMiddleware
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.http_api.handlers import handler as api_handler
 
@@ -78,6 +78,8 @@ def add_handlers(app):
     app.add_url_rule('/services/json-rpc', view_func=jsonrpc_handler, endpoint='services', methods=('POST',))
     app.add_url_rule('/export/<path:path>', view_func=partial(api_handler, '/export'), endpoint='export')
     app.add_url_rule('/api/<path:path>', view_func=partial(api_handler, '/api'), endpoint='api', methods=('POST',))
+    # TODO: Remove the shorturl route and handle them in the main /event/ and /categ/ handlers
+    app.add_url_rule('/<any(event, categ):what>/<tag>', view_func=shorturl_handler, endpoint='shorturl')
     app.register_error_handler(404, handle_404)
     app.register_error_handler(Exception, handle_exception)
 

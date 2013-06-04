@@ -24,7 +24,7 @@ import os
 import re
 import time
 
-from flask import request, redirect
+from flask import request, redirect, url_for
 from flask import current_app as app
 from flask import send_file as _send_file
 from werkzeug.datastructures import Headers
@@ -95,6 +95,14 @@ def create_plugin_rules(app):
             app.add_url_rule(rule, endpoint, view_func=create_flask_rh_htdocs_wrapper(rh))
         else:
             app.add_url_rule(rule, endpoint, view_func=create_flask_rh_wrapper(rh), methods=('GET', 'POST'))
+
+
+def shorturl_handler(what, tag):
+    if what == 'categ':
+        return redirect(url_for('mp-categoryDisplay-index', categId=tag))
+    elif what == 'event':
+        from MaKaC.webinterface.rh.conferenceDisplay import RHShortURLRedirect
+        return RHShortURLRedirect(None).process({'tag': tag})
 
 
 def send_file(name, path, ftype, last_modified=None, no_cache=True):
