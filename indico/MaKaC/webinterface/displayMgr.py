@@ -1358,6 +1358,9 @@ class CSSWrapper(Persistent):
             fn = fn.lower().replace(".css","")
         return fn
 
+    def getFilePath(self):
+        return self._localFile.getFilePath()
+
     def getSize(self):
         return self._localFile.getSize()
 

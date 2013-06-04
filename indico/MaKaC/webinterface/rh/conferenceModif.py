@@ -19,7 +19,10 @@
 
 import os
 import shutil
-import tempfile, types
+import tempfile
+import types
+from copy import copy
+from flask import session
 from persistent.list import PersistentList
 from datetime import datetime,timedelta
 from dateutil.relativedelta import relativedelta
@@ -175,11 +178,9 @@ class RHConferenceModifKey( RHConferenceModifBase ):
         self._redirectURL = params.get("redirectURL","")
 
     def _checkProtection(self):
-        modif_keys = self._getSession().getVar("modifKeys")
-        if modif_keys == None:
-            modif_keys = {}
+        modif_keys = session.setdefault('modifKeys', {})
         modif_keys[self._conf.getId()] = self._modifkey
-        self._getSession().setVar("modifKeys",modif_keys)
+        session.modified = True
 
         RHConferenceModifBase._checkProtection(self)
 
@@ -240,11 +241,9 @@ class RHConferenceCloseModifKey(RHConferenceBase):
         self._redirectURL = params.get("redirectURL", "")
 
     def _process(self):
-        modif_keys = self._getSession().getVar("modifKeys")
-        if modif_keys != None and modif_keys != {}:
-            if modif_keys.has_key(self._conf.getId()) and self._conf.getModifKey() in modif_keys[self._conf.getId()]:
-                del modif_keys[self._conf.getId()]
-            self._getSession().setVar("modifKeys", modif_keys)
+        modif_keys = session.get("modifKeys")
+        if modif_keys and modif_keys.pop(self._conf.getId(), None):
+            session.modified = True
         if self._redirectURL != "":
             url = self._redirectURL
         else:

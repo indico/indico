@@ -111,12 +111,15 @@ def shorturl_handler(what, tag):
         return RHShortURLRedirect(None).process({'tag': tag})
 
 
-def send_file(name, path, ftype, last_modified=None, no_cache=True, inline=False):
+def send_file(name, path, ftype=None, last_modified=None, mimetype=None, no_cache=True, inline=False):
     # Note: path can also be a StringIO!
     as_attachment = request.user_agent.platform != 'android'  # is this still necessary?
     if inline:
         as_attachment = False
-    mimetype = Config.getInstance().getFileTypeMimeType(ftype)  # ftype is e.g. "JPG"
+    if not bool(ftype) ^ bool(mimetype):
+        raise ValueError('exactly one of mimetype and ftype are required')
+    elif ftype:
+        mimetype = Config.getInstance().getFileTypeMimeType(ftype)  # ftype is e.g. "JPG"
     rv = _send_file(path, mimetype=mimetype, as_attachment=as_attachment, attachment_filename=name)
     if not as_attachment:
         # send_file does not add this header if as_attachment is False

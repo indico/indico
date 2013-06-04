@@ -19,6 +19,7 @@
 
 """Some pages for dealing with generic application errors
 """
+from flask import session
 import traceback
 import sys
 from xml.sax.saxutils import quoteattr
@@ -226,10 +227,8 @@ class WPKeyAccessError( WPDecorated ):
     def _getBody( self, params ):
         tgt = self._rh._target
         msg = ""
-        sess = self._rh._getSession()
-        keys = sess.getVar("accessKeys")
-        id = tgt.getUniqueId()
-        if keys != None and keys.has_key(id):
+        keys = session.get("accessKeys", {})
+        if tgt.getUniqueId() in keys:
             msg = i18nformat("""<font color=red> _("Bad access key")!</font>""")
         else:
             msg = ""
@@ -334,10 +333,8 @@ class WPModificationError( WPDecorated ):
     def _getBody( self, params ):
         if hasattr(self._rh._target, "getModifKey") and \
             self._rh._target.getModifKey() != "":
-            sess = self._rh._getSession()
-            keys = sess.getVar("modifKeys")
-            id = self._rh._target.getId()
-            if keys != None and keys.has_key(id) and keys[id].strip()!="":
+            keys = session.get("modifKeys", {})
+            if keys.get(self._rh._target.getId()):
                 msg = i18nformat("""<font color=red> _("Wrong modification key!")</font>""")
             else:
                 msg = ""

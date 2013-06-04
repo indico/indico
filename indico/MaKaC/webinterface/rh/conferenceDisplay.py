@@ -17,9 +17,12 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from datetime import timedelta,datetime, time
+from datetime import datetime
 from flask import session
-import os, re, pytz
+import os
+import re
+import pytz
+
 import MaKaC.common.info as info
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
@@ -41,16 +44,18 @@ import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.errors import MaKaCError, NoReportError, NotFoundError
 from MaKaC.PDFinterface.conference import TimeTablePlain,AbstractBook, SimplifiedTimeTablePlain, TimetablePDFFormat
 from MaKaC.common.contribPacker import ConferencePacker, ZIPFileHandler
-import StringIO, zipfile
+import zipfile
+from cStringIO import StringIO
 from MaKaC.i18n import _
 
 import MaKaC.common.timezoneUtils as timezoneUtils
 from reportlab.platypus.doctemplate import LayoutError
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
-from indico.web.http_api.api import CategoryEventFetcher
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.api import CategoryEventHook
+from indico.web.flask.util import send_file
+
 
 class RHConfSignIn( conferenceBase.RHConferenceBase ):
 
@@ -74,7 +79,7 @@ class RHConfSignIn( conferenceBase.RHConferenceBase ):
         av = auth.autoLogin(self)
         if av:
             url = self._returnURL
-            self._getSession().setUser( av )
+            session.user = av
             if Config.getInstance().getBaseSecureURL().startswith('https://'):
                 url = str(url).replace('http://', 'https://')
             self._redirect( url )
@@ -103,16 +108,6 @@ class RHConfSignIn( conferenceBase.RHConferenceBase ):
                 url = str(url).replace('http://', 'https://')
             self._redirect( url )
 
-# REPLACED BY RHSignOut IN login.py
-#class RHConfSignOut( conferenceBase.RHConferenceBase ):
-#
-#    def _process( self ):
-#        if self._getUser():
-#            self._getSession().setUser( None )
-#            self._setUser( None )
-#        self._redirect( urlHandlers.UHConferenceDisplay.getURL( self._conf ) )
-
-
 
 class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
 
@@ -122,14 +117,12 @@ class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
         conferenceBase.RHConferenceBase._checkParams(self, params )
         self._accesskey = params.get( "accessKey", "" ).strip()
 
-    def _process( self ):
-        access_keys = self._getSession().getVar("accessKeys")
-        if access_keys == None:
-            access_keys = {}
+    def _process(self):
+        access_keys = session.setdefault("accessKeys", {})
         access_keys[self._conf.getUniqueId()] = self._accesskey
-        self._getSession().setVar("accessKeys",access_keys)
-        url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-        self._redirect( url )
+        session.modified = True
+        url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
+        self._redirect(url)
 
 
 class RHConferenceForceAccessKey( conferenceBase.RHConferenceBase ):
@@ -430,7 +423,7 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
         elif view in styleMgr.getXSLStyles():
             if not isLibxml:
                 warningText = "lxml needs to be installed if you want to use a stylesheet-driven display - switching to static display"
-            self._req.content_type = "text/xml"
+            self._responseUtil.content_type = 'text/xml'
             p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
         elif view != "static":
             p = conferences.WPTPLConferenceDisplay( self, self._target, view, type, self._reqParams )
@@ -495,22 +488,17 @@ class RHConferenceOtherViews( RoomBookingDBMixin, RHConferenceBaseDisplay ):
             p = conferences.WPMeetingTimeTable( self, self._target,"parallel","meeting",self._reqParams )
         # generate the html
         if view == "xml" and self._reqParams.get('fr') == 'no':
-            self._req.content_type = "text/xml"
+            self._responseUtil.content_type = 'text/xml'
         return p.display()
 
 
 class RHConferenceGetLogo(RHConferenceBaseDisplay):
 
     def _process(self):
-        logo=self._target.getLogo()
+        logo = self._target.getLogo()
         if not logo:
             raise MaKaCError(_("This event does not have a logo"))
-        self._req.headers_out["Content-Length"]="%s"%logo.getSize()
-        cfg=Config.getInstance()
-        mimetype=cfg.getFileTypeMimeType(logo.getFileType())
-        self._req.content_type="""%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%cleanHTMLHeaderFilename(logo.getFileName())
-        return self._target.getLogo().readBin()
+        return send_file(logo.getFileName(), logo.getFilePath(), logo.getFileType(), inline=True)
 
 
 class RHConferenceGetCSS(RHConferenceBaseDisplay):
@@ -521,35 +509,25 @@ class RHConferenceGetCSS(RHConferenceBaseDisplay):
 
     def _process(self):
         sm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
-        css=sm.getLocalCSS()
+        css = sm.getLocalCSS()
         if css:
-            self._req.headers_out["Content-Length"]="%s"%css.getSize()
-            self._req.content_type="text/css"
-            self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%css.getFileName()
-            return css.readBin()
-
+            return send_file(css.getFileName(), css.getFilePath(), mimetype='text/css', inline=True)
         return ""
 
 
 class RHConferenceGetPic(RHConferenceBaseDisplay):
 
     def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams( self, params )
-        self._picId = params.get("picId","")
+        RHConferenceBaseDisplay._checkParams(self, params)
+        self._picId = params.get("picId", "")
 
     def _process(self):
         im = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getImagesManager()
         if im.getPic(self._picId):
-            pic=im.getPic(self._picId).getLocalFile()
-            self._req.headers_out["Content-Length"]="%s"%pic.getSize()
-            cfg=Config.getInstance()
-            mimetype=cfg.getFileTypeMimeType(pic.getFileType())
-            self._req.content_type="""%s"""%(mimetype)
-            self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%pic.getFileName()
-            return pic.readBin()
+            pic = im.getPic(self._picId).getLocalFile()
+            return send_file(pic.getFileName(), pic.getFilePath(), pic.getFileType(), inline=True)
         else:
-            from indico.web.wsgi import webinterface_handler_config as apache
-            self._req.status = apache.HTTP_NOT_FOUND
+            self._responseUtil.status = 404
             return WPError404(self, urlHandlers.UHConferenceDisplay.getURL(self._conf)).display()
 
 
@@ -629,22 +607,14 @@ class RHConferenceProgram(RHConferenceBaseDisplay):
         return p.display(xs=self._xs)
 
 
-class RHConferenceProgramPDF( RHConferenceBaseDisplay ):
+class RHConferenceProgramPDF(RHConferenceBaseDisplay):
 
-    def _process( self ):
-        tz = timezoneUtils.DisplayTZ(self._aw,self._target).getDisplayTZ()
-        filename = "%s - Programme.pdf"%cleanHTMLHeaderFilename(self._target.getTitle())
+    def _process(self):
+        tz = timezoneUtils.DisplayTZ(self._aw, self._target).getDisplayTZ()
+        filename = "%s - Programme.pdf" % self._target.getTitle()
         from MaKaC.PDFinterface.conference import ProgrammeToPDF
         pdf = ProgrammeToPDF(self._target, tz=tz)
-        data = pdf.getPDFBin()
-        #self._req.headers_out["Accept-Ranges"] = "bytes"
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        #self._req.content_type = """%s; name="%s\""""%(mimetype, filename )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
 class RHConferenceTimeTable( RoomBookingDBMixin, RHConferenceBaseDisplay ):
     _uh = urlHandlers.UHConferenceTimeTable
@@ -757,12 +727,7 @@ class RHTimeTablePDF(RHConferenceTimeTable):
     ##                    tries = 0
     ##                    raise MaKaCError(str(e))
 
-            self._req.headers_out["Content-Length"] = "%s"%len(data)
-            cfg=Config.getInstance()
-            mimetype=cfg.getFileTypeMimeType("PDF")
-            self._req.content_type = """%s"""%(mimetype)
-            self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%filename
-            return data
+            return send_file(filename, StringIO(data), 'PDF', inline=True)
 
 class RHTimeTableCustomizePDF(RHConferenceTimeTable):
 
@@ -936,13 +901,7 @@ class RHContributionListToPDF(RHConferenceBaseDisplay):
             return "No contributions to print"
         from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
         pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-        data = pdf.getPDFBin()
-        self._req.set_content_length(len(data))
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
 
 class RHAbstractBook(RHConferenceBaseDisplay):
@@ -972,21 +931,16 @@ class RHAbstractBook(RHConferenceBaseDisplay):
         else:
             mtime = None
 
-        if boaConfig.isCacheEnabled() and not self._noCache \
-                and mtime and mtime > boaConfig.lastChanged:
-            with open(cacheFile, 'rb') as f:
-                data = f.read()
+        if boaConfig.isCacheEnabled() and not self._noCache and mtime and mtime > boaConfig.lastChanged:
+            return send_file(pdfFilename, cacheFile, 'PDF', inline=True)
         else:
             tz = timezoneUtils.DisplayTZ(self._aw,self._target).getDisplayTZ()
             pdf = AbstractBook(self._target,self.getAW(), tz=tz)
             data = pdf.getPDFBin()
             with open(cacheFile, 'wb') as f:
                 f.write(data)
-        self._req.headers_out['Content-Length'] = str(len(data))
-        cfg = Config.getInstance()
-        self._req.content_type = cfg.getFileTypeMimeType('PDF')
-        self._req.headers_out['Content-Disposition'] = 'inline; filename="%s"' % cleanHTMLHeaderFilename(pdfFilename)
-        return data
+            return send_file(pdfFilename, cacheFile, 'PDF', inline=True)
+
 
 class RHConfParticipantsRefusal(RHConferenceBaseDisplay):
     _uh = urlHandlers.UHConfParticipantsRefusal
@@ -1042,22 +996,17 @@ class RHConferenceToiCal(RoomBookingDBMixin, RHConferenceBaseDisplay):
         RHConferenceBaseDisplay._checkParams( self, params )
         self._detailLevel = params.get("detail","events")
 
-    def _process( self ):
-        filename = "%s-Event.ics"%cleanHTMLHeaderFilename(self._target.getTitle())
+    def _process(self):
+        filename = "%s-Event.ics" % self._target.getTitle()
 
-        hook = CategoryEventHook({'detail':[self._detailLevel]}, 'event', {'idlist':self._conf.getId(), 'dformat': 'ics'})
-        res = hook(self.getAW(), self._req)
+        hook = CategoryEventHook({'detail': self._detailLevel}, 'event',
+                                 {'idlist': self._conf.getId(), 'dformat': 'ics'})
+        res = hook(self.getAW())
         resultFossil = {'results': res[0]}
 
         serializer = Serializer.create('ics')
-        data = serializer(resultFossil)
+        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL', inline=True)
 
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ICAL" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
 
 class RHConferenceToXML(RoomBookingDBMixin, RHConferenceBaseDisplay):
 
@@ -1065,8 +1014,8 @@ class RHConferenceToXML(RoomBookingDBMixin, RHConferenceBaseDisplay):
         RHConferenceBaseDisplay._checkParams( self, params )
         self._xmltype = params.get("xmltype","standard")
 
-    def _process( self ):
-        filename = "%s - Event.xml"%cleanHTMLHeaderFilename(self._target.getTitle())
+    def _process(self):
+        filename = "%s - Event.xml" % self._target.getTitle()
         from MaKaC.common.xmlGen import XMLGen
         from MaKaC.common.output import outputGenerator
         xmlgen = XMLGen()
@@ -1075,13 +1024,7 @@ class RHConferenceToXML(RoomBookingDBMixin, RHConferenceBaseDisplay):
         xmlgen.openTag("event")
         outgen.confToXML(self._target.getConference(),0,0,1)
         xmlgen.closeTag("event")
-        data = xmlgen.getXml()
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "XML" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, StringIO(xmlgen.getXml()), 'XML', inline=True)
 
 
 class RHConferenceToMarcXML(RHConferenceBaseDisplay):
@@ -1096,13 +1039,8 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
         xmlgen.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
         outgen.confToXMLMarc21(self._target.getConference())
         xmlgen.closeTag("marc:record")
-        data = xmlgen.getXml()
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "XML" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, StringIO(xmlgen.getXml()), 'XML', inline=True)
+
 
 class RHInternalPageDisplay(RHConferenceBaseDisplay):
     _uh=urlHandlers.UHInternalPageDisplay
@@ -1131,8 +1069,8 @@ class RHConferenceLatexPackage(RHConferenceBaseDisplay):
 
     def _process( self ):
         #return "nothing"
-        filename = "%s-BookOfAbstracts.zip"%cleanHTMLHeaderFilename(self._target.getTitle())
-        zipdata = StringIO.StringIO()
+        filename = "%s-BookOfAbstracts.zip" % self._target.getTitle()
+        zipdata = StringIO()
         zip = zipfile.ZipFile(zipdata, "w")
         for cont in self._target.getContributionList():
             f = []
@@ -1170,17 +1108,9 @@ class RHConferenceLatexPackage(RHConferenceBaseDisplay):
             f.append("""\\noindent %s"""%cont.getDescription())
             zip.writestr("contribution-%s"%cont.getId(), "\n".join(f))
         zip.close()
-        data = zipdata.getvalue()
-        zipdata.close()
+        zipdata.seek(0)
 
-        #self._req.headers_out["Accept-Ranges"] = "bytes"
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ZIP" )
-        #self._req.content_type = """%s; name="%s\""""%(mimetype, filename )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, zipdata, 'ZIP')
 
 
 class RHFullMaterialPackage(RHConferenceBaseDisplay):
@@ -1225,14 +1155,8 @@ class RHFullMaterialPackagePerform(RHConferenceBaseDisplay):
                 p = ConferencePacker(self._conf, self._aw)
                 path = p.pack(self._materialTypes, self._days, self._mainResource, self._fromDate, ZIPFileHandler(), self._sessionList)
                 if not p.getItems():
-                    raise NoReportError(
-                        _("The selected package does not contain any items."))
-                filename = "full-material.zip"
-                cfg = Config.getInstance()
-                mimetype = cfg.getFileTypeMimeType("ZIP")
-                self._req.content_type = """%s""" % (mimetype)
-                self._req.headers_out["Content-Disposition"] = """inline; filename="%s\"""" % filename
-                self._req.sendfile(path)
+                    raise NoReportError(_("The selected package does not contain any items."))
+                return send_file('full-material.zip', path, 'ZIP')
             else:
                 raise NoReportError(
                     _("You have to select at least one material type"))
