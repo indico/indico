@@ -27,7 +27,7 @@ import time
 from flask import request, redirect, url_for
 from flask import current_app as app
 from flask import send_file as _send_file
-from werkzeug.datastructures import Headers
+from werkzeug.datastructures import Headers, FileStorage
 from werkzeug.exceptions import NotFound
 
 from MaKaC.common import Config
@@ -36,16 +36,22 @@ from indico.util.caching import memoize
 from indico.web.rh import RHHtdocs
 
 
-def _to_utf8(x):
-    return x.encode('utf-8')
+def _convert_request_value(x):
+    if isinstance(x, unicode):
+        return x.encode('utf-8')
+    elif isinstance(x, FileStorage):
+        x.file = x.stream
+        return x
+    raise ValueError('Unexpected item in request data: %s' % type(x))
 
 
 def create_flat_args():
     args = request.args.copy()
     args.update(request.form)
+    args.update(request.files)
     flat_args = {}
     for key, item in args.iterlists():
-        flat_args[key] = map(_to_utf8, item) if len(item) > 1 else _to_utf8(item[0])
+        flat_args[key] = map(_convert_request_value, item) if len(item) > 1 else _convert_request_value(item[0])
     return flat_args
 
 
