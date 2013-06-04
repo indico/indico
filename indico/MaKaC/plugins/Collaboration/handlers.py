@@ -26,6 +26,7 @@ import os, tempfile, time
 # legacy indico imports
 
 # indico api imports
+from werkzeug.exceptions import NotFound
 from indico.util import json
 from indico.web.flask.util import send_file
 from indico.web.rh import RHHtdocs

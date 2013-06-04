@@ -39,6 +39,7 @@ from MaKaC.plugins.util import processPluginMetadata
 
 from indico.core.extpoint import Component, IListener, IContributor
 from indico.web import rh as newrh
+from indico.web.rh import RHHtdocs
 
 
 def pluginId(mod):
@@ -261,10 +262,7 @@ class RHMap(Persistent):
         self.__map = {}
 
     def hasURL(self, rh):
-        if hasattr(rh, '_url') and rh._url != None:
-            return True
-        else:
-            return False
+        return bool(getattr(rh, '_url', None))
 
     def has_key(self, key):
         return self.__map.has_key(key)
@@ -283,7 +281,13 @@ class RHMap(Persistent):
 
     def addRH(self, rh):
         if self.hasURL(rh):
-            self.__map[re.compile(rh._url)] = rh
+            urls = (rh._url,) if isinstance(rh._url, basestring) else rh._url
+            for url in urls:
+                if url.startswith('^'):
+                    if isinstance(rh, RHHtdocs):
+                        raise PluginError('RHHtdocs handlers may not use a regex (%s)' % rh.__name__)
+                    url = re.compile(url)
+                self.__map[url] = rh
             self._notifyModification()
 
     def cleanRHDict(self):

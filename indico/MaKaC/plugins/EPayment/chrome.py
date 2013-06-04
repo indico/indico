@@ -53,7 +53,7 @@ class RHEPaymentHtdocs(RHHtdocs):
     Static file handler for EPayment plugin
     """
 
-    _url = r"^/epayment/(?P<filepath>.*)$"
+    _url = '/epayment/<path:filepath>'
     _local_path = pkg_resources.resource_filename(MaKaC.plugins.EPayment.__name__, "htdocs")
 
 

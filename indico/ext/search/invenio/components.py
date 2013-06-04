@@ -49,6 +49,6 @@ class PluginImplementationContributor(Component, Observable):
 
 class RHSearchHtdocsInvenio(RHHtdocs):
 
-    _url = r"^/invenio/(?P<filepath>.*)$"
+    _url = '/invenio/<path:filepath>'
     _local_path = os.path.join(os.path.dirname(indico.ext.search.invenio.__file__), "htdocs")
     _min_dir = 'invenio'

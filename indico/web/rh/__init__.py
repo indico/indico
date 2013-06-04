@@ -21,6 +21,7 @@
 import os.path
 
 # legacy imports
+from werkzeug.exceptions import NotFound
 from MaKaC.common.Configuration import Config
 from MaKaC.errors import NotFoundError
 
@@ -42,18 +43,16 @@ class RHHtdocs(RH):
     _min_dir = None
 
     @classmethod
-    def calculatePath(cls, filepath, local_path=None):
+    def calculatePath(cls, filepath, local_path=None, plugin=None):
         config = Config.getInstance()
 
         # get compiled files from htdocs/build/{_min_dir}
         if '.min.' in filepath and cls._min_dir:
-            local_path = os.path.join(config.getHtdocsDir(),
-                                      'build', cls._min_dir)
-        else:
-            local_path = local_path or cls._local_path
+            local_path = os.path.join(config.getHtdocsDir(), 'build', cls._min_dir)
+        elif not local_path:
+            local_path = cls._local_path
 
         f_abspath = os.path.abspath(os.path.join(local_path, filepath))
         if f_abspath.startswith(local_path):
             return f_abspath
-        else:
-            raise SERVER_RETURN, HTTP_NOT_FOUND
+        raise NotFound

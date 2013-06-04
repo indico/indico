@@ -41,7 +41,7 @@ class RHInstantMessagingHtdocs(RHHtdocs):
     Static file handler for InstantMessaging plugin
     """
 
-    _url = r"^/InstantMessaging/(?P<filepath>.*)$"
+    _url = '/InstantMessaging/<path:filepath>'
     _local_path = pkg_resources.resource_filename(InstantMessaging.__name__, "htdocs")
     _min_dir = 'InstantMessaging'
 

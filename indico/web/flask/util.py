@@ -28,7 +28,9 @@ from flask import request, redirect
 from flask import current_app as app
 from flask import send_file as _send_file
 from types import ClassType
+import warnings
 from werkzeug.datastructures import Headers
+from werkzeug.exceptions import NotFound
 from werkzeug.routing import BaseConverter
 
 from MaKaC.common import Config
@@ -74,16 +76,34 @@ def create_flask_rh_wrapper(rh):
     return wrapper
 
 
+_rh_htdocs_wrappers = {}
+def create_flask_rh_htdocs_wrapper(rh):
+    if rh in _rh_htdocs_wrappers:
+        return _rh_htdocs_wrappers[rh]
+
+    def wrapper(filepath, plugin=None):
+        path = rh.calculatePath(filepath, plugin=plugin)
+        if not os.path.isfile(path):
+            raise NotFound
+        return _send_file(path)
+
+    _rh_htdocs_wrappers[rh] = wrapper
+    return wrapper
+
+
 def create_plugin_rules(app):
-    for regex, rh in RHMapMemory()._map.iteritems():
-        if hasattr(rh, 'mro') and RHHtdocs in rh.mro():
-            # TODO: handle RHHtdocs somehow
-            continue
-        print regex.pattern[2:]
-        assert regex.pattern[:2] == '^/'
-        rule = '/<regex("%s"):unused>' % regex.pattern[2:]
-        endpoint = 'plugin-%s' % rh.__name__
-        app.add_url_rule(rule, endpoint, view_func=create_flask_rh_wrapper(rh), methods=('GET', 'POST'))
+    for key, rh in RHMapMemory()._map.iteritems():
+        if issubclass(rh, RHHtdocs):
+            if not isinstance(key, basestring):  # all RHHtdocs should have rule strings, not regexes
+                warnings.warn('Skipped RHHtdocs %s which has a regex url' % rh.__name__)
+                continue
+            endpoint = 'plugin-htdocs-%s' % rh.__name__
+            app.add_url_rule(key, endpoint, view_func=create_flask_rh_htdocs_wrapper(rh))
+        else:
+            assert key.pattern[:2] == '^/'
+            endpoint = 'plugin-%s' % rh.__name__
+            rule = '/<regex("%s"):unused>' % key.pattern[2:]
+            app.add_url_rule(rule, endpoint, view_func=create_flask_rh_wrapper(rh), methods=('GET', 'POST'))
 
 
 def send_file(name, path, ftype, last_modified=None, no_cache=True):

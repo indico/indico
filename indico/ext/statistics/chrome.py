@@ -135,7 +135,7 @@ class RHStatisticsView(RHConferenceModifBase):
 
 class RHStatisticsHtdocs(RHHtdocs):
 
-    _url = r"^/statistics/(?P<filepath>.*)$"
+    _url = '/statistics/<path:filepath>'
     _local_path = pkg_resources.resource_filename(indico.ext.statistics.__name__, "htdocs")
 
 

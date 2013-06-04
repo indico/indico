@@ -71,7 +71,7 @@ class RHLiveSyncHtdocs(RHHtdocs):
     Static file handler for LiveSync plugin
     """
 
-    _url = r"^/livesync/(?P<filepath>.*)$"
+    _url = '/livesync/<path:filepath>'
     _local_path = pkg_resources.resource_filename(indico.ext.livesync.__name__, "htdocs")
     _min_dir = 'livesync'
 
