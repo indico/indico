@@ -80,7 +80,7 @@ class RHAdminLiveSyncManagement(RHAdminBase):
     """
     LiveSync management page - request handler
     """
-    _url = r'^/livesync/manage/?$'
+    _url = '/livesync/manage'
 
     def _process(self):
         return WPLiveSyncAdmin(self, WPluginAgentManagement).display()
@@ -90,7 +90,7 @@ class RHAdminLiveSyncStatus(RHAdminBase):
     """
     LiveSync status page - request handler
     """
-    _url = r'^/livesync/status/?$'
+    _url = '/livesync/status'
 
     def _process(self):
         return WPLiveSyncAdmin(self, WPluginAgentStatus).display()

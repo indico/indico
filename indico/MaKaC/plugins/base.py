@@ -23,23 +23,24 @@
     The functions can be used through methods of the "PluginsHolder" class. See its description for more details.
 """
 
-from MaKaC.common.Counter import Counter
+import types
+import inspect
+import pkg_resources
+import zope.interface
 from BTrees.OOBTree import OOBTree
+from persistent import Persistent
+
+from MaKaC.common.Counter import Counter
 from MaKaC.common.Locators import Locator
 from MaKaC.errors import PluginError
 from MaKaC.common import DBMgr
 from MaKaC.common.logger import Logger
-import zope.interface, types
-from persistent import Persistent
-import pkg_resources, types, inspect, re
-
 from MaKaC.plugins.loader import PluginLoader, GlobalPluginOptions
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.plugins.util import processPluginMetadata
 
 from indico.core.extpoint import Component, IListener, IContributor
 from indico.web import rh as newrh
-from indico.web.rh import RHHtdocs
 
 
 def pluginId(mod):
@@ -283,10 +284,8 @@ class RHMap(Persistent):
         if self.hasURL(rh):
             urls = (rh._url,) if isinstance(rh._url, basestring) else rh._url
             for url in urls:
-                if url.startswith('^'):
-                    if isinstance(rh, RHHtdocs):
-                        raise PluginError('RHHtdocs handlers may not use a regex (%s)' % rh.__name__)
-                    url = re.compile(url)
+                if url.startswith('^') or url.endswith('$'):
+                    raise PluginError('Plugin RHs may not use a regex anymore (%s)' % rh.__name__)
                 self.__map[url] = rh
             self._notifyModification()
 

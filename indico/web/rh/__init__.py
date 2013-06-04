@@ -23,10 +23,6 @@ import os.path
 # legacy imports
 from werkzeug.exceptions import NotFound
 from MaKaC.common.Configuration import Config
-from MaKaC.errors import NotFoundError
-
-# indico imports
-from indico.web.wsgi.webinterface_handler_config import SERVER_RETURN, HTTP_NOT_FOUND
 
 
 class RH(object):

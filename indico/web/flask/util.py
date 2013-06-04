@@ -27,14 +27,12 @@ import time
 from flask import request, redirect
 from flask import current_app as app
 from flask import send_file as _send_file
-from types import ClassType
-import warnings
 from werkzeug.datastructures import Headers
 from werkzeug.exceptions import NotFound
-from werkzeug.routing import BaseConverter
 
 from MaKaC.common import Config
 from MaKaC.plugins.base import RHMapMemory
+from indico.util.caching import memoize
 from indico.web.rh import RHHtdocs
 
 
@@ -54,6 +52,7 @@ def create_flat_args():
 def create_flask_mp_wrapper(func):
     def wrapper():
         return func(None, **create_flat_args())
+
     return wrapper
 
 
@@ -70,39 +69,31 @@ def create_modpython_rules(app):
             app.add_url_rule(rule, endpoint, view_func=create_flask_mp_wrapper(func), methods=('GET', 'POST'))
 
 
+@memoize
 def create_flask_rh_wrapper(rh):
-    def wrapper(**kwargs):
+    def wrapper():
         return rh(None).process(create_flat_args())
+
     return wrapper
 
 
-_rh_htdocs_wrappers = {}
+@memoize
 def create_flask_rh_htdocs_wrapper(rh):
-    if rh in _rh_htdocs_wrappers:
-        return _rh_htdocs_wrappers[rh]
-
     def wrapper(filepath, plugin=None):
         path = rh.calculatePath(filepath, plugin=plugin)
         if not os.path.isfile(path):
             raise NotFound
         return _send_file(path)
 
-    _rh_htdocs_wrappers[rh] = wrapper
     return wrapper
 
 
 def create_plugin_rules(app):
-    for key, rh in RHMapMemory()._map.iteritems():
+    for rule, rh in RHMapMemory()._map.iteritems():
+        endpoint = 'plugin-%s' % rh.__name__
         if issubclass(rh, RHHtdocs):
-            if not isinstance(key, basestring):  # all RHHtdocs should have rule strings, not regexes
-                warnings.warn('Skipped RHHtdocs %s which has a regex url' % rh.__name__)
-                continue
-            endpoint = 'plugin-htdocs-%s' % rh.__name__
-            app.add_url_rule(key, endpoint, view_func=create_flask_rh_htdocs_wrapper(rh))
+            app.add_url_rule(rule, endpoint, view_func=create_flask_rh_htdocs_wrapper(rh))
         else:
-            assert key.pattern[:2] == '^/'
-            endpoint = 'plugin-%s' % rh.__name__
-            rule = '/<regex("%s"):unused>' % key.pattern[2:]
             app.add_url_rule(rule, endpoint, view_func=create_flask_rh_wrapper(rh), methods=('GET', 'POST'))
 
 
@@ -123,12 +114,6 @@ def send_file(name, path, ftype, last_modified=None, no_cache=True):
     return rv
 
 
-class RegexConverter(BaseConverter):
-    def __init__(self, url_map, *items):
-        super(RegexConverter, self).__init__(url_map)
-        self.regex = items[0]
-
-
 class ResponseUtil(object):
     """This class allows "modifying" a Response object before it is actually created.
 
@@ -136,6 +121,7 @@ class ResponseUtil(object):
     it later in case of an error or to simply have something to pass around to functions
     which want to modify headers while there is no response available.
     """
+
     def __init__(self):
         self.headers = Headers()
         self._redirect = None
@@ -212,6 +198,7 @@ class XAccelMiddleware(object):
                     raise ValueError('Could not map %s to an URI' % xsf_path)
                 new_headers.append(('X-Accel-Redirect', uri))
             return start_response(status, new_headers, exc_info)
+
         return self.app(environ, _start_response)
 
     def make_x_accel_header(self, path):

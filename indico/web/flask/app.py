@@ -32,7 +32,7 @@ from MaKaC.i18n import _
 from MaKaC.webinterface.pages.error import WErrorWSGI
 from MaKaC.services.interface.rpc.json import process as jsonrpc_handler
 
-from indico.web.flask.util import create_modpython_rules, create_plugin_rules, XAccelMiddleware, RegexConverter
+from indico.web.flask.util import create_modpython_rules, create_plugin_rules, XAccelMiddleware
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.http_api.handlers import handler as api_handler
 
@@ -68,7 +68,9 @@ def configure_app(app):
 
 
 def extend_url_map(app):
-    app.url_map.converters['regex'] = RegexConverter
+    # Doesn't do anything currently. But if you ever need to add a custom url converter register
+    # it in here and put its class definition into indicoweb.flask.util
+    pass
 
 
 def add_handlers(app):

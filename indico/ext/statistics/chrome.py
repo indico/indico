@@ -113,7 +113,7 @@ class UHConfModifStatistics(URLHandler):
 
 class RHStatisticsView(RHConferenceModifBase):
 
-    _url = r"^/statistics/?$"
+    _url = '/statistics'
     _register = StatisticsRegister()
 
     def _checkProtection(self):

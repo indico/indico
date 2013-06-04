@@ -228,7 +228,7 @@ class RHConfModifCSProtection(RHConfModifCSBase):
             return p.display()
 
 class RHElectronicAgreement(RHConfModifCSBookings):
-    _url = r'^/Collaboration/elecAgree/?$'
+    _url = '/Collaboration/elecAgree'
 
     def _checkParams(self, params):
         RHConfModifCSBookings._checkParams(self, params)
@@ -244,7 +244,7 @@ class RHElectronicAgreement(RHConfModifCSBookings):
             return p.display(sortCriteria = self.sortCriteria, order = self.order)
 
 class RHUploadElectronicAgreement(RHConferenceModifBase):
-    _url = r'^/Collaboration/uploadElecAgree/?$'
+    _url = '/Collaboration/uploadElecAgree'
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
@@ -301,7 +301,7 @@ class RHUploadElectronicAgreement(RHConferenceModifBase):
             return json.dumps({'status': 'OK'}, textarea=True)
 
 class RHElectronicAgreementGetFile(RHConfModifCSBookings):
-    _url = r'^/Collaboration/getPaperAgree/?$'
+    _url = '/Collaboration/getPaperAgree'
 
     def _checkParams(self, params):
         RHConfModifCSBookings._checkParams( self, params )
@@ -318,7 +318,7 @@ class RHElectronicAgreementGetFile(RHConfModifCSBookings):
 
 
 class RHElectronicAgreementForm(RHConferenceBaseDisplay):
-    _url = r'^/Collaboration/elecAgreeForm/?$'
+    _url = '/Collaboration/elecAgreeForm'
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)

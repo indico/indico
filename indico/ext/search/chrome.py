@@ -104,7 +104,7 @@ class RHSearchHtdocs(RHHtdocs):
 
 class RHSearchBase(RHCustomizable):
 
-    _url = r"^/search/?$"
+    _url = '/search'
 
     def _checkProtection(self):
         if not PluginsHolder().hasPluginType("search"):

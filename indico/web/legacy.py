@@ -18,4 +18,4 @@
 
 
 def wrapUH(uh):
-    return r'^/%s$' % uh._relativeURL
+    return '/' + uh._relativeURL
