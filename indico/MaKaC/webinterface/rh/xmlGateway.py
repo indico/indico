@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 from MaKaC.webinterface.rh import base
 from MaKaC.common import xmlGen
@@ -38,7 +39,7 @@ class RHXMLHandlerBase ( base.RH ):
         self._genStatus(statusValue, message, XG)
         XG.closeTag("response")
 
-        self._req.content_type = "text/xml"
+        self._responseUtil.content_type = 'text/xml'
         return XG.getXml()
 
 
@@ -48,12 +49,12 @@ class RHLoginStatus( RHXMLHandlerBase ):
         XG.openTag("response")
         self._genStatus("OK", "Request succesful", XG)
         XG.openTag("login-status")
-        if self._getSession().getUser() != None:
-            XG.writeTag("user-id", self._getSession().getUser().getId())
+        if session.user is not None:
+            XG.writeTag("user-id", session.user.getId())
         XG.closeTag("login-status")
         XG.closeTag("response")
 
-        self._req.content_type = "text/xml"
+        self._responseUtil.content_type = 'text/xml'
         return XG.getXml()
 
 
@@ -86,17 +87,17 @@ class RHSignIn( RHXMLHandlerBase ):
         else:
             value = "OK"
             message = "Login succesful"
-            self._getSession().setUser( av )
+            session.user = av
 
         return self._createResponse(value, message)
 
 
 class RHSignOut( RHXMLHandlerBase ):
 
-    def _process( self ):
+    def _process(self):
         if self._getUser():
-            self._getSession().setUser( None )
-            self._setUser( None )
+            session.clear()
+            self._setUser(None)
 
         return self._createResponse("OK", "Logged out")
 
@@ -143,7 +144,7 @@ class RHWebcastOnAir( RHXMLHandlerBase ):
             self._printChannel(ch,XG)
         XG.closeTag("channels")
         XG.closeTag("response")
-        self._req.content_type = "text/xml"
+        self._responseUtil.content_type = 'text/xml'
         return XG.getXml()
 
 class RHWebcastForthcomingEvents( RHXMLHandlerBase ):
@@ -173,7 +174,7 @@ class RHWebcastForthcomingEvents( RHXMLHandlerBase ):
                     self._printWebcast(wc,XG)
         XG.closeTag("webcasts")
         XG.closeTag("response")
-        self._req.content_type = "text/xml"
+        self._responseUtil.content_type = 'text/xml'
         return XG.getXml()
 
 class RHCategInfo( RHXMLHandlerBase ):
@@ -206,7 +207,7 @@ class RHCategInfo( RHXMLHandlerBase ):
         return XG.getXml()
 
     def _process( self ):
-        self._req.content_type = "text/xml"
+        self._responseUtil.content_type = 'text/xml'
         cm = CategoryManager()
         try:
             XG = xmlGen.XMLGen()
@@ -240,7 +241,7 @@ class RHStatsRoomBooking( base.RoomBookingDBMixin, RHXMLHandlerBase ):
         startdt.replace( hour = 0, minute = 0)
         enddt.replace( hour = 23, minute = 59)
 
-        self._req.content_type = "text/xml"
+        self._responseUtil.content_type = 'text/xml'
         XG = xmlGen.XMLGen()
         XG.openTag("response")
 
@@ -291,7 +292,7 @@ class RHStatsIndico( RHXMLHandlerBase ):
         from datetime import datetime,timedelta
         from MaKaC.common.indexes import IndexesHolder
 
-        self._req.content_type = "text/xml"
+        self._responseUtil.content_type = 'text/xml'
         XG = xmlGen.XMLGen()
         XG.openTag("response")
 
