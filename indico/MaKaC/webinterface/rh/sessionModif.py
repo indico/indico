@@ -342,14 +342,8 @@ class RHSessionModifSchedule(RoomBookingDBMixin, RHSessionModCoordinationBase):
 
     def _checkParams(self,params):
         RHSessionModCoordinationBase._checkParams(self,params)
-        view = params.get("view", "parallel").strip()
-        if view:
-            session['scheduleView'] = view
-        elif 'scheduleView' not in session:
-            session['scheduleView'] = 'parallel'
-        self._view = session['scheduleView']
         params["days"] = params.get("day", "all")
-        if params.get("day", None) is not None :
+        if params.get("day", None) is not None:
             del params["day"]
 
     def _process( self ):
@@ -362,8 +356,6 @@ class RHSessionModifSchedule(RoomBookingDBMixin, RHSessionModCoordinationBase):
                p = wf.getSessionModifSchedule(self,self._session)
 
         params = self._getRequestParams()
-        params['view'] = self._view
-
         return p.display(**params)
 
 

@@ -426,14 +426,6 @@ class RHConfModifSchedule( RoomBookingDBMixin, RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-
-        view = params.get('view', '').strip()
-        if view:
-            session['scheduleView'] = view
-        elif 'scheduleView' not in session:
-            session['scheduleView'] = 'parallel'
-        self._view = session['scheduleView']
-
         params["sessions"] = self._normaliseListParam( params.get("session", []) )
         params["slot"] = params.get("slot", [])
         params["days"] = params.get("day", "all")
