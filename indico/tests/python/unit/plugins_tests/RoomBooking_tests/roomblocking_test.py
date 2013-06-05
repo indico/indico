@@ -153,7 +153,6 @@ class TestRoomBlocking(RoomBookingTestCase):
 
     def setUp(self):
         super(TestRoomBlocking, self).setUp()
-        GenericMailer.send = staticmethod(lambda notification: None)
 
     def _blockRoom(self, block, room, approve=True):
         br = BlockedRoom(room)

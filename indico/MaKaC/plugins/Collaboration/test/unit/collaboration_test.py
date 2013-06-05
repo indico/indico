@@ -24,7 +24,7 @@
 from MaKaC.common.db import DBMgr
 from MaKaC.conference import ConferenceHolder
 from random import Random
-from MaKaC.services.implementation.collaboration import CollaborationRemoveCSBooking, CollaborationBookingIndexQuery, CollaborationCreateTestCSBooking
+from MaKaC.plugins.Collaboration.services import CollaborationRemoveCSBooking, CollaborationBookingIndexQuery, CollaborationCreateTestCSBooking
 from MaKaC.plugins.Collaboration.actions import DeleteAllBookingsAction
 from indico.core.index import Catalog
 from MaKaC.common.indexes import IndexesHolder

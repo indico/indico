@@ -20,10 +20,10 @@
 # For now, disable Pylint
 # pylint: disable-all
 
-from indico.tests.env import *
+#from indico.tests.env import *
 
 from MaKaC.user import Avatar
-from MaKaC.conference import AvatarHolder, AdminList, Conference, Contribution,\
+from MaKaC.conference import AvatarHolder, AdminList, Contribution,\
     timezone, datetime, ContributionParticipation, Session, SessionSlot, ConferenceHolder
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.services import SetSpeakerEmailAddress, SendElectronicAgreement,\
