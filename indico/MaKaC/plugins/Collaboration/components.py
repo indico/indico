@@ -25,11 +25,11 @@ import zope.interface
 from MaKaC.conference import Conference, Contribution
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.indexes import CSBookingInstanceWrapper, BookingManagerConferenceIndex
-from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationDisplay, UHConfModifCollaboration
+from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationDisplay, UHConfModifCollaboration, UHAdminCollaboration
 from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin, RCVideoServicesManager, RCVideoServicesUser
 from MaKaC.plugins.Collaboration.output import OutputGenerator
 from MaKaC.plugins.Collaboration.base import CSBookingManager
-from MaKaC.plugins.Collaboration.pages import WEventDetailBanner, WVideoService
+from MaKaC.plugins.Collaboration.pages import WEventDetailBanner, WVideoService, WPluginHelp
 
 from MaKaC.plugins import Collaboration, Plugin
 
@@ -43,8 +43,8 @@ from MaKaC.webinterface import wcomponents
 from indico.core.index import OOIndex, Index, Catalog
 from indico.core.index.adapter import IIndexableByStartDateTime
 from indico.core.extpoint import Component
-from indico.core.extpoint.events import IObjectLifeCycleListener, ITimeActionListener, IMetadataChangeListener, INavigationContributor, IEventDisplayContributor
-from indico.core.extpoint.plugins import IPluginSettingsContributor, IPluginRightsContributor
+from indico.core.extpoint.events import IObjectLifeCycleListener, ITimeActionListener, IMetadataChangeListener, INavigationContributor, IEventDisplayContributor, IHeaderContributor
+from indico.core.extpoint.plugins import IPluginSettingsContributor, IPluginRightsContributor, IPluginDocumentationContributor
 from indico.core.extpoint.location import ILocationActionListener
 from indico.core.extpoint.index import ICatalogIndexProvider, IIndexHolderProvider
 
@@ -455,3 +455,20 @@ class PluginRightsContributor(Component):
         """
 
         return RCVideoServicesUser(params.get("user", None), params.get("pluginName"))
+
+
+class PluginDocumentationContributor(Component):
+
+    zope.interface.implements(IPluginDocumentationContributor)
+
+    def providePluginDocumentation(self, obj):
+        return WPluginHelp.forModule(Collaboration).getHTML({})
+
+class HeaderContributor(Component):
+    zope.interface.implements(IHeaderContributor)
+
+    def addParamsToHeaderItem(self, obj, params, itemList):
+        user = params.get("user", None)
+        if user:
+            if (user.isAdmin() or RCCollaborationAdmin.hasRights(user) or RCCollaborationPluginAdmin.hasRights(user, plugins = "any")) and CollaborationTools.anyPluginsAreActive():
+                itemList.append({'id': 'vsOverview', 'url': UHAdminCollaboration.getURL(), 'text': _("Video Services Overview")})

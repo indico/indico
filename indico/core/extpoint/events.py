@@ -276,3 +276,12 @@ class IUserAreaContributor(IContributor):
         Returns the preferences that the plugins want to add in user profile preferences
         """
 
+class IHeaderContributor(IContributor):
+    """
+    Aggregates extension points that relate to the user area pages
+    """
+    def addParamsToHeaderItem(self, obj, itemList):
+        """
+        Returns the preferences that the plugins want to add in user profile preferences
+        """
+

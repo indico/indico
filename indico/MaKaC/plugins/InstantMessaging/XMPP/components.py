@@ -24,10 +24,12 @@ from MaKaC.plugins.InstantMessaging.XMPP.helpers import GeneralLinkGenerator
 from MaKaC.plugins.helpers import DBHelpers
 from MaKaC.plugins.InstantMessaging.indexes import IndexByConf, IndexByCRName, IndexByID, IndexByUser
 from MaKaC.plugins.InstantMessaging import urlHandlers
+from MaKaC.plugins.InstantMessaging.pages import WPluginHelp
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat, i18nformat
+from MaKaC.plugins import InstantMessaging
+
+from indico.util.i18n import i18nformat
 from MaKaC.conference import ConferenceHolder
-from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface import wcomponents
@@ -37,6 +39,7 @@ import zope.interface
 
 from indico.core.extpoint import Component
 from indico.core.extpoint.events import INavigationContributor
+from indico.core.extpoint.plugins import IPluginDocumentationContributor
 from MaKaC.common.Configuration import Config
 
 
@@ -333,3 +336,11 @@ by the user %s.
 
 Thank you for using our system.""" %(room.getTitle(), conference.getTitle(), conference.getId(), room.getOwner().getFullName()))
         return self
+
+
+class PluginDocumentationContributor(Component):
+
+    zope.interface.implements(IPluginDocumentationContributor)
+
+    def providePluginDocumentation(self, obj):
+        return WPluginHelp.forModule(InstantMessaging).getHTML({})

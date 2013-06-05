@@ -193,3 +193,6 @@ class WConferenceInstantMessaging(wcomponents.WTemplated):
             vars["Links"][cr.getId()]['custom'] = generateCustomLinks(cr)
 
         return vars
+
+class WPluginHelp(wcomponents.WTemplated):
+    pass

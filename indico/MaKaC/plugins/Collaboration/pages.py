@@ -796,3 +796,16 @@ class WVideoService(wcomponents.WTemplated):
         vars["video"] = self._video
         vars["aw"] = ContextManager.get("currentRH").getAW()
         return vars
+
+class WPluginHelp(wcomponents.WTemplated):
+
+    def getVars(self):
+        from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin
+        from MaKaC.webinterface.rh.admins import RCAdmin
+
+        vars = wcomponents.WTemplated.getVars(self)
+        user = ContextManager.get("currentUser")
+        vars["user"] = user
+        vars["IsAdmin"] = RCAdmin.hasRights(self._rh)
+        vars["IsCollaborationAdmin"] = RCCollaborationAdmin.hasRights(user)
+        return vars

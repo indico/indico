@@ -32,6 +32,9 @@ from MaKaC.common.info import HelperMaKaCInfo
 from indico.web.assets import PluginEnvironment
 from indico.core.extpoint import Component
 from indico.core.extpoint.events import ITimetableContributor
+from indico.core.extpoint.plugins import IPluginDocumentationContributor
+from indico.ext import importer
+from indico.ext.importer.pages import WPluginHelp
 
 
 class ImporterContributor(Component, Observable):
@@ -68,3 +71,11 @@ class ImporterContributor(Component, Observable):
         Inserts an "Import" link in a timetable header.
         """
         params.update({"Import" : "createImporterDialog"})
+
+
+class PluginDocumentationContributor(Component):
+
+    zope.interface.implements(IPluginDocumentationContributor)
+
+    def providePluginDocumentation(self, obj):
+        return WPluginHelp.forModule(importer).getHTML({})

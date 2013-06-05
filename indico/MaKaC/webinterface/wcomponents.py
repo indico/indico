@@ -17,15 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from webassets import Environment
-from indico.web import assets
 
-from MaKaC.plugins import PluginsHolder, OldObservable
+from MaKaC.plugins import OldObservable
 from MaKaC.plugins.base import extension_point
 
-import os,types,string
+import os, types
 from xml.sax.saxutils import escape, quoteattr
-from copy import copy
 from datetime import timedelta,datetime,date
 from dateutil.relativedelta import relativedelta
 import exceptions
@@ -33,7 +30,6 @@ import urllib
 from operator import attrgetter
 from MaKaC.common.db import DBMgr
 import MaKaC.conference as conference
-from MaKaC.conference import CategoryManager
 import MaKaC.user as user
 import MaKaC.schedule as schedule
 import MaKaC.common.info as info
@@ -43,14 +39,12 @@ import MaKaC.common.Configuration as Configuration
 from MaKaC import webcast
 
 from MaKaC.accessControl import AdminList
-from MaKaC.errors import UserError
 from MaKaC.common.url import URL
 from MaKaC.common import Config
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.conference import Conference, Category
 
 from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry
-import MaKaC.webinterface.common.timezones as convertTime
 from pytz import timezone
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, utctimestamp2date
 from MaKaC.webinterface.common import contribFilters as contribFilters
@@ -61,7 +55,6 @@ import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.common.TemplateExec as templateEngine
 from MaKaC.common.ContextHelp import ContextHelp
 from MaKaC.rb_tools import FormMode, overlap
-from MaKaC.common.info import HelperMaKaCInfo
 
 from lxml import etree
 
@@ -77,7 +70,6 @@ from indico.util.date_time import utc_timestamp, is_same_month
 from indico.core.index import Catalog
 
 from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
-from indico.web.http_api.auth import APIKey
 from indico.web.http_api.util import generate_public_auth_request
 import pkgutil
 import pkg_resources
@@ -374,12 +366,7 @@ class WHeader(WTemplated):
         if self._currentuser:
             if self._currentuser.isAdmin() or not adminList.getList():
                 adminItemList.append({'id': 'serverAdmin', 'url': urlHandlers.UHAdminArea.getURL(), 'text': _("Server admin")})
-            if PluginsHolder().hasPluginType("Collaboration"):
-                from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
-                from MaKaC.plugins.Collaboration.urlHandlers import UHAdminCollaboration
-                from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-                if (self._currentuser.isAdmin() or RCCollaborationAdmin.hasRights(user = self._currentuser) or RCCollaborationPluginAdmin.hasRights(user = self._currentuser, plugins = "any")) and CollaborationTools.anyPluginsAreActive():
-                    adminItemList.append({'id': 'vsOverview', 'url': UHAdminCollaboration.getURL(), 'text': _("Video Services Overview")})
+            self._notify("addParamsToHeaderItem",{"user": self._currentuser}, adminItemList)
             if webcast.HelperWebcastManager.getWebcastManagerInstance().isManager(self._currentuser):
                 adminItemList.append({'id': 'webcastAdmin', 'url': urlHandlers.UHWebcast.getURL(), 'text': _("Webcast Admin")})
 

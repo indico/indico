@@ -50,3 +50,8 @@ class IPluginRightsContributor(IContributor):
 
     def isPluginUser(self, obj, params):
         pass
+
+class IPluginDocumentationContributor(IContributor):
+
+    def providePluginDocumentation(self, obj):
+        pass
