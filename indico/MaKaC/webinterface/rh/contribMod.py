@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from cStringIO import StringIO
 
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -39,6 +40,8 @@ from MaKaC.i18n import _
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.webinterface.rh.materialDisplay import RHMaterialDisplayCommon
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+from indico.web.flask.util import send_file
+
 
 class RHContribModifBase(RHModificationBaseProtected):
     """ Base RH for contribution modification.
@@ -758,14 +761,7 @@ class RHContributionToXML(RHContributionModification):
 
         x.closeTag("contribution")
 
-        data = x.getXml()
-
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType("XML")
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, StringIO(x.getXml()), 'XML', inline=True)
 
 
 class RHContributionToPDF(RHContributionModification):
@@ -775,13 +771,7 @@ class RHContributionToPDF(RHContributionModification):
         tz = self._target.getConference().getTimezone()
         filename = "%s - Contribution.pdf"%self._target.getTitle()
         pdf = ConfManagerContribToPDF(self._target.getConference(), self._target, tz=tz)
-        data = pdf.getPDFBin()
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType("PDF")
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
 
 class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):

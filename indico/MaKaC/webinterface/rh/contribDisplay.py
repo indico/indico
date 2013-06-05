@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from cStringIO import StringIO
 
 import os.path
 import sys
@@ -32,6 +33,7 @@ from MaKaC.errors import MaKaCError, ModificationError, NoReportError
 import MaKaC.common.timezoneUtils as timezoneUtils
 import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.i18n import _
+from indico.web.flask.util import send_file
 from indico.web.http_api.api import ContributionHook
 from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
@@ -91,12 +93,7 @@ class RHContributionToXML(RHContributionDisplay):
                 data = "Cannot parse stylesheet: %s" % sys.exc_info()[0]
         else:
             data = basexml
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "XML" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, StringIO(data), 'XML', inline=True)
 
 
 class RHContributionToPDF(RHContributionDisplay):
@@ -105,13 +102,7 @@ class RHContributionToPDF(RHContributionDisplay):
         tz = timezoneUtils.DisplayTZ(self._aw,self._target.getConference()).getDisplayTZ()
         filename = "%s - Contribution.pdf"%self._target.getTitle()
         pdf = ContribToPDF(self._target.getConference(), self._target, tz=tz)
-        data = pdf.getPDFBin()
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
 
 class RHContributionToiCal(RoomBookingDBMixin, RHContributionDisplay):
@@ -124,18 +115,12 @@ class RHContributionToiCal(RoomBookingDBMixin, RHContributionDisplay):
         filename = "%s-Contribution.ics"%self._target.getTitle()
 
         hook = ContributionHook({}, 'contribution', {'event': self._conf.getId(), 'idlist':self._contrib.getId(), 'dformat': 'ics'})
-        res = hook(self.getAW(), self._req)
+        res = hook(self.getAW())
         resultFossil = {'results': res[0]}
 
         serializer = Serializer.create('ics')
-        data = serializer(resultFossil)
+        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL', inline=True)
 
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ICAL" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
 
 class RHContributionToMarcXML(RHContributionDisplay):
 
@@ -149,13 +134,7 @@ class RHContributionToMarcXML(RHContributionDisplay):
         xmlgen.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
         outgen.contribToXMLMarc21(self._target, xmlgen)
         xmlgen.closeTag("marc:record")
-        data = xmlgen.getXml()
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "XML" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, StringIO(xmlgen.getXml()), 'XML', inline=True)
 
 
 class RHContributionMaterialSubmissionRightsBase(RHContributionDisplay):
