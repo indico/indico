@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrants as registrants
@@ -48,8 +49,7 @@ class RHRegistrantListMenuClose(RHRegistrantListModifBase):
         self._currentURL = params.get("currentURL","")
 
     def _process( self ):
-        websession = self._getSession()
-        websession.setVar("RegistrantListMenuStatus", "close")
+        session['RegistrantListMenuStatus'] = 'close'
         self._redirect(self._currentURL)
 
 
@@ -60,8 +60,7 @@ class RHRegistrantListMenuOpen(RHRegistrantListModifBase):
         self._currentURL = params.get("currentURL","")
 
     def _process( self ):
-        websession = self._getSession()
-        websession.setVar("RegistrantListMenuStatus", "open")
+        session['RegistrantListMenuStatus'] = 'open'
         self._redirect(self._currentURL)
 
 class RHRegistrantListModif( RHRegistrantListModifBase ):

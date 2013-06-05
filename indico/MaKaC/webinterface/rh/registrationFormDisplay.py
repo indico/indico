@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -78,7 +79,7 @@ class RHRegistrationFormSignIn( RHBaseRegistrationForm ):
         av = auth.autoLogin(self)
         if av:
             url = self._returnURL
-            self._getSession().setUser( av )
+            session.user = av
             if Config.getInstance().getBaseSecureURL().startswith('https://'):
                 url = str(url).replace('http://', 'https://')
             self._redirect( url )
@@ -221,7 +222,7 @@ class RHRegistrationFormconfirmBooking( RHRegistrationFormRegistrantBase ):
         if self._conf.getModPay().hasPaymentConditions() and params.get("conditions","false") != "on":
             raise MaKaCError("You cannot pay without accepting the conditions")
         else:
-            self._getSession().setVar("conditionsAccepted","on")
+            session['conditionsAccepted'] = True
 
     def _processIfActive( self ):
         if self._registrant is not None:
@@ -235,11 +236,8 @@ class RHRegistrationFormconfirmBookingDone( RHRegistrationFormRegistrantBase ):
 
     def _checkParams(self, params):
         RHRegistrationFormRegistrantBase._checkParams(self, params)
-        cond=self._getSession().getVar("conditionsAccepted")
-        if cond is None:
+        if not session.get('conditionsAccepted'):
             raise MaKaCError("You cannot pay without accepting the conditions")
-        #else:
-        #    self._getSession().removeVar("conditionsAccepted")
 
 
     def _processIfActive( self ):
