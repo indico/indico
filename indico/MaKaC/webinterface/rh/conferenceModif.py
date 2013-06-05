@@ -19,6 +19,7 @@
 
 import os
 import shutil
+from cStringIO import StringIO
 import tempfile
 import types
 from flask import session, request
@@ -74,6 +75,7 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from indico.modules.scheduler import Client
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
+from indico.web.flask.util import send_file
 
 
 class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
@@ -684,15 +686,8 @@ class RHConfModifParticipantsAction(RHConfModifParticipants):
             for id in selectedList :
                 participant = self._conf.getParticipation().getParticipantById(id)
                 toList.append(participant)
-        filename = "ParticipantList.csv"
-        excel = ParticipantsListToExcel(self._conf,list=toList)
-        data = excel.getExcelFile()
-        self._req.set_content_length(len(data))
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "CSV" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = 'inline; filename="%s\"'%filename
-        return data
+        excel = ParticipantsListToExcel(self._conf, list=toList)
+        return send_file('ParticipantList.csv', StringIO(excel.getExcelFile()), 'CSV', inline=True)
 
 
 class RHConfModifParticipantsStatistics(RHConferenceModifBase):
@@ -1847,27 +1842,27 @@ class RHAbstractsActions:
     class to select the action to do with the selected abstracts
     """
     def __init__(self, req):
-        self._req = req
+        assert req is None
 
     def process(self, params):
         if params.has_key("newAbstract"):
-            return RHNewAbstract(self._req).process(params)
+            return RHNewAbstract(None).process(params)
         elif params.has_key("pdf"):
-            return RHAbstractsToPDF(self._req).process(params)
+            return RHAbstractsToPDF(None).process(params)
         elif params.has_key("excel"):
-            return RHAbstractsListToExcel(self._req).process(params)
+            return RHAbstractsListToExcel(None).process(params)
         elif params.has_key("xml"):
-            return RHAbstractsToXML(self._req).process(params)
+            return RHAbstractsToXML(None).process(params)
         elif params.has_key("auth"):
-            return RHAbstractsParticipantList(self._req).process(params)
+            return RHAbstractsParticipantList(None).process(params)
         elif params.has_key("merge"):
-            return RHAbstractsMerge(self._req).process(params)
+            return RHAbstractsMerge(None).process(params)
         elif params.has_key("acceptMultiple"):
-            return RHAbstractManagmentAcceptMultiple(self._req).process(params)
+            return RHAbstractManagmentAcceptMultiple(None).process(params)
         elif params.has_key("rejectMultiple"):
-            return RHAbstractManagmentRejectMultiple(self._req).process(params)
+            return RHAbstractManagmentRejectMultiple(None).process(params)
         elif params.has_key("PKGA"):
-            return RHMaterialPackageAbstract(self._req).process(params)
+            return RHMaterialPackageAbstract(None).process(params)
         return "no action to do"
 
 
@@ -2100,19 +2095,12 @@ class RHAbstractsToPDF(RHConfModifCFABase):
         RHConfModifCFABase._checkParams( self, params )
         self._abstractIds = normaliseListParam( params.get("abstracts", []) )
 
-    def _process( self ):
+    def _process(self):
         tz = self._conf.getTimezone()
-        filename = "Abstracts.pdf"
         if not self._abstractIds:
             return _("No abstract to print")
-        pdf = ConfManagerAbstractsToPDF(self._conf, self._abstractIds,tz=tz)
-        data = pdf.getPDFBin()
-        self._req.set_content_length(len(data))
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+        pdf = ConfManagerAbstractsToPDF(self._conf, self._abstractIds, tz=tz)
+        return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
 
 class RHAbstractsToXML(RHConfModifCFABase):
@@ -2126,9 +2114,7 @@ class RHAbstractsToXML(RHConfModifCFABase):
             #if abMgr.getAbstractById(id).canView( self._aw ):
             self._abstracts.append(abMgr.getAbstractById(id))
 
-    def _process( self ):
-        filename = "Abstracts.xml"
-
+    def _process(self):
         x = XMLGen()
 
         x.openTag("AbstractBook")
@@ -2184,14 +2170,8 @@ class RHAbstractsToXML(RHConfModifCFABase):
 
         x.closeTag("AbstractBook")
 
-        data = x.getXml()
+        return send_file('Abstracts.pdf', StringIO(x.getXml()), 'XML', inline=True)
 
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "XML" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
 
 #-------------------------------------------------------------------------------------
 
@@ -2203,22 +2183,12 @@ class RHAbstractsListToExcel(RHConfModifCFABase):
         self._display = self._normaliseListParam(params.get("disp",[]))
 
     def _process( self ):
-        filename = "AbstractList.csv"
-
         abstractList = []
         for abs_id in self._abstracts :
             abstractList.append(self._conf.getAbstractMgr().getAbstractById(abs_id))
 
         generator = AbstractListToExcel(self._conf,abstractList, self._display)
-        data = generator.getExcelFile()
-
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "CSV" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
-
+        return send_file('AbstractList.csv', StringIO(generator.getExcelFile()), 'CSV', inline=True)
 
 
 #-------------------------------------------------------------------------------------
@@ -2311,8 +2281,8 @@ class RHConfModifDisplayAddPageFileBrowser( RHConferenceModifBase ):
         RHConferenceModifBase._checkParams( self, params )
         self._params = params
 
-    def _process( self ):
-        p = conferences.WPConfModifDisplayImageBrowser(self._target, self._req)
+    def _process(self):
+        p = conferences.WPConfModifDisplayImageBrowser(self._target)
         return p.getHTML()
 
 class RHConfModifDisplayAddPageFile( RHConferenceModifBase ):
@@ -2343,7 +2313,6 @@ window.parent.OnUploadCompleted(%s,"%s","%s", "%s") ;
         return fileName
 
     def _process( self ):
-        self._req.content_type = "text/html"
         if "NewFile" in self._params and not type(self._params["NewFile"]) is types.StringType:
             newFile = self._params["NewFile"]
             if not hasattr(self, "_filePath"):
@@ -3280,23 +3249,23 @@ class RHContribsActions:
     class to select the action to do with the selected abstracts
     """
     def __init__(self, req):
-        self._req = req
+        assert req is None
 
     def process(self, params):
         if params.has_key("PDF"):
-            return RHContribsToPDF(self._req).process(params)
+            return RHContribsToPDF(None).process(params)
         elif params.has_key("excel.x"):
-            return  RHContribsToExcel(self._req).process(params)
+            return  RHContribsToExcel(None).process(params)
         elif params.has_key("xml.x"):
-            return  RHContribsToXML(self._req).process(params)
+            return  RHContribsToXML(None).process(params)
         elif params.has_key("AUTH"):
-            return RHContribsParticipantList(self._req).process(params)
+            return RHContribsParticipantList(None).process(params)
         elif params.has_key("move"):
-            return RHMoveContribsToSession(self._req).process(params)
+            return RHMoveContribsToSession(None).process(params)
         elif params.has_key("PKG"):
-            return RHMaterialPackage(self._req).process(params)
+            return RHMaterialPackage(None).process(params)
         elif params.has_key("PROC"):
-            return RHProceedings(self._req).process(params)
+            return RHProceedings(None).process(params)
         return "no action to do"
 
 
@@ -3320,25 +3289,13 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
             tz = self._target.getTimezone()
             filename = "%s - Book of abstracts.pdf"%self._target.getTitle()
             pdf = ContributionBook(self._target, self._contribs, self.getAW(),tz=tz)
-            data = pdf.getPDFBin()
-            self._req.headers_out["Content-Length"] = "%s"%len(data)
-            cfg = Config.getInstance()
-            mimetype = cfg.getFileTypeMimeType( "PDF" )
-            self._req.content_type = """%s"""%(mimetype)
-            self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-            return data
+            return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
         elif self._displayType == "bookOfAbstractBoardNo":
             tz = self._target.getTimezone()
             filename = "%s - Book of abstracts.pdf"%self._target.getTitle()
             pdf = ContributionBook(self._target, self._contribs, self.getAW(),tz=tz, sortedBy="boardNo")
-            data = pdf.getPDFBin()
-            self._req.headers_out["Content-Length"] = "%s"%len(data)
-            cfg = Config.getInstance()
-            mimetype = cfg.getFileTypeMimeType( "PDF" )
-            self._req.content_type = """%s"""%(mimetype)
-            self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-            return data
+            return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
         elif self._displayType == "ContributionList":
             tz = self._conf.getTimezone()
@@ -3346,15 +3303,7 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
             if not self._contribs:
                 return "No contributions to print"
             pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-            data = pdf.getPDFBin()
-            #self._req.headers_out["Accept-Ranges"] = "bytes"
-            self._req.set_content_length(len(data))
-            #self._req.headers_out["Content-Length"] = "%s"%len(data)
-            cfg = Config.getInstance()
-            mimetype = cfg.getFileTypeMimeType( "PDF" )
-            self._req.content_type = """%s"""%(mimetype)
-            self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-            return data
+            return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
 
 class RHContribsToPDF(RHConferenceModifBase):
@@ -3372,15 +3321,8 @@ class RHContribsToPDF(RHConferenceModifBase):
         if not self._contribs:
             return "No contributions to print"
         pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-        data = pdf.getPDFBin()
-        #self._req.headers_out["Accept-Ranges"] = "bytes"
-        self._req.set_content_length(len(data))
-        #self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+
 
 class RHContribsToExcel(RHConferenceModifBase):
 
@@ -3397,13 +3339,8 @@ class RHContribsToExcel(RHConferenceModifBase):
         if not self._contribs:
             return "No contributions to print"
         excel = ContributionsListToExcel(self._conf, self._contribs, tz=tz)
-        data = excel.getExcelFile()
-        self._req.set_content_length(len(data))
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "CSV" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+        return send_file(filename, StringIO(excel.getExcelFile()), 'CSV', inline=True)
+
 
 class RHContribsToXML(RHConferenceModifBase):
 
@@ -3418,13 +3355,7 @@ class RHContribsToXML(RHConferenceModifBase):
         from MaKaC.common.fossilize import fossilize
         resultFossil = fossilize(self._contribs)
         serializer = Serializer.create('xml')
-        data = serializer(resultFossil)
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "XML" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+        return send_file(filename, StringIO(serializer(resultFossil)), 'XML', inline=True)
 
 
 class RHContribsParticipantList(RHConferenceModifBase):
@@ -3563,12 +3494,7 @@ class RHMaterialPackageAbstract(RHConferenceModifBase):
             return FormValuesError(_("No abstract selected"))
         p = AbstractPacker(self._conf)
         path = p.pack(self._abstracts, ZIPFileHandler())
-        filename = "abstractFiles.zip"
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ZIP" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        self._req.sendfile(path)
+        return send_file('abstractFiles.zip', path, 'ZIP')
 
 
 class RHMaterialPackage(RHConferenceModifBase):
@@ -3585,24 +3511,14 @@ class RHMaterialPackage(RHConferenceModifBase):
             return "No contribution selected"
         p=ContribPacker(self._conf)
         path=p.pack(self._contribs,["paper","slides"], ZIPFileHandler())
-        filename = "material.zip"
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ZIP" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        self._req.sendfile(path)
+        return send_file('material.zip', path, 'ZIP')
 
 class RHProceedings(RHConferenceModifBase):
 
     def _process( self ):
         p=ProceedingsPacker(self._conf)
         path=p.pack(ZIPFileHandler())
-        filename = "proceedings.zip"
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ZIP" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        self._req.sendfile(path)
+        return send_file('proceedings.zip', path, 'ZIP')
 
 
 class RHAbstractBook( RHConfModifCFABase ):
@@ -3680,19 +3596,13 @@ class RHFullMaterialPackagePerform(RHConferenceModifBase):
 
     def _process( self ):
         if not self._cancel:
-            if self._materialTypes != []:
+            if self._materialTypes:
                 p=ConferencePacker(self._conf, self._aw)
                 path=p.pack(self._materialTypes, self._days, self._mainResource, self._fromDate, ZIPFileHandler(),self._sessionList)
                 if not p.getItems():
                     raise NoReportError(_("The selected package does not contain any items."))
-                filename = "full-material.zip"
-                cfg = Config.getInstance()
-                mimetype = cfg.getFileTypeMimeType( "ZIP" )
-                self._req.content_type = """%s"""%(mimetype)
-                self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-                self._req.sendfile(path)
-            else:
-                raise NoReportError(_("You have to select at least one material type"))
+                return send_file('full-material.zip', path, 'ZIP')
+            raise NoReportError(_("You have to select at least one material type"))
         else:
             self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
 
@@ -3770,13 +3680,13 @@ class RHConfModifPendingQueuesActionConfSubm:
     _uh = urlHandlers.UHConfModifPendingQueuesActionConfSubm
 
     def __init__(self, req):
-        self._req = req
+        assert req is None
 
     def process(self, params):
-        if params.has_key("remove"):
-            return RHConfModifPendingQueuesRemoveConfSubm(self._req).process(params)
-        elif params.has_key("reminder"):
-            return RHConfModifPendingQueuesReminderConfSubm(self._req).process(params)
+        if 'remove' in params:
+            return RHConfModifPendingQueuesRemoveConfSubm(None).process(params)
+        elif 'reminder' in params:
+            return RHConfModifPendingQueuesReminderConfSubm(None).process(params)
         return "no action to do"
 
 class RHConfModifPendingQueuesRemoveConfSubm( RHConferenceModifBase ):
@@ -3839,13 +3749,13 @@ class RHConfModifPendingQueuesActionSubm:
     _uh = urlHandlers.UHConfModifPendingQueuesActionSubm
 
     def __init__(self, req):
-        self._req = req
+        assert req is None
 
     def process(self, params):
-        if params.has_key("remove"):
-            return RHConfModifPendingQueuesRemoveSubm(self._req).process(params)
-        elif params.has_key("reminder"):
-            return RHConfModifPendingQueuesReminderSubm(self._req).process(params)
+        if 'remove' in params:
+            return RHConfModifPendingQueuesRemoveSubm(None).process(params)
+        elif 'reminder' in params:
+            return RHConfModifPendingQueuesReminderSubm(None).process(params)
         return "no action to do"
 
 class RHConfModifPendingQueuesRemoveSubm( RHConferenceModifBase ):
@@ -3908,13 +3818,13 @@ class RHConfModifPendingQueuesActionMgr:
     _uh = urlHandlers.UHConfModifPendingQueuesActionMgr
 
     def __init__(self, req):
-        self._req = req
+        assert req is None
 
     def process(self, params):
-        if params.has_key("remove"):
-            return RHConfModifPendingQueuesRemoveMgr(self._req).process(params)
-        elif params.has_key("reminder"):
-            return RHConfModifPendingQueuesReminderMgr(self._req).process(params)
+        if 'remove' in params:
+            return RHConfModifPendingQueuesRemoveMgr(None).process(params)
+        elif 'reminder' in params:
+            return RHConfModifPendingQueuesReminderMgr(None).process(params)
         return "no action to do"
 
 class RHConfModifPendingQueuesRemoveMgr( RHConferenceModifBase ):
@@ -3978,13 +3888,13 @@ class RHConfModifPendingQueuesActionCoord:
     _uh = urlHandlers.UHConfModifPendingQueuesActionCoord
 
     def __init__(self, req):
-        self._req = req
+        assert req is None
 
     def process(self, params):
-        if params.has_key("remove"):
-            return RHConfModifPendingQueuesRemoveCoord(self._req).process(params)
-        elif params.has_key("reminder"):
-            return RHConfModifPendingQueuesReminderCoord(self._req).process(params)
+        if 'remove' in params:
+            return RHConfModifPendingQueuesRemoveCoord(None).process(params)
+        elif 'reminder' in params:
+            return RHConfModifPendingQueuesReminderCoord(None).process(params)
         return "no action to do"
 
 class RHConfModifPendingQueuesRemoveCoord( RHConferenceModifBase ):
@@ -4622,9 +4532,9 @@ class RHConfBadgePrinting(RHConfBadgeBase):
 
                 if self.__new:
                     self._target.getBadgeTemplateManager().storeTemplate(self.__templateId, self.__templateData)
-                    key = "tempBackground", self._conf.id, self.__templateId
-                    filePaths = self._getSession().getVar(key)
-                    if filePaths != None:
+                    key = "tempBackground-%s-%s" % (self._conf.id, self.__templateId)
+                    filePaths = session.get(key)
+                    if filePaths:
                         cfg = Config.getInstance()
                         tempPath = cfg.getUploadedFilesSharedTempDir()
                         for filePath in filePaths:
@@ -4643,8 +4553,8 @@ class RHConfBadgePrinting(RHConfBadgeBase):
                 if self._target.getBadgeTemplateManager().hasTemplate(self.__templateId):
                     self._target.getBadgeTemplateManager().getTemplateById(self.__templateId).deleteTempBackgrounds()
                 else:
-                    key = "tempBackground", self._conf.id, self.__templateId
-                    self._getSession().removeVar(key)
+                    key = "tempBackground-%s-%s" % (self._conf.id, self.__templateId)
+                    session.pop(key, None)
 
 
             if self._target.getId() == "default":
@@ -4776,8 +4686,6 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
                 self.__PDFOptions.setDrawDashedRectangles(self.__drawDashedRectangles)
 
 
-            filename = "Badges.pdf"
-
             pdf = RegistrantsListToBadgesPDF(self._conf,
                                              self._conf.getBadgeTemplateManager().getTemplateById(self.__templateId),
                                              self.__marginTop,
@@ -4789,15 +4697,8 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
                                              self.__pagesize,
                                              self.__drawDashedRectangles,
                                              self.__registrantList)
-            data = pdf.getPDFBin()
-            #self._req.headers_out["Accept-Ranges"] = "bytes"
-            self._req.set_content_length(len(data))
-            #self._req.headers_out["Content-Length"] = "%s"%len(data)
-            cfg = Config.getInstance()
-            mimetype = cfg.getFileTypeMimeType( "PDF" )
-            self._req.content_type = """%s"""%(mimetype)
-            self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-            return data
+            return send_file('Badges.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+
 
 class RHConfBadgeSaveTempBackground(RHConfBadgeBase):
     """ This class is used to save a background as a temporary file,
@@ -4814,18 +4715,16 @@ class RHConfBadgeSaveTempBackground(RHConfBadgeBase):
         tempFileName = tempfile.mkstemp( suffix="IndicoBadgeBG.tmp", dir = tempPath )[1]
         return tempFileName
 
-    def _saveFileToTemp( self, fd ):
+    def _saveFileToTemp(self, fs):
         fileName = self._getNewTempFile()
-        f = open( fileName, "wb" )
-        f.write( fd.read() )
-        f.close()
+        fs.save(fileName)
         return os.path.split(fileName)[-1]
 
     def _checkParams(self, params):
         RHConfBadgeBase._checkParams(self, params)
         self.__templateId = params.get("templateId",None)
         try:
-            self._tempFilePath = self._saveFileToTemp( params["file"].file )
+            self._tempFilePath = self._saveFileToTemp(params["file"])
         except AttributeError:
             self._tempFilePath = None
 
@@ -4837,16 +4736,17 @@ class RHConfBadgeSaveTempBackground(RHConfBadgeBase):
                 if self._conf.getBadgeTemplateManager().hasTemplate(self.__templateId):
                     backgroundId = self._conf.getBadgeTemplateManager().getTemplateById(self.__templateId).addTempBackgroundFilePath(self._tempFilePath)
                 else:
-                    key = "tempBackground", self._conf.id, self.__templateId
-                    value = self._getSession().getVar(key)
-                    if value == None:
+                    key = "tempBackground-%s-%s" % (self._conf.id, self.__templateId)
+                    value = session.get(key)
+                    if value is None:
                         tempFilePathList = PersistentList()
                         tempFilePathList.append(self._tempFilePath)
-                        self._getSession().setVar(key, tempFilePathList)
+                        session[key] = tempFilePathList
                         backgroundId = 0
                     else:
                         value.append(self._tempFilePath)
                         backgroundId = len(value) - 1
+                        session.modified = True
 
                 return json.dumps({
                     'status': 'OK',
@@ -4869,21 +4769,14 @@ class RHConfBadgeGetBackground(RHConfBadgeBase):
         self.__height = int(params.get("height","-1"))
 
     def __imageBin(self, image):
-        self._req.headers_out["Content-Length"]="%s"%image.getSize()
-        cfg=Config.getInstance()
-        mimetype=cfg.getFileTypeMimeType(image.getFileType())
-        self._req.content_type="""%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%image.getFileName()
-        return image.readBin()
+        if image.getFileType():
+            kw = {'ftype': image.getFileType()}
+        else:
+            kw = {'mimetype': 'application/octet-stream'}
+        return send_file(image.getFileName(), image.getFilePath(), inline=True, **kw)
 
     def __fileBin(self, filePath):
-        file = open(filePath, "rb")
-        self._req.headers_out["Content-Length"]=str(os.path.getsize(filePath))
-        self._req.content_type="""%s"""%("unknown")
-        self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%"tempBackground"
-        r = file.read()
-        file.close()
-        return r
+        return send_file('tempBackground', filePath, mimetype='application/octet-stream', inline=True)
 
     def _process(self):
         if self._target.isClosed():
@@ -4902,8 +4795,8 @@ class RHConfBadgeGetBackground(RHConfBadgeBase):
                         return self.__fileBin(image)
 
             else:
-                key = "tempBackground", self._conf.id, self.__templateId
-                filePath = os.path.join(tempPath,self._getSession().getVar(key) [ int(self.__backgroundId) ])
+                key = "tempBackground-%s-%s" % (self._conf.id, self.__templateId)
+                filePath = os.path.join(tempPath, session[key][int(self.__backgroundId)])
                 return self.__fileBin(filePath)
 
 
@@ -4949,9 +4842,9 @@ class RHConfPosterPrinting(RHConferenceModifBase):
                 if self.__new:
                 # template is new
                     self._target.getPosterTemplateManager().storeTemplate(self.__templateId, self.__templateData)
-                    key = "tempBackground", self._conf.id, self.__templateId
-                    filePaths = self._getSession().getVar(key)
-                    if filePaths != None:
+                    key = "tempBackground-%s-%s" % (self._conf.id, self.__templateId)
+                    filePaths = session.get(key)
+                    if filePaths:
                         for filePath in filePaths:
                             self._target.getPosterTemplateManager().getTemplateById(self.__templateId).addTempBackgroundFilePath(filePath[0],filePath[1])
                         self._target.getPosterTemplateManager().getTemplateById(self.__templateId).archiveTempBackgrounds(self._conf)
@@ -4966,8 +4859,8 @@ class RHConfPosterPrinting(RHConferenceModifBase):
                 if self._target.getPosterTemplateManager().hasTemplate(self.__templateId):
                     self._target.getPosterTemplateManager().getTemplateById(self.__templateId).deleteTempBackgrounds()
                 else:
-                    fkey = "tempBackground", self._conf.id, self.__templateId
-                    self._getSession().removeVar(fkey)
+                    fkey = "tempBackground-%s-%s" % (self._conf.id, self.__templateId)
+                    session.pop(fkey, None)
 
             if self._target.getId() == "default":
                 p = admins.WPPosterTemplates(self)
@@ -5041,22 +4934,14 @@ class RHConfPosterPrintingPDF(RHConferenceModifBase):
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p
         else:
-            filename = "Poster.pdf"
             pdf = LectureToPosterPDF(self._conf,
                                              self.__template,
                                              self.__marginH,
                                              self.__marginV,
                                              self.__pagesize)
 
-            data = pdf.getPDFBin()
-            #self._req.headers_out["Accept-Ranges"] = "bytes"
-            self._req.set_content_length(len(data))
-            #self._req.headers_out["Content-Length"] = "%s"%len(data)
-            cfg = Config.getInstance()
-            mimetype = cfg.getFileTypeMimeType( "PDF" )
-            self._req.content_type = """%s"""%(mimetype)
-            self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-            return data
+            return send_file('Poster.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+
 
 class RHConfPosterSaveTempBackground(RHConferenceModifBase):
     """ This class is used to save a background as a temporary file,
@@ -5073,11 +4958,9 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
         tempFileName = tempfile.mkstemp( suffix="IndicoPosterBG.tmp", dir = tempPath )[1]
         return tempFileName
 
-    def _saveFileToTemp( self, fd ):
+    def _saveFileToTemp(self, fs):
         fileName = self._getNewTempFile()
-        f = open( fileName, "wb" )
-        f.write( fd.read() )
-        f.close()
+        fs.save(fileName)
         return os.path.split(fileName)[-1]
 
     def _checkParams(self, params):
@@ -5087,7 +4970,7 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
         self._bgPosition = params.get("bgPosition",None)
 
         try:
-            self._tempFilePath = self._saveFileToTemp( params["file"].file )
+            self._tempFilePath = self._saveFileToTemp(params["file"])
         except AttributeError:
             self._tempFilePath = None
 
@@ -5101,19 +4984,19 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
                     backgroundId = self._conf.getPosterTemplateManager().getTemplateById(self.__templateId).addTempBackgroundFilePath(self._tempFilePath,self._bgPosition)
                 else:
                 # New
-                    key = "tempBackground", self._conf.id, self.__templateId
-
-                    value = self._getSession().getVar(key)
-                    if value == None:
+                    key = "tempBackground-%s-%s" % (self._conf.id, self.__templateId)
+                    value = session.get(key)
+                    if value is None:
                     # First background
                         tempFilePathList = PersistentList()
                         tempFilePathList.append((self._tempFilePath,self._bgPosition))
-                        self._getSession().setVar(key, tempFilePathList)
+                        session[key] = tempFilePathList
                         backgroundId = 0
                     else:
                     # We have more
-                        value.append((self._tempFilePath,self._bgPosition))
+                        value.append((self._tempFilePath, self._bgPosition))
                         backgroundId = len(value) - 1
+                        session.modified = True
 
                 return json.dumps({
                     'status': 'OK',
@@ -5138,21 +5021,14 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
         self.__height = int(params.get("height","-1"))
 
     def __imageBin(self, image):
-        self._req.headers_out["Content-Length"]="%s"%image.getSize()
-        cfg=Config.getInstance()
-        mimetype=cfg.getFileTypeMimeType(image.getFileType())
-        self._req.content_type="""%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%image.getFileName()
-        return image.readBin()
+        if image.getFileType():
+            kw = {'ftype': image.getFileType()}
+        else:
+            kw = {'mimetype': 'application/octet-stream'}
+        return send_file(image.getFileName(), image.getFilePath(), inline=True, **kw)
 
     def __fileBin(self, filePath):
-        file = open(filePath, "rb")
-        self._req.headers_out["Content-Length"]=str(os.path.getsize(filePath))
-        self._req.content_type="""%s"""%("unknown")
-        self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%"tempBackground"
-        r = file.read()
-        file.close()
-        return r
+        return send_file('tempBackground', filePath, mimetype='application/octet-stream', inline=True)
 
     def _process(self):
 
@@ -5175,7 +5051,6 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
                         return self.__fileBin(image)
 
             else:
-                key = "tempBackground", self._conf.id, self.__templateId
-
-                filePath = os.path.join(tempPath, self._getSession().getVar(key) [ int(self.__backgroundId) ][0])
+                key = "tempBackground-%s-%s" % (self._conf.id, self.__templateId)
+                filePath = os.path.join(tempPath, session[key][int(self.__backgroundId)][0])
                 return self.__fileBin(filePath)

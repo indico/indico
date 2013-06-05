@@ -7743,9 +7743,8 @@ class WPConfModifExistingMaterials( WPConferenceModifBase ):
 
 class WPConfModifDisplayImageBrowser (wcomponents.WTemplated):
 
-    def __init__(self, conf, req):
+    def __init__(self, conf):
         self._conf = conf
-        self._req = req
 
     def _getFileHTML(self, file):
         return """<td>&nbsp;<a href="#" onClick="OpenFile('%s');return false;"><img src="%s" height="80"></a></td>""" % (str(urlHandlers.UHFileAccess.getURL(file)),str(urlHandlers.UHFileAccess.getURL(file)))
