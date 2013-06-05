@@ -12437,11 +12437,16 @@ class BOAConfig(Persistent):
                    "speaker": L_("Presenter"),
                    "schedule": L_("Schedule")}
 
+    correspondingAuthorTypes = {"none": L_("Nobody"),
+                   "submitter": L_("Submitter"),
+                   "speakers": L_("Speakers")}
+
     def __init__(self,conf):
         self._conf=conf
         self._text=""
         self._showIds= False
         self._sortBy = "number"
+        self._correspondingAuthor = "submitter"
         self._modificationDS = nowutc()
         self._cache = False
 
@@ -12473,6 +12478,19 @@ class BOAConfig(Persistent):
     @staticmethod
     def getSortByTypes():
         return BOAConfig.sortByTypes
+
+    def getCorrespondingAuthor(self):
+        if not hasattr(self, "_correspondingAuthor"):
+            self._correspondingAuthor = "submitter"
+        return self._correspondingAuthor
+
+    def setCorrespondingAuthor(self, correspondingAuthor):
+        self._correspondingAuthor = correspondingAuthor
+        self._notifyModification()
+
+    @staticmethod
+    def getCorrespondingAuthorTypes():
+        return BOAConfig.correspondingAuthorTypes
 
     def isCacheEnabled(self):
         if not hasattr(self, '_cache'):

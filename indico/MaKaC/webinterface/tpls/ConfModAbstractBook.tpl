@@ -30,6 +30,12 @@
         </td>
     </tr>
     <tr>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Corresponding Author")}</span></td>
+        <td class="blacktext" width="100%">
+            <div id="inPlaceEditCorrespondingAuthor" style="display:inline"></div>
+        </td>
+    </tr>
+    <tr>
         <td class="dataCaptionTD">
             <span class="dataCaptionFormat"> ${ _("Miscellaneous options")}</span><br/><br/>
             <img src="${Config.getInstance().getSystemIconURL( 'enabledSection' )}" alt="${ _("Click to disable")}"> <small> ${ _("Enabled option")}</small>
@@ -72,8 +78,9 @@
 $(function() {
     <%  from MaKaC.common import info %>
         $E('inPlaceEditAdditionalText').set(new RichTextInlineEditWidget('abstract.abstractsbook.changeAdditionalText', ${ jsonEncode(dict(conference="%s"%conf.getId())) }, ${ boaConfig.getText() | n,j }, 300, 45, "${_('No additional text')}").draw());
-    new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditSortBy'), 'abstract.abstractsbook.changeSortBy', ${dict(conference="%s"%conf.getId())}, ${sortByList|n,j}, '${sortBy}');
-
+        new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditSortBy'), 'abstract.abstractsbook.changeSortBy', ${dict(conference="%s"%conf.getId())}, ${sortByList|n,j}, '${sortBy}');
+        $('#inPlaceEditCorrespondingAuthor').html(new SelectEditWidget('abstract.abstractsbook.changeCorrespondingAuthor',
+                {'conference':'${conf.getId()}'}, ${correspondingAuthorList|n,j}, ${ jsonEncode(correspondingAuthor) }, null).draw().dom);
     $('#cacheToggle').click(function(){
         indicoRequest('abstract.abstractsbook.toggleCache',
                       {conference: '${conf.getId()}'},

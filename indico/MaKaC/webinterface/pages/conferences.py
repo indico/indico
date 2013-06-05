@@ -5524,23 +5524,22 @@ class WPMyStuff(WPConferenceDefaultDisplayBase):
 class WConfModAbstractBook(wcomponents.WTemplated):
 
     def __init__(self,conf):
-        self._conf=conf
+        self._conf = conf
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        boaConfig=self._conf.getBOAConfig()
-        sortBy=boaConfig.getSortBy()
-        sortByList=boaConfig.getSortByTypes()
-        vars["sortByList"] = sortByList
+        vars = wcomponents.WTemplated.getVars(self)
+        boaConfig = self._conf.getBOAConfig()
+        vars["sortByList"] = boaConfig.getCorrespondingAuthorTypes()
         vars["modURL"]=quoteattr(str(urlHandlers.UHConfModAbstractBookEdit.getURL(self._conf)))
         vars["previewURL"]=quoteattr(str(urlHandlers.UHConfAbstractBook.getURL(self._conf)))
-        vars["sortBy"]=sortBy
+        vars["sortBy"] = boaConfig.getSortBy()
         vars["boaConfig"] = boaConfig
         vars["urlToogleShowIds"]=str(urlHandlers.UHConfModAbstractBookToogleShowIds.getURL(self._conf))
         vars["conf"]=self._conf
         vars["bookOfAbstractsActive"] = self._conf.getAbstractMgr().getCFAStatus()
         vars["bookOfAbstractsMenuActive"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu().getLinkByName('abstractsBook').isEnabled()
-
+        vars["correspondingAuthorList"] = boaConfig.getCorrespondingAuthorTypes()
+        vars["correspondingAuthor"]= boaConfig.getCorrespondingAuthor()
         return vars
 
 class WPModAbstractBook(WPConferenceModifAbstractBase):
