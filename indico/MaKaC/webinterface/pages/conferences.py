@@ -3534,7 +3534,7 @@ class WAbstracts( wcomponents.WTemplated ):
         l = [ i18nformat("""<input type="checkbox" name="typeShowNoValue"%s> --_("not specified")--""")%checked]
         for contribType in self._conf.getContribTypeList():
             checked = ""
-            if field is not None and contribType in field.getValues():
+            if field is not None and contribType.getId() in field.getValues():
                 checked = " checked"
             l.append( """<input type="checkbox" name="type" value=%s%s> %s"""%(quoteattr(contribType.getId()), checked, self.htmlText(contribType.getName())) )
         return l
@@ -3560,7 +3560,7 @@ class WAbstracts( wcomponents.WTemplated ):
         l = [ i18nformat("""<input type="checkbox" name="accTypeShowNoValue"%s> --_("not specified")--""")%checked]
         for contribType in self._conf.getContribTypeList():
             checked = ""
-            if field is not None and contribType in field.getValues():
+            if field is not None and contribType.getId() in field.getValues():
                 checked = " checked"
             l.append( """<input type="checkbox" name="acc_type" value=%s%s> %s"""%(quoteattr(contribType.getId()),checked,self.htmlText(contribType.getName())))
         return l

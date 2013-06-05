@@ -138,11 +138,11 @@ class ContribTypeFilterField(filters.FilterField):
         elif not abstract.getContribType():
             return self._showNoValue
         else:
-            return abstract.getContribType() in self._values
+            return abstract.getContribType().getId() in self._values
 
     def needsToBeApplied(self):
         for ct in self._conf.getContribTypeList():
-            if ct not in self._values:
+            if ct.getId() not in self._values:
                 return True
         return not self._showNoValue
 
@@ -161,13 +161,13 @@ class AccContribTypeFilterField(filters.FilterField):
                                 review.AbstractStatusProposedToAccept]:
                 if s.getType() is None or s.getType()=="":
                     return self._showNoValue
-                return s.getType() in self._values
+                return s.getType().getId() in self._values
             else:
                 return self._showNoValue
 
     def needsToBeApplied(self):
         for ct in self._conf.getContribTypeList():
-            if ct not in self._values:
+            if ct.getId() not in self._values:
                 return True
         return not self._showNoValue
 

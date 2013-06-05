@@ -1689,8 +1689,8 @@ class RHAbstractList(RHConfModifCFABase):
         marking everything as "checked"
         """
 
-        sessionData["track"] = sessionData["acc_track"] = map(lambda track: track.getId(), self._conf.getTrackList())
-        sessionData["type"] = sessionData["acc_type"] = map(lambda contribType: contribType, self._conf.getContribTypeList())
+        sessionData["track"] = sessionData["acc_track"] = [track.getId() for track in self._conf.getTrackList()]
+        sessionData["type"] = sessionData["acc_type"] = [ct.getId() for ct in self._conf.getContribTypeList()]
         abstractStatusList = AbstractStatusList.getInstance()
         sessionData["status"] = map(lambda status: abstractStatusList.getId( status ), abstractStatusList.getStatusList())
         sessionData['authSearch'] = ""
@@ -1700,8 +1700,7 @@ class RHAbstractList(RHConfModifCFABase):
         sessionData["accTypeShowNoValue"] = True
         sessionData["accTrackShowNoValue"] = True
         sessionData["trackShowMultiple"] = False
-        if sessionData.has_key("comment"):
-            del sessionData["comment"]
+        sessionData.pop("comment", None)
 
         return sessionData
 
@@ -1722,12 +1721,6 @@ class RHAbstractList(RHConfModifCFABase):
         sessionData['track'] = utils.normalizeToList(sessionData.get("track"))
         sessionData['status'] = utils.normalizeToList(sessionData.get("status"))
         sessionData['acc_track'] = utils.normalizeToList(sessionData.get("acc_track"))
-
-        # TODO: this should work as for the tracks, NOTE hat this filter is used in many
-        # places (ContribTypeFilterField and AccContribTypeFilterField should expect ids
-        # instead of objects).
-        sessionData["type"] = map(lambda contTypeId: self._conf.getContribTypeById(contTypeId), sessionData["type"])
-        sessionData["acc_type"] = map(lambda contTypeId: self._conf.getContribTypeById(contTypeId), sessionData["acc_type"])
 
         # update these elements in the session so that the parameters that are
         # passed are always taken into account (sessionData.update is not
@@ -1816,9 +1809,9 @@ class RHAbstractList(RHConfModifCFABase):
             sessionData = {}
             filtersActive = False
 
-        if params.has_key("resetFilters"):
-            operation =  'resetFilters'
-        elif operationType ==  'filter':
+        if 'resetFilters' in params:
+            operation = 'resetFilters'
+        elif operationType == 'filter':
             operation =  'setFilters'
         elif operationType == 'display':
             operation = 'setDisplay'
