@@ -200,16 +200,13 @@ class RHSubmitMaterialBase(object):
         return tempFileName
 
     #XXX: improve routine to avoid saving in temporary file
-    def _saveFileToTemp(self, fd):
-        if fd not in self._tempFiles:
+    def _saveFileToTemp(self, fs):
+        if fs not in self._tempFiles:
             fileName = self._getNewTempFile()
-            fd.seek(0) # not really needed since we only copy once but it can't hurt
-            with open(fileName, 'wb') as f:
-                shutil.copyfileobj(fd, f)
-            self._tempFiles[fd] = fileName
-            # queue file for deletion at end of request
+            fs.save(fileName)
+            self._tempFiles[fs] = fileName
             self._tempFilesToDelete.append(fileName)
-        return self._tempFiles[fd]
+        return self._tempFiles[fs]
 
     def _checkProtection(self):
         self._loggedIn = True
@@ -262,7 +259,7 @@ class RHSubmitMaterialBase(object):
                         fDict["filePath"] = ''
                         fDict["size"] = estimSize
                     else:
-                        fDict["filePath"] = self._saveFileToTemp(fileUpload.file)
+                        fDict["filePath"] = self._saveFileToTemp(fileUpload)
                         fDict["size"] = os.path.getsize(fDict["filePath"])
 
                     self._setErrorList(fDict)

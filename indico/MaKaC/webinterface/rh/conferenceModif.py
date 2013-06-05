@@ -2305,11 +2305,9 @@ window.parent.OnUploadCompleted(%s,"%s","%s", "%s") ;
         tempFileName = tempfile.mkstemp( suffix="Indico.tmp", dir = tempPath )[1]
         return tempFileName
 
-    def _saveFileToTemp( self, fd ):
+    def _saveFileToTemp(self, fs):
         fileName = self._getNewTempFile()
-        f = open( fileName, "wb" )
-        f.write( fd.read() )
-        f.close()
+        fs.save(fileName)
         return fileName
 
     def _process( self ):
@@ -2317,7 +2315,7 @@ window.parent.OnUploadCompleted(%s,"%s","%s", "%s") ;
             newFile = self._params["NewFile"]
             if not hasattr(self, "_filePath"):
                 #do not save the file again in case it already exists (db conflicts)
-                self._filePath = self._saveFileToTemp( newFile.file )
+                self._filePath = self._saveFileToTemp(newFile)
                 self._tempFilesToDelete.append(self._filePath)
             self._fileName = newFile.filename
             f = conference.LocalFile()
@@ -2614,17 +2612,15 @@ class RHConfSaveLogo( RHConferenceModifBase ):
         tempFileName = tempfile.mkstemp( suffix="IndicoLogo.tmp", dir = tempPath )[1]
         return tempFileName
 
-    def _saveFileToTemp( self, fd ):
+    def _saveFileToTemp(self, fs):
         fileName = self._getNewTempFile()
-        f = open( fileName, "wb" )
-        f.write( fd.read() )
-        f.close()
+        fs.save(fileName)
         return fileName
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
         if not hasattr(self,"_filePath"):
-            self._filePath = self._saveFileToTemp( params["file"].file )
+            self._filePath = self._saveFileToTemp(params["file"])
             self._tempFilesToDelete.append(self._filePath)
         self._fileName = params["file"].filename
 
@@ -2656,11 +2652,9 @@ class RHConfSaveCSS( RHConferenceModifBase ):
         tempFileName = tempfile.mkstemp( suffix="IndicoCSS.tmp", dir = tempPath )[1]
         return tempFileName
 
-    def _saveFileToTemp( self, fd ):
+    def _saveFileToTemp(self, fs):
         fileName = self._getNewTempFile()
-        f = open( fileName, "wb" )
-        f.write( fd.read() )
-        f.close()
+        fs.save(fileName)
         return fileName
 
     def _checkParams( self, params ):
@@ -2671,7 +2665,7 @@ class RHConfSaveCSS( RHConferenceModifBase ):
             self._fileName = "TemplateInUse"
         else:
             if not hasattr(self,"_filePath"):
-                self._filePath = self._saveFileToTemp( params["file"].file )
+                self._filePath = self._saveFileToTemp(params["file"])
                 self._tempFilesToDelete.append(self._filePath)
             self._fileName = params["file"].filename
         if self._fileName.strip() == "":
@@ -2741,18 +2735,16 @@ class RHConfSavePic( RHConferenceModifBase ):
         tempFileName = tempfile.mkstemp( suffix="IndicoPic.tmp", dir = tempPath )[1]
         return tempFileName
 
-    def _saveFileToTemp( self, fd ):
-        if fd not in self._tempFiles:
+    def _saveFileToTemp(self, fs):
+        if fs not in self._tempFiles:
             fileName = self._getNewTempFile()
-            fd.seek(0) # not really needed since we only copy once but it can't hurt
-            with open(fileName, 'wb') as f:
-                shutil.copyfileobj(fd, f)
-            self._tempFiles[fd] = fileName
-        return self._tempFiles[fd]
+            fs.save(fileName)
+            self._tempFiles[fs] = fileName
+        return self._tempFiles[fs]
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._filePath = self._saveFileToTemp( params["file"].file )
+        self._filePath = self._saveFileToTemp(params["file"])
         self._tempFilesToDelete.append(self._filePath)
         self._fileName = params["file"].filename
         self._params = params

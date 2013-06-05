@@ -93,11 +93,9 @@ class RHCategoryPerformModification( RHCategModifBase ):
         tempFileName = tempfile.mkstemp( suffix="Indico.tmp", dir = tempPath )[1]
         return tempFileName
 
-    def _saveFileToTemp( self, fd ):
+    def _saveFileToTemp(self, fs):
         fileName = self._getNewTempFile()
-        f = open( fileName, "wb" )
-        f.write( fd.read() )
-        f.close()
+        fs.save(fileName)
         return fileName
 
     def _process( self):
@@ -131,7 +129,7 @@ class RHCategoryPerformModification( RHCategModifBase ):
                    params["icon"].filename.strip() != "":
                 if not hasattr(self, "_filePath"):
                     # do not save the file again if it has already been done (db conflicts)
-                    self._filePath = self._saveFileToTemp( params["icon"].file )
+                    self._filePath = self._saveFileToTemp(params["icon"])
                     self._tempFilesToDelete.append(self._filePath)
                 self._fileName = params["icon"].filename
 
