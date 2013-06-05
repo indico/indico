@@ -29,18 +29,21 @@
 </form>
 <script type="text/javascript">
 
-$("#resultsAction").click(function(){
-    new ConfirmPopup($T("Import evaluation"),$T("Are you sure you want to remove these submissions?"), function(confirmed) {
-        if(confirmed) {
-            $("[name=ResultsSubmitters]").submit();
-        }
-    }).open();
-    return false;
+% if mode == 'remove':
+    $("#resultsAction").click(function(){
+        new ConfirmPopup($T("Import evaluation"), $T("Are you sure you want to remove these submissions?"), function(confirmed) {
+            if(confirmed) {
+                var actionField = '<input name="${mode}" value="${mode}" type="hidden">';
+                $("form[name=ResultsSubmitters]").append(actionField).submit();
+            }
+        }).open();
+        return false;
     });
+% endif
 
-  $('.checkAllSubmitters').on('click', function(e) {
-      e.preventDefault();
-      $('.submitter').prop('checked', $(this).data('state'));
-  });
+$('.checkAllSubmitters').on('click', function(e) {
+    e.preventDefault();
+    $('.submitter').prop('checked', $(this).data('state'));
+});
 </script>
 <br/><br/>

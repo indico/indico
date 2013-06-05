@@ -118,7 +118,8 @@
           <td>
             <form action="${specialActionURL}" method="post">
                     <div>
-                          <input type="submit" class="btn" name="removeSubmissions" id="removeSubmissions" value="${ _("remove submissions")}"
+                          <input type="hidden" name="removeSubmissions" value="removeSubmissions"/>
+                          <input type="submit" class="btn" name="submitbtn" id="removeSubmissions" value="${ _("remove submissions")}"
                   onmouseover="this.style.color='red'" onmouseout="this.style.color='#234173'"/>
                      </div>
             </form>
@@ -129,7 +130,8 @@
           <td>
             <form action="${specialActionURL}" method="post">
                   <div>
-                    <input type="submit" class="btn" name="removeQuestions"  id="removeQuestions" value="${ _("remove questions")}"
+                    <input type="hidden" name="removeQuestions" value="removeQuestions"/>
+                    <input type="submit" class="btn" name="submitbtn" id="removeQuestions" value="${ _("remove questions")}"
                   onmouseover="this.style.color='red'" onmouseout="this.style.color='#234173'"/>
                 </div>
             </form>
@@ -142,7 +144,8 @@
           <td>
             <form action="${specialActionURL}" method="post">
                 <div>
-                      <input type="submit" class="btn" name="reinit" id="reinit" value="${ _("reinit evaluation")}"
+                      <input type="hidden" name="reinit" value="reinit"/>
+                      <input type="submit" class="btn" name="submitbtn" id="reinit" value="${ _("reinit evaluation")}"
                   onmouseover="this.style.color='red'" onmouseout="this.style.color='#234173'"/>
                 </div>
             </form>
