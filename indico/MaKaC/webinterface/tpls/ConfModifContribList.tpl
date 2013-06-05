@@ -140,10 +140,10 @@ else:
                             <input type="image" src=${ pdfIconURL} class="btn" name="PDF" value="${ _("Create PDF")}" onclick='this.form.action=${ contributionsPDFURL };this.form.target="_blank";'>
                         </td>
                         <td valign="bottom" align="left">
-                            <input type="image" name="excel" src=${ excelIconURL} border="0">
+                            <input type="image" name="excel" src=${ excelIconURL} border="0" onclick='this.form.action=${ contribSelectionAction };this.form.target="";'>
                         </td>
                         <td valign="bottom" align="left">
-                            <input type="image" name="xml" src=${ xmlIconURL} border="0">
+                            <input type="image" name="xml" src=${ xmlIconURL} border="0" onclick='this.form.action=${ contribSelectionAction };this.form.target="";'>
                         </td>
                 </tbody>
             </table>
