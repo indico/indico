@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 import tempfile
 from MaKaC.errors import MaKaCError
@@ -95,24 +96,22 @@ class RHMaterialDisplay( RHMaterialDisplayBase, RHMaterialDisplayCommon ):
         return p.display()
 
 
-class RHMaterialDisplayStoreAccessKey( RHMaterialDisplayBase ):
+class RHMaterialDisplayStoreAccessKey(RHMaterialDisplayBase):
     _uh = urlHandlers.UHMaterialEnterAccessKey
 
-    def _checkParams( self, params ):
-        RHMaterialDisplayBase._checkParams(self, params )
-        self._accesskey = params.get( "accessKey", "" ).strip()
+    def _checkParams(self, params):
+        RHMaterialDisplayBase._checkParams(self, params)
+        self._accesskey = params.get("accessKey", "").strip()
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         pass
 
-    def _process( self ):
-        access_keys = self._getSession().getVar("accessKeys")
-        if access_keys == None:
-            access_keys = {}
+    def _process(self):
+        access_keys = session.setdefault('accessKeys', {})
         access_keys[self._target.getUniqueId()] = self._accesskey
-        self._getSession().setVar("accessKeys",access_keys)
-        url = urlHandlers.UHMaterialDisplay.getURL( self._target )
-        self._redirect( url )
+        session.modified = True
+        self._redirect(urlHandlers.UHMaterialDisplay.getURL(self._target))
+
 
 class RHMaterialAddConvertedFile(RHMaterialDisplayBase):
 

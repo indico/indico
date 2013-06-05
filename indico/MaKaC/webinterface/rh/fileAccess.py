@@ -16,12 +16,12 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.conferenceBase import RHFileBase, RHLinkBase
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.pages import files
-from MaKaC.common import Config
 from MaKaC.errors import NotFoundError, AccessError
 
 from MaKaC.conference import Reviewing, Link
@@ -63,24 +63,21 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
                              self._file.getCreationDate(), inline=True)
 
 
-class RHFileAccessStoreAccessKey( RHFileBase ):
+class RHFileAccessStoreAccessKey(RHFileBase):
     _uh = urlHandlers.UHFileEnterAccessKey
 
-    def _checkParams( self, params ):
-        RHFileBase._checkParams(self, params )
-        self._accesskey = params.get( "accessKey", "" ).strip()
+    def _checkParams(self, params):
+        RHFileBase._checkParams(self, params)
+        self._accesskey = params.get("accessKey", "").strip()
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         pass
 
-    def _process( self ):
-        access_keys = self._getSession().getVar("accessKeys")
-        if access_keys == None:
-            access_keys = {}
+    def _process(self):
+        access_keys = session.setdefault('accessKeys', {})
         access_keys[self._target.getOwner().getUniqueId()] = self._accesskey
-        self._getSession().setVar("accessKeys",access_keys)
-        url = urlHandlers.UHFileAccess.getURL( self._target )
-        self._redirect( url )
+        session.modified = True
+        self._redirect(urlHandlers.UHFileAccess.getURL(self._target))
 
 
 class RHVideoWmvAccess( RHLinkBase, RHDisplayBaseProtected ):
