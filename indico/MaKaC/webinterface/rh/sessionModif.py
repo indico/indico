@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.pages.conferences as conferences
@@ -405,14 +406,12 @@ class RHSessionModifSchedule(RoomBookingDBMixin, RHSessionModCoordinationBase):
 
     def _checkParams(self,params):
         RHSessionModCoordinationBase._checkParams(self,params)
-        if params.get("view","parallel").strip()!="":
-            self._getSession().ScheduleView = params.get("view","parallel").strip()
-        try:
-            if self._getSession().ScheduleView:
-                pass
-        except AttributeError:
-            self._getSession().ScheduleView=params.get("view","parallel")
-        self._view=self._getSession().ScheduleView
+        view = params.get("view", "parallel").strip()
+        if view:
+            session['scheduleView'] = view
+        elif 'scheduleView' not in session:
+            session['scheduleView'] = 'parallel'
+        self._view = session['scheduleView']
         params["days"] = params.get("day", "all")
         if params.get("day", None) is not None :
             del params["day"]
