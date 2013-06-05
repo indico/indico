@@ -1679,29 +1679,6 @@ class AbstractSortingCriteria( filters.SortingCriteria ):
                                     abstractFilters.ModificationDateSortingField
                                      }
 
-class RHAbstractListMenuClose(RHConfModifCFABase):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._currentURL = params.get("currentURL","")
-
-    def _process( self ):
-        websession = self._getSession()
-        websession.setVar("AbstractListMenuStatus", "close")
-        self._redirect(self._currentURL)
-
-
-class RHAbstractListMenuOpen(RHConfModifCFABase):
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._currentURL = params.get("currentURL","")
-
-    def _process( self ):
-        websession = self._getSession()
-        websession.setVar("AbstractListMenuStatus", "open")
-        self._redirect(self._currentURL)
-
 
 class RHAbstractList(RHConfModifCFABase):
     _uh = urlHandlers.UHConfAbstractManagment
