@@ -331,10 +331,12 @@ class Evaluation(Persistent):
     def setSubmissions(self, submissions):
         """set the submissions of this evaluation."""
         self._submissions = submissions
-    def getSubmissions(self):
+    def getSubmissions(self, ids=None):
         """get the submissions of this evaluation."""
         if not hasattr(self, "_submissions"):
             self._submissions = []
+        if ids is not None:
+            return [s for s in self._submissions if s.getId() in ids]
         return self._submissions
 
     def getUserSubmission(self, user):
@@ -711,7 +713,7 @@ class Question(Persistent):
         answer.setQuestion(self)
         self.notifyModification()
 
-    def getAnswers(self, selectedSubmissions=[]):
+    def getAnswers(self, selectedSubmissions=None):
         """ get the answers for this question.
             This function is a shortcut for getting answers easily from this question.
             In fact, answers and questions are not directly bound.
@@ -722,16 +724,16 @@ class Question(Persistent):
         #check
         if not hasattr(self, "_answers"):
             self._answers = []
-        if not isinstance(selectedSubmissions, list) or len(selectedSubmissions)<1 :
+        if selectedSubmissions is None:
             return self._answers
         #do all the gestion for the answers of a question !
         tempAnswers = []
         for answer in self._answers:
-            if answer.getSubmission() in selectedSubmissions:
+            if answer.getSubmission().getId() in selectedSubmissions:
                 tempAnswers.append(answer)
         return tempAnswers
 
-    def getNbOfAnswers(self, selectedSubmissions=[]):
+    def getNbOfAnswers(self, selectedSubmissions=None):
         """ get the number of answers for this question.
             Params:
                 selectedSubmissions -- [list of Submission] Only answers whose submission belongs in this list are treated.
@@ -739,7 +741,7 @@ class Question(Persistent):
         """
         return len(self.getAnswers(selectedSubmissions))
 
-    def getNbOfFilledAnswers(self, selectedSubmissions=[]):
+    def getNbOfFilledAnswers(self, selectedSubmissions=None):
         """ returns the number of not empty answers.
             Params:
                 selectedSubmissions -- [list of Submission] Only answers whose submission belongs in this list are treated.
@@ -751,7 +753,7 @@ class Question(Persistent):
                 nb += 1
         return nb
 
-    def areAllAnswersFilled(self, selectedSubmissions=[]):
+    def areAllAnswersFilled(self, selectedSubmissions=None):
         """ returns True if all the answers are filled, False otherwise.
             Params:
                 selectedSubmissions -- [list of Submission] Only answers whose submission belongs in this list are treated.
@@ -759,7 +761,7 @@ class Question(Persistent):
         """
         return self.getNbOfFilledAnswers(selectedSubmissions) == self.getNbOfAnswers(selectedSubmissions)
 
-    def printAreAllAnswersFilled(self, selectedSubmissions=[]):
+    def printAreAllAnswersFilled(self, selectedSubmissions=None):
         return "%s %s"%(self.getNbOfFilledAnswers(selectedSubmissions), self.getNbOfAnswers(selectedSubmissions))
 
     def getUserAnswer(self, user):
@@ -1071,7 +1073,7 @@ class Select(Choice):
         selected = self.getUserAnswerValue(user)
         return WUtils.createSelect(True, options, selected, **attributes)
 
-    def getNbOfAnswersLike(self, answerValue, selectedSubmissions=[]):
+    def getNbOfAnswersLike(self, answerValue, selectedSubmissions=None):
         """ [Statistics] Give the number of answers which are the same as the given answer value.
             Params:
                 answerValue -- given answer value of type string.
@@ -1087,7 +1089,7 @@ class Select(Choice):
         except:
             return 0
 
-    def getPercentageAnswersLike(self, answerValue, selectedSubmissions=[]):
+    def getPercentageAnswersLike(self, answerValue, selectedSubmissions=None):
         """ [Statistics] Give the percentage of answers like given answer value.
             Params:
                 answerValue -- given answer value of type string.
@@ -1158,7 +1160,7 @@ class Radio(Choice):
             choiceItemsHTML += WUtils.appendNewLine(WUtils.createInput(itemText, **attributes))
         return choiceItemsHTML
 
-    def getNbOfAnswersLike(self, answerValue, selectedSubmissions=[]):
+    def getNbOfAnswersLike(self, answerValue, selectedSubmissions=None):
         """ [Statistics] Give the number of answers which are the same as the given answer value.
             Params:
                 answerValue -- given answer value of type string.
@@ -1174,7 +1176,7 @@ class Radio(Choice):
         except:
             return 0
 
-    def getPercentageAnswersLike(self, answerValue, selectedSubmissions=[]):
+    def getPercentageAnswersLike(self, answerValue, selectedSubmissions=None):
         """ [Statistics] Give the percentage of answers like given answer value.
             Params:
                 answerValue -- given answer value of type string.
@@ -1241,7 +1243,7 @@ class Checkbox(Choice):
             choiceItemsHTML += WUtils.appendNewLine(WUtils.createInput(itemText, **attributes))
         return choiceItemsHTML
 
-    def getNbOfAnswersLike(self, answerValue, selectedSubmissions=[]):
+    def getNbOfAnswersLike(self, answerValue, selectedSubmissions=None):
         """ [Statistics] Give the number of answers which are the same as the given answer value.
             Params:
                 answerValue -- given answer value of type string.
@@ -1255,7 +1257,7 @@ class Checkbox(Choice):
                     nb += 1
         return nb
 
-    def getNbOfAllSelectedChoiceItems(self, selectedSubmissions=[]):
+    def getNbOfAllSelectedChoiceItems(self, selectedSubmissions=None):
         """ [Statistics] Returns the number of all selected choice items for all answers for this question.
             Params:
                 selectedSubmissions -- [list of Submission] Only answers whose submission belongs in this list are treated.
@@ -1269,7 +1271,7 @@ class Checkbox(Choice):
         except:
             return 0
 
-    def getPercentageAnswersLike(self, answerValue, selectedSubmissions=[]):
+    def getPercentageAnswersLike(self, answerValue, selectedSubmissions=None):
         """ [Statistics] Give the percentage of answers like given answer value.
             Params:
                 answerValue -- given answer value of type string.

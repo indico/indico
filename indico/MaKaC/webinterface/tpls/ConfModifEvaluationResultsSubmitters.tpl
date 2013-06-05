@@ -14,7 +14,7 @@
           <br/><br/>
           % for s in submissions:
             <input type="checkbox" class="submitter" name="${inputCheckboxName}" value="${s.getId()}"
-              ${'checked="checked"' if isModeSelect and (len(selectedSubmissions)<1 or s in selectedSubmissions) else ""}/>
+              ${'checked="checked"' if isModeSelect and (selectedSubmissions is None or s.getId() in selectedSubmissions) else ""}/>
             ${s.getSubmissionDate(str)} - <b>${s.getSubmitterName()}</b>
             ${" (modified on "+s.getModificationDate(str)+")" if s.getModificationDate()!=None else ""}
             <br/>

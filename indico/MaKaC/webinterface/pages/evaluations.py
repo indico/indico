@@ -838,8 +838,8 @@ class WPConfModifEvaluationPreviewSubmitted( WPConfModifEvaluationBase ):
 class WPConfModifEvaluationResults( WPConfModifEvaluationBase ):
     """[ManagementArea] Results of an Evaluation."""
     def _getTabContent( self, params ):
-        sessionVarName = "selectedSubmissions_%s_%s"%(self._conf.getId(), self._conf.getEvaluation().getId())
-        pars = {"selectedSubmissions" : self._rh._getSession().getVar(sessionVarName) or []}
+        sessionVarName = "selectedSubmissions_%s_%s" % (self._conf.getId(), self._conf.getEvaluation().getId())
+        pars = {"selectedSubmissions": session.get(sessionVarName)}
         return WConfModifEvaluationResults(self._conf).getHTML(pars)
     def _setActiveTab( self ):
         self._tabEvaluationResults.setActive()
@@ -858,15 +858,12 @@ class WConfModifEvaluationResults( wcomponents.WTemplated ):
         vars["selectSubmitters"] = Evaluation._SELECT_SUBMITTERS
         vars["removeSubmitters"] = Evaluation._REMOVE_SUBMITTERS
         #submitters
-        if len(vars["selectedSubmissions"]) > 0 :
-            selectedSubmissions = vars["selectedSubmissions"]
-        else:
-            selectedSubmissions = evaluation.getSubmissions()
+        selectedSubmissions = evaluation.getSubmissions(vars["selectedSubmissions"])
         submitters = [sub.getSubmitterName() for sub in selectedSubmissions if isinstance(sub, Submission)]
         vars["submittersContext"] = "<br/> ".join(submitters)
-        if evaluation.getNbOfSubmissions() < 1 :
+        if not vars["selectedSubmissions"] and vars["selectedSubmissions"] is not None:
             vars["submittersVisible"] = _("NONE")
-        elif len(submitters) >= evaluation.getNbOfSubmissions() :
+        elif len(submitters) >= evaluation.getNbOfSubmissions():
             vars["submittersVisible"] = _("ALL")
         elif len(submitters) > 3 :
             del submitters[3:]
@@ -883,8 +880,8 @@ class WPConfModifEvaluationResultsSubmitters( WPConfModifEvaluationBase ):
         self._mode = mode
         WPConfModifEvaluationBase.__init__(self, rh, conf)
     def _getTabContent( self, params ):
-        sessionVarName = "selectedSubmissions_%s_%s"%(self._conf.getId(), self._conf.getEvaluation().getId())
-        pars = {"selectedSubmissions" : self._rh._getSession().getVar(sessionVarName) or []}
+        sessionVarName = "selectedSubmissions_%s_%s" % (self._conf.getId(), self._conf.getEvaluation().getId())
+        pars = {"selectedSubmissions": session.get(sessionVarName)}
         return WConfModifEvaluationResultsSubmitters(self._conf, self._mode).getHTML(pars)
     def _setActiveTab( self ):
         self._tabEvaluationResults.setActive()
