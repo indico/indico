@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from cStringIO import StringIO
 
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -25,6 +26,7 @@ from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
 from MaKaC.webinterface.common.contribFilters import SortingCriteria
 from MaKaC.common import Config
+from indico.web.flask.util import send_file
 from indico.web.http_api.api import SessionHook
 from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
@@ -58,38 +60,11 @@ class RHSessionToiCal(RoomBookingDBMixin, RHSessionDisplay):
         filename = "%s-Session.ics"%self._session.getTitle()
 
         hook = SessionHook({}, 'session', {'event': self._conf.getId(), 'idlist':self._session.getId(), 'dformat': 'ics'})
-        res = hook(self.getAW(), self._req)
+        res = hook(self.getAW())
         resultFossil = {'results': res[0]}
 
         serializer = Serializer.create('ics')
-        data = serializer(resultFossil)
-
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ICAL" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
-
-class RHSessionToMarcXML(RHSessionDisplay):
-
-    def _process( self ):
-        filename = "%s - Session.xml"%self._session.getTitle().replace("/","")
-        from MaKaC.common.xmlGen import XMLGen
-        from MaKaC.common.output import outputGenerator
-        xmlgen = XMLGen()
-        xmlgen.initXml()
-        outgen = outputGenerator(self.getAW(), xmlgen)
-        xmlgen.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
-        outgen.sessionToXMLMarc21(self._session, xmlgen)
-        xmlgen.closeTag("marc:record")
-        data = xmlgen.getXml()
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "XML" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL', inline=True)
 
 
 class RHSessionDisplayRemoveMaterial( RHSessionDisplay ):

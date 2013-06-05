@@ -28,14 +28,6 @@ if DEVELOPMENT:
 def index(req, **params):
     return sessionDisplay.RHSessionDisplay( req ).process( params )
 
+
 def ical( req, **params ):
     return sessionDisplay.RHSessionToiCal( req ).process( params )
-
-def marcxml( req, **params ):
-    return sessionDisplay.RHSessionToMarcXML( req ).process( params )
-
-def xml(req, **params):
-    return sessionDisplay.RHSessionToXML( req ).process( params )
-
-def submit(req, **params):
-    return sessionDisplay.RHSubmitMaterial(req).process(params)

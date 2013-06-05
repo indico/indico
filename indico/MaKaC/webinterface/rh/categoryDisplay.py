@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from cStringIO import StringIO
 
 from datetime import timedelta, datetime
 
@@ -48,6 +49,7 @@ from MaKaC.webinterface.user import UserListModificationBase
 from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
+from indico.web.flask.util import send_file
 from indico.web.http_api.api import CategoryEventHook
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.wsgi import webinterface_handler_config as apache
@@ -526,35 +528,23 @@ class RHCategoryGetIcon(RHCategDisplayBase):
         else:
             RHCategDisplayBase._checkProtection(self)
 
-
     def _process(self):
-        icon=self._target.getIcon()
-        self._req.headers_out["Content-Length"]="%s"%icon.getSize()
-        cfg=Config.getInstance()
-        mimetype=cfg.getFileTypeMimeType(icon.getFileType())
-        self._req.content_type="""%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%icon.getFileName()
-        return self._target.getIcon().readBin()
+        icon = self._target.getIcon()
+        return send_file(icon.getFileName(), icon.getFilePath(), icon.getFileType(), inline=True)
+
 
 class RHCategoryToiCal(RoomBookingDBMixin, RHCategDisplayBase):
 
-    def _process( self ):
-        filename = "%s-Categ.ics"%self._target.getName().replace("/","")
+    def _process(self):
+        filename = "%s-Categ.ics" % self._target.getName().replace("/", "")
 
-        hook = CategoryEventHook({}, 'categ', {'idlist':self._target.getId(), 'dformat': 'ics'})
-        res = hook(self.getAW(), self._req)
+        hook = CategoryEventHook({}, 'categ', {'idlist': self._target.getId(), 'dformat': 'ics'})
+        res = hook(self.getAW())
         resultFossil = {'results': res[0]}
 
         serializer = Serializer.create('ics')
-        data = serializer(resultFossil)
+        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL', inline=True)
 
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ICAL" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-
-        return data
 
 class RHCategoryToRSS(RHCategDisplayBase):
 
@@ -569,20 +559,13 @@ class RHTodayCategoryToRSS(RHCategoryToRSS):
 class RHCategoryToAtom(RoomBookingDBMixin, RHCategDisplayBase):
     _uh = urlHandlers.UHCategoryToAtom
 
-    def _process( self ):
-
-        hook = CategoryEventHook({'from': ['today']}, 'categ', {'idlist':self._target.getId(), 'dformat': 'atom'})
-        res = hook(self.getAW(), self._req)
+    def _process(self):
+        filename = "%s-Categ.atom" % self._target.getName().replace("/", "")
+        hook = CategoryEventHook({'from': 'today'}, 'categ', {'idlist': self._target.getId(), 'dformat': 'atom'})
+        res = hook(self.getAW())
         resultFossil = {'results': res[0], 'url': str(self._uh.getURL(self._target))}
-
         serializer = Serializer.create('atom')
-        data = serializer(resultFossil)
-
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ATOM" )
-        self._req.content_type = """%s"""%(mimetype)
-
-        return data
+        return send_file(filename, StringIO(serializer(resultFossil)), 'ATOM', inline=True)
 
 
 def sortByStartDate(conf1,conf2):
