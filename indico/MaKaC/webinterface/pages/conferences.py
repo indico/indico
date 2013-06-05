@@ -4426,13 +4426,12 @@ class WPConfModifParticipantList( WPConferenceBase ):
 
 class WConfModifContribList(wcomponents.WTemplated):
 
-    def __init__(self,conf,filterCrit, sortingCrit, order, websession, filterUsed=False, filterUrl=None):
+    def __init__(self,conf,filterCrit, sortingCrit, order, filterUsed=False, filterUrl=None):
         self._conf=conf
         self._filterCrit=filterCrit
         self._sortingCrit=sortingCrit
         self._order = order
         self._totaldur =timedelta(0)
-        self.websession = websession
         self._filterUsed = filterUsed
         self._filterUrl = filterUrl
 
@@ -4443,9 +4442,7 @@ class WConfModifContribList(wcomponents.WTemplated):
         url = urlHandlers.UHConfModifContribList.getURL(self._conf)
 
         #save params in websession
-        dict = self.websession.getVar("ContributionFilterConf%s"%self._conf.getId())
-        if not dict:
-            dict = {}
+        dict = session.setdefault('ContributionFilterConf%s' % self._conf.getId(), {})
         if self._filterCrit.getField("type"):
             l=[]
             for t in self._filterCrit.getField("type").getValues():
@@ -4475,7 +4472,7 @@ class WConfModifContribList(wcomponents.WTemplated):
             dict["sortBy"] = self._sortingCrit.getField().getId()
             dict["order"] = "down"
         dict["OK"] = "1"
-        self.websession.setVar("ContributionFilterConf%s"%self._conf.getId(), dict)
+        session.modified = True
 
         return url
 
@@ -4841,7 +4838,6 @@ class WPModifContribList( WPConferenceModifBase ):
         filterCrit=params.get("filterCrit",None)
         sortingCrit=params.get("sortingCrit",None)
         order = params.get("order","down")
-        websession = self._rh._getSession()
 
         filterParams = {}
         fields = getattr(filterCrit, '_fields')
@@ -4864,7 +4860,7 @@ class WPModifContribList( WPConferenceModifBase ):
         urlParams.update(filterParams)
         filterUrl = self._rh._uh.getURL(None, **urlParams)
 
-        wc = WConfModifContribList(self._conf,filterCrit, sortingCrit, order, websession, self._filterUsed, filterUrl)
+        wc = WConfModifContribList(self._conf,filterCrit, sortingCrit, order, self._filterUsed, filterUrl)
         p={"authSearch":params.get("authSearch","")}
 
         return wc.getHTML(p)

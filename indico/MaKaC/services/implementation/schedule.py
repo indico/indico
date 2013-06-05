@@ -20,6 +20,7 @@
 """
 Schedule-related services
 """
+from flask import session
 
 from MaKaC.services.implementation.base import ParameterManager
 
@@ -462,18 +463,14 @@ class ConferenceScheduleAddSession(ScheduleOperation, conferenceServices.Confere
 
     def initializeFilteringCriteria(self, sessionId, conferenceId):
         # Filtering criteria: by default make new session type checked
-        websession = self._getSession()
-        sessionDict = websession.getVar("ContributionFilterConf%s"%conferenceId)
-        if not sessionDict:
-            #Create a new dictionary
-            sessionDict = {}
-        if sessionDict.has_key('sessions'):
+        sessionDict = session.setdefault('ContributionFilterConf%s' % conferenceId, {})
+        if 'sessions' in sessionDict:
             #Append the new type to the existing list
             sessionDict['sessions'].append(sessionId)
-            websession._p_changed = 1
         else:
             #Create a new entry for the dictionary containing the new type
             sessionDict['sessions'] = [sessionId]
+        session.modified = True
 
 class ConferenceScheduleDeleteSession(ScheduleOperation, conferenceServices.ConferenceScheduleModifBase):
 

@@ -1339,19 +1339,16 @@ class RHConfPerformAddTrack( RHConferenceModifBase ):
             t.setTitle(params["title"])
             t.setDescription(params["description"])
             # Filtering criteria: by default make new contribution type checked
-            websession = self._getSession()
-            dict = websession.getVar("ContributionFilterConf%s"%self._conf.getId())
-            if not dict:
-                    #Create a new dictionary
-                    dict = {}
-            if dict.has_key('tracks'):
-                    #Append the new type to the existing list
-                    newDict = dict['tracks'][:]
-                    newDict.append(t.getId())
-                    dict['tracks'] = newDict[:]
+            dct = session.setdefault("ContributionFilterConf%s" % self._conf.getId(), {})
+            if 'tracks' in dct:
+                #Append the new type to the existing list
+                newDict = dct['tracks'][:]
+                newDict.append(t.getId())
+                dct['tracks'] = newDict[:]
             else:
-                    #Create a new entry for the dictionary containing the new type
-                    dict['tracks'] = [t.getId()]
+                #Create a new entry for the dictionary containing the new type
+                dct['tracks'] = [t.getId()]
+            session.modified = True
             self._redirect( urlHandlers.UHConfModifProgram.getURL( self._conf ) )
 
 class RHConfDelTracks( RHConferenceModifBase ):
@@ -2905,12 +2902,8 @@ class RHConfAddContribType(RHConferenceModifBase):
             ct = self._conf.newContribType(self._typeName, self._typeDescription)
 
             # Filtering criteria: by default make new contribution type checked
-            websession = self._getSession()
-            dict = websession.getVar("ContributionFilterConf%s"%self._conf.getId())
-            if not dict:
-                #Create a new dictionary
-                dict = {}
-            if dict.has_key('types'):
+            dict = session.setdefault('ContributionFilterConf%s' % self._conf.getId(), {})
+            if 'types' in dict:
                 #Append the new type to the existing list
                 newDict = dict['types'][:]
                 newDict.append(ct.getId())
@@ -2918,6 +2911,7 @@ class RHConfAddContribType(RHConferenceModifBase):
             else:
                 #Create a new entry for the dictionary containing the new type
                 dict['types'] = [ct.getId()]
+            session.modified = True
 
             self._redirect(urlHandlers.UHConferenceModification.getURL(self._conf))
         else:
@@ -3114,8 +3108,7 @@ class RHContributionList( RoomBookingDBMixin, RHContributionListBase ):
     def _checkParams( self, params ):
         RHContributionListBase._checkParams( self, params )
         operationType = params.get('operationType')
-        websession = self._getSession()
-        sessionData = websession.getVar("ContributionFilterConf%s"%self._conf.getId())
+        sessionData = session.get('ContributionFilterConf%s' % self._conf.getId())
 
         # check if there is information already
         # set in the session variables
@@ -3142,7 +3135,7 @@ class RHContributionList( RoomBookingDBMixin, RHContributionListBase ):
         # Maintain the state about filter usage
         sessionData['filtersActive'] = self._filterUsed;
         # Save the web session
-        websession.setVar("ContributionFilterConf%s"%self._conf.getId(), sessionData)
+        session['ContributionFilterConf%s' % self._conf.getId()] = sessionData
         self._filterCrit = self._buildFilteringCriteria(sessionData)
         self._sortingCrit = ContribSortingCrit([sessionData.get("sortBy", "number").strip()])
         self._order = sessionData.get("order", "down")
