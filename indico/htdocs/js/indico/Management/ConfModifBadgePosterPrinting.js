@@ -12,7 +12,6 @@ $(document).ready(function() {
     resizable: false,
     autoOpen: false,
     maxHeight: '90%',
-    appendTo: '#create_form',
     buttons: {
       Ok: function() {
         $(this).dialog('close');
