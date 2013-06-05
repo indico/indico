@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 import tempfile
 import os
@@ -254,7 +255,7 @@ class RHSubmitMaterialBase(object):
                     fDict = {}
 
                     fDict["fileName"] = fileUpload.filename
-                    estimSize = int(self._req.headers_in["content-length"])
+                    estimSize = request.content_length
 
                     if maxUploadFilesTotalSize and estimSize > (maxUploadFilesTotalSize * BYTES_1MB):
                         # if file is too big, do not save it in disk
@@ -335,7 +336,7 @@ class RHSubmitMaterialBase(object):
         from MaKaC.common.fossilize import fossilize
         from MaKaC.fossils.conference import ILocalFileExtendedFossil, ILinkFossil
 
-        Logger.get('requestHandler').debug('Adding %s - request %s ' % (self._uploadType, id(self._req)))
+        Logger.get('requestHandler').debug('Adding %s - request %s' % (self._uploadType, request))
 
         mat, newlyCreated = self._getMaterial()
 
