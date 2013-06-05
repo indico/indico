@@ -25,8 +25,8 @@ from MaKaC.conference import ConferenceHolder
 
 class ChatroomServiceBase ( ProtectedModificationService, Observable ):
 
-    def __init__(self, params, session, req):
-        ProtectedModificationService.__init__(self, params, session, req)
+    def __init__(self, params):
+        ProtectedModificationService.__init__(self, params)
 
     def _checkParams(self):
         pm = ParameterManager(self._params)

@@ -52,8 +52,8 @@ class XMPPChatroomService( ChatroomServiceBase ):
                  'CRdeletedFromClient': _('Someone deleted the chat room from the XMPP server since this page was loaded. We recommend you to delete the chatroom from Indico as well')
                  }
 
-    def __init__(self, params, session, req):
-        ChatroomServiceBase.__init__(self, params, session, req)
+    def __init__(self, params):
+        ChatroomServiceBase.__init__(self, params)
         #we want the data from the XMPP plugin in the InstantMessaging Plugin type
         oh = PluginFieldsWrapper('InstantMessaging', 'XMPP')
         self._botJID = oh.getOption('indicoUsername') + '@' + oh.getOption('chatServerHost')
