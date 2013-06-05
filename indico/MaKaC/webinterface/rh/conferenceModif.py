@@ -21,8 +21,7 @@ import os
 import shutil
 import tempfile
 import types
-from copy import copy
-from flask import session
+from flask import session, request
 from persistent.list import PersistentList
 from datetime import datetime,timedelta
 from dateutil.relativedelta import relativedelta
@@ -1795,8 +1794,7 @@ class RHAbstractList(RHConfModifCFABase):
         operationType = params.get('operationType')
 
         # session data
-        websession = self._getSession()
-        sessionData = websession.getVar("abstractFilterAndSortingConf%s"%self._conf.getId())
+        sessionData = session.get('abstractFilterAndSortingConf%s' % self._conf.getId())
 
         # check if there is information already
         # set in the session variables
@@ -1824,7 +1822,7 @@ class RHAbstractList(RHConfModifCFABase):
         sessionData['filtersActive'] = self._filterUsed
 
         # Save the web session
-        websession.setVar("abstractFilterAndSortingConf%s"%self._conf.getId(), sessionData)
+        session['abstractFilterAndSortingConf%s' % self._conf.getId()] = sessionData
 
         self._filterCrit = self._buildFilteringCriteria(sessionData)
 
@@ -3243,8 +3241,7 @@ class RHNewAbstract(RHConfModifCFABase, AbstractParam):
         #   necessary
         if self._getUser() is None:
             return
-        headerSize = self._req.headers_in["content-length"]
-        AbstractParam._checkParams(self, params, self._conf, headerSize)
+        AbstractParam._checkParams(self, params, self._conf, request.content_length)
 
     def _doValidate(self):
         #First, one must validate that the information is fine

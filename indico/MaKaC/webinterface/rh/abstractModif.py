@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.abstracts as abstracts
@@ -554,10 +555,9 @@ class RHEditData(RHAbstractModifBase, AbstractParam):
 
     def _checkParams(self, params):
         RHAbstractModifBase._checkParams(self,params)
-        if self._getUser() == None:
+        if self._getUser() is None:
             return
-        headerSize = self._req.headers_in["content-length"]
-        AbstractParam._checkParams(self, params, self._conf, headerSize)
+        AbstractParam._checkParams(self, params, self._conf, request.content_length)
         if self._action == "":#First call
             #TODO: remove this code, this should be handle by AbstractData (not method available
             # because setAbstractData(abstract) is used when saving, so there are specific actions.
