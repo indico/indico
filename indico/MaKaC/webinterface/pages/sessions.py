@@ -362,23 +362,6 @@ class WPSessionDataModification(WPSessionModification):
         params["convener"] = ""
         return p.getHTML(params)
 
-    def _getDefinedDisplayList(self, typeName):
-         list = self._session.getConvenerList()
-         if list is None :
-             return ""
-         html = []
-         counter = 0
-         for person in list :
-             text = """
-                 <tr>
-                     <td width="5%%"><input type="checkbox" name="%ss" value="%s"></td>
-                     <td>&nbsp;%s</td>
-                 </tr>"""%(typeName,counter,person.getFullName())
-             html.append(text)
-             counter = counter + 1
-         return """
-             """.join(html)
-
 #---------------------------------------------------------------------------
 
 class WPModEditDataConfirmation(WPSessionModification):

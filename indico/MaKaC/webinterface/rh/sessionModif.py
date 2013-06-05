@@ -172,18 +172,6 @@ class RHSessionDatesModification(RHSessionModifBase):
         params = self._getRequestParams()
         return p.display(**params)
 
-    def _getPreservedParams(self):
-        params = self._websession.getVar("preservedParams")
-        if params is None:
-            return {}
-        return params
-
-    def _preserveParams(self, params):
-        self._websession.setVar("preservedParams", params)
-
-    def _removePreservedParams(self):
-        self._websession.setVar("preservedParams", None)
-
 
 class RHSessionDataModification(RoomBookingDBMixin, RHSessionModifBase):
     _uh = urlHandlers.UHSessionDataModification
@@ -274,58 +262,6 @@ class RHSessionDataModification(RoomBookingDBMixin, RHSessionModifBase):
             p = wf.getSessionDataModification(self, self._target)
         params = self._getRequestParams()
         return p.display(**params)
-
-    def _getDefinedDisplayList(self, typeName):
-        list = self._websession.getVar("%sList" % typeName)
-        if list is None:
-            return ""
-        html = []
-        counter = 0
-        for person in list:
-            text = """
-                <tr>
-                    <td width="5%%"><input type="checkbox" name="%ss" value="%s"></td>
-                    <td>&nbsp;%s</td>
-                </tr>""" % (typeName, counter, person[0].getFullName())
-            html.append(text)
-            counter = counter + 1
-        return """
-            """.join(html)
-
-    def _getDefinedList(self, typeName):
-        definedList = self._websession.getVar("%sList" % typeName)
-        if definedList is None:
-            return []
-        return definedList
-
-    def _setDefinedList(self, definedList, typeName):
-        self._websession.setVar("%sList" % typeName, definedList)
-
-    def _alreadyDefined(self, person, definedList):
-        if person is None:
-            return True
-        if definedList is None:
-            return False
-        fullName = person.getFullName()
-        for p in definedList:
-            if p[0].getFullName() == fullName:
-                return True
-        return False
-
-    def _removeDefinedList(self, typeName):
-        self._websession.setVar("%sList" % typeName, None)
-
-    def _getPreservedParams(self):
-        params = self._websession.getVar("preservedParams")
-        if params is None:
-            return {}
-        return params
-
-    def _preserveParams(self, params):
-        self._websession.setVar("preservedParams", params)
-
-    def _removePreservedParams(self):
-        self._websession.setVar("preservedParams", None)
 
     def _removePersons(self, params, typeName):
         persons = self._normaliseListParam(params.get("%ss" % typeName, []))
