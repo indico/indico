@@ -24,7 +24,6 @@ import MaKaC.webinterface.wcalendar as wcalendar
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.conf_calendar as calendar
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
-from MaKaC.common.general import *
 from datetime import datetime
 from pytz import timezone
 from MaKaC.errors import AccessError

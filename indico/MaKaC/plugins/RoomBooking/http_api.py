@@ -43,7 +43,6 @@ from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.plugins.RoomBooking.common import rb_check_user_access
 
 # indico imports
-from indico.web.wsgi import webinterface_handler_config as apache
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.api import IteratedDataFetcher, HTTPAPIHook
 from indico.web.http_api.util import get_query_parameter
@@ -188,7 +187,7 @@ class BookRoomHook(HTTPAPIHook):
         missing = list(name for (name, value) in (self._params.iteritems()) if not value)
 
         if missing:
-            raise HTTPAPIError('Argument(s) missing: {0}'.format(', '.join(missing)), apache.HTTP_BAD_REQUEST)
+            raise HTTPAPIError('Argument(s) missing: {0}'.format(', '.join(missing)), 400)
 
         self._room = CrossLocationQueries.getRooms(location=self._params['location'], roomID=int(self._params['roomid']))
 

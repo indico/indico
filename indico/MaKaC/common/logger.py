@@ -45,10 +45,12 @@ class IndicoMailFormatter(logging.Formatter):
             return ''
         info = ['Additional information:']
         info.append('URL: %s' % rh.getRequestURL())
+        info.append('Endpoint: %s' % request.url_rule.endpoint)
+        info.append('Method: %s' % request.method)
         info.append('Params: %s' % rh._getTruncatedParams())
         info.append('IP: %s' % request.remote_addr)
         info.append('User Agent: %s' % request.user_agent)
-        info.append('Referer: %s' % request.referrer or 'n/a')
+        info.append('Referer: %s' % (request.referrer or 'n/a'))
         return '\n\n%s' % '\n'.join(info)
 
 

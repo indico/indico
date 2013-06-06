@@ -39,7 +39,6 @@ import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.errors import MaKaCError,FormValuesError,NoReportError
 import MaKaC.conference as conference
 from MaKaC.conference import ConferenceChair
-from MaKaC.common.general import *
 import MaKaC.statistics as statistics
 from MaKaC.common.Configuration import Config
 import MaKaC.user as user
@@ -52,8 +51,6 @@ from MaKaC.webinterface.common.tools import escape_html
 from indico.web.flask.util import send_file
 from indico.web.http_api.api import CategoryEventHook
 from indico.web.http_api.metadata.serializer import Serializer
-from indico.web.wsgi import webinterface_handler_config as apache
-from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 
@@ -549,12 +546,12 @@ class RHCategoryToiCal(RoomBookingDBMixin, RHCategDisplayBase):
 class RHCategoryToRSS(RHCategDisplayBase):
 
     def _process (self):
-        self._redirect(urlHandlers.UHCategoryToAtom.getURL(self._target), status=apache.HTTP_MOVED_PERMANENTLY)
+        self._redirect(urlHandlers.UHCategoryToAtom.getURL(self._target), status=301)
 
 class RHTodayCategoryToRSS(RHCategoryToRSS):
 
     def _process( self ):
-        self._redirect(urlHandlers.UHCategoryToAtom.getURL(self._target), status=apache.HTTP_MOVED_PERMANENTLY)
+        self._redirect(urlHandlers.UHCategoryToAtom.getURL(self._target), status=301)
 
 class RHCategoryToAtom(RoomBookingDBMixin, RHCategDisplayBase):
     _uh = urlHandlers.UHCategoryToAtom

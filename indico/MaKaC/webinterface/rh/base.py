@@ -26,14 +26,10 @@ which action to carry out in order to handle the request made. This means that
 each of the possible HTTP ports of the system will have a rh which will know
 what to do depending on the parameter values received, etc.
 """
-import copy, time, os, sys, random, re, socket
+import copy, time, os, sys, random
 import StringIO
 from datetime import datetime, timedelta
 
-try:
-    from indico.web.wsgi.indico_wsgi_handler_utils import Field
-except ImportError:
-    pass
 from ZODB.POSException import ConflictError, POSKeyError
 from ZEO.Exceptions import ClientDisconnected
 import oauth2 as oauth
@@ -43,8 +39,6 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
-from MaKaC.webinterface.common.baseNotificator import Notification
-from MaKaC.common.general import *
 
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import DBMgr, Config, security
@@ -152,21 +146,16 @@ class RequestHandlerBase(OldObservable):
         return request.remote_addr
 
     def _getTruncatedParams(self):
-        """ Truncates params, so that file objects do not show up in the logs """
-
+        """Truncates params"""
         params = {}
-
-        for key,value in self._reqParams.iteritems():
-            if isinstance(value, Field):
-                params[key] = "<FILE>"
-            elif type(value) == str:
+        for key, value in self._reqParams.iteritems():
+            if isinstance(value, basestring):
                 params[key] = truncate(value, 1024)
             else:
                 params[key] = value
-
         return params
 
-    accessWrapper = property( getAW )
+    accessWrapper = property(getAW)
 
 
 class RH(RequestHandlerBase):

@@ -89,7 +89,7 @@ class HTTPAPIHook(object):
 
     HOOK_LIST = []
     TYPES = None # abstract
-    PREFIX = 'export' # url prefix. must exist in indico_wsgi_url_parser.py, too! also used as function prefix
+    PREFIX = 'export' # url prefix. must exist in indico.web.flask.app:add_handlers, too! also used as function prefix
     RE = None # abstract
     DEFAULT_DETAIL = None # abstract
     MAX_RECORDS = {}

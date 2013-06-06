@@ -25,7 +25,6 @@ from indico.web.http_api.api import HTTPAPIHook, IteratedDataFetcher
 from indico.web.http_api.metadata.ical import ICalSerializer
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.responses import HTTPAPIError
-from indico.web.wsgi import webinterface_handler_config as apache
 
 from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin
 from MaKaC.common.indexes import IndexesHolder
@@ -131,7 +130,7 @@ class CollaborationAPIHook(HTTPAPIHook):
 
     def api_recordingManager(self, aw):
         if not self._indicoID or not self._cdsID:
-            raise HTTPAPIError('A required argument is missing.', apache.HTTP_BAD_REQUEST)
+            raise HTTPAPIError('A required argument is missing.', 400)
 
         success = createIndicoLink(self._indicoID, self._cdsID)
         return {'success': success}
@@ -150,7 +149,7 @@ class CollaborationExportHook(HTTPAPIHook):
         super(CollaborationExportHook, self)._getParams()
         self._conf = ConferenceHolder().getById(self._pathParams['confId'], True)
         if not self._conf:
-            raise HTTPAPIError('Conference does not exist.', apache.HTTP_BAD_REQUEST)
+            raise HTTPAPIError('Conference does not exist.', 400)
 
     def export_eAgreements(self, aw):
         manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())

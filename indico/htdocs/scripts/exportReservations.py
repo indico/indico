@@ -16,23 +16,24 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+import os
+import csv
+import tempfile
+import stat
+from datetime import datetime, timedelta
 from flask import request
+
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.rb_reservation import Collision
-import os, sys, csv, tempfile, stat
-from datetime import datetime, timedelta
-from indico.web.wsgi import webinterface_handler_config as apache
 from MaKaC.common import DBMgr
 from MaKaC.rb_factory import Factory
 from MaKaC.common.Configuration import Config
-from MaKaC.common.datetimeParser import parse_date
 from MaKaC.domain import DomainHolder
-from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.errors import HostnameResolveError
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 from MaKaC.common.utils import parseDate
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+
 
 """
 TODO: This must be refactor to be done with RH???
