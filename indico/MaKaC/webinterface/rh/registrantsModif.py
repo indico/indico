@@ -202,8 +202,7 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         operationType = params.get('operationType')
 
         # session data
-        websession = self._getSession()
-        sessionData = websession.getVar("registrantsFilterAndSortingConf%s"%self._conf.getId())
+        sessionData = session.get('registrantsFilterAndSortingConf%s' % self._conf.getId())
 
         # check if there is information already
         # set in the session variables
@@ -241,7 +240,7 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         sessionData['filtersActive'] = self._filterUsed;
 
         # Save the web session
-        websession.setVar("registrantsFilterAndSortingConf%s"%self._conf.getId(), sessionData)
+        session['registrantsFilterAndSortingConf%s' % self._conf.getId()] = sessionData
 
         self._filterCrit = self._buildFilteringCriteria(sessionData)
 

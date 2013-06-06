@@ -53,7 +53,6 @@ class WPConfModifRegistrantList( WPConfModifRegistrantListBase ):
         display = params.get("display",None)
         order = params.get("order",None)
         sessionFilterName=params.get("sessionFilterName", "session")
-        websession = self._rh._getSession()
 
         filterParams = {}
         fields = getattr(filterCrit, '_fields')
@@ -78,12 +77,14 @@ class WPConfModifRegistrantList( WPConfModifRegistrantListBase ):
         urlParams.update(filterParams)
         filterUrl = self._rh._uh.getURL(None, **urlParams)
 
-        wc = WConfModifRegistrants(self._conf, filterCrit, sortingCrit, display, websession, filterUrl, order, sessionFilterName, self._filterUsed)
+        wc = WConfModifRegistrants(self._conf, filterCrit, sortingCrit, display, filterUrl, order, sessionFilterName,
+                                   self._filterUsed)
         return wc.getHTML()
 
-class WConfModifRegistrants( wcomponents.WTemplated ):
 
-    def __init__( self, conference,filterCrit, sortingCrit, display, websession, filterUrl, order="down", sessionFilterName="session", filterUsed = False ):
+class WConfModifRegistrants(wcomponents.WTemplated):
+    def __init__(self, conference, filterCrit, sortingCrit, display, filterUrl, order="down",
+                 sessionFilterName="session", filterUsed=False):
 
         self._conf = conference
         self._filterCrit = filterCrit
