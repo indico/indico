@@ -51,7 +51,7 @@ except ImportError:
 
 DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras"]
 
-DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor', 'werkzeug', 'nodeenv', 'fabric', 'fabric-virtualenv']
+DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor', 'werkzeug', 'nodeenv', 'fabric', 'fabric-virtualenv', 'sphinx', 'repoze.sphinx.autointerface']
 
 if sys.platform == 'linux2':
     import pwd

@@ -34,6 +34,7 @@ from fabvenv import virtualenv
 SUBMODULES = ['compass', 'jquery', 'qtip2']
 ASSET_TYPES = ['js', 'sass', 'css']
 PYTHONBREW_PATH = os.path.expanduser('~/.pythonbrew')
+DOC_DIRS = ['guides']
 
 DEFAULT_NODE_VERSION = '0.10'
 DEFAULT_VERSIONS = ['2.6', '2.7']
@@ -263,9 +264,34 @@ def tarball(src_dir=None):
 
     src_dir = src_dir or env['src_dir']
 
+    make_docs(src_dir)
+
     setup_deps(n_env=os.path.join(src_dir, 'ext_modules', 'node_env'),
                src_dir=src_dir)
     local('python setup.py -q sdist')
+
+
+@task
+def make_docs(src_dir=None):
+    print green('Generating documentation')
+    with lcd(os.path.join(src_dir or env['src_dir'], 'doc')):
+        for d in DOC_DIRS:
+            with lcd(d):
+                local('make html')
+                local('make latex')
+                local('mv build/html/* {0}'.format(
+                    os.path.join(env['src_dir'], 'indico', 'htdocs', 'ihelp', 'html')))
+
+        with lcd(os.path.join('guides', 'build', 'latex')):
+            local('make all-pdf')
+            local('mv *.pdf {0}'.format(
+                  os.path.join(env['src_dir'], 'indico', 'htdocs', 'ihelp', 'pdf')))
+
+        print green('Cleaning up')
+        for d in DOC_DIRS:
+            with lcd(d):
+                local('make clean')
+
 
 
 @task

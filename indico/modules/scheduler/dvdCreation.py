@@ -33,6 +33,7 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 import MaKaC.common.info as info
 from MaKaC.i18n import _
 
+from indico.modules.scheduler.tasks import OneShotTask
 from indico.modules.scheduler.server import Scheduler
 
 class OfflineWebsiteCreator(OneShotTask):

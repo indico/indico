@@ -7,6 +7,7 @@ import conf
 
 PATH = '../../../indico/'
 
+from MaKaC import common
 from indico.core.extpoint import IListener, IContributor
 
 
