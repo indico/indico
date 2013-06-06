@@ -160,7 +160,7 @@ $(function() {
             var legends = {'url':$T('field containing the url of the electronic agreement. (This field is mandatory)'),
                     'talkTitle':$T('field containing the talk title. (This field is mandatory)'),
                     'name':$T('field containing the full name of the speaker.')};
-            var popup = new SpeakersEmailPopup(${conf.getTitle()| n,j}, ${conf.getId()}, uniqueIdList, ${fromList} , ${user.getId()}, defaultText, legends);
+            var popup = new SpeakersEmailPopup(${conf.getTitle()| n,j}, ${conf.getId()}, uniqueIdList, ${fromList|n,j} , ${user.getId()}, defaultText, legends);
             popup.open();
         } else {
             var dialog = new WarningPopup($T("Warning"), $T("No entry selected! Please select at least one."));
