@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
@@ -808,15 +809,12 @@ class RHRegistrationFormModifGeneralSectionFieldAdd( RHRegistrationFormModifGene
         RHRegistrationFormModifGeneralSectionBase._checkParams( self, params )
         self._firstTime=params.get('firstTime','yes')!='no'
 
-    def _process( self ):
-        tmpField=None
+    def _process(self):
         if not self._firstTime:
-            tmpField=self._getSession().getVar("tmpSectionField")
+            tmpField = session['tmpSectionField']
         else:
-            self._getSession().removeVar("tmpSectionField")
-            tmpField=_TmpSectionField(self._getRequestParams(), None)
-            self._getSession().setVar("tmpSectionField",tmpField)
-        p = registrationForm.WPConfModifRegFormGeneralSectionFieldAdd( self, self._generalSectionForm, tmpField )
+            session['tmpSectionField'] = tmpField = _TmpSectionField(self._getRequestParams(), None)
+        p = registrationForm.WPConfModifRegFormGeneralSectionFieldAdd( self, self._generalSectionForm, tmpField)
         return p.display()
 
 class RHRegistrationFormModifGeneralSectionFieldPerformAdd( RHRegistrationFormModifGeneralSectionBase ):
@@ -826,15 +824,15 @@ class RHRegistrationFormModifGeneralSectionFieldPerformAdd( RHRegistrationFormMo
         self._cancel = params.has_key("cancel")
         self._save = params.has_key("save")
 
-    def _process( self ):
+    def _process(self):
         if not self._cancel:
             # setup the server variable with the values for the section field
-            tmpSectionField=self._getSession().getVar("tmpSectionField")
-            if tmpSectionField == None:
-                tmpSectionField=_TmpSectionField(self._getRequestParams(), None)
+            tmpSectionField = session.get('tmpSectionField')
+            if tmpSectionField is None:
+                tmpSectionField = _TmpSectionField(self._getRequestParams(), None)
             else:
                 tmpSectionField.map(self._getRequestParams())
-            self._getSession().setVar("tmpSectionField", tmpSectionField)
+            session['tmpSectionField'] = tmpSectionField
             #-----
             if self._save:
                 #############
@@ -842,14 +840,14 @@ class RHRegistrationFormModifGeneralSectionFieldPerformAdd( RHRegistrationFormMo
                 #self._generalSectionForm.addField(GeneralField(self._generalSectionForm, tmpSectionField.getValues()))
                 #
                 self._generalSectionForm.addToSortedFields(GeneralField(self._generalSectionForm, tmpSectionField.getValues()))
-                self._getSession().removeVar("tmpSectionField")
+                session.pop('tmpSectionField', None)
             else:
                 urlfield=urlHandlers.UHConfModifRegFormGeneralSectionFieldAdd.getURL(self._generalSectionForm)
                 urlfield.addParam("firstTime",'no')
                 self._redirect(urlfield)
                 return
         else:
-            self._getSession().removeVar("tmpSectionField")
+            session.pop('tmpSectionField', None)
         self._redirect(urlHandlers.UHConfModifRegFormGeneralSection.getURL(self._generalSectionForm))
 
 class RHRegistrationFormModifGeneralSectionFieldModif( RHRegistrationFormModifGeneralSectionBase ):
@@ -861,11 +859,11 @@ class RHRegistrationFormModifGeneralSectionFieldModif( RHRegistrationFormModifGe
     def _process( self ):
         # setup the server variable with the values for the section field
         if self._firstTime:
-            self._getSession().removeVar("tmpSectionField")
-        tmpSectionField=self._getSession().getVar("tmpSectionField")
-        if tmpSectionField == None:
-            tmpSectionField=_TmpSectionField(generalField=self._sectionField)
-        self._getSession().setVar("tmpSectionField", tmpSectionField)
+            session.pop('tmpSectionField', None)
+        tmpSectionField = session.get('tmpSectionField')
+        if tmpSectionField is None:
+            tmpSectionField = _TmpSectionField(generalField=self._sectionField)
+        session['tmpSectionField'] = tmpSectionField
         #-----
         p = registrationForm.WPConfModifRegFormGeneralSectionFieldModif( self, self._sectionField, tmpSectionField)
         return p.display()
@@ -882,24 +880,24 @@ class RHRegistrationFormModifGeneralSectionFieldPerformModif( RHRegistrationForm
     def _process( self ):
         if not self._cancel:
             # setup the server variable with the values for the section field
-            tmpSectionField=self._getSession().getVar("tmpSectionField")
-            if tmpSectionField == None:
-                tmpSectionField=_TmpSectionField(generalField=self._sectionField)
+            tmpSectionField = session.get('tmpSectionField')
+            if tmpSectionField is None:
+                tmpSectionField = _TmpSectionField(generalField=self._sectionField)
             else:
                 tmpSectionField.map(self._getRequestParams())
-            self._getSession().setVar("tmpSectionField", tmpSectionField)
+            session['tmpSectionField'] = tmpSectionField
             #-----
             if self._save:
                 if self._sectionField is not None:
                     self._sectionField.setValues(tmpSectionField.getValues())
-                self._getSession().removeVar("tmpSectionField")
+                session.pop('tmpSectionField', None)
             else:
                 urlfield=urlHandlers.UHConfModifRegFormGeneralSectionFieldModif.getURL(self._sectionField)
                 urlfield.addParam("firstTime",'no')
                 self._redirect(urlfield)
                 return
         else:
-            self._getSession().removeVar("tmpSectionField")
+            session.pop('tmpSectionField', None)
         self._redirect(urlHandlers.UHConfModifRegFormGeneralSection.getURL(self._generalSectionForm))
 
 
@@ -1104,14 +1102,14 @@ class RHRegistrationFormStatusModif( RHRegistrationFormModifStatusBase ):
         RHRegistrationFormModifStatusBase._checkParams(self, params)
         self._firstTime=params.get('firstTime','yes')!='no'
 
-    def _process( self ):
+    def _process(self):
         if self._firstTime:
-            self._getSession().removeVar("tmpStatus")
-        tmpStatus=self._getSession().getVar("tmpStatus")
+            session.pop('tmpStatus', None)
+        tmpStatus = session.get('tmpStatus')
         if tmpStatus is None:
-            tmpStatus=_TmpStatus(self._getRequestParams(), self._status)
-        self._getSession().setVar("tmpStatus", tmpStatus)
-        p = registrationForm.WPConfModifRegFormStatusModif( self, self._status, tmpStatus )
+            tmpStatus = _TmpStatus(self._getRequestParams(), self._status)
+        session['tmpStatus'] = tmpStatus
+        p = registrationForm.WPConfModifRegFormStatusModif(self, self._status, tmpStatus)
         return p.display()
 
 class RHRegistrationFormModifStatusPerformModif( RHRegistrationFormModifStatusBase ):
@@ -1124,21 +1122,21 @@ class RHRegistrationFormModifStatusPerformModif( RHRegistrationFormModifStatusBa
     def _process( self ):
         if not self._cancel:
             # setup the server variable with the values for the section field
-            tmpStatus=self._getSession().getVar("tmpStatus")
-            if tmpStatus == None:
-                raise MaKaCError( _("Error trying to modify the status"))
+            tmpStatus = session.get('tmpStatus')
+            if tmpStatus is None:
+                raise MaKaCError(_("Error trying to modify the status"))
             else:
                 tmpStatus.map(self._getRequestParams())
-            self._getSession().setVar("tmpStatus", tmpStatus)
+            session['tmpStatus'] = tmpStatus
             #-----
             if self._save:
                 self._status.setValues(tmpStatus.getValues())
-                self._getSession().removeVar("tmpStatus")
+                session.pop('tmpStatus', None)
             else:
                 urlModif=urlHandlers.UHConfModifRegFormStatusModif.getURL(self._status)
                 urlModif.addParam("firstTime", "no")
                 self._redirect(urlModif)
                 return
         else:
-            self._getSession().removeVar("tmpStatus")
+            session.pop('tmpStatus', None)
         self._redirect("%s#statuses"%urlHandlers.UHConfModifRegForm.getURL(self._conf.getRegistrationForm()))
