@@ -21,8 +21,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import groups
 
-if DEVELOPMENT:
-    groups = reload(groups)
+
 
 
 def index( req, **params ):

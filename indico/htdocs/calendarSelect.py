@@ -20,8 +20,7 @@
 from MaKaC.common.general import *
 from MaKaC.webinterface.rh import calendar
 
-if DEVELOPMENT:
-    calendar = reload( calendar )
+
 
 
 def index( req, **params ):

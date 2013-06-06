@@ -21,8 +21,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import conferenceDisplay
 
-if DEVELOPMENT:
-    conferenceDisplay = reload( conferenceDisplay )
+
 
 
 def index( req, **params ):

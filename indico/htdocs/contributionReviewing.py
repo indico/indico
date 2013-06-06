@@ -21,8 +21,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import contribReviewingModif
 
-if DEVELOPMENT:
-    contribReviewingModif = reload( contribReviewingModif )
+
 
 
 def index( req, **params ):

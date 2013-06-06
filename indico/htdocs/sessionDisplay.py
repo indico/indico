@@ -21,8 +21,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import sessionDisplay
 
-if DEVELOPMENT:
-    sessionDisplay = reload( sessionDisplay )
+
 
 
 def index(req, **params):

@@ -21,8 +21,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import contribMod
 
-if DEVELOPMENT:
-    contribMod = reload( contribMod )
+
 
 
 def index(req, **params):

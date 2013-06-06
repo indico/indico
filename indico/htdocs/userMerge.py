@@ -21,8 +21,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import admins
 
-if DEVELOPMENT:
-    admins = reload(admins)
+
 
 
 def index(req, **params):

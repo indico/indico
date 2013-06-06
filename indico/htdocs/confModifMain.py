@@ -17,14 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-
-
 # TODO: this file should be removed. I think it is not used anymore! (Jose B.)
-from MaKaC.common.general import *
-
-if DEVELOPMENT:
-    from MaKaC import webinterface
-    webinterface = reload( webinterface )
 
 from MaKaC.webinterface import pages
 

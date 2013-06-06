@@ -20,8 +20,7 @@
 from MaKaC.common.general import DEVELOPMENT
 from MaKaC.webinterface.rh import reviewingModif
 
-if DEVELOPMENT:
-    reviewingModif = reload( reviewingModif )
+
 
 def access( req, **params ):
     return reviewingModif.RHConfModifReviewingAccess( req ).process( params )

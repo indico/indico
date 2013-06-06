@@ -21,8 +21,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import categoryDisplay
 
-if DEVELOPMENT:
-    categoryDisplay = reload( categoryDisplay )
+
 
 
 def index(req, **params):

@@ -21,8 +21,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import conferenceModif
 
-if DEVELOPMENT:
-    conferenceModif = reload( conferenceModif )
+
 
 
 def index( req, **params ):

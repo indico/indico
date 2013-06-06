@@ -21,8 +21,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import users
 
-if DEVELOPMENT:
-    users = reload(users)
+
 
 
 def index(req, **params):

@@ -21,8 +21,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface import pages
 
-if DEVELOPMENT:
-    pages = reload(pages)
+
 
 
 def index(req, **args):

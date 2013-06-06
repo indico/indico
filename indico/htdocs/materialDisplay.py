@@ -21,8 +21,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import materialDisplay
 
-if DEVELOPMENT:
-    materialDisplay = reload( materialDisplay )
+
 
 
 def index(req, **params):

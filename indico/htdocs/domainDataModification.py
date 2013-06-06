@@ -21,8 +21,7 @@ from MaKaC.common.general import *
 
 from MaKaC.webinterface.rh import domains
 
-if DEVELOPMENT:
-    domains = reload( domains )
+
 
 
 def index(req, **params):
