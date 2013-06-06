@@ -26,7 +26,6 @@ import MaKaC.conference as conference
 import MaKaC.user as user
 import MaKaC.domain as domain
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
-from MaKaC.common.general import *
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 from MaKaC.errors import FormValuesError

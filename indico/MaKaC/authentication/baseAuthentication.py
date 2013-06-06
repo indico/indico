@@ -19,7 +19,6 @@
 
 from persistent import Persistent
 
-from MaKaC.common.general import *
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import UserError
 from MaKaC.i18n import _

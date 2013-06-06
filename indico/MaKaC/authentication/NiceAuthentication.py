@@ -21,7 +21,6 @@ import httplib
 import urllib
 import base64
 import os
-from MaKaC.common.general import *
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface import urlHandlers

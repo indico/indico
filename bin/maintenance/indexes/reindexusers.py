@@ -20,7 +20,6 @@
 import sys,os,re
 
 from MaKaC import user
-from MaKaC.common.general import *
 from MaKaC.common import db
 import MaKaC.common.indexes as indexes
 

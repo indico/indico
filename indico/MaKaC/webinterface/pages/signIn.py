@@ -20,7 +20,6 @@
 import MaKaC.webinterface.pages.base as base
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC.common.general import *
 
 
 class WPSignIn( base.WPDecorated ):

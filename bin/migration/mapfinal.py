@@ -23,7 +23,6 @@ import random
 from datetime import datetime
 from MaKaC import conference
 from MaKaC import user,schedule
-from MaKaC.common.general import *
 from MaKaC.webinterface import webFactoryRegistry
 import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.errors import UserError, MaKaCError

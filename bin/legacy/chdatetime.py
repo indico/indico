@@ -19,10 +19,8 @@
 
 """This script is used to convert all mx.DateTime objects from Indico
 database into standard datetime and timedelta objects"""
-import sys,os,re
+import sys
 
-sys.path.append("C:\development\indico\code\code")
-from MaKaC.common.general import *
 from MaKaC.common import db
 from MaKaC.conference import CategoryManager
 from MaKaC.common import indexes, timerExec

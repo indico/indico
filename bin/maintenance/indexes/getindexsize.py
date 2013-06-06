@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common.general import *
 from MaKaC.common import db
 from MaKaC.conference import CategoryManager
 from MaKaC.common import indexes

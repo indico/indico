@@ -19,7 +19,6 @@
 
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common.general import *
 from MaKaC.common import Config
 from MaKaC.webinterface.pages import admins as adminPages
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected

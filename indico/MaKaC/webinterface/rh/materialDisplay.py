@@ -23,7 +23,6 @@ from MaKaC.errors import MaKaCError
 import MaKaC.webinterface.pages.material as material
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.conference as conference
-from MaKaC.common.general import *
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHMaterialBase
 from MaKaC.common import Config

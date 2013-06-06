@@ -20,7 +20,6 @@
 import sys,re
 import datetime,sets
 
-from MaKaC.common.general import *
 from MaKaC.common import db
 from MaKaC.conference import CategoryManager
 from MaKaC.common import indexes

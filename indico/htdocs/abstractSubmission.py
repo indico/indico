@@ -21,7 +21,6 @@ import os
 
 import MaKaC.webinterface.rh.conferenceDisplay as conferenceDisplay
 import MaKaC.webinterface.rh.CFADisplay as CFADisplay
-from MaKaC.common.general import *
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common import Config
 from MaKaC.webinterface.general import *

@@ -36,7 +36,6 @@ import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.webinterface.navigation as navigation
 from MaKaC.common import Config
 from xml.sax.saxutils import quoteattr, escape
-from MaKaC.common.general import *
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase

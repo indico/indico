@@ -19,7 +19,6 @@
 
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common.general import *
 from MaKaC.common import utils
 from MaKaC.common import info
 import MaKaC.webcast as webcast

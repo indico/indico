@@ -27,7 +27,6 @@ from collections import defaultdict
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.locators as locators
-from MaKaC.common.general import *
 from MaKaC.common.Configuration import Config
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin, RHRoomBookingProtected
 from datetime import datetime, timedelta, date

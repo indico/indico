@@ -18,7 +18,6 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import session
 
-from MaKaC.common.general import *
 
 from MaKaC.common.Configuration import Config
 from MaKaC.authentication.LocalAuthentication import LocalAuthenticator

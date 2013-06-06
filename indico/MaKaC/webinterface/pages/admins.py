@@ -25,7 +25,6 @@ from MaKaC.user import CERNGroup
 from MaKaC.fossils.user import IAvatarFossil
 
 import os
-from MaKaC.common.general import *
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.pages.conferences as conferences

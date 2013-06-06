@@ -23,7 +23,6 @@ import MaKaC.webinterface.pages.admins as adminPages
 import MaKaC.user as user
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.errors as errors
-from MaKaC.common.general import *
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.rh.base import RH, RHProtected
 from MaKaC.i18n import _

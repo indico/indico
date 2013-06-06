@@ -20,7 +20,6 @@ from cStringIO import StringIO
 
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common.general import *
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
     RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
