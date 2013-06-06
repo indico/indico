@@ -22,52 +22,75 @@ fabfile for Indico development operations
 """
 
 import os
-from fabric.api import local, lcd, task
+import sys
+from contextlib import contextmanager
+
+from fabric.api import local, lcd, task, env
 from fabric.context_managers import prefix, settings
 from fabric.colors import red, green, yellow, cyan
 from fabvenv import virtualenv
 
 
-NODE_VERSION = '0.10.9'
 SUBMODULES = ['compass', 'jquery', 'qtip2']
 ASSET_TYPES = ['js', 'sass', 'css']
+PYTHONBREW_PATH = os.path.expanduser('~/.pythonbrew')
+
+DEFAULT_NODE_VERSION = '0.10'
 DEFAULT_VERSIONS = ['2.6', '2.7']
 DEFAULT_BUILD_DIR = '/tmp/indico-build'
-
 
 # Generated vars
 
 DEFAULT_INDICO_DIR = os.path.dirname(__file__)
-DEFAULT_EXT_DIR = os.path.join(DEFAULT_INDICO_DIR, 'ext_modules')
-DEFAULT_NODE_ENV = os.path.join(DEFAULT_EXT_DIR, 'node_env')
-DEFAULT_TARGET_DIR = os.path.join(DEFAULT_INDICO_DIR, 'indico/htdocs')
 
 RECIPES = {}
+
+env.update({
+    'global_node': False,
+    'node_version': DEFAULT_NODE_VERSION,
+    'node_env_path': os.path.join(DEFAULT_INDICO_DIR, 'ext_modules', 'node_env'),
+    'versions': DEFAULT_VERSIONS,
+
+    'build_dir': DEFAULT_BUILD_DIR,
+    'src_dir': DEFAULT_INDICO_DIR,
+    'ext_dir': os.path.join(DEFAULT_INDICO_DIR, 'ext_modules'),
+    'target_dir': os.path.join(DEFAULT_INDICO_DIR, 'indico/htdocs')
+})
 
 
 def recipe(name):
     def _wrapper(f):
         RECIPES[name] = f
-        task(f)
     return _wrapper
 
 
 # Decorators
 
-def node_env(path=DEFAULT_NODE_ENV):
-    return prefix('source {0}'.format(os.path.join(path, 'bin/activate')))
+def node_env():
+    return prefix('source {0}'.format(os.path.join(env['node_env_path'], 'bin/activate')))
 
 
-def pythonbrew(version, env):
-    script = local('pythonbrew venv print_activate {0} -p {1}'.format(env, version), capture=True)
-    return prefix('source {0}'.format(script))
+def pythonbrew():
+    return prefix('source {0}'.format(os.path.join(PYTHONBREW_PATH, 'etc', 'bashrc')))
 
+
+@contextmanager
+def pythonbrew_env(version, env):
+    with pythonbrew():
+        with prefix('pythonbrew venv use {0} -p {1}'.format(env, version)):
+            yield
+
+
+def pythonbrew_cmd(cmd, **kwargs):
+    with pythonbrew():
+        return local('pythonbrew {0}'.format(cmd), **kwargs)
 
 # Util functions
 
-def create_node_env(version=NODE_VERSION, path=DEFAULT_NODE_ENV):
+
+def create_node_env():
     with settings(warn_only=True):
-        local('nodeenv -c -n {0} {1}'.format(version, path))
+        local('nodeenv -c -n {0} {1}'.format(env['node_version'], env['node_env_path']))
 
 
 def lib_dir(src_dir, dtype):
@@ -75,49 +98,87 @@ def lib_dir(src_dir, dtype):
     return os.path.join(target_dir, dtype, 'lib')
 
 
-def _install_dependencies(mod_name, sub_path, dtype, src_dir, ext_dir):
-    dest_dir = os.path.join(lib_dir(src_dir, dtype), mod_name)
+def _check_pythonbrew(versions):
+    """
+    Check that pythonbrew is installed and set up the compilers/virtual envs
+    in case they do not exist
+    """
+
+    try:
+        import pythonbrew
+        HAS_PYTHONBREW = True
+    except ImportError:
+        HAS_PYTHONBREW = False
+
+    if not HAS_PYTHONBREW:
+        print red("Can't find pythonbrew!")
+        print yellow("Are you sure you have installed it? (pip install pythonbrew)")
+        sys.exit(-2)
+
+    elif not os.path.exists(PYTHONBREW_PATH):
+        print yellow("Running pythonbrew_install")
+        local('pythonbrew_install')
+
+    # list available pythonbrew versions
+    av_versions = list(entry.strip() for entry in
+                       pythonbrew_cmd('list', capture=True).split('\n')[1:])
+
+    for version in versions:
+        if ('Python-' + version) not in av_versions:
+            print green('Installing Python {0}'.format(version))
+            pythonbrew_cmd('install {0}'.format(version), capture=True)
+
+        # check envs that are available
+        envs = list(entry.strip() for entry in
+                    pythonbrew_cmd('venv -p {0} list'.format(version), capture=True).split('\n')[1:])
+
+        if 'indico' not in envs:
+            pythonbrew_cmd('venv -p {0} create indico'.format(version))
+
+
+def _install_dependencies(mod_name, sub_path, dtype):
+    dest_dir = os.path.join(lib_dir(env['src_dir'], dtype), mod_name)
     local('mkdir -p {0}'.format(dest_dir))
     local('cp -R {0} {1}/'.format(
-        os.path.join(ext_dir, mod_name, sub_path),
+        os.path.join(env['ext_dir'], mod_name, sub_path),
         dest_dir))
 
 
 # Recipes
 
 @recipe('compass')
-def install_compass(src_dir, ext_dir, n_env):
+def install_compass():
     """
     Install compass stylesheets from Git
     """
-    _install_dependencies('compass', 'frameworks/compass/stylesheets', 'sass', src_dir, ext_dir)
+    _install_dependencies('compass', 'frameworks/compass/stylesheets', 'sass')
 
 
 @recipe('jquery')
-def install_jquery(src_dir, ext_dir, n_env):
+def install_jquery():
     """
     Install jquery from Git
     """
-    with node_env(n_env):
-        with lcd(os.path.join(ext_dir, 'jquery')):
+    with node_env():
+        with lcd(os.path.join(env['ext_dir'], 'jquery')):
             local('npm install')
             local('grunt')
-            dest_dir = lib_dir(src_dir, 'js')
+            dest_dir = lib_dir(env['src_dir'], 'js')
             local('mkdir -p {0}'.format(dest_dir))
             local('cp dist/jquery.js {0}/'.format(dest_dir))
 
 
 @recipe('qtip2')
-def install_qtip2(src_dir, ext_dir, n_env):
+def install_qtip2():
     """
     Install qtip2 from Git
     """
-    with node_env(n_env):
-        with lcd(os.path.join(ext_dir, 'qtip2')):
+    with node_env():
+        with lcd(os.path.join(env['ext_dir'], 'qtip2')):
             local('git submodule update')
             local('npm install')
             local('grunt --plugins="tips modal viewport svg" init clean concat:dist concat:css concat:libs replace')
-            dest_dir_js, dest_dir_css = lib_dir(src_dir, 'js'), lib_dir(src_dir, 'css')
+            dest_dir_js, dest_dir_css = lib_dir(env['src_dir'], 'js'), lib_dir(env['src_dir'], 'css')
             local('mkdir -p {0} {1}'.format(dest_dir_js, dest_dir_css))
             local('cp dist/jquery.qtip.js {0}/'.format(dest_dir_js))
             local('cp dist/jquery.qtip.css {0}/'.format(dest_dir_css))
@@ -126,11 +187,11 @@ def install_qtip2(src_dir, ext_dir, n_env):
 # Tasks
 
 @task
-def install(recipe_name, **dir_info):
+def install(recipe_name):
     """
     Install a module given the recipe name
     """
-    RECIPES[recipe_name](**dir_info)
+    RECIPES[recipe_name]()
 
 
 @task
@@ -145,80 +206,103 @@ def init_submodules(src_dir='.'):
         local('git submodule update')
 
 
-def _install_deps(**dir_info):
+def _install_deps():
     """
     Install asset dependencies
     """
     print green("Installing asset dependencies...")
     for recipe_name in RECIPES:
         print cyan("Installing {0}".format(recipe_name))
-        install(recipe_name, **dir_info)
+        install(recipe_name)
 
 
 @task
-def setup_deps(n_env=DEFAULT_NODE_ENV, n_version=NODE_VERSION, src_dir=DEFAULT_INDICO_DIR):
+def setup_deps(n_env=None, n_version=None, src_dir=None, system_node=False):
     """
     Setup (fetch and install) dependencies for Indico assets
     """
 
+    src_dir = src_dir or env['src_dir']
+    n_env = n_env or env['node_env_path']
+
     # initialize submodules if they haven't yet been
     init_submodules(src_dir)
 
-    dir_info = dict(
-        src_dir=src_dir,
-        ext_dir=os.path.join(src_dir, 'ext_modules'),
-        n_env=os.path.join(src_dir, 'ext_modules', 'node_env'))
+    ext_dir = os.path.join(src_dir, 'ext_modules')
 
-    if not os.path.exists(n_env):
-        create_node_env(path=n_env, version=n_version)
+    with settings(node_env_path=n_env or os.path.join(ext_dir, 'node_env'),
+                  node_version=n_version or env['node_version'],
+                  system_node=system_node,
+                  src_dir=src_dir,
+                  ext_dir=ext_dir):
 
-    with node_env(n_env):
-        local('npm install -g grunt-cli')
+        if not system_node and not os.path.exists(n_env):
+            create_node_env()
 
-    _install_deps(**dir_info)
+        with node_env():
+            local('npm install -g grunt-cli')
+
+        _install_deps()
 
 
 @task
-def clean_deps(src_dir=DEFAULT_INDICO_DIR):
+def clean_deps(src_dir=None):
     """
     Clean up generated files
     """
+
     for dtype in ASSET_TYPES:
-        local('rm -rf {0}/*'.format(lib_dir(src_dir, dtype)))
+        local('rm -rf {0}/*'.format(lib_dir(src_dir or env['src_dir'], dtype)))
 
 
 @task
-def tarball(build_dir=DEFAULT_BUILD_DIR):
-    setup_deps(n_env=os.path.join(build_dir, 'indico', 'ext_modules', 'node_env'),
-               src_dir=os.path.join(build_dir, 'indico'))
-    local('python setup.py sdist')
+def tarball(src_dir=None):
+    """
+    Create a binary indico distribution
+    """
+
+    src_dir = src_dir or env['src_dir']
+
+    setup_deps(n_env=os.path.join(src_dir, 'ext_modules', 'node_env'),
+               src_dir=src_dir)
+    local('python setup.py -q sdist')
 
 
 @task
-def package_release(versions=DEFAULT_VERSIONS, build_dir=DEFAULT_BUILD_DIR):
+def package_release(versions=None, build_dir=None, system_node=False):
+    """
+    Create an Indico release - source and binary distributions
+    """
+
+    versions = versions or env['versions']
+    build_dir = build_dir or env['build_dir']
+
     # get current branch
     current_branch = local('git rev-parse --abbrev-ref HEAD', capture=True)
 
-    with prefix('source ~/.pythonbrew/etc/bashrc'):
-        local('mkdir -p {0}'.format(build_dir))
-        with lcd(build_dir):
-            # clone this same repo
-            if os.path.exists('indico'):
-                print yellow("Repository seems to already exist.")
-                with lcd('indico'):
-                    local('git fetch')
-            else:
-                local('git clone {0} indico'.format(os.path.dirname(__file__)))
+    local('mkdir -p {0}'.format(build_dir))
+
+    _check_pythonbrew(versions)
+
+    with lcd(build_dir):
+        # clone this same repo
+        if os.path.exists(os.path.join(build_dir, 'indico')):
+            print yellow("Repository seems to already exist.")
             with lcd('indico'):
-                print green("Checking out branch '{0}'".format(current_branch))
-                local('git checkout origin/{0}'.format(current_branch))
+                local('git fetch')
+        else:
+            local('git clone {0} indico'.format(os.path.dirname(__file__)))
+        with lcd('indico'):
+            print green("Checking out branch '{0}'".format(current_branch))
+            local('git checkout origin/{0}'.format(current_branch))
 
-                # Build source tarball
-                tarball(build_dir=build_dir)
+            # Build source tarball
+            tarball(os.path.join(build_dir, 'indico'))
 
-                # Build binaries (EGG)
-                for version in versions:
-                    with pythonbrew(version, 'indico'):
-                        local('pip install -r requirements.txt')
-                        local('python setup.py bdist_egg')
-                        print green(local('ls -lah dist/', capture=True))
+            # Build binaries (EGG)
+            for version in versions:
+                with pythonbrew_env(version, 'indico'):
+                    local('pip -q install -r requirements.txt')
+                    local('python setup.py -q bdist_egg')
+                    pass
+            print green(local('ls -lah dist/', capture=True))
