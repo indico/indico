@@ -231,16 +231,8 @@ moment = Bundle('js/moment/moment.js',
 base_js = Bundle(jquery, presentation, indico_jquery, moment, indico_core,
                  indico_legacy, indico_common)
 
-base_sass = Bundle('sass/core.scss',
-                   'sass/dashboard.scss',
-                   'sass/buttons.scss',
-                   'sass/dialogs.scss',
-                   'sass/icons.scss',
-                   'sass/inputs.scss',
-                   'sass/tables.scss',
-                   'sass/toolbars.scss',
-                   'sass/lists.scss',
-                   filters="pyscss", output="scss/base_sass_%(version)s.css")
+base_sass = Bundle('sass/base.scss',
+                   filters=("pyscss","cssmin"), output="sass/base_sass_%(version)s.css")
 
 
 def register_all_js(env):

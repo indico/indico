@@ -152,7 +152,7 @@ def install_compass():
     """
     Install compass stylesheets from Git
     """
-    _install_dependencies('compass', 'frameworks/compass/stylesheets', 'sass')
+    _install_dependencies('compass', 'frameworks/compass/stylesheets/*', 'sass')
 
 
 @recipe('jquery')
