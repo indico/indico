@@ -314,7 +314,7 @@ class RHElectronicAgreementGetFile(RHConfModifCSBookings):
             raise MaKaCError("The speaker wrapper id does not match any existing speaker.")
         self.file = sw.getLocalFile()
         return send_file(self.file.getFileName(), self.file.getFilePath(), self.file.getFileType(),
-                         self.file.getCreationDate())
+                         self.file.getCreationDate(), inline=True)
 
 
 class RHElectronicAgreementForm(RHConferenceBaseDisplay):
