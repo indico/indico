@@ -653,13 +653,14 @@ class RH(RequestHandlerBase):
             self._responseUtil.content_type = 'application/json'
             self._responseUtil.status = e.code
             DBMgr.getInstance().endRequest(False)
-        except Exception, e: #Generic error treatment
-            res = self._processUnexpectedError( e )
+        except Exception, e:
+            res = self._processUnexpectedError(e)
+            self._endRequestSpecific2RH(False)
+            DBMgr.getInstance().endRequest(False)
+
             if Config.getInstance().getEmbeddedWebserver() or Config.getInstance().getPropagateAllExceptions():
                 # Re-raise to get the nice werkzeug exception view
                 raise
-            #DBMgr.getInstance().endRequest(False)
-            #self._endRequestSpecific2RH( False )
 
             #cancels any redirection
             self._responseUtil.redirect = None

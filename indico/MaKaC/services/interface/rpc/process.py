@@ -146,8 +146,12 @@ class ServiceRunner(Observable):
                     time.sleep(MAX_RETRIES - retry)
                     continue
         except CausedError:
+            _endRequestSpecific2RH(False)
+            DBMgr.getInstance().endRequest(False)
             raise
         except Exception:
+            _endRequestSpecific2RH(False)
+            DBMgr.getInstance().endRequest(False)
             raise ProcessError("ERR-P0", "Error processing method.")
 
         return result
@@ -155,12 +159,13 @@ class ServiceRunner(Observable):
 from MaKaC.rb_location import CrossLocationDB
 import MaKaC.common.info as info
 
-def _startRequestSpecific2RH():
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            CrossLocationDB.connect()
 
-def _endRequestSpecific2RH( commit = True ):
+def _startRequestSpecific2RH():
+    minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+    if minfo.getRoomBookingModuleActive():
+        CrossLocationDB.connect()
+
+def _endRequestSpecific2RH(commit=True):
     minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
     if minfo.getRoomBookingModuleActive():
         if commit:
