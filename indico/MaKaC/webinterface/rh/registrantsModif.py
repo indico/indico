@@ -192,7 +192,7 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
 
         return sessionData
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         """
         Main parameter checking routine
         """
@@ -209,18 +209,18 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         if sessionData:
             # work on a copy
             sessionData = sessionData.copy()
-            filtersActive =  sessionData['filtersActive']
+            filtersActive = sessionData['filtersActive']
         else:
             # set a default, empty dict
             sessionData = {}
             filtersActive = False
 
-        if params.has_key("resetFilters"):
-            operation =  'resetFilters'
-        elif operationType ==  'filter':
-            operation =  'setFilters'
-        elif operationType ==  'display':
-            operation =  'setDisplay'
+        if 'resetFilters' in params:
+            operation = 'resetFilters'
+        elif operationType == 'filter':
+            operation = 'setFilters'
+        elif operationType == 'display':
+            operation = 'setDisplay'
         else:
             operation = None
 
@@ -228,32 +228,29 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         # on whether only  the first choice for the session
         # is taken into account
 
-        if params.has_key("firstChoice"):
-            self._sessionFilterName="sessionfirstpriority"
+        if 'firstChoice' in params:
+            self._sessionFilterName = "sessionfirstpriority"
         else:
-            self._sessionFilterName="session"
+            self._sessionFilterName = "session"
 
-        isBookmark = params.has_key("isBookmark")
+        isBookmark = 'isBookmark' in params
         sessionData = self._checkAction(params, filtersActive, sessionData, operation, isBookmark)
 
         # Maintain the state abotu filter usage
-        sessionData['filtersActive'] = self._filterUsed;
+        sessionData['filtersActive'] = self._filterUsed
 
         # Save the web session
         session['registrantsFilterAndSortingConf%s' % self._conf.getId()] = sessionData
 
         self._filterCrit = self._buildFilteringCriteria(sessionData)
+        self._sortingCrit = regFilters.SortingCriteria([sessionData.get("sortBy", "Name").strip()])
+        self._order = sessionData.get("order", "down")
+        self._display = utils.normalizeToList(sessionData.get("disp", []))
 
-        self._sortingCrit = regFilters.SortingCriteria( [sessionData.get( "sortBy", "Name" ).strip()] )
-
-        self._order = sessionData.get("order","down")
-
-        self._display = utils.normalizeToList(sessionData.get("disp",[]))
-
-
-    def _process( self ):
-        p = registrants.WPConfModifRegistrantList( self, self._conf, self._filterUsed )
-        return p.display(filterCrit = self._filterCrit, sortingCrit=self._sortingCrit, display = self._display, sessionFilterName = self._sessionFilterName, order=self._order )
+    def _process(self):
+        p = registrants.WPConfModifRegistrantList(self, self._conf, self._filterUsed)
+        return p.display(filterCrit=self._filterCrit, sortingCrit=self._sortingCrit, display=self._display,
+                         sessionFilterName=self._sessionFilterName, order=self._order)
 
 
 class RHRegistrantListModifAction( RHRegistrantListModifBase ):
