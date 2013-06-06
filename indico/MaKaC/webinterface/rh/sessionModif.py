@@ -16,8 +16,8 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import session
 
+from cStringIO import StringIO
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -47,6 +47,7 @@ from MaKaC.errors import FormValuesError
 from MaKaC.conference import SessionChair
 from MaKaC.i18n import _
 from pytz import timezone
+from indico.web.flask.util import send_file
 
 class RHSessionModifBase( RHSessionBase, RHModificationBaseProtected ):
 
@@ -731,15 +732,15 @@ class RHContribsActions:
     class to select the action to do with the selected contributions
     """
     def __init__(self, req):
-        self._req = req
+        assert req is None
 
     def process(self, params):
-        if params.has_key("REMOVE"):
-            return RHRemContribs(self._req).process(params)
-        elif params.has_key("PDF"):
-            return RHContribsToPDF(self._req).process(params)
-        elif params.has_key("AUTH"):
-            return RHContribsParticipantList(self._req).process(params)
+        if 'REMOVE' in params:
+            return RHRemContribs(None).process(params)
+        elif 'PDF' in params:
+            return RHContribsToPDF(None).process(params)
+        elif 'AUTH' in params:
+            return RHContribsParticipantList(None).process(params)
         return "no action to do"
 
 class RHRemContribs(RHSessionModUnrestrictedContribMngCoordBase):
@@ -768,21 +769,12 @@ class RHContribsToPDF(RHSessionModUnrestrictedContribMngCoordBase):
         for id in self._contribIds:
             self._contribs.append(self._conf.getContributionById(id))
 
-    def _process( self ):
+    def _process(self):
         tz = self._conf.getTimezone()
-        filename = "Contributions.pdf"
         if not self._contribs:
             return "No contributions to print"
         pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-        data = pdf.getPDFBin()
-        #self._req.headers_out["Accept-Ranges"] = "bytes"
-        self._req.set_content_length(len(data))
-        #self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+        return send_file('Contributions.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
 
 class RHContribQuickAccess(RHSessionModCoordinationBase):
