@@ -182,6 +182,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
 
     def _clearSessionState(self):
         session.pop('rbActionSucceeded', None)
+        session.pop('rbTitle', None)
+        session.pop('rbDescription', None)
         session.pop('rbDeletionFailed', None)
         session.pop('rbFormMode', None)
         session.pop('rbCandDataInSession', None)
@@ -1333,10 +1335,10 @@ class RHRoomBookingBookingDetails( RHRoomBookingBase ):
         self._resv = self._target = locator.getObject()
         if not self._resv:
             raise NoReportError("""The specified booking with id "%s" does not exist or has been deleted""" % params["resvID"])
-        self._afterActionSucceeded = session.get('rbActionSucceeded')
-        self._title = session.get('rbTitle')
-        self._description = session.get('rbDescription')
-        self._afterDeletionFailed = session.get('rbDeletionFailed')
+        self._afterActionSucceeded = session.pop('rbActionSucceeded', False)
+        self._title = session.pop('rbTitle', None)
+        self._description = session.pop('rbDescription', None)
+        self._afterDeletionFailed = session.pop('rbDeletionFailed', None)
 
         self._collisions = []
         if not self._resv.isConfirmed:
