@@ -28,6 +28,7 @@ from werkzeug.exceptions import NotFound
 from MaKaC.common import Config
 from MaKaC.common.db import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.webinterface.pages.error import WErrorWSGI
 from MaKaC.services.interface.rpc.json import process as jsonrpc_handler
@@ -94,6 +95,7 @@ def handle_404(exception):
 
 
 def handle_exception(exception):
+    Logger.get('wsgi').exception(exception.message or 'WSGI Exception')
     with DBMgr.getInstance().global_connection():
         if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
             raise
