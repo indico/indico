@@ -33,6 +33,7 @@ from MaKaC.common import pendingQueues
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.errors import UserError
 import MaKaC.common.info as info
+from indico.web.flask.util import send_file
 
 class RHSignIn( base.RH ):
 
@@ -126,16 +127,11 @@ class RHLogoutSSOHook( base.RH):
         expected picture."""
         if self._getUser():
             auth = AuthenticatorMgr()
-            autoLogoutRedirect = auth.autoLogout(self)
+            auth.autoLogout(self)
             session.clear()
             self._setUser(None)
-        self._req.content_type = 'image/gif'
-        self._req.encoding = None
-        self._req.filename = 'wsignout.gif'
-        self._req.headers_out["Content-Disposition"] = "inline; filename=wsignout.gif"
-        self._req.set_content_length(os.path.getsize("%s/wsignout.gif"%Configuration.Config.getInstance().getImagesDir()))
-        self._req.send_http_header()
-        self._req.sendfile("%s/wsignout.gif"%Configuration.Config.getInstance().getImagesDir())
+        path = os.path.join(Configuration.Config.getInstance().getImagesDir(), 'wsignout.gif')
+        return send_file('wsignout.gif', path, 'GIF', inline=True)
 
 
 class RHActive( base.RH ):
