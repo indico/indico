@@ -8255,58 +8255,6 @@ ul.speaker_list > li .contributions li {
     color: #881122 !important;
 }
 
-.infoMessage {
-    color: #3A87AD;
-    background-color: #D9EDF7;
-    padding: 8px 14px 8px 14px;
-    margin-bottom: 18px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    border: 1px solid #BCE8F1;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    text-align: center;
-}
-
-.errorMessage {
-    color: #A76766;
-    background-color: #F2DEDE;
-    padding: 8px 14px 8px 14px;
-    margin-bottom: 18px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    border: 1px solid #A76766;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    text-align: center;
-}
-
-.warningMessage {
-    color: #BE9056;
-    background-color: #FFF3E2;
-    padding: 8px 14px 8px 14px;
-    margin-bottom: 18px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    border: 1px solid #BE9056;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    text-align: center;
-}
-
-.successMessage {
-    color: #638864;
-    background-color: #DBEED3;
-    padding: 8px 14px 8px 14px;
-    margin-bottom: 18px;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-    border: 1px solid #638864;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    text-align: center;
-}
-
 /* roomBokoing breadcrumbs */
 
 #breadcrumbs{

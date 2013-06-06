@@ -1,0 +1,99 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+.infoMessage {
+    color: #3A87AD;
+    background-color: #D9EDF7;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #BCE8F1;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.errorMessage {
+    color: #A76766;
+    background-color: #F2DEDE;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #A76766;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.warningMessage {
+    color: #BE9056;
+    background-color: #FFF3E2;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #BE9056;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.successMessage {
+    color: #638864;
+    background-color: #DBEED3;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #638864;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.confDisplayInfoMessage {
+    background-color: #FAFAFA;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    border: 1px solid #DDD;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.confDisplayInfoMessage:before {
+    font-family: 'icomoon-ultimate';
+    content: "\69";
+    color: #BBB;
+    display: block;
+    float: left;
+    font-size: 1.5em;
+    padding-top: 0.05em;
+}
+
+.confDisplayInfoMessage .messageText {
+    color: #777;
+    font-size: 1.2em;
+    padding: 0.25em 0 0.25em 2.5em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
