@@ -4667,8 +4667,6 @@ class WRoomBookingSearch4Rooms( WTemplated ):
     def getVars( self ):
         vars = WTemplated.getVars( self )
 
-        websession = self._rh._websession
-
         vars["standalone"] = self._standalone
 
         vars["Location"] = Location
@@ -4680,11 +4678,11 @@ class WRoomBookingSearch4Rooms( WTemplated ):
 
         vars["preview"] = False
 
-        vars["startDT"] = websession.getVar( "defaultStartDT" )
-        vars["endDT"] = websession.getVar( "defaultEndDT" )
-        vars["startT"] = websession.getVar( "defaultStartDT" ).time().strftime( "%H:%M" )
-        vars["endT"] = websession.getVar( "defaultEndDT" ).time().strftime( "%H:%M" )
-        vars["repeatability"] = websession.getVar( "defaultRepeatability" )
+        vars["startDT"] = session.get("rbDefaultStartDT")
+        vars["endDT"] = session.get("rbDefaultEndDT")
+        vars["startT"] = session.get("rbDefaultStartDT").time().strftime("%H:%M")
+        vars["endT"] = session.get("rbDefaultEndDT").time().strftime("%H:%M")
+        vars["repeatability"] = session.get("rbDefaultRepeatability")
 
         if self._standalone:
             # URLs for standalone room booking
@@ -4757,7 +4755,6 @@ class WRoomBookingMapOfRoomsWidget(WTemplated):
 
     def getVars(self):
         vars = WTemplated.getVars(self)
-        websession = self._rh._websession
 
         vars["aspects"] = self._aspects
         vars["buildings"] = self._buildings
@@ -4765,12 +4762,12 @@ class WRoomBookingMapOfRoomsWidget(WTemplated):
         vars["forVideoConference"] = self._forVideoConference
         vars["roomID"] = self._roomID
 
-        vars["roomBookingRoomListURL"] = urlHandlers.UHRoomBookingRoomList.getURL( None )
-        vars["startDT"] = websession.getVar( "defaultStartDT" )
-        vars["endDT"] = websession.getVar( "defaultEndDT" )
-        vars["startT"] = websession.getVar( "defaultStartDT" ).time().strftime( "%H:%M" )
-        vars["endT"] = websession.getVar( "defaultEndDT" ).time().strftime( "%H:%M" )
-        vars["repeatability"] = websession.getVar( "defaultRepeatability" )
+        vars["roomBookingRoomListURL"] = urlHandlers.UHRoomBookingRoomList.getURL(None)
+        vars["startDT"] = session.get("rbDefaultStartDT")
+        vars["endDT"] = session.get("rbDefaultEndDT")
+        vars["startT"] = session.get("rbDefaultStartDT").time().strftime("%H:%M")
+        vars["endT"] = session.get("rbDefaultEndDT").time().strftime("%H:%M")
+        vars["repeatability"] = session.get("rbDefaultRepeatability")
 
         return vars
 

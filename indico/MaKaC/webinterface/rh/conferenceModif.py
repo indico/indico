@@ -4254,8 +4254,6 @@ class RHConfModifRoomBookingSearch4Rooms( RHConferenceModifRoomBookingBase, RHRo
         Uses event/session/contribution as an example.
         """
 
-        websession = self._websession
-
         # No example given? Fall back to general defaults
         if self._dontAssign:
             return
@@ -4264,45 +4262,45 @@ class RHConfModifRoomBookingSearch4Rooms( RHConferenceModifRoomBookingBase, RHRo
             self._eventRoomName = self._conf.getRoom().getName()
 
         # Copy values from   Session
-        if self._conf != None  and  self._assign2Session != None:
-            session = self._assign2Session
-            websession.setVar( "defaultStartDT", session.getAdjustedStartDate().replace(tzinfo=None) )
-            websession.setVar( "defaultEndDT", session.getAdjustedEndDate().replace(tzinfo=None) )
-            if session.getStartDate().date() != session.getEndDate().date():
-                websession.setVar( "defaultRepeatability", RepeatabilityEnum.daily )
+        if self._conf is not None and self._assign2Session is not None:
+            confSession = self._assign2Session
+            session["rbDefaultStartDT"] = confSession.getAdjustedStartDate().replace(tzinfo=None)
+            session["rbDefaultEndDT"] = confSession.getAdjustedEndDate().replace(tzinfo=None)
+            if confSession.getStartDate().date() != confSession.getEndDate().date():
+                session["rbDefaultRepeatability"] = RepeatabilityEnum.daily
             else:
-                websession.setVar( "defaultRepeatability", None )
-            websession.setVar( "defaultBookedForName", self._getUser().getFullName() + " | " + session.getTitle() )
-            websession.setVar( "defaultReason", "Session '" + session.getTitle() + "'" )
+                session["rbDefaultRepeatability"] = None
+            session["rbDefaultBookedForName"] = self._getUser().getFullName() + " | " + confSession.getTitle()
+            session["rbDefaultReason"] = "Session '" + confSession.getTitle() + "'"
             return
 
         # Copy values from   Contribution
-        if self._conf != None  and  self._assign2Contribution != None:
+        if self._conf is not None and self._assign2Contribution is not None:
             contrib = self._assign2Contribution
-            websession.setVar( "defaultStartDT", contrib.getAdjustedStartDate().replace(tzinfo=None) )
-            websession.setVar( "defaultEndDT", contrib.getAdjustedEndDate().replace(tzinfo=None) )
+            session["rbDefaultStartDT"] = contrib.getAdjustedStartDate().replace(tzinfo=None)
+            session["rbDefaultEndDT"] = contrib.getAdjustedEndDate().replace(tzinfo=None)
             if contrib.getStartDate().date() != contrib.getEndDate().date():
-                websession.setVar( "defaultRepeatability", RepeatabilityEnum.daily )
+                session["rbDefaultRepeatability"] = RepeatabilityEnum.daily
             else:
-                websession.setVar( "defaultRepeatability", None )
-            websession.setVar( "defaultBookedForName", self._getUser().getFullName() + " | " + contrib.getTitle() )
-            websession.setVar( "defaultReason", "Contribution '" + contrib.getTitle() + "'" )
+                session["rbDefaultRepeatability"] = None
+            session["rbDefaultBookedForName"] = self._getUser().getFullName() + " | " + contrib.getTitle()
+            session["rbDefaultReason"] = "Contribution '" + contrib.getTitle() + "'"
             return
 
-        # Copyt values from   Conference / Meeting / Lecture
+        # Copy values from   Conference / Meeting / Lecture
         if self._conf != None:
             conf = self._conf
-            websession.setVar( "defaultStartDT", conf.getAdjustedStartDate().replace(tzinfo=None) )
-            websession.setVar( "defaultEndDT", conf.getAdjustedEndDate().replace(tzinfo=None) )
+            session["rbDefaultStartDT"] = conf.getAdjustedStartDate().replace(tzinfo=None)
+            session["rbDefaultEndDT"] = conf.getAdjustedEndDate().replace(tzinfo=None)
             if conf.getStartDate().date() != conf.getEndDate().date():
-                websession.setVar( "defaultRepeatability", RepeatabilityEnum.daily )
+                session["rbDefaultRepeatability"] = RepeatabilityEnum.daily
             else:
-                websession.setVar( "defaultRepeatability", None )
+                session["rbDefaultRepeatability"] = None
             if self._getUser():
-                websession.setVar( "defaultBookedForName", self._getUser().getFullName() + " | " + conf.getTitle() )
+                session["rbDefaultBookedForName"] = self._getUser().getFullName() + " | " + conf.getTitle()
             else:
-                websession.setVar( "defaultBookedForName", conf.getTitle() )
-            websession.setVar( "defaultReason", conf.getVerboseType() + " '" + conf.getTitle() + "'" )
+                session["rbDefaultBookedForName"] = conf.getTitle()
+            session["rbDefaultReason"] = conf.getVerboseType() + " '" + conf.getTitle() + "'"
             return
 
     def _checkParams( self, params ):
@@ -4313,19 +4311,19 @@ class RHConfModifRoomBookingSearch4Rooms( RHConferenceModifRoomBookingBase, RHRo
         RHRoomBookingSearch4Rooms._checkParams( self, params )
         self._forNewBooking = True
 
-        if params.get( 'sessionId' ):
-            self._assign2Session = self._conf.getSessionById( params['sessionId'] )
-            self._websession.setVar( "assign2Session", self._assign2Session )
+        if params.get('sessionId'):
+            self._assign2Session = self._conf.getSessionById(params['sessionId'])
+            session["rbAssign2Session"] = self._assign2Session
         else:
             self._assign2Session = None
-        if params.get( 'contribId' ):
+        if params.get('contribId'):
             self._assign2Session = None
-            self._assign2Contribution = self._conf.getContributionById( params['contribId'] )
-            self._websession.setVar( "assign2Contribution", self._assign2Contribution )
+            self._assign2Contribution = self._conf.getContributionById(params['contribId'])
+            session["rbAssign2Contribution"] = self._assign2Contribution
         else:
             self._assign2Contribution = None
-        self._dontAssign = params.get( 'dontAssign' ) == "True"
-        self._websession.setVar( "dontAssign", self._dontAssign )
+        self._dontAssign = params.get('rbDontAssign') == "True"
+        session["rbDontAssign"] = self._dontAssign
 
         self._setDefaultFormValues()
 
@@ -4435,12 +4433,11 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
         RHRoomBookingSaveBooking._checkParams( self, params )
 
         # Assign room to event / session / contribution?
-        websession = self._websession
-        self._assign2Session = websession.getVar( "assign2Session" ) # Session or None
-        self._assign2Contribution = websession.getVar( "assign2Contribution" ) # Contribution or None
+        self._assign2Session = session.get("rbAssign2Session") # Session or None
+        self._assign2Contribution = session.get("rbAssign2Contribution") # Contribution or None
         self._assign2Conference = None
-        if not self._assign2Session  and  not self._assign2Contribution:
-            if self._conf  and  websession.getVar( "dontAssign" ) != True: # True or None
+        if not self._assign2Session and not self._assign2Contribution:
+            if self._conf and not session.get("rbDontAssign"): # True or None
                 self._assign2Conference = self._conf
 
 
