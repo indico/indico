@@ -489,7 +489,7 @@ class RHRegistrationFormModifEnableSection( RHRegistrationFormModifBase ):
         if section is not None:
             if not isinstance(section, GeneralSectionForm) or not section.isRequired():
                 section.setEnabled(not section.isEnabled())
-        self._redirect(str(urlHandlers.UHConfModifRegForm.getURL(self._conf)) + "#sections", True)
+        self._redirect(str(urlHandlers.UHConfModifRegForm.getURL(self._conf)) + "#sections")
 
 
 class RHRegistrationFormModifEnablePersonalField( RHRegistrationFormModifBase ):
@@ -504,7 +504,7 @@ class RHRegistrationFormModifEnablePersonalField( RHRegistrationFormModifBase ):
         if field and not field.isLocked('disable'):
             field.setDisabled(not field.isDisabled())
         url = urlHandlers.UHConfModifRegFormGeneralSection.getURL(pdForm)
-        self._redirect(url, True)
+        self._redirect(url)
 
 
 
