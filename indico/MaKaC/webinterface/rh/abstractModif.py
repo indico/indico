@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from cStringIO import StringIO
 from flask import request
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -33,6 +34,7 @@ from MaKaC.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import CFAEnabled
 from MaKaC.paperReviewing import Answer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+from indico.web.flask.util import send_file
 
 
 class RHAbstractModifBase( RHAbstractBase, RHModificationBaseProtected ):
@@ -125,15 +127,9 @@ class RHAbstractToPDF(RHAbstractModifBase):
 
     def _process( self ):
         tz = self._conf.getTimezone()
-        filename = "%s - Abstract.pdf"%self._target.getTitle()
+        filename = "%s - Abstract.pdf" % self._target.getTitle()
         pdf = ConfManagerAbstractToPDF(self._conf, self._target, tz=tz)
-        data = pdf.getPDFBin()
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
 
 class RHAbstractToXML(RHAbstractModifBase):
@@ -192,14 +188,7 @@ class RHAbstractToXML(RHAbstractModifBase):
 
         x.closeTag("abstract")
 
-        data = x.getXml()
-
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "XML" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, StringIO(x.getXml()), 'XML', inline=True)
 
 
 class _AbstractWrapper:

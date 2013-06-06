@@ -19,6 +19,7 @@
 
 
 from BTrees.OOBTree import OOBTree
+from cStringIO import StringIO
 
 import MaKaC.webinterface.pages.tracks as tracks
 import MaKaC.webinterface.pages.conferences as conferences
@@ -41,6 +42,7 @@ from MaKaC.paperReviewing import Answer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from MaKaC.webinterface.rh.abstractModif import _AbstractWrapper
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
+from indico.web.flask.util import send_file
 
 
 class RHTrackModifBase( RHTrackBase, RHModificationBaseProtected ):
@@ -566,20 +568,14 @@ class RHModAbstractUnMarkAsDup(RHTrackAbstractBase):
         p = tracks.WPModAbstractUnMarkAsDup(self,self._track,self._abstract)
         return p.display(comments=self._comments)
 
+
 class RHAbstractToPDF(RHTrackAbstractBase):
 
-    def _process( self ):
+    def _process(self):
         tz = self._conf.getTimezone()
-        filename = "%s - Abstract.pdf"%self._target.getTitle()
+        filename = "%s - Abstract.pdf" % self._target.getTitle()
         pdf = TrackManagerAbstractToPDF(self._conf, self._abstract, self._track, tz=tz)
-        data = pdf.getPDFBin()
-        #self._req.headers_out["Accept-Ranges"] = "bytes"
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(filename)
-        return data
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
 
 class RHAbstractsActions:
@@ -587,7 +583,7 @@ class RHAbstractsActions:
     class to select the action to do with the selected abstracts
     """
     def __init__(self, req):
-        self._req = req
+        assert req is None
 
     def _checkParams( self, params ):
         self._pdf = params.get("PDF.x", None)
@@ -599,13 +595,13 @@ class RHAbstractsActions:
 
     def _process( self ):
         if self._pdf:
-            return RHAbstractsToPDF(self._req).process( self._params )
+            return RHAbstractsToPDF(None).process( self._params )
         elif self._mail:
-            return RHAbstractSendNotificationMail(self._req).process( self._params )
+            return RHAbstractSendNotificationMail(None).process( self._params )
         elif self._tplPreview:
-            return RHAbstractTPLPreview(self._req).process( self._params )
+            return RHAbstractTPLPreview(None).process( self._params )
         elif self._participant:
-            return RHAbstractsParticipantList(self._req).process( self._params )
+            return RHAbstractsParticipantList(None).process( self._params )
         else:
             return "no action to do"
 
@@ -688,19 +684,12 @@ class RHAbstractsToPDF(RHTrackAbstractsBase):
         self._abstractIds = self._normaliseListParam( params.get("abstracts", []) )
 
 
-    def _process( self ):
+    def _process(self):
         tz = self._conf.getTimezone()
-        filename = "Abstracts.pdf"
         if not self._abstractIds:
             return "No abstract to print"
         pdf = TrackManagerAbstractsToPDF(self._conf, self._track, self._abstractIds,tz=tz)
-        data = pdf.getPDFBin()
-        self._req.set_content_length(len(data))
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s; name="%s\""""%(mimetype, filename )
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+        return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
 
 
 class RHAbstractIntComments( RHTrackAbstractBase ):
@@ -904,13 +893,13 @@ class RHContribsActions:
     class to select the action to do with the selected contributions
     """
     def __init__(self, req):
-        self._req = req
+        assert req is None
 
     def process(self, params):
-        if params.has_key("PDF"):
-            return RHContribsToPDF(self._req).process(params)
-        elif params.has_key("AUTH"):
-            return RHContribsParticipantList(self._req).process(params)
+        if 'PDF' in params:
+            return RHContribsToPDF(None).process(params)
+        elif 'AUTH' in params:
+            return RHContribsParticipantList(None).process(params)
         return "no action to do"
 
 class RHContribsToPDF(RHTrackAbstractsBase):
@@ -925,21 +914,13 @@ class RHContribsToPDF(RHTrackAbstractsBase):
         for id in self._contribIds:
             self._contribs.append(self._conf.getContributionById(id))
 
-    def _process( self ):
+    def _process(self):
         tz = self._conf.getTimezone()
-        filename = "Contributions.pdf"
         if not self._contribs:
             return "No contributions to print"
         pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-        data = pdf.getPDFBin()
-        #self._req.headers_out["Accept-Ranges"] = "bytes"
-        self._req.set_content_length(len(data))
-        #self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s; name="%s\""""%(mimetype, filename )
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+        return send_file('Contributions.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+
 
 class RHContribsParticipantList(RHTrackAbstractsBase):
 
