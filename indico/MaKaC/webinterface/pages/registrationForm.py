@@ -16,7 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import session
+from flask import session, request
 
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -2563,7 +2563,7 @@ class WRegistrationFormconfirmBooking(wcomponents.WTemplated):
         vars["payMods"] = self.modPay.getSortedEnabledModPay()
         vars["registrant"] = self._registrant
         vars["conf"] = self._conf
-        vars["lang"] = self._rh._getSession().getLang()
+        vars["lang"] = session.lang
         vars["secure"] = request.is_secure
         return vars
 

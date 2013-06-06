@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
 import os, re, datetime, cgi, time, copy
 from indico.ext.search.base.implementation import SearchEngineCallAPIAdapter, SearchEngineRedirectAdapter, Author, SearchResult, SubContributionEntry, ContributionEntry, ConferenceEntry, SEATranslator
@@ -58,7 +59,7 @@ class InvenioBaseSEA:
         self._noQuery = False
 
         if self._userLoggedIn:
-            self._sessionHash = "%s_%s" % (ContextManager.get("currentRH", None)._getSession().getId(), ContextManager.get("currentUser", None).getId())
+            self._sessionHash = '%s_%s' % (session.sid, session.user.getId())
         else:
             self._sessionHash = 'PUBLIC'
 
