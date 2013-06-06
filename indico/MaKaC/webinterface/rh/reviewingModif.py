@@ -23,13 +23,12 @@ from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.webinterface.pages.reviewing import WPConfModifReviewingPaperSetup
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase,\
-    RHConferenceModifKey
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common import Config
 from MaKaC.i18n import _
 from indico.util import json
+from indico.web.flask.util import send_file
 
 
 class RCPaperReviewManager:
@@ -286,13 +285,8 @@ class RHDownloadTemplate(RHConferenceBaseDisplay):
         self._templateId = params.get("reviewingTemplateId")
 
     def _process(self):
-        template=self._target.getConfPaperReview().getTemplates()[self._templateId].getFile()
-        self._req.headers_out["Content-Length"]="%s"%template.getSize()
-        cfg=Config.getInstance()
-        mimetype=cfg.getFileTypeMimeType(template.getFileType())
-        self._req.content_type="""%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%template.getFileName()
-        return template.readBin()
+        template = self._target.getConfPaperReview().getTemplates()[self._templateId].getFile()
+        return send_file(template.getFileName(), template.getFilePath(), template.getFileType(), inline=True)
 
 class RHDeleteTemplate(RHConfModifReviewingPRMBase):
 

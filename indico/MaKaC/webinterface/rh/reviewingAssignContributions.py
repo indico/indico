@@ -21,9 +21,9 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.pages.reviewing import WPConfReviewingAssignContributions
 from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
-from MaKaC.errors import MaKaCError
 from MaKaC.common.contribPacker import ZIPFileHandler, ReviewingPacker
-from MaKaC.common import Config
+from indico.web.flask.util import send_file
+
 
 class RHReviewingAssignContributionsList(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifListContribToJudge
@@ -46,13 +46,7 @@ class RHDownloadAcceptedPapers(RHConferenceModifBase):
         if not RCPaperReviewManager.hasRights(self):
             RHConferenceModifBase._checkProtection(self)
 
-    def _process( self ):
+    def _process(self):
         p = ReviewingPacker(self._conf)
         path = p.pack(ZIPFileHandler())
-        filename = "accepted-papers.zip"
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ZIP" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        self._req.sendfile(path)
-
+        return send_file('accepted-papers.zip', path, 'ZIP')
