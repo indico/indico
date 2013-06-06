@@ -16,8 +16,9 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import session
+from cStringIO import StringIO
 
+from flask import session, request
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrants as registrants
 import MaKaC.webinterface.rh.conferenceModif as conferenceModif
@@ -38,6 +39,7 @@ from MaKaC.webinterface.rh import registrationFormModif
 from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
 import re
 import os
+from indico.web.flask.util import send_file
 
 class RHRegistrantListModifBase( registrationFormModif.RHRegistrationFormModifBase ):
     pass
@@ -256,8 +258,7 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
 class RHRegistrantListModifAction( RHRegistrantListModifBase ):
     def _checkParams( self, params ):
         RHRegistrantListModifBase._checkParams(self, params)
-        agent = self._req.headers_in.get('User-Agent', '')
-        self._linuxAgent = re.match(r'(?i).*?\blinux[^a-zA-Z]*?\b', agent) is not None
+        self._windowsAgent = request.user_agent.platform != 'windows'
         self._selectedRegistrants = self._normaliseListParam(params.get("registrant",[]))
         self._addNew = params.has_key("newRegistrant")
         self._remove = params.has_key("removeRegistrants")
@@ -316,7 +317,7 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
             for reg in self._selectedRegistrants:
                 if self._conf.getRegistrantById(reg) != None:
                     regs.append(self._conf.getRegistrantById(reg))
-            r = RHRegistrantListExcel(self,self._conf,regs, self._display, not self._linuxAgent)
+            r = RHRegistrantListExcel(self,self._conf,regs, self._display, self._windowsAgent)
             return r.excel()
         elif self._printBadgesSelected:
             if len(self._selectedRegistrants) > 0:
@@ -375,16 +376,10 @@ class RHRegistrantBookPDF:
         self._rh = rh
         self._display = disp
 
-    def pdf( self ):
-        filename = "RegistrantsBook.pdf"
-        pdf = RegistrantsListToBookPDF(self._conf,list=self._list, display=self._display)
-        data = pdf.getPDFBin()
-        self._rh._req.set_content_length(len(data))
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._rh._req.content_type = """%s"""%(mimetype)
-        self._rh._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+    def pdf(self):
+        pdf = RegistrantsListToBookPDF(self._conf, list=self._list, display=self._display)
+        return send_file('RegistrantsBook.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+
 
 class RHRegistrantListPDF:
     def __init__( self, rh,conf,reglist, disp ):
@@ -393,20 +388,14 @@ class RHRegistrantListPDF:
         self._rh = rh
         self._display = disp
 
-
-    def pdf( self ):
-        filename = "RegistrantsList.pdf"
-        pdf = RegistrantsListToPDF(self._conf,list=self._list, display=self._display)
+    def pdf(self):
+        pdf = RegistrantsListToPDF(self._conf, list=self._list, display=self._display)
         try:
             data = pdf.getPDFBin()
         except:
             raise FormValuesError( _("""Text too large to generate a PDF with "Table Style". Please try again generating with "Book Style"."""))
-        self._rh._req.set_content_length(len(data))
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._rh._req.content_type = """%s"""%(mimetype)
-        self._rh._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+        return send_file('RegistrantsList.pdf', StringIO(data), 'PDF', inline=True)
+
 
 class RHRegistrantListExcel:
     def __init__( self, rh,conf,reglist, disp, excelSpecific):
@@ -416,16 +405,11 @@ class RHRegistrantListExcel:
         self._display = disp
         self._excelSpecific = excelSpecific
 
-    def excel( self ):
-        filename = "RegistrantsList.csv"
-        excel = RegistrantsListToExcel(self._conf,list=self._list, display=self._display, excelSpecific=self._excelSpecific)
-        data = excel.getExcelFile()
-        self._rh._req.set_content_length(len(data))
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "CSV" )
-        self._rh._req.content_type = """%s"""%(mimetype)
-        self._rh._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+    def excel(self):
+        excel = RegistrantsListToExcel(self._conf, list=self._list, display=self._display,
+                                       excelSpecific=self._excelSpecific)
+        return send_file('RegistrantsList.csv', StringIO(excel.getExcelFile()), 'CSV', inline=True)
+
 
 class RHRegistrantListEmail:
     def __init__(self, rh, conf, reglist):
@@ -510,17 +494,12 @@ class RHRegistrantPackage:
         self._list = reglist
         self._rh = rh
 
-    def pack( self ):
-        from MaKaC.common.contribPacker import ZIPFileHandler,RegistrantPacker
-        p=RegistrantPacker(self._conf)
-        path=p.pack(self._list, ZIPFileHandler())
-        filename = "registrants.zip"
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ZIP" )
-        self._rh._req.set_content_length(os.path.getsize(path))
-        self._rh._req.content_type = """%s"""%(mimetype)
-        self._rh._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        self._rh._req.sendfile(path)
+    def pack(self):
+        from MaKaC.common.contribPacker import ZIPFileHandler, RegistrantPacker
+        p = RegistrantPacker(self._conf)
+        path = p.pack(self._list, ZIPFileHandler())
+        return send_file('registrants.zip', path, 'ZIP')
+
 
 class RHRegistrantPerformDataModification( RHRegistrantModifBase ):
 
