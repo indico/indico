@@ -21,7 +21,8 @@ from flask import session
 from MaKaC.plugins.base import pluginId
 # Most of the following imports are probably not necessary - to clean
 
-import os,time,re
+import os
+import time
 from collections import defaultdict
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -32,6 +33,7 @@ from MaKaC.webinterface.rh.base import RoomBookingDBMixin, RHRoomBookingProtecte
 from datetime import datetime, timedelta, date
 from MaKaC.common.utils import validMail, setValidEmailSeparators, parseDate
 from MaKaC.common.datetimeParser import parse_date
+from indico.web.flask.util import send_file
 
 # The following are room booking related
 
@@ -41,7 +43,7 @@ from MaKaC.rb_room import RoomBase
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
 from MaKaC.rb_factory import Factory
 from MaKaC.rb_location import CrossLocationQueries, RoomGUID, Location
-from MaKaC.rb_tools import intd, FormMode, doesPeriodOverlap, dateAdvanceAllowed
+from MaKaC.rb_tools import intd, FormMode, dateAdvanceAllowed
 from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
 from MaKaC.plugins import PluginLoader
 from MaKaC import plugins
@@ -2387,11 +2389,7 @@ class RHRoomBookingSendRoomPhoto( RHRoomBookingBase ):
         filePath = cfg.getRoomPhotosDir()
         if self.small:
             filePath = cfg.getRoomSmallPhotosDir()
-        fullPath = os.path.join( filePath, self.fileName )
-
-        self._req.content_type = "image/jpeg"
-        #self._req.headers_out["Content-Disposition"] = "inline; filename=\"%s\"" % self.fileName
-        self._req.sendfile( fullPath )
+        return send_file(self.fileName, os.path.join(filePath, self.fileName), 'JPG', inline=True)
 
 
 class RHRoomBookingGetRoomSelectList( RHRoomBookingBase ):
