@@ -25750,16 +25750,4 @@ msgstr ""
 msgid "yesterday"
 msgstr ""
 
-#: indico/web/wsgi/indico_wsgi_handler.py:155
-msgid "Page not found"
-msgstr ""
-
-#: indico/web/wsgi/indico_wsgi_handler.py:156
-msgid "The page you were looking for doesn't exist."
-msgstr ""
-
-#: indico/web/wsgi/indico_wsgi_handler.py:158
-#, python-format
-msgid "%s"
-msgstr ""
 
