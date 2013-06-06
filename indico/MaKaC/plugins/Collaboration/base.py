@@ -2369,7 +2369,7 @@ class SpeakerWrapper(Persistent, Fossilizable):
 
     def setStatus(self, newStatus, ip=None):
         try:
-            self.status = newStatus;
+            self.status = newStatus
             if newStatus == SpeakerStatusEnum.SIGNED or newStatus == SpeakerStatusEnum.FROMFILE:
                 self.dateAgreement = now_utc()
                 if newStatus == SpeakerStatusEnum.SIGNED:

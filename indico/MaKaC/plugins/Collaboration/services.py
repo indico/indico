@@ -19,6 +19,7 @@
 """
 Services for Collaboration plugins
 """
+from flask import request
 
 from MaKaC.services.implementation.contribution import ContributionDisplayBase
 from MaKaC.services.implementation.conference import ConferenceModifBase, ConferenceDisplayBase
@@ -623,7 +624,7 @@ CERN Recording Team"""
                 spkWrapper = sw
 
         if spkWrapper:
-            spkWrapper.setStatus(SpeakerStatusEnum.SIGNED, self._req.get_remote_ip())
+            spkWrapper.setStatus(SpeakerStatusEnum.SIGNED, request.remote_addr)
             spkWrapper.triggerNotification()
             if manager.notifyElectronicAgreementAnswer():
                 subject = """[Indico] Electronic Agreement Accepted: '%s'""" % (self._conf.getTitle())
