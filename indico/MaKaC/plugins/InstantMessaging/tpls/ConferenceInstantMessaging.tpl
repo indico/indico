@@ -1,10 +1,13 @@
-<% from MaKaC.plugins.util import PluginFieldsWrapper %>
+<%inherit file="/ConfDisplayBodyBase.tpl"/>
 
-<table width="100%" align="center" border="0" cellpadding="5px">
-    <tr>
-        <td colspan="10" class="groupTitle"> ${ _("Chat rooms for ")} ${ Conference.getTitle()}</td>
-    </tr>
+<%block name="title">
+    ${body_title}
+</%block>
 
+<%block name="content">
+    <% from MaKaC.plugins.util import PluginFieldsWrapper %>
+
+    <table width="100%" align="center" border="0" cellpadding="5px">
         <tr>
             <td></td>
             <td nowrap class="titleChat"> ${ _("Room")}</td>
@@ -43,38 +46,39 @@
                 % endif
                 </tr>
         % endfor
-</table>
+    </table>
 
-${ PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('ckEditor') }
+    ${ PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('ckEditor') }
 
-<script type="text/javascript">
-var crIdList = ${ [cr.getId() for cr in Chatrooms] };
-var joinLinkList = [];
-each(crIdList, function(crId){
-    joinLinkList.push($E('joinLink'+crId));
-});
+    <script type="text/javascript">
+    var crIdList = ${ [cr.getId() for cr in Chatrooms] };
+    var joinLinkList = [];
+    each(crIdList, function(crId){
+        joinLinkList.push($E('joinLink'+crId));
+    });
 
-each(joinLinkList, function(joinLink){
-    var joinMenu = null;
-    if(joinLink){
-        joinLink.observeClick(function(e) {
-            // Close the menu if clicking the link when menu is open
-            if (joinMenu != null && joinMenu.isOpen()) {
-                joinMenu.close();
-                joinMenu = null;
-                return;
-            }
-            var menuItems = {};
-            var links = ${ Links };
-            var crId = joinLink.dom.name;
-            each(links[crId].custom, function(linkType){
-                menuItems['using' + linkType.name] = {action: linkType.link, display: $T('Using ') + linkType.name};
+    each(joinLinkList, function(joinLink){
+        var joinMenu = null;
+        if(joinLink){
+            joinLink.observeClick(function(e) {
+                // Close the menu if clicking the link when menu is open
+                if (joinMenu != null && joinMenu.isOpen()) {
+                    joinMenu.close();
+                    joinMenu = null;
+                    return;
+                }
+                var menuItems = {};
+                var links = ${ Links };
+                var crId = joinLink.dom.name;
+                each(links[crId].custom, function(linkType){
+                    menuItems['using' + linkType.name] = {action: linkType.link, display: $T('Using ') + linkType.name};
+                });
+                joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList', true, false, null, null,true);
+                var pos = joinLink.getAbsolutePosition();
+                joinMenu.open(pos.x - 5, pos.y + joinLink.dom.offsetHeight + 2);
+                return false;
             });
-            joinMenu = new PopupMenu(menuItems, [joinLink], 'categoryDisplayPopupList', true, false, null, null,true);
-            var pos = joinLink.getAbsolutePosition();
-            joinMenu.open(pos.x - 5, pos.y + joinLink.dom.offsetHeight + 2);
-            return false;
-        });
-    }
-});
-</script>
+        }
+    });
+    </script>
+</%block>

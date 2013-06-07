@@ -1,20 +1,29 @@
-<a class="right header-aligned icon-file-pdf i-button icon-only" aria-hidden="true" href="${pdf_url}" title="${_("Download PDF")}"></a>
-<h2 class="page_title">${ _("Scientific Programme")}</h2>
+<%inherit file="ConfDisplayBodyBase.tpl"/>
 
-<div class="quotation programme">
-  ${ description }
-</div>
+<%block name="title">
+    ${body_title}
+</%block>
 
-<ul class="programme">
-% for track in program:
-    <li>
-      % if 'url' in track:
-        <a class="right" href='${track['url']}'>edit</a>
-      % endif
-      <span class="title">${track['title']}</span>
-      <div class="description">
-        ${track['description']}
-      </div>
-    </li>
-% endfor
-</ul>
+<%block name="toolbar">
+    <a class="right header-aligned icon-file-pdf i-button icon-only" aria-hidden="true" href="${pdf_url}" title="${_("Download PDF")}"></a>
+</%block>
+
+<%block name="content">
+    <div class="quotation programme">
+        ${ description }
+    </div>
+
+    <ul class="programme">
+        % for track in program:
+            <li>
+              % if 'url' in track:
+              <a class="right" href='${track['url']}'>edit</a>
+              % endif
+              <span class="title">${track['title']}</span>
+              <div class="description">
+                ${track['description']}
+              </div>
+            </li>
+        % endfor
+    </ul>
+</%block>

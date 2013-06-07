@@ -22,6 +22,7 @@ from datetime import timedelta
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.common.filters as filters
+from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 from MaKaC.webinterface import wcomponents
 from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
@@ -1743,17 +1744,20 @@ class WPConfRegistrantsList( WPConferenceDefaultDisplayBase ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._registrantsListOpt)
 
-class WConfRegistrantsList( wcomponents.WTemplated ):
 
-    def __init__( self, conference, filterCrit, sortingCrit, order, sessionFilterName ):
+class WConfRegistrantsList(WConfDisplayBodyBase):
+
+    _linkname = "registrants"
+
+    def __init__(self, conference, filterCrit, sortingCrit, order, sessionFilterName):
         self._conf = conference
         self._regForm = self._conf.getRegistrationForm()
-        self._filterCrit=filterCrit
-        self._sortingCrit=sortingCrit
-        self._order=order
-        self._sessionFilterName=sessionFilterName
+        self._filterCrit = filterCrit
+        self._sortingCrit = sortingCrit
+        self._order = order
+        self._sessionFilterName = sessionFilterName
 
-    def _getURL( self ):
+    def _getURL(self):
         #builds the URL to the contribution list page
         #   preserving the current filter and sorting status
         url = urlHandlers.UHConfRegistrantsList.getURL(self._conf)
@@ -1763,9 +1767,9 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
 #                url.addParam("accommShowNoValue","1")
 #
         if self._filterCrit.getField(self._sessionFilterName):
-            url.addParam("session",self._filterCrit.getField(self._sessionFilterName).getValues())
+            url.addParam("session", self._filterCrit.getField(self._sessionFilterName).getValues())
             if self._filterCrit.getField(self._sessionFilterName).getShowNoValue():
-                url.addParam("sessionShowNoValue","1")
+                url.addParam("sessionShowNoValue", "1")
 
         if self._sessionFilterName == "sessionfirstpriority":
             url.addParam("firstChoice", "1")
@@ -1776,14 +1780,14 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
 #                url.addParam("eventShowNoValue","1")
 #
         if self._sortingCrit.getField():
-            url.addParam("sortBy",self._sortingCrit.getField().getId())
-            url.addParam("order","down")
+            url.addParam("sortBy", self._sortingCrit.getField().getId())
+            url.addParam("order", "down")
 
 #        url.addParam("disp",self._getDisplay())
 
         return url
 
-    def _getRegistrantsHTML( self, reg ):
+    def _getRegistrantsHTML(self, reg):
         fullName = reg.getFullName()
         institution = ""
         if not self._regForm.getPersonalData().getField("institution").isDisabled():
@@ -1821,26 +1825,26 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
         return html
 
     def _getSessHTML(self):
-        sessform =self._regForm.getSessionsForm()
+        sessform = self._regForm.getSessionsForm()
         sesstypes = sessform.getSessionList()
-        checked=""
+        checked = ""
         if self._filterCrit.getField(self._sessionFilterName).getShowNoValue():
-            checked=" checked"
-        res=[ i18nformat("""<input type="checkbox" name="sessionShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
+            checked = " checked"
+        res = [i18nformat("""<input type="checkbox" name="sessionShowNoValue" value="--none--"%s> --_("not specified")--""")%checked]
         for sess in sesstypes:
-            checked=""
+            checked = ""
             if sess.getId() in self._filterCrit.getField(self._sessionFilterName).getValues():
-                checked=" checked"
-            res.append("""<input type="checkbox" name="session" value=%s%s>%s"""%(quoteattr(str(sess.getId())),checked,self.htmlText(sess.getTitle())))
+                checked = " checked"
+            res.append("""<input type="checkbox" name="session" value=%s%s>%s""" % (quoteattr(str(sess.getId())), checked, self.htmlText(sess.getTitle())))
         if sessform.getType() == "2priorities":
-            checked=""
+            checked = ""
             if self._sessionFilterName == "sessionfirstpriority":
-                checked=" checked"
-            res.append( i18nformat("""<b>------</b><br><input type="checkbox" name="firstChoice" value="firstChoice"%s><i> _("Only by first choice") </i>""")%checked)
+                checked = " checked"
+            res.append(i18nformat("""<b>------</b><br><input type="checkbox" name="firstChoice" value="firstChoice"%s><i> _("Only by first choice") </i>""") % checked)
         return "<br>".join(res)
 
     def _getFilterOptionsHTML(self, currentSortingHTML):
-        filterPostURL=quoteattr("%s#results"%str(urlHandlers.UHConfRegistrantsList.getURL(self._conf)))
+        filterPostURL = quoteattr("%s#results" % str(urlHandlers.UHConfRegistrantsList.getURL(self._conf)))
         return i18nformat("""<tr>
         <td width="100%%">
                     <br>
@@ -1875,20 +1879,21 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
                     </form>
         </td>
             </tr>
-                """)%(filterPostURL, currentSortingHTML, self._getSessHTML())
+                """) % (filterPostURL, currentSortingHTML, self._getSessHTML())
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["regForm"]= self._regForm
-        l=[]
-        lr=self._conf.getRegistrantsList(True)
-        f = filters.SimpleFilter(self._filterCrit,self._sortingCrit)
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        wvars["regForm"] = self._regForm
+        l = []
+        lr = self._conf.getRegistrantsList(True)
+        f = filters.SimpleFilter(self._filterCrit, self._sortingCrit)
         for rp in f.apply(lr):
             l.append(self._getRegistrantsHTML(rp))
-        if self._order =="up":
+        if self._order == "up":
             l.reverse()
-        vars["registrants"] = "".join(l)
-        vars["numRegistrants"]=str(len(l))
+        wvars["registrants"] = "".join(l)
+        wvars["numRegistrants"] = str(len(l))
 
         # Head Table Titles
         currentSorting=""
@@ -1900,81 +1905,81 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
         url=self._getURL()
         url.addParam("sortBy","Name")
         nameImg=""
-        vars["imgNameTitle"]=""
+        wvars["imgNameTitle"]=""
         if currentSorting == "Name":
             currentSortingHTML = """<input type="hidden" name="sortBy" value="Name">"""
             if self._order == "down":
-                vars["imgNameTitle"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                wvars["imgNameTitle"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
             elif self._order == "up":
-                vars["imgNameTitle"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                wvars["imgNameTitle"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
-        vars["urlNameTitle"]=quoteattr("%s#results"%str(url))
+        wvars["urlNameTitle"]=quoteattr("%s#results"%str(url))
 
         # --- Institution
         url=self._getURL()
         url.addParam("sortBy","Institution")
         nameImg=""
-        vars["imgInstitutionTitle"]=""
+        wvars["imgInstitutionTitle"]=""
         if currentSorting == "Institution":
             currentSortingHTML = """<input type="hidden" name="sortBy" value="Institution">"""
             if self._order == "down":
-                vars["imgInstitutionTitle"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                wvars["imgInstitutionTitle"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
             elif self._order == "up":
-                vars["imgInstitutionTitle"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                wvars["imgInstitutionTitle"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
-        vars["urlInstitutionTitle"]=quoteattr("%s#results"%str(url))
+        wvars["urlInstitutionTitle"]=quoteattr("%s#results"%str(url))
 
         # --- Position
         url=self._getURL()
         url.addParam("sortBy","Position")
         nameImg=""
-        vars["imgPositionTitle"]=""
+        wvars["imgPositionTitle"]=""
         if currentSorting == "Position":
             currentSortingHTML = """<input type="hidden" name="sortBy" value="Position">"""
             if self._order == "down":
-                vars["imgPositionTitle"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                wvars["imgPositionTitle"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
             elif self._order == "up":
-                vars["imgPositionTitle"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                wvars["imgPositionTitle"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
-        vars["urlPositionTitle"]=quoteattr("%s#results"%str(url))
+        wvars["urlPositionTitle"]=quoteattr("%s#results"%str(url))
 
         # --- City
         url=self._getURL()
         url.addParam("sortBy","City")
         nameImg=""
-        vars["imgCityTitle"]=""
+        wvars["imgCityTitle"]=""
         if currentSorting == "City":
             currentSortingHTML = """<input type="hidden" name="sortBy" value="City">"""
             if self._order == "down":
-                vars["imgCityTitle"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                wvars["imgCityTitle"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
             elif self._order == "up":
-                vars["imgCityTitle"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                wvars["imgCityTitle"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
-        vars["urlCityTitle"]=quoteattr("%s#results"%str(url))
+        wvars["urlCityTitle"]=quoteattr("%s#results"%str(url))
 
 
         # --- Country
         url=self._getURL()
         url.addParam("sortBy","Country")
         nameImg=""
-        vars["imgCountryTitle"]=""
+        wvars["imgCountryTitle"]=""
         if currentSorting == "Country":
             currentSortingHTML = """<input type="hidden" name="sortBy" value="Country">"""
             if self._order == "down":
-                vars["imgCountryTitle"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                wvars["imgCountryTitle"] = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
                 url.addParam("order","up")
             elif self._order == "up":
-                vars["imgCountryTitle"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                wvars["imgCountryTitle"] = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                 url.addParam("order","down")
-        vars["urlCountryTitle"]=quoteattr("%s#results"%str(url))
+        wvars["urlCountryTitle"]=quoteattr("%s#results"%str(url))
 
         # --- Sessions
 
-        vars["sessionsTitle"] = ""
+        wvars["sessionsTitle"] = ""
 
         if self._regForm.getSessionsForm().isEnabled():
             url=self._getURL()
@@ -1990,13 +1995,13 @@ class WConfRegistrantsList( wcomponents.WTemplated ):
                     imgSessionTitle = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
                     url.addParam("order","down")
             urlSessionTitle=quoteattr("%s#results"%str(url))
-            vars["sessionsTitle"] = """<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s>%s</a></td>"""%(imgSessionTitle, urlSessionTitle, self._conf.getRegistrationForm().getSessionsForm().getTitle())
+            wvars["sessionsTitle"] = """<td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;border-bottom: 1px solid #5294CC;">%s<a href=%s>%s</a></td>"""%(imgSessionTitle, urlSessionTitle, self._conf.getRegistrationForm().getSessionsForm().getTitle())
 
         # --- Filter Options
-        vars["filterOptions"]=""
+        wvars["filterOptions"]=""
         if self._regForm.getSessionsForm().isEnabled():
-            vars["filterOptions"]=self._getFilterOptionsHTML(currentSortingHTML)
-        return vars
+            wvars["filterOptions"]=self._getFilterOptionsHTML(currentSortingHTML)
+        return wvars
 #------------------------------------------------------------------------------------------------------------------------
 """
 Badge Printing classes

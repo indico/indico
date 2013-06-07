@@ -22,6 +22,7 @@ import os
 from webassets import Bundle
 from indico.web.assets import PluginEnvironment
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 from MaKaC.webinterface import wcomponents
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.common.utils import formatDateTime, parseDateTime
@@ -171,28 +172,33 @@ class WConfModifChat(wcomponents.WTemplated):
 
         return vars
 
-class WConferenceInstantMessaging(wcomponents.WTemplated):
+
+class WConferenceInstantMessaging(WConfDisplayBodyBase):
+
+    _linkname = "instantMessaging"
 
     def __init__(self, conference, aw):
         self._conf = conference
         self._aw = aw
         self._user = aw.getUser()
 
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
+    def getVars(self):
+        wvars = WTemplated.getVars(self)
 
-        vars["Conference"] = self._conf
+        wvars["body_title"] = self._getTitle()
+        wvars["Conference"] = self._conf
 
         try:
-            vars["Chatrooms"] = DBHelpers.getShowableRooms(self._conf)
+            wvars["Chatrooms"] = DBHelpers.getShowableRooms(self._conf)
         except Exception, e:
-            vars["Chatrooms"] = None
-        vars["Links"] = {}
-        for cr in vars["Chatrooms"]:
-            vars["Links"][cr.getId()] = {}
-            vars["Links"][cr.getId()]['custom'] = generateCustomLinks(cr)
+            wvars["Chatrooms"] = None
+        wvars["Links"] = {}
+        for cr in wvars["Chatrooms"]:
+            wvars["Links"][cr.getId()] = {}
+            wvars["Links"][cr.getId()]['custom'] = generateCustomLinks(cr)
 
-        return vars
+        return wvars
 
 class WPluginHelp(wcomponents.WTemplated):
     pass
+

@@ -1177,7 +1177,9 @@ class WConfDisplayBodyBase(wcomponents.WTemplated):
         return _(caption) if caption == default_caption else caption
 
 
-class WConfProgram(wcomponents.WTemplated):
+class WConfProgram(WConfDisplayBodyBase):
+
+    _linkname = "programme"
 
     def __init__(self, aw, conf):
         self._conf = conf
@@ -1208,6 +1210,7 @@ class WConfProgram(wcomponents.WTemplated):
 
     def getVars(self):
         pvars = wcomponents.WTemplated.getVars(self)
+        pvars["body_title"] = self._getTitle()
         pvars['description'] = self._conf.getProgramDescription()
         pvars['program'] = [self.buildTrackData(t) for t in self._conf.getTrackList()]
         pvars['pdf_url'] = urlHandlers.UHConferenceProgramPDF.getURL(self._conf)
@@ -1256,19 +1259,21 @@ class WPInternalPageDisplay( WPConferenceDefaultDisplayBase ):
                 break
 
 
-class WConferenceTimeTable(wcomponents.WTemplated):
+class WConferenceTimeTable(WConfDisplayBodyBase):
 
-    def __init__( self, conference, aw ):
+    _linkname = "timetable"
+
+    def __init__(self, conference, aw):
         self._conf = conference
         self._aw = aw
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        tz = DisplayTZ(self._aw, self._conf).getDisplayTZ()
         sf = schedule.ScheduleToJson.process(self._conf.getSchedule(),
                                              tz, self._aw,
-                                             useAttrCache = True,
-                                             hideWeekends = True)
+                                             useAttrCache=True,
+                                             hideWeekends=True)
         # TODO: Move to beginning of file when proved useful
         try:
             import ujson
@@ -1279,7 +1284,7 @@ class WConferenceTimeTable(wcomponents.WTemplated):
         eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz=tz)
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
         vars['eventInfo'] = eventInfo
-        vars['timetableLayout'] = vars.get('ttLyt','')
+        vars['timetableLayout'] = vars.get('ttLyt', '')
         return vars
 
 
@@ -5066,8 +5071,9 @@ class WPContributionList( WPConferenceDefaultDisplayBase ):
         self._sectionMenu.setCurrentItem(self._contribListOpt)
 
 
+class WConfContributionList (WConfDisplayBodyBase):
 
-class WConfContributionList ( wcomponents.WTemplated ):
+    _linkname = "contributionList"
 
     def __init__(self, aw, conf, filterCrit, filterText):
         self._aw = aw
@@ -5075,25 +5081,27 @@ class WConfContributionList ( wcomponents.WTemplated ):
         self._filterCrit = filterCrit
         self._filterText = filterText
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
 
-        vars["contributions"] = self._conf.getContributionListSorted(includeWithdrawn=False, key="title")
-        vars["showAttachedFiles"] = self._conf.getAbstractMgr().showAttachedFilesContribList()
-        vars["conf"] = self._conf
-        vars["accessWrapper"] = self._aw
-        vars["filterCriteria"] = self._filterCrit
-        vars["filterText"] = self._filterText
-        vars["formatDate"] = lambda date: format_date(date, "d MMM yyyy")
-        vars["formatTime"] = lambda time: format_time(time, format="short", timezone=timezone(DisplayTZ(self._aw, self._conf).getDisplayTZ()))
-        return vars
+        wvars["body_title"] = self._getTitle()
+        wvars["contributions"] = self._conf.getContributionListSorted(includeWithdrawn=False, key="title")
+        wvars["showAttachedFiles"] = self._conf.getAbstractMgr().showAttachedFilesContribList()
+        wvars["conf"] = self._conf
+        wvars["accessWrapper"] = self._aw
+        wvars["filterCriteria"] = self._filterCrit
+        wvars["filterText"] = self._filterText
+        wvars["formatDate"] = lambda date: format_date(date, "d MMM yyyy")
+        wvars["formatTime"] = lambda time: format_time(time, format="short", timezone=timezone(DisplayTZ(self._aw, self._conf).getDisplayTZ()))
+        return wvars
 
 
 class WConfAuthorIndex(WConfDisplayBodyBase):
 
+    _linkname = "authorIndex"
+
     def __init__(self, conf):
         self._conf = conf
-        self._linkname = "authorIndex"
 
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
@@ -5146,13 +5154,16 @@ class WPAuthorIndex(WPConferenceDefaultDisplayBase):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._authorIndexOpt)
 
-class WConfSpeakerIndex(wcomponents.WTemplated):
+
+class WConfSpeakerIndex(WConfDisplayBodyBase):
+
+    _linkname = "speakerIndex"
 
     def __init__(self, conf):
         self._conf = conf
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
+        wvars = wcomponents.WTemplated.getVars(self)
         res = collections.defaultdict(list)
         for index, key in enumerate(self._conf.getSpeakerIndex().getParticipationKeys()):
             pl = self._conf.getSpeakerIndex().getById(key)
@@ -5173,8 +5184,10 @@ class WConfSpeakerIndex(wcomponents.WTemplated):
                         continue
                     url = urlHandlers.UHContributionDisplay.getURL(participation)
                 res[index].append({'title': participation.getTitle(), 'url': str(url), 'materials': fossilize(participation.getAllMaterialList())})
-        vars["items"] = res
-        return vars
+        wvars["body_title"] = self._getTitle()
+        wvars["items"] = res
+        return wvars
+
 
 class WPSpeakerIndex(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NESpeakerIndex
@@ -5207,11 +5220,14 @@ class WConfMyContributions(wcomponents.WTemplated):
         vars["ConfReviewingChoice"] = self._conf.getConfPaperReview().getChoice()
         return vars
 
-class WConfMyStuffMySessions(wcomponents.WTemplated):
 
-    def __init__(self,aw,conf):
-        self._aw=aw
-        self._conf=conf
+class WConfMyStuffMySessions(WConfDisplayBodyBase):
+
+    _linkname = "mysessions"
+
+    def __init__(self, aw, conf):
+        self._aw = aw
+        self._conf = conf
 
     def _getSessionsHTML(self):
         if self._aw.getUser() is None:
@@ -5219,36 +5235,34 @@ class WConfMyStuffMySessions(wcomponents.WTemplated):
         #ls=self._conf.getCoordinatedSessions(self._aw.getUser())+self._conf.getManagedSession(self._aw.getUser())
         ls = set(self._conf.getCoordinatedSessions(self._aw.getUser()))
         ls = list(ls | set(self._conf.getManagedSession(self._aw.getUser())))
-        if len(ls)<=0:
+        if len(ls) <= 0:
             return ""
-        res=[]
-        iconURL=Config.getInstance().getSystemIconURL("conf_edit")
+        res = []
+        iconURL = Config.getInstance().getSystemIconURL("conf_edit")
         for s in ls:
-            modURL=urlHandlers.UHSessionModification.getURL(s)
-            dispURL=urlHandlers.UHSessionDisplay.getURL(s)
+            modURL = urlHandlers.UHSessionModification.getURL(s)
+            dispURL = urlHandlers.UHSessionDisplay.getURL(s)
             res.append("""
                 <tr class="infoTR">
                     <td class="infoTD" width="100%%">%s</td>
                     <td nowrap class="infoTD"><a href=%s>Edit</a><span class="horizontalSeparator">|</span><a href=%s>View</a></td>
-                </tr>"""%(self.htmlText(s.getTitle()),
+                </tr>""" % (self.htmlText(s.getTitle()),
                             quoteattr(str(modURL)),
                             quoteattr(str(dispURL))))
         return """
             <table class="groupTable width="70%%" align="center" cellspacing="0" style="padding-top:15px;">
                 <tr>
-                    <td class="groupTitle" colspan="4">Sessions</td>
-                </tr>
-                <tr>
                     <td>%s</td>
                 </tr>
             </table>
-            """%"".join(res)
-
+            """ % "".join(res)
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["items"]=self._getSessionsHTML()
-        return vars
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        wvars["items"] = self._getSessionsHTML()
+        return wvars
+
 
 class WPConfMyStuffMySessions(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff
@@ -5262,19 +5276,23 @@ class WPConfMyStuffMySessions(WPConferenceDefaultDisplayBase):
         self._sectionMenu.setCurrentItem(self._myStuffOpt)
 
 
-class WConfMyStuffMyContributions(wcomponents.WTemplated):
+class WConfMyStuffMyContributions(WConfDisplayBodyBase):
 
-    def __init__(self,aw,conf):
-        self._aw=aw
-        self._conf=conf
+    _linkname = "mycontribs"
+
+    def __init__(self, aw, conf):
+        self._aw = aw
+        self._conf = conf
 
     def _getContribsHTML(self):
         return WConfMyContributions(self._aw, self._conf).getHTML({})
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["items"]=self._getContribsHTML()
-        return vars
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        wvars["items"] = self._getContribsHTML()
+        return wvars
+
 
 class WPConfMyStuffMyContributions(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff
@@ -5288,43 +5306,43 @@ class WPConfMyStuffMyContributions(WPConferenceDefaultDisplayBase):
         self._sectionMenu.setCurrentItem(self._myContribsOpt)
 
 
-class WConfMyStuffMyTracks(wcomponents.WTemplated):
+class WConfMyStuffMyTracks(WConfDisplayBodyBase):
 
-    def __init__(self,aw,conf):
-        self._aw=aw
-        self._conf=conf
+    _linkname = "mytracks"
+
+    def __init__(self, aw, conf):
+        self._aw = aw
+        self._conf = conf
 
     def _getTracksHTML(self):
         if self._aw.getUser() is None or not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
             return ""
-        lt=self._conf.getCoordinatedTracks(self._aw.getUser())
-        if len(lt)<=0:
+        lt = self._conf.getCoordinatedTracks(self._aw.getUser())
+        if len(lt) <= 0:
             return ""
-        res=[]
-        iconURL=Config.getInstance().getSystemIconURL("conf_edit")
+        res = []
+        iconURL = Config.getInstance().getSystemIconURL("conf_edit")
         for t in lt:
-            modURL=urlHandlers.UHTrackModifAbstracts.getURL(t)
+            modURL = urlHandlers.UHTrackModifAbstracts.getURL(t)
             res.append("""
                 <tr class="infoTR">
                     <td class="infoTD" width="100%%">%s</td>
                     <td nowrap class="infoTD"><a href=%s>Edit</a></td>
-                </tr>"""%(self.htmlText(t.getTitle()),
-                          quoteattr(str(modURL))))
+                </tr>""" % (self.htmlText(t.getTitle()),
+                            quoteattr(str(modURL))))
         return """
             <table class="groupTable width="70%%" align="center" cellspacing="0" style="padding-top: 25px;">
-                <tr>
-                    <td class="groupTitle" colspan="4">Tracks</td>
-                </tr>
                 <tr>
                     <td>%s</td>
                 </tr>
             </table>
-            """%"".join(res)
+            """ % "".join(res)
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["items"] = self._getTracksHTML()
-        return vars
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        wvars["items"] = self._getTracksHTML()
+        return wvars
 
 class WPConfMyStuffMyTracks(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff
@@ -5337,11 +5355,20 @@ class WPConfMyStuffMyTracks(WPConferenceDefaultDisplayBase):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._myTracksOpt)
 
-class WConfMyStuff(wcomponents.WTemplated):
 
-    def __init__(self,aw,conf):
-        self._aw=aw
-        self._conf=conf
+class WConfMyStuff(WConfDisplayBodyBase):
+
+    _linkname = "mystuff"
+
+    def __init__(self, aw, conf):
+        self._aw = aw
+        self._conf = conf
+
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        return wvars
+
 
 class WPMyStuff(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEMyStuff
@@ -5478,19 +5505,21 @@ class WPConferenceStaticDefaultDisplayBase( WPConferenceDefaultDisplayBase ):
                 </div>"""%( body )
         return frame.getHTML( self._sectionMenu, body, frameParams)
 
-class WConfStaticDetails( wcomponents.WTemplated ):
+
+class WConfStaticDetails(WConfDisplayBodyBase):
+
+    _linkname = "overview"
 
     def __init__(self, aw, conf, staticPars):
         self._conf = conf
         self._aw = aw
         self._staticPars = staticPars
 
-    def _getChairsHTML( self ):
-        chairList = []
+    def _getChairsHTML(self):
         l = []
         for chair in self._conf.getChairList():
-            mailToURL = """mailto:%s"""%urllib.quote(chair.getEmail())
-            l.append( """<a href=%s>%s</a>"""%(quoteattr(mailToURL),self.htmlText(chair.getFullName())))
+            mailToURL = """mailto:%s""" % urllib.quote(chair.getEmail())
+            l.append("""<a href=%s>%s</a>""" % (quoteattr(mailToURL), self.htmlText(chair.getFullName())))
         res = ""
         if len(l) > 0:
             res = i18nformat("""
@@ -5498,25 +5527,25 @@ class WConfStaticDetails( wcomponents.WTemplated ):
         <td align="right" valign="top" class="displayField"><b> _("Chairs"):</b></td>
         <td>%s</td>
     </tr>
-                """)%"<br>".join(l)
+                """) % "<br>".join(l)
         return res
 
-    def _getMaterialHTML( self ):
+    def _getMaterialHTML(self):
         l = []
         for mat in self._conf.getAllMaterialList():
             temp = wcomponents.WMaterialDisplayItem()
             url = urlHandlers.UHStaticMaterialDisplay.getRelativeURL(mat)
-            l.append( temp.getHTML( self._aw, mat, url, self._staticPars["material"] ) )
+            l.append(temp.getHTML(self._aw, mat, url, self._staticPars["material"]))
         res = ""
         if l:
             res = i18nformat("""
     <tr>
         <td align="right" valign="top" class="displayField"><b> _("Material"):</b></td>
         <td align="left" width="100%%">%s</td>
-    </tr>""")%"<br>".join( l )
+    </tr>""") % "<br>".join(l)
         return res
 
-    def _getMoreInfoHTML( self ):
+    def _getMoreInfoHTML(self):
         res = ""
         if self._conf.getContactInfo() != "":
             res = i18nformat("""
@@ -5524,36 +5553,37 @@ class WConfStaticDetails( wcomponents.WTemplated ):
         <td align="right" valign="top" class="displayField"><b> _("Additional info"):</b>
         </td>
         <td>%s</td>
-    </tr>""")%self._conf.getContactInfo()
+    </tr>""") % self._conf.getContactInfo()
         return res
 
     def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["description"] = self._conf.getDescription()
+        wvars = wcomponents.WTemplated.getVars( self )
+        wvars["description"] = self._conf.getDescription()
         sdate, edate = self._conf.getAdjustedStartDate(), self._conf.getAdjustedEndDate()
         fsdate, fedate = format_date(sDate, format='long'), format_date(eDate, format='long')
         fstime, fetime = sdate.strftime("%H:%M"), edate.strftime("%H:%M")
-        vars["dateInterval"] = i18nformat("""_("from") %s %s _("to") %s %s""")%(fsdate, fstime, \
-                                                        fedate, fetime)
+        wvars["dateInterval"] = i18nformat("""_("from") %s %s _("to") %s %s""") % (fsdate, fstime,
+                                                                                   fedate, fetime)
         if sdate.strftime("%d%B%Y") == edate.strftime("%d%B%Y"):
             timeInterval = fstime
             if sdate.strftime("%H%M") != edate.strftime("%H%M"):
-                timeInterval = "%s-%s"%(fstime, fetime)
-            vars["dateInterval"] = "%s (%s)"%( fsdate, timeInterval)
-        vars["location"] = ""
+                timeInterval = "%s-%s" % (fstime, fetime)
+            wvars["dateInterval"] = "%s (%s)" % (fsdate, timeInterval)
+        wvars["location"] = ""
         location = self._conf.getLocation()
         if location:
-            vars["location"] = "<i>%s</i><br><pre>%s</pre>"%( location.getName(), location.getAddress() )
+            wvars["location"] = "<i>%s</i><br><pre>%s</pre>" % (location.getName(), location.getAddress())
             room = self._conf.getRoom()
             if room:
-                roomLink = linking.RoomLinker().getHTMLLink( room, location )
-                vars["location"] += i18nformat("""<small> _("Room"):</small> %s""")%roomLink
-        vars["chairs"] = self._getChairsHTML()
-        vars["material"] = self._getMaterialHTML()
-        vars["moreInfo"] = self._getMoreInfoHTML()
-        vars["actions"] = ''
+                roomLink = linking.RoomLinker().getHTMLLink(room, location)
+                wvars["location"] += i18nformat("""<small> _("Room"):</small> %s""") % roomLink
+        wvars["chairs"] = self._getChairsHTML()
+        wvars["material"] = self._getMaterialHTML()
+        wvars["moreInfo"] = self._getMoreInfoHTML()
+        wvars["actions"] = ''
 
-        return vars
+        return wvars
+
 
 class ConfStaticDisplayMenu:
 

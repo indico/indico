@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 import MaKaC.webinterface.wcomponents as wcomponents
 
@@ -59,26 +60,39 @@ class WPUploadPaper(WPConferenceDefaultDisplayBase):
         self._sectionMenu.setCurrentItem(self._uploadPaperOpt)
 
 
-class WPaperReviewingDisplay(wcomponents.WTemplated):
+class WPaperReviewingDisplay(WConfDisplayBodyBase):
 
-    def __init__(self, conference):
-        self._conf = conference
-
-
-class WDownloadPRTemplate(wcomponents.WTemplated):
+    _linkname = "paperreviewing"
 
     def __init__(self, conference):
         self._conf = conference
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        return wvars
+
+
+class WDownloadPRTemplate(WConfDisplayBodyBase):
+
+    _linkname = "downloadtemplate"
+
+    def __init__(self, conference):
+        self._conf = conference
+
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+
         from MaKaC.webinterface.pages import reviewing
-        vars["hasPaperReviewing"] = self._conf.getConfPaperReview().hasReviewing()
-        vars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete" : False})
-        return vars
+        wvars["hasPaperReviewing"] = self._conf.getConfPaperReview().hasReviewing()
+        wvars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete": False})
+        return wvars
 
 
-class WUploadPaper(wcomponents.WTemplated):
+class WUploadPaper(WConfDisplayBodyBase):
+
+    _linkname = "uploadpaper"
 
     def __init__(self, aw, conf):
         self._aw = aw
@@ -88,9 +102,10 @@ class WUploadPaper(wcomponents.WTemplated):
         return WConfPaperMyContributions(self._aw, self._conf).getHTML({})
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["items"]=self._getContribsHTML()
-        return vars
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        wvars["items"] = self._getContribsHTML()
+        return wvars
 
 
 class WConfPaperMyContributions(wcomponents.WTemplated):

@@ -27,8 +27,7 @@ from MaKaC.plugins.InstantMessaging import urlHandlers
 from MaKaC.plugins.InstantMessaging.pages import WPluginHelp
 from MaKaC.i18n import _
 from MaKaC.plugins import InstantMessaging
-
-from indico.util.i18n import i18nformat
+from indico.util.i18n import i18nformat, i18nformat, N_
 from MaKaC.conference import ConferenceHolder
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.mail import GenericMailer
@@ -69,7 +68,7 @@ class ChatSMContributor(Component, Observable):
         conf = params['conf']
 
         sideMenuItemsDict["instantMessaging"] =  { \
-                "caption": "Chat Rooms", \
+                "caption": N_("Chat Rooms"), \
                 "URL": urlHandlers.UHConferenceInstantMessaging, \
                 "staticURL": "", \
                 "parent": ""}

@@ -1,50 +1,58 @@
-<script type="text/javascript">
-<!--
-function checkConditions(){
-    if (document.epay.conditions) {
-        if (!document.epay.conditions.checked) {
-            new AlertPopup($T("Warning"), $T("Please, confirm that you have read the conditions.")).open();
-        }else{
+<%inherit file="ConfDisplayBodyBase.tpl"/>
+
+<%block name="title">
+    ${body_title}
+</%block>
+
+<%block name="content">
+    <script type="text/javascript">
+    <!--
+    function checkConditions(){
+        if (document.epay.conditions) {
+            if (!document.epay.conditions.checked) {
+                new AlertPopup($T("Warning"), $T("Please, confirm that you have read the conditions.")).open();
+            }else{
+                return true;
+            }
+        }else {
             return true;
         }
-    }else {
-        return true;
+        return false;
     }
-    return false;
-}
--->
-</script>
-<table width="80%" align="center">
-    <tr>
-        <td style="padding: 15px 0 15px 0">
-            ${ _("Thank you for completing the registration form which has been sent to the organisers for their attention.")}
-            ${ epaymentAnnounce }
+    -->
+    </script>
+    <table width="80%" align="center">
+        <tr>
+            <td style="padding: 0 0 15px 0">
+                ${ _("Thank you for completing the registration form which has been sent to the organisers for their attention.")}
+                ${ epaymentAnnounce }
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="subGroupTitleRegForm">${ _("Registrant ID: ")}</span>
+                <span class="regFormDoneData">${ id }</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-bottom: 15px;">
+                <span class="subGroupTitleRegForm">${ _("Registration date:")}</span>
+                <span class="regFormDoneData">${ registrationDate }</span>
+            </td>
+        </tr>
+        <tr>
+        <td colspan="3">
+            <table width="100%" align="left" class="regFormDoneTable">
+                <tr>
+                    <td>
+                        <table width="100%" align="left">
+                            ${ otherSections }
+                            ${ paymentInfo }
+                        </table>
+                    </td>
+                </tr>
+            </table>
         </td>
-    </tr>
-    <tr>
-        <td>
-            <span class="subGroupTitleRegForm">${ _("Registrant ID: ")}</span>
-            <span class="regFormDoneData">${ id }</span>
-        </td>
-    </tr>
-    <tr>
-        <td style="padding-bottom: 15px;">
-            <span class="subGroupTitleRegForm">${ _("Registration date:")}</span>
-            <span class="regFormDoneData">${ registrationDate }</span>
-        </td>
-    </tr>
-    <tr>
-    <td colspan="3">
-        <table width="100%" align="left" class="regFormDoneTable">
-            <tr>
-                <td>
-                    <table width="100%" align="left">
-                        ${ otherSections }
-                        ${ paymentInfo }
-                    </table>
-                </td>
-            </tr>
-        </table>
-    </td>
-    </tr>
-</table>
+        </tr>
+    </table>
+</%block>

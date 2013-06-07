@@ -1,7 +1,13 @@
-<div class="groupTitle">
-    ${_('Abstract Submission')}
-</div>
-<div class="warningMessage">
-    <p>${_("The submission period is not open yet.")}</p>
-    <p>${_('If you have further queries, please contact the event organizer.')}</p>
-</div>
+<%inherit file="ConfDisplayBodyBase.tpl"/>
+
+<%block name="title">
+    ${body_title}
+</%block>
+
+<%block name="content">
+    <div class="confDisplayInfoMessage">
+        <div class="messageText">
+            ${_("Sorry, but submission is not open yet. It will be available on " + start_date + ".")}
+        </div>
+    </div>
+</%block>

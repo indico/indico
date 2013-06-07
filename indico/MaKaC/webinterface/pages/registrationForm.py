@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import session, request
 
+from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
@@ -1283,69 +1284,76 @@ class WConfModifRegFormStatusModif( wcomponents.WTemplated ):
 
 # ----------------- DISPLAY AREA ---------------------------
 
-class WPRegistrationForm( conferences.WPConferenceDefaultDisplayBase ):
+
+class WPRegistrationForm(conferences.WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NERegistrationForm
 
     def _getBody(self, params):
         wc = WConfRegistrationForm(self._conf, self._getAW().getUser())
         return wc.getHTML()
 
-    def _defineSectionMenu( self ):
+    def _defineSectionMenu(self):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
 
-class WConfRegistrationForm(wcomponents.WTemplated):
+
+class WConfRegistrationForm(WConfDisplayBodyBase):
+
+    _linkname = "registrationForm"
 
     def __init__(self, conf, av):
         self._conf = conf
         self._avatar = av
 
     def _getActionsHTML(self):
+        html = ""
         regForm = self._conf.getRegistrationForm()
         if nowutc() < regForm.getStartRegistrationDate():
-            return ""
+            return html
         else:
             submitOpt = ""
             registered = False
             if self._avatar is not None:
                 registered = self._avatar.isRegisteredInConf(self._conf)
             if regForm.inRegistrationPeriod() and not registered:
-                submitOpt = i18nformat("""<li><a href=%s> _("Show registration form")</a></li>""") % (
-                    quoteattr(str(urlHandlers.UHConfRegistrationFormDisplay.getURL(self._conf))))
+                submitOpt = i18nformat("""<li><a href=%s> _("Show registration form")</a></li>""") % (quoteattr(str(urlHandlers.UHConfRegistrationFormDisplay.getURL(self._conf))))
             if registered:
-                submitOpt = i18nformat("""%s<li><a href=""> _("View or modify your already registration")</a></li>""") % submitOpt
-            return i18nformat("""
+                submitOpt = i18nformat("""%s<li><a href=%s> _("View or modify your already registration")</a></li>""") % (submitOpt, quoteattr(str("")))
+            html = i18nformat("""
             <b> _("Possible actions you can carry out"):</b>
             <ul>
                 %s
             </ul>
                    """) % (submitOpt)
+    return html
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
+        wvars = wcomponents.WTemplated.getVars(self)
         regForm = self._conf.getRegistrationForm()
-        vars["startDate"] = regForm.getStartRegistrationDate().strftime("%d %B %Y")
-        vars["endDate"] = regForm.getEndRegistrationDate().strftime("%d %B %Y")
-        vars["actions"] = self._getActionsHTML()
-        vars["announcement"] = regForm.getAnnouncement()
-        vars["title"] = regForm.getTitle()
-        vars["usersLimit"] = ""
+        wvars["body_title"] = self._getTitle()
+        wvars["startDate"] = regForm.getStartRegistrationDate().strftime("%d %B %Y")
+        wvars["endDate"] = regForm.getEndRegistrationDate().strftime("%d %B %Y")
+        wvars["actions"] = self._getActionsHTML()
+        wvars["announcement"] = regForm.getAnnouncement()
+        wvars["title"] = regForm.getTitle()
+        wvars["usersLimit"] = ""
         if regForm.getUsersLimit() > 0:
-            vars["usersLimit"] =  i18nformat("""
+            wvars["usersLimit"] = i18nformat("""
                                 <tr>
                                     <td nowrap class="displayField"><b> _("Max No. of registrants"):</b></td>
                                     <td width="100%%" align="left">%s</td>
                                 </tr>
-                                """)%regForm.getUsersLimit()
-        vars["contactInfo"] = ""
-        if regForm.getContactInfo().strip()!="":
-            vars["contactInfo"] =  i18nformat("""
+                                """) % regForm.getUsersLimit()
+        wvars["contactInfo"] = ""
+        if regForm.getContactInfo().strip() != "":
+            wvars["contactInfo"] = i18nformat("""
                                 <tr>
                                     <td nowrap class="displayField"><b> _("Contact info"):</b></td>
                                     <td width="100%%" align="left">%s</td>
                                 </tr>
-                                """ )%regForm.getContactInfo()
-        return vars
+                                """) % regForm.getContactInfo()
+        return wvars
+
 
 class WPRegistrationFormDisplay( conferences.WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NERegistrationFormDisplay
@@ -1362,7 +1370,10 @@ class WPRegistrationFormDisplay( conferences.WPConferenceDefaultDisplayBase ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._newRegFormOpt)
 
-class WConfRegistrationFormDisplay(wcomponents.WTemplated):
+
+class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
+
+    _linkname = "newEvaluation"
 
     def __init__(self, conf, user):
         self._currentUser = user
@@ -1408,12 +1419,14 @@ class WConfRegistrationFormDisplay(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         regForm = self._conf.getRegistrationForm()
+        vars["body_title"] = self._getTitle()
         vars["title"] = regForm.getTitle()
         vars["postURL"] = quoteattr(str(urlHandlers.UHConfRegistrationFormCreation.getURL(self._conf)))
         vars["otherSections"]=self._getOtherSectionsHTML()
         return vars
 
-class WConfRegistrationFormPreview( WConfRegistrationFormDisplay ):
+
+class WConfRegistrationFormPreview(WConfRegistrationFormDisplay):
 
     def getVars(self):
         vars = WConfRegistrationFormDisplay.getVars(self)
@@ -1906,15 +1919,26 @@ class WConfRegFormFurtherInformationDisplay(wcomponents.WTemplated):
 class WPRegFormInactive( conferences.WPConferenceDefaultDisplayBase ):
 
     def _getBody( self, params ):
-        wc = WConfRegFormDeactivated()
+        wc = WConfRegFormDeactivated(self._conf)
         return wc.getHTML()
 
     def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
 
-class WConfRegFormDeactivated(wcomponents.WTemplated):
-    pass
+
+class WConfRegFormDeactivated(WConfDisplayBodyBase):
+
+    _linkname = "registrationForm"
+
+    def __init__(self, conf):
+        self._conf = conf
+
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        return wvars
+
 
 class WPRegistrationFormAlreadyRegistered( conferences.WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NERegistrationFormDisplay
@@ -1948,10 +1972,11 @@ class WPRegistrationFormCreationDone( conferences.WPConferenceDefaultDisplayBase
         self._sectionMenu.setCurrentItem(self._regFormOpt)
 
 
+class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
 
-class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
+    _linkname = "NewRegistration"
 
-    def __init__( self, registrant ):
+    def __init__(self, registrant):
         self._registrant = registrant
         self._conf = self._registrant.getConference()
 
@@ -1970,7 +1995,7 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
                     session2 = sessions[1].getTitle()
                     if sessions[1].isCancelled():
                         session2 =  i18nformat("""%s <font color=\"red\">( _("cancelled") )""")%session2
-                text=  i18nformat("""
+                text = i18nformat("""
                         <table>
                           <tr>
                             <td align="left" class="regFormDoneCaption">_("First Priority"):</td>
@@ -2318,18 +2343,20 @@ class WConfRegistrationFormCreationDone(wcomponents.WTemplated):
         return "".join(sects)
 
     def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["id"] = self._registrant.getId()
-        vars["registrationDate"] = i18nformat("""--_("date unknown")--""")
+        wvars = wcomponents.WTemplated.getVars( self )
+
+        wvars["body_title"] = self._getTitle()
+        wvars["id"] = self._registrant.getId()
+        wvars["registrationDate"] = i18nformat("""--_("date unknown")--""")
 
         if self._registrant.getRegistrationDate() is not None:
-            vars["registrationDate"] = self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M")
-        vars["otherSections"] = self._getFormSections()
-        vars["paymentInfo"]  = self._getPaymentInfo()
-        vars["epaymentAnnounce"] = ""
+            wvars["registrationDate"] = self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M")
+        wvars["otherSections"] = self._getFormSections()
+        wvars["paymentInfo"]  = self._getPaymentInfo()
+        wvars["epaymentAnnounce"] = ""
         if self._conf.getModPay().isActivated() and self._registrant.doPay():
-            vars["epaymentAnnounce"] = """<br><span>Please proceed to the <b>payment of your order</b> (by using the "Next" button down this page). You will then receive the payment details.</span>"""
-        return vars
+            wvars["epaymentAnnounce"] = """<br><span>Please proceed to the <b>payment of your order</b> (by using the "Next" button down this page). You will then receive the payment details.</span>"""
+        return wvars
 
 class WPRegistrationFormconfirmBooking( conferences.WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NERegistrationFormDisplay
@@ -2409,13 +2436,17 @@ class WPRegistrationFormModify( conferences.WPConferenceDefaultDisplayBase ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._viewRegFormOpt)
 
+
 class WConfRegistrationFormModify(WConfRegistrationFormDisplay):
 
+    _linkname = "ViewMyRegistration"
+
     def getVars(self):
-        vars = WConfRegistrationFormDisplay.getVars( self )
+        wvars = WConfRegistrationFormDisplay.getVars(self)
         registrant = self._currentUser.getRegistrantById(self._conf.getId())
-        vars["postURL"] = quoteattr(str(urlHandlers.UHConfRegistrationFormPerformModify.getURL(self._conf)))
-        return vars
+        wvars["postURL"] = quoteattr(str(urlHandlers.UHConfRegistrationFormPerformModify.getURL(self._conf)))
+        return wvars
+
 
 class WPRegistrationFormFull( conferences.WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NERegistrationFormDisplay

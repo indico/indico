@@ -33,7 +33,7 @@ from MaKaC.i18n                     import _
 from indico.util.i18n import i18nformat
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.info import HelperMaKaCInfo
-
+from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 
 
 ##############
@@ -56,32 +56,36 @@ class WPEvaluationMainInformation( WPEvaluationBase ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
-class WEvaluationMainInformation(wcomponents.WTemplated):
+
+class WEvaluationMainInformation(WConfDisplayBodyBase):
     """[DisplayArea] display evaluation general information."""
+
+    _linkname = "evaluation"
 
     def __init__(self, conf, user):
         self._conf = conf
         self._user = user
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
+        wvars = wcomponents.WTemplated.getVars(self)
         evaluation = self._conf.getEvaluation()
-        vars["startDate"] = evaluation.getStartDate().strftime("%d %B %Y")
-        vars["endDate"] = evaluation.getEndDate().strftime("%d %B %Y")
-        vars["announcement"] = evaluation.getAnnouncement()
-        vars["title"] = evaluation.getTitle()
-        vars["submissionsLimit"] = evaluation.getSubmissionsLimit()
-        vars["contactInfo"] = evaluation.getContactInfo()
+        wvars["body_title"] = self._getTitle()
+        wvars["startDate"] = evaluation.getStartDate().strftime("%d %B %Y")
+        wvars["endDate"] = evaluation.getEndDate().strftime("%d %B %Y")
+        wvars["announcement"] = evaluation.getAnnouncement()
+        wvars["title"] = evaluation.getTitle()
+        wvars["submissionsLimit"] = evaluation.getSubmissionsLimit()
+        wvars["contactInfo"] = evaluation.getContactInfo()
         #actions
-        vars["actionsShow"] = evaluation.inEvaluationPeriod()
-        vars["actionsDisplayEval"] = None
-        vars["actionsModifyEval"]  = None
-        if vars["actionsShow"]:
-            if self._user!=None and self._user.hasSubmittedEvaluation(evaluation):
-                vars["actionsModifyEval"]  = urlHandlers.UHConfEvaluationDisplayModif.getURL(self._conf)
+        wvars["actionsShow"] = evaluation.inEvaluationPeriod()
+        wvars["actionsDisplayEval"] = None
+        wvars["actionsModifyEval"] = None
+        if wvars["actionsShow"]:
+            if self._user != None and self._user.hasSubmittedEvaluation(evaluation):
+                wvars["actionsModifyEval"] = urlHandlers.UHConfEvaluationDisplayModif.getURL(self._conf)
             else:
-                vars["actionsDisplayEval"] = urlHandlers.UHConfEvaluationDisplay.getURL(self._conf)
-        return vars
+                wvars["actionsDisplayEval"] = urlHandlers.UHConfEvaluationDisplay.getURL(self._conf)
+        return wvars
 
 
 class WPEvaluationDisplay( WPEvaluationBase ):
@@ -98,19 +102,23 @@ class WPEvaluationDisplay( WPEvaluationBase ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._newEvaluationOpt)
 
-class WEvaluationDisplay(wcomponents.WTemplated):
+
+class WEvaluationDisplay(WConfDisplayBodyBase):
     """[DisplayArea] Evaluation default display."""
+
+    _linkname = "newEvaluation"
 
     def __init__(self, conf):
         self._conf = conf
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["evaluation"] = self._conf.getEvaluation()
-        user = vars["user"]
-        vars["hasSubmittedEvaluation"] = isinstance(user,Avatar) and user.hasSubmittedEvaluation(self._conf.getEvaluation())
-        vars["actionUrl"] = urlHandlers.UHConfEvaluationSubmit.getURL(self._conf, mode=Evaluation._SUBMIT)
-        return vars
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        wvars["evaluation"] = self._conf.getEvaluation()
+        user = wvars["user"]
+        wvars["hasSubmittedEvaluation"] = isinstance(user,Avatar) and user.hasSubmittedEvaluation(self._conf.getEvaluation())
+        wvars["actionUrl"] = urlHandlers.UHConfEvaluationSubmit.getURL(self._conf, mode=Evaluation._SUBMIT)
+        return wvars
 
 
 class WPEvaluationDisplayModif( WPEvaluationBase ):
@@ -127,14 +135,18 @@ class WPEvaluationDisplayModif( WPEvaluationBase ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._viewEvaluationOpt)
 
-class WEvaluationDisplayModif( WEvaluationDisplay ):
+
+class WEvaluationDisplayModif(WEvaluationDisplay):
     """[DisplayArea] The user modifies his already submitted evaluation."""
+
+    _linkname = "viewMyEvaluation"
 
     def __init__(self, conf):
         self._conf = conf
 
-    def getVars( self ):
+    def getVars(self):
         vars = WEvaluationDisplay.getVars(self)
+        vars["body_title"] = self._getTitle()
         vars["actionUrl"] = urlHandlers.UHConfEvaluationSubmit.getURL(self._conf, mode=Evaluation._EDIT)
         return vars
 
@@ -160,28 +172,32 @@ class WPEvaluationSubmitted( WPEvaluationBase ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
-class WEvaluationSubmitted( wcomponents.WTemplated ):
+
+class WEvaluationSubmitted(WEvaluationDisplay):
     """Submitted Evaluation."""
 
-    def __init__( self, conference, mode=Evaluation._SUBMIT ):
+    _linkname = "newEvaluation"
+
+    def __init__(self, conference, mode=Evaluation._SUBMIT):
         self._conf = conference
         self._mode = mode
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        if not vars.has_key("redirection"):
-            vars["redirection"] = None
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        if not wvars.has_key("redirection"):
+            wvars["redirection"] = None
         if self._mode == Evaluation._SUBMIT:
-            vars["status"] = _("submitted")
+            wvars["status"] = _("submitted")
         elif self._mode == Evaluation._EDIT:
-            vars["status"] = _("modified")
-        else: #should never be here...
+            wvars["status"] = _("modified")
+        else:  # should never be here...
             if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
-                raise Exception( _("Evaluation - Possible modes are %s, given : %s.")%(
-                                        [Evaluation._SUBMIT,Evaluation._EDIT], self._mode))
+                raise Exception(_("Evaluation - Possible modes are %s, given : %s.") % (
+                                [Evaluation._SUBMIT, Evaluation._EDIT], self._mode))
             else:
-                vars["status"] = _("submitted")
-        return vars
+                wvars["status"] = _("submitted")
+        return wvars
 
 
 class WPEvaluationFull( WPEvaluationBase ):
@@ -195,16 +211,20 @@ class WPEvaluationFull( WPEvaluationBase ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
-class WEvaluationFull( wcomponents.WTemplated ):
+
+class WEvaluationFull(WEvaluationDisplay):
     """[DisplayArea] Evaluation is full."""
+
+    _linkname = "evaluation"
 
     def __init__(self, conf):
         self._conf = conf
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["limit"] = self._conf.getEvaluation().getSubmissionsLimit()
-        return vars
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        wvars["limit"] = self._conf.getEvaluation().getSubmissionsLimit()
+        return wvars
 
 
 class WPEvaluationClosed( WPEvaluationBase ):
@@ -218,28 +238,30 @@ class WPEvaluationClosed( WPEvaluationBase ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
-class WEvaluationClosed( wcomponents.WTemplated ):
+
+class WEvaluationClosed(WEvaluationDisplay):
     """[DisplayArea] Evaluation is closed."""
+
+    _linkname = "evaluation"
 
     def __init__(self, conf):
         self._conf = conf
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        evaluation=self._conf.getEvaluation()
+        wvars = wcomponents.WTemplated.getVars(self)
+        evaluation = self._conf.getEvaluation()
         sDate = evaluation.getStartDate()
         eDate = evaluation.getEndDate()
-        vars["title"]= _("Impossible to do evaluation")
-        vars["msg"]= _("No period for evaluation:")
-        if nowutc()<sDate:
-            vars["title"]= _("Evaluation is not open yet")
-            vars["msg"]= _("Sorry but the evaluation will start later:")
-        elif nowutc()>eDate:
-            vars["title"]= _("Evaluation closed")
-            vars["msg"]= _("Sorry but the evaluation is now over:")
-        vars["startDate"] = sDate.strftime("%A %d %B %Y")
-        vars["endDate"] = eDate.strftime("%A %d %B %Y")
-        return vars
+
+        wvars["body_title"] = self._getTitle()
+        wvars["msg"] = _("No period for evaluation:")
+        if nowutc() < sDate:
+            wvars["msg"] = _("Sorry, but the evaluation is not open yet.")
+        elif nowutc() > eDate:
+            wvars["msg"] = _("Sorry, but the evaluation period has finished.")
+        wvars["startDate"] = sDate.strftime("%A %d %B %Y")
+        wvars["endDate"] = eDate.strftime("%A %d %B %Y")
+        return wvars
 
 
 class WPEvaluationSignIn( WPEvaluationBase ):
@@ -269,16 +291,22 @@ class WPEvaluationInactive( WPEvaluationBase ):
     """[DisplayArea] Inactive evaluation."""
 
     def _getBody( self, params ):
-        return WEvaluationInactive().getHTML()
+        return WEvaluationInactive(self._conf).getHTML()
 
     def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
-class WEvaluationInactive(wcomponents.WTemplated):
-    """[DisplayArea] Inactive evaluation."""
-    pass
 
+class WEvaluationInactive(WEvaluationDisplay):
+    """[DisplayArea] Inactive evaluation."""
+
+    _linkname = "evaluation"
+
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        return wvars
 
 
 #################
