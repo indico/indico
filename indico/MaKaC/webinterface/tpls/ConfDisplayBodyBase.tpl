@@ -1,4 +1,4 @@
-<div class="right">
+<div class="toolbar header-aligned right">
     <%block name="toolbar"></%block>
 </div>
 

@@ -5,7 +5,7 @@
 </%block>
 
 <%block name="toolbar">
-    <a class="right header-aligned icon-file-pdf i-button icon-only" aria-hidden="true" href="${pdf_url}" title="${_("Download PDF")}"></a>
+    <a class="i-button icon-file-pdf icon-only" aria-hidden="true" href="${pdf_url}" title="${_("Download PDF")}"></a>
 </%block>
 
 <%block name="content">
