@@ -88,7 +88,7 @@ def add_handlers(app):
 def handle_404(exception):
     folder = os.path.abspath(os.path.join(app.root_path, 'htdocs'))
     try:
-        return send_from_directory(folder, request.path[1:])
+        return send_from_directory(folder, request.path[1:], conditional=True)
     except NotFound:
         msg = (_("Page not found"), _("The page you were looking for doesn't exist."))
         return WErrorWSGI(msg).getHTML(), 404
