@@ -27,14 +27,5 @@ def index(req, **params):
 def userExists(req, **params ):
     return conferenceDisplay.RHConfUserExistWithIdentity( req ).process( params )
 
-def modify(req, **params):
-    return users.RHUserModification( req ).process( params )
-
-#def update(req, **params ):
-#    return users.RHUserPerformModification( req ).process( params )
-
-def active(req, **params ):
-    return users.RHUserActive( req ).process( params )
-
 def created(req, **params ):
     return conferenceDisplay.RHConfUserCreated( req ).process( params )

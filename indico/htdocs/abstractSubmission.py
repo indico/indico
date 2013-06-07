@@ -17,13 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import os
-
-import MaKaC.webinterface.rh.conferenceDisplay as conferenceDisplay
 import MaKaC.webinterface.rh.CFADisplay as CFADisplay
-from MaKaC.common.xmlGen import XMLGen
-from MaKaC.common import Config
-from MaKaC.webinterface.general import *
 
 
 

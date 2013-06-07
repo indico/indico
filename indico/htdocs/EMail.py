@@ -18,7 +18,6 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceDisplay
-from MaKaC.webinterface.rh import authorDisplay
 from MaKaC.webinterface.rh import registrantsModif
 from MaKaC.webinterface.rh import conferenceModif
 
@@ -28,7 +27,6 @@ def index(req, **params):
 
 def send (req, **params):
     return conferenceDisplay.RHConferenceSendEmail( req ).process( params )
-
 
 def sendreg (req, **params):
     return registrantsModif.RHRegistrantSendEmail( req ).process( params )

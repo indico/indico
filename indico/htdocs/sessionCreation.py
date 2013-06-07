@@ -17,9 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif
-from MaKaC.webinterface import pages
-
 from MaKaC.webinterface import pages
 
 

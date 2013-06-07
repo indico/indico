@@ -18,8 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import unittest, logging
-from indico.ext.livesync import PushSyncAgent, ActionWrapper, SyncManager, \
-     ActionWrapper
+from indico.ext.livesync import PushSyncAgent, ActionWrapper, SyncManager
 
 
 class ObjectStub(object):

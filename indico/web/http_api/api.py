@@ -26,10 +26,10 @@ import fnmatch
 import itertools
 import pytz
 import re
-import types
 import urllib
 from datetime import datetime, timedelta, time
 from flask import request
+from types import GeneratorType
 from ZODB.POSException import ConflictError
 from zope.index.text import parsetree
 
@@ -193,7 +193,7 @@ class HTTPAPIHook(object):
         complete = True
         try:
             res = func(aw)
-            if isinstance(res, types.GeneratorType):
+            if isinstance(res, GeneratorType):
                 for obj in res:
                     resultList.append(obj)
             else:
