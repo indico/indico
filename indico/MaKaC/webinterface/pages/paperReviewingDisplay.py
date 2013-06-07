@@ -123,4 +123,3 @@ class WConfPaperMyContributions(wcomponents.WTemplated):
         vars["Conference"] = self._conf
         vars["ConfReviewingChoice"] = self._conf.getConfPaperReview().getChoice()
         return vars
-

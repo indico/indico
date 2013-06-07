@@ -6,15 +6,14 @@
 
 <%block name="content">
     <% from MaKaC.plugins.util import PluginFieldsWrapper %>
-
-    <table width="100%" align="center" border="0" cellpadding="5px">
+    <table class="infoTable" width="100%" align="center" border="0" cellspacing="0">
         <tr>
-            <td></td>
-            <td nowrap class="titleChat"> ${ _("Room")}</td>
-            <td nowrap class="titleChat"> ${ _("Server")}</td>
-            <td nowrap class="titleChat"> ${ _("Description")}</td>
-            <td nowrap class="titleChat"> ${ _("Requires password")}</td>
-            <td nowrap class="titleChat"> ${ _("Password")}</td>
+            <td nowrap class="tableHeader"> ${ _("Room")}</td>
+            <td nowrap class="tableHeader"> ${ _("Server")}</td>
+            <td nowrap class="tableHeader"> ${ _("Description")}</td>
+            <td nowrap class="tableHeader"> ${ _("Requires password")}</td>
+            <td nowrap class="tableHeader"> ${ _("Password")}</td>
+            <td nowrap class="tableHeader" style="text-align:right;"> ${ _("Actions")}</td>
         </tr>
 
         % for cr in Chatrooms:
@@ -24,22 +23,26 @@
                 <% server = cr.getHost() %>
             % endif
 
-            <tr style="vertical-align: baseline;">
-                <td></td>
-                <td> ${ cr.getTitle()} </td>
-
-                <td style="font-family:monospace;"> ${ server}</td>
-
-                <td><div id='desc${ cr.getId() }'> ${ cr.getDescription()}</div></td>
-
-                <td> ${ _('Yes') if cr.getPassword() else _('No')}</td>
+            <tr class="infoTR" style="vertical-align: baseline;">
+                <td class="infoTD">
+                    ${ cr.getTitle()}
+                </td>
+                <td class="infoTD" style="font-family:monospace;">
+                    ${ server}
+                </td>
+                <td class="infoTD">
+                    <div id='desc${ cr.getId() }'> ${ cr.getDescription()}</div>
+                </td>
+                <td class="infoTD">
+                    ${ _('Yes') if cr.getPassword() else _('No')}
+                </td>
 
                 % if cr.getShowPass() and cr.getPassword():
-                    <td> ${ cr.getPassword()} </td>
+                    <td class="infoTD"> ${ cr.getPassword()} </td>
                 % elif not cr.getShowPass() and cr.getPassword():
-                    <td style="font-style:italic;"> ${ _('Not displayed')} </td>
+                    <td class="infoTD" style="font-style:italic;"> ${ _('Not displayed')} </td>
                 % else:
-                    <td style="font-style:italic;"> - </td>
+                    <td class="infoTD"style="font-style:italic;"> - </td>
                 % endif
                 % if len(PluginFieldsWrapper('InstantMessaging').getOption('customLinks')) > 0:
                     <td style="font-weight: bold;" nowrap><a id="joinLink${ cr.getId() }" name = "${ cr.getId() }" class="dropDownMenu highlight" href="#">${ _("Join now!")}</a></td>

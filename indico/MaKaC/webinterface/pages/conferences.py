@@ -5250,12 +5250,18 @@ class WConfMyStuffMySessions(WConfDisplayBodyBase):
                             quoteattr(str(modURL)),
                             quoteattr(str(dispURL))))
         return """
-            <table class="groupTable width="70%%" align="center" cellspacing="0" style="padding-top:15px;">
+            <table class="infoTable" cellspacing="0" width="100%%">
+                <tr>
+                    <td nowrap class="tableHeader"> %s </td>
+                    <td nowrap class="tableHeader" style="text-align:right;"> %s </td>
+                </tr>
                 <tr>
                     <td>%s</td>
                 </tr>
             </table>
-            """ % "".join(res)
+            """ % (_("Session"),
+                   _("Actions"),
+                   "".join(res))
 
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
@@ -5331,12 +5337,18 @@ class WConfMyStuffMyTracks(WConfDisplayBodyBase):
                 </tr>""" % (self.htmlText(t.getTitle()),
                             quoteattr(str(modURL))))
         return """
-            <table class="groupTable width="70%%" align="center" cellspacing="0" style="padding-top: 25px;">
+            <table class="infoTable" cellspacing="0" width="100%%">
+                <tr>
+                    <td nowrap class="tableHeader"> %s </td>
+                    <td nowrap class="tableHeader" style="text-align:right;"> %s </td>
+                </tr>
                 <tr>
                     <td>%s</td>
                 </tr>
             </table>
-            """ % "".join(res)
+            """ % (_("Track"),
+                   _("Actions"),
+                   "".join(res))
 
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)

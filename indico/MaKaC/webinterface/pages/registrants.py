@@ -1810,7 +1810,7 @@ class WConfRegistrantsList(WConfDisplayBodyBase):
             sessions = """<td valign="top" class="abstractDataCell" nowrap>%s</td>"""%(sessions or "&nbsp;")
         html = """
             <tr>
-                <td valign="top" nowrap class="abstractLeftDataCell">%s</td>
+                <td valign="top" nowrap class="abstractDataCell">%s</td>
                 %s
                 %s
                 %s

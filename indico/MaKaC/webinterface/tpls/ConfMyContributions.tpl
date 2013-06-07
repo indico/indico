@@ -9,7 +9,7 @@
             <table class="infoTable" cellspacing="0" width="100%">
                 <tr>
                     <td nowrap class="tableHeader">${ _("Id") }</td>
-                    <td nowrap class="tableHeader">${ _("Name") }</td>
+                    <td nowrap class="tableHeader">${ _("Contribution") }</td>
                     % if Conference.getConfPaperReview().hasReviewing():
                     <td nowrap class="tableHeader">${ _("Reviewing Status") }</td>
                     % endif

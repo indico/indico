@@ -6,7 +6,7 @@
 
 <%block name="content">
     <p>Number of parcitipants: ${numRegistrants}</p>
-    <table cellspacing="0" align="center" border="0">
+    <table cellspacing="0" border="0">
         ${ filterOptions }
         <tr>
             <td>
