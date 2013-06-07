@@ -114,16 +114,15 @@ def shorturl_handler(what, tag):
 
 def send_file(name, path, ftype=None, last_modified=None, mimetype=None, no_cache=True, inline=False, conditional=False):
     # Note: path can also be a StringIO!
-    as_attachment = request.user_agent.platform != 'android'  # is this still necessary?
-    if inline:
-        as_attachment = False
+    if request.user_agent.platform == 'android':
+        # Android is just full of fail when it comes to inline content-disposition...
+        inline = False
     if not bool(ftype) ^ bool(mimetype):
         raise ValueError('exactly one of mimetype and ftype are required')
     elif ftype:
         mimetype = Config.getInstance().getFileTypeMimeType(ftype)  # ftype is e.g. "JPG"
-    rv = _send_file(path, mimetype=mimetype, as_attachment=as_attachment, attachment_filename=name,
-                    conditional=conditional)
-    if not as_attachment:
+    rv = _send_file(path, mimetype=mimetype, as_attachment=not inline, attachment_filename=name, conditional=conditional)
+    if inline:
         # send_file does not add this header if as_attachment is False
         rv.headers.add('Content-Disposition', 'inline', filename=name)
     if last_modified:
