@@ -23,11 +23,13 @@ fabfile for Indico development operations
 
 import os
 import sys
+import glob
 from contextlib import contextmanager
 
 from fabric.api import local, lcd, task, env
 from fabric.context_managers import prefix, settings
 from fabric.colors import red, green, yellow, cyan
+from fabric.contrib import console
 from fabvenv import virtualenv
 
 
@@ -36,13 +38,13 @@ ASSET_TYPES = ['js', 'sass', 'css']
 PYTHONBREW_PATH = os.path.expanduser('~/.pythonbrew')
 DOC_DIRS = ['guides']
 
-DEFAULT_NODE_VERSION = '0.10'
+DEFAULT_NODE_VERSION = '0.10.10'
 DEFAULT_VERSIONS = ['2.6', '2.7']
-DEFAULT_BUILD_DIR = '/tmp/indico-build'
 
 # Generated vars
 
 DEFAULT_INDICO_DIR = os.path.dirname(__file__)
+DEFAULT_BUILD_DIR = os.path.join(DEFAULT_INDICO_DIR, 'dist', 'indico-build')
 
 RECIPES = {}
 
@@ -55,7 +57,8 @@ env.update({
     'build_dir': DEFAULT_BUILD_DIR,
     'src_dir': DEFAULT_INDICO_DIR,
     'ext_dir': os.path.join(DEFAULT_INDICO_DIR, 'ext_modules'),
-    'target_dir': os.path.join(DEFAULT_INDICO_DIR, 'indico/htdocs')
+    'target_dir': os.path.join(DEFAULT_INDICO_DIR, 'indico/htdocs'),
+    'system_node': False
 })
 
 
@@ -67,8 +70,13 @@ def recipe(name):
 
 # Decorators
 
+@contextmanager
 def node_env():
-    return prefix('source {0}'.format(os.path.join(env['node_env_path'], 'bin/activate')))
+    if env.system_node:
+        yield
+    else:
+        with prefix('source {0}'.format(os.path.join(env.node_env_path, 'bin/activate'))):
+            yield
 
 
 def pythonbrew():
@@ -86,12 +94,12 @@ def pythonbrew_cmd(cmd, **kwargs):
     with pythonbrew():
         return local('pythonbrew {0}'.format(cmd), **kwargs)
 
-# Util functions
 
+# Util functions
 
 def create_node_env():
     with settings(warn_only=True):
-        local('nodeenv -c -n {0} {1}'.format(env['node_version'], env['node_env_path']))
+        local('nodeenv -c -n {0} {1}'.format(env.node_version, env.node_env_path))
 
 
 def lib_dir(src_dir, dtype):
@@ -137,11 +145,37 @@ def _check_pythonbrew(versions):
             pythonbrew_cmd('venv -p {0} create indico'.format(version))
 
 
+def _check_pdflatex():
+    """
+    Check that pdflatex exists
+    """
+    with settings(warn_only=True):
+        if local('which pdflatex > /dev/null && echo $?', capture=True) != '0':
+            print red('pdflatex is not available in this system. It is needed for PDF generation.')
+            sys.exit(-2)
+
+
+def _safe_rm(path, recursive=False, ask=True):
+    with lcd('/tmp'):
+        if path[0] != '/':
+            path = os.path.join(env.lcwd, path)
+        if ask:
+            files = glob.glob(path)
+            if files:
+                print yellow("The following files are going to be deleted:\n  ") + '\n  '.join(files)
+                if console.confirm(cyan("Are you sure you want to delete them?")):
+                    local('rm {0}{1}'.format('-rf ' if recursive else '', path))
+                else:
+                    print red("Delete operation cancelled")
+        else:
+            local('rm {0}{1}'.format('-rf ' if recursive else '', path))
+
+
 def _install_dependencies(mod_name, sub_path, dtype):
-    dest_dir = os.path.join(lib_dir(env['src_dir'], dtype), mod_name)
+    dest_dir = os.path.join(lib_dir(env.src_dir, dtype), mod_name)
     local('mkdir -p {0}'.format(dest_dir))
     local('cp -R {0} {1}/'.format(
-        os.path.join(env['ext_dir'], mod_name, sub_path),
+        os.path.join(env.ext_dir, mod_name, sub_path),
         dest_dir))
 
 
@@ -161,10 +195,10 @@ def install_jquery():
     Install jquery from Git
     """
     with node_env():
-        with lcd(os.path.join(env['ext_dir'], 'jquery')):
+        with lcd(os.path.join(env.ext_dir, 'jquery')):
             local('npm install')
             local('grunt')
-            dest_dir = lib_dir(env['src_dir'], 'js')
+            dest_dir = lib_dir(env.src_dir, 'js')
             local('mkdir -p {0}'.format(dest_dir))
             local('cp dist/jquery.js {0}/'.format(dest_dir))
 
@@ -175,11 +209,11 @@ def install_qtip2():
     Install qtip2 from Git
     """
     with node_env():
-        with lcd(os.path.join(env['ext_dir'], 'qtip2')):
+        with lcd(os.path.join(env.ext_dir, 'qtip2')):
             local('git submodule update')
             local('npm install')
             local('grunt --plugins="tips modal viewport svg" init clean concat:dist concat:css concat:libs replace')
-            dest_dir_js, dest_dir_css = lib_dir(env['src_dir'], 'js'), lib_dir(env['src_dir'], 'css')
+            dest_dir_js, dest_dir_css = lib_dir(env.src_dir, 'js'), lib_dir(env.src_dir, 'css')
             local('mkdir -p {0} {1}'.format(dest_dir_js, dest_dir_css))
             local('cp dist/jquery.qtip.js {0}/'.format(dest_dir_js))
             local('cp dist/jquery.qtip.css {0}/'.format(dest_dir_css))
@@ -218,13 +252,14 @@ def _install_deps():
 
 
 @task
-def setup_deps(n_env=None, n_version=None, src_dir=None, system_node=False):
+def setup_deps(n_env=None, n_version=None, src_dir=None, system_node=None):
     """
     Setup (fetch and install) dependencies for Indico assets
     """
 
-    src_dir = src_dir or env['src_dir']
-    n_env = n_env or env['node_env_path']
+    src_dir = src_dir or env.src_dir
+    n_env = n_env or env.node_env_path
+    system_node = system_node if system_node is not None else env.system_node
 
     # initialize submodules if they haven't yet been
     init_submodules(src_dir)
@@ -232,7 +267,7 @@ def setup_deps(n_env=None, n_version=None, src_dir=None, system_node=False):
     ext_dir = os.path.join(src_dir, 'ext_modules')
 
     with settings(node_env_path=n_env or os.path.join(ext_dir, 'node_env'),
-                  node_version=n_version or env['node_version'],
+                  node_version=n_version or env.node_version,
                   system_node=system_node,
                   src_dir=src_dir,
                   ext_dir=ext_dir):
@@ -253,7 +288,15 @@ def clean_deps(src_dir=None):
     """
 
     for dtype in ASSET_TYPES:
-        local('rm -rf {0}/*'.format(lib_dir(src_dir or env['src_dir'], dtype)))
+        _safe_rm('{0}/*'.format(lib_dir(src_dir or env.src_dir, dtype)), recursive=True)
+
+
+@task
+def cleanup(build_dir=None, force=False):
+    """
+    Clean up build environment
+    """
+    _safe_rm('{0}'.format(build_dir or env.build_dir), recursive=True, ask=(not force))
 
 
 @task
@@ -262,7 +305,7 @@ def tarball(src_dir=None):
     Create a binary indico distribution
     """
 
-    src_dir = src_dir or env['src_dir']
+    src_dir = src_dir or env.src_dir
 
     make_docs(src_dir)
 
@@ -272,26 +315,35 @@ def tarball(src_dir=None):
 
 
 @task
-def make_docs(src_dir=None):
+def make_docs(src_dir=None, build_dir=None):
+    """
+    Generate Indico docs
+    """
+    _check_pdflatex()
+
+    src_dir = src_dir or env.src_dir
+
+    if build_dir is None:
+        target_dir = os.path.join(src_dir, 'indico', 'htdocs', 'ihelp')
+    else:
+        target_dir = os.path.join(build_dir or env.build_dir, 'indico', 'htdocs', 'ihelp')
+
     print green('Generating documentation')
-    with lcd(os.path.join(src_dir or env['src_dir'], 'doc')):
+    with lcd(os.path.join(src_dir, 'doc')):
         for d in DOC_DIRS:
             with lcd(d):
                 local('make html')
                 local('make latex')
-                local('mv build/html/* {0}'.format(
-                    os.path.join(env['src_dir'], 'indico', 'htdocs', 'ihelp', 'html')))
+                local('mv build/html/* {0}'.format(os.path.join(target_dir, 'html')))
 
         with lcd(os.path.join('guides', 'build', 'latex')):
             local('make all-pdf')
-            local('mv *.pdf {0}'.format(
-                  os.path.join(env['src_dir'], 'indico', 'htdocs', 'ihelp', 'pdf')))
+            local('mv *.pdf {0}'.format(os.path.join(target_dir, 'pdf')))
 
         print green('Cleaning up')
         for d in DOC_DIRS:
             with lcd(d):
                 local('make clean')
-
 
 
 @task
@@ -300,8 +352,8 @@ def package_release(versions=None, build_dir=None, system_node=False):
     Create an Indico release - source and binary distributions
     """
 
-    versions = versions or env['versions']
-    build_dir = build_dir or env['build_dir']
+    versions = versions or env.versions
+    build_dir = build_dir or env.build_dir
 
     # get current branch
     current_branch = local('git rev-parse --abbrev-ref HEAD', capture=True)
@@ -322,8 +374,9 @@ def package_release(versions=None, build_dir=None, system_node=False):
             print green("Checking out branch '{0}'".format(current_branch))
             local('git checkout origin/{0}'.format(current_branch))
 
-            # Build source tarball
-            tarball(os.path.join(build_dir, 'indico'))
+            with settings(system_node=system_node):
+                # Build source tarball
+                tarball(os.path.join(build_dir, 'indico'))
 
             # Build binaries (EGG)
             for version in versions:
@@ -332,3 +385,5 @@ def package_release(versions=None, build_dir=None, system_node=False):
                     local('python setup.py -q bdist_egg')
                     pass
             print green(local('ls -lah dist/', capture=True))
+
+    cleanup(build_dir, force=True)
