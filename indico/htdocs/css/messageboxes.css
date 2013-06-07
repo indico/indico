@@ -71,7 +71,7 @@
     text-align: center;
 }
 
-.confDisplayInfoMessage {
+.info-message-box {
     background-color: #FAFAFA;
     padding: 8px 14px 8px 14px;
     margin-bottom: 18px;
@@ -81,7 +81,7 @@
     border-radius: 4px;
 }
 
-.confDisplayInfoMessage:before {
+.info-message-box:before {
     font-family: 'icomoon-ultimate';
     content: "\69";
     color: #BBB;
@@ -91,14 +91,14 @@
     padding-top: 0.05em;
 }
 
-.confDisplayInfoMessage .messageText {
+.info-message-box .message-text {
     color: #777;
     font-size: 1.2em;
     padding: 0.3em 0 0.3em 2.5em;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-.confDisplaySuccessMessage {
+.success-message-box {
     background-color: #EEFAEE;
     padding: 8px 14px 8px 14px;
     margin-bottom: 18px;
@@ -108,7 +108,7 @@
     border-radius: 4px;
 }
 
-.confDisplaySuccessMessage:before {
+.success-message-box:before {
     font-family: 'icomoon-ultimate';
     content: "\4d";
     color: #BBB;
@@ -118,7 +118,7 @@
     padding-top: 0.05em;
 }
 
-.confDisplaySuccessMessage .messageText {
+.success-message-box .message-text {
     color: #777;
     font-size: 1.2em;
     padding: 0.3em 0 0.3em 2.5em;

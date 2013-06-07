@@ -5,8 +5,8 @@
 </%block>
 
 <%block name="content">
-    <div class="confDisplayInfoMessage">
-        <div class="messageText">
+    <div class="info-message-box">
+        <div class="message-text">
             ${_("Sorry, but the deadline for abstract submission and modification finished on " + end_date + ".")}
         </div>
     </div>

@@ -5,8 +5,8 @@
 </%block>
 
 <%block name="content">
-    <div class="confDisplayInfoMessage">
-        <div class="messageText">
+    <div class="info-message-box">
+        <div class="message-text">
             ${msg}
             <ul>
                 <li>${_("Start date")}: ${startDate}</li>

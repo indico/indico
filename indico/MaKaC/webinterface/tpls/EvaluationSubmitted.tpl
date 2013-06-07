@@ -5,8 +5,8 @@
 </%block>
 
 <%block name="content">
-    <div class="confDisplaySuccessMessage">
-        <div class="messageText">${_("Evaluation stored. Thanks for your participation!")}</div>
+    <div class="success-message-box">
+        <div class="message-text">${_("Evaluation stored. Thanks for your participation!")}</div>
     </div>
 
     % if redirection != None:

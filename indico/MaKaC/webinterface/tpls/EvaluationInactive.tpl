@@ -5,7 +5,7 @@
 </%block>
 
 <%block name="content">
-    <div class="confDisplayInfoMessage">
-        <div class="messageText">${_("Sorry, but the evaluation is disabled for this event.")}</div>
+    <div class="info-message-box">
+        <div class="message-text">${_("Sorry, but the evaluation is disabled for this event.")}</div>
     </div>
 </%block>

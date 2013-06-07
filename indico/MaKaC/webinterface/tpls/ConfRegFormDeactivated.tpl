@@ -5,8 +5,8 @@
 </%block>
 
 <%block name="content">
-    <div class="confDisplayInfoMessage">
-        <div class="messageText">
+    <div class="info-message-box">
+        <div class="message-text">
             ${_("Sorry, the registration form is disabled for this conference.")}
         </div>
     </div>

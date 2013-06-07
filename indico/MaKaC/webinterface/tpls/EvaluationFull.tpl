@@ -5,7 +5,7 @@
 </%block>
 
 <%block name="content">
-    <div class="confDisplayInfoMessage">
-        <div class="messageText">${_("Maximum number of submissions reached.")}</div>
+    <div class="info-message-box">
+        <div class="message-text">${_("Maximum number of submissions reached.")}</div>
     </div>
 </%block>
