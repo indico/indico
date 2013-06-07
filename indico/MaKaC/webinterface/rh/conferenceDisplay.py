@@ -498,7 +498,8 @@ class RHConferenceGetLogo(RHConferenceBaseDisplay):
         logo = self._target.getLogo()
         if not logo:
             raise MaKaCError(_("This event does not have a logo"))
-        return send_file(logo.getFileName(), logo.getFilePath(), logo.getFileType(), inline=True)
+        return send_file(logo.getFileName(), logo.getFilePath(), logo.getFileType(), inline=True, no_cache=False,
+                         conditional=True)
 
 
 class RHConferenceGetCSS(RHConferenceBaseDisplay):
@@ -511,7 +512,8 @@ class RHConferenceGetCSS(RHConferenceBaseDisplay):
         sm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
         css = sm.getLocalCSS()
         if css:
-            return send_file(css.getFileName(), css.getFilePath(), mimetype='text/css', inline=True)
+            return send_file(css.getFileName(), css.getFilePath(), mimetype='text/css', inline=True, no_cache=False,
+                             conditional=True)
         return ""
 
 
