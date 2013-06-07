@@ -835,14 +835,15 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         self._buildings = buildings_with_coords
 
     def _process(self):
-        params = self._getRequestParams()
+        params = dict(self._getRequestParams())
         params["lang"] = session.lang
-        html = self._cache.get(params)
+        key = str(sorted(params.iteritems()))
+        html = self._cache.get(key)
         if not html:
             self._businessLogic()
             page = roomBooking_wp.WPRoomBookingMapOfRoomsWidget(self, self._aspects, self._buildings, self._defaultLocation, self._forVideoConference, self._roomID)
             html = page.display()
-            self._cache.set(params, html, 300)
+            self._cache.set(key, html, 300)
         return html
 
 # 2. List of ...
