@@ -17,24 +17,23 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from persistent import Persistent
+
 from MaKaC.common import log
 from MaKaC.plugins import Observable
-from persistent import Persistent
-from datetime import timedelta, datetime
 from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.user import Avatar
-from MaKaC.negotiations import Negotiator
 from MaKaC.webinterface.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common import utils
-import MaKaC.common.info as info
 from MaKaC.i18n import _
-from MaKaC.common import log
 from MaKaC.common.Configuration import Config
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.participant import IParticipantMinimalFossil
+
 from indico.util.contextManager import ContextManager
+
 
 class Participation(Persistent, Observable):
 
@@ -716,15 +715,15 @@ on behalf of %s %s
 
 #---------------------------------------------------------------------------------
 
-class Participant (Persistent, Negotiator, Fossilizable):
+
+class Participant(Persistent, Fossilizable):
     """
         Class collecting data about person taking part in meeting / lecture
     """
     fossilizes(IParticipantMinimalFossil)
 
     def __init__(self, conference, avatar=None):
-        Negotiator(avatar)
-        if avatar is not None :
+        if avatar is not None:
             self._id = None
             self._avatar = avatar
             self._firstName = avatar.getFirstName()
@@ -743,8 +742,7 @@ class Participant (Persistent, Negotiator, Fossilizable):
             self._participation = None
             if conference is not None :
                 self._participation = conference.getParticipation()
-        else :
-            Negotiator(None)
+        else:
             self._id = None
             self._avatar = None
             self._firstName = ""
@@ -817,9 +815,6 @@ class Participant (Persistent, Negotiator, Fossilizable):
 
     def getName(self):
         return "%s %s"%(self.getFirstName(),self.getFamilyName())
-
-    def getNegotiatorInfo(self):
-        return "%s %s %s"%(self._firstName,self._familyName,self._email)
 
     def getAddress(self):
         return self._address
