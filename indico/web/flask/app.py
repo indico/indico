@@ -113,6 +113,7 @@ def make_app():
     configure_app(app)
     extend_url_map(app)
     add_handlers(app)
-    create_modpython_rules(app)
+    create_modpython_rules(app, 'htdocs')
+    create_modpython_rules(app, 'htdocs/scripts', '/scripts')
     create_plugin_rules(app)
     return app

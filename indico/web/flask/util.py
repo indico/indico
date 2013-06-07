@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import glob
 import os
+import posixpath
 import re
 import time
 
@@ -62,13 +63,13 @@ def create_flask_mp_wrapper(func):
     return wrapper
 
 
-def create_modpython_rules(app):
-    for path in sorted(glob.iglob(os.path.join(app.root_path, 'htdocs/*.py'))):
+def create_modpython_rules(app, folder, rule_folder='/'):
+    for path in sorted(glob.iglob(os.path.join(app.root_path, folder, '*.py'))):
         name = os.path.basename(path)
         module_globals = {}
         execfile(path, module_globals)
         functions = filter(lambda x: callable(x[1]), module_globals.iteritems())
-        base_url = '/' + name
+        base_url = posixpath.join(rule_folder, name)
         for func_name, func in functions:
             rule = base_url if func_name == 'index' else base_url + '/' + func_name
             endpoint = 'mp-%s-%s' % (re.sub(r'\.py$', '', name), func_name)
