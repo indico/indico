@@ -62,6 +62,7 @@ from MaKaC.common.cache import EventCache
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
+from indico.util.decorators import cached_classproperty
 import MaKaC.webcast as webcast
 
 from MaKaC.common.fossilize import fossilize
@@ -870,26 +871,30 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._overviewOpt)
 
-class WPTPLConferenceDisplay(WPXSLConferenceDisplay):
+class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
     """Overrides XSL related functions in WPXSLConferenceDisplay
     class and re-implements them using normal Indico templates.
     """
-    _ImagesBaseURL = Config.getInstance().getImagesBaseURL()
-    _Types = {
-        "pdf"   :{"mapsTo" : "pdf",   "imgURL" : os.path.join(_ImagesBaseURL, "pdf_small.png"),  "imgAlt" : "pdf file"},
-        "doc"   :{"mapsTo" : "doc",   "imgURL" : os.path.join(_ImagesBaseURL, "word.png"),       "imgAlt" : "word file"},
-        "docx"  :{"mapsTo" : "doc",   "imgURL" : os.path.join(_ImagesBaseURL, "word.png"),       "imgAlt" : "word file"},
-        "ppt"   :{"mapsTo" : "ppt",   "imgURL" : os.path.join(_ImagesBaseURL, "powerpoint.png"), "imgAlt" : "powerpoint file"},
-        "pptx"  :{"mapsTo" : "ppt",   "imgURL" : os.path.join(_ImagesBaseURL, "powerpoint.png"), "imgAlt" : "powerpoint file"},
-        "sxi"   :{"mapsTo" : "odp",   "imgURL" : os.path.join(_ImagesBaseURL, "impress.png"),    "imgAlt" : "presentation file"},
-        "odp"   :{"mapsTo" : "odp",   "imgURL" : os.path.join(_ImagesBaseURL, "impress.png"),    "imgAlt" : "presentation file"},
-        "sxw"   :{"mapsTo" : "odt",   "imgURL" : os.path.join(_ImagesBaseURL, "writer.png"),     "imgAlt" : "writer file"},
-        "odt"   :{"mapsTo" : "odt",   "imgURL" : os.path.join(_ImagesBaseURL, "writer.png"),     "imgAlt" : "writer file"},
-        "sxc"   :{"mapsTo" : "ods",   "imgURL" : os.path.join(_ImagesBaseURL, "calc.png"),       "imgAlt" : "spreadsheet file"},
-        "ods"   :{"mapsTo" : "ods",   "imgURL" : os.path.join(_ImagesBaseURL, "calc.png"),       "imgAlt" : "spreadsheet file"},
-        "other" :{"mapsTo" : "other", "imgURL" : os.path.join(_ImagesBaseURL, "file_small.png"), "imgAlt" : "unknown type file"},
-        "link"  :{"mapsTo" : "link",  "imgURL" : os.path.join(_ImagesBaseURL, "link.png"),       "imgAlt" : "link"}
-    }
+
+    @cached_classproperty
+    @classmethod
+    def _Types(cls):
+        _ImagesBaseURL = Config.getInstance().getImagesBaseURL()
+        return {
+            "pdf": {"mapsTo": "pdf", "imgURL": os.path.join(_ImagesBaseURL, "pdf_small.png"), "imgAlt": "pdf file"},
+            "doc": {"mapsTo": "doc", "imgURL": os.path.join(_ImagesBaseURL, "word.png"), "imgAlt": "word file"},
+            "docx": {"mapsTo": "doc", "imgURL": os.path.join(_ImagesBaseURL, "word.png"), "imgAlt": "word file"},
+            "ppt": {"mapsTo": "ppt", "imgURL": os.path.join(_ImagesBaseURL, "powerpoint.png"), "imgAlt": "powerpoint file"},
+            "pptx": {"mapsTo": "ppt", "imgURL": os.path.join(_ImagesBaseURL, "powerpoint.png"), "imgAlt": "powerpoint file"},
+            "sxi": {"mapsTo": "odp", "imgURL": os.path.join(_ImagesBaseURL, "impress.png"), "imgAlt": "presentation file"},
+            "odp": {"mapsTo": "odp", "imgURL": os.path.join(_ImagesBaseURL, "impress.png"), "imgAlt": "presentation file"},
+            "sxw": {"mapsTo": "odt", "imgURL": os.path.join(_ImagesBaseURL, "writer.png"), "imgAlt": "writer file"},
+            "odt": {"mapsTo": "odt", "imgURL": os.path.join(_ImagesBaseURL, "writer.png"), "imgAlt": "writer file"},
+            "sxc": {"mapsTo": "ods", "imgURL": os.path.join(_ImagesBaseURL, "calc.png"), "imgAlt": "spreadsheet file"},
+            "ods": {"mapsTo": "ods", "imgURL": os.path.join(_ImagesBaseURL, "calc.png"), "imgAlt": "spreadsheet file"},
+            "other": {"mapsTo": "other", "imgURL": os.path.join(_ImagesBaseURL, "file_small.png"), "imgAlt": "unknown type file"},
+            "link": {"mapsTo": "link", "imgURL": os.path.join(_ImagesBaseURL, "link.png"), "imgAlt": "link"}
+        }
 
     def __init__( self, rh, conference, view, type, params ):
         WPXSLConferenceDisplay.__init__( self, rh, conference, view, type, params )

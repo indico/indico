@@ -22,7 +22,6 @@ import argparse
 import errno
 import urlparse
 import os
-import re
 import signal
 import socket
 import sys
@@ -51,6 +50,8 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
+from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
+
 
 try:
     HAS_IPYTHON = True
@@ -319,6 +320,8 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
         config._configVars['BaseURL'] = base_url
         config._configVars['BaseSecureURL'] = ''
     config._deriveOptions()
+    # Regenerate JSVars to account for the updated URLs
+    RHGetVarsJs.removeTmpVarsFile()
 
     console.info(' * Using BaseURL {0}'.format(base_url))
     app = make_indico_dispatcher(make_app())
