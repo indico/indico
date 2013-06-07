@@ -16,10 +16,10 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-import os
+
 import csv
 import tempfile
-import stat
+from cStringIO import StringIO
 from datetime import datetime, timedelta
 from flask import request
 
@@ -32,12 +32,8 @@ from MaKaC.common.Configuration import Config
 from MaKaC.domain import DomainHolder
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 from MaKaC.common.utils import parseDate
-from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+from indico.web.flask.util import send_file
 
-
-"""
-TODO: This must be refactor to be done with RH???
-"""
 
 def index(req, **params):
 
@@ -96,19 +92,17 @@ def index(req, **params):
 
     of = params.get("of", "csv")
     if of == "xml":
-        result = createXML(collisions, req)
+        response = createXML(collisions)
     else:
-        result = createCSV(collisions, req)
+        response = createCSV(collisions)
 
     Factory.getDALManager().disconnect()
     DBMgr.getInstance().endRequest()
 
-    return result
+    return response
 
 
-def createXML(resvs, req):
-
-    req.content_type="text/xml"
+def createXML(resvs):
 
     xml = XMLGen()
 
@@ -125,11 +119,11 @@ def createXML(resvs, req):
 
     xml.closeTag("bookings")
 
-    return xml.getXml()
+    return send_file('Bookings.xml', StringIO(xml.getXml()), 'XML', inline=True)
 
 
 
-def createCSV(resvs, req):
+def createCSV(resvs):
 
     results=[['URL',
              'id',
@@ -173,19 +167,10 @@ def createCSV(resvs, req):
     tempFileName = tempfile.mkstemp( prefix="Bookings", suffix=".csv", dir = tempPath )[1]
 
     #################### write the results in the temp file ###################
-    fd=open(tempFileName, 'w')
-    writer = csv.writer(fd, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    for i in results:
-        writer.writerow(i)
-    fd.close()
+    with open(tempFileName, 'w') as fd:
+        writer = csv.writer(fd, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for i in results:
+            writer.writerow(i)
 
     #################### return the CSV file ###################
-    req.headers_out["Content-Length"] = "%s"%int(os.stat(tempFileName)[stat.ST_SIZE])
-    mimetype = cfg.getFileTypeMimeType( cfg.getFileType("CSV") )
-    req.content_type = """%s"""%(mimetype)
-    req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%cleanHTMLHeaderFilename(os.path.basename(tempFileName))
-
-    fr = open(tempFileName, "rb")
-    data = fr.read()
-    fr.close()
-    return data
+    return send_file('Bookings.csv', tempFileName, 'CSV', inline=True)
