@@ -92,7 +92,7 @@ class RHEvaluationSetupSpecialAction( RHEvaluationBase ):
         from MaKaC.common.xmlGen import XMLGen
         xmlGen = XMLGen()
         evaluation.exportXml(xmlGen)
-        return send_file(Evaluation._XML_FILENAME, StringIO(xmlGen.getXml()), 'XML')
+        return send_file(Evaluation._XML_FILENAME, StringIO(xmlGen.getXml()), 'XML', inline=False)
 
     def _importedXml(self, evaluation, params):
         """ Importation of an evaluation.
@@ -481,7 +481,7 @@ class RHEvaluationResultsOptions(RHEvaluationBase):
                                     excelGen.addValue(utils.putbackQuotes(ci))
                                 else :
                                     excelGen.addValue("")
-            return send_file(Evaluation._CSV_FILENAME, StringIO(excelGen.getExcelContent()), 'CSV', inline=True)
+            return send_file(Evaluation._CSV_FILENAME, StringIO(excelGen.getExcelContent()), 'CSV')
 
         ########
         #remove#

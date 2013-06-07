@@ -385,7 +385,7 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
         tz = timezoneUtils.DisplayTZ(self._aw, self._conf).getDisplayTZ()
         filename = '%s - Abstract.pdf' % self._target.getTitle()
         pdf = AbstractToPDF(self._conf, self._target, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHUserAbstractsPDF(RHAbstractSubmissionBase):
@@ -400,7 +400,7 @@ class RHUserAbstractsPDF(RHAbstractSubmissionBase):
             return _("No abstract to print")
 
         pdf = AbstractsToPDF(self._conf, self._abstractIds, tz=tz)
-        return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHAbstractModificationBase( RHAbstractDisplayBase, RHModificationBaseProtected ):

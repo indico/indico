@@ -112,7 +112,7 @@ def shorturl_handler(what, tag):
         return RHShortURLRedirect(None).process({'tag': tag})
 
 
-def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=False, conditional=False):
+def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=True, conditional=False):
     # Note: path can also be a StringIO!
     if request.user_agent.platform == 'android':
         # Android is just full of fail when it comes to inline content-disposition...

@@ -527,7 +527,7 @@ class RHCategoryGetIcon(RHCategDisplayBase):
 
     def _process(self):
         icon = self._target.getIcon()
-        return send_file(icon.getFileName(), icon.getFilePath(), icon.getFileType(), inline=True)
+        return send_file(icon.getFileName(), icon.getFilePath(), icon.getFileType())
 
 
 class RHCategoryToiCal(RoomBookingDBMixin, RHCategDisplayBase):
@@ -540,7 +540,7 @@ class RHCategoryToiCal(RoomBookingDBMixin, RHCategDisplayBase):
         resultFossil = {'results': res[0]}
 
         serializer = Serializer.create('ics')
-        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL', inline=True)
+        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL')
 
 
 class RHCategoryToRSS(RHCategDisplayBase):
@@ -562,7 +562,7 @@ class RHCategoryToAtom(RoomBookingDBMixin, RHCategDisplayBase):
         res = hook(self.getAW())
         resultFossil = {'results': res[0], 'url': str(self._uh.getURL(self._target))}
         serializer = Serializer.create('atom')
-        return send_file(filename, StringIO(serializer(resultFossil)), 'ATOM', inline=True)
+        return send_file(filename, StringIO(serializer(resultFossil)), 'ATOM')
 
 
 def sortByStartDate(conf1,conf2):

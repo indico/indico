@@ -93,7 +93,7 @@ class RHContributionToXML(RHContributionDisplay):
                 data = "Cannot parse stylesheet: %s" % sys.exc_info()[0]
         else:
             data = basexml
-        return send_file(filename, StringIO(data), 'XML', inline=True)
+        return send_file(filename, StringIO(data), 'XML')
 
 
 class RHContributionToPDF(RHContributionDisplay):
@@ -102,7 +102,7 @@ class RHContributionToPDF(RHContributionDisplay):
         tz = timezoneUtils.DisplayTZ(self._aw,self._target.getConference()).getDisplayTZ()
         filename = "%s - Contribution.pdf"%self._target.getTitle()
         pdf = ContribToPDF(self._target.getConference(), self._target, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHContributionToiCal(RoomBookingDBMixin, RHContributionDisplay):
@@ -119,7 +119,7 @@ class RHContributionToiCal(RoomBookingDBMixin, RHContributionDisplay):
         resultFossil = {'results': res[0]}
 
         serializer = Serializer.create('ics')
-        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL', inline=True)
+        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL')
 
 
 class RHContributionToMarcXML(RHContributionDisplay):
@@ -134,7 +134,7 @@ class RHContributionToMarcXML(RHContributionDisplay):
         xmlgen.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
         outgen.contribToXMLMarc21(self._target, xmlgen)
         xmlgen.closeTag("marc:record")
-        return send_file(filename, StringIO(xmlgen.getXml()), 'XML', inline=True)
+        return send_file(filename, StringIO(xmlgen.getXml()), 'XML')
 
 
 class RHContributionMaterialSubmissionRightsBase(RHContributionDisplay):

@@ -119,7 +119,7 @@ def createXML(resvs):
 
     xml.closeTag("bookings")
 
-    return send_file('Bookings.xml', StringIO(xml.getXml()), 'XML', inline=True)
+    return send_file('Bookings.xml', StringIO(xml.getXml()), 'XML')
 
 
 
@@ -173,4 +173,4 @@ def createCSV(resvs):
             writer.writerow(i)
 
     #################### return the CSV file ###################
-    return send_file('Bookings.csv', tempFileName, 'CSV', inline=True)
+    return send_file('Bookings.csv', tempFileName, 'CSV')

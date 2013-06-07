@@ -687,7 +687,7 @@ class RHConfModifParticipantsAction(RHConfModifParticipants):
                 participant = self._conf.getParticipation().getParticipantById(id)
                 toList.append(participant)
         excel = ParticipantsListToExcel(self._conf, list=toList)
-        return send_file('ParticipantList.csv', StringIO(excel.getExcelFile()), 'CSV', inline=True)
+        return send_file('ParticipantList.csv', StringIO(excel.getExcelFile()), 'CSV')
 
 
 class RHConfModifParticipantsStatistics(RHConferenceModifBase):
@@ -2100,7 +2100,7 @@ class RHAbstractsToPDF(RHConfModifCFABase):
         if not self._abstractIds:
             return _("No abstract to print")
         pdf = ConfManagerAbstractsToPDF(self._conf, self._abstractIds, tz=tz)
-        return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHAbstractsToXML(RHConfModifCFABase):
@@ -2170,7 +2170,7 @@ class RHAbstractsToXML(RHConfModifCFABase):
 
         x.closeTag("AbstractBook")
 
-        return send_file('Abstracts.pdf', StringIO(x.getXml()), 'XML', inline=True)
+        return send_file('Abstracts.pdf', StringIO(x.getXml()), 'XML')
 
 
 #-------------------------------------------------------------------------------------
@@ -2188,7 +2188,7 @@ class RHAbstractsListToExcel(RHConfModifCFABase):
             abstractList.append(self._conf.getAbstractMgr().getAbstractById(abs_id))
 
         generator = AbstractListToExcel(self._conf,abstractList, self._display)
-        return send_file('AbstractList.csv', StringIO(generator.getExcelFile()), 'CSV', inline=True)
+        return send_file('AbstractList.csv', StringIO(generator.getExcelFile()), 'CSV')
 
 
 #-------------------------------------------------------------------------------------
@@ -3281,13 +3281,13 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
             tz = self._target.getTimezone()
             filename = "%s - Book of abstracts.pdf"%self._target.getTitle()
             pdf = ContributionBook(self._target, self._contribs, self.getAW(),tz=tz)
-            return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+            return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
         elif self._displayType == "bookOfAbstractBoardNo":
             tz = self._target.getTimezone()
             filename = "%s - Book of abstracts.pdf"%self._target.getTitle()
             pdf = ContributionBook(self._target, self._contribs, self.getAW(),tz=tz, sortedBy="boardNo")
-            return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+            return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
         elif self._displayType == "ContributionList":
             tz = self._conf.getTimezone()
@@ -3295,7 +3295,7 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
             if not self._contribs:
                 return "No contributions to print"
             pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-            return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+            return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHContribsToPDF(RHConferenceModifBase):
@@ -3313,7 +3313,7 @@ class RHContribsToPDF(RHConferenceModifBase):
         if not self._contribs:
             return "No contributions to print"
         pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHContribsToExcel(RHConferenceModifBase):
@@ -3331,7 +3331,7 @@ class RHContribsToExcel(RHConferenceModifBase):
         if not self._contribs:
             return "No contributions to print"
         excel = ContributionsListToExcel(self._conf, self._contribs, tz=tz)
-        return send_file(filename, StringIO(excel.getExcelFile()), 'CSV', inline=True)
+        return send_file(filename, StringIO(excel.getExcelFile()), 'CSV')
 
 
 class RHContribsToXML(RHConferenceModifBase):
@@ -3347,7 +3347,7 @@ class RHContribsToXML(RHConferenceModifBase):
         from MaKaC.common.fossilize import fossilize
         resultFossil = fossilize(self._contribs)
         serializer = Serializer.create('xml')
-        return send_file(filename, StringIO(serializer(resultFossil)), 'XML', inline=True)
+        return send_file(filename, StringIO(serializer(resultFossil)), 'XML')
 
 
 class RHContribsParticipantList(RHConferenceModifBase):
@@ -3486,7 +3486,7 @@ class RHMaterialPackageAbstract(RHConferenceModifBase):
             return FormValuesError(_("No abstract selected"))
         p = AbstractPacker(self._conf)
         path = p.pack(self._abstracts, ZIPFileHandler())
-        return send_file('abstractFiles.zip', path, 'ZIP')
+        return send_file('abstractFiles.zip', path, 'ZIP', inline=False)
 
 
 class RHMaterialPackage(RHConferenceModifBase):
@@ -3503,14 +3503,14 @@ class RHMaterialPackage(RHConferenceModifBase):
             return "No contribution selected"
         p=ContribPacker(self._conf)
         path=p.pack(self._contribs,["paper","slides"], ZIPFileHandler())
-        return send_file('material.zip', path, 'ZIP')
+        return send_file('material.zip', path, 'ZIP', inline=False)
 
 class RHProceedings(RHConferenceModifBase):
 
     def _process( self ):
         p=ProceedingsPacker(self._conf)
         path=p.pack(ZIPFileHandler())
-        return send_file('proceedings.zip', path, 'ZIP')
+        return send_file('proceedings.zip', path, 'ZIP', inline=False)
 
 
 class RHAbstractBook( RHConfModifCFABase ):
@@ -3593,7 +3593,7 @@ class RHFullMaterialPackagePerform(RHConferenceModifBase):
                 path=p.pack(self._materialTypes, self._days, self._mainResource, self._fromDate, ZIPFileHandler(),self._sessionList)
                 if not p.getItems():
                     raise NoReportError(_("The selected package does not contain any items."))
-                return send_file('full-material.zip', path, 'ZIP')
+                return send_file('full-material.zip', path, 'ZIP', inline=False)
             raise NoReportError(_("You have to select at least one material type"))
         else:
             self._redirect( urlHandlers.UHConfModifTools.getURL( self._conf ) )
@@ -4686,7 +4686,7 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
                                              self.__pagesize,
                                              self.__drawDashedRectangles,
                                              self.__registrantList)
-            return send_file('Badges.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+            return send_file('Badges.pdf', StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHConfBadgeSaveTempBackground(RHConfBadgeBase):
@@ -4759,10 +4759,10 @@ class RHConfBadgeGetBackground(RHConfBadgeBase):
 
     def __imageBin(self, image):
         mimetype = image.getFileType() or 'application/octet-stream'
-        return send_file(image.getFileName(), image.getFilePath(), mimetype, inline=True)
+        return send_file(image.getFileName(), image.getFilePath(), mimetype)
 
     def __fileBin(self, filePath):
-        return send_file('tempBackground', filePath, 'application/octet-stream', inline=True)
+        return send_file('tempBackground', filePath, 'application/octet-stream')
 
     def _process(self):
         if self._target.isClosed():
@@ -4926,7 +4926,7 @@ class RHConfPosterPrintingPDF(RHConferenceModifBase):
                                              self.__marginV,
                                              self.__pagesize)
 
-            return send_file('Poster.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+            return send_file('Poster.pdf', StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHConfPosterSaveTempBackground(RHConferenceModifBase):
@@ -5008,10 +5008,10 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
 
     def __imageBin(self, image):
         mimetype = image.getFileType() or 'application/octet-stream'
-        return send_file(image.getFileName(), image.getFilePath(), mimetype, inline=True)
+        return send_file(image.getFileName(), image.getFilePath(), mimetype)
 
     def __fileBin(self, filePath):
-        return send_file('tempBackground', filePath, mimetype='application/octet-stream', inline=True)
+        return send_file('tempBackground', filePath, mimetype='application/octet-stream')
 
     def _process(self):
 

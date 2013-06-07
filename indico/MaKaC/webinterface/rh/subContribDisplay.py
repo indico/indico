@@ -59,4 +59,4 @@ class RHSubContributionToMarcXML(RHSubContributionDisplayBase):
         xmlgen.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
         outgen.subContribToXMLMarc21(self._subContrib, xmlgen)
         xmlgen.closeTag("marc:record")
-        return send_file(filename, StringIO(xmlgen.getXml()), 'XML', inline=True)
+        return send_file(filename, StringIO(xmlgen.getXml()), 'XML')

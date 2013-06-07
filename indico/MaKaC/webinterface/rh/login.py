@@ -130,7 +130,7 @@ class RHLogoutSSOHook( base.RH):
             session.clear()
             self._setUser(None)
         path = os.path.join(Configuration.Config.getInstance().getImagesDir(), 'wsignout.gif')
-        return send_file('wsignout.gif', path, 'GIF', inline=True)
+        return send_file('wsignout.gif', path, 'GIF')
 
 
 class RHActive( base.RH ):

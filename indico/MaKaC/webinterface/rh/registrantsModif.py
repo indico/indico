@@ -378,7 +378,7 @@ class RHRegistrantBookPDF:
 
     def pdf(self):
         pdf = RegistrantsListToBookPDF(self._conf, list=self._list, display=self._display)
-        return send_file('RegistrantsBook.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file('RegistrantsBook.pdf', StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHRegistrantListPDF:
@@ -394,7 +394,7 @@ class RHRegistrantListPDF:
             data = pdf.getPDFBin()
         except:
             raise FormValuesError( _("""Text too large to generate a PDF with "Table Style". Please try again generating with "Book Style"."""))
-        return send_file('RegistrantsList.pdf', StringIO(data), 'PDF', inline=True)
+        return send_file('RegistrantsList.pdf', StringIO(data), 'PDF')
 
 
 class RHRegistrantListExcel:
@@ -408,7 +408,7 @@ class RHRegistrantListExcel:
     def excel(self):
         excel = RegistrantsListToExcel(self._conf, list=self._list, display=self._display,
                                        excelSpecific=self._excelSpecific)
-        return send_file('RegistrantsList.csv', StringIO(excel.getExcelFile()), 'CSV', inline=True)
+        return send_file('RegistrantsList.csv', StringIO(excel.getExcelFile()), 'CSV')
 
 
 class RHRegistrantListEmail:
@@ -498,7 +498,7 @@ class RHRegistrantPackage:
         from MaKaC.common.contribPacker import ZIPFileHandler, RegistrantPacker
         p = RegistrantPacker(self._conf)
         path = p.pack(self._list, ZIPFileHandler())
-        return send_file('registrants.zip', path, 'ZIP')
+        return send_file('registrants.zip', path, 'ZIP', inline=False)
 
 
 class RHRegistrantPerformDataModification( RHRegistrantModifBase ):

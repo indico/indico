@@ -60,7 +60,7 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
             return p.display()
         else:
             return send_file(self._file.getFileName(), self._file.getFilePath(), self._file.getFileType(),
-                             self._file.getCreationDate(), inline=True)
+                             self._file.getCreationDate())
 
 
 class RHFileAccessStoreAccessKey(RHFileBase):

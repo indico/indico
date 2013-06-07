@@ -129,7 +129,7 @@ class RHAbstractToPDF(RHAbstractModifBase):
         tz = self._conf.getTimezone()
         filename = "%s - Abstract.pdf" % self._target.getTitle()
         pdf = ConfManagerAbstractToPDF(self._conf, self._target, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHAbstractToXML(RHAbstractModifBase):
@@ -188,7 +188,7 @@ class RHAbstractToXML(RHAbstractModifBase):
 
         x.closeTag("abstract")
 
-        return send_file(filename, StringIO(x.getXml()), 'XML', inline=True)
+        return send_file(filename, StringIO(x.getXml()), 'XML')
 
 
 class _AbstractWrapper:

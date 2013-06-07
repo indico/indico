@@ -54,7 +54,7 @@ class RHTemplateContentJS(base.RH):
         if not os.access(self._cacheFile, os.R_OK):
             raise MaKaCError('Could not generate JSVars')
 
-        return send_file('vars.js', self._cacheFile, mimetype='application/x-javascript', no_cache=False, inline=True,
+        return send_file('vars.js', self._cacheFile, mimetype='application/x-javascript', no_cache=False,
                          conditional=True)
 
     def _process(self):

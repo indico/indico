@@ -774,7 +774,7 @@ class RHContribsToPDF(RHSessionModUnrestrictedContribMngCoordBase):
         if not self._contribs:
             return "No contributions to print"
         pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-        return send_file('Contributions.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file('Contributions.pdf', StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHContribQuickAccess(RHSessionModCoordinationBase):

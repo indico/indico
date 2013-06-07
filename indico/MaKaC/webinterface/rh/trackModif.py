@@ -575,7 +575,7 @@ class RHAbstractToPDF(RHTrackAbstractBase):
         tz = self._conf.getTimezone()
         filename = "%s - Abstract.pdf" % self._target.getTitle()
         pdf = TrackManagerAbstractToPDF(self._conf, self._abstract, self._track, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHAbstractsActions:
@@ -689,7 +689,7 @@ class RHAbstractsToPDF(RHTrackAbstractsBase):
         if not self._abstractIds:
             return "No abstract to print"
         pdf = TrackManagerAbstractsToPDF(self._conf, self._track, self._abstractIds,tz=tz)
-        return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHAbstractIntComments( RHTrackAbstractBase ):
@@ -919,7 +919,7 @@ class RHContribsToPDF(RHTrackAbstractsBase):
         if not self._contribs:
             return "No contributions to print"
         pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-        return send_file('Contributions.pdf', StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file('Contributions.pdf', StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHContribsParticipantList(RHTrackAbstractsBase):

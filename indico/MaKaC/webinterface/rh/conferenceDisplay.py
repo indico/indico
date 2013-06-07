@@ -498,8 +498,7 @@ class RHConferenceGetLogo(RHConferenceBaseDisplay):
         logo = self._target.getLogo()
         if not logo:
             raise MaKaCError(_("This event does not have a logo"))
-        return send_file(logo.getFileName(), logo.getFilePath(), logo.getFileType(), inline=True, no_cache=False,
-                         conditional=True)
+        return send_file(logo.getFileName(), logo.getFilePath(), logo.getFileType(), no_cache=False, conditional=True)
 
 
 class RHConferenceGetCSS(RHConferenceBaseDisplay):
@@ -512,8 +511,7 @@ class RHConferenceGetCSS(RHConferenceBaseDisplay):
         sm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getStyleManager()
         css = sm.getLocalCSS()
         if css:
-            return send_file(css.getFileName(), css.getFilePath(), mimetype='text/css', inline=True, no_cache=False,
-                             conditional=True)
+            return send_file(css.getFileName(), css.getFilePath(), mimetype='text/css', no_cache=False, conditional=True)
         return ""
 
 
@@ -527,7 +525,7 @@ class RHConferenceGetPic(RHConferenceBaseDisplay):
         im = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getImagesManager()
         if im.getPic(self._picId):
             pic = im.getPic(self._picId).getLocalFile()
-            return send_file(pic.getFileName(), pic.getFilePath(), pic.getFileType(), inline=True)
+            return send_file(pic.getFileName(), pic.getFilePath(), pic.getFileType())
         else:
             self._responseUtil.status = 404
             return WPError404(self, urlHandlers.UHConferenceDisplay.getURL(self._conf)).display()
@@ -616,7 +614,7 @@ class RHConferenceProgramPDF(RHConferenceBaseDisplay):
         filename = "%s - Programme.pdf" % self._target.getTitle()
         from MaKaC.PDFinterface.conference import ProgrammeToPDF
         pdf = ProgrammeToPDF(self._target, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 class RHConferenceTimeTable( RoomBookingDBMixin, RHConferenceBaseDisplay ):
     _uh = urlHandlers.UHConferenceTimeTable
@@ -729,7 +727,7 @@ class RHTimeTablePDF(RHConferenceTimeTable):
     ##                    tries = 0
     ##                    raise MaKaCError(str(e))
 
-            return send_file(filename, StringIO(data), 'PDF', inline=True)
+            return send_file(filename, StringIO(data), 'PDF')
 
 class RHTimeTableCustomizePDF(RHConferenceTimeTable):
 
@@ -903,7 +901,7 @@ class RHContributionListToPDF(RHConferenceBaseDisplay):
             return "No contributions to print"
         from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
         pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHAbstractBook(RHConferenceBaseDisplay):
@@ -934,14 +932,14 @@ class RHAbstractBook(RHConferenceBaseDisplay):
             mtime = None
 
         if boaConfig.isCacheEnabled() and not self._noCache and mtime and mtime > boaConfig.lastChanged:
-            return send_file(pdfFilename, cacheFile, 'PDF', inline=True)
+            return send_file(pdfFilename, cacheFile, 'PDF')
         else:
             tz = timezoneUtils.DisplayTZ(self._aw,self._target).getDisplayTZ()
             pdf = AbstractBook(self._target,self.getAW(), tz=tz)
             data = pdf.getPDFBin()
             with open(cacheFile, 'wb') as f:
                 f.write(data)
-            return send_file(pdfFilename, cacheFile, 'PDF', inline=True)
+            return send_file(pdfFilename, cacheFile, 'PDF')
 
 
 class RHConfParticipantsRefusal(RHConferenceBaseDisplay):
@@ -1007,7 +1005,7 @@ class RHConferenceToiCal(RoomBookingDBMixin, RHConferenceBaseDisplay):
         resultFossil = {'results': res[0]}
 
         serializer = Serializer.create('ics')
-        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL', inline=True)
+        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL')
 
 
 class RHConferenceToXML(RoomBookingDBMixin, RHConferenceBaseDisplay):
@@ -1026,7 +1024,7 @@ class RHConferenceToXML(RoomBookingDBMixin, RHConferenceBaseDisplay):
         xmlgen.openTag("event")
         outgen.confToXML(self._target.getConference(),0,0,1)
         xmlgen.closeTag("event")
-        return send_file(filename, StringIO(xmlgen.getXml()), 'XML', inline=True)
+        return send_file(filename, StringIO(xmlgen.getXml()), 'XML')
 
 
 class RHConferenceToMarcXML(RHConferenceBaseDisplay):
@@ -1041,7 +1039,7 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
         xmlgen.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
         outgen.confToXMLMarc21(self._target.getConference())
         xmlgen.closeTag("marc:record")
-        return send_file(filename, StringIO(xmlgen.getXml()), 'XML', inline=True)
+        return send_file(filename, StringIO(xmlgen.getXml()), 'XML')
 
 
 class RHInternalPageDisplay(RHConferenceBaseDisplay):
@@ -1112,7 +1110,7 @@ class RHConferenceLatexPackage(RHConferenceBaseDisplay):
         zip.close()
         zipdata.seek(0)
 
-        return send_file(filename, zipdata, 'ZIP')
+        return send_file(filename, zipdata, 'ZIP', inline=False)
 
 
 class RHFullMaterialPackage(RHConferenceBaseDisplay):
@@ -1158,7 +1156,7 @@ class RHFullMaterialPackagePerform(RHConferenceBaseDisplay):
                 path = p.pack(self._materialTypes, self._days, self._mainResource, self._fromDate, ZIPFileHandler(), self._sessionList)
                 if not p.getItems():
                     raise NoReportError(_("The selected package does not contain any items."))
-                return send_file('full-material.zip', path, 'ZIP')
+                return send_file('full-material.zip', path, 'ZIP', inline=False)
             else:
                 raise NoReportError(
                     _("You have to select at least one material type"))

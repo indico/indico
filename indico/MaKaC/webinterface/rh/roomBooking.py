@@ -2349,7 +2349,7 @@ class RHRoomBookingSendRoomPhoto( RHRoomBookingBase ):
         filePath = cfg.getRoomPhotosDir()
         if self.small:
             filePath = cfg.getRoomSmallPhotosDir()
-        return send_file(self.fileName, os.path.join(filePath, self.fileName), 'JPG', inline=True)
+        return send_file(self.fileName, os.path.join(filePath, self.fileName), 'JPG')
 
 
 class RHRoomBookingGetRoomSelectList( RHRoomBookingBase ):

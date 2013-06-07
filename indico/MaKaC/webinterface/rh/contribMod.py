@@ -761,7 +761,7 @@ class RHContributionToXML(RHContributionModification):
 
         x.closeTag("contribution")
 
-        return send_file(filename, StringIO(x.getXml()), 'XML', inline=True)
+        return send_file(filename, StringIO(x.getXml()), 'XML')
 
 
 class RHContributionToPDF(RHContributionModification):
@@ -771,7 +771,7 @@ class RHContributionToPDF(RHContributionModification):
         tz = self._target.getConference().getTimezone()
         filename = "%s - Contribution.pdf"%self._target.getTitle()
         pdf = ConfManagerContribToPDF(self._target.getConference(), self._target, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF', inline=True)
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):

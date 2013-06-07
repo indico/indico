@@ -63,7 +63,7 @@ class RHSessionToiCal(RoomBookingDBMixin, RHSessionDisplay):
         resultFossil = {'results': res[0]}
 
         serializer = Serializer.create('ics')
-        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL', inline=True)
+        return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL')
 
 
 class RHSessionDisplayRemoveMaterial( RHSessionDisplay ):

@@ -286,7 +286,7 @@ class RHDownloadTemplate(RHConferenceBaseDisplay):
 
     def _process(self):
         template = self._target.getConfPaperReview().getTemplates()[self._templateId].getFile()
-        return send_file(template.getFileName(), template.getFilePath(), template.getFileType(), inline=True)
+        return send_file(template.getFileName(), template.getFilePath(), template.getFileType())
 
 class RHDeleteTemplate(RHConfModifReviewingPRMBase):
 

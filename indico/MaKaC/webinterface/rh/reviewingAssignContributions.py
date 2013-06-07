@@ -49,4 +49,4 @@ class RHDownloadAcceptedPapers(RHConferenceModifBase):
     def _process(self):
         p = ReviewingPacker(self._conf)
         path = p.pack(ZIPFileHandler())
-        return send_file('accepted-papers.zip', path, 'ZIP')
+        return send_file('accepted-papers.zip', path, 'ZIP', inline=False)
