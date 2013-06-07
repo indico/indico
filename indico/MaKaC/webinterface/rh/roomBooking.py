@@ -447,7 +447,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
             "usesAVC": c.usesAVC,
             "needsAVCSupport": c.needsAVCSupport,
             "needsAssistance": c.needsAssistance,
-            "skipConflicting": self._skipConflicting,
+            "skipConflicting": getattr(self, '_skipConflicting', False),
             "useVC": getattr(c, 'useVC', False)
         }
 
