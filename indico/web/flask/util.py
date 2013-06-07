@@ -112,16 +112,16 @@ def shorturl_handler(what, tag):
         return RHShortURLRedirect(None).process({'tag': tag})
 
 
-def send_file(name, path, ftype=None, last_modified=None, mimetype=None, no_cache=True, inline=False, conditional=False):
+def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=False, conditional=False):
     # Note: path can also be a StringIO!
     if request.user_agent.platform == 'android':
         # Android is just full of fail when it comes to inline content-disposition...
         inline = False
-    if not bool(ftype) ^ bool(mimetype):
-        raise ValueError('exactly one of mimetype and ftype are required')
-    elif ftype:
-        mimetype = Config.getInstance().getFileTypeMimeType(ftype)  # ftype is e.g. "JPG"
-    rv = _send_file(path, mimetype=mimetype, as_attachment=not inline, attachment_filename=name, conditional=conditional)
+    if mimetype.isupper() and '/' not in mimetype:
+        # Indico file type such as "JPG" or "CSV"
+        mimetype = Config.getInstance().getFileTypeMimeType(mimetype)
+    rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
+                    conditional=conditional)
     if inline:
         # send_file does not add this header if as_attachment is False
         rv.headers.add('Content-Disposition', 'inline', filename=name)

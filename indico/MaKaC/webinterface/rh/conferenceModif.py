@@ -4758,14 +4758,11 @@ class RHConfBadgeGetBackground(RHConfBadgeBase):
         self.__height = int(params.get("height","-1"))
 
     def __imageBin(self, image):
-        if image.getFileType():
-            kw = {'ftype': image.getFileType()}
-        else:
-            kw = {'mimetype': 'application/octet-stream'}
-        return send_file(image.getFileName(), image.getFilePath(), inline=True, **kw)
+        mimetype = image.getFileType() or 'application/octet-stream'
+        return send_file(image.getFileName(), image.getFilePath(), mimetype, inline=True)
 
     def __fileBin(self, filePath):
-        return send_file('tempBackground', filePath, mimetype='application/octet-stream', inline=True)
+        return send_file('tempBackground', filePath, 'application/octet-stream', inline=True)
 
     def _process(self):
         if self._target.isClosed():
@@ -5010,11 +5007,8 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
         self.__height = int(params.get("height","-1"))
 
     def __imageBin(self, image):
-        if image.getFileType():
-            kw = {'ftype': image.getFileType()}
-        else:
-            kw = {'mimetype': 'application/octet-stream'}
-        return send_file(image.getFileName(), image.getFilePath(), inline=True, **kw)
+        mimetype = image.getFileType() or 'application/octet-stream'
+        return send_file(image.getFileName(), image.getFilePath(), mimetype, inline=True)
 
     def __fileBin(self, filePath):
         return send_file('tempBackground', filePath, mimetype='application/octet-stream', inline=True)
