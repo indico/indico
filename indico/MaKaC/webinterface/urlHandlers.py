@@ -16,15 +16,19 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import re
+import string
+import urlparse
+from new import classobj
+from flask import request
+
 from MaKaC.common.url import URL
 from MaKaC.common.Configuration import Config
-import string
 import MaKaC.user as user
-from new import classobj
 from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
-from flask import request
+
 
 """
 This file contains classes representing url handlers which are objects which
@@ -125,7 +129,7 @@ def Derive(handler, relativeURL):
     return Build(handler._relativeURL + "/" + relativeURL)
 
 # Hack to allow secure Indico on non-80 ports
-def setSSLPort( url ):
+def setSSLPort(url):
     """
     Returns url with port changed to SSL one.
     If url has no port specified, it returns the same url.
@@ -133,22 +137,12 @@ def setSSLPort( url ):
     """
     # Set proper PORT for images requested via SSL
     sslURL = Config.getInstance().getLoginURL() or Config.getInstance().getBaseSecureURL()
-    try:
-        colonIx = sslURL.index( ':', 6 )     # Colon after https:// means port
-        slashIx = sslURL.index( '/', colonIx )
-        if slashIx <= colonIx:
-            slashIx = len( sslURL )
-        sslPort = sslURL[colonIx+1:slashIx]  # like "8443"
-    except ValueError:
-        sslPort = "443"
-
-    sslPort = ':' + sslPort     # like ":8443/"
+    sslPort = ':%d' % (urlparse.urlsplit(sslURL).port or 443)
 
     # If there is NO port, nothing will happen (production indico)
-    # If there IS port, it will be replaced with proper SSL one, taken from loginURL
-    import re
+    # If there IS a port, it will be replaced with proper SSL one, taken from loginURL
     regexp = ':\d{2,5}'   # Examples:   :8080   :80   :65535
-    return re.sub( regexp, sslPort, url )
+    return re.sub(regexp, sslPort, url)
 
 
 class UHWelcome( URLHandler ):
