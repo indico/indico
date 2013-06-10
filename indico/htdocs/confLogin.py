@@ -24,12 +24,6 @@ from MaKaC.webinterface.rh import conferenceDisplay
 def index(req, **params):
     return conferenceDisplay.RHConfSignIn( req ).process( params )
 
-def signIn(req, **params):
-    return conferenceDisplay.RHConfAuthenticate( req ).process( params )
-
-#def signOut(req, **params):
-#    return conferenceDisplay.RHConfSignOut( req ).process( params )
-
 def active(req, **params):
     return conferenceDisplay.RHConfActivate( req ).process( params )
 

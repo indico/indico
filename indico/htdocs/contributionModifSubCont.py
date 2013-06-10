@@ -36,9 +36,6 @@ def create(req, **params):
 def actionSubContribs(req, **params):
     return contribMod.RHSubContribActions(req).process(params)
 
-def delete(req, **params):
-    return contribMod.RHContributionDeleteSC( req ).process( params )
-
 
 def up(req, **params):
     return contribMod.RHContributionUpSC( req ).process( params )

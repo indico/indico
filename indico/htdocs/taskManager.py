@@ -21,7 +21,3 @@ import MaKaC.webinterface.rh.taskManager as taskManager
 
 def index(req, **params):
     return taskManager.RHTaskManager(req).process(params)
-
-
-def removeTask(req, **params):
-    return taskManager.RHRemoveTask(req).process(params)

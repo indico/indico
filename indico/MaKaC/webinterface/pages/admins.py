@@ -1589,58 +1589,6 @@ class WPUserPreferences( WPPersonalArea ):
     def _setActiveTab( self ):
         self._tabPreferences.setActive()
 
-### This class is not used anymore. To remove
-class WUserModify(wcomponents.WTemplated):
-
-    def __init__( self, avatar ):
-        self._avatar = avatar
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        u = self._avatar
-        t = vars.get("title", u.getTitle())
-        vars["titles"] = TitlesRegistry().getSelectItemsHTML(t)
-        vars["locator"] = u.getLocator().getWebForm()
-        vars["Wtitle"] = _("Modifying an existing user")
-        vars["name"] = vars.get("name", u.getName())
-        vars["surName"] =  vars.get("surName", u.getSurName())
-        vars["title"] = vars.get("title", u.getTitle())
-        vars["organisation"] = vars.get("organisation", u.getOrganisations()[0])
-        vars["address"] = vars.get("address", u.getAddresses()[0])
-        vars["email"] = vars.get("email", u.getEmails()[0])
-        vars["secEmails"] = self._getSecEmailHTML(vars.get("secEmails", u.getSecondaryEmails()))
-        vars["telephone"] = vars.get("telephone", u.getTelephones()[0])
-        vars["fax"] =  vars.get("fax", u.getFaxes()[0])
-
-        return vars
-
-    def _getSecEmailHTML(self, secEmails):
-        html = [ i18nformat("""<input type="text" name="secEmailAdd" value="" size="25"><input type="submit" name="addSecEmail" value="_("Add")"><br>""")]
-        emails = []
-        for email in secEmails:
-            emails.append("""<input type="hidden" name="secEmails" value="%s">
-                            <input type="checkbox" name="secEmailRemove" value="%s"> %s"""%(email, email, email))
-        html.append("<br>".join(emails))
-        if secEmails:
-            html.append( i18nformat("""<input type="submit" name="removeSecEmail" value="_("Remove")">"""))
-
-        return "\n".join(html)
-
-### This class is not used anymore. To remove
-class WPUserModification( WPUserDetails ):
-
-    def __init__(self, rh, avatar, params):
-        WPUserDetails.__init__(self, rh)
-        self._avatar = avatar
-        self._params = params
-
-    def _getTabContent( self, params ):
-        p = WUserModify( self._avatar )
-        self._params["postURL"] =  urlHandlers.UHUserModification.getURL()
-        if self._params["msg"] != "":
-            self._params["msg"] = "<table bgcolor=\"gray\"><tr><td bgcolor=\"white\">\n<font size=\"+1\" color=\"red\"><b>%s</b></font>\n</td></tr></table>"%self._params["msg"]
-        return p.getHTML( self._params )
-
 
 class WIdentityModification(wcomponents.WTemplated):
 

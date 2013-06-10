@@ -29,6 +29,3 @@ def abstractsToPDF(req, **params):
 
 def participantList( req, **params ):
     return trackModif.RHAbstractsParticipantList( req ).process( params )
-
-def abstractAction( req, **params ):
-    return trackModif.RHAbstractsAction( req ).process( params )

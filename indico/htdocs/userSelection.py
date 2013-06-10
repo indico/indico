@@ -17,16 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-
-from MaKaC.webinterface import pages
 from MaKaC.webinterface.rh import users
 
-
-
-
-def index( req, **args):
-    p = pages.WPUserSelection( req )
-    return p.display(args)
 
 def createExternalUsers( req, **params):
     return users.RHCreateExternalUsers( req ).process( params )

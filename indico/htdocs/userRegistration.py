@@ -21,19 +21,11 @@
 from MaKaC.webinterface.rh import users
 
 
-
-
 def index(req, **params):
     return users.RHUserCreation( req ).process( params )
 
 def UserExist(req, **params ):
     return users.RHUserExistWithIdentity( req ).process( params )
-
-def modify(req, **params):
-    return users.RHUserModification( req ).process( params )
-
-#def update(req, **params ):
-#    return users.RHUserPerformModification( req ).process( params )
 
 def active(req, **params ):
     return users.RHUserActive( req ).process( params )

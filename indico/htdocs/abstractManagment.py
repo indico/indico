@@ -63,10 +63,6 @@ def xml( req, **params ):
     return abstractModif.RHAbstractToXML( req ).process( params )
 
 
-def abstractsToXML( req, **params ):
-    return abstractModif.RHAbstractsToXML( req ).process( params )
-
-
 def ac(req, **params):
     return abstractModif.RHAC(req).process(params)
 

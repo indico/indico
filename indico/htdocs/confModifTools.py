@@ -47,9 +47,6 @@ def addAlarm( req, **params ):
 def saveAlarm( req, **params ):
     return conferenceModif.RHConfSaveAlarm( req ).process( params )
 
-def testSendAlarm( req, **params ):
-    return conferenceModif.RHConfSendTestAlarm( req ).process( params )
-
 def sendAlarmNow( req, **params ):
     return conferenceModif.RHConfSendAlarmNow( req ).process( params )
 

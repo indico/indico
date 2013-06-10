@@ -28,16 +28,6 @@ def data( req, **params ):
 def modifData( req, **params ):
     return subContribMod.RHSubContributionModifData( req ).process( params )
 
-def addMaterial(req, **params):
-    return subContribMod.RHSubContributionAddMaterial( req ).process( params )
-
-def performAddMaterial(req, **params):
-    return subContribMod.RHSubContributionPerformAddMaterial( req ).process( params )
-
-
-def removeMaterials( req, **params ):
-    return subContribMod.RHSubContributionRemoveMaterials( req ).process( params )
-
 def materialsAdd(req, **params):
     return subContribMod.RHMaterialsAdd(req).process(params)
 

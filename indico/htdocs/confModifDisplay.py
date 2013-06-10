@@ -35,9 +35,6 @@ def resources( req, **params ):
 def confHeader( req, **params ):
     return conferenceModif.RHConfModifDisplayConfHeader( req ).process( params )
 
-def modifyLink( req, **params ):
-    return conferenceModif.RHConfModifDisplayLink( req ).process( params )
-
 def modifyData( req, **params ):
     return conferenceModif.RHConfModifDisplayModifyData( req ).process( params )
 

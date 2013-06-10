@@ -20,9 +20,6 @@
 import MaKaC.webinterface.rh.categoryMod as categoryMod
 
 
-def index(req, **params):
-    return categoryMod.RHCategoryConfCreationControl( req ).process( params )
-
 def setCreateConferenceControl( req, **params ):
     return categoryMod.RHCategorySetConfControl( req ).process( params )
 

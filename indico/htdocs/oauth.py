@@ -19,26 +19,21 @@
 
 from MaKaC.webinterface.rh import oauth
 
+
 def request_token(req, **params):
-	return oauth.RHOAuthRequestToken(req).process(params)
+    return oauth.RHOAuthRequestToken(req).process(params)
 
 def authorize(req, **params):
-	return oauth.RHOAuthAuthorization(req).process(params)
+    return oauth.RHOAuthAuthorization(req).process(params)
 
 def access_token(req, **params):
-	return oauth.RHOAuthAccessTokenURL(req).process(params)
-
-def resource(req, **params):
-	return oauth.RHOAuthResourceURL(req).process(params)
+    return oauth.RHOAuthAccessTokenURL(req).process(params)
 
 def authorize_consumer(req, **params):
-	return oauth.RHOAuthAuthorizeConsumer(req).process(params)
-
-def unauthorize_consumer(req, **params):
-	return oauth.RHOAuthUnauthorizeConsumer(req).process(params)
+    return oauth.RHOAuthAuthorizeConsumer(req).process(params)
 
 def thirdPartyAuth(req, **params):
-	return oauth.RHOAuthThirdPartyAuth(req).process(params)
+    return oauth.RHOAuthThirdPartyAuth(req).process(params)
 
 def userThirdPartyAuth(req, **params):
-	return oauth.RHOAuthUserThirdPartyAuth(req).process(params)
+    return oauth.RHOAuthUserThirdPartyAuth(req).process(params)

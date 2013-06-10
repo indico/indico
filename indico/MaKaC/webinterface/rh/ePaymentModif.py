@@ -23,7 +23,6 @@ import MaKaC.epayment as ePayment
 from datetime import datetime
 import MaKaC.webinterface.rh.conferenceModif as conferenceModif
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-#from MaKaC.registration import AccommodationType, SocialEventItem, RegistrationSession, GeneralSectionForm, GeneralField, FieldInputs, RadioItem, Status, StatusValue
 from MaKaC.errors import FormValuesError, MaKaCError
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.i18n import _
@@ -90,17 +89,6 @@ class RHEPaymentModifPerformDataModification( RHEPaymentModifBase ):
             self._conf.getRegistrationForm().setCurrency(params.get("Currency",""))
         self._redirect(urlHandlers.UHConfModifEPayment.getURL(self._conf))
 
-##class RHEPaymentmodifYellowPay( RHEPaymentModifBase ):
-##
-##    def _process( self ):
-##        p = ePayments.WPConfModifEPaymentYellowPay( self, self._conf )
-##        return p.display()
-##
-##class RHEPaymentmodifYellowPayDataModif( RHEPaymentModifBase ):
-##
-##    def _process( self ):
-##        p = ePayments.WPConfModifEPaymentYellowPayDataModif( self, self._conf )
-##        return p.display()
 
 class RHEPaymentModifEnableSection( RHEPaymentModifBase ):
 
@@ -114,53 +102,6 @@ class RHEPaymentModifEnableSection( RHEPaymentModifBase ):
             modPay.setEnabled(not modPay.isEnabled())
         self._redirect(urlHandlers.UHConfModifEPayment.getURL(self._conf))
 
-##class RHEPaymentmodifYellowPay( RHEPaymentModifBase ):
-##
-##    def _process( self ):
-##        p = ePayments.WPConfModifEPaymentYellowPay( self, self._conf )
-##        return p.display()
-##
-##class RHEPaymentmodifYellowPayDataModif( RHEPaymentModifBase ):
-##
-##    def _process( self ):
-##        p = ePayments.WPConfModifEPaymentYellowPayDataModif( self, self._conf )
-##        return p.display()
-##
-##class RHEPaymentmodifYellowPayPerformDataModif( RHEPaymentModifBase ):
-##
-##    def _checkParams( self, params ):
-##        RHEPaymentModifBase._checkParams( self, params )
-##        self._cancel = params.has_key("cancel")
-##
-##    def _process( self ):
-##        if not self._cancel:
-##            ses = self._conf.getModPay().getModYellowPay()
-##            ses.setValues(self._getRequestParams())
-##        self._redirect(urlHandlers.UHConfModifEPaymentYellowPay.getURL(self._conf))
-
-##class RHEPaymentmodifPayPal( RHEPaymentModifBase ):
-##
-##    def _process( self ):
-##        p = ePayments.WPConfModifEPaymentPayPal( self, self._conf )
-##        return p.display()
-##
-##class RHEPaymentmodifPayPalDataModif( RHEPaymentModifBase ):
-##
-##    def _process( self ):
-##        p = ePayments.WPConfModifEPaymentPayPalDataModif( self, self._conf )
-##        return p.display()
-
-##class RHEPaymentModifEnableSection( RHEPaymentModifBase ):
-##
-##    def _checkParams( self, params ):
-##        RHEPaymentModifBase._checkParams( self, params )
-##        self._epayment = params.get("epayment", "")
-##
-##    def _process( self ):
-##        modPay = self._conf.getModPay().getModPayById(self._epayment)
-##        if modPay is not None:
-##            modPay.setEnabled(not modPay.isEnabled())
-##        self._redirect(urlHandlers.UHConfModifEPayment.getURL(self._conf))
 
 class RHEPaymentmodifPayPalPerformDataModif( RHEPaymentModifBase ):
 
