@@ -107,4 +107,3 @@ def roomBookingCloneBooking( req, **params ):
 # 4. New booking: physical insert
 def roomBookingSaveBooking( req, **params ):
     return conferenceModif.RHConfModifRoomBookingSaveBooking(req).process(params)
-

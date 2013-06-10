@@ -54,7 +54,7 @@ def index(req, **params):
     try:
         sd = parseDate(params.get("sd"), "%Y-%m-%d")
         ed = parseDate(params.get("ed"), "%Y-%m-%d")
-    except ValueError, e:
+    except ValueError:
         return """The format for the dates (sd and ed) must be like this: YYYY-MM-DD"""
     if sd > ed:
         return """'sd' must be <= than 'ed'"""

@@ -33,12 +33,6 @@ def newRegistrant(req, **params):
 def modification(req, **params):
     return registrantsModif.RHRegistrantModification( req ).process( params )
 
-def getPDF(req, **params):
-    return registrantsModif.RHRegistrantListPDF( req ).process( params )
-
-def email(req, **params):
-    return registrantsModif.RHRegistrantListEmail( req ).process( params )
-
 def modifySessions(req, **params):
     return registrantsModif.RHRegistrantSessionModify( req ).process( params )
 

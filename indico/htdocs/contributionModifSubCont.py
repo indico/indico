@@ -29,19 +29,9 @@ def index(req, **params):
 
 def add(req, **params):
     return contribMod.RHContributionAddSC( req ).process( params )
-    """
-    p = pages.WPSubContributionCreation( req )
-    params["postURL"] = "subContributionCreation.py/create"
-    return p.display( params )
-    """
 
 def create(req, **params):
     return contribMod.RHContributionCreateSC( req ).process( params )
-    """
-    p = pages.WPSubContributionCreation( req )
-    p.createSubContribution( params )
-    return "done"
-    """
 
 def actionSubContribs(req, **params):
     return contribMod.RHSubContribActions(req).process(params)
