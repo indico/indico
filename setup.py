@@ -186,6 +186,11 @@ class develop_indico(develop.develop):
         if sys.platform in ["linux2", "darwin"] and not os.path.exists('MaKaC'):
             os.symlink('indico/MaKaC', 'MaKaC')
 
+        # install dev dependencies
+        env = pkg_resources.Environment()
+        easy_install.main(DEVELOP_REQUIRES)
+        env.scan()
+
 
 class develop_config(develop_indico):
     description = "prepares the current directory for Indico development"
@@ -209,10 +214,6 @@ class develop_config(develop_indico):
     def run(self):
         # dependencies, links, etc...
         develop_indico.run(self)
-
-        env = pkg_resources.Environment()
-        easy_install.main(DEVELOP_REQUIRES)
-        env.scan()
 
         local = 'etc/indico.conf'
         if os.path.exists(local):
