@@ -196,21 +196,6 @@ class RHUserCreated( RH ):
         return p.display()
 
 
-#class RHUserModify( RHProtected ):
-#
-#    def _checkProtection( self ):
-#        if self._getUser() and ( (not self._getUser() in AdminList.getInstance().getList()) or (self._av != self._getUser()) ):
-#            raise errors.AccessError("User Modification")
-#        RHProtected._checkProtection( self )
-#
-#    def _checkParams( self, params ):
-#        self._av = user.AvatarHolder().getById(params["userId"])
-#
-#    def _process( self ):
-#        p = users.WPUserModify( self, self._av )
-#        return p.display()
-
-
 class RHUserExistWithIdentity( RH ):
 
     def _checkParams( self, params ):
@@ -373,17 +358,6 @@ class RHUserDisable( RHUserBase ):
             mail.sendAccountDisabled(self._avatar).send()
         self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
 
-#class RHUserPerformModification( RHUserBase ):
-#    _uh = urlHandlers.UHUserPerformModification
-#
-#    def _checkParams( self, params ):
-#        RHUserBase._checkParams( self, params )
-#        self._userData = params
-#
-#    def _process( self ):
-#        _UserUtils.setUserData( self._avatar, self._userData )
-#        self._redirect( urlHandlers.UHUserDetails.getURL( self._avatar ) )
-
 
 class RHUserIdentityBase( RHUserBase ):
 
@@ -414,7 +388,6 @@ class RHUserIdentityCreation( RHUserIdentityBase ):
             return p.display()
 
         msg = ""
-        ok = False
         if self._ok:
             ok = True
             ih = AuthenticatorMgr()

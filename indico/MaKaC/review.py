@@ -2973,9 +2973,6 @@ class AbstractStatusAccepted( AbstractStatus ):
     def proposeToReallocate( self ):
         raise MaKaCError( _("Cannot propose for reallocation an abstract which is already accepted"))
 
-    #def withdraw( self, comments="" ):
-    #    raise MaKaCError( "Cannot withdraw an ACCEPTED abstract" )
-
     def markAsDuplicated(self,responsible,originalAbs,comments=""):
         raise MaKaCError( _("Cannot mark as duplicated an abstract which is accepted"))
 

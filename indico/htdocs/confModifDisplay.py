@@ -92,9 +92,6 @@ def removeCSS( req, **params ):
 def savePic( req, **params ):
     return conferenceModif.RHConfSavePic( req ).process( params )
 
-#def removePic( req, **params ):
-#    return conferenceModif.RHConfRemovePic( req ).process( params )
-
 def modifySystemData(req, **params ):
     return conferenceModif.RHConfModifDisplayModifySystemData( req ).process( params )
 

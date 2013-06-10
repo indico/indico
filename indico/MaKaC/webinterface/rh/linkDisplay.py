@@ -17,51 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import MaKaC.webinterface.pages.links as links
-import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHLinkBase
 
-class RHLinkDisplayBase( RHLinkBase, RHDisplayBaseProtected ):
-    
-    def _checkParams( self, params ):
-        RHLinkBase._checkParams( self, params )
 
-    def _checkProtection( self ):
-        RHDisplayBaseProtected._checkProtection( self )
+class RHLinkDisplayBase(RHLinkBase, RHDisplayBaseProtected):
+    def _checkParams(self, params):
+        RHLinkBase._checkParams(self, params)
 
-#class RHLinkDisplayModificationBase( RHLinkDisplayBase ):
-#
-#    def _checkParams( self, params ):
-#        RHLinkDisplayBase._checkParams( self, params )
-#        cfaMgr = self._conf.getAbstractMgr()
-#        id = ""
-#        if params.has_key("abstractId"):
-#            id = params["abstractId"]
-#        elif params.has_key("contribId"):
-#            id = params["contribId"]
-#        self._abstract = self._target = cfaMgr.getAbstractById( id )
-#    
-#class RHLinkDisplayModification( RHLinkDisplayModificationBase ):
-#    _uh = urlHandlers.UHLinkDisplayModification
-#    
-#    def _process( self ):
-#        p = links.WPLinkDisplayModification( self, self._link )
-#        return p.display()
-
-#class RHLinkDisplayDataModification( RHLinkDisplayModificationBase ):
-#    _uh = urlHandlers.UHLinkDisplayDataModification
-#    
-#    def _process( self ):
-#        p = links.WPLinkDisplayDataModification( self, self._link )
-#        return p.display()
-#
-#class RHLinkDisplayPerformDataModification( RHLinkDisplayModificationBase ):
-#    _uh = urlHandlers.UHLinkDisplayPerformDataModification
-#    
-#    def _process( self ):
-#        linkData = self._getRequestParams()
-#        self._link.setName( linkData["title"] )
-#        self._link.setDescription( linkData["description"] )
-#        self._link.setURL( linkData["url"] )
-#        self._redirect( urlHandlers.UHLinkDisplayModification.getURL( self._link ) )
+    def _checkProtection(self):
+        RHDisplayBaseProtected._checkProtection(self)

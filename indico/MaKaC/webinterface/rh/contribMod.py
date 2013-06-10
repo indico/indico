@@ -368,22 +368,6 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
 #-------------------------------------------------------------------------------------
 
 
-#class RHContributionDeleteSC( RHContribModifBase ):
-#    _uh = urlHandlers.UHContriDeleteSubCont
-#
-#    def _checkParams( self, params ):
-#        RHContribModifBase._checkParams( self, params )
-#        self._confirm = params.has_key( "confirm" )
-#        self._cancel = params.has_key( "cancel" )
-#        self._scIds = self._normaliseListParam( params.get("selSubContribs", []) )
-
-#    def _process( self ):
-#        for id in self._scIds:
-#            sc = self._target.getSubContributionById( id )
-#            self._target.removeSubContribution( sc )
-#        self._redirect( urlHandlers.UHContribModifSubCont.getURL( self._target ) )
-
-
 class RHContributionUpSC(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribUpSubCont
 

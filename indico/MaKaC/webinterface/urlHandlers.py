@@ -607,16 +607,6 @@ class UHRoomPhotoSmall( URLHandler ):
         cls._relativeURL = cls._relativeTemplate % str( target )
         return cls._getURL()
 
-# Used (?) to send room photos via Python script
-#class UHSendRoomPhoto( URLHandler ):
-#    _relativeURL = "roomBooking.py/sendRoomPhoto"
-#
-#    @classmethod
-#    def getURL( cls, photoId, small ):
-#        url = cls._getURL()
-#        url.addParam( "photoId", photoId )
-#        url.addParam( "small", small )
-#        return url
 
 class UHConferenceAddMaterial( URLHandler ):
     _relativeURL = "conferenceModification.py/addMaterial"
@@ -1142,9 +1132,6 @@ class UHMConfPerformAddContribution( URLHandler ):
 class UHContribsConfManagerDisplayParticipantList( URLHandler ):
     _relativeURL = "confModifContribList.py/participantList"
 
-#class UHContribsConfManagerDisplayXML( URLHandler ):
-#    _relativeURL = "abstractsManagment.py/abstractsToXML"
-
 class UHSessionClose( URLHandler ):
     _relativeURL = "sessionModification.py/close"
 
@@ -1528,9 +1515,6 @@ class UHConfSignInAuthenticate( UHConfSignIn ):
     _relativeURL = "confLogin.py/signIn"
 
 
-#class UHConfSignOut( URLHandler ):
-#    _relativeURL = "confLogin.py/signOut"
-
 class UHConfUserCreation( URLHandler ):
     _relativeURL = "confUser.py"
 
@@ -1643,10 +1627,6 @@ class UHUserRegistration( URLHandler ):
 
 class UHUserModification( URLHandler ):
     _relativeURL = "userRegistration.py/modify"
-
-
-#class UHUserPerformModification( URLHandler ):
-#    _relativeURL = "userRegistration.py/update"
 
 
 class UHUserIdentityCreation( URLHandler ):
@@ -2917,7 +2897,6 @@ class UHConfModifEPaymentEnableSection( URLHandler ):
     _relativeURL = "confModifEpayment.py/enableSection"
 class UHConfModifEPaymentChangeStatus( URLHandler ):
     _relativeURL = "confModifEpayment.py/changeStatus"
-#class UHConfModifEPaymentDataModification( URLHandler ):
 class UHConfModifEPaymentdetailPaymentModification( URLHandler ):
     _relativeURL = "confModifEpayment.py/dataModif"
 class UHConfModifEPaymentPerformdetailPaymentModification( URLHandler ):

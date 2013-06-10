@@ -21,20 +21,9 @@
 from MaKaC.webinterface.rh import login
 
 
-
-
 def index(req, **params):
     return login.RHSignIn( req ).process( params )
-    #p = pages.WPSignIn( req )
-    #params["postURL"] = "signIn.py/signIn"
-    #return p.display( params )
 
-#TODO: Never used, should be soon deleted. Also "login.RHAuthenticate" doesn't exist!
-#def signIn(req, **params):
-#    return login.RHAuthenticate( req ).process( params )
-#    #p = pages.WPSignIn( req )
-#    #res = p.authenticate( params )
-#    #return "done: %s"%res
 
 def active(req, **params):
     return login.RHActive( req ).process( params )

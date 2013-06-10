@@ -354,32 +354,6 @@ class RHCategoryPerformCreation( RHCategModifBase ):
         return auAvatars
 
 
-#class RHCategoryRemoveSubItems( RHCategModifBase ):
-#    _uh = urlHandlers.UHCategoryPerformCreation
-#
-#    def _checkParams( self, params ):
-#        RHCategModifBase._checkParams( self, params )
-#        self._cancel = False
-#        if params.get("cancel"):
-#            self._cancel = True
-#            return
-#        categIdList = self._normaliseListParam(params.get("selectedCateg", []))
-#        self._categs = []
-#        cm = conference.CategoryManager()
-#        for categId in categIdList:
-#            self._categs.append( cm.getById( categId ) )
-#        confIdList = self._normaliseListParam(params.get( "selectedConf", [] ))
-#        self._confs = []
-#        ch = conference.ConferenceHolder()
-#        for confId in confIdList:
-#            self._confs.append( ch.getById( confId ) )
-#
-#    def _process( self ):
-#        if self._cancel:
-#            self._redirect(WPCategoryModification.getURL( self._target ))
-#            return "done"
-
-
 class _ActionSubCategDeletion:
 
     def __init__( self, rh, target, selCategs ):

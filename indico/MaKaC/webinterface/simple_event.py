@@ -312,22 +312,6 @@ class WPSEConfClone(WPSEConfModifToolsBase, Observable):
 class WSEConfModifTools (conferences.WConfModifTools):
     pass
 
-#################### Material Modif #####################################
-
-#class WPSEMaterialDataModif (material.WPMaterialDataModification):
-#    def _applyFrame( self, body ):
-#        frame = WSEMaterialModifFrame( self._material, self._getAW() )
-#        return frame.getHTML( body, **p )
-
-#class WSEMaterialModifFrame (wcomponents.WMaterialModifFrame):
-#    pass
-
-#class WSEConfModifHeader(wcomponents.WConfModifHeader):
-#    raise 'hello'
-#    def getVars( self ):
-#        vars = wcomponents.WConfModifHeader.getVars( self )
-#        vars ["nessa"]="Lecture nessa"
-#        return vars
 
 #################### Event Creation #####################################
 class WPSimpleEventCreation( WPConferenceCreationMainData):
@@ -371,22 +355,6 @@ class WPSimpleEventDisplay( conferences.WPConferenceDisplayBase ):
     "subContribModifyURLGen":  urlHandlers.UHSubContribModification.getURL, \
     "materialURLGen": urlHandlers.UHMaterialDisplay.getURL }
         return wc.getHTML( pars )
-
-#class WSimpleEventDataModification(WConferenceDataModification):
-#
-#    def getVars( self ):
-#        vars = WConferenceDataModification.getVars( self )
-#        vars["event_type"] = WebFactory.getId()
-#        return vars
-
-
-#class WSimpleEventCreation(category.WConferenceCreation):
-#
-#    def getVars( self ):
-#        self._type = WebFactory.getId()
-#        vars = category.WConferenceCreation.getVars( self )
-#        vars["event_type"] = WebFactory.getId()
-#        return vars
 
 
 class WSimpleEventDisplay:

@@ -313,23 +313,6 @@ class TitleSF(filters.SortingField):
         return cmp( c1.getTitle().lower().strip(), c2.getTitle().lower().strip() )
 
 
-#class MaterialSF(filters.SortingField):
-#    _id="material"
-#
-#    def compare( self, c1, c2 ):
-#        """
-#        """
-#
-#        if c1.getFirstMaterial() == None and c2.getFirstMaterial() == None:
-#            return 0
-#        if c1.getFirstMaterial()== None:
-#            return +1
-#        if c2.getFirstMaterial() ==None:
-#            return -1
-#        raise "%s,%s"%(c1.getFirstMaterial(), c2.getFirstMaterial())
-#        return cmp( c1.getFirstMaterial().getId(), c2.getFirstMaterial().getId())
-
-
 class NumberSF( filters.SortingField ):
     _id = "number"
 

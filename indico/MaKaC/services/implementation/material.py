@@ -210,8 +210,6 @@ class ResourceModifBase(ResourceBase, MaterialModifBase):
     def _checkParams(self):
         ResourceBase._checkParams(self)
 
-    #def _checkProtection(self):
-    #    MaterialModifBase._checkProtection(self)
 
 class GetMaterialClassesBase(MaterialDisplayBase):
     """

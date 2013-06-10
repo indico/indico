@@ -688,62 +688,6 @@ class WPTrackModifAbstracts( WPTrackModifBase ):
         return wc.getHTML(pars)
 
 
-#class WTrackModifFrame(wcomponents.WTemplated):
-#
-#    def __init__( self, track, aw):
-#        self._track = track
-#        self._aw = aw
-#
-#    def getHTML( self, body, **params):
-#        params["body"] = body
-#        return wcomponents.WTemplated.getHTML( self, params )
-#
-#    def getVars( self ):
-#        vars = wcomponents.WTemplated.getVars( self )
-#        vars["target"] = self._track
-#        return vars
-#
-#    def getOwnerComponent( self ):
-#        owner = self._track.getOwner()
-#        wc = wcomponents.WConferenceModifFrame(owner, self._aw)
-#        return wc
-#
-#    def getIntermediateVTabPixels( self ):
-#        wc = self.getOwnerComponent()
-#        return 7 + wc.getIntermediateVTabPixels()
-#
-#    def getTitleTabPixels( self ):
-#        wc = self.getOwnerComponent()
-#        return wc.getTitleTabPixels() - 7
-#
-#    def getCloseHeaderTags( self ):
-#        wc = self.getOwnerComponent()
-#        return "</table></td></tr>" + wc.getCloseHeaderTags()
-
-
-#class WTrackModifHeader(wcomponents.WTemplated):
-#
-#    def __init__( self, track, aw ):
-#        self._track = track
-#        self._aw = aw
-#
-#    def getHTML( self, params ):
-#        conf = self._track.getConference()
-#        confHTML = wcomponents.WConfModifHeader( conf, self._aw ).getHTML( params )
-#        return "%s%s"%(confHTML, wcomponents.WTemplated.getHTML( self, params ) )
-#
-#    def getVars( self ):
-#        vars = wcomponents.WTemplated.getVars( self )
-#        URLGen = vars.get( "trackModifURLGen", urlHandlers.UHTrackModification.getURL )
-#        vars["trackModificationURL"] = URLGen(self._track)
-#        conf = self._track.getConference()
-#        vars["trackDisplayURL"] = urlHandlers.UHConferenceProgram.getURL( conf )
-#        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL( "gestionGrey" )
-#        vars["title"] = self._track.getTitle()
-#        vars["titleTabPixels"] = WTrackModifFrame(self._track, self._aw).getTitleTabPixels()
-#        return vars
-
-
 class WPTrackAbstractModifBase( WPConferenceModifBase ):
 
     def __init__( self, rh, track, abstract ):

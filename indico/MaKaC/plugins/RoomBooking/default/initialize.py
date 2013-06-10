@@ -156,25 +156,3 @@ def main( **kwargs ):
 
     Factory.getDALManager().disconnect()
     DBMgr.getInstance().endRequest()
-
-
-#def setAVCEmail_pwlodare( **kwargs ):
-#    from MaKaC.rb_factory import Factory
-#    from MaKaC.common.db import DBMgr
-#    DBMgr.getInstance().startRequest()
-#    dm = Factory.getDALManager()
-#    dm.connect()
-#
-#    Location.setDefaultLocation( "CERN" )
-#    Location.getDefaultLocation().insertAVCSupportEmail( 'pwlodare@cern.ch' )
-#
-#    dm.disconnect()
-#    DBMgr.getInstance().endRequest()
-
-
-
-if __name__ == '__main__':
-    pass
-    # Give it name of the first (initial) location!
-    # Can NOT be changed later!
-    #main( location = "CERN" )

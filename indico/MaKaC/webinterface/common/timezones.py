@@ -38,26 +38,9 @@ def convertTime(d,tz):
 class TimezoneRegistry:
     _items = Config.getInstance().getTimezoneList()
 
+    @classmethod
     def getList( self ):
         return self._items
-
-    getList=classmethod(getList)
-
-# TODO: This one should probably removed. It's only used
-#       on event display pages and there we now have a balloon popup.
-#def getSelectItemsHTML( self, selTitle="", localTZ="" ):
-#    l=[]
-#    for title in self._items + ["LOCAL"] + ["My"]:
-#        selected=""
-#        if title==selTitle:
-#            selected=" selected"
-#        screenTitle = title
-#        if localTZ != "" and title == "LOCAL" and selTitle == "LOCAL":
-#            screenTitle = title + ": %s" % localTZ
-#        l.append("""<option value=%s%s>%s</option>"""%(quoteattr(title),
-#                                    selected, escape(screenTitle)))
-#    return "".join(l)
-#getSelectItemsHTML=classmethod(getSelectItemsHTML)
 
     def getShortSelectItemsHTML( self, selTitle="", localTZ="" ):
         l=[]

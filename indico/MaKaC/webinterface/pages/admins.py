@@ -1053,19 +1053,7 @@ class WPUsersAndGroupsCommon(WPAdminsBase):
                 urlHandlers.UHGroups.getURL())
 
     def _getPageContent(self, params):
-
-        #if self._showAdmin:
-        #    html = WPAdminsBase._getBody( self, params )
-        #else:
-        #    html = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-
         return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
-
-    #def _getBody(self, params):
-    #    if self._showAdmin:
-    #        return WPAdminsBase._getBody( self, params )
-    #    else:
-    #        return self._getTabContent( params )
 
 
 class WUserManagement(wcomponents.WTemplated):

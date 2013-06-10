@@ -183,21 +183,6 @@ class NEAbstractDisplayAddMaterial( NavigationEntry ):
     _parent = NEAbstractDisplayMaterial
     _title = "Creation"
 
-#class NEMaterialDisplayModification( NavigationEntry ):
-#    _title = "Resources"
-#    _url = urlHandlers.UHMaterialDisplayModification
-#    _parent = NEAbstractDisplayMaterial
-
-#class NELinkDisplayModification( NavigationEntry ):
-#    _title = "Link"
-#    _url = urlHandlers.UHLinkDisplayModification
-#    _parent = NEMaterialDisplayModification
-
-#class NEFileDisplayModification( NavigationEntry ):
-#    _title = "File"
-#    _url = urlHandlers.UHFileDisplayModification
-#    _parent = NEMaterialDisplayModification
-
 class NERegistrationForm( NavigationEntry ):
     _url = urlHandlers.UHConfRegistrationForm
     _title = "Registration"

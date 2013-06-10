@@ -593,10 +593,3 @@ class SimpleOverviewCalendar(wcomponents.WTemplated):
                 </table>
               """) %(strpy,strpm,datetime(1900,month,1).strftime("%B"), year,strnm,strny, "\n".join(res))
         return html
-
-
-    #def getVars( self ):
-    #    vars = wcomponents.WTemplated.getVars( self )
-    #    vars["calendar"] = self._displayMonth()
-    #    vars["date"] = self._date
-    #    return vars

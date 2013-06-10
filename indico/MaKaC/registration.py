@@ -1898,7 +1898,6 @@ class RadioItem(Persistent):
         self._placesLimit = 0
         self._currentNoPlaces = 0
 
-    #def getQuantity(self):return 1
     def getId(self):
         return self._id
 
@@ -2023,7 +2022,6 @@ class RadioItem(Persistent):
 
 class RadioGroupInput(FieldInputType):
     _id="radio"
-    #def getQuantity(self): return 1
     def getName(cls):
         return "Multiple options/One choice"
     getName=classmethod(getName)
@@ -2943,28 +2941,6 @@ class GeneralSectionForm(BaseForm):
 
     def setRequired(self, required):
         self._required = required
-
-    ###########
-    #Mods to support sorting fields
-    #def getFields(self):
-    #    return self._fields
-    #
-    #def addField(self, f):
-    #    if f not in self.getFields():
-    #        f.setId( str(self._getGeneralFieldGenerator().newCount()) )
-    #        self.getFields().append(f)
-    #        self.notifyModification()
-    #
-    #def removeField(self, f):
-    #    if f in self.getFields():
-    #        self.getFields().remove(f)
-    #        self.notifyModification()
-    #
-    #def getFieldById(self, id):
-    #    for f in self.getFields():
-    #            if f.getId()==id:
-    #                return f
-    #        return None
 
     def getSortedFields(self):
         try:

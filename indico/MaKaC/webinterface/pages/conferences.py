@@ -1336,16 +1336,6 @@ class WConferenceTimeTable(wcomponents.WTemplated):
         vars['timetableLayout'] = vars.get('ttLyt','')
         return vars
 
-#class WMeetingHighDetailTimeTable(WConferenceTimeTable):
-#
-#    def getVars( self ):
-#        vars = wcomponents.WTemplated.getVars( self )
-#        self._contribURLGen = vars["contribURLGen"]
-#        self._sessionURLGen = vars["sessionURLGen"]
-#        vars["title"] = self._conf.getTitle()
-#        vars["timetable"] = self._getHTMLTimeTable(1)
-#        return vars
-
 
 class WPConferenceTimeTable( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEConferenceTimeTable
@@ -1371,15 +1361,6 @@ class WPConferenceTimeTable( WPConferenceDefaultDisplayBase ):
                  <link rel="stylesheet" type="text/css" href="%s/css/timetable.css?%d">
                 """ % ( headContent, baseurl, timestamp)
 
-#class WMeetingTimeTable(WConferenceTimeTable):
-#
-#    def getVars( self ):
-#        vars = wcomponents.WTemplated.getVars( self )
-#        self._contribURLGen = vars["contribURLGen"]
-#        self._sessionURLGen = vars["sessionURLGen"]
-#        vars["title"] = self._conf.getTitle()
-#        vars["timetable"] = self._getHTMLTimeTable(0)
-#        return vars
 
 class WPMeetingTimeTable( WPTPLConferenceDisplay ):
 
@@ -2045,10 +2026,6 @@ class WPConfModifSchedule( WPConferenceModifBase ):
 
     def _setActiveTab( self ):
         self._tabSchedule.setActive()
-
-    #def _getTabContent( self, params ):
-    #    wc = WConfModifSchedule( self._conf )
-    #    return wc.getHTML(params)
 
 #------------------------------------------------------------------------------
 class WConfModScheduleDataEdit(wcomponents.WTemplated):
@@ -2870,26 +2847,6 @@ class WPConfAllSpeakers(WPConfModifListings):
         return p.getHTML({"title": _("All speakers list"), \
                           "participantMainPageURL":urlHandlers.UHConfAllSpeakers.getURL(self._conf), \
                           "participantSelectionAction":quoteattr(str(urlHandlers.UHConfAllSpeakersAction.getURL(self._conf)))})
-
-# I can't find where any of these are used or mathcing tpls,
-# I presume they are legacy  and (potentially) can be deleted? Matt
-
-# class WPConfAllPrimaryAuthors( WPConfModifListings ):
-
-#     def _getPageContent( self, params ):
-#         p = WConfModifAllContribParticipants( self._conf, self._conf.getPrimaryAuthorIndex() )
-#         return p.getHTML({"title": _("All primary authors list"), \
-#                           "participantMainPageURL":urlHandlers.UHConfAllPrimaryAuthors.getURL(self._conf), \
-#                           "participantSelectionAction":quoteattr(str(urlHandlers.UHConfAllPrimaryAuthorsAction.getURL(self._conf)))})
-
-
-# class WPConfAllCoAuthors( WPConfModifListings ):
-
-#     def _getPageContent( self, params ):
-#         p = WConfModifAllContribParticipants( self._conf, self._conf.getCoAuthorIndex() )
-#         return p.getHTML({"title": _("All co-authors list"), \
-#                           "participantMainPageURL":urlHandlers.UHConfAllCoAuthors.getURL(self._conf), \
-#                           "participantSelectionAction":quoteattr(str(urlHandlers.UHConfAllCoAuthorsAction.getURL(self._conf)))})
 
 
 class WPEMailContribParticipants ( WPConfModifListings):

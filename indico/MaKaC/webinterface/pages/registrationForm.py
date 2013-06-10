@@ -340,17 +340,7 @@ class WPConfModifRegFormSessionsBase(WPConfModifRegFormSectionsBase):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main",  _("Main"), \
                 urlHandlers.UHConfModifRegFormSessions.getURL( self._conf ) )
-#        wf = self._rh.getWebFactory()
-#        if wf:
-#            wf.customiseTabCtrl( self._tabCtrl )
         self._setActiveTab()
-
-#    def _applyFrame( self, body ):
-#        frame = WRegFormSessionsModifFrame( self._conf, self._getAW() )
-#        p = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
-#            "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL, \
-#            "confModifURLGen": urlHandlers.UHConfModifRegForm.getURL}
-#        return frame.getHTML( body, **p )
 
     def _setActiveTab( self ):
         pass
@@ -358,41 +348,6 @@ class WPConfModifRegFormSessionsBase(WPConfModifRegFormSectionsBase):
     def _getTabContent( self, params ):
         return "nothing"
 
-#class WRegFormSessionsModifFrame(wcomponents.WTemplated):
-#
-#    def __init__(self, conf, aw):
-#        self._conf = conf
-#        self._aw = aw
-#        self._sessions = self._conf.getRegistrationForm().getSessionsForm()
-#
-#    def getHTML( self, body, **params ):
-#        params["body"] = body
-#        return wcomponents.WTemplated.getHTML( self, params )
-#
-#    def getVars( self ):
-#        vars = wcomponents.WTemplated.getVars( self )
-#        vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
-#        vars["title"] = self._sessions.getTitle()
-#        vars["titleTabPixels"] = self.getTitleTabPixels()
-#        vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
-#        vars["closeHeaderTags"] = self.getCloseHeaderTags()
-#        return vars
-#
-#    def getOwnerComponent( self ):
-#        wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
-#        return wc
-#
-#    def getIntermediateVTabPixels( self ):
-#        wc = self.getOwnerComponent()
-#        return 7 + wc.getIntermediateVTabPixels()
-#
-#    def getTitleTabPixels( self ):
-#        wc = self.getOwnerComponent()
-#        return wc.getTitleTabPixels() - 7
-#
-#    def getCloseHeaderTags( self ):
-#        wc = self.getOwnerComponent()
-#        return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 class WPConfModifRegFormSessions( WPConfModifRegFormSessionsBase ):
 
@@ -548,9 +503,6 @@ class WPConfModifRegFormAccommodationBase(WPConfModifRegFormSectionsBase):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main", "Main", \
                 urlHandlers.UHConfModifRegFormAccommodation.getURL( self._conf ) )
-#        wf = self._rh.getWebFactory()
-#        if wf:
-#            wf.customiseTabCtrl( self._tabCtrl )
         self._setActiveTab()
 
     def _setActiveTab( self ):
@@ -559,41 +511,6 @@ class WPConfModifRegFormAccommodationBase(WPConfModifRegFormSectionsBase):
     def _getTabContent( self, params ):
         return  _("nothing")
 
-#class WRegFormAccommodationModifFrame(wcomponents.WTemplated):
-#
-#    def __init__(self, conf, aw):
-#        self._conf = conf
-#        self._aw = aw
-#        self._accommodation = self._conf.getRegistrationForm().getAccommodationForm()
-#
-#    def getHTML( self, body, **params ):
-#        params["body"] = body
-#        return wcomponents.WTemplated.getHTML( self, params )
-#
-#    def getVars( self ):
-#        vars = wcomponents.WTemplated.getVars( self )
-#        vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
-#        vars["title"] = self._accommodation.getTitle()
-#        vars["titleTabPixels"] = self.getTitleTabPixels()
-#        vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
-#        vars["closeHeaderTags"] = self.getCloseHeaderTags()
-#        return vars
-#
-#    def getOwnerComponent( self ):
-#        wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
-#        return wc
-#
-#    def getIntermediateVTabPixels( self ):
-#        wc = self.getOwnerComponent()
-#        return 7 + wc.getIntermediateVTabPixels()
-#
-#    def getTitleTabPixels( self ):
-#        wc = self.getOwnerComponent()
-#        return wc.getTitleTabPixels() - 7
-#
-#    def getCloseHeaderTags( self ):
-#        wc = self.getOwnerComponent()
-#        return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 class WPConfModifRegFormAccommodation( WPConfModifRegFormAccommodationBase ):
 
@@ -748,9 +665,6 @@ class WPConfModifRegFormFurtherInformationBase(WPConfModifRegFormSectionsBase):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main",  _("Main"), \
                 urlHandlers.UHConfModifRegFormFurtherInformation.getURL( self._conf ) )
-#        wf = self._rh.getWebFactory()
-#        if wf:
-#            wf.customiseTabCtrl( self._tabCtrl )
         self._setActiveTab()
 
     def _setActiveTab( self ):
@@ -759,41 +673,6 @@ class WPConfModifRegFormFurtherInformationBase(WPConfModifRegFormSectionsBase):
     def _getTabContent( self, params ):
         return  _("nothing")
 
-#class WRegFormFurtherInformationModifFrame(wcomponents.WTemplated):
-#
-#    def __init__(self, conf, aw):
-#        self._conf = conf
-#        self._aw = aw
-#        self._furtherInformation = self._conf.getRegistrationForm().getFurtherInformationForm()
-#
-#    def getHTML( self, body, **params ):
-#        params["body"] = body
-#        return wcomponents.WTemplated.getHTML( self, params )
-#
-#    def getVars( self ):
-#        vars = wcomponents.WTemplated.getVars( self )
-#        vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
-#        vars["title"] = self._furtherInformation.getTitle()
-#        vars["titleTabPixels"] = self.getTitleTabPixels()
-#        vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
-#        vars["closeHeaderTags"] = self.getCloseHeaderTags()
-#        return vars
-#
-#    def getOwnerComponent( self ):
-#        wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
-#        return wc
-#
-#    def getIntermediateVTabPixels( self ):
-#        wc = self.getOwnerComponent()
-#        return 7 + wc.getIntermediateVTabPixels()
-#
-#    def getTitleTabPixels( self ):
-#        wc = self.getOwnerComponent()
-#        return wc.getTitleTabPixels() - 7
-#
-#    def getCloseHeaderTags( self ):
-#        wc = self.getOwnerComponent()
-#        return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 class WPConfModifRegFormFurtherInformation( WPConfModifRegFormFurtherInformationBase ):
 
@@ -848,9 +727,6 @@ class WPConfModifRegFormReasonParticipationBase(WPConfModifRegFormSectionsBase):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main", "Main", \
                 urlHandlers.UHConfModifRegFormReasonParticipation.getURL( self._conf ) )
-#        wf = self._rh.getWebFactory()
-#        if wf:
-#            wf.customiseTabCtrl( self._tabCtrl )
         self._setActiveTab()
 
     def _setActiveTab( self ):
@@ -859,41 +735,6 @@ class WPConfModifRegFormReasonParticipationBase(WPConfModifRegFormSectionsBase):
     def _getTabContent( self, params ):
         return  _("nothing")
 
-#class WRegFormReasonParticipationModifFrame(wcomponents.WTemplated):
-#
-#    def __init__(self, conf, aw):
-#        self._conf = conf
-#        self._aw = aw
-#        self._reasonParticipation = self._conf.getRegistrationForm().getReasonParticipationForm()
-#
-#    def getHTML( self, body, **params ):
-#        params["body"] = body
-#        return wcomponents.WTemplated.getHTML( self, params )
-#
-#    def getVars( self ):
-#        vars = wcomponents.WTemplated.getVars( self )
-#        vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
-#        vars["title"] = self._reasonParticipation.getTitle()
-#        vars["titleTabPixels"] = self.getTitleTabPixels()
-#        vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
-#        vars["closeHeaderTags"] = self.getCloseHeaderTags()
-#        return vars
-#
-#    def getOwnerComponent( self ):
-#        wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
-#        return wc
-#
-#    def getIntermediateVTabPixels( self ):
-#        wc = self.getOwnerComponent()
-#        return 7 + wc.getIntermediateVTabPixels()
-#
-#    def getTitleTabPixels( self ):
-#        wc = self.getOwnerComponent()
-#        return wc.getTitleTabPixels() - 7
-#
-#    def getCloseHeaderTags( self ):
-#        wc = self.getOwnerComponent()
-#        return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 class WPConfModifRegFormReasonParticipation( WPConfModifRegFormReasonParticipationBase ):
 
@@ -948,9 +789,6 @@ class WPConfModifRegFormSocialEventBase(WPConfModifRegFormSectionsBase):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main", "Main", \
                 urlHandlers.UHConfModifRegFormSocialEvent.getURL( self._conf ) )
-#        wf = self._rh.getWebFactory()
-#        if wf:
-#            wf.customiseTabCtrl( self._tabCtrl )
         self._setActiveTab()
 
     def _setActiveTab( self ):
@@ -959,41 +797,6 @@ class WPConfModifRegFormSocialEventBase(WPConfModifRegFormSectionsBase):
     def _getTabContent( self, params ):
         return  _("nothing")
 
-#class WRegFormSocialEventModifFrame(wcomponents.WTemplated):
-#
-#    def __init__(self, conf, aw):
-#        self._conf = conf
-#        self._aw = aw
-#        self._socialEvent = self._conf.getRegistrationForm().getSocialEventForm()
-#
-#    def getHTML( self, body, **params ):
-#        params["body"] = body
-#        return wcomponents.WTemplated.getHTML( self, params )
-#
-#    def getVars( self ):
-#        vars = wcomponents.WTemplated.getVars( self )
-#        vars["context"] = wcomponents.WConfModifHeader( self._conf, self._aw ).getHTML(vars)
-#        vars["title"] = self._socialEvent.getTitle()
-#        vars["titleTabPixels"] = self.getTitleTabPixels()
-#        vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
-#        vars["closeHeaderTags"] = self.getCloseHeaderTags()
-#        return vars
-#
-#    def getOwnerComponent( self ):
-#        wc = wcomponents.WConferenceModifFrame(self._conf, self._aw)
-#        return wc
-#
-#    def getIntermediateVTabPixels( self ):
-#        wc = self.getOwnerComponent()
-#        return 7 + wc.getIntermediateVTabPixels()
-#
-#    def getTitleTabPixels( self ):
-#        wc = self.getOwnerComponent()
-#        return wc.getTitleTabPixels() - 7
-#
-#    def getCloseHeaderTags( self ):
-#        wc = self.getOwnerComponent()
-#        return "</table></td></tr>" + wc.getCloseHeaderTags()
 
 class WPConfModifRegFormSocialEvent( WPConfModifRegFormSocialEventBase ):
 
@@ -1196,9 +999,6 @@ class WPConfModifRegFormGeneralSectionBase(WPConfModifRegFormSectionsBase):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab( "main",  _("Main"), \
                 urlHandlers.UHConfModifRegFormGeneralSection.getURL( self._conf ) )
-#        wf = self._rh.getWebFactory()
-#        if wf:
-#            wf.customiseTabCtrl( self._tabCtrl )
         self._setActiveTab()
 
     def _setActiveTab( self ):

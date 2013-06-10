@@ -390,7 +390,3 @@ class _TestScheduler(IndicoTestCase):
 
 class TestProcessScheduler(_TestScheduler):
     _mode = 'processes'
-
-
-#class TestThreadScheduler(_TestScheduler):
-#    _mode = 'threads'

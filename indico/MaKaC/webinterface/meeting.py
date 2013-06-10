@@ -452,16 +452,6 @@ class WMSessionDisplayFull(WMSessionDisplayBase):
 
 #################Contribution Modification##############################
 
-##Taking subContribTabs out and changing link at top##
-#class ContribModifTabsFrame:
-#
-#    @staticmethod
-#    def _getBody( self, params ):
-#        self._createTabCtrl()
-#
-#        banner = wcomponents.WBannerModif().getHTML(self._target)
-#        body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-#        return banner + body
 
 class WPMContributionModification(contributions.WPContributionModification):
 

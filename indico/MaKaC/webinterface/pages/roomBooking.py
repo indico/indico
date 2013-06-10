@@ -27,40 +27,6 @@ from MaKaC.plugins.RoomBooking.default.room import Room
 import MaKaC.common.info as info
 
 
-#import MaKaC.common.info as info
-#import MaKaC.archives as archives
-
-
-# 0. Base classes...
-#class WPRoomBookingBase0( WPMainBase ):
-#    def _getHeadContent( self ):
-#        """
-#        !!!! WARNING
-#        If you update the following, you will need to do
-#        the same update in:
-#        roomBooking.py / WPRoomBookingBase0  AND
-#        conferences.py / WPConfModifRoomBookingBase
-#
-#        For complex reasons, these two inheritance chains
-#        should not have common root, so this duplication is
-#        necessary evil. (In general, one chain is for standalone
-#        room booking and second is for conference-context room
-#        booking.)
-#        """
-#        baseurl = self._getBaseURL()
-#        conf = Config.getInstance()
-#        return """
-#        <!-- Our libs -->
-#        <script type="text/javascript" src="%s/js/indico/validation.js"></script>
-#
-#        <!-- Calendar -->
-#        <link rel="stylesheet" type="text/css" href="%s/css/calendar-blue.css" />
-#        <script type="text/javascript" src="%s"></script>
-#        <script type="text/javascript" src="%s"></script>
-#        """ % (baseurl, baseurl, urlHandlers.UHJavascriptCalendar.getURL(),
-#                urlHandlers.UHJavascriptCalendarSetup.getURL())
-
-
 class WPRoomBookingBase( WPMainBase ):
 
     def _getTitle(self):

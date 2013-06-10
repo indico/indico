@@ -21,22 +21,5 @@
 from MaKaC.webinterface.rh import admins
 
 
-
-
 def index(req, **params):
     return admins.RHUserMerge( req ).process( params )
-
-##def UserExist(req, **params ):
-##    return users.RHUserExistWithIdentity( req ).process( params )
-##
-##def modify(req, **params):
-##    return users.RHUserModification( req ).process( params )
-##
-###def update(req, **params ):
-###    return users.RHUserPerformModification( req ).process( params )
-##
-##def active(req, **params ):
-##    return users.RHUserActive( req ).process( params )
-##
-##def created(req, **params ):
-##    return users.RHUserCreated( req ).process( params )

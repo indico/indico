@@ -224,33 +224,6 @@ Click <a href="%s">here</a> to see it in Indico.<br />
        self._getBookingDetails('new')
        ))
 
-#class NewVidyoPublicRoomNotificationManager(VidyoEventManagerNotificationBase):
-#    """ Template to build an email notification to the conference manager
-#    """
-#
-#    def __init__(self, booking):
-#        VidyoEventManagerNotificationBase.__init__(self, booking)
-#
-#        self.setSubject("""[Indico] New Vidyo meeting: %s (event id: %s)"""
-#                        % (self._conference.getTitle(), str(self._conference.getId())))
-#
-#        self.setBody("""Dear Conference Manager,<br />
-#<br />
-#There is a <strong>new Vidyo meeting</strong> in your conference.<br />
-#Click <a href="%s">here</a> to see it in Indico.<br />
-#<br />
-#%s
-#<br />
-#<br />
-#%s
-#<br />
-#Please note that the auto-join URL will not work until the Vidyo meeting time arrives.
-#""" % (self._modifLink,
-#        MailTools.eventDetails(self._conference),
-#        self._getBookingDetails('new')
-#        ))
-
-
 
 class VidyoPublicRoomModifiedNotificationAdmin(VidyoAdminNotificationBase):
     """ Template to build an email notification to the responsible
@@ -282,34 +255,6 @@ Click <a href="%s">here</a> to see it in Indico.<br />
        ))
 
 
-#class VidyoPublicRoomModifiedNotificationManager(VidyoEventManagerNotificationBase):
-#    """ Template to build an email notification to the event manager
-#    """
-#
-#    def __init__(self, booking):
-#        VidyoEventManagerNotificationBase.__init__(self, booking)
-#
-#        self.setSubject("""[Indico] Vidyo meeting modified: %s (event id: %s)"""
-#                        % (self._conference.getTitle(), str(self._conference.getId())))
-#
-#        self.setBody("""Dear Conference Manager,<br />
-#<br />
-#An Vidyo meeting <strong>was modified</strong> in your conference.<br />
-#Click <a href="%s">here</a> to see it in Indico.<br />
-#<br />
-#%s
-#<br />
-#<br />
-#%s
-#<br />
-#Please note that the auto-join URL will not work until the Vidyo meeting time arrives.
-#""" % (self._modifLink,
-#        MailTools.eventDetails(self._conference),
-#        self._getBookingDetails('modify')
-#        ))
-
-
-
 class VidyoPublicRoomRemovalNotificationAdmin(VidyoAdminNotificationBase):
     """ Template to build an email notification to the responsible
     """
@@ -336,30 +281,6 @@ A Vidyo public room <strong>was deleted</strong> in <a href="%s">%s</a><br />
        MailTools.organizerDetails(self._conference),
        self._getBookingDetails('remove')
        ))
-
-#class VidyoPublicRoomRemovalNotificationManager(VidyoEventManagerNotificationBase):
-#    """ Template to build an email notification to the responsible
-#    """
-#
-#    def __init__(self, booking):
-#        VidyoEventManagerNotificationBase.__init__(self, booking)
-#
-#        self.setSubject("""[Indico] Vidyo public room deleted %s (event id: %s)"""
-#                        % (self._conference.getTitle(), str(self._conference.getId())))
-#
-#        self.setBody("""Dear Conference Manager,<br />
-#<br />
-#An Vidyo meeting <strong>was deleted</strong> in your conference.<br />
-#<br />
-#%s
-#<br />
-#You also can see a list of all the Vidyo meetings here: (not implemented yet).<br />
-#<br />
-#<br />
-#%s
-#""" % (MailTools.eventDetails(self._conference),
-#        self._getBookingDetails('remove')
-#        ))
 
 
 class VidyoCleaningNotification(VidyoAdminNotificationBase):

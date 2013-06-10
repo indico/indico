@@ -8250,13 +8250,6 @@ class Contribution(CommonObjectBase, Locatable):
             return "(no title)"
         return self.title
 
-    #def setDescription( self, newDesc ):
-    #    self.description = newDesc.strip()
-    #    self.notifyModification()
-    #
-    #def getDescription( self ):
-    #    return self.description
-    #
     def getDescription(self):
         return self.getField("content")
 
@@ -11823,17 +11816,6 @@ class LocalFile(Resource):
 
     def __str__( self ):
         return self.getFileName()
-
-    #getURL is removed at the moment from the LocalFile and the file access
-    #   is completely delegated to the web interface; the web interface will
-    #   have to access the files locally (using the getFilePath) or the readBin
-    #   function.
-    #However, for the future it could be required to have several file
-    #   repositories so the file access will have to be reviewed.
-    #def getURL( self ):
-    #    #XXX: Very bad!! We should find a better solution
-    #    c = Config.getInstance()
-    #    return c.getArchivedFileURL( self )
 
 
 class TCIndex( Persistent ):

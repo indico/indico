@@ -85,10 +85,6 @@ class RHAbstractDelete(RHAbstractModifBase):
 
 class RHAbstractManagment(RHAbstractModifBase):
 
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
-
     def _process( self ):
         p = abstracts.WPAbstractManagment( self, self._target )
         return p.display( **self._getRequestParams() )
@@ -133,10 +129,6 @@ class RHAbstractToPDF(RHAbstractModifBase):
 
 
 class RHAbstractToXML(RHAbstractModifBase):
-
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
 
     def _process( self ):
         filename = "%s - Abstract.xml"%self._target.getTitle()
@@ -510,10 +502,6 @@ class RHAbstractManagmentChangeTrack(RHAbstractModifBase):
 
 class RHAbstractTrackManagment(RHAbstractModifBase):
 
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
-
     def _process( self ):
         p = abstracts.WPAbstractTrackManagment( self, self._target )
         return p.display( **self._getRequestParams() )
@@ -526,10 +514,6 @@ class RHAbstractTrackOrderByRating(RHAbstractModifBase):
 
 
 class RHAC(RHAbstractModifBase):
-
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
 
     def _process( self ):
         p = abstracts.WPModAC(self,self._target)
@@ -592,10 +576,6 @@ class RHEditData(RHAbstractModifBase, AbstractParam):
 
 
 class RHIntComments(RHAbstractModifBase):
-
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
 
     def _process( self ):
         p = abstracts.WPModIntComments(self,self._target)
@@ -671,19 +651,11 @@ class RHIntCommentEdit(RHIntCommentBase):
 
 class RHNotifLog(RHAbstractModifBase):
 
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
-
     def _process( self ):
         p = abstracts.WPModNotifLog(self,self._target)
         return p.display()
 
 class RHTools(RHAbstractModifBase):
-
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
 
     def _process( self ):
         p = abstracts.WPModTools(self,self._target)

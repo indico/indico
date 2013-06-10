@@ -3352,10 +3352,6 @@ class RHContribsToXML(RHConferenceModifBase):
 
 class RHContribsParticipantList(RHConferenceModifBase):
 
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHConferenceModifBase._checkProtection( self )
-
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
         self._contribIds = normaliseListParam( params.get("contributions", []) )
