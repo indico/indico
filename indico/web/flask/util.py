@@ -63,13 +63,13 @@ def create_flask_mp_wrapper(func):
     return wrapper
 
 
-def create_modpython_rules(app, folder, rule_folder='/'):
-    for path in sorted(glob.iglob(os.path.join(app.root_path, folder, '*.py'))):
+def create_modpython_rules(app, folder=''):
+    for path in sorted(glob.iglob(os.path.join(app.config['HTDOCS'], folder, '*.py'))):
         name = os.path.basename(path)
         module_globals = {}
         execfile(path, module_globals)
         functions = filter(lambda x: callable(x[1]), module_globals.iteritems())
-        base_url = posixpath.join(rule_folder, name)
+        base_url = posixpath.join('/', folder, name)
         for func_name, func in functions:
             rule = base_url if func_name == 'index' else base_url + '/' + func_name
             endpoint = 'mp-%s-%s' % (re.sub(r'\.py$', '', name), func_name)

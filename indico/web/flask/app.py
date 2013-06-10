@@ -54,6 +54,7 @@ def fix_root_path(app):
 def configure_app(app):
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
+    app.config['HTDOCS'] = Config.getInstance().getHtdocsDir()
     static_file_method = Config.getInstance().getStaticFileMethod()
     if static_file_method:
         app.config['USE_X_SENDFILE'] = True
@@ -86,9 +87,8 @@ def add_handlers(app):
 
 
 def handle_404(exception):
-    folder = os.path.abspath(os.path.join(app.root_path, 'htdocs'))
     try:
-        return send_from_directory(folder, request.path[1:], conditional=True)
+        return send_from_directory(app.config['HTDOCS'], request.path[1:], conditional=True)
     except NotFound:
         msg = (_("Page not found"), _("The page you were looking for doesn't exist."))
         return WErrorWSGI(msg).getHTML(), 404
@@ -113,7 +113,7 @@ def make_app():
     configure_app(app)
     extend_url_map(app)
     add_handlers(app)
-    create_modpython_rules(app, 'htdocs')
-    create_modpython_rules(app, 'htdocs/scripts', '/scripts')
+    create_modpython_rules(app)
+    create_modpython_rules(app, 'scripts')
     create_plugin_rules(app)
     return app
