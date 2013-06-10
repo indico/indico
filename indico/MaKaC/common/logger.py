@@ -113,7 +113,7 @@ class LoggerUtils:
         return handlers
 
     @classmethod
-    def _install_handlers(self, cp, defaultArgs, formatters, filters = None):
+    def _install_handlers(cls, cp, defaultArgs, formatters, filters=None):
         """
         Install and return handlers. If a handler configuration
         is missing its args, fetches the default values from the

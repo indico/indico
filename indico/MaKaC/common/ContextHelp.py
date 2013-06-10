@@ -391,7 +391,7 @@ class ContextHelp:
 
                 content =   '{indico:help ref=snip%s}' % count
 
-                filteredText = ttText.replace('\n','').replace('"','&quot;');
+                filteredText = ttText.replace('\n', '').replace('"', '&quot;')
 
                 if ttType == 'explicit':
                     snippets['snip'+str(count)] ="""<span class="contextHelp" title="%s">
@@ -423,7 +423,7 @@ class ContextHelp:
 
             content =   '{indico:help ref=snip%s}' % count
 
-            filteredText = ttText.replace('\n','').replace('"','&quot;');
+            filteredText = ttText.replace('\n', '').replace('"', '&quot;')
 
             snippets['snip'+str(count)] = filteredText
             elem.append(builder.E.div(content, {'class': 'ctxtInfo'}))
