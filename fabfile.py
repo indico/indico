@@ -171,8 +171,9 @@ def _safe_rm(path, recursive=False, ask=True):
             local('rm {0}{1}'.format('-rf ' if recursive else '', path))
 
 
-def _install_dependencies(mod_name, sub_path, dtype):
-    dest_dir = os.path.join(lib_dir(env.src_dir, dtype), mod_name)
+def _install_dependencies(mod_name, sub_path, dtype, dest_subpath=None):
+    l_dir = lib_dir(env.src_dir, dtype)
+    dest_dir = os.path.join(l_dir, dest_subpath) if dest_subpath else l_dir
     local('mkdir -p {0}'.format(dest_dir))
     local('cp -R {0} {1}/'.format(
         os.path.join(env.ext_dir, mod_name, sub_path),
@@ -186,7 +187,7 @@ def install_compass():
     """
     Install compass stylesheets from Git
     """
-    _install_dependencies('compass', 'frameworks/compass/stylesheets/*', 'sass')
+    _install_dependencies('compass', 'frameworks/compass/stylesheets/*', 'sass', 'compass')
 
 
 @recipe('jquery')
@@ -201,6 +202,14 @@ def install_jquery():
             dest_dir = lib_dir(env.src_dir, 'js')
             local('mkdir -p {0}'.format(dest_dir))
             local('cp dist/jquery.js {0}/'.format(dest_dir))
+
+
+@recipe('underscore')
+def install_underscore():
+    """
+    Install jquery from Git
+    """
+    _install_dependencies('underscore', 'underscore.js', 'js')
 
 
 @recipe('qtip2')
