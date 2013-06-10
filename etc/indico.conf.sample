@@ -205,7 +205,7 @@ MaxUploadFileSize = 0
 # }
 # DO NOT forget the "internal;" statement - it prevents users from accessing those URLs directly.
 
-StaticFileMethod = None
+#StaticFileMethod = None
 
 
 #------------------------------------------------------------------------------
