@@ -25,17 +25,20 @@ to the outside world.
 """
 
 # System modules
-import os, sys, shutil, signal, commands, tempfile, pkg_resources
+import os
+import pkg_resources
+import shutil
+import tempfile
 import threading
 
 # Database
 import transaction
-from MaKaC.common.db import DBMgr
 
 # Indico
 import indico
 from indico.util.console import colored
 from indico.util.shell import WerkzeugServer
+from indico.web.flask.app import make_app
 from indico.tests.config import TestConfig
 from indico.tests.base import TestOptionException, FakeMailThread
 from indico.tests.runners import *
@@ -101,7 +104,8 @@ class TestManager(object):
         Spawn a new refserver-based thread using the test db
         """
         config = TestConfig.getInstance()
-        server = WerkzeugServer(config.getWebServerHost(), int(config.getWebServerPort()), use_debugger=False)
+        server = WerkzeugServer(make_app(), config.getWebServerHost(), int(config.getWebServerPort()),
+                                use_debugger=False)
         server.make_server()
 
         t = threading.Thread(target=server.run)
