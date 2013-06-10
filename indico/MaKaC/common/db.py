@@ -72,7 +72,7 @@ class DBMgr:
         4.1) so this thechnique can be used. This has to be taken into account
         when migrating the system to a multi-threading environment.
     """
-    _instance = None
+    _instances = {}
 
     def __init__( self, hostname=None, port=None, max_disconnect_poll=30 ):
         import Configuration # Please leave this import here, db.py is imported during installation process
@@ -90,15 +90,16 @@ class DBMgr:
         self._conn.conn = None
 
     @classmethod
-    def getInstance( cls, *args, **kwargs ):
-        if cls._instance == None:
+    def getInstance(cls, *args, **kwargs):
+        pid = os.getpid()
+        if os.getpid() not in cls._instances:
             Logger.get('dbmgr').debug('cls._instance is None')
-            cls._instance=DBMgr(*args, **kwargs)
-        return cls._instance
+            cls._instances[pid] = DBMgr(*args, **kwargs)
+        return cls._instances[pid]
 
     @classmethod
-    def setInstance( cls, dbInstance ):
-        cls._instance = dbInstance
+    def setInstance(cls, dbInstance):
+        cls._instances[os.getpid()] = dbInstance
 
     def _getConnObject(self):
         return self._conn.conn
