@@ -27,7 +27,7 @@ $(document).ready(function() {
         // Turn tabs into plain links and fix urls (needed for the active tab)
         $('> .ui-tabs-nav a', this).each(function() {
             var $this = $(this);
-            tabCtrl.data('uiTabs')._off($this, 'click');
+            tabCtrl.data('ui-tabs')._off($this, 'click');
             $this.attr('href', $this.data('href'));
         });
     });
