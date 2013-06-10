@@ -110,8 +110,7 @@ LogDir               = "/opt/indico/log"
 UploadedFilesTempDir = "/opt/indico/tmp"
 XMLCacheDir          = "/opt/indico/cache"
 # You can use 'redis', 'memcached' or 'files'. The files backend caches objects in
-# XMLCacheDir while the Memcached backend uses one or more memcached servers. The
-# Redis backend uses
+# XMLCacheDir while the Memcached backend uses one or more memcached servers.
 #CacheBackend         = 'files'
 # When using memcached, provide a tuple containing 'ip:port' entries for the
 # memcached servers. Do not forget to firewall those servers as memcached has no
