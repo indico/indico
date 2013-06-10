@@ -577,7 +577,7 @@ type("JTabWidget", ["IWidget"], {
     },
     enable: function() {
         this.widget.tabs('enable');
-        for(var i = 0, num = this.widget.data('uiTabs').anchors.length; i < num; i++) {
+        for(var i = 0, num = this.widget.data('ui-tabs').anchors.length; i < num; i++) {
             this.enableTab(i);
         }
         if(this.scrollable) {
@@ -586,7 +586,7 @@ type("JTabWidget", ["IWidget"], {
     },
     disable: function() {
         this.widget.tabs('disable');
-        for(var i = 0, num = this.widget.data('uiTabs').anchors.length; i < num; i++) {
+        for(var i = 0, num = this.widget.data('ui-tabs').anchors.length; i < num; i++) {
             this.disableTab(i);
         }
         if(this.scrollable) {
