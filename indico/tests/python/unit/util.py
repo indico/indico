@@ -22,15 +22,19 @@ Some utils for unit tests
 """
 
 # system imports
-import unittest, sys, new, contextlib
+from flask import session
+from functools import wraps
+import unittest
+import new
+import contextlib
 
 # indico imports
 from indico.util.contextManager import ContextManager
 from indico.util.i18n import setLocale
 
 # indico legacy imports
-from MaKaC.common import Config
 from MaKaC.common.logger import Logger
+from indico.web.flask.app import make_app
 
 loadedFeatures = []
 
@@ -101,6 +105,7 @@ def with_context(context):
     Decorator
     """
     def wrapper(method):
+        @wraps(method)
         def testWrapped(self, *args, **kwargs):
             with self._context(context):
                 return method(self, *args, **kwargs)
@@ -133,15 +138,31 @@ class RequestEnvironment_Feature(IndicoTestFeature):
     """
 
     def _action_endRequest(self):
-        self._do._notify('requestFinished', None)
+        self._do._notify('requestFinished')
 
     def _action_startRequest(self):
-        self._do._notify('requestStarted', None)
+        self._do._notify('requestStarted')
+
+    def _action_make_app_request_context(self):
+        app = make_app()
+        env = {
+            'environ_base': {
+                'REMOTE_ADDR': '127.0.0.1'
+            }
+        }
+        return app.test_request_context(**env)
+
+    def _action_mock_session_user(self):
+        # None of the current tests actually require a user in the session.
+        # If this changes, assign a avatar mock object here
+        session.user = None
 
     def _context_request(self):
         self._startRequest()
-        setLocale('en_GB')
-        yield
+        with self._make_app_request_context():
+            self._mock_session_user()
+            setLocale('en_GB')
+            yield
         self._endRequest()
 
 

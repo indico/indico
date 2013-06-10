@@ -119,7 +119,6 @@ class TestResponsiveness(unittest.TestCase):
     def setUp(self):
         self.random = Random()
         self._loggingSetup()
-        self.falseSession = FalseSession()
 
 
         self._log("Start of test. Current pid is: " + str(os.getpid()))
@@ -313,7 +312,7 @@ class TestResponsiveness(unittest.TestCase):
                   "type": 'DummyPlugin',
                   "bookingParams": {"startDate": self._randomDate(startDate, endDate)},
                   }
-        service = CollaborationCreateTestCSBooking(params, None, self.falseSession)
+        service = CollaborationCreateTestCSBooking(params)
         service._checkParams()
         service._getAnswer()
         self.cdbmgr.endRequest()
@@ -374,7 +373,7 @@ class TestResponsiveness(unittest.TestCase):
         params = {"conference": confId,
                   "bookingId": bookingId
                   }
-        service = CollaborationRemoveCSBooking(params, None, self.falseSession)
+        service = CollaborationRemoveCSBooking(params)
         service._checkParams()
         service._getAnswer()
         self.cdbmgr.endRequest()
@@ -465,7 +464,7 @@ class TestResponsiveness(unittest.TestCase):
                   "conferenceId": ''
                   }
 
-        service = CollaborationBookingIndexQuery(params, None, self.falseSession)
+        service = CollaborationBookingIndexQuery(params)
         service._checkParams()
         service._getAnswer()
 
@@ -567,22 +566,6 @@ class TestResponsiveness(unittest.TestCase):
 class FalseAction:
     def getOwner(self):
         return None
-
-class FalseUser:
-    _instance = None
-
-    @classmethod
-    def getInstance(cls):
-        if cls._instance is None:
-            cls._instance = FalseUser()
-        return cls._instance
-
-    def getTimezone(self):
-        return 'UTC'
-
-class FalseSession:
-    def getUser(self):
-        return FalseUser.getInstance()
 
 def processResults(data):
     n = len(data)

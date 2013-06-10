@@ -33,33 +33,6 @@ from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from indico.core.index import Catalog
 from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase, with_context
 
-class FalseUser:
-    _instance = None
-
-    @classmethod
-    def getInstance(cls):
-        if cls._instance is None:
-            cls._instance = FalseUser()
-        return cls._instance
-
-    def getTimezone(self):
-        return 'UTC'
-
-
-class FalseSession:
-    def is_https(self):
-        return False
-
-    def getUser(self):
-        return FalseUser.getInstance()
-
-    def get_remote_host(self, qqch):
-        return 'localhost'
-
-    def get_remote_ip(self):
-        return '127.0.0.1'
-
-
 class Collaboration_Feature(IndicoTestFeature):
     _requires = ['plugins.Plugins']
 
@@ -74,7 +47,7 @@ class Collaboration_Feature(IndicoTestFeature):
 
 class TestElectronicAgreement(IndicoTestCase):
 
-    _requires = [Collaboration_Feature]
+    _requires = ['util.RequestEnvironment', Collaboration_Feature]
 
     def setUp(self):
         '''
@@ -87,7 +60,6 @@ class TestElectronicAgreement(IndicoTestCase):
 
         self._startDBReq()
 
-        self.falseSession = FalseSession()
         # Create few users
         self._creator = Avatar({"name":"God", "email":"test@epfl.ch"})
         self._creator.setId("creator")
@@ -181,6 +153,7 @@ class TestElectronicAgreement(IndicoTestCase):
                 self.assert_(sw.getRequestType() == "webcast" or sw.getRequestType() == "both")
 
     @with_context('database')
+    @with_context('request')
     def testNOEMAILStatus(self):
         '''
         Test if the status of the SpeakerWrapper is correctly updated to NOEMAIL.\n
@@ -224,6 +197,7 @@ class TestElectronicAgreement(IndicoTestCase):
                 self.assert_(sw.getStatus() == SpeakerStatusEnum.REFUSED)
 
     @with_context('database')
+    @with_context('request')
     def testPENDINGStatus(self):
         '''
         Test if the status of the SpeakerWrapper is correctly updated to PENDING.\n
@@ -245,6 +219,7 @@ class TestElectronicAgreement(IndicoTestCase):
                 self.assert_(sw.getStatus() == SpeakerStatusEnum.PENDING)
 
     @with_context('database')
+    @with_context('request')
     def testSIGNEDStatus(self):
         '''
         Test if the status of the SpeakerWrapper is correctly updated to SIGNED.\n
@@ -259,6 +234,7 @@ class TestElectronicAgreement(IndicoTestCase):
                 self.assert_(sw.getStatus() == SpeakerStatusEnum.SIGNED)
 
     @with_context('database')
+    @with_context('request')
     def testREFUSEDStatus(self):
         '''
         Test if the status of the SpeakerWrapper is correctly updated to REFUSED.\n
@@ -309,7 +285,7 @@ class TestElectronicAgreement(IndicoTestCase):
                   'contribId':contId,
                   'spkId': spkId
                   }
-        service = SetSpeakerEmailAddress(params, self.falseSession, self.falseSession) #weird...
+        service = SetSpeakerEmailAddress(params)
         service._checkParams()
         service._getAnswer()
 
@@ -326,7 +302,7 @@ class TestElectronicAgreement(IndicoTestCase):
                   'uniqueIdList': uniqueId,
                   'confId': self._conf.getId()
                   }
-        service = SendElectronicAgreement(params, self.falseSession, self.falseSession)
+        service = SendElectronicAgreement(params)
         service._checkParams()
         service._getAnswer()
 
@@ -338,9 +314,9 @@ class TestElectronicAgreement(IndicoTestCase):
                   }
 
         if decision == 'accept':
-            service = AcceptElectronicAgreement(params, self.falseSession, self.falseSession)
+            service = AcceptElectronicAgreement(params)
         else:
-            service = RejectElectronicAgreement(params, self.falseSession, self.falseSession)
+            service = RejectElectronicAgreement(params)
 
         service._checkParams()
         service._getAnswer()
