@@ -446,8 +446,6 @@ class Config:
         'BaseSecureURL'             : 'https://localhost/',
         'LoginURL'                  : "",
         'RegistrationURL'           : "",
-        'ShortEventTag'             : "/event/",
-        'ShortCategTag'             : "/categ/",
         'ConfigurationDir'          : "/opt/indico/etc",
         'DocumentationDir'          : "/opt/indico/doc",
         'HtdocsDir'                 : "/opt/indico/htdocs",
@@ -565,8 +563,8 @@ class Config:
             'CssBaseURL'                : "%s/css" % self.getBaseURL(),
             'CssConfTemplateBaseURL'    : self.getCssConfTemplateBaseURL(),
             'DefaultEventStylesheet'    : self.__defaultEventStylesheet,
-            'ShortCategURL'             : '%s/%s' % (self.getBaseURL(), self.getShortCategTag()),
-            'ShortEventURL'             : '%s/%s' % (self.getBaseURL(), self.getShortEventTag()),
+            'ShortCategURL'             : '%s/categ/' % self.getBaseURL(),
+            'ShortEventURL'             : '%s/event/' % self.getBaseURL(),
             'TPLDir'                    : os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'webinterface', 'tpls')),
             'HostNameURL'               : urlparse.urlparse(self.getBaseURL())[1].partition(':')[0],
             'PortURL'                   : urlparse.urlparse(self.getBaseURL())[1].partition(':')[2] or '80',
@@ -575,7 +573,7 @@ class Config:
             'ImagesBaseURL'             : "%s/images" % self._configVars['BaseURL'],
             'ImagesBaseSecureURL'       : "%s/images" % self._configVars['BaseSecureURL'],
             'Version'                   : MaKaC.__version__,
-                                 })
+        })
 
 
     def __readConfigFile(self):

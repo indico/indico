@@ -81,23 +81,6 @@ BaseSecureURL        = "https://localhost:8443/indico"
 #   RegistrationURL      = ""
 
 
-# You can use "fancy" URLs when giving out links to Indico's events and
-# categories. The format of the final links must be:
-#
-#   BaseURL + ShortEventTag + Event Id
-#   BaseURL + ShortEventTag + Category Id
-#
-# For example if a conference id is 5, your BaseURL is
-# http://example.com/ and you specify ShortEventTag = "/event/" then you can
-# use the url http://example.com/event/5 to access the conference.
-#
-# ShortEventTag and ShortCategTag _must_ be different, they must contain only
-# alphanumeric characters and they need to end with a forward slash.
-#
-ShortEventTag        = "event/"
-ShortCategTag        = "categ/"
-
-
 #------------------------------------------------------------------------------
 # DIRECTORIES
 #------------------------------------------------------------------------------
