@@ -16,6 +16,8 @@
 *.egg/
 
 # assets and generated stuff
+indico/htdocs/static/assets
+indico/htdocs/sass/.sass-cache
 .webassets-cache
 *.min.css
 *.min.js

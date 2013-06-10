@@ -219,6 +219,7 @@ def install_qtip2():
     """
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'qtip2')):
+            local('git submodule init')
             local('git submodule update')
             local('npm install')
             local('grunt --plugins="tips modal viewport svg" init clean concat:dist concat:css concat:libs replace')
