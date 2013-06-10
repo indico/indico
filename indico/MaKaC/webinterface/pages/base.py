@@ -48,7 +48,9 @@ class WPBase(OldObservable):
         self._rh = rh
         self._locTZ = ""
 
-        self._asset_env = Environment(config.getHtdocsDir(), '')
+        self._asset_env = Environment(os.path.join(config.getHtdocsDir(), "static", "assets"), '/static/assets/')
+        self._asset_env.config['PYSCSS_LOAD_PATHS'] = [os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass')]
+        self._asset_env.append_path(config.getHtdocsDir(), '/')
 
         if db_connected:
             debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
