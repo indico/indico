@@ -233,12 +233,15 @@ function jsonRequest(url, value, handler) {
  * @return {XMLHttpRequest} request
  */
 function webRequest(url, contentType, body, handler) {
+        var token = $('#csrf-token').attr('content');
         var transport = Web.transport();
         try {
                 transport.open("POST", url, true);
                 transport.setRequestHeader("Accept", "text/javascript, text/html, application/xml, text/xml, application/json, */*");
                 transport.setRequestHeader("Content-Type", contentType);
-                transport.setRequestHeader("X-CSRF-Token", $('#csrf-token').attr('content'));
+                if (token) {
+                        transport.setRequestHeader("X-CSRF-Token", token);
+                }
                 transport.onreadystatechange = function() {
                         if (transport.readyState != ReadyState.Complete) {
                                 return;
