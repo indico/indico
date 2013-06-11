@@ -19,12 +19,8 @@
 
 from __future__ import absolute_import
 
-import glob
 import os
-import posixpath
-import re
 import time
-import types
 
 from flask import request, redirect, url_for
 from flask import current_app as app
@@ -57,32 +53,13 @@ def create_flat_args():
     return flat_args
 
 
-def create_flask_mp_wrapper(func):
-    def wrapper():
-        return func(None, **create_flat_args())
-
-    return wrapper
-
-
-def create_modpython_rules(app, folder=''):
-    for path in sorted(glob.iglob(os.path.join(app.config['INDICO_HTDOCS'], folder, '*.py'))):
-        name = os.path.basename(path)
-        module_globals = {}
-        execfile(path, module_globals)
-        functions = [(fname, func) for fname, func in module_globals.iteritems() if
-                     isinstance(func, types.FunctionType)]
-        base_url = posixpath.join('/', folder, name)
-        for func_name, func in functions:
-            rule = base_url if func_name == 'index' else base_url + '/' + func_name
-            endpoint = 'mp-%s-%s' % (re.sub(r'\.py$', '', name), func_name)
-            app.add_url_rule(rule, endpoint, view_func=create_flask_mp_wrapper(func), methods=('GET', 'POST'))
-
-
 @memoize
-def create_flask_rh_wrapper(rh):
+def rh_as_view(rh):
     def wrapper():
         return rh(None).process(create_flat_args())
 
+    wrapper.__name__ = rh.__name__
+    wrapper.__doc__ = rh.__doc__
     return wrapper
 
 
@@ -103,7 +80,7 @@ def create_plugin_rules(app):
         if issubclass(rh, RHHtdocs):
             app.add_url_rule(rule, endpoint, view_func=create_flask_rh_htdocs_wrapper(rh))
         else:
-            app.add_url_rule(rule, endpoint, view_func=create_flask_rh_wrapper(rh), methods=('GET', 'POST'))
+            app.add_url_rule(rule, endpoint, view_func=rh_as_view(rh), methods=('GET', 'POST'))
 
 
 def shorturl_handler(what, tag):

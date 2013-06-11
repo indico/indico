@@ -15,7 +15,7 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 import csv
 import tempfile
@@ -32,24 +32,25 @@ from MaKaC.common.Configuration import Config
 from MaKaC.domain import DomainHolder
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 from MaKaC.common.utils import parseDate
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, create_flat_args
 
 
-def index(req, **params):
-
+def exportReservations():
+    params = create_flat_args()
     DBMgr.getInstance().startRequest()
     Factory.getDALManager().connect()
 
     ################### checking protection ###################
 
     # check if it is a machine that belongs to the CERN domain
-    cernDomain = DomainHolder().getById(0) # id 0 means CERN
+    cernDomain = DomainHolder().getById(0)  # id 0 means CERN
     if not cernDomain.belongsTo(request.remote_addr):
         return "Only CERN users can access to this export resource"
 
     ################### checking params ###################
-    if not (params.has_key("sd") and params.has_key("ed") and params.has_key("r")):
-        return """Missing parameters. The request should be like this: http://indico.cern.ch/exportReservations.py?sd=2010-09-24&ed=2010-09-25&r=1,18,114,42"""
+    if not all(x in params for x in ('sd', 'ed', 'r')):
+        return """Missing parameters. The request should be like this: """ + \
+               """http://indico.cern.ch/exportReservations.py?sd=2010-09-24&ed=2010-09-25&r=1,18,114,42"""
 
     try:
         sd = parseDate(params.get("sd"), "%Y-%m-%d")
@@ -60,7 +61,6 @@ def index(req, **params):
         return """'sd' must be <= than 'ed'"""
     if ed - sd > timedelta(35):
         return """One can only export 3 days at most"""
-
 
     roomIDs = params.get("r").strip().split(",")
     if roomIDs == "":
@@ -88,7 +88,7 @@ def index(req, **params):
     collisions = []
     for resv in resvs:
         for p in resv.splitToPeriods(endDT=resvEx.endDT, startDT=resvEx.startDT):
-            collisions.append(Collision( ( p.startDT, p.endDT ), resv ))
+            collisions.append(Collision((p.startDT, p.endDT), resv))
 
     of = params.get("of", "csv")
     if of == "xml":
@@ -103,7 +103,6 @@ def index(req, **params):
 
 
 def createXML(resvs):
-
     xml = XMLGen()
 
     xml.openTag("bookings")
@@ -111,7 +110,7 @@ def createXML(resvs):
     for collision in resvs:
         resv = collision.withReservation
         xml.openTag("booking")
-        xml.writeTag("room", "%s %s-%s"%(str(resv.room.building), resv.room.floor, str(resv.room.roomNr)))
+        xml.writeTag("room", "%s %s-%s" % (str(resv.room.building), resv.room.floor, str(resv.room.roomNr)))
         xml.writeTag("startTime", collision.startDT.strftime("%Y-%m-%d %H:%M:%S"))
         xml.writeTag("endTime", collision.endDT.strftime("%Y-%m-%d %H:%M:%S"))
         xml.writeTag("reason", resv.reason or "")
@@ -122,22 +121,23 @@ def createXML(resvs):
     return send_file('Bookings.xml', StringIO(xml.getXml()), 'XML')
 
 
-
 def createCSV(resvs):
-
-    results=[['URL',
-             'id',
-             'start date',
-             'end date',
-             'name',
-             'site',
-             'building',
-             'floor',
-             'roomNr',
-             'IP',
-             'H323 IP',
-             'uses VC equipment'
-             ]]
+    results = [
+        [
+            'URL',
+            'id',
+            'start date',
+            'end date',
+            'name',
+            'site',
+            'building',
+            'floor',
+            'roomNr',
+            'IP',
+            'H323 IP',
+            'uses VC equipment'
+        ]
+    ]
 
     for collision in resvs:
         resv = collision.withReservation
@@ -145,26 +145,25 @@ def createCSV(resvs):
             usesAVC = 1
         else:
             usesAVC = 0
-        results.append([str(UHRoomBookingBookingDetails.getURL(resv)),
-                         str(resv.id),
-                         collision.startDT.strftime("%Y-%m-%d %H:%M:%S"),
-                         collision.endDT.strftime("%Y-%m-%d %H:%M:%S"),
-                         resv.room.name or "",
-                         resv.room.site,
-                         str(resv.room.building),
-                         resv.room.floor,
-                         str(resv.room.roomNr),
-                         resv.room.customAtts.get('IP') or "",
-                         resv.room.customAtts.get('H323 IP') or "",
-                         usesAVC
-                         ])
-
-
+        results.append([
+            str(UHRoomBookingBookingDetails.getURL(resv)),
+            str(resv.id),
+            collision.startDT.strftime("%Y-%m-%d %H:%M:%S"),
+            collision.endDT.strftime("%Y-%m-%d %H:%M:%S"),
+            resv.room.name or "",
+            resv.room.site,
+            str(resv.room.building),
+            resv.room.floor,
+            str(resv.room.roomNr),
+            resv.room.customAtts.get('IP') or "",
+            resv.room.customAtts.get('H323 IP') or "",
+            usesAVC
+        ])
 
     #################### create temp file ###################
     cfg = Config.getInstance()
     tempPath = cfg.getUploadedFilesTempDir()
-    tempFileName = tempfile.mkstemp( prefix="Bookings", suffix=".csv", dir = tempPath )[1]
+    tempFileName = tempfile.mkstemp(prefix="Bookings", suffix=".csv", dir=tempPath)[1]
 
     #################### write the results in the temp file ###################
     with open(tempFileName, 'w') as fd:
