@@ -24,6 +24,7 @@ import os
 import posixpath
 import re
 import time
+import types
 
 from flask import request, redirect, url_for
 from flask import current_app as app
@@ -68,7 +69,8 @@ def create_modpython_rules(app, folder=''):
         name = os.path.basename(path)
         module_globals = {}
         execfile(path, module_globals)
-        functions = filter(lambda x: callable(x[1]), module_globals.iteritems())
+        functions = [(fname, func) for fname, func in module_globals.iteritems() if
+                     isinstance(func, types.FunctionType)]
         base_url = posixpath.join('/', folder, name)
         for func_name, func in functions:
             rule = base_url if func_name == 'index' else base_url + '/' + func_name
