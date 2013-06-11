@@ -95,7 +95,7 @@ indico_management = Bundle(
     filters='rjsmin', output='js/indico_management_%(version)s.min.js')
 
 indico_room_booking = Bundle(
-    'jquery/multiselect.js',
+    'js/indico/jquery/multiselect.js',
     *namespace('js/indico/RoomBooking',
 
                'MapOfRooms.js',
