@@ -121,13 +121,3 @@ def deleteBlocking( req, **params ):
 
 def sendRoomPhoto( req, **params ):
     return roomBooking.RHRoomBookingSendRoomPhoto(req).process(params)
-
-# AJAX: Returns <select></select> list of rooms
-def getRoomSelectList( req, **params ):
-    return roomBooking.RHRoomBookingGetRoomSelectList(req).process(params)
-
-# AJAX: Returns <select></select> list of rooms
-def getRoomSelectList4SubEvents( req, **params ):
-    params['forSubEvents'] = 'True'
-    return roomBooking.RHRoomBookingGetRoomSelectList(req).process(params)
-

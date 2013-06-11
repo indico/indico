@@ -2352,29 +2352,6 @@ class RHRoomBookingSendRoomPhoto( RHRoomBookingBase ):
         return send_file(self.fileName, os.path.join(filePath, self.fileName), 'JPG')
 
 
-class RHRoomBookingGetRoomSelectList( RHRoomBookingBase ):
-
-    def _checkParams( self, params ):
-        self.location = params.get( 'locationName' )
-        self.forSubEvents = params.get( 'forSubEvents' ) == 'True'
-
-    def _process( self ):
-
-        self._roomList = []
-        if self.location:
-            self._roomList = CrossLocationQueries.getRooms( location = self.location )
-        self._locationRoom = ""
-
-        from MaKaC.webinterface import wcomponents
-        if self.forSubEvents:
-            p = wcomponents.WRoomBookingRoomSelectList4SubEvents( self )
-        else:
-            p = wcomponents.WRoomBookingRoomSelectList( self )
-
-        return p.getHTML( self.getRequestParams() )
-
-        #return "<div style='background-color: red;'>&nbsp;&nbsp;&nbsp;&nbsp;</div>"
-
 class RHRoomBookingRejectBookingOccurrence( RHRoomBookingBase ):
 
     def _checkParams( self , params ):

@@ -4383,32 +4383,6 @@ class WRoomBookingWelcome( WTemplated ):
         vars = WTemplated.getVars( self )
         return vars
 
-class WRoomBookingRoomSelectList( WTemplated ):
-
-    def __init__( self, rh ):
-        self._rh = rh
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-
-        vars['roomList'] = self._rh._roomList
-        vars['locationRoom'] = self._rh._locationRoom
-
-        return vars
-
-class WRoomBookingRoomSelectList4SubEvents( WTemplated ):
-
-    def __init__( self, rh ):
-        self._rh = rh
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-
-        vars['roomList'] = self._rh._roomList
-        vars['locationRoom'] = self._rh._locationRoom
-
-        return vars
-
 # ============================================================================
 # == EVENT CONTEXT ==== (Room Booking Related) ===============================
 # ============================================================================
