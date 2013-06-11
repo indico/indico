@@ -52,10 +52,13 @@ def fix_root_path(app):
 
 
 def configure_app(app):
+    cfg = Config.getInstance()
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
-    app.config['HTDOCS'] = Config.getInstance().getHtdocsDir()
-    static_file_method = Config.getInstance().getStaticFileMethod()
+    app.config['PERMANENT_SESSION_LIFETIME'] = cfg.getSessionLifetime()
+    app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
+    app.config['HTDOCS'] = cfg.getHtdocsDir()
+    static_file_method = cfg.getStaticFileMethod()
     if static_file_method:
         app.config['USE_X_SENDFILE'] = True
         method, args = static_file_method

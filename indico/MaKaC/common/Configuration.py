@@ -482,6 +482,7 @@ class Config:
         'EmbeddedWebserver' : False,
         'OAuthAccessTokenTTL' : 10000,
         'MobileURL' : '',
+        'SessionLifetime' : 86400*31,
         # Authentication
         'LDAPConfig': {'host': 'myldapserver.example.com',
                        'useTLS': True,

@@ -21,7 +21,7 @@ from __future__ import absolute_import
 
 import cPickle
 import uuid
-from datetime import timedelta
+from datetime import datetime, timedelta
 from flask import request
 from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
@@ -133,6 +133,12 @@ class IndicoSessionInterface(SessionInterface):
         else:
             return self.temporary_session_lifetime
 
+    def should_refresh_session(self, app, session):
+        if session.new or '_expires' not in session:
+            return False
+        threshold = self.get_storage_lifetime(app, session) / 2
+        return session['_expires'] - datetime.now() < threshold
+
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name)
         if not sid:
@@ -144,17 +150,25 @@ class IndicoSessionInterface(SessionInterface):
 
     def save_session(self, app, session, response):
         domain = self.get_cookie_domain(app)
-        if not session and not session.new:  # empty session, delete it from storage and cookie
+        if not session and not session.new:
+            # empty session, delete it from storage and cookie
             self.storage.delete(session.sid)
             response.delete_cookie(app.session_cookie_name, domain=domain)
             return
-        if not session.modified:
-            # It might be a good idea to store the expiry time in the session itself.
-            # This way we could refresh it from time to time to prevent it from expiring
-            # while it's still in use.
+
+        if not session.modified and not self.should_refresh_session(app, session):
+            # If the session has not been modified we only store if it needs to be refreshed
             return
+
+        if app.config['INDICO_SESSION_PERMANENT']:
+            # Setting session.permanent marks the session as modified so we only set it when we
+            # are saving the session anyway!
+            session.permanent = True
+
         storage_ttl = self.get_storage_lifetime(app, session)
         cookie_lifetime = self.get_expiration_time(app, session)
+        session['_expires'] = datetime.now() + storage_ttl
+
         self.storage.set(session.sid, self.serializer.dumps(dict(session)), storage_ttl)
         response.set_cookie(app.session_cookie_name, session.sid, expires=cookie_lifetime, httponly=True,
                             secure=self.get_cookie_secure(app))

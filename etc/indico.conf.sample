@@ -231,6 +231,10 @@ AuthenticatorList    = ['Local']
 #               'accessCredentials': ('CN=user,OU=Users,DC=example,DC=com','secret_password')
 # }
 
+# Sessions are only stored for a certain time. You can modify the duration here. By setting
+# the lifetime to 0 the cookie will expire when the browser is closed.
+# SessionLifetime = 86400 * 31
+
 #------------------------------------------------------------------------------
 # STYLING
 #------------------------------------------------------------------------------
