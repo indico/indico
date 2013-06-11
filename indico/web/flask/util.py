@@ -64,7 +64,7 @@ def create_flask_mp_wrapper(func):
 
 
 def create_modpython_rules(app, folder=''):
-    for path in sorted(glob.iglob(os.path.join(app.config['HTDOCS'], folder, '*.py'))):
+    for path in sorted(glob.iglob(os.path.join(app.config['INDICO_HTDOCS'], folder, '*.py'))):
         name = os.path.basename(path)
         module_globals = {}
         execfile(path, module_globals)

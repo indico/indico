@@ -57,7 +57,7 @@ def configure_app(app):
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = cfg.getSessionLifetime()
     app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
-    app.config['HTDOCS'] = cfg.getHtdocsDir()
+    app.config['INDICO_HTDOCS'] = cfg.getHtdocsDir()
     static_file_method = cfg.getStaticFileMethod()
     if static_file_method:
         app.config['USE_X_SENDFILE'] = True
@@ -91,7 +91,7 @@ def add_handlers(app):
 
 def handle_404(exception):
     try:
-        return send_from_directory(app.config['HTDOCS'], request.path[1:], conditional=True)
+        return send_from_directory(app.config['INDICO_HTDOCS'], request.path[1:], conditional=True)
     except NotFound:
         msg = (_("Page not found"), _("The page you were looking for doesn't exist."))
         return WErrorWSGI(msg).getHTML(), 404
