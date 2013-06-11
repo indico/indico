@@ -21,7 +21,7 @@ from MaKaC.webinterface.rh import evaluationModif
 
 def index( req, **params ):
     """The index web page of an evaluation is by default the setup page."""
-    return setup(req, **params)
+    return evaluationModif.RHEvaluationSetup( req ).process( params )
 
 def setup( req, **params ):
     """Setup web page of an evaluation."""

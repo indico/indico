@@ -21,7 +21,7 @@
 from MaKaC.webinterface.rh import conferenceModif
 
 def index( req, **params ):
-    return custom(req, **params)
+    return conferenceModif.RHConfModifDisplayCustomization( req ).process( params )
 
 def custom( req, **params ):
     return conferenceModif.RHConfModifDisplayCustomization( req ).process( params )
