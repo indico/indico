@@ -18,9 +18,10 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 #import syslog
-from flask import session
+from flask import session, request
 import MaKaC.webinterface.rh.base as base
 import MaKaC.common.info as info
+from MaKaC.common import Config
 
 class RHResetTZ(base.RH):
 
@@ -50,6 +51,4 @@ class RHResetTZ(base.RH):
 
         session.timezone = tz
         # redirect to the calling URL with the new session tz.
-        #DBMgr.getInstance().endRequest(True)
-        #util.redirect(self._req,parms['REFERER_URL'])
-        self._redirect(parms['REFERER_URL'])
+        self._redirect(request.referrer or Config.getInstance().getBaseURL())
