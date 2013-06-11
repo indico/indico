@@ -88,8 +88,7 @@ def roomBookingRoomList( req, **params ):
     return conferenceModif.RHConfModifRoomBookingRoomList( req ).process( params )
 
 def roomBookingList( req, **params ):
-    r = conferenceModif.RHConfModifRoomBookingList(req).process(params)
-    return r
+    return conferenceModif.RHConfModifRoomBookingList(req).process(params)
 
 # 3. Details of...
 def roomBookingRoomDetails( req, **params ):
