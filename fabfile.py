@@ -75,12 +75,12 @@ def node_env():
     if env.system_node:
         yield
     else:
-        with prefix('source {0}'.format(os.path.join(env.node_env_path, 'bin/activate'))):
+        with prefix('. {0}'.format(os.path.join(env.node_env_path, 'bin/activate'))):
             yield
 
 
 def pythonbrew():
-    return prefix('source {0}'.format(os.path.join(PYTHONBREW_PATH, 'etc', 'bashrc')))
+    return prefix('. {0}'.format(os.path.join(PYTHONBREW_PATH, 'etc', 'bashrc')))
 
 
 @contextmanager
