@@ -64,9 +64,11 @@ class URLHandler(object):
             Parameters:
                 params - (Dict) parameters to be added to the URL.
         """
-        rh = ContextManager.get('currentRH', None)
 
-        if rh and rh._req.is_https() and Config.getInstance().getBaseSecureURL():
+        rh = ContextManager.get('currentRH', None)
+        req = rh._req if rh else ContextManager.get('currentReq', None)
+
+        if req and req.is_https() and Config.getInstance().getBaseSecureURL():
             baseURL = Config.getInstance().getBaseSecureURL()
         else:
             baseURL = Config.getInstance().getBaseURL()
