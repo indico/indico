@@ -20,6 +20,7 @@
 """This file contains classes which allow to handle URLs in a transparent way
 """
 from flask import url_for
+from flask import current_app as app
 from werkzeug.urls import url_encode, url_parse, url_unparse, url_join
 
 from MaKaC.common.Configuration import Config
@@ -64,6 +65,10 @@ class _BaseURL(object):
             self._rebuild()
         return self._url
 
+    @property
+    def js_router(self):
+        raise NotImplementedError
+
     def __str__(self):
         return self.url
 
@@ -80,6 +85,10 @@ class URL(_BaseURL):
         for key, value in self._params.iteritems():
             params[key] = value
         self._url = url_unparse(base._replace(query=url_encode(params), fragment=self.fragment))
+
+    @property
+    def js_router(self):
+        return str(self)
 
     def __repr__(self):
         return '<URL(%s, %r, %s)>' % (self._absolute_url, self._params, self.url)
@@ -99,6 +108,25 @@ class EndpointURL(_BaseURL):
         # the same one. maybe we could even get rid of the baseURL stuff at some point... It's
         # only really important when we change from SSL to non-SSL or vice versa anyway
         self._url = url_join(self._base_url, url_for(self._endpoint, **self._params))
+
+    @property
+    def js_router(self):
+        # based on werkzeug.contrib.jsrouting
+        return {
+            'type': 'flask_rules',
+            'rules': [
+                {
+                    'args': list(rule.arguments),
+                    'defaults': rule.defaults,
+                    'trace': [
+                        {
+                            'is_dynamic': is_dynamic,
+                            'data': data
+                        } for is_dynamic, data in rule._trace
+                    ]
+                } for rule in app.url_map.iter_rules(self._endpoint)
+            ]
+        }
 
     def __repr__(self):
         schema = url_parse(self.url).schema

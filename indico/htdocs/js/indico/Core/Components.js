@@ -36,6 +36,11 @@ function imageFunctionGenerator(url) {
 if (location.protocol == "https:") {
     function fixUrls(urls) {
         for(var key in urls) {
+            // flask router -> skip
+            if(urls[key].type == 'flask_rules') {
+                continue;
+            }
+
             // not a string -> assume object and recurse
             if(urls[key].replace === undefined) {
                 fixUrls(urls[key]);

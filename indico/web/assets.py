@@ -212,6 +212,8 @@ jquery = Bundle(
         'jquery.watermark.js'),
     filters='rjsmin', output='js/jquery_code_%(version)s.min.js')
 
+utils = Bundle('js/utils/routing.js', filters='rjsmin', output='js/utils_%(version)s.min.js')
+
 presentation = Bundle(
     *namespace('js/presentation',
 
@@ -264,7 +266,7 @@ moment = Bundle(
         'lang/fr.js'),
     filters='rjsmin', output='js/moment_%(version)s.min.js')
 
-base_js = Bundle(jquery, presentation, indico_jquery, moment, indico_core,
+base_js = Bundle(jquery, utils, presentation, indico_jquery, moment, indico_core,
                  indico_legacy, indico_common)
 
 base_sass = Bundle('sass/screen.scss',
@@ -276,6 +278,7 @@ base_sass = Bundle('sass/screen.scss',
 
 def register_all_js(env):
     env.register('jquery', jquery)
+    env.register('utils', utils)
     env.register('presentation', presentation)
     env.register('indico_core', indico_core)
     env.register('indico_management', indico_management)
