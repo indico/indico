@@ -55,8 +55,10 @@ def create_flat_args():
 
 @memoize
 def rh_as_view(rh):
-    def wrapper():
-        return rh(None).process(create_flat_args())
+    def wrapper(**kwargs):
+        params = create_flat_args()
+        params.update(kwargs)
+        return rh(None).process(params)
 
     wrapper.__name__ = rh.__name__
     wrapper.__doc__ = rh.__doc__

@@ -59,7 +59,6 @@ def getRequestURL(action, arguments = {}):
 
     url = URL(actionURL)
     url.setParams(arguments)
-    url.setSeparator('&')
 
     return url
 

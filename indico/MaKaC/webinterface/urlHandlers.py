@@ -22,12 +22,11 @@ import urlparse
 from new import classobj
 from flask import request
 
-from MaKaC.common.url import URL
+from MaKaC.common.url import URL, EndpointURL
 from MaKaC.common.Configuration import Config
 import MaKaC.user as user
 from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.common.contextManager import ContextManager
 
 
 """
@@ -52,8 +51,10 @@ class URLHandler(object):
         _relativeURL - (string) Contains the relative (the part which is
             variable from the root) URL pointing to the corresponding request
             handler.
+        _endpoint - (string) Contains the name of a Flask endpoint.
     """
-    _relativeURL = "broken link"
+    _relativeURL = None
+    _endpoint = None
 
     @classmethod
     def getRelativeURL( cls ):
@@ -63,23 +64,26 @@ class URLHandler(object):
         return cls._relativeURL
 
     @classmethod
-    def _getURL( cls, **params ):
+    def _getURL(cls, **params):
         """ Gives the full URL for the corresponding request handler.
 
             Parameters:
                 params - (Dict) parameters to be added to the URL.
         """
-        rh = ContextManager.get('currentRH', None)
 
-        if rh and request.is_secure and Config.getInstance().getBaseSecureURL():
-            baseURL = Config.getInstance().getBaseSecureURL()
-        else:
-            baseURL = Config.getInstance().getBaseURL()
+        secure = request.is_secure and Config.getInstance().getBaseSecureURL()
 
-        return URL('%s/%s' % (baseURL, cls.getRelativeURL()), **params)
+        if not cls._endpoint:
+            # Legacy UH containing a relativeURL
+            cfg = Config.getInstance()
+            baseURL = cfg.getBaseSecureURL() if secure else cfg.getBaseURL()
+            return URL('%s/%s' % (baseURL, cls.getRelativeURL()), **params)
+
+        assert not cls.getRelativeURL()
+        return EndpointURL(cls._endpoint, secure, params)
 
     @classmethod
-    def getURL( cls, target=None, **params ):
+    def getURL(cls, target=None, **params):
         """Gives the full URL for the corresponding request handler. In case
             the target parameter is specified it will append to the URL the
             the necessary parameters to make the target be specified in the url.
@@ -90,10 +94,10 @@ class URLHandler(object):
                     is able to retrieve it.
                 params - (Dict) parameters to be added to the URL.
         """
-        url = cls._getURL(**params)
         if target is not None:
-            url.addParams( target.getLocator() )
-        return url
+            params.update(target.getLocator())
+        return cls._getURL(**params)
+
 
 class SecureURLHandler(URLHandler):
 

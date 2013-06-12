@@ -19,119 +19,90 @@
 
 """This file contains classes which allow to handle URLs in a transparent way
 """
-import urllib
-from UserList import UserList
+from flask import url_for
+from werkzeug.urls import url_encode, url_parse, url_unparse, url_join
+
+from MaKaC.common.Configuration import Config
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import MaKaCError
 
 
-class URL:
-    """This class represents an internet URL and provides methods in order to
-        handle it in an easy way; it encapsulates the encoding of the parameters
-        so clients don't need to worry about that. It also implements the
-        __str__ method which will allow to treat it as a simple string.
+class _BaseURL(object):
+    def __init__(self, params):
+        self.fragment = None
+        self._url = None
+        self._modified = True
+        self._params = dict(params) if params else {}
 
-       Attributes:
-        _base - (String) base url containing the protocol, hostname and path
-            in a correct way
-        _params - (Dict) parameters to be added to the URL
-    """
+    def _rebuild(self):
+        raise NotImplementedError
 
-    def __init__( self, base, **params ):
-        self._segment = ""
-        self.setBase( base )
-        self.setParams( params )
-        """
-            Spearator might need to be set to &amp; by default inorder to
-            follow the W3C standard, but this seems to give problems in IE.
-        """
-        self._separator = "&"
+    def setSegment(self, segment):
+        self.fragment = segment
 
-    def getBase( self ):
-        return self._base
-
-    def setBase( self, newBase ):
-        self._base = str( newBase ).strip()
-
-    def getSegment( self ):
-        return self._segment
-
-    def setSegment( self, newSegment ):
-        self._segment = newSegment.strip()
-
-    def getSeparator(self):
-        if not hasattr(self, "_separator"):
-            self._separator = "&"
-        return self._separator
-
-    def setSeparator(self, separator):
-        self._separator = separator
-
-    def setParams(self,params):
+    def setParams(self, params):
         self._params = {}
-        if params != None:
-            for name in params.keys():
-                self.addParam( name, params[name] )
+        if params:
+            self._params.update(params)
+        self._modified = True
 
-    def addParams(self,params):
-        for name in params.keys():
-            self.addParam( name, params[name] )
+    def addParams(self, params):
+        self._params.update(params)
+        self._modified = True
 
-    def addParam( self, name, value ):
-        self._params[name.strip()] = value
+    def addParam(self, name, value):
+        self._params[name] = value
+        self._modified = True
 
-    def delParam( self, name ):
-        if self._params.has_key( name.strip() ):
-            del self._params[name.strip()]
+    @property
+    def url(self):
+        # We lazily generate the URL only when it's needed. This has the advantage that we never try to build
+        # an URL while not all params are present - while it would not be a big problem when using query string
+        # arguments, it would trigger an exception in case a rule argument is missing.
+        if self._modified:
+            self._modified = False
+            self._rebuild()
+        return self._url
 
-    def _encodeParamValue( self, value ):
-        return urllib.quote_plus( str( value ).strip() )
-
-    def _getParamsURLForm( self ):
-        l = []
-        for name in self._params.keys():
-            value = self._params[name]
-            if type(value) == list or isinstance(value, UserList):
-                for v in value:
-                    l.append(name + '=' + self._encodeParamValue( v ))
-            else:
-                l.append(name + '=' + self._encodeParamValue( value ))
-        return self._separator.join( l )
-
-    def __str__( self ):
-        params = self._getParamsURLForm()
-        if params.strip():
-            params = "?" + params
-        segment = self.getSegment()
-        if segment:
-            segment = "#" + segment
-        return self.getBase() + params + segment
+    def __str__(self):
+        return self.url
 
 
-class MailtoURL:
+class URL(_BaseURL):
+    def __init__(self, absolute_url, **params):
+        _BaseURL.__init__(self, params)
+        self._absolute_url = str(absolute_url).strip()
+        self._rebuild()
 
-    def __init__( self, dest, **params ):
-        self._destination = dest
-        self.setSubject( params.get("subject", "") )
+    def _rebuild(self):
+        base = url_parse(self._absolute_url)
+        params = base.decode_query()
+        for key, value in self._params.iteritems():
+            params[key] = value
+        self._url = url_unparse(base._replace(query=url_encode(params), fragment=self.fragment))
 
-    def setSubject( self, newSubject ):
-        self._subject = newSubject.strip()
+    def __repr__(self):
+        return '<URL(%s, %r, %s)>' % (self._absolute_url, self._params, self.url)
 
-    def _encodeParamValue( self, value ):
-        return urllib.quote( str( value ) )
 
-    def _getParamsURLForm( self ):
-        l = []
-        l.append("subject=%s"%self._subject)
-        return "&amp;".join(l)
+class EndpointURL(_BaseURL):
+    def __init__(self, endpoint, secure, params):
+        _BaseURL.__init__(self, params)
+        cfg = Config.getInstance()
+        self._base_url = cfg.getBaseSecureURL() if secure else cfg.getBaseURL()
+        self._endpoint = endpoint
+        self._secure = secure
 
-    def __str__( self ):
-        res = "mailto:%s"%self._destination
-        params = self._getParamsURLForm()
-        if params != "":
-            res = "%s?%s"%(res, params)
-        return res
+    def _rebuild(self):
+        # url_for already creates an absolute url (e.g. /indico/whatever) but since it starts
+        # with a slash this is not a problem. It overwrites the path part in baseURL but it's
+        # the same one. maybe we could even get rid of the baseURL stuff at some point... It's
+        # only really important when we change from SSL to non-SSL or vice versa anyway
+        self._url = url_join(self._base_url, url_for(self._endpoint, **self._params))
 
+    def __repr__(self):
+        schema = url_parse(self.url).schema
+        return '<EndpointURL(%s, %s, %s, %s)>' % (schema, self._endpoint, self._params, self.url)
 
 
 class ShortURLMapper(ObjectHolder):

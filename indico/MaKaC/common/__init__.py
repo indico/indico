@@ -26,5 +26,5 @@ skip_imports = getIndicoInstallMode()
 if not skip_imports:
     from db import DBMgr
     from info import HelperMaKaCInfo
-    from url import URL,MailtoURL
+    from url import URL
     from Configuration import Config
