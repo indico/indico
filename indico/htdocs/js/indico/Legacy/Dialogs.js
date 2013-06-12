@@ -591,9 +591,9 @@ extend(IndicoUI.Dialogs,
                        rtWidget.set(req.get(), !req.get());
 
                        _.defer(function(){
-                               rtWidget.getEditor().on('change',function(ev){
-                               changedText.set(true);
-                           });
+                               rtWidget.onChange(function(ev){
+                                   changedText.set(true);
+                               });
                        });
                        if (killProgress) {
                            killProgress();
