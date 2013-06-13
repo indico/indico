@@ -52,26 +52,31 @@ class URLHandler(object):
             variable from the root) URL pointing to the corresponding request
             handler.
         _endpoint - (string) Contains the name of a Flask endpoint.
+        _secure - (bool) Always create secure URLs if possible
     """
     _relativeURL = None
     _endpoint = None
+    _secure = False
 
     @classmethod
-    def getRelativeURL( cls ):
+    def getRelativeURL(cls):
         """Gives the relative URL (URL part which is carachteristic) for the
             corresponding request handler.
         """
         return cls._relativeURL
 
     @classmethod
-    def _getURL(cls, **params):
+    def _getURL(cls, _force_secure=None, **params):
         """ Gives the full URL for the corresponding request handler.
 
             Parameters:
-                params - (Dict) parameters to be added to the URL.
+                _force_secure - (bool) create a secure url if possible
+                params - (dict) parameters to be added to the URL.
         """
 
-        secure = request.is_secure and Config.getInstance().getBaseSecureURL()
+        secure = _force_secure if _force_secure is not None else (cls._secure or request.is_secure)
+        if not Config.getInstance().getBaseSecureURL():
+            secure = False
 
         if not cls._endpoint:
             # Legacy UH containing a relativeURL
@@ -100,27 +105,18 @@ class URLHandler(object):
 
 
 class SecureURLHandler(URLHandler):
+    _secure = True
 
-    @classmethod
-    def _getURL(cls, **params):
-        if Config.getInstance().getBaseSecureURL():
-            return URL( "%s/%s"%(Config.getInstance().getBaseSecureURL(), cls.getRelativeURL()) , **params )
-        else:
-            return super(SecureURLHandler, cls)._getURL(**params)
 
 class OptionallySecureURLHandler(URLHandler):
-
     @classmethod
-    def getURL( cls, target=None, secure = False, **params ):
-        if secure:
-            url = URL( "%s/%s"%(Config.getInstance().getBaseSecureURL(), cls.getRelativeURL()) , **params )
-        else:
-            url = URL( "%s/%s"%(Config.getInstance().getBaseURL(),cls.getRelativeURL()) , **params )
+    def getURL(cls, target=None, secure=False, **params):
         if target is not None:
-            url.addParams( target.getLocator() )
-        return url
+            params.update(target.getLocator())
+        return cls._getURL(_force_secure=True, **params)
 
-__URLHandlerClassCounter = 0;
+
+__URLHandlerClassCounter = 0
 
 def Build(relativeURL):
     global __URLHandlerClassCounter
