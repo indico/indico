@@ -37,6 +37,7 @@ from indico.web.flask.util import create_plugin_rules, shorturl_handler, XAccelM
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.legacy_scripts import legacy_scripts
+from indico.web.flask.blueprints.photos import photos
 from indico.web.http_api.handlers import handler as api_handler
 
 
@@ -94,6 +95,7 @@ def add_handlers(app):
 def add_blueprints(app):
     app.register_blueprint(legacy)
     app.register_blueprint(legacy_scripts)
+    app.register_blueprint(photos)
 
 
 def handle_404(exception):

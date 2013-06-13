@@ -570,21 +570,20 @@ class UHConfModifRoomBookingSaveBooking( URLHandler ):
     _relativeURL = "conferenceModification.py/roomBookingSaveBooking"
 
 
-class UHRoomPhoto( URLHandler ):
-    _relativeTemplate = "images/rooms/large_photos/%s.jpg"
+class UHRoomPhoto(URLHandler):
+    _endpoint = 'photos.room_large'
 
     @classmethod
-    def getURL( cls, target = None ):
-        cls._relativeURL = cls._relativeTemplate % str( target )
-        return cls._getURL()
+    def getURL(cls, target=None):
+        return super(UHRoomPhoto, cls).getURL(room=target)
 
-class UHRoomPhotoSmall( URLHandler ):
-    _relativeTemplate = "images/rooms/small_photos/%s.jpg"
+
+class UHRoomPhotoSmall(URLHandler):
+    _endpoint = 'photos.room_small'
 
     @classmethod
-    def getURL( cls, target = None ):
-        cls._relativeURL = cls._relativeTemplate % str( target )
-        return cls._getURL()
+    def getURL(cls, target=None):
+        return super(UHRoomPhotoSmall, cls).getURL(room=target)
 
 
 class UHConferenceAddMaterial( URLHandler ):
