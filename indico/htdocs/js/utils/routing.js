@@ -61,7 +61,7 @@
         return { url: url, unprocessed: unprocessed };
     }
 
-    function build_url(template, params) {
+    function build_url(template, params, fragment) {
         var qsParams, url;
         if (typeof template == 'string') {
             url = template;
@@ -86,6 +86,9 @@
         var qs = $.param(qsParams);
         if (qs) {
             url += (~url.indexOf('?') ? '&' : '?') + qs;
+        }
+        if (fragment) {
+            url += '#' + fragment;
         }
         return url;
     }

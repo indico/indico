@@ -533,7 +533,7 @@ type ("SuggestedUsersPanel", ["IWidget"], {
 
         if (this.suggestedUserList.isEmpty()) {
             var message = Html.span({}, $T("There are no suggested users for you at the moment. Why not add some "),
-                                        Html.a({href: Indico.Urls.Favourites}, $T("favourites")),
+                                        Html.a({href: build_url(Indico.Urls.Favourites)}, $T("favourites")),
                                         "?");
             this.suggestedUserList.setMessage(message);
         }

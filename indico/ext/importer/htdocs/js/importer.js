@@ -441,11 +441,11 @@ type("ImporterDurationDialog",["ExclusivePopupWithButtons", "PreLoadHandler"],
             _extractRedirectUrl: function() {
                 switch (this.destination.entryType){
                     case "Day":
-                        return Indico.Urls.ConfModifSchedule + "?confId=" + this.confId + "#" + this.destination.startDate.date.replace(/-/g,"");
+                        return build_url(Indico.Urls.ConfModifSchedule, {confId: this.confId}, this.destination.startDate.date.replace(/-/g, ''));
                     case "Contribution":
-                        return Indico.Urls.SubcontrModif + "?contribId=" + this.destination.contributionId + "&confId=" + this.confId;
+                        return build_url(Indico.Urls.SubcontrModif, {contribId: this.destination.contributionId, confId: this.confId});
                     case "Session":
-                        return Indico.Urls.ConfModifSchedule + "?confId=" + this.confId + "#" + this.destination.startDate.date.replace(/-/g,"") + "." + this.destination.id;
+                        return build_url(Indico.Urls.ConfModifSchedule, {confId: this.confId}, this.destination.startDate.date.replace(/-/g, '') + '.' + this.destination.id);
                     default:
                         return null;
                 }

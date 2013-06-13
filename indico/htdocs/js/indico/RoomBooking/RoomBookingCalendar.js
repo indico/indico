@@ -58,16 +58,24 @@ type ("RoomBookingRoom", [],
              */
             getBookingFormUrl: function(date, repeatability, flexibleDatesRange, minutes, finishDate, startD, endD, ignoreSession){
                 var ignSession = any(ignoreSession, false);
-                var url = Indico.Urls.RoomBookingForm + "?roomLocation=" + this.location + "&roomID=" + this.id +
-                "&ignoreSession=1&repeatability=" + repeatability;
+                var urlParams = {
+                    roomLocation: this.location,
+                    roomID: this.id,
+                    ignoreSession: 1,
+                    repeatability: repeatability
+                };
                 if (ignSession) {
-                    url = url + "&ignoreSession=1";
-                }else {
-                    url = url + "&infoBookingMode=True";
+                    urlParams.ignoreSession = 1;
+                }
+                else {
+                    urlParams.infoBookingMode = 'True'
                 }
 
                 if (minutes) {
-                    url += "&hour=" + date.substr(11,2) + "&minute=" + date.substr(14,2) + "&hourEnd=" + date.substr(16,2) + "&minuteEnd=" + date.substr(19,2);
+                    urlParams.hour = date.substr(11, 2);
+                    urlParams.minute = date.substr(14, 2);
+                    urlParams.hourEnd = date.substr(16, 2);
+                    urlParams.minuteEnd = date.substr(19, 2);
                 }
                 if (typeof repeatability != 'undefined' && repeatability != 'None' && flexibleDatesRange > 0) {
                     var repeatabilityDays;
@@ -82,24 +90,37 @@ type ("RoomBookingRoom", [],
                     while (roomStartDate >= calendarStartDate)
                         roomStartDate.setDate(roomStartDate.getDate() - repeatabilityDays);
                     roomStartDate.setDate(roomStartDate.getDate() + repeatabilityDays);
-                    url += "&year=" + roomStartDate.getFullYear() + "&month=" + (roomStartDate.getMonth() + 1) + "&day=" + roomStartDate.getDate() +
-                    "&yearEnd=" + endD.substr(0,4) + "&monthEnd=" + endD.substr(5,2) + "&dayEnd=" + endD.substr(8,2);
+                    urlParams.year = roomStartDate.getFullYear();
+                    urlParams.month = roomStartDate.getFullYear();
+                    urlParams.day = roomStartDate.getDate();
+                    urlParams.yearEnd = endD.substr(0, 4);
+                    urlParams.monthEnd = endD.substr(5, 2);
+                    urlParams.dayEnd = endD.substr(8, 2);
                 }
                 else if (finishDate == 'true') {
-                    url += "&year=" + startD.substr(0,4) + "&month=" + startD.substr(5,2) + "&day=" + startD.substr(8,2) +
-                           "&yearEnd=" + endD.substr(0,4) + "&monthEnd=" + endD.substr(5,2) + "&dayEnd=" + endD.substr(8,2);
+                    urlParams.year = startD.substr(0,4);
+                    urlParams.month = startD.substr(5,2);
+                    urlParams.day = startD.substr(8,2);
+                    urlParams.yearEnd = endD.substr(0, 4);
+                    urlParams.monthEnd = endD.substr(5, 2);
+                    urlParams.dayEnd = endD.substr(8, 2);
                 }
                 else {
-                    url +="&year=" + date.substr(0,4) + "&month=" + date.substr(5,2) + "&day=" + date.substr(8,2);
+                    urlParams.year = date.substr(0,4);
+                    urlParams.month = date.substr(5,2);
+                    urlParams.day = date.substr(8,2);
                 }
-                return url;
+                return build_url(Indico.Urls.RoomBookingForm, urlParams);
             },
             /**
              * Returns room details url.
              */
             getDetailsUrl: function(){
-                return Indico.Urls.RoomBookingDetails + "?roomLocation=" + this.location + "&roomID=" + this.id +
-                    "&calendarMonths=True";
+                return build_url(Indico.Urls.RoomBookingDetails, {
+                    roomLocation: this.location,
+                    roomID: this.id,
+                    calendarMonths: 'True'
+                });
             },
             /**
              * Gets full name of the room ( building-floor-roomNumber and roomName), wrapped in Div.
@@ -410,7 +431,7 @@ type ("RoomBookingCalendarDrawer", [],
                         $('#booking-dialog').dialog({
                             buttons: {
                                 "Search again": function() {
-                                    window.location = Indico.Urls.RoomBookingBookRoom;
+                                    window.location = build_url(Indico.Urls.RoomBookingBookRoom);
                                 },
                                 Close: function() {
                                     $(this).dialog('close');
@@ -483,10 +504,10 @@ type ("RoomBookingCalendarDrawer", [],
                 switch( this.data.overload ){
                     //Too long period was chosen
                     case 1:
-                        return Html.div({}, this.drawHeader(), Html.div({style:{width:pixels(700), margin: '0 auto'}, className: 'errorMessage'}, Html.strong({}, "Error: "), $T("Time span is too large. Please issue a "), Html.a({href:Indico.Urls.RoomBookingBookRoom}, $T("more specific query.")), $T("Time span limit is {0} days.").format(this.data.dayLimit)));
+                        return Html.div({}, this.drawHeader(), Html.div({style:{width:pixels(700), margin: '0 auto'}, className: 'errorMessage'}, Html.strong({}, "Error: "), $T("Time span is too large. Please issue a "), Html.a({href:build_url(Indico.Urls.RoomBookingBookRoom)}, $T("more specific query.")), $T("Time span limit is {0} days.").format(this.data.dayLimit)));
                     //Too many results fetched
                     case 2:
-                        return Html.div({}, this.drawHeader(), Html.div({style:{width:pixels(700), margin: '0 auto'}, className: 'errorMessage'}, Html.strong({}, "Error: "), $T("Too many possible periods found. Please issue a "), Html.a({href:Indico.Urls.RoomBookingBookRoom}, $T("more specific query."))));
+                        return Html.div({}, this.drawHeader(), Html.div({style:{width:pixels(700), margin: '0 auto'}, className: 'errorMessage'}, Html.strong({}, "Error: "), $T("Too many possible periods found. Please issue a "), Html.a({href:build_url(Indico.Urls.RoomBookingBookRoom)}, $T("more specific query."))));
                 }
                 return Html.div({}, this.drawHeader(),  this.drawContent());
             }

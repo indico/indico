@@ -822,10 +822,15 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
 
         var url = "#";
         if (self.eventData.entryType == 'Contribution') {
-            url = Indico.Urls.ContributionDisplay + '?contribId=' + self.eventData.contributionId + '&confId=' + self.eventData.conferenceId;
+            url = build_url(Indico.Urls.ContributionDisplay, {
+                contribId: self.eventData.contributionId,
+                confId: self.eventData.conferenceId
+            });
         } else if (self.eventData.entryType == 'Session') {
-            url = Indico.Urls.SessionDisplay + '?sessionId=' + self.eventData.sessionId +
-                    '&confId=' + self.eventData.conferenceId + '#' + self.timetable.currentDay;
+            url = build_url(Indico.Urls.SessionDisplay, {
+                sessionId: self.eventData.sessionId,
+                confId: self.eventData.conferenceId
+            }, self.timetable.currentDay);
         }
         var viewLink = Html.a({'href': url}, "View details");
         bar.append(viewLink);
@@ -848,16 +853,22 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
             var menuItems = {};
             var urlParams;
             if (self.eventData.entryType == 'Contribution') {
-                urlParams = '?contribId=' + self.eventData.contributionId + '&confId=' + self.eventData.conferenceId;
-                menuItems["PDF"] = {action: Indico.Urls.ContribToPDF + urlParams, display: $T('PDF')};
+                urlParams = {
+                    contribId: self.eventData.contributionId,
+                    confId: self.eventData.conferenceId
+                };
+                menuItems["PDF"] = {action: build_url(Indico.Urls.ContribToPDF, urlParams), display: $T('PDF')};
                 menuItems["Calendar"+ self.eventData.uniqueId] = {action: function(){
                     self._getExportPopup("schedule.api.getContribExportPopup",{ confId: self.eventData.conferenceId,
                         contribId: self.eventData.contributionId });
                     }, display: $T('Calendar')};
-                menuItems["XML"] = {action: Indico.Urls.ContribToXML + urlParams, display: $T('XML')};
+                menuItems["XML"] = {action: build_url(Indico.Urls.ContribToXML, urlParams), display: $T('XML')};
             } else if (self.eventData.entryType == 'Session') {
-                urlParams = '?showSessions=' + self.eventData.sessionId + '&confId=' + self.eventData.conferenceId;
-                menuItems["PDFtimetable"] = {action: Indico.Urls.ConfTimeTablePDF + urlParams, display:$T('PDF timetable')};
+                urlParams = {
+                    showSessions: self.eventData.sessionId,
+                    confId: self.eventData.conferenceId
+                };
+                menuItems["PDFtimetable"] = {action: build_url(Indico.Urls.ConfTimeTablePDF, urlParams), display:$T('PDF timetable')};
                 menuItems["Calendar"+ self.eventData.uniqueId] = {action: function(){
                     self._getExportPopup("schedule.api.getSessionExportPopup",{ confId: self.eventData.conferenceId,
                         sessionId: self.eventData.sessionId });

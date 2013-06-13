@@ -193,7 +193,7 @@ type("NoReportErrorDialog", ["AlertPopup"], {
 
         if (this.error.code == 'ERR-P4') {
             content.append(Html.div({style:{marginTop:pixels(10)}},
-                    Html.a({href: Indico.Urls.Login+'?returnURL='+document.URL}, $T("Go to login page"))));
+                    Html.a({href: build_url(Indico.Urls.Login, {returnURL: document.URL})}, $T("Go to login page"))));
         }
 
         return content.dom;

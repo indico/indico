@@ -439,7 +439,8 @@ $('#CAStaticURLLink').qtip({
 });
 
 var buildVideoServicesDisplayUrl = function(conference){
-    return (conference.type === 'conference' ? '${ConfCollaborationDisplay}' : Indico.Urls.ConferenceDisplay ) + '?confId=' + conference.id;
+    var urlTemplate = conference.type === 'conference' ? (${ ConfCollaborationDisplay.js_router | j,n }) : Indico.Urls.ConferenceDisplay;
+    return build_url(urlTemplate, {confId: conference.id});
 };
 
 var confTitleGroupTemplate = function(group, isFirst){

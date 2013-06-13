@@ -1631,7 +1631,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
 
                         IndicoUI.Dialogs.Util.progress($T("Rescheduling day ") + self.__getCurrentDayText() + "...");
 
-                        Util.postRequest(Indico.Urls.Reschedule,
+                        Util.postRequest(build_url(Indico.Urls.Reschedule),
                                 postParams,
                                 {
                                     OK: "ok",
@@ -1653,7 +1653,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                             inSessionTimetable = "yes";
                         }
 
-                        Util.postRequest(Indico.Urls.SlotCalc,
+                        Util.postRequest(build_url(Indico.Urls.SlotCalc),
                                 {
                                     confId: self.tt.eventInfo.id,
                                     sessionId: self.tt.contextInfo.sessionId,
@@ -1776,7 +1776,7 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
             if (this.tt.IntervalManagementTimeTable){
                 // Fit session slot according to its entries.
                 IndicoUI.Dialogs.Util.progress($T("Fitting session to content"));
-                Util.postRequest(Indico.Urls.FitSessionSlot,
+                Util.postRequest(build_url(Indico.Urls.FitSessionSlot),
                         {
                             confId: self.tt.contextInfo.conferenceId,
                             sessionId: self.tt.contextInfo.sessionId,

@@ -143,19 +143,28 @@ type("TimetableManagementActions", [], {
         new ConfirmPopup($T("Delete entry"), $T("Are you sure you want to delete this timetable entry?"), confirmHandler).open();
     },
     editEntry: function(eventData) {
-        var url;
+        var url, urlParams;
 
         if (eventData.entryType == 'Contribution') {
             // Get the id by taking the id string after the c character
             var contribId = eventData.id.substring(eventData.id.indexOf('c')+1);
-
-            url = Indico.Urls.ContributionModification + '?confId=' + eventData.conferenceId + '&contribId=' + contribId;
+            urlParams = {
+                confId: eventData.conferenceId,
+                contribId: contribId
+            };
             if (exists(eventData.sessionId)) {
-                url = url + '&sessionId=' + eventData.sessionId;
+                urlParams.sessionId = eventData.sessionId;
             }
-        } else if (eventData.entryType == 'Session') {
-            url = Indico.Urls.SessionModification + '?confId=' + eventData.conferenceId + '&sessionId=' + eventData.sessionId;
-        } else if (eventData.entryType == 'Break') {
+            url = build_url(Indico.Urls.ContributionModification, urlParams);
+        }
+        else if (eventData.entryType == 'Session') {
+            urlParams = {
+                confId: eventData.conferenceId,
+                sessionId: eventData.sessionId
+            };
+            url = build_url(Indico.Urls.SessionModification, urlParams);
+        }
+        else if (eventData.entryType == 'Break') {
             this.editBreak(eventData);
         }
 
@@ -753,18 +762,25 @@ type("TimetableManagementActions", [], {
      */
 
     editEntryProtection: function(eventData) {
-        var url;
-        url = Indico.Urls.SessionProtection + '?confId=' + eventData.conferenceId + '&sessionId=' + eventData.sessionId;
+        var url, urlParams;
         if (eventData.entryType == 'Contribution') {
             // Get the id by taking the id string after the c character
             var contribId = eventData.id.substring(eventData.id.indexOf('c')+1);
-
-            url = Indico.Urls.ContributionProtection + '?confId=' + eventData.conferenceId + '&contribId=' + contribId;
+            urlParams = {
+                confId: eventData.conferenceId,
+                contribId: contribId
+            };
             if (exists(eventData.sessionId)) {
-                url = url + '&sessionId=' + eventData.sessionId;
+                urlParams.sessionId = eventData.sessionId;
             }
-        } else if (eventData.entryType == 'Session') {
-            url = Indico.Urls.SessionProtection + '?confId=' + eventData.conferenceId + '&sessionId=' + eventData.sessionId;
+            url = build_url(Indico.Urls.ContributionProtection, urlParams);
+        }
+        else if (eventData.entryType == 'Session') {
+            urlParams = {
+                confId: eventData.conferenceId,
+                sessionId: eventData.sessionId
+            };
+            url = build_url(Indico.Urls.SessionProtection, urlParams);
         }
         return url;
     }

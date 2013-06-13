@@ -100,46 +100,44 @@ var Indico = {
 
         APIBase: (window.location.protocol == "https:" ? "${ Config.getInstance().getBaseSecureURL() }" : "${ Config.getInstance().getBaseURL() }") + '/export',
 
-        Login: "${ urlHandlers.UHSignIn.getURL() }",
+        Login: ${ urlHandlers.UHSignIn.getURL().js_router | j,n },
+        Favourites: ${ urlHandlers.UHUserBaskets.getURL().js_router | j,n },
 
-        Favourites: "${ urlHandlers.UHUserBaskets.getURL() }",
+        ConferenceDisplay: ${ urlHandlers.UHConferenceDisplay.getURL().js_router | j,n },
+        ContributionDisplay: ${ urlHandlers.UHContributionDisplay.getURL().js_router | j,n },
+        SessionDisplay: ${ urlHandlers.UHSessionDisplay.getURL().js_router | j,n },
+        ConfCollaborationDisplay: ${ urlHandlers.UHCollaborationDisplay.getURL().js_router | j,n },
 
-        ConferenceDisplay: "${ urlHandlers.UHConferenceDisplay.getURL() }",
-        ContributionDisplay: "${ urlHandlers.UHContributionDisplay.getURL() }",
-        SessionDisplay: "${ urlHandlers.UHSessionDisplay.getURL() }",
+        ContribToXML: ${ urlHandlers.UHContribToXML.getURL().js_router | j,n },
+        ContribToPDF: ${ urlHandlers.UHContribToPDF.getURL().js_router | j,n },
 
-        ContribToXML: "${ urlHandlers.UHContribToXML.getURL() }",
-        ContribToPDF: "${ urlHandlers.UHContribToPDF.getURL() }",
-        ContribToiCal: "${ urlHandlers.UHContribToiCal.getURL() }",
+        ConfTimeTablePDF: ${ urlHandlers.UHConfTimeTablePDF.getURL().js_router | j,n },
+        ConfTimeTableCustomPDF: ${ urlHandlers.UHConfTimeTableCustomizePDF.getURL().js_router | j,n },
 
-        SessionToiCal:  "${ urlHandlers.UHSessionToiCal.getURL() }",
-        ConfTimeTablePDF: "${ urlHandlers.UHConfTimeTablePDF.getURL() }",
-        ConfTimeTableCustomPDF: "${ urlHandlers.UHConfTimeTableCustomizePDF.getURL() }",
+        SessionModification: ${ urlHandlers.UHSessionModification.getURL().js_router | j,n },
+        ContributionModification: ${ urlHandlers.UHContributionModification.getURL().js_router | j,n },
+        SessionProtection: ${ urlHandlers.UHSessionModifAC.getURL().js_router | j,n },
+        ContributionProtection: ${ urlHandlers.UHContribModifAC.getURL().js_router | j,n },
 
-        SessionModification: "${ urlHandlers.UHSessionModification.getURL() }",
-        ContributionModification: "${ urlHandlers.UHContributionModification.getURL() }",
-        SessionProtection: "${ urlHandlers.UHSessionModifAC.getURL() }",
-        ContributionProtection: "${ urlHandlers.UHContribModifAC.getURL() }",
-
-        Reschedule: "${ urlHandlers.UHConfModifReschedule.getURL() }",
-        SlotCalc: "${ urlHandlers.UHSessionModSlotCalc.getURL() }",
-        FitSessionSlot: "${ urlHandlers.UHSessionFitSlot.getURL() }",
+        Reschedule: ${ urlHandlers.UHConfModifReschedule.getURL().js_router | j,n },
+        SlotCalc: ${ urlHandlers.UHSessionModSlotCalc.getURL().js_router | j,n },
+        FitSessionSlot: ${ urlHandlers.UHSessionFitSlot.getURL().js_router | j,n },
 
         UploadAction: {
-            subcontribution: '${ str(urlHandlers.UHSubContribModifAddMaterials.getURL()) }',
-            contribution: '${ str(urlHandlers.UHContribModifAddMaterials.getURL()) }',
-            session: '${ str(urlHandlers.UHSessionModifAddMaterials.getURL()) }',
-            conference: '${ str(urlHandlers.UHConfModifAddMaterials.getURL()) }',
-            category: '${ str(urlHandlers.UHCategoryAddMaterial.getURL()) }'
+            subcontribution: ${ urlHandlers.UHSubContribModifAddMaterials.getURL().js_router | j,n },
+            contribution: ${ urlHandlers.UHContribModifAddMaterials.getURL().js_router | j,n },
+            session: ${ urlHandlers.UHSessionModifAddMaterials.getURL().js_router | j,n },
+            conference: ${ urlHandlers.UHConfModifAddMaterials.getURL().js_router | j,n },
+            category: ${ urlHandlers.UHCategoryAddMaterial.getURL().js_router | j,n }
         },
 
-        RoomBookingBookRoom: "${ urlHandlers.UHRoomBookingBookRoom.getURL() }",
-        RoomBookingForm: "${ urlHandlers.UHRoomBookingBookingForm.getURL() }",
-        RoomBookingDetails: "${ urlHandlers.UHRoomBookingRoomDetails.getURL() }",
-        ConfModifSchedule: "${ urlHandlers.UHConfModifSchedule.getURL() }",
-        SubcontrModif: "${ urlHandlers.UHContribModifSubCont.getURL() }",
-        AuthorDisplay: "${ urlHandlers.UHContribAuthorDisplay.getURL() }",
-        AuthorEmail: "${ urlHandlers.UHConferenceEmail.getURL() }"
+        RoomBookingBookRoom: ${ urlHandlers.UHRoomBookingBookRoom.getURL().js_router | j,n },
+        RoomBookingForm: ${ urlHandlers.UHRoomBookingBookingForm.getURL().js_router | j,n },
+        RoomBookingDetails: ${ urlHandlers.UHRoomBookingRoomDetails.getURL().js_router | j,n },
+        ConfModifSchedule: ${ urlHandlers.UHConfModifSchedule.getURL().js_router | j,n },
+        SubcontrModif: ${ urlHandlers.UHContribModifSubCont.getURL().js_router | j,n },
+        AuthorDisplay: ${ urlHandlers.UHContribAuthorDisplay.getURL().js_router | j,n },
+        AuthorEmail: ${ urlHandlers.UHConferenceEmail.getURL().js_router | j,n }
     },
 
     Data: {

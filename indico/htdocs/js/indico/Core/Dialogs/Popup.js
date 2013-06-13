@@ -708,10 +708,19 @@ type("AuthorsPopup", ["ExclusivePopup"], {
         var container = $("<div/>");
         each(this.authorList, function(author) {
             var authorElem = $("<div/>");
-            var url = Indico.Urls.AuthorDisplay + '?confId=' + self.confId + '&contribId=' + self.contribId + '&authorId=' + author.id;
+            var url = build_url(Indico.Urls.AuthorDisplay, {
+                confId: self.confId,
+                contribId: self.contribId,
+                authorId: author.id
+            });
             var link = $("<a/>").attr("href", url).text(author.name);
             var title = $("<div/>").css("color", "#444444").css("width", self.width + "px").css("font-size", "15px").append(link);
-            var emailUrl = Indico.Urls.AuthorEmail + '?confId=' + self.confId + '&sessionId=' + self.sessionId + '&contribId=' + self.contribId + '&authId=' + author.id;
+            var emailUrl = build_url(Indico.Urls.AuthorEmail, {
+                confId: self.confId,
+                sessionId: self.sessionId,
+                contribId: self.contribId,
+                authId: author.id
+            });
 
             var infoDiv = $("<div/>").css("width", self.width +"px").css("border-bottom", "1px solid #EAEAEA").css("paddingBottom","5px").css("color", "#888").css("font-size", "12px");
             var emailDiv = $("<div/>").append($("<a/>").attr("href", emailUrl).text($T("Email author")));
@@ -860,12 +869,15 @@ type("UploadedPaperPopup", ["ExclusivePopup"], {
 type("ContributionsPopup", ["ExclusivePopup"], {
 
     _generateUrl: function(contrib) {
-        var url = this.urlModif?Indico.Urls.ContributionModification:Indico.Urls.ContributionDisplay;
-        url+='?contribId=' + contrib.contributionId + '&confId=' + contrib.conferenceId;
-        if(contrib.sessionId){
-            url+='&sessionId=' + contrib.sessionId
+        var url = this.urlModif ? Indico.Urls.ContributionModification : Indico.Urls.ContributionDisplay;
+        var params = {
+            contribId: contrib.contributionId,
+            confId: contrib.conferenceId
+        };
+        if (contrib.sessionId) {
+            params.sessionId = contrib.sessionId;
         }
-        return url;
+        return build_url(url, params);
     },
 
     draw: function() {
