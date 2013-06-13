@@ -669,9 +669,13 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
                 candResv.reason = session.get("rbDefaultReason")
 
             if session.get("rbAssign2Session"):
-                self._assign2Session = session.get("rbAssign2Session")
+                locator = locators.WebLocator()
+                locator.setSession(session["rbAssign2Session"])
+                self._assign2Session = locator.getObject()
             if session.get("rbAssign2Contribution"):
-                self._assign2Contributioon = session.get("rbAssign2Contribution")
+                locator = locators.WebLocator()
+                locator.setContribution(session["rbAssign2Contribution"])
+                self._assign2Contribution = locator.getObject()
 
         return candResv
 

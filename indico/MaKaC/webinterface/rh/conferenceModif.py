@@ -4309,13 +4309,14 @@ class RHConfModifRoomBookingSearch4Rooms( RHConferenceModifRoomBookingBase, RHRo
 
         if params.get('sessionId'):
             self._assign2Session = self._conf.getSessionById(params['sessionId'])
-            session["rbAssign2Session"] = self._assign2Session
+            session["rbAssign2Session"] = self._assign2Session.getLocator()
         else:
             self._assign2Session = None
+
         if params.get('contribId'):
             self._assign2Session = None
             self._assign2Contribution = self._conf.getContributionById(params['contribId'])
-            session["rbAssign2Contribution"] = self._assign2Contribution
+            session["rbAssign2Contribution"] = self._assign2Contribution.getLocator()
         else:
             self._assign2Contribution = None
         self._dontAssign = params.get('rbDontAssign') == "True"
@@ -4429,13 +4430,20 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
         RHRoomBookingSaveBooking._checkParams( self, params )
 
         # Assign room to event / session / contribution?
-        self._assign2Session = session.get("rbAssign2Session") # Session or None
-        self._assign2Contribution = session.get("rbAssign2Contribution") # Contribution or None
+        self._assign2Session = None
+        self._assign2Contribution = None
+        if session.get('rbAssign2Session'):
+            locator = locators.WebLocator()
+            locator.setSession(session['rbAssign2Session'])
+            self._assign2Session = locator.getObject()
+        if session.get("rbAssign2Contribution"):
+            locator = locators.WebLocator()
+            locator.setContribution(session['rbAssign2Contribution'])
+            self._assign2Contribution = locator.getObject()
         self._assign2Conference = None
         if not self._assign2Session and not self._assign2Contribution:
             if self._conf and not session.get("rbDontAssign"): # True or None
                 self._assign2Conference = self._conf
-
 
     def _process( self ):
         self._businessLogic()
