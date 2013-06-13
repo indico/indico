@@ -19,7 +19,6 @@
 import re
 import string
 import urlparse
-from new import classobj
 from flask import request
 
 from MaKaC.common.url import URL, EndpointURL
@@ -147,18 +146,6 @@ class OptionallySecureURLHandler(URLHandler):
             params.update(target.getLocator())
         return cls._getURL(_force_secure=True, **params)
 
-
-__URLHandlerClassCounter = 0
-
-def Build(relativeURL):
-    global __URLHandlerClassCounter
-    __URLHandlerClassCounter += 1
-    return classobj("__UHGenerated" + str(__URLHandlerClassCounter), (URLHandler,), {"_relativeURL": relativeURL})
-
-def Derive(handler, relativeURL):
-    if not issubclass(handler, URLHandler):
-        handler = handler._uh;
-    return Build(handler._relativeURL + "/" + relativeURL)
 
 # Hack to allow secure Indico on non-80 ports
 def setSSLPort(url):
@@ -3015,6 +3002,9 @@ class UHConfModifRegistrationPreview( URLHandler ):
 
 class UHConfModifRegistrantList( URLHandler ):
     _relativeURL = "confModifRegistrants.py"
+
+class UHConfModifRegistrantNew(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-newRegistrant'
 
 class UHConfModifRegistrantsOpenMenu( URLHandler ):
     _relativeURL = "confModifRegistrants.py/openMenu"

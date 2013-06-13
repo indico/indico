@@ -31,7 +31,6 @@ from indico.web.flask.util import send_file
 
 
 class RHTemplateContentJS(base.RH):
-    _uh = urlHandlers.Build("JSContent.py")
     _tplName = ''
 
     def __init__(self, req):
@@ -73,8 +72,6 @@ class RHTemplateContentJS(base.RH):
 
 
 class RHGetVarsJs(RHTemplateContentJS):
-    _uh = urlHandlers.Derive(RHTemplateContentJS, "getVars")
-
     _tplName = 'vars.js'
 
     def __init__(self, req):

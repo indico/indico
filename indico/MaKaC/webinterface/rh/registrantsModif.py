@@ -336,7 +336,7 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
             self._redirect(urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
 
 class RHRegistrantNewForm(RHRegistrantListModifBase):
-    _uh = urlHandlers.Derive(RHRegistrantListModif, "newRegistrant")
+    _uh = urlHandlers.UHConfModifRegistrantNew
 
     def _checkParams(self, params):
         RHRegistrantListModifBase._checkParams(self, params)
