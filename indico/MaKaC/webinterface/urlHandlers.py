@@ -164,8 +164,8 @@ def setSSLPort(url):
     return re.sub(regexp, sslPort, url)
 
 
-class UHWelcome( URLHandler ):
-    _relativeURL = "index.py"
+class UHWelcome(URLHandler):
+    _endpoint = 'legacy.index'
 
 
 class UHSignIn(URLHandler):
@@ -183,24 +183,24 @@ class UHSignIn(URLHandler):
         return url
 
 
-class UHActiveAccount( URLHandler ):
-    _relativeURL = "signIn.py/active"
+class UHActiveAccount(URLHandler):
+    _endpoint = 'legacy.signIn-active'
 
 
-class UHSendActivation( URLHandler ):
-    _relativeURL = "signIn.py/sendActivation"
+class UHSendActivation(URLHandler):
+    _endpoint = 'legacy.signIn-sendActivation'
 
 
-class UHDisabledAccount( URLHandler ):
-    _relativeURL = "signIn.py/disabledAccount"
+class UHDisabledAccount(URLHandler):
+    _endpoint = 'legacy.signIn-disabledAccount'
 
 
-class UHSendLogin( URLHandler ):
-    _relativeURL = "signIn.py/sendLogin"
+class UHSendLogin(URLHandler):
+    _endpoint = 'legacy.signIn-sendLogin'
 
 
-class UHUnactivatedAccount( URLHandler ):
-    _relativeURL = "signIn.py/unactivatedAccount"
+class UHUnactivatedAccount(URLHandler):
+    _endpoint = 'legacy.signIn-unactivatedAccount'
 
 
 class UHSignOut(URLHandler):
@@ -216,34 +216,43 @@ class UHSignOut(URLHandler):
 
 
 class UHOAuthRequestToken(URLHandler):
-    _relativeURL = "oauth.py/request_token"
+    _endpoint = 'legacy.oauth-request_token'
+
 
 class UHOAuthAuthorization(URLHandler):
-    _relativeURL = "oauth.py/authorize"
+    _endpoint = 'legacy.oauth-authorize'
+
 
 class UHOAuthAccessTokenURL(URLHandler):
-    _relativeURL = "oauth.py/access_token"
+    _endpoint = 'legacy.oauth-access_token'
+
 
 class UHOAuthResourceURL(URLHandler):
-    _relativeURL = "oauth.py/resource"
+    _endpoint = 'legacy.oauth-resource'
+
 
 class UHOAuthAuthorizeConsumer(URLHandler):
-    _relativeURL = "oauth.py/authorize_consumer"
+    _endpoint = 'legacy.oauth-authorize_consumer'
+
 
 class UHOAuthUnauthorizeConsumer(URLHandler):
-    _relativeURL = "oauth.py/unauthorize_consumer"
+    _endpoint = 'legacy.oauth-unauthorize_consumer'
 
-class UHOAuthThirdPartyAuth( URLHandler ):
-    _relativeURL = "oauth.py/thirdPartyAuth"
 
-class UHOAuthUserThirdPartyAuth( URLHandler ):
-    _relativeURL = "oauth.py/userThirdPartyAuth"
+class UHOAuthThirdPartyAuth(URLHandler):
+    _endpoint = 'legacy.oauth-thirdPartyAuth'
 
-class UHIndicoNews( URLHandler ):
-    _relativeURL = "news.py"
+
+class UHOAuthUserThirdPartyAuth(URLHandler):
+    _endpoint = 'legacy.oauth-userThirdPartyAuth'
+
+
+class UHIndicoNews(URLHandler):
+    _endpoint = 'legacy.news'
+
 
 class UHConferenceHelp(URLHandler):
-    _relativeURL ="help.py"
+    _endpoint = 'legacy.help'
 
 
 class UHCalendar(URLHandler):
@@ -259,12 +268,12 @@ class UHCalendar(URLHandler):
         return url
 
 
-class UHCalendarSelectCategories( URLHandler ):
+class UHCalendarSelectCategories(URLHandler):
     _endpoint = 'legacy.wcalendar-select'
 
 
-class UHSimpleCalendar( URLHandler ):
-    _relativeURL = "calendarSelect.py"
+class UHSimpleCalendar(URLHandler):
+    _endpoint = 'legacy.calendarSelect'
 
 
 class UHConferenceCreation(URLHandler):
@@ -278,17 +287,17 @@ class UHConferenceCreation(URLHandler):
         return url
 
 
-class UHConferencePerformCreation( URLHandler ):
-    _relativeURL = "conferenceCreation.py/createConference"
+class UHConferencePerformCreation(URLHandler):
+    _endpoint = 'legacy.conferenceCreation-createConference'
 
-class UHConferenceDisplay( URLHandler ):
-    _relativeURL = "conferenceDisplay.py"
+class UHConferenceDisplay(URLHandler):
+    _endpoint = 'legacy.conferenceDisplay'
 
 class UHNextEvent(URLHandler):
-    _relativeURL = "conferenceDisplay.py/next"
+    _endpoint = 'legacy.conferenceDisplay-next'
 
 class UHPreviousEvent(URLHandler):
-    _relativeURL = "conferenceDisplay.py/prev"
+    _endpoint = 'legacy.conferenceDisplay-prev'
 
 
 class UHConferenceOverview(URLHandler):
@@ -297,51 +306,51 @@ class UHConferenceOverview(URLHandler):
 
 
 class UHConferenceEmail(URLHandler):
-    _relativeURL = "EMail.py"
+    _endpoint = 'legacy.EMail'
 
 class UHConferenceSendEmail(URLHandler):
-    _relativeURL = "EMail.py/send"
+    _endpoint = 'legacy.EMail-send'
 
 class UHRegistrantsSendEmail(URLHandler):
-    _relativeURL = "EMail.py/sendreg"
+    _endpoint = 'legacy.EMail-sendreg'
 
 class UHConvenersSendEmail(URLHandler):
-    _relativeURL = "EMail.py/sendconvener"
+    _endpoint = 'legacy.EMail-sendconvener'
 
 class UHAuthorSendEmail(URLHandler):
-    _relativeURL = "EMail.py/authsend"
+    _endpoint = 'legacy.EMail-authsend'
 
 class UHContribParticipantsSendEmail(URLHandler):
-    _relativeURL = "EMail.py/sendcontribparticipants"
+    _endpoint = 'legacy.EMail-sendcontribparticipants'
 
-class UHConferenceOtherViews( URLHandler ):
-    _relativeURL = "conferenceOtherViews.py"
-
-
-class UHConferenceLogo( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/getLogo"
+class UHConferenceOtherViews(URLHandler):
+    _endpoint = 'legacy.conferenceOtherViews'
 
 
-class UHConferenceCSS( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/getCSS"
+class UHConferenceLogo(URLHandler):
+    _endpoint = 'legacy.conferenceDisplay-getLogo'
 
-class UHConferencePic( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/getPic"
+
+class UHConferenceCSS(URLHandler):
+    _endpoint = 'legacy.conferenceDisplay-getCSS'
+
+class UHConferencePic(URLHandler):
+    _endpoint = 'legacy.conferenceDisplay-getPic'
 
 class UHConfModifPreviewCSS(URLHandler):
-    _relativeURL = "confModifDisplay.py/previewCSS"
+    _endpoint = 'legacy.confModifDisplay-previewCSS'
 
-class UHCategoryIcon( URLHandler ):
-    _relativeURL = "categoryDisplay.py/getIcon"
+class UHCategoryIcon(URLHandler):
+    _endpoint = 'legacy.categoryDisplay-getIcon'
 
-class UHConferenceModification( URLHandler ):
-    _relativeURL = "conferenceModification.py"
+class UHConferenceModification(URLHandler):
+    _endpoint = 'legacy.conferenceModification'
 
-class UHConfModifShowMaterials( URLHandler ):
-    _relativeURL = "conferenceModification.py/materialsShow"
+class UHConfModifShowMaterials(URLHandler):
+    _endpoint = 'legacy.conferenceModification-materialsShow'
 
-class UHConfModifAddMaterials( URLHandler ):
-    _relativeURL = "conferenceModification.py/materialsAdd"
+class UHConfModifAddMaterials(URLHandler):
+    _endpoint = 'legacy.conferenceModification-materialsAdd'
 
 # ============================================================================
 # ROOM BOOKING ===============================================================
@@ -349,14 +358,14 @@ class UHConfModifAddMaterials( URLHandler ):
 
 # Free standing ==============================================================
 
-class UHRoomBookingMapOfRooms( URLHandler ):
-    _relativeURL = "roomBooking.py/mapOfRooms"
+class UHRoomBookingMapOfRooms(URLHandler):
+    _endpoint = 'legacy.roomBooking-mapOfRooms'
 
-class UHRoomBookingMapOfRoomsWidget( URLHandler ):
-    _relativeURL = "roomBooking.py/mapOfRoomsWidget"
+class UHRoomBookingMapOfRoomsWidget(URLHandler):
+    _endpoint = 'legacy.roomBooking-mapOfRoomsWidget'
 
-class UHRoomBookingWelcome( URLHandler ):
-    _relativeURL = "roomBooking.py"
+class UHRoomBookingWelcome(URLHandler):
+    _endpoint = 'legacy.roomBooking'
 
 
 class UHRoomBookingSearch4Rooms(URLHandler):
@@ -364,11 +373,11 @@ class UHRoomBookingSearch4Rooms(URLHandler):
     _defaultParams = dict(forNewBooking=False)
 
 
-class UHRoomBookingSearch4Bookings( URLHandler ):
-    _relativeURL = "roomBooking.py/search4Bookings"
+class UHRoomBookingSearch4Bookings(URLHandler):
+    _endpoint = 'legacy.roomBooking-search4Bookings'
 
-class UHRoomBookingBookRoom( URLHandler ):
-    _relativeURL = "roomBooking.py/bookRoom"
+class UHRoomBookingBookRoom(URLHandler):
+    _endpoint = 'legacy.roomBooking-bookRoom'
 
 
 class UHRoomBookingRoomList(BooleanOnMixin, URLHandler):
@@ -410,88 +419,88 @@ class UHRoomBookingRoomDetails(BooleanTrueMixin, URLHandler):
     _endpoint = "legacy.roomBooking-roomDetails"
 
 
-class UHRoomBookingRoomStats( URLHandler ):
-    _relativeURL = "roomBooking.py/roomStats"
+class UHRoomBookingRoomStats(URLHandler):
+    _endpoint = 'legacy.roomBooking-roomStats'
 
-class UHRoomBookingBookingDetails( URLHandler ):
-    _relativeURL = "roomBooking.py/bookingDetails"
+class UHRoomBookingBookingDetails(URLHandler):
+    _endpoint = 'legacy.roomBooking-bookingDetails'
 
-class UHRoomBookingRoomForm( URLHandler ):
-    _relativeURL = "roomBooking.py/roomForm"
-class UHRoomBookingSaveRoom( URLHandler ):
-    _relativeURL = "roomBooking.py/saveRoom"
-class UHRoomBookingDeleteRoom( URLHandler ):
-    _relativeURL = "roomBooking.py/deleteRoom"
+class UHRoomBookingRoomForm(URLHandler):
+    _endpoint = 'legacy.roomBooking-roomForm'
+class UHRoomBookingSaveRoom(URLHandler):
+    _endpoint = 'legacy.roomBooking-saveRoom'
+class UHRoomBookingDeleteRoom(URLHandler):
+    _endpoint = 'legacy.roomBooking-deleteRoom'
 
-class UHRoomBookingBookingForm( URLHandler ):
-    _relativeURL = "roomBooking.py/bookingForm"
-class UHRoomBookingSaveBooking( URLHandler ):
-    _relativeURL = "roomBooking.py/saveBooking"
-class UHRoomBookingDeleteBooking( URLHandler ):
-    _relativeURL = "roomBooking.py/deleteBooking"
-class UHRoomBookingCloneBooking( URLHandler ):
-    _relativeURL = "roomBooking.py/cloneBooking"
-class UHRoomBookingCancelBooking( URLHandler ):
-    _relativeURL = "roomBooking.py/cancelBooking"
-class UHRoomBookingAcceptBooking( URLHandler ):
-    _relativeURL = "roomBooking.py/acceptBooking"
-class UHRoomBookingRejectBooking( URLHandler ):
-    _relativeURL = "roomBooking.py/rejectBooking"
-class UHRoomBookingRejectAllConflicting( URLHandler):
-    _relativeURL = "roomBooking.py/rejectAllConflicting"
+class UHRoomBookingBookingForm(URLHandler):
+    _endpoint = 'legacy.roomBooking-bookingForm'
+class UHRoomBookingSaveBooking(URLHandler):
+    _endpoint = 'legacy.roomBooking-saveBooking'
+class UHRoomBookingDeleteBooking(URLHandler):
+    _endpoint = 'legacy.roomBooking-deleteBooking'
+class UHRoomBookingCloneBooking(URLHandler):
+    _endpoint = 'legacy.roomBooking-cloneBooking'
+class UHRoomBookingCancelBooking(URLHandler):
+    _endpoint = 'legacy.roomBooking-cancelBooking'
+class UHRoomBookingAcceptBooking(URLHandler):
+    _endpoint = 'legacy.roomBooking-acceptBooking'
+class UHRoomBookingRejectBooking(URLHandler):
+    _endpoint = 'legacy.roomBooking-rejectBooking'
+class UHRoomBookingRejectAllConflicting(URLHandler):
+    _endpoint = 'legacy.roomBooking-rejectAllConflicting'
 
 
 class UHRoomBookingRejectBookingOccurrence(URLHandler):
     _endpoint = 'legacy.roomBooking-rejectBookingOccurrence'
 
 
-class UHRoomBookingCancelBookingOccurrence( URLHandler ):
+class UHRoomBookingCancelBookingOccurrence(URLHandler):
     _endpoint = 'legacy.roomBooking-cancelBookingOccurrence'
 
 
-class UHRoomBookingStatement( URLHandler ):
-    _relativeURL = "roomBooking.py/statement"
+class UHRoomBookingStatement(URLHandler):
+    _endpoint = 'legacy.roomBooking-statement'
 
 # RB Administration
 
-class UHRoomBookingPluginAdmin( URLHandler ):
-    _relativeURL = "roomBookingPluginAdmin.py"
+class UHRoomBookingPluginAdmin(URLHandler):
+    _endpoint = 'legacy.roomBookingPluginAdmin'
 
-class UHRoomBookingModuleActive( URLHandler ):
-    _relativeURL = "roomBookingPluginAdmin.py/switchRoomBookingModuleActive"
+class UHRoomBookingModuleActive(URLHandler):
+    _endpoint = 'legacy.roomBookingPluginAdmin-switchRoomBookingModuleActive'
 
-class UHRoomBookingPlugAdminZODBSave( URLHandler ):
-    _relativeURL = "roomBookingPluginAdmin.py/zodbSave"
+class UHRoomBookingPlugAdminZODBSave(URLHandler):
+    _endpoint = 'legacy.roomBookingPluginAdmin-zodbSave'
 
-class UHRoomBookingAdmin( URLHandler ):
-    _relativeURL = "roomBooking.py/admin"
+class UHRoomBookingAdmin(URLHandler):
+    _endpoint = 'legacy.roomBooking-admin'
 
-class UHRoomBookingAdminLocation( URLHandler ):
-    _relativeURL = "roomBooking.py/adminLocation"
+class UHRoomBookingAdminLocation(URLHandler):
+    _endpoint = 'legacy.roomBooking-adminLocation'
 
-class UHRoomBookingSetDefaultLocation( URLHandler ):
-    _relativeURL = "roomBooking.py/setDefaultLocation"
-class UHRoomBookingSaveLocation( URLHandler ):
-    _relativeURL = "roomBooking.py/saveLocation"
-class UHRoomBookingDeleteLocation( URLHandler ):
-    _relativeURL = "roomBooking.py/deleteLocation"
-class UHRoomBookingSaveEquipment( URLHandler ):
-    _relativeURL = "roomBooking.py/saveEquipment"
-class UHRoomBookingDeleteEquipment( URLHandler ):
-    _relativeURL = "roomBooking.py/deleteEquipment"
+class UHRoomBookingSetDefaultLocation(URLHandler):
+    _endpoint = 'legacy.roomBooking-setDefaultLocation'
+class UHRoomBookingSaveLocation(URLHandler):
+    _endpoint = 'legacy.roomBooking-saveLocation'
+class UHRoomBookingDeleteLocation(URLHandler):
+    _endpoint = 'legacy.roomBooking-deleteLocation'
+class UHRoomBookingSaveEquipment(URLHandler):
+    _endpoint = 'legacy.roomBooking-saveEquipment'
+class UHRoomBookingDeleteEquipment(URLHandler):
+    _endpoint = 'legacy.roomBooking-deleteEquipment'
 
-class UHRoomBookingSaveCustomAttributes( URLHandler ):
-    _relativeURL = "roomBooking.py/saveCustomAttributes"
-class UHRoomBookingDeleteCustomAttribute( URLHandler ):
-    _relativeURL = "roomBooking.py/deleteCustomAttribute"
+class UHRoomBookingSaveCustomAttributes(URLHandler):
+    _endpoint = 'legacy.roomBooking-saveCustomAttributes'
+class UHRoomBookingDeleteCustomAttribute(URLHandler):
+    _endpoint = 'legacy.roomBooking-deleteCustomAttribute'
 
 
 class UHRoomBookingBlockingsMyRooms(URLHandler):
     _endpoint = 'legacy.roomBooking-blockingsForMyRooms'
 
 
-class UHRoomBookingBlockingsBlockingDetails( URLHandler ):
-    _relativeURL = "roomBooking.py/blockingDetails"
+class UHRoomBookingBlockingsBlockingDetails(URLHandler):
+    _endpoint = 'legacy.roomBooking-blockingDetails'
 
 
 class UHRoomBookingBlockingList(BooleanOnMixin, URLHandler):
@@ -499,11 +508,11 @@ class UHRoomBookingBlockingList(BooleanOnMixin, URLHandler):
     _defaultParams = dict(onlyThisYear=True)
 
 
-class UHRoomBookingBlockingForm( URLHandler ):
-    _relativeURL = "roomBooking.py/blockingForm"
+class UHRoomBookingBlockingForm(URLHandler):
+    _endpoint = 'legacy.roomBooking-blockingForm'
 
-class UHRoomBookingDeleteBlocking( URLHandler ):
-    _relativeURL = "roomBooking.py/deleteBlocking"
+class UHRoomBookingDeleteBlocking(URLHandler):
+    _endpoint = 'legacy.roomBooking-deleteBlocking'
 
 # For the event ==============================================================
 
@@ -518,26 +527,26 @@ class UHConfModifRoomBookingBase(URLHandler):
             url.addParams(conf.getLocator())
         return url
 
-class UHConfModifRoomBookingChooseEvent( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingChooseEvent"
+class UHConfModifRoomBookingChooseEvent(URLHandler):
+    _endpoint = 'legacy.conferenceModification-roomBookingChooseEvent'
 
 
 class UHConfModifRoomBookingSearch4Rooms(BooleanTrueMixin, URLHandler):
     _endpoint = 'legacy.conferenceModification-roomBookingSearch4Rooms'
 
 
-class UHConfModifRoomBookingList( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingList"
-class UHConfModifRoomBookingRoomList( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingRoomList"
+class UHConfModifRoomBookingList(URLHandler):
+    _endpoint = 'legacy.conferenceModification-roomBookingList'
+class UHConfModifRoomBookingRoomList(URLHandler):
+    _endpoint = 'legacy.conferenceModification-roomBookingRoomList'
 
-class UHConfModifRoomBookingDetails( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingDetails"
+class UHConfModifRoomBookingDetails(URLHandler):
+    _endpoint = 'legacy.conferenceModification-roomBookingDetails'
 class UHConfModifRoomBookingRoomDetails(UHConfModifRoomBookingBase):
-    _relativeURL = "conferenceModification.py/roomBookingRoomDetails"
+    _endpoint = 'legacy.conferenceModification-roomBookingRoomDetails'
 
 class UHConfModifRoomBookingBookingForm(UHConfModifRoomBookingBase):
-    _relativeURL = "conferenceModification.py/roomBookingBookingForm"
+    _endpoint = 'legacy.conferenceModification-roomBookingBookingForm'
 
 
 class UHConfModifRoomBookingCloneBooking(UHConfModifRoomBookingBase):
@@ -553,8 +562,8 @@ class UHConfModifRoomBookingCloneBooking(UHConfModifRoomBookingBase):
         return url
 
 
-class UHConfModifRoomBookingSaveBooking( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingSaveBooking"
+class UHConfModifRoomBookingSaveBooking(URLHandler):
+    _endpoint = 'legacy.conferenceModification-roomBookingSaveBooking'
 
 
 class UHRoomPhoto(URLHandler):
@@ -573,154 +582,154 @@ class UHRoomPhotoSmall(URLHandler):
         return super(UHRoomPhotoSmall, cls).getURL(room=target)
 
 
-class UHConferenceAddMaterial( URLHandler ):
-    _relativeURL = "conferenceModification.py/addMaterial"
+class UHConferenceAddMaterial(URLHandler):
+    _endpoint = 'legacy.conferenceModification-addMaterial'
 
 
-class UHConferencePerformAddMaterial( URLHandler ):
-    _relativeURL = "conferenceModification.py/performAddMaterial"
+class UHConferencePerformAddMaterial(URLHandler):
+    _endpoint = 'legacy.conferenceModification-performAddMaterial'
 
 
-class UHConferenceRemoveMaterials( URLHandler ):
-    _relativeURL = "conferenceModification.py/removeMaterials"
+class UHConferenceRemoveMaterials(URLHandler):
+    _endpoint = 'legacy.conferenceModification-removeMaterials'
 
 
-class UHConfModSessionSlots( URLHandler ):
-    _relativeURL = "conferenceModification.py/sessionSlots"
+class UHConfModSessionSlots(URLHandler):
+    _endpoint = 'legacy.conferenceModification-sessionSlots'
 
-class UHConferenceClose( URLHandler ):
-    _relativeURL = "conferenceModification.py/close"
+class UHConferenceClose(URLHandler):
+    _endpoint = 'legacy.conferenceModification-close'
 
-class UHConferenceDeleteSocialEvent( URLHandler ):
-    _relativeURL = "conferenceModification.py/deleteSocialEvent"
+class UHConferenceDeleteSocialEvent(URLHandler):
+    _endpoint = 'legacy.conferenceModification-deleteSocialEvent'
 
-class UHConferenceModificationClosed( URLHandler ):
-    _relativeURL = "conferenceModification.py/modificationClosed"
+class UHConferenceModificationClosed(URLHandler):
+    _endpoint = 'legacy.conferenceModification-modificationClosed'
 
-class UHConferenceOpen( URLHandler ):
-    _relativeURL = "conferenceModification.py/open"
+class UHConferenceOpen(URLHandler):
+    _endpoint = 'legacy.conferenceModification-open'
 
 
 class UHConfDataModif(URLHandler):
-    _relativeURL = "conferenceModification.py/data"
+    _endpoint = 'legacy.conferenceModification-data'
 
 
-class UHConfScreenDatesEdit( URLHandler ):
-    _relativeURL = "conferenceModification.py/screenDates"
+class UHConfScreenDatesEdit(URLHandler):
+    _endpoint = 'legacy.conferenceModification-screenDates'
 
-class UHConfPerformDataModif( URLHandler ):
-    _relativeURL = "conferenceModification.py/dataPerform"
-
-
-class UHConfAddContribType( URLHandler ):
-    _relativeURL = "conferenceModification.py/addContribType"
+class UHConfPerformDataModif(URLHandler):
+    _endpoint = 'legacy.conferenceModification-dataPerform'
 
 
-class UHConfRemoveContribType( URLHandler ):
-    _relativeURL = "conferenceModification.py/removeContribType"
+class UHConfAddContribType(URLHandler):
+    _endpoint = 'legacy.conferenceModification-addContribType'
 
 
-class UHConfEditContribType( URLHandler ):
-    _relativeURL = "conferenceModification.py/editContribType"
+class UHConfRemoveContribType(URLHandler):
+    _endpoint = 'legacy.conferenceModification-removeContribType'
 
-class UHConfSectionsSettings( URLHandler ):
-    _relativeURL = "conferenceModification.py/sectionsSettings"
 
-class UHConfModifCFAOptFld( URLHandler ):
-    _relativeURL = "confModifCFA.py/abstractFields"
+class UHConfEditContribType(URLHandler):
+    _endpoint = 'legacy.conferenceModification-editContribType'
 
-class UHConfModifCFAAddOptFld( URLHandler ):
-    _relativeURL = "confModifCFA.py/addAbstractField"
+class UHConfSectionsSettings(URLHandler):
+    _endpoint = 'legacy.conferenceModification-sectionsSettings'
 
-class UHConfModifCFAPerformAddOptFld( URLHandler ):
-    _relativeURL = "confModifCFA.py/performAddAbstractField"
+class UHConfModifCFAOptFld(URLHandler):
+    _endpoint = 'legacy.confModifCFA-abstractFields'
 
-class UHConfModifCFAEditOptFld( URLHandler ):
-    _relativeURL = "confModifCFA.py/editAbstractField"
+class UHConfModifCFAAddOptFld(URLHandler):
+    _endpoint = 'legacy.confModifCFA-addAbstractField'
 
-class UHConfModifCFARemoveOptFld( URLHandler ):
-    _relativeURL = "confModifCFA.py/removeAbstractField"
+class UHConfModifCFAPerformAddOptFld(URLHandler):
+    _endpoint = 'legacy.confModifCFA-performAddAbstractField'
+
+class UHConfModifCFAEditOptFld(URLHandler):
+    _endpoint = 'legacy.confModifCFA-editAbstractField'
+
+class UHConfModifCFARemoveOptFld(URLHandler):
+    _endpoint = 'legacy.confModifCFA-removeAbstractField'
 
 class UHConfModifCFAAbsFieldUp(URLHandler):
-    _relativeURL = "confModifCFA.py/absFieldUp"
+    _endpoint = 'legacy.confModifCFA-absFieldUp'
 
 class UHConfModifCFAAbsFieldDown(URLHandler):
-    _relativeURL = "confModifCFA.py/absFieldDown"
+    _endpoint = 'legacy.confModifCFA-absFieldDown'
 
-class UHConfModifProgram( URLHandler ):
-    _relativeURL = "confModifProgram.py"
+class UHConfModifProgram(URLHandler):
+    _endpoint = 'legacy.confModifProgram'
 
-class UHConfModifCFA( URLHandler ):
-    _relativeURL = "confModifCFA.py"
+class UHConfModifCFA(URLHandler):
+    _endpoint = 'legacy.confModifCFA'
 
-class UHConfModifCFAPreview( URLHandler ):
-    _relativeURL = "confModifCFA.py/preview"
+class UHConfModifCFAPreview(URLHandler):
+    _endpoint = 'legacy.confModifCFA-preview'
 
-class UHConfCFAChangeStatus( URLHandler ):
-    _relativeURL = "confModifCFA.py/changeStatus"
+class UHConfCFAChangeStatus(URLHandler):
+    _endpoint = 'legacy.confModifCFA-changeStatus'
 
-class UHConfCFASwitchMultipleTracks( URLHandler ):
-    _relativeURL = "confModifCFA.py/switchMultipleTracks"
+class UHConfCFASwitchMultipleTracks(URLHandler):
+    _endpoint = 'legacy.confModifCFA-switchMultipleTracks'
 
-class UHConfCFAMakeTracksMandatory( URLHandler ):
-    _relativeURL = "confModifCFA.py/makeTracksMandatory"
+class UHConfCFAMakeTracksMandatory(URLHandler):
+    _endpoint = 'legacy.confModifCFA-makeTracksMandatory'
 
-class UHConfCFAAllowAttachFiles( URLHandler ):
-    _relativeURL = "confModifCFA.py/switchAttachFiles"
+class UHConfCFAAllowAttachFiles(URLHandler):
+    _endpoint = 'legacy.confModifCFA-switchAttachFiles'
 
 class UHAbstractAttachmentFileAccess(URLHandler):
-    _relativeURL = "abstractDisplay.py/getAttachedFile"
+    _endpoint = 'legacy.abstractDisplay-getAttachedFile'
 
-class UHConfCFAShowSelectAsSpeaker( URLHandler ):
-    _relativeURL = "confModifCFA.py/switchShowSelectSpeaker"
+class UHConfCFAShowSelectAsSpeaker(URLHandler):
+    _endpoint = 'legacy.confModifCFA-switchShowSelectSpeaker'
 
-class UHConfCFASelectSpeakerMandatory( URLHandler ):
-    _relativeURL = "confModifCFA.py/switchSelectSpeakerMandatory"
+class UHConfCFASelectSpeakerMandatory(URLHandler):
+    _endpoint = 'legacy.confModifCFA-switchSelectSpeakerMandatory'
 
-class UHConfCFAAttachedFilesContribList( URLHandler ):
-    _relativeURL = "confModifCFA.py/switchShowAttachedFiles"
+class UHConfCFAAttachedFilesContribList(URLHandler):
+    _endpoint = 'legacy.confModifCFA-switchShowAttachedFiles'
 
-class UHCFAManagementAddType( URLHandler ):
-    _relativeURL = "confModifCFA.py/addType"
-
-
-class UHCFAManagementRemoveType( URLHandler ):
-    _relativeURL = "confModifCFA.py/removeType"
+class UHCFAManagementAddType(URLHandler):
+    _endpoint = 'legacy.confModifCFA-addType'
 
 
-class UHCFADataModification( URLHandler ):
-    _relativeURL = "confModifCFA.py/modifyData"
+class UHCFAManagementRemoveType(URLHandler):
+    _endpoint = 'legacy.confModifCFA-removeType'
 
 
-class UHCFAPerformDataModification( URLHandler ):
-    _relativeURL = "confModifCFA.py/performModifyData"
+class UHCFADataModification(URLHandler):
+    _endpoint = 'legacy.confModifCFA-modifyData'
 
 
-class UHCFAModifTemplate( URLHandler ):
-    _relativeURL = "CFAModification.py/template"
+class UHCFAPerformDataModification(URLHandler):
+    _endpoint = 'legacy.confModifCFA-performModifyData'
 
 
-class UHCFAModifReferee( URLHandler ):
-    _relativeURL = "CFAModification.py/referee"
+class UHCFAModifTemplate(URLHandler):
+    _endpoint = 'legacy.CFAModification-template'
 
 
-class UHCFASelectReferee( URLHandler ):
-    _relativeURL = "CFAModification.py/selectReferee"
+class UHCFAModifReferee(URLHandler):
+    _endpoint = 'legacy.CFAModification-referee'
 
 
-class UHCFAAddReferees( URLHandler ):
-    _relativeURL = "CFAModification.py/addReferees"
+class UHCFASelectReferee(URLHandler):
+    _endpoint = 'legacy.CFAModification-selectReferee'
 
 
-class UHCFARemoveReferee( URLHandler ):
-    _relativeURL = "CFAModification.py/deleteReferees"
+class UHCFAAddReferees(URLHandler):
+    _endpoint = 'legacy.CFAModification-addReferees'
 
 
-class UHConfAbstractManagment( URLHandler ):
-    _relativeURL = "abstractsManagment.py"
+class UHCFARemoveReferee(URLHandler):
+    _endpoint = 'legacy.CFAModification-deleteReferees'
+
+
+class UHConfAbstractManagment(URLHandler):
+    _endpoint = 'legacy.abstractsManagment'
 
 class UHConfAbstractList(URLHandler):
-    _relativeURL = "abstractsManagment.py"
+    _endpoint = 'legacy.abstractsManagment'
 
 
 class UHAbstractSubmission(URLHandler):
@@ -728,69 +737,69 @@ class UHAbstractSubmission(URLHandler):
     _fragment = 'interest'
 
 
-class UHAbstractSubmissionConfirmation( URLHandler ):
-    _relativeURL = "abstractSubmission.py/confirmation"
+class UHAbstractSubmissionConfirmation(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-confirmation'
 
 
-class UHAbstractDisplay( URLHandler ):
-    _relativeURL = "abstractDisplay.py"
+class UHAbstractDisplay(URLHandler):
+    _endpoint = 'legacy.abstractDisplay'
 
-class UHAbstractDisplayMaterial( URLHandler ):
-    _relativeURL = "abstractDisplay.py/material"
+class UHAbstractDisplayMaterial(URLHandler):
+    _endpoint = 'legacy.abstractDisplay-material'
 
-class UHAbstractDisplayAddMaterial( URLHandler ):
-    _relativeURL = "abstractDisplay.py/addMaterial"
+class UHAbstractDisplayAddMaterial(URLHandler):
+    _endpoint = 'legacy.abstractDisplay-addMaterial'
 
-class UHAbstractDisplayPerformAddMaterial( URLHandler ):
-    _relativeURL = "abstractDisplay.py/performAddMaterial"
+class UHAbstractDisplayPerformAddMaterial(URLHandler):
+    _endpoint = 'legacy.abstractDisplay-performAddMaterial'
 
-class UHAbstractDisplayRemoveMaterials( URLHandler ):
-    _relativeURL = "abstractDisplay.py/removeMaterials"
+class UHAbstractDisplayRemoveMaterials(URLHandler):
+    _endpoint = 'legacy.abstractDisplay-removeMaterials'
 
-class UHAbstractDisplayPDF( URLHandler ):
-    _relativeURL = "abstractDisplay.py/pdf"
+class UHAbstractDisplayPDF(URLHandler):
+    _endpoint = 'legacy.abstractDisplay-pdf'
 
-class UHAbstractConfManagerDisplayPDF( URLHandler ):
-    _relativeURL = "abstractManagment.py/abstractToPDF"
-
-
-class UHAbstractsConfManagerDisplayPDF( URLHandler ):
-    _relativeURL = "abstractsManagment.py/abstractsToPDF"
+class UHAbstractConfManagerDisplayPDF(URLHandler):
+    _endpoint = 'legacy.abstractManagment-abstractToPDF'
 
 
-class UHAbstractConfSelectionAction( URLHandler ):
-    _relativeURL = "abstractsManagment.py/abstractsActions"
+class UHAbstractsConfManagerDisplayPDF(URLHandler):
+    _endpoint = 'legacy.abstractsManagment-abstractsToPDF'
 
 
-class UHAbstractsConfManagerDisplayParticipantList( URLHandler ):
-    _relativeURL = "abstractsManagment.py/participantList"
+class UHAbstractConfSelectionAction(URLHandler):
+    _endpoint = 'legacy.abstractsManagment-abstractsActions'
 
 
-class UHAbstractsConfManagerDisplayXML( URLHandler ):
-    _relativeURL = "abstractsManagment.py/abstractsToXML"
+class UHAbstractsConfManagerDisplayParticipantList(URLHandler):
+    _endpoint = 'legacy.abstractsManagment-participantList'
 
 
-class UHAbstractsConfManagerDisplayExcel( URLHandler ):
-    _relativeURL = "abstractsManagment.py/abstractsListToExcel"
+class UHAbstractsConfManagerDisplayXML(URLHandler):
+    _endpoint = 'legacy.abstractsManagment-abstractsToXML'
 
 
-class UHAbstractsTrackManagerParticipantList( URLHandler ):
-    _relativeURL = "trackModifAbstracts.py/participantList"
+class UHAbstractsConfManagerDisplayExcel(URLHandler):
+    _endpoint = 'legacy.abstractsManagment-abstractsListToExcel'
 
 
-class UHAbstractsTrackManagerDisplayPDF( URLHandler ):
-    _relativeURL = "trackModifAbstracts.py/abstractsToPDF"
+class UHAbstractsTrackManagerParticipantList(URLHandler):
+    _endpoint = 'legacy.trackModifAbstracts-participantList'
 
 
-class UHAbstractstrackManagerDisplayPDF( URLHandler ):
-    _relativeURL = "trackModifAbstracts.py/abstractsToPDF"
+class UHAbstractsTrackManagerDisplayPDF(URLHandler):
+    _endpoint = 'legacy.trackModifAbstracts-abstractsToPDF'
 
 
-class UHUserAbstracts( URLHandler ):
-    _relativeURL = "userAbstracts.py"
+class UHAbstractstrackManagerDisplayPDF(URLHandler):
+    _endpoint = 'legacy.trackModifAbstracts-abstractsToPDF'
 
-class UHUserAbstractsPDF( URLHandler ):
-    _relativeURL = "userAbstracts.py/pdf"
+
+class UHUserAbstracts(URLHandler):
+    _endpoint = 'legacy.userAbstracts'
+
+class UHUserAbstractsPDF(URLHandler):
+    _endpoint = 'legacy.userAbstracts-pdf'
 
 
 class UHAbstractModify(URLHandler):
@@ -798,175 +807,175 @@ class UHAbstractModify(URLHandler):
     _fragment = 'interest'
 
 
-class UHCFAModifAbstracts( URLHandler ):
-    _relativeURL = "CFAModification.py/abstracts"
+class UHCFAModifAbstracts(URLHandler):
+    _endpoint = 'legacy.CFAModification-abstracts'
 
 
-class UHCFAAbstractManagment( URLHandler ):
-    _relativeURL = "abstractManagment.py"
+class UHCFAAbstractManagment(URLHandler):
+    _endpoint = 'legacy.abstractManagment'
 
 
-class UHAbstractManagment( URLHandler ):
-    _relativeURL = "abstractManagment.py"
+class UHAbstractManagment(URLHandler):
+    _endpoint = 'legacy.abstractManagment'
 
 
-class UHAbstractManagmentAccept( URLHandler ):
-    _relativeURL = "abstractManagment.py/accept"
+class UHAbstractManagmentAccept(URLHandler):
+    _endpoint = 'legacy.abstractManagment-accept'
 
 
-class UHAbstractManagmentAcceptMultiple( URLHandler ):
-    _relativeURL = "abstractManagment.py/acceptMultiple"
+class UHAbstractManagmentAcceptMultiple(URLHandler):
+    _endpoint = 'legacy.abstractManagment-acceptMultiple'
 
 
-class UHAbstractManagmentRejectMultiple( URLHandler ):
-    _relativeURL = "abstractManagment.py/rejectMultiple"
+class UHAbstractManagmentRejectMultiple(URLHandler):
+    _endpoint = 'legacy.abstractManagment-rejectMultiple'
 
 
-class UHAbstractManagmentReject( URLHandler ):
-    _relativeURL = "abstractManagment.py/reject"
+class UHAbstractManagmentReject(URLHandler):
+    _endpoint = 'legacy.abstractManagment-reject'
 
 
-class UHAbstractManagmentChangeTrack( URLHandler ):
-    _relativeURL = "abstractManagment.py/changeTrack"
+class UHAbstractManagmentChangeTrack(URLHandler):
+    _endpoint = 'legacy.abstractManagment-changeTrack'
 
 
-class UHAbstractTrackProposalManagment( URLHandler ):
-    _relativeURL = "abstractManagment.py/trackProposal"
+class UHAbstractTrackProposalManagment(URLHandler):
+    _endpoint = 'legacy.abstractManagment-trackProposal'
 
-class UHAbstractTrackOrderByRating( URLHandler ):
-    _relativeURL = "abstractManagment.py/orderByRating"
+class UHAbstractTrackOrderByRating(URLHandler):
+    _endpoint = 'legacy.abstractManagment-orderByRating'
 
 
-class UHCFAAbstractDeletion( URLHandler ):
-    _relativeURL = "abstractManagment.py/deleteAbstract"
+class UHCFAAbstractDeletion(URLHandler):
+    _endpoint = 'legacy.abstractManagment-deleteAbstract'
 
 
-class UHAbstractDirectAccess( URLHandler ):
-    _relativeURL = "abstractManagment.py/directAccess"
+class UHAbstractDirectAccess(URLHandler):
+    _endpoint = 'legacy.abstractManagment-directAccess'
 
 
-class UHAbstractToXML( URLHandler ):
-    _relativeURL = "abstractManagment.py/xml"
+class UHAbstractToXML(URLHandler):
+    _endpoint = 'legacy.abstractManagment-xml'
 
 
-class UHAbstractSubmissionDisplay( URLHandler ):
-    _relativeURL = "abstractSubmission.py"
+class UHAbstractSubmissionDisplay(URLHandler):
+    _endpoint = 'legacy.abstractSubmission'
 
 
-class UHAbstractCheckUser( URLHandler ):
-    _relativeURL = "abstractSubmission.py/checkUser"
+class UHAbstractCheckUser(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-checkUser'
 
 
-class UHAbstractAuthenticateUser( URLHandler ):
-    _relativeURL = "abstractSubmission.py/authenticateUser"
+class UHAbstractAuthenticateUser(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-authenticateUser'
 
 
-class UHAbstractSubmissionSendLogin( URLHandler ):
-    _relativeURL = "abstractSubmission.py/sendLogin"
+class UHAbstractSubmissionSendLogin(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-sendLogin'
 
 
-class UHAbstractSubmissionAbstract( URLHandler ):
-    _relativeURL = "abstractSubmission.py/submitAbstract"
+class UHAbstractSubmissionAbstract(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-submitAbstract'
 
 
-class UHAbstractSubmitAuthors( URLHandler ):
-    _relativeURL = "abstractSubmission.py/submitAuthors"
+class UHAbstractSubmitAuthors(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-submitAuthors'
 
 
-class UHAbstractSubmissionSelectAuthors( URLHandler ):
-    _relativeURL = "abstractSubmission.py/selectAuthors"
+class UHAbstractSubmissionSelectAuthors(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-selectAuthors'
 
 
-class UHAbstractSubmissionAddAuthors( URLHandler ):
-    _relativeURL = "abstractSubmission.py/addAuthors"
+class UHAbstractSubmissionAddAuthors(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-addAuthors'
 
 
-class UHAbstractSubmissionRemoveAuthors( URLHandler ):
-    _relativeURL = "abstractSubmission.py/removeAuthors"
+class UHAbstractSubmissionRemoveAuthors(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-removeAuthors'
 
 
-class UHAbstractSubmissionSelectPrimAuthor( URLHandler ):
-    _relativeURL = "abstractSubmission.py/selectPrimAuthor"
+class UHAbstractSubmissionSelectPrimAuthor(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-selectPrimAuthor'
 
 
-class UHAbstractSubmissionSetPrimAuthor( URLHandler ):
-    _relativeURL = "abstractSubmission.py/setPrimAuthor"
+class UHAbstractSubmissionSetPrimAuthor(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-setPrimAuthor'
 
 
-class UHAbstractSubmissionSelectSpeakers( URLHandler ):
-    _relativeURL = "abstractSubmission.py/selectSpeakers"
+class UHAbstractSubmissionSelectSpeakers(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-selectSpeakers'
 
 
-class UHAbstractSubmissionAddSpeakers( URLHandler ):
-    _relativeURL = "abstractSubmission.py/addSpeakers"
+class UHAbstractSubmissionAddSpeakers(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-addSpeakers'
 
 
-class UHAbstractSubmissionRemoveSpeakers( URLHandler ):
-    _relativeURL = "abstractSubmission.py/removeSpeakers"
+class UHAbstractSubmissionRemoveSpeakers(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-removeSpeakers'
 
 
-class UHAbstractSubmissionFinal( URLHandler ):
-    _relativeURL = "abstractSubmission.py/final"
+class UHAbstractSubmissionFinal(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-final'
 
 
-class UHAbstractCheckAbstract( URLHandler ):
-    _relativeURL = "abstractSubmission.py/checkAbstract"
+class UHAbstractCheckAbstract(URLHandler):
+    _endpoint = 'legacy.abstractSubmission-checkAbstract'
 
 
-class UHAbstractModification( URLHandler ):
-    _relativeURL = "abstractModification.py"
+class UHAbstractModification(URLHandler):
+    _endpoint = 'legacy.abstractModification'
 
 
-class UHAbstractModificationModify( URLHandler ):
-    _relativeURL = "abstractModification.py/modify"
+class UHAbstractModificationModify(URLHandler):
+    _endpoint = 'legacy.abstractModification-modify'
 
 
-class UHAbstractModificationPerformModify( URLHandler ):
-    _relativeURL = "abstractModification.py/performModify"
+class UHAbstractModificationPerformModify(URLHandler):
+    _endpoint = 'legacy.abstractModification-performModify'
 
 
-class UHAbstractModificationSelectAuthors( URLHandler ):
-    _relativeURL = "abstractModification.py/selectAuthors"
+class UHAbstractModificationSelectAuthors(URLHandler):
+    _endpoint = 'legacy.abstractModification-selectAuthors'
 
 
-class UHAbstractModificationAddAuthors( URLHandler ):
-    _relativeURL = "abstractModification.py/addAuthors"
+class UHAbstractModificationAddAuthors(URLHandler):
+    _endpoint = 'legacy.abstractModification-addAuthors'
 
 
-class UHAbstractModificationRemoveAuthors( URLHandler ):
-    _relativeURL = "abstractModification.py/removeAuthors"
+class UHAbstractModificationRemoveAuthors(URLHandler):
+    _endpoint = 'legacy.abstractModification-removeAuthors'
 
 
-class UHAbstractModificationSelectSpeakers( URLHandler ):
-    _relativeURL = "abstractModification.py/selectSpeakers"
+class UHAbstractModificationSelectSpeakers(URLHandler):
+    _endpoint = 'legacy.abstractModification-selectSpeakers'
 
 
-class UHAbstractModificationAddSpeakers( URLHandler ):
-    _relativeURL = "abstractModification.py/addSpeakers"
+class UHAbstractModificationAddSpeakers(URLHandler):
+    _endpoint = 'legacy.abstractModification-addSpeakers'
 
 
-class UHAbstractModificationRemoveSpeakers( URLHandler ):
-    _relativeURL = "abstractModification.py/removeSpeakers"
+class UHAbstractModificationRemoveSpeakers(URLHandler):
+    _endpoint = 'legacy.abstractModification-removeSpeakers'
 
 
-class UHConfAddTrack( URLHandler ):
-    _relativeURL = "confModifProgram.py/addTrack"
+class UHConfAddTrack(URLHandler):
+    _endpoint = 'legacy.confModifProgram-addTrack'
 
 
-class UHConfDelTracks( URLHandler ):
-    _relativeURL = "confModifProgram.py/deleteTracks"
+class UHConfDelTracks(URLHandler):
+    _endpoint = 'legacy.confModifProgram-deleteTracks'
 
 
-class UHConfPerformAddTrack( URLHandler ):
-    _relativeURL = "confModifProgram.py/performAddTrack"
+class UHConfPerformAddTrack(URLHandler):
+    _endpoint = 'legacy.confModifProgram-performAddTrack'
 
 
-class UHTrackModification( URLHandler ):
-    _relativeURL = "trackModification.py"
+class UHTrackModification(URLHandler):
+    _endpoint = 'legacy.trackModification'
 
 
-class UHTrackModifAbstracts( URLHandler ):
-    _relativeURL = "trackModifAbstracts.py"
+class UHTrackModifAbstracts(URLHandler):
+    _endpoint = 'legacy.trackModifAbstracts'
 
 
 class UHTrackAbstractBase(URLHandler):
@@ -978,448 +987,448 @@ class UHTrackAbstractBase(URLHandler):
         return url
 
 
-class UHTrackAbstractModif( UHTrackAbstractBase ):
-    _relativeURL = "trackAbstractModif.py"
+class UHTrackAbstractModif(UHTrackAbstractBase):
+    _endpoint = 'legacy.trackAbstractModif'
 
 
-class UHAbstractTrackManagerDisplayPDF( UHTrackAbstractBase ):
-    _relativeURL = "trackAbstractModif.py/abstractToPDF"
+class UHAbstractTrackManagerDisplayPDF(UHTrackAbstractBase):
+    _endpoint = 'legacy.trackAbstractModif-abstractToPDF'
 
 
-class UHAbstractsTrackManagerAction( URLHandler ):
-    _relativeURL = "trackAbstractModif.py/abstractAction"
+class UHAbstractsTrackManagerAction(URLHandler):
+    _endpoint = 'legacy.trackAbstractModif-abstractAction'
 
 
-class UHTrackAbstractPropToAcc( UHTrackAbstractBase ):
-    _relativeURL = "trackAbstractModif.py/proposeToBeAcc"
+class UHTrackAbstractPropToAcc(UHTrackAbstractBase):
+    _endpoint = 'legacy.trackAbstractModif-proposeToBeAcc'
 
 
-class UHTrackAbstractPropToRej( UHTrackAbstractBase ):
-    _relativeURL = "trackAbstractModif.py/proposeToBeRej"
+class UHTrackAbstractPropToRej(UHTrackAbstractBase):
+    _endpoint = 'legacy.trackAbstractModif-proposeToBeRej'
 
-class UHTrackAbstractAccept( UHTrackAbstractBase ):
-    _relativeURL = "trackAbstractModif.py/accept"
+class UHTrackAbstractAccept(UHTrackAbstractBase):
+    _endpoint = 'legacy.trackAbstractModif-accept'
 
-class UHTrackAbstractReject( UHTrackAbstractBase ):
-    _relativeURL = "trackAbstractModif.py/reject"
-
-
-class UHTrackAbstractDirectAccess( URLHandler ):
-    _relativeURL = "trackAbstractModif.py/directAccess"
+class UHTrackAbstractReject(UHTrackAbstractBase):
+    _endpoint = 'legacy.trackAbstractModif-reject'
 
 
-class UHTrackAbstractPropForOtherTrack( UHTrackAbstractBase ):
-    _relativeURL = "trackAbstractModif.py/proposeForOtherTracks"
+class UHTrackAbstractDirectAccess(URLHandler):
+    _endpoint = 'legacy.trackAbstractModif-directAccess'
 
 
-class UHTrackModifCoordination( URLHandler ):
-    _relativeURL = "trackModifCoordination.py"
+class UHTrackAbstractPropForOtherTrack(UHTrackAbstractBase):
+    _endpoint = 'legacy.trackAbstractModif-proposeForOtherTracks'
 
 
-class UHTrackModifSubTrack( URLHandler ):
-    _relativeURL = "trackModification.py/subTrack"
+class UHTrackModifCoordination(URLHandler):
+    _endpoint = 'legacy.trackModifCoordination'
 
 
-class UHSubTrackPerformDataModification( URLHandler ):
-    _relativeURL = "trackModification.py/subTrackPerformModify"
+class UHTrackModifSubTrack(URLHandler):
+    _endpoint = 'legacy.trackModification-subTrack'
 
 
-class UHSubTrackDataModif( URLHandler ):
-    _relativeURL = "trackModification.py/modifySubTrack"
-
-class UHTrackDataModif( URLHandler ):
-    _relativeURL = "trackModification.py/modify"
+class UHSubTrackPerformDataModification(URLHandler):
+    _endpoint = 'legacy.trackModification-subTrackPerformModify'
 
 
-class UHTrackPerformDataModification( URLHandler ):
-    _relativeURL = "trackModification.py/performModify"
+class UHSubTrackDataModif(URLHandler):
+    _endpoint = 'legacy.trackModification-modifySubTrack'
+
+class UHTrackDataModif(URLHandler):
+    _endpoint = 'legacy.trackModification-modify'
 
 
-class UHTrackDeleteSubTracks( URLHandler ):
-    _relativeURL = "trackModification.py/deleteSubTracks"
+class UHTrackPerformDataModification(URLHandler):
+    _endpoint = 'legacy.trackModification-performModify'
 
 
-class UHTrackAddSubTracks( URLHandler ):
-    _relativeURL = "trackModification.py/addSubTrack"
+class UHTrackDeleteSubTracks(URLHandler):
+    _endpoint = 'legacy.trackModification-deleteSubTracks'
 
 
-class UHTrackPerformAddSubTrack( URLHandler ):
-    _relativeURL = "trackModification.py/performAddSubTrack"
+class UHTrackAddSubTracks(URLHandler):
+    _endpoint = 'legacy.trackModification-addSubTrack'
+
+
+class UHTrackPerformAddSubTrack(URLHandler):
+    _endpoint = 'legacy.trackModification-performAddSubTrack'
 
 
 class UHTrackAbstractModIntComments(UHTrackAbstractBase):
-    _relativeURL = "trackAbstractModif.py/comments"
+    _endpoint = 'legacy.trackAbstractModif-comments'
 
 
-class UHConfModifSchedule( URLHandler ):
-    _relativeURL = "confModifSchedule.py"
+class UHConfModifSchedule(URLHandler):
+    _endpoint = 'legacy.confModifSchedule'
 
-class UHConfModifScheduleCustomizePDF( URLHandler ):
-    _relativeURL = "confModifSchedule.py/customizePdf"
+class UHConfModifScheduleCustomizePDF(URLHandler):
+    _endpoint = 'legacy.confModifSchedule-customizePdf'
 
-class UHConfDelSchItems( URLHandler ):
-    _relativeURL = "confModifSchedule.py/deleteItems"
+class UHConfDelSchItems(URLHandler):
+    _endpoint = 'legacy.confModifSchedule-deleteItems'
 
-class UHContribConfSelectionAction( URLHandler ):
-    _relativeURL = "confModifContribList.py/contribsActions"
+class UHContribConfSelectionAction(URLHandler):
+    _endpoint = 'legacy.confModifContribList-contribsActions'
 
-class UHContribsConfManagerDisplayPDF( URLHandler ):
-    _relativeURL = "confModifContribList.py/contribsToPDF"
+class UHContribsConfManagerDisplayPDF(URLHandler):
+    _endpoint = 'legacy.confModifContribList-contribsToPDF'
 
-class UHContribsConfManagerDisplayMenuPDF( URLHandler ):
-    _relativeURL = "confModifContribList.py/contribsToPDFMenu"
+class UHContribsConfManagerDisplayMenuPDF(URLHandler):
+    _endpoint = 'legacy.confModifContribList-contribsToPDFMenu'
 
-class UHConfPerformAddContribution( URLHandler ):
-    _relativeURL = "confModifContribList.py/performAddContribution"
+class UHConfPerformAddContribution(URLHandler):
+    _endpoint = 'legacy.confModifContribList-performAddContribution'
 
-class UHMConfPerformAddContribution( URLHandler ):
-    _relativeURL = "confModifContribList.py/performAddContributionM"
+class UHMConfPerformAddContribution(URLHandler):
+    _endpoint = 'legacy.confModifContribList-performAddContributionM'
 
-class UHContribsConfManagerDisplayParticipantList( URLHandler ):
-    _relativeURL = "confModifContribList.py/participantList"
+class UHContribsConfManagerDisplayParticipantList(URLHandler):
+    _endpoint = 'legacy.confModifContribList-participantList'
 
-class UHSessionClose( URLHandler ):
-    _relativeURL = "sessionModification.py/close"
-
-
-class UHSessionOpen( URLHandler ):
-    _relativeURL = "sessionModification.py/open"
+class UHSessionClose(URLHandler):
+    _endpoint = 'legacy.sessionModification-close'
 
 
-class UHSessionCreation( URLHandler ):
-    _relativeURL = "confModifSchedule.py"
+class UHSessionOpen(URLHandler):
+    _endpoint = 'legacy.sessionModification-open'
 
 
-class UHContribCreation( URLHandler ):
-    _relativeURL = "confModifSchedule.py"
+class UHSessionCreation(URLHandler):
+    _endpoint = 'legacy.confModifSchedule'
 
 
-class UHContribToXMLConfManager( URLHandler ):
-    _relativeURL = "contributionModification.py/xml"
+class UHContribCreation(URLHandler):
+    _endpoint = 'legacy.confModifSchedule'
 
 
-class UHContribToXML( URLHandler ):
-    _relativeURL = "contributionDisplay.py/xml"
+class UHContribToXMLConfManager(URLHandler):
+    _endpoint = 'legacy.contributionModification-xml'
 
 
-class UHContribToiCal( URLHandler ):
-    _relativeURL = "contributionDisplay.py/ical"
+class UHContribToXML(URLHandler):
+    _endpoint = 'legacy.contributionDisplay-xml'
 
 
-class UHContribToPDFConfManager( URLHandler ):
-    _relativeURL = "contributionModification.py/pdf"
+class UHContribToiCal(URLHandler):
+    _endpoint = 'legacy.contributionDisplay-ical'
 
 
-class UHContribToPDF( URLHandler ):
-    _relativeURL = "contributionDisplay.py/pdf"
+class UHContribToPDFConfManager(URLHandler):
+    _endpoint = 'legacy.contributionModification-pdf'
 
 
-class UHContribModifAC( URLHandler ):
-    _relativeURL = "contributionAC.py"
+class UHContribToPDF(URLHandler):
+    _endpoint = 'legacy.contributionDisplay-pdf'
 
 
-class UHContributionSetVisibility( URLHandler ):
-    _relativeURL = "contributionAC.py/setVisibility"
+class UHContribModifAC(URLHandler):
+    _endpoint = 'legacy.contributionAC'
 
-class UHContribModifMaterialMgmt( URLHandler ):
-    _relativeURL = "contributionModification.py/materials"
 
-class UHContribModifAddMaterials( URLHandler ):
-    _relativeURL = "contributionModification.py/materialsAdd"
+class UHContributionSetVisibility(URLHandler):
+    _endpoint = 'legacy.contributionAC-setVisibility'
 
-class UHContributionRemoveMaterials( URLHandler ):
-    _relativeURL = "contributionModification.py/removeMaterials"
+class UHContribModifMaterialMgmt(URLHandler):
+    _endpoint = 'legacy.contributionModification-materials'
+
+class UHContribModifAddMaterials(URLHandler):
+    _endpoint = 'legacy.contributionModification-materialsAdd'
+
+class UHContributionRemoveMaterials(URLHandler):
+    _endpoint = 'legacy.contributionModification-removeMaterials'
 
 # <Deprecated>
-class UHContributionAddMaterial( URLHandler ):
-    _relativeURL = "contributionModification.py/addMaterial"
+class UHContributionAddMaterial(URLHandler):
+    _endpoint = 'legacy.contributionModification-addMaterial'
 
-class UHContributionPerformAddMaterial( URLHandler ):
-    _relativeURL = "contributionModification.py/performAddMaterial"
+class UHContributionPerformAddMaterial(URLHandler):
+    _endpoint = 'legacy.contributionModification-performAddMaterial'
 # </Deprecated>
 
 
-class UHContribModifSubCont( URLHandler ):
-    _relativeURL = "contributionModifSubCont.py"
+class UHContribModifSubCont(URLHandler):
+    _endpoint = 'legacy.contributionModifSubCont'
 
 
-class UHContribDeleteSubCont( URLHandler ):
-    _relativeURL = "contributionModifSubCont.py/delete"
+class UHContribDeleteSubCont(URLHandler):
+    _endpoint = 'legacy.contributionModifSubCont-delete'
 
 
-class UHContribAddSubCont( URLHandler ):
-    _relativeURL = "contributionModifSubCont.py/add"
+class UHContribAddSubCont(URLHandler):
+    _endpoint = 'legacy.contributionModifSubCont-add'
 
 
-class UHContribCreateSubCont( URLHandler ):
-    _relativeURL = "contributionModifSubCont.py/create"
+class UHContribCreateSubCont(URLHandler):
+    _endpoint = 'legacy.contributionModifSubCont-create'
 
 
-class UHContribUpSubCont( URLHandler ):
-    _relativeURL = "contributionModifSubCont.py/up"
+class UHContribUpSubCont(URLHandler):
+    _endpoint = 'legacy.contributionModifSubCont-up'
 
 
-class UHContribDownSubCont( URLHandler ):
-    _relativeURL = "contributionModifSubCont.py/Down"
+class UHContribDownSubCont(URLHandler):
+    _endpoint = 'legacy.contributionModifSubCont-Down'
 
 class UHSubContribActions(URLHandler):
-    _relativeURL ="contributionModifSubCont.py/actionSubContribs"
+    _endpoint = 'legacy.contributionModifSubCont-actionSubContribs'
 
 
-class UHContribModifTools( URLHandler ):
-    _relativeURL = "contributionTools.py"
+class UHContribModifTools(URLHandler):
+    _endpoint = 'legacy.contributionTools'
 
 
-class UHContributionDataModif( URLHandler ):
-    _relativeURL = "contributionModification.py/modifData"
+class UHContributionDataModif(URLHandler):
+    _endpoint = 'legacy.contributionModification-modifData'
 
 
-class UHContributionDataModification( URLHandler ):
-    _relativeURL = "contributionModification.py/data"
+class UHContributionDataModification(URLHandler):
+    _endpoint = 'legacy.contributionModification-data'
 
 
-class UHContributionCreation( URLHandler ):
-    _relativeURL = "contributionCreation.py"
+class UHContributionCreation(URLHandler):
+    _endpoint = 'legacy.contributionCreation'
 
-class UHSubContributionCreation( URLHandler ):
-    _relativeURL = "subContributionCreation.py"
+class UHSubContributionCreation(URLHandler):
+    _endpoint = 'legacy.subContributionCreation'
 
-class UHConfModifAC( URLHandler ):
-    _relativeURL = "confModifAC.py"
+class UHConfModifAC(URLHandler):
+    _endpoint = 'legacy.confModifAC'
 
-class UHConfSetVisibility( URLHandler ):
-    _relativeURL = "confModifAC.py/setVisibility"
+class UHConfSetVisibility(URLHandler):
+    _endpoint = 'legacy.confModifAC-setVisibility'
 
-class UHConfGrantSubmissionToAllSpeakers( URLHandler ):
-    _relativeURL = "confModifAC.py/grantSubmissionToAllSpeakers"
+class UHConfGrantSubmissionToAllSpeakers(URLHandler):
+    _endpoint = 'legacy.confModifAC-grantSubmissionToAllSpeakers'
 
-class UHConfRemoveAllSubmissionRights( URLHandler ):
-    _relativeURL = "confModifAC.py/removeAllSubmissionRights"
+class UHConfRemoveAllSubmissionRights(URLHandler):
+    _endpoint = 'legacy.confModifAC-removeAllSubmissionRights'
 
-class UHConfGrantModificationToAllConveners( URLHandler ):
-    _relativeURL = "confModifAC.py/grantModificationToAllConveners"
+class UHConfGrantModificationToAllConveners(URLHandler):
+    _endpoint = 'legacy.confModifAC-grantModificationToAllConveners'
 
 class UHConfModifCoordinatorRights(URLHandler):
-    _relativeURL = "confModifAC.py/modifySessionCoordRights"
+    _endpoint = 'legacy.confModifAC-modifySessionCoordRights'
 
-class UHConfModifTools( URLHandler ):
-    _relativeURL = "confModifTools.py"
+class UHConfModifTools(URLHandler):
+    _endpoint = 'legacy.confModifTools'
 
-class UHConfModifListings( URLHandler ):
-    _relativeURL = "confModifListings.py"
+class UHConfModifListings(URLHandler):
+    _endpoint = 'legacy.confModifListings'
 
-class UHConfModifParticipants( URLHandler ):
-    _relativeURL = "confModifParticipants.py"
+class UHConfModifParticipants(URLHandler):
+    _endpoint = 'legacy.confModifParticipants'
 
-class UHConfModifLog( URLHandler ):
-    _relativeURL = "confModifLog.py"
+class UHConfModifLog(URLHandler):
+    _endpoint = 'legacy.confModifLog'
 
-class UHInternalPageDisplay( URLHandler ):
-    _relativeURL = "internalPage.py"
+class UHInternalPageDisplay(URLHandler):
+    _endpoint = 'legacy.internalPage'
 
-class UHConfModifDisplay( URLHandler ):
-    _relativeURL = "confModifDisplay.py"
+class UHConfModifDisplay(URLHandler):
+    _endpoint = 'legacy.confModifDisplay'
 
-class UHConfModifDisplayCustomization( URLHandler ):
-    _relativeURL = "confModifDisplay.py/custom"
+class UHConfModifDisplayCustomization(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-custom'
 
-class UHConfModifDisplayMenu( URLHandler ):
-    _relativeURL = "confModifDisplay.py/menu"
+class UHConfModifDisplayMenu(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-menu'
 
-class UHConfModifDisplayResources( URLHandler ):
-    _relativeURL = "confModifDisplay.py/resources"
+class UHConfModifDisplayResources(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-resources'
 
-class UHConfModifDisplayConfHeader( URLHandler ):
-    _relativeURL = "confModifDisplay.py/confHeader"
+class UHConfModifDisplayConfHeader(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-confHeader'
 
-class UHConfModifDisplayLink( URLHandler ):
-    _relativeURL = "confModifDisplay.py/modifyLink"
+class UHConfModifDisplayLink(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-modifyLink'
 
 
-class UHConfModifDisplayAddLink( URLHandler ):
-    _relativeURL = "confModifDisplay.py/addLink"
+class UHConfModifDisplayAddLink(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-addLink'
 
-class UHConfModifDisplayAddPage( URLHandler ):
-    _relativeURL = "confModifDisplay.py/addPage"
+class UHConfModifDisplayAddPage(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-addPage'
 
-class UHConfModifDisplayAddPageFile( URLHandler ):
-    _relativeURL = "confModifDisplay.py/addPageFile"
+class UHConfModifDisplayAddPageFile(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-addPageFile'
 
-class UHConfModifDisplayAddPageFileBrowser( URLHandler ):
-    _relativeURL = "confModifDisplay.py/addPageFileBrowser"
+class UHConfModifDisplayAddPageFileBrowser(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-addPageFileBrowser'
 
-class UHConfModifDisplayModifyData( URLHandler ):
-    _relativeURL = "confModifDisplay.py/modifyData"
+class UHConfModifDisplayModifyData(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-modifyData'
 
-class UHConfModifDisplayModifySystemData( URLHandler ):
-    _relativeURL = "confModifDisplay.py/modifySystemData"
+class UHConfModifDisplayModifySystemData(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-modifySystemData'
 
-class UHConfModifDisplayAddSpacer( URLHandler ):
-    _relativeURL = "confModifDisplay.py/addSpacer"
+class UHConfModifDisplayAddSpacer(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-addSpacer'
 
 
-class UHConfModifDisplayRemoveLink( URLHandler ):
-    _relativeURL = "confModifDisplay.py/removeLink"
+class UHConfModifDisplayRemoveLink(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-removeLink'
 
 
-class UHConfModifDisplayToggleLinkStatus( URLHandler ):
-    _relativeURL = "confModifDisplay.py/toggleLinkStatus"
+class UHConfModifDisplayToggleLinkStatus(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-toggleLinkStatus'
 
-class UHConfModifDisplayToggleHomePage( URLHandler ):
-    _relativeURL = "confModifDisplay.py/toggleHomePage"
+class UHConfModifDisplayToggleHomePage(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-toggleHomePage'
 
-class UHConfModifDisplayUpLink( URLHandler ):
-    _relativeURL = "confModifDisplay.py/upLink"
+class UHConfModifDisplayUpLink(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-upLink'
 
 
-class UHConfModifDisplayDownLink( URLHandler ):
-    _relativeURL = "confModifDisplay.py/downLink"
+class UHConfModifDisplayDownLink(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-downLink'
 
-class UHConfModifFormatTitleBgColor( URLHandler ):
-    _relativeURL = "confModifDisplay.py/formatTitleBgColor"
+class UHConfModifFormatTitleBgColor(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-formatTitleBgColor'
 
-class UHConfModifFormatTitleTextColor( URLHandler ):
-    _relativeURL = "confModifDisplay.py/formatTitleTextColor"
+class UHConfModifFormatTitleTextColor(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-formatTitleTextColor'
 
-class UHConfDeletion( URLHandler ):
-    _relativeURL = "confModifTools.py/delete"
+class UHConfDeletion(URLHandler):
+    _endpoint = 'legacy.confModifTools-delete'
 
 
-class UHConfClone( URLHandler ):
-    _relativeURL = "confModifTools.py/clone"
+class UHConfClone(URLHandler):
+    _endpoint = 'legacy.confModifTools-clone'
 
-class UHConfPerformCloning( URLHandler ):
-    _relativeURL = "confModifTools.py/performCloning"
+class UHConfPerformCloning(URLHandler):
+    _endpoint = 'legacy.confModifTools-performCloning'
 
-class UHConfPerformCloneOnce( URLHandler ):
-    _relativeURL = "confModifTools.py/performCloneOnce"
+class UHConfPerformCloneOnce(URLHandler):
+    _endpoint = 'legacy.confModifTools-performCloneOnce'
 
 
-class UHConfPerformCloneInterval( URLHandler ):
-    _relativeURL = "confModifTools.py/performCloneInterval"
+class UHConfPerformCloneInterval(URLHandler):
+    _endpoint = 'legacy.confModifTools-performCloneInterval'
 
 
-class UHConfPerformCloneDays( URLHandler ):
-    _relativeURL = "confModifTools.py/performCloneDays"
+class UHConfPerformCloneDays(URLHandler):
+    _endpoint = 'legacy.confModifTools-performCloneDays'
 
-class UHConfAllSessionsConveners( URLHandler ):
-    _relativeURL = "confModifTools.py/allSessionsConveners"
+class UHConfAllSessionsConveners(URLHandler):
+    _endpoint = 'legacy.confModifTools-allSessionsConveners'
 
-class UHConfAllSessionsConvenersAction( URLHandler ):
-    _relativeURL = "confModifTools.py/allSessionsConvenersAction"
+class UHConfAllSessionsConvenersAction(URLHandler):
+    _endpoint = 'legacy.confModifTools-allSessionsConvenersAction'
 
-class UHConfAllSpeakers( URLHandler ):
-    _relativeURL = "confModifListings.py/allSpeakers"
+class UHConfAllSpeakers(URLHandler):
+    _endpoint = 'legacy.confModifListings-allSpeakers'
 
-class UHConfAllSpeakersAction( URLHandler ):
-    _relativeURL = "confModifListings.py/allSpeakersAction"
+class UHConfAllSpeakersAction(URLHandler):
+    _endpoint = 'legacy.confModifListings-allSpeakersAction'
 
-class UHConfAllPrimaryAuthors( URLHandler ):
-    _relativeURL = "confModifListings.py/allPrimaryAuthors"
+class UHConfAllPrimaryAuthors(URLHandler):
+    _endpoint = 'legacy.confModifListings-allPrimaryAuthors'
 
-class UHConfAllPrimaryAuthorsAction( URLHandler ):
-    _relativeURL = "confModifListings.py/allPrimaryAuthorsAction"
+class UHConfAllPrimaryAuthorsAction(URLHandler):
+    _endpoint = 'legacy.confModifListings-allPrimaryAuthorsAction'
 
-class UHConfAllCoAuthors( URLHandler ):
-    _relativeURL = "confModifListings.py/allCoAuthors"
+class UHConfAllCoAuthors(URLHandler):
+    _endpoint = 'legacy.confModifListings-allCoAuthors'
 
-class UHConfAllCoAuthorsAction( URLHandler ):
-    _relativeURL = "confModifListings.py/allCoAuthorsAction"
+class UHConfAllCoAuthorsAction(URLHandler):
+    _endpoint = 'legacy.confModifListings-allCoAuthorsAction'
 
-class UHConfDisplayAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/displayAlarm"
+class UHConfDisplayAlarm(URLHandler):
+    _endpoint = 'legacy.confModifTools-displayAlarm'
 
-class UHConfAddAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/addAlarm"
+class UHConfAddAlarm(URLHandler):
+    _endpoint = 'legacy.confModifTools-addAlarm'
 
 
-class UHSaveAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/saveAlarm"
+class UHSaveAlarm(URLHandler):
+    _endpoint = 'legacy.confModifTools-saveAlarm'
 
 
-class UHTestSendAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/testSendAlarm"
+class UHTestSendAlarm(URLHandler):
+    _endpoint = 'legacy.confModifTools-testSendAlarm'
 
 
-class UHSendAlarmNow( URLHandler ):
-    _relativeURL = "confModifTools.py/sendAlarmNow"
+class UHSendAlarmNow(URLHandler):
+    _endpoint = 'legacy.confModifTools-sendAlarmNow'
 
 
-class UHConfDeleteAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/deleteAlarm"
+class UHConfDeleteAlarm(URLHandler):
+    _endpoint = 'legacy.confModifTools-deleteAlarm'
 
 
-class UHConfModifyAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/modifyAlarm"
+class UHConfModifyAlarm(URLHandler):
+    _endpoint = 'legacy.confModifTools-modifyAlarm'
 
 
-class UHConfSaveAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/saveAlarm"
+class UHConfSaveAlarm(URLHandler):
+    _endpoint = 'legacy.confModifTools-saveAlarm'
 
 
-class UHSaveLogo( URLHandler ):
-    _relativeURL = "confModifDisplay.py/saveLogo"
+class UHSaveLogo(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-saveLogo'
 
 
-class UHRemoveLogo( URLHandler ):
-    _relativeURL = "confModifDisplay.py/removeLogo"
+class UHRemoveLogo(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-removeLogo'
 
-class UHSaveCSS( URLHandler ):
-    _relativeURL = "confModifDisplay.py/saveCSS"
+class UHSaveCSS(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-saveCSS'
 
-class UHUseCSS( URLHandler ):
-    _relativeURL = "confModifDisplay.py/useCSS"
+class UHUseCSS(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-useCSS'
 
-class UHRemoveCSS( URLHandler ):
-    _relativeURL = "confModifDisplay.py/removeCSS"
+class UHRemoveCSS(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-removeCSS'
 
-class UHSavePic( URLHandler ):
-    _relativeURL = "confModifDisplay.py/savePic"
+class UHSavePic(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-savePic'
 
-class UHConfModifParticipantsSetup( URLHandler ):
-    _relativeURL = "confModifParticipants.py/setup"
+class UHConfModifParticipantsSetup(URLHandler):
+    _endpoint = 'legacy.confModifParticipants-setup'
 
-class UHConfModifParticipantsPending( URLHandler ):
-    _relativeURL = "confModifParticipants.py/pendingParticipants"
+class UHConfModifParticipantsPending(URLHandler):
+    _endpoint = 'legacy.confModifParticipants-pendingParticipants'
 
-class UHConfModifParticipantsDeclined( URLHandler ):
-    _relativeURL = "confModifParticipants.py/declinedParticipants"
+class UHConfModifParticipantsDeclined(URLHandler):
+    _endpoint = 'legacy.confModifParticipants-declinedParticipants'
 
-class UHConfModifParticipantsAction( URLHandler ):
-    _relativeURL = "confModifParticipants.py/action"
+class UHConfModifParticipantsAction(URLHandler):
+    _endpoint = 'legacy.confModifParticipants-action'
 
-class UHConfModifParticipantsStatistics( URLHandler ):
-    _relativeURL = "confModifParticipants.py/statistics"
+class UHConfModifParticipantsStatistics(URLHandler):
+    _endpoint = 'legacy.confModifParticipants-statistics'
 
-class UHConfParticipantsInvitation( URLHandler ):
-    _relativeURL = "confModifParticipants.py/invitation"
+class UHConfParticipantsInvitation(URLHandler):
+    _endpoint = 'legacy.confModifParticipants-invitation'
 
-class UHConfParticipantsRefusal( URLHandler ):
-    _relativeURL = "confModifParticipants.py/refusal"
+class UHConfParticipantsRefusal(URLHandler):
+    _endpoint = 'legacy.confModifParticipants-refusal'
 
-class UHConfModifToggleSearch( URLHandler ):
-    _relativeURL = "confModifDisplay.py/toggleSearch"
+class UHConfModifToggleSearch(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-toggleSearch'
 
-class UHConfModifToggleNavigationBar( URLHandler ):
-    _relativeURL = "confModifDisplay.py/toggleNavigationBar"
+class UHConfModifToggleNavigationBar(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-toggleNavigationBar'
 
-class UHTickerTapeAction( URLHandler ):
-    _relativeURL = "confModifDisplay.py/tickerTapeAction"
+class UHTickerTapeAction(URLHandler):
+    _endpoint = 'legacy.confModifDisplay-tickerTapeAction'
 
-class UHUserManagement( URLHandler ):
-    _relativeURL = "userManagement.py"
+class UHUserManagement(URLHandler):
+    _endpoint = 'legacy.userManagement'
 
-class UHUserManagementSwitchAuthorisedAccountCreation( URLHandler ):
-    _relativeURL = "userManagement.py/switchAuthorisedAccountCreation"
+class UHUserManagementSwitchAuthorisedAccountCreation(URLHandler):
+    _endpoint = 'legacy.userManagement-switchAuthorisedAccountCreation'
 
-class UHUserManagementSwitchNotifyAccountCreation( URLHandler ):
-    _relativeURL = "userManagement.py/switchNotifyAccountCreation"
+class UHUserManagementSwitchNotifyAccountCreation(URLHandler):
+    _endpoint = 'legacy.userManagement-switchNotifyAccountCreation'
 
-class UHUserManagementSwitchModerateAccountCreation( URLHandler ):
-    _relativeURL = "userManagement.py/switchModerateAccountCreation"
+class UHUserManagementSwitchModerateAccountCreation(URLHandler):
+    _endpoint = 'legacy.userManagement-switchModerateAccountCreation'
 
-class UHUsers( URLHandler ):
-    _relativeURL = "userList.py"
+class UHUsers(URLHandler):
+    _endpoint = 'legacy.userList'
 
 class UHUserCreation(URLHandler):
     _endpoint = 'legacy.userRegistration'
@@ -1436,11 +1445,11 @@ class UHUserCreation(URLHandler):
         return url
 
 
-class UHUserPerformCreation( URLHandler ):
-    _relativeURL = "userRegistration.py/update"
+class UHUserPerformCreation(URLHandler):
+    _endpoint = 'legacy.userRegistration-update'
 
-class UHUserMerge( URLHandler ):
-    _relativeURL = "userMerge.py"
+class UHUserMerge(URLHandler):
+    _endpoint = 'legacy.userMerge'
 
 
 class UHConfSignIn(SecureURLHandler):
@@ -1493,138 +1502,138 @@ class UHConfUser(URLHandler):
         return url
 
 
-class UHConfDisabledAccount( UHConfUser ):
-    _relativeURL = "confLogin.py/disabledAccount"
+class UHConfDisabledAccount(UHConfUser):
+    _endpoint = 'legacy.confLogin-disabledAccount'
 
 
-class UHConfUnactivatedAccount( UHConfUser ):
-    _relativeURL = "confLogin.py/unactivatedAccount"
+class UHConfUnactivatedAccount(UHConfUser):
+    _endpoint = 'legacy.confLogin-unactivatedAccount'
 
 
-class UHConfUserCreated( UHConfUser ):
-    _relativeURL = "confUser.py/created"
+class UHConfUserCreated(UHConfUser):
+    _endpoint = 'legacy.confUser-created'
 
 
-class UHConfSendLogin( UHConfUser ):
-    _relativeURL = "confLogin.py/sendLogin"
+class UHConfSendLogin(UHConfUser):
+    _endpoint = 'legacy.confLogin-sendLogin'
 
 
-class UHConfSendActivation( UHConfUser ):
-    _relativeURL = "confLogin.py/sendActivation"
+class UHConfSendActivation(UHConfUser):
+    _endpoint = 'legacy.confLogin-sendActivation'
 
 
-class UHConfUserExistWithIdentity( UHConfUser ):
-    _relativeURL = "confUser.py/userExists"
+class UHConfUserExistWithIdentity(UHConfUser):
+    _endpoint = 'legacy.confUser-userExists'
 
 
-class UHConfActiveAccount( UHConfUser ):
-    _relativeURL = "confLogin.py/active"
+class UHConfActiveAccount(UHConfUser):
+    _endpoint = 'legacy.confLogin-active'
 
 
-class UHConfEnterAccessKey( UHConfUser ):
-    _relativeURL = "conferenceDisplay.py/accessKey"
+class UHConfEnterAccessKey(UHConfUser):
+    _endpoint = 'legacy.conferenceDisplay-accessKey'
 
-class UHConfForceEnterAccessKey( UHConfUser ):
-    _relativeURL = "conferenceDisplay.py/forceAccessKey"
+class UHConfForceEnterAccessKey(UHConfUser):
+    _endpoint = 'legacy.conferenceDisplay-forceAccessKey'
 
 class UHConfManagementAccess(UHConfUser):
-    _relativeURL = "conferenceModification.py/managementAccess"
+    _endpoint = 'legacy.conferenceModification-managementAccess'
 
-class UHConfEnterModifKey( UHConfUser ):
-    _relativeURL = "conferenceModification.py/modifKey"
+class UHConfEnterModifKey(UHConfUser):
+    _endpoint = 'legacy.conferenceModification-modifKey'
 
-class UHConfCloseModifKey( UHConfUser ):
-    _relativeURL = "conferenceModification.py/closeModifKey"
+class UHConfCloseModifKey(UHConfUser):
+    _endpoint = 'legacy.conferenceModification-closeModifKey'
 
-class UHUserCreated( UHConfUser ):
-    _relativeURL = "userRegistration.py/created"
+class UHUserCreated(UHConfUser):
+    _endpoint = 'legacy.userRegistration-created'
 
-class UHUserActive( URLHandler ):
-    _relativeURL = "userRegistration.py/active"
+class UHUserActive(URLHandler):
+    _endpoint = 'legacy.userRegistration-active'
 
-class UHUserDisable( URLHandler ):
-    _relativeURL = "userRegistration.py/disable"
+class UHUserDisable(URLHandler):
+    _endpoint = 'legacy.userRegistration-disable'
 
 
 class UHUserDashboard(URLHandler):
-    _relativeURL = "userDashboard.py"
+    _endpoint = 'legacy.userDashboard'
 
-class UHUserDetails( URLHandler ):
-    _relativeURL = "userDetails.py"
+class UHUserDetails(URLHandler):
+    _endpoint = 'legacy.userDetails'
 
-class UHUserBaskets( URLHandler ):
-    _relativeURL = "userBaskets.py"
+class UHUserBaskets(URLHandler):
+    _endpoint = 'legacy.userBaskets'
 
-class UHUserPreferences( URLHandler ):
-    _relativeURL = "userPreferences.py"
+class UHUserPreferences(URLHandler):
+    _endpoint = 'legacy.userPreferences'
 
-class UHUserAPI( URLHandler ):
-    _relativeURL = "userAPI.py"
+class UHUserAPI(URLHandler):
+    _endpoint = 'legacy.userAPI'
 
-class UHUserAPICreate( URLHandler ):
-    _relativeURL = "userAPI.py/create"
+class UHUserAPICreate(URLHandler):
+    _endpoint = 'legacy.userAPI-create'
 
-class UHUserAPIBlock( URLHandler ):
-    _relativeURL = "userAPI.py/block"
+class UHUserAPIBlock(URLHandler):
+    _endpoint = 'legacy.userAPI-block'
 
-class UHUserAPIDelete( URLHandler ):
-    _relativeURL = "userAPI.py/delete"
+class UHUserAPIDelete(URLHandler):
+    _endpoint = 'legacy.userAPI-delete'
 
-class UHUserRegistration( URLHandler ):
-    _relativeURL = "userRegistration.py"
-
-
-class UHUserModification( URLHandler ):
-    _relativeURL = "userRegistration.py/modify"
+class UHUserRegistration(URLHandler):
+    _endpoint = 'legacy.userRegistration'
 
 
-class UHUserIdentityCreation( URLHandler ):
-    _relativeURL = "identityCreation.py"
+class UHUserModification(URLHandler):
+    _endpoint = 'legacy.userRegistration-modify'
 
 
-class UHUserRemoveIdentity( URLHandler ):
-    _relativeURL = "identityCreation.py/remove"
+class UHUserIdentityCreation(URLHandler):
+    _endpoint = 'legacy.identityCreation'
 
 
-class UHUserExistWithIdentity( UHConfUser ):
-    _relativeURL = "userRegistration.py/UserExist"
-
-class UHUserIdPerformCreation( URLHandler ):
-    _relativeURL = "identityCreation.py/create"
-
-class UHUserIdentityChangePassword( URLHandler ):
-    _relativeURL = "identityCreation.py/changePassword"
+class UHUserRemoveIdentity(URLHandler):
+    _endpoint = 'legacy.identityCreation-remove'
 
 
+class UHUserExistWithIdentity(UHConfUser):
+    _endpoint = 'legacy.userRegistration-UserExist'
 
-class UHGroups( URLHandler ):
-    _relativeURL = "groupList.py"
+class UHUserIdPerformCreation(URLHandler):
+    _endpoint = 'legacy.identityCreation-create'
 
-
-class UHNewGroup( URLHandler ):
-    _relativeURL = "groupRegistration.py"
-
-class UHNewLDAPGroup( URLHandler ):
-    _relativeURL = "groupRegistration.py/LDAPGroup"
+class UHUserIdentityChangePassword(URLHandler):
+    _endpoint = 'legacy.identityCreation-changePassword'
 
 
-class UHGroupPerformRegistration( URLHandler ):
-    _relativeURL = "groupRegistration.py/update"
 
-class UHLDAPGroupPerformRegistration( URLHandler ):
-    _relativeURL = "groupRegistration.py/updateLDAPGroup"
+class UHGroups(URLHandler):
+    _endpoint = 'legacy.groupList'
 
 
-class UHGroupDetails( URLHandler ):
-    _relativeURL = "groupDetails.py"
+class UHNewGroup(URLHandler):
+    _endpoint = 'legacy.groupRegistration'
+
+class UHNewLDAPGroup(URLHandler):
+    _endpoint = 'legacy.groupRegistration-LDAPGroup'
 
 
-class UHGroupModification( URLHandler ):
-    _relativeURL = "groupModification.py"
+class UHGroupPerformRegistration(URLHandler):
+    _endpoint = 'legacy.groupRegistration-update'
+
+class UHLDAPGroupPerformRegistration(URLHandler):
+    _endpoint = 'legacy.groupRegistration-updateLDAPGroup'
 
 
-class UHGroupPerformModification( URLHandler ):
-    _relativeURL = "groupModification.py/update"
+class UHGroupDetails(URLHandler):
+    _endpoint = 'legacy.groupDetails'
+
+
+class UHGroupModification(URLHandler):
+    _endpoint = 'legacy.groupModification'
+
+
+class UHGroupPerformModification(URLHandler):
+    _endpoint = 'legacy.groupModification-update'
 
 
 class UHPrincipalDetails:
@@ -1638,86 +1647,86 @@ class UHPrincipalDetails:
             return ''
 
 
-class UHDomains( URLHandler ):
-    _relativeURL = "domainList.py"
+class UHDomains(URLHandler):
+    _endpoint = 'legacy.domainList'
 
 
-class UHNewDomain( URLHandler ):
-    _relativeURL = "domainCreation.py"
+class UHNewDomain(URLHandler):
+    _endpoint = 'legacy.domainCreation'
 
 
-class UHDomainPerformCreation( URLHandler ):
-    _relativeURL = "domainCreation.py/create"
+class UHDomainPerformCreation(URLHandler):
+    _endpoint = 'legacy.domainCreation-create'
 
 
-class UHDomainDetails( URLHandler ):
-    _relativeURL = "domainDetails.py"
+class UHDomainDetails(URLHandler):
+    _endpoint = 'legacy.domainDetails'
 
 
-class UHDomainModification( URLHandler ):
-    _relativeURL = "domainDataModification.py"
+class UHDomainModification(URLHandler):
+    _endpoint = 'legacy.domainDataModification'
 
 
-class UHDomainPerformModification( URLHandler ):
-    _relativeURL = "domainDataModification.py/modify"
+class UHDomainPerformModification(URLHandler):
+    _endpoint = 'legacy.domainDataModification-modify'
 
-class UHRoomMappers( URLHandler ):
-    _relativeURL = "roomMapper.py"
-
-
-class UHNewRoomMapper( URLHandler ):
-    _relativeURL = "roomMapper.py/creation"
-
-class UHRoomMapperPerformCreation( URLHandler ):
-    _relativeURL = "roomMapper.py/performCreation"
+class UHRoomMappers(URLHandler):
+    _endpoint = 'legacy.roomMapper'
 
 
-class UHRoomMapperDetails( URLHandler ):
-    _relativeURL = "roomMapper.py/details"
+class UHNewRoomMapper(URLHandler):
+    _endpoint = 'legacy.roomMapper-creation'
+
+class UHRoomMapperPerformCreation(URLHandler):
+    _endpoint = 'legacy.roomMapper-performCreation'
 
 
-class UHRoomMapperModification( URLHandler ):
-    _relativeURL = "roomMapper.py/modify"
+class UHRoomMapperDetails(URLHandler):
+    _endpoint = 'legacy.roomMapper-details'
 
 
-class UHRoomMapperPerformModification( URLHandler ):
-    _relativeURL = "roomMapper.py/performModify"
+class UHRoomMapperModification(URLHandler):
+    _endpoint = 'legacy.roomMapper-modify'
 
-class UHAdminArea( URLHandler ):
-    _relativeURL = "adminList.py"
 
-class UHAdminSwitchCacheActive( URLHandler ):
-    _relativeURL = "adminList.py/switchCacheActive"
+class UHRoomMapperPerformModification(URLHandler):
+    _endpoint = 'legacy.roomMapper-performModify'
 
-class UHAdminSwitchDebugActive( URLHandler ):
-    _relativeURL = "adminList.py/switchDebugActive"
+class UHAdminArea(URLHandler):
+    _endpoint = 'legacy.adminList'
 
-class UHAdminSwitchNewsActive( URLHandler ):
-    _relativeURL = "adminList.py/switchNewsActive"
+class UHAdminSwitchCacheActive(URLHandler):
+    _endpoint = 'legacy.adminList-switchCacheActive'
 
-class UHAdminSwitchHighlightActive( URLHandler ):
-    _relativeURL = "adminList.py/switchHighlightActive"
+class UHAdminSwitchDebugActive(URLHandler):
+    _endpoint = 'legacy.adminList-switchDebugActive'
 
-class UHAdminsStyles( URLHandler ):
-    _relativeURL = "adminLayout.py/styles"
+class UHAdminSwitchNewsActive(URLHandler):
+    _endpoint = 'legacy.adminList-switchNewsActive'
 
-class UHAdminsConferenceStyles( URLHandler ):
-    _relativeURL = "adminConferenceStyles.py"
+class UHAdminSwitchHighlightActive(URLHandler):
+    _endpoint = 'legacy.adminList-switchHighlightActive'
 
-class UHAdminsAddStyle( URLHandler ):
-    _relativeURL = "adminLayout.py/addStyle"
+class UHAdminsStyles(URLHandler):
+    _endpoint = 'legacy.adminLayout-styles'
 
-class UHAdminsDeleteStyle( URLHandler ):
-    _relativeURL = "adminLayout.py/deleteStyle"
+class UHAdminsConferenceStyles(URLHandler):
+    _endpoint = 'legacy.adminConferenceStyles'
 
-class UHAdminsSystem( URLHandler ):
-    _relativeURL = "adminSystem.py"
+class UHAdminsAddStyle(URLHandler):
+    _endpoint = 'legacy.adminLayout-addStyle'
 
-class UHAdminsSystemModif( URLHandler ):
-    _relativeURL = "adminSystem.py/modify"
+class UHAdminsDeleteStyle(URLHandler):
+    _endpoint = 'legacy.adminLayout-deleteStyle'
 
-class UHAdminsProtection( URLHandler ):
-    _relativeURL = "adminProtection.py"
+class UHAdminsSystem(URLHandler):
+    _endpoint = 'legacy.adminSystem'
+
+class UHAdminsSystemModif(URLHandler):
+    _endpoint = 'legacy.adminSystem-modify'
+
+class UHAdminsProtection(URLHandler):
+    _endpoint = 'legacy.adminProtection'
 
 
 class UHMaterialModification(URLHandler):
@@ -1744,11 +1753,11 @@ class UHMaterialModification(URLHandler):
         return handler.getURL(owner, returnURL=returnURL)
 
 
-class UHMaterialEnterAccessKey( URLHandler ):
-    _relativeURL = "materialDisplay.py/accessKey"
+class UHMaterialEnterAccessKey(URLHandler):
+    _endpoint = 'legacy.materialDisplay-accessKey'
 
-class UHFileEnterAccessKey( URLHandler ):
-    _relativeURL = "getFile.py/accessKey"
+class UHFileEnterAccessKey(URLHandler):
+    _endpoint = 'legacy.getFile-accessKey'
 
 
 class UHCategoryModification(URLHandler):
@@ -1759,69 +1768,69 @@ class UHCategoryModification(URLHandler):
         return ''
 
 
-class UHCategoryAddMaterial( URLHandler ):
-    _relativeURL = "categoryFiles.py/addMaterial"
+class UHCategoryAddMaterial(URLHandler):
+    _endpoint = 'legacy.categoryFiles-addMaterial'
 
-class UHCategoryActionSubCategs( URLHandler ):
-    _relativeURL = "categoryModification.py/actionSubCategs"
+class UHCategoryActionSubCategs(URLHandler):
+    _endpoint = 'legacy.categoryModification-actionSubCategs'
 
-class UHCategoryActionConferences( URLHandler ):
-    _relativeURL = "categoryModification.py/actionConferences"
+class UHCategoryActionConferences(URLHandler):
+    _endpoint = 'legacy.categoryModification-actionConferences'
 
-class UHCategoryClearCache( URLHandler ):
-    _relativeURL = "categoryModification.py/clearCache"
+class UHCategoryClearCache(URLHandler):
+    _endpoint = 'legacy.categoryModification-clearCache'
 
-class UHCategoryClearConferenceCaches( URLHandler ):
-    _relativeURL = "categoryModification.py/clearConferenceCaches"
+class UHCategoryClearConferenceCaches(URLHandler):
+    _endpoint = 'legacy.categoryModification-clearConferenceCaches'
 
-class UHCategModifAC( URLHandler ):
-    _relativeURL = "categoryAC.py"
+class UHCategModifAC(URLHandler):
+    _endpoint = 'legacy.categoryAC'
 
-class UHCategorySetConfCreationControl( URLHandler ):
-    _relativeURL = "categoryConfCreationControl.py/setCreateConferenceControl"
+class UHCategorySetConfCreationControl(URLHandler):
+    _endpoint = 'legacy.categoryConfCreationControl-setCreateConferenceControl'
 
-class UHCategorySetNotifyCreation( URLHandler ):
-    _relativeURL = "categoryConfCreationControl.py/setNotifyCreation"
-
-
-class UHCategModifTools( URLHandler ):
-    _relativeURL = "categoryTools.py"
-
-class UHCategoryDeletion( URLHandler ):
-    _relativeURL = "categoryTools.py/delete"
+class UHCategorySetNotifyCreation(URLHandler):
+    _endpoint = 'legacy.categoryConfCreationControl-setNotifyCreation'
 
 
-class UHCategModifTasks( URLHandler ):
-    _relativeURL = "categoryTasks.py"
+class UHCategModifTools(URLHandler):
+    _endpoint = 'legacy.categoryTools'
 
-class UHCategModifFiles( URLHandler ):
-    _relativeURL = "categoryFiles.py"
-
-class UHCategModifTasksAction( URLHandler ):
-    _relativeURL = "categoryTasks.py/taskAction"
-
-class UHCategoryDataModif( URLHandler ):
-    _relativeURL = "categoryDataModification.py"
+class UHCategoryDeletion(URLHandler):
+    _endpoint = 'legacy.categoryTools-delete'
 
 
-class UHCategoryPerformModification( URLHandler ):
-    _relativeURL = "categoryDataModification.py/modify"
+class UHCategModifTasks(URLHandler):
+    _endpoint = 'legacy.categoryTasks'
+
+class UHCategModifFiles(URLHandler):
+    _endpoint = 'legacy.categoryFiles'
+
+class UHCategModifTasksAction(URLHandler):
+    _endpoint = 'legacy.categoryTasks-taskAction'
+
+class UHCategoryDataModif(URLHandler):
+    _endpoint = 'legacy.categoryDataModification'
 
 
-class UHCategoryTasksOption( URLHandler ):
-    _relativeURL = "categoryDataModification.py/tasksOption"
+class UHCategoryPerformModification(URLHandler):
+    _endpoint = 'legacy.categoryDataModification-modify'
 
 
-class UHCategorySetVisibility( URLHandler ):
-    _relativeURL = "categoryAC.py/setVisibility"
+class UHCategoryTasksOption(URLHandler):
+    _endpoint = 'legacy.categoryDataModification-tasksOption'
 
 
-class UHCategoryCreation( URLHandler ):
-    _relativeURL = "categoryCreation.py"
+class UHCategorySetVisibility(URLHandler):
+    _endpoint = 'legacy.categoryAC-setVisibility'
 
 
-class UHCategoryPerformCreation( URLHandler ):
-    _relativeURL = "categoryCreation.py/create"
+class UHCategoryCreation(URLHandler):
+    _endpoint = 'legacy.categoryCreation'
+
+
+class UHCategoryPerformCreation(URLHandler):
+    _endpoint = 'legacy.categoryCreation-create'
 
 
 class UHCategoryDisplay(URLHandler):
@@ -1837,8 +1846,8 @@ class UHCategoryDisplay(URLHandler):
         return url
 
 
-class UHCategoryMap( URLHandler ):
-    _relativeURL = "categoryMap.py"
+class UHCategoryMap(URLHandler):
+    _endpoint = 'legacy.categoryMap'
 
 
 class UHCategoryOverview(URLHandler):
@@ -1873,252 +1882,252 @@ class UHCategoryOverview(URLHandler):
         return url
 
 
-class UHGeneralInfoModification( URLHandler ):
-    _relativeURL = "generalInfoModification.py"
+class UHGeneralInfoModification(URLHandler):
+    _endpoint = 'legacy.generalInfoModification'
 
 
-class UHGeneralInfoPerformModification( URLHandler ):
-    _relativeURL = "generalInfoModification.py/update"
+class UHGeneralInfoPerformModification(URLHandler):
+    _endpoint = 'legacy.generalInfoModification-update'
 
 
-class UHContributionDelete( URLHandler ):
-    _relativeURL = "contributionTools.py/delete"
+class UHContributionDelete(URLHandler):
+    _endpoint = 'legacy.contributionTools-delete'
 
-class UHSubContributionDataModification( URLHandler ):
-    _relativeURL = "subContributionModification.py/data"
+class UHSubContributionDataModification(URLHandler):
+    _endpoint = 'legacy.subContributionModification-data'
 
-class UHSubContributionDataModif( URLHandler ):
-    _relativeURL = "subContributionModification.py/modifData"
+class UHSubContributionDataModif(URLHandler):
+    _endpoint = 'legacy.subContributionModification-modifData'
 
-class UHSubContributionDelete( URLHandler ):
-    _relativeURL = "subContributionTools.py/delete"
-
-
-class UHSubContributionAddMaterial( URLHandler ):
-    _relativeURL = "subContributionModification.py/addMaterial"
+class UHSubContributionDelete(URLHandler):
+    _endpoint = 'legacy.subContributionTools-delete'
 
 
-class UHSubContributionPerformAddMaterial( URLHandler ):
-    _relativeURL = "subContributionModification.py/performAddMaterial"
+class UHSubContributionAddMaterial(URLHandler):
+    _endpoint = 'legacy.subContributionModification-addMaterial'
 
 
-class UHSubContributionRemoveMaterials( URLHandler ):
-    _relativeURL = "subContributionModification.py/removeMaterials"
-
-class UHSubContribModifAddMaterials( URLHandler ):
-    _relativeURL = "subContributionModification.py/materialsAdd"
-
-class UHSubContribModifTools( URLHandler ):
-    _relativeURL = "subContributionTools.py"
-
-class UHSessionModification( URLHandler ):
-    _relativeURL = "sessionModification.py"
-
-class UHSessionModifMaterials( URLHandler ):
-    _relativeURL = "sessionModification.py/materials"
-
-class UHSessionDataModification( URLHandler ):
-    _relativeURL = "sessionModification.py/modify"
-
-class UHSessionDatesModification( URLHandler ):
-    _relativeURL = "sessionModification.py/modifyDates"
-
-class UHSessionModSlotConvenerNew( URLHandler ):
-    _relativeURL = "sessionModification.py/newSlotConvener"
-
-class UHSessionModSlotConvenersRem( URLHandler ):
-    _relativeURL = "sessionModification.py/remSlotConveners"
+class UHSubContributionPerformAddMaterial(URLHandler):
+    _endpoint = 'legacy.subContributionModification-performAddMaterial'
 
 
-class UHSessionModSlotConvenerEdit( URLHandler ):
-    _relativeURL = "sessionModification.py/editSlotConvener"
+class UHSubContributionRemoveMaterials(URLHandler):
+    _endpoint = 'legacy.subContributionModification-removeMaterials'
 
-class UHSessionFitSlot( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/fitSlot"
+class UHSubContribModifAddMaterials(URLHandler):
+    _endpoint = 'legacy.subContributionModification-materialsAdd'
+
+class UHSubContribModifTools(URLHandler):
+    _endpoint = 'legacy.subContributionTools'
+
+class UHSessionModification(URLHandler):
+    _endpoint = 'legacy.sessionModification'
+
+class UHSessionModifMaterials(URLHandler):
+    _endpoint = 'legacy.sessionModification-materials'
+
+class UHSessionDataModification(URLHandler):
+    _endpoint = 'legacy.sessionModification-modify'
+
+class UHSessionDatesModification(URLHandler):
+    _endpoint = 'legacy.sessionModification-modifyDates'
+
+class UHSessionModSlotConvenerNew(URLHandler):
+    _endpoint = 'legacy.sessionModification-newSlotConvener'
+
+class UHSessionModSlotConvenersRem(URLHandler):
+    _endpoint = 'legacy.sessionModification-remSlotConveners'
+
+
+class UHSessionModSlotConvenerEdit(URLHandler):
+    _endpoint = 'legacy.sessionModification-editSlotConvener'
+
+class UHSessionFitSlot(URLHandler):
+    _endpoint = 'legacy.sessionModifSchedule-fitSlot'
 
 # <Deprecated>
-class UHSessionAddMaterial( URLHandler ):
-    _relativeURL = "sessionModification.py/addMaterial"
+class UHSessionAddMaterial(URLHandler):
+    _endpoint = 'legacy.sessionModification-addMaterial'
 
 
-class UHSessionPerformAddMaterial( URLHandler ):
-    _relativeURL = "sessionModification.py/performAddMaterial"
+class UHSessionPerformAddMaterial(URLHandler):
+    _endpoint = 'legacy.sessionModification-performAddMaterial'
 # </Deprecated>
 
-class UHSessionRemoveMaterials( URLHandler ):
-    _relativeURL = "sessionModification.py/removeMaterials"
+class UHSessionRemoveMaterials(URLHandler):
+    _endpoint = 'legacy.sessionModification-removeMaterials'
 
-class UHSessionModifAddMaterials( URLHandler ):
-    _relativeURL = "sessionModification.py/materialsAdd"
-
-
-class UHSessionImportContrib( URLHandler ):
-    _relativeURL = "sessionModification.py/importContrib"
-
-class UHSessionModifSchedule( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py"
-
-class UHSessionModSlotCalc( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/slotCalc"
-
-class UHSessionModifAC( URLHandler ):
-    _relativeURL = "sessionModifAC.py"
+class UHSessionModifAddMaterials(URLHandler):
+    _endpoint = 'legacy.sessionModification-materialsAdd'
 
 
-class UHSessionSetVisibility( URLHandler ):
-    _relativeURL = "sessionModifAC.py/setVisibility"
+class UHSessionImportContrib(URLHandler):
+    _endpoint = 'legacy.sessionModification-importContrib'
+
+class UHSessionModifSchedule(URLHandler):
+    _endpoint = 'legacy.sessionModifSchedule'
+
+class UHSessionModSlotCalc(URLHandler):
+    _endpoint = 'legacy.sessionModifSchedule-slotCalc'
+
+class UHSessionModifAC(URLHandler):
+    _endpoint = 'legacy.sessionModifAC'
 
 
-class UHSessionModifTools( URLHandler ):
-    _relativeURL = "sessionModifTools.py"
-
-class UHSessionModifComm( URLHandler ):
-    _relativeURL = "sessionModifComm.py"
-
-class UHSessionModifCommEdit( URLHandler ):
-    _relativeURL = "sessionModifComm.py/edit"
+class UHSessionSetVisibility(URLHandler):
+    _endpoint = 'legacy.sessionModifAC-setVisibility'
 
 
-class UHSessionDeletion( URLHandler ):
-    _relativeURL = "sessionModifTools.py/delete"
+class UHSessionModifTools(URLHandler):
+    _endpoint = 'legacy.sessionModifTools'
 
-class UHContributionModification( URLHandler ):
-    _relativeURL = "contributionModification.py"
+class UHSessionModifComm(URLHandler):
+    _endpoint = 'legacy.sessionModifComm'
 
-
-class UHContribModifMaterials( URLHandler ):
-    _relativeURL = "contributionModification.py/materials"
-
-class UHContribModifSchedule( URLHandler ):
-    _relativeURL = "contributionModification.py/schedule"
-
-class UHContributionPerformMove( URLHandler ):
-    _relativeURL = "contributionModification.py/performMove"
-
-class UHSubContribModification( URLHandler ):
-    _relativeURL = "subContributionModification.py"
-
-class UHSubContribModifMaterials( URLHandler ):
-    _relativeURL = "subContributionModification.py/materials"
-
-class UHMaterialDisplay( URLHandler ):
-    _relativeURL = "materialDisplay.py"
-
-class UHConferenceProgram( URLHandler ):
-    _relativeURL = "conferenceProgram.py"
+class UHSessionModifCommEdit(URLHandler):
+    _endpoint = 'legacy.sessionModifComm-edit'
 
 
-class UHConferenceProgramPDF( URLHandler ):
-    _relativeURL = "conferenceProgram.py/pdf"
+class UHSessionDeletion(URLHandler):
+    _endpoint = 'legacy.sessionModifTools-delete'
+
+class UHContributionModification(URLHandler):
+    _endpoint = 'legacy.contributionModification'
 
 
-class UHConferenceTimeTable( URLHandler ):
-    _relativeURL = "conferenceTimeTable.py"
+class UHContribModifMaterials(URLHandler):
+    _endpoint = 'legacy.contributionModification-materials'
 
-class UHConfTimeTablePDF( URLHandler ):
-    _relativeURL = "conferenceTimeTable.py/pdf"
+class UHContribModifSchedule(URLHandler):
+    _endpoint = 'legacy.contributionModification-schedule'
 
+class UHContributionPerformMove(URLHandler):
+    _endpoint = 'legacy.contributionModification-performMove'
 
-class UHConferenceCFA( URLHandler ):
-    _relativeURL = "conferenceCFA.py"
+class UHSubContribModification(URLHandler):
+    _endpoint = 'legacy.subContributionModification'
 
+class UHSubContribModifMaterials(URLHandler):
+    _endpoint = 'legacy.subContributionModification-materials'
 
-class UHSessionDisplay( URLHandler ):
-    _relativeURL = "sessionDisplay.py"
+class UHMaterialDisplay(URLHandler):
+    _endpoint = 'legacy.materialDisplay'
 
-class UHSessionToiCal( URLHandler ):
-    _relativeURL = "sessionDisplay.py/ical"
-
-class UHContributionDisplay( URLHandler ):
-    _relativeURL = "contributionDisplay.py"
-
-class UHContributionDisplayRemoveMaterial( URLHandler ):
-    _relativeURL = "contributionDisplay.py/removeMaterial"
-
-class UHSubContributionDisplay( URLHandler ):
-    _relativeURL = "subContributionDisplay.py"
-
-class UHSubContributionModification( URLHandler ):
-    _relativeURL = "subContributionModification.py"
-
-class UHFileAccess( URLHandler ):
-    _relativeURL = "getFile.py/access"
-
-class UHVideoWmvAccess( URLHandler ):
-    _relativeURL = "getFile.py/wmv"
-
-class UHVideoFlashAccess( URLHandler ):
-    _relativeURL = "getFile.py/flash"
-
-class UHErrorReporting( URLHandler ):
-    _relativeURL = "errors.py"
-
-class UHErrorSendReport( URLHandler ):
-    _relativeURL = "error.py/sendReport"
-
-class UHAbstractWithdraw( URLHandler ):
-    _relativeURL = "abstractWithdraw.py"
+class UHConferenceProgram(URLHandler):
+    _endpoint = 'legacy.conferenceProgram'
 
 
-class UHAbstractRecovery( URLHandler ):
-    _relativeURL = "abstractWithdraw.py/recover"
+class UHConferenceProgramPDF(URLHandler):
+    _endpoint = 'legacy.conferenceProgram-pdf'
 
 
-class UHConfModifContribList( URLHandler ):
-    _relativeURL = "confModifContribList.py"
+class UHConferenceTimeTable(URLHandler):
+    _endpoint = 'legacy.conferenceTimeTable'
 
-class UHConfModifContribListOpenMenu( URLHandler ):
-    _relativeURL = "confModifContribList.py/openMenu"
-
-class UHConfModifContribListCloseMenu( URLHandler ):
-    _relativeURL = "confModifContribList.py/closeMenu"
-
-class UHContribModifMaterialBrowse( URLHandler ):
-    _relativeURL = "contributionModification.py/browseMaterial"
+class UHConfTimeTablePDF(URLHandler):
+    _endpoint = 'legacy.conferenceTimeTable-pdf'
 
 
-class UHContribModSetTrack( URLHandler ):
-    _relativeURL = "contributionModification.py/setTrack"
+class UHConferenceCFA(URLHandler):
+    _endpoint = 'legacy.conferenceCFA'
 
 
-class UHContribModSetSession( URLHandler ):
-    _relativeURL = "contributionModification.py/setSession"
+class UHSessionDisplay(URLHandler):
+    _endpoint = 'legacy.sessionDisplay'
+
+class UHSessionToiCal(URLHandler):
+    _endpoint = 'legacy.sessionDisplay-ical'
+
+class UHContributionDisplay(URLHandler):
+    _endpoint = 'legacy.contributionDisplay'
+
+class UHContributionDisplayRemoveMaterial(URLHandler):
+    _endpoint = 'legacy.contributionDisplay-removeMaterial'
+
+class UHSubContributionDisplay(URLHandler):
+    _endpoint = 'legacy.subContributionDisplay'
+
+class UHSubContributionModification(URLHandler):
+    _endpoint = 'legacy.subContributionModification'
+
+class UHFileAccess(URLHandler):
+    _endpoint = 'legacy.getFile-access'
+
+class UHVideoWmvAccess(URLHandler):
+    _endpoint = 'legacy.getFile-wmv'
+
+class UHVideoFlashAccess(URLHandler):
+    _endpoint = 'legacy.getFile-flash'
+
+class UHErrorReporting(URLHandler):
+    _endpoint = 'legacy.errors'
+
+class UHErrorSendReport(URLHandler):
+    _endpoint = 'legacy.error-sendReport'
+
+class UHAbstractWithdraw(URLHandler):
+    _endpoint = 'legacy.abstractWithdraw'
 
 
-class UHTrackModMoveUp( URLHandler ):
-    _relativeURL = "confModifProgram.py/moveTrackUp"
+class UHAbstractRecovery(URLHandler):
+    _endpoint = 'legacy.abstractWithdraw-recover'
 
 
-class UHTrackModMoveDown( URLHandler ):
-    _relativeURL = "confModifProgram.py/moveTrackDown"
+class UHConfModifContribList(URLHandler):
+    _endpoint = 'legacy.confModifContribList'
+
+class UHConfModifContribListOpenMenu(URLHandler):
+    _endpoint = 'legacy.confModifContribList-openMenu'
+
+class UHConfModifContribListCloseMenu(URLHandler):
+    _endpoint = 'legacy.confModifContribList-closeMenu'
+
+class UHContribModifMaterialBrowse(URLHandler):
+    _endpoint = 'legacy.contributionModification-browseMaterial'
 
 
-class UHAbstractModAC( URLHandler ):
-    _relativeURL = "abstractManagment.py/ac"
+class UHContribModSetTrack(URLHandler):
+    _endpoint = 'legacy.contributionModification-setTrack'
+
+
+class UHContribModSetSession(URLHandler):
+    _endpoint = 'legacy.contributionModification-setSession'
+
+
+class UHTrackModMoveUp(URLHandler):
+    _endpoint = 'legacy.confModifProgram-moveTrackUp'
+
+
+class UHTrackModMoveDown(URLHandler):
+    _endpoint = 'legacy.confModifProgram-moveTrackDown'
+
+
+class UHAbstractModAC(URLHandler):
+    _endpoint = 'legacy.abstractManagment-ac'
 
 
 class UHAbstractModEditData(URLHandler):
-    _relativeURL = "abstractManagment.py/editData"
+    _endpoint = 'legacy.abstractManagment-editData'
 
 
 class UHAbstractModIntComments(URLHandler):
-    _relativeURL = "abstractManagment.py/comments"
+    _endpoint = 'legacy.abstractManagment-comments'
 
 
 class UHAbstractModNewIntComment(URLHandler):
-    _relativeURL = "abstractManagment.py/newComment"
+    _endpoint = 'legacy.abstractManagment-newComment'
 
 
 class UHAbstractModIntCommentEdit(URLHandler):
-    _relativeURL = "abstractManagment.py/editComment"
+    _endpoint = 'legacy.abstractManagment-editComment'
 
 
 class UHAbstractModIntCommentRem(URLHandler):
-    _relativeURL = "abstractManagment.py/remComment"
+    _endpoint = 'legacy.abstractManagment-remComment'
 
 
 class UHTrackAbstractModIntCommentNew(UHTrackAbstractBase):
-    _relativeURL = "trackAbstractModif.py/commentNew"
+    _endpoint = 'legacy.trackAbstractModif-commentNew'
 
 
 class UHTrackAbstractModCommentBase(URLHandler):
@@ -2131,435 +2140,435 @@ class UHTrackAbstractModCommentBase(URLHandler):
 
 
 class UHTrackAbstractModIntCommentEdit(UHTrackAbstractModCommentBase):
-    _relativeURL = "trackAbstractModif.py/commentEdit"
+    _endpoint = 'legacy.trackAbstractModif-commentEdit'
 
 
 class UHTrackAbstractModIntCommentRem(UHTrackAbstractModCommentBase):
-    _relativeURL = "trackAbstractModif.py/commentRem"
+    _endpoint = 'legacy.trackAbstractModif-commentRem'
 
 
 class UHAbstractReviewingNotifTpl(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTpl"
+    _endpoint = 'legacy.abstractReviewing-notifTpl'
 
 class UHAbstractModNotifTplNew(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplNew"
+    _endpoint = 'legacy.abstractReviewing-notifTplNew'
 
 
 class UHAbstractModNotifTplRem(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplRem"
+    _endpoint = 'legacy.abstractReviewing-notifTplRem'
 
 
 class UHAbstractModNotifTplEdit(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplEdit"
+    _endpoint = 'legacy.abstractReviewing-notifTplEdit'
 
 
 class UHAbstractModNotifTplDisplay(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplDisplay"
+    _endpoint = 'legacy.abstractReviewing-notifTplDisplay'
 
 
 class UHAbstractModNotifTplPreview(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplPreview"
+    _endpoint = 'legacy.abstractReviewing-notifTplPreview'
 
 
 class UHTrackAbstractModMarkAsDup(UHTrackAbstractBase):
-    _relativeURL = "trackAbstractModif.py/markAsDup"
+    _endpoint = 'legacy.trackAbstractModif-markAsDup'
 
 
 class UHTrackAbstractModUnMarkAsDup(UHTrackAbstractBase):
-    _relativeURL = "trackAbstractModif.py/unMarkAsDup"
+    _endpoint = 'legacy.trackAbstractModif-unMarkAsDup'
 
 
 class UHAbstractModMarkAsDup(URLHandler):
-    _relativeURL = "abstractManagment.py/markAsDup"
+    _endpoint = 'legacy.abstractManagment-markAsDup'
 
 
 class UHAbstractModUnMarkAsDup(URLHandler):
-    _relativeURL = "abstractManagment.py/unMarkAsDup"
+    _endpoint = 'legacy.abstractManagment-unMarkAsDup'
 
 
 class UHAbstractModMergeInto(URLHandler):
-    _relativeURL = "abstractManagment.py/mergeInto"
+    _endpoint = 'legacy.abstractManagment-mergeInto'
 
 
 class UHAbstractModUnMerge(URLHandler):
-    _relativeURL = "abstractManagment.py/unmerge"
+    _endpoint = 'legacy.abstractManagment-unmerge'
 
 
 class UHConfModNewAbstract(URLHandler):
-    _relativeURL = "abstractsManagment.py/newAbstract"
+    _endpoint = 'legacy.abstractsManagment-newAbstract'
 
 
 class UHConfModNotifTplConditionNew(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplCondNew"
+    _endpoint = 'legacy.abstractReviewing-notifTplCondNew'
 
 
 class UHConfModNotifTplConditionRem(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplCondRem"
+    _endpoint = 'legacy.abstractReviewing-notifTplCondRem'
 
 
-class UHConfModAbstractsMerge( URLHandler ):
-    _relativeURL = "abstractsManagment.py/mergeAbstracts"
+class UHConfModAbstractsMerge(URLHandler):
+    _endpoint = 'legacy.abstractsManagment-mergeAbstracts'
 
 
-class UHAbstractModNotifLog( URLHandler ):
-    _relativeURL = "abstractManagment.py/notifLog"
+class UHAbstractModNotifLog(URLHandler):
+    _endpoint = 'legacy.abstractManagment-notifLog'
 
-class UHAbstractModTools( URLHandler ):
-    _relativeURL = "abstractTools.py"
+class UHAbstractModTools(URLHandler):
+    _endpoint = 'legacy.abstractTools'
 
-class UHAbstractDelete( URLHandler ):
-    _relativeURL = "abstractTools.py/delete"
-
-
-class UHSessionModContribList( URLHandler ):
-    _relativeURL = "sessionModification.py/contribList"
+class UHAbstractDelete(URLHandler):
+    _endpoint = 'legacy.abstractTools-delete'
 
 
-class UHSessionModContribListEditContrib( URLHandler ):
-    _relativeURL = "sessionModification.py/editContrib"
+class UHSessionModContribList(URLHandler):
+    _endpoint = 'legacy.sessionModification-contribList'
 
-class UHConfModifReschedule( URLHandler ):
-    _relativeURL = "confModifSchedule.py/reschedule"
 
-class UHContributionList( URLHandler ):
-    _relativeURL = "contributionListDisplay.py"
+class UHSessionModContribListEditContrib(URLHandler):
+    _endpoint = 'legacy.sessionModification-editContrib'
 
-class UHContributionListToPDF( URLHandler ):
-    _relativeURL = "contributionListDisplay.py/contributionsToPDF"
+class UHConfModifReschedule(URLHandler):
+    _endpoint = 'legacy.confModifSchedule-reschedule'
+
+class UHContributionList(URLHandler):
+    _endpoint = 'legacy.contributionListDisplay'
+
+class UHContributionListToPDF(URLHandler):
+    _endpoint = 'legacy.contributionListDisplay-contributionsToPDF'
 
 class UHConfModAbstractPropToAcc(URLHandler):
-    _relativeURL="abstractManagment.py/propToAcc"
+    _endpoint = 'legacy.abstractManagment-propToAcc'
 
 class UHAbstractManagmentBackToSubmitted(URLHandler):
-    _relativeURL="abstractManagment.py/backToSubmitted"
+    _endpoint = 'legacy.abstractManagment-backToSubmitted'
 
 class UHConfModAbstractPropToRej(URLHandler):
-    _relativeURL="abstractManagment.py/propToRej"
+    _endpoint = 'legacy.abstractManagment-propToRej'
 
 
 class UHConfModAbstractWithdraw(URLHandler):
-    _relativeURL="abstractManagment.py/withdraw"
+    _endpoint = 'legacy.abstractManagment-withdraw'
 
 
-class UHSessionModAddContribs( URLHandler ):
-    _relativeURL = "sessionModification.py/addContribs"
+class UHSessionModAddContribs(URLHandler):
+    _endpoint = 'legacy.sessionModification-addContribs'
 
 
-class UHSessionModContributionAction( URLHandler ):
-    _relativeURL = "sessionModification.py/contribAction"
+class UHSessionModContributionAction(URLHandler):
+    _endpoint = 'legacy.sessionModification-contribAction'
 
-class UHSessionModParticipantList( URLHandler ):
-    _relativeURL = "sessionModification.py/participantList"
+class UHSessionModParticipantList(URLHandler):
+    _endpoint = 'legacy.sessionModification-participantList'
 
-class UHSessionModToPDF( URLHandler ):
-    _relativeURL = "sessionModification.py/contribsToPDF"
+class UHSessionModToPDF(URLHandler):
+    _endpoint = 'legacy.sessionModification-contribsToPDF'
 
 class UHConfModCFANotifTplUp(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplUp"
+    _endpoint = 'legacy.abstractReviewing-notifTplUp'
 
 class UHConfModCFANotifTplDown(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplDown"
+    _endpoint = 'legacy.abstractReviewing-notifTplDown'
 
 class UHConfAuthorIndex(URLHandler):
-    _relativeURL = "confAuthorIndex.py"
+    _endpoint = 'legacy.confAuthorIndex'
 
 class UHConfSpeakerIndex(URLHandler):
-    _relativeURL = "confSpeakerIndex.py"
+    _endpoint = 'legacy.confSpeakerIndex'
 
-class UHContribModWithdraw( URLHandler ):
-    _relativeURL = "contributionModification.py/withdraw"
+class UHContribModWithdraw(URLHandler):
+    _endpoint = 'legacy.contributionModification-withdraw'
 
 class UHTrackModContribList(URLHandler):
-    _relativeURL="trackModContribList.py"
+    _endpoint = 'legacy.trackModContribList'
 
-class UHTrackModContributionAction( URLHandler ):
-    _relativeURL = "trackModContribList.py/contribAction"
+class UHTrackModContributionAction(URLHandler):
+    _endpoint = 'legacy.trackModContribList-contribAction'
 
-class UHTrackModParticipantList( URLHandler ):
-    _relativeURL = "trackModContribList.py/participantList"
+class UHTrackModParticipantList(URLHandler):
+    _endpoint = 'legacy.trackModContribList-participantList'
 
-class UHTrackModToPDF( URLHandler ):
-    _relativeURL = "trackModContribList.py/contribsToPDF"
+class UHTrackModToPDF(URLHandler):
+    _endpoint = 'legacy.trackModContribList-contribsToPDF'
 
 class UHConfModContribQuickAccess(URLHandler):
-    _relativeURL="confModifContribList.py/contribQuickAccess"
+    _endpoint = 'legacy.confModifContribList-contribQuickAccess'
 
 
 class UHSessionModContribQuickAccess(URLHandler):
-    _relativeURL="sessionModification.py/contribQuickAccess"
+    _endpoint = 'legacy.sessionModification-contribQuickAccess'
 
 
 class UHTrackModContribQuickAccess(URLHandler):
-    _relativeURL="trackModContribList.py/contribQuickAccess"
+    _endpoint = 'legacy.trackModContribList-contribQuickAccess'
 
 
 class UHConfMyStuff(URLHandler):
-    _relativeURL="myconference.py"
+    _endpoint = 'legacy.myconference'
 
 
 class UHConfMyStuffMySessions(URLHandler):
-    _relativeURL="myconference.py/mySessions"
+    _endpoint = 'legacy.myconference-mySessions'
 
 
 class UHConfMyStuffMyTracks(URLHandler):
-    _relativeURL="myconference.py/myTracks"
+    _endpoint = 'legacy.myconference-myTracks'
 
 
 class UHConfMyStuffMyContributions(URLHandler):
-    _relativeURL="myconference.py/myContributions"
+    _endpoint = 'legacy.myconference-myContributions'
 
 
 class UHConfModSlotRem(URLHandler):
-    _relativeURL="confModifSchedule.py/remSlot"
+    _endpoint = 'legacy.confModifSchedule-remSlot'
 
 class UHConfModSessionMove(URLHandler):
-    _relativeURL="confModifSchedule.py/moveSession"
+    _endpoint = 'legacy.confModifSchedule-moveSession'
 
 class UHConfModSessionMoveConfirmation(URLHandler):
-    _relativeURL="confModifSchedule.py/moveSession"
+    _endpoint = 'legacy.confModifSchedule-moveSession'
 
 
 class UHConfModSessionRem(URLHandler):
-    _relativeURL="confModifSchedule.py/remSession"
+    _endpoint = 'legacy.confModifSchedule-remSession'
 
 
-class UHConfModMoveContribsToSession( URLHandler ):
-    _relativeURL = "confModifContribList.py/moveToSession"
+class UHConfModMoveContribsToSession(URLHandler):
+    _endpoint = 'legacy.confModifContribList-moveToSession'
 
-class UHConferenceDisplayMaterialPackage( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/matPkg"
+class UHConferenceDisplayMaterialPackage(URLHandler):
+    _endpoint = 'legacy.conferenceDisplay-matPkg'
 
-class UHConferenceDisplayMaterialPackagePerform( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/performMatPkg"
+class UHConferenceDisplayMaterialPackagePerform(URLHandler):
+    _endpoint = 'legacy.conferenceDisplay-performMatPkg'
 
-class UHConferenceDisplayMenuClose( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/closeMenu"
+class UHConferenceDisplayMenuClose(URLHandler):
+    _endpoint = 'legacy.conferenceDisplay-closeMenu'
 
-class UHConferenceDisplayMenuOpen( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/openMenu"
+class UHConferenceDisplayMenuOpen(URLHandler):
+    _endpoint = 'legacy.conferenceDisplay-openMenu'
 
-class UHSessionDisplayRemoveMaterial( URLHandler ):
-    _relativeURL = "sessionDisplay.py/removeMaterial"
+class UHSessionDisplayRemoveMaterial(URLHandler):
+    _endpoint = 'legacy.sessionDisplay-removeMaterial'
 
-class UHConfAbstractBook( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/abstractBook"
+class UHConfAbstractBook(URLHandler):
+    _endpoint = 'legacy.conferenceDisplay-abstractBook'
 
-class UHConfAbstractBookLatex( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/abstractBookLatex"
+class UHConfAbstractBookLatex(URLHandler):
+    _endpoint = 'legacy.conferenceDisplay-abstractBookLatex'
 
-class UHConferenceToiCal( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/ical"
+class UHConferenceToiCal(URLHandler):
+    _endpoint = 'legacy.conferenceDisplay-ical'
 
-class UHConfModAbstractBook( URLHandler ):
-    _relativeURL = "confModBOA.py"
+class UHConfModAbstractBook(URLHandler):
+    _endpoint = 'legacy.confModBOA'
 
-class UHConfModAbstractBookEdit( URLHandler ):
-    _relativeURL = "confModBOA.py/edit"
+class UHConfModAbstractBookEdit(URLHandler):
+    _endpoint = 'legacy.confModBOA-edit'
 
-class UHConfModAbstractBookToogleShowIds( URLHandler ):
-    _relativeURL = "confModBOA.py/toogleShowIds"
+class UHConfModAbstractBookToogleShowIds(URLHandler):
+    _endpoint = 'legacy.confModBOA-toogleShowIds'
 
 class UHAbstractReviewingSetup(URLHandler):
-    _relativeURL = "abstractReviewing.py/reviewingSetup"
+    _endpoint = 'legacy.abstractReviewing-reviewingSetup'
 
-class UHAbstractReviewingTeam (URLHandler):
-    _relativeURL = "abstractReviewing.py/reviewingTeam"
+class UHAbstractReviewingTeam(URLHandler):
+    _endpoint = 'legacy.abstractReviewing-reviewingTeam'
 
-class UHConfModScheduleDataEdit( URLHandler ):
-    _relativeURL = "confModifSchedule.py/edit"
+class UHConfModScheduleDataEdit(URLHandler):
+    _endpoint = 'legacy.confModifSchedule-edit'
 
-class UHConfModMaterialPackage( URLHandler ):
-    _relativeURL = "confModifContribList.py/matPkg"
+class UHConfModMaterialPackage(URLHandler):
+    _endpoint = 'legacy.confModifContribList-matPkg'
 
-class UHConfModProceedings( URLHandler ):
-    _relativeURL = "confModifContribList.py/proceedings"
+class UHConfModProceedings(URLHandler):
+    _endpoint = 'legacy.confModifContribList-proceedings'
 
-class UHConfModFullMaterialPackage( URLHandler ):
-    _relativeURL = "confModifTools.py/matPkg"
+class UHConfModFullMaterialPackage(URLHandler):
+    _endpoint = 'legacy.confModifTools-matPkg'
 
-class UHConfModFullMaterialPackagePerform( URLHandler ):
-    _relativeURL = "confModifTools.py/performMatPkg"
+class UHConfModFullMaterialPackagePerform(URLHandler):
+    _endpoint = 'legacy.confModifTools-performMatPkg'
 
-class UHTaskManager( URLHandler ):
-    _relativeURL = "taskManager.py"
+class UHTaskManager(URLHandler):
+    _endpoint = 'legacy.taskManager'
 
-class UHRemoveTask( URLHandler ):
-    _relativeURL = "taskManager.py/removeTask"
+class UHRemoveTask(URLHandler):
+    _endpoint = 'legacy.taskManager-removeTask'
 
-class UHUpdateNews( URLHandler ):
-    _relativeURL = "updateNews.py"
+class UHUpdateNews(URLHandler):
+    _endpoint = 'legacy.updateNews'
 
 # Server Admin, plugin management related
-class UHAdminPlugins( URLHandler ):
-    _relativeURL = "adminPlugins.py"
+class UHAdminPlugins(URLHandler):
+    _endpoint = 'legacy.adminPlugins'
 
-class UHAdminPluginsSaveOptionReloadAll( URLHandler ):
-    _relativeURL = "adminPlugins.py/saveOptionReloadAll"
+class UHAdminPluginsSaveOptionReloadAll(URLHandler):
+    _endpoint = 'legacy.adminPlugins-saveOptionReloadAll'
 
-class UHAdminPluginsReloadAll( URLHandler ):
-    _relativeURL = "adminPlugins.py/reloadAll"
+class UHAdminPluginsReloadAll(URLHandler):
+    _endpoint = 'legacy.adminPlugins-reloadAll'
 
-class UHAdminPluginsClearAllInfo( URLHandler ):
-    _relativeURL = "adminPlugins.py/clearAllInfo"
+class UHAdminPluginsClearAllInfo(URLHandler):
+    _endpoint = 'legacy.adminPlugins-clearAllInfo'
 
-class UHAdminReloadPlugins( URLHandler ):
-    _relativeURL = "adminPlugins.py/reload"
+class UHAdminReloadPlugins(URLHandler):
+    _endpoint = 'legacy.adminPlugins-reload'
 
-class UHAdminTogglePluginType( URLHandler ):
-    _relativeURL = "adminPlugins.py/toggleActivePluginType"
+class UHAdminTogglePluginType(URLHandler):
+    _endpoint = 'legacy.adminPlugins-toggleActivePluginType'
 
-class UHAdminTogglePlugin( URLHandler ):
-    _relativeURL = "adminPlugins.py/toggleActive"
+class UHAdminTogglePlugin(URLHandler):
+    _endpoint = 'legacy.adminPlugins-toggleActive'
 
-class UHAdminPluginsTypeSaveOptions ( URLHandler ):
-    _relativeURL = "adminPlugins.py/savePluginTypeOptions"
+class UHAdminPluginsTypeSaveOptions(URLHandler):
+    _endpoint = 'legacy.adminPlugins-savePluginTypeOptions'
 
-class UHAdminPluginsSaveOptions ( URLHandler ):
-    _relativeURL = "adminPlugins.py/savePluginOptions"
+class UHAdminPluginsSaveOptions(URLHandler):
+    _endpoint = 'legacy.adminPlugins-savePluginOptions'
 # End of Server Admin, plugin management related
 
 
-class UHMaintenance( URLHandler ):
-    _relativeURL = "adminMaintenance.py"
+class UHMaintenance(URLHandler):
+    _endpoint = 'legacy.adminMaintenance'
 
-class UHMaintenanceTmpCleanup( URLHandler ):
-    _relativeURL = "adminMaintenance.py/tmpCleanup"
+class UHMaintenanceTmpCleanup(URLHandler):
+    _endpoint = 'legacy.adminMaintenance-tmpCleanup'
 
-class UHMaintenancePerformTmpCleanup( URLHandler ):
-    _relativeURL = "adminMaintenance.py/performTmpCleanup"
+class UHMaintenancePerformTmpCleanup(URLHandler):
+    _endpoint = 'legacy.adminMaintenance-performTmpCleanup'
 
-class UHMaintenancePack( URLHandler ):
-    _relativeURL = "adminMaintenance.py/pack"
+class UHMaintenancePack(URLHandler):
+    _endpoint = 'legacy.adminMaintenance-pack'
 
-class UHMaintenancePerformPack( URLHandler ):
-    _relativeURL = "adminMaintenance.py/performPack"
+class UHMaintenancePerformPack(URLHandler):
+    _endpoint = 'legacy.adminMaintenance-performPack'
 
-class UHAdminLayoutGeneral( URLHandler ):
-    _relativeURL = "adminLayout.py"
+class UHAdminLayoutGeneral(URLHandler):
+    _endpoint = 'legacy.adminLayout'
 
-class UHAdminLayoutSaveTemplateSet( URLHandler ):
-    _relativeURL = "adminLayout.py/saveTemplateSet"
+class UHAdminLayoutSaveTemplateSet(URLHandler):
+    _endpoint = 'legacy.adminLayout-saveTemplateSet'
 
-class UHAdminLayoutSaveSocial( URLHandler ):
-    _relativeURL = "adminLayout.py/saveSocial"
+class UHAdminLayoutSaveSocial(URLHandler):
+    _endpoint = 'legacy.adminLayout-saveSocial'
 
-class UHTemplatesSetDefaultPDFOptions( URLHandler ):
-    _relativeURL = "adminLayout.py/setDefaultPDFOptions"
+class UHTemplatesSetDefaultPDFOptions(URLHandler):
+    _endpoint = 'legacy.adminLayout-setDefaultPDFOptions'
 
-class UHServices( URLHandler ):
-    _relativeURL = "adminServices.py"
+class UHServices(URLHandler):
+    _endpoint = 'legacy.adminServices'
 
-class UHWebcast( URLHandler ):
-    _relativeURL = "adminServices.py/webcast"
+class UHWebcast(URLHandler):
+    _endpoint = 'legacy.adminServices-webcast'
 
-class UHWebcastArchive( URLHandler ):
-    _relativeURL = "adminServices.py/webcastArchive"
+class UHWebcastArchive(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastArchive'
 
-class UHWebcastSetup( URLHandler ):
-    _relativeURL = "adminServices.py/webcastSetup"
+class UHWebcastSetup(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastSetup'
 
-class UHWebcastAddWebcast( URLHandler ):
-    _relativeURL = "adminServices.py/webcastAddWebcast"
+class UHWebcastAddWebcast(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastAddWebcast'
 
-class UHWebcastRemoveWebcast( URLHandler ):
-    _relativeURL = "adminServices.py/webcastRemoveWebcast"
+class UHWebcastRemoveWebcast(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastRemoveWebcast'
 
-class UHWebcastArchiveWebcast( URLHandler ):
-    _relativeURL = "adminServices.py/webcastArchiveWebcast"
+class UHWebcastArchiveWebcast(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastArchiveWebcast'
 
-class UHWebcastUnArchiveWebcast( URLHandler ):
-    _relativeURL = "adminServices.py/webcastUnArchiveWebcast"
+class UHWebcastUnArchiveWebcast(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastUnArchiveWebcast'
 
-class UHWebcastModifyChannel( URLHandler ):
-    _relativeURL = "adminServices.py/webcastModifyChannel"
+class UHWebcastModifyChannel(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastModifyChannel'
 
-class UHWebcastAddChannel( URLHandler ):
-    _relativeURL = "adminServices.py/webcastAddChannel"
+class UHWebcastAddChannel(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastAddChannel'
 
-class UHWebcastRemoveChannel( URLHandler ):
-    _relativeURL = "adminServices.py/webcastRemoveChannel"
+class UHWebcastRemoveChannel(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastRemoveChannel'
 
-class UHWebcastSwitchChannel( URLHandler ):
-    _relativeURL = "adminServices.py/webcastSwitchChannel"
+class UHWebcastSwitchChannel(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastSwitchChannel'
 
-class UHWebcastMoveChannelUp( URLHandler ):
-    _relativeURL = "adminServices.py/webcastMoveChannelUp"
+class UHWebcastMoveChannelUp(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastMoveChannelUp'
 
-class UHWebcastMoveChannelDown( URLHandler ):
-    _relativeURL = "adminServices.py/webcastMoveChannelDown"
+class UHWebcastMoveChannelDown(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastMoveChannelDown'
 
-class UHWebcastSaveWebcastSynchronizationURL( URLHandler ):
-    _relativeURL = "adminServices.py/webcastSaveWebcastSynchronizationURL"
+class UHWebcastSaveWebcastSynchronizationURL(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastSaveWebcastSynchronizationURL'
 
-class UHWebcastManualSynchronization( URLHandler ):
-    _relativeURL = "adminServices.py/webcastManualSynchronization"
+class UHWebcastManualSynchronization(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastManualSynchronization'
 
-class UHWebcastAddStream( URLHandler ):
-    _relativeURL = "adminServices.py/webcastAddStream"
+class UHWebcastAddStream(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastAddStream'
 
-class UHWebcastRemoveStream( URLHandler ):
-    _relativeURL = "adminServices.py/webcastRemoveStream"
+class UHWebcastRemoveStream(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastRemoveStream'
 
-class UHWebcastAddOnAir( URLHandler ):
-    _relativeURL = "adminServices.py/webcastAddOnAir"
+class UHWebcastAddOnAir(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastAddOnAir'
 
-class UHWebcastRemoveFromAir( URLHandler ):
-    _relativeURL = "adminServices.py/webcastRemoveFromAir"
+class UHWebcastRemoveFromAir(URLHandler):
+    _endpoint = 'legacy.adminServices-webcastRemoveFromAir'
 
-class UHIPBasedACL( URLHandler ):
-    _relativeURL = "adminServices.py/ipbasedacl"
+class UHIPBasedACL(URLHandler):
+    _endpoint = 'legacy.adminServices-ipbasedacl'
 
-class UHIPBasedACLFullAccessGrant( URLHandler ):
-    _relativeURL = "adminServices.py/ipbasedacl_fagrant"
+class UHIPBasedACLFullAccessGrant(URLHandler):
+    _endpoint = 'legacy.adminServices-ipbasedacl_fagrant'
 
-class UHIPBasedACLFullAccessRevoke( URLHandler ):
-    _relativeURL = "adminServices.py/ipbasedacl_farevoke"
+class UHIPBasedACLFullAccessRevoke(URLHandler):
+    _endpoint = 'legacy.adminServices-ipbasedacl_farevoke'
 
-class UHAdminAPIOptions( URLHandler ):
-    _relativeURL = "adminServices.py/apiOptions"
+class UHAdminAPIOptions(URLHandler):
+    _endpoint = 'legacy.adminServices-apiOptions'
 
-class UHAdminAPIOptionsSet( URLHandler ):
-    _relativeURL = "adminServices.py/apiOptionsSet"
+class UHAdminAPIOptionsSet(URLHandler):
+    _endpoint = 'legacy.adminServices-apiOptionsSet'
 
-class UHAdminAPIKeys( URLHandler ):
-    _relativeURL = "adminServices.py/apiKeys"
+class UHAdminAPIKeys(URLHandler):
+    _endpoint = 'legacy.adminServices-apiKeys'
 
-class UHAdminOAuthConsumers( URLHandler ):
-    _relativeURL = "adminServices.py/oauthConsumers"
+class UHAdminOAuthConsumers(URLHandler):
+    _endpoint = 'legacy.adminServices-oauthConsumers'
 
-class UHAdminOAuthAuthorized( URLHandler ):
-    _relativeURL = "adminServices.py/oauthAuthorized"
+class UHAdminOAuthAuthorized(URLHandler):
+    _endpoint = 'legacy.adminServices-oauthAuthorized'
 
-class UHAnalytics( URLHandler ):
-    _relativeURL = "adminServices.py/analytics"
+class UHAnalytics(URLHandler):
+    _endpoint = 'legacy.adminServices-analytics'
 
-class UHSaveAnalytics( URLHandler ):
-    _relativeURL = "adminServices.py/saveAnalytics"
+class UHSaveAnalytics(URLHandler):
+    _endpoint = 'legacy.adminServices-saveAnalytics'
 
-class UHBadgeTemplates( URLHandler ):
-    _relativeURL = "badgeTemplates.py"
+class UHBadgeTemplates(URLHandler):
+    _endpoint = 'legacy.badgeTemplates'
 
-class UHPosterTemplates( URLHandler ):
-    _relativeURL = "posterTemplates.py"
+class UHPosterTemplates(URLHandler):
+    _endpoint = 'legacy.posterTemplates'
 
-class UHAnnouncement( URLHandler ):
-    _relativeURL = "adminAnnouncement.py"
+class UHAnnouncement(URLHandler):
+    _endpoint = 'legacy.adminAnnouncement'
 
-class UHAnnouncementSave( URLHandler ):
-    _relativeURL = "adminAnnouncement.py/save"
+class UHAnnouncementSave(URLHandler):
+    _endpoint = 'legacy.adminAnnouncement-save'
 
-class UHConfigUpcomingEvents( URLHandler ):
-    _relativeURL = "adminUpcomingEvents.py"
+class UHConfigUpcomingEvents(URLHandler):
+    _endpoint = 'legacy.adminUpcomingEvents'
 
 # ------- DVD creation and static webpages ------
 
-class UHConfDVDCreation( URLHandler ):
-    _relativeURL = "confModifTools.py/dvdCreation"
+class UHConfDVDCreation(URLHandler):
+    _endpoint = 'legacy.confModifTools-dvdCreation'
 
-class UHStaticConferenceDisplay( URLHandler ):
+class UHStaticConferenceDisplay(URLHandler):
     _relativeURL = "./index.html"
 
-class UHStaticMaterialDisplay( URLHandler ):
+class UHStaticMaterialDisplay(URLHandler):
     _relativeURL = "none-page-material.html"
 
     def _normalisePathItem(cls,name):
@@ -2597,22 +2606,22 @@ class UHStaticMaterialDisplay( URLHandler ):
         return cls._relativeURL
     getRelativeURL = classmethod( getRelativeURL )
 
-class UHStaticConfAbstractBook( URLHandler ):
+class UHStaticConfAbstractBook(URLHandler):
     _relativeURL = "./abstractBook.pdf"
 
-class UHStaticConferenceProgram( URLHandler ):
+class UHStaticConferenceProgram(URLHandler):
     _relativeURL = "./programme.html"
 
-class UHStaticConferenceTimeTable( URLHandler ):
+class UHStaticConferenceTimeTable(URLHandler):
     _relativeURL = "./timetable.html"
 
-class UHStaticContributionList( URLHandler ):
+class UHStaticContributionList(URLHandler):
     _relativeURL = "./contributionList.html"
 
-class UHStaticConfAuthorIndex( URLHandler ):
+class UHStaticConfAuthorIndex(URLHandler):
     _relativeURL = "./authorIndex.html"
 
-class UHStaticContributionDisplay( URLHandler ):
+class UHStaticContributionDisplay(URLHandler):
     _relativeURL = ""
 
     def getRelativeURL(cls, target=None, prevPath=".", escape=True):
@@ -2634,14 +2643,14 @@ class UHStaticContributionDisplay( URLHandler ):
         return url
     getRelativeURL = classmethod( getRelativeURL )
 
-class UHStaticSessionDisplay( URLHandler ):
+class UHStaticSessionDisplay(URLHandler):
     _relativeURL = ""
 
     def getRelativeURL(cls, target=None):
         return "./sessions/s%s.html"%target.getId()
     getRelativeURL = classmethod( getRelativeURL )
 
-class UHStaticResourceDisplay( URLHandler ):
+class UHStaticResourceDisplay(URLHandler):
     _relativeURL = "none-page-resource.html"
 
     def _normalisePathItem(cls,name):
@@ -2671,7 +2680,7 @@ class UHStaticResourceDisplay( URLHandler ):
             return relativeURL
     getRelativeURL = classmethod( getRelativeURL )
 
-class UHStaticTrackContribList( URLHandler ):
+class UHStaticTrackContribList(URLHandler):
     _relativeURL = ""
 
     def getRelativeURL(cls, target=None, escape=True):
@@ -2685,11 +2694,11 @@ class UHStaticTrackContribList( URLHandler ):
 
     getRelativeURL = classmethod( getRelativeURL )
 
-class UHDVDDone( URLHandler ):
-    _relativeURL = "confModifTools.py/dvdDone"
+class UHDVDDone(URLHandler):
+    _endpoint = 'legacy.confModifTools-dvdDone'
 
 
-class UHMStaticMaterialDisplay( URLHandler ):
+class UHMStaticMaterialDisplay(URLHandler):
     _relativeURL = "none-page.html"
 
     def _normalisePathItem(cls,name):
@@ -2739,7 +2748,7 @@ class UHMStaticMaterialDisplay( URLHandler ):
         return cls._relativeURL
     getRelativeURL = classmethod( getRelativeURL )
 
-class UHMStaticResourceDisplay( URLHandler ):
+class UHMStaticResourceDisplay(URLHandler):
     _relativeURL = "none-page.html"
 
     def _normalisePathItem(cls,name):
@@ -2787,23 +2796,23 @@ class UHMStaticResourceDisplay( URLHandler ):
 
 # ------- END: DVD creation and static webpages ------
 
-class UHContribAuthorDisplay( URLHandler ):
-    _relativeURL = "contribAuthorDisplay.py"
+class UHContribAuthorDisplay(URLHandler):
+    _endpoint = 'legacy.contribAuthorDisplay'
 
-class UHConfTimeTableCustomizePDF( URLHandler ):
-    _relativeURL = "conferenceTimeTable.py/customizePdf"
+class UHConfTimeTableCustomizePDF(URLHandler):
+    _endpoint = 'legacy.conferenceTimeTable-customizePdf'
 
-class UHConfRegistrationForm( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py"
+class UHConfRegistrationForm(URLHandler):
+    _endpoint = 'legacy.confRegistrationFormDisplay'
 
-class UHConfRegistrationFormDisplay( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/display"
+class UHConfRegistrationFormDisplay(URLHandler):
+    _endpoint = 'legacy.confRegistrationFormDisplay-display'
 
-class UHConfRegistrationFormCreation( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/creation"
+class UHConfRegistrationFormCreation(URLHandler):
+    _endpoint = 'legacy.confRegistrationFormDisplay-creation'
 
-class UHConfRegistrationFormConditions( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/conditions"
+class UHConfRegistrationFormConditions(URLHandler):
+    _endpoint = 'legacy.confRegistrationFormDisplay-conditions'
 
 
 class UHConfRegistrationFormSignIn(URLHandler):
@@ -2830,298 +2839,298 @@ class UHConfRegistrationFormCreationDone(URLHandler):
         return url
 
 
-class UHConfRegistrationFormconfirmBooking( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/confirmBooking"
+class UHConfRegistrationFormconfirmBooking(URLHandler):
+    _endpoint = 'legacy.confRegistrationFormDisplay-confirmBooking'
 
-class UHConfRegistrationFormconfirmBookingDone( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/confirmBookingDone"
+class UHConfRegistrationFormconfirmBookingDone(URLHandler):
+    _endpoint = 'legacy.confRegistrationFormDisplay-confirmBookingDone'
 
-class UHConfRegistrationFormModify( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/modify"
+class UHConfRegistrationFormModify(URLHandler):
+    _endpoint = 'legacy.confRegistrationFormDisplay-modify'
 
-class UHConfRegistrationFormPerformModify( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/performModify"
+class UHConfRegistrationFormPerformModify(URLHandler):
+    _endpoint = 'legacy.confRegistrationFormDisplay-performModify'
 
 ###################################################################################
 ## epayment url
-class UHConfModifEPayment( URLHandler ):
-    _relativeURL = "confModifEpayment.py"
+class UHConfModifEPayment(URLHandler):
+    _endpoint = 'legacy.confModifEpayment'
 
-class UHConfModifEPaymentEnableSection( URLHandler ):
-    _relativeURL = "confModifEpayment.py/enableSection"
-class UHConfModifEPaymentChangeStatus( URLHandler ):
-    _relativeURL = "confModifEpayment.py/changeStatus"
-class UHConfModifEPaymentdetailPaymentModification( URLHandler ):
-    _relativeURL = "confModifEpayment.py/dataModif"
-class UHConfModifEPaymentPerformdetailPaymentModification( URLHandler ):
-    _relativeURL = "confModifEpayment.py/performDataModif"
+class UHConfModifEPaymentEnableSection(URLHandler):
+    _endpoint = 'legacy.confModifEpayment-enableSection'
+class UHConfModifEPaymentChangeStatus(URLHandler):
+    _endpoint = 'legacy.confModifEpayment-changeStatus'
+class UHConfModifEPaymentdetailPaymentModification(URLHandler):
+    _endpoint = 'legacy.confModifEpayment-dataModif'
+class UHConfModifEPaymentPerformdetailPaymentModification(URLHandler):
+    _endpoint = 'legacy.confModifEpayment-performDataModif'
 
 ###################################################################################
 
 
-class UHConfModifRegForm( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py"
+class UHConfModifRegForm(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm'
 
-class UHConfModifRegFormChangeStatus( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/changeStatus"
+class UHConfModifRegFormChangeStatus(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-changeStatus'
 
-class UHConfModifRegFormDataModification( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/dataModif"
+class UHConfModifRegFormDataModification(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-dataModif'
 
-class UHConfModifRegFormPerformDataModification( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performDataModif"
+class UHConfModifRegFormPerformDataModification(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performDataModif'
 
-class UHConfModifRegFormSessions( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifSessions"
+class UHConfModifRegFormSessions(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifSessions'
 
-class UHConfModifRegFormSessionsDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifSessionsData"
+class UHConfModifRegFormSessionsDataModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifSessionsData'
 
-class UHConfModifRegFormSessionsPerformDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifSessionsData"
+class UHConfModifRegFormSessionsPerformDataModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performModifSessionsData'
 
-class UHConfModifRegFormSessionsAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/addSession"
+class UHConfModifRegFormSessionsAdd(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-addSession'
 
-class UHConfModifRegFormSessionsPerformAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performAddSession"
+class UHConfModifRegFormSessionsPerformAdd(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performAddSession'
 
-class UHConfModifRegFormSessionsRemove( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/removeSession"
+class UHConfModifRegFormSessionsRemove(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-removeSession'
 
-class UHConfModifRegFormSessionItemModify( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifySessionItem"
+class UHConfModifRegFormSessionItemModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifySessionItem'
 
-class UHConfModifRegFormSessionItemPerformModify( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifySessionItem"
+class UHConfModifRegFormSessionItemPerformModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performModifySessionItem'
 
-class UHConfModifRegFormAccommodation( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifAccommodation"
+class UHConfModifRegFormAccommodation(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifAccommodation'
 
-class UHConfModifRegFormAccommodationDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifAccommodationData"
+class UHConfModifRegFormAccommodationDataModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifAccommodationData'
 
-class UHConfModifRegFormAccommodationPerformDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifAccommodationData"
+class UHConfModifRegFormAccommodationPerformDataModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performModifAccommodationData'
 
-class UHConfModifRegFormAccommodationTypeRemove( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/removeAccommodationType"
+class UHConfModifRegFormAccommodationTypeRemove(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-removeAccommodationType'
 
-class UHConfModifRegFormAccommodationTypeAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/addAccommodationType"
+class UHConfModifRegFormAccommodationTypeAdd(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-addAccommodationType'
 
-class UHConfModifRegFormAccommodationTypePerformAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performAddAccommodationType"
+class UHConfModifRegFormAccommodationTypePerformAdd(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performAddAccommodationType'
 
-class UHConfModifRegFormAccommodationTypeModify( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifyAccommodationType"
+class UHConfModifRegFormAccommodationTypeModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifyAccommodationType'
 
-class UHConfModifRegFormAccommodationTypePerformModify( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifyAccommodationType"
+class UHConfModifRegFormAccommodationTypePerformModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performModifyAccommodationType'
 
-class UHConfModifRegFormReasonParticipation( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifReasonParticipation"
+class UHConfModifRegFormReasonParticipation(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifReasonParticipation'
 
-class UHConfModifRegFormReasonParticipationDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifReasonParticipationData"
+class UHConfModifRegFormReasonParticipationDataModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifReasonParticipationData'
 
-class UHConfModifRegFormReasonParticipationPerformDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifReasonParticipationData"
+class UHConfModifRegFormReasonParticipationPerformDataModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performModifReasonParticipationData'
 
-class UHConfModifRegFormFurtherInformation( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifFurtherInformation"
+class UHConfModifRegFormFurtherInformation(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifFurtherInformation'
 
-class UHConfModifRegFormFurtherInformationDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifFurtherInformationData"
+class UHConfModifRegFormFurtherInformationDataModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifFurtherInformationData'
 
-class UHConfModifRegFormFurtherInformationPerformDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifFurtherInformationData"
+class UHConfModifRegFormFurtherInformationPerformDataModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performModifFurtherInformationData'
 
-class UHConfModifRegFormSocialEvent( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifSocialEvent"
+class UHConfModifRegFormSocialEvent(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifSocialEvent'
 
-class UHConfModifRegFormSocialEventDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifSocialEventData"
+class UHConfModifRegFormSocialEventDataModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifSocialEventData'
 
-class UHConfModifRegFormSocialEventPerformDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifSocialEventData"
+class UHConfModifRegFormSocialEventPerformDataModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performModifSocialEventData'
 
-class UHConfModifRegFormSocialEventRemove( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/removeSocialEvent"
+class UHConfModifRegFormSocialEventRemove(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-removeSocialEvent'
 
-class UHConfModifRegFormSocialEventAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/addSocialEvent"
+class UHConfModifRegFormSocialEventAdd(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-addSocialEvent'
 
-class UHConfModifRegFormSocialEventPerformAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performAddSocialEvent"
+class UHConfModifRegFormSocialEventPerformAdd(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performAddSocialEvent'
 
-class UHConfModifRegFormSocialEventItemModify( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifySocialEventItem"
+class UHConfModifRegFormSocialEventItemModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifySocialEventItem'
 
-class UHConfModifRegFormSocialEventItemPerformModify( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifySocialEventItem"
+class UHConfModifRegFormSocialEventItemPerformModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performModifySocialEventItem'
 
-class UHConfModifRegFormActionStatuses( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/actionStatuses"
+class UHConfModifRegFormActionStatuses(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-actionStatuses'
 
-class UHConfModifRegFormStatusModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifStatus"
+class UHConfModifRegFormStatusModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifStatus'
 
-class UHConfModifRegFormStatusPerformModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifStatus"
+class UHConfModifRegFormStatusPerformModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performModifStatus'
 
-class UHConfModifRegFormActionSection( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/actionSection"
+class UHConfModifRegFormActionSection(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-actionSection'
 
-class UHConfModifRegFormGeneralSection( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifGeneralSection"
+class UHConfModifRegFormGeneralSection(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifGeneralSection'
 
-class UHConfModifRegFormGeneralSectionDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifGeneralSectionData"
+class UHConfModifRegFormGeneralSectionDataModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifGeneralSectionData'
 
-class UHConfModifRegFormGeneralSectionPerformDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifGeneralSectionData"
+class UHConfModifRegFormGeneralSectionPerformDataModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performModifGeneralSectionData'
 
-class UHConfModifRegFormGeneralSectionFieldAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/addGeneralField"
+class UHConfModifRegFormGeneralSectionFieldAdd(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-addGeneralField'
 
-class UHConfModifRegFormGeneralSectionFieldPerformAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performAddGeneralField"
+class UHConfModifRegFormGeneralSectionFieldPerformAdd(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performAddGeneralField'
 
-class UHConfModifRegFormGeneralSectionFieldRemove( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/removeGeneralField"
+class UHConfModifRegFormGeneralSectionFieldRemove(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-removeGeneralField'
 
-class UHConfModifRegFormGeneralSectionFieldModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifGeneralField"
+class UHConfModifRegFormGeneralSectionFieldModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-modifGeneralField'
 
-class UHConfModifRegFormGeneralSectionFieldPerformModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifGeneralField"
+class UHConfModifRegFormGeneralSectionFieldPerformModif(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-performModifGeneralField'
 
-class UHConfModifRegistrationPreview( URLHandler ):
-    _relativeURL = "confModifRegistrationPreview.py"
+class UHConfModifRegistrationPreview(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationPreview'
 
-class UHConfModifRegistrantList( URLHandler ):
-    _relativeURL = "confModifRegistrants.py"
+class UHConfModifRegistrantList(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants'
 
 class UHConfModifRegistrantNew(URLHandler):
     _endpoint = 'legacy.confModifRegistrants-newRegistrant'
 
-class UHConfModifRegistrantsOpenMenu( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/openMenu"
+class UHConfModifRegistrantsOpenMenu(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-openMenu'
 
-class UHConfModifRegistrantsCloseMenu( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/closeMenu"
+class UHConfModifRegistrantsCloseMenu(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-closeMenu'
 
-class UHConfModifRegistrantListAction( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/action"
+class UHConfModifRegistrantListAction(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-action'
 
-class UHConfModifRegistrantPerformRemove( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/remove"
+class UHConfModifRegistrantPerformRemove(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-remove'
 
-class UHRegistrantModification( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modification"
+class UHRegistrantModification(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-modification'
 
-class UHRegistrantDataModification( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/dataModification"
+class UHRegistrantDataModification(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-dataModification'
 
-class UHRegistrantPerformDataModification( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performDataModification"
+class UHRegistrantPerformDataModification(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-performDataModification'
 
 class UHRegistrantAttachmentFileAccess(URLHandler):
-    _relativeURL = "confModifRegistrants.py/getAttachedFile"
+    _endpoint = 'legacy.confModifRegistrants-getAttachedFile'
 
-class UHConfModifRegFormEnableSection( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/enableSection"
+class UHConfModifRegFormEnableSection(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-enableSection'
 
-class UHConfModifRegFormEnablePersonalField( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/enablePersonalField"
+class UHConfModifRegFormEnablePersonalField(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-enablePersonalField'
 
-class UHConfModifRegFormSwitchPersonalField( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/switchPersonalField"
+class UHConfModifRegFormSwitchPersonalField(URLHandler):
+    _endpoint = 'legacy.confModifRegistrationForm-switchPersonalField'
 
-class UHCategoryStatistics( URLHandler ):
-    _relativeURL = "categoryStatistics.py"
+class UHCategoryStatistics(URLHandler):
+    _endpoint = 'legacy.categoryStatistics'
 
-class UHCategoryToiCal( URLHandler ):
-    _relativeURL = "categoryDisplay.py/ical"
+class UHCategoryToiCal(URLHandler):
+    _endpoint = 'legacy.categoryDisplay-ical'
 
-class UHCategoryToRSS( URLHandler ):
-    _relativeURL = "categoryDisplay.py/rss"
+class UHCategoryToRSS(URLHandler):
+    _endpoint = 'legacy.categoryDisplay-rss'
 
-class UHCategoryToAtom( URLHandler ):
-    _relativeURL = "categoryDisplay.py/atom"
+class UHCategoryToAtom(URLHandler):
+    _endpoint = 'legacy.categoryDisplay-atom'
 
-class UHCategOverviewToRSS( URLHandler ):
-    _relativeURL = "categOverview.py/rss"
+class UHCategOverviewToRSS(URLHandler):
+    _endpoint = 'legacy.categOverview-rss'
 
-class UHConfRegistrantsList( URLHandler ):
-    _relativeURL = "confRegistrantsDisplay.py/list"
+class UHConfRegistrantsList(URLHandler):
+    _endpoint = 'legacy.confRegistrantsDisplay-list'
 
-class UHConfModifRegistrantSessionModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifySessions"
+class UHConfModifRegistrantSessionModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-modifySessions'
 
-class UHConfModifRegistrantSessionPeformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performModifySessions"
+class UHConfModifRegistrantSessionPeformModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-performModifySessions'
 
-class UHConfModifRegistrantTransactionModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifyTransaction"
+class UHConfModifRegistrantTransactionModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-modifyTransaction'
 
-class UHConfModifRegistrantTransactionPeformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/peformModifyTransaction"
+class UHConfModifRegistrantTransactionPeformModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-peformModifyTransaction'
 
-class UHConfModifRegistrantAccoModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifyAccommodation"
+class UHConfModifRegistrantAccoModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-modifyAccommodation'
 
-class UHConfModifRegistrantAccoPeformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performModifyAccommodation"
+class UHConfModifRegistrantAccoPeformModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-performModifyAccommodation'
 
-class UHConfModifRegistrantSocialEventsModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifySocialEvents"
+class UHConfModifRegistrantSocialEventsModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-modifySocialEvents'
 
-class UHConfModifRegistrantSocialEventsPeformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performModifySocialEvents"
+class UHConfModifRegistrantSocialEventsPeformModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-performModifySocialEvents'
 
-class UHConfModifRegistrantReasonPartModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifyReasonParticipation"
+class UHConfModifRegistrantReasonPartModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-modifyReasonParticipation'
 
-class UHConfModifRegistrantReasonPartPeformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performModifyReasonParticipation"
+class UHConfModifRegistrantReasonPartPeformModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-performModifyReasonParticipation'
 
-class UHConfModifPendingQueues( URLHandler ):
-    _relativeURL = "confModifPendingQueues.py"
+class UHConfModifPendingQueues(URLHandler):
+    _endpoint = 'legacy.confModifPendingQueues'
 
-class UHConfModifPendingQueuesActionConfSubm( URLHandler ):
-    _relativeURL = "confModifPendingQueues.py/actionConfSubmitters"
+class UHConfModifPendingQueuesActionConfSubm(URLHandler):
+    _endpoint = 'legacy.confModifPendingQueues-actionConfSubmitters'
 
-class UHConfModifPendingQueuesActionSubm( URLHandler ):
-    _relativeURL = "confModifPendingQueues.py/actionSubmitters"
+class UHConfModifPendingQueuesActionSubm(URLHandler):
+    _endpoint = 'legacy.confModifPendingQueues-actionSubmitters'
 
-class UHConfModifPendingQueuesActionMgr( URLHandler ):
-    _relativeURL = "confModifPendingQueues.py/actionManagers"
+class UHConfModifPendingQueuesActionMgr(URLHandler):
+    _endpoint = 'legacy.confModifPendingQueues-actionManagers'
 
-class UHConfModifPendingQueuesActionCoord( URLHandler ):
-    _relativeURL = "confModifPendingQueues.py/actionCoordinators"
+class UHConfModifPendingQueuesActionCoord(URLHandler):
+    _endpoint = 'legacy.confModifPendingQueues-actionCoordinators'
 
-class UHConfModifRegistrantMiscInfoModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifyMiscInfo"
+class UHConfModifRegistrantMiscInfoModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-modifyMiscInfo'
 
-class UHConfModifRegistrantMiscInfoPerformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performModifyMiscInfo"
+class UHConfModifRegistrantMiscInfoPerformModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-performModifyMiscInfo'
 
-class UHUserSearchCreateExternalUser( URLHandler ):
-    _relativeURL = "userSelection.py/createExternalUsers"
+class UHUserSearchCreateExternalUser(URLHandler):
+    _endpoint = 'legacy.userSelection-createExternalUsers'
 
-class UHConfModifRegistrantStatusesModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifyStatuses"
+class UHConfModifRegistrantStatusesModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-modifyStatuses'
 
-class UHConfModifRegistrantStatusesPerformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performModifyStatuses"
+class UHConfModifRegistrantStatusesPerformModify(URLHandler):
+    _endpoint = 'legacy.confModifRegistrants-performModifyStatuses'
 
-class UHGetCalendarOverview( URLHandler ):
-    _relativeURL ="categOverview.py"
+class UHGetCalendarOverview(URLHandler):
+    _endpoint = 'legacy.categOverview'
 
-class UHCategoryCalendarOverview( URLHandler ):
-    _relativeURL ="wcalendar.py"
+class UHCategoryCalendarOverview(URLHandler):
+    _endpoint = 'legacy.wcalendar'
 
 
 # URL Handlers for Printing and Design
@@ -3338,14 +3347,14 @@ class UHJsonRpcService(OptionallySecureURLHandler):
 #Evaluation# DISPLAY AREA
 ############
 
-class UHConfEvaluationMainInformation( URLHandler ):
-    _relativeURL = "confDisplayEvaluation.py"
+class UHConfEvaluationMainInformation(URLHandler):
+    _endpoint = 'legacy.confDisplayEvaluation'
 
-class UHConfEvaluationDisplay( URLHandler ):
-    _relativeURL = "confDisplayEvaluation.py/display"
+class UHConfEvaluationDisplay(URLHandler):
+    _endpoint = 'legacy.confDisplayEvaluation-display'
 
-class UHConfEvaluationDisplayModif( URLHandler ):
-    _relativeURL = "confDisplayEvaluation.py/modif"
+class UHConfEvaluationDisplayModif(URLHandler):
+    _endpoint = 'legacy.confDisplayEvaluation-modif'
 
 
 class UHConfEvaluationSignIn(URLHandler):
@@ -3361,205 +3370,205 @@ class UHConfEvaluationSignIn(URLHandler):
         return url
 
 
-class UHConfEvaluationSubmit( URLHandler ):
-    _relativeURL = "confDisplayEvaluation.py/submit"
+class UHConfEvaluationSubmit(URLHandler):
+    _endpoint = 'legacy.confDisplayEvaluation-submit'
 
-class UHConfEvaluationSubmitted( URLHandler ):
-    _relativeURL = "confDisplayEvaluation.py/submitted"
+class UHConfEvaluationSubmitted(URLHandler):
+    _endpoint = 'legacy.confDisplayEvaluation-submitted'
 
 ############
 #Evaluation# MANAGEMENT AREA
 ############
-class UHConfModifEvaluation( URLHandler ):
-    _relativeURL = "confModifEvaluation.py"
+class UHConfModifEvaluation(URLHandler):
+    _endpoint = 'legacy.confModifEvaluation'
 
-class UHConfModifEvaluationSetup( URLHandler ):
+class UHConfModifEvaluationSetup(URLHandler):
     """same result as UHConfModifEvaluation."""
-    _relativeURL = "confModifEvaluation.py/setup"
+    _endpoint = 'legacy.confModifEvaluation-setup'
 
-class UHConfModifEvaluationSetupChangeStatus( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/changeStatus"
+class UHConfModifEvaluationSetupChangeStatus(URLHandler):
+    _endpoint = 'legacy.confModifEvaluation-changeStatus'
 
-class UHConfModifEvaluationSetupSpecialAction( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/specialAction"
+class UHConfModifEvaluationSetupSpecialAction(URLHandler):
+    _endpoint = 'legacy.confModifEvaluation-specialAction'
 
-class UHConfModifEvaluationDataModif( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/dataModif"
+class UHConfModifEvaluationDataModif(URLHandler):
+    _endpoint = 'legacy.confModifEvaluation-dataModif'
 
-class UHConfModifEvaluationPerformDataModif( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/performDataModif"
+class UHConfModifEvaluationPerformDataModif(URLHandler):
+    _endpoint = 'legacy.confModifEvaluation-performDataModif'
 
-class UHConfModifEvaluationEdit( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/edit"
+class UHConfModifEvaluationEdit(URLHandler):
+    _endpoint = 'legacy.confModifEvaluation-edit'
 
-class UHConfModifEvaluationEditPerformChanges( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/editPerformChanges"
+class UHConfModifEvaluationEditPerformChanges(URLHandler):
+    _endpoint = 'legacy.confModifEvaluation-editPerformChanges'
 
-class UHConfModifEvaluationPreview( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/preview"
+class UHConfModifEvaluationPreview(URLHandler):
+    _endpoint = 'legacy.confModifEvaluation-preview'
 
-class UHConfModifEvaluationResults( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/results"
+class UHConfModifEvaluationResults(URLHandler):
+    _endpoint = 'legacy.confModifEvaluation-results'
 
-class UHConfModifEvaluationResultsOptions( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/resultsOptions"
+class UHConfModifEvaluationResultsOptions(URLHandler):
+    _endpoint = 'legacy.confModifEvaluation-resultsOptions'
 
-class UHConfModifEvaluationResultsSubmittersActions( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/resultsSubmittersActions"
+class UHConfModifEvaluationResultsSubmittersActions(URLHandler):
+    _endpoint = 'legacy.confModifEvaluation-resultsSubmittersActions'
 
-class UHResetSession (URLHandler):
-    _relativeURL = "resetSessionTZ.py"
+class UHResetSession(URLHandler):
+    _endpoint = 'legacy.resetSessionTZ'
 
 ##############
 # Reviewing
 #############
-class UHConfModifReviewingAccess ( URLHandler ):
-    _relativeURL = "confModifReviewing.py/access"
+class UHConfModifReviewingAccess(URLHandler):
+    _endpoint = 'legacy.confModifReviewing-access'
 
-class UHConfModifReviewingPaperSetup( URLHandler ):
-    _relativeURL = "confModifReviewing.py/paperSetup"
+class UHConfModifReviewingPaperSetup(URLHandler):
+    _endpoint = 'legacy.confModifReviewing-paperSetup'
 
-class UHChooseReviewing( URLHandler ):
-    _relativeURL = "confModifReviewing.py/chooseReviewing"
+class UHChooseReviewing(URLHandler):
+    _endpoint = 'legacy.confModifReviewing-chooseReviewing'
 
-class UHAddState( URLHandler ):
-    _relativeURL = "confModifReviewing.py/addState"
+class UHAddState(URLHandler):
+    _endpoint = 'legacy.confModifReviewing-addState'
 
-class UHRemoveState( URLHandler ):
-    _relativeURL = "confModifReviewing.py/removeState"
+class UHRemoveState(URLHandler):
+    _endpoint = 'legacy.confModifReviewing-removeState'
 
-class UHAddQuestion( URLHandler ):
-    _relativeURL = "confModifReviewing.py/addQuestion"
+class UHAddQuestion(URLHandler):
+    _endpoint = 'legacy.confModifReviewing-addQuestion'
 
-class UHRemoveQuestion( URLHandler ):
-    _relativeURL = "confModifReviewing.py/removeQuestion"
+class UHRemoveQuestion(URLHandler):
+    _endpoint = 'legacy.confModifReviewing-removeQuestion'
 
-class UHSetTemplate( URLHandler ):
-    _relativeURL = "confModifReviewing.py/setTemplate"
+class UHSetTemplate(URLHandler):
+    _endpoint = 'legacy.confModifReviewing-setTemplate'
 
-class UHAddCriteria( URLHandler ):
-    _relativeURL = "confModifReviewing.py/addCriteria"
+class UHAddCriteria(URLHandler):
+    _endpoint = 'legacy.confModifReviewing-addCriteria'
 
-class UHRemoveCriteria( URLHandler ):
-    _relativeURL = "confModifReviewing.py/removeCriteria"
+class UHRemoveCriteria(URLHandler):
+    _endpoint = 'legacy.confModifReviewing-removeCriteria'
 
-class UHDownloadContributionTemplate( URLHandler ):
-    _relativeURL = "confModifReviewing.py/downloadTemplate"
+class UHDownloadContributionTemplate(URLHandler):
+    _endpoint = 'legacy.confModifReviewing-downloadTemplate'
 
-class UHDeleteContributionTemplate( URLHandler ):
-    _relativeURL = "confModifReviewing.py/deleteTemplate"
+class UHDeleteContributionTemplate(URLHandler):
+    _endpoint = 'legacy.confModifReviewing-deleteTemplate'
 
-class UHConfModifReviewingControl ( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py"
+class UHConfModifReviewingControl(URLHandler):
+    _endpoint = 'legacy.confModifReviewingControl'
 
-class UHConfModifReviewingAbstractsControl ( URLHandler ):
-    _relativeURL = "confModifAbstractsReviewingControl.py"
+class UHConfModifReviewingAbstractsControl(URLHandler):
+    _endpoint = 'legacy.confModifAbstractsReviewingControl'
 
-class UHConfModifUserCompetences ( URLHandler ):
-    _relativeURL = "confModifUserCompetences.py"
+class UHConfModifUserCompetences(URLHandler):
+    _endpoint = 'legacy.confModifUserCompetences'
 
-class UHConfModifUserCompetencesAbstracts ( URLHandler ):
-    _relativeURL = "confModifUserCompetences.py/Abstracts"
+class UHConfModifUserCompetencesAbstracts(URLHandler):
+    _endpoint = 'legacy.confModifUserCompetences-Abstracts'
 
-class UHConfModifModifyUserCompetences ( URLHandler ):
-    _relativeURL = "confModifUserCompetences.py/modifyCompetences"
+class UHConfModifModifyUserCompetences(URLHandler):
+    _endpoint = 'legacy.confModifUserCompetences-modifyCompetences'
 
-class UHConfModifListContribToJudge( URLHandler ):
-    _relativeURL = "confListContribToJudge.py"
+class UHConfModifListContribToJudge(URLHandler):
+    _endpoint = 'legacy.confListContribToJudge'
 
-class UHConfModifListContribToJudgeAsReviewer( URLHandler ):
-    _relativeURL = "confListContribToJudge.py/asReviewer"
+class UHConfModifListContribToJudgeAsReviewer(URLHandler):
+    _endpoint = 'legacy.confListContribToJudge-asReviewer'
 
-class UHConfModifListContribToJudgeAsEditor( URLHandler ):
-    _relativeURL = "confListContribToJudge.py/asEditor"
+class UHConfModifListContribToJudgeAsEditor(URLHandler):
+    _endpoint = 'legacy.confListContribToJudge-asEditor'
 
-class UHConfModifReviewingAssignContributionsList( URLHandler ):
-    _relativeURL = "assignContributions.py"
+class UHConfModifReviewingAssignContributionsList(URLHandler):
+    _endpoint = 'legacy.assignContributions'
 
-class UHConfModifReviewingAssignContributionsAssign( URLHandler ):
-    _relativeURL = "assignContributions.py/assign"
+class UHConfModifReviewingAssignContributionsAssign(URLHandler):
+    _endpoint = 'legacy.assignContributions-assign'
 
-class UHConfModifReviewingDownloadAcceptedPapers( URLHandler ):
-    _relativeURL = "assignContributions.py/downloadAcceptedPapers"
+class UHConfModifReviewingDownloadAcceptedPapers(URLHandler):
+    _endpoint = 'legacy.assignContributions-downloadAcceptedPapers'
 
 
 #Contribution reviewing
-class UHContributionModifReviewing( URLHandler ):
-    _relativeURL = "contributionReviewing.py"
+class UHContributionModifReviewing(URLHandler):
+    _endpoint = 'legacy.contributionReviewing'
 
-class UHContribModifReviewingMaterials ( URLHandler ):
-    _relativeURL = "contributionReviewing.py/contributionReviewingMaterials"
+class UHContribModifReviewingMaterials(URLHandler):
+    _endpoint = 'legacy.contributionReviewing-contributionReviewingMaterials'
 
-class UHContributionReviewingJudgements ( URLHandler ):
-    _relativeURL = "contributionReviewing.py/contributionReviewingJudgements"
+class UHContributionReviewingJudgements(URLHandler):
+    _endpoint = 'legacy.contributionReviewing-contributionReviewingJudgements'
 
-class UHContributionSubmitForRewiewing( URLHandler ):
-    _relativeURL = "contributionReviewing.py/submitForReviewing"
+class UHContributionSubmitForRewiewing(URLHandler):
+    _endpoint = 'legacy.contributionReviewing-submitForReviewing'
 
 class UHAssignReferee(URLHandler):
-    _relativeURL = "contributionReviewing.py/assignReferee"
+    _endpoint = 'legacy.contributionReviewing-assignReferee'
 
 class UHRemoveAssignReferee(URLHandler):
-    _relativeURL = "contributionReviewing.py/removeAssignReferee"
+    _endpoint = 'legacy.contributionReviewing-removeAssignReferee'
 
-class UHAssignEditing( URLHandler ):
-    _relativeURL = "contributionReviewing.py/assignEditing"
+class UHAssignEditing(URLHandler):
+    _endpoint = 'legacy.contributionReviewing-assignEditing'
 
-class UHRemoveAssignEditing( URLHandler ):
-    _relativeURL = "contributionReviewing.py/removeAssignEditing"
+class UHRemoveAssignEditing(URLHandler):
+    _endpoint = 'legacy.contributionReviewing-removeAssignEditing'
 
-class UHAssignReviewing( URLHandler ):
-    _relativeURL = "contributionReviewing.py/assignReviewing"
+class UHAssignReviewing(URLHandler):
+    _endpoint = 'legacy.contributionReviewing-assignReviewing'
 
-class UHRemoveAssignReviewing( URLHandler ):
-    _relativeURL = "contributionReviewing.py/removeAssignReviewing"
+class UHRemoveAssignReviewing(URLHandler):
+    _endpoint = 'legacy.contributionReviewing-removeAssignReviewing'
 
-class UHFinalJudge( URLHandler ):
-    _relativeURL = "contributionReviewing.py/finalJudge"
+class UHFinalJudge(URLHandler):
+    _endpoint = 'legacy.contributionReviewing-finalJudge'
 
-class UHContributionModifReviewingHistory( URLHandler ):
-    _relativeURL = "contributionReviewing.py/reviewingHistory"
+class UHContributionModifReviewingHistory(URLHandler):
+    _endpoint = 'legacy.contributionReviewing-reviewingHistory'
 
-class UHContributionEditingJudgement( URLHandler ):
-    _relativeURL = "contributionEditingJudgement.py"
+class UHContributionEditingJudgement(URLHandler):
+    _endpoint = 'legacy.contributionEditingJudgement'
 
-class UHJudgeEditing( URLHandler ):
-    _relativeURL = "contributionEditingJudgement.py/judgeEditing"
+class UHJudgeEditing(URLHandler):
+    _endpoint = 'legacy.contributionEditingJudgement-judgeEditing'
 
-class UHContributionGiveAdvice( URLHandler ):
-    _relativeURL = "contributionGiveAdvice.py"
+class UHContributionGiveAdvice(URLHandler):
+    _endpoint = 'legacy.contributionGiveAdvice'
 
-class UHGiveAdvice( URLHandler ):
-    _relativeURL = "contributionGiveAdvice.py/giveAdvice"
+class UHGiveAdvice(URLHandler):
+    _endpoint = 'legacy.contributionGiveAdvice-giveAdvice'
 
-class UHRefereeDueDate (URLHandler):
-    _relativeURL = "contributionReviewing.py/refereeDueDate"
+class UHRefereeDueDate(URLHandler):
+    _endpoint = 'legacy.contributionReviewing-refereeDueDate'
 
-class UHEditorDueDate (URLHandler):
-    _relativeURL = "contributionReviewing.py/editorDueDate"
+class UHEditorDueDate(URLHandler):
+    _endpoint = 'legacy.contributionReviewing-editorDueDate'
 
-class UHReviewerDueDate (URLHandler):
-    _relativeURL = "contributionReviewing.py/reviewerDueDate"
+class UHReviewerDueDate(URLHandler):
+    _endpoint = 'legacy.contributionReviewing-reviewerDueDate'
 
 class UHDownloadPRTemplate(URLHandler):
-    _relativeURL = "paperReviewingDisplay.py/downloadTemplate"
+    _endpoint = 'legacy.paperReviewingDisplay-downloadTemplate'
 
 class UHUploadPaper(URLHandler):
-    _relativeURL = "paperReviewingDisplay.py/uploadPaper"
+    _endpoint = 'legacy.paperReviewingDisplay-uploadPaper'
 
 class UHPaperReviewingDisplay(URLHandler):
-    _relativeURL = "paperReviewingDisplay.py"
+    _endpoint = 'legacy.paperReviewingDisplay'
 
 #### End of reviewing
 
-class UHChangeLang( URLHandler ):
-    _relativeURL = "changeLang.py"
+class UHChangeLang(URLHandler):
+    _endpoint = 'legacy.changeLang'
 
-class UHAbout( URLHandler ):
-    _relativeURL = "about.py"
+class UHAbout(URLHandler):
+    _endpoint = 'legacy.about'
 
-class UHContact( URLHandler ):
-    _relativeURL = "contact.py"
+class UHContact(URLHandler):
+    _endpoint = 'legacy.contact'
 
 class UHHelper(object):
     """ Returns the display or modif UH for an object of a given class
