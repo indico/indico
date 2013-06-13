@@ -28,17 +28,6 @@ from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
 
 
-"""
-This file contains classes representing url handlers which are objects which
-contain information about every request handler of the application and which are
-responsible for generating the correct url for a given request handler given
-certain parameters. This file is a kind URL database so other web interface
-modules will use the classes instead of using harcoded urls; this makes possible
-to eassily change the urls or the parameter names without affecting the rest of
-the system.
-"""
-
-
 class BooleanOnMixin:
     """Mixin to convert True to 'on' and remove False altogether."""
     _true = 'on'
