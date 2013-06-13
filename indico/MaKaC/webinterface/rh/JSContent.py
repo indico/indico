@@ -23,18 +23,18 @@ from email.Utils import formatdate
 from MaKaC.common import Config
 from MaKaC.common.logger import Logger
 from MaKaC.errors import MaKaCError
-from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.rh import base
 import MaKaC.common.TemplateExec as templateEngine
 
 from indico.web.flask.util import send_file
 
 
-class RHTemplateContentJS(base.RH):
-    _tplName = ''
+class RHGetVarsJs(base.RH):
+    _tplName = 'vars.js'
 
     def __init__(self, req):
         base.RH.__init__(self, req)
+        self._dict = {}
 
     def process(self, params):
         # Check incoming headers
@@ -70,18 +70,10 @@ class RHTemplateContentJS(base.RH):
             Logger.get('vars_js').exception('Problem generating vars.js')
             raise
 
-
-class RHGetVarsJs(RHTemplateContentJS):
-    _tplName = 'vars.js'
-
-    def __init__(self, req):
-        RHTemplateContentJS.__init__(self, req)
-        self._dict = {}
-
     @classmethod
     def removeTmpVarsFile(cls):
         cfg = Config.getInstance()
-        fileName = cfg.getTPLFile( cls._tplName )
+        fileName = cfg.getTPLFile(cls._tplName)
 
         if not fileName:
             fileName = "%s.tpl" % cls._tplName
