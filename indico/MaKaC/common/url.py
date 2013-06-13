@@ -30,13 +30,22 @@ from MaKaC.errors import MaKaCError
 
 class _BaseURL(object):
     def __init__(self, params):
-        self.fragment = None
+        self._fragment = None
         self._url = None
         self._modified = True
         self._params = dict(params) if params else {}
 
     def _rebuild(self):
         raise NotImplementedError
+
+    @property
+    def fragment(self):
+        return self._fragment
+
+    @fragment.setter
+    def fragment(self, fragment):
+        self._fragment = fragment
+        self._modified = True
 
     def setSegment(self, segment):
         self.fragment = segment
@@ -110,7 +119,8 @@ class EndpointURL(_BaseURL):
         # with a slash this is not a problem. It overwrites the path part in baseURL but it's
         # the same one. maybe we could even get rid of the baseURL stuff at some point... It's
         # only really important when we change from SSL to non-SSL or vice versa anyway
-        self._url = url_join(self._base_url, url_for(self._endpoint, **self._params))
+        anchor = self.fragment or None
+        self._url = url_join(self._base_url, url_for(self._endpoint, _anchor=anchor, **self._params))
 
     @property
     def js_router(self):
