@@ -46,7 +46,7 @@ class _Worker(object):
         context of the thread (due to database reasons)
         """
 
-        self._prepareDB()
+        self._dbi = DBMgr.getInstance()
         self._dbi.startRequest()
 
         with self._dbi.transaction() as conn:
@@ -157,9 +157,6 @@ class ThreadWorker(_Worker, threading.Thread):
         super(ThreadWorker, self).__init__(tid, configData, delay)
         self._result = 0
 
-    def _prepareDB(self):
-        self._dbi = DBMgr.getInstance()
-
     def _setResult(self, res):
         self._result = res
 
@@ -172,17 +169,6 @@ class ProcessWorker(_Worker, multiprocessing.Process):
     def __init__(self, tid, configData, delay):
         super(ProcessWorker, self).__init__(tid, configData, delay)
         self._result = multiprocessing.Value('i', 0)
-
-    def _prepareDB(self):
-        # since the DBMgr instance will be replicated across objects,
-        # we just set it as None for this one.
-
-        # first, store the server address - this wouldn't normally be needed,
-        # but the tests won't work otherwise (as the DB is _not_ the default one)
-        hostname, port = DBMgr._instance._db.storage._addr
-
-        DBMgr.setInstance(DBMgr(hostname, port))
-        self._dbi = DBMgr.getInstance()
 
     def isAlive(self):
         return self.is_alive()

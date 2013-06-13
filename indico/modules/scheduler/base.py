@@ -19,6 +19,7 @@
 
 import time, types
 from ZODB.POSException import ConflictError
+from MaKaC.common import DBMgr
 
 from indico.util.date_time import nowutc
 
@@ -49,7 +50,7 @@ class OperationManager(object):
     def __call__(self, zelf, *args, **kwargs):
         # some magic introspection
         logger = zelf._logger
-        dbi = zelf._dbi
+        dbi = DBMgr.getInstance()
         sync = False
 
         logger.debug("START Critical section around  %s" % self._f.__name__)
