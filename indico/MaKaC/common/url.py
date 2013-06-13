@@ -83,7 +83,10 @@ class URL(_BaseURL):
         base = url_parse(self._absolute_url)
         params = base.decode_query()
         for key, value in self._params.iteritems():
-            params[key] = value
+            if isinstance(value, (list, tuple)):
+                params.setlist(key, value)
+            else:
+                params[key] = value
         self._url = url_unparse(base._replace(query=url_encode(params), fragment=self.fragment))
 
     @property
@@ -154,5 +157,3 @@ class ShortURLMapper(ObjectHolder):
         if not tree.has_key( item.getUrlTag() ):
             return
         del tree[item.getUrlTag()]
-
-
