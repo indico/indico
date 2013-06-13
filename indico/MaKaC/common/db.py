@@ -99,7 +99,10 @@ class DBMgr:
 
     @classmethod
     def setInstance(cls, dbInstance):
-        cls._instances[os.getpid()] = dbInstance
+        if dbInstance is None:
+            cls._instances.pop(os.getpid(), None)
+        else:
+            cls._instances[os.getpid()] = dbInstance
 
     def _getConnObject(self):
         return self._conn.conn
