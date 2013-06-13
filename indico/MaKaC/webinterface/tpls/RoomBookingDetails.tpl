@@ -430,10 +430,10 @@
                                             % for period in reservation.splitToPeriods():
                                                 ${ formatDate(period.startDT.date()) }
                                                 % if canReject:
-                                                    <a href="javascript: void( 0 )" onclick="submit_reject_occurrence( '${ urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( reservation, formatDate(period.startDT.date()) ) }');">Reject</a>
+                                                    <a href="javascript: void( 0 )" onclick="submit_reject_occurrence( '${ urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( reservation, date=formatDate(period.startDT.date()) ) }');">Reject</a>
                                                 % endif
                                                 % if canCancel:
-                                                    <a href="javascript: void( 0 )" onclick="submit_cancel_occurrence('${ urlHandlers.UHRoomBookingCancelBookingOccurrence.getURL( reservation, formatDate(period.startDT.date()) ) }');">Cancel</a>
+                                                    <a href="javascript: void( 0 )" onclick="submit_cancel_occurrence('${ urlHandlers.UHRoomBookingCancelBookingOccurrence.getURL( reservation, date=formatDate(period.startDT.date()) ) }');">Cancel</a>
                                                 % endif
 
                                                 <br />

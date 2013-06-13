@@ -39,6 +39,22 @@ to eassily change the urls or the parameter names without affecting the rest of
 the system.
 """
 
+
+class BooleanOnMixin:
+    """Mixin to convert True to 'on' and remove False altogether."""
+    _true = 'on'
+
+    @classmethod
+    def _translateParams(cls, params):
+        return dict((key, cls._true if value is True else value)
+                    for key, value in params.iteritems()
+                    if value is not False)
+
+
+class BooleanTrueMixin:
+    _true = 'True'
+
+
 class URLHandler(object):
     """This is the generic URLHandler class. It contains information about the
         concrete URL pointing to the request handler and gives basic methods to
@@ -53,10 +69,14 @@ class URLHandler(object):
             handler.
         _endpoint - (string) Contains the name of a Flask endpoint.
         _secure - (bool) Always create secure URLs if possible
+        _defaultParams - (dict) Default params (overwritten by kwargs)
+        _fragment - (string) URL fragment to set
     """
     _relativeURL = None
     _endpoint = None
     _secure = False
+    _defaultParams = {}
+    _fragment = False
 
     @classmethod
     def getRelativeURL(cls):
@@ -82,10 +102,20 @@ class URLHandler(object):
             # Legacy UH containing a relativeURL
             cfg = Config.getInstance()
             baseURL = cfg.getBaseSecureURL() if secure else cfg.getBaseURL()
-            return URL('%s/%s' % (baseURL, cls.getRelativeURL()), **params)
+            url = URL('%s/%s' % (baseURL, cls.getRelativeURL()), **params)
+        else:
+            assert not cls.getRelativeURL()
+            url = EndpointURL(cls._endpoint, secure, params)
 
-        assert not cls.getRelativeURL()
-        return EndpointURL(cls._endpoint, secure, params)
+        if cls._fragment:
+            url.fragment = cls._fragment
+
+        return url
+
+
+    @classmethod
+    def _translateParams(cls, params):
+        return params
 
     @classmethod
     def getURL(cls, target=None, **params):
@@ -99,6 +129,8 @@ class URLHandler(object):
                     is able to retrieve it.
                 params - (Dict) parameters to be added to the URL.
         """
+        params = dict(cls._defaultParams, **params)
+        params = cls._translateParams(params)
         if target is not None:
             params.update(target.getLocator())
         return cls._getURL(**params)
@@ -149,18 +181,19 @@ class UHWelcome( URLHandler ):
     _relativeURL = "index.py"
 
 
-class UHSignIn( URLHandler ):
-    _relativeURL = "signIn.py"
+class UHSignIn(URLHandler):
+    _endpoint = 'legacy.signIn'
 
-    def getURL( cls, returnURL="" ):
-        if Config.getInstance().getLoginURL() != "":
+    @classmethod
+    def getURL(cls, returnURL=''):
+        returnURL = str(returnURL).strip()
+        if Config.getInstance().getLoginURL():
             url = URL(Config.getInstance().getLoginURL())
         else:
             url = cls._getURL()
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
+        if returnURL:
+            url.addParam('returnURL', returnURL)
         return url
-    getURL = classmethod( getURL )
 
 
 class UHActiveAccount( URLHandler ):
@@ -182,15 +215,17 @@ class UHSendLogin( URLHandler ):
 class UHUnactivatedAccount( URLHandler ):
     _relativeURL = "signIn.py/unactivatedAccount"
 
-class UHSignOut( URLHandler ):
-    _relativeURL = "logOut.py"
 
-    def getURL( cls, returnURL="" ):
+class UHSignOut(URLHandler):
+    _endpoint = 'legacy.logOut'
+
+    @classmethod
+    def getURL(cls, returnURL=''):
+        returnURL = str(returnURL).strip()
         url = cls._getURL()
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
+        if returnURL:
+            url.addParam('returnURL', returnURL)
         return url
-    getURL = classmethod( getURL )
 
 
 class UHOAuthRequestToken(URLHandler):
@@ -223,36 +258,38 @@ class UHIndicoNews( URLHandler ):
 class UHConferenceHelp(URLHandler):
     _relativeURL ="help.py"
 
-class UHCalendar( URLHandler ):
-    _relativeURL = "wcalendar.py"
 
-    def getURL( cls, categList = None ):
+class UHCalendar(URLHandler):
+    _endpoint = 'legacy.wcalendar'
+
+    @classmethod
+    def getURL(cls, categList=None):
         url = cls._getURL()
         if not categList:
             categList = []
-        l = []
-        for categ in categList:
-            l.append( categ.getId() )
-        url.addParam( "selCateg", l )
+        lst = [categ.getId() for categ in categList]
+        url.addParam('selCateg', lst)
         return url
-    getURL = classmethod( getURL )
 
 
 class UHCalendarSelectCategories( URLHandler ):
-    _relativeURL = "wcalendar.py/select"
+    _endpoint = 'legacy.wcalendar-select'
 
 
 class UHSimpleCalendar( URLHandler ):
     _relativeURL = "calendarSelect.py"
 
-class UHConferenceCreation( URLHandler ):
-    _relativeURL = "conferenceCreation.py"
+
+class UHConferenceCreation(URLHandler):
+    _endpoint = 'legacy.conferenceCreation'
+
     @classmethod
-    def getURL( cls, target):
+    def getURL(cls, target):
         url = cls._getURL()
         if target is not None:
-            url.addParams( target.getLocator() )
+            url.addParams(target.getLocator())
         return url
+
 
 class UHConferencePerformCreation( URLHandler ):
     _relativeURL = "conferenceCreation.py/createConference"
@@ -266,16 +303,11 @@ class UHNextEvent(URLHandler):
 class UHPreviousEvent(URLHandler):
     _relativeURL = "conferenceDisplay.py/prev"
 
-class UHConferenceOverview( URLHandler ):
-    _relativeURL = "conferenceDisplay.py"
 
-    @classmethod
-    def getURL( cls, target ):
-        url = cls._getURL()
-        if target is not None:
-            url.addParams( target.getLocator() )
-        url.addParam( 'ovw', True )
-        return url
+class UHConferenceOverview(URLHandler):
+    _endpoint = 'legacy.conferenceDisplay'
+    _defaultParams = dict(ovw=True)
+
 
 class UHConferenceEmail(URLHandler):
     _relativeURL = "EMail.py"
@@ -339,16 +371,11 @@ class UHRoomBookingMapOfRoomsWidget( URLHandler ):
 class UHRoomBookingWelcome( URLHandler ):
     _relativeURL = "roomBooking.py"
 
-class UHRoomBookingSearch4Rooms( URLHandler ):
-    _relativeURL = "roomBooking.py/search4Rooms"
-    @classmethod
-    def getURL( cls, forNewBooking = False ):
-        url = cls._getURL()
-        if forNewBooking:
-            url.addParam( 'forNewBooking', True )
-        else:
-            url.addParam( 'forNewBooking', False )
-        return url
+
+class UHRoomBookingSearch4Rooms(URLHandler):
+    _endpoint = 'legacy.roomBooking-search4Rooms'
+    _defaultParams = dict(forNewBooking=False)
+
 
 class UHRoomBookingSearch4Bookings( URLHandler ):
     _relativeURL = "roomBooking.py/search4Bookings"
@@ -356,18 +383,17 @@ class UHRoomBookingSearch4Bookings( URLHandler ):
 class UHRoomBookingBookRoom( URLHandler ):
     _relativeURL = "roomBooking.py/bookRoom"
 
-class UHRoomBookingRoomList( URLHandler ):
-    _relativeURL = "roomBooking.py/roomList"
+
+class UHRoomBookingRoomList(BooleanOnMixin, URLHandler):
+    _endpoint = 'legacy.roomBooking-roomList'
+
+
+class UHRoomBookingBookingList(URLHandler):
+    _endpoint = 'legacy.roomBooking-bookingList'
+
     @classmethod
-    def getURL( cls, onlyMy = False ):
-        url = cls._getURL()
-        if onlyMy:
-            url.addParam( 'onlyMy', 'on' )
-        return url
-class UHRoomBookingBookingList( URLHandler ):
-    _relativeURL = "roomBooking.py/bookingList"
-    @classmethod
-    def getURL( cls, onlyMy = False, newBooking = False,  ofMyRooms = False, onlyPrebookings = False, autoCriteria = False, newParams = None, today = False, allRooms = False ):
+    def getURL(cls, onlyMy=False, newBooking=False, ofMyRooms=False, onlyPrebookings=False, autoCriteria=False,
+               newParams=None, today=False, allRooms=False):
         """
         onlyMy - only bookings of the current user
         ofMyRooms - only bookings for rooms managed by the current user
@@ -375,39 +401,27 @@ class UHRoomBookingBookingList( URLHandler ):
         """
         url = cls._getURL()
         if onlyMy:
-            url.addParam( 'onlyMy', 'on' )
+            url.addParam('onlyMy', 'on')
         if newBooking:
-            url.addParam( 'newBooking', 'on' )
+            url.addParam('newBooking', 'on')
         if ofMyRooms:
-            url.addParam( 'ofMyRooms', 'on' )
+            url.addParam('ofMyRooms', 'on')
         if onlyPrebookings:
-            url.addParam( 'onlyPrebookings', 'on' )
+            url.addParam('onlyPrebookings', 'on')
         if autoCriteria:
-            url.addParam( 'autoCriteria', 'True' )
+            url.addParam('autoCriteria', 'True')
         if today:
-            url.addParam( 'day', 'today' )
+            url.addParam('day', 'today')
         if allRooms:
-            url.addParam( 'roomGUID', 'allRooms' )
+            url.addParam('roomGUID', 'allRooms')
         if newParams:
-            url.setParams( newParams )
+            url.setParams(newParams)
         return url
 
-class UHRoomBookingRoomDetails( URLHandler ):
-    _relativeURL = "roomBooking.py/roomDetails"
 
-    @classmethod
-    def getURL( cls, target = None, calendarMonths = None ):
-        """
-        onlyMy - only bookings of the current user
-        ofMyRooms - only bookings for rooms managed by the current user
-        autoCriteria - some reasonable constraints, like "only one month ahead"
-        """
-        url = cls._getURL()
-        if target:
-            url.setParams( target.getLocator() )
-        if calendarMonths:
-            url.addParam( 'calendarMonths', 'True' )
-        return url
+class UHRoomBookingRoomDetails(BooleanTrueMixin, URLHandler):
+    _endpoint = "legacy.roomBooking-roomDetails"
+
 
 class UHRoomBookingRoomStats( URLHandler ):
     _relativeURL = "roomBooking.py/roomStats"
@@ -438,29 +452,14 @@ class UHRoomBookingRejectBooking( URLHandler ):
     _relativeURL = "roomBooking.py/rejectBooking"
 class UHRoomBookingRejectAllConflicting( URLHandler):
     _relativeURL = "roomBooking.py/rejectAllConflicting"
-class UHRoomBookingRejectBookingOccurrence( URLHandler ):
-    _relativeURL = "roomBooking.py/rejectBookingOccurrence"
 
-    @classmethod
-    def getURL( cls, target, date ):
-        url = cls._getURL()
-        if target:
-            url.setParams( target.getLocator() )
-        if date:
-            url.addParam( 'date', date )
-        return url
+
+class UHRoomBookingRejectBookingOccurrence(URLHandler):
+    _endpoint = 'legacy.roomBooking-rejectBookingOccurrence'
+
 
 class UHRoomBookingCancelBookingOccurrence( URLHandler ):
-    _relativeURL = "roomBooking.py/cancelBookingOccurrence"
-
-    @classmethod
-    def getURL( cls, target, date ):
-        url = cls._getURL()
-        if target:
-            url.setParams( target.getLocator() )
-        if date:
-            url.addParam( 'date', date )
-        return url
+    _endpoint = 'legacy.roomBooking-cancelBookingOccurrence'
 
 
 class UHRoomBookingStatement( URLHandler ):
@@ -499,37 +498,19 @@ class UHRoomBookingSaveCustomAttributes( URLHandler ):
 class UHRoomBookingDeleteCustomAttribute( URLHandler ):
     _relativeURL = "roomBooking.py/deleteCustomAttribute"
 
-class UHRoomBookingBlockingsMyRooms( URLHandler ):
-    _relativeURL = "roomBooking.py/blockingsForMyRooms"
-    @classmethod
-    def getURL(cls, filterState=None):
-        """
-        filterState - only show requests which have the given state
-        """
-        url = cls._getURL()
-        if filterState:
-            url.addParam( 'filterState', filterState )
-        return url
+
+class UHRoomBookingBlockingsMyRooms(URLHandler):
+    _endpoint = 'legacy.roomBooking-blockingsForMyRooms'
+
 
 class UHRoomBookingBlockingsBlockingDetails( URLHandler ):
     _relativeURL = "roomBooking.py/blockingDetails"
 
-class UHRoomBookingBlockingList( URLHandler ):
-    _relativeURL = "roomBooking.py/blockingList"
-    @classmethod
-    def getURL(cls, onlyMine=False, onlyRecent=False, onlyThisYear=True):
-        """
-        onlyMine - only show own blockings
-        onlyRecent - only show bookings ending in the future
-        """
-        url = cls._getURL()
-        if onlyMine:
-            url.addParam( 'onlyMine', 'on' )
-        if onlyRecent:
-            url.addParam( 'onlyRecent', 'on' )
-        if onlyThisYear:
-            url.addParam( 'onlyThisYear', 'on' )
-        return url
+
+class UHRoomBookingBlockingList(BooleanOnMixin, URLHandler):
+    _endpoint = 'legacy.roomBooking-blockingList'
+    _defaultParams = dict(onlyThisYear=True)
+
 
 class UHRoomBookingBlockingForm( URLHandler ):
     _relativeURL = "roomBooking.py/blockingForm"
@@ -553,17 +534,10 @@ class UHConfModifRoomBookingBase(URLHandler):
 class UHConfModifRoomBookingChooseEvent( URLHandler ):
     _relativeURL = "conferenceModification.py/roomBookingChooseEvent"
 
-class UHConfModifRoomBookingSearch4Rooms( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingSearch4Rooms"
 
-    @classmethod
-    def getURL( cls, target = None, dontAssign = False  ):
-        url = cls._getURL()
-        if target:
-            url.setParams( target.getLocator() )
-        if dontAssign:
-            url.addParam( "dontAssign", True )
-        return url
+class UHConfModifRoomBookingSearch4Rooms(BooleanTrueMixin, URLHandler):
+    _endpoint = 'legacy.conferenceModification-roomBookingSearch4Rooms'
+
 
 class UHConfModifRoomBookingList( URLHandler ):
     _relativeURL = "conferenceModification.py/roomBookingList"
@@ -578,8 +552,19 @@ class UHConfModifRoomBookingRoomDetails(UHConfModifRoomBookingBase):
 class UHConfModifRoomBookingBookingForm(UHConfModifRoomBookingBase):
     _relativeURL = "conferenceModification.py/roomBookingBookingForm"
 
+
 class UHConfModifRoomBookingCloneBooking(UHConfModifRoomBookingBase):
-    _relativeURL = "conferenceModification.py/roomBookingCloneBooking"
+    _endpoint = 'legacy.conferenceModification-roomBookingCloneBooking'
+
+    @classmethod
+    def getURL(cls, target=None, conf=None, **params):
+        url = cls._getURL(**params)
+        if target is not None:
+            url.addParams(target.getLocator())
+        if conf is not None:
+            url.addParams(conf.getLocator())
+        return url
+
 
 class UHConfModifRoomBookingSaveBooking( URLHandler ):
     _relativeURL = "conferenceModification.py/roomBookingSaveBooking"
@@ -629,14 +614,10 @@ class UHConferenceModificationClosed( URLHandler ):
 class UHConferenceOpen( URLHandler ):
     _relativeURL = "conferenceModification.py/open"
 
-class UHConfDataModif( URLHandler ):
+
+class UHConfDataModif(URLHandler):
     _relativeURL = "conferenceModification.py/data"
-    @classmethod
-    def getURL( cls, target):
-        url = cls._getURL()
-        if target is not None:
-            url.addParams( target.getLocator() )
-        return url
+
 
 class UHConfScreenDatesEdit( URLHandler ):
     _relativeURL = "conferenceModification.py/screenDates"
@@ -756,16 +737,9 @@ class UHConfAbstractList(URLHandler):
     _relativeURL = "abstractsManagment.py"
 
 
-class UHAbstractSubmission( URLHandler ):
-    _relativeURL = "abstractSubmission.py"
-
-    def getURL( cls, target=None ):
-        url = cls._getURL()
-        if target:
-            url.setParams( target.getLocator() )
-        url.setSegment("interest")
-        return url
-    getURL = classmethod( getURL )
+class UHAbstractSubmission(URLHandler):
+    _endpoint = 'legacy.abstractSubmission'
+    _fragment = 'interest'
 
 
 class UHAbstractSubmissionConfirmation( URLHandler ):
@@ -832,16 +806,10 @@ class UHUserAbstracts( URLHandler ):
 class UHUserAbstractsPDF( URLHandler ):
     _relativeURL = "userAbstracts.py/pdf"
 
-class UHAbstractModify( URLHandler ):
-    _relativeURL = "abstractModify.py"
 
-    def getURL( cls, target=None ):
-        url = cls._getURL()
-        if target:
-            url.setParams( target.getLocator() )
-        url.setSegment("interest")
-        return url
-    getURL = classmethod( getURL )
+class UHAbstractModify(URLHandler):
+    _endpoint = 'legacy.abstractModify'
+    _fragment = 'interest'
 
 
 class UHCFAModifAbstracts( URLHandler ):
@@ -1015,15 +983,13 @@ class UHTrackModifAbstracts( URLHandler ):
     _relativeURL = "trackModifAbstracts.py"
 
 
-
-class UHTrackAbstractBase( URLHandler ):
-
-    def getURL( cls, track, abstract ):
+class UHTrackAbstractBase(URLHandler):
+    @classmethod
+    def getURL(cls, track, abstract):
         url = cls._getURL()
-        url.setParams( track.getLocator() )
-        url.addParam( "abstractId", abstract.getId() )
+        url.setParams(track.getLocator())
+        url.addParam('abstractId', abstract.getId())
         return url
-    getURL = classmethod( getURL )
 
 
 class UHTrackAbstractModif( UHTrackAbstractBase ):
@@ -1469,18 +1435,20 @@ class UHUserManagementSwitchModerateAccountCreation( URLHandler ):
 class UHUsers( URLHandler ):
     _relativeURL = "userList.py"
 
-class UHUserCreation( URLHandler ):
-    _relativeURL = "userRegistration.py"
+class UHUserCreation(URLHandler):
+    _endpoint = 'legacy.userRegistration'
 
-    def getURL( cls, returnURL="" ):
-        if Config.getInstance().getRegistrationURL() != "":
+    @classmethod
+    def getURL(cls, returnURL=''):
+        returnURL = str(returnURL).strip()
+        if Config.getInstance().getRegistrationURL():
             url = URL(Config.getInstance().getRegistrationURL())
         else:
             url = cls._getURL()
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
+        if returnURL:
+            url.addParam('returnURL', returnURL)
         return url
-    getURL = classmethod( getURL )
+
 
 class UHUserPerformCreation( URLHandler ):
     _relativeURL = "userRegistration.py/update"
@@ -1489,53 +1457,54 @@ class UHUserMerge( URLHandler ):
     _relativeURL = "userMerge.py"
 
 
-class UHConfSignIn( SecureURLHandler ):
-    _relativeURL = "confLogin.py"
+class UHConfSignIn(SecureURLHandler):
+    _endpoint = 'legacy.confLogin'
 
-    def getURL( cls, conf, returnURL="" ):
-        if Config.getInstance().getLoginURL().strip() != "":
+    @classmethod
+    def getURL(cls, conf, returnURL=''):
+        returnURL = str(returnURL).strip()
+        if Config.getInstance().getLoginURL():
             url = URL(Config.getInstance().getLoginURL())
         else:
             url = cls._getURL()
         if conf is not None:
-            url.setParams( conf.getLocator() )
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
+            url.setParams(conf.getLocator())
+        if returnURL:
+            url.addParam('returnURL', returnURL)
         return url
-    getURL = classmethod( getURL )
 
 
-class UHConfSignInAuthenticate( UHConfSignIn ):
-    _relativeURL = "confLogin.py/signIn"
+class UHConfSignInAuthenticate(UHConfSignIn):
+    _endpoint = 'legacy.confLogin-signIn'
 
 
-class UHConfUserCreation( URLHandler ):
-    _relativeURL = "confUser.py"
+class UHConfUserCreation(URLHandler):
+    _endpoint = 'legacy.confUser'
 
-    def getURL( cls, conf, returnURL="" ):
-        if Config.getInstance().getRegistrationURL().strip() != "":
+    @classmethod
+    def getURL(cls, conf, returnURL=''):
+        returnURL = str(returnURL).strip()
+        if Config.getInstance().getRegistrationURL():
             url = URL(Config.getInstance().getRegistrationURL())
         else:
             url = cls._getURL()
         if conf is not None:
-            url.setParams( conf.getLocator() )
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
+            url.setParams(conf.getLocator())
+        if returnURL:
+            url.addParam('returnURL', returnURL)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfUser( URLHandler ):
 
-    def getURL( cls, conference, av=None ):
+class UHConfUser(URLHandler):
+    @classmethod
+    def getURL(cls, conference, av=None):
         url = cls._getURL()
         if conference is not None:
             loc = conference.getLocator().copy()
             if av:
-                for i in av.getLocator().keys():
-                    loc[i] = av.getLocator()[i]
-            url.setParams( loc )
+                loc.update(av.getLocator())
+            url.setParams(loc)
         return url
-    getURL = classmethod( getURL )
 
 
 class UHConfDisabledAccount( UHConfUser ):
@@ -1673,15 +1642,14 @@ class UHGroupPerformModification( URLHandler ):
 
 
 class UHPrincipalDetails:
-
-    def getURL( cls, member ):
-        if isinstance( member, user.Group ):
-            return UHGroupDetails.getURL( member )
-        elif isinstance( member, user.Avatar ):
-            return UHUserDetails.getURL( member )
+    @classmethod
+    def getURL(cls, member):
+        if isinstance(member, user.Group):
+            return UHGroupDetails.getURL(member)
+        elif isinstance(member, user.Avatar):
+            return UHUserDetails.getURL(member)
         else:
-            return ""
-    getURL = classmethod( getURL )
+            return ''
 
 
 class UHDomains( URLHandler ):
@@ -1765,10 +1733,11 @@ class UHAdminsSystemModif( URLHandler ):
 class UHAdminsProtection( URLHandler ):
     _relativeURL = "adminProtection.py"
 
-class UHMaterialModification( URLHandler ):
+
+class UHMaterialModification(URLHandler):
 
     @classmethod
-    def getURL( cls, material, returnURL="" ):
+    def getURL(cls, material, returnURL=""):
         from MaKaC import conference
 
         owner = material.getOwner()
@@ -1796,12 +1765,12 @@ class UHFileEnterAccessKey( URLHandler ):
     _relativeURL = "getFile.py/accessKey"
 
 
-class UHCategoryModification( URLHandler ):
-    _relativeURL = "categoryModification.py"
+class UHCategoryModification(URLHandler):
+    _endpoint = 'legacy.categoryModification'
 
-    def getActionURL( cls ):
-        return ""
-    getActionURL = classmethod( getActionURL )
+    @classmethod
+    def getActionURL(cls):
+        return ''
 
 
 class UHCategoryAddMaterial( URLHandler ):
@@ -1869,52 +1838,54 @@ class UHCategoryPerformCreation( URLHandler ):
     _relativeURL = "categoryCreation.py/create"
 
 
-class UHCategoryDisplay( URLHandler ):
-    _relativeURL = "categoryDisplay.py"
+class UHCategoryDisplay(URLHandler):
+    _endpoint = 'legacy.categoryDisplay'
 
-    def getURL( cls, target=None ):
+    @classmethod
+    def getURL(cls, target=None):
         url = cls._getURL()
         if target:
             if target.isRoot():
                 return UHWelcome.getURL()
-            url.setParams( target.getLocator() )
+            url.setParams(target.getLocator())
         return url
-    getURL = classmethod( getURL )
 
 
 class UHCategoryMap( URLHandler ):
     _relativeURL = "categoryMap.py"
 
-class UHCategoryOverview( URLHandler ):
-    _relativeURL = "categOverview.py"
 
-    def getURLFromOverview( cls, ow ):
+class UHCategoryOverview(URLHandler):
+    _endpoint = 'legacy.categOverview'
+
+    @classmethod
+    def getURLFromOverview(cls, ow):
         url = cls.getURL()
-        url.setParams( ow.getLocator() )
+        url.setParams(ow.getLocator())
         return url
-    getURLFromOverview = classmethod( getURLFromOverview )
 
     @classmethod
     def getWeekOverviewUrl(cls, categ):
         url = cls.getURL(categ)
-        p = {"day" : nowutc().day,
-             "month" : nowutc().month,
-             "year" : nowutc().year,
-             "period" : "week",
-             "detail" : "conference"}
+        p = {"day": nowutc().day,
+             "month": nowutc().month,
+             "year": nowutc().year,
+             "period": "week",
+             "detail": "conference"}
         url.addParams(p)
         return url
 
     @classmethod
     def getMonthOverviewUrl(cls, categ):
         url = cls.getURL(categ)
-        p = {"day" : nowutc().day,
-             "month" : nowutc().month,
-             "year" : nowutc().year,
-             "period" : "month",
-             "detail" : "conference"}
+        p = {"day": nowutc().day,
+             "month": nowutc().month,
+             "year": nowutc().year,
+             "period": "month",
+             "detail": "conference"}
         url.addParams(p)
         return url
+
 
 class UHGeneralInfoModification( URLHandler ):
     _relativeURL = "generalInfoModification.py"
@@ -2164,14 +2135,13 @@ class UHTrackAbstractModIntCommentNew(UHTrackAbstractBase):
     _relativeURL = "trackAbstractModif.py/commentNew"
 
 
-class UHTrackAbstractModCommentBase( URLHandler ):
-
-    def getURL( cls, track, comment):
+class UHTrackAbstractModCommentBase(URLHandler):
+    @classmethod
+    def getURL(cls, track, comment):
         url = cls._getURL()
-        url.setParams( comment.getLocator() )
-        url.addParam( "trackId", track.getId() )
+        url.setParams(comment.getLocator())
+        url.addParam("trackId", track.getId())
         return url
-    getURL = classmethod( getURL )
 
 
 class UHTrackAbstractModIntCommentEdit(UHTrackAbstractModCommentBase):
@@ -2849,26 +2819,30 @@ class UHConfRegistrationFormCreation( URLHandler ):
 class UHConfRegistrationFormConditions( URLHandler ):
     _relativeURL = "confRegistrationFormDisplay.py/conditions"
 
-class UHConfRegistrationFormSignIn( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/signIn"
 
-    def getURL( cls, conf, returnURL="" ):
+class UHConfRegistrationFormSignIn(URLHandler):
+    _endpoint = 'legacy.confRegistrationFormDisplay-signIn'
+
+    @classmethod
+    def getURL(cls, conf, returnURL=''):
+        returnURL = str(returnURL).strip()
         url = cls._getURL()
         url.setParams(conf.getLocator())
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
+        if returnURL:
+            url.addParam("returnURL", returnURL)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfRegistrationFormCreationDone( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/creationDone"
 
-    def getURL( cls, registrant):
+class UHConfRegistrationFormCreationDone(URLHandler):
+    _endpoint = 'legacy.confRegistrationFormDisplay-creationDone'
+
+    @classmethod
+    def getURL(cls, registrant):
         url = cls._getURL()
         url.setParams(registrant.getLocator())
-        url.addParam( "authkey", registrant.getRandomId() )
+        url.addParam('authkey', registrant.getRandomId())
         return url
-    getURL = classmethod( getURL )
+
 
 class UHConfRegistrationFormconfirmBooking( URLHandler ):
     _relativeURL = "confRegistrationFormDisplay.py/confirmBooking"
@@ -3161,13 +3135,12 @@ class UHCategoryCalendarOverview( URLHandler ):
     _relativeURL ="wcalendar.py"
 
 
-"""
-URL Handlers for  Printing and Design
-"""
-class UHConfModifBadgePrinting ( URLHandler ):
-    _relativeURL = "confModifTools.py/badgePrinting"
+# URL Handlers for Printing and Design
+class UHConfModifBadgePrinting(URLHandler):
+    _endpoint = "legacy.confModifTools-badgePrinting"
 
-    def getURL( cls, target=None, templateId=None, deleteTemplateId=None, cancel=False, new=False, copyTemplateId=None ):
+    @classmethod
+    def getURL(cls, target=None, templateId=None, deleteTemplateId=None, cancel=False, new=False, copyTemplateId=None):
         """
           -The deleteTemplateId param should be set if we want to erase a template.
           -The copyTemplateId param should be set if we want to duplicate a template
@@ -3191,12 +3164,13 @@ class UHConfModifBadgePrinting ( URLHandler ):
             if new:
                 url.addParam("new", True)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfModifBadgeDesign ( URLHandler ):
-    _relativeURL = "confModifTools.py/badgeDesign"
 
-    def getURL( cls, target=None, templateId=None, new=False):
+class UHConfModifBadgeDesign(URLHandler):
+    _endpoint = 'legacy.confModifTools-badgeDesign'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, new=False):
         """
           -The templateId param should always be set:
            *if we are editing a template, it's the id of the template edited.
@@ -3211,12 +3185,13 @@ class UHConfModifBadgeDesign ( URLHandler ):
                 url.addParam("templateId", templateId)
             url.addParam("new", new)
         return url
-    getURL = classmethod( getURL )
 
-class UHModifDefTemplateBadge ( URLHandler ):
-    _relativeURL = "badgeTemplates.py/badgeDesign"
 
-    def getURL( cls, target=None, templateId=None, new=False):
+class UHModifDefTemplateBadge(URLHandler):
+    _endpoint = 'legacy.badgeTemplates-badgeDesign'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, new=False):
         """
           -The templateId param should always be set:
            *if we are editing a template, it's the id of the template edited.
@@ -3231,41 +3206,43 @@ class UHModifDefTemplateBadge ( URLHandler ):
                 url.addParam("templateId", templateId)
             url.addParam("new", new)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfModifBadgeSaveBackground ( URLHandler ):
-    _relativeURL = "confModifTools.py/badgeSaveBackground"
 
-    def getURL( cls, target=None, templateId=None ):
+class UHConfModifBadgeSaveBackground(URLHandler):
+    _endpoint = 'legacy.confModifTools-badgeSaveBackground'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None):
         url = cls._getURL()
         if target is not None and templateId is not None:
             url.setParams(target.getLocator())
             url.addParam("templateId", templateId)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfModifBadgeGetBackground ( URLHandler ):
-    _relativeURL = "confModifTools.py/badgeGetBackground"
 
-    def getURL( cls, target=None, templateId=None, backgroundId=None):
+class UHConfModifBadgeGetBackground(URLHandler):
+    _endpoint = 'legacy.confModifTools-badgeGetBackground'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, backgroundId=None):
         url = cls._getURL()
         if target is not None and templateId is not None:
             url.setParams(target.getLocator())
             url.addParam("templateId", templateId)
             url.addParam("backgroundId", backgroundId)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfModifBadgePrintingPDF ( URLHandler ):
-    _relativeURL = "confModifTools.py/badgePrintingPDF"
 
-"""
-URL Handlers for Poster Printing and Design
-"""
-class UHConfModifPosterPrinting ( URLHandler ):
-    _relativeURL = "confModifTools.py/posterPrinting"
+class UHConfModifBadgePrintingPDF(URLHandler):
+    _endpoint = 'legacy.confModifTools-badgePrintingPDF'
 
-    def getURL( cls, target=None, templateId=None, deleteTemplateId=None, cancel=False, new=False, copyTemplateId=None ):
+
+# URL Handlers for Poster Printing and Design
+class UHConfModifPosterPrinting(URLHandler):
+    _endpoint = 'legacy.confModifTools-posterPrinting'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, deleteTemplateId=None, cancel=False, new=False, copyTemplateId=None):
         """
           -The deleteTemplateId param should be set if we want to erase a template.
           -The copyTemplateId param should be set if we want to duplicate a template
@@ -3291,12 +3268,13 @@ class UHConfModifPosterPrinting ( URLHandler ):
             if new:
                 url.addParam("new", True)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfModifPosterDesign ( URLHandler ):
-    _relativeURL = "confModifTools.py/posterDesign"
 
-    def getURL( cls, target=None, templateId=None, new=False):
+class UHConfModifPosterDesign(URLHandler):
+    _endpoint = 'legacy.confModifTools-posterDesign'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, new=False):
         """
           -The templateId param should always be set:
            *if we are editing a template, it's the id of the template edited.
@@ -3311,12 +3289,13 @@ class UHConfModifPosterDesign ( URLHandler ):
                 url.addParam("templateId", templateId)
             url.addParam("new", new)
         return url
-    getURL = classmethod( getURL )
 
-class UHModifDefTemplatePoster ( URLHandler ):
-    _relativeURL = "posterTemplates.py/posterDesign"
 
-    def getURL( cls, target=None, templateId=None, new=False):
+class UHModifDefTemplatePoster(URLHandler):
+    _endpoint = 'legacy.posterTemplates-posterDesign'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, new=False):
         """
           -The templateId param should always be set:
            *if we are editing a template, it's the id of the template edited.
@@ -3331,46 +3310,40 @@ class UHModifDefTemplatePoster ( URLHandler ):
                 url.addParam("templateId", templateId)
             url.addParam("new", new)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfModifPosterSaveBackground ( URLHandler ):
-    _relativeURL = "confModifTools.py/posterSaveBackground"
 
-    def getURL( cls, target=None, templateId=None ):
+class UHConfModifPosterSaveBackground(URLHandler):
+    _endpoint = 'legacy.confModifTools-posterSaveBackground'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None):
         url = cls._getURL()
         if target is not None and templateId is not None:
             url.setParams(target.getLocator())
             url.addParam("templateId", templateId)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfModifPosterGetBackground ( URLHandler ):
-    _relativeURL = "confModifTools.py/posterGetBackground"
 
-    def getURL( cls, target=None, templateId=None, backgroundId=None):
+class UHConfModifPosterGetBackground(URLHandler):
+    _endpoint = 'legacy.confModifTools-posterGetBackground'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, backgroundId=None):
         url = cls._getURL()
         if target is not None and templateId is not None:
             url.setParams(target.getLocator())
             url.addParam("templateId", templateId)
             url.addParam("backgroundId", backgroundId)
         return url
-    getURL = classmethod( getURL )
-
-class UHConfModifPosterPrintingPDF ( URLHandler ):
-    _relativeURL = "confModifTools.py/posterPrintingPDF"
 
 
-"""
-URL Handlers for Javascript Packages
-"""
-class UHJsonRpcService (OptionallySecureURLHandler):
+class UHConfModifPosterPrintingPDF(URLHandler):
+    _endpoint = 'legacy.confModifTools-posterPrintingPDF'
+
+
+class UHJsonRpcService(OptionallySecureURLHandler):
     _relativeURL = "services/json-rpc"
 
-class UHJavascriptCalendar (URLHandler):
-    _relativeURL = "js/calendar/calendar.js"
-
-class UHJavascriptCalendarSetup (URLHandler):
-    _relativeURL = "js/calendar/calendar-setup.js"
 
 ############
 #Evaluation# DISPLAY AREA
@@ -3385,16 +3358,19 @@ class UHConfEvaluationDisplay( URLHandler ):
 class UHConfEvaluationDisplayModif( URLHandler ):
     _relativeURL = "confDisplayEvaluation.py/modif"
 
-class UHConfEvaluationSignIn( URLHandler ):
-    _relativeURL = "confDisplayEvaluation.py/signIn"
 
-    def getURL( cls, conf, returnURL="" ):
+class UHConfEvaluationSignIn(URLHandler):
+    _endpoint = 'legacy.confDisplayEvaluation-signIn'
+
+    @classmethod
+    def getURL(cls, conf, returnURL=''):
+        returnURL = str(returnURL).strip()
         url = cls._getURL()
         url.setParams(conf.getLocator())
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
+        if returnURL:
+            url.addParam('returnURL', returnURL)
         return url
-    getURL = classmethod( getURL )
+
 
 class UHConfEvaluationSubmit( URLHandler ):
     _relativeURL = "confDisplayEvaluation.py/submit"
@@ -3632,4 +3608,4 @@ class UHHelper(object):
 
     @classmethod
     def getDisplayUH(cls, klazz, type=""):
-        return cls.displayUHs.get("%s%s"%(klazz.__name__, type), None)
+        return cls.displayUHs.get("%s%s" % (klazz.__name__, type), None)

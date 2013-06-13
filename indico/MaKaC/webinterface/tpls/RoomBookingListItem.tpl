@@ -26,7 +26,7 @@
 
     occurrence = collision
     myDetails = bookingDetailsUH.getURL( reservation )
-    rejectOccurrence = urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( reservation, formatDate(occurrence.startDT.date()) )
+    rejectOccurrence = urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( reservation, date=formatDate(occurrence.startDT.date()) )
     rejectReservation = urlHandlers.UHRoomBookingRejectBooking.getURL( reservation )
 
     onClickDetails = ""
