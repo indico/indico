@@ -510,7 +510,13 @@ class ConferenceScheduleDeleteContribution(ScheduleOperation, conferenceServices
 class SessionScheduleDeleteSessionSlot(ScheduleOperation, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 
     def _performOperation(self):
-        self._session.removeSlot(self._slot)
+        if len(self._session.getSlotList()) > 1:
+            self._session.removeSlot(self._slot)
+        else:
+            logInfo = self._session.getLogInfo()
+            logInfo["subject"] = "Deleted session: %s"%self._session.getTitle()
+            self._conf.getLogHandler().logAction(logInfo, log.ModuleNames.TIMETABLE)
+            self._conf.removeSession(self._session)
 
 class SessionScheduleChangeSessionColors(ScheduleOperation, sessionServices.SessionModifBase):
 
