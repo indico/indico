@@ -149,7 +149,9 @@ class RequestHandlerBase(OldObservable):
         """Truncates params"""
         params = {}
         for key, value in self._reqParams.iteritems():
-            if isinstance(value, basestring):
+            if key == 'password':
+                params[key] = '[password hidden, len=%d]' % len(value)
+            elif isinstance(value, basestring):
                 params[key] = truncate(value, 1024)
             else:
                 params[key] = value
