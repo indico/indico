@@ -114,6 +114,7 @@ class EndpointURL(_BaseURL):
         # based on werkzeug.contrib.jsrouting
         return {
             'type': 'flask_rules',
+            'endpoint': self._endpoint,
             'rules': [
                 {
                     'args': list(rule.arguments),
