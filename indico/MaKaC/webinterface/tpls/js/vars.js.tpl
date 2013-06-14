@@ -95,6 +95,8 @@ var Indico = {
     Urls: {
         JsonRpcService: window.location.protocol == "https:"?"${ urlHandlers.UHJsonRpcService.getURL(secure=True) }":"${ urlHandlers.UHJsonRpcService.getURL() }",
 
+        Base: (window.location.protocol == "https:" ? "${ Config.getInstance().getBaseSecureURL() }" : "${ Config.getInstance().getBaseURL() }"),
+
         ImagesBase: "${ Config.getInstance().getImagesBaseURL() }",
         SecureImagesBase: "${ Config.getInstance().getImagesBaseSecureURL() }",
 

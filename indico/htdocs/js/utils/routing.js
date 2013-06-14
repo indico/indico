@@ -105,6 +105,8 @@
             if (!url) {
                 throw new BuildError('Could not build an URL', template.endpoint, params);
             }
+
+            url = Indico.Urls.Base + url;
         }
         else {
             throw new BuildError('Invalid URL template', template);
