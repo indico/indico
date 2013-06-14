@@ -30,7 +30,6 @@ from fabric.api import local, lcd, task, env
 from fabric.context_managers import prefix, settings
 from fabric.colors import red, green, yellow, cyan
 from fabric.contrib import console
-from fabvenv import virtualenv
 
 
 SUBMODULES = ['compass', 'jquery', 'qtip2']
