@@ -105,6 +105,14 @@ class URLHandler(object):
         return params
 
     @classmethod
+    def _getParams(cls, target, params):
+        params = dict(cls._defaultParams, **params)
+        params = cls._translateParams(params)
+        if target is not None:
+            params.update(target.getLocator())
+        return params
+
+    @classmethod
     def getURL(cls, target=None, **params):
         """Gives the full URL for the corresponding request handler. In case
             the target parameter is specified it will append to the URL the
@@ -116,11 +124,8 @@ class URLHandler(object):
                     is able to retrieve it.
                 params - (Dict) parameters to be added to the URL.
         """
-        params = dict(cls._defaultParams, **params)
-        params = cls._translateParams(params)
-        if target is not None:
-            params.update(target.getLocator())
-        return cls._getURL(**params)
+
+        return cls._getURL(**cls._getParams(target, params))
 
 
 class SecureURLHandler(URLHandler):
@@ -130,9 +135,7 @@ class SecureURLHandler(URLHandler):
 class OptionallySecureURLHandler(URLHandler):
     @classmethod
     def getURL(cls, target=None, secure=False, **params):
-        if target is not None:
-            params.update(target.getLocator())
-        return cls._getURL(_force_secure=True, **params)
+        return cls._getURL(_force_secure=True, **cls._getParams(target, params))
 
 
 # Hack to allow secure Indico on non-80 ports
@@ -605,9 +608,7 @@ class UHConfModifRoomBookingCloneBooking(UHConfModifRoomBookingBase):
 
     @classmethod
     def getURL(cls, target=None, conf=None, **params):
-        url = cls._getURL(**params)
-        if target is not None:
-            url.addParams(target.getLocator())
+        url = cls._getURL(**cls._getParams(target, params))
         if conf is not None:
             url.addParams(conf.getLocator())
         return url
