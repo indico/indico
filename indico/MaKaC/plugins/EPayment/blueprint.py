@@ -22,7 +22,7 @@ from flask import Blueprint
 import MaKaC.plugins.EPayment.chrome as handlers
 from indico.web.flask.util import rh_as_view
 
-blueprint = Blueprint('epayment', __name__)
 
-blueprint.add_url_rule('/epayment/<path:filepath>', 'htdocs', rh_as_view(handlers.RHEPaymentHtdocs))
-blueprint.add_url_rule('/epayment', 'htdocs', build_only=True)
+blueprint = Blueprint('epayment', __name__, url_prefix='/epayment')
+
+blueprint.add_url_rule('/<path:filepath>', 'htdocs', rh_as_view(handlers.RHEPaymentHtdocs))

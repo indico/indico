@@ -7,4 +7,4 @@
     var currencies = ${currency_data | n,j};
 </script>
 
-<script type="text/javascript" src="${epayment_htdocs}/js/settings.js"></script>
+<script type="text/javascript" src="${epayment_htdocs.getURL(filepath='js/settings.js')}"></script>

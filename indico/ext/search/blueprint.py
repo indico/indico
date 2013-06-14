@@ -22,7 +22,8 @@ from flask import Blueprint
 import indico.ext.search.chrome as handlers
 from indico.web.flask.util import rh_as_view
 
-blueprint = Blueprint('search', __name__)
 
-blueprint.add_url_rule('/search', 'search', rh_as_view(handlers.RHSearchBase))
-blueprint.add_url_rule('/search/<path:filepath>', 'htdocs', rh_as_view(handlers.RHSearchHtdocs))
+blueprint = Blueprint('search', __name__, url_prefix='/search')
+
+blueprint.add_url_rule('', 'search', rh_as_view(handlers.RHSearchBase))
+blueprint.add_url_rule('/<path:filepath>', 'htdocs', rh_as_view(handlers.RHSearchHtdocs))

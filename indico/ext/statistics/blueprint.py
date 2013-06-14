@@ -22,7 +22,8 @@ from flask import Blueprint
 import indico.ext.statistics.chrome as handlers
 from indico.web.flask.util import rh_as_view
 
-blueprint = Blueprint('statistics', __name__)
 
-blueprint.add_url_rule('/statistics', 'view', rh_as_view(handlers.RHStatisticsView))
-blueprint.add_url_rule('/statistics/<path:filepath>', 'htdocs', rh_as_view(handlers.RHStatisticsHtdocs))
+blueprint = Blueprint('statistics', __name__, url_prefix='/statistics')
+
+blueprint.add_url_rule('', 'view', rh_as_view(handlers.RHStatisticsView))
+blueprint.add_url_rule('/<path:filepath>', 'htdocs', rh_as_view(handlers.RHStatisticsHtdocs))

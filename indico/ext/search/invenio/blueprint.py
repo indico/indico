@@ -22,6 +22,7 @@ from flask import Blueprint
 import indico.ext.search.invenio.components as handlers
 from indico.web.flask.util import rh_as_view
 
-blueprint = Blueprint('search-invenio', __name__)
 
-blueprint.add_url_rule('/invenio/<path:filepath>', 'htdocs', rh_as_view(handlers.RHSearchHtdocsInvenio))
+blueprint = Blueprint('search-invenio', __name__, url_prefix='/invenio')
+
+blueprint.add_url_rule('/<path:filepath>', 'htdocs', rh_as_view(handlers.RHSearchHtdocsInvenio))

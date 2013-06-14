@@ -22,13 +22,14 @@ from flask import Blueprint
 import MaKaC.plugins.Collaboration.handlers as handlers
 from indico.web.flask.util import rh_as_view
 
+
 blueprint = Blueprint('collaboration', __name__, url_prefix='/Collaboration')
+
 blueprint.add_url_rule('/elecAgree', 'elecAgree', rh_as_view(handlers.RHElectronicAgreement))
 blueprint.add_url_rule('/uploadElecAgree', 'uploadElecAgree', rh_as_view(handlers.RHUploadElectronicAgreement),
                        methods=('POST',))
 blueprint.add_url_rule('/getPaperAgree', 'getPaperAgree', rh_as_view(handlers.RHElectronicAgreementGetFile))
-blueprint.add_url_rule('/elecAgreeForm', 'elecAgreeForm', rh_as_view(handlers.RHElectronicAgreementForm),
-                       methods=('GET', 'POST'))
+blueprint.add_url_rule('/elecAgreeForm', 'elecAgreeForm', rh_as_view(handlers.RHElectronicAgreementForm))
 
 blueprint.add_url_rule('/<plugin>/<path:filepath>', 'htdocs', rh_as_view(handlers.RHCollaborationHtdocs))
 blueprint.add_url_rule('/<path:filepath>', 'htdocs', rh_as_view(handlers.RHCollaborationHtdocs))

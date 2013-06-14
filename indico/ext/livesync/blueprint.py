@@ -22,6 +22,7 @@ from flask import Blueprint
 import indico.ext.livesync.chrome as handlers
 from indico.web.flask.util import rh_as_view
 
+
 blueprint = Blueprint('livesync', __name__, url_prefix='/livesync')
 
 blueprint.add_url_rule('/manage', 'manage', rh_as_view(handlers.RHAdminLiveSyncManagement))

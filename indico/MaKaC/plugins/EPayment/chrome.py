@@ -80,7 +80,7 @@ class WPluginSettings(WTemplated):
         ph = PluginsHolder()
 
         tplVars = WTemplated.getVars(self)
-        tplVars["epayment_htdocs"] = UHEPaymentHtdocs.getURL()
+        tplVars["epayment_htdocs"] = UHEPaymentHtdocs
         tplVars["currency_data"] = ph.getPluginType('EPayment').getOption("customCurrency").getValue()
         return tplVars
 
