@@ -55,34 +55,21 @@ def create_flat_args():
 
 @memoize
 def rh_as_view(rh):
-    def wrapper(**kwargs):
-        params = create_flat_args()
-        params.update(kwargs)
-        return rh(None).process(params)
+    if issubclass(rh, RHHtdocs):
+        def wrapper(filepath, plugin=None):
+            path = rh.calculatePath(filepath, plugin=plugin)
+            if not os.path.isfile(path):
+                raise NotFound
+            return _send_file(path)
+    else:
+        def wrapper(**kwargs):
+            params = create_flat_args()
+            params.update(kwargs)
+            return rh(None).process(params)
 
     wrapper.__name__ = rh.__name__
     wrapper.__doc__ = rh.__doc__
     return wrapper
-
-
-@memoize
-def create_flask_rh_htdocs_wrapper(rh):
-    def wrapper(filepath, plugin=None):
-        path = rh.calculatePath(filepath, plugin=plugin)
-        if not os.path.isfile(path):
-            raise NotFound
-        return _send_file(path)
-
-    return wrapper
-
-
-def create_plugin_rules(app):
-    for rule, rh in RHMapMemory()._map.iteritems():
-        endpoint = 'plugin-%s' % rh.__name__
-        if issubclass(rh, RHHtdocs):
-            app.add_url_rule(rule, endpoint, view_func=create_flask_rh_htdocs_wrapper(rh))
-        else:
-            app.add_url_rule(rule, endpoint, view_func=rh_as_view(rh), methods=('GET', 'POST'))
 
 
 def shorturl_handler(what, tag):

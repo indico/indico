@@ -56,13 +56,11 @@ class URLHandler(object):
             variable from the root) URL pointing to the corresponding request
             handler.
         _endpoint - (string) Contains the name of a Flask endpoint.
-        _secure - (bool) Always create secure URLs if possible
         _defaultParams - (dict) Default params (overwritten by kwargs)
         _fragment - (string) URL fragment to set
     """
     _relativeURL = None
     _endpoint = None
-    _secure = False
     _defaultParams = {}
     _fragment = False
 
@@ -82,7 +80,7 @@ class URLHandler(object):
                 params - (dict) parameters to be added to the URL.
         """
 
-        secure = _force_secure if _force_secure is not None else (cls._secure or request.is_secure)
+        secure = _force_secure if _force_secure is not None else request.is_secure
         if not Config.getInstance().getBaseSecureURL():
             secure = False
 
@@ -129,7 +127,9 @@ class URLHandler(object):
 
 
 class SecureURLHandler(URLHandler):
-    _secure = True
+    @classmethod
+    def getURL(cls, target=None, **params):
+        return cls._getURL(_force_secure=True, **cls._getParams(target, params))
 
 
 class OptionallySecureURLHandler(URLHandler):

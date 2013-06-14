@@ -24,11 +24,11 @@
 """
 
 import types
-import inspect
 import pkg_resources
 import zope.interface
 from BTrees.OOBTree import OOBTree
 from persistent import Persistent
+from flask import Blueprint
 
 from MaKaC.common.Counter import Counter
 from MaKaC.common.Locators import Locator
@@ -40,7 +40,7 @@ from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.plugins.util import processPluginMetadata
 
 from indico.core.extpoint import Component, IListener, IContributor
-from indico.web import rh as newrh
+from indico.util.importlib import import_module
 
 
 def pluginId(mod):
@@ -261,6 +261,7 @@ class RHMap(Persistent):
     def __init__(self):
         self.__id = "RHMap"
         self.__map = {}
+        self.__blueprints = set()
 
     def hasURL(self, rh):
         return bool(getattr(rh, '_url', None))
@@ -277,6 +278,10 @@ class RHMap(Persistent):
     def get(self):
         return self.__map
 
+    def getBlueprints(self):
+        for module, name in self.__blueprints:
+            yield getattr(import_module(module), name)
+
     def getId(self):
         return self.__id
 
@@ -289,10 +294,18 @@ class RHMap(Persistent):
                 self.__map[url] = rh
             self._notifyModification()
 
+    def addBlueprint(self, module, attr):
+        self.__blueprints.add((module.__name__, attr))
+        self._notifyModification()
+
     def cleanRHDict(self):
         """ Attributes in this class are persistent, so when we want to erase them we'll need to explicitely invoke this method
         """
         self.__map.clear()
+        try:
+            self.__blueprints.clear()
+        except AttributeError:
+            self.__blueprints = set()
         self._notifyModification()
 
 
@@ -448,12 +461,14 @@ class RHMapMemory:
     #  @todo Add all variables, and methods needed for the Singleton class below
     class Singleton:
         def __init__(self):
-            if not hasattr(self, '_map'):
+            if not hasattr(self, '_map') or not hasattr(self, '_blueprints'):
                 if DBMgr.getInstance().isConnected():
-                    self._map=PluginsHolder().getRHMap().copy()
+                    self._map = PluginsHolder().getRHMap().copy()
+                    self._blueprints = set(PluginsHolder().getRHMap().getBlueprints())
                 else:
                     DBMgr.getInstance().startRequest()
-                    self._map=PluginsHolder().getRHMap().copy()
+                    self._map = PluginsHolder().getRHMap().copy()
+                    self._blueprints = set(PluginsHolder().getRHMap().getBlueprints())
                     DBMgr.getInstance().endRequest()
 
     ## The constructor
@@ -892,15 +907,14 @@ class PluginType (PluginBase):
                     PluginsHolder().getComponentsManager().addComponent(obj)
 
     def _updateRHMapInfo(self, plugin, module):
-        from MaKaC.webinterface.rh.base import RH
         for smodule in self._getAllSubmodules(module):
-            Logger.get('plugins.holder.rhmap').debug(
-                "Analyzing %s" % smodule)
-            for obj in smodule.__dict__.values():
-                # account for old style and new style class/rh
-                if (type(obj) == types.ClassType and RH in inspect.getmro(obj)) or \
-                   (type(obj) == type and newrh.RH in obj.mro()):
-                    PluginsHolder().getRHMap().addRH(obj)
+            Logger.get('plugins.holder.rhmap').debug('Analyzing %s' % smodule)
+            for name, obj in smodule.__dict__.iteritems():
+                if isinstance(obj, Blueprint):
+                    if obj.name != plugin.getName().lower():
+                        raise PluginError('Blueprint in plugin %s must be named %s, not %s' % (
+                                          plugin.getName(), plugin.getName().lower(), obj.name))
+                    PluginsHolder().getRHMap().addBlueprint(smodule, name)
 
     def _updateHandlerInfo(self, plugin, module):
 

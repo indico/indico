@@ -29,9 +29,10 @@ from MaKaC.common.db import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
+from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
-from indico.web.flask.util import create_plugin_rules, shorturl_handler, XAccelMiddleware
+from indico.web.flask.util import shorturl_handler, XAccelMiddleware
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.legacy_scripts import legacy_scripts
@@ -94,6 +95,11 @@ def add_blueprints(app):
     app.register_blueprint(api)
 
 
+def add_plugin_blueprints(app):
+    for blueprint in RHMapMemory()._blueprints:
+        app.register_blueprint(blueprint)
+
+
 def handle_404(exception):
     try:
         return send_from_directory(app.config['INDICO_HTDOCS'], request.path[1:], conditional=True)
@@ -122,5 +128,5 @@ def make_app():
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)
-    create_plugin_rules(app)
+    add_plugin_blueprints(app)
     return app
