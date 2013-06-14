@@ -108,12 +108,11 @@ class StatisticsMaterialDownloadListener(Component):
 
 class UHConfModifStatistics(URLHandler):
 
-    _relativeURL = "statistics"
+    _endpoint = 'statistics.view'
 
 
 class RHStatisticsView(RHConferenceModifBase):
 
-    _url = '/statistics'
     _register = StatisticsRegister()
 
     def _checkProtection(self):
@@ -134,8 +133,6 @@ class RHStatisticsView(RHConferenceModifBase):
 
 
 class RHStatisticsHtdocs(RHHtdocs):
-
-    _url = '/statistics/<path:filepath>'
     _local_path = pkg_resources.resource_filename(indico.ext.statistics.__name__, "htdocs")
 
 
