@@ -51,46 +51,32 @@ from MaKaC.webinterface import wcomponents
 from MaKaC.common.info import HelperMaKaCInfo
 
 class UHAdminLiveSyncManagement(URLHandler):
-    """
-    URL handler for livesync agent management
-    """
-    _relativeURL = "livesync/manage"
+    """URL handler for livesync agent management"""
+    _endpoint = 'livesync.manage'
 
 
 class UHAdminLiveSyncStatus(URLHandler):
-    """
-    URL handler for livesync status
-    """
-    _relativeURL = "livesync/status"
+    """URL handler for livesync status"""
+    _endpoint = 'livesync.status'
 
 
 # Request Handlers
 
 class RHLiveSyncHtdocs(RHHtdocs):
-    """
-    Static file handler for LiveSync plugin
-    """
+    """Static file handler for LiveSync plugin"""
 
-    _url = '/livesync/<path:filepath>'
     _local_path = pkg_resources.resource_filename(indico.ext.livesync.__name__, "htdocs")
     _min_dir = 'livesync'
 
 
 class RHAdminLiveSyncManagement(RHAdminBase):
-    """
-    LiveSync management page - request handler
-    """
-    _url = '/livesync/manage'
-
+    """LiveSync management page - request handler"""
     def _process(self):
         return WPLiveSyncAdmin(self, WPluginAgentManagement).display()
 
 
 class RHAdminLiveSyncStatus(RHAdminBase):
-    """
-    LiveSync status page - request handler
-    """
-    _url = '/livesync/status'
+    """LiveSync status page - request handler"""
 
     def _process(self):
         return WPLiveSyncAdmin(self, WPluginAgentStatus).display()
