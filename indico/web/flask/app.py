@@ -22,7 +22,6 @@ from __future__ import absolute_import
 import os
 from flask import redirect, url_for, send_from_directory, request
 from flask import current_app as app
-from functools import partial
 from werkzeug.exceptions import NotFound
 
 from MaKaC.common import Config
@@ -31,14 +30,13 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.webinterface.pages.error import WErrorWSGI
-from MaKaC.services.interface.rpc.json import process as jsonrpc_handler
 
 from indico.web.flask.util import create_plugin_rules, shorturl_handler, XAccelMiddleware
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.legacy_scripts import legacy_scripts
 from indico.web.flask.blueprints.photos import photos
-from indico.web.http_api.handlers import handler as api_handler
+from indico.web.flask.blueprints.api import api
 
 
 def fix_root_path(app):
@@ -83,9 +81,6 @@ def extend_url_map(app):
 
 def add_handlers(app):
     app.add_url_rule('/', view_func=lambda: redirect(url_for('legacy.index')))
-    app.add_url_rule('/services/json-rpc', view_func=jsonrpc_handler, endpoint='services', methods=('POST',))
-    app.add_url_rule('/export/<path:path>', view_func=partial(api_handler, '/export'), endpoint='export')
-    app.add_url_rule('/api/<path:path>', view_func=partial(api_handler, '/api'), endpoint='api', methods=('POST',))
     # TODO: Remove the shorturl route and handle them in the main /event/ and /categ/ handlers
     app.add_url_rule('/<any(event, categ):what>/<tag>', view_func=shorturl_handler, endpoint='shorturl')
     app.register_error_handler(404, handle_404)
@@ -96,6 +91,7 @@ def add_blueprints(app):
     app.register_blueprint(legacy)
     app.register_blueprint(legacy_scripts)
     app.register_blueprint(photos)
+    app.register_blueprint(api)
 
 
 def handle_404(exception):

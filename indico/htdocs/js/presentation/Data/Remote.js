@@ -342,7 +342,7 @@ function apiRequest(path, payload, opts) {
     };
 
     $.ajax({
-        url: Indico.Urls.APIBase + path + '.json',
+        url: (opts.method == 'POST' ? Indico.Urls.APIBase : Indico.Urls.ExportAPIBase) + path + '.json',
         data: payload,
         type: opts.method,
         cache: false, // we really don't want caching for AJAX requests!

@@ -3792,7 +3792,17 @@ class UHConfModifPosterPrintingPDF(URLHandler):
 
 
 class UHJsonRpcService(OptionallySecureURLHandler):
-    _relativeURL = "services/json-rpc"
+    _endpoint = 'api.jsonrpc'
+
+
+class UHAPIExport(OptionallySecureURLHandler):
+    _endpoint = 'api.httpapi'
+    _defaultParams = dict(prefix='export')
+
+
+class UHAPIAPI(OptionallySecureURLHandler):
+    _endpoint = 'api.httpapi'
+    _defaultParams = dict(prefix='api')
 
 
 ############

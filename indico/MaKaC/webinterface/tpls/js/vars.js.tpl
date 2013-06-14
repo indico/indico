@@ -98,7 +98,8 @@ var Indico = {
         ImagesBase: "${ Config.getInstance().getImagesBaseURL() }",
         SecureImagesBase: "${ Config.getInstance().getImagesBaseSecureURL() }",
 
-        APIBase: (window.location.protocol == "https:" ? "${ Config.getInstance().getBaseSecureURL() }" : "${ Config.getInstance().getBaseURL() }") + '/export',
+        ExportAPIBase: (window.location.protocol == "https:" ? "${ urlHandlers.UHAPIExport.getURL(secure=True) }" : "${ urlHandlers.UHAPIExport.getURL() }"),
+        APIBase: (window.location.protocol == "https:" ? "${ urlHandlers.UHAPIAPI.getURL(secure=True) }" : "${ urlHandlers.UHAPIAPI.getURL() }"),
 
         Login: ${ urlHandlers.UHSignIn.getURL().js_router | j,n },
         Favourites: ${ urlHandlers.UHUserBaskets.getURL().js_router | j,n },

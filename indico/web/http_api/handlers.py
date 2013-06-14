@@ -128,7 +128,7 @@ def buildAW(ak, onlyPublic=False):
 
 
 def handler(prefix, path):
-    path = posixpath.join(prefix, path)
+    path = posixpath.join('/', prefix, path)
     ContextManager.destroy()
     ContextManager.set('currentReq', req)
     logger = Logger.get('httpapi')
