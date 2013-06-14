@@ -33,7 +33,6 @@ from indico.web.rh import RHHtdocs
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.conference import LocalFile
-from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from MaKaC.common.logger import Logger
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -227,9 +226,8 @@ class RHConfModifCSProtection(RHConfModifCSBase):
             p = WPConfModifCollaborationProtection( self, self._conf)
             return p.display()
 
-class RHElectronicAgreement(RHConfModifCSBookings):
-    _url = '/Collaboration/elecAgree'
 
+class RHElectronicAgreement(RHConfModifCSBookings):
     def _checkParams(self, params):
         RHConfModifCSBookings._checkParams(self, params)
         self._activeTabName = 'Electronic Agreement'
@@ -243,9 +241,8 @@ class RHElectronicAgreement(RHConfModifCSBookings):
             p = WPElectronicAgreement(self, self._conf)
             return p.display(sortCriteria = self.sortCriteria, order = self.order)
 
-class RHUploadElectronicAgreement(RHConferenceModifBase):
-    _url = '/Collaboration/uploadElecAgree'
 
+class RHUploadElectronicAgreement(RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.spkUniqueId = params.get('spkUniqueId', None)
@@ -300,9 +297,8 @@ class RHUploadElectronicAgreement(RHConferenceModifBase):
             self.uploadProcess()
             return json.dumps({'status': 'OK'}, textarea=True)
 
-class RHElectronicAgreementGetFile(RHConfModifCSBookings):
-    _url = '/Collaboration/getPaperAgree'
 
+class RHElectronicAgreementGetFile(RHConfModifCSBookings):
     def _checkParams(self, params):
         RHConfModifCSBookings._checkParams( self, params )
         self.spkUniqueId = params.get("spkId","")
@@ -318,8 +314,6 @@ class RHElectronicAgreementGetFile(RHConfModifCSBookings):
 
 
 class RHElectronicAgreementForm(RHConferenceBaseDisplay):
-    _url = '/Collaboration/elecAgreeForm'
-
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
         self.authKey = params['authKey']

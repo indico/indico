@@ -83,40 +83,33 @@ class UHCollaborationDisplay(URLHandler):
     """
     _relativeURL = "Collaboration/display"
 
+
 class UHCollaborationElectronicAgreement(URLHandler):
-    """
-    URL handler for Electronic Agreement Manager
-    """
-    _relativeURL = "Collaboration/elecAgree"
+    """URL handler for Electronic Agreement Manager"""
+    _endpoint = 'collaboration.elecAgree'
+
 
 class UHCollaborationUploadElectronicAgreement(URLHandler):
-    """
-    URL handler for Electronic Agreement to upload the Agreement
-    """
-    _relativeURL = "Collaboration/uploadElecAgree"
+    """URL handler for Electronic Agreement to upload the Agreement"""
+    _endpoint = 'collaboration.uploadElecAgree'
+
 
 class UHCollaborationElectronicAgreementGetFile(URLHandler):
-    """
-    URL handler for Electronic Agreement Manager to get Paper
-    """
-    _relativeURL = "Collaboration/getPaperAgree"
+    """URL handler for Electronic Agreement Manager to get Paper"""
+    _endpoint = 'collaboration.getPaperAgree'
+
+    @classmethod
     def getURL(cls, conf, spkId, **params):
         url = cls._getURL()
-        url.addParam("confId", conf.getId())
-        url.addParam("spkId", spkId)
+        url.addParam('confId', conf.getId())
+        url.addParam('spkId', spkId)
         return url
-    getURL = classmethod( getURL )
+
 
 class UHCollaborationElectronicAgreementForm(SecureURLHandler):
-    """
-    URL handler for Electronic Agreement Form
-    """
-    _relativeURL = "Collaboration/elecAgreeForm"
+    """URL handler for Electronic Agreement Form"""
+    _endpoint = 'collaboration.elecAgreeForm'
 
+    @classmethod
     def getURL(cls, confId, key, **params):
-        url = cls._getURL()
-        url.addParam("authKey", key)
-        url.addParam("confId", confId)
-        return url
-    getURL = classmethod( getURL )
-
+        return super(UHCollaborationElectronicAgreementForm, cls).getURL(authKey=key, confId=confId)
