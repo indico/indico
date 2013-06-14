@@ -40,20 +40,14 @@ from MaKaC.plugins import PluginsHolder
 
 
 class UHEPaymentHtdocs(URLHandler):
-    """
-    URL handler for epayment status
-    """
-    _relativeURL = "epayment"
+    """URL handler for epayment status"""
+    _endpoint = 'epayment.htdocs'
 
 # Request Handlers
 
 
 class RHEPaymentHtdocs(RHHtdocs):
-    """
-    Static file handler for EPayment plugin
-    """
-
-    _url = '/epayment/<path:filepath>'
+    """Static file handler for EPayment plugin"""
     _local_path = pkg_resources.resource_filename(MaKaC.plugins.EPayment.__name__, "htdocs")
 
 
