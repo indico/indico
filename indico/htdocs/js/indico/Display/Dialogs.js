@@ -222,7 +222,6 @@ type("ParticipantsEmailPopup", ["BasicEmailPopup"],{
                     if (error) {
                         killProgress();
                         IndicoUtil.errorReport(error);
-                        self.close();
                     } else {
                         killProgress();
                         successHandler(result);
