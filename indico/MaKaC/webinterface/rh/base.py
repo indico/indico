@@ -178,8 +178,7 @@ class RH(RequestHandlerBase):
         Attributes:
             _uh - (URLHandler) Associated URLHandler which points to the
                 current rh.
-            _req - (mod_python.Request) mod_python request received for the
-                current rh.
+            _req - UNUSED/OBSOLETE, always None
             _requestStarted - (bool) Flag which tells whether a DB transaction
                 has been started or not.
             _aw - (AccessWrapper) Current access information for the rh.
