@@ -282,6 +282,9 @@ class RHMap(Persistent):
         for module, name in self.__blueprints:
             yield getattr(import_module(module), name)
 
+    def hasBlueprint(self, module, name):
+        return (module.__name__, name) in self.__blueprints
+
     def getId(self):
         return self.__id
 
@@ -907,15 +910,26 @@ class PluginType (PluginBase):
                     PluginsHolder().getComponentsManager().addComponent(obj)
 
     def _updateRHMapInfo(self, plugin, module):
+        rh_map = PluginsHolder().getRHMap()
         for smodule in self._getAllSubmodules(module):
             Logger.get('plugins.holder.rhmap').debug('Analyzing %s' % smodule)
             for name, obj in smodule.__dict__.iteritems():
-                if isinstance(obj, Blueprint):
-                    expected_name = plugin.getName().lower().replace(' ', '')
-                    if obj.name != expected_name:
-                        raise PluginError('Blueprint in plugin %s must be named %s, not %s' % (
-                                          plugin.getName(), expected_name, obj.name))
-                    PluginsHolder().getRHMap().addBlueprint(smodule, name)
+                if not isinstance(obj, Blueprint):
+                    continue
+                if rh_map.hasBlueprint(smodule, name):
+                    # If a submodule defines a blueprint it is also seen when this method runs for the parent
+                    # plugin type. However, since submodules are always checked first we can simply skip
+                    # already-registered blueprints!
+                    continue
+                # For a plugin type the blueprint is named 'foo', for a subplugin 'foo-bar'
+                if isinstance(plugin, PluginType):
+                    expected_name = plugin.getId().lower()
+                else:
+                    expected_name = '%s-%s' % (plugin.getOwner().getId().lower(), plugin.getId().lower())
+                if obj.name != expected_name:
+                    raise PluginError('Blueprint in plugin %s must be named %s, not %s' % (
+                                      plugin.getName(), expected_name, obj.name))
+                rh_map.addBlueprint(smodule, name)
 
     def _updateHandlerInfo(self, plugin, module):
 
