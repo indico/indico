@@ -21,10 +21,10 @@ import httplib
 import urllib
 import base64
 import os
+from flask import request
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface import urlHandlers
-from MaKaC.externUsers import NiceUser
 from MaKaC.user import Avatar
 from MaKaC.common import Configuration
 from MaKaC.common.Configuration import Config
@@ -51,17 +51,15 @@ class NiceAuthenticator(Authenthicator):
         """
         Login using Shibbolet.
         """
-        req = rh._req
-        req.add_common_vars()
-        if  req.subprocess_env.has_key("ADFS_EMAIL"):
-            email = req.subprocess_env["ADFS_EMAIL"]
-            login = req.subprocess_env["ADFS_LOGIN"]
-            personId = req.subprocess_env["ADFS_PERSONID"]
-            phone = req.subprocess_env.get("ADFS_PHONENUMBER","")
-            fax = req.subprocess_env.get("ADFS_FAXNUMBER","")
-            lastname = req.subprocess_env.get("ADFS_LASTNAME","")
-            firstname = req.subprocess_env.get("ADFS_FIRSTNAME","")
-            institute = req.subprocess_env.get("ADFS_HOMEINSTITUTE","")
+        if 'ADFS_EMAIL' in request.environ:
+            email = request.environ['ADFS_EMAIL']
+            login = request.environ['ADFS_LOGIN']
+            personId = request.environ['ADFS_PERSONID']
+            phone = request.environ.get('ADFS_PHONENUMBER', "")
+            fax = request.environ.get('ADFS_FAXNUMBER', "")
+            lastname = request.environ.get('ADFS_LASTNAME', "")
+            firstname = request.environ.get('ADFS_FIRSTNAME', "")
+            institute = request.environ.get('ADFS_HOMEINSTITUTE', "")
             if personId == '-1':
                 personId = None
             from MaKaC.user import AvatarHolder
