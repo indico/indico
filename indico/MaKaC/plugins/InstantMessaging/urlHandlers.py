@@ -18,13 +18,14 @@
 
 from MaKaC.webinterface.urlHandlers import URLHandler
 
-class UHConferenceInstantMessaging( URLHandler ):
-    _relativeURL = "conferenceInstantMessaging"
+
+class UHConferenceInstantMessaging(URLHandler):
+    _endpoint = 'instantmessaging.conferenceInstantMessaging'
 
 
 class UHConfModifChat(URLHandler):
-    _relativeURL = "confModifChat"
+    _endpoint = 'instantmessaging.confModifChat'
 
 
 class UHConfModifChatSeeLogs(URLHandler):
-    _relativeURL = "confModifChat/logs"
+    _endpoint = 'instantmessaging.confModifChat-logs'

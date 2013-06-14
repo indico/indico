@@ -911,9 +911,10 @@ class PluginType (PluginBase):
             Logger.get('plugins.holder.rhmap').debug('Analyzing %s' % smodule)
             for name, obj in smodule.__dict__.iteritems():
                 if isinstance(obj, Blueprint):
-                    if obj.name != plugin.getName().lower():
+                    expected_name = plugin.getName().lower().replace(' ', '')
+                    if obj.name != expected_name:
                         raise PluginError('Blueprint in plugin %s must be named %s, not %s' % (
-                                          plugin.getName(), plugin.getName().lower(), obj.name))
+                                          plugin.getName(), expected_name, obj.name))
                     PluginsHolder().getRHMap().addBlueprint(smodule, name)
 
     def _updateHandlerInfo(self, plugin, module):

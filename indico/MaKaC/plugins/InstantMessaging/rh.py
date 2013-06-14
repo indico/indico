@@ -37,18 +37,12 @@ from indico.web.rh import RHHtdocs
 
 
 class RHInstantMessagingHtdocs(RHHtdocs):
-    """
-    Static file handler for InstantMessaging plugin
-    """
-
-    _url = '/InstantMessaging/<path:filepath>'
+    """Static file handler for InstantMessaging plugin"""
     _local_path = pkg_resources.resource_filename(InstantMessaging.__name__, "htdocs")
     _min_dir = 'InstantMessaging'
 
 
 class RHChatModifBase(RHConferenceModifBase):
-
-
     def _checkProtection( self ):
         instantMessagingAdmins = []
         for imPlugin in PluginsHolder().getPluginType('InstantMessaging').getPluginList():
@@ -69,9 +63,7 @@ class RHChatModifBase(RHConferenceModifBase):
 
 
 class RHChatFormModif(RHChatModifBase):
-    """ For the conference modification"""
-    _url = wrapUH(UHConfModifChat)
-
+    """For the conference modification"""
     def _checkParams(self, params):
         RHChatModifBase._checkParams(self, params)
         if self._activeTabName and not self._activeTabName in self._tabs:
@@ -87,9 +79,7 @@ class RHChatFormModif(RHChatModifBase):
 
 
 class RHChatSeeLogs(RHChatModifBase):
-    """ For the conference modification"""
-    _url = wrapUH(UHConfModifChatSeeLogs)
-
+    """For the conference modification"""
     def _checkParams(self, params):
         RHChatModifBase._checkParams(self, params)
         self._conf = ConferenceHolder().getById(params['confId'])
@@ -115,9 +105,7 @@ class RHChatSeeLogs(RHChatModifBase):
 
 
 class RHInstantMessagingDisplay(RHConferenceBaseDisplay):
-    """ For the conference display"""
-    _url = wrapUH(UHConferenceInstantMessaging)
-
+    """For the conference display"""
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
 
