@@ -31,11 +31,8 @@ import indico.ext.importer
 
 
 class RHImporterHtdocs(RHHtdocs):
-    """
-    Static file handler for Importer plugin
-    """
+    """Static file handler for Importer plugin"""
 
-    _url = '/importer/<path:filepath>'
     _local_path = pkg_resources.resource_filename(indico.ext.importer.__name__, "htdocs")
     _min_dir = 'importer'
 
