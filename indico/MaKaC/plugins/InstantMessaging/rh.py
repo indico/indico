@@ -32,7 +32,6 @@ from MaKaC.i18n import _
 import urllib2
 import pkg_resources
 
-from indico.web.legacy import wrapUH
 from indico.web.rh import RHHtdocs
 
 
