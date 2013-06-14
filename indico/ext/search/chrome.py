@@ -91,20 +91,17 @@ class PluginSettingsContributor(Component):
         else:
             return None
 
-class UHSearch(URLHandler):
 
-    _relativeURL = "search"
+class UHSearch(URLHandler):
+    _endpoint = "search.search"
 
 
 class RHSearchHtdocs(RHHtdocs):
-
-    _url = '/search/<path:filepath>'
     _local_path = os.path.join(os.path.dirname(indico.ext.search.__file__), "htdocs")
     _min_dir = 'search'
 
-class RHSearchBase(RHCustomizable):
 
-    _url = '/search'
+class RHSearchBase(RHCustomizable):
 
     def _checkProtection(self):
         if not PluginsHolder().hasPluginType("search"):
