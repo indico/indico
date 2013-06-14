@@ -23,30 +23,16 @@ from MaKaC.plugins.EPayment.yellowPay import MODULE_ID
 
 
 class EPURLHandler(MainURLHandler):
-    
-    _requestTag = ""
-    
-    def getURL( cls, target=None ):
-        """Gives the full URL for the corresponding request handler. In case
-            the target parameter is specified it will append to the URL the 
-            the necessary parameters to make the target be specified in the url.
-            
-            Parameters:
-                target - (Locable) Target object which must be uniquely 
-                    specified in the URL so the destination request handler
-                    is able to retrieve it. 
-        """
-        #url = MainURLHandler.getURL(target)
-        url = cls._getURL()
-        if target is not None:
-            url.setParams( target.getLocator() )
-        url.addParam( "EPaymentName", MODULE_ID )
-        url.addParam( "requestTag", cls._requestTag )
-        return url
-    getURL = classmethod( getURL )
+    _requestTag = ''
+
+    @classmethod
+    def getURL(cls, target=None):
+        return super(EPURLHandler, cls).getURL(target, EPaymentName=MODULE_ID, requestTag=cls._requestTag)
+
 
 class UHConfModifEPayment(EPURLHandler):
-    _relativeURL = "confModifEpayment.py/modifModule"
+    _endpoint = 'legacy.confModifEpayment-modifModule'
+
 
 class UHConfModifEPaymentYellowPay( UHConfModifEPayment ):
     _requestTag = "modifYellowPay"  
@@ -57,7 +43,8 @@ class UHConfModifEPaymentYellowPayPerformDataModif( UHConfModifEPayment ):
 
 
 class UHPay(EPURLHandler):
-    _relativeURL = "payment.py"
+    _endpoint = 'legacy.payment'
+
     
 class UHPayConfirmYellowPay( UHPay ):
     _requestTag = "effectuer"      
