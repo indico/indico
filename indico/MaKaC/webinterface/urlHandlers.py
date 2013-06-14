@@ -135,7 +135,7 @@ class SecureURLHandler(URLHandler):
 class OptionallySecureURLHandler(URLHandler):
     @classmethod
     def getURL(cls, target=None, secure=False, **params):
-        return cls._getURL(_force_secure=True, **cls._getParams(target, params))
+        return cls._getURL(_force_secure=secure, **cls._getParams(target, params))
 
 
 # Hack to allow secure Indico on non-80 ports
