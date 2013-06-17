@@ -82,13 +82,25 @@
         return { url: url, unprocessed: unprocessed };
     }
 
+    function fix_params(params) {
+        var clean_params = {};
+        for (var key in params) {
+            var value = params[key];
+            if (value === undefined || value === null) {
+                console.log(params);  // JSON.stringify skips undefined so let's log it here
+                throw new BuildError('params contain undefined/null');
+            }
+            if (!_.isObject(value) || _.isArray(value)) {
+                clean_params[key] = value;
+            }
+        }
+        return clean_params;
+    }
+
     function build_url(template, params, fragment) {
         var qsParams, url;
 
-        if (_.contains(params, undefined) || _.contains(params, null)) {
-            console.log(params);  // JSON.stringify skips undefined so let's log it here
-            throw new BuildError('params contain undefined/null');
-        }
+        params = fix_params(params);
 
         if (typeof template == 'string') {
             url = template;
