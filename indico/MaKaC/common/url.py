@@ -114,13 +114,29 @@ class EndpointURL(_BaseURL):
         self._endpoint = endpoint
         self._secure = secure
 
+    def _fix_param(self, value):
+        if isinstance(value, int):
+            return unicode(value)
+        elif isinstance(value, (list, tuple)):
+            if len(value) == 1:
+                value = self._fix_param(value[0])
+            else:
+                value = map(self._fix_param, value)
+        return value
+
+    def _get_fixed_params(self):
+        params = {}
+        for key, value in self._params.iteritems():
+            params[key] = self._fix_param(value)
+        return params
+
     def _rebuild(self):
         # url_for already creates an absolute url (e.g. /indico/whatever) but since it starts
         # with a slash this is not a problem. It overwrites the path part in baseURL but it's
         # the same one. maybe we could even get rid of the baseURL stuff at some point... It's
         # only really important when we change from SSL to non-SSL or vice versa anyway
         anchor = self.fragment or None
-        self._url = url_join(self._base_url, url_for(self._endpoint, _anchor=anchor, **self._params))
+        self._url = url_join(self._base_url, url_for(self._endpoint, _anchor=anchor, **self._get_fixed_params()))
 
     @property
     def js_router(self):
