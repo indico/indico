@@ -20,13 +20,12 @@ from flask import request, session
 from urlparse import urljoin
 from indico.web.flask.util import ResponseUtil
 
-"""Base definitions for the request handlers (rh). A rh is a class which
-complies to a well defined interface and which from a mod_python request knows
-which action to carry out in order to handle the request made. This means that
-each of the possible HTTP ports of the system will have a rh which will know
-what to do depending on the parameter values received, etc.
-"""
-import copy, time, os, sys, random
+
+import copy
+import time
+import os
+import sys
+import random
 import StringIO
 from datetime import datetime, timedelta
 
