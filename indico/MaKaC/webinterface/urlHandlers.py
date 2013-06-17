@@ -247,7 +247,7 @@ class UHConferenceHelp(URLHandler):
 
 
 class UHCalendar(URLHandler):
-    _endpoint = 'legacy.wcalendar'
+    _endpoint = 'category.wcalendar'
 
     @classmethod
     def getURL(cls, categList=None):
@@ -260,7 +260,7 @@ class UHCalendar(URLHandler):
 
 
 class UHCalendarSelectCategories(URLHandler):
-    _endpoint = 'legacy.wcalendar-select'
+    _endpoint = 'category.wcalendar-select'
 
 
 class UHSimpleCalendar(URLHandler):
@@ -344,7 +344,7 @@ class UHConfModifPreviewCSS(URLHandler):
 
 
 class UHCategoryIcon(URLHandler):
-    _endpoint = 'legacy.categoryDisplay-getIcon'
+    _endpoint = 'category.categoryDisplay-getIcon'
 
 
 class UHConferenceModification(URLHandler):
@@ -2044,7 +2044,7 @@ class UHCategoryPerformCreation(URLHandler):
 
 
 class UHCategoryDisplay(URLHandler):
-    _endpoint = 'legacy.categoryDisplay'
+    _endpoint = 'category.categoryDisplay'
 
     @classmethod
     def getURL(cls, target=None):
@@ -2057,11 +2057,11 @@ class UHCategoryDisplay(URLHandler):
 
 
 class UHCategoryMap(URLHandler):
-    _endpoint = 'legacy.categoryMap'
+    _endpoint = 'category.categoryMap'
 
 
 class UHCategoryOverview(URLHandler):
-    _endpoint = 'legacy.categOverview'
+    _endpoint = 'category.categOverview'
 
     @classmethod
     def getURLFromOverview(cls, ow):
@@ -3474,23 +3474,23 @@ class UHConfModifRegFormSwitchPersonalField(URLHandler):
 
 
 class UHCategoryStatistics(URLHandler):
-    _endpoint = 'legacy.categoryStatistics'
+    _endpoint = 'category.categoryStatistics'
 
 
 class UHCategoryToiCal(URLHandler):
-    _endpoint = 'legacy.categoryDisplay-ical'
+    _endpoint = 'category.categoryDisplay-ical'
 
 
 class UHCategoryToRSS(URLHandler):
-    _endpoint = 'legacy.categoryDisplay-rss'
+    _endpoint = 'category.categoryDisplay-rss'
 
 
 class UHCategoryToAtom(URLHandler):
-    _endpoint = 'legacy.categoryDisplay-atom'
+    _endpoint = 'category.categoryDisplay-atom'
 
 
 class UHCategOverviewToRSS(URLHandler):
-    _endpoint = 'legacy.categOverview-rss'
+    _endpoint = 'category.categOverview-rss'
 
 
 class UHConfRegistrantsList(URLHandler):
@@ -3578,11 +3578,11 @@ class UHConfModifRegistrantStatusesPerformModify(URLHandler):
 
 
 class UHGetCalendarOverview(URLHandler):
-    _endpoint = 'legacy.categOverview'
+    _endpoint = 'category.categOverview'
 
 
 class UHCategoryCalendarOverview(URLHandler):
-    _endpoint = 'legacy.wcalendar'
+    _endpoint = 'category.wcalendar'
 
 
 # URL Handlers for Printing and Design

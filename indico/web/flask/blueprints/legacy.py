@@ -780,15 +780,8 @@ legacy.add_url_rule('/calendarSelect.py',
 
 
 # Routes for categOverview.py
-legacy.add_url_rule('/categOverview.py',
-                    'categOverview',
-                    rh_as_view(mod_rh_categoryDisplay.RHCategOverviewDisplay),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categOverview.py/rss',
-                    'categOverview-rss',
-                    rh_as_view(mod_rh_categoryDisplay.RHTodayCategoryToRSS),
-                    methods=('GET', 'POST'))
+# Inactive: /categOverview.py (mod_rh_categoryDisplay.RHCategOverviewDisplay)
+# Inactive: /categOverview.py/rss (mod_rh_categoryDisplay.RHTodayCategoryToRSS)
 
 
 # Routes for categoryAC.py
@@ -845,30 +838,11 @@ legacy.add_url_rule('/categoryDataModification.py/tasksOption',
 
 
 # Routes for categoryDisplay.py
-legacy.add_url_rule('/categoryDisplay.py',
-                    'categoryDisplay',
-                    rh_as_view(mod_rh_categoryDisplay.RHCategoryDisplay),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryDisplay.py/atom',
-                    'categoryDisplay-atom',
-                    rh_as_view(mod_rh_categoryDisplay.RHCategoryToAtom),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryDisplay.py/getIcon',
-                    'categoryDisplay-getIcon',
-                    rh_as_view(mod_rh_categoryDisplay.RHCategoryGetIcon),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryDisplay.py/ical',
-                    'categoryDisplay-ical',
-                    rh_as_view(mod_rh_categoryDisplay.RHCategoryToiCal),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryDisplay.py/rss',
-                    'categoryDisplay-rss',
-                    rh_as_view(mod_rh_categoryDisplay.RHCategoryToRSS),
-                    methods=('GET', 'POST'))
+# Inactive: /categoryDisplay.py (mod_rh_categoryDisplay.RHCategoryDisplay)
+# Inactive: /categoryDisplay.py/atom (mod_rh_categoryDisplay.RHCategoryToAtom)
+# Inactive: /categoryDisplay.py/getIcon (mod_rh_categoryDisplay.RHCategoryGetIcon)
+# Inactive: /categoryDisplay.py/ical (mod_rh_categoryDisplay.RHCategoryToiCal)
+# Inactive: /categoryDisplay.py/rss (mod_rh_categoryDisplay.RHCategoryToRSS)
 
 
 # Routes for categoryFiles.py
@@ -884,10 +858,7 @@ legacy.add_url_rule('/categoryFiles.py/addMaterial',
 
 
 # Routes for categoryMap.py
-legacy.add_url_rule('/categoryMap.py',
-                    'categoryMap',
-                    rh_as_view(mod_rh_categoryDisplay.RHCategoryMap),
-                    methods=('GET', 'POST'))
+# Inactive: /categoryMap.py (mod_rh_categoryDisplay.RHCategoryMap)
 
 
 # Routes for categoryModification.py
@@ -918,10 +889,7 @@ legacy.add_url_rule('/categoryModification.py/clearConferenceCaches',
 
 
 # Routes for categoryStatistics.py
-legacy.add_url_rule('/categoryStatistics.py',
-                    'categoryStatistics',
-                    rh_as_view(mod_rh_categoryDisplay.RHCategoryStatistics),
-                    methods=('GET', 'POST'))
+# Inactive: /categoryStatistics.py (mod_rh_categoryDisplay.RHCategoryStatistics)
 
 
 # Routes for categoryTasks.py
@@ -3958,15 +3926,8 @@ legacy.add_url_rule('/userSelection.py/createExternalUsers',
 
 
 # Routes for wcalendar.py
-legacy.add_url_rule('/wcalendar.py',
-                    'wcalendar',
-                    rh_as_view(mod_rh_calendar.RHCalendar),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/wcalendar.py/select',
-                    'wcalendar-select',
-                    rh_as_view(mod_rh_calendar.RHCalendarSelectCategories),
-                    methods=('GET', 'POST'))
+# Inactive: /wcalendar.py (mod_rh_calendar.RHCalendar)
+# Inactive: /wcalendar.py/select (mod_rh_calendar.RHCalendarSelectCategories)
 
 
 # Routes for xmlGateway.py

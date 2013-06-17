@@ -41,8 +41,8 @@ from indico.web.flask.blueprints.api import api
 from indico.web.flask.blueprints.category import category
 
 
-BLUEPRINTS = (legacy, legacy_scripts, photos, api)
-COMPAT_BLUEPRINTS = map(make_compat_blueprint, ())
+BLUEPRINTS = (legacy, legacy_scripts, photos, api, category)
+COMPAT_BLUEPRINTS = map(make_compat_blueprint, (category,))
 
 
 def fix_root_path(app):
