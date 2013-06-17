@@ -28,7 +28,8 @@ import textwrap
 import types
 from operator import itemgetter
 
-from indico.web.flask.app import make_app
+from indico.web.flask.app import make_app, COMPAT_BLUEPRINTS
+from indico.web.flask.util import iter_blueprint_rules, legacy_rule_from_endpoint
 
 
 def intercept_visit(f):
@@ -92,7 +93,8 @@ class Walker(ast.NodeVisitor):
 
 
 def generate_imports(routes):
-    for module, alias in sorted(set((route['module'], route['module_alias']) for route in routes)):
+    active_routes = (route for route in routes if not route['inactive'])
+    for module, alias in sorted(set((route['module'], route['module_alias']) for route in active_routes)):
         yield 'import {0} as {1}'.format(module, alias)
 
 
@@ -103,6 +105,9 @@ def generate_routes(routes):
             yield '\n'
         yield '# Routes for {0}'.format(module)
         for i, route in enumerate(module_routes):
+            if route['inactive']:
+                yield '# Inactive: {rule} ({module_alias}.{rh})'.format(**route)
+                continue
             if i != 0:
                 yield ''
             yield textwrap.dedent('''
@@ -115,6 +120,12 @@ def generate_routes(routes):
 
 def main():
     app = make_app()
+
+    # Rules which we need to skip because a legacy blueprint already defines them (with a redirect)
+    modernized_rules = set(legacy_rule_from_endpoint(rule['endpoint'])
+                           for blueprint in COMPAT_BLUEPRINTS
+                           for rule in iter_blueprint_rules(blueprint))
+
     routes = []
     for path in sorted(glob.iglob(os.path.join(app.config['INDICO_HTDOCS'], '*.py'))):
         name = os.path.basename(path)
@@ -133,13 +144,17 @@ def main():
             else:
                 rule = base_url + '/' + func_name
                 endpoint = '{0}-{1}'.format(re.sub(r'\.py$', '', name), func_name)
+            inactive = rule in modernized_rules
+            if inactive:
+                print 'Skipping rule (found in compat blueprint): ' + rule
             routes.append({
                 'rule': rule,
                 'endpoint': endpoint,
                 'pyfile': name,
                 'module': module_name,
                 'module_alias': 'mod_rh_' + module_name.split('.')[-1],
-                'rh': rh.__name__
+                'rh': rh.__name__,
+                'inactive': inactive
             })
 
     if not routes:

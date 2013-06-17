@@ -20,16 +20,16 @@
 from __future__ import absolute_import
 
 import os
+import re
 import time
 
-from flask import request, redirect, url_for
+from flask import request, redirect, url_for, Blueprint
 from flask import current_app as app
 from flask import send_file as _send_file
 from werkzeug.datastructures import Headers, FileStorage
 from werkzeug.exceptions import NotFound
 
 from MaKaC.common import Config
-from MaKaC.plugins.base import RHMapMemory
 from indico.util.caching import memoize
 from indico.web.rh import RHHtdocs
 
@@ -70,6 +70,45 @@ def rh_as_view(rh):
     wrapper.__name__ = rh.__name__
     wrapper.__doc__ = rh.__doc__
     return wrapper
+
+
+def iter_blueprint_rules(blueprint):
+    for func in blueprint.deferred_functions:
+        yield dict(zip(func.func_code.co_freevars, (c.cell_contents for c in func.func_closure)))
+
+
+def legacy_rule_from_endpoint(endpoint):
+    endpoint = re.sub(r':\d+$', '', endpoint)
+    if '-' in endpoint:
+        return '/' + endpoint.replace('-', '.py/')
+    else:
+        return '/' + endpoint + '.py'
+
+
+def make_compat_blueprint(blueprint):
+    compat = Blueprint('compat_' + blueprint.name, __name__)
+    used_endpoints = set()
+    for rule in iter_blueprint_rules(blueprint):
+        if not rule.get('endpoint'):
+            continue
+
+        endpoint = rule['endpoint']
+        i = 0
+        while endpoint in used_endpoints:
+            i += 1
+            endpoint = '%s:%s' % (rule['endpoint'], i)
+        used_endpoints.add(endpoint)
+
+        def _redirect():
+            # Ugly hack to get non-list arguments unless they are used multiple times.
+            # This is necessary since passing a list for an URL path argument breaks things.
+            args = dict((k, v[0] if len(v) == 1 else v) for k, v in request.args.iterlists())
+            target = url_for('%s.%s' % (blueprint.name, rule['endpoint']), **args)
+            return redirect(target)
+
+        compat.add_url_rule(legacy_rule_from_endpoint(endpoint), endpoint, _redirect,
+                            methods=rule['options'].get('methods'))
+    return compat
 
 
 def shorturl_handler(what, tag):

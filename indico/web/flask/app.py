@@ -32,12 +32,17 @@ from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
-from indico.web.flask.util import shorturl_handler, XAccelMiddleware
+from indico.web.flask.util import shorturl_handler, XAccelMiddleware, make_compat_blueprint
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.legacy_scripts import legacy_scripts
 from indico.web.flask.blueprints.photos import photos
 from indico.web.flask.blueprints.api import api
+from indico.web.flask.blueprints.category import category
+
+
+BLUEPRINTS = (legacy, legacy_scripts, photos, api)
+COMPAT_BLUEPRINTS = map(make_compat_blueprint, ())
 
 
 def fix_root_path(app):
@@ -89,10 +94,13 @@ def add_handlers(app):
 
 
 def add_blueprints(app):
-    app.register_blueprint(legacy)
-    app.register_blueprint(legacy_scripts)
-    app.register_blueprint(photos)
-    app.register_blueprint(api)
+    for blueprint in BLUEPRINTS:
+        app.register_blueprint(blueprint)
+
+
+def add_compat_blueprints(app):
+    for blueprint in COMPAT_BLUEPRINTS:
+        app.register_blueprint(blueprint)
 
 
 def add_plugin_blueprints(app):
@@ -128,5 +136,6 @@ def make_app():
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)
+    add_compat_blueprints(app)
     add_plugin_blueprints(app)
     return app
