@@ -11,6 +11,10 @@
         }
         this.name = 'BuildError';
         this.message = message + (arg_str ? ': ' + arg_str : '');
+        // remove the following when http://code.google.com/p/chromium/issues/detail?id=228909 is fixed
+        var err = new Error(this.message);
+        err.name = this.name;
+        return err;
     }
     BuildError.prototype = new Error();
     BuildError.prototype.constructor = BuildError;
