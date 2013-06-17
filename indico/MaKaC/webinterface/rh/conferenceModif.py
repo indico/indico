@@ -2311,7 +2311,7 @@ window.parent.OnUploadCompleted(%s,"%s","%s", "%s") ;
         return fileName
 
     def _process( self ):
-        if "NewFile" in self._params and not type(self._params["NewFile"]) is types.StringType:
+        if "NewFile" in self._params and not isinstance(self._params["NewFile"], basestring):
             newFile = self._params["NewFile"]
             if not hasattr(self, "_filePath"):
                 #do not save the file again in case it already exists (db conflicts)

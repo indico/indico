@@ -17,8 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import types
-
 import MaKaC.conference as conference
 import MaKaC.errors as errors
 import MaKaC.domain as domain
@@ -34,8 +32,8 @@ class CategoryWebLocator:
         if categIds == [] or params["categId"] == "":
             if mustExist:
                 raise errors.MaKaCError( _("category ids not set"))
-        if type(categIds) is types.StringType:
-            categIds = [ categIds ]
+        if isinstance(categIds, basestring):
+            categIds = [categIds]
         ch = conference.CategoryManager()
         for id in categIds:
             try:
