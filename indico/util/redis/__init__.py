@@ -18,9 +18,10 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os
+from werkzeug.local import LocalProxy
+
 from indico.util.contextManager import ContextManager
 from indico.util.redis.scripts import LazyScriptLoader
-from indico.util.proxy import LocalProxy
 from MaKaC.common import Config
 
 try:
