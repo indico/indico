@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import collections
-from flask import session
+from flask import session, request
 import os
 import random
 import urllib
@@ -120,7 +120,7 @@ class WPConferenceBase( base.WPDecorated ):
         if wf:
             return WPDecorated.getLoginURL(self)
 
-        return urlHandlers.UHConfSignIn.getURL(self._conf,"%s"%self._rh.getCurrentURL())
+        return urlHandlers.UHConfSignIn.getURL(self._conf, request.url)
 
     def getLogoutURL( self ):
         return urlHandlers.UHSignOut.getURL(str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
@@ -328,9 +328,9 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         drawer = wcomponents.WConfTickerTapeDrawer(self._conf, self._tz)
         frame = WConfDisplayFrame( self._getAW(), self._conf )
         urlClose = urlHandlers.UHConferenceDisplayMenuClose.getURL(self._conf)
-        urlClose.addParam("currentURL",self._rh.getCurrentURL())
+        urlClose.addParam("currentURL", request.url)
         urlOpen = urlHandlers.UHConferenceDisplayMenuOpen.getURL(self._conf)
-        urlOpen.addParam("currentURL",self._rh.getCurrentURL())
+        urlOpen.addParam("currentURL", request.url)
         menuStatus = session.get('menuStatus', 'open')
 
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
@@ -346,7 +346,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         frameParams = {\
             "confModifURL": urlHandlers.UHConferenceModification.getURL(self._conf), \
             "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf), \
-            "currentURL":self._rh.getCurrentURL(), \
+            "currentURL": request.url, \
             "closeMenuURL":  urlClose, \
             "menuStatus": menuStatus, \
             "nowHappening": drawer.getNowHappeningHTML(), \
@@ -362,7 +362,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         padding=""
         if  menuStatus != "open":
             urlOpen = urlHandlers.UHConferenceDisplayMenuOpen.getURL(self._conf)
-            urlOpen.addParam("currentURL",self._rh.getCurrentURL())
+            urlOpen.addParam("currentURL", request.url)
             colspan = """ colspan="2" """
             imgOpen = """<table valign="top" align="left" border="0" cellspacing="0" cellpadding="0" style="padding-right:10px;">
                            <tr>

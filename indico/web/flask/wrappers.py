@@ -24,6 +24,7 @@ from flask.wrappers import Request
 from werkzeug.utils import cached_property
 
 from MaKaC.common import HelperMaKaCInfo
+from MaKaC.common.url import URL
 from indico.web.flask.session import IndicoSessionInterface
 
 
@@ -35,6 +36,14 @@ class IndicoRequest(Request):
         if HelperMaKaCInfo.getMaKaCInfoInstance().useProxy() and 'HTTP_X_FORWARDED_FOR' in self.environ:
             proxy_ip = self.environ['HTTP_X_FORWARDED_FOR'].split(',')[0].strip()
         return proxy_ip or self.environ['REMOTE_ADDR']
+
+    @cached_property
+    def url(self):
+        return URL(super(IndicoRequest, self).url)
+
+    @cached_property
+    def base_url(self):
+        return URL(super(IndicoRequest, self).base_url)
 
 
 class IndicoFlask(Flask):

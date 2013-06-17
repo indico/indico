@@ -150,11 +150,6 @@ class RHConferenceCreationBase( RHCategoryDisplay ):
 class RHConferenceCreation( RoomBookingDBMixin, RHConferenceCreationBase ):
     _uh = urlHandlers.UHConferenceCreation
 
-    def getCurrentURL( self ):
-        url = self._uh.getURL(self._target)
-        url.addParam("event_type", self._event_type)
-        return url
-
     def _checkProtection( self ):
         try:
             RHConferenceCreationBase._checkProtection( self )
@@ -167,7 +162,6 @@ class RHConferenceCreation( RoomBookingDBMixin, RHConferenceCreationBase ):
         RHConferenceCreationBase._checkParams( self, params, mustExist=0 )
 
     def _process( self ):
-
         if self._event_type == "":
             raise MaKaCError("No event type specified")
         else:

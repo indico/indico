@@ -215,10 +215,10 @@ class WPDecorated( WPBase ):
         return "DisplayArea"
 
     def getLoginURL( self ):
-        return urlHandlers.UHSignIn.getURL("%s"%self._rh.getCurrentURL())
+        return urlHandlers.UHSignIn.getURL(request.url)
 
     def getLogoutURL( self ):
-        return urlHandlers.UHSignOut.getURL("%s"%self._rh.getCurrentURL())
+        return urlHandlers.UHSignOut.getURL(request.url)
 
 
     def _getHeader( self ):
@@ -285,11 +285,11 @@ class WPDecorated( WPBase ):
 
 class WPNotDecorated( WPBase ):
 
-    def getLoginURL( self ):
-        return urlHandlers.UHSignIn.getURL("%s"%self._rh.getCurrentURL())
+    def getLoginURL(self):
+        return urlHandlers.UHSignIn.getURL(request.url)
 
-    def getLogoutURL( self ):
-        return urlHandlers.UHSignOut.getURL("%s"%self._rh.getCurrentURL())
+    def getLogoutURL(self):
+        return urlHandlers.UHSignOut.getURL(request.url)
 
     def _display( self, params ):
         return self._getBody( params )

@@ -16,7 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import session
+from flask import session, request
 
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -89,11 +89,8 @@ class RHRegistrationFormSignIn( RHBaseRegistrationForm ):
 class RHRegistrationFormDisplayBase( RHBaseRegistrationForm ):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 
-    def _getLoginURL( self ):
-        url = self.getCurrentURL()
-        if url == "":
-            url = urlHandlers.UHWelcome.getURL()
-        urlLogin = str(urlHandlers.UHConfRegistrationFormSignIn.getURL( self._conf, url ))
+    def _getLoginURL(self):
+        urlLogin = str(urlHandlers.UHConfRegistrationFormSignIn.getURL(self._conf, request.url))
         if Config.getInstance().getLoginURL().startswith("https"):
             urlLogin = urlLogin.replace("http://", "https://")
         return urlLogin

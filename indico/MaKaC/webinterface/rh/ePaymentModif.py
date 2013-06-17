@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.epayments as ePayments
@@ -125,10 +126,7 @@ class RHRegistrationFormDisplayBase( RHConferenceBaseDisplay ):
         self._regForm = self._conf.getRegistrationForm()
 
     def _getLoginURL( self ):
-        url = self.getCurrentURL()
-        if url == "":
-            url = urlHandlers.UHWelcome.getURL()
-        urlLogin = str(urlHandlers.UHConfRegistrationFormSignIn.getURL( self._conf, url ))
+        urlLogin = str(urlHandlers.UHConfRegistrationFormSignIn.getURL(self._conf, request.url))
         from MaKaC.common import Config
         if Config.getInstance().getLoginURL().startswith("https"):
             urlLogin = urlLogin.replace("http://", "https://")

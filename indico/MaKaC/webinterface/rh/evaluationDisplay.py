@@ -87,9 +87,6 @@ class RHEvaluationDisplayBase( RHBaseEvaluation ):
     _uh = urlHandlers.UHConfEvaluationDisplay
 
     def _getLoginURL( self ):
-        url = self.getCurrentURL()
-        if url == "":
-            url = urlHandlers.UHWelcome.getURL()
         urlLogin = str(urlHandlers.UHSignIn.getURL(urlHandlers.UHConfEvaluationDisplay.getURL(self._conf)))
         if Config.getInstance().getLoginURL().startswith("https"):
             urlLogin = urlLogin.replace("http://", "https://")

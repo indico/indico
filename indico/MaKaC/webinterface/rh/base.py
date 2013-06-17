@@ -96,14 +96,6 @@ class RequestHandlerBase(OldObservable):
         """
         self._aw.setUser(newUser)
 
-    def getCurrentURL( self ):
-        """
-        Gets the "current URL", through the URL handler
-        """
-        if self._uh == None:
-            return ""
-        return self._uh.getURL( self._target )
-
     def getRequestURL(self, secure=False):
         """
         Reconstructs the request URL

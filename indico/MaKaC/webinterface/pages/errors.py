@@ -19,14 +19,13 @@
 
 """Some pages for dealing with generic application errors
 """
-from flask import session
+from flask import session, request
 import traceback
 import sys
 from xml.sax.saxutils import quoteattr
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common import Config
-from MaKaC.conference import Category
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.webinterface.pages.main import WPMainBase
@@ -192,7 +191,7 @@ class WAccessKeyError( WTemplated ):
         vars = WTemplated.getVars( self )
         vars["loginURL"] = ""
         if self._rh._getUser() is None:
-            vars["loginURL"] = str(urlHandlers.UHSignIn.getURL(returnURL=self._rh.getCurrentURL()))
+            vars["loginURL"] = str(urlHandlers.UHSignIn.getURL(returnURL=request.url))
         if isinstance(self._rh._target,Conference):
             vars["type"] = "event"
             vars["url"] = quoteattr( str( urlHandlers.UHConfEnterAccessKey.getURL(self._rh._target) ) )
@@ -315,7 +314,7 @@ class WModificationKeyError( WTemplated ):
         vars = WTemplated.getVars( self )
         vars["loginURL"] = ""
         if self._rh._getUser() is None:
-            vars["loginURL"] = str(urlHandlers.UHSignIn.getURL(returnURL=self._rh.getCurrentURL()))
+            vars["loginURL"] = str(urlHandlers.UHSignIn.getURL(returnURL=request.url))
         vars["msg"] = self._msg
         redirectURL = ""
         if hasattr(self._rh, "_redirectURL"):

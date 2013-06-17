@@ -1058,9 +1058,6 @@ class RHInternalPageDisplay(RHConferenceBaseDisplay):
         else:
             raise MaKaCError( _("The webpage, you are trying to access, does not exist"))
 
-    def getCurrentURL( self ):
-        return self._uh.getURL( self._page )
-
     def _process( self ):
         p=conferences.WPInternalPageDisplay(self,self._conf, self._page)
         return p.display()

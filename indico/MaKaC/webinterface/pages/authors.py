@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 from xml.sax.saxutils import quoteattr
 
@@ -96,8 +97,3 @@ class WPAuthorDisplay(WPConferenceDefaultDisplayBase):
     def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._authorIndexOpt)
-
-    def getLoginURL(self):
-        returnURL = self._rh.getCurrentURL()
-        returnURL.addParam('authorId', self._authorId)
-        return urlHandlers.UHConfSignIn.getURL(self._conf, returnURL)
