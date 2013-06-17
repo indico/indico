@@ -32,7 +32,7 @@ from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
-from indico.web.flask.util import shorturl_handler, XAccelMiddleware, make_compat_blueprint
+from indico.web.flask.util import shorturl_handler, XAccelMiddleware, make_compat_blueprint, ListConverter
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.legacy_scripts import legacy_scripts
@@ -80,9 +80,7 @@ def configure_app(app):
 
 
 def extend_url_map(app):
-    # Doesn't do anything currently. But if you ever need to add a custom url converter register
-    # it in here and put its class definition into indicoweb.flask.util
-    pass
+    app.url_map.converters['list'] = ListConverter
 
 
 def add_handlers(app):

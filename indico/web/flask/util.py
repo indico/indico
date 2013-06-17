@@ -28,6 +28,7 @@ from flask import current_app as app
 from flask import send_file as _send_file
 from werkzeug.datastructures import Headers, FileStorage
 from werkzeug.exceptions import NotFound
+from werkzeug.routing import BaseConverter
 
 from MaKaC.common import Config
 from indico.util.caching import memoize
@@ -146,6 +147,22 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         rv.cache_control.private = True
         rv.cache_control.no_cache = True
     return rv
+
+
+class ListConverter(BaseConverter):
+    """Matches a dash-separated list"""
+
+    def __init__(self, map):
+        BaseConverter.__init__(self, map)
+        self.regex = '\w+(?:-\w+)*'
+
+    def to_python(self, value):
+        return value.split('-')
+
+    def to_url(self, value):
+        if isinstance(value, (list, tuple, set)):
+            value = '-'.join(value)
+        return super(ListConverter, self).to_url(value)
 
 
 class ResponseUtil(object):
