@@ -74,7 +74,7 @@ def rh_as_view(rh):
 
 def shorturl_handler(what, tag):
     if what == 'categ':
-        return redirect(url_for('mp-categoryDisplay-index', categId=tag))
+        return redirect(url_for('legacy.categoryDisplay', categId=tag))
     elif what == 'event':
         from MaKaC.webinterface.rh.conferenceDisplay import RHShortURLRedirect
         return RHShortURLRedirect(None).process({'tag': tag})
