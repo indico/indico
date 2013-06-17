@@ -10847,7 +10847,7 @@ class Material(CommonObjectBase):
         """used mainly in the web session access key table"""
         return "%sm%s" % (self.getOwner().getUniqueId(),self.id)
 
-    def setOwner( self, newOwner ):
+    def setOwner(self, newOwner):
         self.owner = newOwner
 
     def getOwner( self ):
@@ -11022,7 +11022,8 @@ class Material(CommonObjectBase):
     def setMainResource(self, mr):
         self._mainResource = mr
 
-    def delete( self ):
+    def delete(self):
+        self.__ac.unlinkAvatars('access')
         for res in self.getResourceList():
             self.removeResource( res )
         self.notify_protection_to_owner(self, delete=True)
@@ -11455,7 +11456,7 @@ class Resource(CommonObjectBase):
         only the material can be protected with an access key"""
         return self.getOwner().getUniqueId()
 
-    def setOwner( self, newOwner ):
+    def setOwner(self, newOwner):
         self._owner = newOwner
 
     def getOwner( self ):
@@ -11513,10 +11514,11 @@ class Resource(CommonObjectBase):
             system already ensures the archiving of the basic resource data"""
         return
 
-    def delete( self ):
-        if self._owner != None:
+    def delete(self):
+        if self._owner is not None:
             self.notify_protection_to_owner(delete=True)
-            self._owner.removeResource( self )
+            self._owner.removeResource(self)
+            self.__ac.unlinkAvatars('access')
             self._owner = None
             TrashCanManager().add(self)
 
