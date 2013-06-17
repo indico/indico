@@ -793,3 +793,111 @@ function(inPlaceMaterial, inPlaceExistingMaterial, uploadLink, sizeError, initia
         this._drawExistingMaterial();
     }
 });
+
+
+type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
+    {
+        draw: function() {
+            var self = this;
+            var form = IndicoUtil.createFormFromMap([
+                ["Type", self.fieldType],
+                ["Name", self.fieldName],
+                ["Caption", self.fieldCaption],
+                ["Max length", self.fieldMaxLength],
+                ["Mandatory", self.mandatoryFlag]
+            ]);
+
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, $('<div></div>').append(form));
+        },
+
+        _fillForm: function() {
+            // TODO: get the information from existing field
+        },
+
+        _generateForm: function() {
+            var self = this;
+
+            self.fieldType = $("<select></select>", {
+                id: "field-type",
+                name: "fieldType"
+            })  .append("<option>Dropdown</option>")
+                .append("<option>Input</option>")
+                .append("<option>Text field</option>");
+
+            // TODO: append options from available ones stored somewhere
+
+            self.fieldName = $("<input></input>", {
+                type: "text",
+                name: "fieldName"
+            });
+
+            self.fieldCaption = $("<input></input>", {
+                type: "text",
+                name: "fieldCaption"
+            });
+
+            self.fieldMaxLength = $("<input></input>", {
+                type: "text",
+                name: "fieldMaxLength"
+            });
+
+            self.mandatoryFlag = $("<input></input>", {
+                type: "checkbox",
+                name: "mandatoryFlag"
+            });
+        },
+
+        _getButtons: function() {
+            var self = this;
+            var cancelButton;
+            var actionButton;
+            var actionButtonLabel;
+
+            if (this.dialogType == "add") {
+                actionButtonLabel = $T('Add');
+            } else {
+                actionButtonLabel = $T('Update');
+            }
+
+            actionButton = [actionButtonLabel, function() {
+                self.__save();
+            }];
+
+            cancelButton = [$T('Cancel'), function() {
+                self.close();
+            }];
+
+            return [actionButton, cancelButton];
+        },
+
+        __save: function() {
+            if (this.dialogType == "add") {
+                indicoRequest();
+            } else {
+                indicoRequest();
+            }
+        }
+    },
+
+    function(fieldId) {
+        var self = this;
+        var title;
+
+        if (fieldId === undefined) {
+            self.dialogType = "add";
+            title = $T("Add Field");
+        } else {
+            self.dialogType = "edit";
+            self.fieldId = fieldId;
+            self._fillForm();
+            title = $T("Edit Field");
+        }
+
+        self._generateForm();
+        self._fillForm();
+
+        self.ExclusivePopupWithButtons(title, function() {
+            return true;
+        });
+    }
+);

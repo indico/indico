@@ -118,13 +118,20 @@
                     ${ abstractFields }
             </table>
         </td>
+        <td><a id="add-field" href="#">Add field</a></td>
     </tr>
     <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
 </table>
-<br>
+
 <script type="text/javascript">
+$(function() {
+    $("#add-field").click(function(e) {
+        e.preventDefault();
+        new AddAbstractFieldDialog().open();
+    });
+});
 
 var lateSubmissionAuthUsers = new ListOfUsersManager('${ confId }',
     {'addExisting': 'abstracts.lateSubmission.addExistingLateAuthUser', 'remove': 'abstracts.lateSubmission.removeLateAuthUser'},
