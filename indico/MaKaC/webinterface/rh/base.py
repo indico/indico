@@ -676,6 +676,9 @@ class RH(RequestHandlerBase):
         if profile and proffilename != "" and os.path.exists(proffilename):
             os.remove(proffilename)
 
+        if self._responseUtil.call:
+            return self._responseUtil.make_call()
+
         # In case of no process needed, we should return empty string to avoid erroneous ouput
         # specially with getVars breaking the JS files.
         if not self._doProcess or res is None:
