@@ -3,7 +3,7 @@ urlConference = urlHandlers.UHConferenceCreation.getURL(categ)
 urlConference.addParam("event_type","conference")
 
 urlLecture = urlHandlers.UHConferenceCreation.getURL(categ)
-urlLecture.addParam("event_type","simple_event")
+urlLecture.addParam("event_type", "lecture")
 
 urlMeeting = urlHandlers.UHConferenceCreation.getURL(categ)
 urlMeeting.addParam("event_type","meeting")

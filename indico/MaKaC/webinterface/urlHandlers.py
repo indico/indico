@@ -268,7 +268,7 @@ class UHSimpleCalendar(URLHandler):
 
 
 class UHConferenceCreation(URLHandler):
-    _endpoint = 'legacy.conferenceCreation'
+    _endpoint = 'event.conferenceCreation'
 
     @classmethod
     def getURL(cls, target):
@@ -279,23 +279,23 @@ class UHConferenceCreation(URLHandler):
 
 
 class UHConferencePerformCreation(URLHandler):
-    _endpoint = 'legacy.conferenceCreation-createConference'
+    _endpoint = 'event.conferenceCreation-createConference'
 
 
 class UHConferenceDisplay(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay'
+    _endpoint = 'event.conferenceDisplay'
 
 
 class UHNextEvent(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay-next'
+    _endpoint = 'event.conferenceDisplay-next'
 
 
 class UHPreviousEvent(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay-prev'
+    _endpoint = 'event.conferenceDisplay-prev'
 
 
 class UHConferenceOverview(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay'
+    _endpoint = 'event.conferenceDisplay'
     _defaultParams = dict(ovw=True)
 
 

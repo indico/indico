@@ -140,9 +140,11 @@ class RHConferenceCreationBase( RHCategoryDisplay ):
         #    raise MaKaCError( _("Cannot add conferences to a category which already contains some sub-categories"))
         self._wf = None
         self._wfReg = webFactoryRegistry.WebFactoryRegistry()
-        et = params.get("event_type", "").strip()
-        if et != "" and et !="default":
-            self._wf = self._wfReg.getFactoryById( et )
+        self._event_type = params.get("event_type", "").strip()
+        if self._event_type == 'lecture':
+            self._event_type = 'simple_event'
+        if self._event_type and self._event_type != 'default':
+            self._wf = self._wfReg.getFactoryById(self._event_type)
 
 
 #-------------------------------------------------------------------------------------
@@ -158,11 +160,10 @@ class RHConferenceCreation( RoomBookingDBMixin, RHConferenceCreationBase ):
 
     def _checkParams( self, params ):
         self._params = params
-        self._event_type = params.get("event_type", "").strip()
         RHConferenceCreationBase._checkParams( self, params, mustExist=0 )
 
-    def _process( self ):
-        if self._event_type == "":
+    def _process(self):
+        if not self._event_type:
             raise MaKaCError("No event type specified")
         else:
             p = category.WPConferenceCreationMainData( self, self._target )
@@ -191,7 +192,7 @@ class RHConferencePerformCreation( RoomBookingDBMixin, RHConferenceCreationBase 
             params["title"]="No Title"
         # change number of dates (lecture)
         if self._confirm == True:
-            if self._params.get("event_type","") != "simple_event":
+            if self._event_type != "simple_event":
                 c = self._createEvent( self._params )
                 self.alertCreation([c])
             # lectures

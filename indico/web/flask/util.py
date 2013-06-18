@@ -115,14 +115,6 @@ def make_compat_blueprint(blueprint):
     return compat
 
 
-def shorturl_handler(what, tag):
-    if what == 'categ':
-        return redirect(url_for('legacy.categoryDisplay', categId=tag))
-    elif what == 'event':
-        from MaKaC.webinterface.rh.conferenceDisplay import RHShortURLRedirect
-        return RHShortURLRedirect(None).process({'tag': tag})
-
-
 def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=True, conditional=False):
     # Note: path can also be a StringIO!
     if request.user_agent.platform == 'android':

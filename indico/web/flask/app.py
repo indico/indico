@@ -32,17 +32,18 @@ from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
-from indico.web.flask.util import shorturl_handler, XAccelMiddleware, make_compat_blueprint, ListConverter
+from indico.web.flask.util import XAccelMiddleware, make_compat_blueprint, ListConverter
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.legacy_scripts import legacy_scripts
 from indico.web.flask.blueprints.photos import photos
 from indico.web.flask.blueprints.api import api
-from indico.web.flask.blueprints.category import category
+from indico.web.flask.blueprints.category import category, category_shorturl
+from indico.web.flask.blueprints.event import event
 
 
-BLUEPRINTS = (legacy, legacy_scripts, photos, api, category)
-COMPAT_BLUEPRINTS = map(make_compat_blueprint, (category,))
+BLUEPRINTS = (legacy, legacy_scripts, photos, api, category, category_shorturl, event)
+COMPAT_BLUEPRINTS = map(make_compat_blueprint, (category, event))
 
 
 def fix_root_path(app):
@@ -85,8 +86,6 @@ def extend_url_map(app):
 
 def add_handlers(app):
     app.add_url_rule('/', view_func=lambda: redirect(url_for('legacy.index')))
-    # TODO: Remove the shorturl route and handle them in the main /event/ and /categ/ handlers
-    app.add_url_rule('/<any(event, categ):what>/<tag>', view_func=shorturl_handler, endpoint='shorturl')
     app.register_error_handler(404, handle_404)
     app.register_error_handler(Exception, handle_exception)
 

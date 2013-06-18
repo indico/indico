@@ -30,7 +30,6 @@ import MaKaC.webinterface.rh.announcement as mod_rh_announcement
 import MaKaC.webinterface.rh.api as mod_rh_api
 import MaKaC.webinterface.rh.authorDisplay as mod_rh_authorDisplay
 import MaKaC.webinterface.rh.calendar as mod_rh_calendar
-import MaKaC.webinterface.rh.categoryDisplay as mod_rh_categoryDisplay
 import MaKaC.webinterface.rh.collaboration as mod_rh_collaboration
 import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
@@ -2235,22 +2234,12 @@ legacy.add_url_rule('/conferenceCFA.py',
 
 
 # Routes for conferenceCreation.py
-legacy.add_url_rule('/conferenceCreation.py',
-                    'conferenceCreation',
-                    rh_as_view(mod_rh_categoryDisplay.RHConferenceCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceCreation.py/createConference',
-                    'conferenceCreation-createConference',
-                    rh_as_view(mod_rh_categoryDisplay.RHConferencePerformCreation),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceCreation.py (mod_rh_categoryDisplay.RHConferenceCreation)
+# Inactive: /conferenceCreation.py/createConference (mod_rh_categoryDisplay.RHConferencePerformCreation)
 
 
 # Routes for conferenceDisplay.py
-legacy.add_url_rule('/conferenceDisplay.py',
-                    'conferenceDisplay',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceDisplay),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceDisplay.py (mod_rh_conferenceDisplay.RHConferenceDisplay)
 
 legacy.add_url_rule('/conferenceDisplay.py/abstractBook',
                     'conferenceDisplay-abstractBook',
@@ -2301,21 +2290,13 @@ legacy.add_url_rule('/conferenceDisplay.py/matPkg',
                     'conferenceDisplay-matPkg',
                     rh_as_view(mod_rh_conferenceDisplay.RHFullMaterialPackage),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceDisplay.py/next',
-                    'conferenceDisplay-next',
-                    rh_as_view(mod_rh_conferenceDisplay.RHRelativeEvent),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceDisplay.py/next (mod_rh_conferenceDisplay.RHRelativeEvent)
 
 legacy.add_url_rule('/conferenceDisplay.py/performMatPkg',
                     'conferenceDisplay-performMatPkg',
                     rh_as_view(mod_rh_conferenceDisplay.RHFullMaterialPackagePerform),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceDisplay.py/prev',
-                    'conferenceDisplay-prev',
-                    rh_as_view(mod_rh_conferenceDisplay.RHRelativeEvent),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceDisplay.py/prev (mod_rh_conferenceDisplay.RHRelativeEvent)
 
 legacy.add_url_rule('/conferenceDisplay.py/xml',
                     'conferenceDisplay-xml',

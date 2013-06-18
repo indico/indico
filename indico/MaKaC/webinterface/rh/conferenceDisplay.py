@@ -18,7 +18,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from datetime import datetime
-from flask import session
+from flask import session, redirect
 import os
 import re
 import pytz
@@ -438,9 +438,9 @@ class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
 
 
 class RHRelativeEvent(RHConferenceBaseDisplay):
-    def __init__(self, req, which):
-        RHConferenceBaseDisplay.__init__(self, req)
-        self._which = which
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        self._which = params['which']
 
     def _process(self):
         evt = self._conf.getOwner().getRelativeEvent(self._which, conf=self._conf)
@@ -1160,25 +1160,3 @@ class RHFullMaterialPackagePerform(RHConferenceBaseDisplay):
         else:
             self._redirect(
                 urlHandlers.UHConferenceDisplay.getURL(self._conf))
-
-
-
-class RHShortURLRedirect(RH):
-
-    def _checkParams( self, params ):
-        self._tag = params.get("tag", "").strip()
-
-    def _process(self):
-        from MaKaC.conference import ConferenceHolder
-        ch = ConferenceHolder()
-        from MaKaC.common.url import ShortURLMapper
-        sum = ShortURLMapper()
-        if ch.hasKey(self._tag):
-            conf = ch.getById(self._tag)
-            self._redirect(urlHandlers.UHConferenceDisplay.getURL(conf))
-        elif sum.hasKey(self._tag):
-            conf = sum.getById(self._tag)
-            self._redirect(urlHandlers.UHConferenceDisplay.getURL(conf))
-        else:
-            raise NoReportError(_("The specified event with id or tag \"%s\" does not exist or has been deleted")%self._tag)
-
