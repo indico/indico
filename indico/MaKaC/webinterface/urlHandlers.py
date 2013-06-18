@@ -751,7 +751,7 @@ class UHConfCFAAllowAttachFiles(URLHandler):
 
 
 class UHAbstractAttachmentFileAccess(URLHandler):
-    _endpoint = 'legacy.abstractDisplay-getAttachedFile'
+    _endpoint = 'event.abstractDisplay-getAttachedFile'
 
 
 class UHConfCFAShowSelectAsSpeaker(URLHandler):
@@ -811,16 +811,15 @@ class UHConfAbstractList(URLHandler):
 
 
 class UHAbstractSubmission(URLHandler):
-    _endpoint = 'legacy.abstractSubmission'
-    _fragment = 'interest'
+    _endpoint = 'event.abstractSubmission'
 
 
 class UHAbstractSubmissionConfirmation(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-confirmation'
+    _endpoint = 'event.abstractSubmission-confirmation'
 
 
 class UHAbstractDisplay(URLHandler):
-    _endpoint = 'legacy.abstractDisplay'
+    _endpoint = 'event.abstractDisplay'
 
 
 class UHAbstractDisplayMaterial(URLHandler):
@@ -840,7 +839,7 @@ class UHAbstractDisplayRemoveMaterials(URLHandler):
 
 
 class UHAbstractDisplayPDF(URLHandler):
-    _endpoint = 'legacy.abstractDisplay-pdf'
+    _endpoint = 'event.abstractDisplay-pdf'
 
 
 class UHAbstractConfManagerDisplayPDF(URLHandler):
@@ -880,16 +879,15 @@ class UHAbstractstrackManagerDisplayPDF(URLHandler):
 
 
 class UHUserAbstracts(URLHandler):
-    _endpoint = 'legacy.userAbstracts'
+    _endpoint = 'event.userAbstracts'
 
 
 class UHUserAbstractsPDF(URLHandler):
-    _endpoint = 'legacy.userAbstracts-pdf'
+    _endpoint = 'event.userAbstracts-pdf'
 
 
 class UHAbstractModify(URLHandler):
-    _endpoint = 'legacy.abstractModify'
-    _fragment = 'interest'
+    _endpoint = 'event.abstractModify'
 
 
 class UHCFAModifAbstracts(URLHandler):
@@ -945,7 +943,7 @@ class UHAbstractToXML(URLHandler):
 
 
 class UHAbstractSubmissionDisplay(URLHandler):
-    _endpoint = 'legacy.abstractSubmission'
+    _endpoint = 'event.abstractSubmission'
 
 
 class UHAbstractCheckUser(URLHandler):
@@ -2251,23 +2249,23 @@ class UHMaterialDisplay(URLHandler):
 
 
 class UHConferenceProgram(URLHandler):
-    _endpoint = 'legacy.conferenceProgram'
+    _endpoint = 'event.conferenceProgram'
 
 
 class UHConferenceProgramPDF(URLHandler):
-    _endpoint = 'legacy.conferenceProgram-pdf'
+    _endpoint = 'event.conferenceProgram-pdf'
 
 
 class UHConferenceTimeTable(URLHandler):
-    _endpoint = 'legacy.conferenceTimeTable'
+    _endpoint = 'event.conferenceTimeTable'
 
 
 class UHConfTimeTablePDF(URLHandler):
-    _endpoint = 'legacy.conferenceTimeTable-pdf'
+    _endpoint = 'event.conferenceTimeTable-pdf'
 
 
 class UHConferenceCFA(URLHandler):
-    _endpoint = 'legacy.conferenceCFA'
+    _endpoint = 'event.conferenceCFA'
 
 
 class UHSessionDisplay(URLHandler):
@@ -2315,11 +2313,11 @@ class UHErrorSendReport(URLHandler):
 
 
 class UHAbstractWithdraw(URLHandler):
-    _endpoint = 'legacy.abstractWithdraw'
+    _endpoint = 'event.abstractWithdraw'
 
 
 class UHAbstractRecovery(URLHandler):
-    _endpoint = 'legacy.abstractWithdraw-recover'
+    _endpoint = 'event.abstractWithdraw-recover'
 
 
 class UHConfModifContribList(URLHandler):
@@ -2488,11 +2486,11 @@ class UHConfModifReschedule(URLHandler):
 
 
 class UHContributionList(URLHandler):
-    _endpoint = 'legacy.contributionListDisplay'
+    _endpoint = 'event.contributionListDisplay'
 
 
 class UHContributionListToPDF(URLHandler):
-    _endpoint = 'legacy.contributionListDisplay-contributionsToPDF'
+    _endpoint = 'event.contributionListDisplay-contributionsToPDF'
 
 
 class UHConfModAbstractPropToAcc(URLHandler):
@@ -2536,11 +2534,11 @@ class UHConfModCFANotifTplDown(URLHandler):
 
 
 class UHConfAuthorIndex(URLHandler):
-    _endpoint = 'legacy.confAuthorIndex'
+    _endpoint = 'event.confAuthorIndex'
 
 
 class UHConfSpeakerIndex(URLHandler):
-    _endpoint = 'legacy.confSpeakerIndex'
+    _endpoint = 'event.confSpeakerIndex'
 
 
 class UHContribModWithdraw(URLHandler):
@@ -3150,7 +3148,7 @@ class UHContribAuthorDisplay(URLHandler):
 
 
 class UHConfTimeTableCustomizePDF(URLHandler):
-    _endpoint = 'legacy.conferenceTimeTable-customizePdf'
+    _endpoint = 'event.conferenceTimeTable-customizePdf'
 
 
 class UHConfRegistrationForm(URLHandler):
@@ -4004,10 +4002,6 @@ class UHContribModifReviewingMaterials(URLHandler):
 
 class UHContributionReviewingJudgements(URLHandler):
     _endpoint = 'legacy.contributionReviewing-contributionReviewingJudgements'
-
-
-class UHContributionSubmitForRewiewing(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-submitForReviewing'
 
 
 class UHAssignReferee(URLHandler):

@@ -817,11 +817,10 @@ type("SubmitPopup", ["ExclusivePopupWithButtons"], {
         ];
     }
     },
-     function(title, args, action) {
+     function(title, args) {
 
          this.title = title;
          this.args = args;
-         this.action = action;
          this.width = 400;
 
          this.ExclusivePopup(this.title, null, true, true);

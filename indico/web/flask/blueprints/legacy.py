@@ -20,7 +20,6 @@
 from flask import Blueprint
 from indico.web.flask.util import rh_as_view
 
-import MaKaC.webinterface.rh.CFADisplay as mod_rh_CFADisplay
 import MaKaC.webinterface.rh.JSContent as mod_rh_JSContent
 import MaKaC.webinterface.rh.about as mod_rh_about
 import MaKaC.webinterface.rh.abstractModif as mod_rh_abstractModif
@@ -124,20 +123,9 @@ legacy.add_url_rule('/about.py',
 
 
 # Routes for abstractDisplay.py
-legacy.add_url_rule('/abstractDisplay.py',
-                    'abstractDisplay',
-                    rh_as_view(mod_rh_CFADisplay.RHAbstractDisplay),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractDisplay.py/getAttachedFile',
-                    'abstractDisplay-getAttachedFile',
-                    rh_as_view(mod_rh_CFADisplay.RHGetAttachedFile),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractDisplay.py/pdf',
-                    'abstractDisplay-pdf',
-                    rh_as_view(mod_rh_CFADisplay.RHAbstractDisplayPDF),
-                    methods=('GET', 'POST'))
+# Inactive: /abstractDisplay.py (mod_rh_CFADisplay.RHAbstractDisplay)
+# Inactive: /abstractDisplay.py/getAttachedFile (mod_rh_CFADisplay.RHGetAttachedFile)
+# Inactive: /abstractDisplay.py/pdf (mod_rh_CFADisplay.RHAbstractDisplayPDF)
 
 
 # Routes for abstractManagment.py
@@ -273,10 +261,7 @@ legacy.add_url_rule('/abstractManagment.py/xml',
 
 
 # Routes for abstractModify.py
-legacy.add_url_rule('/abstractModify.py',
-                    'abstractModify',
-                    rh_as_view(mod_rh_CFADisplay.RHAbstractModify),
-                    methods=('GET', 'POST'))
+# Inactive: /abstractModify.py (mod_rh_CFADisplay.RHAbstractModify)
 
 
 # Routes for abstractReviewing.py
@@ -342,15 +327,8 @@ legacy.add_url_rule('/abstractReviewing.py/reviewingTeam',
 
 
 # Routes for abstractSubmission.py
-legacy.add_url_rule('/abstractSubmission.py',
-                    'abstractSubmission',
-                    rh_as_view(mod_rh_CFADisplay.RHAbstractSubmission),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractSubmission.py/confirmation',
-                    'abstractSubmission-confirmation',
-                    rh_as_view(mod_rh_CFADisplay.RHAbstractSubmissionConfirmation),
-                    methods=('GET', 'POST'))
+# Inactive: /abstractSubmission.py (mod_rh_CFADisplay.RHAbstractSubmission)
+# Inactive: /abstractSubmission.py/confirmation (mod_rh_CFADisplay.RHAbstractSubmissionConfirmation)
 
 
 # Routes for abstractTools.py
@@ -366,15 +344,8 @@ legacy.add_url_rule('/abstractTools.py/delete',
 
 
 # Routes for abstractWithdraw.py
-legacy.add_url_rule('/abstractWithdraw.py',
-                    'abstractWithdraw',
-                    rh_as_view(mod_rh_CFADisplay.RHAbstractWithdraw),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractWithdraw.py/recover',
-                    'abstractWithdraw-recover',
-                    rh_as_view(mod_rh_CFADisplay.RHAbstractRecovery),
-                    methods=('GET', 'POST'))
+# Inactive: /abstractWithdraw.py (mod_rh_CFADisplay.RHAbstractWithdraw)
+# Inactive: /abstractWithdraw.py/recover (mod_rh_CFADisplay.RHAbstractRecovery)
 
 
 # Routes for abstractsManagment.py
@@ -869,10 +840,7 @@ legacy.add_url_rule('/confAbstractBook.py/test',
 
 
 # Routes for confAuthorIndex.py
-legacy.add_url_rule('/confAuthorIndex.py',
-                    'confAuthorIndex',
-                    rh_as_view(mod_rh_conferenceDisplay.RHAuthorIndex),
-                    methods=('GET', 'POST'))
+# Inactive: /confAuthorIndex.py (mod_rh_conferenceDisplay.RHAuthorIndex)
 
 
 # Routes for confDisplayEvaluation.py
@@ -2203,10 +2171,7 @@ legacy.add_url_rule('/confRegistrationFormDisplay.py/signIn',
 
 
 # Routes for confSpeakerIndex.py
-legacy.add_url_rule('/confSpeakerIndex.py',
-                    'confSpeakerIndex',
-                    rh_as_view(mod_rh_conferenceDisplay.RHSpeakerIndex),
-                    methods=('GET', 'POST'))
+# Inactive: /confSpeakerIndex.py (mod_rh_conferenceDisplay.RHSpeakerIndex)
 
 
 # Routes for confUser.py
@@ -2227,10 +2192,7 @@ legacy.add_url_rule('/confUser.py/userExists',
 
 
 # Routes for conferenceCFA.py
-legacy.add_url_rule('/conferenceCFA.py',
-                    'conferenceCFA',
-                    rh_as_view(mod_rh_CFADisplay.RHConferenceCFA),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceCFA.py (mod_rh_CFADisplay.RHConferenceCFA)
 
 
 # Routes for conferenceCreation.py
@@ -2444,32 +2406,14 @@ legacy.add_url_rule('/conferenceOtherViews.py',
 
 
 # Routes for conferenceProgram.py
-legacy.add_url_rule('/conferenceProgram.py',
-                    'conferenceProgram',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceProgram),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceProgram.py/pdf',
-                    'conferenceProgram-pdf',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceProgramPDF),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceProgram.py (mod_rh_conferenceDisplay.RHConferenceProgram)
+# Inactive: /conferenceProgram.py/pdf (mod_rh_conferenceDisplay.RHConferenceProgramPDF)
 
 
 # Routes for conferenceTimeTable.py
-legacy.add_url_rule('/conferenceTimeTable.py',
-                    'conferenceTimeTable',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceTimeTable),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceTimeTable.py/customizePdf',
-                    'conferenceTimeTable-customizePdf',
-                    rh_as_view(mod_rh_conferenceDisplay.RHTimeTableCustomizePDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceTimeTable.py/pdf',
-                    'conferenceTimeTable-pdf',
-                    rh_as_view(mod_rh_conferenceDisplay.RHTimeTablePDF),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceTimeTable.py (mod_rh_conferenceDisplay.RHConferenceTimeTable)
+# Inactive: /conferenceTimeTable.py/customizePdf (mod_rh_conferenceDisplay.RHTimeTableCustomizePDF)
+# Inactive: /conferenceTimeTable.py/pdf (mod_rh_conferenceDisplay.RHTimeTablePDF)
 
 
 # Routes for contact.py
@@ -2555,15 +2499,8 @@ legacy.add_url_rule('/contributionGiveAdvice.py/giveAdvice',
 
 
 # Routes for contributionListDisplay.py
-legacy.add_url_rule('/contributionListDisplay.py',
-                    'contributionListDisplay',
-                    rh_as_view(mod_rh_conferenceDisplay.RHContributionList),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionListDisplay.py/contributionsToPDF',
-                    'contributionListDisplay-contributionsToPDF',
-                    rh_as_view(mod_rh_conferenceDisplay.RHContributionListToPDF),
-                    methods=('GET', 'POST'))
+# Inactive: /contributionListDisplay.py (mod_rh_conferenceDisplay.RHContributionList)
+# Inactive: /contributionListDisplay.py/contributionsToPDF (mod_rh_conferenceDisplay.RHContributionListToPDF)
 
 
 # Routes for contributionModifSubCont.py
@@ -3724,15 +3661,8 @@ legacy.add_url_rule('/userAPI.py/delete',
 
 
 # Routes for userAbstracts.py
-legacy.add_url_rule('/userAbstracts.py',
-                    'userAbstracts',
-                    rh_as_view(mod_rh_CFADisplay.RHUserAbstracts),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/userAbstracts.py/pdf',
-                    'userAbstracts-pdf',
-                    rh_as_view(mod_rh_CFADisplay.RHUserAbstractsPDF),
-                    methods=('GET', 'POST'))
+# Inactive: /userAbstracts.py (mod_rh_CFADisplay.RHUserAbstracts)
+# Inactive: /userAbstracts.py/pdf (mod_rh_CFADisplay.RHUserAbstractsPDF)
 
 
 # Routes for userBaskets.py

@@ -400,7 +400,7 @@ class RHUserAbstractsPDF(RHAbstractSubmissionBase):
             return _("No abstract to print")
 
         pdf = AbstractsToPDF(self._conf, self._abstractIds, tz=tz)
-        return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF')
+        return send_file('my-abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHAbstractModificationBase( RHAbstractDisplayBase, RHModificationBaseProtected ):

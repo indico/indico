@@ -150,7 +150,7 @@
     };
 
     var updateStaticURL = function() {
-        var url = '${ urlHandlers.UHContributionList.getURL(conf) }';
+        var url = '${ urlHandlers.UHContributionList.getURL(conf) }?';
         var query = checkQueryParam($("#contribTypeSelector"), "typeShowNoValue", "selTypes")
                 + checkQueryParam($("#sessionSelector"), "sessionShowNoValue", "selSessions")
                 + checkQueryParam($("#trackSelector"), "trackShowNoValue", "selTracks");

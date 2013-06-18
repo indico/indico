@@ -155,7 +155,7 @@
     });
 
     $("#revSubmit").click(function(){
-        var popupSubmit = new SubmitPopup($T("Paper selection and submission"), args, '${urlHandlers.UHContributionSubmitForRewiewing.getURL(Contribution)}');
+        var popupSubmit = new SubmitPopup($T("Paper selection and submission"), args);
         popupSubmit.open();
     });
 
