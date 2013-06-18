@@ -2026,7 +2026,7 @@ class AbstractBook(PDFWithTOC):
         lauth=[]
         institutions=[]
         authors = self._addAuthors(contrib.getPrimaryAuthorList(), institutions)
-        if contrib.getCoAuthorList():
+        if authors and contrib.getCoAuthorList():
             authors = i18nformat("""<b>_("%s"):</b> %s""")%(ngettext("Author", "Authors", len(authors)), "; ".join(authors))
         else:
             authors = "; ".join(authors)
@@ -2052,12 +2052,7 @@ class AbstractBook(PDFWithTOC):
                 submitter = i18nformat("""<b>_("Corresponding Author"):</b> %s""")%submitterEmail
                 paragraphs.append(Paragraph(escape(submitter),self._styles["normal"]))
         elif self._conf.getBOAConfig().getCorrespondingAuthor() == "speakers":
-            speakersEmail = []
-            if isinstance(contrib, conference.AcceptedContribution):
-                speakersEmail = [speaker.getEmail() for speaker in contrib.getAbstract().getSpeakerList()]
-            elif contrib.getSubmitterList():
-                speakersEmail = [speaker.getEmail() for speaker in contrib.getSpeakerList()]
-
+            speakersEmail = [speaker.getEmail() for speaker in contrib.getSpeakerList()]
             if speakersEmail:
                 speakers = i18nformat("""<b>_("Corresponding %s"):</b> %s""")%(ngettext("Author", "Authors", len(speakersEmail)), ", ".join(speakersEmail))
                 paragraphs.append(Paragraph(escape(speakers),self._styles["normal"]))

@@ -30,14 +30,14 @@
         </td>
     </tr>
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Corresponding Author")}</span></td>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat" style="white-space: nowrap;"> ${ _("Corresponding Author")}</span></td>
         <td class="blacktext" width="100%">
             <div id="inPlaceEditCorrespondingAuthor" style="display:inline"></div>
         </td>
     </tr>
     <tr>
         <td class="dataCaptionTD">
-            <span class="dataCaptionFormat"> ${ _("Miscellaneous options")}</span><br/><br/>
+            <span class="dataCaptionFormat" style="white-space: nowrap;"> ${ _("Miscellaneous options")}</span><br/><br/>
             <img src="${Config.getInstance().getSystemIconURL( 'enabledSection' )}" alt="${ _("Click to disable")}"> <small> ${ _("Enabled option")}</small>
             <br />
             <img src="${Config.getInstance().getSystemIconURL( 'disabledSection' )}" alt="${ _("Click to enable")}"> <small> ${ _("Disabled option")}</small>
