@@ -18,6 +18,7 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from flask import Blueprint, redirect, url_for
+from werkzeug.exceptions import NotFound
 
 from MaKaC.common import DBMgr
 from MaKaC.errors import NoReportError
@@ -32,29 +33,42 @@ def _redirect_simple_event(**kwargs):
     return redirect(url_for('.conferenceCreation', event_type='lecture', **kwargs))
 
 
-def _event_or_shorturl(confId):
+def _event_or_shorturl(confId, shorturl_namespace=False):
     from MaKaC.conference import ConferenceHolder
     from MaKaC.common.url import ShortURLMapper
 
     with DBMgr.getInstance().global_connection():
         ch = ConferenceHolder()
-        shum = ShortURLMapper()
+        su = ShortURLMapper()
         if ch.hasKey(confId):
-            func = lambda: conferenceDisplay.RHConferenceDisplay(None).process({'confId': confId})
-        elif shum.hasKey(confId):
-            url = UHConferenceDisplay.getURL(shum.getById(confId))
+            if shorturl_namespace:
+                url = UHConferenceDisplay.getURL(ch.getById(confId))
+                func = lambda: redirect(url)
+            else:
+                func = lambda: conferenceDisplay.RHConferenceDisplay(None).process({'confId': confId})
+        elif su.hasKey(confId):
+            url = UHConferenceDisplay.getURL(su.getById(confId))
             func = lambda: redirect(url)
         else:
-            raise NoReportError(
+            if '/' in confId and not shorturl_namespace:
+                # Most likely NOT an attempt to retrieve an event with an invalid short url
+                raise NotFound()
+            raise NotFound(
                 _("The specified event with id or tag \"%s\" does not exist or has been deleted") % confId)
+
     return func()
 
 
 event = Blueprint('event', __name__, url_prefix='/event')
+event_shorturl = Blueprint('event_shorturl', __name__)
+
+
+# Short URLs
+event_shorturl.add_url_rule('/e/<path:confId>', view_func=_event_or_shorturl, strict_slashes=False,
+                            defaults={'shorturl_namespace': True})
 
 
 # conferenceCreation.py
-event.add_url_rule('/create', 'conferenceCreation', rh_as_view(categoryDisplay.RHConferenceCreation))
 event.add_url_rule('/create/simple_event', view_func=_redirect_simple_event)
 event.add_url_rule('/create/simple_event/<categId>', view_func=_redirect_simple_event)
 event.add_url_rule('/create/<any(lecture,meeting,conference):event_type>', 'conferenceCreation',
@@ -65,7 +79,7 @@ event.add_url_rule('/create/save', 'conferenceCreation-createConference',
                    rh_as_view(categoryDisplay.RHConferencePerformCreation), methods=('POST',))
 
 # conferenceDisplay.py
-event.add_url_rule('/<confId>/', 'conferenceDisplay', _event_or_shorturl)
+event.add_url_rule('/<path:confId>/', 'conferenceDisplay', _event_or_shorturl)
 event.add_url_rule('/<confId>/next', 'conferenceDisplay-next', rh_as_view(conferenceDisplay.RHRelativeEvent),
                    defaults={'which': 'next'})
 event.add_url_rule('/<confId>/prev', 'conferenceDisplay-prev', rh_as_view(conferenceDisplay.RHRelativeEvent),

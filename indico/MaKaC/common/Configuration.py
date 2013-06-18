@@ -564,8 +564,6 @@ class Config:
             'CssBaseURL'                : "%s/css" % self.getBaseURL(),
             'CssConfTemplateBaseURL'    : self.getCssConfTemplateBaseURL(),
             'DefaultEventStylesheet'    : self.__defaultEventStylesheet,
-            'ShortCategURL'             : '%s/categ/' % self.getBaseURL(),
-            'ShortEventURL'             : '%s/event/' % self.getBaseURL(),
             'TPLDir'                    : os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'webinterface', 'tpls')),
             'HostNameURL'               : urlparse.urlparse(self.getBaseURL())[1].partition(':')[0],
             'PortURL'                   : urlparse.urlparse(self.getBaseURL())[1].partition(':')[2] or '80',
@@ -650,6 +648,12 @@ class Config:
             return True
         else:
             return False
+
+    def getShortCategURL(self):
+        return '%s/c/' % self.getBaseURL()
+
+    def getShortEventURL(self):
+        return '%s/e/' % self.getBaseURL()
 
     def getSmtpUseTLS(self):
         return self._yesOrNoVariable('SmtpUseTLS')

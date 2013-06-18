@@ -27,8 +27,9 @@ from flask import request, redirect, url_for, Blueprint
 from flask import current_app as app
 from flask import send_file as _send_file
 from werkzeug.datastructures import Headers, FileStorage
-from werkzeug.exceptions import NotFound
-from werkzeug.routing import BaseConverter
+from werkzeug.exceptions import NotFound, HTTPException
+from werkzeug.routing import BaseConverter, RequestRedirect
+from werkzeug.urls import url_parse
 
 from MaKaC.common import Config
 from indico.util.caching import memoize
@@ -113,6 +114,17 @@ def make_compat_blueprint(blueprint):
         compat.add_url_rule(legacy_rule_from_endpoint(endpoint), endpoint, make_compat_redirect_func(blueprint, rule),
                             methods=rule['options'].get('methods'))
     return compat
+
+
+def endpoint_for_url(url):
+    urldata = url_parse(url)
+    adapter = app.url_map.bind(urldata.netloc)
+    try:
+        return adapter.match(urldata.path)
+    except RequestRedirect, e:
+        return endpoint_for_url(e.new_url)
+    except HTTPException:
+        return None
 
 
 def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=True, conditional=False):

@@ -24,13 +24,17 @@ import MaKaC.webinterface.rh.categoryMod as categoryMod
 from indico.web.flask.util import rh_as_view
 
 
-category = Blueprint('category', __name__, url_prefix='/category')
-category_shorturl = Blueprint('category_shorturl', __name__, url_prefix='/categ')
-
-
-@category_shorturl.route('/<categId>', strict_slashes=False)
-def shorturl(categId):
+def _shorturl(categId):
     return redirect(url_for('category.categoryDisplay', categId=categId))
+
+
+category = Blueprint('category', __name__, url_prefix='/category')
+category_shorturl = Blueprint('category_shorturl', __name__)
+
+
+# Short URLs
+category_shorturl.add_url_rule('/categ/<categId>', view_func=_shorturl, strict_slashes=False)
+category_shorturl.add_url_rule('/c/<categId>', view_func=_shorturl, strict_slashes=False)
 
 
 # categoryDisplay.py

@@ -39,10 +39,10 @@ from indico.web.flask.blueprints.legacy_scripts import legacy_scripts
 from indico.web.flask.blueprints.photos import photos
 from indico.web.flask.blueprints.api import api
 from indico.web.flask.blueprints.category import category, category_shorturl
-from indico.web.flask.blueprints.event import event
+from indico.web.flask.blueprints.event import event, event_shorturl
 
 
-BLUEPRINTS = (legacy, legacy_scripts, photos, api, category, category_shorturl, event)
+BLUEPRINTS = (legacy, legacy_scripts, photos, api, category, category_shorturl, event, event_shorturl)
 COMPAT_BLUEPRINTS = map(make_compat_blueprint, (category, event))
 
 
@@ -109,7 +109,11 @@ def handle_404(exception):
     try:
         return send_from_directory(app.config['INDICO_HTDOCS'], request.path[1:], conditional=True)
     except NotFound:
-        msg = (_("Page not found"), _("The page you were looking for doesn't exist."))
+        if exception.description == NotFound.description:
+            # The default reason is too long and not localized
+            msg = (_("Page not found"), _("The page you were looking for doesn't exist."))
+        else:
+            msg = (_("Page not found"), exception.description)
         return WErrorWSGI(msg).getHTML(), 404
 
 
