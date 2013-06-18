@@ -78,8 +78,43 @@ class RemoveLateSubmissionAuthUser(ConferenceModifBase):
         return fossilize(self._conf.getAbstractMgr().getAuthorizedSubmitterList())
 
 
+class AddField(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self.fieldId = pm.extract("id", pType=str, allowEmpty=True)
+        self.name = pm.extract("name", pType=str, allowEmpty=False)
+        self.caption = pm.extract("caption", pType=str, allowEmpty=False)
+        self.maxLength = pm.extract("maxLength", pType=str, allowEmpty=False)
+        self.isMandatory = pm.extract("isMandatory", pType=bool, allowEmpty=False)
+        self.fieldType = pm.extract("fieldType", pType=str, allowEmpty=False)
+        self.fieldLimitation = pm.extract("fieldLimitation", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        self._conf.getAbstractMgr().addAbstractField(self.fieldId, self.name, self.caption,
+                                                     self.maxLength, self.isMandatory,
+                                                     self.fieldType, self.fieldLimitation)
+
+
+class GetField(ConferenceModifBase):
+
+    def _checkParams(self):
+        ConferenceModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self.fieldId = pm.extract("id", pType=str, allowEmpty=False)
+
+    def _getAnswer(self):
+        field = self._conf.getAbstractMgr().getAbstractFieldsMgr().getFieldById(self.fieldId)
+        if field is None:
+            raise ServiceError("ERR-U0", _("Field '%s' does not exist for this conference.") % self.fieldId)
+        return fossilize(field)
+
+
 methodMap = {
     "changeSubmitter": ChangeAbstractSubmitter,
     "lateSubmission.addExistingLateAuthUser": AddLateSubmissionAuthUser,
-    "lateSubmission.removeLateAuthUser": RemoveLateSubmissionAuthUser
-    }
+    "lateSubmission.removeLateAuthUser": RemoveLateSubmissionAuthUser,
+    "fields.addField": AddField,
+    "fields.getField": GetField
+}
