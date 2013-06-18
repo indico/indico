@@ -18,6 +18,7 @@
 
 from MaKaC.common.fossilize import IFossil
 
+
 class IAuthorFossil(IFossil):
 
     def getTitle(self):
@@ -44,3 +45,26 @@ class IAuthorFossil(IFossil):
     def isSpeaker(self):
         """ Author is speaker """
 
+
+class IAbstractFieldFossil(IFossil):
+
+    def getCaption(self):
+        """ Caption of the field """
+
+    def getId(self):
+        """ ID of the field """
+
+    def getLimitation(self):
+        """ Type of limitation """
+
+    def getMaxLength(self):
+        """ Maximum length of the field """
+
+    def getName(self):
+        """ Name of the field """
+
+    def getType(self):
+        """ Type of the field """
+
+    def isMandatory(self):
+        """ True if mandatory """

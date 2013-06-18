@@ -35,6 +35,8 @@ from MaKaC.trashCan import TrashCanManager
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
 from MaKaC.common import Config
+from MaKaC.common.fossilize import fossilizes, Fossilizable
+from MaKaC.fossils.abstracts import IAbstractFieldFossil
 import tempfile
 
 
@@ -445,7 +447,11 @@ class _AuthEmailIdx(_AuthIdx):
     def _getKey(self, auth):
         return auth.getEmail().lower()
 
-class AbstractField(Persistent):
+
+class AbstractField(Persistent, Fossilizable):
+
+    fossilizes(IAbstractFieldFossil)
+
     _fieldTypes = [ 'input', 'textarea' ]
 
     def __init__(self, id, name, caption, maxlength=0, isMandatory=False, type="textarea", limitation="chars"):
