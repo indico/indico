@@ -10,7 +10,6 @@
 <!-- END OF CONTEXT HELP DIVS -->
 
 <form action="${ postURL }" method="POST" ENCTYPE="multipart/form-data">
-    ${ locator }
     <table class="groupTable">
         <tr>
             <td colspan="2"><div class="groupTitle">

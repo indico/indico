@@ -31,7 +31,6 @@ import MaKaC.webinterface.rh.api as mod_rh_api
 import MaKaC.webinterface.rh.authorDisplay as mod_rh_authorDisplay
 import MaKaC.webinterface.rh.calendar as mod_rh_calendar
 import MaKaC.webinterface.rh.categoryDisplay as mod_rh_categoryDisplay
-import MaKaC.webinterface.rh.categoryMod as mod_rh_categoryMod
 import MaKaC.webinterface.rh.collaboration as mod_rh_collaboration
 import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
@@ -785,56 +784,24 @@ legacy.add_url_rule('/calendarSelect.py',
 
 
 # Routes for categoryAC.py
-legacy.add_url_rule('/categoryAC.py',
-                    'categoryAC',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryAC),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryAC.py/setVisibility',
-                    'categoryAC-setVisibility',
-                    rh_as_view(mod_rh_categoryMod.RHCategorySetVisibility),
-                    methods=('GET', 'POST'))
+# Inactive: /categoryAC.py (mod_rh_categoryMod.RHCategoryAC)
+# Inactive: /categoryAC.py/setVisibility (mod_rh_categoryMod.RHCategorySetVisibility)
 
 
 # Routes for categoryConfCreationControl.py
-legacy.add_url_rule('/categoryConfCreationControl.py/setCreateConferenceControl',
-                    'categoryConfCreationControl-setCreateConferenceControl',
-                    rh_as_view(mod_rh_categoryMod.RHCategorySetConfControl),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryConfCreationControl.py/setNotifyCreation',
-                    'categoryConfCreationControl-setNotifyCreation',
-                    rh_as_view(mod_rh_categoryMod.RHCategorySetNotifyCreation),
-                    methods=('GET', 'POST'))
+# Inactive: /categoryConfCreationControl.py/setCreateConferenceControl (mod_rh_categoryMod.RHCategorySetConfControl)
+# Inactive: /categoryConfCreationControl.py/setNotifyCreation (mod_rh_categoryMod.RHCategorySetNotifyCreation)
 
 
 # Routes for categoryCreation.py
-legacy.add_url_rule('/categoryCreation.py',
-                    'categoryCreation',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryCreation.py/create',
-                    'categoryCreation-create',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryPerformCreation),
-                    methods=('GET', 'POST'))
+# Inactive: /categoryCreation.py (mod_rh_categoryMod.RHCategoryCreation)
+# Inactive: /categoryCreation.py/create (mod_rh_categoryMod.RHCategoryPerformCreation)
 
 
 # Routes for categoryDataModification.py
-legacy.add_url_rule('/categoryDataModification.py',
-                    'categoryDataModification',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryDataModification.py/modify',
-                    'categoryDataModification-modify',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryPerformModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryDataModification.py/tasksOption',
-                    'categoryDataModification-tasksOption',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryTaskOption),
-                    methods=('GET', 'POST'))
+# Inactive: /categoryDataModification.py (mod_rh_categoryMod.RHCategoryDataModif)
+# Inactive: /categoryDataModification.py/modify (mod_rh_categoryMod.RHCategoryPerformModification)
+# Inactive: /categoryDataModification.py/tasksOption (mod_rh_categoryMod.RHCategoryTaskOption)
 
 
 # Routes for categoryDisplay.py
@@ -846,15 +813,8 @@ legacy.add_url_rule('/categoryDataModification.py/tasksOption',
 
 
 # Routes for categoryFiles.py
-legacy.add_url_rule('/categoryFiles.py',
-                    'categoryFiles',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryFiles),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryFiles.py/addMaterial',
-                    'categoryFiles-addMaterial',
-                    rh_as_view(mod_rh_categoryMod.RHAddMaterial),
-                    methods=('GET', 'POST'))
+# Inactive: /categoryFiles.py (mod_rh_categoryMod.RHCategoryFiles)
+# Inactive: /categoryFiles.py/addMaterial (mod_rh_categoryMod.RHAddMaterial)
 
 
 # Routes for categoryMap.py
@@ -862,30 +822,11 @@ legacy.add_url_rule('/categoryFiles.py/addMaterial',
 
 
 # Routes for categoryModification.py
-legacy.add_url_rule('/categoryModification.py',
-                    'categoryModification',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryModification.py/actionConferences',
-                    'categoryModification-actionConferences',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryActionConferences),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryModification.py/actionSubCategs',
-                    'categoryModification-actionSubCategs',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryActionSubCategs),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryModification.py/clearCache',
-                    'categoryModification-clearCache',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryClearCache),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryModification.py/clearConferenceCaches',
-                    'categoryModification-clearConferenceCaches',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryClearConferenceCaches),
-                    methods=('GET', 'POST'))
+# Inactive: /categoryModification.py (mod_rh_categoryMod.RHCategoryModification)
+# Inactive: /categoryModification.py/actionConferences (mod_rh_categoryMod.RHCategoryActionConferences)
+# Inactive: /categoryModification.py/actionSubCategs (mod_rh_categoryMod.RHCategoryActionSubCategs)
+# Inactive: /categoryModification.py/clearCache (mod_rh_categoryMod.RHCategoryClearCache)
+# Inactive: /categoryModification.py/clearConferenceCaches (mod_rh_categoryMod.RHCategoryClearConferenceCaches)
 
 
 # Routes for categoryStatistics.py
@@ -893,27 +834,13 @@ legacy.add_url_rule('/categoryModification.py/clearConferenceCaches',
 
 
 # Routes for categoryTasks.py
-legacy.add_url_rule('/categoryTasks.py',
-                    'categoryTasks',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryTasks),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryTasks.py/taskAction',
-                    'categoryTasks-taskAction',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryTasksAction),
-                    methods=('GET', 'POST'))
+# Inactive: /categoryTasks.py (mod_rh_categoryMod.RHCategoryTasks)
+# Inactive: /categoryTasks.py/taskAction (mod_rh_categoryMod.RHCategoryTasksAction)
 
 
 # Routes for categoryTools.py
-legacy.add_url_rule('/categoryTools.py',
-                    'categoryTools',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryTools),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/categoryTools.py/delete',
-                    'categoryTools-delete',
-                    rh_as_view(mod_rh_categoryMod.RHCategoryDeletion),
-                    methods=('GET', 'POST'))
+# Inactive: /categoryTools.py (mod_rh_categoryMod.RHCategoryTools)
+# Inactive: /categoryTools.py/delete (mod_rh_categoryMod.RHCategoryDeletion)
 
 
 # Routes for changeLang.py

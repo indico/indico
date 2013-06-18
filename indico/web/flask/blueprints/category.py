@@ -20,10 +20,12 @@
 from flask import Blueprint
 import MaKaC.webinterface.rh.calendar as calendar
 import MaKaC.webinterface.rh.categoryDisplay as categoryDisplay
+import MaKaC.webinterface.rh.categoryMod as categoryMod
 from indico.web.flask.util import rh_as_view
 
 
 category = Blueprint('category', __name__, url_prefix='/category')
+
 # categoryDisplay.py
 category.add_url_rule('/<categId>/', 'categoryDisplay', rh_as_view(categoryDisplay.RHCategoryDisplay))
 category.add_url_rule('/<categId>/events.atom', 'categoryDisplay-atom', rh_as_view(categoryDisplay.RHCategoryToAtom))
@@ -43,3 +45,51 @@ category.add_url_rule('/<categId>/statistics', 'categoryStatistics', rh_as_view(
 category.add_url_rule('/calendar/', 'wcalendar', rh_as_view(calendar.RHCalendar))
 category.add_url_rule('/calendar/select', 'wcalendar-select', rh_as_view(calendar.RHCalendarSelectCategories),
                       methods=('GET', 'POST'))
+
+
+# categoryModification.py
+category.add_url_rule('/<categId>/modify/', 'categoryModification', rh_as_view(categoryMod.RHCategoryModification))
+category.add_url_rule('/<categId>/modify/events', 'categoryModification-actionConferences',
+                      rh_as_view(categoryMod.RHCategoryActionConferences), methods=('GET', 'POST'))
+category.add_url_rule('/<categId>/modify/subcategories', 'categoryModification-actionSubCategs',
+                      rh_as_view(categoryMod.RHCategoryActionSubCategs), methods=('GET', 'POST'))
+category.add_url_rule('/<categId>/modify/clear-cache', 'categoryModification-clearCache',
+                      rh_as_view(categoryMod.RHCategoryClearCache), methods=('POST',))
+category.add_url_rule('/<categId>/modify/clear-event-cache', 'categoryModification-clearConferenceCaches',
+                      rh_as_view(categoryMod.RHCategoryClearConferenceCaches), methods=('POST',))
+# categoryAC.py
+category.add_url_rule('/<categId>/modify/access', 'categoryAC', rh_as_view(categoryMod.RHCategoryAC))
+category.add_url_rule('/<categId>/modify/access/visibility', 'categoryAC-setVisibility',
+                      rh_as_view(categoryMod.RHCategorySetVisibility), methods=('POST',))
+# categoryConfCreationControl.py
+category.add_url_rule('/<categId>/modify/create-control', 'categoryConfCreationControl-setCreateConferenceControl',
+                      rh_as_view(categoryMod.RHCategorySetConfControl), methods=('POST',))
+category.add_url_rule('/<categId>/modify/notify-creation', 'categoryConfCreationControl-setNotifyCreation',
+                      rh_as_view(categoryMod.RHCategorySetNotifyCreation), methods=('POST',))
+# categoryTools.py
+category.add_url_rule('/<categId>/modify/tools', 'categoryTools', rh_as_view(categoryMod.RHCategoryTools))
+category.add_url_rule('/<categId>/delete', 'categoryTools-delete', rh_as_view(categoryMod.RHCategoryDeletion),
+                      methods=('GET', 'POST'))
+# categoryDataModification.py
+category.add_url_rule('/<categId>/modify/data', 'categoryDataModification', rh_as_view(categoryMod.RHCategoryDataModif),
+                      methods=('GET', 'POST'))
+category.add_url_rule('/<categId>/modify/data/save', 'categoryDataModification-modify',
+                      rh_as_view(categoryMod.RHCategoryPerformModification), methods=('POST',))
+category.add_url_rule('/<categId>/modify/tasks', 'categoryDataModification-tasksOption',
+                      rh_as_view(categoryMod.RHCategoryTaskOption), methods=('GET', 'POST'))
+# Routes for categoryFiles.py
+category.add_url_rule('/<categId>/modify/files', 'categoryFiles', rh_as_view(categoryMod.RHCategoryFiles))
+category.add_url_rule('/<categId>/modify/files/add', 'categoryFiles-addMaterial', rh_as_view(categoryMod.RHAddMaterial),
+                      methods=('POST',))
+# Routes for categoryTasks.py
+category.add_url_rule('/<categId>/tasks', 'categoryTasks', rh_as_view(categoryMod.RHCategoryTasks),
+                      methods=('GET', 'POST'))
+category.add_url_rule('/<categId>/tasks/action', 'categoryTasks-taskAction',
+                      rh_as_view(categoryMod.RHCategoryTasksAction), methods=('GET', 'POST'))
+
+
+# categoryCreation.py
+category.add_url_rule('/<categId>/create/subcategory', 'categoryCreation', rh_as_view(categoryMod.RHCategoryCreation),
+                      methods=('GET', 'POST'))
+category.add_url_rule('/<categId>/create/subcategory/save', 'categoryCreation-create',
+                      rh_as_view(categoryMod.RHCategoryPerformCreation), methods=('POST',))

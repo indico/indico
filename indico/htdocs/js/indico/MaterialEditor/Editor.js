@@ -474,7 +474,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
             {
                 method: 'post',
                 id: Html.generateId(),
-                action: build_url(this.uploadAction),
+                action: build_url(this.uploadAction, this.args),
                 enctype: 'multipart/form-data'
             },
             this.tabWidget.draw());
@@ -656,7 +656,7 @@ type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {
         this.form = Html.form({
                             method: 'post',
                             id: Html.generateId(),
-                            action: build_url(this.uploadAction),
+                            action: build_url(this.uploadAction, this.args),
                             enctype: 'multipart/form-data',
                             encoding: 'multipart/form-data'
                         },

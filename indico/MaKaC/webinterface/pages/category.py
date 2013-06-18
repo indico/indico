@@ -1520,13 +1520,13 @@ class WPCategoryModification( WPCategModifMain ):
         wc = WCategModifMain( self._target )
         pars = { \
 "dataModificationURL": urlHandlers.UHCategoryDataModif.getURL( self._target ), \
-"addSubCategoryURL": urlHandlers.UHCategoryCreation.getURL(), \
+"addSubCategoryURL": urlHandlers.UHCategoryCreation.getURL(self._target),
 "addConferenceURL": urlHandlers.UHConferenceCreation.getURL( self._target ), \
 "confModifyURLGen": urlHandlers.UHConferenceModification.getURL, \
 "confModifyURLOpen": urlHandlers.UHConferenceOpen.getURL, \
 "categModifyURLGen": urlHandlers.UHCategoryModification.getURL, \
-"actionSubCategsURL": urlHandlers.UHCategoryActionSubCategs.getURL(), \
-"actionConferencesURL": urlHandlers.UHCategoryActionConferences.getURL()}
+"actionSubCategsURL": urlHandlers.UHCategoryActionSubCategs.getURL(self._target),
+"actionConferencesURL": urlHandlers.UHCategoryActionConferences.getURL(self._target)}
         return wc.getHTML( pars )
 
 
@@ -1560,7 +1560,6 @@ class WCategoryDataModification(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["locator"] = self._categ.getLocator().getWebForm()
         vars["name"] = self._categ.getName()
         vars["description"] = self._categ.getDescription()
         vars["visibility"] = self._getVisibilityHTML()
@@ -1591,7 +1590,7 @@ class WPCategoryDataModification(WPCategModifMain):
 
     def _getPageContent(self, params):
         wc = WCategoryDataModification(self._target)
-        pars = {"postURL": urlHandlers.UHCategoryPerformModification.getURL()}
+        pars = {"postURL": urlHandlers.UHCategoryPerformModification.getURL(self._target)}
         return wc.getHTML(pars)
 
 
@@ -1644,7 +1643,7 @@ class WPCategoryCreation(WPCategModifMain):
     def _getPageContent(self, params):
         wc = WCategoryCreation(self._target)
         pars = {"categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
-                "postURL": urlHandlers.UHCategoryPerformCreation.getURL()}
+                "postURL": urlHandlers.UHCategoryPerformCreation.getURL(self._target)}
         return wc.getHTML(pars)
 
 
@@ -1933,12 +1932,13 @@ class WPCategModifAC( WPCategoryModifBase ):
     def _setActiveSideMenuItem( self ):
         self._ACMenuItem.setActive()
 
-    def _getPageContent( self, params ):
-        wc = WCategModifAC( self._target )
-        pars = { \
-"setVisibilityURL": urlHandlers.UHCategorySetVisibility.getURL(), \
-"setConferenceCreationControlURL": urlHandlers.UHCategorySetConfCreationControl.getURL() }
-        return wc.getHTML( pars )
+    def _getPageContent(self, params):
+        wc = WCategModifAC(self._target)
+        pars = {
+            "setVisibilityURL": urlHandlers.UHCategorySetVisibility.getURL(self._target),
+            "setConferenceCreationControlURL": urlHandlers.UHCategorySetConfCreationControl.getURL(self._target)
+        }
+        return wc.getHTML(pars)
 
 #---------------------------------------------------------------------------------
 

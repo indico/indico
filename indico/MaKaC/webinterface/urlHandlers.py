@@ -1960,7 +1960,7 @@ class UHFileEnterAccessKey(URLHandler):
 
 
 class UHCategoryModification(URLHandler):
-    _endpoint = 'legacy.categoryModification'
+    _endpoint = 'category.categoryModification'
 
     @classmethod
     def getActionURL(cls):
@@ -1968,79 +1968,79 @@ class UHCategoryModification(URLHandler):
 
 
 class UHCategoryAddMaterial(URLHandler):
-    _endpoint = 'legacy.categoryFiles-addMaterial'
+    _endpoint = 'category.categoryFiles-addMaterial'
 
 
 class UHCategoryActionSubCategs(URLHandler):
-    _endpoint = 'legacy.categoryModification-actionSubCategs'
+    _endpoint = 'category.categoryModification-actionSubCategs'
 
 
 class UHCategoryActionConferences(URLHandler):
-    _endpoint = 'legacy.categoryModification-actionConferences'
+    _endpoint = 'category.categoryModification-actionConferences'
 
 
 class UHCategoryClearCache(URLHandler):
-    _endpoint = 'legacy.categoryModification-clearCache'
+    _endpoint = 'category.categoryModification-clearCache'
 
 
 class UHCategoryClearConferenceCaches(URLHandler):
-    _endpoint = 'legacy.categoryModification-clearConferenceCaches'
+    _endpoint = 'category.categoryModification-clearConferenceCaches'
 
 
 class UHCategModifAC(URLHandler):
-    _endpoint = 'legacy.categoryAC'
+    _endpoint = 'category.categoryAC'
 
 
 class UHCategorySetConfCreationControl(URLHandler):
-    _endpoint = 'legacy.categoryConfCreationControl-setCreateConferenceControl'
+    _endpoint = 'category.categoryConfCreationControl-setCreateConferenceControl'
 
 
 class UHCategorySetNotifyCreation(URLHandler):
-    _endpoint = 'legacy.categoryConfCreationControl-setNotifyCreation'
+    _endpoint = 'category.categoryConfCreationControl-setNotifyCreation'
 
 
 class UHCategModifTools(URLHandler):
-    _endpoint = 'legacy.categoryTools'
+    _endpoint = 'category.categoryTools'
 
 
 class UHCategoryDeletion(URLHandler):
-    _endpoint = 'legacy.categoryTools-delete'
+    _endpoint = 'category.categoryTools-delete'
 
 
 class UHCategModifTasks(URLHandler):
-    _endpoint = 'legacy.categoryTasks'
+    _endpoint = 'category.categoryTasks'
 
 
 class UHCategModifFiles(URLHandler):
-    _endpoint = 'legacy.categoryFiles'
+    _endpoint = 'category.categoryFiles'
 
 
 class UHCategModifTasksAction(URLHandler):
-    _endpoint = 'legacy.categoryTasks-taskAction'
+    _endpoint = 'category.categoryTasks-taskAction'
 
 
 class UHCategoryDataModif(URLHandler):
-    _endpoint = 'legacy.categoryDataModification'
+    _endpoint = 'category.categoryDataModification'
 
 
 class UHCategoryPerformModification(URLHandler):
-    _endpoint = 'legacy.categoryDataModification-modify'
+    _endpoint = 'category.categoryDataModification-modify'
 
 
 class UHCategoryTasksOption(URLHandler):
-    _endpoint = 'legacy.categoryDataModification-tasksOption'
+    _endpoint = 'category.categoryDataModification-tasksOption'
 
 
 class UHCategorySetVisibility(URLHandler):
-    _endpoint = 'legacy.categoryAC-setVisibility'
+    _endpoint = 'category.categoryAC-setVisibility'
 
 
 class UHCategoryCreation(URLHandler):
-    _endpoint = 'legacy.categoryCreation'
+    _endpoint = 'category.categoryCreation'
 
 
 class UHCategoryPerformCreation(URLHandler):
-    _endpoint = 'legacy.categoryCreation-create'
+    _endpoint = 'category.categoryCreation-create'
 
 
 class UHCategoryDisplay(URLHandler):
