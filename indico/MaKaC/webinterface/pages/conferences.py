@@ -327,11 +327,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
     def _applyConfDisplayDecoration( self, body ):
         drawer = wcomponents.WConfTickerTapeDrawer(self._conf, self._tz)
         frame = WConfDisplayFrame( self._getAW(), self._conf )
-        urlClose = urlHandlers.UHConferenceDisplayMenuClose.getURL(self._conf)
-        urlClose.addParam("currentURL", request.url)
-        urlOpen = urlHandlers.UHConferenceDisplayMenuOpen.getURL(self._conf)
-        urlOpen.addParam("currentURL", request.url)
-        menuStatus = session.get('menuStatus', 'open')
 
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
 
@@ -347,8 +342,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             "confModifURL": urlHandlers.UHConferenceModification.getURL(self._conf), \
             "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf), \
             "currentURL": request.url, \
-            "closeMenuURL":  urlClose, \
-            "menuStatus": menuStatus, \
+            "menuStatus": 'open',
             "nowHappening": drawer.getNowHappeningHTML(), \
             "simpleTextAnnouncement": drawer.getSimpleText(), \
             "onAirURL": onAirURL,
@@ -357,27 +351,11 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         if self._conf.getLogo():
             frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
 
-        colspan=""
-        imgOpen=""
-        padding=""
-        if  menuStatus != "open":
-            urlOpen = urlHandlers.UHConferenceDisplayMenuOpen.getURL(self._conf)
-            urlOpen.addParam("currentURL", request.url)
-            colspan = """ colspan="2" """
-            imgOpen = """<table valign="top" align="left" border="0" cellspacing="0" cellpadding="0" style="padding-right:10px;">
-                           <tr>
-                                <td align="left" valign="top">
-                                    <a href=%s><img alt="Show menu" src="%s" class="imglink" style="padding:0px; border:0px"></a>
-                                </td>
-                           </tr>
-                      </table>"""%(quoteattr(str(urlOpen)),Config.getInstance().getSystemIconURL("openMenuIcon"))
-            padding=""" style="padding:0px" """
-
         body = """
-            <div class="confBodyBox clearfix" %s %s>
+            <div class="confBodyBox clearfix">
 
                                     <div>
-                                        <div>%s</div>
+                                        <div></div>
                                         <div class="breadcrumps">%s</div>
                                         <div style="float:right;">%s</div>
                                     </div>
@@ -387,7 +365,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                                         %s
                                         </div>
                                   </div>
-            </div>"""%(colspan,padding,imgOpen,
+            </div>""" % (
                     self._getNavigationBarHTML(),
                     self._getToolBarHTML().strip(),
                     body)
@@ -475,8 +453,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         sinfo = self._conf.getSupportInfo()
 
 
-        p={"closeMenuURL": vars["closeMenuURL"], \
-            "menuStatus": vars["menuStatus"], \
+        p={ "menuStatus": vars["menuStatus"],
             "menu": self._menu,
             "support_info": sinfo,
             "event": self._conf
@@ -1937,21 +1914,6 @@ class WPConfDataModif( WPConferenceModification ):
         return p.getHTML( pars )
 
 
-class WPConfAddMaterial( WPConferenceModification ):
-
-    def __init__( self, rh, conf, mf ):
-        WPConferenceModification.__init__( self, rh, conf )
-        self._mf = mf
-
-    def _getTabContent( self, params ):
-        if self._mf:
-            comp = self._mf.getCreationWC( self._conf )
-        else:
-            comp = wcomponents.WMaterialCreation( self._conf )
-        pars = { "postURL": urlHandlers.UHConferencePerformAddMaterial.getURL() }
-        return comp.getHTML( pars )
-
-
 class WConfModifScheduleGraphic(wcomponents.WTemplated):
 
     def __init__(self, conference, customLinks, **params):
@@ -2599,10 +2561,6 @@ class WConfModifListings( wcomponents.WTemplated ):
         vars["allSessionsConvenersURL"]=quoteattr(str(urlHandlers.UHConfAllSessionsConveners.getURL( self.__conf )))
         vars["allSpeakersIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("listing")))
         vars["allSpeakersURL"]=quoteattr(str(urlHandlers.UHConfAllSpeakers.getURL( self.__conf )))
-        vars["allPrimaryAuthorsIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("listing")))
-        vars["allPrimaryAuthorsURL"]=quoteattr(str(urlHandlers.UHConfAllPrimaryAuthors.getURL( self.__conf )))
-        vars["allCoAuthorsIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("listing")))
-        vars["allCoAuthorsURL"]=quoteattr(str(urlHandlers.UHConfAllCoAuthors.getURL( self.__conf )))
         return vars
 
 
@@ -2693,11 +2651,8 @@ class WPConfClone( WPConfModifToolsBase, OldObservable ):
 
     def _getTabContent( self, params ):
         p = WConferenceClone( self._conf )
-        pars = {"cancelURL": urlHandlers.UHConfModifTools.getURL( self._conf ), \
-                "cloneOnce": urlHandlers.UHConfPerformCloneOnce.getURL( self._conf ), \
-                "cloneInterval": urlHandlers.UHConfPerformCloneInterval.getURL( self._conf ), \
-                "cloneday": urlHandlers.UHConfPerformCloneDays.getURL( self._conf ), \
-                "cloning" : urlHandlers.UHConfPerformCloning.getURL( self._conf ),
+        pars = {"cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
+                "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
                 "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTracks" id="cloneTracks" value="1" />_("Tracks")</li>
                                      <li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" />_("Full timetable")</li>
                                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>

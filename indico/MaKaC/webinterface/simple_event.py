@@ -292,18 +292,16 @@ class WPSEConfClone(WPSEConfModifToolsBase, Observable):
 
     def _getTabContent( self, params ):
         p = conferences.WConferenceClone( self._conf )
-        pars = { \
-"cancelURL": urlHandlers.UHConfModifTools.getURL( self._conf ), \
-"cloneOnce": urlHandlers.UHConfPerformCloneOnce.getURL( self._conf ), \
-"cloneInterval": urlHandlers.UHConfPerformCloneInterval.getURL( self._conf ), \
-"cloneday": urlHandlers.UHConfPerformCloneDays.getURL( self._conf ), \
-"cloning" : urlHandlers.UHConfPerformCloning.getURL( self._conf ),
-"cloneOptions": i18nformat("""
+        pars = {
+            "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
+            "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
+            "cloneOptions": i18nformat("""
     <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1" >
         _("Participants")</li>
     <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" >
         _("Evaluation")</li>
-           """) }
+           """)
+        }
         #let the plugins add their own elements
         self._notify('addCheckBox2CloneConf', pars)
         return p.getHTML( pars )

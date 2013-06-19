@@ -174,14 +174,6 @@ class WebFactory(WebFactory):
         return WPMSessionDataModification (self,session)
     getSessionDataModification = staticmethod(getSessionDataModification)
 
-    def getSessionModifMaterials():
-        return WPMSessionModifMaterials
-    getSessionModifMaterials = staticmethod(getSessionModifMaterials)
-
-    def getSessionAddMaterial(self,session,mf):
-        return WPMSessionAddMaterial(self,session,mf)
-    getSessionAddMaterial = staticmethod(getSessionAddMaterial)
-
     def getSessionModification(rh,session):
         return WPMSessionModification(rh,session)
     getSessionModification = staticmethod(getSessionModification)
@@ -638,17 +630,15 @@ class WPMConfClone(conferences.WPConfClone):
 
     def _getTabContent( self, params ):
         p = conferences.WConferenceClone( self._conf )
-        pars = { \
-"cancelURL": urlHandlers.UHConfModifTools.getURL( self._conf ), \
-"cloneOnce": urlHandlers.UHConfPerformCloneOnce.getURL( self._conf ), \
-"cloneInterval": urlHandlers.UHConfPerformCloneInterval.getURL( self._conf ), \
-"cloneday": urlHandlers.UHConfPerformCloneDays.getURL( self._conf ), \
-"cloning" : urlHandlers.UHConfPerformCloning.getURL( self._conf ),
-"cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" checked="checked" />_("Full timetable")</li>
+        pars = {
+            "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
+            "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
+            "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" checked="checked" />_("Full timetable")</li>
                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
                      <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1" checked="checked" />_("Participants")</li>
                      <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>
-               """) }
+               """)
+        }
         #let the plugins add their own elements
         self._notify('addCheckBox2CloneConf', pars)
         return p.getHTML( pars )
@@ -660,10 +650,6 @@ class WPMConfModifSchedule(conferences.WPConfModifScheduleGraphic):
 ######################### Session View #######################
 
 ##TabControl####
-class WPMSessionAddMaterial(sessions.WPSessionAddMaterial):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
 class WPMSessionDataModification(sessions.WPSessionDataModification):
     def _setupTabCtrl(self):
         self._tabContribs.disable()

@@ -279,8 +279,6 @@ class WSessionModifMain(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["addMaterialURL"]=urlHandlers.UHSessionAddMaterial.getURL(self._session)
-        vars["removeMaterialsURL"]=urlHandlers.UHSessionRemoveMaterials.getURL()
 
         vars["dataModificationURL"]=quoteattr(str(urlHandlers.UHSessionDataModification.getURL(self._session)))
         vars["code"]=self.htmlText(self._session.getCode())
@@ -378,21 +376,6 @@ class WPModEditDataConfirmation(WPSessionModification):
 
         url=urlHandlers.UHSessionDataModification.getURL(self._session)
         return wc.getHTML(msg,url,params)
-
-
-class WPSessionAddMaterial( WPSessionModification ):
-
-    def __init__( self, rh, session, mf ):
-        WPSessionModification.__init__( self, rh, session )
-        self._mf = mf
-
-    def _getTabContent( self, params ):
-        if self._mf:
-            comp = self._mf.getCreationWC( self._session )
-        else:
-            comp = wcomponents.WMaterialCreation( self._session )
-        pars = { "postURL": urlHandlers.UHSessionPerformAddMaterial.getURL() }
-        return comp.getHTML( pars )
 
 
 class WPSessionModifSchedule( WPSessionModifBase, WPConfModifScheduleGraphic  ):
@@ -1252,19 +1235,6 @@ class WPModParticipantList( WPSessionModifBase ):
         params = {"urlDisplayGroup":urlHandlers.UHSessionModParticipantList.getURL(self._session)}
         return wc.getHTML(params)
 
-class WPSessionDisplayRemoveMaterialsConfirm( WPSessionDefaultDisplayBase ):
-
-    def __init__(self,rh, conf, mat):
-        WPSessionDefaultDisplayBase.__init__(self,rh,conf)
-        self._mat=mat
-
-    def _getBody(self,params):
-        wc=wcomponents.WDisplayConfirmation()
-        msg="""Are you sure you want to delete the following material?<br>
-        <b><i>%s</i></b>
-        <br>"""%self._mat.getTitle()
-        url=urlHandlers.UHSessionDisplayRemoveMaterial.getURL(self._mat.getOwner())
-        return wc.getHTML(msg,url,{"deleteMaterial":self._mat.getId()})
 
 class WPSessionModifRelocate(WPSessionModifBase):
 

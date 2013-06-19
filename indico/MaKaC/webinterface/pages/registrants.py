@@ -367,16 +367,6 @@ class WConfModifRegistrants(wcomponents.WTemplated):
         html.append("""<input type="hidden" name="sortBy" value="%s">"""%(self._sortingCrit.getField().getId()))
         return "".join(html)
 
-    def _getOpenMenuURL(self):
-        url = urlHandlers.UHConfModifRegistrantsOpenMenu.getURL(self._conf)
-        url.addParam("currentURL", self._getURL())
-        return url
-
-    def _getCloseMenuURL(self):
-        url = urlHandlers.UHConfModifRegistrantsCloseMenu.getURL(self._conf)
-        url.addParam("currentURL", self._getURL())
-        return url
-
     def _getFilterMenu(self):
 
         regForm = self._conf.getRegistrationForm()
@@ -485,10 +475,6 @@ class WConfModifRegistrants(wcomponents.WTemplated):
         vars["displayOptions"]=self._getDisplayOptionsHTML()
         vars["sortingOptions"]="""<input type="hidden" name="sortBy" value="%s">
                                   <input type="hidden" name="order" value="%s">"""%(self._sortingCrit.getField().getId(), self._order)
-        vars["closeMenuURL"] = self._getCloseMenuURL()
-        vars["closeMenuImg"] = quoteattr(Config.getInstance().getSystemIconURL("openMenu"))
-        vars["openMenuURL"] = self._getOpenMenuURL()
-        vars["openMenuImg"] = quoteattr(Config.getInstance().getSystemIconURL("closeMenu"))
 
         vars["checkAcco"] = """<img src=%s border="0" alt="Select all" onclick="javascript:selectAcco()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
         vars["uncheckAcco"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectAcco()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))

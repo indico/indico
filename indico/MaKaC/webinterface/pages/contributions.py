@@ -903,10 +903,11 @@ class WPEditData(WPContribModifMain):
     def _getTabContent( self, params ):
         wc = WContributionDataModification(self._target, self._conf)
 
-        pars = {"postURL": urlHandlers.UHConfPerformAddContribution.getURL(), \
-        "calendarIconURL": Config.getInstance().getSystemIconURL( "calendar" ), \
-        "calendarSelectURL":  urlHandlers.UHSimpleCalendar.getURL() }
-        return wc.getHTML( pars )
+        pars = {
+            "calendarIconURL": Config.getInstance().getSystemIconURL("calendar"),
+            "calendarSelectURL": urlHandlers.UHSimpleCalendar.getURL()
+        }
+        return wc.getHTML(pars)
 
 
 class WPContributionDeletion( WPContributionModifTools ):

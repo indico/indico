@@ -118,11 +118,6 @@ class WOAuthUserThirdPartyAuth(WTemplated):
     def __init__(self, av):
         self._avatar = av
 
-    def _getDeAuthorizeURL(self, token, user):
-        url = urlHandlers.UHOAuthUnauthorizeConsumer.getURL(user)
-        url.addParams({"third_party_app": token.getConsumer().getName()})
-        return url
-
     def getVars(self):
         vars = WTemplated.getVars( self )
         vars['user'] = self._avatar

@@ -173,15 +173,6 @@ class NEAbstractSubmissionConfirmation( NavigationEntry ):
     _parent = NEConferenceCFA
     _title = "Abstract submission confirmation"
 
-class NEAbstractDisplayMaterial( NavigationEntry ):
-    _url = urlHandlers.UHAbstractDisplayMaterial
-    _parent = NEAbstractDisplay
-    _title = "Material"
-
-class NEAbstractDisplayAddMaterial( NavigationEntry ):
-    _url = urlHandlers.UHAbstractDisplayAddMaterial
-    _parent = NEAbstractDisplayMaterial
-    _title = "Creation"
 
 class NERegistrationForm( NavigationEntry ):
     _url = urlHandlers.UHConfRegistrationForm

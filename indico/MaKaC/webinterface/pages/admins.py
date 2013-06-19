@@ -1546,7 +1546,6 @@ class WPUserDetails( WPPersonalArea ):
 
     def _getTabContent( self, params ):
         c = WUserDetails( self._avatar )
-        params["modifyUserURL"] = urlHandlers.UHUserModification.getURL( self._avatar )
         params["addIdentityURL"] = urlHandlers.UHUserIdentityCreation.getURL( self._avatar )
         params["removeIdentityURL"] = urlHandlers.UHUserRemoveIdentity.getURL( self._avatar )
         params["activeURL"] = urlHandlers.UHUserActive.getURL( self._avatar )
@@ -2533,24 +2532,6 @@ class WPTaskManager(WPTaskManagerBase):
 class WTaskManager(wcomponents.WTemplated):
     pass
 
-
-class WPConfirmDelete(WPTaskManagerBase):
-
-    def __init__(self, req, taskId):
-        WPTaskManagerBase.__init__(self, req)
-        self._taskId = taskId
-
-    def _getTabContent(self, params):
-        wc = wcomponents.WConfirmation()
-
-        msg = {'challenge': _('Are you sure you want to delete the following task?'),
-               'target': self._taskId,
-               'important': True,
-               'subtext': _('Note that you will permanently remove the task.')
-               }
-
-        postURL = urlHandlers.UHRemoveTask.getURL()
-        return wc.getHTML(msg, postURL, {"taskId": self._taskId})
 
 class WPIPBasedACL( WPServicesCommon ):
 

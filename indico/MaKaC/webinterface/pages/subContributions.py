@@ -35,6 +35,7 @@ from indico.util.i18n import i18nformat
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 
+
 class WPSubContributionBase( WPMainBase, WPConferenceBase ):
 
     def __init__( self, rh, subContribution ):
@@ -42,18 +43,6 @@ class WPSubContributionBase( WPMainBase, WPConferenceBase ):
         self._conf = self._target.getConference()
         self._contrib = self._subContrib.getOwner()
         WPConferenceBase.__init__( self, rh, self._conf )
-
-#    def _createMenu( self ):
-#        main.WPMainBase._createMenu( self )
-#        c = self._target
-#        self._newContOpt.setActionURL( urlHandlers.UHSubContributionCreation.getURL(c) )
-#        if not c.canModify( self._getAW() ):
-#            self._modifyContOpt.disable()
-#        self._modifySubContOpt.setActionURL( urlHandlers.UHSubContributionModification.getURL( c ) )
-#        self._detailsSubContOpt.setActionURL( urlHandlers.UHSubContributionDisplay.getURL( c ) )
-#        self._currentSubContOpt.enable()
-#        self._calendarSubContOpt.setActionURL( urlHandlers.UHSubCalendar.getURL( [c] ) )
-#        self._overviewSubContOpt.setActionURL( urlHandlers.UHSubContributionOverview.getURL( c ) )
 
 
 class WPSubContributionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPSubContributionBase ):
@@ -197,10 +186,7 @@ class WPSubContributionModification( WPSubContribModifMain ):
                 "duration": (datetime(1900,1,1)+self._target.getDuration()).strftime("%Hh%M'"), \
                 "confId": self._target.getConference().getId(), \
                 "contribId": self._target.getOwner().getId(), \
-                "subContribId": self._target.getId(), \
-                "addMaterialURL": str(urlHandlers.UHSubContributionAddMaterial.getURL( self._target )), \
-                "removeMaterialsURL": str(urlHandlers.UHSubContributionRemoveMaterials.getURL()), \
-                "modifyMaterialURLGen": urlHandlers.UHMaterialModification.getURL}
+                "subContribId": self._target.getId()}
         return wc.getHTML( pars )
 
 class WSubContributionDataModification(wcomponents.WTemplated):
@@ -228,20 +214,6 @@ class WPSubContribData( WPSubContribModifMain ):
         params["postURL"] = urlHandlers.UHSubContributionDataModif.getURL()
         return wc.getHTML( params )
 
-
-class WPSubContribAddMaterial( WPSubContribModifMain ):
-
-    def __init__( self, rh, contrib, mf ):
-        WPSubContribModifMain.__init__( self, rh, contrib )
-        self._mf = mf
-
-    def _getTabContent( self, params ):
-        if self._mf:
-            comp = self._mf.getCreationWC( self._target )
-        else:
-            comp = wcomponents.WMaterialCreation( self._target )
-        pars = { "postURL": urlHandlers.UHSubContributionPerformAddMaterial.getURL() }
-        return comp.getHTML( pars )
 
 class WSubContributionDeletion(object):
 

@@ -333,75 +333,6 @@ class RHConfPerformDataModif( RoomBookingDBMixin, RHConferenceModifBase ):
         self._redirect( urlHandlers.UHConferenceModification.getURL( self._conf) )
 
 
-class RHConfAddMaterial( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConferenceAddMaterial
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        typeMat = params.get( "typeMaterial", "notype" )
-        if typeMat=="notype" or typeMat.strip()=="":
-            raise FormValuesError("Please choose a material type")
-        self._mf = materialFactories.ConfMFRegistry().getById( typeMat )
-
-    def _process( self ):
-        if self._mf:
-            if not self._mf.needsCreationPage():
-                m = RHConfPerformAddMaterial.create( self._conf, self._mf, self._getRequestParams() )
-                self._redirect( urlHandlers.UHMaterialModification.getURL( m ) )
-                return
-        p = conferences.WPConfAddMaterial( self, self._target, self._mf )
-        return p.display()
-
-
-class RHConfPerformAddMaterial( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConferencePerformAddMaterial
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        typeMat = params.get( "typeMaterial", "" )
-        self._mf = materialFactories.ConfMFRegistry().getById( typeMat )
-
-    @staticmethod
-    def create( conf, matFactory, matData ):
-        if matFactory:
-            m = matFactory.create( conf )
-        else:
-            m = conference.Material()
-            conf.addMaterial( m )
-            m.setValues( matData )
-        return m
-
-    def _process( self ):
-        m = self.create( self._conf, self._mf, self._getRequestParams() )
-        self._redirect( urlHandlers.UHMaterialModification.getURL( m ) )
-
-
-class RHConfRemoveMaterials( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConferenceRemoveMaterials
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        typeMat = params.get( "typeMaterial", "" )
-        #self._mf = materialFactories.ConfMFRegistry.getById( typeMat )
-        self._materialIds = self._normaliseListParam( params.get("materialId", []) )
-        self._returnURL = params.get("returnURL","")
-
-    def _process( self ):
-        for id in self._materialIds:
-            #Performing the deletion of special material types
-            f = materialFactories.ConfMFRegistry().getById( id )
-            if f:
-                f.remove( self._target )
-            else:
-                #Performs the deletion of additional material types
-                mat = self._target.getMaterialById( id )
-                self._target.removeMaterial( mat )
-        if self._returnURL != "":
-            url = self._returnURL
-        else:
-            url = urlHandlers.UHConfModifMaterials.getURL( self._target )
-        self._redirect( url )
-
 #----------------------------------------------------------------
 
 class RHConfSessionSlots( RHConferenceModifBase ):
@@ -3087,36 +3018,6 @@ class RHContribQuickAccess(RHConferenceModifBase):
         if self._contrib is not None:
             url=urlHandlers.UHContributionModification.getURL(self._contrib)
         self._redirect(url)
-
-class RHConfPerformAddContribution( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfPerformAddContribution
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._type=None
-        if params.has_key("type") and params["type"].strip()!="":
-            self._type=self._conf.getContribTypeById(params["type"])
-        self._cancel = params.has_key("cancel")
-
-    def _process( self ):
-        if self._cancel:
-            self._redirect( urlHandlers.UHConfModifContribList.getURL( self._conf ) )
-        else:
-            s = conference.Contribution()
-            self._conf.addContribution( s )
-            s.setParent(self._conf)
-            params = self._getRequestParams()
-            if params["locationAction"] == "inherit":
-                params["locationName"] = ""
-            if params["roomAction"] == "inherit":
-                params["roomName"] = ""
-            elif params["roomAction"] == "exist":
-                params["roomName"] = params["exists"]
-            elif params["roomAction"] == "define":
-                params["roomName"] = params.get( "bookedRoomName" ) or params["roomName"]
-            s.setValues( params )
-            s.setType(self._type)
-            self._redirect( urlHandlers.UHContributionModification.getURL( s ) )
 
 #-------------------------------------------------------------------------------------
 

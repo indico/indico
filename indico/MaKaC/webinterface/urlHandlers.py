@@ -218,16 +218,8 @@ class UHOAuthAccessTokenURL(URLHandler):
     _endpoint = 'legacy.oauth-access_token'
 
 
-class UHOAuthResourceURL(URLHandler):
-    _endpoint = 'legacy.oauth-resource'
-
-
 class UHOAuthAuthorizeConsumer(URLHandler):
     _endpoint = 'legacy.oauth-authorize_consumer'
-
-
-class UHOAuthUnauthorizeConsumer(URLHandler):
-    _endpoint = 'legacy.oauth-unauthorize_consumer'
 
 
 class UHOAuthThirdPartyAuth(URLHandler):
@@ -313,10 +305,6 @@ class UHRegistrantsSendEmail(URLHandler):
 
 class UHConvenersSendEmail(URLHandler):
     _endpoint = 'legacy.EMail-sendconvener'
-
-
-class UHAuthorSendEmail(URLHandler):
-    _endpoint = 'legacy.EMail-authsend'
 
 
 class UHContribParticipantsSendEmail(URLHandler):
@@ -634,28 +622,12 @@ class UHRoomPhotoSmall(URLHandler):
         return super(UHRoomPhotoSmall, cls).getURL(room=target)
 
 
-class UHConferenceAddMaterial(URLHandler):
-    _endpoint = 'legacy.conferenceModification-addMaterial'
-
-
-class UHConferencePerformAddMaterial(URLHandler):
-    _endpoint = 'legacy.conferenceModification-performAddMaterial'
-
-
-class UHConferenceRemoveMaterials(URLHandler):
-    _endpoint = 'legacy.conferenceModification-removeMaterials'
-
-
 class UHConfModSessionSlots(URLHandler):
     _endpoint = 'legacy.conferenceModification-sessionSlots'
 
 
 class UHConferenceClose(URLHandler):
     _endpoint = 'legacy.conferenceModification-close'
-
-
-class UHConferenceDeleteSocialEvent(URLHandler):
-    _endpoint = 'legacy.conferenceModification-deleteSocialEvent'
 
 
 class UHConferenceModificationClosed(URLHandler):
@@ -782,26 +754,6 @@ class UHCFAPerformDataModification(URLHandler):
     _endpoint = 'legacy.confModifCFA-performModifyData'
 
 
-class UHCFAModifTemplate(URLHandler):
-    _endpoint = 'legacy.CFAModification-template'
-
-
-class UHCFAModifReferee(URLHandler):
-    _endpoint = 'legacy.CFAModification-referee'
-
-
-class UHCFASelectReferee(URLHandler):
-    _endpoint = 'legacy.CFAModification-selectReferee'
-
-
-class UHCFAAddReferees(URLHandler):
-    _endpoint = 'legacy.CFAModification-addReferees'
-
-
-class UHCFARemoveReferee(URLHandler):
-    _endpoint = 'legacy.CFAModification-deleteReferees'
-
-
 class UHConfAbstractManagment(URLHandler):
     _endpoint = 'legacy.abstractsManagment'
 
@@ -822,22 +774,6 @@ class UHAbstractDisplay(URLHandler):
     _endpoint = 'event.abstractDisplay'
 
 
-class UHAbstractDisplayMaterial(URLHandler):
-    _endpoint = 'legacy.abstractDisplay-material'
-
-
-class UHAbstractDisplayAddMaterial(URLHandler):
-    _endpoint = 'legacy.abstractDisplay-addMaterial'
-
-
-class UHAbstractDisplayPerformAddMaterial(URLHandler):
-    _endpoint = 'legacy.abstractDisplay-performAddMaterial'
-
-
-class UHAbstractDisplayRemoveMaterials(URLHandler):
-    _endpoint = 'legacy.abstractDisplay-removeMaterials'
-
-
 class UHAbstractDisplayPDF(URLHandler):
     _endpoint = 'event.abstractDisplay-pdf'
 
@@ -846,24 +782,12 @@ class UHAbstractConfManagerDisplayPDF(URLHandler):
     _endpoint = 'legacy.abstractManagment-abstractToPDF'
 
 
-class UHAbstractsConfManagerDisplayPDF(URLHandler):
-    _endpoint = 'legacy.abstractsManagment-abstractsToPDF'
-
-
 class UHAbstractConfSelectionAction(URLHandler):
     _endpoint = 'legacy.abstractsManagment-abstractsActions'
 
 
 class UHAbstractsConfManagerDisplayParticipantList(URLHandler):
     _endpoint = 'legacy.abstractsManagment-participantList'
-
-
-class UHAbstractsConfManagerDisplayXML(URLHandler):
-    _endpoint = 'legacy.abstractsManagment-abstractsToXML'
-
-
-class UHAbstractsConfManagerDisplayExcel(URLHandler):
-    _endpoint = 'legacy.abstractsManagment-abstractsListToExcel'
 
 
 class UHAbstractsTrackManagerParticipantList(URLHandler):
@@ -888,10 +812,6 @@ class UHUserAbstractsPDF(URLHandler):
 
 class UHAbstractModify(URLHandler):
     _endpoint = 'event.abstractModify'
-
-
-class UHCFAModifAbstracts(URLHandler):
-    _endpoint = 'legacy.CFAModification-abstracts'
 
 
 class UHCFAAbstractManagment(URLHandler):
@@ -930,10 +850,6 @@ class UHAbstractTrackOrderByRating(URLHandler):
     _endpoint = 'legacy.abstractManagment-orderByRating'
 
 
-class UHCFAAbstractDeletion(URLHandler):
-    _endpoint = 'legacy.abstractManagment-deleteAbstract'
-
-
 class UHAbstractDirectAccess(URLHandler):
     _endpoint = 'legacy.abstractManagment-directAccess'
 
@@ -944,102 +860,6 @@ class UHAbstractToXML(URLHandler):
 
 class UHAbstractSubmissionDisplay(URLHandler):
     _endpoint = 'event.abstractSubmission'
-
-
-class UHAbstractCheckUser(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-checkUser'
-
-
-class UHAbstractAuthenticateUser(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-authenticateUser'
-
-
-class UHAbstractSubmissionSendLogin(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-sendLogin'
-
-
-class UHAbstractSubmissionAbstract(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-submitAbstract'
-
-
-class UHAbstractSubmitAuthors(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-submitAuthors'
-
-
-class UHAbstractSubmissionSelectAuthors(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-selectAuthors'
-
-
-class UHAbstractSubmissionAddAuthors(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-addAuthors'
-
-
-class UHAbstractSubmissionRemoveAuthors(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-removeAuthors'
-
-
-class UHAbstractSubmissionSelectPrimAuthor(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-selectPrimAuthor'
-
-
-class UHAbstractSubmissionSetPrimAuthor(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-setPrimAuthor'
-
-
-class UHAbstractSubmissionSelectSpeakers(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-selectSpeakers'
-
-
-class UHAbstractSubmissionAddSpeakers(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-addSpeakers'
-
-
-class UHAbstractSubmissionRemoveSpeakers(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-removeSpeakers'
-
-
-class UHAbstractSubmissionFinal(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-final'
-
-
-class UHAbstractCheckAbstract(URLHandler):
-    _endpoint = 'legacy.abstractSubmission-checkAbstract'
-
-
-class UHAbstractModification(URLHandler):
-    _endpoint = 'legacy.abstractModification'
-
-
-class UHAbstractModificationModify(URLHandler):
-    _endpoint = 'legacy.abstractModification-modify'
-
-
-class UHAbstractModificationPerformModify(URLHandler):
-    _endpoint = 'legacy.abstractModification-performModify'
-
-
-class UHAbstractModificationSelectAuthors(URLHandler):
-    _endpoint = 'legacy.abstractModification-selectAuthors'
-
-
-class UHAbstractModificationAddAuthors(URLHandler):
-    _endpoint = 'legacy.abstractModification-addAuthors'
-
-
-class UHAbstractModificationRemoveAuthors(URLHandler):
-    _endpoint = 'legacy.abstractModification-removeAuthors'
-
-
-class UHAbstractModificationSelectSpeakers(URLHandler):
-    _endpoint = 'legacy.abstractModification-selectSpeakers'
-
-
-class UHAbstractModificationAddSpeakers(URLHandler):
-    _endpoint = 'legacy.abstractModification-addSpeakers'
-
-
-class UHAbstractModificationRemoveSpeakers(URLHandler):
-    _endpoint = 'legacy.abstractModification-removeSpeakers'
 
 
 class UHConfAddTrack(URLHandler):
@@ -1111,36 +931,12 @@ class UHTrackModifCoordination(URLHandler):
     _endpoint = 'legacy.trackModifCoordination'
 
 
-class UHTrackModifSubTrack(URLHandler):
-    _endpoint = 'legacy.trackModification-subTrack'
-
-
-class UHSubTrackPerformDataModification(URLHandler):
-    _endpoint = 'legacy.trackModification-subTrackPerformModify'
-
-
-class UHSubTrackDataModif(URLHandler):
-    _endpoint = 'legacy.trackModification-modifySubTrack'
-
-
 class UHTrackDataModif(URLHandler):
     _endpoint = 'legacy.trackModification-modify'
 
 
 class UHTrackPerformDataModification(URLHandler):
     _endpoint = 'legacy.trackModification-performModify'
-
-
-class UHTrackDeleteSubTracks(URLHandler):
-    _endpoint = 'legacy.trackModification-deleteSubTracks'
-
-
-class UHTrackAddSubTracks(URLHandler):
-    _endpoint = 'legacy.trackModification-addSubTrack'
-
-
-class UHTrackPerformAddSubTrack(URLHandler):
-    _endpoint = 'legacy.trackModification-performAddSubTrack'
 
 
 class UHTrackAbstractModIntComments(UHTrackAbstractBase):
@@ -1155,10 +951,6 @@ class UHConfModifScheduleCustomizePDF(URLHandler):
     _endpoint = 'legacy.confModifSchedule-customizePdf'
 
 
-class UHConfDelSchItems(URLHandler):
-    _endpoint = 'legacy.confModifSchedule-deleteItems'
-
-
 class UHContribConfSelectionAction(URLHandler):
     _endpoint = 'legacy.confModifContribList-contribsActions'
 
@@ -1169,14 +961,6 @@ class UHContribsConfManagerDisplayPDF(URLHandler):
 
 class UHContribsConfManagerDisplayMenuPDF(URLHandler):
     _endpoint = 'legacy.confModifContribList-contribsToPDFMenu'
-
-
-class UHConfPerformAddContribution(URLHandler):
-    _endpoint = 'legacy.confModifContribList-performAddContribution'
-
-
-class UHMConfPerformAddContribution(URLHandler):
-    _endpoint = 'legacy.confModifContribList-performAddContributionM'
 
 
 class UHContribsConfManagerDisplayParticipantList(URLHandler):
@@ -1253,10 +1037,6 @@ class UHContribModifSubCont(URLHandler):
     _endpoint = 'legacy.contributionModifSubCont'
 
 
-class UHContribDeleteSubCont(URLHandler):
-    _endpoint = 'legacy.contributionModifSubCont-delete'
-
-
 class UHContribAddSubCont(URLHandler):
     _endpoint = 'legacy.contributionModifSubCont-add'
 
@@ -1287,14 +1067,6 @@ class UHContributionDataModif(URLHandler):
 
 class UHContributionDataModification(URLHandler):
     _endpoint = 'legacy.contributionModification-data'
-
-
-class UHContributionCreation(URLHandler):
-    _endpoint = 'legacy.contributionCreation'
-
-
-class UHSubContributionCreation(URLHandler):
-    _endpoint = 'legacy.subContributionCreation'
 
 
 class UHConfModifAC(URLHandler):
@@ -1359,10 +1131,6 @@ class UHConfModifDisplayResources(URLHandler):
 
 class UHConfModifDisplayConfHeader(URLHandler):
     _endpoint = 'legacy.confModifDisplay-confHeader'
-
-
-class UHConfModifDisplayLink(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-modifyLink'
 
 
 class UHConfModifDisplayAddLink(URLHandler):
@@ -1433,18 +1201,6 @@ class UHConfPerformCloning(URLHandler):
     _endpoint = 'legacy.confModifTools-performCloning'
 
 
-class UHConfPerformCloneOnce(URLHandler):
-    _endpoint = 'legacy.confModifTools-performCloneOnce'
-
-
-class UHConfPerformCloneInterval(URLHandler):
-    _endpoint = 'legacy.confModifTools-performCloneInterval'
-
-
-class UHConfPerformCloneDays(URLHandler):
-    _endpoint = 'legacy.confModifTools-performCloneDays'
-
-
 class UHConfAllSessionsConveners(URLHandler):
     _endpoint = 'legacy.confModifTools-allSessionsConveners'
 
@@ -1461,22 +1217,6 @@ class UHConfAllSpeakersAction(URLHandler):
     _endpoint = 'legacy.confModifListings-allSpeakersAction'
 
 
-class UHConfAllPrimaryAuthors(URLHandler):
-    _endpoint = 'legacy.confModifListings-allPrimaryAuthors'
-
-
-class UHConfAllPrimaryAuthorsAction(URLHandler):
-    _endpoint = 'legacy.confModifListings-allPrimaryAuthorsAction'
-
-
-class UHConfAllCoAuthors(URLHandler):
-    _endpoint = 'legacy.confModifListings-allCoAuthors'
-
-
-class UHConfAllCoAuthorsAction(URLHandler):
-    _endpoint = 'legacy.confModifListings-allCoAuthorsAction'
-
-
 class UHConfDisplayAlarm(URLHandler):
     _endpoint = 'legacy.confModifTools-displayAlarm'
 
@@ -1487,10 +1227,6 @@ class UHConfAddAlarm(URLHandler):
 
 class UHSaveAlarm(URLHandler):
     _endpoint = 'legacy.confModifTools-saveAlarm'
-
-
-class UHTestSendAlarm(URLHandler):
-    _endpoint = 'legacy.confModifTools-testSendAlarm'
 
 
 class UHSendAlarmNow(URLHandler):
@@ -1608,10 +1344,6 @@ class UHUserCreation(URLHandler):
         return url
 
 
-class UHUserPerformCreation(URLHandler):
-    _endpoint = 'legacy.userRegistration-update'
-
-
 class UHUserMerge(URLHandler):
     _endpoint = 'legacy.userMerge'
 
@@ -1631,10 +1363,6 @@ class UHConfSignIn(SecureURLHandler):
         if returnURL:
             url.addParam('returnURL', returnURL)
         return url
-
-
-class UHConfSignInAuthenticate(UHConfSignIn):
-    _endpoint = 'legacy.confLogin-signIn'
 
 
 class UHConfUserCreation(URLHandler):
@@ -1760,10 +1488,6 @@ class UHUserAPIDelete(URLHandler):
 
 class UHUserRegistration(URLHandler):
     _endpoint = 'legacy.userRegistration'
-
-
-class UHUserModification(URLHandler):
-    _endpoint = 'legacy.userRegistration-modify'
 
 
 class UHUserIdentityCreation(URLHandler):
@@ -2114,18 +1838,6 @@ class UHSubContributionDelete(URLHandler):
     _endpoint = 'legacy.subContributionTools-delete'
 
 
-class UHSubContributionAddMaterial(URLHandler):
-    _endpoint = 'legacy.subContributionModification-addMaterial'
-
-
-class UHSubContributionPerformAddMaterial(URLHandler):
-    _endpoint = 'legacy.subContributionModification-performAddMaterial'
-
-
-class UHSubContributionRemoveMaterials(URLHandler):
-    _endpoint = 'legacy.subContributionModification-removeMaterials'
-
-
 class UHSubContribModifAddMaterials(URLHandler):
     _endpoint = 'legacy.subContributionModification-materialsAdd'
 
@@ -2150,42 +1862,12 @@ class UHSessionDatesModification(URLHandler):
     _endpoint = 'legacy.sessionModification-modifyDates'
 
 
-class UHSessionModSlotConvenerNew(URLHandler):
-    _endpoint = 'legacy.sessionModification-newSlotConvener'
-
-
-class UHSessionModSlotConvenersRem(URLHandler):
-    _endpoint = 'legacy.sessionModification-remSlotConveners'
-
-
-class UHSessionModSlotConvenerEdit(URLHandler):
-    _endpoint = 'legacy.sessionModification-editSlotConvener'
-
-
 class UHSessionFitSlot(URLHandler):
     _endpoint = 'legacy.sessionModifSchedule-fitSlot'
 
 
-# <Deprecated>
-class UHSessionAddMaterial(URLHandler):
-    _endpoint = 'legacy.sessionModification-addMaterial'
-
-
-class UHSessionPerformAddMaterial(URLHandler):
-    _endpoint = 'legacy.sessionModification-performAddMaterial'
-# </Deprecated>
-
-
-class UHSessionRemoveMaterials(URLHandler):
-    _endpoint = 'legacy.sessionModification-removeMaterials'
-
-
 class UHSessionModifAddMaterials(URLHandler):
     _endpoint = 'legacy.sessionModification-materialsAdd'
-
-
-class UHSessionImportContrib(URLHandler):
-    _endpoint = 'legacy.sessionModification-importContrib'
 
 
 class UHSessionModifSchedule(URLHandler):
@@ -2226,10 +1908,6 @@ class UHContributionModification(URLHandler):
 
 class UHContribModifMaterials(URLHandler):
     _endpoint = 'legacy.contributionModification-materials'
-
-
-class UHContribModifSchedule(URLHandler):
-    _endpoint = 'legacy.contributionModification-schedule'
 
 
 class UHContributionPerformMove(URLHandler):
@@ -2308,10 +1986,6 @@ class UHErrorReporting(URLHandler):
     _endpoint = 'legacy.errors'
 
 
-class UHErrorSendReport(URLHandler):
-    _endpoint = 'legacy.error-sendReport'
-
-
 class UHAbstractWithdraw(URLHandler):
     _endpoint = 'event.abstractWithdraw'
 
@@ -2322,14 +1996,6 @@ class UHAbstractRecovery(URLHandler):
 
 class UHConfModifContribList(URLHandler):
     _endpoint = 'legacy.confModifContribList'
-
-
-class UHConfModifContribListOpenMenu(URLHandler):
-    _endpoint = 'legacy.confModifContribList-openMenu'
-
-
-class UHConfModifContribListCloseMenu(URLHandler):
-    _endpoint = 'legacy.confModifContribList-closeMenu'
 
 
 class UHContribModifMaterialBrowse(URLHandler):
@@ -2589,22 +2255,6 @@ class UHConfMyStuffMyContributions(URLHandler):
     _endpoint = 'legacy.myconference-myContributions'
 
 
-class UHConfModSlotRem(URLHandler):
-    _endpoint = 'legacy.confModifSchedule-remSlot'
-
-
-class UHConfModSessionMove(URLHandler):
-    _endpoint = 'legacy.confModifSchedule-moveSession'
-
-
-class UHConfModSessionMoveConfirmation(URLHandler):
-    _endpoint = 'legacy.confModifSchedule-moveSession'
-
-
-class UHConfModSessionRem(URLHandler):
-    _endpoint = 'legacy.confModifSchedule-remSession'
-
-
 class UHConfModMoveContribsToSession(URLHandler):
     _endpoint = 'legacy.confModifContribList-moveToSession'
 
@@ -2615,18 +2265,6 @@ class UHConferenceDisplayMaterialPackage(URLHandler):
 
 class UHConferenceDisplayMaterialPackagePerform(URLHandler):
     _endpoint = 'legacy.conferenceDisplay-performMatPkg'
-
-
-class UHConferenceDisplayMenuClose(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay-closeMenu'
-
-
-class UHConferenceDisplayMenuOpen(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay-openMenu'
-
-
-class UHSessionDisplayRemoveMaterial(URLHandler):
-    _endpoint = 'legacy.sessionDisplay-removeMaterial'
 
 
 class UHConfAbstractBook(URLHandler):
@@ -2683,10 +2321,6 @@ class UHConfModFullMaterialPackagePerform(URLHandler):
 
 class UHTaskManager(URLHandler):
     _endpoint = 'legacy.taskManager'
-
-
-class UHRemoveTask(URLHandler):
-    _endpoint = 'legacy.taskManager-removeTask'
 
 
 class UHUpdateNews(URLHandler):
@@ -2765,10 +2399,6 @@ class UHAdminLayoutSaveSocial(URLHandler):
 
 class UHTemplatesSetDefaultPDFOptions(URLHandler):
     _endpoint = 'legacy.adminLayout-setDefaultPDFOptions'
-
-
-class UHServices(URLHandler):
-    _endpoint = 'legacy.adminServices'
 
 
 class UHWebcast(URLHandler):
@@ -3447,14 +3077,6 @@ class UHRegistrantModification(URLHandler):
     _endpoint = 'legacy.confModifRegistrants-modification'
 
 
-class UHRegistrantDataModification(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-dataModification'
-
-
-class UHRegistrantPerformDataModification(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-performDataModification'
-
-
 class UHRegistrantAttachmentFileAccess(URLHandler):
     _endpoint = 'legacy.confModifRegistrants-getAttachedFile'
 
@@ -3465,10 +3087,6 @@ class UHConfModifRegFormEnableSection(URLHandler):
 
 class UHConfModifRegFormEnablePersonalField(URLHandler):
     _endpoint = 'legacy.confModifRegistrationForm-enablePersonalField'
-
-
-class UHConfModifRegFormSwitchPersonalField(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-switchPersonalField'
 
 
 class UHCategoryStatistics(URLHandler):
@@ -3951,10 +3569,6 @@ class UHConfModifReviewingControl(URLHandler):
     _endpoint = 'legacy.confModifReviewingControl'
 
 
-class UHConfModifReviewingAbstractsControl(URLHandler):
-    _endpoint = 'legacy.confModifAbstractsReviewingControl'
-
-
 class UHConfModifUserCompetences(URLHandler):
     _endpoint = 'legacy.confModifUserCompetences'
 
@@ -3981,10 +3595,6 @@ class UHConfModifListContribToJudgeAsEditor(URLHandler):
 
 class UHConfModifReviewingAssignContributionsList(URLHandler):
     _endpoint = 'legacy.assignContributions'
-
-
-class UHConfModifReviewingAssignContributionsAssign(URLHandler):
-    _endpoint = 'legacy.assignContributions-assign'
 
 
 class UHConfModifReviewingDownloadAcceptedPapers(URLHandler):
@@ -4101,9 +3711,7 @@ class UHHelper(object):
         "AcceptedContribution": UHContributionModification,
         "Session": UHSessionModification,
         "SubContribution": UHSubContributionModification,
-        "Abstract": UHAbstractModification,
-        "Track": UHTrackModification,
-        "SubTrack": UHTrackModifSubTrack
+        "Track": UHTrackModification
     }
 
     displayUHs = {
