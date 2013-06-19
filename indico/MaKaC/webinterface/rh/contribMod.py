@@ -614,7 +614,8 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRigh
             self._loggedIn = True
         # status = 3 means the paper is under review (submitted but not reviewed)
         # status = 2 means that the author has not yet submitted the material
-        elif not (RCContributionPaperReviewingStaff.hasRights(self, includingContentReviewer=False) and  self._target.getReviewing().getReviewingState() in [2, 3]):
+        elif not (RCContributionPaperReviewingStaff.hasRights(self, includingContentReviewer=False)
+                  and self._target.getReviewing() and self._target.getReviewing().getReviewingState() in (2, 3)):
             RHSubmitMaterialBase._checkProtection(self)
         else:
             self._loggedIn = True
