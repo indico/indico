@@ -29,7 +29,7 @@ def display (req, **params):
 
 def modif (req, **params):
     """Evaluation modification."""
-    return evaluationDisplay.RHEvaluationModif( req ).process( params )
+    return evaluationDisplay.RHEvaluationDisplay(req).process(params)
 
 def signIn (req, **params):
     """Evaluation sign in."""

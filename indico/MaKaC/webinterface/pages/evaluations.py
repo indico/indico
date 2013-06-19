@@ -266,7 +266,7 @@ class WEvaluationSignIn(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["signInURL"] = urlHandlers.UHSignIn.getURL(urlHandlers.UHConfEvaluationDisplay.getURL(self._conf))
+        vars["signInURL"] = urlHandlers.UHConfSignIn.getURL(self._conf, urlHandlers.UHConfEvaluationDisplay.getURL(self._conf))
         return vars
 
 

@@ -3422,19 +3422,19 @@ class UHAPIAPI(OptionallySecureURLHandler):
 ############
 
 class UHConfEvaluationMainInformation(URLHandler):
-    _endpoint = 'legacy.confDisplayEvaluation'
+    _endpoint = 'event.confDisplayEvaluation'
 
 
 class UHConfEvaluationDisplay(URLHandler):
-    _endpoint = 'legacy.confDisplayEvaluation-display'
+    _endpoint = 'event.confDisplayEvaluation-display'
 
 
 class UHConfEvaluationDisplayModif(URLHandler):
-    _endpoint = 'legacy.confDisplayEvaluation-modif'
+    _endpoint = 'event.confDisplayEvaluation-modif'
 
 
 class UHConfEvaluationSignIn(URLHandler):
-    _endpoint = 'legacy.confDisplayEvaluation-signIn'
+    _endpoint = 'event.confDisplayEvaluation-signIn'
 
     @classmethod
     def getURL(cls, conf, returnURL=''):
@@ -3447,11 +3447,11 @@ class UHConfEvaluationSignIn(URLHandler):
 
 
 class UHConfEvaluationSubmit(URLHandler):
-    _endpoint = 'legacy.confDisplayEvaluation-submit'
+    _endpoint = 'event.confDisplayEvaluation-submit'
 
 
 class UHConfEvaluationSubmitted(URLHandler):
-    _endpoint = 'legacy.confDisplayEvaluation-submitted'
+    _endpoint = 'event.confDisplayEvaluation-submitted'
 
 
 ############

@@ -37,7 +37,6 @@ import MaKaC.webinterface.rh.contribReviewingModif as mod_rh_contribReviewingMod
 import MaKaC.webinterface.rh.domains as mod_rh_domains
 import MaKaC.webinterface.rh.ePaymentModif as mod_rh_ePaymentModif
 import MaKaC.webinterface.rh.errors as mod_rh_errors
-import MaKaC.webinterface.rh.evaluationDisplay as mod_rh_evaluationDisplay
 import MaKaC.webinterface.rh.evaluationModif as mod_rh_evaluationModif
 import MaKaC.webinterface.rh.fileAccess as mod_rh_fileAccess
 import MaKaC.webinterface.rh.groups as mod_rh_groups
@@ -830,35 +829,12 @@ legacy.add_url_rule('/changeLang.py',
 
 
 # Routes for confDisplayEvaluation.py
-legacy.add_url_rule('/confDisplayEvaluation.py',
-                    'confDisplayEvaluation',
-                    rh_as_view(mod_rh_evaluationDisplay.RHEvaluationMainInformation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confDisplayEvaluation.py/display',
-                    'confDisplayEvaluation-display',
-                    rh_as_view(mod_rh_evaluationDisplay.RHEvaluationDisplay),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confDisplayEvaluation.py/modif',
-                    'confDisplayEvaluation-modif',
-                    rh_as_view(mod_rh_evaluationDisplay.RHEvaluationModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confDisplayEvaluation.py/signIn',
-                    'confDisplayEvaluation-signIn',
-                    rh_as_view(mod_rh_evaluationDisplay.RHEvaluationSignIn),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confDisplayEvaluation.py/submit',
-                    'confDisplayEvaluation-submit',
-                    rh_as_view(mod_rh_evaluationDisplay.RHEvaluationSubmit),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confDisplayEvaluation.py/submitted',
-                    'confDisplayEvaluation-submitted',
-                    rh_as_view(mod_rh_evaluationDisplay.RHEvaluationSubmitted),
-                    methods=('GET', 'POST'))
+# Inactive: /confDisplayEvaluation.py (mod_rh_evaluationDisplay.RHEvaluationMainInformation)
+# Inactive: /confDisplayEvaluation.py/display (mod_rh_evaluationDisplay.RHEvaluationDisplay)
+# Inactive: /confDisplayEvaluation.py/modif (mod_rh_evaluationDisplay.RHEvaluationModif)
+# Inactive: /confDisplayEvaluation.py/signIn (mod_rh_evaluationDisplay.RHEvaluationSignIn)
+# Inactive: /confDisplayEvaluation.py/submit (mod_rh_evaluationDisplay.RHEvaluationSubmit)
+# Inactive: /confDisplayEvaluation.py/submitted (mod_rh_evaluationDisplay.RHEvaluationSubmitted)
 
 
 # Routes for confListContribToJudge.py

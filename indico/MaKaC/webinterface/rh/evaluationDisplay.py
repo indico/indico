@@ -77,58 +77,43 @@ class RHEvaluationSignIn( RHBaseEvaluation ):
     _tohttps = True
     _isMobile = False
 
+    def _getLoginURL(self):
+        return RHConferenceBaseDisplay._getLoginURL(self, urlHandlers.UHConfEvaluationDisplay.getURL(self._conf))
 
-    def _processIfActive( self ):
-        return self._wpEvaluation("SignIn").display()
+    def _processIfActive(self):
+        if self._getUser():
+            self._redirect(urlHandlers.UHConfEvaluationDisplay.getURL(self._conf))
+        else:
+            return self._wpEvaluation("SignIn").display()
 
 
 class RHEvaluationDisplayBase( RHBaseEvaluation ):
     """Base for evaluation display."""
     _uh = urlHandlers.UHConfEvaluationDisplay
 
-    def _getLoginURL( self ):
-        urlLogin = str(urlHandlers.UHSignIn.getURL(urlHandlers.UHConfEvaluationDisplay.getURL(self._conf)))
-        if Config.getInstance().getLoginURL().startswith("https"):
-            urlLogin = urlLogin.replace("http://", "https://")
-        return urlLogin
-
     def _checkProtection( self ):
         RHBaseEvaluation._checkProtection(self)
-        if self._evaluation.inEvaluationPeriod() and self._evaluation.isMandatoryAccount() and self._getUser()==None:
-            self._redirect( self._getLoginURL() )
+        if self._evaluation.inEvaluationPeriod() and self._evaluation.isMandatoryAccount() and not self._getUser():
+            self._redirect(urlHandlers.UHConfEvaluationSignIn.getURL(self._conf))
             self._doProcess = False
 
 
-class RHEvaluationDisplay( RHEvaluationDisplayBase ):
+class RHEvaluationDisplay(RHEvaluationDisplayBase):
     """Evaluation display."""
 
-    def _processIfActive( self ):
-        if self._getUser()!=None and self._getUser().hasSubmittedEvaluation(self._evaluation):
-            return self._wpEvaluation("DisplayModif").display()
-        else:
-            return self._evaluationDisplay().display()
+    def _processIfActive(self):
+        return self._evaluationDisplay().display()
 
     def _evaluationDisplay(self):
         """What to display."""
         if not self._evaluation.inEvaluationPeriod():
             return self._wpEvaluation("Closed")
+        elif self._getUser() and self._getUser().hasSubmittedEvaluation(self._evaluation):
+            return self._wpEvaluation("DisplayModif")
         elif self._evaluation.isFull():
             return self._wpEvaluation("Full")
         else:
             return self._wpEvaluation("Display")
-
-
-class RHEvaluationModif( RHEvaluationDisplayBase ):
-    """Submitted evaluation modification."""
-    _uh = urlHandlers.UHConfEvaluationDisplayModif
-
-    def _processIfActive( self ):
-        if self._getUser()!=None and self._getUser().hasSubmittedEvaluation(self._conf.getEvaluation()):
-            if not self._evaluation.inEvaluationPeriod():
-                return self._wpEvaluation("Closed").display()
-            else:
-                return self._wpEvaluation("DisplayModif").display()
-        self._redirect(urlHandlers.UHConfEvaluationMainInformation.getURL(self._conf))
 
 
 class RHEvaluationSubmit (RHBaseEvaluation):

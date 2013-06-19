@@ -22,13 +22,8 @@ from werkzeug.exceptions import NotFound
 
 from MaKaC.common import DBMgr
 from MaKaC.webinterface.urlHandlers import UHConferenceDisplay
-import MaKaC.webinterface.rh.categoryDisplay as categoryDisplay
-import MaKaC.webinterface.rh.conferenceDisplay as conferenceDisplay
-import MaKaC.webinterface.rh.contribDisplay as contribDisplay
-import MaKaC.webinterface.rh.CFADisplay as CFADisplay
-import MaKaC.webinterface.rh.authorDisplay as authorDisplay
-import MaKaC.webinterface.rh.paperReviewingDisplay as paperReviewingDisplay
-import MaKaC.webinterface.rh.collaboration as collaboration
+from MaKaC.webinterface.rh import categoryDisplay, conferenceDisplay, contribDisplay, CFADisplay, authorDisplay, \
+    paperReviewingDisplay, collaboration, evaluationDisplay
 from indico.web.flask.util import rh_as_view
 
 
@@ -180,3 +175,16 @@ event.add_url_rule('/<confId>/abstract-book-latex.zip', 'conferenceDisplay-abstr
 event.add_url_rule('/<confId>/page/<pageId>', 'internalPage', rh_as_view(conferenceDisplay.RHInternalPageDisplay))
 # collaborationDisplay.py
 event.add_url_rule('/<confId>/collaboration', 'collaborationDisplay', rh_as_view(collaboration.RHCollaborationDisplay))
+# confDisplayEvaluation.py
+event.add_url_rule('/<confId>/evaluation/', 'confDisplayEvaluation',
+                   rh_as_view(evaluationDisplay.RHEvaluationMainInformation))
+event.add_url_rule('/<confId>/evaluation/form', 'confDisplayEvaluation-display',
+                   rh_as_view(evaluationDisplay.RHEvaluationDisplay))
+event.add_url_rule('/<confId>/evaluation/form', 'confDisplayEvaluation-modif',
+                   rh_as_view(evaluationDisplay.RHEvaluationDisplay))
+event.add_url_rule('/<confId>/evaluation/signin', 'confDisplayEvaluation-signIn',
+                   rh_as_view(evaluationDisplay.RHEvaluationSignIn))
+event.add_url_rule('/<confId>/evaluation/submit', 'confDisplayEvaluation-submit',
+                   rh_as_view(evaluationDisplay.RHEvaluationSubmit), methods=('POST',))
+event.add_url_rule('/<confId>/evaluation/submitted', 'confDisplayEvaluation-submitted',
+                   rh_as_view(evaluationDisplay.RHEvaluationSubmitted))
