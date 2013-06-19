@@ -118,7 +118,6 @@
                     ${ abstractFields }
             </table>
         </td>
-        <td><a id="add-field" href="#">Add field</a></td>
     </tr>
     <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
@@ -129,7 +128,13 @@
 $(function() {
     $("#add-field").click(function(e) {
         e.preventDefault();
-        new AddAbstractFieldDialog().open();
+        new AddAbstractFieldDialog(${confId}).open();
+    });
+
+    $(".edit-field").click(function(e) {
+        e.preventDefault();
+        var fieldId = $(this).data("id");
+        new AddAbstractFieldDialog(${confId}, fieldId).open();
     });
 });
 

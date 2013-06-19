@@ -3109,7 +3109,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
                                 </td>
                                 <td width="1%%">%s</td>
                                 <td>
-                                  &nbsp;<a href=%s>%s</a> %s
+                                  &nbsp;<a class="edit-field" href="#" data-id=%s>%s</a> %s
                                 </td>
                             </tr>
                             """%(
@@ -3121,14 +3121,14 @@ class WConfModifCFA( wcomponents.WTemplated ):
                                 quoteattr(str(urlDown)),\
                                 quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))),\
                                 removeButton, \
-                                urledit, \
+                                af.getId(),
                                 af.getName(), \
                                 addInfo))
         laf.append( i18nformat("""
     <tr>
       <td align="right" colspan="3">
         <input type="submit" value="_("remove")" onClick="this.form.action='%s';" class="btn">
-        <input type="submit" value="_("add")" class="btn">
+        <input id="add-field" type="submit" value="_("add")" class="btn">
       </td>
     </tr>
     </form>""") % urlRemove)

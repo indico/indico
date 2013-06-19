@@ -804,6 +804,7 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
                 ["Name", self.fieldName],
                 ["Caption", self.fieldCaption],
                 ["Max length", self.fieldMaxLength],
+                ["Limitation", self.fieldLimitation],
                 ["Mandatory", self.mandatoryFlag]
             ]);
 
@@ -811,7 +812,37 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
         },
 
         _fillForm: function() {
-            // TODO: get the information from existing field
+            var self = this;
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading field..."));
+
+            indicoRequest("abstracts.fields.getField", {
+                conference: self.conferenceId,
+                id: self.fieldId
+            },
+            function(result, error) {
+                if (!error) {
+                    killProgress();
+
+                    $("#field-name").val(result.name);
+                    $("#field-caption").val(result.caption);
+                    $("#field-maxlength").val(result.maxLength);
+
+                    if (result.isMandatory) {
+                        $("#field-mandatoryflag").prop("checked", true);
+                    }
+
+                    $("#field-type option").filter(function() {
+                        return $(this).val() == result.type;
+                    }).prop("selected", true);
+
+                    $("#field-limitation option").filter(function() {
+                        return $(this).val() == result.limitation;
+                    }).prop("selected", true);
+                } else {
+                    killProgress();
+                    IndicoUtil.errorReport(error);
+                }
+            });
         },
 
         _generateForm: function() {
@@ -820,28 +851,38 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
             self.fieldType = $("<select></select>", {
                 id: "field-type",
                 name: "fieldType"
-            })  .append("<option>Dropdown</option>")
-                .append("<option>Input</option>")
-                .append("<option>Text field</option>");
+            })  .append("<option value='dropdown'>Dropdown</option>")
+                .append("<option value='input'>Input</option>")
+                .append("<option value='textarea'>Text field</option>");
 
             // TODO: append options from available ones stored somewhere
 
             self.fieldName = $("<input></input>", {
+                id: "field-name",
                 type: "text",
                 name: "fieldName"
             });
 
             self.fieldCaption = $("<input></input>", {
+                id: "field-caption",
                 type: "text",
                 name: "fieldCaption"
             });
 
             self.fieldMaxLength = $("<input></input>", {
+                id: "field-maxlength",
                 type: "text",
                 name: "fieldMaxLength"
             });
 
+            self.fieldLimitation = $("<select></select>", {
+                id: "field-limitation",
+                name: "fieldLimitation"
+            })  .append("<option value='chars'>Characters</option>")
+                .append("<option value='words'>Words</option>");
+
             self.mandatoryFlag = $("<input></input>", {
+                id: "field-mandatoryflag",
                 type: "checkbox",
                 name: "mandatoryFlag"
             });
@@ -860,7 +901,7 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
             }
 
             actionButton = [actionButtonLabel, function() {
-                self.__save();
+                self._save();
             }];
 
             cancelButton = [$T('Cancel'), function() {
@@ -870,19 +911,39 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
             return [actionButton, cancelButton];
         },
 
-        __save: function() {
-            if (this.dialogType == "add") {
-                indicoRequest();
-            } else {
-                indicoRequest();
-            }
+        _save: function() {
+            var self = this;
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving field..."));
+
+            indicoRequest("abstracts.fields.addField", {
+                conference: self.conferenceId,
+                id: self.fieldId,
+                name: $("#field-name").val(),
+                caption: $("#field-caption").val(),
+                maxLength: $("#field-maxlength").val(),
+                isMandatory: $("#field-mandatoryflag").is(":checked"),
+                fieldType: $("#field-type").val(),
+                fieldLimitation: $("#field-limitation").val()
+            },
+            function(result, error) {
+                if (!error) {
+                    killProgress();
+                    self.close();
+                    location.reload();
+                } else {
+                    killProgress();
+                    IndicoUtil.errorReport(error);
+                }
+            });
         }
     },
 
-    function(fieldId) {
+    function(conferenceId, fieldId) {
         var self = this;
-        var title;
+        self.conferenceId = conferenceId;
+        self._generateForm();
 
+        var title;
         if (fieldId === undefined) {
             self.dialogType = "add";
             title = $T("Add Field");
@@ -892,9 +953,6 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
             self._fillForm();
             title = $T("Edit Field");
         }
-
-        self._generateForm();
-        self._fillForm();
 
         self.ExclusivePopupWithButtons(title, function() {
             return true;
