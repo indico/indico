@@ -38,12 +38,6 @@ def performModifyData( req, **params ):
 def abstractFields(req, **params):
     return conferenceModif.RHConfAbstractFields(req).process(params)
 
-def addAbstractField(req, **params):
-    return conferenceModif.RHConfAddAbstractField(req).process(params)
-
-def editAbstractField(req, **params):
-    return conferenceModif.RHConfEditAbstractField(req).process(params)
-
 def performAddAbstractField(req, **params):
     return conferenceModif.RHConfPerformAddAbstractField(req).process(params)
 

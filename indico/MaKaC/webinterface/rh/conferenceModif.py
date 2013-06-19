@@ -3729,62 +3729,6 @@ class RHConfAbstractFields( RHConfModifCFABase ):
                 self._conf.getAbstractMgr().enableAbstractField(self._fieldId)
         self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
 
-class RHConfAddAbstractField( RHConfModifCFABase ):
-    _uh = urlHandlers.UHConfModifCFAAddOptFld
-
-    def _checkParams( self, params ):
-        RHConfModifCFABase._checkParams( self, params )
-        self._fieldId = ""
-
-    def _process( self ):
-        p = conferences.WPConfModifCFAAddField( self, self._target, self._fieldId )
-        return p.display()
-
-class RHConfEditAbstractField( RHConfModifCFABase ):
-    _uh = urlHandlers.UHConfModifCFAEditOptFld
-
-    def _checkParams( self, params ):
-        RHConfModifCFABase._checkParams( self, params )
-        self._fieldId = params.get("fieldId", "")
-
-    def _process( self ):
-        p = conferences.WPConfModifCFAAddField( self, self._target, self._fieldId )
-        return p.display()
-
-class RHConfPerformAddAbstractField( RHConfModifCFABase ):
-    _uh = urlHandlers.UHConfModifCFAPerformAddOptFld
-
-    def _checkParams( self, params ):
-        RHConfModifCFABase._checkParams( self, params )
-        self._cancel = params.get("cancel",None)
-        if self._cancel:
-            return
-        self._fieldId = params.get("fieldId", "")
-        self._fieldName = params.get("fieldName", "")
-        self._fieldCaption = params.get("fieldCaption", "")
-        self._fieldMaxLength = params.get("fieldMaxLength", 0)
-        if self._fieldMaxLength.strip() == "":
-            self._fieldMaxLength = 0
-        self._fieldLimitation = params.get("limitation", "chars")
-        try:
-            self._fieldMaxLength = int(self._fieldMaxLength)
-        except ValueError:
-            raise FormValuesError(_("The field Max Length must be a number"))
-        self._fieldIsMandatory = params.get("fieldIsMandatory", False)
-        self._fieldType = params.get("fieldType", "textarea")
-        if self._fieldIsMandatory == "Yes":
-            self._fieldIsMandatory = True
-        else:
-            self._fieldIsMandatory = False
-        if self._fieldName == "":
-            raise MaKaCError( _("The field name must not be empty"))
-
-    def _process( self ):
-        if not self._cancel:
-            id=self._conf.getAbstractMgr().addAbstractField(self._fieldId, self._fieldName, self._fieldCaption, \
-                                                            self._fieldMaxLength, self._fieldIsMandatory, self._fieldType, \
-                                                            self._fieldLimitation)
-        self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
 
 class RHConfRemoveAbstractField( RHConfModifCFABase ):
     _uh = urlHandlers.UHConfModifCFARemoveOptFld

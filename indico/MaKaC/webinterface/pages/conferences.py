@@ -3015,49 +3015,6 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
 
 #----------------------------------------------------------------------------------
 
-class WConfModifCFAAddField( wcomponents.WTemplated ):
-
-    def __init__( self, conference, fieldId ):
-        self._conf = conference
-        self._fieldId = fieldId
-
-    def getVars (self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["postURL"] = quoteattr(str(urlHandlers.UHConfModifCFAPerformAddOptFld.getURL(self._conf)))
-        selectedYes = ""
-        selectedNo = "checked"
-        fieldType = "textarea"
-        if self._fieldId != "":
-            abf = self._conf.getAbstractMgr().getAbstractFieldsMgr().getFieldById(self._fieldId)
-            vars["id"] = quoteattr(abf.getId())
-            vars["name"] = quoteattr(abf.getName())
-            vars["caption"] = quoteattr(abf.getCaption())
-            vars["maxlength"] = quoteattr(str(abf.getMaxLength()))
-            vars["action"] = "Edit"
-            if abf.isMandatory():
-                selectedYes = "checked"
-                selectedNo = ""
-            fieldType = abf.getType()
-            vars["limitationOption"] = abf.getLimitation()
-        else:
-            vars["id"] = vars["name"] = vars["caption"] = quoteattr("")
-            vars["maxlength"] = 0
-            vars["action"] = "Add"
-            vars["limitationOption"] = "words" # by default we show selected the "words" option
-        #vars["fieldName"] = """<input type="text" name="fieldId" value=%s size="60">""" % quoteattr(self._fieldId)
-        #if self._fieldId == "content":
-        #    vars["fieldName"] = """%s<input type="hidden" name="fieldId" value=%s size="60">""" % (self._fieldId, quoteattr(self._fieldId))
-        vars["selectedYes"] = selectedYes
-        vars["selectedNo"] = selectedNo
-        vars["fieldTypeOptions"] = ""
-        for type in review.AbstractField._fieldTypes:
-            selected = ""
-            if type == fieldType:
-                selected = " selected"
-            vars["fieldTypeOptions"] += """<option value="%s"%s>%s\n""" % (type, selected, type)
-        return vars
-
-
 class WConfModifCFA( wcomponents.WTemplated ):
 
     def __init__( self, conference ):
@@ -3230,19 +3187,6 @@ class WPConfModifCFA( WPConferenceModifAbstractBase ):
         wc = WConfModifCFA( self._conf )
         return wc.getHTML()
 
-class WPConfModifCFAAddField( WPConferenceModifAbstractBase ):
-
-    def __init__(self,rh,conf,fieldId):
-        WPConferenceModifAbstractBase.__init__(self, rh, conf)
-        self._conf = conf
-        self._fieldId = fieldId
-
-    def _setActiveTab( self ):
-        self._tabCFA.setActive()
-
-    def _getTabContent( self, params ):
-        wc = WConfModifCFAAddField( self._conf, self._fieldId )
-        return wc.getHTML()
 
 class WCFADataModification(wcomponents.WTemplated):
 
