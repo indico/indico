@@ -4610,7 +4610,7 @@ class RHConfModifRoomBookingBookingForm( RHConferenceModifRoomBookingBase, RHRoo
         p = conferences.WPConfModifRoomBookingBookingForm( self )
         return p.display()
 
-class RHConfModifRoomBookingCloneBooking(RHConferenceModifBase, RHRoomBookingCloneBooking):
+class RHConfModifRoomBookingCloneBooking(RHConferenceModifRoomBookingBase, RHRoomBookingCloneBooking):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         RHRoomBookingCloneBooking._checkParams(self, params)
