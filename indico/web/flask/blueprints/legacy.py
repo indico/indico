@@ -48,7 +48,6 @@ import MaKaC.webinterface.rh.maintenance as mod_rh_maintenance
 import MaKaC.webinterface.rh.materialDisplay as mod_rh_materialDisplay
 import MaKaC.webinterface.rh.newsDisplay as mod_rh_newsDisplay
 import MaKaC.webinterface.rh.oauth as mod_rh_oauth
-import MaKaC.webinterface.rh.paperReviewingDisplay as mod_rh_paperReviewingDisplay
 import MaKaC.webinterface.rh.payment as mod_rh_payment
 import MaKaC.webinterface.rh.registrantsDisplay as mod_rh_registrantsDisplay
 import MaKaC.webinterface.rh.registrantsModif as mod_rh_registrantsModif
@@ -2917,20 +2916,9 @@ legacy.add_url_rule('/oauth.py/userThirdPartyAuth',
 
 
 # Routes for paperReviewingDisplay.py
-legacy.add_url_rule('/paperReviewingDisplay.py',
-                    'paperReviewingDisplay',
-                    rh_as_view(mod_rh_paperReviewingDisplay.RHPaperReviewingDisplay),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/paperReviewingDisplay.py/downloadTemplate',
-                    'paperReviewingDisplay-downloadTemplate',
-                    rh_as_view(mod_rh_paperReviewingDisplay.RHDownloadPRTemplate),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/paperReviewingDisplay.py/uploadPaper',
-                    'paperReviewingDisplay-uploadPaper',
-                    rh_as_view(mod_rh_paperReviewingDisplay.RHUploadPaper),
-                    methods=('GET', 'POST'))
+# Inactive: /paperReviewingDisplay.py (mod_rh_paperReviewingDisplay.RHPaperReviewingDisplay)
+# Inactive: /paperReviewingDisplay.py/downloadTemplate (mod_rh_paperReviewingDisplay.RHDownloadPRTemplate)
+# Inactive: /paperReviewingDisplay.py/uploadPaper (mod_rh_paperReviewingDisplay.RHUploadPaper)
 
 
 # Routes for payment.py

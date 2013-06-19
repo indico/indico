@@ -3671,15 +3671,15 @@ class UHReviewerDueDate(URLHandler):
 
 
 class UHDownloadPRTemplate(URLHandler):
-    _endpoint = 'legacy.paperReviewingDisplay-downloadTemplate'
+    _endpoint = 'event.paperReviewingDisplay-downloadTemplate'
 
 
 class UHUploadPaper(URLHandler):
-    _endpoint = 'legacy.paperReviewingDisplay-uploadPaper'
+    _endpoint = 'event.paperReviewingDisplay-uploadPaper'
 
 
 class UHPaperReviewingDisplay(URLHandler):
-    _endpoint = 'legacy.paperReviewingDisplay'
+    _endpoint = 'event.paperReviewingDisplay'
 
 
 #### End of reviewing

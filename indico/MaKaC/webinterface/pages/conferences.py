@@ -5372,12 +5372,8 @@ class WConfMyStuffMyTracks(wcomponents.WTemplated):
             """%"".join(res)
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["items"]=self._getTracksHTML()
-
-        from MaKaC.webinterface.pages import reviewing
-        vars["hasPaperReviewing"] = self._conf.hasEnabledSection('paperReviewing')
-        vars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete" : False})
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["items"] = self._getTracksHTML()
         return vars
 
 class WPConfMyStuffMyTracks(WPConferenceDefaultDisplayBase):

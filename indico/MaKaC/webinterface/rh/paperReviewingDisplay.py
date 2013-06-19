@@ -21,6 +21,7 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 import MaKaC.webinterface.rh.base as base
 from MaKaC.webinterface.pages.paperReviewingDisplay import WPPaperReviewingDisplay, \
             WPDownloadPRTemplate, WPUploadPaper
+from MaKaC.webinterface.rh.reviewingModif import RHDownloadTemplate
 
 
 class RHPaperReviewingDisplay(RHConferenceBaseDisplay, base.RHProtected):
@@ -37,7 +38,14 @@ class RHDownloadPRTemplate(RHConferenceBaseDisplay, base.RHProtected):
     def _checkProtection(self):
         base.RHProtected._checkProtection(self)
 
+    def _checkParams(self, params):
+        RHConferenceBaseDisplay._checkParams(self, params)
+        self._templateId = params.get('reviewingTemplateId')
+
     def _process(self):
+        if self._templateId:
+            self._changeRH(RHDownloadTemplate, self._reqParams)
+            return
         p = WPDownloadPRTemplate( self, self._target)
         return p.display()
 

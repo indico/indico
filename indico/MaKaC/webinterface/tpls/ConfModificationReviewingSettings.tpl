@@ -629,7 +629,8 @@ var TemplateList = function(){
 
                     var cellFormat = Html.td({id:'TemplateName_'+'${ t.getId()}', className:'content'}, '${ t.getFormat()}');
                     var cellDescription = Html.td({id:'TemplateName_'+'${ t.getId()}', className:'content'}, ${t.getDescription() | n,j});
-                    var downloadSpan = Html.span({className:'link'}, "Download");
+                    var downloadURL = "${ urlHandlers.UHDownloadContributionTemplate.getURL() }" + "?reviewingTemplateId=" + '${ t.getId()}' + "&confId=${ ConfReview.getConference().getId()}";
+                    var downloadSpan = Html.a({href: downloadURL}, "Download");
                     var barSpan = Html.span({className:'horizontalSeparator'}, "|");
                     var removeSpan = Html.span({className:'link'}, "Remove");
                     var cellActions = Html.td({className:'content', style:{textAlign: 'right'}});
@@ -640,10 +641,6 @@ var TemplateList = function(){
                     row.append(cellFormat);
                     row.append(cellDescription);
                     row.append(cellActions);
-
-                    downloadSpan.observeClick(function() {
-                        window.location = "${ urlHandlers.UHDownloadContributionTemplate.getURL() }" + "?reviewingTemplateId=" + '${ t.getId()}' + "&confId=${ ConfReview.getConference().getId()}";
-                    });
                     removeSpan.observeClick(function(event){
                         var selectedRow = $E('TemplateRow_'+'${t.getId()}');
                         deleteTpl(selectedRow);
@@ -823,7 +820,8 @@ $('#reviewerSubmittedRefereeNotifButton').html(new SwitchOptionButton('reviewing
             var cellName = Html.td({id:'TemplateName_'+ value.id, className:'content'}, nameSpan);
             var cellFormat = Html.td({id:'TemplateName_'+ value.id, className:'content'}, value.format);
             var cellDescription = Html.td({id:'TemplateName_'+ value.id, className:'content'}, value.description);
-            var downloadSpan = Html.span({className:'link'}, "Download");
+            var downloadURL = "${ urlHandlers.UHDownloadContributionTemplate.getURL() }" + "?reviewingTemplateId=" + value.id + "&confId=${ ConfReview.getConference().getId()}";
+            var downloadSpan = Html.a({href: downloadURL}, "Download");
             var barSpan = Html.span({className:'horizontalSeparator'}, "|");
             var removeSpan = Html.span({className:'link'}, "Remove");
             var cellActions = Html.td({className:'content', style:{textAlign: 'right'}});
@@ -835,9 +833,6 @@ $('#reviewerSubmittedRefereeNotifButton').html(new SwitchOptionButton('reviewing
             row.append(cellDescription);
             row.append(cellActions);
 
-            downloadSpan.observeClick(function() {
-                window.location = "${ urlHandlers.UHDownloadContributionTemplate.getURL() }" + "?reviewingTemplateId=" + value.id + "&confId=${ ConfReview.getConference().getId()}";
-            });
             removeSpan.observeClick(deleteTemplate);
 
             return $E('templateListTable').append(row);

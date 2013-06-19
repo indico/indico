@@ -254,6 +254,10 @@ class RH(RequestHandlerBase):
             raise MaKaCError(_("http header CRLF injection detected"))
         self._responseUtil.redirect = (targetURL, status)
 
+    def _changeRH(self, rh, params):
+        """Calls the specified RH after processing this one"""
+        self._responseUtil.call = lambda: rh(None).process(params)
+
     def _checkHttpsRedirect(self):
         """
         If HTTPS must be used but it is not, redirect!

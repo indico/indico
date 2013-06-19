@@ -27,6 +27,7 @@ import MaKaC.webinterface.rh.conferenceDisplay as conferenceDisplay
 import MaKaC.webinterface.rh.contribDisplay as contribDisplay
 import MaKaC.webinterface.rh.CFADisplay as CFADisplay
 import MaKaC.webinterface.rh.authorDisplay as authorDisplay
+import MaKaC.webinterface.rh.paperReviewingDisplay as paperReviewingDisplay
 from indico.web.flask.util import rh_as_view
 
 
@@ -159,3 +160,12 @@ event.add_url_rule('/<confId>/my-conference/sessions', 'myconference-mySessions'
                    rh_as_view(conferenceDisplay.RHConfMyStuffMySessions))
 event.add_url_rule('/<confId>/my-conference/tracks', 'myconference-myTracks',
                    rh_as_view(conferenceDisplay.RHConfMyStuffMyTracks))
+# paperReviewingDisplay.py
+event.add_url_rule('/<confId>/paper-reviewing/', 'paperReviewingDisplay',
+                   rh_as_view(paperReviewingDisplay.RHPaperReviewingDisplay))
+event.add_url_rule('/<confId>/paper-reviewing/templates/', 'paperReviewingDisplay-downloadTemplate',
+                   rh_as_view(paperReviewingDisplay.RHDownloadPRTemplate))
+event.add_url_rule('/<confId>/paper-reviewing/templates/<reviewingTemplateId>',
+                   'paperReviewingDisplay-downloadTemplate', rh_as_view(paperReviewingDisplay.RHDownloadPRTemplate))
+event.add_url_rule('/<confId>/paper-reviewing/upload', 'paperReviewingDisplay-uploadPaper',
+                   rh_as_view(paperReviewingDisplay.RHUploadPaper))
