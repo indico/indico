@@ -26,6 +26,7 @@ import MaKaC.webinterface.rh.categoryDisplay as categoryDisplay
 import MaKaC.webinterface.rh.conferenceDisplay as conferenceDisplay
 import MaKaC.webinterface.rh.contribDisplay as contribDisplay
 import MaKaC.webinterface.rh.CFADisplay as CFADisplay
+import MaKaC.webinterface.rh.authorDisplay as authorDisplay
 from indico.web.flask.util import rh_as_view
 
 
@@ -145,5 +146,8 @@ event.add_url_rule('/<confId>/contribution/<contribId>.pdf', 'contributionDispla
                    rh_as_view(contribDisplay.RHContributionToPDF))
 # confAuthorIndex.py
 event.add_url_rule('/<confId>/authors', 'confAuthorIndex', rh_as_view(conferenceDisplay.RHAuthorIndex))
+# contribAuthorDisplay.py
+event.add_url_rule('/<confId>/contribution/<contribId>/author/<authorId>', 'contribAuthorDisplay',
+                   rh_as_view(authorDisplay.RHAuthorDisplay))
 # confSpeakerIndex.py
 event.add_url_rule('/<confId>/speakers', 'confSpeakerIndex', rh_as_view(conferenceDisplay.RHSpeakerIndex))

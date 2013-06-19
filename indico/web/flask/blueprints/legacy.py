@@ -27,7 +27,6 @@ import MaKaC.webinterface.rh.abstractReviewing as mod_rh_abstractReviewing
 import MaKaC.webinterface.rh.admins as mod_rh_admins
 import MaKaC.webinterface.rh.announcement as mod_rh_announcement
 import MaKaC.webinterface.rh.api as mod_rh_api
-import MaKaC.webinterface.rh.authorDisplay as mod_rh_authorDisplay
 import MaKaC.webinterface.rh.calendar as mod_rh_calendar
 import MaKaC.webinterface.rh.collaboration as mod_rh_collaboration
 import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
@@ -2423,10 +2422,7 @@ legacy.add_url_rule('/contact.py',
 
 
 # Routes for contribAuthorDisplay.py
-legacy.add_url_rule('/contribAuthorDisplay.py',
-                    'contribAuthorDisplay',
-                    rh_as_view(mod_rh_authorDisplay.RHAuthorDisplay),
-                    methods=('GET', 'POST'))
+# Inactive: /contribAuthorDisplay.py (mod_rh_authorDisplay.RHAuthorDisplay)
 
 
 # Routes for contributionAC.py

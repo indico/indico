@@ -2770,7 +2770,7 @@ class UHMStaticResourceDisplay(URLHandler):
 # ------- END: DVD creation and static webpages ------
 
 class UHContribAuthorDisplay(URLHandler):
-    _endpoint = 'legacy.contribAuthorDisplay'
+    _endpoint = 'event.contribAuthorDisplay'
 
 
 class UHConfTimeTableCustomizePDF(URLHandler):
