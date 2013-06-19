@@ -1196,11 +1196,12 @@ class ImageWrapper(Persistent):
     def getLocator(self):
         loc = self._localFile.getOwner().getLocator()
         loc["picId"] = self.getId()
+        loc["picExt"] = self._localFile.getFileType().lower()
         return loc
 
     def clone(self):
-        lf=self.getLocalFile().clone()
-        iw = ImageWraper(lf)
+        lf = self.getLocalFile().clone()
+        iw = ImageWrapper(lf)
         return iw
 
     def getLocalFile(self):

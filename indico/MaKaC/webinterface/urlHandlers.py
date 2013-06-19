@@ -315,15 +315,15 @@ class UHConferenceOtherViews(URLHandler):
 
 
 class UHConferenceLogo(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay-getLogo'
+    _endpoint = 'event.conferenceDisplay-getLogo'
 
 
 class UHConferenceCSS(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay-getCSS'
+    _endpoint = 'event.conferenceDisplay-getCSS'
 
 
 class UHConferencePic(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay-getPic'
+    _endpoint = 'event.conferenceDisplay-getPic'
 
 
 class UHConfModifPreviewCSS(URLHandler):
@@ -1422,11 +1422,7 @@ class UHConfActiveAccount(UHConfUser):
 
 
 class UHConfEnterAccessKey(UHConfUser):
-    _endpoint = 'legacy.conferenceDisplay-accessKey'
-
-
-class UHConfForceEnterAccessKey(UHConfUser):
-    _endpoint = 'legacy.conferenceDisplay-forceAccessKey'
+    _endpoint = 'event.conferenceDisplay-accessKey'
 
 
 class UHConfManagementAccess(UHConfUser):
@@ -2255,11 +2251,11 @@ class UHConfModMoveContribsToSession(URLHandler):
 
 
 class UHConferenceDisplayMaterialPackage(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay-matPkg'
+    _endpoint = 'event.conferenceDisplay-matPkg'
 
 
 class UHConferenceDisplayMaterialPackagePerform(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay-performMatPkg'
+    _endpoint = 'event.conferenceDisplay-performMatPkg'
 
 
 class UHConfAbstractBook(URLHandler):
@@ -2271,7 +2267,7 @@ class UHConfAbstractBookLatex(URLHandler):
 
 
 class UHConferenceToiCal(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay-ical'
+    _endpoint = 'event.conferenceDisplay-ical'
 
 
 class UHConfModAbstractBook(URLHandler):

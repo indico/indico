@@ -831,7 +831,7 @@ legacy.add_url_rule('/changeLang.py',
 # Routes for confDisplayEvaluation.py
 # Inactive: /confDisplayEvaluation.py (mod_rh_evaluationDisplay.RHEvaluationMainInformation)
 # Inactive: /confDisplayEvaluation.py/display (mod_rh_evaluationDisplay.RHEvaluationDisplay)
-# Inactive: /confDisplayEvaluation.py/modif (mod_rh_evaluationDisplay.RHEvaluationModif)
+# Inactive: /confDisplayEvaluation.py/modif (mod_rh_evaluationDisplay.RHEvaluationDisplay)
 # Inactive: /confDisplayEvaluation.py/signIn (mod_rh_evaluationDisplay.RHEvaluationSignIn)
 # Inactive: /confDisplayEvaluation.py/submit (mod_rh_evaluationDisplay.RHEvaluationSubmit)
 # Inactive: /confDisplayEvaluation.py/submitted (mod_rh_evaluationDisplay.RHEvaluationSubmitted)
@@ -2166,58 +2166,17 @@ legacy.add_url_rule('/confUser.py/userExists',
 # Inactive: /conferenceDisplay.py (mod_rh_conferenceDisplay.RHConferenceDisplay)
 # Inactive: /conferenceDisplay.py/abstractBook (mod_rh_conferenceDisplay.RHAbstractBook)
 # Inactive: /conferenceDisplay.py/abstractBookLatex (mod_rh_conferenceDisplay.RHConferenceLatexPackage)
-
-legacy.add_url_rule('/conferenceDisplay.py/accessKey',
-                    'conferenceDisplay-accessKey',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceAccessKey),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceDisplay.py/forceAccessKey',
-                    'conferenceDisplay-forceAccessKey',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceForceAccessKey),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceDisplay.py/getCSS',
-                    'conferenceDisplay-getCSS',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceGetCSS),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceDisplay.py/getLogo',
-                    'conferenceDisplay-getLogo',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceGetLogo),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceDisplay.py/getPic',
-                    'conferenceDisplay-getPic',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceGetPic),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceDisplay.py/ical',
-                    'conferenceDisplay-ical',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceToiCal),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceDisplay.py/marcxml',
-                    'conferenceDisplay-marcxml',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceToMarcXML),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceDisplay.py/matPkg',
-                    'conferenceDisplay-matPkg',
-                    rh_as_view(mod_rh_conferenceDisplay.RHFullMaterialPackage),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceDisplay.py/accessKey (mod_rh_conferenceDisplay.RHConferenceAccessKey)
+# Inactive: /conferenceDisplay.py/getCSS (mod_rh_conferenceDisplay.RHConferenceGetCSS)
+# Inactive: /conferenceDisplay.py/getLogo (mod_rh_conferenceDisplay.RHConferenceGetLogo)
+# Inactive: /conferenceDisplay.py/getPic (mod_rh_conferenceDisplay.RHConferenceGetPic)
+# Inactive: /conferenceDisplay.py/ical (mod_rh_conferenceDisplay.RHConferenceToiCal)
+# Inactive: /conferenceDisplay.py/marcxml (mod_rh_conferenceDisplay.RHConferenceToMarcXML)
+# Inactive: /conferenceDisplay.py/matPkg (mod_rh_conferenceDisplay.RHFullMaterialPackage)
 # Inactive: /conferenceDisplay.py/next (mod_rh_conferenceDisplay.RHRelativeEvent)
-
-legacy.add_url_rule('/conferenceDisplay.py/performMatPkg',
-                    'conferenceDisplay-performMatPkg',
-                    rh_as_view(mod_rh_conferenceDisplay.RHFullMaterialPackagePerform),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceDisplay.py/performMatPkg (mod_rh_conferenceDisplay.RHFullMaterialPackagePerform)
 # Inactive: /conferenceDisplay.py/prev (mod_rh_conferenceDisplay.RHRelativeEvent)
-
-legacy.add_url_rule('/conferenceDisplay.py/xml',
-                    'conferenceDisplay-xml',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceToXML),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceDisplay.py/xml (mod_rh_conferenceDisplay.RHConferenceToXML)
 
 
 # Routes for conferenceModification.py

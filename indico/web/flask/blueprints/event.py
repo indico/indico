@@ -94,6 +94,25 @@ event.add_url_rule('/<confId>/next', 'conferenceDisplay-next', rh_as_view(confer
                    defaults={'which': 'next'})
 event.add_url_rule('/<confId>/prev', 'conferenceDisplay-prev', rh_as_view(conferenceDisplay.RHRelativeEvent),
                    defaults={'which': 'prev'})
+event.add_url_rule('/<confId>/accesskey', 'conferenceDisplay-accessKey',
+                   rh_as_view(conferenceDisplay.RHConferenceAccessKey), methods=('GET', 'POST'))
+event.add_url_rule('/<confId>/abstract-book.pdf', 'conferenceDisplay-abstractBook',
+                   rh_as_view(conferenceDisplay.RHAbstractBook))
+event.add_url_rule('/<confId>/abstract-book-latex.zip', 'conferenceDisplay-abstractBookLatex',
+                   rh_as_view(conferenceDisplay.RHConferenceLatexPackage))
+event.add_url_rule('/<confId>/material/download', 'conferenceDisplay-matPkg',
+                   rh_as_view(conferenceDisplay.RHFullMaterialPackage))
+event.add_url_rule('/<confId>/material/download', 'conferenceDisplay-performMatPkg',
+                   rh_as_view(conferenceDisplay.RHFullMaterialPackagePerform), methods=('POST',))
+event.add_url_rule('/<confId>/style.css', 'conferenceDisplay-getCSS', rh_as_view(conferenceDisplay.RHConferenceGetCSS))
+event.add_url_rule('/<confId>/logo', 'conferenceDisplay-getLogo',
+                   rh_as_view(conferenceDisplay.RHConferenceGetLogo), methods=('GET', 'POST'))
+event.add_url_rule('/<confId>/picture/<picId>.<picExt>', 'conferenceDisplay-getPic',
+                   rh_as_view(conferenceDisplay.RHConferenceGetPic))
+event.add_url_rule('/<confId>/event.ics', 'conferenceDisplay-ical', rh_as_view(conferenceDisplay.RHConferenceToiCal))
+event.add_url_rule('/<confId>/event.marc.xml', 'conferenceDisplay-marcxml',
+                   rh_as_view(conferenceDisplay.RHConferenceToMarcXML))
+event.add_url_rule('/<confId>/event.xml', 'conferenceDisplay-xml', rh_as_view(conferenceDisplay.RHConferenceToXML))
 # conferenceProgram.py
 event.add_url_rule('/<confId>/program', 'conferenceProgram', rh_as_view(conferenceDisplay.RHConferenceProgram))
 event.add_url_rule('/<confId>/program.pdf', 'conferenceProgram-pdf',
@@ -170,12 +189,8 @@ event.add_url_rule('/<confId>/paper-reviewing/templates/<reviewingTemplateId>',
                    'paperReviewingDisplay-downloadTemplate', rh_as_view(paperReviewingDisplay.RHDownloadPRTemplate))
 event.add_url_rule('/<confId>/paper-reviewing/upload', 'paperReviewingDisplay-uploadPaper',
                    rh_as_view(paperReviewingDisplay.RHUploadPaper))
-# confAbstractBook.py, conferenceDisplay.py
+# confAbstractBook.py
 event.add_url_rule('/<confId>/abstract-book.pdf', 'confAbstractBook', rh_as_view(conferenceDisplay.RHAbstractBook))
-event.add_url_rule('/<confId>/abstract-book.pdf', 'conferenceDisplay-abstractBook',
-                   rh_as_view(conferenceDisplay.RHAbstractBook))
-event.add_url_rule('/<confId>/abstract-book-latex.zip', 'conferenceDisplay-abstractBookLatex',
-                   rh_as_view(conferenceDisplay.RHConferenceLatexPackage))
 # internalPage.py
 event.add_url_rule('/<confId>/page/<pageId>', 'internalPage', rh_as_view(conferenceDisplay.RHInternalPageDisplay))
 # collaborationDisplay.py

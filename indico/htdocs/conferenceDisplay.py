@@ -41,9 +41,6 @@ def abstractBookLatex(req, **params):
 def accessKey(req, **params):
     return conferenceDisplay.RHConferenceAccessKey(req).process(params)
 
-def forceAccessKey(req, **params):
-    return conferenceDisplay.RHConferenceForceAccessKey(req).process(params)
-
 def ical(req, **params):
     return conferenceDisplay.RHConferenceToiCal( req ).process( params )
 

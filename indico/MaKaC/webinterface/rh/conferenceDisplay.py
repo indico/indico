@@ -125,16 +125,6 @@ class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
         self._redirect(url)
 
 
-class RHConferenceForceAccessKey( conferenceBase.RHConferenceBase ):
-
-    def _checkParams( self, params ):
-        conferenceBase.RHConferenceBase._checkParams(self, params )
-
-    def _process( self ):
-        wp = WPAccessError( self )
-        return wp.display()
-
-
 class RHConfDisabledAccount( conferenceBase.RHConferenceBase ):
 
     def _checkParams( self, params ):

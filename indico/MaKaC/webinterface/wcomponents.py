@@ -584,12 +584,6 @@ class WMenuMeetingHeader( WConferenceHeader ):
         vars = WConferenceHeader.getVars( self )
 
         vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
-        #vars["confModif"] =  i18nformat("""<a href=%s> _("manage")</a>""")%quoteattr(str(urlHandlers.UHConfEnterModifKey.getURL(self._conf)))
-        #if self._conf.canKeyModify(self._aw):
-        #    vars["confModif"] =  i18nformat("""<a href=%s> _("exit manage")</a>""")%quoteattr(str(urlHandlers.UHConfCloseModifKey.getURL(self._conf)))
-        #vars["confModif"] += "&nbsp;|&nbsp;"
-        #if not self._conf.canAccess(self._aw) and self._conf.getAccessKey() != "":
-        #    vars["confModif"] += i18nformat("""<a href=%s>_("full agenda")</a>&nbsp;|&nbsp;""")%(quoteattr(str(urlHandlers.UHConfForceEnterAccessKey.getURL(self._conf))))
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         styles = styleMgr.getExistingStylesForEventType(vars["type"])
 
