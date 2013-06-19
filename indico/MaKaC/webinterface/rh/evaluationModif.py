@@ -518,9 +518,10 @@ class RHEvaluationResultsSubmittersActions(RHEvaluationBase):
             removedSubmitters = set(params.get("removedSubmitters", []))
             if removedSubmitters:
                 #remove submissions in session variable
-                selectedSubmissions = session.setdefault(sessionVarName, set())
-                selectedSubmissions -= removedSubmitters
-                session.modified = True
+                if sessionVarName in session:
+                    selectedSubmissions = session.setdefault(sessionVarName, set())
+                    selectedSubmissions -= removedSubmitters
+                    session.modified = True
                 #remove submissions in database
                 removedSubmissions = set(s for s in evaluation.getSubmissions() if s.getId() in removedSubmitters)
                 for submission in removedSubmissions:
