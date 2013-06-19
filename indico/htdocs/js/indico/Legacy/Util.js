@@ -734,6 +734,10 @@ var IndicoUtil = {
          *
          */
         this.add = function(component, dataType, allowEmpty, extraCheckFunction) {
+            if (component instanceof jQuery) {
+                component = $E(component[0]);
+            }
+
             // Add new entry
             entryList.append([component, dataType, allowEmpty, extraCheckFunction]);
 
@@ -745,7 +749,6 @@ var IndicoUtil = {
                 }
 
                 classList[component.dom.id] = component.dom.className;
-
             }
             return component;
         };
