@@ -159,8 +159,8 @@ class EndpointURL(_BaseURL):
         }
 
     def __repr__(self):
-        schema = url_parse(self.url).schema
-        return '<EndpointURL(%s, %s, %s, %s)>' % (schema, self._endpoint, self._params, self.url)
+        scheme = url_parse(self.url).scheme
+        return '<EndpointURL(%s, %s, %s, %s)>' % (scheme, self._endpoint, self._params, self.url)
 
 
 class ShortURLMapper(ObjectHolder):
