@@ -794,6 +794,11 @@ function(inPlaceMaterial, inPlaceExistingMaterial, uploadLink, sizeError, initia
     }
 });
 
+type("AbstractFieldDialogFactory",
+    {
+// TODO: factory for kinds of dialogs
+    }
+);
 
 type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
     {
@@ -821,8 +826,6 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
             },
             function(result, error) {
                 if (!error) {
-                    killProgress();
-
                     $("#field-name").val(result.name);
                     $("#field-caption").val(result.caption);
                     $("#field-maxlength").val(result.maxLength);
@@ -838,6 +841,8 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
                     $("#field-limitation option").filter(function() {
                         return $(this).val() == result.limitation;
                     }).prop("selected", true);
+
+                    killProgress();
                 } else {
                     killProgress();
                     IndicoUtil.errorReport(error);
@@ -849,8 +854,7 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
             var self = this;
 
             self.fieldType = $("<select></select>", {
-                id: "field-type",
-                name: "fieldType"
+                id: "field-type"
             })  .append("<option value='dropdown'>Dropdown</option>")
                 .append("<option value='input'>Input</option>")
                 .append("<option value='textarea'>Text field</option>");
@@ -859,33 +863,36 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
 
             self.fieldName = $("<input></input>", {
                 id: "field-name",
-                type: "text",
-                name: "fieldName"
+                type: "text"
             });
-
             self.fieldCaption = $("<input></input>", {
                 id: "field-caption",
-                type: "text",
-                name: "fieldCaption"
+                type: "text"
             });
+
 
             self.fieldMaxLength = $("<input></input>", {
                 id: "field-maxlength",
-                type: "text",
-                name: "fieldMaxLength"
+                type: "text"
             });
 
             self.fieldLimitation = $("<select></select>", {
-                id: "field-limitation",
-                name: "fieldLimitation"
+                id: "field-limitation"
             })  .append("<option value='chars'>Characters</option>")
                 .append("<option value='words'>Words</option>");
 
             self.mandatoryFlag = $("<input></input>", {
                 id: "field-mandatoryflag",
-                type: "checkbox",
-                name: "mandatoryFlag"
+                type: "checkbox"
             });
+
+            self.parameterManager = new IndicoUtil.parameterManager();
+            self.fieldType = self.parameterManager.add(self.fieldType, "text", false);
+            self.fieldName = self.parameterManager.add(self.fieldName, "text", false);
+            self.fieldCaption = self.parameterManager.add(self.fieldCaption, "text", false);
+            self.fieldMaxLength = self.parameterManager.add(self.fieldMaxLength, "unsigned_int", true);
+            self.fieldLimitation = self.parameterManager.add(self.fieldLimitation, "text", false);
+            self.mandatoryFlag = self.parameterManager.add(self.mandatoryFlag, "checkbox", true);
         },
 
         _getButtons: function() {
@@ -913,28 +920,30 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
 
         _save: function() {
             var self = this;
-            var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving field..."));
 
-            indicoRequest("abstracts.fields.addField", {
-                conference: self.conferenceId,
-                id: self.fieldId,
-                name: $("#field-name").val(),
-                caption: $("#field-caption").val(),
-                maxLength: $("#field-maxlength").val(),
-                isMandatory: $("#field-mandatoryflag").is(":checked"),
-                fieldType: $("#field-type").val(),
-                fieldLimitation: $("#field-limitation").val()
-            },
-            function(result, error) {
-                if (!error) {
-                    killProgress();
-                    self.close();
-                    location.reload();
-                } else {
-                    killProgress();
-                    IndicoUtil.errorReport(error);
-                }
-            });
+            if (self.parameterManager.check()) {
+                var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving field..."));
+                indicoRequest("abstracts.fields.addField", {
+                    conference: self.conferenceId,
+                    id: self.fieldId,
+                    name: $("#field-name").val(),
+                    caption: $("#field-caption").val(),
+                    maxLength: $("#field-maxlength").val(),
+                    isMandatory: $("#field-mandatoryflag").is(":checked"),
+                    fieldType: $("#field-type").val(),
+                    fieldLimitation: $("#field-limitation").val()
+                },
+                function(result, error) {
+                    if (!error) {
+                        killProgress();
+                        self.close();
+                        location.reload();
+                    } else {
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    }
+                });
+            }
         }
     },
 

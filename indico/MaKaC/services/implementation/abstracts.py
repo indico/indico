@@ -86,7 +86,7 @@ class AddField(ConferenceModifBase):
         self.fieldId = pm.extract("id", pType=str, allowEmpty=True)
         self.name = pm.extract("name", pType=str, allowEmpty=False)
         self.caption = pm.extract("caption", pType=str, allowEmpty=False)
-        self.maxLength = pm.extract("maxLength", pType=str, allowEmpty=False)
+        self.maxLength = pm.extract("maxLength", pType=int, allowEmpty=True, defaultValue=0)
         self.isMandatory = pm.extract("isMandatory", pType=bool, allowEmpty=False)
         self.fieldType = pm.extract("fieldType", pType=str, allowEmpty=False)
         self.fieldLimitation = pm.extract("fieldLimitation", pType=str, allowEmpty=False)
