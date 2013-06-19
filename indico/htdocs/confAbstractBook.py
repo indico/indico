@@ -21,6 +21,3 @@ from MaKaC.webinterface.rh import conferenceDisplay
 
 def index(req,**params):
     return conferenceDisplay.RHAbstractBook(req).process(params)
-
-def test(req,**params):
-    return conferenceDisplay.RHAbstractBook(req).process(params)

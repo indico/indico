@@ -2264,11 +2264,11 @@ class UHConferenceDisplayMaterialPackagePerform(URLHandler):
 
 
 class UHConfAbstractBook(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay-abstractBook'
+    _endpoint = 'event.conferenceDisplay-abstractBook'
 
 
 class UHConfAbstractBookLatex(URLHandler):
-    _endpoint = 'legacy.conferenceDisplay-abstractBookLatex'
+    _endpoint = 'event.conferenceDisplay-abstractBookLatex'
 
 
 class UHConferenceToiCal(URLHandler):

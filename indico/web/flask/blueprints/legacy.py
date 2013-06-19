@@ -825,15 +825,7 @@ legacy.add_url_rule('/collaborationDisplay.py',
 
 
 # Routes for confAbstractBook.py
-legacy.add_url_rule('/confAbstractBook.py',
-                    'confAbstractBook',
-                    rh_as_view(mod_rh_conferenceDisplay.RHAbstractBook),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confAbstractBook.py/test',
-                    'confAbstractBook-test',
-                    rh_as_view(mod_rh_conferenceDisplay.RHAbstractBook),
-                    methods=('GET', 'POST'))
+# Inactive: /confAbstractBook.py (mod_rh_conferenceDisplay.RHAbstractBook)
 
 
 # Routes for confAuthorIndex.py
@@ -2199,16 +2191,8 @@ legacy.add_url_rule('/confUser.py/userExists',
 
 # Routes for conferenceDisplay.py
 # Inactive: /conferenceDisplay.py (mod_rh_conferenceDisplay.RHConferenceDisplay)
-
-legacy.add_url_rule('/conferenceDisplay.py/abstractBook',
-                    'conferenceDisplay-abstractBook',
-                    rh_as_view(mod_rh_conferenceDisplay.RHAbstractBook),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceDisplay.py/abstractBookLatex',
-                    'conferenceDisplay-abstractBookLatex',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceLatexPackage),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceDisplay.py/abstractBook (mod_rh_conferenceDisplay.RHAbstractBook)
+# Inactive: /conferenceDisplay.py/abstractBookLatex (mod_rh_conferenceDisplay.RHConferenceLatexPackage)
 
 legacy.add_url_rule('/conferenceDisplay.py/accessKey',
                     'conferenceDisplay-accessKey',

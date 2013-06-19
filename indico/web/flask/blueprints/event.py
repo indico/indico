@@ -169,3 +169,9 @@ event.add_url_rule('/<confId>/paper-reviewing/templates/<reviewingTemplateId>',
                    'paperReviewingDisplay-downloadTemplate', rh_as_view(paperReviewingDisplay.RHDownloadPRTemplate))
 event.add_url_rule('/<confId>/paper-reviewing/upload', 'paperReviewingDisplay-uploadPaper',
                    rh_as_view(paperReviewingDisplay.RHUploadPaper))
+# confAbstractBook.py, conferenceDisplay.py
+event.add_url_rule('/<confId>/abstract-book.pdf', 'confAbstractBook', rh_as_view(conferenceDisplay.RHAbstractBook))
+event.add_url_rule('/<confId>/abstract-book.pdf', 'conferenceDisplay-abstractBook',
+                   rh_as_view(conferenceDisplay.RHAbstractBook))
+event.add_url_rule('/<confId>/abstract-book-latex.zip', 'conferenceDisplay-abstractBookLatex',
+                   rh_as_view(conferenceDisplay.RHConferenceLatexPackage))
