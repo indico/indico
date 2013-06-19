@@ -47,8 +47,10 @@ def _convert_request_value(x):
 
 def create_flat_args():
     args = request.args.copy()
-    args.update(request.form)
-    args.update(request.files)
+    for key, values in request.form.iterlists():
+        args.setlist(key, values)
+    for key, values in request.files.iterlists():
+        args.setlist(key, values)
     flat_args = {}
     for key, item in args.iterlists():
         flat_args[key] = map(_convert_request_value, item) if len(item) > 1 else _convert_request_value(item[0])
