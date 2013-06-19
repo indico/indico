@@ -42,7 +42,7 @@ class IndicoMailFormatter(logging.Formatter):
     def _getRequestInfo(self):
         rh = ContextManager.get('currentRH', None)
         info = ['Additional information:']
-        info.append('URL: %s' % rh.getRequestURL() if rh else request.url)
+        info.append('URL: %s' % request.url)
         info.append('Endpoint: %s' % request.url_rule.endpoint)
         info.append('Method: %s' % request.method)
         if rh:

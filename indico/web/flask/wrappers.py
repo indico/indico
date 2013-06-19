@@ -23,7 +23,7 @@ from flask import Flask
 from flask.wrappers import Request
 from werkzeug.utils import cached_property
 
-from MaKaC.common import HelperMaKaCInfo
+from MaKaC.common import HelperMaKaCInfo, DBMgr
 from MaKaC.common.url import URL
 from indico.web.flask.session import IndicoSessionInterface
 
@@ -33,8 +33,9 @@ class IndicoRequest(Request):
     def remote_addr(self):
         """The remote address of the client."""
         proxy_ip = None
-        if HelperMaKaCInfo.getMaKaCInfoInstance().useProxy() and 'HTTP_X_FORWARDED_FOR' in self.environ:
-            proxy_ip = self.environ['HTTP_X_FORWARDED_FOR'].split(',')[0].strip()
+        with DBMgr.getInstance().global_connection():
+            if HelperMaKaCInfo.getMaKaCInfoInstance().useProxy() and 'HTTP_X_FORWARDED_FOR' in self.environ:
+                proxy_ip = self.environ['HTTP_X_FORWARDED_FOR'].split(',')[0].strip()
         return proxy_ip or self.environ['REMOTE_ADDR']
 
     @cached_property
