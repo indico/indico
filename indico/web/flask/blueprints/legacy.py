@@ -818,10 +818,7 @@ legacy.add_url_rule('/changeLang.py',
 
 
 # Routes for collaborationDisplay.py
-legacy.add_url_rule('/collaborationDisplay.py',
-                    'collaborationDisplay',
-                    rh_as_view(mod_rh_collaboration.RHCollaborationDisplay),
-                    methods=('GET', 'POST'))
+# Inactive: /collaborationDisplay.py (mod_rh_collaboration.RHCollaborationDisplay)
 
 
 # Routes for confAbstractBook.py

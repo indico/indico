@@ -926,7 +926,7 @@ class PluginType (PluginBase):
                     expected_name = plugin.getId().lower()
                 else:
                     expected_name = '%s-%s' % (plugin.getOwner().getId().lower(), plugin.getId().lower())
-                if obj.name != expected_name:
+                if obj.name not in (expected_name, 'compat_' + expected_name):
                     raise PluginError('Blueprint in plugin %s must be named %s, not %s' % (
                                       plugin.getName(), expected_name, obj.name))
                 rh_map.addBlueprint(smodule, name)

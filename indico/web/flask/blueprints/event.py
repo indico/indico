@@ -28,6 +28,7 @@ import MaKaC.webinterface.rh.contribDisplay as contribDisplay
 import MaKaC.webinterface.rh.CFADisplay as CFADisplay
 import MaKaC.webinterface.rh.authorDisplay as authorDisplay
 import MaKaC.webinterface.rh.paperReviewingDisplay as paperReviewingDisplay
+import MaKaC.webinterface.rh.collaboration as collaboration
 from indico.web.flask.util import rh_as_view
 
 
@@ -177,3 +178,5 @@ event.add_url_rule('/<confId>/abstract-book-latex.zip', 'conferenceDisplay-abstr
                    rh_as_view(conferenceDisplay.RHConferenceLatexPackage))
 # internalPage.py
 event.add_url_rule('/<confId>/page/<pageId>', 'internalPage', rh_as_view(conferenceDisplay.RHInternalPageDisplay))
+# collaborationDisplay.py
+event.add_url_rule('/<confId>/collaboration', 'collaborationDisplay', rh_as_view(collaboration.RHCollaborationDisplay))

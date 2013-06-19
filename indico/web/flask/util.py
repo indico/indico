@@ -89,12 +89,12 @@ def legacy_rule_from_endpoint(endpoint):
         return '/' + endpoint + '.py'
 
 
-def make_compat_redirect_func(blueprint, rule):
+def make_compat_redirect_func(blueprint, endpoint):
     def _redirect():
         # Ugly hack to get non-list arguments unless they are used multiple times.
         # This is necessary since passing a list for an URL path argument breaks things.
         args = dict((k, v[0] if len(v) == 1 else v) for k, v in request.args.iterlists())
-        target = url_for('%s.%s' % (blueprint.name, rule['endpoint']), **args)
+        target = url_for('%s.%s' % (blueprint.name, endpoint), **args)
         return redirect(target)
     return _redirect
 
@@ -113,7 +113,8 @@ def make_compat_blueprint(blueprint):
             endpoint = '%s:%s' % (rule['endpoint'], i)
         used_endpoints.add(endpoint)
 
-        compat.add_url_rule(legacy_rule_from_endpoint(endpoint), endpoint, make_compat_redirect_func(blueprint, rule),
+        compat.add_url_rule(legacy_rule_from_endpoint(endpoint), endpoint,
+                            make_compat_redirect_func(blueprint, rule['endpoint']),
                             methods=rule['options'].get('methods'))
     return compat
 

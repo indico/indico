@@ -20,12 +20,16 @@
 from flask import Blueprint
 
 import MaKaC.plugins.InstantMessaging.rh as handlers
-from indico.web.flask.util import rh_as_view
+from indico.web.flask.util import rh_as_view, make_compat_redirect_func
 
 blueprint = Blueprint('instantmessaging', __name__)
 blueprint.add_url_rule('/confModifChat', 'confModifChat', rh_as_view(handlers.RHChatFormModif))
 blueprint.add_url_rule('/confModifChat/logs', 'confModifChat-logs', rh_as_view(handlers.RHChatSeeLogs))
-blueprint.add_url_rule('/conferenceInstantMessaging', 'conferenceInstantMessaging',
-                       rh_as_view(handlers.RHInstantMessagingDisplay))
+blueprint.add_url_rule('/<confId>/chat', 'conferenceInstantMessaging', rh_as_view(handlers.RHInstantMessagingDisplay))
 
 blueprint.add_url_rule('/InstantMessaging/<path:filepath>', 'htdocs', rh_as_view(handlers.RHInstantMessagingHtdocs))
+
+# we can't use make_compat_blueprint here because the old url doesn't end in .py
+compat = Blueprint('compat_instantmessaging', __name__)
+compat.add_url_rule('/conferenceInstantMessaging', 'conferenceInstantMessaging',
+                    make_compat_redirect_func(blueprint, 'conferenceInstantMessaging'))
