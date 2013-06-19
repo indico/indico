@@ -175,3 +175,5 @@ event.add_url_rule('/<confId>/abstract-book.pdf', 'conferenceDisplay-abstractBoo
                    rh_as_view(conferenceDisplay.RHAbstractBook))
 event.add_url_rule('/<confId>/abstract-book-latex.zip', 'conferenceDisplay-abstractBookLatex',
                    rh_as_view(conferenceDisplay.RHConferenceLatexPackage))
+# internalPage.py
+event.add_url_rule('/<confId>/page/<pageId>', 'internalPage', rh_as_view(conferenceDisplay.RHInternalPageDisplay))

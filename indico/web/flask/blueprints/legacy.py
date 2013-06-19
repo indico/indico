@@ -2821,10 +2821,7 @@ legacy.add_url_rule('/index.py',
 
 
 # Routes for internalPage.py
-legacy.add_url_rule('/internalPage.py',
-                    'internalPage',
-                    rh_as_view(mod_rh_conferenceDisplay.RHInternalPageDisplay),
-                    methods=('GET', 'POST'))
+# Inactive: /internalPage.py (mod_rh_conferenceDisplay.RHInternalPageDisplay)
 
 
 # Routes for logOut.py

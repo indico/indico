@@ -1110,7 +1110,7 @@ class UHConfModifLog(URLHandler):
 
 
 class UHInternalPageDisplay(URLHandler):
-    _endpoint = 'legacy.internalPage'
+    _endpoint = 'event.internalPage'
 
 
 class UHConfModifDisplay(URLHandler):
