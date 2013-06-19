@@ -32,7 +32,7 @@ def _redirect_simple_event(**kwargs):
     return redirect(url_for('.conferenceCreation', event_type='lecture', **kwargs))
 
 
-def _event_or_shorturl(confId, shorturl_namespace=False):
+def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
     from MaKaC.conference import ConferenceHolder
     from MaKaC.common.url import ShortURLMapper
 
@@ -44,12 +44,16 @@ def _event_or_shorturl(confId, shorturl_namespace=False):
             # It only causes problems when someone tries to POST to an URL that is not supposed to accept POST
             # requests but getting a proper 405 error in that case is very nice. When the problem in werkzeug is
             # fixed this workaround can be removed and strict_slashes re-enabled for the /<path:confId>/ rule.
-            no_trailing_slash = str(request.url)[-1] != '/'
-            if shorturl_namespace or no_trailing_slash:
+            no_trailing_slash = str(request.base_url)[-1] != '/'
+            if shorturl_namespace or (no_trailing_slash and not ovw):
                 url = UHConferenceDisplay.getURL(ch.getById(confId))
                 func = lambda: redirect(url, 301 if no_trailing_slash else 302)
             else:
-                func = lambda: conferenceDisplay.RHConferenceDisplay(None).process({'confId': confId})
+                params = request.args.to_dict()
+                params['confId'] = confId
+                if ovw:
+                    params['ovw'] = 'True'
+                func = lambda: conferenceDisplay.RHConferenceDisplay(None).process(params)
         elif su.hasKey(confId):
             url = UHConferenceDisplay.getURL(su.getById(confId))
             func = lambda: redirect(url)
@@ -85,6 +89,7 @@ event.add_url_rule('/create/save', 'conferenceCreation-createConference',
 
 # conferenceDisplay.py
 event.add_url_rule('/<path:confId>/', 'conferenceDisplay', _event_or_shorturl, strict_slashes=False)
+event.add_url_rule('/<confId>/overview', 'conferenceDisplay-overview', _event_or_shorturl, defaults={'ovw': True})
 event.add_url_rule('/<confId>/next', 'conferenceDisplay-next', rh_as_view(conferenceDisplay.RHRelativeEvent),
                    defaults={'which': 'next'})
 event.add_url_rule('/<confId>/prev', 'conferenceDisplay-prev', rh_as_view(conferenceDisplay.RHRelativeEvent),

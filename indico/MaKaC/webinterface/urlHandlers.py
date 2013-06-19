@@ -287,8 +287,7 @@ class UHPreviousEvent(URLHandler):
 
 
 class UHConferenceOverview(URLHandler):
-    _endpoint = 'event.conferenceDisplay'
-    _defaultParams = dict(ovw=True)
+    _endpoint = 'event.conferenceDisplay-overview'
 
 
 class UHConferenceEmail(URLHandler):
