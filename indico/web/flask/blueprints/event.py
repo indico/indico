@@ -151,3 +151,11 @@ event.add_url_rule('/<confId>/contribution/<contribId>/author/<authorId>', 'cont
                    rh_as_view(authorDisplay.RHAuthorDisplay))
 # confSpeakerIndex.py
 event.add_url_rule('/<confId>/speakers', 'confSpeakerIndex', rh_as_view(conferenceDisplay.RHSpeakerIndex))
+# myconference.py
+event.add_url_rule('/<confId>/my-conference/', 'myconference', rh_as_view(conferenceDisplay.RHMyStuff))
+event.add_url_rule('/<confId>/my-conference/contributions', 'myconference-myContributions',
+                   rh_as_view(conferenceDisplay.RHConfMyStuffMyContributions))
+event.add_url_rule('/<confId>/my-conference/sessions', 'myconference-mySessions',
+                   rh_as_view(conferenceDisplay.RHConfMyStuffMySessions))
+event.add_url_rule('/<confId>/my-conference/tracks', 'myconference-myTracks',
+                   rh_as_view(conferenceDisplay.RHConfMyStuffMyTracks))

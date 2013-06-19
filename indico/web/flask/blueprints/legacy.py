@@ -2871,25 +2871,10 @@ legacy.add_url_rule('/materialDisplay.py/accessKey',
 
 
 # Routes for myconference.py
-legacy.add_url_rule('/myconference.py',
-                    'myconference',
-                    rh_as_view(mod_rh_conferenceDisplay.RHMyStuff),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/myconference.py/myContributions',
-                    'myconference-myContributions',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfMyStuffMyContributions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/myconference.py/mySessions',
-                    'myconference-mySessions',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfMyStuffMySessions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/myconference.py/myTracks',
-                    'myconference-myTracks',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfMyStuffMyTracks),
-                    methods=('GET', 'POST'))
+# Inactive: /myconference.py (mod_rh_conferenceDisplay.RHMyStuff)
+# Inactive: /myconference.py/myContributions (mod_rh_conferenceDisplay.RHConfMyStuffMyContributions)
+# Inactive: /myconference.py/mySessions (mod_rh_conferenceDisplay.RHConfMyStuffMySessions)
+# Inactive: /myconference.py/myTracks (mod_rh_conferenceDisplay.RHConfMyStuffMyTracks)
 
 
 # Routes for news.py

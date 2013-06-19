@@ -2236,19 +2236,19 @@ class UHTrackModContribQuickAccess(URLHandler):
 
 
 class UHConfMyStuff(URLHandler):
-    _endpoint = 'legacy.myconference'
+    _endpoint = 'event.myconference'
 
 
 class UHConfMyStuffMySessions(URLHandler):
-    _endpoint = 'legacy.myconference-mySessions'
+    _endpoint = 'event.myconference-mySessions'
 
 
 class UHConfMyStuffMyTracks(URLHandler):
-    _endpoint = 'legacy.myconference-myTracks'
+    _endpoint = 'event.myconference-myTracks'
 
 
 class UHConfMyStuffMyContributions(URLHandler):
-    _endpoint = 'legacy.myconference-myContributions'
+    _endpoint = 'event.myconference-myContributions'
 
 
 class UHConfModMoveContribsToSession(URLHandler):
