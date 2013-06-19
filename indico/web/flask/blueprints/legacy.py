@@ -33,7 +33,6 @@ import MaKaC.webinterface.rh.collaboration as mod_rh_collaboration
 import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
 import MaKaC.webinterface.rh.contact as mod_rh_contact
-import MaKaC.webinterface.rh.contribDisplay as mod_rh_contribDisplay
 import MaKaC.webinterface.rh.contribMod as mod_rh_contribMod
 import MaKaC.webinterface.rh.contribReviewingModif as mod_rh_contribReviewingModif
 import MaKaC.webinterface.rh.domains as mod_rh_domains
@@ -2443,35 +2442,11 @@ legacy.add_url_rule('/contributionAC.py/setVisibility',
 
 
 # Routes for contributionDisplay.py
-legacy.add_url_rule('/contributionDisplay.py',
-                    'contributionDisplay',
-                    rh_as_view(mod_rh_contribDisplay.RHContributionDisplay),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionDisplay.py/ical',
-                    'contributionDisplay-ical',
-                    rh_as_view(mod_rh_contribDisplay.RHContributionToiCal),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionDisplay.py/marcxml',
-                    'contributionDisplay-marcxml',
-                    rh_as_view(mod_rh_contribDisplay.RHContributionToMarcXML),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionDisplay.py/pdf',
-                    'contributionDisplay-pdf',
-                    rh_as_view(mod_rh_contribDisplay.RHContributionToPDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionDisplay.py/removeMaterial',
-                    'contributionDisplay-removeMaterial',
-                    rh_as_view(mod_rh_contribDisplay.RHContributionDisplayRemoveMaterial),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionDisplay.py/xml',
-                    'contributionDisplay-xml',
-                    rh_as_view(mod_rh_contribDisplay.RHContributionToXML),
-                    methods=('GET', 'POST'))
+# Inactive: /contributionDisplay.py (mod_rh_contribDisplay.RHContributionDisplay)
+# Inactive: /contributionDisplay.py/ical (mod_rh_contribDisplay.RHContributionToiCal)
+# Inactive: /contributionDisplay.py/marcxml (mod_rh_contribDisplay.RHContributionToMarcXML)
+# Inactive: /contributionDisplay.py/pdf (mod_rh_contribDisplay.RHContributionToPDF)
+# Inactive: /contributionDisplay.py/xml (mod_rh_contribDisplay.RHContributionToXML)
 
 
 # Routes for contributionEditingJudgement.py

@@ -920,20 +920,6 @@ class WPContributionDeletion( WPContributionModifTools ):
                 })
 
 
-class WPContributionDisplayRemoveMaterialsConfirm( WPContributionDefaultDisplayBase ):
-
-    def __init__(self,rh, conf, mat):
-        WPContributionDefaultDisplayBase.__init__(self,rh,conf)
-        self._mat=mat
-
-    def _getBody(self,params):
-        wc=wcomponents.WDisplayConfirmation()
-        msg= i18nformat(""" _("Are you sure you want to delete the following material")?<br>
-        <b><i>%s</i></b>
-        <br>""")%self._mat.getTitle()
-        url=urlHandlers.UHContributionDisplayRemoveMaterial.getURL(self._mat.getOwner())
-        return wc.getHTML(msg,url,{"deleteMaterial":self._mat.getId()})
-
 class WPContributionReportNumberEdit(WPContributionModifBase):
 
     def __init__(self, rh, contribution, reportNumberSystem):

@@ -988,11 +988,11 @@ class UHContribToXMLConfManager(URLHandler):
 
 
 class UHContribToXML(URLHandler):
-    _endpoint = 'legacy.contributionDisplay-xml'
+    _endpoint = 'event.contributionDisplay-xml'
 
 
 class UHContribToiCal(URLHandler):
-    _endpoint = 'legacy.contributionDisplay-ical'
+    _endpoint = 'event.contributionDisplay-ical'
 
 
 class UHContribToPDFConfManager(URLHandler):
@@ -1000,7 +1000,7 @@ class UHContribToPDFConfManager(URLHandler):
 
 
 class UHContribToPDF(URLHandler):
-    _endpoint = 'legacy.contributionDisplay-pdf'
+    _endpoint = 'event.contributionDisplay-pdf'
 
 
 class UHContribModifAC(URLHandler):
@@ -1955,11 +1955,7 @@ class UHSessionToiCal(URLHandler):
 
 
 class UHContributionDisplay(URLHandler):
-    _endpoint = 'legacy.contributionDisplay'
-
-
-class UHContributionDisplayRemoveMaterial(URLHandler):
-    _endpoint = 'legacy.contributionDisplay-removeMaterial'
+    _endpoint = 'event.contributionDisplay'
 
 
 class UHSubContributionDisplay(URLHandler):

@@ -24,6 +24,7 @@ from MaKaC.common import DBMgr
 from MaKaC.webinterface.urlHandlers import UHConferenceDisplay
 import MaKaC.webinterface.rh.categoryDisplay as categoryDisplay
 import MaKaC.webinterface.rh.conferenceDisplay as conferenceDisplay
+import MaKaC.webinterface.rh.contribDisplay as contribDisplay
 import MaKaC.webinterface.rh.CFADisplay as CFADisplay
 from indico.web.flask.util import rh_as_view
 
@@ -131,6 +132,17 @@ event.add_url_rule('/<confId>/contributions', 'contributionListDisplay',
                    rh_as_view(conferenceDisplay.RHContributionList))
 event.add_url_rule('/<confId>/contributions.pdf', 'contributionListDisplay-contributionsToPDF',
                    rh_as_view(conferenceDisplay.RHContributionListToPDF), methods=('POST',))
+# contributionDisplay.py
+event.add_url_rule('/<confId>/contribution/<contribId>', 'contributionDisplay',
+                   rh_as_view(contribDisplay.RHContributionDisplay))
+event.add_url_rule('/<confId>/contribution/<contribId>.ics', 'contributionDisplay-ical',
+                   rh_as_view(contribDisplay.RHContributionToiCal))
+event.add_url_rule('/<confId>/contribution/<contribId>.marc.xml', 'contributionDisplay-marcxml',
+                   rh_as_view(contribDisplay.RHContributionToMarcXML))
+event.add_url_rule('/<confId>/contribution/<contribId>.xml', 'contributionDisplay-xml',
+                   rh_as_view(contribDisplay.RHContributionToXML))
+event.add_url_rule('/<confId>/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
+                   rh_as_view(contribDisplay.RHContributionToPDF))
 # confAuthorIndex.py
 event.add_url_rule('/<confId>/authors', 'confAuthorIndex', rh_as_view(conferenceDisplay.RHAuthorIndex))
 # confSpeakerIndex.py

@@ -37,6 +37,3 @@ def ical( req, **params ):
 
 def marcxml( req, **params ):
     return contribDisplay.RHContributionToMarcXML( req ).process( params )
-
-def removeMaterial(req, **params):
-    return contribDisplay.RHContributionDisplayRemoveMaterial(req).process(params)
