@@ -133,8 +133,8 @@ class ParameterManager(object):
             # in the future
             value = datetime.strptime(value,'%Y/%m/%d').date()
         elif pType == int:
-            if value == None and allowEmpty:
-                value = None
+            if (value is None or value == '') and allowEmpty:
+                value = defaultValue
             else:
                 value = int(value)
         elif pType == float:
