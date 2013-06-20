@@ -416,7 +416,7 @@ class WConferenceHeader(WHeader):
                                        for sid in sorted(styles, key=styleMgr.getStyleName))
         vars["SelectedStyle"] = ""
         vars["pdfURL"] = ""
-        vars["displayURL"] = str(urlHandlers.UHConferenceOtherViews.getURL())
+        vars["displayURL"] = str(urlHandlers.UHConferenceOtherViews.getURL(self._conf))
 
         # Setting the buttons that will be displayed in the header menu
         vars["showFilterButton"] = False

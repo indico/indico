@@ -253,3 +253,6 @@ event.add_url_rule('/<confId>/registration/modify', 'confRegistrationFormDisplay
                    rh_as_view(registrationFormDisplay.RHRegistrationFormPerformModify), methods=('POST',))
 event.add_url_rule('/<confId>/registration/signin', 'confRegistrationFormDisplay-signIn',
                    rh_as_view(registrationFormDisplay.RHRegistrationFormSignIn))
+
+# conferenceOtherViews.py
+event.add_url_rule('/<confId>/other-view', 'conferenceOtherViews', rh_as_view(conferenceDisplay.RHConferenceOtherViews))

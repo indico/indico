@@ -10,7 +10,7 @@
     <table border="0" cellpadding="2" cellspacing="0" width="100%" class="headerselected" bgcolor="#000060">
     <tr>
           <td width="35">
-            <img src="images/meeting.png" width="32" height="32" alt="lecture"/>
+            <img src="${Config.getInstance().getBaseURL()}/images/meeting.png" width="32" height="32" alt="lecture"/>
           </td>
           <td class="headerselected" align="right">
             <span style="font-weight:bold;">

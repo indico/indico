@@ -2253,10 +2253,7 @@ legacy.add_url_rule('/conferenceModification.py/sessionSlots',
 
 
 # Routes for conferenceOtherViews.py
-legacy.add_url_rule('/conferenceOtherViews.py',
-                    'conferenceOtherViews',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceOtherViews),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceOtherViews.py (mod_rh_conferenceDisplay.RHConferenceOtherViews)
 
 
 # Routes for conferenceProgram.py

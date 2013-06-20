@@ -311,7 +311,7 @@ class UHContribParticipantsSendEmail(URLHandler):
 
 
 class UHConferenceOtherViews(URLHandler):
-    _endpoint = 'legacy.conferenceOtherViews'
+    _endpoint = 'event.conferenceOtherViews'
 
 
 class UHConferenceLogo(URLHandler):
