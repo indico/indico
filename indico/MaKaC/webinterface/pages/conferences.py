@@ -3025,9 +3025,8 @@ class WConfModifCFA( wcomponents.WTemplated ):
         enabledText = _("Click to disable")
         disabledText = _("Click to enable")
         laf=[]
-        urlAdd = str(urlHandlers.UHConfModifCFAAddOptFld.getURL(self._conf))
         urlRemove = str(urlHandlers.UHConfModifCFARemoveOptFld.getURL(self._conf))
-        laf.append("""<form action="%s" method="POST">""" % urlAdd)
+        laf.append("""<form action="" method="POST">""")
         for af in abMgr.getAbstractFieldsMgr().getFields():
             urlUp = urlHandlers.UHConfModifCFAAbsFieldUp.getURL(self._conf)
             urlUp.addParam("fieldId",af.getId())
@@ -3046,9 +3045,6 @@ class WConfModifCFA( wcomponents.WTemplated ):
             url=urlHandlers.UHConfModifCFAOptFld.getURL(self._conf)
             url.addParam("fieldId", af.getId())
             url=quoteattr("%s#optional"%str(url))
-            urledit=urlHandlers.UHConfModifCFAEditOptFld.getURL(self._conf)
-            urledit.addParam("fieldId", af.getId())
-            urledit=quoteattr("%s#optional"%str(urledit))
             if self._conf.getAbstractMgr().hasEnabledAbstractField(af.getId()):
                 icon=vars["enablePic"]
                 textIcon=enabledText
