@@ -19,9 +19,17 @@
 
 from flask import Blueprint
 
-from MaKaC.webinterface.rh import welcome
+from MaKaC.webinterface.rh import welcome, helpDisplay, newsDisplay, payment, lang, resetTimezone, about, contact
 from indico.web.flask.util import rh_as_view
 
 
 misc = Blueprint('misc', __name__)
+
 misc.add_url_rule('/', 'index', rh_as_view(welcome.RHWelcome))
+misc.add_url_rule('/help', 'help', rh_as_view(helpDisplay.RHHelp))
+misc.add_url_rule('/news', 'news', rh_as_view(newsDisplay.RHNews))
+misc.add_url_rule('/payment', 'payment', rh_as_view(payment.RHPaymentModule), methods=('GET', 'POST'))
+misc.add_url_rule('/change-language', 'changeLang', rh_as_view(lang.RHChangeLang), methods=('GET', 'POST'))
+misc.add_url_rule('/change-timezone', 'resetSessionTZ', rh_as_view(resetTimezone.RHResetTZ), methods=('GET', 'POST'))
+misc.add_url_rule('/about', 'about', rh_as_view(about.RHAbout))
+misc.add_url_rule('/contact', 'contact', rh_as_view(contact.RHContact))

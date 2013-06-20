@@ -160,7 +160,7 @@ class UHWelcome(URLHandler):
 
 
 class UHSignIn(URLHandler):
-    _endpoint = 'legacy.signIn'
+    _endpoint = 'user.signIn'
 
     @classmethod
     def getURL(cls, returnURL=''):
@@ -175,27 +175,27 @@ class UHSignIn(URLHandler):
 
 
 class UHActiveAccount(URLHandler):
-    _endpoint = 'legacy.signIn-active'
+    _endpoint = 'user.signIn-active'
 
 
 class UHSendActivation(URLHandler):
-    _endpoint = 'legacy.signIn-sendActivation'
+    _endpoint = 'user.signIn-sendActivation'
 
 
 class UHDisabledAccount(URLHandler):
-    _endpoint = 'legacy.signIn-disabledAccount'
+    _endpoint = 'user.signIn-disabledAccount'
 
 
 class UHSendLogin(URLHandler):
-    _endpoint = 'legacy.signIn-sendLogin'
+    _endpoint = 'user.signIn-sendLogin'
 
 
 class UHUnactivatedAccount(URLHandler):
-    _endpoint = 'legacy.signIn-unactivatedAccount'
+    _endpoint = 'user.signIn-unactivatedAccount'
 
 
 class UHSignOut(URLHandler):
-    _endpoint = 'legacy.logOut'
+    _endpoint = 'user.logOut'
 
     @classmethod
     def getURL(cls, returnURL=''):
@@ -231,11 +231,11 @@ class UHOAuthUserThirdPartyAuth(URLHandler):
 
 
 class UHIndicoNews(URLHandler):
-    _endpoint = 'legacy.news'
+    _endpoint = 'misc.news'
 
 
 class UHConferenceHelp(URLHandler):
-    _endpoint = 'legacy.help'
+    _endpoint = 'misc.help'
 
 
 class UHCalendar(URLHandler):
@@ -1329,7 +1329,7 @@ class UHUsers(URLHandler):
 
 
 class UHUserCreation(URLHandler):
-    _endpoint = 'legacy.userRegistration'
+    _endpoint = 'user.userRegistration'
 
     @classmethod
     def getURL(cls, returnURL=''):
@@ -1438,15 +1438,15 @@ class UHConfCloseModifKey(UHConfUser):
 
 
 class UHUserCreated(UHConfUser):
-    _endpoint = 'legacy.userRegistration-created'
+    _endpoint = 'user.userRegistration-created'
 
 
 class UHUserActive(URLHandler):
-    _endpoint = 'legacy.userRegistration-active'
+    _endpoint = 'user.userRegistration-active'
 
 
 class UHUserDisable(URLHandler):
-    _endpoint = 'legacy.userRegistration-disable'
+    _endpoint = 'user.userRegistration-disable'
 
 
 class UHUserDashboard(URLHandler):
@@ -1482,27 +1482,27 @@ class UHUserAPIDelete(URLHandler):
 
 
 class UHUserRegistration(URLHandler):
-    _endpoint = 'legacy.userRegistration'
+    _endpoint = 'user.userRegistration'
 
 
 class UHUserIdentityCreation(URLHandler):
-    _endpoint = 'legacy.identityCreation'
+    _endpoint = 'user.identityCreation'
 
 
 class UHUserRemoveIdentity(URLHandler):
-    _endpoint = 'legacy.identityCreation-remove'
+    _endpoint = 'user.identityCreation-remove'
 
 
 class UHUserExistWithIdentity(UHConfUser):
-    _endpoint = 'legacy.userRegistration-UserExist'
+    _endpoint = 'user.userRegistration-UserExist'
 
 
 class UHUserIdPerformCreation(URLHandler):
-    _endpoint = 'legacy.identityCreation-create'
+    _endpoint = 'user.identityCreation-create'
 
 
 class UHUserIdentityChangePassword(URLHandler):
-    _endpoint = 'legacy.identityCreation-changePassword'
+    _endpoint = 'user.identityCreation-changePassword'
 
 
 class UHGroups(URLHandler):
@@ -3502,7 +3502,7 @@ class UHConfModifEvaluationResultsSubmittersActions(URLHandler):
 
 
 class UHResetSession(URLHandler):
-    _endpoint = 'legacy.resetSessionTZ'
+    _endpoint = 'misc.resetSessionTZ'
 
 
 ##############
@@ -3679,15 +3679,15 @@ class UHPaperReviewingDisplay(URLHandler):
 
 #### End of reviewing
 class UHChangeLang(URLHandler):
-    _endpoint = 'legacy.changeLang'
+    _endpoint = 'misc.changeLang'
 
 
 class UHAbout(URLHandler):
-    _endpoint = 'legacy.about'
+    _endpoint = 'misc.about'
 
 
 class UHContact(URLHandler):
-    _endpoint = 'legacy.contact'
+    _endpoint = 'misc.contact'
 
 
 class UHHelper(object):

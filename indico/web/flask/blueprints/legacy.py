@@ -21,7 +21,6 @@ from flask import Blueprint
 from indico.web.flask.util import rh_as_view
 
 import MaKaC.webinterface.rh.JSContent as mod_rh_JSContent
-import MaKaC.webinterface.rh.about as mod_rh_about
 import MaKaC.webinterface.rh.abstractModif as mod_rh_abstractModif
 import MaKaC.webinterface.rh.abstractReviewing as mod_rh_abstractReviewing
 import MaKaC.webinterface.rh.admins as mod_rh_admins
@@ -31,7 +30,6 @@ import MaKaC.webinterface.rh.calendar as mod_rh_calendar
 import MaKaC.webinterface.rh.collaboration as mod_rh_collaboration
 import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
-import MaKaC.webinterface.rh.contact as mod_rh_contact
 import MaKaC.webinterface.rh.contribMod as mod_rh_contribMod
 import MaKaC.webinterface.rh.contribReviewingModif as mod_rh_contribReviewingModif
 import MaKaC.webinterface.rh.domains as mod_rh_domains
@@ -40,17 +38,11 @@ import MaKaC.webinterface.rh.errors as mod_rh_errors
 import MaKaC.webinterface.rh.evaluationModif as mod_rh_evaluationModif
 import MaKaC.webinterface.rh.fileAccess as mod_rh_fileAccess
 import MaKaC.webinterface.rh.groups as mod_rh_groups
-import MaKaC.webinterface.rh.helpDisplay as mod_rh_helpDisplay
-import MaKaC.webinterface.rh.lang as mod_rh_lang
-import MaKaC.webinterface.rh.login as mod_rh_login
 import MaKaC.webinterface.rh.maintenance as mod_rh_maintenance
 import MaKaC.webinterface.rh.materialDisplay as mod_rh_materialDisplay
-import MaKaC.webinterface.rh.newsDisplay as mod_rh_newsDisplay
 import MaKaC.webinterface.rh.oauth as mod_rh_oauth
-import MaKaC.webinterface.rh.payment as mod_rh_payment
 import MaKaC.webinterface.rh.registrantsModif as mod_rh_registrantsModif
 import MaKaC.webinterface.rh.registrationFormModif as mod_rh_registrationFormModif
-import MaKaC.webinterface.rh.resetTimezone as mod_rh_resetTimezone
 import MaKaC.webinterface.rh.reviewingAssignContributions as mod_rh_reviewingAssignContributions
 import MaKaC.webinterface.rh.reviewingControlModif as mod_rh_reviewingControlModif
 import MaKaC.webinterface.rh.reviewingListContribToJudge as mod_rh_reviewingListContribToJudge
@@ -109,10 +101,7 @@ legacy.add_url_rule('/JSContent.py/getVars',
 
 
 # Routes for about.py
-legacy.add_url_rule('/about.py',
-                    'about',
-                    rh_as_view(mod_rh_about.RHAbout),
-                    methods=('GET', 'POST'))
+# Inactive: /about.py (mod_rh_about.RHAbout)
 
 
 # Routes for abstractDisplay.py
@@ -807,10 +796,7 @@ legacy.add_url_rule('/calendarSelect.py',
 
 
 # Routes for changeLang.py
-legacy.add_url_rule('/changeLang.py',
-                    'changeLang',
-                    rh_as_view(mod_rh_lang.RHChangeLang),
-                    methods=('GET', 'POST'))
+# Inactive: /changeLang.py (mod_rh_lang.RHChangeLang)
 
 
 # Routes for collaborationDisplay.py
@@ -2285,10 +2271,7 @@ legacy.add_url_rule('/conferenceOtherViews.py',
 
 
 # Routes for contact.py
-legacy.add_url_rule('/contact.py',
-                    'contact',
-                    rh_as_view(mod_rh_contact.RHContact),
-                    methods=('GET', 'POST'))
+# Inactive: /contact.py (mod_rh_contact.RHContact)
 
 
 # Routes for contribAuthorDisplay.py
@@ -2672,32 +2655,14 @@ legacy.add_url_rule('/groupRegistration.py/update',
 
 
 # Routes for help.py
-legacy.add_url_rule('/help.py',
-                    'help',
-                    rh_as_view(mod_rh_helpDisplay.RHHelp),
-                    methods=('GET', 'POST'))
+# Inactive: /help.py (mod_rh_helpDisplay.RHHelp)
 
 
 # Routes for identityCreation.py
-legacy.add_url_rule('/identityCreation.py',
-                    'identityCreation',
-                    rh_as_view(mod_rh_users.RHUserIdentityCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/identityCreation.py/changePassword',
-                    'identityCreation-changePassword',
-                    rh_as_view(mod_rh_users.RHUserIdentityChangePassword),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/identityCreation.py/create',
-                    'identityCreation-create',
-                    rh_as_view(mod_rh_users.RHUserIdentityCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/identityCreation.py/remove',
-                    'identityCreation-remove',
-                    rh_as_view(mod_rh_users.RHUserRemoveIdentity),
-                    methods=('GET', 'POST'))
+# Inactive: /identityCreation.py (mod_rh_users.RHUserIdentityCreation)
+# Inactive: /identityCreation.py/changePassword (mod_rh_users.RHUserIdentityChangePassword)
+# Inactive: /identityCreation.py/create (mod_rh_users.RHUserIdentityCreation)
+# Inactive: /identityCreation.py/remove (mod_rh_users.RHUserRemoveIdentity)
 
 
 # Routes for index.py
@@ -2709,17 +2674,11 @@ legacy.add_url_rule('/identityCreation.py/remove',
 
 
 # Routes for logOut.py
-legacy.add_url_rule('/logOut.py',
-                    'logOut',
-                    rh_as_view(mod_rh_login.RHSignOut),
-                    methods=('GET', 'POST'))
+# Inactive: /logOut.py (mod_rh_login.RHSignOut)
 
 
 # Routes for logoutSSOHook.py
-legacy.add_url_rule('/logoutSSOHook.py',
-                    'logoutSSOHook',
-                    rh_as_view(mod_rh_login.RHLogoutSSOHook),
-                    methods=('GET', 'POST'))
+# Inactive: /logoutSSOHook.py (mod_rh_login.RHLogoutSSOHook)
 
 
 # Routes for materialDisplay.py
@@ -2742,10 +2701,7 @@ legacy.add_url_rule('/materialDisplay.py/accessKey',
 
 
 # Routes for news.py
-legacy.add_url_rule('/news.py',
-                    'news',
-                    rh_as_view(mod_rh_newsDisplay.RHNews),
-                    methods=('GET', 'POST'))
+# Inactive: /news.py (mod_rh_newsDisplay.RHNews)
 
 
 # Routes for oauth.py
@@ -2787,10 +2743,7 @@ legacy.add_url_rule('/oauth.py/userThirdPartyAuth',
 
 
 # Routes for payment.py
-legacy.add_url_rule('/payment.py',
-                    'payment',
-                    rh_as_view(mod_rh_payment.RHPaymentModule),
-                    methods=('GET', 'POST'))
+# Inactive: /payment.py (mod_rh_payment.RHPaymentModule)
 
 
 # Routes for posterTemplates.py
@@ -2811,10 +2764,7 @@ legacy.add_url_rule('/posterTemplates.py/posterPrinting',
 
 
 # Routes for resetSessionTZ.py
-legacy.add_url_rule('/resetSessionTZ.py',
-                    'resetSessionTZ',
-                    rh_as_view(mod_rh_resetTimezone.RHResetTZ),
-                    methods=('GET', 'POST'))
+# Inactive: /resetSessionTZ.py (mod_rh_resetTimezone.RHResetTZ)
 
 
 # Routes for roomBooking.py
@@ -3206,35 +3156,12 @@ legacy.add_url_rule('/sessionModification.py/participantList',
 
 
 # Routes for signIn.py
-legacy.add_url_rule('/signIn.py',
-                    'signIn',
-                    rh_as_view(mod_rh_login.RHSignIn),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/signIn.py/active',
-                    'signIn-active',
-                    rh_as_view(mod_rh_login.RHActive),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/signIn.py/disabledAccount',
-                    'signIn-disabledAccount',
-                    rh_as_view(mod_rh_login.RHDisabledAccount),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/signIn.py/sendActivation',
-                    'signIn-sendActivation',
-                    rh_as_view(mod_rh_login.RHSendActivation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/signIn.py/sendLogin',
-                    'signIn-sendLogin',
-                    rh_as_view(mod_rh_login.RHSendLogin),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/signIn.py/unactivatedAccount',
-                    'signIn-unactivatedAccount',
-                    rh_as_view(mod_rh_login.RHUnactivatedAccount),
-                    methods=('GET', 'POST'))
+# Inactive: /signIn.py (mod_rh_login.RHSignIn)
+# Inactive: /signIn.py/active (mod_rh_login.RHActive)
+# Inactive: /signIn.py/disabledAccount (mod_rh_login.RHDisabledAccount)
+# Inactive: /signIn.py/sendActivation (mod_rh_login.RHSendActivation)
+# Inactive: /signIn.py/sendLogin (mod_rh_login.RHSendLogin)
+# Inactive: /signIn.py/unactivatedAccount (mod_rh_login.RHUnactivatedAccount)
 
 
 # Routes for subContributionDisplay.py
@@ -3539,30 +3466,11 @@ legacy.add_url_rule('/userPreferences.py',
 
 
 # Routes for userRegistration.py
-legacy.add_url_rule('/userRegistration.py',
-                    'userRegistration',
-                    rh_as_view(mod_rh_users.RHUserCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/userRegistration.py/UserExist',
-                    'userRegistration-UserExist',
-                    rh_as_view(mod_rh_users.RHUserExistWithIdentity),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/userRegistration.py/active',
-                    'userRegistration-active',
-                    rh_as_view(mod_rh_users.RHUserActive),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/userRegistration.py/created',
-                    'userRegistration-created',
-                    rh_as_view(mod_rh_users.RHUserCreated),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/userRegistration.py/disable',
-                    'userRegistration-disable',
-                    rh_as_view(mod_rh_users.RHUserDisable),
-                    methods=('GET', 'POST'))
+# Inactive: /userRegistration.py (mod_rh_users.RHUserCreation)
+# Inactive: /userRegistration.py/UserExist (mod_rh_users.RHUserExistWithIdentity)
+# Inactive: /userRegistration.py/active (mod_rh_users.RHUserActive)
+# Inactive: /userRegistration.py/created (mod_rh_users.RHUserCreated)
+# Inactive: /userRegistration.py/disable (mod_rh_users.RHUserDisable)
 
 
 # Routes for userSelection.py

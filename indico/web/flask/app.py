@@ -39,12 +39,13 @@ from indico.web.flask.blueprints.legacy_scripts import legacy_scripts
 from indico.web.flask.blueprints.photos import photos
 from indico.web.flask.blueprints.api import api
 from indico.web.flask.blueprints.misc import misc
+from indico.web.flask.blueprints.user import user
 from indico.web.flask.blueprints.category import category, category_shorturl
 from indico.web.flask.blueprints.event import event, event_shorturl
 
 
-BLUEPRINTS = (legacy, legacy_scripts, photos, api, misc, category, category_shorturl, event, event_shorturl)
-COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, category, event))
+BLUEPRINTS = (legacy, legacy_scripts, photos, api, misc, user, category, category_shorturl, event, event_shorturl)
+COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, category, event))
 
 
 def fix_root_path(app):
