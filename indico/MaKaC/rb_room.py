@@ -16,21 +16,17 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from MaKaC.conference import ConferenceHolder
-
 """
 Part of Room Booking Module (rb_)
 """
 
 from MaKaC.plugins.RoomBooking.common import rb_check_user_access
-from MaKaC.rb_tools import Impersistant, checkPresence, iterdays
+from MaKaC.rb_tools import checkPresence, iterdays
 from MaKaC.rb_location import Location, RoomGUID, CrossLocationQueries
 from MaKaC.user import Avatar, AvatarHolder
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.errors import MaKaCError
 from datetime import datetime, timedelta
-
-from zope.interface import implements
 
 
 class RoomBase( object ):
@@ -153,7 +149,6 @@ class RoomBase( object ):
         Look ReservationBase.getReservations for details.
         """
         # Simply redirect to the plugin
-        from MaKaC.rb_factory import Factory
         from MaKaC.rb_reservation import ReservationBase
 
         return ReservationBase.getReservations( resvExample = resvExample, rooms = [self], archival = archival )
@@ -181,7 +176,6 @@ class RoomBase( object ):
         Checks whether the room is available for the potentialReservation.
         potentialReservation is of type ReservationBase. It specifies the period.
         """
-        from MaKaC.rb_reservation import ReservationBase
         if potentialReservation.getCollisions( boolResult = True ):
             return False
         return True
@@ -449,44 +443,11 @@ class RoomBase( object ):
         FINAL (not intented to be overriden)
         Returns a globaly unique identification encapsulated in a Locator object
         """
-        owner = self.getOwner()
-        if owner:
-            loc = owner.getLocator()
-        else:
-            from MaKaC.common.Locators import Locator
-            loc = Locator()
+        from MaKaC.common.Locators import Locator
+        loc = Locator()
         loc["roomLocation"] = self.locationName
         loc["roomID"] = self.id
         return loc
-
-    def setOwner( self, owner ):
-        """
-        FINAL (not intented to be overriden)
-        """
-        oryg = self._p_changed
-        self.__owner = None
-        if owner:
-            self.__owner = owner.getId()#Impersistant( owner )
-        self._p_changed = oryg
-
-    def getOwner( self ):
-        """
-        FINAL (not intented to be overriden)
-        Owner in terms of "parent", i.e. conference
-        """
-        ####---FIXING THE USE OF IMPERSISTANT CLASS-----
-        if isinstance(self.__owner, Impersistant):
-            o = self.__owner.getObject()
-            if o:
-                self.__owner=o.getId()
-            else:
-                self.__owner=None
-        ####---ENDO OF FIXING THE USE OF IMPERSISTANT CLASS-----
-        ch = ConferenceHolder()
-        if self.__owner and self.__owner in ch._getIdx():
-            return ch.getById(self.__owner)
-
-        return None
 
     def isProtected( self ):
         """
@@ -590,9 +551,9 @@ class RoomBase( object ):
         except:
             self._v_isOwnedBy = {}
         if self.customAtts.get( 'Simba List' ):
-            list = self.customAtts.get( 'Simba List' )
-            if list != "Error: unknown mailing list" and list != "":
-                if user.isMemberOfSimbaList( list ):
+            simbaList = self.customAtts.get( 'Simba List' )
+            if simbaList != "Error: unknown mailing list" and simbaList != "":
+                if user.isMemberOfSimbaList(simbaList):
                     self._v_isOwnedBy[user] = True
                     return True
         self._v_isOwnedBy[user] = False
@@ -807,8 +768,7 @@ notificationAssistance: #{self.resvNotificationAssistance}
     responsibleId = None  # str, responsible person id (avatar.id)
     maxAdvanceDays = 0    # maximum number of days a booking can be done in advance
 
-    #customAtts = {}      # Must behave like name-value dictionary of
-                          # custom attributes. Must be put in derived classes.
+    #customAtts = {}      # Must behave like name-value dictionary of custom attributes. Must be put in derived classes.
 
     verboseEquipment = property( _getVerboseEquipment )
     needsAVCSetup = property( _getNeedsAVCSetup )
@@ -818,12 +778,9 @@ notificationAssistance: #{self.resvNotificationAssistance}
 # ============================================================================
 
 class Test:
-    from MaKaC.rb_factory import Factory
-
     @staticmethod
     def getReservations():
         from MaKaC.rb_factory import Factory
-        from datetime import datetime
 
         dalManager = Factory.getDALManager()
         dalManager.connect()
@@ -834,7 +791,6 @@ class Test:
         resvEx = Factory.newReservation()
         resvEx.startDT = datetime( 2006, 9, 23, 0 )
         resvEx.endDT = datetime( 2006, 9, 30, 23, 59 )
-        reservations = amphitheatre.getLiveReservations( resvExample = resvEx )
 
         dalManager.disconnect()
 

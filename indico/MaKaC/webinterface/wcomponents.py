@@ -5418,7 +5418,7 @@ class WRoomBookingDetails( WTemplated ):
         else:
             vars["roomDetailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
             vars["modifyBookingUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
-            vars["cloneURL"] = urlHandlers.UHConfModifRoomBookingCloneBooking.getURL(self._resv, self._conf)
+            vars["cloneURL"] = urlHandlers.UHConfModifRoomBookingCloneBooking.getURL(self._resv)
 
         vars["bookMessage"] = "Book"
         if not self._resv.isConfirmed:

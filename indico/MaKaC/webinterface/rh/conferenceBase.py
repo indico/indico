@@ -37,6 +37,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.common.timezoneUtils import nowutc
 
 from indico.util import json
+from indico.util.contextManager import ContextManager
 
 BYTES_1MB = 1024 * 1024
 
@@ -60,6 +61,7 @@ class RHConferenceSite( RHCustomizable ):
         l = locators.WebLocator()
         l.setConference( params )
         self._conf = self._target = l.getObject()
+        ContextManager.set("currentConference", self._conf)
 
     def _getLoginURL( self ):
         url = self.getRequestURL()
