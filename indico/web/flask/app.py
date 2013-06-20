@@ -36,7 +36,7 @@ from indico.web.flask.util import XAccelMiddleware, make_compat_blueprint, ListC
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.legacy_scripts import legacy_scripts
-from indico.web.flask.blueprints.photos import photos
+from indico.web.flask.blueprints.rooms import rooms
 from indico.web.flask.blueprints.api import api
 from indico.web.flask.blueprints.misc import misc
 from indico.web.flask.blueprints.user import user
@@ -45,9 +45,9 @@ from indico.web.flask.blueprints.category import category, category_shorturl
 from indico.web.flask.blueprints.event import event, event_shorturl
 
 
-BLUEPRINTS = (legacy, legacy_scripts, photos, api, category_shorturl, event_shorturl,
-              misc, user, oauth, category, event)
-COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, oauth, category, event))
+BLUEPRINTS = (legacy, legacy_scripts, api, category_shorturl, event_shorturl,
+              misc, user, oauth, rooms, category, event)
+COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, oauth, rooms, category, event))
 
 
 def fix_root_path(app):

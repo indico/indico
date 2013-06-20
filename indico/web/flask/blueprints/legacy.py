@@ -2742,10 +2742,7 @@ legacy.add_url_rule('/posterTemplates.py/posterPrinting',
 
 
 # Routes for roomBooking.py
-legacy.add_url_rule('/roomBooking.py',
-                    'roomBooking',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingWelcome),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py (mod_rh_roomBooking.RHRoomBookingWelcome)
 
 legacy.add_url_rule('/roomBooking.py/acceptBooking',
                     'roomBooking-acceptBooking',
@@ -2781,26 +2778,14 @@ legacy.add_url_rule('/roomBooking.py/blockingsForMyRooms',
                     'roomBooking-blockingsForMyRooms',
                     rh_as_view(mod_rh_roomBooking.RHRoomBookingBlockingsForMyRooms),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/bookRoom',
-                    'roomBooking-bookRoom',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingBookRoom),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/bookRoom (mod_rh_roomBooking.RHRoomBookingBookRoom)
 
 legacy.add_url_rule('/roomBooking.py/bookingDetails',
                     'roomBooking-bookingDetails',
                     rh_as_view(mod_rh_roomBooking.RHRoomBookingBookingDetails),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/bookingForm',
-                    'roomBooking-bookingForm',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingBookingForm),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/bookingList',
-                    'roomBooking-bookingList',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingBookingList),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/bookingForm (mod_rh_roomBooking.RHRoomBookingBookingForm)
+# Inactive: /roomBooking.py/bookingList (mod_rh_roomBooking.RHRoomBookingBookingList)
 
 legacy.add_url_rule('/roomBooking.py/cancelBooking',
                     'roomBooking-cancelBooking',
@@ -2846,16 +2831,8 @@ legacy.add_url_rule('/roomBooking.py/deleteRoom',
                     'roomBooking-deleteRoom',
                     rh_as_view(mod_rh_roomBooking.RHRoomBookingDeleteRoom),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/mapOfRooms',
-                    'roomBooking-mapOfRooms',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingMapOfRooms),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/mapOfRoomsWidget',
-                    'roomBooking-mapOfRoomsWidget',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingMapOfRoomsWidget),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/mapOfRooms (mod_rh_roomBooking.RHRoomBookingMapOfRooms)
+# Inactive: /roomBooking.py/mapOfRoomsWidget (mod_rh_roomBooking.RHRoomBookingMapOfRoomsWidget)
 
 legacy.add_url_rule('/roomBooking.py/rejectAllConflicting',
                     'roomBooking-rejectAllConflicting',
@@ -2891,11 +2868,7 @@ legacy.add_url_rule('/roomBooking.py/roomStats',
                     'roomBooking-roomStats',
                     rh_as_view(mod_rh_roomBooking.RHRoomBookingRoomStats),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/saveBooking',
-                    'roomBooking-saveBooking',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingSaveBooking),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/saveBooking (mod_rh_roomBooking.RHRoomBookingSaveBooking)
 
 legacy.add_url_rule('/roomBooking.py/saveCustomAttributes',
                     'roomBooking-saveCustomAttributes',
@@ -2916,16 +2889,8 @@ legacy.add_url_rule('/roomBooking.py/saveRoom',
                     'roomBooking-saveRoom',
                     rh_as_view(mod_rh_roomBooking.RHRoomBookingSaveRoom),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/search4Bookings',
-                    'roomBooking-search4Bookings',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingSearch4Bookings),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/search4Rooms',
-                    'roomBooking-search4Rooms',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingSearch4Rooms),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/search4Bookings (mod_rh_roomBooking.RHRoomBookingSearch4Bookings)
+# Inactive: /roomBooking.py/search4Rooms (mod_rh_roomBooking.RHRoomBookingSearch4Rooms)
 
 legacy.add_url_rule('/roomBooking.py/sendRoomPhoto',
                     'roomBooking-sendRoomPhoto',

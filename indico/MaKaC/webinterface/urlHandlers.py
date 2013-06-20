@@ -353,28 +353,28 @@ class UHConfModifAddMaterials(URLHandler):
 
 
 class UHRoomBookingMapOfRooms(URLHandler):
-    _endpoint = 'legacy.roomBooking-mapOfRooms'
+    _endpoint = 'rooms.roomBooking-mapOfRooms'
 
 
 class UHRoomBookingMapOfRoomsWidget(URLHandler):
-    _endpoint = 'legacy.roomBooking-mapOfRoomsWidget'
+    _endpoint = 'rooms.roomBooking-mapOfRoomsWidget'
 
 
 class UHRoomBookingWelcome(URLHandler):
-    _endpoint = 'legacy.roomBooking'
+    _endpoint = 'rooms.roomBooking'
 
 
 class UHRoomBookingSearch4Rooms(URLHandler):
-    _endpoint = 'legacy.roomBooking-search4Rooms'
+    _endpoint = 'rooms.roomBooking-search4Rooms'
     _defaultParams = dict(forNewBooking=False)
 
 
 class UHRoomBookingSearch4Bookings(URLHandler):
-    _endpoint = 'legacy.roomBooking-search4Bookings'
+    _endpoint = 'rooms.roomBooking-search4Bookings'
 
 
 class UHRoomBookingBookRoom(URLHandler):
-    _endpoint = 'legacy.roomBooking-bookRoom'
+    _endpoint = 'rooms.roomBooking-bookRoom'
 
 
 class UHRoomBookingRoomList(BooleanOnMixin, URLHandler):
@@ -382,7 +382,7 @@ class UHRoomBookingRoomList(BooleanOnMixin, URLHandler):
 
 
 class UHRoomBookingBookingList(URLHandler):
-    _endpoint = 'legacy.roomBooking-bookingList'
+    _endpoint = 'rooms.roomBooking-bookingList'
 
     @classmethod
     def getURL(cls, onlyMy=False, newBooking=False, ofMyRooms=False, onlyPrebookings=False, autoCriteria=False,
@@ -412,6 +412,10 @@ class UHRoomBookingBookingList(URLHandler):
         return url
 
 
+class UHRoomBookingBookingListForBooking(UHRoomBookingBookingList):
+    _endpoint = 'rooms.roomBooking-bookingListForBooking'
+
+
 class UHRoomBookingRoomDetails(BooleanTrueMixin, URLHandler):
     _endpoint = "legacy.roomBooking-roomDetails"
 
@@ -437,11 +441,11 @@ class UHRoomBookingDeleteRoom(URLHandler):
 
 
 class UHRoomBookingBookingForm(URLHandler):
-    _endpoint = 'legacy.roomBooking-bookingForm'
+    _endpoint = 'rooms.roomBooking-bookingForm'
 
 
 class UHRoomBookingSaveBooking(URLHandler):
-    _endpoint = 'legacy.roomBooking-saveBooking'
+    _endpoint = 'rooms.roomBooking-saveBooking'
 
 
 class UHRoomBookingDeleteBooking(URLHandler):
@@ -606,7 +610,7 @@ class UHConfModifRoomBookingSaveBooking(URLHandler):
 
 
 class UHRoomPhoto(URLHandler):
-    _endpoint = 'photos.room_large'
+    _endpoint = 'rooms.photo_large'
 
     @classmethod
     def getURL(cls, target=None):
@@ -614,7 +618,7 @@ class UHRoomPhoto(URLHandler):
 
 
 class UHRoomPhotoSmall(URLHandler):
-    _endpoint = 'photos.room_small'
+    _endpoint = 'rooms.photo_small'
 
     @classmethod
     def getURL(cls, target=None):

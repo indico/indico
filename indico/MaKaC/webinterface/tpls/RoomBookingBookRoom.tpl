@@ -128,7 +128,7 @@
             $('.RoomBooking .ui-multiselect-selection-counter').text(o.selectedText.replace('#', $(".RoomBooking.ui-multiselect-menu input:checked").length));
 
             // Adding advanced lables
-            var advancedImages = ["../images/rb_video.png","../images/rb_webcast.png", "../images/rb_public.png", "../images/rb_capacity.png"];
+            var advancedImages = ["images/rb_video.png","images/rb_webcast.png", "images/rb_public.png", "images/rb_capacity.png"];
             var advancedImagesTitles = ["Video conference", "Webcast/Recording", "Public room", "Capacity"];
 
             $("#roomGUID option").each(function(index) {
@@ -136,7 +136,7 @@
                 var html = '</br><div style="padding: 4px 0px 0px 20px; color: gray">';
                 for (var i = 0; i < advLabelsParts.length; i++){
                     if (advLabelsParts[i] != 'None' && advLabelsParts[i].toLowerCase() !='false'){
-                        html += '<img title="' + advancedImagesTitles[i] + '" class="ui-multiselect-images" src="' + advancedImages[i]+  '">';
+                        html += '<img title="' + advancedImagesTitles[i] + '" class="ui-multiselect-images" src="' + Indico.Urls.Base + '/' + advancedImages[i]+  '">';
                         if (advLabelsParts[i].toLowerCase() != "true") {
                             html += advLabelsParts[i];
                         }
@@ -370,7 +370,7 @@
                     <!-- CAPACITY -->
                     <tr >
                         <td>
-                            <img src="../images/rb_capacity.png">
+                            <img src="${Config.getInstance().getBaseURL()}/images/rb_capacity.png">
                             <small> ${ _("Minimum capacity")}&nbsp;&nbsp;</small>
                         </td>
                         <td>
@@ -388,7 +388,7 @@
                     <!-- VIDEO CONFERENCE -->
                     <tr>
                         <td>
-                            <img src="../images/rb_video.png">
+                            <img src="${Config.getInstance().getBaseURL()}/images/rb_video.png">
                             <small> ${ _("Video conference")}&nbsp;&nbsp;</small>
                         </td>
                         <td>
@@ -398,7 +398,7 @@
                     <!-- WEBCAST/RECORDING -->
                     <tr>
                         <td>
-                            <img src="../images/rb_webcast.png">
+                            <img src="${Config.getInstance().getBaseURL()}/images/rb_webcast.png">
                             <small> ${ _("Webcast/Recording")}&nbsp;&nbsp;</small>
                         </td>
                         <td>
@@ -408,7 +408,7 @@
                     <!-- PUBLIC ROOM -->
                     <tr>
                         <td >
-                            <img src="../images/rb_public.png">
+                            <img src="${Config.getInstance().getBaseURL()}/images/rb_public.png">
                             <small> ${ _("Public room")}&nbsp;&nbsp;</small>
                         </td>
                         <td>
@@ -420,17 +420,17 @@
              <!-- LEGEND -->
              <div id="bookingLegend" style="background: #F2F2F2; border-top: 1px solid #DDD; padding: 5px 0px 3px 0px; margin-top: -9px">
                 <!-- CAPACITY -->
-                <img src="../images/rb_capacity.png" style="padding-left: 5px;">
+                <img src="${Config.getInstance().getBaseURL()}/images/rb_capacity.png" style="padding-left: 5px;">
                 <small> ${ _("Capacity")}&nbsp;&nbsp;</small>
                 <!-- VIDEO CONFERENCE -->
-                <img src="../images/rb_video.png">
+                <img src="${Config.getInstance().getBaseURL()}/images/rb_video.png">
                 <small> ${ _("Video conference")}&nbsp;&nbsp;</small>
                 <!-- WEBCAST/RECORDING -->
-                <img src="../images/rb_webcast.png">
+                <img src="${Config.getInstance().getBaseURL()}/images/rb_webcast.png">
                 <small> ${ _("Webcast/Recording")}&nbsp;&nbsp;</small>
                 <!-- PUBLIC ROOM -->
                 <span id="publicRoomHelp">
-                    <img src="../images/rb_public.png">
+                    <img src="${Config.getInstance().getBaseURL()}/images/rb_public.png">
                     <small> ${ _("Public room")}&nbsp;&nbsp;</small>
                 </span>
              </div>

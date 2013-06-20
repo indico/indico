@@ -4221,7 +4221,7 @@ class WRoomBookingBookRoom( WTemplated ):
 
         vars["today"] = datetime.now()
         vars["rooms"] = self._rh._rooms
-        vars["roomBookingBookingListURL"] = urlHandlers.UHRoomBookingBookingList.getURL(newBooking = 'True')
+        vars["roomBookingBookingListURL"] = urlHandlers.UHRoomBookingBookingListForBooking.getURL(newBooking = 'True')
 
         return vars
 
