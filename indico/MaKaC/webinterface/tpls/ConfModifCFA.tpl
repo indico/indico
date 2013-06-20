@@ -126,9 +126,38 @@
 
 <script type="text/javascript">
 $(function() {
-    $("#add-field").click(function(e) {
+    $("#add-field-button").click(function(e) {
         e.preventDefault();
-        new AddAbstractFieldDialog(${confId}).open();
+    }).qtip({
+        id: "add-typeoffield",
+        content: {
+            title: {
+                text: $T("Select type of field"),
+                button: $T("Close")
+            },
+            text: $('<div><a class="add-field" href="#" data-fieldtye="text">Text</a></div> \
+                     <div><a class="add-field" href="#" data-fieldtye="input">Input</a></div> \
+                     <div><a class="add-field" href="#" data-fieldtye="selection">Selection</a></div>')
+        },
+        position: {
+            at: "top right",
+            my: "bottom right"
+        },
+        show: {
+            event: "click"
+        },
+        hide: {
+            event: "unfocus click"
+        },
+        events: {
+            render: function(event, api) {
+                $(".add-field").click(function(e) {
+                    e.preventDefault();
+                    api.hide();
+                    new AddAbstractFieldDialog(${confId}).open();
+                });
+            }
+        }
     });
 
     $(".edit-field").click(function(e) {

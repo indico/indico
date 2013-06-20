@@ -937,7 +937,7 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
                     if (!error) {
                         killProgress();
                         self.close();
-                        location.reload();
+                        window.location.reload();
                     } else {
                         killProgress();
                         IndicoUtil.errorReport(error);

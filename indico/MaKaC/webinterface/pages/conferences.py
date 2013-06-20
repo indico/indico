@@ -3081,7 +3081,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
     <tr>
       <td align="right" colspan="3">
         <input type="submit" value="_("remove")" onClick="this.form.action='%s';" class="btn">
-        <input id="add-field" type="submit" value="_("add")" class="btn">
+        <input id="add-field-button" type="submit" value="_("add")" class="btn">
       </td>
     </tr>
     </form>""") % urlRemove)
