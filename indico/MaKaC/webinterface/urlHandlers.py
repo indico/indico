@@ -156,7 +156,7 @@ def setSSLPort(url):
 
 
 class UHWelcome(URLHandler):
-    _endpoint = 'legacy.index'
+    _endpoint = 'misc.index'
 
 
 class UHSignIn(URLHandler):

@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 
 import os
-from flask import redirect, url_for, send_from_directory, request
+from flask import send_from_directory, request
 from flask import current_app as app
 from werkzeug.exceptions import NotFound
 
@@ -38,12 +38,13 @@ from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.legacy_scripts import legacy_scripts
 from indico.web.flask.blueprints.photos import photos
 from indico.web.flask.blueprints.api import api
+from indico.web.flask.blueprints.misc import misc
 from indico.web.flask.blueprints.category import category, category_shorturl
 from indico.web.flask.blueprints.event import event, event_shorturl
 
 
-BLUEPRINTS = (legacy, legacy_scripts, photos, api, category, category_shorturl, event, event_shorturl)
-COMPAT_BLUEPRINTS = map(make_compat_blueprint, (category, event))
+BLUEPRINTS = (legacy, legacy_scripts, photos, api, misc, category, category_shorturl, event, event_shorturl)
+COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, category, event))
 
 
 def fix_root_path(app):
@@ -85,7 +86,6 @@ def extend_url_map(app):
 
 
 def add_handlers(app):
-    app.add_url_rule('/', view_func=lambda: redirect(url_for('legacy.index')))
     app.register_error_handler(404, handle_404)
     app.register_error_handler(Exception, handle_exception)
 

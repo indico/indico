@@ -70,7 +70,6 @@ import MaKaC.webinterface.rh.taskManager as mod_rh_taskManager
 import MaKaC.webinterface.rh.templates as mod_rh_templates
 import MaKaC.webinterface.rh.trackModif as mod_rh_trackModif
 import MaKaC.webinterface.rh.users as mod_rh_users
-import MaKaC.webinterface.rh.welcome as mod_rh_welcome
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
 
 
@@ -2746,10 +2745,7 @@ legacy.add_url_rule('/identityCreation.py/remove',
 
 
 # Routes for index.py
-legacy.add_url_rule('/index.py',
-                    'index',
-                    rh_as_view(mod_rh_welcome.RHWelcome),
-                    methods=('GET', 'POST'))
+# Inactive: /index.py (mod_rh_welcome.RHWelcome)
 
 
 # Routes for internalPage.py
