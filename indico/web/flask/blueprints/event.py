@@ -23,7 +23,7 @@ from werkzeug.exceptions import NotFound
 from MaKaC.common import DBMgr
 from MaKaC.webinterface.urlHandlers import UHConferenceDisplay
 from MaKaC.webinterface.rh import categoryDisplay, conferenceDisplay, contribDisplay, CFADisplay, authorDisplay, \
-    paperReviewingDisplay, collaboration, evaluationDisplay
+    paperReviewingDisplay, collaboration, evaluationDisplay, registrantsDisplay, registrationFormDisplay
 from indico.web.flask.util import rh_as_view
 
 
@@ -113,24 +113,30 @@ event.add_url_rule('/<confId>/event.ics', 'conferenceDisplay-ical', rh_as_view(c
 event.add_url_rule('/<confId>/event.marc.xml', 'conferenceDisplay-marcxml',
                    rh_as_view(conferenceDisplay.RHConferenceToMarcXML))
 event.add_url_rule('/<confId>/event.xml', 'conferenceDisplay-xml', rh_as_view(conferenceDisplay.RHConferenceToXML))
+
 # conferenceProgram.py
 event.add_url_rule('/<confId>/program', 'conferenceProgram', rh_as_view(conferenceDisplay.RHConferenceProgram))
 event.add_url_rule('/<confId>/program.pdf', 'conferenceProgram-pdf',
                    rh_as_view(conferenceDisplay.RHConferenceProgramPDF))
+
 # conferenceCFA.py
 event.add_url_rule('/<confId>/call-for-abstracts/', 'conferenceCFA', rh_as_view(CFADisplay.RHConferenceCFA))
+
 # userAbstracts.py
 event.add_url_rule('/<confId>/call-for-abstracts/my-abstracts', 'userAbstracts', rh_as_view(CFADisplay.RHUserAbstracts))
 event.add_url_rule('/<confId>/call-for-abstracts/my-abstracts.pdf', 'userAbstracts-pdf',
                    rh_as_view(CFADisplay.RHUserAbstractsPDF))
+
 # abstractSubmission.py
 event.add_url_rule('/<confId>/call-for-abstracts/submit', 'abstractSubmission',
                    rh_as_view(CFADisplay.RHAbstractSubmission), methods=('GET', 'POST'))
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/submitted', 'abstractSubmission-confirmation',
                    rh_as_view(CFADisplay.RHAbstractSubmissionConfirmation))
+
 # Routes for abstractModify.py
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/modify', 'abstractModify',
                    rh_as_view(CFADisplay.RHAbstractModify), methods=('GET', 'POST'))
+
 # Routes for abstractDisplay.py
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/', 'abstractDisplay',
                    rh_as_view(CFADisplay.RHAbstractDisplay))
@@ -138,22 +144,26 @@ event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/file/<resId>', 'ab
                    rh_as_view(CFADisplay.RHGetAttachedFile))
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/Abstract.pdf', 'abstractDisplay-pdf',
                    rh_as_view(CFADisplay.RHAbstractDisplayPDF))
+
 # Routes for abstractWithdraw.py
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/withdraw', 'abstractWithdraw',
                    rh_as_view(CFADisplay.RHAbstractWithdraw), methods=('GET', 'POST'))
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/recover', 'abstractWithdraw-recover',
                    rh_as_view(CFADisplay.RHAbstractRecovery), methods=('GET', 'POST'))
+
 # conferenceTimeTable.py
 event.add_url_rule('/<confId>/timetable/', 'conferenceTimeTable', rh_as_view(conferenceDisplay.RHConferenceTimeTable))
 event.add_url_rule('/<confId>/timetable/pdf', 'conferenceTimeTable-customizePdf',
                    rh_as_view(conferenceDisplay.RHTimeTableCustomizePDF))
 event.add_url_rule('/<confId>/timetable/timetable.pdf', 'conferenceTimeTable-pdf',
                    rh_as_view(conferenceDisplay.RHTimeTablePDF), methods=('GET', 'POST'))
+
 # contributionListDisplay.py
 event.add_url_rule('/<confId>/contributions', 'contributionListDisplay',
                    rh_as_view(conferenceDisplay.RHContributionList))
 event.add_url_rule('/<confId>/contributions.pdf', 'contributionListDisplay-contributionsToPDF',
                    rh_as_view(conferenceDisplay.RHContributionListToPDF), methods=('POST',))
+
 # contributionDisplay.py
 event.add_url_rule('/<confId>/contribution/<contribId>', 'contributionDisplay',
                    rh_as_view(contribDisplay.RHContributionDisplay))
@@ -165,13 +175,17 @@ event.add_url_rule('/<confId>/contribution/<contribId>.xml', 'contributionDispla
                    rh_as_view(contribDisplay.RHContributionToXML))
 event.add_url_rule('/<confId>/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
                    rh_as_view(contribDisplay.RHContributionToPDF))
+
 # confAuthorIndex.py
 event.add_url_rule('/<confId>/authors', 'confAuthorIndex', rh_as_view(conferenceDisplay.RHAuthorIndex))
+
 # contribAuthorDisplay.py
 event.add_url_rule('/<confId>/contribution/<contribId>/author/<authorId>', 'contribAuthorDisplay',
                    rh_as_view(authorDisplay.RHAuthorDisplay))
+
 # confSpeakerIndex.py
 event.add_url_rule('/<confId>/speakers', 'confSpeakerIndex', rh_as_view(conferenceDisplay.RHSpeakerIndex))
+
 # myconference.py
 event.add_url_rule('/<confId>/my-conference/', 'myconference', rh_as_view(conferenceDisplay.RHMyStuff))
 event.add_url_rule('/<confId>/my-conference/contributions', 'myconference-myContributions',
@@ -180,6 +194,7 @@ event.add_url_rule('/<confId>/my-conference/sessions', 'myconference-mySessions'
                    rh_as_view(conferenceDisplay.RHConfMyStuffMySessions))
 event.add_url_rule('/<confId>/my-conference/tracks', 'myconference-myTracks',
                    rh_as_view(conferenceDisplay.RHConfMyStuffMyTracks))
+
 # paperReviewingDisplay.py
 event.add_url_rule('/<confId>/paper-reviewing/', 'paperReviewingDisplay',
                    rh_as_view(paperReviewingDisplay.RHPaperReviewingDisplay))
@@ -189,22 +204,52 @@ event.add_url_rule('/<confId>/paper-reviewing/templates/<reviewingTemplateId>',
                    'paperReviewingDisplay-downloadTemplate', rh_as_view(paperReviewingDisplay.RHDownloadPRTemplate))
 event.add_url_rule('/<confId>/paper-reviewing/upload', 'paperReviewingDisplay-uploadPaper',
                    rh_as_view(paperReviewingDisplay.RHUploadPaper))
+
 # confAbstractBook.py
 event.add_url_rule('/<confId>/abstract-book.pdf', 'confAbstractBook', rh_as_view(conferenceDisplay.RHAbstractBook))
+
 # internalPage.py
 event.add_url_rule('/<confId>/page/<pageId>', 'internalPage', rh_as_view(conferenceDisplay.RHInternalPageDisplay))
+
 # collaborationDisplay.py
 event.add_url_rule('/<confId>/collaboration', 'collaborationDisplay', rh_as_view(collaboration.RHCollaborationDisplay))
+
 # confDisplayEvaluation.py
 event.add_url_rule('/<confId>/evaluation/', 'confDisplayEvaluation',
                    rh_as_view(evaluationDisplay.RHEvaluationMainInformation))
-event.add_url_rule('/<confId>/evaluation/form', 'confDisplayEvaluation-display',
+event.add_url_rule('/<confId>/evaluation/evaluate', 'confDisplayEvaluation-display',
                    rh_as_view(evaluationDisplay.RHEvaluationDisplay))
-event.add_url_rule('/<confId>/evaluation/form', 'confDisplayEvaluation-modif',
+event.add_url_rule('/<confId>/evaluation/evaluate', 'confDisplayEvaluation-modif',
                    rh_as_view(evaluationDisplay.RHEvaluationDisplay))
 event.add_url_rule('/<confId>/evaluation/signin', 'confDisplayEvaluation-signIn',
                    rh_as_view(evaluationDisplay.RHEvaluationSignIn))
-event.add_url_rule('/<confId>/evaluation/submit', 'confDisplayEvaluation-submit',
+event.add_url_rule('/<confId>/evaluation/evaluate', 'confDisplayEvaluation-submit',
                    rh_as_view(evaluationDisplay.RHEvaluationSubmit), methods=('POST',))
-event.add_url_rule('/<confId>/evaluation/submitted', 'confDisplayEvaluation-submitted',
+event.add_url_rule('/<confId>/evaluation/evaluate/success', 'confDisplayEvaluation-submitted',
                    rh_as_view(evaluationDisplay.RHEvaluationSubmitted))
+
+# confRegistrantsDisplay.py
+event.add_url_rule('/<confId>/registration/registrants', 'confRegistrantsDisplay-list',
+                   rh_as_view(registrantsDisplay.RHRegistrantsList))
+
+# confRegistrationFormDisplay.py
+event.add_url_rule('/<confId>/registration/', 'confRegistrationFormDisplay',
+                   rh_as_view(registrationFormDisplay.RHRegistrationForm))
+event.add_url_rule('/<confId>/registration/conditions', 'confRegistrationFormDisplay-conditions',
+                   rh_as_view(registrationFormDisplay.RHRegistrationFormConditions))
+event.add_url_rule('/<confId>/registration/confirm', 'confRegistrationFormDisplay-confirmBooking',
+                   rh_as_view(registrationFormDisplay.RHRegistrationFormconfirmBooking), methods=('GET', 'POST'))
+event.add_url_rule('/<confId>/registration/pay', 'confRegistrationFormDisplay-confirmBookingDone',
+                   rh_as_view(registrationFormDisplay.RHRegistrationFormconfirmBookingDone))
+event.add_url_rule('/<confId>/registration/register', 'confRegistrationFormDisplay-creation',
+                   rh_as_view(registrationFormDisplay.RHRegistrationFormCreation), methods=('POST',))
+event.add_url_rule('/<confId>/registration/register/success', 'confRegistrationFormDisplay-creationDone',
+                   rh_as_view(registrationFormDisplay.RHRegistrationFormCreationDone))
+event.add_url_rule('/<confId>/registration/register', 'confRegistrationFormDisplay-display',
+                   rh_as_view(registrationFormDisplay.RHRegistrationFormDisplay))
+event.add_url_rule('/<confId>/registration/modify', 'confRegistrationFormDisplay-modify',
+                   rh_as_view(registrationFormDisplay.RHRegistrationFormModify))
+event.add_url_rule('/<confId>/registration/modify', 'confRegistrationFormDisplay-performModify',
+                   rh_as_view(registrationFormDisplay.RHRegistrationFormPerformModify), methods=('POST',))
+event.add_url_rule('/<confId>/registration/signin', 'confRegistrationFormDisplay-signIn',
+                   rh_as_view(registrationFormDisplay.RHRegistrationFormSignIn))

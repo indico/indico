@@ -22,7 +22,7 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC import registration
-from MaKaC.errors import FormValuesError,MaKaCError, AccessError, NotFoundError
+from MaKaC.errors import FormValuesError,MaKaCError, AccessError, NotFoundError, NoReportError
 from MaKaC.common import Config
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
@@ -75,6 +75,9 @@ class RHRegistrationFormSignIn( RHBaseRegistrationForm ):
 
     def _processIfActive( self ):
         #Check for automatic login
+        if self._getUser():
+            self._redirect(urlHandlers.UHConfRegistrationFormCreation.getURL(self._conf))
+            return
         auth = AuthenticatorMgr()
         av = auth.autoLogin(self)
         if av:
@@ -217,7 +220,7 @@ class RHRegistrationFormconfirmBooking( RHRegistrationFormRegistrantBase ):
         RHRegistrationFormRegistrantBase._checkParams(self, params)
         self._regForm = self._conf.getRegistrationForm()
         if self._conf.getModPay().hasPaymentConditions() and params.get("conditions","false") != "on":
-            raise MaKaCError("You cannot pay without accepting the conditions")
+            raise NoReportError("You cannot pay without accepting the conditions")
         else:
             session['conditionsAccepted'] = True
 
@@ -234,8 +237,8 @@ class RHRegistrationFormconfirmBookingDone( RHRegistrationFormRegistrantBase ):
     def _checkParams(self, params):
         RHRegistrationFormRegistrantBase._checkParams(self, params)
         if not session.get('conditionsAccepted'):
-            raise MaKaCError("You cannot pay without accepting the conditions")
-
+            self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(self._registrant))
+            self._doProcess = False
 
     def _processIfActive( self ):
         if self._registrant is not None:

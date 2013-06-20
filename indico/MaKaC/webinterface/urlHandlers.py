@@ -2773,23 +2773,23 @@ class UHConfTimeTableCustomizePDF(URLHandler):
 
 
 class UHConfRegistrationForm(URLHandler):
-    _endpoint = 'legacy.confRegistrationFormDisplay'
+    _endpoint = 'event.confRegistrationFormDisplay'
 
 
 class UHConfRegistrationFormDisplay(URLHandler):
-    _endpoint = 'legacy.confRegistrationFormDisplay-display'
+    _endpoint = 'event.confRegistrationFormDisplay-display'
 
 
 class UHConfRegistrationFormCreation(URLHandler):
-    _endpoint = 'legacy.confRegistrationFormDisplay-creation'
+    _endpoint = 'event.confRegistrationFormDisplay-creation'
 
 
 class UHConfRegistrationFormConditions(URLHandler):
-    _endpoint = 'legacy.confRegistrationFormDisplay-conditions'
+    _endpoint = 'event.confRegistrationFormDisplay-conditions'
 
 
 class UHConfRegistrationFormSignIn(URLHandler):
-    _endpoint = 'legacy.confRegistrationFormDisplay-signIn'
+    _endpoint = 'event.confRegistrationFormDisplay-signIn'
 
     @classmethod
     def getURL(cls, conf, returnURL=''):
@@ -2802,7 +2802,7 @@ class UHConfRegistrationFormSignIn(URLHandler):
 
 
 class UHConfRegistrationFormCreationDone(URLHandler):
-    _endpoint = 'legacy.confRegistrationFormDisplay-creationDone'
+    _endpoint = 'event.confRegistrationFormDisplay-creationDone'
 
     @classmethod
     def getURL(cls, registrant):
@@ -2813,19 +2813,19 @@ class UHConfRegistrationFormCreationDone(URLHandler):
 
 
 class UHConfRegistrationFormconfirmBooking(URLHandler):
-    _endpoint = 'legacy.confRegistrationFormDisplay-confirmBooking'
+    _endpoint = 'event.confRegistrationFormDisplay-confirmBooking'
 
 
 class UHConfRegistrationFormconfirmBookingDone(URLHandler):
-    _endpoint = 'legacy.confRegistrationFormDisplay-confirmBookingDone'
+    _endpoint = 'event.confRegistrationFormDisplay-confirmBookingDone'
 
 
 class UHConfRegistrationFormModify(URLHandler):
-    _endpoint = 'legacy.confRegistrationFormDisplay-modify'
+    _endpoint = 'event.confRegistrationFormDisplay-modify'
 
 
 class UHConfRegistrationFormPerformModify(URLHandler):
-    _endpoint = 'legacy.confRegistrationFormDisplay-performModify'
+    _endpoint = 'event.confRegistrationFormDisplay-performModify'
 
 
 ###################################################################################
@@ -3101,7 +3101,7 @@ class UHCategOverviewToRSS(URLHandler):
 
 
 class UHConfRegistrantsList(URLHandler):
-    _endpoint = 'legacy.confRegistrantsDisplay-list'
+    _endpoint = 'event.confRegistrantsDisplay-list'
 
 
 class UHConfModifRegistrantSessionModify(URLHandler):

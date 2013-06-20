@@ -48,9 +48,7 @@ import MaKaC.webinterface.rh.materialDisplay as mod_rh_materialDisplay
 import MaKaC.webinterface.rh.newsDisplay as mod_rh_newsDisplay
 import MaKaC.webinterface.rh.oauth as mod_rh_oauth
 import MaKaC.webinterface.rh.payment as mod_rh_payment
-import MaKaC.webinterface.rh.registrantsDisplay as mod_rh_registrantsDisplay
 import MaKaC.webinterface.rh.registrantsModif as mod_rh_registrantsModif
-import MaKaC.webinterface.rh.registrationFormDisplay as mod_rh_registrationFormDisplay
 import MaKaC.webinterface.rh.registrationFormModif as mod_rh_registrationFormModif
 import MaKaC.webinterface.rh.resetTimezone as mod_rh_resetTimezone
 import MaKaC.webinterface.rh.reviewingAssignContributions as mod_rh_reviewingAssignContributions
@@ -2073,62 +2071,20 @@ legacy.add_url_rule('/confModifUserCompetences.py/modifyCompetences',
 
 
 # Routes for confRegistrantsDisplay.py
-legacy.add_url_rule('/confRegistrantsDisplay.py/list',
-                    'confRegistrantsDisplay-list',
-                    rh_as_view(mod_rh_registrantsDisplay.RHRegistrantsList),
-                    methods=('GET', 'POST'))
+# Inactive: /confRegistrantsDisplay.py/list (mod_rh_registrantsDisplay.RHRegistrantsList)
 
 
 # Routes for confRegistrationFormDisplay.py
-legacy.add_url_rule('/confRegistrationFormDisplay.py',
-                    'confRegistrationFormDisplay',
-                    rh_as_view(mod_rh_registrationFormDisplay.RHRegistrationForm),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confRegistrationFormDisplay.py/conditions',
-                    'confRegistrationFormDisplay-conditions',
-                    rh_as_view(mod_rh_registrationFormDisplay.RHRegistrationFormConditions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confRegistrationFormDisplay.py/confirmBooking',
-                    'confRegistrationFormDisplay-confirmBooking',
-                    rh_as_view(mod_rh_registrationFormDisplay.RHRegistrationFormconfirmBooking),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confRegistrationFormDisplay.py/confirmBookingDone',
-                    'confRegistrationFormDisplay-confirmBookingDone',
-                    rh_as_view(mod_rh_registrationFormDisplay.RHRegistrationFormconfirmBookingDone),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confRegistrationFormDisplay.py/creation',
-                    'confRegistrationFormDisplay-creation',
-                    rh_as_view(mod_rh_registrationFormDisplay.RHRegistrationFormCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confRegistrationFormDisplay.py/creationDone',
-                    'confRegistrationFormDisplay-creationDone',
-                    rh_as_view(mod_rh_registrationFormDisplay.RHRegistrationFormCreationDone),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confRegistrationFormDisplay.py/display',
-                    'confRegistrationFormDisplay-display',
-                    rh_as_view(mod_rh_registrationFormDisplay.RHRegistrationFormDisplay),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confRegistrationFormDisplay.py/modify',
-                    'confRegistrationFormDisplay-modify',
-                    rh_as_view(mod_rh_registrationFormDisplay.RHRegistrationFormModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confRegistrationFormDisplay.py/performModify',
-                    'confRegistrationFormDisplay-performModify',
-                    rh_as_view(mod_rh_registrationFormDisplay.RHRegistrationFormPerformModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confRegistrationFormDisplay.py/signIn',
-                    'confRegistrationFormDisplay-signIn',
-                    rh_as_view(mod_rh_registrationFormDisplay.RHRegistrationFormSignIn),
-                    methods=('GET', 'POST'))
+# Inactive: /confRegistrationFormDisplay.py (mod_rh_registrationFormDisplay.RHRegistrationForm)
+# Inactive: /confRegistrationFormDisplay.py/conditions (mod_rh_registrationFormDisplay.RHRegistrationFormConditions)
+# Inactive: /confRegistrationFormDisplay.py/confirmBooking (mod_rh_registrationFormDisplay.RHRegistrationFormconfirmBooking)
+# Inactive: /confRegistrationFormDisplay.py/confirmBookingDone (mod_rh_registrationFormDisplay.RHRegistrationFormconfirmBookingDone)
+# Inactive: /confRegistrationFormDisplay.py/creation (mod_rh_registrationFormDisplay.RHRegistrationFormCreation)
+# Inactive: /confRegistrationFormDisplay.py/creationDone (mod_rh_registrationFormDisplay.RHRegistrationFormCreationDone)
+# Inactive: /confRegistrationFormDisplay.py/display (mod_rh_registrationFormDisplay.RHRegistrationFormDisplay)
+# Inactive: /confRegistrationFormDisplay.py/modify (mod_rh_registrationFormDisplay.RHRegistrationFormModify)
+# Inactive: /confRegistrationFormDisplay.py/performModify (mod_rh_registrationFormDisplay.RHRegistrationFormPerformModify)
+# Inactive: /confRegistrationFormDisplay.py/signIn (mod_rh_registrationFormDisplay.RHRegistrationFormSignIn)
 
 
 # Routes for confSpeakerIndex.py
