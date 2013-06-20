@@ -42,10 +42,6 @@ class IndicoRequest(Request):
     def url(self):
         return URL(super(IndicoRequest, self).url)
 
-    @cached_property
-    def base_url(self):
-        return URL(super(IndicoRequest, self).base_url)
-
 
 class IndicoFlask(Flask):
     request_class = IndicoRequest

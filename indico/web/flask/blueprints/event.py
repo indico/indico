@@ -44,7 +44,7 @@ def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
             # It only causes problems when someone tries to POST to an URL that is not supposed to accept POST
             # requests but getting a proper 405 error in that case is very nice. When the problem in werkzeug is
             # fixed this workaround can be removed and strict_slashes re-enabled for the /<path:confId>/ rule.
-            no_trailing_slash = str(request.base_url)[-1] != '/'
+            no_trailing_slash = request.base_url[-1] != '/'
             if shorturl_namespace or (no_trailing_slash and not ovw):
                 url = UHConferenceDisplay.getURL(ch.getById(confId))
                 func = lambda: redirect(url, 301 if no_trailing_slash else 302)
