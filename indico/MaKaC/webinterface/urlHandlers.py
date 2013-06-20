@@ -207,27 +207,27 @@ class UHSignOut(URLHandler):
 
 
 class UHOAuthRequestToken(URLHandler):
-    _endpoint = 'legacy.oauth-request_token'
+    _endpoint = 'oauth.oauth-request_token'
 
 
 class UHOAuthAuthorization(URLHandler):
-    _endpoint = 'legacy.oauth-authorize'
+    _endpoint = 'oauth.oauth-authorize'
 
 
 class UHOAuthAccessTokenURL(URLHandler):
-    _endpoint = 'legacy.oauth-access_token'
+    _endpoint = 'oauth.oauth-access_token'
 
 
 class UHOAuthAuthorizeConsumer(URLHandler):
-    _endpoint = 'legacy.oauth-authorize_consumer'
+    _endpoint = 'oauth.oauth-authorize_consumer'
 
 
 class UHOAuthThirdPartyAuth(URLHandler):
-    _endpoint = 'legacy.oauth-thirdPartyAuth'
+    _endpoint = 'oauth.oauth-thirdPartyAuth'
 
 
 class UHOAuthUserThirdPartyAuth(URLHandler):
-    _endpoint = 'legacy.oauth-userThirdPartyAuth'
+    _endpoint = 'oauth.oauth-userThirdPartyAuth'
 
 
 class UHIndicoNews(URLHandler):
@@ -1450,35 +1450,35 @@ class UHUserDisable(URLHandler):
 
 
 class UHUserDashboard(URLHandler):
-    _endpoint = 'legacy.userDashboard'
+    _endpoint = 'user.userDashboard'
 
 
 class UHUserDetails(URLHandler):
-    _endpoint = 'legacy.userDetails'
+    _endpoint = 'user.userDetails'
 
 
 class UHUserBaskets(URLHandler):
-    _endpoint = 'legacy.userBaskets'
+    _endpoint = 'user.userBaskets'
 
 
 class UHUserPreferences(URLHandler):
-    _endpoint = 'legacy.userPreferences'
+    _endpoint = 'user.userPreferences'
 
 
 class UHUserAPI(URLHandler):
-    _endpoint = 'legacy.userAPI'
+    _endpoint = 'user.userAPI'
 
 
 class UHUserAPICreate(URLHandler):
-    _endpoint = 'legacy.userAPI-create'
+    _endpoint = 'user.userAPI-create'
 
 
 class UHUserAPIBlock(URLHandler):
-    _endpoint = 'legacy.userAPI-block'
+    _endpoint = 'user.userAPI-block'
 
 
 class UHUserAPIDelete(URLHandler):
-    _endpoint = 'legacy.userAPI-delete'
+    _endpoint = 'user.userAPI-delete'
 
 
 class UHUserRegistration(URLHandler):

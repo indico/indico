@@ -2705,35 +2705,12 @@ legacy.add_url_rule('/materialDisplay.py/accessKey',
 
 
 # Routes for oauth.py
-legacy.add_url_rule('/oauth.py/access_token',
-                    'oauth-access_token',
-                    rh_as_view(mod_rh_oauth.RHOAuthAccessTokenURL),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/oauth.py/authorize',
-                    'oauth-authorize',
-                    rh_as_view(mod_rh_oauth.RHOAuthAuthorization),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/oauth.py/authorize_consumer',
-                    'oauth-authorize_consumer',
-                    rh_as_view(mod_rh_oauth.RHOAuthAuthorizeConsumer),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/oauth.py/request_token',
-                    'oauth-request_token',
-                    rh_as_view(mod_rh_oauth.RHOAuthRequestToken),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/oauth.py/thirdPartyAuth',
-                    'oauth-thirdPartyAuth',
-                    rh_as_view(mod_rh_oauth.RHOAuthThirdPartyAuth),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/oauth.py/userThirdPartyAuth',
-                    'oauth-userThirdPartyAuth',
-                    rh_as_view(mod_rh_oauth.RHOAuthUserThirdPartyAuth),
-                    methods=('GET', 'POST'))
+# Inactive: /oauth.py/access_token (mod_rh_oauth.RHOAuthAccessTokenURL)
+# Inactive: /oauth.py/authorize (mod_rh_oauth.RHOAuthAuthorization)
+# Inactive: /oauth.py/authorize_consumer (mod_rh_oauth.RHOAuthAuthorizeConsumer)
+# Inactive: /oauth.py/request_token (mod_rh_oauth.RHOAuthRequestToken)
+# Inactive: /oauth.py/thirdPartyAuth (mod_rh_oauth.RHOAuthThirdPartyAuth)
+# Inactive: /oauth.py/userThirdPartyAuth (mod_rh_oauth.RHOAuthUserThirdPartyAuth)
 
 
 # Routes for paperReviewingDisplay.py
@@ -3375,25 +3352,10 @@ legacy.add_url_rule('/updateNews.py',
 
 
 # Routes for userAPI.py
-legacy.add_url_rule('/userAPI.py',
-                    'userAPI',
-                    rh_as_view(mod_rh_api.RHUserAPI),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/userAPI.py/block',
-                    'userAPI-block',
-                    rh_as_view(mod_rh_api.RHUserAPIBlock),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/userAPI.py/create',
-                    'userAPI-create',
-                    rh_as_view(mod_rh_api.RHUserAPICreate),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/userAPI.py/delete',
-                    'userAPI-delete',
-                    rh_as_view(mod_rh_api.RHUserAPIDelete),
-                    methods=('GET', 'POST'))
+# Inactive: /userAPI.py (mod_rh_api.RHUserAPI)
+# Inactive: /userAPI.py/block (mod_rh_api.RHUserAPIBlock)
+# Inactive: /userAPI.py/create (mod_rh_api.RHUserAPICreate)
+# Inactive: /userAPI.py/delete (mod_rh_api.RHUserAPIDelete)
 
 
 # Routes for userAbstracts.py
@@ -3402,24 +3364,15 @@ legacy.add_url_rule('/userAPI.py/delete',
 
 
 # Routes for userBaskets.py
-legacy.add_url_rule('/userBaskets.py',
-                    'userBaskets',
-                    rh_as_view(mod_rh_users.RHUserBaskets),
-                    methods=('GET', 'POST'))
+# Inactive: /userBaskets.py (mod_rh_users.RHUserBaskets)
 
 
 # Routes for userDashboard.py
-legacy.add_url_rule('/userDashboard.py',
-                    'userDashboard',
-                    rh_as_view(mod_rh_users.RHUserDashboard),
-                    methods=('GET', 'POST'))
+# Inactive: /userDashboard.py (mod_rh_users.RHUserDashboard)
 
 
 # Routes for userDetails.py
-legacy.add_url_rule('/userDetails.py',
-                    'userDetails',
-                    rh_as_view(mod_rh_users.RHUserDetails),
-                    methods=('GET', 'POST'))
+# Inactive: /userDetails.py (mod_rh_users.RHUserDetails)
 
 
 # Routes for userList.py
@@ -3459,10 +3412,7 @@ legacy.add_url_rule('/userMerge.py',
 
 
 # Routes for userPreferences.py
-legacy.add_url_rule('/userPreferences.py',
-                    'userPreferences',
-                    rh_as_view(mod_rh_users.RHUserPreferences),
-                    methods=('GET', 'POST'))
+# Inactive: /userPreferences.py (mod_rh_users.RHUserPreferences)
 
 
 # Routes for userRegistration.py
