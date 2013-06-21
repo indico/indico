@@ -453,12 +453,16 @@ class UHRoomBookingBookingForm(URLHandler):
     _endpoint = 'rooms.roomBooking-bookingForm'
 
 
+class UHRoomBookingModifyBookingForm(URLHandler):
+    _endpoint = 'rooms.roomBooking-modifyBookingForm'
+
+
 class UHRoomBookingSaveBooking(URLHandler):
     _endpoint = 'rooms.roomBooking-saveBooking'
 
 
 class UHRoomBookingDeleteBooking(URLHandler):
-    _endpoint = 'legacy.roomBooking-deleteBooking'
+    _endpoint = 'rooms.roomBooking-deleteBooking'
 
 
 class UHRoomBookingCloneBooking(URLHandler):
@@ -466,7 +470,7 @@ class UHRoomBookingCloneBooking(URLHandler):
 
 
 class UHRoomBookingCancelBooking(URLHandler):
-    _endpoint = 'legacy.roomBooking-cancelBooking'
+    _endpoint = 'rooms.roomBooking-cancelBooking'
 
 
 class UHRoomBookingAcceptBooking(URLHandler):
@@ -474,7 +478,7 @@ class UHRoomBookingAcceptBooking(URLHandler):
 
 
 class UHRoomBookingRejectBooking(URLHandler):
-    _endpoint = 'legacy.roomBooking-rejectBooking'
+    _endpoint = 'rooms.roomBooking-rejectBooking'
 
 
 class UHRoomBookingRejectAllConflicting(URLHandler):
@@ -482,15 +486,15 @@ class UHRoomBookingRejectAllConflicting(URLHandler):
 
 
 class UHRoomBookingRejectBookingOccurrence(URLHandler):
-    _endpoint = 'legacy.roomBooking-rejectBookingOccurrence'
+    _endpoint = 'rooms.roomBooking-rejectBookingOccurrence'
 
 
 class UHRoomBookingCancelBookingOccurrence(URLHandler):
-    _endpoint = 'legacy.roomBooking-cancelBookingOccurrence'
+    _endpoint = 'rooms.roomBooking-cancelBookingOccurrence'
 
 
 class UHRoomBookingStatement(URLHandler):
-    _endpoint = 'legacy.roomBooking-statement'
+    _endpoint = 'rooms.roomBooking-statement'
 
 
 # RB Administration

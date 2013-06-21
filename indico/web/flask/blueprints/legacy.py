@@ -2782,16 +2782,8 @@ legacy.add_url_rule('/roomBooking.py/blockingsForMyRooms',
 # Inactive: /roomBooking.py/bookingDetails (mod_rh_roomBooking.RHRoomBookingBookingDetails)
 # Inactive: /roomBooking.py/bookingForm (mod_rh_roomBooking.RHRoomBookingBookingForm)
 # Inactive: /roomBooking.py/bookingList (mod_rh_roomBooking.RHRoomBookingBookingList)
-
-legacy.add_url_rule('/roomBooking.py/cancelBooking',
-                    'roomBooking-cancelBooking',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingCancelBooking),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/cancelBookingOccurrence',
-                    'roomBooking-cancelBookingOccurrence',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingCancelBookingOccurrence),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/cancelBooking (mod_rh_roomBooking.RHRoomBookingCancelBooking)
+# Inactive: /roomBooking.py/cancelBookingOccurrence (mod_rh_roomBooking.RHRoomBookingCancelBookingOccurrence)
 
 legacy.add_url_rule('/roomBooking.py/cloneBooking',
                     'roomBooking-cloneBooking',
@@ -2802,11 +2794,7 @@ legacy.add_url_rule('/roomBooking.py/deleteBlocking',
                     'roomBooking-deleteBlocking',
                     rh_as_view(mod_rh_roomBooking.RHRoomBookingDelete),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/deleteBooking',
-                    'roomBooking-deleteBooking',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingDeleteBooking),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/deleteBooking (mod_rh_roomBooking.RHRoomBookingDeleteBooking)
 
 legacy.add_url_rule('/roomBooking.py/deleteCustomAttribute',
                     'roomBooking-deleteCustomAttribute',
@@ -2834,16 +2822,8 @@ legacy.add_url_rule('/roomBooking.py/rejectAllConflicting',
                     'roomBooking-rejectAllConflicting',
                     rh_as_view(mod_rh_roomBooking.RHRoomBookingRejectALlConflicting),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/rejectBooking',
-                    'roomBooking-rejectBooking',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingRejectBooking),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/rejectBookingOccurrence',
-                    'roomBooking-rejectBookingOccurrence',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingRejectBookingOccurrence),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/rejectBooking (mod_rh_roomBooking.RHRoomBookingRejectBooking)
+# Inactive: /roomBooking.py/rejectBookingOccurrence (mod_rh_roomBooking.RHRoomBookingRejectBookingOccurrence)
 
 legacy.add_url_rule('/roomBooking.py/roomDetails',
                     'roomBooking-roomDetails',
@@ -2897,11 +2877,7 @@ legacy.add_url_rule('/roomBooking.py/setDefaultLocation',
                     'roomBooking-setDefaultLocation',
                     rh_as_view(mod_rh_roomBooking.RHRoomBookingSetDefaultLocation),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/statement',
-                    'roomBooking-statement',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingStatement),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/statement (mod_rh_roomBooking.RHRoomBookingStatement)
 
 
 # Routes for roomBookingPluginAdmin.py

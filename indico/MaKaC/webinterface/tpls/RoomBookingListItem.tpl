@@ -6,7 +6,7 @@
         if ( !reason )
             return false;
 
-        element.href = element.href + '&reason=' + encodeURI( reason );
+        element.href = build_url(element.href, {reason: reason});
         return true;
     }
 
@@ -16,7 +16,7 @@
         if ( !reason )
             return false;
 
-        element.href = element.href + '&reason=' + encodeURI( reason );
+        element.href = build_url(element.href, {reason: reason});
         return true;
     }
 </script>

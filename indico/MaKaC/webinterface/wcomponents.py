@@ -4879,7 +4879,7 @@ class WRoomBookingDetails( WTemplated ):
 
         if self._standalone:
             vars["roomDetailsUH"] = urlHandlers.UHRoomBookingRoomDetails
-            vars["modifyBookingUH"] = urlHandlers.UHRoomBookingBookingForm
+            vars["modifyBookingUH"] = urlHandlers.UHRoomBookingModifyBookingForm
             vars["cloneURL"] = urlHandlers.UHRoomBookingCloneBooking.getURL(self._resv)
         else:
             vars["roomDetailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
