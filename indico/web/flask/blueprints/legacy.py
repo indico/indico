@@ -2758,26 +2758,10 @@ legacy.add_url_rule('/roomBooking.py/adminLocation',
                     'roomBooking-adminLocation',
                     rh_as_view(mod_rh_roomBooking.RHRoomBookingAdminLocation),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/blockingDetails',
-                    'roomBooking-blockingDetails',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingBlockingDetails),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/blockingForm',
-                    'roomBooking-blockingForm',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingBlockingForm),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/blockingList',
-                    'roomBooking-blockingList',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingBlockingList),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/blockingsForMyRooms',
-                    'roomBooking-blockingsForMyRooms',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingBlockingsForMyRooms),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/blockingDetails (mod_rh_roomBooking.RHRoomBookingBlockingDetails)
+# Inactive: /roomBooking.py/blockingForm (mod_rh_roomBooking.RHRoomBookingBlockingForm)
+# Inactive: /roomBooking.py/blockingList (mod_rh_roomBooking.RHRoomBookingBlockingList)
+# Inactive: /roomBooking.py/blockingsForMyRooms (mod_rh_roomBooking.RHRoomBookingBlockingsForMyRooms)
 # Inactive: /roomBooking.py/bookRoom (mod_rh_roomBooking.RHRoomBookingBookRoom)
 # Inactive: /roomBooking.py/bookingDetails (mod_rh_roomBooking.RHRoomBookingBookingDetails)
 # Inactive: /roomBooking.py/bookingForm (mod_rh_roomBooking.RHRoomBookingBookingForm)
@@ -2789,11 +2773,7 @@ legacy.add_url_rule('/roomBooking.py/cloneBooking',
                     'roomBooking-cloneBooking',
                     rh_as_view(mod_rh_roomBooking.RHRoomBookingCloneBooking),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/deleteBlocking',
-                    'roomBooking-deleteBlocking',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingDelete),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/deleteBlocking (mod_rh_roomBooking.RHRoomBookingDelete)
 # Inactive: /roomBooking.py/deleteBooking (mod_rh_roomBooking.RHRoomBookingDeleteBooking)
 
 legacy.add_url_rule('/roomBooking.py/deleteCustomAttribute',

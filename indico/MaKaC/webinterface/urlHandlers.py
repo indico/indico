@@ -547,24 +547,24 @@ class UHRoomBookingDeleteCustomAttribute(URLHandler):
 
 
 class UHRoomBookingBlockingsMyRooms(URLHandler):
-    _endpoint = 'legacy.roomBooking-blockingsForMyRooms'
+    _endpoint = 'rooms.roomBooking-blockingsForMyRooms'
 
 
 class UHRoomBookingBlockingsBlockingDetails(URLHandler):
-    _endpoint = 'legacy.roomBooking-blockingDetails'
+    _endpoint = 'rooms.roomBooking-blockingDetails'
 
 
 class UHRoomBookingBlockingList(BooleanOnMixin, URLHandler):
-    _endpoint = 'legacy.roomBooking-blockingList'
+    _endpoint = 'rooms.roomBooking-blockingList'
     _defaultParams = dict(onlyThisYear=True)
 
 
 class UHRoomBookingBlockingForm(URLHandler):
-    _endpoint = 'legacy.roomBooking-blockingForm'
+    _endpoint = 'rooms.roomBooking-blockingForm'
 
 
 class UHRoomBookingDeleteBlocking(URLHandler):
-    _endpoint = 'legacy.roomBooking-deleteBlocking'
+    _endpoint = 'rooms.roomBooking-deleteBlocking'
 
 # For the event ==============================================================
 

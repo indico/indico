@@ -74,3 +74,17 @@ rooms.add_url_rule('/rooms/room/<roomLocation>/<roomID>/', 'roomBooking-roomDeta
                    rh_as_view(roomBooking.RHRoomBookingRoomDetails))
 rooms.add_url_rule('/rooms/room/<roomLocation>/<roomID>/stats', 'roomBooking-roomStats',
                    rh_as_view(roomBooking.RHRoomBookingRoomStats), methods=('GET', 'POST'))
+
+# Room blocking
+rooms.add_url_rule('/rooms/blocking/<blockingId>/', 'roomBooking-blockingDetails',
+                   rh_as_view(roomBooking.RHRoomBookingBlockingDetails))
+rooms.add_url_rule('/rooms/blocking/<blockingId>/modify', 'roomBooking-blockingForm',
+                   rh_as_view(roomBooking.RHRoomBookingBlockingForm), methods=('GET', 'POST'))
+rooms.add_url_rule('/rooms/blocking/<blockingId>/delete', 'roomBooking-deleteBlocking',
+                   rh_as_view(roomBooking.RHRoomBookingDelete), methods=('GET','POST',))
+rooms.add_url_rule('/rooms/blocking/create', 'roomBooking-blockingForm',
+                   rh_as_view(roomBooking.RHRoomBookingBlockingForm), methods=('GET', 'POST'))
+rooms.add_url_rule('/rooms/blocking/list', 'roomBooking-blockingList',
+                   rh_as_view(roomBooking.RHRoomBookingBlockingList))
+rooms.add_url_rule('/rooms/blocking/list/my-rooms', 'roomBooking-blockingsForMyRooms',
+                   rh_as_view(roomBooking.RHRoomBookingBlockingsForMyRooms))
