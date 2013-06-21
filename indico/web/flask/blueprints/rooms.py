@@ -64,6 +64,8 @@ rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/reject', 'roomBooking
                    rh_as_view(roomBooking.RHRoomBookingRejectBooking), methods=('POST',))
 rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/delete', 'roomBooking-deleteBooking',
                    rh_as_view(roomBooking.RHRoomBookingDeleteBooking), methods=('POST',))
+rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/clone', 'roomBooking-cloneBooking',
+                   rh_as_view(roomBooking.RHRoomBookingCloneBooking), methods=('POST',))
 rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/<date>/cancel', 'roomBooking-cancelBookingOccurrence',
                    rh_as_view(roomBooking.RHRoomBookingCancelBookingOccurrence), methods=('POST',))
 rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/<date>/reject', 'roomBooking-rejectBookingOccurrence',

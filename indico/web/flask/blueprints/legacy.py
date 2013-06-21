@@ -2768,11 +2768,7 @@ legacy.add_url_rule('/roomBooking.py/adminLocation',
 # Inactive: /roomBooking.py/bookingList (mod_rh_roomBooking.RHRoomBookingBookingList)
 # Inactive: /roomBooking.py/cancelBooking (mod_rh_roomBooking.RHRoomBookingCancelBooking)
 # Inactive: /roomBooking.py/cancelBookingOccurrence (mod_rh_roomBooking.RHRoomBookingCancelBookingOccurrence)
-
-legacy.add_url_rule('/roomBooking.py/cloneBooking',
-                    'roomBooking-cloneBooking',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingCloneBooking),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/cloneBooking (mod_rh_roomBooking.RHRoomBookingCloneBooking)
 # Inactive: /roomBooking.py/deleteBlocking (mod_rh_roomBooking.RHRoomBookingDelete)
 # Inactive: /roomBooking.py/deleteBooking (mod_rh_roomBooking.RHRoomBookingDeleteBooking)
 

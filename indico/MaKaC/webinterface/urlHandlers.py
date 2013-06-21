@@ -466,7 +466,7 @@ class UHRoomBookingDeleteBooking(URLHandler):
 
 
 class UHRoomBookingCloneBooking(URLHandler):
-    _endpoint = 'legacy.roomBooking-cloneBooking'
+    _endpoint = 'rooms.roomBooking-cloneBooking'
 
 
 class UHRoomBookingCancelBooking(URLHandler):
