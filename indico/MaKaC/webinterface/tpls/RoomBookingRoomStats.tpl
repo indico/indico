@@ -68,8 +68,6 @@
             <table>
             <tr>
           <form action=${ statsURL }>
-          <input type="hidden" name="roomLocation" value=${ room.locationName }>
-          <input type="hidden" name="roomID" value=${ room.id }>
           <td bgcolor="white" valign="top" style="padding-left: 12px;">
             <select name="period" onChange="this.form.submit();">
             % if period=="pastmonth":

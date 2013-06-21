@@ -4759,7 +4759,7 @@ class WRoomBookingRoomStats( WTemplated ):
         vars["kbiTotalBookings"] = self._rh._totalBookings
         # Next 9 KPIs
         vars["stats"] = self._rh._booking_stats
-        vars["statsURL"] = urlHandlers.UHRoomBookingRoomStats.getURL()
+        vars["statsURL"] = urlHandlers.UHRoomBookingRoomStats.getURL(self._rh._room)
         return vars
 
 

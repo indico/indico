@@ -419,11 +419,11 @@ class UHRoomBookingBookingListForBooking(UHRoomBookingBookingList):
 
 
 class UHRoomBookingRoomDetails(BooleanTrueMixin, URLHandler):
-    _endpoint = "legacy.roomBooking-roomDetails"
+    _endpoint = 'rooms.roomBooking-roomDetails'
 
 
 class UHRoomBookingRoomStats(URLHandler):
-    _endpoint = 'legacy.roomBooking-roomStats'
+    _endpoint = 'rooms.roomBooking-roomStats'
 
 
 class UHRoomBookingBookingDetails(URLHandler):
