@@ -49,3 +49,7 @@ rooms.add_url_rule('/rooms/book/confirm', 'roomBooking-bookingForm', rh_as_view(
                    methods=('GET', 'POST'))
 rooms.add_url_rule('/rooms/book/save', 'roomBooking-saveBooking', rh_as_view(roomBooking.RHRoomBookingSaveBooking),
                    methods=('GET', 'POST'))
+
+# Booking info
+rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/', 'roomBooking-bookingDetails',
+                   rh_as_view(roomBooking.RHRoomBookingBookingDetails))

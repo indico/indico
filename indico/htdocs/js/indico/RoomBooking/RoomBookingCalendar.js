@@ -151,7 +151,12 @@ type ("RoomBookingRoom", [],
             this.building = roomData["building"];
             this.name = roomData["name"];
             this.type = roomData["type"];
-            this.bookingUrl = roomData["bookingUrl"] + '&day=' + date.substring(8,10) + '&month=' + date.substring(5,7) + '&year=' + date.substring(0,4) + '&ignoreSession=1';
+            this.bookingUrl = build_url(roomData['bookingUrl'], {
+                day: date.substring(8,10),
+                month: date.substring(5,7),
+                year: date.substring(0,4),
+                ignoreSession: 1
+            });
             this.id = roomData["id"];
             this.location = roomData["locationName"];
         });
@@ -443,8 +448,7 @@ type ("RoomBookingCalendarDrawer", [],
                         $('#booking-dialog').dialog({
                             buttons: {
                                 "Skip conflicting days": function() {
-                                    url += "&skipConflicting=on";
-                                    window.location = url;
+                                    window.location = build_url(url, {skipConflicting: 'on'});
                                 },
                                 Close: function() {
                                     $(this).dialog('close');
@@ -765,8 +769,9 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                                             Html.p({},$T('Are you sure you want to REJECT the booking for ' + bar.startDT.print("%H:%M %d/%m/%Y") + '?')),
                                             Html.p({},$T('If so, please give a reason:')), textArea),
                                     function(value) {
-                                        if(value)
-                                            window.location = bar.rejectURL + "&reason=" + textArea.dom.value;
+                                        if(value) {
+                                            window.location = build_url(bar.rejectURL, {reason: textArea.dom.value});
+                                        }
                                     }).open();
                         });
                     }
@@ -937,13 +942,18 @@ type("RoomBookingPrevNext", [],
 
                 function showDateSelector() {
                     var dlg = new DateRangeSelector(self.startD, self.endD, function(startDate, endDate) {
-                        var redirectUrl =  self.formUrl + "?" + (self.search ? 'search=on&' : '') + "sDay=" + startDate.getDate() +"&sMonth=" + (startDate.getMonth() + 1) + "&sYear=" + startDate.getFullYear() + "&eDay=" + endDate.getDate() +"&eMonth=" + (endDate.getMonth() + 1) + "&eYear=" + endDate.getFullYear();
-
-                        for (var param in self.params) {
-                            redirectUrl += "&" + param + "=" + self.params[param];
+                        var urlParams = $.extend({
+                            sDay: startDate.getDate(),
+                            sMonth: startDate.getMonth() + 1,
+                            sYear: startDate.getFullYear(),
+                            eDay: endDate.getDate(),
+                            eMonth: endDate.getMonth() + 1,
+                            eYear: endDate.getFullYear()
+                        }, self.params);
+                        if (self.search) {
+                            urlParams.search = 'on';
                         }
-
-                        location.href = redirectUrl;
+                        location.href = build_url(self.formUrl, urlParams);
                     }, $T("Choose Period"), true);
                     dlg.open();
                 }

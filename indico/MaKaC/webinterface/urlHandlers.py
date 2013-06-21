@@ -100,14 +100,16 @@ class URLHandler(object):
 
     @classmethod
     def _translateParams(cls, params):
+        # When overriding this you may return a new dict or modify the existing one in-place.
+        # But in any case, you must return the final dict.
         return params
 
     @classmethod
     def _getParams(cls, target, params):
         params = dict(cls._defaultParams, **params)
-        params = cls._translateParams(params)
         if target is not None:
             params.update(target.getLocator())
+        params = cls._translateParams(params)
         return params
 
     @classmethod
@@ -425,7 +427,14 @@ class UHRoomBookingRoomStats(URLHandler):
 
 
 class UHRoomBookingBookingDetails(URLHandler):
-    _endpoint = 'legacy.roomBooking-bookingDetails'
+    _endpoint = 'rooms.roomBooking-bookingDetails'
+
+    @classmethod
+    def _translateParams(cls, params):
+        # confId is apparently unused and thus just ugly
+        params.pop('confId', None)
+        return params
+
 
 
 class UHRoomBookingRoomForm(URLHandler):

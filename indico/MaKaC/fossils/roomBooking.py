@@ -90,6 +90,13 @@ class IRoomMapFossil(IRoomFossil):
         """ Available equipment for audio and video conference """
 
 
+def _produce_booking_url(resv):
+    if resv.id is None:
+        # Booking is not saved yet
+        return None
+    return str(UHRoomBookingBookingDetails.getURL(resv))
+
+
 class IReservationFossil(IFossil):
     """ Fossil inteface for reservation """
 
@@ -101,7 +108,7 @@ class IReservationFossil(IFossil):
 
     def getBookingUrl(self):
         """ URL to reservation details webpage """
-    getBookingUrl.produce = lambda s: str(UHRoomBookingBookingDetails.getURL( s ))
+    getBookingUrl.produce = _produce_booking_url
 
     def reason(self):
         """ Reason of the reservation """

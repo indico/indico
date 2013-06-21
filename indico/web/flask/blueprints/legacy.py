@@ -2779,11 +2779,7 @@ legacy.add_url_rule('/roomBooking.py/blockingsForMyRooms',
                     rh_as_view(mod_rh_roomBooking.RHRoomBookingBlockingsForMyRooms),
                     methods=('GET', 'POST'))
 # Inactive: /roomBooking.py/bookRoom (mod_rh_roomBooking.RHRoomBookingBookRoom)
-
-legacy.add_url_rule('/roomBooking.py/bookingDetails',
-                    'roomBooking-bookingDetails',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingBookingDetails),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/bookingDetails (mod_rh_roomBooking.RHRoomBookingBookingDetails)
 # Inactive: /roomBooking.py/bookingForm (mod_rh_roomBooking.RHRoomBookingBookingForm)
 # Inactive: /roomBooking.py/bookingList (mod_rh_roomBooking.RHRoomBookingBookingList)
 
