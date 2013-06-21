@@ -87,8 +87,8 @@
         for (var key in params) {
             var value = params[key];
             if (value === undefined || value === null) {
-                console.log(params);  // JSON.stringify skips undefined so let's log it here
-                throw new BuildError('params contain undefined/null');
+                // convert them to a string
+                value = '' + value
             }
             if (!_.isObject(value) || _.isArray(value)) {
                 clean_params[key] = value;
