@@ -16,6 +16,8 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session, g, request
+from flask import current_app as app
 import pkg_resources
 
 """Template engine."""
@@ -400,3 +402,8 @@ def registerHelpers(objDict):
         objDict['N_'] = ngettext
     if not 'format_number' in objDict:
         objDict['format_number'] = format_number
+    # flask proxies
+    objDict['_session'] = session
+    objDict['_request'] = request
+    objDict['_g'] = g
+    objDict['_app'] = app
