@@ -37,3 +37,14 @@ function loginAs() {
         });
     popup.execute();
 }
+
+function undoLoginAs() {
+    indicoRequest('admin.header.undoLoginAs', {}, function(result, error) {
+        if (!error) {
+            window.location.reload();
+        }
+        else {
+            IndicoUtil.errorReport(error);
+        }
+    });
+}

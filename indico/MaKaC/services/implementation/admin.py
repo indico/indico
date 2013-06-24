@@ -17,7 +17,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import session
 
-from MaKaC.services.implementation.base import AdminService, TextModificationBase
+from MaKaC.services.implementation.base import AdminService, TextModificationBase, LoggedOnlyService
 
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.user import PrincipalHolder, AvatarHolder, GroupHolder
@@ -80,8 +80,26 @@ class AdminLoginAs(AdminService):
     def _getAnswer(self):
         tzUtil = timezoneUtils.SessionTZ(self._av)
         tz = tzUtil.getSessionTZ()
+        session.setdefault('login_as_history', []).append({
+            'timezone': session.timezone,
+            'user_id': session.user.getId(),
+            'user_name': session.user.getStraightAbrName()
+        })
         session.user = self._av
         session.timezone = tz
+        return True
+
+
+class AdminUndoLoginAs(LoggedOnlyService):
+
+    def _getAnswer(self):
+        try:
+            entry = session['login_as_history'].pop()
+        except (IndexError, KeyError):
+            raise NoReportError(_('No login-as history entry found'))
+
+        session.user = AvatarHolder().getById(entry['user_id'])
+        session.timezone = entry['timezone']
         return True
 
 
@@ -223,6 +241,7 @@ methodMap = {
     "general.removeAdmin": RemoveAdministrator,
 
     "header.loginAs": AdminLoginAs,
+    "header.undoLoginAs": AdminUndoLoginAs,
 
     "groups.addExistingMember": GroupAddExistingMember,
     "groups.removeMember": GroupRemoveMember,

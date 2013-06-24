@@ -2889,6 +2889,10 @@ div.pageOverHeader
     font-weight: bold;
 }
 
+div.pageOverHeader.impersonation {
+    background-color: #ff5454;
+}
+
 /* Mobile Header */
 
 div.mobile-device-header{

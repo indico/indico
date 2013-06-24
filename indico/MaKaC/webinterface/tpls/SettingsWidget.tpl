@@ -19,7 +19,14 @@
         <div class="settingsWidgetSection"><a href="${ urlHandlers.UHUserDashboard.getURL(currentUser) }">${ _("My profile") }</a></div>
         <div class="settingsWidgetSection"><a href="${ urlHandlers.UHUserPreferences.getURL(currentUser) }">${ _("My preferences") }</a></div>
         % if currentUser.isAdmin():
-            <div class="settingsWidgetSection"><a href="#" onclick="loginAs();">${ _("Login as...") }</a></div>
+            <div class="settingsWidgetSection"><a href="#" onclick="loginAs(); return false;">${ _("Login as...") }</a></div>
+        % endif
+        % if _session.get('login_as_history'):
+            <div class="settingsWidgetSection">
+                <a href="#" onclick="undoLoginAs(); return false;">
+                    ${ _("Switch back to") } ${ _session['login_as_history'][-1]['user_name'] }
+                </a>
+            </div>
         % endif
         <div style="border-bottom: 1px solid #DDDDDD; margin-bottom:5px; margin-top:10px"></div>
         <div class="settingsWidgetSection"><a href="${ logoutURL }">${ _("Logout") }</a></div>
