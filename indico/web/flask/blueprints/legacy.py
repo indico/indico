@@ -35,7 +35,6 @@ import MaKaC.webinterface.rh.ePaymentModif as mod_rh_ePaymentModif
 import MaKaC.webinterface.rh.evaluationModif as mod_rh_evaluationModif
 import MaKaC.webinterface.rh.groups as mod_rh_groups
 import MaKaC.webinterface.rh.maintenance as mod_rh_maintenance
-import MaKaC.webinterface.rh.materialDisplay as mod_rh_materialDisplay
 import MaKaC.webinterface.rh.oauth as mod_rh_oauth
 import MaKaC.webinterface.rh.registrantsModif as mod_rh_registrantsModif
 import MaKaC.webinterface.rh.registrationFormModif as mod_rh_registrationFormModif
@@ -2521,10 +2520,7 @@ legacy.add_url_rule('/generalInfoModification.py/update',
 
 
 # Routes for getConvertedFile.py
-legacy.add_url_rule('/getConvertedFile.py',
-                    'getConvertedFile',
-                    rh_as_view(mod_rh_materialDisplay.RHMaterialAddConvertedFile),
-                    methods=('GET', 'POST'))
+# Inactive: /getConvertedFile.py (mod_rh_materialDisplay.RHMaterialAddConvertedFile)
 
 
 # Routes for getFile.py

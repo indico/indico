@@ -157,7 +157,7 @@ MaxUploadFileSize = 0
 # If you are interested in this feature please contact us at:
 #   indico-team@cern.ch
 #
-# FileConverter        = {"conversion_server": "localhost", "response_url": "http://localhost/getConvertedFile.py"}
+# FileConverter        = {"conversion_server": "localhost", "response_url": "http://localhost/conversion-finished"}
 
 
 #------------------------------------------------------------------------------

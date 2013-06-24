@@ -20,7 +20,7 @@
 from flask import Blueprint
 
 from MaKaC.webinterface.rh import welcome, helpDisplay, newsDisplay, payment, lang, resetTimezone, about, contact, \
-    JSContent, errors
+    JSContent, errors, materialDisplay
 from indico.web.flask.util import rh_as_view
 
 
@@ -36,3 +36,5 @@ misc.add_url_rule('/about', 'about', rh_as_view(about.RHAbout))
 misc.add_url_rule('/contact', 'contact', rh_as_view(contact.RHContact))
 misc.add_url_rule('/vars.js', 'JSContent-getVars', rh_as_view(JSContent.RHGetVarsJs))
 misc.add_url_rule('/report-error', 'errors', rh_as_view(errors.RHErrorReporting), methods=('GET', 'POST'))
+misc.add_url_rule('/conversion-finished', 'getConvertedFile', rh_as_view(materialDisplay.RHMaterialAddConvertedFile),
+                  methods=('POST',))
