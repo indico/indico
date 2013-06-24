@@ -257,10 +257,6 @@ class UHCalendarSelectCategories(URLHandler):
     _endpoint = 'category.wcalendar-select'
 
 
-class UHSimpleCalendar(URLHandler):
-    _endpoint = 'legacy.calendarSelect'
-
-
 class UHConferenceCreation(URLHandler):
     _endpoint = 'event.conferenceCreation'
 
@@ -1868,10 +1864,6 @@ class UHSessionModifMaterials(URLHandler):
 
 class UHSessionDataModification(URLHandler):
     _endpoint = 'legacy.sessionModification-modify'
-
-
-class UHSessionDatesModification(URLHandler):
-    _endpoint = 'legacy.sessionModification-modifyDates'
 
 
 class UHSessionFitSlot(URLHandler):

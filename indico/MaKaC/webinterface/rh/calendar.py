@@ -111,28 +111,3 @@ class RHCalendarSelectCategories( base.RH ):
     def _process( self ):
         p = calendar.WPCalendarSelectCategories( self, self._cal )
         return p.display( expanded=self._expanded )
-
-
-class RHSimpleCalendar( base.RH ):
-    _uh = urlHandlers.UHSimpleCalendar
-
-    def _checkParams( self, params ):
-        # month/year indicates which month should be displayed in the calendar
-        # date indicates if a day should be highlighted in the calendar
-        tz = DisplayTZ(self._aw).getDisplayTZ()
-        if params.has_key("month") and params.get("month")=="":
-            del params["month"]
-        if params.has_key("year") and params.get("year")=="":
-            del params["year"]
-        self._month = int( params.get("month", nowutc().astimezone(timezone(tz)).month) )
-        self._year = int(params.get("year", nowutc().astimezone(timezone(tz)).year))
-        if params.get('date','') == '--' or params.get('date','') == '':
-            self._date = '%s-%s-%s' % ( '01', self._month, self._year )
-        else:
-            self._date = ""
-        self._form = int(params.get('form',0) )
-
-    def _process( self ):
-        p = calendar.WPSimpleCalendar( self, self._month, self._year, self._date, self._form )
-        return p.display()
-

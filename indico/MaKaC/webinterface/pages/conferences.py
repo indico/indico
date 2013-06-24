@@ -1907,10 +1907,9 @@ class WPConfDataModif( WPConferenceModification ):
     def _getPageContent( self, params ):
         p = WConferenceDataModification( self._conf, self._rh )
         pars = {
-        "postURL": urlHandlers.UHConfPerformDataModif.getURL(),
-        "calendarIconURL": Config.getInstance().getSystemIconURL("calendar"),
-        "calendarSelectURL":  urlHandlers.UHSimpleCalendar.getURL(),
-        "type": params.get("type") }
+            "postURL": urlHandlers.UHConfPerformDataModif.getURL(),
+            "type": params.get("type")
+        }
         return p.getHTML( pars )
 
 
@@ -2639,8 +2638,6 @@ class WConferenceClone(wcomponents.WTemplated):
         vars["selectDay"] = self._getSelectDay()
         vars["selectMonth"] = self._getSelectMonth()
         vars["selectYear"] = self._getSelectYear()
-        vars["calendarIconURL"] = Config.getInstance().getSystemIconURL( "calendar" )
-        vars["calendarSelectURL"] = urlHandlers.UHSimpleCalendar.getURL()
         return vars
 
 

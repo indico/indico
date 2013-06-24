@@ -3635,9 +3635,6 @@ class WSessionModEditData(WTemplated):
         vars["eventId"] = "s" + vars["sessionId"]
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
-        vars["calendarIconURL"] = Config.getInstance(
-        ).getSystemIconURL("calendar")
-        vars["calendarSelectURL"] = urlHandlers.UHSimpleCalendar.getURL()
         vars["pageTitle"] = self.htmlText(self._title)
         vars["postURL"] = quoteattr(str(vars["postURL"]))
         vars["title"] = quoteattr(str(vars.get("title", "")))

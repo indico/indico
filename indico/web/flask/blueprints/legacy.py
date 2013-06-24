@@ -25,7 +25,6 @@ import MaKaC.webinterface.rh.abstractReviewing as mod_rh_abstractReviewing
 import MaKaC.webinterface.rh.admins as mod_rh_admins
 import MaKaC.webinterface.rh.announcement as mod_rh_announcement
 import MaKaC.webinterface.rh.api as mod_rh_api
-import MaKaC.webinterface.rh.calendar as mod_rh_calendar
 import MaKaC.webinterface.rh.collaboration as mod_rh_collaboration
 import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
@@ -707,13 +706,6 @@ legacy.add_url_rule('/badgeTemplates.py/badgeDesign',
 legacy.add_url_rule('/badgeTemplates.py/badgePrinting',
                     'badgeTemplates-badgePrinting',
                     rh_as_view(mod_rh_templates.RHBadgeTemplates),
-                    methods=('GET', 'POST'))
-
-
-# Routes for calendarSelect.py
-legacy.add_url_rule('/calendarSelect.py',
-                    'calendarSelect',
-                    rh_as_view(mod_rh_calendar.RHSimpleCalendar),
                     methods=('GET', 'POST'))
 
 
@@ -2966,11 +2958,6 @@ legacy.add_url_rule('/sessionModification.py/materialsAdd',
 legacy.add_url_rule('/sessionModification.py/modify',
                     'sessionModification-modify',
                     rh_as_view(mod_rh_sessionModif.RHSessionDataModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/modifyDates',
-                    'sessionModification-modifyDates',
-                    rh_as_view(mod_rh_sessionModif.RHSessionDatesModification),
                     methods=('GET', 'POST'))
 
 legacy.add_url_rule('/sessionModification.py/open',

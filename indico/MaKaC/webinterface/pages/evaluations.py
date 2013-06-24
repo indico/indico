@@ -454,8 +454,6 @@ class WConfModifEvaluationSetupDataModif( WConfModifEvaluationSetup ):
         evaluationStartNotification = evaluation.getNotification(Evaluation._EVALUATION_START)
         newSubmissionNotification   = evaluation.getNotification(Evaluation._NEW_SUBMISSION)
         vars["postURL"]=urlHandlers.UHConfModifEvaluationPerformDataModif.getURL(self._conf)
-        vars["calendarSelectURL"]= urlHandlers.UHSimpleCalendar.getURL()
-        vars["calendarIconURL"]  = Config.getInstance().getSystemIconURL("calendar")
         vars["announcement"]     = evaluation.getAnnouncement()
         vars["contactInfo"]      = evaluation.getContactInfo()
         vars["submissionsLimit"] = evaluation.getSubmissionsLimit()

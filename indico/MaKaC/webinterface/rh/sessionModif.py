@@ -110,69 +110,6 @@ class RHSessionModification(RHSessionModifBase):
 
 #--------------------------------------------------------------------------
 
-class RHSessionDatesModification(RHSessionModifBase):
-    _uh = urlHandlers.UHSessionDatesModification
-
-    def _checkParams(self, params):
-        self._check = int(params.get("check", 1))
-        self._slmove = int(params.get("slmove", 1))
-        RHSessionModifBase._checkParams(self, params)
-        self._confirmed = "confirm" in params
-        self._action = ""
-        if "CANCEL" in params or "cancel" in params:
-            self._action = "CANCEL"
-        elif "OK" in params or "confirm" in params:
-            self._action = "MODIFY"
-        elif "performedAction" in params:
-            self._action = params["performedAction"]
-        else:
-            sd, ed = self._session.getAdjustedStartDate(
-            ), self._session.getAdjustedEndDate()
-            params["sYear"], params["sMonth"] = sd.year, sd.month
-            params["sDay"] = sd.day
-            params["sHour"], params["sMinute"] = sd.hour, sd.minute
-            params["eYear"], params["eMonth"] = ed.year, ed.month
-            params["eDay"] = ed.day
-            params["eHour"], params["eMinute"] = ed.hour, ed.minute
-
-    def _modify(self, params):
-        tz = self._session.getConference().getTimezone()
-        sd = timezone(tz).localize(datetime(int(params["sYear"]),
-                                            int(params["sMonth"]),
-                                            int(params["sDay"]),
-                                            int(params["sHour"]),
-                                            int(params["sMinute"])))
-        params["sDate"] = sd.astimezone(timezone('UTC'))
-        if params.get("eYear", "") == "":
-            ed = timezone(tz).localize(datetime(int(params["sYear"]),
-                                                int(params["sMonth"]),
-                                                int(params["sDay"]),
-                                                int(params["eHour"]),
-                                                int(params["eMinute"])))
-        else:
-            ed = timezone(tz).localize(datetime(int(params["eYear"]),
-                                                int(params["eMonth"]),
-                                                int(params["eDay"]),
-                                                int(params["eHour"]),
-                                                int(params["eMinute"])))
-        params["eDate"] = ed.astimezone(timezone('UTC'))
-        self._target.setDates(
-            params["sDate"], params["eDate"], self._check, self._slmove)
-
-    def _process(self):
-        url = urlHandlers.UHSessionModifSchedule.getURL(self._target)
-        params = self._getRequestParams()
-        if self._action == "CANCEL":
-            self._redirect(url)
-            return
-        elif self._action == "MODIFY":
-            self._modify(params)
-            self._redirect(url)
-            return
-        p = sessions.WPSessionDatesModification(self, self._target)
-        params = self._getRequestParams()
-        return p.display(**params)
-
 
 class RHSessionDataModification(RoomBookingDBMixin, RHSessionModifBase):
     _uh = urlHandlers.UHSessionDataModification

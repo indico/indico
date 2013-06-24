@@ -1,5 +1,3 @@
-<% calendarIconURL = Config.getInstance().getSystemIconURL("calendar") %>
-
 <script type="text/javascript">
 
     // Displays div with dates and hours

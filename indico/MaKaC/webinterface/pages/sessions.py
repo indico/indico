@@ -1269,48 +1269,6 @@ class WPSessionModifMaterials( WPSessionModifBase ):
         wc=wcomponents.WShowExistingMaterial(self._target)
         return wc.getHTML( pars )
 
-class WPSessionDatesModification(WPSessionModifSchedule):
-
-    def _getTabContent(self,params):
-        p=WSessionModEditDates(self._session.getConference())
-        params["postURL"]=urlHandlers.UHSessionDatesModification.getURL(self._session)
-        return p.getHTML(params)
-
-class WSessionModEditDates(wcomponents.WTemplated):
-
-    def __init__(self,targetConf,targetDay=None):
-        self._conf=targetConf
-        self._targetDay=targetDay
-
-    def getVars( self ):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(vars["postURL"]))
-        vars["calendarIconURL"]=Config.getInstance().getSystemIconURL( "calendar" )
-        vars["calendarSelectURL"]=urlHandlers.UHSimpleCalendar.getURL()
-        refDate=self._conf.getSchedule().calculateDayEndDate(self._targetDay, self._conf.getTimezone())
-        endDate = None
-        if refDate.hour == 23:
-            refDate = refDate - timedelta(minutes=refDate.minute)
-            endDate = refDate + timedelta(minutes=59)
-        vars["sDay"]=quoteattr(str(vars.get("sDay",refDate.day)))
-        vars["sMonth"]=quoteattr(str(vars.get("sMonth",refDate.month)))
-        vars["sYear"]=quoteattr(str(vars.get("sYear",refDate.year)))
-        vars["sHour"]=quoteattr(str(vars.get("sHour",refDate.hour)))
-        vars["sMinute"]=quoteattr(str(vars.get("sMinute",refDate.minute)))
-        if not endDate:
-            endDate=refDate+timedelta(hours=1)
-        vars["eDay"]=quoteattr(str(vars.get("eDay",endDate.day)))
-        vars["eMonth"]=quoteattr(str(vars.get("eMonth",endDate.month)))
-        vars["eYear"]=quoteattr(str(vars.get("eYear",endDate.year)))
-        vars["eHour"]=quoteattr(str(vars.get("eHour",endDate.hour)))
-        vars["eMinute"]=quoteattr(str(vars.get("eMinute",endDate.minute)))
-        vars["autoUpdate"]=""
-        if not self._conf.getEnableSessionSlots():
-            vars["disabled"] = "disabled"
-        else:
-            vars["disabled"] = ""
-        vars["adjustSlots"]=""
-        return vars
 
 class WSessionICalExport(WICalExportBase):
 

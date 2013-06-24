@@ -294,8 +294,6 @@ class WConfModifRegFormDataModification( wcomponents.WTemplated ):
             vars["meDay"]=d.day
             vars["meMonth"]=d.month
             vars["meYear"]=d.year
-        vars["calendarIconURL"] = Config.getInstance().getSystemIconURL("calendar")
-        vars["calendarSelectURL"] = urlHandlers.UHSimpleCalendar.getURL()
         vars["announcement"] = regForm.getAnnouncement()
         vars["contactInfo"] = regForm.getContactInfo()
         vars["usersLimit"] = regForm.getUsersLimit()

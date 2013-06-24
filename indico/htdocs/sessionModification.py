@@ -26,9 +26,6 @@ def index(req, **params):
 def modify( req, **params ):
     return sessionModif.RHSessionDataModification( req ).process( params )
 
-def modifyDates( req, **params ):
-    return sessionModif.RHSessionDatesModification( req ).process( params )
-
 def close( req, **params ):
     return sessionModif.RHSessionClose( req ).process( params )
 
