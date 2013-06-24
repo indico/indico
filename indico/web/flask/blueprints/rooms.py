@@ -35,6 +35,8 @@ rooms.add_url_rule('/rooms/map/widget', 'roomBooking-mapOfRoomsWidget',
                    rh_as_view(roomBooking.RHRoomBookingMapOfRoomsWidget))
 rooms.add_url_rule('/rooms/bookings', 'roomBooking-bookingList', rh_as_view(roomBooking.RHRoomBookingBookingList),
                    methods=('GET', 'POST'))
+rooms.add_url_rule('/rooms/rooms', 'roomBooking-roomList', rh_as_view(roomBooking.RHRoomBookingRoomList),
+                   methods=('GET', 'POST'))
 rooms.add_url_rule('/rooms/search/bookings', 'roomBooking-search4Bookings',
                    rh_as_view(roomBooking.RHRoomBookingSearch4Bookings), methods=('GET', 'POST'))
 rooms.add_url_rule('/rooms/search/rooms', 'roomBooking-search4Rooms', rh_as_view(roomBooking.RHRoomBookingSearch4Rooms),

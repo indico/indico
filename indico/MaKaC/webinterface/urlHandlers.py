@@ -376,7 +376,7 @@ class UHRoomBookingBookRoom(URLHandler):
 
 
 class UHRoomBookingRoomList(BooleanOnMixin, URLHandler):
-    _endpoint = 'legacy.roomBooking-roomList'
+    _endpoint = 'rooms.roomBooking-roomList'
 
 
 class UHRoomBookingBookingList(URLHandler):

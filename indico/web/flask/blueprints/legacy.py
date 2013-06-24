@@ -2713,11 +2713,7 @@ legacy.add_url_rule('/roomBooking.py/roomForm',
                     'roomBooking-roomForm',
                     rh_as_view(mod_rh_roomBooking.RHRoomBookingRoomForm),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/roomList',
-                    'roomBooking-roomList',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingRoomList),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/roomList (mod_rh_roomBooking.RHRoomBookingRoomList)
 # Inactive: /roomBooking.py/roomStats (mod_rh_roomBooking.RHRoomBookingRoomStats)
 # Inactive: /roomBooking.py/saveBooking (mod_rh_roomBooking.RHRoomBookingSaveBooking)
 
