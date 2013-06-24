@@ -1983,7 +1983,7 @@ class UHVideoFlashAccess(URLHandler):
 
 
 class UHErrorReporting(URLHandler):
-    _endpoint = 'legacy.errors'
+    _endpoint = 'misc.errors'
 
 
 class UHAbstractWithdraw(URLHandler):

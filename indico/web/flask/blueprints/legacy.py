@@ -32,7 +32,6 @@ import MaKaC.webinterface.rh.contribMod as mod_rh_contribMod
 import MaKaC.webinterface.rh.contribReviewingModif as mod_rh_contribReviewingModif
 import MaKaC.webinterface.rh.domains as mod_rh_domains
 import MaKaC.webinterface.rh.ePaymentModif as mod_rh_ePaymentModif
-import MaKaC.webinterface.rh.errors as mod_rh_errors
 import MaKaC.webinterface.rh.evaluationModif as mod_rh_evaluationModif
 import MaKaC.webinterface.rh.groups as mod_rh_groups
 import MaKaC.webinterface.rh.maintenance as mod_rh_maintenance
@@ -2506,10 +2505,7 @@ legacy.add_url_rule('/domainList.py',
 
 
 # Routes for errors.py
-legacy.add_url_rule('/errors.py',
-                    'errors',
-                    rh_as_view(mod_rh_errors.RHErrorReporting),
-                    methods=('GET', 'POST'))
+# Inactive: /errors.py (mod_rh_errors.RHErrorReporting)
 
 
 # Routes for generalInfoModification.py
