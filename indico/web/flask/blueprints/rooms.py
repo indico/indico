@@ -60,6 +60,8 @@ rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/modify', 'roomBooking
                    rh_as_view(roomBooking.RHRoomBookingBookingForm), methods=('GET', 'POST'))
 rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/cancel', 'roomBooking-cancelBooking',
                    rh_as_view(roomBooking.RHRoomBookingCancelBooking), methods=('POST',))
+rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/accept', 'roomBooking-acceptBooking',
+                    rh_as_view(roomBooking.RHRoomBookingAcceptBooking), methods=('POST',))
 rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/reject', 'roomBooking-rejectBooking',
                    rh_as_view(roomBooking.RHRoomBookingRejectBooking), methods=('POST',))
 rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/delete', 'roomBooking-deleteBooking',
@@ -70,6 +72,8 @@ rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/<date>/cancel', 'room
                    rh_as_view(roomBooking.RHRoomBookingCancelBookingOccurrence), methods=('POST',))
 rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/<date>/reject', 'roomBooking-rejectBookingOccurrence',
                    rh_as_view(roomBooking.RHRoomBookingRejectBookingOccurrence), methods=('POST',))
+rooms.add_url_rule('/rooms/bookings/reject-all-conflicting', 'roomBooking-rejectAllConflicting',
+                   rh_as_view(roomBooking.RHRoomBookingRejectALlConflicting))
 
 # Room info
 rooms.add_url_rule('/rooms/room/<roomLocation>/<roomID>/', 'roomBooking-roomDetails',

@@ -474,7 +474,7 @@ class UHRoomBookingCancelBooking(URLHandler):
 
 
 class UHRoomBookingAcceptBooking(URLHandler):
-    _endpoint = 'legacy.roomBooking-acceptBooking'
+    _endpoint = 'rooms.roomBooking-acceptBooking'
 
 
 class UHRoomBookingRejectBooking(URLHandler):
@@ -482,7 +482,7 @@ class UHRoomBookingRejectBooking(URLHandler):
 
 
 class UHRoomBookingRejectAllConflicting(URLHandler):
-    _endpoint = 'legacy.roomBooking-rejectAllConflicting'
+    _endpoint = 'rooms.roomBooking-rejectAllConflicting'
 
 
 class UHRoomBookingRejectBookingOccurrence(URLHandler):
