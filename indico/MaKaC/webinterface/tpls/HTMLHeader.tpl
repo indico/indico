@@ -22,7 +22,7 @@
         </script>
 
         <!-- Indico specific -->
-        ${ page._getJavaScriptInclude(baseurl + "/JSContent.py/getVars") } <!-- Indico Variables -->
+        ${ page._getJavaScriptInclude(str(urlHandlers.UHJSVars.getURL())) } <!-- Indico Variables -->
 
         <!-- Page Specific JS files-->
         % for JSFile in extraJSFiles:

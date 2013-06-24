@@ -20,7 +20,6 @@
 from flask import Blueprint
 from indico.web.flask.util import rh_as_view
 
-import MaKaC.webinterface.rh.JSContent as mod_rh_JSContent
 import MaKaC.webinterface.rh.abstractModif as mod_rh_abstractModif
 import MaKaC.webinterface.rh.abstractReviewing as mod_rh_abstractReviewing
 import MaKaC.webinterface.rh.admins as mod_rh_admins
@@ -92,10 +91,7 @@ legacy.add_url_rule('/EMail.py/sendreg',
 
 
 # Routes for JSContent.py
-legacy.add_url_rule('/JSContent.py/getVars',
-                    'JSContent-getVars',
-                    rh_as_view(mod_rh_JSContent.RHGetVarsJs),
-                    methods=('GET', 'POST'))
+# Inactive: /JSContent.py/getVars (mod_rh_JSContent.RHGetVarsJs)
 
 
 # Routes for about.py

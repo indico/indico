@@ -3707,6 +3707,10 @@ class UHContact(URLHandler):
     _endpoint = 'misc.contact'
 
 
+class UHJSVars(URLHandler):
+    _endpoint = 'misc.JSContent-getVars'
+
+
 class UHHelper(object):
     """ Returns the display or modif UH for an object of a given class
     """

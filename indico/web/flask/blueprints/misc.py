@@ -19,7 +19,8 @@
 
 from flask import Blueprint
 
-from MaKaC.webinterface.rh import welcome, helpDisplay, newsDisplay, payment, lang, resetTimezone, about, contact
+from MaKaC.webinterface.rh import welcome, helpDisplay, newsDisplay, payment, lang, resetTimezone, about, contact, \
+    JSContent
 from indico.web.flask.util import rh_as_view
 
 
@@ -33,3 +34,4 @@ misc.add_url_rule('/change-language', 'changeLang', rh_as_view(lang.RHChangeLang
 misc.add_url_rule('/change-timezone', 'resetSessionTZ', rh_as_view(resetTimezone.RHResetTZ), methods=('GET', 'POST'))
 misc.add_url_rule('/about', 'about', rh_as_view(about.RHAbout))
 misc.add_url_rule('/contact', 'contact', rh_as_view(contact.RHContact))
+misc.add_url_rule('/vars.js', 'JSContent-getVars', rh_as_view(JSContent.RHGetVarsJs))
