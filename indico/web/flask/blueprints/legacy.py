@@ -36,7 +36,6 @@ import MaKaC.webinterface.rh.domains as mod_rh_domains
 import MaKaC.webinterface.rh.ePaymentModif as mod_rh_ePaymentModif
 import MaKaC.webinterface.rh.errors as mod_rh_errors
 import MaKaC.webinterface.rh.evaluationModif as mod_rh_evaluationModif
-import MaKaC.webinterface.rh.fileAccess as mod_rh_fileAccess
 import MaKaC.webinterface.rh.groups as mod_rh_groups
 import MaKaC.webinterface.rh.maintenance as mod_rh_maintenance
 import MaKaC.webinterface.rh.materialDisplay as mod_rh_materialDisplay
@@ -2587,25 +2586,10 @@ legacy.add_url_rule('/getConvertedFile.py',
 
 
 # Routes for getFile.py
-legacy.add_url_rule('/getFile.py/access',
-                    'getFile-access',
-                    rh_as_view(mod_rh_fileAccess.RHFileAccess),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/getFile.py/accessKey',
-                    'getFile-accessKey',
-                    rh_as_view(mod_rh_fileAccess.RHFileAccessStoreAccessKey),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/getFile.py/flash',
-                    'getFile-flash',
-                    rh_as_view(mod_rh_fileAccess.RHVideoFlashAccess),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/getFile.py/wmv',
-                    'getFile-wmv',
-                    rh_as_view(mod_rh_fileAccess.RHVideoWmvAccess),
-                    methods=('GET', 'POST'))
+# Inactive: /getFile.py/access (mod_rh_fileAccess.RHFileAccess)
+# Inactive: /getFile.py/accessKey (mod_rh_fileAccess.RHFileAccessStoreAccessKey)
+# Inactive: /getFile.py/flash (mod_rh_fileAccess.RHVideoFlashAccess)
+# Inactive: /getFile.py/wmv (mod_rh_fileAccess.RHVideoWmvAccess)
 
 
 # Routes for groupDetails.py
@@ -2679,15 +2663,8 @@ legacy.add_url_rule('/groupRegistration.py/update',
 
 
 # Routes for materialDisplay.py
-legacy.add_url_rule('/materialDisplay.py',
-                    'materialDisplay',
-                    rh_as_view(mod_rh_materialDisplay.RHMaterialDisplay),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/materialDisplay.py/accessKey',
-                    'materialDisplay-accessKey',
-                    rh_as_view(mod_rh_materialDisplay.RHMaterialDisplayStoreAccessKey),
-                    methods=('GET', 'POST'))
+# Inactive: /materialDisplay.py (mod_rh_materialDisplay.RHMaterialDisplay)
+# Inactive: /materialDisplay.py/accessKey (mod_rh_materialDisplay.RHMaterialDisplayStoreAccessKey)
 
 
 # Routes for myconference.py

@@ -11699,6 +11699,18 @@ class LocalFile(Resource):
         localfile.setFileName(self.getFileName())
         return localfile
 
+    def getLocator(self):
+        locator = Resource.getLocator(self)
+        if self.fileName == 'minutes.txt' and isinstance(self._owner, Minutes):
+            # Hack to get a html extension when viewing minutes
+            locator['fileExt'] = 'html'
+        else:
+            try:
+                locator['fileExt'] = self.fileType.lower() or os.path.splitext(self.fileName)[1].lower().lstrip('.')
+            except Exception:
+                locator['fileExt'] = 'bin'  # no extension => use a dummy
+        return locator
+
     def setFileName( self, newFileName, checkArchive=True ):
         """While the file is not archived sets the file name of the current
             object to the one specified (if a full path is specified the

@@ -1686,11 +1686,11 @@ class UHMaterialModification(URLHandler):
 
 
 class UHMaterialEnterAccessKey(URLHandler):
-    _endpoint = 'legacy.materialDisplay-accessKey'
+    _endpoint = 'files.materialDisplay-accessKey'
 
 
 class UHFileEnterAccessKey(URLHandler):
-    _endpoint = 'legacy.getFile-accessKey'
+    _endpoint = 'files.getFile-accessKey'
 
 
 class UHCategoryModification(URLHandler):
@@ -1935,7 +1935,7 @@ class UHSubContribModifMaterials(URLHandler):
 
 
 class UHMaterialDisplay(URLHandler):
-    _endpoint = 'legacy.materialDisplay'
+    _endpoint = 'files.materialDisplay'
 
 
 class UHConferenceProgram(URLHandler):
@@ -1979,15 +1979,15 @@ class UHSubContributionModification(URLHandler):
 
 
 class UHFileAccess(URLHandler):
-    _endpoint = 'legacy.getFile-access'
+    _endpoint = 'files.getFile-access'
 
 
 class UHVideoWmvAccess(URLHandler):
-    _endpoint = 'legacy.getFile-wmv'
+    _endpoint = 'files.getFile-wmv'
 
 
 class UHVideoFlashAccess(URLHandler):
-    _endpoint = 'legacy.getFile-flash'
+    _endpoint = 'files.getFile-flash'
 
 
 class UHErrorReporting(URLHandler):

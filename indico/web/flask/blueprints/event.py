@@ -133,11 +133,11 @@ event.add_url_rule('/<confId>/call-for-abstracts/submit', 'abstractSubmission',
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/submitted', 'abstractSubmission-confirmation',
                    rh_as_view(CFADisplay.RHAbstractSubmissionConfirmation))
 
-# Routes for abstractModify.py
+# abstractModify.py
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/modify', 'abstractModify',
                    rh_as_view(CFADisplay.RHAbstractModify), methods=('GET', 'POST'))
 
-# Routes for abstractDisplay.py
+# abstractDisplay.py
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/', 'abstractDisplay',
                    rh_as_view(CFADisplay.RHAbstractDisplay))
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/file/<resId>', 'abstractDisplay-getAttachedFile',
@@ -145,7 +145,7 @@ event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/file/<resId>', 'ab
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/Abstract.pdf', 'abstractDisplay-pdf',
                    rh_as_view(CFADisplay.RHAbstractDisplayPDF))
 
-# Routes for abstractWithdraw.py
+# abstractWithdraw.py
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/withdraw', 'abstractWithdraw',
                    rh_as_view(CFADisplay.RHAbstractWithdraw), methods=('GET', 'POST'))
 event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/recover', 'abstractWithdraw-recover',
