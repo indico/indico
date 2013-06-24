@@ -23,7 +23,7 @@ from werkzeug.exceptions import NotFound
 from MaKaC.common import DBMgr
 from MaKaC.webinterface.urlHandlers import UHConferenceDisplay
 from MaKaC.webinterface.rh import categoryDisplay, conferenceDisplay, contribDisplay, CFADisplay, authorDisplay, \
-    paperReviewingDisplay, collaboration, evaluationDisplay, registrantsDisplay, registrationFormDisplay
+    paperReviewingDisplay, collaboration, evaluationDisplay, registrantsDisplay, registrationFormDisplay, sessionDisplay
 from indico.web.flask.util import rh_as_view
 
 
@@ -175,6 +175,26 @@ event.add_url_rule('/<confId>/contribution/<contribId>.xml', 'contributionDispla
                    rh_as_view(contribDisplay.RHContributionToXML))
 event.add_url_rule('/<confId>/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
                    rh_as_view(contribDisplay.RHContributionToPDF))
+
+# contributionDisplay.py (within a session)
+event.add_url_rule('/<confId>/session/<sessionId>/contribution/<contribId>', 'contributionDisplay',
+                   rh_as_view(contribDisplay.RHContributionDisplay))
+event.add_url_rule('/<confId>/session/<sessionId>/contribution/<contribId>.ics', 'contributionDisplay-ical',
+                   rh_as_view(contribDisplay.RHContributionToiCal))
+event.add_url_rule('/<confId>/session/<sessionId>/contribution/<contribId>.marc.xml', 'contributionDisplay-marcxml',
+                   rh_as_view(contribDisplay.RHContributionToMarcXML))
+event.add_url_rule('/<confId>/session/<sessionId>/contribution/<contribId>.xml', 'contributionDisplay-xml',
+                   rh_as_view(contribDisplay.RHContributionToXML))
+event.add_url_rule('/<confId>/session/<sessionId>/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
+                   rh_as_view(contribDisplay.RHContributionToPDF))
+
+# sessionDisplay.py
+event.add_url_rule('/<confId>/session/<sessionId>/', 'sessionDisplay', rh_as_view(sessionDisplay.RHSessionDisplay))
+event.add_url_rule('/<confId>/session/<sessionId>/session.ics', 'sessionDisplay-ical',
+                   rh_as_view(sessionDisplay.RHSessionToiCal))
+event.add_url_rule('/<confId>/session/<showSessions>/timetable.pdf', 'conferenceTimeTable-pdf',
+                   rh_as_view(conferenceDisplay.RHTimeTablePDF))
+
 
 # confAuthorIndex.py
 event.add_url_rule('/<confId>/authors', 'confAuthorIndex', rh_as_view(conferenceDisplay.RHAuthorIndex))

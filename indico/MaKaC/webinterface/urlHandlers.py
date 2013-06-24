@@ -1959,11 +1959,11 @@ class UHConferenceCFA(URLHandler):
 
 
 class UHSessionDisplay(URLHandler):
-    _endpoint = 'legacy.sessionDisplay'
+    _endpoint = 'event.sessionDisplay'
 
 
 class UHSessionToiCal(URLHandler):
-    _endpoint = 'legacy.sessionDisplay-ical'
+    _endpoint = 'event.sessionDisplay-ical'
 
 
 class UHContributionDisplay(URLHandler):

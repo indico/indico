@@ -30,6 +30,8 @@ files.add_url_rule('/event/<confId>/material/<materialId>/', 'materialDisplay',
                    rh_as_view(materialDisplay.RHMaterialDisplay))
 files.add_url_rule('/event/<confId>/contribution/<contribId>/material/<materialId>/', 'materialDisplay',
                    rh_as_view(materialDisplay.RHMaterialDisplay))
+files.add_url_rule('/event/<confId>/session/<sessionId>/contribution/<contribId>/material/<materialId>/',
+                   'materialDisplay', rh_as_view(materialDisplay.RHMaterialDisplay))
 files.add_url_rule('/event/<confId>/material/<materialId>/accesskey', 'materialDisplay-accessKey',
                    rh_as_view(materialDisplay.RHMaterialDisplayStoreAccessKey), methods=('POST',))
 
@@ -38,6 +40,9 @@ files.add_url_rule('/category/<categId>/material/<materialId>/', 'materialDispla
                    rh_as_view(materialDisplay.RHMaterialDisplay))
 
 # File access (event)
+files.add_url_rule(
+    '/event/<confId>/session/<sessionId>/contribution/<contribId>/material/<materialId>/<resId>.<fileExt>',
+    'getFile-access', rh_as_view(fileAccess.RHFileAccess))
 files.add_url_rule('/event/<confId>/contribution/<contribId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',
                    rh_as_view(fileAccess.RHFileAccess))
 files.add_url_rule('/event/<confId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',

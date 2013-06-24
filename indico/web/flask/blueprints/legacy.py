@@ -51,7 +51,6 @@ import MaKaC.webinterface.rh.roomBooking as mod_rh_roomBooking
 import MaKaC.webinterface.rh.roomBookingPluginAdmin as mod_rh_roomBookingPluginAdmin
 import MaKaC.webinterface.rh.roomMappers as mod_rh_roomMappers
 import MaKaC.webinterface.rh.services as mod_rh_services
-import MaKaC.webinterface.rh.sessionDisplay as mod_rh_sessionDisplay
 import MaKaC.webinterface.rh.sessionModif as mod_rh_sessionModif
 import MaKaC.webinterface.rh.subContribDisplay as mod_rh_subContribDisplay
 import MaKaC.webinterface.rh.subContribMod as mod_rh_subContribMod
@@ -2867,15 +2866,8 @@ legacy.add_url_rule('/roomMapper.py/performModify',
 
 
 # Routes for sessionDisplay.py
-legacy.add_url_rule('/sessionDisplay.py',
-                    'sessionDisplay',
-                    rh_as_view(mod_rh_sessionDisplay.RHSessionDisplay),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionDisplay.py/ical',
-                    'sessionDisplay-ical',
-                    rh_as_view(mod_rh_sessionDisplay.RHSessionToiCal),
-                    methods=('GET', 'POST'))
+# Inactive: /sessionDisplay.py (mod_rh_sessionDisplay.RHSessionDisplay)
+# Inactive: /sessionDisplay.py/ical (mod_rh_sessionDisplay.RHSessionToiCal)
 
 
 # Routes for sessionModifAC.py
