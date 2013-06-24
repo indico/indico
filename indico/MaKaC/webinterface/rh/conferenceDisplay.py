@@ -157,7 +157,7 @@ class RHConfSendActivation( conferenceBase.RHConferenceBase ):
 
     def _process( self ):
         av = user.AvatarHolder().getById(self._userId)
-        sm = mail.sendConfirmationRequest(av)
+        sm = mail.sendConfirmationRequest(av, self._conf)
         sm.send()
         self._redirect( urlHandlers.UHConfSignIn.getURL( self._conf ) )
 
@@ -251,7 +251,7 @@ class RHConfUserCreation( conferenceBase.RHConferenceBase ):
                     if minfo.getModerateAccountCreation():
                         mail.sendAccountCreationModeration(a).send()
                     else:
-                        mail.sendConfirmationRequest(a).send()
+                        mail.sendConfirmationRequest(a, self._conf).send()
                         if minfo.getNotifyAccountCreation():
                             mail.sendAccountCreationNotification(a).send()
             else:
@@ -341,7 +341,7 @@ class RHConfSendLogin( conferenceBase.RHConferenceBase ):
             av = user.AvatarHolder().getById(self._userId)
         elif self._email != "":
             try:
-                av = user.AvatarHolder().match({"email":self._email})[0]
+                av = user.AvatarHolder().match({"email": self._email}, exact=1)[0]
             except IndexError:
                 pass
         if av:

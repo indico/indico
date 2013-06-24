@@ -1361,7 +1361,7 @@ class UHUserMerge(URLHandler):
 
 
 class UHConfSignIn(SecureURLHandler):
-    _endpoint = 'legacy.confLogin'
+    _endpoint = 'event.confLogin'
 
     @classmethod
     def getURL(cls, conf, returnURL=''):
@@ -1378,7 +1378,7 @@ class UHConfSignIn(SecureURLHandler):
 
 
 class UHConfUserCreation(URLHandler):
-    _endpoint = 'legacy.confUser'
+    _endpoint = 'event.confUser'
 
     @classmethod
     def getURL(cls, conf, returnURL=''):
@@ -1407,31 +1407,31 @@ class UHConfUser(URLHandler):
 
 
 class UHConfDisabledAccount(UHConfUser):
-    _endpoint = 'legacy.confLogin-disabledAccount'
+    _endpoint = 'event.confLogin-disabledAccount'
 
 
 class UHConfUnactivatedAccount(UHConfUser):
-    _endpoint = 'legacy.confLogin-unactivatedAccount'
+    _endpoint = 'event.confLogin-unactivatedAccount'
 
 
 class UHConfUserCreated(UHConfUser):
-    _endpoint = 'legacy.confUser-created'
+    _endpoint = 'event.confUser-created'
 
 
 class UHConfSendLogin(UHConfUser):
-    _endpoint = 'legacy.confLogin-sendLogin'
+    _endpoint = 'event.confLogin-sendLogin'
 
 
 class UHConfSendActivation(UHConfUser):
-    _endpoint = 'legacy.confLogin-sendActivation'
+    _endpoint = 'event.confLogin-sendActivation'
 
 
 class UHConfUserExistWithIdentity(UHConfUser):
-    _endpoint = 'legacy.confUser-userExists'
+    _endpoint = 'event.confUser-userExists'
 
 
 class UHConfActiveAccount(UHConfUser):
-    _endpoint = 'legacy.confLogin-active'
+    _endpoint = 'event.confLogin-active'
 
 
 class UHConfEnterAccessKey(UHConfUser):

@@ -277,8 +277,28 @@ event.add_url_rule('/<confId>/registration/signin', 'confRegistrationFormDisplay
 # conferenceOtherViews.py
 event.add_url_rule('/<confId>/other-view', 'conferenceOtherViews', rh_as_view(conferenceDisplay.RHConferenceOtherViews))
 
-
 # EMail.py
 event.add_url_rule('/<confId>/email', 'EMail', rh_as_view(conferenceDisplay.RHConferenceEmail), methods=('GET', 'POST'))
 event.add_url_rule('/<confId>/email/send', 'EMail-send', rh_as_view(conferenceDisplay.RHConferenceSendEmail),
                    methods=('POST',))
+
+# confLogin.py
+event.add_url_rule('/<confId>/user/login', 'confLogin', rh_as_view(conferenceDisplay.RHConfSignIn),
+                   methods=('GET', 'POST'))
+event.add_url_rule('/<confId>/user/login/disabled', 'confLogin-disabledAccount',
+                   rh_as_view(conferenceDisplay.RHConfDisabledAccount), methods=('GET', 'POST'))
+event.add_url_rule('/<confId>/user/login/not-activated', 'confLogin-unactivatedAccount',
+                   rh_as_view(conferenceDisplay.RHConfUnactivatedAccount))
+event.add_url_rule('/<confId>/user/send-password', 'confLogin-sendLogin', rh_as_view(conferenceDisplay.RHConfSendLogin),
+                   methods=('POST',))
+event.add_url_rule('/<confId>/user/register/activate', 'confLogin-active', rh_as_view(conferenceDisplay.RHConfActivate))
+event.add_url_rule('/<confId>/user/register/send-activation', 'confLogin-sendActivation',
+                   rh_as_view(conferenceDisplay.RHConfSendActivation), methods=('GET', 'POST'))
+
+# confUser.py
+event.add_url_rule('/<confId>/user/register', 'confUser', rh_as_view(conferenceDisplay.RHConfUserCreation),
+                   methods=('GET', 'POST'))
+event.add_url_rule('/<confId>/user/register/success', 'confUser-created',
+                   rh_as_view(conferenceDisplay.RHConfUserCreated))
+event.add_url_rule('/<confId>/user/register/exists', 'confUser-userExists',
+                   rh_as_view(conferenceDisplay.RHConfUserExistWithIdentity), methods=('GET', 'POST'))

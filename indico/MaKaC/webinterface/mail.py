@@ -156,10 +156,12 @@ Indico project <http://indico-software.org/>
 
 class sendConfirmationRequest:
 
-    def __init__( self, user ):
+    def __init__(self, user, conf=None):
         self._user = user
+        self._conf = conf
 
     def send( self ):
+        url = urlHandlers.UHConfActiveAccount.getURL(self._conf) if self._conf else urlHandlers.UHActiveAccount.getURL()
         text =  _("""Welcome to Indico,
 You have created a new account on the Indico conference management system.
 
@@ -170,7 +172,7 @@ In order to activate your new account and being able to be authenticated by the 
 Once you've done it, your account will be fully operational so you can log in and start using the system normally.
 
 Thank you for using our system.
-                """)%(urlHandlers.UHActiveAccount.getURL(), \
+                """)%(url,
                         self._user.getId(), \
                         self._user.getKey())
         maildata = {

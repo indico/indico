@@ -817,35 +817,12 @@ legacy.add_url_rule('/confListContribToJudge.py/asReviewer',
 
 
 # Routes for confLogin.py
-legacy.add_url_rule('/confLogin.py',
-                    'confLogin',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfSignIn),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confLogin.py/active',
-                    'confLogin-active',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfActivate),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confLogin.py/disabledAccount',
-                    'confLogin-disabledAccount',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfDisabledAccount),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confLogin.py/sendActivation',
-                    'confLogin-sendActivation',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfSendActivation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confLogin.py/sendLogin',
-                    'confLogin-sendLogin',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfSendLogin),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confLogin.py/unactivatedAccount',
-                    'confLogin-unactivatedAccount',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfUnactivatedAccount),
-                    methods=('GET', 'POST'))
+# Inactive: /confLogin.py (mod_rh_conferenceDisplay.RHConfSignIn)
+# Inactive: /confLogin.py/active (mod_rh_conferenceDisplay.RHConfActivate)
+# Inactive: /confLogin.py/disabledAccount (mod_rh_conferenceDisplay.RHConfDisabledAccount)
+# Inactive: /confLogin.py/sendActivation (mod_rh_conferenceDisplay.RHConfSendActivation)
+# Inactive: /confLogin.py/sendLogin (mod_rh_conferenceDisplay.RHConfSendLogin)
+# Inactive: /confLogin.py/unactivatedAccount (mod_rh_conferenceDisplay.RHConfUnactivatedAccount)
 
 
 # Routes for confModBOA.py
@@ -2057,20 +2034,9 @@ legacy.add_url_rule('/confModifUserCompetences.py/modifyCompetences',
 
 
 # Routes for confUser.py
-legacy.add_url_rule('/confUser.py',
-                    'confUser',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfUserCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confUser.py/created',
-                    'confUser-created',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfUserCreated),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confUser.py/userExists',
-                    'confUser-userExists',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfUserExistWithIdentity),
-                    methods=('GET', 'POST'))
+# Inactive: /confUser.py (mod_rh_conferenceDisplay.RHConfUserCreation)
+# Inactive: /confUser.py/created (mod_rh_conferenceDisplay.RHConfUserCreated)
+# Inactive: /confUser.py/userExists (mod_rh_conferenceDisplay.RHConfUserExistWithIdentity)
 
 
 # Routes for conferenceCFA.py
