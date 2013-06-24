@@ -127,7 +127,7 @@
                 ${_('Visitors Geography')}
             </div>
             <div class="statsWidgetContent">
-                <img id="graphGeography" src="images/loading.gif"
+                <img id="graphGeography" src="${Config.getInstance().getBaseURL()}/images/loading.gif"
                      alt="${_('Visitor Origins.')}" />
             </div>
         </div>
@@ -170,7 +170,7 @@
                 ${_('User Systems')}
             </div>
             <div class="statsWidgetContent" style="text-align:center;">
-                <img id="graphDevices" src="images/loading.gif"
+                <img id="graphDevices" src="${Config.getInstance().getBaseURL()}/images/loading.gif"
                      alt="${_('Visitor Systems.')}" />
             </div>
         </div>

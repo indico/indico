@@ -1,7 +1,7 @@
 <%page args="video"/>
 <span class="videoServiceWrapperInline">
     <span class="videoServiceType">
-        <img src="images/video_${video.getType()}.png" border="0" alt="locked" style="margin-left: 3px;"/>
+        <img src="${Config.getInstance().getBaseURL()}/images/video_${video.getType()}.png" border="0" alt="locked" style="margin-left: 3px;"/>
     </span>
     <span class="videoServiceLinks">
         <% launchInfo = video._getLaunchDisplayInfo() %>

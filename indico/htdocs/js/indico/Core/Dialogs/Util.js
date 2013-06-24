@@ -39,7 +39,7 @@ IndicoUI.Dialogs.Util = {
     ttStatusInfo: function(text) {
         var stext = $('<div class="text"></div>').text(text ? $T(text) : null);
         var image = $('<img/>', {
-            src: "images/loading.gif",
+            src: Indico.Urls.Base + "/images/loading.gif",
             alt: $T('Loading...')
         });
 

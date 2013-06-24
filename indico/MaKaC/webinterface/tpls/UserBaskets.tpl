@@ -22,7 +22,7 @@
                             % for entry in favoriteCategs:
                                 <li data-categ-id="${entry['id']}" class="favoriteCateg">
                                     <span class="toggle" style="float: right; clear: both; padding-right: 10px;">
-                                        <img src="images/remove.png" alt="del" style="vertical-align: middle;" />
+                                        <img src="${Config.getInstance().getBaseURL()}/images/remove.png" alt="del" style="vertical-align: middle;" />
                                     </span>
                                     <span>${entry['title']}</span>
                                 </li>

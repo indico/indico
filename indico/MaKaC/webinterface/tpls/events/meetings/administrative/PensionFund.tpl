@@ -10,7 +10,7 @@
     <table class="eventHeader">
         <tr>
             <td>
-                <img src="./images/CERNLogo.jpg" />
+                <img src="${Config.getInstance().getBaseURL()}/images/CERNLogo.jpg" />
             </td>
             <td>
                 <div class="eventHeader">
@@ -20,7 +20,7 @@
                 </div>
             </td>
             <td>
-                <img src="./images/eso-logo.gif" />
+                <img src="${Config.getInstance().getBaseURL()}/images/eso-logo.gif" />
             </td>
         </tr>
     </table>

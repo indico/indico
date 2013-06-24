@@ -5,7 +5,7 @@
         ${material.type}
         ${material.title}
         % if material.isItselfProtected():
-            <img src="images/protected.png" border="0" alt="locked" style="margin-left: 3px;"/>
+            <img src="${Config.getInstance().getBaseURL()}/images/protected.png" border="0" alt="locked" style="margin-left: 3px;"/>
         % endif
     </a>
 
@@ -19,7 +19,7 @@
         % elif len(filesWithType) > 1:
             <% materialMenuName = 'materialMenu%s%s%s%s%s' % (material.getId(), typeName, sessionId, contribId, subContId) %>
             <a class="material dropDownMaterialMenu" id="${materialMenuName}" title="${typeInfo['imgAlt']}">
-                <img class="resourceIcon" src="${typeInfo['imgURL']}" border="0" alt="${typeInfo['imgAlt']}"/><img class="arrow" src="images/menu_arrow_black.png" border='0' alt="down arrow"/>
+                <img class="resourceIcon" src="${typeInfo['imgURL']}" border="0" alt="${typeInfo['imgAlt']}"/><img class="arrow" src="${Config.getInstance().getBaseURL()}/images/menu_arrow_black.png" border='0' alt="down arrow"/>
             </a>
             <script type="text/javascript">
                 $E('${materialMenuName}').observeClick(function() {
@@ -37,7 +37,7 @@
         % for f in filesWithType:
             % if f['pdfConversionStatus'] == 'converting' and material.canUserModify(self_._rh._getUser()):
                 <a class="material">
-                <img class="converting" id="${f['id']}" src="images/pdf_small_faded.png" alt="${typeInfo['imgAlt']}" border="0"/></a>
+                <img class="converting" id="${f['id']}" src="${Config.getInstance().getBaseURL()}/images/pdf_small_faded.png" alt="${typeInfo['imgAlt']}" border="0"/></a>
                 <script type="text/javascript">
                     var mch = new MaterialConversionHelper();
                     mch.setQtip(${f});
