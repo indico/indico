@@ -64,15 +64,8 @@ legacy = Blueprint('legacy', __name__)
 
 
 # Routes for EMail.py
-legacy.add_url_rule('/EMail.py',
-                    'EMail',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceEmail),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/EMail.py/send',
-                    'EMail-send',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConferenceSendEmail),
-                    methods=('GET', 'POST'))
+# Inactive: /EMail.py (mod_rh_conferenceDisplay.RHConferenceEmail)
+# Inactive: /EMail.py/send (mod_rh_conferenceDisplay.RHConferenceSendEmail)
 
 legacy.add_url_rule('/EMail.py/sendcontribparticipants',
                     'EMail-sendcontribparticipants',

@@ -276,3 +276,9 @@ event.add_url_rule('/<confId>/registration/signin', 'confRegistrationFormDisplay
 
 # conferenceOtherViews.py
 event.add_url_rule('/<confId>/other-view', 'conferenceOtherViews', rh_as_view(conferenceDisplay.RHConferenceOtherViews))
+
+
+# EMail.py
+event.add_url_rule('/<confId>/email', 'EMail', rh_as_view(conferenceDisplay.RHConferenceEmail), methods=('GET', 'POST'))
+event.add_url_rule('/<confId>/email/send', 'EMail-send', rh_as_view(conferenceDisplay.RHConferenceSendEmail),
+                   methods=('POST',))

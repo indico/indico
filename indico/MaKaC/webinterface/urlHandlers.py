@@ -293,11 +293,11 @@ class UHConferenceOverview(URLHandler):
 
 
 class UHConferenceEmail(URLHandler):
-    _endpoint = 'legacy.EMail'
+    _endpoint = 'event.EMail'
 
 
 class UHConferenceSendEmail(URLHandler):
-    _endpoint = 'legacy.EMail-send'
+    _endpoint = 'event.EMail-send'
 
 
 class UHRegistrantsSendEmail(URLHandler):
