@@ -22,7 +22,7 @@
       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("System title")}</span></td>
       <td bgcolor="white" width="100%" valign="top" class="blacktext">${title}</td>
       <td rowspan="4" valign="top">
-        <form action="${ GeneralInfoModifURL }" method="POST">
+        <form action="${ GeneralInfoModifURL }" method="GET">
         <input type="submit" class="btn" value="${ _("modify")}">
         </form>
       </td>

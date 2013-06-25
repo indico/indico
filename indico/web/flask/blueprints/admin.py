@@ -34,6 +34,9 @@ admin.add_url_rule('/settings/general/debug', 'adminList-switchDebugActive',
                    rh_as_view(admins.RHAdminSwitchDebugActive))
 admin.add_url_rule('/settings/general/news', 'adminList-switchNewsActive',
                    rh_as_view(admins.RHAdminSwitchNewsActive))
+admin.add_url_rule('/settings/general/', 'generalInfoModification', rh_as_view(admins.RHGeneralInfoModification))
+admin.add_url_rule('/settings/general/', 'generalInfoModification-update',
+                   rh_as_view(admins.RHGeneralInfoPerformModification), methods=('POST',))
 
 # System settings
 admin.add_url_rule('/settings/system', 'adminSystem', rh_as_view(admins.RHSystem))
@@ -87,6 +90,7 @@ admin.add_url_rule('/settings/users/moderate-creation', 'userManagement-switchMo
 admin.add_url_rule('/settings/users/notify-creation', 'userManagement-switchNotifyAccountCreation',
                    rh_as_view(users.RHUserManagementSwitchNotifyAccountCreation))
 admin.add_url_rule('/users/', 'userList', rh_as_view(users.RHUsers), methods=('GET', 'POST'))
+admin.add_url_rule('/users/merge', 'userMerge', rh_as_view(admins.RHUserMerge), methods=('GET', 'POST'))
 
 # Groups
 admin.add_url_rule('/users/groups/', 'groupList', rh_as_view(groups.RHGroups), methods=('GET', 'POST'))

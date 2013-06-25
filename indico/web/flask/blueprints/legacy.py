@@ -22,7 +22,6 @@ from indico.web.flask.util import rh_as_view
 
 import MaKaC.webinterface.rh.abstractModif as mod_rh_abstractModif
 import MaKaC.webinterface.rh.abstractReviewing as mod_rh_abstractReviewing
-import MaKaC.webinterface.rh.admins as mod_rh_admins
 import MaKaC.webinterface.rh.collaboration as mod_rh_collaboration
 import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
@@ -2226,15 +2225,8 @@ legacy.add_url_rule('/contributionTools.py/delete',
 
 
 # Routes for generalInfoModification.py
-legacy.add_url_rule('/generalInfoModification.py',
-                    'generalInfoModification',
-                    rh_as_view(mod_rh_admins.RHGeneralInfoModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/generalInfoModification.py/update',
-                    'generalInfoModification-update',
-                    rh_as_view(mod_rh_admins.RHGeneralInfoPerformModification),
-                    methods=('GET', 'POST'))
+# Inactive: /generalInfoModification.py (mod_rh_admins.RHGeneralInfoModification)
+# Inactive: /generalInfoModification.py/update (mod_rh_admins.RHGeneralInfoPerformModification)
 
 
 # Routes for getConvertedFile.py
@@ -2856,10 +2848,7 @@ legacy.add_url_rule('/trackModification.py/performModify',
 
 
 # Routes for userMerge.py
-legacy.add_url_rule('/userMerge.py',
-                    'userMerge',
-                    rh_as_view(mod_rh_admins.RHUserMerge),
-                    methods=('GET', 'POST'))
+# Inactive: /userMerge.py (mod_rh_admins.RHUserMerge)
 
 
 # Routes for userPreferences.py

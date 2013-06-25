@@ -1357,7 +1357,7 @@ class UHUserCreation(URLHandler):
 
 
 class UHUserMerge(URLHandler):
-    _endpoint = 'legacy.userMerge'
+    _endpoint = 'admin.userMerge'
 
 
 class UHConfSignIn(SecureURLHandler):
@@ -1811,11 +1811,11 @@ class UHCategoryOverview(URLHandler):
 
 
 class UHGeneralInfoModification(URLHandler):
-    _endpoint = 'legacy.generalInfoModification'
+    _endpoint = 'admin.generalInfoModification'
 
 
 class UHGeneralInfoPerformModification(URLHandler):
-    _endpoint = 'legacy.generalInfoModification-update'
+    _endpoint = 'admin.generalInfoModification-update'
 
 
 class UHContributionDelete(URLHandler):
