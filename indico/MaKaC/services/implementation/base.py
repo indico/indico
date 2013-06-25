@@ -91,66 +91,57 @@ class ParameterManager(object):
         """
 
         # "global" policy applies if allowEmpty not set
-        if (allowEmpty == None):
+        if (allowEmpty is None):
             allowEmpty = self._allowEmpty
 
         value = self._paramList.get(paramName)
-
-        if (not allowEmpty) and (value == None):
-            raise EmptyParameterException(paramName)
-
-        if pType == str:
-            if value != None:
-                value = str(value)
-            else:
+        if value is None:
+            if allowEmpty:
                 value = defaultValue
-
-            if (value == '' or value == None) and not allowEmpty:
+            else:
                 raise EmptyParameterException(paramName)
-        elif pType == datetime:
-            # format will possibly be accomodated to different standards,
-            # in the future
 
-            try:
-                # both strings and objects are accepted
-                if type(value) == str:
-                    naiveDate = datetime.strptime(value, '%Y/%m/%d %H:%M')
-                elif value:
-                    naiveDate = datetime.strptime(value['date']+' '+value['time'][:5], '%Y/%m/%d %H:%M')
-                elif not allowEmpty:
-                    raise EmptyParameterException(paramName)
-                else:
-                    naiveDate = None
-            except ValueError:
-                raise DateTimeParameterException(paramName, value)
-
-            if self._timezone and naiveDate:
-                value = timezone(self._timezone).localize(naiveDate).astimezone(timezone('utc'))
-            else:
-                value = naiveDate
-        elif pType == date:
-            # format will possibly be accomodated to different standards,
-            # in the future
-            value = datetime.strptime(value,'%Y/%m/%d').date()
-        elif pType == int:
-            if (value is None or value == '') and allowEmpty:
-                value = defaultValue
-            else:
+        if value is not None:
+            if pType == str:
+                value = str(value)
+            elif pType == int:
                 value = int(value)
-        elif pType == float:
-            if value == None and allowEmpty:
-                value = None
-            else:
+            elif pType == float:
                 value = float(value)
-        elif pType == dict:
-            if not (type(value) == dict or (allowEmpty and value == None)):
-                raise ExpectedParameterException(paramName, dict, type(value))
-        elif pType == list:
-            if not (type(value) == list or (allowEmpty and value == None)):
-                raise ExpectedParameterException(paramName, list, type(value))
-        elif pType == bool:
-            if not (type(value) == bool or (allowEmpty and value == None)):
-                raise ExpectedParameterException(paramName, bool, type(value))
+            elif pType == bool:
+                if not type(value) == bool:
+                    raise ExpectedParameterException(paramName, bool, type(value))
+            elif pType == dict:
+                if not type(value) == dict:
+                    raise ExpectedParameterException(paramName, dict, type(value))
+            elif pType == list:
+                if not type(value) == list:
+                    raise ExpectedParameterException(paramName, list, type(value))
+            elif pType == date:
+                # format will possibly be accomodated to different standards,
+                # in the future
+                value = datetime.strptime(value, '%Y/%m/%d').date()
+            elif pType == datetime:
+                # format will possibly be accomodated to different standards,
+                # in the future
+                try:
+                    # both strings and objects are accepted
+                    if type(value) == str:
+                        naiveDate = datetime.strptime(value, '%Y/%m/%d %H:%M')
+                    elif value:
+                        naiveDate = datetime.strptime(value['date']+' '+value['time'][:5], '%Y/%m/%d %H:%M')
+                    else:
+                        naiveDate = None
+                except ValueError:
+                    raise DateTimeParameterException(paramName, value)
+
+                if self._timezone and naiveDate:
+                    value = timezone(self._timezone).localize(naiveDate).astimezone(timezone('utc'))
+                else:
+                    value = naiveDate
+
+        if (value is None or value == "") and not allowEmpty:
+            EmptyParameterException(paramName)
 
         return value
 
