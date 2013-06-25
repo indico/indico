@@ -17,14 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.pages.admins as adminPages
 import MaKaC.user as user
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.errors as errors
 from MaKaC.errors import MaKaCError
-from MaKaC.webinterface.rh.base import RH, RHProtected
+from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.i18n import _
 
 class RHGroupsProtected(admins.RHAdminBase):
@@ -47,13 +46,6 @@ class RHGroupCreation( RHGroupsProtected ):
 
     def _process( self ):
         p = adminPages.WPGroupCreation( self )
-        return p.display()
-
-class RHLDAPGroupCreation( RHGroupsProtected ):
-    _uh = urlHandlers.UHNewGroup
-
-    def _process( self ):
-        p = adminPages.WPLDAPGroupCreation( self )
         return p.display()
 
 

@@ -44,11 +44,12 @@ from indico.web.flask.blueprints.oauth import oauth
 from indico.web.flask.blueprints.category import category, category_shorturl
 from indico.web.flask.blueprints.event import event, event_shorturl
 from indico.web.flask.blueprints.files import files
+from indico.web.flask.blueprints.admin import admin
 
 
 BLUEPRINTS = (legacy, legacy_scripts, api, category_shorturl, event_shorturl,
-              misc, user, oauth, rooms, category, event, files)
-COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, oauth, rooms, category, event, files))
+              misc, user, oauth, rooms, category, event, files, admin)
+COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, oauth, rooms, category, event, files, admin))
 
 
 def fix_root_path(app):

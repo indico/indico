@@ -28,6 +28,3 @@ def index(req):
 
 def update(req, **params):
     return groups.RHGroupPerformCreation( req ).process( params )
-
-def LDAPGroup(req):
-    return groups.RHLDAPGroupCreation( req ).process( {} )

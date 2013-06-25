@@ -1088,8 +1088,6 @@ class WUserManagement(wcomponents.WTemplated):
             icon = iconDisabled
 
         vars["accountCreationData"] += i18nformat("""<br><a href="%s"><img src="%s" border="0"> _("Moderate Account Creation")</a>""") % (str(url), icon)
-        vars["moderators"] = ""
-        vars["moderatorsURL"] = ""
 
         return vars
 
@@ -1814,13 +1812,6 @@ class WPGroupCreation(WPGroupCommon):
                 "backURL": urlHandlers.UHGroups.getURL() }
         return comp.getHTML( pars )
 
-class WPLDAPGroupCreation(WPGroupCommon):
-
-    def _getTabContent( self, params ):
-        comp = WLDAPGroupModification()
-        pars = {"postURL": urlHandlers.UHLDAPGroupPerformRegistration.getURL() }
-        return comp.getHTML( pars )
-
 
 class WPGroupBase( WPGroupCommon ):
 
@@ -1861,37 +1852,11 @@ class WPGroupModificationBase( WPGroupBase ):
     pass
 
 
-class WLDAPGroupModification(wcomponents.WTemplated):
-
-    def __init__( self, group=None ):
-        self._group = group
-
-    def __setNewGroupVars( self, vars={} ):
-        vars["Wtitle"] = _("Creating a new LDAP group")
-        vars["name"] = ""
-        vars["description"] = ""
-
-    def __setGroupVars( self, group, vars ):
-        vars["Wtitle"] = _("Modifying LDAP group basic data")
-        vars["name"] = group.getName()
-        vars["description"] = group.getDescription()
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        if self._group == None:
-            self.__setNewGroupVars( vars )
-            vars["locator"] = ""
-        else:
-            self.__setGroupVars( self._group, vars )
-            vars["locator"] = self._group.getLocator().getWebForm()
-        return vars
-
-
 class WPGroupModification( WPGroupModificationBase ):
 
     def _getTabContent( self, params ):
         comp = WGroupModification( self._group )
-        params["postURL"] = urlHandlers.UHGroupPerformModification.getURL()
+        params["postURL"] = urlHandlers.UHGroupPerformModification.getURL(self._group)
         params["backURL"] = urlHandlers.UHGroupDetails.getURL( self._group )
         return comp.getHTML( params )
 
@@ -2245,7 +2210,9 @@ class WPDomainModification( WPDomainBase ):
 
     def _getPageContent( self, params ):
         comp = WDomainDataModification( self._domain )
-        pars = {"postURL": urlHandlers.UHDomainPerformModification.getURL() }
+        pars = {
+            'postURL': urlHandlers.UHDomainPerformModification.getURL(self._domain)
+        }
         return comp.getHTML( pars )
 
 

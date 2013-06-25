@@ -28,7 +28,7 @@
         </tr>
         </table>
       </td>
-      <form action="${modifyURL}" method="POST">
+      <form action="${modifyURL}" method="GET">
       <td valign="bottom" align="right">
     <input type="submit" class="btn" value="modify"><br>
       </td>

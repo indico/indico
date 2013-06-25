@@ -23,18 +23,14 @@ from indico.web.flask.util import rh_as_view
 import MaKaC.webinterface.rh.abstractModif as mod_rh_abstractModif
 import MaKaC.webinterface.rh.abstractReviewing as mod_rh_abstractReviewing
 import MaKaC.webinterface.rh.admins as mod_rh_admins
-import MaKaC.webinterface.rh.announcement as mod_rh_announcement
 import MaKaC.webinterface.rh.api as mod_rh_api
 import MaKaC.webinterface.rh.collaboration as mod_rh_collaboration
 import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
 import MaKaC.webinterface.rh.contribMod as mod_rh_contribMod
 import MaKaC.webinterface.rh.contribReviewingModif as mod_rh_contribReviewingModif
-import MaKaC.webinterface.rh.domains as mod_rh_domains
 import MaKaC.webinterface.rh.ePaymentModif as mod_rh_ePaymentModif
 import MaKaC.webinterface.rh.evaluationModif as mod_rh_evaluationModif
-import MaKaC.webinterface.rh.groups as mod_rh_groups
-import MaKaC.webinterface.rh.maintenance as mod_rh_maintenance
 import MaKaC.webinterface.rh.oauth as mod_rh_oauth
 import MaKaC.webinterface.rh.registrantsModif as mod_rh_registrantsModif
 import MaKaC.webinterface.rh.registrationFormModif as mod_rh_registrationFormModif
@@ -50,7 +46,6 @@ import MaKaC.webinterface.rh.services as mod_rh_services
 import MaKaC.webinterface.rh.sessionModif as mod_rh_sessionModif
 import MaKaC.webinterface.rh.subContribDisplay as mod_rh_subContribDisplay
 import MaKaC.webinterface.rh.subContribMod as mod_rh_subContribMod
-import MaKaC.webinterface.rh.taskManager as mod_rh_taskManager
 import MaKaC.webinterface.rh.templates as mod_rh_templates
 import MaKaC.webinterface.rh.trackModif as mod_rh_trackModif
 import MaKaC.webinterface.rh.users as mod_rh_users
@@ -342,15 +337,8 @@ legacy.add_url_rule('/abstractsManagment.py/participantList',
 
 
 # Routes for adminAnnouncement.py
-legacy.add_url_rule('/adminAnnouncement.py',
-                    'adminAnnouncement',
-                    rh_as_view(mod_rh_announcement.RHAnnouncementModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminAnnouncement.py/save',
-                    'adminAnnouncement-save',
-                    rh_as_view(mod_rh_announcement.RHAnnouncementModifSave),
-                    methods=('GET', 'POST'))
+# Inactive: /adminAnnouncement.py (mod_rh_announcement.RHAnnouncementModif)
+# Inactive: /adminAnnouncement.py/save (mod_rh_announcement.RHAnnouncementModifSave)
 
 
 # Routes for adminCollaboration.py
@@ -405,52 +393,18 @@ legacy.add_url_rule('/adminLayout.py/styles',
 
 
 # Routes for adminList.py
-legacy.add_url_rule('/adminList.py',
-                    'adminList',
-                    rh_as_view(mod_rh_admins.RHAdminArea),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminList.py/switchCacheActive',
-                    'adminList-switchCacheActive',
-                    rh_as_view(mod_rh_admins.RHAdminSwitchCacheActive),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminList.py/switchDebugActive',
-                    'adminList-switchDebugActive',
-                    rh_as_view(mod_rh_admins.RHAdminSwitchDebugActive),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminList.py/switchNewsActive',
-                    'adminList-switchNewsActive',
-                    rh_as_view(mod_rh_admins.RHAdminSwitchNewsActive),
-                    methods=('GET', 'POST'))
+# Inactive: /adminList.py (mod_rh_admins.RHAdminArea)
+# Inactive: /adminList.py/switchCacheActive (mod_rh_admins.RHAdminSwitchCacheActive)
+# Inactive: /adminList.py/switchDebugActive (mod_rh_admins.RHAdminSwitchDebugActive)
+# Inactive: /adminList.py/switchNewsActive (mod_rh_admins.RHAdminSwitchNewsActive)
 
 
 # Routes for adminMaintenance.py
-legacy.add_url_rule('/adminMaintenance.py',
-                    'adminMaintenance',
-                    rh_as_view(mod_rh_maintenance.RHMaintenance),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminMaintenance.py/pack',
-                    'adminMaintenance-pack',
-                    rh_as_view(mod_rh_maintenance.RHMaintenancePack),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminMaintenance.py/performPack',
-                    'adminMaintenance-performPack',
-                    rh_as_view(mod_rh_maintenance.RHMaintenancePerformPack),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminMaintenance.py/performTmpCleanup',
-                    'adminMaintenance-performTmpCleanup',
-                    rh_as_view(mod_rh_maintenance.RHMaintenancePerformTmpCleanup),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminMaintenance.py/tmpCleanup',
-                    'adminMaintenance-tmpCleanup',
-                    rh_as_view(mod_rh_maintenance.RHMaintenanceTmpCleanup),
-                    methods=('GET', 'POST'))
+# Inactive: /adminMaintenance.py (mod_rh_maintenance.RHMaintenance)
+# Inactive: /adminMaintenance.py/pack (mod_rh_maintenance.RHMaintenancePack)
+# Inactive: /adminMaintenance.py/performPack (mod_rh_maintenance.RHMaintenancePerformPack)
+# Inactive: /adminMaintenance.py/performTmpCleanup (mod_rh_maintenance.RHMaintenancePerformTmpCleanup)
+# Inactive: /adminMaintenance.py/tmpCleanup (mod_rh_maintenance.RHMaintenanceTmpCleanup)
 
 
 # Routes for adminPlugins.py
@@ -501,10 +455,7 @@ legacy.add_url_rule('/adminPlugins.py/toggleActivePluginType',
 
 
 # Routes for adminProtection.py
-legacy.add_url_rule('/adminProtection.py',
-                    'adminProtection',
-                    rh_as_view(mod_rh_admins.RHAdminProtection),
-                    methods=('GET', 'POST'))
+# Inactive: /adminProtection.py (mod_rh_admins.RHAdminProtection)
 
 
 # Routes for adminServices.py
@@ -655,22 +606,12 @@ legacy.add_url_rule('/adminServices.py/webcastUnArchiveWebcast',
 
 
 # Routes for adminSystem.py
-legacy.add_url_rule('/adminSystem.py',
-                    'adminSystem',
-                    rh_as_view(mod_rh_admins.RHSystem),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminSystem.py/modify',
-                    'adminSystem-modify',
-                    rh_as_view(mod_rh_admins.RHSystemModify),
-                    methods=('GET', 'POST'))
+# Inactive: /adminSystem.py (mod_rh_admins.RHSystem)
+# Inactive: /adminSystem.py/modify (mod_rh_admins.RHSystemModify)
 
 
 # Routes for adminUpcomingEvents.py
-legacy.add_url_rule('/adminUpcomingEvents.py',
-                    'adminUpcomingEvents',
-                    rh_as_view(mod_rh_admins.RHConfigUpcoming),
-                    methods=('GET', 'POST'))
+# Inactive: /adminUpcomingEvents.py (mod_rh_admins.RHConfigUpcoming)
 
 
 # Routes for assignContributions.py
@@ -2461,41 +2402,21 @@ legacy.add_url_rule('/contributionTools.py/delete',
 
 
 # Routes for domainCreation.py
-legacy.add_url_rule('/domainCreation.py',
-                    'domainCreation',
-                    rh_as_view(mod_rh_domains.RHDomainCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/domainCreation.py/create',
-                    'domainCreation-create',
-                    rh_as_view(mod_rh_domains.RHDomainPerformCreation),
-                    methods=('GET', 'POST'))
+# Inactive: /domainCreation.py (mod_rh_domains.RHDomainCreation)
+# Inactive: /domainCreation.py/create (mod_rh_domains.RHDomainPerformCreation)
 
 
 # Routes for domainDataModification.py
-legacy.add_url_rule('/domainDataModification.py',
-                    'domainDataModification',
-                    rh_as_view(mod_rh_domains.RHDomainModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/domainDataModification.py/modify',
-                    'domainDataModification-modify',
-                    rh_as_view(mod_rh_domains.RHDomainPerformModification),
-                    methods=('GET', 'POST'))
+# Inactive: /domainDataModification.py (mod_rh_domains.RHDomainModification)
+# Inactive: /domainDataModification.py/modify (mod_rh_domains.RHDomainPerformModification)
 
 
 # Routes for domainDetails.py
-legacy.add_url_rule('/domainDetails.py',
-                    'domainDetails',
-                    rh_as_view(mod_rh_domains.RHDomainDetails),
-                    methods=('GET', 'POST'))
+# Inactive: /domainDetails.py (mod_rh_domains.RHDomainDetails)
 
 
 # Routes for domainList.py
-legacy.add_url_rule('/domainList.py',
-                    'domainList',
-                    rh_as_view(mod_rh_domains.RHDomains),
-                    methods=('GET', 'POST'))
+# Inactive: /domainList.py (mod_rh_domains.RHDomains)
 
 
 # Routes for errors.py
@@ -2526,46 +2447,21 @@ legacy.add_url_rule('/generalInfoModification.py/update',
 
 
 # Routes for groupDetails.py
-legacy.add_url_rule('/groupDetails.py',
-                    'groupDetails',
-                    rh_as_view(mod_rh_groups.RHGroupDetails),
-                    methods=('GET', 'POST'))
+# Inactive: /groupDetails.py (mod_rh_groups.RHGroupDetails)
 
 
 # Routes for groupList.py
-legacy.add_url_rule('/groupList.py',
-                    'groupList',
-                    rh_as_view(mod_rh_groups.RHGroups),
-                    methods=('GET', 'POST'))
+# Inactive: /groupList.py (mod_rh_groups.RHGroups)
 
 
 # Routes for groupModification.py
-legacy.add_url_rule('/groupModification.py',
-                    'groupModification',
-                    rh_as_view(mod_rh_groups.RHGroupModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/groupModification.py/update',
-                    'groupModification-update',
-                    rh_as_view(mod_rh_groups.RHGroupPerformModification),
-                    methods=('GET', 'POST'))
+# Inactive: /groupModification.py (mod_rh_groups.RHGroupModification)
+# Inactive: /groupModification.py/update (mod_rh_groups.RHGroupPerformModification)
 
 
 # Routes for groupRegistration.py
-legacy.add_url_rule('/groupRegistration.py',
-                    'groupRegistration',
-                    rh_as_view(mod_rh_groups.RHGroupCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/groupRegistration.py/LDAPGroup',
-                    'groupRegistration-LDAPGroup',
-                    rh_as_view(mod_rh_groups.RHLDAPGroupCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/groupRegistration.py/update',
-                    'groupRegistration-update',
-                    rh_as_view(mod_rh_groups.RHGroupPerformCreation),
-                    methods=('GET', 'POST'))
+# Inactive: /groupRegistration.py (mod_rh_groups.RHGroupCreation)
+# Inactive: /groupRegistration.py/update (mod_rh_groups.RHGroupPerformCreation)
 
 
 # Routes for help.py
@@ -2981,10 +2877,7 @@ legacy.add_url_rule('/subContributionTools.py/delete',
 
 
 # Routes for taskManager.py
-legacy.add_url_rule('/taskManager.py',
-                    'taskManager',
-                    rh_as_view(mod_rh_taskManager.RHTaskManager),
-                    methods=('GET', 'POST'))
+# Inactive: /taskManager.py (mod_rh_taskManager.RHTaskManager)
 
 
 # Routes for trackAbstractModif.py
@@ -3133,10 +3026,7 @@ legacy.add_url_rule('/trackModification.py/performModify',
 
 
 # Routes for updateNews.py
-legacy.add_url_rule('/updateNews.py',
-                    'updateNews',
-                    rh_as_view(mod_rh_admins.RHUpdateNews),
-                    methods=('GET', 'POST'))
+# Inactive: /updateNews.py (mod_rh_admins.RHUpdateNews)
 
 
 # Routes for userAPI.py
@@ -3164,32 +3054,14 @@ legacy.add_url_rule('/updateNews.py',
 
 
 # Routes for userList.py
-legacy.add_url_rule('/userList.py',
-                    'userList',
-                    rh_as_view(mod_rh_users.RHUsers),
-                    methods=('GET', 'POST'))
+# Inactive: /userList.py (mod_rh_users.RHUsers)
 
 
 # Routes for userManagement.py
-legacy.add_url_rule('/userManagement.py',
-                    'userManagement',
-                    rh_as_view(mod_rh_users.RHUserManagement),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/userManagement.py/switchAuthorisedAccountCreation',
-                    'userManagement-switchAuthorisedAccountCreation',
-                    rh_as_view(mod_rh_users.RHUserManagementSwitchAuthorisedAccountCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/userManagement.py/switchModerateAccountCreation',
-                    'userManagement-switchModerateAccountCreation',
-                    rh_as_view(mod_rh_users.RHUserManagementSwitchModerateAccountCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/userManagement.py/switchNotifyAccountCreation',
-                    'userManagement-switchNotifyAccountCreation',
-                    rh_as_view(mod_rh_users.RHUserManagementSwitchNotifyAccountCreation),
-                    methods=('GET', 'POST'))
+# Inactive: /userManagement.py (mod_rh_users.RHUserManagement)
+# Inactive: /userManagement.py/switchAuthorisedAccountCreation (mod_rh_users.RHUserManagementSwitchAuthorisedAccountCreation)
+# Inactive: /userManagement.py/switchModerateAccountCreation (mod_rh_users.RHUserManagementSwitchModerateAccountCreation)
+# Inactive: /userManagement.py/switchNotifyAccountCreation (mod_rh_users.RHUserManagementSwitchNotifyAccountCreation)
 
 
 # Routes for userMerge.py

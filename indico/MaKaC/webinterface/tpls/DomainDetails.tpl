@@ -19,7 +19,7 @@
                 </tr>
                 <tr>
                     <td colspan="2" align="center">
-                        <form action="${ modifyURL }" method="POST">
+                        <form action="${ modifyURL }" method="GET">
                             <input type="submit" class="btn" value="${ _("modify")}">
                         </form>
                     </td>

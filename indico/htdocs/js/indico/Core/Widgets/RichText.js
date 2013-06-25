@@ -322,7 +322,7 @@ type("RichTextInlineEditWidget", ["InlineEditWidget"],
                     if (value == "" && self.noValueText) {
                         value = '<em>' + self.noValueText + '</em>';
                     }
-                    doc.body.innerHTML = '<link href="css/Default.css" type="text/css" rel="stylesheet">' + (Util.Validation.isHtml(value)?value:escapeHTML(value));
+                    doc.body.innerHTML = '<link href="' + Indico.Urls.Base + '/css/Default.css" type="text/css" rel="stylesheet">' + (Util.Validation.isHtml(value)?value:escapeHTML(value));
                 };
 
                 if (Browser.IE) {

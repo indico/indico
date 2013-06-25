@@ -1322,23 +1322,23 @@ class UHTickerTapeAction(URLHandler):
 
 
 class UHUserManagement(URLHandler):
-    _endpoint = 'legacy.userManagement'
+    _endpoint = 'admin.userManagement'
 
 
 class UHUserManagementSwitchAuthorisedAccountCreation(URLHandler):
-    _endpoint = 'legacy.userManagement-switchAuthorisedAccountCreation'
+    _endpoint = 'admin.userManagement-switchAuthorisedAccountCreation'
 
 
 class UHUserManagementSwitchNotifyAccountCreation(URLHandler):
-    _endpoint = 'legacy.userManagement-switchNotifyAccountCreation'
+    _endpoint = 'admin.userManagement-switchNotifyAccountCreation'
 
 
 class UHUserManagementSwitchModerateAccountCreation(URLHandler):
-    _endpoint = 'legacy.userManagement-switchModerateAccountCreation'
+    _endpoint = 'admin.userManagement-switchModerateAccountCreation'
 
 
 class UHUsers(URLHandler):
-    _endpoint = 'legacy.userList'
+    _endpoint = 'admin.userList'
 
 
 class UHUserCreation(URLHandler):
@@ -1519,35 +1519,27 @@ class UHUserIdentityChangePassword(URLHandler):
 
 
 class UHGroups(URLHandler):
-    _endpoint = 'legacy.groupList'
+    _endpoint = 'admin.groupList'
 
 
 class UHNewGroup(URLHandler):
-    _endpoint = 'legacy.groupRegistration'
-
-
-class UHNewLDAPGroup(URLHandler):
-    _endpoint = 'legacy.groupRegistration-LDAPGroup'
+    _endpoint = 'admin.groupRegistration'
 
 
 class UHGroupPerformRegistration(URLHandler):
-    _endpoint = 'legacy.groupRegistration-update'
-
-
-class UHLDAPGroupPerformRegistration(URLHandler):
-    _endpoint = 'legacy.groupRegistration-updateLDAPGroup'
+    _endpoint = 'admin.groupRegistration-update'
 
 
 class UHGroupDetails(URLHandler):
-    _endpoint = 'legacy.groupDetails'
+    _endpoint = 'admin.groupDetails'
 
 
 class UHGroupModification(URLHandler):
-    _endpoint = 'legacy.groupModification'
+    _endpoint = 'admin.groupModification'
 
 
 class UHGroupPerformModification(URLHandler):
-    _endpoint = 'legacy.groupModification-update'
+    _endpoint = 'admin.groupModification-update'
 
 
 class UHPrincipalDetails:
@@ -1562,27 +1554,27 @@ class UHPrincipalDetails:
 
 
 class UHDomains(URLHandler):
-    _endpoint = 'legacy.domainList'
+    _endpoint = 'admin.domainList'
 
 
 class UHNewDomain(URLHandler):
-    _endpoint = 'legacy.domainCreation'
+    _endpoint = 'admin.domainCreation'
 
 
 class UHDomainPerformCreation(URLHandler):
-    _endpoint = 'legacy.domainCreation-create'
+    _endpoint = 'admin.domainCreation-create'
 
 
 class UHDomainDetails(URLHandler):
-    _endpoint = 'legacy.domainDetails'
+    _endpoint = 'admin.domainDetails'
 
 
 class UHDomainModification(URLHandler):
-    _endpoint = 'legacy.domainDataModification'
+    _endpoint = 'admin.domainDataModification'
 
 
 class UHDomainPerformModification(URLHandler):
-    _endpoint = 'legacy.domainDataModification-modify'
+    _endpoint = 'admin.domainDataModification-modify'
 
 
 class UHRoomMappers(URLHandler):
@@ -1610,19 +1602,19 @@ class UHRoomMapperPerformModification(URLHandler):
 
 
 class UHAdminArea(URLHandler):
-    _endpoint = 'legacy.adminList'
+    _endpoint = 'admin.adminList'
 
 
 class UHAdminSwitchCacheActive(URLHandler):
-    _endpoint = 'legacy.adminList-switchCacheActive'
+    _endpoint = 'admin.adminList-switchCacheActive'
 
 
 class UHAdminSwitchDebugActive(URLHandler):
-    _endpoint = 'legacy.adminList-switchDebugActive'
+    _endpoint = 'admin.adminList-switchDebugActive'
 
 
 class UHAdminSwitchNewsActive(URLHandler):
-    _endpoint = 'legacy.adminList-switchNewsActive'
+    _endpoint = 'admin.adminList-switchNewsActive'
 
 
 class UHAdminsStyles(URLHandler):
@@ -1642,15 +1634,15 @@ class UHAdminsDeleteStyle(URLHandler):
 
 
 class UHAdminsSystem(URLHandler):
-    _endpoint = 'legacy.adminSystem'
+    _endpoint = 'admin.adminSystem'
 
 
 class UHAdminsSystemModif(URLHandler):
-    _endpoint = 'legacy.adminSystem-modify'
+    _endpoint = 'admin.adminSystem-modify'
 
 
 class UHAdminsProtection(URLHandler):
-    _endpoint = 'legacy.adminProtection'
+    _endpoint = 'admin.adminProtection'
 
 
 class UHMaterialModification(URLHandler):
@@ -2316,11 +2308,11 @@ class UHConfModFullMaterialPackagePerform(URLHandler):
 
 
 class UHTaskManager(URLHandler):
-    _endpoint = 'legacy.taskManager'
+    _endpoint = 'admin.taskManager'
 
 
 class UHUpdateNews(URLHandler):
-    _endpoint = 'legacy.updateNews'
+    _endpoint = 'admin.updateNews'
 
 
 # Server Admin, plugin management related
@@ -2362,23 +2354,23 @@ class UHAdminPluginsSaveOptions(URLHandler):
 
 
 class UHMaintenance(URLHandler):
-    _endpoint = 'legacy.adminMaintenance'
+    _endpoint = 'admin.adminMaintenance'
 
 
 class UHMaintenanceTmpCleanup(URLHandler):
-    _endpoint = 'legacy.adminMaintenance-tmpCleanup'
+    _endpoint = 'admin.adminMaintenance-tmpCleanup'
 
 
 class UHMaintenancePerformTmpCleanup(URLHandler):
-    _endpoint = 'legacy.adminMaintenance-performTmpCleanup'
+    _endpoint = 'admin.adminMaintenance-performTmpCleanup'
 
 
 class UHMaintenancePack(URLHandler):
-    _endpoint = 'legacy.adminMaintenance-pack'
+    _endpoint = 'admin.adminMaintenance-pack'
 
 
 class UHMaintenancePerformPack(URLHandler):
-    _endpoint = 'legacy.adminMaintenance-performPack'
+    _endpoint = 'admin.adminMaintenance-performPack'
 
 
 class UHAdminLayoutGeneral(URLHandler):
@@ -2522,15 +2514,15 @@ class UHPosterTemplates(URLHandler):
 
 
 class UHAnnouncement(URLHandler):
-    _endpoint = 'legacy.adminAnnouncement'
+    _endpoint = 'admin.adminAnnouncement'
 
 
 class UHAnnouncementSave(URLHandler):
-    _endpoint = 'legacy.adminAnnouncement-save'
+    _endpoint = 'admin.adminAnnouncement-save'
 
 
 class UHConfigUpcomingEvents(URLHandler):
-    _endpoint = 'legacy.adminUpcomingEvents'
+    _endpoint = 'admin.adminUpcomingEvents'
 
 # ------- DVD creation and static webpages ------
 
