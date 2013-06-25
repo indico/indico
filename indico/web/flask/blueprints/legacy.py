@@ -371,50 +371,15 @@ legacy.add_url_rule('/abstractsManagment.py/participantList',
 
 
 # Routes for adminPlugins.py
-legacy.add_url_rule('/adminPlugins.py',
-                    'adminPlugins',
-                    rh_as_view(mod_rh_admins.RHAdminPlugins),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminPlugins.py/clearAllInfo',
-                    'adminPlugins-clearAllInfo',
-                    rh_as_view(mod_rh_admins.RHAdminPluginsClearAllInfo),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminPlugins.py/reload',
-                    'adminPlugins-reload',
-                    rh_as_view(mod_rh_admins.RHAdminPluginsReload),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminPlugins.py/reloadAll',
-                    'adminPlugins-reloadAll',
-                    rh_as_view(mod_rh_admins.RHAdminPluginsReloadAll),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminPlugins.py/saveOptionReloadAll',
-                    'adminPlugins-saveOptionReloadAll',
-                    rh_as_view(mod_rh_admins.RHAdminPluginsSaveOptionReloadAll),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminPlugins.py/savePluginOptions',
-                    'adminPlugins-savePluginOptions',
-                    rh_as_view(mod_rh_admins.RHAdminPluginsSaveOptions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminPlugins.py/savePluginTypeOptions',
-                    'adminPlugins-savePluginTypeOptions',
-                    rh_as_view(mod_rh_admins.RHAdminPluginsSaveTypeOptions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminPlugins.py/toggleActive',
-                    'adminPlugins-toggleActive',
-                    rh_as_view(mod_rh_admins.RHAdminTogglePlugin),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminPlugins.py/toggleActivePluginType',
-                    'adminPlugins-toggleActivePluginType',
-                    rh_as_view(mod_rh_admins.RHAdminTogglePluginType),
-                    methods=('GET', 'POST'))
+# Inactive: /adminPlugins.py (mod_rh_admins.RHAdminPlugins)
+# Inactive: /adminPlugins.py/clearAllInfo (mod_rh_admins.RHAdminPluginsClearAllInfo)
+# Inactive: /adminPlugins.py/reload (mod_rh_admins.RHAdminPluginsReload)
+# Inactive: /adminPlugins.py/reloadAll (mod_rh_admins.RHAdminPluginsReloadAll)
+# Inactive: /adminPlugins.py/saveOptionReloadAll (mod_rh_admins.RHAdminPluginsSaveOptionReloadAll)
+# Inactive: /adminPlugins.py/savePluginOptions (mod_rh_admins.RHAdminPluginsSaveOptions)
+# Inactive: /adminPlugins.py/savePluginTypeOptions (mod_rh_admins.RHAdminPluginsSaveTypeOptions)
+# Inactive: /adminPlugins.py/toggleActive (mod_rh_admins.RHAdminTogglePlugin)
+# Inactive: /adminPlugins.py/toggleActivePluginType (mod_rh_admins.RHAdminTogglePluginType)
 
 
 # Routes for adminProtection.py

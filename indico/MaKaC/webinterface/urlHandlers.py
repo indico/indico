@@ -2317,39 +2317,39 @@ class UHUpdateNews(URLHandler):
 
 # Server Admin, plugin management related
 class UHAdminPlugins(URLHandler):
-    _endpoint = 'legacy.adminPlugins'
+    _endpoint = 'admin.adminPlugins'
 
 
 class UHAdminPluginsSaveOptionReloadAll(URLHandler):
-    _endpoint = 'legacy.adminPlugins-saveOptionReloadAll'
+    _endpoint = 'admin.adminPlugins-saveOptionReloadAll'
 
 
 class UHAdminPluginsReloadAll(URLHandler):
-    _endpoint = 'legacy.adminPlugins-reloadAll'
+    _endpoint = 'admin.adminPlugins-reloadAll'
 
 
 class UHAdminPluginsClearAllInfo(URLHandler):
-    _endpoint = 'legacy.adminPlugins-clearAllInfo'
+    _endpoint = 'admin.adminPlugins-clearAllInfo'
 
 
 class UHAdminReloadPlugins(URLHandler):
-    _endpoint = 'legacy.adminPlugins-reload'
+    _endpoint = 'admin.adminPlugins-reload'
 
 
 class UHAdminTogglePluginType(URLHandler):
-    _endpoint = 'legacy.adminPlugins-toggleActivePluginType'
+    _endpoint = 'admin.adminPlugins-toggleActivePluginType'
 
 
 class UHAdminTogglePlugin(URLHandler):
-    _endpoint = 'legacy.adminPlugins-toggleActive'
+    _endpoint = 'admin.adminPlugins-toggleActive'
 
 
 class UHAdminPluginsTypeSaveOptions(URLHandler):
-    _endpoint = 'legacy.adminPlugins-savePluginTypeOptions'
+    _endpoint = 'admin.adminPlugins-savePluginTypeOptions'
 
 
 class UHAdminPluginsSaveOptions(URLHandler):
-    _endpoint = 'legacy.adminPlugins-savePluginOptions'
+    _endpoint = 'admin.adminPlugins-savePluginOptions'
 # End of Server Admin, plugin management related
 
 

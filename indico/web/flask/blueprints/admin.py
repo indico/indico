@@ -187,3 +187,24 @@ admin.add_url_rule('/webcast/onair/remove', 'adminServices-webcastRemoveFromAir'
                    rh_as_view(services.RHWebcastRemoveFromAir))
 admin.add_url_rule('/webcast/channel/switch', 'adminServices-webcastSwitchChannel',
                    rh_as_view(services.RHWebcastSwitchChannel))
+
+# Plugins
+admin.add_url_rule('/plugins/', 'adminPlugins', rh_as_view(admins.RHAdminPlugins), methods=('GET', 'POST'))
+admin.add_url_rule('/settings/plugins/reload-all', 'adminPlugins-saveOptionReloadAll',
+                   rh_as_view(admins.RHAdminPluginsSaveOptionReloadAll), methods=('POST',))
+admin.add_url_rule('/plugins/reload-all', 'adminPlugins-reloadAll', rh_as_view(admins.RHAdminPluginsReloadAll),
+                   methods=('POST',))
+admin.add_url_rule('/plugins/clear-all-info', 'adminPlugins-clearAllInfo',
+                   rh_as_view(admins.RHAdminPluginsClearAllInfo), methods=('POST',))
+admin.add_url_rule('/plugins/type/<pluginType>/', 'adminPlugins', rh_as_view(admins.RHAdminPlugins),
+                   methods=('GET', 'POST'))
+admin.add_url_rule('/plugins/type/<pluginType>/reload', 'adminPlugins-reload',
+                   rh_as_view(admins.RHAdminPluginsReload), methods=('POST',))
+admin.add_url_rule('/plugins/type/<pluginType>/toggle', 'adminPlugins-toggleActivePluginType',
+                   rh_as_view(admins.RHAdminTogglePluginType))
+admin.add_url_rule('/plugins/type/<pluginType>/save-options', 'adminPlugins-savePluginTypeOptions',
+                   rh_as_view(admins.RHAdminPluginsSaveTypeOptions), methods=('POST',))
+admin.add_url_rule('/plugins/plugin/<pluginType>/<pluginId>/toggle', 'adminPlugins-toggleActive',
+                   rh_as_view(admins.RHAdminTogglePlugin))
+admin.add_url_rule('/plugins/plugin/<pluginType>/<pluginId>/save-options', 'adminPlugins-savePluginOptions',
+                   rh_as_view(admins.RHAdminPluginsSaveOptions), methods=('POST',))
