@@ -20,7 +20,7 @@
 from flask import Blueprint
 
 from MaKaC.webinterface.rh import admins, announcement, taskManager, maintenance, domains, users, groups, templates, \
-    conferenceModif, collaboration
+    conferenceModif, collaboration, services, api, oauth
 from indico.web.flask.util import rh_as_view
 
 
@@ -66,7 +66,7 @@ admin.add_url_rule('/maintenance/clean-tmp/execute', 'adminMaintenance-performTm
                    rh_as_view(maintenance.RHMaintenancePerformTmpCleanup), methods=('POST',))
 
 # Protection
-admin.add_url_rule('/protection', 'adminProtection', rh_as_view(admins.RHAdminProtection))
+admin.add_url_rule('/protection/messages', 'adminProtection', rh_as_view(admins.RHAdminProtection))
 
 # IP domains (let's call them "networks" in the URL - that's more fitting)
 admin.add_url_rule('/networks/create', 'domainCreation', rh_as_view(domains.RHDomainCreation))
@@ -132,3 +132,58 @@ admin.add_url_rule('/layout/posters/design', 'posterTemplates-posterDesign',
 
 # Collaboration
 admin.add_url_rule('/collaboration', 'adminCollaboration', rh_as_view(collaboration.RHAdminCollaboration))
+
+# IP ACL
+admin.add_url_rule('/protection/ip-acl', 'adminServices-ipbasedacl', rh_as_view(services.RHIPBasedACL))
+admin.add_url_rule('/protection/ip-acl/add', 'adminServices-ipbasedacl_fagrant',
+                   rh_as_view(services.RHIPBasedACLFullAccessGrant), methods=('POST',))
+admin.add_url_rule('/protection/ip-acl/remove', 'adminServices-ipbasedacl_farevoke',
+                   rh_as_view(services.RHIPBasedACLFullAccessRevoke), methods=('POST',))
+
+# HTTP API
+admin.add_url_rule('/api/', 'adminServices-apiOptions', rh_as_view(api.RHAdminAPIOptions))
+admin.add_url_rule('/api/', 'adminServices-apiOptionsSet', rh_as_view(api.RHAdminAPIOptionsSet), methods=('POST',))
+admin.add_url_rule('/api/keys', 'adminServices-apiKeys', rh_as_view(api.RHAdminAPIKeys))
+
+# OAuth
+admin.add_url_rule('/oauth/consumers', 'adminServices-oauthAuthorized', rh_as_view(oauth.RHAdminOAuthAuthorized))
+admin.add_url_rule('/oauth/authorized', 'adminServices-oauthConsumers', rh_as_view(oauth.RHAdminOAuthConsumers))
+
+# Analytics
+admin.add_url_rule('/analytics', 'adminServices-analytics', rh_as_view(services.RHAnalytics))
+admin.add_url_rule('/analytics', 'adminServices-saveAnalytics', rh_as_view(services.RHSaveAnalytics), methods=('POST',))
+
+# Webcast
+admin.add_url_rule('/webcast/live', 'adminServices-webcast', rh_as_view(services.RHWebcast), methods=('GET', 'POST'))
+admin.add_url_rule('/webcast/setup/', 'adminServices-webcastSetup', rh_as_view(services.RHWebcastSetup))
+admin.add_url_rule('/webcast/setup/sync/set-url', 'adminServices-webcastSaveWebcastSynchronizationURL',
+                   rh_as_view(services.RHWebcastSaveWebcastSynchronizationURL), methods=('POST',))
+admin.add_url_rule('/webcast/setup/sync', 'adminServices-webcastManualSynchronization',
+                   rh_as_view(services.RHWebcastManuelSynchronizationURL), methods=('POST',))
+admin.add_url_rule('/webcast/setup/stream/add', 'adminServices-webcastAddStream',
+                   rh_as_view(services.RHWebcastAddStream), methods=('POST',))
+admin.add_url_rule('/webcast/setup/stream/remove', 'adminServices-webcastRemoveStream',
+                   rh_as_view(services.RHWebcastRemoveStream))
+admin.add_url_rule('/webcast/setup/channel/move/down', 'adminServices-webcastMoveChannelDown',
+                   rh_as_view(services.RHWebcastMoveChannelDown))
+admin.add_url_rule('/webcast/setup/channel/move/up', 'adminServices-webcastMoveChannelUp',
+                   rh_as_view(services.RHWebcastMoveChannelUp))
+admin.add_url_rule('/webcast/setup/channel/remove', 'adminServices-webcastRemoveChannel',
+                   rh_as_view(services.RHWebcastRemoveChannel))
+admin.add_url_rule('/webcast/setup/channel/modify', 'adminServices-webcastModifyChannel',
+                   rh_as_view(services.RHWebcastModifyChannel), methods=('POST',))
+admin.add_url_rule('/webcast/setup/channel/add', 'adminServices-webcastAddChannel',
+                   rh_as_view(services.RHWebcastAddChannel), methods=('POST',))
+admin.add_url_rule('/webcast/archive/', 'adminServices-webcastArchive', rh_as_view(services.RHWebcastArchive))
+admin.add_url_rule('/webcast/<webcastid>/archive', 'adminServices-webcastArchiveWebcast',
+                   rh_as_view(services.RHWebcastArchiveWebcast))
+admin.add_url_rule('/webcast/<webcastid>/unarchive', 'adminServices-webcastUnArchiveWebcast',
+                   rh_as_view(services.RHWebcastUnArchiveWebcast))
+admin.add_url_rule('/webcast/<webcastid>/remove', 'adminServices-webcastRemoveWebcast', rh_as_view(services.RHWebcastRemoveWebcast))
+admin.add_url_rule('/webcast/add', 'adminServices-webcastAddWebcast', rh_as_view(services.RHWebcastAddWebcast),
+                   methods=('POST',))
+admin.add_url_rule('/webcast/onair/add', 'adminServices-webcastAddOnAir', rh_as_view(services.RHWebcastAddOnAir))
+admin.add_url_rule('/webcast/onair/remove', 'adminServices-webcastRemoveFromAir',
+                   rh_as_view(services.RHWebcastRemoveFromAir))
+admin.add_url_rule('/webcast/channel/switch', 'adminServices-webcastSwitchChannel',
+                   rh_as_view(services.RHWebcastSwitchChannel))

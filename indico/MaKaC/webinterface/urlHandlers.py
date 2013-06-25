@@ -2390,119 +2390,119 @@ class UHTemplatesSetDefaultPDFOptions(URLHandler):
 
 
 class UHWebcast(URLHandler):
-    _endpoint = 'legacy.adminServices-webcast'
+    _endpoint = 'admin.adminServices-webcast'
 
 
 class UHWebcastArchive(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastArchive'
+    _endpoint = 'admin.adminServices-webcastArchive'
 
 
 class UHWebcastSetup(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastSetup'
+    _endpoint = 'admin.adminServices-webcastSetup'
 
 
 class UHWebcastAddWebcast(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastAddWebcast'
+    _endpoint = 'admin.adminServices-webcastAddWebcast'
 
 
 class UHWebcastRemoveWebcast(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastRemoveWebcast'
+    _endpoint = 'admin.adminServices-webcastRemoveWebcast'
 
 
 class UHWebcastArchiveWebcast(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastArchiveWebcast'
+    _endpoint = 'admin.adminServices-webcastArchiveWebcast'
 
 
 class UHWebcastUnArchiveWebcast(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastUnArchiveWebcast'
+    _endpoint = 'admin.adminServices-webcastUnArchiveWebcast'
 
 
 class UHWebcastModifyChannel(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastModifyChannel'
+    _endpoint = 'admin.adminServices-webcastModifyChannel'
 
 
 class UHWebcastAddChannel(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastAddChannel'
+    _endpoint = 'admin.adminServices-webcastAddChannel'
 
 
 class UHWebcastRemoveChannel(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastRemoveChannel'
+    _endpoint = 'admin.adminServices-webcastRemoveChannel'
 
 
 class UHWebcastSwitchChannel(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastSwitchChannel'
+    _endpoint = 'admin.adminServices-webcastSwitchChannel'
 
 
 class UHWebcastMoveChannelUp(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastMoveChannelUp'
+    _endpoint = 'admin.adminServices-webcastMoveChannelUp'
 
 
 class UHWebcastMoveChannelDown(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastMoveChannelDown'
+    _endpoint = 'admin.adminServices-webcastMoveChannelDown'
 
 
 class UHWebcastSaveWebcastSynchronizationURL(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastSaveWebcastSynchronizationURL'
+    _endpoint = 'admin.adminServices-webcastSaveWebcastSynchronizationURL'
 
 
 class UHWebcastManualSynchronization(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastManualSynchronization'
+    _endpoint = 'admin.adminServices-webcastManualSynchronization'
 
 
 class UHWebcastAddStream(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastAddStream'
+    _endpoint = 'admin.adminServices-webcastAddStream'
 
 
 class UHWebcastRemoveStream(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastRemoveStream'
+    _endpoint = 'admin.adminServices-webcastRemoveStream'
 
 
 class UHWebcastAddOnAir(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastAddOnAir'
+    _endpoint = 'admin.adminServices-webcastAddOnAir'
 
 
 class UHWebcastRemoveFromAir(URLHandler):
-    _endpoint = 'legacy.adminServices-webcastRemoveFromAir'
+    _endpoint = 'admin.adminServices-webcastRemoveFromAir'
 
 
 class UHIPBasedACL(URLHandler):
-    _endpoint = 'legacy.adminServices-ipbasedacl'
+    _endpoint = 'admin.adminServices-ipbasedacl'
 
 
 class UHIPBasedACLFullAccessGrant(URLHandler):
-    _endpoint = 'legacy.adminServices-ipbasedacl_fagrant'
+    _endpoint = 'admin.adminServices-ipbasedacl_fagrant'
 
 
 class UHIPBasedACLFullAccessRevoke(URLHandler):
-    _endpoint = 'legacy.adminServices-ipbasedacl_farevoke'
+    _endpoint = 'admin.adminServices-ipbasedacl_farevoke'
 
 
 class UHAdminAPIOptions(URLHandler):
-    _endpoint = 'legacy.adminServices-apiOptions'
+    _endpoint = 'admin.adminServices-apiOptions'
 
 
 class UHAdminAPIOptionsSet(URLHandler):
-    _endpoint = 'legacy.adminServices-apiOptionsSet'
+    _endpoint = 'admin.adminServices-apiOptionsSet'
 
 
 class UHAdminAPIKeys(URLHandler):
-    _endpoint = 'legacy.adminServices-apiKeys'
+    _endpoint = 'admin.adminServices-apiKeys'
 
 
 class UHAdminOAuthConsumers(URLHandler):
-    _endpoint = 'legacy.adminServices-oauthConsumers'
+    _endpoint = 'admin.adminServices-oauthConsumers'
 
 
 class UHAdminOAuthAuthorized(URLHandler):
-    _endpoint = 'legacy.adminServices-oauthAuthorized'
+    _endpoint = 'admin.adminServices-oauthAuthorized'
 
 
 class UHAnalytics(URLHandler):
-    _endpoint = 'legacy.adminServices-analytics'
+    _endpoint = 'admin.adminServices-analytics'
 
 
 class UHSaveAnalytics(URLHandler):
-    _endpoint = 'legacy.adminServices-saveAnalytics'
+    _endpoint = 'admin.adminServices-saveAnalytics'
 
 
 class UHBadgeTemplates(URLHandler):

@@ -23,7 +23,6 @@ from indico.web.flask.util import rh_as_view
 import MaKaC.webinterface.rh.abstractModif as mod_rh_abstractModif
 import MaKaC.webinterface.rh.abstractReviewing as mod_rh_abstractReviewing
 import MaKaC.webinterface.rh.admins as mod_rh_admins
-import MaKaC.webinterface.rh.api as mod_rh_api
 import MaKaC.webinterface.rh.collaboration as mod_rh_collaboration
 import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
@@ -31,7 +30,6 @@ import MaKaC.webinterface.rh.contribMod as mod_rh_contribMod
 import MaKaC.webinterface.rh.contribReviewingModif as mod_rh_contribReviewingModif
 import MaKaC.webinterface.rh.ePaymentModif as mod_rh_ePaymentModif
 import MaKaC.webinterface.rh.evaluationModif as mod_rh_evaluationModif
-import MaKaC.webinterface.rh.oauth as mod_rh_oauth
 import MaKaC.webinterface.rh.registrantsModif as mod_rh_registrantsModif
 import MaKaC.webinterface.rh.registrationFormModif as mod_rh_registrationFormModif
 import MaKaC.webinterface.rh.reviewingAssignContributions as mod_rh_reviewingAssignContributions
@@ -42,7 +40,6 @@ import MaKaC.webinterface.rh.reviewingUserCompetencesModif as mod_rh_reviewingUs
 import MaKaC.webinterface.rh.roomBooking as mod_rh_roomBooking
 import MaKaC.webinterface.rh.roomBookingPluginAdmin as mod_rh_roomBookingPluginAdmin
 import MaKaC.webinterface.rh.roomMappers as mod_rh_roomMappers
-import MaKaC.webinterface.rh.services as mod_rh_services
 import MaKaC.webinterface.rh.sessionModif as mod_rh_sessionModif
 import MaKaC.webinterface.rh.subContribDisplay as mod_rh_subContribDisplay
 import MaKaC.webinterface.rh.subContribMod as mod_rh_subContribMod
@@ -425,150 +422,35 @@ legacy.add_url_rule('/adminPlugins.py/toggleActivePluginType',
 
 
 # Routes for adminServices.py
-legacy.add_url_rule('/adminServices.py/analytics',
-                    'adminServices-analytics',
-                    rh_as_view(mod_rh_services.RHAnalytics),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/apiKeys',
-                    'adminServices-apiKeys',
-                    rh_as_view(mod_rh_api.RHAdminAPIKeys),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/apiOptions',
-                    'adminServices-apiOptions',
-                    rh_as_view(mod_rh_api.RHAdminAPIOptions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/apiOptionsSet',
-                    'adminServices-apiOptionsSet',
-                    rh_as_view(mod_rh_api.RHAdminAPIOptionsSet),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/ipbasedacl',
-                    'adminServices-ipbasedacl',
-                    rh_as_view(mod_rh_services.RHIPBasedACL),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/ipbasedacl_fagrant',
-                    'adminServices-ipbasedacl_fagrant',
-                    rh_as_view(mod_rh_services.RHIPBasedACLFullAccessGrant),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/ipbasedacl_farevoke',
-                    'adminServices-ipbasedacl_farevoke',
-                    rh_as_view(mod_rh_services.RHIPBasedACLFullAccessRevoke),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/oauthAuthorized',
-                    'adminServices-oauthAuthorized',
-                    rh_as_view(mod_rh_oauth.RHAdminOAuthAuthorized),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/oauthConsumers',
-                    'adminServices-oauthConsumers',
-                    rh_as_view(mod_rh_oauth.RHAdminOAuthConsumers),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/saveAnalytics',
-                    'adminServices-saveAnalytics',
-                    rh_as_view(mod_rh_services.RHSaveAnalytics),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcast',
-                    'adminServices-webcast',
-                    rh_as_view(mod_rh_services.RHWebcast),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastAddChannel',
-                    'adminServices-webcastAddChannel',
-                    rh_as_view(mod_rh_services.RHWebcastAddChannel),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastAddOnAir',
-                    'adminServices-webcastAddOnAir',
-                    rh_as_view(mod_rh_services.RHWebcastAddOnAir),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastAddStream',
-                    'adminServices-webcastAddStream',
-                    rh_as_view(mod_rh_services.RHWebcastAddStream),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastAddWebcast',
-                    'adminServices-webcastAddWebcast',
-                    rh_as_view(mod_rh_services.RHWebcastAddWebcast),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastArchive',
-                    'adminServices-webcastArchive',
-                    rh_as_view(mod_rh_services.RHWebcastArchive),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastArchiveWebcast',
-                    'adminServices-webcastArchiveWebcast',
-                    rh_as_view(mod_rh_services.RHWebcastArchiveWebcast),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastManualSynchronization',
-                    'adminServices-webcastManualSynchronization',
-                    rh_as_view(mod_rh_services.RHWebcastManuelSynchronizationURL),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastModifyChannel',
-                    'adminServices-webcastModifyChannel',
-                    rh_as_view(mod_rh_services.RHWebcastModifyChannel),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastMoveChannelDown',
-                    'adminServices-webcastMoveChannelDown',
-                    rh_as_view(mod_rh_services.RHWebcastMoveChannelDown),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastMoveChannelUp',
-                    'adminServices-webcastMoveChannelUp',
-                    rh_as_view(mod_rh_services.RHWebcastMoveChannelUp),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastRemoveChannel',
-                    'adminServices-webcastRemoveChannel',
-                    rh_as_view(mod_rh_services.RHWebcastRemoveChannel),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastRemoveFromAir',
-                    'adminServices-webcastRemoveFromAir',
-                    rh_as_view(mod_rh_services.RHWebcastRemoveFromAir),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastRemoveStream',
-                    'adminServices-webcastRemoveStream',
-                    rh_as_view(mod_rh_services.RHWebcastRemoveStream),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastRemoveWebcast',
-                    'adminServices-webcastRemoveWebcast',
-                    rh_as_view(mod_rh_services.RHWebcastRemoveWebcast),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastSaveWebcastSynchronizationURL',
-                    'adminServices-webcastSaveWebcastSynchronizationURL',
-                    rh_as_view(mod_rh_services.RHWebcastSaveWebcastSynchronizationURL),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastSetup',
-                    'adminServices-webcastSetup',
-                    rh_as_view(mod_rh_services.RHWebcastSetup),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastSwitchChannel',
-                    'adminServices-webcastSwitchChannel',
-                    rh_as_view(mod_rh_services.RHWebcastSwitchChannel),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminServices.py/webcastUnArchiveWebcast',
-                    'adminServices-webcastUnArchiveWebcast',
-                    rh_as_view(mod_rh_services.RHWebcastUnArchiveWebcast),
-                    methods=('GET', 'POST'))
+# Inactive: /adminServices.py/analytics (mod_rh_services.RHAnalytics)
+# Inactive: /adminServices.py/apiKeys (mod_rh_api.RHAdminAPIKeys)
+# Inactive: /adminServices.py/apiOptions (mod_rh_api.RHAdminAPIOptions)
+# Inactive: /adminServices.py/apiOptionsSet (mod_rh_api.RHAdminAPIOptionsSet)
+# Inactive: /adminServices.py/ipbasedacl (mod_rh_services.RHIPBasedACL)
+# Inactive: /adminServices.py/ipbasedacl_fagrant (mod_rh_services.RHIPBasedACLFullAccessGrant)
+# Inactive: /adminServices.py/ipbasedacl_farevoke (mod_rh_services.RHIPBasedACLFullAccessRevoke)
+# Inactive: /adminServices.py/oauthAuthorized (mod_rh_oauth.RHAdminOAuthAuthorized)
+# Inactive: /adminServices.py/oauthConsumers (mod_rh_oauth.RHAdminOAuthConsumers)
+# Inactive: /adminServices.py/saveAnalytics (mod_rh_services.RHSaveAnalytics)
+# Inactive: /adminServices.py/webcast (mod_rh_services.RHWebcast)
+# Inactive: /adminServices.py/webcastAddChannel (mod_rh_services.RHWebcastAddChannel)
+# Inactive: /adminServices.py/webcastAddOnAir (mod_rh_services.RHWebcastAddOnAir)
+# Inactive: /adminServices.py/webcastAddStream (mod_rh_services.RHWebcastAddStream)
+# Inactive: /adminServices.py/webcastAddWebcast (mod_rh_services.RHWebcastAddWebcast)
+# Inactive: /adminServices.py/webcastArchive (mod_rh_services.RHWebcastArchive)
+# Inactive: /adminServices.py/webcastArchiveWebcast (mod_rh_services.RHWebcastArchiveWebcast)
+# Inactive: /adminServices.py/webcastManualSynchronization (mod_rh_services.RHWebcastManuelSynchronizationURL)
+# Inactive: /adminServices.py/webcastModifyChannel (mod_rh_services.RHWebcastModifyChannel)
+# Inactive: /adminServices.py/webcastMoveChannelDown (mod_rh_services.RHWebcastMoveChannelDown)
+# Inactive: /adminServices.py/webcastMoveChannelUp (mod_rh_services.RHWebcastMoveChannelUp)
+# Inactive: /adminServices.py/webcastRemoveChannel (mod_rh_services.RHWebcastRemoveChannel)
+# Inactive: /adminServices.py/webcastRemoveFromAir (mod_rh_services.RHWebcastRemoveFromAir)
+# Inactive: /adminServices.py/webcastRemoveStream (mod_rh_services.RHWebcastRemoveStream)
+# Inactive: /adminServices.py/webcastRemoveWebcast (mod_rh_services.RHWebcastRemoveWebcast)
+# Inactive: /adminServices.py/webcastSaveWebcastSynchronizationURL (mod_rh_services.RHWebcastSaveWebcastSynchronizationURL)
+# Inactive: /adminServices.py/webcastSetup (mod_rh_services.RHWebcastSetup)
+# Inactive: /adminServices.py/webcastSwitchChannel (mod_rh_services.RHWebcastSwitchChannel)
+# Inactive: /adminServices.py/webcastUnArchiveWebcast (mod_rh_services.RHWebcastUnArchiveWebcast)
 
 
 # Routes for adminSystem.py
