@@ -420,11 +420,6 @@ legacy.add_url_rule('/adminList.py/switchDebugActive',
                     rh_as_view(mod_rh_admins.RHAdminSwitchDebugActive),
                     methods=('GET', 'POST'))
 
-legacy.add_url_rule('/adminList.py/switchHighlightActive',
-                    'adminList-switchHighlightActive',
-                    rh_as_view(mod_rh_admins.RHAdminSwitchHighlightActive),
-                    methods=('GET', 'POST'))
-
 legacy.add_url_rule('/adminList.py/switchNewsActive',
                     'adminList-switchNewsActive',
                     rh_as_view(mod_rh_admins.RHAdminSwitchNewsActive),

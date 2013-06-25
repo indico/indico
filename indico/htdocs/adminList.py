@@ -31,6 +31,3 @@ def switchDebugActive( req, **params ):
 
 def switchNewsActive( req, **params ):
     return admins.RHAdminSwitchNewsActive( req ).process( params )
-
-def switchHighlightActive( req, **params ):
-    return admins.RHAdminSwitchHighlightActive( req ).process( params )

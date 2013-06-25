@@ -217,16 +217,6 @@ class MaKaCInfo(Persistent):
     def setNewsActive( self, bool=True ):
         self._newsActive = bool
 
-    def isHighlightActive ( self ):
-        if hasattr( self, "_highlightActive" ):
-            return self._highlightActive
-        else:
-            self._highlightActive = False
-            return False
-
-    def setHighlightActive (self, bool=True ):
-        self._highlightActive = bool
-
     def setTitle( self, newTitle ):
         self._title = newTitle.strip()
 

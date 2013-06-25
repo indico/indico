@@ -127,12 +127,6 @@ class RHAdminSwitchDebugActive( RHAdminBase ):
         self._minfo.setDebugActive( not self._minfo.isDebugActive() )
         self._redirect( urlHandlers.UHAdminArea.getURL() )
 
-class RHAdminSwitchHighlightActive( RHAdminBase ):
-    _uh = urlHandlers.UHAdminSwitchHighlightActive
-
-    def _process( self ):
-        self._minfo.setHighlightActive( not self._minfo.isHighlightActive() )
-        self._redirect( urlHandlers.UHAdminArea.getURL() )
 
 class RHGeneralInfoPerformModification( RHAdminBase ):
     _uh = urlHandlers.UHGeneralInfoPerformModification

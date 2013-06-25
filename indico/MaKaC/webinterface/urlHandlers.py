@@ -1625,10 +1625,6 @@ class UHAdminSwitchNewsActive(URLHandler):
     _endpoint = 'legacy.adminList-switchNewsActive'
 
 
-class UHAdminSwitchHighlightActive(URLHandler):
-    _endpoint = 'legacy.adminList-switchHighlightActive'
-
-
 class UHAdminsStyles(URLHandler):
     _endpoint = 'legacy.adminLayout-styles'
 
