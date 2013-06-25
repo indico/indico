@@ -46,7 +46,6 @@ import MaKaC.webinterface.rh.services as mod_rh_services
 import MaKaC.webinterface.rh.sessionModif as mod_rh_sessionModif
 import MaKaC.webinterface.rh.subContribDisplay as mod_rh_subContribDisplay
 import MaKaC.webinterface.rh.subContribMod as mod_rh_subContribMod
-import MaKaC.webinterface.rh.templates as mod_rh_templates
 import MaKaC.webinterface.rh.trackModif as mod_rh_trackModif
 import MaKaC.webinterface.rh.users as mod_rh_users
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
@@ -349,47 +348,17 @@ legacy.add_url_rule('/adminCollaboration.py',
 
 
 # Routes for adminConferenceStyles.py
-legacy.add_url_rule('/adminConferenceStyles.py',
-                    'adminConferenceStyles',
-                    rh_as_view(mod_rh_admins.RHConferenceStyles),
-                    methods=('GET', 'POST'))
+# Inactive: /adminConferenceStyles.py (mod_rh_admins.RHConferenceStyles)
 
 
 # Routes for adminLayout.py
-legacy.add_url_rule('/adminLayout.py',
-                    'adminLayout',
-                    rh_as_view(mod_rh_admins.RHAdminLayoutGeneral),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminLayout.py/addStyle',
-                    'adminLayout-addStyle',
-                    rh_as_view(mod_rh_admins.RHAddStyle),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminLayout.py/deleteStyle',
-                    'adminLayout-deleteStyle',
-                    rh_as_view(mod_rh_admins.RHDeleteStyle),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminLayout.py/saveSocial',
-                    'adminLayout-saveSocial',
-                    rh_as_view(mod_rh_admins.RHAdminLayoutSaveSocial),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminLayout.py/saveTemplateSet',
-                    'adminLayout-saveTemplateSet',
-                    rh_as_view(mod_rh_admins.RHAdminLayoutSaveTemplateSet),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminLayout.py/setDefaultPDFOptions',
-                    'adminLayout-setDefaultPDFOptions',
-                    rh_as_view(mod_rh_templates.RHSetDefaultPDFOptions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/adminLayout.py/styles',
-                    'adminLayout-styles',
-                    rh_as_view(mod_rh_admins.RHStyles),
-                    methods=('GET', 'POST'))
+# Inactive: /adminLayout.py (mod_rh_admins.RHAdminLayoutGeneral)
+# Inactive: /adminLayout.py/addStyle (mod_rh_admins.RHAddStyle)
+# Inactive: /adminLayout.py/deleteStyle (mod_rh_admins.RHDeleteStyle)
+# Inactive: /adminLayout.py/saveSocial (mod_rh_admins.RHAdminLayoutSaveSocial)
+# Inactive: /adminLayout.py/saveTemplateSet (mod_rh_admins.RHAdminLayoutSaveTemplateSet)
+# Inactive: /adminLayout.py/setDefaultPDFOptions (mod_rh_templates.RHSetDefaultPDFOptions)
+# Inactive: /adminLayout.py/styles (mod_rh_admins.RHStyles)
 
 
 # Routes for adminList.py
@@ -627,20 +596,9 @@ legacy.add_url_rule('/assignContributions.py/downloadAcceptedPapers',
 
 
 # Routes for badgeTemplates.py
-legacy.add_url_rule('/badgeTemplates.py',
-                    'badgeTemplates',
-                    rh_as_view(mod_rh_templates.RHBadgeTemplates),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/badgeTemplates.py/badgeDesign',
-                    'badgeTemplates-badgeDesign',
-                    rh_as_view(mod_rh_templates.RHConfBadgeDesign),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/badgeTemplates.py/badgePrinting',
-                    'badgeTemplates-badgePrinting',
-                    rh_as_view(mod_rh_templates.RHBadgeTemplates),
-                    methods=('GET', 'POST'))
+# Inactive: /badgeTemplates.py (mod_rh_templates.RHBadgeTemplates)
+# Inactive: /badgeTemplates.py/badgeDesign (mod_rh_templates.RHConfBadgeDesign)
+# Inactive: /badgeTemplates.py/badgePrinting (mod_rh_templates.RHBadgeTemplates)
 
 
 # Routes for categOverview.py
@@ -2527,20 +2485,9 @@ legacy.add_url_rule('/generalInfoModification.py/update',
 
 
 # Routes for posterTemplates.py
-legacy.add_url_rule('/posterTemplates.py',
-                    'posterTemplates',
-                    rh_as_view(mod_rh_templates.RHPosterTemplates),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/posterTemplates.py/posterDesign',
-                    'posterTemplates-posterDesign',
-                    rh_as_view(mod_rh_templates.RHConfPosterDesign),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/posterTemplates.py/posterPrinting',
-                    'posterTemplates-posterPrinting',
-                    rh_as_view(mod_rh_templates.RHPosterTemplates),
-                    methods=('GET', 'POST'))
+# Inactive: /posterTemplates.py (mod_rh_templates.RHPosterTemplates)
+# Inactive: /posterTemplates.py/posterDesign (mod_rh_templates.RHConfPosterDesign)
+# Inactive: /posterTemplates.py/posterPrinting (mod_rh_templates.RHPosterTemplates)
 
 
 # Routes for resetSessionTZ.py

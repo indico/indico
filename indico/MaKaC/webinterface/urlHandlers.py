@@ -1618,19 +1618,19 @@ class UHAdminSwitchNewsActive(URLHandler):
 
 
 class UHAdminsStyles(URLHandler):
-    _endpoint = 'legacy.adminLayout-styles'
+    _endpoint = 'admin.adminLayout-styles'
 
 
 class UHAdminsConferenceStyles(URLHandler):
-    _endpoint = 'legacy.adminConferenceStyles'
+    _endpoint = 'admin.adminConferenceStyles'
 
 
 class UHAdminsAddStyle(URLHandler):
-    _endpoint = 'legacy.adminLayout-addStyle'
+    _endpoint = 'admin.adminLayout-addStyle'
 
 
 class UHAdminsDeleteStyle(URLHandler):
-    _endpoint = 'legacy.adminLayout-deleteStyle'
+    _endpoint = 'admin.adminLayout-deleteStyle'
 
 
 class UHAdminsSystem(URLHandler):
@@ -2374,19 +2374,19 @@ class UHMaintenancePerformPack(URLHandler):
 
 
 class UHAdminLayoutGeneral(URLHandler):
-    _endpoint = 'legacy.adminLayout'
+    _endpoint = 'admin.adminLayout'
 
 
 class UHAdminLayoutSaveTemplateSet(URLHandler):
-    _endpoint = 'legacy.adminLayout-saveTemplateSet'
+    _endpoint = 'admin.adminLayout-saveTemplateSet'
 
 
 class UHAdminLayoutSaveSocial(URLHandler):
-    _endpoint = 'legacy.adminLayout-saveSocial'
+    _endpoint = 'admin.adminLayout-saveSocial'
 
 
 class UHTemplatesSetDefaultPDFOptions(URLHandler):
-    _endpoint = 'legacy.adminLayout-setDefaultPDFOptions'
+    _endpoint = 'admin.adminLayout-setDefaultPDFOptions'
 
 
 class UHWebcast(URLHandler):
@@ -2506,11 +2506,11 @@ class UHSaveAnalytics(URLHandler):
 
 
 class UHBadgeTemplates(URLHandler):
-    _endpoint = 'legacy.badgeTemplates'
+    _endpoint = 'admin.badgeTemplates'
 
 
 class UHPosterTemplates(URLHandler):
-    _endpoint = 'legacy.posterTemplates'
+    _endpoint = 'admin.posterTemplates'
 
 
 class UHAnnouncement(URLHandler):
@@ -3206,6 +3206,8 @@ class UHConfModifBadgePrinting(URLHandler):
         """
         url = cls._getURL()
         if target is not None:
+            if target.getId() == 'default':
+                url = UHBadgeTemplatePrinting._getURL()
             url.setParams(target.getLocator())
             if templateId is not None:
                 url.addParam("templateId", templateId)
@@ -3218,6 +3220,10 @@ class UHConfModifBadgePrinting(URLHandler):
             if new:
                 url.addParam("new", True)
         return url
+
+
+class UHBadgeTemplatePrinting(URLHandler):
+    _endpoint = 'admin.badgeTemplates-badgePrinting'
 
 
 class UHConfModifBadgeDesign(URLHandler):
@@ -3234,6 +3240,8 @@ class UHConfModifBadgeDesign(URLHandler):
         """
         url = cls._getURL()
         if target is not None:
+            if target.getId() == 'default':
+                url = UHModifDefTemplateBadge._getURL()
             url.setParams(target.getLocator())
             if templateId is not None:
                 url.addParam("templateId", templateId)
@@ -3242,7 +3250,7 @@ class UHConfModifBadgeDesign(URLHandler):
 
 
 class UHModifDefTemplateBadge(URLHandler):
-    _endpoint = 'legacy.badgeTemplates-badgeDesign'
+    _endpoint = 'admin.badgeTemplates-badgeDesign'
 
     @classmethod
     def getURL(cls, target=None, templateId=None, new=False):
@@ -3309,7 +3317,8 @@ class UHConfModifPosterPrinting(URLHandler):
         url = cls._getURL()
 
         if target is not None:
-
+            if target.getId() == 'default':
+                url = UHPosterTemplatePrinting._getURL()
             url.setParams(target.getLocator())
             if templateId is not None:
                 url.addParam("templateId", templateId)
@@ -3322,6 +3331,10 @@ class UHConfModifPosterPrinting(URLHandler):
             if new:
                 url.addParam("new", True)
         return url
+
+
+class UHPosterTemplatePrinting(URLHandler):
+    _endpoint = 'admin.posterTemplates-posterPrinting'
 
 
 class UHConfModifPosterDesign(URLHandler):
@@ -3338,6 +3351,8 @@ class UHConfModifPosterDesign(URLHandler):
         """
         url = cls._getURL()
         if target is not None:
+            if target.getId() == 'default':
+                url = UHModifDefTemplatePoster._getURL()
             url.setParams(target.getLocator())
             if templateId is not None:
                 url.addParam("templateId", templateId)
@@ -3346,7 +3361,7 @@ class UHConfModifPosterDesign(URLHandler):
 
 
 class UHModifDefTemplatePoster(URLHandler):
-    _endpoint = 'legacy.posterTemplates-posterDesign'
+    _endpoint = 'admin.posterTemplates-posterDesign'
 
     @classmethod
     def getURL(cls, target=None, templateId=None, new=False):

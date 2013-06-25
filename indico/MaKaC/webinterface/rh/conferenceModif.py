@@ -4420,7 +4420,7 @@ class RHConfBadgePrinting(RHConfBadgeBase):
 
     def _process(self):
         if self._target.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
+            return conferences.WPConferenceModificationClosed(self, self._target).display()
         else:
             if self.__templateId and self.__templateData and not self.__deleteTemplateId:
 
@@ -4450,13 +4450,17 @@ class RHConfBadgePrinting(RHConfBadgeBase):
                     key = "tempBackground-%s-%s" % (self._conf.id, self.__templateId)
                     session.pop(key, None)
 
-
             if self._target.getId() == "default":
                 p = admins.WPBadgeTemplates(self)
+                url = urlHandlers.UHBadgeTemplates.getURL()
             else:
                 p = conferences.WPConfModifBadgePrinting(self, self._target)
+                url = urlHandlers.UHConfModifBadgePrinting.getURL(self._target)
+            if request.method == 'POST':
+                self._redirect(url)
+            else:
+                return p.display()
 
-        return p.display()
 
 class RHConfBadgeDesign(RHConfBadgeBase):
     """ This class corresponds to the screen where templates are
@@ -4727,7 +4731,7 @@ class RHConfPosterPrinting(RHConferenceModifBase):
 
     def _process(self):
         if self._target.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
+            return conferences.WPConferenceModificationClosed(self, self._target).display()
         else:
             if self.__templateId and self.__templateData and not self.__deleteTemplateId:
                 if self.__new:
@@ -4755,9 +4759,15 @@ class RHConfPosterPrinting(RHConferenceModifBase):
 
             if self._target.getId() == "default":
                 p = admins.WPPosterTemplates(self)
+                url = urlHandlers.UHPosterTemplates.getURL()
             else:
                 p = conferences.WPConfModifPosterPrinting(self, self._target)
-        return p.display()
+                url = urlHandlers.UHConfModifPosterPrinting.getURL(self._target)
+            if request.method == 'POST':
+                self._redirect(url)
+            else:
+                return p.display()
+
 
 class RHConfPosterDesign(RHConferenceModifBase):
     """ This class corresponds to the screen where templates are

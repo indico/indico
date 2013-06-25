@@ -19,7 +19,8 @@
 
 from flask import Blueprint
 
-from MaKaC.webinterface.rh import admins, announcement, taskManager, maintenance, domains, users, groups
+from MaKaC.webinterface.rh import admins, announcement, taskManager, maintenance, domains, users, groups, templates, \
+    conferenceModif
 from indico.web.flask.util import rh_as_view
 
 
@@ -96,3 +97,35 @@ admin.add_url_rule('/users/groups/<groupId>/modify', 'groupModification-update',
 admin.add_url_rule('/users/groups/create', 'groupRegistration', rh_as_view(groups.RHGroupCreation))
 admin.add_url_rule('/users/groups/create', 'groupRegistration-update',
                    rh_as_view(groups.RHGroupPerformCreation), methods=('POST',))
+
+# Layout
+admin.add_url_rule('/layout/', 'adminLayout', rh_as_view(admins.RHAdminLayoutGeneral), methods=('GET', 'POST'))
+admin.add_url_rule('/layout/social', 'adminLayout-saveSocial', rh_as_view(admins.RHAdminLayoutSaveSocial),
+                   methods=('POST',))
+admin.add_url_rule('/layout/template-set', 'adminLayout-saveTemplateSet',
+                   rh_as_view(admins.RHAdminLayoutSaveTemplateSet), methods=('POST',))
+admin.add_url_rule('/layout/styles/timetable/', 'adminLayout-styles', rh_as_view(admins.RHStyles),
+                   methods=('GET', 'POST'))
+admin.add_url_rule('/layout/styles/timetable/create', 'adminLayout-addStyle', rh_as_view(admins.RHAddStyle),
+                   methods=('GET', 'POST'))
+admin.add_url_rule('/layout/styles/timetable/<templatefile>/delete', 'adminLayout-deleteStyle',
+                   rh_as_view(admins.RHDeleteStyle))
+admin.add_url_rule('/layout/styles/conference/', 'adminConferenceStyles', rh_as_view(admins.RHConferenceStyles))
+
+# Badge templates
+admin.add_url_rule('/layout/badges/', 'badgeTemplates', rh_as_view(templates.RHBadgeTemplates),
+                   methods=('GET', 'POST'))
+admin.add_url_rule('/layout/badges/save', 'badgeTemplates-badgePrinting',
+                   rh_as_view(conferenceModif.RHConfBadgePrinting), methods=('GET', 'POST'))
+admin.add_url_rule('/layout/badges/pdf-options', 'adminLayout-setDefaultPDFOptions',
+                   rh_as_view(templates.RHSetDefaultPDFOptions), methods=('POST',))
+admin.add_url_rule('/layout/badges/design', 'badgeTemplates-badgeDesign',
+                   rh_as_view(templates.RHConfBadgeDesign), methods=('GET', 'POST'))
+
+# Poster templates
+admin.add_url_rule('/layout/posters/', 'posterTemplates', rh_as_view(templates.RHPosterTemplates),
+                   methods=('GET', 'POST'))
+admin.add_url_rule('/layout/posters/save', 'posterTemplates-posterPrinting',
+                   rh_as_view(conferenceModif.RHConfPosterPrinting), methods=('GET', 'POST'))
+admin.add_url_rule('/layout/posters/design', 'posterTemplates-posterDesign',
+                   rh_as_view(templates.RHConfPosterDesign), methods=('GET', 'POST'))
