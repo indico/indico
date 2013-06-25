@@ -54,17 +54,22 @@ class IAbstractFieldFossil(IFossil):
     def getId(self):
         """ ID of the field """
 
-    def getLimitation(self):
-        """ Type of limitation """
-
-    def getMaxLength(self):
-        """ Maximum length of the field """
-
     def getName(self):
         """ Name of the field """
 
-    def getType(self):
-        """ Type of the field """
-
     def isMandatory(self):
         """ True if mandatory """
+
+
+class IAbstractTextFieldFossil(IAbstractFieldFossil):
+    def getMaxLength(self):
+        """ Maximum length of the field """
+
+    def getLimitation(self):
+        """ Type of limitation """
+
+
+class IAbstractSelectionFieldFossil(IAbstractFieldFossil):
+
+    def getOptions(self):
+        """ Options for selection """

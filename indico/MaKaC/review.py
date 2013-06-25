@@ -37,6 +37,9 @@ from MaKaC.i18n import _
 from MaKaC.common import Config
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.abstracts import IAbstractFieldFossil
+from MaKaC.fossils.abstracts import IAbstractTextFieldFossil
+from MaKaC.fossils.abstracts import IAbstractSelectionFieldFossil
+
 import tempfile
 
 
@@ -449,47 +452,38 @@ class _AuthEmailIdx(_AuthIdx):
 
 
 class AbstractField(Persistent, Fossilizable):
-
     fossilizes(IAbstractFieldFossil)
 
-    _fieldTypes = [ 'input', 'textarea' ]
+    fieldtypes = ["text", "input", "selection"]
 
-    def __init__(self, id, name, caption, maxlength=0, isMandatory=False, type="textarea", limitation="chars"):
-        self._id = id
-        self._name = name
-        self._caption = caption
+    @classmethod
+    def makefield(cls, params):
+        fieldType = params["type"]
+        if fieldType not in cls.fieldtypes:
+            raise "Invalid field type"
+        elif fieldType == "text":
+            return AbstractTextAreaField(params)
+        elif fieldType == "input":
+            return AbstractInputField(params)
+        elif fieldType == "selection":
+            return AbstractSelectionField(params)
+
+    def __init__(self, params):
+        self._id = params["id"]
+        self._name = params["name"]
+        self._caption = params["caption"]
+        self._isMandatory = params["isMandatory"]
         self._active = True
-        self._maxLength = maxlength
-        self._isMandatory = isMandatory
-        self._type = type
-        self._limitation = limitation # possible values: chars, words
 
     def clone(self):
-        af = AbstractField(self.getId(),self.getName(),self.getCaption(),self.getMaxLength(), self.isMandatory(), self.getType(), self.getLimitation())
-        return af
+        """ To be implemented by subclasses """
+        pass
 
     def _notifyModification(self):
         self._p_changed = 1
 
     def getType(self):
-        try:
-            return self._type
-        except:
-            self._type = "textarea"
-            return self._type
-
-    def setType(self, type):
-        self._type = type
-
-    def getLimitation(self):
-        try:
-            return self._limitation
-        except:
-            self._limitation = "chars"
-            return self._limitation
-
-    def setLimitation(self, limitation):
-        self._limitation = limitation
+        return self._type
 
     def isMandatory(self):
         try:
@@ -502,31 +496,11 @@ class AbstractField(Persistent, Fossilizable):
         self._isMandatory = isMandatory
         self._notifyModification()
 
-    def getMaxLength(self):
-        try:
-            return self._maxLength
-        except:
-            self._maxLength=0
-            return self._maxLength
-
-    def setValues(self, name, caption, maxlength, isMandatory, fieldType, fieldLimitation):
-        self._name = name
-        self._caption = caption
-        self._maxLength = maxlength
-        self._isMandatory = isMandatory
-        self._type = fieldType
-        self._limitation = fieldLimitation
-        self._notifyModification()
-
-    def setMaxLength(self, maxLength=0):
-        self._maxLength = maxLength
-        self._notifyModification()
-
     def getId(self):
         return self._id
 
     def setId(self, id):
-        self._id=id
+        self._id = id
         self._notifyModification()
 
     def getName(self):
@@ -543,22 +517,122 @@ class AbstractField(Persistent, Fossilizable):
         return self._name
 
     def setName(self, name):
-        self._name=name
+        self._name = name
         self._notifyModification()
 
     def getCaption(self):
         return self._caption
 
     def setCaption(self, caption):
-        self._caption=caption
+        self._caption = caption
         self._notifyModification()
 
     def isActive(self):
         return self._active
 
     def setActive(self, active):
-        self._active=active
+        self._active = active
         self._notifyModification()
+
+    def getValues(self):
+        values = []
+        values["id"] = self.getId()
+        values["name"] = self.getName()
+        values["caption"] = self.getCaption()
+        return values
+
+    def setValues(self, params):
+        self.setName(params["name"])
+        self.setCaption(params["caption"])
+        self.setMandatory(params["isMandatory"])
+        self._notifyModification()
+
+
+class AbstractTextField(AbstractField):
+    fossilizes(IAbstractTextFieldFossil)
+
+    def __init__(self, params):
+        AbstractField.__init__(self, params)
+        self._maxLength = params["maxLength"]
+        self._limitation = params["limitation"]  # possible values: chars, words
+
+    def clone(self):
+        return AbstractTextField(self.getValues())
+
+    def getLimitation(self):
+        try:
+            return self._limitation
+        except:
+            self._limitation = "chars"
+            return self._limitation
+
+    def getMaxLength(self):
+        try:
+            return self._maxLength
+        except:
+            self._maxLength = 0
+            return self._maxLength
+
+    def setLimitation(self, limitation="chars"):
+        self._limitation = limitation
+        self._notifyModification()
+
+    def setMaxLength(self, maxLength=0):
+        self._maxLength = maxLength
+        self._notifyModification()
+
+    def getValues(self):
+        values = AbstractField.getValues(self)
+        values["maxLength"] = self.getMaxLength()
+        values["limitation"] = self.getLimitation()
+        return values
+
+    def setValues(self, params):
+        AbstractField.setValues(self, params)
+        self.setMaxLength(params["maxLength"])
+        self.setLimitation(params["limitation"])
+        self._notifyModification()
+
+
+class AbstractTextAreaField(AbstractTextField):
+    _type = "text"
+    pass
+
+
+class AbstractInputField(AbstractTextField):
+    _type = "input"
+    pass
+
+
+class AbstractSelectionField(AbstractField):
+    fossilizes(IAbstractSelectionFieldFossil)
+    _type = "selection"
+
+    def __init__(self, params):
+        AbstractField.__init__(params)
+        self._options = params["options"]
+
+    def clone(self):
+        return AbstractSelectionField(self.getValues())
+
+    def addOption(self, option):
+        self._options.append(option)
+
+    def getOptions(self):
+        return self._options
+
+    def setOptions(self, options=[]):
+        self._options = options
+
+    def getValues(self):
+        values = AbstractField.getValues(self)
+        values["options"] = self.getOptions()
+        return values
+
+    def setValues(self, params):
+        AbstractField.setValues(self, params)
+        self.setOptions(params["options"])
+
 
 class AbstractFieldsMgr(Persistent):
 
@@ -644,15 +718,15 @@ class AbstractFieldsMgr(Persistent):
     def _addField(self, field):
         self._fields.append(field)
 
-    def addField(self, id, name, caption, maxlength=0, isMandatory=False, fieldType="textarea", fieldLimitation="chars"):
-        if self.hasField(id):
-            self.getFieldById(id).setValues(name, caption, maxlength, isMandatory, fieldType, fieldLimitation)
+    def setField(self, params):
+        if self.hasField(params["id"]):
+            self.getFieldById(params["id"]).setValues(params)
         else:
-            id=str(self.getFieldGenerator().newCount())
-            absf = AbstractField(id, name, caption, maxlength, isMandatory, fieldType, fieldLimitation)
+            params["id"] = str(self.getFieldGenerator().newCount())
+            absf = AbstractField.makefield(params)
             self._fields.append(absf)
         self._notifyModification()
-        return id
+        return params["id"]
 
     def removeField(self, id):
         if self.hasField(id):
@@ -1176,8 +1250,8 @@ class AbstractMgr(Persistent):
         res=self._getPrimAuthIndex().match(query)
         return [self.getAbstractById(id) for id in res]
 
-    def addAbstractField(self, id, name, caption, maxLength=0, isMandatory=False, fieldType="textarea", fieldLimitation="chars"):
-        return self.getAbstractFieldsMgr().addField(id, name, caption, maxLength, isMandatory, fieldType, fieldLimitation)
+    def setAbstractField(self, params):
+        return self.getAbstractFieldsMgr().setField(params)
 
     def removeAbstractField(self, id):
         self.getAbstractFieldsMgr().removeField(id)

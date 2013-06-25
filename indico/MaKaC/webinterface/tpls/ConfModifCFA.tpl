@@ -132,12 +132,11 @@ $(function() {
         id: "add-typeoffield",
         content: {
             title: {
-                text: $T("Select type of field"),
-                button: $T("Close")
+                text: $T("Select type of field")
             },
-            text: $('<div><a class="add-field" href="#" data-fieldtye="text">Text</a></div> \
-                     <div><a class="add-field" href="#" data-fieldtye="input">Input</a></div> \
-                     <div><a class="add-field" href="#" data-fieldtye="selection">Selection</a></div>')
+            text: $('<div><a class="add-field" href="#" data-fieldtype="text">Text</a></div> \
+                     <div><a class="add-field" href="#" data-fieldtype="input">Input</a></div> \
+                     <div><a class="add-field" href="#" data-fieldtype="selection">Selection</a></div>')
         },
         position: {
             at: "top right",
@@ -154,7 +153,8 @@ $(function() {
                 $(".add-field").click(function(e) {
                     e.preventDefault();
                     api.hide();
-                    new AddAbstractFieldDialog(${confId}).open();
+                    var fieldType = $(this).data("fieldtype");
+                    new AbstractFieldDialogFactory().makeDialog(fieldType, ${confId}).open();
                 });
             }
         }
@@ -163,7 +163,8 @@ $(function() {
     $(".edit-field").click(function(e) {
         e.preventDefault();
         var fieldId = $(this).data("id");
-        new AddAbstractFieldDialog(${confId}, fieldId).open();
+        var fieldType = $(this).data("fieldtype");
+        new AbstractFieldDialogFactory().makeDialog(fieldType, ${confId}, fieldId).open();
     });
 });
 

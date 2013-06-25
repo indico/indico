@@ -78,23 +78,27 @@ class RemoveLateSubmissionAuthUser(ConferenceModifBase):
         return fossilize(self._conf.getAbstractMgr().getAuthorizedSubmitterList())
 
 
-class AddField(ConferenceModifBase):
+class SetField(ConferenceModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self.fieldId = pm.extract("id", pType=str, allowEmpty=True)
-        self.name = pm.extract("name", pType=str, allowEmpty=False)
-        self.caption = pm.extract("caption", pType=str, allowEmpty=False)
-        self.maxLength = pm.extract("maxLength", pType=int, allowEmpty=True, defaultValue=0)
-        self.isMandatory = pm.extract("isMandatory", pType=bool, allowEmpty=False)
-        self.fieldType = pm.extract("fieldType", pType=str, allowEmpty=False)
-        self.fieldLimitation = pm.extract("fieldLimitation", pType=str, allowEmpty=False)
+        self.params = {}
+
+        self.params["type"] = pm.extract("type", pType=str, allowEmpty=False, defaultValue="text")
+        self.params["id"] = pm.extract("id", pType=str, allowEmpty=True)
+        self.params["name"] = pm.extract("name", pType=str, allowEmpty=False)
+        self.params["caption"] = pm.extract("caption", pType=str, allowEmpty=False)
+        self.params["isMandatory"] = pm.extract("isMandatory", pType=bool, allowEmpty=True, defaultValue=False)
+
+        if self.params["type"] == "text" or self.params["type"] == "input":
+            self.params["maxLength"] = pm.extract("maxLength", pType=int, allowEmpty=True, defaultValue=0)
+            self.params["limitation"] = pm.extract("limitation", pType=str, allowEmpty=True, defaultValue="chars")
+        elif self.params["type"] == "selection":
+            self.params["options"] = []
 
     def _getAnswer(self):
-        self._conf.getAbstractMgr().addAbstractField(self.fieldId, self.name, self.caption,
-                                                     self.maxLength, self.isMandatory,
-                                                     self.fieldType, self.fieldLimitation)
+        self._conf.getAbstractMgr().setAbstractField(self.params)
 
 
 class GetField(ConferenceModifBase):
@@ -115,6 +119,6 @@ methodMap = {
     "changeSubmitter": ChangeAbstractSubmitter,
     "lateSubmission.addExistingLateAuthUser": AddLateSubmissionAuthUser,
     "lateSubmission.removeLateAuthUser": RemoveLateSubmissionAuthUser,
-    "fields.addField": AddField,
+    "fields.setField": SetField,
     "fields.getField": GetField
 }

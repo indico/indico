@@ -41,6 +41,7 @@ import MaKaC.common.filters as filters
 from MaKaC.common.utils import isStringHTML, formatDateTime, formatDate
 import MaKaC.common.utils
 import MaKaC.review as review
+from MaKaC.review import AbstractTextField
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.pages.signIn import WPResetPasswordBase
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
@@ -3037,10 +3038,11 @@ class WConfModifCFA( wcomponents.WTemplated ):
             else:
                 mandatoryText = _("optional")
             maxCharText = ""
-            if int(af.getMaxLength()) != 0:
-                maxCharText = _("max: %s %s.") % (af.getMaxLength(), af.getLimitation())
-            else:
-                maxCharText = _("no limited")
+            if isinstance(af, AbstractTextField):
+                if int(af.getMaxLength()) != 0:
+                    maxCharText = _("max: %s %s.") % (af.getMaxLength(), af.getLimitation())
+                else:
+                    maxCharText = _("no limited")
             addInfo = "(%s - %s)" % (mandatoryText,maxCharText)
             url=urlHandlers.UHConfModifCFAOptFld.getURL(self._conf)
             url.addParam("fieldId", af.getId())
@@ -3062,7 +3064,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
                                 </td>
                                 <td width="1%%">%s</td>
                                 <td>
-                                  &nbsp;<a class="edit-field" href="#" data-id=%s>%s</a> %s
+                                  &nbsp;<a class="edit-field" href="#" data-id=%s data-fieldType=%s>%s</a> %s
                                 </td>
                             </tr>
                             """%(
@@ -3075,6 +3077,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
                                 quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))),\
                                 removeButton, \
                                 af.getId(),
+                                af.getType(),
                                 af.getName(), \
                                 addInfo))
         laf.append( i18nformat("""
