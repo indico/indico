@@ -156,7 +156,7 @@ function addProperty(object, value, observer) {
  */
 function changeProperty(object, key, value, observer) {
 	var old = object[key];
-	if (!equals(old, value)) {
+	if (old !== value) {
 		if (exists(value)) {
 			object[key] = value;
 		} else {
