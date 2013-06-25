@@ -79,7 +79,9 @@ class WEventDetailBanner(wcomponents.WTemplated):
         vars["conf"] = self._rh._conf
         return vars
 
+
 class WPCollaborationBase:
+
     def __init__(self):
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
         self._plugin_asset_env = PluginEnvironment('Collaboration', os.path.dirname(__file__), '/Collaboration')
@@ -159,6 +161,7 @@ class WAdminCollaboration(wcomponents.WTemplated):
         vars["InitialResultsPerPage"] = self._queryParams["resultsPerPage"]
         vars["InitialPage"] = self._queryParams["page"]
         vars["BaseURL"] = collaborationUrlHandlers.UHAdminCollaboration.getURL()
+        vars["ConfCollaborationDisplay"] = collaborationUrlHandlers.UHCollaborationDisplay.getURL()
 
         if self._queryParams["queryOnLoad"]:
             ci = IndexesHolder().getById('collaboration')
@@ -281,6 +284,9 @@ class WPConfModifCSBase (WPConferenceModifBase):
         if self._pluginsDictMenuItem.has_key('Video Services'):
             self._pluginsDictMenuItem['Video Services'].setActive(True)
 
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + ['Collaboration/Style.css']
+
 
 class WPConfModifCollaboration(WPConfModifCSBase, WPCollaborationBase):
 
@@ -356,7 +362,7 @@ class WConfModifCollaboration(wcomponents.WTemplated):
 
         from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin, RCVideoServicesUser
 
-        vars["UserIsAdmin"] = vars["UserIsAdmin"] = RCCollaborationAdmin.hasRights(self._user) or RCCollaborationPluginAdmin.hasRights(self._user, plugins = self._tabPlugins)
+        vars["UserIsAdmin"] = RCCollaborationAdmin.hasRights(self._user) or RCCollaborationPluginAdmin.hasRights(self._user, plugins=self._tabPlugins)
 
         hasCreatePermissions = {}
         videoServSupport = {}

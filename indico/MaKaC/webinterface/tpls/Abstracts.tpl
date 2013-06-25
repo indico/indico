@@ -36,7 +36,7 @@
                     <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
                     <span style="padding: 0px 6px 0px 6px">|</span>
                 % endif
-                <a id="index_filter" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
+                <a id="index_filter" class="CRLIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
                   % if filterUsed:
                     ${ _("Show filters")}
                   % else:
@@ -44,7 +44,7 @@
                   % endif
                 </a>
                 <span style="padding: 0px 6px 0px 6px">|</span>
-                <a id="index_display" class="CAIndexUnselected" font-size="16">
+                <a id="index_display" class="CRLIndexUnselected" font-size="16">
                     ${ _("Columns to display")}
                 </a>
             </div>
@@ -171,10 +171,10 @@
     </tr>
     % if (totalNumberAbstracts == "0"):
     <tr>
-        <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText">${_("There are no abstracts submitted yet")}</span></td>
+        <td style="padding:15px 0px 15px 15px;"><span class="italic">${_("There are no abstracts submitted yet")}</span></td>
     </tr>
     % elif (filteredNumberAbstracts == "0"):
-        <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText">${_("There are no abstracts with the filters criteria selected")}</span></td>
+        <td style="padding:15px 0px 15px 15px;"><span class="italic">${_("There are no abstracts with the filters criteria selected")}</span></td>
     % else:
         <tr>
             <td></td>

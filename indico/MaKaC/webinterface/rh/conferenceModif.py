@@ -63,7 +63,6 @@ from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.plugins.base import Observable
 from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.plugins.Collaboration.urlHandlers import UHConfModifCollaboration
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
 import MaKaC.webinterface.pages.abstracts as abstracts
 from MaKaC.rb_tools import FormMode
@@ -200,15 +199,16 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         self._isRegistrar = self._target.isRegistrar( self._getUser() )
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
-        self._isVideoServicesManagerOrAdmin =  (self._notify("isPluginTypeAdmin", {"user": self._getUser()}) or
-            self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"}) or
-            self._notify("isPluginManager", {"user": self._getUser(), "plugins": "any"}))
+        self._isPluginManagerOrAdmin = any(self._notify("isPluginTypeAdmin", {"user": self._getUser()}) +
+                                           self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"}) +
+                                           self._notify("isPluginManager", {"user": self._getUser(), "conf": self._target, "plugins": "any"}))
 
     def _checkProtection(self):
-        if not (self._isRegistrar or self._isPRM or self._isReferee or self._isVideoServicesManagerOrAdmin):
+        if not (self._isRegistrar or self._isPRM or self._isReferee or self._isPluginManagerOrAdmin):
             RHConferenceModifKey._checkProtection(self)
 
     def _process( self ):
+        url = None
         if self._redirectURL != "":
             url = self._redirectURL
 
@@ -221,10 +221,11 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
             url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
-        elif self._isVideoServicesManagerOrAdmin:
-            url = UHConfModifCollaboration.getURL(self._conf, secure = self.use_https())
-
-        else:
+        elif self._isPluginManagerOrAdmin:
+            urls = self._notify("conferencePluginManagementURL", {"conf": self._target, "secure": self.use_https()})
+            if urls:
+                url = urls[0]
+        if not url:
             url = urlHandlers.UHConfManagementAccess.getURL( self._conf )
 
         self._redirect( url )

@@ -622,7 +622,7 @@ var showInfo = function(chatroom) {
     var infoTbody = Html.tbody();
     if (chatroom.error && chatroom.errorDetails) {
         var errorCell = Html.td({colspan:2, colSpan:2});
-        errorCell.append(Html.span('collaborationWarning', chatroom.errorDetails));
+        errorCell.append(Html.span('chatWarning', chatroom.errorDetails));
         infoTbody.append(Html.tr({}, errorCell));
     }
 
@@ -1095,7 +1095,7 @@ var refreshTableHead = function() {
         var firstCell = Html.td();
         headRow.append(firstCell);
 
-        var emptyCell = Html.td({className: "collaborationTitleCell"});
+        var emptyCell = Html.td({className: "chatfTitleCell"});
         headRow.append(emptyCell);
 
         var lastCell = Html.td({width: "100%", colspan: 1, colSpan: 1})

@@ -62,7 +62,7 @@
     </tr>
     <tr id="noPendingInfo">
         <td colspan=10 style="font-style: italic; padding:15px 0px 15px 15px; border-bottom: 1px solid #DDDDDD;" nowrap>
-            <span class="collShowBookingsText">${_("There are no pending participants yet")}</span>
+            <span class="italic">${_("There are no pending participants yet")}</span>
         </td>
     </tr>
     % for key, p in pending:

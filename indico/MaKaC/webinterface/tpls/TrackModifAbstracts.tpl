@@ -35,7 +35,7 @@
                 <span id="resetLink" class="btnRemove" onclick="window.location = '${ resetFiltersURL }';" style="padding-left:6px;">${ _("Reset filters") }</span>
                 <span style="padding: 0px 6px 0px 0px">|</span>
             % endif
-            <span id="filtersLink" class="CAIndexUnselected" onclick="showFilters();" style="cursor:pointer; padding-left:6px;">${ _("Show filters") if (filterUsed) else _("Apply filters") }</span>
+            <span id="filtersLink" class="CRLIndexUnselected" onclick="showFilters();" style="cursor:pointer; padding-left:6px;">${ _("Show filters") if (filterUsed) else _("Apply filters") }</span>
         </td>
     </tr>
     <tr>
@@ -100,10 +100,10 @@
                 </tr>
                 % if (totalNumberAbstracts == "0"):
                 <tr>
-                    <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText">${_("There are no abstracts submitted yet")}</span></td>
+                    <td style="padding:15px 0px 15px 15px;"><span class="italic">${_("There are no abstracts submitted yet")}</span></td>
                 </tr>
                 % elif (filteredNumberAbstracts == "0"):
-                    <td style="padding:15px 0px 15px 15px;"><span class="collShowBookingsText">${_("There are no abstracts with the filters criteria selected")}</span></td>
+                    <td style="padding:15px 0px 15px 15px;"><span class="italic">${_("There are no abstracts with the filters criteria selected")}</span></td>
                 % else:
                 <tr>
                     <td colspan="7" style="padding: 5px 0px 10px;" nowrap>${ _("Select: ") }<a style="color: #0B63A5;" id="selectAll">${ _("All") }</a>, <a style="color: #0B63A5;" id="deselectAll">${ _("None") }</a></td>
@@ -162,7 +162,7 @@ function showFilters() {
         % else:
             $E('filtersLink').set($T('Apply filters'));
         % endif
-        $E('filtersLink').dom.className = "CAIndexUnselected";
+        $E('filtersLink').dom.className = "CRLIndexUnselected";
     }
 }
 

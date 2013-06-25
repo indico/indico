@@ -20,25 +20,25 @@
             <table>
                 <tbody>
                 <tr>
-                    <td class="collaborationDisplayInfoLeftCol"> Name: </td>
-                    <td class="collaborationDisplayInfoRightCol"> ${chatroom.getTitle()} </td>
+                    <td class="chatDisplayInfoLeftCol"> Name: </td>
+                    <td class="chatDisplayInfoRightCol"> ${chatroom.getTitle()} </td>
                 </tr>
                 <tr>
-                    <td class="collaborationDisplayInfoLeftCol"> Server: </td>
-                    <td class="collaborationDisplayInfoRightCol" style="font-family:monospace;">
+                    <td class="chatDisplayInfoLeftCol"> Server: </td>
+                    <td class="chatDisplayInfoRightCol" style="font-family:monospace;">
                     ${'conference.' + chatroom.getHost() if chatroom.getCreatedInLocalServer() else chatroom.getHost()}
                     </td>
                 </tr>
                 <tr>
-                    <td class="collaborationDisplayInfoLeftCol"> Description: </td>
-                    <td class="collaborationDisplayInfoRightCol"> ${chatroom.getDescription()} </td>
+                    <td class="chatDisplayInfoLeftCol"> Description: </td>
+                    <td class="chatDisplayInfoRightCol"> ${chatroom.getDescription()} </td>
                 </tr>
                 <tr>
-                    <td class="collaborationDisplayInfoLeftCol"> Requires password: </td>
-                    <td class="collaborationDisplayInfoRightCol"> ${_('Yes') if chatroom.getPassword() else _('No')} </td>
+                    <td class="chatDisplayInfoLeftCol"> Requires password: </td>
+                    <td class="chatDisplayInfoRightCol"> ${_('Yes') if chatroom.getPassword() else _('No')} </td>
                 </tr>
                 <tr>
-                    <td class="collaborationDisplayInfoLeftCol"> Password: </td>
+                    <td class="chatDisplayInfoLeftCol"> Password: </td>
                     % if chatroom.getShowPass() and chatroom.getPassword():
                     <td>${chatroom.getPassword()}</td>
                     % elif not chatroom.getShowPass() and chatroom.getPassword():
@@ -56,7 +56,7 @@
         <script type="text/javascript">
             $E('CRMoreInfo${cid}').dom.onmouseover = function (event) {
                 IndicoUI.Widgets.Generic.tooltip($E('CRMoreInfo${cid}').dom, event,
-                    '<div class="collaborationLinkTooltipMeetingLecture">Click here to show / hide detailed information.</div>'
+                    '<div class="chatLinkTooltipMeetingLecture">Click here to show / hide detailed information.</div>'
                 );
             }
             var chatInfoState${cid} = false;

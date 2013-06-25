@@ -8,9 +8,9 @@
         <td colspan="3">
             <div style="padding:5px; color:gray;">
                 % if tracks:
-                    <span class="collShowBookingsText">${_("Note that the reviewers will be track coordinators of that track.")}</span>
+                    <span class="italic">${_("Note that the reviewers will be track coordinators of that track.")}</span>
                 % else:
-                    <span class="collShowBookingsText">${_("There are no tracks created yet. Please go to the menu ")}<a href="${ urlHandlers.UHConfModifProgram.getURL(conf) }">${ _("Programme")}</a>${_(" to create tracks.")}</span>
+                    <span class="italic">${_("There are no tracks created yet. Please go to the menu ")}<a href="${ urlHandlers.UHConfModifProgram.getURL(conf) }">${ _("Programme")}</a>${_(" to create tracks.")}</span>
                 % endif
             </div>
         </td>

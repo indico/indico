@@ -56,9 +56,7 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 
     def _checkProtection( self ):
-        from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
-        if not RCCollaborationAdmin.hasRights(self, None) and \
-            not RCCollaborationPluginAdmin.hasRights(self, plugins = "any"):
+        if not any(self._notify("isPluginTypeAdmin", {"user": self._getUser()}) + self._notify("isPluginTypeAdmin", {"user": self._getUser(), "plugins": "any"})):
             base.RHDisplayBaseProtected._checkProtection( self )
 
     def _checkParams( self, params, mustExist = 1 ):

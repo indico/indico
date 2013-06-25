@@ -3816,7 +3816,7 @@ class Conference(CommonObjectBase, Locatable):
         if self.getConfPaperReview().isInReviewingTeam(av):
             return True
 
-        if True in self._notify("isAllowedToAccess", {"conf": self, "user": av}):
+        if any(self._notify("isAllowedToAccess", {"conf": self, "user": av})):
             return True
 
         return False

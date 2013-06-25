@@ -80,7 +80,7 @@ else:
                 <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
                 <span style="padding: 0px 6px 0px 6px">|</span>
             % endif
-            <a id="index_filter" onclick="showFilters()" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
+            <a id="index_filter" onclick="showFilters()" class="CRLIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
               % if filterUsed:
                 ${ _("Show filters")}
               % else:
@@ -88,7 +88,7 @@ else:
               % endif
             </a>
             <span style="padding: 0px 6px 0px 6px">|</span>
-            <a id="index_display" onclick="staticURLSwitch()" class="CAIndexUnselected" font-size="16">
+            <a id="index_display" onclick="staticURLSwitch()" class="CRLIndexUnselected" font-size="16">
                 ${ _("Static URL for this result")}
             </a>
         </div>

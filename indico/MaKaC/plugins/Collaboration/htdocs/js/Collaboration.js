@@ -2017,3 +2017,88 @@ var rejectElectronicAgreement = function(confId, authKey, redirectionLink) {
 
     popup.open();
 };
+
+
+/**
+ * Builds a widget with page numbers, to put at the bottom of paginated results.
+ * @param {Integer or String with an Integer} nPages : The total number of pages through which we want to browse.
+ * @param {Integer or String with an Integer}selectedPage : The currently selected page.
+ * @param {Integer or String with an Integer}around : Number of pages that we want to whow to each side of the selected page. Note: if the selected page is 1,
+ *               it will have around * 2 pages on its right.
+ * @param {function} handler : a function that will be called everytime the user clicks on a page number. The function will be passed
+ *                             the clicked number.
+ *
+ * The resulting object has the following methods:
+ * -draw() : returns the HTML that renders the widget.
+ * -setNumberOfPages(Integer or String with an Integer): to change the number of pages of an existing widget.
+ * -selectPage(Integer or String with an Integer): to change the currently selected page. This will call refresh()
+ * -refresh(): redraws the widget in-place.
+ * -getNumberOfPages(): gets the current number of pages.
+ * -getSelectedPage(): gets the currently selected page.
+ */
+type("PageFooter", [],
+    {
+        getNumberOfPages: function() {
+            return this.nPages;
+        },
+
+        setNumberOfPages: function(nPages) {
+            nPages = parseInt(nPages);
+            this.nPages = nPages;
+            this.selectedPage = 1;
+        },
+
+        getSelectedPage: function() {
+            return this.selectedPage;
+        },
+
+        selectPage: function(page) {
+            page = parseInt(page);
+            this.selectedPage = page;
+            this.refresh()
+        },
+
+        refresh: function() {
+            var self = this;
+
+            var pages = makePageList(this.nPages, this.selectedPage, this.around);
+
+            if (this.nPages > 1) {
+                if (this.hidden) {
+                    IndicoUI.Effect.appear(this.content);
+                    this.hidden = false;
+                }
+                this.content.clear();
+
+                each(pages, function(i){
+                    var page = Html.a(i == self.selectedPage ? 'pageSelected' : 'pageUnselected', i);
+                    page.observeClick(function(){
+                        self.handler(i);
+                    });
+                    self.content.append(Html.li('pageNumber' + (i == self.nPages ? ' lastPageNumber' : ''), page))
+                });
+            } else {
+                this.hidden = true;
+                IndicoUI.Effect.disappear(this.content);
+            }
+        },
+
+        draw: function() {
+            this.content = Html.ul('pageNumberList');
+            this.refresh();
+            return this.content;
+        }
+    },
+    function(nPages, initialPage, around, handler) {
+        this.nPages = parseInt(nPages);
+        if (!this.nPages) {this.nPages = 1}
+        this.selectedPage = parseInt(initialPage);
+        if (!this.selectedPage) {this.selectedPage = 1}
+        this.around = around;
+        if (!this.around) {this.around = 4}
+
+        this.handler = handler;
+
+        this.hidden = false;
+    }
+);

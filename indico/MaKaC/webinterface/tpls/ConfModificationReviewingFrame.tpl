@@ -20,8 +20,8 @@
         <td>
             % if ConfReview.getEnableRefereeEmailNotif() or ConfReview.getEnableEditorEmailNotif() or ConfReview.getEnableReviewerEmailNotif():
                 <div style="padding:5px; color:gray;">
-                    <span class="collShowBookingsText">${_("An automatically generated e-mail will be sent to newly assigned Reviewers.")}</span><br>
-                    <span class="collShowBookingsText">${ _("You  can  modify this from the Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></span>
+                    <span class="italic">${_("An automatically generated e-mail will be sent to newly assigned Reviewers.")}</span><br>
+                    <span class="italic">${ _("You  can  modify this from the Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></span>
                 </div>
             % endif
         </td>

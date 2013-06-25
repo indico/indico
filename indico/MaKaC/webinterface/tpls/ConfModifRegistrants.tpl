@@ -19,7 +19,7 @@
                         <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
                         <span style="padding: 0px 6px 0px 6px">|</span>
                     % endif
-                    <a id="index_filter" onclick="showFilters()" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
+                    <a id="index_filter" onclick="showFilters()" class="CRLIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
                       % if filterUsed:
                         ${ _("Show filters")}
                       % else:
@@ -27,11 +27,11 @@
                       % endif
                     </a>
                     <span style="padding: 0px 6px 0px 6px">|</span>
-                    <a id="index_display" onclick="showDisplay()" class="CAIndexUnselected" font-size="16">
+                    <a id="index_display" onclick="showDisplay()" class="CRLIndexUnselected" font-size="16">
                         ${ _("Columns to display")}
                     </a>
                     <span style="padding: 0px 6px 0px 6px">|</span>
-                    <a id="index_display" onclick="staticURLSwitch()" class="CAIndexUnselected" font-size="16">
+                    <a id="index_display" onclick="staticURLSwitch()" class="CRLIndexUnselected" font-size="16">
                         ${ _("Static URL for this result")}
                     </a>
                 </div>
@@ -115,7 +115,7 @@
             % if filteredNumberRegistrants == "0":
             <tr id="noRegistrantInfo">
                 <td colspan=10 style="font-style: italic; padding:15px 0px 15px 15px; border-bottom: 1px solid #DDDDDD;" nowrap>
-                    <span class="collShowBookingsText">${ _("There are no registrants yet") }</span>
+                    <span class="italic">${ _("There are no registrants yet") }</span>
                 </td>
             </tr>
             % else:

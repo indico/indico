@@ -6,7 +6,6 @@
 <% from indico.util import json %>
 <% import MaKaC.webinterface.common.tools as securityTools %>
 <% from MaKaC.export import fileConverter %>
-<% from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationDisplay %>
 <%
 config = Config.getInstance()
 authenticators = filter(lambda x: x.id != 'Local', AuthenticatorMgr().getList())
@@ -108,7 +107,6 @@ var Indico = {
         ConferenceDisplay: "${ urlHandlers.UHConferenceDisplay.getURL() }",
         ContributionDisplay: "${ urlHandlers.UHContributionDisplay.getURL() }",
         SessionDisplay: "${ urlHandlers.UHSessionDisplay.getURL() }",
-        ConfCollaborationDisplay: "${ UHCollaborationDisplay.getURL() }",
 
         ContribToXML: "${ urlHandlers.UHContribToXML.getURL() }",
         ContribToPDF: "${ urlHandlers.UHContribToPDF.getURL() }",

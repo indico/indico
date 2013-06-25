@@ -123,7 +123,7 @@ class CollaborationBookingModif(CollaborationBookingModifBase):
     """
     def _checkProtection(self):
         CollaborationBookingModifBase._checkProtection(self)
-        if not RCVideoServicesUser.hasRights(self, None, self._bookingType):
+        if not RCVideoServicesUser.hasRights(self, self._bookingType):
             raise CollaborationException(_("You dot have access to modify a %s booking")%self._bookingType)
 
 

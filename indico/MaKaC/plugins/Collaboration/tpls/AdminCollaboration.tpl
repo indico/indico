@@ -439,7 +439,7 @@ $('#CAStaticURLLink').qtip({
 });
 
 var buildVideoServicesDisplayUrl = function(conference){
-    return (conference.type === 'conference' ? Indico.Urls.ConfCollaborationDisplay : Indico.Urls.ConferenceDisplay ) + '?confId=' + conference.id;
+    return (conference.type === 'conference' ? '${ConfCollaborationDisplay}' : Indico.Urls.ConferenceDisplay ) + '?confId=' + conference.id;
 };
 
 var confTitleGroupTemplate = function(group, isFirst){

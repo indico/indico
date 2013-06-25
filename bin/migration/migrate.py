@@ -667,7 +667,9 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
         ####################################
         #Update vidyo indexes:
         ####################################
-        csbm = conf.getCSBookingManager()
+        csbm = getattr(conf, "_CSBookingManager", None)
+        if csbm is None:
+            return
         for booking in csbm.getBookingList():
             if booking.getType() == "Vidyo" and booking.isCreated():
                 endDateIndex.indexBooking(booking)
@@ -681,9 +683,6 @@ def conferenceMigration1_0(dbi, withRBDB, prevVersion):
         vidyoRoomIndex = VidyoTools.getIndexByVidyoRoom()
         endDateIndex.clear()
         vidyoRoomIndex.clear()
-
-
-
 
     ch = ConferenceHolder()
     i = 0
@@ -799,15 +798,16 @@ def redisLinkedTo(dbi, withRBDB, prevVersion):
     print '\r  Done   '
 
 @since('1.2')
-def updateVideoServices(dbi, withRBDB, prevVersion):
+def removeVideoServicesLinksFromCore(dbi, withRBDB, prevVersion):
     """Video Services migration remove from core"""
     ch = ConferenceHolder()
     idx = Catalog.getIdx("cs_bookingmanager_conference")
     i = 0
     for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
-        # Stopre CSBookingManager in the index
+        # Store CSBookingManager in the index
         csbm = getattr(conf, "_CSBookingManager", None)
-        if csbm is None: continue
+        if csbm is None:
+            continue
         idx.index(conf.getId(), csbm)
         # Update Menu Links
         menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf).getMenu()

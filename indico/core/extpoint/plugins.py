@@ -29,10 +29,12 @@ class IPluginSettingsContributor(IContributor):
     def getPluginSettingsHTML(self, obj, ptype, plugin):
         pass
 
+
 class IPluginImplementationContributor(IContributor):
 
     def getPluginImplementation(self, obj):
         pass
+
 
 class IPluginRightsContributor(IContributor):
 
@@ -50,6 +52,10 @@ class IPluginRightsContributor(IContributor):
 
     def isPluginUser(self, obj, params):
         pass
+
+    def conferencePluginManagementURL(self, obj, params):
+        pass
+
 
 class IPluginDocumentationContributor(IContributor):
 

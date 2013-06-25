@@ -31,7 +31,7 @@
                     ${ 1 + moreScheduled } more scheduled bookings.
                 % endif
             </span>
-            <span id="collShowBookings" class="fakeLink collShowBookingsText">Show</span>
+            <span id="collShowBookings" class="fakeLink italic">Show</span>
         </div>
     </div>
 

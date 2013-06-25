@@ -766,7 +766,7 @@ type("SubmitPopup", ["ExclusivePopupWithButtons"], {
     draw: function() {
         var contentDiv = $("<div/>");
         var materialList = $("<div/>", {id: "reviewingMaterialListPlace1"});
-        var warningDiv =  $("<div/>", {id: "submitWarningText"}).addClass("collaborationWarning");
+        var warningDiv =  $("<div/>", {id: "submitWarningText"}).addClass("rescheduleWarning");
         warningDiv.css("padding-bottom", "3px");
         warningDiv.css("padding-left", "3px");
         warningDiv.css("margin-top", "5px");

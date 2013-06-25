@@ -62,13 +62,13 @@ class RCCollaborationAdmin(object):
 
 class RCCollaborationPluginAdmin(object):
     @staticmethod
-    def hasRights(user, plugins = []):
+    def hasRights(user, plugins=[]):
         """ Returns True if the user is an admin of one of the plugins corresponding to pluginNames
             plugins: a list of Plugin objects (e.g. EVO, RecordingRequest) or strings with the plugin name ('EVO', 'RecordingRequest')
                      or the string 'any' (we will then check if the user is manager of any plugin),
         """
         if user:
-            plist = CollaborationTools.getCollaborationPluginType().getPluginList() if  plugins == 'any' else plugins
+            plist = CollaborationTools.getCollaborationPluginType().getPluginList() if plugins == 'any' else plugins
 
             if plist:
                 for plugin in plist:
@@ -81,7 +81,7 @@ class RCCollaborationPluginAdmin(object):
 
 class RCVideoServicesManager(object):
     @staticmethod
-    def hasRights(user, conf, plugins = []):
+    def hasRights(user, conf, plugins=[]):
         """ Returns True if the logged in user has rights to operate with bookings of at least one of a list of plugins, for an event.
             This is true if:
                 -the user is a Video Services manager (can operate with all plugins)
