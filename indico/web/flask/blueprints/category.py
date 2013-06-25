@@ -18,9 +18,7 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from flask import Blueprint, redirect, url_for
-import MaKaC.webinterface.rh.calendar as calendar
-import MaKaC.webinterface.rh.categoryDisplay as categoryDisplay
-import MaKaC.webinterface.rh.categoryMod as categoryMod
+from MaKaC.webinterface.rh import calendar, categoryDisplay, categoryMod
 from indico.web.flask.util import rh_as_view
 
 
