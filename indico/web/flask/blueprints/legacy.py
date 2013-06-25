@@ -341,10 +341,7 @@ legacy.add_url_rule('/abstractsManagment.py/participantList',
 
 
 # Routes for adminCollaboration.py
-legacy.add_url_rule('/adminCollaboration.py',
-                    'adminCollaboration',
-                    rh_as_view(mod_rh_collaboration.RHAdminCollaboration),
-                    methods=('GET', 'POST'))
+# Inactive: /adminCollaboration.py (mod_rh_collaboration.RHAdminCollaboration)
 
 
 # Routes for adminConferenceStyles.py

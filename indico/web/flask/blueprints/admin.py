@@ -20,7 +20,7 @@
 from flask import Blueprint
 
 from MaKaC.webinterface.rh import admins, announcement, taskManager, maintenance, domains, users, groups, templates, \
-    conferenceModif
+    conferenceModif, collaboration
 from indico.web.flask.util import rh_as_view
 
 
@@ -129,3 +129,6 @@ admin.add_url_rule('/layout/posters/save', 'posterTemplates-posterPrinting',
                    rh_as_view(conferenceModif.RHConfPosterPrinting), methods=('GET', 'POST'))
 admin.add_url_rule('/layout/posters/design', 'posterTemplates-posterDesign',
                    rh_as_view(templates.RHConfPosterDesign), methods=('GET', 'POST'))
+
+# Collaboration
+admin.add_url_rule('/collaboration', 'adminCollaboration', rh_as_view(collaboration.RHAdminCollaboration))
