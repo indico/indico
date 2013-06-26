@@ -483,6 +483,7 @@ class Config:
         'OAuthAccessTokenTTL' : 10000,
         'MobileURL' : '',
         'SessionLifetime' : 86400*31,
+        'RouteOldUrls': False,
         # Authentication
         'LDAPConfig': {'host': 'myldapserver.example.com',
                        'useTLS': True,

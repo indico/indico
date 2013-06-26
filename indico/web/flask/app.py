@@ -20,6 +20,7 @@
 from __future__ import absolute_import
 
 import os
+import re
 from flask import send_from_directory, request
 from flask import current_app as app
 from werkzeug.exceptions import NotFound
@@ -72,6 +73,7 @@ def configure_app(app):
     app.config['PERMANENT_SESSION_LIFETIME'] = cfg.getSessionLifetime()
     app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
     app.config['INDICO_HTDOCS'] = cfg.getHtdocsDir()
+    app.config['INDICO_COMPAT_ROUTES'] = cfg.getRouteOldUrls()
     static_file_method = cfg.getStaticFileMethod()
     if static_file_method:
         app.config['USE_X_SENDFILE'] = True
@@ -112,6 +114,9 @@ def add_plugin_blueprints(app):
 
 def handle_404(exception):
     try:
+        if re.search(r'\.py(?:/\S+)?$', request.path):
+            # While not dangerous per so, we never serve *.py files as static
+            raise NotFound
         return send_from_directory(app.config['INDICO_HTDOCS'], request.path[1:], conditional=True)
     except NotFound:
         if exception.description == NotFound.description:
@@ -142,6 +147,7 @@ def make_app():
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)
-    add_compat_blueprints(app)
+    if app.config['INDICO_COMPAT_ROUTES']:
+        add_compat_blueprints(app)
     add_plugin_blueprints(app)
     return app

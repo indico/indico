@@ -80,6 +80,10 @@ BaseSecureURL        = "https://localhost:8443/indico"
 #   LoginURL             = ""
 #   RegistrationURL      = ""
 
+# Support the old mod_python-style URLs (conferenceDisplay.py?confId=123 etc.) by redirecting
+# them to their new URL.
+#RouteOldUrls = False
+
 
 #------------------------------------------------------------------------------
 # DIRECTORIES
