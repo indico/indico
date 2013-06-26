@@ -62,6 +62,7 @@ class IAbstractFieldFossil(IFossil):
 
 
 class IAbstractTextFieldFossil(IAbstractFieldFossil):
+
     def getMaxLength(self):
         """ Maximum length of the field """
 
@@ -69,7 +70,21 @@ class IAbstractTextFieldFossil(IAbstractFieldFossil):
         """ Type of limitation """
 
 
+class ISelectionFieldOptionFossil(IFossil):
+
+    def getId(self):
+        """ ID of the option """
+
+    def getCaption(self):
+        """ Caption of the option """
+
+    def isDeleted(self):
+        """ True if option has been deleted """
+
+
 class IAbstractSelectionFieldFossil(IAbstractFieldFossil):
 
     def getOptions(self):
         """ Options for selection """
+
+    getOptions.result = ISelectionFieldOptionFossil

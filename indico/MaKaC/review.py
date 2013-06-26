@@ -39,6 +39,7 @@ from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.abstracts import IAbstractFieldFossil
 from MaKaC.fossils.abstracts import IAbstractTextFieldFossil
 from MaKaC.fossils.abstracts import IAbstractSelectionFieldFossil
+from MaKaC.fossils.abstracts import ISelectionFieldOptionFossil
 
 import tempfile
 
@@ -609,29 +610,80 @@ class AbstractSelectionField(AbstractField):
     _type = "selection"
 
     def __init__(self, params):
-        AbstractField.__init__(params)
-        self._options = params["options"]
+        AbstractField.__init__(self, params)
+        self.__optionGenerator = Counter()
+        self._options = []
+        for o in params["options"]:
+            self._setOption(o)
+
+    def _setOption(self, option):
+        if self.hasOption(option["id"]):
+            self.getOptionById(option["id"]).setCaption(option["caption"])
+        else:
+            option["id"] = self.__optionGenerator.newCount()
+            self._options.append(SelectionFieldOption(option["id"], option["caption"]))
 
     def clone(self):
         return AbstractSelectionField(self.getValues())
 
-    def addOption(self, option):
-        self._options.append(option)
+    def getOptionById(self, id):
+        for o in self._options:
+            if o.getId() == id:
+                return o
+        return None
 
     def getOptions(self):
         return self._options
 
+    def hasOption(self, id):
+        return self.getOptionById(id) is not None
+
     def setOptions(self, options=[]):
-        self._options = options
+        for option in options:
+            self._addOption(option)
+        self._notifyModification()
 
     def getValues(self):
         values = AbstractField.getValues(self)
-        values["options"] = self.getOptions()
+
+        options = []
+        for o in self.getOptions():
+            options.append(o.__dict__)
+        values["options"] = options
+
         return values
 
     def setValues(self, params):
         AbstractField.setValues(self, params)
         self.setOptions(params["options"])
+        self._notifyModification()
+
+
+class SelectionFieldOption(Fossilizable):
+    fossilizes(ISelectionFieldOptionFossil)
+
+    def __init__(self, id, caption):
+        self._id = id
+        self._caption = caption
+        self._deleted = False
+
+    def __str__(self):
+        return self._caption
+
+    def getCaption(self):
+        return self._caption
+
+    def getId(self):
+        return self._id
+
+    def isDeleted(self):
+        return self._deleted
+
+    def setCaption(self, caption):
+        self._caption = caption
+
+    def setDeleted(self, deletion=True):
+        self._deleted = deletion
 
 
 class AbstractFieldsMgr(Persistent):

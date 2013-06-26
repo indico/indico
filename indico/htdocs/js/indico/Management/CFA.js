@@ -992,10 +992,14 @@ type("AddAbstractSelectionFieldDialog", ["AddAbstractFieldDialog"],
     {
         _initializeForm: function() {
             this.AddAbstractFieldDialog.prototype._initializeForm.call(this);
+            var fieldOptions = this._parameterManager.add(new RealtimeTextArea({}), "text", true);
+            fieldOptions = $B(fieldOptions, this.info.accessor("options"));
+            this._form.push([$T("Options"), fieldOptions.draw()]);
         },
 
-        __fetch: function() {
-
+        __fillForm: function() {
+            this.AddAbstractFieldDialog.prototype.__fillForm.call(this, field);
+            this.info.set("options", field.options);
         }
     },
 
