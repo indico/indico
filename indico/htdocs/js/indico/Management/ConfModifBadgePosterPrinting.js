@@ -29,10 +29,27 @@ $(document).ready(function() {
     var data = $('#create_form #config_data');
     // set data directly in form
     data.html('');
-    data.append($('#badgePDFOptions input').clone());
+
+    // TODO: remove ugly workaround when IE bug is solved
+    // http://bugs.jquery.com/ticket/10550#comment:22
+    $('#badgePDFOptions input[type=checkbox]:not(:checked)').addClass("_unchecked");
+    var clone = $('#badgePDFOptions input').clone();
+    _fixclonedcheckbox(clone);
+    data.append(clone);
+
     $('#create_form').submit();
     return false;
   });
+
+  // TODO: remove ugly workaround when IE bug is solved
+  // http://bugs.jquery.com/ticket/10550#comment:22
+  var _fixclonedcheckbox = function(clone) {
+    clone.each(function() {
+        if ($(this).attr("class") == "_unchecked") {
+            $(this).prop("checked", false);
+        }
+    });
+  };
 
   var get_radio_buttons = function() {
     return $(document).find('[name=templateId]');
