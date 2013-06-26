@@ -144,13 +144,13 @@ def _check_pythonbrew(versions):
             pythonbrew_cmd('venv -p {0} create indico'.format(version))
 
 
-def _check_pdflatex():
+def _check_present(executable, message="Please install it first."):
     """
-    Check that pdflatex exists
+    Check that executable exists in $PATH
     """
     with settings(warn_only=True):
-        if local('which pdflatex > /dev/null && echo $?', capture=True) != '0':
-            print red('pdflatex is not available in this system. It is needed for PDF generation.')
+        if local('which {0} > /dev/null && echo $?'.format(executable), capture=True) != '0':
+            print red('{0} is not available in this system. {1}'.format(executable, message))
             sys.exit(-2)
 
 
@@ -275,6 +275,8 @@ def setup_deps(n_env=None, n_version=None, src_dir=None, system_node=None):
 
     ext_dir = os.path.join(src_dir, 'ext_modules')
 
+    _check_present('curl')
+
     with settings(node_env_path=n_env or os.path.join(ext_dir, 'node_env'),
                   node_version=n_version or env.node_version,
                   system_node=system_node,
@@ -328,7 +330,7 @@ def make_docs(src_dir=None, build_dir=None):
     """
     Generate Indico docs
     """
-    _check_pdflatex()
+    _check_present('pdflatex')
 
     src_dir = src_dir or env.src_dir
 
