@@ -17,8 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint
 from MaKaC.webinterface.legacyReservationExport import exportReservations
+from indico.web.flask.wrappers import IndicoBlueprint
 
-legacy_scripts = Blueprint('legacy_scripts', __name__, url_prefix='/scripts')
+legacy_scripts = IndicoBlueprint('legacy_scripts', __name__, url_prefix='/scripts')
 legacy_scripts.add_url_rule('/exportReservations.py', view_func=exportReservations, methods=('GET', 'POST'))

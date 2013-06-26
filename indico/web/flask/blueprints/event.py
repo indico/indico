@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint, redirect, url_for, request
+from flask import redirect, url_for, request
 from werkzeug.exceptions import NotFound
 
 from MaKaC.common import DBMgr
@@ -25,6 +25,7 @@ from MaKaC.webinterface.urlHandlers import UHConferenceDisplay
 from MaKaC.webinterface.rh import categoryDisplay, conferenceDisplay, contribDisplay, CFADisplay, authorDisplay, \
     paperReviewingDisplay, collaboration, evaluationDisplay, registrantsDisplay, registrationFormDisplay, sessionDisplay
 from indico.web.flask.util import rh_as_view
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
 def _redirect_simple_event(**kwargs):
@@ -67,8 +68,8 @@ def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
     return func()
 
 
-event = Blueprint('event', __name__, url_prefix='/event')
-event_shorturl = Blueprint('event_shorturl', __name__)
+event = IndicoBlueprint('event', __name__, url_prefix='/event')
+event_shorturl = IndicoBlueprint('event_shorturl', __name__)
 
 
 # Short URLs

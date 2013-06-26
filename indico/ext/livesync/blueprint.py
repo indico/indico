@@ -17,13 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint
-
 import indico.ext.livesync.chrome as handlers
 from indico.web.flask.util import rh_as_view
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
-blueprint = Blueprint('livesync', __name__, url_prefix='/livesync')
+blueprint = IndicoBlueprint('livesync', __name__, url_prefix='/livesync')
 
 blueprint.add_url_rule('/manage', 'manage', rh_as_view(handlers.RHAdminLiveSyncManagement))
 blueprint.add_url_rule('/status', 'status', rh_as_view(handlers.RHAdminLiveSyncStatus))

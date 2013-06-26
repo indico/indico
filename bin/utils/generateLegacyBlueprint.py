@@ -182,14 +182,14 @@ def main():
             ## You should have received a copy of the GNU General Public License
             ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-            from flask import Blueprint
             from indico.web.flask.util import rh_as_view
+            from indico.web.flask.wrappers import IndicoBlueprint
         ''').lstrip('\n'))
         f.write('\n')
         f.writelines(line + '\n' for line in generate_imports(routes))
         f.write('\n')
         f.write(textwrap.dedent('''
-            legacy = Blueprint('legacy', __name__)
+            legacy = IndicoBlueprint('legacy', __name__)
         '''))
         f.write('\n\n')
         f.writelines(line + '\n' for line in generate_routes(routes))

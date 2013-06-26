@@ -17,82 +17,82 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint
-
 from MaKaC.webinterface.rh import roomBooking
 from indico.web.flask.util import rh_as_view
+from indico.web.flask.wrappers import IndicoBlueprint
 
-rooms = Blueprint('rooms', __name__)
+
+rooms = IndicoBlueprint('rooms', __name__, url_prefix='/rooms')
 
 # Photos
-rooms.add_url_rule('/images/rooms/large_photos/<room>.jpg', 'photo_large', build_only=True)
-rooms.add_url_rule('/images/rooms/small_photos/<room>.jpg', 'photo_small', build_only=True)
+rooms.add_url_rule('!/images/rooms/large_photos/<room>.jpg', 'photo_large', build_only=True)
+rooms.add_url_rule('!/images/rooms/small_photos/<room>.jpg', 'photo_small', build_only=True)
 
 # Home, map, lists, search
-rooms.add_url_rule('/rooms/', 'roomBooking', rh_as_view(roomBooking.RHRoomBookingWelcome))
-rooms.add_url_rule('/rooms/map', 'roomBooking-mapOfRooms', rh_as_view(roomBooking.RHRoomBookingMapOfRooms))
-rooms.add_url_rule('/rooms/map/widget', 'roomBooking-mapOfRoomsWidget',
+rooms.add_url_rule('/', 'roomBooking', rh_as_view(roomBooking.RHRoomBookingWelcome))
+rooms.add_url_rule('/map', 'roomBooking-mapOfRooms', rh_as_view(roomBooking.RHRoomBookingMapOfRooms))
+rooms.add_url_rule('/map/widget', 'roomBooking-mapOfRoomsWidget',
                    rh_as_view(roomBooking.RHRoomBookingMapOfRoomsWidget))
-rooms.add_url_rule('/rooms/bookings', 'roomBooking-bookingList', rh_as_view(roomBooking.RHRoomBookingBookingList),
+rooms.add_url_rule('/bookings', 'roomBooking-bookingList', rh_as_view(roomBooking.RHRoomBookingBookingList),
                    methods=('GET', 'POST'))
-rooms.add_url_rule('/rooms/rooms', 'roomBooking-roomList', rh_as_view(roomBooking.RHRoomBookingRoomList),
+rooms.add_url_rule('/rooms', 'roomBooking-roomList', rh_as_view(roomBooking.RHRoomBookingRoomList),
                    methods=('GET', 'POST'))
-rooms.add_url_rule('/rooms/search/bookings', 'roomBooking-search4Bookings',
+rooms.add_url_rule('/search/bookings', 'roomBooking-search4Bookings',
                    rh_as_view(roomBooking.RHRoomBookingSearch4Bookings), methods=('GET', 'POST'))
-rooms.add_url_rule('/rooms/search/rooms', 'roomBooking-search4Rooms', rh_as_view(roomBooking.RHRoomBookingSearch4Rooms),
+rooms.add_url_rule('/search/rooms', 'roomBooking-search4Rooms', rh_as_view(roomBooking.RHRoomBookingSearch4Rooms),
                    methods=('GET', 'POST'))
 
 # Booking a room
-rooms.add_url_rule('/rooms/book/', 'roomBooking-bookRoom', rh_as_view(roomBooking.RHRoomBookingBookRoom))
-rooms.add_url_rule('/rooms/book/search', 'roomBooking-bookingListForBooking',
+rooms.add_url_rule('/book/', 'roomBooking-bookRoom', rh_as_view(roomBooking.RHRoomBookingBookRoom))
+rooms.add_url_rule('/book/search', 'roomBooking-bookingListForBooking',
                    rh_as_view(roomBooking.RHRoomBookingBookingList), methods=('GET', 'POST'),
                    defaults={'newBooking': 'on'})
-rooms.add_url_rule('/rooms/book/confirm', 'roomBooking-bookingForm', rh_as_view(roomBooking.RHRoomBookingBookingForm),
+rooms.add_url_rule('/book/confirm', 'roomBooking-bookingForm', rh_as_view(roomBooking.RHRoomBookingBookingForm),
                    methods=('GET', 'POST'))
-rooms.add_url_rule('/rooms/book/save', 'roomBooking-saveBooking', rh_as_view(roomBooking.RHRoomBookingSaveBooking),
+rooms.add_url_rule('/book/save', 'roomBooking-saveBooking', rh_as_view(roomBooking.RHRoomBookingSaveBooking),
                    methods=('GET', 'POST'))
 
 # Booking info
-rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/', 'roomBooking-bookingDetails',
+rooms.add_url_rule('/booking/<roomLocation>/<resvID>/', 'roomBooking-bookingDetails',
                    rh_as_view(roomBooking.RHRoomBookingBookingDetails))
 
 # Modify booking
-rooms.add_url_rule('/rooms/show-message', 'roomBooking-statement', rh_as_view(roomBooking.RHRoomBookingStatement))
-rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/modify', 'roomBooking-modifyBookingForm',
+rooms.add_url_rule('/show-message', 'roomBooking-statement', rh_as_view(roomBooking.RHRoomBookingStatement))
+rooms.add_url_rule('/booking/<roomLocation>/<resvID>/modify', 'roomBooking-modifyBookingForm',
                    rh_as_view(roomBooking.RHRoomBookingBookingForm), methods=('GET', 'POST'))
-rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/cancel', 'roomBooking-cancelBooking',
+rooms.add_url_rule('/booking/<roomLocation>/<resvID>/cancel', 'roomBooking-cancelBooking',
                    rh_as_view(roomBooking.RHRoomBookingCancelBooking), methods=('POST',))
-rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/accept', 'roomBooking-acceptBooking',
+rooms.add_url_rule('/booking/<roomLocation>/<resvID>/accept', 'roomBooking-acceptBooking',
                     rh_as_view(roomBooking.RHRoomBookingAcceptBooking), methods=('POST',))
-rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/reject', 'roomBooking-rejectBooking',
+rooms.add_url_rule('/booking/<roomLocation>/<resvID>/reject', 'roomBooking-rejectBooking',
                    rh_as_view(roomBooking.RHRoomBookingRejectBooking), methods=('POST',))
-rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/delete', 'roomBooking-deleteBooking',
+rooms.add_url_rule('/booking/<roomLocation>/<resvID>/delete', 'roomBooking-deleteBooking',
                    rh_as_view(roomBooking.RHRoomBookingDeleteBooking), methods=('POST',))
-rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/clone', 'roomBooking-cloneBooking',
+rooms.add_url_rule('/booking/<roomLocation>/<resvID>/clone', 'roomBooking-cloneBooking',
                    rh_as_view(roomBooking.RHRoomBookingCloneBooking), methods=('POST',))
-rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/<date>/cancel', 'roomBooking-cancelBookingOccurrence',
+rooms.add_url_rule('/booking/<roomLocation>/<resvID>/<date>/cancel', 'roomBooking-cancelBookingOccurrence',
                    rh_as_view(roomBooking.RHRoomBookingCancelBookingOccurrence), methods=('POST',))
-rooms.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/<date>/reject', 'roomBooking-rejectBookingOccurrence',
+rooms.add_url_rule('/booking/<roomLocation>/<resvID>/<date>/reject', 'roomBooking-rejectBookingOccurrence',
                    rh_as_view(roomBooking.RHRoomBookingRejectBookingOccurrence), methods=('POST',))
-rooms.add_url_rule('/rooms/bookings/reject-all-conflicting', 'roomBooking-rejectAllConflicting',
+rooms.add_url_rule('/bookings/reject-all-conflicting', 'roomBooking-rejectAllConflicting',
                    rh_as_view(roomBooking.RHRoomBookingRejectALlConflicting))
 
 # Room info
-rooms.add_url_rule('/rooms/room/<roomLocation>/<roomID>/', 'roomBooking-roomDetails',
+rooms.add_url_rule('/room/<roomLocation>/<roomID>/', 'roomBooking-roomDetails',
                    rh_as_view(roomBooking.RHRoomBookingRoomDetails))
-rooms.add_url_rule('/rooms/room/<roomLocation>/<roomID>/stats', 'roomBooking-roomStats',
+rooms.add_url_rule('/room/<roomLocation>/<roomID>/stats', 'roomBooking-roomStats',
                    rh_as_view(roomBooking.RHRoomBookingRoomStats), methods=('GET', 'POST'))
 
 # Room blocking
-rooms.add_url_rule('/rooms/blocking/<blockingId>/', 'roomBooking-blockingDetails',
+rooms.add_url_rule('/blocking/<blockingId>/', 'roomBooking-blockingDetails',
                    rh_as_view(roomBooking.RHRoomBookingBlockingDetails))
-rooms.add_url_rule('/rooms/blocking/<blockingId>/modify', 'roomBooking-blockingForm',
+rooms.add_url_rule('/blocking/<blockingId>/modify', 'roomBooking-blockingForm',
                    rh_as_view(roomBooking.RHRoomBookingBlockingForm), methods=('GET', 'POST'))
-rooms.add_url_rule('/rooms/blocking/<blockingId>/delete', 'roomBooking-deleteBlocking',
+rooms.add_url_rule('/blocking/<blockingId>/delete', 'roomBooking-deleteBlocking',
                    rh_as_view(roomBooking.RHRoomBookingDelete), methods=('GET','POST',))
-rooms.add_url_rule('/rooms/blocking/create', 'roomBooking-blockingForm',
+rooms.add_url_rule('/blocking/create', 'roomBooking-blockingForm',
                    rh_as_view(roomBooking.RHRoomBookingBlockingForm), methods=('GET', 'POST'))
-rooms.add_url_rule('/rooms/blocking/list', 'roomBooking-blockingList',
+rooms.add_url_rule('/blocking/list', 'roomBooking-blockingList',
                    rh_as_view(roomBooking.RHRoomBookingBlockingList))
-rooms.add_url_rule('/rooms/blocking/list/my-rooms', 'roomBooking-blockingsForMyRooms',
+rooms.add_url_rule('/blocking/list/my-rooms', 'roomBooking-blockingsForMyRooms',
                    rh_as_view(roomBooking.RHRoomBookingBlockingsForMyRooms))

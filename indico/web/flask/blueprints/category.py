@@ -17,17 +17,18 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint, redirect, url_for
+from flask import redirect, url_for
 from MaKaC.webinterface.rh import calendar, categoryDisplay, categoryMod
 from indico.web.flask.util import rh_as_view
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
 def _shorturl(categId):
     return redirect(url_for('category.categoryDisplay', categId=categId))
 
 
-category = Blueprint('category', __name__, url_prefix='/category')
-category_shorturl = Blueprint('category_shorturl', __name__)
+category = IndicoBlueprint('category', __name__, url_prefix='/category')
+category_shorturl = IndicoBlueprint('category_shorturl', __name__)
 
 
 # Short URLs

@@ -17,12 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint
-
 import indico.ext.search.invenio.components as handlers
 from indico.web.flask.util import rh_as_view
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
-blueprint = Blueprint('search-invenio', __name__, url_prefix='/invenio')
+blueprint = IndicoBlueprint('search-invenio', __name__, url_prefix='/invenio')
 
 blueprint.add_url_rule('/<path:filepath>', 'htdocs', rh_as_view(handlers.RHSearchHtdocsInvenio))

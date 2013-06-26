@@ -17,13 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint
-
 from MaKaC.webinterface.rh import oauth as oauth_rh
 from indico.web.flask.util import rh_as_view
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
-oauth = Blueprint('oauth', __name__)
+oauth = IndicoBlueprint('oauth', __name__)
 
 # Consumer endpoints
 oauth.add_url_rule('/oauth/access_token', 'oauth-access_token', rh_as_view(oauth_rh.RHOAuthAccessTokenURL),

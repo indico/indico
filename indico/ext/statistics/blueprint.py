@@ -17,13 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint
-
 import indico.ext.statistics.chrome as handlers
 from indico.web.flask.util import rh_as_view
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
-blueprint = Blueprint('statistics', __name__, url_prefix='/statistics')
+blueprint = IndicoBlueprint('statistics', __name__, url_prefix='/statistics')
 
 blueprint.add_url_rule('', 'view', rh_as_view(handlers.RHStatisticsView))
 blueprint.add_url_rule('/<path:filepath>', 'htdocs', rh_as_view(handlers.RHStatisticsHtdocs))

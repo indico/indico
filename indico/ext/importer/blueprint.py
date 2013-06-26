@@ -17,12 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint
-
 import indico.ext.importer.handlers as handlers
 from indico.web.flask.util import rh_as_view
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
-blueprint = Blueprint('importer', __name__, url_prefix='/importer')
+blueprint = IndicoBlueprint('importer', __name__, url_prefix='/importer')
 
 blueprint.add_url_rule('/<path:filepath>', 'htdocs', rh_as_view(handlers.RHImporterHtdocs))

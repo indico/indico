@@ -19,7 +19,9 @@
 
 from __future__ import absolute_import
 
-from flask import Flask
+from contextlib import contextmanager
+from flask import Flask, Blueprint
+from flask.blueprints import BlueprintSetupState
 from flask.wrappers import Request
 from werkzeug.utils import cached_property
 
@@ -41,3 +43,26 @@ class IndicoRequest(Request):
 class IndicoFlask(Flask):
     request_class = IndicoRequest
     session_interface = IndicoSessionInterface()
+
+
+class IndicoBlueprintSetupState(BlueprintSetupState):
+    @contextmanager
+    def _unprefixed(self):
+        prefix = self.url_prefix
+        self.url_prefix = None
+        yield
+        self.url_prefix = prefix
+
+    def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
+        if rule.startswith('!/'):
+            with self._unprefixed():
+                super(IndicoBlueprintSetupState, self).add_url_rule(rule[1:], endpoint, view_func, **options)
+        else:
+            super(IndicoBlueprintSetupState, self).add_url_rule(rule, endpoint, view_func, **options)
+
+
+class IndicoBlueprint(Blueprint):
+    """A Blueprint implementation that allows prefixing URLs with `!` to
+    ignore the url_prefix of the blueprint"""
+    def make_setup_state(self, app, options, first_registration=False):
+        return IndicoBlueprintSetupState(self, app, options, first_registration)

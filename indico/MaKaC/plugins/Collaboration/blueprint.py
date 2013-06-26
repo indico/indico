@@ -17,13 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint
-
 import MaKaC.plugins.Collaboration.handlers as handlers
 from indico.web.flask.util import rh_as_view
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
-blueprint = Blueprint('collaboration', __name__, url_prefix='/Collaboration')
+blueprint = IndicoBlueprint('collaboration', __name__, url_prefix='/Collaboration')
 
 blueprint.add_url_rule('/elecAgree', 'elecAgree', rh_as_view(handlers.RHElectronicAgreement))
 blueprint.add_url_rule('/uploadElecAgree', 'uploadElecAgree', rh_as_view(handlers.RHUploadElectronicAgreement),

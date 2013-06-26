@@ -17,8 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint
 from indico.web.flask.util import rh_as_view
+from indico.web.flask.wrappers import IndicoBlueprint
 
 import MaKaC.webinterface.rh.abstractModif as mod_rh_abstractModif
 import MaKaC.webinterface.rh.abstractReviewing as mod_rh_abstractReviewing
@@ -47,7 +47,7 @@ import MaKaC.webinterface.rh.users as mod_rh_users
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
 
 
-legacy = Blueprint('legacy', __name__)
+legacy = IndicoBlueprint('legacy', __name__)
 
 
 # Routes for EMail.py

@@ -17,14 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint
-
 from MaKaC.webinterface.rh import admins, announcement, taskManager, maintenance, domains, users, groups, templates, \
     conferenceModif, collaboration, services, api, oauth
 from indico.web.flask.util import rh_as_view
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
-admin = Blueprint('admin', __name__, url_prefix='/admin')
+admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
 
 # General settings
 admin.add_url_rule('/', 'adminList', rh_as_view(admins.RHAdminArea))

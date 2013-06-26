@@ -17,13 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import Blueprint
-
 from MaKaC.webinterface.rh import materialDisplay, fileAccess
 from indico.web.flask.util import rh_as_view
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
-files = Blueprint('files', __name__)
+files = IndicoBlueprint('files', __name__)
 
 # Material (event)
 files.add_url_rule('/event/<confId>/material/<materialId>/', 'materialDisplay',
