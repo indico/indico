@@ -82,7 +82,7 @@
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
 
-    <form action="${ urlHandlers.UHRoomBookingSaveRoom.getURL( None ) }" method="post" enctype="multipart/form-data">
+    <form action="${ urlHandlers.UHRoomBookingSaveRoom.getURL(room) if not insert else urlHandlers.UHRoomBookingSaveRoom.getURL(roomLocation=room.locationName) }" method="post" enctype="multipart/form-data">
                 <table width="95%" cellpadding="0" cellspacing="0" border="0" align="center">
                     <tr><td class="formTitle"><a href="${urlHandlers.UHRoomBookingAdminLocation.getURL(Location.parse(room.locationName))}">&lt;&lt;Back</a></td></tr>
                     <tr>

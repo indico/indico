@@ -118,6 +118,3 @@ def blockingForm( req, **params ):
     return roomBooking.RHRoomBookingBlockingForm(req).process(params)
 def deleteBlocking( req, **params ):
     return roomBooking.RHRoomBookingDelete(req).process(params)
-
-def sendRoomPhoto( req, **params ):
-    return roomBooking.RHRoomBookingSendRoomPhoto(req).process(params)

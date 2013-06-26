@@ -1878,7 +1878,7 @@ class RHRoomBookingSaveRoom( RHRoomBookingAdminBase ):
             session['rbShowErrors'] = True
 
             self._saveRoomCandidateToSession( candRoom )
-            url = urlHandlers.UHRoomBookingRoomForm.getURL( None )
+            url = urlHandlers.UHRoomBookingRoomForm.getURL(roomLocation=candRoom.locationName)
             self._redirect( url ) # Redirect again to FORM
 
 
@@ -2340,20 +2340,6 @@ class RHRoomBookingDeleteCustomAttribute( RHRoomBookingAdminBase ):  # + additio
         self._location.factory.getCustomAttributesManager().removeAttribute( self._attr, location=self._location.friendlyName )
         url = urlHandlers.UHRoomBookingAdminLocation.getURL(self._location)
         self._redirect( url )
-
-class RHRoomBookingSendRoomPhoto( RHRoomBookingBase ):
-
-    def _checkParams( self, params ):
-        self.fileName = params['photoId'] + ".jpg"
-        self.small = params.get( 'small' ) == 'True' # Large by default
-
-    def _process( self ):
-        cfg = Config.getInstance()
-
-        filePath = cfg.getRoomPhotosDir()
-        if self.small:
-            filePath = cfg.getRoomSmallPhotosDir()
-        return send_file(self.fileName, os.path.join(filePath, self.fileName), 'JPG')
 
 
 class RHRoomBookingRejectBookingOccurrence( RHRoomBookingBase ):

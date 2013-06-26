@@ -432,15 +432,15 @@ class UHRoomBookingBookingDetails(URLHandler):
 
 
 class UHRoomBookingRoomForm(URLHandler):
-    _endpoint = 'legacy.roomBooking-roomForm'
+    _endpoint = 'rooms_admin.roomBooking-roomForm'
 
 
 class UHRoomBookingSaveRoom(URLHandler):
-    _endpoint = 'legacy.roomBooking-saveRoom'
+    _endpoint = 'rooms_admin.roomBooking-saveRoom'
 
 
 class UHRoomBookingDeleteRoom(URLHandler):
-    _endpoint = 'legacy.roomBooking-deleteRoom'
+    _endpoint = 'rooms_admin.roomBooking-deleteRoom'
 
 
 class UHRoomBookingBookingForm(URLHandler):
@@ -493,51 +493,51 @@ class UHRoomBookingStatement(URLHandler):
 
 # RB Administration
 class UHRoomBookingPluginAdmin(URLHandler):
-    _endpoint = 'legacy.roomBookingPluginAdmin'
+    _endpoint = 'rooms_admin.roomBookingPluginAdmin'
 
 
 class UHRoomBookingModuleActive(URLHandler):
-    _endpoint = 'legacy.roomBookingPluginAdmin-switchRoomBookingModuleActive'
+    _endpoint = 'rooms_admin.roomBookingPluginAdmin-switchRoomBookingModuleActive'
 
 
 class UHRoomBookingPlugAdminZODBSave(URLHandler):
-    _endpoint = 'legacy.roomBookingPluginAdmin-zodbSave'
+    _endpoint = 'rooms_admin.roomBookingPluginAdmin-zodbSave'
 
 
 class UHRoomBookingAdmin(URLHandler):
-    _endpoint = 'legacy.roomBooking-admin'
+    _endpoint = 'rooms_admin.roomBooking-admin'
 
 
 class UHRoomBookingAdminLocation(URLHandler):
-    _endpoint = 'legacy.roomBooking-adminLocation'
+    _endpoint = 'rooms_admin.roomBooking-adminLocation'
 
 
 class UHRoomBookingSetDefaultLocation(URLHandler):
-    _endpoint = 'legacy.roomBooking-setDefaultLocation'
+    _endpoint = 'rooms_admin.roomBooking-setDefaultLocation'
 
 
 class UHRoomBookingSaveLocation(URLHandler):
-    _endpoint = 'legacy.roomBooking-saveLocation'
+    _endpoint = 'rooms_admin.roomBooking-saveLocation'
 
 
 class UHRoomBookingDeleteLocation(URLHandler):
-    _endpoint = 'legacy.roomBooking-deleteLocation'
+    _endpoint = 'rooms_admin.roomBooking-deleteLocation'
 
 
 class UHRoomBookingSaveEquipment(URLHandler):
-    _endpoint = 'legacy.roomBooking-saveEquipment'
+    _endpoint = 'rooms_admin.roomBooking-saveEquipment'
 
 
 class UHRoomBookingDeleteEquipment(URLHandler):
-    _endpoint = 'legacy.roomBooking-deleteEquipment'
+    _endpoint = 'rooms_admin.roomBooking-deleteEquipment'
 
 
 class UHRoomBookingSaveCustomAttributes(URLHandler):
-    _endpoint = 'legacy.roomBooking-saveCustomAttributes'
+    _endpoint = 'rooms_admin.roomBooking-saveCustomAttributes'
 
 
 class UHRoomBookingDeleteCustomAttribute(URLHandler):
-    _endpoint = 'legacy.roomBooking-deleteCustomAttribute'
+    _endpoint = 'rooms_admin.roomBooking-deleteCustomAttribute'
 
 
 class UHRoomBookingBlockingsMyRooms(URLHandler):
@@ -1573,27 +1573,27 @@ class UHDomainPerformModification(URLHandler):
 
 
 class UHRoomMappers(URLHandler):
-    _endpoint = 'legacy.roomMapper'
+    _endpoint = 'rooms_admin.roomMapper'
 
 
 class UHNewRoomMapper(URLHandler):
-    _endpoint = 'legacy.roomMapper-creation'
+    _endpoint = 'rooms_admin.roomMapper-creation'
 
 
 class UHRoomMapperPerformCreation(URLHandler):
-    _endpoint = 'legacy.roomMapper-performCreation'
+    _endpoint = 'rooms_admin.roomMapper-performCreation'
 
 
 class UHRoomMapperDetails(URLHandler):
-    _endpoint = 'legacy.roomMapper-details'
+    _endpoint = 'rooms_admin.roomMapper-details'
 
 
 class UHRoomMapperModification(URLHandler):
-    _endpoint = 'legacy.roomMapper-modify'
+    _endpoint = 'rooms_admin.roomMapper-modify'
 
 
 class UHRoomMapperPerformModification(URLHandler):
-    _endpoint = 'legacy.roomMapper-performModify'
+    _endpoint = 'rooms_admin.roomMapper-performModify'
 
 
 class UHAdminArea(URLHandler):

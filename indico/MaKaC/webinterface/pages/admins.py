@@ -2038,7 +2038,7 @@ class WPRoomMapperModification( WPRoomMapperBase ):
 
     def _getTabContent( self, params ):
         comp = WRoomMapperEdit( self._domain )
-        pars = {"postURL": urlHandlers.UHRoomMapperPerformModification.getURL() }
+        pars = {"postURL": urlHandlers.UHRoomMapperPerformModification.getURL(self._domain)}
         return comp.getHTML( pars )
 
 

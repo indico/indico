@@ -36,9 +36,6 @@ import MaKaC.webinterface.rh.reviewingControlModif as mod_rh_reviewingControlMod
 import MaKaC.webinterface.rh.reviewingListContribToJudge as mod_rh_reviewingListContribToJudge
 import MaKaC.webinterface.rh.reviewingModif as mod_rh_reviewingModif
 import MaKaC.webinterface.rh.reviewingUserCompetencesModif as mod_rh_reviewingUserCompetencesModif
-import MaKaC.webinterface.rh.roomBooking as mod_rh_roomBooking
-import MaKaC.webinterface.rh.roomBookingPluginAdmin as mod_rh_roomBookingPluginAdmin
-import MaKaC.webinterface.rh.roomMappers as mod_rh_roomMappers
 import MaKaC.webinterface.rh.sessionModif as mod_rh_sessionModif
 import MaKaC.webinterface.rh.subContribDisplay as mod_rh_subContribDisplay
 import MaKaC.webinterface.rh.subContribMod as mod_rh_subContribMod
@@ -2333,16 +2330,8 @@ legacy.add_url_rule('/contributionTools.py/delete',
 # Routes for roomBooking.py
 # Inactive: /roomBooking.py (mod_rh_roomBooking.RHRoomBookingWelcome)
 # Inactive: /roomBooking.py/acceptBooking (mod_rh_roomBooking.RHRoomBookingAcceptBooking)
-
-legacy.add_url_rule('/roomBooking.py/admin',
-                    'roomBooking-admin',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingAdmin),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/adminLocation',
-                    'roomBooking-adminLocation',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingAdminLocation),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/admin (mod_rh_roomBooking.RHRoomBookingAdmin)
+# Inactive: /roomBooking.py/adminLocation (mod_rh_roomBooking.RHRoomBookingAdminLocation)
 # Inactive: /roomBooking.py/blockingDetails (mod_rh_roomBooking.RHRoomBookingBlockingDetails)
 # Inactive: /roomBooking.py/blockingForm (mod_rh_roomBooking.RHRoomBookingBlockingForm)
 # Inactive: /roomBooking.py/blockingList (mod_rh_roomBooking.RHRoomBookingBlockingList)
@@ -2356,122 +2345,43 @@ legacy.add_url_rule('/roomBooking.py/adminLocation',
 # Inactive: /roomBooking.py/cloneBooking (mod_rh_roomBooking.RHRoomBookingCloneBooking)
 # Inactive: /roomBooking.py/deleteBlocking (mod_rh_roomBooking.RHRoomBookingDelete)
 # Inactive: /roomBooking.py/deleteBooking (mod_rh_roomBooking.RHRoomBookingDeleteBooking)
-
-legacy.add_url_rule('/roomBooking.py/deleteCustomAttribute',
-                    'roomBooking-deleteCustomAttribute',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingDeleteCustomAttribute),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/deleteEquipment',
-                    'roomBooking-deleteEquipment',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingDeleteEquipment),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/deleteLocation',
-                    'roomBooking-deleteLocation',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingDeleteLocation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/deleteRoom',
-                    'roomBooking-deleteRoom',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingDeleteRoom),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/deleteCustomAttribute (mod_rh_roomBooking.RHRoomBookingDeleteCustomAttribute)
+# Inactive: /roomBooking.py/deleteEquipment (mod_rh_roomBooking.RHRoomBookingDeleteEquipment)
+# Inactive: /roomBooking.py/deleteLocation (mod_rh_roomBooking.RHRoomBookingDeleteLocation)
+# Inactive: /roomBooking.py/deleteRoom (mod_rh_roomBooking.RHRoomBookingDeleteRoom)
 # Inactive: /roomBooking.py/mapOfRooms (mod_rh_roomBooking.RHRoomBookingMapOfRooms)
 # Inactive: /roomBooking.py/mapOfRoomsWidget (mod_rh_roomBooking.RHRoomBookingMapOfRoomsWidget)
 # Inactive: /roomBooking.py/rejectAllConflicting (mod_rh_roomBooking.RHRoomBookingRejectALlConflicting)
 # Inactive: /roomBooking.py/rejectBooking (mod_rh_roomBooking.RHRoomBookingRejectBooking)
 # Inactive: /roomBooking.py/rejectBookingOccurrence (mod_rh_roomBooking.RHRoomBookingRejectBookingOccurrence)
 # Inactive: /roomBooking.py/roomDetails (mod_rh_roomBooking.RHRoomBookingRoomDetails)
-
-legacy.add_url_rule('/roomBooking.py/roomForm',
-                    'roomBooking-roomForm',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingRoomForm),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/roomForm (mod_rh_roomBooking.RHRoomBookingRoomForm)
 # Inactive: /roomBooking.py/roomList (mod_rh_roomBooking.RHRoomBookingRoomList)
 # Inactive: /roomBooking.py/roomStats (mod_rh_roomBooking.RHRoomBookingRoomStats)
 # Inactive: /roomBooking.py/saveBooking (mod_rh_roomBooking.RHRoomBookingSaveBooking)
-
-legacy.add_url_rule('/roomBooking.py/saveCustomAttributes',
-                    'roomBooking-saveCustomAttributes',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingSaveCustomAttribute),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/saveEquipment',
-                    'roomBooking-saveEquipment',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingSaveEquipment),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/saveLocation',
-                    'roomBooking-saveLocation',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingSaveLocation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/saveRoom',
-                    'roomBooking-saveRoom',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingSaveRoom),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/saveCustomAttributes (mod_rh_roomBooking.RHRoomBookingSaveCustomAttribute)
+# Inactive: /roomBooking.py/saveEquipment (mod_rh_roomBooking.RHRoomBookingSaveEquipment)
+# Inactive: /roomBooking.py/saveLocation (mod_rh_roomBooking.RHRoomBookingSaveLocation)
+# Inactive: /roomBooking.py/saveRoom (mod_rh_roomBooking.RHRoomBookingSaveRoom)
 # Inactive: /roomBooking.py/search4Bookings (mod_rh_roomBooking.RHRoomBookingSearch4Bookings)
 # Inactive: /roomBooking.py/search4Rooms (mod_rh_roomBooking.RHRoomBookingSearch4Rooms)
-
-legacy.add_url_rule('/roomBooking.py/sendRoomPhoto',
-                    'roomBooking-sendRoomPhoto',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingSendRoomPhoto),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBooking.py/setDefaultLocation',
-                    'roomBooking-setDefaultLocation',
-                    rh_as_view(mod_rh_roomBooking.RHRoomBookingSetDefaultLocation),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBooking.py/setDefaultLocation (mod_rh_roomBooking.RHRoomBookingSetDefaultLocation)
 # Inactive: /roomBooking.py/statement (mod_rh_roomBooking.RHRoomBookingStatement)
 
 
 # Routes for roomBookingPluginAdmin.py
-legacy.add_url_rule('/roomBookingPluginAdmin.py',
-                    'roomBookingPluginAdmin',
-                    rh_as_view(mod_rh_roomBookingPluginAdmin.RHRoomBookingPluginAdmin),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBookingPluginAdmin.py/switchRoomBookingModuleActive',
-                    'roomBookingPluginAdmin-switchRoomBookingModuleActive',
-                    rh_as_view(mod_rh_roomBookingPluginAdmin.RHSwitchRoomBookingModuleActive),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomBookingPluginAdmin.py/zodbSave',
-                    'roomBookingPluginAdmin-zodbSave',
-                    rh_as_view(mod_rh_roomBookingPluginAdmin.RHZODBSave),
-                    methods=('GET', 'POST'))
+# Inactive: /roomBookingPluginAdmin.py (mod_rh_roomBookingPluginAdmin.RHRoomBookingPluginAdmin)
+# Inactive: /roomBookingPluginAdmin.py/switchRoomBookingModuleActive (mod_rh_roomBookingPluginAdmin.RHSwitchRoomBookingModuleActive)
+# Inactive: /roomBookingPluginAdmin.py/zodbSave (mod_rh_roomBookingPluginAdmin.RHZODBSave)
 
 
 # Routes for roomMapper.py
-legacy.add_url_rule('/roomMapper.py',
-                    'roomMapper',
-                    rh_as_view(mod_rh_roomMappers.RHRoomMappers),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomMapper.py/creation',
-                    'roomMapper-creation',
-                    rh_as_view(mod_rh_roomMappers.RHRoomMapperCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomMapper.py/details',
-                    'roomMapper-details',
-                    rh_as_view(mod_rh_roomMappers.RHRoomMapperDetails),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomMapper.py/modify',
-                    'roomMapper-modify',
-                    rh_as_view(mod_rh_roomMappers.RHRoomMapperModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomMapper.py/performCreation',
-                    'roomMapper-performCreation',
-                    rh_as_view(mod_rh_roomMappers.RHRoomMapperPerformCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/roomMapper.py/performModify',
-                    'roomMapper-performModify',
-                    rh_as_view(mod_rh_roomMappers.RHRoomMapperPerformModification),
-                    methods=('GET', 'POST'))
+# Inactive: /roomMapper.py (mod_rh_roomMappers.RHRoomMappers)
+# Inactive: /roomMapper.py/creation (mod_rh_roomMappers.RHRoomMapperCreation)
+# Inactive: /roomMapper.py/details (mod_rh_roomMappers.RHRoomMapperDetails)
+# Inactive: /roomMapper.py/modify (mod_rh_roomMappers.RHRoomMapperModification)
+# Inactive: /roomMapper.py/performCreation (mod_rh_roomMappers.RHRoomMapperPerformCreation)
+# Inactive: /roomMapper.py/performModify (mod_rh_roomMappers.RHRoomMapperPerformModification)
 
 
 # Routes for sessionDisplay.py

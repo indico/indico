@@ -410,15 +410,11 @@ class RoomBase( object ):
 
     def getPhotoURL( self ):
         # Used to send photos via Python script
-        #from MaKaC.webinterface.urlHandlers import UHSendRoomPhoto
-        #return UHSendRoomPhoto.getURL( self.photoId, small = False )
         from MaKaC.webinterface.urlHandlers import UHRoomPhoto
         return UHRoomPhoto.getURL( self.photoId )
 
     def getSmallPhotoURL( self ):
         # Used to send photos via Python script
-        #from MaKaC.webinterface.urlHandlers import UHSendRoomPhoto
-        #return UHSendRoomPhoto.getURL( self.photoId, small = True )
         from MaKaC.webinterface.urlHandlers import UHRoomPhotoSmall
         return UHRoomPhotoSmall.getURL( self.photoId )
 

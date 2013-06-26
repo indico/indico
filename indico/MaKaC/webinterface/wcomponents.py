@@ -4281,7 +4281,6 @@ class WRoomBookingRoomList( WTemplated ):
 
         vars["rooms"] = self._rh._rooms
         vars["mapAvailable"] = self._rh._mapAvailable
-        #vars["roomPhotoUH"] = urlHandlers.UHSendRoomPhoto
         vars["standalone"] = self._standalone
         vars["title"] = self._title
         if self._onlyMy:
@@ -4343,7 +4342,6 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         rh = self._rh
         candResvs = self._candResvs
 
-        #vars["smallPhotoUH"] = urlHandlers.UHSendRoomPhoto
         vars["finishDate"] = rh._finishDate
         vars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
         vars["withPhoto"] = False
@@ -4778,7 +4776,6 @@ class WRoomBookingRoomDetails( WTemplated ):
                 if attribute['name'] == 'notification email' :
                     vars["attrs"][attribute['name']] = vars["attrs"][attribute['name']].replace(',', ', ')
         vars["config"] = Config.getInstance()
-        #vars["roomPhoto"] = urlHandlers.UHSendRoomPhoto.getURL( self._rh._room.photoId, small = False )
         vars["standalone"] = self._standalone
         vars["actionSucceeded"] = self._rh._afterActionSucceeded
         vars["deletionFailed"] = self._rh._afterDeletionFailed
@@ -4867,8 +4864,6 @@ class WRoomBookingDetails( WTemplated ):
         vars["reservation"] = self._resv
         vars["collisions"] = self._rh._collisions
         vars["config"] = Config.getInstance()
-        #vars["smallPhotoUH"] = urlHandlers.UHSendRoomPhoto
-        #vars["roomPhotoUH"] = urlHandlers.UHSendRoomPhoto
         vars["actionSucceeded"] = self._rh._afterActionSucceeded
         if self._rh._afterActionSucceeded:
             vars["title"] = self._rh._title

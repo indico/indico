@@ -32,21 +32,18 @@
       <td class="titleUpCellTD" style="width: 160px;"><span class="titleCellFormat">Available Rooms</span></td>
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
         ${len(Rooms)} rooms found in this location.
-        <% url = urlHandlers.UHRoomBookingRoomDetails.getURL() %>
-        <form method="post" action="${url}" id="roomListForm">
-        <input type="hidden" name="roomLocation" value="${location.friendlyName}">
-        <select name="roomID">
+        <form>
+        <select id="roomID">
           % for room in Rooms:
             <option value="${room.id}" class="${roomClass( room )}">${ room.getFullName() }</option>
           % endfor
         </select>
-        <input class="btn" type="submit" value="Details"/>
-        <input class="btn" type="submit" value="Modify" onClick="this.form.action='${ urlHandlers.UHRoomBookingRoomForm.getURL( )}'; this.form.submit();"/>
-        <input class="btn" type="submit" value="Delete" id="deleteRoom"/>
+        <input class="btn" type="button" value="Details" id="viewRoom" data-template="details" />
+        <input class="btn" type="button" value="Modify" id="modifyRoom" data-template="modify" />
+        <input class="btn" type="button" value="Delete" id="deleteRoom" data-template="delete" />
         </form>
-        <form method="post" action="${urlHandlers.UHRoomBookingRoomForm.getURL( )}">
-        <input type="hidden" name="roomLocation" value="${location.friendlyName}">
-        <input class="btn" type="submit" value="New Room"/>
+        <form>
+        <input class="btn" type="button" value="New Room" id="createRoom" data-template="modify" />
         </form>
       </td>
     </tr>
@@ -152,15 +149,45 @@
 
 <script type="text/javascript">
 
-$("#deleteRoom").click(function(){
-    new ConfirmPopup($T("Delete room"),$T("Are you sure you want to delete this room? All related bookings will also be deleted. this action is PERMANENT!"), function(confirmed) {
-        if(confirmed) {
-            $("#roomListForm").attr("action", '${ urlHandlers.UHRoomBookingDeleteRoom.getURL( )}');
-            $("#roomListForm").submit();
+    var urlTemplates = {
+        'details': ${ urlHandlers.UHRoomBookingRoomDetails.getURL().js_router | j,n },
+        'modify': ${ urlHandlers.UHRoomBookingRoomForm.getURL().js_router | j,n },
+        'delete': ${ urlHandlers.UHRoomBookingDeleteRoom.getURL().js_router | j,n }
+    };
+
+    $('#viewRoom, #modifyRoom, #createRoom').on('click', function(e) {
+        e.preventDefault();
+        var args = {
+            roomLocation: ${ location.friendlyName | j,n }
+        };
+        if(this.id != 'createRoom') {
+            args.roomID = $('#roomID').val();
+            if(!args.roomID) {
+                return;
+            }
         }
-    }).open();
-    return false;
-});
+        location.href = build_url(urlTemplates[$(this).data('template')], args);
+    });
+
+    $('#deleteRoom').on('click', function(e) {
+        e.preventDefault();
+        if(!$('#roomID').val()) {
+            return;
+        }
+        var url = build_url(urlTemplates[$(this).data('template')], {
+            roomLocation: ${ location.friendlyName | j,n },
+            roomID: $('#roomID').val()
+        });
+        new ConfirmPopup($T("Delete room"), $T("Are you sure you want to delete this room? All related bookings will also be deleted. this action is PERMANENT!"), function(confirmed) {
+            if (confirmed) {
+                $('<form>', {
+                    method: 'POST',
+                    action: url
+                }).submit();
+            }
+        }).open();
+    });
+
 
 var newAspectsHandler = function(newAspect, setResult) {
     var killProgress = IndicoUI.Dialogs.Util.progress();
