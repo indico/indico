@@ -216,14 +216,17 @@ class WTemplated(OldObservable):
                 else:
                     raise
 
-
+    @staticmethod
     def htmlText(param):
-        if param:
-            return escape(param)
-        #return "&nbsp;"
-        return ""
-    htmlText = staticmethod( htmlText )
+        if not param:
+            return ''
+        if not isinstance(param, basestring):
+            param = repr(param)
+        if isinstance(param, unicode):
+            param = param.encode('utf-8')
+        return escape(param)
 
+    @staticmethod
     def textToHTML(param):
         if param != "":
             if param.lower().find("<br>") == -1 and param.lower().find("<p>") == -1 and param.lower().find("<li>") == -1 and param.lower().find("<table") == -1:
@@ -231,7 +234,6 @@ class WTemplated(OldObservable):
                 param=param.replace("\n","<br>")
             return param
         return "&nbsp;"
-    textToHTML = staticmethod( textToHTML )
 
     def _escapeChars(self, text):
         # Does nothing right now - it used to replace % with %% for the old-style templates

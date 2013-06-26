@@ -52,12 +52,10 @@ class WGenericError( WTemplated ):
         params = []
         for (k,v) in self._rh.getRequestParams().items():
             if k.strip() != "password":
-                params.append( """%s = %s"""%(self.htmlText(k), \
-                                                self.htmlText(str(v))))
+                params.append("""%s = %s""" % (self.htmlText(k), self.htmlText(v)))
         headers = []
         for (k,v) in self._rh.getRequestHTTPHeaders().items():
-            headers.append( """%s: %s"""%(self.htmlText(k),\
-                                            self.htmlText(str(v))))
+            headers.append("""%s: %s""" % (self.htmlText(k), self.htmlText(v)))
         userHTML = """-- none --"""
         vars["userEmail"] = ""
         av = self._rh.getAW().getUser()
