@@ -39,6 +39,12 @@ class IndicoRequest(Request):
                 proxy_ip = self.environ['HTTP_X_FORWARDED_FOR'].split(',')[0].strip()
         return proxy_ip or self.environ['REMOTE_ADDR']
 
+    def __repr__(self):
+        rv = super(IndicoRequest, self).__repr__()
+        if isinstance(rv, unicode):
+            rv = rv.encode('utf-8')
+        return rv
+
 
 class IndicoFlask(Flask):
     request_class = IndicoRequest

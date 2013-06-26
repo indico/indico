@@ -209,6 +209,8 @@ class ResponseUtil(object):
             pass
         else:
             raise ValueError('redirect must be None or a 2-tuple containing URL and status code')
+        if isinstance(value[0], str):
+            value = (value[0].decode('utf-8'), value[1])
         self._redirect = value
 
     def make_empty(self):

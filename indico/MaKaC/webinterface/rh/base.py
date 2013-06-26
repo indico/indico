@@ -459,8 +459,8 @@ class RH(RequestHandlerBase):
         DBMgr.getInstance().startRequest()
         self._startRequestSpecific2RH()     # I.e. implemented by Room Booking request handlers
         textLog.append("%s : Database request started" % (datetime.now() - self._startTime))
-        Logger.get('requestHandler').info('[pid=%s] Request %s started (%s)' % (
-            os.getpid(), request, request.path))
+        Logger.get('requestHandler').info('[pid=%s] Request %s started' % (
+            os.getpid(), request))
 
         # notify components that the request has started
         self._notify('requestStarted')

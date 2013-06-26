@@ -166,7 +166,6 @@ class UHSignIn(URLHandler):
 
     @classmethod
     def getURL(cls, returnURL=''):
-        returnURL = str(returnURL).strip()
         if Config.getInstance().getLoginURL():
             url = URL(Config.getInstance().getLoginURL())
         else:
@@ -201,7 +200,6 @@ class UHSignOut(URLHandler):
 
     @classmethod
     def getURL(cls, returnURL=''):
-        returnURL = str(returnURL).strip()
         url = cls._getURL()
         if returnURL:
             url.addParam('returnURL', returnURL)
@@ -1346,7 +1344,6 @@ class UHUserCreation(URLHandler):
 
     @classmethod
     def getURL(cls, returnURL=''):
-        returnURL = str(returnURL).strip()
         if Config.getInstance().getRegistrationURL():
             url = URL(Config.getInstance().getRegistrationURL())
         else:
@@ -1365,7 +1362,6 @@ class UHConfSignIn(SecureURLHandler):
 
     @classmethod
     def getURL(cls, conf, returnURL=''):
-        returnURL = str(returnURL).strip()
         if Config.getInstance().getLoginURL():
             url = URL(Config.getInstance().getLoginURL())
         else:
@@ -1382,7 +1378,6 @@ class UHConfUserCreation(URLHandler):
 
     @classmethod
     def getURL(cls, conf, returnURL=''):
-        returnURL = str(returnURL).strip()
         if Config.getInstance().getRegistrationURL():
             url = URL(Config.getInstance().getRegistrationURL())
         else:
@@ -2790,7 +2785,6 @@ class UHConfRegistrationFormSignIn(URLHandler):
 
     @classmethod
     def getURL(cls, conf, returnURL=''):
-        returnURL = str(returnURL).strip()
         url = cls._getURL()
         url.setParams(conf.getLocator())
         if returnURL:
@@ -3445,7 +3439,6 @@ class UHConfEvaluationSignIn(URLHandler):
 
     @classmethod
     def getURL(cls, conf, returnURL=''):
-        returnURL = str(returnURL).strip()
         url = cls._getURL()
         url.setParams(conf.getLocator())
         if returnURL:

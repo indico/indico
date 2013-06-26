@@ -117,6 +117,8 @@ class EndpointURL(_BaseURL):
     def _fix_param(self, value):
         if isinstance(value, int):
             return unicode(value)
+        elif isinstance(value, str):
+            return value.decode('utf-8')
         elif isinstance(value, (list, tuple)):
             if len(value) == 1:
                 value = self._fix_param(value[0])

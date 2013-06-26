@@ -48,7 +48,7 @@ class WGenericError( WTemplated ):
         ty, ex, tb = sys.exc_info()
         tracebackList = traceback.format_list( traceback.extract_tb( tb ) )
         rh = self._rh.__class__
-        url = str( self._rh.getRequestURL() )
+        url = request.url.encode('utf-8')
         params = []
         for (k,v) in self._rh.getRequestParams().items():
             if k.strip() != "password":
@@ -130,7 +130,7 @@ class WGenericError( WTemplated ):
                     "exception type => %s" %str(ty), \
                     "traceback => \n%s"%"\n".join(tracebackList), \
                     "request handler => %s"%self._rh.__class__, \
-                    "url => %s"%str( self._rh.getRequestURL() ), \
+                    "url => %s" % request.url.encode('utf-8'),
                     "parameters => \n%s"%"\n".join(params), \
                     "headers => \n%s"%"\n".join(headers), \
                     "user => %s"%userStr ]
