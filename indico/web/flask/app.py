@@ -118,7 +118,10 @@ def handle_404(exception):
         if re.search(r'\.py(?:/\S+)?$', request.path):
             # While not dangerous per so, we never serve *.py files as static
             raise NotFound
-        return send_from_directory(app.config['INDICO_HTDOCS'], request.path[1:], conditional=True)
+        try:
+            return send_from_directory(app.config['INDICO_HTDOCS'], request.path[1:], conditional=True)
+        except UnicodeEncodeError:
+            raise NotFound
     except NotFound:
         if exception.description == NotFound.description:
             # The default reason is too long and not localized
