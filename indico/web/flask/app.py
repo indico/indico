@@ -111,6 +111,8 @@ def add_compat_blueprints(app):
 
 def add_plugin_blueprints(app):
     for blueprint in RHMapMemory()._blueprints:
+        if not app.config['INDICO_COMPAT_ROUTES'] and blueprint.name.startswith('compat_'):
+            continue
         app.register_blueprint(blueprint)
 
 
