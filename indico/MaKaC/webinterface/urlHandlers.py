@@ -323,7 +323,7 @@ class UHConferencePic(URLHandler):
 
 
 class UHConfModifPreviewCSS(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-previewCSS'
+    _endpoint = 'event_mgmt.confModifDisplay-previewCSS'
 
 
 class UHCategoryIcon(URLHandler):
@@ -1124,79 +1124,71 @@ class UHInternalPageDisplay(URLHandler):
 
 
 class UHConfModifDisplay(URLHandler):
-    _endpoint = 'legacy.confModifDisplay'
+    _endpoint = 'event_mgmt.confModifDisplay'
 
 
 class UHConfModifDisplayCustomization(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-custom'
+    _endpoint = 'event_mgmt.confModifDisplay-custom'
 
 
 class UHConfModifDisplayMenu(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-menu'
+    _endpoint = 'event_mgmt.confModifDisplay-menu'
 
 
 class UHConfModifDisplayResources(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-resources'
+    _endpoint = 'event_mgmt.confModifDisplay-resources'
 
 
 class UHConfModifDisplayConfHeader(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-confHeader'
+    _endpoint = 'event_mgmt.confModifDisplay-confHeader'
 
 
 class UHConfModifDisplayAddLink(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-addLink'
+    _endpoint = 'event_mgmt.confModifDisplay-addLink'
 
 
 class UHConfModifDisplayAddPage(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-addPage'
-
-
-class UHConfModifDisplayAddPageFile(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-addPageFile'
-
-
-class UHConfModifDisplayAddPageFileBrowser(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-addPageFileBrowser'
+    _endpoint = 'event_mgmt.confModifDisplay-addPage'
 
 
 class UHConfModifDisplayModifyData(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-modifyData'
+    _endpoint = 'event_mgmt.confModifDisplay-modifyData'
 
 
 class UHConfModifDisplayModifySystemData(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-modifySystemData'
+    _endpoint = 'event_mgmt.confModifDisplay-modifySystemData'
 
 
 class UHConfModifDisplayAddSpacer(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-addSpacer'
+    _endpoint = 'event_mgmt.confModifDisplay-addSpacer'
 
 
 class UHConfModifDisplayRemoveLink(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-removeLink'
+    _endpoint = 'event_mgmt.confModifDisplay-removeLink'
 
 
 class UHConfModifDisplayToggleLinkStatus(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-toggleLinkStatus'
+    _endpoint = 'event_mgmt.confModifDisplay-toggleLinkStatus'
 
 
 class UHConfModifDisplayToggleHomePage(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-toggleHomePage'
+    _endpoint = 'event_mgmt.confModifDisplay-toggleHomePage'
 
 
 class UHConfModifDisplayUpLink(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-upLink'
+    _endpoint = 'event_mgmt.confModifDisplay-upLink'
 
 
 class UHConfModifDisplayDownLink(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-downLink'
+    _endpoint = 'event_mgmt.confModifDisplay-downLink'
 
 
 class UHConfModifFormatTitleBgColor(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-formatTitleBgColor'
+    _endpoint = 'event_mgmt.confModifDisplay-formatTitleBgColor'
 
 
 class UHConfModifFormatTitleTextColor(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-formatTitleTextColor'
+    _endpoint = 'event_mgmt.confModifDisplay-formatTitleTextColor'
 
 
 class UHConfDeletion(URLHandler):
@@ -1256,27 +1248,27 @@ class UHConfModifyAlarm(URLHandler):
 
 
 class UHSaveLogo(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-saveLogo'
+    _endpoint = 'event_mgmt.confModifDisplay-saveLogo'
 
 
 class UHRemoveLogo(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-removeLogo'
+    _endpoint = 'event_mgmt.confModifDisplay-removeLogo'
 
 
 class UHSaveCSS(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-saveCSS'
+    _endpoint = 'event_mgmt.confModifDisplay-saveCSS'
 
 
 class UHUseCSS(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-useCSS'
+    _endpoint = 'event_mgmt.confModifDisplay-useCSS'
 
 
 class UHRemoveCSS(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-removeCSS'
+    _endpoint = 'event_mgmt.confModifDisplay-removeCSS'
 
 
 class UHSavePic(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-savePic'
+    _endpoint = 'event_mgmt.confModifDisplay-savePic'
 
 
 class UHConfModifParticipantsSetup(URLHandler):
@@ -1308,15 +1300,15 @@ class UHConfParticipantsRefusal(URLHandler):
 
 
 class UHConfModifToggleSearch(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-toggleSearch'
+    _endpoint = 'event_mgmt.confModifDisplay-toggleSearch'
 
 
 class UHConfModifToggleNavigationBar(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-toggleNavigationBar'
+    _endpoint = 'event_mgmt.confModifDisplay-toggleNavigationBar'
 
 
 class UHTickerTapeAction(URLHandler):
-    _endpoint = 'legacy.confModifDisplay-tickerTapeAction'
+    _endpoint = 'event_mgmt.confModifDisplay-tickerTapeAction'
 
 
 class UHUserManagement(URLHandler):

@@ -21,6 +21,7 @@ import collections
 from flask import session, request
 import os
 import random
+import time
 import urllib
 from indico.util import json
 
@@ -3737,14 +3738,10 @@ class WConfModifDisplayCustom(wcomponents.WTemplated):
         vars["saveLogo"]=urlHandlers.UHSaveLogo.getURL(self._conf)
         vars["logoURL"]=""
         if self._conf.getLogo():
-            vars["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
+            vars["logoURL"] = urlHandlers.UHConferenceLogo.getURL(self._conf, _=int(time.time()))
 
         vars["formatTitleTextColor"] = WFormatColorOptionModif("titleTextColor", self._format, self._conf, 3).getHTML()
         vars["formatTitleBgColor"] = WFormatColorOptionModif("titleBgColor", self._format, self._conf, 4).getHTML()
-
-        #indico-style "checkboxes"
-        enabledText = _("Click to disable")
-        disabledText = _("Click to enable")
 
         # Set up the logo of the conference
         vars["logoIconURL"] = Config.getInstance().getSystemIconURL("logo")
@@ -7650,36 +7647,6 @@ class WPConfModifExistingMaterials( WPConferenceModifBase ):
 
     def _setActiveSideMenuItem( self ):
         self._materialMenuItem.setActive()
-
-class WPConfModifDisplayImageBrowser (wcomponents.WTemplated):
-
-    def __init__(self, conf):
-        self._conf = conf
-
-    def _getFileHTML(self, file):
-        return """<td>&nbsp;<a href="#" onClick="OpenFile('%s');return false;"><img src="%s" height="80"></a></td>""" % (str(urlHandlers.UHFileAccess.getURL(file)),str(urlHandlers.UHFileAccess.getURL(file)))
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["baseURL"] = Config.getInstance().getBaseURL()
-        vars["body"] = ""
-        materialName = _("Internal Page Files")
-        mats = self._conf.getMaterialList()
-        mat = None
-        existingFiles = []
-        for m in mats:
-            if m.getTitle() == materialName:
-                mat = m
-        if mat != None:
-            existingFiles = mat.getResourceList()
-        if len(existingFiles) == 0:
-            vars["body"] = i18nformat("""<br><br>&nbsp;&nbsp;&nbsp; _("no image found")...""")
-        else:
-            vars["body"] += "<table><tr>"
-            for file in existingFiles:
-                vars["body"] += self._getFileHTML(file)
-            vars["body"] += "</tr></table>"
-        return vars
 
 
 class WPDisplayFullMaterialPackage(WPConferenceDefaultDisplayBase):

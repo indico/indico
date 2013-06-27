@@ -44,12 +44,6 @@ def addLink( req, **params ):
 def addPage( req, **params ):
     return conferenceModif.RHConfModifDisplayAddPage( req ).process( params )
 
-def addPageFile( req, **params ):
-    return conferenceModif.RHConfModifDisplayAddPageFile( req ).process( params )
-
-def addPageFileBrowser( req, **params ):
-    return conferenceModif.RHConfModifDisplayAddPageFileBrowser( req ).process( params )
-
 def addSpacer( req, **params ):
     return conferenceModif.RHConfModifDisplayAddSpacer( req ).process( params )
 

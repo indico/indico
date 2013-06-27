@@ -768,150 +768,35 @@ legacy.add_url_rule('/confModifContribList.py/proceedings',
 
 
 # Routes for confModifDisplay.py
-legacy.add_url_rule('/confModifDisplay.py',
-                    'confModifDisplay',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayCustomization),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/addLink',
-                    'confModifDisplay-addLink',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayAddLink),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/addPage',
-                    'confModifDisplay-addPage',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayAddPage),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/addPageFile',
-                    'confModifDisplay-addPageFile',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayAddPageFile),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/addPageFileBrowser',
-                    'confModifDisplay-addPageFileBrowser',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayAddPageFileBrowser),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/addSpacer',
-                    'confModifDisplay-addSpacer',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayAddSpacer),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/confHeader',
-                    'confModifDisplay-confHeader',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayConfHeader),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/custom',
-                    'confModifDisplay-custom',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayCustomization),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/downLink',
-                    'confModifDisplay-downLink',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayDownLink),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/formatTitleBgColor',
-                    'confModifDisplay-formatTitleBgColor',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifFormatTitleBgColor),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/formatTitleTextColor',
-                    'confModifDisplay-formatTitleTextColor',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifFormatTitleTextColor),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/menu',
-                    'confModifDisplay-menu',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayMenu),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/modifyData',
-                    'confModifDisplay-modifyData',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayModifyData),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/modifySystemData',
-                    'confModifDisplay-modifySystemData',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayModifySystemData),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/previewCSS',
-                    'confModifDisplay-previewCSS',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifPreviewCSS),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/removeCSS',
-                    'confModifDisplay-removeCSS',
-                    rh_as_view(mod_rh_conferenceModif.RHConfRemoveCSS),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/removeLink',
-                    'confModifDisplay-removeLink',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayRemoveLink),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/removeLogo',
-                    'confModifDisplay-removeLogo',
-                    rh_as_view(mod_rh_conferenceModif.RHConfRemoveLogo),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/resources',
-                    'confModifDisplay-resources',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayResources),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/saveCSS',
-                    'confModifDisplay-saveCSS',
-                    rh_as_view(mod_rh_conferenceModif.RHConfSaveCSS),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/saveLogo',
-                    'confModifDisplay-saveLogo',
-                    rh_as_view(mod_rh_conferenceModif.RHConfSaveLogo),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/savePic',
-                    'confModifDisplay-savePic',
-                    rh_as_view(mod_rh_conferenceModif.RHConfSavePic),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/tickerTapeAction',
-                    'confModifDisplay-tickerTapeAction',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifTickerTapeAction),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/toggleHomePage',
-                    'confModifDisplay-toggleHomePage',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayToggleHomePage),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/toggleLinkStatus',
-                    'confModifDisplay-toggleLinkStatus',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayToggleLinkStatus),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/toggleNavigationBar',
-                    'confModifDisplay-toggleNavigationBar',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifToggleNavigationBar),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/toggleSearch',
-                    'confModifDisplay-toggleSearch',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifToggleSearch),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/upLink',
-                    'confModifDisplay-upLink',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifDisplayUpLink),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifDisplay.py/useCSS',
-                    'confModifDisplay-useCSS',
-                    rh_as_view(mod_rh_conferenceModif.RHConfUseCSS),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifDisplay.py (mod_rh_conferenceModif.RHConfModifDisplayCustomization)
+# Inactive: /confModifDisplay.py/addLink (mod_rh_conferenceModif.RHConfModifDisplayAddLink)
+# Inactive: /confModifDisplay.py/addPage (mod_rh_conferenceModif.RHConfModifDisplayAddPage)
+# Inactive: /confModifDisplay.py/addPageFile (mod_rh_conferenceModif.RHConfModifDisplayAddPageFile)
+# Inactive: /confModifDisplay.py/addPageFileBrowser (mod_rh_conferenceModif.RHConfModifDisplayAddPageFileBrowser)
+# Inactive: /confModifDisplay.py/addSpacer (mod_rh_conferenceModif.RHConfModifDisplayAddSpacer)
+# Inactive: /confModifDisplay.py/confHeader (mod_rh_conferenceModif.RHConfModifDisplayConfHeader)
+# Inactive: /confModifDisplay.py/custom (mod_rh_conferenceModif.RHConfModifDisplayCustomization)
+# Inactive: /confModifDisplay.py/downLink (mod_rh_conferenceModif.RHConfModifDisplayDownLink)
+# Inactive: /confModifDisplay.py/formatTitleBgColor (mod_rh_conferenceModif.RHConfModifFormatTitleBgColor)
+# Inactive: /confModifDisplay.py/formatTitleTextColor (mod_rh_conferenceModif.RHConfModifFormatTitleTextColor)
+# Inactive: /confModifDisplay.py/menu (mod_rh_conferenceModif.RHConfModifDisplayMenu)
+# Inactive: /confModifDisplay.py/modifyData (mod_rh_conferenceModif.RHConfModifDisplayModifyData)
+# Inactive: /confModifDisplay.py/modifySystemData (mod_rh_conferenceModif.RHConfModifDisplayModifySystemData)
+# Inactive: /confModifDisplay.py/previewCSS (mod_rh_conferenceModif.RHConfModifPreviewCSS)
+# Inactive: /confModifDisplay.py/removeCSS (mod_rh_conferenceModif.RHConfRemoveCSS)
+# Inactive: /confModifDisplay.py/removeLink (mod_rh_conferenceModif.RHConfModifDisplayRemoveLink)
+# Inactive: /confModifDisplay.py/removeLogo (mod_rh_conferenceModif.RHConfRemoveLogo)
+# Inactive: /confModifDisplay.py/resources (mod_rh_conferenceModif.RHConfModifDisplayResources)
+# Inactive: /confModifDisplay.py/saveCSS (mod_rh_conferenceModif.RHConfSaveCSS)
+# Inactive: /confModifDisplay.py/saveLogo (mod_rh_conferenceModif.RHConfSaveLogo)
+# Inactive: /confModifDisplay.py/savePic (mod_rh_conferenceModif.RHConfSavePic)
+# Inactive: /confModifDisplay.py/tickerTapeAction (mod_rh_conferenceModif.RHConfModifTickerTapeAction)
+# Inactive: /confModifDisplay.py/toggleHomePage (mod_rh_conferenceModif.RHConfModifDisplayToggleHomePage)
+# Inactive: /confModifDisplay.py/toggleLinkStatus (mod_rh_conferenceModif.RHConfModifDisplayToggleLinkStatus)
+# Inactive: /confModifDisplay.py/toggleNavigationBar (mod_rh_conferenceModif.RHConfModifToggleNavigationBar)
+# Inactive: /confModifDisplay.py/toggleSearch (mod_rh_conferenceModif.RHConfModifToggleSearch)
+# Inactive: /confModifDisplay.py/upLink (mod_rh_conferenceModif.RHConfModifDisplayUpLink)
+# Inactive: /confModifDisplay.py/useCSS (mod_rh_conferenceModif.RHConfUseCSS)
 
 
 # Routes for confModifEpayment.py
