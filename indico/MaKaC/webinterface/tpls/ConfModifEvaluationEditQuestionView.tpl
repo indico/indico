@@ -56,12 +56,11 @@
 <script type="text/javascript">
 $("[id^=questionRemove]").click(function(){
     var self = this;
-    new ConfirmPopup($T("Remove referee"),$T("The reviewers already assigned to this contribution will be removed. Do you want to remove the referee anyway?"), function(confirmed) {
+    new ConfirmPopup($T("Remove question"),$T("Do you really want to remove this question?"), function(confirmed) {
         if(confirmed) {
             $(self).closest("form").submit();
         }
     }).open();
     return false;
 });
-
 </script>

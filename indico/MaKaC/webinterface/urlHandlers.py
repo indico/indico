@@ -3446,52 +3446,52 @@ class UHConfEvaluationSubmitted(URLHandler):
 #Evaluation# MANAGEMENT AREA
 ############
 class UHConfModifEvaluation(URLHandler):
-    _endpoint = 'legacy.confModifEvaluation'
+    _endpoint = 'event_mgmt.confModifEvaluation'
 
 
 class UHConfModifEvaluationSetup(URLHandler):
     """same result as UHConfModifEvaluation."""
-    _endpoint = 'legacy.confModifEvaluation-setup'
+    _endpoint = 'event_mgmt.confModifEvaluation-setup'
 
 
 class UHConfModifEvaluationSetupChangeStatus(URLHandler):
-    _endpoint = 'legacy.confModifEvaluation-changeStatus'
+    _endpoint = 'event_mgmt.confModifEvaluation-changeStatus'
 
 
 class UHConfModifEvaluationSetupSpecialAction(URLHandler):
-    _endpoint = 'legacy.confModifEvaluation-specialAction'
+    _endpoint = 'event_mgmt.confModifEvaluation-specialAction'
 
 
 class UHConfModifEvaluationDataModif(URLHandler):
-    _endpoint = 'legacy.confModifEvaluation-dataModif'
+    _endpoint = 'event_mgmt.confModifEvaluation-dataModif'
 
 
 class UHConfModifEvaluationPerformDataModif(URLHandler):
-    _endpoint = 'legacy.confModifEvaluation-performDataModif'
+    _endpoint = 'event_mgmt.confModifEvaluation-performDataModif'
 
 
 class UHConfModifEvaluationEdit(URLHandler):
-    _endpoint = 'legacy.confModifEvaluation-edit'
+    _endpoint = 'event_mgmt.confModifEvaluation-edit'
 
 
 class UHConfModifEvaluationEditPerformChanges(URLHandler):
-    _endpoint = 'legacy.confModifEvaluation-editPerformChanges'
+    _endpoint = 'event_mgmt.confModifEvaluation-editPerformChanges'
 
 
 class UHConfModifEvaluationPreview(URLHandler):
-    _endpoint = 'legacy.confModifEvaluation-preview'
+    _endpoint = 'event_mgmt.confModifEvaluation-preview'
 
 
 class UHConfModifEvaluationResults(URLHandler):
-    _endpoint = 'legacy.confModifEvaluation-results'
+    _endpoint = 'event_mgmt.confModifEvaluation-results'
 
 
 class UHConfModifEvaluationResultsOptions(URLHandler):
-    _endpoint = 'legacy.confModifEvaluation-resultsOptions'
+    _endpoint = 'event_mgmt.confModifEvaluation-resultsOptions'
 
 
 class UHConfModifEvaluationResultsSubmittersActions(URLHandler):
-    _endpoint = 'legacy.confModifEvaluation-resultsSubmittersActions'
+    _endpoint = 'event_mgmt.confModifEvaluation-resultsSubmittersActions'
 
 
 class UHResetSession(URLHandler):

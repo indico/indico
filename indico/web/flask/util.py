@@ -76,6 +76,13 @@ def rh_as_view(rh):
     return wrapper
 
 
+def redirect_view(endpoint, code=302):
+    def _redirect(**kwargs):
+        return redirect(url_for(endpoint, **kwargs), code=code)
+
+    return _redirect
+
+
 def iter_blueprint_rules(blueprint):
     for func in blueprint.deferred_functions:
         yield dict(zip(func.func_code.co_freevars, (c.cell_contents for c in func.func_closure)))

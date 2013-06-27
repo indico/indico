@@ -28,7 +28,6 @@ import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
 import MaKaC.webinterface.rh.contribMod as mod_rh_contribMod
 import MaKaC.webinterface.rh.contribReviewingModif as mod_rh_contribReviewingModif
 import MaKaC.webinterface.rh.ePaymentModif as mod_rh_ePaymentModif
-import MaKaC.webinterface.rh.evaluationModif as mod_rh_evaluationModif
 import MaKaC.webinterface.rh.registrantsModif as mod_rh_registrantsModif
 import MaKaC.webinterface.rh.registrationFormModif as mod_rh_registrationFormModif
 import MaKaC.webinterface.rh.reviewingAssignContributions as mod_rh_reviewingAssignContributions
@@ -799,65 +798,18 @@ legacy.add_url_rule('/confModifEpayment.py/performDataModif',
 
 
 # Routes for confModifEvaluation.py
-legacy.add_url_rule('/confModifEvaluation.py',
-                    'confModifEvaluation',
-                    rh_as_view(mod_rh_evaluationModif.RHEvaluationSetup),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEvaluation.py/changeStatus',
-                    'confModifEvaluation-changeStatus',
-                    rh_as_view(mod_rh_evaluationModif.RHEvaluationSetupChangeStatus),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEvaluation.py/dataModif',
-                    'confModifEvaluation-dataModif',
-                    rh_as_view(mod_rh_evaluationModif.RHEvaluationSetupDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEvaluation.py/edit',
-                    'confModifEvaluation-edit',
-                    rh_as_view(mod_rh_evaluationModif.RHEvaluationEdit),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEvaluation.py/editPerformChanges',
-                    'confModifEvaluation-editPerformChanges',
-                    rh_as_view(mod_rh_evaluationModif.RHEvaluationEditPerformChanges),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEvaluation.py/performDataModif',
-                    'confModifEvaluation-performDataModif',
-                    rh_as_view(mod_rh_evaluationModif.RHEvaluationSetupPerformDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEvaluation.py/preview',
-                    'confModifEvaluation-preview',
-                    rh_as_view(mod_rh_evaluationModif.RHEvaluationPreview),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEvaluation.py/results',
-                    'confModifEvaluation-results',
-                    rh_as_view(mod_rh_evaluationModif.RHEvaluationResults),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEvaluation.py/resultsOptions',
-                    'confModifEvaluation-resultsOptions',
-                    rh_as_view(mod_rh_evaluationModif.RHEvaluationResultsOptions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEvaluation.py/resultsSubmittersActions',
-                    'confModifEvaluation-resultsSubmittersActions',
-                    rh_as_view(mod_rh_evaluationModif.RHEvaluationResultsSubmittersActions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEvaluation.py/setup',
-                    'confModifEvaluation-setup',
-                    rh_as_view(mod_rh_evaluationModif.RHEvaluationSetup),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEvaluation.py/specialAction',
-                    'confModifEvaluation-specialAction',
-                    rh_as_view(mod_rh_evaluationModif.RHEvaluationSetupSpecialAction),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifEvaluation.py (mod_rh_evaluationModif.RHEvaluationSetup)
+# Inactive: /confModifEvaluation.py/changeStatus (mod_rh_evaluationModif.RHEvaluationSetupChangeStatus)
+# Inactive: /confModifEvaluation.py/dataModif (mod_rh_evaluationModif.RHEvaluationSetupDataModif)
+# Inactive: /confModifEvaluation.py/edit (mod_rh_evaluationModif.RHEvaluationEdit)
+# Inactive: /confModifEvaluation.py/editPerformChanges (mod_rh_evaluationModif.RHEvaluationEditPerformChanges)
+# Inactive: /confModifEvaluation.py/performDataModif (mod_rh_evaluationModif.RHEvaluationSetupPerformDataModif)
+# Inactive: /confModifEvaluation.py/preview (mod_rh_evaluationModif.RHEvaluationPreview)
+# Inactive: /confModifEvaluation.py/results (mod_rh_evaluationModif.RHEvaluationResults)
+# Inactive: /confModifEvaluation.py/resultsOptions (mod_rh_evaluationModif.RHEvaluationResultsOptions)
+# Inactive: /confModifEvaluation.py/resultsSubmittersActions (mod_rh_evaluationModif.RHEvaluationResultsSubmittersActions)
+# Inactive: /confModifEvaluation.py/setup (mod_rh_evaluationModif.RHEvaluationSetup)
+# Inactive: /confModifEvaluation.py/specialAction (mod_rh_evaluationModif.RHEvaluationSetupSpecialAction)
 
 
 # Routes for confModifListings.py
