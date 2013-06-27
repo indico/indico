@@ -63,7 +63,7 @@ rooms.add_url_rule('/booking/<path:roomLocation>/<resvID>/modify', 'roomBooking-
 rooms.add_url_rule('/booking/<path:roomLocation>/<resvID>/cancel', 'roomBooking-cancelBooking',
                    rh_as_view(roomBooking.RHRoomBookingCancelBooking), methods=('POST',))
 rooms.add_url_rule('/booking/<path:roomLocation>/<resvID>/accept', 'roomBooking-acceptBooking',
-                    rh_as_view(roomBooking.RHRoomBookingAcceptBooking), methods=('POST',))
+                   rh_as_view(roomBooking.RHRoomBookingAcceptBooking), methods=('POST',))
 rooms.add_url_rule('/booking/<path:roomLocation>/<resvID>/reject', 'roomBooking-rejectBooking',
                    rh_as_view(roomBooking.RHRoomBookingRejectBooking), methods=('POST',))
 rooms.add_url_rule('/booking/<path:roomLocation>/<resvID>/delete', 'roomBooking-deleteBooking',
@@ -89,7 +89,7 @@ rooms.add_url_rule('/blocking/<blockingId>/', 'roomBooking-blockingDetails',
 rooms.add_url_rule('/blocking/<blockingId>/modify', 'roomBooking-blockingForm',
                    rh_as_view(roomBooking.RHRoomBookingBlockingForm), methods=('GET', 'POST'))
 rooms.add_url_rule('/blocking/<blockingId>/delete', 'roomBooking-deleteBlocking',
-                   rh_as_view(roomBooking.RHRoomBookingDelete), methods=('GET','POST',))
+                   rh_as_view(roomBooking.RHRoomBookingDelete), methods=('POST',))
 rooms.add_url_rule('/blocking/create', 'roomBooking-blockingForm',
                    rh_as_view(roomBooking.RHRoomBookingBlockingForm), methods=('GET', 'POST'))
 rooms.add_url_rule('/blocking/list', 'roomBooking-blockingList',

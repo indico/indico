@@ -182,7 +182,8 @@ admin.add_url_rule('/webcast/<webcastid>/archive', 'adminServices-webcastArchive
                    rh_as_view(services.RHWebcastArchiveWebcast))
 admin.add_url_rule('/webcast/<webcastid>/unarchive', 'adminServices-webcastUnArchiveWebcast',
                    rh_as_view(services.RHWebcastUnArchiveWebcast))
-admin.add_url_rule('/webcast/<webcastid>/remove', 'adminServices-webcastRemoveWebcast', rh_as_view(services.RHWebcastRemoveWebcast))
+admin.add_url_rule('/webcast/<webcastid>/remove', 'adminServices-webcastRemoveWebcast',
+                   rh_as_view(services.RHWebcastRemoveWebcast))
 admin.add_url_rule('/webcast/add', 'adminServices-webcastAddWebcast', rh_as_view(services.RHWebcastAddWebcast),
                    methods=('POST',))
 admin.add_url_rule('/webcast/onair/add', 'adminServices-webcastAddOnAir', rh_as_view(services.RHWebcastAddOnAir))
