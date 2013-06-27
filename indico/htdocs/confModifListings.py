@@ -20,9 +20,6 @@
 from MaKaC.webinterface.rh import conferenceModif
 
 
-def allSessionsConveners( req, **params ):
-    return conferenceModif.RHConfAllSessionsConveners( req ).process( params )
-
 def allSpeakers( req, **params ):
     return conferenceModif.RHConfAllSpeakers( req ).process( params )
 

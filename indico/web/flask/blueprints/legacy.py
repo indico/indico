@@ -861,10 +861,6 @@ legacy.add_url_rule('/confModifEvaluation.py/specialAction',
 
 
 # Routes for confModifListings.py
-legacy.add_url_rule('/confModifListings.py/allSessionsConveners',
-                    'confModifListings-allSessionsConveners',
-                    rh_as_view(mod_rh_conferenceModif.RHConfAllSessionsConveners),
-                    methods=('GET', 'POST'))
 # Inactive: /confModifListings.py/allSpeakers (mod_rh_conferenceModif.RHConfAllSpeakers)
 # Inactive: /confModifListings.py/allSpeakersAction (mod_rh_conferenceModif.RHConfAllSpeakersAction)
 
