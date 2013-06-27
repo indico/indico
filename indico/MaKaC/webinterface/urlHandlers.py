@@ -1116,7 +1116,7 @@ class UHConfModifParticipants(URLHandler):
 
 
 class UHConfModifLog(URLHandler):
-    _endpoint = 'legacy.confModifLog'
+    _endpoint = 'event_mgmt.confModifLog'
 
 
 class UHInternalPageDisplay(URLHandler):

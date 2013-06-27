@@ -1031,10 +1031,7 @@ legacy.add_url_rule('/confModifListings.py/allSpeakersAction',
 
 
 # Routes for confModifLog.py
-legacy.add_url_rule('/confModifLog.py',
-                    'confModifLog',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifLog),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifLog.py (mod_rh_conferenceModif.RHConfModifLog)
 
 
 # Routes for confModifParticipants.py

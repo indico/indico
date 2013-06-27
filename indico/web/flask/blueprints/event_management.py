@@ -109,3 +109,6 @@ event_mgmt.add_url_rule('/tools/material-package', 'confModifTools-matPkg',
                         rh_as_view(conferenceModif.RHFullMaterialPackage))
 event_mgmt.add_url_rule('/tools/material-package', 'confModifTools-performMatPkg',
                         rh_as_view(conferenceModif.RHFullMaterialPackagePerform), methods=('POST',))
+
+# Logs
+event_mgmt.add_url_rule('/logs', 'confModifLog', rh_as_view(conferenceModif.RHConfModifLog))
