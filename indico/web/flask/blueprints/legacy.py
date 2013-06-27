@@ -1627,18 +1627,10 @@ legacy.add_url_rule('/confModifTools.py/dvdDone',
                     'confModifTools-dvdDone',
                     rh_as_view(mod_rh_conferenceModif.RHConfDVDDone),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/matPkg',
-                    'confModifTools-matPkg',
-                    rh_as_view(mod_rh_conferenceModif.RHFullMaterialPackage),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifTools.py/matPkg (mod_rh_conferenceModif.RHFullMaterialPackage)
 # Inactive: /confModifTools.py/modifyAlarm (mod_rh_conferenceModif.RHConfModifyAlarm)
 # Inactive: /confModifTools.py/performCloning (mod_rh_conferenceModif.RHConfPerformCloning)
-
-legacy.add_url_rule('/confModifTools.py/performMatPkg',
-                    'confModifTools-performMatPkg',
-                    rh_as_view(mod_rh_conferenceModif.RHFullMaterialPackagePerform),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifTools.py/performMatPkg (mod_rh_conferenceModif.RHFullMaterialPackagePerform)
 # Inactive: /confModifTools.py/posterDesign (mod_rh_conferenceModif.RHConfPosterDesign)
 # Inactive: /confModifTools.py/posterGetBackground (mod_rh_conferenceModif.RHConfPosterGetBackground)
 # Inactive: /confModifTools.py/posterPrinting (mod_rh_conferenceModif.RHConfPosterPrinting)

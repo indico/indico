@@ -2295,11 +2295,11 @@ class UHConfModProceedings(URLHandler):
 
 
 class UHConfModFullMaterialPackage(URLHandler):
-    _endpoint = 'legacy.confModifTools-matPkg'
+    _endpoint = 'event_mgmt.confModifTools-matPkg'
 
 
 class UHConfModFullMaterialPackagePerform(URLHandler):
-    _endpoint = 'legacy.confModifTools-performMatPkg'
+    _endpoint = 'event_mgmt.confModifTools-performMatPkg'
 
 
 class UHTaskManager(URLHandler):

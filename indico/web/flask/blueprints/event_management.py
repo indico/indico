@@ -103,3 +103,9 @@ event_mgmt.add_url_rule('/tools/badges/background', 'confModifTools-badgeGetBack
                         rh_as_view(conferenceModif.RHConfBadgeGetBackground), methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/tools/badges/save-background', 'confModifTools-badgeSaveBackground',
                         rh_as_view(conferenceModif.RHConfBadgeSaveTempBackground), methods=('POST',))
+
+# Tools: Material Package
+event_mgmt.add_url_rule('/tools/material-package', 'confModifTools-matPkg',
+                        rh_as_view(conferenceModif.RHFullMaterialPackage))
+event_mgmt.add_url_rule('/tools/material-package', 'confModifTools-performMatPkg',
+                        rh_as_view(conferenceModif.RHFullMaterialPackagePerform), methods=('POST',))
