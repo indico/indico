@@ -44,3 +44,23 @@ event_mgmt.add_url_rule('/contribution-types/delete', 'conferenceModification-re
                         rh_as_view(conferenceModif.RHConfRemoveContribType), methods=('POST',))
 event_mgmt.add_url_rule('/contribution-types/<contribTypeId>', 'conferenceModification-editContribType',
                         rh_as_view(conferenceModif.RHConfEditContribType), methods=('GET', 'POST'))
+
+# Tools
+event_mgmt.add_url_rule('/tools/', 'confModifTools', rh_as_view(conferenceModif.RHConfModifTools))
+
+# Tools: Alarms
+event_mgmt.add_url_rule('/tools/alarms/', 'confModifTools-displayAlarm', rh_as_view(conferenceModif.RHConfDisplayAlarm))
+event_mgmt.add_url_rule('/tools/alarms/add', 'confModifTools-addAlarm',
+                        rh_as_view(conferenceModif.RHConfAddAlarm), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/tools/alarms/add/save', 'confModifTools-saveAlarm',
+                        rh_as_view(conferenceModif.RHConfSaveAlarm), methods=('POST',))
+event_mgmt.add_url_rule('/tools/alarms/add/trigger', 'confModifTools-sendAlarmNow',
+                        rh_as_view(conferenceModif.RHConfSendAlarmNow), methods=('POST',))
+event_mgmt.add_url_rule('/tools/alarms/<alarmId>/', 'confModifTools-modifyAlarm',
+                        rh_as_view(conferenceModif.RHConfModifyAlarm))
+event_mgmt.add_url_rule('/tools/alarms/<alarmId>/', 'confModifTools-modifySaveAlarm',
+                        rh_as_view(conferenceModif.RHConfSaveAlarm), methods=('POST',))
+event_mgmt.add_url_rule('/tools/alarms/<alarmId>/delete', 'confModifTools-deleteAlarm',
+                        rh_as_view(conferenceModif.RHConfDeleteAlarm))
+event_mgmt.add_url_rule('/tools/alarms/<alarmId>/trigger', 'confModifTools-sendAlarmNow',
+                        rh_as_view(conferenceModif.RHConfSendAlarmNow), methods=('POST',))

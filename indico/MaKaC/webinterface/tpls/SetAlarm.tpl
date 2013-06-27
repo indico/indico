@@ -7,7 +7,6 @@
 <br>
 <TABLE border="0" align="center" width="100%">
 <form method="POST" name="alarmForm" id="alarmForm">
-<input type="hidden" name="alarmId" value="${ alarmId }">
     <tr>
       <td align="right">
       </td>
@@ -181,12 +180,12 @@ IndicoUI.executeOnLoad(function()
     parameterManagerNow.add($E('email'),'text',true,checkRecipients);
 
     $('#save').click(function(){
-        this.form.action = '${ urlHandlers.UHSaveAlarm.getURL( conference ) }';
+        this.form.action = '${ urlHandlers.UHModifySaveAlarm.getURL(alarm) if alarm else urlHandlers.UHSaveAlarm().getURL(conference) }';
         return parameterManager.check();
     });
 
     $('#sendNow').click(function(){
-        this.form.action = '${urlHandlers.UHSendAlarmNow.getURL( conference )}';
+        this.form.action = '${urlHandlers.UHSendAlarmNow.getURL(alarm or conference)}';
         return parameterManagerNow.check();
     });
     $('#sendTest').click(function(){
@@ -195,8 +194,9 @@ IndicoUI.executeOnLoad(function()
         }
         return false;
     });
-    $('#cancel').click(function(){
-        this.form.action = '${urlHandlers.UHConfDisplayAlarm.getURL( conference )}';
+    $('#cancel').click(function(e){
+        e.preventDefault();
+        location.href = '${urlHandlers.UHConfDisplayAlarm.getURL(conference)}';
     });
 });
 </script>

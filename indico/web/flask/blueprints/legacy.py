@@ -1596,15 +1596,8 @@ legacy.add_url_rule('/confModifSchedule.py/reschedule',
 
 
 # Routes for confModifTools.py
-legacy.add_url_rule('/confModifTools.py',
-                    'confModifTools',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifTools),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/addAlarm',
-                    'confModifTools-addAlarm',
-                    rh_as_view(mod_rh_conferenceModif.RHConfAddAlarm),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifTools.py (mod_rh_conferenceModif.RHConfModifTools)
+# Inactive: /confModifTools.py/addAlarm (mod_rh_conferenceModif.RHConfAddAlarm)
 
 legacy.add_url_rule('/confModifTools.py/allSessionsConveners',
                     'confModifTools-allSessionsConveners',
@@ -1650,16 +1643,8 @@ legacy.add_url_rule('/confModifTools.py/delete',
                     'confModifTools-delete',
                     rh_as_view(mod_rh_conferenceModif.RHConfDeletion),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/deleteAlarm',
-                    'confModifTools-deleteAlarm',
-                    rh_as_view(mod_rh_conferenceModif.RHConfDeleteAlarm),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/displayAlarm',
-                    'confModifTools-displayAlarm',
-                    rh_as_view(mod_rh_conferenceModif.RHConfDisplayAlarm),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifTools.py/deleteAlarm (mod_rh_conferenceModif.RHConfDeleteAlarm)
+# Inactive: /confModifTools.py/displayAlarm (mod_rh_conferenceModif.RHConfDisplayAlarm)
 
 legacy.add_url_rule('/confModifTools.py/dvdCreation',
                     'confModifTools-dvdCreation',
@@ -1675,11 +1660,7 @@ legacy.add_url_rule('/confModifTools.py/matPkg',
                     'confModifTools-matPkg',
                     rh_as_view(mod_rh_conferenceModif.RHFullMaterialPackage),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/modifyAlarm',
-                    'confModifTools-modifyAlarm',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifyAlarm),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifTools.py/modifyAlarm (mod_rh_conferenceModif.RHConfModifyAlarm)
 
 legacy.add_url_rule('/confModifTools.py/performCloning',
                     'confModifTools-performCloning',
@@ -1715,16 +1696,8 @@ legacy.add_url_rule('/confModifTools.py/posterSaveBackground',
                     'confModifTools-posterSaveBackground',
                     rh_as_view(mod_rh_conferenceModif.RHConfPosterSaveTempBackground),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/saveAlarm',
-                    'confModifTools-saveAlarm',
-                    rh_as_view(mod_rh_conferenceModif.RHConfSaveAlarm),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/sendAlarmNow',
-                    'confModifTools-sendAlarmNow',
-                    rh_as_view(mod_rh_conferenceModif.RHConfSendAlarmNow),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifTools.py/saveAlarm (mod_rh_conferenceModif.RHConfSaveAlarm)
+# Inactive: /confModifTools.py/sendAlarmNow (mod_rh_conferenceModif.RHConfSendAlarmNow)
 
 
 # Routes for confModifUserCompetences.py

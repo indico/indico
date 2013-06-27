@@ -1104,7 +1104,7 @@ class UHConfModifCoordinatorRights(URLHandler):
 
 
 class UHConfModifTools(URLHandler):
-    _endpoint = 'legacy.confModifTools'
+    _endpoint = 'event_mgmt.confModifTools'
 
 
 class UHConfModifListings(URLHandler):
@@ -1228,31 +1228,31 @@ class UHConfAllSpeakersAction(URLHandler):
 
 
 class UHConfDisplayAlarm(URLHandler):
-    _endpoint = 'legacy.confModifTools-displayAlarm'
+    _endpoint = 'event_mgmt.confModifTools-displayAlarm'
 
 
 class UHConfAddAlarm(URLHandler):
-    _endpoint = 'legacy.confModifTools-addAlarm'
+    _endpoint = 'event_mgmt.confModifTools-addAlarm'
 
 
 class UHSaveAlarm(URLHandler):
-    _endpoint = 'legacy.confModifTools-saveAlarm'
+    _endpoint = 'event_mgmt.confModifTools-saveAlarm'
+
+
+class UHModifySaveAlarm(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-modifySaveAlarm'
 
 
 class UHSendAlarmNow(URLHandler):
-    _endpoint = 'legacy.confModifTools-sendAlarmNow'
+    _endpoint = 'event_mgmt.confModifTools-sendAlarmNow'
 
 
 class UHConfDeleteAlarm(URLHandler):
-    _endpoint = 'legacy.confModifTools-deleteAlarm'
+    _endpoint = 'event_mgmt.confModifTools-deleteAlarm'
 
 
 class UHConfModifyAlarm(URLHandler):
-    _endpoint = 'legacy.confModifTools-modifyAlarm'
-
-
-class UHConfSaveAlarm(URLHandler):
-    _endpoint = 'legacy.confModifTools-saveAlarm'
+    _endpoint = 'event_mgmt.confModifTools-modifyAlarm'
 
 
 class UHSaveLogo(URLHandler):

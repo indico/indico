@@ -2924,8 +2924,6 @@ class WConfDisplayAlarm( wcomponents.WTemplated ):
         vars["alarmList"] = self.__target.getAlarmList()
         vars["timezone"] = self.__target.getTimezone()
         vars["addAlarmURL"] = urlHandlers.UHConfAddAlarm.getURL( self.__conf )
-        vars["deleteAlarmURL"] = urlHandlers.UHConfDeleteAlarm.getURL()
-        vars["modifyAlarmURL"] = urlHandlers.UHConfModifyAlarm.getURL()
         return vars
 
 class WPConfDisplayAlarm( WPConfModifToolsBase ):
@@ -2983,6 +2981,7 @@ class WPConfAddAlarm( WPConfModifToolsBase ):
         wc = WSetAlarm( self._conf, self._getAW() )
         pars = {}
         pars["alarmId"] = self._rh._reqParams.get("alarmId","")
+        pars["alarm"] = None
         pars["user"] = self._rh._getUser()
         pars["fromAddr"] = self._rh._reqParams.get("fromAddr","")
         pars["Emails"] = self._rh._reqParams.get("Emails","")
@@ -3013,6 +3012,7 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
         wc = WSetAlarm(self._conf, self._getAW())
         pars ={}
         pars["alarmId"] = self._alarm.getConfRelativeId()
+        pars["alarm"] = self._alarm
         pars["timeBeforeType"] = ""
         timeBefore=0
         year = month = day = hour = minute = -1

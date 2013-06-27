@@ -605,8 +605,6 @@ class WPMConfModifTools (conferences.WPConfModifToolsBase):
             "deleteConferenceURL": urlHandlers.UHConfDeletion.getURL( self._conf ), \
             "cloneConferenceURL": urlHandlers.UHConfClone.getURL( self._conf ), \
             "addAlarmURL": urlHandlers.UHConfAddAlarm.getURL( self._conf ), \
-            "deleteAlarmURL": urlHandlers.UHConfDeleteAlarm.getURL(), \
-            "modifyAlarmURL": urlHandlers.UHConfModifyAlarm.getURL(), \
             }
         return wc.getHTML( p )
 
