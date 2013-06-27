@@ -17,13 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from indico.web.flask.wrappers import IndicoBlueprint
+from MaKaC.webinterface.rh import conferenceModif
+from indico.web.flask.util import rh_as_view
+from indico.web.flask.blueprints.event.management import event_mgmt
 
-event_mgmt = IndicoBlueprint('event_mgmt', __name__, url_prefix='/event/<confId>/manage')
 
-import indico.web.flask.blueprints.event.management.main
-import indico.web.flask.blueprints.event.management.general
-import indico.web.flask.blueprints.event.management.tools
-import indico.web.flask.blueprints.event.management.layout
-import indico.web.flask.blueprints.event.management.protection
-import indico.web.flask.blueprints.event.management.misc
+# Management entrance (redirects to most appropriate page)
+event_mgmt.add_url_rule('/', 'conferenceModification-managementAccess',
+                        rh_as_view(conferenceModif.RHConferenceModifManagementAccess))
