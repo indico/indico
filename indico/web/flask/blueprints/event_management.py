@@ -65,7 +65,17 @@ event_mgmt.add_url_rule('/tools/alarms/<alarmId>/delete', 'confModifTools-delete
 event_mgmt.add_url_rule('/tools/alarms/<alarmId>/trigger', 'confModifTools-sendAlarmNow',
                         rh_as_view(conferenceModif.RHConfSendAlarmNow), methods=('POST',))
 
-# Tools: Cloning
+# Tools: Clone
 event_mgmt.add_url_rule('/tools/clone', 'confModifTools-clone', rh_as_view(conferenceModif.RHConfClone))
 event_mgmt.add_url_rule('/tools/clone', 'confModifTools-performCloning',
                         rh_as_view(conferenceModif.RHConfPerformCloning), methods=('POST',))
+
+# Tools: Delete
+event_mgmt.add_url_rule('/tools/delete', 'confModifTools-delete', rh_as_view(conferenceModif.RHConfDeletion),
+                        methods=('GET', 'POST'))
+
+# Tools: Lock
+event_mgmt.add_url_rule('/tools/lock', 'conferenceModification-close', rh_as_view(conferenceModif.RHConferenceClose),
+                        methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/tools/unlock', 'conferenceModification-open', rh_as_view(conferenceModif.RHConferenceOpen),
+                        methods=('GET', 'POST'))

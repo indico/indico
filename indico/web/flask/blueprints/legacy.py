@@ -1634,11 +1634,7 @@ legacy.add_url_rule('/confModifTools.py/badgeSaveBackground',
                     rh_as_view(mod_rh_conferenceModif.RHConfBadgeSaveTempBackground),
                     methods=('GET', 'POST'))
 # Inactive: /confModifTools.py/clone (mod_rh_conferenceModif.RHConfClone)
-
-legacy.add_url_rule('/confModifTools.py/delete',
-                    'confModifTools-delete',
-                    rh_as_view(mod_rh_conferenceModif.RHConfDeletion),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifTools.py/delete (mod_rh_conferenceModif.RHConfDeletion)
 # Inactive: /confModifTools.py/deleteAlarm (mod_rh_conferenceModif.RHConfDeleteAlarm)
 # Inactive: /confModifTools.py/displayAlarm (mod_rh_conferenceModif.RHConfDisplayAlarm)
 
@@ -1765,11 +1761,7 @@ legacy.add_url_rule('/confModifUserCompetences.py/modifyCompetences',
 # Routes for conferenceModification.py
 # Inactive: /conferenceModification.py (mod_rh_conferenceModif.RHConferenceModification)
 # Inactive: /conferenceModification.py/addContribType (mod_rh_conferenceModif.RHConfAddContribType)
-
-legacy.add_url_rule('/conferenceModification.py/close',
-                    'conferenceModification-close',
-                    rh_as_view(mod_rh_conferenceModif.RHConferenceClose),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceModification.py/close (mod_rh_conferenceModif.RHConferenceClose)
 
 legacy.add_url_rule('/conferenceModification.py/closeModifKey',
                     'conferenceModification-closeModifKey',
@@ -1799,11 +1791,7 @@ legacy.add_url_rule('/conferenceModification.py/modificationClosed',
                     'conferenceModification-modificationClosed',
                     rh_as_view(mod_rh_conferenceModif.RHConferenceModificationClosed),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/open',
-                    'conferenceModification-open',
-                    rh_as_view(mod_rh_conferenceModif.RHConferenceOpen),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceModification.py/open (mod_rh_conferenceModif.RHConferenceOpen)
 # Inactive: /conferenceModification.py/removeContribType (mod_rh_conferenceModif.RHConfRemoveContribType)
 
 legacy.add_url_rule('/conferenceModification.py/roomBookingBookingForm',

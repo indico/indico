@@ -637,7 +637,7 @@ class UHConfModSessionSlots(URLHandler):
 
 
 class UHConferenceClose(URLHandler):
-    _endpoint = 'legacy.conferenceModification-close'
+    _endpoint = 'event_mgmt.conferenceModification-close'
 
 
 class UHConferenceModificationClosed(URLHandler):
@@ -645,7 +645,7 @@ class UHConferenceModificationClosed(URLHandler):
 
 
 class UHConferenceOpen(URLHandler):
-    _endpoint = 'legacy.conferenceModification-open'
+    _endpoint = 'event_mgmt.conferenceModification-open'
 
 
 class UHConfDataModif(URLHandler):
@@ -1200,7 +1200,7 @@ class UHConfModifFormatTitleTextColor(URLHandler):
 
 
 class UHConfDeletion(URLHandler):
-    _endpoint = 'legacy.confModifTools-delete'
+    _endpoint = 'event_mgmt.confModifTools-delete'
 
 
 class UHConfClone(URLHandler):
