@@ -943,15 +943,6 @@ class WEpaymentBannerModif(WBannerModif):
         title=target.getTitle()
         WBannerModif.__init__(self, path, itemType, title)
 
-class WListingsBannerModif(WBannerModif):
-
-    def __init__( self, conf, type ):
-        path=[{"url": urlHandlers.UHConfModifListings.getURL(conf), "title":_("All listings")}]
-
-        itemType= type
-        title=""
-        WBannerModif.__init__(self, path, itemType, title)
-
 class WParticipantsBannerModif(WBannerModif):
 
     def __init__( self, conf ):

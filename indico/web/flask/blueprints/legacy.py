@@ -50,16 +50,8 @@ legacy = IndicoBlueprint('legacy', __name__)
 # Routes for EMail.py
 # Inactive: /EMail.py (mod_rh_conferenceDisplay.RHConferenceEmail)
 # Inactive: /EMail.py/send (mod_rh_conferenceDisplay.RHConferenceSendEmail)
-
-legacy.add_url_rule('/EMail.py/sendcontribparticipants',
-                    'EMail-sendcontribparticipants',
-                    rh_as_view(mod_rh_conferenceModif.RHContribParticipantsSendEmail),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/EMail.py/sendconvener',
-                    'EMail-sendconvener',
-                    rh_as_view(mod_rh_conferenceModif.RHConvenerSendEmail),
-                    methods=('GET', 'POST'))
+# Inactive: /EMail.py/sendcontribparticipants (mod_rh_conferenceModif.RHContribParticipantsSendEmail)
+# Inactive: /EMail.py/sendconvener (mod_rh_conferenceModif.RHConvenerSendEmail)
 
 legacy.add_url_rule('/EMail.py/sendreg',
                     'EMail-sendreg',
@@ -869,25 +861,12 @@ legacy.add_url_rule('/confModifEvaluation.py/specialAction',
 
 
 # Routes for confModifListings.py
-legacy.add_url_rule('/confModifListings.py',
-                    'confModifListings',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifListings),
-                    methods=('GET', 'POST'))
-
 legacy.add_url_rule('/confModifListings.py/allSessionsConveners',
                     'confModifListings-allSessionsConveners',
                     rh_as_view(mod_rh_conferenceModif.RHConfAllSessionsConveners),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifListings.py/allSpeakers',
-                    'confModifListings-allSpeakers',
-                    rh_as_view(mod_rh_conferenceModif.RHConfAllSpeakers),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifListings.py/allSpeakersAction',
-                    'confModifListings-allSpeakersAction',
-                    rh_as_view(mod_rh_conferenceModif.RHConfAllSpeakersAction),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifListings.py/allSpeakers (mod_rh_conferenceModif.RHConfAllSpeakers)
+# Inactive: /confModifListings.py/allSpeakersAction (mod_rh_conferenceModif.RHConfAllSpeakersAction)
 
 
 # Routes for confModifLog.py
@@ -937,30 +916,11 @@ legacy.add_url_rule('/confModifParticipants.py/statistics',
 
 
 # Routes for confModifPendingQueues.py
-legacy.add_url_rule('/confModifPendingQueues.py',
-                    'confModifPendingQueues',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifPendingQueues),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifPendingQueues.py/actionConfSubmitters',
-                    'confModifPendingQueues-actionConfSubmitters',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifPendingQueuesActionConfSubm),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifPendingQueues.py/actionCoordinators',
-                    'confModifPendingQueues-actionCoordinators',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifPendingQueuesActionCoord),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifPendingQueues.py/actionManagers',
-                    'confModifPendingQueues-actionManagers',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifPendingQueuesActionMgr),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifPendingQueues.py/actionSubmitters',
-                    'confModifPendingQueues-actionSubmitters',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifPendingQueuesActionSubm),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifPendingQueues.py (mod_rh_conferenceModif.RHConfModifPendingQueues)
+# Inactive: /confModifPendingQueues.py/actionConfSubmitters (mod_rh_conferenceModif.RHConfModifPendingQueuesActionConfSubm)
+# Inactive: /confModifPendingQueues.py/actionCoordinators (mod_rh_conferenceModif.RHConfModifPendingQueuesActionCoord)
+# Inactive: /confModifPendingQueues.py/actionManagers (mod_rh_conferenceModif.RHConfModifPendingQueuesActionMgr)
+# Inactive: /confModifPendingQueues.py/actionSubmitters (mod_rh_conferenceModif.RHConfModifPendingQueuesActionSubm)
 
 
 # Routes for confModifProgram.py
@@ -1455,16 +1415,8 @@ legacy.add_url_rule('/confModifSchedule.py/reschedule',
 # Routes for confModifTools.py
 # Inactive: /confModifTools.py (mod_rh_conferenceModif.RHConfModifTools)
 # Inactive: /confModifTools.py/addAlarm (mod_rh_conferenceModif.RHConfAddAlarm)
-
-legacy.add_url_rule('/confModifTools.py/allSessionsConveners',
-                    'confModifTools-allSessionsConveners',
-                    rh_as_view(mod_rh_conferenceModif.RHConfAllSessionsConveners),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/allSessionsConvenersAction',
-                    'confModifTools-allSessionsConvenersAction',
-                    rh_as_view(mod_rh_conferenceModif.RHConfAllSessionsConvenersAction),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifTools.py/allSessionsConveners (mod_rh_conferenceModif.RHConfAllSessionsConveners)
+# Inactive: /confModifTools.py/allSessionsConvenersAction (mod_rh_conferenceModif.RHConfAllSessionsConvenersAction)
 # Inactive: /confModifTools.py/badgeDesign (mod_rh_conferenceModif.RHConfBadgeDesign)
 # Inactive: /confModifTools.py/badgeGetBackground (mod_rh_conferenceModif.RHConfBadgeGetBackground)
 # Inactive: /confModifTools.py/badgePrinting (mod_rh_conferenceModif.RHConfBadgePrinting)

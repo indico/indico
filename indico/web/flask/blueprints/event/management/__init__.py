@@ -26,4 +26,5 @@ import indico.web.flask.blueprints.event.management.general
 import indico.web.flask.blueprints.event.management.tools
 import indico.web.flask.blueprints.event.management.layout
 import indico.web.flask.blueprints.event.management.protection
+import indico.web.flask.blueprints.event.management.lists
 import indico.web.flask.blueprints.event.management.misc

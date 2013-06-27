@@ -299,11 +299,11 @@ class UHRegistrantsSendEmail(URLHandler):
 
 
 class UHConvenersSendEmail(URLHandler):
-    _endpoint = 'legacy.EMail-sendconvener'
+    _endpoint = 'event_mgmt.EMail-sendconvener'
 
 
 class UHContribParticipantsSendEmail(URLHandler):
-    _endpoint = 'legacy.EMail-sendcontribparticipants'
+    _endpoint = 'event_mgmt.EMail-sendcontribparticipants'
 
 
 class UHConferenceOtherViews(URLHandler):
@@ -1107,10 +1107,6 @@ class UHConfModifTools(URLHandler):
     _endpoint = 'event_mgmt.confModifTools'
 
 
-class UHConfModifListings(URLHandler):
-    _endpoint = 'legacy.confModifListings'
-
-
 class UHConfModifParticipants(URLHandler):
     _endpoint = 'legacy.confModifParticipants'
 
@@ -1204,19 +1200,19 @@ class UHConfPerformCloning(URLHandler):
 
 
 class UHConfAllSessionsConveners(URLHandler):
-    _endpoint = 'legacy.confModifTools-allSessionsConveners'
+    _endpoint = 'event_mgmt.confModifTools-allSessionsConveners'
 
 
 class UHConfAllSessionsConvenersAction(URLHandler):
-    _endpoint = 'legacy.confModifTools-allSessionsConvenersAction'
+    _endpoint = 'event_mgmt.confModifTools-allSessionsConvenersAction'
 
 
 class UHConfAllSpeakers(URLHandler):
-    _endpoint = 'legacy.confModifListings-allSpeakers'
+    _endpoint = 'event_mgmt.confModifListings-allSpeakers'
 
 
 class UHConfAllSpeakersAction(URLHandler):
-    _endpoint = 'legacy.confModifListings-allSpeakersAction'
+    _endpoint = 'event_mgmt.confModifListings-allSpeakersAction'
 
 
 class UHConfDisplayAlarm(URLHandler):
@@ -3128,23 +3124,23 @@ class UHConfModifRegistrantReasonPartPeformModify(URLHandler):
 
 
 class UHConfModifPendingQueues(URLHandler):
-    _endpoint = 'legacy.confModifPendingQueues'
+    _endpoint = 'event_mgmt.confModifPendingQueues'
 
 
 class UHConfModifPendingQueuesActionConfSubm(URLHandler):
-    _endpoint = 'legacy.confModifPendingQueues-actionConfSubmitters'
+    _endpoint = 'event_mgmt.confModifPendingQueues-actionConfSubmitters'
 
 
 class UHConfModifPendingQueuesActionSubm(URLHandler):
-    _endpoint = 'legacy.confModifPendingQueues-actionSubmitters'
+    _endpoint = 'event_mgmt.confModifPendingQueues-actionSubmitters'
 
 
 class UHConfModifPendingQueuesActionMgr(URLHandler):
-    _endpoint = 'legacy.confModifPendingQueues-actionManagers'
+    _endpoint = 'event_mgmt.confModifPendingQueues-actionManagers'
 
 
 class UHConfModifPendingQueuesActionCoord(URLHandler):
-    _endpoint = 'legacy.confModifPendingQueues-actionCoordinators'
+    _endpoint = 'event_mgmt.confModifPendingQueues-actionCoordinators'
 
 
 class UHConfModifRegistrantMiscInfoModify(URLHandler):

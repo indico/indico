@@ -526,20 +526,6 @@ class RHConfModifTools( RHConferenceModifBase ):
         p = conferences.WPConfDisplayAlarm(self, self._target)
         return p.display()
 
-class RHConfModifListings( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModifListings
-
-    def _process( self ):
-        if self._conf.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
-        else:
-            p = conferences.WPConfModifListings( self, self._target )
-            wf=self.getWebFactory()
-            if wf is not None:
-                p = wf.getConfModifListings(self, self._conf)
-            return p.display()
-
 class RHConfDeletion( RoomBookingDBMixin, RHConferenceModifBase ):
     _uh = urlHandlers.UHConfDeletion
 

@@ -2675,7 +2675,6 @@ class WConferenceAllSessionsConveners(wcomponents.WTemplated):
         vars["contribSetIndex"] = 'index'
         vars["convenerNumber"] = str(len(self.__conf.getAllSessionsConvenerList()))
         vars["conveners"] = self._getAllConveners()
-        vars["backURL"] = quoteattr(str(urlHandlers.UHConfModifListings.getURL(self.__conf)))
         return vars
 
     def _getTimetableURL(self, convener):
@@ -2752,7 +2751,6 @@ class WConfModifAllContribParticipants(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
         self._url = vars["participantMainPageURL"]
         vars["speakers"] = self._getAllParticipants()
-        vars["backURL"] = quoteattr(str(urlHandlers.UHConfModifListings.getURL(self._conf)))
         vars["participantNumber"] = str(len(self._partIndex.getParticipationKeys()))
 
         return vars
@@ -7239,7 +7237,6 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
 
         html = WConfModifPendingQueuesList(str(url), title, target, list, pType).getHTML()
         vars["pendingQueue"] = wcomponents.WTabControl(self._tabCtrl, self._aw).getHTML(html)
-        vars["backURL"] = quoteattr(str(urlHandlers.UHConfModifListings.getURL(self._conf)))
 
         return vars
 
@@ -7249,10 +7246,6 @@ class WPConfModifPendingQueuesBase(WPConfModifListings):
     def __init__(self, rh, conf, activeTab=""):
         WPConfModifListings.__init__(self, rh, conf)
         self._activeTab = activeTab
-
-    def _getTabContent(self, params):
-        banner = wcomponents.WListingsBannerModif(self._conf, _("Pending queues")).getHTML()
-        return banner + self._getTabContent(params)
 
     def _setActiveSideMenuItem(self):
         self._listingsMenuItem.setActive(True)
