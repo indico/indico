@@ -17,10 +17,18 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif
+from MaKaC.webinterface.rh import conferenceModif, collaboration
 from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Logs
 event_mgmt.add_url_rule('/logs', 'confModifLog', rh_as_view(conferenceModif.RHConfModifLog))
+
+# Collaboration
+event_mgmt.add_url_rule('/collaboration/', 'confModifCollaboration', rh_as_view(collaboration.RHConfModifCSBookings),
+                        methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/collaboration/<tab>/', 'confModifCollaboration',
+                        rh_as_view(collaboration.RHConfModifCSBookings), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/collaboration/managers', 'confModifCollaboration-managers',
+                        rh_as_view(collaboration.RHConfModifCSProtection))

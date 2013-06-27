@@ -18,17 +18,27 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.plugins.Collaboration.handlers as handlers
-from indico.web.flask.util import rh_as_view
+from indico.web.flask.util import rh_as_view, make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-blueprint = IndicoBlueprint('collaboration', __name__, url_prefix='/Collaboration')
+blueprint = IndicoBlueprint('collaboration', __name__)
 
-blueprint.add_url_rule('/elecAgree', 'elecAgree', rh_as_view(handlers.RHElectronicAgreement))
-blueprint.add_url_rule('/uploadElecAgree', 'uploadElecAgree', rh_as_view(handlers.RHUploadElectronicAgreement),
-                       methods=('POST',))
-blueprint.add_url_rule('/getPaperAgree', 'getPaperAgree', rh_as_view(handlers.RHElectronicAgreementGetFile))
-blueprint.add_url_rule('/elecAgreeForm', 'elecAgreeForm', rh_as_view(handlers.RHElectronicAgreementForm))
+blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/', 'elecAgree',
+                       rh_as_view(handlers.RHElectronicAgreement))
+blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/upload', 'uploadElecAgree',
+                       rh_as_view(handlers.RHUploadElectronicAgreement), methods=('POST',))
+blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/download', 'getPaperAgree',
+                       rh_as_view(handlers.RHElectronicAgreementGetFile))
+blueprint.add_url_rule('/event/<confId>/collaboration/agreement', 'elecAgreeForm',
+                       rh_as_view(handlers.RHElectronicAgreementForm))
 
-blueprint.add_url_rule('/<plugin>/<path:filepath>', 'htdocs', rh_as_view(handlers.RHCollaborationHtdocs))
-blueprint.add_url_rule('/<path:filepath>', 'htdocs', rh_as_view(handlers.RHCollaborationHtdocs))
+blueprint.add_url_rule('/Collaboration/<plugin>/<path:filepath>', 'htdocs', rh_as_view(handlers.RHCollaborationHtdocs))
+blueprint.add_url_rule('/Collaboration/<path:filepath>', 'htdocs', rh_as_view(handlers.RHCollaborationHtdocs))
+
+# we can't use make_compat_blueprint here because the old url doesn't end in .py
+compat = IndicoBlueprint('compat_collaboration', __name__)
+compat.add_url_rule('/Collaboration/elecAgree', 'elecAgree',
+                    make_compat_redirect_func(blueprint, 'elecAgree'))
+compat.add_url_rule('/Collaboration/elecAgreeForm', 'elecAgreeForm',
+                    make_compat_redirect_func(blueprint, 'elecAgreeForm'))

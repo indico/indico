@@ -22,7 +22,6 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 import MaKaC.webinterface.rh.abstractModif as mod_rh_abstractModif
 import MaKaC.webinterface.rh.abstractReviewing as mod_rh_abstractReviewing
-import MaKaC.webinterface.rh.collaboration as mod_rh_collaboration
 import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
 import MaKaC.webinterface.rh.contribMod as mod_rh_contribMod
@@ -677,15 +676,8 @@ legacy.add_url_rule('/confModifCFA.py/switchShowSelectSpeaker',
 
 
 # Routes for confModifCollaboration.py
-legacy.add_url_rule('/confModifCollaboration.py',
-                    'confModifCollaboration',
-                    rh_as_view(mod_rh_collaboration.RHConfModifCSBookings),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCollaboration.py/managers',
-                    'confModifCollaboration-managers',
-                    rh_as_view(mod_rh_collaboration.RHConfModifCSProtection),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifCollaboration.py (mod_rh_collaboration.RHConfModifCSBookings)
+# Inactive: /confModifCollaboration.py/managers (mod_rh_collaboration.RHConfModifCSProtection)
 
 
 # Routes for confModifContribList.py
