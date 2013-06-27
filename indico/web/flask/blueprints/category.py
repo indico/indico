@@ -28,12 +28,11 @@ def _shorturl(categId):
 
 
 category = IndicoBlueprint('category', __name__, url_prefix='/category')
-category_shorturl = IndicoBlueprint('category_shorturl', __name__)
 
 
 # Short URLs
-category_shorturl.add_url_rule('/categ/<categId>', view_func=_shorturl, strict_slashes=False)
-category_shorturl.add_url_rule('/c/<categId>', view_func=_shorturl, strict_slashes=False)
+category.add_url_rule('!/categ/<categId>', view_func=_shorturl, strict_slashes=False)
+category.add_url_rule('!/c/<categId>', view_func=_shorturl, strict_slashes=False)
 
 
 # categoryDisplay.py

@@ -69,12 +69,11 @@ def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
 
 
 event = IndicoBlueprint('event', __name__, url_prefix='/event')
-event_shorturl = IndicoBlueprint('event_shorturl', __name__)
 
 
 # Short URLs
-event_shorturl.add_url_rule('/e/<path:confId>', view_func=_event_or_shorturl, strict_slashes=False,
-                            defaults={'shorturl_namespace': True})
+event.add_url_rule('!/e/<path:confId>', view_func=_event_or_shorturl, strict_slashes=False,
+                   defaults={'shorturl_namespace': True})
 
 
 # conferenceCreation.py
