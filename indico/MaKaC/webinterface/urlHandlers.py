@@ -256,7 +256,7 @@ class UHCalendarSelectCategories(URLHandler):
 
 
 class UHConferenceCreation(URLHandler):
-    _endpoint = 'event.conferenceCreation'
+    _endpoint = 'event_creation.conferenceCreation'
 
     @classmethod
     def getURL(cls, target):
@@ -267,7 +267,7 @@ class UHConferenceCreation(URLHandler):
 
 
 class UHConferencePerformCreation(URLHandler):
-    _endpoint = 'event.conferenceCreation-createConference'
+    _endpoint = 'event_creation.conferenceCreation-createConference'
 
 
 class UHConferenceDisplay(URLHandler):
