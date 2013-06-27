@@ -1080,27 +1080,27 @@ class UHContributionDataModification(URLHandler):
 
 
 class UHConfModifAC(URLHandler):
-    _endpoint = 'legacy.confModifAC'
+    _endpoint = 'event_mgmt.confModifAC'
 
 
 class UHConfSetVisibility(URLHandler):
-    _endpoint = 'legacy.confModifAC-setVisibility'
+    _endpoint = 'event_mgmt.confModifAC-setVisibility'
 
 
 class UHConfGrantSubmissionToAllSpeakers(URLHandler):
-    _endpoint = 'legacy.confModifAC-grantSubmissionToAllSpeakers'
+    _endpoint = 'event_mgmt.confModifAC-grantSubmissionToAllSpeakers'
 
 
 class UHConfRemoveAllSubmissionRights(URLHandler):
-    _endpoint = 'legacy.confModifAC-removeAllSubmissionRights'
+    _endpoint = 'event_mgmt.confModifAC-removeAllSubmissionRights'
 
 
 class UHConfGrantModificationToAllConveners(URLHandler):
-    _endpoint = 'legacy.confModifAC-grantModificationToAllConveners'
+    _endpoint = 'event_mgmt.confModifAC-grantModificationToAllConveners'
 
 
 class UHConfModifCoordinatorRights(URLHandler):
-    _endpoint = 'legacy.confModifAC-modifySessionCoordRights'
+    _endpoint = 'event_mgmt.confModifAC-modifySessionCoordRights'
 
 
 class UHConfModifTools(URLHandler):

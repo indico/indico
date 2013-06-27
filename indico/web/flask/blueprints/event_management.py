@@ -177,3 +177,16 @@ event_mgmt.add_url_rule('/layout/images/', 'confModifDisplay-resources',
                         rh_as_view(conferenceModif.RHConfModifDisplayResources))
 event_mgmt.add_url_rule('/layout/images/upload', 'confModifDisplay-savePic', rh_as_view(conferenceModif.RHConfSavePic),
                         methods=('POST',))
+
+# Protection
+event_mgmt.add_url_rule('/access/', 'confModifAC', rh_as_view(conferenceModif.RHConfModifAC))
+event_mgmt.add_url_rule('/access/visibility', 'confModifAC-setVisibility',
+                        rh_as_view(conferenceModif.RHConfSetVisibility), methods=('POST',))
+event_mgmt.add_url_rule('/access/session-coordinators', 'confModifAC-modifySessionCoordRights',
+                        rh_as_view(conferenceModif.RHModifSessionCoordRights))
+event_mgmt.add_url_rule('/access/grant/modification/conveners', 'confModifAC-grantModificationToAllConveners',
+                        rh_as_view(conferenceModif.RHConfGrantModificationToAllConveners), methods=('POST',))
+event_mgmt.add_url_rule('/access/grant/submission/speakers', 'confModifAC-grantSubmissionToAllSpeakers',
+                        rh_as_view(conferenceModif.RHConfGrantSubmissionToAllSpeakers), methods=('POST',))
+event_mgmt.add_url_rule('/access/revoke/submission', 'confModifAC-removeAllSubmissionRights',
+                        rh_as_view(conferenceModif.RHConfRemoveAllSubmissionRights), methods=('POST',))

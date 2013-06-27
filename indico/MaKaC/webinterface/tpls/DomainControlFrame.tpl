@@ -19,13 +19,17 @@
   </form>
 </div>
 <script type="text/javascript">
-function smooth_slide(el, text) {
+function smooth_slide(el, text, immediately) {
+    if (immediately) {
+        el.html(text);
+        return;
+    }
     el.slideUp(function() {
         $(this).html(text)
     }).slideDown();
 }
 
-function refresh_state() {
+function refresh_state(immediately) {
     var el = $('.domain_control #message');
 
     var new_state = $(':checkbox:checked').length > 0;
@@ -34,15 +38,15 @@ function refresh_state() {
         return;
     } else if (new_state){
         el.data('enabled', true);
-        smooth_slide(el, $T('<span class="protPrivate strong">Access restricted</span><p>Only users in the networks selected below will be able to access this event.</p>'));
+        smooth_slide(el, $T('<span class="protPrivate strong">Access restricted</span><p>Only users in the networks selected below will be able to access this event.</p>'), immediately);
     } else{
         el.data('enabled', false);
-        smooth_slide(el, $T('<span class="protPublic strong">Accessible from everywhere</span><p>To restrict access to this event only to certain IP addresses, choose at least one of the networks below.</p>'));
+        smooth_slide(el, $T('<span class="protPublic strong">Accessible from everywhere</span><p>To restrict access to this event only to certain IP addresses, choose at least one of the networks below.</p>'), immediately);
     }
 }
 
 $(function(){
-    refresh_state();
+    refresh_state(true);
 });
 
 $('.domain_control input:checkbox').on('change', function(){

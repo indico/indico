@@ -2088,10 +2088,9 @@ class WPConfModifAC(WPConferenceModifBase):
 
     def _getPageContent(self, params):
         wc = WConfModifAC(self._conf, self._eventType, self._user)
-        import MaKaC.webinterface.rh.conferenceModif as conferenceModif
         p = {
-            "setVisibilityURL": urlHandlers.UHConfSetVisibility.getURL()
-            }
+            'setVisibilityURL': urlHandlers.UHConfSetVisibility.getURL(self._conf)
+        }
         return wc.getHTML(p)
 
 

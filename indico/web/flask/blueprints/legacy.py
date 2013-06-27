@@ -575,35 +575,12 @@ legacy.add_url_rule('/confModBOA.py/toogleShowIds',
 
 
 # Routes for confModifAC.py
-legacy.add_url_rule('/confModifAC.py',
-                    'confModifAC',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifAC),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifAC.py/grantModificationToAllConveners',
-                    'confModifAC-grantModificationToAllConveners',
-                    rh_as_view(mod_rh_conferenceModif.RHConfGrantModificationToAllConveners),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifAC.py/grantSubmissionToAllSpeakers',
-                    'confModifAC-grantSubmissionToAllSpeakers',
-                    rh_as_view(mod_rh_conferenceModif.RHConfGrantSubmissionToAllSpeakers),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifAC.py/modifySessionCoordRights',
-                    'confModifAC-modifySessionCoordRights',
-                    rh_as_view(mod_rh_conferenceModif.RHModifSessionCoordRights),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifAC.py/removeAllSubmissionRights',
-                    'confModifAC-removeAllSubmissionRights',
-                    rh_as_view(mod_rh_conferenceModif.RHConfRemoveAllSubmissionRights),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifAC.py/setVisibility',
-                    'confModifAC-setVisibility',
-                    rh_as_view(mod_rh_conferenceModif.RHConfSetVisibility),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifAC.py (mod_rh_conferenceModif.RHConfModifAC)
+# Inactive: /confModifAC.py/grantModificationToAllConveners (mod_rh_conferenceModif.RHConfGrantModificationToAllConveners)
+# Inactive: /confModifAC.py/grantSubmissionToAllSpeakers (mod_rh_conferenceModif.RHConfGrantSubmissionToAllSpeakers)
+# Inactive: /confModifAC.py/modifySessionCoordRights (mod_rh_conferenceModif.RHModifSessionCoordRights)
+# Inactive: /confModifAC.py/removeAllSubmissionRights (mod_rh_conferenceModif.RHConfRemoveAllSubmissionRights)
+# Inactive: /confModifAC.py/setVisibility (mod_rh_conferenceModif.RHConfSetVisibility)
 
 
 # Routes for confModifCFA.py
@@ -771,8 +748,6 @@ legacy.add_url_rule('/confModifContribList.py/proceedings',
 # Inactive: /confModifDisplay.py (mod_rh_conferenceModif.RHConfModifDisplayCustomization)
 # Inactive: /confModifDisplay.py/addLink (mod_rh_conferenceModif.RHConfModifDisplayAddLink)
 # Inactive: /confModifDisplay.py/addPage (mod_rh_conferenceModif.RHConfModifDisplayAddPage)
-# Inactive: /confModifDisplay.py/addPageFile (mod_rh_conferenceModif.RHConfModifDisplayAddPageFile)
-# Inactive: /confModifDisplay.py/addPageFileBrowser (mod_rh_conferenceModif.RHConfModifDisplayAddPageFileBrowser)
 # Inactive: /confModifDisplay.py/addSpacer (mod_rh_conferenceModif.RHConfModifDisplayAddSpacer)
 # Inactive: /confModifDisplay.py/confHeader (mod_rh_conferenceModif.RHConfModifDisplayConfHeader)
 # Inactive: /confModifDisplay.py/custom (mod_rh_conferenceModif.RHConfModifDisplayCustomization)
