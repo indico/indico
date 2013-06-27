@@ -1907,7 +1907,7 @@ class WPConfDataModif( WPConferenceModification ):
     def _getPageContent( self, params ):
         p = WConferenceDataModification( self._conf, self._rh )
         pars = {
-            "postURL": urlHandlers.UHConfPerformDataModif.getURL(),
+            "postURL": urlHandlers.UHConfPerformDataModif.getURL(self._conf),
             "type": params.get("type")
         }
         return p.getHTML( pars )

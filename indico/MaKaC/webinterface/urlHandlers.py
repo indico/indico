@@ -331,7 +331,7 @@ class UHCategoryIcon(URLHandler):
 
 
 class UHConferenceModification(URLHandler):
-    _endpoint = 'legacy.conferenceModification'
+    _endpoint = 'event_mgmt.conferenceModification'
 
 
 class UHConfModifShowMaterials(URLHandler):
@@ -649,27 +649,27 @@ class UHConferenceOpen(URLHandler):
 
 
 class UHConfDataModif(URLHandler):
-    _endpoint = 'legacy.conferenceModification-data'
+    _endpoint = 'event_mgmt.conferenceModification-data'
 
 
 class UHConfScreenDatesEdit(URLHandler):
-    _endpoint = 'legacy.conferenceModification-screenDates'
+    _endpoint = 'event_mgmt.conferenceModification-screenDates'
 
 
 class UHConfPerformDataModif(URLHandler):
-    _endpoint = 'legacy.conferenceModification-dataPerform'
+    _endpoint = 'event_mgmt.conferenceModification-dataPerform'
 
 
 class UHConfAddContribType(URLHandler):
-    _endpoint = 'legacy.conferenceModification-addContribType'
+    _endpoint = 'event_mgmt.conferenceModification-addContribType'
 
 
 class UHConfRemoveContribType(URLHandler):
-    _endpoint = 'legacy.conferenceModification-removeContribType'
+    _endpoint = 'event_mgmt.conferenceModification-removeContribType'
 
 
 class UHConfEditContribType(URLHandler):
-    _endpoint = 'legacy.conferenceModification-editContribType'
+    _endpoint = 'event_mgmt.conferenceModification-editContribType'
 
 
 class UHConfSectionsSettings(URLHandler):
@@ -1434,7 +1434,7 @@ class UHConfEnterAccessKey(UHConfUser):
 
 
 class UHConfManagementAccess(UHConfUser):
-    _endpoint = 'legacy.conferenceModification-managementAccess'
+    _endpoint = 'event_mgmt.conferenceModification-managementAccess'
 
 
 class UHConfEnterModifKey(UHConfUser):

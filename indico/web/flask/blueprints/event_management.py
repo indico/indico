@@ -23,3 +23,24 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 event_mgmt = IndicoBlueprint('event_mgmt', __name__, url_prefix='/event/<confId>/manage')
+
+# Management entrance (redirects to most appropriate page)
+event_mgmt.add_url_rule('/', 'conferenceModification-managementAccess',
+                        rh_as_view(conferenceModif.RHConferenceModifManagementAccess))
+
+# General settings
+event_mgmt.add_url_rule('/general/', 'conferenceModification', rh_as_view(conferenceModif.RHConferenceModification))
+event_mgmt.add_url_rule('/general/screendates', 'conferenceModification-screenDates',
+                        rh_as_view(conferenceModif.RHConfScreenDatesEdit), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/general/data', 'conferenceModification-data', rh_as_view(conferenceModif.RHConfDataModif),
+                        methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/general/data/save', 'conferenceModification-dataPerform',
+                        rh_as_view(conferenceModif.RHConfPerformDataModif), methods=('POST',))
+
+# Contribution types
+event_mgmt.add_url_rule('/contribution-types/add', 'conferenceModification-addContribType',
+                        rh_as_view(conferenceModif.RHConfAddContribType), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/contribution-types/delete', 'conferenceModification-removeContribType',
+                        rh_as_view(conferenceModif.RHConfRemoveContribType), methods=('POST',))
+event_mgmt.add_url_rule('/contribution-types/<contribTypeId>', 'conferenceModification-editContribType',
+                        rh_as_view(conferenceModif.RHConfEditContribType), methods=('GET', 'POST'))

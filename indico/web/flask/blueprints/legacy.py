@@ -1798,15 +1798,8 @@ legacy.add_url_rule('/confModifUserCompetences.py/modifyCompetences',
 
 
 # Routes for conferenceModification.py
-legacy.add_url_rule('/conferenceModification.py',
-                    'conferenceModification',
-                    rh_as_view(mod_rh_conferenceModif.RHConferenceModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/addContribType',
-                    'conferenceModification-addContribType',
-                    rh_as_view(mod_rh_conferenceModif.RHConfAddContribType),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceModification.py (mod_rh_conferenceModif.RHConferenceModification)
+# Inactive: /conferenceModification.py/addContribType (mod_rh_conferenceModif.RHConfAddContribType)
 
 legacy.add_url_rule('/conferenceModification.py/close',
                     'conferenceModification-close',
@@ -1817,26 +1810,10 @@ legacy.add_url_rule('/conferenceModification.py/closeModifKey',
                     'conferenceModification-closeModifKey',
                     rh_as_view(mod_rh_conferenceModif.RHConferenceCloseModifKey),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/data',
-                    'conferenceModification-data',
-                    rh_as_view(mod_rh_conferenceModif.RHConfDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/dataPerform',
-                    'conferenceModification-dataPerform',
-                    rh_as_view(mod_rh_conferenceModif.RHConfPerformDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/editContribType',
-                    'conferenceModification-editContribType',
-                    rh_as_view(mod_rh_conferenceModif.RHConfEditContribType),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/managementAccess',
-                    'conferenceModification-managementAccess',
-                    rh_as_view(mod_rh_conferenceModif.RHConferenceModifManagementAccess),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceModification.py/data (mod_rh_conferenceModif.RHConfDataModif)
+# Inactive: /conferenceModification.py/dataPerform (mod_rh_conferenceModif.RHConfPerformDataModif)
+# Inactive: /conferenceModification.py/editContribType (mod_rh_conferenceModif.RHConfEditContribType)
+# Inactive: /conferenceModification.py/managementAccess (mod_rh_conferenceModif.RHConferenceModifManagementAccess)
 
 legacy.add_url_rule('/conferenceModification.py/materialsAdd',
                     'conferenceModification-materialsAdd',
@@ -1862,11 +1839,7 @@ legacy.add_url_rule('/conferenceModification.py/open',
                     'conferenceModification-open',
                     rh_as_view(mod_rh_conferenceModif.RHConferenceOpen),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/removeContribType',
-                    'conferenceModification-removeContribType',
-                    rh_as_view(mod_rh_conferenceModif.RHConfRemoveContribType),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceModification.py/removeContribType (mod_rh_conferenceModif.RHConfRemoveContribType)
 
 legacy.add_url_rule('/conferenceModification.py/roomBookingBookingForm',
                     'conferenceModification-roomBookingBookingForm',
@@ -1912,11 +1885,7 @@ legacy.add_url_rule('/conferenceModification.py/roomBookingSearch4Rooms',
                     'conferenceModification-roomBookingSearch4Rooms',
                     rh_as_view(mod_rh_conferenceModif.RHConfModifRoomBookingSearch4Rooms),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/screenDates',
-                    'conferenceModification-screenDates',
-                    rh_as_view(mod_rh_conferenceModif.RHConfScreenDatesEdit),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceModification.py/screenDates (mod_rh_conferenceModif.RHConfScreenDatesEdit)
 
 legacy.add_url_rule('/conferenceModification.py/sectionsSettings',
                     'conferenceModification-sectionsSettings',
