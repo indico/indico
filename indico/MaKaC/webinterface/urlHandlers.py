@@ -3185,7 +3185,7 @@ class UHCategoryCalendarOverview(URLHandler):
 
 # URL Handlers for Printing and Design
 class UHConfModifBadgePrinting(URLHandler):
-    _endpoint = "legacy.confModifTools-badgePrinting"
+    _endpoint = "event_mgmt.confModifTools-badgePrinting"
 
     @classmethod
     def getURL(cls, target=None, templateId=None, deleteTemplateId=None, cancel=False, new=False, copyTemplateId=None):
@@ -3221,7 +3221,7 @@ class UHBadgeTemplatePrinting(URLHandler):
 
 
 class UHConfModifBadgeDesign(URLHandler):
-    _endpoint = 'legacy.confModifTools-badgeDesign'
+    _endpoint = 'event_mgmt.confModifTools-badgeDesign'
 
     @classmethod
     def getURL(cls, target=None, templateId=None, new=False):
@@ -3265,7 +3265,7 @@ class UHModifDefTemplateBadge(URLHandler):
 
 
 class UHConfModifBadgeSaveBackground(URLHandler):
-    _endpoint = 'legacy.confModifTools-badgeSaveBackground'
+    _endpoint = 'event_mgmt.confModifTools-badgeSaveBackground'
 
     @classmethod
     def getURL(cls, target=None, templateId=None):
@@ -3277,7 +3277,7 @@ class UHConfModifBadgeSaveBackground(URLHandler):
 
 
 class UHConfModifBadgeGetBackground(URLHandler):
-    _endpoint = 'legacy.confModifTools-badgeGetBackground'
+    _endpoint = 'event_mgmt.confModifTools-badgeGetBackground'
 
     @classmethod
     def getURL(cls, target=None, templateId=None, backgroundId=None):
@@ -3290,12 +3290,12 @@ class UHConfModifBadgeGetBackground(URLHandler):
 
 
 class UHConfModifBadgePrintingPDF(URLHandler):
-    _endpoint = 'legacy.confModifTools-badgePrintingPDF'
+    _endpoint = 'event_mgmt.confModifTools-badgePrintingPDF'
 
 
 # URL Handlers for Poster Printing and Design
 class UHConfModifPosterPrinting(URLHandler):
-    _endpoint = 'legacy.confModifTools-posterPrinting'
+    _endpoint = 'event_mgmt.confModifTools-posterPrinting'
 
     @classmethod
     def getURL(cls, target=None, templateId=None, deleteTemplateId=None, cancel=False, new=False, copyTemplateId=None):
@@ -3332,7 +3332,7 @@ class UHPosterTemplatePrinting(URLHandler):
 
 
 class UHConfModifPosterDesign(URLHandler):
-    _endpoint = 'legacy.confModifTools-posterDesign'
+    _endpoint = 'event_mgmt.confModifTools-posterDesign'
 
     @classmethod
     def getURL(cls, target=None, templateId=None, new=False):
@@ -3376,7 +3376,7 @@ class UHModifDefTemplatePoster(URLHandler):
 
 
 class UHConfModifPosterSaveBackground(URLHandler):
-    _endpoint = 'legacy.confModifTools-posterSaveBackground'
+    _endpoint = 'event_mgmt.confModifTools-posterSaveBackground'
 
     @classmethod
     def getURL(cls, target=None, templateId=None):
@@ -3388,7 +3388,7 @@ class UHConfModifPosterSaveBackground(URLHandler):
 
 
 class UHConfModifPosterGetBackground(URLHandler):
-    _endpoint = 'legacy.confModifTools-posterGetBackground'
+    _endpoint = 'event_mgmt.confModifTools-posterGetBackground'
 
     @classmethod
     def getURL(cls, target=None, templateId=None, backgroundId=None):
@@ -3401,7 +3401,7 @@ class UHConfModifPosterGetBackground(URLHandler):
 
 
 class UHConfModifPosterPrintingPDF(URLHandler):
-    _endpoint = 'legacy.confModifTools-posterPrintingPDF'
+    _endpoint = 'event_mgmt.confModifTools-posterPrintingPDF'
 
 
 class UHJsonRpcService(OptionallySecureURLHandler):

@@ -1608,31 +1608,11 @@ legacy.add_url_rule('/confModifTools.py/allSessionsConvenersAction',
                     'confModifTools-allSessionsConvenersAction',
                     rh_as_view(mod_rh_conferenceModif.RHConfAllSessionsConvenersAction),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/badgeDesign',
-                    'confModifTools-badgeDesign',
-                    rh_as_view(mod_rh_conferenceModif.RHConfBadgeDesign),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/badgeGetBackground',
-                    'confModifTools-badgeGetBackground',
-                    rh_as_view(mod_rh_conferenceModif.RHConfBadgeGetBackground),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/badgePrinting',
-                    'confModifTools-badgePrinting',
-                    rh_as_view(mod_rh_conferenceModif.RHConfBadgePrinting),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/badgePrintingPDF',
-                    'confModifTools-badgePrintingPDF',
-                    rh_as_view(mod_rh_conferenceModif.RHConfBadgePrintingPDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/badgeSaveBackground',
-                    'confModifTools-badgeSaveBackground',
-                    rh_as_view(mod_rh_conferenceModif.RHConfBadgeSaveTempBackground),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifTools.py/badgeDesign (mod_rh_conferenceModif.RHConfBadgeDesign)
+# Inactive: /confModifTools.py/badgeGetBackground (mod_rh_conferenceModif.RHConfBadgeGetBackground)
+# Inactive: /confModifTools.py/badgePrinting (mod_rh_conferenceModif.RHConfBadgePrinting)
+# Inactive: /confModifTools.py/badgePrintingPDF (mod_rh_conferenceModif.RHConfBadgePrintingPDF)
+# Inactive: /confModifTools.py/badgeSaveBackground (mod_rh_conferenceModif.RHConfBadgeSaveTempBackground)
 # Inactive: /confModifTools.py/clone (mod_rh_conferenceModif.RHConfClone)
 # Inactive: /confModifTools.py/delete (mod_rh_conferenceModif.RHConfDeletion)
 # Inactive: /confModifTools.py/deleteAlarm (mod_rh_conferenceModif.RHConfDeleteAlarm)
@@ -1659,31 +1639,11 @@ legacy.add_url_rule('/confModifTools.py/performMatPkg',
                     'confModifTools-performMatPkg',
                     rh_as_view(mod_rh_conferenceModif.RHFullMaterialPackagePerform),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/posterDesign',
-                    'confModifTools-posterDesign',
-                    rh_as_view(mod_rh_conferenceModif.RHConfPosterDesign),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/posterGetBackground',
-                    'confModifTools-posterGetBackground',
-                    rh_as_view(mod_rh_conferenceModif.RHConfPosterGetBackground),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/posterPrinting',
-                    'confModifTools-posterPrinting',
-                    rh_as_view(mod_rh_conferenceModif.RHConfPosterPrinting),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/posterPrintingPDF',
-                    'confModifTools-posterPrintingPDF',
-                    rh_as_view(mod_rh_conferenceModif.RHConfPosterPrintingPDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/posterSaveBackground',
-                    'confModifTools-posterSaveBackground',
-                    rh_as_view(mod_rh_conferenceModif.RHConfPosterSaveTempBackground),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifTools.py/posterDesign (mod_rh_conferenceModif.RHConfPosterDesign)
+# Inactive: /confModifTools.py/posterGetBackground (mod_rh_conferenceModif.RHConfPosterGetBackground)
+# Inactive: /confModifTools.py/posterPrinting (mod_rh_conferenceModif.RHConfPosterPrinting)
+# Inactive: /confModifTools.py/posterPrintingPDF (mod_rh_conferenceModif.RHConfPosterPrintingPDF)
+# Inactive: /confModifTools.py/posterSaveBackground (mod_rh_conferenceModif.RHConfPosterSaveTempBackground)
 # Inactive: /confModifTools.py/saveAlarm (mod_rh_conferenceModif.RHConfSaveAlarm)
 # Inactive: /confModifTools.py/sendAlarmNow (mod_rh_conferenceModif.RHConfSendAlarmNow)
 

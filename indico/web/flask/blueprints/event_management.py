@@ -79,3 +79,27 @@ event_mgmt.add_url_rule('/tools/lock', 'conferenceModification-close', rh_as_vie
                         methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/tools/unlock', 'conferenceModification-open', rh_as_view(conferenceModif.RHConferenceOpen),
                         methods=('GET', 'POST'))
+
+# Tools: Posters
+event_mgmt.add_url_rule('/tools/posters/', 'confModifTools-posterPrinting',
+                        rh_as_view(conferenceModif.RHConfPosterPrinting), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/tools/posters/poster.pdf', 'confModifTools-posterPrintingPDF',
+                        rh_as_view(conferenceModif.RHConfPosterPrintingPDF), methods=('POST',))
+event_mgmt.add_url_rule('/tools/posters/design', 'confModifTools-posterDesign',
+                        rh_as_view(conferenceModif.RHConfPosterDesign), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/tools/posters/background', 'confModifTools-posterGetBackground',
+                        rh_as_view(conferenceModif.RHConfPosterGetBackground), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/tools/posters/save-background', 'confModifTools-posterSaveBackground',
+                        rh_as_view(conferenceModif.RHConfPosterSaveTempBackground), methods=('POST',))
+
+# Tools: Badges
+event_mgmt.add_url_rule('/tools/badges/', 'confModifTools-badgePrinting',
+                        rh_as_view(conferenceModif.RHConfBadgePrinting), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/tools/badges/badges.pdf', 'confModifTools-badgePrintingPDF',
+                        rh_as_view(conferenceModif.RHConfBadgePrintingPDF), methods=('POST',))
+event_mgmt.add_url_rule('/tools/badges/design', 'confModifTools-badgeDesign',
+                        rh_as_view(conferenceModif.RHConfBadgeDesign), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/tools/badges/background', 'confModifTools-badgeGetBackground',
+                        rh_as_view(conferenceModif.RHConfBadgeGetBackground), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/tools/badges/save-background', 'confModifTools-badgeSaveBackground',
+                        rh_as_view(conferenceModif.RHConfBadgeSaveTempBackground), methods=('POST',))
