@@ -24,7 +24,7 @@ Asynchronous request handlers for conference-related data modification.
 
 # 3rd party imports
 from email.utils import formataddr
-import re
+from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from indico.util.string import permissive_format
 
 import datetime
@@ -47,7 +47,7 @@ from MaKaC.participant import Participant
 from MaKaC.fossils.contribution import IContributionFossil
 
 import MaKaC.webinterface.displayMgr as displayMgr
-from MaKaC.webinterface import urlHandlers, wcomponents
+from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.rh.reviewingModif import RCReferee, RCPaperReviewManager
 from MaKaC.webinterface.common import contribFilters
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
@@ -61,7 +61,6 @@ from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 # indico imports
 from indico.modules.scheduler import tasks
 from indico.util.i18n import i18nformat
-from indico.web.flask.util import endpoint_for_url
 from indico.web.http_api.util import generate_public_auth_request
 
 
@@ -272,21 +271,10 @@ class ConferenceShortURLModification( ConferenceTextModificationBase ):
     def _handleSet(self):
         mapper = ShortURLMapper()
         if self._value:
-            if self._value.isdigit():
-                raise NoReportError(_("Short URL tag is a number: '%s'. Please add at least one non-digit.") % self._value)
-            if not re.match(r'^[a-zA-Z0-9 @._/-]+$', self._value):
-                raise NoReportError(_("Short URL tag contains invalid chars: '%s'. Please select another one.") % self._value)
-            if self._value.startswith('/') or self._value.endswith('/'):
-                raise NoReportError(_("Short URL tag may not begin/end with a slash: '%s'. Please select another one.") % self._value)
-            if mapper.hasKey(self._value) and mapper.getById(self._value) != self._target:
-                raise NoReportError(_("Short URL tag already used: '%s'. Please select another one.") % self._value)
-            if conference.ConferenceHolder().hasKey(self._value):
-                # Reject existing event ids. It'd be EXTREMELY confusing and broken to allow such a shorturl
-                raise NoReportError(_("Short URL tag is an event id: '%s'. Please select another one.") % self._value)
-            ep = endpoint_for_url(Config.getInstance().getShortEventURL() + self._value)
-            if ep and ep[0] != 'event.conferenceDisplay' and not ep[0].startswith('event_shorturl.'):
-                # URL collides with an existing rule that does does not know about shorturls
-                raise NoReportError(_("Short URL tag conflicts with an URL used by Indico: '%s'. Please select another one.") % self._value)
+            try:
+                UtilsConference.validateShortURL(self._value, self._target)
+            except ValueError, e:
+                raise NoReportError(e.message)
         mapper.remove(self._target)
         self._target.setUrlTag(self._value)
         if self._value:

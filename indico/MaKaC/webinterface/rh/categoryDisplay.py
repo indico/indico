@@ -24,10 +24,12 @@ from datetime import timedelta, datetime
 # Fermi timezone awareness      #
 #################################
 from pytz import timezone
+import re
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 #################################
 # Fermi timezone awareness(end) #
 #################################
+from MaKaC.common.url import ShortURLMapper
 import MaKaC.webinterface.rh.base as base
 from base import RoomBookingDBMixin
 import MaKaC.webinterface.locators as locators
@@ -48,7 +50,7 @@ from MaKaC.webinterface.user import UserListModificationBase
 from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, endpoint_for_url
 from indico.web.http_api.api import CategoryEventHook
 from indico.web.http_api.metadata.serializer import Serializer
 
@@ -401,8 +403,8 @@ class UtilPersons:
 
 class UtilsConference:
 
+    @staticmethod
     def setValues(c, confData, notify=False):
-        from MaKaC.webinterface.common.tools import escape_tags_short_url
         c.setTitle( confData["title"] )
         c.setDescription( confData["description"] )
         c.setOrgText(confData.get("orgText",""))
@@ -411,14 +413,17 @@ class UtilsConference:
         c.setChairmanText( confData.get("chairText", "") )
         if "shortURLTag" in confData.keys():
             tag = confData["shortURLTag"].strip()
-            tag = escape_tags_short_url(tag)
+            if tag:
+                try:
+                    UtilsConference.validateShortURL(tag, c)
+                except ValueError, e:
+                    raise FormValuesError(e.message)
             if c.getUrlTag() != tag:
-                from MaKaC.common.url import ShortURLMapper
-                sum = ShortURLMapper()
-                sum.remove(c)
+                mapper = ShortURLMapper()
+                mapper.remove(c)
                 c.setUrlTag(tag)
                 if tag:
-                    sum.add(tag, c)
+                    mapper.add(tag, c)
         c.setContactInfo( confData.get("contactInfo","") )
         #################################
         # Fermi timezone awareness      #
@@ -506,7 +511,28 @@ class UtilsConference:
             dispMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(c)
             styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
             dispMgr.setDefaultStyle(styleMgr.getDefaultStyleForEventType(newType))
-    setValues = staticmethod( setValues )
+
+    @staticmethod
+    def validateShortURL(tag, target):
+        if tag.isdigit():
+            raise ValueError(_("Short URL tag is a number: '%s'. Please add at least one non-digit.") % tag)
+        if not re.match(r'^[a-zA-Z0-9._-]+$', tag):
+            raise ValueError(
+                _("Short URL tag contains invalid chars: '%s'. Please select another one.") % tag)
+        if tag.startswith('/') or tag.endswith('/'):
+            raise ValueError(
+                _("Short URL tag may not begin/end with a slash: '%s'. Please select another one.") % tag)
+        mapper = ShortURLMapper()
+        if mapper.hasKey(tag) and mapper.getById(tag) != target:
+            raise ValueError(_("Short URL tag already used: '%s'. Please select another one.") % tag)
+        if conference.ConferenceHolder().hasKey(tag):
+            # Reject existing event ids. It'd be EXTREMELY confusing and broken to allow such a shorturl
+            raise ValueError(_("Short URL tag is an event id: '%s'. Please select another one.") % tag)
+        ep = endpoint_for_url(Config.getInstance().getShortEventURL() + tag)
+        if ep and ep[0] not in ('event.conferenceDisplay', 'event._event_or_shorturl'):
+            # URL collides with an existing rule that does does not know about shorturls
+            raise ValueError(
+                _("Short URL tag conflicts with an URL used by Indico: '%s'. Please select another one.") % tag)
 
 
 class RHCategoryGetIcon(RHCategDisplayBase):

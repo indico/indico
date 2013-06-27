@@ -249,8 +249,9 @@ var userCaption = "speaker";
 % endif
 
 $E('inPlaceEditShortURL').set(new URLPathEditWidget('event.main.changeShortURL',
-        {'conference':'${ conferenceId }'}, ${ jsonEncode(shortURLBase) }, ${ jsonEncode(shortURLTag) }, true, null, null,
-        null).draw());
+        {'conference':'${ conferenceId }'}, ${ jsonEncode(shortURLBase) }, ${ jsonEncode(shortURLTag) }, true, null, function(value) {
+            return IndicoUtil.parseShortURL(value);
+        }, $T("The short URL contains invalid characters. The allowed characters are alphanumeric, _, - and .")).draw());
 
 $E('inPlaceEditKeywords').set(new TextAreaEditWidget('event.main.changeKeywords', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, ${ jsonEncode(keywords) }).draw());
 
