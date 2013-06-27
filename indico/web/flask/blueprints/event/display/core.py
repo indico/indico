@@ -25,7 +25,7 @@ from MaKaC.webinterface.urlHandlers import UHConferenceDisplay
 from MaKaC.webinterface.rh import categoryDisplay, conferenceDisplay, contribDisplay, CFADisplay, authorDisplay, \
     paperReviewingDisplay, collaboration, evaluationDisplay, registrantsDisplay, registrationFormDisplay, sessionDisplay
 from indico.web.flask.util import rh_as_view
-from indico.web.flask.wrappers import IndicoBlueprint
+from indico.web.flask.blueprints.event.display import event
 
 
 def _redirect_simple_event(**kwargs):
@@ -66,9 +66,6 @@ def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
                 _("The specified event with id or tag \"%s\" does not exist or has been deleted") % confId)
 
     return func()
-
-
-event = IndicoBlueprint('event', __name__, url_prefix='/event')
 
 
 # Short URLs
