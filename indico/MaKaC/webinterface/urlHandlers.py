@@ -1204,11 +1204,11 @@ class UHConfDeletion(URLHandler):
 
 
 class UHConfClone(URLHandler):
-    _endpoint = 'legacy.confModifTools-clone'
+    _endpoint = 'event_mgmt.confModifTools-clone'
 
 
 class UHConfPerformCloning(URLHandler):
-    _endpoint = 'legacy.confModifTools-performCloning'
+    _endpoint = 'event_mgmt.confModifTools-performCloning'
 
 
 class UHConfAllSessionsConveners(URLHandler):

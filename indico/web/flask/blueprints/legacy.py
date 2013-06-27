@@ -1633,11 +1633,7 @@ legacy.add_url_rule('/confModifTools.py/badgeSaveBackground',
                     'confModifTools-badgeSaveBackground',
                     rh_as_view(mod_rh_conferenceModif.RHConfBadgeSaveTempBackground),
                     methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/clone',
-                    'confModifTools-clone',
-                    rh_as_view(mod_rh_conferenceModif.RHConfClone),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifTools.py/clone (mod_rh_conferenceModif.RHConfClone)
 
 legacy.add_url_rule('/confModifTools.py/delete',
                     'confModifTools-delete',
@@ -1661,11 +1657,7 @@ legacy.add_url_rule('/confModifTools.py/matPkg',
                     rh_as_view(mod_rh_conferenceModif.RHFullMaterialPackage),
                     methods=('GET', 'POST'))
 # Inactive: /confModifTools.py/modifyAlarm (mod_rh_conferenceModif.RHConfModifyAlarm)
-
-legacy.add_url_rule('/confModifTools.py/performCloning',
-                    'confModifTools-performCloning',
-                    rh_as_view(mod_rh_conferenceModif.RHConfPerformCloning),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifTools.py/performCloning (mod_rh_conferenceModif.RHConfPerformCloning)
 
 legacy.add_url_rule('/confModifTools.py/performMatPkg',
                     'confModifTools-performMatPkg',
