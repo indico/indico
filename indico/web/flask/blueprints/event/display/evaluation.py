@@ -23,15 +23,14 @@ from indico.web.flask.blueprints.event.display import event
 
 
 # Evaluation
-event.add_url_rule('/<confId>/evaluation/', 'confDisplayEvaluation',
-                   rh_as_view(evaluationDisplay.RHEvaluationMainInformation))
-event.add_url_rule('/<confId>/evaluation/evaluate', 'confDisplayEvaluation-display',
+event.add_url_rule('/evaluation/', 'confDisplayEvaluation', rh_as_view(evaluationDisplay.RHEvaluationMainInformation))
+event.add_url_rule('/evaluation/evaluate', 'confDisplayEvaluation-display',
                    rh_as_view(evaluationDisplay.RHEvaluationDisplay))
-event.add_url_rule('/<confId>/evaluation/evaluate', 'confDisplayEvaluation-modif',
+event.add_url_rule('/evaluation/evaluate', 'confDisplayEvaluation-modif',
                    rh_as_view(evaluationDisplay.RHEvaluationDisplay))
-event.add_url_rule('/<confId>/evaluation/signin', 'confDisplayEvaluation-signIn',
+event.add_url_rule('/evaluation/signin', 'confDisplayEvaluation-signIn',
                    rh_as_view(evaluationDisplay.RHEvaluationSignIn))
-event.add_url_rule('/<confId>/evaluation/evaluate', 'confDisplayEvaluation-submit',
+event.add_url_rule('/evaluation/evaluate', 'confDisplayEvaluation-submit',
                    rh_as_view(evaluationDisplay.RHEvaluationSubmit), methods=('POST',))
-event.add_url_rule('/<confId>/evaluation/evaluate/success', 'confDisplayEvaluation-submitted',
+event.add_url_rule('/evaluation/evaluate/success', 'confDisplayEvaluation-submitted',
                    rh_as_view(evaluationDisplay.RHEvaluationSubmitted))

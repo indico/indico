@@ -62,29 +62,30 @@ def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
     return func()
 
 
-# Event home page and short urls
+# Routes supporting shorturls (legacy ones may contain slashes ...)
 event.add_url_rule('!/e/<path:confId>', view_func=_event_or_shorturl, strict_slashes=False,
                    defaults={'shorturl_namespace': True})
-event.add_url_rule('/<path:confId>/', 'conferenceDisplay', _event_or_shorturl, strict_slashes=False)
-event.add_url_rule('/<confId>/overview', 'conferenceDisplay-overview', _event_or_shorturl, defaults={'ovw': True})
-event.add_url_rule('/<confId>/next', 'conferenceDisplay-next', rh_as_view(conferenceDisplay.RHRelativeEvent),
+event.add_url_rule('!/event/<path:confId>/', 'conferenceDisplay', _event_or_shorturl, strict_slashes=False)
+
+# Event overview and navigation
+event.add_url_rule('/overview', 'conferenceDisplay-overview', _event_or_shorturl, defaults={'ovw': True})
+event.add_url_rule('/next', 'conferenceDisplay-next', rh_as_view(conferenceDisplay.RHRelativeEvent),
                    defaults={'which': 'next'})
-event.add_url_rule('/<confId>/prev', 'conferenceDisplay-prev', rh_as_view(conferenceDisplay.RHRelativeEvent),
+event.add_url_rule('/prev', 'conferenceDisplay-prev', rh_as_view(conferenceDisplay.RHRelativeEvent),
                    defaults={'which': 'prev'})
 
 # Event access
-event.add_url_rule('/<confId>/accesskey', 'conferenceDisplay-accessKey',
-                   rh_as_view(conferenceDisplay.RHConferenceAccessKey), methods=('GET', 'POST'))
+event.add_url_rule('/accesskey', 'conferenceDisplay-accessKey', rh_as_view(conferenceDisplay.RHConferenceAccessKey),
+                   methods=('GET', 'POST'))
 
 # Event layout
-event.add_url_rule('/<confId>/style.css', 'conferenceDisplay-getCSS', rh_as_view(conferenceDisplay.RHConferenceGetCSS))
-event.add_url_rule('/<confId>/logo', 'conferenceDisplay-getLogo',
-                   rh_as_view(conferenceDisplay.RHConferenceGetLogo), methods=('GET', 'POST'))
-event.add_url_rule('/<confId>/picture/<picId>.<picExt>', 'conferenceDisplay-getPic',
+event.add_url_rule('/style.css', 'conferenceDisplay-getCSS', rh_as_view(conferenceDisplay.RHConferenceGetCSS))
+event.add_url_rule('/logo', 'conferenceDisplay-getLogo', rh_as_view(conferenceDisplay.RHConferenceGetLogo),
+                   methods=('GET', 'POST'))
+event.add_url_rule('/picture/<picId>.<picExt>', 'conferenceDisplay-getPic',
                    rh_as_view(conferenceDisplay.RHConferenceGetPic))
 
 # Machine-readable formats
-event.add_url_rule('/<confId>/event.ics', 'conferenceDisplay-ical', rh_as_view(conferenceDisplay.RHConferenceToiCal))
-event.add_url_rule('/<confId>/event.marc.xml', 'conferenceDisplay-marcxml',
-                   rh_as_view(conferenceDisplay.RHConferenceToMarcXML))
-event.add_url_rule('/<confId>/event.xml', 'conferenceDisplay-xml', rh_as_view(conferenceDisplay.RHConferenceToXML))
+event.add_url_rule('/event.ics', 'conferenceDisplay-ical', rh_as_view(conferenceDisplay.RHConferenceToiCal))
+event.add_url_rule('/event.marc.xml', 'conferenceDisplay-marcxml', rh_as_view(conferenceDisplay.RHConferenceToMarcXML))
+event.add_url_rule('/event.xml', 'conferenceDisplay-xml', rh_as_view(conferenceDisplay.RHConferenceToXML))

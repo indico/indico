@@ -23,20 +23,19 @@ from indico.web.flask.blueprints.event.display import event
 
 
 # Program
-event.add_url_rule('/<confId>/program', 'conferenceProgram', rh_as_view(conferenceDisplay.RHConferenceProgram))
-event.add_url_rule('/<confId>/program.pdf', 'conferenceProgram-pdf',
-                   rh_as_view(conferenceDisplay.RHConferenceProgramPDF))
+event.add_url_rule('/program', 'conferenceProgram', rh_as_view(conferenceDisplay.RHConferenceProgram))
+event.add_url_rule('/program.pdf', 'conferenceProgram-pdf', rh_as_view(conferenceDisplay.RHConferenceProgramPDF))
 
 # Timetable
-event.add_url_rule('/<confId>/timetable/', 'conferenceTimeTable', rh_as_view(conferenceDisplay.RHConferenceTimeTable))
-event.add_url_rule('/<confId>/timetable/pdf', 'conferenceTimeTable-customizePdf',
+event.add_url_rule('/timetable/', 'conferenceTimeTable', rh_as_view(conferenceDisplay.RHConferenceTimeTable))
+event.add_url_rule('/timetable/pdf', 'conferenceTimeTable-customizePdf',
                    rh_as_view(conferenceDisplay.RHTimeTableCustomizePDF))
-event.add_url_rule('/<confId>/timetable/timetable.pdf', 'conferenceTimeTable-pdf',
-                   rh_as_view(conferenceDisplay.RHTimeTablePDF), methods=('GET', 'POST'))
+event.add_url_rule('/timetable/timetable.pdf', 'conferenceTimeTable-pdf', rh_as_view(conferenceDisplay.RHTimeTablePDF),
+                   methods=('GET', 'POST'))
 
 # Sessions
-event.add_url_rule('/<confId>/session/<sessionId>/', 'sessionDisplay', rh_as_view(sessionDisplay.RHSessionDisplay))
-event.add_url_rule('/<confId>/session/<sessionId>/session.ics', 'sessionDisplay-ical',
+event.add_url_rule('/session/<sessionId>/', 'sessionDisplay', rh_as_view(sessionDisplay.RHSessionDisplay))
+event.add_url_rule('/session/<sessionId>/session.ics', 'sessionDisplay-ical',
                    rh_as_view(sessionDisplay.RHSessionToiCal))
-event.add_url_rule('/<confId>/session/<showSessions>/timetable.pdf', 'conferenceTimeTable-pdf',
+event.add_url_rule('/session/<showSessions>/timetable.pdf', 'conferenceTimeTable-pdf',
                    rh_as_view(conferenceDisplay.RHTimeTablePDF))

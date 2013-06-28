@@ -23,37 +23,35 @@ from indico.web.flask.blueprints.event.display import event
 
 
 # Contribution list
-event.add_url_rule('/<confId>/contributions', 'contributionListDisplay',
-                   rh_as_view(conferenceDisplay.RHContributionList))
-event.add_url_rule('/<confId>/contributions.pdf', 'contributionListDisplay-contributionsToPDF',
+event.add_url_rule('/contributions', 'contributionListDisplay', rh_as_view(conferenceDisplay.RHContributionList))
+event.add_url_rule('/contributions.pdf', 'contributionListDisplay-contributionsToPDF',
                    rh_as_view(conferenceDisplay.RHContributionListToPDF), methods=('POST',))
 
 # Display contribution
-event.add_url_rule('/<confId>/contribution/<contribId>', 'contributionDisplay',
-                   rh_as_view(contribDisplay.RHContributionDisplay))
-event.add_url_rule('/<confId>/contribution/<contribId>.ics', 'contributionDisplay-ical',
+event.add_url_rule('/contribution/<contribId>', 'contributionDisplay', rh_as_view(contribDisplay.RHContributionDisplay))
+event.add_url_rule('/contribution/<contribId>.ics', 'contributionDisplay-ical',
                    rh_as_view(contribDisplay.RHContributionToiCal))
-event.add_url_rule('/<confId>/contribution/<contribId>.marc.xml', 'contributionDisplay-marcxml',
+event.add_url_rule('/contribution/<contribId>.marc.xml', 'contributionDisplay-marcxml',
                    rh_as_view(contribDisplay.RHContributionToMarcXML))
-event.add_url_rule('/<confId>/contribution/<contribId>.xml', 'contributionDisplay-xml',
+event.add_url_rule('/contribution/<contribId>.xml', 'contributionDisplay-xml',
                    rh_as_view(contribDisplay.RHContributionToXML))
-event.add_url_rule('/<confId>/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
+event.add_url_rule('/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
                    rh_as_view(contribDisplay.RHContributionToPDF))
 
 # Display contribution within a session
-event.add_url_rule('/<confId>/session/<sessionId>/contribution/<contribId>', 'contributionDisplay',
+event.add_url_rule('/session/<sessionId>/contribution/<contribId>', 'contributionDisplay',
                    rh_as_view(contribDisplay.RHContributionDisplay))
-event.add_url_rule('/<confId>/session/<sessionId>/contribution/<contribId>.ics', 'contributionDisplay-ical',
+event.add_url_rule('/session/<sessionId>/contribution/<contribId>.ics', 'contributionDisplay-ical',
                    rh_as_view(contribDisplay.RHContributionToiCal))
-event.add_url_rule('/<confId>/session/<sessionId>/contribution/<contribId>.marc.xml', 'contributionDisplay-marcxml',
+event.add_url_rule('/session/<sessionId>/contribution/<contribId>.marc.xml', 'contributionDisplay-marcxml',
                    rh_as_view(contribDisplay.RHContributionToMarcXML))
-event.add_url_rule('/<confId>/session/<sessionId>/contribution/<contribId>.xml', 'contributionDisplay-xml',
+event.add_url_rule('/session/<sessionId>/contribution/<contribId>.xml', 'contributionDisplay-xml',
                    rh_as_view(contribDisplay.RHContributionToXML))
-event.add_url_rule('/<confId>/session/<sessionId>/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
+event.add_url_rule('/session/<sessionId>/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
                    rh_as_view(contribDisplay.RHContributionToPDF))
 
 # Authors/Speakers
-event.add_url_rule('/<confId>/authors', 'confAuthorIndex', rh_as_view(conferenceDisplay.RHAuthorIndex))
-event.add_url_rule('/<confId>/contribution/<contribId>/author/<authorId>', 'contribAuthorDisplay',
+event.add_url_rule('/authors', 'confAuthorIndex', rh_as_view(conferenceDisplay.RHAuthorIndex))
+event.add_url_rule('/contribution/<contribId>/author/<authorId>', 'contribAuthorDisplay',
                    rh_as_view(authorDisplay.RHAuthorDisplay))
-event.add_url_rule('/<confId>/speakers', 'confSpeakerIndex', rh_as_view(conferenceDisplay.RHSpeakerIndex))
+event.add_url_rule('/speakers', 'confSpeakerIndex', rh_as_view(conferenceDisplay.RHSpeakerIndex))

@@ -23,34 +23,32 @@ from indico.web.flask.blueprints.event.display import event
 
 
 # Call for abstracts
-event.add_url_rule('/<confId>/call-for-abstracts/', 'conferenceCFA', rh_as_view(CFADisplay.RHConferenceCFA))
-event.add_url_rule('/<confId>/call-for-abstracts/my-abstracts', 'userAbstracts', rh_as_view(CFADisplay.RHUserAbstracts))
-event.add_url_rule('/<confId>/call-for-abstracts/my-abstracts.pdf', 'userAbstracts-pdf',
+event.add_url_rule('/call-for-abstracts/', 'conferenceCFA', rh_as_view(CFADisplay.RHConferenceCFA))
+event.add_url_rule('/call-for-abstracts/my-abstracts', 'userAbstracts', rh_as_view(CFADisplay.RHUserAbstracts))
+event.add_url_rule('/call-for-abstracts/my-abstracts.pdf', 'userAbstracts-pdf',
                    rh_as_view(CFADisplay.RHUserAbstractsPDF))
 
 # Abstract submission
-event.add_url_rule('/<confId>/call-for-abstracts/submit', 'abstractSubmission',
-                   rh_as_view(CFADisplay.RHAbstractSubmission), methods=('GET', 'POST'))
-event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/submitted', 'abstractSubmission-confirmation',
+event.add_url_rule('/call-for-abstracts/submit', 'abstractSubmission', rh_as_view(CFADisplay.RHAbstractSubmission),
+                   methods=('GET', 'POST'))
+event.add_url_rule('/call-for-abstracts/<abstractId>/submitted', 'abstractSubmission-confirmation',
                    rh_as_view(CFADisplay.RHAbstractSubmissionConfirmation))
-event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/modify', 'abstractModify',
-                   rh_as_view(CFADisplay.RHAbstractModify), methods=('GET', 'POST'))
-event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/withdraw', 'abstractWithdraw',
+event.add_url_rule('/call-for-abstracts/<abstractId>/modify', 'abstractModify', rh_as_view(CFADisplay.RHAbstractModify),
+                   methods=('GET', 'POST'))
+event.add_url_rule('/call-for-abstracts/<abstractId>/withdraw', 'abstractWithdraw',
                    rh_as_view(CFADisplay.RHAbstractWithdraw), methods=('GET', 'POST'))
-event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/recover', 'abstractWithdraw-recover',
+event.add_url_rule('/call-for-abstracts/<abstractId>/recover', 'abstractWithdraw-recover',
                    rh_as_view(CFADisplay.RHAbstractRecovery), methods=('GET', 'POST'))
 
 # View abstract
-event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/', 'abstractDisplay',
-                   rh_as_view(CFADisplay.RHAbstractDisplay))
-event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/file/<resId>', 'abstractDisplay-getAttachedFile',
+event.add_url_rule('/call-for-abstracts/<abstractId>/', 'abstractDisplay', rh_as_view(CFADisplay.RHAbstractDisplay))
+event.add_url_rule('/call-for-abstracts/<abstractId>/file/<resId>', 'abstractDisplay-getAttachedFile',
                    rh_as_view(CFADisplay.RHGetAttachedFile))
-event.add_url_rule('/<confId>/call-for-abstracts/<abstractId>/Abstract.pdf', 'abstractDisplay-pdf',
+event.add_url_rule('/call-for-abstracts/<abstractId>/Abstract.pdf', 'abstractDisplay-pdf',
                    rh_as_view(CFADisplay.RHAbstractDisplayPDF))
 
 # Abstract book
-event.add_url_rule('/<confId>/abstract-book.pdf', 'confAbstractBook', rh_as_view(conferenceDisplay.RHAbstractBook))
-event.add_url_rule('/<confId>/abstract-book.pdf', 'conferenceDisplay-abstractBook',
-                   rh_as_view(conferenceDisplay.RHAbstractBook))
-event.add_url_rule('/<confId>/abstract-book-latex.zip', 'conferenceDisplay-abstractBookLatex',
+event.add_url_rule('/abstract-book.pdf', 'confAbstractBook', rh_as_view(conferenceDisplay.RHAbstractBook))
+event.add_url_rule('/abstract-book.pdf', 'conferenceDisplay-abstractBook', rh_as_view(conferenceDisplay.RHAbstractBook))
+event.add_url_rule('/abstract-book-latex.zip', 'conferenceDisplay-abstractBookLatex',
                    rh_as_view(conferenceDisplay.RHConferenceLatexPackage))

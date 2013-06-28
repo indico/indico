@@ -23,22 +23,20 @@ from indico.web.flask.blueprints.event.display import event
 
 
 # Login
-event.add_url_rule('/<confId>/user/login', 'confLogin', rh_as_view(conferenceDisplay.RHConfSignIn),
-                   methods=('GET', 'POST'))
-event.add_url_rule('/<confId>/user/login/disabled', 'confLogin-disabledAccount',
+event.add_url_rule('/user/login', 'confLogin', rh_as_view(conferenceDisplay.RHConfSignIn), methods=('GET', 'POST'))
+event.add_url_rule('/user/login/disabled', 'confLogin-disabledAccount',
                    rh_as_view(conferenceDisplay.RHConfDisabledAccount), methods=('GET', 'POST'))
-event.add_url_rule('/<confId>/user/login/not-activated', 'confLogin-unactivatedAccount',
+event.add_url_rule('/user/login/not-activated', 'confLogin-unactivatedAccount',
                    rh_as_view(conferenceDisplay.RHConfUnactivatedAccount))
-event.add_url_rule('/<confId>/user/send-password', 'confLogin-sendLogin', rh_as_view(conferenceDisplay.RHConfSendLogin),
+event.add_url_rule('/user/send-password', 'confLogin-sendLogin', rh_as_view(conferenceDisplay.RHConfSendLogin),
                    methods=('POST',))
 
 # Registration
-event.add_url_rule('/<confId>/user/register', 'confUser', rh_as_view(conferenceDisplay.RHConfUserCreation),
+event.add_url_rule('/user/register', 'confUser', rh_as_view(conferenceDisplay.RHConfUserCreation),
                    methods=('GET', 'POST'))
-event.add_url_rule('/<confId>/user/register/success', 'confUser-created',
-                   rh_as_view(conferenceDisplay.RHConfUserCreated))
-event.add_url_rule('/<confId>/user/register/exists', 'confUser-userExists',
+event.add_url_rule('/user/register/success', 'confUser-created', rh_as_view(conferenceDisplay.RHConfUserCreated))
+event.add_url_rule('/user/register/exists', 'confUser-userExists',
                    rh_as_view(conferenceDisplay.RHConfUserExistWithIdentity), methods=('GET', 'POST'))
-event.add_url_rule('/<confId>/user/register/activate', 'confLogin-active', rh_as_view(conferenceDisplay.RHConfActivate))
-event.add_url_rule('/<confId>/user/register/send-activation', 'confLogin-sendActivation',
+event.add_url_rule('/user/register/activate', 'confLogin-active', rh_as_view(conferenceDisplay.RHConfActivate))
+event.add_url_rule('/user/register/send-activation', 'confLogin-sendActivation',
                    rh_as_view(conferenceDisplay.RHConfSendActivation), methods=('GET', 'POST'))

@@ -23,27 +23,27 @@ from indico.web.flask.blueprints.event.display import event
 
 
 # Registrants
-event.add_url_rule('/<confId>/registration/registrants', 'confRegistrantsDisplay-list',
+event.add_url_rule('/registration/registrants', 'confRegistrantsDisplay-list',
                    rh_as_view(registrantsDisplay.RHRegistrantsList))
 
 # Registration
-event.add_url_rule('/<confId>/registration/', 'confRegistrationFormDisplay',
+event.add_url_rule('/registration/', 'confRegistrationFormDisplay',
                    rh_as_view(registrationFormDisplay.RHRegistrationForm))
-event.add_url_rule('/<confId>/registration/conditions', 'confRegistrationFormDisplay-conditions',
+event.add_url_rule('/registration/conditions', 'confRegistrationFormDisplay-conditions',
                    rh_as_view(registrationFormDisplay.RHRegistrationFormConditions))
-event.add_url_rule('/<confId>/registration/confirm', 'confRegistrationFormDisplay-confirmBooking',
+event.add_url_rule('/registration/confirm', 'confRegistrationFormDisplay-confirmBooking',
                    rh_as_view(registrationFormDisplay.RHRegistrationFormconfirmBooking), methods=('GET', 'POST'))
-event.add_url_rule('/<confId>/registration/pay', 'confRegistrationFormDisplay-confirmBookingDone',
+event.add_url_rule('/registration/pay', 'confRegistrationFormDisplay-confirmBookingDone',
                    rh_as_view(registrationFormDisplay.RHRegistrationFormconfirmBookingDone))
-event.add_url_rule('/<confId>/registration/register', 'confRegistrationFormDisplay-creation',
+event.add_url_rule('/registration/register', 'confRegistrationFormDisplay-creation',
                    rh_as_view(registrationFormDisplay.RHRegistrationFormCreation), methods=('POST',))
-event.add_url_rule('/<confId>/registration/register/success', 'confRegistrationFormDisplay-creationDone',
+event.add_url_rule('/registration/register/success', 'confRegistrationFormDisplay-creationDone',
                    rh_as_view(registrationFormDisplay.RHRegistrationFormCreationDone))
-event.add_url_rule('/<confId>/registration/register', 'confRegistrationFormDisplay-display',
+event.add_url_rule('/registration/register', 'confRegistrationFormDisplay-display',
                    rh_as_view(registrationFormDisplay.RHRegistrationFormDisplay))
-event.add_url_rule('/<confId>/registration/modify', 'confRegistrationFormDisplay-modify',
+event.add_url_rule('/registration/modify', 'confRegistrationFormDisplay-modify',
                    rh_as_view(registrationFormDisplay.RHRegistrationFormModify))
-event.add_url_rule('/<confId>/registration/modify', 'confRegistrationFormDisplay-performModify',
+event.add_url_rule('/registration/modify', 'confRegistrationFormDisplay-performModify',
                    rh_as_view(registrationFormDisplay.RHRegistrationFormPerformModify), methods=('POST',))
-event.add_url_rule('/<confId>/registration/signin', 'confRegistrationFormDisplay-signIn',
+event.add_url_rule('/registration/signin', 'confRegistrationFormDisplay-signIn',
                    rh_as_view(registrationFormDisplay.RHRegistrationFormSignIn))
