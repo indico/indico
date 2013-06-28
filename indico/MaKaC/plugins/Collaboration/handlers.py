@@ -374,7 +374,8 @@ class RHAdminCollaboration(RHAdminBase):
 
     def _checkProtection( self ):
 
-        if not RCCollaborationAdmin.hasRights(self._getUser()) and not RCCollaborationPluginAdmin.hasRights(self._getUser(), plugins = "any"): #RCCollaborationPluginAdmin.hasRights(self, None, self._tabPlugins):
+        if not RCCollaborationAdmin.hasRights(self._getUser()) and \
+           not RCCollaborationPluginAdmin.hasRights(self._getUser(), plugins="any"):
             RHAdminBase._checkProtection(self)
 
     def _process(self):
