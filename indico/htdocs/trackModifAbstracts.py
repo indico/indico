@@ -23,9 +23,3 @@ from MaKaC.webinterface.rh import trackModif
 
 def index(req, **params):
     return trackModif.RHTrackAbstractList( req ).process( params )
-
-def abstractsToPDF(req, **params):
-    return trackModif.RHAbstractsToPDF( req ).process( params )
-
-def participantList( req, **params ):
-    return trackModif.RHAbstractsParticipantList( req ).process( params )

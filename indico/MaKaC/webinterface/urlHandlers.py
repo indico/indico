@@ -709,7 +709,7 @@ class UHConfModifCFAAbsFieldDown(URLHandler):
 
 
 class UHConfModifProgram(URLHandler):
-    _endpoint = 'legacy.confModifProgram'
+    _endpoint = 'event_mgmt.confModifProgram'
 
 
 class UHConfModifCFA(URLHandler):
@@ -796,18 +796,6 @@ class UHAbstractsConfManagerDisplayParticipantList(URLHandler):
     _endpoint = 'event_mgmt.abstractsManagment-participantList'
 
 
-class UHAbstractsTrackManagerParticipantList(URLHandler):
-    _endpoint = 'legacy.trackModifAbstracts-participantList'
-
-
-class UHAbstractsTrackManagerDisplayPDF(URLHandler):
-    _endpoint = 'legacy.trackModifAbstracts-abstractsToPDF'
-
-
-class UHAbstractstrackManagerDisplayPDF(URLHandler):
-    _endpoint = 'legacy.trackModifAbstracts-abstractsToPDF'
-
-
 class UHUserAbstracts(URLHandler):
     _endpoint = 'event.userAbstracts'
 
@@ -869,23 +857,23 @@ class UHAbstractSubmissionDisplay(URLHandler):
 
 
 class UHConfAddTrack(URLHandler):
-    _endpoint = 'legacy.confModifProgram-addTrack'
+    _endpoint = 'event_mgmt.confModifProgram-addTrack'
 
 
 class UHConfDelTracks(URLHandler):
-    _endpoint = 'legacy.confModifProgram-deleteTracks'
+    _endpoint = 'event_mgmt.confModifProgram-deleteTracks'
 
 
 class UHConfPerformAddTrack(URLHandler):
-    _endpoint = 'legacy.confModifProgram-performAddTrack'
+    _endpoint = 'event_mgmt.confModifProgram-performAddTrack'
 
 
 class UHTrackModification(URLHandler):
-    _endpoint = 'legacy.trackModification'
+    _endpoint = 'event_mgmt.trackModification'
 
 
 class UHTrackModifAbstracts(URLHandler):
-    _endpoint = 'legacy.trackModifAbstracts'
+    _endpoint = 'event_mgmt.trackModifAbstracts'
 
 
 class UHTrackAbstractBase(URLHandler):
@@ -898,55 +886,55 @@ class UHTrackAbstractBase(URLHandler):
 
 
 class UHTrackAbstractModif(UHTrackAbstractBase):
-    _endpoint = 'legacy.trackAbstractModif'
+    _endpoint = 'event_mgmt.trackAbstractModif'
 
 
 class UHAbstractTrackManagerDisplayPDF(UHTrackAbstractBase):
-    _endpoint = 'legacy.trackAbstractModif-abstractToPDF'
+    _endpoint = 'event_mgmt.trackAbstractModif-abstractToPDF'
 
 
 class UHAbstractsTrackManagerAction(URLHandler):
-    _endpoint = 'legacy.trackAbstractModif-abstractAction'
+    _endpoint = 'event_mgmt.trackAbstractModif-abstractAction'
 
 
 class UHTrackAbstractPropToAcc(UHTrackAbstractBase):
-    _endpoint = 'legacy.trackAbstractModif-proposeToBeAcc'
+    _endpoint = 'event_mgmt.trackAbstractModif-proposeToBeAcc'
 
 
 class UHTrackAbstractPropToRej(UHTrackAbstractBase):
-    _endpoint = 'legacy.trackAbstractModif-proposeToBeRej'
+    _endpoint = 'event_mgmt.trackAbstractModif-proposeToBeRej'
 
 
 class UHTrackAbstractAccept(UHTrackAbstractBase):
-    _endpoint = 'legacy.trackAbstractModif-accept'
+    _endpoint = 'event_mgmt.trackAbstractModif-accept'
 
 
 class UHTrackAbstractReject(UHTrackAbstractBase):
-    _endpoint = 'legacy.trackAbstractModif-reject'
+    _endpoint = 'event_mgmt.trackAbstractModif-reject'
 
 
 class UHTrackAbstractDirectAccess(URLHandler):
-    _endpoint = 'legacy.trackAbstractModif-directAccess'
+    _endpoint = 'event_mgmt.trackAbstractModif-directAccess'
 
 
 class UHTrackAbstractPropForOtherTrack(UHTrackAbstractBase):
-    _endpoint = 'legacy.trackAbstractModif-proposeForOtherTracks'
+    _endpoint = 'event_mgmt.trackAbstractModif-proposeForOtherTracks'
 
 
 class UHTrackModifCoordination(URLHandler):
-    _endpoint = 'legacy.trackModifCoordination'
+    _endpoint = 'event_mgmt.trackModifCoordination'
 
 
 class UHTrackDataModif(URLHandler):
-    _endpoint = 'legacy.trackModification-modify'
+    _endpoint = 'event_mgmt.trackModification-modify'
 
 
 class UHTrackPerformDataModification(URLHandler):
-    _endpoint = 'legacy.trackModification-performModify'
+    _endpoint = 'event_mgmt.trackModification-performModify'
 
 
 class UHTrackAbstractModIntComments(UHTrackAbstractBase):
-    _endpoint = 'legacy.trackAbstractModif-comments'
+    _endpoint = 'event_mgmt.trackAbstractModif-comments'
 
 
 class UHConfModifSchedule(URLHandler):
@@ -1978,11 +1966,11 @@ class UHContribModSetSession(URLHandler):
 
 
 class UHTrackModMoveUp(URLHandler):
-    _endpoint = 'legacy.confModifProgram-moveTrackUp'
+    _endpoint = 'event_mgmt.confModifProgram-moveTrackUp'
 
 
 class UHTrackModMoveDown(URLHandler):
-    _endpoint = 'legacy.confModifProgram-moveTrackDown'
+    _endpoint = 'event_mgmt.confModifProgram-moveTrackDown'
 
 
 class UHAbstractModAC(URLHandler):
@@ -2010,7 +1998,7 @@ class UHAbstractModIntCommentRem(URLHandler):
 
 
 class UHTrackAbstractModIntCommentNew(UHTrackAbstractBase):
-    _endpoint = 'legacy.trackAbstractModif-commentNew'
+    _endpoint = 'event_mgmt.trackAbstractModif-commentNew'
 
 
 class UHTrackAbstractModCommentBase(URLHandler):
@@ -2023,11 +2011,11 @@ class UHTrackAbstractModCommentBase(URLHandler):
 
 
 class UHTrackAbstractModIntCommentEdit(UHTrackAbstractModCommentBase):
-    _endpoint = 'legacy.trackAbstractModif-commentEdit'
+    _endpoint = 'event_mgmt.trackAbstractModif-commentEdit'
 
 
 class UHTrackAbstractModIntCommentRem(UHTrackAbstractModCommentBase):
-    _endpoint = 'legacy.trackAbstractModif-commentRem'
+    _endpoint = 'event_mgmt.trackAbstractModif-commentRem'
 
 
 class UHAbstractReviewingNotifTpl(URLHandler):
@@ -2055,11 +2043,11 @@ class UHAbstractModNotifTplPreview(URLHandler):
 
 
 class UHTrackAbstractModMarkAsDup(UHTrackAbstractBase):
-    _endpoint = 'legacy.trackAbstractModif-markAsDup'
+    _endpoint = 'event_mgmt.trackAbstractModif-markAsDup'
 
 
 class UHTrackAbstractModUnMarkAsDup(UHTrackAbstractBase):
-    _endpoint = 'legacy.trackAbstractModif-unMarkAsDup'
+    _endpoint = 'event_mgmt.trackAbstractModif-unMarkAsDup'
 
 
 class UHAbstractModMarkAsDup(URLHandler):
@@ -2179,19 +2167,19 @@ class UHContribModWithdraw(URLHandler):
 
 
 class UHTrackModContribList(URLHandler):
-    _endpoint = 'legacy.trackModContribList'
+    _endpoint = 'event_mgmt.trackModContribList'
 
 
 class UHTrackModContributionAction(URLHandler):
-    _endpoint = 'legacy.trackModContribList-contribAction'
+    _endpoint = 'event_mgmt.trackModContribList-contribAction'
 
 
 class UHTrackModParticipantList(URLHandler):
-    _endpoint = 'legacy.trackModContribList-participantList'
+    _endpoint = 'event_mgmt.trackModContribList-participantList'
 
 
 class UHTrackModToPDF(URLHandler):
-    _endpoint = 'legacy.trackModContribList-contribsToPDF'
+    _endpoint = 'event_mgmt.trackModContribList-contribsToPDF'
 
 
 class UHConfModContribQuickAccess(URLHandler):
@@ -2203,7 +2191,7 @@ class UHSessionModContribQuickAccess(URLHandler):
 
 
 class UHTrackModContribQuickAccess(URLHandler):
-    _endpoint = 'legacy.trackModContribList-contribQuickAccess'
+    _endpoint = 'event_mgmt.trackModContribList-contribQuickAccess'
 
 
 class UHConfMyStuff(URLHandler):

@@ -3350,8 +3350,8 @@ class WTrackCreation( wcomponents.WTemplated ):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars(self)
-        vars["title"], vars["description"] = "", ""
-        vars["locator"] = self.__conf.getLocator().getWebForm()
+        vars['title'] = ''
+        vars['description'] = ''
         return vars
 
 
@@ -3363,7 +3363,7 @@ class WPConfAddTrack( WPConfModifProgram ):
 
     def _getPageContent( self, params ):
         p = WTrackCreation( self._conf )
-        pars = {"postURL": urlHandlers.UHConfPerformAddTrack.getURL() }
+        pars = {"postURL": urlHandlers.UHConfPerformAddTrack.getURL(self._conf)}
         return p.getHTML( pars )
 
 class WFilterCriteriaAbstracts(wcomponents.WFilterCriteria):

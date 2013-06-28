@@ -1,7 +1,6 @@
 <div class="groupTitle"> ${ _("Creating new track (basic data)")}</div>
 
 <form id="createTrackForm" method="POST" action="${ postURL }">
-    ${ locator }
     <table width="100%" border="0">
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Title")}</span><span class="mandatoryField"> *</span></td>
@@ -30,8 +29,9 @@
     var parameterManager = new IndicoUtil.parameterManager();
     parameterManager.add($E('title'), 'text', false);
 
-    $("#ok").click(function() {
-        if (!parameterManager.check())
-            event.preventDefault();
+    $("#ok").click(function(e) {
+        if (!parameterManager.check()) {
+            e.preventDefault();
+        }
     });
 </script>

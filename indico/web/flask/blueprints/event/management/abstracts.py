@@ -86,7 +86,7 @@ event_mgmt.add_url_rule('/call-for-abstracts/abstracts/reject', 'abstractManagme
 
 # Abstract: main
 event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/', 'abstractManagment',
-                        rh_as_view(abstractModif.RHAbstractManagment))
+                        rh_as_view(abstractModif.RHAbstractManagment), methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/abstract.pdf', 'abstractManagment-abstractToPDF',
                         rh_as_view(abstractModif.RHAbstractToPDF))
 event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/abstract.xml', 'abstractManagment-xml',

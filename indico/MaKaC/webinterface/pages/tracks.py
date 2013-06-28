@@ -650,8 +650,6 @@ class WTrackModifAbstracts( wcomponents.WTemplated ):
         for tpl in self._conf.getAbstractMgr().getNotificationTplList():
             l.append("""<option value="%s">%s</option>"""%(tpl.getId(), tpl.getName()))
         vars["notifTpls"] = "\n".join(l)
-        vars["participantListURL"]=quoteattr(str(urlHandlers.UHAbstractsTrackManagerParticipantList.getURL(self._track)))
-        vars["abstractsPDFURL"]=quoteattr(str(urlHandlers.UHAbstractsTrackManagerDisplayPDF.getURL(self._track)))
         vars["actionURL"]=quoteattr(str(urlHandlers.UHAbstractsTrackManagerAction.getURL(self._track)))
         vars["selectURL"]=quoteattr(str(urlHandlers.UHTrackModifAbstracts.getURL(self._track)))
         vars["filterUsed"] = self._filterUsed

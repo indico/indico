@@ -32,7 +32,6 @@ import MaKaC.webinterface.rh.reviewingUserCompetencesModif as mod_rh_reviewingUs
 import MaKaC.webinterface.rh.sessionModif as mod_rh_sessionModif
 import MaKaC.webinterface.rh.subContribDisplay as mod_rh_subContribDisplay
 import MaKaC.webinterface.rh.subContribMod as mod_rh_subContribMod
-import MaKaC.webinterface.rh.trackModif as mod_rh_trackModif
 import MaKaC.webinterface.rh.users as mod_rh_users
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
 
@@ -562,35 +561,12 @@ legacy.add_url_rule('/confModifParticipants.py/statistics',
 
 
 # Routes for confModifProgram.py
-legacy.add_url_rule('/confModifProgram.py',
-                    'confModifProgram',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifProgram),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifProgram.py/addTrack',
-                    'confModifProgram-addTrack',
-                    rh_as_view(mod_rh_conferenceModif.RHConfAddTrack),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifProgram.py/deleteTracks',
-                    'confModifProgram-deleteTracks',
-                    rh_as_view(mod_rh_conferenceModif.RHConfDelTracks),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifProgram.py/moveTrackDown',
-                    'confModifProgram-moveTrackDown',
-                    rh_as_view(mod_rh_conferenceModif.RHProgramTrackDown),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifProgram.py/moveTrackUp',
-                    'confModifProgram-moveTrackUp',
-                    rh_as_view(mod_rh_conferenceModif.RHProgramTrackUp),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifProgram.py/performAddTrack',
-                    'confModifProgram-performAddTrack',
-                    rh_as_view(mod_rh_conferenceModif.RHConfPerformAddTrack),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifProgram.py (mod_rh_conferenceModif.RHConfModifProgram)
+# Inactive: /confModifProgram.py/addTrack (mod_rh_conferenceModif.RHConfAddTrack)
+# Inactive: /confModifProgram.py/deleteTracks (mod_rh_conferenceModif.RHConfDelTracks)
+# Inactive: /confModifProgram.py/moveTrackDown (mod_rh_conferenceModif.RHProgramTrackDown)
+# Inactive: /confModifProgram.py/moveTrackUp (mod_rh_conferenceModif.RHProgramTrackUp)
+# Inactive: /confModifProgram.py/performAddTrack (mod_rh_conferenceModif.RHConfPerformAddTrack)
 
 
 # Routes for confModifRegistrants.py
@@ -1568,148 +1544,43 @@ legacy.add_url_rule('/subContributionTools.py/delete',
 
 
 # Routes for trackAbstractModif.py
-legacy.add_url_rule('/trackAbstractModif.py',
-                    'trackAbstractModif',
-                    rh_as_view(mod_rh_trackModif.RHTrackAbstract),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/abstractAction',
-                    'trackAbstractModif-abstractAction',
-                    rh_as_view(mod_rh_trackModif.RHAbstractsActions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/abstractToPDF',
-                    'trackAbstractModif-abstractToPDF',
-                    rh_as_view(mod_rh_trackModif.RHAbstractToPDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/accept',
-                    'trackAbstractModif-accept',
-                    rh_as_view(mod_rh_trackModif.RHTrackAbstractAccept),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/commentEdit',
-                    'trackAbstractModif-commentEdit',
-                    rh_as_view(mod_rh_trackModif.RHAbstractIntCommentEdit),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/commentNew',
-                    'trackAbstractModif-commentNew',
-                    rh_as_view(mod_rh_trackModif.RHAbstractIntCommentNew),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/commentRem',
-                    'trackAbstractModif-commentRem',
-                    rh_as_view(mod_rh_trackModif.RHAbstractIntCommentRem),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/comments',
-                    'trackAbstractModif-comments',
-                    rh_as_view(mod_rh_trackModif.RHAbstractIntComments),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/directAccess',
-                    'trackAbstractModif-directAccess',
-                    rh_as_view(mod_rh_trackModif.RHTrackAbstractDirectAccess),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/markAsDup',
-                    'trackAbstractModif-markAsDup',
-                    rh_as_view(mod_rh_trackModif.RHModAbstractMarkAsDup),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/proposeForOtherTracks',
-                    'trackAbstractModif-proposeForOtherTracks',
-                    rh_as_view(mod_rh_trackModif.RHTrackAbstractPropForOtherTracks),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/proposeToBeAcc',
-                    'trackAbstractModif-proposeToBeAcc',
-                    rh_as_view(mod_rh_trackModif.RHTrackAbstractPropToAccept),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/proposeToBeRej',
-                    'trackAbstractModif-proposeToBeRej',
-                    rh_as_view(mod_rh_trackModif.RHTrackAbstractPropToReject),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/reject',
-                    'trackAbstractModif-reject',
-                    rh_as_view(mod_rh_trackModif.RHTrackAbstractReject),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackAbstractModif.py/unMarkAsDup',
-                    'trackAbstractModif-unMarkAsDup',
-                    rh_as_view(mod_rh_trackModif.RHModAbstractUnMarkAsDup),
-                    methods=('GET', 'POST'))
+# Inactive: /trackAbstractModif.py (mod_rh_trackModif.RHTrackAbstract)
+# Inactive: /trackAbstractModif.py/abstractAction (mod_rh_trackModif.RHAbstractsActions)
+# Inactive: /trackAbstractModif.py/abstractToPDF (mod_rh_trackModif.RHAbstractToPDF)
+# Inactive: /trackAbstractModif.py/accept (mod_rh_trackModif.RHTrackAbstractAccept)
+# Inactive: /trackAbstractModif.py/commentEdit (mod_rh_trackModif.RHAbstractIntCommentEdit)
+# Inactive: /trackAbstractModif.py/commentNew (mod_rh_trackModif.RHAbstractIntCommentNew)
+# Inactive: /trackAbstractModif.py/commentRem (mod_rh_trackModif.RHAbstractIntCommentRem)
+# Inactive: /trackAbstractModif.py/comments (mod_rh_trackModif.RHAbstractIntComments)
+# Inactive: /trackAbstractModif.py/directAccess (mod_rh_trackModif.RHTrackAbstractDirectAccess)
+# Inactive: /trackAbstractModif.py/markAsDup (mod_rh_trackModif.RHModAbstractMarkAsDup)
+# Inactive: /trackAbstractModif.py/proposeForOtherTracks (mod_rh_trackModif.RHTrackAbstractPropForOtherTracks)
+# Inactive: /trackAbstractModif.py/proposeToBeAcc (mod_rh_trackModif.RHTrackAbstractPropToAccept)
+# Inactive: /trackAbstractModif.py/proposeToBeRej (mod_rh_trackModif.RHTrackAbstractPropToReject)
+# Inactive: /trackAbstractModif.py/reject (mod_rh_trackModif.RHTrackAbstractReject)
+# Inactive: /trackAbstractModif.py/unMarkAsDup (mod_rh_trackModif.RHModAbstractUnMarkAsDup)
 
 
 # Routes for trackModContribList.py
-legacy.add_url_rule('/trackModContribList.py',
-                    'trackModContribList',
-                    rh_as_view(mod_rh_trackModif.RHContribList),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackModContribList.py/contribAction',
-                    'trackModContribList-contribAction',
-                    rh_as_view(mod_rh_trackModif.RHContribsActions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackModContribList.py/contribQuickAccess',
-                    'trackModContribList-contribQuickAccess',
-                    rh_as_view(mod_rh_trackModif.RHContribQuickAccess),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackModContribList.py/contribsToPDF',
-                    'trackModContribList-contribsToPDF',
-                    rh_as_view(mod_rh_trackModif.RHContribsToPDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackModContribList.py/participantList',
-                    'trackModContribList-participantList',
-                    rh_as_view(mod_rh_trackModif.RHContribsParticipantList),
-                    methods=('GET', 'POST'))
+# Inactive: /trackModContribList.py (mod_rh_trackModif.RHContribList)
+# Inactive: /trackModContribList.py/contribAction (mod_rh_trackModif.RHContribsActions)
+# Inactive: /trackModContribList.py/contribQuickAccess (mod_rh_trackModif.RHContribQuickAccess)
+# Inactive: /trackModContribList.py/contribsToPDF (mod_rh_trackModif.RHContribsToPDF)
+# Inactive: /trackModContribList.py/participantList (mod_rh_trackModif.RHContribsParticipantList)
 
 
 # Routes for trackModifAbstracts.py
-legacy.add_url_rule('/trackModifAbstracts.py',
-                    'trackModifAbstracts',
-                    rh_as_view(mod_rh_trackModif.RHTrackAbstractList),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackModifAbstracts.py/abstractsToPDF',
-                    'trackModifAbstracts-abstractsToPDF',
-                    rh_as_view(mod_rh_trackModif.RHAbstractsToPDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackModifAbstracts.py/participantList',
-                    'trackModifAbstracts-participantList',
-                    rh_as_view(mod_rh_trackModif.RHAbstractsParticipantList),
-                    methods=('GET', 'POST'))
+# Inactive: /trackModifAbstracts.py (mod_rh_trackModif.RHTrackAbstractList)
 
 
 # Routes for trackModifCoordination.py
-legacy.add_url_rule('/trackModifCoordination.py',
-                    'trackModifCoordination',
-                    rh_as_view(mod_rh_trackModif.RHTrackCoordination),
-                    methods=('GET', 'POST'))
+# Inactive: /trackModifCoordination.py (mod_rh_trackModif.RHTrackCoordination)
 
 
 # Routes for trackModification.py
-legacy.add_url_rule('/trackModification.py',
-                    'trackModification',
-                    rh_as_view(mod_rh_trackModif.RHTrackModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackModification.py/modify',
-                    'trackModification-modify',
-                    rh_as_view(mod_rh_trackModif.RHTrackDataModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/trackModification.py/performModify',
-                    'trackModification-performModify',
-                    rh_as_view(mod_rh_trackModif.RHTrackPerformDataModification),
-                    methods=('GET', 'POST'))
+# Inactive: /trackModification.py (mod_rh_trackModif.RHTrackModification)
+# Inactive: /trackModification.py/modify (mod_rh_trackModif.RHTrackDataModification)
+# Inactive: /trackModification.py/performModify (mod_rh_trackModif.RHTrackPerformDataModification)
 
 
 # Routes for updateNews.py
