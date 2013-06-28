@@ -32,3 +32,9 @@ event_mgmt.add_url_rule('/collaboration/<tab>/', 'confModifCollaboration',
                         rh_as_view(collaboration.RHConfModifCSBookings), methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/collaboration/managers', 'confModifCollaboration-managers',
                         rh_as_view(collaboration.RHConfModifCSProtection))
+
+# Material
+event_mgmt.add_url_rule('/material', 'conferenceModification-materialsShow',
+                        rh_as_view(conferenceModif.RHMaterialsShow))
+event_mgmt.add_url_rule('/material/add', 'conferenceModification-materialsAdd',
+                        rh_as_view(conferenceModif.RHMaterialsAdd), methods=('POST',))

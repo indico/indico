@@ -335,11 +335,11 @@ class UHConferenceModification(URLHandler):
 
 
 class UHConfModifShowMaterials(URLHandler):
-    _endpoint = 'legacy.conferenceModification-materialsShow'
+    _endpoint = 'event_mgmt.conferenceModification-materialsShow'
 
 
 class UHConfModifAddMaterials(URLHandler):
-    _endpoint = 'legacy.conferenceModification-materialsAdd'
+    _endpoint = 'event_mgmt.conferenceModification-materialsAdd'
 
 # ============================================================================
 # ROOM BOOKING ===============================================================

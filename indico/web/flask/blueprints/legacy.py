@@ -1472,16 +1472,8 @@ legacy.add_url_rule('/conferenceModification.py/closeModifKey',
 # Inactive: /conferenceModification.py/dataPerform (mod_rh_conferenceModif.RHConfPerformDataModif)
 # Inactive: /conferenceModification.py/editContribType (mod_rh_conferenceModif.RHConfEditContribType)
 # Inactive: /conferenceModification.py/managementAccess (mod_rh_conferenceModif.RHConferenceModifManagementAccess)
-
-legacy.add_url_rule('/conferenceModification.py/materialsAdd',
-                    'conferenceModification-materialsAdd',
-                    rh_as_view(mod_rh_conferenceModif.RHMaterialsAdd),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/materialsShow',
-                    'conferenceModification-materialsShow',
-                    rh_as_view(mod_rh_conferenceModif.RHMaterialsShow),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceModification.py/materialsAdd (mod_rh_conferenceModif.RHMaterialsAdd)
+# Inactive: /conferenceModification.py/materialsShow (mod_rh_conferenceModif.RHMaterialsShow)
 
 legacy.add_url_rule('/conferenceModification.py/modifKey',
                     'conferenceModification-modifKey',
