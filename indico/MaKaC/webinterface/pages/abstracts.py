@@ -1370,30 +1370,6 @@ class WPAbstractTrackOrderByRating(WPAbstractManagementBase):
         return wc.getHTML(params)
 
 
-class WAbstractModAC(wcomponents.WTemplated):
-
-    def __init__(self, abstract):
-        self._abstract = abstract
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["subCanModURL"] = quoteattr("")
-        vars["subCanModStatus"] = self.htmlText()
-        vars["subCanModBtnName"] = quoteattr("")
-        vars["subCanModBtnCaption"] = quoteattr("")
-        return vars
-
-
-class WPModAC(WPAbstractManagementBase):
-
-    def _setActiveTab(self):
-        self._tabAC.setActive()
-
-    def _getTabContent(self, params):
-        wc = WAbstractModAC(self._target)
-        return wc.getHTML()
-
-
 class WPModIntComments(WPAbstractManagementBase):
 
     def _setActiveTab(self):

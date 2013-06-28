@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import request, session
 
+from indico.util.translations import LazyProxy
 
 from MaKaC.plugins import OldObservable
 from MaKaC.plugins.base import extension_point
@@ -220,7 +221,7 @@ class WTemplated(OldObservable):
     def htmlText(param):
         if not param:
             return ''
-        if not isinstance(param, basestring):
+        if not isinstance(param, (basestring, LazyProxy)):
             param = repr(param)
         if isinstance(param, unicode):
             param = param.encode('utf-8')

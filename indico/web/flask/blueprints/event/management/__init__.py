@@ -31,4 +31,5 @@ import indico.web.flask.blueprints.event.management.evaluation
 import indico.web.flask.blueprints.event.management.rooms
 import indico.web.flask.blueprints.event.management.registration
 import indico.web.flask.blueprints.event.management.payment
+import indico.web.flask.blueprints.event.management.abstracts
 import indico.web.flask.blueprints.event.management.misc

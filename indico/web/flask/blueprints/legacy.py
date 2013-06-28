@@ -20,8 +20,6 @@
 from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
-import MaKaC.webinterface.rh.abstractModif as mod_rh_abstractModif
-import MaKaC.webinterface.rh.abstractReviewing as mod_rh_abstractReviewing
 import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
 import MaKaC.webinterface.rh.contribMod as mod_rh_contribMod
@@ -65,135 +63,31 @@ legacy = IndicoBlueprint('legacy', __name__)
 
 
 # Routes for abstractManagment.py
-legacy.add_url_rule('/abstractManagment.py',
-                    'abstractManagment',
-                    rh_as_view(mod_rh_abstractModif.RHAbstractManagment),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/abstractToPDF',
-                    'abstractManagment-abstractToPDF',
-                    rh_as_view(mod_rh_abstractModif.RHAbstractToPDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/ac',
-                    'abstractManagment-ac',
-                    rh_as_view(mod_rh_abstractModif.RHAC),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/accept',
-                    'abstractManagment-accept',
-                    rh_as_view(mod_rh_abstractModif.RHAbstractManagmentAccept),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/acceptMultiple',
-                    'abstractManagment-acceptMultiple',
-                    rh_as_view(mod_rh_conferenceModif.RHAbstractManagmentAcceptMultiple),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/backToSubmitted',
-                    'abstractManagment-backToSubmitted',
-                    rh_as_view(mod_rh_abstractModif.RHBackToSubmitted),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/changeTrack',
-                    'abstractManagment-changeTrack',
-                    rh_as_view(mod_rh_abstractModif.RHAbstractManagmentChangeTrack),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/comments',
-                    'abstractManagment-comments',
-                    rh_as_view(mod_rh_abstractModif.RHIntComments),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/directAccess',
-                    'abstractManagment-directAccess',
-                    rh_as_view(mod_rh_abstractModif.RHAbstractDirectAccess),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/editComment',
-                    'abstractManagment-editComment',
-                    rh_as_view(mod_rh_abstractModif.RHIntCommentEdit),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/editData',
-                    'abstractManagment-editData',
-                    rh_as_view(mod_rh_abstractModif.RHEditData),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/markAsDup',
-                    'abstractManagment-markAsDup',
-                    rh_as_view(mod_rh_abstractModif.RHMarkAsDup),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/mergeInto',
-                    'abstractManagment-mergeInto',
-                    rh_as_view(mod_rh_abstractModif.RHMergeInto),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/newComment',
-                    'abstractManagment-newComment',
-                    rh_as_view(mod_rh_abstractModif.RHNewIntComment),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/notifLog',
-                    'abstractManagment-notifLog',
-                    rh_as_view(mod_rh_abstractModif.RHNotifLog),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/orderByRating',
-                    'abstractManagment-orderByRating',
-                    rh_as_view(mod_rh_abstractModif.RHAbstractTrackOrderByRating),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/propToAcc',
-                    'abstractManagment-propToAcc',
-                    rh_as_view(mod_rh_abstractModif.RHPropToAcc),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/propToRej',
-                    'abstractManagment-propToRej',
-                    rh_as_view(mod_rh_abstractModif.RHPropToRej),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/reject',
-                    'abstractManagment-reject',
-                    rh_as_view(mod_rh_abstractModif.RHAbstractManagmentReject),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/rejectMultiple',
-                    'abstractManagment-rejectMultiple',
-                    rh_as_view(mod_rh_conferenceModif.RHAbstractManagmentRejectMultiple),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/remComment',
-                    'abstractManagment-remComment',
-                    rh_as_view(mod_rh_abstractModif.RHIntCommentRem),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/trackProposal',
-                    'abstractManagment-trackProposal',
-                    rh_as_view(mod_rh_abstractModif.RHAbstractTrackManagment),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/unMarkAsDup',
-                    'abstractManagment-unMarkAsDup',
-                    rh_as_view(mod_rh_abstractModif.RHUnMarkAsDup),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/unmerge',
-                    'abstractManagment-unmerge',
-                    rh_as_view(mod_rh_abstractModif.RHUnMerge),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/withdraw',
-                    'abstractManagment-withdraw',
-                    rh_as_view(mod_rh_abstractModif.RHWithdraw),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractManagment.py/xml',
-                    'abstractManagment-xml',
-                    rh_as_view(mod_rh_abstractModif.RHAbstractToXML),
-                    methods=('GET', 'POST'))
+# Inactive: /abstractManagment.py (mod_rh_abstractModif.RHAbstractManagment)
+# Inactive: /abstractManagment.py/abstractToPDF (mod_rh_abstractModif.RHAbstractToPDF)
+# Inactive: /abstractManagment.py/accept (mod_rh_abstractModif.RHAbstractManagmentAccept)
+# Inactive: /abstractManagment.py/acceptMultiple (mod_rh_conferenceModif.RHAbstractManagmentAcceptMultiple)
+# Inactive: /abstractManagment.py/backToSubmitted (mod_rh_abstractModif.RHBackToSubmitted)
+# Inactive: /abstractManagment.py/changeTrack (mod_rh_abstractModif.RHAbstractManagmentChangeTrack)
+# Inactive: /abstractManagment.py/comments (mod_rh_abstractModif.RHIntComments)
+# Inactive: /abstractManagment.py/directAccess (mod_rh_abstractModif.RHAbstractDirectAccess)
+# Inactive: /abstractManagment.py/editComment (mod_rh_abstractModif.RHIntCommentEdit)
+# Inactive: /abstractManagment.py/editData (mod_rh_abstractModif.RHEditData)
+# Inactive: /abstractManagment.py/markAsDup (mod_rh_abstractModif.RHMarkAsDup)
+# Inactive: /abstractManagment.py/mergeInto (mod_rh_abstractModif.RHMergeInto)
+# Inactive: /abstractManagment.py/newComment (mod_rh_abstractModif.RHNewIntComment)
+# Inactive: /abstractManagment.py/notifLog (mod_rh_abstractModif.RHNotifLog)
+# Inactive: /abstractManagment.py/orderByRating (mod_rh_abstractModif.RHAbstractTrackOrderByRating)
+# Inactive: /abstractManagment.py/propToAcc (mod_rh_abstractModif.RHPropToAcc)
+# Inactive: /abstractManagment.py/propToRej (mod_rh_abstractModif.RHPropToRej)
+# Inactive: /abstractManagment.py/reject (mod_rh_abstractModif.RHAbstractManagmentReject)
+# Inactive: /abstractManagment.py/rejectMultiple (mod_rh_conferenceModif.RHAbstractManagmentRejectMultiple)
+# Inactive: /abstractManagment.py/remComment (mod_rh_abstractModif.RHIntCommentRem)
+# Inactive: /abstractManagment.py/trackProposal (mod_rh_abstractModif.RHAbstractTrackManagment)
+# Inactive: /abstractManagment.py/unMarkAsDup (mod_rh_abstractModif.RHUnMarkAsDup)
+# Inactive: /abstractManagment.py/unmerge (mod_rh_abstractModif.RHUnMerge)
+# Inactive: /abstractManagment.py/withdraw (mod_rh_abstractModif.RHWithdraw)
+# Inactive: /abstractManagment.py/xml (mod_rh_abstractModif.RHAbstractToXML)
 
 
 # Routes for abstractModify.py
@@ -201,65 +95,18 @@ legacy.add_url_rule('/abstractManagment.py/xml',
 
 
 # Routes for abstractReviewing.py
-legacy.add_url_rule('/abstractReviewing.py/notifTpl',
-                    'abstractReviewing-notifTpl',
-                    rh_as_view(mod_rh_abstractReviewing.RHNotifTpl),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractReviewing.py/notifTplCondNew',
-                    'abstractReviewing-notifTplCondNew',
-                    rh_as_view(mod_rh_abstractReviewing.RHNotifTplConditionNew),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractReviewing.py/notifTplCondRem',
-                    'abstractReviewing-notifTplCondRem',
-                    rh_as_view(mod_rh_abstractReviewing.RHNotifTplConditionRem),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractReviewing.py/notifTplDisplay',
-                    'abstractReviewing-notifTplDisplay',
-                    rh_as_view(mod_rh_abstractReviewing.RHCFANotifTplDisplay),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractReviewing.py/notifTplDown',
-                    'abstractReviewing-notifTplDown',
-                    rh_as_view(mod_rh_abstractReviewing.RHCFANotifTplDown),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractReviewing.py/notifTplEdit',
-                    'abstractReviewing-notifTplEdit',
-                    rh_as_view(mod_rh_abstractReviewing.RHCFANotifTplEdit),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractReviewing.py/notifTplNew',
-                    'abstractReviewing-notifTplNew',
-                    rh_as_view(mod_rh_abstractReviewing.RHCFANotifTplNew),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractReviewing.py/notifTplPreview',
-                    'abstractReviewing-notifTplPreview',
-                    rh_as_view(mod_rh_abstractReviewing.RHCFANotifTplPreview),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractReviewing.py/notifTplRem',
-                    'abstractReviewing-notifTplRem',
-                    rh_as_view(mod_rh_abstractReviewing.RHCFANotifTplRem),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractReviewing.py/notifTplUp',
-                    'abstractReviewing-notifTplUp',
-                    rh_as_view(mod_rh_abstractReviewing.RHCFANotifTplUp),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractReviewing.py/reviewingSetup',
-                    'abstractReviewing-reviewingSetup',
-                    rh_as_view(mod_rh_abstractReviewing.RHAbstractReviewingSetup),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractReviewing.py/reviewingTeam',
-                    'abstractReviewing-reviewingTeam',
-                    rh_as_view(mod_rh_abstractReviewing.RHAbstractReviewingTeam),
-                    methods=('GET', 'POST'))
+# Inactive: /abstractReviewing.py/notifTpl (mod_rh_abstractReviewing.RHNotifTpl)
+# Inactive: /abstractReviewing.py/notifTplCondNew (mod_rh_abstractReviewing.RHNotifTplConditionNew)
+# Inactive: /abstractReviewing.py/notifTplCondRem (mod_rh_abstractReviewing.RHNotifTplConditionRem)
+# Inactive: /abstractReviewing.py/notifTplDisplay (mod_rh_abstractReviewing.RHCFANotifTplDisplay)
+# Inactive: /abstractReviewing.py/notifTplDown (mod_rh_abstractReviewing.RHCFANotifTplDown)
+# Inactive: /abstractReviewing.py/notifTplEdit (mod_rh_abstractReviewing.RHCFANotifTplEdit)
+# Inactive: /abstractReviewing.py/notifTplNew (mod_rh_abstractReviewing.RHCFANotifTplNew)
+# Inactive: /abstractReviewing.py/notifTplPreview (mod_rh_abstractReviewing.RHCFANotifTplPreview)
+# Inactive: /abstractReviewing.py/notifTplRem (mod_rh_abstractReviewing.RHCFANotifTplRem)
+# Inactive: /abstractReviewing.py/notifTplUp (mod_rh_abstractReviewing.RHCFANotifTplUp)
+# Inactive: /abstractReviewing.py/reviewingSetup (mod_rh_abstractReviewing.RHAbstractReviewingSetup)
+# Inactive: /abstractReviewing.py/reviewingTeam (mod_rh_abstractReviewing.RHAbstractReviewingTeam)
 
 
 # Routes for abstractSubmission.py
@@ -268,15 +115,8 @@ legacy.add_url_rule('/abstractReviewing.py/reviewingTeam',
 
 
 # Routes for abstractTools.py
-legacy.add_url_rule('/abstractTools.py',
-                    'abstractTools',
-                    rh_as_view(mod_rh_abstractModif.RHTools),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractTools.py/delete',
-                    'abstractTools-delete',
-                    rh_as_view(mod_rh_abstractModif.RHAbstractDelete),
-                    methods=('GET', 'POST'))
+# Inactive: /abstractTools.py (mod_rh_abstractModif.RHTools)
+# Inactive: /abstractTools.py/delete (mod_rh_abstractModif.RHAbstractDelete)
 
 
 # Routes for abstractWithdraw.py
@@ -285,30 +125,11 @@ legacy.add_url_rule('/abstractTools.py/delete',
 
 
 # Routes for abstractsManagment.py
-legacy.add_url_rule('/abstractsManagment.py',
-                    'abstractsManagment',
-                    rh_as_view(mod_rh_conferenceModif.RHAbstractList),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractsManagment.py/abstractsActions',
-                    'abstractsManagment-abstractsActions',
-                    rh_as_view(mod_rh_conferenceModif.RHAbstractsActions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractsManagment.py/mergeAbstracts',
-                    'abstractsManagment-mergeAbstracts',
-                    rh_as_view(mod_rh_conferenceModif.RHAbstractsMerge),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractsManagment.py/newAbstract',
-                    'abstractsManagment-newAbstract',
-                    rh_as_view(mod_rh_conferenceModif.RHNewAbstract),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/abstractsManagment.py/participantList',
-                    'abstractsManagment-participantList',
-                    rh_as_view(mod_rh_conferenceModif.RHAbstractsParticipantList),
-                    methods=('GET', 'POST'))
+# Inactive: /abstractsManagment.py (mod_rh_conferenceModif.RHAbstractList)
+# Inactive: /abstractsManagment.py/abstractsActions (mod_rh_conferenceModif.RHAbstractsActions)
+# Inactive: /abstractsManagment.py/mergeAbstracts (mod_rh_conferenceModif.RHAbstractsMerge)
+# Inactive: /abstractsManagment.py/newAbstract (mod_rh_conferenceModif.RHNewAbstract)
+# Inactive: /abstractsManagment.py/participantList (mod_rh_conferenceModif.RHAbstractsParticipantList)
 
 
 # Routes for adminAnnouncement.py
@@ -541,20 +362,8 @@ legacy.add_url_rule('/confListContribToJudge.py/asReviewer',
 
 
 # Routes for confModBOA.py
-legacy.add_url_rule('/confModBOA.py',
-                    'confModBOA',
-                    rh_as_view(mod_rh_conferenceModif.RHAbstractBook),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModBOA.py/edit',
-                    'confModBOA-edit',
-                    rh_as_view(mod_rh_conferenceModif.RHAbstractBookEdit),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModBOA.py/toogleShowIds',
-                    'confModBOA-toogleShowIds',
-                    rh_as_view(mod_rh_conferenceModif.RHAbstractBookToogleShowIds),
-                    methods=('GET', 'POST'))
+# Inactive: /confModBOA.py (mod_rh_conferenceModif.RHAbstractBook)
+# Inactive: /confModBOA.py/toogleShowIds (mod_rh_conferenceModif.RHAbstractBookToogleShowIds)
 
 
 # Routes for confModifAC.py
@@ -567,105 +376,24 @@ legacy.add_url_rule('/confModBOA.py/toogleShowIds',
 
 
 # Routes for confModifCFA.py
-legacy.add_url_rule('/confModifCFA.py',
-                    'confModifCFA',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifCFA),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/absFieldDown',
-                    'confModifCFA-absFieldDown',
-                    rh_as_view(mod_rh_conferenceModif.RHConfMoveAbsFieldDown),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/absFieldUp',
-                    'confModifCFA-absFieldUp',
-                    rh_as_view(mod_rh_conferenceModif.RHConfMoveAbsFieldUp),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/abstractFields',
-                    'confModifCFA-abstractFields',
-                    rh_as_view(mod_rh_conferenceModif.RHConfAbstractFields),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/addAbstractField',
-                    'confModifCFA-addAbstractField',
-                    rh_as_view(mod_rh_conferenceModif.RHConfAddAbstractField),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/addType',
-                    'confModifCFA-addType',
-                    rh_as_view(mod_rh_conferenceModif.RHCFAAddType),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/changeStatus',
-                    'confModifCFA-changeStatus',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifCFAStatus),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/editAbstractField',
-                    'confModifCFA-editAbstractField',
-                    rh_as_view(mod_rh_conferenceModif.RHConfEditAbstractField),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/makeTracksMandatory',
-                    'confModifCFA-makeTracksMandatory',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifCFAMakeTracksMandatory),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/modifyData',
-                    'confModifCFA-modifyData',
-                    rh_as_view(mod_rh_conferenceModif.RHCFADataModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/performAddAbstractField',
-                    'confModifCFA-performAddAbstractField',
-                    rh_as_view(mod_rh_conferenceModif.RHConfPerformAddAbstractField),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/performModifyData',
-                    'confModifCFA-performModifyData',
-                    rh_as_view(mod_rh_conferenceModif.RHCFAPerformDataModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/preview',
-                    'confModifCFA-preview',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifCFAPreview),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/removeAbstractField',
-                    'confModifCFA-removeAbstractField',
-                    rh_as_view(mod_rh_conferenceModif.RHConfRemoveAbstractField),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/removeType',
-                    'confModifCFA-removeType',
-                    rh_as_view(mod_rh_conferenceModif.RHCFARemoveType),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/switchAttachFiles',
-                    'confModifCFA-switchAttachFiles',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifCFASwitchAttachFiles),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/switchMultipleTracks',
-                    'confModifCFA-switchMultipleTracks',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifCFASwitchMultipleTracks),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/switchSelectSpeakerMandatory',
-                    'confModifCFA-switchSelectSpeakerMandatory',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifCFASwitchSelectSpeakerMandatory),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/switchShowAttachedFiles',
-                    'confModifCFA-switchShowAttachedFiles',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifCFASwitchShowAttachedFilesContribList),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifCFA.py/switchShowSelectSpeaker',
-                    'confModifCFA-switchShowSelectSpeaker',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifCFASwitchShowSelectAsSpeaker),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifCFA.py (mod_rh_conferenceModif.RHConfModifCFA)
+# Inactive: /confModifCFA.py/absFieldDown (mod_rh_conferenceModif.RHConfMoveAbsFieldDown)
+# Inactive: /confModifCFA.py/absFieldUp (mod_rh_conferenceModif.RHConfMoveAbsFieldUp)
+# Inactive: /confModifCFA.py/abstractFields (mod_rh_conferenceModif.RHConfAbstractFields)
+# Inactive: /confModifCFA.py/addAbstractField (mod_rh_conferenceModif.RHConfAddAbstractField)
+# Inactive: /confModifCFA.py/changeStatus (mod_rh_conferenceModif.RHConfModifCFAStatus)
+# Inactive: /confModifCFA.py/editAbstractField (mod_rh_conferenceModif.RHConfEditAbstractField)
+# Inactive: /confModifCFA.py/makeTracksMandatory (mod_rh_conferenceModif.RHConfModifCFAMakeTracksMandatory)
+# Inactive: /confModifCFA.py/modifyData (mod_rh_conferenceModif.RHCFADataModification)
+# Inactive: /confModifCFA.py/performAddAbstractField (mod_rh_conferenceModif.RHConfPerformAddAbstractField)
+# Inactive: /confModifCFA.py/performModifyData (mod_rh_conferenceModif.RHCFAPerformDataModification)
+# Inactive: /confModifCFA.py/preview (mod_rh_conferenceModif.RHConfModifCFAPreview)
+# Inactive: /confModifCFA.py/removeAbstractField (mod_rh_conferenceModif.RHConfRemoveAbstractField)
+# Inactive: /confModifCFA.py/switchAttachFiles (mod_rh_conferenceModif.RHConfModifCFASwitchAttachFiles)
+# Inactive: /confModifCFA.py/switchMultipleTracks (mod_rh_conferenceModif.RHConfModifCFASwitchMultipleTracks)
+# Inactive: /confModifCFA.py/switchSelectSpeakerMandatory (mod_rh_conferenceModif.RHConfModifCFASwitchSelectSpeakerMandatory)
+# Inactive: /confModifCFA.py/switchShowAttachedFiles (mod_rh_conferenceModif.RHConfModifCFASwitchShowAttachedFilesContribList)
+# Inactive: /confModifCFA.py/switchShowSelectSpeaker (mod_rh_conferenceModif.RHConfModifCFASwitchShowSelectAsSpeaker)
 
 
 # Routes for confModifCollaboration.py

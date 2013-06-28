@@ -681,31 +681,31 @@ class UHConfSectionsSettings(URLHandler):
 
 
 class UHConfModifCFAOptFld(URLHandler):
-    _endpoint = 'legacy.confModifCFA-abstractFields'
+    _endpoint = 'event_mgmt.confModifCFA-abstractFields'
 
 
 class UHConfModifCFAAddOptFld(URLHandler):
-    _endpoint = 'legacy.confModifCFA-addAbstractField'
+    _endpoint = 'event_mgmt.confModifCFA-addAbstractField'
 
 
 class UHConfModifCFAPerformAddOptFld(URLHandler):
-    _endpoint = 'legacy.confModifCFA-performAddAbstractField'
+    _endpoint = 'event_mgmt.confModifCFA-performAddAbstractField'
 
 
 class UHConfModifCFAEditOptFld(URLHandler):
-    _endpoint = 'legacy.confModifCFA-editAbstractField'
+    _endpoint = 'event_mgmt.confModifCFA-editAbstractField'
 
 
 class UHConfModifCFARemoveOptFld(URLHandler):
-    _endpoint = 'legacy.confModifCFA-removeAbstractField'
+    _endpoint = 'event_mgmt.confModifCFA-removeAbstractField'
 
 
 class UHConfModifCFAAbsFieldUp(URLHandler):
-    _endpoint = 'legacy.confModifCFA-absFieldUp'
+    _endpoint = 'event_mgmt.confModifCFA-absFieldUp'
 
 
 class UHConfModifCFAAbsFieldDown(URLHandler):
-    _endpoint = 'legacy.confModifCFA-absFieldDown'
+    _endpoint = 'event_mgmt.confModifCFA-absFieldDown'
 
 
 class UHConfModifProgram(URLHandler):
@@ -713,27 +713,27 @@ class UHConfModifProgram(URLHandler):
 
 
 class UHConfModifCFA(URLHandler):
-    _endpoint = 'legacy.confModifCFA'
+    _endpoint = 'event_mgmt.confModifCFA'
 
 
 class UHConfModifCFAPreview(URLHandler):
-    _endpoint = 'legacy.confModifCFA-preview'
+    _endpoint = 'event_mgmt.confModifCFA-preview'
 
 
 class UHConfCFAChangeStatus(URLHandler):
-    _endpoint = 'legacy.confModifCFA-changeStatus'
+    _endpoint = 'event_mgmt.confModifCFA-changeStatus'
 
 
 class UHConfCFASwitchMultipleTracks(URLHandler):
-    _endpoint = 'legacy.confModifCFA-switchMultipleTracks'
+    _endpoint = 'event_mgmt.confModifCFA-switchMultipleTracks'
 
 
 class UHConfCFAMakeTracksMandatory(URLHandler):
-    _endpoint = 'legacy.confModifCFA-makeTracksMandatory'
+    _endpoint = 'event_mgmt.confModifCFA-makeTracksMandatory'
 
 
 class UHConfCFAAllowAttachFiles(URLHandler):
-    _endpoint = 'legacy.confModifCFA-switchAttachFiles'
+    _endpoint = 'event_mgmt.confModifCFA-switchAttachFiles'
 
 
 class UHAbstractAttachmentFileAccess(URLHandler):
@@ -741,39 +741,31 @@ class UHAbstractAttachmentFileAccess(URLHandler):
 
 
 class UHConfCFAShowSelectAsSpeaker(URLHandler):
-    _endpoint = 'legacy.confModifCFA-switchShowSelectSpeaker'
+    _endpoint = 'event_mgmt.confModifCFA-switchShowSelectSpeaker'
 
 
 class UHConfCFASelectSpeakerMandatory(URLHandler):
-    _endpoint = 'legacy.confModifCFA-switchSelectSpeakerMandatory'
+    _endpoint = 'event_mgmt.confModifCFA-switchSelectSpeakerMandatory'
 
 
 class UHConfCFAAttachedFilesContribList(URLHandler):
-    _endpoint = 'legacy.confModifCFA-switchShowAttachedFiles'
-
-
-class UHCFAManagementAddType(URLHandler):
-    _endpoint = 'legacy.confModifCFA-addType'
-
-
-class UHCFAManagementRemoveType(URLHandler):
-    _endpoint = 'legacy.confModifCFA-removeType'
+    _endpoint = 'event_mgmt.confModifCFA-switchShowAttachedFiles'
 
 
 class UHCFADataModification(URLHandler):
-    _endpoint = 'legacy.confModifCFA-modifyData'
+    _endpoint = 'event_mgmt.confModifCFA-modifyData'
 
 
 class UHCFAPerformDataModification(URLHandler):
-    _endpoint = 'legacy.confModifCFA-performModifyData'
+    _endpoint = 'event_mgmt.confModifCFA-performModifyData'
 
 
 class UHConfAbstractManagment(URLHandler):
-    _endpoint = 'legacy.abstractsManagment'
+    _endpoint = 'event_mgmt.abstractsManagment'
 
 
 class UHConfAbstractList(URLHandler):
-    _endpoint = 'legacy.abstractsManagment'
+    _endpoint = 'event_mgmt.abstractsManagment'
 
 
 class UHAbstractSubmission(URLHandler):
@@ -793,15 +785,15 @@ class UHAbstractDisplayPDF(URLHandler):
 
 
 class UHAbstractConfManagerDisplayPDF(URLHandler):
-    _endpoint = 'legacy.abstractManagment-abstractToPDF'
+    _endpoint = 'event_mgmt.abstractManagment-abstractToPDF'
 
 
 class UHAbstractConfSelectionAction(URLHandler):
-    _endpoint = 'legacy.abstractsManagment-abstractsActions'
+    _endpoint = 'event_mgmt.abstractsManagment-abstractsActions'
 
 
 class UHAbstractsConfManagerDisplayParticipantList(URLHandler):
-    _endpoint = 'legacy.abstractsManagment-participantList'
+    _endpoint = 'event_mgmt.abstractsManagment-participantList'
 
 
 class UHAbstractsTrackManagerParticipantList(URLHandler):
@@ -829,47 +821,47 @@ class UHAbstractModify(URLHandler):
 
 
 class UHCFAAbstractManagment(URLHandler):
-    _endpoint = 'legacy.abstractManagment'
+    _endpoint = 'event_mgmt.abstractManagment'
 
 
 class UHAbstractManagment(URLHandler):
-    _endpoint = 'legacy.abstractManagment'
+    _endpoint = 'event_mgmt.abstractManagment'
 
 
 class UHAbstractManagmentAccept(URLHandler):
-    _endpoint = 'legacy.abstractManagment-accept'
+    _endpoint = 'event_mgmt.abstractManagment-accept'
 
 
 class UHAbstractManagmentAcceptMultiple(URLHandler):
-    _endpoint = 'legacy.abstractManagment-acceptMultiple'
+    _endpoint = 'event_mgmt.abstractManagment-acceptMultiple'
 
 
 class UHAbstractManagmentRejectMultiple(URLHandler):
-    _endpoint = 'legacy.abstractManagment-rejectMultiple'
+    _endpoint = 'event_mgmt.abstractManagment-rejectMultiple'
 
 
 class UHAbstractManagmentReject(URLHandler):
-    _endpoint = 'legacy.abstractManagment-reject'
+    _endpoint = 'event_mgmt.abstractManagment-reject'
 
 
 class UHAbstractManagmentChangeTrack(URLHandler):
-    _endpoint = 'legacy.abstractManagment-changeTrack'
+    _endpoint = 'event_mgmt.abstractManagment-changeTrack'
 
 
 class UHAbstractTrackProposalManagment(URLHandler):
-    _endpoint = 'legacy.abstractManagment-trackProposal'
+    _endpoint = 'event_mgmt.abstractManagment-trackProposal'
 
 
 class UHAbstractTrackOrderByRating(URLHandler):
-    _endpoint = 'legacy.abstractManagment-orderByRating'
+    _endpoint = 'event_mgmt.abstractManagment-orderByRating'
 
 
 class UHAbstractDirectAccess(URLHandler):
-    _endpoint = 'legacy.abstractManagment-directAccess'
+    _endpoint = 'event_mgmt.abstractManagment-directAccess'
 
 
 class UHAbstractToXML(URLHandler):
-    _endpoint = 'legacy.abstractManagment-xml'
+    _endpoint = 'event_mgmt.abstractManagment-xml'
 
 
 class UHAbstractSubmissionDisplay(URLHandler):
@@ -1994,27 +1986,27 @@ class UHTrackModMoveDown(URLHandler):
 
 
 class UHAbstractModAC(URLHandler):
-    _endpoint = 'legacy.abstractManagment-ac'
+    _endpoint = 'event_mgmt.abstractManagment-ac'
 
 
 class UHAbstractModEditData(URLHandler):
-    _endpoint = 'legacy.abstractManagment-editData'
+    _endpoint = 'event_mgmt.abstractManagment-editData'
 
 
 class UHAbstractModIntComments(URLHandler):
-    _endpoint = 'legacy.abstractManagment-comments'
+    _endpoint = 'event_mgmt.abstractManagment-comments'
 
 
 class UHAbstractModNewIntComment(URLHandler):
-    _endpoint = 'legacy.abstractManagment-newComment'
+    _endpoint = 'event_mgmt.abstractManagment-newComment'
 
 
 class UHAbstractModIntCommentEdit(URLHandler):
-    _endpoint = 'legacy.abstractManagment-editComment'
+    _endpoint = 'event_mgmt.abstractManagment-editComment'
 
 
 class UHAbstractModIntCommentRem(URLHandler):
-    _endpoint = 'legacy.abstractManagment-remComment'
+    _endpoint = 'event_mgmt.abstractManagment-remComment'
 
 
 class UHTrackAbstractModIntCommentNew(UHTrackAbstractBase):
@@ -2039,27 +2031,27 @@ class UHTrackAbstractModIntCommentRem(UHTrackAbstractModCommentBase):
 
 
 class UHAbstractReviewingNotifTpl(URLHandler):
-    _endpoint = 'legacy.abstractReviewing-notifTpl'
+    _endpoint = 'event_mgmt.abstractReviewing-notifTpl'
 
 
 class UHAbstractModNotifTplNew(URLHandler):
-    _endpoint = 'legacy.abstractReviewing-notifTplNew'
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplNew'
 
 
 class UHAbstractModNotifTplRem(URLHandler):
-    _endpoint = 'legacy.abstractReviewing-notifTplRem'
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplRem'
 
 
 class UHAbstractModNotifTplEdit(URLHandler):
-    _endpoint = 'legacy.abstractReviewing-notifTplEdit'
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplEdit'
 
 
 class UHAbstractModNotifTplDisplay(URLHandler):
-    _endpoint = 'legacy.abstractReviewing-notifTplDisplay'
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplDisplay'
 
 
 class UHAbstractModNotifTplPreview(URLHandler):
-    _endpoint = 'legacy.abstractReviewing-notifTplPreview'
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplPreview'
 
 
 class UHTrackAbstractModMarkAsDup(UHTrackAbstractBase):
@@ -2071,47 +2063,47 @@ class UHTrackAbstractModUnMarkAsDup(UHTrackAbstractBase):
 
 
 class UHAbstractModMarkAsDup(URLHandler):
-    _endpoint = 'legacy.abstractManagment-markAsDup'
+    _endpoint = 'event_mgmt.abstractManagment-markAsDup'
 
 
 class UHAbstractModUnMarkAsDup(URLHandler):
-    _endpoint = 'legacy.abstractManagment-unMarkAsDup'
+    _endpoint = 'event_mgmt.abstractManagment-unMarkAsDup'
 
 
 class UHAbstractModMergeInto(URLHandler):
-    _endpoint = 'legacy.abstractManagment-mergeInto'
+    _endpoint = 'event_mgmt.abstractManagment-mergeInto'
 
 
 class UHAbstractModUnMerge(URLHandler):
-    _endpoint = 'legacy.abstractManagment-unmerge'
+    _endpoint = 'event_mgmt.abstractManagment-unmerge'
 
 
 class UHConfModNewAbstract(URLHandler):
-    _endpoint = 'legacy.abstractsManagment-newAbstract'
+    _endpoint = 'event_mgmt.abstractsManagment-newAbstract'
 
 
 class UHConfModNotifTplConditionNew(URLHandler):
-    _endpoint = 'legacy.abstractReviewing-notifTplCondNew'
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplCondNew'
 
 
 class UHConfModNotifTplConditionRem(URLHandler):
-    _endpoint = 'legacy.abstractReviewing-notifTplCondRem'
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplCondRem'
 
 
 class UHConfModAbstractsMerge(URLHandler):
-    _endpoint = 'legacy.abstractsManagment-mergeAbstracts'
+    _endpoint = 'event_mgmt.abstractsManagment-mergeAbstracts'
 
 
 class UHAbstractModNotifLog(URLHandler):
-    _endpoint = 'legacy.abstractManagment-notifLog'
+    _endpoint = 'event_mgmt.abstractManagment-notifLog'
 
 
 class UHAbstractModTools(URLHandler):
-    _endpoint = 'legacy.abstractTools'
+    _endpoint = 'event_mgmt.abstractTools'
 
 
 class UHAbstractDelete(URLHandler):
-    _endpoint = 'legacy.abstractTools-delete'
+    _endpoint = 'event_mgmt.abstractTools-delete'
 
 
 class UHSessionModContribList(URLHandler):
@@ -2135,19 +2127,19 @@ class UHContributionListToPDF(URLHandler):
 
 
 class UHConfModAbstractPropToAcc(URLHandler):
-    _endpoint = 'legacy.abstractManagment-propToAcc'
+    _endpoint = 'event_mgmt.abstractManagment-propToAcc'
 
 
 class UHAbstractManagmentBackToSubmitted(URLHandler):
-    _endpoint = 'legacy.abstractManagment-backToSubmitted'
+    _endpoint = 'event_mgmt.abstractManagment-backToSubmitted'
 
 
 class UHConfModAbstractPropToRej(URLHandler):
-    _endpoint = 'legacy.abstractManagment-propToRej'
+    _endpoint = 'event_mgmt.abstractManagment-propToRej'
 
 
 class UHConfModAbstractWithdraw(URLHandler):
-    _endpoint = 'legacy.abstractManagment-withdraw'
+    _endpoint = 'event_mgmt.abstractManagment-withdraw'
 
 
 class UHSessionModAddContribs(URLHandler):
@@ -2167,11 +2159,11 @@ class UHSessionModToPDF(URLHandler):
 
 
 class UHConfModCFANotifTplUp(URLHandler):
-    _endpoint = 'legacy.abstractReviewing-notifTplUp'
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplUp'
 
 
 class UHConfModCFANotifTplDown(URLHandler):
-    _endpoint = 'legacy.abstractReviewing-notifTplDown'
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplDown'
 
 
 class UHConfAuthorIndex(URLHandler):
@@ -2255,23 +2247,19 @@ class UHConferenceToiCal(URLHandler):
 
 
 class UHConfModAbstractBook(URLHandler):
-    _endpoint = 'legacy.confModBOA'
-
-
-class UHConfModAbstractBookEdit(URLHandler):
-    _endpoint = 'legacy.confModBOA-edit'
+    _endpoint = 'event_mgmt.confModBOA'
 
 
 class UHConfModAbstractBookToogleShowIds(URLHandler):
-    _endpoint = 'legacy.confModBOA-toogleShowIds'
+    _endpoint = 'event_mgmt.confModBOA-toogleShowIds'
 
 
 class UHAbstractReviewingSetup(URLHandler):
-    _endpoint = 'legacy.abstractReviewing-reviewingSetup'
+    _endpoint = 'event_mgmt.abstractReviewing-reviewingSetup'
 
 
 class UHAbstractReviewingTeam(URLHandler):
-    _endpoint = 'legacy.abstractReviewing-reviewingTeam'
+    _endpoint = 'event_mgmt.abstractReviewing-reviewingTeam'
 
 
 class UHConfModScheduleDataEdit(URLHandler):
@@ -3695,7 +3683,8 @@ class UHHelper(object):
         "AcceptedContribution": UHContributionModification,
         "Session": UHSessionModification,
         "SubContribution": UHSubContributionModification,
-        "Track": UHTrackModification
+        "Track": UHTrackModification,
+        "Abstract": UHAbstractModify
     }
 
     displayUHs = {

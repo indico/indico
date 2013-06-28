@@ -23,9 +23,6 @@ from MaKaC.webinterface.rh import conferenceModif
 def index(req, **params):
     return conferenceModif.RHAbstractBook( req ).process( params )
 
-def edit(req, **params):
-    return conferenceModif.RHAbstractBookEdit( req ).process( params )
 
 def toogleShowIds(req, **params):
     return conferenceModif.RHAbstractBookToogleShowIds( req ).process( params )
-

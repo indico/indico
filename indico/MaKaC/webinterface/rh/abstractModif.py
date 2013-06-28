@@ -513,13 +513,6 @@ class RHAbstractTrackOrderByRating(RHAbstractModifBase):
         return p.display( **self._getRequestParams() )
 
 
-class RHAC(RHAbstractModifBase):
-
-    def _process( self ):
-        p = abstracts.WPModAC(self,self._target)
-        return p.display()
-
-
 class RHEditData(RHAbstractModifBase, AbstractParam):
 
     def __init__(self, req):

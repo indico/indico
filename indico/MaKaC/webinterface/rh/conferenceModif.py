@@ -1382,30 +1382,6 @@ class RHConfModifCFASwitchShowAttachedFilesContribList( RHConfModifCFABase ):
         self._conf.getAbstractMgr().setSwitchShowAttachedFilesContribList(not self._conf.getAbstractMgr().showAttachedFilesContribList())
         self._redirect( urlHandlers.UHConfModifCFA.getURL( self._conf ) )
 
-class RHCFAAddType( RHConfModifCFABase ):
-
-    def _checkParams( self, params ):
-        RHConfModifCFABase._checkParams( self, params )
-        self.type = params["type"]
-
-
-    def _process( self ):
-        self._conf.getAbstractMgr().addContribType(self.type)
-        self._redirect( urlHandlers.UHConfModifCFA.getURL( self._conf ) )
-
-
-class RHCFARemoveType( RHConfModifCFABase ):
-
-    def _checkParams( self, params ):
-        RHConfModifCFABase._checkParams( self, params )
-        self._types = self._normaliseListParam( params.get( "types", [] ) )
-
-
-    def _process( self ):
-        for type in self._types:
-            self._conf.getAbstractMgr().removeContribType(type)
-        self._redirect( urlHandlers.UHConfModifCFA.getURL( self._conf ) )
-
 
 class RHCFADataModification( RHConfModifCFABase ):
 
@@ -3340,32 +3316,6 @@ class RHAbstractBook( RHConfModifCFABase ):
         p = conferences.WPModAbstractBook(self,self._target)
         return p.display()
 
-
-class RHAbstractBookEdit( RHConfModifCFABase ):
-    _uh = urlHandlers.UHConfModAbstractBookEdit
-
-    def _checkParams( self, params ):
-        RHConfModifCFABase._checkParams( self, params )
-        self._action=""
-        if params.has_key("EDIT"):
-            self._action="EDIT"
-            self._text=params.get("text","")
-            self._sortBy=params.get("sortBy","")
-        elif params.has_key("CANCEL"):
-            self._action="CANCEL"
-
-    def _process( self ):
-        url=urlHandlers.UHConfModAbstractBook.getURL(self._target)
-        if self._action=="CANCEL":
-            self._redirect(url)
-            return
-        elif self._action=="EDIT":
-            self._target.getBOAConfig().setText(self._text)
-            self._target.getBOAConfig().setSortBy(self._sortBy)
-            self._redirect(url)
-            return
-        p=conferences.WPModAbstractBookEdit(self,self._target)
-        return p.display()
 
 class RHAbstractBookToogleShowIds( RHConfModifCFABase ):
     _uh = urlHandlers.UHConfModAbstractBookToogleShowIds

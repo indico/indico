@@ -28,14 +28,6 @@ def changeStatus( req, **params ):
     return conferenceModif.RHConfModifCFAStatus( req ).process( params )
 
 
-def addType(req, **params):
-    return conferenceModif.RHCFAAddType( req ).process( params )
-
-
-def removeType(req, **params):
-    return conferenceModif.RHCFARemoveType( req ).process( params )
-
-
 def modifyData( req, **params ):
     return conferenceModif.RHCFADataModification( req ).process( params )
 

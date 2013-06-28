@@ -63,10 +63,6 @@ def xml( req, **params ):
     return abstractModif.RHAbstractToXML( req ).process( params )
 
 
-def ac(req, **params):
-    return abstractModif.RHAC(req).process(params)
-
-
 def editData(req, **params):
     return abstractModif.RHEditData(req).process(params)
 

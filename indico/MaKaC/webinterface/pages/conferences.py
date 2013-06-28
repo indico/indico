@@ -3194,8 +3194,6 @@ class WConfModifCFA( wcomponents.WTemplated ):
 
         vars["setStatusURL"]=urlHandlers.UHConfCFAChangeStatus.getURL(self._conf)
         vars["dataModificationURL"]=urlHandlers.UHCFADataModification.getURL(self._conf)
-        vars["addTypeURL"]=urlHandlers.UHCFAManagementAddType.getURL(self._conf)
-        vars["removeTypeURL"]=urlHandlers.UHCFAManagementRemoveType.getURL(self._conf)
         if abMgr.getCFAStatus():
             vars["changeTo"] = "False"
             vars["status"] = _("ENABLED")
@@ -5405,7 +5403,6 @@ class WConfModAbstractBook(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
         boaConfig = self._conf.getBOAConfig()
         vars["sortByList"] = boaConfig.getCorrespondingAuthorTypes()
-        vars["modURL"]=quoteattr(str(urlHandlers.UHConfModAbstractBookEdit.getURL(self._conf)))
         vars["previewURL"]=quoteattr(str(urlHandlers.UHConfAbstractBook.getURL(self._conf)))
         vars["sortBy"] = boaConfig.getSortBy()
         vars["boaConfig"] = boaConfig
