@@ -19,8 +19,6 @@
 
 import sys,os,re
 
-sys.path.append("/home/jbenito/development/indico/code/code")
-
 from MaKaC import user
 from MaKaC.common.general import *
 from MaKaC.common import db
