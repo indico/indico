@@ -995,8 +995,8 @@ class WPConfModifRegFormGeneralSectionBase(WPConfModifRegFormSectionsBase):
 
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
-        self._tabMain = self._tabCtrl.newTab( "main",  _("Main"), \
-                urlHandlers.UHConfModifRegFormGeneralSection.getURL( self._conf ) )
+        self._tabMain = self._tabCtrl.newTab("main", _("Main"),
+                                             urlHandlers.UHConfModifRegFormGeneralSection.getURL(self._targetSection))
         self._setActiveTab()
 
     def _setActiveTab( self ):
@@ -1099,6 +1099,7 @@ class WConfModifRegFormGeneralSection( wcomponents.WTemplated ):
                 chkbox = """<input type="checkbox" name="fieldsIds" value="%s">""" % f.getId()
 
             urlStatus = urlHandlers.UHConfModifRegFormEnablePersonalField.getURL(self._conf)
+            urlStatus.addParam("sectionFormId", self._generalSection.getId())
             urlStatus.addParam("personalfield", f.getId())
             img = enabledBulb
             imgAlt = enabledText

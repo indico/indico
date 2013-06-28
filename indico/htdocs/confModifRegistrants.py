@@ -72,12 +72,6 @@ def performModifyMiscInfo(req, **params):
 def remove(req, **params):
     return registrantsModif.RHRegistrantListRemove(req).process(params)
 
-def openMenu(req, **params):
-    return registrantsModif.RHRegistrantListMenuOpen(req).process(params)
-
-def closeMenu(req, **params):
-    return registrantsModif.RHRegistrantListMenuClose(req).process(params)
-
 def modifyStatuses(req, **params):
     return registrantsModif.RHRegistrantStatusesModify( req ).process( params )
 

@@ -26,9 +26,6 @@ import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
 import MaKaC.webinterface.rh.contribMod as mod_rh_contribMod
 import MaKaC.webinterface.rh.contribReviewingModif as mod_rh_contribReviewingModif
-import MaKaC.webinterface.rh.ePaymentModif as mod_rh_ePaymentModif
-import MaKaC.webinterface.rh.registrantsModif as mod_rh_registrantsModif
-import MaKaC.webinterface.rh.registrationFormModif as mod_rh_registrationFormModif
 import MaKaC.webinterface.rh.reviewingAssignContributions as mod_rh_reviewingAssignContributions
 import MaKaC.webinterface.rh.reviewingControlModif as mod_rh_reviewingControlModif
 import MaKaC.webinterface.rh.reviewingListContribToJudge as mod_rh_reviewingListContribToJudge
@@ -50,11 +47,7 @@ legacy = IndicoBlueprint('legacy', __name__)
 # Inactive: /EMail.py/send (mod_rh_conferenceDisplay.RHConferenceSendEmail)
 # Inactive: /EMail.py/sendcontribparticipants (mod_rh_conferenceModif.RHContribParticipantsSendEmail)
 # Inactive: /EMail.py/sendconvener (mod_rh_conferenceModif.RHConvenerSendEmail)
-
-legacy.add_url_rule('/EMail.py/sendreg',
-                    'EMail-sendreg',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantSendEmail),
-                    methods=('GET', 'POST'))
+# Inactive: /EMail.py/sendreg (mod_rh_registrantsModif.RHRegistrantSendEmail)
 
 
 # Routes for JSContent.py
@@ -758,35 +751,12 @@ legacy.add_url_rule('/confModifContribList.py/proceedings',
 
 
 # Routes for confModifEpayment.py
-legacy.add_url_rule('/confModifEpayment.py',
-                    'confModifEpayment',
-                    rh_as_view(mod_rh_ePaymentModif.RHEPaymentModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEpayment.py/changeStatus',
-                    'confModifEpayment-changeStatus',
-                    rh_as_view(mod_rh_ePaymentModif.RHEPaymentModifChangeStatus),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEpayment.py/dataModif',
-                    'confModifEpayment-dataModif',
-                    rh_as_view(mod_rh_ePaymentModif.RHEPaymentModifDataModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEpayment.py/enableSection',
-                    'confModifEpayment-enableSection',
-                    rh_as_view(mod_rh_ePaymentModif.RHEPaymentModifEnableSection),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEpayment.py/modifModule',
-                    'confModifEpayment-modifModule',
-                    rh_as_view(mod_rh_ePaymentModif.RHModifModule),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifEpayment.py/performDataModif',
-                    'confModifEpayment-performDataModif',
-                    rh_as_view(mod_rh_ePaymentModif.RHEPaymentModifPerformDataModification),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifEpayment.py (mod_rh_ePaymentModif.RHEPaymentModif)
+# Inactive: /confModifEpayment.py/changeStatus (mod_rh_ePaymentModif.RHEPaymentModifChangeStatus)
+# Inactive: /confModifEpayment.py/dataModif (mod_rh_ePaymentModif.RHEPaymentModifDataModification)
+# Inactive: /confModifEpayment.py/enableSection (mod_rh_ePaymentModif.RHEPaymentModifEnableSection)
+# Inactive: /confModifEpayment.py/modifModule (mod_rh_ePaymentModif.RHModifModule)
+# Inactive: /confModifEpayment.py/performDataModif (mod_rh_ePaymentModif.RHEPaymentModifPerformDataModification)
 
 
 # Routes for confModifEvaluation.py
@@ -896,364 +866,81 @@ legacy.add_url_rule('/confModifProgram.py/performAddTrack',
 
 
 # Routes for confModifRegistrants.py
-legacy.add_url_rule('/confModifRegistrants.py',
-                    'confModifRegistrants',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantListModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/action',
-                    'confModifRegistrants-action',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantListModifAction),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/closeMenu',
-                    'confModifRegistrants-closeMenu',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantListMenuClose),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/getAttachedFile',
-                    'confModifRegistrants-getAttachedFile',
-                    rh_as_view(mod_rh_registrantsModif.RHGetAttachedFile),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/modification',
-                    'confModifRegistrants-modification',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/modifyAccommodation',
-                    'confModifRegistrants-modifyAccommodation',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantAccommodationModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/modifyMiscInfo',
-                    'confModifRegistrants-modifyMiscInfo',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantMiscInfoModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/modifyReasonParticipation',
-                    'confModifRegistrants-modifyReasonParticipation',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantReasonParticipationModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/modifySessions',
-                    'confModifRegistrants-modifySessions',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantSessionModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/modifySocialEvents',
-                    'confModifRegistrants-modifySocialEvents',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantSocialEventsModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/modifyStatuses',
-                    'confModifRegistrants-modifyStatuses',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantStatusesModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/modifyTransaction',
-                    'confModifRegistrants-modifyTransaction',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantTransactionModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/newRegistrant',
-                    'confModifRegistrants-newRegistrant',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantNewForm),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/openMenu',
-                    'confModifRegistrants-openMenu',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantListMenuOpen),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/peformModifyTransaction',
-                    'confModifRegistrants-peformModifyTransaction',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantTransactionPerformModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/performModifyAccommodation',
-                    'confModifRegistrants-performModifyAccommodation',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantAccommodationPerformModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/performModifyMiscInfo',
-                    'confModifRegistrants-performModifyMiscInfo',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantMiscInfoPerformModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/performModifyReasonParticipation',
-                    'confModifRegistrants-performModifyReasonParticipation',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantReasonParticipationPerformModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/performModifySessions',
-                    'confModifRegistrants-performModifySessions',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantSessionPerformModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/performModifySocialEvents',
-                    'confModifRegistrants-performModifySocialEvents',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantSocialEventsPerformModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/performModifyStatuses',
-                    'confModifRegistrants-performModifyStatuses',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantStatusesPerformModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrants.py/remove',
-                    'confModifRegistrants-remove',
-                    rh_as_view(mod_rh_registrantsModif.RHRegistrantListRemove),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifRegistrants.py (mod_rh_registrantsModif.RHRegistrantListModif)
+# Inactive: /confModifRegistrants.py/action (mod_rh_registrantsModif.RHRegistrantListModifAction)
+# Inactive: /confModifRegistrants.py/getAttachedFile (mod_rh_registrantsModif.RHGetAttachedFile)
+# Inactive: /confModifRegistrants.py/modification (mod_rh_registrantsModif.RHRegistrantModification)
+# Inactive: /confModifRegistrants.py/modifyAccommodation (mod_rh_registrantsModif.RHRegistrantAccommodationModify)
+# Inactive: /confModifRegistrants.py/modifyMiscInfo (mod_rh_registrantsModif.RHRegistrantMiscInfoModify)
+# Inactive: /confModifRegistrants.py/modifyReasonParticipation (mod_rh_registrantsModif.RHRegistrantReasonParticipationModify)
+# Inactive: /confModifRegistrants.py/modifySessions (mod_rh_registrantsModif.RHRegistrantSessionModify)
+# Inactive: /confModifRegistrants.py/modifySocialEvents (mod_rh_registrantsModif.RHRegistrantSocialEventsModify)
+# Inactive: /confModifRegistrants.py/modifyStatuses (mod_rh_registrantsModif.RHRegistrantStatusesModify)
+# Inactive: /confModifRegistrants.py/modifyTransaction (mod_rh_registrantsModif.RHRegistrantTransactionModify)
+# Inactive: /confModifRegistrants.py/newRegistrant (mod_rh_registrantsModif.RHRegistrantNewForm)
+# Inactive: /confModifRegistrants.py/peformModifyTransaction (mod_rh_registrantsModif.RHRegistrantTransactionPerformModify)
+# Inactive: /confModifRegistrants.py/performModifyAccommodation (mod_rh_registrantsModif.RHRegistrantAccommodationPerformModify)
+# Inactive: /confModifRegistrants.py/performModifyMiscInfo (mod_rh_registrantsModif.RHRegistrantMiscInfoPerformModify)
+# Inactive: /confModifRegistrants.py/performModifyReasonParticipation (mod_rh_registrantsModif.RHRegistrantReasonParticipationPerformModify)
+# Inactive: /confModifRegistrants.py/performModifySessions (mod_rh_registrantsModif.RHRegistrantSessionPerformModify)
+# Inactive: /confModifRegistrants.py/performModifySocialEvents (mod_rh_registrantsModif.RHRegistrantSocialEventsPerformModify)
+# Inactive: /confModifRegistrants.py/performModifyStatuses (mod_rh_registrantsModif.RHRegistrantStatusesPerformModify)
+# Inactive: /confModifRegistrants.py/remove (mod_rh_registrantsModif.RHRegistrantListRemove)
 
 
 # Routes for confModifRegistrationForm.py
-legacy.add_url_rule('/confModifRegistrationForm.py',
-                    'confModifRegistrationForm',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/actionSection',
-                    'confModifRegistrationForm-actionSection',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormActionSection),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/actionStatuses',
-                    'confModifRegistrationForm-actionStatuses',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormActionStatuses),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/addAccommodationType',
-                    'confModifRegistrationForm-addAccommodationType',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifAccommodationTypeAdd),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/addGeneralField',
-                    'confModifRegistrationForm-addGeneralField',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionFieldAdd),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/addSession',
-                    'confModifRegistrationForm-addSession',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifSessionsAdd),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/addSocialEvent',
-                    'confModifRegistrationForm-addSocialEvent',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifSocialEventAdd),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/changeStatus',
-                    'confModifRegistrationForm-changeStatus',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifChangeStatus),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/dataModif',
-                    'confModifRegistrationForm-dataModif',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifDataModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/enablePersonalField',
-                    'confModifRegistrationForm-enablePersonalField',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifEnablePersonalField),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/enableSection',
-                    'confModifRegistrationForm-enableSection',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifEnableSection),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifAccommodation',
-                    'confModifRegistrationForm-modifAccommodation',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifAccommodation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifAccommodationData',
-                    'confModifRegistrationForm-modifAccommodationData',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifAccommodationDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifFurtherInformation',
-                    'confModifRegistrationForm-modifFurtherInformation',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifFurtherInformation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifFurtherInformationData',
-                    'confModifRegistrationForm-modifFurtherInformationData',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifFurtherInformationDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifGeneralField',
-                    'confModifRegistrationForm-modifGeneralField',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionFieldModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifGeneralSection',
-                    'confModifRegistrationForm-modifGeneralSection',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSection),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifGeneralSectionData',
-                    'confModifRegistrationForm-modifGeneralSectionData',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifReasonParticipation',
-                    'confModifRegistrationForm-modifReasonParticipation',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifReasonParticipation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifReasonParticipationData',
-                    'confModifRegistrationForm-modifReasonParticipationData',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifReasonParticipationDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifSessions',
-                    'confModifRegistrationForm-modifSessions',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifSessions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifSessionsData',
-                    'confModifRegistrationForm-modifSessionsData',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifSessionsDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifSocialEvent',
-                    'confModifRegistrationForm-modifSocialEvent',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifSocialEvent),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifSocialEventData',
-                    'confModifRegistrationForm-modifSocialEventData',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifSocialEventDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifStatus',
-                    'confModifRegistrationForm-modifStatus',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormStatusModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifyAccommodationType',
-                    'confModifRegistrationForm-modifyAccommodationType',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormAccommodationTypeModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifySessionItem',
-                    'confModifRegistrationForm-modifySessionItem',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormSessionItemModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/modifySocialEventItem',
-                    'confModifRegistrationForm-modifySocialEventItem',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormSocialEventItemModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performAddAccommodationType',
-                    'confModifRegistrationForm-performAddAccommodationType',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifAccommodationTypePerformAdd),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performAddGeneralField',
-                    'confModifRegistrationForm-performAddGeneralField',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionFieldPerformAdd),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performAddSession',
-                    'confModifRegistrationForm-performAddSession',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifSessionsPerformAdd),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performAddSocialEvent',
-                    'confModifRegistrationForm-performAddSocialEvent',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifSocialEventPerformAdd),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performDataModif',
-                    'confModifRegistrationForm-performDataModif',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifPerformDataModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performModifAccommodationData',
-                    'confModifRegistrationForm-performModifAccommodationData',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifAccommodationPerformDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performModifFurtherInformationData',
-                    'confModifRegistrationForm-performModifFurtherInformationData',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifFurtherInformationPerformDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performModifGeneralField',
-                    'confModifRegistrationForm-performModifGeneralField',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionFieldPerformModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performModifGeneralSectionData',
-                    'confModifRegistrationForm-performModifGeneralSectionData',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionPerformDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performModifReasonParticipationData',
-                    'confModifRegistrationForm-performModifReasonParticipationData',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifReasonParticipationPerformDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performModifSessionsData',
-                    'confModifRegistrationForm-performModifSessionsData',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifSessionsPerformDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performModifSocialEventData',
-                    'confModifRegistrationForm-performModifSocialEventData',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifSocialEventPerformDataModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performModifStatus',
-                    'confModifRegistrationForm-performModifStatus',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifStatusPerformModif),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performModifyAccommodationType',
-                    'confModifRegistrationForm-performModifyAccommodationType',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormAccommodationTypePerformModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performModifySessionItem',
-                    'confModifRegistrationForm-performModifySessionItem',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormSessionItemPerformModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/performModifySocialEventItem',
-                    'confModifRegistrationForm-performModifySocialEventItem',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormSocialEventItemPerformModify),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/removeAccommodationType',
-                    'confModifRegistrationForm-removeAccommodationType',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifAccommodationTypeRemove),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/removeGeneralField',
-                    'confModifRegistrationForm-removeGeneralField',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionFieldProcess),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/removeSession',
-                    'confModifRegistrationForm-removeSession',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifSessionsRemove),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifRegistrationForm.py/removeSocialEvent',
-                    'confModifRegistrationForm-removeSocialEvent',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationFormModifSocialEventRemove),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifRegistrationForm.py (mod_rh_registrationFormModif.RHRegistrationFormModif)
+# Inactive: /confModifRegistrationForm.py/actionSection (mod_rh_registrationFormModif.RHRegistrationFormActionSection)
+# Inactive: /confModifRegistrationForm.py/actionStatuses (mod_rh_registrationFormModif.RHRegistrationFormActionStatuses)
+# Inactive: /confModifRegistrationForm.py/addAccommodationType (mod_rh_registrationFormModif.RHRegistrationFormModifAccommodationTypeAdd)
+# Inactive: /confModifRegistrationForm.py/addGeneralField (mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionFieldAdd)
+# Inactive: /confModifRegistrationForm.py/addSession (mod_rh_registrationFormModif.RHRegistrationFormModifSessionsAdd)
+# Inactive: /confModifRegistrationForm.py/addSocialEvent (mod_rh_registrationFormModif.RHRegistrationFormModifSocialEventAdd)
+# Inactive: /confModifRegistrationForm.py/changeStatus (mod_rh_registrationFormModif.RHRegistrationFormModifChangeStatus)
+# Inactive: /confModifRegistrationForm.py/dataModif (mod_rh_registrationFormModif.RHRegistrationFormModifDataModification)
+# Inactive: /confModifRegistrationForm.py/enablePersonalField (mod_rh_registrationFormModif.RHRegistrationFormModifEnablePersonalField)
+# Inactive: /confModifRegistrationForm.py/enableSection (mod_rh_registrationFormModif.RHRegistrationFormModifEnableSection)
+# Inactive: /confModifRegistrationForm.py/modifAccommodation (mod_rh_registrationFormModif.RHRegistrationFormModifAccommodation)
+# Inactive: /confModifRegistrationForm.py/modifAccommodationData (mod_rh_registrationFormModif.RHRegistrationFormModifAccommodationDataModif)
+# Inactive: /confModifRegistrationForm.py/modifFurtherInformation (mod_rh_registrationFormModif.RHRegistrationFormModifFurtherInformation)
+# Inactive: /confModifRegistrationForm.py/modifFurtherInformationData (mod_rh_registrationFormModif.RHRegistrationFormModifFurtherInformationDataModif)
+# Inactive: /confModifRegistrationForm.py/modifGeneralField (mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionFieldModif)
+# Inactive: /confModifRegistrationForm.py/modifGeneralSection (mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSection)
+# Inactive: /confModifRegistrationForm.py/modifGeneralSectionData (mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionDataModif)
+# Inactive: /confModifRegistrationForm.py/modifReasonParticipation (mod_rh_registrationFormModif.RHRegistrationFormModifReasonParticipation)
+# Inactive: /confModifRegistrationForm.py/modifReasonParticipationData (mod_rh_registrationFormModif.RHRegistrationFormModifReasonParticipationDataModif)
+# Inactive: /confModifRegistrationForm.py/modifSessions (mod_rh_registrationFormModif.RHRegistrationFormModifSessions)
+# Inactive: /confModifRegistrationForm.py/modifSessionsData (mod_rh_registrationFormModif.RHRegistrationFormModifSessionsDataModif)
+# Inactive: /confModifRegistrationForm.py/modifSocialEvent (mod_rh_registrationFormModif.RHRegistrationFormModifSocialEvent)
+# Inactive: /confModifRegistrationForm.py/modifSocialEventData (mod_rh_registrationFormModif.RHRegistrationFormModifSocialEventDataModif)
+# Inactive: /confModifRegistrationForm.py/modifStatus (mod_rh_registrationFormModif.RHRegistrationFormStatusModif)
+# Inactive: /confModifRegistrationForm.py/modifyAccommodationType (mod_rh_registrationFormModif.RHRegistrationFormAccommodationTypeModify)
+# Inactive: /confModifRegistrationForm.py/modifySessionItem (mod_rh_registrationFormModif.RHRegistrationFormSessionItemModify)
+# Inactive: /confModifRegistrationForm.py/modifySocialEventItem (mod_rh_registrationFormModif.RHRegistrationFormSocialEventItemModify)
+# Inactive: /confModifRegistrationForm.py/performAddAccommodationType (mod_rh_registrationFormModif.RHRegistrationFormModifAccommodationTypePerformAdd)
+# Inactive: /confModifRegistrationForm.py/performAddGeneralField (mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionFieldPerformAdd)
+# Inactive: /confModifRegistrationForm.py/performAddSession (mod_rh_registrationFormModif.RHRegistrationFormModifSessionsPerformAdd)
+# Inactive: /confModifRegistrationForm.py/performAddSocialEvent (mod_rh_registrationFormModif.RHRegistrationFormModifSocialEventPerformAdd)
+# Inactive: /confModifRegistrationForm.py/performDataModif (mod_rh_registrationFormModif.RHRegistrationFormModifPerformDataModification)
+# Inactive: /confModifRegistrationForm.py/performModifAccommodationData (mod_rh_registrationFormModif.RHRegistrationFormModifAccommodationPerformDataModif)
+# Inactive: /confModifRegistrationForm.py/performModifFurtherInformationData (mod_rh_registrationFormModif.RHRegistrationFormModifFurtherInformationPerformDataModif)
+# Inactive: /confModifRegistrationForm.py/performModifGeneralField (mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionFieldPerformModif)
+# Inactive: /confModifRegistrationForm.py/performModifGeneralSectionData (mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionPerformDataModif)
+# Inactive: /confModifRegistrationForm.py/performModifReasonParticipationData (mod_rh_registrationFormModif.RHRegistrationFormModifReasonParticipationPerformDataModif)
+# Inactive: /confModifRegistrationForm.py/performModifSessionsData (mod_rh_registrationFormModif.RHRegistrationFormModifSessionsPerformDataModif)
+# Inactive: /confModifRegistrationForm.py/performModifSocialEventData (mod_rh_registrationFormModif.RHRegistrationFormModifSocialEventPerformDataModif)
+# Inactive: /confModifRegistrationForm.py/performModifStatus (mod_rh_registrationFormModif.RHRegistrationFormModifStatusPerformModif)
+# Inactive: /confModifRegistrationForm.py/performModifyAccommodationType (mod_rh_registrationFormModif.RHRegistrationFormAccommodationTypePerformModify)
+# Inactive: /confModifRegistrationForm.py/performModifySessionItem (mod_rh_registrationFormModif.RHRegistrationFormSessionItemPerformModify)
+# Inactive: /confModifRegistrationForm.py/performModifySocialEventItem (mod_rh_registrationFormModif.RHRegistrationFormSocialEventItemPerformModify)
+# Inactive: /confModifRegistrationForm.py/removeAccommodationType (mod_rh_registrationFormModif.RHRegistrationFormModifAccommodationTypeRemove)
+# Inactive: /confModifRegistrationForm.py/removeGeneralField (mod_rh_registrationFormModif.RHRegistrationFormModifGeneralSectionFieldProcess)
+# Inactive: /confModifRegistrationForm.py/removeSession (mod_rh_registrationFormModif.RHRegistrationFormModifSessionsRemove)
+# Inactive: /confModifRegistrationForm.py/removeSocialEvent (mod_rh_registrationFormModif.RHRegistrationFormModifSocialEventRemove)
 
 
 # Routes for confModifRegistrationPreview.py
-legacy.add_url_rule('/confModifRegistrationPreview.py',
-                    'confModifRegistrationPreview',
-                    rh_as_view(mod_rh_registrationFormModif.RHRegistrationPreview),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifRegistrationPreview.py (mod_rh_registrationFormModif.RHRegistrationPreview)
 
 
 # Routes for confModifReviewing.py

@@ -31,7 +31,7 @@ class EPURLHandler(MainURLHandler):
 
 
 class UHConfModifEPayment(EPURLHandler):
-    _endpoint = 'legacy.confModifEpayment-modifModule'
+    _endpoint = 'event_mgmt.confModifEpayment-modifModule'
 
 
 class UHConfModifEPaymentYellowPay( UHConfModifEPayment ):
@@ -43,7 +43,7 @@ class UHConfModifEPaymentYellowPayPerformDataModif( UHConfModifEPayment ):
 
 
 class UHPay(EPURLHandler):
-    _endpoint = 'legacy.payment'
+    _endpoint = 'misc.payment'
 
     
 class UHPayConfirmYellowPay( UHPay ):

@@ -46,6 +46,9 @@ files.add_url_rule('/event/<confId>/contribution/<contribId>/material/<materialI
                    rh_as_view(fileAccess.RHFileAccess))
 files.add_url_rule('/event/<confId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',
                    rh_as_view(fileAccess.RHFileAccess))
+files.add_url_rule('/event/<confId>/registration/attachments/<registrantId>-<resId>.<fileExt>', 'getFile-access',
+                   rh_as_view(fileAccess.RHFileAccess))
+
 
 # File access (category)
 files.add_url_rule('/category/<categId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',

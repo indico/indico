@@ -44,26 +44,6 @@ from indico.web.flask.util import send_file
 class RHRegistrantListModifBase( registrationFormModif.RHRegistrationFormModifBase ):
     pass
 
-class RHRegistrantListMenuClose(RHRegistrantListModifBase):
-
-    def _checkParams( self, params ):
-        RHRegistrantListModifBase._checkParams( self, params )
-        self._currentURL = params.get("currentURL","")
-
-    def _process( self ):
-        session['RegistrantListMenuStatus'] = 'close'
-        self._redirect(self._currentURL)
-
-
-class RHRegistrantListMenuOpen(RHRegistrantListModifBase):
-
-    def _checkParams( self, params ):
-        RHRegistrantListModifBase._checkParams( self, params )
-        self._currentURL = params.get("currentURL","")
-
-    def _process( self ):
-        session['RegistrantListMenuStatus'] = 'open'
-        self._redirect(self._currentURL)
 
 class RHRegistrantListModif( RHRegistrantListModifBase ):
     """

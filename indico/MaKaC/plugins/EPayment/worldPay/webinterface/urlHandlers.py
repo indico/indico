@@ -31,7 +31,7 @@ class EPURLHandler(MainURLHandler):
 
 # URL for WorldPay configuration
 class UHConfModifEPayment(EPURLHandler):
-    _endpoint = 'legacy.confModifEpayment-modifModule'
+    _endpoint = 'event_mgmt.confModifEpayment-modifModule'
     
 
 class UHConfModifEPaymentWorldPay( UHConfModifEPayment ):
@@ -46,7 +46,7 @@ class UHConfModifEPaymentWorldPayPerformDataModif( UHConfModifEPayment ):
 
 # URL for WorldPay callback
 class UHPay(MainURLHandler):
-    _endpoint = 'legacy.payment'
+    _endpoint = 'misc.payment'
 
 class UHPayConfirmWorldPay( UHPay ):
     _requestTag = "confirm"

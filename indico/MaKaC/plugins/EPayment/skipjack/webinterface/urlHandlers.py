@@ -31,7 +31,7 @@ class EPURLHandler(MainURLHandler):
 
 # URL for Skipjack configuration
 class UHConfModifEPayment(EPURLHandler):
-    _endpoint = 'legacy.confModifEpayment-modifModule'
+    _endpoint = 'event_mgmt.confModifEpayment-modifModule'
     
 
 class UHConfModifEPaymentSkipjack( UHConfModifEPayment ):
@@ -46,7 +46,7 @@ class UHConfModifEPaymentSkipjackPerformDataModif( UHConfModifEPayment ):
 
 # URL for Skipjack callback
 class UHPay(EPURLHandler):
-    _endpoint = 'legacy.payment'
+    _endpoint = 'misc.payment'
 
 
 class UHPayConfirmSkipjack( UHPay ):

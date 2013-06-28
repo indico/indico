@@ -1269,7 +1269,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                 pass
             else:
                 sects.append(self._getMiscellaneousInfoHTML(formSection))
-        return "".join(sects)
+        return ''.join(x.encode('utf-8') if isinstance(x, unicode) else x for x in sects)
 
     def _getStatusesHTML(self):
         regForm = self._conf.getRegistrationForm()

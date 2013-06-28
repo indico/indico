@@ -295,7 +295,7 @@ class UHConferenceSendEmail(URLHandler):
 
 
 class UHRegistrantsSendEmail(URLHandler):
-    _endpoint = 'legacy.EMail-sendreg'
+    _endpoint = 'event_mgmt.EMail-sendreg'
 
 
 class UHConvenersSendEmail(URLHandler):
@@ -2814,253 +2814,245 @@ class UHConfRegistrationFormPerformModify(URLHandler):
 ###################################################################################
 ## epayment url
 class UHConfModifEPayment(URLHandler):
-    _endpoint = 'legacy.confModifEpayment'
+    _endpoint = 'event_mgmt.confModifEpayment'
 
 
 class UHConfModifEPaymentEnableSection(URLHandler):
-    _endpoint = 'legacy.confModifEpayment-enableSection'
+    _endpoint = 'event_mgmt.confModifEpayment-enableSection'
 
 
 class UHConfModifEPaymentChangeStatus(URLHandler):
-    _endpoint = 'legacy.confModifEpayment-changeStatus'
+    _endpoint = 'event_mgmt.confModifEpayment-changeStatus'
 
 
 class UHConfModifEPaymentdetailPaymentModification(URLHandler):
-    _endpoint = 'legacy.confModifEpayment-dataModif'
+    _endpoint = 'event_mgmt.confModifEpayment-dataModif'
 
 
 class UHConfModifEPaymentPerformdetailPaymentModification(URLHandler):
-    _endpoint = 'legacy.confModifEpayment-performDataModif'
+    _endpoint = 'event_mgmt.confModifEpayment-performDataModif'
 
 ###################################################################################
 
 
 class UHConfModifRegForm(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm'
+    _endpoint = 'event_mgmt.confModifRegistrationForm'
 
 
 class UHConfModifRegFormChangeStatus(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-changeStatus'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-changeStatus'
 
 
 class UHConfModifRegFormDataModification(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-dataModif'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-dataModif'
 
 
 class UHConfModifRegFormPerformDataModification(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performDataModif'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performDataModif'
 
 
 class UHConfModifRegFormSessions(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifSessions'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifSessions'
 
 
 class UHConfModifRegFormSessionsDataModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifSessionsData'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifSessionsData'
 
 
 class UHConfModifRegFormSessionsPerformDataModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performModifSessionsData'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifSessionsData'
 
 
 class UHConfModifRegFormSessionsAdd(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-addSession'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-addSession'
 
 
 class UHConfModifRegFormSessionsPerformAdd(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performAddSession'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performAddSession'
 
 
 class UHConfModifRegFormSessionsRemove(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-removeSession'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-removeSession'
 
 
 class UHConfModifRegFormSessionItemModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifySessionItem'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifySessionItem'
 
 
 class UHConfModifRegFormSessionItemPerformModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performModifySessionItem'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifySessionItem'
 
 
 class UHConfModifRegFormAccommodation(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifAccommodation'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifAccommodation'
 
 
 class UHConfModifRegFormAccommodationDataModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifAccommodationData'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifAccommodationData'
 
 
 class UHConfModifRegFormAccommodationPerformDataModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performModifAccommodationData'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifAccommodationData'
 
 
 class UHConfModifRegFormAccommodationTypeRemove(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-removeAccommodationType'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-removeAccommodationType'
 
 
 class UHConfModifRegFormAccommodationTypeAdd(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-addAccommodationType'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-addAccommodationType'
 
 
 class UHConfModifRegFormAccommodationTypePerformAdd(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performAddAccommodationType'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performAddAccommodationType'
 
 
 class UHConfModifRegFormAccommodationTypeModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifyAccommodationType'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifyAccommodationType'
 
 
 class UHConfModifRegFormAccommodationTypePerformModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performModifyAccommodationType'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifyAccommodationType'
 
 
 class UHConfModifRegFormReasonParticipation(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifReasonParticipation'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifReasonParticipation'
 
 
 class UHConfModifRegFormReasonParticipationDataModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifReasonParticipationData'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifReasonParticipationData'
 
 
 class UHConfModifRegFormReasonParticipationPerformDataModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performModifReasonParticipationData'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifReasonParticipationData'
 
 
 class UHConfModifRegFormFurtherInformation(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifFurtherInformation'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifFurtherInformation'
 
 
 class UHConfModifRegFormFurtherInformationDataModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifFurtherInformationData'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifFurtherInformationData'
 
 
 class UHConfModifRegFormFurtherInformationPerformDataModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performModifFurtherInformationData'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifFurtherInformationData'
 
 
 class UHConfModifRegFormSocialEvent(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifSocialEvent'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifSocialEvent'
 
 
 class UHConfModifRegFormSocialEventDataModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifSocialEventData'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifSocialEventData'
 
 
 class UHConfModifRegFormSocialEventPerformDataModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performModifSocialEventData'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifSocialEventData'
 
 
 class UHConfModifRegFormSocialEventRemove(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-removeSocialEvent'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-removeSocialEvent'
 
 
 class UHConfModifRegFormSocialEventAdd(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-addSocialEvent'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-addSocialEvent'
 
 
 class UHConfModifRegFormSocialEventPerformAdd(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performAddSocialEvent'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performAddSocialEvent'
 
 
 class UHConfModifRegFormSocialEventItemModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifySocialEventItem'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifySocialEventItem'
 
 
 class UHConfModifRegFormSocialEventItemPerformModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performModifySocialEventItem'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifySocialEventItem'
 
 
 class UHConfModifRegFormActionStatuses(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-actionStatuses'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-actionStatuses'
 
 
 class UHConfModifRegFormStatusModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifStatus'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifStatus'
 
 
 class UHConfModifRegFormStatusPerformModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performModifStatus'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifStatus'
 
 
 class UHConfModifRegFormActionSection(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-actionSection'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-actionSection'
 
 
 class UHConfModifRegFormGeneralSection(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifGeneralSection'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifGeneralSection'
 
 
 class UHConfModifRegFormGeneralSectionDataModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifGeneralSectionData'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifGeneralSectionData'
 
 
 class UHConfModifRegFormGeneralSectionPerformDataModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performModifGeneralSectionData'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifGeneralSectionData'
 
 
 class UHConfModifRegFormGeneralSectionFieldAdd(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-addGeneralField'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-addGeneralField'
 
 
 class UHConfModifRegFormGeneralSectionFieldPerformAdd(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performAddGeneralField'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performAddGeneralField'
 
 
 class UHConfModifRegFormGeneralSectionFieldRemove(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-removeGeneralField'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-removeGeneralField'
 
 
 class UHConfModifRegFormGeneralSectionFieldModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-modifGeneralField'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifGeneralField'
 
 
 class UHConfModifRegFormGeneralSectionFieldPerformModif(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-performModifGeneralField'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifGeneralField'
 
 
 class UHConfModifRegistrationPreview(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationPreview'
+    _endpoint = 'event_mgmt.confModifRegistrationPreview'
 
 
 class UHConfModifRegistrantList(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants'
+    _endpoint = 'event_mgmt.confModifRegistrants'
 
 
 class UHConfModifRegistrantNew(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-newRegistrant'
-
-
-class UHConfModifRegistrantsOpenMenu(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-openMenu'
-
-
-class UHConfModifRegistrantsCloseMenu(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-closeMenu'
+    _endpoint = 'event_mgmt.confModifRegistrants-newRegistrant'
 
 
 class UHConfModifRegistrantListAction(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-action'
+    _endpoint = 'event_mgmt.confModifRegistrants-action'
 
 
 class UHConfModifRegistrantPerformRemove(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-remove'
+    _endpoint = 'event_mgmt.confModifRegistrants-remove'
 
 
 class UHRegistrantModification(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-modification'
+    _endpoint = 'event_mgmt.confModifRegistrants-modification'
 
 
 class UHRegistrantAttachmentFileAccess(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-getAttachedFile'
+    _endpoint = 'event_mgmt.confModifRegistrants-getAttachedFile'
 
 
 class UHConfModifRegFormEnableSection(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-enableSection'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-enableSection'
 
 
 class UHConfModifRegFormEnablePersonalField(URLHandler):
-    _endpoint = 'legacy.confModifRegistrationForm-enablePersonalField'
+    _endpoint = 'event_mgmt.confModifRegistrationForm-enablePersonalField'
 
 
 class UHCategoryStatistics(URLHandler):
@@ -3088,43 +3080,43 @@ class UHConfRegistrantsList(URLHandler):
 
 
 class UHConfModifRegistrantSessionModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-modifySessions'
+    _endpoint = 'event_mgmt.confModifRegistrants-modifySessions'
 
 
 class UHConfModifRegistrantSessionPeformModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-performModifySessions'
+    _endpoint = 'event_mgmt.confModifRegistrants-performModifySessions'
 
 
 class UHConfModifRegistrantTransactionModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-modifyTransaction'
+    _endpoint = 'event_mgmt.confModifRegistrants-modifyTransaction'
 
 
 class UHConfModifRegistrantTransactionPeformModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-peformModifyTransaction'
+    _endpoint = 'event_mgmt.confModifRegistrants-peformModifyTransaction'
 
 
 class UHConfModifRegistrantAccoModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-modifyAccommodation'
+    _endpoint = 'event_mgmt.confModifRegistrants-modifyAccommodation'
 
 
 class UHConfModifRegistrantAccoPeformModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-performModifyAccommodation'
+    _endpoint = 'event_mgmt.confModifRegistrants-performModifyAccommodation'
 
 
 class UHConfModifRegistrantSocialEventsModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-modifySocialEvents'
+    _endpoint = 'event_mgmt.confModifRegistrants-modifySocialEvents'
 
 
 class UHConfModifRegistrantSocialEventsPeformModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-performModifySocialEvents'
+    _endpoint = 'event_mgmt.confModifRegistrants-performModifySocialEvents'
 
 
 class UHConfModifRegistrantReasonPartModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-modifyReasonParticipation'
+    _endpoint = 'event_mgmt.confModifRegistrants-modifyReasonParticipation'
 
 
 class UHConfModifRegistrantReasonPartPeformModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-performModifyReasonParticipation'
+    _endpoint = 'event_mgmt.confModifRegistrants-performModifyReasonParticipation'
 
 
 class UHConfModifPendingQueues(URLHandler):
@@ -3148,11 +3140,11 @@ class UHConfModifPendingQueuesActionCoord(URLHandler):
 
 
 class UHConfModifRegistrantMiscInfoModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-modifyMiscInfo'
+    _endpoint = 'event_mgmt.confModifRegistrants-modifyMiscInfo'
 
 
 class UHConfModifRegistrantMiscInfoPerformModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-performModifyMiscInfo'
+    _endpoint = 'event_mgmt.confModifRegistrants-performModifyMiscInfo'
 
 
 class UHUserSearchCreateExternalUser(URLHandler):
@@ -3160,11 +3152,11 @@ class UHUserSearchCreateExternalUser(URLHandler):
 
 
 class UHConfModifRegistrantStatusesModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-modifyStatuses'
+    _endpoint = 'event_mgmt.confModifRegistrants-modifyStatuses'
 
 
 class UHConfModifRegistrantStatusesPerformModify(URLHandler):
-    _endpoint = 'legacy.confModifRegistrants-performModifyStatuses'
+    _endpoint = 'event_mgmt.confModifRegistrants-performModifyStatuses'
 
 
 class UHGetCalendarOverview(URLHandler):

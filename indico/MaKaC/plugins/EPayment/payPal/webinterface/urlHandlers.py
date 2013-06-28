@@ -30,7 +30,7 @@ class EPURLHandler(MainURLHandler):
 
 
 class UHConfModifEPayment(EPURLHandler):
-    _endpoint = 'legacy.confModifEpayment-modifModule'
+    _endpoint = 'event_mgmt.confModifEpayment-modifModule'
 
 
 class UHConfModifEPaymentPayPal( UHConfModifEPayment ):
@@ -42,7 +42,7 @@ class UHConfModifEPaymentPayPalPerformDataModif( UHConfModifEPayment ):
 
 
 class UHPay(EPURLHandler):
-    _endpoint = 'legacy.payment'
+    _endpoint = 'misc.payment'
 
 class UHPayConfirmPayPal( UHPay ):
     _requestTag = "confirm"      

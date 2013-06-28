@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 import random, time
 from hashlib import md5
@@ -1845,7 +1846,9 @@ class FileInput(FieldInputType):
     getName=classmethod(getName)
 
     def getValueDisplay(self, value):
-        return """<a href="%s" target="_blank">%s</a>"""%(urlHandlers.UHRegistrantAttachmentFileAccess.getURL(value), value.getFileName())
+        uh = (urlHandlers.UHRegistrantAttachmentFileAccess if request.blueprint == 'event_mgmt' else
+              urlHandlers.UHFileAccess)
+        return """<a href="%s">%s</a>""" % (uh.getURL(value), value.getFileName())
 
     def _getModifHTML(self, item, registrant, default=None):
         from MaKaC.webinterface.pages.registrationForm import WFileInputField
