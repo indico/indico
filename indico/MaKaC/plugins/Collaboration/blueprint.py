@@ -18,12 +18,14 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.plugins.Collaboration.handlers as handlers
+from MaKaC.plugins.Collaboration.urlHandlers import RHCollaborationHtdocs
 from indico.web.flask.util import rh_as_view, make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 blueprint = IndicoBlueprint('collaboration', __name__)
 
+# Speaker Agreement
 blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/', 'elecAgree',
                        rh_as_view(handlers.RHElectronicAgreement))
 blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/upload', 'uploadElecAgree',
@@ -33,8 +35,24 @@ blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/download'
 blueprint.add_url_rule('/event/<confId>/collaboration/agreement', 'elecAgreeForm',
                        rh_as_view(handlers.RHElectronicAgreementForm))
 
-blueprint.add_url_rule('/Collaboration/<plugin>/<path:filepath>', 'htdocs', rh_as_view(handlers.RHCollaborationHtdocs))
-blueprint.add_url_rule('/Collaboration/<path:filepath>', 'htdocs', rh_as_view(handlers.RHCollaborationHtdocs))
+# Manage event
+blueprint.add_url_rule('/event/<confId>/manage/collaboration/', 'confModifCollaboration',
+                       rh_as_view(handlers.RHConfModifCSBookings), methods=('GET', 'POST'))
+blueprint.add_url_rule('/event/<confId>/manage/collaboration/<tab>/', 'confModifCollaboration',
+                       rh_as_view(handlers.RHConfModifCSBookings), methods=('GET', 'POST'))
+blueprint.add_url_rule('/event/<confId>/manage/collaboration/managers', 'confModifCollaboration-managers',
+                       rh_as_view(handlers.RHConfModifCSProtection))
+
+# Display event
+blueprint.add_url_rule('/event/<confId>/collaboration', 'collaborationDisplay',
+                       rh_as_view(handlers.RHCollaborationDisplay))
+
+# Collaboration admin
+blueprint.add_url_rule('/admin/collaboration', 'adminCollaboration', rh_as_view(handlers.RHAdminCollaboration))
+
+# htdocs
+blueprint.add_url_rule('/Collaboration/<plugin>/<path:filepath>', 'htdocs', rh_as_view(RHCollaborationHtdocs))
+blueprint.add_url_rule('/Collaboration/<path:filepath>', 'htdocs', rh_as_view(RHCollaborationHtdocs))
 
 # we can't use make_compat_blueprint here because the old url doesn't end in .py
 compat = IndicoBlueprint('compat_collaboration', __name__)

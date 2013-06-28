@@ -109,7 +109,6 @@ var Indico = {
         ConferenceDisplay: ${ urlHandlers.UHConferenceDisplay.getURL().js_router | j,n },
         ContributionDisplay: ${ urlHandlers.UHContributionDisplay.getURL().js_router | j,n },
         SessionDisplay: ${ urlHandlers.UHSessionDisplay.getURL().js_router | j,n },
-        ConfCollaborationDisplay: ${ urlHandlers.UHCollaborationDisplay.getURL().js_router | j,n },
 
         ContribToXML: ${ urlHandlers.UHContribToXML.getURL().js_router | j,n },
         ContribToPDF: ${ urlHandlers.UHContribToPDF.getURL().js_router | j,n },

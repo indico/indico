@@ -26,6 +26,7 @@ from MaKaC.common.Configuration import Config
 import MaKaC.user as user
 from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
+from MaKaC.common.contextManager import ContextManager
 
 
 class BooleanOnMixin:
@@ -430,7 +431,6 @@ class UHRoomBookingBookingDetails(URLHandler):
         return params
 
 
-
 class UHRoomBookingRoomForm(URLHandler):
     _endpoint = 'rooms_admin.roomBooking-roomForm'
 
@@ -560,8 +560,8 @@ class UHRoomBookingBlockingForm(URLHandler):
 class UHRoomBookingDeleteBlocking(URLHandler):
     _endpoint = 'rooms.roomBooking-deleteBlocking'
 
-# For the event ==============================================================
 
+# For the event ==============================================================
 class UHConfModifRoomBookingBase(URLHandler):
     @classmethod
     def _getURL(cls, target=None, **params):
@@ -572,6 +572,7 @@ class UHConfModifRoomBookingBase(URLHandler):
         if conf:
             url.addParams(conf.getLocator())
         return url
+
 
 class UHConfModifRoomBookingChooseEvent(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-roomBookingChooseEvent'

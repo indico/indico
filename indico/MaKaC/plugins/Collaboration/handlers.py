@@ -167,7 +167,6 @@ class RHConfModifCSBase(RHConferenceModifBase):
 
 
 class RHConfModifCSBookings(RoomBookingDBMixin, RHConfModifCSBase):
-    _url = r'^/Collaboration/bookingModif/?$'
     _tohttps = True
 
     def _checkParams(self, params):
@@ -206,7 +205,6 @@ class RHConfModifCSBookings(RoomBookingDBMixin, RHConfModifCSBase):
                 return p.display()
 
 class RHConfModifCSProtection(RHConfModifCSBase):
-    _url = r'^/Collaboration/managers/?$'
 
     def _checkParams(self, params):
         RHConfModifCSBase._checkParams(self, params)
@@ -330,7 +328,6 @@ class RHElectronicAgreementForm(RHConferenceBaseDisplay):
 
 ################################################### Server Wide pages #########################################
 class RHAdminCollaboration(RHAdminBase):
-    _url = r'^/Collaboration/admin'
 
     def _checkParams( self, params ):
         RHAdminBase._checkParams( self, params )
@@ -364,7 +361,6 @@ class RHAdminCollaboration(RHAdminBase):
 
 ################################################### Event Display Request Handlers ####################################
 class RHCollaborationDisplay(RHConferenceBaseDisplay):
-    _url = r'^/Collaboration/display/?$'
 
     def _process( self ):
         p = WPCollaborationDisplay( self, self._target )

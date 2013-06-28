@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceDisplay, collaboration
+from MaKaC.webinterface.rh import conferenceDisplay
 from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.display import event
 
@@ -39,9 +39,6 @@ event.add_url_rule('/my-conference/tracks', 'myconference-myTracks',
 
 # Custom pages
 event.add_url_rule('/page/<pageId>', 'internalPage', rh_as_view(conferenceDisplay.RHInternalPageDisplay))
-
-# Collaboration
-event.add_url_rule('/collaboration', 'collaborationDisplay', rh_as_view(collaboration.RHCollaborationDisplay))
 
 # Other views
 event.add_url_rule('/other-view', 'conferenceOtherViews', rh_as_view(conferenceDisplay.RHConferenceOtherViews))

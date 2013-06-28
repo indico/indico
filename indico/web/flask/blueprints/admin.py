@@ -18,7 +18,7 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import admins, announcement, taskManager, maintenance, domains, users, groups, templates, \
-    conferenceModif, collaboration, services, api, oauth
+    conferenceModif, services, api, oauth
 from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -132,9 +132,6 @@ admin.add_url_rule('/layout/posters/save', 'posterTemplates-posterPrinting',
                    rh_as_view(conferenceModif.RHConfPosterPrinting), methods=('GET', 'POST'))
 admin.add_url_rule('/layout/posters/design', 'posterTemplates-posterDesign',
                    rh_as_view(templates.RHConfPosterDesign), methods=('GET', 'POST'))
-
-# Collaboration
-admin.add_url_rule('/collaboration', 'adminCollaboration', rh_as_view(collaboration.RHAdminCollaboration))
 
 # IP ACL
 admin.add_url_rule('/protection/ip-acl', 'adminServices-ipbasedacl', rh_as_view(services.RHIPBasedACL))

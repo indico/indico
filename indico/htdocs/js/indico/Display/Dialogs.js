@@ -95,7 +95,6 @@ type("ApplyForParticipationPopup", ["ServiceDialogWithButtons"], {
     }
 );
 
-
 type("BasicEmailPopup", ["ExclusivePopupWithButtons"],{
 
     _getButtons: function(){
