@@ -1,23 +1,30 @@
 <%page args="unrolledReservations=None, withPhoto=None"/>
 <script type="text/javascript">
+    function submit_rejection(url) {
+        $('<form>', {
+            method: 'POST',
+            action: url
+        }).submit();
+    }
+
     function confirm_reject_occurrence(element, date)
     {
         var reason = prompt( 'Are you sure you want to REJECT the booking for '+date+'? If so, please give a reason:', '' );
-        if ( !reason )
+        if (!reason)
             return false;
 
-        element.href = build_url(element.href, {reason: reason});
-        return true;
+        submit_rejection(build_url(element.href, {reason: reason}));
+        return false;
     }
 
     function confirm_reject_reservation(element, date)
     {
         var reason = prompt( 'Are you sure you want to REJECT the booking for '+date+'? If so, please give a reason:', '' );
-        if ( !reason )
+        if (!reason)
             return false;
 
-        element.href = build_url(element.href, {reason: reason});
-        return true;
+        submit_rejection(build_url(element.href, {reason: reason}));
+        return false;
     }
 </script>
 % for collision in unrolledReservations:
@@ -26,7 +33,7 @@
 
     occurrence = collision
     myDetails = bookingDetailsUH.getURL( reservation )
-    rejectOccurrence = urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( reservation, date=formatDate(occurrence.startDT.date()) )
+    rejectOccurrence = urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( reservation, date=formatDate(occurrence.startDT.date(), format='%Y-%m-%d') )
     rejectReservation = urlHandlers.UHRoomBookingRejectBooking.getURL( reservation )
 
     onClickDetails = ""

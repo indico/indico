@@ -574,35 +574,39 @@ class UHConfModifRoomBookingBase(URLHandler):
         return url
 
 class UHConfModifRoomBookingChooseEvent(URLHandler):
-    _endpoint = 'legacy.conferenceModification-roomBookingChooseEvent'
+    _endpoint = 'event_mgmt.conferenceModification-roomBookingChooseEvent'
 
 
 class UHConfModifRoomBookingSearch4Rooms(BooleanTrueMixin, URLHandler):
-    _endpoint = 'legacy.conferenceModification-roomBookingSearch4Rooms'
+    _endpoint = 'event_mgmt.conferenceModification-roomBookingSearch4Rooms'
 
 
 class UHConfModifRoomBookingList(URLHandler):
-    _endpoint = 'legacy.conferenceModification-roomBookingList'
+    _endpoint = 'event_mgmt.conferenceModification-roomBookingList'
 
 
 class UHConfModifRoomBookingRoomList(URLHandler):
-    _endpoint = 'legacy.conferenceModification-roomBookingRoomList'
+    _endpoint = 'event_mgmt.conferenceModification-roomBookingRoomList'
 
 
 class UHConfModifRoomBookingDetails(URLHandler):
-    _endpoint = 'legacy.conferenceModification-roomBookingDetails'
+    _endpoint = 'event_mgmt.conferenceModification-roomBookingDetails'
 
 
 class UHConfModifRoomBookingRoomDetails(UHConfModifRoomBookingBase):
-    _endpoint = 'legacy.conferenceModification-roomBookingRoomDetails'
+    _endpoint = 'event_mgmt.conferenceModification-roomBookingRoomDetails'
 
 
 class UHConfModifRoomBookingBookingForm(UHConfModifRoomBookingBase):
-    _endpoint = 'legacy.conferenceModification-roomBookingBookingForm'
+    _endpoint = 'event_mgmt.conferenceModification-roomBookingBookingForm'
+
+
+class UHConfModifRoomBookingModifyBookingForm(UHConfModifRoomBookingBase):
+    _endpoint = 'event_mgmt.conferenceModification-roomBookingModifyBookingForm'
 
 
 class UHConfModifRoomBookingCloneBooking(UHConfModifRoomBookingBase):
-    _endpoint = 'legacy.conferenceModification-roomBookingCloneBooking'
+    _endpoint = 'event_mgmt.conferenceModification-roomBookingCloneBooking'
 
     @classmethod
     def getURL(cls, target=None, conf=None, **params):
@@ -613,7 +617,7 @@ class UHConfModifRoomBookingCloneBooking(UHConfModifRoomBookingBase):
 
 
 class UHConfModifRoomBookingSaveBooking(URLHandler):
-    _endpoint = 'legacy.conferenceModification-roomBookingSaveBooking'
+    _endpoint = 'event_mgmt.conferenceModification-roomBookingSaveBooking'
 
 
 class UHRoomPhoto(URLHandler):

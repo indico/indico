@@ -1494,51 +1494,15 @@ legacy.add_url_rule('/conferenceModification.py/modificationClosed',
                     methods=('GET', 'POST'))
 # Inactive: /conferenceModification.py/open (mod_rh_conferenceModif.RHConferenceOpen)
 # Inactive: /conferenceModification.py/removeContribType (mod_rh_conferenceModif.RHConfRemoveContribType)
-
-legacy.add_url_rule('/conferenceModification.py/roomBookingBookingForm',
-                    'conferenceModification-roomBookingBookingForm',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifRoomBookingBookingForm),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/roomBookingChooseEvent',
-                    'conferenceModification-roomBookingChooseEvent',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifRoomBookingChooseEvent),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/roomBookingCloneBooking',
-                    'conferenceModification-roomBookingCloneBooking',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifRoomBookingCloneBooking),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/roomBookingDetails',
-                    'conferenceModification-roomBookingDetails',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifRoomBookingDetails),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/roomBookingList',
-                    'conferenceModification-roomBookingList',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifRoomBookingList),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/roomBookingRoomDetails',
-                    'conferenceModification-roomBookingRoomDetails',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifRoomBookingRoomDetails),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/roomBookingRoomList',
-                    'conferenceModification-roomBookingRoomList',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifRoomBookingRoomList),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/roomBookingSaveBooking',
-                    'conferenceModification-roomBookingSaveBooking',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifRoomBookingSaveBooking),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/conferenceModification.py/roomBookingSearch4Rooms',
-                    'conferenceModification-roomBookingSearch4Rooms',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifRoomBookingSearch4Rooms),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceModification.py/roomBookingBookingForm (mod_rh_conferenceModif.RHConfModifRoomBookingBookingForm)
+# Inactive: /conferenceModification.py/roomBookingChooseEvent (mod_rh_conferenceModif.RHConfModifRoomBookingChooseEvent)
+# Inactive: /conferenceModification.py/roomBookingCloneBooking (mod_rh_conferenceModif.RHConfModifRoomBookingCloneBooking)
+# Inactive: /conferenceModification.py/roomBookingDetails (mod_rh_conferenceModif.RHConfModifRoomBookingDetails)
+# Inactive: /conferenceModification.py/roomBookingList (mod_rh_conferenceModif.RHConfModifRoomBookingList)
+# Inactive: /conferenceModification.py/roomBookingRoomDetails (mod_rh_conferenceModif.RHConfModifRoomBookingRoomDetails)
+# Inactive: /conferenceModification.py/roomBookingRoomList (mod_rh_conferenceModif.RHConfModifRoomBookingRoomList)
+# Inactive: /conferenceModification.py/roomBookingSaveBooking (mod_rh_conferenceModif.RHConfModifRoomBookingSaveBooking)
+# Inactive: /conferenceModification.py/roomBookingSearch4Rooms (mod_rh_conferenceModif.RHConfModifRoomBookingSearch4Rooms)
 # Inactive: /conferenceModification.py/screenDates (mod_rh_conferenceModif.RHConfScreenDatesEdit)
 
 legacy.add_url_rule('/conferenceModification.py/sectionsSettings',
