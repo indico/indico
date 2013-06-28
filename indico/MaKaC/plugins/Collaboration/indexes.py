@@ -616,6 +616,9 @@ class BookingManagerConferenceIndex(Persistent):
         self._tree = OOBTree()
         self._name =  "bookingManagerByConf"
 
+    def initialize(self, dbi=None):
+        pass
+
     def getName(self):
         return self._name
 
