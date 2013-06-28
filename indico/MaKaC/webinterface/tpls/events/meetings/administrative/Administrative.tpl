@@ -1,4 +1,4 @@
-<%page args="showOrder=False"/>
+<%page args="showOrder=True"/>
 <%namespace name="common" file="../${context['INCLUDE']}/Common.tpl"/>
 <%!
   allMaterial = False
@@ -85,11 +85,13 @@
                         </tr>
                     % endif
                     % if getItemType(item) == "Session":
-                        <%include file="include/Session.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, showOrder=True"/>
+                        <%include file="include/Session.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, showOrder=showOrder"/>
                     % else:
                         <%include file="include/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=showOrder"/>
                     % endif
-                    <% order +=1 %>
+                    % if getItemType(item) != "Break":
+                        <% order +=1 %>
+                    % endif
                 % endfor
             </table>
         </%block>

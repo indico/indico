@@ -38,6 +38,14 @@ class ConferenceAbstractsBookSortBy( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._conf.getBOAConfig().getSortBy()
 
+class ConferenceAbstractsBookCorrespondingAuthor( ConferenceTextModificationBase ):
+
+    def _handleSet(self):
+        self._conf.getBOAConfig().setCorrespondingAuthor(self._value)
+
+    def _handleGet(self):
+        return self._conf.getBOAConfig().getCorrespondingAuthor()
+
 
 class ConferenceAbstractsBookToggleCache (ConferenceModifBase):
     """
@@ -62,6 +70,7 @@ class ConferenceAbstractsBookDirtyCache (ConferenceModifBase):
 methodMap = {
     "abstractsbook.changeAdditionalText": ConferenceAbstractsBookAdditionalText,
     "abstractsbook.changeSortBy": ConferenceAbstractsBookSortBy,
+    "abstractsbook.changeCorrespondingAuthor": ConferenceAbstractsBookCorrespondingAuthor,
     "abstractsbook.toggleCache": ConferenceAbstractsBookToggleCache,
     "abstractsbook.dirtyCache": ConferenceAbstractsBookDirtyCache
     }

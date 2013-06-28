@@ -1045,6 +1045,9 @@ class ConferenceInviteParticipants(ConferenceParticipantBase, ConferenceParticip
         else:
             data["fromAddr"] = formataddr((self._conf.getTitle(), Config.getInstance().getNoReplyEmail()))
 
+        if self._emailBody.find('{urlInvitation}') == -1:
+            raise NoReportError(_("The {urlInvitation} field is missing in your email. This is a mandatory field thus, this email cannot be sent."))
+
         data["subject"] = self._emailSubject
         data["body"] = self._emailBody
         for user in self._userList:

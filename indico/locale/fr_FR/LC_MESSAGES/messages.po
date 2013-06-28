@@ -19177,7 +19177,7 @@ msgstr "Date limite de modification"
 
 #: MaKaC/webinterface/tpls/ConfModifRegFormDataModification.tpl:93
 #: indico/MaKaC/webinterface/tpls/ConfModifRegFormDataModification.tpl:93
-msgid "Email organisators"
+msgid "Email organisers"
 msgstr "Envoyer un courriel aux organisateurs"
 
 #: MaKaC/webinterface/tpls/ConfModifRegFormDataModification.tpl:94

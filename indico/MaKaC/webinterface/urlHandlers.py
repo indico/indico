@@ -64,9 +64,11 @@ class URLHandler(object):
             Parameters:
                 params - (Dict) parameters to be added to the URL.
         """
-        rh = ContextManager.get('currentRH', None)
 
-        if rh and rh._req.is_https() and Config.getInstance().getBaseSecureURL():
+        rh = ContextManager.get('currentRH', None)
+        req = rh._req if rh else ContextManager.get('currentReq', None)
+
+        if req and req.is_https() and Config.getInstance().getBaseSecureURL():
             baseURL = Config.getInstance().getBaseSecureURL()
         else:
             baseURL = Config.getInstance().getBaseURL()
@@ -550,6 +552,16 @@ class UHRoomBookingDeleteBlocking( URLHandler ):
 
 # For the event ==============================================================
 
+class UHConfModifRoomBookingBase(URLHandler):
+    @classmethod
+    def _getURL(cls, target=None, **params):
+        url = super(UHConfModifRoomBookingBase, cls)._getURL(**params)
+        if target:
+            url.setParams(target.getLocator())
+        conf = ContextManager.get("currentConference", None)
+        if conf:
+            url.addParams(conf.getLocator())
+        return url
 
 class UHConfModifRoomBookingChooseEvent( URLHandler ):
     _relativeURL = "conferenceModification.py/roomBookingChooseEvent"
@@ -573,23 +585,14 @@ class UHConfModifRoomBookingRoomList( URLHandler ):
 
 class UHConfModifRoomBookingDetails( URLHandler ):
     _relativeURL = "conferenceModification.py/roomBookingDetails"
-class UHConfModifRoomBookingRoomDetails( URLHandler ):
+class UHConfModifRoomBookingRoomDetails(UHConfModifRoomBookingBase):
     _relativeURL = "conferenceModification.py/roomBookingRoomDetails"
 
-class UHConfModifRoomBookingBookingForm( URLHandler ):
+class UHConfModifRoomBookingBookingForm(UHConfModifRoomBookingBase):
     _relativeURL = "conferenceModification.py/roomBookingBookingForm"
 
-class UHConfModifRoomBookingCloneBooking( URLHandler ):
+class UHConfModifRoomBookingCloneBooking(UHConfModifRoomBookingBase):
     _relativeURL = "conferenceModification.py/roomBookingCloneBooking"
-
-    @classmethod
-    def getURL(cls, target=None, conf=None, **params):
-        url = cls._getURL(**params)
-        if target is not None:
-            url.addParams(target.getLocator())
-        if conf is not None:
-            url.addParams(conf.getLocator())
-        return url
 
 class UHConfModifRoomBookingSaveBooking( URLHandler ):
     _relativeURL = "conferenceModification.py/roomBookingSaveBooking"

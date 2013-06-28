@@ -654,6 +654,9 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor", "ErrorAware"],
 
 type("RealtimeTextArea", ["RealtimeTextBox"],
      {
+         onChange: function(callback){
+             this.input.observeEvent('change',callback);
+         }
      },
      function(args) {
 

@@ -102,9 +102,8 @@ type("TimetableBlockBase", [],
 
              var button = Html.div('timetableBlockMaterial');
              button.observeClick(function(e) {
-                 e.stopPropagation();
+                 stopPropagation(e);
                  self.closePopup();
-
                  // use this style as long as the menu is open
                  button.dom.className = "timetableBlockMaterial timetableBlockMaterialActive";
                  $(".timetableBlockMaterialActive").qtip({

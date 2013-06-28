@@ -84,7 +84,12 @@ type("RichTextEditor", ["IWidget", "Accessor"],
 
          getEditor: function() {
              return CKEDITOR.instances["text" + this.divId];
+         },
+
+         onChange: function(callback) {
+             this.getEditor().on('change', callback);
          }
+
      },
      function(width, height, toolbarSet) {
          this.onLoadList = new WatchList();
@@ -181,6 +186,13 @@ type("RichTextWidget", ["IWidget", "Accessor"],
 
          destroy: function() {
              this.rich.destroy();
+         },
+
+         onChange: function(callback) {
+             this.plain.onChange(callback);
+             if(this.loaded){
+                 this.rich.onChange(callback);
+             }
          }
      },
      function(width, height, initialText, mode, toolbarSet, hideSwitchLink) {
@@ -250,12 +262,12 @@ type("RichTextWidget", ["IWidget", "Accessor"],
 
 type("ParsedRichTextWidget",['RichTextWidget'],
         {
-            clean: function(){
-                if(this.activeAccessor == this.rich)
-                    return this.rich.clean();
-                else if(this.activeAccessor == this.plain)
-                    return cleanText(this.plain.get(),this.plain);
-            }
+         clean: function(){
+             if(this.activeAccessor == this.rich)
+                 return this.rich.clean();
+             else if(this.activeAccessor == this.plain)
+                 return cleanText(this.plain.get(),this.plain);
+         }
         },
         function(width, height, initialText, mode, toolbarSet, hideSwitchLink) {
             this.RichTextWidget(width, height, initialText, mode, toolbarSet, hideSwitchLink);

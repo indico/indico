@@ -116,42 +116,27 @@ else:
 
 <script type="text/javascript">
 $(function() {
-    function setMouseEvents(element, tooltipText) {
-        var tooltipText = "<span style='padding:3px'>" + tooltipText + "</span>";
-        element.dom.onmouseover = function(event) {
-            IndicoUI.Widgets.Generic.tooltip(element.dom, event, tooltipText);
-        }
+    function createTooltip(element, tooltipText) {
+        element.qtip({
+            content: {
+                text: $("<span style='padding:3px' />").append(tooltipText)
+            }
+        });
     }
 
-    setMouseEvents($E('homeButton'), '${ _("Go to Indico Home Page")}');
-
-    if (exists($E('firstEventButton'))) {
-        setMouseEvents($E('firstEventButton'), '${ _("Oldest event")}');
-    }
-
-    if (exists($E('previousEventButton'))) {
-        setMouseEvents($E('previousEventButton'), '${ _("Older event")}');
-    }
-
-    setMouseEvents($E('upToCategoryButton'), '${ _("Up to category")}');
-
-    if (exists($E('nextEventButton'))) {
-        setMouseEvents($E('nextEventButton'), '${ _("Newer event")}');
-    }
-
-    if (exists($E('lastEventButton'))) {
-        setMouseEvents($E('lastEventButton'), '${ _("Newest event")}');
-    }
-
-    if (exists($E('printButton'))) {
-        setMouseEvents($E('printButton'), '${ _("Printable version")}');
-    }
+    createTooltip($('#homeButton'), '${ _("Go to Indico Home Page")}');
+    createTooltip($('#firstEventButton'), '${ _("Oldest event")}');
+    createTooltip($('#previousEventButton'), '${ _("Older event")}');
+    createTooltip($('#upToCategoryButton'), '${ _("Up to category")}');
+    createTooltip($('#nextEventButton'), '${ _("Newer event")}');
+    createTooltip($('#lastEventButton'), '${ _("Newest event")}');
+    createTooltip($('#printButton'), '${ _("Printable version")}');
+    createTooltip($('#manageEventButton'), '${ _("Switch to management area for this event")}');
 
     $(".exportIcal").click(function(){
         $(this).trigger('menu_select');
     });
 
-    setMouseEvents($E('manageEventButton'), '${ _("Switch to management area for this event")}');
 });
 
 </script>

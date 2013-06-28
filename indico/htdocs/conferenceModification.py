@@ -17,39 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-# The following is a (failed) trial to reload modules
-# for each request, so you do not have to restart apache.
-# Pitty.
-
-#import sys
-#oryginalModules = sys.modules.copy()
-
-#import __builtin__
-#class RollbackImporter:
-#
-#    def __init__(self):
-#        "Creates an instance and installs as the global importer"
-#
-#        self.previousModules = sys.modules.copy()
-#        self.realImport = __builtin__.__import__
-#        __builtin__.__import__ = self._import
-#        self.newModules = {}
-#
-#    def _import(self, name, globals=None, locals=None, fromlist=[]):
-#        result = apply(self.realImport, (name, globals, locals, fromlist))
-#        self.newModules[name] = 1
-#        return result
-#
-#    def uninstall(self):
-#        for modname in self.newModules.keys():
-#            if not self.previousModules.has_key(modname):
-#                # Force reload when modname next imported
-#                del(sys.modules[modname])
-#
-#        __builtin__.__import__ = self.realImport
-
-#rollbackImporter = RollbackImporter()
-
 from MaKaC.webinterface.rh import conferenceModif
 
 def index(req, **params):
@@ -139,9 +106,5 @@ def roomBookingCloneBooking( req, **params ):
 
 # 4. New booking: physical insert
 def roomBookingSaveBooking( req, **params ):
-#    import wingdbstub
-#    if wingdbstub.debugger != None:
-#        wingdbstub.debugger.StartDebug()
     return conferenceModif.RHConfModifRoomBookingSaveBooking(req).process(params)
 
-roomBookingChooseEvent

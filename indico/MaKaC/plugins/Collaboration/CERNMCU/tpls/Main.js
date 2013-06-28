@@ -257,9 +257,9 @@
         disableCustomId();
         % if IncludeInitialRoom:
             pf = new ParticipantListField([{type: 'room',
-                                           name: "${ InitialRoomName }",
-                                           institution: "${ InitialRoomInstitution }",
-                                           ip: "${ InitialRoomIP }",
+                                           name: "${escapeHTMLForJS(InitialRoomName)}",
+                                           institution: "${escapeHTMLForJS(InitialRoomInstitution)}",
+                                           ip: "${InitialRoomIP}",
                                            participantType: 'by_address'}])
             var ipRetrievalResult = ${ IPRetrievalResult }
 

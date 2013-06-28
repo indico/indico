@@ -25,6 +25,7 @@ from datetime import datetime,timedelta
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
 import MaKaC.common.timezoneUtils as timezoneUtils
+from MaKaC.common.contextManager import ContextManager
 from BTrees.OOBTree import OOBTree
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 import MaKaC.review as review
@@ -4382,9 +4383,6 @@ class RHConfModifRoomBookingChooseEvent( RHConferenceModifRoomBookingBase, RHRoo
     _uh = urlHandlers.UHConfModifRoomBookingChooseEvent
 
     def _checkParams( self, params ):
-        locator = locators.WebLocator()
-        locator.setConference( params )
-        self._conf = locator.getConference()
         RHConferenceModifRoomBookingBase._checkParams( self, params )
 
         self._forNewBooking = True
@@ -4484,8 +4482,6 @@ class RHConfModifRoomBookingSearch4Rooms( RHConferenceModifRoomBookingBase, RHRo
 
     def _process( self ):
         self._businessLogic()
-        for room in self._rooms:
-            room.setOwner( self._conf )
 
         p = conferences.WPConfModifRoomBookingSearch4Rooms( self )
         return p.display()
@@ -4496,22 +4492,15 @@ class RHConfModifRoomBookingRoomList( RHConferenceModifRoomBookingBase, RHRoomBo
     _uh = urlHandlers.UHConfModifRoomBookingRoomList
 
     def _checkParams( self, params ):
-        locator = locators.WebLocator()
-        locator.setConference( params )
-        self._conf = locator.getConference()
-        self._target = self._conf
-
+        RHConferenceModifRoomBookingBase._checkParams(self, params)
         RHRoomBookingRoomList._checkParams( self, params )
 
     def _process( self ):
         if self._target.isClosed():
-            p = conferences.WPConfModifClosed( self, self._target )
+            p = conferences.WPConferenceModificationClosed( self, self._target )
             return p.display()
 
         self._businessLogic()
-        for room in self._rooms:
-            if room.getOwner() == None:
-                room.setOwner( self._conf )
 
         p = conferences.WPConfModifRoomBookingRoomList( self )
         return p.display()
@@ -4520,12 +4509,8 @@ class RHConfModifRoomBookingList( RHConferenceModifRoomBookingBase, RHRoomBookin
     _uh = urlHandlers.UHConfModifRoomBookingList
 
     def _checkParams( self, params ):
-        RHConferenceModifRoomBookingBase._checkParams(self, params)
         RHRoomBookingBookingList._checkParams(self, params)
-
-        locator = locators.WebLocator()
-        locator.setConference( params )
-        self._conf = self._target = locator.getConference()
+        RHConferenceModifRoomBookingBase._checkParams(self, params)
 
     def _process( self ):
         if self._target.isClosed():
@@ -4546,17 +4531,11 @@ class RHConfModifRoomBookingRoomDetails( RHConferenceModifRoomBookingBase, RHRoo
     _uh = urlHandlers.UHConfModifRoomBookingRoomDetails
 
     def _checkParams( self, params ):
-        RHRoomBookingRoomDetails._checkParams( self, params )
-
-        locator = locators.WebLocator()
-        locator.setConference( params )
-        self._conf = locator.getConference()
-
-        self._target = self._conf
+        RHRoomBookingBookingDetails._checkParams( self, params )
+        RHConferenceModifRoomBookingBase._checkParams(self, params)
 
     def _process( self ):
         self._businessLogic()
-        self._room.setOwner( self._conf )
         p = conferences.WPConfModifRoomBookingRoomDetails( self )
         return p.display()
 
@@ -4564,17 +4543,12 @@ class RHConfModifRoomBookingDetails( RHConferenceModifRoomBookingBase, RHRoomBoo
     _uh = urlHandlers.UHConfModifRoomBookingDetails
 
     def _checkParams( self, params ):
-        locator = locators.WebLocator()
-        locator.setConference( params )
-        self._conf = locator.getConference()
-
         RHRoomBookingBookingDetails._checkParams( self, params )
-        self._target = self._conf
+        RHConferenceModifRoomBookingBase._checkParams(self, params)
 
     def _process( self ):
         self._businessLogic()
         self._resv.setOwner( self._conf )
-        self._resv.room.setOwner( self._conf )
 
         p = conferences.WPConfModifRoomBookingDetails( self )
         return p.display()
@@ -4586,23 +4560,18 @@ class RHConfModifRoomBookingBookingForm( RHConferenceModifRoomBookingBase, RHRoo
 
     def _checkParams( self, params ):
         RHRoomBookingBookingForm._checkParams( self, params )
-
-        locator = locators.WebLocator()
-        locator.setConference( params )
-        self._conf = locator.getConference()
-        self._target = self._conf     #self._candResv
+        RHConferenceModifRoomBookingBase._checkParams(self, params)
 
     def _process( self ):
         self._businessLogic()
-        self._candResv.room.setOwner( self._conf )
         self._candResv.setOwner( self._conf )
         p = conferences.WPConfModifRoomBookingBookingForm( self )
         return p.display()
 
-class RHConfModifRoomBookingCloneBooking(RHConferenceModifBase, RHRoomBookingCloneBooking):
+class RHConfModifRoomBookingCloneBooking(RHConferenceModifRoomBookingBase, RHRoomBookingCloneBooking):
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
         RHRoomBookingCloneBooking._checkParams(self, params)
+        RHConferenceModifBase._checkParams(self, params)
 
     def _process( self ):
         self._redirect(urlHandlers.UHConfModifRoomBookingBookingForm.getURL(self._room))
@@ -4611,12 +4580,8 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
     _uh = urlHandlers.UHConfModifRoomBookingSaveBooking
 
     def _checkParams( self, params ):
+        RHConferenceModifRoomBookingBase._checkParams(self, params)
         RHRoomBookingSaveBooking._checkParams( self, params )
-
-        locator = locators.WebLocator()
-        locator.setConference( params )
-        self._conf = locator.getConference()
-        self._target = self._conf
 
         # Assign room to event / session / contribution?
         websession = self._websession
@@ -4629,7 +4594,6 @@ class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoo
 
 
     def _process( self ):
-        self._candResv.room.setOwner( self._conf )
         self._businessLogic()
 
         if self._thereAreConflicts:

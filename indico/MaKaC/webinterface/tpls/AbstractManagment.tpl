@@ -252,7 +252,7 @@ var changeSubmitterHandler = function(user) {
             function(result,error) {
                 if (!error) {
                     // update the submitter
-                    var link = Html.a({href: 'mailto:'+result['email']+'?subject=['+'${ confTitle }'+'] '+$T("Abstract ")+'${ abstractId }'+': '+'${ title }'},
+                    var link = Html.a({href: 'mailto:'+result['email']+'?subject=['+'${escapeHTMLForJS(confTitle)}'+'] '+$T("Abstract ")+'${ abstractId }'+': '+'${escapeHTMLForJS(title)}'},
                                       result['name']+' ('+result['affiliation']+')');
                     $E('submitterPlace').set(link);
                 } else {

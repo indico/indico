@@ -57,7 +57,7 @@ from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.common.tools import strip_ml_tags
 import re
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat
+from indico.util.i18n import i18nformat, ngettext
 
 
 styles = getSampleStyleSheet()
@@ -1984,6 +1984,21 @@ class AbstractBook(PDFWithTOC):
         normalStyle.alignment=TA_JUSTIFY
         self._styles["normal"]=normalStyle
 
+    def _addAuthors(self, authorList, institutions):
+        lauth = []
+        for auth in authorList:
+            fullName=auth.getFullName()
+            instit=auth.getAffiliation().strip()
+            if instit!="":
+                try:
+                    indexInsti = institutions.index(instit) + 1
+                except:
+                    institutions.append(instit)
+                    indexInsti = len(institutions)
+                fullName="%s <sup>%s</sup>"%(fullName,indexInsti)
+            lauth.append("%s"%escape(fullName))
+        return lauth
+
     def _addContribution(self, contrib, story):
         if not contrib.canAccess(self._aw):
             return
@@ -2010,19 +2025,15 @@ class AbstractBook(PDFWithTOC):
 
         lauth=[]
         institutions=[]
-        for auth in contrib.getAuthorList():
-            fullName=auth.getFullName()
-            instit=auth.getAffiliation().strip()
-            if instit!="":
-                try:
-                    indexInsti = institutions.index(instit) + 1
-                except:
-                    institutions.append(instit)
-                    indexInsti = len(institutions)
-                fullName="%s <sup>%s</sup>"%(fullName,indexInsti)
-            lauth.append("%s"%escape(fullName))
-        authors= "; ".join(lauth)
-        paragraphs.append(Paragraph(authors,self._styles["authors"]))
+        authors = self._addAuthors(contrib.getPrimaryAuthorList(), institutions)
+        if authors and contrib.getCoAuthorList():
+            authors = i18nformat("""<b>_("%s"):</b> %s""")%(ngettext("Author", "Authors", len(authors)), "; ".join(authors))
+        else:
+            authors = "; ".join(authors)
+        paragraphs.append(Paragraph(authors, self._styles["authors"]))
+        coauthors = self._addAuthors(contrib.getCoAuthorList(), institutions)
+        if coauthors:
+            paragraphs.append(Paragraph(i18nformat("""<b>_("Co-%s"):</b> %s""")%(ngettext("Author", "Authors", len(coauthors)), "; ".join(coauthors)),self._styles["authors"]))
         if institutions:
             linst=[]
             for instit in institutions:
@@ -2030,16 +2041,21 @@ class AbstractBook(PDFWithTOC):
             institutionsText="<br/>".join(linst)
             paragraphs.append(Paragraph(institutionsText,self._styles["authors"]))
 
-        submitterEmail=""
-        if isinstance(contrib, conference.AcceptedContribution):
-            submitterEmail=contrib.getAbstract().getSubmitter().getEmail()
-        elif contrib.getSubmitterList():
-            submitterEmail=contrib.getSubmitterList()[0].getEmail()
+        if self._conf.getBOAConfig().getCorrespondingAuthor() == "submitter":
+            submitterEmail=""
+            if isinstance(contrib, conference.AcceptedContribution):
+                submitterEmail=contrib.getAbstract().getSubmitter().getEmail()
+            elif contrib.getSubmitterList():
+                submitterEmail=contrib.getSubmitterList()[0].getEmail()
 
-        if submitterEmail!="":
-            submitter = i18nformat("""<b>_("Corresponding Author"):</b> %s""")%submitterEmail
-            paragraphs.append(Paragraph(escape(submitter),self._styles["normal"]))
-
+            if submitterEmail!="":
+                submitter = i18nformat("""<b>_("Corresponding Author"):</b> %s""")%submitterEmail
+                paragraphs.append(Paragraph(escape(submitter),self._styles["normal"]))
+        elif self._conf.getBOAConfig().getCorrespondingAuthor() == "speakers":
+            speakersEmail = [speaker.getEmail() for speaker in contrib.getSpeakerList()]
+            if speakersEmail:
+                speakers = i18nformat("""<b>_("Corresponding %s"):</b> %s""")%(ngettext("Author", "Authors", len(speakersEmail)), ", ".join(speakersEmail))
+                paragraphs.append(Paragraph(escape(speakers),self._styles["normal"]))
         abstract=contrib.getDescription()
         paragraphs.append(Paragraph(escape(abstract),self._styles["abstract"]))
 

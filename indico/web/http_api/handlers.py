@@ -125,6 +125,7 @@ def buildAW(ak, req, onlyPublic=False):
 
 def handler(req, **params):
     ContextManager.destroy()
+    ContextManager.set('currentReq', req)
     logger = Logger.get('httpapi')
     path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
     if req.method == 'POST':

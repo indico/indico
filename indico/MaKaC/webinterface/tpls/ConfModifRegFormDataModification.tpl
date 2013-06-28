@@ -90,7 +90,7 @@
     </tr>
     <tr>
       <td nowrap class="titleCellTD">
-        <span class="titleCellFormat"> ${ _("Email organisators")}</span><br>
+        <span class="titleCellFormat"> ${ _("Email organisers")}</span><br>
         <span class="smallLabel">${ _("(on new registrations)")}</span>
       </td>
       <td bgcolor="white" width="100%">

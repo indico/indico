@@ -19324,8 +19324,7 @@ msgstr "Fecha final de modificaciones"
 
 #: MaKaC/webinterface/tpls/ConfModifRegFormDataModification.tpl:93
 #: indico/MaKaC/webinterface/tpls/ConfModifRegFormDataModification.tpl:93
-#, fuzzy
-msgid "Email organisators"
+msgid "Email organisers"
 msgstr "Notificaciones por correo electrónico"
 
 #: MaKaC/webinterface/tpls/ConfModifRegFormDataModification.tpl:94

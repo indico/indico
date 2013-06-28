@@ -772,7 +772,7 @@ class CSBooking(CSBookingBase):
         cs.setHidden(self.isHidden())
         cs.setPin(self.getPin())
         cs.setModeratorPin(self.getModeratorPin())
-        cs.setOwnerAccount(self.getOwnerAccount())
+        cs.setOwnerAccount(self.getOwnerAccount(), True)
         cs.setRoomId(self.getRoomId())
         cs.setExtension(self.getExtension())
         cs.setURL(self.getURL())
