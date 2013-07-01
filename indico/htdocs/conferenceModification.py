@@ -31,9 +31,6 @@ def screenDates( req, **params ):
 def dataPerform( req, **params ):
     return conferenceModif.RHConfPerformDataModif( req ).process( params )
 
-def sessionSlots( req, **params ):
-    return conferenceModif.RHConfSessionSlots( req ).process( params )
-
 def addContribType( req, **params ):
     return conferenceModif.RHConfAddContribType( req ).process( params )
 

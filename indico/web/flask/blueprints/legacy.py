@@ -809,11 +809,6 @@ legacy.add_url_rule('/confModifUserCompetences.py/modifyCompetences',
 # Inactive: /conferenceModification.py/roomBookingSearch4Rooms (mod_rh_conferenceModif.RHConfModifRoomBookingSearch4Rooms)
 # Inactive: /conferenceModification.py/screenDates (mod_rh_conferenceModif.RHConfScreenDatesEdit)
 
-legacy.add_url_rule('/conferenceModification.py/sessionSlots',
-                    'conferenceModification-sessionSlots',
-                    rh_as_view(mod_rh_conferenceModif.RHConfSessionSlots),
-                    methods=('GET', 'POST'))
-
 
 # Routes for conferenceOtherViews.py
 # Inactive: /conferenceOtherViews.py (mod_rh_conferenceDisplay.RHConferenceOtherViews)

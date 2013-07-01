@@ -637,10 +637,6 @@ class UHRoomPhotoSmall(URLHandler):
         return super(UHRoomPhotoSmall, cls).getURL(room=target)
 
 
-class UHConfModSessionSlots(URLHandler):
-    _endpoint = 'legacy.conferenceModification-sessionSlots'
-
-
 class UHConferenceClose(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-close'
 

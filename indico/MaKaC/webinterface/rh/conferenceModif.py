@@ -328,24 +328,6 @@ class RHConfPerformDataModif( RoomBookingDBMixin, RHConferenceModifBase ):
 
 #----------------------------------------------------------------
 
-class RHConfSessionSlots( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfModSessionSlots
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-
-    def _process( self ):
-        if self._target.getEnableSessionSlots() :
-            for s in self._target.getSessionList() :
-                if len(s.getSlotList()) > 1 :
-                    raise FormValuesError( _("More then one slot defined for session '%s'. Cannot disable displaying multiple session slots.")%self._target.getTitle())
-            self._target.disableSessionSlots()
-        else :
-            self._target.enableSessionSlots()
-        self._redirect( urlHandlers.UHConferenceModification.getURL( self._target ) )
-
-#----------------------------------------------------------------
-
 class RHConfModifSchedule( RoomBookingDBMixin, RHConferenceModifBase ):
     _uh = urlHandlers.UHConfModifSchedule
 
