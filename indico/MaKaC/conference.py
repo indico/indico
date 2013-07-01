@@ -9053,7 +9053,7 @@ class Contribution(CommonObjectBase, Locatable):
         """
         if self.canAccess( aw ):
             return True
-        if self._notify("isPluginAdmin", {"user": self.getUser(), "plugins": "any"}) or \
+        if self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"}) or \
                 self._notify("isPluginTypeAdmin", {"user": aw.getUser()}):
             return True
         ################################################################################################
