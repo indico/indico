@@ -15,16 +15,16 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceModif
+from indico.web.flask.util import rh_as_view
+from indico.web.flask.blueprints.event.management import event_mgmt
 
 
-def index( req, **params ):
-    return conferenceModif.RHConfModifSchedule( req ).process( params )
-
-def edit(req,**params):
-    return conferenceModif.RHScheduleDataEdit( req ).process( params )
-
-def reschedule(req, **params):
-    return conferenceModif.RHReschedule( req ).process( params )
+event_mgmt.add_url_rule('/timetable/', 'confModifSchedule', rh_as_view(conferenceModif.RHConfModifSchedule),
+                        methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/timetable/reschedule', 'confModifSchedule-reschedule',
+                        rh_as_view(conferenceModif.RHReschedule), methods=('POST',))
+event_mgmt.add_url_rule('/timetables/dates', 'confModifSchedule-edit',
+                        rh_as_view(conferenceModif.RHScheduleDataEdit), methods=('GET', 'POST'))

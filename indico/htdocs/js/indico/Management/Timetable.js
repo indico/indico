@@ -1631,8 +1631,8 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
 
                         IndicoUI.Dialogs.Util.progress($T("Rescheduling day ") + self.__getCurrentDayText() + "...");
 
-                        Util.postRequest(build_url(Indico.Urls.Reschedule),
-                                postParams,
+                        Util.postRequest(build_url(Indico.Urls.Reschedule, postParams),
+                                null,
                                 {
                                     OK: "ok",
                                     action: self.rescheduleAction,

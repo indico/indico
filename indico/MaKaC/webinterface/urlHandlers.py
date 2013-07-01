@@ -939,11 +939,7 @@ class UHTrackAbstractModIntComments(UHTrackAbstractBase):
 
 
 class UHConfModifSchedule(URLHandler):
-    _endpoint = 'legacy.confModifSchedule'
-
-
-class UHConfModifScheduleCustomizePDF(URLHandler):
-    _endpoint = 'legacy.confModifSchedule-customizePdf'
+    _endpoint = 'event_mgmt.confModifSchedule'
 
 
 class UHContribConfSelectionAction(URLHandler):
@@ -971,11 +967,11 @@ class UHSessionOpen(URLHandler):
 
 
 class UHSessionCreation(URLHandler):
-    _endpoint = 'legacy.confModifSchedule'
+    _endpoint = 'event_mgmt.confModifSchedule'
 
 
 class UHContribCreation(URLHandler):
-    _endpoint = 'legacy.confModifSchedule'
+    _endpoint = 'event_mgmt.confModifSchedule'
 
 
 class UHContribToXMLConfManager(URLHandler):
@@ -2104,7 +2100,7 @@ class UHSessionModContribListEditContrib(URLHandler):
 
 
 class UHConfModifReschedule(URLHandler):
-    _endpoint = 'legacy.confModifSchedule-reschedule'
+    _endpoint = 'event_mgmt.confModifSchedule-reschedule'
 
 
 class UHContributionList(URLHandler):
@@ -2252,7 +2248,7 @@ class UHAbstractReviewingTeam(URLHandler):
 
 
 class UHConfModScheduleDataEdit(URLHandler):
-    _endpoint = 'legacy.confModifSchedule-edit'
+    _endpoint = 'event_mgmt.confModifSchedule-edit'
 
 
 class UHConfModMaterialPackage(URLHandler):

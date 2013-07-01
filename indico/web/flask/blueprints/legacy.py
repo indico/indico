@@ -136,10 +136,6 @@ legacy = IndicoBlueprint('legacy', __name__)
 # Inactive: /adminAnnouncement.py/save (mod_rh_announcement.RHAnnouncementModifSave)
 
 
-# Routes for adminCollaboration.py
-# Inactive: /adminCollaboration.py (mod_rh_collaboration.RHAdminCollaboration)
-
-
 # Routes for adminConferenceStyles.py
 # Inactive: /adminConferenceStyles.py (mod_rh_admins.RHConferenceStyles)
 
@@ -313,10 +309,6 @@ legacy.add_url_rule('/assignContributions.py/downloadAcceptedPapers',
 # Inactive: /changeLang.py (mod_rh_lang.RHChangeLang)
 
 
-# Routes for collaborationDisplay.py
-# Inactive: /collaborationDisplay.py (mod_rh_collaboration.RHCollaborationDisplay)
-
-
 # Routes for confAbstractBook.py
 # Inactive: /confAbstractBook.py (mod_rh_conferenceDisplay.RHAbstractBook)
 
@@ -393,11 +385,6 @@ legacy.add_url_rule('/confListContribToJudge.py/asReviewer',
 # Inactive: /confModifCFA.py/switchSelectSpeakerMandatory (mod_rh_conferenceModif.RHConfModifCFASwitchSelectSpeakerMandatory)
 # Inactive: /confModifCFA.py/switchShowAttachedFiles (mod_rh_conferenceModif.RHConfModifCFASwitchShowAttachedFilesContribList)
 # Inactive: /confModifCFA.py/switchShowSelectSpeaker (mod_rh_conferenceModif.RHConfModifCFASwitchShowSelectAsSpeaker)
-
-
-# Routes for confModifCollaboration.py
-# Inactive: /confModifCollaboration.py (mod_rh_collaboration.RHConfModifCSBookings)
-# Inactive: /confModifCollaboration.py/managers (mod_rh_collaboration.RHConfModifCSProtection)
 
 
 # Routes for confModifContribList.py
@@ -717,30 +704,9 @@ legacy.add_url_rule('/confModifReviewingControl.py',
 
 
 # Routes for confModifSchedule.py
-legacy.add_url_rule('/confModifSchedule.py',
-                    'confModifSchedule',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifSchedule),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifSchedule.py/customizePdf',
-                    'confModifSchedule-customizePdf',
-                    rh_as_view(mod_rh_conferenceDisplay.RHTimeTableCustomizePDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifSchedule.py/edit',
-                    'confModifSchedule-edit',
-                    rh_as_view(mod_rh_conferenceModif.RHScheduleDataEdit),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifSchedule.py/pdf',
-                    'confModifSchedule-pdf',
-                    rh_as_view(mod_rh_conferenceDisplay.RHTimeTablePDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifSchedule.py/reschedule',
-                    'confModifSchedule-reschedule',
-                    rh_as_view(mod_rh_conferenceModif.RHReschedule),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifSchedule.py (mod_rh_conferenceModif.RHConfModifSchedule)
+# Inactive: /confModifSchedule.py/edit (mod_rh_conferenceModif.RHScheduleDataEdit)
+# Inactive: /confModifSchedule.py/reschedule (mod_rh_conferenceModif.RHReschedule)
 
 
 # Routes for confModifTools.py
