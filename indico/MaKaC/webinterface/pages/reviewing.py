@@ -102,19 +102,11 @@ class WPConfModifReviewingPaperSetup(WPConfModifReviewingBase):
     def _setActiveTab( self ):
         self._subTabPaperReviewingSetup.setActive()
 
-    def _getTabContent( self, params ):
-        wc = WConfModifReviewingPaperSetup( self._conf)
-        p = { # probably these values are not needed (except setTemplateURL) any more since now all these things are done by services
-             "choiceURL": urlHandlers.UHChooseReviewing.getURL(self._conf), \
-             "addStateURL": urlHandlers.UHAddState.getURL(self._conf), \
-             "removeStateURL": urlHandlers.UHRemoveState.getURL(self._conf), \
-             "addQuestionURL": urlHandlers.UHAddQuestion.getURL(self._conf), \
-             "removeQuestionURL": urlHandlers.UHRemoveQuestion.getURL(self._conf), \
-             "setTemplateURL": urlHandlers.UHSetTemplate.getURL(self._conf), \
-             "addCriteriaURL": urlHandlers.UHAddCriteria.getURL(self._conf), \
-             "removeCriteriaURL": urlHandlers.UHRemoveCriteria.getURL(self._conf), \
-             }
-        return wc.getHTML( p )
+    def _getTabContent(self, params):
+        wc = WConfModifReviewingPaperSetup(self._conf)
+        p = {'setTemplateURL': urlHandlers.UHSetTemplate.getURL(self._conf)}
+        return wc.getHTML(p)
+
 
 class WConfModifReviewingPaperSetup(wcomponents.WTemplated):
     """ Template for the previous class (WPConfModifReviewingPaperSetup)
@@ -131,35 +123,19 @@ class WConfModifReviewingPaperSetup(wcomponents.WTemplated):
         return vars
 
     def getHTML(self, params):
-        rc= WConfModificationReviewingSettings().getHTML( self._conf,\
-                                                    params["choiceURL"], \
-                                                    params["addStateURL"], \
-                                                    params["removeStateURL"], \
-                                                    params["addQuestionURL"], \
-                                                    params["removeQuestionURL"], \
-                                                    params["setTemplateURL"], \
-                                                    params["addCriteriaURL"], \
-                                                    params["removeCriteriaURL"])
+        rc = WConfModificationReviewingSettings().getHTML(self._conf, params["setTemplateURL"])
 
-        return """<br><table width="100%%" class="revtab"><tr><td>%s<br><br></td></tr></table>"""%(rc)
+        return """<br><table width="100%%" class="revtab"><tr><td>%s<br><br></td></tr></table>""" % rc
 
 
 class WConfModificationReviewingSettings(wcomponents.WTemplated):
     """ Template used by the previous one (WConfModifReviewingPaperSetup)
     """
 
-    def getHTML( self, target, choiceURL, addStateURL, removeStateURL, addQuestionURL, removeQuestionURL, setTemplateURL, addCriteriaURL, removeCriteriaURL ):
+    def getHTML(self, target, setTemplateURL):
         self.__target = target
-        params = { "choiceURL": choiceURL, \
-                   "addStateURL": addStateURL, \
-                   "removeStateURL": removeStateURL, \
-                   "addQuestionURL": addQuestionURL, \
-                   "removeQuestionURL": removeQuestionURL, \
-                   "setTemplateURL": setTemplateURL, \
-                   "addCriteriaURL": addCriteriaURL, \
-                   "removeCriteriaURL": removeCriteriaURL}
-
-        return  wcomponents.WTemplated.getHTML( self, params )
+        params = {'setTemplateURL': setTemplateURL}
+        return wcomponents.WTemplated.getHTML(self, params)
 
     def getVars( self):
         vars = wcomponents.WTemplated.getVars( self )
@@ -527,39 +503,6 @@ class WPConfModifUserCompetences(WPConfModifReviewingBase):
         return wc.getHTML()
 
 class WConfModifUserCompetences(wcomponents.WTemplated):
-    """ Template used to show list of contributions to judge / edit / give advice on
-    """
-
-    def __init__(self, conf):
-        self._conf = conf
-
-    def getHTML(self):
-        return wcomponents.WTemplated.getHTML(self)
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-
-        vars["Conference"] = self._conf
-        vars["ConfReview"] = self._conf.getConfPaperReview()
-
-        return vars
-
-class WPConfModifUserCompetencesAbstracts(WPConfModifReviewingBase):
-    """ Tab to see the user competences
-    """
-
-    def __init__(self, rh, conference):
-        WPConfModifReviewingBase.__init__(self, rh, conference)
-
-    def _setActiveTab( self ):
-        self._tabUserCompetencesAbstracts.setActive()
-        self._subtabAbstractsReviewing.setActive()
-
-    def _getTabContent( self, params ):
-        wc = WConfModifUserCompetencesAbstracts(self._conf)
-        return wc.getHTML()
-
-class WConfModifUserCompetencesAbstracts(wcomponents.WTemplated):
     """ Template used to show list of contributions to judge / edit / give advice on
     """
 

@@ -128,26 +128,6 @@ class RHRemoveAssignReferee(RHAssignRefereeBase):
         self._target.getReviewManager().removeReferee()
         self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
 
-class RHRefereeDueDate(RHAssignRefereeBase):
-    _uh = urlHandlers.UHRemoveAssignReferee
-
-    def _checkParams(self, params):
-        RHContribModifBase._checkParams(self, params)
-        try:
-            self._day = int(params.get('sDay', 0))
-            self._month = int(params.get('sMonth', 0))
-            self._year = int(params.get('sYear', 0))
-            if self._day == 0 or self._month == 0 or self._year == 0:
-                raise MaKaCError("Please set the date correctly")
-        except Exception:
-            raise MaKaCError("Please set the date correctly")
-
-
-    def _process( self ):
-        self._target.getReviewManager().getLastReview().setRefereeDueDate(self._day, self._month, self._year)
-        self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
-
-
 
 class RHAssignEditing(RHAssignEditorOrReviewerBase):
     _uh = urlHandlers.UHAssignEditing
@@ -175,23 +155,6 @@ class RHRemoveAssignEditing(RHAssignEditorOrReviewerBase):
         self._target.getReviewManager().removeEditor()
         self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
 
-class RHEditorDueDate(RHAssignEditorOrReviewerBase):
-    _uh = urlHandlers.UHRemoveAssignReferee
-
-    def _checkParams(self, params):
-        RHContribModifBase._checkParams(self, params)
-        try:
-            self._day = int(params.get('sDay', 0))
-            self._month = int(params.get('sMonth', 0))
-            self._year = int(params.get('sYear', 0))
-            if self._day == 0 or self._month == 0 or self._year == 0:
-                raise MaKaCError("Please set the date correctly")
-        except Exception:
-            raise MaKaCError("Please set the date correctly")
-
-    def _process( self ):
-        self._target.getReviewManager().getLastReview().setEditorDueDate(self._day, self._month, self._year)
-        self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
 
 #Assign Reviewer classes
 class RHAssignReviewing(RHAssignEditorOrReviewerBase):
@@ -226,56 +189,6 @@ class RHRemoveAssignReviewing(RHAssignEditorOrReviewerBase):
         self._target.getReviewManager().removeReviewer(ph.getById(self._reviewer))
         self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
 
-class RHReviewerDueDate(RHAssignEditorOrReviewerBase):
-    _uh = urlHandlers.UHRemoveAssignReferee
-
-    def _checkParams(self, params):
-        RHContribModifBase._checkParams(self, params)
-        try:
-            self._day = int(params.get('sDay', 0))
-            self._month = int(params.get('sMonth', 0))
-            self._year = int(params.get('sYear', 0))
-            if self._day == 0 or self._month == 0 or self._year == 0:
-                raise MaKaCError("Please set the date correctly")
-        except Exception:
-            raise MaKaCError("Please set the date correctly")
-
-    def _process( self ):
-        self._target.getReviewManager().getLastReview().setReviewerDueDate(self._day, self._month, self._year)
-        self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
-
-
-
-#Judgement classes for referee
-class RHFinalJudge(RHContribModifBase):
-    _uh = urlHandlers.UHFinalJudge
-
-    def _checkProtection(self):
-        if not RCContributionReferee.hasRights(self):
-            RHContribModifBase._checkProtection(self);
-
-    def _checkParams( self, params ):
-        RHContribModifBase._checkParams( self, params )
-        if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
-            raise MaKaCError("You must wait until the author has submitted the materials")
-
-        self._questions = params.get("questions")
-        self._judgement = params.get("judgement")
-        self._comments = params.get("comments")
-
-    def _process( self ):
-        if self._judgement == None:
-            raise MaKaCError("Select a judgement for this contribution")
-        else:
-            lastReview = self._target.getReviewManager().getLastReview()
-            lastReview.getRefereeJudgement().setAuthor(self._getUser())
-            #TODO: this does not work any more now that questions are not Yes/No questions but multiple-answer questions
-            #lastReview.getRefereeJudgement().setQuestions(self._questions)
-            lastReview.getRefereeJudgement().setComments(self._comments)
-            lastReview.getRefereeJudgement().setJudgement(self._judgement)
-            #lastReview.setFinalJudgement(self._judgement)
-            lastReview.getRefereeJudgement().sendNotificationEmail()
-            self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
 
 #Judgement classes for editor
 class RHEditorBase(RHContribModifBase):
@@ -306,42 +219,6 @@ class RHContributionEditingJudgement(RHEditorBase):
         return p.display()
 
 
-class RHJudgeEditing(RHEditorBase):
-    _uh = urlHandlers.UHJudgeEditing
-
-    def _checkParams( self, params ):
-        RHEditorBase._checkParams( self, params )
-        if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
-            raise MaKaCError("You must wait until the author has submitted the materials")
-        if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted() and \
-            not self._target.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING:
-            raise MaKaCError("This contribution has already been assessed by the referee.")
-        self._editingJudgement = params.get("editingJudgement")
-        self._comments = params.get("comments")
-        self._criteria = params.get("criteria")
-        self._editor = self.getAW().getUser()
-
-    def _process( self ):
-
-        if self._editingJudgement == None:
-            raise MaKaCError("Select an assessment for this contribution")
-        else:
-            lastReview = self._target.getReviewManager().getLastReview()
-            lastReview.getEditorJudgement().setAuthor(self._editor)
-            #TODO: this does not work any more now that questions are not Yes/No questions but multiple-answer questions
-            #lastReview.getEditorJudgement().setLayoutCriteria(self._criteria)
-            lastReview.getEditorJudgement().setJudgement(self._editingJudgement)
-            lastReview.getEditorJudgement().setComments(self._comments)
-            lastReview.getEditorJudgement().sendNotificationEmail()
-            #if self._target.getParent().getConfPaperReview().getChoice() == 3:
-            #    self._target.getReviewManager().getLastReview().setFinalJudgement(self._editingJudgement)
-
-            #if self._editingJudgement == "Accept" or self._editingJudgement == "Reject":
-            if self._editingJudgement == "1" or self._editingJudgement == "3":
-                self._redirect( urlHandlers.UHContributionEditingJudgement.getURL( self._target ))
-            else:
-                self._redirect( urlHandlers.UHContributionModifReviewing.getURL( self._target ))
-
 #Judgement classes for reviewer
 class RHReviewerBase(RHContribModifBase):
 
@@ -355,12 +232,11 @@ class RHReviewerBase(RHContribModifBase):
         else:
             raise MaKaCError(_("Paper Reviewing is not active for this conference"))
 
-
-
     def _checkParams(self, params):
         RHContribModifBase._checkParams(self, params)
         if self._target.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
             raise MaKaCError("The content assessment has been submitted")
+
 
 class RHContributionGiveAdvice(RHReviewerBase):
     _uh = urlHandlers.UHContributionGiveAdvice
@@ -373,36 +249,6 @@ class RHContributionGiveAdvice(RHReviewerBase):
         p = contributionReviewing.WPGiveAdvice(self, self._target)
         return p.display()
 
-
-class RHGiveAdvice(RHReviewerBase):
-    _uh = urlHandlers.UHGiveAdvice
-
-    def _checkParams( self, params ):
-        RHReviewerBase._checkParams( self, params )
-        if not (self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
-            raise MaKaCError("You must wait until the author has submitted the materials")
-        if self._target.getReviewManager().getLastReview().isSubmitted():
-            raise MaKaCError("This contribution has already been assessed by the referee.")
-        self._reviewer = self.getAW().getUser()
-        self._questions = params.get("questions")
-        self._adviceJudgement = params.get("adviceJudgement")
-        self._comments = params.get("comments")
-        self._questions = params.get("questions")
-
-    def _process( self ):
-        if self._adviceJudgement == None:
-            raise MaKaCError("Select an assessment for this contribution")
-        else:
-            lastReview = self._target.getReviewManager().getLastReview()
-            lastReview.addReviewerJudgement(self._reviewer)
-            reviewerJudgement = lastReview.getReviewerJudgement(self._reviewer)
-            #TODO: this does not work any more now that questions are not Yes/No questions but multiple-answer questions
-            #reviewerJudgement.setQuestions(self._questions)
-            reviewerJudgement.setComments(self._comments)
-            reviewerJudgement.setJudgement(self._adviceJudgement)
-            reviewerJudgement.sendNotificationEmail()
-
-            self._redirect( urlHandlers.UHContributionGiveAdvice.getURL( self._target ))
 
 #class to show reviewing history
 class RHReviewingHistory(RHContribModifBaseReviewingStaffRights):

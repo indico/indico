@@ -1928,10 +1928,6 @@ class UHTrackModMoveDown(URLHandler):
     _endpoint = 'event_mgmt.confModifProgram-moveTrackDown'
 
 
-class UHAbstractModAC(URLHandler):
-    _endpoint = 'event_mgmt.abstractManagment-ac'
-
-
 class UHAbstractModEditData(URLHandler):
     _endpoint = 'event_mgmt.abstractManagment-editData'
 
@@ -3429,160 +3425,96 @@ class UHResetSession(URLHandler):
 # Reviewing
 #############
 class UHConfModifReviewingAccess(URLHandler):
-    _endpoint = 'legacy.confModifReviewing-access'
+    _endpoint = 'event_mgmt.confModifReviewing-access'
 
 
 class UHConfModifReviewingPaperSetup(URLHandler):
-    _endpoint = 'legacy.confModifReviewing-paperSetup'
-
-
-class UHChooseReviewing(URLHandler):
-    _endpoint = 'legacy.confModifReviewing-chooseReviewing'
-
-
-class UHAddState(URLHandler):
-    _endpoint = 'legacy.confModifReviewing-addState'
-
-
-class UHRemoveState(URLHandler):
-    _endpoint = 'legacy.confModifReviewing-removeState'
-
-
-class UHAddQuestion(URLHandler):
-    _endpoint = 'legacy.confModifReviewing-addQuestion'
-
-
-class UHRemoveQuestion(URLHandler):
-    _endpoint = 'legacy.confModifReviewing-removeQuestion'
+    _endpoint = 'event_mgmt.confModifReviewing-paperSetup'
 
 
 class UHSetTemplate(URLHandler):
-    _endpoint = 'legacy.confModifReviewing-setTemplate'
-
-
-class UHAddCriteria(URLHandler):
-    _endpoint = 'legacy.confModifReviewing-addCriteria'
-
-
-class UHRemoveCriteria(URLHandler):
-    _endpoint = 'legacy.confModifReviewing-removeCriteria'
+    _endpoint = 'event_mgmt.confModifReviewing-setTemplate'
 
 
 class UHDownloadContributionTemplate(URLHandler):
-    _endpoint = 'legacy.confModifReviewing-downloadTemplate'
-
-
-class UHDeleteContributionTemplate(URLHandler):
-    _endpoint = 'legacy.confModifReviewing-deleteTemplate'
+    _endpoint = 'event_mgmt.confModifReviewing-downloadTemplate'
 
 
 class UHConfModifReviewingControl(URLHandler):
-    _endpoint = 'legacy.confModifReviewingControl'
+    _endpoint = 'event_mgmt.confModifReviewingControl'
 
 
 class UHConfModifUserCompetences(URLHandler):
-    _endpoint = 'legacy.confModifUserCompetences'
-
-
-class UHConfModifUserCompetencesAbstracts(URLHandler):
-    _endpoint = 'legacy.confModifUserCompetences-Abstracts'
-
-
-class UHConfModifModifyUserCompetences(URLHandler):
-    _endpoint = 'legacy.confModifUserCompetences-modifyCompetences'
+    _endpoint = 'event_mgmt.confModifUserCompetences'
 
 
 class UHConfModifListContribToJudge(URLHandler):
-    _endpoint = 'legacy.confListContribToJudge'
+    _endpoint = 'event_mgmt.confListContribToJudge'
 
 
 class UHConfModifListContribToJudgeAsReviewer(URLHandler):
-    _endpoint = 'legacy.confListContribToJudge-asReviewer'
+    _endpoint = 'event_mgmt.confListContribToJudge-asReviewer'
 
 
 class UHConfModifListContribToJudgeAsEditor(URLHandler):
-    _endpoint = 'legacy.confListContribToJudge-asEditor'
+    _endpoint = 'event_mgmt.confListContribToJudge-asEditor'
 
 
 class UHConfModifReviewingAssignContributionsList(URLHandler):
-    _endpoint = 'legacy.assignContributions'
+    _endpoint = 'event_mgmt.assignContributions'
 
 
 class UHConfModifReviewingDownloadAcceptedPapers(URLHandler):
-    _endpoint = 'legacy.assignContributions-downloadAcceptedPapers'
+    _endpoint = 'event_mgmt.assignContributions-downloadAcceptedPapers'
 
 
 #Contribution reviewing
 class UHContributionModifReviewing(URLHandler):
-    _endpoint = 'legacy.contributionReviewing'
+    _endpoint = 'event_mgmt.contributionReviewing'
 
 
 class UHContribModifReviewingMaterials(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-contributionReviewingMaterials'
+    _endpoint = 'event_mgmt.contributionReviewing-contributionReviewingMaterials'
 
 
 class UHContributionReviewingJudgements(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-contributionReviewingJudgements'
+    _endpoint = 'event_mgmt.contributionReviewing-contributionReviewingJudgements'
 
 
 class UHAssignReferee(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-assignReferee'
+    _endpoint = 'event_mgmt.contributionReviewing-assignReferee'
 
 
 class UHRemoveAssignReferee(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-removeAssignReferee'
+    _endpoint = 'event_mgmt.contributionReviewing-removeAssignReferee'
 
 
 class UHAssignEditing(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-assignEditing'
+    _endpoint = 'event_mgmt.contributionReviewing-assignEditing'
 
 
 class UHRemoveAssignEditing(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-removeAssignEditing'
+    _endpoint = 'event_mgmt.contributionReviewing-removeAssignEditing'
 
 
 class UHAssignReviewing(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-assignReviewing'
+    _endpoint = 'event_mgmt.contributionReviewing-assignReviewing'
 
 
 class UHRemoveAssignReviewing(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-removeAssignReviewing'
-
-
-class UHFinalJudge(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-finalJudge'
+    _endpoint = 'event_mgmt.contributionReviewing-removeAssignReviewing'
 
 
 class UHContributionModifReviewingHistory(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-reviewingHistory'
+    _endpoint = 'event_mgmt.contributionReviewing-reviewingHistory'
 
 
 class UHContributionEditingJudgement(URLHandler):
-    _endpoint = 'legacy.contributionEditingJudgement'
-
-
-class UHJudgeEditing(URLHandler):
-    _endpoint = 'legacy.contributionEditingJudgement-judgeEditing'
+    _endpoint = 'event_mgmt.contributionEditingJudgement'
 
 
 class UHContributionGiveAdvice(URLHandler):
-    _endpoint = 'legacy.contributionGiveAdvice'
-
-
-class UHGiveAdvice(URLHandler):
-    _endpoint = 'legacy.contributionGiveAdvice-giveAdvice'
-
-
-class UHRefereeDueDate(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-refereeDueDate'
-
-
-class UHEditorDueDate(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-editorDueDate'
-
-
-class UHReviewerDueDate(URLHandler):
-    _endpoint = 'legacy.contributionReviewing-reviewerDueDate'
+    _endpoint = 'event_mgmt.contributionGiveAdvice'
 
 
 class UHDownloadPRTemplate(URLHandler):

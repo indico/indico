@@ -50,17 +50,5 @@ def assignReferee( req, **params ):
 def removeAssignReferee(req, **params):
     return contribReviewingModif.RHRemoveAssignReferee( req ).process(params)
 
-def finalJudge( req, **params ):
-    return contribReviewingModif.RHFinalJudge( req ).process( params )
-
 def reviewingHistory( req, **params ):
     return contribReviewingModif.RHReviewingHistory( req ).process( params )
-
-def refereeDueDate( req, **params ):
-    return contribReviewingModif.RHRefereeDueDate( req ).process( params )
-
-def editorDueDate( req, **params ):
-    return contribReviewingModif.RHEditorDueDate( req ).process( params )
-
-def reviewerDueDate( req, **params ):
-    return contribReviewingModif.RHReviewerDueDate( req ).process( params )

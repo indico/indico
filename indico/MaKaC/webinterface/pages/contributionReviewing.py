@@ -98,9 +98,7 @@ class WPContributionReviewingJudgements( WPContributionModifBase ):
 
     def _getTabContent( self, params ):
         wc = WContributionReviewingJudgements(self._target.getConference(), self._aw)
-        finalJudgeURL = urlHandlers.UHFinalJudge.getURL(self._target)
-
-        return wc.getHTML(self._target, finalJudgeURL)
+        return wc.getHTML(self._target)
 
 class WPContributionModifReviewingMaterials( WPContributionModifBase ):
 
@@ -145,11 +143,9 @@ class WContributionReviewingJudgements(WContributionReviewingBase):
         self._conf = conference
         self._aw = aw
 
-    def getHTML( self, target, finalJudgeURL ):
-
+    def getHTML(self, target):
         self.__target = target
-        params = {"finalJudgeURL": finalJudgeURL}
-        return wcomponents.WTemplated.getHTML(self, params)
+        return wcomponents.WTemplated.getHTML(self)
 
     def getVars( self):
         vars = wcomponents.WTemplated.getVars( self )

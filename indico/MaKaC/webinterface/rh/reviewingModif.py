@@ -149,92 +149,6 @@ class RHConfModifReviewingPaperSetup( RHConfModifReviewingPRMBase ):
         return p.display()
 
 
-
-#################################### Start of old classes that are not used anymore ###############################
-class RHChooseReviewing(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHChooseReviewing
-
-    def _checkParams( self, params ):
-        RHConfModifReviewingPRMBase._checkParams( self, params )
-        self._reviewing = int(params.get("reviewing"))
-
-    def _process( self ):
-        self._conf.getConfPaperReview().setChoice( self._reviewing )
-        if self._reviewing == "No_reviewing":
-            self._redirect(urlHandlers.UHConferenceModification.getURL(self._conf))
-        else:
-            self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-
-class RHAddState(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHAddState
-
-    def _checkParams( self, params ):
-        RHConfModifReviewingPRMBase._checkParams( self, params )
-        self._state = params.get("state")
-
-    def _process( self ):
-        self._conf.getConfPaperReview().addState( self._state )
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-
-class RHRemoveState(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHRemoveState
-
-    def _checkParams(self, params):
-        RHConfModifReviewingPRMBase._checkParams(self, params)
-        self._state = params.get("stateSelection")
-
-    def _process(self):
-        self._conf.getConfPaperReview().removeState(self._state)
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-class RHAddQuestion(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHAddQuestion
-
-    def _checkParams( self, params ):
-        RHConfModifReviewingPRMBase._checkParams( self, params )
-        self._question = params.get("question")
-
-    def _process( self ):
-        self._conf.getConfPaperReview().addReviewingQuestion( self._question )
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-class RHRemoveQuestion(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHRemoveQuestion
-
-    def _checkParams(self, params):
-        RHConfModifReviewingPRMBase._checkParams(self, params)
-        self._question = params.get("questionSelection")
-
-    def _process(self):
-        self._conf.getConfPaperReview().removeReviewingQuestion(self._question)
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-class RHAddCriteria(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHAddCriteria
-
-    def _checkParams( self, params ):
-        RHConfModifReviewingPRMBase._checkParams( self, params )
-        self._criteria = params.get("criteria")
-
-    def _process( self ):
-        self._conf.getConfPaperReview().addLayoutCriteria( self._criteria )
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-class RHRemoveCriteria(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHRemoveCriteria
-
-    def _checkParams(self, params):
-        RHConfModifReviewingPRMBase._checkParams(self, params)
-        self._criteria = params.get("criteriaSelection")
-
-    def _process(self):
-        self._conf.getConfPaperReview().removeLayoutCriteria(self._criteria)
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-#################################### END of old classes that are not used anymore ###############################
-
 class RHSetTemplate(RHConfModifReviewingPRMBase):
     _uh = urlHandlers.UHSetTemplate
 
@@ -287,13 +201,3 @@ class RHDownloadTemplate(RHConferenceBaseDisplay):
     def _process(self):
         template = self._target.getConfPaperReview().getTemplates()[self._templateId].getFile()
         return send_file(template.getFileName(), template.getFilePath(), template.getFileType())
-
-class RHDeleteTemplate(RHConfModifReviewingPRMBase):
-
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams( self, params )
-        self._templateId = params.get("reviewingTemplateId")
-
-    def _process(self):
-        self._conf.getConfPaperReview().deleteTemplate(self._templateId)
-        self._redirect(urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ))

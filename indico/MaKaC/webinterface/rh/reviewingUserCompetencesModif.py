@@ -21,8 +21,8 @@
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.reviewing as reviewing
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
-import MaKaC.user as user
 from MaKaC.webinterface.rh.reviewingModif import RHConfModifReviewingPRMAMBase
+
 
 class RHConfModifUserCompetences( RHConfModifReviewingPRMAMBase ):
     _uh = urlHandlers.UHConfModifUserCompetences
@@ -33,36 +33,3 @@ class RHConfModifUserCompetences( RHConfModifReviewingPRMAMBase ):
         else:
             p = reviewing.WPConfModifUserCompetences( self, self._target)
         return p.display()
-    
-
-class RHConfModifUserCompetencesAbstracts( RHConfModifReviewingPRMAMBase ):
-    _uh = urlHandlers.UHConfModifUserCompetences
-
-    def _process( self ):
-        if self._conf.isClosed():
-            p = WPConferenceModificationClosed( self, self._target )
-        else:
-            p = reviewing.WPConfModifUserCompetencesAbstracts( self, self._target)
-        return p.display()
-
-class RHConfModifModifyUserCompetences( RHConfModifReviewingPRMAMBase ):
-    
-    def _checkParams( self, params ):
-        RHConfModifReviewingPRMAMBase._checkParams( self, params )
-        self._add = params.has_key("add")
-        self._remove = params.has_key("remove")
-        ph = user.PrincipalHolder()
-        self._user =  ph.getById( params.get("user"))
-        self._competences = [competence.strip() for competence in params.get("competences", '').split(',')]
-
-    def _process( self ):
-        if self._conf.isClosed():
-            p = WPConferenceModificationClosed( self, self._target )
-            return p.display()
-        else:
-            if self._add:
-                self._conf.getConfPaperReview().addUserCompetences(self._user, self._competences)
-            if self._remove:
-                self._conf.getConfPaperReview().removeUserCompetences(self._user, self._competences)
-            self._redirect(urlHandlers.UHConfModifUserCompetences.getURL(self._conf))
-        

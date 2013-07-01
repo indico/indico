@@ -37,4 +37,5 @@ import indico.web.flask.blueprints.event.management.schedule
 import indico.web.flask.blueprints.event.management.participants
 import indico.web.flask.blueprints.event.management.contributions
 import indico.web.flask.blueprints.event.management.sessions
+import indico.web.flask.blueprints.event.management.paperreviewing
 import indico.web.flask.blueprints.event.management.misc

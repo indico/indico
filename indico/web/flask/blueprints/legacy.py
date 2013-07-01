@@ -21,12 +21,6 @@ from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
-import MaKaC.webinterface.rh.contribReviewingModif as mod_rh_contribReviewingModif
-import MaKaC.webinterface.rh.reviewingAssignContributions as mod_rh_reviewingAssignContributions
-import MaKaC.webinterface.rh.reviewingControlModif as mod_rh_reviewingControlModif
-import MaKaC.webinterface.rh.reviewingListContribToJudge as mod_rh_reviewingListContribToJudge
-import MaKaC.webinterface.rh.reviewingModif as mod_rh_reviewingModif
-import MaKaC.webinterface.rh.reviewingUserCompetencesModif as mod_rh_reviewingUserCompetencesModif
 import MaKaC.webinterface.rh.users as mod_rh_users
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
 
@@ -218,15 +212,8 @@ legacy = IndicoBlueprint('legacy', __name__)
 
 
 # Routes for assignContributions.py
-legacy.add_url_rule('/assignContributions.py',
-                    'assignContributions',
-                    rh_as_view(mod_rh_reviewingAssignContributions.RHReviewingAssignContributionsList),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/assignContributions.py/downloadAcceptedPapers',
-                    'assignContributions-downloadAcceptedPapers',
-                    rh_as_view(mod_rh_reviewingAssignContributions.RHDownloadAcceptedPapers),
-                    methods=('GET', 'POST'))
+# Inactive: /assignContributions.py (mod_rh_reviewingAssignContributions.RHReviewingAssignContributionsList)
+# Inactive: /assignContributions.py/downloadAcceptedPapers (mod_rh_reviewingAssignContributions.RHDownloadAcceptedPapers)
 
 
 # Routes for badgeTemplates.py
@@ -322,20 +309,9 @@ legacy.add_url_rule('/assignContributions.py/downloadAcceptedPapers',
 
 
 # Routes for confListContribToJudge.py
-legacy.add_url_rule('/confListContribToJudge.py',
-                    'confListContribToJudge',
-                    rh_as_view(mod_rh_reviewingListContribToJudge.RHContribListToJudge),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confListContribToJudge.py/asEditor',
-                    'confListContribToJudge-asEditor',
-                    rh_as_view(mod_rh_reviewingListContribToJudge.RHContribListToJudgeAsEditor),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confListContribToJudge.py/asReviewer',
-                    'confListContribToJudge-asReviewer',
-                    rh_as_view(mod_rh_reviewingListContribToJudge.RHContribListToJudgeAsReviewer),
-                    methods=('GET', 'POST'))
+# Inactive: /confListContribToJudge.py (mod_rh_reviewingListContribToJudge.RHContribListToJudge)
+# Inactive: /confListContribToJudge.py/asEditor (mod_rh_reviewingListContribToJudge.RHContribListToJudgeAsEditor)
+# Inactive: /confListContribToJudge.py/asReviewer (mod_rh_reviewingListContribToJudge.RHContribListToJudgeAsReviewer)
 
 
 # Routes for confLogin.py
@@ -563,72 +539,14 @@ legacy.add_url_rule('/confListContribToJudge.py/asReviewer',
 
 
 # Routes for confModifReviewing.py
-legacy.add_url_rule('/confModifReviewing.py/access',
-                    'confModifReviewing-access',
-                    rh_as_view(mod_rh_reviewingModif.RHConfModifReviewingAccess),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifReviewing.py/addCriteria',
-                    'confModifReviewing-addCriteria',
-                    rh_as_view(mod_rh_reviewingModif.RHAddCriteria),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifReviewing.py/addQuestion',
-                    'confModifReviewing-addQuestion',
-                    rh_as_view(mod_rh_reviewingModif.RHAddQuestion),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifReviewing.py/addState',
-                    'confModifReviewing-addState',
-                    rh_as_view(mod_rh_reviewingModif.RHAddState),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifReviewing.py/chooseReviewing',
-                    'confModifReviewing-chooseReviewing',
-                    rh_as_view(mod_rh_reviewingModif.RHChooseReviewing),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifReviewing.py/deleteTemplate',
-                    'confModifReviewing-deleteTemplate',
-                    rh_as_view(mod_rh_reviewingModif.RHDeleteTemplate),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifReviewing.py/downloadTemplate',
-                    'confModifReviewing-downloadTemplate',
-                    rh_as_view(mod_rh_reviewingModif.RHDownloadTemplate),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifReviewing.py/paperSetup',
-                    'confModifReviewing-paperSetup',
-                    rh_as_view(mod_rh_reviewingModif.RHConfModifReviewingPaperSetup),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifReviewing.py/removeCriteria',
-                    'confModifReviewing-removeCriteria',
-                    rh_as_view(mod_rh_reviewingModif.RHRemoveCriteria),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifReviewing.py/removeQuestion',
-                    'confModifReviewing-removeQuestion',
-                    rh_as_view(mod_rh_reviewingModif.RHRemoveQuestion),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifReviewing.py/removeState',
-                    'confModifReviewing-removeState',
-                    rh_as_view(mod_rh_reviewingModif.RHRemoveState),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifReviewing.py/setTemplate',
-                    'confModifReviewing-setTemplate',
-                    rh_as_view(mod_rh_reviewingModif.RHSetTemplate),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifReviewing.py/access (mod_rh_reviewingModif.RHConfModifReviewingAccess)
+# Inactive: /confModifReviewing.py/downloadTemplate (mod_rh_reviewingModif.RHDownloadTemplate)
+# Inactive: /confModifReviewing.py/paperSetup (mod_rh_reviewingModif.RHConfModifReviewingPaperSetup)
+# Inactive: /confModifReviewing.py/setTemplate (mod_rh_reviewingModif.RHSetTemplate)
 
 
 # Routes for confModifReviewingControl.py
-legacy.add_url_rule('/confModifReviewingControl.py',
-                    'confModifReviewingControl',
-                    rh_as_view(mod_rh_reviewingControlModif.RHConfModifReviewingControl),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifReviewingControl.py (mod_rh_reviewingControlModif.RHConfModifReviewingControl)
 
 
 # Routes for confModifSchedule.py
@@ -675,20 +593,7 @@ legacy.add_url_rule('/confModifTools.py/dvdDone',
 
 
 # Routes for confModifUserCompetences.py
-legacy.add_url_rule('/confModifUserCompetences.py',
-                    'confModifUserCompetences',
-                    rh_as_view(mod_rh_reviewingUserCompetencesModif.RHConfModifUserCompetences),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifUserCompetences.py/Abstracts',
-                    'confModifUserCompetences-Abstracts',
-                    rh_as_view(mod_rh_reviewingUserCompetencesModif.RHConfModifUserCompetencesAbstracts),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifUserCompetences.py/modifyCompetences',
-                    'confModifUserCompetences-modifyCompetences',
-                    rh_as_view(mod_rh_reviewingUserCompetencesModif.RHConfModifModifyUserCompetences),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifUserCompetences.py (mod_rh_reviewingUserCompetencesModif.RHConfModifUserCompetences)
 
 
 # Routes for confRegistrantsDisplay.py
@@ -807,27 +712,11 @@ legacy.add_url_rule('/confModifUserCompetences.py/modifyCompetences',
 
 
 # Routes for contributionEditingJudgement.py
-legacy.add_url_rule('/contributionEditingJudgement.py',
-                    'contributionEditingJudgement',
-                    rh_as_view(mod_rh_contribReviewingModif.RHContributionEditingJudgement),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionEditingJudgement.py/judgeEditing',
-                    'contributionEditingJudgement-judgeEditing',
-                    rh_as_view(mod_rh_contribReviewingModif.RHJudgeEditing),
-                    methods=('GET', 'POST'))
+# Inactive: /contributionEditingJudgement.py (mod_rh_contribReviewingModif.RHContributionEditingJudgement)
 
 
 # Routes for contributionGiveAdvice.py
-legacy.add_url_rule('/contributionGiveAdvice.py',
-                    'contributionGiveAdvice',
-                    rh_as_view(mod_rh_contribReviewingModif.RHContributionGiveAdvice),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionGiveAdvice.py/giveAdvice',
-                    'contributionGiveAdvice-giveAdvice',
-                    rh_as_view(mod_rh_contribReviewingModif.RHGiveAdvice),
-                    methods=('GET', 'POST'))
+# Inactive: /contributionGiveAdvice.py (mod_rh_contribReviewingModif.RHContributionGiveAdvice)
 
 
 # Routes for contributionListDisplay.py
@@ -857,75 +746,16 @@ legacy.add_url_rule('/contributionGiveAdvice.py/giveAdvice',
 
 
 # Routes for contributionReviewing.py
-legacy.add_url_rule('/contributionReviewing.py',
-                    'contributionReviewing',
-                    rh_as_view(mod_rh_contribReviewingModif.RHContributionReviewing),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/assignEditing',
-                    'contributionReviewing-assignEditing',
-                    rh_as_view(mod_rh_contribReviewingModif.RHAssignEditing),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/assignReferee',
-                    'contributionReviewing-assignReferee',
-                    rh_as_view(mod_rh_contribReviewingModif.RHAssignReferee),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/assignReviewing',
-                    'contributionReviewing-assignReviewing',
-                    rh_as_view(mod_rh_contribReviewingModif.RHAssignReviewing),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/contributionReviewingJudgements',
-                    'contributionReviewing-contributionReviewingJudgements',
-                    rh_as_view(mod_rh_contribReviewingModif.RHContributionReviewingJudgements),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/contributionReviewingMaterials',
-                    'contributionReviewing-contributionReviewingMaterials',
-                    rh_as_view(mod_rh_contribReviewingModif.RHContribModifReviewingMaterials),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/editorDueDate',
-                    'contributionReviewing-editorDueDate',
-                    rh_as_view(mod_rh_contribReviewingModif.RHEditorDueDate),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/finalJudge',
-                    'contributionReviewing-finalJudge',
-                    rh_as_view(mod_rh_contribReviewingModif.RHFinalJudge),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/refereeDueDate',
-                    'contributionReviewing-refereeDueDate',
-                    rh_as_view(mod_rh_contribReviewingModif.RHRefereeDueDate),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/removeAssignEditing',
-                    'contributionReviewing-removeAssignEditing',
-                    rh_as_view(mod_rh_contribReviewingModif.RHRemoveAssignEditing),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/removeAssignReferee',
-                    'contributionReviewing-removeAssignReferee',
-                    rh_as_view(mod_rh_contribReviewingModif.RHRemoveAssignReferee),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/removeAssignReviewing',
-                    'contributionReviewing-removeAssignReviewing',
-                    rh_as_view(mod_rh_contribReviewingModif.RHRemoveAssignReviewing),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/reviewerDueDate',
-                    'contributionReviewing-reviewerDueDate',
-                    rh_as_view(mod_rh_contribReviewingModif.RHReviewerDueDate),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionReviewing.py/reviewingHistory',
-                    'contributionReviewing-reviewingHistory',
-                    rh_as_view(mod_rh_contribReviewingModif.RHReviewingHistory),
-                    methods=('GET', 'POST'))
+# Inactive: /contributionReviewing.py (mod_rh_contribReviewingModif.RHContributionReviewing)
+# Inactive: /contributionReviewing.py/assignEditing (mod_rh_contribReviewingModif.RHAssignEditing)
+# Inactive: /contributionReviewing.py/assignReferee (mod_rh_contribReviewingModif.RHAssignReferee)
+# Inactive: /contributionReviewing.py/assignReviewing (mod_rh_contribReviewingModif.RHAssignReviewing)
+# Inactive: /contributionReviewing.py/contributionReviewingJudgements (mod_rh_contribReviewingModif.RHContributionReviewingJudgements)
+# Inactive: /contributionReviewing.py/contributionReviewingMaterials (mod_rh_contribReviewingModif.RHContribModifReviewingMaterials)
+# Inactive: /contributionReviewing.py/removeAssignEditing (mod_rh_contribReviewingModif.RHRemoveAssignEditing)
+# Inactive: /contributionReviewing.py/removeAssignReferee (mod_rh_contribReviewingModif.RHRemoveAssignReferee)
+# Inactive: /contributionReviewing.py/removeAssignReviewing (mod_rh_contribReviewingModif.RHRemoveAssignReviewing)
+# Inactive: /contributionReviewing.py/reviewingHistory (mod_rh_contribReviewingModif.RHReviewingHistory)
 
 
 # Routes for contributionTools.py
