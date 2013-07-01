@@ -796,11 +796,6 @@ legacy.add_url_rule('/confModifUserCompetences.py/modifyCompetences',
 # Inactive: /conferenceModification.py/materialsAdd (mod_rh_conferenceModif.RHMaterialsAdd)
 # Inactive: /conferenceModification.py/materialsShow (mod_rh_conferenceModif.RHMaterialsShow)
 # Inactive: /conferenceModification.py/modifKey (mod_rh_conferenceModif.RHConferenceModifKey)
-
-legacy.add_url_rule('/conferenceModification.py/modificationClosed',
-                    'conferenceModification-modificationClosed',
-                    rh_as_view(mod_rh_conferenceModif.RHConferenceModificationClosed),
-                    methods=('GET', 'POST'))
 # Inactive: /conferenceModification.py/open (mod_rh_conferenceModif.RHConferenceOpen)
 # Inactive: /conferenceModification.py/removeContribType (mod_rh_conferenceModif.RHConfRemoveContribType)
 # Inactive: /conferenceModification.py/roomBookingBookingForm (mod_rh_conferenceModif.RHConfModifRoomBookingBookingForm)

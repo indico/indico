@@ -101,13 +101,6 @@ class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
         return self._displayDefaultPage()
 
 
-class RHConferenceModificationClosed( RHConferenceModifBase ):
-
-    def _process(self):
-        if self._conf.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
-
 class RHConferenceModification( RoomBookingDBMixin, RHConferenceModifBase ):
     _uh = urlHandlers.UHConferenceModification
 

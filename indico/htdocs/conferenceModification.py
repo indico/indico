@@ -58,9 +58,6 @@ def close(req, **params):
 def open(req, **params):
     return conferenceModif.RHConferenceOpen(req).process(params)
 
-def modificationClosed(req, **params):
-    return conferenceModif.RHConferenceModificationClosed(req).process(params)
-
 def sectionsSettings(req, **params):
     return conferenceModif.RHConfSectionsSettings(req).process(params)
 

@@ -645,10 +645,6 @@ class UHConferenceClose(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-close'
 
 
-class UHConferenceModificationClosed(URLHandler):
-    _endpoint = 'legacy.conferenceModification-modificationClosed'
-
-
 class UHConferenceOpen(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-open'
 
