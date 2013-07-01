@@ -1653,20 +1653,18 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                             inSessionTimetable = "yes";
                         }
 
-                        Util.postRequest(build_url(Indico.Urls.SlotCalc),
-                                {
-                                    confId: self.tt.eventInfo.id,
-                                    sessionId: self.tt.contextInfo.sessionId,
-                                    slotId: self.tt.contextInfo.sessionSlotId
-                                },
-                                {
+                        Util.postRequest(build_url(Indico.Urls.SlotCalc, {
+                            confId: self.tt.eventInfo.id,
+                            sessionId: self.tt.contextInfo.sessionId,
+                            slotId: self.tt.contextInfo.sessionSlotId
+                        }), null, {
                                     OK: "ok",
                                     action: self.rescheduleAction,
                                     hour: "0",
                                     minute: self.minuteInput.get(),
                                     currentDay: self.tt.currentDay,
                                     inSessionTimetable: inSessionTimetable
-                                });
+                        });
                     }
                 }
             };
@@ -1776,14 +1774,12 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
             if (this.tt.IntervalManagementTimeTable){
                 // Fit session slot according to its entries.
                 IndicoUI.Dialogs.Util.progress($T("Fitting session to content"));
-                Util.postRequest(build_url(Indico.Urls.FitSessionSlot),
-                        {
-                            confId: self.tt.contextInfo.conferenceId,
-                            sessionId: self.tt.contextInfo.sessionId,
-                            slotId: self.tt.contextInfo.sessionSlotId,
-                            day: self.tt.currentDay
-                        },
-                        {});
+                Util.postRequest(build_url(Indico.Urls.FitSessionSlot, {
+                    confId: self.tt.contextInfo.conferenceId,
+                    sessionId: self.tt.contextInfo.sessionId,
+                    slotId: self.tt.contextInfo.sessionSlotId,
+                    day: self.tt.currentDay
+                }), null, {});
             }
 //            else if (this.tt.isSessionTimetable) {
 //                // Fit session according to its session slots

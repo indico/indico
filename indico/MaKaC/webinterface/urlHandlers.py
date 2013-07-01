@@ -943,11 +943,11 @@ class UHContribsConfManagerDisplayParticipantList(URLHandler):
 
 
 class UHSessionClose(URLHandler):
-    _endpoint = 'legacy.sessionModification-close'
+    _endpoint = 'event_mgmt.sessionModification-close'
 
 
 class UHSessionOpen(URLHandler):
-    _endpoint = 'legacy.sessionModification-open'
+    _endpoint = 'event_mgmt.sessionModification-open'
 
 
 class UHSessionCreation(URLHandler):
@@ -1769,55 +1769,55 @@ class UHSubContribModifTools(URLHandler):
 
 
 class UHSessionModification(URLHandler):
-    _endpoint = 'legacy.sessionModification'
+    _endpoint = 'event_mgmt.sessionModification'
 
 
 class UHSessionModifMaterials(URLHandler):
-    _endpoint = 'legacy.sessionModification-materials'
+    _endpoint = 'event_mgmt.sessionModification-materials'
 
 
 class UHSessionDataModification(URLHandler):
-    _endpoint = 'legacy.sessionModification-modify'
+    _endpoint = 'event_mgmt.sessionModification-modify'
 
 
 class UHSessionFitSlot(URLHandler):
-    _endpoint = 'legacy.sessionModifSchedule-fitSlot'
+    _endpoint = 'event_mgmt.sessionModifSchedule-fitSlot'
 
 
 class UHSessionModifAddMaterials(URLHandler):
-    _endpoint = 'legacy.sessionModification-materialsAdd'
+    _endpoint = 'event_mgmt.sessionModification-materialsAdd'
 
 
 class UHSessionModifSchedule(URLHandler):
-    _endpoint = 'legacy.sessionModifSchedule'
+    _endpoint = 'event_mgmt.sessionModifSchedule'
 
 
 class UHSessionModSlotCalc(URLHandler):
-    _endpoint = 'legacy.sessionModifSchedule-slotCalc'
+    _endpoint = 'event_mgmt.sessionModifSchedule-slotCalc'
 
 
 class UHSessionModifAC(URLHandler):
-    _endpoint = 'legacy.sessionModifAC'
+    _endpoint = 'event_mgmt.sessionModifAC'
 
 
 class UHSessionSetVisibility(URLHandler):
-    _endpoint = 'legacy.sessionModifAC-setVisibility'
+    _endpoint = 'event_mgmt.sessionModifAC-setVisibility'
 
 
 class UHSessionModifTools(URLHandler):
-    _endpoint = 'legacy.sessionModifTools'
+    _endpoint = 'event_mgmt.sessionModifTools'
 
 
 class UHSessionModifComm(URLHandler):
-    _endpoint = 'legacy.sessionModifComm'
+    _endpoint = 'event_mgmt.sessionModifComm'
 
 
 class UHSessionModifCommEdit(URLHandler):
-    _endpoint = 'legacy.sessionModifComm-edit'
+    _endpoint = 'event_mgmt.sessionModifComm-edit'
 
 
 class UHSessionDeletion(URLHandler):
-    _endpoint = 'legacy.sessionModifTools-delete'
+    _endpoint = 'event_mgmt.sessionModifTools-delete'
 
 
 class UHContributionModification(URLHandler):
@@ -2050,11 +2050,11 @@ class UHAbstractDelete(URLHandler):
 
 
 class UHSessionModContribList(URLHandler):
-    _endpoint = 'legacy.sessionModification-contribList'
+    _endpoint = 'event_mgmt.sessionModification-contribList'
 
 
 class UHSessionModContribListEditContrib(URLHandler):
-    _endpoint = 'legacy.sessionModification-editContrib'
+    _endpoint = 'event_mgmt.sessionModification-editContrib'
 
 
 class UHConfModifReschedule(URLHandler):
@@ -2086,19 +2086,19 @@ class UHConfModAbstractWithdraw(URLHandler):
 
 
 class UHSessionModAddContribs(URLHandler):
-    _endpoint = 'legacy.sessionModification-addContribs'
+    _endpoint = 'event_mgmt.sessionModification-addContribs'
 
 
 class UHSessionModContributionAction(URLHandler):
-    _endpoint = 'legacy.sessionModification-contribAction'
+    _endpoint = 'event_mgmt.sessionModification-contribAction'
 
 
 class UHSessionModParticipantList(URLHandler):
-    _endpoint = 'legacy.sessionModification-participantList'
+    _endpoint = 'event_mgmt.sessionModification-participantList'
 
 
 class UHSessionModToPDF(URLHandler):
-    _endpoint = 'legacy.sessionModification-contribsToPDF'
+    _endpoint = 'event_mgmt.sessionModification-contribsToPDF'
 
 
 class UHConfModCFANotifTplUp(URLHandler):
@@ -2142,7 +2142,7 @@ class UHConfModContribQuickAccess(URLHandler):
 
 
 class UHSessionModContribQuickAccess(URLHandler):
-    _endpoint = 'legacy.sessionModification-contribQuickAccess'
+    _endpoint = 'event_mgmt.sessionModification-contribQuickAccess'
 
 
 class UHTrackModContribQuickAccess(URLHandler):

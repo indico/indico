@@ -29,3 +29,5 @@ event_mgmt.add_url_rule('/timetable/reschedule', 'confModifSchedule-reschedule',
                         rh_as_view(conferenceModif.RHReschedule), methods=('POST',))
 event_mgmt.add_url_rule('/timetables/dates', 'confModifSchedule-edit',
                         rh_as_view(conferenceModif.RHScheduleDataEdit), methods=('GET', 'POST'))
+
+# Session timetable - see the "sessions" module

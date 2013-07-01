@@ -230,7 +230,7 @@ class RHSessionClose( RHSessionModifBase ):
 
     def _process( self ):
         if self._cancel:
-            self._redirect(urlHandlers.UHSessionModification.getURL(self._target))
+            self._redirect(urlHandlers.UHSessionModifTools.getURL(self._target))
         elif self._confirm:
             self._target.setClosed(True)
             self._redirect(urlHandlers.UHSessionModification.getURL(self._target))

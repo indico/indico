@@ -27,7 +27,6 @@ import MaKaC.webinterface.rh.reviewingControlModif as mod_rh_reviewingControlMod
 import MaKaC.webinterface.rh.reviewingListContribToJudge as mod_rh_reviewingListContribToJudge
 import MaKaC.webinterface.rh.reviewingModif as mod_rh_reviewingModif
 import MaKaC.webinterface.rh.reviewingUserCompetencesModif as mod_rh_reviewingUserCompetencesModif
-import MaKaC.webinterface.rh.sessionModif as mod_rh_sessionModif
 import MaKaC.webinterface.rh.users as mod_rh_users
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
 
@@ -1125,123 +1124,40 @@ legacy.add_url_rule('/contributionReviewing.py/reviewingHistory',
 
 
 # Routes for sessionModifAC.py
-legacy.add_url_rule('/sessionModifAC.py',
-                    'sessionModifAC',
-                    rh_as_view(mod_rh_sessionModif.RHSessionModifAC),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModifAC.py/setVisibility',
-                    'sessionModifAC-setVisibility',
-                    rh_as_view(mod_rh_sessionModif.RHSessionSetVisibility),
-                    methods=('GET', 'POST'))
+# Inactive: /sessionModifAC.py (mod_rh_sessionModif.RHSessionModifAC)
+# Inactive: /sessionModifAC.py/setVisibility (mod_rh_sessionModif.RHSessionSetVisibility)
 
 
 # Routes for sessionModifComm.py
-legacy.add_url_rule('/sessionModifComm.py',
-                    'sessionModifComm',
-                    rh_as_view(mod_rh_sessionModif.RHSessionModifComm),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModifComm.py/edit',
-                    'sessionModifComm-edit',
-                    rh_as_view(mod_rh_sessionModif.RHSessionModifCommEdit),
-                    methods=('GET', 'POST'))
+# Inactive: /sessionModifComm.py (mod_rh_sessionModif.RHSessionModifComm)
+# Inactive: /sessionModifComm.py/edit (mod_rh_sessionModif.RHSessionModifCommEdit)
 
 
 # Routes for sessionModifSchedule.py
-legacy.add_url_rule('/sessionModifSchedule.py',
-                    'sessionModifSchedule',
-                    rh_as_view(mod_rh_sessionModif.RHSessionModifSchedule),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModifSchedule.py/fitSlot',
-                    'sessionModifSchedule-fitSlot',
-                    rh_as_view(mod_rh_sessionModif.RHFitSlot),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModifSchedule.py/slotCalc',
-                    'sessionModifSchedule-slotCalc',
-                    rh_as_view(mod_rh_sessionModif.RHSlotCalc),
-                    methods=('GET', 'POST'))
+# Inactive: /sessionModifSchedule.py (mod_rh_sessionModif.RHSessionModifSchedule)
+# Inactive: /sessionModifSchedule.py/fitSlot (mod_rh_sessionModif.RHFitSlot)
+# Inactive: /sessionModifSchedule.py/slotCalc (mod_rh_sessionModif.RHSlotCalc)
 
 
 # Routes for sessionModifTools.py
-legacy.add_url_rule('/sessionModifTools.py',
-                    'sessionModifTools',
-                    rh_as_view(mod_rh_sessionModif.RHSessionModifTools),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModifTools.py/delete',
-                    'sessionModifTools-delete',
-                    rh_as_view(mod_rh_sessionModif.RHSessionDeletion),
-                    methods=('GET', 'POST'))
+# Inactive: /sessionModifTools.py (mod_rh_sessionModif.RHSessionModifTools)
+# Inactive: /sessionModifTools.py/delete (mod_rh_sessionModif.RHSessionDeletion)
 
 
 # Routes for sessionModification.py
-legacy.add_url_rule('/sessionModification.py',
-                    'sessionModification',
-                    rh_as_view(mod_rh_sessionModif.RHSessionModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/addContribs',
-                    'sessionModification-addContribs',
-                    rh_as_view(mod_rh_sessionModif.RHAddContribs),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/close',
-                    'sessionModification-close',
-                    rh_as_view(mod_rh_sessionModif.RHSessionClose),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/contribAction',
-                    'sessionModification-contribAction',
-                    rh_as_view(mod_rh_sessionModif.RHContribsActions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/contribList',
-                    'sessionModification-contribList',
-                    rh_as_view(mod_rh_sessionModif.RHContribList),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/contribQuickAccess',
-                    'sessionModification-contribQuickAccess',
-                    rh_as_view(mod_rh_sessionModif.RHContribQuickAccess),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/contribsToPDF',
-                    'sessionModification-contribsToPDF',
-                    rh_as_view(mod_rh_sessionModif.RHContribsToPDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/editContrib',
-                    'sessionModification-editContrib',
-                    rh_as_view(mod_rh_sessionModif.RHContribListEditContrib),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/materials',
-                    'sessionModification-materials',
-                    rh_as_view(mod_rh_sessionModif.RHMaterials),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/materialsAdd',
-                    'sessionModification-materialsAdd',
-                    rh_as_view(mod_rh_sessionModif.RHMaterialsAdd),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/modify',
-                    'sessionModification-modify',
-                    rh_as_view(mod_rh_sessionModif.RHSessionDataModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/open',
-                    'sessionModification-open',
-                    rh_as_view(mod_rh_sessionModif.RHSessionOpen),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/sessionModification.py/participantList',
-                    'sessionModification-participantList',
-                    rh_as_view(mod_rh_sessionModif.RHContribsParticipantList),
-                    methods=('GET', 'POST'))
+# Inactive: /sessionModification.py (mod_rh_sessionModif.RHSessionModification)
+# Inactive: /sessionModification.py/addContribs (mod_rh_sessionModif.RHAddContribs)
+# Inactive: /sessionModification.py/close (mod_rh_sessionModif.RHSessionClose)
+# Inactive: /sessionModification.py/contribAction (mod_rh_sessionModif.RHContribsActions)
+# Inactive: /sessionModification.py/contribList (mod_rh_sessionModif.RHContribList)
+# Inactive: /sessionModification.py/contribQuickAccess (mod_rh_sessionModif.RHContribQuickAccess)
+# Inactive: /sessionModification.py/contribsToPDF (mod_rh_sessionModif.RHContribsToPDF)
+# Inactive: /sessionModification.py/editContrib (mod_rh_sessionModif.RHContribListEditContrib)
+# Inactive: /sessionModification.py/materials (mod_rh_sessionModif.RHMaterials)
+# Inactive: /sessionModification.py/materialsAdd (mod_rh_sessionModif.RHMaterialsAdd)
+# Inactive: /sessionModification.py/modify (mod_rh_sessionModif.RHSessionDataModification)
+# Inactive: /sessionModification.py/open (mod_rh_sessionModif.RHSessionOpen)
+# Inactive: /sessionModification.py/participantList (mod_rh_sessionModif.RHContribsParticipantList)
 
 
 # Routes for signIn.py
