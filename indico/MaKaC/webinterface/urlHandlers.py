@@ -1407,11 +1407,11 @@ class UHConfManagementAccess(UHConfUser):
 
 
 class UHConfEnterModifKey(UHConfUser):
-    _endpoint = 'legacy.conferenceModification-modifKey'
+    _endpoint = 'event_mgmt.conferenceModification-modifKey'
 
 
 class UHConfCloseModifKey(UHConfUser):
-    _endpoint = 'legacy.conferenceModification-closeModifKey'
+    _endpoint = 'event_mgmt.conferenceModification-closeModifKey'
 
 
 class UHUserCreated(UHConfUser):

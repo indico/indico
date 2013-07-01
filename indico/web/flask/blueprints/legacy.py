@@ -788,22 +788,14 @@ legacy.add_url_rule('/confModifUserCompetences.py/modifyCompetences',
 # Inactive: /conferenceModification.py (mod_rh_conferenceModif.RHConferenceModification)
 # Inactive: /conferenceModification.py/addContribType (mod_rh_conferenceModif.RHConfAddContribType)
 # Inactive: /conferenceModification.py/close (mod_rh_conferenceModif.RHConferenceClose)
-
-legacy.add_url_rule('/conferenceModification.py/closeModifKey',
-                    'conferenceModification-closeModifKey',
-                    rh_as_view(mod_rh_conferenceModif.RHConferenceCloseModifKey),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceModification.py/closeModifKey (mod_rh_conferenceModif.RHConferenceCloseModifKey)
 # Inactive: /conferenceModification.py/data (mod_rh_conferenceModif.RHConfDataModif)
 # Inactive: /conferenceModification.py/dataPerform (mod_rh_conferenceModif.RHConfPerformDataModif)
 # Inactive: /conferenceModification.py/editContribType (mod_rh_conferenceModif.RHConfEditContribType)
 # Inactive: /conferenceModification.py/managementAccess (mod_rh_conferenceModif.RHConferenceModifManagementAccess)
 # Inactive: /conferenceModification.py/materialsAdd (mod_rh_conferenceModif.RHMaterialsAdd)
 # Inactive: /conferenceModification.py/materialsShow (mod_rh_conferenceModif.RHMaterialsShow)
-
-legacy.add_url_rule('/conferenceModification.py/modifKey',
-                    'conferenceModification-modifKey',
-                    rh_as_view(mod_rh_conferenceModif.RHConferenceModifKey),
-                    methods=('GET', 'POST'))
+# Inactive: /conferenceModification.py/modifKey (mod_rh_conferenceModif.RHConferenceModifKey)
 
 legacy.add_url_rule('/conferenceModification.py/modificationClosed',
                     'conferenceModification-modificationClosed',
