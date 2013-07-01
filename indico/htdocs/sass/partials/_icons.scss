@@ -231,3 +231,12 @@ you can use the generic selector below, but it's slower:
 .icon-checkmark:before {
 	content: "\4d";
 }
+.icon-textarea:before {
+    content: "\e000";
+}
+.icon-textfield:before {
+    content: "\f5d5";
+}
+.icon-dropmenu:before {
+    content: "\f0a5";
+}
