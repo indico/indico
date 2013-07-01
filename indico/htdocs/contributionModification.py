@@ -25,20 +25,8 @@ def index(req, **params):
 def browseMaterial(req, **params):
     return contribMod.RHContribModifMaterialBrowse( req ).process( params )
 
-def addMaterial(req, **params):
-    return contribMod.RHContributionAddMaterial( req ).process( params )
-
-def performAddMaterial(req, **params):
-    return contribMod.RHContributionPerformAddMaterial( req ).process( params )
-
 def materialsAdd(req, **params):
     return contribMod.RHMaterialsAdd(req).process(params)
-
-def removeMaterials( req, **params ):
-    return contribMod.RHContributionRemoveMaterials( req ).process( params )
-
-def performMove( req, **params ):
-    return contribMod.RHContributionPerformMove( req ).process( params )
 
 def data( req, **params ):
     return contribMod.RHContributionData( req ).process( params )

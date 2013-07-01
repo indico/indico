@@ -21,7 +21,6 @@ from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
-import MaKaC.webinterface.rh.contribMod as mod_rh_contribMod
 import MaKaC.webinterface.rh.contribReviewingModif as mod_rh_contribReviewingModif
 import MaKaC.webinterface.rh.reviewingAssignContributions as mod_rh_reviewingAssignContributions
 import MaKaC.webinterface.rh.reviewingControlModif as mod_rh_reviewingControlModif
@@ -29,8 +28,6 @@ import MaKaC.webinterface.rh.reviewingListContribToJudge as mod_rh_reviewingList
 import MaKaC.webinterface.rh.reviewingModif as mod_rh_reviewingModif
 import MaKaC.webinterface.rh.reviewingUserCompetencesModif as mod_rh_reviewingUserCompetencesModif
 import MaKaC.webinterface.rh.sessionModif as mod_rh_sessionModif
-import MaKaC.webinterface.rh.subContribDisplay as mod_rh_subContribDisplay
-import MaKaC.webinterface.rh.subContribMod as mod_rh_subContribMod
 import MaKaC.webinterface.rh.users as mod_rh_users
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
 
@@ -387,50 +384,14 @@ legacy.add_url_rule('/confListContribToJudge.py/asReviewer',
 
 
 # Routes for confModifContribList.py
-legacy.add_url_rule('/confModifContribList.py',
-                    'confModifContribList',
-                    rh_as_view(mod_rh_conferenceModif.RHContributionList),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifContribList.py/contribQuickAccess',
-                    'confModifContribList-contribQuickAccess',
-                    rh_as_view(mod_rh_conferenceModif.RHContribQuickAccess),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifContribList.py/contribsActions',
-                    'confModifContribList-contribsActions',
-                    rh_as_view(mod_rh_conferenceModif.RHContribsActions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifContribList.py/contribsToPDF',
-                    'confModifContribList-contribsToPDF',
-                    rh_as_view(mod_rh_conferenceModif.RHContribsToPDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifContribList.py/contribsToPDFMenu',
-                    'confModifContribList-contribsToPDFMenu',
-                    rh_as_view(mod_rh_conferenceModif.RHContribsToPDFMenu),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifContribList.py/matPkg',
-                    'confModifContribList-matPkg',
-                    rh_as_view(mod_rh_conferenceModif.RHMaterialPackage),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifContribList.py/moveToSession',
-                    'confModifContribList-moveToSession',
-                    rh_as_view(mod_rh_conferenceModif.RHMoveContribsToSession),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifContribList.py/participantList',
-                    'confModifContribList-participantList',
-                    rh_as_view(mod_rh_conferenceModif.RHContribsParticipantList),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifContribList.py/proceedings',
-                    'confModifContribList-proceedings',
-                    rh_as_view(mod_rh_conferenceModif.RHProceedings),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifContribList.py (mod_rh_conferenceModif.RHContributionList)
+# Inactive: /confModifContribList.py/contribQuickAccess (mod_rh_conferenceModif.RHContribQuickAccess)
+# Inactive: /confModifContribList.py/contribsActions (mod_rh_conferenceModif.RHContribsActions)
+# Inactive: /confModifContribList.py/contribsToPDFMenu (mod_rh_conferenceModif.RHContribsToPDFMenu)
+# Inactive: /confModifContribList.py/matPkg (mod_rh_conferenceModif.RHMaterialPackage)
+# Inactive: /confModifContribList.py/moveToSession (mod_rh_conferenceModif.RHMoveContribsToSession)
+# Inactive: /confModifContribList.py/participantList (mod_rh_conferenceModif.RHContribsParticipantList)
+# Inactive: /confModifContribList.py/proceedings (mod_rh_conferenceModif.RHProceedings)
 
 
 # Routes for confModifDisplay.py
@@ -834,15 +795,8 @@ legacy.add_url_rule('/confModifUserCompetences.py/modifyCompetences',
 
 
 # Routes for contributionAC.py
-legacy.add_url_rule('/contributionAC.py',
-                    'contributionAC',
-                    rh_as_view(mod_rh_contribMod.RHContributionAC),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionAC.py/setVisibility',
-                    'contributionAC-setVisibility',
-                    rh_as_view(mod_rh_contribMod.RHContributionSetVisibility),
-                    methods=('GET', 'POST'))
+# Inactive: /contributionAC.py (mod_rh_contribMod.RHContributionAC)
+# Inactive: /contributionAC.py/setVisibility (mod_rh_contribMod.RHContributionSetVisibility)
 
 
 # Routes for contributionDisplay.py
@@ -883,117 +837,24 @@ legacy.add_url_rule('/contributionGiveAdvice.py/giveAdvice',
 
 
 # Routes for contributionModifSubCont.py
-legacy.add_url_rule('/contributionModifSubCont.py',
-                    'contributionModifSubCont',
-                    rh_as_view(mod_rh_contribMod.RHContributionSC),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModifSubCont.py/Down',
-                    'contributionModifSubCont-Down',
-                    rh_as_view(mod_rh_contribMod.RHContributionDownSC),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModifSubCont.py/actionSubContribs',
-                    'contributionModifSubCont-actionSubContribs',
-                    rh_as_view(mod_rh_contribMod.RHSubContribActions),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModifSubCont.py/add',
-                    'contributionModifSubCont-add',
-                    rh_as_view(mod_rh_contribMod.RHContributionAddSC),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModifSubCont.py/create',
-                    'contributionModifSubCont-create',
-                    rh_as_view(mod_rh_contribMod.RHContributionCreateSC),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModifSubCont.py/setVisibility',
-                    'contributionModifSubCont-setVisibility',
-                    rh_as_view(mod_rh_contribMod.RHContributionSetVisibility),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModifSubCont.py/up',
-                    'contributionModifSubCont-up',
-                    rh_as_view(mod_rh_contribMod.RHContributionUpSC),
-                    methods=('GET', 'POST'))
+# Inactive: /contributionModifSubCont.py (mod_rh_contribMod.RHContributionSC)
+# Inactive: /contributionModifSubCont.py/actionSubContribs (mod_rh_contribMod.RHSubContribActions)
+# Inactive: /contributionModifSubCont.py/add (mod_rh_contribMod.RHContributionAddSC)
+# Inactive: /contributionModifSubCont.py/create (mod_rh_contribMod.RHContributionCreateSC)
 
 
 # Routes for contributionModification.py
-legacy.add_url_rule('/contributionModification.py',
-                    'contributionModification',
-                    rh_as_view(mod_rh_contribMod.RHContributionModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/addMaterial',
-                    'contributionModification-addMaterial',
-                    rh_as_view(mod_rh_contribMod.RHContributionAddMaterial),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/browseMaterial',
-                    'contributionModification-browseMaterial',
-                    rh_as_view(mod_rh_contribMod.RHContribModifMaterialBrowse),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/data',
-                    'contributionModification-data',
-                    rh_as_view(mod_rh_contribMod.RHContributionData),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/materials',
-                    'contributionModification-materials',
-                    rh_as_view(mod_rh_contribMod.RHMaterials),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/materialsAdd',
-                    'contributionModification-materialsAdd',
-                    rh_as_view(mod_rh_contribMod.RHMaterialsAdd),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/modifData',
-                    'contributionModification-modifData',
-                    rh_as_view(mod_rh_contribMod.RHContributionModifData),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/pdf',
-                    'contributionModification-pdf',
-                    rh_as_view(mod_rh_contribMod.RHContributionToPDF),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/performAddMaterial',
-                    'contributionModification-performAddMaterial',
-                    rh_as_view(mod_rh_contribMod.RHContributionPerformAddMaterial),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/performMove',
-                    'contributionModification-performMove',
-                    rh_as_view(mod_rh_contribMod.RHContributionPerformMove),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/removeMaterials',
-                    'contributionModification-removeMaterials',
-                    rh_as_view(mod_rh_contribMod.RHContributionRemoveMaterials),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/setSession',
-                    'contributionModification-setSession',
-                    rh_as_view(mod_rh_contribMod.RHSetSession),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/setTrack',
-                    'contributionModification-setTrack',
-                    rh_as_view(mod_rh_contribMod.RHSetTrack),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/withdraw',
-                    'contributionModification-withdraw',
-                    rh_as_view(mod_rh_contribMod.RHWithdraw),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionModification.py/xml',
-                    'contributionModification-xml',
-                    rh_as_view(mod_rh_contribMod.RHContributionToXML),
-                    methods=('GET', 'POST'))
+# Inactive: /contributionModification.py (mod_rh_contribMod.RHContributionModification)
+# Inactive: /contributionModification.py/browseMaterial (mod_rh_contribMod.RHContribModifMaterialBrowse)
+# Inactive: /contributionModification.py/data (mod_rh_contribMod.RHContributionData)
+# Inactive: /contributionModification.py/materials (mod_rh_contribMod.RHMaterials)
+# Inactive: /contributionModification.py/materialsAdd (mod_rh_contribMod.RHMaterialsAdd)
+# Inactive: /contributionModification.py/modifData (mod_rh_contribMod.RHContributionModifData)
+# Inactive: /contributionModification.py/pdf (mod_rh_contribMod.RHContributionToPDF)
+# Inactive: /contributionModification.py/setSession (mod_rh_contribMod.RHSetSession)
+# Inactive: /contributionModification.py/setTrack (mod_rh_contribMod.RHSetTrack)
+# Inactive: /contributionModification.py/withdraw (mod_rh_contribMod.RHWithdraw)
+# Inactive: /contributionModification.py/xml (mod_rh_contribMod.RHContributionToXML)
 
 
 # Routes for contributionReviewing.py
@@ -1069,15 +930,8 @@ legacy.add_url_rule('/contributionReviewing.py/reviewingHistory',
 
 
 # Routes for contributionTools.py
-legacy.add_url_rule('/contributionTools.py',
-                    'contributionTools',
-                    rh_as_view(mod_rh_contribMod.RHContributionTools),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/contributionTools.py/delete',
-                    'contributionTools-delete',
-                    rh_as_view(mod_rh_contribMod.RHContributionDeletion),
-                    methods=('GET', 'POST'))
+# Inactive: /contributionTools.py (mod_rh_contribMod.RHContributionTools)
+# Inactive: /contributionTools.py/delete (mod_rh_contribMod.RHContributionDeletion)
 
 
 # Routes for domainCreation.py
@@ -1400,54 +1254,21 @@ legacy.add_url_rule('/sessionModification.py/participantList',
 
 
 # Routes for subContributionDisplay.py
-legacy.add_url_rule('/subContributionDisplay.py',
-                    'subContributionDisplay',
-                    rh_as_view(mod_rh_subContribDisplay.RHSubContributionDisplay),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/subContributionDisplay.py/marcxml',
-                    'subContributionDisplay-marcxml',
-                    rh_as_view(mod_rh_subContribDisplay.RHSubContributionToMarcXML),
-                    methods=('GET', 'POST'))
+# Inactive: /subContributionDisplay.py (mod_rh_subContribDisplay.RHSubContributionDisplay)
+# Inactive: /subContributionDisplay.py/marcxml (mod_rh_subContribDisplay.RHSubContributionToMarcXML)
 
 
 # Routes for subContributionModification.py
-legacy.add_url_rule('/subContributionModification.py',
-                    'subContributionModification',
-                    rh_as_view(mod_rh_subContribMod.RHSubContributionModification),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/subContributionModification.py/data',
-                    'subContributionModification-data',
-                    rh_as_view(mod_rh_subContribMod.RHSubContributionData),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/subContributionModification.py/materials',
-                    'subContributionModification-materials',
-                    rh_as_view(mod_rh_subContribMod.RHMaterials),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/subContributionModification.py/materialsAdd',
-                    'subContributionModification-materialsAdd',
-                    rh_as_view(mod_rh_subContribMod.RHMaterialsAdd),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/subContributionModification.py/modifData',
-                    'subContributionModification-modifData',
-                    rh_as_view(mod_rh_subContribMod.RHSubContributionModifData),
-                    methods=('GET', 'POST'))
+# Inactive: /subContributionModification.py (mod_rh_subContribMod.RHSubContributionModification)
+# Inactive: /subContributionModification.py/data (mod_rh_subContribMod.RHSubContributionData)
+# Inactive: /subContributionModification.py/materials (mod_rh_subContribMod.RHMaterials)
+# Inactive: /subContributionModification.py/materialsAdd (mod_rh_subContribMod.RHMaterialsAdd)
+# Inactive: /subContributionModification.py/modifData (mod_rh_subContribMod.RHSubContributionModifData)
 
 
 # Routes for subContributionTools.py
-legacy.add_url_rule('/subContributionTools.py',
-                    'subContributionTools',
-                    rh_as_view(mod_rh_subContribMod.RHSubContributionTools),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/subContributionTools.py/delete',
-                    'subContributionTools-delete',
-                    rh_as_view(mod_rh_subContribMod.RHSubContributionDeletion),
-                    methods=('GET', 'POST'))
+# Inactive: /subContributionTools.py (mod_rh_subContribMod.RHSubContributionTools)
+# Inactive: /subContributionTools.py/delete (mod_rh_subContribMod.RHSubContributionDeletion)
 
 
 # Routes for taskManager.py

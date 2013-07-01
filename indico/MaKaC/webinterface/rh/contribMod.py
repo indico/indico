@@ -349,9 +349,9 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
             logInfo["subject"] = "Created new subcontribution: %s" %sc.getTitle()
             self._target.getConference().getLogHandler().logAction(logInfo,
                                                        log.ModuleNames.TIMETABLE)
-            self._redirect(urlHandlers.UHContribModifSubCont.getURL(sc))
+            self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
         else:
-            self._redirect(urlHandlers.UHContribModifSubCont.getURL(sc))
+            self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
 
     def _newSpeaker(self, presenter):
         spk = conference.SubContribParticipation()
@@ -366,33 +366,6 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
         return spk
 
 #-------------------------------------------------------------------------------------
-
-
-class RHContributionUpSC(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContribUpSubCont
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        self._scId = params.get("subContId", "")
-
-    def _process(self):
-        sc = self._target.getSubContributionById(self._scId)
-        self._target.upSubContribution(sc)
-        self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
-
-
-class RHContributionDownSC(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContribDownSubCont
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        self._scId = params.get("subContId", "")
-
-    def _process(self):
-        sc = self._target.getSubContributionById(self._scId)
-        self._target.downSubContribution(sc)
-        self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
-
 
 class RHContributionTools(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribModifTools
@@ -505,82 +478,8 @@ class RHContribModifMaterialBrowse( RHContribModifBase, RHMaterialDisplayCommon 
     def _process(self):
         return RHMaterialDisplayCommon._process(self)
 
-    def _processManyMaterials( self ):
-        self._redirect( urlHandlers.UHContribModifMaterials.getURL( self._material ))
-
-
-class RHContributionAddMaterial(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionAddMaterial
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        typeMat = params.get("typeMaterial", "notype")
-        if typeMat=="notype" or typeMat.strip()=="":
-            raise FormValuesError("Please choose a material type")
-        self._mf = materialFactories.ContribMFRegistry().getById(typeMat)
-
-    def _process(self):
-        if self._mf:
-            if not self._mf.needsCreationPage():
-                m = RHContributionPerformAddMaterial.create(self._target, self._mf, self._getRequestParams())
-                self._redirect(urlHandlers.UHMaterialModification.getURL(m))
-                return
-        p = contributions.WPContribAddMaterial(self, self._target, self._mf)
-        wf = self.getWebFactory()
-        if wf != None:
-            p = wf.getContribAddMaterial(self, self._target, self._mf)
-        return p.display()
-
-
-class RHContributionPerformAddMaterial(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionPerformAddMaterial
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        typeMat = params.get("typeMaterial", "")
-        self._mf = materialFactories.ContribMFRegistry.getById(typeMat)
-
-    @staticmethod
-    def create(contrib, matFactory, matData):
-        if matFactory:
-            m = matFactory.create(contrib)
-        else:
-            m = conference.Material()
-            contrib.addMaterial(m)
-            m.setValues(matData)
-        return m
-
-    def _process(self):
-        m = self.create(self._target, self._mf, self._getRequestParams())
-        self._redirect(urlHandlers.UHMaterialModification.getURL(m))
-
-
-class RHContributionRemoveMaterials(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionRemoveMaterials
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        #typeMat = params.get( "typeMaterial", "" )
-        #self._mf = materialFactories.ConfMFRegistry().getById( typeMat )
-        self._materialIds = self._normaliseListParam(params.get("deleteMaterial", []))
-        self._materialIds = self._normaliseListParam( params.get("materialId", []) )
-        self._returnURL = params.get("returnURL","")
-
-    def _process(self):
-        for id in self._materialIds:
-            #Performing the deletion of special material types
-            f = materialFactories.ContribMFRegistry().getById(id)
-            if f:
-                f.remove(self._target)
-            else:
-                #Performs the deletion of additional material types
-                mat = self._target.getMaterialById( id )
-                self._target.removeMaterial( mat )
-        if self._returnURL != "":
-            url = self._returnURL
-        else:
-            url = urlHandlers.UHContribModifMaterials.getURL( self._target )
-        self._redirect( url )
+    def _processManyMaterials(self):
+        self._redirect(urlHandlers.UHContribModifMaterials.getURL(self._material.getOwner()))
 
 
 class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRights):
@@ -660,31 +559,6 @@ class RHContributionDeletion(RHContribModifBaseSpecialSesCoordRights):
             p = contributions.WPContributionDeletion(self, self._target)
             return p.display()
 
-
-class RHContributionPerformMove(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionPerformMove
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        self._dest = params["Destination"]
-        if self._dest == "--no-sessions--":
-            raise MaKaCError( _("Undefined destination for the contribution."))
-
-    def _process(self):
-        conf = self._target.getConference()
-        if self._dest == 'CONF':
-            newOwner = conf
-        else:
-            newOwner = conf.getSessionById(self._dest)
-        self._moveContrib(newOwner)
-        self._redirect(urlHandlers.UHContribModifTools.getURL(self._target))
-
-        return "done"
-
-    def _moveContrib(self, newOwner):
-        owner = self._target.getOwner()
-        owner.removeContribution(self._target)
-        newOwner.addContribution(self._target)
 
 class RHContributionToXML(RHContributionModification):
     _uh = urlHandlers.UHContribToXMLConfManager

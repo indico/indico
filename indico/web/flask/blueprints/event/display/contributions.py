@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceDisplay, contribDisplay, authorDisplay
+from MaKaC.webinterface.rh import conferenceDisplay, contribDisplay, subContribDisplay, authorDisplay
 from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.display import event
 
@@ -37,6 +37,10 @@ event.add_url_rule('/contribution/<contribId>.xml', 'contributionDisplay-xml',
                    rh_as_view(contribDisplay.RHContributionToXML))
 event.add_url_rule('/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
                    rh_as_view(contribDisplay.RHContributionToPDF))
+event.add_url_rule('/contribution/<contribId>/<subContId>', 'subContributionDisplay',
+                   rh_as_view(subContribDisplay.RHSubContributionDisplay))
+event.add_url_rule('/contribution/<contribId>/<subContId>.marc.xml', 'subContributionDisplay-marcxml',
+                   rh_as_view(subContribDisplay.RHSubContributionToMarcXML))
 
 # Display contribution within a session
 event.add_url_rule('/session/<sessionId>/contribution/<contribId>', 'contributionDisplay',
@@ -49,6 +53,10 @@ event.add_url_rule('/session/<sessionId>/contribution/<contribId>.xml', 'contrib
                    rh_as_view(contribDisplay.RHContributionToXML))
 event.add_url_rule('/session/<sessionId>/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
                    rh_as_view(contribDisplay.RHContributionToPDF))
+event.add_url_rule('/session/<sessionId>/contribution/<contribId>/<subContId>', 'subContributionDisplay',
+                   rh_as_view(subContribDisplay.RHSubContributionDisplay))
+event.add_url_rule('/session/<sessionId>/contribution/<contribId>/<subContId>.marc.xml',
+                   'subContributionDisplay-marcxml', rh_as_view(subContribDisplay.RHSubContributionToMarcXML))
 
 # Authors/Speakers
 event.add_url_rule('/authors', 'confAuthorIndex', rh_as_view(conferenceDisplay.RHAuthorIndex))

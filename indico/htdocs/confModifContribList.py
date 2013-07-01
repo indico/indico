@@ -32,9 +32,6 @@ def contribsActions( req, **params ):
 def contribsToPDFMenu( req, **params ):
     return conferenceModif.RHContribsToPDFMenu( req ).process( params )
 
-def contribsToPDF( req, **params ):
-    return conferenceModif.RHContribsToPDF( req ).process( params )
-
 def participantList( req, **params ):
     return conferenceModif.RHContribsParticipantList( req ).process( params )
 

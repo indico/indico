@@ -647,7 +647,7 @@ class WContribModifAC(wcomponents.WTemplated):
         mcf=wcomponents.WModificationControlFrame()
         vars["modifyControlFrame"] = mcf.getHTML(self._contrib)
         acf=wcomponents.WAccessControlFrame()
-        visURL=urlHandlers.UHContributionSetVisibility.getURL()
+        visURL = urlHandlers.UHContributionSetVisibility.getURL(self._contrib)
 
         if isinstance(self._contrib.getOwner(), conference.Session):
             vars["accessControlFrame"]=acf.getHTML(self._contrib, visURL, "InSessionContribution")
@@ -680,17 +680,14 @@ class WPContribModifSC( WPContributionModifBase ):
     def _setActiveTab( self ):
         self._tabSubCont.setActive()
 
-
-    def _getTabContent( self, params ):
-
-        wc = wcomponents.WContribModifSC( self._target )
-        pars = { \
-            "moveSubContribURL": urlHandlers.UHSubContribActions.getURL(self._contrib), \
-            "addSubContURL": urlHandlers.UHContribAddSubCont.getURL(self._contrib), \
-            "subContModifURL": urlHandlers.UHSubContribModification.getURL, \
-            "subContUpURL": urlHandlers.UHContribUpSubCont.getURL(), \
-            "subContDownURL": urlHandlers.UHContribDownSubCont.getURL()}
-        return wc.getHTML( pars )
+    def _getTabContent(self, params):
+        wc = wcomponents.WContribModifSC(self._target)
+        pars = {
+            'moveSubContribURL': urlHandlers.UHSubContribActions.getURL(self._contrib),
+            'addSubContURL': urlHandlers.UHContribAddSubCont.getURL(self._contrib),
+            'subContModifURL': urlHandlers.UHSubContribModification.getURL  # the () are NOT missing
+        }
+        return wc.getHTML(pars)
 
 #-----------------------------------------------------------------------------
 
@@ -721,8 +718,7 @@ class WPContribAddSC( WPContributionModifBase ):
     def _getTabContent( self, params ):
 
         wc = WSubContributionCreation( self._target )
-        pars = { \
-            "postURL": urlHandlers.UHContribCreateSubCont.getURL()}
+        pars = {"postURL": urlHandlers.UHContribCreateSubCont.getURL(self._contrib)}
         params.update(pars)
 
         return wc.getHTML( params )

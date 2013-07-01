@@ -21,8 +21,6 @@
 from MaKaC.webinterface.rh import contribMod
 
 
-
-
 def index(req, **params):
     return contribMod.RHContributionSC( req ).process( params )
 
@@ -35,14 +33,3 @@ def create(req, **params):
 
 def actionSubContribs(req, **params):
     return contribMod.RHSubContribActions(req).process(params)
-
-
-def up(req, **params):
-    return contribMod.RHContributionUpSC( req ).process( params )
-
-
-def Down(req, **params):
-    return contribMod.RHContributionDownSC( req ).process( params )
-
-def setVisibility( req, **params ):
-    return contribMod.RHContributionSetVisibility( req ).process( params )

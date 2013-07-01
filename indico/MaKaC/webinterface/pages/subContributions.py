@@ -211,7 +211,7 @@ class WPSubContribData( WPSubContribModifMain ):
 
     def _getTabContent( self, params ):
         wc = WSubContributionDataModification(self._target)
-        params["postURL"] = urlHandlers.UHSubContributionDataModif.getURL()
+        params["postURL"] = urlHandlers.UHSubContributionDataModif.getURL(self._subContrib)
         return wc.getHTML( params )
 
 

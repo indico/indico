@@ -931,19 +931,15 @@ class UHConfModifSchedule(URLHandler):
 
 
 class UHContribConfSelectionAction(URLHandler):
-    _endpoint = 'legacy.confModifContribList-contribsActions'
-
-
-class UHContribsConfManagerDisplayPDF(URLHandler):
-    _endpoint = 'legacy.confModifContribList-contribsToPDF'
+    _endpoint = 'event_mgmt.confModifContribList-contribsActions'
 
 
 class UHContribsConfManagerDisplayMenuPDF(URLHandler):
-    _endpoint = 'legacy.confModifContribList-contribsToPDFMenu'
+    _endpoint = 'event_mgmt.confModifContribList-contribsToPDFMenu'
 
 
 class UHContribsConfManagerDisplayParticipantList(URLHandler):
-    _endpoint = 'legacy.confModifContribList-participantList'
+    _endpoint = 'event_mgmt.confModifContribList-participantList'
 
 
 class UHSessionClose(URLHandler):
@@ -963,7 +959,7 @@ class UHContribCreation(URLHandler):
 
 
 class UHContribToXMLConfManager(URLHandler):
-    _endpoint = 'legacy.contributionModification-xml'
+    _endpoint = 'event_mgmt.contributionModification-xml'
 
 
 class UHContribToXML(URLHandler):
@@ -975,7 +971,7 @@ class UHContribToiCal(URLHandler):
 
 
 class UHContribToPDFConfManager(URLHandler):
-    _endpoint = 'legacy.contributionModification-pdf'
+    _endpoint = 'event_mgmt.contributionModification-pdf'
 
 
 class UHContribToPDF(URLHandler):
@@ -983,69 +979,47 @@ class UHContribToPDF(URLHandler):
 
 
 class UHContribModifAC(URLHandler):
-    _endpoint = 'legacy.contributionAC'
+    _endpoint = 'event_mgmt.contributionAC'
 
 
 class UHContributionSetVisibility(URLHandler):
-    _endpoint = 'legacy.contributionAC-setVisibility'
+    _endpoint = 'event_mgmt.contributionAC-setVisibility'
 
 
 class UHContribModifMaterialMgmt(URLHandler):
-    _endpoint = 'legacy.contributionModification-materials'
+    _endpoint = 'event_mgmt.contributionModification-materials'
 
 
 class UHContribModifAddMaterials(URLHandler):
-    _endpoint = 'legacy.contributionModification-materialsAdd'
-
-
-class UHContributionRemoveMaterials(URLHandler):
-    _endpoint = 'legacy.contributionModification-removeMaterials'
-
-
-# <Deprecated>
-class UHContributionAddMaterial(URLHandler):
-    _endpoint = 'legacy.contributionModification-addMaterial'
-
-
-class UHContributionPerformAddMaterial(URLHandler):
-    _endpoint = 'legacy.contributionModification-performAddMaterial'
-# </Deprecated>
+    _endpoint = 'event_mgmt.contributionModification-materialsAdd'
 
 
 class UHContribModifSubCont(URLHandler):
-    _endpoint = 'legacy.contributionModifSubCont'
+    _endpoint = 'event_mgmt.contributionModifSubCont'
 
 
 class UHContribAddSubCont(URLHandler):
-    _endpoint = 'legacy.contributionModifSubCont-add'
+    _endpoint = 'event_mgmt.contributionModifSubCont-add'
 
 
 class UHContribCreateSubCont(URLHandler):
-    _endpoint = 'legacy.contributionModifSubCont-create'
-
-
-class UHContribUpSubCont(URLHandler):
-    _endpoint = 'legacy.contributionModifSubCont-up'
-
-
-class UHContribDownSubCont(URLHandler):
-    _endpoint = 'legacy.contributionModifSubCont-Down'
+    _endpoint = 'event_mgmt.contributionModifSubCont-create'
 
 
 class UHSubContribActions(URLHandler):
-    _endpoint = 'legacy.contributionModifSubCont-actionSubContribs'
+    _endpoint = 'event_mgmt.contributionModifSubCont-actionSubContribs'
 
 
 class UHContribModifTools(URLHandler):
-    _endpoint = 'legacy.contributionTools'
+    _endpoint = 'event_mgmt.contributionTools'
 
 
 class UHContributionDataModif(URLHandler):
-    _endpoint = 'legacy.contributionModification-modifData'
+    _endpoint = 'event_mgmt.contributionModification-modifData'
 
 
 class UHContributionDataModification(URLHandler):
-    _endpoint = 'legacy.contributionModification-data'
+    _endpoint = 'event_mgmt.contributionModification-data'
 
 
 class UHConfModifAC(URLHandler):
@@ -1771,27 +1745,27 @@ class UHGeneralInfoPerformModification(URLHandler):
 
 
 class UHContributionDelete(URLHandler):
-    _endpoint = 'legacy.contributionTools-delete'
+    _endpoint = 'event_mgmt.contributionTools-delete'
 
 
 class UHSubContributionDataModification(URLHandler):
-    _endpoint = 'legacy.subContributionModification-data'
+    _endpoint = 'event_mgmt.subContributionModification-data'
 
 
 class UHSubContributionDataModif(URLHandler):
-    _endpoint = 'legacy.subContributionModification-modifData'
+    _endpoint = 'event_mgmt.subContributionModification-modifData'
 
 
 class UHSubContributionDelete(URLHandler):
-    _endpoint = 'legacy.subContributionTools-delete'
+    _endpoint = 'event_mgmt.subContributionTools-delete'
 
 
 class UHSubContribModifAddMaterials(URLHandler):
-    _endpoint = 'legacy.subContributionModification-materialsAdd'
+    _endpoint = 'event_mgmt.subContributionModification-materialsAdd'
 
 
 class UHSubContribModifTools(URLHandler):
-    _endpoint = 'legacy.subContributionTools'
+    _endpoint = 'event_mgmt.subContributionTools'
 
 
 class UHSessionModification(URLHandler):
@@ -1847,23 +1821,19 @@ class UHSessionDeletion(URLHandler):
 
 
 class UHContributionModification(URLHandler):
-    _endpoint = 'legacy.contributionModification'
+    _endpoint = 'event_mgmt.contributionModification'
 
 
 class UHContribModifMaterials(URLHandler):
-    _endpoint = 'legacy.contributionModification-materials'
-
-
-class UHContributionPerformMove(URLHandler):
-    _endpoint = 'legacy.contributionModification-performMove'
+    _endpoint = 'event_mgmt.contributionModification-materials'
 
 
 class UHSubContribModification(URLHandler):
-    _endpoint = 'legacy.subContributionModification'
+    _endpoint = 'event_mgmt.subContributionModification'
 
 
 class UHSubContribModifMaterials(URLHandler):
-    _endpoint = 'legacy.subContributionModification-materials'
+    _endpoint = 'event_mgmt.subContributionModification-materials'
 
 
 class UHMaterialDisplay(URLHandler):
@@ -1903,11 +1873,11 @@ class UHContributionDisplay(URLHandler):
 
 
 class UHSubContributionDisplay(URLHandler):
-    _endpoint = 'legacy.subContributionDisplay'
+    _endpoint = 'event.subContributionDisplay'
 
 
 class UHSubContributionModification(URLHandler):
-    _endpoint = 'legacy.subContributionModification'
+    _endpoint = 'event_mgmt.subContributionModification'
 
 
 class UHFileAccess(URLHandler):
@@ -1935,19 +1905,19 @@ class UHAbstractRecovery(URLHandler):
 
 
 class UHConfModifContribList(URLHandler):
-    _endpoint = 'legacy.confModifContribList'
+    _endpoint = 'event_mgmt.confModifContribList'
 
 
 class UHContribModifMaterialBrowse(URLHandler):
-    _endpoint = 'legacy.contributionModification-browseMaterial'
+    _endpoint = 'event_mgmt.contributionModification-browseMaterial'
 
 
 class UHContribModSetTrack(URLHandler):
-    _endpoint = 'legacy.contributionModification-setTrack'
+    _endpoint = 'event_mgmt.contributionModification-setTrack'
 
 
 class UHContribModSetSession(URLHandler):
-    _endpoint = 'legacy.contributionModification-setSession'
+    _endpoint = 'event_mgmt.contributionModification-setSession'
 
 
 class UHTrackModMoveUp(URLHandler):
@@ -2148,7 +2118,7 @@ class UHConfSpeakerIndex(URLHandler):
 
 
 class UHContribModWithdraw(URLHandler):
-    _endpoint = 'legacy.contributionModification-withdraw'
+    _endpoint = 'event_mgmt.contributionModification-withdraw'
 
 
 class UHTrackModContribList(URLHandler):
@@ -2168,7 +2138,7 @@ class UHTrackModToPDF(URLHandler):
 
 
 class UHConfModContribQuickAccess(URLHandler):
-    _endpoint = 'legacy.confModifContribList-contribQuickAccess'
+    _endpoint = 'event_mgmt.confModifContribList-contribQuickAccess'
 
 
 class UHSessionModContribQuickAccess(URLHandler):
@@ -2196,7 +2166,7 @@ class UHConfMyStuffMyContributions(URLHandler):
 
 
 class UHConfModMoveContribsToSession(URLHandler):
-    _endpoint = 'legacy.confModifContribList-moveToSession'
+    _endpoint = 'event_mgmt.confModifContribList-moveToSession'
 
 
 class UHConferenceDisplayMaterialPackage(URLHandler):
@@ -2240,11 +2210,11 @@ class UHConfModScheduleDataEdit(URLHandler):
 
 
 class UHConfModMaterialPackage(URLHandler):
-    _endpoint = 'legacy.confModifContribList-matPkg'
+    _endpoint = 'event_mgmt.confModifContribList-matPkg'
 
 
 class UHConfModProceedings(URLHandler):
-    _endpoint = 'legacy.confModifContribList-proceedings'
+    _endpoint = 'event_mgmt.confModifContribList-proceedings'
 
 
 class UHConfModFullMaterialPackage(URLHandler):
