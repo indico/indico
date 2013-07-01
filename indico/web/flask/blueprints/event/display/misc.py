@@ -46,3 +46,9 @@ event.add_url_rule('/other-view', 'conferenceOtherViews', rh_as_view(conferenceD
 # EMail form
 event.add_url_rule('/email', 'EMail', rh_as_view(conferenceDisplay.RHConferenceEmail), methods=('GET', 'POST'))
 event.add_url_rule('/email/send', 'EMail-send', rh_as_view(conferenceDisplay.RHConferenceSendEmail), methods=('POST',))
+
+# Participation invitation
+event.add_url_rule('/invitation/participant/<participantId>', 'confModifParticipants-invitation',
+                   rh_as_view(conferenceDisplay.RHConfParticipantsInvitation), methods=('GET', 'POST'))
+event.add_url_rule('/invitation/participant/<participantId>/refuse', 'confModifParticipants-refusal',
+                   rh_as_view(conferenceDisplay.RHConfParticipantsRefusal), methods=('GET', 'POST'))

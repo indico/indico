@@ -1089,7 +1089,7 @@ class UHConfModifTools(URLHandler):
 
 
 class UHConfModifParticipants(URLHandler):
-    _endpoint = 'legacy.confModifParticipants'
+    _endpoint = 'event_mgmt.confModifParticipants'
 
 
 class UHConfModifLog(URLHandler):
@@ -1249,31 +1249,31 @@ class UHSavePic(URLHandler):
 
 
 class UHConfModifParticipantsSetup(URLHandler):
-    _endpoint = 'legacy.confModifParticipants-setup'
+    _endpoint = 'event_mgmt.confModifParticipants-setup'
 
 
 class UHConfModifParticipantsPending(URLHandler):
-    _endpoint = 'legacy.confModifParticipants-pendingParticipants'
+    _endpoint = 'event_mgmt.confModifParticipants-pendingParticipants'
 
 
 class UHConfModifParticipantsDeclined(URLHandler):
-    _endpoint = 'legacy.confModifParticipants-declinedParticipants'
+    _endpoint = 'event_mgmt.confModifParticipants-declinedParticipants'
 
 
 class UHConfModifParticipantsAction(URLHandler):
-    _endpoint = 'legacy.confModifParticipants-action'
+    _endpoint = 'event_mgmt.confModifParticipants-action'
 
 
 class UHConfModifParticipantsStatistics(URLHandler):
-    _endpoint = 'legacy.confModifParticipants-statistics'
+    _endpoint = 'event_mgmt.confModifParticipants-statistics'
 
 
 class UHConfParticipantsInvitation(URLHandler):
-    _endpoint = 'legacy.confModifParticipants-invitation'
+    _endpoint = 'event.confModifParticipants-invitation'
 
 
 class UHConfParticipantsRefusal(URLHandler):
-    _endpoint = 'legacy.confModifParticipants-refusal'
+    _endpoint = 'event.confModifParticipants-refusal'
 
 
 class UHConfModifToggleSearch(URLHandler):

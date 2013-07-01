@@ -727,6 +727,7 @@ class ConferenceParticipantBase:
 
             data["body"] = permissive_format(data["body"], mailEnv)
             data["subject"] = permissive_format(data["subject"], mailEnv)
+            data["content-type"] = 'text/html'
             GenericMailer.sendAndLog(GenericNotification(data), self._conf,
                                      log.ModuleNames.PARTICIPANTS)
 

@@ -292,11 +292,11 @@ IndicoUI.executeOnLoad(function(){
 
     $("#invite_users").bind('menu_select', function(){
         var inviteHandler = function(peopleList){
-            var text = 'Dear {name}, The event manager of {confTitle} would like to invite you to take part in the event, ' +
-            'which will take place on ${conf.getAdjustedStartDate()}. Further information about this event is available at {url}' +
+            var text = 'Dear {name}, the event manager of {confTitle} would like to invite you to take part in the event, ' +
+            'which will take place on ${conf.getAdjustedStartDate()}. Further information about this event is available <a href="{url}">in Indico</a>' +
             '<br/><br/>' +
-            'You are kindly requested to either accept or decline your participation in this event by clicking on the relevant link below :<br/>' +
-            '{urlInvitation}' +
+            'You are kindly requested to either accept or decline your participation in this event by clicking on the relevant link below:<br/>' +
+            '<br><a href="{urlInvitation}">Accept or decline the invitation</a><br/><br>' +
             'Looking forward to meeting you at {confTitle} <br/>' +
             'Kindest regards';
             var subject = "Invitation to ${conf.getTitle()}";

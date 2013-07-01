@@ -20,7 +20,6 @@
 from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
-import MaKaC.webinterface.rh.conferenceDisplay as mod_rh_conferenceDisplay
 import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
 import MaKaC.webinterface.rh.contribMod as mod_rh_contribMod
 import MaKaC.webinterface.rh.contribReviewingModif as mod_rh_contribReviewingModif
@@ -498,45 +497,14 @@ legacy.add_url_rule('/confModifContribList.py/proceedings',
 
 
 # Routes for confModifParticipants.py
-legacy.add_url_rule('/confModifParticipants.py',
-                    'confModifParticipants',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifParticipants),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifParticipants.py/action',
-                    'confModifParticipants-action',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifParticipantsAction),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifParticipants.py/declinedParticipants',
-                    'confModifParticipants-declinedParticipants',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifParticipantsDeclined),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifParticipants.py/invitation',
-                    'confModifParticipants-invitation',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfParticipantsInvitation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifParticipants.py/pendingParticipants',
-                    'confModifParticipants-pendingParticipants',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifParticipantsPending),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifParticipants.py/refusal',
-                    'confModifParticipants-refusal',
-                    rh_as_view(mod_rh_conferenceDisplay.RHConfParticipantsRefusal),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifParticipants.py/setup',
-                    'confModifParticipants-setup',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifParticipantsSetup),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifParticipants.py/statistics',
-                    'confModifParticipants-statistics',
-                    rh_as_view(mod_rh_conferenceModif.RHConfModifParticipantsStatistics),
-                    methods=('GET', 'POST'))
+# Inactive: /confModifParticipants.py (mod_rh_conferenceModif.RHConfModifParticipants)
+# Inactive: /confModifParticipants.py/action (mod_rh_conferenceModif.RHConfModifParticipantsAction)
+# Inactive: /confModifParticipants.py/declinedParticipants (mod_rh_conferenceModif.RHConfModifParticipantsDeclined)
+# Inactive: /confModifParticipants.py/invitation (mod_rh_conferenceDisplay.RHConfParticipantsInvitation)
+# Inactive: /confModifParticipants.py/pendingParticipants (mod_rh_conferenceModif.RHConfModifParticipantsPending)
+# Inactive: /confModifParticipants.py/refusal (mod_rh_conferenceDisplay.RHConfParticipantsRefusal)
+# Inactive: /confModifParticipants.py/setup (mod_rh_conferenceModif.RHConfModifParticipantsSetup)
+# Inactive: /confModifParticipants.py/statistics (mod_rh_conferenceModif.RHConfModifParticipantsStatistics)
 
 
 # Routes for confModifPendingQueues.py
