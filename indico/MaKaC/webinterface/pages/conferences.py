@@ -1514,9 +1514,6 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         if self._conf.getType() == 'conference':
             self._participantsMenuItem.setVisible(False)
 
-        # make sure that the section evaluation is always activated
-        # for all conferences
-        self._conf.enableSection("evaluation")
         wf = self._rh.getWebFactory()
         if wf:
             wf.customiseSideMenu( self )

@@ -4316,8 +4316,6 @@ class Conference(CommonObjectBase, Locatable):
         # Contribution Types' List (main detailes of the conference)
         for t in self.getContribTypeList() :
             conf.addContribType(t.clone(conf))
-        for item in self.getSections() :
-            conf._sections.append(item)
         if options.get("sessions", False):
             for entry in self.getSchedule().getEntries():
                 if isinstance(entry,BreakTimeSchEntry):
@@ -4892,15 +4890,6 @@ class Conference(CommonObjectBase, Locatable):
             self._sessionCoordinatorRights.remove(right)
         self.notifyModification()
 
-    def getSections(self):
-        try:
-            if self._sections:
-                pass
-        except AttributeError, e:
-            self._sections = ConfSectionsMgr().getSectionKeys()
-            self.notifyModification()
-        return self._sections
-
     def hasEnabledSection(self, section):
         # This hack is there since there is no more enable/disable boxes
         # in the conference managment area corresponding to those features.
@@ -4909,16 +4898,6 @@ class Conference(CommonObjectBase, Locatable):
         # available for the time being, but we keep the previous code for
         # further improvements
         return True
-
-    def enableSection(self, section):
-        if ConfSectionsMgr().hasSection(section) and not self.hasEnabledSection(section):
-            self._sections.append(section)
-            self.notifyModification()
-
-    def disableSection(self, section):
-        if ConfSectionsMgr().hasSection(section) and self.hasEnabledSection(section):
-            self._sections.remove(section)
-            self.notifyModification()
 
     def getPendingQueuesMgr(self):
         try:
@@ -5017,48 +4996,6 @@ class ConferenceHolder( ObjectHolder ):
             return None
         else:
             raise NoReportError( _("The specified event with id \"%s\" does not exist or has been deleted.") % escape_html(str(id)) )
-
-class ConfSectionsMgr:
-
-    def __init__(self):
-        self._sections = {
-            "cfa": "Call for abstracts",
-            "paperReviewing" : "Paper Reviewing",
-            "evaluation": "Evaluation Form",
-            "videoconference": "Videoconference", # only for meetings
-            "collaboration": "Collaboration", # only for meetings
-            "regForm": "Registration Form"
-        }
-
-    def hasSection(self, s):
-        # This hack is there since there is no more enable/disable boxes
-        # in the conference managment area corresponding to those features.
-        # Until the managment area is improved to get a more user-friendly
-        # way of enabling/disabling those features, we always make them
-        # available in the side menu for the time being, but we keep
-        # the previous code for further improvements
-        #return self._sections.has_key(s)
-        return True
-
-    def getSections(self):
-        return self._sections
-
-    def getSectionList(self, sort=False):
-        l=self._sections.values()
-        if sort:
-            l.sort()
-        return l
-
-    def getSectionKeys(self, sort=False):
-        l=self._sections.keys()
-        if sort:
-            l.sort()
-        return l
-
-    def getSection(self, id):
-        if self._sections.has_key(id):
-            return self._sections[id]
-        return None
 
 
 class Observer(object):

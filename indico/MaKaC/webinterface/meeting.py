@@ -579,14 +579,10 @@ class WPMConfModif(conferences.WPConferenceModification):
         pars = { "type": params.get("type",""), "conferenceId": self._conf.getId() }
         return wc.getHTML( pars )
 
+
 class WMConfModifMainData(conferences.WConfModifMainData):
-    def getVars(self):
-        vars = conferences.WConfModifMainData.getVars( self )
+    pass
 
-        #enable Evaluation by default
-        self._conf.enableSection('evaluation')
-
-        return vars
 
 ##Access Control ##
 class WPMConfModifAC(conferences.WPConfModifAC):

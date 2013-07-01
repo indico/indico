@@ -1675,10 +1675,6 @@ class ConferenceRecovery:
             self._conf._submissionDate = recoveredC.getSubmittedDate()
             self._conf._archivingRequestDate = recoveredC.getRequestedToArchiveDate()
             self._conf.getBOAConfig().setText(recoveredC.getBOAConfig().getText())
-            for s in self._conf.getSections():
-                self._conf.disableSection(s)
-            for s in recoveredC.getSections():
-                self._conf.enableSection(s)
             for r in self._conf.getSessionCoordinatorRights()[:]:
                 self._conf.removeSessionCoordinatorRight(r)
             for r in recoveredC.getSessionCoordinatorRights():

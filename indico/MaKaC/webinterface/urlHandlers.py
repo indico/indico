@@ -673,10 +673,6 @@ class UHConfEditContribType(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-editContribType'
 
 
-class UHConfSectionsSettings(URLHandler):
-    _endpoint = 'legacy.conferenceModification-sectionsSettings'
-
-
 class UHConfModifCFAOptFld(URLHandler):
     _endpoint = 'event_mgmt.confModifCFA-abstractFields'
 

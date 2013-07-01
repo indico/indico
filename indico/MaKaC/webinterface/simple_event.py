@@ -260,15 +260,9 @@ class WPSEConfModif(conferences.WPConferenceModification):
         pars = { "type": params.get("type",""), "conferenceId": self._conf.getId() }
         return wc.getHTML( pars )
 
+
 class WSEConfModifMainData(meeting.WMConfModifMainData):
-    def getVars(self):
-
-        #enable Evaluation by default
-        self._conf.enableSection('evaluation')
-
-        vars = conferences.WConfModifMainData.getVars( self )
-
-        return vars
+    pass
 
 
 #####Access Control # stays the same as conference for now

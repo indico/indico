@@ -3398,24 +3398,6 @@ class RHModifSessionCoordRights( RHConferenceModifBase ):
                 self._conf.addSessionCoordinatorRight(self._rightId)
             self._redirect( "%s#sessionCoordinatorRights"%urlHandlers.UHConfModifAC.getURL( self._conf) )
 
-class RHConfSectionsSettings( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfSectionsSettings
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._sectionId = params.get("sectionId", "")
-        if self._sectionId.strip()!="":
-            if not conference.ConfSectionsMgr().hasSection(self._sectionId):
-                raise MaKaCError( _("The section that you are trying to enable/disable does not exist"))
-
-
-    def _process( self ):
-        if self._sectionId.strip() != "":
-            if self._conf.hasEnabledSection(self._sectionId):
-                self._conf.disableSection(self._sectionId)
-            else:
-                self._conf.enableSection(self._sectionId)
-        self._redirect(urlHandlers.UHConferenceModification.getURL(self._conf))
 
 class RHConfModifPendingQueues( RHConferenceModifBase ):
     _uh = urlHandlers.UHConfModifPendingQueues
