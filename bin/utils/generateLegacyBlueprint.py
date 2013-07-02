@@ -119,6 +119,7 @@ def generate_routes(routes):
 
 
 def main():
+    keep_inactive = len(sys.argv) > 1 and sys.argv[1] == '--keep-inactive'
     app = make_app()
 
     # Rules which we need to skip because a legacy blueprint already defines them (with a redirect)
@@ -147,6 +148,8 @@ def main():
             inactive = rule in modernized_rules
             if inactive:
                 print 'Skipping rule (found in compat blueprint): ' + rule
+                if not keep_inactive:
+                    continue
             routes.append({
                 'rule': rule,
                 'endpoint': endpoint,
