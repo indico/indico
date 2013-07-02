@@ -17,7 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from flask import redirect, request
+from flask import redirect, request, url_for
+from flask import current_app as app
 from werkzeug.exceptions import NotFound
 
 from MaKaC.common import DBMgr
@@ -35,37 +36,40 @@ def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
         ch = ConferenceHolder()
         su = ShortURLMapper()
         if ch.hasKey(confId):
-            # https://github.com/mitsuhiko/werkzeug/issues/397
-            # It only causes problems when someone tries to POST to an URL that is not supposed to accept POST
-            # requests but getting a proper 405 error in that case is very nice. When the problem in werkzeug is
-            # fixed this workaround can be removed and strict_slashes re-enabled for the /<path:confId>/ rule.
-            no_trailing_slash = request.base_url[-1] != '/'
-            if shorturl_namespace or (no_trailing_slash and not ovw):
+            # For obvious reasons an event id always comes first.
+            # If it's used within the short url namespace we redirect to the event namespace, otherwise
+            # we call the RH to display the event
+            if shorturl_namespace:
                 url = UHConferenceDisplay.getURL(ch.getById(confId))
-                func = lambda: redirect(url, 301 if no_trailing_slash else 302)
+                func = lambda: redirect(url)
             else:
                 params = request.args.to_dict()
                 params['confId'] = confId
                 if ovw:
                     params['ovw'] = 'True'
                 func = lambda: conferenceDisplay.RHConferenceDisplay(None).process(params)
-        elif su.hasKey(confId):
-            url = UHConferenceDisplay.getURL(su.getById(confId))
-            func = lambda: redirect(url)
+        elif (shorturl_namespace or app.config['INDICO_COMPAT_ROUTES']) and su.hasKey(confId):
+            if shorturl_namespace:
+                # Correct namespace => redirect to the event
+                url = UHConferenceDisplay.getURL(su.getById(confId))
+                func = lambda: redirect(url)
+            else:
+                # Old event namespace => 301-redirect to the new shorturl first to get Google etc. to update it
+                url = url_for('.shorturl', confId=confId)
+                func = lambda: redirect(url, 301)
         else:
-            if '/' in confId and not shorturl_namespace:
-                # Most likely NOT an attempt to retrieve an event with an invalid short url
-                raise NotFound()
             raise NotFound(
                 _('The specified event with id or tag "%s" does not exist or has been deleted') % confId)
 
     return func()
 
 
-# Routes supporting shorturls (legacy ones may contain slashes ...)
-event.add_url_rule('!/e/<path:confId>', view_func=_event_or_shorturl, strict_slashes=False,
+# Routes supporting shorturls
+# /e/ accepts slashes, /event/ doesn't - this is intended. We do not want to support slashes in the old namespace
+# since it's a major pain in the ass to do so (and its route would eat anything that's usually a 404)
+event.add_url_rule('!/e/<path:confId>', 'shorturl', _event_or_shorturl, strict_slashes=False,
                    defaults={'shorturl_namespace': True})
-event.add_url_rule('!/event/<path:confId>/', 'conferenceDisplay', _event_or_shorturl, strict_slashes=False)
+event.add_url_rule('!/event/<confId>/', 'conferenceDisplay', _event_or_shorturl)
 
 # Event overview and navigation
 event.add_url_rule('/overview', 'conferenceDisplay-overview', _event_or_shorturl, defaults={'ovw': True})

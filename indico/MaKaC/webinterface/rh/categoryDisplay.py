@@ -516,10 +516,10 @@ class UtilsConference:
     def validateShortURL(tag, target):
         if tag.isdigit():
             raise ValueError(_("Short URL tag is a number: '%s'. Please add at least one non-digit.") % tag)
-        if not re.match(r'^[a-zA-Z0-9._-]+$', tag):
+        if not re.match(r'^[a-zA-Z0-9/._-]+$', tag) or '//' in tag:
             raise ValueError(
                 _("Short URL tag contains invalid chars: '%s'. Please select another one.") % tag)
-        if tag.startswith('/') or tag.endswith('/'):
+        if tag[0] == '/' or tag[-1] == '/':
             raise ValueError(
                 _("Short URL tag may not begin/end with a slash: '%s'. Please select another one.") % tag)
         mapper = ShortURLMapper()
@@ -529,8 +529,10 @@ class UtilsConference:
             # Reject existing event ids. It'd be EXTREMELY confusing and broken to allow such a shorturl
             raise ValueError(_("Short URL tag is an event id: '%s'. Please select another one.") % tag)
         ep = endpoint_for_url(Config.getInstance().getShortEventURL() + tag)
-        if ep and ep[0] not in ('event.conferenceDisplay', 'event._event_or_shorturl'):
-            # URL collides with an existing rule that does does not know about shorturls
+        if not ep or ep[0] != 'event.shorturl':
+            # URL does not match the shorturl rule or collides with an existing rule that does does not
+            # know about shorturls.
+            # This shouldn't happen anymore with the /e/ namespace but we keep the check just to be safe
             raise ValueError(
                 _("Short URL tag conflicts with an URL used by Indico: '%s'. Please select another one.") % tag)
 

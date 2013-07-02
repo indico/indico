@@ -425,8 +425,12 @@ var IndicoUtil = {
             // Just a number
             return false;
         }
+        if (s.substr(0, 1) == '/' || s.substr(s.length - 1, 1) == '/' || ~s.indexOf('//')) {
+            // Leading/trailing/duplicate slash
+            return false;
+        }
         // Restrict characters
-        return /^[a-zA-Z0-9._-]*$/.test(s);
+        return /^[a-zA-Z0-9/._-]*$/.test(s);
     },
 
     /**
@@ -614,7 +618,7 @@ var IndicoUtil = {
                     error = Html.span({}, $T("Time format is not valid. It should be hh:mm"));
                 }
                 else if (dataType == 'shortURL' && !IndicoUtil.parseShortURL(component.get())) {
-                    error = Html.span({}, $T("The short URL contains invalid characters. The allowed characters are alphanumeric, _, - and ."));
+                    error = Html.span({}, $T("The short URL contains invalid characters. The allowed characters are alphanumeric, /, _, - and ."));
                 }
                 else if (!allowEmpty && component.get() != null && (!isString(component.get()) || trim(component.get()) === '')) {
                     error = Html.span({}, $T("Field is mandatory"));
