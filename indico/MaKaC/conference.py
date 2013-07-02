@@ -10781,8 +10781,10 @@ class Material(CommonObjectBase):
         return cmp(self.getConference(), other.getConference())
 
     def updateNonInheritingChildren(self, elem, delete=False):
-        self.getAccessController().updateNonInheritingChildren(elem, delete)
-        self.notify_protection_to_owner(elem, delete)
+        # We do not want to store the inherited children in a Category because the funcionallity is not used
+        if not isinstance(self.getOwner(), Category):
+            self.getAccessController().updateNonInheritingChildren(elem, delete)
+            self.notify_protection_to_owner(elem, delete)
 
     def notify_protection_to_owner(self, elem, delete=False):
         self.getOwner().updateNonInheritingChildren(elem, delete)
