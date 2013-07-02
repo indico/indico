@@ -797,6 +797,7 @@ def redisLinkedTo(dbi, withRBDB, prevVersion):
         pipe.execute()
     print '\r  Done   '
 
+
 @since('1.2')
 def removeVideoServicesLinksFromCore(dbi, withRBDB, prevVersion):
     """Video Services migration remove from core"""
@@ -818,6 +819,7 @@ def removeVideoServicesLinksFromCore(dbi, withRBDB, prevVersion):
         i += 1
         if dbi and i % 1000 == 999:
             dbi.commit()
+    dbi.commit()
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),

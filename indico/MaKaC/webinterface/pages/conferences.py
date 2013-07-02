@@ -139,7 +139,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
     navigationEntry = None
 
     def getJSFiles(self):
-        return WPConferenceBase.getJSFiles(self) + \
+        return WPConferenceBase.getJSFiles(self) + self._includeJSPackage('Display') + \
                self._includeJSPackage('MaterialEditor') + sum(self._notify('injectJSFiles'), [])
 
     def _getFooter( self ):
