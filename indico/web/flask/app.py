@@ -136,9 +136,8 @@ def handle_404(exception):
 
 def handle_exception(exception):
     Logger.get('wsgi').exception(exception.message or 'WSGI Exception')
-    with DBMgr.getInstance().global_connection():
-        if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
-            raise
+    if app.debug:
+        raise
     msg = (str(exception), _("An unexpected error ocurred."))
     return WErrorWSGI(msg).getHTML(), 500
 

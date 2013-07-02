@@ -27,6 +27,7 @@ from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
+from MaKaC.common import DBMgr
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.user import AvatarHolder
@@ -77,7 +78,8 @@ class IndicoSession(BaseSession):
         elif self.user:
             return self.user.getLang()
         else:
-            return HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
+            with DBMgr.getInstance().global_connection():
+                return HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
 
     @lang.setter
     def lang(self, lang):
@@ -99,7 +101,8 @@ class IndicoSession(BaseSession):
     def timezone(self):
         if '_timezone' in self:
             return self['_timezone']
-        return HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        with DBMgr.getInstance().global_connection():
+            return HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
 
     @timezone.setter
     def timezone(self, tz):

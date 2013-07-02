@@ -33,11 +33,10 @@ class IndicoRequest(Request):
     @cached_property
     def remote_addr(self):
         """The remote address of the client."""
-        proxy_ip = None
         with DBMgr.getInstance().global_connection():
-            if HelperMaKaCInfo.getMaKaCInfoInstance().useProxy() and 'HTTP_X_FORWARDED_FOR' in self.environ:
-                proxy_ip = self.environ['HTTP_X_FORWARDED_FOR'].split(',')[0].strip()
-        return proxy_ip or self.environ['REMOTE_ADDR']
+            if HelperMaKaCInfo.getMaKaCInfoInstance().useProxy():
+                return self.access_route[0]
+        return super(IndicoRequest, self).remote_addr
 
     def __repr__(self):
         rv = super(IndicoRequest, self).__repr__()
@@ -49,6 +48,11 @@ class IndicoRequest(Request):
 class IndicoFlask(Flask):
     request_class = IndicoRequest
     session_interface = IndicoSessionInterface()
+
+    @property
+    def debug(self):
+        with DBMgr.getInstance().global_connection():
+            return HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
 
 
 class IndicoBlueprintSetupState(BlueprintSetupState):
