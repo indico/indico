@@ -118,6 +118,21 @@ def generate_routes(routes):
             ''').format(**route).strip('\n')
 
 
+def generate_list_lines(items, max_length=120, indent=''):
+    line = indent
+    for i, item in enumerate(items):
+        item_str = repr(item)
+        if i < len(items) - 1:
+            item_str += ', '
+        if len(line) + len(item_str) > max_length:
+            yield line.rstrip()
+            line = indent + item_str
+        else:
+            line += item_str
+    if line.strip():
+        yield line
+
+
 def main():
     keep_inactive = len(sys.argv) > 1 and sys.argv[1] == '--keep-inactive'
     app = make_app()
@@ -128,6 +143,7 @@ def main():
                            for rule in iter_blueprint_rules(blueprint))
 
     routes = []
+    prettified_endpoints = set()
     for path in sorted(glob.iglob(os.path.join(app.config['INDICO_HTDOCS'], '*.py'))):
         name = os.path.basename(path)
         module_globals = {}
@@ -148,6 +164,7 @@ def main():
             inactive = rule in modernized_rules
             if inactive:
                 print 'Skipping rule (found in compat blueprint): ' + rule
+                prettified_endpoints.add(endpoint)
                 if not keep_inactive:
                     continue
             routes.append({
@@ -196,6 +213,14 @@ def main():
         '''))
         f.write('\n\n')
         f.writelines(line + '\n' for line in generate_routes(routes))
+        f.write('\n\n')
+        f.write('# Prettified legacy endpoints that need compatibility routes\n')
+        f.write('prettified_endpoints = set([')
+        f.write('\n')
+        f.write('\n'.join(generate_list_lines(sorted(prettified_endpoints, key=str.lower), indent='    ')))
+        f.write('\n')
+        f.write('])\n')
+
 
 if __name__ == '__main__':
     main()

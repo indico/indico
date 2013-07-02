@@ -111,10 +111,16 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None):
 
 
 def make_compat_blueprint(blueprint):
+    from indico.web.flask.blueprints.legacy import prettified_endpoints
+
     compat = Blueprint('compat_' + blueprint.name, __name__)
     used_endpoints = set()
     for rule in iter_blueprint_rules(blueprint):
+        # Rules without an endpoint are never legacy rules
         if not rule.get('endpoint'):
+            continue
+        # Rules which do not have a matching .py file are also not legacy rules
+        if rule['endpoint'] not in prettified_endpoints:
             continue
 
         endpoint = rule['endpoint']
