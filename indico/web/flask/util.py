@@ -106,7 +106,7 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None):
         # This is necessary since passing a list for an URL path argument breaks things.
         args = dict((k, v[0] if len(v) == 1 else v) for k, v in request.args.iterlists())
         target = url_for('%s.%s' % (blueprint.name, endpoint), **args)
-        return redirect(target)
+        return redirect(target, 301)
     return _redirect
 
 
