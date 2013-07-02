@@ -6282,7 +6282,7 @@ class Session(CommonObjectBase, Locatable):
         if self.canAccess( aw ):
             return True
 
-        if self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) or self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"}):
+        if any(self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) + self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
             return True
 
         for contrib in self.getContributionList():
@@ -8990,8 +8990,7 @@ class Contribution(CommonObjectBase, Locatable):
         """
         if self.canAccess( aw ):
             return True
-        if self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"}) or \
-                self._notify("isPluginTypeAdmin", {"user": aw.getUser()}):
+        if any(self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"}) + self._notify("isPluginTypeAdmin", {"user": aw.getUser()})):
             return True
         ################################################################################################
         for sc in self.getSubContributionList():
@@ -11023,7 +11022,7 @@ class Material(CommonObjectBase):
             return True
         #####################################################
 
-        if self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) or self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"}):
+        if any(self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) + self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
             return True
 
         canUserAccess = self.isAllowedToAccess( aw.getUser() )
@@ -11473,7 +11472,7 @@ class Resource(CommonObjectBase):
             return True
         #####################################################
 
-        if self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) or self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"}):
+        if any(self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) + self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
             return True
 
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):

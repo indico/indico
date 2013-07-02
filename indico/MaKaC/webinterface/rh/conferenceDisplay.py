@@ -356,8 +356,8 @@ class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
         RHConferenceBase._checkParams( self, params )
 
     def _checkProtection( self ):
-        if not(self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"}) or
-                self._notify("isPluginTypeAdmin", {"user": self._getUser()})):
+        if not any(self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"}) +
+                   self._notify("isPluginTypeAdmin", {"user": self._getUser()})):
             RHDisplayBaseProtected._checkProtection( self )
 
 

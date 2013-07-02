@@ -46,8 +46,7 @@ class WNewBookingForm(WCSPageTemplateBase):
         underTheLimit = self._conf.getNumberOfContributions() <= self._RecordingRequestOptions["contributionLoadLimit"].getValue()
         manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         user = self._rh._getUser()
-        isManager = user.isAdmin() or self._notify("isPluginTypeAdmin", {"user": user}) or self._notify("isPluginAdmin", {"user": user, "plugins": ["RecordingRequest"]})
-
+        isManager = user.isAdmin() or RCCollaborationAdmin.hasRights(user) or RCCollaborationPluginAdmin.hasRights(user, plugins=['RecordingRequest'])
         booking = manager.getSingleBooking('RecordingRequest')
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
         initialDisplay = (self._conf.getNumberOfContributions() > 0 and underTheLimit) or (booking is not None and initialChoose)
