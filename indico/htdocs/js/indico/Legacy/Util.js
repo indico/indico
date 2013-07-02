@@ -418,11 +418,15 @@ var IndicoUtil = {
     /**
      * Determines if a string contains invalid characters for short URLs
      * @param {String} s The input string
-     * @return {Booleab} true if the string is a valid string, false otherwise
+     * @return {Boolean} true if the string is a valid string, false otherwise
      */
     parseShortURL: function(s) {
-        var regExp = new RegExp("[^A-Za-z0-9\._-]");
-        return !regExp.test(s);
+        if (!isNaN(+s)) {
+            // Just a number
+            return false;
+        }
+        // Restrict characters
+        return /^[a-zA-Z0-9._-]*$/.test(s);
     },
 
     /**
