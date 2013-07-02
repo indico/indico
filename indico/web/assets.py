@@ -121,7 +121,7 @@ indico_timetable = Bundle(
                'DragAndDrop.js',
                'Draw.js',
                'Management.js'),
-   filters='rjsmin', output='js/indico_timetable_%(version)s.min.js')
+    filters='rjsmin', output='js/indico_timetable_%(version)s.min.js')
 
 indico_legacy = Bundle(
     *namespace('js/indico/Legacy',
@@ -263,8 +263,11 @@ moment = Bundle(
 base_js = Bundle(jquery, presentation, indico_jquery, moment, indico_core,
                  indico_legacy, indico_common)
 
-base_sass = Bundle('sass/base.scss',
-                   filters=("pyscss", "cssrewrite", "cssmin"), output="sass/base_sass_%(version)s.css")
+base_sass = Bundle('sass/screen.scss',
+                   filters=("pyscss", "cssrewrite", "cssmin"),
+                   output="sass/screen_sass_%(version)s.css",
+                   depends=["sass/base/*.scss",
+                            "sass/partials/*.scss"])
 
 
 def register_all_js(env):
