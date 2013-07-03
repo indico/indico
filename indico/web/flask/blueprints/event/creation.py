@@ -31,12 +31,14 @@ def _redirect_simple_event(**kwargs):
 
 event_creation = IndicoBlueprint('event_creation', __name__, url_prefix='/event/create')
 
-# Event creaetion
+# Event creation
 event_creation.add_url_rule('/simple_event', view_func=_redirect_simple_event)
-event_creation.add_url_rule('/simple_event/<categId>', view_func=_redirect_simple_event)
 event_creation.add_url_rule('/<any(lecture,meeting,conference):event_type>', 'conferenceCreation',
-                            rh_as_view(categoryDisplay.RHConferenceCreation))
-event_creation.add_url_rule('/<any(lecture,meeting,conference):event_type>/<categId>', 'conferenceCreation',
                             rh_as_view(categoryDisplay.RHConferenceCreation))
 event_creation.add_url_rule('/save', 'conferenceCreation-createConference',
                             rh_as_view(categoryDisplay.RHConferencePerformCreation), methods=('POST',))
+
+# Event creation - category specified
+event_creation.add_url_rule('!/category/<categId>/create/event/simple_event', view_func=_redirect_simple_event)
+event_creation.add_url_rule('!/category/<categId>/create/event/<any(lecture,meeting,conference):event_type>',
+                            'conferenceCreation', rh_as_view(categoryDisplay.RHConferenceCreation))

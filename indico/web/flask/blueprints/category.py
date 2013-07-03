@@ -39,6 +39,7 @@ category.add_url_rule('/<categId>/create/subcategory', 'categoryCreation', rh_as
                       methods=('GET', 'POST'))
 category.add_url_rule('/<categId>/create/subcategory/save', 'categoryCreation-create',
                       rh_as_view(categoryMod.RHCategoryPerformCreation), methods=('POST',))
+# Event creation is in event.creation
 
 # Display
 category.add_url_rule('/<categId>/', 'categoryDisplay', rh_as_view(categoryDisplay.RHCategoryDisplay))
