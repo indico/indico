@@ -27,36 +27,22 @@ event.add_url_rule('/contributions', 'contributionListDisplay', rh_as_view(confe
 event.add_url_rule('/contributions.pdf', 'contributionListDisplay-contributionsToPDF',
                    rh_as_view(conferenceDisplay.RHContributionListToPDF), methods=('POST',))
 
-# Display contribution
-event.add_url_rule('/contribution/<contribId>', 'contributionDisplay', rh_as_view(contribDisplay.RHContributionDisplay))
-event.add_url_rule('/contribution/<contribId>.ics', 'contributionDisplay-ical',
-                   rh_as_view(contribDisplay.RHContributionToiCal))
-event.add_url_rule('/contribution/<contribId>.marc.xml', 'contributionDisplay-marcxml',
-                   rh_as_view(contribDisplay.RHContributionToMarcXML))
-event.add_url_rule('/contribution/<contribId>.xml', 'contributionDisplay-xml',
-                   rh_as_view(contribDisplay.RHContributionToXML))
-event.add_url_rule('/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
-                   rh_as_view(contribDisplay.RHContributionToPDF))
-event.add_url_rule('/contribution/<contribId>/<subContId>', 'subContributionDisplay',
-                   rh_as_view(subContribDisplay.RHSubContributionDisplay))
-event.add_url_rule('/contribution/<contribId>/<subContId>.marc.xml', 'subContributionDisplay-marcxml',
-                   rh_as_view(subContribDisplay.RHSubContributionToMarcXML))
-
-# Display contribution within a session
-event.add_url_rule('/session/<sessionId>/contribution/<contribId>', 'contributionDisplay',
-                   rh_as_view(contribDisplay.RHContributionDisplay))
-event.add_url_rule('/session/<sessionId>/contribution/<contribId>.ics', 'contributionDisplay-ical',
-                   rh_as_view(contribDisplay.RHContributionToiCal))
-event.add_url_rule('/session/<sessionId>/contribution/<contribId>.marc.xml', 'contributionDisplay-marcxml',
-                   rh_as_view(contribDisplay.RHContributionToMarcXML))
-event.add_url_rule('/session/<sessionId>/contribution/<contribId>.xml', 'contributionDisplay-xml',
-                   rh_as_view(contribDisplay.RHContributionToXML))
-event.add_url_rule('/session/<sessionId>/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
-                   rh_as_view(contribDisplay.RHContributionToPDF))
-event.add_url_rule('/session/<sessionId>/contribution/<contribId>/<subContId>', 'subContributionDisplay',
-                   rh_as_view(subContribDisplay.RHSubContributionDisplay))
-event.add_url_rule('/session/<sessionId>/contribution/<contribId>/<subContId>.marc.xml',
-                   'subContributionDisplay-marcxml', rh_as_view(subContribDisplay.RHSubContributionToMarcXML))
+with event.add_prefixed_rules('/session/<sessionId>'):
+    # Display contribution
+    event.add_url_rule('/contribution/<contribId>', 'contributionDisplay',
+                       rh_as_view(contribDisplay.RHContributionDisplay))
+    event.add_url_rule('/contribution/<contribId>.ics', 'contributionDisplay-ical',
+                       rh_as_view(contribDisplay.RHContributionToiCal))
+    event.add_url_rule('/contribution/<contribId>.marc.xml', 'contributionDisplay-marcxml',
+                       rh_as_view(contribDisplay.RHContributionToMarcXML))
+    event.add_url_rule('/contribution/<contribId>.xml', 'contributionDisplay-xml',
+                       rh_as_view(contribDisplay.RHContributionToXML))
+    event.add_url_rule('/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
+                       rh_as_view(contribDisplay.RHContributionToPDF))
+    event.add_url_rule('/contribution/<contribId>/<subContId>', 'subContributionDisplay',
+                       rh_as_view(subContribDisplay.RHSubContributionDisplay))
+    event.add_url_rule('/contribution/<contribId>/<subContId>.marc.xml', 'subContributionDisplay-marcxml',
+                       rh_as_view(subContribDisplay.RHSubContributionToMarcXML))
 
 # Authors/Speakers
 event.add_url_rule('/authors', 'confAuthorIndex', rh_as_view(conferenceDisplay.RHAuthorIndex))

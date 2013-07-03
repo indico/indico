@@ -57,39 +57,39 @@ event_mgmt.add_url_rule('/paper-reviewing/assess/reviewer/layout', 'confListCont
 event_mgmt.add_url_rule('/paper-reviewing/assess/reviewer/content', 'confListContribToJudge-asReviewer',
                         rh_as_view(reviewingListContribToJudge.RHContribListToJudgeAsReviewer))
 
+with event_mgmt.add_prefixed_rules('/session/<sessionId>'):
+    # Contribution reviewing: team
+    event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/', 'contributionReviewing',
+                            rh_as_view(contribReviewingModif.RHContributionReviewing), methods=('GET', 'POST'))
+    event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/assign/referee',
+                            'contributionReviewing-assignReferee', rh_as_view(contribReviewingModif.RHAssignReferee),
+                            methods=('POST',))
+    event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/unassign/referee',
+                            'contributionReviewing-removeAssignReferee',
+                            rh_as_view(contribReviewingModif.RHRemoveAssignReferee), methods=('POST',))
+    event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/assign/reviewer/layout',
+                            'contributionReviewing-assignEditing',
+                            rh_as_view(contribReviewingModif.RHAssignEditing), methods=('POST',))
+    event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/unassign/reviewer/layout',
+                            'contributionReviewing-removeAssignEditing',
+                            rh_as_view(contribReviewingModif.RHRemoveAssignEditing), methods=('POST',))
+    event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/assign/reviewer/content',
+                            'contributionReviewing-assignReviewing',
+                            rh_as_view(contribReviewingModif.RHAssignReviewing), methods=('POST',))
+    event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/unassign/reviewer/content',
+                            'contributionReviewing-removeAssignReviewing',
+                            rh_as_view(contribReviewingModif.RHRemoveAssignReviewing), methods=('POST',))
 
-# Contribution reviewing: team
-event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/', 'contributionReviewing',
-                        rh_as_view(contribReviewingModif.RHContributionReviewing), methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/assign/referee',
-                        'contributionReviewing-assignReferee', rh_as_view(contribReviewingModif.RHAssignReferee),
-                        methods=('POST',))
-event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/unassign/referee',
-                        'contributionReviewing-removeAssignReferee',
-                        rh_as_view(contribReviewingModif.RHRemoveAssignReferee), methods=('POST',))
-event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/assign/reviewer/layout',
-                        'contributionReviewing-assignEditing',
-                        rh_as_view(contribReviewingModif.RHAssignEditing), methods=('POST',))
-event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/unassign/reviewer/layout',
-                        'contributionReviewing-removeAssignEditing',
-                        rh_as_view(contribReviewingModif.RHRemoveAssignEditing), methods=('POST',))
-event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/assign/reviewer/content',
-                        'contributionReviewing-assignReviewing',
-                        rh_as_view(contribReviewingModif.RHAssignReviewing), methods=('POST',))
-event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/unassign/reviewer/content',
-                        'contributionReviewing-removeAssignReviewing',
-                        rh_as_view(contribReviewingModif.RHRemoveAssignReviewing), methods=('POST',))
-
-# Contribution reviewing: assessments
-event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/assess/referee',
-                        'contributionReviewing-contributionReviewingJudgements',
-                        rh_as_view(contribReviewingModif.RHContributionReviewingJudgements))
-event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/assess/layout', 'contributionEditingJudgement',
-                        rh_as_view(contribReviewingModif.RHContributionEditingJudgement))
-event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/assess/content', 'contributionGiveAdvice',
-                        rh_as_view(contribReviewingModif.RHContributionGiveAdvice))
-event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/material',
-                        'contributionReviewing-contributionReviewingMaterials',
-                        rh_as_view(contribReviewingModif.RHContribModifReviewingMaterials))
-event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/history', 'contributionReviewing-reviewingHistory',
-                        rh_as_view(contribReviewingModif.RHReviewingHistory))
+    # Contribution reviewing: assessments
+    event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/assess/referee',
+                            'contributionReviewing-contributionReviewingJudgements',
+                            rh_as_view(contribReviewingModif.RHContributionReviewingJudgements))
+    event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/assess/layout', 'contributionEditingJudgement',
+                            rh_as_view(contribReviewingModif.RHContributionEditingJudgement))
+    event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/assess/content', 'contributionGiveAdvice',
+                            rh_as_view(contribReviewingModif.RHContributionGiveAdvice))
+    event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/material',
+                            'contributionReviewing-contributionReviewingMaterials',
+                            rh_as_view(contribReviewingModif.RHContribModifReviewingMaterials))
+    event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/history', 'contributionReviewing-reviewingHistory',
+                            rh_as_view(contribReviewingModif.RHReviewingHistory))
