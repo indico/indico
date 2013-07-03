@@ -1604,7 +1604,7 @@ class UHFileEnterAccessKey(URLHandler):
 
 
 class UHCategoryModification(URLHandler):
-    _endpoint = 'category.categoryModification'
+    _endpoint = 'category_mgmt.categoryModification'
 
     @classmethod
     def getActionURL(cls):
@@ -1612,79 +1612,79 @@ class UHCategoryModification(URLHandler):
 
 
 class UHCategoryAddMaterial(URLHandler):
-    _endpoint = 'category.categoryFiles-addMaterial'
+    _endpoint = 'category_mgmt.categoryFiles-addMaterial'
 
 
 class UHCategoryActionSubCategs(URLHandler):
-    _endpoint = 'category.categoryModification-actionSubCategs'
+    _endpoint = 'category_mgmt.categoryModification-actionSubCategs'
 
 
 class UHCategoryActionConferences(URLHandler):
-    _endpoint = 'category.categoryModification-actionConferences'
+    _endpoint = 'category_mgmt.categoryModification-actionConferences'
 
 
 class UHCategoryClearCache(URLHandler):
-    _endpoint = 'category.categoryModification-clearCache'
+    _endpoint = 'category_mgmt.categoryModification-clearCache'
 
 
 class UHCategoryClearConferenceCaches(URLHandler):
-    _endpoint = 'category.categoryModification-clearConferenceCaches'
+    _endpoint = 'category_mgmt.categoryModification-clearConferenceCaches'
 
 
 class UHCategModifAC(URLHandler):
-    _endpoint = 'category.categoryAC'
+    _endpoint = 'category_mgmt.categoryAC'
 
 
 class UHCategorySetConfCreationControl(URLHandler):
-    _endpoint = 'category.categoryConfCreationControl-setCreateConferenceControl'
+    _endpoint = 'category_mgmt.categoryConfCreationControl-setCreateConferenceControl'
 
 
 class UHCategorySetNotifyCreation(URLHandler):
-    _endpoint = 'category.categoryConfCreationControl-setNotifyCreation'
+    _endpoint = 'category_mgmt.categoryConfCreationControl-setNotifyCreation'
 
 
 class UHCategModifTools(URLHandler):
-    _endpoint = 'category.categoryTools'
+    _endpoint = 'category_mgmt.categoryTools'
 
 
 class UHCategoryDeletion(URLHandler):
-    _endpoint = 'category.categoryTools-delete'
+    _endpoint = 'category_mgmt.categoryTools-delete'
 
 
 class UHCategModifTasks(URLHandler):
-    _endpoint = 'category.categoryTasks'
+    _endpoint = 'category_mgmt.categoryTasks'
 
 
 class UHCategModifFiles(URLHandler):
-    _endpoint = 'category.categoryFiles'
+    _endpoint = 'category_mgmt.categoryFiles'
 
 
 class UHCategModifTasksAction(URLHandler):
-    _endpoint = 'category.categoryTasks-taskAction'
+    _endpoint = 'category_mgmt.categoryTasks-taskAction'
 
 
 class UHCategoryDataModif(URLHandler):
-    _endpoint = 'category.categoryDataModification'
+    _endpoint = 'category_mgmt.categoryDataModification'
 
 
 class UHCategoryPerformModification(URLHandler):
-    _endpoint = 'category.categoryDataModification-modify'
+    _endpoint = 'category_mgmt.categoryDataModification-modify'
 
 
 class UHCategoryTasksOption(URLHandler):
-    _endpoint = 'category.categoryDataModification-tasksOption'
+    _endpoint = 'category_mgmt.categoryDataModification-tasksOption'
 
 
 class UHCategorySetVisibility(URLHandler):
-    _endpoint = 'category.categoryAC-setVisibility'
+    _endpoint = 'category_mgmt.categoryAC-setVisibility'
 
 
 class UHCategoryCreation(URLHandler):
-    _endpoint = 'category.categoryCreation'
+    _endpoint = 'category_mgmt.categoryCreation'
 
 
 class UHCategoryPerformCreation(URLHandler):
-    _endpoint = 'category.categoryCreation-create'
+    _endpoint = 'category_mgmt.categoryCreation-create'
 
 
 class UHCategoryDisplay(URLHandler):
