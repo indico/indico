@@ -1721,7 +1721,7 @@ class WBrowseGroups( wcomponents.WTemplated ):
         res = []
         if self._letter != None:
             if self._letter != "all":
-                res = gh.matchFirstLetter(self._letter, searchInAuthenticators=True)
+                res = gh.matchFirstLetter(self._letter, searchInAuthenticators=False)
             else:
                 res = gh.getValuesToList()
             res.sort(utils.sortGroupsByName)

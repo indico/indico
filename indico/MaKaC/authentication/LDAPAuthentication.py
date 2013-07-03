@@ -66,6 +66,7 @@ from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.errors import MaKaCError
 from MaKaC.common.logger import Logger
 from MaKaC.common import Configuration
+from MaKaC.user import Group, PrincipalHolder
 
 
 RETRIEVED_FIELDS = ['uid', 'cn', 'mail', 'o', 'ou', 'company', 'givenName',
@@ -202,7 +203,6 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             return None
 
     def matchGroup(self, criteria, exact=0):
-        from MaKaC.user import LDAPGroup
         ldapc = LDAPConnector()
         ldapc.open()
         ldapc.login()
@@ -219,7 +219,6 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         return groupList
 
     def matchGroupFirstLetter(self, letter):
-        from MaKaC.user import LDAPGroup
         ldapc = LDAPConnector()
         ldapc.open()
         ldapc.login()
@@ -555,6 +554,49 @@ class LDAPConnector(object):
             return memberUids
         else:
             raise Exception("Unknown LDAP group style, choices are: SLAPD or ActiveDirectory")
+
+class LDAPGroup(Group):
+    groupType = "LDAP"
+
+    def __str__(self):
+        return "<LDAPGroup id: %s name: %s desc: %s>" % (self.getId(),
+                                                         self.getName(),
+                                                         self.getDescription())
+
+    def addMember(self, newMember):
+        pass
+
+    def removeMember(self, member):
+        pass
+
+    def getMemberList(self):
+        uidList = AuthenticatorMgr.getInstance().getById('LDAP').getGroupMemberList(self.getName())
+        avatarLists = []
+        for uid in uidList:
+            # First, try locally (fast)
+            lst = PrincipalHolder().match(uid , exact=1, searchInAuthenticators=False)
+            print "Result", lst
+            if not lst:
+                # If not found, try external
+                lst = PrincipalHolder().match(uid, exact=1)
+            avatarLists.append(lst)
+        return [avList[0] for avList in avatarLists if avList]
+
+    def containsUser(self, avatar):
+
+        # used when checking acces to private events restricted for certain groups
+        if not avatar:
+            return False
+        login = None
+        for aid in avatar.getIdentityList():
+            if aid.getAuthenticatorTag() == 'LDAP':
+                login = aid.getLogin()
+        if not login:
+            return False
+        return AuthenticatorMgr.getInstance().getById('LDAP').isUserInGroup((login, self.getName()))
+
+    def containsMember(self, avatar):
+        return 0
 
 class LDAPTools:
 

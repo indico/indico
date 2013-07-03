@@ -48,7 +48,8 @@ from MaKaC.plugins.RoomBooking.tasks import RoomReservationTask
 from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools
 from MaKaC.plugins.Collaboration import urlHandlers
 from MaKaC.webinterface import displayMgr
-from MaKaC.authentication.LocalAuthentication import LocalAuthenticator
+from MaKaC.authentication.LocalAuthentication import LocalAuthenticator, LocalIdentity
+from MaKaC.authentication.LDAPAuthentication import LDAPIdentity
 from MaKaC.user import AvatarHolder
 from MaKaC.rb_location import CrossLocationQueries
 
@@ -824,22 +825,36 @@ def removeVideoServicesLinksFromCore(dbi, withRBDB, prevVersion):
     dbi.commit()
 
 
-@since('1.1')
+@since('1.2')
 def localIdentityMigration(dbi, withRBDB, prevVersion):
     """
     Generate the new password with a salt
     """
 
     auth = LocalAuthenticator()
-    i = 0
 
-    for identity in auth.getList():
+    for i, identity in enumerate(auth.getList()):
         if not hasattr(identity, "salt"):
             identity.salt = bcrypt.gensalt()
             identity.password = bcrypt.hashpw(identity.password, identity.salt)
             if i % 1000 == 999:
                 dbi.commit()
             i += 1
+    dbi.commit()
+
+
+@since('1.2')
+def removeNiceIdentities(dbi, withRBDB, prevVersion):
+    """
+    Remove the NiceIdentities from the avatars
+    """
+
+    for i, avatar in enumerate(AvatarHolder().getList()):
+        for identity in avatar.getIdentityList():
+            if not isinstance(identity, (LocalIdentity, LDAPIdentity)):
+                avatar.removeIdentity(identity)
+        if i % 100 == 99:
+            dbi.commit()
     dbi.commit()
 
 

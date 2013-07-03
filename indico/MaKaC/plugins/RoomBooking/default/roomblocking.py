@@ -24,7 +24,7 @@ from MaKaC.plugins.RoomBooking.rb_roomblocking import RoomBlockingBase
 from MaKaC.rb_location import RoomGUID, Location
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 import datetime
-from MaKaC.user import Avatar, LDAPGroup, Group, AvatarHolder, GroupHolder
+from MaKaC.user import Avatar, Group, AvatarHolder, GroupHolder
 from MaKaC.rb_reservation import RepeatabilityEnum
 from MaKaC.plugins.RoomBooking.default.reservation import ResvHistoryEntry
 from MaKaC.webinterface.wcomponents import WTemplated
