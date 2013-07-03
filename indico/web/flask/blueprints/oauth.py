@@ -33,7 +33,8 @@ oauth.add_url_rule('/oauth/request_token', 'oauth-request_token', rh_as_view(oau
                    methods=('GET', 'POST'))
 
 # User endpoints: App list and authorization
-oauth.add_url_rule('/user/oauth', 'oauth-userThirdPartyAuth', rh_as_view(oauth_rh.RHOAuthUserThirdPartyAuth))
-oauth.add_url_rule('/user/oauth/authorize', 'oauth-thirdPartyAuth', rh_as_view(oauth_rh.RHOAuthThirdPartyAuth))
-oauth.add_url_rule('/user/oauth/authorize_consumer', 'oauth-authorize_consumer',
-                   rh_as_view(oauth_rh.RHOAuthAuthorizeConsumer))
+with oauth.add_prefixed_rules('/user/<userId>', '/user'):
+    oauth.add_url_rule('/oauth', 'oauth-userThirdPartyAuth', rh_as_view(oauth_rh.RHOAuthUserThirdPartyAuth))
+    oauth.add_url_rule('/oauth/authorize', 'oauth-thirdPartyAuth', rh_as_view(oauth_rh.RHOAuthThirdPartyAuth))
+    oauth.add_url_rule('/oauth/authorize_consumer', 'oauth-authorize_consumer',
+                       rh_as_view(oauth_rh.RHOAuthAuthorizeConsumer))

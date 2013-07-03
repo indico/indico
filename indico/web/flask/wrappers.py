@@ -73,6 +73,32 @@ class IndicoBlueprintSetupState(BlueprintSetupState):
 
 class IndicoBlueprint(Blueprint):
     """A Blueprint implementation that allows prefixing URLs with `!` to
-    ignore the url_prefix of the blueprint"""
+    ignore the url_prefix of the blueprint.
+
+    It also supports automatically creating rules in two versions - with and
+    without a prefix."""
+
+    def __init__(self, *args, **kwargs):
+        self.__prefix = None
+        self.__default_prefix = ''
+        super(IndicoBlueprint, self).__init__(*args, **kwargs)
+
     def make_setup_state(self, app, options, first_registration=False):
         return IndicoBlueprintSetupState(self, app, options, first_registration)
+
+    def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
+        super(IndicoBlueprint, self).add_url_rule(self.__default_prefix + rule, endpoint, view_func, **options)
+        if self.__prefix:
+            super(IndicoBlueprint, self).add_url_rule(self.__prefix + rule, endpoint, view_func, **options)
+
+    @contextmanager
+    def add_prefixed_rules(self, prefix, default_prefix=''):
+        """Creates prefixed rules in addition to the normal ones.
+        When specifying a default_prefix, too, the normally "unprefixed" rules
+        are prefixed with it."""
+        assert self.__prefix is None and not self.__default_prefix
+        self.__prefix = prefix
+        self.__default_prefix = default_prefix
+        yield
+        self.__prefix = None
+        self.__default_prefix = ''

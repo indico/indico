@@ -19,7 +19,7 @@
 import re
 import string
 import urlparse
-from flask import request
+from flask import request, session
 
 from MaKaC.common.url import URL, EndpointURL
 from MaKaC.common.Configuration import Config
@@ -141,6 +141,15 @@ class OptionallySecureURLHandler(URLHandler):
         return cls._getURL(_force_secure=secure, **cls._getParams(target, params))
 
 
+class UserURLHandler(URLHandler):
+    """Strips the userId param if it's the current user"""
+    @classmethod
+    def _translateParams(cls, params):
+        if 'userId' in params and session.get('_avatarId') == params['userId']:
+            del params['userId']
+        return params
+
+
 # Hack to allow secure Indico on non-80 ports
 def setSSLPort(url):
     """
@@ -219,15 +228,15 @@ class UHOAuthAccessTokenURL(URLHandler):
     _endpoint = 'oauth.oauth-access_token'
 
 
-class UHOAuthAuthorizeConsumer(URLHandler):
+class UHOAuthAuthorizeConsumer(UserURLHandler):
     _endpoint = 'oauth.oauth-authorize_consumer'
 
 
-class UHOAuthThirdPartyAuth(URLHandler):
+class UHOAuthThirdPartyAuth(UserURLHandler):
     _endpoint = 'oauth.oauth-thirdPartyAuth'
 
 
-class UHOAuthUserThirdPartyAuth(URLHandler):
+class UHOAuthUserThirdPartyAuth(UserURLHandler):
     _endpoint = 'oauth.oauth-userThirdPartyAuth'
 
 
@@ -1380,43 +1389,43 @@ class UHUserCreated(UHConfUser):
     _endpoint = 'user.userRegistration-created'
 
 
-class UHUserActive(URLHandler):
+class UHUserActive(UserURLHandler):
     _endpoint = 'user.userRegistration-active'
 
 
-class UHUserDisable(URLHandler):
+class UHUserDisable(UserURLHandler):
     _endpoint = 'user.userRegistration-disable'
 
 
-class UHUserDashboard(URLHandler):
+class UHUserDashboard(UserURLHandler):
     _endpoint = 'user.userDashboard'
 
 
-class UHUserDetails(URLHandler):
+class UHUserDetails(UserURLHandler):
     _endpoint = 'user.userDetails'
 
 
-class UHUserBaskets(URLHandler):
+class UHUserBaskets(UserURLHandler):
     _endpoint = 'user.userBaskets'
 
 
-class UHUserPreferences(URLHandler):
+class UHUserPreferences(UserURLHandler):
     _endpoint = 'user.userPreferences'
 
 
-class UHUserAPI(URLHandler):
+class UHUserAPI(UserURLHandler):
     _endpoint = 'user.userAPI'
 
 
-class UHUserAPICreate(URLHandler):
+class UHUserAPICreate(UserURLHandler):
     _endpoint = 'user.userAPI-create'
 
 
-class UHUserAPIBlock(URLHandler):
+class UHUserAPIBlock(UserURLHandler):
     _endpoint = 'user.userAPI-block'
 
 
-class UHUserAPIDelete(URLHandler):
+class UHUserAPIDelete(UserURLHandler):
     _endpoint = 'user.userAPI-delete'
 
 
@@ -1424,11 +1433,11 @@ class UHUserRegistration(URLHandler):
     _endpoint = 'user.userRegistration'
 
 
-class UHUserIdentityCreation(URLHandler):
+class UHUserIdentityCreation(UserURLHandler):
     _endpoint = 'user.identityCreation'
 
 
-class UHUserRemoveIdentity(URLHandler):
+class UHUserRemoveIdentity(UserURLHandler):
     _endpoint = 'user.identityCreation-remove'
 
 
@@ -1436,11 +1445,11 @@ class UHUserExistWithIdentity(UHConfUser):
     _endpoint = 'user.userRegistration-UserExist'
 
 
-class UHUserIdPerformCreation(URLHandler):
+class UHUserIdPerformCreation(UserURLHandler):
     _endpoint = 'user.identityCreation-create'
 
 
-class UHUserIdentityChangePassword(URLHandler):
+class UHUserIdentityChangePassword(UserURLHandler):
     _endpoint = 'user.identityCreation-changePassword'
 
 

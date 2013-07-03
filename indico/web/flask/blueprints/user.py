@@ -36,8 +36,9 @@ user.add_url_rule('/login/not-activated', 'signIn-unactivatedAccount', rh_as_vie
 
 # Passwords
 user.add_url_rule('/send-password', 'signIn-sendLogin', rh_as_view(login.RHSendLogin), methods=('POST',))
-user.add_url_rule('/account/change-password', 'identityCreation-changePassword',
-                  rh_as_view(users.RHUserIdentityChangePassword), methods=('GET', 'POST'))
+with user.add_prefixed_rules('/<userId>'):
+    user.add_url_rule('/account/change-password', 'identityCreation-changePassword',
+                      rh_as_view(users.RHUserIdentityChangePassword), methods=('GET', 'POST'))
 
 # Registration
 user.add_url_rule('/register/activate', 'signIn-active', rh_as_view(login.RHActive))
@@ -48,25 +49,27 @@ user.add_url_rule('/register/exists', 'userRegistration-UserExist', rh_as_view(u
 user.add_url_rule('/register/success', 'userRegistration-created', rh_as_view(users.RHUserCreated),
                   methods=('GET', 'POST'))
 
-# Identities
-user.add_url_rule('/account/create-identity', 'identityCreation', rh_as_view(users.RHUserIdentityCreation))
-user.add_url_rule('/account/create-identity', 'identityCreation-create', rh_as_view(users.RHUserIdentityCreation),
-                  methods=('POST',))
-user.add_url_rule('/account/delete-identity', 'identityCreation-remove', rh_as_view(users.RHUserRemoveIdentity),
-                  methods=('POST',))
-user.add_url_rule('/account/disable', 'userRegistration-disable', rh_as_view(users.RHUserDisable),
-                  methods=('GET', 'POST'))
-user.add_url_rule('/account/activate', 'userRegistration-active', rh_as_view(users.RHUserActive),
-                  methods=('GET', 'POST'))
 
-# Dashboard, Favorites, etc.
-user.add_url_rule('/dashboard', 'userDashboard', rh_as_view(users.RHUserDashboard))
-user.add_url_rule('/account/', 'userDetails', rh_as_view(users.RHUserDetails))
-user.add_url_rule('/favorites', 'userBaskets', rh_as_view(users.RHUserBaskets))
-user.add_url_rule('/preferences', 'userPreferences', rh_as_view(users.RHUserPreferences))
+with user.add_prefixed_rules('/<userId>'):
+    # Identities
+    user.add_url_rule('/account/create-identity', 'identityCreation', rh_as_view(users.RHUserIdentityCreation))
+    user.add_url_rule('/account/create-identity', 'identityCreation-create',
+                      rh_as_view(users.RHUserIdentityCreation), methods=('POST',))
+    user.add_url_rule('/account/delete-identity', 'identityCreation-remove',
+                      rh_as_view(users.RHUserRemoveIdentity), methods=('POST',))
+    user.add_url_rule('/account/disable', 'userRegistration-disable', rh_as_view(users.RHUserDisable),
+                      methods=('GET', 'POST'))
+    user.add_url_rule('/account/activate', 'userRegistration-active', rh_as_view(users.RHUserActive),
+                      methods=('GET', 'POST'))
 
-# API Keys
-user.add_url_rule('/api', 'userAPI', rh_as_view(api.RHUserAPI))
-user.add_url_rule('/api/block', 'userAPI-block', rh_as_view(api.RHUserAPIBlock), methods=('POST',))
-user.add_url_rule('/api/create', 'userAPI-create', rh_as_view(api.RHUserAPICreate), methods=('POST',))
-user.add_url_rule('/api/delete', 'userAPI-delete', rh_as_view(api.RHUserAPIDelete), methods=('POST',))
+    # Dashboard, Favorites, etc.
+    user.add_url_rule('/dashboard', 'userDashboard', rh_as_view(users.RHUserDashboard))
+    user.add_url_rule('/account/', 'userDetails', rh_as_view(users.RHUserDetails))
+    user.add_url_rule('/favorites', 'userBaskets', rh_as_view(users.RHUserBaskets))
+    user.add_url_rule('/preferences', 'userPreferences', rh_as_view(users.RHUserPreferences))
+
+    # API Keys
+    user.add_url_rule('/api', 'userAPI', rh_as_view(api.RHUserAPI))
+    user.add_url_rule('/api/block', 'userAPI-block', rh_as_view(api.RHUserAPIBlock), methods=('POST',))
+    user.add_url_rule('/api/create', 'userAPI-create', rh_as_view(api.RHUserAPICreate), methods=('POST',))
+    user.add_url_rule('/api/delete', 'userAPI-delete', rh_as_view(api.RHUserAPIDelete), methods=('POST',))

@@ -17,6 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import re
+from flask import session
+
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.pages.admins as adminPages
@@ -31,7 +34,6 @@ from MaKaC.webinterface.rh.base import RH, RHProtected
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common import DBMgr
 from MaKaC.common import pendingQueues
-import re
 from MaKaC.i18n import _
 
 
@@ -242,22 +244,19 @@ class _UserUtils:
     setUserData = classmethod( setUserData )
 
 
-class RHUserBase( RHProtected ):
-
-    def _checkParams( self, params ):
-
-        if "userId" not in params or params["userId"].strip() == "":
-            raise MaKaCError( _("user id not specified"))
+class RHUserBase(RHProtected):
+    def _checkParams(self, params):
+        if not params.setdefault('userId', session.get('_avatarId')):
+            raise MaKaCError(_("user id not specified"))
 
         ah = user.AvatarHolder()
-        self._target = self._avatar = ah.getById( params["userId"] )
-        if self._avatar == None:
+        self._target = self._avatar = ah.getById(params['userId'])
+        if self._avatar is None:
             raise NotFoundError("The user id does not match any existing user.")
 
-    def _checkProtection( self ):
-
-        RHProtected._checkProtection( self )
-        if not self._avatar.canUserModify( self._getUser() ):
+    def _checkProtection(self):
+        RHProtected._checkProtection(self)
+        if not self._avatar.canUserModify(self._getUser()):
             raise errors.AccessControlError("user")
 
 
@@ -266,21 +265,6 @@ class RHUserDashboard(RHUserBase):
 
     def __init__(self, req):
         RHUserBase.__init__(self, req)
-
-    def _checkParams( self, params ):
-        user = self._getUser()
-
-        # if no user id was specified and we're logged in
-        # assume user wants to see their own profile
-        if "userId" not in params and user:
-            params["userId"] = user.getId()
-            self._doProcess = False
-
-            # just set so that _checkProtection doesn't fail
-            self._avatar = user
-            self._redirect(self._uh.getURL(**params))
-            return
-        RHUserBase._checkParams(self, params)
 
     def _process(self):
         p = adminPages.WPUserDashboard(self, self._avatar)

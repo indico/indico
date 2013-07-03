@@ -101,8 +101,7 @@ class RHOAuthAuthorization(RHOAuth, base.RHProtected):
             RequestTokenHolder().add(self._request_token)
         if not self._request_token.getConsumer().isTrusted() and not self._request_token.isAuthorized():
             redirectURL = UHOAuthThirdPartyAuth.getURL()
-            redirectURL.addParams({'userId': user.getId(),
-                                   'callback': self._request_token.getToken().get_callback_url(),
+            redirectURL.addParams({'callback': self._request_token.getToken().get_callback_url(),
                                    #'returnURL': str(urlHandlers.UHOAuthAuthorizeConsumer.getURL()),
                                    'third_party_app': self._request_token.getConsumer().getName()})
             self._redirect(redirectURL)
@@ -207,10 +206,10 @@ class RHAdminOAuthAuthorized(RHServicesBase):
 
 
 class RHOAuthThirdPartyAuth(base.RHProtected):
-
-    def _process( self ):
+    def _process(self):
         p = WPOAuthThirdPartyAuth(self)
-        return p.display(** self._reqParams)
+        return p.display(userId=self._getUser().getId(), **self._reqParams)
+
 
 class RHOAuthUserThirdPartyAuth(RHUserBase):
     _uh = urlHandlers.UHOAuthUserThirdPartyAuth
