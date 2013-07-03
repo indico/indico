@@ -52,9 +52,6 @@ from MaKaC.user import CERNGroup, Avatar
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
 from indico.modules.upcoming import WUpcomingEvents
-from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
-from indico.web.http_api.auth import APIKey
-from indico.web.http_api.util import generate_public_auth_request
 
 
 class WPCategoryBase ( main.WPMainBase ):
@@ -68,55 +65,13 @@ class WPCategoryBase ( main.WPMainBase ):
         self._setTitle(title)
         self._conf = None
 
-#    def _createMenu( self ):
-#        main.WPMainBase._createMenu( self )
-#        c = self._target
-#
-#        # enable event creation
-#        if c and c.canCreateConference(self._getAW().getUser()):
-#            if not c.hasSubcategories():
-#                self._lectureOpt.setEnabled(True)
-#                self._meetingOpt.setEnabled(True)
-#                self._conferenceOpt.setEnabled(True)
-#
-#                urlConference = urlHandlers.UHConferenceCreation.getURL(c)
-#                urlConference.addParam("event_type","default")
-#
-#                urlLecture = urlHandlers.UHConferenceCreation.getURL(c)
-#                urlLecture.addParam("event_type","simple_event")
-#
-#                urlMeeting = urlHandlers.UHConferenceCreation.getURL(c)
-#                urlMeeting.addParam("event_type","meeting")
-#
-#
-#                self._conferenceOpt.setURL( urlConference )
-#                self._lectureOpt.setURL( urlLecture )
-#                self._meetingOpt.setURL( urlMeeting )
-#            else:
-#                self._lectureOpt.setErrorMessage("msgNotFinalCategory")
-#                self._meetingOpt.setErrorMessage("msgNotFinalCategory")
-#                self._conferenceOpt.setErrorMessage("msgNotFinalCategory")
-
-
     def _currentCategory(self):
         return self._target
 
-class WPCategoryDisplayBase( WPCategoryBase ):
+
+class WPCategoryDisplayBase(WPCategoryBase):
     pass
 
-## TODO: TO REMOVE ????
-#    def _getFooter( self ):
-#        """
-#        """
-#        wc = wcomponents.WFooter(isFrontPage=self._isFrontPage())
-#        p = {}
-#        if Config.getInstance().getShortCategURL():
-#            if self._target.getId() != "0":
-#                p["shortURL"] =  Config.getInstance().getShortCategURL() + self._target.getId()
-#            else:
-#                p["shortURL"] =  Config.getInstance().getBaseURL()
-#        p["subArea"] = self._getSiteArea()
-#        return wc.getHTML(p)
 
 class WCategoryDisplay(WICalExportBase):
 
@@ -1272,13 +1227,13 @@ class WPCategoryModifBase( WPCategoryBase ):
         return WPCategoryBase.getJSFiles(self) + \
                self._includeJSPackage('Management')
 
-    def _getHeader( self ):
-        """
-        """
-        wc = wcomponents.WHeader( self._getAW() )
-        return wc.getHTML( { "subArea": self._getSiteArea(), \
-                             "loginURL": self._escapeChars(str(self.getLoginURL())),\
-                             "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )
+    def _getHeader(self):
+        wc = wcomponents.WHeader(self._getAW(), currentCategory=self._currentCategory())
+        return wc.getHTML({
+            'subArea': self._getSiteArea(),
+            'loginURL': self._escapeChars(str(self.getLoginURL())),
+            'logoutURL': self._escapeChars(str(self.getLogoutURL()))
+        })
 
     def _getNavigationDrawer(self):
         pars = {"target": self._target , "isModif" : True}
