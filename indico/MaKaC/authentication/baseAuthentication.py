@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 from persistent import Persistent
 
@@ -243,17 +244,15 @@ class SSOHandler:
         from MaKaC.user import AvatarHolder, Avatar
         config = Config.getInstance().getAuthenticatorConfigById(self.id).get("SSOMapping", {})
 
-        req = rh._req
-        req.add_common_vars()
-        if  req.subprocess_env.has_key(config.get("email", "ADFS_EMAIL")):
-            email = req.subprocess_env[config.get("email", "ADFS_EMAIL")]
-            login = req.subprocess_env[config.get("personId", "ADFS_LOGIN")]
-            personId = req.subprocess_env[config.get("personId", "ADFS_PERSONID")]
-            phone = req.subprocess_env.get(config.get("phone", "ADFS_PHONENUMBER"),"")
-            fax = req.subprocess_env.get(config.get("fax", "ADFS_FAXNUMBER"),"")
-            lastname = req.subprocess_env.get(config.get("lastname", "ADFS_LASTNAME"),"")
-            firstname = req.subprocess_env.get(config.get("firstname", "ADFS_FIRSTNAME"),"")
-            institute = req.subprocess_env.get(config.get("institute", "ADFS_HOMEINSTITUTE"),"")
+        if config.get('email', 'ADFS_EMAIL') in request.environ:
+            email = request.environ[config.get("email", "ADFS_EMAIL")]
+            login = request.environ[config.get("personId", "ADFS_LOGIN")]
+            personId = request.environ[config.get("personId", "ADFS_PERSONID")]
+            phone = request.environ.get(config.get("phone", "ADFS_PHONENUMBER"), "")
+            fax = request.environ.get(config.get("fax", "ADFS_FAXNUMBER"), "")
+            lastname = request.environ.get(config.get("lastname", "ADFS_LASTNAME"), "")
+            firstname = request.environ.get(config.get("firstname", "ADFS_FIRSTNAME"), "")
+            institute = request.environ.get(config.get("institute", "ADFS_HOMEINSTITUTE"), "")
             if personId == '-1':
                 personId = None
             ah = AvatarHolder()

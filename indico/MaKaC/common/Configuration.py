@@ -481,17 +481,7 @@ class Config:
         'OAuthAccessTokenTTL' : 10000,
         'MobileURL' : '',
         'SessionLifetime' : 86400*31,
-        'RouteOldUrls': False,
-        # Authentication
-        'LDAPConfig': {'host': 'myldapserver.example.com',
-                       'useTLS': True,
-                       'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
-                       'groupDNQuery': ('cn={0}',
-                                        'OU=Groups,DC=example,DC=com'),
-                       'groupStyle': 'SLAPD',
-                       'accessCredentials': ('CN=user,OU=Users,'
-                                             'DC=example,DC=com',
-                                             'secret_password')}
+        'RouteOldUrls': False
     }
 
     if sys.platform == 'win32':
