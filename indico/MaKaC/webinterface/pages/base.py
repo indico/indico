@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from urlparse import urlparse
 from webassets import Environment
 from indico.web import assets
 
@@ -48,9 +49,15 @@ class WPBase(OldObservable):
         self._rh = rh
         self._locTZ = ""
 
-        self._asset_env = Environment(os.path.join(config.getHtdocsDir(), "static", "assets"), '/static/assets/')
+        url_path = urlparse(config.getBaseURL()).path
+
+        self._asset_env = Environment(os.path.join(config.getHtdocsDir(), 'static', 'assets'),
+                                      '{0}/static/assets/'.format(url_path))
         self._asset_env.config['PYSCSS_LOAD_PATHS'] = [os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass')]
+
         self._asset_env.append_path(config.getHtdocsDir(), '/')
+        self._asset_env.append_path(os.path.join(config.getHtdocsDir(), 'css'), '{0}/css'.format(url_path))
+        self._asset_env.append_path(os.path.join(config.getHtdocsDir(), 'js'), '{0}/js'.format(url_path))
 
         if db_connected:
             debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()

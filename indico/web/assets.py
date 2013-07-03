@@ -23,6 +23,7 @@ This file declares all core JS/CSS assets used by Indico
 """
 # stdlib imports
 import os
+from urlparse import urlparse
 
 # 3rd party libs
 from webassets import Bundle, Environment
@@ -36,11 +37,14 @@ from MaKaC.common.Configuration import Config
 class PluginEnvironment(Environment):
     def __init__(self, plugin_name, plugin_dir, url_path):
         config = Config.getInstance()
-        output_dir = os.path.join(config.getHtdocsDir(), 'build', plugin_name)
 
-        super(PluginEnvironment, self).__init__(output_dir, url_path)
+        url_base_path = urlparse(config.getBaseURL()).path
 
-        self.append_path(os.path.join(plugin_dir, 'htdocs'), url=url_path)
+        output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets', 'plugins', plugin_name)
+
+        super(PluginEnvironment, self).__init__(output_dir, url_base_path + url_path)
+
+        self.append_path(os.path.join(plugin_dir, 'htdocs'), url=(url_base_path + url_path))
 
 
 def namespace(dir_ns, *list_files):
@@ -248,7 +252,7 @@ presentation = Bundle(
         'Ui/Widgets/WidgetEditable.js',
         'Ui/Widgets/WidgetMenu.js',
         'Ui/Widgets/WidgetGrid.js'),
-    filters='rjsmin', output='presentation_%(version)s.min.js')
+    filters='rjsmin', output='js/presentation_%(version)s.min.js')
 
 ie_compatibility = Bundle('js/selectivizr.js',
                           filters='rjsmin', output='js/ie_compatibility_%(version)s.min.js')
@@ -265,7 +269,7 @@ base_js = Bundle(jquery, presentation, indico_jquery, moment, indico_core,
 
 base_sass = Bundle('sass/screen.scss',
                    filters=("pyscss", "cssrewrite", "cssmin"),
-                   output="sass/screen_sass_%(version)s.css",
+                   output="sass/base_sass_%(version)s.css",
                    depends=["sass/base/*.scss",
                             "sass/partials/*.scss"])
 

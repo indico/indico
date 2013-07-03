@@ -43,6 +43,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 from indico.web.assets import PluginEnvironment
 from webassets import Bundle
 
+
 class SearchCHContributor(Component):
     """
     Adds the Search option to the header of the Category.
