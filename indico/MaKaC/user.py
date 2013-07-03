@@ -77,30 +77,30 @@ class Group(Persistent, Fossilizable):
             return cmp(hash(self), hash(other))
         return cmp(self.getId(), other.getId())
 
-    def setId( self, newId ):
+    def setId(self, newId):
         self.id = str(newId)
 
-    def getId( self ):
+    def getId(self):
         return self.id
 
-    def setName( self, newName ):
+    def setName(self, newName):
         self.name = newName.strip()
-        GroupHolder().notifyGroupNameChange( self )
+        GroupHolder().notifyGroupNameChange(self)
 
-    def getName( self ):
+    def getName(self):
         return self.name
     getFullName = getName
 
-    def setDescription( self, newDesc ):
+    def setDescription(self, newDesc):
         self.description = newDesc.strip()
 
-    def getDescription( self ):
+    def getDescription(self):
         return self.description
 
-    def setEmail( self, newEmail ):
+    def setEmail(self, newEmail):
         self.email = newEmail.strip()
 
-    def getEmail( self ):
+    def getEmail(self):
         try:
             return self.email
         except:
@@ -115,56 +115,56 @@ class Group(Persistent, Fossilizable):
     def setObsolete(self, obsolete):
         self.obsolete = obsolete
 
-    def addMember( self, newMember ):
+    def addMember(self, newMember):
         if newMember == self:
-            raise MaKaCError( _("It is not possible to add a group as member of itself"))
+            raise MaKaCError(_("It is not possible to add a group as member of itself"))
         if self.containsMember(newMember) or newMember.containsMember(self):
             return
-        self.members.append( newMember )
+        self.members.append(newMember)
         if isinstance(newMember, Avatar):
             newMember.linkTo(self, "member")
         self._p_changed = 1
 
-    def removeMember( self, member ):
+    def removeMember(self, member):
         if member == None or member not in self.members:
             return
-        self.members.remove( member )
+        self.members.remove(member)
         if isinstance(member, Avatar):
             member.unlinkTo(self, "member")
         self._p_changed = 1
 
-    def getMemberList( self ):
+    def getMemberList(self):
         return self.members
 
-    def containsUser( self, avatar ):
+    def containsUser(self, avatar):
         if avatar == None:
             return 0
         for member in self.members:
-            if member.containsUser( avatar ):
+            if member.containsUser(avatar):
                 return 1
         return 0
 
-    def containsMember( self, member ):
+    def containsMember(self, member):
         if member == None:
             return 0
         if member in self.members:
             return 1
         for m in self.members:
             try:
-                if m.containsMember( member ):
+                if m.containsMember(member):
                     return 1
             except AttributeError, e:
                 continue
         return 0
 
-    def canModify( self, aw ):
-        return self.canUserModify( aw.getUser() )
+    def canModify(self, aw):
+        return self.canUserModify(aw.getUser())
 
-    def canUserModify( self, user ):
+    def canUserModify(self, user):
         return self.containsMember(user) or \
                                 (user in AdminList.getInstance().getList())
 
-    def getLocator( self ):
+    def getLocator(self):
         d = Locator()
         d["groupId"] = self.getId()
         return d
@@ -208,11 +208,11 @@ class LDAPGroup(Group):
         avatarLists = []
         for uid in uidList:
             # First, try locally (fast)
-            lst = AvatarHolder().match({'login': uid }, exact=1,
-                                       searchInAuthenticators=False)
+            lst = PrincipalHolder().match(uid , exact=1, searchInAuthenticators=False)
+            print "Result", lst
             if not lst:
                 # If not found, try external
-                lst = AvatarHolder().match({'login': uid}, exact=1)
+                lst = PrincipalHolder().match(uid, exact=1)
             avatarLists.append(lst)
         return [avList[0] for avList in avatarLists if avList]
 
@@ -239,40 +239,40 @@ class GroupHolder(ObjectHolder):
     idxName = "groups"
     counterName = "PRINCIPAL"
 
-    def add( self, group ):
-        ObjectHolder.add( self, group )
-        self.getIndex().indexGroup( group )
+    def add(self, group):
+        ObjectHolder.add(self, group)
+        self.getIndex().indexGroup(group)
 
-    def remove( self, group ):
-        ObjectHolder.remove( self, group )
-        self.getIndex().unindexGroup( group )
+    def remove(self, group):
+        ObjectHolder.remove(self, group)
+        self.getIndex().unindexGroup(group)
 
-    def notifyGroupNameChange( self, group ):
-        self.getIndex().unindexGroup( group )
-        self.getIndex().indexGroup( group )
+    def notifyGroupNameChange(self, group):
+        self.getIndex().unindexGroup(group)
+        self.getIndex().indexGroup(group)
 
-    def getIndex( self ):
+    def getIndex(self):
         index = indexes.IndexesHolder().getById("group")
         if index.getLength() == 0:
             self._reIndex(index)
         return index
 
-    def _reIndex( self, index ):
+    def _reIndex(self, index):
         for group in self.getList():
-            index.indexGroup( group )
+            index.indexGroup(group)
 
-    def getBrowseIndex( self ):
+    def getBrowseIndex(self):
         return self.getIndex().getBrowseIndex()
 
-    def getLength( self ):
+    def getLength(self):
         return self.getIndex().getLength()
 
-    def matchFirstLetter( self, letter, searchInAuthenticators=True ):
+    def matchFirstLetter(self, letter, searchInAuthenticators=True):
         result = []
         index = self.getIndex()
         if searchInAuthenticators:
             self._updateGroupMatchFirstLetter(letter)
-        match = index.matchFirstLetter( letter )
+        match = index.matchFirstLetter(letter)
         if match != None:
             for groupid in match:
                 if groupid != "":
@@ -299,17 +299,27 @@ class GroupHolder(ObjectHolder):
                     result.append(gr)
         return result
 
+    def update(self, group):
+        if self.hasKey(group.getId()):
+            current_group = self.getById(group.getId())
+            current_group.setDescription(group.getDescription())
+
     def _updateGroupMatch(self, name, exact=False):
         for auth in AuthenticatorMgr.getInstance().getList():
             for group in auth.matchGroup(name, exact):
                 if not self.hasKey(group.getId()):
                     self.add(group)
+                else:
+                    self.update(group)
 
     def _updateGroupMatchFirstLetter(self, letter):
         for auth in AuthenticatorMgr.getInstance().getList():
             for group in auth.matchGroupFirstLetter(letter):
                 if not self.hasKey(group.getId()):
                     self.add(group)
+                else:
+                    self.update(group)
+
 
 class Avatar(Persistent, Fossilizable):
     """This class implements the representation of users inside the system.
@@ -402,37 +412,37 @@ class Avatar(Persistent, Fossilizable):
         self.authenticatorPersonalData = {} # personal data from authenticator
 
         if userData != None:
-            if userData.has_key( "name" ):
-                self.setName( userData["name"] )
-            if userData.has_key( "surName" ):
-                self.setSurName( userData["surName"] )
-            if userData.has_key( "title" ):
-                self.setTitle( userData["title"] )
-            if userData.has_key( "organisation" ):
+            if userData.has_key("name"):
+                self.setName(userData["name"])
+            if userData.has_key("surName"):
+                self.setSurName(userData["surName"])
+            if userData.has_key("title"):
+                self.setTitle(userData["title"])
+            if userData.has_key("organisation"):
                 if len(userData["organisation"])>0:
                     for org in userData["organisation"]:
                         if not self.getOrganisation():
-                            self.setOrganisation( org )
+                            self.setOrganisation(org)
                         else:
-                            self.addOrganisation( org )
-            if userData.has_key( "address" ):
+                            self.addOrganisation(org)
+            if userData.has_key("address"):
                 if len(userData["address"])>0:
                     for addr in userData["address"]:
-                        self.addAddress( addr )
-            if userData.has_key( "email" ):
+                        self.addAddress(addr)
+            if userData.has_key("email"):
                 if type(userData["email"]) == str:
                     self.setEmail(userData["email"])
                 elif len(userData["email"])>0:
                     for em in userData["email"]:
-                        self.setEmail( em )
-            if userData.has_key( "telephone" ):
+                        self.setEmail(em)
+            if userData.has_key("telephone"):
                 if len(userData["telephone"])>0:
                     for tel in userData["telephone"]:
-                        self.addTelephone( tel )
-            if userData.has_key( "fax" ):
+                        self.addTelephone(tel)
+            if userData.has_key("fax"):
                 if len(userData["fax"])>0:
                     for fax in userData["fax"]:
-                        self.addTelephone( fax )
+                        self.addTelephone(fax)
 
             ############################
             #Fermi timezone awareness  #
@@ -484,7 +494,7 @@ class Avatar(Persistent, Fossilizable):
             self._mergeFrom = []
         return self._mergeFrom
 
-    def getKey( self ):
+    def getKey(self):
         return self.key
 
     def getAPIKey(self):
@@ -568,19 +578,19 @@ class Avatar(Persistent, Fossilizable):
                             avatar_links.del_link(self, event, field + '_' + role)
                 break
 
-    def getStatus( self ):
+    def getStatus(self):
         try:
             return self.status
         except AttributeError:
             self.status = "activated"
             return self.status
 
-    def setStatus( self, status ):
+    def setStatus(self, status):
         statIdx = indexes.IndexesHolder().getById("status")
-        statIdx.unindexUser( self )
+        statIdx.unindexUser(self)
         self.status = status
         self._p_changed = 1
-        statIdx.indexUser( self )
+        statIdx.indexUser(self)
 
     def activateAccount(self, checkPending=True):
         self.setStatus("activated")
@@ -589,16 +599,16 @@ class Avatar(Persistent, Fossilizable):
             from MaKaC.common import pendingQueues
             pendingQueues.PendingQueuesHolder().grantRights(self)
 
-    def disabledAccount( self ):
+    def disabledAccount(self):
         self.setStatus("disabled")
 
-    def isActivated( self ):
+    def isActivated(self):
         return self.status == "activated"
 
-    def isDisabled( self ):
+    def isDisabled(self):
         return self.status == "disabled"
 
-    def isNotConfirmed( self ):
+    def isNotConfirmed(self):
         return self.status == "Not confirmed"
 
     def setId(self, id):
@@ -651,7 +661,7 @@ class Avatar(Persistent, Fossilizable):
             surName = "%s, " % self.getSurName().decode('utf-8').upper().encode('utf-8')
         return "%s%s"%(surName, self.getName())
 
-    def getStraightFullName( self, upper = True ):
+    def getStraightFullName(self, upper = True):
         return ("%s %s"%(self.getFirstName(), self.getFamilyName().upper() if upper else self.getFamilyName())).strip()
     getDirectFullNameNoTitle = getStraightFullName
 
@@ -694,7 +704,7 @@ class Avatar(Persistent, Fossilizable):
     def getOrganisations(self):
         return self.organisation
 
-    def getOrganisation( self ):
+    def getOrganisation(self):
         return self.organisation[0]
 
     getAffiliation = getOrganisation
@@ -702,7 +712,7 @@ class Avatar(Persistent, Fossilizable):
     def setTitle(self, title):
         self.title = title
 
-    def getTitle( self ):
+    def getTitle(self):
         return self.title
 
     #################################
@@ -743,7 +753,7 @@ class Avatar(Persistent, Fossilizable):
     def getAddresses(self):
         return self.address
 
-    def getAddress( self ):
+    def getAddress(self):
         return self.address[0]
 
     def setAddress(self, address, item=0):
@@ -759,10 +769,10 @@ class Avatar(Persistent, Fossilizable):
         else:
             self.email = email.strip().lower()
 
-    def getEmails( self ):
+    def getEmails(self):
         return [self.email] + self.getSecondaryEmails()
 
-    def getEmail( self ):
+    def getEmail(self):
         return self.email
 
     def getSecondaryEmails(self):
@@ -794,15 +804,15 @@ class Avatar(Persistent, Fossilizable):
         return email.lower().strip() in l
 
 
-    def addTelephone(self, newTel ):
-        self.telephone.append( newTel )
+    def addTelephone(self, newTel):
+        self.telephone.append(newTel)
         self._p_changed = 1
 
-    def getTelephone( self ):
+    def getTelephone(self):
         return self.telephone[0]
     getPhone = getTelephone
 
-    def setTelephone(self, tel, item=0 ):
+    def setTelephone(self, tel, item=0):
         self.telephone[item] = tel
         self._p_changed = 1
     setPhone = setTelephone
@@ -813,11 +823,11 @@ class Avatar(Persistent, Fossilizable):
     def getSecondaryTelephones(self):
         return self.telephone[1:]
 
-    def addFax(self, newFax ):
-        self.fax.append( newFax )
+    def addFax(self, newFax):
+        self.fax.append(newFax)
         self._p_changed = 1
 
-    def setFax(self, fax, item=0 ):
+    def setFax(self, fax, item=0):
         self.fax[item] = fax
         self._p_changed = 1
 
@@ -833,7 +843,7 @@ class Avatar(Persistent, Fossilizable):
             :type newId: PIdentity
         """
         if newId != None and (newId not in self.identities):
-            self.identities.append( newId )
+            self.identities.append(newId)
             self._p_changed = 1
 
     def removeIdentity(self, Id):
@@ -845,7 +855,7 @@ class Avatar(Persistent, Fossilizable):
             self.identities.remove(Id)
             self._p_changed = 1
 
-    def getIdentityList( self ):
+    def getIdentityList(self):
         """ Returns a list of identities for this Avatar.
             Each identity will be a PIdentity or inheriting object
         """
@@ -890,10 +900,10 @@ class Avatar(Persistent, Fossilizable):
             del self.getRegistrants()[r.getConference().getId()]
             self._p_changed = 1
 
-    def getRegistrantList( self ):
+    def getRegistrantList(self):
         return self.getRegistrants().values()
 
-    def getRegistrants( self ):
+    def getRegistrants(self):
         try:
             if self.registrants:
                 pass
@@ -918,17 +928,17 @@ class Avatar(Persistent, Fossilizable):
                 return True
         return False
 
-    def containsUser( self, avatar ):
+    def containsUser(self, avatar):
         return avatar == self
     containsMember = containsUser
 
-    def canModify( self, aw ):
-        return self.canUserModify( aw.getUser() )
+    def canModify(self, aw):
+        return self.canUserModify(aw.getUser())
 
-    def canUserModify( self, user ):
+    def canUserModify(self, user):
         return user == self or (user in AdminList.getInstance().getList())
 
-    def getLocator( self ):
+    def getLocator(self):
         d = Locator()
         d["userId"] = self.getId()
         return d
@@ -941,7 +951,7 @@ class Avatar(Persistent, Fossilizable):
 
     # Room booking related
 
-    def isMemberOfSimbaList( self, simbaListName ):
+    def isMemberOfSimbaList(self, simbaListName):
 
         # Try to get the result from the cache
         try:
@@ -956,24 +966,24 @@ class Avatar(Persistent, Fossilizable):
             # there shouldn't be uppercase letters
             groups.append(GroupHolder().getById(simbaListName))
         except KeyError:
-            groups = GroupHolder().match( { 'name': simbaListName }, searchInAuthenticators = False, exact=True)
+            groups = GroupHolder().match({ 'name': simbaListName }, searchInAuthenticators = False, exact=True)
             if not groups:
-                groups = GroupHolder().match( { 'name': simbaListName }, exact=True)
+                groups = GroupHolder().match({ 'name': simbaListName }, exact=True)
 
         if groups:
-            result = groups[0].containsUser( self )
+            result = groups[0].containsUser(self)
             self._v_isMember[simbaListName] = result
             return result
         self._v_isMember[simbaListName] = False
         return False
 
-    def isAdmin( self ):
+    def isAdmin(self):
         """
         Convenience method for checking whether this user is an admin.
         Returns bool.
         """
         al = AdminList.getInstance()
-        if al.isAdmin( self ):
+        if al.isAdmin(self):
             return True
         return False
 
@@ -990,7 +1000,7 @@ class Avatar(Persistent, Fossilizable):
                 return True
         return False
 
-    def getRooms( self ):
+    def getRooms(self):
         """
         Returns list of rooms (RoomBase derived objects) this
         user is responsible for.
@@ -1000,7 +1010,7 @@ class Avatar(Persistent, Fossilizable):
 
         rooms = Room.getUserRooms(self)
 
-        roomList = [ RoomGUID.parse( str(rg) ).getRoom() for rg in rooms ] if rooms else []
+        roomList = [ RoomGUID.parse(str(rg)).getRoom() for rg in rooms ] if rooms else []
         return [room for room in roomList if room and room.isActive]
 
     def getReservations(self):
@@ -1016,15 +1026,15 @@ class Avatar(Persistent, Fossilizable):
         from MaKaC.rb_reservation import ReservationBase
 
         resvEx = ReservationBase()
-        resvEx.createdBy = str( self.id )
+        resvEx.createdBy = str(self.id)
         resvEx.isCancelled = None
         resvEx.isRejected = None
         resvEx.isArchival = None
 
-        myResvs = CrossLocationQueries.getReservations( resvExample = resvEx )
+        myResvs = CrossLocationQueries.getReservations(resvExample = resvEx)
         return myResvs
 
-    def getReservationsOfMyRooms( self ):
+    def getReservationsOfMyRooms(self):
         """
         Returns list of ALL reservations (ReservationBase
         derived objects) this user has ever made.
@@ -1043,7 +1053,7 @@ class Avatar(Persistent, Fossilizable):
         resvEx.isRejected = None
         resvEx.isArchival = None
 
-        myResvs = CrossLocationQueries.getReservations( resvExample = resvEx, rooms = myRooms )
+        myResvs = CrossLocationQueries.getReservations(resvExample = resvEx, rooms = myRooms)
         return myResvs
 
 
@@ -1101,7 +1111,7 @@ class Avatar(Persistent, Fossilizable):
         self._lang =lang
 
 
-class AvatarHolder( ObjectHolder ):
+class AvatarHolder(ObjectHolder):
     """Specialised ObjectHolder dealing with user (avatar) objects. Objects of
        this class represent an access point to Avatars of the application and
        provides different methods for accessing and retrieving them in several
@@ -1112,7 +1122,7 @@ class AvatarHolder( ObjectHolder ):
     _indexes = [ "email", "name", "surName","organisation", "status" ]
     _external_user_cache = GenericCache("external_user_cache")
 
-    def matchFirstLetter( self, index, letter, onlyActivated=True, searchInAuthenticators=True ):
+    def matchFirstLetter(self, index, letter, onlyActivated=True, searchInAuthenticators=True):
         result = {}
         if index not in self._indexes:
             return None
@@ -1187,7 +1197,7 @@ class AvatarHolder( ObjectHolder ):
                                 av = userMatched[0]
                                 if self._userMatchCriteria(av, criteria, exact):
                                     result[av.getEmail()] = av
-            self._external_user_cache.set(key, result.values(), EXTERNAL_CACHE_TTL)
+            #self._external_user_cache.set(key, result.values(), EXTERNAL_CACHE_TTL)
         return result.values()
 
     def _userMatchCriteria(self, av, criteria, exact):
@@ -1265,10 +1275,10 @@ class AvatarHolder( ObjectHolder ):
             Before adding the user, check if the email address isn't used
         """
         if av.getEmail() is None or av.getEmail()=="":
-            raise UserError( _("User not created. You must enter an email address"))
+            raise UserError(_("User not created. You must enter an email address"))
         emailmatch = self.match({'email': av.getEmail()}, exact=1, searchInAuthenticators=False)
         if emailmatch != None and len(emailmatch) > 0 and emailmatch[0] != '':
-            raise UserError( _("User not created. The email address %s is already used.")% av.getEmail())
+            raise UserError(_("User not created. The email address %s is already used.")% av.getEmail())
         id = ObjectHolder.add(self,av)
         for i in self._indexes:
             indexes.IndexesHolder().getById(i).indexUser(av)
@@ -1429,11 +1439,11 @@ class AvatarHolder( ObjectHolder ):
         # remove merged from holder
         self.remove(merged)
         idxs = indexes.IndexesHolder()
-        org = idxs.getById( 'organisation' )
-        email = idxs.getById( 'email' )
-        name = idxs.getById( 'name' )
-        surName = idxs.getById( 'surName' )
-        status_index = idxs.getById( 'status' )
+        org = idxs.getById('organisation')
+        email = idxs.getById('email')
+        name = idxs.getById('name')
+        surName = idxs.getById('surName')
+        status_index = idxs.getById('status')
 
         org.unindexUser(merged)
         email.unindexUser(merged)
@@ -1460,10 +1470,10 @@ class AvatarHolder( ObjectHolder ):
         merged.mergeTo(None)
 
         idxs = indexes.IndexesHolder()
-        org = idxs.getById( 'organisation' )
-        email = idxs.getById( 'email' )
-        name = idxs.getById( 'name' )
-        surName = idxs.getById( 'surName' )
+        org = idxs.getById('organisation')
+        email = idxs.getById('email')
+        name = idxs.getById('name')
+        surName = idxs.getById('surName')
 
 
         email.unindexUser(prin)
@@ -1501,37 +1511,44 @@ class AvatarHolder( ObjectHolder ):
 # I'll keep the ObjectHolder interface so it will be easier afterwards to
 #   implement a more optimised solution (just this object needs to be modified)
 class PrincipalHolder:
-    def __init__( self ):
+    def __init__(self):
         self.__gh = GroupHolder()
         self.__ah = AvatarHolder()
 
-    def getById( self, id ):
+    def getById(self, id):
         try:
-            prin = self.__gh.getById( id )
+            prin = self.__gh.getById(id)
             return prin
         except KeyError, e:
             pass
-        prin = self.__ah.getById( id )
+        prin = self.__ah.getById(id)
         return prin
 
+    def match(self, element_id, exact=1, searchInAuthenticators=True):
+        prin = self.__gh.match({"name": element_id}, searchInAuthenticators=searchInAuthenticators, exact=exact)
+        print "Grupo", prin
+        if not prin:
+            prin = self.__ah.match({"login": element_id}, searchInAuthenticators=searchInAuthenticators, exact=exact)
+            print "User", prin
+        return prin
 
 
 class LoginInfo:
 
     def __init__(self, login, password):
-        self.setLogin( login )
-        self.setPassword( password )
+        self.setLogin(login)
+        self.setPassword(password)
 
-    def setLogin( self, newLogin ):
+    def setLogin(self, newLogin):
         self.login = newLogin.strip()
 
-    def getLogin( self ):
+    def getLogin(self):
         return self.login
 
-    def setPassword( self, newPassword ):
+    def setPassword(self, newPassword):
         self.password = newPassword
 
-    def getPassword( self ):
+    def getPassword(self):
         return self.password
 
 
@@ -1581,7 +1598,7 @@ class PersonalBasket(Persistent):
         elif (type(element) == MaKaC.rb_location.RoomGUID):
             return self._rooms
         else:
-            raise Exception( _("Unknown Element Type"))
+            raise Exception(_("Unknown Element Type"))
 
     def addElement(self, element):
         dict = self.__findDict(element)

@@ -145,7 +145,7 @@ class Authenthicator(ObjectHolder):
             :param exact: the match has to be exact
             :type exact: boolean
         """
-        return None
+        return []
 
     def matchUserFirstLetter(self, index, letter):
         """ Returns the list of users (Avatar) starting by the given letter
@@ -156,7 +156,7 @@ class Authenthicator(ObjectHolder):
             :param letter: the letter char
             :type letter: str
         """
-        return None
+        return []
 
     def searchUserById(self, id):
         """ Returns an Avatar by the given id
@@ -175,7 +175,7 @@ class Authenthicator(ObjectHolder):
             :param exact: the match has to be exact
             :type exact: boolean
         """
-        return None
+        return []
 
     def matchGroupFirstLetter(self, letter):
         """ Returns the list of groups (Group) starting by the given letter
@@ -183,7 +183,7 @@ class Authenthicator(ObjectHolder):
             :param letter: the letter char
             :type letter: str
         """
-        return None
+        return []
 
     def getGroupMemberList(self, group):
         """ Returns the list of members (string) for the given group
@@ -191,7 +191,7 @@ class Authenthicator(ObjectHolder):
             :param group: the group string
             :type group: str
         """
-        return None
+        return []
 
     def isUserInGroup(self, user, group):
         """ Returns True if the user belongs to the group
