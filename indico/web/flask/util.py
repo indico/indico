@@ -76,6 +76,7 @@ def rh_as_view(rh):
     return wrapper
 
 
+@memoize
 def redirect_view(endpoint, code=302):
     def _redirect(**kwargs):
         return redirect(url_for(endpoint, **kwargs), code=code)
