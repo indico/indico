@@ -826,6 +826,10 @@ class Avatar(Persistent, Fossilizable):
         for identity in self.identities:
             if identity.getAuthenticatorTag() == authenticatorName:
                 result.append(identity)
+        if not result:
+            identity = AuthenticatorMgr.getInstance().getById(authenticatorName).fetchIdentity(self)
+            if identity:
+                result.append(identity)
         return result
 
 

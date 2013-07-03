@@ -102,6 +102,16 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         else:
             return None
 
+    def fetchIdentity(self, avatar):
+        Logger.get("auth.ldap").info("fetchIdentity (%s %s)" % (avatar.getId(), avatar.getEmail()))
+        user = self.matchUser({"email": avatar.getEmail()}, exact=1)
+        if user:
+            user = user.values()[0]
+            identity = LDAPIdentity(user["login"], avatar)
+            self.add(identity)
+            return identity
+        return None
+
     def createUser(self, li):
         Logger.get('auth.ldap').debug("create '%s'" % li.getLogin())
         # first, check if authentication is OK

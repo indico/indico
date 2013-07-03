@@ -63,7 +63,9 @@ class Authenthicator(ObjectHolder):
 
         if self.hasKey(li.getLogin()):
             identity = self.getById( li.getLogin() )
-            return identity.authenticate( li )
+            avatar = identity.authenticate( li )
+            self._postLogin(li.getLogin(), avatar)
+            return avatar
         return None
 
     def getAvatarByLogin(self, login):
@@ -122,6 +124,16 @@ class Authenthicator(ObjectHolder):
         """ Returns the created PIdentity object with the LoginInfo an Avatar
 
             :param li: a LoginInfo object with the person's login string and password
+            :type li: MaKaC.user.LoginInfo
+
+            :param avatar: an Avatar object of the user
+            :type avatar: MaKaC.user.Avatar
+        """
+        return None
+
+    def fetchIdentity(self, li, avatar):
+        """ Returns the created PIdentity object with the Avatar fetching from the authenticator
+
             :type li: MaKaC.user.LoginInfo
 
             :param avatar: an Avatar object of the user
@@ -205,6 +217,13 @@ class Authenthicator(ObjectHolder):
         """
         return False
 
+    def _postLogin(self, login, av):
+        if login != "" and not self.hasKey(login):
+            ni = self.createIdentity(av, login)
+            self.add(ni)
+        if login != "" and self.hasKey(login) and not av.getIdentityById(login, self.getId()):
+            av.addIdentity(self.getById(login))
+
 
 class PIdentity(Persistent):
 
@@ -229,7 +248,7 @@ class PIdentity(Persistent):
         return self.login
 
     def match(self, id):
-        return self.getLogin == id.getLogin()
+        return self.getLogin() == id.getLogin()
 
     def authenticate(self, id):
         return None
@@ -302,10 +321,3 @@ class SSOHandler:
 
     def getLogoutCallbackURL(self):
         return Config.getInstance().getAuthenticatorConfigById(self.id).get("LogoutCallbackURL", "https://login.cern.ch/adfs/ls/?wa=wsignout1.0")
-
-    def _postLogin(self, login, av):
-        if login != "" and not self.hasKey(login):
-            ni = self.createIdentity(av, login)
-            self.add(ni)
-        if login != "" and self.hasKey(login) and not av.getIdentityById(login, self.getId()):
-            av.addIdentity(self.getById(login))
