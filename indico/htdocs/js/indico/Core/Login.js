@@ -48,3 +48,16 @@ function undoLoginAs() {
         }
     });
 }
+
+$(document).ready(function() {
+    $('.login-as').on('click', function(e) {
+        e.preventDefault();
+        loginAs();
+    });
+
+
+    $('.undo-login-as').on('click', function(e) {
+        e.preventDefault();
+        undoLoginAs();
+    });
+});
