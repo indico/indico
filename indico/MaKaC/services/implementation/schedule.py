@@ -1134,6 +1134,8 @@ class ScheduleContributions(ScheduleOperation):
             if not isPoster:
                 d = self._target.getSchedule().calculateDayEndDate(self._date)
                 contrib.setStartDate(d)
+                if isinstance(self._target, conference.SessionSlot):
+                    contrib.setDuration(dur=self._target.getSession().getContribDuration())
 
             schEntry = contrib.getSchEntry()
 
