@@ -187,13 +187,12 @@ class RH(RequestHandlerBase):
     _doNotSanitizeFields = []
     _isMobile = True # this value means that the generated web page can be mobile
 
-    def __init__( self, req ):
+    def __init__(self, req=None):
         """Constructor. Initialises the rh setting up basic attributes so it is
             able to process the request.
 
             Parameters:
-                req - (mod_python.Request) mod_python request received for the
-                    current rh.
+                req - OBSOLETE, MUST BE NONE
         """
         RequestHandlerBase.__init__(self, req)
         self._responseUtil = ResponseUtil()
@@ -213,31 +212,27 @@ class RH(RequestHandlerBase):
 
     # Methods =============================================================
 
-    def getTarget( self ):
+    def getTarget(self):
         return self._target
 
     def isMobile(self):
         return self._isMobile
 
-    def _setSessionUser( self ):
-        """
-        """
+    def _setSessionUser(self):
         self._aw.setUser(session.user)
 
     @property
     def csrf_token(self):
         return session.csrf_token
 
-    def _getRequestParams( self ):
+    def _getRequestParams(self):
         return self._reqParams
 
-    def getRequestParams( self ):
+    def getRequestParams(self):
         return self._getRequestParams()
 
     def _disableCaching(self):
-        """
-        Disables caching, i.e. for materials
-        """
+        """Disables caching"""
 
         # IE doesn't seem to like 'no-cache' Cache-Control headers...
         if request.user_agent.browser == 'msie':
@@ -259,33 +254,25 @@ class RH(RequestHandlerBase):
         self._responseUtil.call = lambda: rh(None).process(params)
 
     def _checkHttpsRedirect(self):
-        """
-        If HTTPS must be used but it is not, redirect!
-        """
+        """If HTTPS must be used but it is not, redirect!"""
         if self.use_https() and not request.is_secure:
             self._redirect(self.getRequestURL(secure=True))
             return True
         else:
             return False
 
-    def _normaliseListParam( self, param ):
+    def _normaliseListParam(self, param):
         if not isinstance(param, list):
-                return [ param ]
+            return [param]
         return param
 
-    def _processError( self, ex ):
-        """
-        """
+    def _processError(self, ex):
         raise
 
-    def _checkParams( self, params ):
-        """
-        """
+    def _checkParams(self, params):
         pass
 
-    def _process( self ):
-        """
-        """
+    def _process(self):
         pass
 
     def _checkCSRF(self):
@@ -305,44 +292,38 @@ class RH(RequestHandlerBase):
             return
         raise BadRefererError('This operation is not allowed from an external referer.')
 
-    def _processGeneralError(self,e):
-        """Treats general errors occured during the process of a RH.
-        """
+    def _processGeneralError(self, e):
+        """Treats general errors occured during the process of a RH. """
 
         Logger.get('requestHandler').info('Request %s finished with: "%s"' % (request, e))
 
         p=errors.WPGenericError(self)
         return p.display()
 
-    def _processUnexpectedError(self,e):
-        """Unexpected errors
-        """
+    def _processUnexpectedError(self, e):
+        """Unexpected errors"""
 
         Logger.get('requestHandler').exception('Request %s failed: "%s"' % (request, e))
         p=errors.WPUnexpectedError(self)
         return p.display()
 
-    def _processHostnameResolveError(self,e):
-        """Unexpected errors
-        """
+    def _processHostnameResolveError(self, e):
+        """Unexpected errors"""
 
         Logger.get('requestHandler').exception('Request %s failed: "%s"' % (request, e))
         p=errors.WPHostnameResolveError(self)
         return p.display()
 
-
-    def _processAccessError(self,e):
-        """Treats access errors occured during the process of a RH.
-        """
+    def _processAccessError(self, e):
+        """Treats access errors occured during the process of a RH."""
         Logger.get('requestHandler').info('Request %s finished with AccessError: "%s"' % (request, e))
 
         self._responseUtil.status = 403
         p=errors.WPAccessError(self)
         return p.display()
 
-    def _processKeyAccessError(self,e):
-        """Treats access errors occured during the process of a RH.
-        """
+    def _processKeyAccessError(self, e):
+        """Treats access errors occured during the process of a RH."""
         Logger.get('requestHandler').info('Request %s finished with KeyAccessError: "%s"' % (request, e))
 
         # We are going to redirect to the page asking for access key
@@ -354,42 +335,37 @@ class RH(RequestHandlerBase):
         p=errors.WPKeyAccessError(self)
         return p.display()
 
-    def _processModificationError(self,e):
-        """Treats modification errors occured during the process of a RH.
-        """
+    def _processModificationError(self, e):
+        """Treats modification errors occured during the process of a RH."""
 
         Logger.get('requestHandler').info('Request %s finished with ModificationError: "%s"' % (request, e))
 
         p=errors.WPModificationError(self)
         return p.display()
 
-    def _processConferenceClosedError(self,e):
-        """Treats access to modification pages for conferences when they are closed.
-        """
+    def _processConferenceClosedError(self, e):
+        """Treats access to modification pages for conferences when they are closed."""
         p = WPConferenceModificationClosed( self, e._conf )
         return p.display()
 
-    def _processTimingError(self,e):
-        """Treats timing errors occured during the process of a RH.
-        """
+    def _processTimingError(self, e):
+        """Treats timing errors occured during the process of a RH."""
 
         Logger.get('requestHandler').info('Request %s finished with TimingError: "%s"' % (request, e))
 
-        p=errors.WPTimingError(self,e)
+        p = errors.WPTimingError(self, e)
         return p.display()
 
-    def _processNoReportError(self,e):
-        """Process errors without reporting
-        """
+    def _processNoReportError(self, e):
+        """Process errors without reporting"""
 
         Logger.get('requestHandler').info('Request %s finished with NoReportError: "%s"' % (request, e))
 
         p=errors.WPNoReportError(self,e)
         return p.display()
 
-    def _processNotFoundError(self,e):
-        """Process not found error; uses NoReportError template
-        """
+    def _processNotFoundError(self, e):
+        """Process not found error; uses NoReportError template"""
 
         Logger.get('requestHandler').info('Request %s finished with NotFoundError: "%s"' % (request, e))
 
@@ -397,27 +373,24 @@ class RH(RequestHandlerBase):
         p=errors.WPNoReportError(self,e)
         return p.display()
 
-    def _processParentTimingError(self,e):
-        """Treats timing errors occured during the process of a RH.
-        """
+    def _processParentTimingError(self, e):
+        """Treats timing errors occured during the process of a RH."""
 
         Logger.get('requestHandler').info('Request %s finished with ParentTimingError: "%s"' % (request, e))
 
         p=errors.WPParentTimingError(self,e)
         return p.display()
 
-    def _processEntryTimingError(self,e):
-        """Treats timing errors occured during the process of a RH.
-        """
+    def _processEntryTimingError(self, e):
+        """Treats timing errors occured during the process of a RH."""
 
         Logger.get('requestHandler').info('Request %s finished with EntryTimingError: "%s"' % (request, e))
 
         p=errors.WPEntryTimingError(self,e)
         return p.display()
 
-    def _processFormValuesError(self,e):
-        """Treats user input related errors occured during the process of a RH.
-        """
+    def _processFormValuesError(self, e):
+        """Treats user input related errors occured during the process of a RH."""
 
         Logger.get('requestHandler').info('Request %s finished with FormValuesError: "%s"' % (request, e))
 
@@ -690,13 +663,13 @@ class RH(RequestHandlerBase):
 
         return self._responseUtil.make_response(res)
 
-    def _deleteTempFiles( self ):
+    def _deleteTempFiles(self):
         if len(self._tempFilesToDelete) > 0:
             for f in self._tempFilesToDelete:
                 if f is not None:
                     os.remove(f)
 
-    def _startRequestSpecific2RH( self ):
+    def _startRequestSpecific2RH(self):
         """
         Works like DBMgr.getInstance().startRequest() but is specific to
         request handler. It is used to connect to other database only
@@ -707,7 +680,7 @@ class RH(RequestHandlerBase):
         """
         pass
 
-    def _endRequestSpecific2RH( self, commit ):
+    def _endRequestSpecific2RH(self, commit):
         """
         Works like DBMgr.getInstance().endRequest() but is specific to
         request handler. It is used to disconnect from other database only
@@ -718,7 +691,7 @@ class RH(RequestHandlerBase):
         """
         pass
 
-    def _syncSpecific2RH( self ):
+    def _syncSpecific2RH(self):
         """
         Works like DBMgr.getInstance().sync() but is specific to
         request handler. It is used to connect to other database only
@@ -729,7 +702,7 @@ class RH(RequestHandlerBase):
         """
         pass
 
-    def _abortSpecific2RH( self ):
+    def _abortSpecific2RH(self):
         """
         Works like DBMgr.getInstance().abort() but is specific to
         request handler. It is used to abort transactions of other database
@@ -765,24 +738,24 @@ class RoomBookingDBMixin:     # It's _not_ RH
     base class.
     """
 
-    def _startRequestSpecific2RH( self ):
+    def _startRequestSpecific2RH(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getRoomBookingModuleActive():
             CrossLocationDB.connect()
 
-    def _endRequestSpecific2RH( self, commit = True ):
+    def _endRequestSpecific2RH(self, commit=True):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getRoomBookingModuleActive():
             if commit: CrossLocationDB.commit()
             else: CrossLocationDB.rollback()
             CrossLocationDB.disconnect()
 
-    def _syncSpecific2RH( self ):
+    def _syncSpecific2RH(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getRoomBookingModuleActive():
             CrossLocationDB.sync()
 
-    def _abortSpecific2RH( self ):
+    def _abortSpecific2RH(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getRoomBookingModuleActive():
             CrossLocationDB.rollback()
@@ -790,27 +763,24 @@ class RoomBookingDBMixin:     # It's _not_ RH
 
 class RHProtected(RH):
 
-    def _getLoginURL( self ):
+    def _getLoginURL(self):
         return urlHandlers.UHSignIn.getURL(self.getRequestURL())
 
-    def _checkSessionUser( self ):
-        """
-        """
-
-        if self._getUser() == None:
-            self._redirect( self._getLoginURL() )
+    def _checkSessionUser(self):
+        if self._getUser() is None:
+            self._redirect(self._getLoginURL())
             self._doProcess = False
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         self._checkSessionUser()
 
 
 class RHRoomBookingProtected(RHProtected):
 
-    def _checkSessionUser( self ):
+    def _checkSessionUser(self):
         user = self._getUser()
-        if user == None:
-            self._redirect( self._getLoginURL() )
+        if user is None:
+            self._redirect(self._getLoginURL())
             self._doProcess = False
         else:
             try:
@@ -823,7 +793,7 @@ class RHRoomBookingProtected(RHProtected):
 
 class RHDisplayBaseProtected(RHProtected):
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         if not self._target.canAccess( self.getAW() ):
             from MaKaC.conference import Link, LocalFile, Category
             if isinstance(self._target,Link) or isinstance(self._target,LocalFile):
@@ -843,11 +813,11 @@ class RHModificationBaseProtected(RHProtected):
 
     _allowClosed = False
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         if not self._target.canModify( self.getAW() ):
             if self._target.getModifKey() != "":
                 raise ModificationError()
-            if self._getUser() == None:
+            if self._getUser() is None:
                 self._checkSessionUser()
             else:
                 raise ModificationError()
