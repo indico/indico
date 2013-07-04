@@ -33,8 +33,12 @@ def isFullyAccess(level):
     def wrap(func):
         @wraps(func)
         def decorator(*args):
+            # if protected and checking for fully public OR
+            # if not protected and checking for full private
+            if (args[0].isProtected() and level == - 1) or (not args[0].isProtected() and level == 1):
+                return False
             for child in args[0].getNonInheritingChildren():
-                if child.getAccessController().getAccessProtectionLevel() == level:
+                if child.getAccessController().getAccessProtectionLevel() != level:
                     return False
             return True
         return decorator
@@ -44,7 +48,8 @@ def getChildren(level):
     def wrap(func):
         @wraps(func)
         def decorator(*args):
-            return [child for child in args[0].getNonInheritingChildren() if child.getAccessController().getAccessProtectionLevel() == level]
+            return [child for child in args[0].getNonInheritingChildren()
+                    if child.getAccessController().getAccessProtectionLevel() != level]
         return decorator
     return wrap
 
@@ -450,20 +455,19 @@ class AccessController( Persistent, Observable ):
             self.addNonInheritingChildren(elem)
         self._p_changed = 1
 
-
-    @isFullyAccess(1)
+    @isFullyAccess(-1)
     def isFullyPublic(self):
         pass
 
-    @isFullyAccess(-1)
+    @isFullyAccess(1)
     def isFullyPrivate(self):
         pass
 
-    @getChildren(1)
+    @getChildren(-1)
     def getProtectedChildren(self):
         pass
 
-    @getChildren(-1)
+    @getChildren(1)
     def getPublicChildren(self):
         pass
 
