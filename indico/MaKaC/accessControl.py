@@ -405,7 +405,7 @@ class AccessController( Persistent, Observable ):
     def _getAvatarByEmail(self, email):
         from MaKaC.user import AvatarHolder
         ah = AvatarHolder()
-        avatars = ah.match({"email": email}, exact=1, forceWithoutExtAuth=True)
+        avatars = ah.match({"email": email}, exact=1, searchInAuthenticators=False)
         if not avatars:
             avatars = ah.match({"email": email}, exact=1)
         for av in avatars:

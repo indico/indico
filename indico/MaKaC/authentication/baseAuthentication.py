@@ -275,7 +275,7 @@ class SSOHandler:
             if personId == '-1':
                 personId = None
             ah = AvatarHolder()
-            av = ah.match({"email":email},exact=1, onlyActivated=False, forceWithoutExtAuth=True)
+            av = ah.match({"email": email}, exact=1, onlyActivated=False, searchInAuthenticators=False)
             if av:
                 av = av[0]
                 # don't allow disabled accounts

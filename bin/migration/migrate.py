@@ -839,7 +839,6 @@ def localIdentityMigration(dbi, withRBDB, prevVersion):
             identity.password = bcrypt.hashpw(identity.password, identity.salt)
             if i % 1000 == 999:
                 dbi.commit()
-            i += 1
     dbi.commit()
 
 

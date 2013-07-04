@@ -61,6 +61,7 @@ class RHSignInBase( base.RH ):
         authManager = AuthenticatorMgr.getInstance()
         if authManager.isSSOLoginActive() and len(authManager.getList()) == 1 and not Config.getInstance().getDisplayLoginPage():
             self._redirect(urlHandlers.UHSignInSSO.getURL(authId=authManager.getDefaultAuthenticator().getId()))
+            return
         if not self._signIn:
             return self._signInPage.display( returnURL = self._returnURL )
         else:
