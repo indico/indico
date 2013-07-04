@@ -1,15 +1,15 @@
-<div class="container" style="width: 100%; margin: 50px auto; max-width: 600px">
+<div class="container" style="margin: 50px auto; max-width: 420px">
 
-    <div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt;">${ _("Reset your Indico password")}</div>
+    <div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt; white-space: nowrap;">${ _("Reset your Indico password")}</div>
 
     <form action="" method="POST">
-        <table style="border: 1px solid #DDDDDD; padding: 20px; margin:auto; width:80%; border-radius:6px">
+        <table style="border: 1px solid #DDDDDD; padding: 20px; border-radius:6px">
             <tr>
                 <td class="titleCellTD">
                     <span class="titleCellFormat">${ _("Name")}</span>
                 </td>
                 <td class="contentCellTD" id="usernameInput">
-                    <input type="text" name="_name" size="50" value="${ rh._avatar.getStraightFullName() }" disabled>
+                    <input type="text" name="_name" style="width: 99%;" value="${ rh._avatar.getStraightFullName() }" disabled>
                 </td>
             </tr>
             <tr>
@@ -17,23 +17,23 @@
                     <span class="titleCellFormat">${ _("Login")}</span>
                 </td>
                 <td class="contentCellTD" id="usernameInput">
-                    <input type="text" name="_login" size="50" value="${ rh._data['login'] }" disabled>
+                    <input type="text" name="_login" style="width: 99%;" value="${ rh._data['login'] }" disabled>
                 </td>
             </tr>
             <tr>
                 <td class="titleCellTD">
-                    <span class="titleCellFormat">${ _("Password")}</span>
+                    <span class="titleCellFormat" style="white-space: nowrap;">${ _("New Password")}</span>
                 </td>
                 <td class="contentCellTD" id="passwordInput">
-                    <input type="password" name="password" size="50">
+                    <input type="password" name="password" style="width: 99%;">
                 </td>
             </tr>
             <tr>
                 <td class="titleCellTD">
-                    <span class="titleCellFormat">${ _("Repeat password")}</span>
+                    <span class="titleCellFormat" style="white-space: nowrap;">${ _("Repeat password")}</span>
                 </td>
                 <td class="contentCellTD" id="passwordInput">
-                    <input type="password" name="password_confirm" size="50">
+                    <input type="password" name="password_confirm" style="width: 99%;">
                 </td>
             </tr>
 

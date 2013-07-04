@@ -1,12 +1,12 @@
 
-<div class="container" style="width: 100%; margin: 50px auto; max-width: 600px">
+<div class="container" style="width: 100%; margin: 50px auto; max-width: 420px">
 
-<div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt;    ">${ _("Log in to Indico")}</div>
+<div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt; white-space: nowrap;">${ _("Log in to Indico")}</div>
 <div id="cookiesEnabled" style="display:none; text-align:center; color:#881122; font-size:large; padding-bottom:15px" colspan="2">
     ${("Please enable cookies in your browser!")}
 </div>
 % if isSSOLoginActive:
-<div style="width:80%; margin:10px auto;color:#444;font-size:14px">
+<div style="margin:10px auto;color:#444;font-size:14px">
     <div>${_("You can login through SSO:")}</div>
     <form name="signInSSOForm" action=${ ssoURL } method="POST">
     <div style="text-align:center;margin:10px">
@@ -25,7 +25,7 @@
 <form name="signInForm" action=${ postURL } method="POST">
 <input type="hidden" name="returnURL" value=${ returnURL }>
 
-<table style="border: 1px solid #DDDDDD; padding: 20px; margin:auto; width:80%; border-radius:6px">
+<table style="border: 1px solid #DDDDDD; padding: 20px; margin:auto; border-radius:6px">
     % if 'passwordChanged' in _request.args:
         <tr>
             <td class="titleCellTD">&nbsp;</td>
@@ -39,7 +39,7 @@
             <span class="titleCellFormat">${ _("Login")}</span>
         </td>
         <td class="contentCellTD" id="usernameInput">
-            <input type="text" name="login" size="20" value=${ login }>
+            <input type="text" name="login" style="width: 99%;" value=${ login }>
         </td>
     </tr>
     <tr>
@@ -47,7 +47,7 @@
             <span class="titleCellFormat">${ _("Password")}</span>
         </td>
         <td class="contentCellTD" id="passwordInput">
-            <input type="password" name="password" size="20">
+            <input type="password" name="password" style="width: 99%;">
         </td>
     </tr>
 
