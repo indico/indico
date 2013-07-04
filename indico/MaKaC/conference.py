@@ -10859,11 +10859,13 @@ class Material(CommonObjectBase):
         return None
 
     def getConference( self ):
-        if type(self.getOwner()) is Conference:
-            return self.getOwner()
-        if type(self.getOwner()) is Category:
+        owner = self.getOwner()
+        if owner is None or isinstance(owner, Category):
             return None
-        return self.getOwner().getConference()
+        elif isinstance(owner, Conference):
+            return owner
+        else:
+            return owner.getConference()
 
     def getSession( self ):
         if self.getContribution():
@@ -11476,7 +11478,7 @@ class Resource(CommonObjectBase):
         # protection checking functions call getConference()
         # directly on resources, without caring whether they
         # are owned by Conferences or Categories
-        if isinstance(self._owner, Category):
+        if self._owner is None or isinstance(self._owner, Category):
             return None
         else:
             return self._owner.getConference()
