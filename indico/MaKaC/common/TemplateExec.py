@@ -16,12 +16,10 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 from flask import session, g, request
 from flask import current_app as app
 import pkg_resources
-
-"""Template engine."""
-
 import os.path
 import posixpath, re
 from MaKaC.common import DBMgr
@@ -32,12 +30,13 @@ from mako.lookup import TemplateLookup
 import mako.exceptions as exceptions
 import MaKaC
 import MaKaC.common.info as info
+from MaKaC.plugins.base import PluginsHolder
 import xml.sax.saxutils
 
 from indico.util.date_time import format_number
 from indico.util.i18n import ngettext
+from indico.util.contextManager import ContextManager
 
-from MaKaC.plugins.base import PluginsHolder
 # The main template directory
 TEMPLATE_DIR = Config.getInstance().getTPLDir()
 FILTER_IMPORTS = ['from indico.util.json import dumps as j',
@@ -107,10 +106,11 @@ class IndicoTemplateLookup(TemplateLookup):
 
 def _define_lookup():
     return IndicoTemplateLookup(directories=[TEMPLATE_DIR],
-                          module_directory=os.path.join(Config.getInstance().getTempDir(), "mako_modules"),
-                          disable_unicode=True,
-                          filesystem_checks=True,
-                          imports=FILTER_IMPORTS)
+                                module_directory=os.path.join(Config.getInstance().getTempDir(), "mako_modules"),
+                                disable_unicode=True,
+                                filesystem_checks=True,
+                                imports=FILTER_IMPORTS,
+                                cache_enabled=not ContextManager.get('offlineMode'))
 
 
 mako = _define_lookup()

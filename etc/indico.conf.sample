@@ -18,7 +18,7 @@ DBPassword           = ""
 DBRealm              = ""
 
 #------------------------------------------------------------------------------
-# Redis
+# REDIS
 #------------------------------------------------------------------------------
 
 # To enable redis, specify a valid redis connection string here.
@@ -285,19 +285,16 @@ CssStylesheetName    = "Default"
 
 
 #------------------------------------------------------------------------------
-# OFFSITE PACKAGES CREATION
+# OFFLINE WEBSITE PACKAGES CREATION
 #------------------------------------------------------------------------------
-# **** THIS FEATURE IS TEMPORARILY DISABLED ****
-# Indico allows users to download all the information and materials associated
-# with a conference through the 'Offline Website Package' command.
+# Indico allows users to download their event so they can run it offline.
 #
-# The PublicFolder variable points to a directory that must live inside htdocs
-# and it is the directory that Indico will use to store this offline website
-# packages to allow users to download them.
+# The OfflineStore variable points to a directory that Indico will use to store
+# the offline website packages.
 #
-# This directory needs to be writeable by the Apache user.
-
-# PublicFolder         = "/opt/indico/htdocs/results"
+# If the OfflineStore variable is not set, the functionality will be disabled.
+#
+# OfflineStore         = "/opt/indico/archive"
 
 
 #------------------------------------------------------------------------------

@@ -92,10 +92,10 @@ class WPBase(OldObservable):
         else:
             return Config.getInstance().getBaseURL()
 
-    def _getTitle( self ):
+    def _getTitle(self):
         return self._title
 
-    def _setTitle( self, newTitle ):
+    def _setTitle(self, newTitle):
         self._title = newTitle.strip()
 
     def getCSSFiles(self):

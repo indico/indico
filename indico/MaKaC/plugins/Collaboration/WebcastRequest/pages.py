@@ -42,7 +42,8 @@ class WNewBookingForm(WCSPageTemplateBase):
         underTheLimit = self._conf.getNumberOfContributions() <= self._WebcastRequestOptions["contributionLoadLimit"].getValue()
         manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         user = self._rh._getUser()
-        isManager = user.isAdmin() or RCCollaborationAdmin.hasRights(user) or RCCollaborationPluginAdmin.hasRights(user, plugins=['WebcastRequest'])
+        isManager = user.isAdmin() or RCCollaborationAdmin.hasRights(user) or \
+            RCCollaborationPluginAdmin.hasRights(user, plugins=['WebcastRequest'])
         booking = manager.getSingleBooking('WebcastRequest')
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
         initialDisplay = (self._conf.getNumberOfContributions() > 0 and underTheLimit) or (booking is not None and initialChoose)

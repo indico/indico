@@ -57,7 +57,8 @@ from indico.web.http_api.metadata.serializer import Serializer
 class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 
     def _checkProtection( self ):
-        if not any(self._notify("isPluginTypeAdmin", {"user": self._getUser()}) + self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"})):
+        if not any(self._notify("isPluginTypeAdmin", {"user": self._getUser()}) +
+                   self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"})):
             base.RHDisplayBaseProtected._checkProtection( self )
 
     def _checkParams( self, params, mustExist = 1 ):

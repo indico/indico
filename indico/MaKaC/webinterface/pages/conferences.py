@@ -1085,21 +1085,22 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         return WPConferenceBase._getHTMLHeader(self)
 
     def _getHeadContent( self ):
-        conf = Config.getInstance()
+        config = Config.getInstance()
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        htdocs = conf.getHtdocsDir()
-        baseurl = conf.getCssBaseURL()
+        htdocs = config.getHtdocsDir()
+        baseurl = self._getBaseURL()
         # First include the default Indico stylesheet
         timestamp = os.stat(__file__).st_mtime
-        styleText = """<link rel="stylesheet" href="%s/%s?%d">\n""" % \
+        styleText = """<link rel="stylesheet" href="%s/css/%s?%d">\n""" % \
             (baseurl, Config.getInstance().getCssStylesheetName(), timestamp)
         # Then the common event display stylesheet
         if os.path.exists("%s/css/events/common.css" % htdocs):
-            styleText += """        <link rel="stylesheet" href="%s/events/common.css?%d">\n""" % (baseurl, timestamp)
-        
+            styleText += """        <link rel="stylesheet" href="%s/css/events/common.css?%d">\n""" % (baseurl,
+                                                                                                       timestamp)
+
         # And finally the specific display stylesheet
         if styleMgr.existsCSSFile(self._view):
-            cssPath = os.path.join(baseurl, 'events', styleMgr.getCSSFilename(self._view))
+            cssPath = os.path.join(baseurl, 'css', 'events', styleMgr.getCSSFilename(self._view))
             styleText += """        <link rel="stylesheet" href="%s?%d">\n""" % (cssPath, timestamp)
 
         confMetadata = WConfMetadata(self._conf).getHTML()
@@ -2095,36 +2096,6 @@ class WPConfModifAC(WPConferenceModifBase):
         }
         return wc.getHTML(p)
 
-
-class WConfModifTools(wcomponents.WTemplated):
-
-    def __init__(self, conference, user=None):
-        self.__conf = conference
-        self._user = user
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["offlsiteMsg"] = ""
-        vars["dvdURL"] = quoteattr(str(urlHandlers.UHConfDVDCreation.getURL(self.__conf)))
-
-        if self._user is None:
-            vars["offlsiteMsg"] = _("(Please, login if you want to apply for your Offline Website)")
-            vars["dvdURL"] = quoteattr("")
-
-        vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("delete")
-        vars["cloneIconURL"] = Config.getInstance().getSystemIconURL("clone")
-        vars["matPkgIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("materialPkg")))
-        vars["matPkgURL"] = quoteattr(str(urlHandlers.UHConfModFullMaterialPackage.getURL(self.__conf)))
-        vars["dvdIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("dvd")))
-        vars["closeIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("closeIcon")))
-        vars["closeURL"] = quoteattr(str(urlHandlers.UHConferenceClose.getURL(self.__conf)))
-        vars["alarmURL"] = quoteattr(str(urlHandlers.UHConfDisplayAlarm.getURL(self.__conf)))
-        vars["alarmIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("alarmIcon")))
-        vars["badgePrintingURL"] = quoteattr(str(urlHandlers.UHConfModifBadgePrinting.getURL(self.__conf)))
-        vars["badgeIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("badge")))
-        return vars
-
-
 class WPConfModifToolsBase(WPConferenceModifBase):
 
     def _setActiveSideMenuItem(self):
@@ -2147,8 +2118,9 @@ class WPConfModifToolsBase(WPConferenceModifBase):
                 urlHandlers.UHConfDeletion.getURL(self._conf))
         self._tabMatPackage = self._tabCtrl.newTab("matPackage", _("Material Package"), \
                 urlHandlers.UHConfModFullMaterialPackage.getURL(self._conf))
-        self._tabOffline = self._tabCtrl.newTab("offline", _("Offline version"), \
-                urlHandlers.UHConfOffline.getURL(self._conf))
+        if Config.getInstance().getOfflineStore():
+            self._tabOffline = self._tabCtrl.newTab("offline", _("Offline version"),
+                                                    urlHandlers.UHConfOffline.getURL(self._conf))
 
         self._setActiveTab()
 
@@ -7049,40 +7021,6 @@ class WPSessionStaticDisplay(WPConferenceStaticDefaultDisplayBase):
         return wc.getHTML()
 
 #------------------------ End Static ---------------------------------------------------------------
-
-
-class WDVDDone(wcomponents.WTemplated):
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["supportAddr"] = Config.getInstance().getSupportEmail()
-        return vars
-
-
-class WPDVDDone(WPConfModifToolsBase):
-
-    def _setActiveTab(self):
-        self._tabOfflineSite.setActive()
-
-    def _getTabContent(self, params):
-        w = WDVDDone()
-        p = {}
-        p["url"] = quoteattr(str(params.get("url")))
-        return w.getHTML(p)
-
-
-class WPConfModifDVDCreationConfirm(WPConfModifToolsBase):
-
-    def _setActiveTab(self):
-        self._tabOfflineSite.setActive()
-
-    def _getTabContent(self, params):
-        wc = wcomponents.WConfirmation()
-        msg = """<br>Please confirm that you want to create an "Offline Website" for your event<br>
-        <font color="red">(note if you confirm you cannot stop the creation of the website )</font><br>"""
-        url = urlHandlers.UHConfDVDCreation.getURL(self._conf)
-        return wc.getHTML(msg, url, {})
-
 
 class WTimeTableCustomizePDF(wcomponents.WTemplated):
 

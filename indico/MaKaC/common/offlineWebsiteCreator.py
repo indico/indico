@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,82 +18,87 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import string
-import shutil
 import os
 import re
 import MaKaC.common.TemplateExec as templateEngine
 from MaKaC import conference
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import displayMgr
-from MaKaC.webinterface.pages.static import WPTPLStaticConferenceDisplay, WPStaticConferenceDisplay, WPStaticConferenceTimeTable, WPStaticConferenceProgram, WPStaticContributionList, WPStaticInternalPageDisplay, WPStaticAuthorIndex, WPStaticSpeakerIndex, WPStaticSessionDisplay, WPStaticContributionDisplay, WPStaticConfRegistrantsList, WPStaticMaterialConfDisplayBase, WPStaticSubContributionDisplay, WPStaticAuthorDisplay
+from MaKaC.webinterface.pages.static import WPStaticConferenceTimeTable, WPStaticConferenceProgram, \
+    WPStaticContributionList, WPStaticInternalPageDisplay, \
+    WPStaticAuthorIndex, WPStaticSpeakerIndex, WPStaticSessionDisplay, \
+    WPStaticContributionDisplay, WPStaticConfRegistrantsList, \
+    WPStaticMaterialConfDisplayBase, WPStaticSubContributionDisplay, \
+    WPStaticAuthorDisplay, WPTPLStaticConferenceDisplay, \
+    WPStaticConferenceDisplay
 from MaKaC.common.Configuration import Config
 from MaKaC.common.contribPacker import ZIPFileHandler
 from MaKaC.errors import MaKaCError
-from MaKaC.i18n import _
-from MaKaC.common.logger import Logger
-from MaKaC.common import timezoneUtils
+from MaKaC.common import timezoneUtils, info
 from MaKaC.conference import LocalFile
-from MaKaC.fileRepository import LocalRepository
+from MaKaC.fileRepository import OfflineRepository
+from MaKaC.PDFinterface.conference import ProgrammeToPDF, TimeTablePlain, AbstractBook, ContribToPDF, \
+    ConfManagerContribsToPDF
+from MaKaC.common.logger import Logger
+from indico.util.contextManager import ContextManager
 
-from MaKaC.PDFinterface.conference import ProgrammeToPDF
-from MaKaC.PDFinterface.conference import TimeTablePlain
-from MaKaC.PDFinterface.conference import AbstractBook
-from MaKaC.PDFinterface.conference import ContribToPDF
-from MaKaC.PDFinterface.conference import TimeTablePlain
-from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
 
 class OfflineEvent:
 
-    def __init__(self, rh, conf, eventType, html):
+    def __init__(self, rh, conf, eventType):
         self._rh = rh
         self._conf = conf
         self._eventType = eventType
-        self._html = html
 
     def create(self):
         if self._eventType in ("simple_event", "meeting"):
-            websiteCreator = OfflineEventCreator(self._rh, self._conf, self._html)
+            websiteCreator = OfflineEventCreator(self._rh, self._conf, self._eventType)
         elif self._eventType == "conference":
-            websiteCreator = ConferenceOfflineCreator(self._rh, self._conf, self._html)
+            websiteCreator = ConferenceOfflineCreator(self._rh, self._conf)
         return websiteCreator.create()
 
 
-class OfflineEventCreator:
+class OfflineEventCreator(object):
 
-    def __init__(self, rh, conf, html):
+    def __init__(self, rh, conf, event_type=""):
         self._rh = rh
         self._conf = conf
-        self._html = html
+        self._html = ""
         self._outputFile = ""
         self._fileHandler = None
         self._mainPath = ""
         self._staticPath = ""
-        # self._toUser = ContextManager.get('currentUser')
+        self._eventType = event_type
 
     def create(self):
         config = Config.getInstance()
         self._fileHandler = ZIPFileHandler()
-        
+
+        # create the home page html
+        self._create_home()
+
         # Create main and static folders
         self._mainPath = "OfflineWebsite-%s" % self._normalisePath(self._conf.getTitle())
         self._fileHandler.addDir(self._mainPath)
         self._staticPath = os.path.join(self._mainPath, "static")
         self._fileHandler.addDir(self._staticPath)
+        # Download all the icons
+        self._addFolderFromSrc(os.path.join(self._staticPath, "fonts"), os.path.join(config.getHtdocsDir(), 'fonts'))
 
         # Getting all materials, static files (css, images, js and vars.js.tpl)
         self._getAllMaterial()
         self._html = self._getStaticFiles(self._html)
-        
+
         # Specific changes
-        self._create()
+        self._create_other_pages()
 
         # Creating ConferenceDisplay.html file
-        conferenceDisplayPath = os.path.join(self._mainPath, urlHandlers.UHConferenceDisplay.getStaticURL()) 
+        conferenceDisplayPath = os.path.join(self._mainPath, urlHandlers.UHConferenceDisplay.getStaticURL())
         self._fileHandler.addNewFile(conferenceDisplayPath, self._html)
-        
+
         # Creating index.html file
         self._fileHandler.addNewFile("index.html", """<meta HTTP-EQUIV="REFRESH" content="0; url=%s">""" % conferenceDisplayPath)
-        
+
         self._fileHandler.close()
         self._outputFile = self._generateZipFile(self._fileHandler.getPath())
         return self._outputFile
@@ -106,14 +111,26 @@ class OfflineEventCreator:
         self._downloadFiles(html, config.getCssBaseURL(), config.getCssDir(), "css")
         # Download all JS files
         self._downloadFiles(html, "js", config.getJSDir(), "js")
+        # Download all files generated from SASS and static js libs
+        self._downloadFiles(html, 'static/static', os.path.join(config.getHtdocsDir(), 'static'), "static")
         # Download vars.js.tpl
         self._addVarsJSTpl()
         # Replace the html link
         html = html.replace("static/JSContent.py/getVars", "static/js/vars.js")
         return html
 
-    def _create(self):
-        return ""
+    def _create_home(self):
+        # get default/selected view
+        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
+        view = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._rh._target).getDefaultStyle()
+        # if no default view was attributed, then get the configuration default
+        if view == "" or not styleMgr.existsStyle(view) or view in styleMgr.getXSLStyles():
+            view = styleMgr.getDefaultStyleForEventType(self._eventType)
+        p = WPTPLStaticConferenceDisplay(self._rh, self._rh._target, view, self._eventType, self._rh._reqParams)
+        self._html = p.display(**self._rh._getRequestParams())
+
+    def _create_other_pages(self):
+        pass
 
     def _normalisePath(self, path):
         forbiddenChars = string.maketrans(" /:()*?<>|\"", "___________")
@@ -140,6 +157,10 @@ class OfflineEventCreator:
                         self._addFileFromSrc(dstPath, res.getFilePath())
 
     def _downloadFiles(self, html, baseURL, srcPath, dstNamePath):
+        """
+        Downloads all the files whose URL matches with baseURL in the string html (html page); and copies the file from
+        the source path (srcPath) to the target folder (dstNamePath).
+        """
         dstPath = os.path.join(self._staticPath, dstNamePath)
         self._fileHandler.addDir(dstPath)
         files = re.findall(r'%s/(.+?\..+?)[?|"]' % (baseURL), html)
@@ -157,6 +178,16 @@ class OfflineEventCreator:
                 newFile = open(srcPath, "rb")
                 self._fileHandler.addNewFile(dstPath, newFile.read())
                 newFile.close()
+
+    def _addFolderFromSrc(self, dstPath, srcPath):
+        for root, subfolders, files in os.walk(srcPath):
+            for filename in files:
+                src_filepath = os.path.join(root, filename)
+                dst_dirpath = os.path.join(dstPath, root.strip(srcPath))
+                dst_filepath = os.path.join(dst_dirpath, filename)
+                self._fileHandler.addDir(dst_dirpath)
+                if not self._fileHandler.hasFile(dst_filepath):
+                    self._fileHandler.add(dst_filepath, src_filepath)
 
     def _addImagesFromCss(self, cssFilename):
         config = Config.getInstance()
@@ -188,29 +219,34 @@ class OfflineEventCreator:
             self._fileHandler.addNewFile(varsPath, varsData)
 
     def _generateZipFile(self, srcPath):
-        repo = LocalRepository()
+        repo = OfflineRepository.getRepositoryFromDB()
         filename = os.path.basename(srcPath) + ".zip"
-        file = LocalFile()
-        file.setFilePath(srcPath)
-        file.setFileName(filename)
-        repo.storeFile(file, self._conf.getId())
-        return file
+        fd = LocalFile()
+        fd.setFilePath(srcPath)
+        fd.setFileName(filename)
+        repo.storeFile(fd, self._conf.getId())
+        return fd
 
 
 class ConferenceOfflineCreator(OfflineEventCreator):
 
-    # Menu items allowed to be shown in offline mode
-    _menu_offline_items = {"overview": None,
-                           "programme": None,
-                           "timetable": None,
-                           "authorIndex": None,
-                           "speakerIndex": None,
-                           "contributionList": None,
-                           "registrants": None,
-                           "abstractsBook": None}
-
-    def _create(self):
+    def __init__(self, rh, conf, event_type=""):
+        super(ConferenceOfflineCreator, self).__init__(rh, conf, event_type)
+        self._menu_offline_items = {"overview": None,
+                                    "programme": None,
+                                    "timetable": None,
+                                    "authorIndex": None,
+                                    "speakerIndex": None,
+                                    "contributionList": None,
+                                    "registrants": None,
+                                    "abstractsBook": None}
         self._initializeMenuItensComponents()
+
+    def _create_home(self):
+        p = WPStaticConferenceDisplay(self._rh, self._conf)
+        self._html = p.display()
+
+    def _create_other_pages(self):
         # Getting conference logo
         self._addLogo()
         # Getting all menu items
@@ -246,6 +282,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         self._menu_offline_items["speakerIndex"] = WPStaticSpeakerIndex(self._rh, self._conf)
         self._menu_offline_items["contributionList"] = WPStaticContributionList(self._rh, self._conf)
         self._menu_offline_items["registrants"] = WPStaticConfRegistrantsList(self._rh, self._conf)
+        ContextManager.set("_menu_offline_items", self._menu_offline_items)
 
     def _addLogo(self):
         if self._conf.getLogo():

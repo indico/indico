@@ -154,7 +154,6 @@ class Config:
                  "closed": "closed.png",
                  "closeIcon": "close.png",
                  "alarmIcon": "alarm.png",
-                 "dvd": "dvd.png",
                  "badge": "badge.png",
                  "badgeMargins": "badge_margins.png",
                  "loading": "loading.gif",
@@ -454,6 +453,7 @@ class Config:
         'UploadedFilesTempDir'      : "/opt/indico/tmp",
         'UploadedFilesSharedTempDir': "",
         'XMLCacheDir'               : "/opt/indico/cache",
+        'OfflineStore'              : "",
         'CacheBackend'              : 'files',
         'MemcachedServers'          : [],
         'RedisCacheURL'             : None,
@@ -468,7 +468,6 @@ class Config:
         'DisplayLoginPage'          : "yes",
         'AuthenticatorList'         : [('Local',{})],
         'CssStylesheetName'         : 'indico.css',
-        'PublicFolder'              : "/opt/indico/htdocs/results",
         'ReportNumberSystems'       : {},
         'Profile'                   : 'no',
         'StaticFileMethod'          : None,
@@ -543,7 +542,6 @@ class Config:
             'ImagesDir'                 : os.path.join(self.getHtdocsDir(), 'images'),
             'FontsDir'                  : os.path.join(self.getHtdocsDir(), 'fonts'),
             'JSDir'                     : os.path.join(self.getHtdocsDir(), 'js'),
-            'PublicURL'                 : "%s/%s" % (self.getBaseURL(), self.getPublicFolder()),
             'SystemIcons'               : self.__systemIcons,
             'Styles'                    : self.__styles,
             'EventStylesheets'          : self.__eventStylesheets,
@@ -735,20 +733,6 @@ class Config:
             baseURL = self.getBaseURL()
 
         return "%s/css/confTemplates" % baseURL
-
-
-
-    def getPublicDir(self):
-        """gives back the path of the directory where the public files are kept"""
-        publicFolderPath = os.path.join(self._configVars['htdocsDir'], self._configVars['publicFolder'])
-        try:
-            if not os.path.exists(publicFolderPath):
-                os.mkdir(publicFolderPath)
-        except:
-            raise MaKaCError( _("It is not possible to create the folder \"results\" to store the dvd zip file. \
-                    Please contact with the system administrator"))
-        return publicFolderPath
-
 
     def getTPLFile(self, tplId):
         """gives back the template file name associated to a certain page of

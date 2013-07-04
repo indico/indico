@@ -2,7 +2,7 @@
 #
 #
 # This file is part of Indico.
-# Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,10 +21,12 @@
 from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPConferenceDisplay, WPConferenceTimeTable, WPConferenceProgram, WPContributionList, WPInternalPageDisplay, WPAuthorIndex, WPSpeakerIndex
 from MaKaC.webinterface.pages.sessions import WPSessionDisplay
 from MaKaC.webinterface.pages.contributions import WPContributionDisplay
-from MaKaC.webinterface.pages.registrants import WPConfRegistrantsList
+from MaKaC.webinterface.pages.registrants import WPConfRegistrantsList, WConfRegistrantsList
 from MaKaC.webinterface.pages.material import WPMaterialConfDisplayBase
 from MaKaC.webinterface.pages.subContributions import WPSubContributionDisplay
 from MaKaC.webinterface.pages.authors import WPAuthorDisplay
+from MaKaC.webinterface.displayMgr import SystemLink
+from indico.util.contextManager import ContextManager
 
 
 class WPStaticEventBase:
@@ -42,10 +44,9 @@ class WPStaticEventBase:
         return self._asset_env['base_js'].urls()
 
     def _getMenu(self):
-        self._trackMgtOpt.setVisible(False)
-        self._cfaOpt.setVisible(False)
-        self._abstractsBookOpt.setVisible(True)
-        self._paperReviewingOpt.setVisible(False)
+        for link in self._sectionMenu.getLinkList():
+            if isinstance(link, SystemLink) and link.getName() not in ContextManager.get("_menu_offline_items"):
+                link.setVisible(False)
 
 
 class WPTPLStaticConferenceDisplay(WPStaticEventBase, WPTPLConferenceDisplay):
@@ -155,7 +156,7 @@ class WPStaticConfRegistrantsList(WPStaticEventBase, WPConfRegistrantsList):
 
     def _getBody(self, params):
         from MaKaC.webinterface.rh.registrantsDisplay import RHRegistrantsList
-        import MaKaC.webinterface.common.regFilters as regFilters
+        from MaKaC.webinterface.common import regFilters
 
         sortingCrit = regFilters.SortingCriteria([params.get("sortBy", "Name").strip()])
         filterCrit = RHRegistrantsList.create_filter(self._conf, params)
@@ -177,7 +178,7 @@ class WPStaticSubContributionDisplay(WPStaticEventBase, WPSubContributionDisplay
         self._getMenu()
 
 class WPStaticAuthorDisplay(WPStaticEventBase, WPAuthorDisplay):
-    
+
     def _defineSectionMenu(self):
         WPAuthorDisplay._defineSectionMenu(self)
         self._getMenu()

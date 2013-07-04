@@ -511,8 +511,8 @@ class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
-        self._auth = params.has_key("authId")
-        self._chair = params.has_key("chairId")
+        self._auth = "authorId" in params
+        self._chair = "chairId" in params
         if params.has_key("contribId"):
             contrib = self._conf.getContributionById(params.get("contribId",""))
         if self._chair:
@@ -522,7 +522,7 @@ class RHConferenceEmail(RHConferenceBaseDisplay, base.RHProtected):
                 raise NotFoundError(_("The chair you try to email does not exist."))
             self._emailto = chair
         if self._auth:
-            authid=params.get("authId","")
+            authid = params.get("authorId", "")
             if not contrib:
                 raise MaKaCError(_("The author's contribution does not exist anymore."))
             author = contrib.getAuthorById(authid)
@@ -543,13 +543,13 @@ class RHConferenceSendEmail (RHConferenceBaseDisplay, base.RHProtected):
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams( self, params )
-        if params.has_key("contribId"):
+        if "contribId" in params:
             contrib = self._conf.getContributionById(params.get("contribId",""))
-        if params.has_key("chairId"):
+        if "chairId" in params:
             chairid=params.get("chairId","")
             self._to = self._conf.getChairById(chairid).getEmail()
-        if params.has_key("authId"):
-            authid=params.get("authId","")
+        if "authorId" in params:
+            authid = params.get("authorId", "")
             self._to = contrib.getAuthorById(authid).getEmail()
         fromId = params.get("from","")
         self._from = (user.AvatarHolder()).getById(fromId).getEmail()

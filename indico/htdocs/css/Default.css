@@ -7915,6 +7915,12 @@ ul.conveners ul.names .affiliation {
     background: none repeat scroll 0 0 #B93725;
 }
 
+.offlineTasksExpired {
+    text-align: center;
+    width: 65px;
+    background: none repeat scroll 0 0 #E0A565;
+}
+
 .offlineTask {
     width: 1px;
     white-space: nowrap;

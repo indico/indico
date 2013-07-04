@@ -719,7 +719,7 @@ type("AuthorsPopup", ["ExclusivePopup"], {
                 confId: self.confId,
                 sessionId: self.sessionId,
                 contribId: self.contribId,
-                authId: author.id
+                authorId: author.id
             });
 
             var infoDiv = $("<div/>").css("width", self.width +"px").css("border-bottom", "1px solid #EAEAEA").css("paddingBottom","5px").css("color", "#888").css("font-size", "12px");

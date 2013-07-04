@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,10 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import os
 from persistent import Persistent
 from MaKaC.common.Counter import Counter
 from indico.modules import ModuleHolder, Module
-from indico.util.i18n import L_
+from indico.util.i18n import L_, _
 from MaKaC.common.timezoneUtils import nowutc
 from BTrees.OOBTree import OOBTree
 from MaKaC.webinterface.urlHandlers import UHOfflineEventAccess
@@ -33,23 +34,24 @@ class OfflineEventsModule(Module):
     """
 
     id = "offlineEvents"
-    _offlineEventTypes = {"Queued": _("Queued"), "Generated" : _("Generated"), "Failed": _("Failed")}
+    _offlineEventTypes = {"Queued": L_("Queued"), "Generated": L_("Generated"), "Failed": L_("Failed"),
+                          "Expired": L_("Expired")}
 
     def __init__(self):
         self._idxConf = OOBTree()
         self._offlineEventCounter = Counter()
 
-    def getOfflineEventList(self):
+    def getOfflineEventIndex(self):
         return self._idxConf
 
     def getOfflineEventByConfId(self, confId):
         return self._idxConf.get(confId, [])
 
     def getOfflineEventByFileId(self, confId, fileId):
-        eventList = self._idxConf.get(confId, [])
-        for event in eventList:
-            if event.id == fileId:
-                return event
+        offline_request_list = self._idxConf.get(confId, [])
+        for req in offline_request_list:
+            if req.id == fileId:
+                return req
         return None
 
     def addOfflineEvent(self, offlineEvent):
@@ -63,15 +65,23 @@ class OfflineEventsModule(Module):
         lst.append(offlineEvent)
         self._idxConf[confId] = lst
 
-    def removeOfflineEvent(self, offlineEvent):
+    def removeOfflineEvent(self, offlineEvent, del_file=False):
         if offlineEvent:
             confId = offlineEvent.conference.getId()
             lst = self._idxConf.get(confId,[])
             if offlineEvent in lst:
                 lst.remove(offlineEvent)
             self._idxConf[confId] = lst
+            if del_file:
+                self.removeOfflineFile(offlineEvent)
         else:
             raise Exception(_("OfflineEvent does not exist"))
+
+    def removeOfflineFile(self, offlineEvent):
+        filepath = offlineEvent.file.getFilePath()
+        if os.path.isfile(filepath):
+            os.remove(filepath)
+        offlineEvent.status = "Expired"
 
     @classmethod
     def getOfflineEventTypes(self):

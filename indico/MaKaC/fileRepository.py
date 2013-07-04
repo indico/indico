@@ -63,9 +63,22 @@ class MaterialLocalRepository(Persistent):
     """
     def __init__(self):
         self.__files = OOBTree.OOBTree()
-        #self.__idGen = Counter()
 
-    def __getNewFileId( self ):
+    #===========================================================================
+    # @staticmethod
+    # def getRepositoryFromDB():
+    #    dbRoot = DBMgr.getInstance().getDBConnection().root()
+    #    try:
+    #        fr = dbRoot["local_repositories"]["main"]
+    #    except KeyError:
+    #        fr = MaterialLocalRepository()
+    #        if not "local_repositories" in dbRoot:
+    #            dbRoot["local_repositories"] = OOBTree()
+    #        dbRoot["local_repositories"]["main"] = fr
+    #    return fr
+    #===========================================================================
+
+    def _getNewFileId(self):
         while True:
             id=str(random.randint(0,sys.maxint))
             if not self.__files.has_key(id):
@@ -80,17 +93,15 @@ class MaterialLocalRepository(Persistent):
         #   very very low in case of having a big directory list
         #while 1:
         #    id = str(self.__idGen.newCount())
-        #    destPath = os.path.join( self.__getRepositoryPath(), id )
+        #    destPath = os.path.join( self._getRepositoryPath(), id )
         #    if not os.access( destPath, os.F_OK ):
         #        return id
 
-    def __getRepositoryPath( self ):
-        from MaKaC.common.Configuration import Config
-        cfg = Config.getInstance()
-        return cfg.getArchiveDir()
+    def _getRepositoryPath(self):
+        return Config.getInstance().getArchiveDir()
 
-    def getRepositoryPath( self ):
-        return self.__getRepositoryPath()
+    def getRepositoryPath(self):
+        return self._getRepositoryPath()
 
     def getFiles(self):
         return self.__files
@@ -98,8 +109,8 @@ class MaterialLocalRepository(Persistent):
     def __getFilePath( self, id ):
         # this os.path.split is to be removed, just to keep compatibility with
         #   old filerepository where the full path was stored
-        file = self.__files[id]
-        path = os.path.join( self.__getRepositoryPath(), file )
+        fp = self.__files[id]
+        path = os.path.join(self._getRepositoryPath(), fp)
         if os.path.exists(path):
             return path
         #legacy
@@ -125,7 +136,7 @@ class MaterialLocalRepository(Persistent):
         if forcedFileId:
             id = forcedFileId
         else:
-            id = self.__getNewFileId()
+            id = self._getNewFileId()
 
         cat = newFile.getCategory()
         #raise "%s"%cat
@@ -178,20 +189,20 @@ class MaterialLocalRepository(Persistent):
         from MaKaC.common import info
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         volume = minfo.getArchivingVolume()
-        destPath = os.path.join( self.__getRepositoryPath(), volume, interPath, id )
+        destPath = os.path.join(self._getRepositoryPath(), volume, interPath, id)
 
         if forcedFileId == None:
-            os.makedirs( destPath )
+            os.makedirs(destPath)
 
-        destPath = os.path.join( destPath, newFile.getFileName() )
-        relativePath = os.path.join( volume, interPath, id, newFile.getFileName())
+        destPath = os.path.join(destPath, newFile.getFileName())
+        relativePath = os.path.join(volume, interPath, id, newFile.getFileName())
 
         if forcedFileId == None:
             try:
-                shutil.copyfile( newFile.getFilePath(), destPath )
+                shutil.copyfile(newFile.getFilePath(), destPath)
             except IOError, e:
                 Logger.get('storage').exception('Problem copying file')
-                raise Exception( _("Couldn't archive file %s to %s")%( newFile.getFilePath(), destPath ) )
+                raise Exception(_("Couldn't archive file %s to %s") % (newFile.getFilePath(), destPath))
 
         self.__files[id] = relativePath
         newFile.setArchivedId( self, id )
@@ -270,70 +281,43 @@ class MaterialLocalRepository(Persistent):
         del self.__files[ file.getRepositoryId() ]
 
 
-class LocalRepository(Persistent):
-    """File repositroy keeping the files under a certain path in the local
-        filesystem (machine where the system is installed).
+class OfflineRepository(MaterialLocalRepository):
+    """File repositroy keeping the offline sites under a certain path in the local
+        filesystem.
     """
-    def __init__(self):
-        self.__files = OOBTree.OOBTree()
-        self.__idGen = Counter()
 
-    def __getNewFileId( self ):
-        return str(self.__idGen.newCount())
-
-    def __getRepositoryPath( self ):
-        return os.path.join(Config.getInstance().getUploadedFilesSharedTempDir(), 'offline/')
-
-    def getFilePath( self, id ):
-        return os.path.join( self.__getRepositoryPath(), self.__files[id])
-
-    def storeFile( self, newFile, confId):
-        id = self.__getNewFileId()
-        destPath = os.path.join( self.__getRepositoryPath(), confId )
-        if not os.access( destPath, os.F_OK ):
-            os.makedirs( destPath )
-        destPath = os.path.join( destPath, newFile.getFileName() )
-        relativePath = os.path.join( confId, newFile.getFileName())
+    @staticmethod
+    def getRepositoryFromDB():
+        from MaKaC.common.db import DBMgr
+        dbRoot = DBMgr.getInstance().getDBConnection().root()
         try:
-            shutil.copyfile( newFile.getFilePath(), destPath )
-            self.__files[id] = relativePath
-            newFile.setArchivedId( self, id )
-        except IOError, e:
-            raise Exception( _("Couldn't archive file %s to %s")%( newFile.getFilePath(), destPath ) )
-        return id
+            fr = dbRoot["local_repositories"]["offline"]
+        except KeyError:
+            fr = OfflineRepository()
+            if not "local_repositories" in dbRoot:
+                dbRoot["local_repositories"] = OOBTree()
+            dbRoot["local_repositories"]["offline"] = fr
+        return fr
 
-    def getFileSize( self, id ):
-        filePath = self.getFilePath( id )
-        return int(os.stat( filePath )[stat.ST_SIZE])
+    def _getRepositoryPath(self):
+        return Config.getInstance().getOfflineStore()
 
-    def getCreationDate( self, id):
-        """
-        This method returns the creation date of one file in the repository.
-        The file is got with the "id" argument.
-        """
-        filePath = self.__getFilePath( id )
-        return datetime.datetime.fromtimestamp(os.path.getctime(filePath))
-
-    def readFile( self, id ):
-        filePath = self.getFilePath( id )
-        f = open(filePath, "rb")
-        data = f.read()
-        f.close()
-        return data
-
-    def replaceContent( self, id, newContent ):
-        filePath = self.getFilePath( id )
-        f = open(filePath, "w")
-        f.write( newContent )
-        f.close()
-
-    def retireFile( self, file ):
-        if not self.__files.has_key( file.getRepositoryId() ):
-            return
-        os.remove( self.__files[ file.getRepositoryId() ] )
-        del self.__files[ file.getRepositoryId() ]
-
-
+    def storeFile(self, newFile, confId):
+        from MaKaC.common import info
+        volume = info.HelperMaKaCInfo.getMaKaCInfoInstance().getArchivingVolume()
+        new_file_id = self._getNewFileId()
+        destPath = os.path.join(self._getRepositoryPath(), volume, 'offline', confId)
+        if not os.access(destPath, os.F_OK):
+            os.makedirs(destPath)
+        destPath = os.path.join(destPath, newFile.getFileName())
+        relativePath = os.path.join(volume, 'offline', confId, newFile.getFileName())
+        try:
+            shutil.copyfile(newFile.getFilePath(), destPath)
+            self.getFiles()[new_file_id] = relativePath
+            newFile.setArchivedId(self, new_file_id)
+        except IOError:
+            raise Exception(_("Couldn't archive file %s to %s") % (newFile.getFilePath(), destPath))
+        return new_file_id
 
 class SimpleRepository:
     """File repository keeping the files under a certain path in the local
@@ -341,9 +325,7 @@ class SimpleRepository:
     """
 
     def getRepositoryPath( self ):
-        from MaKaC.common.Configuration import Config
-        cfg = Config.getInstance()
-        return cfg.getArchiveDir()
+        return Config.getInstance().getArchiveDir()
 
     def getFullPath( self, relativePath ):
         return os.path.join( self.getRepositoryPath(), relativePath )

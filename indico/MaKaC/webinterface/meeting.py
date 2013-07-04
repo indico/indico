@@ -602,11 +602,6 @@ class WPMConfModifTools (conferences.WPConfModifToolsBase):
             }
         return wc.getHTML( p )
 
-
-class WMConfModifTools (conferences.WConfModifTools):
-    pass
-
-
 class WPMConfModifListings (conferences.WPConfModifListings):
 
     def _getTabContent( self, params ):

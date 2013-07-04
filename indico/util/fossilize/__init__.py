@@ -30,10 +30,12 @@ Some of the features are:
 import logging
 import inspect
 import re
+import threading
 import zope.interface
 from types import NoneType
 from itertools import ifilter
 
+_fossil_cache = threading.local()
 
 def fossilizes(*classList):
     """
@@ -83,7 +85,6 @@ class IFossil(zope.interface.Interface):
     Fossil base interface. All fossil classes should derive from this one.
     """
 
-
 class Fossilizable(object):
     """
     Base class for all the objects that can be fossilized
@@ -91,11 +92,6 @@ class Fossilizable(object):
 
     __fossilNameRE = re.compile('^I(\w+)Fossil$')
     __methodNameRE = re.compile('^get(\w+)|(has\w+)|(is\w+)$')
-    __methodNameCache = {}
-    __fossilNameCache = {}
-    __fossilInterfaceCache = {}
-    __fossilAttrsCache = {} # Attribute Cache for Fossils with
-                            # fields that are repeated
 
     @classmethod
     def __extractName(cls, name):
@@ -103,8 +99,8 @@ class Fossilizable(object):
         'De-camelcase' the name
         """
 
-        if name in cls.__methodNameCache:
-            return cls.__methodNameCache[name]
+        if name in _fossil_cache.methodName:
+            return _fossil_cache.methodName[name]
         else:
             nmatch = cls.__methodNameRE.match(name)
 
@@ -115,7 +111,7 @@ class Fossilizable(object):
             else:
                 group = nmatch.group(1) or nmatch.group(2) or nmatch.group(3)
                 extractedName = group[0:1].lower() + group[1:]
-                cls.__methodNameCache[name] = extractedName
+                _fossil_cache.methodName[name] = extractedName
                 return extractedName
 
     @classmethod
@@ -126,8 +122,8 @@ class Fossilizable(object):
         IMyObjectBasicFossil -> myObjectBasic
         """
 
-        if name in cls.__fossilNameCache:
-            fossilName = cls.__fossilNameCache[name]
+        if name in _fossil_cache.fossilName:
+            fossilName = _fossil_cache.fossilName[name]
         else:
             fossilNameMatch = Fossilizable.__fossilNameRE.match(name)
             if fossilNameMatch is None:
@@ -138,7 +134,7 @@ class Fossilizable(object):
                 fossilName = fossilNameMatch.group(1)[0].lower() + \
                 fossilNameMatch.group(1)[1:]
 
-                cls.__fossilNameCache[name] = fossilName
+                _fossil_cache.fossilName[name] = fossilName
         return fossilName
 
     @classmethod
@@ -199,7 +195,12 @@ class Fossilizable(object):
         """
         Clears the fossil attribute cache
         """
-        cls.__fossilAttrsCache = {}
+        _fossil_cache.methodName = {}
+        _fossil_cache.fossilName = {}
+        _fossil_cache.fossilInterface = {}
+        _fossil_cache.fossilAttrs = {}  # Attribute Cache for Fossils with
+                                        # fields that are repeated
+
 
 
     @classmethod
@@ -272,10 +273,10 @@ class Fossilizable(object):
         result = {}
 
         # cache method names for each interface
-        names = cls.__fossilInterfaceCache.get(interface)
+        names = _fossil_cache.fossilInterface.get(interface)
         if names is None:
             names = interface.names(all=True)
-            cls.__fossilInterfaceCache[interface] = names
+            _fossil_cache.fossilInterface[interface] = names
         ###
 
         for methodName in names:
@@ -290,7 +291,7 @@ class Fossilizable(object):
             cacheUsed = False
             if useAttrCache:
                 try:
-                    methodResult = cls.__fossilAttrsCache[obj._p_oid][methodName]
+                    methodResult = _fossil_cache.fossilAttrs[obj._p_oid][methodName]
                     cacheUsed = True
                 except KeyError:
                     pass
@@ -313,7 +314,7 @@ class Fossilizable(object):
                         isAttribute = True
 
                 if hasattr(obj, "_p_oid"):
-                    cls.__fossilAttrsCache.setdefault(obj._p_oid, {})[methodName] = methodResult
+                    _fossil_cache.fossilAttrs.setdefault(obj._p_oid, {})[methodName] = methodResult
 
             if 'filterBy' in tags:
                 if 'filters' not in kwargs:

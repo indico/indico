@@ -23,9 +23,11 @@
                     % if isinstance(resource, Link):
                         <img src="${Config.getInstance().getSystemIconURL('link')}" style="vertical-align: middle; border: 0;">
                         <a href="${getURL(resource)}">${resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() else resource.getURL()}</a>
+                        % if resource.getDescription().strip():
                         <ul class="resourceDetail">
                             <li>${resource.getDescription()}</li>
                         </ul>
+                        % endif
                         % if resource.isProtected():
                             <img src="${Config.getInstance().getSystemIconURL('protected')}" style="vertical-align: middle; border: 0;">
                         % endif

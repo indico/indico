@@ -58,7 +58,7 @@ import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.common.contribPacker import ZIPFileHandler,AbstractPacker, ContribPacker,ConferencePacker, ProceedingsPacker
-from MaKaC.conference import ContributionParticipation, Contribution, CustomRoom
+from MaKaC.conference import CustomRoom
 from MaKaC.common import pendingQueues
 from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
 from MaKaC.common import utils
@@ -4756,5 +4756,10 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
 
 class RHConfOffline(RHConferenceModifBase):
 
+    def _checkProtection(self):
+        RHConferenceModifBase._checkProtection(self)
+
     def _process(self):
+        if not Config.getInstance().getOfflineStore():
+            raise MaKaCError(_("This feature is not enabled"))
         return conferences.WPConfOffline(self, self._conf).display()

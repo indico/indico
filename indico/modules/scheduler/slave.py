@@ -17,18 +17,17 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import time, logging
-
-from indico.modules.scheduler import SchedulerModule, base, TaskDelayed
+import time
+import logging
+import multiprocessing
+import threading
+from ZODB.POSException import ConflictError
 from MaKaC.common import DBMgr
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.RoomBooking.default.dalManager import DBConnection, DALManager
 from MaKaC.common.info import HelperMaKaCInfo
-
-import multiprocessing
-import threading
-
-from ZODB.POSException import ConflictError
+from indico.modules.scheduler import SchedulerModule, base, TaskDelayed
+from indico.util import fossilize
 
 class _Worker(object):
 
@@ -94,6 +93,7 @@ class _Worker(object):
             try:
                 if i > 0:
                     self._dbi.abort()
+                    # delete all queued emails
                     GenericMailer.flushQueue(False)
                     # restore logger
                     self._task.plugLogger(self._logger)
@@ -103,6 +103,9 @@ class _Worker(object):
 
                         self._logger.info('Task cycle %d' % i)
                         i = i + 1
+
+                        # clear the fossile cache at the start of each task
+                        fossilize.clearCache()
 
                         self._task.start(self._executionDelay)
                         break

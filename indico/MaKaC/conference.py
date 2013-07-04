@@ -6282,7 +6282,8 @@ class Session(CommonObjectBase, Locatable):
         if self.canAccess( aw ):
             return True
 
-        if any(self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) + self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
+        if any(self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) +
+               self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
             return True
 
         for contrib in self.getContributionList():
@@ -8990,7 +8991,8 @@ class Contribution(CommonObjectBase, Locatable):
         """
         if self.canAccess( aw ):
             return True
-        if any(self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"}) + self._notify("isPluginTypeAdmin", {"user": aw.getUser()})):
+        if any(self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"}) +
+               self._notify("isPluginTypeAdmin", {"user": aw.getUser()})):
             return True
         ################################################################################################
         for sc in self.getSubContributionList():
@@ -9891,13 +9893,6 @@ class SubContribParticipation(Persistent, Fossilizable):
         if self._subContrib is not None:
             return self._subContrib.getContribution()
         return None
-
-   # def getLocator(self):
-#        if self.getSubContrib() is None:
-#            return None
-#        loc=self.getSubContrib().getLocator()
-#        loc["authId"]=self.getId()
-#        return loc
 
     def _unindex(self):
         contrib=self.getContribution()
@@ -11022,7 +11017,8 @@ class Material(CommonObjectBase):
             return True
         #####################################################
 
-        if any(self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) + self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
+        if any(self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) +
+               self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
             return True
 
         canUserAccess = self.isAllowedToAccess( aw.getUser() )
@@ -11475,7 +11471,8 @@ class Resource(CommonObjectBase):
             return True
         #####################################################
 
-        if any(self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) + self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
+        if any(self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) +
+               self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
             return True
 
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):

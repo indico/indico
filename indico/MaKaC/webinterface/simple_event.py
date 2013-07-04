@@ -301,10 +301,6 @@ class WPSEConfClone(WPSEConfModifToolsBase, Observable):
         return p.getHTML( pars )
 
 
-class WSEConfModifTools (conferences.WConfModifTools):
-    pass
-
-
 #################### Event Creation #####################################
 class WPSimpleEventCreation( WPConferenceCreationMainData):
 

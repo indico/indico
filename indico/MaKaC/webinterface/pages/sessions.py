@@ -27,7 +27,8 @@ import MaKaC.webinterface.navigation as navigation
 import MaKaC.schedule as schedule
 import MaKaC.conference as conference
 import MaKaC.webinterface.linking as linking
-from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, WPConferenceDefaultDisplayBase, WContribParticipantList, WPConferenceModifBase, WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, \
+    WPConferenceDefaultDisplayBase, WContribParticipantList, WPConferenceModifBase
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC.common import Config, info
 import MaKaC.webinterface.timetable as timetable
@@ -49,7 +50,6 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
 from MaKaC.user import Avatar
-from MaKaC.common.contextManager import ContextManager
 
 class WPSessionBase(WPConferenceBase):
 
@@ -165,9 +165,8 @@ class WSessionDisplay:
         self._session = session
 
     def getHTML(self):
-        if self._session.canAccess( self._aw ):
-            c = WSessionDisplayFull(self._aw, self._session)
-            return c.getHTML()
+        c = WSessionDisplayFull(self._aw, self._session)
+        return c.getHTML()
 
 
 class WPSessionDisplay( WPSessionDefaultDisplayBase ):

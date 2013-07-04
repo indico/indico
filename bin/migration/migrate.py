@@ -37,7 +37,10 @@ from MaKaC.common import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
 from MaKaC.common.Configuration import Config
-from MaKaC.common.dvdCreation import OfflineWebsiteCreator
+try:
+    from MaKaC.common.dvdCreation import OfflineWebsiteCreator
+except ImportError:
+    pass
 from MaKaC.conference import ConferenceHolder, CategoryManager, Conference, CustomLocation, CustomRoom
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder

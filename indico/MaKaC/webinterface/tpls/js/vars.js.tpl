@@ -6,7 +6,6 @@
 <% from indico.util import json %>
 <% import MaKaC.webinterface.common.tools as securityTools %>
 <% from MaKaC.export import fileConverter %>
-<% from MaKaC.common.contextManager import ContextManager %>
 <%
 config = Config.getInstance()
 authenticators = filter(lambda x: x.id != 'Local', AuthenticatorMgr().getList())
@@ -164,7 +163,7 @@ var Indico = {
 
     Settings: {
         ExtAuthenticators: ${ jsonEncode(extAuths) },
-        RoomBookingModuleActive: ${ jsBoolean(rbActive) },
+        RoomBookingModuleActive: ${ jsBoolean(rbActive) }
     },
 
     FileRestrictions: {

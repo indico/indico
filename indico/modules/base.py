@@ -45,11 +45,11 @@ class ModuleHolder( ObjectHolder ):
     def __init__(self):
         ObjectHolder.__init__(self)
         # These imports are done like this in order to avoid circular imports problems.
-        import indico.modules.news as news
-        import indico.modules.cssTpls as cssTpls
-        import indico.modules.upcoming as upcoming
-        import indico.modules.scheduler as scheduler
-        import indico.modules.offlineEvents as offlineEvents
+        from indico.modules import news
+        from indico.modules import cssTpls
+        from indico.modules import upcoming
+        from indico.modules import scheduler
+        from indico.modules import offlineEvents
 
 
         ModuleHolder._availableModules = {

@@ -34,7 +34,6 @@ from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
-from MaKaC.common.contextManager import ContextManager
 
 
 class WPSubContributionBase( WPMainBase, WPConferenceBase ):

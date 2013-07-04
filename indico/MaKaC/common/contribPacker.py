@@ -61,7 +61,9 @@ class ZIPFileHandler:
             self._file.writestr(name, bytes)
 
     def addDir(self,path):
-        self.addNewFile("%s/indico_file.dat" % self._normalisePath(path), "# Indico File")
+        normalized_path = os.path.join(self._normalisePath(path), "indico_file.dat")
+        if not self.hasFile(normalized_path):
+            self.addNewFile(normalized_path, "# Indico File")
 
     def close(self):
         self._file.close()

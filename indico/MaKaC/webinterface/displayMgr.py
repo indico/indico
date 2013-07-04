@@ -30,7 +30,7 @@ from MaKaC.conference import LocalFile
 from MaKaC.plugins.base import Observable
 import re
 from MaKaC.i18n import _
-from MaKaC.common.contextManager import ContextManager
+from indico.util.contextManager import ContextManager
 
 class ConfDisplayMgrRegistery:
     """
@@ -201,7 +201,8 @@ class ConfDisplayMgr(DisplayMgr):
         return self._format
 
     def getSearchEnabled(self):
-        # check if _SearchEnabled exists in the db structure
+        if ContextManager.get('offlineMode', False):
+            return False
         try:
             return self._searchEnabled
         except AttributeError:

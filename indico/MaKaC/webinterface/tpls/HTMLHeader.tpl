@@ -29,7 +29,7 @@
 
         <!-- Page Specific JS files-->
         % for JSFile in extraJSFiles:
-            ${ page._getJavaScriptInclude(baseUrl + JSFile) }
+            ${ page._getJavaScriptInclude(JSFile) }
         % endfor
 
         <!--[if (gte IE 6)&(lte IE 8)]>
@@ -49,7 +49,7 @@
 
         <!-- Page Specific CSS files-->
         % for cssFile in extraCSS:
-            <link rel="stylesheet" type="text/css" href="${baseUrl}/${cssFile.lstrip('/')}">
+            <link rel="stylesheet" type="text/css" href="${cssFile}">
         % endfor
 
         <!-- Page Specific, directly inserted Javascript -->

@@ -1544,7 +1544,7 @@ class ScheduleToJson:
     @staticmethod
     def checkProtection(obj, aw):
 
-        if aw is None:
+        if aw is None or ContextManager.get('offlineMode'):
             return True
 
         from MaKaC.conference import SessionSlot

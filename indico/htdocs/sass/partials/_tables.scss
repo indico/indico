@@ -3,7 +3,7 @@
 
 
    This file is part of Indico.
-   Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+   Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
 
    Indico is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -48,13 +48,21 @@ table.i-table.no-margin {
     margin-top: 0em;
 }
 
+.i-table thead {
+    th {
+        padding: 5px;
+        font-weight: bold;
+        text-align: left;
+        background-color: #EAEAEA;
+    }
+}
+
 tr.i-table {
     border-bottom: 1px solid #E5E5E5;
     border-top: 1px solid #E5E5E5;
 }
 
 td.i-table {
-/*     border-left: 2px solid rgba(56, 126, 229,0); */
     border-left: 2px solid transparent;
     box-sizing: border-box;
     -moz-box-sizing: border-box;

@@ -18,6 +18,8 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import session
 
+import os
+from copy import copy
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.conferenceBase import RHFileBase, RHLinkBase
 from MaKaC.webinterface.rh.base import RH, RHDisplayBaseProtected
@@ -26,7 +28,7 @@ from MaKaC.webinterface.pages import files
 from MaKaC.errors import NotFoundError, AccessError
 from MaKaC.conference import Reviewing, Link
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
-from copy import copy
+from MaKaC.i18n import _
 
 from indico.web.flask.util import send_file
 from indico.modules import ModuleHolder
@@ -120,15 +122,14 @@ class RHOfflineEventAccess(RHConferenceModifBase):
     _uh = urlHandlers.UHOfflineEventAccess
 
     def _checkParams(self, params):
-        if not "confId" in params:
-            raise NotFoundError("Missing 'confId' argument.")
-        if not "fileId" in params:
-            raise NotFoundError("Missing 'fileId' argument.")
+        RHConferenceModifBase._checkParams(self, params)
+        if 'fileId' not in params:
+            raise NotFoundError(_("Missing 'fileId' argument."))
         self._offlineEvent = ModuleHolder().getById("offlineEvents").getOfflineEventByFileId(params["confId"],
                                                                                              params["fileId"])
-        if not self._offlineEvent or not self._offlineEvent.file:
-            raise NotFoundError("The file you try to access does not exist.")
-        self._target = self._offlineEvent.conference
+        if not self._offlineEvent or not self._offlineEvent.file or \
+           not os.path.isfile(self._offlineEvent.file.getFilePath()):
+            raise NotFoundError(_("The file you try to access does not exist anymore."))
 
     def _process(self):
         f = self._offlineEvent.file

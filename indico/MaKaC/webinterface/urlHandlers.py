@@ -1906,11 +1906,15 @@ class UHMaterialDisplay(URLHandler):
     @classmethod
     def getStaticURL(cls, target, **params):
         if target is not None:
+            from MaKaC.conference import LocalFile
             params = target.getLocator()
             resources = target.getOwner().getMaterialById(params["materialId"]).getResourceList()
             if len(resources) == 1:
-                return os.path.join("files/events/conference", params["materialId"],
-                                    resources[0].getId() + "-" + resources[0].getName())
+                if isinstance(resources[0], LocalFile):
+                    return os.path.join("files/events/conference", params["materialId"],
+                                        resources[0].getId() + "-" + resources[0].getName())
+                else:
+                    return resources[0].getURL()
             return "materialDisplay-%s.html" % params["materialId"]
         return cls._getURL()
 
