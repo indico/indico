@@ -189,6 +189,10 @@ class UHSignInSSO(SecureURLHandler):
     _endpoint = "user.signIn-sso"
 
 
+class UHSignInSSOExecute(SecureURLHandler):
+    _endpoint = 'user.signIn-sso-execute'
+
+
 class UHActiveAccount(URLHandler):
     _endpoint = 'user.signIn-active'
 

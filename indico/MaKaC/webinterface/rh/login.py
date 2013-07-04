@@ -117,7 +117,7 @@ class RHSignInSSO(RHSignInBase):
         authenticator = session.pop('Authenticator', None)
         if self._authId:
             session['Authenticator'] = self._authId
-            self._redirect(str(urlHandlers.UHSignIn.getURL()) + "/SSO" + self._authId)
+            self._redirect(str(urlHandlers.UHSignInSSOExecute.getURL(authId=self._authId)))
         elif authenticator is not None:
             authManager = AuthenticatorMgr.getInstance()
             if authManager.isSSOLoginActive():
