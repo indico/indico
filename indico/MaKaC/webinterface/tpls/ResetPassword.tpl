@@ -40,8 +40,8 @@
             <tr>
                 <td class="titleCellTD">&nbsp;</td>
                 <td class="contentCellTD">
-                    <div class="yellowButton loginButton">
-                        <input type="submit" value="${ _("Change password")}">
+                    <div class="i-buttons">
+                        <input type="submit" class="i-button right" value="${ _("Change password")}">
                     </div>
                 </td>
             </tr>

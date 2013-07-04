@@ -72,8 +72,8 @@
     <tr>
         <td class="titleCellTD">&nbsp;</td>
         <td class="contentCellTD">
-            <div class="yellowButton loginButton">
-                <input type="submit" id="loginButton" value="${ _("Login")}" name="signIn">
+            <div class="i-buttons">
+                <input type="submit" id="loginButton" class="i-button right" value="${ _("Login")}" name="signIn">
             </div>
         </td>
     </tr>
