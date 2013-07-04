@@ -19,6 +19,10 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-._rounded-corners {
-    @include border-radius(0.2em, 0.2em);
+@mixin box-border($color: #DDD) {
+    border: 1px solid $color;
+}
+
+@mixin rounded-corners($radius: 0.2em) {
+    @include border-radius($radius, $radius);
 }
