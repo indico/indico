@@ -28,8 +28,10 @@ event.add_url_rule('/user/login/disabled', 'confLogin-disabledAccount',
                    rh_as_view(conferenceDisplay.RHConfDisabledAccount), methods=('GET', 'POST'))
 event.add_url_rule('/user/login/not-activated', 'confLogin-unactivatedAccount',
                    rh_as_view(conferenceDisplay.RHConfUnactivatedAccount))
-event.add_url_rule('/user/send-password', 'confLogin-sendLogin', rh_as_view(conferenceDisplay.RHConfSendLogin),
+event.add_url_rule('/user/reset-password', 'confLogin-sendLogin', rh_as_view(conferenceDisplay.RHConfSendLogin),
                    methods=('POST',))
+event.add_url_rule('/user/reset-password/<token>', 'confLogin-resetPassword',
+                   rh_as_view(conferenceDisplay.RHConfResetPassword), methods=('GET', 'POST',))
 
 # Registration
 event.add_url_rule('/user/register', 'confUser', rh_as_view(conferenceDisplay.RHConfUserCreation),

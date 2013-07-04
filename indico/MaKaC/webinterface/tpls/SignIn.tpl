@@ -26,6 +26,14 @@
 <input type="hidden" name="returnURL" value=${ returnURL }>
 
 <table style="border: 1px solid #DDDDDD; padding: 20px; margin:auto; width:80%; border-radius:6px">
+    % if 'passwordChanged' in _request.args:
+        <tr>
+            <td class="titleCellTD">&nbsp;</td>
+            <td class="contentCellTD">
+                <em>${_("You may now log in using your new password")}</em>
+            </td>
+        </tr>
+    % endif
     <tr>
         <td class="titleCellTD">
             <span class="titleCellFormat">${ _("Login")}</span>

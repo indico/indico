@@ -16,10 +16,11 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import session
+from flask import session, request
 
 import os
 from MaKaC.common import Configuration, Config
+from MaKaC.common.cache import GenericCache
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -30,7 +31,7 @@ from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.user import AvatarHolder
 from MaKaC.common import pendingQueues
 import MaKaC.common.timezoneUtils as timezoneUtils
-from MaKaC.errors import UserError, MaKaCError, FormValuesError
+from MaKaC.errors import UserError, MaKaCError, FormValuesError, NoReportError
 import MaKaC.common.info as info
 from indico.web.flask.util import send_file
 
@@ -201,6 +202,48 @@ class RHSendLogin( base.RH ):
             sm = mail.sendLoginInfo(av)
             sm.send()
         self._redirect(urlHandlers.UHSignIn.getURL() )
+
+
+class RHResetPasswordBase:
+    _isMobile = False
+    _token_storage = GenericCache('resetpass')
+
+    def _checkParams(self, params):
+        self._token = request.view_args['token']
+        self._data = self._token_storage.get(self._token)
+        if not self._data:
+            raise NoReportError(_('Invalid token. It might have expired.'))
+        self._avatar = AuthenticatorMgr().getById(self._data['tag']).getAvatarByLogin(self._data['login'])
+        self._identity = self._avatar.getIdentityById(self._data['login'], self._data['tag'])
+        if not self._identity:
+            raise NoReportError(_('Invalid token (no login found)'))
+
+        # If we used POST we expect a new password
+        if request.method == 'POST':
+            self._password = request.form['password'].strip()
+            if not self._password:
+                raise FormValuesError(_('Your password must not be empty.'))
+            if self._password != request.form['password_confirm'].strip():
+                raise FormValuesError(_('Your password confirmation is not correct.'))
+
+    def _process(self):
+        if request.method == 'POST':
+            self._identity.setPassword(self._password.encode('utf-8'))
+            self._token_storage.delete(self._token)
+            url = self._getRedirectURL()
+            url.addParam('passwordChanged', True)
+            self._redirect(url)
+            return
+
+        return self._getWP().display()
+
+
+class RHResetPassword(RHResetPasswordBase, base.RH):
+    def _getRedirectURL(self):
+        return urlHandlers.UHSignIn.getURL()
+
+    def _getWP(self):
+        return signIn.WPResetPassword(self)
 
 
 class RHSendActivation( base.RH ):

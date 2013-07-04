@@ -40,6 +40,15 @@ class WPSignIn( base.WPDecorated ):
         return wc.getHTML( p )
 
 
+class WPResetPasswordBase:
+    def _getBody(self, params):
+        return wcomponents.WResetPassword().getHTML()
+
+
+class WPResetPassword(WPResetPasswordBase, base.WPDecorated):
+    pass
+
+
 class WPAccountAlreadyActivated( base.WPDecorated ):
 
     def __init__(self, rh, av):

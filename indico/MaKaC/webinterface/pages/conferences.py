@@ -42,6 +42,7 @@ from MaKaC.common.utils import isStringHTML, formatDateTime, formatDate
 import MaKaC.common.utils
 import MaKaC.review as review
 from MaKaC.webinterface.pages.base import WPDecorated
+from MaKaC.webinterface.pages.signIn import WPResetPasswordBase
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
 from MaKaC.webinterface.materialFactories import ConfMFRegistry,PaperFactory,SlidesFactory,PosterFactory
 from MaKaC.common import Config
@@ -497,6 +498,11 @@ class WPConfSignIn( WPConferenceDefaultDisplayBase ):
     "login": self._login, \
     "msg": self._msg }
         return wc.getHTML( p )
+
+
+class WPConfResetPassword(WPResetPasswordBase, WPConferenceDefaultDisplayBase):
+    pass
+
 
 class WPConfAccountAlreadyActivated( WPConferenceDefaultDisplayBase ):
 

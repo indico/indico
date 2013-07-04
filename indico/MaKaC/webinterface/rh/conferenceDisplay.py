@@ -39,7 +39,7 @@ from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-from MaKaC.webinterface.rh.login import RHSignInBase
+from MaKaC.webinterface.rh.login import RHSignInBase, RHResetPasswordBase
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.errors import MaKaCError, NoReportError, NotFoundError
@@ -315,9 +315,21 @@ class RHConfSendLogin( conferenceBase.RHConferenceBase ):
             except IndexError:
                 pass
         if av:
-            sm = mail.sendLoginInfo(av)
+            sm = mail.sendLoginInfo(av, self._conf)
             sm.send()
         self._redirect(urlHandlers.UHConfSignIn.getURL( self._conf ))
+
+
+class RHConfResetPassword(RHResetPasswordBase, RHConferenceBase):
+    def _checkParams(self, params):
+        RHConferenceBase._checkParams(self, params)
+        RHResetPasswordBase._checkParams(self, params)
+
+    def _getWP(self):
+        return conferences.WPConfResetPassword(self, self._conf)
+
+    def _getRedirectURL(self):
+        return urlHandlers.UHConfSignIn.getURL(self._conf)
 
 
 class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):

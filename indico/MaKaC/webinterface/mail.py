@@ -16,7 +16,9 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+import uuid
 
+from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.info import HelperMaKaCInfo
@@ -260,32 +262,50 @@ Your account has been disabled by the site administrator.
 
 class sendLoginInfo:
 
-    def __init__( self, user ):
-        self._user = user
+    _token_storage = GenericCache('resetpass')
 
-    def send (self ):
+    def __init__(self, user, event=None):
+        self._user = user
+        self._event = event
+        self._uh = urlHandlers.UHConfResetPassword if event else urlHandlers.UHResetPassword
+
+    def send(self):
         idList = self._user.getIdentityList()
         logins = []
         for id in idList:
-            try:
-                pw = id.password
-            except AttributeError, e:
-                pw = _(" Sorry, you are using your CERN credentials to login into Indico. Please contact the CERN helpdesk in case you do not remember your password (helpdesk@cern.ch).")
-            logins.append( [id.getAuthenticatorTag(), id.getLogin(),pw])
-        if logins == []:
-            text = _("Sorry, we did not find your login.\nPlease, create one here:\n%s")%urlHandlers.UHUserDetails.getURL(self._user)
+            if not hasattr(id, 'setPassword'):
+                msg = _("Sorry, you are using your CERN credentials (%s) to login into Indico.\n") % id.getLogin()
+                msg += _("Please contact CERN helpdesk in case you do not remember your password (helpdesk@cern.ch).")
+                logins.append((id.getAuthenticatorTag(), id.getLogin(), None, msg))
+            else:
+                tag = id.getAuthenticatorTag()
+                login = id.getLogin()
+                token = str(uuid.uuid4())
+                data = {'tag': tag, 'login': login}
+                while True:
+                    if self._token_storage.get(token):
+                        continue
+                    self._token_storage.set(token, data, 6*3600)
+                    break
+                url = str(self._uh.getURL(self._event, token=token))
+                logins.append((tag, login, url, None))
+        if not logins:
+            url = urlHandlers.UHUserDetails.getURL(self._user)
+            text = _("Sorry, we did not find your login.\nPlease, create one here:\n%s") % url
         else:
-            text = _("Please, find your login and password:")
+            text = _("You can use the following links within the next six hours to reset your password.")
             for l in logins:
                 text += "\n\n==================\n"
-                text += _("system:%s\n")%l[0]
-                text += _("Login:%s\n")%l[1]
-                text += _("Password:%s\n")%l[2]
-                text += "==================\n"
+                if l[2]:
+                    text += _("Click below to reset your password for the login %s (%s)\n") % (l[1], l[0])
+                    text += l[2]
+                else:
+                    text += l[3]
+                text += "\n==================\n"
         maildata = {
             "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
             "toList": [self._user.getEmail()],
             "subject": _("[%s] Login Information") % getSubjectIndicoTitle(),
             "body": text
-            }
+        }
         GenericMailer.send(GenericNotification(maildata))

@@ -37,7 +37,9 @@ user.add_url_rule('/login/disabled', 'signIn-disabledAccount', rh_as_view(login.
 user.add_url_rule('/login/not-activated', 'signIn-unactivatedAccount', rh_as_view(login.RHUnactivatedAccount))
 
 # Passwords
-user.add_url_rule('/send-password', 'signIn-sendLogin', rh_as_view(login.RHSendLogin), methods=('POST',))
+user.add_url_rule('/reset-password', 'signIn-sendLogin', rh_as_view(login.RHSendLogin), methods=('POST',))
+user.add_url_rule('/reset-password/<token>', 'signIn-resetPassword', rh_as_view(login.RHResetPassword),
+                  methods=('GET', 'POST'))
 with user.add_prefixed_rules('/<userId>'):
     user.add_url_rule('/account/change-password', 'identityCreation-changePassword',
                       rh_as_view(users.RHUserIdentityChangePassword), methods=('GET', 'POST'))

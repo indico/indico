@@ -1998,6 +1998,10 @@ class WSignIn(WTemplated):
         return vars
 
 
+class WResetPassword(WTemplated):
+    pass
+
+
 class WConfirmation(WTemplated):
 
     def getHTML(self, message, postURL, passingArgs, loading=False, severity="warning", **opts):
