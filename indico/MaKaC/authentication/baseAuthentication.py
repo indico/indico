@@ -54,7 +54,7 @@ class Authenthicator(ObjectHolder):
         tree[ id ] = newId
         return id
 
-    def getAvatar( self, li ):
+    def getAvatar(self, li):
         """ Returns an Avatar object, checking that the password is right.
 
             :param li: a LoginInfo object with the person's login string and password
@@ -62,10 +62,11 @@ class Authenthicator(ObjectHolder):
         """
 
         if self.hasKey(li.getLogin()):
-            identity = self.getById( li.getLogin() )
-            avatar = identity.authenticate( li )
-            self._postLogin(li.getLogin(), avatar)
-            return avatar
+            identity = self.getById(li.getLogin())
+            avatar = identity.authenticate(li)
+            if avatar:
+                self._postLogin(li.getLogin(), avatar)
+                return avatar
         return None
 
     def getAvatarByLogin(self, login):
