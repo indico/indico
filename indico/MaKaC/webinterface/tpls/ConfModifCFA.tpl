@@ -124,23 +124,21 @@
     </tr>
 </table>
 
+<%include file="ConfModifCFAAddFieldTooltip.tpl"/>
+
 <script type="text/javascript">
-$(function() {
+$(window).load(function() {
     $("#add-field-button").click(function(e) {
         e.preventDefault();
     }).qtip({
-        id: "add-typeoffield",
-        content: {
-            title: {
-                text: $T("Select type of field")
-            },
-            text: $('<div><a class="add-field" href="#" data-fieldtype="text">Text</a></div> \
-                     <div><a class="add-field" href="#" data-fieldtype="input">Input</a></div> \
-                     <div><a class="add-field" href="#" data-fieldtype="selection">Selection</a></div>')
-        },
+        id: "add-field",
+        content: $("#qtip-content-add-field"),
         position: {
             at: "top right",
             my: "bottom right"
+        },
+        style: {
+            classes: "add-field-qtip"
         },
         show: {
             event: "click"
@@ -159,6 +157,7 @@ $(function() {
             }
         }
     });
+});
 
     $(".edit-field").click(function(e) {
         e.preventDefault();
