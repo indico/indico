@@ -137,9 +137,6 @@ $(window).load(function() {
             at: "top right",
             my: "bottom right"
         },
-        style: {
-            classes: "add-field-qtip"
-        },
         show: {
             event: "click"
         },
@@ -148,7 +145,7 @@ $(window).load(function() {
         },
         events: {
             render: function(event, api) {
-                $(".add-field").click(function(e) {
+                $("#qtip-content-add-field .i-big-button").click(function(e) {
                     e.preventDefault();
                     api.hide();
                     var fieldType = $(this).data("fieldtype");
@@ -159,10 +156,10 @@ $(window).load(function() {
     });
 
     $(window).bind('keydown', function(event) {
-    if(event.keyCode === 27) {
-        $('#add-field-button').qtip('hide', event);
-    }
-});
+        if(event.keyCode === 27) {
+            $('#add-field-button').qtip('hide', event);
+        }
+    });
 
     $(".edit-field").click(function(e) {
         e.preventDefault();
