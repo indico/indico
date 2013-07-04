@@ -246,6 +246,11 @@ class _UserUtils:
 
 class RHUserBase(RHProtected):
     def _checkParams(self, params):
+        if not session.user:
+            # Let checkProtection deal with it.. no need to raise an exception here
+            # if no user is specified
+            return
+
         if not params.setdefault('userId', session.get('_avatarId')):
             raise MaKaCError(_("user id not specified"))
 
@@ -256,6 +261,9 @@ class RHUserBase(RHProtected):
 
     def _checkProtection(self):
         RHProtected._checkProtection(self)
+        if not self._doProcess:
+            # Logged-in check failed
+            return
         if not self._avatar.canUserModify(self._getUser()):
             raise errors.AccessControlError("user")
 
@@ -345,10 +353,12 @@ class RHUserDisable( RHUserBase ):
 
 class RHUserIdentityBase( RHUserBase ):
 
-    def _checkProtection( self ):
-        if self._avatar.getIdentityList() == []:
+    def _checkProtection(self):
+        RHUserBase._checkProtection(self)
+        if not self._doProcess:
+            return False
+        if not self._avatar.getIdentityList():
             return
-        RHUserBase._checkProtection( self )
         if not self._avatar.canModify( self._aw ):
             raise errors.ModificationError("user")
 
