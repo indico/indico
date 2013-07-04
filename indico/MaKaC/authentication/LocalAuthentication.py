@@ -40,11 +40,11 @@ class LocalIdentity(PIdentity):
 
     def __init__(self, login, password, user):
         PIdentity.__init__(self, login, user)
-        self.salt = bcrypt.gensalt()
         self.setPassword(password)
 
     def setPassword(self, newPwd):
-        self.password = bcrypt.hashpw(newPwd, self.salt)
+        self.algorithm = 'bcrypt'
+        self.password = bcrypt.hashpw(newPwd, bcrypt.gensalt())
 
     def authenticate(self, id):
         if self.getLogin() == id.getLogin() and self.password == bcrypt.hashpw(id.getPassword(), self.password):

@@ -827,18 +827,17 @@ def removeVideoServicesLinksFromCore(dbi, withRBDB, prevVersion):
 
 @since('1.2')
 def localIdentityMigration(dbi, withRBDB, prevVersion):
-    """
-    Generate the new password with a salt
-    """
+    """Generate the new password with a salt"""
 
     auth = LocalAuthenticator()
-
+    total = len(auth.getList())
     for i, identity in enumerate(auth.getList()):
-        if not hasattr(identity, "salt"):
-            identity.salt = bcrypt.gensalt()
-            identity.password = bcrypt.hashpw(identity.password, identity.salt)
-            if i % 1000 == 999:
-                dbi.commit()
+        print '\r  Processing %d/%d' % (i + 1, total),
+        if not hasattr(identity, 'algorithm'):
+            identity.setPassword(identity.password)
+        if i % 1000 == 999:
+            dbi.commit()
+    print
     dbi.commit()
 
 
