@@ -94,8 +94,8 @@ legacy.add_url_rule('/xmlGateway.py/webcastOnAir',
                     methods=('GET', 'POST'))
 
 
-# Prettified legacy endpoints that need compatibility routes
-prettified_endpoints = set([
+# Legacy endpoints defined in htdocs/*.py files (and need compatibility routes)
+legacy_endpoints = set([
     'about', 'abstractDisplay', 'abstractDisplay-getAttachedFile', 'abstractDisplay-pdf', 'abstractManagment',
     'abstractManagment-abstractToPDF', 'abstractManagment-accept', 'abstractManagment-acceptMultiple',
     'abstractManagment-backToSubmitted', 'abstractManagment-changeTrack', 'abstractManagment-comments',
@@ -234,12 +234,12 @@ prettified_endpoints = set([
     'confModifTools-addAlarm', 'confModifTools-allSessionsConveners', 'confModifTools-allSessionsConvenersAction',
     'confModifTools-badgeDesign', 'confModifTools-badgeGetBackground', 'confModifTools-badgePrinting',
     'confModifTools-badgePrintingPDF', 'confModifTools-badgeSaveBackground', 'confModifTools-clone',
-    'confModifTools-delete', 'confModifTools-deleteAlarm', 'confModifTools-displayAlarm', 'confModifTools-matPkg',
-    'confModifTools-modifyAlarm', 'confModifTools-performCloning', 'confModifTools-performMatPkg',
-    'confModifTools-posterDesign', 'confModifTools-posterGetBackground', 'confModifTools-posterPrinting',
-    'confModifTools-posterPrintingPDF', 'confModifTools-posterSaveBackground', 'confModifTools-saveAlarm',
-    'confModifTools-sendAlarmNow', 'confModifUserCompetences', 'confRegistrantsDisplay-list',
-    'confRegistrationFormDisplay', 'confRegistrationFormDisplay-conditions',
+    'confModifTools-delete', 'confModifTools-deleteAlarm', 'confModifTools-displayAlarm', 'confModifTools-dvdCreation',
+    'confModifTools-dvdDone', 'confModifTools-matPkg', 'confModifTools-modifyAlarm', 'confModifTools-performCloning',
+    'confModifTools-performMatPkg', 'confModifTools-posterDesign', 'confModifTools-posterGetBackground',
+    'confModifTools-posterPrinting', 'confModifTools-posterPrintingPDF', 'confModifTools-posterSaveBackground',
+    'confModifTools-saveAlarm', 'confModifTools-sendAlarmNow', 'confModifUserCompetences',
+    'confRegistrantsDisplay-list', 'confRegistrationFormDisplay', 'confRegistrationFormDisplay-conditions',
     'confRegistrationFormDisplay-confirmBooking', 'confRegistrationFormDisplay-confirmBookingDone',
     'confRegistrationFormDisplay-creation', 'confRegistrationFormDisplay-creationDone',
     'confRegistrationFormDisplay-display', 'confRegistrationFormDisplay-modify',
@@ -307,5 +307,8 @@ prettified_endpoints = set([
     'userList', 'userManagement', 'userManagement-switchAuthorisedAccountCreation',
     'userManagement-switchModerateAccountCreation', 'userManagement-switchNotifyAccountCreation', 'userMerge',
     'userPreferences', 'userRegistration', 'userRegistration-active', 'userRegistration-created',
-    'userRegistration-disable', 'userRegistration-UserExist', 'wcalendar', 'wcalendar-select'
+    'userRegistration-disable', 'userRegistration-UserExist', 'userSelection-createExternalUsers', 'wcalendar',
+    'wcalendar-select', 'xmlGateway', 'xmlGateway-getCategoryInfo', 'xmlGateway-getStatsIndico',
+    'xmlGateway-getStatsRoomBooking', 'xmlGateway-loginStatus', 'xmlGateway-signIn', 'xmlGateway-signOut',
+    'xmlGateway-webcastForthcomingEvents', 'xmlGateway-webcastOnAir'
 ])

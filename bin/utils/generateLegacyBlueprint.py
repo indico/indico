@@ -23,6 +23,7 @@ import inspect
 import itertools
 import os
 import re
+import subprocess
 import sys
 import textwrap
 import types
@@ -133,7 +134,7 @@ def generate_list_lines(items, max_length=120, indent=''):
         yield line
 
 
-def main():
+def main(quiet=False):
     keep_inactive = len(sys.argv) > 1 and sys.argv[1] == '--keep-inactive'
     app = make_app()
 
@@ -143,7 +144,7 @@ def main():
                            for rule in iter_blueprint_rules(blueprint))
 
     routes = []
-    prettified_endpoints = set()
+    legacy_endpoints = set()
     for path in sorted(glob.iglob(os.path.join(app.config['INDICO_HTDOCS'], '*.py'))):
         name = os.path.basename(path)
         module_globals = {}
@@ -162,9 +163,10 @@ def main():
                 rule = base_url + '/' + func_name
                 endpoint = '{0}-{1}'.format(re.sub(r'\.py$', '', name), func_name)
             inactive = rule in modernized_rules
+            legacy_endpoints.add(endpoint)
             if inactive:
-                print 'Skipping rule (found in compat blueprint): ' + rule
-                prettified_endpoints.add(endpoint)
+                if not quiet:
+                    print 'Skipping rule (found in compat blueprint): ' + rule
                 if not keep_inactive:
                     continue
             routes.append({
@@ -214,13 +216,21 @@ def main():
         f.write('\n\n')
         f.writelines(line + '\n' for line in generate_routes(routes))
         f.write('\n\n')
-        f.write('# Prettified legacy endpoints that need compatibility routes\n')
-        f.write('prettified_endpoints = set([')
+        f.write('# Legacy endpoints defined in htdocs/*.py files (and need compatibility routes)\n')
+        f.write('legacy_endpoints = set([')
         f.write('\n')
-        f.write('\n'.join(generate_list_lines(sorted(prettified_endpoints, key=str.lower), indent='    ')))
+        f.write('\n'.join(generate_list_lines(sorted(legacy_endpoints, key=str.lower), indent='    ')))
         f.write('\n')
         f.write('])\n')
 
 
 if __name__ == '__main__':
-    main()
+    round_two = len(sys.argv) > 1 and sys.argv[1] == '-2'
+    main(quiet=not round_two)
+    if not round_two:
+        # Running this script twice is necessary because legacy_endpoints in the existing legacy.py
+        # might not be to date the first time this script runs. This is a problem because the compat
+        # blueprints will not contain rules for those endpoints and thus we don't see them as already
+        # handled by a blueprint.
+        print 'Re-running to ensure everything is generated properly'
+        subprocess.call(('ipython', __file__, '--', '-2'))
