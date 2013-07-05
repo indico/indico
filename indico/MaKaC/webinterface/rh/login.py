@@ -135,18 +135,18 @@ class RHSignInSSO(RHSignInBase):
             raise MaKaCError(_("You did not pass the authenticator"))
 
 
-class RHSignOut( base.RH ):
+class RHSignOut(base.RH):
 
     _isMobile = False
 
-    def _checkParams( self, params ):
-        self._returnURL = params.get( "returnURL", str(urlHandlers.UHWelcome.getURL())).strip()
+    def _checkParams(self, params):
+        self._returnURL = params.get("returnURL", str(urlHandlers.UHWelcome.getURL())).strip()
 
-    def _process( self ):
+    def _process(self):
         if self._getUser():
             self._returnURL = AuthenticatorMgr.getInstance().getLogoutCallbackURL(self) or self._returnURL
-            session.clear()
             self._setUser(None)
+        session.clear()
         self._redirect(self._returnURL)
 
 
