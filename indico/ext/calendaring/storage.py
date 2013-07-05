@@ -23,7 +23,7 @@ from MaKaC.user import Avatar
 from MaKaC.common import DBMgr
 from persistent.list import PersistentList
 from MaKaC.conference import Conference
-
+from MaKaC.common.timezoneUtils import nowutc
 
 """
 Here are included some general-purpose storage operations that are used from different parts
@@ -62,15 +62,17 @@ def getAvatarConferenceStorage():
 
 
 def addAvatarConference(avatar, conference, eventType):
-    avatar = getAvatar(avatar)
-    if avatar and isUserPluginEnabled(avatar.getId()):
-        storage = getAvatarConferenceStorage()
-        key = avatar.getId() + "_" + conference.getId()
-        if not storage.get(key):
-            storage[key] = PersistentList()
-        # Remove duplicated events to avoid passing two identical pairs: key + eventType to ExternalOperationsManager
-        storage[key] = PersistentList([event for event in storage[key] if event['eventType'] != eventType])
-        storage[key].append(dict(avatar=avatar, conference=conference, eventType=eventType))
+    if conference.getStartDate() > nowutc():
+        avatar = getAvatar(avatar)
+        if avatar and isUserPluginEnabled(avatar.getId()):
+            storage = getAvatarConferenceStorage()
+            key = avatar.getId() + "_" + conference.getId()
+            if not storage.get(key):
+                storage[key] = PersistentList()
+            # Remove duplicated events to avoid passing two identical pairs:
+            # key + eventType to ExternalOperationsManager
+            storage[key] = PersistentList([event for event in storage[key] if event['eventType'] != eventType])
+            storage[key].append(dict(avatar=avatar, conference=conference, eventType=eventType))
 
 
 def updateConference(obj, status="updated"):
