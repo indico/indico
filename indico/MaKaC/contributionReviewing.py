@@ -786,24 +786,6 @@ class Review(Persistent, Fossilizable):
         l["reviewId"] = self.getId()
         return l
 
-    def isFullyPublic( self ):
-        if hasattr(self, "_fullyPublic"):
-            return self._fullyPublic
-        else:
-            self.setFullyPublic()
-            return self._fullyPublic
-
-    def setFullyPublic( self ):
-        for mat in self.getMaterials():
-            if not mat.isFullyPublic():
-                self._fullyPublic = False
-                return
-        self._fullyPublic = True
-
-    def updateFullyPublic( self ):
-        self.setFullyPublic()
-        self.getOwner().updateFullyPublic()
-
     def isProtected(self):
         return self.getOwner().isProtected()
 
