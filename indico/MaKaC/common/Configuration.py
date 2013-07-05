@@ -631,9 +631,8 @@ class Config:
         else:
             raise AttributeError
 
-
     def _yesOrNoVariable(self, varName):
-        if self._configVars[varName] == 'yes':
+        if self._configVars[varName] in ('yes', True):
             return True
         else:
             return False
@@ -664,9 +663,8 @@ class Config:
         else:
             return val
 
-    def geDisplayLoginPage(self):
+    def getDisplayLoginPage(self):
         return self._yesOrNoVariable('DisplayLoginPage')
-
 
     def getAuthenticatedEnforceSecure(self):
         return self._yesOrNoVariable('AuthenticatedEnforceSecure') and self.getBaseSecureURL()
