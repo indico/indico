@@ -181,6 +181,7 @@ MaxUploadFileSize = 0
 # X-Accel-Redirect (nginx):
 # StaticFileMethod = ('xaccelredirect', {
 #     '/opt/indico/archive': '/.xsf/archive',
+#     '/opt/indico/cache': '/.xsf/cache',
 #     '/opt/indico/htdocs': '/.xsf/htdocs'
 # })
 # Because of the way nginx works (using URLs instead of paths) you also need to map the .xsf urls to
