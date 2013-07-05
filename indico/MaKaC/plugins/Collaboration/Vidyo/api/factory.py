@@ -57,7 +57,7 @@ class SOAPObjectFactory(object):
         return newRoom
 
     @classmethod
-    def createFilter(cls, apiType, query):
+    def createFilter(cls, apiType, query, entityType=None):
         if apiType == 'admin':
             vidyoClient = AdminClient.getInstance()
         else:
@@ -66,5 +66,7 @@ class SOAPObjectFactory(object):
         newFilter = vidyoClient.factory.create('Filter')
         newFilter.query = query
         newFilter.dir = 'DESC'
+        if entityType:
+            newFilter.EntityType = entityType
 
         return newFilter

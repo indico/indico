@@ -39,7 +39,7 @@ class VidyoOperations(object):
         # we retrieve the just created room; we need to do this because Vidyo will have
         # added extra data like the room id, the url
         searchFilter = SOAPObjectFactory.createFilter('admin', roomName)
-        answer = AdminApi.getRooms(searchFilter, None, None)
+        answer = AdminApi.getRooms(searchFilter)
         createdRooms = answer.room
 
         for room in createdRooms:
@@ -97,7 +97,7 @@ class VidyoOperations(object):
 
             newRoom = SOAPObjectFactory.createRoom(roomNameForVidyo, description, possibleLogins[loginToUse], extension, pin, moderatorPin)
             try:
-                AdminApi.addRoom(newRoom, confId, bookingId)
+                AdminApi.addRoom(newRoom)
                 roomCreated = True
 
             except WebFault, e:
@@ -127,7 +127,7 @@ class VidyoOperations(object):
         # we retrieve the just created room; we need to do this because Vidyo will have
         # added extra data like the room id, the url
         searchFilter = SOAPObjectFactory.createFilter('admin', extension)
-        answer = AdminApi.getRooms(searchFilter, confId, bookingId)
+        answer = AdminApi.getRooms(searchFilter)
         createdRooms = answer.room
 
         for room in createdRooms:
@@ -143,7 +143,7 @@ class VidyoOperations(object):
             return VidyoError("userHasNoAccounts", "attach")
         roomName = booking.getBookingParamByName("roomName")
         searchFilter = SOAPObjectFactory.createFilter('admin', roomName)
-        answer = AdminApi.getRooms(searchFilter, booking.getConference().getId(), booking.getId())
+        answer = AdminApi.getRooms(searchFilter)
         createdRooms = answer.room
 
         for room in createdRooms:
@@ -202,7 +202,7 @@ class VidyoOperations(object):
 
             newRoom = SOAPObjectFactory.createRoom(roomNameForVidyo, description, ownerAccountName, booking.getExtension(), pin, moderatorPin)
             try:
-                AdminApi.updateRoom(roomId, newRoom, confId, bookingId)
+                AdminApi.updateRoom(roomId, newRoom)
                 roomModified = True
 
             except WebFault, e:
@@ -234,7 +234,7 @@ class VidyoOperations(object):
         # we retrieve the just created room; we need to do this because Vidyo will have
         # added extra data like the room id, the url
         try:
-            modifiedRoom = AdminApi.getRoom(roomId, confId, bookingId)
+            modifiedRoom = AdminApi.getRoom(roomId)
         except WebFault, e:
             faultString = e.fault.faultstring
             if faultString.startswith('Room not found for roomID'):
@@ -254,7 +254,7 @@ class VidyoOperations(object):
         autoMute = booking.getBookingParamByName("autoMute")
 
         try:
-            AdminApi.setAutomute(roomId, autoMute, confId, bookingId)
+            AdminApi.setAutomute(roomId, autoMute)
         except WebFault, e:
             faultString = e.fault.faultstring
             if faultString.startswith('Room not found for roomID'):
@@ -270,7 +270,7 @@ class VidyoOperations(object):
         roomId = booking.getRoomId()
 
         try:
-            return AdminApi.getAutomute(roomId, confId, bookingId)
+            return AdminApi.getAutomute(roomId)
         except WebFault, e:
             faultString = e.fault.faultstring
             if faultString.startswith('Room not found for roomID'):
@@ -286,7 +286,7 @@ class VidyoOperations(object):
         moderatorPIN = booking.getModeratorPin()
 
         try:
-            AdminApi.setModeratorPIN(roomId, moderatorPIN, confId, bookingId)
+            AdminApi.setModeratorPIN(roomId, moderatorPIN)
         except WebFault, e:
             faultString = e.fault.faultstring
             if faultString.startswith('Room not found for roomID'):
@@ -310,7 +310,7 @@ class VidyoOperations(object):
         roomId = booking.getRoomId()
 
         try:
-            adminApiRoom = AdminApi.getRoom(roomId, confId, bookingId)
+            adminApiRoom = AdminApi.getRoom(roomId)
         except WebFault, e:
             faultString = e.fault.faultstring
             if faultString.startswith('Room not found for roomID'):
@@ -328,7 +328,7 @@ class VidyoOperations(object):
         bookingId = booking.getId()
 
         try:
-            AdminApi.deleteRoom(roomId, confId, bookingId)
+            AdminApi.deleteRoom(roomId)
         except WebFault, e:
             faultString = e.fault.faultstring
             if faultString.startswith('Room not found for roomID'):
@@ -344,11 +344,11 @@ class VidyoOperations(object):
         bookingId = booking.getId()
         try:
             searchFilter = SOAPObjectFactory.createFilter('user', query)
-            userApiAnswer = UserApi.search(searchFilter, confId, bookingId)
+            userApiAnswer = UserApi.search(searchFilter)
             if userApiAnswer.total == 0:
                 return VidyoError("noExistsRoom", "connect", _("The conference room is not registered in the vidyo service. ") + VidyoTools.getContactSupportText())
             legacyMember = userApiAnswer.Entity[0].entityID
-            AdminApi.connectRoom(roomId, confId, bookingId, legacyMember)
+            AdminApi.connectRoom(roomId, legacyMember)
         except WebFault, e:
             faultString = e.fault.faultstring
             if faultString.startswith('ConferenceID is invalid'):
@@ -407,3 +407,18 @@ class VidyoOperations(object):
             return result
         except Exception:
             return VidyoError("roomCheckFailed", "roomConnected", _("There was a problem obtaining the room status. ") + VidyoTools.getContactSupportText())
+
+    @classmethod
+    def searchRooms(cls, query):
+        try:
+            userRooms = []
+            searchFilter = SOAPObjectFactory.createFilter('admin', "%%%s%%" % VidyoTools.replaceSpacesInName(query))
+            rooms = AdminApi.getRooms(searchFilter)
+            if rooms.total > 0:
+                userRooms = [room for room in rooms.room if room.RoomType == "Public"]
+            return userRooms
+
+        except WebFault, e:
+            Logger.get('Vidyo').exception("""Admin API's searchRooms operation got WebFault: %s"""
+                                          % e.fault.faultstring)
+            raise

@@ -42,18 +42,10 @@ class ApiBase(object):
         else:
             raise
 
-
-class AdminApi(ApiBase):
-    """ This class performs low-level operations by getting the corresponding
-        client and calling a SOAP service.
-        We write info statements to the log with the details of what we are doing.
-        Each class method performs a single service call to Vidyo.
-    """
-
     @classmethod
     def _api_operation(cls, service, *params, **kwargs):
         try:
-            vidyoClient = AdminClient.getInstance()
+            vidyoClient = cls.getVidyoClient()
         except Exception, e:
             raise VidyoConnectionException(e)
         try:
@@ -63,49 +55,61 @@ class AdminApi(ApiBase):
         except Exception, e:
             cls._handleServiceCallException(e)
 
+
+class AdminApi(ApiBase):
+    """ This class performs low-level operations by getting the corresponding
+        client and calling a SOAP service.
+        We write info statements to the log with the details of what we are doing.
+        Each class method performs a single service call to Vidyo.
+    """
+
     @classmethod
-    def addRoom(cls, newRoom, confId, bookingId):
+    def getVidyoClient(cls):
+        return AdminClient.getInstance()
+
+    @classmethod
+    def addRoom(cls, newRoom):
         return cls._api_operation('addRoom', newRoom)
 
     @classmethod
-    def updateRoom(cls, roomId, updatedRoom, confId, bookingId):
+    def updateRoom(cls, roomId, updatedRoom):
         return cls._api_operation('updateRoom', roomId, updatedRoom)
 
     @classmethod
-    def getRooms(cls, searchFilter, confId, bookingId):
+    def getRooms(cls, searchFilter):
         return cls._api_operation('getRooms', searchFilter)
 
     @classmethod
-    def getRoom(cls, roomId, confId, bookingId):
+    def getRoom(cls, roomId):
         return cls._api_operation('getRoom', roomId)
 
     @classmethod
-    def deleteRoom(cls, roomId, confId, bookingId):
+    def deleteRoom(cls, roomId):
         return cls._api_operation('deleteRoom', roomId)
 
     @classmethod
-    def setAutomute(cls, roomId, enabled, confId, bookingId):
+    def setAutomute(cls, roomId, enabled):
         if enabled:
             return cls._api_operation('setRoomProfile', roomId, AUTOMUTE_API_PROFILE)
         else:
             return cls._api_operation('removeRoomProfile', roomId)
 
     @classmethod
-    def getAutomute(cls, roomId, confId, bookingId):
+    def getAutomute(cls, roomId):
         answer = cls._api_operation('getRoomProfile', roomId)
         if answer is None or answer == "":
             return False
         return answer.roomProfileName == AUTOMUTE_API_PROFILE
 
     @classmethod
-    def setModeratorPIN(cls, roomId, moderatorPIN, confId, bookingId):
+    def setModeratorPIN(cls, roomId, moderatorPIN):
         if moderatorPIN:
             return cls._api_operation('createModeratorPIN', roomId, moderatorPIN)
         else:
             return cls._api_operation('removeModeratorPIN', roomId)
 
     @classmethod
-    def connectRoom(cls, roomId, confId, bookingId, legacyMember):
+    def connectRoom(cls, roomId, legacyMember):
         return cls._api_operation('inviteToConference', roomId, entityID=legacyMember)
 
 
@@ -115,28 +119,10 @@ class UserApi(ApiBase):
         We write info statements to the log with the details of what we are doing.
     """
 
+    @classmethod
+    def getVidyoClient(cls):
+        return UserClient.getInstance()
 
     @classmethod
-    def search(cls, searchFilter, confId, bookingId):
-        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, opening connection to Vidyo Admin API""" % (confId, bookingId))
-        try:
-            vidyoClient = UserClient.getInstance()
-        except Exception, e:
-            raise VidyoConnectionException(e)
-
-        #Logger.get('Vidyo').info("""Evt:%s, booking:%s, calling User API's search operation with filter: %s""" %
-        #                                 (confId, bookingId, str(searchFilter)))
-        try:
-            answer = vidyoClient.service.search(searchFilter)
-        #    Logger.get('Vidyo').info("""Evt:%s, booking:%s, User API's search operation got answer: %s""" %
-        #                                     (confId, bookingId, str(answer)))
-
-            return answer
-
-        except WebFault, e:
-            Logger.get('Vidyo').exception("""Evt:%s, booking:%s, User API's search operation operation got WebFault: %s""" %
-                                    (confId, bookingId, e.fault.faultstring))
-            raise
-
-        except Exception, e:
-            cls._handleServiceCallException(e)
+    def search(cls, searchFilter):
+        return cls._api_operation('search', searchFilter)
