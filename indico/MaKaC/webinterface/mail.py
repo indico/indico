@@ -280,13 +280,11 @@ class sendLoginInfo:
             else:
                 tag = id.getAuthenticatorTag()
                 login = id.getLogin()
-                token = str(uuid.uuid4())
                 data = {'tag': tag, 'login': login}
-                while True:
-                    if self._token_storage.get(token):
-                        continue
-                    self._token_storage.set(token, data, 6*3600)
-                    break
+                token = str(uuid.uuid4())
+                while self._token_storage.get(token):
+                    token = str(uuid.uuid4())
+                self._token_storage.set(token, data, 6*3600)
                 url = str(self._uh.getURL(self._event, token=token))
                 logins.append((tag, login, url, None))
         if not logins:
