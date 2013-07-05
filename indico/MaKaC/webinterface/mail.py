@@ -276,7 +276,11 @@ class sendLoginInfo:
             if not hasattr(id, 'setPassword'):
                 msg = _("Sorry, you are using your CERN credentials (%s) to login into Indico.\n") % id.getLogin()
                 msg += _("Please contact CERN helpdesk in case you do not remember your password (helpdesk@cern.ch).")
-                logins.append((id.getAuthenticatorTag(), id.getLogin(), None, msg))
+                logins.append({
+                    'tag': id.getAuthenticatorTag(),
+                    'login': id.getLogin(),
+                    'error': msg
+                })
             else:
                 tag = id.getAuthenticatorTag()
                 login = id.getLogin()
@@ -286,19 +290,24 @@ class sendLoginInfo:
                     token = str(uuid.uuid4())
                 self._token_storage.set(token, data, 6*3600)
                 url = str(self._uh.getURL(self._event, token=token))
-                logins.append((tag, login, url, None))
+                logins.append({
+                    'tag': tag,
+                    'login': login,
+                    'link': url
+                })
         if not logins:
             url = urlHandlers.UHUserDetails.getURL(self._user)
             text = _("Sorry, we did not find your login.\nPlease, create one here:\n%s") % url
         else:
             text = _("You can use the following links within the next six hours to reset your password.")
-            for l in logins:
+            for entry in logins:
                 text += "\n\n==================\n"
-                if l[2]:
-                    text += _("Click below to reset your password for the login %s (%s)\n") % (l[1], l[0])
-                    text += l[2]
+                if 'link' in entry:
+                    text += _("Click below to reset your password for the %s login '%s':\n") % (entry['tag'],
+                                                                                                entry['login'])
+                    text += entry['link']
                 else:
-                    text += l[3]
+                    text += entry['error']
                 text += "\n==================\n"
         maildata = {
             "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
