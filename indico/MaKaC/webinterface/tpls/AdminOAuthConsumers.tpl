@@ -1,5 +1,5 @@
 <div id="inPlaceAddConsumer" style="margin-bottom: 1em;"></div>
-<ol class="ordered-list consumer-list" style="border-top: 1px solid #DDDDDD">
+<ol class="ordered-list consumer-list" style="border-top: 1px solid #DDDDDD; margin-left: 0.25em">
     % for consumer in consumers:
     <li>
         <div class="list-item-title">

@@ -1748,6 +1748,7 @@ type("AddItemWidget", [],
                 var toolBar = $("<div class='toolbar'/>");
                 var container = $("<div class='toolbar'/>");
                 var addButton = $("<div class='i-button left'/>").text("Add consumer");
+                var addButtonContainer = $("<div class='left group'/>");
                 var addContainer = $("<div class='left group' style='display:none'/>");
                 var saveButton = $("<div class='i-button accept'/>").text("Add");
                 var cancelButton = $("<div class='i-button'/>").text("Cancel");
@@ -1756,12 +1757,12 @@ type("AddItemWidget", [],
 
                 addButton.click(function(){
                     addContainer.show();
-                    addButton.hide();
+                    addButtonContainer.hide();
                 });
                 cancelButton.click(function(){
                     input.val("");
                     addContainer.hide();
-                    addButton.show();
+                    addButtonContainer.show();
                 });
                 saveButton.click(function(){
                     var params = {};
@@ -1778,15 +1779,16 @@ type("AddItemWidget", [],
                                     self.addHandler(result);
                                     input.val("");
                                     addContainer.hide();
-                                    addButton.show();
+                                    addButtonContainer.show();
                                 }
                             });
                     });
+                addButtonContainer.append(addButton);
                 inputContainer.append(input);
                 addContainer.append(inputContainer);
                 addContainer.append(saveButton);
                 addContainer.append(cancelButton);
-                container.append(addButton);
+                container.append(addButtonContainer);
                 container.append(addContainer);
                 return container;
             }
