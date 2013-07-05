@@ -217,14 +217,11 @@ class ResponseUtil(object):
 
     @redirect.setter
     def redirect(self, value):
-        if value is None:
-            pass
-        elif isinstance(value, tuple) and len(value) == 2:
-            pass
-        else:
+        if isinstance(value, tuple) and len(value) == 2:
+            if isinstance(value[0], str):
+                value = (value[0].decode('utf-8'), value[1])
+        elif value is not None:
             raise ValueError('redirect must be None or a 2-tuple containing URL and status code')
-        if isinstance(value[0], str):
-            value = (value[0].decode('utf-8'), value[1])
         self._redirect = value
 
     def make_empty(self):
