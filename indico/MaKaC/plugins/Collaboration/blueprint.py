@@ -30,7 +30,7 @@ blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/', 'elecA
                        rh_as_view(handlers.RHElectronicAgreement))
 blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/upload', 'uploadElecAgree',
                        rh_as_view(handlers.RHUploadElectronicAgreement), methods=('POST',))
-blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/download', 'getPaperAgree',
+blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/download/<spkId>', 'getPaperAgree',
                        rh_as_view(handlers.RHElectronicAgreementGetFile))
 blueprint.add_url_rule('/event/<confId>/collaboration/agreement', 'elecAgreeForm',
                        rh_as_view(handlers.RHElectronicAgreementForm))
