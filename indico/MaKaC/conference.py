@@ -11035,12 +11035,15 @@ class Material(CommonObjectBase):
 
     def canKeyAccess(self, aw):
         key = session.get('accessKeys', {}).get(self.getUniqueId())
-        if not key:
-            return False
-        elif self.getAccessKey():
+        if self.getAccessKey():
+            # Material has an access key => require this key
+            if not key:
+                return False
             return self.__ac.canKeyAccess(key)
         elif self.getConference():
-            return self.getConference().canKeyAccess(aw, key)
+            # If it has no key we check the conference's key
+            conf_key = session.get('accessKeys', {}).get(self.getConference().getUniqueId())
+            return self.getConference().canKeyAccess(aw, conf_key)
         return False
 
     def grantModification( self, prin ):
