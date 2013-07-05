@@ -20,7 +20,6 @@ from flask import request
 
 import time
 from urllib import urlencode
-import urllib2
 import oauth2 as oauth
 
 from indico.core.index import Catalog
@@ -33,7 +32,6 @@ from MaKaC.webinterface.rh import base
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.urlHandlers import UHOAuthThirdPartyAuth
 from MaKaC.errors import AccessControlError, MaKaCError
-from MaKaC.common.Configuration import Config
 from MaKaC.webinterface.rh.services import RHServicesBase
 from MaKaC.webinterface.rh.users import RHUserBase
 from MaKaC.webinterface.pages.oauth import WPAdminOAuthConsumers, WPAdminOAuthAuthorized, WPOAuthThirdPartyAuth, WPOAuthUserThirdPartyAuth
@@ -44,6 +42,7 @@ class RHOAuth(base.RH):
     def _checkParams(self, params):
         self._oauth_request = oauth.Request.from_request(request.method, request.base_url, headers=request.headers,
                                                          parameters=params)
+
 
 class RHOAuthRequestToken(RHOAuth):
 
@@ -95,7 +94,7 @@ class RHOAuthAuthorization(RHOAuth, base.RHProtected):
         TempRequestTokenHolder().remove(self._request_token)
         self._request_token.setUser(user)
         if old_request_token is not None:
-            self._request_token.setAuthorized(True)
+            self._request_token.setAuthorized(old_request_token.isAuthorized())
             RequestTokenHolder().update(old_request_token, self._request_token)
         else:
             RequestTokenHolder().add(self._request_token)
@@ -118,6 +117,7 @@ class RHOAuthAuthorization(RHOAuth, base.RHProtected):
                 if token.getConsumer().getName() == consumer:
                     return token
         return None
+
 
 class RHOAuthAuthorizeConsumer(RHOAuth, base.RHProtected):
 

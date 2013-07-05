@@ -122,6 +122,6 @@ class WOAuthUserThirdPartyAuth(WTemplated):
         vars = WTemplated.getVars( self )
         vars['user'] = self._avatar
         vars['currentUser'] = self._rh._getUser()
-        vars["tokens"] = Catalog.getIdx('user_oauth_request_token').get(self._avatar.getId(), [])
+        vars["tokens"] = Catalog.getIdx('user_oauth_access_token').get(self._avatar.getId(), [])
         vars["formatTimestamp"] = lambda ts: format_datetime(utctimestamp2date(ts), format='d/M/yyyy H:mm')
         return vars
