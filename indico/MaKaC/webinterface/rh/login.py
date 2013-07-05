@@ -106,14 +106,13 @@ class RHSignIn( RHSignInBase ):
     def _process(self):
         return self._makeLoginProcess()
 
+
 class RHSignInSSO(RHSignInBase):
 
     _isMobile = False
 
-    def _checkParams( self, params ):
-        self._authId = params.get( "authId", "").strip()
-        if self._authId == "":
-            raise FormValuesError(_("You must choose the authenticator to sign in with"))
+    def _checkParams(self, params):
+        self._authId = params.get('authId', '').strip()
 
     def _process(self):
         authenticator = session.pop('Authenticator', None)
