@@ -121,15 +121,13 @@ class RHSignInSSO(RHSignInBase):
             self._redirect(str(urlHandlers.UHSignInSSOExecute.getURL(authId=self._authId)))
         elif authenticator is not None:
             authManager = AuthenticatorMgr.getInstance()
-            if authManager.isSSOLoginActive():
-                av = authManager.SSOLogin(self, authenticator)
-                if av:
-                    self._setSessionVars(av)
-                    self._redirect(self._url)
-                else:
-                    raise MaKaCError(_("You could not login through SSO."))
-            else:
+            if not authManager.isSSOLoginActive():
                 raise MaKaCError(_("SSO Login is not active."))
+            av = authManager.SSOLogin(self, authenticator)
+            if not av:
+                raise MaKaCError(_("You could not login through SSO."))
+            self._setSessionVars(av)
+            self._redirect(self._url)
         else:
             raise MaKaCError(_("You did not pass the authenticator"))
 
