@@ -56,8 +56,8 @@ function updateTimeSlider(event, ui) {
     if (sTime && eTime || sTime == 0) {
         $('#timeRange').slider('values', 0, sTime).slider('values', 1, eTime);
     }
-    $('#sTimeBubble').text($("#sTime").val()).css({'left':$('#timeRange .ui-slider-handle:first').offset().left});
-    $('#eTimeBubble').text($("#eTime").val()).css({'left':$('#timeRange .ui-slider-handle:last').offset().left});
+    $('#sTimeBubble').text($("#sTime").val()).offset({left:$('#timeRange .ui-slider-handle:first').offset().left});
+    $('#eTimeBubble').text($("#eTime").val()).offset({left:$('#timeRange .ui-slider-handle:last').offset().left});
 }
 
 //Refresh datapicker's dates
