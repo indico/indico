@@ -92,7 +92,7 @@ class AccessController( Persistent, Observable ):
         self.owner = owner
 
     def unlinkAvatars(self, role):
-        for prin in itertools.chain(self.submitters, self.managers, self.allowed):
+        for prin in itertools.chain(self.getSubmitterList(), self.managers, self.allowed):
             if isinstance(prin, MaKaC.user.Avatar):
                 prin.unlinkTo(self.owner, role)
 
