@@ -39,6 +39,8 @@ from MaKaC.fossils.schedule import IContribSchEntryDisplayFossil,\
         ILinkedTimeSchEntryDisplayFossil, ILinkedTimeSchEntryMgmtFossil
 from MaKaC.common.cache import GenericCache
 from MaKaC.errors import NoReportError
+from indico.util.decorators import classproperty
+
 
 class Schedule:
     """base schedule class. Do NOT instantiate
@@ -1458,7 +1460,7 @@ class ContribSchEntry(LinkedTimeSchEntry):
         return self.getOwner().getOwnLocation()
 
 
-class ScheduleToJson:
+class ScheduleToJson(object):
 
     _cacheEntries = GenericCache("ConfTTEntries")
     _cache = GenericCache("ConfTT")
@@ -1467,6 +1469,11 @@ class ScheduleToJson:
     def get_versioned_key(cache, key, timezone):
         num = int(cache.get('_version-%s' % key, 0))
         return '%s.%d.%s' % (key, num, timezone)
+
+    @classproperty
+    @classmethod
+    def use_cache(cls):
+        return not ContextManager.get('offlineMode', False)
 
     @staticmethod
     def bump_cache_version(cache, key):
@@ -1483,11 +1490,12 @@ class ScheduleToJson:
         else:
             cache_key = cls.get_versioned_key(cls._cacheEntries, entry.getUniqueId(), tz)
 
-            result = cls._cacheEntries.get(cache_key)
+            result = cls._cacheEntries.get(cache_key) if cls.use_cache else None
 
             if result is None:
                 result = entry.fossilize(interfaceArg = fossilInterface, useAttrCache = useAttrCache, tz = tz, convert=True)
-                cls._cacheEntries.set(cache_key, result, timedelta(minutes=5))
+                if cls.use_cache:
+                    cls._cacheEntries.set(cache_key, result, timedelta(minutes=5))
 
         return result
 
@@ -1579,7 +1587,7 @@ class ScheduleToJson:
     def process(cls, schedule, tz, aw, days=None, mgmtMode=False, useAttrCache=False, hideWeekends=False):
         scheduleDict = {}
 
-        if not days and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
+        if cls.use_cache and not days and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
             scheduleDict = cls._cache.get(cls.get_versioned_key(cls._cache, schedule.getOwner().getUniqueId(), tz))
 
         if not scheduleDict:
@@ -1604,7 +1612,7 @@ class ScheduleToJson:
                     if day in dates:
                         genId, resultData = ScheduleToJson.processEntry(obj, tz, aw, mgmtMode, useAttrCache)
                         scheduleDict[day][genId] = resultData
-            if fullTT and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
+            if cls.use_cache and fullTT and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
                 cls._cache.set(cls.get_versioned_key(cls._cache, schedule.getOwner().getUniqueId(), tz), scheduleDict,
                                timedelta(minutes=5))
 
