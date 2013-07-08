@@ -3732,6 +3732,10 @@ class UHContact(URLHandler):
 class UHJSVars(URLHandler):
     _endpoint = 'misc.JSContent-getVars'
 
+    @classmethod
+    def getStaticURL(cls, target=None, **params):
+        return 'static/js/vars.js'
+
 
 class UHHelper(object):
     """ Returns the display or modif UH for an object of a given class

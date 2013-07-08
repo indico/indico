@@ -19,6 +19,12 @@
         ${analyticsCode}
 % endif
 
+% if baseUrl == 'static':
+        <script type="text/javascript">
+        window.indicoOfflineSite = true;
+        </script>
+% endif
+
         <script type="text/javascript">
                 var TextRoot = "${ baseUrl }/js/indico/i18n/";
                 var ScriptRoot = "${ baseUrl }/js/";

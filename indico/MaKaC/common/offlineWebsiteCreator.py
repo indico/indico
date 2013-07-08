@@ -83,7 +83,11 @@ class OfflineEventCreator(object):
         self._staticPath = os.path.join(self._mainPath, "static")
         self._fileHandler.addDir(self._staticPath)
         # Download all the icons
-        self._addFolderFromSrc(os.path.join(self._staticPath, "fonts"), os.path.join(config.getHtdocsDir(), 'fonts'))
+        self._addFolderFromSrc(os.path.join(self._mainPath, 'sass', 'static', "fonts"),
+                               os.path.join(config.getHtdocsDir(), 'static', 'fonts'))
+        # Add i18n js
+        self._addFolderFromSrc(os.path.join(self._staticPath, 'js', 'indico', 'i18n'),
+                               os.path.join(config.getHtdocsDir(), 'js', 'indico', 'i18n'))
 
         # Getting all materials, static files (css, images, js and vars.js.tpl)
         self._getAllMaterial()
@@ -108,15 +112,13 @@ class OfflineEventCreator(object):
         # Download all images
         self._downloadFiles(html, config.getImagesBaseURL(), config.getImagesDir(), "images")
         # Download all CSS files
-        self._downloadFiles(html, config.getCssBaseURL(), config.getCssDir(), "css")
+        self._downloadFiles(html, 'css', config.getCssDir(), "css")
         # Download all JS files
         self._downloadFiles(html, "js", config.getJSDir(), "js")
         # Download all files generated from SASS and static js libs
-        self._downloadFiles(html, 'static/static', os.path.join(config.getHtdocsDir(), 'static'), "static")
+        self._downloadFiles(html, 'static/assets', os.path.join(config.getHtdocsDir(), 'static', 'assets'), 'assets')
         # Download vars.js.tpl
         self._addVarsJSTpl()
-        # Replace the html link
-        html = html.replace("static/JSContent.py/getVars", "static/js/vars.js")
         return html
 
     def _create_home(self):
@@ -163,12 +165,12 @@ class OfflineEventCreator(object):
         """
         dstPath = os.path.join(self._staticPath, dstNamePath)
         self._fileHandler.addDir(dstPath)
-        files = re.findall(r'%s/(.+?\..+?)[?|"]' % (baseURL), html)
+        files = re.findall(r'%s/(.+?\..+?)[?|"]' % baseURL, html)
         for filename in files:
             srcFile = os.path.join(srcPath, filename)
             dstFile = os.path.join(dstPath, filename)
             # If a CSS File, download the images
-            if (dstNamePath == "css"):
+            if filename.endswith('.css'):
                 self._addImagesFromCss(srcFile)
             self._addFileFromSrc(dstFile, srcFile)
 

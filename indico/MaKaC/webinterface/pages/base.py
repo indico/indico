@@ -20,6 +20,7 @@ from flask import request, session
 
 from urlparse import urlparse
 from webassets import Environment
+from webassets.version import Version
 from indico.web import assets
 
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -33,6 +34,11 @@ import os
 
 from MaKaC.plugins.base import OldObservable
 from MaKaC.common.db import DBMgr
+
+
+class _StaticVersion(Version):
+    def determine_version(self, bundle, hunk=None, env=None):
+        return 'static'
 
 
 class WPBase(OldObservable):
@@ -50,15 +56,29 @@ class WPBase(OldObservable):
         self._rh = rh
         self._locTZ = ""
 
-        url_path = urlparse(config.getBaseURL()).path
+        if ContextManager.get('offlineMode', False):
+            tmp = ContextManager.get('offlineModeTemp')
+            cache = os.path.join(tmp, '.webassets-cache')
+            if not os.path.exists(cache):
+                os.makedirs(cache)
+            self._asset_env = Environment(os.path.join(config.getHtdocsDir(), 'static', 'assets'), 'static/assets/',
+                                          cache=cache, versions=_StaticVersion())
+            self._asset_env.config['PYSCSS_LOAD_PATHS'] = [os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass')]
 
-        self._asset_env = Environment(os.path.join(config.getHtdocsDir(), 'static', 'assets'),
-                                      '{0}/static/assets/'.format(url_path))
-        self._asset_env.config['PYSCSS_LOAD_PATHS'] = [os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass')]
+            self._asset_env.append_path(config.getHtdocsDir(), '/')
+            self._asset_env.append_path(os.path.join(config.getHtdocsDir(), 'css'), 'static/css')
+            self._asset_env.append_path(os.path.join(config.getHtdocsDir(), 'js'), 'static/js')
+        else:
+            url_path = urlparse(config.getBaseURL()).path
 
-        self._asset_env.append_path(config.getHtdocsDir(), '/')
-        self._asset_env.append_path(os.path.join(config.getHtdocsDir(), 'css'), '{0}/css'.format(url_path))
-        self._asset_env.append_path(os.path.join(config.getHtdocsDir(), 'js'), '{0}/js'.format(url_path))
+            self._asset_env = Environment(os.path.join(config.getHtdocsDir(), 'static', 'assets'),
+                                          '{0}/static/assets/'.format(url_path))
+            self._asset_env.config['PYSCSS_LOAD_PATHS'] = [
+                os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass')]
+
+            self._asset_env.append_path(config.getHtdocsDir(), '/')
+            self._asset_env.append_path(os.path.join(config.getHtdocsDir(), 'css'), '{0}/css'.format(url_path))
+            self._asset_env.append_path(os.path.join(config.getHtdocsDir(), 'js'), '{0}/js'.format(url_path))
 
         if db_connected:
             debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()

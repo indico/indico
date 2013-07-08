@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import os
+import tempfile
 from MaKaC.common import DBMgr
 from MaKaC.common import Config
 from MaKaC.common.mail import GenericMailer
@@ -32,6 +34,18 @@ from MaKaC.common.offlineWebsiteCreator import OfflineEvent
 from indico.util.i18n import setLocale
 from MaKaC.accessControl import AccessWrapper
 from indico.util import fossilize
+
+
+def _delete_recursively(target):
+    if os.path.isdir(target):
+        for path, dirs, files in os.walk(target, topdown=False):
+            for name in files:
+                os.remove(os.path.join(path, name))
+            for name in dirs:
+                os.rmdir(os.path.join(path, name))
+        os.rmdir(target)
+    elif os.path.exists(target):
+        os.remove(target)
 
 
 class OfflineEventGeneratorTask(OneShotTask):
@@ -57,6 +71,7 @@ class OfflineEventGeneratorTask(OneShotTask):
 
         ContextManager.set('currentRH', self._rh)
         ContextManager.set('offlineMode', True)
+        ContextManager.set('offlineModeTemp', tempfile.mkdtemp())
 
         # Get event type
         wf = self._rh.getWebFactory()
@@ -68,10 +83,13 @@ class OfflineEventGeneratorTask(OneShotTask):
         try:
             websiteZipFile = OfflineEvent(self._rh, self._rh._conf, eventType).create()
         except Exception, e:
+            raise  # XXX remove it
             Logger.get('OfflineEventGeneratorTask').exception("Generation of the offline website for task %s failed \
                 with message error: %s" % (self._task.id, e))
             self._task.status = "Failed"
             return
+        finally:
+            _delete_recursively(ContextManager.get('offlineModeTemp'))
 
         self._task.creationTime = nowutc()
         if not websiteZipFile:

@@ -16,8 +16,10 @@
  */
 
 
-include(ScriptRoot + "ckeditor/add_url.patch.js");
-include(ScriptRoot + "ckeditor/ckeditor.js");
+if(!window.indicoOfflineSite) {
+    include(ScriptRoot + "ckeditor/add_url.patch.js");
+    include(ScriptRoot + "ckeditor/ckeditor.js");
+}
 
 var indicoSource = null;
 var indicoRequest = null;
