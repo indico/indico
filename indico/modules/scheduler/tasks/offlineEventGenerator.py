@@ -41,6 +41,13 @@ class OfflineEventGeneratorTask(OneShotTask):
         self._task = task
 
     def run(self):
+        from indico.web.flask.app import make_app
+
+        app = make_app()
+        with app.test_request_context():
+            self._run()
+
+    def _run(self):
         Logger.get('OfflineEventGeneratorTask').info("Started generation of the offline website for task: %s" %
                                                      self._task.id)
         setLocale(self._task.avatar.getLang())
@@ -77,6 +84,7 @@ class OfflineEventGeneratorTask(OneShotTask):
 
         Logger.get('OfflineEventGeneratorTask').info("Finished generation of the offline website for task %s" %
                                                      self._task.id)
+        ContextManager.set('offlineMode', False)
         notification = OfflineEventGeneratedNotification(self._task)
         GenericMailer.sendAndLog(notification, self._task.conference, "OfflineEventGenerator")
 
