@@ -43,10 +43,10 @@ from indico.util.contextManager import ContextManager
 BYTES_1MB = 1024 * 1024
 
 
-class RHCustomizable( RH ):
+class RHCustomizable(RH):
 
-    def __init__( self, req ):
-        RH.__init__( self, req )
+    def __init__(self, req=None):
+        RH.__init__(self)
         self._wf = ""
 
     def getWebFactory( self ):

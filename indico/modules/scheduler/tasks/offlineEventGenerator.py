@@ -34,22 +34,6 @@ from MaKaC.accessControl import AccessWrapper
 from indico.util import fossilize
 
 
-class FakeRequest():
-
-    def __init__(self):
-        self.headers_in = {}
-        self.unparsed_uri = ""
-        self.remote_ip = "127.0.0.1"
-
-    def get_remote_ip(self):
-        return "127.0.0.1"
-
-    def is_https(self):
-        return False
-
-    def construct_url(self, uri):
-        return ""
-
 class OfflineEventGeneratorTask(OneShotTask):
 
     def __init__(self, task):
@@ -60,7 +44,7 @@ class OfflineEventGeneratorTask(OneShotTask):
         Logger.get('OfflineEventGeneratorTask').info("Started generation of the offline website for task: %s" %
                                                      self._task.id)
         setLocale(self._task.avatar.getLang())
-        self._rh = RHCustomizable(FakeRequest())
+        self._rh = RHCustomizable()
         self._aw = self._rh._aw = AccessWrapper()
         self._rh._conf = self._rh._target = self._task.conference
 
