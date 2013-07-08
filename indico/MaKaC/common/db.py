@@ -207,8 +207,10 @@ class DBMgr:
             yield
         else:
             self.startRequest()
-            yield
-            self.endRequest(commit)
+            try:
+                yield
+            finally:
+                self.endRequest(commit)
 
     # ZODB version check
     try:
