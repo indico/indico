@@ -20,24 +20,11 @@
 from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
-import MaKaC.webinterface.rh.conferenceModif as mod_rh_conferenceModif
 import MaKaC.webinterface.rh.users as mod_rh_users
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
 
 
 legacy = IndicoBlueprint('legacy', __name__)
-
-
-# Routes for confModifTools.py
-legacy.add_url_rule('/confModifTools.py/dvdCreation',
-                    'confModifTools-dvdCreation',
-                    rh_as_view(mod_rh_conferenceModif.RHConfDVDCreation),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/confModifTools.py/dvdDone',
-                    'confModifTools-dvdDone',
-                    rh_as_view(mod_rh_conferenceModif.RHConfDVDDone),
-                    methods=('GET', 'POST'))
 
 
 # Routes for userSelection.py
@@ -234,8 +221,8 @@ legacy_endpoints = set([
     'confModifTools-addAlarm', 'confModifTools-allSessionsConveners', 'confModifTools-allSessionsConvenersAction',
     'confModifTools-badgeDesign', 'confModifTools-badgeGetBackground', 'confModifTools-badgePrinting',
     'confModifTools-badgePrintingPDF', 'confModifTools-badgeSaveBackground', 'confModifTools-clone',
-    'confModifTools-delete', 'confModifTools-deleteAlarm', 'confModifTools-displayAlarm', 'confModifTools-dvdCreation',
-    'confModifTools-dvdDone', 'confModifTools-matPkg', 'confModifTools-modifyAlarm', 'confModifTools-performCloning',
+    'confModifTools-delete', 'confModifTools-deleteAlarm', 'confModifTools-displayAlarm', 'confModifTools-matPkg',
+    'confModifTools-modifyAlarm', 'confModifTools-offline', 'confModifTools-performCloning',
     'confModifTools-performMatPkg', 'confModifTools-posterDesign', 'confModifTools-posterGetBackground',
     'confModifTools-posterPrinting', 'confModifTools-posterPrintingPDF', 'confModifTools-posterSaveBackground',
     'confModifTools-saveAlarm', 'confModifTools-sendAlarmNow', 'confModifUserCompetences',
@@ -261,12 +248,12 @@ legacy_endpoints = set([
     'domainCreation-create', 'domainDataModification', 'domainDataModification-modify', 'domainDetails', 'domainList',
     'EMail', 'EMail-send', 'EMail-sendcontribparticipants', 'EMail-sendconvener', 'EMail-sendreg', 'errors',
     'generalInfoModification', 'generalInfoModification-update', 'getConvertedFile', 'getFile-access',
-    'getFile-accessKey', 'getFile-flash', 'getFile-wmv', 'groupDetails', 'groupList', 'groupModification',
-    'groupModification-update', 'groupRegistration', 'groupRegistration-update', 'help', 'identityCreation',
-    'identityCreation-changePassword', 'identityCreation-create', 'identityCreation-remove', 'index', 'internalPage',
-    'JSContent-getVars', 'logOut', 'materialDisplay', 'materialDisplay-accessKey', 'myconference',
-    'myconference-myContributions', 'myconference-mySessions', 'myconference-myTracks', 'news', 'oauth-access_token',
-    'oauth-authorize', 'oauth-authorize_consumer', 'oauth-request_token', 'oauth-thirdPartyAuth',
+    'getFile-accessKey', 'getFile-flash', 'getFile-offlineEvent', 'getFile-wmv', 'groupDetails', 'groupList',
+    'groupModification', 'groupModification-update', 'groupRegistration', 'groupRegistration-update', 'help',
+    'identityCreation', 'identityCreation-changePassword', 'identityCreation-create', 'identityCreation-remove',
+    'index', 'internalPage', 'JSContent-getVars', 'logOut', 'materialDisplay', 'materialDisplay-accessKey',
+    'myconference', 'myconference-myContributions', 'myconference-mySessions', 'myconference-myTracks', 'news',
+    'oauth-access_token', 'oauth-authorize', 'oauth-authorize_consumer', 'oauth-request_token', 'oauth-thirdPartyAuth',
     'oauth-userThirdPartyAuth', 'paperReviewingDisplay', 'paperReviewingDisplay-downloadTemplate',
     'paperReviewingDisplay-uploadPaper', 'payment', 'posterTemplates', 'posterTemplates-posterDesign',
     'posterTemplates-posterPrinting', 'resetSessionTZ', 'roomBooking', 'roomBooking-acceptBooking',

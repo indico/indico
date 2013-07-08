@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif
+from MaKaC.webinterface.rh import conferenceModif, fileAccess
 from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.management import event_mgmt
 
@@ -86,3 +86,8 @@ event_mgmt.add_url_rule('/tools/material-package', 'confModifTools-matPkg',
                         rh_as_view(conferenceModif.RHFullMaterialPackage))
 event_mgmt.add_url_rule('/tools/material-package', 'confModifTools-performMatPkg',
                         rh_as_view(conferenceModif.RHFullMaterialPackagePerform), methods=('POST',))
+
+# Tools: Offline version
+event_mgmt.add_url_rule('/tools/offline/', 'confModifTools-offline', rh_as_view(conferenceModif.RHConfOffline))
+event_mgmt.add_url_rule('/tools/offline/<fileId>.zip', 'getFile-offlineEvent',
+                        rh_as_view(fileAccess.RHOfflineEventAccess))

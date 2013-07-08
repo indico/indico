@@ -2025,10 +2025,6 @@ class UHFileAccess(URLHandler):
         return cls.generateFileStaticLink(target)
 
 
-class UHOfflineEventAccess(URLHandler):
-    _relativeURL = "getFile.py/offlineEvent"
-
-
 class UHVideoWmvAccess(URLHandler):
     _endpoint = 'files.getFile-wmv'
 
@@ -2372,6 +2368,14 @@ class UHConfModFullMaterialPackage(URLHandler):
 
 class UHConfModFullMaterialPackagePerform(URLHandler):
     _endpoint = 'event_mgmt.confModifTools-performMatPkg'
+
+
+class UHConfOffline(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-offline'
+
+
+class UHOfflineEventAccess(URLHandler):
+    _endpoint = 'event_mgmt.getFile-offlineEvent'
 
 
 class UHTaskManager(URLHandler):
@@ -3765,7 +3769,3 @@ class UHHelper(object):
     @classmethod
     def getDisplayUH(cls, klazz, type=""):
         return cls.displayUHs.get("%s%s" % (klazz.__name__, type), None)
-
-
-class UHConfOffline (URLHandler):
-    _relativeURL = "confModifTools.py/offline"
