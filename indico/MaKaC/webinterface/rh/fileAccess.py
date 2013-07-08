@@ -133,5 +133,5 @@ class RHOfflineEventAccess(RHConferenceModifBase):
 
     def _process(self):
         f = self._offlineEvent.file
-        return send_file(f.getFileName(), f.getFilePath(), f.getFileType(),
+        return send_file('event-%s.zip' % self._conf.getId(), f.getFilePath(), f.getFileType(),
                          last_modified=self._offlineEvent.creationTime, inline=False)
