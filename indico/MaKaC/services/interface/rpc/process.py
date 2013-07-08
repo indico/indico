@@ -30,7 +30,7 @@ from MaKaC.services.interface.rpc import handlers
 from MaKaC.plugins.base import Observable
 import MaKaC.errors
 
-from MaKaC.common import DBMgr, Config
+from MaKaC.common import DBMgr, Config, fossilize
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.mail import GenericMailer
 
@@ -107,6 +107,9 @@ class ServiceRunner(Observable):
                 if retry < MAX_RETRIES:
                     # notify components that the request is being retried
                     self._notify('requestRetry', MAX_RETRIES - retry)
+
+                # clear/init fossil cache
+                fossilize.clearCache()
 
                 try:
                     # delete all queued emails

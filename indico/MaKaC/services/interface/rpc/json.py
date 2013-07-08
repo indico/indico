@@ -19,7 +19,7 @@
 from flask import request, current_app as app
 from MaKaC.common.security import Sanitization
 
-from MaKaC.common.fossilize import fossilize, NonFossilizableException
+from MaKaC.common.fossilize import fossilize, NonFossilizableException, clearCache
 from MaKaC.fossils.error import ICausedErrorFossil
 
 from MaKaC.services.interface.rpc.common import RequestError
@@ -85,6 +85,9 @@ def process():
         # check content type (if the users know what they are using)
         #if req.content_type != "application/json":
         #    raise RequestError("Invalid content type. It must be 'application/json'.")
+
+        # init/clear fossil cache
+        clearCache()
 
         # read request
         requestText = request.data  # TODO: use request.json!
