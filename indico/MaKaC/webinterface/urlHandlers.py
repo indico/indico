@@ -75,8 +75,11 @@ class URLHandler(object):
 
     @classmethod
     def getStaticURL(cls, target=None, **params):
-        url = cls._relativeURL.replace("py", "html")
-        return url
+        if cls._relativeURL:
+            return cls._relativeURL.replace('.py', '.html')
+        else:
+            # yay, super ugly, but it works...
+            return re.sub(r'^event\.', '', cls._endpoint) + '.html'
 
     @classmethod
     def _getURL(cls, _force_secure=None, **params):
@@ -120,7 +123,7 @@ class URLHandler(object):
         return params
 
     @classmethod
-    def getURL(cls, target=None, **params):
+    def getURL(cls, target=None, _ignore_static=False, **params):
         """Gives the full URL for the corresponding request handler. In case
             the target parameter is specified it will append to the URL the
             the necessary parameters to make the target be specified in the url.
@@ -131,8 +134,8 @@ class URLHandler(object):
                     is able to retrieve it.
                 params - (Dict) parameters to be added to the URL.
         """
-        if ContextManager.get('offlineMode', False):
-            return URL(cls.getStaticURL(target), **params)
+        if not _ignore_static and ContextManager.get('offlineMode', False):
+            return URL(cls.getStaticURL(target, **params))
         return cls._getURL(**cls._getParams(target, params))
 
 
@@ -317,7 +320,7 @@ class UHConferenceOverview(URLHandler):
     @classmethod
     def getURL(cls, target):
         if ContextManager.get('offlineMode', False):
-            return cls.getStaticURL(target)
+            return UHConferenceDisplay.getStaticURL(target)
         return super(UHConferenceOverview, cls).getURL(target)
 
 
@@ -1962,9 +1965,8 @@ class UHSessionDisplay(URLHandler):
     @classmethod
     def getStaticURL(cls, target, **params):
         if target is not None:
-            params = target.getLocator()
-            return "%s-session.html" % (params["sessionId"])
-        return cls._getURL()
+            params.update(target.getLocator())
+        return "%s-session.html" % params["sessionId"]
 
 
 class UHSessionToiCal(URLHandler):
@@ -1979,7 +1981,7 @@ class UHContributionDisplay(URLHandler):
         if target is not None:
             params = target.getLocator()
             return "%s-contrib.html" % (params["contribId"])
-        return cls._getURL()
+        return cls.getURL(target, _ignore_static=True, **params)
 
 
 class UHSubContributionDisplay(URLHandler):
@@ -1990,7 +1992,7 @@ class UHSubContributionDisplay(URLHandler):
         if target is not None:
             params = target.getLocator()
             return "%s-subcontrib.html" % (params["subContId"])
-        return cls._getURL()
+        return cls.getURL(target, _ignore_static=True, **params)
 
 
 class UHSubContributionModification(URLHandler):

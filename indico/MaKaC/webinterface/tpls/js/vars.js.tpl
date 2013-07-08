@@ -104,42 +104,42 @@ var Indico = {
         APIBase: (window.location.protocol == "https:" ? "${ urlHandlers.UHAPIAPI.getURL(secure=True) }" : "${ urlHandlers.UHAPIAPI.getURL() }"),
 
         Login: ${ urlHandlers.UHSignIn.getURL().js_router | j,n },
-        Favourites: ${ urlHandlers.UHUserBaskets.getURL().js_router | j,n },
+        Favourites: ${ urlHandlers.UHUserBaskets.getURL(_ignore_static=True).js_router | j,n },
 
-        ConferenceDisplay: ${ urlHandlers.UHConferenceDisplay.getURL().js_router | j,n },
-        ContributionDisplay: ${ urlHandlers.UHContributionDisplay.getURL().js_router | j,n },
-        SessionDisplay: ${ urlHandlers.UHSessionDisplay.getURL().js_router | j,n },
+        ConferenceDisplay: ${ urlHandlers.UHConferenceDisplay.getURL(_ignore_static=True).js_router | j,n },
+        ContributionDisplay: ${ urlHandlers.UHContributionDisplay.getURL(_ignore_static=True).js_router | j,n },
+        SessionDisplay: ${ urlHandlers.UHSessionDisplay.getURL(_ignore_static=True).js_router | j,n },
 
-        ContribToXML: ${ urlHandlers.UHContribToXML.getURL().js_router | j,n },
-        ContribToPDF: ${ urlHandlers.UHContribToPDF.getURL().js_router | j,n },
+        ContribToXML: ${ urlHandlers.UHContribToXML.getURL(_ignore_static=True).js_router | j,n },
+        ContribToPDF: ${ urlHandlers.UHContribToPDF.getURL(_ignore_static=True).js_router | j,n },
 
-        ConfTimeTablePDF: ${ urlHandlers.UHConfTimeTablePDF.getURL().js_router | j,n },
-        ConfTimeTableCustomPDF: ${ urlHandlers.UHConfTimeTableCustomizePDF.getURL().js_router | j,n },
+        ConfTimeTablePDF: ${ urlHandlers.UHConfTimeTablePDF.getURL(_ignore_static=True).js_router | j,n },
+        ConfTimeTableCustomPDF: ${ urlHandlers.UHConfTimeTableCustomizePDF.getURL(_ignore_static=True).js_router | j,n },
 
-        SessionModification: ${ urlHandlers.UHSessionModification.getURL().js_router | j,n },
-        ContributionModification: ${ urlHandlers.UHContributionModification.getURL().js_router | j,n },
-        SessionProtection: ${ urlHandlers.UHSessionModifAC.getURL().js_router | j,n },
-        ContributionProtection: ${ urlHandlers.UHContribModifAC.getURL().js_router | j,n },
+        SessionModification: ${ urlHandlers.UHSessionModification.getURL(_ignore_static=True).js_router | j,n },
+        ContributionModification: ${ urlHandlers.UHContributionModification.getURL(_ignore_static=True).js_router | j,n },
+        SessionProtection: ${ urlHandlers.UHSessionModifAC.getURL(_ignore_static=True).js_router | j,n },
+        ContributionProtection: ${ urlHandlers.UHContribModifAC.getURL(_ignore_static=True).js_router | j,n },
 
-        Reschedule: ${ urlHandlers.UHConfModifReschedule.getURL().js_router | j,n },
-        SlotCalc: ${ urlHandlers.UHSessionModSlotCalc.getURL().js_router | j,n },
-        FitSessionSlot: ${ urlHandlers.UHSessionFitSlot.getURL().js_router | j,n },
+        Reschedule: ${ urlHandlers.UHConfModifReschedule.getURL(_ignore_static=True).js_router | j,n },
+        SlotCalc: ${ urlHandlers.UHSessionModSlotCalc.getURL(_ignore_static=True).js_router | j,n },
+        FitSessionSlot: ${ urlHandlers.UHSessionFitSlot.getURL(_ignore_static=True).js_router | j,n },
 
         UploadAction: {
-            subcontribution: ${ urlHandlers.UHSubContribModifAddMaterials.getURL().js_router | j,n },
-            contribution: ${ urlHandlers.UHContribModifAddMaterials.getURL().js_router | j,n },
-            session: ${ urlHandlers.UHSessionModifAddMaterials.getURL().js_router | j,n },
-            conference: ${ urlHandlers.UHConfModifAddMaterials.getURL().js_router | j,n },
-            category: ${ urlHandlers.UHCategoryAddMaterial.getURL().js_router | j,n }
+            subcontribution: ${ urlHandlers.UHSubContribModifAddMaterials.getURL(_ignore_static=True).js_router | j,n },
+            contribution: ${ urlHandlers.UHContribModifAddMaterials.getURL(_ignore_static=True).js_router | j,n },
+            session: ${ urlHandlers.UHSessionModifAddMaterials.getURL(_ignore_static=True).js_router | j,n },
+            conference: ${ urlHandlers.UHConfModifAddMaterials.getURL(_ignore_static=True).js_router | j,n },
+            category: ${ urlHandlers.UHCategoryAddMaterial.getURL(_ignore_static=True).js_router | j,n }
         },
 
-        RoomBookingBookRoom: ${ urlHandlers.UHRoomBookingBookRoom.getURL().js_router | j,n },
-        RoomBookingForm: ${ urlHandlers.UHRoomBookingBookingForm.getURL().js_router | j,n },
-        RoomBookingDetails: ${ urlHandlers.UHRoomBookingRoomDetails.getURL().js_router | j,n },
-        ConfModifSchedule: ${ urlHandlers.UHConfModifSchedule.getURL().js_router | j,n },
-        SubcontrModif: ${ urlHandlers.UHContribModifSubCont.getURL().js_router | j,n },
-        AuthorDisplay: ${ urlHandlers.UHContribAuthorDisplay.getURL().js_router | j,n },
-        AuthorEmail: ${ urlHandlers.UHConferenceEmail.getURL().js_router | j,n }
+        RoomBookingBookRoom: ${ urlHandlers.UHRoomBookingBookRoom.getURL(_ignore_static=True).js_router | j,n },
+        RoomBookingForm: ${ urlHandlers.UHRoomBookingBookingForm.getURL(_ignore_static=True).js_router | j,n },
+        RoomBookingDetails: ${ urlHandlers.UHRoomBookingRoomDetails.getURL(_ignore_static=True).js_router | j,n },
+        ConfModifSchedule: ${ urlHandlers.UHConfModifSchedule.getURL(_ignore_static=True).js_router | j,n },
+        SubcontrModif: ${ urlHandlers.UHContribModifSubCont.getURL(_ignore_static=True).js_router | j,n },
+        AuthorDisplay: ${ urlHandlers.UHContribAuthorDisplay.getURL(_ignore_static=True).js_router | j,n },
+        AuthorEmail: ${ urlHandlers.UHConferenceEmail.getURL(_ignore_static=True).js_router | j,n }
     },
 
     Data: {

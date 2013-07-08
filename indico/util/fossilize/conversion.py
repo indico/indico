@@ -186,9 +186,7 @@ class Conversion(object):
     @classmethod
     def url(cls, handler):
         def _url(locator):
-            url = handler.getURL()
-            url.addParams(locator)
-            return str(url)
+            return str(handler.getURL(**locator))
         return _url
 
     @classmethod
