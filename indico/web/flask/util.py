@@ -155,8 +155,14 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     if mimetype.isupper() and '/' not in mimetype:
         # Indico file type such as "JPG" or "CSV"
         mimetype = Config.getInstance().getFileTypeMimeType(mimetype)
-    rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
-                    conditional=conditional)
+    try:
+        rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
+                        conditional=conditional)
+    except IOError:
+        from MaKaC.common.info import HelperMaKaCInfo
+        if not HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
+            raise
+        raise NotFound('File not found: %s' % path_or_fd)
     if inline:
         # send_file does not add this header if as_attachment is False
         rv.headers.add('Content-Disposition', 'inline', filename=name)

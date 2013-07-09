@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import request, session
 from urlparse import urljoin
+from werkzeug.exceptions import NotFound
 from indico.web.flask.util import ResponseUtil
 
 
@@ -583,9 +584,9 @@ class RH(RequestHandlerBase):
             #Error without report option
             res = self._processNoReportError( e )
             DBMgr.getInstance().endRequest(False)
-        except NotFoundError, e:
-            #File not fond error
-            res = self._processNotFoundError( e )
+        except (NotFoundError, NotFound), e:
+            # File not found error
+            res = self._processNotFoundError(e)
             DBMgr.getInstance().endRequest(False)
         except HtmlScriptError,e:
             res = self._processHtmlScriptError(e)

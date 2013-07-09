@@ -262,12 +262,17 @@ class MaterialLocalRepository(Persistent):
             return datetime.datetime.fromtimestamp(0)
         return datetime.datetime.fromtimestamp(os.path.getctime(filePath))
 
-    def readFile( self, id ):
-        filePath = self.__getFilePath( id )
-        f = open(filePath, "rb")
-        data = f.read()
-        f.close()
-        return data
+    def readFile(self, id):
+        filePath = self.__getFilePath(id)
+        try:
+            with open(filePath, 'rb') as f:
+                return f.read()
+        except IOError:
+            # In debugging we return an empty file instead of throwing an error
+            from MaKaC.common.info import HelperMaKaCInfo
+            if not HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
+                raise
+            return ''
 
     def replaceContent( self, id, newContent ):
         filePath = self.__getFilePath( id )
