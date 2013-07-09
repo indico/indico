@@ -365,6 +365,10 @@ class UHConferenceLogo(URLHandler):
 class UHConferenceCSS(URLHandler):
     _endpoint = 'event.conferenceDisplay-getCSS'
 
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        return cls.getURL(target, _ignore_static=True, **params)
+
 
 class UHConferencePic(URLHandler):
     _endpoint = 'event.conferenceDisplay-getPic'

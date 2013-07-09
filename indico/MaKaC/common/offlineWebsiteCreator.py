@@ -59,6 +59,10 @@ def _fix_url_path(path):
     if path.startswith('static/'):
         # It's a path that was prefixed with baseurl
         path = path[7:]
+    elif path.startswith(Config.getInstance().getBaseURL()):
+        path = path[len(Config.getInstance().getBaseURL()):]
+    elif path.startswith(Config.getInstance().getBaseSecureURL()):
+        path = path[len(Config.getInstance().getBaseSecureURL()):]
     path = path.lstrip('/')
     path = _remove_qs(path)
     return path
@@ -93,6 +97,7 @@ class OfflineEventCreator(object):
         self._eventType = event_type
         self._failed_paths = set()
         self._css_files = set()
+        self._downloaded_files = {}
 
     def create(self):
         config = Config.getInstance()
@@ -123,9 +128,13 @@ class OfflineEventCreator(object):
 
         # Retrieve files that were not available in the file system (e.e. js/css from plugins)
         self._get_failed_paths()
+        self._failed_paths = set()
 
         # Retrieve files referenced in CSS files
         self._get_css_refs()
+
+        # A custom event CSS might reference an uploaded image so we need to check for failed paths again
+        self._get_failed_paths()
 
         # Creating ConferenceDisplay.html file
         conferenceDisplayPath = os.path.join(self._mainPath, urlHandlers.UHConferenceDisplay.getStaticURL())
@@ -147,12 +156,11 @@ class OfflineEventCreator(object):
         for path in itertools.chain(scripts, styles):
             src_path = os.path.join(config.getHtdocsDir(), path)
             dst_path = os.path.join(self._staticPath, path)
-            if not os.path.isfile(src_path):
-                self._failed_paths.add(path)
-                continue
             if path in styles:
                 self._css_files.add(path)
-            else:
+            if not os.path.isfile(src_path):
+                self._failed_paths.add(path)
+            elif path not in styles:
                 self._addFileFromSrc(dst_path, src_path)
         for script in soup.select('script[src]'):
             script['src'] = os.path.join('static', _fix_url_path(script['src']))
@@ -171,9 +179,10 @@ class OfflineEventCreator(object):
         base_url = cfg.getEmbeddedWebserverBaseURL() or cfg.getBaseURL()
         for path in self._failed_paths:
             dst_path = os.path.join(self._staticPath, path)
-            if not os.path.isfile(dst_path):
+            if not self._fileHandler.hasFile(dst_path):
                 response = requests.get(os.path.join(base_url, path), verify=False)
-                self._fileHandler.addNewFile(dst_path, response.text)
+                self._downloaded_files[dst_path] = response.content
+                self._fileHandler.addNewFile(dst_path, response.content)
 
     def _get_css_refs(self):
         """Adds files referenced in stylesheets and rewrite the URLs inside those stylesheets"""
@@ -181,8 +190,11 @@ class OfflineEventCreator(object):
         for path in self._css_files:
             src_path = os.path.join(config.getHtdocsDir(), path)
             dst_path = os.path.join(self._staticPath, path)
-            with open(src_path, 'rb') as f:
-                css = f.read()
+            if dst_path in self._downloaded_files and not os.path.exists(src_path):
+                css = self._downloaded_files[dst_path]
+            else:
+                with open(src_path, 'rb') as f:
+                    css = f.read()
             # Extract all paths inside url()
             urls = set(m.group('url') for m in RE_CSS_URL.finditer(css) if m.group('url')[0] != '#')
             for url in urls:
@@ -203,8 +215,11 @@ class OfflineEventCreator(object):
                     ref_src_path = os.path.normpath(os.path.join(os.path.dirname(css_abs_path), url))
                     ref_dst_path = os.path.normpath(os.path.join(self._staticPath, os.path.dirname(path), url))
                     static_url = os.path.relpath(ref_src_path, os.path.dirname(css_abs_path))
-                assert os.path.isfile(ref_src_path), ref_src_path
-                self._addFileFromSrc(ref_dst_path, ref_src_path)
+                if not os.path.isfile(ref_src_path):
+                    htdocs_relative_path = os.path.relpath(ref_src_path, config.getHtdocsDir())
+                    self._failed_paths.add(htdocs_relative_path)
+                else:
+                    self._addFileFromSrc(ref_dst_path, ref_src_path)
                 css = css.replace(orig_url, static_url)
             self._fileHandler.addNewFile(dst_path, css)
 
