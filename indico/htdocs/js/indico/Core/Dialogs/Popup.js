@@ -164,6 +164,26 @@ type("ExclusivePopup", ["Printable"], {
             var pos = this.canvas.dialog('option', 'position');
             this.canvas.dialog('option', 'position', pos);
         }
+
+        $("body").on("mousewheel wheel", function (e) {
+            var dialog = $(e.target).closest(".ui-dialog-content");
+
+            if (dialog.get(0) == $(".ui-dialog-content").get(0)) {
+                var elem = $(e.target).closest(".scrollable", ".ui-dialog-content");
+                var wheelup = (e.originalEvent.wheelDelta || -e.originalEvent.deltaY) / 120 > 0;
+
+                if (elem.scrollTop() == 0 && wheelup) {
+                    return false;
+                }
+
+                if (elem.scrollTop()+1 >= (elem.prop("scrollHeight") - elem.outerHeight())) {
+                    if (!wheelup) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        });
     },
 
     postDraw: function() {
@@ -176,6 +196,7 @@ type("ExclusivePopup", ["Printable"], {
         this.canvas.remove();
         this.canvas = this.dialogElement = null;
         this.buttons = [];
+        $("body").off("mousewheel wheel");
     }
 
 }, function(title, closeButtonHandler, printable, showPrintButton, noCanvas) {
