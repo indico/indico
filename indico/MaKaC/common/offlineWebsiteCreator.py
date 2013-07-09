@@ -17,10 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import string
+import itertools
 import os
 import re
-import MaKaC.common.TemplateExec as templateEngine
+import requests
+import string
+from bs4 import BeautifulSoup
 from MaKaC import conference
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import displayMgr
@@ -39,8 +41,27 @@ from MaKaC.conference import LocalFile
 from MaKaC.fileRepository import OfflineRepository
 from MaKaC.PDFinterface.conference import ProgrammeToPDF, TimeTablePlain, AbstractBook, ContribToPDF, \
     ConfManagerContribsToPDF
-from MaKaC.common.logger import Logger
 from indico.util.contextManager import ContextManager
+from indico.web.assets import ie_compatibility
+
+
+RE_CSS_URL = re.compile(r'url\(\s*(?P<quote>["\']?)(?!data:)(?P<url>[^\\\')]+)(?P=quote)\s*\)')
+RE_QUERYSTRING = re.compile(r'\?.+$')
+
+
+def _remove_qs(url):
+    """Removes a cache buster (or any other query string)."""
+    return RE_QUERYSTRING.sub('', url)
+
+
+def _fix_url_path(path):
+    """Sanitizes an URL extracted from the HTML document"""
+    if path.startswith('static/'):
+        # It's a path that was prefixed with baseurl
+        path = path[7:]
+    path = path.lstrip('/')
+    path = _remove_qs(path)
+    return path
 
 
 class OfflineEvent:
@@ -51,6 +72,7 @@ class OfflineEvent:
         self._eventType = eventType
 
     def create(self):
+        websiteCreator = None
         if self._eventType in ("simple_event", "meeting"):
             websiteCreator = OfflineEventCreator(self._rh, self._conf, self._eventType)
         elif self._eventType == "conference":
@@ -69,6 +91,8 @@ class OfflineEventCreator(object):
         self._mainPath = ""
         self._staticPath = ""
         self._eventType = event_type
+        self._failed_paths = set()
+        self._css_files = set()
 
     def create(self):
         config = Config.getInstance()
@@ -78,48 +102,111 @@ class OfflineEventCreator(object):
         self._create_home()
 
         # Create main and static folders
-        self._mainPath = "OfflineWebsite-%s" % self._normalisePath(self._conf.getTitle())
+        self._mainPath = "OfflineWebsite-%s" % self._normalize_path(self._conf.getTitle())
         self._fileHandler.addDir(self._mainPath)
         self._staticPath = os.path.join(self._mainPath, "static")
         self._fileHandler.addDir(self._staticPath)
-        # Download all the icons
-        self._addFolderFromSrc(os.path.join(self._mainPath, 'sass', 'static', "fonts"),
-                               os.path.join(config.getHtdocsDir(), 'static', 'fonts'))
         # Add i18n js
         self._addFolderFromSrc(os.path.join(self._staticPath, 'js', 'indico', 'i18n'),
                                os.path.join(config.getHtdocsDir(), 'js', 'indico', 'i18n'))
+        # IE compat files (in conditional comments so BS doesn't see them)
+        for path in ie_compatibility.urls():
+            self._addFileFromSrc(os.path.join(self._staticPath, path.lstrip('/')),
+                                 os.path.join(config.getHtdocsDir(), path.lstrip('/')))
 
         # Getting all materials, static files (css, images, js and vars.js.tpl)
         self._getAllMaterial()
-        self._html = self._getStaticFiles(self._html)
+        self._html = self._get_static_files(self._html)
 
         # Specific changes
         self._create_other_pages()
+
+        # Retrieve files that were not available in the file system (e.e. js/css from plugins)
+        self._get_failed_paths()
+
+        # Retrieve files referenced in CSS files
+        self._get_css_refs()
 
         # Creating ConferenceDisplay.html file
         conferenceDisplayPath = os.path.join(self._mainPath, urlHandlers.UHConferenceDisplay.getStaticURL())
         self._fileHandler.addNewFile(conferenceDisplayPath, self._html)
 
         # Creating index.html file
-        self._fileHandler.addNewFile("index.html", """<meta HTTP-EQUIV="REFRESH" content="0; url=%s">""" % conferenceDisplayPath)
+        self._fileHandler.addNewFile('index.html',
+                                     '<meta http-equiv="Refresh" content="0; url=%s">' % conferenceDisplayPath)
 
         self._fileHandler.close()
         self._outputFile = self._generateZipFile(self._fileHandler.getPath())
         return self._outputFile
 
-    def _getStaticFiles(self, html):
+    def _get_static_files(self, html):
         config = Config.getInstance()
-        # Download all images
-        self._downloadFiles(html, config.getImagesBaseURL(), config.getImagesDir(), "images")
-        # Download all CSS files
-        self._downloadFiles(html, 'css', config.getCssDir(), "css")
-        # Download all JS files
-        self._downloadFiles(html, "js", config.getJSDir(), "js")
-        # Download all files generated from SASS and static js libs
-        self._downloadFiles(html, 'static/assets', os.path.join(config.getHtdocsDir(), 'static', 'assets'), 'assets')
-        # Download vars.js.tpl
-        self._addVarsJSTpl()
-        return html
+        soup = BeautifulSoup(html)
+        scripts = set(_fix_url_path(x['src']) for x in soup.select('script[src]'))
+        styles = set(_fix_url_path(x['href']) for x in soup.select('link[rel="stylesheet"]'))
+        for path in itertools.chain(scripts, styles):
+            src_path = os.path.join(config.getHtdocsDir(), path)
+            dst_path = os.path.join(self._staticPath, path)
+            if not os.path.isfile(src_path):
+                self._failed_paths.add(path)
+                continue
+            if path in styles:
+                self._css_files.add(path)
+            else:
+                self._addFileFromSrc(dst_path, src_path)
+        for script in soup.select('script[src]'):
+            script['src'] = os.path.join('static', _fix_url_path(script['src']))
+        for style in soup.select('link[rel="stylesheet"]'):
+            style['href'] = os.path.join('static', _fix_url_path(style['href']))
+        return str(soup)
+
+    def _get_failed_paths(self):
+        """Downloads files that were not available in the fielystem via HTTP.
+        This is the only clean way to deal with static files from plugins since otherwise
+        we would have to emulate RHHtdocs.
+        """
+        cfg = Config.getInstance()
+        # If we have the embedded webserver prefer its base url since the iptables hack does
+        # not work for connections from the same machine
+        base_url = cfg.getEmbeddedWebserverBaseURL() or cfg.getBaseURL()
+        for path in self._failed_paths:
+            dst_path = os.path.join(self._staticPath, path)
+            if not os.path.isfile(dst_path):
+                response = requests.get(os.path.join(base_url, path), verify=False)
+                self._fileHandler.addNewFile(dst_path, response.text)
+
+    def _get_css_refs(self):
+        """Adds files referenced in stylesheets and rewrite the URLs inside those stylesheets"""
+        config = Config.getInstance()
+        for path in self._css_files:
+            src_path = os.path.join(config.getHtdocsDir(), path)
+            dst_path = os.path.join(self._staticPath, path)
+            with open(src_path, 'rb') as f:
+                css = f.read()
+            # Extract all paths inside url()
+            urls = set(m.group('url') for m in RE_CSS_URL.finditer(css) if m.group('url')[0] != '#')
+            for url in urls:
+                orig_url = url
+                url = _remove_qs(url)  # get rid of cache busters
+                if url[0] == '/':
+                    # make it relative and resolve '..' elements
+                    url = os.path.normpath(url[1:])
+                    # anything else is straightforward: the url is now relative to the htdocs folder
+                    ref_src_path = os.path.join(config.getHtdocsDir(), url)
+                    ref_dst_path = os.path.join(self._staticPath, url)
+                    # the new url is relative to the css location
+                    static_url = os.path.relpath(url, os.path.dirname(path))
+                else:
+                    # make the relative path absolute (note: it's most likely NOT relative to htdocs!)
+                    css_abs_path = os.path.join(config.getHtdocsDir(), path)
+                    # now we can combine the relative url with that path to get the proper paths of the resource
+                    ref_src_path = os.path.normpath(os.path.join(os.path.dirname(css_abs_path), url))
+                    ref_dst_path = os.path.normpath(os.path.join(self._staticPath, os.path.dirname(path), url))
+                    static_url = os.path.relpath(ref_src_path, os.path.dirname(css_abs_path))
+                assert os.path.isfile(ref_src_path), ref_src_path
+                self._addFileFromSrc(ref_dst_path, ref_src_path)
+                css = css.replace(orig_url, static_url)
+            self._fileHandler.addNewFile(dst_path, css)
 
     def _create_home(self):
         # get default/selected view
@@ -134,10 +221,9 @@ class OfflineEventCreator(object):
     def _create_other_pages(self):
         pass
 
-    def _normalisePath(self, path):
-        forbiddenChars = string.maketrans(" /:()*?<>|\"", "___________")
-        path = path.translate(forbiddenChars)
-        return path
+    def _normalize_path(self, path):
+        return path.translate(string.maketrans(' /:()*?<>|"',
+                                               '___________'))
 
     def _getAllMaterial(self):
         self._addMaterialFrom(self._conf, "events/conference")
@@ -158,22 +244,6 @@ class OfflineEventCreator(object):
                             self._mainPath, "files", categoryPath, mat.getId(), res.getId() + "-" + res.getName())
                         self._addFileFromSrc(dstPath, res.getFilePath())
 
-    def _downloadFiles(self, html, baseURL, srcPath, dstNamePath):
-        """
-        Downloads all the files whose URL matches with baseURL in the string html (html page); and copies the file from
-        the source path (srcPath) to the target folder (dstNamePath).
-        """
-        dstPath = os.path.join(self._staticPath, dstNamePath)
-        self._fileHandler.addDir(dstPath)
-        files = re.findall(r'%s/(.+?\..+?)[?|"]' % baseURL, html)
-        for filename in files:
-            srcFile = os.path.join(srcPath, filename)
-            dstFile = os.path.join(dstPath, filename)
-            # If a CSS File, download the images
-            if filename.endswith('.css'):
-                self._addImagesFromCss(srcFile)
-            self._addFileFromSrc(dstFile, srcFile)
-
     def _addFileFromSrc(self, dstPath, srcPath):
         if not os.path.isfile(dstPath) and os.path.isfile(srcPath):
             if not self._fileHandler.hasFile(dstPath):
@@ -190,35 +260,6 @@ class OfflineEventCreator(object):
                 self._fileHandler.addDir(dst_dirpath)
                 if not self._fileHandler.hasFile(dst_filepath):
                     self._fileHandler.add(dst_filepath, src_filepath)
-
-    def _addImagesFromCss(self, cssFilename):
-        config = Config.getInstance()
-        if os.path.isfile(cssFilename):
-            imgPath = os.path.join(self._staticPath, "images")
-            fontPath = os.path.join(self._staticPath, "fonts")
-            cssFile = open(cssFilename, "rb")
-            for line in cssFile.readlines():
-                images = re.findall(r'images/(.+?\.\w*)', line)
-                fonts = re.findall(r'fonts/(.+?\.\w*)', line)
-                for imgFilename in images:
-                    imgSrcFile = os.path.join(config.getImagesDir(), imgFilename)
-                    imgDstFile = os.path.join(imgPath, imgFilename)
-                    self._addFileFromSrc(imgDstFile, imgSrcFile)
-                for fontFilename in fonts:
-                    fontSrcFile = os.path.join(config.getFontsDir(), fontFilename)
-                    fontDstFile = os.path.join(fontPath, fontFilename)
-                    self._addFileFromSrc(fontDstFile, fontSrcFile)
-
-    def _addVarsJSTpl(self):
-        config = Config.getInstance()
-        varsPath = os.path.join(self._staticPath, "js/vars.js")
-        tplFile = os.path.join(config.getTPLDir(), "js/vars.js.tpl")
-        if not os.path.isfile(varsPath):
-            varsDict = {}
-            varsDict["__rh__"] = self._rh
-            varsDict["user"] = None
-            varsData = templateEngine.render(tplFile, varsDict)
-            self._fileHandler.addNewFile(varsPath, varsData)
 
     def _generateZipFile(self, srcPath):
         repo = OfflineRepository.getRepositoryFromDB()
@@ -254,9 +295,10 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         # Getting all menu items
         self._getMenuItems()
         # Getting conference timetable in PDF
-        self._addPdf(self._conf, urlHandlers.UHConfTimeTablePDF, TimeTablePlain, **{'conf': self._conf, 'aw': self._rh._aw})
+        self._addPdf(self._conf, urlHandlers.UHConfTimeTablePDF, TimeTablePlain, conf=self._conf, aw=self._rh._aw)
         # Generate contributions in PDF
-        self._addPdf(self._conf, urlHandlers.UHContributionListToPDF, ConfManagerContribsToPDF, **{'conf': self._conf, 'contribList': self._conf.getContributionList()})
+        self._addPdf(self._conf, urlHandlers.UHContributionListToPDF, ConfManagerContribsToPDF, conf=self._conf,
+                     contribList=self._conf.getContributionList())
 
         # Getting specific pages for contributions
         for cont in self._conf.getContributionList():
@@ -307,10 +349,10 @@ class ConferenceOfflineCreator(OfflineEventCreator):
                 html = self._menu_offline_items[link.getName()].display()
                 handler = getattr(urlHandlers, link.getURLHandler())
                 self._addPage(html, handler, target=None)
-        if (link.getName() == "abstractsBook"):
-            self._addPdf(self._conf, urlHandlers.UHConfAbstractBook, AbstractBook, **{'conf': self._conf, 'aw': self._rh._aw})
-        if (link.getName() == "programme"):
-            self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF, **{'conf': self._conf})
+        if link.getName() == 'abstractsBook':
+            self._addPdf(self._conf, urlHandlers.UHConfAbstractBook, AbstractBook, conf=self._conf, aw=self._rh._aw)
+        if link.getName() == 'programme':
+            self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF, conf=self._conf)
 
     def _getInternalPage(self, link):
         page = link.getPage()
@@ -319,13 +361,13 @@ class ConferenceOfflineCreator(OfflineEventCreator):
 
     def _addPage(self, html, rh, target, **params):
         fname = os.path.join(self._mainPath, str(rh.getStaticURL(target, **params)))
-        html = self._getStaticFiles(html)
+        html = self._get_static_files(html)
         self._fileHandler.addNewFile(fname, html)
 
     def _getContrib(self, contrib):
         html = WPStaticContributionDisplay(self._rh, contrib, 0).display()
         self._addPage(html, urlHandlers.UHContributionDisplay, target=contrib)
-        self._addPdf(contrib, urlHandlers.UHContribToPDF, ContribToPDF, **{'conf': self._conf, 'contrib': contrib})
+        self._addPdf(contrib, urlHandlers.UHContribToPDF, ContribToPDF, conf=self._conf, contrib=contrib)
 
         for author in contrib.getAuthorList():
             self._getAuthor(contrib, author)
@@ -348,11 +390,12 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         self._addPage(html, urlHandlers.UHSessionDisplay, target=session)
 
         htmlContrib = WPStaticSessionDisplay(self._rh, session).display(activeTab="contribs")
-        sessionContribfile = os.path.join(self._mainPath, "contribs-" + urlHandlers.UHSessionDisplay.getStaticURL(session))
-        htmlContrib = self._getStaticFiles(htmlContrib)
+        sessionContribfile = os.path.join(self._mainPath,
+                                          'contribs-' + urlHandlers.UHSessionDisplay.getStaticURL(session))
+        htmlContrib = self._get_static_files(htmlContrib)
         self._fileHandler.addNewFile(sessionContribfile, htmlContrib)
-        self._addPdf(session, urlHandlers.UHConfTimeTablePDF, TimeTablePlain, **{'conf': self._conf, 'aw':
-                     self._rh._aw, 'showSessions': [session.getId()]})
+        self._addPdf(session, urlHandlers.UHConfTimeTablePDF, TimeTablePlain, conf=self._conf, aw=self._rh._aw,
+                     showSessions=[session.getId()])
 
     def _addPdf(self, event, pdfUrlHandler, generatorClass, **generatorParams):
         tz = timezoneUtils.DisplayTZ(self._rh._aw, self._conf).getDisplayTZ()

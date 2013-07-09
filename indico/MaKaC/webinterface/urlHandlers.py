@@ -20,7 +20,7 @@ import re
 import os
 import string
 import urlparse
-from flask import request, session
+from flask import request, session, url_for
 
 from MaKaC.common.url import URL, EndpointURL
 from MaKaC.common.Configuration import Config
@@ -3736,7 +3736,8 @@ class UHJSVars(URLHandler):
 
     @classmethod
     def getStaticURL(cls, target=None, **params):
-        return 'static/js/vars.js'
+        # We want a relative URL here, so just use url_for directly...
+        return url_for(cls._endpoint)
 
 
 class UHHelper(object):

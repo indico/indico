@@ -477,6 +477,7 @@ class Config:
         'ForceConflicts' : 0,
         'PropagateAllExceptions' : False,
         'EmbeddedWebserver' : False,
+        'EmbeddedWebserverBaseURL': None,
         'OAuthAccessTokenTTL' : 10000,
         'MobileURL' : '',
         'SessionLifetime' : 86400*31,

@@ -306,7 +306,12 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
     # mentioned above but simply did not consider using a non-privileged port.
     elif requested_port != used_port:
         netloc = '{0}:{1}'.format(url_data.netloc.partition(':')[0], used_port)
-        base_url = '{0}://{1}{2}' % (url_data.scheme, netloc, url_data.path)
+        base_url = '{0}://{1}{2}'.format(url_data.scheme, netloc, url_data.path)
+
+    # If we need to perform internal requests for some reason we want to use the true host:port
+    server_netloc = '{0}:{1}'.format(host, port) if port != default_port else host
+    config._configVars['EmbeddedWebserverBaseURL'] = urlparse.urlunsplit(
+        urlparse.urlsplit(base_url)._replace(netloc=server_netloc))
 
     # We update both BaseURL and BaseSecureURL to something that actually works.
     # In case of SSL-only we need both URLs to be set to the same SSL url to prevent some stuff being "loaded"

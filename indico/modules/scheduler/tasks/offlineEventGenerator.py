@@ -18,7 +18,6 @@
 # along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os
-import tempfile
 from MaKaC.common import DBMgr
 from MaKaC.common import Config
 from MaKaC.common.mail import GenericMailer
@@ -71,7 +70,6 @@ class OfflineEventGeneratorTask(OneShotTask):
 
         ContextManager.set('currentRH', self._rh)
         ContextManager.set('offlineMode', True)
-        ContextManager.set('offlineModeTemp', tempfile.mkdtemp())
 
         # Get event type
         wf = self._rh.getWebFactory()
@@ -88,8 +86,6 @@ class OfflineEventGeneratorTask(OneShotTask):
                 with message error: %s" % (self._task.id, e))
             self._task.status = "Failed"
             return
-        finally:
-            _delete_recursively(ContextManager.get('offlineModeTemp'))
 
         self._task.creationTime = nowutc()
         if not websiteZipFile:
