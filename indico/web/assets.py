@@ -214,6 +214,10 @@ jquery = Bundle(
 
 utils = Bundle('js/utils/routing.js', filters='rjsmin', output='js/utils_%(version)s.min.js')
 
+calendar = Bundle(
+    *namespace('js/calendar', 'calendar.js', 'calendar-setup.js'),
+    filters='rjsmin', output='js/calendar_%(version)s.min.js')
+
 presentation = Bundle(
     *namespace('js/presentation',
 
@@ -266,7 +270,7 @@ moment = Bundle(
         'lang/fr.js'),
     filters='rjsmin', output='js/moment_%(version)s.min.js')
 
-base_js = Bundle(jquery, utils, presentation, indico_jquery, moment, indico_core,
+base_js = Bundle(jquery, utils, presentation, calendar, indico_jquery, moment, indico_core,
                  indico_legacy, indico_common)
 
 base_sass = Bundle('sass/screen.scss',

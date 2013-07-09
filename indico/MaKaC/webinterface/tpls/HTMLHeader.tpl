@@ -49,10 +49,6 @@
       loadDictionary(currentLanguage);
     </script>
 
-        <!-- Calendar Widget -->
-        ${ page._getJavaScriptInclude(baseUrl + "/js/calendar/calendar.js") }
-        ${ page._getJavaScriptInclude(baseUrl + "/js/calendar/calendar-setup.js") }
-
         <!-- Page Specific CSS files-->
         % for cssFile in extraCSS:
             <link rel="stylesheet" type="text/css" href="${cssFile}">
