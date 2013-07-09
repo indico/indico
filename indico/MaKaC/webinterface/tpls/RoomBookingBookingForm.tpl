@@ -77,6 +77,7 @@
                                              $E('bookedForName').set(users[0].name);
                                              $E('bookedForId').set(users[0].id);
                                              $E('contactEmail').set(users[0].email);
+                                             $E('contactPhone').set(users[0].phone);
                                          });
 
             popup.execute();
