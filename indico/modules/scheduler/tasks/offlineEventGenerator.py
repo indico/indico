@@ -81,7 +81,6 @@ class OfflineEventGeneratorTask(OneShotTask):
         try:
             websiteZipFile = OfflineEvent(self._rh, self._rh._conf, eventType).create()
         except Exception, e:
-            raise  # XXX remove it
             Logger.get('OfflineEventGeneratorTask').exception("Generation of the offline website for task %s failed \
                 with message error: %s" % (self._task.id, e))
             self._task.status = "Failed"
