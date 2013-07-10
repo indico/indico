@@ -19,6 +19,24 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+.input-text {
+    @include box-border($gray);
+    @include transition(border-color 0.25s ease-out);
+    @include placeholder {
+        @extend %placeholder;
+    }
+
+    &:hover,
+    &:focus {
+        box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+    }
+
+    &:focus {
+        @include box-border($blue);
+        outline: none;
+    }
+}
+
 /* ********** */
 /* Text-input */
 /* ********** */

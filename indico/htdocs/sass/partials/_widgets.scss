@@ -3,7 +3,7 @@
 
 
    This file is part of Indico.
-   Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+   Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
 
    Indico is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -19,8 +19,27 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-$blue: #5D95EA;
+.field-area {
 
-$gray: #bbb;
-$dark-gray: #777;
-$light-gray: #f9f9f9;
+    max-height: 150px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 20px;
+
+    .dragger {
+        @include user-select(none);
+        cursor: move;
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+
+    a {
+        visibility: hidden;
+    }
+
+    tr:hover a {
+        visibility: visible;
+    }
+}

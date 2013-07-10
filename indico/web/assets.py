@@ -212,7 +212,8 @@ jquery = Bundle(
         'jquery.typewatch.js',
         'jquery.multiselect.filter.js',
         'jstorage.js',
-        'jquery.watermark.js'),
+        'jquery.watermark.js',
+        'jquery.ui.fieldarea.js'),
     filters='rjsmin', output='js/jquery_code_%(version)s.min.js')
 
 utils = Bundle('js/utils/routing.js', filters='rjsmin', output='js/utils_%(version)s.min.js')
