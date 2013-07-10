@@ -179,7 +179,7 @@ class IMEventDisplayComponent(Component):
         return ['Collaboration/Style.css']
 
     def injectJSFiles(self, obj):
-        return ['/Collaboration/js/bookings.js', '/Collaboration/js/Collaboration.js']
+        return ['Collaboration/js/bookings.js', 'Collaboration/js/Collaboration.js']
 
     def eventDetailBanner(self, obj, conf):
         params = CollaborationTools.getCollaborationParams(conf)

@@ -31,6 +31,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 import os
+import posixpath
 
 from MaKaC.plugins.base import OldObservable
 from MaKaC.common.db import DBMgr
@@ -173,13 +174,19 @@ class WPBase(OldObservable):
             "baseurl": self._getBaseURL(),
             "conf": Config.getInstance(),
             "page": self,
-            "extraCSS": self.getCSSFiles(),
-            "extraJSFiles": self.getJSFiles(),
+            "extraCSS": map(self._fix_path, self.getCSSFiles()),
+            "extraJSFiles": map(self._fix_path, self.getJSFiles()),
             "extraJS": self._extraJS,
             "language": session.lang,
             "social": info.getSocialAppConfig(),
             "assets": self._asset_env
         })
+
+    def _fix_path(self, path):
+        url_path = urlparse(Config.getInstance().getBaseURL()).path or '/'
+        if path[0] != '/':
+            path = posixpath.join(url_path, path)
+        return path
 
     def _getHTMLFooter( self ):
         return """
