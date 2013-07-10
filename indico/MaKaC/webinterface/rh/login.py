@@ -215,24 +215,22 @@ class RHResetPasswordBase:
         if not self._identity:
             raise NoReportError(_('Invalid token (no login found)'))
 
-        # If we used POST we expect a new password
-        if request.method == 'POST':
-            self._password = request.form['password'].strip()
-            if not self._password:
-                raise FormValuesError(_('Your password must not be empty.'))
-            if self._password != request.form['password_confirm'].strip():
-                raise FormValuesError(_('Your password confirmation is not correct.'))
+    def _checkParams_POST(self):
+        self._password = request.form['password'].strip()
+        if not self._password:
+            raise FormValuesError(_('Your password must not be empty.'))
+        if self._password != request.form['password_confirm'].strip():
+            raise FormValuesError(_('Your password confirmation is not correct.'))
 
-    def _process(self):
-        if request.method == 'POST':
-            self._identity.setPassword(self._password.encode('utf-8'))
-            self._token_storage.delete(self._token)
-            url = self._getRedirectURL()
-            url.addParam('passwordChanged', True)
-            self._redirect(url)
-            return
-
+    def _process_GET(self):
         return self._getWP().display()
+
+    def _process_POST(self):
+        self._identity.setPassword(self._password.encode('utf-8'))
+        self._token_storage.delete(self._token)
+        url = self._getRedirectURL()
+        url.addParam('passwordChanged', True)
+        self._redirect(url)
 
 
 class RHResetPassword(RHResetPasswordBase, base.RH):

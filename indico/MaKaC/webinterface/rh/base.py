@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import request, session
 from urlparse import urljoin
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, BadRequest, MethodNotAllowed
 from indico.web.flask.util import ResponseUtil
 
 
@@ -67,8 +67,12 @@ class RequestHandlerBase(OldObservable):
         if req is not None:
             raise Exception("Received request object")
 
-    def _checkProtection( self ):
-        """
+    def _checkProtection(self):
+        """This method is called after _checkParams and is a good place
+        to check if the user is permitted to perform some actions.
+
+        If you only want to run some code for GET or POST requests, you can create
+        a method named e.g. _checkProtection_POST which will be executed AFTER this one.
         """
         pass
 
@@ -182,6 +186,8 @@ class RH(RequestHandlerBase):
     _doNotSanitizeFields = []
     _isMobile = True # this value means that the generated web page can be mobile
 
+    HTTP_VERBS = frozenset(('GET', 'POST', 'PUT', 'DELETE'))
+
     def __init__(self, req=None):
         """Constructor. Initialises the rh setting up basic attributes so it is
             able to process the request.
@@ -265,10 +271,34 @@ class RH(RequestHandlerBase):
         raise
 
     def _checkParams(self, params):
+        """This method is called before _checkProtection and is a good place
+        to assign variables from request params to member variables.
+
+        Note that in any new code the params argument SHOULD be IGNORED.
+        Use the following objects provided by Flask instead:
+        from flask import request
+        request.view_args (URL route params)
+        request.args (GET params (from the query string))
+        request.form (POST params)
+        request.values (GET+POST params - use only if ABSOLUTELY NECESSARY)
+
+        If you only want to run some code for GET or POST requests, you can create
+        a method named e.g. _checkParams_POST which will be executed AFTER this one.
+        The method is called without any arguments (except self).
+        """
         pass
 
     def _process(self):
-        pass
+        """The default process method dispatches to a method containing
+        the HTTP verb used for the current request, e.g. _process_POST.
+        When implementing this please consider that you most likely want/need
+        only GET and POST - the other verbs are not supported everywhere!
+        """
+        method = getattr(self, '_process_' + request.method, None)
+        if method is None:
+            valid_methods = [m for m in self.HTTP_VERBS if hasattr(self, '_process_' + m)]
+            raise MethodNotAllowed(valid_methods)
+        return method()
 
     def _checkCSRF(self):
         # Check referer for POST requests. We do it here so we can properly use indico's error handling
@@ -407,6 +437,10 @@ class RH(RequestHandlerBase):
         return p.display()
 
     def process(self, params):
+        if request.method not in self.HTTP_VERBS:
+            # Just to be sure that we don't get some crappy http verb we don't expect
+            raise BadRequest
+
         profile = Config.getInstance().getProfile()
         proffilename = ""
         res = ""
@@ -469,12 +503,17 @@ class RH(RequestHandlerBase):
                                     return self._responseUtil.make_redirect()
 
                         self._checkCSRF()
-                        #if self._getUser() != None and self._getUser().getId() == "893":
-                        #    profile = True
-                        self._reqParams = copy.copy( params )
-                        self._checkParams( self._reqParams )
+                        self._reqParams = copy.copy(params)
+                        self._checkParams(self._reqParams)
+                        func = getattr(self, '_checkParams_' + request.method, None)
+                        if func:
+                            func()
 
                         self._checkProtection()
+                        func = getattr(self, '_checkProtection_' + request.method, None)
+                        if func:
+                            func()
+
                         security.Sanitization.sanitizationCheck(self._target,
                                                self._reqParams,
                                                self._aw, self._doNotSanitizeFields)
