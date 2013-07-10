@@ -111,7 +111,9 @@
         },
 
         destroy: function() {
-            // TODO: destroy
+            this.element.off("focusout click keyup propertychange paste");
+            this.element.removeClass("field-area scrollable");
+            this.table.remove();
         },
 
         _deleteRow: function(row) {
