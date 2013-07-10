@@ -1913,15 +1913,10 @@ class UHMaterialDisplay(URLHandler):
     @classmethod
     def getStaticURL(cls, target, **params):
         if target is not None:
-            from MaKaC.conference import LocalFile
             params = target.getLocator()
             resources = target.getOwner().getMaterialById(params["materialId"]).getResourceList()
             if len(resources) == 1:
-                if isinstance(resources[0], LocalFile):
-                    return os.path.join("files/events/conference", params["materialId"],
-                                        resources[0].getId() + "-" + resources[0].getName())
-                else:
-                    return resources[0].getURL()
+                return UHFileAccess.getStaticURL(resources[0])
             return "materialDisplay-%s.html" % params["materialId"]
         return cls._getURL()
 
@@ -2022,13 +2017,13 @@ class UHFileAccess(URLHandler):
         elif isinstance(owner, conference.SubContribution):
             path = "agenda/%s-subcontribution" % owner.getId()
         else:
-            return "non static link"
+            return None
         url = os.path.join("files", path, params["materialId"], params["resId"] + "-" + target.getName())
         return url
 
     @classmethod
     def getStaticURL(cls, target, **params):
-        return cls.generateFileStaticLink(target)
+        return cls.generateFileStaticLink(target) or cls.getURL(target, _ignore_static=True, **params)
 
 
 class UHVideoWmvAccess(URLHandler):
