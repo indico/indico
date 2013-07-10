@@ -43,9 +43,9 @@ with event.add_prefixed_rules('/session/<sessionId>'):
                        rh_as_view(subContribDisplay.RHSubContributionDisplay))
     event.add_url_rule('/contribution/<contribId>/<subContId>.marc.xml', 'subContributionDisplay-marcxml',
                        rh_as_view(subContribDisplay.RHSubContributionToMarcXML))
+    event.add_url_rule('/contribution/<contribId>/author/<authorId>', 'contribAuthorDisplay',
+                       rh_as_view(authorDisplay.RHAuthorDisplay))
 
 # Authors/Speakers
 event.add_url_rule('/authors', 'confAuthorIndex', rh_as_view(conferenceDisplay.RHAuthorIndex))
-event.add_url_rule('/contribution/<contribId>/author/<authorId>', 'contribAuthorDisplay',
-                   rh_as_view(authorDisplay.RHAuthorDisplay))
 event.add_url_rule('/speakers', 'confSpeakerIndex', rh_as_view(conferenceDisplay.RHSpeakerIndex))
