@@ -114,6 +114,10 @@ class OfflineEventCreator(object):
         # Add i18n js
         self._addFolderFromSrc(os.path.join(self._staticPath, 'js', 'indico', 'i18n'),
                                os.path.join(config.getHtdocsDir(), 'js', 'indico', 'i18n'))
+        # Add system icons (not referenced in HTML/CSS)
+        for icon in Config.getInstance().getSystemIcons().itervalues():
+            self._addFileFromSrc(os.path.join(self._staticPath, 'images', icon),
+                                 os.path.join(config.getHtdocsDir(), 'images', icon))
         # IE compat files (in conditional comments so BS doesn't see them)
         for path in ie_compatibility.urls():
             self._addFileFromSrc(os.path.join(self._staticPath, path.lstrip('/')),
