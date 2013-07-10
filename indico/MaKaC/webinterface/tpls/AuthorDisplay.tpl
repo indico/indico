@@ -1,7 +1,3 @@
-<script type="text/javascript">
-    include(ScriptRoot + "indico/Timetable/Loader.js");
-</script>
-
 <div class="groupTitle">${ _("Details for") } <b>${ fullName }</b></div>
 <table>
   % if self_._aw.getUser():
