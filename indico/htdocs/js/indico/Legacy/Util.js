@@ -754,6 +754,10 @@ var IndicoUtil = {
         };
 
         this.remove = function(component) {
+            if (component instanceof jQuery) {
+                component = $E(component[0]);
+            }
+
             var removeEntry = null;
             each(entryList,
                  function(entry) {
