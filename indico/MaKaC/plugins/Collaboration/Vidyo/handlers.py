@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from flask import request
 
 from indico.util.fossilize import fossilize
 
@@ -31,7 +32,8 @@ class ConnectVidyoBookingBase(CollaborationBookingModifBase):
     """
 
     def _checkProtection(self):
-        if self.getAW().getUser() and self.getHostIP() == VidyoTools.getLinkRoomIp(self._booking.getLinkObject(), ipAttName='IP'):
+        if self.getAW().getUser() and request.remote_addr == VidyoTools.getLinkRoomIp(self._booking.getLinkObject(),
+                                                                                      ipAttName='IP'):
             return
         elif not hasattr(self._booking, "getOwnerObject") or self._booking.getOwnerObject() != self.getAW().getUser():
             CollaborationBookingModifBase._checkProtection(self)

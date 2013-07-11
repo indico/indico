@@ -16,7 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import session
+from flask import session, request
 
 import tempfile
 from MaKaC.errors import MaKaCError
@@ -122,7 +122,7 @@ class RHMaterialAddConvertedFile(RHMaterialDisplayBase):
 
     def _process( self ):
         params = self._getRequestParams()
-        tempFilePath = fileConverter.CDSConvFileConverter.storeConvertedFile(self.getHostIP(), params)
+        tempFilePath = fileConverter.CDSConvFileConverter.storeConvertedFile(request.remote_addr, params)
         self._tempFilesToDelete.append(tempFilePath)
         #Normally, you do not have to response anything special.....but we can think about it.
         return params.get("filename","")

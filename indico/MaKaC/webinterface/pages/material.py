@@ -27,7 +27,6 @@ import MaKaC.conference as conference
 from MaKaC.webinterface.general import strfFileSize
 from MaKaC.webinterface.materialFactories import ConfMFRegistry,SessionMFRegistry,ContribMFRegistry
 from MaKaC.common.Configuration import Config
-from MaKaC.common.contextManager import ContextManager
 from MaKaC.webinterface.pages.category import WPCategoryBase,WPCategoryDisplayBase,WPCategoryDisplay
 import MaKaC.webinterface.pages.category
 import MaKaC.webinterface.displayMgr as displayMgr

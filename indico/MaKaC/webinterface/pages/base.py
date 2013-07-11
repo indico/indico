@@ -36,12 +36,6 @@ import posixpath
 from MaKaC.plugins.base import OldObservable
 from MaKaC.common.db import DBMgr
 
-
-class _StaticVersion(Version):
-    def determine_version(self, bundle, hunk=None, env=None):
-        return 'static'
-
-
 class WPBase(OldObservable):
     """
     """

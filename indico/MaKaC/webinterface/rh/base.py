@@ -114,9 +114,6 @@ class RequestHandlerBase(OldObservable):
     def getRequestParams( self ):
         return self._params
 
-    def getRequestHTTPHeaders( self ):
-        return request.headers
-
     def _setLang(self, params=None):
 
         # allow to choose the lang from params
@@ -133,9 +130,6 @@ class RequestHandlerBase(OldObservable):
             lang = "en_GB"
         from indico.util.i18n import setLocale
         setLocale(lang)
-
-    def getHostIP(self):
-        return request.remote_addr
 
     def _getTruncatedParams(self):
         """Truncates params"""
@@ -448,7 +442,7 @@ class RH(RequestHandlerBase):
                     self._notify('requestRetry', MAX_RETRIES - retry)
 
                 try:
-                    Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), self.getHostIP()))
+                    Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), request.remote_addr))
                     try:
                         # clear the fossile cache at the start of each request
                         fossilize.clearCache()
@@ -462,7 +456,7 @@ class RH(RequestHandlerBase):
                         # keep a link to the web session in the access wrapper
                         # this is used for checking access/modification key existence
                         # in the user session
-                        self._aw.setIP(self.getHostIP())
+                        self._aw.setIP(request.remote_addr)
                         self._setSessionUser()
                         self._setLang(params)
                         if self._getAuth():
