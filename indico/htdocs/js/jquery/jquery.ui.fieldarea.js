@@ -24,14 +24,15 @@
 
         options: {
             fields_caption: "field",
-            parameter_manager: undefined
+            parameter_manager: undefined,
+            parameter_type: "text"
         },
 
         _create: function() {
             var self = this;
 
             self.info = {};
-            self.info["next_index"] = 2;
+            self.info["next_index"] = 0;
 
             self.table = $("<table></table>");
             self.element.addClass("field-area scrollable");
@@ -107,6 +108,7 @@
                 this._prevIndex();
                 this.new_row.remove();
                 this.new_row = row;
+                this._removeFromPM(row.find("input"));
             }
         },
 
@@ -120,6 +122,7 @@
             if (row[0] != this.new_row[0]) {
                 var id = $(this).closest("tr").find("input").data("id");
                 delete this.info[id];
+                this._removeFromPM(row.find("input"));
                 row.remove();
             }
         },
@@ -130,6 +133,20 @@
 
         _prevIndex: function() {
             return this.info["next_index"]--;
+        },
+
+        _addToPM: function(input) {
+            if (this.options["parameter_manager"] !== undefined) {
+                var parameter_type = this.options["parameter_type"];
+                this.options["parameter_manager"].remove(input);
+                this.options["parameter_manager"].add(input, parameter_type, false);
+            }
+        },
+
+        _removeFromPM: function(input) {
+            if (this.options["parameter_manager"] !== undefined) {
+                this.options["parameter_manager"].remove(input);
+            }
         },
 
         _row: function(id) {
@@ -158,9 +175,7 @@
                 this._deleteRow(row);
             } else {
                 this.info[input.data("id")] = input.val();
-                if (this.options["parameter_manager"] !== undefined) {
-                    this.options["parameter_manager"].add(input, "int", false);
-                }
+                this._addToPM(input);
             }
         },
 
