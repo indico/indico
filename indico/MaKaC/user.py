@@ -367,35 +367,35 @@ class Avatar(Persistent, Fossilizable):
         self.unlockedFields = [] # fields that are not synchronized with auth backends
         self.authenticatorPersonalData = {} # personal data from authenticator
 
-        if userData != None:
-            if userData.has_key("name"):
+        if userData is not None:
+            if 'name' in userData:
                 self.setName(userData["name"])
-            if userData.has_key("surName"):
+            if 'surName' in userData:
                 self.setSurName(userData["surName"])
-            if userData.has_key("title"):
+            if 'title' in userData:
                 self.setTitle(userData["title"])
-            if userData.has_key("organisation"):
+            if 'organisation' in userData:
                 if len(userData["organisation"])>0:
                     for org in userData["organisation"]:
                         if not self.getOrganisation():
                             self.setOrganisation(org)
                         else:
                             self.addOrganisation(org)
-            if userData.has_key("address"):
+            if 'address' in userData:
                 if len(userData["address"])>0:
                     for addr in userData["address"]:
                         self.addAddress(addr)
-            if userData.has_key("email"):
+            if 'email' in userData:
                 if type(userData["email"]) == str:
                     self.setEmail(userData["email"])
                 elif len(userData["email"])>0:
                     for em in userData["email"]:
                         self.setEmail(em)
-            if userData.has_key("telephone"):
+            if 'telephone' in userData:
                 if len(userData["telephone"])>0:
                     for tel in userData["telephone"]:
                         self.addTelephone(tel)
-            if userData.has_key("fax"):
+            if 'fax' in userData:
                 if len(userData["fax"])>0:
                     for fax in userData["fax"]:
                         self.addTelephone(fax)
@@ -404,15 +404,12 @@ class Avatar(Persistent, Fossilizable):
             #Fermi timezone awareness  #
             ############################
 
-            if userData.has_key("timezone"):
+            if 'timezone' in userData:
                 self.setTimezone(userData["timezone"])
             else:
                 self.setTimezone(info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
 
-            if userData.has_key("displayTZMode"):
-                self.setDisplayTZMode(userData["displayTZMode"])
-            else:
-                self.setDisplayTZMode("Event Timezone")
+            self.setDisplayTZMode(userData.get("displayTZMode", "Event Timezone"))
 
     def mergeTo(self, av):
         if av:
