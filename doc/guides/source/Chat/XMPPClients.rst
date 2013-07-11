@@ -93,7 +93,7 @@ How do I add my account?
 
 - Type the name you want to give this account in the Resource box. For example, Work or CERN.
 
-- Type your NICE password into the Password box. :warning:`DO NOT check "Remember password", since it will be saved in plain text and it could cause a security problem`.
+- Type your CERN password into the Password box. :warning:`DO NOT check "Remember password", since it will be saved in plain text and it could cause a security problem`.
 
 - Click the Advanced tab.
 

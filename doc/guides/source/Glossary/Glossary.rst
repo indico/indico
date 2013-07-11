@@ -16,14 +16,12 @@ Indico's Glossary
 
    Account
      A register, associated with a user, and that enables him/her to
-     authenticate his/her identity. Indico supports local accounts (no
-     longer used at CERN) and NICE accounts (centrally registered at
-     CERN, and authenticated through SSO).
+     authenticate his/her identity. Indico supports local accounts, LDAP
+     and SSO.
 
    Avatar
      An "Avatar" is a representation of a user in the Indico database.
-     It usually contains all the user's personal info (that is extracted
-     from the NICE database the first time the user logs into Indico).
+     It usually contains all the user's personal info.
      These data can be explicitly modified by the user. An Avatar is
      normally associated with one or more accounts.
 

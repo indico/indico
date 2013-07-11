@@ -25,7 +25,7 @@
              ${ _("Whether the room exists. Turn it off if room is no longer suitable for meetings, but for some reason you don't want to delete it.")}
         </div>
         <div id="isReservableCH" class="tip">
-             ${ _("Whether the room is bookable by anyone having Indico or NICE account.")}
+             ${ _("Whether the room is bookable by anyone having a user account.")}
         </div>
         <div id="resvsNeedConfirmationCH" class="tip">
              ${ _("Whether bookings must be accepted by person responsible.")}
