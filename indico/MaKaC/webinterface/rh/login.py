@@ -60,7 +60,8 @@ class RHSignInBase( base.RH ):
     def _makeLoginProcess( self ):
         #Check for automatic login
         authManager = AuthenticatorMgr.getInstance()
-        if authManager.isSSOLoginActive() and len(authManager.getList()) == 1 and not Config.getInstance().getDisplayLoginPage():
+        if (authManager.isSSOLoginActive() and len(authManager.getList()) == 1 and
+           not Config.getInstance().getDisplayLoginPage()):
             self._redirect(urlHandlers.UHSignInSSO.getURL(authId=authManager.getDefaultAuthenticator().getId()))
             return
         if not self._signIn:

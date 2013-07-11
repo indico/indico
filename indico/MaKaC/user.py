@@ -1046,9 +1046,26 @@ class Avatar(Persistent, Fossilizable):
         return self.unlockedFields
 
     def setAuthenticatorPersonalData(self, field, value):
+        fields = {'phone': {'get': self.getPhone,
+                            'set': self.setPhone},
+                  'fax': {'get': self.getFax,
+                          'set': self.setFax},
+                  'surName': {'get': self.getSurName,
+                              'set': lambda x: self.setSurName(x, reindex=True)},
+                  'firstName': {'get': self.getFirstName,
+                                'set': lambda x: self.setFirstName(x, reindex=True)},
+                  'affiliation': {'get': self.getAffiliation,
+                                  'set': lambda x: self.setAffiliation(x, reindex=True)},
+                  'email': {'get': self.getEmail,
+                            'set': lambda x: self.setEmail(x, reindex=True)}}
+
         if not hasattr(self, 'authenticatorPersonalData'):
             self.authenticatorPersonalData = {}
-        self.authenticatorPersonalData[field] = value
+        self.authenticatorPersonalData[field] = value or ''
+
+        field_accessors = fields[field]
+        if value and value != field_accessors['get']() and self.isFieldSynced(field):
+            field_accessors['set'](value)
         self._p_changed = 1
 
     def getAuthenticatorPersonalData(self, field):

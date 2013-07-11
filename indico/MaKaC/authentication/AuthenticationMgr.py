@@ -21,6 +21,8 @@ from flask import session
 from MaKaC.common.Configuration import Config
 from MaKaC.errors import MaKaCError
 
+from indico.util.importlib import import_module
+
 class AuthenticatorMgr:
 
     _instance = None
@@ -30,14 +32,14 @@ class AuthenticatorMgr:
         config = Config.getInstance()
         for auth, config in config.getAuthenticatorList():
             try:
-                self._authenticator_list.append(getattr(__import__("MaKaC.authentication." + auth + "Authentication", globals(), locals(),[auth + "Authentication"]), auth + "Authenticator")())
-            except:
+                mod = import_module("MaKaC.authentication." + auth + "Authentication")
+                self._authenticator_list.append(getattr(mod, auth + "Authenticator")())
+            except ImportError:
                 raise MaKaCError("Impossible to load %s" % auth)
 
     @classmethod
-    def getInstance( cls ):
-
-        if cls._instance == None:
+    def getInstance(cls):
+        if cls._instance is None:
             cls._instance = AuthenticatorMgr()
         return cls._instance
 
@@ -84,12 +86,12 @@ class AuthenticatorMgr:
             :type auth: str, list or NoneType
         """
 
-        if auth == None:
+        if auth is None:
             # search all authenticators
             authList = self.getList()
         else:
             # get the actual Authenticator objects
-            authList = list(self.getById(a) for a in auth)
+            authList = map(self.getById, auth)
 
         # we search for Avatars in each authenticator
         foundAvatars = {}
@@ -102,7 +104,7 @@ class AuthenticatorMgr:
 
         return foundAvatars
 
-    def isLoginFree( self, login):
+    def isLoginAvailable(self, login):
         for au in self.getList():
             try:
                 if au.getById(login):
@@ -111,7 +113,7 @@ class AuthenticatorMgr:
                 pass
         return True
 
-    def getDefaultAuthenticator( self ):
+    def getDefaultAuthenticator(self):
         return self.getList()[0]
 
     def getList(self):
@@ -132,18 +134,18 @@ class AuthenticatorMgr:
             auth = self.getDefaultAuthenticator()
         return auth.createIdentity(li, avatar)
 
-    def removeIdentity( self, Id):
+    def removeIdentity(self, identity):
         #check if there is almost another one identity
-        if len(Id.getUser().getIdentityList()) > 1:
-            auth = self.getById(Id.getAuthenticatorTag())
-            auth.remove(Id)
+        if len(identity.getUser().getIdentityList()) > 1:
+            auth = self.getById(identity.getAuthenticatorTag())
+            auth.remove(identity)
 
     def getIdentityById(self, id):
         for auth in self.getList():
             try:
-                Id = auth.getById(id)
-                if Id:
-                    return Id
+                identity = auth.getById(id)
+                if identity:
+                    return identity
             except KeyError,e:
                 pass
         return None
@@ -159,7 +161,7 @@ class AuthenticatorMgr:
         if auth and auth.isSSOLoginActive():
             av = auth.retrieveAvatar(rh)
             if av:
-                rh._getSession().setVar("SSOLogin", auth.getId())
+                session["SSOLogin"] = auth.getId()
                 return av
         return None
 

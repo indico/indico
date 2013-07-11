@@ -209,8 +209,10 @@ $E('inPlaceEditEmail').set(new InputEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'email'}, ${ jsonEncode(onlyEmail) }, false, null, Util.Validation.isEmailAddress,
         $T("Invalid e-mail address")).draw());
 
-$E('inPlaceEditAddress').set(new TextAreaEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'address'}, $E('inPlaceEditAddress').dom.innerHTML, true).draw());
+var editAddress = new TextAreaEditWidget('user.setPersonalData',
+        {'userId':'${ userId }', 'dataType':'address'}, ${ jsonEncode(address) }, true, curry(unlockField, 'address'), null, null, null,
+        curry(beforeEdit, 'address'));
+$E('inPlaceEditAddress').set(editAddress.draw());
 
 var editTelephone = new InputEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'telephone'}, ${ jsonEncode(telephon) }, true, curry(unlockField, 'phone'), null, null, null,
@@ -234,7 +236,8 @@ $.each({
     firstName: editFirstName,
     affiliation: editOrganisation,
     phone: editTelephone,
-    fax: editFax
+    fax: editFax,
+    address: editAddress
 }, function(field, editor) {
     if(_.contains(unlockedFields, field)) {
         unlockField.call(editor, field);

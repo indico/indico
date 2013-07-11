@@ -273,57 +273,25 @@ class LDAPIdentity(PIdentity):
 
         log = Logger.get('auth.ldap')
         log.info("authenticate(%s)" % id.getLogin())
-        data = AuthenticatorMgr.getInstance().getById(self.getAuthenticatorTag()).checkLoginPassword(id.getLogin(), id.getPassword())
-        if data:
-            if self.getLogin() == id.getLogin():
-                # modify Avatar with the up-to-date info from LDAP
-                av = self.user
-                av.clearAuthenticatorPersonalData()
-                udata = LDAPTools.extractUserDataFromLdapData(data)
-                if 'name' in udata:
-                    firstName = udata['name']
-                    av.setAuthenticatorPersonalData('firstName', firstName)
-                    if firstName and av.getName() != firstName and av.isFieldSynced('firstName'):
-                        av.setName(firstName, reindex=True)
-                        log.info('updated name for user '+id.getLogin()+' to '+firstName)
-                    if 'surName' in udata:
-                        surname = udata['surName']
-                        av.setAuthenticatorPersonalData('surName', surname)
-                        if surname and av.getSurName() != surname and av.isFieldSynced('surName'):
-                            av.setSurName(surname, reindex=True)
-                            log.info('updated surName for user '+id.getLogin()+' to '+surname)
-                    if 'organisation' in udata:
-                        org = udata['organisation']
-                        av.setAuthenticatorPersonalData('affiliation', org)
-                        if org.strip() != '' and org != av.getOrganisation() and av.isFieldSynced('affiliation'):
-                            av.setOrganisation(org, reindex=True)
-                            log.info('updated organisation for user '+id.getLogin()+' to '+org)
-                    if 'email' in udata:
-                        mail = udata['email']
-                        if mail.strip() != '' and mail != av.getEmail():
-                            av.setEmail(mail, reindex=True)
-                            log.info('updated email for user '+id.getLogin()+' to '+mail)
-                    if 'address' in udata:
-                        address = udata['address']
-                        if address != av.getAddress():
-                            av.setFieldSynced('address',True)
-                            av.setAddress(address)
-                            log.info('updated address for user '+id.getLogin()+' to '+address)
-                    if 'phone' in udata:
-                        phone = udata['phone']
-                        if phone and phone != av.getPhone() and av.isFieldSynced('phone'):
-                            av.setPhone(phone)
-                            log.info('updated phone for user '+id.getLogin()+' to '+phone)
-                    if 'fax' in udata:
-                        fax = udata['fax']
-                        if fax and fax != av.getFax() and av.isFieldSynced('fax'):
-                            av.setFax(fax)
-                            log.info('updated fax for user '+id.getLogin()+' to '+fax)
+        data = AuthenticatorMgr.getInstance().getById(self.getAuthenticatorTag()).checkLoginPassword(id.getLogin(),
+                                                                                                     id.getPassword())
+        if not data or self.getLogin() != id.getLogin():
+            return None
+        # modify Avatar with the up-to-date info from LDAP
+        av = self.user
+        av.clearAuthenticatorPersonalData()
+        udata = LDAPTools.extractUserDataFromLdapData(data)
 
-                return self.user
-            else:
-                return None
-        return None
+        mail = udata.get('email', '').strip()
+        if mail != '' and mail != av.getEmail():
+            av.setEmail(mail, reindex=True)
+        av.setAuthenticatorPersonalData('firstName', udata.get('name'))
+        av.setAuthenticatorPersonalData('surName', udata.get('surName'))
+        av.setAuthenticatorPersonalData('affiliation', udata.get('organisation'))
+        av.setAuthenticatorPersonalData('address', udata.get('address'))
+        av.setAuthenticatorPersonalData('phone', udata.get('phone'))
+        av.setAuthenticatorPersonalData('fax', udata.get('fax'))
+        return self.user
 
     def getAuthenticatorTag(self):
         return LDAPAuthenticator.getId()

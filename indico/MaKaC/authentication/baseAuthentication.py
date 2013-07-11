@@ -34,9 +34,6 @@ Every Authenticator that is developed has to overwrite the main methods if they 
 
 class Authenthicator(ObjectHolder):
 
-    def __init__(self):
-        ObjectHolder.__init__(self)
-
     def add( self, newId ):
         """ Add a new Id to the ObjectHolder.
             Returns the identity Id.
@@ -85,11 +82,11 @@ class Authenthicator(ObjectHolder):
         """
         return self._getIdx()
 
+    @classmethod
     def getId(self):
         """ Returns the Id of the Authenticator
         """
         return self.id
-    getId = classmethod( getId )
 
     def getName(self):
         """ Returns the name of the Authenticator. If it is setup in the configuration, otherwise, default name.
@@ -291,16 +288,6 @@ class SSOHandler:
                 av.setAuthenticatorPersonalData('surName', lastname)
                 av.setAuthenticatorPersonalData('firstName', firstname)
                 av.setAuthenticatorPersonalData('affiliation', institute)
-                if phone != '' and phone != av.getPhone() and av.isFieldSynced('phone'):
-                    av.setTelephone(phone)
-                if fax != '' and fax != av.getFax() and av.isFieldSynced('fax'):
-                    av.setFax(fax)
-                if lastname != '' and lastname != av.getFamilyName() and av.isFieldSynced('surName'):
-                    av.setSurName(lastname, reindex=True)
-                if firstname != '' and firstname != av.getFirstName() and av.isFieldSynced('firstName'):
-                    av.setName(firstname, reindex=True)
-                if institute != '' and institute != av.getAffiliation() and av.isFieldSynced('affiliation'):
-                    av.setAffiliation(institute, reindex=True)
                 if personId != None and personId != av.getPersonId():
                     av.setPersonId(personId)
             else:
@@ -321,4 +308,4 @@ class SSOHandler:
         return None
 
     def getLogoutCallbackURL(self):
-        return Config.getInstance().getAuthenticatorConfigById(self.id).get("LogoutCallbackURL", "https://login.cern.ch/adfs/ls/?wa=wsignout1.0")
+        return Config.getInstance().getAuthenticatorConfigById(self.id).get("LogoutCallbackURL")

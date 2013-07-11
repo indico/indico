@@ -236,13 +236,9 @@ MaxUploadFileSize = 0
 #
 #
 #
-# The default configuration will use only Indico's authentication system.
-
-AuthenticatorList    = [('Local', {})]
-
 # For instance if you want to setup the LDAP Authenticator you should define as following:
 #
-# AuthenticatorList  = [('Local', { 'host': 'myldapserver.example.com',
+# AuthenticatorList  = [('LDAP', { 'host': 'myldapserver.example.com',
 #
 #                                   # use TLS (do so, if your server allows)
 #                                   'useTLS': True,
@@ -262,6 +258,9 @@ AuthenticatorList    = [('Local', {})]
 #
 #
 #
+# The default configuration will use only Indico's authentication system.
+
+AuthenticatorList    = [('Local', {})]
 
 # Sessions are only stored for a certain time. You can modify the duration here. By setting
 # the lifetime to 0 the cookie will expire when the browser is closed.

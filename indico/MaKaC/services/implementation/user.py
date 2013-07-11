@@ -444,6 +444,9 @@ class UserSetPersonalData(UserPersonalDataBase):
             elif self._dataType == "fax":
                 self._user.setFieldSynced('fax', False)
                 self._user.setFax(self._value)
+            elif self._dataType == "address":
+                self._user.setFieldSynced('address', False)
+                self._user.setAddress(self._value)
             else:
                 getattr(self._user, funcSet)(self._value)
 
