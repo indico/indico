@@ -1141,7 +1141,8 @@ class AvatarHolder(ObjectHolder):
         result = {}
         iset = set()
         for f,v in criteria.items():
-            if str(v).strip()!="" and f in self._indexes:
+            v = str(v).strip()
+            if v and f in self._indexes:
                 match = indexes.IndexesHolder().getById(f).matchUser(v, exact=exact)
                 if match!= None:
                     if len(iset) == 0:
@@ -1174,7 +1175,7 @@ class AvatarHolder(ObjectHolder):
                                 av = userMatched[0]
                                 if self._userMatchCriteria(av, criteria, exact):
                                     result[av.getEmail()] = av
-            #self._external_user_cache.set(key, result.values(), EXTERNAL_CACHE_TTL)
+            self._external_user_cache.set(key, result.values(), EXTERNAL_CACHE_TTL)
         return result.values()
 
     def _userMatchCriteria(self, av, criteria, exact):
