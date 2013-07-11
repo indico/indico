@@ -105,18 +105,10 @@
             <td>&nbsp;</td>
             <td width="100%">
                 <div style="padding: 5px 0;">
-                    <div style="padding-bottom: 10px;">${ _("Please enter your e-mail address in the field below and your password will be sent to you") }</div>
+                    <div style="padding-bottom: 10px;">${ _("If you can't remember your login and password, please use the button below to receive a link to reset your password by email")}</div>
                     <form action=${ forgotPasswordURL } method="POST">
-                        <input type="text" name="email"> <input type="submit" class="btn" value="${ _("Send me my password") }">
+                        <input type="submit" class="btn" value="${ _("Reset my password")}">
                     </form>
-                </div>
-                <div style="padding: 5px 0; color: #444;">
-                      <% from MaKaC.common.Configuration import Config    %>
-                      % if "Local" not in Config.getInstance().getAuthenticatorList():
-                           <em>${ _("If you <b>can't remember your password</b>, please click") } <a href="https://cernaccount.web.cern.ch/cernaccount/ResetPassword.aspx">${ ("here") }</a></em>
-                      % else:
-                           <em>${ _("<b>Note:</b> this works only with Indico local accounts, not with CERN NICE/External accounts; for these click") } <a href="https://cernaccount.web.cern.ch/cernaccount/ResetPassword.aspx">${ _("here") }</a></em>.
-                      % endif
                 </div>
             </td>
         </tr>

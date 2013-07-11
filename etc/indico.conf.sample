@@ -231,7 +231,8 @@ MaxUploadFileSize = 0
 #                                                           'fax': 'ADFS_FAXNUMBER',
 #                                                           'lastname': 'ADFS_LASTNAME',
 #                                                           'firstname': 'ADFS_FIRSTNAME',
-#                                                           'institute': 'ADFS_HOMEINSTITUTE'}
+#                                                           'institute': 'ADFS_HOMEINSTITUTE'},
+#                                                           'ResetPasswordMessage': 'Please contact helpdesk or access this url: http://example.com'
 #                                          })]
 #
 #

@@ -274,8 +274,11 @@ class sendLoginInfo:
         logins = []
         for id in idList:
             if not hasattr(id, 'setPassword'):
-                msg = _("Sorry, you are using your CERN credentials (%s) to login into Indico.\n") % id.getLogin()
-                msg += _("Please contact CERN helpdesk in case you do not remember your password (helpdesk@cern.ch).")
+                config = Config.getInstance()
+                extra_message = config.getAuthenticatorConfigById(id.getAuthenticatorTag()).get("ResetPasswordMessage")
+                msg = _("Sorry, you are using an externally managed account (%s) to login into Indico.") % id.getLogin()
+                if extra_message:
+                    msg += "\n" + extra_message
                 logins.append({
                     'tag': id.getAuthenticatorTag(),
                     'login': id.getLogin(),
