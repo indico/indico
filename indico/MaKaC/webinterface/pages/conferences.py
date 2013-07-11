@@ -339,18 +339,18 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             webcastURL = wm.getWebcastServiceURL(wc)
         forthcomingWebcast = not onAirURL and wm.getForthcomingWebcast(self._conf)
 
-        frameParams = {\
-            "confModifURL": urlHandlers.UHConferenceModification.getURL(self._conf), \
-            "logoURL": urlHandlers.UHConferenceLogo.getURL( self._conf), \
-            "currentURL": request.url, \
-            "menuStatus": 'open',
-            "nowHappening": drawer.getNowHappeningHTML(), \
-            "simpleTextAnnouncement": drawer.getSimpleText(), \
+        frameParams = {
+            "confModifURL": urlHandlers.UHConferenceModification.getURL(self._conf),
+            "logoURL": urlHandlers.UHConferenceLogo.getURL(self._conf),
+            "currentURL": request.url,
+            "nowHappening": drawer.getNowHappeningHTML(),
+            "simpleTextAnnouncement": drawer.getSimpleText(),
             "onAirURL": onAirURL,
             "webcastURL": webcastURL,
-            "forthcomingWebcast": forthcomingWebcast }
+            "forthcomingWebcast": forthcomingWebcast
+        }
         if self._conf.getLogo():
-            frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL( self._conf)
+            frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL(self._conf)
 
         body = """
             <div class="confBodyBox clearfix">
@@ -453,12 +453,9 @@ class WConfDisplayFrame(wcomponents.WTemplated):
 
         sinfo = self._conf.getSupportInfo()
 
-
-        p={ "menuStatus": vars["menuStatus"],
-            "menu": self._menu,
-            "support_info": sinfo,
-            "event": self._conf
-           }
+        p = {"menu": self._menu,
+             "support_info": sinfo,
+             "event": self._conf}
         vars["menu"] = WConfDisplayMenu(self._menu).getHTML(p)
 
         dm = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False)
@@ -610,30 +607,28 @@ class WConfDetailsBase( wcomponents.WTemplated ):
                 l.append( temp.getHTML( self._aw, mat, url ) )
         return l
 
-    def _getActionsHTML( self, showActions = False):
-        html=[]
-        if showActions:
-            html=[ i18nformat("""
-                <table style="padding-top:40px; padding-left:20px">
-                <tr>
-                    <td nowrap>
-                        <b> _("Conference sections"):</b>
-                        <ul>
-                """)]
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            for link in menu.getLinkList():
-                if link.isVisible() and link.isEnabled():
-                    if not isinstance(link, displayMgr.Spacer):
-                        html.append(""" <li><a href="%s">%s</a></li>
-                                """%( link.getURL(), link.getCaption() ) )
-                    else:
-                        html.append("%s"%link)
-            html.append("""
-                        </ul>
-                    </td>
-                </tr>
-                </table>
-                """)
+    def _getActionsHTML(self):
+        html = [i18nformat("""
+            <table style="padding-top:40px; padding-left:20px">
+            <tr>
+                <td nowrap>
+                    <b> _("Conference sections"):</b>
+                    <ul>
+            """)]
+        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
+        for link in menu.getLinkList():
+            if link.isVisible() and link.isEnabled():
+                if not isinstance(link, displayMgr.Spacer):
+                    html.append(""" <li><a href="%s">%s</a></li>
+                            """ % (link.getURL(), link.getCaption()))
+                else:
+                    html.append(str(link))
+        html.append("""
+                    </ul>
+                </td>
+            </tr>
+            </table>
+            """)
         return "".join(html)
 
     def getVars( self ):
@@ -672,7 +667,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         info = self._conf.getContactInfo()
         vars["moreInfo_html"] = isStringHTML(info)
         vars["moreInfo"] = info
-        vars["actions"] = self._getActionsHTML(vars.get("menuStatus", "open") != "open")
+        vars["actions"] = self._getActionsHTML()
         vars["isSubmitter"] = self._conf.getAccessController().canUserSubmit(self._aw.getUser()) or self._conf.canModify(self._aw)
         return vars
 
@@ -694,21 +689,19 @@ class WConfDetails:
         return WConfDetailsFull( self._aw, self._conf ).getHTML( params )
 
 
-class WPConferenceDisplay( WPConferenceDefaultDisplayBase ):
+class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
 
-    def _getBody( self, params ):
+    def _getBody(self, params):
 
-        wc = WConfDetails( self._getAW(), self._conf )
-        pars = { \
-    "modifyURL": urlHandlers.UHConferenceModification.getURL( self._conf ), \
-    "sessionModifyURLGen": urlHandlers.UHSessionModification.getURL, \
-    "contribModifyURLGen": urlHandlers.UHContributionModification.getURL, \
-    "subContribModifyURLGen":  urlHandlers.UHSubContribModification.getURL, \
-    "materialURLGen": urlHandlers.UHMaterialDisplay.getURL, \
-    "menuStatus": session.get('menuStatus', 'open')}
-        return wc.getHTML( pars )
+        wc = WConfDetails(self._getAW(), self._conf)
+        pars = {"modifyURL": urlHandlers.UHConferenceModification.getURL(self._conf),
+                "sessionModifyURLGen": urlHandlers.UHSessionModification.getURL,
+                "contribModifyURLGen": urlHandlers.UHContributionModification.getURL,
+                "subContribModifyURLGen":  urlHandlers.UHSubContribModification.getURL,
+                "materialURLGen": urlHandlers.UHMaterialDisplay.getURL}
+        return wc.getHTML(pars)
 
-    def _getHeadContent( self ):
+    def _getHeadContent(self):
         printCSS = WPConferenceDefaultDisplayBase._getHeadContent(self)
         confMetadata = WConfMetadata(self._conf).getHTML()
         return printCSS + confMetadata
@@ -717,7 +710,7 @@ class WPConferenceDisplay( WPConferenceDefaultDisplayBase ):
         wc = wcomponents.WEventFooter(self._conf)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ):
+    def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._overviewOpt)
 
@@ -5561,27 +5554,25 @@ class WConfStaticDetails( wcomponents.WTemplated ):
     </tr>""")%self._conf.getContactInfo()
         return res
 
-    def _getActionsHTML( self, showActions = False):
-        html=[]
-        if showActions:
-            html=[ i18nformat("""
-                <table style="padding-top:40px; padding-left:20px">
-                <tr>
-                    <td nowrap>
-                        <b> _("Conference sections"):</b>
-                        <ul>
-                """)]
-            menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-            for link in menu.getLinkList():
-                if link.isVisible() and link.isEnabled():
-                    html.append(""" <li><a href="%s">%s</a></li>
-                            """%( link.getURL(), link.getCaption() ) )
-            html.append("""
-                        </ul>
-                    </td>
-                </tr>
-                </table>
-                """)
+    def _getActionsHTML(self):
+        html = [i18nformat("""
+            <table style="padding-top:40px; padding-left:20px">
+            <tr>
+                <td nowrap>
+                    <b> _("Conference sections"):</b>
+                    <ul>
+            """)]
+        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
+        for link in menu.getLinkList():
+            if link.isVisible() and link.isEnabled():
+                html.append(""" <li><a href="%s">%s</a></li>
+                        """ % (link.getURL(), link.getCaption()))
+        html.append("""
+                    </ul>
+                </td>
+            </tr>
+            </table>
+            """)
         return "".join(html)
 
     def getVars( self ):
@@ -5608,7 +5599,7 @@ class WConfStaticDetails( wcomponents.WTemplated ):
         vars["chairs"] = self._getChairsHTML()
         vars["material"] = self._getMaterialHTML()
         vars["moreInfo"] = self._getMoreInfoHTML()
-        vars["actions"] = self._getActionsHTML(vars.get("menuStatus", "open") != "open")
+        vars["actions"] = self._getActionsHTML()
 
         return vars
 

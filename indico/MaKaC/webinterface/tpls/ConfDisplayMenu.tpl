@@ -1,4 +1,4 @@
-% if menuStatus == "open" and menu:
+% if menu:
   <!--Left menu-->
   <div class="conf_leftMenu">
     <ul id="outer" class="clearfix">

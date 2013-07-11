@@ -1288,8 +1288,7 @@ class WPRegistrationForm( conferences.WPConferenceDefaultDisplayBase ):
 
     def _getBody(self, params):
         wc = WConfRegistrationForm(self._conf, self._getAW().getUser())
-        pars = {'menuStatus': session.get('menuStatus', 'open')}
-        return wc.getHTML(pars)
+        return wc.getHTML()
 
     def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
@@ -1301,35 +1300,33 @@ class WConfRegistrationForm(wcomponents.WTemplated):
         self._conf = conf
         self._avatar = av
 
-    def _getActionsHTML( self, showActions = False ):
-        html = ""
-        if showActions:
-            regForm = self._conf.getRegistrationForm()
-            if nowutc() < regForm.getStartRegistrationDate():
-                return html
-            else:
-                submitOpt = ""
-                registered = False
-                if self._avatar is not None:
-                    registered = self._avatar.isRegisteredInConf(self._conf)
-                if regForm.inRegistrationPeriod() and not registered:
-                   submitOpt =  i18nformat("""<li><a href=%s> _("Show registration form")</a></li>""")%(quoteattr(str(urlHandlers.UHConfRegistrationFormDisplay.getURL( self._conf ))))
-                if registered:
-                    submitOpt =  i18nformat("""%s<li><a href=%s> _("View or modify your already registration")</a></li>""")%(submitOpt, quoteattr(str("")))
-                html =  i18nformat("""
-                <b> _("Possible actions you can carry out"):</b>
-                <ul>
-                    %s
-                </ul>
-                       """)%( submitOpt )
-        return html
+    def _getActionsHTML(self):
+        regForm = self._conf.getRegistrationForm()
+        if nowutc() < regForm.getStartRegistrationDate():
+            return ""
+        else:
+            submitOpt = ""
+            registered = False
+            if self._avatar is not None:
+                registered = self._avatar.isRegisteredInConf(self._conf)
+            if regForm.inRegistrationPeriod() and not registered:
+                submitOpt = i18nformat("""<li><a href=%s> _("Show registration form")</a></li>""") % (
+                    quoteattr(str(urlHandlers.UHConfRegistrationFormDisplay.getURL(self._conf))))
+            if registered:
+                submitOpt = i18nformat("""%s<li><a href=""> _("View or modify your already registration")</a></li>""") % submitOpt
+            return i18nformat("""
+            <b> _("Possible actions you can carry out"):</b>
+            <ul>
+                %s
+            </ul>
+                   """) % (submitOpt)
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         regForm = self._conf.getRegistrationForm()
         vars["startDate"] = regForm.getStartRegistrationDate().strftime("%d %B %Y")
         vars["endDate"] = regForm.getEndRegistrationDate().strftime("%d %B %Y")
-        vars["actions"] = self._getActionsHTML(vars["menuStatus"] == "close")
+        vars["actions"] = self._getActionsHTML()
         vars["announcement"] = regForm.getAnnouncement()
         vars["title"] = regForm.getTitle()
         vars["usersLimit"] = ""
@@ -1359,8 +1356,7 @@ class WPRegistrationFormDisplay( conferences.WPConferenceDefaultDisplayBase ):
 
     def _getBody(self, params):
         wc = WConfRegistrationFormDisplay(self._conf, self._rh._getUser())
-        pars = {'menuStatus': session.get('menuStatus', 'open')}
-        return wc.getHTML(pars)
+        return wc.getHTML()
 
     def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
@@ -2407,8 +2403,7 @@ class WPRegistrationFormModify( conferences.WPConferenceDefaultDisplayBase ):
 
     def _getBody(self, params):
         wc = WConfRegistrationFormModify(self._conf, self._rh._getUser())
-        pars = {'menuStatus': session.get('menuStatus', 'open')}
-        return wc.getHTML(pars)
+        return wc.getHTML()
 
     def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)

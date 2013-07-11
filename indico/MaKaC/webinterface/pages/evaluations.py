@@ -50,8 +50,7 @@ class WPEvaluationMainInformation( WPEvaluationBase ):
     navigationEntry = NEEvaluationMainInformation
 
     def _getBody(self, params):
-        pars = {'menuStatus': session.get('menuStatus', 'open')}
-        return WEvaluationMainInformation(self._conf, self._getAW().getUser()).getHTML(pars)
+        return WEvaluationMainInformation(self._conf, self._getAW().getUser()).getHTML()
 
     def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
@@ -74,7 +73,7 @@ class WEvaluationMainInformation(wcomponents.WTemplated):
         vars["submissionsLimit"] = evaluation.getSubmissionsLimit()
         vars["contactInfo"] = evaluation.getContactInfo()
         #actions
-        vars["actionsShow"] = evaluation.inEvaluationPeriod() and vars["menuStatus"]=="close"
+        vars["actionsShow"] = evaluation.inEvaluationPeriod()
         vars["actionsDisplayEval"] = None
         vars["actionsModifyEval"]  = None
         if vars["actionsShow"]:
@@ -91,7 +90,6 @@ class WPEvaluationDisplay( WPEvaluationBase ):
 
     def _getBody(self, params):
         pars = {
-            'menuStatus': session.get('menuStatus', 'open'),
             'user': self._rh._getUser()
         }
         return WEvaluationDisplay(self._conf).getHTML(pars)
@@ -121,7 +119,6 @@ class WPEvaluationDisplayModif( WPEvaluationBase ):
 
     def _getBody(self, params):
         pars = {
-            'menuStatus': session.get('menuStatus', 'open'),
             'user': self._rh._getUser()
         }
         return WEvaluationDisplayModif(self._conf).getHTML(pars)
@@ -151,9 +148,7 @@ class WPEvaluationSubmitted( WPEvaluationBase ):
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
 
     def _getBody(self, params):
-        pars = {
-            'menuStatus': session.get('menuStatus', 'open')
-        }
+        pars = {}
         # redirection
         if self._rh.getWebFactory() is not None:  #Event == Meeting/Lecture
             pars["redirection"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
@@ -804,7 +799,6 @@ class WPConfModifEvaluationPreview( WPConfModifEvaluationBase ):
     """[ManagementArea] Preview of an Evaluation."""
     def _getTabContent( self, params ):
         pars = {
-            'menuStatus': session.get('menuStatus', 'open'),
             'user': self._rh._getUser()
         }
         return WConfModifEvaluationPreview(self._conf).getHTML(pars)

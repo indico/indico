@@ -1109,21 +1109,20 @@ class AvatarHolder(ObjectHolder):
                         result[av.getEmail()]=av
         if searchInAuthenticators:
             for authenticator in AuthenticatorMgr.getInstance().getList():
-                dict = authenticator.matchUserFirstLetter(index, letter)
-                if dict:
-                    for email in dict.iterkeys():
+                matches = authenticator.matchUserFirstLetter(index, letter)
+                if matches:
+                    for email, record in matches.iteritems():
                         emailResultList = [av.getEmails() for av in result.values()]
-                        if not email in emailResultList:
+                        if email not in emailResultList:
                             userMatched = self.match({'email': email}, exact=1, searchInAuthenticators=False)
                             if not userMatched:
-                                av = Avatar(dict[email])
-                                av.setId(dict[email]["id"])
-                                av.status = dict[email]["status"]
+                                av = Avatar(record)
+                                av.setId(record["id"])
+                                av.status = record["status"]
                                 result[email] = av
                             else:
                                 av = userMatched[0]
                                 result[av.getEmail()] = av
-            pass
         return result.values()
 
     def match(self, criteria, exact=0, onlyActivated=True, searchInAuthenticators=True):
@@ -1152,21 +1151,17 @@ class AvatarHolder(ObjectHolder):
                 result[av.getEmail()]=av
         if searchInAuthenticators:
             for authenticator in AuthenticatorMgr.getInstance().getList():
-                dict = authenticator.matchUser(criteria, exact=exact)
-                if dict:
-                    for email in dict.iterkeys():
+                matches = authenticator.matchUser(criteria, exact=exact)
+                if matches:
+                    for email, record in matches.iteritems():
                         emailResultList = [av.getEmails() for av in result.values()]
                         if not email in emailResultList:
                             userMatched = self.match({'email': email}, exact=1, searchInAuthenticators=False)
                             if not userMatched:
-                                av = Avatar(dict[email])
-                                av.setId(dict[email]["id"])
-                                av.status = dict[email]["status"]
+                                av = Avatar(record)
+                                av.setId(record["id"])
+                                av.status = record["status"]
                                 if self._userMatchCriteria(av, criteria, exact):
-                                    # TODO: logins can be reused, hence the removal
-                                    # TODO: check if same can happen with emails
-                                    # if auth.hasKey(dict[email]["login"]):
-                                    #     av = auth.getById(dict[email]["login"]).getUser()
                                     result[email] = av
                             else:
                                 av = userMatched[0]
@@ -1236,10 +1231,10 @@ class AvatarHolder(ObjectHolder):
         av = self.match({"email":extId}, searchInAuthenticators=False)
         if av:
             return av[0]
-        dict = AuthenticatorMgr.getInstance().getById(authId).searchUserById(extId)
-        av = Avatar(dict)
-        identity = dict["identity"](dict["login"], av)
-        dict["authenticator"].add(identity)
+        user_data = AuthenticatorMgr.getInstance().getById(authId).searchUserById(extId)
+        av = Avatar(user_data)
+        identity = user_data["identity"](user_data["login"], av)
+        user_data["authenticator"].add(identity)
         av.activateAccount()
         self.add(av)
         return av
@@ -1501,10 +1496,8 @@ class PrincipalHolder:
 
     def match(self, element_id, exact=1, searchInAuthenticators=True):
         prin = self.__gh.match({"name": element_id}, searchInAuthenticators=searchInAuthenticators, exact=exact)
-        print "Grupo", prin
         if not prin:
             prin = self.__ah.match({"login": element_id}, searchInAuthenticators=searchInAuthenticators, exact=exact)
-            print "User", prin
         return prin
 
 
@@ -1576,9 +1569,9 @@ class PersonalBasket(Persistent):
             raise Exception(_("Unknown Element Type"))
 
     def addElement(self, element):
-        dict = self.__findDict(element)
-        if (not dict.has_key(element.getId())):
-            dict[element.getId()] = element;
+        basket = self.__findDict(element)
+        if element.getId() not in basket:
+            basket[element.getId()] = element
             self._p_changed = 1
             return True
         return False

@@ -81,23 +81,23 @@ class WConfCFA(wcomponents.WTemplated):
         self._conf = conf
         self._aw = aw
 
-    def _getActionsHTML( self, showActions = False ):
+    def _getActionsHTML(self):
         html = ""
-        if showActions:
-            cfa = self._conf.getAbstractMgr()
-            if nowutc() < cfa.getStartSubmissionDate():
-                return html
-            else:
-                submitOpt = ""
-                if cfa.inSubmissionPeriod():
-                    submitOpt = i18nformat("""<li><a href="%s"> _("Submit a new abstract")</a></li>""")%(urlHandlers.UHAbstractSubmission.getURL( self._conf ))
-                html = i18nformat("""
-                <b> _("Possible actions you can carry out"):</b>
-                <ul>
-                    %s
-                    <li><a href="%s"> _("View or modify your already submitted abstracts")</a></li>
-                </ul>
-                       """)%( submitOpt, urlHandlers.UHUserAbstracts.getURL( self._conf ) )
+        cfa = self._conf.getAbstractMgr()
+        if nowutc() < cfa.getStartSubmissionDate():
+            return html
+        else:
+            submitOpt = ""
+            if cfa.inSubmissionPeriod():
+                submitOpt = i18nformat("""<li><a href="%s"> _("Submit a new abstract")</a></li>""") % (
+                    urlHandlers.UHAbstractSubmission.getURL(self._conf))
+            html = i18nformat("""
+            <b> _("Possible actions you can carry out"):</b>
+            <ul>
+                %s
+                <li><a href="%s"> _("View or modify your already submitted abstracts")</a></li>
+            </ul>
+                   """) % (submitOpt, urlHandlers.UHUserAbstracts.getURL(self._conf))
         return html
 
 
@@ -110,7 +110,7 @@ class WConfCFA(wcomponents.WTemplated):
             vars["status"] = _("CLOSED")
         vars["startDate"] = cfa.getStartSubmissionDate().strftime("%d %B %Y")
         vars["endDate"] = cfa.getEndSubmissionDate().strftime("%d %B %Y")
-        vars["actions"] = self._getActionsHTML(vars["menuStatus"] == "close")
+        vars["actions"] = self._getActionsHTML()
         vars["announcement"] = cfa.getAnnouncement()
         return vars
 
@@ -120,8 +120,7 @@ class WPConferenceCFA( WPConferenceDefaultDisplayBase ):
 
     def _getBody(self, params):
         wc = WConfCFA(self._getAW(), self._conf)
-        pars = {'menuStatus': session.get('menuStatus', 'open')}
-        return wc.getHTML(pars)
+        return wc.getHTML()
 
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
