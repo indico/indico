@@ -49,7 +49,7 @@ from indico.modules.oauth.components import OAuthUtils
 # indico legacy imports
 from MaKaC.common import DBMgr, Config
 from MaKaC.common.logger import Logger
-from MaKaC.common.fossilize import fossilize
+from MaKaC.common.fossilize import fossilize, clearCache
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.cache import GenericCache
@@ -130,6 +130,7 @@ def buildAW(ak, onlyPublic=False):
 def handler(prefix, path):
     path = posixpath.join('/', prefix, path)
     ContextManager.destroy()
+    clearCache()  # init fossil cache
     logger = Logger.get('httpapi')
     if request.method == 'POST':
         # Convert POST data to a query string
