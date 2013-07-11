@@ -104,7 +104,7 @@
 
         _deleteInput: function(row) {
             if (row.next()[0] == this.new_row[0]) {
-                this._fixIndex();
+                this._prevIndex();
                 this.new_row.remove();
                 this.new_row = row;
             }
@@ -124,12 +124,12 @@
             }
         },
 
-        _fixIndex: function() {
-            this.info["next_index"]--;
-        },
-
         _nextIndex: function() {
             return this.info["next_index"]++;
+        },
+
+        _prevIndex: function() {
+            return this.info["next_index"]--;
         },
 
         _row: function(id) {
