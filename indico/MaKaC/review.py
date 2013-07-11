@@ -611,16 +611,26 @@ class AbstractSelectionField(AbstractField):
 
     def __init__(self, params):
         AbstractField.__init__(self, params)
-        self.__optionGenerator = Counter()
+        self.__id_generator = Counter()
         self._options = []
         for o in params["options"]:
             self._setOption(o)
 
+    def _updateDeletedOptions(self, options={}):
+        for stored_op in self._options:
+            found = False
+            for op in options:
+                if stored_op.getId() == op.getId():
+                    found = True
+            if not found:
+                stored_op.setDeleted()
+
     def _setOption(self, option):
         if self.hasOption(option["id"]):
-            self.getOptionById(option["id"]).setCaption(option["caption"])
+            if not self.getOptionById(option["id"]).isDeleted():
+                self.getOptionById(option["id"]).setCaption(option["caption"])
         else:
-            option["id"] = self.__optionGenerator.newCount()
+            option["id"] = self.__id_generator.newCount()
             self._options.append(SelectionFieldOption(option["id"], option["caption"]))
 
     def clone(self):
@@ -639,8 +649,9 @@ class AbstractSelectionField(AbstractField):
         return self.getOptionById(id) is not None
 
     def setOptions(self, options=[]):
-        for option in options:
-            self._addOption(option)
+        self._updateDeletedOptions(options)
+        for o in options:
+            self._setOption(o)
         self._notifyModification()
 
     def getValues(self):
@@ -648,7 +659,8 @@ class AbstractSelectionField(AbstractField):
 
         options = []
         for o in self.getOptions():
-            options.append(o.__dict__)
+            if not o.isDeleted:
+                options.append(o.__dict__)
         values["options"] = options
 
         return values
