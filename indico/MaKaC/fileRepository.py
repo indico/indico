@@ -61,22 +61,25 @@ class MaterialLocalRepository(Persistent):
     """File repository keeping the files under a certain path in the local
         filesystem (machine where the system is installed).
     """
+
+    _repo_name = "main"
+    _repo_class = MaterialLocalRepository
+
     def __init__(self):
         self.__files = OOBTree.OOBTree()
 
-    #===========================================================================
-    # @staticmethod
-    # def getRepositoryFromDB():
-    #    dbRoot = DBMgr.getInstance().getDBConnection().root()
-    #    try:
-    #        fr = dbRoot["local_repositories"]["main"]
-    #    except KeyError:
-    #        fr = MaterialLocalRepository()
-    #        if not "local_repositories" in dbRoot:
-    #            dbRoot["local_repositories"] = OOBTree()
-    #        dbRoot["local_repositories"]["main"] = fr
-    #    return fr
-    #===========================================================================
+    @classmethod
+    def getRepositoryFromDB(cls):
+        from MaKaC.common.db import DBMgr
+        dbRoot = DBMgr.getInstance().getDBConnection().root()
+        try:
+            fr = dbRoot["local_repositories"][cls._repo_name]
+        except KeyError:
+            fr = cls._repo_class()
+            if not "local_repositories" in dbRoot:
+                dbRoot["local_repositories"] = OOBTree()
+            dbRoot["local_repositories"][cls._repo_name] = fr
+        return fr
 
     def _getNewFileId(self):
         while True:
@@ -291,18 +294,8 @@ class OfflineRepository(MaterialLocalRepository):
         filesystem.
     """
 
-    @staticmethod
-    def getRepositoryFromDB():
-        from MaKaC.common.db import DBMgr
-        dbRoot = DBMgr.getInstance().getDBConnection().root()
-        try:
-            fr = dbRoot["local_repositories"]["offline"]
-        except KeyError:
-            fr = OfflineRepository()
-            if not "local_repositories" in dbRoot:
-                dbRoot["local_repositories"] = OOBTree()
-            dbRoot["local_repositories"]["offline"] = fr
-        return fr
+    _repo_name = "offline"
+    _repo_class = OfflineRepository
 
     def _getRepositoryPath(self):
         return Config.getInstance().getOfflineStore()
