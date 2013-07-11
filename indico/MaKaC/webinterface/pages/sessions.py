@@ -286,19 +286,6 @@ class WSessionModifMain(wcomponents.WTemplated):
             vars["description"] = self._session.getDescription()
         else:
             vars["description"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._session.getDescription()
-        vars["place"]=""
-        place=self._session.getLocation()
-        if place is not None:
-            vars["place"] = "%s<br><pre>%s</pre>"%(\
-                                            self.htmlText(place.getName()),
-                                            self.htmlText(place.getAddress()))
-        room=self._session.getRoom()
-        if room is not None:
-            vars["place"]+="<i>Room:</i> %s"%self.htmlText(room.getName())
-        vars["startDate"],vars["endDate"],vars["duration"]="","",""
-        if self._session.getAdjustedStartDate() is not None:
-            vars["startDate"]=self.htmlText(format_datetime(self._session.getAdjustedStartDate(), format='EEEE d MMMM yyyy H:mm'))
-            vars["endDate"]=self.htmlText(format_datetime(self._session.getAdjustedEndDate(), format='EEEE d MMMM yyyy H:mm'))
         vars["bgcolor"] = self._session.getColor()
         vars["textcolor"] = self._session.getTextColor()
         vars["entryDuration"]=self.htmlText((datetime(1900,1,1)+self._session.getContribDuration()).strftime("%Hh%M'"))
@@ -308,7 +295,7 @@ class WSessionModifMain(wcomponents.WTemplated):
             vars["Type"]=WSessionModifMainType().getHTML(vars)
             vars["Colors"]=WSessionModifMainColors().getHTML(vars)
             vars["Code"]=WSessionModifMainCode().getHTML(vars)
-            vars["Rowspan"]=7
+            vars["Rowspan"]=6
         else:
             vars["Type"]=""
             vars["Colors"]=""

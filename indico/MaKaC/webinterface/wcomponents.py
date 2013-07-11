@@ -3419,29 +3419,6 @@ class WSessionModEditData(WTemplated):
         vars["postURL"] = quoteattr(str(vars["postURL"]))
         vars["title"] = quoteattr(str(vars.get("title", "")))
         vars["description"] = self.htmlText(vars.get("description", ""))
-        if self._targetDay is None:
-            sessionId = vars["sessionId"]
-            session = self._conf.getSessionById(sessionId)
-            refDate = session.getAdjustedStartDate()
-        else:
-            refDate = self._conf.getSchedule(
-            ).getFirstFreeSlotOnDay(self._targetDay)
-        endDate = None
-        if refDate.hour == 23:
-            refDate = refDate - timedelta(minutes=refDate.minute)
-            endDate = refDate + timedelta(minutes=59)
-        vars["sDay"] = str(vars.get("sDay", refDate.day))
-        vars["sMonth"] = str(vars.get("sMonth", refDate.month))
-        vars["sYear"] = str(vars.get("sYear", refDate.year))
-        vars["sHour"] = str(vars.get("sHour", refDate.hour))
-        vars["sMinute"] = str(vars.get("sMinute", refDate.minute))
-        if not endDate:
-            endDate = refDate + timedelta(hours=1)
-        vars["eDay"] = str(vars.get("eDay", endDate.day))
-        vars["eMonth"] = str(vars.get("eMonth", endDate.month))
-        vars["eYear"] = str(vars.get("eYear", endDate.year))
-        vars["eHour"] = str(vars.get("eHour", endDate.hour))
-        vars["eMinute"] = str(vars.get("eMinute", endDate.minute))
         vars["durHour"] = quoteattr(str(vars.get("durHour", 0)))
         vars["durMin"] = quoteattr(str(vars.get("durMin", 20)))
         vars["defaultInheritPlace"] = "checked"
@@ -3504,15 +3481,6 @@ class WSessionModEditData(WTemplated):
             vars["confRoom"] = self.htmlText(confRoom.getName())
         vars["roomName"] = quoteattr(str(roomName))
 
-        vars["autoUpdate"] = ""
-        if not self._conf.getEnableSessionSlots():
-            vars["disabled"] = "disabled"
-        else:
-            vars["disabled"] = ""
-        if self._title.find("Ed") != -1 and self._conf.getEnableSessionSlots():
-            vars["adjustSlots"] = i18nformat("""<input type="checkbox" name="slmove" value="1">  _("Also move timetable entries")""")
-        else:
-            vars["adjustSlots"] = """<input type="hidden" name="slmove" value="1">"""
         import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
         wr = webFactoryRegistry.WebFactoryRegistry()
         wf = wr.getFactory(self._conf)

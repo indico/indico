@@ -130,15 +130,6 @@ class RHSessionDataModification(RoomBookingDBMixin, RHSessionModifBase):
             params["title"] = self._session.getTitle()
             params["code"] = self._session.getCode()
             params["description"] = self._session.getDescription()
-            tz = self._session.getConference().getTimezone()
-            sd = self._session.getStartDate().astimezone(timezone(tz))
-            ed = self._session.getEndDate().astimezone(timezone(tz))
-            params["sYear"], params["sMonth"] = sd.year, sd.month
-            params["sDay"] = sd.day
-            params["sHour"], params["sMinute"] = sd.hour, sd.minute
-            params["eYear"], params["eMonth"] = ed.year, ed.month
-            params["eDay"] = ed.day
-            params["eHour"], params["eMinute"] = ed.hour, ed.minute
             cdur = self._session.getContribDuration()
             params["durHour"], params["durMin"] = int(
                 cdur.seconds / 3600), int((cdur.seconds % 3600) / 60)
@@ -147,26 +138,6 @@ class RHSessionDataModification(RoomBookingDBMixin, RHSessionModifBase):
         self._evt = self._session
 
     def _modify(self, params):
-        tz = self._conf.getTimezone()
-        sd = timezone(tz).localize(datetime(int(params["sYear"]),
-                                            int(params["sMonth"]),
-                                            int(params["sDay"]),
-                                            int(params["sHour"]),
-                                            int(params["sMinute"])))
-        params["sDate"] = sd.astimezone(timezone('UTC'))
-        if params.get("eYear", "") == "":
-            ed = timezone(tz).localize(datetime(int(params["sYear"]),
-                                                int(params["sMonth"]),
-                                                int(params["sDay"]),
-                                                int(params["eHour"]),
-                                                int(params["eMinute"])))
-        else:
-            ed = timezone(tz).localize(datetime(int(params["eYear"]),
-                                                int(params["eMonth"]),
-                                                int(params["eDay"]),
-                                                int(params["eHour"]),
-                                                int(params["eMinute"])))
-        params["eDate"] = ed.astimezone(timezone('UTC'))
         self._target.setValues(params, self._check, self._slmove)
         self._target.setScheduleType(
             params.get("tt_type", self._target.getScheduleType()))
