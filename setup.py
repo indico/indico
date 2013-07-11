@@ -127,7 +127,8 @@ def _getInstallRequires():
             'pytz', 'lxml', 'cds-indico-extras', 'zc.queue',
             'python-dateutil<2.0', 'pypdf', 'mako>=0.4.1', 'babel',
             'icalendar>=3.2', 'pyatom', 'jsmin', 'cssmin', 'webassets', 'pojson>=0.4',
-            'requests>=1.2.0', 'simplejson>=2.1.0', 'reportlab', 'PIL', 'oauth2', 'pyscss', 'bcrypt']
+            'requests>=1.2.0', 'simplejson>=2.1.0', 'reportlab', 'PIL', 'oauth2', 'pyscss==1.1.5', 'Werkzeug==0.9',
+            'Flask==0.10', 'bcrypt==1.0.2', 'beautifulsoup4==4.2.1']
 
     #for Python older than 2.7
     if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
