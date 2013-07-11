@@ -260,23 +260,10 @@ class RHMap(Persistent):
     """ This class is the representation in the DB of the RHMap """
     def __init__(self):
         self.__id = "RHMap"
-        self.__map = {}
         self.__blueprints = set()
-
-    def hasURL(self, rh):
-        return bool(getattr(rh, '_url', None))
-
-    def has_key(self, key):
-        return self.__map.has_key(key)
-
-    def copy(self):
-        return self.__map.copy()
 
     def _notifyModification(self):
         self._p_changed = 1
-
-    def get(self):
-        return self.__map
 
     def getBlueprints(self):
         for module, name in self.__blueprints:
@@ -288,15 +275,6 @@ class RHMap(Persistent):
     def getId(self):
         return self.__id
 
-    def addRH(self, rh):
-        if self.hasURL(rh):
-            urls = (rh._url,) if isinstance(rh._url, basestring) else rh._url
-            for url in urls:
-                if url.startswith('^') or url.endswith('$'):
-                    raise PluginError('Plugin RHs may not use a regex anymore (%s)' % rh.__name__)
-                self.__map[url] = rh
-            self._notifyModification()
-
     def addBlueprint(self, module, attr):
         self.__blueprints.add((module.__name__, attr))
         self._notifyModification()
@@ -304,7 +282,6 @@ class RHMap(Persistent):
     def cleanRHDict(self):
         """ Attributes in this class are persistent, so when we want to erase them we'll need to explicitely invoke this method
         """
-        self.__map.clear()
         try:
             self.__blueprints.clear()
         except AttributeError:
@@ -464,15 +441,9 @@ class RHMapMemory:
     #  @todo Add all variables, and methods needed for the Singleton class below
     class Singleton:
         def __init__(self):
-            if not hasattr(self, '_map') or not hasattr(self, '_blueprints'):
-                if DBMgr.getInstance().isConnected():
-                    self._map = PluginsHolder().getRHMap().copy()
+            if not hasattr(self, '_blueprints'):
+                with DBMgr.getInstance().global_connection():
                     self._blueprints = set(PluginsHolder().getRHMap().getBlueprints())
-                else:
-                    DBMgr.getInstance().startRequest()
-                    self._map = PluginsHolder().getRHMap().copy()
-                    self._blueprints = set(PluginsHolder().getRHMap().getBlueprints())
-                    DBMgr.getInstance().endRequest()
 
     ## The constructor
     #  @param self The object pointer.

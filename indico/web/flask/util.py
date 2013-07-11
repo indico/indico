@@ -60,6 +60,7 @@ def create_flat_args():
 @memoize
 def rh_as_view(rh):
     if issubclass(rh, RHHtdocs):
+        # used only for plugin htdocs
         def wrapper(filepath, plugin=None):
             path = rh.calculatePath(filepath, plugin=plugin)
             if not os.path.isfile(path):
