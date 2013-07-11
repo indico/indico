@@ -37,10 +37,6 @@ from MaKaC.common import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
 from MaKaC.common.Configuration import Config
-try:
-    from MaKaC.common.dvdCreation import OfflineWebsiteCreator
-except ImportError:
-    pass
 from MaKaC.conference import ConferenceHolder, CategoryManager, Conference, CustomLocation, CustomRoom
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder
@@ -289,7 +285,7 @@ def taskMigration(dbi, withRBDB, prevVersion):
     for t in HelperTaskList().getTaskListInstance().getTasks():
         for obj in t.listObj.values():
             print console.colored("   * %s" % obj.__class__.__name__, 'blue')
-            if isinstance(obj, OfflineWebsiteCreator):
+            if obj.__class__.__name__ == 'OfflineWebsiteCreator':
                 continue
             if obj.__class__.__name__ == 'FoundationSync':
                 c.enqueue(

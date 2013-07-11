@@ -2599,11 +2599,7 @@ class UHConfigUpcomingEvents(URLHandler):
     _endpoint = 'admin.adminUpcomingEvents'
 
 
-# ------- DVD creation and static webpages ------
-
-class UHConfDVDCreation(URLHandler):
-    _endpoint = 'legacy.confModifTools-dvdCreation'
-
+# ------- Static webpages ------
 
 class UHStaticConferenceDisplay(URLHandler):
     _relativeURL = "./index.html"
@@ -2858,7 +2854,7 @@ class UHMStaticResourceDisplay(URLHandler):
         return cls._relativeURL
 
 
-# ------- END: DVD creation and static webpages ------
+# ------- END: Static webpages ------
 
 class UHContribAuthorDisplay(URLHandler):
     _endpoint = 'event.contribAuthorDisplay'
