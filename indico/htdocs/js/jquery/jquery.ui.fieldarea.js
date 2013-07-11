@@ -23,7 +23,8 @@
     $.widget("ui.fieldarea", {
 
         options: {
-            fields_caption: "field"
+            fields_caption: "field",
+            parameter_manager: undefined
         },
 
         _create: function() {
@@ -94,7 +95,6 @@
         },
 
         _drawInput: function() {
-            // if (this.new_row === undefined || this.new_row.data("removed") || this.new_row.find("input").val() !== "") {
             if (this.new_row === undefined || this.new_row.find("input").val() !== "") {
                 this.new_row = this._row();
                 this.table.append(this.new_row);
@@ -153,11 +153,14 @@
 
         _updateField: function(input) {
             input = $(input);
-            var row = input.closest("tr");
             if (input.val() === "") {
+                var row = input.closest("tr");
                 this._deleteRow(row);
             } else {
                 this.info[input.data("id")] = input.val();
+                if (this.options["parameter_manager"] !== undefined) {
+                    this.options["parameter_manager"].add(input, "int", false);
+                }
             }
         },
 
