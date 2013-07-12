@@ -26,7 +26,7 @@ from persistent.list import PersistentList
 from BTrees.OOBTree import OOBTree, intersection, union
 from BTrees.IOBTree import IOBTree
 import BTrees.OIBTree as OIBTree
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 import MaKaC
 from MaKaC.common.Counter import Counter
 from MaKaC.errors import MaKaCError, NoReportError
@@ -46,6 +46,7 @@ import tempfile
 
 class AbstractSorter:
     pass
+
 
 class AbstractFilter:
     pass
@@ -68,10 +69,10 @@ class _AbstractParticipationIndex(Persistent):
         integrity of the index.
     """
 
-    def __init__( self ):
+    def __init__(self):
         self._idx = OOBTree()
 
-    def index( self, participation ):
+    def index(self, participation):
         """Add a new participation to the index
         """
         #if the Participation is not linked to an Avatar there's no point to
@@ -82,14 +83,14 @@ class _AbstractParticipationIndex(Persistent):
         #ToDo: if the Participation corresponds to an abstract which doesn't
         #   correspond to the current CFAMgr, then an error must be raised
 
-        if not self._idx.has_key( a.getId() ):
+        if not self._idx.has_key(a.getId()):
             self._idx[a.getId()] = PersistentList()
         #if the participation is already in the index, no need for adding it
         if participation in self._idx[a.getId()]:
             return
-        self._idx[a.getId()].append( participation )
+        self._idx[a.getId()].append(participation)
 
-    def unindex( self, participation ):
+    def unindex(self, participation):
         """Remove an existing participation from the index
         """
         #if the Participation is not linked to an Avatar there's no point to
@@ -100,22 +101,22 @@ class _AbstractParticipationIndex(Persistent):
             return
         #if the Avatar associated to the participation isn't in the index do
         #   nothing
-        if not self._idx.has_key( a.getId() ):
+        if not self._idx.has_key(a.getId()):
             return
         #if the given participation is indexed remove it, otherwise do nothing
         if participation in self._idx[a.getId()]:
-             self._idx[a.getId()].remove( participation )
+            self._idx[a.getId()].remove(participation)
 
-    def getParticipationList( self, av ):
+    def getParticipationList(self, av):
         try:
-            return self._idx[ av.getId() ]
+            return self._idx[av.getId()]
         except KeyError, e:
             return []
 
 
 class AbstractParticipation(Persistent):
 
-    def __init__( self, abstract, **data ):
+    def __init__(self, abstract, **data):
         self._abstract = abstract
         self._firstName = ""
         self._surName = ""
@@ -125,47 +126,47 @@ class AbstractParticipation(Persistent):
         self._telephone = ""
         self._fax = ""
         self._title = ""
-        self.setData( **data )
+        self.setData(**data)
 
-    def setFromAvatar( self, av ):
-        data = {"title": av.getTitle(), \
-                "firstName": av.getName(), \
-                "surName": av.getSurName(), \
-                "email": av.getEmail(), \
-                "affiliation": av.getOrganisation(), \
-                "address": av.getAddress(), \
-                "telephone": av.getTelephone(), \
-                "fax": av.getFax() }
-        self.setData( **data )
+    def setFromAvatar(self, av):
+        data = {"title": av.getTitle(),
+                "firstName": av.getName(),
+                "surName": av.getSurName(),
+                "email": av.getEmail(),
+                "affiliation": av.getOrganisation(),
+                "address": av.getAddress(),
+                "telephone": av.getTelephone(),
+                "fax": av.getFax()}
+        self.setData(**data)
 
-    def setFromAbstractParticipation(self,part):
-        data = {"title": part.getTitle(), \
-                "firstName": part.getFirstName(), \
-                "surName": part.getSurName(), \
-                "email": part.getEmail(), \
-                "affiliation": part.getAffiliation(), \
-                "address": part.getAddress(), \
-                "telephone": part.getTelephone(), \
-                "fax": part.getFax() }
-        self.setData( **data )
+    def setFromAbstractParticipation(self, part):
+        data = {"title": part.getTitle(),
+                "firstName": part.getFirstName(),
+                "surName": part.getSurName(),
+                "email": part.getEmail(),
+                "affiliation": part.getAffiliation(),
+                "address": part.getAddress(),
+                "telephone": part.getTelephone(),
+                "fax": part.getFax()}
+        self.setData(**data)
 
-    def setData( self, **data ):
+    def setData(self, **data):
         if "firstName" in data:
-            self.setFirstName( data["firstName"] )
+            self.setFirstName(data["firstName"])
         if "surName" in data:
-            self.setSurName( data["surName"] )
+            self.setSurName(data["surName"])
         if "email" in data:
-            self.setEmail( data["email"] )
+            self.setEmail(data["email"])
         if "affiliation" in data:
-            self.setAffiliation( data["affiliation"] )
+            self.setAffiliation(data["affiliation"])
         if "address" in data:
-            self.setAddress( data["address"] )
+            self.setAddress(data["address"])
         if "telephone" in data:
-            self.setTelephone( data["telephone"] )
+            self.setTelephone(data["telephone"])
         if "fax" in data:
-            self.setFax( data["fax"] )
+            self.setFax(data["fax"])
         if "title" in data:
-            self.setTitle( data["title"] )
+            self.setTitle(data["title"])
     setValues = setData
 
     def getData(self):
@@ -182,58 +183,58 @@ class AbstractParticipation(Persistent):
         return data
     getValues = getData
 
-    def clone (self, abstract):
-        ap = AbstractParticipation(abstract,self.getData())
+    def clone(self, abstract):
+        ap = AbstractParticipation(abstract, self.getData())
         return ap
 
     def _notifyModification(self):
         self._abstract._notifyModification()
 
     def _unindex(self):
-        abs=self.getAbstract()
+        abs = self.getAbstract()
         if abs is not None:
-            mgr=abs.getOwner()
+            mgr = abs.getOwner()
             if mgr is not None:
                 mgr.unindexAuthor(self)
 
     def _index(self):
-        abs=self.getAbstract()
+        abs = self.getAbstract()
         if abs is not None:
-            mgr=abs.getOwner()
+            mgr = abs.getOwner()
             if mgr is not None:
                 mgr.indexAuthor(self)
 
-    def setFirstName( self, name ):
-        tmp=name.strip()
-        if tmp==self.getFirstName():
+    def setFirstName(self, name):
+        tmp = name.strip()
+        if tmp == self.getFirstName():
             return
         self._unindex()
-        self._firstName=tmp
+        self._firstName = tmp
         self._index()
         self._notifyModification()
 
-    def getFirstName( self ):
+    def getFirstName(self):
         return self._firstName
 
-    def getName( self ):
+    def getName(self):
         return self._firstName
 
-    def setSurName( self, name ):
-        tmp=name.strip()
-        if tmp==self.getSurName():
+    def setSurName(self, name):
+        tmp = name.strip()
+        if tmp == self.getSurName():
             return
         self._unindex()
-        self._surName=tmp
+        self._surName = tmp
         self._index()
         self._notifyModification()
 
-    def getSurName( self ):
+    def getSurName(self):
         return self._surName
 
-    def getFamilyName( self ):
+    def getFamilyName(self):
         return self._surName
 
-    def setEmail( self, email ):
+    def setEmail(self, email):
         email = email.strip().lower()
         if email != self.getEmail():
             self._unindex()
@@ -241,82 +242,82 @@ class AbstractParticipation(Persistent):
             self._index()
             self._notifyModification()
 
-    def getEmail( self ):
+    def getEmail(self):
         return self._email
 
-    def setAffiliation( self, af ):
+    def setAffiliation(self, af):
         self._affilliation = af.strip()
         self._notifyModification()
 
-    setAffilliation=setAffiliation
+    setAffilliation = setAffiliation
 
-    def getAffiliation( self ):
+    def getAffiliation(self):
         return self._affilliation
 
-    def setAddress( self, address ):
+    def setAddress(self, address):
         self._address = address.strip()
         self._notifyModification()
 
-    def getAddress( self ):
+    def getAddress(self):
         return self._address
 
-    def setTelephone( self, telf ):
+    def setTelephone(self, telf):
         self._telephone = telf.strip()
         self._notifyModification()
 
-    def getTelephone( self ):
+    def getTelephone(self):
         return self._telephone
 
-    def setFax( self, fax ):
+    def setFax(self, fax):
         self._fax = fax.strip()
         self._notifyModification()
 
     def getFax(self):
         return self._fax
 
-    def setTitle( self, title ):
+    def setTitle(self, title):
         self._title = title.strip()
         self._notifyModification()
 
-    def getTitle( self ):
+    def getTitle(self):
         return self._title
 
-    def getFullName( self ):
+    def getFullName(self):
         res = self.getSurName().decode('utf-8').upper().encode('utf-8')
-        tmp=[]
+        tmp = []
         for name in self.getFirstName().lower().split(" "):
             if name.strip() == "":
                 continue
-            name=name.strip()
-            tmp.append("%s%s"%(name[0].upper(),name[1:]))
-        firstName=" ".join(tmp)
+            name = name.strip()
+            tmp.append("%s%s" % (name[0].upper(), name[1:]))
+        firstName = " ".join(tmp)
         if firstName != "":
-            res = "%s, %s"%( res, firstName )
+            res = "%s, %s" % (res, firstName)
         if self.getTitle() != "":
-            res = "%s %s"%( self.getTitle(), res )
+            res = "%s %s" % (self.getTitle(), res)
         return res
 
     def getStraightFullName(self):
         name = ""
         if self.getName() != "":
-            name = "%s "%self.getName()
-        return "%s%s"%(name, self.getSurName())
+            name = "%s " % self.getName()
+        return "%s%s" % (name, self.getSurName())
 
     def getAbrName(self):
         res = self.getSurName()
         if self.getFirstName() != "":
             if res != "":
-                res = "%s, "%res
-            res = "%s%s."%(res, self.getFirstName()[0].upper())
+                res = "%s, " % res
+            res = "%s%s." % (res, self.getFirstName()[0].upper())
         return res
 
-    def getAbstract( self ):
+    def getAbstract(self):
         return self._abstract
 
     def setAbstract(self, abs):
         self._abstract = abs
 
-    def delete( self ):
+    def delete(self):
         self._unindex()
         self._abstract = None
         TrashCanManager().add(self)
@@ -325,17 +326,17 @@ class AbstractParticipation(Persistent):
         TrashCanManager().remove(self)
 
 
-class Author( AbstractParticipation ):
+class Author(AbstractParticipation):
 
-    def __init__( self, abstract, **data ):
-        AbstractParticipation.__init__( self, abstract, **data )
+    def __init__(self, abstract, **data):
+        AbstractParticipation.__init__(self, abstract, **data)
         self._abstractId = ""
 
-    def getId( self ):
+    def getId(self):
         return self._id
 
-    def setId( self, newId ):
-        self._id = str( newId )
+    def setId(self, newId):
+        self._id = str(newId)
 
     def clone(self, abstract):
         auth = Author(abstract, self.getData())
@@ -344,99 +345,101 @@ class Author( AbstractParticipation ):
     def isSpeaker(self):
         return self._abstract.isSpeaker(self)
 
-class Submitter( AbstractParticipation ):
 
-    def __init__( self, abstract, av ):
-        if av == None:
-            raise MaKaCError( _("abstract submitter cannot be None") )
-        AbstractParticipation.__init__( self, abstract )
+class Submitter(AbstractParticipation):
+
+    def __init__(self, abstract, av):
+        if av is None:
+            raise MaKaCError(_("abstract submitter cannot be None"))
+        AbstractParticipation.__init__(self, abstract)
         self._user = None
-        self._setUser( av )
-        self.setFromAvatar( av )
+        self._setUser(av)
+        self.setFromAvatar(av)
 
-    def _setUser( self, av ):
+    def _setUser(self, av):
         if self.getUser() == av:
             return
         #if currently there's an association with a registered user, we notify
         #   the unidexation of the participation
         if self.getUser():
-            self.getAbstract().getOwner().unregisterParticipation( self )
+            self.getAbstract().getOwner().unregisterParticipation(self)
         self._user = av
         #if the participation is associated to any avatar, we make the
         #   association and index it
         if self.getUser():
-            self.getAbstract().getOwner().registerParticipation( self )
+            self.getAbstract().getOwner().registerParticipation(self)
 
     def clone(self, abstract):
-        sub = Submitter(abstract,self.getAvatar())
+        sub = Submitter(abstract, self.getAvatar())
         sub.setData(self.getData())
         return sub
 
-    def getUser( self ):
+    def getUser(self):
         return self._user
 
-    def getAvatar( self ):
+    def getAvatar(self):
         return self._user
 
-    def representsUser( self, av ):
+    def representsUser(self, av):
         return self.getUser() == av
 
 
 class _AuthIdx(Persistent):
 
-    def __init__(self,mgr):
-        self._mgr=mgr
-        self._idx=OOBTree()
+    def __init__(self, mgr):
+        self._mgr = mgr
+        self._idx = OOBTree()
 
-    def _getKey(self,auth):
-        return "%s %s"%(auth.getSurName().lower(),auth.getFirstName().lower())
+    def _getKey(self, auth):
+        return "%s %s" % (auth.getSurName().lower(), auth.getFirstName().lower())
 
-    def index(self,auth):
+    def index(self, auth):
         if auth.getAbstract() is None:
-            raise MaKaCError( _("cannot index an author of an abstract which is not included in a conference"))
-        if auth.getAbstract().getOwner()!=self._mgr:
-            raise MaKaCError( _("cannot index an author of an abstract which does not belong to this conference"))
-        key=self._getKey(auth)
-        abstractId=str(auth.getAbstract().getId())
+            raise MaKaCError(_("cannot index an author of an abstract which is not included in a conference"))
+        if auth.getAbstract().getOwner() != self._mgr:
+            raise MaKaCError(_("cannot index an author of an abstract which does not belong to this conference"))
+        key = self._getKey(auth)
+        abstractId = str(auth.getAbstract().getId())
         if not self._idx.has_key(key):
-            self._idx[key]=OIBTree.OIBTree()
+            self._idx[key] = OIBTree.OIBTree()
         if not self._idx[key].has_key(abstractId):
-            self._idx[key][abstractId]=0
-        self._idx[key][abstractId]+=1
+            self._idx[key][abstractId] = 0
+        self._idx[key][abstractId] += 1
 
-    def unindex(self,auth):
+    def unindex(self, auth):
         if auth.getAbstract() is None:
-            raise MaKaCError( _("cannot unindex an author of an abstract which is not included in a conference"))
-        if auth.getAbstract().getOwner()!=self._mgr:
-            raise MaKaCError( _("cannot unindex an author of an abstract which does not belong to this conference"))
-        key=self._getKey(auth)
+            raise MaKaCError(_("cannot unindex an author of an abstract which is not included in a conference"))
+        if auth.getAbstract().getOwner() != self._mgr:
+            raise MaKaCError(_("cannot unindex an author of an abstract which does not belong to this conference"))
+        key = self._getKey(auth)
         if not self._idx.has_key(key):
             return
-        abstractId=str(auth.getAbstract().getId())
+        abstractId = str(auth.getAbstract().getId())
         if abstractId not in self._idx[key]:
             return
-        self._idx[key][abstractId]-=1
-        if self._idx[key][abstractId]<=0:
+        self._idx[key][abstractId] -= 1
+        if self._idx[key][abstractId] <= 0:
             del self._idx[key][abstractId]
-        if len(self._idx[key])<=0:
+        if len(self._idx[key]) <= 0:
             del self._idx[key]
 
-    def match(self,query):
-        query=query.lower().strip()
-        res=OIBTree.OISet()
+    def match(self, query):
+        query = query.lower().strip()
+        res = OIBTree.OISet()
         for k in self._idx.keys():
-            if k.find(query)!=-1:
-                res=OIBTree.union(res,self._idx[k])
+            if k.find(query) != -1:
+                res = OIBTree.union(res, self._idx[k])
         return res
 
 
 class _PrimAuthIdx(_AuthIdx):
 
-    def __init__(self,mgr):
-        _AuthIdx.__init__(self,mgr)
+    def __init__(self, mgr):
+        _AuthIdx.__init__(self, mgr)
         for abs in self._mgr.getAbstractList():
             for auth in abs.getPrimaryAuthorList():
                 self.index(auth)
+
 
 class _AuthEmailIdx(_AuthIdx):
 
@@ -720,7 +723,7 @@ class AbstractFieldsMgr(Persistent):
         try:
             if self.__fieldGenerator:
                 pass
-        except AttributeError,e:
+        except AttributeError, e:
             self.__fieldGenerator = Counter()
         return self.__fieldGenerator
 
@@ -728,10 +731,10 @@ class AbstractFieldsMgr(Persistent):
         self._p_changed = 1
 
     def _initFields(self):
-        d=[]
-        su=AbstractField("content", "Content", "Abstract content", 0, True)
+        d = []
+        su = AbstractField("content", "Content", "Abstract content", 0, True)
         d.append(su)
-        su=AbstractField("summary", "Summary", "Summary",0)
+        su = AbstractField("summary", "Summary", "Summary", 0)
         d.append(su)
         return d
 
@@ -743,7 +746,7 @@ class AbstractFieldsMgr(Persistent):
 
     def getFields(self):
         if not self.hasField("content"):
-            ac=AbstractField("content","Content", _("Abstract content"),0,True)
+            ac = AbstractField("content", "Content", _("Abstract content"), 0, True)
             self._fields.insert(0, ac)
         return self._fields
 
@@ -757,7 +760,7 @@ class AbstractFieldsMgr(Persistent):
     def hasActiveField(self, id):
         return self.hasField(id) and self.getFieldById(id).isActive()
 
-    def hasAnyActiveField( self ):
+    def hasAnyActiveField(self):
         for f in self._fields:
             if f.isActive():
                 return True
@@ -825,6 +828,7 @@ class AbstractFieldsMgr(Persistent):
                 self._fields.insert(idx+1,f)
             self._notifyModification()
 
+
 class AbstractMgr(Persistent):
 
     def __init__(self, owner):
@@ -833,40 +837,40 @@ class AbstractMgr(Persistent):
         self._participationIdx = _AbstractParticipationIndex()
         self.__abstractGenerator = Counter()
         self._activated = False
-        self.setStartSubmissionDate( datetime.now() )
-        self.setEndSubmissionDate( datetime.now() )
+        self.setStartSubmissionDate(datetime.now())
+        self.setEndSubmissionDate(datetime.now())
 ##        self._contribTypes = PersistentList()
-        self.setAnnouncement( "" )
-        self._notifTpls=IOBTree()
-        self._notifTplsOrder=PersistentList()
-        self.__notifTplsCounter=Counter()
+        self.setAnnouncement("")
+        self._notifTpls = IOBTree()
+        self._notifTplsOrder = PersistentList()
+        self.__notifTplsCounter = Counter()
         self._authorizedSubmitter = PersistentList()
-        self._primAuthIdx =_PrimAuthIdx(self)
-        self._authEmailIdx =_AuthEmailIdx(self)
-        self._abstractFieldsMgr=AbstractFieldsMgr()
-        self._submissionNotification=SubmissionNotification()
+        self._primAuthIdx = _PrimAuthIdx(self)
+        self._authEmailIdx = _AuthEmailIdx(self)
+        self._abstractFieldsMgr = AbstractFieldsMgr()
+        self._submissionNotification = SubmissionNotification()
         self._multipleTracks = True
         self._tracksMandatory = False
         self._attachFiles = False
-        self._showSelectAsSpeaker= True
-        self._selectSpeakerMandatory= True
+        self._showSelectAsSpeaker = True
+        self._selectSpeakerMandatory = True
         self._showAttachedFilesContribList = False
 
-    def getMultipleTracks( self ):
+    def getMultipleTracks(self):
         try:
             return self._multipleTracks
         except:
-            self.setMultipleTracks( True )
+            self.setMultipleTracks(True)
             return self._multipleTracks
 
-    def setMultipleTracks( self, multipleTracks = True ):
+    def setMultipleTracks(self, multipleTracks=True):
         self._multipleTracks = multipleTracks
 
-    def areTracksMandatory( self ):
+    def areTracksMandatory(self):
         try:
             return self._tracksMandatory
         except:
-            self.setTracksMandatory( False )
+            self.setTracksMandatory(False)
             return self._tracksMandatory
 
     def canAttachFiles(self):
@@ -879,14 +883,14 @@ class AbstractMgr(Persistent):
     def setAllowAttachFiles(self, attachedFiles):
         self._attachFiles = attachedFiles
 
-    def setTracksMandatory( self, tracksMandatory = False ):
+    def setTracksMandatory(self, tracksMandatory=False):
         self._tracksMandatory = tracksMandatory
 
     def showSelectAsSpeaker(self):
         try:
             return self._showSelectAsSpeaker
         except:
-            self._showSelectAsSpeaker= True
+            self._showSelectAsSpeaker = True
             return self._showSelectAsSpeaker
 
     def setShowSelectAsSpeaker(self, showSelectAsSpeaker):
@@ -896,7 +900,7 @@ class AbstractMgr(Persistent):
         try:
             return self._selectSpeakerMandatory
         except:
-            self._selectSpeakerMandatory= True
+            self._selectSpeakerMandatory = True
             return self._selectSpeakerMandatory
 
     def setSelectSpeakerMandatory(self, selectSpeakerMandatory):
@@ -906,7 +910,7 @@ class AbstractMgr(Persistent):
         try:
             return self._showAttachedFilesContribList
         except:
-            self._showAttachedFilesContribList= False
+            self._showAttachedFilesContribList = False
             return self._showAttachedFilesContribList
 
     def setSwitchShowAttachedFilesContribList(self, showshowAttachedFilesContribList):
@@ -916,7 +920,7 @@ class AbstractMgr(Persistent):
         try:
             return self._abstractFieldsMgr
         except:
-            self._abstractFieldsMgr=AbstractFieldsMgr()
+            self._abstractFieldsMgr = AbstractFieldsMgr()
             return self._abstractFieldsMgr
 
     def clone(self, conference):
@@ -929,19 +933,19 @@ class AbstractMgr(Persistent):
         amgr.setEndSubmissionDate(self.getEndSubmissionDate() + timeDifference)
 
         modifDeadline = self.getModificationDeadline()
-        if modifDeadline is not None :
+        if modifDeadline is not None:
             amgr.setModificationDeadline(self.getModificationDeadline() + timeDifference)
 
         amgr.setActive(self.isActive())
-        if self.getCFAStatus() :
+        if self.getCFAStatus():
             amgr.activeCFA()
-        else :
+        else:
             amgr.desactiveCFA()
 
-        for a in self.getAbstractList() :
+        for a in self.getAbstractList():
             amgr.addAbstract(a.clone(conference, amgr._generateNewAbstractId()))
 
-        for tpl in self.getNotificationTplList() :
+        for tpl in self.getNotificationTplList():
             amgr.addNotificationTpl(tpl.clone())
 
         # Cloning submission notification:
