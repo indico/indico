@@ -73,7 +73,7 @@ legacy.add_url_rule('/xmlGateway.py/webcastOnAir',
                     methods=('GET', 'POST'))
 
 
-# Legacy endpoints defined in htdocs/*.py files (and need compatibility routes)
+# Legacy endpoints defined in htdocs/*.py files (which need compatibility routes)
 legacy_endpoints = set([
     'about', 'abstractDisplay', 'abstractDisplay-getAttachedFile', 'abstractDisplay-pdf', 'abstractManagment',
     'abstractManagment-abstractToPDF', 'abstractManagment-accept', 'abstractManagment-acceptMultiple',

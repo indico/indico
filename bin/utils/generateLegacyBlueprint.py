@@ -216,7 +216,7 @@ def main(quiet=False):
         f.write('\n\n')
         f.writelines(line + '\n' for line in generate_routes(routes))
         f.write('\n\n')
-        f.write('# Legacy endpoints defined in htdocs/*.py files (and need compatibility routes)\n')
+        f.write('# Legacy endpoints defined in htdocs/*.py files (which need compatibility routes)\n')
         f.write('legacy_endpoints = set([')
         f.write('\n')
         f.write('\n'.join(generate_list_lines(sorted(legacy_endpoints, key=str.lower), indent='    ')))
