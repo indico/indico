@@ -3269,10 +3269,6 @@ class UHConfModifRegistrantMiscInfoPerformModify(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrants-performModifyMiscInfo'
 
 
-class UHUserSearchCreateExternalUser(URLHandler):
-    _endpoint = 'legacy.userSelection-createExternalUsers'
-
-
 class UHConfModifRegistrantStatusesModify(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrants-modifyStatuses'
 

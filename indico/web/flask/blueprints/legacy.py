@@ -20,18 +20,10 @@
 from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
-import MaKaC.webinterface.rh.users as mod_rh_users
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
 
 
 legacy = IndicoBlueprint('legacy', __name__)
-
-
-# Routes for userSelection.py
-legacy.add_url_rule('/userSelection.py/createExternalUsers',
-                    'userSelection-createExternalUsers',
-                    rh_as_view(mod_rh_users.RHCreateExternalUsers),
-                    methods=('GET', 'POST'))
 
 
 # Routes for xmlGateway.py
@@ -295,7 +287,7 @@ legacy_endpoints = set([
     'userManagement-switchAuthorisedAccountCreation', 'userManagement-switchModerateAccountCreation',
     'userManagement-switchNotifyAccountCreation', 'userMerge', 'userPreferences', 'userRegistration',
     'userRegistration-active', 'userRegistration-created', 'userRegistration-disable', 'userRegistration-UserExist',
-    'userSelection-createExternalUsers', 'wcalendar', 'wcalendar-select', 'xmlGateway', 'xmlGateway-getCategoryInfo',
-    'xmlGateway-getStatsIndico', 'xmlGateway-getStatsRoomBooking', 'xmlGateway-loginStatus', 'xmlGateway-signIn',
-    'xmlGateway-signOut', 'xmlGateway-webcastForthcomingEvents', 'xmlGateway-webcastOnAir'
+    'wcalendar', 'wcalendar-select', 'xmlGateway', 'xmlGateway-getCategoryInfo', 'xmlGateway-getStatsIndico',
+    'xmlGateway-getStatsRoomBooking', 'xmlGateway-loginStatus', 'xmlGateway-signIn', 'xmlGateway-signOut',
+    'xmlGateway-webcastForthcomingEvents', 'xmlGateway-webcastOnAir'
 ])
