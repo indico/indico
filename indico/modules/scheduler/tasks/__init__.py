@@ -80,15 +80,6 @@ class BaseTask(TimedEvent):
     # seconds to consider a task AWOL
     _AWOLThresold = 6000
 
-    def __cmp__(self, obj):
-        if obj == None:
-            return 1
-        elif (not isinstance(obj, BaseTask) or \
-              self.id == obj.id and self.id == None):
-            return cmp(hash(self), hash(obj))
-        else:
-            return cmp(self.id, obj.id)
-
     def __init__(self, expiryDate=None):
         self.createdOn = self._getCurrentDateTime()
         self.expiryDate = expiryDate
@@ -99,6 +90,22 @@ class BaseTask(TimedEvent):
 
         self.startedOn = None
         self.endedOn = None
+
+    def __cmp__(self, obj):
+        if obj is None:
+            return 1
+        elif isinstance(obj, TaskOcurrence):
+            task_cmp = cmp(self, obj.getTask())
+            if task_cmp == 0:
+                return -1
+            else:
+                return task_cmp
+        # This condition will mostlike never happen
+        elif not isinstance(obj, BaseTask) or (self.id == obj.id and self.id is None):
+            return cmp(hash(self), hash(obj))
+        # This is the 'default case' where we are comparing 2 Tasks
+        else:
+            return cmp(self.id, obj.id)
 
     def reset(self):
         '''Resets a task to its state before being run'''
@@ -313,7 +320,6 @@ class TaskOccurrence(TimedEvent):
 
     fossilizes(ITaskOccurrenceFossil)
 
-
     def __init__(self, task):
         self._task = task
         self._startedOn = task.getStartedOn()
@@ -321,7 +327,22 @@ class TaskOccurrence(TimedEvent):
         self._id = None
 
     def __cmp__(self, other):
-        return cmp(self._id, other._id)
+        if other is None:
+            return 1
+        elif isinstance(other, BaseTask):
+            task_cmp = cmp(self.getTask(), other)
+            if task_cmp == 0:
+                return 1
+            else:
+                return task_cmp
+        elif not isinstance(obj, TaskOccurrence) or (self._id == obj._id and self._id is None):
+            return cmp(hash(self), hash(other))
+
+        occ_task_cmp = cmp(self.getTask(), other.getTask())
+        if occ_task_cmp == 0:
+            return cmp(self.getId(), other.getId())
+        else:
+            return occ_task_cmp
 
     def getId(self):
         return self._id
