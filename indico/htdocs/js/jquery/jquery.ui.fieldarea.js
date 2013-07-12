@@ -54,7 +54,7 @@
                 self._deleteRow($(this).closest("tr"));
             });
 
-            self.element.on("keyup propertychange paste change", "input", function(e) {
+            self.element.on("keyup propertychange paste", "input", function(e) {
                 // Enter
                 if (e.type == "keyup" && e.which == 13) {
                     $(this).blur();
@@ -142,7 +142,7 @@
         },
 
         _deleteNewField: function() {
-            this.prevIndex();
+            this._prevIndex();
             this.info.pop();
         },
 
