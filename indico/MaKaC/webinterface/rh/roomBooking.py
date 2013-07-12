@@ -2222,6 +2222,8 @@ class RHRoomBookingSaveLocation( RHRoomBookingAdminBase ):
 
     def _checkParams( self , params ):
         self._locationName = params["newLocationName"].strip()
+        if '/' in self._locationName:
+            raise FormValuesError(_('Location name may not contain slashes'))
         self._pluginClass = None
         name = params.get("pluginName","default")
         plugs = PluginLoader.getPluginsByType("RoomBooking")

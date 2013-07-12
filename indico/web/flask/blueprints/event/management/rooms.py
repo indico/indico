@@ -27,12 +27,12 @@ event_mgmt.add_url_rule('/rooms/book/select-event', 'conferenceModification-room
                         conferenceModif.RHConfModifRoomBookingChooseEvent)
 
 # View/modify booking
-event_mgmt.add_url_rule('/rooms/booking/<path:roomLocation>/<resvID>/', 'conferenceModification-roomBookingDetails',
+event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/', 'conferenceModification-roomBookingDetails',
                         conferenceModif.RHConfModifRoomBookingDetails)
-event_mgmt.add_url_rule('/rooms/booking/<path:roomLocation>/<resvID>/modify',
+event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/modify',
                         'conferenceModification-roomBookingModifyBookingForm',
                         conferenceModif.RHConfModifRoomBookingBookingForm, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/rooms/booking/<path:roomLocation>/<resvID>/clone',
+event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/clone',
                         'conferenceModification-roomBookingCloneBooking',
                         conferenceModif.RHConfModifRoomBookingCloneBooking, methods=('GET', 'POST'))
 
@@ -47,5 +47,5 @@ event_mgmt.add_url_rule('/rooms/book/save', 'conferenceModification-roomBookingS
                         conferenceModif.RHConfModifRoomBookingSaveBooking, methods=('GET', 'POST'))
 
 # Room details
-event_mgmt.add_url_rule('/rooms/room/<path:roomLocation>/<roomID>/', 'conferenceModification-roomBookingRoomDetails',
+event_mgmt.add_url_rule('/rooms/room/<roomLocation>/<roomID>/', 'conferenceModification-roomBookingRoomDetails',
                         conferenceModif.RHConfModifRoomBookingRoomDetails, methods=('GET', 'POST'))
