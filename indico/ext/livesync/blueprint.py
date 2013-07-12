@@ -18,12 +18,11 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 import indico.ext.livesync.chrome as handlers
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 blueprint = IndicoBlueprint('livesync', __name__, url_prefix='/livesync')
 
-blueprint.add_url_rule('/manage', 'manage', rh_as_view(handlers.RHAdminLiveSyncManagement))
-blueprint.add_url_rule('/status', 'status', rh_as_view(handlers.RHAdminLiveSyncStatus))
-blueprint.add_url_rule('/<path:filepath>', 'htdocs', rh_as_view(handlers.RHLiveSyncHtdocs))
+blueprint.add_url_rule('/manage', 'manage', handlers.RHAdminLiveSyncManagement)
+blueprint.add_url_rule('/status', 'status', handlers.RHAdminLiveSyncStatus)
+blueprint.add_url_rule('/<path:filepath>', 'htdocs', handlers.RHLiveSyncHtdocs)

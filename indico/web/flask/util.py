@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import
 
+import inspect
 import os
 import re
 import time
@@ -58,23 +59,40 @@ def create_flat_args():
 
 
 @memoize
-def rh_as_view(rh):
-    if issubclass(rh, RHHtdocs):
-        # used only for plugin htdocs
-        def wrapper(filepath, plugin=None):
-            path = rh.calculatePath(filepath, plugin=plugin)
-            if not os.path.isfile(path):
-                raise NotFound
-            return _send_file(path)
-    else:
-        def wrapper(**kwargs):
-            params = create_flat_args()
-            params.update(kwargs)
-            return rh(None).process(params)
+def make_view_func(obj):
+    """Turns an object in to a view function.
 
-    wrapper.__name__ = rh.__name__
-    wrapper.__doc__ = rh.__doc__
-    return wrapper
+    This function is called on each view_func passed to IndicoBlueprint.add_url_route().
+    It handles RH classes and normal functions.
+    """
+    if inspect.isclass(obj):
+        # Some class
+        if issubclass(obj, RHHtdocs):
+            # Special RH used to provide htdocs folders of plugins
+            def wrapper(filepath, plugin=None):
+                path = obj.calculatePath(filepath, plugin=plugin)
+                if not os.path.isfile(path):
+                    raise NotFound
+                return _send_file(path)
+        elif hasattr(obj, 'process'):
+            # Indico RH
+            def wrapper(**kwargs):
+                params = create_flat_args()
+                params.update(kwargs)
+                return obj(None).process(params)
+        else:
+            # Some class we didn't expect.
+            raise ValueError('Unexpected view func class: %r' % obj)
+
+        wrapper.__name__ = obj.__name__
+        wrapper.__doc__ = obj.__doc__
+        return wrapper
+    elif callable(obj):
+        # Normal function
+        return obj
+    else:
+        # If you ever get this error you should probably feel bad. :)
+        raise ValueError('Unexpected view func: %r' % obj)
 
 
 @memoize

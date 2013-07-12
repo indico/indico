@@ -18,21 +18,20 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import ePaymentModif
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # General settings
-event_mgmt.add_url_rule('/registration/payment/', 'confModifEpayment', rh_as_view(ePaymentModif.RHEPaymentModif))
+event_mgmt.add_url_rule('/registration/payment/', 'confModifEpayment', ePaymentModif.RHEPaymentModif)
 event_mgmt.add_url_rule('/registration/payment/modify', 'confModifEpayment-dataModif',
-                        rh_as_view(ePaymentModif.RHEPaymentModifDataModification), methods=('GET', 'POST'))
+                        ePaymentModif.RHEPaymentModifDataModification, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/registration/payment/modify/save', 'confModifEpayment-performDataModif',
-                        rh_as_view(ePaymentModif.RHEPaymentModifPerformDataModification), methods=('POST',))
+                        ePaymentModif.RHEPaymentModifPerformDataModification, methods=('POST',))
 event_mgmt.add_url_rule('/registration/payment/toggle', 'confModifEpayment-changeStatus',
-                        rh_as_view(ePaymentModif.RHEPaymentModifChangeStatus), methods=('POST',))
+                        ePaymentModif.RHEPaymentModifChangeStatus, methods=('POST',))
 
 # Modules
 event_mgmt.add_url_rule('/registration/payment/modules/<EPaymentName>/<requestTag>', 'confModifEpayment-modifModule',
-                        rh_as_view(ePaymentModif.RHModifModule), methods=('GET', 'POST'))
+                        ePaymentModif.RHModifModule, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/registration/payment/toggle/<epayment>', 'confModifEpayment-enableSection',
-                        rh_as_view(ePaymentModif.RHEPaymentModifEnableSection), methods=('GET', 'POST'))
+                        ePaymentModif.RHEPaymentModifEnableSection, methods=('GET', 'POST'))

@@ -18,16 +18,15 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Management entrance (redirects to most appropriate page)
 event_mgmt.add_url_rule('/', 'conferenceModification-managementAccess',
-                        rh_as_view(conferenceModif.RHConferenceModifManagementAccess))
+                        conferenceModif.RHConferenceModifManagementAccess)
 
 # Modification key
 event_mgmt.add_url_rule('/modificationkey/logout', 'conferenceModification-closeModifKey',
-                        rh_as_view(conferenceModif.RHConferenceCloseModifKey))
-event_mgmt.add_url_rule('/modificationkey', 'conferenceModification-modifKey',
-                        rh_as_view(conferenceModif.RHConferenceModifKey), methods=('GET', 'POST'))
+                        conferenceModif.RHConferenceCloseModifKey)
+event_mgmt.add_url_rule('/modificationkey', 'conferenceModification-modifKey', conferenceModif.RHConferenceModifKey,
+                        methods=('GET', 'POST'))

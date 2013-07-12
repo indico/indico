@@ -18,23 +18,22 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # General settings
-event_mgmt.add_url_rule('/general/', 'conferenceModification', rh_as_view(conferenceModif.RHConferenceModification))
+event_mgmt.add_url_rule('/general/', 'conferenceModification', conferenceModif.RHConferenceModification)
 event_mgmt.add_url_rule('/general/screendates', 'conferenceModification-screenDates',
-                        rh_as_view(conferenceModif.RHConfScreenDatesEdit), methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/general/data', 'conferenceModification-data', rh_as_view(conferenceModif.RHConfDataModif),
+                        conferenceModif.RHConfScreenDatesEdit, methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/general/data', 'conferenceModification-data', conferenceModif.RHConfDataModif,
                         methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/general/data/save', 'conferenceModification-dataPerform',
-                        rh_as_view(conferenceModif.RHConfPerformDataModif), methods=('POST',))
+                        conferenceModif.RHConfPerformDataModif, methods=('POST',))
 
 # Contribution types
 event_mgmt.add_url_rule('/contribution-types/add', 'conferenceModification-addContribType',
-                        rh_as_view(conferenceModif.RHConfAddContribType), methods=('GET', 'POST'))
+                        conferenceModif.RHConfAddContribType, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/contribution-types/delete', 'conferenceModification-removeContribType',
-                        rh_as_view(conferenceModif.RHConfRemoveContribType), methods=('POST',))
+                        conferenceModif.RHConfRemoveContribType, methods=('POST',))
 event_mgmt.add_url_rule('/contribution-types/<contribTypeId>', 'conferenceModification-editContribType',
-                        rh_as_view(conferenceModif.RHConfEditContribType), methods=('GET', 'POST'))
+                        conferenceModif.RHConfEditContribType, methods=('GET', 'POST'))

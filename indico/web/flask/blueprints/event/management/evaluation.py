@@ -18,37 +18,35 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import evaluationModif
-from indico.web.flask.util import rh_as_view, redirect_view
+from indico.web.flask.util import redirect_view
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Setup
 event_mgmt.add_url_rule('/evaluation/', 'confModifEvaluation', redirect_view('.confModifEvaluation-setup'))
-event_mgmt.add_url_rule('/evaluation/setup/', 'confModifEvaluation-setup',
-                        rh_as_view(evaluationModif.RHEvaluationSetup))
+event_mgmt.add_url_rule('/evaluation/setup/', 'confModifEvaluation-setup', evaluationModif.RHEvaluationSetup)
 event_mgmt.add_url_rule('/evaluation/setup/change-status', 'confModifEvaluation-changeStatus',
-                        rh_as_view(evaluationModif.RHEvaluationSetupChangeStatus), methods=('POST',))
+                        evaluationModif.RHEvaluationSetupChangeStatus, methods=('POST',))
 event_mgmt.add_url_rule('/evaluation/setup/modify', 'confModifEvaluation-dataModif',
-                        rh_as_view(evaluationModif.RHEvaluationSetupDataModif), methods=('GET', 'POST'))
+                        evaluationModif.RHEvaluationSetupDataModif, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/evaluation/setup/modify/save', 'confModifEvaluation-performDataModif',
-                        rh_as_view(evaluationModif.RHEvaluationSetupPerformDataModif), methods=('POST',))
+                        evaluationModif.RHEvaluationSetupPerformDataModif, methods=('POST',))
 event_mgmt.add_url_rule('/evaluation/setup/special-action', 'confModifEvaluation-specialAction',
-                        rh_as_view(evaluationModif.RHEvaluationSetupSpecialAction), methods=('POST',))
+                        evaluationModif.RHEvaluationSetupSpecialAction, methods=('POST',))
 
 # Edit questions
-event_mgmt.add_url_rule('/evaluation/edit', 'confModifEvaluation-edit',
-                        rh_as_view(evaluationModif.RHEvaluationEdit))
+event_mgmt.add_url_rule('/evaluation/edit', 'confModifEvaluation-edit', evaluationModif.RHEvaluationEdit)
 event_mgmt.add_url_rule('/evaluation/edit', 'confModifEvaluation-editPerformChanges',
-                        rh_as_view(evaluationModif.RHEvaluationEditPerformChanges), methods=('POST',))
+                        evaluationModif.RHEvaluationEditPerformChanges, methods=('POST',))
 
 # Preview
-event_mgmt.add_url_rule('/evaluation/preview', 'confModifEvaluation-preview',
-                        rh_as_view(evaluationModif.RHEvaluationPreview), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/evaluation/preview', 'confModifEvaluation-preview', evaluationModif.RHEvaluationPreview,
+                        methods=('GET', 'POST'))
 
 # Results
-event_mgmt.add_url_rule('/evaluation/results/', 'confModifEvaluation-results',
-                        rh_as_view(evaluationModif.RHEvaluationResults), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/evaluation/results/', 'confModifEvaluation-results', evaluationModif.RHEvaluationResults,
+                        methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/evaluation/results/options', 'confModifEvaluation-resultsOptions',
-                        rh_as_view(evaluationModif.RHEvaluationResultsOptions), methods=('POST',))
+                        evaluationModif.RHEvaluationResultsOptions, methods=('POST',))
 event_mgmt.add_url_rule('/evaluation/results/perform-action', 'confModifEvaluation-resultsSubmittersActions',
-                        rh_as_view(evaluationModif.RHEvaluationResultsSubmittersActions), methods=('POST',))
+                        evaluationModif.RHEvaluationResultsSubmittersActions, methods=('POST',))

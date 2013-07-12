@@ -27,6 +27,7 @@ from werkzeug.utils import cached_property
 
 from MaKaC.common import HelperMaKaCInfo, DBMgr
 from indico.web.flask.session import IndicoSessionInterface
+from indico.web.flask.util import make_view_func
 
 
 class IndicoRequest(Request):
@@ -87,6 +88,9 @@ class IndicoBlueprint(Blueprint):
         return IndicoBlueprintSetupState(self, app, options, first_registration)
 
     def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
+        if view_func is not None:
+            # We might have a RH class here - convert it to a callable suitable as a view func.
+            view_func = make_view_func(view_func)
         super(IndicoBlueprint, self).add_url_rule(self.__default_prefix + rule, endpoint, view_func, **options)
         if self.__prefix:
             super(IndicoBlueprint, self).add_url_rule(self.__prefix + rule, endpoint, view_func, **options)

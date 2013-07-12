@@ -18,15 +18,13 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Logs
-event_mgmt.add_url_rule('/logs', 'confModifLog', rh_as_view(conferenceModif.RHConfModifLog))
+event_mgmt.add_url_rule('/logs', 'confModifLog', conferenceModif.RHConfModifLog)
 
 # Material
-event_mgmt.add_url_rule('/material', 'conferenceModification-materialsShow',
-                        rh_as_view(conferenceModif.RHMaterialsShow))
-event_mgmt.add_url_rule('/material/add', 'conferenceModification-materialsAdd',
-                        rh_as_view(conferenceModif.RHMaterialsAdd), methods=('POST',))
+event_mgmt.add_url_rule('/material', 'conferenceModification-materialsShow', conferenceModif.RHMaterialsShow)
+event_mgmt.add_url_rule('/material/add', 'conferenceModification-materialsAdd', conferenceModif.RHMaterialsAdd,
+                        methods=('POST',))

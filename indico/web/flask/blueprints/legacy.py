@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
@@ -27,49 +26,29 @@ legacy = IndicoBlueprint('legacy', __name__)
 
 
 # Routes for xmlGateway.py
-legacy.add_url_rule('/xmlGateway.py',
-                    'xmlGateway',
-                    rh_as_view(mod_rh_xmlGateway.RHLoginStatus),
+legacy.add_url_rule('/xmlGateway.py', 'xmlGateway', mod_rh_xmlGateway.RHLoginStatus, methods=('GET', 'POST'))
+
+legacy.add_url_rule('/xmlGateway.py/getCategoryInfo', 'xmlGateway-getCategoryInfo', mod_rh_xmlGateway.RHCategInfo,
                     methods=('GET', 'POST'))
 
-legacy.add_url_rule('/xmlGateway.py/getCategoryInfo',
-                    'xmlGateway-getCategoryInfo',
-                    rh_as_view(mod_rh_xmlGateway.RHCategInfo),
+legacy.add_url_rule('/xmlGateway.py/getStatsIndico', 'xmlGateway-getStatsIndico', mod_rh_xmlGateway.RHStatsIndico,
                     methods=('GET', 'POST'))
 
-legacy.add_url_rule('/xmlGateway.py/getStatsIndico',
-                    'xmlGateway-getStatsIndico',
-                    rh_as_view(mod_rh_xmlGateway.RHStatsIndico),
+legacy.add_url_rule('/xmlGateway.py/getStatsRoomBooking', 'xmlGateway-getStatsRoomBooking',
+                    mod_rh_xmlGateway.RHStatsRoomBooking, methods=('GET', 'POST'))
+
+legacy.add_url_rule('/xmlGateway.py/loginStatus', 'xmlGateway-loginStatus', mod_rh_xmlGateway.RHLoginStatus,
                     methods=('GET', 'POST'))
 
-legacy.add_url_rule('/xmlGateway.py/getStatsRoomBooking',
-                    'xmlGateway-getStatsRoomBooking',
-                    rh_as_view(mod_rh_xmlGateway.RHStatsRoomBooking),
+legacy.add_url_rule('/xmlGateway.py/signIn', 'xmlGateway-signIn', mod_rh_xmlGateway.RHSignIn, methods=('GET', 'POST'))
+
+legacy.add_url_rule('/xmlGateway.py/signOut', 'xmlGateway-signOut', mod_rh_xmlGateway.RHSignOut,
                     methods=('GET', 'POST'))
 
-legacy.add_url_rule('/xmlGateway.py/loginStatus',
-                    'xmlGateway-loginStatus',
-                    rh_as_view(mod_rh_xmlGateway.RHLoginStatus),
-                    methods=('GET', 'POST'))
+legacy.add_url_rule('/xmlGateway.py/webcastForthcomingEvents', 'xmlGateway-webcastForthcomingEvents',
+                    mod_rh_xmlGateway.RHWebcastForthcomingEvents, methods=('GET', 'POST'))
 
-legacy.add_url_rule('/xmlGateway.py/signIn',
-                    'xmlGateway-signIn',
-                    rh_as_view(mod_rh_xmlGateway.RHSignIn),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/signOut',
-                    'xmlGateway-signOut',
-                    rh_as_view(mod_rh_xmlGateway.RHSignOut),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/webcastForthcomingEvents',
-                    'xmlGateway-webcastForthcomingEvents',
-                    rh_as_view(mod_rh_xmlGateway.RHWebcastForthcomingEvents),
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/webcastOnAir',
-                    'xmlGateway-webcastOnAir',
-                    rh_as_view(mod_rh_xmlGateway.RHWebcastOnAir),
+legacy.add_url_rule('/xmlGateway.py/webcastOnAir', 'xmlGateway-webcastOnAir', mod_rh_xmlGateway.RHWebcastOnAir,
                     methods=('GET', 'POST'))
 
 
@@ -95,11 +74,11 @@ legacy_endpoints = set([
     'adminLayout-addStyle', 'adminLayout-deleteStyle', 'adminLayout-saveSocial', 'adminLayout-saveTemplateSet',
     'adminLayout-setDefaultPDFOptions', 'adminLayout-styles', 'adminList', 'adminList-switchCacheActive',
     'adminList-switchDebugActive', 'adminList-switchNewsActive', 'adminMaintenance', 'adminMaintenance-pack',
-    'adminMaintenance-performPack', 'adminMaintenance-performTmpCleanup', 'adminMaintenance-tmpCleanup',
-    'adminPlugins', 'adminPlugins-clearAllInfo', 'adminPlugins-reload', 'adminPlugins-reloadAll',
-    'adminPlugins-saveOptionReloadAll', 'adminPlugins-savePluginOptions', 'adminPlugins-savePluginTypeOptions',
-    'adminPlugins-toggleActive', 'adminPlugins-toggleActivePluginType', 'adminProtection', 'adminServices-analytics',
-    'adminServices-apiKeys', 'adminServices-apiOptions', 'adminServices-apiOptionsSet', 'adminServices-ipbasedacl',
+    'adminMaintenance-performPack', 'adminMaintenance-performTmpCleanup', 'adminMaintenance-tmpCleanup', 'adminPlugins',
+    'adminPlugins-clearAllInfo', 'adminPlugins-reload', 'adminPlugins-reloadAll', 'adminPlugins-saveOptionReloadAll',
+    'adminPlugins-savePluginOptions', 'adminPlugins-savePluginTypeOptions', 'adminPlugins-toggleActive',
+    'adminPlugins-toggleActivePluginType', 'adminProtection', 'adminServices-analytics', 'adminServices-apiKeys',
+    'adminServices-apiOptions', 'adminServices-apiOptionsSet', 'adminServices-ipbasedacl',
     'adminServices-ipbasedacl_fagrant', 'adminServices-ipbasedacl_farevoke', 'adminServices-oauthAuthorized',
     'adminServices-oauthConsumers', 'adminServices-saveAnalytics', 'adminServices-webcast',
     'adminServices-webcastAddChannel', 'adminServices-webcastAddOnAir', 'adminServices-webcastAddStream',
@@ -151,12 +130,12 @@ legacy_endpoints = set([
     'confModifContribList-contribQuickAccess', 'confModifContribList-contribsActions',
     'confModifContribList-contribsToPDFMenu', 'confModifContribList-matPkg', 'confModifContribList-moveToSession',
     'confModifContribList-participantList', 'confModifContribList-proceedings', 'confModifDisplay',
-    'confModifDisplay-addLink', 'confModifDisplay-addPage', 'confModifDisplay-addSpacer',
-    'confModifDisplay-confHeader', 'confModifDisplay-custom', 'confModifDisplay-downLink',
-    'confModifDisplay-formatTitleBgColor', 'confModifDisplay-formatTitleTextColor', 'confModifDisplay-menu',
-    'confModifDisplay-modifyData', 'confModifDisplay-modifySystemData', 'confModifDisplay-previewCSS',
-    'confModifDisplay-removeCSS', 'confModifDisplay-removeLink', 'confModifDisplay-removeLogo',
-    'confModifDisplay-resources', 'confModifDisplay-saveCSS', 'confModifDisplay-saveLogo', 'confModifDisplay-savePic',
+    'confModifDisplay-addLink', 'confModifDisplay-addPage', 'confModifDisplay-addSpacer', 'confModifDisplay-confHeader',
+    'confModifDisplay-custom', 'confModifDisplay-downLink', 'confModifDisplay-formatTitleBgColor',
+    'confModifDisplay-formatTitleTextColor', 'confModifDisplay-menu', 'confModifDisplay-modifyData',
+    'confModifDisplay-modifySystemData', 'confModifDisplay-previewCSS', 'confModifDisplay-removeCSS',
+    'confModifDisplay-removeLink', 'confModifDisplay-removeLogo', 'confModifDisplay-resources',
+    'confModifDisplay-saveCSS', 'confModifDisplay-saveLogo', 'confModifDisplay-savePic',
     'confModifDisplay-tickerTapeAction', 'confModifDisplay-toggleHomePage', 'confModifDisplay-toggleLinkStatus',
     'confModifDisplay-toggleNavigationBar', 'confModifDisplay-toggleSearch', 'confModifDisplay-upLink',
     'confModifDisplay-useCSS', 'confModifEpayment', 'confModifEpayment-changeStatus', 'confModifEpayment-dataModif',
@@ -208,50 +187,50 @@ legacy_endpoints = set([
     'confModifRegistrationForm-removeAccommodationType', 'confModifRegistrationForm-removeGeneralField',
     'confModifRegistrationForm-removeSession', 'confModifRegistrationForm-removeSocialEvent',
     'confModifRegistrationPreview', 'confModifReviewing-access', 'confModifReviewing-downloadTemplate',
-    'confModifReviewing-paperSetup', 'confModifReviewing-setTemplate', 'confModifReviewingControl',
-    'confModifSchedule', 'confModifSchedule-edit', 'confModifSchedule-reschedule', 'confModifTools',
-    'confModifTools-addAlarm', 'confModifTools-allSessionsConveners', 'confModifTools-allSessionsConvenersAction',
-    'confModifTools-badgeDesign', 'confModifTools-badgeGetBackground', 'confModifTools-badgePrinting',
-    'confModifTools-badgePrintingPDF', 'confModifTools-badgeSaveBackground', 'confModifTools-clone',
-    'confModifTools-delete', 'confModifTools-deleteAlarm', 'confModifTools-displayAlarm', 'confModifTools-matPkg',
-    'confModifTools-modifyAlarm', 'confModifTools-offline', 'confModifTools-performCloning',
-    'confModifTools-performMatPkg', 'confModifTools-posterDesign', 'confModifTools-posterGetBackground',
-    'confModifTools-posterPrinting', 'confModifTools-posterPrintingPDF', 'confModifTools-posterSaveBackground',
-    'confModifTools-saveAlarm', 'confModifTools-sendAlarmNow', 'confModifUserCompetences',
-    'confRegistrantsDisplay-list', 'confRegistrationFormDisplay', 'confRegistrationFormDisplay-conditions',
-    'confRegistrationFormDisplay-confirmBooking', 'confRegistrationFormDisplay-confirmBookingDone',
-    'confRegistrationFormDisplay-creation', 'confRegistrationFormDisplay-creationDone',
-    'confRegistrationFormDisplay-display', 'confRegistrationFormDisplay-modify',
-    'confRegistrationFormDisplay-performModify', 'confRegistrationFormDisplay-signIn', 'confSpeakerIndex', 'confUser',
-    'confUser-created', 'confUser-userExists', 'contact', 'contribAuthorDisplay', 'contributionAC',
-    'contributionAC-setVisibility', 'contributionDisplay', 'contributionDisplay-ical', 'contributionDisplay-marcxml',
-    'contributionDisplay-pdf', 'contributionDisplay-xml', 'contributionEditingJudgement', 'contributionGiveAdvice',
-    'contributionListDisplay', 'contributionListDisplay-contributionsToPDF', 'contributionModification',
-    'contributionModification-browseMaterial', 'contributionModification-data', 'contributionModification-materials',
-    'contributionModification-materialsAdd', 'contributionModification-modifData', 'contributionModification-pdf',
-    'contributionModification-setSession', 'contributionModification-setTrack', 'contributionModification-withdraw',
-    'contributionModification-xml', 'contributionModifSubCont', 'contributionModifSubCont-actionSubContribs',
-    'contributionModifSubCont-add', 'contributionModifSubCont-create', 'contributionReviewing',
-    'contributionReviewing-assignEditing', 'contributionReviewing-assignReferee',
-    'contributionReviewing-assignReviewing', 'contributionReviewing-contributionReviewingJudgements',
-    'contributionReviewing-contributionReviewingMaterials', 'contributionReviewing-removeAssignEditing',
-    'contributionReviewing-removeAssignReferee', 'contributionReviewing-removeAssignReviewing',
-    'contributionReviewing-reviewingHistory', 'contributionTools', 'contributionTools-delete', 'domainCreation',
-    'domainCreation-create', 'domainDataModification', 'domainDataModification-modify', 'domainDetails', 'domainList',
-    'EMail', 'EMail-send', 'EMail-sendcontribparticipants', 'EMail-sendconvener', 'EMail-sendreg', 'errors',
-    'generalInfoModification', 'generalInfoModification-update', 'getConvertedFile', 'getFile-access',
-    'getFile-accessKey', 'getFile-flash', 'getFile-offlineEvent', 'getFile-wmv', 'groupDetails', 'groupList',
-    'groupModification', 'groupModification-update', 'groupRegistration', 'groupRegistration-update', 'help',
-    'identityCreation', 'identityCreation-changePassword', 'identityCreation-create', 'identityCreation-remove',
-    'index', 'internalPage', 'JSContent-getVars', 'logOut', 'materialDisplay', 'materialDisplay-accessKey',
-    'myconference', 'myconference-myContributions', 'myconference-mySessions', 'myconference-myTracks', 'news',
-    'oauth-access_token', 'oauth-authorize', 'oauth-authorize_consumer', 'oauth-request_token', 'oauth-thirdPartyAuth',
-    'oauth-userThirdPartyAuth', 'paperReviewingDisplay', 'paperReviewingDisplay-downloadTemplate',
-    'paperReviewingDisplay-uploadPaper', 'payment', 'posterTemplates', 'posterTemplates-posterDesign',
-    'posterTemplates-posterPrinting', 'resetSessionTZ', 'roomBooking', 'roomBooking-acceptBooking',
-    'roomBooking-admin', 'roomBooking-adminLocation', 'roomBooking-blockingDetails', 'roomBooking-blockingForm',
-    'roomBooking-blockingList', 'roomBooking-blockingsForMyRooms', 'roomBooking-bookingDetails',
-    'roomBooking-bookingForm', 'roomBooking-bookingList', 'roomBooking-bookRoom', 'roomBooking-cancelBooking',
+    'confModifReviewing-paperSetup', 'confModifReviewing-setTemplate', 'confModifReviewingControl', 'confModifSchedule',
+    'confModifSchedule-edit', 'confModifSchedule-reschedule', 'confModifTools', 'confModifTools-addAlarm',
+    'confModifTools-allSessionsConveners', 'confModifTools-allSessionsConvenersAction', 'confModifTools-badgeDesign',
+    'confModifTools-badgeGetBackground', 'confModifTools-badgePrinting', 'confModifTools-badgePrintingPDF',
+    'confModifTools-badgeSaveBackground', 'confModifTools-clone', 'confModifTools-delete', 'confModifTools-deleteAlarm',
+    'confModifTools-displayAlarm', 'confModifTools-matPkg', 'confModifTools-modifyAlarm', 'confModifTools-offline',
+    'confModifTools-performCloning', 'confModifTools-performMatPkg', 'confModifTools-posterDesign',
+    'confModifTools-posterGetBackground', 'confModifTools-posterPrinting', 'confModifTools-posterPrintingPDF',
+    'confModifTools-posterSaveBackground', 'confModifTools-saveAlarm', 'confModifTools-sendAlarmNow',
+    'confModifUserCompetences', 'confRegistrantsDisplay-list', 'confRegistrationFormDisplay',
+    'confRegistrationFormDisplay-conditions', 'confRegistrationFormDisplay-confirmBooking',
+    'confRegistrationFormDisplay-confirmBookingDone', 'confRegistrationFormDisplay-creation',
+    'confRegistrationFormDisplay-creationDone', 'confRegistrationFormDisplay-display',
+    'confRegistrationFormDisplay-modify', 'confRegistrationFormDisplay-performModify',
+    'confRegistrationFormDisplay-signIn', 'confSpeakerIndex', 'confUser', 'confUser-created', 'confUser-userExists',
+    'contact', 'contribAuthorDisplay', 'contributionAC', 'contributionAC-setVisibility', 'contributionDisplay',
+    'contributionDisplay-ical', 'contributionDisplay-marcxml', 'contributionDisplay-pdf', 'contributionDisplay-xml',
+    'contributionEditingJudgement', 'contributionGiveAdvice', 'contributionListDisplay',
+    'contributionListDisplay-contributionsToPDF', 'contributionModification', 'contributionModification-browseMaterial',
+    'contributionModification-data', 'contributionModification-materials', 'contributionModification-materialsAdd',
+    'contributionModification-modifData', 'contributionModification-pdf', 'contributionModification-setSession',
+    'contributionModification-setTrack', 'contributionModification-withdraw', 'contributionModification-xml',
+    'contributionModifSubCont', 'contributionModifSubCont-actionSubContribs', 'contributionModifSubCont-add',
+    'contributionModifSubCont-create', 'contributionReviewing', 'contributionReviewing-assignEditing',
+    'contributionReviewing-assignReferee', 'contributionReviewing-assignReviewing',
+    'contributionReviewing-contributionReviewingJudgements', 'contributionReviewing-contributionReviewingMaterials',
+    'contributionReviewing-removeAssignEditing', 'contributionReviewing-removeAssignReferee',
+    'contributionReviewing-removeAssignReviewing', 'contributionReviewing-reviewingHistory', 'contributionTools',
+    'contributionTools-delete', 'domainCreation', 'domainCreation-create', 'domainDataModification',
+    'domainDataModification-modify', 'domainDetails', 'domainList', 'EMail', 'EMail-send',
+    'EMail-sendcontribparticipants', 'EMail-sendconvener', 'EMail-sendreg', 'errors', 'generalInfoModification',
+    'generalInfoModification-update', 'getConvertedFile', 'getFile-access', 'getFile-accessKey', 'getFile-flash',
+    'getFile-offlineEvent', 'getFile-wmv', 'groupDetails', 'groupList', 'groupModification', 'groupModification-update',
+    'groupRegistration', 'groupRegistration-update', 'help', 'identityCreation', 'identityCreation-changePassword',
+    'identityCreation-create', 'identityCreation-remove', 'index', 'internalPage', 'JSContent-getVars', 'logOut',
+    'materialDisplay', 'materialDisplay-accessKey', 'myconference', 'myconference-myContributions',
+    'myconference-mySessions', 'myconference-myTracks', 'news', 'oauth-access_token', 'oauth-authorize',
+    'oauth-authorize_consumer', 'oauth-request_token', 'oauth-thirdPartyAuth', 'oauth-userThirdPartyAuth',
+    'paperReviewingDisplay', 'paperReviewingDisplay-downloadTemplate', 'paperReviewingDisplay-uploadPaper', 'payment',
+    'posterTemplates', 'posterTemplates-posterDesign', 'posterTemplates-posterPrinting', 'resetSessionTZ',
+    'roomBooking', 'roomBooking-acceptBooking', 'roomBooking-admin', 'roomBooking-adminLocation',
+    'roomBooking-blockingDetails', 'roomBooking-blockingForm', 'roomBooking-blockingList',
+    'roomBooking-blockingsForMyRooms', 'roomBooking-bookingDetails', 'roomBooking-bookingForm',
+    'roomBooking-bookingList', 'roomBooking-bookRoom', 'roomBooking-cancelBooking',
     'roomBooking-cancelBookingOccurrence', 'roomBooking-cloneBooking', 'roomBooking-deleteBlocking',
     'roomBooking-deleteBooking', 'roomBooking-deleteCustomAttribute', 'roomBooking-deleteEquipment',
     'roomBooking-deleteLocation', 'roomBooking-deleteRoom', 'roomBooking-mapOfRooms', 'roomBooking-mapOfRoomsWidget',

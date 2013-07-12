@@ -18,19 +18,15 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import evaluationDisplay
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.display import event
 
 
 # Evaluation
-event.add_url_rule('/evaluation/', 'confDisplayEvaluation', rh_as_view(evaluationDisplay.RHEvaluationMainInformation))
-event.add_url_rule('/evaluation/evaluate', 'confDisplayEvaluation-display',
-                   rh_as_view(evaluationDisplay.RHEvaluationDisplay))
-event.add_url_rule('/evaluation/evaluate', 'confDisplayEvaluation-modif',
-                   rh_as_view(evaluationDisplay.RHEvaluationDisplay))
-event.add_url_rule('/evaluation/signin', 'confDisplayEvaluation-signIn',
-                   rh_as_view(evaluationDisplay.RHEvaluationSignIn))
-event.add_url_rule('/evaluation/evaluate', 'confDisplayEvaluation-submit',
-                   rh_as_view(evaluationDisplay.RHEvaluationSubmit), methods=('POST',))
+event.add_url_rule('/evaluation/', 'confDisplayEvaluation', evaluationDisplay.RHEvaluationMainInformation)
+event.add_url_rule('/evaluation/evaluate', 'confDisplayEvaluation-display', evaluationDisplay.RHEvaluationDisplay)
+event.add_url_rule('/evaluation/evaluate', 'confDisplayEvaluation-modif', evaluationDisplay.RHEvaluationDisplay)
+event.add_url_rule('/evaluation/signin', 'confDisplayEvaluation-signIn', evaluationDisplay.RHEvaluationSignIn)
+event.add_url_rule('/evaluation/evaluate', 'confDisplayEvaluation-submit', evaluationDisplay.RHEvaluationSubmit,
+                   methods=('POST',))
 event.add_url_rule('/evaluation/evaluate/success', 'confDisplayEvaluation-submitted',
-                   rh_as_view(evaluationDisplay.RHEvaluationSubmitted))
+                   evaluationDisplay.RHEvaluationSubmitted)

@@ -18,27 +18,24 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceDisplay
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.display import event
 
 
 # Login
-event.add_url_rule('/user/login', 'confLogin', rh_as_view(conferenceDisplay.RHConfSignIn), methods=('GET', 'POST'))
-event.add_url_rule('/user/login/disabled', 'confLogin-disabledAccount',
-                   rh_as_view(conferenceDisplay.RHConfDisabledAccount), methods=('GET', 'POST'))
+event.add_url_rule('/user/login', 'confLogin', conferenceDisplay.RHConfSignIn, methods=('GET', 'POST'))
+event.add_url_rule('/user/login/disabled', 'confLogin-disabledAccount', conferenceDisplay.RHConfDisabledAccount,
+                   methods=('GET', 'POST'))
 event.add_url_rule('/user/login/not-activated', 'confLogin-unactivatedAccount',
-                   rh_as_view(conferenceDisplay.RHConfUnactivatedAccount))
-event.add_url_rule('/user/reset-password', 'confLogin-sendLogin', rh_as_view(conferenceDisplay.RHConfSendLogin),
-                   methods=('POST',))
-event.add_url_rule('/user/reset-password/<token>', 'confLogin-resetPassword',
-                   rh_as_view(conferenceDisplay.RHConfResetPassword), methods=('GET', 'POST',))
+                   conferenceDisplay.RHConfUnactivatedAccount)
+event.add_url_rule('/user/reset-password', 'confLogin-sendLogin', conferenceDisplay.RHConfSendLogin, methods=('POST',))
+event.add_url_rule('/user/reset-password/<token>', 'confLogin-resetPassword', conferenceDisplay.RHConfResetPassword,
+                   methods=('GET', 'POST',))
 
 # Registration
-event.add_url_rule('/user/register', 'confUser', rh_as_view(conferenceDisplay.RHConfUserCreation),
+event.add_url_rule('/user/register', 'confUser', conferenceDisplay.RHConfUserCreation, methods=('GET', 'POST'))
+event.add_url_rule('/user/register/success', 'confUser-created', conferenceDisplay.RHConfUserCreated)
+event.add_url_rule('/user/register/exists', 'confUser-userExists', conferenceDisplay.RHConfUserExistWithIdentity,
                    methods=('GET', 'POST'))
-event.add_url_rule('/user/register/success', 'confUser-created', rh_as_view(conferenceDisplay.RHConfUserCreated))
-event.add_url_rule('/user/register/exists', 'confUser-userExists',
-                   rh_as_view(conferenceDisplay.RHConfUserExistWithIdentity), methods=('GET', 'POST'))
-event.add_url_rule('/user/register/activate', 'confLogin-active', rh_as_view(conferenceDisplay.RHConfActivate))
-event.add_url_rule('/user/register/send-activation', 'confLogin-sendActivation',
-                   rh_as_view(conferenceDisplay.RHConfSendActivation), methods=('GET', 'POST'))
+event.add_url_rule('/user/register/activate', 'confLogin-active', conferenceDisplay.RHConfActivate)
+event.add_url_rule('/user/register/send-activation', 'confLogin-sendActivation', conferenceDisplay.RHConfSendActivation,
+                   methods=('GET', 'POST'))

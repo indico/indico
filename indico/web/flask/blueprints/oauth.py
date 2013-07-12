@@ -18,23 +18,18 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import oauth as oauth_rh
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 oauth = IndicoBlueprint('oauth', __name__)
 
 # Consumer endpoints
-oauth.add_url_rule('/oauth/access_token', 'oauth-access_token', rh_as_view(oauth_rh.RHOAuthAccessTokenURL),
-                   methods=('GET', 'POST'))
-oauth.add_url_rule('/oauth/authorize', 'oauth-authorize', rh_as_view(oauth_rh.RHOAuthAuthorization),
-                   methods=('GET', 'POST'))
-oauth.add_url_rule('/oauth/request_token', 'oauth-request_token', rh_as_view(oauth_rh.RHOAuthRequestToken),
-                   methods=('GET', 'POST'))
+oauth.add_url_rule('/oauth/access_token', 'oauth-access_token', oauth_rh.RHOAuthAccessTokenURL, methods=('GET', 'POST'))
+oauth.add_url_rule('/oauth/authorize', 'oauth-authorize', oauth_rh.RHOAuthAuthorization, methods=('GET', 'POST'))
+oauth.add_url_rule('/oauth/request_token', 'oauth-request_token', oauth_rh.RHOAuthRequestToken, methods=('GET', 'POST'))
 
 # User endpoints: App list and authorization
 with oauth.add_prefixed_rules('/user/<userId>', '/user'):
-    oauth.add_url_rule('/oauth', 'oauth-userThirdPartyAuth', rh_as_view(oauth_rh.RHOAuthUserThirdPartyAuth))
-    oauth.add_url_rule('/oauth/authorize', 'oauth-thirdPartyAuth', rh_as_view(oauth_rh.RHOAuthThirdPartyAuth))
-    oauth.add_url_rule('/oauth/authorize_consumer', 'oauth-authorize_consumer',
-                       rh_as_view(oauth_rh.RHOAuthAuthorizeConsumer))
+    oauth.add_url_rule('/oauth', 'oauth-userThirdPartyAuth', oauth_rh.RHOAuthUserThirdPartyAuth)
+    oauth.add_url_rule('/oauth/authorize', 'oauth-thirdPartyAuth', oauth_rh.RHOAuthThirdPartyAuth)
+    oauth.add_url_rule('/oauth/authorize_consumer', 'oauth-authorize_consumer', oauth_rh.RHOAuthAuthorizeConsumer)

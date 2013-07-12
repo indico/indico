@@ -18,32 +18,29 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import registrantsDisplay, registrationFormDisplay
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.display import event
 
 
 # Registrants
-event.add_url_rule('/registration/registrants', 'confRegistrantsDisplay-list',
-                   rh_as_view(registrantsDisplay.RHRegistrantsList))
+event.add_url_rule('/registration/registrants', 'confRegistrantsDisplay-list', registrantsDisplay.RHRegistrantsList)
 
 # Registration
-event.add_url_rule('/registration/', 'confRegistrationFormDisplay',
-                   rh_as_view(registrationFormDisplay.RHRegistrationForm))
+event.add_url_rule('/registration/', 'confRegistrationFormDisplay', registrationFormDisplay.RHRegistrationForm)
 event.add_url_rule('/registration/conditions', 'confRegistrationFormDisplay-conditions',
-                   rh_as_view(registrationFormDisplay.RHRegistrationFormConditions))
+                   registrationFormDisplay.RHRegistrationFormConditions)
 event.add_url_rule('/registration/confirm', 'confRegistrationFormDisplay-confirmBooking',
-                   rh_as_view(registrationFormDisplay.RHRegistrationFormconfirmBooking), methods=('GET', 'POST'))
+                   registrationFormDisplay.RHRegistrationFormconfirmBooking, methods=('GET', 'POST'))
 event.add_url_rule('/registration/pay', 'confRegistrationFormDisplay-confirmBookingDone',
-                   rh_as_view(registrationFormDisplay.RHRegistrationFormconfirmBookingDone))
+                   registrationFormDisplay.RHRegistrationFormconfirmBookingDone)
 event.add_url_rule('/registration/register', 'confRegistrationFormDisplay-creation',
-                   rh_as_view(registrationFormDisplay.RHRegistrationFormCreation), methods=('POST',))
+                   registrationFormDisplay.RHRegistrationFormCreation, methods=('POST',))
 event.add_url_rule('/registration/register/success', 'confRegistrationFormDisplay-creationDone',
-                   rh_as_view(registrationFormDisplay.RHRegistrationFormCreationDone))
+                   registrationFormDisplay.RHRegistrationFormCreationDone)
 event.add_url_rule('/registration/register', 'confRegistrationFormDisplay-display',
-                   rh_as_view(registrationFormDisplay.RHRegistrationFormDisplay))
+                   registrationFormDisplay.RHRegistrationFormDisplay)
 event.add_url_rule('/registration/modify', 'confRegistrationFormDisplay-modify',
-                   rh_as_view(registrationFormDisplay.RHRegistrationFormModify))
+                   registrationFormDisplay.RHRegistrationFormModify)
 event.add_url_rule('/registration/modify', 'confRegistrationFormDisplay-performModify',
-                   rh_as_view(registrationFormDisplay.RHRegistrationFormPerformModify), methods=('POST',))
+                   registrationFormDisplay.RHRegistrationFormPerformModify, methods=('POST',))
 event.add_url_rule('/registration/signin', 'confRegistrationFormDisplay-signIn',
-                   rh_as_view(registrationFormDisplay.RHRegistrationFormSignIn))
+                   registrationFormDisplay.RHRegistrationFormSignIn)

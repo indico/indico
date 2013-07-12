@@ -18,62 +18,54 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import login, users, api
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 user = IndicoBlueprint('user', __name__, url_prefix='/user')
 
 # Logout
-user.add_url_rule('/logout', 'logOut', rh_as_view(login.RHSignOut))
+user.add_url_rule('/logout', 'logOut', login.RHSignOut)
 
 # Login
-user.add_url_rule('/login', 'signIn', rh_as_view(login.RHSignIn), methods=('GET', 'POST'))
-user.add_url_rule('/login/sso', 'signIn-sso', rh_as_view(login.RHSignInSSO), methods=('GET', 'POST'))
-user.add_url_rule('/login/sso/<authId>', 'signIn-sso', rh_as_view(login.RHSignInSSO), methods=('GET', 'POST'))
+user.add_url_rule('/login', 'signIn', login.RHSignIn, methods=('GET', 'POST'))
+user.add_url_rule('/login/sso', 'signIn-sso', login.RHSignInSSO, methods=('GET', 'POST'))
+user.add_url_rule('/login/sso/<authId>', 'signIn-sso', login.RHSignInSSO, methods=('GET', 'POST'))
 user.add_url_rule('/login/sso/<authId>/execute', 'signIn-sso-execute', build_only=True)
-user.add_url_rule('/login/disabled', 'signIn-disabledAccount', rh_as_view(login.RHDisabledAccount),
-                  methods=('GET', 'POST'))
-user.add_url_rule('/login/not-activated', 'signIn-unactivatedAccount', rh_as_view(login.RHUnactivatedAccount))
+user.add_url_rule('/login/disabled', 'signIn-disabledAccount', login.RHDisabledAccount, methods=('GET', 'POST'))
+user.add_url_rule('/login/not-activated', 'signIn-unactivatedAccount', login.RHUnactivatedAccount)
 
 # Passwords
-user.add_url_rule('/reset-password', 'signIn-sendLogin', rh_as_view(login.RHSendLogin), methods=('POST',))
-user.add_url_rule('/reset-password/<token>', 'signIn-resetPassword', rh_as_view(login.RHResetPassword),
-                  methods=('GET', 'POST'))
+user.add_url_rule('/reset-password', 'signIn-sendLogin', login.RHSendLogin, methods=('POST',))
+user.add_url_rule('/reset-password/<token>', 'signIn-resetPassword', login.RHResetPassword, methods=('GET', 'POST'))
 with user.add_prefixed_rules('/<userId>'):
-    user.add_url_rule('/account/change-password', 'identityCreation-changePassword',
-                      rh_as_view(users.RHUserIdentityChangePassword), methods=('GET', 'POST'))
+    user.add_url_rule('/account/change-password', 'identityCreation-changePassword', users.RHUserIdentityChangePassword,
+                      methods=('GET', 'POST'))
 
 # Registration
-user.add_url_rule('/register/activate', 'signIn-active', rh_as_view(login.RHActive))
-user.add_url_rule('/register/send-activation', 'signIn-sendActivation', rh_as_view(login.RHSendActivation),
-                  methods=('GET', 'POST'))
-user.add_url_rule('/register', 'userRegistration', rh_as_view(users.RHUserCreation), methods=('GET', 'POST'))
-user.add_url_rule('/register/exists', 'userRegistration-UserExist', rh_as_view(users.RHUserExistWithIdentity))
-user.add_url_rule('/register/success', 'userRegistration-created', rh_as_view(users.RHUserCreated),
-                  methods=('GET', 'POST'))
-
+user.add_url_rule('/register/activate', 'signIn-active', login.RHActive)
+user.add_url_rule('/register/send-activation', 'signIn-sendActivation', login.RHSendActivation, methods=('GET', 'POST'))
+user.add_url_rule('/register', 'userRegistration', users.RHUserCreation, methods=('GET', 'POST'))
+user.add_url_rule('/register/exists', 'userRegistration-UserExist', users.RHUserExistWithIdentity)
+user.add_url_rule('/register/success', 'userRegistration-created', users.RHUserCreated, methods=('GET', 'POST'))
 
 with user.add_prefixed_rules('/<userId>'):
     # Identities
-    user.add_url_rule('/account/create-identity', 'identityCreation', rh_as_view(users.RHUserIdentityCreation))
-    user.add_url_rule('/account/create-identity', 'identityCreation-create',
-                      rh_as_view(users.RHUserIdentityCreation), methods=('POST',))
-    user.add_url_rule('/account/delete-identity', 'identityCreation-remove',
-                      rh_as_view(users.RHUserRemoveIdentity), methods=('POST',))
-    user.add_url_rule('/account/disable', 'userRegistration-disable', rh_as_view(users.RHUserDisable),
-                      methods=('GET', 'POST'))
-    user.add_url_rule('/account/activate', 'userRegistration-active', rh_as_view(users.RHUserActive),
-                      methods=('GET', 'POST'))
+    user.add_url_rule('/account/create-identity', 'identityCreation', users.RHUserIdentityCreation)
+    user.add_url_rule('/account/create-identity', 'identityCreation-create', users.RHUserIdentityCreation,
+                      methods=('POST',))
+    user.add_url_rule('/account/delete-identity', 'identityCreation-remove', users.RHUserRemoveIdentity,
+                      methods=('POST',))
+    user.add_url_rule('/account/disable', 'userRegistration-disable', users.RHUserDisable, methods=('GET', 'POST'))
+    user.add_url_rule('/account/activate', 'userRegistration-active', users.RHUserActive, methods=('GET', 'POST'))
 
     # Dashboard, Favorites, etc.
-    user.add_url_rule('/dashboard', 'userDashboard', rh_as_view(users.RHUserDashboard))
-    user.add_url_rule('/account/', 'userDetails', rh_as_view(users.RHUserDetails))
-    user.add_url_rule('/favorites', 'userBaskets', rh_as_view(users.RHUserBaskets))
-    user.add_url_rule('/preferences', 'userPreferences', rh_as_view(users.RHUserPreferences))
+    user.add_url_rule('/dashboard', 'userDashboard', users.RHUserDashboard)
+    user.add_url_rule('/account/', 'userDetails', users.RHUserDetails)
+    user.add_url_rule('/favorites', 'userBaskets', users.RHUserBaskets)
+    user.add_url_rule('/preferences', 'userPreferences', users.RHUserPreferences)
 
     # API Keys
-    user.add_url_rule('/api', 'userAPI', rh_as_view(api.RHUserAPI))
-    user.add_url_rule('/api/block', 'userAPI-block', rh_as_view(api.RHUserAPIBlock), methods=('POST',))
-    user.add_url_rule('/api/create', 'userAPI-create', rh_as_view(api.RHUserAPICreate), methods=('POST',))
-    user.add_url_rule('/api/delete', 'userAPI-delete', rh_as_view(api.RHUserAPIDelete), methods=('POST',))
+    user.add_url_rule('/api', 'userAPI', api.RHUserAPI)
+    user.add_url_rule('/api/block', 'userAPI-block', api.RHUserAPIBlock, methods=('POST',))
+    user.add_url_rule('/api/create', 'userAPI-create', api.RHUserAPICreate, methods=('POST',))
+    user.add_url_rule('/api/delete', 'userAPI-delete', api.RHUserAPIDelete, methods=('POST',))

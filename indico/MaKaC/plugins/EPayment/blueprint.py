@@ -18,10 +18,9 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.plugins.EPayment.chrome as handlers
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 blueprint = IndicoBlueprint('epayment', __name__, url_prefix='/epayment')
 
-blueprint.add_url_rule('/<path:filepath>', 'htdocs', rh_as_view(handlers.RHEPaymentHtdocs))
+blueprint.add_url_rule('/<path:filepath>', 'htdocs', handlers.RHEPaymentHtdocs)

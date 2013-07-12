@@ -18,16 +18,13 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import paperReviewingDisplay
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.display import event
 
 
 # paperReviewingDisplay.py
-event.add_url_rule('/paper-reviewing/', 'paperReviewingDisplay',
-                   rh_as_view(paperReviewingDisplay.RHPaperReviewingDisplay))
+event.add_url_rule('/paper-reviewing/', 'paperReviewingDisplay', paperReviewingDisplay.RHPaperReviewingDisplay)
 event.add_url_rule('/paper-reviewing/templates/', 'paperReviewingDisplay-downloadTemplate',
-                   rh_as_view(paperReviewingDisplay.RHDownloadPRTemplate))
+                   paperReviewingDisplay.RHDownloadPRTemplate)
 event.add_url_rule('/paper-reviewing/templates/<reviewingTemplateId>', 'paperReviewingDisplay-downloadTemplate',
-                   rh_as_view(paperReviewingDisplay.RHDownloadPRTemplate))
-event.add_url_rule('/paper-reviewing/upload', 'paperReviewingDisplay-uploadPaper',
-                   rh_as_view(paperReviewingDisplay.RHUploadPaper))
+                   paperReviewingDisplay.RHDownloadPRTemplate)
+event.add_url_rule('/paper-reviewing/upload', 'paperReviewingDisplay-uploadPaper', paperReviewingDisplay.RHUploadPaper)

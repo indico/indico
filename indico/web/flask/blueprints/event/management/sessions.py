@@ -18,62 +18,58 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import sessionModif
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Main
-event_mgmt.add_url_rule('/session/<sessionId>/', 'sessionModification', rh_as_view(sessionModif.RHSessionModification))
+event_mgmt.add_url_rule('/session/<sessionId>/', 'sessionModification', sessionModif.RHSessionModification)
 event_mgmt.add_url_rule('/session/<sessionId>/modify', 'sessionModification-modify',
-                        rh_as_view(sessionModif.RHSessionDataModification), methods=('GET', 'POST'))
+                        sessionModif.RHSessionDataModification, methods=('GET', 'POST'))
 
 # Contributions
 event_mgmt.add_url_rule('/session/<sessionId>/contributions/', 'sessionModification-contribList',
-                        rh_as_view(sessionModif.RHContribList), methods=('GET', 'POST'))
+                        sessionModif.RHContribList, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/session/<sessionId>/contributions/direct-access', 'sessionModification-contribQuickAccess',
-                        rh_as_view(sessionModif.RHContribQuickAccess), methods=('GET', 'POST'))
+                        sessionModif.RHContribQuickAccess, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/session/<sessionId>/contributions/add', 'sessionModification-addContribs',
-                        rh_as_view(sessionModif.RHAddContribs), methods=('GET', 'POST'))
+                        sessionModif.RHAddContribs, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/session/<sessionId>/contributions/perform-action', 'sessionModification-contribAction',
-                        rh_as_view(sessionModif.RHContribsActions), methods=('POST',))
+                        sessionModif.RHContribsActions, methods=('POST',))
 event_mgmt.add_url_rule('/session/<sessionId>/contributions/contributions.pdf', 'sessionModification-contribsToPDF',
-                        rh_as_view(sessionModif.RHContribsToPDF), methods=('POST',))
+                        sessionModif.RHContribsToPDF, methods=('POST',))
 event_mgmt.add_url_rule('/session/<sessionId>/contributions/participants', 'sessionModification-participantList',
-                        rh_as_view(sessionModif.RHContribsParticipantList), methods=('POST',))
+                        sessionModif.RHContribsParticipantList, methods=('POST',))
 event_mgmt.add_url_rule('/session/<sessionId>/contributions/edit/<contribId>', 'sessionModification-editContrib',
-                        rh_as_view(sessionModif.RHContribListEditContrib), methods=('GET', 'POST'))
+                        sessionModif.RHContribListEditContrib, methods=('GET', 'POST'))
 
 # Timetable
-event_mgmt.add_url_rule('/session/<sessionId>/timetable/', 'sessionModifSchedule',
-                        rh_as_view(sessionModif.RHSessionModifSchedule), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/session/<sessionId>/timetable/', 'sessionModifSchedule', sessionModif.RHSessionModifSchedule,
+                        methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/session/<sessionId>/timetable/fit-slot', 'sessionModifSchedule-fitSlot',
-                        rh_as_view(sessionModif.RHFitSlot), methods=('POST',))
+                        sessionModif.RHFitSlot, methods=('POST',))
 event_mgmt.add_url_rule('/session/<sessionId>/timetable/slot-calc', 'sessionModifSchedule-slotCalc',
-                        rh_as_view(sessionModif.RHSlotCalc), methods=('POST',))
+                        sessionModif.RHSlotCalc, methods=('POST',))
 
 # Comment
-event_mgmt.add_url_rule('/session/<sessionId>/comment/', 'sessionModifComm',
-                        rh_as_view(sessionModif.RHSessionModifComm))
+event_mgmt.add_url_rule('/session/<sessionId>/comment/', 'sessionModifComm', sessionModif.RHSessionModifComm)
 event_mgmt.add_url_rule('/session/<sessionId>/comment/edit', 'sessionModifComm-edit',
-                        rh_as_view(sessionModif.RHSessionModifCommEdit), methods=('GET', 'POST'))
+                        sessionModif.RHSessionModifCommEdit, methods=('GET', 'POST'))
 
 # Material
-event_mgmt.add_url_rule('/session/<sessionId>/material/', 'sessionModification-materials',
-                        rh_as_view(sessionModif.RHMaterials))
+event_mgmt.add_url_rule('/session/<sessionId>/material/', 'sessionModification-materials', sessionModif.RHMaterials)
 event_mgmt.add_url_rule('/session/<sessionId>/material/add', 'sessionModification-materialsAdd',
-                        rh_as_view(sessionModif.RHMaterialsAdd), methods=('POST',))
+                        sessionModif.RHMaterialsAdd, methods=('POST',))
 
 # Protection
-event_mgmt.add_url_rule('/session/<sessionId>/access/', 'sessionModifAC', rh_as_view(sessionModif.RHSessionModifAC))
+event_mgmt.add_url_rule('/session/<sessionId>/access/', 'sessionModifAC', sessionModif.RHSessionModifAC)
 event_mgmt.add_url_rule('/session/<sessionId>/access/visibility', 'sessionModifAC-setVisibility',
-                        rh_as_view(sessionModif.RHSessionSetVisibility), methods=('POST',))
+                        sessionModif.RHSessionSetVisibility, methods=('POST',))
 
 # Tools
-event_mgmt.add_url_rule('/session/<sessionId>/tools/', 'sessionModifTools',
-                        rh_as_view(sessionModif.RHSessionModifTools))
-event_mgmt.add_url_rule('/session/<sessionId>/tools/delete', 'sessionModifTools-delete',
-                        rh_as_view(sessionModif.RHSessionDeletion), methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/session/<sessionId>/tools/lock', 'sessionModification-close',
-                        rh_as_view(sessionModif.RHSessionClose), methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/session/<sessionId>/tools/unlock', 'sessionModification-open',
-                        rh_as_view(sessionModif.RHSessionOpen), methods=('POST',))
+event_mgmt.add_url_rule('/session/<sessionId>/tools/', 'sessionModifTools', sessionModif.RHSessionModifTools)
+event_mgmt.add_url_rule('/session/<sessionId>/tools/delete', 'sessionModifTools-delete', sessionModif.RHSessionDeletion,
+                        methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/session/<sessionId>/tools/lock', 'sessionModification-close', sessionModif.RHSessionClose,
+                        methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/session/<sessionId>/tools/unlock', 'sessionModification-open', sessionModif.RHSessionOpen,
+                        methods=('POST',))

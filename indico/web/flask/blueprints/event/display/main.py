@@ -24,7 +24,6 @@ from werkzeug.exceptions import NotFound
 from MaKaC.common import DBMgr
 from MaKaC.webinterface.rh import conferenceDisplay
 from MaKaC.webinterface.urlHandlers import UHConferenceDisplay
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.display import event
 
 
@@ -73,23 +72,19 @@ event.add_url_rule('!/event/<confId>/', 'conferenceDisplay', _event_or_shorturl)
 
 # Event overview and navigation
 event.add_url_rule('/overview', 'conferenceDisplay-overview', _event_or_shorturl, defaults={'ovw': True})
-event.add_url_rule('/next', 'conferenceDisplay-next', rh_as_view(conferenceDisplay.RHRelativeEvent),
-                   defaults={'which': 'next'})
-event.add_url_rule('/prev', 'conferenceDisplay-prev', rh_as_view(conferenceDisplay.RHRelativeEvent),
-                   defaults={'which': 'prev'})
+event.add_url_rule('/next', 'conferenceDisplay-next', conferenceDisplay.RHRelativeEvent, defaults={'which': 'next'})
+event.add_url_rule('/prev', 'conferenceDisplay-prev', conferenceDisplay.RHRelativeEvent, defaults={'which': 'prev'})
 
 # Event access
-event.add_url_rule('/accesskey', 'conferenceDisplay-accessKey', rh_as_view(conferenceDisplay.RHConferenceAccessKey),
+event.add_url_rule('/accesskey', 'conferenceDisplay-accessKey', conferenceDisplay.RHConferenceAccessKey,
                    methods=('GET', 'POST'))
 
 # Event layout
-event.add_url_rule('/style.css', 'conferenceDisplay-getCSS', rh_as_view(conferenceDisplay.RHConferenceGetCSS))
-event.add_url_rule('/logo', 'conferenceDisplay-getLogo', rh_as_view(conferenceDisplay.RHConferenceGetLogo),
-                   methods=('GET', 'POST'))
-event.add_url_rule('/picture/<picId>.<picExt>', 'conferenceDisplay-getPic',
-                   rh_as_view(conferenceDisplay.RHConferenceGetPic))
+event.add_url_rule('/style.css', 'conferenceDisplay-getCSS', conferenceDisplay.RHConferenceGetCSS)
+event.add_url_rule('/logo', 'conferenceDisplay-getLogo', conferenceDisplay.RHConferenceGetLogo, methods=('GET', 'POST'))
+event.add_url_rule('/picture/<picId>.<picExt>', 'conferenceDisplay-getPic', conferenceDisplay.RHConferenceGetPic)
 
 # Machine-readable formats
-event.add_url_rule('/event.ics', 'conferenceDisplay-ical', rh_as_view(conferenceDisplay.RHConferenceToiCal))
-event.add_url_rule('/event.marc.xml', 'conferenceDisplay-marcxml', rh_as_view(conferenceDisplay.RHConferenceToMarcXML))
-event.add_url_rule('/event.xml', 'conferenceDisplay-xml', rh_as_view(conferenceDisplay.RHConferenceToXML))
+event.add_url_rule('/event.ics', 'conferenceDisplay-ical', conferenceDisplay.RHConferenceToiCal)
+event.add_url_rule('/event.marc.xml', 'conferenceDisplay-marcxml', conferenceDisplay.RHConferenceToMarcXML)
+event.add_url_rule('/event.xml', 'conferenceDisplay-xml', conferenceDisplay.RHConferenceToXML)

@@ -18,40 +18,36 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Speakers
-event_mgmt.add_url_rule('/lists/speakers', 'confModifListings-allSpeakers',
-                        rh_as_view(conferenceModif.RHConfAllSpeakers))
+event_mgmt.add_url_rule('/lists/speakers', 'confModifListings-allSpeakers', conferenceModif.RHConfAllSpeakers)
 event_mgmt.add_url_rule('/lists/speakers', 'confModifListings-allSpeakersAction',
-                        rh_as_view(conferenceModif.RHConfAllSpeakersAction), methods=('POST',))
+                        conferenceModif.RHConfAllSpeakersAction, methods=('POST',))
 event_mgmt.add_url_rule('/lists/speakers/email/send', 'EMail-sendcontribparticipants',
-                        rh_as_view(conferenceModif.RHContribParticipantsSendEmail), methods=('POST',))
+                        conferenceModif.RHContribParticipantsSendEmail, methods=('POST',))
 
 # Conveners
 event_mgmt.add_url_rule('/lists/conveners', 'confModifTools-allSessionsConveners',
-                        rh_as_view(conferenceModif.RHConfAllSessionsConveners))
+                        conferenceModif.RHConfAllSessionsConveners)
 event_mgmt.add_url_rule('/lists/conveners', 'confModifTools-allSessionsConvenersAction',
-                        rh_as_view(conferenceModif.RHConfAllSessionsConvenersAction), methods=('POST',))
-event_mgmt.add_url_rule('/lists/conveners/email/send', 'EMail-sendconvener',
-                        rh_as_view(conferenceModif.RHConvenerSendEmail), methods=('POST',))
+                        conferenceModif.RHConfAllSessionsConvenersAction, methods=('POST',))
+event_mgmt.add_url_rule('/lists/conveners/email/send', 'EMail-sendconvener', conferenceModif.RHConvenerSendEmail,
+                        methods=('POST',))
 
 # Pending
-event_mgmt.add_url_rule('/lists/pending/', 'confModifPendingQueues',
-                        rh_as_view(conferenceModif.RHConfModifPendingQueues))
-event_mgmt.add_url_rule('/lists/pending/<tab>', 'confModifPendingQueues',
-                        rh_as_view(conferenceModif.RHConfModifPendingQueues))
+event_mgmt.add_url_rule('/lists/pending/', 'confModifPendingQueues', conferenceModif.RHConfModifPendingQueues)
+event_mgmt.add_url_rule('/lists/pending/<tab>', 'confModifPendingQueues', conferenceModif.RHConfModifPendingQueues)
 event_mgmt.add_url_rule('/lists/pending/submitters', 'confModifPendingQueues-actionSubmitters',
-                        rh_as_view(conferenceModif.RHConfModifPendingQueuesActionSubm), methods=('POST',),
+                        conferenceModif.RHConfModifPendingQueuesActionSubm, methods=('POST',),
                         defaults={'tab': 'submitters'})
 event_mgmt.add_url_rule('/lists/pending/submitters', 'confModifPendingQueues-actionConfSubmitters',
-                        rh_as_view(conferenceModif.RHConfModifPendingQueuesActionConfSubm), methods=('POST',),
+                        conferenceModif.RHConfModifPendingQueuesActionConfSubm, methods=('POST',),
                         defaults={'tab': 'conf_submitters'})
 event_mgmt.add_url_rule('/lists/pending/managers', 'confModifPendingQueues-actionManagers',
-                        rh_as_view(conferenceModif.RHConfModifPendingQueuesActionMgr), methods=('POST',),
+                        conferenceModif.RHConfModifPendingQueuesActionMgr, methods=('POST',),
                         defaults={'tab': 'managers'})
 event_mgmt.add_url_rule('/lists/pending/coordinators', 'confModifPendingQueues-actionCoordinators',
-                        rh_as_view(conferenceModif.RHConfModifPendingQueuesActionCoord), methods=('POST',),
+                        conferenceModif.RHConfModifPendingQueuesActionCoord, methods=('POST',),
                         defaults={'tab': 'coordinators'})

@@ -18,44 +18,39 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import materialDisplay, fileAccess
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 files = IndicoBlueprint('files', __name__)
 
 # Material (event)
-files.add_url_rule('/event/<confId>/material/<materialId>/', 'materialDisplay',
-                   rh_as_view(materialDisplay.RHMaterialDisplay))
+files.add_url_rule('/event/<confId>/material/<materialId>/', 'materialDisplay', materialDisplay.RHMaterialDisplay)
 files.add_url_rule('/event/<confId>/contribution/<contribId>/material/<materialId>/', 'materialDisplay',
-                   rh_as_view(materialDisplay.RHMaterialDisplay))
+                   materialDisplay.RHMaterialDisplay)
 files.add_url_rule('/event/<confId>/session/<sessionId>/contribution/<contribId>/material/<materialId>/',
-                   'materialDisplay', rh_as_view(materialDisplay.RHMaterialDisplay))
+                   'materialDisplay', materialDisplay.RHMaterialDisplay)
 files.add_url_rule('/event/<confId>/material/<materialId>/accesskey', 'materialDisplay-accessKey',
-                   rh_as_view(materialDisplay.RHMaterialDisplayStoreAccessKey), methods=('POST',))
+                   materialDisplay.RHMaterialDisplayStoreAccessKey, methods=('POST',))
 
 # Material (category)
-files.add_url_rule('/category/<categId>/material/<materialId>/', 'materialDisplay',
-                   rh_as_view(materialDisplay.RHMaterialDisplay))
+files.add_url_rule('/category/<categId>/material/<materialId>/', 'materialDisplay', materialDisplay.RHMaterialDisplay)
 
 # File access (event)
 files.add_url_rule(
     '/event/<confId>/session/<sessionId>/contribution/<contribId>/material/<materialId>/<resId>.<fileExt>',
-    'getFile-access', rh_as_view(fileAccess.RHFileAccess))
+    'getFile-access', fileAccess.RHFileAccess)
 files.add_url_rule('/event/<confId>/contribution/<contribId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',
-                   rh_as_view(fileAccess.RHFileAccess))
-files.add_url_rule('/event/<confId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',
-                   rh_as_view(fileAccess.RHFileAccess))
+                   fileAccess.RHFileAccess)
+files.add_url_rule('/event/<confId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access', fileAccess.RHFileAccess)
 files.add_url_rule('/event/<confId>/registration/attachments/<registrantId>-<resId>.<fileExt>', 'getFile-access',
-                   rh_as_view(fileAccess.RHFileAccess))
+                   fileAccess.RHFileAccess)
 
 
 # File access (category)
 files.add_url_rule('/category/<categId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',
-                   rh_as_view(fileAccess.RHFileAccess))
+                   fileAccess.RHFileAccess)
 
 # File access (generic)
-files.add_url_rule('/file/video.swf', 'getFile-flash', rh_as_view(fileAccess.RHVideoFlashAccess))
-files.add_url_rule('/file/video.wmv', 'getFile-wmv', rh_as_view(fileAccess.RHVideoWmvAccess))
-files.add_url_rule('/file/accesskey', 'getFile-accessKey', rh_as_view(fileAccess.RHFileAccessStoreAccessKey),
-                   methods=('POST',))
+files.add_url_rule('/file/video.swf', 'getFile-flash', fileAccess.RHVideoFlashAccess)
+files.add_url_rule('/file/video.wmv', 'getFile-wmv', fileAccess.RHVideoWmvAccess)
+files.add_url_rule('/file/accesskey', 'getFile-accessKey', fileAccess.RHFileAccessStoreAccessKey, methods=('POST',))

@@ -18,7 +18,7 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import calendar, categoryDisplay
-from indico.web.flask.util import rh_as_view, redirect_view
+from indico.web.flask.util import redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -30,23 +30,23 @@ category.add_url_rule('!/categ/<categId>', view_func=redirect_view('.categoryDis
 category.add_url_rule('!/c/<categId>', view_func=redirect_view('.categoryDisplay'), strict_slashes=False)
 
 # Display
-category.add_url_rule('/<categId>/', 'categoryDisplay', rh_as_view(categoryDisplay.RHCategoryDisplay))
-category.add_url_rule('/<categId>/events.atom', 'categoryDisplay-atom', rh_as_view(categoryDisplay.RHCategoryToAtom))
-category.add_url_rule('/<categId>/events.rss', 'categoryDisplay-rss', rh_as_view(categoryDisplay.RHCategoryToRSS))
-category.add_url_rule('/<categId>/events.ics', 'categoryDisplay-ical', rh_as_view(categoryDisplay.RHCategoryToiCal))
-category.add_url_rule('/<categId>/icon', 'categoryDisplay-getIcon', rh_as_view(categoryDisplay.RHCategoryGetIcon))
-category.add_url_rule('/<categId>/statistics', 'categoryStatistics', rh_as_view(categoryDisplay.RHCategoryStatistics))
+category.add_url_rule('/<categId>/', 'categoryDisplay', categoryDisplay.RHCategoryDisplay)
+category.add_url_rule('/<categId>/events.atom', 'categoryDisplay-atom', categoryDisplay.RHCategoryToAtom)
+category.add_url_rule('/<categId>/events.rss', 'categoryDisplay-rss', categoryDisplay.RHCategoryToRSS)
+category.add_url_rule('/<categId>/events.ics', 'categoryDisplay-ical', categoryDisplay.RHCategoryToiCal)
+category.add_url_rule('/<categId>/icon', 'categoryDisplay-getIcon', categoryDisplay.RHCategoryGetIcon)
+category.add_url_rule('/<categId>/statistics', 'categoryStatistics', categoryDisplay.RHCategoryStatistics)
 
 # Overview
-category.add_url_rule('/<categId>/overview', 'categOverview', rh_as_view(categoryDisplay.RHCategOverviewDisplay))
-category.add_url_rule('/<selCateg>/overview', 'categOverview', rh_as_view(categoryDisplay.RHCategOverviewDisplay))
-category.add_url_rule('/overview', 'categOverview', rh_as_view(categoryDisplay.RHCategOverviewDisplay))
-category.add_url_rule('/<categId>/overview.rss', 'categOverview-rss', rh_as_view(categoryDisplay.RHTodayCategoryToRSS))
+category.add_url_rule('/<categId>/overview', 'categOverview', categoryDisplay.RHCategOverviewDisplay)
+category.add_url_rule('/<selCateg>/overview', 'categOverview', categoryDisplay.RHCategOverviewDisplay)
+category.add_url_rule('/overview', 'categOverview', categoryDisplay.RHCategOverviewDisplay)
+category.add_url_rule('/<categId>/overview.rss', 'categOverview-rss', categoryDisplay.RHTodayCategoryToRSS)
 
 # Event map
-category.add_url_rule('/<categId>/map', 'categoryMap', rh_as_view(categoryDisplay.RHCategoryMap))
+category.add_url_rule('/<categId>/map', 'categoryMap', categoryDisplay.RHCategoryMap)
 
 # Event calendar
-category.add_url_rule('/calendar/', 'wcalendar', rh_as_view(calendar.RHCalendar))
-category.add_url_rule('/calendar/select', 'wcalendar-select', rh_as_view(calendar.RHCalendarSelectCategories),
+category.add_url_rule('/calendar/', 'wcalendar', calendar.RHCalendar)
+category.add_url_rule('/calendar/select', 'wcalendar-select', calendar.RHCalendarSelectCategories,
                       methods=('GET', 'POST'))

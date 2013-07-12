@@ -21,7 +21,6 @@ from werkzeug.utils import redirect
 
 from MaKaC.webinterface.rh import categoryDisplay
 from indico.web.flask.wrappers import IndicoBlueprint
-from indico.web.flask.util import rh_as_view
 
 
 def _redirect_simple_event(**kwargs):
@@ -34,11 +33,11 @@ event_creation = IndicoBlueprint('event_creation', __name__, url_prefix='/event/
 # Event creation
 event_creation.add_url_rule('/simple_event', view_func=_redirect_simple_event)
 event_creation.add_url_rule('/<any(lecture,meeting,conference):event_type>', 'conferenceCreation',
-                            rh_as_view(categoryDisplay.RHConferenceCreation))
-event_creation.add_url_rule('/save', 'conferenceCreation-createConference',
-                            rh_as_view(categoryDisplay.RHConferencePerformCreation), methods=('POST',))
+                            categoryDisplay.RHConferenceCreation)
+event_creation.add_url_rule('/save', 'conferenceCreation-createConference', categoryDisplay.RHConferencePerformCreation,
+                            methods=('POST',))
 
 # Event creation - category specified
 event_creation.add_url_rule('!/category/<categId>/create/event/simple_event', view_func=_redirect_simple_event)
 event_creation.add_url_rule('!/category/<categId>/create/event/<any(lecture,meeting,conference):event_type>',
-                            'conferenceCreation', rh_as_view(categoryDisplay.RHConferenceCreation))
+                            'conferenceCreation', categoryDisplay.RHConferenceCreation)

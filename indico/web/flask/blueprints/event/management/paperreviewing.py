@@ -19,77 +19,75 @@
 
 from MaKaC.webinterface.rh import reviewingControlModif, reviewingModif, reviewingUserCompetencesModif, \
     reviewingAssignContributions, reviewingListContribToJudge, contribReviewingModif
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Entrance (redirects to most appropriate page)
-event_mgmt.add_url_rule('/paper-reviewing/', 'confModifReviewing-access',
-                        rh_as_view(reviewingModif.RHConfModifReviewingAccess))
+event_mgmt.add_url_rule('/paper-reviewing/', 'confModifReviewing-access', reviewingModif.RHConfModifReviewingAccess)
 
 # Setup
 event_mgmt.add_url_rule('/paper-reviewing/setup/', 'confModifReviewing-paperSetup',
-                        rh_as_view(reviewingModif.RHConfModifReviewingPaperSetup))
+                        reviewingModif.RHConfModifReviewingPaperSetup)
 event_mgmt.add_url_rule('/paper-reviewing/setup/templates/<reviewingTemplateId>', 'confModifReviewing-downloadTemplate',
-                        rh_as_view(reviewingModif.RHDownloadTemplate))
+                        reviewingModif.RHDownloadTemplate)
 event_mgmt.add_url_rule('/paper-reviewing/setup/templates/upload', 'confModifReviewing-setTemplate',
-                        rh_as_view(reviewingModif.RHSetTemplate), methods=('POST',))
+                        reviewingModif.RHSetTemplate, methods=('POST',))
 
 # Team
 event_mgmt.add_url_rule('/paper-reviewing/team', 'confModifReviewingControl',
-                        rh_as_view(reviewingControlModif.RHConfModifReviewingControl))
+                        reviewingControlModif.RHConfModifReviewingControl)
 
 # Competences
 event_mgmt.add_url_rule('/paper-reviewing/competences/', 'confModifUserCompetences',
-                        rh_as_view(reviewingUserCompetencesModif.RHConfModifUserCompetences))
+                        reviewingUserCompetencesModif.RHConfModifUserCompetences)
 
 # Assign papers
 event_mgmt.add_url_rule('/paper-reviewing/assign/', 'assignContributions',
-                        rh_as_view(reviewingAssignContributions.RHReviewingAssignContributionsList))
+                        reviewingAssignContributions.RHReviewingAssignContributionsList)
 event_mgmt.add_url_rule('/paper-reviewing/assign/accepted-papers.zip', 'assignContributions-downloadAcceptedPapers',
-                        rh_as_view(reviewingAssignContributions.RHDownloadAcceptedPapers))
+                        reviewingAssignContributions.RHDownloadAcceptedPapers)
 
 # Assess papers
 event_mgmt.add_url_rule('/paper-reviewing/assess/referee', 'confListContribToJudge',
-                        rh_as_view(reviewingListContribToJudge.RHContribListToJudge))
+                        reviewingListContribToJudge.RHContribListToJudge)
 event_mgmt.add_url_rule('/paper-reviewing/assess/reviewer/layout', 'confListContribToJudge-asEditor',
-                        rh_as_view(reviewingListContribToJudge.RHContribListToJudgeAsEditor))
+                        reviewingListContribToJudge.RHContribListToJudgeAsEditor)
 event_mgmt.add_url_rule('/paper-reviewing/assess/reviewer/content', 'confListContribToJudge-asReviewer',
-                        rh_as_view(reviewingListContribToJudge.RHContribListToJudgeAsReviewer))
+                        reviewingListContribToJudge.RHContribListToJudgeAsReviewer)
 
 with event_mgmt.add_prefixed_rules('/session/<sessionId>'):
     # Contribution reviewing: team
     event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/', 'contributionReviewing',
-                            rh_as_view(contribReviewingModif.RHContributionReviewing), methods=('GET', 'POST'))
+                            contribReviewingModif.RHContributionReviewing, methods=('GET', 'POST'))
     event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/assign/referee',
-                            'contributionReviewing-assignReferee', rh_as_view(contribReviewingModif.RHAssignReferee),
+                            'contributionReviewing-assignReferee', contribReviewingModif.RHAssignReferee,
                             methods=('POST',))
     event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/unassign/referee',
-                            'contributionReviewing-removeAssignReferee',
-                            rh_as_view(contribReviewingModif.RHRemoveAssignReferee), methods=('POST',))
+                            'contributionReviewing-removeAssignReferee', contribReviewingModif.RHRemoveAssignReferee,
+                            methods=('POST',))
     event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/assign/reviewer/layout',
-                            'contributionReviewing-assignEditing',
-                            rh_as_view(contribReviewingModif.RHAssignEditing), methods=('POST',))
+                            'contributionReviewing-assignEditing', contribReviewingModif.RHAssignEditing,
+                            methods=('POST',))
     event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/unassign/reviewer/layout',
-                            'contributionReviewing-removeAssignEditing',
-                            rh_as_view(contribReviewingModif.RHRemoveAssignEditing), methods=('POST',))
+                            'contributionReviewing-removeAssignEditing', contribReviewingModif.RHRemoveAssignEditing,
+                            methods=('POST',))
     event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/assign/reviewer/content',
-                            'contributionReviewing-assignReviewing',
-                            rh_as_view(contribReviewingModif.RHAssignReviewing), methods=('POST',))
+                            'contributionReviewing-assignReviewing', contribReviewingModif.RHAssignReviewing,
+                            methods=('POST',))
     event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/team/unassign/reviewer/content',
                             'contributionReviewing-removeAssignReviewing',
-                            rh_as_view(contribReviewingModif.RHRemoveAssignReviewing), methods=('POST',))
+                            contribReviewingModif.RHRemoveAssignReviewing, methods=('POST',))
 
     # Contribution reviewing: assessments
     event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/assess/referee',
                             'contributionReviewing-contributionReviewingJudgements',
-                            rh_as_view(contribReviewingModif.RHContributionReviewingJudgements))
+                            contribReviewingModif.RHContributionReviewingJudgements)
     event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/assess/layout', 'contributionEditingJudgement',
-                            rh_as_view(contribReviewingModif.RHContributionEditingJudgement))
+                            contribReviewingModif.RHContributionEditingJudgement)
     event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/assess/content', 'contributionGiveAdvice',
-                            rh_as_view(contribReviewingModif.RHContributionGiveAdvice))
+                            contribReviewingModif.RHContributionGiveAdvice)
     event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/material',
                             'contributionReviewing-contributionReviewingMaterials',
-                            rh_as_view(contribReviewingModif.RHContribModifReviewingMaterials))
+                            contribReviewingModif.RHContribModifReviewingMaterials)
     event_mgmt.add_url_rule('/contribution/<contribId>/reviewing/history', 'contributionReviewing-reviewingHistory',
-                            rh_as_view(contribReviewingModif.RHReviewingHistory))
+                            contribReviewingModif.RHReviewingHistory)

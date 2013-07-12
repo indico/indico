@@ -18,18 +18,18 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.plugins.InstantMessaging.rh as handlers
-from indico.web.flask.util import rh_as_view, make_compat_redirect_func
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 blueprint = IndicoBlueprint('instantmessaging', __name__)
 
-blueprint.add_url_rule('/event/<confId>/manage/chat/', 'confModifChat', rh_as_view(handlers.RHChatFormModif))
-blueprint.add_url_rule('/event/<confId>/manage/chat/logs', 'confModifChat-logs', rh_as_view(handlers.RHChatSeeLogs))
+blueprint.add_url_rule('/event/<confId>/manage/chat/', 'confModifChat', handlers.RHChatFormModif)
+blueprint.add_url_rule('/event/<confId>/manage/chat/logs', 'confModifChat-logs', handlers.RHChatSeeLogs)
 blueprint.add_url_rule('/event/<confId>/chat', 'conferenceInstantMessaging',
-                       rh_as_view(handlers.RHInstantMessagingDisplay))
+                       handlers.RHInstantMessagingDisplay)
 
-blueprint.add_url_rule('/InstantMessaging/<path:filepath>', 'htdocs', rh_as_view(handlers.RHInstantMessagingHtdocs))
+blueprint.add_url_rule('/InstantMessaging/<path:filepath>', 'htdocs', handlers.RHInstantMessagingHtdocs)
 
 # we can't use make_compat_blueprint here because the old url doesn't end in .py
 compat = IndicoBlueprint('compat_instantmessaging', __name__)

@@ -18,24 +18,20 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceDisplay, sessionDisplay
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.display import event
 
 
 # Program
-event.add_url_rule('/program', 'conferenceProgram', rh_as_view(conferenceDisplay.RHConferenceProgram))
-event.add_url_rule('/program.pdf', 'conferenceProgram-pdf', rh_as_view(conferenceDisplay.RHConferenceProgramPDF))
+event.add_url_rule('/program', 'conferenceProgram', conferenceDisplay.RHConferenceProgram)
+event.add_url_rule('/program.pdf', 'conferenceProgram-pdf', conferenceDisplay.RHConferenceProgramPDF)
 
 # Timetable
-event.add_url_rule('/timetable/', 'conferenceTimeTable', rh_as_view(conferenceDisplay.RHConferenceTimeTable))
-event.add_url_rule('/timetable/pdf', 'conferenceTimeTable-customizePdf',
-                   rh_as_view(conferenceDisplay.RHTimeTableCustomizePDF))
-event.add_url_rule('/timetable/timetable.pdf', 'conferenceTimeTable-pdf', rh_as_view(conferenceDisplay.RHTimeTablePDF),
+event.add_url_rule('/timetable/', 'conferenceTimeTable', conferenceDisplay.RHConferenceTimeTable)
+event.add_url_rule('/timetable/pdf', 'conferenceTimeTable-customizePdf', conferenceDisplay.RHTimeTableCustomizePDF)
+event.add_url_rule('/timetable/timetable.pdf', 'conferenceTimeTable-pdf', conferenceDisplay.RHTimeTablePDF,
                    methods=('GET', 'POST'))
 
 # Sessions
-event.add_url_rule('/session/<sessionId>/', 'sessionDisplay', rh_as_view(sessionDisplay.RHSessionDisplay))
-event.add_url_rule('/session/<sessionId>/session.ics', 'sessionDisplay-ical',
-                   rh_as_view(sessionDisplay.RHSessionToiCal))
-event.add_url_rule('/session/<showSessions>/timetable.pdf', 'conferenceTimeTable-pdf',
-                   rh_as_view(conferenceDisplay.RHTimeTablePDF))
+event.add_url_rule('/session/<sessionId>/', 'sessionDisplay', sessionDisplay.RHSessionDisplay)
+event.add_url_rule('/session/<sessionId>/session.ics', 'sessionDisplay-ical', sessionDisplay.RHSessionToiCal)
+event.add_url_rule('/session/<showSessions>/timetable.pdf', 'conferenceTimeTable-pdf', conferenceDisplay.RHTimeTablePDF)

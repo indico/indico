@@ -18,23 +18,22 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Setup
 event_mgmt.add_url_rule('/participants/setup', 'confModifParticipants-setup',
-                        rh_as_view(conferenceModif.RHConfModifParticipantsSetup))
+                        conferenceModif.RHConfModifParticipantsSetup)
 
 # Participants
-event_mgmt.add_url_rule('/participants/', 'confModifParticipants', rh_as_view(conferenceModif.RHConfModifParticipants))
+event_mgmt.add_url_rule('/participants/', 'confModifParticipants', conferenceModif.RHConfModifParticipants)
 event_mgmt.add_url_rule('/participants/pending', 'confModifParticipants-pendingParticipants',
-                        rh_as_view(conferenceModif.RHConfModifParticipantsPending))
+                        conferenceModif.RHConfModifParticipantsPending)
 event_mgmt.add_url_rule('/participants/declined', 'confModifParticipants-declinedParticipants',
-                        rh_as_view(conferenceModif.RHConfModifParticipantsDeclined))
+                        conferenceModif.RHConfModifParticipantsDeclined)
 event_mgmt.add_url_rule('/participants/perform-action', 'confModifParticipants-action',
-                        rh_as_view(conferenceModif.RHConfModifParticipantsAction), methods=('POST',))
+                        conferenceModif.RHConfModifParticipantsAction, methods=('POST',))
 
 # Statistics
 event_mgmt.add_url_rule('/participants/statistics', 'confModifParticipants-statistics',
-                        rh_as_view(conferenceModif.RHConfModifParticipantsStatistics))
+                        conferenceModif.RHConfModifParticipantsStatistics)

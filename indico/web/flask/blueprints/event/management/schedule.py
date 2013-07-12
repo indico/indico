@@ -18,16 +18,15 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceModif
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Timetable
-event_mgmt.add_url_rule('/timetable/', 'confModifSchedule', rh_as_view(conferenceModif.RHConfModifSchedule),
+event_mgmt.add_url_rule('/timetable/', 'confModifSchedule', conferenceModif.RHConfModifSchedule,
                         methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/timetable/reschedule', 'confModifSchedule-reschedule',
-                        rh_as_view(conferenceModif.RHReschedule), methods=('POST',))
-event_mgmt.add_url_rule('/timetables/dates', 'confModifSchedule-edit',
-                        rh_as_view(conferenceModif.RHScheduleDataEdit), methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/timetable/reschedule', 'confModifSchedule-reschedule', conferenceModif.RHReschedule,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/timetables/dates', 'confModifSchedule-edit', conferenceModif.RHScheduleDataEdit,
+                        methods=('GET', 'POST'))
 
 # Session timetable - see the "sessions" module

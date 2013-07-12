@@ -18,37 +18,33 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceDisplay
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.display import event
 
 
 # Material package
-event.add_url_rule('/material/download', 'conferenceDisplay-matPkg',
-                   rh_as_view(conferenceDisplay.RHFullMaterialPackage))
+event.add_url_rule('/material/download', 'conferenceDisplay-matPkg', conferenceDisplay.RHFullMaterialPackage)
 event.add_url_rule('/material/download', 'conferenceDisplay-performMatPkg',
-                   rh_as_view(conferenceDisplay.RHFullMaterialPackagePerform), methods=('POST',))
+                   conferenceDisplay.RHFullMaterialPackagePerform, methods=('POST',))
 
 # My conference
-event.add_url_rule('/my-conference/', 'myconference', rh_as_view(conferenceDisplay.RHMyStuff))
+event.add_url_rule('/my-conference/', 'myconference', conferenceDisplay.RHMyStuff)
 event.add_url_rule('/my-conference/contributions', 'myconference-myContributions',
-                   rh_as_view(conferenceDisplay.RHConfMyStuffMyContributions))
-event.add_url_rule('/my-conference/sessions', 'myconference-mySessions',
-                   rh_as_view(conferenceDisplay.RHConfMyStuffMySessions))
-event.add_url_rule('/my-conference/tracks', 'myconference-myTracks',
-                   rh_as_view(conferenceDisplay.RHConfMyStuffMyTracks))
+                   conferenceDisplay.RHConfMyStuffMyContributions)
+event.add_url_rule('/my-conference/sessions', 'myconference-mySessions', conferenceDisplay.RHConfMyStuffMySessions)
+event.add_url_rule('/my-conference/tracks', 'myconference-myTracks', conferenceDisplay.RHConfMyStuffMyTracks)
 
 # Custom pages
-event.add_url_rule('/page/<pageId>', 'internalPage', rh_as_view(conferenceDisplay.RHInternalPageDisplay))
+event.add_url_rule('/page/<pageId>', 'internalPage', conferenceDisplay.RHInternalPageDisplay)
 
 # Other views
-event.add_url_rule('/other-view', 'conferenceOtherViews', rh_as_view(conferenceDisplay.RHConferenceOtherViews))
+event.add_url_rule('/other-view', 'conferenceOtherViews', conferenceDisplay.RHConferenceOtherViews)
 
 # EMail form
-event.add_url_rule('/email', 'EMail', rh_as_view(conferenceDisplay.RHConferenceEmail), methods=('GET', 'POST'))
-event.add_url_rule('/email/send', 'EMail-send', rh_as_view(conferenceDisplay.RHConferenceSendEmail), methods=('POST',))
+event.add_url_rule('/email', 'EMail', conferenceDisplay.RHConferenceEmail, methods=('GET', 'POST'))
+event.add_url_rule('/email/send', 'EMail-send', conferenceDisplay.RHConferenceSendEmail, methods=('POST',))
 
 # Participation invitation
 event.add_url_rule('/invitation/participant/<participantId>', 'confModifParticipants-invitation',
-                   rh_as_view(conferenceDisplay.RHConfParticipantsInvitation), methods=('GET', 'POST'))
+                   conferenceDisplay.RHConfParticipantsInvitation, methods=('GET', 'POST'))
 event.add_url_rule('/invitation/participant/<participantId>/refuse', 'confModifParticipants-refusal',
-                   rh_as_view(conferenceDisplay.RHConfParticipantsRefusal), methods=('GET', 'POST'))
+                   conferenceDisplay.RHConfParticipantsRefusal, methods=('GET', 'POST'))

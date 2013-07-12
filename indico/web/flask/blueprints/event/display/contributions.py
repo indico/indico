@@ -18,34 +18,29 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceDisplay, contribDisplay, subContribDisplay, authorDisplay
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.blueprints.event.display import event
 
 
 # Contribution list
-event.add_url_rule('/contributions', 'contributionListDisplay', rh_as_view(conferenceDisplay.RHContributionList))
+event.add_url_rule('/contributions', 'contributionListDisplay', conferenceDisplay.RHContributionList)
 event.add_url_rule('/contributions.pdf', 'contributionListDisplay-contributionsToPDF',
-                   rh_as_view(conferenceDisplay.RHContributionListToPDF), methods=('POST',))
+                   conferenceDisplay.RHContributionListToPDF, methods=('POST',))
 
 with event.add_prefixed_rules('/session/<sessionId>'):
     # Display contribution
-    event.add_url_rule('/contribution/<contribId>', 'contributionDisplay',
-                       rh_as_view(contribDisplay.RHContributionDisplay))
-    event.add_url_rule('/contribution/<contribId>.ics', 'contributionDisplay-ical',
-                       rh_as_view(contribDisplay.RHContributionToiCal))
+    event.add_url_rule('/contribution/<contribId>', 'contributionDisplay', contribDisplay.RHContributionDisplay)
+    event.add_url_rule('/contribution/<contribId>.ics', 'contributionDisplay-ical', contribDisplay.RHContributionToiCal)
     event.add_url_rule('/contribution/<contribId>.marc.xml', 'contributionDisplay-marcxml',
-                       rh_as_view(contribDisplay.RHContributionToMarcXML))
-    event.add_url_rule('/contribution/<contribId>.xml', 'contributionDisplay-xml',
-                       rh_as_view(contribDisplay.RHContributionToXML))
-    event.add_url_rule('/contribution/<contribId>.pdf', 'contributionDisplay-pdf',
-                       rh_as_view(contribDisplay.RHContributionToPDF))
+                       contribDisplay.RHContributionToMarcXML)
+    event.add_url_rule('/contribution/<contribId>.xml', 'contributionDisplay-xml', contribDisplay.RHContributionToXML)
+    event.add_url_rule('/contribution/<contribId>.pdf', 'contributionDisplay-pdf', contribDisplay.RHContributionToPDF)
     event.add_url_rule('/contribution/<contribId>/<subContId>', 'subContributionDisplay',
-                       rh_as_view(subContribDisplay.RHSubContributionDisplay))
+                       subContribDisplay.RHSubContributionDisplay)
     event.add_url_rule('/contribution/<contribId>/<subContId>.marc.xml', 'subContributionDisplay-marcxml',
-                       rh_as_view(subContribDisplay.RHSubContributionToMarcXML))
+                       subContribDisplay.RHSubContributionToMarcXML)
     event.add_url_rule('/contribution/<contribId>/author/<authorId>', 'contribAuthorDisplay',
-                       rh_as_view(authorDisplay.RHAuthorDisplay))
+                       authorDisplay.RHAuthorDisplay)
 
 # Authors/Speakers
-event.add_url_rule('/authors', 'confAuthorIndex', rh_as_view(conferenceDisplay.RHAuthorIndex))
-event.add_url_rule('/speakers', 'confSpeakerIndex', rh_as_view(conferenceDisplay.RHSpeakerIndex))
+event.add_url_rule('/authors', 'confAuthorIndex', conferenceDisplay.RHAuthorIndex)
+event.add_url_rule('/speakers', 'confSpeakerIndex', conferenceDisplay.RHSpeakerIndex)

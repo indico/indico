@@ -19,21 +19,20 @@
 
 from MaKaC.webinterface.rh import welcome, helpDisplay, newsDisplay, payment, lang, resetTimezone, about, contact, \
     JSContent, errors, materialDisplay
-from indico.web.flask.util import rh_as_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 misc = IndicoBlueprint('misc', __name__)
 
-misc.add_url_rule('/', 'index', rh_as_view(welcome.RHWelcome))
-misc.add_url_rule('/help', 'help', rh_as_view(helpDisplay.RHHelp))
-misc.add_url_rule('/news', 'news', rh_as_view(newsDisplay.RHNews))
-misc.add_url_rule('/payment', 'payment', rh_as_view(payment.RHPaymentModule), methods=('GET', 'POST'))
-misc.add_url_rule('/change-language', 'changeLang', rh_as_view(lang.RHChangeLang), methods=('GET', 'POST'))
-misc.add_url_rule('/change-timezone', 'resetSessionTZ', rh_as_view(resetTimezone.RHResetTZ), methods=('GET', 'POST'))
-misc.add_url_rule('/about', 'about', rh_as_view(about.RHAbout))
-misc.add_url_rule('/contact', 'contact', rh_as_view(contact.RHContact))
-misc.add_url_rule('/vars.js', 'JSContent-getVars', rh_as_view(JSContent.RHGetVarsJs))
-misc.add_url_rule('/report-error', 'errors', rh_as_view(errors.RHErrorReporting), methods=('GET', 'POST'))
-misc.add_url_rule('/conversion-finished', 'getConvertedFile', rh_as_view(materialDisplay.RHMaterialAddConvertedFile),
+misc.add_url_rule('/', 'index', welcome.RHWelcome)
+misc.add_url_rule('/help', 'help', helpDisplay.RHHelp)
+misc.add_url_rule('/news', 'news', newsDisplay.RHNews)
+misc.add_url_rule('/payment', 'payment', payment.RHPaymentModule, methods=('GET', 'POST'))
+misc.add_url_rule('/change-language', 'changeLang', lang.RHChangeLang, methods=('GET', 'POST'))
+misc.add_url_rule('/change-timezone', 'resetSessionTZ', resetTimezone.RHResetTZ, methods=('GET', 'POST'))
+misc.add_url_rule('/about', 'about', about.RHAbout)
+misc.add_url_rule('/contact', 'contact', contact.RHContact)
+misc.add_url_rule('/vars.js', 'JSContent-getVars', JSContent.RHGetVarsJs)
+misc.add_url_rule('/report-error', 'errors', errors.RHErrorReporting, methods=('GET', 'POST'))
+misc.add_url_rule('/conversion-finished', 'getConvertedFile', materialDisplay.RHMaterialAddConvertedFile,
                   methods=('POST',))
