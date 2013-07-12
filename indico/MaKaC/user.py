@@ -27,7 +27,6 @@ import MaKaC
 from MaKaC.common import filters, indexes
 from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder
-from MaKaC.common.cache import GenericCache
 from MaKaC.errors import UserError, MaKaCError
 from MaKaC.trashCan import TrashCanManager
 import MaKaC.common.info as info
@@ -47,8 +46,6 @@ from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 import indico.util.redis.avatar_links as avatar_links
-
-EXTERNAL_CACHE_TTL = 300
 
 """Contains the classes that implement the user management subsystem
 """
@@ -1094,7 +1091,6 @@ class AvatarHolder(ObjectHolder):
     idxName = "avatars"
     counterName = "PRINCIPAL"
     _indexes = [ "email", "name", "surName","organisation", "status" ]
-    _external_user_cache = GenericCache("external_user_cache")
 
     def matchFirstLetter(self, index, letter, onlyActivated=True, searchInAuthenticators=True):
         result = {}
@@ -1126,14 +1122,6 @@ class AvatarHolder(ObjectHolder):
         return result.values()
 
     def match(self, criteria, exact=0, onlyActivated=True, searchInAuthenticators=True):
-        # for external requests, attemp caching.
-        # We use a Generic Cache
-        if searchInAuthenticators:
-            key = order_dict(criteria)
-            cache_result = self._external_user_cache.get(key)
-            if cache_result is not None:
-                return cache_result
-
         result = {}
         iset = set()
         for f,v in criteria.items():
@@ -1167,7 +1155,6 @@ class AvatarHolder(ObjectHolder):
                                 av = userMatched[0]
                                 if self._userMatchCriteria(av, criteria, exact):
                                     result[av.getEmail()] = av
-            self._external_user_cache.set(key, result.values(), EXTERNAL_CACHE_TTL)
         return result.values()
 
     def _userMatchCriteria(self, av, criteria, exact):
