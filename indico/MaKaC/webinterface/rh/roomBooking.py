@@ -1998,8 +1998,8 @@ class RHRoomBookingCancelBookingOccurrence( RHRoomBookingBase ):
             GenericMailer.send(notification)
 
         session['rbActionSucceeded'] = True
-        session['rbTitle'] = "Selected occurrence has been cancelled."
-        session['rbDescription'] = "You have successfully cancelled an occurrence of this booking."
+        session['rbTitle'] = _("Selected occurrence has been cancelled.")
+        session['rbDescription'] = _("You have successfully cancelled an occurrence of this booking.")
         url = urlHandlers.UHRoomBookingBookingDetails.getURL( self._resv )
         self._redirect( url ) # Redirect to booking details
 
@@ -2380,8 +2380,8 @@ class RHRoomBookingRejectBookingOccurrence( RHRoomBookingBase ):
             GenericMailer.send(notification)
 
         session['rbActionSucceeded'] = True
-        session['rbTitle'] = "Selected occurrence of this booking has been rejected."
-        session['rbDescription'] = "NOTE: rejection e-mail has been sent to the user."
+        session['rbTitle'] = _("Selected occurrence of this booking has been rejected.")
+        session['rbDescription'] = _("NOTE: rejection e-mail has been sent to the user.")
         url = urlHandlers.UHRoomBookingBookingDetails.getURL( self._resv )
         self._redirect( url ) # Redirect to booking details
 

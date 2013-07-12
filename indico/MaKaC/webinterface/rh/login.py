@@ -95,7 +95,6 @@ class RHSignIn( RHSignInBase ):
         self._unactivatedAccountURL = lambda av: urlHandlers.UHUnactivatedAccount.getURL(av)
         self._signInPage = signIn.WPSignIn( self )
         self._signInPageFailed = signIn.WPSignIn( self, login = self._login, msg = _("Wrong login or password") )
-        self._noCacheRedirect = True
 
     def _addExtraParamsToURL(self):
         if self._userId != "":

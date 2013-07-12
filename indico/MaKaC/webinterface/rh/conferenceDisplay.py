@@ -71,7 +71,6 @@ class RHConfSignIn( conferenceBase.RHConferenceBase, RHSignInBase):
         self._unactivatedAccountURL = lambda av: urlHandlers.UHConfUnactivatedAccount.getURL(self.conf, av)
         self._signInPage = conferences.WPConfSignIn( self, self._conf )
         self._signInPageFailed = conferences.WPConfSignIn( self, self._conf, login = self._login, msg = _("Wrong login or password")  )
-        self._noCacheRedirect = False
 
     def _addExtraParamsToURL(self):
         pass

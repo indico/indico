@@ -540,7 +540,7 @@ class RHEvaluationResultsSubmittersActions(RHEvaluationBase):
                 session[sessionVarName] = selected
             else:
                 # Everything selected => DELETE session var since that means "everything" and will stay that way when
-                # a new evaluatino is submitted.
+                # a new evaluation is submitted.
                 session.pop(sessionVarName, None)
 
         #redirecting...

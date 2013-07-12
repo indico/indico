@@ -2631,15 +2631,15 @@ class RHConfAddContribType(RHConferenceModifBase):
             ct = self._conf.newContribType(self._typeName, self._typeDescription)
 
             # Filtering criteria: by default make new contribution type checked
-            dict = session.setdefault('ContributionFilterConf%s' % self._conf.getId(), {})
-            if 'types' in dict:
+            filters = session.setdefault('ContributionFilterConf%s' % self._conf.getId(), {})
+            if 'types' in filters:
                 #Append the new type to the existing list
-                newDict = dict['types'][:]
+                newDict = filters['types'][:]
                 newDict.append(ct.getId())
-                dict['types'] = newDict[:]
+                filters['types'] = newDict[:]
             else:
                 #Create a new entry for the dictionary containing the new type
-                dict['types'] = [ct.getId()]
+                filters['types'] = [ct.getId()]
             session.modified = True
 
             self._redirect(urlHandlers.UHConferenceModification.getURL(self._conf))

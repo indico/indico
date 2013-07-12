@@ -238,7 +238,7 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
 class RHRegistrantListModifAction( RHRegistrantListModifBase ):
     def _checkParams( self, params ):
         RHRegistrantListModifBase._checkParams(self, params)
-        self._windowsAgent = request.user_agent.platform != 'windows'
+        self._windowsAgent = request.user_agent.platform == 'windows'
         self._selectedRegistrants = self._normaliseListParam(params.get("registrant",[]))
         self._addNew = params.has_key("newRegistrant")
         self._remove = params.has_key("removeRegistrants")

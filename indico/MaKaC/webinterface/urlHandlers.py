@@ -41,7 +41,7 @@ class BooleanOnMixin:
                     if value is not False)
 
 
-class BooleanTrueMixin:
+class BooleanTrueMixin(BooleanOnMixin):
     _true = 'True'
 
 
