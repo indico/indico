@@ -114,7 +114,7 @@ class RoomBooking_Feature(IndicoTestFeature):
 
 
 class RoomBookingTestCase(IndicoTestCase):
-    _requires = ['db.DummyUser', RoomBooking_Feature]
+    _requires = ['util.RequestEnvironment', 'db.DummyUser', RoomBooking_Feature]
 
     def _createResv(self, room, user, startDate, endDate, pre=False):
         resv = Location.getDefaultLocation().factory.newReservation()
@@ -256,6 +256,7 @@ class TestRoomBlocking(RoomBookingTestCase):
         self.assertTrue(not RoomBlockingBase.getByRoom(self._room1))
 
     @with_context('database')
+    @with_context('request')
     def testBlockingRejectionIfNotAllowed(self):
         self._createTestReservations()
         block = self._createTestBlocking()
@@ -292,6 +293,7 @@ class TestRoomBlocking(RoomBookingTestCase):
         self.assertTrue(self._resv9.isRejected) # should be rejected: blocking has been approved
 
     @with_context('database')
+    @with_context('request')
     def testReservationSpecificBlockingMethods(self):
         block = self._createTestBlocking()
         candResv = Location.getDefaultLocation().factory.newReservation()

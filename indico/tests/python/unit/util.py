@@ -30,6 +30,7 @@ import contextlib
 
 # indico imports
 from indico.util.contextManager import ContextManager
+from indico.util.fossilize import clearCache
 from indico.util.i18n import setLocale
 
 # indico legacy imports
@@ -182,6 +183,7 @@ class IndicoTestCase(unittest.TestCase, FeatureLoadingObject):
     def setUp(self):
         setLocale('en_GB')
         Logger.removeHandler('smtp')
+        clearCache()  # init/clear fossil cache
         self._configFeatures(self)
 
     def tearDown(self):
