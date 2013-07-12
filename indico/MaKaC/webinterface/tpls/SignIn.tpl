@@ -79,42 +79,21 @@
     </tr>
 </table>
 </form>
-<div style="margin: 20px 30px 0 30px;">
-
-    <table width="100%" cellspacing="5" cellpadding="0"><tbody>
-        <tr>
-            <td align="left"><img src="${ itemIcon }" alt="o" style="padding-right: 10px;"></td>
-            <td align="left" width="100%">
-                <div style="padding: 5px 0; color: #444">
-                    % if isAuthorisedAccountCreation:
-                        ${_("If you don't have an account, you can create one")} <a href="${createAccountURL}">${_("here")}</a>
-                    % endif
-                </div>
-            </td>
-        </tr>
-
-        <tr>
-            <td align="left"><img src="${ itemIcon }" alt="o" style="padding-right: 10px;"></td>
-            <td align="left" width="100%">
-                <div style="color: #444">
-                    ${ _("Forgot your password?") } <span class="fakeLink" onclick="$E('forgotPasswordInfo').dom.style.display = ''; this.style.display = 'none';">${ ("Click here") }</span>
-                </div>
-            </td>
-        </tr>
-        <tr style="display: none;" id="forgotPasswordInfo">
-            <td>&nbsp;</td>
-            <td width="100%">
-                <div style="padding: 5px 0;">
-                    <div style="padding-bottom: 10px;">${ _("If you can't remember your login and password, please use the button below to receive a link to reset your password by email")}</div>
-                    <form action=${ forgotPasswordURL } method="POST">
-                        <input type="submit" class="btn" value="${ _("Reset my password")}">
-                    </form>
-                </div>
-            </td>
-        </tr>
-    </tbody></table>
-
-
+<div style="margin-top: 20px;">
+    <div style="padding: 5px 0; color: #444">
+        % if isAuthorisedAccountCreation:
+            ${_("If you don't have an account, you can create one")} <a href="${createAccountURL}">${_("here")}</a>
+        % endif
+    </div>
+    <div style="color: #444">
+        ${ _("Forgot your password?") } <span class="fakeLink" onclick="$('#reset_password').show(); $(this).hide();">${ ("Click here") }</span>
+    </div>
+    <div id="reset_password" style="padding: 5px 0; display:none">
+        <form action=${ forgotPasswordURL } method="POST">
+            <input type="text" name="email" placeholder="${_('enter your email address')}" style="width: 50%">
+            <input type="submit" class="btn" value="${ _("Reset my password")}">
+        </form>
+    </div>
 </div>
 
 </div>
