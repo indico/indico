@@ -119,10 +119,7 @@ class IndicoSessionInterface(SessionInterface):
         self.storage = GenericCache('flask-session')
 
     def generate_sid(self):
-        sid = str(uuid.uuid4())
-        # Collisions are VERY unlikely but just to be completely safe we delete any existing session
-        self.storage.delete(sid)
-        return sid
+        return str(uuid.uuid4())
 
     def get_cookie_secure(self, app):
         return request.is_secure
