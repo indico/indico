@@ -191,10 +191,10 @@ class RHSendLogin( base.RH ):
         if self._userId:
             av = AvatarHolder().getById(self._userId)
         elif self._email:
-            try:
-                av = AvatarHolder().match({"email":self._email}, exact=1)[0]
-            except:
-                pass
+            av_list = AvatarHolder().match({"email": self._email}, exact=1)
+            if not av_list:
+                raise NoReportError(_("We couldn't find any account with this email address"))
+            av = av_list[0]
         if av:
             sm = mail.sendLoginInfo(av)
             sm.send()

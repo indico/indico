@@ -29,8 +29,7 @@ class AuthenticatorMgr:
 
     def __init__(self):
         self._authenticator_list = []
-        config = Config.getInstance()
-        for auth, config in config.getAuthenticatorList():
+        for auth, config in Config.getInstance().getAuthenticatorList():
             try:
                 mod = import_module("MaKaC.authentication." + auth + "Authentication")
                 self._authenticator_list.append(getattr(mod, auth + "Authenticator")())
