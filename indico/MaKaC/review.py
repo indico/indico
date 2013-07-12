@@ -613,40 +613,45 @@ class AbstractSelectionField(AbstractField):
         AbstractField.__init__(self, params)
         self.__id_generator = Counter()
         self._options = []
+        self._deleted_options = []
         for o in params["options"]:
             self._setOption(o)
 
-    def _updateDeletedOptions(self, options={}):
-        for stored_op in self._options:
-            found = False
-            for op in options:
-                if stored_op.getId() == op.getId():
-                    found = True
-            if not found:
-                stored_op.setDeleted()
+    def _deleteOption(self, option):
+        self._options.remove(option)
+        self._deleted_options.append(option)
+
+    def _updateDeletedOptions(self, options=[]):
+        for o in self._options:
+            print o.__hash__()
+        stored_options = set(self._options)
+        new_options = set(self.getOptionById(o["id"]) for o in options if o["id"] < 0)
+
+        for deleted_option in stored_options - new_options:
+            self._deleteOption(deleted_option)
 
     def _setOption(self, option):
-        if self.hasOption(option["id"]):
-            if not self.getOptionById(option["id"]).isDeleted():
-                self.getOptionById(option["id"]).setCaption(option["caption"])
-        else:
+        stored = self.getOptionById(option["id"])
+        if stored:
+            stored.setValue(option["value"])
+        elif option["value"] is not "":
             option["id"] = self.__id_generator.newCount()
-            self._options.append(SelectionFieldOption(option["id"], option["caption"]))
+            self._options.append(SelectionFieldOption(option["id"], option["value"]))
 
     def clone(self):
         return AbstractSelectionField(self.getValues())
 
+    def getDeletedOptionsById(self, id):
+        return next((o for o in self._deleted_options if o.getId() == id), None)
+
+    def getDeletedOptions(self, id):
+        return self._deleted_options
+
     def getOptionById(self, id):
-        for o in self._options:
-            if o.getId() == id:
-                return o
-        return None
+        return next((o for o in self._options if o.getId() == id), None)
 
     def getOptions(self):
         return self._options
-
-    def hasOption(self, id):
-        return self.getOptionById(id) is not None
 
     def setOptions(self, options=[]):
         self._updateDeletedOptions(options)
@@ -658,9 +663,8 @@ class AbstractSelectionField(AbstractField):
         values = AbstractField.getValues(self)
 
         options = []
-        for o in self.getOptions():
-            if not o.isDeleted:
-                options.append(o.__dict__)
+        for o in self._options:
+            options.append(o.__dict__)
         values["options"] = options
 
         return values
@@ -674,28 +678,30 @@ class AbstractSelectionField(AbstractField):
 class SelectionFieldOption(Fossilizable):
     fossilizes(ISelectionFieldOptionFossil)
 
-    def __init__(self, id, caption):
-        self._id = id
-        self._caption = caption
-        self._deleted = False
+    def __init__(self, id, value):
+        self.id = id
+        self.value = value
+        self.deleted = False
+
+    def __eq__(self, other):
+        if isinstance(other, SelectionFieldOption):
+            return self.id == other.id
+        return False
+
+    def __hash__(self):
+        return hash(self.id)
 
     def __str__(self):
-        return self._caption
+        return self.value
 
-    def getCaption(self):
-        return self._caption
+    def getValue(self):
+        return self.value
 
     def getId(self):
-        return self._id
+        return self.id
 
     def isDeleted(self):
-        return self._deleted
-
-    def setCaption(self, caption):
-        self._caption = caption
-
-    def setDeleted(self, deletion=True):
-        self._deleted = deletion
+        return self.deleted
 
 
 class AbstractFieldsMgr(Persistent):

@@ -75,8 +75,8 @@ class ISelectionFieldOptionFossil(IFossil):
     def getId(self):
         """ ID of the option """
 
-    def getCaption(self):
-        """ Caption of the option """
+    def getValue(self):
+        """ Value of the option """
 
     def isDeleted(self):
         """ True if option has been deleted """
