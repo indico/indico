@@ -137,6 +137,7 @@
         _addNewField: function() {
             var id = this._nextIndex();
             var field = {"id": id, "value": ""};
+            this.info.push(field);
             return field;
         },
 
@@ -214,7 +215,14 @@
         },
 
         getInfo: function() {
+            this._cleanInfo();
             return this.info;
+        },
+
+        _cleanInfo: function() {
+            if (this.info[this.info.length-1]["value"] === "") {
+                this.info.pop();
+            }
         },
 
         setInfo: function(info) {
