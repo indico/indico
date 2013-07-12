@@ -863,16 +863,6 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
                 function(result, error) {
                     if (!error) {
                         self.__fillForm(result);
-                        // $("#field-maxlength").val(result.maxLength);
-
-                        // $("#field-type option").filter(function() {
-                        //     return $(this).val() == result.type;
-                        // }).prop("selected", true);
-
-                        // $("#field-limitation option").filter(function() {
-                        //     return $(this).val() == result.limitation;
-                        // }).prop("selected", true);
-
                         killProgress();
                     } else {
                         killProgress();
@@ -888,13 +878,13 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
             this.info.set("isMandatory", field.isMandatory);
         },
 
-        __preprocess: function() {
+        __preSubmit: function() {
             // Override if preprocess befor submit is required
         },
 
         __submit: function() {
             var self = this;
-            self.__preprocess();
+            self.__preSubmit();
 
             if (self._parameterManager.check()) {
                 var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving field..."));
@@ -957,7 +947,7 @@ type("AddAbstractTextFieldDialog", ["AddAbstractFieldDialog"],
             this.info.set("limitation", field.limitation);
         },
 
-        __preprocess: function() {
+        __preSubmit: function() {
             var self = this;
             var maxLength = this.info.get("maxLength");
 
@@ -976,14 +966,14 @@ type("AddAbstractTextFieldDialog", ["AddAbstractFieldDialog"],
 
 type("AddAbstractTextAreaFieldDialog", ["AddAbstractTextFieldDialog"], {},
     function(conferenceId, fieldId) {
-        this.AddAbstractTextFieldDialog(conferenceId, fieldId, "Text");
+        this.AddAbstractTextFieldDialog(conferenceId, fieldId, $T("Text"));
         this.info.set("type", "text");
     }
 );
 
 type("AddAbstractInputFieldDialog", ["AddAbstractTextFieldDialog"], {},
     function(conferenceId, fieldId) {
-        this.AddAbstractTextFieldDialog(conferenceId, fieldId, "Input");
+        this.AddAbstractTextFieldDialog(conferenceId, fieldId, $T("Input"));
         this.info.set("type", "input");
     }
 );
@@ -992,19 +982,23 @@ type("AddAbstractSelectionFieldDialog", ["AddAbstractFieldDialog"],
     {
         _initializeForm: function() {
             this.AddAbstractFieldDialog.prototype._initializeForm.call(this);
-            var fieldOptions = this._parameterManager.add(new RealtimeTextArea({}), "text", true);
-            fieldOptions = $B(fieldOptions, this.info.accessor("options"));
-            this._form.push([$T("Options"), fieldOptions.draw()]);
+            this.fieldOptions = $("<div></div>").fieldarea({fields_caption: $T("option"),
+                                                           parameter_manager: this._parameterManager});
+            this._form.push([$T("Options"), this.fieldOptions]);
         },
 
-        __fillForm: function() {
+        __fillForm: function(field) {
             this.AddAbstractFieldDialog.prototype.__fillForm.call(this, field);
-            this.info.set("options", field.options);
+            this.fieldOptions.fieldarea("setInfo", field["options"]);
+        },
+
+        __preSubmit: function() {
+            this.info.set("options", this.fieldOptions.fieldarea("getInfo"));
         }
     },
 
     function(conferenceId, fieldId) {
-        this.AddAbstractFieldDialog(conferenceId, fieldId, "Selection");
+        this.AddAbstractFieldDialog(conferenceId, fieldId, $T("Selection"));
         this.info.set("type", "selection");
     }
 );

@@ -155,12 +155,6 @@ $(window).load(function() {
         }
     });
 
-    $(window).bind('keydown', function(event) {
-        if(event.keyCode === 27) {
-            $('#add-field-button').qtip('hide', event);
-        }
-    });
-
     $(".edit-field").click(function(e) {
         e.preventDefault();
         var fieldId = $(this).data("id");

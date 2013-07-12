@@ -42,4 +42,8 @@
     tr:hover a {
         visibility: visible;
     }
+
+    tr:last-of-type a {
+        visibility: hidden;
+    }
 }

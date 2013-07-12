@@ -21,10 +21,11 @@
 
 %button {
     @include user-select(none);
-    @include rounded-corners;
-    @include box-border;
+    @include rounded-corners();
+    @include box-border();
     display: inline-block;
     cursor: pointer;
+    color: $dark-gray;
     outline: none;
 }
 
@@ -65,11 +66,6 @@ a.i-big-button {
     height: $size;
     vertical-align: middle;
 
-    i,
-    span {
-        color: $dark-gray;
-    }
-
     i {
         font-size: 3em;
         line-height: ($size/3)*2;
@@ -98,6 +94,12 @@ a.i-big-button {
             line-height: $size;
         }
     }
+}
+
+a.i-small-button {
+    $size = 10px;
+    @extend %button;
+
 
 }
 
