@@ -31,8 +31,8 @@
         _create: function() {
             var self = this;
 
-            self.info = {};
-            self.info["next_index"] = 0;
+            self.info = [];
+            self.next_index = -1;
 
             self.table = $("<table></table>");
             self.element.addClass("field-area scrollable");
@@ -54,26 +54,27 @@
                 self._deleteRow($(this).closest("tr"));
             });
 
-            self.element.on("keyup propertychange paste", "input", function(e) {
+            self.element.on("keyup propertychange paste change", "input", function(e) {
                 // Enter
                 if (e.type == "keyup" && e.which == 13) {
                     $(this).blur();
                 }
 
                 if ($(this).val() === "") {
-                    self._deleteInput($(this).closest("tr"));
+                    self._deleteNewInput($(this).closest("tr"));
                 }
 
-                self._drawInput();
+                self._drawNewInput();
             });
 
             self.element.on("keydown", "input", function(e) {
                 // ESC
                 if (e.which == 27) {
                     e.stopPropagation();
-                    value = self.info[$(this).data("id")];
+                    value = self._getField($(this).data("id"))["value"];
                     $(this).val(value);
                     $(this).blur();
+                    $(this).trigger("propertychange");
                 }
             });
         },
@@ -82,30 +83,35 @@
             var self = this;
             var table = self.table;
 
-            table.find("tr").each(function() {
-                $(this).remove();
-            });
+            self._reinitTable();
 
-            for (var key in self.info) {
-                if (!isNaN(key)) {
-                    table.append(self._row(key));
-                }
+            for (var i=0; i<self.info.length; ++i) {
+                table.append(self._row(self.info[i]));
             }
 
-            self._drawInput();
+            self._drawNewInput();
         },
 
-        _drawInput: function() {
+        _reinitTable: function() {
+            this.next_index = -1;
+            this.new_row = undefined;
+
+            this.table.find("tr").each(function() {
+                $(this).remove();
+            });
+        },
+
+        _drawNewInput: function() {
             if (this.new_row === undefined || this.new_row.find("input").val() !== "") {
-                this.new_row = this._row();
+                this.new_row = this._row(this._addNewField());
                 this.table.append(this.new_row);
                 this.element.scrollTop(this.element[0].scrollHeight);
             }
         },
 
-        _deleteInput: function(row) {
+        _deleteNewInput: function(row) {
             if (row.next()[0] == this.new_row[0]) {
-                this._prevIndex();
+                this._deleteNewField();
                 this.new_row.remove();
                 this.new_row = row;
                 this._removeFromPM(row.find("input"));
@@ -120,19 +126,51 @@
 
         _deleteRow: function(row) {
             if (row[0] != this.new_row[0]) {
-                var id = $(this).closest("tr").find("input").data("id");
-                delete this.info[id];
+                var id = row.find("input").data("id");
+                var index = this._getFieldIndex(id);
+                this.info.splice(index, 1);
                 this._removeFromPM(row.find("input"));
                 row.remove();
             }
         },
 
+        _addNewField: function() {
+            var id = this._nextIndex();
+            var field = {"id": id, "value": ""};
+            return field;
+        },
+
+        _deleteNewField: function() {
+            this.prevIndex();
+            this.info.pop();
+        },
+
         _nextIndex: function() {
-            return this.info["next_index"]++;
+            return this.next_index--;
         },
 
         _prevIndex: function() {
-            return this.info["next_index"]--;
+            return this.next_index === 0? this.next_index : this.next_index++;
+        },
+
+        _getField: function(id) {
+            for (var i=0; i<this.info.length; ++i) {
+                if (this.info[i]["id"] == id) {
+                    return this.info[i];
+                }
+            }
+
+            return undefined;
+        },
+
+        _getFieldIndex: function(id) {
+            for (var i=0; i<this.info.length; ++i) {
+                if (this.info[i]["id"] == id) {
+                    return i;
+                }
+            }
+
+            return undefined;
         },
 
         _addToPM: function(input) {
@@ -149,23 +187,19 @@
             }
         },
 
-        _row: function(id) {
-            var value;
+        _row: function(field) {
+            field = field || this._addNewField();
+
+            var id = field["id"];
+            var value = field["value"];
             var placeholder = "Type to add " + this.options["fields_caption"];
 
-            if (id !== undefined) {
-                value = this.info[id];
-            } else {
-                id = this._nextIndex();
-                value = "";
-            }
+            var row = $("<tr></tr>")
+                        .append($("<td class='dragger'>.</td>"))
+                        .append($("<td><input class='input-text' type='text' data-id='"+ id +"' placeholder='"+ placeholder+"' value='"+ value +"'/></td>"))
+                        .append($("<td><a class='i-small-button icon-remove' href='#'></a></td>"));
 
-            var row = $("<tr></tr>");
-            var dragger = $("<td class='dragger'>.</td>");
-            var field = $("<td><input class='input-text' type='text' data-id='"+ id +"' placeholder='"+ placeholder+"' value='"+ value +"'/></td>");
-            var remove = $("<td><a class='i-small-button icon-remove' href='#'></a></td>");
-
-            return row.append(dragger).append(field).append(remove);
+            return row;
         },
 
         _updateField: function(input) {
@@ -174,7 +208,7 @@
                 var row = input.closest("tr");
                 this._deleteRow(row);
             } else {
-                this.info[input.data("id")] = input.val();
+                this._getField(input.data("id"))["value"] = input.val();
                 this._addToPM(input);
             }
         },
@@ -185,7 +219,7 @@
 
         setInfo: function(info) {
             this.info = info;
-            _drawTable();
+            this._drawTable();
         }
     });
 })(jQuery);
