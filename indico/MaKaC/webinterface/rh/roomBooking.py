@@ -1644,11 +1644,11 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                     candResv.insert()
                     emailsToBeSent += candResv.notifyAboutNewReservation()
                     if candResv.isConfirmed:
-                        session['rbTitle'] = 'You have successfully made a booking.'
-                        session['rbDescription'] = 'NOTE: Your booking is complete. However, be <b>aware</b> that in special cases the person responsible for a room may reject your booking. In that case you would be instantly notified by e-mail.'
+                        session['rbTitle'] = _('You have successfully made a booking.')
+                        session['rbDescription'] = _('NOTE: Your booking is complete. However, be <b>aware</b> that in special cases the person responsible for a room may reject your booking. In that case you would be instantly notified by e-mail.')
                     else:
-                        session['rbTitle'] = 'You have successfully made a <span style="color: Red;">PRE</span>-booking.'
-                        session['rbDescription'] = 'NOTE: PRE-bookings are subject to acceptance or rejection. Expect an e-mail with acceptance/rejection information.'
+                        session['rbTitle'] = _('You have successfully made a <span style="color: Red;">PRE</span>-booking.')
+                        session['rbDescription'] = _('NOTE: PRE-bookings are subject to acceptance or rejection. Expect an e-mail with acceptance/rejection information.')
                 elif self._formMode == FormMode.MODIF:
                     self._orig_candResv.unindexDayReservations()
                     self._orig_candResv.clearCalendarCache()
@@ -1670,8 +1670,8 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
                         histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
                         self._orig_candResv.getResvHistory().addHistoryEntry(histEntry)
 
-                    session['rbTitle'] = 'Booking updated.'
-                    session['rbDescription'] = 'Please review details below.'
+                    session['rbTitle'] = _('Booking updated.')
+                    session['rbDescription'] = _('Please review details below.')
 
                 session['rbActionSucceeded'] = True
 
@@ -1900,8 +1900,8 @@ class RHRoomBookingDeleteRoom( RHRoomBookingAdminBase ):
             for resv in room.getReservations():
                 resv.remove()
             room.remove()
-            session['rbTitle'] = "Room has been deleted."
-            session['rbDescription'] = "You have successfully deleted the room. All its archival, cancelled and rejected bookings have also been deleted."
+            session['rbTitle'] = _("Room has been deleted.")
+            session['rbDescription'] = _("You have successfully deleted the room. All its archival, cancelled and rejected bookings have also been deleted.")
             url = urlHandlers.UHRoomBookingStatement.getURL()
             self._redirect( url ) # Redirect to deletion confirmation
         else:
@@ -1921,8 +1921,8 @@ class RHRoomBookingDeleteBooking( RHRoomBookingAdminBase ):
     def _process( self ):
         # Booking deletion is always possible - just delete
         self._resv.remove()
-        session['rbTitle'] = "Booking has been deleted."
-        session['rbDescription'] = "You have successfully deleted the booking."
+        session['rbTitle'] = _("Booking has been deleted.")
+        session['rbDescription'] = _("You have successfully deleted the booking.")
         url = urlHandlers.UHRoomBookingStatement.getURL()
         self._redirect( url ) # Redirect to deletion confirmation
 
@@ -1958,8 +1958,8 @@ class RHRoomBookingCancelBooking( RHRoomBookingBase ):
             GenericMailer.send(notification)
 
         session['rbActionSucceeded'] = True
-        session['rbTitle'] = "Booking has been cancelled."
-        session['rbDescription'] = "You have successfully cancelled the booking."
+        session['rbTitle'] = _("Booking has been cancelled.")
+        session['rbDescription'] = _("You have successfully cancelled the booking.")
         url = urlHandlers.UHRoomBookingBookingDetails.getURL( self._resv )
         self._redirect( url ) # Redirect to booking details
 
@@ -2040,8 +2040,8 @@ class RHRoomBookingRejectBooking( RHRoomBookingBase ):
             GenericMailer.send(notification)
 
         session['rbActionSucceeded'] = True
-        session['rbTitle'] = "Booking has been rejected."
-        session['rbDescription'] = "NOTE: rejection e-mail has been sent to the user. However, it's advisable to <strong>inform</strong> the user directly. Note that users often don't read e-mails."
+        session['rbTitle'] = _("Booking has been rejected.")
+        session['rbDescription'] = _("NOTE: rejection e-mail has been sent to the user. However, it's advisable to <strong>inform</strong> the user directly. Note that users often don't read e-mails.")
         url = urlHandlers.UHRoomBookingBookingDetails.getURL( self._resv )
         self._redirect( url ) # Redirect to booking details
 
@@ -2092,10 +2092,10 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
             resv.isConfirmed = tmpConfirmed
         session['rbPrebookingsRejected'] = True
         if counter > 0:
-            session['rbTitle'] = str(counter) + " conflicting PRE-bookings have been rejected."
-            session['rbDescription'] = "Rejection e-mails have been sent to the users, with explanation that their PRE-bookings conflicted with the present confirmed bookings."
+            session['rbTitle'] = _("%d conflicting PRE-bookings have been rejected.") % counter
+            session['rbDescription'] = _("Rejection e-mails have been sent to the users, with explanation that their PRE-bookings conflicted with the present confirmed bookings.")
         else:
-            session['rbTitle'] = "There are no conflicting PRE-bookings for your rooms."
+            session['rbTitle'] = _("There are no conflicting PRE-bookings for your rooms.")
             session['rbDescription'] = ""
         for notification in emailsToBeSent:
             GenericMailer.send(notification)
@@ -2137,8 +2137,8 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
             self._resv.getResvHistory().addHistoryEntry(histEntry)
 
             session['rbActionSucceeded'] = True
-            session['rbTitle'] = "Booking has been accepted."
-            session['rbDescription'] = "NOTE: confirmation e-mail has been sent to the user."
+            session['rbTitle'] = _("Booking has been accepted.")
+            session['rbDescription'] = _("NOTE: confirmation e-mail has been sent to the user.")
             url = urlHandlers.UHRoomBookingBookingDetails.getURL( self._resv )
             self._redirect( url ) # Redirect to booking details
         else:
@@ -2149,7 +2149,7 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
             session['rbShowErrors'] = True
             session['rbThereAreConflicts'] = True
 
-            session['rbTitle'] = "PRE-Booking conflicts with other (confirmed) bookings."
+            session['rbTitle'] = _("PRE-Booking conflicts with other (confirmed) bookings.")
             session['rbDescription'] = ""
 
             self._formMode = FormMode.MODIF
