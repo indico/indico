@@ -847,7 +847,7 @@ def removeNiceIdentities(dbi, withRBDB, prevVersion):
     """
 
     for i, avatar in enumerate(AvatarHolder().getList()):
-        for identity in avatar.getIdentityList():
+        for identity in avatar.getIdentityList()[:]:
             if not isinstance(identity, (LocalIdentity, LDAPIdentity)):
                 avatar.removeIdentity(identity)
         if i % 100 == 99:
