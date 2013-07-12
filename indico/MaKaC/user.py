@@ -1044,6 +1044,8 @@ class Avatar(Persistent, Fossilizable):
                             'set': self.setPhone},
                   'fax': {'get': self.getFax,
                           'set': self.setFax},
+                  'address': {'get': self.getAddress,
+                              'set': self.setAddress},
                   'surName': {'get': self.getSurName,
                               'set': lambda x: self.setSurName(x, reindex=True)},
                   'firstName': {'get': self.getFirstName,

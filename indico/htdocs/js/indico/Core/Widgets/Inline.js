@@ -1600,6 +1600,12 @@ type("TextAreaEditWidget", ["InlineEditWidget"],
                 }
             },
 
+            _handleSuccess: function() {
+                if (this.successHandler) {
+                    return this.successHandler();
+                }
+            },
+
             _getNewValue: function() {
                 return this.textarea.get();
             },
@@ -1608,9 +1614,10 @@ type("TextAreaEditWidget", ["InlineEditWidget"],
                 return this.__parameterManager.check();
             }
         },
-        function(method, attributes, initValue) {
-            this.InlineEditWidget(method, attributes, initValue);
+        function(method, attributes, initValue, successHandler, beforeEdit) {
+            this.InlineEditWidget(method, attributes, initValue, beforeEdit);
             this.frameAttrs = {'display': 'block', 'marginTop': '5px'};
+            this.successHandler = successHandler;
             this.__parameterManager = new IndicoUtil.parameterManager();
         });
 

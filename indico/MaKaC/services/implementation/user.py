@@ -359,7 +359,7 @@ class UserPersonalDataBase(UserModifyBase):
         else:
             raise ServiceError("ERR-U5", _("User id not specified"))
         self._dataType = self._pm.extract("dataType", pType=str, allowEmpty=False)
-        if not self._dataType in self._dataTypes:
+        if self._dataType not in self._dataTypes:
             raise ServiceError("ERR-U7", _("Data argument is not valid"))
 
 
@@ -456,7 +456,7 @@ class UserSetPersonalData(UserPersonalDataBase):
 
 
 class UserSyncPersonalData(UserPersonalDataBase):
-    _dataTypes = ["surName", "firstName", "affiliation", "phone", "fax"]
+    _dataTypes = ["surName", "firstName", "affiliation", "phone", "fax", "address"]
 
     def _getAnswer(self):
         if self._dataType == 'name':

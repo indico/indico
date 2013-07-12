@@ -210,8 +210,10 @@ $E('inPlaceEditEmail').set(new InputEditWidget('user.setPersonalData',
         $T("Invalid e-mail address")).draw());
 
 var editAddress = new TextAreaEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'address'}, ${ jsonEncode(address) }, true, curry(unlockField, 'address'), null, null, null,
-        curry(beforeEdit, 'address'));
+                                         {'userId': '${ userId }', 'dataType':'address'},
+                                         ${ jsonEncode(address) },
+                                         curry(unlockField, 'address'),
+                                         curry(beforeEdit, 'address'));
 $E('inPlaceEditAddress').set(editAddress.draw());
 
 var editTelephone = new InputEditWidget('user.setPersonalData',
