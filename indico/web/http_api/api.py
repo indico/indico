@@ -44,12 +44,11 @@ from indico.web.http_api.metadata.html import HTML4Serializer
 from indico.web.http_api.metadata.jsonp import JSONPSerializer
 from indico.web.http_api.metadata.ical import ICalSerializer
 from indico.web.http_api.metadata.atom import AtomSerializer
-from indico.web.http_api.fossils import IConferenceMetadataFossil, \
-IConferenceMetadataWithContribsFossil, IConferenceMetadataWithSubContribsFossil, \
-IConferenceMetadataWithSessionsFossil, IPeriodFossil, ICategoryMetadataFossil, \
-ICategoryProtectedMetadataFossil, ISessionMetadataWithContributionsFossil, \
-ISessionMetadataWithSubContribsFossil, IContributionMetadataFossil, \
-IContributionMetadataWithSubContribsFossil, IBasicConferenceMetadataFossil
+from indico.web.http_api.fossils import IConferenceMetadataFossil, IConferenceMetadataWithContribsFossil, \
+    IConferenceMetadataWithSubContribsFossil, IConferenceMetadataWithSessionsFossil, IPeriodFossil, \
+    ICategoryMetadataFossil, ICategoryProtectedMetadataFossil, ISessionMetadataWithContributionsFossil, \
+    ISessionMetadataWithSubContribsFossil, IContributionMetadataFossil, IContributionMetadataWithSubContribsFossil, \
+    IBasicConferenceMetadataFossil
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 
@@ -88,16 +87,16 @@ class HTTPAPIHook(object):
     """
 
     HOOK_LIST = []
-    TYPES = None # abstract
-    PREFIX = 'export' # url prefix. must exist in indico.web.flask.app:add_handlers, too! also used as function prefix
-    RE = None # abstract
-    DEFAULT_DETAIL = None # abstract
+    TYPES = None  # abstract
+    PREFIX = 'export'  # url prefix. must exist in indico.web.flask.blueprints.api, too! also used as function prefix
+    RE = None  # abstract
+    DEFAULT_DETAIL = None  # abstract
     MAX_RECORDS = {}
-    SERIALIZER_TYPE_MAP = {} # maps fossil type names to friendly names (useful for plugins e.g. RoomCERN --> Room)
-    VALID_FORMATS = None # None = all formats
-    GUEST_ALLOWED = True # When False, it forces authentication
-    COMMIT = False # commit database changes
-    HTTP_POST = False # require (and allow) HTTP POST
+    SERIALIZER_TYPE_MAP = {}  # maps fossil type names to friendly names (useful for plugins e.g. RoomCERN --> Room)
+    VALID_FORMATS = None  # None = all formats
+    GUEST_ALLOWED = True  # When False, it forces authentication
+    COMMIT = False  # commit database changes
+    HTTP_POST = False  # require (and allow) HTTP POST
     NO_CACHE = False
 
     @classmethod
