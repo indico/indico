@@ -266,7 +266,11 @@ class RHMap(Persistent):
         self._p_changed = 1
 
     def getBlueprints(self):
-        for module, name in self.__blueprints:
+        try:
+            blueprints = self.__blueprints
+        except AttributeError:
+            blueprints = self.__blueprints = set()
+        for module, name in blueprints:
             yield getattr(import_module(module), name)
 
     def hasBlueprint(self, module, name):

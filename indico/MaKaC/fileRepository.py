@@ -63,7 +63,6 @@ class MaterialLocalRepository(Persistent):
     """
 
     _repo_name = "main"
-    _repo_class = MaterialLocalRepository
 
     def __init__(self):
         self.__files = OOBTree.OOBTree()
@@ -75,7 +74,7 @@ class MaterialLocalRepository(Persistent):
         try:
             fr = dbRoot["local_repositories"][cls._repo_name]
         except KeyError:
-            fr = cls._repo_class()
+            fr = cls()
             if not "local_repositories" in dbRoot:
                 dbRoot["local_repositories"] = OOBTree()
             dbRoot["local_repositories"][cls._repo_name] = fr
@@ -295,7 +294,6 @@ class OfflineRepository(MaterialLocalRepository):
     """
 
     _repo_name = "offline"
-    _repo_class = OfflineRepository
 
     def _getRepositoryPath(self):
         return Config.getInstance().getOfflineStore()
