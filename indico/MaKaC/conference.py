@@ -10752,8 +10752,10 @@ class Material(CommonObjectBase):
         return cmp(self.getConference(), other.getConference())
 
     def updateNonInheritingChildren(self, elem, delete=False):
-        self.getAccessController().updateNonInheritingChildren(elem, delete)
-        self.notify_protection_to_owner(elem, delete)
+        # We do not want to store the inherited children in a Category because the funcionallity is not used
+        if not isinstance(self.getOwner(), Category):
+            self.getAccessController().updateNonInheritingChildren(elem, delete)
+            self.notify_protection_to_owner(elem, delete)
 
     def notify_protection_to_owner(self, elem, delete=False):
         self.getOwner().updateNonInheritingChildren(elem, delete)
@@ -10816,7 +10818,7 @@ class Material(CommonObjectBase):
         """used mainly in the web session access key table"""
         return "%sm%s" % (self.getOwner().getUniqueId(),self.id)
 
-    def setOwner( self, newOwner ):
+    def setOwner(self, newOwner):
         self.owner = newOwner
 
     def getOwner( self ):
@@ -10828,11 +10830,13 @@ class Material(CommonObjectBase):
         return None
 
     def getConference( self ):
-        if type(self.getOwner()) is Conference:
-            return self.getOwner()
-        if type(self.getOwner()) is Category:
+        owner = self.getOwner()
+        if owner is None or isinstance(owner, Category):
             return None
-        return self.getOwner().getConference()
+        elif isinstance(owner, Conference):
+            return owner
+        else:
+            return owner.getConference()
 
     def getSession( self ):
         if self.getContribution():
@@ -10991,7 +10995,8 @@ class Material(CommonObjectBase):
     def setMainResource(self, mr):
         self._mainResource = mr
 
-    def delete( self ):
+    def delete(self):
+        self.__ac.unlinkAvatars('access')
         for res in self.getResourceList():
             self.removeResource( res )
         self.notify_protection_to_owner(self, delete=True)
@@ -11422,7 +11427,7 @@ class Resource(CommonObjectBase):
         only the material can be protected with an access key"""
         return self.getOwner().getUniqueId()
 
-    def setOwner( self, newOwner ):
+    def setOwner(self, newOwner):
         self._owner = newOwner
 
     def getOwner( self ):
@@ -11442,7 +11447,7 @@ class Resource(CommonObjectBase):
         # protection checking functions call getConference()
         # directly on resources, without caring whether they
         # are owned by Conferences or Categories
-        if isinstance(self._owner, Category):
+        if self._owner is None or isinstance(self._owner, Category):
             return None
         else:
             return self._owner.getConference()
@@ -11480,10 +11485,11 @@ class Resource(CommonObjectBase):
             system already ensures the archiving of the basic resource data"""
         return
 
-    def delete( self ):
-        if self._owner != None:
+    def delete(self):
+        if self._owner is not None:
             self.notify_protection_to_owner(delete=True)
-            self._owner.removeResource( self )
+            self._owner.removeResource(self)
+            self.__ac.unlinkAvatars('access')
             self._owner = None
             TrashCanManager().add(self)
 

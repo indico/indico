@@ -1457,26 +1457,37 @@ class ContribSchEntry(LinkedTimeSchEntry):
     def getOwnLocation(self):
         return self.getOwner().getOwnLocation()
 
+
 class ScheduleToJson:
 
     _cacheEntries = GenericCache("ConfTTEntries")
     _cache = GenericCache("ConfTT")
 
     @staticmethod
-    def obtainFossil(entry, tz, fossilInterface = None, mgmtMode = False, useAttrCache = False):
+    def get_versioned_key(cache, key, timezone):
+        num = int(cache.get('_version-%s' % key, 0))
+        return '%s.%d.%s' % (key, num, timezone)
+
+    @staticmethod
+    def bump_cache_version(cache, key):
+        vkey = '_version-%s' % key
+        cache.set(vkey, int(cache.get(vkey, 0)) + 1)
+
+    @classmethod
+    def obtainFossil(cls, entry, tz, fossilInterface=None, mgmtMode=False, useAttrCache=False):
 
         if mgmtMode or (not isinstance(entry, BreakTimeSchEntry) and not entry.getOwner().getAccessController().isFullyPublic()):
         # We check if it is fully public because it could be some material protected
         # that would create a security hole if we cache it
             result = entry.fossilize(interfaceArg = fossilInterface, useAttrCache = useAttrCache, tz = tz, convert=True)
         else:
-            cache_key = entry.getUniqueId()
+            cache_key = cls.get_versioned_key(cls._cacheEntries, entry.getUniqueId(), tz)
 
-            result = ScheduleToJson._cacheEntries.get(cache_key)
+            result = cls._cacheEntries.get(cache_key)
 
             if result is None:
                 result = entry.fossilize(interfaceArg = fossilInterface, useAttrCache = useAttrCache, tz = tz, convert=True)
-                ScheduleToJson._cacheEntries.set(entry.getUniqueId(), result, timedelta(minutes=5))
+                cls._cacheEntries.set(cache_key, result, timedelta(minutes=5))
 
         return result
 
@@ -1564,13 +1575,12 @@ class ScheduleToJson:
                 return False
         return True
 
-
-    @staticmethod
-    def process(schedule, tz, aw, days = None, mgmtMode = False, useAttrCache = False, hideWeekends = False):
+    @classmethod
+    def process(cls, schedule, tz, aw, days=None, mgmtMode=False, useAttrCache=False, hideWeekends=False):
         scheduleDict = {}
 
         if not days and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
-            scheduleDict = ScheduleToJson._cache.get(schedule.getOwner().getUniqueId())
+            scheduleDict = cls._cache.get(cls.get_versioned_key(cls._cache, schedule.getOwner().getUniqueId(), tz))
 
         if not scheduleDict:
             scheduleDict={}
@@ -1595,7 +1605,8 @@ class ScheduleToJson:
                         genId, resultData = ScheduleToJson.processEntry(obj, tz, aw, mgmtMode, useAttrCache)
                         scheduleDict[day][genId] = resultData
             if fullTT and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
-                ScheduleToJson._cache.set(schedule.getOwner().getUniqueId(), scheduleDict, timedelta(minutes=5))
+                cls._cache.set(cls.get_versioned_key(cls._cache, schedule.getOwner().getUniqueId(), tz), scheduleDict,
+                               timedelta(minutes=5))
 
         if hideWeekends and not ScheduleToJson.isOnlyWeekend(scheduleDict.keys()):
             for entry in scheduleDict.keys():
@@ -1616,13 +1627,12 @@ class ScheduleToJson:
 
         return new_dict
 
-    @staticmethod
-    def cleanCache(obj, cleanConferenceCache = True):
-        ScheduleToJson._cacheEntries.delete(obj.getUniqueId())
+    @classmethod
+    def cleanCache(cls, obj, cleanConferenceCache=True):
+        cls.bump_cache_version(cls._cacheEntries, obj.getUniqueId())
         if cleanConferenceCache:
-            ScheduleToJson.cleanConferenceCache(obj.getOwner().getConference())
+            cls.cleanConferenceCache(obj.getOwner().getConference())
 
-    @staticmethod
-    def cleanConferenceCache(obj):
-        ScheduleToJson._cache.delete(obj.getUniqueId())
-
+    @classmethod
+    def cleanConferenceCache(cls, obj):
+        cls.bump_cache_version(cls._cache, obj.getUniqueId())

@@ -459,7 +459,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var presListWidget = new UserListField(
             'LongPeopleListDiv', 'PeopleList',
             self.isEdit?self.info.get("presenters"):null, true, null,
-            true, true, self.info.get("conference"), null,
+            true, false, self.info.get("conference"), null,
             true, true, true, true,
             userListNothing, userListNothing, userListNothing);
 

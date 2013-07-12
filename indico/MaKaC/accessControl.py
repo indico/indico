@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import ZODB
+import itertools
 from persistent import Persistent
 from functools import wraps
 
@@ -89,6 +90,11 @@ class AccessController( Persistent, Observable ):
 
     def setOwner(self, owner):
         self.owner = owner
+
+    def unlinkAvatars(self, role):
+        for prin in itertools.chain(self.getSubmitterList(), self.managers, self.allowed):
+            if isinstance(prin, MaKaC.user.Avatar):
+                prin.unlinkTo(self.owner, role)
 
     def _getAccessProtection( self ):
         try:
@@ -559,4 +565,3 @@ class AccessWrapper:
 
 if __name__ == "__main__":
     pass
-
