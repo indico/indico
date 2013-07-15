@@ -247,8 +247,8 @@ class RHConferencePerformCreation( RoomBookingDBMixin, RHConferenceCreationBase 
         elif eventAccessProtection == "public" :
             c.getAccessController().setProtection(-1)
 
-        avatars, newUsers, allowedAvatars = self._getPersons()
-        UtilPersons.addToConf(avatars, newUsers, allowedAvatars, c, self._params.has_key('grant-manager'), self._params.has_key('presenter-grant-submission'))
+        avatars, newUsers, editedAvatars, allowedAvatars = self._getPersons()
+        UtilPersons.addToConf(avatars, newUsers, editedAvatars, allowedAvatars, c, self._params.has_key('grant-manager'), self._params.has_key('presenter-grant-submission'))
         if params.get("sessionSlots",None) is not None :
             if params["sessionSlots"] == "enabled" :
                 c.enableSessionSlots()
@@ -258,7 +258,7 @@ class RHConferencePerformCreation( RoomBookingDBMixin, RHConferenceCreationBase 
         return c
 
     def _getPersons(self):
-        cpAvatars, cpNewUsers, auAvatars = [], [], []
+        cpAvatars, cpNewUsers, cpEditedAvatars , auAvatars, auNewUsers, auEditedAvatars = [], [], [] , [] , [] , []
         from MaKaC.services.interface.rpc import json
         chairpersonDict = json.decode(self._params.get("chairperson", "")) or []
         allowedUsersDict = json.decode(self._params.get("allowedUsers", "")) or []
@@ -268,7 +268,7 @@ class RHConferencePerformCreation( RoomBookingDBMixin, RHConferenceCreationBase 
             auAvatars, auNewUsers, auEditedAvatars = UserListModificationBase.retrieveUsers({"userList":allowedUsersDict})
         #raise "avt: %s, newusers: %s, edited: %s"%(map(lambda x:x.getFullName(),avatars), newUsers, editedAvatars)
 
-        return cpAvatars, cpNewUsers, auAvatars
+        return cpAvatars, cpNewUsers, cpEditedAvatars, auEditedAvatars # : in which case (?) , auAvatars , auNewUsers  
 
     def alertCreation(self, confs):
         conf = confs[0]
@@ -335,7 +335,7 @@ _Access%s_
 class UtilPersons:
 
     @staticmethod
-    def addToConf( avatars, newUsers, accessingAvatars, conf, grantManager, grantSubmission):
+    def addToConf( avatars, newUsers, editedUsers, accessingAvatars, conf, grantManager, grantSubmission):
 
         if newUsers :
             for newUser in newUsers:
@@ -345,7 +345,7 @@ class UtilPersons:
                 person.setEmail(newUser.get("email",""))
                 person.setAffiliation(newUser.get("affiliation",""))
                 person.setAddress(newUser.get("address",""))
-                person.setPhone(newUser.get("telephone",""))
+                person.setPhone(newUser.get("phone",""))
                 person.setTitle(newUser.get("title",""))
                 person.setFax(newUser.get("fax",""))
                 if not UtilPersons._alreadyDefined(person) :
@@ -356,7 +356,6 @@ class UtilPersons:
                     pass
 
         if avatars:
-
             for selected in avatars :
                 if isinstance(selected, user.Avatar) :
                     person = ConferenceChair()
@@ -377,10 +376,29 @@ class UtilPersons:
                 #        else :
                 #            self._errorList.append("%s has been already defined as %s of this conference"%(presenter.getFullName(),self._typeName))
 
+        if editedUsers:
+            for edUser in editedUsers:
+                person = ConferenceChair()
+                person.setFirstName(edUser[1].get("firstName",""))
+                person.setFamilyName(edUser[1].get("familyName",""))
+                person.setEmail(edUser[1].get("email",""))
+                person.setAffiliation(edUser[1].get("affiliation",""))
+                person.setAddress(edUser[1].get("address",""))
+                person.setPhone(edUser[1].get("phone",""))
+                person.setTitle(edUser[1].get("title",""))
+                person.setFax(edUser[1].get("fax",""))
+
+                UtilPersons._addChair(conf, person, grantManager, grantSubmission)
+
+
         if accessingAvatars:
-            for person in accessingAvatars :
+            for person in accessingAvatars:
                 if isinstance(person, user.Avatar) or isinstance(person, user.Group):
                     conf.grantAccess(person)
+                    
+
+
+    #WHAT IS THE USE FOR THIS ? > #
 
     @staticmethod
     def _alreadyDefined(person):#, definedList):
