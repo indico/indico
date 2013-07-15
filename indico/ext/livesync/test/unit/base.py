@@ -108,7 +108,7 @@ class _TUpload(object):
 
         time.sleep(3)
 
-        with self._context('database'):
+        with self._context('database', 'request'):
             task.run()
 
         if self._fakeServer.exception:
