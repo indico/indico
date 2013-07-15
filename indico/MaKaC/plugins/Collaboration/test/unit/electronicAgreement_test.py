@@ -126,7 +126,8 @@ class TestElectronicAgreement(IndicoTestCase):
         slot1.getSchedule().addEntry(c1.getSchEntry())
         slot1.getSchedule().addEntry(c2.getSchEntry())
 
-        self.createAndAcceptBooking()
+        with self._context('request'):
+            self.createAndAcceptBooking()
         self._stopDBReq()
 
     @with_context('database')
