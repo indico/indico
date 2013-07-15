@@ -26,9 +26,23 @@
     overflow-x: hidden;
     padding-right: 20px;
 
-    .dragger {
+    .handle {
+        @include border-left-radius(0.2em);
         @include user-select(none);
         cursor: move;
+        display: inline-block;
+        height: 19px;
+        width: 5px;
+        vertical-align: -7px;
+    }
+
+
+    .sortable-placeholder {
+        height: 25px;
+    }
+
+    input {
+        margin-left: 0px;
     }
 
     table {
@@ -39,11 +53,28 @@
         visibility: hidden;
     }
 
-    tr:hover a {
-        visibility: visible;
+    tr {
+        &:hover a {
+            visibility: visible;
+        }
+
+        &:last-of-type {
+            .handle {
+                cursor: default;
+                background: white;
+            }
+
+            a {
+                visibility: hidden;
+            }
+        }
+
+        &.ui-sortable-helper a {
+            visibility: hidden;
+        }
     }
 
-    tr:last-of-type a {
-        visibility: hidden;
+    td {
+        padding: 0;
     }
 }

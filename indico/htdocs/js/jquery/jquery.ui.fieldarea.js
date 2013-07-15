@@ -32,9 +32,25 @@
             var self = this;
 
             self.info = [];
-            self.next_index = -1;
+            self.next_id = -1;
 
-            self.table = $("<table></table>");
+            self.table = $("<table></table>").sortable({
+                axis: "y",
+                containment: "parent",
+                cursor: "move",
+                distance: 10,
+                handle: ".handle",
+                items: "tr:not(:last-child)",
+                placeholder: "sortable-placeholder",
+                tolerance: "pointer",
+                start: function(e, ui) {
+                    self.start_index = ui.item.index();
+                },
+                update: function(e, ui) {
+                    _.move(self.info, self.start_index, ui.item.index());
+                }
+            });
+
             self.element.addClass("field-area scrollable");
             self.element.append(self.table);
 
@@ -93,7 +109,7 @@
         },
 
         _reinitTable: function() {
-            this.next_index = -1;
+            this.next_id = -1;
             this.new_row = undefined;
 
             this.table.find("tr").each(function() {
@@ -135,23 +151,23 @@
         },
 
         _addNewField: function() {
-            var id = this._nextIndex();
+            var id = this._nextId();
             var field = {"id": id, "value": ""};
             this.info.push(field);
             return field;
         },
 
         _deleteNewField: function() {
-            this._prevIndex();
+            this._prevId();
             this.info.pop();
         },
 
-        _nextIndex: function() {
-            return this.next_index--;
+        _nextId: function() {
+            return this.next_id--;
         },
 
-        _prevIndex: function() {
-            return this.next_index === 0? this.next_index : this.next_index++;
+        _prevId: function() {
+            return this.next_id === 0? this.next_id : this.next_id++;
         },
 
         _getField: function(id) {
@@ -196,9 +212,15 @@
             var placeholder = "Type to add " + this.options["fields_caption"];
 
             var row = $("<tr></tr>")
-                        .append($("<td class='dragger'>.</td>"))
-                        .append($("<td><input class='input-text' type='text' data-id='"+ id +"' placeholder='"+ placeholder+"' value='"+ value +"'/></td>"))
-                        .append($("<td><a class='i-small-button icon-remove' href='#'></a></td>"));
+                        .append($("<td><span class='handle'></span></td>"))
+                        .append($("<td width='100%'><input class='input-text' type='text' data-id='"+ id +"' placeholder='"+ placeholder+"' value='"+ value +"'/></td>"))
+                        .append($("<td><a class='i-small-button' title='"+ $T("Delete") +"' href='#' tabIndex='-1'><i class='icon-remove'></i></a></td>"));
+
+            row.find("a").qtip({
+                hide: {
+                    event: "mouseleave"
+                }
+            });
 
             return row;
         },
@@ -215,14 +237,7 @@
         },
 
         getInfo: function() {
-            this._cleanInfo();
-            return this.info;
-        },
-
-        _cleanInfo: function() {
-            if (this.info[this.info.length-1]["value"] === "") {
-                this.info.pop();
-            }
+            return this.info.slice().splice(0, this.info.length-1);
         },
 
         setInfo: function(info) {
