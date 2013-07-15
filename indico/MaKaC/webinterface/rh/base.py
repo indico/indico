@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import request, session
 from urlparse import urljoin
-from werkzeug.exceptions import NotFound, BadRequest, MethodNotAllowed
+from werkzeug.exceptions import NotFound, BadRequest, MethodNotAllowed, BadRequestKeyError
 from indico.web.flask.util import ResponseUtil
 
 
@@ -607,6 +607,12 @@ class RH(RequestHandlerBase):
             #Error filling the values of a form
             res = self._processFormValuesError( e )
             self._endRequestSpecific2RH( False )
+            DBMgr.getInstance().endRequest(False)
+        except BadRequestKeyError, e:
+            # The KeyError raised when accessing e.g. request.args['invalid']
+            msg = _('Required argument missing: %s') % e.message
+            res = errors.WPFormValuesError(self, msg).display()
+            self._endRequestSpecific2RH(False)
             DBMgr.getInstance().endRequest(False)
         except ConferenceClosedError, e:
             #Modification error treatment
