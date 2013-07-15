@@ -60,7 +60,6 @@ from MaKaC.webinterface.pages import main
 from MaKaC.webinterface.pages import base
 from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
 import MaKaC.common.info as info
-from MaKaC.common.cache import EventCache
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
@@ -795,24 +794,11 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         outGen = outputGenerator(self._getAW())
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
         if styleMgr.existsXSLFile(self._view):
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            tz = DisplayTZ(self._getAW(),self._conf).getDisplayTZ()
-            useCache = minfo.isCacheActive() and self._params.get("detailLevel", "") in [ "", "contribution" ] and self._view == self._conf.getDefaultStyle() and self._params.get("showSession","all") == "all" and self._params.get("showDate","all") == "all" and tz == self._conf.getTimezone()
-            useNormalCache = useCache and self._conf.getAccessController().isFullyPublic() and not self._conf.canModify(self._getAW()) and self._getAW().getUser() == None
-            useManagerCache = useCache and self._conf.canModify( self._getAW())
-            body = ""
-            if useManagerCache:
-                cache = EventCache({"id": self._conf.getId(), "type": "manager"})
-                body = cache.getCachePage()
-            elif useNormalCache:
-                cache = EventCache({"id": self._conf.getId(), "type": "normal"})
-                body = cache.getCachePage()
-            if body == "":
-                if self._params.get("detailLevel", "") == "contribution" or self._params.get("detailLevel", "") == "":
-                    includeContribution = 1
-                else:
-                    includeContribution = 0
-                body = outGen.getFormattedOutput(self._rh, self._conf, styleMgr.getXSLPath(self._view), vars, 1, includeContribution, 1, 1, self._params.get("showSession",""), self._params.get("showDate",""))
+            if self._params.get("detailLevel", "") == "contribution" or self._params.get("detailLevel", "") == "":
+                includeContribution = 1
+            else:
+                includeContribution = 0
+            body = outGen.getFormattedOutput(self._rh, self._conf, styleMgr.getXSLPath(self._view), vars, 1, includeContribution, 1, 1, self._params.get("showSession", ""), self._params.get("showDate", ""))
             if useManagerCache or useNormalCache:
                 cache.saveCachePage( body )
             return body

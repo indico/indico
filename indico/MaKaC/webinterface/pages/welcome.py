@@ -23,7 +23,6 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.conference as conference
 from MaKaC.common.Configuration import Config
 import MaKaC.common.info as info
-from MaKaC.common.cache import CategoryCache
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ
 

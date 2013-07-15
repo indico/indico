@@ -23,9 +23,6 @@ import MaKaC.webinterface.rh.admins as admins
 def index( req, **params ):
     return admins.RHAdminArea( req ).process( params )
 
-def switchCacheActive( req, **params ):
-    return admins.RHAdminSwitchCacheActive( req ).process( params )
-
 def switchDebugActive( req, **params ):
     return admins.RHAdminSwitchDebugActive( req ).process( params )
 

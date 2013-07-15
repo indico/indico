@@ -189,12 +189,6 @@ class WAdmins(wcomponents.WTemplated):
         iconDisabled = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
         iconEnabled = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
         vars["features"] = ""
-        url = urlHandlers.UHAdminSwitchCacheActive.getURL()
-        if minfo.isCacheActive():
-            icon = iconEnabled
-        else:
-            icon = iconDisabled
-        vars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="%s"><img src="%s" border="0" alt="Toggle on/off" style="float:left; padding-right: 5px"> _("Cache Indico Pages")</a></div>""") % (str(url), icon)
         url = urlHandlers.UHAdminSwitchNewsActive.getURL()
         if minfo.isNewsActive():
             icon = iconEnabled

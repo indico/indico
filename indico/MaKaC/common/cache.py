@@ -92,24 +92,6 @@ class IndicoCache:
         open(self.getFilePath(),"w").write( page )
         self.lockCache( self.getFilePath(), False )
 
-class CategoryCache( IndicoCache ):
-    _subDirName = "categories"
-
-    def __init__( self, vars={} ):
-        self._categId = vars.get("categId","")
-
-    def getFileName( self ):
-        return "cat-%s" % self._categId
-
-class EventCache( IndicoCache ):
-    _subDirName = "events"
-
-    def __init__( self, vars={} ):
-        self._eventId = vars.get("id","")
-        self._type = vars.get("type", "")
-
-    def getFileName( self ):
-        return "eve-%s-%s" % (self._eventId, self._type)
 
 class CacheStorage(object):
     __CACHE_STORAGE_LIST = {}

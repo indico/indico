@@ -65,19 +65,6 @@ class RHCategoryDataModif( RHCategModifBase ):
         p = category.WPCategoryDataModification( self, self._target )
         return p.display()
 
-class RHCategoryClearCache( RHCategModifBase ):
-    _uh = urlHandlers.UHCategoryClearCache
-
-    def _process( self ):
-        self._target.clearCache()
-        self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )
-
-class RHCategoryClearConferenceCaches( RHCategModifBase ):
-    _uh = urlHandlers.UHCategoryClearConferenceCaches
-
-    def _process( self ):
-        self._target.clearConferenceCaches()
-        self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )
 
 class RHCategoryPerformModification( RHCategModifBase ):
     _uh = urlHandlers.UHCategoryPerformModification

@@ -27,7 +27,6 @@ import MaKaC.common.info as info
 from MaKaC.errors import AdminError, MaKaCError, PluginError, FormValuesError
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.webinterface.rh.base import RHProtected, RoomBookingDBMixin
-from MaKaC.common.cache import CategoryCache, EventCache
 from MaKaC.plugins import PluginsHolder
 from MaKaC.i18n import _
 
@@ -104,14 +103,6 @@ class RHGeneralInfoModification( RHAdminBase ):
         p = admins.WPGenInfoModification( self )
         return p.display()
 
-class RHAdminSwitchCacheActive( RHAdminBase ):
-    _uh = urlHandlers.UHAdminSwitchCacheActive
-
-    def _process( self ):
-        CategoryCache().cleanUpAllFiles()
-        EventCache().cleanUpAllFiles()
-        self._minfo.setCacheActive( not self._minfo.isCacheActive() )
-        self._redirect( urlHandlers.UHAdminArea.getURL() )
 
 class RHAdminSwitchNewsActive( RHAdminBase ):
     _uh = urlHandlers.UHAdminSwitchNewsActive

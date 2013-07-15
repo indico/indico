@@ -26,7 +26,6 @@ admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
 
 # General settings
 admin.add_url_rule('/', 'adminList', admins.RHAdminArea)
-admin.add_url_rule('/settings/general/cache', 'adminList-switchCacheActive', admins.RHAdminSwitchCacheActive)
 admin.add_url_rule('/settings/general/debug', 'adminList-switchDebugActive', admins.RHAdminSwitchDebugActive)
 admin.add_url_rule('/settings/general/news', 'adminList-switchNewsActive', admins.RHAdminSwitchNewsActive)
 admin.add_url_rule('/settings/general/', 'generalInfoModification', admins.RHGeneralInfoModification)

@@ -65,7 +65,6 @@ class MaKaCInfo(Persistent):
         self._news = ""
 
         # special features
-        self._cacheActive = False
         self._newsActive = False
         self._debugActive = False
 
@@ -196,16 +195,6 @@ class MaKaCInfo(Persistent):
 
     def getTitle( self ):
         return self._title
-
-    def isCacheActive( self ):
-        if hasattr( self, "_cacheActive" ):
-            return self._cacheActive
-        else:
-            self._cacheActive = False
-            return False
-
-    def setCacheActive( self, bool=True ):
-        self._cacheActive = bool
 
     def isNewsActive( self ):
         if hasattr( self, "_newsActive" ):

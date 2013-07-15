@@ -85,7 +85,6 @@ from MaKaC.common.log import LogHandler
 import MaKaC.common.info as info
 from MaKaC.badge import BadgeTemplateManager
 from MaKaC.poster import PosterTemplateManager
-from MaKaC.common.cache import CategoryCache, EventCache
 from MaKaC.common import mail
 from MaKaC.common.utils import getHierarchicalId
 from MaKaC.i18n import _
@@ -403,21 +402,6 @@ class Category(CommonObjectBase):
         self.paper=newPaper
         self.paper.setOwner( self )
         self.notifyModification()
-
-    def cleanCache( self ):
-        """ delete cache files of this category and its fathers
-        usually used when an object in the category has changed """
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.isCacheActive():
-            for id in self.getCategoryPath():
-                cache = CategoryCache({"categId":id})
-                cache.cleanCache()
-
-    def clearCache( self ):
-        """ delete cache file of this category. usually used for
-        admin purposes """
-        cache = CategoryCache({"categId":self.getId()})
-        cache.cleanCache()
 
     def clearConferenceCaches( self ):
         """ delete cache files of all conferences in the category
@@ -975,7 +959,6 @@ class Category(CommonObjectBase):
         if not deleteConferences:
             if self.getNumConferences()>0:
                 raise MaKaCError( _("This category still contains some conferences, please remove them first"), _("Category"))
-        self.cleanCache()
         for subcateg in self.getSubCategoryList():
             subcateg.delete( deleteConferences )
         for conference in self.getConferenceList():
@@ -1024,14 +1007,11 @@ class Category(CommonObjectBase):
 
         self._notify('categoryTitleChanged', oldName, newName)
 
-        self.cleanCache()
-
     def getDescription( self ):
         return self.description
 
     def setDescription( self, newDesc ):
         self.description = newDesc.strip()
-        self.cleanCache()
 
     def moveConference(self, conf, toCateg):
         """
@@ -1058,7 +1038,6 @@ class Category(CommonObjectBase):
         newSc.setOwner( self )
         self.subcategories[ newSc.getId() ] = newSc
         self._incNumConfs(newSc.getNumConferences())
-        self.cleanCache()
 
     def _removeSubCategory( self, sc ):
         """if the given subcategory belongs to the current category it removes
@@ -1069,7 +1048,6 @@ class Category(CommonObjectBase):
             self._decNumConfs(sc.getNumConferences())
             del self.subcategories[ sc.getId() ]
             sc.setOwner( None )
-            self.cleanCache()
 
     def newSubCategory(self, protection):
         cm = CategoryManager()
@@ -1083,7 +1061,6 @@ class Category(CommonObjectBase):
         sc._notify('created', self)
 
         self._addSubCategory( sc )
-        self.cleanCache()
 
         return sc
 
@@ -1112,7 +1089,6 @@ class Category(CommonObjectBase):
         newConf.addOwner(self)
         self._incNumConfs(1)
         self.indexConf(newConf)
-        self.cleanCache()
 
     def getAccessKey(self):
         return ""
@@ -1153,7 +1129,6 @@ class Category(CommonObjectBase):
             conf.delete()
         conf.removeOwner( self, notify )
         self._decNumConfs(1)
-        self.cleanCache()
 
     def getSubCategoryList( self ):
         subcategs = self.subcategories.values()
@@ -1323,13 +1298,11 @@ class Category(CommonObjectBase):
         self.__ac.grantModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "manager")
-        self.cleanCache()
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
-        self.cleanCache()
 
     def canModify( self, aw ):
         return self.canUserModify( aw.getUser() )
@@ -1384,7 +1357,6 @@ class Category(CommonObjectBase):
 
         self.__ac.setProtection( private )
         self._notify('protectionChanged', oldProtection, private)
-        self.cleanCache()
 
     def hasProtectedOwner( self ):
         return self.__ac._getFatherProtection()
@@ -1503,7 +1475,6 @@ class Category(CommonObjectBase):
         """
         if raiseEvent:
             self._notify('infoChanged')
-        self.cleanCache()
         self._p_changed=1
 
 
@@ -2206,22 +2177,9 @@ class Conference(CommonObjectBase, Locatable):
         self._orgText = org
 
     def cleanCache( self ):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.isCacheActive():
-            cache = EventCache({"id":self.getId(), "type": "normal"})
-            cache.cleanCache()
-            cache = EventCache({"id":self.getId(), "type": "manager"})
-            cache.cleanCache()
-            cache = EventCache({"id":self.getId(), "type": "static"})
-            cache.cleanCache()
-
         if not ContextManager.get('clean%s'%self.getUniqueId(), False):
             ScheduleToJson.cleanConferenceCache(self)
             ContextManager.set('clean%s'%self.getUniqueId(), True)
-
-    def cleanCategoryCache( self ):
-        if len(self.getOwnerList()) > 0:
-            self.getOwnerList()[0].cleanCache()
 
     def updateNonInheritingChildren(self, elem, delete=False):
         self.getAccessController().updateNonInheritingChildren(elem, delete)
@@ -2837,9 +2795,6 @@ class Conference(CommonObjectBase, Locatable):
         # reindex the conference
         self.indexConf()
 
-        # clear the category cache
-        self.cleanCategoryCache()
-
         # notify observers
         try:
             self._notify('dateChanged', {'oldStartDate': oldStartDate, 'newStartDate': self.getStartDate(), 'oldEndDate': oldEndDate, 'newEndDate': self.getEndDate()})
@@ -3171,7 +3126,6 @@ class Conference(CommonObjectBase, Locatable):
         oldTitle = self.title
 
         self.title = title
-        self.cleanCategoryCache()
         self.notifyModification()
 
         nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
@@ -3763,7 +3717,6 @@ class Conference(CommonObjectBase, Locatable):
         oldValue = 1 if self.isProtected() else -1
 
         self.getAccessController().setProtection( private )
-        self.cleanCategoryCache()
 
         if oldValue != private:
             # notify listeners

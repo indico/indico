@@ -43,11 +43,6 @@ category_mgmt.add_url_rule('/events', 'categoryModification-actionConferences', 
                            methods=('GET', 'POST'))
 category_mgmt.add_url_rule('/subcategories', 'categoryModification-actionSubCategs',
                            categoryMod.RHCategoryActionSubCategs, methods=('GET', 'POST'))
-category_mgmt.add_url_rule('/clear-cache', 'categoryModification-clearCache', categoryMod.RHCategoryClearCache,
-                           methods=('POST',))
-category_mgmt.add_url_rule('/clear-event-cache', 'categoryModification-clearConferenceCaches',
-                           categoryMod.RHCategoryClearConferenceCaches, methods=('POST',))
-
 # Files
 category_mgmt.add_url_rule('/files', 'categoryFiles', categoryMod.RHCategoryFiles)
 category_mgmt.add_url_rule('/files/add', 'categoryFiles-addMaterial', categoryMod.RHAddMaterial, methods=('POST',))

@@ -36,7 +36,6 @@ import MaKaC.webinterface.linking as linking
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC import schedule
 import MaKaC.common.info as info
-from MaKaC.common.cache import CategoryCache
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 
@@ -171,21 +170,12 @@ class WPCategoryDisplay(WPCategoryDisplayBase):
         i18nformat("""<link rel="alternate" type="application/atom+xml" title="_('Indico Atom Feed')" href="%s">""") % url
 
     def _getBody( self, params ):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        tz = DisplayTZ(self._getAW(),self._target).getDisplayTZ()
-        if minfo.isCacheActive() and tz == self._target.getTimezone():
-            cache = CategoryCache({"categId":self._target.getId()})
-            page = cache.getCachePage()
-            if page != "":
-                return page
         wc = WCategoryDisplay(self._target, self._wfReg, self._locTZ)
         pars = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
                 "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL, \
                 "allowUserModif": self._target.canModify( self._getAW() ), \
                 "allowCreateEvent": self._target.canCreateConference(self._getAW().getUser()) }
         page = wc.getHTML( self._getAW(), pars )
-        if minfo.isCacheActive() and tz == self._target.getTimezone():
-            cache.saveCachePage(page)
         return page
 
     def _getNavigationDrawer(self):
@@ -1909,11 +1899,6 @@ class WCategModifTools(wcomponents.WTemplated):
         vars["id"] = self._categ.getId()
         if not self._categ.isRoot():
             vars["deleteButton"] = i18nformat("""<input type="submit" class="btn" value="_("delete this category")">""")
-        vars["clearCache"] = ""
-        if info.HelperMaKaCInfo.getMaKaCInfoInstance().isCacheActive():
-            vars["clearCache"] = i18nformat("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear category cache")"></form>""") % urlHandlers.UHCategoryClearCache.getURL(self._categ)
-            if self._categ.conferences:
-                vars["clearCache"] += i18nformat("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear conference caches")"></form>""") % urlHandlers.UHCategoryClearConferenceCaches.getURL(self._categ)
         return vars
 
 

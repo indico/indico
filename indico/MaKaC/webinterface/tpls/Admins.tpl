@@ -4,7 +4,6 @@
         <!-- Where is key? -->
         <div id="features" class="tip">
             ${ _("""<b>Click on one item to enable/disable the option.</b><br>
-            - <b>Cache</b>: will cache events standard display pages for faster access<br>
             - <b>News</b>: will display "latest news" on Indico home page and menu<br>
             - <b>Debug</b>: will display extensive debug information on error pages.""")}
         </div>
