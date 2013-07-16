@@ -3269,6 +3269,8 @@ class RHMaterialPackage(RHConferenceModifBase):
             return "No contribution selected"
         p=ContribPacker(self._conf)
         path=p.pack(self._contribs, ZIPFileHandler())
+        if not p.getItems():
+            raise NoReportError(_("The selected package does not contain any items"))
         return send_file('material.zip', path, 'ZIP', inline=False)
 
 
