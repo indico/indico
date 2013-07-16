@@ -607,30 +607,6 @@ class WConfDetailsBase( wcomponents.WTemplated ):
                 l.append( temp.getHTML( self._aw, mat, url ) )
         return l
 
-    def _getActionsHTML(self):
-        html = [i18nformat("""
-            <table style="padding-top:40px; padding-left:20px">
-            <tr>
-                <td nowrap>
-                    <b> _("Conference sections"):</b>
-                    <ul>
-            """)]
-        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        for link in menu.getLinkList():
-            if link.isVisible() and link.isEnabled():
-                if not isinstance(link, displayMgr.Spacer):
-                    html.append(""" <li><a href="%s">%s</a></li>
-                            """ % (link.getURL(), link.getCaption()))
-                else:
-                    html.append(str(link))
-        html.append("""
-                    </ul>
-                </td>
-            </tr>
-            </table>
-            """)
-        return "".join(html)
-
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
@@ -667,7 +643,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         info = self._conf.getContactInfo()
         vars["moreInfo_html"] = isStringHTML(info)
         vars["moreInfo"] = info
-        vars["actions"] = self._getActionsHTML()
+        vars["actions"] = ''
         vars["isSubmitter"] = self._conf.getAccessController().canUserSubmit(self._aw.getUser()) or self._conf.canModify(self._aw)
         return vars
 
@@ -5554,27 +5530,6 @@ class WConfStaticDetails( wcomponents.WTemplated ):
     </tr>""")%self._conf.getContactInfo()
         return res
 
-    def _getActionsHTML(self):
-        html = [i18nformat("""
-            <table style="padding-top:40px; padding-left:20px">
-            <tr>
-                <td nowrap>
-                    <b> _("Conference sections"):</b>
-                    <ul>
-            """)]
-        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
-        for link in menu.getLinkList():
-            if link.isVisible() and link.isEnabled():
-                html.append(""" <li><a href="%s">%s</a></li>
-                        """ % (link.getURL(), link.getCaption()))
-        html.append("""
-                    </ul>
-                </td>
-            </tr>
-            </table>
-            """)
-        return "".join(html)
-
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["description"] = self._conf.getDescription()
@@ -5599,7 +5554,7 @@ class WConfStaticDetails( wcomponents.WTemplated ):
         vars["chairs"] = self._getChairsHTML()
         vars["material"] = self._getMaterialHTML()
         vars["moreInfo"] = self._getMoreInfoHTML()
-        vars["actions"] = self._getActionsHTML()
+        vars["actions"] = ''
 
         return vars
 
