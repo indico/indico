@@ -97,7 +97,7 @@ class ComponentsManager(Persistent):
             self.__components.append(component)
         self._notifyModification()
 
-    def registerAllComponents(self, pluginType = None):
+    def registerAllComponents(self):
         '''We register all the components, but if a plugintype is passed we should just register the changes
         in the part referred to that plugintype'''
 
@@ -106,7 +106,13 @@ class ComponentsManager(Persistent):
 
             #it's a plugin
             if possiblePluginName:
-                isActive = PluginsHolder().getPluginType(pluginTypeName).getPlugin(possiblePluginName).isActive()
+                try:
+                    isActive = PluginsHolder().getPluginType(pluginTypeName).getPlugin(possiblePluginName).isActive()
+                except KeyError, e:
+                    Logger.get('components.register').warning(
+                        "Skipped {0} ({1}:{2}) - Plugin doesn't exist or disabled?".format(
+                            component, pluginTypeName, possiblePluginName))
+
                 #if the pluginType that the plugin belongs to is not active we won't register the components for the plugin
                 if not PluginsHolder().getPluginType(pluginTypeName).isActive():
                     isActive = False
@@ -128,7 +134,7 @@ class ComponentsManager(Persistent):
             for met in list(interface):
                 #if the method is implemented in the component, then we register it
                 if met in dir(component):
-                    self.registerNewEvent(met , component)
+                    self.registerNewEvent(met, component)
 
     def registerNewEvent(self, event, componentClass):
         changed = False
@@ -156,7 +162,6 @@ class ComponentsManager(Persistent):
         subscribers = self.getAllSubscribers(event)
 
         for subscriber in subscribers:
-
             try:
                 f = getattr(subscriber,event)
                 results.append(f(obj, *params))
@@ -287,6 +292,8 @@ class RHMap(Persistent):
         """ Attributes in this class are persistent, so when we want to erase them we'll need to explicitely invoke this method
         """
         try:
+            if hasattr(self, '_RHMap__map'):
+                delattr(self, '_RHMap__map')
             self.__blueprints.clear()
         except AttributeError:
             self.__blueprints = set()

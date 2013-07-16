@@ -22,6 +22,7 @@
 from flask import url_for
 from flask import current_app as app
 from werkzeug.urls import url_encode, url_parse, url_unparse, url_join
+from werkzeug.routing import BuildError
 
 from MaKaC.common.Configuration import Config
 from MaKaC.common.ObjectHolders import ObjectHolder
@@ -63,6 +64,10 @@ class _BaseURL(object):
     def addParam(self, name, value):
         self._params[name] = value
         self._modified = True
+
+    @property
+    def valid(self):
+        return True
 
     @property
     def url(self):
@@ -139,6 +144,14 @@ class EndpointURL(_BaseURL):
         # only really important when we change from SSL to non-SSL or vice versa anyway
         anchor = self.fragment or None
         self._url = url_join(self._base_url, url_for(self._endpoint, _anchor=anchor, **self._get_fixed_params()))
+
+    @property
+    def valid(self):
+        try:
+            str(self)
+            return True
+        except BuildError:
+            return False
 
     @property
     def js_router(self):

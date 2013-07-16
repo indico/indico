@@ -793,7 +793,7 @@ class SystemLink(Link):
             # left them
             return True
 
-    def getURL(self):
+    def _getURLObject(self):
         # TOREMOVE: fix events with "absolute" URL
         if not hasattr(self, '_URLHandler'):
             self.getMenu().updateSystemLink()
@@ -802,7 +802,10 @@ class SystemLink(Link):
             handler = getattr(urlHandlers, self._URLHandler)
         else:
             handler = self._URLHandler
-        return str(handler.getURL(conf))
+        return handler.getURL(conf)
+
+    def getURL(self):
+        return str(self._getURLObject())
 
     def getURLHandler(self):
         if not hasattr(self, '_URLHandler'):
@@ -822,6 +825,9 @@ class SystemLink(Link):
             # if the caption was changed, do not update it when the default
             # value get an update
             self._changed = True
+
+    def isVisible(self):
+        return self._getURLObject().valid and super(SystemLink, self).isVisible()
 
 
 class SystemLinkData(Observable):
@@ -956,6 +962,7 @@ class SystemLinkData(Observable):
                 "parent": "evaluation"}
             }
             self._notify('confDisplaySMFillDict', {'dict': self._linkData, 'conf': conf})
+
         #this ordered list allow us to keep the order we want for the menu
         if not hasattr(self, "_linkDataOrderedKeys"):
             self._linkDataOrderedKeys = ["overview",
@@ -989,7 +996,6 @@ class SystemLinkData(Observable):
                                         "newEvaluation",
                                         "viewMyEvaluation"]
             self._notify('confDisplaySMFillOrderedKeys', self._linkDataOrderedKeys)
-
 
     def getLinkData(self):
         return self._linkData
