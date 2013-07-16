@@ -47,6 +47,9 @@ def _convert_request_value(x):
 
 
 def create_flat_args():
+    """Creates a dict containing the GET/POST arguments in a style old indico code expects.
+
+    Do not use this for anything new - use request.* directly instead!"""
     args = request.args.copy()
     for key, values in request.form.iterlists():
         args.setlist(key, values)
@@ -97,6 +100,7 @@ def make_view_func(obj):
 
 @memoize
 def redirect_view(endpoint, code=302):
+    """Creates a view function that redirects to the given endpoint."""
     def _redirect(**kwargs):
         return redirect(url_for(endpoint, **kwargs), code=code)
 
@@ -167,7 +171,18 @@ def endpoint_for_url(url):
 
 
 def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=True, conditional=False):
-    # Note: path can also be a StringIO!
+    """Sends a file to the user.
+
+    `name` is required and should be the filename visible to the user.
+    `path_or_fd` is either the physical path to the file or a file-like object (e.g. a StringIO).
+    `mimetype` SHOULD be a proper MIME type such as image/png. It may also be an indico-style file type such as JPG.
+    `last_modified` may contain a unix timestamp or datetime object indicating the last modification of the file.
+    `no_cache` can be set to False to disable no-cache headers.
+    `inline` SHOULD be set to false only when you want to force the user's browser to download the file. Usually it is
+    much nicer if e.g. a PDF file can be displayed inline so don't disable it unless really necessary.
+    `conditional` is very useful when sending static files such as CSS/JS/images. It will allow the browser to retrieve
+    the file only if it has been modified (based on mtime and size).
+    """
     if request.user_agent.platform == 'android':
         # Android is just full of fail when it comes to inline content-disposition...
         inline = False
