@@ -4543,7 +4543,7 @@ class RHConfModifRoomBookingRoomDetails( RHConferenceModifRoomBookingBase, RHRoo
     _uh = urlHandlers.UHConfModifRoomBookingRoomDetails
 
     def _checkParams( self, params ):
-        RHRoomBookingBookingDetails._checkParams( self, params )
+        RHRoomBookingRoomDetails._checkParams(self, params)
         RHConferenceModifRoomBookingBase._checkParams(self, params)
 
     def _process( self ):
