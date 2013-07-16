@@ -26,7 +26,7 @@ event_mgmt.add_url_rule('/timetable/', 'confModifSchedule', conferenceModif.RHCo
                         methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/timetable/reschedule', 'confModifSchedule-reschedule', conferenceModif.RHReschedule,
                         methods=('POST',))
-event_mgmt.add_url_rule('/timetables/dates', 'confModifSchedule-edit', conferenceModif.RHScheduleDataEdit,
+event_mgmt.add_url_rule('/timetable/dates', 'confModifSchedule-edit', conferenceModif.RHScheduleDataEdit,
                         methods=('GET', 'POST'))
 
 # Session timetable - see the "sessions" module
