@@ -21,12 +21,31 @@
 
 %button {
     @include user-select(none);
-    @include rounded-corners();
-    @include box-border();
+    @include border-radius();
+    @include border-all($gray);
     display: inline-block;
     cursor: pointer;
     color: $dark-gray;
     outline: none;
+    text-align: center;
+    vertical-align: middle;
+}
+
+@mixin i-button-custom($line-height: 1.6em, $font-size: 1.1em) {
+    @extend %button;
+
+    border: none;
+    width: $line-height;
+    height: $line-height;
+
+    i {
+        line-height: $line-height;
+        font-size: $font-size;
+    }
+
+    &:hover i {
+        color: darken($dark-gray, $color-variation);
+    }
 }
 
 .i-button {
@@ -61,10 +80,8 @@ a.i-big-button {
 
     background: #FFF;
     padding: 3px;
-    text-align: center;
     width: $size;
     height: $size;
-    vertical-align: middle;
 
     i {
         font-size: 3em;
@@ -94,13 +111,6 @@ a.i-big-button {
             line-height: $size;
         }
     }
-}
-
-a.i-small-button {
-    $size = 10px;
-    @extend %button;
-
-
 }
 
 button::-moz-focus-inner {

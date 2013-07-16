@@ -19,8 +19,38 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-@mixin box-border($color: #DDD) {
-    border: 1px solid $color;
+$default-border-radius: 0.2em;
+$default-transition-duration: 0.25s;
+$default-transition-function: ease-out;
+
+$default-border-color: $gray;
+$default-border-style: solid;
+
+$color-variation: 15%;
+
+@mixin border-top($color: $default-border-color, $style: $default-border-style) {
+    border-top: 1px $style $color;
+}
+@mixin border-right($color: $default-border-color, $style: $default-border-style) {
+    border-right: 1px $style $color;
+}
+@mixin border-bottom($color: $default-border-color, $style: $default-border-style) {
+    border-bottom: 1px $style $color;
+}
+@mixin border-left($color: $default-border-color, $style: $default-border-style) {
+    border-left: 1px $style $color;
+}
+@mixin border-vert($color: $default-border-color, $style: $default-border-style) {
+    @include border-top($color, $style);
+    @include border-bottom($color, $style);
+}
+@mixin border-horz($color: $default-border-color, $style: $default-border-style) {
+    @include border-right($color, $style);
+    @include border-left($color, $style);
+}
+@mixin border-all($color: $default-border-color, $style: $default-border-style) {
+    @include border-vert($color, $style);
+    @include border-horz($color, $style);
 }
 
 @mixin rounded-corners($radius: 0.2em) {

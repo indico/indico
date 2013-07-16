@@ -20,11 +20,16 @@
 */
 
 .input-text {
-    @include box-border($gray);
-    @include transition(border-color 0.25s ease-out);
+    @include border-all();
+    @include box-sizing(border-box);
+    @include single-transition(border-color);
     @include placeholder {
         @extend %placeholder;
     }
+
+    padding: 2px 4px;
+    line-height: 1.6em;
+    height: 1.6em;
 
     &:hover,
     &:focus {
@@ -32,7 +37,7 @@
     }
 
     &:focus {
-        @include box-border($blue);
+        @include border-all($blue);
         outline: none;
     }
 }

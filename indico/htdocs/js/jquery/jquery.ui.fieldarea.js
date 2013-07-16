@@ -25,37 +25,48 @@
         options: {
             fields_caption: "field",
             parameter_manager: undefined,
-            parameter_type: "text"
+            parameter_type: "text",
+            ui_sortable: false
         },
 
         _create: function() {
+            this.info = [];
+
+            this.element.addClass("field-area scrollable");
+            this._createList();
+            this._handleEvents();
+            this._drawList();
+        },
+
+        destroy: function() {
+            this.element.off("focusout click keyup propertychange paste");
+            this.element.removeClass("field-area scrollable");
+            this.list.remove();
+        },
+
+        _createList: function() {
             var self = this;
+            self.list = $("<ul></ul>");
+            self.element.append(self.list);
 
-            self.info = [];
-            self.next_id = -1;
-
-            self.table = $("<table></table>").sortable({
-                axis: "y",
-                containment: "parent",
-                cursor: "move",
-                distance: 10,
-                handle: ".handle",
-                items: "tr:not(:last-child)",
-                placeholder: "sortable-placeholder",
-                tolerance: "pointer",
-                start: function(e, ui) {
-                    self.start_index = ui.item.index();
-                },
-                update: function(e, ui) {
-                    _.move(self.info, self.start_index, ui.item.index());
-                }
-            });
-
-            self.element.addClass("field-area scrollable");
-            self.element.append(self.table);
-
-            self._handleEvents();
-            self._drawTable();
+            if (self.options["ui_sortable"]) {
+                self.list.sortable({
+                    axis: "y",
+                    containment: "parent",
+                    cursor: "move",
+                    distance: 10,
+                    handle: ".handle",
+                    items: "li:not(:last-child)",
+                    tolerance: "pointer",
+                    start: function(e, ui) {
+                        self.start_index = ui.item.index();
+                        ui.item.find("input").blur();
+                    },
+                    update: function(e, ui) {
+                        _.move(self.info, self.start_index, ui.item.index());
+                    }
+                });
+            }
         },
 
         _handleEvents: function() {
@@ -63,11 +74,12 @@
 
             self.element.on("focusout", "input", function(e) {
                 self._updateField(this);
+                self._drawNewItem();
             });
 
             self.element.on("click", "a", function(e) {
                 e.preventDefault();
-                self._deleteRow($(this).closest("tr"));
+                self._deleteItem($(this).closest("li"));
             });
 
             self.element.on("keyup propertychange paste", "input", function(e) {
@@ -77,10 +89,10 @@
                 }
 
                 if ($(this).val() === "") {
-                    self._deleteNewInput($(this).closest("tr"));
+                    self._deleteNewItem($(this).closest("li"));
                 }
 
-                self._drawNewInput();
+                self._drawNewItem();
             });
 
             self.element.on("keydown", "input", function(e) {
@@ -95,79 +107,68 @@
             });
         },
 
-        _drawTable: function() {
+        _drawList: function() {
             var self = this;
-            var table = self.table;
+            var list = self.list;
 
-            self._reinitTable();
+            self._reinitList();
 
             for (var i=0; i<self.info.length; ++i) {
-                table.append(self._row(self.info[i]));
+                list.append(self._item(self.info[i]));
             }
 
-            self._drawNewInput();
+            self._drawNewItem();
         },
 
-        _reinitTable: function() {
+        _reinitList: function() {
             this.next_id = -1;
-            this.new_row = undefined;
+            this.new_item = undefined;
 
-            this.table.find("tr").each(function() {
+            this.list.find("li").each(function() {
                 $(this).remove();
             });
         },
 
-        _drawNewInput: function() {
-            if (this.new_row === undefined || this.new_row.find("input").val() !== "") {
-                this.new_row = this._row(this._addNewField());
-                this.table.append(this.new_row);
+        _drawNewItem: function() {
+            if (this.new_item === undefined || this.new_item.find("input").val() !== "") {
+                this.new_item = this._item(this._addNewFieldInfo());
+                this.list.append(this.new_item);
                 this.element.scrollTop(this.element[0].scrollHeight);
+                this._scrollFix();
             }
         },
 
-        _deleteNewInput: function(row) {
-            if (row.next()[0] == this.new_row[0]) {
-                this._deleteNewField();
-                this.new_row.remove();
-                this.new_row = row;
-                this._removeFromPM(row.find("input"));
+        _deleteNewItem: function(item) {
+            if (item.next()[0] == this.new_item[0]) {
+                this._deleteNewFieldInfo();
+                this.new_item.remove();
+                this.new_item = item;
+                this._removeFieldFromPM(item.find("input"));
+                this._scrollFix();
             }
         },
 
-        destroy: function() {
-            this.element.off("focusout click keyup propertychange paste");
-            this.element.removeClass("field-area scrollable");
-            this.table.remove();
-        },
-
-        _deleteRow: function(row) {
-            if (row[0] != this.new_row[0]) {
-                var id = row.find("input").data("id");
+        _deleteItem: function(item) {
+            if (item[0] != this.new_item[0]) {
+                var id = item.find("input").data("id");
                 var index = this._getFieldIndex(id);
                 this.info.splice(index, 1);
-                this._removeFromPM(row.find("input"));
-                row.remove();
+                this._removeFieldFromPM(item.find("input"));
+                item.remove();
+                this._scrollFix();
             }
         },
 
-        _addNewField: function() {
+        _addNewFieldInfo: function() {
             var id = this._nextId();
             var field = {"id": id, "value": ""};
             this.info.push(field);
             return field;
         },
 
-        _deleteNewField: function() {
+        _deleteNewFieldInfo: function() {
             this._prevId();
             this.info.pop();
-        },
-
-        _nextId: function() {
-            return this.next_id--;
-        },
-
-        _prevId: function() {
-            return this.next_id === 0? this.next_id : this.next_id++;
         },
 
         _getField: function(id) {
@@ -190,7 +191,7 @@
             return undefined;
         },
 
-        _addToPM: function(input) {
+        _addFieldToPM: function(input) {
             if (this.options["parameter_manager"] !== undefined) {
                 var parameter_type = this.options["parameter_type"];
                 this.options["parameter_manager"].remove(input);
@@ -198,41 +199,66 @@
             }
         },
 
-        _removeFromPM: function(input) {
+        _removeFieldFromPM: function(input) {
             if (this.options["parameter_manager"] !== undefined) {
                 this.options["parameter_manager"].remove(input);
             }
         },
 
-        _row: function(field) {
-            field = field || this._addNewField();
+        _item: function(field) {
+            field = field || this._addNewFieldInfo();
 
             var id = field["id"];
             var value = field["value"];
             var placeholder = "Type to add " + this.options["fields_caption"];
 
-            var row = $("<tr></tr>")
-                        .append($("<td><span class='handle'></span></td>"))
-                        .append($("<td width='100%'><input class='input-text' type='text' data-id='"+ id +"' placeholder='"+ placeholder+"' value='"+ value +"'/></td>"))
-                        .append($("<td><a class='i-small-button' title='"+ $T("Delete") +"' href='#' tabIndex='-1'><i class='icon-remove'></i></a></td>"));
+            var item = $("<li></li>");
 
-            row.find("a").qtip({
+            if (this.options["ui_sortable"]) {
+                item.append($("<span class='handle'></span>"));
+            }
+
+            item.append($("<input class='input-text' type='text' data-id='"+ id +"' placeholder='"+ placeholder+"' value='"+ value +"'/>"))
+                .append($("<a class='i-button-remove' title='"+ $T("Delete") +"' href='#' tabIndex='-1'><i class='icon-remove'></i></a>"));
+
+            item.find("a.i-button-remove").qtip({
+                position: {
+                    at: "top center",
+                    my: "bottom center",
+                    target: item.find("a")
+                },
                 hide: {
                     event: "mouseleave"
                 }
             });
 
-            return row;
+            return item;
         },
 
         _updateField: function(input) {
             input = $(input);
             if (input.val() === "") {
-                var row = input.closest("tr");
-                this._deleteRow(row);
+                var item = input.closest("li");
+                this._deleteItem(item);
             } else {
                 this._getField(input.data("id"))["value"] = input.val();
-                this._addToPM(input);
+                this._addFieldToPM(input);
+            }
+        },
+
+        _nextId: function() {
+            return this.next_id--;
+        },
+
+        _prevId: function() {
+            return this.next_id === 0? this.next_id : this.next_id++;
+        },
+
+        _scrollFix: function() {
+            if ((this.element[0].clientHeight+1 < this.element[0].scrollHeight)) {
+                this.element.find("input").addClass("width-scrolling");
+            } else {
+                this.element.find("input").removeClass("width-scrolling");
             }
         },
 
@@ -242,7 +268,7 @@
 
         setInfo: function(info) {
             this.info = info;
-            this._drawTable();
+            this._drawList();
         }
     });
 })(jQuery);

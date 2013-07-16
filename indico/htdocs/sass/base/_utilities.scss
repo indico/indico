@@ -19,6 +19,19 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+@mixin before-icon($content) {
+    &:before {
+        font-family: 'icomoon-ultimate';
+        speak: none;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        -webkit-font-smoothing: antialiased;
+        content: $content;
+    }
+}
+
 @mixin placeholder {
     &:-moz-placeholder { @content }
     &:-ms-input-placeholder { @content }

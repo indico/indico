@@ -20,41 +20,75 @@
 */
 
 .field-area {
+    $line-height: 1.6em;
+    $width: 200px;
+    $input-width-scrolling: 150px;
 
     max-height: 150px;
     overflow-y: auto;
     overflow-x: hidden;
-    padding-right: 20px;
 
     .handle {
-        @include border-left-radius(0.2em);
+        @include before-icon("\e001");
+        @include border-left-radius();
+        @include border-left();
+        @include border-vert();
+        @include box-sizing(border-box);
+        @include single-transition(background);
+        @include single-transition(color);
         @include user-select(none);
+
+        background: $light-gray;
+        color: $gray;
         cursor: move;
         display: inline-block;
-        height: 19px;
-        width: 5px;
-        vertical-align: -7px;
+        height: $line-height;
+        line-height: $line-height;
+        width: 1.1em;
+        float: left;
     }
 
+    .ui-sortable-placeholder {
+        height: 1.6em;
+    }
 
-    .sortable-placeholder {
-        height: 25px;
+    .ui-sortable-helper {
+        input,
+        .handle {
+            box-shadow: 2px 2px 3px $gray;
+        }
     }
 
     input {
-        margin-left: 0px;
+        display: inline-block;
+        float: left;
+        margin: 0;
+
+        &.width-scrolling {
+            width: $input-width-scrolling;
+        }
     }
 
-    table {
-        border-collapse: collapse;
-    }
+    a.i-button-remove {
+        @include i-button-custom($line-height);
 
-    a {
+        display: inline-block;
+        float: left;
         visibility: hidden;
     }
 
-    tr {
-        &:hover a {
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    li {
+        height: $line-height;
+        width: $width;
+        margin: 3px 0;
+
+        &:hover a.i-button-remove {
             visibility: visible;
         }
 
@@ -62,19 +96,16 @@
             .handle {
                 cursor: default;
                 background: white;
+                color: white;
             }
 
-            a {
+            a.i-button-remove {
                 visibility: hidden;
             }
         }
 
-        &.ui-sortable-helper a {
+        &.ui-sortable-helper a.i-button-remove {
             visibility: hidden;
         }
-    }
-
-    td {
-        padding: 0;
     }
 }

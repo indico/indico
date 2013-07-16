@@ -983,7 +983,8 @@ type("AddAbstractSelectionFieldDialog", ["AddAbstractFieldDialog"],
         _initializeForm: function() {
             this.AddAbstractFieldDialog.prototype._initializeForm.call(this);
             this.fieldOptions = $("<div></div>").fieldarea({fields_caption: $T("option"),
-                                                           parameter_manager: this._parameterManager});
+                                                            parameter_manager: this._parameterManager,
+                                                            ui_sortable: true});
             this._form.push([$T("Options"), this.fieldOptions]);
         },
 
