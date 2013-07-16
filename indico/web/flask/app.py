@@ -34,7 +34,6 @@ from MaKaC.webinterface.pages.error import WErrorWSGI
 from indico.web.flask.util import XAccelMiddleware, make_compat_blueprint, ListConverter
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.flask.blueprints.legacy import legacy
-from indico.web.flask.blueprints.legacy_scripts import legacy_scripts
 from indico.web.flask.blueprints.rooms import rooms
 from indico.web.flask.blueprints.api import api
 from indico.web.flask.blueprints.misc import misc
@@ -48,7 +47,7 @@ from indico.web.flask.blueprints.admin import admin
 from indico.web.flask.blueprints.rooms_admin import rooms_admin
 
 
-BLUEPRINTS = (legacy, legacy_scripts, api, misc, user, oauth, rooms, category, category_mgmt, event_display,
+BLUEPRINTS = (legacy, api, misc, user, oauth, rooms, category, category_mgmt, event_display,
               event_creation, event_mgmt, files, admin, rooms_admin)
 COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, oauth, rooms, category, category_mgmt, event_display,
                                                 event_creation, event_mgmt, files, admin, rooms_admin))
