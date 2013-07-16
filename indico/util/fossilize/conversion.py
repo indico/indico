@@ -74,6 +74,13 @@ class Conversion(object):
             return ''
 
     @classmethod
+    def roomFullName(cls, room):
+        if room:
+            return room.getFullName()
+        else:
+            return ''
+
+    @classmethod
     def locationName(cls, loc):
         if loc:
             return loc.getName()

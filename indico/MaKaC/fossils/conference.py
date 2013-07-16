@@ -317,6 +317,12 @@ class ISessionFossil(IFossil):
         """ Session Room """
     getRoom.convert = Conversion.roomName
 
+    def getRoomFullName(self):
+        """ Session Room """
+    getRoomFullName.produce = lambda s: s.getRoom()
+    getRoomFullName.convert = Conversion.roomFullName
+    getRoomFullName.name = 'roomFullname'
+
     def getConvenerList(self):
         """ Session Conveners list """
     getConvenerList.produce = lambda s: s.getAllConvenerList()
