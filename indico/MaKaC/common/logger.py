@@ -42,14 +42,18 @@ class IndicoMailFormatter(logging.Formatter):
     def _getRequestInfo(self):
         rh = ContextManager.get('currentRH', None)
         info = ['Additional information:']
-        info.append('URL: %s' % request.url)
-        info.append('Endpoint: %s' % request.url_rule.endpoint)
-        info.append('Method: %s' % request.method)
-        if rh:
-            info.append('Params: %s' % rh._getTruncatedParams())
-        info.append('IP: %s' % request.remote_addr)
-        info.append('User Agent: %s' % request.user_agent)
-        info.append('Referer: %s' % (request.referrer or 'n/a'))
+
+        try:
+            info.append('URL: %s' % request.url)
+            info.append('Endpoint: %s' % request.url_rule.endpoint)
+            info.append('Method: %s' % request.method)
+            if rh:
+                info.append('Params: %s' % rh._getTruncatedParams())
+            info.append('IP: %s' % request.remote_addr)
+            info.append('User Agent: %s' % request.user_agent)
+            info.append('Referer: %s' % (request.referrer or 'n/a'))
+        except RuntimeError, e:
+            info.append('Not available: %s' % e)
         return '\n\n%s' % '\n'.join(info)
 
 
