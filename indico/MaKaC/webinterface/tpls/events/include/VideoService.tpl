@@ -11,7 +11,7 @@
             <!--${launchInfo['launchText']}-->
         </a>
 
-        % if video.getType() == "Vidyo" and (video.hasConnect() or video.hasDisconnect()) and video.isLinkedToEquippedRoom() and self_._rh._getUser() and (conf.canModify(self_._rh._aw) or video.getOwner()["id"] == self_._rh._getUser().getId() or self_._rh.getHostIP() == VidyoTools.getLinkRoomIp(video.getLinkObject(), ipAttName='IP')):
+        % if video.getType() == "Vidyo" and (video.hasConnect() or video.hasDisconnect()) and video.isLinkedToEquippedRoom() and self_._rh._getUser() and (conf.canModify(self_._rh._aw) or video.getOwner()["id"] == self_._rh._getUser().getId() or self_._rh.getHostIP() == VidyoTools.getLinkRoomAttribute(video.getLinkObject(), attName='IP')):
           <span style="margin-left:3px;margin-right:3px;">|</span>
           <a href="#" class="connect_room" data-booking-id="${video.getId()}"
              data-event="${conf.getId()}" data-location="${video.getLinkVideoRoomLocation()}">${_("Connect")} ${video.getLinkVideoRoomLocation()}</a>

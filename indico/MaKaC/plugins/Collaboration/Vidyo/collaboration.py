@@ -96,7 +96,7 @@ class CSBooking(CSBookingBase):
         return self._created
 
     def isLinkedToEquippedRoom(self):
-        return self._created and VidyoTools.getLinkRoomIp(self.getLinkObject()) != ""
+        return self._created and VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="H323 IP") != ""
 
     def __conform__(self, proto):
         if proto == IIndexableByVidyoRoom:
@@ -253,7 +253,8 @@ class CSBooking(CSBookingBase):
         self._checksDone = checksDone
 
     def connectionStatus(self):
-        return VidyoOperations.isRoomConnected(self, VidyoTools.getLinkRoomIp(self.getLinkObject()))
+        return VidyoOperations.isRoomConnected(self, VidyoTools.getLinkRoomAttribute(self.getLinkObject(),
+                                                                                     attName="H323 IP"))
 
     def getBookingInformation(self):
         """ For retreiving the ServiceInformation sections dict built for the
@@ -470,7 +471,7 @@ class CSBooking(CSBookingBase):
         if isinstance(connectionStatus, VidyoError):
             return connectionStatus
 
-        confRoomIp = VidyoTools.getLinkRoomIp(self.getLinkObject())
+        confRoomIp = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="H323 IP")
         if confRoomIp == "":
             return VidyoError("noValidConferenceRoom", "connect")
 
@@ -515,7 +516,7 @@ class CSBooking(CSBookingBase):
 
     def _disconnect(self):
         self._checkStatus()
-        confRoomIp = VidyoTools.getLinkRoomIp(self.getLinkObject())
+        confRoomIp = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="H323 IP")
         if confRoomIp == "":
             return VidyoError("noValidConferenceRoom", "disconnect")
         connectionStatus = self.connectionStatus()
