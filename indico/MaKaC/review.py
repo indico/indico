@@ -625,18 +625,16 @@ class AbstractSelectionField(AbstractField):
         self._deleted_options.append(option)
 
     def _updateDeletedOptions(self, options=[]):
-        for o in self._options:
-            print o.__hash__()
         stored_options = set(self._options)
-        new_options = set(self.getOptionById(o["id"]) for o in options if o["id"] < 0)
+        updated_options = set(self.getOptionById(o["id"]) for o in options)
 
-        for deleted_option in stored_options - new_options:
+        for deleted_option in stored_options - updated_options:
             self._deleteOption(deleted_option)
 
     def _setOption(self, option):
         stored = self.getOptionById(option["id"])
         if stored:
-            stored.setValue(option["value"])
+            stored.value = option["value"]
         elif option["value"] is not "":
             option["id"] = self.__id_generator.newCount()
             self._options.append(SelectionFieldOption(option["id"], option["value"]))
@@ -694,7 +692,7 @@ class SelectionFieldOption(Fossilizable):
     def __hash__(self):
         return hash(self.id)
 
-    def __str__(self):
+    def __repr__(self):
         return self.value
 
     def getValue(self):
