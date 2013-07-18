@@ -3016,23 +3016,24 @@ class WPConfModifyAlarm( WPConfModifToolsBase ):
 
 #----------------------------------------------------------------------------------
 
-class WConfModifCFA( wcomponents.WTemplated ):
 
-    def __init__( self, conference ):
+class WConfModifCFA(wcomponents.WTemplated):
+
+    def __init__(self, conference):
         self._conf = conference
 
     def _getAbstractFieldsHTML(self, vars):
         abMgr = self._conf.getAbstractMgr()
         enabledText = _("Click to disable")
         disabledText = _("Click to enable")
-        laf=[]
+        laf = []
         urlRemove = str(urlHandlers.UHConfModifCFARemoveOptFld.getURL(self._conf))
         laf.append("""<form action="" method="POST">""")
         for af in abMgr.getAbstractFieldsMgr().getFields():
             urlUp = urlHandlers.UHConfModifCFAAbsFieldUp.getURL(self._conf)
-            urlUp.addParam("fieldId",af.getId())
+            urlUp.addParam("fieldId", af.getId())
             urlDown = urlHandlers.UHConfModifCFAAbsFieldDown.getURL(self._conf)
-            urlDown.addParam("fieldId",af.getId())
+            urlDown.addParam("fieldId", af.getId())
             if af.isMandatory():
                 mandatoryText = _("mandatory")
             else:
@@ -3043,16 +3044,16 @@ class WConfModifCFA( wcomponents.WTemplated ):
                     maxCharText = _("max: %s %s.") % (af.getMaxLength(), af.getLimitation())
                 else:
                     maxCharText = _("no limited")
-            addInfo = "(%s - %s)" % (mandatoryText,maxCharText)
-            url=urlHandlers.UHConfModifCFAOptFld.getURL(self._conf)
+            addInfo = "(%s - %s)" % (mandatoryText, maxCharText)
+            url = urlHandlers.UHConfModifCFAOptFld.getURL(self._conf)
             url.addParam("fieldId", af.getId())
-            url=quoteattr("%s#optional"%str(url))
+            url = quoteattr("%s#optional" % str(url))
             if self._conf.getAbstractMgr().hasEnabledAbstractField(af.getId()):
-                icon=vars["enablePic"]
-                textIcon=enabledText
+                icon = vars["enablePic"]
+                textIcon = enabledText
             else:
-                icon=vars["disablePic"]
-                textIcon=disabledText
+                icon = vars["disablePic"]
+                textIcon = disabledText
             if af.getId() == "content":
                 removeButton = ""
             else:
@@ -3067,20 +3068,20 @@ class WConfModifCFA( wcomponents.WTemplated ):
                                   &nbsp;<a class="edit-field" href="#" data-id=%s data-fieldType=%s>%s</a> %s
                                 </td>
                             </tr>
-                            """%(
-                                url, \
-                                icon, \
-                                textIcon, \
-                                quoteattr(str(urlUp)),\
-                                quoteattr(str(Config.getInstance().getSystemIconURL("upArrow"))),\
-                                quoteattr(str(urlDown)),\
-                                quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))),\
-                                removeButton, \
+                            """ % (
+                                url,
+                                icon,
+                                textIcon,
+                                quoteattr(str(urlUp)),
+                                quoteattr(str(Config.getInstance().getSystemIconURL("upArrow"))),
+                                quoteattr(str(urlDown)),
+                                quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))),
+                                removeButton,
                                 af.getId(),
                                 af.getType(),
-                                af.getName(), \
+                                af.getName(),
                                 addInfo))
-        laf.append( i18nformat("""
+        laf.append(i18nformat("""
     <tr>
       <td align="right" colspan="3">
         <input type="submit" value="_("remove")" onClick="this.form.action='%s';" class="btn">
@@ -3091,12 +3092,12 @@ class WConfModifCFA( wcomponents.WTemplated ):
         laf.append("</form>")
         return "".join(laf)
 
-    def getVars( self ):
+    def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         abMgr = self._conf.getAbstractMgr()
 
-        vars["iconDisabled"] = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
-        vars["iconEnabled"] = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
+        vars["iconDisabled"] = str(Config.getInstance().getSystemIconURL("disabledSection"))
+        vars["iconEnabled"] = str(Config.getInstance().getSystemIconURL("enabledSection"))
 
         vars["multipleTracks"] = abMgr.getMultipleTracks()
         vars["areTracksMandatory"] = abMgr.areTracksMandatory()
@@ -3137,7 +3138,7 @@ class WConfModifCFA( wcomponents.WTemplated ):
                                 <td align="left">%s</td>
                             </tr>
                         </table>
-                        """)%(", ".join(abMgr.getSubmissionNotification().getToList()) or i18nformat("""--_("no TO list")--"""), ", ".join(abMgr.getSubmissionNotification().getCCList()) or i18nformat("""--_("no CC list")--"""))
+                        """) % (", ".join(abMgr.getSubmissionNotification().getToList()) or i18nformat("""--_("no TO list")--"""), ", ".join(abMgr.getSubmissionNotification().getCCList()) or i18nformat("""--_("no CC list")--"""))
         else:
             vars["changeTo"] = "True"
             vars["status"] = _("DISABLED")
@@ -3150,25 +3151,25 @@ class WConfModifCFA( wcomponents.WTemplated ):
             vars["disabled"] = "disabled"
             vars["modifDL"] = ""
             vars["submitters"] = ""
-            vars["notification"]=""
-        vars["enablePic"]=quoteattr(str(Config.getInstance().getSystemIconURL( "enabledSection" )))
-        vars["disablePic"]=quoteattr(str(Config.getInstance().getSystemIconURL( "disabledSection" )))
-        vars["abstractFields"]=self._getAbstractFieldsHTML(vars)
-        vars["addNotifTplURL"]=urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)
-        vars["remNotifTplURL"]=urlHandlers.UHAbstractModNotifTplRem.getURL(self._conf)
+            vars["notification"] = ""
+        vars["enablePic"] = quoteattr(str(Config.getInstance().getSystemIconURL("enabledSection")))
+        vars["disablePic"] = quoteattr(str(Config.getInstance().getSystemIconURL("disabledSection")))
+        vars["abstractFields"] = self._getAbstractFieldsHTML(vars)
+        vars["addNotifTplURL"] = urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)
+        vars["remNotifTplURL"] = urlHandlers.UHAbstractModNotifTplRem.getURL(self._conf)
         vars["confId"] = self._conf.getId()
         vars["lateAuthUsers"] = fossilize(self._conf.getAbstractMgr().getAuthorizedSubmitterList())
         return vars
 
 
-class WPConfModifCFAPreview( WPConferenceModifAbstractBase ):
+class WPConfModifCFAPreview(WPConferenceModifAbstractBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabCFAPreview.setActive()
 
-    def _getTabContent( self, params ):
+    def _getTabContent(self, params):
         import MaKaC.webinterface.pages.abstracts as abstracts
-        wc = abstracts.WAbstractDataModification( self._conf )
+        wc = abstracts.WAbstractDataModification(self._conf)
         # Simulate fake abstract
         from MaKaC.webinterface.common.abstractDataWrapper import AbstractData
         ad = AbstractData(self._conf.getAbstractMgr(), {}, 9999)
@@ -3177,22 +3178,23 @@ class WPConfModifCFAPreview( WPConferenceModifAbstractBase ):
         params["origin"] = "management"
         return wc.getHTML(params)
 
-class WPConfModifCFA( WPConferenceModifAbstractBase ):
 
-    def _setActiveTab( self ):
+class WPConfModifCFA(WPConferenceModifAbstractBase):
+
+    def _setActiveTab(self):
         self._tabCFA.setActive()
 
-    def _getTabContent( self, params ):
-        wc = WConfModifCFA( self._conf )
+    def _getTabContent(self, params):
+        wc = WConfModifCFA(self._conf)
         return wc.getHTML()
 
 
 class WCFADataModification(wcomponents.WTemplated):
 
-    def __init__( self, conf ):
+    def __init__(self, conf):
         self._conf = conf
 
-    def getVars( self ):
+    def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         abMgr = self._conf.getAbstractMgr()
         vars["sDay"] = abMgr.getStartSubmissionDate().day
@@ -3214,16 +3216,17 @@ class WCFADataModification(wcomponents.WTemplated):
         vars["announcement"] = abMgr.getAnnouncement()
         vars["toList"] = ", ".join(abMgr.getSubmissionNotification().getToList())
         vars["ccList"] = ", ".join(abMgr.getSubmissionNotification().getCCList())
-        vars["postURL" ] = urlHandlers.UHCFAPerformDataModification.getURL( self._conf )
+        vars["postURL"] = urlHandlers.UHCFAPerformDataModification.getURL(self._conf)
         return vars
 
-class WPCFADataModification( WPConferenceModifAbstractBase ):
 
-    def _setActiveTab( self ):
+class WPCFADataModification(WPConferenceModifAbstractBase):
+
+    def _setActiveTab(self):
         self._tabCFA.setActive()
 
-    def _getTabContent( self, params ):
-        p = WCFADataModification( self._conf )
+    def _getTabContent(self, params):
+        p = WCFADataModification(self._conf)
         return p.getHTML()
 
 

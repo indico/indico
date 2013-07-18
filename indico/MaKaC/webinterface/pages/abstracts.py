@@ -534,92 +534,115 @@ class WPAbstractManagementBase( WPConferenceModifBase ):
         return "nothing"
 
 
-class WAbstractManagment( wcomponents.WTemplated ):
+class WAbstractManagment(wcomponents.WTemplated):
 
-    def __init__( self, aw, abstract ):
+    def __init__(self, aw, abstract):
         self._abstract = abstract
         self._aw = aw
         self._conf = abstract.getOwner().getOwner()
 
-    def _getAuthorHTML( self, auth ):
-        tmp = "%s (%s)"%(auth.getFullName(), auth.getAffiliation())
-        tmp = self.htmlText( tmp )
+    def _getAuthorHTML(self, auth):
+        tmp = "%s (%s)" % (auth.getFullName(), auth.getAffiliation())
+        tmp = self.htmlText(tmp)
         if auth.getEmail() != "":
-            mailtoSubject = i18nformat("""[%s] _("Abstract") %s: %s""")%( self._conf.getTitle(), self._abstract.getId(), self._abstract.getTitle() )
-            mailtoURL = "mailto:%s?subject=%s"%( auth.getEmail(), urllib.quote( mailtoSubject ) )
-            href = quoteattr( mailtoURL )
-            tmp = """<a href=%s>%s</a>"""%(href, tmp)
+            mailtoSubject = i18nformat("""[%s] _("Abstract") %s: %s""") % (self._conf.getTitle(), self._abstract.getId(), self._abstract.getTitle())
+            mailtoURL = "mailto:%s?subject=%s" % (auth.getEmail(), urllib.quote(mailtoSubject))
+            href = quoteattr(mailtoURL)
+            tmp = """<a href=%s>%s</a>""" % (href, tmp)
         return tmp
 
-    def _getStatusHTML( self ):
+    def _getStatusHTML(self):
         status = self._abstract.getCurrentStatus()
-        html = """<b>%s</b>"""%AbstractStatusList.getInstance().getCaption( status.__class__ ).upper()
-        tzUtil = DisplayTZ(self._aw,self._conf)
+        html = """<b>%s</b>""" % AbstractStatusList.getInstance().getCaption(status.__class__).upper()
+        tzUtil = DisplayTZ(self._aw, self._conf)
         tz = tzUtil.getDisplayTZ()
         if hasattr(status, 'getResponsible'):
-            respPerson = i18nformat(""" _("by") %s""")%self._getAuthorHTML(status.getResponsible()) if status.getResponsible() else ""
+            respPerson = i18nformat(""" _("by") %s""") % self._getAuthorHTML(status.getResponsible()) if status.getResponsible() else ""
         else:
             respPerson = ""
 
-        if status.__class__  == review.AbstractStatusAccepted:
+        if status.__class__ == review.AbstractStatusAccepted:
             trackTitle, contribTitle = "", ""
             if status.getTrack():
-                trackTitle = " for %s"%self.htmlText(status.getTrack().getTitle())
+                trackTitle = " for %s" % self.htmlText(status.getTrack().getTitle())
             if status.getType():
-                contribTitle = " as %s"%self.htmlText(status.getType().getName())
-            html = i18nformat("""%s%s%s<br><font size="-1">%s _("on") %s</font>""")%( \
-                            html, trackTitle, contribTitle,\
-                            respPerson, \
-                            getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
+                contribTitle = " as %s" % self.htmlText(status.getType().getName())
+            html = i18nformat("""%s%s%s<br><font size="-1">%s _("on") %s</font>""") % (
+                html,
+                trackTitle,
+                contribTitle,
+                respPerson,
+                getAdjustedDate(status.getDate(), tz=tz).strftime("%d %B %Y %H:%M")
+            )
             if status.getComments() != "":
-                html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
-                                                    html, status.getComments() )
+                html = """%s<br><font size="-1"><i>%s</i></font>""" % (
+                    html,
+                    status.getComments()
+                )
         elif status.__class__ == review.AbstractStatusRejected:
-            html = i18nformat("""%s<br><font size="-1">%s _("on") %s</font>""")%( \
-                            html, \
-                            respPerson, \
-                            getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
+            html = i18nformat("""%s<br><font size="-1">%s _("on") %s</font>""") % (
+                html,
+                respPerson,
+                getAdjustedDate(status.getDate(), tz=tz).strftime("%d %B %Y %H:%M")
+            )
             if status.getComments() != "":
-                html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
-                                                    html, status.getComments() )
+                html = """%s<br><font size="-1"><i>%s</i></font>""" % (
+                    html,
+                    status.getComments()
+                )
         elif status.__class__ == review.AbstractStatusWithdrawn:
-            html = i18nformat("""%s<font size="-1">%s _("on") %s</font>""")%( \
-                            html,\
-                            respPerson, \
-                            getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
+            html = i18nformat("""%s<font size="-1">%s _("on") %s</font>""") % (
+                html,
+                respPerson,
+                getAdjustedDate(status.getDate(), tz=tz).strftime("%d %B %Y %H:%M")
+            )
             if status.getComments() != "":
-                html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
-                                                    html, status.getComments() )
+                html = """%s<br><font size="-1"><i>%s</i></font>""" % (
+                    html,
+                    status.getComments()
+                )
         elif status.__class__ == review.AbstractStatusDuplicated:
-            original=status.getOriginal()
-            url=urlHandlers.UHAbstractManagment.getURL(original)
-            html = i18nformat("""%s (<a href=%s>%s-<i>%s</i></a>) <font size="-1">%s _("on") %s</font>""")%( html, quoteattr(str(url)), self.htmlText(original.getId()),\
-                self.htmlText(original.getTitle()),\
-                respPerson, \
-                getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
+            original = status.getOriginal()
+            url = urlHandlers.UHAbstractManagment.getURL(original)
+            html = i18nformat("""%s (<a href=%s>%s-<i>%s</i></a>) <font size="-1">%s _("on") %s</font>""") % (
+                html,
+                quoteattr(str(url)),
+                self.htmlText(original.getId()),
+                self.htmlText(original.getTitle()),
+                respPerson,
+                getAdjustedDate(status.getDate(), tz=tz).strftime("%d %B %Y %H:%M")
+            )
             if status.getComments() != "":
-                html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
-                                                    html, status.getComments() )
+                html = """%s<br><font size="-1"><i>%s</i></font>""" % (
+                    html,
+                    status.getComments()
+                )
         elif status.__class__ == review.AbstractStatusMerged:
-            target=status.getTargetAbstract()
-            url=urlHandlers.UHAbstractManagment.getURL(target)
-            html = i18nformat("""<font color="black"><b>%s</b></font> (<a href=%s>%s-<i>%s</i></a>) <font size="-1">%s _("on") %s</font>""")%( html, quoteattr(str(url)), self.htmlText(target.getId()),\
-                self.htmlText(target.getTitle()),\
-                respPerson, \
-                getAdjustedDate(status.getDate(),tz=tz).strftime("%d %B %Y %H:%M") )
+            target = status.getTargetAbstract()
+            url = urlHandlers.UHAbstractManagment.getURL(target)
+            html = i18nformat("""<font color="black"><b>%s</b></font> (<a href=%s>%s-<i>%s</i></a>) <font size="-1">%s _("on") %s</font>""") % (
+                html,
+                quoteattr(str(url)),
+                self.htmlText(target.getId()),
+                self.htmlText(target.getTitle()),
+                respPerson,
+                getAdjustedDate(status.getDate(), tz=tz).strftime("%d %B %Y %H:%M")
+            )
             if status.getComments() != "":
-                html = """%s<br><font size="-1"><i>%s</i></font>"""%(\
-                                                    html, status.getComments() )
+                html = """%s<br><font size="-1"><i>%s</i></font>""" % (
+                    html,
+                    status.getComments()
+                )
         return html
 
-    def _getTracksHTML( self ):
+    def _getTracksHTML(self):
         prog = []
         for track in self._abstract.getTrackListSorted():
             jud = self._abstract.getTrackJudgement(track)
             if jud.__class__ == review.AbstractAcceptance:
-                cTypeCaption=""
+                cTypeCaption = ""
                 if jud.getContribType() is not None:
-                    cTypeCaption=jud.getContribType().getName()
+                    cTypeCaption = jud.getContribType().getName()
                 st = i18nformat(""" - _("Proposed to accept")""")
                 if cTypeCaption:
                     st += self.htmlText(cTypeCaption)
@@ -637,19 +660,19 @@ class WAbstractManagment( wcomponents.WTemplated ):
                 st = ""
                 color = ""
             if st != "":
-                prog.append( """<li>%s <font size="-1" %s> %s </font></li>"""%(self.htmlText( track.getTitle() ), color, st) )
+                prog.append("""<li>%s <font size="-1" %s> %s </font></li>""" % (self.htmlText(track.getTitle()), color, st))
             else:
-                prog.append( """<li>%s</li>"""%(self.htmlText( track.getTitle() )) )
-        return "<ul>%s</ul>"%"".join( prog )
+                prog.append("""<li>%s</li>""" % (self.htmlText(track.getTitle())))
+        return "<ul>%s</ul>" % "".join(prog)
 
-    def _getContributionHTML( self ):
+    def _getContributionHTML(self):
         res = ""
         contrib = self._abstract.getContribution()
         if contrib:
             url = urlHandlers.UHContributionModification.getURL(contrib)
             title = self.htmlText(contrib.getTitle())
             id = self.htmlText(contrib.getId())
-            res = """<a href=%s>%s - %s</a>"""%(quoteattr(str(url)),id,title)
+            res = """<a href=%s>%s - %s</a>""" % (quoteattr(str(url)), id, title)
         return res
 
     def _getMergeFromHTML(self):
@@ -659,17 +682,17 @@ class WAbstractManagment( wcomponents.WTemplated ):
         l = []
         for abstract in abstracts:
             if abstract.getOwner():
-                l.append("""<a href="%s">%s : %s</a><br>\n"""%(urlHandlers.UHAbstractManagment.getURL(abstract), abstract.getId(), abstract.getTitle()))
+                l.append("""<a href="%s">%s : %s</a><br>\n""" % (urlHandlers.UHAbstractManagment.getURL(abstract), abstract.getId(), abstract.getTitle()))
             else:
-                l.append("""%s : %s [DELETED]<br>\n"""%(abstract.getId(), abstract.getTitle()))
+                l.append("""%s : %s [DELETED]<br>\n""" % (abstract.getId(), abstract.getTitle()))
 
         return i18nformat("""<tr>
                     <td class="dataCaptionTD" nowrap><span class="dataCaptionFormat"> _("Merged from")</span></td>
                     <td bgcolor="white" valign="top" colspan="3">%s</td>
-                </tr>""")%"".join(l)
+                </tr>""") % "".join(l)
 
     def _getAdditionalFieldsHTML(self):
-        html=""
+        html = ""
         afm = self._abstract.getConference().getAbstractMgr().getAbstractFieldsMgr()
         for f in afm.getActiveFields():
             id = f.getId()
@@ -678,24 +701,24 @@ class WAbstractManagment( wcomponents.WTemplated ):
                 value = str(f.getOption(self._abstract.getField(id))) if f.getOption(self._abstract.getField(id)) else ""
             else:
                 value = self._abstract.getField(id)
-            html+="""
+            html += """
                     <tr>
                         <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">%s</span></td>
                         <td bgcolor="white" valign="top"><table class="tablepre"><tr><td><pre>%s</pre></td></tr></table></td>
                     </tr>
-                """%(self.htmlText(caption), self.htmlText(value) )
+                """ % (self.htmlText(caption), self.htmlText(value))
         return html
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         vars["title"] = self.htmlText(self._abstract.getTitle())
         vars["additionalFields"] = self._getAdditionalFieldsHTML()
         vars["organisation"] = self.htmlText(self._abstract.getSubmitter().getAffiliation())
         vars["status"] = self._getStatusHTML()
         vars["statusName"] = AbstractStatusList.getInstance().getCaption(self._abstract.getCurrentStatus().__class__).upper()
-        vars["showBackToSubmitted"] = isinstance(self._abstract.getCurrentStatus(), (review.AbstractStatusWithdrawn, \
-                                                                         review.AbstractStatusRejected, \
-                                                                                      review.AbstractStatusAccepted))
+        vars["showBackToSubmitted"] = isinstance(self._abstract.getCurrentStatus(), (review.AbstractStatusWithdrawn,
+                                                                                     review.AbstractStatusRejected,
+                                                                                     review.AbstractStatusAccepted))
         #for author in self._abstract.getAuthorList():
         #    if self._abstract.isPrimaryAuthor( author ):
         #        primary_authors.append( self._getAuthorHTML( author ) )
@@ -703,74 +726,78 @@ class WAbstractManagment( wcomponents.WTemplated ):
         #        co_authors.append( self._getAuthorHTML( author ) )
         primary_authors = []
         for author in self._abstract.getPrimaryAuthorList():
-            primary_authors.append( self._getAuthorHTML( author ) )
+            primary_authors.append(self._getAuthorHTML(author))
         co_authors = []
         for author in self._abstract.getCoAuthorList():
-            co_authors.append( self._getAuthorHTML( author ) )
-        vars["primary_authors"] = "<br>".join( primary_authors )
-        vars["co_authors"] = "<br>".join( co_authors )
+            co_authors.append(self._getAuthorHTML(author))
+        vars["primary_authors"] = "<br>".join(primary_authors)
+        vars["co_authors"] = "<br>".join(co_authors)
         speakers = []
         for spk in self._abstract.getSpeakerList():
             speakers.append(self._getAuthorHTML(spk))
-        vars["speakers"] = "<br>".join( speakers )
+        vars["speakers"] = "<br>".join(speakers)
         vars["tracks"] = self._getTracksHTML()
         vars["type"] = ""
         if self._abstract.getContribType() is not None:
             vars["type"] = self._abstract.getContribType().getName()
         vars["submitDate"] = self._abstract.getSubmissionDate().strftime("%d %B %Y %H:%M")
         vars["modificationDate"] = self._abstract.getModificationDate().strftime("%d %B %Y %H:%M")
-        vars["disable"],vars["dupDisable"],vars["mergeDisable"] = "","",""
-        if self._abstract.getCurrentStatus().__class__ in [review.AbstractStatusAccepted,review.AbstractStatusRejected,review.AbstractStatusWithdrawn]:
+        vars["disable"] = ""
+        vars["dupDisable"] = ""
+        vars["mergeDisable"] = ""
+        if self._abstract.getCurrentStatus().__class__ in [review.AbstractStatusAccepted,
+                                                           review.AbstractStatusRejected,
+                                                           review.AbstractStatusWithdrawn]:
             vars["disable"] = "disabled"
             vars["mergeDisable"] = "disabled"
             vars["dupDisable"] = "disabled"
 
         vars["duplicatedButton"] = _("mark as duplicated")
-        vars["duplicateURL"]=quoteattr(str(urlHandlers.UHAbstractModMarkAsDup.getURL(self._abstract)))
+        vars["duplicateURL"] = quoteattr(str(urlHandlers.UHAbstractModMarkAsDup.getURL(self._abstract)))
         if self._abstract.getCurrentStatus().__class__ == review.AbstractStatusDuplicated:
             vars["duplicatedButton"] = _("unmark as duplicated")
-            vars["duplicateURL"]=quoteattr(str(urlHandlers.UHAbstractModUnMarkAsDup.getURL(self._abstract)))
+            vars["duplicateURL"] = quoteattr(str(urlHandlers.UHAbstractModUnMarkAsDup.getURL(self._abstract)))
             vars["mergeDisable"] = "disabled"
             vars["disable"] = "disabled"
 
         vars["mergeButton"] = _("merge into")
-        vars["mergeIntoURL"]=quoteattr(str(urlHandlers.UHAbstractModMergeInto.getURL(self._abstract)))
+        vars["mergeIntoURL"] = quoteattr(str(urlHandlers.UHAbstractModMergeInto.getURL(self._abstract)))
         if self._abstract.getCurrentStatus().__class__ == review.AbstractStatusMerged:
-            vars["mergeIntoURL"]=quoteattr(str(urlHandlers.UHAbstractModUnMerge.getURL(self._abstract)))
+            vars["mergeIntoURL"] = quoteattr(str(urlHandlers.UHAbstractModUnMerge.getURL(self._abstract)))
             vars["mergeButton"] = _("unmerge")
             vars["dupDisable"] = "disabled"
             vars["disable"] = "disabled"
 
         vars["mergeFrom"] = self._getMergeFromHTML()
 
-        vars["abstractListURL"] = quoteattr( str( urlHandlers.UHConfAbstractManagment.getURL( self._conf ) ) )
-        vars["viewTrackDetailsURL"] = quoteattr( str (urlHandlers.UHAbstractTrackProposalManagment.getURL( self._abstract) ) )
+        vars["abstractListURL"] = quoteattr(str(urlHandlers.UHConfAbstractManagment.getURL(self._conf)))
+        vars["viewTrackDetailsURL"] = quoteattr(str(urlHandlers.UHAbstractTrackProposalManagment.getURL(self._abstract)))
         vars["comments"] = self._abstract.getComments()
         vars["abstractId"] = self._abstract.getId()
         vars["contribution"] = self._getContributionHTML()
-        vars["abstractPDF"]=urlHandlers.UHAbstractConfManagerDisplayPDF.getURL(self._abstract)
-        vars["printIconURL"]=Config.getInstance().getSystemIconURL("pdf")
-        vars["abstractXML"]=urlHandlers.UHAbstractToXML.getURL(self._abstract)
-        vars["xmlIconURL"]=Config.getInstance().getSystemIconURL("xml")
-        vars["acceptURL"]=quoteattr(str(urlHandlers.UHAbstractManagmentAccept.getURL(self._abstract)))
-        vars["rejectURL"]=quoteattr(str(urlHandlers.UHAbstractManagmentReject.getURL(self._abstract)))
-        vars["changeTrackURL"]=quoteattr(str(urlHandlers.UHAbstractManagmentChangeTrack.getURL(self._abstract)))
-        vars["backToSubmittedURL"]=quoteattr(str(urlHandlers.UHAbstractManagmentBackToSubmitted.getURL(self._abstract)))
-        vars["modDataURL"]=quoteattr(str(urlHandlers.UHAbstractModEditData.getURL(self._abstract)))
-        vars["propToAccURL"]=quoteattr(str(urlHandlers.UHConfModAbstractPropToAcc.getURL(self._abstract)))
-        vars["propToRejURL"]=quoteattr(str(urlHandlers.UHConfModAbstractPropToRej.getURL(self._abstract)))
-        vars["withdrawURL"]=quoteattr(str(urlHandlers.UHConfModAbstractWithdraw.getURL(self._abstract)))
-        vars["disableWithdraw"]=""
+        vars["abstractPDF"] = urlHandlers.UHAbstractConfManagerDisplayPDF.getURL(self._abstract)
+        vars["printIconURL"] = Config.getInstance().getSystemIconURL("pdf")
+        vars["abstractXML"] = urlHandlers.UHAbstractToXML.getURL(self._abstract)
+        vars["xmlIconURL"] = Config.getInstance().getSystemIconURL("xml")
+        vars["acceptURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentAccept.getURL(self._abstract)))
+        vars["rejectURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentReject.getURL(self._abstract)))
+        vars["changeTrackURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentChangeTrack.getURL(self._abstract)))
+        vars["backToSubmittedURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentBackToSubmitted.getURL(self._abstract)))
+        vars["modDataURL"] = quoteattr(str(urlHandlers.UHAbstractModEditData.getURL(self._abstract)))
+        vars["propToAccURL"] = quoteattr(str(urlHandlers.UHConfModAbstractPropToAcc.getURL(self._abstract)))
+        vars["propToRejURL"] = quoteattr(str(urlHandlers.UHConfModAbstractPropToRej.getURL(self._abstract)))
+        vars["withdrawURL"] = quoteattr(str(urlHandlers.UHConfModAbstractWithdraw.getURL(self._abstract)))
+        vars["disableWithdraw"] = ""
         if self._abstract.getCurrentStatus().__class__ not in \
-                [review.AbstractStatusSubmitted,review.AbstractStatusAccepted,
-                review.AbstractStatusInConflict,\
-                review.AbstractStatusUnderReview,\
-                review.AbstractStatusProposedToReject,\
-                review.AbstractStatusProposedToAccept]:
-            vars["disableWithdraw"]=" disabled"
+                [review.AbstractStatusSubmitted, review.AbstractStatusAccepted,
+                    review.AbstractStatusInConflict,
+                    review.AbstractStatusUnderReview,
+                    review.AbstractStatusProposedToReject,
+                    review.AbstractStatusProposedToAccept]:
+            vars["disableWithdraw"] = " disabled"
 
         rating = self._abstract.getRating()
-        if rating == None:
+        if rating is None:
             vars["rating"] = ""
         else:
             vars["rating"] = "%.2f" % rating
