@@ -24,7 +24,7 @@
     </span>
   </td>
   <td valign="top" align="right">
-    % if session.getDescription() or len(item.getConvenerList()) > 0 or session.getConvenerText() or (getLocationInfo(item) != getLocationInfo(item.getOwner()) and checkOwnerLocation) or (getLocationInfo(item) != ('', '', '') and not checkOwnerLocation) or len(session.getAllMaterialList()) > 0:
+    % if session.getDescription() or len(item.getOwnConvenerList()) > 0 or session.getConvenerText() or (getLocationInfo(item) != getLocationInfo(item.getOwner()) and checkOwnerLocation) or (getLocationInfo(item) != ('', '', '') and not checkOwnerLocation) or len(session.getAllMaterialList()) > 0:
     <table bgcolor="#f0c060" cellpadding="2" cellspacing="0" border="0" class="results">
     % if session.getDescription():
       <tr>
@@ -43,13 +43,13 @@
       </tr>
 
     % endif
-    % if len(item.getConvenerList()) > 0 or session.getConvenerText():
+    % if len(item.getOwnConvenerList()) > 0 or session.getConvenerText():
     <tr>
       <td valign="top" class="headerTitle">
         Chairperson:
       </td>
       <td class="headerInfo" >
-        ${common.renderUsers(item.getConvenerList(), unformatted=session.getConvenerText(), title=False )}
+        ${common.renderUsers(item.getOwnConvenerList(), unformatted=session.getConvenerText(), title=False )}
       </td>
     </tr>
     % endif
