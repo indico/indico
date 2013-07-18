@@ -21,11 +21,11 @@ type("WordsManager", [],
     {
 
     checkNumWords: function() {
-	    if (this.maxWords - this._numWords(this.element.dom.value) < 0) {
-	        this.maxWordsCounter.set(Html.span({className:'formError'}, $T('Over the limit')));
-	    } else {
+        if (this.maxWords - this._numWords(this.element.dom.value) < 0) {
+            this.maxWordsCounter.set(Html.span({className:'formError'}, $T('Over the limit')));
+        } else {
             this.maxWordsCounter.set(this.maxWords - this._numWords(this.element.dom.value) + $T(' words left'));
-	    }
+        }
         this.pm.check();
     },
 
@@ -799,7 +799,7 @@ type("AbstractFieldDialogFactory", [],
     {
         makeDialog: function(fieldType, conferenceId, fieldId) {
             switch (fieldType) {
-                case "text":
+                case "textarea":
                     return new AddAbstractTextAreaFieldDialog(conferenceId, fieldId);
                 case "input":
                     return new AddAbstractInputFieldDialog(conferenceId, fieldId);
@@ -829,7 +829,7 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
         _generateForm: function() {
             this._initializeForm();
             this._finalizeForm();
-            if (this.info.get("id")) {
+            if (this.info.get("id") !== "") {
                 this.__fetch();
             }
         },
@@ -844,7 +844,7 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
         _getButtons: function() {
             var self = this;
 
-            var actionButton = [this.info.get("id")? $T('Update') : $T('Add'), function() {
+            var actionButton = [this.info.get("id") !== ""? $T('Update') : $T('Add'), function() {
                 self.__submit();
             }];
 
@@ -912,7 +912,7 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
         this._parameterManager = new IndicoUtil.parameterManager();
         this._form = [];
 
-        var title = (fieldId? $T("Edit Field: ") : $T("Add Field: ")) + fieldTypeTitle;
+        var title = (fieldId !== ""? $T("Edit Field: ") : $T("Add Field: ")) + fieldTypeTitle;
         this.ExclusivePopupWithButtons(title);
     }
 );
@@ -929,7 +929,6 @@ type("AddAbstractTextFieldDialog", ["AddAbstractFieldDialog"],
 
             var fieldMaxLength = this._parameterManager.add(new RealtimeTextBox(), "int", true);
             var fieldLimitation = this._parameterManager.add(selection, "text", false);
-
             fieldMaxLength = $B(fieldMaxLength, this.info.accessor("maxLength")).draw();
             fieldLimitation = $B(fieldLimitation, this.info.accessor("limitation"));
 
@@ -967,7 +966,7 @@ type("AddAbstractTextFieldDialog", ["AddAbstractFieldDialog"],
 type("AddAbstractTextAreaFieldDialog", ["AddAbstractTextFieldDialog"], {},
     function(conferenceId, fieldId) {
         this.AddAbstractTextFieldDialog(conferenceId, fieldId, $T("Text"));
-        this.info.set("type", "text");
+        this.info.set("type", "textarea");
     }
 );
 

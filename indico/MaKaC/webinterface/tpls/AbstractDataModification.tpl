@@ -1,4 +1,7 @@
 <% from MaKaC.common import Config %>
+<% from MaKaC.review import AbstractTextField %>
+<% from MaKaC.review import AbstractSelectionField %>
+
 % if origin == "display":
 <form action=${ postURL } enctype="multipart/form-data" method="POST" width="100%" onsubmit="return onsubmitDisplayActions();">
     <table width="100%" align="center">
@@ -39,15 +42,17 @@
                                             <td align="right" valign="top"  style="white-space:nowrap">
                                                 <span class="dataCaptionFormat">${ field.getCaption() }</span>&nbsp;${'<span class="mandatoryField">*</span>' if field.isMandatory() else ''}<br><br>
                                                 <% nbRows = 10 %>
-                                                % if field.getMaxLength() > 0:
-                                                    % if field.getLimitation() == "words":
-                                                        <% nbRows = int((int(field.getMaxLength())*4.5)/85) + 1 %>
-                                                        <input type="hidden" name="maxwords${ field.getId().replace(" ", "_")}" value="${ field.getMaxLength() }">
-                                                        <small><span id="maxLimitionCounter_${ field.getId().replace(" ", "_")}" style="padding-right:5px;">${ field.getMaxLength() } ${ _(" words left") }</span></small>
-                                                    % else:
-                                                        <% nbRows = int(int(field.getMaxLength())/85) + 1 %>
-                                                        <input type="hidden" name="maxchars${ field.getId().replace(" ", "_")}" value="${ field.getMaxLength() }">
-                                                        <small><span id="maxLimitionCounter_${ field.getId().replace(" ", "_")}" style="padding-right:5px;">${ field.getMaxLength() } ${ _(" chars left") }</span></small>
+                                                % if isinstance(field, AbstractTextField):
+                                                    % if field.getMaxLength() > 0:
+                                                        % if field.getLimitation() == "words":
+                                                            <% nbRows = int((int(field.getMaxLength())*4.5)/85) + 1 %>
+                                                            <input type="hidden" name="maxwords${ field.getId().replace(" ", "_")}" value="${ field.getMaxLength() }">
+                                                            <small><span id="maxLimitionCounter_${ field.getId().replace(" ", "_")}" style="padding-right:5px;">${ field.getMaxLength() } ${ _(" words left") }</span></small>
+                                                        % else:
+                                                            <% nbRows = int(int(field.getMaxLength())/85) + 1 %>
+                                                            <input type="hidden" name="maxchars${ field.getId().replace(" ", "_")}" value="${ field.getMaxLength() }">
+                                                            <small><span id="maxLimitionCounter_${ field.getId().replace(" ", "_")}" style="padding-right:5px;">${ field.getMaxLength() } ${ _(" chars left") }</span></small>
+                                                        % endif
                                                     % endif
                                                 % endif
                                                 % if (nbRows > 30):
@@ -59,6 +64,16 @@
                                                     <textarea id="f_${ field.getId() }" name="f_${ field.getId() }" width="100%" rows="${ nbRows }" style="width:100%">${ fieldsDict["f_"+ field.getId()] }</textarea>
                                                 % elif field.getType() == "input":
                                                     <input id="f_${ field.getId() }" name="f_${ field.getId() }" value="${ fieldsDict["f_"+ field.getId()] }" style="width:100%">
+                                                % elif field.getType() == "selection":
+                                                    <select id="f_${field.getId()}" name="f_${field.getId()}">
+                                                        <% nooption = "--{}--".format(_("not specified")) %>
+                                                        <% selected = "selected" if fieldsDict["f_" + field.getId()] == "" else "" %>
+                                                        <option value="" ${selected}>${nooption}</option>
+                                                        % for option in field.getOptions():
+                                                            <% selected = "selected" if fieldsDict["f_" + field.getId()] == option.getId() else "" %>
+                                                            <option value="${option.getId()}" ${selected}>${option.getValue()}</option>
+                                                        % endfor
+                                                    </select>
                                                 % endif
                                             </td>
                                         </tr>

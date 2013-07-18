@@ -38,6 +38,7 @@ from MaKaC.common import Configuration
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.review import AbstractStatusSubmitted
+from MaKaC.review import AbstractTextField
 
 
 class WConfCFADeactivated(WConfDisplayBodyBase):
@@ -373,7 +374,7 @@ class WPAbstractDisplay( WPAbstractDisplayBase ):
         wc = WAbstractDisplay( self._getAW(), self._abstract )
         return wc.getHTML()
 
-class WAbstractDataModification( wcomponents.WTemplated ):
+class WAbstractDataModification( wcomponents.WTemplated):
 
     def __init__( self, conf ):
         self._conf = conf
@@ -385,13 +386,15 @@ class WAbstractDataModification( wcomponents.WTemplated ):
         for f in abfm.getFields():
             id = f.getId()
             if f.isActive():
-                maxLength = int(f.getMaxLength())
-                isMandatory = f.isMandatory()
-                if maxLength > 0: # it means there is a limit for the field in words or in characters
-                    self._limitedFieldList.append(["f_"+id, maxLength, "maxLimitionCounter_"+id.replace(" ", "_"), f.getLimitation(), str(isMandatory)]) # append the textarea/input id
-                else:
-                    if isMandatory:
+                if isinstance(f, AbstractTextField):
+                    maxLength = int(f.getMaxLength())
+                    limitation = f.getLimitation()
+                    if maxLength > 0: # it means there is a limit for the field in words or in characters
+                        self._limitedFieldList.append(["f_"+id, maxLength, "maxLimitionCounter_"+id.replace(" ", "_"), limitation, str(f.isMandatory())]) # append the textarea/input id
+                    elif f.isMandatory():
                         self._mandatoryFieldList.append("f_"+id)
+                elif f.isMandatory():
+                    self._mandatoryFieldList.append("f_"+id)
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
@@ -671,12 +674,16 @@ class WAbstractManagment( wcomponents.WTemplated ):
         for f in afm.getActiveFields():
             id = f.getId()
             caption = f.getName()
+            if f.getType() == "selection":
+                value = str(f.getOption(self._abstract.getField(id))) if f.getOption(self._abstract.getField(id)) else ""
+            else:
+                value = self._abstract.getField(id)
             html+="""
                     <tr>
                         <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">%s</span></td>
                         <td bgcolor="white" valign="top"><table class="tablepre"><tr><td><pre>%s</pre></td></tr></table></td>
                     </tr>
-                """%(self.htmlText(caption), self.htmlText(self._abstract.getField(id)) )
+                """%(self.htmlText(caption), self.htmlText(value) )
         return html
 
     def getVars( self ):

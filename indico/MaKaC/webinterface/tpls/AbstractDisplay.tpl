@@ -10,7 +10,7 @@
         % if isinstance(abstract.getCurrentStatus(), AbstractStatusWithdrawn):
             <a href="${recoverURL}">${_("Recover")}</a> |
         % elif not withdrawDisabled:
-            <a href="${withdrawURL}" ">${_("Withdraw")}</a> |
+            <a href="${withdrawURL}">${_("Withdraw")}</a> |
         % endif
     % endif
     <a href="${str(urlHandlers.UHAbstractDisplayPDF.getURL(abstract))}" target="_blank">${_("PDF")}</a>
@@ -54,11 +54,15 @@
         <div class="abstractDetail">
             % for f in abstract.getConference().getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
                     % if abstract.getField(f.getId()):
-                    <div class="abstractSection">
-                        <h2 class="abstractSectionTitle">${f.getName()}</h2>
-                        <div class="abstractSectionContent">${abstract.getField(f.getId()) | h}
+                        % if f.getType() == "selection":
+                            <% content = f.getOption(abstract.getField(f.getId()))%>
+                        % else:
+                            <% content = abstract.getField(f.getId())%>
+                        % endif
+                        <div class="abstractSection">
+                            <h2 class="abstractSectionTitle">${f.getName()}</h2>
+                            <div class="abstractSectionContent">${content | h}</div>
                         </div>
-                    </div>
                     % endif
             % endfor
             % if abstract.getComments():

@@ -4,7 +4,7 @@
             <i class="icon-textfield"></i>
             <span>${_("Text field")}</span>
         </a>
-        <a class="i-big-button" data-fieldtype="text" href="#">
+        <a class="i-big-button" data-fieldtype="textarea" href="#">
             <i class="icon-textarea"></i>
             <span>${_("Text area")}</span>
         </a>

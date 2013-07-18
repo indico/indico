@@ -22,7 +22,7 @@
 .field-area {
     $line-height: 1.6em;
     $width: 200px;
-    $input-width-scrolling: 150px;
+    $input-width: 160px;
 
     max-height: 150px;
     overflow-y: auto;
@@ -63,9 +63,10 @@
         display: inline-block;
         float: left;
         margin: 0;
+        max-width: $input-width
 
         &.width-scrolling {
-            width: $input-width-scrolling;
+            width: ($input-width - 10);
         }
     }
 

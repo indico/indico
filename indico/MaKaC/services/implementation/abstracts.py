@@ -91,7 +91,7 @@ class SetField(ConferenceModifBase):
         self.params["caption"] = pm.extract("caption", pType=str, allowEmpty=False)
         self.params["isMandatory"] = pm.extract("isMandatory", pType=bool, allowEmpty=True, defaultValue=False)
 
-        if self.params["type"] == "text" or self.params["type"] == "input":
+        if self.params["type"] == "textarea" or self.params["type"] == "input":
             self.params["maxLength"] = pm.extract("maxLength", pType=int, allowEmpty=True, defaultValue=0)
             self.params["limitation"] = pm.extract("limitation", pType=str, allowEmpty=True, defaultValue="chars")
         elif self.params["type"] == "selection":
