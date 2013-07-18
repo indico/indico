@@ -387,8 +387,8 @@ def parseIndicoID(IndicoID):
     # number
     pConference      = re.compile('(\w*\d+)$')
     pSession         = re.compile('(\w*\d+)s(\d+)$')
-    pContribution    = re.compile('(\w*\d+)c(\d+)$')
-    pSubcontribution = re.compile('(\w*\d+)c(\d+)sc(\d+)$')
+    pContribution    = re.compile('(\w*\d+)c(\d+|s\d+t\d+)$')
+    pSubcontribution = re.compile('(\w*\d+)c(\d+|s\d+t\d+)sc(\d+)$')
 
     # perform the matches (match searches from the beginning of the string,
     # unlike search, which matches anywhere in the string)
