@@ -30,6 +30,13 @@
         </tr>
         <tr>
             <td>
+                <span class="subGroupTitleRegForm">
+                    <a href="${ pdfTicketURL }">${ _("Download ticket") }</a>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <span class="subGroupTitleRegForm">${ _("Registrant ID: ")}</span>
                 <span class="regFormDoneData">${ id }</span>
             </td>

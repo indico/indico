@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import session, request
+from cStringIO import StringIO
 
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay, RHConfSignIn
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -30,6 +31,8 @@ from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.utils import validMail
+from MaKaC.common import timezoneUtils
+from indico.web.flask.util import send_file
 
 
 class RHBaseRegistrationForm( RHConferenceBaseDisplay ):
@@ -197,6 +200,17 @@ class RHRegistrationFormCreationDone( RHRegistrationFormRegistrantBase ):
         if self._registrant is not None:
             p = registrationForm.WPRegistrationFormCreationDone(self, self._conf, self._registrant)
             return p.display()
+
+
+class RHConferenceTicketPDF(RHRegistrationFormCreationDone):
+
+    def _process(self):
+        tz = timezoneUtils.DisplayTZ(self._aw, self._target).getDisplayTZ()
+        filename = "%s - Ticket.pdf" % self._target.getTitle()
+        from MaKaC.PDFinterface.conference import TicketToPDF
+        pdf = TicketToPDF(self._target, self._registrant, tz=tz)
+        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
+
 
 class RHRegistrationFormconfirmBooking( RHRegistrationFormRegistrantBase ):
     _uh = urlHandlers.UHConfRegistrationFormDisplay

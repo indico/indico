@@ -2352,8 +2352,11 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
         if self._registrant.getRegistrationDate() is not None:
             wvars["registrationDate"] = self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M")
         wvars["otherSections"] = self._getFormSections()
-        wvars["paymentInfo"]  = self._getPaymentInfo()
+        wvars["paymentInfo"] = self._getPaymentInfo()
         wvars["epaymentAnnounce"] = ""
+        wvars["pdfTicketURL"] = urlHandlers.UHConferenceTicketPDF.getURL(
+            self._registrant)
+
         if self._conf.getModPay().isActivated() and self._registrant.doPay():
             wvars["epaymentAnnounce"] = """<br><span>Please proceed to the <b>payment of your order</b> (by using the "Next" button down this page). You will then receive the payment details.</span>"""
         return wvars

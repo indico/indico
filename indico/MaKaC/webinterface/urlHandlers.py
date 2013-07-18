@@ -2879,6 +2879,17 @@ class UHConfRegistrationFormCreationDone(URLHandler):
         return url
 
 
+class UHConferenceTicketPDF(URLHandler):
+    _endpoint = 'event.confRegistrationFormDisplay-ticket-pdf'
+
+    @classmethod
+    def getURL(cls, registrant):
+        url = cls._getURL()
+        url.setParams(registrant.getLocator())
+        url.addParam('authkey', registrant.getRandomId())
+        return url
+
+
 class UHConfRegistrationFormconfirmBooking(URLHandler):
     _endpoint = 'event.confRegistrationFormDisplay-confirmBooking'
 

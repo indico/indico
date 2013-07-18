@@ -36,6 +36,9 @@ event.add_url_rule('/registration/register', 'confRegistrationFormDisplay-creati
                    registrationFormDisplay.RHRegistrationFormCreation, methods=('POST',))
 event.add_url_rule('/registration/register/success', 'confRegistrationFormDisplay-creationDone',
                    registrationFormDisplay.RHRegistrationFormCreationDone)
+event.add_url_rule('/registration/register/ticket.pdf',
+                   'confRegistrationFormDisplay-ticket-pdf',
+                   registrationFormDisplay.RHConferenceTicketPDF)
 event.add_url_rule('/registration/register', 'confRegistrationFormDisplay-display',
                    registrationFormDisplay.RHRegistrationFormDisplay)
 event.add_url_rule('/registration/modify', 'confRegistrationFormDisplay-modify',
