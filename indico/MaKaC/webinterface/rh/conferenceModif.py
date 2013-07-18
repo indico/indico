@@ -3635,24 +3635,25 @@ class RHMaterialPackageAbstract(RHConferenceModifBase):
 
 class RHMaterialPackage(RHConferenceModifBase):
 
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._contribIds = self._normaliseListParam( params.get("contributions", []) )
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self._contribIds = self._normaliseListParam(params.get("contributions", []))
         self._contribs = []
         for id in self._contribIds:
             self._contribs.append(self._conf.getContributionById(id))
 
-    def _process( self ):
+    def _process(self):
         if not self._contribs:
             return "No contribution selected"
-        p=ContribPacker(self._conf)
-        path=p.pack(self._contribs,["paper","slides"], ZIPFileHandler())
+        p = ContribPacker(self._conf)
+        path = p.pack(self._contribs, ZIPFileHandler())
         filename = "material.zip"
         cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ZIP" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
+        mimetype = cfg.getFileTypeMimeType("ZIP")
+        self._req.content_type = """%s""" % (mimetype)
+        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\"""" % filename
         self._req.sendfile(path)
+
 
 class RHProceedings(RHConferenceModifBase):
 
