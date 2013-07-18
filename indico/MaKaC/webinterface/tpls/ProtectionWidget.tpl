@@ -20,7 +20,7 @@
 </div>
 
 <li id="protectionBar" class="protectionBar protectionBar${protection[0]}">
-    <img src=${ shieldIconURL} border="0" style="float:left; padding-right:5px">
+    <span class="icon-shield"></span>
     <a id="protectionLink">${protection[1]}</a>
 </li>
 
