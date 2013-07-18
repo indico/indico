@@ -113,7 +113,7 @@ class ContribPacker:
                     if isinstance(res, conference.LocalFile):
                         self._items += 1
                         fileHandler.add("%s/%s/%s-%s-%s" % (self._normalisePathItem(contribDirName),
-                                                            self._normalisePathItem(material.getId()),
+                                                            self._normalisePathItem(material.getTitle()),
                                                             self._normalisePathItem(contrib.getId()),
                                                             self._normalisePathItem(res.getId()),
                                                             self._normalisePathItem(res.getFileName())),
