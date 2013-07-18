@@ -94,13 +94,15 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         return True
 
     def createIdentity(self, li, avatar):
-        Logger.get("auth.ldap").info("createIdentity %s (%s %s)" % \
-                                     (li.getLogin(), avatar.getId(),
-                                      avatar.getEmail()))
+        Logger.get("auth.ldap").info("createIdentity %s (%s %s)" % (li.getLogin(), avatar.getId(), avatar.getEmail()))
         if self.checkLoginPassword(li.getLogin(), li.getPassword()):
             return LDAPIdentity(li.getLogin(), avatar)
         else:
             return None
+
+    def createIdentitySSO(self, login, avatar):
+        Logger.get("auth.ldap").info("createIdentitySSO %s (%s %s)" % (login, avatar.getId(), avatar.getEmail()))
+        return LDAPIdentity(login, avatar)
 
     def fetchIdentity(self, avatar):
         Logger.get("auth.ldap").info("fetchIdentity (%s %s)" % (avatar.getId(), avatar.getEmail()))

@@ -30,7 +30,6 @@ user.add_url_rule('/logout', 'logOut', login.RHSignOut)
 user.add_url_rule('/login', 'signIn', login.RHSignIn, methods=('GET', 'POST'))
 user.add_url_rule('/login/sso', 'signIn-sso', login.RHSignInSSO, methods=('GET', 'POST'))
 user.add_url_rule('/login/sso/<authId>', 'signIn-sso', login.RHSignInSSO, methods=('GET', 'POST'))
-user.add_url_rule('/login/sso/<authId>/execute', 'signIn-sso-execute', build_only=True)
 user.add_url_rule('/login/disabled', 'signIn-disabledAccount', login.RHDisabledAccount, methods=('GET', 'POST'))
 user.add_url_rule('/login/not-activated', 'signIn-unactivatedAccount', login.RHUnactivatedAccount)
 

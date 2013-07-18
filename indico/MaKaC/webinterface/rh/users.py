@@ -375,11 +375,10 @@ class RHUserIdentityCreation( RHUserIdentityBase ):
         self._ok = params.get("OK", "")
         self._params = params
 
-    def _process( self ):
-
-        if self._params.get("Cancel",None) is not None :
-            p = adminPages.WPUserDetails( self, self._avatar )
-            return p.display()
+    def _process(self):
+        if self._params.get("Cancel") is not None:
+            self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
+            return
 
         msg = ""
         if self._ok:
@@ -449,8 +448,8 @@ class RHUserIdentityChangePassword( RHUserIdentityBase ):
         RHUserIdentityBase._checkParams( self, params )
         self._params = params
 
-    def _process( self ):
-        if self._params.get("OK",None) is not None :
+    def _process(self):
+        if self._params.get("OK") is not None:
             if self._params.get("password","") == "" or self._params.get("passwordBis","") == "" :
                 self._params["msg"] = _("Both password and password confirmation fields must be filled up")
                 del self._params["OK"]
@@ -463,15 +462,13 @@ class RHUserIdentityChangePassword( RHUserIdentityBase ):
                 return p.display()
             identity = self._avatar.getIdentityById(self._params["login"], "Local")
             identity.setPassword(self._params["password"])
-            p = adminPages.WPUserDetails( self, self._avatar )
+            self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
+        elif self._params.get("Cancel") is not None:
+            self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
+        else:
+            self._params["msg"] = ""
+            p = adminPages.WPIdentityChangePassword(self, self._avatar, self._params)
             return p.display()
-        elif self._params.get("Cancel",None) is not None :
-            p = adminPages.WPUserDetails( self, self._avatar )
-            return p.display()
-
-        self._params["msg"] = ""
-        p = adminPages.WPIdentityChangePassword( self, self._avatar, self._params )
-        return p.display()
 
 
 class RHUserRemoveIdentity( RHUserIdentityBase ):

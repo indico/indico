@@ -41,14 +41,17 @@ class RHSignInBase( base.RH ):
     _tohttps = True
     _isMobile = False
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         self._signIn = params.get("signIn", "").strip()
-        self._login = params.get( "login", "" ).strip()
-        self._password = params.get( "password", "" )
-        self._returnURL = params.get( "returnURL", "").strip()
-
+        self._login = params.get("login", "").strip()
+        self._password = params.get("password", "")
+        self._returnURL = params.get("returnURL", "").strip()
+        if self._returnURL:
+            session['loginReturnURL'] = self._returnURL
 
     def _setSessionVars(self, av):
+        if not self._returnURL:
+            self._returnURL = session.pop('loginReturnURL', urlHandlers.UHWelcome.getURL())
         self._url = self._returnURL
         tzUtil = timezoneUtils.SessionTZ(av)
         tz = tzUtil.getSessionTZ()
@@ -113,13 +116,11 @@ class RHSignInSSO(RHSignInBase):
 
     def _checkParams(self, params):
         self._authId = params.get('authId', '').strip()
+        self._returnURL = params.get('returnURL', '')
 
     def _process(self):
         authenticator = session.pop('Authenticator', None)
-        if self._authId:
-            session['Authenticator'] = self._authId
-            self._redirect(str(urlHandlers.UHSignInSSOExecute.getURL(authId=self._authId)))
-        elif authenticator is not None:
+        if authenticator is not None:
             authManager = AuthenticatorMgr.getInstance()
             if not authManager.isSSOLoginActive():
                 raise MaKaCError(_("SSO Login is not active."))
@@ -128,6 +129,11 @@ class RHSignInSSO(RHSignInBase):
                 raise MaKaCError(_("You could not login through SSO."))
             self._setSessionVars(av)
             self._redirect(self._url)
+        elif self._authId:
+            session['Authenticator'] = self._authId
+            if self._returnURL:
+                session['loginReturnURL'] = self._returnURL
+            self._redirect(str(urlHandlers.UHSignInSSO.getURL(authId=self._authId)))
         else:
             raise MaKaCError(_("You did not pass the authenticator"))
 

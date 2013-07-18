@@ -21,9 +21,10 @@ from flask import request
 from persistent import Persistent
 
 from MaKaC.common.ObjectHolders import ObjectHolder
-from MaKaC.errors import UserError
+from MaKaC.errors import UserError, MaKaCError
 from MaKaC.i18n import _
 from MaKaC.common.Configuration import Config
+from MaKaC.user import LoginInfo
 
 """
 In this file the Authenticator base class is defined, also the PIdentity base.
@@ -129,10 +130,12 @@ class Authenthicator(ObjectHolder):
         """
         return None
 
-    def fetchIdentity(self, li, avatar):
-        """ Returns the created PIdentity object with the Avatar fetching from the authenticator
+    def createIdentitySSO(self, login, avatar):
+        """Like createIdentity but with just a login (coming from SSO) instead of a login/pw combination."""
+        return None
 
-            :type li: MaKaC.user.LoginInfo
+    def fetchIdentity(self, avatar):
+        """ Returns the created PIdentity object with the Avatar fetching from the authenticator
 
             :param avatar: an Avatar object of the user
             :type avatar: MaKaC.user.Avatar
@@ -215,11 +218,16 @@ class Authenthicator(ObjectHolder):
         """
         return False
 
-    def _postLogin(self, login, av):
-        if login != "" and not self.hasKey(login):
-            ni = self.createIdentity(av, login)
-            self.add(ni)
-        if login != "" and self.hasKey(login) and not av.getIdentityById(login, self.getId()):
+    def _postLogin(self, login, av, sso=False):
+        if not login:
+            return
+        if not self.hasKey(login):
+            if not sso:
+                # createIdentity expects a LoginInfo object, not a string!
+                # However, _postLogin is never called for a non-existant identity unless SSO has been used.
+                raise MaKaCError('postLogin called for new non-SSO identity')
+            self.add(self.createIdentitySSO(login, av))
+        elif not av.getIdentityById(login, self.getId()):
             av.addIdentity(self.getById(login))
 
 
@@ -303,7 +311,7 @@ class SSOHandler:
                 av.setPersonId(personId)
                 av.activateAccount()
 
-            self._postLogin(login, av)
+            self._postLogin(login, av, True)
             return av
         return None
 

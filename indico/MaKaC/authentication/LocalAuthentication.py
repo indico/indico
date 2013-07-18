@@ -35,6 +35,9 @@ class LocalAuthenticator(Authenthicator, SSOHandler):
     def createIdentity(self, li, avatar):
         return LocalIdentity(li.getLogin(), li.getPassword(), avatar)
 
+    def createIdentitySSO(self, login, avatar):
+        return LocalIdentity(login, None, avatar)
+
 
 class LocalIdentity(PIdentity):
 
@@ -44,9 +47,16 @@ class LocalIdentity(PIdentity):
 
     def setPassword(self, newPwd):
         self.algorithm = 'bcrypt'
-        self.password = bcrypt.hashpw(newPwd, bcrypt.gensalt())
+        if newPwd is not None:
+            self.password = bcrypt.hashpw(newPwd, bcrypt.gensalt())
+        else:
+            # This happens e.g. when SSO is used with Local identities.
+            # The user can add the password later if he wants to anyway
+            self.password = None
 
     def authenticate(self, id):
+        if self.password is None:
+            return None
         if self.getLogin() == id.getLogin() and self.password == bcrypt.hashpw(id.getPassword(), self.password):
             return self.user
         return None
