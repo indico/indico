@@ -38,14 +38,7 @@ from reportlab.lib.fonts import addMapping
 from MaKaC.i18n import _
 from MaKaC.common.utils import isStringHTML
 
-# PIL is the library used by reportlab to work with images.
-# If it isn't available, we must NOT put images in the PDF.
-# Then before add an image, we must check the HAVE_PIL global variable
-try :
-    from PIL import Image as PILImage
-    HAVE_PIL = True
-except ImportError, e:
-    HAVE_PIL = False
+from PIL import Image as PILImage
 
 ratio = math.sqrt(math.sqrt(2.0))
 
@@ -513,37 +506,35 @@ class PDFBase:
         return height
 
     def _drawLogo(self, c, drawTitle = True):
-        if HAVE_PIL:
-            logo = self._conf.getLogo()
-            imagePath = ""
-            if logo:
-                imagePath = logo.getFilePath()
-            if imagePath:
-                try:
-                    img = PILImage.open(imagePath)
-                    width, height = img.size
+        logo = self._conf.getLogo()
+        imagePath = ""
+        if logo:
+            imagePath = logo.getFilePath()
+        if imagePath:
+            try:
+                img = PILImage.open(imagePath)
+                width, height = img.size
 
-                    # resize in case too big for page
-                    if width > self._PAGE_WIDTH / 2:
-                        ratio =  float(height)/width
-                        width = self._PAGE_WIDTH / 2
-                        height = width * ratio
-                    startHeight = self._PAGE_HEIGHT
+                # resize in case too big for page
+                if width > self._PAGE_WIDTH / 2:
+                    ratio =  float(height)/width
+                    width = self._PAGE_WIDTH / 2
+                    height = width * ratio
+                startHeight = self._PAGE_HEIGHT
 
-                    if drawTitle:
-                        startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
+                if drawTitle:
+                    startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
 
-                    # lower edge of the image
-                    startHeight = startHeight - inch / 2 - height
+                # lower edge of the image
+                startHeight = startHeight - inch / 2 - height
 
-                    # draw horizontally centered, with recalculated width and height
-                    c.drawImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height, mask="auto")
-                    return startHeight
-                except IOError:
-                    if drawTitle:
-                        self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
+                # draw horizontally centered, with recalculated width and height
+                c.drawImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height, mask="auto")
+                return startHeight
+            except IOError:
+                if drawTitle:
+                    self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
         return 0
-
 
 
 def _doNothing(canvas, doc):

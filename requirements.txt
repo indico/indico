@@ -39,3 +39,5 @@ Werkzeug==0.9
 Flask==0.10
 bcrypt==1.0.2
 beautifulsoup4==4.2.1
+PIL==1.1.7
+qrcode==3.0
