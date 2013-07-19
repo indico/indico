@@ -138,7 +138,7 @@
     </div>
 
     <div id="contributionListDiv">
-        <%include file="SessionContributionList.tpl" args="accessWrapper=self_._aw"/>
+        <%include file="SessionContributionList.tpl" args="accessWrapper=self_._aw, poster=session.getScheduleType() == 'poster'"/>
     </div>
     % if session.getScheduleType() != "poster":
         <div id="timeTableDiv">
@@ -155,22 +155,25 @@
   var eventInfo = ${eventInfo | n,j};
 
   $(function() {
-    var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 710, $E('timeTableDiv'), new BrowserHistoryBroker());
-    $E('timeTableDiv').set(timetable.draw());
-    timetable.postDraw();
-    $("#timeTableTitle").click(function(){
-        $("#contribListTitle").css('font-weight','normal');
-        $("#timeTableTitle").css('font-weight','bold');
-        $('#contributionListDiv').hide();
-        $('#timeTableDiv').show();
-    });
+    % if session.getScheduleType() != "poster":
+        var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 710, $E('timeTableDiv'), new BrowserHistoryBroker());
+        $E('timeTableDiv').set(timetable.draw());
+        timetable.postDraw();
+        $("#timeTableTitle").click(function(){
+            $("#contribListTitle").css('font-weight','normal');
+            $("#timeTableTitle").css('font-weight','bold');
+            $('#contributionListDiv').hide();
+            $('#timeTableDiv').show();
+        });
+        $("#timeTableTitle").click();
+    % endif
+
     $("#contribListTitle").click(function(){
         $("#contribListTitle").css('font-weight','bold');
         $("#timeTableTitle").css('font-weight','normal');
         $('#contributionListDiv').show();
         $('#timeTableDiv').hide();
     });
-    $("#timeTableTitle").click();
 
     $("#manageMaterial").click(function(){
       IndicoUI.Dialogs.Material.editor(${session.getConference().getId() |n,j}, ${session.getId() |n,j},'','',

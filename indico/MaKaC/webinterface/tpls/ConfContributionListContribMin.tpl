@@ -21,7 +21,7 @@
                 <span style="font-weight:bold">${_("Track")}: </span>${contrib.getTrack().getTitle()}
             % endif
             % if poster == True and contrib.getBoardNumber() != '':
-                <span style="font-weight:bold">${_("Board Number")}: </span>
+                <span style="font-weight:bold">${_("Board #")}: </span>
                 ${contrib.getBoardNumber()}
             % endif;
         </div>
