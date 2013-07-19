@@ -45,7 +45,7 @@ from indico.util.caching import order_dict
 from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
-import indico.util.redis.avatar_links as avatar_links
+from indico.util.redis import avatar_links, suggestions
 
 """Contains the classes that implement the user management subsystem
 """
@@ -1430,6 +1430,7 @@ class AvatarHolder(ObjectHolder):
         # Merge avatars in redis
         if redis_write_client:
             avatar_links.merge_avatars(prin, merged)
+            suggestions.merge_avatars(prin, merged)
 
         # remove merged from holder
         self.remove(merged)

@@ -36,6 +36,8 @@ from MaKaC.authentication import AuthenticatorMgr
 from indico.core.db import DBMgr
 from MaKaC.common import pendingQueues
 from MaKaC.i18n import _
+from indico.util.redis import suggestions
+from indico.util.redis import write_client as redis_write_client
 
 
 class RHUserManagementSwitchAuthorisedAccountCreation( admins.RHAdminBase ):
@@ -283,6 +285,8 @@ class RHUserDashboard(RHUserBase):
 
     def _process(self):
         p = adminPages.WPUserDashboard(self, self._avatar)
+        if redis_write_client:
+            suggestions.schedule_check(self._avatar)
         return p.display()
 
 
