@@ -533,6 +533,26 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             });
         }
 
+        var template = function(value, key) {
+            var item;
+
+            if (self.isEdit) {
+                info.set("field_" + key, info.get("fields")[key]);
+            }
+
+            if (value._type == "AbstractSelectionField") {
+                var options = [];
+                for (var i=0, len=value.options.length; i<len; i++) {
+                    options.push(Html.option({"value": value.options[i]["id"]}, value.options[i]["value"]));
+                }
+                item = Html.select({}, options);
+            } else {
+                item = Html.textarea({cols: 50,rows: 2});
+            }
+
+            return [value.caption, $B(item, info.accessor('field_' + key))];
+        };
+
         if (!this.isConference || !this.isCFAEnabled) {
             // if it's a meeting, just add a description
             if(self.isEdit) info.set("field_content", info.get("fields")["content"]);
@@ -540,12 +560,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                                             info.accessor('field_content'))]];
         } else {
             // otherwise, add the abstract fields (conferences)
-            fields = translate(self.fields,
-                               function(value, key) {
-                                   if(self.isEdit) info.set("field_"+key, info.get("fields")[key]);
-                                   return [value, $B(Html.textarea({cols: 50,rows: 2}),
-                                                     info.accessor('field_'+key))];
-                               });
+            fields = translate(self.fields, template);
         }
 
         fields.push([$T('Keywords'), keywordField.element]);

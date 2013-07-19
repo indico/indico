@@ -460,17 +460,21 @@ class WContribModifMain(wcomponents.WTemplated):
         return html
 
     def _getAdditionalFieldsHTML(self):
-        html=""
+        html = ""
         if self._contrib.getConference().getAbstractMgr().isActive() and self._contrib.getConference().hasEnabledSection("cfa") and self._contrib.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
             for f in self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields():
                 if f.isActive():
                     id = f.getId()
                     caption = f.getName()
-                    html+="""
+                    if f.getType() == "selection":
+                        value = str(f.getOption(self._contrib.getField(id))) if f.getOption(self._contrib.getField(id)) else ""
+                    else:
+                        value = self._contrib.getField(id)
+                    html += """
                     <tr>
                         <td class="dataCaptionTD"><span class="dataCaptionFormat">%s</span></td>
                         <td bgcolor="white" class="blacktext"><table class="tablepre"><tr><td><pre>%s</pre></td></tr></table></td>
-                    </tr>"""%(caption, self.htmlText( self._contrib.getField(id) ))
+                    </tr>""" % (caption, self.htmlText(value))
         return html
 
     def _getParticipantsList(self, participantList):
@@ -774,15 +778,25 @@ class WContributionDataModification(wcomponents.WTemplated):
                 if f.isActive():
                     id = f.getId()
                     caption = f.getName()
-                    html+="""
+                    value = self._contrib.getField(id)
+                    if f.getType() == "selection":
+                        elem = "<select name='%s'>" % ("f_%s" % id)
+                        elem += "<option value=''>--%s--</option>" % (_("not specified"))
+                        for option in f.getOptions():
+                            selected = "selected" if option.getId() == value else ""
+                            elem += "<option value='%s' %s>%s</option>" % (option.getId(), selected, option.getValue())
+                        elem += "</select>"
+                    else:
+                        elem = "<textarea name='%s' cols='65' rows='10'>%s</textarea>" % ("f_%s" % id, self.htmlText(value))
+                    html += """
                     <tr>
                         <td nowrap class="titleCellTD">
                             <span class="titleCellFormat">%s</span>
                         </td>
                         <td bgcolor="white" width="100%%" valign="top" class="blacktext">
-                            <textarea name="%s" cols="65" rows="10">%s</textarea>
+                            %s
                         </td>
-                    </tr>"""%(caption, "f_%s"%id, self.htmlText(self._contrib.getField(id)))
+                    </tr>""" % (caption, elem)
         return html
 
     def getContribId(self):
