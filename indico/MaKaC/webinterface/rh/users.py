@@ -123,7 +123,7 @@ class RHUserCreation( RH ):
             if self._params.get("password","") != self._params.get("passwordBis",""):
                 self._params["msg"] += _("You must enter the same password twice.")+"<br>"
                 save = False
-            if not authManager.isLoginFree(self._params.get("login","")):
+            if not authManager.isLoginAvailable(self._params.get("login", "")):
                 self._params["msg"] += _("Sorry, the login you requested is already in use. Please choose another one.")+"<br>"
                 save = False
             if not self._validMail(self._params.get("email","")):
@@ -386,7 +386,7 @@ class RHUserIdentityCreation( RHUserIdentityBase ):
             ok = True
             authManager = AuthenticatorMgr.getInstance()
             #first, check if login is free
-            if not authManager.isLoginFree(self._login):
+            if not authManager.isLoginAvailable(self._login):
                 msg += "Sorry, the login you requested is already in use. Please choose another one.<br>"
                 ok = False
             if not self._pwd:
@@ -424,7 +424,7 @@ class RHUserIdPerformCreation( RHUserIdentityBase ):
     def _process( self ):
         authManager = AuthenticatorMgr.getInstance()
         #first, check if login is free
-        if not authManager.isLoginFree(self._login):
+        if not authManager.isLoginAvailable(self._login):
             self._redirect(self._fromURL + "&msg=Login not avaible")
             return
         #then, check if password is OK
