@@ -26,9 +26,5 @@ def index(req, **params):
 def actionSubCategs( req, **params ):
     return categoryMod.RHCategoryActionSubCategs( req ).process( params )
 
-
-def clearConferenceCaches( req, **params ):
-    return categoryMod.RHCategoryClearConferenceCaches( req ).process( params )
-
 def actionConferences( req, **params ):
     return categoryMod.RHCategoryActionConferences( req ).process( params )

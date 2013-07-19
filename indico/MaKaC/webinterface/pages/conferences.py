@@ -789,7 +789,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         return pars
 
     def _getBody( self, params ):
-        vars = self._getBodyVariables()
+        self._getBodyVariables()
         view = self._view
         outGen = outputGenerator(self._getAW())
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
@@ -799,8 +799,6 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
             else:
                 includeContribution = 0
             body = outGen.getFormattedOutput(self._rh, self._conf, styleMgr.getXSLPath(self._view), vars, 1, includeContribution, 1, 1, self._params.get("showSession", ""), self._params.get("showDate", ""))
-            if useManagerCache or useNormalCache:
-                cache.saveCachePage( body )
             return body
         else:
             return _("Cannot find the %s stylesheet") % view

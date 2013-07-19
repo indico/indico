@@ -403,12 +403,6 @@ class Category(CommonObjectBase):
         self.paper.setOwner( self )
         self.notifyModification()
 
-    def clearConferenceCaches( self ):
-        """ delete cache files of all conferences in the category
-        usually used for admin purposes """
-        for conf in self.getConferenceList():
-            conf.cleanCache()
-
     def removePaper( self ):
         if self.paper is None:
             return
