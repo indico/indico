@@ -30,69 +30,6 @@ import hashlib, os, shutil, datetime, time
 import cPickle as pickle
 from itertools import izip
 
-
-class IndicoCache:
-    """
-    Used to cache some pages in Indico
-    """
-    _subDirName = ""
-
-    def __init__( self, vars ):
-        pass
-
-    def getFileName( self ):
-        return ""
-
-    def lockCache( self, file, flag=True):
-        global fp
-        if flag:
-            fp = open(file,"a")
-            OSSpecific.lockFile(fp, 'LOCK_EX')
-        else:
-            if not fp:
-                return
-            OSSpecific.lockFile(fp, 'LOCK_UN')
-            fp.close()
-            fp = None
-
-    def getCachePath( self ):
-        path = os.path.join(Config.getInstance().getXMLCacheDir(),self._subDirName)
-        if not os.path.exists(path):
-            try:
-                os.mkdir(path)
-            except:
-                pass
-        return path
-
-    def getFilePath( self ):
-        return os.path.join(self.getCachePath(), self.getFileName())
-
-    def cleanCache( self ):
-        self.lockCache( self.getFilePath(), True )
-        if os.path.exists( self.getFilePath() ):
-            os.remove( self.getFilePath() )
-        self.lockCache( self.getFilePath(), False )
-
-    def cleanUpAllFiles( self ):
-        """ removes an entire cache directory"""
-        path = self.getCachePath()
-        if os.path.exists(path):
-            shutil.rmtree(path)
-
-    def getCachePage( self ):
-        if os.path.isfile(self.getFilePath()):
-            fp = open(self.getFilePath(),"r")
-            OSSpecific.lockFile(fp, 'LOCK_SH')
-            page = fp.read()
-            return page
-        return ""
-
-    def saveCachePage( self, page ):
-        self.lockCache( self.getFilePath(), True )
-        open(self.getFilePath(),"w").write( page )
-        self.lockCache( self.getFilePath(), False )
-
-
 class CacheStorage(object):
     __CACHE_STORAGE_LIST = {}
     __CACHE_STORAGE_DEFAULT = None
