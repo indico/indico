@@ -144,6 +144,9 @@ class DBMgr:
         return self._db.classFactory
 
     def commit(self, sub=False):
+        import StringIO
+        import transaction._transaction
+        transaction._transaction.StringIO = StringIO.StringIO
         if (sub):
             transaction.savepoint()
         else:

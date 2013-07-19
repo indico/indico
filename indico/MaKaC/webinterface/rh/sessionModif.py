@@ -115,8 +115,6 @@ class RHSessionDataModification(RoomBookingDBMixin, RHSessionModifBase):
     _uh = urlHandlers.UHSessionDataModification
 
     def _checkParams(self, params):
-        self._check = int(params.get("check", 1))
-        self._slmove = int(params.get("slmove", 0))
         RHSessionModifBase._checkParams(self, params)
         self._confirmed = "confirm" in params
         self._action = ""
@@ -138,7 +136,7 @@ class RHSessionDataModification(RoomBookingDBMixin, RHSessionModifBase):
         self._evt = self._session
 
     def _modify(self, params):
-        self._target.setValues(params, self._check, self._slmove)
+        self._target.setValues(params, 1)
         self._target.setScheduleType(
             params.get("tt_type", self._target.getScheduleType()))
 
