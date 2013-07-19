@@ -1325,7 +1325,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
                 %s
             </ul>
                    """) % (submitOpt)
-    return html
+        return html
 
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
