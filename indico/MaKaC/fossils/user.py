@@ -60,20 +60,21 @@ class IAvatarFossil(IAvatarMinimalFossil):
         """ Avatar organisation / affiliation """
     getOrganisation.name = "affiliation"
 
+    def getFax(self):
+        """ Avatar fax """
+
+    def getAddress( self ):
+        """ Avatar address """
 
 class IAvatarAllDetailsFossil(IAvatarFossil):
 
     def getSecondaryEmails( self ):
         """ Avatar secondary emails """
 
-    def getAddress( self ):
-        """ Avatar address """
-
     def getTelephone( self ):
         """ Avatar telephone """
 
-    def getFax(self):
-        """ Avatar fax """
+
 
 class IPersonalInfoFossil(IFossil):
 
