@@ -27,7 +27,7 @@ from MaKaC.common.contextManager import ContextManager
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from indico.core.index import Catalog
-from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
+from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WConfDisplayBodyBase
 from MaKaC.webinterface.simple_event import WPSimpleEventDisplay
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface import wcomponents, urlHandlers
@@ -487,20 +487,23 @@ class WPCollaborationDisplay(WPConferenceDefaultDisplayBase, WPCollaborationBase
         wc = WCollaborationDisplay.forModule(Collaboration, self._getAW(), self._conf)
         return wc.getHTML()
 
-class WCollaborationDisplay(wcomponents.WTemplated):
+
+class WCollaborationDisplay(WConfDisplayBodyBase):
+
+    _linkname = "collaboration"
 
     def __init__(self, aw, conference):
-        wcomponents.WTemplated.__init__(self)
+        WConfDisplayBodyBase.__init__(self)
         self._conf = conference
         self._tz = DisplayTZ(aw, conference).getDisplayTZ()
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
+        wvars = WConfDisplayBodyBase.getVars(self)
 
         csbm = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         pluginNames = csbm.getEventDisplayPlugins()
-        bookings = csbm.getBookingList(filterByType = pluginNames, notify = True, onlyPublic = True)
-        bookings.sort(key = lambda b: b.getStartDate() or minDatetime())
+        bookings = csbm.getBookingList(filterByType=pluginNames, notify=True, onlyPublic=True)
+        bookings.sort(key=lambda b: b.getStartDate() or minDatetime())
 
         timeless_bookings = []
         ongoingBookings = []
@@ -520,14 +523,15 @@ class WCollaborationDisplay(wcomponents.WTemplated):
         keys.sort()
         scheduledBookings = [(date, scheduledBookings[date]) for date in keys]
 
-        vars["OngoingBookings"] = ongoingBookings
-        vars["ScheduledBookings"] = scheduledBookings
-        vars["timeless_bookings"] = timeless_bookings
-        vars["all_bookings"] = fossilize(bookings)
-        vars["Timezone"] = self._tz
-        vars["conf"] = self._conf
+        wvars["body_title"] = self._getTitle()
+        wvars["OngoingBookings"] = ongoingBookings
+        wvars["ScheduledBookings"] = scheduledBookings
+        wvars["timeless_bookings"] = timeless_bookings
+        wvars["all_bookings"] = fossilize(bookings)
+        wvars["Timezone"] = self._tz
+        wvars["conf"] = self._conf
 
-        return vars
+        return wvars
 
 
 # Extra WP and W classes for the Electronic Agreement page

@@ -1,4 +1,4 @@
-<%inherit file="ConfDisplayBodyBase.tpl"/>
+<%inherit file="/ConfDisplayBodyBase.tpl"/>
 
 <%block name="title">
     ${body_title}
