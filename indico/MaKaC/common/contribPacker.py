@@ -112,34 +112,21 @@ class ContribPacker:
     def _normalisePathItem(self,name):
         return str(name).translate(string.maketrans("",""),"\\/")
 
-    def pack(self,contribList=[],materialTypes=[],fileHandler=None):
-        if len(contribList)<=0:
-            raise MaKaCError( _("no contribution to pack"))
+    def pack(self, contribList=[], fileHandler=None):
+        if len(contribList) <= 0:
+            raise MaKaCError(_("no contribution to pack"))
         for contrib in contribList:
-            spk=""
-            if len(contrib.getSpeakerList())>0:
-                spk=contrib.getSpeakerList()[0].getFamilyName().lower()
-            contribDirName="%s-%s"%(contrib.getId(),spk)
-            if "slides" in materialTypes and contrib.getSlides() is not None:
-                for res in contrib.getSlides().getResourceList():
-                    if isinstance(res,conference.LocalFile):
+            contribDirName = "%s_%s" % (contrib.getId(), contrib.getTitle())
+            for material in contrib.getAllMaterialList():
+                for res in material.getResourceList():
+                    if isinstance(res, conference.LocalFile):
                         self._items += 1
-                        fileHandler.add("%s/slides/%s-%s-%s"%(\
-                            self._normalisePathItem(contribDirName),
-                            self._normalisePathItem(contrib.getId()),
-                            self._normalisePathItem(res.getId()),
-                            self._normalisePathItem(res.getFileName())),
-                        res.getFilePath())
-            if "paper" in materialTypes and contrib.getPaper() is not None:
-                for res in contrib.getPaper().getResourceList():
-                    if isinstance(res,conference.LocalFile):
-                        self._items += 1
-                        fileHandler.add("%s/paper/%s-%s-%s"%(\
-                            self._normalisePathItem(contribDirName),
-                            self._normalisePathItem(contrib.getId()),
-                            self._normalisePathItem(res.getId()),
-                            self._normalisePathItem(res.getFileName())),
-                        res.getFilePath())
+                        fileHandler.add("%s/%s/%s-%s-%s" % (self._normalisePathItem(contribDirName),
+                                                            self._normalisePathItem(material.getTitle()),
+                                                            self._normalisePathItem(contrib.getId()),
+                                                            self._normalisePathItem(res.getId()),
+                                                            self._normalisePathItem(res.getFileName())),
+                                        res.getFilePath())
         fileHandler.close()
         return fileHandler.getPath()
 

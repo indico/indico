@@ -1502,7 +1502,10 @@ class NumberInput(FieldInputType):
             htmlName=item.getHTMLName()
 
         mandat = "false" if self._parent.isMandatory() else "true"
-        extra_check = "IndicoUtil.validate_number({minimum:%s})"%self.getMinValue() if self.getMinValue() != 0 else ""
+        if self.getMinValue() != 0:
+            extra_check = "IndicoUtil.validate_number({minimum:%s})" % self.getMinValue()
+        else:
+            extra_check = "function(){}"
         param = """<script>addParam($E('%s'), 'non_negative_int', %s, %s);</script>""" % (htmlName, mandat, extra_check)
 
         disable=""
@@ -1515,9 +1518,10 @@ class NumberInput(FieldInputType):
             length = 'size="6"'
         onkeyup = ""
         if billable:
-            onkeyup = """
-                onkeyup="$E('subtotal-%s').dom.innerHTML = ((isNaN(parseInt(this.value, 10)) || parseInt(this.value, 10) < 0) ? 0 : parseInt(this.value, 10)) * %s;"
-            """ % (htmlName, price)
+            onkeyup = """onkeyup="
+            var value = ((isNaN(parseInt(this.value, 10)) || parseInt(this.value, 10) < 0) ? 0 : parseInt(this.value, 10)) * %s;
+            $E('subtotal-%s').dom.innerHTML = parseInt(value) === parseFloat(value) ? value : value.toFixed(2);"
+            """ % (price, htmlName)
         tmp = """<input type="text" id="%s" name="%s" value="%s" %s %s %s /> %s""" % (htmlName, htmlName, v, onkeyup, disable, length, param)
         tmp= """ <td>%s</td>"""%tmp
         if billable:

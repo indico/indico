@@ -43,9 +43,9 @@
         <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
     </div>
     <span style="font-weight:bold;">${session.getTitle()}</span>
-    %  if len(item.getConvenerList()) > 0 or session.getConvenerText():
+    %  if len(item.getOwnConvenerList()) > 0 or session.getConvenerText():
     -<span style="color:green;">
-           ${common.renderUsers(item.getConvenerList(), unformatted=session.getConvenerText(), title=False, italicAffilation=False, separator=' ')}
+           ${common.renderUsers(item.getOwnConvenerList(), unformatted=session.getConvenerText(), title=False, italicAffilation=False, separator=' ')}
      </span>
     % endif
     % if not isTime0H0M(session.getAdjustedStartDate(timezone)):

@@ -251,6 +251,12 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
         pass
     getRoom.convert = lambda r: r and r.getName()
 
+    def getRoomFullName(self):
+        """ Session Room """
+    getRoomFullName.produce = lambda s: s.getRoom()
+    getRoomFullName.convert = Conversion.roomFullName
+    getRoomFullName.name = 'roomFullname'
+
     def getStartDate(self):
         pass
     getStartDate.convert = Conversion.datetime
@@ -297,6 +303,10 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
         pass
     getLocator.convert = Conversion.url(urlHandlers.UHContributionDisplay)
     getLocator.name = 'url'
+
+    def getKeywords(self):
+        pass
+    getKeywords.produce = lambda x: x.getKeywords().splitlines() if x.getKeywords().strip() else []
 
 
 class ISubContributionMetadataFossil(IFossil):

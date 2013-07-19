@@ -27,10 +27,10 @@
 
     <table class="sessionDetails">
         <tbody>
-        % if len(item.getConvenerList()) > 0 or session.getConvenerText():
+        % if len(item.getOwnConvenerList()) > 0 or session.getConvenerText():
             <tr>
-                <td class="leftCol">${ _("Conveners") if len(session.getConvenerList()) > 1 else _("Convener")}:</td>
-                <td>${common.renderUsers(item.getConvenerList(), unformatted=session.getConvenerText())}</td>
+                <td class="leftCol">${ _("Conveners") if len(item.getOwnConvenerList()) > 1 else _("Convener")}:</td>
+                <td>${common.renderUsers(item.getOwnConvenerList(), unformatted=session.getConvenerText())}</td>
             </tr>
         % endif
 

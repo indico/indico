@@ -3257,19 +3257,20 @@ class RHMaterialPackageAbstract(RHConferenceModifBase):
 
 class RHMaterialPackage(RHConferenceModifBase):
 
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        self._contribIds = self._normaliseListParam( params.get("contributions", []) )
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self._contribIds = self._normaliseListParam(params.get("contributions", []))
         self._contribs = []
         for id in self._contribIds:
             self._contribs.append(self._conf.getContributionById(id))
 
-    def _process( self ):
+    def _process(self):
         if not self._contribs:
             return "No contribution selected"
         p=ContribPacker(self._conf)
-        path=p.pack(self._contribs,["paper","slides"], ZIPFileHandler())
+        path=p.pack(self._contribs, ZIPFileHandler())
         return send_file('material.zip', path, 'ZIP', inline=False)
+
 
 class RHProceedings(RHConferenceModifBase):
 
@@ -4078,7 +4079,7 @@ class RHConfModifRoomBookingRoomDetails( RHConferenceModifRoomBookingBase, RHRoo
     _uh = urlHandlers.UHConfModifRoomBookingRoomDetails
 
     def _checkParams( self, params ):
-        RHRoomBookingBookingDetails._checkParams( self, params )
+        RHRoomBookingRoomDetails._checkParams(self, params)
         RHConferenceModifRoomBookingBase._checkParams(self, params)
 
     def _process( self ):
