@@ -93,7 +93,7 @@ class RHAbstractSubmissionBase(RHBaseCFA):
             p = abstracts.WPCFANotYetOpened(self, self._conf)
             return p.display()
         elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate():
-            p = abstracts.WPCFAClosed(self, self._conf)
+            p = abstracts.WPCFAClosed(self, self._conf, False)
             return p.display()
         else:
             return self._processIfOpened()
@@ -297,7 +297,7 @@ class RHAbstractModify(RHAbstractModificationAction, RHModificationBaseProtected
             return p.display()
         #elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate() :
         elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate() and timezoneUtils.nowutc() > modifDeadLine:
-            p = abstracts.WPCFAClosed(self, self._conf)
+            p = abstracts.WPCFAClosed(self, self._conf, True)
             return p.display()
         else:
             return self._processIfOpened()
@@ -423,7 +423,7 @@ class RHAbstractModificationBase(RHAbstractDisplayBase, RHModificationBaseProtec
             return p.display()
         #elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate() :
         elif timezoneUtils.nowutc() > cfaMgr.getEndSubmissionDate() and timezoneUtils.nowutc() > modifDeadLine:
-            p = abstracts.WPCFAClosed(self, self._conf)
+            p = abstracts.WPCFAClosed(self, self._conf, True)
             return p.display()
         else:
             return self._processIfOpened()

@@ -106,9 +106,13 @@ class WCFAClosed(WConfDisplayBodyBase):
 
 class WPCFAClosed(WPConferenceDefaultDisplayBase):
 
+    def __init__(self, rh, conf, is_modif):
+        WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
+        self._is_modif = is_modif
+
     def _getBody(self, params):
         wc = WCFAClosed(self._getAW(), self._conf)
-        return wc.getHTML()
+        return wc.getHTML({'is_modif': self._is_modif})
 
     def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)

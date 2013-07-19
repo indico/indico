@@ -7,7 +7,11 @@
 <%block name="content">
     <div class="info-message-box">
         <div class="message-text">
-            ${_("Sorry, but the deadline for abstract submission and modification finished on " + end_date + ".")}
+            % if is_modif: # easier to translate
+                ${_("Sorry, but the deadline for abstract modification finished on {date}.".format(date=end_date))}
+            % else:
+                ${_("Sorry, but the deadline for abstract submission finished on {date}.".format(date=end_date))}
+            % endif
         </div>
     </div>
 </%block>
