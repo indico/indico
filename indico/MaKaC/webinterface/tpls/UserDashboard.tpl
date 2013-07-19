@@ -54,10 +54,30 @@
                     </a></li>
                 % endfor
                 % endif
+                % if suggested_categories:
+                <li class="no-event" id="category-suggestion-header">
+                    <span class="event-title italic text-superfluous">${_("You might be interested in the following categories...")}</span>
+                </li>
+
+                % for category in suggested_categories:
+                    <li class="suggestion" data-id="${ category["categ"].getId() }">
+                        <a href="${urlHandlers.UHCategoryDisplay.getURL(category["categ"])}" class="truncate">
+                            <span class="category-name truncate-target">${category["categ"].getTitle()}</span>
+                            <span class="item-legend">
+                                <span title="${_('Click here to remove this suggestion. It will not be suggested again.')}" class="icon-close contextHelp active suggestion-remove"></span>
+                                <span title="${_('Click here to add this category to your favorites')}" class="icon-star contextHelp active suggestion-favorite"></span>
+                            </span>
+                            % if category["path"]:
+                                <span class="category-path">${category["path"]}</span>
+                            % endif
+                        </a>
+                    </li>
+                % endfor
+                % endif
                 </ol>
             </div>
             <div id="happeningCategories" class="dashboard-box">
-                <h3>${_("Happening in your categories")}</h3>
+                <h3>${_("Happening in your categories")}</h3
                 <ol>
                 % if not categories:
                     <li class="no-event">
@@ -198,6 +218,49 @@ $(document).ready(function(){
         var timezone_offset = "${offset}";
         return moment(date.date + " " + date.time + " " + timezone_offset);
     }
+
+    % if suggested_categories:
+        $('.suggestion-favorite').on('click', function(e) {
+            var container = $(this).closest('.suggestion');
+            var $this = $(this);
+            e.preventDefault();
+
+            indicoRequest('category.favorites.addCategory', {
+                categId: ''+container.data('id')
+            }, function(result, error) {
+                if (error) {
+                    $this.qtip({content: {text: $T('There has been an error. Please reload the page.')}});
+                    IndicoUtil.errorReport(error);
+                }
+                else {
+                    container.find('.suggestion-favorite').off('click').qtip('hide').qtip('disable');
+                    container.find('.suggestion-remove').remove();
+                    container.insertBefore('#category-suggestion-header');
+                }
+            });
+        });
+
+        $('.suggestion-remove').on('click', function(e) {
+            var container = $(this).closest('.suggestion');
+            var $this = $(this);
+            e.preventDefault();
+
+            indicoRequest('category.suggestions.delSuggestion', {
+                categId: ''+container.data('id')
+            }, function(result, error) {
+                if (error) {
+                    $this.qtip({content: {text: $T('There has been an error. Please reload the page.')}});
+                    IndicoUtil.errorReport(error);
+                }
+                else {
+                    container.remove();
+                    if(!$('#category-suggestion-header + li.suggestion').length) {
+                        $('#category-suggestion-header').remove();
+                    }
+                }
+            });
+        });
+    % endif
 
     var getDate = function(startDate, endDate) {
         var now = moment();

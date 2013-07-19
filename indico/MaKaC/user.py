@@ -474,6 +474,20 @@ class Avatar(Persistent, Fossilizable):
             }
         return OrderedDict(sorted(res.items(), key=operator.itemgetter(0)))
 
+    def getSuggestedCategories(self):
+        related = union(self.getLinkTo('category', 'favorite'), self.getLinkTo('category', 'manager'))
+        res = []
+        for id, score in suggestions.get_suggestions(self, 'category').iteritems():
+            categ = MaKaC.conference.CategoryManager().getById(id)
+            if not categ or categ in related:
+                continue
+            res.append({
+                'score': score,
+                'categ': categ,
+                'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
+            })
+        return res
+
     def resetLinkedTo(self):
         self.linkedTo = {}
         self.updateLinkedTo()

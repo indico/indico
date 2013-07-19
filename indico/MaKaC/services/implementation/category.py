@@ -22,6 +22,7 @@ Asynchronous request handlers for category-related services.
 
 from datetime import datetime
 from flask import session
+from indico.util.redis import suggestions
 from itertools import islice
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.services.implementation.base import ProtectedDisplayService
@@ -382,6 +383,8 @@ class CategoryFavoriteAdd(CategoryBasketBase):
         if self._categ is conference.CategoryManager().getRoot():
             raise ServiceError('ERR-U0', _('Cannot add root category as favorite'))
         self._avatar.linkTo(self._categ, 'favorite')
+        suggestions.unignore(self._avatar, 'category', self._categ.getId())
+        suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
 
     def _checkParams(self):
         CategoryDisplayBase._checkParams(self)
@@ -408,6 +411,20 @@ class CategoryFavoriteDel(CategoryBasketBase):
         CategoryDisplayBase._checkProtection(self)
 
 
+class CategorySuggestionDel(CategoryBasketBase):
+    def _getAnswer(self):
+        suggestions.unsuggest(self._avatar, 'category', self._categ.getId(), True)
+
+    def _checkParams(self):
+        CategoryDisplayBase._checkParams(self)
+        CategoryBasketBase._checkParams(self)
+
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
+        CategoryBasketBase._checkProtection(self)
+        CategoryDisplayBase._checkProtection(self)
+
+
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
@@ -423,5 +440,6 @@ methodMap = {
     "protection.toggleDomains": CategoryProtectionToggleDomains,
     "api.getExportURLs": CategoryExportURLs,
     "favorites.addCategory": CategoryFavoriteAdd,
-    "favorites.delCategory": CategoryFavoriteDel
+    "favorites.delCategory": CategoryFavoriteDel,
+    "suggestions.delSuggestion": CategorySuggestionDel
 }
