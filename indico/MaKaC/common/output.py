@@ -516,7 +516,7 @@ class outputGenerator(Observable):
         #plugins XML
         out.openTag("plugins")
         #we add all the information to be displayed by the plugins
-        self._notify('meetingAndLectureDisplay', {'out': out, 'conf': conf})
+        self._notify('meetingAndLectureDisplay', {'out': out, 'conf': conf, 'tz': tz})
         out.closeTag("plugins")
 
 
