@@ -77,7 +77,7 @@
                 </ol>
             </div>
             <div id="happeningCategories" class="dashboard-box">
-                <h3>${_("Happening in your categories")}</h3
+                <h3>${_("Happening in your categories")}</h3>
                 <ol>
                 % if not categories:
                     <li class="no-event">
