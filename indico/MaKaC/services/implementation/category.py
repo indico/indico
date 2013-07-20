@@ -400,6 +400,7 @@ class CategoryFavoriteDel(CategoryBasketBase):
 
     def _getAnswer(self):
         self._avatar.unlinkTo(self._categ, 'favorite')
+        suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
 
     def _checkParams(self):
         CategoryDisplayBase._checkParams(self)
