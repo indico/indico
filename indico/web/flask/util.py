@@ -30,7 +30,7 @@ from flask import url_for as _url_for
 from flask import send_file as _send_file
 from werkzeug.datastructures import Headers, FileStorage
 from werkzeug.exceptions import NotFound, HTTPException
-from werkzeug.routing import BaseConverter, RequestRedirect
+from werkzeug.routing import BaseConverter, UnicodeConverter, RequestRedirect
 from werkzeug.urls import url_parse
 
 from indico.util.caching import memoize
@@ -226,6 +226,7 @@ def url_rule_to_js(endpoint):
         endpoint = endpoint._endpoint
 
     # based on werkzeug.contrib.jsrouting
+    # we skip UnicodeConverter in the converters list since that one is the default and never needs custom js code
     return {
         'type': 'flask_rules',
         'endpoint': endpoint,
@@ -238,7 +239,10 @@ def url_rule_to_js(endpoint):
                         'is_dynamic': is_dynamic,
                         'data': data
                     } for is_dynamic, data in rule._trace
-                ]
+                ],
+                'converters': dict((key, type(converter).__name__)
+                                   for key, converter in rule._converters.iteritems()
+                                   if type(converter) is not UnicodeConverter)
             } for rule in app.url_map.iter_rules(endpoint)
         ]
     }
@@ -289,6 +293,8 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     return rv
 
 
+# Note: When adding custom converters please do not forget to add them to converter_functions in routing.js
+# if they need any custom processing (i.e. not just encodeURIComponent) in JavaScript.
 class ListConverter(BaseConverter):
     """Matches a dash-separated list"""
 

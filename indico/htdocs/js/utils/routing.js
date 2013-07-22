@@ -19,6 +19,16 @@
     BuildError.prototype = new Error();
     BuildError.prototype.constructor = BuildError;
 
+    var converter_functions = {
+        // Put any converter functions for custom URL converters here. The key is the converter's python class name.
+        // If there is no function, encodeURIComponent is used - so there's no need to put default converters here!
+        ListConverter: function(value) {
+            if (_.isArray(value)) {
+                value = value.join('-');
+            }
+            return encodeURIComponent(value);
+        }
+    };
 
     function split_obj(obj) {
         // Splits an object into keys and values (and the object itself for convenience)
@@ -67,7 +77,12 @@
         for (var i = 0; i < rule.trace.length; i++) {
             var part = rule.trace[i];
             if (part.is_dynamic) {
-                tmp.push(encodeURIComponent(args.original[part.data]));
+                var converter = converter_functions[rule.converters[part.data]] || encodeURIComponent;
+                var value = converter(args.original[part.data]);
+                if (value === null) {
+                    return null;
+                }
+                tmp.push(value);
                 processed.push(part.name);
             }
             else {
@@ -112,6 +127,9 @@
                 var rule = template.rules[i];
                 if (suitable(rule, args)) {
                     var res = build(rule, args);
+                    if (res === null) {
+                        continue;
+                    }
                     url = res.url;
                     qsParams = _.pick(params, res.unprocessed);
                     break;
