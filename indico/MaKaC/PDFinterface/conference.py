@@ -3237,21 +3237,25 @@ class TicketToPDF(PDFBase):
         self._drawWrappedString(c, escape(self._registrant.getFullName()),
                                 height=height, width=width, size=15,
                                 align="left", font='Times-Roman')
-        height -= 0.5*cm
-        self._drawWrappedString(c, escape(self._registrant.getInstitution()),
-                                height=height, width=width, size=15,
-                                align="left", font='Times-Roman')
+        if self._registrant.getInstitution():
+            height -= 0.5*cm
+            self._drawWrappedString(c,
+                                    escape(self._registrant.getInstitution()),
+                                    height=height, width=width, size=15,
+                                    align="left", font='Times-Roman')
         if self._registrant.getAddress():
             height -= 0.5*cm
             self._drawWrappedString(c, escape(self._registrant.getAddress()),
                                     height=height, width=width, size=15,
                                     align="left", font='Times-Roman')
-        height -= 0.5*cm
-        self._drawWrappedString(c, escape(self._registrant.getCity()),
-                                height=height, width=width, size=15,
-                                align="left", font='Times-Roman')
-        height -= 0.5*cm
-        self._drawWrappedString(c, escape(self._registrant.getCountry()),
-                                height=height, width=width, size=15,
-                                align="left", font='Times-Roman')
+        if self._registrant.getCity():
+            height -= 0.5*cm
+            self._drawWrappedString(c, escape(self._registrant.getCity()),
+                                    height=height, width=width, size=15,
+                                    align="left", font='Times-Roman')
+        if self._registrant.getCountry():
+            height -= 0.5*cm
+            self._drawWrappedString(c, escape(self._registrant.getCountry()),
+                                    height=height, width=width, size=15,
+                                    align="left", font='Times-Roman')
         c.restoreState()
