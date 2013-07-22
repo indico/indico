@@ -216,10 +216,6 @@ class UHSendLogin(URLHandler):
     _endpoint = 'user.signIn-sendLogin'
 
 
-class UHResetPassword(SecureURLHandler):
-    _endpoint = 'user.signIn-resetPassword'
-
-
 class UHUnactivatedAccount(URLHandler):
     _endpoint = 'user.signIn-unactivatedAccount'
 
@@ -1410,10 +1406,6 @@ class UHConfUserCreated(UHConfUser):
 
 class UHConfSendLogin(UHConfUser):
     _endpoint = 'event.confLogin-sendLogin'
-
-
-class UHConfResetPassword(SecureURLHandler):
-    _endpoint = 'event.confLogin-resetPassword'
 
 
 class UHConfSendActivation(UHConfUser):

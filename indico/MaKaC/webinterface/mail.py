@@ -25,6 +25,8 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common import Config
 from MaKaC.i18n import _
 
+from indico.web.flask.util import url_for
+
 
 def getSubjectIndicoTitle():
     minfo=HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -267,7 +269,7 @@ class sendLoginInfo:
     def __init__(self, user, event=None):
         self._user = user
         self._event = event
-        self._uh = urlHandlers.UHConfResetPassword if event else urlHandlers.UHResetPassword
+        self._endpoint = 'event.confLogin-resetPassword' if event else 'user.signIn-resetPassword'
 
     def send(self):
         idList = self._user.getIdentityList()
@@ -292,7 +294,7 @@ class sendLoginInfo:
                 while self._token_storage.get(token):
                     token = str(uuid.uuid4())
                 self._token_storage.set(token, data, 6*3600)
-                url = str(self._uh.getURL(self._event, token=token))
+                url = url_for(self._endpoint, self._event, token=token, _external=True, _secure=True)
                 logins.append({
                     'tag': tag,
                     'login': login,
