@@ -117,6 +117,10 @@ class ProgrammeToPDF(PDFBase):
             story = self._story
         style = styles["Normal"]
         style.alignment = TA_JUSTIFY
+        p = Paragraph(escape(self._conf.getProgramDescription()), style)
+        story.append(p)
+        story.append(Spacer(1, 0.4*inch))
+
         for track in self._conf.getTrackList():
 
             bogustext = track.getTitle()
