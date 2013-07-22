@@ -202,9 +202,8 @@ class RHSendLogin( base.RH ):
                 raise NoReportError(_("We couldn't find any account with this email address"))
             av = av_list[0]
         if av:
-            sm = mail.sendLoginInfo(av)
-            sm.send()
-        self._redirect(urlHandlers.UHSignIn.getURL() )
+            mail.send_login_info(av)
+        self._redirect(urlHandlers.UHSignIn.getURL())
 
 
 class RHResetPasswordBase:

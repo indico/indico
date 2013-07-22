@@ -315,9 +315,8 @@ class RHConfSendLogin( conferenceBase.RHConferenceBase ):
             except IndexError:
                 pass
         if av:
-            sm = mail.sendLoginInfo(av, self._conf)
-            sm.send()
-        self._redirect(urlHandlers.UHConfSignIn.getURL( self._conf ))
+            mail.send_login_info(av, self._conf)
+        self._redirect(urlHandlers.UHConfSignIn.getURL(self._conf))
 
 
 class RHConfResetPassword(RHResetPasswordBase, RHConferenceBase):
