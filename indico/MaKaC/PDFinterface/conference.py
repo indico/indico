@@ -3191,7 +3191,7 @@ class TicketToPDF(PDFBase):
 
         # Conference start and end date
         height -= 0.7*cm
-        self._drawWrappedString(c, "%s - %s"%(
+        self._drawWrappedString(c, "%s - %s" % (
             self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"),
             self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")),
             height=height, width=width, align="left", font="Times-Italic",
@@ -3200,10 +3200,11 @@ class TicketToPDF(PDFBase):
         # Conference location
         if self._conf.getLocation():
             height -= 0.7*cm
-            self._drawWrappedString(c,
-                            escape(self._conf.getLocation().getName()),
-                            height=height, width=width, size=15, align="left",
-                            font="Times-Italic")
+            self._drawWrappedString(
+                c,
+                escape(self._conf.getLocation().getName()),
+                height=height, width=width, size=15, align="left",
+                font="Times-Italic")
 
         # e-Ticket
         c.setFont('Times-Bold', 30)
@@ -3240,7 +3241,7 @@ class TicketToPDF(PDFBase):
         self._drawWrappedString(c, escape(self._registrant.getInstitution()),
                                 height=height, width=width, size=15,
                                 align="left", font='Times-Roman')
-        if (self._registrant.getAddress()):
+        if self._registrant.getAddress():
             height -= 0.5*cm
             self._drawWrappedString(c, escape(self._registrant.getAddress()),
                                     height=height, width=width, size=15,
