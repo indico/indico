@@ -829,7 +829,8 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
         _generateForm: function() {
             this._initializeForm();
             this._finalizeForm();
-            if (this.info.get("id") !== "") {
+
+            if (this.info.get("id") !== undefined) {
                 this.__fetch();
             }
         },
@@ -844,7 +845,7 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
         _getButtons: function() {
             var self = this;
 
-            var actionButton = [this.info.get("id") !== ""? $T('Update') : $T('Add'), function() {
+            var actionButton = [this.info.get("id") !== undefined? $T('Update') : $T('Add'), function() {
                 self.__submit();
             }];
 
@@ -912,7 +913,7 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
         this._parameterManager = new IndicoUtil.parameterManager();
         this._form = [];
 
-        var title = (fieldId !== ""? $T("Edit Field: ") : $T("Add Field: ")) + fieldTypeTitle;
+        var title = (fieldId !== undefined? $T("Edit Field: ") : $T("Add Field: ")) + fieldTypeTitle;
         this.ExclusivePopupWithButtons(title);
     }
 );
