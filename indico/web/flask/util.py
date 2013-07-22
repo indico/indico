@@ -174,7 +174,12 @@ def url_for(endpoint, target=None, **values):
     """Wrapper for Flask's url_for() function.
 
     Instead of an endpoint you can also pass an URLHandler - in this case **only** its _endpoint will be used.
-    The `target` argument allows you to pass some object having a `getLocator` method returning a dict.
+    However, there is usually no need to do so. This is just so you can use it in places where sometimes a UH
+    might be passed instead.
+
+    The `target` argument allows you to pass some object having a `getLocator` method returning a dict. This
+    should be used e.g. when generating an URL for an event since `getLocator()` provides the `{'confId': 123}`
+    dict instead of you having to pass `confId=event.getId()` as a kwarg.
 
     For details on Flask's url_for, please see its documentation.
     Anyway, the important arguments you can put in `values` besides actual arguments are:
