@@ -22,6 +22,10 @@
         });
     };
 
+    $.fn.hasCSS = function(propertyName, value) {
+        return this.css(propertyName) === value;
+    };
+
     var __gotoToday = $.datepicker._gotoToday;
 
     $.extend($.datepicker, {

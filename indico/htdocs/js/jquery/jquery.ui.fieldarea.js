@@ -32,7 +32,7 @@
         _create: function() {
             this.info = [];
 
-            this.element.addClass("field-area scrollable");
+            this.element.addClass("field-area");
             this._createList();
             this._handleEvents();
             this._drawList();
@@ -40,7 +40,7 @@
 
         destroy: function() {
             this.element.off("focusout click keyup propertychange paste");
-            this.element.removeClass("field-area scrollable");
+            this.element.removeClass("field-area");
             this.list.remove();
         },
 
