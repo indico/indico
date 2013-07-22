@@ -197,7 +197,7 @@ def url_for(endpoint, target=None, **values):
 
     if target is not None:
         locator = target.getLocator()
-        intersection = set(locator) & set(values)
+        intersection = set(locator.iterkeys()) & set(values.iterkeys())
         if intersection:
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
         values.update(locator)
