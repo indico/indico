@@ -318,19 +318,19 @@ class WPContributionModifTools(WPContributionModifBase):
         return wcomponents.WContribModifTool().getHTML({"deleteContributionURL": urlHandlers.UHContributionDelete.getURL(self._target)})
 
 
-class WPContributionModifMaterials( WPContributionModifBase ):
+class WPContributionModifMaterials(WPContributionModifBase):
 
     _userData = ['favorite-user-list']
 
     def __init__(self, rh, contribution):
         WPContributionModifBase.__init__(self, rh, contribution)
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabMaterials.setActive()
 
-    def _getTabContent( self, pars ):
-        wc=wcomponents.WShowExistingMaterial(self._target, mode='management', showTitle=True)
-        return wc.getHTML( pars )
+    def _getTabContent(self, pars):
+        wc = wcomponents.WShowExistingMaterial(self._target, mode='management', showTitle=True)
+        return wc.getHTML(pars)
 
 
 class WAuthorTable(wcomponents.WTemplated):
@@ -341,44 +341,45 @@ class WAuthorTable(wcomponents.WTemplated):
         self._contrib = contrib
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        urlGen=vars.get("modAuthorURLGen",None)
+        vars = wcomponents.WTemplated.getVars(self)
+        urlGen = vars.get("modAuthorURLGen", None)
         l = []
         for author in self._list:
-            authCaption=author.getFullName()
-            if author.getAffiliation()!="":
-                authCaption="%s (%s)"%(authCaption,author.getAffiliation())
+            authCaption = author.getFullName()
+            if author.getAffiliation() != "":
+                authCaption = "%s (%s)" % (authCaption, author.getAffiliation())
             if urlGen:
-                authCaption="""<a href=%s>%s</a>"""%(urlGen(author),self.htmlText(authCaption))
-            href ="\"\""
+                authCaption = """<a href=%s>%s</a>""" % (urlGen(author), self.htmlText(authCaption))
+            href = "\"\""
             if author.getEmail() != "":
-                mailtoSubject = """[%s] _("Contribution") %s: %s"""%( self._conf.getTitle(), self._contrib.getId(), self._contrib.getTitle() )
-                mailtoURL = "mailto:%s?subject=%s"%( author.getEmail(), urllib.quote( mailtoSubject ) )
-                href = quoteattr( mailtoURL )
-            emailHtml = """ <a href=%s><img src="%s" style="border:0px" alt="email"></a> """%(href, Config.getInstance().getSystemIconURL("smallEmail"))
-            upURLGen=vars.get("upAuthorURLGen",None)
-            up=""
+                mailtoSubject = """[%s] _("Contribution") %s: %s""" % (self._conf.getTitle(), self._contrib.getId(), self._contrib.getTitle())
+                mailtoURL = "mailto:%s?subject=%s" % (author.getEmail(), urllib.quote(mailtoSubject))
+                href = quoteattr(mailtoURL)
+            emailHtml = """ <a href=%s><img src="%s" style="border:0px" alt="email"></a> """ % (href, Config.getInstance().getSystemIconURL("smallEmail"))
+            upURLGen = vars.get("upAuthorURLGen", None)
+            up = ""
             if upURLGen is not None:
-                up="""<a href=%s><img src=%s border="0" alt="up"></a>"""%(quoteattr(str(upURLGen(author))),quoteattr(str(Config.getInstance().getSystemIconURL("upArrow"))))
-            downURLGen=vars.get("downAuthorURLGen",None)
-            down=""
+                up = """<a href=%s><img src=%s border="0" alt="up"></a>""" % (quoteattr(str(upURLGen(author))), quoteattr(str(Config.getInstance().getSystemIconURL("upArrow"))))
+            downURLGen = vars.get("downAuthorURLGen", None)
+            down = ""
             if downURLGen is not None:
-                down="""<a href=%s><img src=%s border="0" alt="down"></a>"""%(quoteattr(str(downURLGen(author))),quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))))
-            l.append("""<input type="checkbox" name="selAuthor" value=%s>%s%s%s %s"""%(quoteattr(author.getId()),up,down,emailHtml,authCaption))
+                down = """<a href=%s><img src=%s border="0" alt="down"></a>""" % (quoteattr(str(downURLGen(author))), quoteattr(str(Config.getInstance().getSystemIconURL("downArrow"))))
+            l.append("""<input type="checkbox" name="selAuthor" value=%s>%s%s%s %s""" % (quoteattr(author.getId()), up, down, emailHtml, authCaption))
         vars["authors"] = "<br>".join(l)
-        vars["remAuthorsURL"] = vars.get("remAuthorsURL","")
-        vars["addAuthorsURL"] = vars.get("addAuthorsURL","")
-        vars["searchAuthorURL"] = vars.get("searchAuthorURL","")
+        vars["remAuthorsURL"] = vars.get("remAuthorsURL", "")
+        vars["addAuthorsURL"] = vars.get("addAuthorsURL", "")
+        vars["searchAuthorURL"] = vars.get("searchAuthorURL", "")
         return vars
+
 
 class WContribModifMain(wcomponents.WTemplated):
 
-    def __init__( self, contribution, mfRegistry, eventType = "conference" ):
+    def __init__(self, contribution, mfRegistry, eventType="conference"):
         self._contrib = contribution
         self._mfRegistry = mfRegistry
         self._eventType = eventType
 
-    def _getAbstractHTML( self ):
+    def _getAbstractHTML(self):
         if not self._contrib.getConference().getAbstractMgr().isActive() or not self._contrib.getConference().hasEnabledSection("cfa"):
             return ""
         abs = self._contrib.getAbstract()
@@ -391,8 +392,8 @@ class WContribModifMain(wcomponents.WTemplated):
             <tr>
                 <td colspan="3" class="horizontalLine">&nbsp;</td>
             </tr>
-                """)%( quoteattr(str(urlHandlers.UHAbstractManagment.getURL(abs))),\
-                    self.htmlText(abs.getId()), abs.getTitle() )
+                """) % (quoteattr(str(urlHandlers.UHAbstractManagment.getURL(abs))),
+                        self.htmlText(abs.getId()), abs.getTitle())
         else:
             html = i18nformat("""
              <tr>
@@ -406,31 +407,31 @@ class WContribModifMain(wcomponents.WTemplated):
         return html
 
     def _getChangeTracksHTML(self):
-        res=[]
+        res = []
         if not self._contrib.getTrack() is None:
-            res=[ i18nformat("""<option value="">--_("none")--</option>""")]
+            res = [i18nformat("""<option value="">--_("none")--</option>""")]
         for track in self._contrib.getConference().getTrackList():
-            if self._contrib.getTrack()==track:
+            if self._contrib.getTrack() == track:
                 continue
-            res.append("""<option value=%s>%s</option>"""%(quoteattr(str(track.getId())),self.htmlText(track.getTitle())))
+            res.append("""<option value=%s>%s</option>""" % (quoteattr(str(track.getId())), self.htmlText(track.getTitle())))
         return "".join(res)
 
     def _getChangeSessionsHTML(self):
-        res=[]
+        res = []
         if not self._contrib.getSession() is None:
-            res=[ i18nformat("""<option value="">--_("none")--</option>""")]
+            res = [i18nformat("""<option value="">--_("none")--</option>""")]
         for session in self._contrib.getConference().getSessionListSorted():
-            if self._contrib.getSession()==session or session.isClosed():
+            if self._contrib.getSession() == session or session.isClosed():
                 continue
             from MaKaC.common.TemplateExec import truncateTitle
-            res.append("""<option value=%s>%s</option>"""%(quoteattr(str(session.getId())),self.htmlText(truncateTitle(session.getTitle(), 60))))
+            res.append("""<option value=%s>%s</option>""" % (quoteattr(str(session.getId())), self.htmlText(truncateTitle(session.getTitle(), 60))))
         return "".join(res)
 
     def _getWithdrawnNoticeHTML(self):
-        res=""
-        status=self._contrib.getCurrentStatus()
-        if isinstance(status,conference.ContribStatusWithdrawn):
-            res= i18nformat("""
+        res = ""
+        status = self._contrib.getCurrentStatus()
+        if isinstance(status, conference.ContribStatusWithdrawn):
+            res = i18nformat("""
                 <tr>
                     <td align="center"><b>--_("WITHDRAWN")--</b></td>
                 </tr>
@@ -438,16 +439,16 @@ class WContribModifMain(wcomponents.WTemplated):
         return res
 
     def _getWithdrawnInfoHTML(self):
-        status=self._contrib.getCurrentStatus()
-        if not isinstance(status,conference.ContribStatusWithdrawn):
+        status = self._contrib.getCurrentStatus()
+        if not isinstance(status, conference.ContribStatusWithdrawn):
             return ""
-        comment=""
-        if status.getComment()!="":
-            comment="""<br><i>%s"""%self.htmlText(status.getComment())
-        d=self.htmlText(status.getDate().strftime("%Y-%b-%D %H:%M"))
-        resp=""
+        comment = ""
+        if status.getComment() != "":
+            comment = """<br><i>%s""" % self.htmlText(status.getComment())
+        d = self.htmlText(status.getDate().strftime("%Y-%b-%D %H:%M"))
+        resp = ""
         if status.getResponsible() is not None:
-            resp="by %s"%self.htmlText(status.getResponsible().getFullName())
+            resp = "by %s" % self.htmlText(status.getResponsible().getFullName())
         html = i18nformat("""
      <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> _("Withdrawal information")</span></td>
@@ -456,7 +457,7 @@ class WContribModifMain(wcomponents.WTemplated):
     <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
-            """)%(d,resp,comment)
+            """) % (d, resp, comment)
         return html
 
     def _getAdditionalFieldsHTML(self):
@@ -493,10 +494,10 @@ class WContribModifMain(wcomponents.WTemplated):
             result.append(partFossil)
         return result
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         vars["eventType"] = self._eventType
-        vars["withdrawnNotice"]=self._getWithdrawnNoticeHTML()
+        vars["withdrawnNotice"] = self._getWithdrawnNoticeHTML()
         vars["locator"] = self._contrib.getLocator().getWebForm()
         vars["title"] = self._contrib.getTitle()
         if isStringHTML(self._contrib.getDescription()):
@@ -504,48 +505,48 @@ class WContribModifMain(wcomponents.WTemplated):
         else:
             vars["description"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._contrib.getDescription()
         vars["additionalFields"] = self._getAdditionalFieldsHTML()
-        vars["rowspan"]="6"
+        vars["rowspan"] = "6"
         vars["place"] = ""
         if self._contrib.getLocation():
-            vars["place"]=self.htmlText(self._contrib.getLocation().getName())
-        room=self._contrib.getRoom()
-        if room is not None and room.getName().strip()!="":
-            vars["place"]= i18nformat("""%s <br> _("Room"): %s""")%(vars["place"],self.htmlText(room.getName()))
-        if self._eventType == "conference" and self._contrib.getBoardNumber()!="" and self._contrib.getBoardNumber() is not None:
-            vars["place"]= i18nformat("""%s<br> _("Board #")%s""")%(vars["place"],self.htmlText(self._contrib.getBoardNumber()))
-        vars["id"] = self.htmlText( self._contrib.getId() )
-        vars["dataModificationURL"] = str( urlHandlers.UHContributionDataModification.getURL( self._contrib ) )
-        vars["duration"]=""
+            vars["place"] = self.htmlText(self._contrib.getLocation().getName())
+        room = self._contrib.getRoom()
+        if room is not None and room.getName().strip() != "":
+            vars["place"] = i18nformat("""%s <br> _("Room"): %s""") % (vars["place"], self.htmlText(room.getName()))
+        if self._eventType == "conference" and self._contrib.getBoardNumber() != "" and self._contrib.getBoardNumber() is not None:
+            vars["place"] = i18nformat("""%s<br> _("Board #")%s""") % (vars["place"], self.htmlText(self._contrib.getBoardNumber()))
+        vars["id"] = self.htmlText(self._contrib.getId())
+        vars["dataModificationURL"] = str(urlHandlers.UHContributionDataModification.getURL(self._contrib))
+        vars["duration"] = ""
         if self._contrib.getDuration() is not None:
-            vars["duration"]=(datetime(1900,1,1)+self._contrib.getDuration()).strftime("%Hh%M'")
+            vars["duration"] = (datetime(1900, 1, 1) + self._contrib.getDuration()).strftime("%Hh%M'")
         vars["type"] = ""
         if self._contrib.getType():
-            vars["type"] = self.htmlText( self._contrib.getType().getName() )
+            vars["type"] = self.htmlText(self._contrib.getType().getName())
         vars["track"] = i18nformat("""--_("none")--""")
         if self._contrib.getTrack():
-            vars["track"] = """<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHTrackModification.getURL(self._contrib.getTrack()))),self.htmlText(self._contrib.getTrack().getTitle()))
+            vars["track"] = """<a href=%s>%s</a>""" % (quoteattr(str(urlHandlers.UHTrackModification.getURL(self._contrib.getTrack()))), self.htmlText(self._contrib.getTrack().getTitle()))
         vars["session"] = ""
         if self._contrib.getSession():
-            vars["session"]="""<a href=%s>%s</a>"""%(quoteattr(str(urlHandlers.UHSessionModification.getURL(self._contrib.getSession()))),self.htmlText(self._contrib.getSession().getTitle()))
+            vars["session"] = """<a href=%s>%s</a>""" % (quoteattr(str(urlHandlers.UHSessionModification.getURL(self._contrib.getSession()))), self.htmlText(self._contrib.getSession().getTitle()))
         vars["abstract"] = ""
         if isinstance(self._contrib, conference.AcceptedContribution):
             vars["abstract"] = self._getAbstractHTML()
         vars["contrib"] = self._contrib
-        vars["selTracks"]=self._getChangeTracksHTML()
-        vars["setTrackURL"]=quoteattr(str(urlHandlers.UHContribModSetTrack.getURL(self._contrib)))
-        vars["selSessions"]=self._getChangeSessionsHTML()
-        vars["setSessionURL"]=quoteattr(str(urlHandlers.UHContribModSetSession.getURL(self._contrib)))
-        vars["contribXML"]=urlHandlers.UHContribToXMLConfManager.getURL(self._contrib)
-        vars["contribPDF"]=urlHandlers.UHContribToPDFConfManager.getURL(self._contrib)
+        vars["selTracks"] = self._getChangeTracksHTML()
+        vars["setTrackURL"] = quoteattr(str(urlHandlers.UHContribModSetTrack.getURL(self._contrib)))
+        vars["selSessions"] = self._getChangeSessionsHTML()
+        vars["setSessionURL"] = quoteattr(str(urlHandlers.UHContribModSetSession.getURL(self._contrib)))
+        vars["contribXML"] = urlHandlers.UHContribToXMLConfManager.getURL(self._contrib)
+        vars["contribPDF"] = urlHandlers.UHContribToPDFConfManager.getURL(self._contrib)
         vars["printIconURL"] = Config.getInstance().getSystemIconURL("pdf")
-        vars["xmlIconURL"]=Config.getInstance().getSystemIconURL("xml")
-        vars["withdrawURL"]=quoteattr(str(urlHandlers.UHContribModWithdraw.getURL(self._contrib)))
-        vars["withdrawnInfo"]=self._getWithdrawnInfoHTML()
-        vars["withdrawDisabled"]=False
-        if isinstance(self._contrib.getCurrentStatus(),conference.ContribStatusWithdrawn):
-            vars["withdrawDisabled"]=True
-        vars["reportNumbersTable"]=wcomponents.WReportNumbersTable(self._contrib,"contribution").getHTML()
-        vars["keywords"]=self._contrib.getKeywords()
+        vars["xmlIconURL"] = Config.getInstance().getSystemIconURL("xml")
+        vars["withdrawURL"] = quoteattr(str(urlHandlers.UHContribModWithdraw.getURL(self._contrib)))
+        vars["withdrawnInfo"] = self._getWithdrawnInfoHTML()
+        vars["withdrawDisabled"] = False
+        if isinstance(self._contrib.getCurrentStatus(), conference.ContribStatusWithdrawn):
+            vars["withdrawDisabled"] = True
+        vars["reportNumbersTable"] = wcomponents.WReportNumbersTable(self._contrib, "contribution").getHTML()
+        vars["keywords"] = self._contrib.getKeywords()
         if self._contrib.getSession():
             vars["sessionType"] = self._contrib.getSession().getScheduleType()
         else:
@@ -556,20 +557,21 @@ class WContribModifMain(wcomponents.WTemplated):
         return vars
 
 
-class WPContributionModification( WPContribModifMain ):
+class WPContributionModification(WPContribModifMain):
 
-    def _getTabContent( self, params ):
-        wc = WContribModifMain( self._contrib, materialFactories.ContribMFRegistry() )
+    def _getTabContent(self, params):
+        wc = WContribModifMain(self._contrib, materialFactories.ContribMFRegistry())
         return wc.getHTML()
 
-class WPContributionModificationClosed( WPContribModifMain ):
 
-    def _createTabCtrl( self ):
+class WPContributionModificationClosed(WPContribModifMain):
+
+    def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
-        self._tabMain = self._tabCtrl.newTab( "main", _("Main"), "")
+        self._tabMain = self._tabCtrl.newTab("main", _("Main"), "")
 
-    def _getTabContent( self, params ):
-        if self._contrib.getSession() != None:
+    def _getTabContent(self, params):
+        if self._contrib.getSession() is not None:
             message = _("The session is currently locked and you cannot modify it in this status. ")
             if self._contrib.getConference().canModify(self._rh.getAW()):
                 message += _("If you unlock the session, you will be able to modify its details again.")
@@ -582,30 +584,33 @@ class WPContributionModificationClosed( WPContribModifMain ):
             url = urlHandlers.UHConferenceOpen.getURL(self._contrib.getConference())
             unlockButtonCaption = _("Unlock event")
         return wcomponents.WClosed().getHTML({"message": message,
-                                             "postURL":url,
+                                             "postURL": url,
                                              "showUnlockButton": self._contrib.getConference().canModify(self._rh.getAW()),
                                              "unlockButtonCaption": unlockButtonCaption})
 
+
 class WContribModWithdraw(wcomponents.WTemplated):
 
-    def __init__(self,contrib):
-        self._contrib=contrib
+    def __init__(self, contrib):
+        self._contrib = contrib
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHContribModWithdraw.getURL(self._contrib)))
-        vars["comment"]=self.htmlText("")
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["postURL"] = quoteattr(str(urlHandlers.UHContribModWithdraw.getURL(self._contrib)))
+        vars["comment"] = self.htmlText("")
         return vars
+
 
 class WPModWithdraw(WPContribModifMain):
 
-    def _getTabContent(self,params):
-        wc=WContribModWithdraw(self._target)
+    def _getTabContent(self, params):
+        wc = WContribModWithdraw(self._target)
         return wc.getHTML()
+
 
 class WContribModifAC(wcomponents.WTemplated):
 
-    def __init__( self, contrib ):
+    def __init__(self, contrib):
         self._contrib = contrib
 
     def _getManagersList(self):
@@ -645,21 +650,21 @@ class WContribModifAC(wcomponents.WTemplated):
             result.append(pendingUser)
         return result
 
-    def getVars( self ):
-        vars=wcomponents.WTemplated.getVars( self )
-        mcf=wcomponents.WModificationControlFrame()
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        mcf = wcomponents.WModificationControlFrame()
         vars["modifyControlFrame"] = mcf.getHTML(self._contrib)
-        acf=wcomponents.WAccessControlFrame()
+        acf = wcomponents.WAccessControlFrame()
         visURL = urlHandlers.UHContributionSetVisibility.getURL(self._contrib)
 
         if isinstance(self._contrib.getOwner(), conference.Session):
-            vars["accessControlFrame"]=acf.getHTML(self._contrib, visURL, "InSessionContribution")
-        else :
-            vars["accessControlFrame"]=acf.getHTML(self._contrib, visURL, "Contribution")
+            vars["accessControlFrame"] = acf.getHTML(self._contrib, visURL, "InSessionContribution")
+        else:
+            vars["accessControlFrame"] = acf.getHTML(self._contrib, visURL, "Contribution")
 
         if not self._contrib.isProtected():
-            df=wcomponents.WDomainControlFrame( self._contrib )
-            vars["accessControlFrame"] += "<br>%s"%df.getHTML()
+            df = wcomponents.WDomainControlFrame(self._contrib)
+            vars["accessControlFrame"] += "<br>%s" % df.getHTML()
         vars["confId"] = self._contrib.getConference().getId()
         vars["contribId"] = self._contrib.getId()
         vars["eventType"] = self._contrib.getConference().getType()
@@ -668,19 +673,19 @@ class WContribModifAC(wcomponents.WTemplated):
         return vars
 
 
-class WPContribModifAC( WPContributionModifBase ):
+class WPContribModifAC(WPContributionModifBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabAC.setActive()
 
-    def _getTabContent( self, params ):
-        wc=WContribModifAC(self._target)
+    def _getTabContent(self, params):
+        wc = WContribModifAC(self._target)
         return wc.getHTML()
 
 
-class WPContribModifSC( WPContributionModifBase ):
+class WPContribModifSC(WPContributionModifBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabSubCont.setActive()
 
     def _getTabContent(self, params):
@@ -694,37 +699,36 @@ class WPContribModifSC( WPContributionModifBase ):
 
 #-----------------------------------------------------------------------------
 
+
 class WSubContributionCreation(wcomponents.WTemplated):
 
-    def __init__( self, target ):
+    def __init__(self, target):
         self.__owner = target
         self._contribution = target
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["title"] = vars.get("title","")
-        vars["description"] = vars.get("description","")
-        vars["durationHours"] = vars.get("durationHours","0")
-        vars["durationMinutes"] = vars.get("durationMinutes","15")
-        vars["keywords"] = vars.get("keywords","")
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["title"] = vars.get("title", "")
+        vars["description"] = vars.get("description", "")
+        vars["durationHours"] = vars.get("durationHours", "0")
+        vars["durationMinutes"] = vars.get("durationMinutes", "15")
+        vars["keywords"] = vars.get("keywords", "")
         vars["locator"] = self.__owner.getLocator().getWebForm()
         vars["authors"] = fossilize(self._contribution.getAllAuthors())
         vars["eventType"] = self._contribution.getConference().getType()
         return vars
 
 
-class WPContribAddSC( WPContributionModifBase ):
+class WPContribAddSC(WPContributionModifBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabSubCont.setActive()
 
-    def _getTabContent( self, params ):
-
+    def _getTabContent(self, params):
         wc = WSubContributionCreation( self._target )
         pars = {"postURL": urlHandlers.UHContribCreateSubCont.getURL(self._contrib)}
         params.update(pars)
-
-        return wc.getHTML( params )
+        return wc.getHTML(params)
 
 
 #---------------------------------------------------------------------------
@@ -735,22 +739,24 @@ class WContributionDataModificationBoard(wcomponents.WTemplated):
     def __init__(self):
         pass
 
-    def getVars( self ):
-        vars=wcomponents.WTemplated.getVars(self)
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         return vars
+
 
 class WContributionDataModificationType(wcomponents.WTemplated):
 
     def __init__(self):
         pass
 
-    def getVars( self ):
-        vars=wcomponents.WTemplated.getVars(self)
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         return vars
+
 
 class WContributionDataModification(wcomponents.WTemplated):
 
-    def __init__( self, contribution, conf, rh = None ):
+    def __init__(self, contribution, conf, rh=None):
         self._contrib = contribution
         self._owner = self._contrib.getOwner()
         self._conf = conf
@@ -758,18 +764,18 @@ class WContributionDataModification(wcomponents.WTemplated):
 
     def _getTypeItemsHTML(self):
         res = ["""<option value=""></option>"""]
-        conf=self._contrib.getConference()
+        conf = self._contrib.getConference()
         for type in conf.getContribTypeList():
-            selected=""
-            if self._contrib.getType()==type:
-                selected=" selected"
-            res.append("""<option value=%s%s>%s</option>"""%(\
-                quoteattr(str(type.getId())),selected,\
+            selected = ""
+            if self._contrib.getType() == type:
+                selected = " selected"
+            res.append("""<option value=%s%s>%s</option>""" % (
+                quoteattr(str(type.getId())), selected,
                 self.htmlText(type.getName())))
         return "".join(res)
 
     def _getAdditionalFieldsHTML(self):
-        html=""
+        html = ""
         if self._contrib.getConference().getAbstractMgr().isActive() and \
                 self._contrib.getConference().hasEnabledSection("cfa") and \
                 self._contrib.getConference().getType() == "conference" and \

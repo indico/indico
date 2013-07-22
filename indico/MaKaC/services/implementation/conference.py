@@ -72,19 +72,18 @@ class ConferenceBase:
     Base class for conference modification
     """
 
-    def _checkParams( self ):
+    def _checkParams(self):
 
         try:
-            self._target = self._conf = conference.ConferenceHolder().getById(self._params["conference"]);
+            self._target = self._conf = conference.ConferenceHolder().getById(self._params["conference"])
         except:
             try:
-                self._target = self._conf = conference.ConferenceHolder().getById(self._params["confId"]);
+                self._target = self._conf = conference.ConferenceHolder().getById(self._params["confId"])
             except:
                 raise ServiceError("ERR-E4", "Invalid conference id.")
-            if self._target == None:
+            if self._target is None:
                 Logger.get('rpc.conference').debug('self._target is null')
                 raise Exception("Null target.")
-
 
     def _getCheckFlag(self):
         """
@@ -102,18 +101,20 @@ class ConferenceModifBase(ProtectedModificationService, ConferenceBase):
         ConferenceBase._checkParams(self)
         ProtectedModificationService._checkParams(self)
 
+
 class ConferenceScheduleModifBase(ConferenceModifBase):
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
         if not self._params.has_key("scheduleEntry"):
             raise ServiceError("ERR-E4", "No scheduleEntry id set.")
         self._schEntry = self._conf.getSchedule().getEntryById(self._params["scheduleEntry"])
-        if self._schEntry == None:
+        if self._schEntry is None:
             raise NoReportError(_("It seems that the entry has been deleted or moved, please refresh the page"))
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         self._target = self._schEntry.getOwner()
         ConferenceModifBase._checkProtection(self)
+
 
 class ConferenceDisplayBase(ProtectedDisplayService, ConferenceBase):
 
@@ -121,30 +122,34 @@ class ConferenceDisplayBase(ProtectedDisplayService, ConferenceBase):
         ConferenceBase._checkParams(self)
         ProtectedDisplayService._checkParams(self)
 
+
 class ConferenceTextModificationBase(TextModificationBase, ConferenceModifBase):
     #Note: don't change the order of the inheritance here!
     pass
+
 
 class ConferenceHTMLModificationBase(HTMLModificationBase, ConferenceModifBase):
     #Note: don't change the order of the inheritance here!
     pass
 
+
 class ConferenceDateTimeModificationBase (DateTimeModificationBase, ConferenceModifBase):
     #Note: don't change the order of the inheritance here!
     pass
+
 
 class ConferenceListModificationBase (ListModificationBase, ConferenceModifBase):
     #Note: don't change the order of the inheritance here!
     pass
 
 
-class ConferenceTitleModification( ConferenceTextModificationBase ):
+class ConferenceTitleModification(ConferenceTextModificationBase):
     """
     Conference title modification
     """
     def _handleSet(self):
         title = self._value
-        if (title ==""):
+        if (title == ""):
             raise ServiceError("ERR-E2",
                                "The title cannot be empty")
         self._target.setTitle(self._value)
@@ -153,7 +158,7 @@ class ConferenceTitleModification( ConferenceTextModificationBase ):
         return self._target.getTitle()
 
 
-class ConferenceDescriptionModification( ConferenceHTMLModificationBase ):
+class ConferenceDescriptionModification(ConferenceHTMLModificationBase):
     """
     Conference description modification
     """
@@ -163,7 +168,8 @@ class ConferenceDescriptionModification( ConferenceHTMLModificationBase ):
     def _handleGet(self):
         return self._target.getDescription()
 
-class ConferenceAdditionalInfoModification( ConferenceHTMLModificationBase ):
+
+class ConferenceAdditionalInfoModification(ConferenceHTMLModificationBase):
     """
     Conference additional info (a.k.a contact info) modification
     """
@@ -173,7 +179,8 @@ class ConferenceAdditionalInfoModification( ConferenceHTMLModificationBase ):
     def _handleGet(self):
         return self._target.getContactInfo()
 
-class ConferenceTypeModification( ConferenceTextModificationBase ):
+
+class ConferenceTypeModification(ConferenceTextModificationBase):
     """
     Conference title modification
     """
@@ -196,7 +203,7 @@ class ConferenceTypeModification( ConferenceTextModificationBase ):
         return self._target.getType()
 
 
-class ConferenceBookingModification( ConferenceTextModificationBase ):
+class ConferenceBookingModification(ConferenceTextModificationBase):
     """
     Conference location name modification
     """
@@ -208,7 +215,7 @@ class ConferenceBookingModification( ConferenceTextModificationBase ):
         newLocation = self._value.get('location')
         newRoom = self._value.get('room')
 
-        if room == None:
+        if room is None:
             room = conference.CustomRoom()
             self._target.setRoom(room)
 
@@ -223,7 +230,7 @@ class ConferenceBookingModification( ConferenceTextModificationBase ):
                 room.fullName = None
             changed = True
 
-        if loc == None:
+        if loc is None:
             loc = conference.CustomLocation()
             self._target.setLocation(loc)
 
@@ -241,11 +248,12 @@ class ConferenceBookingModification( ConferenceTextModificationBase ):
         loc = self._target.getLocation()
         room = self._target.getRoom()
 
-        return { 'location': loc.getName() if loc else "",
-                 'room': room.name if room else "",
-                 'address': loc.getAddress() if loc else "" }
+        return {'location': loc.getName() if loc else "",
+                'room': room.name if room else "",
+                'address': loc.getAddress() if loc else ""}
 
-class ConferenceBookingDisplay( ConferenceDisplayBase ):
+
+class ConferenceBookingDisplay(ConferenceDisplayBase):
     """
         Conference location
     """
@@ -263,11 +271,12 @@ class ConferenceBookingDisplay( ConferenceDisplayBase ):
         else:
             roomName = ''
 
-        return { 'location': locName,
-                 'room': roomName,
-                 'address': locAddress }
+        return {'location': locName,
+                'room': roomName,
+                'address': locAddress}
 
-class ConferenceShortURLModification( ConferenceTextModificationBase ):
+
+class ConferenceShortURLModification(ConferenceTextModificationBase):
     """
     Conference short URL modification
     """
@@ -286,7 +295,8 @@ class ConferenceShortURLModification( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._target.getUrlTag()
 
-class ConferenceTimezoneModification( ConferenceTextModificationBase ):
+
+class ConferenceTimezoneModification(ConferenceTextModificationBase):
     """
     Conference Timezone modification
     """
@@ -296,7 +306,8 @@ class ConferenceTimezoneModification( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._target.getTimezone()
 
-class ConferenceKeywordsModification( ConferenceTextModificationBase ):
+
+class ConferenceKeywordsModification(ConferenceTextModificationBase):
     """
     Conference keywords modification
     """
@@ -306,7 +317,8 @@ class ConferenceKeywordsModification( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._target.getKeywords()
 
-class ConferenceSpeakerTextModification( ConferenceTextModificationBase ):
+
+class ConferenceSpeakerTextModification(ConferenceTextModificationBase):
     """ Conference chairman text modification (for conferences and meetings)
     """
     def _handleSet(self):
@@ -315,7 +327,8 @@ class ConferenceSpeakerTextModification( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._target.getChairmanText()
 
-class ConferenceOrganiserTextModification( ConferenceTextModificationBase ):
+
+class ConferenceOrganiserTextModification(ConferenceTextModificationBase):
     """ Conference organiser text modification (for lectures)
     """
     def _handleSet(self):
@@ -324,7 +337,8 @@ class ConferenceOrganiserTextModification( ConferenceTextModificationBase ):
     def _handleGet(self):
         return self._target.getOrgText()
 
-class ConferenceSupportModification( ConferenceTextModificationBase ):
+
+class ConferenceSupportModification(ConferenceTextModificationBase):
     """
     Conference support caption and e-mail modification
     """
@@ -351,7 +365,8 @@ class ConferenceSupportModification( ConferenceTextModificationBase ):
     def _handleGet(self):
         return fossilize(self._supportInfo)
 
-class ConferenceDefaultStyleModification( ConferenceTextModificationBase ):
+
+class ConferenceDefaultStyleModification(ConferenceTextModificationBase):
     """
     Conference default style modification
     """
@@ -363,7 +378,8 @@ class ConferenceDefaultStyleModification( ConferenceTextModificationBase ):
         dispManReg = displayMgr.ConfDisplayMgrRegistery()
         return dispManReg.getDisplayMgr(self._target).getDefaultStyle()
 
-class ConferenceVisibilityModification( ConferenceTextModificationBase ):
+
+class ConferenceVisibilityModification(ConferenceTextModificationBase):
     """
     Conference visibility modification
     """
@@ -372,13 +388,14 @@ class ConferenceVisibilityModification( ConferenceTextModificationBase ):
         try:
             val = int(self._value)
         except ValueError:
-            raise ServiceError("ERR-E1","Invalid value type for property")
+            raise ServiceError("ERR-E1", "Invalid value type for property")
         self._target.setVisibility(val)
 
     def _handleGet(self):
         return self._target.getVisibility()
 
-class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
+
+class ConferenceStartEndDateTimeModification(ConferenceModifBase):
     """
     Conference start date/time modification
 
@@ -402,7 +419,7 @@ class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
             self._startDate = pm.extract('startDate', pType=datetime.datetime)
             self._endDate = pm.extract('endDate', pType=datetime.datetime)
         except ValueError, e:
-            raise NoReportError("Warning",e.message)
+            raise NoReportError("Warning", e.message)
         self._shiftTimes = pm.extract('shiftTimes', pType=bool)
 
     def _getAnswer(self):
@@ -424,11 +441,11 @@ class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
         try:
             self._target.setDates(self._startDate,
                                   self._endDate,
-                                  moveEntries = moveEntries)
-        except TimingError,e:
+                                  moveEntries=moveEntries)
+        except TimingError, e:
             raise TimingNoReportError(e.getMsg(),
-                                      title = _("Cannot set event dates"),
-                                      explanation = e.getExplanation())
+                                      title=_("Cannot set event dates"),
+                                      explanation=e.getExplanation())
 
         dateChangeNotificationProblems = ContextManager.get('dateChangeNotificationProblems')
 
@@ -447,13 +464,14 @@ class ConferenceStartEndDateTimeModification( ConferenceModifBase ):
         else:
             return self._params.get('value')
 
-class ConferenceListUsedRooms( ConferenceDisplayBase ):
+
+class ConferenceListUsedRooms(ConferenceDisplayBase):
     """
     Get rooms that are used in the context of the conference:
      * Booked in CRBS
      * Already chosen in sessions
     """
-    def _getAnswer( self ):
+    def _getAnswer(self):
         """
         Calls _handle() on the derived classes, in order to make it happen. Provides
         them with self._value.
@@ -465,7 +483,7 @@ class ConferenceListUsedRooms( ConferenceDisplayBase ):
         return roomList
 
 
-class ConferenceDateTimeEndModification( ConferenceDateTimeModificationBase ):
+class ConferenceDateTimeEndModification(ConferenceDateTimeModificationBase):
     """ Conference end date/time modification
         When changing the end date / time, the _setParam method will be called by DateTimeModificationBase's _handleSet method.
         The _setParam method will return None (if there are no problems),
@@ -479,7 +497,7 @@ class ConferenceDateTimeEndModification( ConferenceDateTimeModificationBase ):
 
         if (self._pTime < self._target.getStartDate()):
             raise ServiceError("ERR-E3",
-                               "Date/time of end cannot "+
+                               "Date/time of end cannot " +
                                "be lower than data/time of start")
         self._target.setDates(self._target.getStartDate(),
                               self._pTime.astimezone(timezone("UTC")),
@@ -498,7 +516,6 @@ class ConferenceDateTimeEndModification( ConferenceDateTimeModificationBase ):
         else:
             return None
 
-
     def _handleGet(self):
         return datetime.datetime.strftime(self._target.getAdjustedEndDate(),
                                           '%d/%m/%Y %H:%M')
@@ -514,7 +531,7 @@ class ConferenceListSessions (ConferenceListModificationBase):
 
         for sess in sessions:
             for slot in sess.getSortedSlotList():
-                time = " (" + formatDateTime(slot.getAdjustedStartDate(), format = "dd MMM yyyy HH:mm") + ")"
+                time = " (" + formatDateTime(slot.getAdjustedStartDate(), format="dd MMM yyyy HH:mm") + ")"
                 result["s"+sess.getId()+"l"+slot.getId()] = sess.getTitle() + (" - " + slot.getTitle() if slot.getTitle() else "") + time
 
         return result
@@ -530,7 +547,7 @@ class ConferenceListContributions (ConferenceListModificationBase):
         result = {}
         for cont in contributions:
             session = (" (" + cont.getSession().getTitle() + ")") if (cont.getSession() is not None) else ""
-            time = " (" + formatDateTime(cont.getAdjustedStartDate(), format = "dd MMM yyyy HH:mm") + ")"
+            time = " (" + formatDateTime(cont.getAdjustedStartDate(), format="dd MMM yyyy HH:mm") + ")"
             result[cont.getId()] = cont.getTitle() + session + time
 
         return result
@@ -543,9 +560,9 @@ class ConferenceListContributionsReview (ConferenceListModificationBase):
     def _checkParams(self):
         ConferenceListModificationBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._selTypes = pm.extract("selTypes", pType=list, allowEmpty = True, defaultValue = []) #ids of selected types
-        self._selTracks = pm.extract("selTracks", pType=list, allowEmpty = True, defaultValue = []) #ids of selected tracks
-        self._selSessions = pm.extract("selSessions", pType=list, allowEmpty = True, defaultValue = []) #ids of selected sessions
+        self._selTypes = pm.extract("selTypes", pType=list, allowEmpty=True, defaultValue=[])  # ids of selected types
+        self._selTracks = pm.extract("selTracks", pType=list, allowEmpty=True, defaultValue=[])  # ids of selected tracks
+        self._selSessions = pm.extract("selSessions", pType=list, allowEmpty=True, defaultValue=[])  # ids of selected sessions
 
         self._typeShowNoValue = self._params.get("typeShowNoValue", True)
         self._trackShowNoValue = self._params.get("trackShowNoValue", True)
@@ -570,8 +587,8 @@ class ConferenceListContributionsReview (ConferenceListModificationBase):
 
         #filtering if the active user is a referee: he can only see his own contribs
         isOnlyReferee = RCReferee.hasRights(self) \
-                        and not RCPaperReviewManager.hasRights(self) \
-                        and not self._conf.canModify(self.getAW())
+            and not RCPaperReviewManager.hasRights(self) \
+            and not self._conf.canModify(self.getAW())
 
         # We want to make an 'or', not an 'and' of the reviewing assign status
 
@@ -585,7 +602,6 @@ class ConferenceListContributionsReview (ConferenceListModificationBase):
         if self._showWithReviewer:
             filter["reviewing"]["reviewer"] = "any"
 
-
         filter["type"] = self._selTypes
         filter["track"] = self._selTracks
         filter["session"] = self._selSessions
@@ -595,17 +611,18 @@ class ConferenceListContributionsReview (ConferenceListModificationBase):
         filterCrit = ContributionsReviewingFilterCrit(self._conf, filter)
         sortingCrit = contribFilters.SortingCriteria(["number"])
 
-        filterCrit.getField("type").setShowNoValue( self._typeShowNoValue )
-        filterCrit.getField("track").setShowNoValue( self._trackShowNoValue )
-        filterCrit.getField("session").setShowNoValue( self._sessionShowNoValue )
+        filterCrit.getField("type").setShowNoValue(self._typeShowNoValue)
+        filterCrit.getField("track").setShowNoValue(self._trackShowNoValue)
+        filterCrit.getField("session").setShowNoValue(self._sessionShowNoValue)
 
-        filterCrit.getField("reviewing").setShowNoValue( self._showWithoutTeam )
-        filterCrit.getField("materialsubmitted").setShowNoValue( self._showWithoutMaterial)
+        filterCrit.getField("reviewing").setShowNoValue(self._showWithoutTeam)
+        filterCrit.getField("materialsubmitted").setShowNoValue(self._showWithoutMaterial)
 
-        f= filters.SimpleFilter(filterCrit, sortingCrit)
+        f = filters.SimpleFilter(filterCrit, sortingCrit)
         contributions = f.apply(contributions)
 
         return fossilize(contributions, IContributionFossil)
+
 
 class ConferenceDeleteContributions (ConferenceModifBase):
     """ Deletes a list of all contributions of a conference
@@ -613,13 +630,13 @@ class ConferenceDeleteContributions (ConferenceModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
-        self._selectedContributions = self._params.get('contributions',[])
+        self._selectedContributions = self._params.get('contributions', [])
 
     def _getAnswer(self):
         for contribId in self._selectedContributions:
             contrib = self._conf.getContributionById(contribId)
             if contrib.getSession() is not None and contrib.getSession().isClosed():
-                raise ServiceAccessError(_("""The contribution "%s" cannot be deleted because it is inside of the session "%s" that is closed""")%(contrib.getId(), contrib.getSession().getTitle()))
+                raise ServiceAccessError(_("""The contribution "%s" cannot be deleted because it is inside of the session "%s" that is closed""") % (contrib.getId(), contrib.getSession().getTitle()))
             contrib.getParent().getSchedule().removeEntry(contrib.getSchEntry())
             self._conf.removeContribution(contrib)
 
@@ -627,21 +644,23 @@ class ConferenceDeleteContributions (ConferenceModifBase):
 # Contribution filtering
 #########################
 
+
 class ContributionsReviewingFilterCrit(filters.FilterCriteria):
     _availableFields = {
-        contribFilters.RefereeFilterField.getId() : contribFilters.RefereeFilterField,
-        contribFilters.EditorFilterField.getId() : contribFilters.EditorFilterField,
-        contribFilters.ReviewerFilterField.getId() : contribFilters.ReviewerFilterField,
-        contribFilters.TypeFilterField.getId() : contribFilters.TypeFilterField,
-        contribFilters.TrackFilterField.getId() : contribFilters.TrackFilterField,
-        contribFilters.SessionFilterField.getId() : contribFilters.SessionFilterField,
-        contribFilters.MaterialSubmittedFilterField.getId() : contribFilters.MaterialSubmittedFilterField,
+        contribFilters.RefereeFilterField.getId(): contribFilters.RefereeFilterField,
+        contribFilters.EditorFilterField.getId(): contribFilters.EditorFilterField,
+        contribFilters.ReviewerFilterField.getId(): contribFilters.ReviewerFilterField,
+        contribFilters.TypeFilterField.getId(): contribFilters.TypeFilterField,
+        contribFilters.TrackFilterField.getId(): contribFilters.TrackFilterField,
+        contribFilters.SessionFilterField.getId(): contribFilters.SessionFilterField,
+        contribFilters.MaterialSubmittedFilterField.getId(): contribFilters.MaterialSubmittedFilterField,
         contribFilters.ReviewingFilterField.getId(): contribFilters.ReviewingFilterField
     }
 
 #############################
 # Conference Modif Display  #
 #############################
+
 
 class ConferencePicDelete(ConferenceModifBase):
 
@@ -660,6 +679,7 @@ class ConferencePicDelete(ConferenceModifBase):
 # Conference cretion        #
 #############################
 
+
 class ShowConcurrentEvents(ServiceBase):
 
     def _checkParams(self):
@@ -672,21 +692,21 @@ class ShowConcurrentEvents(ServiceBase):
         self._sDate = pm.extract("sDate", pType=datetime.datetime, allowEmpty=False)
         self._eDate = pm.extract("eDate", pType=datetime.datetime, allowEmpty=False)
 
-    def _getAnswer( self ):
+    def _getAnswer(self):
         im = indexes.IndexesHolder()
         ch = conference.ConferenceHolder()
         calIdx = im.getIndex("calendar")
         evtIds = calIdx.getObjectsIn(self._sDate, self._eDate)
 
-        evtsByCateg={}
+        evtsByCateg = {}
         for evtId in evtIds:
             try:
                 evt = ch.getById(evtId)
-                categs =evt.getOwnerList()
-                categname =categs[0].getName()
+                categs = evt.getOwnerList()
+                categname = categs[0].getName()
                 if not evtsByCateg.has_key(categname):
                     evtsByCateg[categname] = []
-                evtsByCateg[categname].append((evt.getTitle().strip(),evt.getAdjustedStartDate().strftime('%d/%m/%Y %H:%M '),evt.getAdjustedEndDate().strftime('%d/%m/%Y %H:%M '), evt.getTimezone()))
+                evtsByCateg[categname].append((evt.getTitle().strip(), evt.getAdjustedStartDate().strftime('%d/%m/%Y %H:%M '),evt.getAdjustedEndDate().strftime('%d/%m/%Y %H:%M '), evt.getTimezone()))
 
             except Exception:
                 continue
@@ -706,7 +726,7 @@ class ConferenceParticipantBase:
 
     def _generateParticipant(self, av=None):
         participant = Participant(self._conf, av)
-        if av is None :
+        if av is None:
             participant.setTitle(self._title)
             participant.setFamilyName(self._familyName)
             participant.setFirstName(self._firstName)
@@ -735,6 +755,7 @@ class ConferenceParticipantBase:
             GenericMailer.sendAndLog(GenericNotification(data), self._conf,
                                      log.ModuleNames.PARTICIPANTS)
 
+
 class ConferenceAddEditParticipantBase(ConferenceParticipantBase):
 
     def _checkParams(self):
@@ -751,6 +772,7 @@ class ConferenceAddEditParticipantBase(ConferenceParticipantBase):
         self._telephone = pm.extract("phone", pType=str, allowEmpty=True, defaultValue="")
         self._fax = pm.extract("fax", pType=str, allowEmpty=True, defaultValue="")
 
+
 class ConferenceParticipantListBase(ConferenceModifBase):
 
     def _checkParams(self):
@@ -761,11 +783,11 @@ class ConferenceParticipantListBase(ConferenceModifBase):
     def _getWarningAlreadyAdded(self, list, typeList=""):
         if len(list) == 1:
             return _("""The participant identified by email %s
-                        is already in the %s participants' list.""")%(typeList, list[0])
+                        is already in the %s participants' list.""") % (typeList, list[0])
         else:
 
             return _("""The participants identified by email %s
-                        are already in the %s participants' list.""")%(typeList ,", ".join(list))
+                        are already in the %s participants' list.""") % (typeList, ", ".join(list))
 
     def _checkParticipantConfirmed(self, participant):
         if not participant.isConfirmed():
@@ -774,8 +796,8 @@ class ConferenceParticipantListBase(ConferenceModifBase):
 
 class ConferenceParticipantsDisplay(ConferenceModifBase):
 
-    def _getAnswer( self ):
-        if self._conf.getParticipation().displayParticipantList() :
+    def _getAnswer(self):
+        if self._conf.getParticipation().displayParticipantList():
             self._conf.getParticipation().participantListHide()
         else:
             self._conf.getParticipation().participantListDisplay()
@@ -784,8 +806,8 @@ class ConferenceParticipantsDisplay(ConferenceModifBase):
 
 class ConferenceParticipantsAddedInfo(ConferenceModifBase):
 
-    def _getAnswer( self ):
-        if self._conf.getParticipation().isAddedInfo() :
+    def _getAnswer(self):
+        if self._conf.getParticipation().isAddedInfo():
             self._conf.getParticipation().setNoAddedInfo(self._getUser())
         else:
             self._conf.getParticipation().setAddedInfo(self._getUser())
@@ -794,8 +816,8 @@ class ConferenceParticipantsAddedInfo(ConferenceModifBase):
 
 class ConferenceParticipantsAllowForApplying(ConferenceModifBase):
 
-    def _getAnswer( self ):
-        if self._conf.getParticipation().isAllowedForApplying() :
+    def _getAnswer(self):
+        if self._conf.getParticipation().isAllowedForApplying():
             self._conf.getParticipation().setNotAllowedForApplying(self._getUser())
         else:
             self._conf.getParticipation().setAllowedForApplying(self._getUser())
@@ -804,24 +826,26 @@ class ConferenceParticipantsAllowForApplying(ConferenceModifBase):
 
 class ConferenceParticipantsAutoAccept(ConferenceModifBase):
 
-    def _getAnswer( self ):
+    def _getAnswer(self):
         participation = self._conf.getParticipation()
         participation.setAutoAccept(not participation.isAutoAccept(), self._getUser())
         return participation.isAutoAccept()
 
+
 class ConferenceParticipantsNotifyMgrNewParticipant(ConferenceModifBase):
 
-    def _getAnswer( self ):
+    def _getAnswer(self):
         participation = self._conf.getParticipation()
         participation.setNotifyMgrNewParticipant(not participation.isNotifyMgrNewParticipant())
 
-class ConferenceParticipantsSetNumMaxParticipants( ConferenceTextModificationBase ):
+
+class ConferenceParticipantsSetNumMaxParticipants(ConferenceTextModificationBase):
     """
     Conference num max participants modification
     """
     def _handleSet(self):
         numMaxPart = self._value
-        if (self._value ==""):
+        if (self._value == ""):
             raise ServiceError("ERR-E2", _("The value of the maximum numbers of participants cannot be empty."))
         try:
             numMaxPart = int(self._value)
@@ -830,9 +854,9 @@ class ConferenceParticipantsSetNumMaxParticipants( ConferenceTextModificationBas
 
         self._target.getParticipation().setNumMaxParticipants(int(numMaxPart))
 
-
     def _handleGet(self):
         return self._target.getParticipation().getNumMaxParticipants()
+
 
 class ConferenceApplyParticipant(ConferenceDisplayBase, ConferenceAddEditParticipantBase):
 
