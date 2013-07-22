@@ -716,7 +716,7 @@ class ShowConcurrentEvents(ServiceBase):
 class ConferenceGetFieldsAndContribTypes(ConferenceDisplayBase):
     def _getAnswer(self):
         afm = self._target.getAbstractMgr().getAbstractFieldsMgr()
-        afmDict = dict([(f.getId(), fossilize(f)) for f in afm.getFields()])
+        afmDict = dict([(i, fossilize(f)) for i, f in enumerate(afm.getFields())])
         cTypes = self._target.getContribTypeList()
         cTypesDict = dict([(ct.getId(), ct.getName()) for ct in cTypes])
         return [afmDict, cTypesDict]
