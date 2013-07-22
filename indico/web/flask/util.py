@@ -192,7 +192,7 @@ def url_for(endpoint, target=None, **values):
     if hasattr(endpoint, '_endpoint'):
         endpoint = endpoint._endpoint
 
-    secure = values.pop('_secure')
+    secure = values.pop('_secure', None)
     if secure is not None:
         from MaKaC.common import Config
         if secure and Config.getInstance().getBaseSecureURL():
