@@ -36,6 +36,7 @@ import xml.sax.saxutils
 from indico.util.date_time import format_number
 from indico.util.i18n import ngettext
 from indico.util.contextManager import ContextManager
+from indico.web.flask.util import url_for, url_rule_to_js
 
 # The main template directory
 TEMPLATE_DIR = Config.getInstance().getTPLDir()
@@ -407,3 +408,6 @@ def registerHelpers(objDict):
     objDict['_request'] = request
     objDict['_g'] = g
     objDict['_app'] = app
+    # flask utils
+    objDict['url_for'] = url_for
+    objDict['url_rule_to_js'] = url_rule_to_js

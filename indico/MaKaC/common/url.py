@@ -20,13 +20,13 @@
 """This file contains classes which allow to handle URLs in a transparent way
 """
 from flask import url_for
-from flask import current_app as app
 from werkzeug.urls import url_encode, url_parse, url_unparse, url_join
 from werkzeug.routing import BuildError
 
 from MaKaC.common.Configuration import Config
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import MaKaCError
+from indico.web.flask.util import url_rule_to_js
 
 
 class _BaseURL(object):
@@ -155,23 +155,7 @@ class EndpointURL(_BaseURL):
 
     @property
     def js_router(self):
-        # based on werkzeug.contrib.jsrouting
-        return {
-            'type': 'flask_rules',
-            'endpoint': self._endpoint,
-            'rules': [
-                {
-                    'args': list(rule.arguments),
-                    'defaults': rule.defaults,
-                    'trace': [
-                        {
-                            'is_dynamic': is_dynamic,
-                            'data': data
-                        } for is_dynamic, data in rule._trace
-                    ]
-                } for rule in app.url_map.iter_rules(self._endpoint)
-            ]
-        }
+        return url_rule_to_js(self._endpoint)
 
     def __repr__(self):
         scheme = url_parse(self.url).scheme
