@@ -100,4 +100,6 @@ $(document).ready(function() {
             e.stopPropagation();
         }
     });
+
+    $('input, textarea').placeholder();
 });

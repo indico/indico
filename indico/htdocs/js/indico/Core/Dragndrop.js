@@ -17,14 +17,14 @@
 
 // drag and drop, table element
 
-$.widget('ui.tablesorter', {
+$.widget('indico.tablesorter', {
     // Default options
     options: {
         sortableContainer: '.sortblock', // relative to element
         sortables: '.sortblock tbody', // relative to element
         sortableElements: '> tr', // relative to sortable
         handle: '.dragHandle', // relative to sortable element - the handle to start sorting
-        placeholderClass: 'placeholder', // the class to set on the placeholder element
+        placeholderClass: 'dragndrop-placeholder', // the class to set on the placeholder element
         placeholderHTML: '<td></td>', // the html to put inside the placeholder element
         dropTargetClass: 'drop-target', // the class for valid drop targets (set on srrtable containers)
         noDropTargetClass: 'no-drop-target', // the class for invalid drop targets (set on srrtable containers)

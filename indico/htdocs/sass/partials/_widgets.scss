@@ -20,7 +20,7 @@
 */
 
 .field-area {
-    $line-height: 1.6em;
+    $height: 1.6em;
     $width: 200px;
     $input-width: 160px;
 
@@ -42,14 +42,14 @@
         color: $gray;
         cursor: move;
         display: inline-block;
-        height: $line-height;
-        line-height: $line-height;
+        height: $height;
+        line-height: $height;
         width: 1.1em;
         float: left;
     }
 
     .ui-sortable-placeholder {
-        height: 1.6em;
+        height: $height;
     }
 
     .ui-sortable-helper {
@@ -71,7 +71,7 @@
     }
 
     a.i-button-remove {
-        @include i-button-custom($line-height);
+        @include i-button-custom($height);
 
         display: inline-block;
         float: left;
@@ -85,7 +85,7 @@
     }
 
     li {
-        height: $line-height;
+        height: $height;
         width: $width;
         margin: 3px 0;
 

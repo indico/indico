@@ -7019,7 +7019,7 @@ table.infoQuestionsTable td.dataBold {
     padding-left: 5px;
 }
 
-.placeholder {
+.dragndrop-placeholder {
     background: none repeat scroll 0 0 #FFCC66;
     height: 1.5em;
     margin-top: 3px;

@@ -249,11 +249,11 @@ type("ExclusivePopupWithButtons", ["ExclusivePopup"], {
             var dialog = $(e.target).closest(".ui-dialog-content");
 
             if (dialog.get(0) == $(".ui-dialog-content").get(0)) {
+
                 var elem = $(e.target).parentsUntil(".ui-dialog-content").filter(function(){
-                    return $(this).hasCSS("overflow", "auto");
+                    return $(this).hasCSS("overflow-y", "auto");
                 });
 
-                // var elem = $(e.target).closest(".scrollable", ".ui-dialog-content");
                 var wheelup = (e.originalEvent.wheelDelta || -e.originalEvent.deltaY) / 120 > 0;
 
                 if (elem.scrollTop() === 0 && wheelup) {

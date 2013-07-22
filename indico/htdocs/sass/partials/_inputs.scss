@@ -23,12 +23,8 @@
     @include border-all();
     @include box-sizing(border-box);
     @include single-transition(border-color);
-    @include placeholder {
-        @extend %placeholder;
-    }
 
-    padding: 2px 4px;
-    line-height: 1.6em;
+    padding: 0 4px;
     height: 1.6em;
 
     &:hover,
@@ -39,6 +35,10 @@
     &:focus {
         @include border-all($blue);
         outline: none;
+    }
+
+    &.placeholder {
+        color: #aaa;
     }
 }
 
