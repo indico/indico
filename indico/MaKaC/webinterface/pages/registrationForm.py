@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import session, request
+from indico.web.flask.util import url_for
 
 from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 import MaKaC.webinterface.pages.conferences as conferences
@@ -53,6 +54,8 @@ class WPConfModifRegFormBase( conferences.WPConferenceModifBase ):
                 urlHandlers.UHConfModifRegistrationPreview.getURL( self._conf ) )
         self._tabEPay = self._tabCtrl.newTab( "epay", _("e-payment"), \
                 urlHandlers.UHConfModifEPayment.getURL( self._conf ) )
+        self._tabETicket = self._tabCtrl.newTab("eticket", _("e-ticket"),
+                url_for("event_mgmt.confModifETicket", self._conf))
 
         self._setActiveTab()
 
@@ -61,6 +64,7 @@ class WPConfModifRegFormBase( conferences.WPConferenceModifBase ):
             self._tabRegistrants.disable()
             self._tabEPay.disable()
             self._tabRegistrationPreview.disable()
+            self._tabETicket.disable()
 
     def _getPageContent(self, params):
         self._createTabCtrl()
