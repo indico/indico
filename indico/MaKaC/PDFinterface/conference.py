@@ -3217,7 +3217,7 @@ class TicketToPDF(PDFBase):
             version=2,
             error_correction=constants.ERROR_CORRECT_M,
             box_size=4,
-            border=1,
+            border=1
         )
         qr.add_data(self._registrant._randomId)
         qr.make(fit=True)

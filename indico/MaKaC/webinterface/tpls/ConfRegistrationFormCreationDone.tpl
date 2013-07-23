@@ -28,6 +28,7 @@
                 ${ epaymentAnnounce }
             </td>
         </tr>
+        % if pdfTicketURL:
         <tr>
             <td>
                 <span class="subGroupTitleRegForm">
@@ -35,6 +36,7 @@
                 </span>
             </td>
         </tr>
+        % endif
         <tr>
             <td>
                 <span class="subGroupTitleRegForm">${ _("Registrant ID: ")}</span>

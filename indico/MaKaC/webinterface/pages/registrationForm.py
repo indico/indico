@@ -2358,8 +2358,12 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
         wvars["otherSections"] = self._getFormSections()
         wvars["paymentInfo"] = self._getPaymentInfo()
         wvars["epaymentAnnounce"] = ""
-        wvars["pdfTicketURL"] = urlHandlers.UHConferenceTicketPDF.getURL(
-            self._registrant)
+
+        if self._conf.getModETicket().isActivated():
+            wvars["pdfTicketURL"] = url_for(
+                "event.e-ticket-pdf",
+                self._registrant,
+                authkey=self._registrant.getRandomId())
 
         if self._conf.getModPay().isActivated() and self._registrant.doPay():
             wvars["epaymentAnnounce"] = """<br><span>Please proceed to the <b>payment of your order</b> (by using the "Next" button down this page). You will then receive the payment details.</span>"""
