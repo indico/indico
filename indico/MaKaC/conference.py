@@ -9232,7 +9232,7 @@ class Contribution(CommonObjectBase, Locatable):
 
     def getAllViewableMaterialList( self, aw=None ):
         if not aw:
-            aw = ContextManager.get("currentRH").getAW()
+            aw = ContextManager.get("currentAW", ContextManager.get("currentRH").getAW())
         return [mat for mat in self.getAllMaterialList() if mat.canView(aw)]
 
 
