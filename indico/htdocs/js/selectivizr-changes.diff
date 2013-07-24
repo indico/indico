@@ -1,0 +1,29 @@
+--- a/indico/htdocs/js/selectivizr.js
++++ b/indico/htdocs/js/selectivizr.js
+@@ -219,26 +219,6 @@ References:
+ 					}
+ 					break;
+
+-				case "focus":
+-					activateEventName = "focus";
+-					deactivateEventName = "blur";
+-
+-				case "hover":
+-					if (!activateEventName) {
+-						activateEventName = "mouseenter";
+-						deactivateEventName = "mouseleave";
+-					}
+-					applyClass = function(e) {
+-						addEvent( e, isNegated ? deactivateEventName : activateEventName, function() {
+-							toggleElementClass( e, className, true );
+-						})
+-						addEvent( e, isNegated ? activateEventName : deactivateEventName, function() {
+-							toggleElementClass( e, className, false );
+-						})
+-						return isNegated;
+-					}
+-					break;
+-
+ 				// everything else
+ 				default:
+ 					// If we don't support this pseudo-class don't create
