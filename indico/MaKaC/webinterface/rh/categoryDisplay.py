@@ -117,8 +117,6 @@ class RHCategOverviewDisplay( RoomBookingDBMixin, RHCategDisplayBase ):
             self._cal = wcalendar.MonthOverview( self._aw, sd, [self._target] )
         elif period == "week":
             self._cal = wcalendar.WeekOverview( self._aw, sd, [self._target] )
-        elif period == "nextweek":
-            self._cal = wcalendar.NextWeekOverview( self._aw, [self._target] )
         else:
             self._cal = wcalendar.Overview( self._aw, sd, [self._target] )
         self._cal.setDetailLevel( params.get("detail", "conference") )

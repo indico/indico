@@ -648,48 +648,6 @@ class WWeekOverview(wcomponents.WTemplated):
         vars["isWeekendFree"] = isWeekendFree
         return vars
 
-# This class is currently not used since the list of conference that we
-# iterate over is always zero for some reason. Remove the class in the future
-# or fix it?
-class WNextWeekOverview(wcomponents.WTemplated):
-
-    def __init__( self, ow ):
-        self._ow = ow
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-
-        startDate = """%s""" % self._ow.getStartDate().strftime("%A %d %B %Y")
-        endDate = """%s""" % self._ow.getEndDate().strftime("%A %d %B %Y")
-        vars["dates"] = """%s &nbsp;&ndash;&nbsp; %s"""%(startDate, endDate)
-
-        inc = timedelta( 1 )
-        sd = self._ow.getStartDate()
-        idx = 0
-        while sd <= self._ow.getEndDate():
-            vars["date%i"%idx] = sd.strftime( "%a %d/%m" )
-            res = []
-            confs = self._ow.getConferencesWithStartTime( sd )
-            for tuple in confs:
-                conf = tuple[0]
-                stTime = tuple[1]
-                wc = WOverviewConferenceItem( self._ow.getAW(), \
-                                            conf, \
-                                            sd, \
-                                            vars["displayConfURLGen"]( conf ),\
-                                            self._ow._cal.getIcons(), \
-                                            self._ow.getDetailLevel(),
-                                            stTime )
-                res.append( wc.getHTML( {} ) )
-                raise wc
-            if res==[]:
-                res.append("<tr><td></td></tr>")
-            vars["item%i"%idx] = "".join( res )
-            sd += inc
-            idx += 1
-        vars["items"] = ""
-        return vars
-
 
 class WMonthOverview(wcomponents.WTemplated):
 
@@ -816,7 +774,6 @@ class WCategoryOverview(wcomponents.WTemplated):
 
         vars["selDay"] = ""
         vars["selWeek"] = ""
-        vars["selNextWeek"] = ""
         vars["selMonth"] = ""
         vars["selYear"] = ""
 
@@ -828,13 +785,6 @@ class WCategoryOverview(wcomponents.WTemplated):
         elif isinstance( self._ow, wcalendar.WeekOverview ):
             displayOW = WWeekOverview( self._ow )
             vars["selWeek"] = "selected"
-
-        #  This will not happen since the option in the selection
-        #  box in the user interface has been removed. Can be readded
-        #  in the future if needed.
-        elif isinstance( self._ow, wcalendar.NextWeekOverview ):
-            displayOW = WNextWeekOverview( self._ow )
-            vars["selNextWeek"] = "selected"
         else:
             displayOW = WDayOverview( self._ow )
             vars["selDay"] = "selected"
@@ -901,16 +851,12 @@ class WCategoryOverview(wcomponents.WTemplated):
 
         return res
 
-    def _whichPeriod(self,vars):
-
-
-        if vars["selDay"]=="selected":
+    def _whichPeriod(self, vars):
+        if vars["selDay"] == "selected":
             return "day"
-        if vars["selWeek"]=="selected":
+        if vars["selWeek"] == "selected":
             return "week"
-        if vars["selNextWeek"]=="selected":
-            return "nextweek"
-        if vars["selMonth"]=="selected":
+        if vars["selMonth"] == "selected":
             return "month"
 
     def _getMonthDays(self):

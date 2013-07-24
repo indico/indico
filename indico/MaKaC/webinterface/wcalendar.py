@@ -526,35 +526,6 @@ class WeekOverview( Overview ):
         ow.setDetailLevel( self.getDetailLevel() )
         return ow
 
-class NextWeekOverview( Overview ):
-
-    def __init__( self, aw, categList=[] ):
-        self._detailLevel = "conference"
-        self._categList = categList
-        self._tz = DisplayTZ(aw).getDisplayTZ()
-        self._date = nowutc().astimezone(timezone(self._tz))
-        self._aw = aw
-        self._cal = None
-
-    def getLocator( self ):
-        l = Overview.getLocator( self )
-        l["period"] = "week"
-        return l
-
-    def getStartDate( self ):
-        return self._date
-
-    def getEndDate( self ):
-        return self.getStartDate()+timedelta(days=7)
-
-    def getOverviewOtherCateg( self, categid ):
-        """Returns an exact copy of the current overview object for another
-            category"""
-        ow = NextWeekOverview( self.getAW(), \
-                        #self.getDate(), \
-                        [categid] )
-        ow.setDetailLevel( self.getDetailLevel() )
-        return ow
 
 class MonthOverview( Overview ):
 
