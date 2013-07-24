@@ -65,7 +65,7 @@
                             <span class="category-name truncate-target">${category["categ"].getTitle()}</span>
                             <span class="item-legend">
                                 <span title="${_('Click here to remove this suggestion. It will not be suggested again.')}" class="icon-close contextHelp active suggestion-remove"></span>
-                                <span title="${_('Click here to add this category to your favorites')}" class="icon-star contextHelp active suggestion-favorite"></span>
+                                <span title="${_('Click here to add this category to your favorites.')}" class="icon-star contextHelp active suggestion-favorite"></span>
                             </span>
                             % if category["path"]:
                                 <span class="category-path">${category["path"]}</span>
