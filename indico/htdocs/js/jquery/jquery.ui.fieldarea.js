@@ -218,7 +218,7 @@
                 item.append($("<span class='handle'></span>"));
             }
 
-            item.append($("<input class='input-text' type='text' data-id='"+ id +"' placeholder='"+ placeholder+"' value='"+ value +"'/>").placeholder())
+            item.append($("<input type='text' data-id='"+ id +"' placeholder='"+ placeholder+"' value='"+ value +"'/>").placeholder())
                 .append($("<a class='i-button-remove' title='"+ $T("Delete") +"' href='#' tabIndex='-1'><i class='icon-remove'></i></a>"));
 
             item.find("a.i-button-remove").qtip({

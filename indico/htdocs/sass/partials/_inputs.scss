@@ -19,7 +19,7 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-.input-text {
+input[type=text] {
     @include border-all();
     @include box-sizing(border-box);
     @include single-transition(border-color);
