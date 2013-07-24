@@ -38,9 +38,14 @@
                 % endif
             % endif
         </td>
-        <td>
+        <td width="100%">
             % if field.getType() == "textarea":
-                <textarea id=${fid} name=${fid} width="100%" rows="${nbRows}" style="width:100%">${fdict[fid]}</textarea>
+                <div class="wmd-panel">
+                <div id="wmd-button-bar-${fid}"></div>
+                    <textarea class="wmd-input" id="wmd-input-${fid}" name="${fid}" width="100%" rows="${ nbRows }" style="width:100%">${ fieldsDict[fid] }</textarea>
+                </div>
+
+                <div id="wmd-preview-${fid}" class="wmd-panel wmd-preview"></div>
             % elif field.getType() == "input":
                 <input id=${fid} name=${fid} value="${fdict[fid]}" style="width:100%">
             % elif field.getType() == "selection":
