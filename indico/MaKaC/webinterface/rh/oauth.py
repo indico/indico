@@ -34,6 +34,7 @@ from MaKaC.errors import AccessControlError, MaKaCError
 from MaKaC.webinterface.rh.services import RHServicesBase
 from MaKaC.webinterface.rh.users import RHUserBase
 from MaKaC.webinterface.pages.oauth import WPAdminOAuthConsumers, WPAdminOAuthAuthorized, WPOAuthThirdPartyAuth, WPOAuthUserThirdPartyAuth
+from MaKaC.common.Configuration import Config
 
 
 class RHOAuth(base.RH):
@@ -69,7 +70,6 @@ class RHOAuthRequestToken(RHOAuth):
         TempRequestTokenHolder().add(Token(token.key, token, timestamp, self._consumer, None))
         Logger.get('oauth.request_token').info(token.to_string())
         return token.to_string()
-
 
 
 class RHOAuthAuthorization(RHOAuth, base.RHProtected):
@@ -146,7 +146,8 @@ class RHOAuthAuthorizeConsumer(RHOAuth, base.RHProtected):
                     RequestTokenHolder().remove(request_token)
                 self._redirect(request_token.getToken().get_callback_url())
         else:
-            raise MaKaCError(_("There was a problem while authenticating. Please, start again the login process from the beginning"))
+            raise MaKaCError(_("""There was a problem while authenticating.
+                                  Please, start again the login process from the beginning"""))
 
 
 class RHOAuthAccessTokenURL(RHOAuth):
@@ -178,41 +179,46 @@ class RHOAuthAccessTokenURL(RHOAuth):
                         access_token.setTimestamp(timestamp)
                         response = {'oauth_token': access_token.getId(),
                                     'oauth_token_secret': access_token.getToken().secret,
-                                    'user_id': user.getId()}
+                                    'user_id': user.getId(),
+                                    'token_expires': access_token.getTimestamp() +
+                                    Config.getInstance().getOAuthAccessTokenTTL()}
                         return urlencode(response)
             access_token_key = OAuthUtils.gen_random_string()
             access_token_secret = OAuthUtils.gen_random_string()
             access_token = Token(access_token_key, oauth.Token(access_token_key, access_token_secret),
-                timestamp, self._request_token.getConsumer(), user)
+                                 timestamp, self._request_token.getConsumer(), user)
             AccessTokenHolder().add(access_token)
             response = {'oauth_token': access_token_key,
                         'oauth_token_secret': access_token_secret,
-                        'user_id': user.getId()}
+                        'user_id': user.getId(),
+                        'token_expires': access_token.getTimestamp() +
+                        Config.getInstance().getOAuthAccessTokenTTL()}
             return urlencode(response)
         except oauth.Error, err:
             raise OAuthError(err.message, 401)
         return
 
-# ADMINISTRATION SERVICES
 
+# ADMINISTRATION SERVICES
 class RHAdminOAuthConsumers(RHServicesBase):
     def _process(self):
         p = WPAdminOAuthConsumers(self)
         return p.display()
+
 
 class RHAdminOAuthAuthorized(RHServicesBase):
     def _process(self):
         p = WPAdminOAuthAuthorized(self)
         return p.display()
 
+
 # User related
-
-
 class RHOAuthThirdPartyAuth(base.RHProtected):
 
-    def _process( self ):
+    def _process(self):
         p = WPOAuthThirdPartyAuth(self)
         return p.display(** self._reqParams)
+
 
 class RHOAuthUserThirdPartyAuth(RHUserBase):
     _uh = urlHandlers.UHOAuthUserThirdPartyAuth
@@ -223,6 +229,6 @@ class RHOAuthUserThirdPartyAuth(RHUserBase):
             if not self._avatar.canModify(self._aw):
                 raise AccessControlError("user")
 
-    def _process( self ):
+    def _process(self):
         p = WPOAuthUserThirdPartyAuth(self, self._avatar)
         return p.display()
