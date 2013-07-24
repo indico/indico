@@ -479,6 +479,7 @@ class Config:
         'EmbeddedWebserverBaseURL': None,
         'OAuthAccessTokenTTL' : 10000,
         'MobileURL' : '',
+        'SCSSDebugInfo': True,
         'SessionLifetime' : 86400*31,
         'RouteOldUrls': False
     }
