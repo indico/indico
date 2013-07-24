@@ -2,6 +2,45 @@
 <% from MaKaC.paperReviewing import ConferencePaperReview as CPR %>
 <% from MaKaC.review import AbstractStatusWithdrawn %>
 
+<script type="text/javascript"
+  src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+<script type="text/javascript"
+  src="http://pmgaudencio.neei.uevora.pt/mathjax/mathjax-editing.js">
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"HTML-CSS": { 
+    preferredFont: "TeX",
+    availableFonts: ["STIX","TeX"],
+    linebreaks: { automatic:true },
+    EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50) },
+    tex2jax: { inlineMath: [
+        ["$", "$"],
+        ["\\\\(","\\\\)"]
+    ],
+    displayMath: [
+        ["$$","$$"],
+        ["\\[", "\\]"]
+    ],
+    processEscapes: true,
+    ignoreClass: "tex2jax_ignore|dno" },
+    TeX: {  
+        noUndefined: { 
+            attributes: { 
+                mathcolor: "red",
+                mathbackground: "#FFEEEE",
+                mathsize: "90%" }
+            },
+        Macros: {
+            href: "{}"
+        }
+    },
+    messageStyle: "none"
+    });
+
+</script>
+
 <div id="buttonBar" class="abstractButtonBar">
     % if abstract.canModify(accessWrapper):
         % if not modifyDisabled:
@@ -54,11 +93,17 @@
         <div class="abstractDetail">
             % for f in abstract.getConference().getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
                     % if abstract.getField(f.getId()):
-                        <% content = str(abstract.getField(f.getId()))%>
-                        <div class="abstractSection">
-                            <h2 class="abstractSectionTitle">${f.getCaption()}</h2>
-                            <div class="abstractSectionContent">${content | h}</div>
+                      <% content = str(abstract.getField(f.getId()))%>
+                      <div class="abstractSection">
+                        <h2 class="abstractSectionTitle">${f.getCaption()}</h2>
+                        <div class="wmd-panel">
+                            <div id="wmd-button-bar-${f.getCaption()}" style="display: none;"></div>
+                            <textarea class="wmd-input" id="wmd-input-${f.getName()}" style="display: none;">${content}</textarea>
                         </div>
+
+                        <div id="wmd-preview-${f.getCaption()}" class="wmd-panel wmd-preview" style="background: white"></div>
+                        <div class="abstractSectionContent"></div>
+                    </div>
                     % endif
             % endfor
             % if abstract.getComments():
@@ -134,5 +179,26 @@
     });
 % endif
 
+
+// Pagedown editor stuff
+
+(function () {
+    % for f in abstract.getConference().getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
+        % if abstract.getField(f.getId()):
+            var converter = Markdown.getSanitizingConverter();
+
+            converter.hooks.chain("preBlockGamut", function (text, rbg) {
+                return text.replace(/^ {0,3}""" *\n((?:.*?\n)+?) {0,3}""" *$/gm, function (whole, inner) {
+                    return "<blockquote>" + rbg(inner) + "</blockquote>\n";
+                });
+            });
+
+            var editor = new Markdown.Editor(converter, "-${f.getName()}");
+
+            editor.run();
+        % endif
+    % endfor
+
+})();
 
 </script>
