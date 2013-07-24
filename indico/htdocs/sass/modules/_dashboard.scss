@@ -62,6 +62,10 @@
     padding: 10px;
 }
 
+.dashboard-box.suggestions h3 {
+    background: #dcebf5;
+}
+
 .dashboard-box ol {
     list-style: none;
     margin: 0;
@@ -69,13 +73,18 @@
     border: 0;
 }
 
-.dashboard-box ol li a, .dashboard-box ol li.no-event span {
+.dashboard-box ol li {
     border-bottom: 1px solid #E5E5E5;
+    padding-bottom: 5px;
+    position: relative;
+}
+
+.dashboard-box ol li > a, .dashboard-box ol li.no-event span {
     display: block;
     font-size: 14px;
     font-weight: bold;
     line-height: 18px;
-    padding: 10px;
+    padding: 10px 10px 5px 10px;
     position: relative;
     user-select: none;
     -webkit-touch-callout: none;
@@ -85,12 +94,29 @@
     -ms-user-select: none;
 }
 
-.dashboard-box ol li:last-child a, .dashboard-box ol li.no-event:last-child span {
+.dashboard-box.suggestions ol li > a {
+    margin-right: 35px;
+}
+
+.dashboard-box ol li .actions {
+    font-size: 10px;
+    padding: 0 0 5px 10px;
+}
+
+.dashboard-box ol li .actions a:hover span {
+    text-decoration: underline;
+}
+
+.dashboard-box.suggestions ol .item-legend {
+    display: none;
+}
+
+.dashboard-box ol li:last-child > a, .dashboard-box ol li.no-event:last-child span {
     border-bottom: none;
 }
 
-.dashboard-box ol li a:hover .event-title,
-.dashboard-box ol li a:hover .category-name {
+.dashboard-box ol li > a:hover .event-title,
+.dashboard-box ol li > a:hover .category-name {
     text-decoration: underline;
 }
 
@@ -128,6 +154,19 @@
     max-width: 150px;
     position: relative;
     float: right;
+}
+
+.dashboard-box ol li .close-box {
+    display: none;
+    font-size: 18px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 10px 10px 0 0;
+}
+
+.dashboard-box ol li:hover .close-box {
+    display: inline-block;
 }
 
 .truncate .truncate-target {

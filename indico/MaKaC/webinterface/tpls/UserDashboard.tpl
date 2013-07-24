@@ -54,28 +54,34 @@
                     </a></li>
                 % endfor
                 % endif
-                % if suggested_categories:
-                <li class="no-event" id="category-suggestion-header">
-                    <span class="event-title italic text-superfluous">${_("You might be interested in the following categories...")}</span>
-                </li>
-
-                % for category in suggested_categories:
-                    <li class="suggestion" data-id="${ category["categ"].getId() }">
-                        <a href="${urlHandlers.UHCategoryDisplay.getURL(category["categ"])}" class="truncate">
-                            <span class="category-name truncate-target">${category["categ"].getTitle()}</span>
-                            <span class="item-legend">
-                                <span title="${_('Click here to remove this suggestion. It will not be suggested again.')}" class="icon-close contextHelp active suggestion-remove"></span>
-                                <span title="${_('Click here to add this category to your favorites.')}" class="icon-star contextHelp active suggestion-favorite"></span>
-                            </span>
-                            % if category["path"]:
-                                <span class="category-path">${category["path"]}</span>
-                            % endif
-                        </a>
-                    </li>
-                % endfor
-                % endif
                 </ol>
             </div>
+            % if suggested_categories:
+                <div id="suggestedCategories" class="dashboard-box suggestions">
+                    <h3>${_("You might be interested in the following categories...")}</h3>
+                    <ol>
+                        % for category in suggested_categories:
+                            <li class="suggestion" data-id="${ category["categ"].getId() }">
+                                <a href="${urlHandlers.UHCategoryDisplay.getURL(category["categ"])}" class="truncate">
+                                    <span class="category-name truncate-target">${category["categ"].getTitle()}</span>
+                                    <span class="item-legend">
+                                        <span title="You have favorited this category" class="icon-star contextHelp active"></span>
+                                    </span>
+                                    % if category["path"]:
+                                        <span class="category-path">${category["path"]}</span>
+                                    % endif
+                                </a>
+                                <div class="close-box">
+                                    <a href="#" title="${_('Click here to remove this suggestion. It will not be suggested again.')}" class="icon-close contextHelp active suggestion-remove"></a>
+                                </div>
+                                <div class="actions">
+                                    <a href="#" title="${_('Click here to add this category to your favorites.')}" class="icon-star contextHelp active suggestion-favorite"><span>${_('Add to favorites')}</span></a>
+                                </div>
+                            </li>
+                        % endfor
+                    </ol>
+                </div>
+            % endif
             <div id="happeningCategories" class="dashboard-box">
                 <h3>${_("Happening in your categories")}</h3>
                 <ol>
@@ -233,9 +239,11 @@ $(document).ready(function(){
                     IndicoUtil.errorReport(error);
                 }
                 else {
-                    container.find('.suggestion-favorite').off('click').qtip('hide').qtip('disable');
-                    container.find('.suggestion-remove').remove();
-                    container.insertBefore('#category-suggestion-header');
+                    container.find('.actions, .close-box').remove();
+                    container.appendTo('#yourCategories ol');
+                    if(!$('#suggestedCategories ol > li').length) {
+                        $('#suggestedCategories').remove();
+                    }
                 }
             });
         });
@@ -254,8 +262,8 @@ $(document).ready(function(){
                 }
                 else {
                     container.remove();
-                    if(!$('#category-suggestion-header + li.suggestion').length) {
-                        $('#category-suggestion-header').remove();
+                    if (!$('#suggestedCategories ol > li').length) {
+                        $('#suggestedCategories').remove();
                     }
                 }
             });
