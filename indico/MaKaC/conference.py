@@ -3527,6 +3527,20 @@ class Conference(CommonObjectBase, Locatable):
         else:
             return len(self.contributions)
 
+    def hasSomethingOnWeekend(self, day):
+        """Checks if the event has a session or contribution on the weekend indicated by `day`.
+
+        `day` must be either a saturday or a sunday"""
+        if day.weekday() == 5:
+            weekend = (day, day + timedelta(days=1))
+        elif day.weekday() == 6:
+            weekend = (day, day - timedelta(days=1))
+        else:
+            raise ValueError('day must be on a weekend')
+        return (any(c.startDate.date() in weekend and not isinstance(c.getCurrentStatus(), ContribStatusWithdrawn)
+                    for c in self.contributions.itervalues() if c.startDate is not None) or
+                any(s.startDate.date() in weekend for s in self.sessions.itervalues() if s.startDate is not None))
+
     def getProgramDescription(self):
         try:
             return self.programDescription

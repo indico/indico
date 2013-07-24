@@ -620,29 +620,25 @@ class WWeekOverview(wcomponents.WTemplated):
                 nextsel)
         vars["dates"] = """%s &nbsp;&ndash;&nbsp; %s"""%(startDate, endDate)
 
-        inc = timedelta( 1 )
+        inc = timedelta(1)
         sd = self._ow.getStartDate()
         idx = 0
         while sd <= self._ow.getEndDate():
-            vars["date%i"%idx] = sd.strftime( "%a %d/%m" )
+            weekend = sd.weekday() >= 5
+            vars["date%i" % idx] = sd.strftime("%a %d/%m")
             res = []
-            confs = self._ow.getConferencesWithStartTime( sd )
-            if sd.weekday() >= 5 and confs:
-                    isWeekendFree = False
-            for tuple in confs:
-                conf = tuple[0]
-                stTime = tuple[1]
-                wc = WOverviewConferenceItem( self._ow.getAW(), \
-                                            conf, \
-                                            sd, \
-                                            vars["displayConfURLGen"]( conf ),\
-                                            self._ow._cal.getIcons(), \
-                                            self._ow.getDetailLevel(),
-                                            stTime )
-                res.append( wc.getHTML( {} ) )
-            if res==[]:
+            confs = self._ow.getConferencesWithStartTime(sd)
+            for conf, stTime in confs:
+                if weekend and not conf.hasSomethingOnWeekend(sd.date()):
+                    continue
+                wc = WOverviewConferenceItem(self._ow.getAW(), conf, sd, vars["displayConfURLGen"](conf),
+                                             self._ow._cal.getIcons(), self._ow.getDetailLevel(), stTime)
+                res.append(wc.getHTML({}))
+            if not res:
                 res.append("<tr><td></td></tr>")
-            vars["item%i"%idx] = "".join( res )
+            elif weekend:
+                isWeekendFree = False
+            vars["item%i" % idx] = "".join(res)
             sd += inc
             idx += 1
         vars["isWeekendFree"] = isWeekendFree
