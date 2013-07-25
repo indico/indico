@@ -22,7 +22,7 @@ import operator
 from BTrees.OOBTree import OOTreeSet, union
 
 from persistent import Persistent
-from accessControl import AdminList
+from accessControl import AdminList, AccessWrapper
 import MaKaC
 from MaKaC.common import filters, indexes
 from MaKaC.common.Locators import Locator
@@ -484,6 +484,10 @@ class Avatar(Persistent, Fossilizable):
             if not categ or categ.isSuggestionsDisabled() or categ in related:
                 continue
             if any(p.isSuggestionsDisabled() for p in categ.iterParents()):
+                continue
+            aw = AccessWrapper()
+            aw.setUser(self)
+            if not categ.canAccess(aw):
                 continue
             res.append({
                 'score': score,
