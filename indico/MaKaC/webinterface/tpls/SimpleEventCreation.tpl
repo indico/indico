@@ -42,12 +42,7 @@
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat">${ _("Speaker") }</span>
             </td>
-            <td class="contentCellTD">
-                <input type="hidden" id="chairperson" name="chairperson" value="">
-                <div id="chairpersonsContainer">
-                <!-- Filled through DOM manipulation   -->
-                </div>
-            </td>
+            <%include file="EventChairpersonAddition.tpl"/>
         </tr>
         <tr>
             <td>&nbsp;</td>
@@ -98,16 +93,6 @@
 <%include file="EventCreationJS.tpl"/>
 
 <script  type="text/javascript">
-    //---- chairperson management
-
-    var uf = new UserListField('VeryShortPeopleListDiv', 'PeopleList',
-            null, true, null,
-            true, false, false, {"grant-manager": [${ jsonEncode(_("event modification"))}, false], "presenter-grant-submission": [$T("submission rights"), false]},
-            true, false, true,
-            userListNothing, userListNothing, userListNothing);
-
-    $E('chairpersonsContainer').set(uf.draw());
-
 
     // ----- Categ Chooser
     var categoryChooserHandler = function(categ, protection){

@@ -320,7 +320,6 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
             }
         );
     },
-
     /**
      * Returns the panel's DOM
      */
@@ -1288,10 +1287,10 @@ type("UserListWidget", ["ListWidget"],
                              self.editProcess(userData, function(result) {
                                  if (result) {
                                      userData.update(newData.getAll());
-                                     if (!startsWith('' + userData.get('id'),
-                                                     'newUser')) {
+                                     if (!startsWith('' + userData.get('id'), 'newUser')) {
                                          userData.set('id', 'edited' + userData.get('id'));
                                      }
+                                     self.userListField.inform();
                                  }
                              });
                              suicideHook();
@@ -1306,6 +1305,7 @@ type("UserListWidget", ["ListWidget"],
                              self.removeProcess(userData, function(result) {
                                      if (result) {
                                          self.set(user.key, null);
+                                         self.userListField.inform();
                                      }
                                  });
                              }, IndicoUI.Buttons.removeButton()));
@@ -1338,7 +1338,7 @@ type("UserListWidget", ["ListWidget"],
          }
      },
 
-     function(style, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons) {
+     function(style, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons,userListField) {
 
          this.style = any(style, "UIPeopleList");
          this.allowSetRights = allowSetRights;
@@ -1346,7 +1346,7 @@ type("UserListWidget", ["ListWidget"],
          this.editProcess = any(editProcess, singleUserNothing);
          this.removeProcess = any(removeProcess, singleUserNothing);
          this.showToggleFavouriteButtons = any(showToggleFavouriteButtons, true);
-
+         this.userListField = userListField;
          this.ListWidget(style);
      }
     );
@@ -1379,13 +1379,97 @@ type("UserListField", ["IWidget"], {
         this.userList.clearList();
     },
 
+    privilegesOn: function()
+    {
+        return $('#grant-manager').attr("checked") || $('#presenter-grant-submission').attr("checked");
+    },
+
+    bothPrivilegesOn: function()
+    {
+        return $('#grant-manager').attr("checked") && $('#presenter-grant-submission').attr("checked");
+    },
+
+    setUpParameters: function() {
+        /* set up basic components : div containers for message , a checkbox list ,
+           a list of messages and a warning counter.*/
+
+        this.warningList = new Array();
+        this.warningList[0] = ($T("Please note that you have added a user that does not exist in Indico.\
+                                    Non existing users will be asked via email to create an account so\
+                                    that they will be able to use the privileges below."));
+        this.warningList[1] = ($T("Please note that you have added a user without an email. Users without \
+                                    email will not be contacted by Indico and therefore they will \
+                                    not be able to use the privileges below."));
+        this.divList = new Array();
+        this.messageDiv = $("<div/>", {css: {height: '58px',
+                                            width: '420px',
+                                            textAlign: 'left'
+                                        }}).addClass("warningMessage");
+        this.messageContainer = $("<div/>", {css: {display: 'inline-block', position: 'absolute'}});
+        this.containerDiv = $("<div/>", {css: {height: '80px',
+                                              overflow: 'hidden',
+                                              marginBottom: '10px'
+                                        }});
+        this.warning_flag = false;
+    },
+
+    appendMessage: function(message) {
+        this.messageDiv.html(message);
+        this.messageContainer.append(this.messageDiv);
+        this.containerDiv.append(this.messageContainer);
+        this.warning_flag = true;
+    },
+
+    clearMessages: function() {
+        this.messageContainer.html('');
+        this.containerDiv.append(this.messageContainer);
+        this.warning_flag = false;
+    },
+
+    checkList: function(list) {
+        var self = this;
+        self.clearMessages();
+        each(list, function(val,key){
+            self.check(self.userList.get(key));
+        });
+    },
+
+    check: function(user){
+        var self = this;
+
+        if(keys(this.privileges).length>0){
+            if(this.privilegesOn()){
+            if(!user.get('email')){
+                this.appendMessage(this.warningList[1]);
+            }
+            else{
+                indicoRequest('search.users', {email:user.get('email')}, function(result, error){
+                if (!error){
+                    if (result.length == 0){
+                        self.appendMessage(self.warningList[0]);
+                    }
+                }});
+            }
+        }}
+    },
+
+    inform: function() {
+        if(keys(this.privileges).length>0){
+            if(!this.userList.isEmpty()){
+                this.checkList(this.userList.getAll());
+            }
+            else{
+                this.clearMessages();
+            }
+        }
+    },
+
     getPrivileges: function() {
         return this.selectedPrivileges;
     },
 
     draw: function() {
         var self = this;
-
         var select;
         var buttonDiv = Html.div({style:{marginTop: pixels(10)}});
 
@@ -1438,14 +1522,10 @@ type("UserListField", ["IWidget"], {
 
 
         if (this.allowNew) {
-
             var addNewUserButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add New') );
-
             addNewUserButton.observeClick(function(){
-
                 var newUserId = 'newUser' + self.newUserCounter++;
                 var newUser = $O({'id': newUserId});
-
                 var newUserPopup = new UserDataPopup(
                     $T('New user'),
                     newUser,
@@ -1455,6 +1535,7 @@ type("UserListField", ["IWidget"], {
                             self.newProcess([newUser], function(result) {
                                 if (result) {
                                     self.userList.set(newUserId, newUser);
+                                    self.check(newUser);
                                     //self._highlightNewUser(newUserId);
                                     $('.icon-shield[data-id="author_'+newUser.get('email')+'"]').trigger('participantProctChange', [{isSubmitter: newUser.get('isSubmitter') || false}]);
                                 }
@@ -1469,10 +1550,10 @@ type("UserListField", ["IWidget"], {
         }
 
         // User privileges (submission privilege, etc.)
-        var privilegesDiv = Html.span({style:{marginTop: pixels(10)}});
+        var privilegesDiv = $("<span/>").css("marginTop","10px");
         var keysList = keys(this.privileges);
         if (keysList.length>0) {
-            privilegesDiv.append(Html.span({},$T("Grant all these users with privileges: ")));
+            privilegesDiv.append($("<span/>").html($T("Grant all these users with privileges: ")));
         }
         var comma = ", ";
         for (var i=0; i<keysList.length; i++) {
@@ -1481,13 +1562,23 @@ type("UserListField", ["IWidget"], {
             }
             var key = keysList[i];
             var value = this.privileges[key];
-            var checkbox = Html.checkbox({style:{verticalAlign:"middle"}}, value[1]? value[1] : null);
-            checkbox.dom.name = key;
+            var checkbox = $('<input>', {type:"checkbox" , id: key}).change(function(){
+                if(!self.privilegesOn()){
+                    self.clearMessages();
+                    return;
+                }
+                else{
+                    if(!self.warning_flag)self.inform();
+                }
+            });
             $B(this.selectedPrivileges.accessor(key), checkbox);
-            privilegesDiv.append(Html.span({},checkbox, value[0] + comma));
+            privilegesDiv.append($("<span/>").append(checkbox).append(value[0] + comma));
         }
 
-        return Widget.block([Html.div(this.userDivStyle,this.userList.draw()), privilegesDiv, buttonDiv]);
+        var containsUserListDiv = $("<div/>").css("display","inline-block");
+        containsUserListDiv.append($("<div/>").addClass(this.userDivStyle).html(this.userList.draw().dom));
+        this.containerDiv.append(containsUserListDiv);
+        return Widget.block([this.containerDiv.get(0), privilegesDiv.get(0), buttonDiv]);
 
     }
 },
@@ -1517,9 +1608,10 @@ type("UserListField", ["IWidget"], {
              newProcess, editProcess, removeProcess) {
 
         var self = this;
-        this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons);
+        this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons,this);
         self.newUserCounter = 0;
         this.userDivStyle = any(userDivStyle, "UIPeopleListDiv");
+        this.setUpParameters();
 
         if (exists(initialUsers)) {
             each(initialUsers, function(user){
