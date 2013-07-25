@@ -483,6 +483,8 @@ class Avatar(Persistent, Fossilizable):
             categ = MaKaC.conference.CategoryManager().getById(id)
             if not categ or categ.isSuggestionsDisabled() or categ in related:
                 continue
+            if any(p.isSuggestionsDisabled() for p in categ.iterParents()):
+                continue
             res.append({
                 'score': score,
                 'categ': categ,

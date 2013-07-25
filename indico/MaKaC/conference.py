@@ -948,6 +948,12 @@ class Category(CommonObjectBase):
             l.append(self.getId())
             return l
 
+    def iterParents(self):
+        categ = self
+        while not categ.isRoot():
+            categ = categ.getOwner()
+            yield categ
+
     def getCategoryPathTitles(self):
         # Breadcrumbs
         breadcrumbs = []
