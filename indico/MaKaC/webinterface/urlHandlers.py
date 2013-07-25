@@ -717,18 +717,6 @@ class UHConfModifCFAOptFld(URLHandler):
     _endpoint = 'event_mgmt.confModifCFA-abstractFields'
 
 
-class UHConfModifCFAAddOptFld(URLHandler):
-    _endpoint = 'event_mgmt.confModifCFA-addAbstractField'
-
-
-class UHConfModifCFAPerformAddOptFld(URLHandler):
-    _endpoint = 'event_mgmt.confModifCFA-performAddAbstractField'
-
-
-class UHConfModifCFAEditOptFld(URLHandler):
-    _endpoint = 'event_mgmt.confModifCFA-editAbstractField'
-
-
 class UHConfModifCFARemoveOptFld(URLHandler):
     _endpoint = 'event_mgmt.confModifCFA-removeAbstractField'
 
@@ -2720,10 +2708,6 @@ class UHStaticTrackContribList(URLHandler):
         if escape:
             url = utf8rep(url)
         return url
-
-
-class UHDVDDone(URLHandler):
-    _endpoint = 'legacy.confModifTools-dvdDone'
 
 
 class UHMStaticMaterialDisplay(URLHandler):

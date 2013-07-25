@@ -31,18 +31,12 @@ event_mgmt.add_url_rule('/call-for-abstracts/setup/modify/save', 'confModifCFA-p
                         conferenceModif.RHCFAPerformDataModification, methods=('POST',))
 
 # Setup: fields
-event_mgmt.add_url_rule('/call-for-abstracts/setup/fields/<fieldId>/', 'confModifCFA-editAbstractField',
-                        conferenceModif.RHConfEditAbstractField, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/call-for-abstracts/setup/fields/<fieldId>/toggle', 'confModifCFA-abstractFields',
                         conferenceModif.RHConfAbstractFields)
 event_mgmt.add_url_rule('/call-for-abstracts/setup/fields/<fieldId>/down', 'confModifCFA-absFieldDown',
                         conferenceModif.RHConfMoveAbsFieldDown)
 event_mgmt.add_url_rule('/call-for-abstracts/setup/fields/<fieldId>/up', 'confModifCFA-absFieldUp',
                         conferenceModif.RHConfMoveAbsFieldUp, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/setup/fields/add', 'confModifCFA-addAbstractField',
-                        conferenceModif.RHConfAddAbstractField, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/setup/fields/save', 'confModifCFA-performAddAbstractField',
-                        conferenceModif.RHConfPerformAddAbstractField, methods=('POST',))
 event_mgmt.add_url_rule('/call-for-abstracts/setup/fields/remove', 'confModifCFA-removeAbstractField',
                         conferenceModif.RHConfRemoveAbstractField, methods=('POST',))
 
