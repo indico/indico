@@ -9160,7 +9160,7 @@ $.widget( "ui.dialog", {
 			}
 		});
 
-		this.uiDialogTitlebarClose = $("<button></button>")
+		this.uiDialogTitlebarClose = $("<button type='button'></button>")
 			.button({
 				label: this.options.closeText,
 				icons: {
