@@ -127,7 +127,7 @@
 <%include file="ConfModifCFAAddFieldTooltip.tpl"/>
 
 <script type="text/javascript">
-$(window).load(function() {
+$(function() {
     $("#add-field-button").click(function(e) {
         e.preventDefault();
     }).qtip({

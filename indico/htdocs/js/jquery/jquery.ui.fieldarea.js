@@ -83,9 +83,11 @@
             });
 
             self.element.on("keyup propertychange paste", "input", function(e) {
+
                 // Enter
                 if (e.type == "keyup" && e.which == 13) {
                     $(this).blur();
+                    $(this).parent().next().find("input").focus();
                 }
 
                 if ($(this).val() === "") {
