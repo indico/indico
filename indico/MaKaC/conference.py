@@ -839,6 +839,16 @@ class Category(CommonObjectBase):
         self._visibility = int(visibility)
         self._reindex()
 
+    def isSuggestionsDisabled(self):
+        try:
+            return self._suggestions_disabled
+        except AttributeError:
+            self._suggestions_disabled = False
+            return False
+
+    def setSuggestionsDisabled(self, value):
+        self._suggestions_disabled = value
+
     def _reindex(self):
         catIdx = indexes.IndexesHolder().getIndex('category')
         catIdx.reindexCateg(self)

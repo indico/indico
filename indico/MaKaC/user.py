@@ -481,7 +481,7 @@ class Avatar(Persistent, Fossilizable):
         res = []
         for id, score in suggestions.get_suggestions(self, 'category').iteritems():
             categ = MaKaC.conference.CategoryManager().getById(id)
-            if not categ or categ in related:
+            if not categ or categ.isSuggestionsDisabled() or categ in related:
                 continue
             res.append({
                 'score': score,

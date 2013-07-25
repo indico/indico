@@ -54,6 +54,18 @@
               </td>
         </tr>
         <tr>
+            <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Disable suggestions")}</span></td>
+            <td class="blacktext">
+                % if user.isAdmin():
+                <input name="disableSuggestions" type="checkbox" ${'checked="checked"' if rh._target.isSuggestionsDisabled() else ''}}>
+                ${inlineContextHelp(_('If checked, the category will not be suggested as a potential favorite in the dashboard.'))}
+                % else:
+                <input name="disableSuggestions" type="checkbox" disabled="disabled" ${'checked="checked"' if rh._target.isSuggestionsDisabled() else ''}}>
+                ${inlineContextHelp(_('If checked, the category will not be suggested as a potential favorite in the dashboard. Only Indico administrators may change this settings.'))}
+                % endif
+            </td>
+        </tr>
+        <tr>
             <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Default Timezone")}</span></td>
             <td class="blacktext"><select name="defaultTimezone">${ timezoneOptions }</select>
             % if not rh._target.getSubCategoryList():
