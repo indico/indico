@@ -475,6 +475,8 @@ class Avatar(Persistent, Fossilizable):
         return OrderedDict(sorted(res.items(), key=operator.itemgetter(0)))
 
     def getSuggestedCategories(self):
+        if not redis_write_client:
+            return []
         related = union(self.getLinkTo('category', 'favorite'), self.getLinkTo('category', 'manager'))
         res = []
         for id, score in suggestions.get_suggestions(self, 'category').iteritems():

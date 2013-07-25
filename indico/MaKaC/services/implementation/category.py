@@ -38,6 +38,7 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
 from indico.core.index import Catalog
 from indico.web.http_api.util import generate_public_auth_request
+from indico.util.redis import write_client as redis_write_client
 import MaKaC.common.info as info
 from MaKaC import domain
 from MaKaC.common.Configuration import Config
@@ -383,8 +384,9 @@ class CategoryFavoriteAdd(CategoryBasketBase):
         if self._categ is conference.CategoryManager().getRoot():
             raise ServiceError('ERR-U0', _('Cannot add root category as favorite'))
         self._avatar.linkTo(self._categ, 'favorite')
-        suggestions.unignore(self._avatar, 'category', self._categ.getId())
-        suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
+        if redis_write_client:
+            suggestions.unignore(self._avatar, 'category', self._categ.getId())
+            suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
 
     def _checkParams(self):
         CategoryDisplayBase._checkParams(self)
@@ -400,7 +402,8 @@ class CategoryFavoriteDel(CategoryBasketBase):
 
     def _getAnswer(self):
         self._avatar.unlinkTo(self._categ, 'favorite')
-        suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
+        if redis_write_client:
+            suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
 
     def _checkParams(self):
         CategoryDisplayBase._checkParams(self)

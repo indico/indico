@@ -20,6 +20,7 @@
 from MaKaC.user import AvatarHolder
 from indico.modules.scheduler.tasks import PeriodicTask
 from indico.util.suggestions import get_category_scores
+from indico.util.redis import write_client as redis_write_client
 import indico.util.redis.suggestions as redis_suggestions
 
 # Minimum score for a category to be suggested
@@ -35,6 +36,8 @@ class CategorySuggestionTask(PeriodicTask):
             redis_suggestions.suggest(avatar, 'category', category.getId(), score)
 
     def run(self):
+        if not redis_write_client:
+            return
         while True:
             avatar_id = redis_suggestions.next_scheduled_check()
             if avatar_id is None:
