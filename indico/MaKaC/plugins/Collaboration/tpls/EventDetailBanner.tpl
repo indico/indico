@@ -82,7 +82,8 @@
         % endif
 
         % if (bookingInfo or launchInfo) and booking.getType() == "Vidyo" and self_._rh._getUser() and booking.isLinkedToEquippedRoom():
-          % if conf.canModify(self_._rh._aw) or booking.getOwner()["id"] == self_._rh._getUser().getId() or (_request.remote_addr == VidyoTools.getLinkRoomIp(booking.getLinkObject(), ipAttName='IP')):
+          % if conf.canModify(self_._rh._aw) or booking.getOwner()["id"] == self_._rh._getUser().getId() or \
+               (_request.remote_addr == VidyoTools.getLinkRoomAttribute(booking.getLinkObject(), attName='IP')):
             <span style="margin-left:3px;margin-right:3px;">|</span>
             <a href="#" class="connect_room" data-booking-id="${booking.getId()}"
                data-event="${conf.getId()}" data-location="${booking.getLinkVideoRoomLocation()}">${_("Connect")} ${booking.getLinkVideoRoomLocation()}</a>

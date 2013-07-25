@@ -339,11 +339,11 @@ class VidyoOperations(object):
                 raise
 
     @classmethod
-    def connectRoom(cls, booking, roomId, extension):
+    def connectRoom(cls, booking, roomId, query):
         confId = booking.getConference().getId()
         bookingId = booking.getId()
         try:
-            searchFilter = SOAPObjectFactory.createFilter('user', extension)
+            searchFilter = SOAPObjectFactory.createFilter('user', query)
             userApiAnswer = UserApi.search(searchFilter, confId, bookingId)
             if userApiAnswer.total == 0:
                 return VidyoError("noExistsRoom", "connect", _("The conference room is not registered in the vidyo service. ") + VidyoTools.getContactSupportText())
@@ -353,7 +353,8 @@ class VidyoOperations(object):
             faultString = e.fault.faultstring
             if faultString.startswith('ConferenceID is invalid'):
                 return VidyoError("unknownRoom", "connect")
-            if faultString.startswith('Failed to Invite to Conference'):
+            elif (faultString.startswith('Failed to Invite to Conference') or
+                  faultString.startswith('Status of invited member is not Online')):
                 message = _("The connection has failed. ") + VidyoTools.getContactSupportText()
                 return VidyoError("connectFailed", "connect", message)
             else:
@@ -362,34 +363,42 @@ class VidyoOperations(object):
                 raise
 
     @classmethod
-    def disconnectRoom(cls, booking, roomIp, serviceType):
+    def disconnectRoom(cls, booking, serviceType, roomIp="", roomPanoramaUser=""):
         try:
-            answer = RavemApi.disconnectRoom(roomIp, serviceType)
+            if roomIp != "":
+                answer = RavemApi.disconnectLegacyEndpoint(roomIp, serviceType,
+                                                           booking.getBookingParamByName("roomName"))
+            else:
+                answer = RavemApi.disconnectVidyoPanorama(roomPanoramaUser, serviceType,
+                                                          booking.getBookingParamByName("roomName"))
             if not answer.ok or "error" in answer.json():
-                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Ravem API's disconnectRoom operation not successfull: %s""" %
-                        (booking.getConference().getId(), booking.getId(), answer.text))
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s,
+                                              Ravem API's disconnect operation not successfull: %s""" %
+                                              (booking.getConference().getId(), booking.getId(), answer.text))
                 return VidyoError("disconnectFailed", "disconnect", _("There was a problem with the videoconference disconnection. ") + VidyoTools.getContactSupportText())
         except Exception:
             return VidyoError("disconnectFailed", "disconnect", _("There was a problem with the videoconference disconnection. ") + VidyoTools.getContactSupportText())
 
-
     @classmethod
-    def isRoomConnected(cls, booking, roomIp):
+    def isRoomConnected(cls, booking, roomIp="", roomPanoramaUser=""):
         try:
-            answer =  RavemApi.isRoomConnected(roomIp)
-
+            if roomIp != "":
+                answer = RavemApi.isLegacyEndpointConnected(roomIp)
+            else:
+                answer = RavemApi.isVidyoPanoramaConnected(roomPanoramaUser)
             if not answer.ok or "error" in answer.json():
-                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Ravem API's isRoomConnected operation not successfull: %s""" %
-                        (booking.getConference().getId(), booking.getId(), answer.text))
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s,
+                                              Ravem API's isConnected operation not successfull: %s""" %
+                                              (booking.getConference().getId(), booking.getId(), answer.text))
                 return VidyoError("roomCheckFailed", "roomConnected", _("There was a problem obtaining the room status. ") + VidyoTools.getContactSupportText())
             result = {"roomName": None, "isConnected": False, "service": None}
-            answer =  answer.json()
-            if answer.has_key("result"):
+            answer = answer.json()
+            if "result" in answer:
                 for service in answer.get("result").get("services"):
-                    if service.get("name","") == "videoconference":
-                        result["roomName"] = VidyoTools.recoverVidyoName(service.get("eventName"))
+                    if service.get("name", "") == "videoconference":
+                        result["roomName"] = VidyoTools.recoverVidyoName(service.get("event_name"))
                         result["isConnected"] = service.get("status") == 1
-                        result["service"] = VidyoTools.recoverVidyoDescription(service.get("eventType"))
+                        result["service"] = VidyoTools.recoverVidyoDescription(service.get("event_type"))
             return result
         except Exception:
             return VidyoError("roomCheckFailed", "roomConnected", _("There was a problem obtaining the room status. ") + VidyoTools.getContactSupportText())

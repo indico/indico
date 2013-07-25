@@ -226,6 +226,7 @@ def handler(prefix, path):
                 result, extra, ts, complete, typeMap = obj
                 addToCache = False
         if result is None:
+            ContextManager.set("currentAW", aw)
             # Perform the actual exporting
             res = hook(aw)
             if isinstance(res, tuple) and len(res) == 4:

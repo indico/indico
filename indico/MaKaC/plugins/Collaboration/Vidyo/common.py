@@ -189,22 +189,22 @@ class VidyoTools(object):
         return nowutc() - timedelta(days = getVidyoOptionValue("maxDaysBeforeClean"))
 
     @classmethod
-    def getLinkRoomIp(cls, linkVideo, ipAttName="H323 IP"):
+    def getLinkRoomAttribute(cls, linkVideo, attName="H323 IP"):
         if linkVideo is None:
             return ""
         location = linkVideo.getLocation()
         room = linkVideo.getRoom()
-        roomIp = ""
+        roomAttribute = ""
         if location and room and location.getName() and room.getName() and location.getName().strip() and room.getName().strip():
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
             if minfo.getRoomBookingModuleActive():
                 CrossLocationDB.connect()
                 try:
-                    roomInfo = CrossLocationQueries.getRooms( location = location.getName(), roomName = room.getName())
-                    roomIp = roomInfo.customAtts[ipAttName]
+                    roomInfo = CrossLocationQueries.getRooms(location=location.getName(), roomName=room.getName())
+                    roomAttribute = roomInfo.customAtts[attName]
                 except Exception, e:
                     Logger.get("Vidyo").warning("Location: '%s' - Problem with CrossLocationQueries: '%s'" % (location.getName(), str(e)))
-        return roomIp
+        return roomAttribute
 
     @classmethod
     def getContactSupportText(cls):

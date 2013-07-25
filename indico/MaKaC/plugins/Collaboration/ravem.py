@@ -22,6 +22,8 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.logger import Logger
 from requests.auth import HTTPDigestAuth
 import requests
+from urllib import urlencode
+
 
 class RavemClient(object):
     """ Singleton for the client for RAVEM API
@@ -38,44 +40,54 @@ class RavemClient(object):
         return data
 
     @classmethod
-    def getInstance(cls, ravemAPIUrl = None, username = None, password = None):
+    def getInstance(cls, ravem_api_url=None, username=None, password=None):
 
-        if cls._instance is None or (ravemAPIUrl is not None or username is not None or password is not None):
+        if cls._instance is None or (ravem_api_url is not None or username is not None or password is not None):
 
-            if ravemAPIUrl is None:
-                ravemAPIUrl = CollaborationTools.getCollaborationOptionValue('ravemAPIURL')
+            if ravem_api_url is None:
+                ravem_api_url = CollaborationTools.getCollaborationOptionValue('ravemAPIURL')
             if username is None:
                 username = CollaborationTools.getCollaborationOptionValue('ravemUsername')
             if password is None:
                 password = CollaborationTools.getCollaborationOptionValue('ravemPassword')
 
             try:
-                cls._instance = RavemClient(username, password, ravemAPIUrl)
+                cls._instance = RavemClient(username, password, ravem_api_url)
             except Exception:
                 Logger.get("Ravem").exception("Problem building RavemClient")
                 raise
         return cls._instance
+
 
 class RavemApi(object):
     """ This class performs low-level operations by getting the corresponding
         client and calling a service.
     """
 
-
     @classmethod
-    def isRoomConnected(cls, roomIp):
+    def _api_operation(cls, service, *args, **kwargs):
         try:
+            url = "/%s?%s" % (service, urlencode(kwargs))
             ravemClient = RavemClient.getInstance()
-            return ravemClient.performOperation("/getstatus?where=vc_endpoint_ip&value=%s"%roomIp)
+            return ravemClient.performOperation(url)
         except Exception, e:
-            Logger.get('Ravem').exception("""Ravem API's isRoomConnected operation not successfull: %s""" % e.message)
+            Logger.get('Ravem').exception("""Ravem API's '%s' operation not successfull: %s""" % (service, e.message))
             raise
 
     @classmethod
-    def disconnectRoom(cls, roomIp, serviceType):
-        try:
-            ravemClient = RavemClient.getInstance()
-            return ravemClient.performOperation("/videoconference/disconnect?type=%s&where=vc_endpoint_ip&value=%s"%(serviceType, roomIp))
-        except Exception, e:
-            Logger.get('Ravem').exception("""Ravem API's disconnectRoom operation not successfull: %s""" % e.message)
-            raise
+    def isLegacyEndpointConnected(cls, room_ip):
+        return cls._api_operation("getstatus", where="vc_endpoint_legacy_ip", value=room_ip)
+
+    @classmethod
+    def isVidyoPanoramaConnected(cls, vidyo_panorama_id):
+        return cls._api_operation("getstatus", where="vc_endpoint_vidyo_username", value=vidyo_panorama_id)
+
+    @classmethod
+    def disconnectLegacyEndpoint(cls, room_ip, service_type, room_name):
+        return cls._api_operation("videoconference/disconnect", type=service_type, where="vc_endpoint_legacy_ip",
+                                  value=room_ip, vidyo_room_name=room_name)
+
+    @classmethod
+    def disconnectVidyoPanorama(cls, vidyo_panorama_id, service_type, room_name):
+        return cls._api_operation("videoconference/disconnect", type=service_type, where="vc_endpoint_vidyo_username",
+                                  value=vidyo_panorama_id, vidyo_room_name=room_name)

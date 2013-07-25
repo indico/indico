@@ -910,7 +910,7 @@ type("ContributionsPopup", ["ExclusivePopup"], {
 
                 var i = 0;
                 each(contrib.presenters, function(p) {
-                    speakers.append(i++ > 0 ? ', ' : '' + p.name);
+                    speakers.append((i++ > 0 ? ', ' : '') + p.name);
                     if (p.affiliation && p.affiliation !== '') {
                         speakers.append(Html.em({style: {fontSize: '12px'}}, ' (' + p.affiliation + ')'));
                     }

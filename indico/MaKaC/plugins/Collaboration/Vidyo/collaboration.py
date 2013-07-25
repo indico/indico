@@ -96,7 +96,9 @@ class CSBooking(CSBookingBase):
         return self._created
 
     def isLinkedToEquippedRoom(self):
-        return self._created and VidyoTools.getLinkRoomIp(self.getLinkObject()) != ""
+        return self._created and (VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="H323 IP") != "" or
+                                  VidyoTools.getLinkRoomAttribute(self.getLinkObject(),
+                                                                  attName="VidyoPanorama ID") != "")
 
     def __conform__(self, proto):
         if proto == IIndexableByVidyoRoom:
@@ -253,7 +255,10 @@ class CSBooking(CSBookingBase):
         self._checksDone = checksDone
 
     def connectionStatus(self):
-        return VidyoOperations.isRoomConnected(self, VidyoTools.getLinkRoomIp(self.getLinkObject()))
+        return VidyoOperations.isRoomConnected(self, VidyoTools.getLinkRoomAttribute(self.getLinkObject(),
+                                                                                     attName="H323 IP"),
+                                               VidyoTools.getLinkRoomAttribute(self.getLinkObject(),
+                                                                               attName="VidyoPanorama ID"))
 
     def getBookingInformation(self):
         """ For retreiving the ServiceInformation sections dict built for the
@@ -470,8 +475,9 @@ class CSBooking(CSBookingBase):
         if isinstance(connectionStatus, VidyoError):
             return connectionStatus
 
-        confRoomIp = VidyoTools.getLinkRoomIp(self.getLinkObject())
-        if confRoomIp == "":
+        confRoomIp = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="H323 IP")
+        confRoomPanoramaUser = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="VidyoPanorama ID")
+        if confRoomIp == "" and confRoomPanoramaUser == "":
             return VidyoError("noValidConferenceRoom", "connect")
 
         if connectionStatus.get("isConnected") == True:
@@ -486,7 +492,7 @@ class CSBooking(CSBookingBase):
                 # otherwise, replace whatever call is going on
                 ExternalOperationsManager.execute(
                     self, "disconnectRoom", VidyoOperations.disconnectRoom,
-                    self, confRoomIp, connectionStatus.get("service"))
+                    self, connectionStatus.get("service"), confRoomIp, confRoomPanoramaUser)
 
                 retry = 15
                 connected = True
@@ -507,23 +513,27 @@ class CSBooking(CSBookingBase):
                     # give it some time before trying to connect
                     time.sleep(5)
 
-        prefixConnect = getVidyoOptionValue("prefixConnect")
-        result = ExternalOperationsManager.execute(self, "connectRoom", VidyoOperations.connectRoom, self, self._roomId, prefixConnect + confRoomIp)
+        query = (getVidyoOptionValue("prefixConnect") + confRoomIp) if confRoomIp else confRoomPanoramaUser
+        result = ExternalOperationsManager.execute(self, "connectRoom", VidyoOperations.connectRoom, self, self._roomId,
+                                                   query)
         if isinstance(result, VidyoError):
             return result
         return self
 
     def _disconnect(self):
         self._checkStatus()
-        confRoomIp = VidyoTools.getLinkRoomIp(self.getLinkObject())
-        if confRoomIp == "":
+        confRoomIp = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="H323 IP")
+        confRoomPanoramaUser = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="VidyoPanorama ID")
+        if confRoomIp == "" and confRoomPanoramaUser == "":
             return VidyoError("noValidConferenceRoom", "disconnect")
         connectionStatus = self.connectionStatus()
         if isinstance(connectionStatus, VidyoError):
             return connectionStatus
         if not connectionStatus.get("isConnected"):
-            return VidyoError("alreadyDisconnected", "disconnect", _("It seems that the room has been already disconnected, please refresh the page"))
-        result = ExternalOperationsManager.execute(self, "disconnectRoom", VidyoOperations.disconnectRoom, self, confRoomIp, connectionStatus.get("service"))
+            return VidyoError("alreadyDisconnected", "disconnect",
+                              _("It seems that the room has been already disconnected, please refresh the page"))
+        result = ExternalOperationsManager.execute(self, "disconnectRoom", VidyoOperations.disconnectRoom, self,
+                                                   connectionStatus.get("service"), confRoomIp, confRoomPanoramaUser)
         if isinstance(result, VidyoError):
             return result
         return self
