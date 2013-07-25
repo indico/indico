@@ -3079,7 +3079,7 @@ class WConfModifCFA(wcomponents.WTemplated):
                                 removeButton,
                                 af.getId(),
                                 af.getType(),
-                                af.getName(),
+                                af.getCaption(),
                                 addInfo))
         laf.append(i18nformat("""
     <tr>

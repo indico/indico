@@ -474,7 +474,6 @@ class AbstractField(Persistent, Fossilizable):
 
     def __init__(self, params):
         self._id = params["id"]
-        self._name = params.get("name") if params.get("name") else self._id
         self._caption = params.get("caption") if params.get("caption") else self._id
         self._isMandatory = params.get("isMandatory") if params.get("isMandatory") else False
         self._active = True
@@ -503,13 +502,6 @@ class AbstractField(Persistent, Fossilizable):
         self._id = id
         self._notifyModification()
 
-    def getName(self):
-        return self._name
-
-    def setName(self, name):
-        self._name = name
-        self._notifyModification()
-
     def getCaption(self):
         return self._caption
 
@@ -527,7 +519,6 @@ class AbstractField(Persistent, Fossilizable):
     def getValues(self):
         values = []
         values["id"] = self.getId()
-        values["name"] = self.getName()
         values["caption"] = self.getCaption()
         return values
 
@@ -715,9 +706,9 @@ class AbstractFieldsMgr(Persistent):
 
     def _initFields(self):
         d = []
-        params = {"type": "textarea", "id": "content", "name": "Content", "caption": _("Abstract content"), "isMandatory": True}
+        params = {"type": "textarea", "id": "content", "caption": _("Content"), "isMandatory": True}
         d.append(AbstractField.makefield(params))
-        params = {"type": "textarea", "id": "summary", "name": "Summary", "caption": _("Summary")}
+        params = {"type": "textarea", "id": "summary", "caption": _("Summary")}
         d.append(AbstractField.makefield(params))
         return d
 
@@ -729,7 +720,7 @@ class AbstractFieldsMgr(Persistent):
 
     def getFields(self):
         if not self.hasField("content"):
-            params = {"type": "textarea", "id": "content", "name": "Content", "caption": _("Abstract content"), "isMandatory": True}
+            params = {"type": "textarea", "id": "content", "caption": _("Content"), "isMandatory": True}
             ac = AbstractField.makefield(params)
             self._fields.insert(0, ac)
         return self._fields

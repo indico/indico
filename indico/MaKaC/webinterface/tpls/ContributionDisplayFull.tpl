@@ -57,7 +57,7 @@
                 <% content = Contribution.getField(f.getId()) %>
             % endif
             <div class="contributionSection">
-                <h2 class="contributionSectionTitle">${f.getName()}</h2>
+                <h2 class="contributionSectionTitle">${f.getCaption()}</h2>
                 <div class="contributionSectionContent">${content | h}</div>
             </div>
             % endif

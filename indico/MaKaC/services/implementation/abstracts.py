@@ -87,7 +87,6 @@ class SetField(ConferenceModifBase):
 
         self.params["type"] = pm.extract("type", pType=str, allowEmpty=False, defaultValue="text")
         self.params["id"] = pm.extract("id", pType=str, allowEmpty=True)
-        self.params["name"] = pm.extract("name", pType=str, allowEmpty=False)
         self.params["caption"] = pm.extract("caption", pType=str, allowEmpty=False)
         self.params["isMandatory"] = pm.extract("isMandatory", pType=bool, allowEmpty=True, defaultValue=False)
 

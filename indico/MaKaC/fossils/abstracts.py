@@ -54,9 +54,6 @@ class IAbstractFieldFossil(IFossil):
     def getId(self):
         """ ID of the field """
 
-    def getName(self):
-        """ Name of the field """
-
     def isMandatory(self):
         """ True if mandatory """
 

@@ -229,7 +229,7 @@ class AbstractToPDF(PDFBase):
 
         for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             id = field.getId()
-            name = field.getName()
+            name = field.getCaption()
             value = self._abstract.getField(id).strip()
             if value: #id not in ["content"] and
                 #styleHead = ParagraphStyle({})

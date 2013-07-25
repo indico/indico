@@ -836,9 +836,7 @@ type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
         },
 
         _initializeForm: function() {
-            var fieldName = this._parameterManager.add(new RealtimeTextBox(), "text", false);
             var fieldCaption = this._parameterManager.add(new RealtimeTextBox(), "text", false);
-            this._form.push([$T("Name"), $B(fieldName, this.info.accessor("name")).draw()]);
             this._form.push([$T("Caption"), $B(fieldCaption, this.info.accessor("caption")).draw()]);
         },
 

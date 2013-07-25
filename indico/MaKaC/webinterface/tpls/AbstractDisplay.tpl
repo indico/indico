@@ -60,7 +60,7 @@
                             <% content = abstract.getField(f.getId())%>
                         % endif
                         <div class="abstractSection">
-                            <h2 class="abstractSectionTitle">${f.getName()}</h2>
+                            <h2 class="abstractSectionTitle">${f.getCaption()}</h2>
                             <div class="abstractSectionContent">${content | h}</div>
                         </div>
                     % endif

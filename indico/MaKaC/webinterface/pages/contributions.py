@@ -466,7 +466,7 @@ class WContribModifMain(wcomponents.WTemplated):
             for f in self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields():
                 if f.isActive():
                     id = f.getId()
-                    caption = f.getName()
+                    caption = f.getCaption()
                     if f.getType() == "selection":
                         value = str(f.getOption(self._contrib.getField(id))) if f.getOption(self._contrib.getField(id)) else ""
                     else:
@@ -783,7 +783,7 @@ class WContributionDataModification(wcomponents.WTemplated):
             for f in self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields():
                 if f.isActive():
                     id = f.getId()
-                    caption = f.getName()
+                    caption = f.getCaption()
                     value = self._contrib.getField(id)
                     if f.getType() == "selection":
                         elem = "<select name='%s'>" % ("f_%s" % id)

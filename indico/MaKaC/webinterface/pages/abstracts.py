@@ -696,7 +696,7 @@ class WAbstractManagment(wcomponents.WTemplated):
         afm = self._abstract.getConference().getAbstractMgr().getAbstractFieldsMgr()
         for f in afm.getActiveFields():
             id = f.getId()
-            caption = f.getName()
+            caption = f.getCaption()
             if f.getType() == "selection":
                 value = str(f.getOption(self._abstract.getField(id))) if f.getOption(self._abstract.getField(id)) else ""
             else:
