@@ -40,6 +40,8 @@ from MaKaC.fossils.abstracts import IAbstractFieldFossil
 from MaKaC.fossils.abstracts import IAbstractTextFieldFossil
 from MaKaC.fossils.abstracts import IAbstractSelectionFieldFossil
 from MaKaC.fossils.abstracts import ISelectionFieldOptionFossil
+from indico.util.i18n import N_
+from indico.util.text import wordsCounter
 
 import tempfile
 
@@ -706,9 +708,9 @@ class AbstractFieldsMgr(Persistent):
 
     def _initFields(self):
         d = []
-        params = {"type": "textarea", "id": "content", "caption": _("Content"), "isMandatory": True}
+        params = {"type": "textarea", "id": "content", "caption": N_("Content"), "isMandatory": True}
         d.append(AbstractField.makefield(params))
-        params = {"type": "textarea", "id": "summary", "caption": _("Summary")}
+        params = {"type": "textarea", "id": "summary", "caption": N_("Summary")}
         d.append(AbstractField.makefield(params))
         return d
 
