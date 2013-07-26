@@ -19,13 +19,13 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-input[type=text] {
+%text-input {
     @include border-all();
     @include box-sizing(border-box);
     @include single-transition(border-color);
 
+    font-family: inherit;
     padding: 0 4px;
-    height: 1.6em;
 
     &:hover,
     &:focus {
@@ -36,10 +36,21 @@ input[type=text] {
         @include border-all($blue);
         outline: none;
     }
+}
+
+input[type=text],
+input[type=password] {
+    @extend %text-input;
+
+    height: 1.6em;
 
     &.placeholder {
         color: #aaa;
     }
+}
+
+textarea {
+    @extend %text-input;
 }
 
 /* ********** */
