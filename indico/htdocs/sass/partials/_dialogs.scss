@@ -54,6 +54,18 @@
     font-weight: bold;
 }
 
+.confirmation-dialog .body ul {
+    padding-left: 13px;
+    margin: 0;
+}
+
+.confirmation-dialog .body span {
+    padding-left: 10px;
+    color: #888888;
+    font-size: 0.9em;
+    margin: 0;
+}
+
 .confirmation-dialog .clearer {
     clear: both;
 }

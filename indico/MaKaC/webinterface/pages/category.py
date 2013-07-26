@@ -38,6 +38,7 @@ from MaKaC import schedule
 import MaKaC.common.info as info
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.util.date_time import format_datetime
 
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.common.tools import escape_html
@@ -1630,8 +1631,25 @@ class WConferenceDeletion(object):
     def getHTML(self, actionURL):
         events = []
 
+        events.append("<ul>")
+
         for event in self._confList:
-            events.append("""<li><i>%s</i></li>""" % event.getTitle())
+
+            # Formatting the dates. ( XX XX 20XX - XY XY 20XX )
+            splited_date = str(format_datetime(event.getStartDate())).split( )
+            start_date = splited_date[0] + " " + splited_date[1] + " " + splited_date[2]
+            splited_date = str(format_datetime(event.getEndDate())).split( )
+            end_date = splited_date[0] + " " + splited_date[1] + " " + splited_date[2]
+            if start_date!=end_date :
+                start_date = start_date + " - " + end_date
+
+            #Append the event title and date
+            events.append("<li>")
+            events.append("""<i>%s</i>"""%event.getTitle()+":")
+            events.append("""<span>%s</span>"""%start_date)
+            events.append("</li>")
+
+        events.append("</ul>")
 
         msg = {'challenge': _('Are you sure that you want to delete the following events?'),
                'target': "".join(events),
