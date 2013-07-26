@@ -4495,6 +4495,8 @@ class Registrant(Persistent):
         self._id = ""
         self._complete = False
         self._registrationDate = nowutc()
+        self._checkedIn = False
+        self._checkInDate = None
 
         self._title = ""
         self._firstName = ""
@@ -4700,6 +4702,36 @@ class Registrant(Persistent):
         except AttributeError, e:
             self._complete = False
         return self._complete
+
+    def isCheckedIn(self):
+        try:
+            if self._checkedIn:
+                pass
+        except AttributeError:
+            self._checkedIn = False
+        return self._checkedIn
+
+    def setCheckedIn(self, checkedIn):
+        if checkedIn:
+            self._checkInDate = nowutc()
+        else:
+            self._checkInDate = None
+        self._checkedIn = checkedIn
+
+    def getCheckInDate(self):
+        try:
+            if self._checkInDate:
+                pass
+        except AttributeError:
+            self._checkInDate = None
+        return self._checkInDate
+
+    def getAdjustedCheckInDate(self, tz=None):
+        if not tz:
+            tz = self.getConference().getTimezone()
+        if tz not in all_timezones:
+            tz = 'UTC'
+        return self.getCheckInDate().astimezone(timezone(tz))
 
     def getPayed(self):
         try:

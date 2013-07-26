@@ -429,6 +429,14 @@ class RHRegistrantModification( RHRegistrantModifBase ):
         p = registrants.WPRegistrantModification( self, self._registrant )
         return p.display()
 
+
+class RHRegistrantModificationEticket(RHRegistrantModifBase):
+
+    def _process(self):
+        p = registrants.WPRegistrantModifETicket(self, self._registrant)
+        return p.display()
+
+
 class RHRegistrantSendEmail( RHRegistrationFormModifBase ):
 
     def _checkParams(self, params):

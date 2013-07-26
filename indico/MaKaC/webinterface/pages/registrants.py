@@ -34,6 +34,7 @@ from MaKaC import registration
 from conferences import WConfModifBadgePDFOptions
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.web.flask.util import url_for
 from xml.sax.saxutils import escape
 import string
 
@@ -841,10 +842,17 @@ class WPRegistrantModifBase( WPRegistrantBase ):
 
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
-        self._tabMain = self._tabCtrl.newTab( "main", _("Main"), \
-                urlHandlers.UHRegistrantModification.getURL( self._target ) )
+        self._tabMain = self._tabCtrl.newTab("main", _("Main"),
+                url_for("event_mgmt.confModifRegistrants-modification",
+                        self._target))
+        self._tabETicket = self._tabCtrl.newTab("eticket", _("E-Ticket"),
+                url_for("event_mgmt.confModifRegistrants-modification-eticket",
+                        self._target))
         self._setActiveTab()
         self._setupTabCtrl()
+
+        if not self._conf.getModETicket().isActivated():
+            self._tabETicket.disable()
 
     def _setActiveTab( self ):
         pass
@@ -863,6 +871,37 @@ class WPRegistrantModifBase( WPRegistrantBase ):
 
     def _getTabContent( self, params ):
         return  _("nothing")
+
+
+class WPRegistrantModifETicket(WPRegistrantModifBase):
+
+    def _setActiveTab(self):
+        self._tabETicket.setActive()
+
+    def _getTabContent(self, params):
+        wc = WRegistrantModifETicket(self._registrant)
+        return wc.getHTML()
+
+
+class WRegistrantModifETicket(wcomponents.WTemplated):
+
+    def __init__(self, registrant):
+        self._registrant = registrant
+        self._conf = self._registrant.getConference()
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["eTicketUrl"] = url_for("event.e-ticket-pdf",
+                                     self._registrant,
+                                     authkey=self._registrant.getRandomId())
+        vars["isCheckedIn"] = self._registrant.isCheckedIn()
+        if self._registrant.getCheckInDate() is not None:
+            vars["checkInDate"] = "%s (%s)" % (
+                self._registrant.getAdjustedCheckInDate().strftime(
+                    "%d-%B-%Y %H:%M"), self._conf.getTimezone())
+
+        return vars
+
 
 class WPRegistrantModifMain( WPRegistrantModifBase ):
 
