@@ -32,7 +32,10 @@
         <tr>
             <td>
                 <span class="subGroupTitleRegForm">
-                    <a href="${ pdfTicketURL }">${ _("Download ticket") }</a>
+                    <a href="${ pdfTicketURL }">
+                        <i class="icon-file-pdf"></i>
+                        ${ _("Download ticket") }
+                    </a>
                 </span>
             </td>
         </tr>
