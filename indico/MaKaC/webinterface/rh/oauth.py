@@ -17,7 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import time
+
+from datetime import timedelta
 from urllib import urlencode
 import oauth2 as oauth
 
@@ -26,6 +27,7 @@ from indico.modules.oauth.db import OAuthServer, Token, ConsumerHolder, AccessTo
 from indico.modules.oauth.errors import OAuthError
 from indico.modules.oauth.components import OAuthUtils
 
+from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.logger import Logger
 from MaKaC.webinterface.rh import base
 from MaKaC.webinterface import urlHandlers
@@ -66,7 +68,7 @@ class RHOAuthRequestToken(RHOAuth):
         # TODO: Token should have flag authorized=False
         token = oauth.Token(OAuthUtils.gen_random_string(), OAuthUtils.gen_random_string())
         token.set_callback(self._oauth_request.get_parameter('oauth_callback'))
-        timestamp = time.time()
+        timestamp = nowutc()
         TempRequestTokenHolder().add(Token(token.key, token, timestamp, self._consumer, None))
         Logger.get('oauth.request_token').info(token.to_string())
         return token.to_string()
@@ -172,7 +174,7 @@ class RHOAuthAccessTokenURL(RHOAuth):
         try:
             user = self._request_token.getUser()
             access_tokens = Catalog.getIdx('user_oauth_access_token').get(user.getId())
-            timestamp = time.time()
+            timestamp = nowutc()
             if access_tokens is not None:
                 for access_token in list(access_tokens):
                     if access_token.getConsumer().getName() == self._request_token.getConsumer().getName():
@@ -180,8 +182,9 @@ class RHOAuthAccessTokenURL(RHOAuth):
                         response = {'oauth_token': access_token.getId(),
                                     'oauth_token_secret': access_token.getToken().secret,
                                     'user_id': user.getId(),
-                                    'token_expires': access_token.getTimestamp() +
-                                    Config.getInstance().getOAuthAccessTokenTTL()}
+                                    'oauth_token_ttl': Config.getInstance().getOAuthAccessTokenTTL(),
+                                    'oauth_token_expiration_timestamp': access_token.getTimestamp() +
+                                    timedelta(seconds=Config.getInstance().getOAuthAccessTokenTTL())}
                         return urlencode(response)
             access_token_key = OAuthUtils.gen_random_string()
             access_token_secret = OAuthUtils.gen_random_string()
@@ -191,8 +194,9 @@ class RHOAuthAccessTokenURL(RHOAuth):
             response = {'oauth_token': access_token_key,
                         'oauth_token_secret': access_token_secret,
                         'user_id': user.getId(),
-                        'token_expires': access_token.getTimestamp() +
-                        Config.getInstance().getOAuthAccessTokenTTL()}
+                        'oauth_token_ttl': Config.getInstance().getOAuthAccessTokenTTL(),
+                        'oauth_token_expiration_timestamp': access_token.getTimestamp() +
+                        timedelta(seconds=Config.getInstance().getOAuthAccessTokenTTL())}
             return urlencode(response)
         except oauth.Error, err:
             raise OAuthError(err.message, 401)
