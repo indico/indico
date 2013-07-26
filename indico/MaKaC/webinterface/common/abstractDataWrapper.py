@@ -237,18 +237,8 @@ class AbstractData(object):
         if self.title.strip() == "":
             errors.append(_("Abstract title cannot be empty"))
         for f in self._afm.getFields():
-            id = f.getId()
-            caption = f.getCaption()
-            if f.isActive() and f.isMandatory() and self._otherFields.get(id, "") == "":
-                errors.append(_("The field '%s' is mandatory") % caption)
-            if f.getType() == "textarea" or f.getType() == "input":
-                ml = f.getMaxLength()
-                limitation = f.getLimitation()
-                if ml != 0:
-                    if limitation == "words" and textUtils.wordsCounter(self._otherFields.get(id, "")) > ml:
-                        errors.append(_("The field '%s' cannot be more than %s words") % (caption, ml))
-                    elif limitation == "chars" and len(self._otherFields.get(id, "")) > ml:
-                        errors.append(_("The field '%s' cannot be more than %s characters") % (caption, ml))
+            value = self._otherFields.get(f.getId(), "")
+            errors += f.check(value)
         if not self.origin == "management":
             if not self._prAuthorsListParam:
                 errors.append(_("No primary author has been specified. You must define at least one primary author"))

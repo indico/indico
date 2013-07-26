@@ -487,6 +487,14 @@ class AbstractField(Persistent, Fossilizable):
     def _notifyModification(self):
         self._p_changed = 1
 
+    def check(self, content):
+        errors = []
+
+        if self._active and self._isMandatory and content == "":
+                errors.append(_("The field '%s' is mandatory") % self._caption)
+
+        return errors
+
     def getType(self):
         return self._type
 
@@ -543,6 +551,17 @@ class AbstractTextField(AbstractField):
 
     def clone(self):
         return AbstractTextField(self.getValues())
+
+    def check(self, content):
+        errors = AbstractField.check(self, content)
+
+        if self._maxLength != 0:
+            if self._limitation == "words" and wordsCounter(content) > self._maxLength:
+                errors.append(_("The field '%s' cannot be more than %s words") % (self._caption, self._maxLength))
+            elif self._limitation == "chars" and len(content) > self._maxLength:
+                errors.append(_("The field '%s' cannot be more than %s characters") % (self._caption, self._maxLength))
+
+        return errors
 
     def getLimitation(self):
         return self._limitation
@@ -616,6 +635,17 @@ class AbstractSelectionField(AbstractField):
 
     def clone(self):
         return AbstractSelectionField(self.getValues())
+
+    def check(self, content):
+        errors = AbstractField.check(self, content)
+
+        if self._active and self._isMandatory and content == "":
+            errors.append(_("The field '%s' is mandatory") % self._caption)
+        elif content != "":
+            if next((op for op in self._options if op.id == content), None) is None:
+                errors.append(_("The option with ID '%s' in the field %s") % (content, self._caption))
+
+        return errors
 
     def getDeletedOption(self, id):
         return next((o for o in self._deleted_options if o.getId() == id), None)
