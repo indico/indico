@@ -147,7 +147,6 @@ pre {
    font-family: arial, serif;
    white-space: pre-wrap;       /* css-3 */
    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-   white-space: -pre-wrap;      /* Opera 4-6 */
    white-space: -o-pre-wrap;    /* Opera 7 */
    word-wrap: break-word;       /* Internet Explorer 5.5+ */
    margin: 0px;
@@ -2736,7 +2735,10 @@ ul.UIUserEvtList li
 
 .bookedItemCollision:hover + div{
     display: block;
-    position: absolute; top: 25px; left: 0px; width: 100% - 6;
+    position: absolute;
+    top: 25px;
+    left: 0px;
+    width: 100%;
     color: #AAA;
     background-color: #FFF6DF;
     padding: 3px;
@@ -2745,7 +2747,10 @@ ul.UIUserEvtList li
 
 .bookedItemOutsideBooking:hover + div{
     display: block;
-    position: absolute; top: 25px; left: 0px; width: 100% - 6;
+    position: absolute;
+    top: 25px;
+    left: 0px;
+    width: 100%;
     color: #AAA;
     background-color: #FFF6DF;
     padding: 3px;
@@ -3617,7 +3622,7 @@ ul.listCompact {
     font-size: 18px;
     margin-top: 20px;
     margin-left: 40px;
-    padding 0;
+    padding: 0;
     border-bottom: 1px solid #EBEBEB;
 }
 
@@ -4332,7 +4337,7 @@ div.resourceContainer
 }
 
 div.highlighted {
-    border: 1 px solid red;
+    border: 1px solid red;
 }
 
 div.descriptionBox
@@ -4603,7 +4608,7 @@ ul.warningLevel1 {
 }
 
 .newsItemDate {
-   font-weight: italic;
+   font-style: italic;
    color: #36393D;
 }
 
@@ -5267,7 +5272,7 @@ td.timetablePopupContributionTitle{
 .colorPicker .inputContainer, .colorField .inputContainer {
     border: 1px solid #777;
     margin: 2px 0 2px 7px;
-    position: relativ;
+    position: relative;
     -moz-border-radius: 2px;
     -webkit-border-radius: 2px;
     border-radius: 2px;
@@ -8057,7 +8062,7 @@ table#currencies {
 
 table#currencies tr {
     border: 1px solid #ddd;
-    border-spacing: 5x;
+    border-spacing: 5px;
 }
 
 table#currencies td, table#currencies th {
@@ -8119,7 +8124,7 @@ ul.material_list ul li {
 }
 
 .visibility_hidden {
-    visibility: none;
+    visibility: hidden;
     padding: 0;
     height: 0;
     margin: 0;
@@ -8215,7 +8220,7 @@ ul.speaker_list li {
     margin: 1em 0 0 0;
 }
 
-ul.speaker_list a {m
+ul.speaker_list a {
     font-size: 1em;
 }
 
