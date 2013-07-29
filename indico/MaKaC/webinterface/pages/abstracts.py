@@ -273,51 +273,52 @@ class WPAbstractCannotBeModified( WPAbstractDisplayBase ):
         wc = WAbstractCannotBeModified( self._abstract )
         return wc.getHTML()
 
-class WAbstractSubmissionConfirmation( wcomponents.WTemplated ):
 
-    def __init__( self, aw, abstract ):
+class WAbstractSubmissionConfirmation(wcomponents.WTemplated):
+
+    def __init__(self, aw, abstract):
         self._aw = aw
         self._abstract = abstract
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["displayURL"] = quoteattr( str ( urlHandlers.UHAbstractDisplay.getURL( self._abstract ) ) )
-        vars["displayURLText"] = self.htmlText( str( urlHandlers.UHAbstractDisplay.getURL( self._abstract ) ) )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["displayURL"] = quoteattr(str(urlHandlers.UHAbstractDisplay.getURL(self._abstract)))
+        vars["displayURLText"] = self.htmlText(str(urlHandlers.UHAbstractDisplay.getURL(self._abstract)))
         conf = self._abstract.getConference()
-        vars["userAbstractsURL"] = quoteattr( str ( urlHandlers.UHUserAbstracts.getURL( conf ) ) )
-        vars["userAbstractsURLText"] = self.htmlText( str ( urlHandlers.UHUserAbstracts.getURL( conf ) ) )
-        vars["CFAURL"] = quoteattr( str ( urlHandlers.UHConferenceCFA.getURL( conf ) ) )
+        vars["userAbstractsURL"] = quoteattr(str(urlHandlers.UHUserAbstracts.getURL(conf)))
+        vars["userAbstractsURLText"] = self.htmlText(str(urlHandlers.UHUserAbstracts.getURL(conf)))
+        vars["CFAURL"] = quoteattr(str(urlHandlers.UHConferenceCFA.getURL(conf)))
         vars["abstractId"] = self._abstract.getId()
         return vars
 
 
-class WPAbstractSubmissionConfirmation( WPAbstractDisplayBase ):
+class WPAbstractSubmissionConfirmation(WPAbstractDisplayBase):
     navigationEntry = navigation.NEAbstractSubmissionConfirmation
 
-    def _getBody( self, params ):
-        wc = WAbstractSubmissionConfirmation( self._getAW(), self._abstract )
+    def _getBody(self, params):
+        wc = WAbstractSubmissionConfirmation(self._getAW(), self._abstract)
         return wc.getHTML()
 
 
-class WAbstractDisplay( wcomponents.WTemplated ):
+class WAbstractDisplay(wcomponents.WTemplated):
 
     def __init__(self, aw, abstract):
         self._abstract = abstract
         self._aw = aw
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
 
         tzUtil = DisplayTZ(self._aw, self._abstract.getConference())
         tz = tzUtil.getDisplayTZ()
 
-        status=self._abstract.getCurrentStatus()
-        if isinstance(status,review.AbstractStatusAccepted):
-            vars["contribType"]= status.getType()
-            vars["tracks"]= status.getTrack()
+        status = self._abstract.getCurrentStatus()
+        if isinstance(status, review.AbstractStatusAccepted):
+            vars["contribType"] = status.getType()
+            vars["tracks"] = status.getTrack()
         else:
             vars["tracks"] = self._abstract.getTrackListSorted()
-            vars["contribType"]=self._abstract.getContribType()
+            vars["contribType"] = self._abstract.getContribType()
         vars["modifyURL"] = str(urlHandlers.UHAbstractModify.getURL(self._abstract))
         vars["withdrawURL"] = str(urlHandlers.UHAbstractWithdraw.getURL(self._abstract))
         vars["recoverURL"] = str(urlHandlers.UHAbstractRecovery.getURL(self._abstract))
@@ -330,31 +331,31 @@ class WAbstractDisplay( wcomponents.WTemplated ):
 
         vars["modifyDisabled"] = isinstance(status, (review.AbstractStatusAccepted,
                                                      review.AbstractStatusRejected, review.AbstractStatusDuplicated, review.AbstractStatusMerged))
-        vars["withdrawDisabled"] = isinstance( status, (review.AbstractStatusAccepted, review.AbstractStatusRejected,
-                                                        review.AbstractStatusWithdrawn, review.AbstractStatusDuplicated, review.AbstractStatusMerged ) )
+        vars["withdrawDisabled"] = isinstance(status, (review.AbstractStatusAccepted, review.AbstractStatusRejected,
+                                                       review.AbstractStatusWithdrawn, review.AbstractStatusDuplicated, review.AbstractStatusMerged))
         status = self._abstract.getCurrentStatus()
-        if isinstance( status, review.AbstractStatusAccepted ):
+        if isinstance(status, review.AbstractStatusAccepted):
             vars["statusText"] = _("ACCEPTED ")
-            if status.getType() is not None and status.getType()!="":
-                vars["statusText"] += "as %s"% status.getType().getName()
+            if status.getType() is not None and status.getType() != "":
+                vars["statusText"] += "as %s" % status.getType().getName()
             vars["statusClass"] = "abstractStatusAccepted"
             vars["statusComments"] = ""
-        elif isinstance( status, review.AbstractStatusRejected ):
+        elif isinstance(status, review.AbstractStatusRejected):
             vars["statusText"] = _("REJECTED")
             vars["statusClass"] = "abstractStatusRejected"
             vars["statusComments"] = ""
-        elif isinstance( status, review.AbstractStatusWithdrawn ):
+        elif isinstance(status, review.AbstractStatusWithdrawn):
             vars["statusText"] = _("Withdrawn")
             vars["statusClass"] = "abstractStatusWithdrawn"
-            vars["statusComments"] = i18nformat("""_("Withdrawn") by %s _("on") %s %s""")%(self.htmlText(status.getResponsible().getFullName()),format_date(status.getDate(), "d MMM yyyy"), format_time(status.getDate(), format="short", timezone=timezone(tz)))
-        elif isinstance(status,review.AbstractStatusDuplicated):
+            vars["statusComments"] = i18nformat("""_("Withdrawn") by %s _("on") %s %s""") % (self.htmlText(status.getResponsible().getFullName()), format_date(status.getDate(), "d MMM yyyy"), format_time(status.getDate(), format="short", timezone=timezone(tz)))
+        elif isinstance(status, review.AbstractStatusDuplicated):
             vars["statusText"] = _("Duplicated")
             vars["statusClass"] = "abstractStatusDuplicated"
             vars["statusComments"] = ""
-        elif isinstance(status,review.AbstractStatusMerged):
+        elif isinstance(status, review.AbstractStatusMerged):
             vars["statusText"] = _("Merged")
             vars["statusClass"] = "abstractStatusMerged"
-            vars["statusComments"] = i18nformat("""_("Merged") into %s-%s""")%(self.htmlText(status.getTargetAbstract().getId()),self.htmlText(status.getTargetAbstract().getTitle()))
+            vars["statusComments"] = i18nformat("""_("Merged") into %s-%s""") % (self.htmlText(status.getTargetAbstract().getId()), self.htmlText(status.getTargetAbstract().getTitle()))
         elif isinstance(status, (review.AbstractStatusProposedToAccept, review.AbstractStatusProposedToReject)):
             vars["statusText"] = _("Under Review")
             vars["statusClass"] = "abstractStatusUnderReview"
@@ -367,11 +368,11 @@ class WAbstractDisplay( wcomponents.WTemplated ):
         return vars
 
 
-class WPAbstractDisplay( WPAbstractDisplayBase ):
+class WPAbstractDisplay(WPAbstractDisplayBase):
     navigationEntry = navigation.NEAbstractDisplay
 
-    def _getBody( self, params ):
-        wc = WAbstractDisplay( self._getAW(), self._abstract )
+    def _getBody(self, params):
+        wc = WAbstractDisplay(self._getAW(), self._abstract)
         return wc.getHTML()
 
 
@@ -379,10 +380,10 @@ class WAbstractDataModification(WConfDisplayBodyBase):
 
     _linkname = "SubmitAbstract"
 
-    def __init__( self, conf ):
+    def __init__(self, conf):
         self._conf = conf
         self._limitedFieldList = []
-        self._mandatoryFieldList = [] # all mandatory fields ids, except which are also limited
+        self._mandatoryFieldList = []  # all mandatory fields ids, except which are also limited
 
     def _setMandatoryAndLimitedFields(self):
         abfm = self._conf.getAbstractMgr().getAbstractFieldsMgr()
@@ -392,17 +393,17 @@ class WAbstractDataModification(WConfDisplayBodyBase):
                 if isinstance(f, AbstractTextField):
                     maxLength = int(f.getMaxLength())
                     limitation = f.getLimitation()
-                    if maxLength > 0: # it means there is a limit for the field in words or in characters
-                        self._limitedFieldList.append(["f_"+id, maxLength, "maxLimitionCounter_"+id.replace(" ", "_"), limitation, str(f.isMandatory())]) # append the textarea/input id
+                    if maxLength > 0:  # it means there is a limit for the field in words or in characters
+                        self._limitedFieldList.append(["f_"+id, maxLength, "maxLimitionCounter_"+id.replace(" ", "_"), limitation, str(f.isMandatory())])  # append the textarea/input id
                     elif f.isMandatory():
                         self._mandatoryFieldList.append("f_"+id)
                 elif f.isMandatory():
                     self._mandatoryFieldList.append("f_"+id)
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         vars["body_title"] = self._getTitle()
-        vars["postURL"] = quoteattr(str( vars["postURL"]))
+        vars["postURL"] = quoteattr(str(vars["postURL"]))
         vars["origin"] = vars.get("origin", "display")
         vars["abstractTitle"] = quoteattr(str(vars.get("title", "")))
         vars["prAuthors"] = fossilize(vars.get("prAuthors", []))
@@ -414,7 +415,7 @@ class WAbstractDataModification(WConfDisplayBodyBase):
             vars["trackListType"] = "checkbox"
         else:
             vars["trackListType"] = "radio"
-        vars["tracksSelected"] = vars.get("tracksSelectedList", []) # list of track ids that had been selected
+        vars["tracksSelected"] = vars.get("tracksSelectedList", [])  # list of track ids that had been selected
         vars["types"] = self._conf.getContribTypeList()
         vars["typeSelected"] = vars.get("type", None)
         vars["comments"] = str(vars.get("comments", ""))
@@ -435,28 +436,28 @@ class WAbstractDataModification(WConfDisplayBodyBase):
         return vars
 
 
-class WPAbstractModify( WPAbstractDisplayBase ):
+class WPAbstractModify(WPAbstractDisplayBase):
     navigationEntry = navigation.NEAbstractModify
 
     def getJSFiles(self):
         return WPAbstractDisplayBase.getJSFiles(self) + \
-               self._includeJSPackage('Management')
+            self._includeJSPackage('Management')
 
-    def _getBody( self, params ):
-        params["postURL"] = urlHandlers.UHAbstractModify.getURL( self._abstract )
-        wc = WAbstractDataModification( self._abstract.getConference() )
-        return wc.getHTML( params )
+    def _getBody(self, params):
+        params["postURL"] = urlHandlers.UHAbstractModify.getURL(self._abstract)
+        wc = WAbstractDataModification(self._abstract.getConference())
+        return wc.getHTML(params)
 
 
-class WAbstractWithdraw( wcomponents.WTemplated ):
+class WAbstractWithdraw(wcomponents.WTemplated):
 
-    def __init__( self, abstract ):
+    def __init__(self, abstract):
         self._abstract = abstract
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["title"] = self.htmlText( self._abstract.getTitle() )
-        vars["postURL"] = urlHandlers.UHAbstractWithdraw.getURL( self._abstract )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["title"] = self.htmlText(self._abstract.getTitle())
+        vars["postURL"] = urlHandlers.UHAbstractWithdraw.getURL(self._abstract)
         return vars
 
 
@@ -701,10 +702,7 @@ class WAbstractManagment(wcomponents.WTemplated):
         for f in afm.getActiveFields():
             id = f.getId()
             caption = f.getCaption()
-            if f.getType() == "selection":
-                value = str(f.getOption(self._abstract.getField(id))) if f.getOption(self._abstract.getField(id)) else ""
-            else:
-                value = self._abstract.getField(id)
+            value = self._abstract.getField(id)
             html += """
                     <tr>
                         <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">%s</span></td>

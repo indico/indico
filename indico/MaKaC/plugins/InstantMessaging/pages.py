@@ -25,15 +25,15 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConfer
 from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 from MaKaC.webinterface import wcomponents
 from MaKaC.webinterface.wcomponents import WTemplated
-from MaKaC.common.utils import formatDateTime, parseDateTime
+from MaKaC.common.utils import formatDateTime
 from MaKaC.common.fossilize import fossilize
-from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, setAdjustedDate, DisplayTZ, minDatetime
+from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc, DisplayTZ
 from MaKaC.plugins import PluginsHolder, InstantMessaging
 from MaKaC.plugins.helpers import DBHelpers
 from MaKaC.plugins.util import PluginFieldsWrapper
 from MaKaC.plugins.InstantMessaging import urlHandlers
 from MaKaC.webinterface.rh.conferenceModif import RHMaterialsShow
-from MaKaC.plugins.InstantMessaging.XMPP.helpers import generateCustomLinks, generateLogLink, XMPPLogsActivated, DesktopLinkGenerator, WebLinkGenerator
+from MaKaC.plugins.InstantMessaging.XMPP.helpers import generateCustomLinks, generateLogLink, XMPPLogsActivated
 from MaKaC.i18n import _
 import zope.interface
 from indico.core.extpoint import Component
@@ -46,7 +46,7 @@ class WPConfModifChat(WPConferenceModifBase):
     def __init__(self, rh, conf):
         WPConferenceModifBase.__init__(self, rh, conf)
         self._conf = conf
-        self._tabs = {} # list of Indico's Tab objects
+        self._tabs = {}  # list of Indico's Tab objects
         self._tabNames = rh._tabs
         self._activeTabName = rh._activeTabName
         self._aw = rh.getAW()
@@ -62,15 +62,15 @@ class WPConfModifChat(WPConferenceModifBase):
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + \
-               self._plugin_asset_env['instant_messaging'].urls()
+            self._plugin_asset_env['instant_messaging'].urls()
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + \
-               ['InstantMessaging/im.css']
+            ['InstantMessaging/im.css']
 
     def _createTabCtrl(self):
         for tabName in self._tabNames:
-            url = urlHandlers.UHConfModifChat.getURL(self._conf, tab = tabName)
+            url = urlHandlers.UHConfModifChat.getURL(self._conf, tab=tabName)
             self._tabs[tabName] = self._tabCtrl.newTab(tabName, tabName, url)
 
         self._setActiveTab()
@@ -107,7 +107,7 @@ class WPConferenceInstantMessaging(WPConferenceDefaultDisplayBase):
                                                    self._conf, self._aw)
         return wc.getHTML({})
 
-    def _defineSectionMenu( self ):
+    def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._sectionMenu.getLinkByName("instantMessaging"))
 
@@ -134,6 +134,7 @@ class IMEventDisplayComponent(Component):
 class WEventDetailBanner(wcomponents.WTemplated):
     pass
 
+
 class WConfModifChat(wcomponents.WTemplated):
 
     def __init__(self, conference, activeTab, tabNames, aw):
@@ -143,8 +144,8 @@ class WConfModifChat(wcomponents.WTemplated):
         self._aw = aw
         self._user = aw.getUser()
 
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
+    def getVars(self):
+        vars = WTemplated.getVars(self)
         vars["Conference"] = self._conf
         try:
             chatrooms = list(DBHelpers.getChatroomList(self._conf))
@@ -157,7 +158,7 @@ class WConfModifChat(wcomponents.WTemplated):
         links = {}
 
         for cr in chatrooms:
-            crinfo = links[cr.getId() ] = {}
+            crinfo = links[cr.getId()] = {}
             crinfo['custom'] = generateCustomLinks(cr)
             crinfo['logs'] = generateLogLink(cr, self._conf)
 
@@ -166,7 +167,7 @@ class WConfModifChat(wcomponents.WTemplated):
         vars['DefaultServer'] = PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('chatServerHost')
         vars["EventDate"] = formatDateTime(getAdjustedDate(nowutc(), self._conf))
         vars["User"] = self._user
-        vars["tz"] = DisplayTZ(self._aw,self._conf).getDisplayTZ()
+        vars["tz"] = DisplayTZ(self._aw, self._conf).getDisplayTZ()
         vars["MaterialUrl"] = RHMaterialsShow._uh().getURL(self._conf).__str__()
         vars["ShowLogsLink"] = XMPPLogsActivated()
 
@@ -199,6 +200,6 @@ class WConferenceInstantMessaging(WConfDisplayBodyBase):
 
         return wvars
 
+
 class WPluginHelp(wcomponents.WTemplated):
     pass
-

@@ -3113,8 +3113,8 @@ class WConfModifCFA(wcomponents.WTemplated):
         vars["speakerMandatoryUrl"] = urlHandlers.UHConfCFASelectSpeakerMandatory.getURL(self._conf)
         vars["showAttachedFilesUrl"] = urlHandlers.UHConfCFAAttachedFilesContribList.getURL(self._conf)
 
-        vars["setStatusURL"]=urlHandlers.UHConfCFAChangeStatus.getURL(self._conf)
-        vars["dataModificationURL"]=urlHandlers.UHCFADataModification.getURL(self._conf)
+        vars["setStatusURL"] = urlHandlers.UHConfCFAChangeStatus.getURL(self._conf)
+        vars["dataModificationURL"] = urlHandlers.UHCFADataModification.getURL(self._conf)
         if abMgr.getCFAStatus():
             vars["changeTo"] = "False"
             vars["status"] = _("ENABLED")
