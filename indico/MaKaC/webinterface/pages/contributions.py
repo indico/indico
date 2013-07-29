@@ -23,7 +23,6 @@ from pytz import timezone
 
 import MaKaC.conference as conference
 import MaKaC.webinterface.wcomponents as wcomponents
-import MaKaC.webinterface.linking as linking
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
 import MaKaC.webinterface.materialFactories as materialFactories
@@ -38,36 +37,34 @@ from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.fossilize import fossilize
 from MaKaC.user import Avatar, AvatarHolder
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
-from MaKaC.common.contextManager import ContextManager
 
 from indico.util.i18n import i18nformat
-from indico.util.date_time import format_time, format_date, format_datetime
-from indico.util import json
+from indico.util.date_time import format_time, format_date
 
 
-class WPContributionBase( WPMainBase, WPConferenceBase ):
+class WPContributionBase(WPMainBase, WPConferenceBase):
 
-    def __init__( self, rh, contribution, hideFull = 0 ):
+    def __init__(self, rh, contribution, hideFull=0):
         self._contrib = self._target = contribution
-        WPConferenceBase.__init__( self, rh, self._contrib.getConference() )
+        WPConferenceBase.__init__(self, rh, self._contrib.getConference())
         self._navigationTarget = contribution
         self._hideFull = hideFull
 
 
-class WPContributionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPContributionBase ):
+class WPContributionDefaultDisplayBase(WPConferenceDefaultDisplayBase, WPContributionBase):
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
             self._includeJSPackage('Management') + \
-               self._includeJSPackage('MaterialEditor')
+            self._includeJSPackage('MaterialEditor')
 
-    def __init__( self, rh, contribution, hideFull = 0 ):
-        WPContributionBase.__init__( self, rh, contribution, hideFull )
+    def __init__(self, rh, contribution, hideFull=0):
+        WPContributionBase.__init__(self, rh, contribution, hideFull)
 
 
 class WContributionDisplayBase(WICalExportBase):
 
-    def __init__(self, aw, contrib, hideFull = 0):
+    def __init__(self, aw, contrib, hideFull=0):
         self._aw = aw
         self._contrib = contrib
         self._hideFull = hideFull
@@ -86,34 +83,34 @@ class WContributionDisplayBase(WICalExportBase):
         versioning = self._contrib.getReviewManager().getVersioning()
         review = self._contrib.getReviewManager().getLastReview()
         if self._contrib.getConference().getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING:
-            if review.getEditorJudgement().isSubmitted(): # editor has accepted or rejected
+            if review.getEditorJudgement().isSubmitted():  # editor has accepted or rejected
                 return review.getEditorJudgement().getJudgement()
             elif review.isAuthorSubmitted():
                 return "Submitted"
-            elif len(versioning) > 1: # there was a judgement 'To be corrected' or custom status
+            elif len(versioning) > 1:  # there was a judgement 'To be corrected' or custom status
                 return versioning[-2].getEditorJudgement().getJudgement()
         elif self._contrib.getConference().getConfPaperReview().getChoice() in [CPR.CONTENT_REVIEWING, CPR.CONTENT_AND_LAYOUT_REVIEWING]:
-            if review.getRefereeJudgement().isSubmitted(): # referee has accepted or rejected
+            if review.getRefereeJudgement().isSubmitted():  # referee has accepted or rejected
                 return review.getRefereeJudgement().getJudgement()
             elif review.isAuthorSubmitted():
                 return "Submitted"
-            elif len(versioning) > 1: # there was a judgement 'To be corrected' or custom status
+            elif len(versioning) > 1:  # there was a judgement 'To be corrected' or custom status
                 return versioning[-2].getRefereeJudgement().getJudgement()
         if review.isAuthorSubmitted():
             return "Submitted"
         return None
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
 
-        vars["isWithdrawn"] = isinstance(self._contrib.getCurrentStatus(),conference.ContribStatusWithdrawn)
+        vars["isWithdrawn"] = isinstance(self._contrib.getCurrentStatus(), conference.ContribStatusWithdrawn)
         vars["Contribution"] = vars["target"] = self._contrib
-        vars["urlICSFile"] =  urlHandlers.UHContribToiCal.getURL(self._contrib)
+        vars["urlICSFile"] = urlHandlers.UHContribToiCal.getURL(self._contrib)
 
         vars["showAttachedFiles"] = self._contrib.getConference().getAbstractMgr().showAttachedFilesContribList() and isinstance(self._contrib, conference.AcceptedContribution) and self._contrib.getAbstract() and len(self._contrib.getAbstract().getAttachments()) > 0
         vars["abstractAttachments"] = fossilize(self._contrib.getAbstract().getAttachments().values(), ILocalFileAbstractMaterialFossil) if isinstance(self._contrib, conference.AcceptedContribution) and self._contrib.getAbstract() else []
 
-        vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/event/%s/contribution/%s.ics' % \
+        vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/event/%s/contribution/%s.ics' %
                                               (self._contrib.getConference().getId(), self._contrib.getId())))
 
         vars["getAuthorURL"] = lambda auth: self._getAuthorURL(auth)
@@ -124,9 +121,10 @@ class WContributionDisplayBase(WICalExportBase):
         vars["showSubmit"] = statusReviewing not in ["Accept", "Reject", "Submitted"]
         vars["showMaterial"] = statusReviewing is not None
         vars["showHistory"] = statusReviewing is not None
-        vars["reviewingActive"] = self._contrib.getConference() and self._contrib.getConference().getConfPaperReview().hasReviewing() \
-                                    and not isinstance(self._contrib.getCurrentStatus(),conference.ContribStatusWithdrawn) \
-                                    and (self._contrib.canUserSubmit(self._aw.getUser()) or self._contrib.canModify(self._aw))
+        vars["reviewingActive"] = self._contrib.getConference() and \
+            self._contrib.getConference().getConfPaperReview().hasReviewing() and \
+            not isinstance(self._contrib.getCurrentStatus(), conference.ContribStatusWithdrawn) and \
+            (self._contrib.canUserSubmit(self._aw.getUser()) or self._contrib.canModify(self._aw))
         if statusReviewing == "Submitted":
             vars["statusText"] = _("Awaiting review")
             vars["statusClass"] = "contributionReviewingStatusPending"
@@ -145,12 +143,10 @@ class WContributionDisplayBase(WICalExportBase):
         else:
             vars["statusText"] = _("Paper not yet submitted")
             vars["statusClass"] = "contributionReviewingStatusNotSubmitted"
-        vars["prefixUpload"] = "Re-" if  statusReviewing not in ["Accept", "Reject", None] else ""
+        vars["prefixUpload"] = "Re-" if statusReviewing not in ["Accept", "Reject", None] else ""
         vars["getResourceName"] = lambda resource: self._getResourceName(resource)
         vars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
         return vars
-
-
 
 
 class WContributionDisplayFull(WContributionDisplayBase):
@@ -163,33 +159,33 @@ class WContributionDisplayMin(WContributionDisplayBase):
 
 class WContributionDisplay:
 
-    def __init__(self, aw, contrib, hideFull = 0):
+    def __init__(self, aw, contrib, hideFull=0):
         self._aw = aw
         self._contrib = contrib
         self._hideFull = hideFull
 
-    def getHTML(self,params={}):
-        if self._contrib.canAccess( self._aw ):
-            c = WContributionDisplayFull( self._aw, self._contrib, self._hideFull)
-            return c.getHTML( params )
-        if self._contrib.canView( self._aw ):
-            c = WContributionDisplayMin( self._aw, self._contrib)
-            return c.getHTML( params )
+    def getHTML(self, params={}):
+        if self._contrib.canAccess(self._aw):
+            c = WContributionDisplayFull(self._aw, self._contrib, self._hideFull)
+            return c.getHTML(params)
+        if self._contrib.canView(self._aw):
+            c = WContributionDisplayMin(self._aw, self._contrib)
+            return c.getHTML(params)
         return ""
 
 
-class WPContributionDisplay( WPContributionDefaultDisplayBase ):
+class WPContributionDisplay(WPContributionDefaultDisplayBase):
     navigationEntry = navigation.NEContributionDisplay
 
-    def _getBody( self, params ):
-        wc=WContributionDisplay( self._getAW(), self._contrib, self._hideFull )
+    def _getBody(self, params):
+        wc = WContributionDisplay(self._getAW(), self._contrib, self._hideFull)
         return wc.getHTML()
 
 
-class WPContributionModifBase( WPConferenceModifBase  ):
+class WPContributionModifBase(WPConferenceModifBase):
 
-    def __init__( self, rh, contribution ):
-        WPConferenceModifBase.__init__( self, rh, contribution.getConference() )
+    def __init__(self, rh, contribution):
+        WPConferenceModifBase.__init__(self, rh, contribution.getConference())
         self._contrib = self._target = contribution
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager
         self._isPRM = RCPaperReviewManager.hasRights(rh)
@@ -199,80 +195,79 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         return False
 
     def _getNavigationDrawer(self):
-        pars = {"target": self._contrib , "isModif": True}
-        return wcomponents.WNavigationDrawer( pars, bgColor="white" )
+        pars = {"target": self._contrib, "isModif": True}
+        return wcomponents.WNavigationDrawer(pars, bgColor="white")
 
-    def _createTabCtrl( self ):
+    def _createTabCtrl(self):
 
         self._tabCtrl = wcomponents.TabControl()
-        self._tabMain = self._tabCtrl.newTab( "main", _("Main"), \
-                urlHandlers.UHContributionModification.getURL( self._target ) )
-        self._tabMaterials = self._tabCtrl.newTab( "materials", _("Material"), \
-                urlHandlers.UHContribModifMaterials.getURL( self._target ) )
-        #self._tabMaterials = self._tabCtrl.newTab( "materials", _("Files"), \
-        #        urlHandlers.UHContribModifMaterials.getURL( self._target ) )
-        self._tabSubCont = self._tabCtrl.newTab( "subCont", _("Sub Contribution"), \
-                urlHandlers.UHContribModifSubCont.getURL( self._target ) )
+        self._tabMain = self._tabCtrl.newTab("main", _("Main"),
+                                             urlHandlers.UHContributionModification.getURL(self._target))
+        self._tabMaterials = self._tabCtrl.newTab("materials", _("Material"),
+                                                  urlHandlers.UHContribModifMaterials.getURL(self._target))
+        self._tabSubCont = self._tabCtrl.newTab("subCont", _("Sub Contribution"),
+                                                urlHandlers.UHContribModifSubCont.getURL(self._target))
         if self._canModify:
-            self._tabAC = self._tabCtrl.newTab( "ac", _("Protection"), \
-                urlHandlers.UHContribModifAC.getURL( self._target ) )
-            self._tabTools = self._tabCtrl.newTab( "tools", _("Tools"), \
-                urlHandlers.UHContribModifTools.getURL( self._target ) )
+            self._tabAC = self._tabCtrl.newTab("ac", _("Protection"),
+                                               urlHandlers.UHContribModifAC.getURL(self._target))
+            self._tabTools = self._tabCtrl.newTab("tools", _("Tools"),
+                                                  urlHandlers.UHContribModifTools.getURL(self._target))
 
         hasReviewingEnabled = self._contrib.getConference().hasEnabledSection('paperReviewing')
         paperReviewChoice = self._contrib.getConference().getConfPaperReview().getChoice()
 
         if hasReviewingEnabled and paperReviewChoice != 1:
-
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
-                self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
-                urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
+                self._subtabReviewing = self._tabCtrl.newTab("reviewing", "Paper Reviewing",
+                                                             urlHandlers.UHContributionModifReviewing.getURL(self._target))
             else:
                 if self._contrib.getReviewManager().isEditor(self._rh._getUser()):
-                    self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
-                    urlHandlers.UHContributionEditingJudgement.getURL( self._target ) )
+                    self._subtabReviewing = self._tabCtrl.newTab("reviewing", "Paper Reviewing",
+                                                                 urlHandlers.UHContributionEditingJudgement.getURL(self._target))
                 elif self._contrib.getReviewManager().isReviewer(self._rh._getUser()):
-                    self._subtabReviewing = self._tabCtrl.newTab( "reviewing", "Paper Reviewing", \
-                    urlHandlers.UHContributionGiveAdvice.getURL( self._target ) )
-
+                    self._subtabReviewing = self._tabCtrl.newTab("reviewing", "Paper Reviewing",
+                                                                 urlHandlers.UHContributionGiveAdvice.getURL(self._target))
 
             if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()):
-                self._subTabAssign = self._subtabReviewing.newSubTab( "assign", _("Assign Team"), \
-                urlHandlers.UHContributionModifReviewing.getURL( self._target ) )
+                self._subTabAssign = self._subtabReviewing.newSubTab("assign", _("Assign Team"),
+                                                                     urlHandlers.UHContributionModifReviewing.getURL(self._target))
                 if self._contrib.getReviewManager().isReferee(self._rh._getUser()) and not (paperReviewChoice == 3 or paperReviewChoice == 1):
-                    self._subTabJudgements = self._subtabReviewing.newSubTab( "referee", _("Referee Assessment"), \
-                    urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
+                    self._subTabJudgements = self._subtabReviewing.newSubTab("referee", _("Referee Assessment"),
+                                                                             urlHandlers.UHContributionReviewingJudgements.getURL(self._target))
                 else:
-                    self._subTabJudgements = self._subtabReviewing.newSubTab( "Assessments", _("Assessments"), \
-                    urlHandlers.UHContributionReviewingJudgements.getURL( self._target ) )
+                    self._subTabJudgements = self._subtabReviewing.newSubTab("Assessments", _("Assessments"),
+                                                                             urlHandlers.UHContributionReviewingJudgements.getURL(self._target))
 
             if (paperReviewChoice == 3 or paperReviewChoice == 4) and \
-                self._contrib.getReviewManager().isEditor(self._rh._getUser()) and \
-                not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-
-                self._tabJudgeEditing = self._subtabReviewing.newSubTab( "editing", "Assess Layout", \
-                urlHandlers.UHContributionEditingJudgement.getURL(self._target) )
+               self._contrib.getReviewManager().isEditor(self._rh._getUser()) and \
+               not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
+                self._tabJudgeEditing = self._subtabReviewing.newSubTab("editing", "Assess Layout",
+                                                                        urlHandlers.UHContributionEditingJudgement.getURL(self._target))
 
             if (paperReviewChoice == 2 or paperReviewChoice == 4) and \
-                self._contrib.getReviewManager().isReviewer(self._rh._getUser()) and \
-                not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
+               self._contrib.getReviewManager().isReviewer(self._rh._getUser()) and \
+               not self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
+                self._tabGiveAdvice = self._subtabReviewing.newSubTab("advice", "Assess Content",
+                                                                      urlHandlers.UHContributionGiveAdvice.getURL(self._target))
 
-                self._tabGiveAdvice = self._subtabReviewing.newSubTab( "advice", "Assess Content", \
-                                      urlHandlers.UHContributionGiveAdvice.getURL(self._target))
+            if self._canModify or \
+               self._isPRM or \
+               self._contrib.getReviewManager().isInReviewingTeamforContribution(self._rh._getUser()):
+                self._subTabRevMaterial = self._subtabReviewing.newSubTab("revmaterial", _("Material to Review"),
+                                                                          urlHandlers.UHContribModifReviewingMaterials.getURL(self._target))
 
-            if self._canModify or self._isPRM or self._contrib.getReviewManager().isInReviewingTeamforContribution(self._rh._getUser()):
-                self._subTabRevMaterial = self._subtabReviewing.newSubTab( "revmaterial", _("Material to Review"), \
-                urlHandlers.UHContribModifReviewingMaterials.getURL( self._target ) )
-
-            if self._canModify or self._isPRM or self._contrib.getReviewManager().isReferee(self._rh._getUser()) or \
-            len(self._contrib.getReviewManager().getVersioning()) > 1 or self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
-                self._subTabReviewingHistory = self._subtabReviewing.newSubTab( "reviewing_history", "History", \
-                                            urlHandlers.UHContributionModifReviewingHistory.getURL( self._target ) )
+            if self._canModify or \
+               self._isPRM or \
+               self._contrib.getReviewManager().isReferee(self._rh._getUser()) or \
+               len(self._contrib.getReviewManager().getVersioning()) > 1 or \
+               self._contrib.getReviewManager().getLastReview().getRefereeJudgement().isSubmitted():
+                self._subTabReviewingHistory = self._subtabReviewing.newSubTab("reviewing_history", "History",
+                                                                               urlHandlers.UHContributionModifReviewingHistory.getURL(self._target))
 
         self._setActiveTab()
         self._setupTabCtrl()
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         pass
 
     def _setupTabCtrl(self):
@@ -284,7 +279,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         else:
             self._contribListMenuItem.setActive(True)
 
-    def _getPageContent( self, params ):
+    def _getPageContent(self, params):
         self._createTabCtrl()
         banner = ""
         if self._canModify or self._isPRM:
@@ -299,7 +294,7 @@ class WPContributionModifBase( WPConferenceModifBase  ):
         if banner == "":
             banner = wcomponents.WTimetableBannerModif(self._getAW(), self._target).getHTML()
 
-        body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
+        body = wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
         return banner + body
 
 
@@ -467,10 +462,7 @@ class WContribModifMain(wcomponents.WTemplated):
                 if f.isActive():
                     id = f.getId()
                     caption = f.getCaption()
-                    if f.getType() == "selection":
-                        value = str(f.getOption(self._contrib.getField(id))) if f.getOption(self._contrib.getField(id)) else ""
-                    else:
-                        value = self._contrib.getField(id)
+                    value = self._contrib.getField(id)
                     html += """
                     <tr>
                         <td class="dataCaptionTD"><span class="dataCaptionFormat">%s</span></td>
@@ -725,7 +717,7 @@ class WPContribAddSC(WPContributionModifBase):
         self._tabSubCont.setActive()
 
     def _getTabContent(self, params):
-        wc = WSubContributionCreation( self._target )
+        wc = WSubContributionCreation(self._target)
         pars = {"postURL": urlHandlers.UHContribCreateSubCont.getURL(self._contrib)}
         params.update(pars)
         return wc.getHTML(params)
@@ -786,28 +778,31 @@ class WContributionDataModification(wcomponents.WTemplated):
 
     def getContribId(self):
         if isinstance(self._owner, conference.Session):
-            return "s" +  self._owner.id + "c" + self._contrib.id
+            return "s" + self._owner.id + "c" + self._contrib.id
         else:
             return "c" + self._contrib.id
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         defaultDefinePlace = defaultDefineRoom = ""
         defaultInheritPlace = defaultInheritRoom = "checked"
-        locationName, locationAddress, roomName, defaultExistRoom = "", "", "",""
+        locationName, locationAddress, roomName, defaultExistRoom = "", "", "", ""
 
         vars["conference"] = self._conf
-        vars["boardNumber"]=quoteattr(str(self._contrib.getBoardNumber()))
+        vars["boardNumber"] = quoteattr(str(self._contrib.getBoardNumber()))
         vars["contrib"] = self._contrib
         vars["title"] = quoteattr(self._contrib.getTitle())
         vars["description"] = self.htmlText(self._contrib.getDescription())
         vars["additionalFields"] = self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields()
         vars["fieldDict"] = self._getAdditionalFieldsData()
-        vars["day"],vars["month"],vars["year"]="","",""
-        vars["sHour"],vars["sMinute"]="",""
-        sDate=self._contrib.getStartDate()
+        vars["day"] = ""
+        vars["month"] = ""
+        vars["year"] = ""
+        vars["sHour"] = ""
+        vars["sMinute"] = ""
+        sDate = self._contrib.getStartDate()
         if sDate is not None:
-            vars["day"]=quoteattr(str(sDate.day))
+            vars["day"] = quoteattr(str(sDate.day))
             vars["month"] = quoteattr(str(sDate.month))
             vars["year"] = quoteattr(str(sDate.year))
             vars["sHour"] = quoteattr(str(sDate.hour))
@@ -816,10 +811,10 @@ class WContributionDataModification(wcomponents.WTemplated):
             vars["dateTime"] = formatDateTime(self._contrib.getAdjustedStartDate())
         else:
             vars["dateTime"] = ""
-        vars["duration"] = self._contrib.getDuration().seconds/60
+        vars["duration"] = self._contrib.getDuration().seconds / 60
         if self._contrib.getDuration() is not None:
-            vars["durationHours"]=quoteattr(str((datetime(1900,1,1)+self._contrib.getDuration()).hour))
-            vars["durationMinutes"]=quoteattr(str((datetime(1900,1,1)+self._contrib.getDuration()).minute))
+            vars["durationHours"] = quoteattr(str((datetime(1900, 1, 1) + self._contrib.getDuration()).hour))
+            vars["durationMinutes"] = quoteattr(str((datetime(1900, 1, 1) + self._contrib.getDuration()).minute))
         if self._contrib.getOwnLocation():
             defaultDefinePlace = "checked"
             defaultInheritPlace = ""
@@ -827,16 +822,16 @@ class WContributionDataModification(wcomponents.WTemplated):
             locationAddress = self._contrib.getLocation().getAddress()
 
         if self._contrib.getOwnRoom():
-            defaultDefineRoom= "checked"
+            defaultDefineRoom = "checked"
             defaultInheritRoom = ""
-            defaultExistRoom=""
+            defaultExistRoom = ""
             roomName = self._contrib.getRoom().getName()
         vars["defaultInheritPlace"] = defaultInheritPlace
         vars["defaultDefinePlace"] = defaultDefinePlace
         vars["confPlace"] = ""
         confLocation = self._owner.getLocation()
         if self._contrib.isScheduled():
-            confLocation=self._contrib.getSchEntry().getSchedule().getOwner().getLocation()
+            confLocation = self._contrib.getSchEntry().getSchedule().getOwner().getLocation()
         if self._contrib.getSession() and not self._contrib.getConference().getEnableSessionSlots():
             confLocation = self._contrib.getSession().getLocation()
         if confLocation:
@@ -848,16 +843,16 @@ class WContributionDataModification(wcomponents.WTemplated):
         vars["defaultExistRoom"] = defaultExistRoom
         vars["confRoom"] = ""
         confRoom = self._owner.getRoom()
-        rx=[]
+        rx = []
         roomsexist = self._conf.getRoomList()
         roomsexist.sort()
         for room in roomsexist:
-            sel=""
-            rx.append("""<option value=%s%s>%s</option>"""%(quoteattr(str(room)),
-                        sel,self.htmlText(room)))
-        vars ["roomsexist"] = "".join(rx)
+            sel = ""
+            rx.append("""<option value=%s%s>%s</option>""" % (quoteattr(str(room)),
+                                                              sel, self.htmlText(room)))
+        vars["roomsexist"] = "".join(rx)
         if self._contrib.isScheduled():
-            confRoom=self._contrib.getSchEntry().getSchedule().getOwner().getRoom()
+            confRoom = self._contrib.getSchEntry().getSchedule().getOwner().getRoom()
         if self._contrib.getSession() and not self._contrib.getConference().getEnableSessionSlots():
             confRoom = self._contrib.getSession().getRoom()
         if confRoom:
@@ -867,23 +862,23 @@ class WContributionDataModification(wcomponents.WTemplated):
         if self._contrib.getSession() is not None:
             vars["parentType"] = "session"
             if self._contrib.isScheduled() and self._contrib.getConference().getEnableSessionSlots():
-                vars["parentType"]="session slot"
+                vars["parentType"] = "session slot"
         vars["postURL"] = urlHandlers.UHContributionDataModif.getURL(self._contrib)
-        vars["types"]=self._getTypeItemsHTML()
-        vars["keywords"]=self._contrib.getKeywords()
+        vars["types"] = self._getTypeItemsHTML()
+        vars["keywords"] = self._contrib.getKeywords()
         import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
         wr = webFactoryRegistry.WebFactoryRegistry()
         wf = wr.getFactory(self._conf)
-        if wf != None:
+        if wf is not None:
             type = wf.getId()
         else:
             type = "conference"
         if type == "conference":
-            vars["Type"]=WContributionDataModificationType().getHTML(vars)
-            vars["Board"]=WContributionDataModificationBoard().getHTML(vars)
+            vars["Type"] = WContributionDataModificationType().getHTML(vars)
+            vars["Board"] = WContributionDataModificationBoard().getHTML(vars)
         else:
-            vars["Type"]=""
-            vars["Board"]=""
+            vars["Type"] = ""
+            vars["Board"] = ""
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()

@@ -3513,9 +3513,6 @@ class NotificationTemplate(Persistent):
         for con in self.getConditionList() :
             tpl.addCondition(con.clone(tpl))
 
-        # kto to jest OWNER..??
-        # bo nie konferencja..!!
-
         return tpl
 
     def delete(self):
