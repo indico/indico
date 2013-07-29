@@ -367,7 +367,7 @@ class VidyoOperations(object):
         serviceType = connectionStatus.get("service")
         # roomName should be empty if we are forcing disconnection (otherwise we'd be sending the wrong name and
         # disconnetion would fail)
-        if connectionStatus.get("roomName") == self.getBookingParamByName("roomName"):
+        if connectionStatus.get("roomName") == booking.getBookingParamByName("roomName"):
             roomName = booking.getBookingParamByName("roomName")
         else:
             roomName = ""
