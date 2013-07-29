@@ -533,7 +533,6 @@ class AbstractField(Persistent, Fossilizable):
         return values
 
     def setValues(self, params):
-        self.setName(params.get("name") if params.get("name") else self._id)
         self.setCaption(params.get("caption") if params.get("caption") else self._id)
         self.setMandatory(params.get("isMandatory") if params.get("isMandatory") else False)
         self._notifyModification()
