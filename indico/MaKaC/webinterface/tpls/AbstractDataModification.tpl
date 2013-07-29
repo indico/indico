@@ -230,7 +230,6 @@
         </tr>
     </table>
 </form>
-</%block>
 
 <script type="text/javascript">
 
@@ -241,8 +240,6 @@ function onsubmitManagementActions() {
     } else {
         return false;
     }
-    //setAuthorsParam();
-    //return true;
 }
 
 function onsubmitDisplayActions() {
@@ -256,8 +253,6 @@ function onsubmitDisplayActions() {
         }
         return false;
     }
-    //setAuthorsParam();
-    //return true;
 }
 
 % if attachedFilesAllowed:
@@ -435,3 +430,4 @@ $('#sortspace').tablesorter({
 });
 
 </script>
+</%block>
