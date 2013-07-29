@@ -1847,9 +1847,15 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
             var topPx = 0;
             each(data, function(blockData, id) {
 
-                var editLink = Html.a('fakeLink', "Edit");
+                var editLink = Html.a({className: 'dropDownMenu', style: {fontWeight: 'bold'}}, $T('Edit'));
+                var menuItems = {};
+                menuItems["blockProperties"] = { action: function() {self.managementActions.editContribution(blockData);self.close();}, display: $T('Basic edition')};
+                menuItems["contributionFullEdition"] = {action: self.managementActions.editEntry(blockData), display: $T('Full edition')};
+                menuItems["contributionProtection"] = {action: self.managementActions.editEntryProtection(blockData), display: $T('Edit protection')};
                 editLink.observeClick(function() {
-                    window.location = self.managementActions.editEntry(blockData);
+                    var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);
+                    var pos = editLink.getAbsolutePosition();
+                    menu.open(pos.x + editLink.dom.offsetWidth + 2, pos.y + editLink.dom.offsetHeight + 2);
                 });
 
                 var deleteLink = Html.a('fakeLink', "Delete");
