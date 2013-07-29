@@ -418,7 +418,7 @@ class WAbstractDataModification( wcomponents.WTemplated):
         for field in cfaMgr.getAbstractFieldsMgr().getFields():
             f_id = "f_" + field.getId()
             fieldDict[f_id] = vars.get(f_id, "")
-        vars["fieldsDict"] = fieldDict
+        vars["fieldDict"] = fieldDict
         vars["additionalFields"] = cfaMgr.getAbstractFieldsMgr().getFields()
         self._setMandatoryAndLimitedFields()
         vars["limitedFieldList"] = self._limitedFieldList

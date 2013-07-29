@@ -12,7 +12,9 @@
             </td>
         </tr>
         % if self_._rh._target.getConference().getAbstractMgr().isActive() and self_._rh._target.getConference().hasEnabledSection("cfa") and self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-        ${ additionalFields }
+            % for field in additionalFields:
+                <%include file="AbstractField.tpl" args="field=field, fdict=fieldDict"/>
+            % endfor
         % else:
         <tr>
             <td class="titleCellTD">

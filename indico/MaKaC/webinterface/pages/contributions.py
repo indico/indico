@@ -774,36 +774,15 @@ class WContributionDataModification(wcomponents.WTemplated):
                 self.htmlText(type.getName())))
         return "".join(res)
 
-    def _getAdditionalFieldsHTML(self):
-        html = ""
-        if self._contrib.getConference().getAbstractMgr().isActive() and \
-                self._contrib.getConference().hasEnabledSection("cfa") and \
-                self._contrib.getConference().getType() == "conference" and \
-                self._contrib.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-            for f in self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields():
-                if f.isActive():
-                    id = f.getId()
-                    caption = f.getCaption()
-                    value = self._contrib.getField(id)
-                    if f.getType() == "selection":
-                        elem = "<select name='%s'>" % ("f_%s" % id)
-                        elem += "<option value=''>--%s--</option>" % (_("not specified"))
-                        for option in f.getOptions():
-                            selected = "selected" if option.getId() == value else ""
-                            elem += "<option value='%s' %s>%s</option>" % (option.getId(), selected, option.getValue())
-                        elem += "</select>"
-                    else:
-                        elem = "<textarea name='%s' cols='65' rows='10'>%s</textarea>" % ("f_%s" % id, self.htmlText(value))
-                    html += """
-                    <tr>
-                        <td nowrap class="titleCellTD">
-                            <span class="titleCellFormat">%s</span>
-                        </td>
-                        <td bgcolor="white" width="100%%" valign="top" class="blacktext">
-                            %s
-                        </td>
-                    </tr>""" % (caption, elem)
-        return html
+    def _getAdditionalFieldsData(self):
+        fields = self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields()
+        fieldDict = {}
+
+        for field in fields:
+            f_id = "f_" + field.getId()
+            fieldDict[f_id] = self._contrib.getField(field.getId())
+
+        return fieldDict
 
     def getContribId(self):
         if isinstance(self._owner, conference.Session):
@@ -816,12 +795,14 @@ class WContributionDataModification(wcomponents.WTemplated):
         defaultDefinePlace = defaultDefineRoom = ""
         defaultInheritPlace = defaultInheritRoom = "checked"
         locationName, locationAddress, roomName, defaultExistRoom = "", "", "",""
+
         vars["conference"] = self._conf
         vars["boardNumber"]=quoteattr(str(self._contrib.getBoardNumber()))
         vars["contrib"] = self._contrib
         vars["title"] = quoteattr(self._contrib.getTitle())
         vars["description"] = self.htmlText(self._contrib.getDescription())
-        vars["additionalFields"] = self._getAdditionalFieldsHTML()
+        vars["additionalFields"] = self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields()
+        vars["fieldDict"] = self._getAdditionalFieldsData()
         vars["day"],vars["month"],vars["year"]="","",""
         vars["sHour"],vars["sMinute"]="",""
         sDate=self._contrib.getStartDate()
