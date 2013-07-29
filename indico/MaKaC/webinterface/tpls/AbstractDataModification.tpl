@@ -1,7 +1,11 @@
+<%inherit file="ConfDisplayBodyBase.tpl"/>
 <% from MaKaC.common import Config %>
-<% from MaKaC.review import AbstractTextField %>
-<% from MaKaC.review import AbstractSelectionField %>
 
+<%block name="title">
+    ${body_title}
+</%block>
+
+<%block name="content">
 % if origin == "display":
 <form action=${ postURL } enctype="multipart/form-data" method="POST" width="100%" onsubmit="return onsubmitDisplayActions();">
     <table width="100%" align="center">
@@ -28,7 +32,7 @@
                                         <span class="mandatoryField">*</span>
                                     </td>
                                     <td width="100%">
-                                        <input id="abstractTitle" type="text" name="title" value=${ title } style="width:100%">
+                                        <input id="abstractTitle" type="text" name="title" value=${abstractTitle} style="width:100%">
                                     </td>
                                 </tr>
                                 % for field in additionalFields:
@@ -226,6 +230,7 @@
         </tr>
     </table>
 </form>
+</%block>
 
 <script type="text/javascript">
 

@@ -374,7 +374,10 @@ class WPAbstractDisplay( WPAbstractDisplayBase ):
         wc = WAbstractDisplay( self._getAW(), self._abstract )
         return wc.getHTML()
 
-class WAbstractDataModification( wcomponents.WTemplated):
+
+class WAbstractDataModification(WConfDisplayBodyBase):
+
+    _linkname = "SubmitAbstract"
 
     def __init__( self, conf ):
         self._conf = conf
@@ -398,9 +401,10 @@ class WAbstractDataModification( wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+        vars["body_title"] = self._getTitle()
         vars["postURL"] = quoteattr(str( vars["postURL"]))
         vars["origin"] = vars.get("origin", "display")
-        vars["title"] = quoteattr(str(vars.get("title", "")))
+        vars["abstractTitle"] = quoteattr(str(vars.get("title", "")))
         vars["prAuthors"] = fossilize(vars.get("prAuthors", []))
         vars["coAuthors"] = fossilize(vars.get("coAuthors", []))
         cfaMgr = self._conf.getAbstractMgr()
