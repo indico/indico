@@ -32,6 +32,7 @@ from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.utils import validMail
 from MaKaC.common import timezoneUtils
+from MaKaC.PDFinterface.conference import TicketToPDF
 from indico.web.flask.util import send_file
 
 
@@ -169,7 +170,16 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
             user.addRegistrant(rp)
             rp.setAvatar(user)
         # avoid multiple sending in case of db conflict
-        email = self._regForm.getNotification().createEmailNewRegistrant(self._regForm, rp)
+        email = self._regForm.getNotification()\
+            .createEmailNewRegistrant(self._regForm, rp)
+        attachment = {}
+        filename = "%s - Ticket.pdf" % self._target.getTitle()
+        attachment["name"] = filename
+        tz = timezoneUtils.DisplayTZ(self._aw, self._target).getDisplayTZ()
+        pdf = TicketToPDF(self._target, rp, tz=tz)
+        attachment["binary"] = pdf.getPDFBin()
+        email["attachment"] = attachment
+
         if email:
             GenericMailer.send(email)
         if canManageRegistration and user != self._getUser():
@@ -207,7 +217,6 @@ class RHConferenceTicketPDF(RHRegistrationFormCreationDone):
     def _process(self):
         tz = timezoneUtils.DisplayTZ(self._aw, self._target).getDisplayTZ()
         filename = "%s - Ticket.pdf" % self._target.getTitle()
-        from MaKaC.PDFinterface.conference import TicketToPDF
         pdf = TicketToPDF(self._target, self._registrant, tz=tz)
         return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 

@@ -18,7 +18,15 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email.mime.application import MIMEApplication
+from email.mime.text import MIMEText
 from email.utils import formatdate
+from email import Encoders
+from email import charset
+# Prevent base64 encoding of utf-8 e-mails
+charset.add_charset('utf-8', charset.SHORTEST)
 
 from indico.core.config import Config
 from MaKaC.errors import MaKaCError
@@ -59,43 +67,47 @@ class GenericMailer:
 
     @staticmethod
     def _prepare(notification):
-        fromAddr=notification.getFromAddr()
-        # what are these two loops for??
-        for to in notification.getToList() :
-            if len(to) == 0 :
-                notification.getToList().remove(to)
-        for cc in notification.getCCList() :
-            if len(cc) == 0 :
-                notification.getCCList().remove(cc)
-
-        to=", ".join(notification.getToList())
-        cc=""
-        if len(notification.getCCList())>0:
-            cc="Cc: %s\r\n"%", ".join(notification.getCCList())
-        if not to and not cc:
-            return
-
-        try:
-            ct=notification.getContentType()
-        except:
-            ct = "text/plain"
-        subject=notification.getSubject()
-        body=notification.getBody()
-        msg="""Content-Type: %s; charset=\"utf-8\"\r\nFrom: %s\r\nTo: %s\r\n%sSubject: %s\r\nDate: %s\r\n\r\n%s"""%(ct, fromAddr,\
-                to,cc,subject,formatdate(localtime=True),body)
+        fromAddr = notification.getFromAddr()
         toList = notification.getToList()
         ccList = notification.getCCList()
-        if hasattr(notification, 'getBCCList'):
+        if hasattr(notification, "getBCCList"):
             bccList = notification.getBCCList()
         else:
             bccList = []
+
+        msg = MIMEMultipart()
+        msg["Subject"] = notification.getSubject()
+        msg["From"] = fromAddr
+        msg["To"] = ', '.join(filter(None, toList))
+        msg["Cc"] = ', '.join(filter(None, ccList))
+
+        try:
+            ct = notification.getContentType()
+        except:
+            ct = "text/plain"
+
+        body = notification.getBody()
+        if ct == "text/plain":
+            part1 = MIMEText(body, "plain", "utf-8")
+        elif ct == "text/html":
+            part1 = MIMEText(body, "html", "utf-8")
+        else:
+            raise MaKaCError(_("Unknown MIME type: %s") % (ct))
+        msg.attach(part1)
+
+        attachment = notification.getAttachment()
+        if attachment is not None:
+            part2 = MIMEApplication(attachment["binary"])
+            part2.add_header("Content-Disposition",
+                             'attachment;filename="%s"' % (attachment["name"]))
+            msg.attach(part2)
+
         return {
-            'msg': msg,
+            'msg': msg.as_string(),
             'toList': toList,
             'ccList': ccList,
             'bccList': bccList,
             'fromAddr': fromAddr,
-            'to': to
         }
 
     @staticmethod
@@ -120,7 +132,7 @@ class GenericMailer:
             server.quit()
             raise MaKaCError("Email address is not valid: %s" % e.recipients)
         server.quit()
-        Logger.get('mail').info('Mail sent to %s' % msgData['to'])
+        Logger.get('mail').info('Mail sent to %s' % msgData['toList'])
 
     @classmethod
     def _log(cls, data):
