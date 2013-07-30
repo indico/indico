@@ -25,6 +25,7 @@ from flask import request, session, url_for
 from MaKaC.common.url import URL, EndpointURL
 from indico.core.config import Config
 import MaKaC.user as user
+from MaKaC.user import AvatarHolder
 from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
@@ -2876,6 +2877,23 @@ class UHConfRegistrationFormCreationDone(URLHandler):
         url = cls._getURL()
         url.setParams(registrant.getLocator())
         url.addParam('authkey', registrant.getRandomId())
+        return url
+
+
+# This URL handler is used to generate a PDF e-ticket download link
+# in the menu for logged in users.
+class UHConferenceTicketPDF(URLHandler):
+    _endpoint = 'event.e-ticket-pdf'
+
+    @classmethod
+    def getURL(cls, conf):
+        url = cls._getURL()
+        avatar_id = session.get('_avatarId')
+        user = AvatarHolder().getById(avatar_id)
+        if user is not None:
+            registrant = user.getRegistrantById(conf.getId())
+            url.setParams(registrant.getLocator())
+            url.addParam('authkey', registrant.getRandomId())
         return url
 
 

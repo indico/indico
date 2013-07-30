@@ -919,6 +919,24 @@ def updateAvatarEmails(dbi, withRBDB, prevVersion):
     dbi.commit()
 
 
+@since('1.2')
+def addLinkToMenu(dbi, withRBDB, prevVersion):
+    """
+    Add download e-ticket PDF link to the menu
+    """
+
+    cdmr = displayMgr.ConfDisplayMgrRegistery()
+    ch = ConferenceHolder()
+    i = 0
+
+    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
+        _fixDefaultStyle(conf, cdmr)
+        i += 1
+        if i % 1000 == 0:
+            dbi.commit()
+    dbi.commit()
+
+
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
                  specified=[], dry_run=False, run_from=None):
 
