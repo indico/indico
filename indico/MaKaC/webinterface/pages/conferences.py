@@ -3040,11 +3040,12 @@ class WConfModifCFA(wcomponents.WTemplated):
                 mandatoryText = _("optional")
             maxCharText = ""
             if isinstance(af, AbstractTextField):
+                maxCharText = " - "
                 if int(af.getMaxLength()) != 0:
-                    maxCharText = _("max: %s %s.") % (af.getMaxLength(), af.getLimitation())
+                    maxCharText += _("max: %s %s.") % (af.getMaxLength(), af.getLimitation())
                 else:
-                    maxCharText = _("no limited")
-            addInfo = "(%s - %s)" % (mandatoryText, maxCharText)
+                    maxCharText += _("not limited")
+            addInfo = "(%s%s)" % (mandatoryText, maxCharText)
             url = urlHandlers.UHConfModifCFAOptFld.getURL(self._conf)
             url.addParam("fieldId", af.getId())
             url = quoteattr("%s#optional" % str(url))
