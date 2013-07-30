@@ -19,9 +19,9 @@
 
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.abstracts import IAuthorFossil
-import indico.util.text as textUtils
 from MaKaC.webinterface.general import normaliseListParam
 from MaKaC.common import Config
+from MaKaC.review import AbstractFieldContent
 
 BYTES_1MB = 1024 * 1024
 
@@ -98,8 +98,9 @@ class AbstractData(object):
         self.title = params.get("title", "").strip()
         self._otherFields = {}
         for f in self._afm.getFields():
-            id = f.getId()
-            self._otherFields[id] = params.get("f_%s" % id, "").strip()
+            fid = f.getId()
+            value = params.get("f_%s" % fid, "").strip()
+            self._otherFields[fid] = AbstractFieldContent(f, value)
         self.type = params.get("type", None)
         self.tracks = normaliseListParam(params.get("tracks", []))
 

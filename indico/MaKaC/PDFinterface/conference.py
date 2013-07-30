@@ -230,7 +230,7 @@ class AbstractToPDF(PDFBase):
         for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             id = field.getId()
             name = field.getCaption()
-            value = self._abstract.getField(id).strip()
+            value = str(self._abstract.getField(id)).strip()
             if value: #id not in ["content"] and
                 #styleHead = ParagraphStyle({})
                 #styleHead.firstLineIndent = -45

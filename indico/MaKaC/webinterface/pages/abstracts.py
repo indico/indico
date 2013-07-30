@@ -702,7 +702,7 @@ class WAbstractManagment(wcomponents.WTemplated):
         for f in afm.getActiveFields():
             id = f.getId()
             caption = f.getCaption()
-            value = self._abstract.getField(id)
+            value = str(self._abstract.getField(id))
             html += """
                     <tr>
                         <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">%s</span></td>

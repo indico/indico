@@ -555,7 +555,7 @@ class AbstractTextField(AbstractField):
         errors = AbstractField.check(self, content)
 
         if self._maxLength != 0:
-            if self._limitation == "words" and wordsCounter(content) > self._maxLength:
+            if self._limitation == "words" and wordsCounter(str(content)) > self._maxLength:
                 errors.append(_("The field '%s' cannot be more than %s words") % (self._caption, self._maxLength))
             elif self._limitation == "chars" and len(content) > self._maxLength:
                 errors.append(_("The field '%s' cannot be more than %s characters") % (self._caption, self._maxLength))
@@ -710,6 +710,36 @@ class SelectionFieldOption(Fossilizable):
 
     def isDeleted(self):
         return self.deleted
+
+
+class AbstractFieldContent(Persistent):
+
+    def __init__(self, field, value):
+        self.field = field
+        self.value = value
+
+    def __eq__(self, other):
+        if isinstance(other, AbstractFieldContent) and self.field == other.field:
+            return self.value == other.value
+        elif not isinstance(other, AbstractFieldContent):
+            return self.value == other
+        return False
+
+    def __len__(self):
+        return len(self.value)
+
+    def __ne__(self, other):
+        if isinstance(other, AbstractFieldContent) and self.field == other.field:
+            return self.value != other.value
+        elif not isinstance(other, AbstractFieldContent):
+            return self.value != other
+        return True
+
+    def __str__(self):
+        if isinstance(self.field, AbstractSelectionField):
+            return str(self.field.getOption(self.value))
+        else:
+            return str(self.value)
 
 
 class AbstractFieldsMgr(Persistent):

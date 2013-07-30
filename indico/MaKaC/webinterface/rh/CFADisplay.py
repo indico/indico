@@ -164,7 +164,7 @@ class _AbstractSubmissionNotification:
         msg.append( "" )
         for f in self._conf.getAbstractMgr().getAbstractFieldsMgr().getFields():
             msg.append( tw.fill(f.getCaption()) )
-            msg.append( self._abstract.getField(f.getId()) )
+            msg.append( str(self._abstract.getField(f.getId())) )
             msg.append( "" )
         msg.append( tw.fill( i18nformat("""_("Primary Authors"):""") ) )
         msg += primary_authors

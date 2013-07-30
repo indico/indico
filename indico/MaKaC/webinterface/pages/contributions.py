@@ -462,7 +462,7 @@ class WContribModifMain(wcomponents.WTemplated):
                 if f.isActive():
                     id = f.getId()
                     caption = f.getCaption()
-                    value = self._contrib.getField(id)
+                    value = str(self._contrib.getField(id))
                     html += """
                     <tr>
                         <td class="dataCaptionTD"><span class="dataCaptionFormat">%s</span></td>

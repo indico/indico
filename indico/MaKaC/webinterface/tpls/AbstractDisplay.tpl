@@ -54,11 +54,7 @@
         <div class="abstractDetail">
             % for f in abstract.getConference().getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
                     % if abstract.getField(f.getId()):
-                        % if f.getType() == "selection":
-                            <% content = f.getOption(abstract.getField(f.getId()))%>
-                        % else:
-                            <% content = abstract.getField(f.getId())%>
-                        % endif
+                        <% content = str(abstract.getField(f.getId()))%>
                         <div class="abstractSection">
                             <h2 class="abstractSectionTitle">${f.getCaption()}</h2>
                             <div class="abstractSectionContent">${content | h}</div>

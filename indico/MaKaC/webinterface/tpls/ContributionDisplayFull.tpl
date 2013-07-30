@@ -51,11 +51,7 @@
     % else:
         % for f in Contribution.getConference().getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             % if Contribution.getField(f.getId()):
-            % if f.getType() == "selection":
-                <% content = f.getOption(Contribution.getField(f.getId())) %>
-            % else:
-                <% content = Contribution.getField(f.getId()) %>
-            % endif
+            <% content = str(Contribution.getField(f.getId())) %>
             <div class="contributionSection">
                 <h2 class="contributionSectionTitle">${f.getCaption()}</h2>
                 <div class="contributionSectionContent">${content | h}</div>
