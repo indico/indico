@@ -101,18 +101,18 @@ class RHAbstractSubmissionBase(RHBaseCFA):
 
 class _AbstractSubmissionNotification:
 
-    def __init__( self, abstract ):
+    def __init__(self, abstract):
         self._abstract = abstract
         self._conf = self._abstract.getConference()
-        self._subject=_("Abstract submission confirmation (%s)")%self._conf.getTitle()
+        self._subject = _("Abstract submission confirmation (%s)") % self._conf.getTitle()
 
-    def getSubject( self ):
+    def getSubject(self):
         return self._subject
 
-    def setSubject(self,s):
-        self._subject=s
+    def setSubject(self, s):
+        self._subject = s
 
-    def getDestination( self ):
+    def getDestination(self):
         return self._abstract.getSubmitter()
 
     def getFromAddr(self):
@@ -124,77 +124,77 @@ class _AbstractSubmissionNotification:
     def getToList(self):
         return self._abstract.getOwner().getSubmissionNotification().getToList()
 
-    def getMsg( self ):
+    def getMsg(self):
         primary_authors = []
         for auth in self._abstract.getPrimaryAuthorList():
-            primary_authors.append("""%s (%s) <%s>"""%(auth.getFullName(), auth.getAffiliation(), auth.getEmail())  )
+            primary_authors.append("""%s (%s) <%s>""" % (auth.getFullName(), auth.getAffiliation(), auth.getEmail()))
         co_authors = []
         for auth in self._abstract.getCoAuthorList():
             email = ""
             if auth.getEmail() != "":
-                email = " <%s>"%auth.getEmail()
-            co_authors.append( """%s (%s)%s"""%(auth.getFullName(), auth.getAffiliation(), email) )
+                email = " <%s>" % auth.getEmail()
+            co_authors.append("""%s (%s)%s""" % (auth.getFullName(), auth.getAffiliation(), email))
         speakers = []
         for spk in self._abstract.getSpeakerList():
-            speakers.append( spk.getFullName() )
+            speakers.append(spk.getFullName())
         tracks = []
         for track in self._abstract.getTrackListSorted():
-            tracks.append( """%s"""%track.getTitle() )
+            tracks.append("""%s""" % track.getTitle())
         tw = TextWrapper()
-        msg = [ i18nformat("""_("Dear") %s,""")%self._abstract.getSubmitter().getStraightFullName() ]
-        msg.append( "" )
-        msg.append( tw.fill(_("The submission of your abstract has been successfully processed.")) )
-        msg.append( "" )
+        msg = [i18nformat("""_("Dear") %s,""") % self._abstract.getSubmitter().getStraightFullName()]
+        msg.append("")
+        msg.append(tw.fill(_("The submission of your abstract has been successfully processed.")))
+        msg.append("")
         tw.break_long_words = False
-        msg.append( tw.fill( i18nformat("""_("Abstract submitted"):\n<%s>.""")%urlHandlers.UHUserAbstracts.getURL( self._conf ) ) )
-        msg.append( "" )
-        msg.append( tw.fill( i18nformat("""_("Status of your abstract"):\n<%s>.""")%urlHandlers.UHAbstractDisplay.getURL( self._abstract ) ) )
-        msg.append( "" )
+        msg.append(tw.fill(i18nformat("""_("Abstract submitted"):\n<%s>.""") % urlHandlers.UHUserAbstracts.getURL(self._conf)))
+        msg.append("")
+        msg.append(tw.fill(i18nformat("""_("Status of your abstract"):\n<%s>.""") % urlHandlers.UHAbstractDisplay.getURL(self._abstract)))
+        msg.append("")
         tw.subsequent_indent = ""
-        msg.append( tw.fill( i18nformat("""_("See below a detailed summary of your submitted abstract"):""") ) )
-        msg.append( "" )
+        msg.append(tw.fill(i18nformat("""_("See below a detailed summary of your submitted abstract"):""")))
+        msg.append("")
         tw.subsequent_indent = " "*3
-        msg.append( tw.fill( i18nformat("""_("Conference"): %s""")%self._conf.getTitle() ) )
-        msg.append( "" )
-        msg.append( tw.fill( i18nformat("""_("Submitted by"): %s""")%self._abstract.getSubmitter().getFullName() ) )
-        msg.append( "" )
-        msg.append( tw.fill( i18nformat("""_("Submitted on"): %s""")%self._abstract.getSubmissionDate().strftime( "%d %B %Y %H:%M" ) ) )
-        msg.append( "" )
-        msg.append( tw.fill( i18nformat("""_("Title"): %s""")%self._abstract.getTitle() ) )
-        msg.append( "" )
+        msg.append(tw.fill(i18nformat("""_("Conference"): %s""") % self._conf.getTitle()))
+        msg.append("")
+        msg.append(tw.fill(i18nformat("""_("Submitted by"): %s""") % self._abstract.getSubmitter().getFullName()))
+        msg.append("")
+        msg.append(tw.fill(i18nformat("""_("Submitted on"): %s""") % self._abstract.getSubmissionDate().strftime("%d %B %Y %H:%M")))
+        msg.append("")
+        msg.append(tw.fill(i18nformat("""_("Title"): %s""") % self._abstract.getTitle()))
+        msg.append("")
         for f in self._conf.getAbstractMgr().getAbstractFieldsMgr().getFields():
-            msg.append( tw.fill(f.getCaption()) )
-            msg.append( str(self._abstract.getField(f.getId())) )
-            msg.append( "" )
-        msg.append( tw.fill( i18nformat("""_("Primary Authors"):""") ) )
+            msg.append(tw.fill(f.getCaption()))
+            msg.append(str(self._abstract.getField(f.getId())))
+            msg.append("")
+        msg.append(tw.fill(i18nformat("""_("Primary Authors"):""")))
         msg += primary_authors
-        msg.append( "" )
-        msg.append( tw.fill( i18nformat("""_("Co-authors"):""") ) )
+        msg.append("")
+        msg.append(tw.fill(i18nformat("""_("Co-authors"):""")))
         msg += co_authors
-        msg.append( "" )
-        msg.append( tw.fill( i18nformat("""_("Abstract presenters"):""") ) )
+        msg.append("")
+        msg.append(tw.fill(i18nformat("""_("Abstract presenters"):""")))
         msg += speakers
-        msg.append( "" )
-        msg.append( tw.fill( i18nformat("""_("Track classification"):""") ) )
+        msg.append("")
+        msg.append(tw.fill(i18nformat("""_("Track classification"):""")))
         msg += tracks
-        msg.append( "" )
-        ctype= i18nformat("""--_("not specified")--""")
+        msg.append("")
+        ctype = i18nformat("""--_("not specified")--""")
         if self._abstract.getContribType() is not None:
-            ctype=self._abstract.getContribType().getName()
-        msg.append( tw.fill( i18nformat("""_("Presentation type"): %s""")%ctype) )
-        msg.append( "" )
-        msg.append( tw.fill( i18nformat("""_("Comments"): %s""")%self._abstract.getComments() ) )
-        msg.append( "" )
-        return "\n".join( msg )
+            ctype = self._abstract.getContribType().getName()
+        msg.append(tw.fill(i18nformat("""_("Presentation type"): %s""") % ctype))
+        msg.append("")
+        msg.append(tw.fill(i18nformat("""_("Comments"): %s""") % self._abstract.getComments()))
+        msg.append("")
+        return "\n".join(msg)
 
     def getBody(self):
-        msg=self.getMsg()
+        msg = self.getMsg()
         return i18nformat("""
 _("The following email has been sent to %s"):
 
 ===
 
-%s""")%(self.getDestination().getFullName(), msg)
+%s""") % (self.getDestination().getFullName(), msg)
 
 
 class RHAbstractModificationAction(RHAbstractSubmissionBase, AbstractParam):
