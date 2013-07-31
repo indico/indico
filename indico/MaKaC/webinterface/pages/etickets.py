@@ -39,13 +39,12 @@ class WConfModifETicket(wcomponents.WTemplated):
 
     def __init__(self, conference, aw):
         self._conf = conference
-        self._aw = aw
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         modETicket = self._conf.getModETicket()
         vars["statusURL"] = url_for("event_mgmt.confModifETicket-changeStatus",
-                                       self._conf)
+                                    self._conf)
 
         if modETicket.isActivated():
             vars["changeTo"] = "False"
