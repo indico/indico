@@ -3018,6 +3018,19 @@ div.sessionBar .links
     height: 25px;
 }
 
+div.sessionBar .icon-shield {
+    font-size: 1.2em;
+    vertical-align: middle;
+}
+
+.protectionBarRestricted .icon-shield {
+    color: #752020;
+}
+
+.protectionBarDomainProtected .icon-shield {
+    color: #ADA644;
+}
+
 .loginHighlighted {
     background: transparent url(../images/sprites.png) repeat-x scroll 0 -150px;
     height: 16px;
@@ -3085,7 +3098,11 @@ div.sessionBar .protectionBar{
     padding-right:10px;
     padding-left:5px;
     background: transparent url(../images/sprites.png) repeat-x scroll 0 0;
-    height: 16px;
+    height: 17px;
+}
+
+div.sessionBar .protectionBar * {
+  vertical-align: middle;
 }
 
 div.sessionBar .protectionBarDomainProtected{
@@ -3106,7 +3123,6 @@ div.sessionBar .protectionBarDomainProtected a:hover{
 
 div.sessionBar .protectionBarRestricted a{
     color: #FFFFFF !important;
-    font-weight: bold;
     font-size: 12px;
 }
 
