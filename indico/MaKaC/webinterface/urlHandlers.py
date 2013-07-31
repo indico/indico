@@ -2888,9 +2888,8 @@ class UHConferenceTicketPDF(URLHandler):
     @classmethod
     def getURL(cls, conf):
         url = cls._getURL()
-        avatar_id = session.get('_avatarId')
-        user = AvatarHolder().getById(avatar_id)
-        if user is not None:
+        user = ContextManager.get("currentUser")
+        if user:
             registrant = user.getRegistrantById(conf.getId())
             url.setParams(registrant.getLocator())
             url.addParam('authkey', registrant.getRandomId())
