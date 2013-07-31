@@ -9557,39 +9557,40 @@ class Contribution(CommonObjectBase, Locatable):
             res=self.getSession().getTextColor()
         return res
 
-class AcceptedContribution( Contribution ):
+
+class AcceptedContribution(Contribution):
     """This class represents a contribution which has been created from an
         abstract
     """
 
-    def __init__(self,abstract):
+    def __init__(self, abstract):
         Contribution.__init__(self)
-        abstract.getConference().addContribution(self,abstract.getId())
+        abstract.getConference().addContribution(self, abstract.getId())
         self._abstract = abstract
-        self.setTitle( abstract.getTitle() )
+        self.setTitle(abstract.getTitle())
         self._setFieldsFromAbstract()
-        if isinstance( abstract.getCurrentStatus(),review.AbstractStatusAccepted ):
-            self.setTrack( abstract.getCurrentStatus().getTrack() )
-            self.setType( abstract.getCurrentStatus().getType() )
+        if isinstance(abstract.getCurrentStatus(), review.AbstractStatusAccepted):
+            self.setTrack(abstract.getCurrentStatus().getTrack())
+            self.setType(abstract.getCurrentStatus().getType())
         for auth in abstract.getAuthorList():
             c_auth = ContributionParticipation()
-            self._setAuthorValuesFromAbstract( c_auth, auth )
-            if abstract.isPrimaryAuthor( auth ):
-                self.addPrimaryAuthor( c_auth )
+            self._setAuthorValuesFromAbstract(c_auth, auth)
+            if abstract.isPrimaryAuthor(auth):
+                self.addPrimaryAuthor(c_auth)
             else:
-                self.addCoAuthor( c_auth )
-            if abstract.isSpeaker( auth ):
-                self.addSpeaker( c_auth )
+                self.addCoAuthor(c_auth)
+            if abstract.isSpeaker(auth):
+                self.addSpeaker(c_auth)
         self._grantSubmission(self.getAbstract().getSubmitter().getUser())
 
-    def _setAuthorValuesFromAbstract( self, cAuth, aAuth ):
-        cAuth.setTitle( aAuth.getTitle() )
-        cAuth.setFirstName( aAuth.getFirstName() )
-        cAuth.setFamilyName( aAuth.getSurName() )
-        cAuth.setEmail( aAuth.getEmail() )
-        cAuth.setAffiliation( aAuth.getAffiliation() )
-        cAuth.setAddress( aAuth.getAddress() )
-        cAuth.setPhone( aAuth.getTelephone() )
+    def _setAuthorValuesFromAbstract(self, cAuth, aAuth):
+        cAuth.setTitle(aAuth.getTitle())
+        cAuth.setFirstName(aAuth.getFirstName())
+        cAuth.setFamilyName(aAuth.getSurName())
+        cAuth.setEmail(aAuth.getEmail())
+        cAuth.setAffiliation(aAuth.getAffiliation())
+        cAuth.setAddress(aAuth.getAddress())
+        cAuth.setPhone(aAuth.getTelephone())
 
     def _setFieldsFromAbstract(self):
         for k, v in self._abstract.getFields().items():
@@ -9598,7 +9599,7 @@ class AcceptedContribution( Contribution ):
             else:
                 self.setField(k, v)
 
-    def getAbstract( self ):
+    def getAbstract(self):
         return self._abstract
 
     def setAbstract(self, abs):
@@ -9609,19 +9610,19 @@ class AcceptedContribution( Contribution ):
             if self._submitters:
                 pass
         except AttributeError:
-            self._submitters=[]#create the attribute
+            self._submitters = []  # create the attribute
             self._grantSubmission(self.getAbstract().getSubmitter().getUser())
         if no_groups:
             return filter(lambda s: not isinstance(s, MaKaC.user.Group), self._submitters)
         else:
             return self._submitters
 
-    def delete( self ):
+    def delete(self):
         """deletes a contribution and all of their subitems
         """
         abs = self.getAbstract()
         if abs:
-            cs=abs.getCurrentStatus()
+            cs = abs.getCurrentStatus()
             if isinstance(cs, review.AbstractStatusAccepted):
                 if cs.getTrack() is not None:
                     abs.addTrack(cs.getTrack())
@@ -9629,7 +9630,6 @@ class AcceptedContribution( Contribution ):
             abs._setContribution(None)
             self.setAbstract(None)
         Contribution.delete(self)
-
 
 
 class ContribStatus(Persistent):

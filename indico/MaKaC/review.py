@@ -40,6 +40,7 @@ from MaKaC.fossils.abstracts import IAbstractFieldFossil
 from MaKaC.fossils.abstracts import IAbstractTextFieldFossil
 from MaKaC.fossils.abstracts import IAbstractSelectionFieldFossil
 from MaKaC.fossils.abstracts import ISelectionFieldOptionFossil
+from MaKaC.fossils.abstracts import IAbstractFieldContentFossil
 from indico.util.i18n import N_
 from indico.util.text import wordsCounter
 
@@ -712,7 +713,8 @@ class SelectionFieldOption(Fossilizable):
         return self.deleted
 
 
-class AbstractFieldContent(Persistent):
+class AbstractFieldContent(Persistent, Fossilizable):
+    fossilizes(IAbstractFieldContentFossil)
 
     def __init__(self, field, value):
         self.field = field
@@ -740,6 +742,15 @@ class AbstractFieldContent(Persistent):
             return str(self.field.getOption(self.value))
         else:
             return str(self.value)
+
+    def getField(self):
+        return self.field
+
+    def getStr(self):
+        return str(self)
+
+    def getValue(self):
+        return self.value
 
 
 class AbstractFieldsMgr(Persistent):
@@ -2108,7 +2119,7 @@ class Abstract(Persistent):
     def isProposedForTrack( self, track ):
         return self._tracks.has_key( track.getId() )
 
-    def getNumTracks( self ):
+    def getNumTracks(self):
         return len( self._tracks )
 
     def getLocator(self):
@@ -2116,7 +2127,7 @@ class Abstract(Persistent):
         loc["abstractId"] = self.getId()
         return loc
 
-    def isAllowedToCoordinate(self,av):
+    def isAllowedToCoordinate(self, av):
         """Tells whether or not the specified user can coordinate any of the
             tracks of this abstract
         """
@@ -2128,13 +2139,13 @@ class Abstract(Persistent):
     def canAuthorAccess(self, user):
         if user is None:
             return False
-        el=self.getCoAuthorEmailList(True)+self.getPrimaryAuthorEmailList(True)
+        el = self.getCoAuthorEmailList(True)+self.getPrimaryAuthorEmailList(True)
         for e in user.getEmails():
             if e.lower() in el:
                 return True
         return False
 
-    def isAllowedToAccess( self, av ):
+    def isAllowedToAccess(self, av):
         """Tells whether or not an avatar can access an abstract independently
             of the protection
         """
@@ -2148,32 +2159,32 @@ class Abstract(Persistent):
             return True
         return self.canUserModify(av)
 
-    def canAccess(self,aw):
+    def canAccess(self, aw):
         #if the conference is protected, then only allowed AW can access
-        return self.isAllowedToAccess( aw.getUser() )
+        return self.isAllowedToAccess(aw.getUser())
 
     def canView(self, aw):
         #in the future it would be possible to add an access control
         #only those users allowed to access are allowed to view
-        return self.isAllowedToAccess( aw.getUser() )
+        return self.isAllowedToAccess(aw.getUser())
 
-    def canModify( self, aw ):
-        return self.canUserModify( aw.getUser() )
+    def canModify(self, aw):
+        return self.canUserModify(aw.getUser())
 
-    def canUserModify( self, av ):
+    def canUserModify(self, av):
         #the submitter can modify
-        if self.isSubmitter( av ):
+        if self.isSubmitter(av):
             return True
         #??? any CFA manager can modify
         #??? any user granted with modification privileges can modify
         #conference managers can modify
         conf = self.getConference()
-        return conf.canUserModify( av )
+        return conf.canUserModify(av)
 
-    def getModifKey( self ):
+    def getModifKey(self):
         return ""
 
-    def getAccessKey( self ):
+    def getAccessKey(self):
         return ""
 
     def getAccessController(self):
@@ -2193,50 +2204,50 @@ class Abstract(Persistent):
             self.clearTracks()
             owner = self._owner
             self._owner = None
-            owner.removeAbstract( self )
+            owner.removeAbstract(self)
             self.setCurrentStatus(AbstractStatusNone(self))
             TrashCanManager().add(self)
 
     def recoverFromTrashCan(self):
         TrashCanManager().remove(self)
 
-    def getCurrentStatus( self ):
+    def getCurrentStatus(self):
         try:
             if self._currentStatus:
                 pass
         except AttributeError, e:
-            self._currentStatus = AbstractStatusSubmitted( self )
+            self._currentStatus = AbstractStatusSubmitted(self)
         return self._currentStatus
 
-    def setCurrentStatus( self, newStatus ):
+    def setCurrentStatus(self, newStatus):
         self._currentStatus = newStatus
         #If we want to keep a history of status changes we should add here
         #   the old status to a list
 
-    def accept(self,responsible,destTrack,type,comments="",session=None):
+    def accept(self, responsible, destTrack, type, comments="", session=None):
         """
         """
-        self.getCurrentStatus().accept(responsible,destTrack,type,comments )
+        self.getCurrentStatus().accept(responsible, destTrack, type, comments)
         #add the abstract to the track for which it has been accepted so it
         #   is visible for it.
         if destTrack is not None:
-            destTrack.addAbstract( self )
+            destTrack.addAbstract(self)
         #once the abstract is accepted a new contribution under the destination
         #   track must be created
         # ATTENTION: This import is placed here explicitely for solving
         #   problems with circular imports
         from MaKaC.conference import AcceptedContribution
-        contrib=AcceptedContribution(self)
-        if session != None:
+        contrib = AcceptedContribution(self)
+        if session is not None:
             contrib.setSession(session)
             contrib.setDuration(dur=session.getContribDuration())
-        self.getCurrentStatus().setContribution( contrib )
-        self._setContribution( contrib )
+        self.getCurrentStatus().setContribution(contrib)
+        self._setContribution(contrib)
 
-    def reject( self, responsible, comments="" ):
+    def reject(self, responsible, comments=""):
         """
         """
-        self.getCurrentStatus().reject( responsible, comments )
+        self.getCurrentStatus().reject(responsible, comments)
 
     def _cmpByDate(self, tj1, tj2):
         return cmp(tj1.getDate(), tj2.getDate())
@@ -2246,17 +2257,17 @@ class Abstract(Persistent):
             if self._trackJudgementsHistorical:
                 pass
             if type(self._trackJudgementsHistorical) == tuple:
-                self._trackJudgementsHistorical={}
+                self._trackJudgementsHistorical = {}
         except AttributeError:
-            self._trackJudgementsHistorical={}
+            self._trackJudgementsHistorical = {}
             for track in self.getTrackList():
                 judgement = None
-                if self.getTrackAcceptances().has_key( track.getId() ):
-                    judgement = self.getTrackAcceptances()[ track.getId() ]
-                elif self.getTrackRejections().has_key( track.getId() ):
-                    judgement = self.getTrackRejections()[ track.getId() ]
-                elif self.getTrackReallocations().has_key( track.getId() ):
-                    judgement = self.getTrackReallocations()[ track.getId() ]
+                if self.getTrackAcceptances().has_key(track.getId()):
+                    judgement = self.getTrackAcceptances()[track.getId()]
+                elif self.getTrackRejections().has_key(track.getId()):
+                    judgement = self.getTrackRejections()[track.getId()]
+                elif self.getTrackReallocations().has_key(track.getId()):
+                    judgement = self.getTrackReallocations()[track.getId()]
                 self._trackJudgementsHistorical[track.getId()] = [judgement]
             self._notifyModification()
         return self._trackJudgementsHistorical
