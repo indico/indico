@@ -25,8 +25,6 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 from email import Encoders
 from email import charset
-# Prevent base64 encoding of utf-8 e-mails
-charset.add_charset('utf-8', charset.SHORTEST)
 
 from indico.core.config import Config
 from MaKaC.errors import MaKaCError
@@ -34,6 +32,10 @@ from MaKaC.i18n import _
 
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
+
+# Prevent base64 encoding of utf-8 e-mails
+charset.add_charset('utf-8', charset.SHORTEST)
+
 
 class GenericMailer:
 
@@ -78,6 +80,7 @@ class GenericMailer:
         msg = MIMEMultipart()
         msg["Subject"] = notification.getSubject()
         msg["From"] = fromAddr
+        # Filter out empty strings from the lists before join
         msg["To"] = ', '.join(filter(None, toList))
         msg["Cc"] = ', '.join(filter(None, ccList))
 
@@ -95,12 +98,13 @@ class GenericMailer:
             raise MaKaCError(_("Unknown MIME type: %s") % (ct))
         msg.attach(part1)
 
-        attachment = notification.getAttachment()
-        if attachment:
-            part2 = MIMEApplication(attachment["binary"])
-            part2.add_header("Content-Disposition",
-                             'attachment;filename="%s"' % (attachment["name"]))
-            msg.attach(part2)
+        attachments = notification.getAttachments()
+        if attachments:
+            for attachment in attachments:
+                part2 = MIMEApplication(attachment["binary"])
+                part2.add_header("Content-Disposition",
+                                 'attachment;filename="%s"' % (attachment["name"]))
+                msg.attach(part2)
 
         return {
             'msg': msg.as_string(),

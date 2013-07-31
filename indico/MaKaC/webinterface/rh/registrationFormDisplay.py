@@ -172,13 +172,14 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
         # avoid multiple sending in case of db conflict
         email = self._regForm.getNotification()\
             .createEmailNewRegistrant(self._regForm, rp)
+
         attachment = {}
         filename = "%s - Ticket.pdf" % self._target.getTitle()
         attachment["name"] = filename
         tz = timezoneUtils.DisplayTZ(self._aw, self._target).getDisplayTZ()
         pdf = TicketToPDF(self._target, rp, tz=tz)
         attachment["binary"] = pdf.getPDFBin()
-        email["attachment"] = attachment
+        email["attachments"] = [attachment]
 
         if email:
             GenericMailer.send(email)

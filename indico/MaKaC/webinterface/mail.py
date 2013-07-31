@@ -57,7 +57,7 @@ class personMail:
 class GenericNotification :
 
     def __init__(self, data=None):
-        if data is None :
+        if data is None:
             self._fromAddr = ""
             self._toList = []
             self._ccList = []
@@ -65,8 +65,8 @@ class GenericNotification :
             self._subject = ""
             self._body = ""
             self._contenttype = "text/plain"
-            self._attachment = {}
-        else :
+            self._attachments = []
+        else:
             self._fromAddr = data.get("fromAddr", "")
             self._toList = data.get("toList", [])
             self._ccList = data.get("ccList", [])
@@ -74,17 +74,19 @@ class GenericNotification :
             self._subject = data.get("subject", "")
             self._body = data.get("body", "")
             self._contenttype = data.get("content-type", "text/plain")
-            self._attachment = data.get("attachment", {})
+            self._attachments = data.get("attachments", [])
 
+    def getAttachments(self):
+        return self._attachments
 
-    def getAttachment(self):
-        return self._attachment
+    def addAttachment(self, attachment):
+        """
+        Attachment is a dictionary with two keys:
+        - name: containing the filename of the file
+        - binary: containing the file data
+        """
 
-    def setAttachment(self, attachment):
-        if attachment is None :
-            return False
-        self._attachment = attachment
-        return True
+        self._attachments.append()
 
     def getContentType(self):
         return self._contenttype
