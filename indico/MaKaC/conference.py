@@ -7635,6 +7635,7 @@ class _PrimAuthIdx(_AuthIdx):
             for auth in contrib.getPrimaryAuthorList():
                 self.index(auth)
 
+
 class Contribution(CommonObjectBase, Locatable):
     """This class implements a conference contribution, being the concrete
         contributes of the conference participants. The class contains
@@ -7643,23 +7644,22 @@ class Contribution(CommonObjectBase, Locatable):
         attached either to a session or to a conference.
     """
 
-    fossilizes(IContributionFossil, IContributionWithSpeakersFossil,\
-                IContributionWithSubContribsFossil)
+    fossilizes(IContributionFossil, IContributionWithSpeakersFossil, IContributionWithSubContribsFossil)
 
-    def __init__(self,**contribData):
+    def __init__(self, **contribData):
         self.parent = None
-        self._session=None
+        self._session = None
         self.id = ""
         self.title = ""
         self._fields = {}
         self.description = ""
-        self.startDate=None
+        self.startDate = None
         self.duration = timedelta(0)
         self.speakers = []
         self.speakerText = ""
         self.place = None
         self.room = None
-        self._boardNumber=""
+        self._boardNumber = ""
         self._resetSchEntry()
         self.__ac = AccessController(self)
         self.materials = {}
@@ -7679,10 +7679,10 @@ class Contribution(CommonObjectBase, Locatable):
         self._speakers = []
         self._track = None
         self._type = None
-        self._status=ContribStatusNotSch(self)
+        self._status = ContribStatusNotSch(self)
         #List of allowed users to submit material
-        self._submitters=[]
-        self._submittersEmail=[]
+        self._submitters = []
+        self._submittersEmail = []
         self._modificationDS = nowutc()
         self._keywords = ""
         self._reviewManager = ReviewManager(self)
@@ -7705,7 +7705,7 @@ class Contribution(CommonObjectBase, Locatable):
             parentId = None
         return "<Contribution %s:%s@%s>" % (parentId, self.getId(), hex(id(self)))
 
-    def getTimezone( self ):
+    def getTimezone(self):
         return self.getConference().getTimezone()
 
     def getReviewManager(self):
@@ -7732,9 +7732,9 @@ class Contribution(CommonObjectBase, Locatable):
             self._keywords = keywords[0]
         else:
             self._keywords = keywords
-        self.notifyModification(cleanCache = False)
+        self.notifyModification(cleanCache=False)
 
-    def getFields( self ):
+    def getFields(self):
         try:
             return self._fields
         except:
@@ -7747,7 +7747,7 @@ class Contribution(CommonObjectBase, Locatable):
                 pass
             return self._fields
 
-    def removeField( self, field ):
+    def removeField(self, field):
         if self.getFields().has_key(field):
             del self.getFields()[field]
             self.notifyModification()
@@ -7762,7 +7762,7 @@ class Contribution(CommonObjectBase, Locatable):
             if f is not None:
                 self.getFields()[fid] = AbstractFieldContent(f, value)
 
-    def getField( self, field ):
+    def getField(self, field):
         if self.getFields().has_key(field):
             value = self.getFields()[field]
             if type(value) is list:
@@ -7780,7 +7780,7 @@ class Contribution(CommonObjectBase, Locatable):
         data["id"] = self.id
         data["title"] = self.title
         data["parent title"] = self.parent.getTitle()
-        if self._session is not None :
+        if self._session is not None:
             data["session title"] = self._session.getTitle()
         data["description"] = self.description
         if self.getConference():
@@ -7788,26 +7788,26 @@ class Contribution(CommonObjectBase, Locatable):
             for f in afm.getFields():
                 id = f.getId()
                 data[id] = self.getField(id)
-        data["start date"] = "%s"%self.startDate
-        data["duration"] = "%s"%self.duration
-        if self._track is not None :
+        data["start date"] = "%s" % self.startDate
+        data["duration"] = "%s" % self.duration
+        if self._track is not None:
             data["track"] = self._track.getTitle()
-        if self._type is not None :
+        if self._type is not None:
             data["type"] = self._type
         data["speaker text"] = self.speakerText
-        if self.place is not None :
+        if self.place is not None:
             data["place"] = self.place.getName()
-        if self.room is not None :
+        if self.room is not None:
             data["room"] = self.room.getName()
         data["board number"] = self._boardNumber
-        for sc in self.getSubContributionList() :
-            data["subcontribution %s"%sc.getId()] = sc.getTitle()
-        for pa in self._primaryAuthors :
-            data["primary author %s"%pa.getId()] = pa.getFullName()
-        for ca in self._coAuthors :
-            data["co-author %s"%ca.getId()] = ca.getFullName()
-        for sp in self._speakers :
-            data["speaker %s"%sp.getId()] = sp.getFullName()
+        for sc in self.getSubContributionList():
+            data["subcontribution %s" % sc.getId()] = sc.getTitle()
+        for pa in self._primaryAuthors:
+            data["primary author %s" % pa.getId()] = pa.getFullName()
+        for ca in self._coAuthors:
+            data["co-author %s" % ca.getId()] = ca.getFullName()
+        for sp in self._speakers:
+            data["speaker %s" % sp.getId()] = sp.getFullName()
         for s in self.getSubmitterList():
             if isinstance(s, MaKaC.user.Avatar):
                 data["submitter"] = s.getFullName()
@@ -7815,8 +7815,7 @@ class Contribution(CommonObjectBase, Locatable):
                 data["submitter"] = s.getName()
         return data
 
-
-    def setValues( self, data, check=2, moveEntriesBelow=0):
+    def setValues(self, data, check=2, moveEntriesBelow=0):
         """Sets all the values of the current contribution object from a
             dictionary containing the following key-value pairs:
                 title-(str)
@@ -7847,9 +7846,9 @@ class Contribution(CommonObjectBase, Locatable):
         # and the list of entries to move. It's is needed to take those datas in advance because they
         # are going to be modified before the moving.
         if moveEntriesBelow == 1:
-            oldStartDate=copy.copy(self.getStartDate())
-            oldDuration=copy.copy(self.getDuration())
-            i=self.getSchEntry().getSchedule().getEntries().index(self.getSchEntry())+1
+            oldStartDate = copy.copy(self.getStartDate())
+            oldDuration = copy.copy(self.getDuration())
+            i = self.getSchEntry().getSchedule().getEntries().index(self.getSchEntry())+1
             entriesList = self.getSchEntry().getSchedule().getEntries()[i:]
         if data.has_key("title"):
             self.setTitle(data["title"])
@@ -7863,13 +7862,13 @@ class Contribution(CommonObjectBase, Locatable):
             afm = self.getConference().getAbstractMgr().getAbstractFieldsMgr()
             for f in afm.getFields():
                 id = f.getId()
-                if data.has_key("f_%s"%id):
-                    self.setField(id, data["f_%s"%id])
+                if data.has_key("f_%s" % id):
+                    self.setField(id, data["f_%s" % id])
 
         if "locationName" in data:
-            loc=self.getOwnLocation()
+            loc = self.getOwnLocation()
             if not loc:
-                loc=CustomLocation()
+                loc = CustomLocation()
             self.setLocation(loc)
             loc.setName(data["locationName"])
             loc.setAddress(data.get("locationAddress", ""))
@@ -7878,9 +7877,9 @@ class Contribution(CommonObjectBase, Locatable):
 
         #same as for the location
         if "roomName" in data:
-            room=self.getOwnRoom()
+            room = self.getOwnRoom()
             if not room:
-                room=CustomRoom()
+                room = CustomRoom()
             self.setRoom(room)
             room.setName(data["roomName"])
             room.retrieveFullName(data.get("locationName", ""))
@@ -7890,18 +7889,18 @@ class Contribution(CommonObjectBase, Locatable):
         tz = 'UTC'
         if self.getConference():
             tz = self.getConference().getTimezone()
-        if data.get("targetDay","")!="" and data.get("sHour","")!="" and data.get("sMinute","")!="" and check==2:
+        if data.get("targetDay", "") != "" and data.get("sHour", "") != "" and data.get("sMinute", "") != "" and check == 2:
             ############################################
             # Fermi timezone awareness                 #
             ############################################
-            me = timezone(tz).localize(datetime(int(data["targetDay"][0:4]), \
-                 int(data["targetDay"][5:7]),int(data["targetDay"][8:])))
-            sdate = timezone(tz).localize(datetime(me.year,me.month, \
-                    me.day,int(data["sHour"]),int(data["sMinute"])))
-            self.setStartDate(sdate.astimezone(timezone('UTC')),check=2)
-        if data.get("sYear","")!="" and data.get("sMonth","")!="" and \
-                data.get("sDay","")!="" and data.get("sHour","")!="" and \
-                data.get("sMinute","")!="":
+            me = timezone(tz).localize(datetime(int(data["targetDay"][0:4]),
+                                                int(data["targetDay"][5:7]), int(data["targetDay"][8:])))
+            sdate = timezone(tz).localize(datetime(me.year, me.month,
+                                                   me.day, int(data["sHour"]), int(data["sMinute"])))
+            self.setStartDate(sdate.astimezone(timezone('UTC')), check=2)
+        if data.get("sYear", "") != "" and data.get("sMonth", "") != "" and \
+                data.get("sDay", "") != "" and data.get("sHour", "") != "" and \
+                data.get("sMinute", "") != "":
             self.setStartDate(timezone(tz).localize(datetime(int(data["sYear"]),
                               int(data["sMonth"]), int(data["sDay"]),
                               int(data["sHour"]),  int(data["sMinute"]))).astimezone(timezone('UTC')),
@@ -7911,18 +7910,18 @@ class Contribution(CommonObjectBase, Locatable):
             ############################################
         if data.get("durTimedelta", "") != "":
             self.setDuration(check=check, dur=data["durTimedelta"])
-        elif data.get("durHours","")!="" and data.get("durMins","")!="":
-            self.setDuration(data["durHours"],data["durMins"],check)
+        elif data.get("durHours", "") != "" and data.get("durMins", "") != "":
+            self.setDuration(data["durHours"], data["durMins"], check)
         else:
-            h=data.get("durHours","").strip()
-            m=data.get("durMins","").strip()
-            if h!="" or m!="":
-                h=h or "0"
-                m=m or "0"
-                if h!="0" or m!="0":
-                    self.setDuration(int(h), int(m),check)
+            h = data.get("durHours", "").strip()
+            m = data.get("durMins", "").strip()
+            if h != "" or m != "":
+                h = h or "0"
+                m = m or "0"
+                if h != "0" or m != "0":
+                    self.setDuration(int(h), int(m), check)
         if data.has_key("boardNumber"):
-            self.setBoardNumber(data.get("boardNumber",""))
+            self.setBoardNumber(data.get("boardNumber", ""))
         if moveEntriesBelow == 1:
             diff = (self.getStartDate() - oldStartDate) + (self.getDuration() - oldDuration)
             self.getConference().getSchedule().moveEntriesBelow(diff, entriesList)
@@ -8206,7 +8205,7 @@ class Contribution(CommonObjectBase, Locatable):
     def isWithdrawn(self):
         return isinstance(self.getCurrentStatus(), ContribStatusWithdrawn)
 
-    def getLocationParent( self ):
+    def getLocationParent(self):
         """
         Returns the object from which the room/location
         information should be inherited
@@ -8217,25 +8216,25 @@ class Contribution(CommonObjectBase, Locatable):
             return self.getSchEntry().getSchedule().getOwner()
         return self.getOwner()
 
-    def getOwnLocation( self ):
+    def getOwnLocation(self):
         return self.place
 
-    def setLocation( self, newLocation ):
+    def setLocation(self, newLocation):
         oldLocation = self.place
         self.place = newLocation
         self._notify('locationChanged', oldLocation, newLocation)
         self.notifyModification()
 
-    def getOwnRoom( self ):
+    def getOwnRoom(self):
         return self.room
 
-    def setRoom( self, newRoom ):
+    def setRoom(self, newRoom):
         oldRoom = self.room
         self.room = newRoom
         self._notify('roomChanged', oldRoom, newRoom)
         self.notifyModification()
 
-    def setBoardNumber(self,newBoardNum):
+    def setBoardNumber(self, newBoardNum):
         self._boardNumber=str(newBoardNum).strip()
 
     def getBoardNumber(self):
@@ -8307,10 +8306,10 @@ class Contribution(CommonObjectBase, Locatable):
         self.getSchEntry().synchro()
         self.notifyModification()
 
-    def getStartDate( self ):
+    def getStartDate(self):
         return self.startDate
 
-    def getAdjustedStartDate(self,tz=None):
+    def getAdjustedStartDate(self, tz=None):
         if self.getStartDate() is None:
             return None
         if not tz:
@@ -8319,12 +8318,12 @@ class Contribution(CommonObjectBase, Locatable):
             tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
 
-    def getEndDate( self ):
+    def getEndDate(self):
         if self.getStartDate() is None:
             return None
         return self.getStartDate()+self.getDuration()
 
-    def getAdjustedEndDate(self,tz=None):
+    def getAdjustedEndDate(self, tz=None):
         if not tz:
             tz = self.getConference().getTimezone()
         if tz not in all_timezones:
@@ -8333,7 +8332,7 @@ class Contribution(CommonObjectBase, Locatable):
             return self.getEndDate().astimezone(timezone(tz))
         return None
 
-    def getDuration( self ):
+    def getDuration(self):
         return self.duration
 
     def verifyDuration(self, check=2):
@@ -8360,7 +8359,7 @@ class Contribution(CommonObjectBase, Locatable):
                                                           owner, self.getAdjustedEndDate()))
                     owner.setEndDate(endDate, check)
 
-    def setDuration(self,hours=0,minutes=15,check=2,dur=0):
+    def setDuration(self, hours=0, minutes=15, check=2, dur=0):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
@@ -8375,7 +8374,7 @@ class Contribution(CommonObjectBase, Locatable):
         self.getSchEntry().synchro()
         self.notifyModification()
 
-    def _addAuthor( self, part ):
+    def _addAuthor(self, part):
         """
         """
         try:
@@ -8394,7 +8393,7 @@ class Contribution(CommonObjectBase, Locatable):
         self._authors[newId] = part
         part.includeInContribution( self, newId )
 
-    def _removeAuthor( self, part ):
+    def _removeAuthor(self, part):
         """
         """
         try:
@@ -8407,7 +8406,7 @@ class Contribution(CommonObjectBase, Locatable):
         del self._authors[ part.getId() ]
         part.delete()
 
-    def addPrimaryAuthor( self, part, index = None ):
+    def addPrimaryAuthor(self, part, index=None):
         """
         """
         try:
@@ -8424,7 +8423,7 @@ class Contribution(CommonObjectBase, Locatable):
             self.getConference().indexAuthor(part)
         self.notifyModification(cleanCache = False)
 
-    def removePrimaryAuthor( self, part, removeSpeaker=1, removePendingSubm=True):
+    def removePrimaryAuthor(self, part, removeSpeaker=1, removePendingSubm=True):
         """
         """
         try:
@@ -8452,7 +8451,7 @@ class Contribution(CommonObjectBase, Locatable):
         if isPendingSubmitter:
             self.getConference().getPendingQueuesMgr().addPendingSubmitter(pa, False)
 
-    def isPrimaryAuthor( self, part ):
+    def isPrimaryAuthor(self, part):
         """
         """
         try:
@@ -8488,7 +8487,7 @@ class Contribution(CommonObjectBase, Locatable):
                 return True
         return False
 
-    def changePosPrimaryAuthor(self,part,index):
+    def changePosPrimaryAuthor(self, part, index):
         """
         """
         try:
@@ -8502,7 +8501,7 @@ class Contribution(CommonObjectBase, Locatable):
         self._primaryAuthors.insert(index,part)
         self.notifyModification(cleanCache = False)
 
-    def upPrimaryAuthor(self,part):
+    def upPrimaryAuthor(self, part):
         """
         """
         try:
@@ -8518,9 +8517,9 @@ class Contribution(CommonObjectBase, Locatable):
             return
         self._primaryAuthors.remove(part)
         self._primaryAuthors.insert(idx-1,part)
-        self.notifyModification(cleanCache = False)
+        self.notifyModification(cleanCache=False)
 
-    def downPrimaryAuthor(self,part):
+    def downPrimaryAuthor(self, part):
         """
         """
         try:
@@ -8569,7 +8568,6 @@ class Contribution(CommonObjectBase, Locatable):
                         result.append(author)
         return result
 
-
     def getPrimaryAuthorById(self, authorId):
         for author in self.getPrimaryAuthorList():
             if authorId == author.getId():
@@ -8604,8 +8602,7 @@ class Contribution(CommonObjectBase, Locatable):
         self._coAuthors.insert(index,part)
         self.notifyModification(cleanCache = False)
 
-
-    def upCoAuthor(self,part):
+    def upCoAuthor(self, part):
         """
         """
         try:
@@ -8623,7 +8620,7 @@ class Contribution(CommonObjectBase, Locatable):
         self._coAuthors.insert(idx-1,part)
         self.notifyModification(cleanCache = False)
 
-    def downCoAuthor(self,part):
+    def downCoAuthor(self, part):
         """
         """
         try:
@@ -8641,7 +8638,7 @@ class Contribution(CommonObjectBase, Locatable):
         self._coAuthors.insert(idx+1,part)
         self.notifyModification(cleanCache = False)
 
-    def getPrimaryAuthorList( self ):
+    def getPrimaryAuthorList(self):
         """
         """
         try:
@@ -8653,7 +8650,7 @@ class Contribution(CommonObjectBase, Locatable):
 
     getPrimaryAuthorsList = getPrimaryAuthorList
 
-    def getAuthorList( self ):
+    def getAuthorList(self):
         """
         """
         try:
@@ -8670,7 +8667,7 @@ class Contribution(CommonObjectBase, Locatable):
         """
         return self.getPrimaryAuthorList() + self.getCoAuthorList()
 
-    def addCoAuthor( self, part, index=None ):
+    def addCoAuthor(self, part, index=None):
         """
         """
         try:
@@ -8687,7 +8684,7 @@ class Contribution(CommonObjectBase, Locatable):
             self.getConference().indexAuthor(part)
         self.notifyModification(cleanCache = False)
 
-    def removeCoAuthor( self, part, removeSpeaker=1, removePendingSubm=True):
+    def removeCoAuthor(self, part, removeSpeaker=1, removePendingSubm=True):
         """
         """
         try:
@@ -8715,7 +8712,7 @@ class Contribution(CommonObjectBase, Locatable):
         if isPendingSubmitter:
             self.getConference().getPendingQueuesMgr().addPendingSubmitter(ca, False)
 
-    def getCoAuthorList( self ):
+    def getCoAuthorList(self):
         """
         """
         try:
@@ -8725,7 +8722,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._coAuthors = []
         return self._coAuthors
 
-    def getAuthorById( self, authorId ):
+    def getAuthorById(self, authorId):
         """
         """
         try:
@@ -8735,7 +8732,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._authors = OOBTree()
         return self._authors.get( authorId.strip(), None )
 
-    def isAuthor( self, part ):
+    def isAuthor(self, part):
         """
         """
         try:
@@ -8745,7 +8742,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._authors = OOBTree()
         return self._authors.has_key( part.getId() )
 
-    def getSpeakerById( self, authorId ):
+    def getSpeakerById(self, authorId):
         """
         """
         try:
@@ -8758,7 +8755,7 @@ class Contribution(CommonObjectBase, Locatable):
                 return spk
         return None
 
-    def changePosSpeaker(self,part,index):
+    def changePosSpeaker(self, part, index):
         """
         """
         try:
@@ -8772,7 +8769,7 @@ class Contribution(CommonObjectBase, Locatable):
         self._speakers.insert(index,part)
         self.notifyModification()
 
-    def addSpeaker( self, part, index=None ):
+    def addSpeaker(self, part, index=None):
         """
         Adds a speaker (ContributionParticipation object) to the contribution
         forcing it to be one of the authors of the contribution
@@ -8792,7 +8789,7 @@ class Contribution(CommonObjectBase, Locatable):
             self.getConference().indexSpeaker(part)
         self.notifyModification()
 
-    def newSpeaker( self, part ):
+    def newSpeaker(self, part):
         """
         Adds a new speaker (ContributionParticipation object) to the contribution
         setting the speakers ID and the fact it belongs to that contribution
@@ -8816,7 +8813,7 @@ class Contribution(CommonObjectBase, Locatable):
             self.getConference().indexSpeaker(part)
         self.notifyModification()
 
-    def removeSpeaker( self, part ):
+    def removeSpeaker(self, part):
         """
         """
         try:
@@ -8842,7 +8839,7 @@ class Contribution(CommonObjectBase, Locatable):
         if isPendingSubmitter:
             self.getConference().getPendingQueuesMgr().addPendingSubmitter(spk, False)
 
-    def isSpeaker( self, part ):
+    def isSpeaker(self, part):
         """
         """
         try:
@@ -8852,7 +8849,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._speakers = []
         return part in self._speakers
 
-    def getSpeakerList ( self ):
+    def getSpeakerList(self):
         """
         """
         try:
@@ -8862,7 +8859,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._speakers = []
         return self._speakers
 
-    def getSpeakerText( self ):
+    def getSpeakerText(self):
         #to be removed
         try:
             if self.speakerText:
@@ -8871,30 +8868,30 @@ class Contribution(CommonObjectBase, Locatable):
             self.speakerText = ""
         return self.speakerText
 
-    def setSpeakerText( self, newText ):
+    def setSpeakerText(self, newText):
         self.speakerText = newText.strip()
 
-    def appendSpeakerText( self, newText ):
-        self.setSpeakerText( "%s, %s"%(self.getSpeakerText(), newText.strip()) )
+    def appendSpeakerText(self, newText):
+        self.setSpeakerText("%s, %s" % (self.getSpeakerText(), newText.strip()))
 
-    def canIPAccess( self, ip ):
+    def canIPAccess(self, ip):
         if not self.__ac.canIPAccess( ip ):
             return False
         if self.getOwner() != None:
             return self.getOwner().canIPAccess(ip)
         return True
 
-    def isProtected( self ):
+    def isProtected(self):
         # tells if a contribution is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
 
-    def getAccessProtectionLevel( self ):
+    def getAccessProtectionLevel(self):
         return self.__ac.getAccessProtectionLevel()
 
-    def isItselfProtected( self ):
+    def isItselfProtected(self):
         return self.__ac.isItselfProtected()
 
-    def hasAnyProtection( self ):
+    def hasAnyProtection(self):
         """Tells whether a contribution has any kind of protection over it:
             access or domain protection.
         """
@@ -8909,12 +8906,12 @@ class Contribution(CommonObjectBase, Locatable):
         else:
             return False
 
-    def hasProtectedOwner( self ):
+    def hasProtectedOwner(self):
         if self.getOwner() != None:
             return self.getOwner().isProtected()
         return False
 
-    def setProtection( self, private ):
+    def setProtection(self, private):
 
         oldValue = 1 if self.isProtected() else -1
 
@@ -8925,7 +8922,7 @@ class Contribution(CommonObjectBase, Locatable):
             # notify listeners
             self._notify('protectionChanged', oldValue, private)
 
-    def grantAccess( self, prin ):
+    def grantAccess(self, prin):
         self.__ac.grantAccess( prin )
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "access")
@@ -9570,9 +9567,7 @@ class AcceptedContribution( Contribution ):
         abstract.getConference().addContribution(self,abstract.getId())
         self._abstract = abstract
         self.setTitle( abstract.getTitle() )
-        #self.setDescription(abstract.getField("content"))
         for key in abstract.getFields().keys():
-            #if key != "content":
             self.setField(key, abstract.getField(key))
         if isinstance( abstract.getCurrentStatus(),review.AbstractStatusAccepted ):
             self.setTrack( abstract.getCurrentStatus().getTrack() )
