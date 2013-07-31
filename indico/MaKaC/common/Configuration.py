@@ -262,7 +262,6 @@ class Config:
                  "twitter": "twitter.png",
                  "gplus": "gplus.png",
                  "gcal": "gcal.png",
-                 "shield": "shield.png",
                  "link": "link.png"
     }
 

@@ -307,7 +307,6 @@ class WHeader(WTemplated):
         # *****************
 
         vars["currentUser"] = self._currentuser
-        vars["shieldIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("shield")))
 
         imgLogo=Configuration.Config.getInstance().getSystemIconURL( "logoIndico" )
         imgLogin=Configuration.Config.getInstance().getSystemIconURL( "login" )
