@@ -1822,12 +1822,15 @@ class Abstract(Persistent):
             del self.getFields()[field]
             self._notifyModification()
 
-    def setField( self, field, value ):
+    def setField(self, fid, value):
         try:
-            self.getFields()[field] = value
+            self.getFields()[fid].value = value
             self._notifyModification()
         except:
-            pass
+            afm = self.getOwner().getAbstractFieldsMgr()
+            f = next(f for f in afm.getFields() if f.getId() == fid)
+            if f is not None:
+                self.getFields()[fid] = AbstractFieldContent(f, value)
 
     def getField( self, field):
         try:

@@ -100,7 +100,7 @@ class AbstractData(object):
         for f in self._afm.getFields():
             fid = f.getId()
             value = params.get("f_%s" % fid, "").strip()
-            self._otherFields[fid] = AbstractFieldContent(f, value)
+            self._otherFields[fid] = value
         self.type = params.get("type", None)
         self.tracks = normaliseListParam(params.get("tracks", []))
 

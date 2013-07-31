@@ -41,6 +41,7 @@ from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from indico.util.i18n import L_
+from MaKaC.review import AbstractFieldContent
 
 
 import re, os
@@ -7751,12 +7752,15 @@ class Contribution(CommonObjectBase, Locatable):
             del self.getFields()[field]
             self.notifyModification()
 
-    def setField( self, field, value ):
+    def setField(self, fid, value):
         try:
-            self.getFields()[field] = value
-            self.notifyModification()
+            self.getFields()[fid].value = value
+            self._notifyModification()
         except:
-            pass
+            afm = self.getOwner().getAbstractMgr().getAbstractFieldsMgr()
+            f = next(f for f in afm.getFields() if f.getId() == fid)
+            if f is not None:
+                self.getFields()[fid] = AbstractFieldContent(f, value)
 
     def getField( self, field ):
         if self.getFields().has_key(field):
