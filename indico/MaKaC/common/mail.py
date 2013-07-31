@@ -96,7 +96,7 @@ class GenericMailer:
         msg.attach(part1)
 
         attachment = notification.getAttachment()
-        if attachment is not None:
+        if attachment:
             part2 = MIMEApplication(attachment["binary"])
             part2.add_header("Content-Disposition",
                              'attachment;filename="%s"' % (attachment["name"]))

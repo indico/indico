@@ -65,7 +65,7 @@ class GenericNotification :
             self._subject = ""
             self._body = ""
             self._contenttype = "text/plain"
-            self._attachment = None
+            self._attachment = {}
         else :
             self._fromAddr = data.get("fromAddr", "")
             self._toList = data.get("toList", [])
@@ -74,7 +74,7 @@ class GenericNotification :
             self._subject = data.get("subject", "")
             self._body = data.get("body", "")
             self._contenttype = data.get("content-type", "text/plain")
-            self._attachment = data.get("attachment", None)
+            self._attachment = data.get("attachment", {})
 
 
     def getAttachment(self):
