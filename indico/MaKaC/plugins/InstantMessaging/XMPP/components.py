@@ -126,8 +126,7 @@ class ChatSMContributor(Component, Observable):
             * There are rooms in the event created by the user who wants to clone
         """
         #list of creators of the chat rooms
-        ownersList = [cr.getOwner() for cr in DBHelpers().getChatroomList(obj._conf)]
-        if PluginsWrapper('InstantMessaging', 'XMPP').isActive() and obj._rh._aw._currentUser in ownersList:
+        if PluginsWrapper('InstantMessaging', 'XMPP').isActive():
             list['cloneOptions'] += i18nformat("""<li><input type="checkbox" name="cloneChatrooms" id="cloneChatrooms" value="1" />_("Chat Rooms")</li>""")
 
     @classmethod
