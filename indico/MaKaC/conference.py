@@ -9567,8 +9567,7 @@ class AcceptedContribution( Contribution ):
         abstract.getConference().addContribution(self,abstract.getId())
         self._abstract = abstract
         self.setTitle( abstract.getTitle() )
-        for key in abstract.getFields().keys():
-            self.setField(key, abstract.getField(key))
+        self._setFieldsFromAbstract()
         if isinstance( abstract.getCurrentStatus(),review.AbstractStatusAccepted ):
             self.setTrack( abstract.getCurrentStatus().getTrack() )
             self.setType( abstract.getCurrentStatus().getType() )
@@ -9591,6 +9590,13 @@ class AcceptedContribution( Contribution ):
         cAuth.setAffiliation( aAuth.getAffiliation() )
         cAuth.setAddress( aAuth.getAddress() )
         cAuth.setPhone( aAuth.getTelephone() )
+
+    def _setFieldsFromAbstract(self):
+        for k, v in self._abstract.getFields().items():
+            if isinstance(v, AbstractFieldContent):
+                self.setField(k, v.value)
+            else:
+                self.setField(k, v)
 
     def getAbstract( self ):
         return self._abstract
