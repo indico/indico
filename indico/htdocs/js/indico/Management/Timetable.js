@@ -535,9 +535,10 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
 
         var template = function(value, key) {
             var item;
+            var fid = value.id;
 
             if (self.isEdit) {
-                info.set("field_" + key, info.get("fields")[key]);
+                info.set("field_" + fid, info.get("fields")[fid].value);
             }
 
             if (value._type == "AbstractSelectionField") {
@@ -549,8 +550,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             } else {
                 item = Html.textarea({cols: 50,rows: 2});
             }
-
-            return [value.caption, $B(item, info.accessor('field_' + key))];
+            return [value.caption, $B(item, info.accessor('field_' + fid))];
         };
 
         if (!this.isConference || !this.isCFAEnabled) {
