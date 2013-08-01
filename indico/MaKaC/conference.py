@@ -9588,7 +9588,7 @@ class AcceptedContribution(Contribution):
         cAuth.setPhone(aAuth.getTelephone())
 
     def _setFieldsFromAbstract(self):
-        for k, v in self._abstract.getFields().items():
+        for k, v in self._abstract.getFields().iteritems():
             self.setField(k, v)
 
     def getAbstract(self):
