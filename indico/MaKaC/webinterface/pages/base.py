@@ -59,7 +59,10 @@ class WPBase(OldObservable):
 
         self._asset_env = Environment(os.path.join(config.getHtdocsDir(), 'static', 'assets'),
                                       '{0}/static/assets/'.format(url_path))
-        self._asset_env.config['PYSCSS_LOAD_PATHS'] = [os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass')]
+        self._asset_env.config['PYSCSS_LOAD_PATHS'] = [
+            os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass'),
+            os.path.join(config.getHtdocsDir(), 'sass')
+        ]
         self._asset_env.config['PYSCSS_DEBUG_INFO'] = debug and Config.getInstance().getSCSSDebugInfo()
 
         self._asset_env.append_path(config.getHtdocsDir(), '/')
