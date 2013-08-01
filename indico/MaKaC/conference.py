@@ -7745,15 +7745,17 @@ class Contribution(CommonObjectBase, Locatable):
             del self.getFields()[field]
             self.notifyModification()
 
-    def setField(self, fid, value):
+    def setField(self, fid, v):
+        if isinstance(v, AbstractFieldContent):
+            v = v.value
         try:
-            self.getFields()[fid].value = value
+            self.getFields()[fid].value = v
             self._notifyModification()
         except:
             afm = self.getOwner().getAbstractMgr().getAbstractFieldsMgr()
             f = next(f for f in afm.getFields() if f.getId() == fid)
             if f is not None:
-                self.getFields()[fid] = AbstractFieldContent(f, value)
+                self.getFields()[fid] = AbstractFieldContent(f, v)
 
     def getField(self, field):
         if self.getFields().has_key(field):
@@ -7926,10 +7928,7 @@ class Contribution(CommonObjectBase, Locatable):
         cont.setTitle( self.getTitle() )
         cont.setDescription( self.getDescription() )
         for k, v in self.getFields().items():
-            if isinstance(v, AbstractFieldContent):
-                cont.setField(k, v.value)
-            else:
-                cont.setField(k, v)
+            cont.setField(k, v)
         cont.setKeywords( self.getKeywords() )
         if deltaTime == 0 :
             deltaTime = parent.getStartDate() - self.getOwner().getStartDate()
@@ -9590,10 +9589,7 @@ class AcceptedContribution(Contribution):
 
     def _setFieldsFromAbstract(self):
         for k, v in self._abstract.getFields().items():
-            if isinstance(v, AbstractFieldContent):
-                self.setField(k, v.value)
-            else:
-                self.setField(k, v)
+            self.setField(k, v)
 
     def getAbstract(self):
         return self._abstract
