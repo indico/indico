@@ -117,7 +117,7 @@ def _define_lookup():
 mako = _define_lookup()
 
 
-def render(tplPath, params, module=None):
+def render(tplPath, params={}, module=None):
     """Render the template."""
     template = mako.get_template(tplPath, module)
     registerHelpers(params)
