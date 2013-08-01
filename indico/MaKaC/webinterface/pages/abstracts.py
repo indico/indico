@@ -39,6 +39,7 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.review import AbstractStatusSubmitted
 from MaKaC.review import AbstractTextField
+from MaKaC.common.TemplateExec import render
 
 
 class WConfCFADeactivated(WConfDisplayBodyBase):
@@ -177,9 +178,19 @@ class WPConferenceCFA( WPConferenceDefaultDisplayBase ):
 class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
     navigationEntry = navigation.NEAbstractSubmission
 
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
+            self._asset_env['pagedown_css'].urls()
+
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-           self._includeJSPackage('Management')
+            self._includeJSPackage('Management') + \
+            self._asset_env['pagedown_js'].urls()
+
+    def _getHeadContent(self):
+        return WPConferenceDefaultDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                       for url in self._asset_env['mathjax_js'].urls()])
 
     def _getBody( self, params ):
         params["postURL"] = urlHandlers.UHAbstractSubmission.getURL( self._conf )
@@ -439,7 +450,8 @@ class WPAbstractModify(WPAbstractDisplayBase):
 
     def getJSFiles(self):
         return WPAbstractDisplayBase.getJSFiles(self) + \
-            self._includeJSPackage('Management')
+            self._includeJSPackage('Management') + \
+            self._asset_env['mathjax'].urls()
 
     def _getBody(self, params):
         params["postURL"] = urlHandlers.UHAbstractModify.getURL(self._abstract)

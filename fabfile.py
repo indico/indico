@@ -24,6 +24,7 @@ fabfile for Indico development operations
 import os
 import sys
 import glob
+import shutil
 from contextlib import contextmanager
 
 from fabric.api import local, lcd, task, env
@@ -154,19 +155,30 @@ def _check_present(executable, message="Please install it first."):
 
 
 def _safe_rm(path, recursive=False, ask=True):
-    with lcd('/tmp'):
-        if path[0] != '/':
-            path = os.path.join(env.lcwd, path)
-        if ask:
-            files = glob.glob(path)
-            if files:
-                print yellow("The following files are going to be deleted:\n  ") + '\n  '.join(files)
-                if console.confirm(cyan("Are you sure you want to delete them?")):
-                    local('rm {0}{1}'.format('-rf ' if recursive else '', path))
-                else:
-                    print red("Delete operation cancelled")
-        else:
-            local('rm {0}{1}'.format('-rf ' if recursive else '', path))
+    if path[0] != '/':
+        path = os.path.join(env.lcwd, path)
+    if ask:
+        files = glob.glob(path)
+        if files:
+            print yellow("The following files are going to be deleted:\n  ") + '\n  '.join(files)
+            if console.confirm(cyan("Are you sure you want to delete them?")):
+                local('rm {0}{1}'.format('-rf ' if recursive else '', path))
+            else:
+                print red("Delete operation cancelled")
+    else:
+        local('rm {0}{1}'.format('-rf ' if recursive else '', path))
+
+
+def _cp_tree(dfrom, dto, exclude=[]):
+    """
+    Simple copy with exclude option
+    """
+    if dfrom[0] != '/':
+        dfrom = os.path.join(env.lcwd, dfrom)
+    if dto[0] != '/':
+        dto = os.path.join(env.lcwd, dto)
+
+    shutil.copytree(dfrom, dto, ignore=shutil.ignore_patterns(*exclude))
 
 
 def _install_dependencies(mod_name, sub_path, dtype, dest_subpath=None):
@@ -217,8 +229,6 @@ def install_qtip2():
     """
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'qtip2')):
-            local('git submodule init')
-            local('git submodule update')
             local('npm install')
             local('grunt --plugins="tips modal viewport svg" init clean concat:dist concat:css concat:libs replace')
             dest_dir_js, dest_dir_css = lib_dir(env.src_dir, 'js'), lib_dir(env.src_dir, 'css')
@@ -243,6 +253,30 @@ def install_jquery_ui_multiselect():
             local('cp jquery.multiselect.filter.css {0}/'.format(dest_dir_css))
 
 
+@recipe('MathJax')
+def install_mathjax():
+    """
+    Install MathJax from Git
+    """
+    with lcd(os.path.join(env.ext_dir, 'mathjax')):
+        dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'mathjax/')
+        local('rm -rf {0}'.format(os.path.join(dest_dir)))
+        _cp_tree('unpacked/', dest_dir, exclude=["AM*", "MML*", "Accessible*", "Safe*"])
+        _cp_tree('images/', os.path.join(dest_dir, 'images'))
+        _cp_tree('fonts/', os.path.join(dest_dir, 'fonts'), exclude=["png"])
+
+
+@recipe('PageDown')
+def install_pagedown():
+    """
+    Install PageDown from Git (mirror!)
+    """
+    with lcd(os.path.join(env.ext_dir, 'pagedown')):
+        dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'pagedown/')
+        local('mkdir -p {0}'.format(dest_dir))
+        local('cp *.js {0}'.format(dest_dir))
+
+
 # Tasks
 
 @task
@@ -261,8 +295,7 @@ def init_submodules(src_dir='.'):
 
     print green("Initializing submodules")
     with lcd(src_dir):
-        local('git submodule init')
-        local('git submodule update')
+        local('git submodule update --init --recursive')
 
 
 def _install_deps():

@@ -80,10 +80,6 @@ indico_core = Bundle(
                'Util.js',
                'Login.js',
                'Dragndrop.js',
-               # this it here because I don't know which js is used on AbstractDisplay.tpl:
-               '../Management/Markdown.Converter.js',
-               '../Management/Markdown.Editor.js',
-               '../Management/Markdown.Sanitizer.js',
                'keymap.js'),
     filters='rjsmin', output='js/indico_core_%(version)s.min.js')
 
@@ -101,11 +97,7 @@ indico_management = Bundle(
                'Sessions.js',
                'CFA.js',
                'RoomBookingMapOfRooms.js',
-               'EventUsers.js',
-               #'Markdown.Converter.js',
-               #'Markdown.Editor.js',
-               #'Markdown.Sanitizer.js'
-               ),
+               'EventUsers.js'),
     filters='rjsmin', output='js/indico_management_%(version)s.min.js')
 
 indico_room_booking = Bundle(
@@ -285,6 +277,18 @@ moment = Bundle(
         'lang/fr.js'),
     filters='rjsmin', output='js/moment_%(version)s.min.js')
 
+mathjax_js = Bundle(
+    'js/lib/mathjax/MathJax.js',
+    'js/custom/pagedown_mathjax.js',
+    filters='rjsmin', output='js/mathjax_%(version)s.min.js')
+
+pagedown_js = Bundle(
+    *namespace('js/lib/pagedown',
+               'Markdown.Converter.js',
+               'Markdown.Editor.js',
+               'Markdown.Sanitizer.js'),
+    filters='rjsmin', output='js/pagedown_%(version)s.min.js')
+
 base_js = Bundle(jquery, utils, presentation, calendar, indico_jquery, moment, indico_core,
                  indico_legacy, indico_common)
 
@@ -297,7 +301,6 @@ screen_sass = Bundle('sass/screen.scss',
                               "sass/partials/*.scss",
                               "sass/modules/*.scss",
                               "sass/modules/roombooking/*.scss"])
-
 
 def register_all_js(env):
     env.register('jquery', jquery)
@@ -317,9 +320,15 @@ def register_all_js(env):
     env.register('indico_badges_js', indico_badges_js)
     env.register('base_js', base_js)
     env.register('ie_compatibility', ie_compatibility)
+    env.register('pagedown_js', pagedown_js)
+    env.register('mathjax_js', mathjax_js)
 
 
 def register_all_css(env, main_css_file):
+
+    pagedown_css = Bundle('css/pagedown_editor.css',
+                          filters=("cssmin", "cssrewrite"),
+                          output="css/pagedown_editor_%(version)s.min.css")
 
     base_css = Bundle(
         *namespace('css',
@@ -333,13 +342,11 @@ def register_all_css(env, main_css_file):
                     'jquery.colorbox.css',
                     'jquery-ui-custom.css',
                     'jquery.qtip-custom.css',
-                    'jquery.colorpicker.css',
-                    'jquery.multiselect.filter.css',
-                    'jquery.multiselect.css',
-                    'pagedown_editor.css'),
+                    'jquery.colorpicker.css'),
         filters=("cssmin", "cssrewrite"),
         output='css/base_%(version)s.min.css')
 
     env.register('indico_badges_css', indico_badges_css)
+    env.register('pagedown_css', pagedown_css)
     env.register('base_css', base_css)
     env.register('screen_sass', screen_sass)

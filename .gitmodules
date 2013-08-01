@@ -1,18 +1,28 @@
 [submodule "ext_modules/jquery"]
-	path = ext_modules/jquery
-	url = git://github.com/jquery/jquery.git
+    path = ext_modules/jquery
+    url = git://github.com/jquery/jquery.git
     ignore = dirty
 [submodule "ext_modules/compass"]
-	path = ext_modules/compass
-	url = git://github.com/chriseppstein/compass.git
+    path = ext_modules/compass
+    url = git://github.com/chriseppstein/compass.git
     ignore = dirty
 [submodule "ext_modules/qtip2"]
-	path = ext_modules/qtip2
-	url = git://github.com/Craga89/qTip2.git
+    path = ext_modules/qtip2
+    url = git://github.com/Craga89/qTip2.git
     ignore = dirty
 [submodule "ext_modules/underscore"]
-	path = ext_modules/underscore
-	url = git://github.com/documentcloud/underscore.git
+    path = ext_modules/underscore
+    url = git://github.com/documentcloud/underscore.git
+    ignore = dirty
+
+[submodule "ext_modules/mathjax"]
+    path = ext_modules/mathjax
+    url = git://github.com/mathjax/MathJax.git
+    ignore = dirty
+
+[submodule "ext_modules/pagedown"]
+    path = ext_modules/pagedown
+    url = git@github.com:ujifgc/pagedown.git
     ignore = dirty
 [submodule "ext_modules/jquery-ui-multiselect"]
 	path = ext_modules/jquery-ui-multiselect
