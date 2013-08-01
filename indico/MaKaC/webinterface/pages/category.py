@@ -1631,22 +1631,18 @@ class WConferenceDeletion(object):
     def getHTML(self, actionURL):
         events = []
 
-        events.append("<ul>")
+        events.append("<ul class='categ-list'>")
 
         for event in self._confList:
 
-            # Formatting the dates. ( XX XX 20XX - XY XY 20XX )
-            splited_date = str(format_datetime(event.getStartDate())).split( )
-            start_date = splited_date[0] + " " + splited_date[1] + " " + splited_date[2]
-            splited_date = str(format_datetime(event.getEndDate())).split( )
-            end_date = splited_date[0] + " " + splited_date[1] + " " + splited_date[2]
-            if start_date!=end_date :
-                start_date = start_date + " - " + end_date
+            start_date = format_datetime(event.getAdjustedStartDate(), "dd MMMM yyyy")
+            end_date = format_datetime(event.getAdjustedEndDate(), "dd MMMM yyyy")
+            date = "{0} - {1}".format(start_date, end_date) if start_date != end_date else start_date
 
             #Append the event title and date
             events.append("<li>")
-            events.append("""<i>%s</i>"""%event.getTitle()+":")
-            events.append("""<span>%s</span>"""%start_date)
+            events.append("<i>%s:</i>" % event.getTitle())
+            events.append("<span>%s</span>" % date)
             events.append("</li>")
 
         events.append("</ul>")
