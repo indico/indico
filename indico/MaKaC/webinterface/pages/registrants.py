@@ -34,6 +34,7 @@ from MaKaC import registration
 from conferences import WConfModifBadgePDFOptions
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.util. date_time import format_datetime
 from indico.web.flask.util import url_for
 from xml.sax.saxutils import escape
 import string
@@ -895,10 +896,9 @@ class WRegistrantModifETicket(wcomponents.WTemplated):
                                      self._registrant,
                                      authkey=self._registrant.getRandomId())
         vars["isCheckedIn"] = self._registrant.isCheckedIn()
-        if self._registrant.getCheckInDate() is not None:
-            vars["checkInDate"] = "%s (%s)" % (
-                self._registrant.getAdjustedCheckInDate().strftime(
-                    "%d-%B-%Y %H:%M"), self._conf.getTimezone())
+        checkInDate = self._registrant.getCheckInDate()
+        if checkInDate:
+            vars["checkInDate"] = format_datetime(checkInDate)
 
         return vars
 

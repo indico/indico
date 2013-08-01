@@ -57,6 +57,7 @@ from MaKaC.webinterface.common.tools import strip_ml_tags
 import re
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat, ngettext
+from indico.util.date_time import format_date
 
 
 styles = getSampleStyleSheet()
@@ -3169,13 +3170,9 @@ class LectureToPosterPDF:
 
 class TicketToPDF(PDFBase):
 
-    def __init__(self, conf, registrant, doc=None, story=None, tz=None):
+    def __init__(self, conf, registrant, doc=None, story=None):
         self._conf = conf
         self._registrant = registrant
-        if not tz:
-            self._tz = self._conf.getTimezone()
-        else:
-            self._tz = tz
         PDFBase.__init__(self, doc, story)
 
     def firstPage(self, c, doc):
@@ -3192,8 +3189,8 @@ class TicketToPDF(PDFBase):
         # Conference start and end date
         height -= 0.7*cm
         self._drawWrappedString(c, "%s - %s" % (
-            self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"),
-            self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")),
+            format_date(self._conf.getStartDate(), format='full'),
+            format_date(self._conf.getEndDate(), format='full')),
             height=height, width=width, align="left", font="Times-Italic",
             size=15)
 

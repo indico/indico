@@ -4736,13 +4736,6 @@ class Registrant(Persistent):
             self._checkInDate = None
         return self._checkInDate
 
-    def getAdjustedCheckInDate(self, tz=None):
-        if not tz:
-            tz = self.getConference().getTimezone()
-        if tz not in all_timezones:
-            tz = 'UTC'
-        return self.getCheckInDate().astimezone(timezone(tz))
-
     def getPayed(self):
         try:
             return self._hasPay

@@ -31,7 +31,6 @@ from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.utils import validMail
-from MaKaC.common import timezoneUtils
 from MaKaC.PDFinterface.conference import TicketToPDF
 from indico.web.flask.util import send_file
 
@@ -176,8 +175,7 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
         attachment = {}
         filename = "%s - Ticket.pdf" % self._target.getTitle()
         attachment["name"] = filename
-        tz = timezoneUtils.DisplayTZ(self._aw, self._target).getDisplayTZ()
-        pdf = TicketToPDF(self._target, rp, tz=tz)
+        pdf = TicketToPDF(self._target, rp)
         attachment["binary"] = pdf.getPDFBin()
         email["attachments"] = [attachment]
 
@@ -216,9 +214,8 @@ class RHRegistrationFormCreationDone( RHRegistrationFormRegistrantBase ):
 class RHConferenceTicketPDF(RHRegistrationFormCreationDone):
 
     def _process(self):
-        tz = timezoneUtils.DisplayTZ(self._aw, self._target).getDisplayTZ()
         filename = "%s - Ticket.pdf" % self._target.getTitle()
-        pdf = TicketToPDF(self._target, self._registrant, tz=tz)
+        pdf = TicketToPDF(self._target, self._registrant)
         return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
