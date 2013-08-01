@@ -1798,24 +1798,8 @@ class Abstract(Persistent):
     def getTitle(self):
         return self._title
 
-    def getFields( self ):
-        try:
-            return self._fields
-        except:
-            self._fields = {}
-            try:
-                if self._content != "":
-                    self._fields["content"] = self._content
-                del self._content
-            except:
-                pass
-            try:
-                if self._summary != "":
-                    self._fields["summary"] = self._summary
-                del self._summary
-            except:
-                pass
-            return self._fields
+    def getFields(self):
+        return self._fields
 
     def removeField(self, field):
         if self.getFields().has_key(field):
@@ -1832,19 +1816,7 @@ class Abstract(Persistent):
             if f is not None:
                 self.getFields()[fid] = AbstractFieldContent(f, value)
 
-    def getField( self, field):
-        try:
-            if self._content != "":
-                self._fields["content"] = self._content
-            del self._content
-        except:
-            pass
-        try:
-            if self._summary != "":
-                self._fields["summary"] = self._summary
-            del self._summary
-        except:
-            pass
+    def getField(self, field):
         if self.getFields().has_key(field):
             return self.getFields()[field]
         else:
