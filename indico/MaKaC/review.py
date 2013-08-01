@@ -40,7 +40,6 @@ from MaKaC.fossils.abstracts import IAbstractFieldFossil
 from MaKaC.fossils.abstracts import IAbstractTextFieldFossil
 from MaKaC.fossils.abstracts import IAbstractSelectionFieldFossil
 from MaKaC.fossils.abstracts import ISelectionFieldOptionFossil
-from MaKaC.fossils.abstracts import IAbstractFieldContentFossil
 from indico.util.i18n import N_
 from indico.util.text import wordsCounter
 
@@ -713,8 +712,7 @@ class SelectionFieldOption(Fossilizable):
         return self.deleted
 
 
-class AbstractFieldContent(Persistent, Fossilizable):
-    fossilizes(IAbstractFieldContentFossil)
+class AbstractFieldContent(Persistent):
 
     def __init__(self, field, value):
         self.field = field
@@ -742,15 +740,6 @@ class AbstractFieldContent(Persistent, Fossilizable):
             return str(self.field.getOption(self.value))
         else:
             return str(self.value)
-
-    def getField(self):
-        return self.field
-
-    def getStr(self):
-        return str(self)
-
-    def getValue(self):
-        return self.value
 
 
 class AbstractFieldsMgr(Persistent):

@@ -21,7 +21,6 @@ from MaKaC.common.fossilize import IFossil
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.Conversion import Conversion
 from MaKaC.webinterface import urlHandlers
-from MaKaC.fossils.abstracts import IAbstractFieldContentFossil
 from MaKaC.fossils.conference import IMaterialMinimalFossil,\
         IConferenceParticipationFossil, IConferenceParticipationMinimalFossil
 from MaKaC.fossils.contribution import IContributionParticipationTTDisplayFossil,\
@@ -246,7 +245,7 @@ class IContribSchEntryMgmtFossil(IContribSchEntryFossil):
 
     def getFields(self):
         """ Entry fields """
-    getFields.produce = lambda x: fossilize(x.getOwner().getFields())
+    getFields.produce = lambda x: x.getOwner().getFields(valueonly=True)
 
     def getReportNumbers(self):
         """ Entry report numbers """

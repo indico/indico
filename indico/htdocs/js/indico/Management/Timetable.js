@@ -536,7 +536,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             var fid = value.id;
 
             if (self.isEdit) {
-                info.set("field_" + fid, info.get("fields")[fid].value);
+                info.set("field_" + fid, info.get("fields")[fid]);
             }
 
             if (value._type == "AbstractSelectionField") {

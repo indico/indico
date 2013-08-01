@@ -7734,18 +7734,11 @@ class Contribution(CommonObjectBase, Locatable):
             self._keywords = keywords
         self.notifyModification(cleanCache=False)
 
-    def getFields(self):
-        try:
+    def getFields(self, valueonly=False):
+        if not valueonly:
             return self._fields
-        except:
-            self._fields = {}
-            try:
-                if self.summary != "":
-                    self._fields["summary"] = self.summary
-                del self.summary
-            except:
-                pass
-            return self._fields
+        else:
+            return {k: (v.value if isinstance(v, AbstractFieldContent) else v) for k, v in self._fields.iteritems()}
 
     def removeField(self, field):
         if self.getFields().has_key(field):

@@ -84,16 +84,3 @@ class IAbstractSelectionFieldFossil(IAbstractFieldFossil):
     def getOptions(self):
         """ Options for selection """
     getOptions.result = ISelectionFieldOptionFossil
-
-
-class IAbstractFieldContentFossil(IFossil):
-
-    def getField(self):
-        pass
-    getField.result = IAbstractFieldFossil
-
-    def getValue(self):
-        pass
-
-    def getStr(self):
-        pass
