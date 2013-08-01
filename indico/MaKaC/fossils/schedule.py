@@ -122,7 +122,6 @@ class IBreakTimeSchEntryMgmtFossil(IBreakTimeSchEntryFossil):
     inheritRoom.name = "inheritRoom"
 
 
-
 class IContribSchEntryFossil(ISchEntryFossil):
 
     def getUniqueId(self):
@@ -320,7 +319,6 @@ class ILinkedTimeSchEntryFossil(ISchEntryFossil):
         """ Entry Conference id """
     getConferenceId.produce = lambda s: s.getOwner().getConference().getId()
 
-
     def getContribDuration(self):
         """ Default duration for contribs """
     getContribDuration.produce = lambda s: s.getOwner().getSession().getContribDuration()
@@ -337,6 +335,7 @@ class ILinkedTimeSchEntryFossil(ISchEntryFossil):
     def getUniqueId(self):
         """ Unique Id """
     getUniqueId.produce = lambda s: s.getOwner().getSession().getUniqueId()
+
 
 class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):
 
@@ -392,6 +391,7 @@ class IConferenceScheduleDisplayFossil(IFossil):
     getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryDisplayFossil,
                          "BreakTimeSchEntry": IBreakTimeSchEntryFossil,
                          "ContribSchEntry": IContribSchEntryDisplayFossil}
+
 
 class IConferenceScheduleMgmtFossil(IFossil):
 

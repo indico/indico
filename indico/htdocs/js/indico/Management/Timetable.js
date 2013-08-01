@@ -273,9 +273,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
      function(method, timeStartMethod, args, parentRoomData,
               confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms, isEdit) {
          var self = this;
-
          this.newArgs = Array.prototype.slice.call(arguments, 0);
-
          this.args = args;
          this.selectedDay = dayStartDate;
          this.days = days;

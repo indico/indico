@@ -23,6 +23,7 @@ from MaKaC.fossils.subcontribution import ISubContributionFossil
 from MaKaC.fossils.reviewing import IReviewManagerFossil
 from MaKaC.webinterface import urlHandlers
 
+
 class IContributionFossil(IFossil):
 
     def getId(self):
@@ -67,11 +68,11 @@ class IContributionFossil(IFossil):
         pass
     getReviewManager.result = IReviewManagerFossil
 
-    def getTrack( self ):
+    def getTrack(self):
         pass
     getTrack.convert = lambda t: t and t.getTitle()
 
-    def getSession( self ):
+    def getSession(self):
         pass
     getSession.convert = lambda s: s and s.getTitle()
 
@@ -87,6 +88,7 @@ class IContributionFossil(IFossil):
     def getProtectionURL(self):
         """Contribution protection URL"""
     getProtectionURL.produce = lambda s: str(urlHandlers.UHContribModifAC.getURL(s))
+
 
 class IContributionParticipationTTDisplayFossil(IFossil):
     """
@@ -178,6 +180,7 @@ class IContributionWithSpeakersFossil(IContributionFossil):
         pass
     getSpeakerList.result = IContributionParticipationMinimalFossil
     getSpeakerList.name = "presenters"
+
 
 class IContributionWithSubContribsFossil(IContributionFossil):
 
