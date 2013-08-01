@@ -180,7 +180,7 @@ class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
 
     def getCSSFiles(self):
         return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-            self._asset_env['pagedown_css'].urls()
+            self._asset_env['pagedown_sass'].urls()
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
