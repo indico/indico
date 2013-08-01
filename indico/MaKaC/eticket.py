@@ -21,19 +21,20 @@ from persistent import Persistent
 
 
 class ETicket(Persistent):
+    """
+    This class manages the configuration of the ETicket module.
+    """
 
-    def __init__(self, conf, groupData=None):
-        self._conf = conf
-        if groupData is None:
-            self.activated = False
-        else:
-            self.activated = groupData.get("activated", False)
+    def __init__(self):
+        self._enabled = False
 
-    def isActivated(self):
-        return self.activated
+    def isEnabled(self):
+        return self._enabled
 
-    def activate(self):
-        self.activated = True
+    def setEnabled(self, enabled):
+        self._enabled = enabled
 
-    def deactivate(self):
-        self.activated = False
+    def clone(self):
+        e_ticket = ETicket()
+        e_ticket.setEnabled(self.isEnabled())
+        return e_ticket

@@ -77,7 +77,7 @@ from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
 from MaKaC.accessControl import AccessController, AdminList
 from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NoReportError
-from MaKaC import registration, epayment, eticket
+from MaKaC import registration, epayment
 from MaKaC.evaluation import Evaluation
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.user import AvatarHolder
@@ -4687,14 +4687,6 @@ class Conference(CommonObjectBase, Locatable):
         except AttributeError,e:
             self._modPay= epayment.EPayment(self)
         return self._modPay
-
-    def getModETicket(self):
-        try:
-            if self._modETicket is None:
-                self._modETicket= eticket.ETicket(self)
-        except AttributeError,e:
-            self._modETicket= eticket.ETicket(self)
-        return self._modETicket
 
     def getRegistrants(self):
         try:

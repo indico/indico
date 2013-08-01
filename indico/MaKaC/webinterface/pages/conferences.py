@@ -189,7 +189,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         self._newRegFormOpt = self._sectionMenu.getLinkByName("NewRegistration")
         if awUser != None:
             self._viewRegFormOpt.setVisible(awUser.isRegisteredInConf(self._conf))
-            if self._conf.getModETicket().isActivated():
+            if self._conf.getRegistrationForm().getETicket().isEnabled():
                 self._eTicketOpt.setVisible(awUser.isRegisteredInConf(self._conf))
             else:
                 self._eTicketOpt.setVisible(False)

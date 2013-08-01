@@ -28,6 +28,7 @@ from persistent import Persistent
 from persistent.mapping import PersistentMapping
 from persistent.list import PersistentList
 import MaKaC
+from MaKaC import eticket
 from MaKaC.common.Counter import Counter
 from MaKaC.errors import FormValuesError,MaKaCError
 from MaKaC.common.Locators import Locator
@@ -86,6 +87,7 @@ class RegistrationForm(Persistent):
             self.contactInfo = groupData.get("contactInfo", "")
             self.setCurrency(groupData.get("Currency", ""))
         self.notification = Notification()
+        self._eTicket = eticket.ETicket()
         # Status definition
         self._statuses={}
         self._statusesGenerator=Counter()
@@ -140,6 +142,7 @@ class RegistrationForm(Persistent):
         form.setSendPaidEmail(self.isSendPaidEmail())
         form.setAllSessions()
         form.notification=self.getNotification().clone()
+        form._eTicket = self.getETicket().clone()
         form.personalData = self.getPersonalData().clone(form)
         form.generalSectionForms[form.personalData.getId()] = form.personalData
         acf = self.getAccommodationForm()
@@ -579,6 +582,13 @@ class RegistrationForm(Persistent):
     def notifyModification(self):
         self._p_changed=1
         self._conf.notifyModification()
+
+    def getETicket(self):
+        try:
+            return self._eTicket
+        except AttributeError:
+            self._eTicket = eticket.ETicket()
+            return self._eTicket
 
 class Notification(Persistent):
 

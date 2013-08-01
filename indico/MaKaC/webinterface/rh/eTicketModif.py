@@ -42,9 +42,9 @@ class RHETicketModifChangeStatus(RHETicketModifBase):
         self._newStatus = params["changeTo"]
 
     def _process(self):
-        eticket = self._conf.getModETicket()
+        eticket = self._conf.getRegistrationForm().getETicket()
         if self._newStatus == "True":
-            eticket.activate()
+            eticket.setEnabled(True)
         else:
-            eticket.deactivate()
+            eticket.setEnabled(False)
         self._redirect(url_for("event_mgmt.confModifETicket", self._conf))

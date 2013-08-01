@@ -851,7 +851,7 @@ class WPRegistrantModifBase( WPRegistrantBase ):
         self._setActiveTab()
         self._setupTabCtrl()
 
-        if not self._conf.getModETicket().isActivated():
+        if not self._conf.getRegistrationForm().getETicket().isEnabled():
             self._tabETicket.disable()
 
     def _setActiveTab( self ):
