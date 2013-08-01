@@ -7932,8 +7932,11 @@ class Contribution(CommonObjectBase, Locatable):
         parent.addContribution(cont)
         cont.setTitle( self.getTitle() )
         cont.setDescription( self.getDescription() )
-        for k in self.getFields().keys():
-            cont.setField(k, self.getField(k))
+        for k, v in self.getFields().items():
+            if isinstance(v, AbstractFieldContent):
+                cont.setField(k, v.value)
+            else:
+                cont.setField(k, v)
         cont.setKeywords( self.getKeywords() )
         if deltaTime == 0 :
             deltaTime = parent.getStartDate() - self.getOwner().getStartDate()
