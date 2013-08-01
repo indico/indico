@@ -1623,45 +1623,8 @@ class WCategoryDeletion(object):
                           severity='danger')
 
 
-class WConferenceDeletion(object):
-
-    def __init__(self, conferenceList):
-        self._confList = conferenceList
-
-    def getHTML(self, actionURL):
-        events = []
-
-        events.append("<ul class='categ-list'>")
-
-        for event in self._confList:
-
-            start_date = format_datetime(event.getAdjustedStartDate(), "dd MMMM yyyy")
-            end_date = format_datetime(event.getAdjustedEndDate(), "dd MMMM yyyy")
-            date = "{0} - {1}".format(start_date, end_date) if start_date != end_date else start_date
-
-            #Append the event title and date
-            events.append("<li>")
-            events.append("<i>%s:</i>" % event.getTitle())
-            events.append("<span>%s</span>" % date)
-            events.append("</li>")
-
-        events.append("</ul>")
-
-        msg = {'challenge': _('Are you sure that you want to delete the following events?'),
-               'target': "".join(events),
-               'important': True,
-               'subtext': _('Note that ALL the content therein will be deleted as well')
-               }
-
-        wc = wcomponents.WConfirmation()
-        eventIdList = []
-
-        for event in self._confList:
-            eventIdList.append(event.getId())
-
-        return wc.getHTML(msg, actionURL, {"selectedConf": eventIdList}, \
-                                            confirmButtonCaption=_("Yes"), \
-                                            cancelButtonCaption=_("No"))
+class WConferenceDeletion(wcomponents.WTemplated):
+    pass
 
 
 class WPSubCategoryDeletion(WPCategModifMain):
@@ -1675,10 +1638,11 @@ class WPSubCategoryDeletion(WPCategModifMain):
 class WPConferenceDeletion(WPCategModifMain):
 
     def _getPageContent(self, params):
-        #raise '%s'%params
-        selConfs = params["events"]
-        wc = WConferenceDeletion(selConfs)
-        return wc.getHTML(urlHandlers.UHCategoryActionConferences.getURL(self._target))
+        wc = WConferenceDeletion()
+        return wc.getHTML({'eventList': params["events"],
+                           'postURL': urlHandlers.UHCategoryActionConferences.getURL(self._target),
+                           'cancelButtonCaption': _("No"),
+                           'confirmButtonCaption': _("Yes")})
 
 
 class WItemReallocation(wcomponents.WTemplated):

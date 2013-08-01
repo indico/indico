@@ -25,9 +25,13 @@
     margin: 0;
 }
 
-.confirmation-dialog ul.categ-list span {
+.confirmation-dialog ul.categ-list span.event-date {
     padding-left: 10px;
     color: #888888;
     font-size: 0.9em;
     margin: 0;
+}
+
+.confirmation-dialog ul.categ-list span.event-title {
+    font-weight: italic;
 }

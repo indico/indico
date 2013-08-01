@@ -277,7 +277,8 @@ base_sass = Bundle('sass/screen.scss',
                    filters=("pyscss", "cssrewrite", "cssmin"),
                    output="sass/base_sass_%(version)s.css",
                    depends=["sass/base/*.scss",
-                            "sass/partials/*.scss"])
+                            "sass/partials/*.scss",
+                            "sass/modules/*.scss"])
 
 
 def register_all_js(env):

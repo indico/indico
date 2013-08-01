@@ -1110,13 +1110,9 @@ class WContribModifHeader(WTemplated):
 class WContribModifTool(WTemplated):
     pass
 
+
 class WContributionDeletion(WTemplated):
-
-    def delete(self):
-        for contrib in self._contribList:
-            contrib.delete()
-
-        return "done"
+    pass
 
 
 class WContribModifSC(WTemplated):

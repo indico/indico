@@ -27,13 +27,13 @@
               ${message['target']}
             </%block>
           </p>
-          % if message.get('subtext'):
             <div class="subtext">
               <%block name="subtext">
+                % if message and message.get('subtext'):
                 ${message['subtext']}
+                % endif
               </%block>
             </div>
-          % endif
         </div>
         <div class="clearer"></div>
       % else:

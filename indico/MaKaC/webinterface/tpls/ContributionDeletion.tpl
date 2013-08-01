@@ -29,7 +29,6 @@
     </ul>
   </li>
 </ul>
-
 All the existing sub-contributions within the above contribution(s) will also be deleted
 """)}
 </%block>
