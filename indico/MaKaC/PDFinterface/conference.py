@@ -697,8 +697,8 @@ class ContribToPDF(PDFBase):
 
         for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             fid = field.getId()
-            name = field.getName()
-            value = self._contrib.getField(fid).strip()
+            name = field.getCaption()
+            value = str(self._contrib.getField(fid)).strip()
             if value: #id not in ["content"] and
                 styleHead = ParagraphStyle({})
                 styleHead.firstLineIndent = -55
@@ -928,7 +928,7 @@ class ContributionBook(PDFBase):
                 lspk.append("%s"%escape(fullName))
             speakers= i18nformat("""<b>_("Presenter"): %s</b>""")%"; ".join(lspk)
             p2=Paragraph(speakers,self._styles["speakers"])
-            abstract=contrib.getDescription()
+            abstract=str(contrib.getDescription())
             p3=Paragraph(escape(abstract),self._styles["abstract"])
             ses=""
             if contrib.getSession() is not None:
