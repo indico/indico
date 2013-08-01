@@ -7418,7 +7418,7 @@ class ContributionParticipation(Persistent, Fossilizable):
     def getAddress( self ):
         return self._address
 
-    @Updates ('MaKaC.conference.ContributionParticipation', 'telephone')
+    @Updates('MaKaC.conference.ContributionParticipation', 'phone')
     def setPhone( self, newPhone ):
         self._phone = newPhone.strip()
         self._notifyModification()
