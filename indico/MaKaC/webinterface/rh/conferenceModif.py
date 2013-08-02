@@ -3364,6 +3364,75 @@ class RHConfModifPendingQueues( RHConferenceModifBase ):
         p = conferences.WPConfModifPendingQueues( self, self._target, self._getRequestParams().get("tab","conf_submitters") )
         return p.display()
 
+class RHConfModifPendingQueuesActionConfMgr:
+    """
+    class to select the action to do with the selected pending conference submitters
+    """
+
+    _uh = urlHandlers.UHConfModifPendingQueuesActionConfMgr
+
+    def __init__(self, req):
+        assert req is None
+
+    def process(self, params):
+        if 'remove' in params:
+            return RHConfModifPendingQueuesRemoveConfMgr(None).process(params)
+        elif 'reminder' in params:
+            return RHConfModifPendingQueuesReminderConfMgr(None).process(params)
+        return "no action to do"
+
+class RHConfModifPendingQueuesRemoveConfMgr( RHConferenceModifBase ):
+
+    def _checkParams( self, params ):
+        RHConferenceModifBase._checkParams( self, params )
+        self._pendingConfMgrIds = self._normaliseListParam( params.get("pendingUsers", []) )
+        self._pendingConfMgrs = []
+        for id in self._pendingConfMgrIds:
+            self._pendingConfMgrs.extend(self._conf.getPendingQueuesMgr().getPendingConfManagersByEmail(id))
+        self._remove=params.has_key("confirm")
+        self._confirmed=params.has_key("confirm") or params.has_key("cancel")
+
+    def _process( self ):
+        url=urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
+        url.addParam("tab","conf_managers")
+        if self._pendingConfMgrs == []:
+            self._redirect(url)
+        if self._confirmed:
+            if self._remove:
+                for ps in self._pendingConfMgrs:
+                    self._conf.getPendingQueuesMgr().removePendingConfManager(ps)
+            self._redirect(url)
+        else:
+            wp = conferences.WPConfModifPendingQueuesRemoveConfMgrConfirm(self, self._conf, self._pendingConfMgrIds)
+            return wp.display()
+
+class RHConfModifPendingQueuesReminderConfMgr( RHConferenceModifBase ):
+
+    def _checkParams( self, params ):
+        RHConferenceModifBase._checkParams( self, params )
+        self._pendingConfMgrIds = self._normaliseListParam( params.get("pendingUsers", []) )
+        self._pendingConfMgrs = []
+        for email in self._pendingConfMgrIds:
+            self._pendingConfMgrs.append(self._conf.getPendingQueuesMgr().getPendingConfManagersByEmail(email))
+        self._send=params.has_key("confirm")
+        self._confirmed=params.has_key("confirm") or params.has_key("cancel")
+
+
+    def _process( self ):
+        url=urlHandlers.UHConfModifPendingQueues.getURL(self._conf)
+        url.addParam("tab","conf_managers")
+        if self._pendingConfMgrs == []:
+            self._redirect(url)
+        if self._confirmed:
+            if self._send:
+                pendings=pendingQueues.PendingConfManagersHolder()
+                for pss in self._pendingConfMgrs:
+                    pendings._sendReminderEmail(pss)
+            self._redirect(url)
+        else:
+            wp = conferences.WPConfModifPendingQueuesReminderConfMgrConfirm(self, self._conf, self._pendingConfMgrIds)
+            return wp.display()
+
 class RHConfModifPendingQueuesActionConfSubm:
     """
     class to select the action to do with the selected pending conference submitters
@@ -3385,7 +3454,7 @@ class RHConfModifPendingQueuesRemoveConfSubm( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._pendingConfSubmIds = self._normaliseListParam( params.get("pendingSubmitters", []) )
+        self._pendingConfSubmIds = self._normaliseListParam( params.get("pendingUsers", []) )
         self._pendingConfSubms = []
         for id in self._pendingConfSubmIds:
             self._pendingConfSubms.extend(self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(id))
@@ -3410,7 +3479,7 @@ class RHConfModifPendingQueuesReminderConfSubm( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._pendingConfSubmIds = self._normaliseListParam( params.get("pendingSubmitters", []) )
+        self._pendingConfSubmIds = self._normaliseListParam( params.get("pendingUsers", []) )
         self._pendingConfSubms = []
         for email in self._pendingConfSubmIds:
             self._pendingConfSubms.append(self._conf.getPendingQueuesMgr().getPendingConfSubmittersByEmail(email))
@@ -3454,7 +3523,7 @@ class RHConfModifPendingQueuesRemoveSubm( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._pendingSubmIds = self._normaliseListParam( params.get("pendingSubmitters", []) )
+        self._pendingSubmIds = self._normaliseListParam( params.get("pendingUsers", []) )
         self._pendingSubms = []
         for id in self._pendingSubmIds:
             self._pendingSubms.extend(self._conf.getPendingQueuesMgr().getPendingSubmittersByEmail(id))
@@ -3479,7 +3548,7 @@ class RHConfModifPendingQueuesReminderSubm( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._pendingSubmIds = self._normaliseListParam( params.get("pendingSubmitters", []) )
+        self._pendingSubmIds = self._normaliseListParam( params.get("pendingUsers", []) )
         self._pendingSubms = []
         for email in self._pendingSubmIds:
             self._pendingSubms.append(self._conf.getPendingQueuesMgr().getPendingSubmittersByEmail(email))
@@ -3523,7 +3592,7 @@ class RHConfModifPendingQueuesRemoveMgr( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._pendingMgrIds = self._normaliseListParam( params.get("pendingManagers", []) )
+        self._pendingMgrIds = self._normaliseListParam( params.get("pendingUsers", []) )
         self._pendingMgrs = []
         for id in self._pendingMgrIds:
             self._pendingMgrs.extend(self._conf.getPendingQueuesMgr().getPendingManagersByEmail(id))
@@ -3549,7 +3618,7 @@ class RHConfModifPendingQueuesReminderMgr( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._pendingMgrIds = self._normaliseListParam( params.get("pendingManagers", []) )
+        self._pendingMgrIds = self._normaliseListParam( params.get("pendingUsers", []) )
         self._pendingMgrs = []
         for email in self._pendingMgrIds:
             self._pendingMgrs.append(self._conf.getPendingQueuesMgr().getPendingManagersByEmail(email))
@@ -3593,7 +3662,7 @@ class RHConfModifPendingQueuesRemoveCoord( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._pendingCoordIds = self._normaliseListParam( params.get("pendingCoordinators", []) )
+        self._pendingCoordIds = self._normaliseListParam( params.get("pendingUsers", []) )
         self._pendingCoords = []
         for id in self._pendingCoordIds:
             self._pendingCoords.extend(self._conf.getPendingQueuesMgr().getPendingCoordinatorsByEmail(id))
@@ -3619,7 +3688,7 @@ class RHConfModifPendingQueuesReminderCoord( RHConferenceModifBase ):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
-        self._pendingCoordIds = self._normaliseListParam( params.get("pendingCoordinators", []) )
+        self._pendingCoordIds = self._normaliseListParam( params.get("pendingUsers", []) )
         self._pendingCoords = []
         for email in self._pendingCoordIds:
             self._pendingCoords.append(self._conf.getPendingQueuesMgr().getPendingCoordinatorsByEmail(email))

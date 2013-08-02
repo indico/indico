@@ -487,36 +487,35 @@ class PendingConfManagersHolder(PendingHolder):
 
     def __init__(self):
         """Index by email of all the requests"""
-        self._id="Managers"
-        self._idx = indexes.IndexesHolder().getById("pendingManagers") # All the pending managers
-        self._tasksIdx=indexes.IndexesHolder().getById("pendingManagersTasks") # Tasks which send reminder emails periodically asking
-                                                                               # for the creation of one indico account
-        self._reminder=PendingManagerReminder
+        self._id="ConfManagers"
+        self._idx = indexes.IndexesHolder().getById("pendingConfManagers") # All the pending managers
+        self._tasksIdx=indexes.IndexesHolder().getById("pendingConfManagersTasks") # Tasks which send reminder emails periodically asking
+                                                                                   # for the creation of one indico account
+        self._reminder=PendingConfManagerReminder
 
     def grantRights(self, av):
         l=self.getPendingByEmail(av.getEmail())
         for e in l:
-            # We must grant the new avatar with submission rights
-            session=e.getSession()
-            session.grantModification(av)
+            conf = e.getConference()
+            conf.grantModification(av)
             # the ConfPendingQueuesMgr method "removePendingManager" will remove the Manager
-            # (type-SessionChair) objects from the conference pending manager
+            # (type-ConferenceChair) objects from the conference pending manager
             # list and from the this index (PendingManagersHolder).
-            e.getConference().getPendingQueuesMgr().removePendingManager(e)
+            conf.getPendingQueuesMgr().removePendingConfManager(e)
 
     def _sendReminderEmail(self, sb):
-        from MaKaC.conference import SessionChair
+        from MaKaC.conference import ConferenceChair
         if type(sb)==list:
             # Sending email just about the participations of the list "sb" (normally
             # they are sessions from one event)
-            notif = _PendingManagerNotification( sb )
+            notif = _PendingConfManagerNotification( sb )
             mail.GenericMailer.send( notif )
-        elif isinstance(sb, SessionChair):
+        elif isinstance(sb, ConferenceChair):
             # The param "sb" is a SessionChair, so we send an email with the info
             # about all its participations
             psList=self.getPendingByEmail(sb.getEmail())
             if psList != [] and psList is not None:
-                notif = _PendingManagerNotification( psList )
+                notif = _PendingConfManagerNotification( psList )
                 mail.GenericMailer.send( notif )
 
 class _PendingConfManagerNotification(_PendingNotification):
@@ -550,17 +549,17 @@ class PendingConfManagerReminder(PendingReminder):
     def run(self):
         hasAccount=PendingReminder.run(self)
         if not hasAccount:
-            psh=PendingManagersHolder()
+            psh=PendingConfManagersHolder()
             psl=psh.getPendingByEmail(self._email)
             if psl != [] and psl is not None:
-                notif = _PendingManagerNotification( psl )
+                notif = _PendingConfManagerNotification( psl )
                 mail.GenericMailer.send( notif )
 
     def tearDown(self):
-        psh = PendingManagersHolder()
+        psh = PendingConfManagersHolder()
         psl = psh.getPendingByEmail(self._email)
         for e in psl:
-            e.getConference().getPendingQueuesMgr().removePendingManager(e)
+            e.getConference().getPendingQueuesMgr().removePendingConfManager(e)
 
     def getPendings(self):
         psh = PendingManagersHolder()
@@ -665,7 +664,8 @@ class PendingCoordinatorReminder(PendingReminder):
 #--GENERAL---
 class PendingQueuesHolder(object):
 
-    _pendingQueues=[PendingConfSubmittersHolder, \
+    _pendingQueues=[PendingConfManagersHolder, \
+                    PendingConfSubmittersHolder, \
                     PendingSubmittersHolder, \
                     PendingManagersHolder, \
                     PendingCoordinatorsHolder]
@@ -693,6 +693,7 @@ class ConfPendingQueuesMgr(Persistent):
 
     def __init__(self, conf):
         self._conf=conf
+        self._pendingConfManagers={}
         self._pendingConfSubmitters={}
         self._pendingSubmitters={}
         self._pendingManagers={}
@@ -700,6 +701,14 @@ class ConfPendingQueuesMgr(Persistent):
 
     def getConference(self):
         return self._conf
+
+    def getPendingConfManagers(self):
+        try:
+            if self._pendingConfManagers:
+                pass
+        except AttributeError:
+            self._pendingConfManagers={}
+        return self._pendingConfManagers
 
     def getPendingConfSubmitters(self):
         try:
@@ -727,6 +736,36 @@ class ConfPendingQueuesMgr(Persistent):
         except AttributeError:
             self._pendingCoordinators={}
         return self._pendingCoordinators
+
+    def getPendingConfManagersKeys(self, sort=False):
+        if sort:
+            from MaKaC.conference import ConferenceChair
+            # return keys of contribution participants sorted by name
+            keys=[]
+            vl=[]
+            # flatten the list of lists
+            for v in self.getPendingConfManagers().values()[:]:
+                vl.extend(v)
+            # sort
+            vl.sort(ConferenceChair._cmpFamilyName)
+            for v in vl:
+                email=v.getEmail().lower().strip()
+                if email not in keys:
+                    keys.append(email)
+            return keys
+        else:
+            keys=self.getPendingConfManagers().keys()
+        return keys
+
+    def getPendingConfManagersByEmail(self, email):
+        email=email.lower().strip()
+        if self.getPendingConfManagers().has_key(email):
+            return self._pendingConfManagers[email]
+        return []
+
+    def isPendingConfManager(self, cp):
+        email=cp.getEmail().lower().strip()
+        return cp in self.getPendingConfManagersByEmail(email)
 
     #----Pending queue for conference submitters-----
 
@@ -760,6 +799,28 @@ class ConfPendingQueuesMgr(Persistent):
         from MaKaC.conference import Conference
         if isinstance(owner, Conference):
             self.removePendingConfSubmitter(ps)
+
+    def addPendingConfManager(self, ps, sendEmail=True, sendPeriodicEmail=False):
+        email=ps.getEmail().lower().strip()
+        if self.getPendingConfManagers().has_key(email):
+            if not ps in self._pendingConfManagers[email]:
+                self._pendingConfManagers[email].append(ps)
+        else:
+            self._pendingConfManagers[email] = [ps]
+        pendings=PendingConfManagersHolder()
+        pendings.addPending(ps, sendEmail, sendPeriodicEmail)
+        self.notifyModification()
+
+    def removePendingConfManager(self, ps):
+        email=ps.getEmail().lower().strip()
+        if self.getPendingConfManagers().has_key(email):
+            if ps in self._pendingConfManagers[email]:
+                self._pendingConfManagers[email].remove(ps)
+                pendings=PendingConfManagersHolder()
+                pendings.removePending(ps)
+            if self._pendingConfManagers[email] == []:
+                del self._pendingConfManagers[email]
+            self.notifyModification()
 
     def addPendingConfSubmitter(self, ps, sendEmail=True, sendPeriodicEmail=False):
         email=ps.getEmail().lower().strip()

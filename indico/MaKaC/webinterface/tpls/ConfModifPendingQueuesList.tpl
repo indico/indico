@@ -21,7 +21,7 @@
 <ul class="speaker_list clear">
     % for (key, pList) in list:
     <li>
-        <input type="checkbox" name="pendingSubmitters" value="${str(key)}">
+        <input type="checkbox" name="pendingUsers" value="${str(key)}">
             % if pList[0].getEmail():
                 <a href="mailto:${pList[0].getEmail()}" class="name">${pList[0].getFullName()}</a>
             % else:

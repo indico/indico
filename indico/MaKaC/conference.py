@@ -3820,6 +3820,7 @@ class Conference(CommonObjectBase, Locatable):
             #No registered user in Indico with that email
             if len(results) == 0:
                 self.__ac.grantModificationEmail(email)
+                self.getConference().getPendingQueuesMgr().addPendingConfManager(prin, False)
                 if sendEmail and isinstance(prin, ConferenceChair):
                     notif = pendingQueues._PendingConfManagerNotification( [prin] )
                     mail.GenericMailer.sendAndLog( notif, self.getConference() )

@@ -7091,6 +7091,7 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
         self._conf = conf
         self._aw = aw
         self._activeTab = activeTab
+        self._pendingConfManagers = self._conf.getPendingQueuesMgr().getPendingConfManagers()
         self._pendingConfSubmitters = self._conf.getPendingQueuesMgr().getPendingConfSubmitters()
         self._pendingSubmitters = self._conf.getPendingQueuesMgr().getPendingSubmitters()
         self._pendingManagers = self._conf.getPendingQueuesMgr().getPendingManagers()
@@ -7102,6 +7103,9 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
         url.addParam("tab", "conf_submitters")
         self._tabConfSubmitters = self._tabCtrl.newTab("conf_submitters", \
                                                 _("Pending Conference Submitters"),str(url))
+        url.addParam("tab", "conf_managers")
+        self._tabConfManagers = self._tabCtrl.newTab("conf_managers", \
+                                                _("Pending Conference Managers"),str(url))
         url.addParam("tab", "submitters")
         self._tabSubmitters = self._tabCtrl.newTab("submitters", \
                                                 _("Pending Contribution Submitters"),str(url))
@@ -7137,7 +7141,20 @@ class WConfModifPendingQueues(wcomponents.WTemplated):
             for key in keys:
                 list.append((key, self._pendingConfSubmitters[key][:]))
 
-        if self._tabSubmitters.isActive():
+        elif self._tabConfManagers.isActive():
+            # Pending conference managers
+            keys = self._conf.getPendingQueuesMgr().getPendingConfManagersKeys(True)
+
+            url = urlHandlers.UHConfModifPendingQueuesActionConfMgr.getURL(self._conf)
+            url.addParam("tab","conf_managers")
+            title = _("Pending chairpersons to become managers")
+            target = _("Conference")
+            pType = "ConfManagers"
+
+            for key in keys:
+                list.append((key, self._pendingConfManagers[key][:]))
+
+        elif self._tabSubmitters.isActive():
             # Pending submitters
             keys = self._conf.getPendingQueuesMgr().getPendingSubmittersKeys(True)
 
@@ -7200,6 +7217,49 @@ class WPConfModifPendingQueues(WPConfModifPendingQueuesBase):
         wc = WConfModifPendingQueues(self._conf, self._getAW(), self._activeTab)
         return wc.getHTML()
 
+
+class WPConfModifPendingQueuesRemoveConfMgrConfirm(WPConfModifPendingQueuesBase):
+
+    def __init__(self, rh, conf, pendingConfMgrs):
+        WPConfModifPendingQueuesBase.__init__(self, rh, conf)
+        self._pendingConfMgrs = pendingConfMgrs
+
+    def _getTabContent(self,params):
+        wc = wcomponents.WConfirmation()
+        psubs = ''.join(list("<li>{0}</li>".format(s) for s in self._pendingConfMgrs))
+
+        msg = {'challenge': _("Are you sure you want to delete the following users pending to become conference managers?"),
+               'target': "<ul>{0}</ul>".format(psubs),
+               'subtext': _("Please note that they will still remain as user"),
+               }
+
+        url = urlHandlers.UHConfModifPendingQueuesActionConfMgr.getURL(self._conf)
+        return wc.getHTML(msg,url,{"pendingUsers":self._pendingConfMgrs, "remove": _("remove")})
+
+
+class WPConfModifPendingQueuesReminderConfMgrConfirm(WPConfModifPendingQueuesBase):
+
+    def __init__(self, rh, conf, pendingConfMgrs):
+        WPConfModifPendingQueuesBase.__init__(self, rh, conf)
+        self._pendingConfMgrs = pendingConfMgrs
+
+    def _getTabContent(self,params):
+        wc = wcomponents.WConfirmation()
+        psubs = ''.join(list("<li>{0}</li>".format(s) for s in self._pendingConfMgrs))
+
+        msg = {'challenge': _("Are you sure that you want to send these users an email with a reminder to create an account in Indico?"),
+               'target': "<ul>{0}</ul>".format(psubs)
+               }
+        url = urlHandlers.UHConfModifPendingQueuesActionConfMgr.getURL(self._conf)
+        return wc.getHTML(
+            msg,
+            url, {
+                "pendingUsers": self._pendingConfMgrs,
+                "reminder": _("reminder")
+                },
+            severity='accept')
+
+
 class WPConfModifPendingQueuesRemoveConfSubmConfirm(WPConfModifPendingQueuesBase):
 
     def __init__(self, rh, conf, pendingConfSubms):
@@ -7216,25 +7276,7 @@ class WPConfModifPendingQueuesRemoveConfSubmConfirm(WPConfModifPendingQueuesBase
                }
 
         url = urlHandlers.UHConfModifPendingQueuesActionConfSubm.getURL(self._conf)
-        return wc.getHTML(msg,url,{"pendingSubmitters":self._pendingConfSubms, "remove": _("remove")})
-
-class WPConfModifPendingQueuesRemoveSubmConfirm(WPConfModifPendingQueuesBase):
-
-    def __init__(self, rh, conf, pendingSubms):
-        WPConfModifPendingQueuesBase.__init__(self, rh, conf)
-        self._pendingSubms = pendingSubms
-
-    def _getTabContent(self, params):
-        wc = wcomponents.WConfirmation()
-        psubs = ''.join(list("<li>{0}</li>".format(s) for s in self._pendingSubms))
-
-        msg = {'challenge': _("Are you sure you want to delete the following participants pending to become submitters?"),
-               'target': "<ul>{0}</ul>".format(psubs),
-               'subtext': _("Please note that they will still remain as participants"),
-               }
-
-        url = urlHandlers.UHConfModifPendingQueuesActionSubm.getURL(self._conf)
-        return wc.getHTML(msg, url, {"pendingSubmitters": self._pendingSubms, "remove": _("remove")})
+        return wc.getHTML(msg,url,{"pendingUsers":self._pendingConfSubms, "remove": _("remove")})
 
 class WPConfModifPendingQueuesReminderConfSubmConfirm(WPConfModifPendingQueuesBase):
 
@@ -7253,10 +7295,29 @@ class WPConfModifPendingQueuesReminderConfSubmConfirm(WPConfModifPendingQueuesBa
         return wc.getHTML(
             msg,
             url, {
-                "pendingSubmitters": self._pendingConfSubms,
+                "pendingUsers": self._pendingConfSubms,
                 "reminder": _("reminder")
                 },
             severity='accept')
+
+class WPConfModifPendingQueuesRemoveSubmConfirm(WPConfModifPendingQueuesBase):
+
+    def __init__(self, rh, conf, pendingSubms):
+        WPConfModifPendingQueuesBase.__init__(self, rh, conf)
+        self._pendingSubms = pendingSubms
+
+    def _getTabContent(self, params):
+        wc = wcomponents.WConfirmation()
+        psubs = ''.join(list("<li>{0}</li>".format(s) for s in self._pendingSubms))
+
+        msg = {'challenge': _("Are you sure you want to delete the following participants pending to become submitters?"),
+               'target': "<ul>{0}</ul>".format(psubs),
+               'subtext': _("Please note that they will still remain as participants"),
+               }
+
+        url = urlHandlers.UHConfModifPendingQueuesActionSubm.getURL(self._conf)
+        return wc.getHTML(msg, url, {"pendingUsers": self._pendingSubms, "remove": _("remove")})
+
 
 class WPConfModifPendingQueuesReminderSubmConfirm( WPConfModifPendingQueuesBase ):
 
@@ -7277,7 +7338,7 @@ class WPConfModifPendingQueuesReminderSubmConfirm( WPConfModifPendingQueuesBase 
         return wc.getHTML(
             msg,
             url, {
-                "pendingSubmitters": self._pendingSubms,
+                "pendingUsers": self._pendingSubms,
                 "reminder": _("reminder")
                 },
             severity='accept')
@@ -7299,7 +7360,7 @@ class WPConfModifPendingQueuesRemoveMgrConfirm( WPConfModifPendingQueuesBase ):
                }
 
         url = urlHandlers.UHConfModifPendingQueuesActionMgr.getURL(self._conf)
-        return wc.getHTML(msg,url,{"pendingManagers":self._pendingMgrs, "remove": _("remove")})
+        return wc.getHTML(msg,url,{"pendingUsers":self._pendingMgrs, "remove": _("remove")})
 
 class WPConfModifPendingQueuesReminderMgrConfirm( WPConfModifPendingQueuesBase ):
 
@@ -7317,7 +7378,7 @@ class WPConfModifPendingQueuesReminderMgrConfirm( WPConfModifPendingQueuesBase )
                }
 
         url = urlHandlers.UHConfModifPendingQueuesActionMgr.getURL(self._conf)
-        return wc.getHTML(msg,url,{"pendingManagers":self._pendingMgrs, "reminder": _("reminder")})
+        return wc.getHTML(msg,url,{"pendingUsers":self._pendingMgrs, "reminder": _("reminder")})
 
 class WPConfModifPendingQueuesRemoveCoordConfirm( WPConfModifPendingQueuesBase ):
 
@@ -7337,7 +7398,7 @@ class WPConfModifPendingQueuesRemoveCoordConfirm( WPConfModifPendingQueuesBase )
 
         url = urlHandlers.UHConfModifPendingQueuesActionCoord.getURL(self._conf)
         return wc.getHTML(msg, url,{
-                "pendingCoordinators": self._pendingCoords,
+                "pendingUsers": self._pendingCoords,
                 "remove": _("remove")
                 })
 
@@ -7359,7 +7420,7 @@ class WPConfModifPendingQueuesReminderCoordConfirm( WPConfModifPendingQueuesBase
         url = urlHandlers.UHConfModifPendingQueuesActionCoord.getURL(self._conf)
         return wc.getHTML(
             msg, url, {
-                "pendingCoordinators": self._pendingCoords,
+                "pendingUsers": self._pendingCoords,
                 "reminder": _("reminder")
                 })
 
