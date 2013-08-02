@@ -246,7 +246,6 @@ class RHConferencePerformCreation( RoomBookingDBMixin, RHConferenceCreationBase 
             c.getAccessController().setProtection(1)
         elif eventAccessProtection == "public" :
             c.getAccessController().setProtection(-1)
-
         avatars, newUsers, editedAvatars, allowedAvatars = self._getPersons()
         UtilPersons.addToConf(avatars, newUsers, editedAvatars, allowedAvatars, c, self._params.has_key('grant-manager'), self._params.has_key('presenter-grant-submission'))
         if params.get("sessionSlots",None) is not None :
@@ -266,9 +265,8 @@ class RHConferencePerformCreation( RoomBookingDBMixin, RHConferenceCreationBase 
             cpAvatars, cpNewUsers, cpEditedAvatars = UserListModificationBase.retrieveUsers({"userList":chairpersonDict})
         if allowedUsersDict :
             auAvatars, auNewUsers, auEditedAvatars = UserListModificationBase.retrieveUsers({"userList":allowedUsersDict})
-        #raise "avt: %s, newusers: %s, edited: %s"%(map(lambda x:x.getFullName(),avatars), newUsers, editedAvatars)
 
-        return cpAvatars, cpNewUsers, cpEditedAvatars, auEditedAvatars # : in which case (?) , auAvatars , auNewUsers  
+        return cpAvatars, cpNewUsers, cpEditedAvatars, auAvatars
 
     def alertCreation(self, confs):
         conf = confs[0]
@@ -335,9 +333,9 @@ _Access%s_
 class UtilPersons:
 
     @staticmethod
-    def addToConf( avatars, newUsers, editedUsers, accessingAvatars, conf, grantManager, grantSubmission):
+    def addToConf(avatars, newUsers, editedAvatars, accessingAvatars, conf, grantManager, grantSubmission):
 
-        if newUsers :
+        if newUsers:
             for newUser in newUsers:
                 person = ConferenceChair()
                 person.setFirstName(newUser.get("firstName",""))
@@ -348,45 +346,26 @@ class UtilPersons:
                 person.setPhone(newUser.get("phone",""))
                 person.setTitle(newUser.get("title",""))
                 person.setFax(newUser.get("fax",""))
-                if not UtilPersons._alreadyDefined(person) :
-                    #TODO: add to conf
-                    UtilPersons._addChair(conf, person, grantManager, grantSubmission)
-                else :
-                    #self._errorList.append("%s has been already defined as %s of this conference"%(person.getFullName(),self._typeName))
-                    pass
+                UtilPersons._addChair(conf, person, grantManager, grantSubmission)
 
         if avatars:
-            for selected in avatars :
+            for selected in avatars:
                 if isinstance(selected, user.Avatar) :
                     person = ConferenceChair()
                     person.setDataFromAvatar(selected)
-                    if not UtilPersons._alreadyDefined(person):
-                        #TODO: add to conf
-                        UtilPersons._addChair(conf, person, grantManager, grantSubmission)
-                    else :
-                        #self._errorList.append("%s has been already defined as %s of this conference"%(person.getFullName(),self._typeName))
-                        pass
+                    UtilPersons._addChair(conf, person, grantManager, grantSubmission)
 
-                #elif isinstance(selected, user.Group) :
-                #    for member in selected.getMemberList() :
-                #        person = ConferenceChair()
-                #        person.setDataFromAvatar(member)
-                #        if not self._alreadyDefined(person, definedList) :
-                #            definedList.append([person,params.has_key("submissionControl")])
-                #        else :
-                #            self._errorList.append("%s has been already defined as %s of this conference"%(presenter.getFullName(),self._typeName))
-
-        if editedUsers:
-            for edUser in editedUsers:
+        if editedAvatars:
+            for edited_avatar in editedAvatars:
                 person = ConferenceChair()
-                person.setFirstName(edUser[1].get("firstName",""))
-                person.setFamilyName(edUser[1].get("familyName",""))
-                person.setEmail(edUser[1].get("email",""))
-                person.setAffiliation(edUser[1].get("affiliation",""))
-                person.setAddress(edUser[1].get("address",""))
-                person.setPhone(edUser[1].get("phone",""))
-                person.setTitle(edUser[1].get("title",""))
-                person.setFax(edUser[1].get("fax",""))
+                person.setFirstName(edited_avatar[1].get("firstName", ""))
+                person.setFamilyName(edited_avatar[1].get("familyName", ""))
+                person.setEmail(edited_avatar[1].get("email", ""))
+                person.setAffiliation(edited_avatar[1].get("affiliation", ""))
+                person.setAddress(edited_avatar[1].get("address", ""))
+                person.setPhone(edited_avatar[1].get("phone", ""))
+                person.setTitle(edited_avatar[1].get("title", ""))
+                person.setFax(edited_avatar[1].get("fax", ""))
 
                 UtilPersons._addChair(conf, person, grantManager, grantSubmission)
 
@@ -395,22 +374,6 @@ class UtilPersons:
             for person in accessingAvatars:
                 if isinstance(person, user.Avatar) or isinstance(person, user.Group):
                     conf.grantAccess(person)
-                    
-
-
-    #WHAT IS THE USE FOR THIS ? > #
-
-    @staticmethod
-    def _alreadyDefined(person):#, definedList):
-        #if person is None :
-        #    return True
-        #if definedList is None :
-        #    return False
-        #fullName = person.getFullName()
-        #for p in definedList :
-        #    if p[0].getFullName() == fullName :
-        #        return True
-        return False
 
     @staticmethod
     def _addChair(conf, chair, grantManager, grantSubmission):
