@@ -608,7 +608,7 @@ class AbstractSelectionField(AbstractField):
         self.__id_generator = Counter()
         self._options = []
         self._deleted_options = []
-        for o in params.get("options"):
+        for o in params.get("options") if params.get("options") else []:
             self._setOption(o)
 
     def _deleteOption(self, option):
