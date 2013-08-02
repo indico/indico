@@ -108,6 +108,7 @@ from MaKaC.schedule import ScheduleToJson
 from indico.util.redis import write_client as redis_write_client
 import indico.util.redis.avatar_links as avatar_links
 
+
 class CoreObject(Persistent):
     """
     CoreObjects are Persistent objects that are employed by Indico's core
@@ -116,7 +117,7 @@ class CoreObject(Persistent):
     zope.interface.implements(IUniqueIdProvider,
                               IIndexableByStartDateTime)
 
-    def setModificationDate(self, date = None):
+    def setModificationDate(self, date=None):
         """
         Method called to notify the current object has been modified.
         """
@@ -177,24 +178,24 @@ class Locatable:
 
     def setLocation(self, newLocation):
         oldLocation = self.getOwnLocation()
-        if newLocation == None:
+        if newLocation is None:
             if len(self.places) > 0:
                 del self.places[0]
         elif len(self.places) > 0:
             self.places[0] = newLocation
         else:
-            self.places.append( newLocation )
+            self.places.append(newLocation)
         self.notifyModification()
 
     def setRoom(self, newRoom):
         oldRoom = self.getOwnRoom()
-        if newRoom == None:
+        if newRoom is None:
             if len(self.rooms) > 0:
                 del self.rooms[0]
         elif len(self.rooms) > 0:
             self.rooms[0] = newRoom
         else:
-            self.rooms.append( newRoom )
+            self.rooms.append(newRoom)
         self.notifyModification()
 
 
@@ -255,7 +256,7 @@ class CommonObjectBase(CoreObject, Observable, Fossilizable):
         # people/groups allowed to access it, plus managers of owner(s)
         elif apl == 1:
             al = self.getAllowedToAccessList() + self.getManagerList() + \
-                 self.getOwner().getRecursiveManagerList()
+                self.getOwner().getRecursiveManagerList()
             if al is not None:
                 for av in al:
                     av_set.add(av)
@@ -281,7 +282,7 @@ class CommonObjectBase(CoreObject, Observable, Fossilizable):
         return av_set
 
 
-class CategoryManager( ObjectHolder ):
+class CategoryManager(ObjectHolder):
     idxName = "categories"
     counterName = "CATEGORY"
 
@@ -298,26 +299,26 @@ class CategoryManager( ObjectHolder ):
         nameIdx.unindex(category.getId())
         Catalog.getIdx('categ_conf_sd').remove_category(category.getId())
 
-    def _newId( self ):
+    def _newId(self):
         """
         returns a new id for the category
         the id must not already exist in the collection
         """
-        id = ObjectHolder._newId( self )
+        id = ObjectHolder._newId(self)
         while self.hasKey(id):
-            id = ObjectHolder._newId( self )
+            id = ObjectHolder._newId(self)
         return id
 
-    def getRoot( self ):
+    def getRoot(self):
         root = DBMgr.getInstance().getDBConnection().root()
         if not root.has_key("rootCategory"):
             r = Category()
             r.setName("Home")
-            self.add( r )
+            self.add(r)
             root["rootCategory"] = r
         return root["rootCategory"]
 
-    def getDefaultConference( self ):
+    def getDefaultConference(self):
         dconf = HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
         if dconf == None:
             return HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultConference())
@@ -325,12 +326,10 @@ class CategoryManager( ObjectHolder ):
             return dconf
 
 
-
 class Category(CommonObjectBase):
-
     fossilizes(ICategoryFossil)
 
-    def __init__( self ):
+    def __init__(self):
 
         self.id = ""
         self.name = ""
@@ -340,15 +339,15 @@ class Category(CommonObjectBase):
         self.conferences = OOTreeSet()
         self._numConferences = 0
         self.owner = None
-        self._defaultStyle = { "simple_event":"","meeting":"" }
+        self._defaultStyle = {"simple_event": "", "meeting": ""}
         self._order = 0
         self.__ac = AccessController(self)
         self.__confCreationRestricted = 1
         self.__confCreators = []
         self._visibility = 999
-        self._statistics = {"events":None,"contributions":None,"resources":None,\
-        "updated":None}
-        self._icon=None
+        self._statistics = {"events": None, "contributions": None, "resources": None,
+                            "updated": None}
+        self._icon = None
         self.materials = {}
         #self._materials = {}
         #self.material ={}
@@ -382,7 +381,7 @@ class Category(CommonObjectBase):
     def updateNonInheritingChildren(self, elem, delete=False):
         pass
 
-    def getNotifyCreationList( self ):
+    def getNotifyCreationList(self):
         """ self._notifyCreationList is a string containing the list of
         email addresses to send an email to when a new event is created"""
         try:
@@ -391,20 +390,20 @@ class Category(CommonObjectBase):
             self._notifyCreationList = ""
             return self._notifyCreationList
 
-    def setNotifyCreationList( self, value ):
+    def setNotifyCreationList(self, value):
         self._notifyCreationList = value
 
-    def getUniqueId( self ):
+    def getUniqueId(self):
         return "cat%s" % self.getId()
 
-    def setPaper( self, newPaper ):
-        if self.getPaper() != None:
-            raise MaKaCError( _("The paper for this conference has already been set"), _("Conference"))
-        self.paper=newPaper
-        self.paper.setOwner( self )
+    def setPaper(self, newPaper):
+        if self.getPaper() is not None:
+            raise MaKaCError(_("The paper for this conference has already been set"), _("Conference"))
+        self.paper = newPaper
+        self.paper.setOwner(self)
         self.notifyModification()
 
-    def removePaper( self ):
+    def removePaper(self):
         if self.paper is None:
             return
         self.paper.delete()
@@ -416,7 +415,7 @@ class Category(CommonObjectBase):
         self.setPaper(p)
         p.recover()
 
-    def getPaper( self ):
+    def getPaper(self):
         try:
             if self.paper:
                 pass
@@ -424,26 +423,26 @@ class Category(CommonObjectBase):
             self.paper = None
         return self.paper
 
-    def setSlides( self, newSlides ):
-        if self.getSlides() != None:
-            raise MaKaCError( _("The slides for this conference have already been set"), _("Conference"))
-        self.slides=newSlides
-        self.slides.setOwner( self )
+    def setSlides(self, newSlides):
+        if self.getSlides() is not None:
+            raise MaKaCError(_("The slides for this conference have already been set"), _("Conference"))
+        self.slides = newSlides
+        self.slides.setOwner(self)
         self.notifyModification()
 
-    def removeSlides( self ):
+    def removeSlides(self):
         if self.slides is None:
             return
         self.slides.delete()
-        self.slides.setOwner( None )
-        self.slides= None
+        self.slides.setOwner(None)
+        self.slides = None
         self.notifyModification()
 
     def recoverSlides(self, s):
         self.setSlides(s)
         s.recover()
 
-    def getSlides( self ):
+    def getSlides(self):
         try:
             if self.slides:
                 pass
@@ -451,14 +450,14 @@ class Category(CommonObjectBase):
             self.slides = None
         return self.slides
 
-    def setVideo( self, newVideo ):
-        if self.getVideo() != None:
-            raise MaKaCError( _("The video for this conference has already been set"), _("Conference"))
-        self.video=newVideo
-        self.video.setOwner( self )
+    def setVideo(self, newVideo):
+        if self.getVideo() is not None:
+            raise MaKaCError(_("The video for this conference has already been set"), _("Conference"))
+        self.video = newVideo
+        self.video.setOwner(self)
         self.notifyModification()
 
-    def removeVideo( self ):
+    def removeVideo(self):
         if self.getVideo() is None:
             return
         self.video.delete()
@@ -470,7 +469,7 @@ class Category(CommonObjectBase):
         self.setVideo(v)
         v.recover()
 
-    def getVideo( self ):
+    def getVideo(self):
         try:
             if self.video:
                 pass
@@ -478,14 +477,14 @@ class Category(CommonObjectBase):
             self.video = None
         return self.video
 
-    def setPoster( self, newPoster ):
-        if self.getPoster() != None:
-            raise MaKaCError( _("the poster for this conference has already been set"), _("Conference"))
-        self.poster=newPoster
-        self.poster.setOwner( self )
+    def setPoster(self, newPoster):
+        if self.getPoster() is not None:
+            raise MaKaCError(_("the poster for this conference has already been set"), _("Conference"))
+        self.poster = newPoster
+        self.poster.setOwner(self)
         self.notifyModification()
 
-    def removePoster( self ):
+    def removePoster(self):
         if self.getPoster() is None:
             return
         self.poster.delete()
@@ -497,7 +496,7 @@ class Category(CommonObjectBase):
         self.setPoster(p)
         p.recover()
 
-    def getPoster( self ):
+    def getPoster(self):
         try:
             if self.poster:
                 pass
@@ -505,39 +504,39 @@ class Category(CommonObjectBase):
             self.poster = None
         return self.poster
 
-    def setMinutes( self, newMinutes ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("The Minutes for this conference has already been set"))
-        self.minutes=newMinutes
-        self.minutes.setOwner( self )
+    def setMinutes(self, newMinutes):
+        if self.getMinutes() is not None:
+            raise MaKaCError(_("The Minutes for this conference has already been set"))
+        self.minutes = newMinutes
+        self.minutes.setOwner(self)
         self.notifyModification()
 
-    def createMinutes( self ):
-        if self.getMinutes() != None:
-            raise MaKaCError( _("The minutes for this conference have already been created"), _("Conference"))
+    def createMinutes(self):
+        if self.getMinutes() is not None:
+            raise MaKaCError(_("The minutes for this conference have already been created"), _("Conference"))
         self.minutes = Minutes()
-        self.minutes.setOwner( self )
+        self.minutes.setOwner(self)
         self.notifyModification()
         return self.minutes
 
-    def removeMinutes( self ):
+    def removeMinutes(self):
         if self.getMinutes() is None:
             return
         self.minutes.delete()
-        self.minutes.setOwner( None )
+        self.minutes.setOwner(None)
         self.minutes = None
         self.notifyModification()
 
     def recoverMinutes(self, min):
-        self.removeMinutes() # To ensure that the current minutes are put in
-                             # the trash can.
+        self.removeMinutes()  # To ensure that the current minutes are put in
+                              # the trash can.
         self.minutes = min
-        self.minutes.setOwner( self )
+        self.minutes.setOwner(self)
         min.recover()
         self.notifyModification()
         return self.minutes
 
-    def getMinutes( self ):
+    def getMinutes(self):
         #To be removed
         try:
            if self.minutes:
@@ -546,44 +545,44 @@ class Category(CommonObjectBase):
             self.minutes = None
         return self.minutes
 
-    def addMaterial( self, newMat ):
+    def addMaterial(self, newMat):
         try:
-            newMat.setId( str(self.__materialGenerator.newCount()) )
+            newMat.setId(str(self.__materialGenerator.newCount()))
         except:
             self.__materialGenerator = Counter()
-            newMat.setId(self.__materialGenerator.newCount() )
-        newMat.setOwner( self )
-        self.materials[ newMat.getId() ] =  newMat
+            newMat.setId(self.__materialGenerator.newCount())
+        newMat.setOwner(self)
+        self.materials[newMat.getId()] = newMat
         self.notifyModification()
 
-    def removeMaterial( self, mat ):
+    def removeMaterial(self, mat):
         if mat.getId() in self.materials.keys():
             mat.delete()
             self.materials[mat.getId()].setOwner(None)
-            del self.materials[ mat.getId() ]
+            del self.materials[mat.getId()]
             self.notifyModification()
-            return "done: %s"%mat.getId()
+            return "done: %s" % mat.getId()
         elif mat.getId().lower() == 'minutes':
             self.removeMinutes()
-            return "done: %s"%mat.getId()
+            return "done: %s" % mat.getId()
         elif mat.getId().lower() == 'paper':
             self.removePaper()
-            return "done: %s"%mat.getId()
+            return "done: %s" % mat.getId()
         elif mat.getId().lower() == 'slides':
             self.removeSlides()
-            return "done: %s"%mat.getId()
+            return "done: %s" % mat.getId()
         elif mat.getId().lower() == 'video':
             self.removeVideo()
-            return "done: %s"%mat.getId()
+            return "done: %s" % mat.getId()
         elif mat.getId().lower() == 'poster':
             self.removePoster()
-            return "done: %s"%mat.getId()
-        return "not done: %s"%mat.getId()
+            return "done: %s" % mat.getId()
+        return "not done: %s" % mat.getId()
 
     def recoverMaterial(self, recMat):
     # Id must already be set in recMat.
-        recMat.setOwner( self )
-        self.materials[ recMat.getId() ] = recMat
+        recMat.setOwner(self)
+        self.materials[recMat.getId()] = recMat
         recMat.recover()
         self.notifyModification()
 
@@ -594,7 +593,7 @@ class Category(CommonObjectBase):
         from MaKaC.webinterface.materialFactories import CategoryMFRegistry
         return CategoryMFRegistry
 
-    def getMaterialById( self, matId ):
+    def getMaterialById(self, matId):
         if matId.lower() == 'paper':
             return self.getPaper()
         elif matId.lower() == 'slides':
@@ -606,34 +605,34 @@ class Category(CommonObjectBase):
         elif matId.lower() == 'minutes':
             return self.getMinutes()
         elif self.materials.has_key(matId):
-            return self.materials[ matId ]
+            return self.materials[matId]
         return None
 
-    def getMaterialList( self ):
+    def getMaterialList(self):
         try:
             return self.materials.values()
         except:
-            self.materials={}
+            self.materials = {}
             return self.materials.values()
 
     def getAllMaterialList(self):
         l = self.getMaterialList()
         if self.getPaper():
-            l.append( self.getPaper() )
+            l.append(self.getPaper())
         if self.getSlides():
-            l.append( self.getSlides() )
+            l.append(self.getSlides())
         if self.getVideo():
-            l.append( self.getVideo() )
+            l.append(self.getVideo())
         if self.getPoster():
-            l.append( self.getPoster() )
+            l.append(self.getPoster())
         if self.getMinutes():
-            l.append( self.getMinutes() )
+            l.append(self.getMinutes())
         return l
 
     def getTaskList(self):
-        try :
+        try:
             return self._tasks.values()
-        except :
+        except:
             self._tasks = {}
             return self._tasks.values()
 
@@ -641,19 +640,19 @@ class Category(CommonObjectBase):
         return self.name
 
     def getTasks(self):
-        try :
+        try:
             return self._tasks
-        except :
+        except:
             self._tasks = {}
             return self._tasks
 
     def getTask(self, taskId):
-        return self.getTasks().get(taskId,None)
+        return self.getTasks().get(taskId, None)
 
     def _getTasksAllowed(self):
-        try :
+        try:
             return self._tasksAllowed
-        except :
+        except:
             self._tasksAllowed = False
             return self._tasksAllowed
 
@@ -663,7 +662,7 @@ class Category(CommonObjectBase):
         return self._getTasksAllowed()
 
     def setTasksAllowed(self):
-        if self.hasSubcategories() :
+        if self.hasSubcategories():
             return False
         self._getTasksAllowed()
         self._tasksAllowed = True
@@ -671,7 +670,7 @@ class Category(CommonObjectBase):
         return True
 
     def setTasksForbidden(self):
-        if len(self.getTaskList()) > 0 :
+        if len(self.getTaskList()) > 0:
             return False
         self._getTasksAllowed()
         self._tasksAllowed = False
@@ -679,26 +678,26 @@ class Category(CommonObjectBase):
         return False
 
     def _getNewTaskId(self):
-        try :
-            if self._taskIdGenerator :
+        try:
+            if self._taskIdGenerator:
                 pass
-        except :
+        except:
             self._taskIdGenerator = 0
         self._taskIdGenerator = self._taskIdGenerator + 1
         return self._taskIdGenerator
 
     def newTask(self, user):
-        if user is None :
+        if user is None:
             return None
         newTask = task.Task(self, self._getNewTaskId(), user)
-        self.getTasks()["%s"%newTask.getId()] = newTask
+        self.getTasks()["%s" % newTask.getId()] = newTask
         self.notifyModification()
         return newTask
 
     def tasksPublic(self):
-        try :
+        try:
             return self._tasksPublic
-        except :
+        except:
             self._tasksPublic = True
             return self._tasksPublic
 
@@ -711,9 +710,9 @@ class Category(CommonObjectBase):
         self._tasksPublic = False
 
     def tasksCommentPublic(self):
-        try :
+        try:
             return self._tasksCommentPublic
-        except :
+        except:
             self._tasksCommentPublic = True
             return self._tasksCommentPublic
 
@@ -726,21 +725,21 @@ class Category(CommonObjectBase):
         self._tasksCommentPublic = False
 
     def getTasksManagerList(self):
-        try :
+        try:
             return self._tasksManagers
-        except :
+        except:
             self._tasksManagers = []
             self._p_changed = 1
             return self._tasksManagers
 
     def getTasksManager(self, index):
         length = len(self.getTasksManagerList())
-        if index < 0 or index >= length :
+        if index < 0 or index >= length:
             return None
         return self._tasksManagers[index]
 
-    def addTasksManager(self,user):
-        if user is None :
+    def addTasksManager(self, user):
+        if user is None:
             return False
         self.getTasksManagerList().append(user)
         self._p_changed = 1
@@ -748,28 +747,28 @@ class Category(CommonObjectBase):
 
     def removeTasksManager(self, index):
         length = len(self.getTasksManagerList())
-        if index < 0 or index >= length :
+        if index < 0 or index >= length:
             return False
         del self.getTasksManagerList()[index]
         self._p_changed = 1
         return True
 
     def getTasksCommentatorList(self):
-        try :
+        try:
             return self._tasksCommentators
-        except :
+        except:
             self._tasksCommentators = []
             self._p_changed = 1
             return self._tasksCommentators
 
     def getTasksCommentator(self, index):
         length = len(self.getTasksCommentatorList())
-        if index < 0 or index >= length :
+        if index < 0 or index >= length:
             return None
         return self._tasksCommentators[index]
 
-    def addTasksCommentator(self,user):
-        if user is None :
+    def addTasksCommentator(self, user):
+        if user is None:
             return False
         self.getTasksCommentatorList().append(user)
         self._p_changed = 1
@@ -777,29 +776,28 @@ class Category(CommonObjectBase):
 
     def removeTasksCommentator(self, index):
         length = len(self.getTasksCommentatorList())
-        if index < 0 or index >= length :
+        if index < 0 or index >= length:
             return False
         del self._tasksCommentators[index]
         self._p_changed = 1
         return True
 
-
     def getTasksAccessList(self):
-        try :
+        try:
             return self._tasksAccessList
-        except :
+        except:
             self._tasksAccessList = []
             self._p_changed = 1
             return self._tasksAccessList
 
     def getTasksAccessPerson(self, index):
         length = len(self.getTasksAccessList())
-        if index < 0 or index >= length :
+        if index < 0 or index >= length:
             return None
         return self._tasksAccessList[index]
 
-    def addTasksAccessPerson(self,user):
-        if user is None :
+    def addTasksAccessPerson(self, user):
+        if user is None:
             return False
         self.getTasksAccessList().append(user)
         self._p_changed = 1
@@ -807,7 +805,7 @@ class Category(CommonObjectBase):
 
     def removeTasksAccessPerson(self, index):
         length = len(self.getTasksAccessList())
-        if index < 0 or index >= length :
+        if index < 0 or index >= length:
             return False
         del self.getTasksAccessList()[index]
         self._p_changed = 1
@@ -816,7 +814,7 @@ class Category(CommonObjectBase):
     def hasSubcategories(self):
         return len(self.subcategories.values()) > 0
 
-    def getVisibility ( self ):
+    def getVisibility(self):
         """
         Returns category visibility, considering that it can be
         restricted by parent categories
@@ -830,11 +828,11 @@ class Category(CommonObjectBase):
         else:
             return visibility
 
-    def setVisibility( self, visibility=999 ):
+    def setVisibility(self, visibility=999):
         self._visibility = int(visibility)
         self._reindex()
 
-    def _reindex( self ):
+    def _reindex(self):
         catIdx = indexes.IndexesHolder().getIndex('category')
         catIdx.reindexCateg(self)
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
@@ -842,46 +840,45 @@ class Category(CommonObjectBase):
         catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
         catDateAllIdx.reindexCateg(self)
 
-    def isRoot( self ):
+    def isRoot(self):
         #to be improved
-        return self.owner == None
+        return self.owner is None
 
-    def getDefaultStyle( self, type ):
+    def getDefaultStyle(self, type):
         try:
             return self._defaultStyle[type]
         except:
             return ""
 
-    def setDefaultStyle( self, type, style, subcatsStyle=False ):
+    def setDefaultStyle(self, type, style, subcatsStyle=False):
         try:
             self._defaultStyle[type] = style
         except:
-            self._defaultStyle =  { "simple_event":"","meeting":"" }
+            self._defaultStyle = {"simple_event": "", "meeting": ""}
             self._defaultStyle[type] = style
         self.notifyModification()
         #raise str(subcatsStyle)
         if subcatsStyle:
 
-            categ=self.getSubCategoryList()
+            categ = self.getSubCategoryList()
 
             for cat in categ:
-                cat.setDefaultStyle(type, style, subcatsStyle )
+                cat.setDefaultStyle(type, style, subcatsStyle)
 
     ##################################
     # Fermi timezone awareness       #
     ##################################
     def getTimezone(self):
         try:
-           if self._timezone not in all_timezones:
-               self.setTimezone('UTC')
-           return self._timezone
+            if self._timezone not in all_timezones:
+                self.setTimezone('UTC')
+            return self._timezone
         except:
-           self.setTimezone('UTC')
-           return 'UTC'
+            self.setTimezone('UTC')
+            return 'UTC'
 
-    def setTimezone(self,tz):
+    def setTimezone(self, tz):
         self._timezone = tz
-
 
     def changeConfTimezones(self, tz):
         for conference in self.getConferenceList():
@@ -891,23 +888,23 @@ class Category(CommonObjectBase):
     # Fermi timezone awareness(end)  #
     ##################################
 
-    def getOrder( self ):
+    def getOrder(self):
         try:
             return self._order
         except:
             self._order = 0
             return 0
 
-    def setOrder( self, order ):
+    def setOrder(self, order):
         self._order = order
 
-    def getId( self ):
+    def getId(self):
         return self.id
 
-    def setId( self, newId ):
-        self.id = str( newId.strip() )
+    def setId(self, newId):
+        self.id = str(newId.strip())
 
-    def getLocator( self ):
+    def getLocator(self):
         """Gives back (Locator) a globaly unique identification encapsulated
                 in a Locator object for the category instance """
         d = Locator()
@@ -917,12 +914,12 @@ class Category(CommonObjectBase):
     def getCategory(self):
         return self
 
-    def getOwner( self ):
+    def getOwner(self):
         return self.owner
 
-    def setOwner( self, newOwner ):
-        if self.getOwner() != None and newOwner != None and self.getOwner() != newOwner:
-            self.move( newOwner )
+    def setOwner(self, newOwner):
+        if self.getOwner() is not None and newOwner is not None and self.getOwner() != newOwner:
+            self.move(newOwner)
         else:
             self.owner = newOwner
 
@@ -943,22 +940,22 @@ class Category(CommonObjectBase):
             cat = cat.getOwner()
         return breadcrumbs
 
-    def delete( self, deleteConferences=0 ):
+    def delete(self, deleteConferences=0):
         """removes completely a category (and all its sub-items) from the
             system"""
 
         oldOwner = self.getOwner()
 
         if self.isRoot():
-            raise MaKaCError( _("Root category cannot be deleted"), _("Category"))
+            raise MaKaCError(_("Root category cannot be deleted"), _("Category"))
         if not deleteConferences:
-            if self.getNumConferences()>0:
-                raise MaKaCError( _("This category still contains some conferences, please remove them first"), _("Category"))
+            if self.getNumConferences() > 0:
+                raise MaKaCError(_("This category still contains some conferences, please remove them first"), _("Category"))
         for subcateg in self.getSubCategoryList():
-            subcateg.delete( deleteConferences )
+            subcateg.delete(deleteConferences)
         for conference in self.getConferenceList():
-            self.removeConference( conference, delete = True )
-        self.getOwner()._removeSubCategory( self )
+            self.removeConference(conference, delete=True)
+        self.getOwner()._removeSubCategory(self)
         CategoryManager().remove(self)
         for prin in self.__ac.getAccessList():
             if isinstance(prin, MaKaC.user.Avatar):
@@ -972,7 +969,7 @@ class Category(CommonObjectBase):
 
         return
 
-    def move( self, newOwner ):
+    def move(self, newOwner):
         oldOwner = self.getOwner()
         catDateIdx = indexes.IndexesHolder().getIndex('categoryDate')
         catDateAllIdx = indexes.IndexesHolder().getIndex('categoryDateAll')
@@ -980,18 +977,18 @@ class Category(CommonObjectBase):
         catDateIdx.unindexCateg(self)
         catDateAllIdx.unindexCateg(self)
 
-        self.getOwner()._removeSubCategory( self )
-        newOwner._addSubCategory( self )
+        self.getOwner()._removeSubCategory(self)
+        newOwner._addSubCategory(self)
         self._reindex()
         catDateIdx.indexCateg(self)
         catDateAllIdx.indexCateg(self)
 
         self._notify('moved', oldOwner, newOwner)
 
-    def getName( self ):
+    def getName(self):
         return self.name
 
-    def setName( self, newName ):
+    def setName(self, newName):
         oldName = self.name
         self.name = newName.strip()
 
@@ -1002,21 +999,21 @@ class Category(CommonObjectBase):
 
         self._notify('categoryTitleChanged', oldName, newName)
 
-    def getDescription( self ):
+    def getDescription(self):
         return self.description
 
-    def setDescription( self, newDesc ):
+    def setDescription(self, newDesc):
         self.description = newDesc.strip()
 
     def moveConference(self, conf, toCateg):
         """
         Moves a conference from this category to another one
         """
-        self.removeConference( conf )
-        toCateg._addConference( conf )
+        self.removeConference(conf)
+        toCateg._addConference(conf)
         conf._notify('moved', self, toCateg)
 
-    def _addSubCategory( self, newSc ):
+    def _addSubCategory(self, newSc):
         #categories can only contain either conferences either other categories
         #   but can never contain both. For the moment an exception is raised
         #   but this could be replaced by the following policy: if a
@@ -1024,30 +1021,30 @@ class Category(CommonObjectBase):
         #   conferences then the conferes are moved into the new sub-category
         #   and it is added to target category.
         #first, check that the category is registered if not raise an exception
-        if len(self.conferences)>0:
+        if len(self.conferences) > 0:
             for conf in self.getConferenceList():
                 self.moveConference(conf, newSc)
 
-        if len(self.conferences)>0:
-            raise MaKaCError( _("Cannot add subcategory: the current category already contains events"), _("Category"))
-        newSc.setOwner( self )
-        self.subcategories[ newSc.getId() ] = newSc
+        if len(self.conferences) > 0:
+            raise MaKaCError(_("Cannot add subcategory: the current category already contains events"), _("Category"))
+        newSc.setOwner(self)
+        self.subcategories[newSc.getId()] = newSc
         self._incNumConfs(newSc.getNumConferences())
 
-    def _removeSubCategory( self, sc ):
+    def _removeSubCategory(self, sc):
         """if the given subcategory belongs to the current category it removes
             it from the subcategories list (don't use this method, use delete
             instead)
         """
         if sc in self.getSubCategoryList():
             self._decNumConfs(sc.getNumConferences())
-            del self.subcategories[ sc.getId() ]
-            sc.setOwner( None )
+            del self.subcategories[sc.getId()]
+            sc.setOwner(None)
 
     def newSubCategory(self, protection):
         cm = CategoryManager()
         sc = Category()
-        cm.add( sc )
+        cm.add(sc)
 
         # set the protection
         sc.setProtection(protection)
@@ -1055,7 +1052,7 @@ class Category(CommonObjectBase):
         Catalog.getIdx('categ_conf_sd').add_category(sc.getId())
         sc._notify('created', self)
 
-        self._addSubCategory( sc )
+        self._addSubCategory(sc)
 
         return sc
 
@@ -1063,7 +1060,7 @@ class Category(CommonObjectBase):
         """Increases the number of conferences for the current category in a given number.
             WARNING: Only Categories must use this method!!!"""
         self._numConferences = self.getNumConferences()
-        self._numConferences+=num
+        self._numConferences += num
         if self.getOwner() is not None:
             self.getOwner()._incNumConfs(num)
 
@@ -1071,15 +1068,15 @@ class Category(CommonObjectBase):
         """Decreases the number of conferences for the current category in a given number.
             WARNING: Only Categories must use this method!!!"""
         self._numConferences = self.getNumConferences()
-        self._numConferences-=num
+        self._numConferences -= num
         if self.getOwner() is not None:
             self.getOwner()._decNumConfs(num)
 
-    def _addConference( self, newConf ):
-        if len(self.subcategories)>0:
-            raise MaKaCError( _("Cannot add event: the current category already contains some sub-categories"), _("Category"))
+    def _addConference(self, newConf):
+        if len(self.subcategories) > 0:
+            raise MaKaCError(_("Cannot add event: the current category already contains some sub-categories"), _("Category"))
         if newConf.getId() == "":
-            raise MaKaCError( _("Cannot add to a category an event which is not registered"), _("Category"))
+            raise MaKaCError(_("Cannot add to a category an event which is not registered"), _("Category"))
         self.conferences.insert(newConf)
         newConf.addOwner(self)
         self._incNumConfs(1)
@@ -1091,45 +1088,45 @@ class Category(CommonObjectBase):
     def getModifKey(self):
         return ""
 
-    def indexConf( self, conf ):
+    def indexConf(self, conf):
         # Specific for category changes, calls Conference.indexConf()
         # (date-related indexes)
         catIdx = indexes.IndexesHolder().getIndex('category')
         catIdx.indexConf(conf)
         conf.indexConf()
 
-    def unindexConf( self, conf ):
+    def unindexConf(self, conf):
         catIdx = indexes.IndexesHolder().getIndex('category')
         catIdx.unindexConf(conf)
         conf.unindexConf()
 
-    def newConference( self, creator, id="", creationDate=None, modificationDate=None ):
-        conf = Conference( creator, id, creationDate, modificationDate )
-        ConferenceHolder().add( conf )
-        self._addConference( conf )
+    def newConference(self, creator, id="", creationDate=None, modificationDate=None):
+        conf = Conference(creator, id, creationDate, modificationDate)
+        ConferenceHolder().add(conf)
+        self._addConference(conf)
         conf.linkCreator()
 
         conf._notify('created', self)
 
         return conf
 
-    def removeConference( self, conf, notify=True, delete = False ):
+    def removeConference(self, conf, notify=True, delete=False):
         if not (conf in self.conferences):
             return
 
-        self.unindexConf( conf )
+        self.unindexConf(conf)
 
         self.conferences.remove(conf)
         if delete:
             conf.delete()
-        conf.removeOwner( self, notify )
+        conf.removeOwner(self, notify)
         self._decNumConfs(1)
 
-    def getSubCategoryList( self ):
+    def getSubCategoryList(self):
         subcategs = self.subcategories.values()
         cl = []
         for categ in subcategs:
-            cl.append("%04s%s-%s" % (categ.getOrder(),categ.getName().replace("-",""),categ.getId()))
+            cl.append("%04s%s-%s" % (categ.getOrder(), categ.getName().replace("-", ""), categ.getId()))
         cl.sort()
         res = []
         for c in cl:
@@ -1143,7 +1140,7 @@ class Category(CommonObjectBase):
     def itervalues(self, *args):
         return self.conferences.itervalues(*args)
 
-    def getConferenceList( self, sortType=1 ):
+    def getConferenceList(self, sortType=1):
         """returns the list of conferences included in the current category.
            Thanks to the used structure the list is sorted by date.
            We can choose other sorting types:
@@ -1155,19 +1152,19 @@ class Category(CommonObjectBase):
 
         res = sorted(self.conferences, cmp=Conference._cmpByDate)
 
-        if sortType==2:
+        if sortType == 2:
             res.sort(Conference._cmpTitle)
-        elif sortType==3:
+        elif sortType == 3:
             res.sort(Conference._cmpTitle)
             res = reversed(res)
         return res
 
-    def iterConferences( self):
+    def iterConferences(self):
         """returns the iterator for conferences.
         """
         return self.conferences
 
-    def iterAllConferences( self):
+    def iterAllConferences(self):
         """returns the iterator for conferences in all subcategories.
         """
         for conf in self.conferences:
@@ -1177,7 +1174,7 @@ class Category(CommonObjectBase):
             for conf in subcateg.iterAllConferences():
                 yield conf
 
-    def getAllConferenceList( self ):
+    def getAllConferenceList(self):
         """returns the list of all conferences included in the current category
         and in all its subcategories"""
         res = self.getConferenceList()
@@ -1219,7 +1216,7 @@ class Category(CommonObjectBase):
             for sc in self.getSubCategoryList():
                 self._incNumConfs(sc.getNumConferences())
 
-    def getNumConferences( self ):
+    def getNumConferences(self):
         """returns the total number of conferences contained in the current
             category and all its sub-categories (if any)"""
         #this new approach will speed up considerably the counting of category
@@ -1235,7 +1232,7 @@ class Category(CommonObjectBase):
             self._setNumConferences()
         return self._numConferences
 
-    def _getRepository( self ):
+    def _getRepository(self):
         dbRoot = DBMgr.getInstance().getDBConnection().root()
         try:
             fr = dbRoot["local_repositories"]["main"]
@@ -1245,28 +1242,28 @@ class Category(CommonObjectBase):
             dbRoot["local_repositories"]["main"] = fr
         return fr
 
-    def removeResource( self, res ):
+    def removeResource(self, res):
         pass
 
-    def setIcon( self, iconFile ):
-        iconFile.setOwner( self )
-        iconFile.setId( "icon" )
-        iconFile.archive( self._getRepository() )
-        iconFile.setProtection( -1 )
-        if self.getIcon() != None:
+    def setIcon(self, iconFile):
+        iconFile.setOwner(self)
+        iconFile.setId("icon")
+        iconFile.archive(self._getRepository())
+        iconFile.setProtection(-1)
+        if self.getIcon() is not None:
             self._icon.delete()
         self._icon = iconFile
         self.notifyModification()
 
-    def getIcon( self ):
+    def getIcon(self):
         try:
             if self._icon:
                 pass
         except AttributeError, e:
-            self._icon=None
+            self._icon = None
         return self._icon
 
-    def getIconURL( self ):
+    def getIconURL(self):
         if self.getIcon() is None:
             return ""
         return self._icon.getURL()
@@ -1280,44 +1277,43 @@ class Category(CommonObjectBase):
 
     def recoverIcon(self, icon):
         icon.setOwner(self)
-        if self.getIcon() != None:
+        if self.getIcon() is not None:
             self._icon.delete()
         self._icon = icon
         icon.recover()
         self.notifyModification()
 
-    def getManagerList( self ):
+    def getManagerList(self):
         return self.__ac.getModifierList()
 
-    def grantModification( self, prin ):
-        self.__ac.grantModification( prin )
+    def grantModification(self, prin):
+        self.__ac.grantModification(prin)
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "manager")
 
-    def revokeModification( self, prin ):
-        self.__ac.revokeModification( prin )
+    def revokeModification(self, prin):
+        self.__ac.revokeModification(prin)
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
 
-    def canModify( self, aw ):
-        return self.canUserModify( aw.getUser() )
+    def canModify(self, aw):
+        return self.canUserModify(aw.getUser())
 
-    def canUserModify( self, av ):
+    def canUserModify(self, av):
         inherited = 0
-        if self.getOwner() != None:
-            inherited = self.getOwner().canUserModify( av )
-        return inherited or self.__ac.canModify( av )
+        if self.getOwner() is not None:
+            inherited = self.getOwner().canUserModify(av)
+        return inherited or self.__ac.canModify(av)
 
-
-    def getAllowedToAccessList( self ):
+    def getAllowedToAccessList(self):
         return self.__ac.getAccessList()
 
-    def canKeyAccess( self, aw ):
+    def canKeyAccess(self, aw):
         # Categories don't allow access keys
         return False
 
-    def canIPAccess( self, ip ):
-        if not self.__ac.canIPAccess( ip ):
+    def canIPAccess(self, ip):
+        if not self.__ac.canIPAccess(ip):
             return False
 
         # if category is inheriting, check protection above
@@ -1325,107 +1321,107 @@ class Category(CommonObjectBase):
             return self.getOwner().canIPAccess(ip)
         return True
 
-    def isProtected( self ):
+    def isProtected(self):
         return self.__ac.isProtected()
 
-    def getAccessProtectionLevel( self ):
+    def getAccessProtectionLevel(self):
         return self.__ac.getAccessProtectionLevel()
 
-    def isItselfProtected( self ):
+    def isItselfProtected(self):
         return self.__ac.isItselfProtected()
 
-    def hasAnyProtection( self ):
-        if self.__ac.isProtected() or len(self.getDomainList())>0:
+    def hasAnyProtection(self):
+        if self.__ac.isProtected() or len(self.getDomainList()) > 0:
             return True
-        if self.getAccessProtectionLevel() == -1: #PUBLIC
+        if self.getAccessProtectionLevel() == -1:  # PUBLIC
             return False
         if self.getOwner() is not None:
             return self.getOwner().hasAnyProtection()
         return False
 
-    def setProtection( self, private ):
+    def setProtection(self, private):
         """
         Allows to change the category's access protection
         """
 
         oldProtection = 1 if self.isProtected() else -1
 
-        self.__ac.setProtection( private )
+        self.__ac.setProtection(private)
         self._notify('protectionChanged', oldProtection, private)
 
-    def hasProtectedOwner( self ):
+    def hasProtectedOwner(self):
         return self.__ac._getFatherProtection()
 
-    def isAllowedToAccess( self, av ):
+    def isAllowedToAccess(self, av):
         """Says whether an avatar can access a category independently of it is
             or not protected or domain filtered
         """
-        if self.__ac.canUserAccess( av ) or self.canUserModify( av ):
+        if self.__ac.canUserAccess(av) or self.canUserModify(av):
             return True
         if not self.isItselfProtected() and self.getOwner():
-            return self.getOwner().isAllowedToAccess( av )
+            return self.getOwner().isAllowedToAccess(av)
 
-    def canView(self,aw):
-        if self.canAccess( aw ):
+    def canView(self, aw):
+        if self.canAccess(aw):
             return True
         for conf in self.getConferenceList():
-            if conf.canView( aw ):
+            if conf.canView(aw):
                 return True
         for subcateg in self.getSubCategoryList():
-            if subcateg.canView( aw ):
+            if subcateg.canView(aw):
                 return True
         return False
 
-    def canAccess( self, aw ):
+    def canAccess(self, aw):
         if not self.hasAnyProtection():
             return True
         if not self.isProtected():
             #domain checking only triggered if the category is PUBLIC
-            return self.canIPAccess( aw.getIP() ) or \
+            return self.canIPAccess(aw.getIP()) or \
                 self.isAllowedToCreateConference(aw.getUser()) or \
                 self.isAllowedToAccess(aw.getUser())
         return self.isAllowedToCreateConference(aw.getUser()) or \
             self.isAllowedToAccess(aw.getUser())
 
-    def grantAccess( self, prin ):
-        self.__ac.grantAccess( prin )
+    def grantAccess(self, prin):
+        self.__ac.grantAccess(prin)
         if isinstance(prin, MaKaC.user.Avatar):
             prin.linkTo(self, "access")
 
-    def revokeAccess( self, prin ):
-        self.__ac.revokeAccess( prin )
+    def revokeAccess(self, prin):
+        self.__ac.revokeAccess(prin)
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "access")
 
-    def isConferenceCreationRestricted( self ):
+    def isConferenceCreationRestricted(self):
         return self.__confCreationRestricted
 
-    def restrictConferenceCreation( self ):
+    def restrictConferenceCreation(self):
         self.__confCreationRestricted = 1
 
-    def allowConferenceCreation( self ):
+    def allowConferenceCreation(self):
         self.__confCreationRestricted = 0
 
-    def grantConferenceCreation( self, prin ):
+    def grantConferenceCreation(self, prin):
         if prin not in self.__confCreators:
-            self.__confCreators.append( prin )
+            self.__confCreators.append(prin)
             if isinstance(prin, MaKaC.user.Avatar):
                 prin.linkTo(self, "creator")
             self._p_changed = 1
 
-    def revokeConferenceCreation( self, prin ):
+    def revokeConferenceCreation(self, prin):
         if prin in self.__confCreators:
-            self.__confCreators.remove( prin )
+            self.__confCreators.remove(prin)
             if isinstance(prin, MaKaC.user.Avatar):
                 prin.unlinkTo(self, "creator")
             self._p_changed = 1
 
-    def getConferenceCreatorList( self ):
+    def getConferenceCreatorList(self):
         return self.__confCreators
 
-    def isAllowedToCreateConference( self, av ):
+    def isAllowedToCreateConference(self, av):
 
-        if self.canUserModify( av ):
+        if self.canUserModify(av):
             return 1
 
         # Avatar is directly in the list
@@ -1441,23 +1437,23 @@ class Category(CommonObjectBase):
                 pass
         return 0
 
-    def canCreateConference( self, av ):
+    def canCreateConference(self, av):
         if not self.isConferenceCreationRestricted():
             return 1
-        return self.isAllowedToCreateConference( av )
+        return self.isAllowedToCreateConference(av)
 
-    def requireDomain( self, dom ):
-        self.__ac.requireDomain( dom )
+    def requireDomain(self, dom):
+        self.__ac.requireDomain(dom)
         self._notify('accessDomainAdded', dom)
 
-    def freeDomain( self, dom ):
-        self.__ac.freeDomain( dom )
+    def freeDomain(self, dom):
+        self.__ac.freeDomain(dom)
         self._notify('accessDomainRemoved', dom)
 
-    def getDomainList( self ):
+    def getDomainList(self):
         return self.__ac.getRequiredDomainList()
 
-    def getStatistics( self ):
+    def getStatistics(self):
         try:
             if self._statistics:
                 pass
@@ -1465,12 +1461,12 @@ class Category(CommonObjectBase):
             self._statistics = {}
         return self._statistics
 
-    def notifyModification(self, raiseEvent = True):
+    def notifyModification(self, raiseEvent=True):
         """Method called to notify the current category has been modified.
         """
         if raiseEvent:
             self._notify('infoChanged')
-        self._p_changed=1
+        self._p_changed = 1
 
 
 class CustomLocation(Persistent):
@@ -1481,19 +1477,19 @@ class CustomLocation(Persistent):
         self.room = ""
 
     def setValues(self, data):
-        self.setName(data.get("name",""))
-        self.setAddress(data.get("address",""))
-        self.setRoom(data.get("room",""))
+        self.setName(data.get("name", ""))
+        self.setAddress(data.get("address", ""))
+        self.setRoom(data.get("room", ""))
 
     def getValues(self):
-        d={}
-        d["name"]=self.getName()
-        d["address"]=self.getAddress()
-        d["room"]=self.getRoom()
+        d = {}
+        d["name"] = self.getName()
+        d["address"] = self.getAddress()
+        d["room"] = self.getRoom()
         return d
 
     def clone(self):
-        newCL=CustomLocation()
+        newCL = CustomLocation()
         newCL.setValues(self.getValues())
         return newCL
 
@@ -1518,31 +1514,31 @@ class CustomLocation(Persistent):
 
 class CustomRoom(Persistent):
 
-    def __init__( self ):
+    def __init__(self):
         self.name = ""
 
     def setValues(self, data):
-        self.setName(data.get("name",""))
+        self.setName(data.get("name", ""))
         self.setFullName(data.get("fullName"))
 
     def getValues(self):
-        d={}
-        d["name"]=self.getName()
-        d["fullName"]=self.getFullName()
+        d = {}
+        d["name"] = self.getName()
+        d["fullName"] = self.getFullName()
         return d
 
     def getId(self):
         return "Custom"
 
     def clone(self):
-        newCR=CustomRoom()
+        newCR = CustomRoom()
         newCR.setValues(self.getValues())
         return newCR
 
-    def setName( self, newName ):
+    def setName(self, newName):
         self.name = newName.strip()
 
-    def getName( self ):
+    def getName(self):
         return self.name
 
     def retrieveFullName(self, location):
