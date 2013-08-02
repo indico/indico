@@ -51,7 +51,8 @@
                 <select id=${fid} name=${fid}>
                     <% nooption = "{}...".format(_("Choose")) %>
                     <% selected = "selected" if fdict[fid] == "" else "" %>
-                    <option value="" disabled ${selected}>${nooption}</option>
+                    <% disabled = "disabled" if field.isMandatory() else "" %>
+                    <option value="" ${disabled} ${selected}>${nooption}</option>
                     % for option in field.getOptions():
                         <% selected = "selected" if fdict[fid] == option.getId() else "" %>
                         <option value="${option.getId()}" ${selected}>${option.getValue()}</option>
