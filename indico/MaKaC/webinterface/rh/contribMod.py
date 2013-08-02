@@ -573,8 +573,8 @@ class RHContributionToXML(RHContributionModification):
         afm = self._target.getConference().getAbstractMgr().getAbstractFieldsMgr()
         for f in afm.getFields():
             id = f.getId()
-            if f.isActive() and self._target.getField(id).strip() != "":
-                x.writeTag(f.getName().replace(" ","_"),self._target.getField(id))
+            if f.isActive() and str(self._target.getField(id)).strip() != "":
+                x.writeTag(f.getCaption().replace(" ", "_"), self._target.getField(id))
         x.writeTag("Conference", self._target.getConference().getTitle())
         session = self._target.getSession()
         if session!=None:

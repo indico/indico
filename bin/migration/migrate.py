@@ -51,6 +51,7 @@ from MaKaC.authentication.LocalAuthentication import LocalAuthenticator, LocalId
 from MaKaC.authentication.LDAPAuthentication import LDAPIdentity
 from MaKaC.user import AvatarHolder
 from MaKaC.rb_location import CrossLocationQueries
+from MaKaC.review import AbstractField
 
 from indico.core.index import Catalog
 from indico.core.db.event import SupportInfo
@@ -852,6 +853,29 @@ def removeNiceIdentities(dbi, withRBDB, prevVersion):
                 avatar.removeIdentity(identity)
         if i % 100 == 99:
             dbi.commit()
+    dbi.commit()
+
+
+@since('1.2')
+def updateAbstractFields(dbi, withRBDB, prevVersion):
+    """
+    Migrates old AbstractField to new AbstractField subclasses
+    """
+
+    i = 0
+    for (__, conf) in console.conferenceHolderIterator(ConferenceHolder(), deepness='event'):
+        afm = conf.getAbstractManager().getAbstractFieldManager()
+        for field in afm.getFields():
+            params = {}
+            params["id"] = field.getId()
+            params["type"] = field.getType()
+            params["caption"] = field.getCaption()
+            params["maxLength"] = field.getMaxLength()
+            params["limitation"] = field.getLimitation()
+            field = AbstractField.makefield(params)
+        if i % 100 == 99:
+            dbi.commit()
+        i += 1
     dbi.commit()
 
 

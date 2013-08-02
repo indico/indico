@@ -2060,8 +2060,8 @@ class AbstractBook(PDFWithTOC):
             if speakersEmail:
                 speakers = i18nformat("""<b>_("Corresponding %s"):</b> %s""")%(ngettext("Author", "Authors", len(speakersEmail)), ", ".join(speakersEmail))
                 paragraphs.append(Paragraph(escape(speakers),self._styles["normal"]))
-        abstract=contrib.getDescription()
-        paragraphs.append(Paragraph(escape(abstract),self._styles["abstract"]))
+        abstract = str(contrib.getDescription())
+        paragraphs.append(Paragraph(escape(abstract), self._styles["abstract"]))
 
         abs=KeepTogether(paragraphs)
         story.append(abs)

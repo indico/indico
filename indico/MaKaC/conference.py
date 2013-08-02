@@ -7752,7 +7752,7 @@ class Contribution(CommonObjectBase, Locatable):
             self.getFields()[fid].value = v
             self._notifyModification()
         except:
-            afm = self.getOwner().getAbstractMgr().getAbstractFieldsMgr()
+            afm = self.getConference().getAbstractMgr().getAbstractFieldsMgr()
             f = next(f for f in afm.getFields() if f.getId() == fid)
             if f is not None:
                 self.getFields()[fid] = AbstractFieldContent(f, v)
