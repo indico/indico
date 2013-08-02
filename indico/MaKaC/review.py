@@ -530,6 +530,7 @@ class AbstractField(Persistent, Fossilizable):
         values = []
         values["id"] = self.getId()
         values["caption"] = self.getCaption()
+        values["isMandatory"] = self.isMandatory()
         return values
 
     def setValues(self, params):
