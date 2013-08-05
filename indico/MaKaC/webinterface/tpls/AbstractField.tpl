@@ -1,8 +1,4 @@
 <%page args="field=None, fdict=None"/>
-<% from indico.MaKaC.review import AbstractTextField %>
-<% from indico.MaKaC.review import AbstractTextAreaField %>
-<% from indico.MaKaC.review import AbstractInputField %>
-<% from indico.MaKaC.review import AbstractSelectionField %>
 
 <% fid = "f_" + field.getId() %>
 % if not field.isActive():
