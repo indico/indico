@@ -825,8 +825,15 @@ The options you can find inside the setup tab are the following:
 
 * **Misc. Options**: Other options available, such as enable/disable multiple track selection
 
-* **Abstract fields**: The fields that will appear in the form to submit abstracts. You can add more and also select the order in which they appear
+* **Abstract fields**: The fields that will appear in the form to submit abstracts. You can add more and also select the order in which they appear.
 
+Different types of abstract fields can be added by clicking in the *add* button.
+
+|image161|
+
+Fields can be configured at creation time or at any moment by clicking on the name of the field. These dialogs will appear. For changes to take effect the *add*/*update* must be clicked.
+
+|image162| |image163|
 
 --------------
 
@@ -2076,3 +2083,6 @@ session. You may also make a PDF of the session.
 .. |image158| image:: UserGuidePics/confreg15pdfopts.png
 .. |image159| image:: UserGuidePics/posterdesign.png
 .. |image160| image:: UserGuidePics/childrenProtectedPopup.png
+.. |image161| image:: UserGuidePics/addAbstractFieldQtip.png
+.. |image162| image:: UserGuidePics/addAbstractFieldDialog1.png
+.. |image163| image:: UserGuidePics/addAbstractFieldDialog2.png
