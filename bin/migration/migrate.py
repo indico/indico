@@ -864,15 +864,29 @@ def updateAbstractFields(dbi, withRBDB, prevVersion):
 
     i = 0
     for (__, conf) in console.conferenceHolderIterator(ConferenceHolder(), deepness='event'):
-        afm = conf.getAbstractManager().getAbstractFieldManager()
-        for field in afm.getFields():
-            params = {}
-            params["id"] = field.getId()
-            params["type"] = field.getType()
-            params["caption"] = field.getCaption()
-            params["maxLength"] = field.getMaxLength()
-            params["limitation"] = field.getLimitation()
-            field = AbstractField.makefield(params)
+        afm = conf.getAbstractMgr().getAbstractFieldsMgr()
+        for index, field in enumerate(afm.getFields()):
+            if field is not None:
+                if type(field) != "AbstractField":
+                    pass
+                    # raise "Database contains AbstractField objects created on v1.2"
+                params = {}
+                params["id"] = field._id
+                params["type"] = field._type
+                params["caption"] = field._caption
+                params["isMandatory"] = field._isMandatory
+                try:
+                    params["maxLength"] = field._maxLength
+                except:
+                    pass
+                try:
+                    params["limitation"] = field._limitation
+                except:
+                    pass
+                afm.getFields()[index] = AbstractField.makefield(params)
+                afm._p_changed = 1
+            else:
+                del field
         if i % 100 == 99:
             dbi.commit()
         i += 1
