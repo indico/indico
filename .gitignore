@@ -16,6 +16,11 @@
 *.egg/
 
 # assets and generated stuff
+doc/guides/build
+indico/htdocs/ihelp/html
+indico/htdocs/ihelp/pdf
+!indico/htdocs/ihelp/help/.*
+!indico/htdocs/ihelp/pdf/.*
 indico/htdocs/static/assets
 indico/htdocs/sass/.sass-cache
 .webassets-cache
