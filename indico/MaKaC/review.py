@@ -466,7 +466,7 @@ class AbstractField(Persistent, Fossilizable):
     def makefield(cls, params):
         fieldType = params["type"]
         if fieldType not in cls.fieldtypes:
-            raise "Invalid field type"
+            return AbstractTextAreaField(params)
         elif fieldType == "textarea":
             return AbstractTextAreaField(params)
         elif fieldType == "input":
