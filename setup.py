@@ -334,7 +334,7 @@ class test_indico(test.test):
     silent = False
     mode = None
     server_url = None
-    killself = False
+    killself = True
     html = False
     record = False
     log = False
