@@ -41,6 +41,7 @@ from MaKaC.trashCan import TrashCanManager
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.util.date_time import format_datetime, format_date
 from MaKaC.webinterface.common.countries import CountryHolder
 import re
 import tempfile, os
@@ -5542,25 +5543,27 @@ class RegistrantMapping(object):
     def __init__(self, registrant):
         self._registrant = registrant
         self._regDict = {
-                        "FirstName" :           self._registrant.getFirstName,
-                        "LastName" :            self._registrant.getSurName,
-                        "Institution" :         self._registrant.getInstitution,
-                        "Position" :            self._registrant.getPosition,
-                        "Phone" :               self._registrant.getPhone,
-                        "City" :                self._registrant.getCity,
-                        "Address" :             self._registrant.getAddress,
-                        "Email" :               self._registrant.getEmail,
-                        "isPayed" :             self._registrant.isPayedText,
-                        "idpayment" :           self._registrant.getIdPay,
-                        "Country" :             self._getCountry,
-                        "amountToPay" :         self._getAmountToPay,
-                        "Accommodation" :        self._getAccomodation,
-                        "SocialEvents" :        self._getSocialEvents,
-                        "ReasonParticipation" : self._getReasonParticipation,
-                        "RegistrationDate" :    self._getRegistrationDate,
-                        "Sessions" :            self._getSessions,
-                        "DepartureDate" :       self._getDepartureDate,
-                        "ArrivalDate" :         self._getArrivalDate
+                        "FirstName":           self._registrant.getFirstName,
+                        "LastName":            self._registrant.getSurName,
+                        "Institution":         self._registrant.getInstitution,
+                        "Position":            self._registrant.getPosition,
+                        "Phone":               self._registrant.getPhone,
+                        "City":                self._registrant.getCity,
+                        "Address":             self._registrant.getAddress,
+                        "Email":               self._registrant.getEmail,
+                        "isPayed":             self._registrant.isPayedText,
+                        "idpayment":           self._registrant.getIdPay,
+                        "Country":             self._getCountry,
+                        "amountToPay":         self._getAmountToPay,
+                        "Accommodation":       self._getAccomodation,
+                        "SocialEvents":        self._getSocialEvents,
+                        "ReasonParticipation": self._getReasonParticipation,
+                        "RegistrationDate":    self._getRegistrationDate,
+                        "Sessions":            self._getSessions,
+                        "DepartureDate":       self._getDepartureDate,
+                        "ArrivalDate":         self._getArrivalDate,
+                        "checkedIn":           self._getCheckedIn,
+                        "checkInDate":         self._getCheckInDate
                         }
 
     def __getitem__(self, key):
@@ -5589,15 +5592,19 @@ class RegistrantMapping(object):
         return ""
 
     def _getDepartureDate(self):
-        if self._registrant.getAccommodation() is not None:
-            if self._registrant.getAccommodation().getDepartureDate() is not None:
-                return self._registrant.getAccommodation().getDepartureDate().strftime("%d-%B-%Y")
+        accomodation = self._registrant.getAccommodation()
+        if accomodation is not None:
+            departure_date = accomodation.getDepartureDate()
+            if departure_date is not None:
+                return format_date(departure_date)
         return ""
 
     def _getArrivalDate(self):
-        if self._registrant.getAccommodation() is not None:
-            if self._registrant.getAccommodation().getArrivalDate() is not None:
-                return self._registrant.getAccommodation().getArrivalDate().strftime("%d-%B-%Y")
+        accomodation = self._registrant.getAccommodation()
+        if accomodation is not None:
+            arrival_date = accomodation.getArrivalDate()
+            if arrival_date is not None:
+                return format_date(arrival_date)
         return ""
 
     def _getSocialEvents(self):
@@ -5609,9 +5616,9 @@ class RegistrantMapping(object):
         return self._registrant.getReasonParticipation() or ""
 
     def _getRegistrationDate(self):
-
-        if self._registrant.getRegistrationDate() is not None:
-            return self._registrant.getAdjustedRegistrationDate().strftime("%d-%B-%Y %H:%M")
+        registration_date = self._registrant.getRegistrationDate()
+        if registration_date is not None:
+            return format_datetime(registration_date)
         else:
             return i18nformat("""--  _("date unknown")--""")
 
@@ -5646,3 +5653,19 @@ class RegistrantMapping(object):
             return self._formatValue(item.getGeneralField().getInput(), item.getValue())
         else:
             return ""
+
+    def _getCheckedIn(self):
+        conf = self._registrant.getConference()
+        if not conf.getRegistrationForm().getETicket().isEnabled():
+            return "-"
+        elif self._registrant.isCheckedIn():
+            return _("Yes")
+        else:
+            return _("No")
+
+    def _getCheckInDate(self):
+        checkInDate = self._registrant.getCheckInDate()
+        if checkInDate:
+            return format_datetime(checkInDate)
+        else:
+            return "-"

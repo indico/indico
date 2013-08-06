@@ -90,6 +90,7 @@
                                   <div class="group left">
                                     <a href="#" class="i-button" id="add_new_user">${_("Add new")}</a>
                                     <a href="#" class="i-button" id="remove_users">${_("Remove")}</a>
+                                    <a href="#" class="i-button" id="check_in">${_("Check in")}</a>
                                     <a href="#" class="i-button" id="send_email">${_("Email")}</a>
                                     <a href="#" class="i-button" id="print_badges">${_("Print Badges")}</a>
                                     <a href="#" class="i-button" id="attachments">${_("Attachments")}</a>
@@ -145,7 +146,15 @@
                       % for group_key, group_data in groups_order.iteritems():
                         % if group_key != "PersonalData":
                           % for key in group_data:
-                            <td class="CRLabstractDataCell">${regdict[key]}</td>
+                            % if key == "checkedIn":
+                                <td class="CRLabstractDataCell checkedIn">
+                                    ${regdict[key]}
+                                </td>
+                            % else:
+                                <td class="CRLabstractDataCell">
+                                    ${regdict[key]}
+                                </td>
+                            % endif
                           % endfor
                         % endif
                       % endfor
@@ -281,13 +290,21 @@ function submitForm(style) {
         form.dom.submit(); pdfMenu.close();
 }
 
+function getSelectedRegistrants() {
+    var selected = new Array();
+    $("input[name='registrant']:checked").each(function() {
+        selected.push($(this).val());
+    });
+    return selected;
+}
+
 var atLeastOneRegistrantSelected = function(){
-    if (newUser || $("input:checkbox:checked[name^=registrant]").length>0){
-    return true;
-    } else{
-    var dialog = new WarningPopup($T("Warning"), $T("No registrant selected! Please select at least one."));
-    dialog.open();
-    return false;
+    if (newUser || getSelectedRegistrants().length > 0){
+        return true;
+    } else {
+        var dialog = new WarningPopup($T("Warning"), $T("No registrant selected! Please select at least one."));
+        dialog.open();
+        return false;
     }
 };
 
@@ -350,6 +367,35 @@ IndicoUI.executeOnLoad(function(){
    $("#export_csv").on("menu_select", function() {
       submitForm('excel');
    });
+
+    $("#check_in").bind('menu_select',function(){
+        if (atLeastOneRegistrantSelected()) {
+            var selectedRegistrants = getSelectedRegistrants();
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Checking in registrants..."));
+            indicoRequest("registrant.eticket.checkIn",
+                {
+                    registrants: selectedRegistrants,
+                    conference: "${ conferenceId }",
+                },
+                function(result, error){
+                    if (!error) {
+                        killProgress();
+                        registrants = result["registrants"]
+                        for(i in registrants){
+                            changedField = $("input[value=" + registrants[i] + "]")
+                                            .parents("td")
+                                            .nextAll("td.checkedIn")
+                            changedField.effect("highlight", {}, 1500);
+                            changedField.html("${_('Yes')}");
+                        }
+                    } else {
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    }
+                }
+            );
+        }
+    });
 
     $('#selectAll').click(function() {
         $('#registrantsItems input:visible').prop('checked', true);
