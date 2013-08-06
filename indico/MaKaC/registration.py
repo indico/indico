@@ -4737,6 +4737,15 @@ class Registrant(Persistent):
             self._checkInDate = None
         return self._checkInDate
 
+    def getAdjustedCheckInDate(self,tz=None):
+        if not tz:
+            tz = self.getConference().getTimezone()
+        if tz not in all_timezones:
+            tz = 'UTC'
+        checkInDate = self.getCheckInDate()
+        if checkInDate:
+            return checkInDate.astimezone(timezone(tz))
+
     def getPayed(self):
         try:
             return self._hasPay
@@ -5616,7 +5625,7 @@ class RegistrantMapping(object):
         return self._registrant.getReasonParticipation() or ""
 
     def _getRegistrationDate(self):
-        registration_date = self._registrant.getRegistrationDate()
+        registration_date = self._registrant.getAdjustedRegistrationDate()
         if registration_date is not None:
             return format_datetime(registration_date)
         else:
@@ -5664,7 +5673,7 @@ class RegistrantMapping(object):
             return _("No")
 
     def _getCheckInDate(self):
-        checkInDate = self._registrant.getCheckInDate()
+        checkInDate = self._registrant.getAdjustedCheckInDate()
         if checkInDate:
             return format_datetime(checkInDate)
         else:

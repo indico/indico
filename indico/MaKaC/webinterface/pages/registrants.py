@@ -912,7 +912,7 @@ class WRegistrantModifETicket(wcomponents.WTemplated):
                                      self._registrant,
                                      authkey=self._registrant.getRandomId())
         vars["isCheckedIn"] = self._registrant.isCheckedIn()
-        checkInDate = self._registrant.getCheckInDate()
+        checkInDate = self._registrant.getAdjustedCheckInDate()
         if checkInDate:
             vars["checkInDate"] = format_datetime(checkInDate)
 
