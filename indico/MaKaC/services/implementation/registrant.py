@@ -23,6 +23,7 @@ Asynchronous request handlers for registrant-related data
 
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.common.contextManager import ContextManager
+from indico.util.date_time import format_datetime
 
 
 class RegistrantModifBase(ConferenceModifBase):
@@ -43,13 +44,14 @@ class RegistrantModifBase(ConferenceModifBase):
 class RegistrantModifCheckIn(RegistrantModifBase):
 
     def _getAnswer(self):
-        registrants_changed = []
+        dates_changed = {}
         for registrant_id in self._registrant_ids:
             registrant = self._conf.getRegistrantById(registrant_id)
             if not registrant.isCheckedIn():
-                registrants_changed.append(registrant_id)
                 registrant.setCheckedIn(True)
-        return {"registrants": registrants_changed}
+                checkInDate = registrant.getAdjustedCheckInDate()
+                dates_changed[registrant_id] = format_datetime(checkInDate)
+        return {"dates": dates_changed}
 
 
 methodMap = {

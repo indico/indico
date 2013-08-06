@@ -150,6 +150,10 @@
                                 <td class="CRLabstractDataCell checkedIn">
                                     ${regdict[key]}
                                 </td>
+                            % elif key == "checkInDate":
+                                <td class="CRLabstractDataCell checkInDate">
+                                    ${regdict[key]}
+                                </td>
                             % else:
                                 <td class="CRLabstractDataCell">
                                     ${regdict[key]}
@@ -380,13 +384,18 @@ IndicoUI.executeOnLoad(function(){
                 function(result, error){
                     if (!error) {
                         killProgress();
-                        registrants = result["registrants"]
-                        for(i in registrants){
-                            changedField = $("input[value=" + registrants[i] + "]")
-                                            .parents("td")
-                                            .nextAll("td.checkedIn")
-                            changedField.effect("highlight", {}, 1500);
-                            changedField.html("${_('Yes')}");
+                        dates = result["dates"]
+                        for(var id in dates){
+                            changedFieldCheckedIn = $("input[value=" + id + "]")
+                                                    .parents("td")
+                                                    .nextAll("td.checkedIn");
+                            changedFieldCheckedIn.effect("highlight", {}, 1500);
+                            changedFieldCheckedIn.html("${_('Yes')}");
+                            changedFieldCheckInDate = $("input[value=" + id + "]")
+                                                      .parents("td")
+                                                      .nextAll("td.checkInDate");
+                            changedFieldCheckInDate.effect("highlight", {}, 1500);
+                            changedFieldCheckInDate.html(dates[id]);
                         }
                     } else {
                         killProgress();
