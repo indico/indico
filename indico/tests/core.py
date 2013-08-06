@@ -38,6 +38,7 @@ import transaction
 import indico
 from indico.util.console import colored
 from indico.util.shell import WerkzeugServer
+from indico.util.contextManager import ContextManager
 from indico.web.flask.app import make_app
 from indico.tests.config import TestConfig
 from indico.tests.base import TestOptionException, FakeMailThread
@@ -133,6 +134,7 @@ class TestManager(object):
         else:
             baseURL = "http://localhost:8000/indico"
 
+        ContextManager.set('test_env', True)
         self._setFakeConfig({
                 "SmtpServer": smtpAddr,
                 "BaseURL": baseURL

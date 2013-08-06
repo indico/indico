@@ -20,23 +20,25 @@
 import time
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.i18n import _
+from indico.util.contextManager import ContextManager
 
 class TrashCanManager(ObjectHolder):
     idxName = "trashcan"
-    
+
     def add(self, newItem):
         oid = ""
         try:
-            oid = newItem._p_oid            
+            oid = newItem._p_oid
         except:
             raise MaKaCError( _("Cannot put an object which is not persistent in the trash can."))
         tree = self._getIdx()
-        tree[oid] = newItem
+        if not (ContextManager.get('test_env')):
+            tree[oid] = newItem
 
     def remove(self, item):
         oid = ""
         try:
-            oid = item._p_oid            
+            oid = item._p_oid
         except:
             return
         tree = self._getIdx()
