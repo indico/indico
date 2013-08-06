@@ -58,6 +58,7 @@ import re
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat, ngettext
 from indico.util.date_time import format_date
+from indico.util import json
 
 
 styles = getSampleStyleSheet()
@@ -3208,15 +3209,20 @@ class TicketToPDF(PDFBase):
         height -= 2*cm
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, _("e-Ticket"))
 
-        # QRCode (Version 2 with error correction L can contain up to 32 bytes)
+        # QRCode (Version 6 with error correction L can contain up to 106 bytes)
         height -= 6*cm
         qr = QRCode(
-            version=2,
+            version=6,
             error_correction=constants.ERROR_CORRECT_M,
             box_size=4,
             border=1
         )
-        qr.add_data(self._registrant._randomId)
+
+        qr_data = {"uuid": self._registrant.getCheckInUUID(),
+                   "target": self._conf.getId(),
+                   "application": "indico"}
+        json_qr_data = json.dumps(qr_data)
+        qr.add_data(json_qr_data)
         qr.make(fit=True)
         qr_img = qr.make_image()
 

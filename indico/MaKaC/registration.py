@@ -19,6 +19,7 @@
 from flask import request
 
 import random, time
+from uuid import uuid4
 from hashlib import md5
 from datetime import datetime,timedelta
 from pytz import timezone
@@ -4508,6 +4509,7 @@ class Registrant(Persistent):
         self._registrationDate = nowutc()
         self._checkedIn = False
         self._checkInDate = None
+        self._checkInUUID = str(uuid4())
 
         self._title = ""
         self._firstName = ""
@@ -4728,6 +4730,14 @@ class Registrant(Persistent):
         else:
             self._checkInDate = None
         self._checkedIn = checkedIn
+
+    def getCheckInUUID(self):
+        try:
+            if self._checkInUUID:
+                pass
+        except AttributeError:
+            self._checkInUUID = str(uuid4())
+        return self._checkInUUID
 
     def getCheckInDate(self):
         try:
