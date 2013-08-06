@@ -67,15 +67,15 @@ class TestTasks(IndicoTestCase):
 
         self._conf1 = category.newConference(self._avatar1)
         self._conf1.setTimezone('UTC')
-        sd1 = datetime(2012, 12, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed1 = datetime(2012, 12, 1, 18, 0, tzinfo=timezone('UTC'))
+        sd1 = datetime(2020, 12, 1, 10, 0, tzinfo=timezone('UTC'))
+        ed1 = datetime(2020, 12, 1, 18, 0, tzinfo=timezone('UTC'))
         self._conf1.setDates(sd1, ed1)
         ch.add(self._conf1)
 
         self._conf2 = category.newConference(self._avatar2)
         self._conf2.setTimezone('UTC')
-        sd2 = datetime(2012, 12, 10, 11, 0, tzinfo=timezone('UTC'))
-        ed2 = datetime(2012, 12, 11, 13, 0, tzinfo=timezone('UTC'))
+        sd2 = datetime(2020, 12, 10, 11, 0, tzinfo=timezone('UTC'))
+        ed2 = datetime(2020, 12, 11, 13, 0, tzinfo=timezone('UTC'))
         self._conf2.setDates(sd2, ed2)
         ch.add(self._conf2)
 
