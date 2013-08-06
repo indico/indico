@@ -470,7 +470,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var startTimeLine, daySelect, datecomponent;
 
         // in case of poster sessions
-        if (exists(this.timetable) && (this.args.get("session")||this.isEdit) && this.timetable.isPoster) {
+        if (exists(this.timetable) && this.timetable.isPoster) {
             daySelect = [];
             startTimeLine = [];
             this.info.set('duration', self.timeField);

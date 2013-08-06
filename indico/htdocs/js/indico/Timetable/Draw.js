@@ -1849,7 +1849,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
 
                 var editLink = Html.a({className: 'dropDownMenu', style: {fontWeight: 'bold'}}, $T('Edit'));
                 var menuItems = {};
-                menuItems["blockProperties"] = { action: function() {self.managementActions.editContribution(blockData);self.close();}, display: $T('Basic edition')};
+                menuItems["blockProperties"] = { action: function() {self.managementActions.editContribution(blockData);}, display: $T('Basic edition')};
                 menuItems["contributionFullEdition"] = {action: self.managementActions.editEntry(blockData), display: $T('Full edition')};
                 menuItems["contributionProtection"] = {action: self.managementActions.editEntryProtection(blockData), display: $T('Edit protection')};
                 editLink.observeClick(function() {
