@@ -868,8 +868,7 @@ def updateAbstractFields(dbi, withRBDB, prevVersion):
         for index, field in enumerate(afm.getFields()):
             if field is not None:
                 if type(field) != "AbstractField":
-                    pass
-                    # raise "Database contains AbstractField objects created on v1.2"
+                    raise "Database contains AbstractField objects created on v1.2"
                 params = {}
                 params["id"] = field._id
                 params["type"] = field._type
