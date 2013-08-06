@@ -320,6 +320,9 @@ class TaskOccurrence(TimedEvent):
         self._endedOn = task.getEndedOn()
         self._id = None
 
+    def __cmp__(self, other):
+        return cmp(self._id, other._id)
+
     def getId(self):
         return self._id
 
