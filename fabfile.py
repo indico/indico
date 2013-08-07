@@ -345,8 +345,8 @@ def make_docs(src_dir=None, build_dir=None):
             with lcd(d):
                 local('make html')
                 local('make latex')
-                local('cp -r build/html/* {0}'.format(os.path.join(target_dir, 'html')))
-                local('rm -rf build/html/*')
+                local('rm -rf {0}/*'.format(os.path.join(target_dir, 'html')))
+                local('mv build/html/* {0}'.format(os.path.join(target_dir, 'html')))
 
         with lcd(os.path.join('guides', 'build', 'latex')):
             local('make all-pdf')
