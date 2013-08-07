@@ -47,6 +47,10 @@ class WPBase(OldObservable):
     def __init__( self, rh ):
         config = Config.getInstance()
         db_connected = DBMgr.getInstance().isConnected()
+        if db_connected:
+            debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
+        else:
+            debug = False
 
         self._rh = rh
         self._locTZ = ""
@@ -56,16 +60,11 @@ class WPBase(OldObservable):
         self._asset_env = Environment(os.path.join(config.getHtdocsDir(), 'static', 'assets'),
                                       '{0}/static/assets/'.format(url_path))
         self._asset_env.config['PYSCSS_LOAD_PATHS'] = [os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass')]
-        self._asset_env.config['PYSCSS_DEBUG_INFO'] = Config.getInstance().getSCSSDebugInfo()
+        self._asset_env.config['PYSCSS_DEBUG_INFO'] = debug and Config.getInstance().getSCSSDebugInfo()
 
         self._asset_env.append_path(config.getHtdocsDir(), '/')
         self._asset_env.append_path(os.path.join(config.getHtdocsDir(), 'css'), '{0}/css'.format(url_path))
         self._asset_env.append_path(os.path.join(config.getHtdocsDir(), 'js'), '{0}/js'.format(url_path))
-
-        if db_connected:
-            debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
-        else:
-            debug = False
 
         # This is done in order to avoid the problem sending the error report because the DB is not connected.
         if db_connected:
