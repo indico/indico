@@ -41,6 +41,8 @@ from MaKaC.review import AbstractStatusSubmitted
 from MaKaC.review import AbstractTextField
 from MaKaC.common.TemplateExec import render
 
+from indico.util.string import m
+
 
 class WConfCFADeactivated(WConfDisplayBodyBase):
 
@@ -266,6 +268,15 @@ class WPAbstractDisplayBase( WPConferenceDefaultDisplayBase ):
         WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
         self._navigationTarget = self._abstract = abstract
 
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
+            self._asset_env['pagedown_sass'].urls()
+
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
+            self._includeJSPackage('Management') + \
+            self._asset_env['pagedown_js'].urls()
+
 
 class WAbstractCannotBeModified( wcomponents.WTemplated ):
 
@@ -451,7 +462,7 @@ class WPAbstractModify(WPAbstractDisplayBase):
     def getJSFiles(self):
         return WPAbstractDisplayBase.getJSFiles(self) + \
             self._includeJSPackage('Management') + \
-            self._asset_env['mathjax'].urls()
+            self._asset_env['mathjax_js'].urls()
 
     def _getBody(self, params):
         params["postURL"] = urlHandlers.UHAbstractModify.getURL(self._abstract)
@@ -716,9 +727,9 @@ class WAbstractManagment(wcomponents.WTemplated):
             html += """
                     <tr>
                         <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">%s</span></td>
-                        <td bgcolor="white" valign="top"><table class="tablepre"><tr><td><pre>%s</pre></td></tr></table></td>
+                        <td bgcolor="white" valign="top"><table class="tablepre"><tr><td><pre><div style="white-space: nowrap;">%s</div></pre></td></tr></table></td>
                     </tr>
-                """ % (self.htmlText(caption), self.htmlText(value))
+                """ % (self.htmlText(caption), m(self.htmlText(value))))
         return html
 
     def getVars(self):
