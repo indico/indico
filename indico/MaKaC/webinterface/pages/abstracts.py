@@ -395,9 +395,7 @@ class WAbstractDataModification(WConfDisplayBodyBase):
                     limitation = f.getLimitation()
                     if maxLength > 0:  # it means there is a limit for the field in words or in characters
                         self._limitedFieldList.append(["f_"+id, maxLength, "maxLimitionCounter_"+id.replace(" ", "_"), limitation, str(f.isMandatory())])  # append the textarea/input id
-                    elif f.isMandatory():
-                        self._mandatoryFieldList.append("f_"+id)
-                elif f.isMandatory():
+                if f.isMandatory():
                     self._mandatoryFieldList.append("f_"+id)
 
     def getVars(self):
