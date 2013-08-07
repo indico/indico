@@ -157,7 +157,8 @@ indico_jquery = Bundle(
 
                'defaults.js',
                'global.js',
-               'multiselect.js'),
+               'multiselect.js',
+               'fieldarea.js'),
     filters='rjsmin', output='js/indico_jquery_%(version)s.min.js')
 
 indico_jquery_authors = Bundle('js/indico/jquery/authors.js',
@@ -213,7 +214,6 @@ jquery = Bundle(
         'jquery.multiselect.filter.js',
         'jstorage.js',
         'jquery.watermark.js',
-        'jquery.ui.fieldarea.js',
         'jquery.placeholder.js'),
     filters='rjsmin', output='js/jquery_code_%(version)s.min.js')
 
