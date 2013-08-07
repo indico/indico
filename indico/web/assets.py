@@ -127,9 +127,6 @@ indico_timetable = Bundle(
                'Management.js'),
     filters='rjsmin', output='js/indico_timetable_%(version)s.min.js')
 
-indico_collaboration = Bundle('js/indico/Collaboration/Collaboration.js',
-                              filters='rjsmin', output='js/indico_collaboration_%(version)s.min.js')
-
 indico_legacy = Bundle(
     *namespace('js/indico/Legacy',
 
