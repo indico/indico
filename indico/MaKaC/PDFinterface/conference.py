@@ -687,11 +687,6 @@ class ContribToPDF(PDFBase):
         style = ParagraphStyle({})
         style.fontName = "LinuxLibertine"
         style.fontSize = 9
-        #p = Paragraph(escape(self._contrib.getDescription()), style, part=escape(self._contrib.getTitle()))
-        #story.append(p)
-
-        #story.append(Spacer(inch, 0.2*cm, part=escape(self._contrib.getTitle())))
-
         for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             fid = field.getId()
             name = field.getCaption()
@@ -918,7 +913,7 @@ class ContributionBook(PDFBase):
                 lspk.append("%s"%escape(fullName))
             speakers= i18nformat("""<b>_("Presenter"): %s</b>""")%"; ".join(lspk)
             p2=Paragraph(speakers,self._styles["speakers"])
-            abstract=str(contrib.getDescription())
+            abstract = contrib.getDescription()
             p3=Paragraph(escape(abstract),self._styles["abstract"])
             ses=""
             if contrib.getSession() is not None:
@@ -2050,7 +2045,7 @@ class AbstractBook(PDFWithTOC):
             if speakersEmail:
                 speakers = i18nformat("""<b>_("Corresponding %s"):</b> %s""")%(ngettext("Author", "Authors", len(speakersEmail)), ", ".join(speakersEmail))
                 paragraphs.append(Paragraph(escape(speakers),self._styles["normal"]))
-        abstract = str(contrib.getDescription())
+        abstract = contrib.getDescription()
         paragraphs.append(Paragraph(escape(abstract), self._styles["abstract"]))
 
         abs=KeepTogether(paragraphs)

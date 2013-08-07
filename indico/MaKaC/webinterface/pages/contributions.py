@@ -792,7 +792,7 @@ class WContributionDataModification(wcomponents.WTemplated):
         vars["boardNumber"] = quoteattr(str(self._contrib.getBoardNumber()))
         vars["contrib"] = self._contrib
         vars["title"] = quoteattr(self._contrib.getTitle())
-        vars["description"] = self.htmlText(str(self._contrib.getDescription()))
+        vars["description"] = self.htmlText(self._contrib.getDescription())
         vars["additionalFields"] = self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields()
         vars["fieldDict"] = self._getAdditionalFieldsData()
         vars["day"] = ""

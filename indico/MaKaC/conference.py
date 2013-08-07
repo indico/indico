@@ -8131,7 +8131,7 @@ class Contribution(CommonObjectBase, Locatable):
         return self.title
 
     def getDescription(self):
-        return self.getField("content")
+        return str(self.getField("content"))
 
     def setDescription(self, desc):
         self.setField("content", desc)

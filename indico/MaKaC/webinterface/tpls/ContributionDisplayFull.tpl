@@ -42,16 +42,16 @@
 
 <%block name="detail">
     % if not Contribution.getConference().getAbstractMgr().isActive() or not Contribution.getConference().hasEnabledSection("cfa") or not Contribution.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-        % if str(Contribution.getDescription()).strip()!="":
+        % if Contribution.getDescription().strip()!="":
         <div class="contributionSection">
             <h2 class="contributionSectionTitle">Description</h2>
-            <div class="contributionSectionContent">${str(Contribution.getDescription())}</div>
+            <div class="contributionSectionContent">${Contribution.getDescription()}</div>
         </div>
         % endif
     % else:
         % for f in Contribution.getConference().getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             % if Contribution.getField(f.getId()):
-            <% content = str(Contribution.getField(f.getId())) %>
+            <% content = Contribution.getField(f.getId()) %>
             <div class="contributionSection">
                 <h2 class="contributionSectionTitle">${f.getCaption()}</h2>
                 <div class="contributionSectionContent">${content | h}</div>
