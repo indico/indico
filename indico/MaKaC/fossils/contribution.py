@@ -62,7 +62,6 @@ class IContributionFossil(IFossil):
 
     def getDescription(self):
         pass
-    getDescription.convert = lambda d: str(d)
 
     def getReviewManager(self):
         pass

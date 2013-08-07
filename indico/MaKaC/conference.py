@@ -7731,6 +7731,11 @@ class Contribution(CommonObjectBase, Locatable):
         self.notifyModification(cleanCache=False)
 
     def getFields(self, valueonly=False):
+        try:
+            if self._fields:
+                pass
+        except AttributeError:
+            self._fields = {}
         if not valueonly:
             return self._fields
         else:

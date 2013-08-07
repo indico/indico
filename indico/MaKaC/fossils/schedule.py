@@ -145,7 +145,7 @@ class IContribSchEntryFossil(ISchEntryFossil):
 
     def getDescription(self):
         """ Entry Description """
-    getDescription.produce = lambda s: str(s.getOwner().getDescription())
+    getDescription.produce = lambda s: s.getOwner().getDescription()
 
     def getRoom(self):
         """ Entry Room """
