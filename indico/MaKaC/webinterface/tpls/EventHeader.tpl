@@ -23,7 +23,7 @@ else:
     dark_ = False;
 %>
 % if Config.getInstance().getMobileURL():
-    <%include file="MobileDetection.tpl"/>
+    <%include file="MobileDetection.tpl" args="conf=conf"/>
 % endif
 <%include file="Announcement.tpl"/>
 
