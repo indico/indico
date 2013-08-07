@@ -228,11 +228,11 @@ class AbstractToPDF(PDFBase):
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
 
         for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
-            id = field.getId()
+            fid = field.getfId()
             name = field.getCaption()
-            value = str(self._abstract.getField(id)).strip()
+            value = str(self._abstract.getField(fid)).strip()
             if value:  # id not in ["content"] and
-                if name != "Content" and name != "Summary":
+                if fid != "content" and fid != "summary":
                     text = "%s: %s" % (name, value)
                     p = SimpleParagraph(text, spaceAfter=5)
                     story.append(p)
