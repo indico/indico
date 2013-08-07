@@ -102,4 +102,26 @@ rbWidget.setDateTimeInfo(info);
             injectValuesInForm($E('ContributionDataModificationForm'));
         });
 
+
+// Pagedown editor stuff
+
+function block_handler(text, rbg) {
+    return text.replace(/^ {0,3}""" *\n((?:.*?\n)+?) {0,3}""" *$/gm, function (whole, inner) {
+        return "<blockquote>" + rbg(inner) + "</blockquote>\n";
+    });
+}
+
+$(function() {
+    $('textarea.wmd-input').each(function(i, elem) {
+        var fieldId = $(elem).closest('td').data('fieldId');
+
+        converter = Markdown.getSanitizingConverter();
+        converter.hooks.chain("preBlockGamut", block_handler);
+
+        var editor = new Markdown.Editor(converter, "-" + fieldId);
+        PageDownMathJax.mathjaxEditing().prepareWmdForMathJax(editor, "-" + fieldId, [["$$", "$$"], ["\\\\(","\\\\)"]]);
+        editor.run();
+    });
+});
+
 </script>
