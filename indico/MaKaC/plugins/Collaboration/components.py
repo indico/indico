@@ -287,16 +287,18 @@ class EventCollaborationListener(Component):
     @classmethod
     def locationChanged(cls, obj, oldLocation, newLocation):
         csBookingManager = obj.getCSBookingManager()
-        for booking in csBookingManager.getBookingList():
-            booking.unindex_talk(obj)
-            booking.index_talk(obj)
+        if obj.getStartDate() is not None:
+            for booking in csBookingManager.getBookingList():
+                booking.unindex_talk(obj)
+                booking.index_talk(obj)
 
     @classmethod
     def roomChanged(cls, obj, oldLocation, newLocation):
         csBookingManager = obj.getCSBookingManager()
-        for booking in csBookingManager.getBookingList():
-            booking.unindex_talk(obj)
-            booking.index_talk(obj)
+        if obj.getStartDate() is not None:
+            for booking in csBookingManager.getBookingList():
+                booking.unindex_talk(obj)
+                booking.index_talk(obj)
 
     @classmethod
     def cloneEvent(cls, confToClone, params):
