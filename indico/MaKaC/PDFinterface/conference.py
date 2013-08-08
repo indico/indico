@@ -228,7 +228,7 @@ class AbstractToPDF(PDFBase):
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
 
         for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
-            fid = field.getfId()
+            fid = field.getId()
             name = field.getCaption()
             value = str(self._abstract.getField(fid)).strip()
             if value:  # id not in ["content"] and
@@ -692,20 +692,29 @@ class ContribToPDF(PDFBase):
             name = field.getCaption()
             value = str(self._contrib.getField(fid)).strip()
             if value: #id not in ["content"] and
-                styleHead = ParagraphStyle({})
-                # styleHead.firstLineIndent = -55
-                # styleHead.leftIndent = 45
-                text = "<b>%s</b>:" % name
-                p = Paragraph(text, styleHead, part=escape(self._contrib.getTitle()))
-                story.append(p)
-                l=value.split("\n")
-                res=[]
-                for line in l:
-                    res.append(fill(line,85))
-                res="\n".join(res)
-                p = Paragraph(escape(res), style, part=escape(self._contrib.getTitle()))
-                story.append(p)
+                if isinstance(field, review.AbstractTextAreaField):
+                    styleHead = ParagraphStyle({})
+                    # styleHead.firstLineIndent = -55
+                    # styleHead.leftIndent = 45
+                    text = "<b>%s</b>:" % name
+                    p = Paragraph(text, styleHead, part=escape(self._contrib.getTitle()))
+                    story.append(p)
+                    l = value.split("\n")
+                    res = []
+                    for line in l:
+                        res.append(fill(line, 85))
+                    res = "\n".join(res)
+                    p = Paragraph(escape(res), style, part=escape(self._contrib.getTitle()))
+                    story.append(p)
+                else:
+                    styleHead = ParagraphStyle({})
+                    # styleHead.firstLineIndent = -55
+                    # styleHead.leftIndent = 45
+                    text = "<b>%s</b>: %s" % (name, value)
+                    p = Paragraph(text, styleHead, part=escape(self._contrib.getTitle()))
+                    story.append(p)
                 story.append(Spacer(inch, 0.2*cm, part=escape(self._contrib.getTitle())))
+
 
         story.append(Spacer(inch, 0.5*cm, part=escape(self._contrib.getTitle())))
 
