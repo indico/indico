@@ -488,7 +488,8 @@ var contributionTemplate = function(contribution) {
     var cell3 = Html.td({className:'contributionDataCell'});
     // Sadly this hack is necessary to get the link since getURL() needs a Contribution object (from Indico, not the local one from Javascript)
     // and contributions are loaded asynchronously...
-    linkString = "${ urlHandlers.UHContributionModifReviewing.getURL() }" + "?contribId=" + contribution.id + "&confId=${ Conference.getId()}"
+    var url_template = ${ url_rule_to_js('event_mgmt.contributionReviewing') | n,j };
+    var linkString = build_url(url_template, {contribId: contribution.id, confId: ${ Conference.getId() | n,j}});
     var link = Html.a({href: linkString});
     link.set(contribution.title);
     cell3.set(link);
