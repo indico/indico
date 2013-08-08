@@ -371,9 +371,11 @@ class VidyoOperations(object):
             roomName = booking.getBookingParamByName("roomName")
         else:
             roomName = ""
-        endPoint = roomIp or roomPanoramaUser
         try:
-            answer = RavemApi.disconnectLegacyEndpoint(endPoint, serviceType, roomName)
+            if roomIp != "":
+                answer = RavemApi.disconnectLegacyEndpoint(roomIp, serviceType, roomName)
+            else:
+                answer = RavemApi.disconnectVidyoPanorama(roomPanoramaUser, serviceType, roomName)
             if not answer.ok or "error" in answer.json():
                 Logger.get('Vidyo').exception("""Evt:%s, booking:%s,
                                               Ravem API's disconnect operation not successfull: %s""" %
