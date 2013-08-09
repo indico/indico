@@ -961,7 +961,7 @@ type("ChildrenProtectionPopup", ["ExclusivePopup"], {
 
     draw: function() {
         var self = this;
-        var container = $("<table/>").attr("cellspacing", 0);
+        var container = $("<table/>").attr("cellspacing", 0).css("margin-bottom", "5px");
         each(this.elementList, function(element) {
             var className = (self.elementList.length.get() != self.elementList.indexOf(element) + 1)?"CRLabstractDataCell":"CRLLastDataCell";
             var row = $("<tr/>").css("color","#444444");
@@ -976,7 +976,7 @@ type("ChildrenProtectionPopup", ["ExclusivePopup"], {
             row.append($("<td/>").attr("nowrap", "nowrap").addClass(className).append(link));
             container.append(row);
         });
-        return this.ExclusivePopup.prototype.draw.call(this, container, {margin: pixels(5), minWidth: pixels(300), maxWidth: pixels(this.width)});
+        return this.ExclusivePopup.prototype.draw.call(this, container, {margin: pixels(5), minWidth: pixels(300), maxWidth: pixels(this.width),  maxHeight: pixels(this.height)});
     },
     postDraw: function(){
         this.ExclusivePopup.prototype.postDraw.call(this);
@@ -987,6 +987,7 @@ type("ChildrenProtectionPopup", ["ExclusivePopup"], {
          this.elementList = $L(elementList);
          this.title = title;
          this.width = 450;
+         this.height = window.innerHeight*0.8;
          this.ExclusivePopup(this.title, null, true, true);
      }
     );
