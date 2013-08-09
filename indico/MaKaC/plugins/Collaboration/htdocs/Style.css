@@ -90,7 +90,7 @@ form.EAChoiceButton{
     border-color: #999;
 }
 
-.left {
+.leftButton {
     -webkit-border-top-right-radius: 0;
     -moz-border-radius-topright: 0;
     border-top-right-radius: 0;
@@ -99,7 +99,7 @@ form.EAChoiceButton{
     border-bottom-right-radius: 0;
 }
 
-.right {
+.rightButton {
     -webkit-border-top-left-radius: 0;
     -moz-border-radius-topleft: 0;
     border-top-left-radius: 0;
