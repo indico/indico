@@ -26,9 +26,10 @@ from MaKaC.common import db
 from MaKaC.common.logger import Logger
 
 
-from indico.modules.scheduler import SchedulerModule, base, tasks
+from indico.modules.scheduler import SchedulerModule, base
+from indico.modules.scheduler.tasks.periodic import PeriodicTask, TaskOccurrence
 from indico.modules.scheduler.slave import ProcessWorker, ThreadWorker
-from indico.util.date_time import nowutc, int_timestamp
+from indico.util.date_time import int_timestamp
 
 
 class Scheduler(object):
@@ -170,10 +171,10 @@ class Scheduler(object):
         task.setStatus(status)
 
         # if it's a periodic task, do some extra things
-        if isinstance(task, tasks.PeriodicTask):
+        if isinstance(task, PeriodicTask):
             # prepare an "occurrence" object
 
-            occurrence = tasks.TaskOccurrence(task)
+            occurrence = TaskOccurrence(task)
 
             task.addOccurrence(occurrence)
 
@@ -441,7 +442,7 @@ class Scheduler(object):
         """
         """
 
-        if isinstance(task, tasks.PeriodicTask):
+        if isinstance(task, PeriodicTask):
             # don't let periodic tasks respawn
             task.dontComeBack()
             self._dbi.commit()

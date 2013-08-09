@@ -20,7 +20,7 @@
 from MaKaC.common import DBMgr
 from indico.modules import ModuleHolder
 from MaKaC.common.timezoneUtils import nowutc
-from indico.modules.scheduler.tasks import PeriodicTask
+from indico.modules.scheduler.tasks.periodic import PeriodicTask
 from datetime import timedelta
 
 

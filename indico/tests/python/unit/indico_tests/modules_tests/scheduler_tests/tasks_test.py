@@ -21,7 +21,8 @@ import unittest
 from datetime import datetime, timedelta
 from dateutil import rrule
 
-from indico.modules.scheduler.tasks import PeriodicTask
+from indico.modules.scheduler.tasks.periodic import PeriodicTask
+
 
 class TestPeriodicTask(unittest.TestCase):
 

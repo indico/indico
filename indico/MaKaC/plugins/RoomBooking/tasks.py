@@ -20,7 +20,8 @@
 from MaKaC.plugins.base import Observable
 from MaKaC.rb_location import ReservationGUID
 
-from indico.modules.scheduler.tasks import OneShotTask, PeriodicUniqueTask
+from indico.modules.scheduler.tasks import OneShotTask
+from indico.modules.scheduler.tasks.periodic import PeriodicUniqueTask
 
 
 class RoomReservationEndTask(OneShotTask, Observable):

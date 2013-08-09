@@ -29,7 +29,8 @@ from MaKaC.common.db import DBMgr
 
 from indico.util.date_time import nowutc
 from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
-from indico.modules.scheduler.tasks import OneShotTask, PeriodicTask
+from indico.modules.scheduler.tasks import OneShotTask
+from indico.modules.scheduler.tasks.periodic import PeriodicTask
 from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase
 
 terminated = None

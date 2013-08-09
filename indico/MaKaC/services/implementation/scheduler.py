@@ -26,7 +26,6 @@ from MaKaC.services.interface.rpc.common import ServiceError
 
 from indico.modules import ModuleHolder
 from indico.modules.scheduler import Client
-from indico.modules.scheduler.tasks import OneShotTask, PeriodicTask
 from indico.util import fossilize, date_time
 
 
