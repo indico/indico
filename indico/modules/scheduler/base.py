@@ -17,9 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import time, types
+import time
+import types
 from ZODB.POSException import ConflictError
-from MaKaC.common import DBMgr
 
 from indico.util.date_time import nowutc
 
@@ -50,7 +50,7 @@ class OperationManager(object):
     def __call__(self, zelf, *args, **kwargs):
         # some magic introspection
         logger = zelf._logger
-        dbi = DBMgr.getInstance()
+        dbi = zelf._dbi
         sync = False
 
         logger.debug("START Critical section around  %s" % self._f.__name__)

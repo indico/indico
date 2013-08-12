@@ -132,6 +132,7 @@ def _start(args):
             print pid
             return
         else:
+            DBMgr.setInstance(None)
             SchedulerApp(args).run()
 
         return 0
