@@ -21,29 +21,45 @@ import unittest
 from datetime import datetime, timedelta
 from dateutil import rrule
 
-from indico.modules.scheduler.tasks.periodic import PeriodicTask
+from indico.modules.scheduler.tasks.periodic import PeriodicTask, TaskOccurrence
 
 
 class TestPeriodicTask(unittest.TestCase):
 
     def testPeriodicTaskFrequency(self):
-        dt = datetime(2010,1,1,20,0,0)
-        pt = PeriodicTask(rrule.MINUTELY, dtstart = dt)
-        self.assertEqual(pt.getStartOn(), datetime(2010,1,1,20,0,0))
-        pt.setNextOccurrence(dateAfter = dt)
-        self.assertEqual(pt.getStartOn(), datetime(2010,1,1,20,1,0))
+        dt = datetime(2010, 1, 1, 20, 0, 0)
+        pt = PeriodicTask(rrule.MINUTELY, dtstart=dt)
+        self.assertEqual(pt.getStartOn(), datetime(2010, 1, 1, 20, 0, 0))
+        pt.setNextOccurrence(dateAfter=dt)
+        self.assertEqual(pt.getStartOn(), datetime(2010, 1, 1, 20, 1, 0))
 
-        pt = PeriodicTask(rrule.HOURLY, dtstart = dt)
-        self.assertEqual(pt.getStartOn(), datetime(2010,1,1,20,0,0))
-        pt.setNextOccurrence(dateAfter = dt)
-        self.assertEqual(pt.getStartOn(), datetime(2010,1,1,21,0,0))
+        pt = PeriodicTask(rrule.HOURLY, dtstart=dt)
+        self.assertEqual(pt.getStartOn(), datetime(2010, 1, 1, 20, 0, 0))
+        pt.setNextOccurrence(dateAfter=dt)
+        self.assertEqual(pt.getStartOn(), datetime(2010, 1, 1, 21, 0, 0))
 
     def testPeriodicTaskNoMoreLeft(self):
-        dt = datetime(2010,1,1,20,0,0)
+        dt = datetime(2010, 1, 1, 20, 0, 0)
         # date + 1 month
-        pt = PeriodicTask(rrule.YEARLY, dtstart = dt, until = dt + timedelta(days = 30))
-        self.assertEqual(pt.getStartOn(), datetime(2010,1,1,20,0,0))
-        pt.setNextOccurrence(dateAfter = dt)
+        pt = PeriodicTask(rrule.YEARLY, dtstart=dt, until=dt + timedelta(days=30))
+        self.assertEqual(pt.getStartOn(), datetime(2010, 1, 1, 20, 0, 0))
+        pt.setNextOccurrence(dateAfter=dt)
         self.assertEqual(pt.getStartOn(), None)
-        pt.setNextOccurrence(dateAfter = dt)
+        pt.setNextOccurrence(dateAfter=dt)
         self.assertEqual(pt.getStartOn(), None)
+
+    def testPeriodicTaskOrder(self):
+        dt = datetime(2010, 1, 1, 20, 0, 0)
+        pt = PeriodicTask(rrule.MINUTELY, dtstart=dt)
+        pt.id = 0
+        pt2 = PeriodicTask(rrule.MINUTELY, dtstart=dt)
+        pt2.id = 1
+        for i in range(5):
+            pt.addOccurrence(TaskOccurrence(pt))
+            pt2.addOccurrence(TaskOccurrence(pt2))
+        self.assertEqual(cmp(pt, pt2), -1)
+        self.assertEqual(cmp(pt._occurrences[0], pt2), -1)
+        self.assertEqual(cmp(pt._occurrences[0], pt), 1)
+        self.assertEqual(cmp(pt._occurrences[0], pt._occurrences[1]), -1)
+        self.assertEqual(cmp(pt._occurrences[0], pt._occurrences[0]), 0)
+        self.assertEqual(cmp(pt._occurrences[0], pt2._occurrences[0]), -1)
