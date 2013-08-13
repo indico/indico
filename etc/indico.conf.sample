@@ -236,8 +236,13 @@ MaxUploadFileSize = 0
 #                                          })]
 #
 #
+# Please note that some authentication systems may require extra dependency libs.
+# For instance, for LDAP authentication, you will also need to install the python-ldap lib:
 #
-# For instance if you want to setup the LDAP Authenticator you should define as following:
+#  $ pip install python-ldap
+#
+#
+# As an example if you want to setup the LDAP Authenticator you should define as following:
 #
 # AuthenticatorList  = [('LDAP', { 'host': 'myldapserver.example.com',
 #
@@ -256,7 +261,6 @@ MaxUploadFileSize = 0
 #                                   # access credentials of a user with read access
 #                                    'accessCredentials': ('CN=user,OU=Users,DC=example,DC=com','secret_password')
 #                                   }
-#
 #
 #
 # The default configuration will use only Indico's authentication system.
