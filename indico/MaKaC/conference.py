@@ -7753,10 +7753,10 @@ class Contribution(CommonObjectBase, Locatable):
         if not valueonly:
             return self._fields
         else:
-            return {k: (v.value if isinstance(v, AbstractFieldContent) else v) for k, v in self._fields.iteritems()}
+            return dict((k, v.value if isinstance(v, AbstractFieldContent) else v) for k, v in self._fields.iteritems())
 
     def removeField(self, field):
-        if self.getFields().has_key(field):
+        if field in self.getFields():
             del self.getFields()[field]
             self.notifyModification()
 
