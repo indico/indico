@@ -159,6 +159,9 @@ def handler(prefix, path):
     onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
     onlyAuthed = get_query_parameter(queryParams, ['oa', 'onlyauthed'], 'no') == 'yes'
     oauthToken = 'oauth_token' in queryParams
+    # Check if OAuth data is supplied in the Authorization header
+    if not oauthToken and request.headers.get('Authorization') is not None:
+        oauthToken = 'oauth_token' in request.headers.get('Authorization')
 
     # Get our handler function and its argument and response type
     hook, dformat = HTTPAPIHook.parseRequest(path, queryParams)
