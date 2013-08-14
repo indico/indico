@@ -492,7 +492,7 @@ class CSBooking(CSBookingBase):
                 # otherwise, replace whatever call is going on
                 ExternalOperationsManager.execute(
                     self, "disconnectRoom", VidyoOperations.disconnectRoom,
-                    self, connectionStatus.get("service"), confRoomIp, confRoomPanoramaUser)
+                    self, connectionStatus, confRoomIp, confRoomPanoramaUser)
 
                 retry = 15
                 connected = True
@@ -533,7 +533,7 @@ class CSBooking(CSBookingBase):
             return VidyoError("alreadyDisconnected", "disconnect",
                               _("It seems that the room has been already disconnected, please refresh the page"))
         result = ExternalOperationsManager.execute(self, "disconnectRoom", VidyoOperations.disconnectRoom, self,
-                                                   connectionStatus.get("service"), confRoomIp, confRoomPanoramaUser)
+                                                   connectionStatus, confRoomIp, confRoomPanoramaUser)
         if isinstance(result, VidyoError):
             return result
         return self

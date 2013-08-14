@@ -23,7 +23,7 @@
 import zipfile
 import tempfile
 import string, sys, os
-from datetime import timedelta,datetime
+from datetime import timedelta, datetime
 
 from indico.util.date_time import format_date
 
@@ -35,32 +35,33 @@ from MaKaC.common.Configuration import Config
 from MaKaC.PDFinterface.conference import ProceedingsTOC, ProceedingsChapterSeparator
 from MaKaC.i18n import _
 
+
 class ZIPFileHandler:
 
     def __init__(self):
-        (fh,name)=tempfile.mkstemp(prefix="Indico",dir=Config.getInstance().getTempDir())
+        (fh, name) = tempfile.mkstemp(prefix="Indico", dir=Config.getInstance().getTempDir())
         os.fdopen(fh).close()
         try:
-            self._file=zipfile.ZipFile(name,"w", zipfile.ZIP_DEFLATED, allowZip64=True)
+            self._file = zipfile.ZipFile(name, "w", zipfile.ZIP_DEFLATED, allowZip64=True)
         except:
-            self._file=zipfile.ZipFile(name,"w", allowZip64=True)
+            self._file=zipfile.ZipFile(name, "w", allowZip64=True)
         self._name=name
 
-    def _normalisePath(self,path):
-        forbiddenChars=string.maketrans(" :()*?<>|\"","__________")
-        path=path.translate(forbiddenChars)
+    def _normalisePath(self, path):
+        forbiddenChars = string.maketrans(" :()*?<>|\"", "__________")
+        path = path.translate(forbiddenChars)
         return path
 
-    def add(self,name,path):
+    def add(self, name, path):
         name = utf8rep(name)
-        self._file.write(str(path),self._normalisePath(name))
+        self._file.write(str(path), self._normalisePath(name))
 
     def addNewFile(self, name, bytes):
         if not self.hasFile(name):
             name = utf8rep(name)
             self._file.writestr(name, bytes)
 
-    def addDir(self,path):
+    def addDir(self, path):
         normalized_path = os.path.join(self._normalisePath(path), "indico_file.dat")
         if not self.hasFile(normalized_path):
             self.addNewFile(normalized_path, "# Indico File")
@@ -76,6 +77,7 @@ class ZIPFileHandler:
             if zfile.filename == fileName:
                 return True
         return False
+
 
 class AbstractPacker:
     """

@@ -101,7 +101,7 @@ IndicoUI.Buttons = {
      * Returns a text with a 'play' icon
      */
     playButtonText: function(text, position){
-        return Html.div({className: 'buttonWithPlay ' + position }, text);
+        return Html.div({className: 'buttonWithPlay ' + "{0}Button".format(position) }, text);
     },
     /**
      * Returns an image with an 'stop' icon

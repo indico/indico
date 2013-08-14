@@ -411,19 +411,23 @@ class Scheduler(object):
         pair = self._db_popFromSpool()
 
         while pair:
-            op, obj = pair
+            try:
+                op, obj = pair
 
-            if op == 'add':
-                self._db_addTaskToQueue(obj)
-            elif op == 'change':
-                # pass oldTS and task
-                self._db_changeTaskStartDate(*obj)
-            elif op == 'del':
-                self._db_deleteTaskFromQueue(obj)
-            elif op == 'shutdown':
-                raise base.SchedulerQuitException(obj)
-            else:
-                raise base.SchedulerUnknownOperationException(op)
+                if op == 'add':
+                    self._db_addTaskToQueue(obj)
+                elif op == 'change':
+                    # pass oldTS and task
+                    self._db_changeTaskStartDate(*obj)
+                elif op == 'del':
+                    self._db_deleteTaskFromQueue(obj)
+                elif op == 'shutdown':
+                    raise base.SchedulerQuitException(obj)
+                else:
+                    raise base.SchedulerUnknownOperationException(op)
+            except Exception, e:
+                self._logger.exception('Exception in task %s: %s' % (obj, e))
+                raise
             pair = self._db_popFromSpool()
 
     def _sleep(self, msg):

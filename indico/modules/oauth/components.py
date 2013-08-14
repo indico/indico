@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import time
+from datetime import timedelta
 import oauth2 as oauth
 from flask import request
 from random import choice
@@ -29,6 +29,8 @@ from indico.web.flask.util import create_flat_args
 from indico.modules.oauth.errors import OAuthError
 from MaKaC.common.logger import Logger
 from MaKaC.common.Configuration import Config
+from MaKaC.common.timezoneUtils import nowutc
+
 
 
 class IIndexableByUserId(Interface):
@@ -52,19 +54,20 @@ class UserOAuthAccessTokenIndex(OOIndex):
     def initialize(self, dbi=None):
         pass
 
+
 class OAuthUtils:
     @classmethod
-    def OAuthCheckAccessResource(cls):
+    def OAuthCheckAccessResource(cls, req, query_string):
         from indico.modules.oauth.db import ConsumerHolder, AccessTokenHolder, OAuthServer
 
-        oauth_request = oauth.Request.from_request(request.method, request.base_url, request.headers,
-                                                   parameters=create_flat_args())
+        oauth_request = oauth.Request.from_request(req.get_method(), req.construct_url(req.get_uri()),
+                                                   headers=req.headers_in, query_string=urlencode(query_string))
         Logger.get('oauth.resource').info(oauth_request)
         try:
-            now = time.time()
+            now = nowutc()
             consumer_key = oauth_request.get_parameter('oauth_consumer_key')
             if not ConsumerHolder().hasKey(consumer_key):
-                raise OAuthError('Invalid Consumer Key', 401)
+                raise OAuthError('Invalid Consumer Key', apache.HTTP_UNAUTHORIZED)
             consumer = ConsumerHolder().getById(consumer_key)
             token = oauth_request.get_parameter('oauth_token')
             if not token or not AccessTokenHolder().hasKey(token):
@@ -73,9 +76,9 @@ class OAuthUtils:
             oauth_consumer = oauth.Consumer(consumer.getId(), consumer.getSecret())
             OAuthServer.getInstance().verify_request(oauth_request, oauth_consumer, access_token.getToken())
             if access_token.getConsumer().getId() != oauth_consumer.key:
-                raise OAuthError('Invalid Consumer Key', 401)
-            elif (now - access_token.getTimestamp()) > Config.getInstance().getOAuthAccessTokenTTL():
-                raise OAuthError('Expired Token', 401)
+                raise OAuthError('Invalid Consumer Key', apache.HTTP_UNAUTHORIZED)
+            elif (now - access_token.getTimestamp()) > timedelta(seconds=Config.getInstance().getOAuthAccessTokenTTL()):
+                raise OAuthError('Expired Token', apache.HTTP_UNAUTHORIZED)
             return access_token
         except oauth.Error, e:
             if e.message.startswith("Invalid Signature"):

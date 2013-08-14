@@ -1,3 +1,4 @@
+<%page args="conf=None"/>
 <div class="mobile-device-header" style="display:none">
     <div class="text">${_("There is a Mobile version of Indico. Would you like to try it?")}</div>
     <div class="i-buttons">
@@ -9,10 +10,12 @@
  <script type="text/javascript">
      $("#useMobile").click(function(){
          var url = "${Config.getInstance().getMobileURL()}";
-         var confId = $.urlParam("confId");
-         if(confId){
-             url += "/event/"+confId;
-         }
+         % if conf :
+             url += "/event/"+${conf.getId()};
+             % if conf.hasAnyProtection():
+                   url += "?pr=yes";
+             % endif
+         % endif
          window.location.href=url;
      });
 

@@ -11,10 +11,12 @@ else:
         ${_("Classic")} | <a id="mobileURL" style="font-size:11px !important" href="${Config.getInstance().getMobileURL()}"><span class="icon icon-mobile"></span>${_("Mobile")}</a>
     </div>
      <script type="text/javascript">
-         var confId = $.urlParam("confId");
-         if(confId){
-            $("#mobileURL").prop("href", $("#mobileURL").prop("href") + "/event/"+confId);
-         }
+         % if conf:
+             $("#mobileURL").prop("href", $("#mobileURL").prop("href") + "/event/"+${conf.getId()});
+             % if conf.hasAnyProtection():
+                  $("#mobileURL").prop("href", $("#mobileURL").prop("href") + "?pr=yes");
+             % endif
+         % endif
          if($.mobileBrowser) {
                 $(".mobile-footer").show();
          }
