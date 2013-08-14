@@ -26,7 +26,7 @@ class MeetingBase(LectureBase):
         super(MeetingBase, self).setUp(event)
 
     def test_timetable(self):
-        self.go("/confModifSchedule.py?confId=0#20110711")
+        self.go("/event/0/manage/timetable/#20110711")
         self.click(ltext="Add new")
         self.click(ltext="Session")
         self.type(id="sessionTitle", text="Session 1")
