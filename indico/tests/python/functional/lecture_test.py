@@ -132,7 +132,7 @@ class LectureBase(object):
         self.type(id="userSearchFocusField", text="fake")
         self.click(css="input[type=\"button\"]")
         self.click(id="_GID1_existingAv0")
-        self.click(xpath="//button[@type='button']")
+        self.click(css="button.ui-button")
 
         # wait for overlay to go away
         self.wait_remove(css='.ui-widget-overlay')
@@ -142,10 +142,10 @@ class LectureBase(object):
         self.type(id="_GID3", text="Ficticio")
         self.type(id="_GID4", text="Joaquim")
         self.type(xpath="(//input[@type='text'])[3]", text="CERN")
-        self.click(xpath="//button[@type='button']")
+        self.click(css="button.ui-button")
         self.click(id="_GID5")
         self.type(id="_GID5", text="ficticio.joaquim@example.com")
-        self.click(xpath="//button[@type='button']")
+        self.click(css="button.ui-button")
         self.click(id="checkParticipant2")
         self.click(id="remove_users")
 
@@ -213,7 +213,7 @@ class LectureBase(object):
         self.click(name="submit")
         self.click(xpath="//li")
         self.click(css=".ui-tabs-nav li a")
-        self.click(name="reinit")
+        self.click(id="reinit")
         self.click(css="button.ui-button")
         self.click(css="div > input.btn")
         edate = self.elem(css="#eDatePlace > div.dateField > input[type=text]")
