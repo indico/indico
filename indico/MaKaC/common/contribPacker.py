@@ -22,7 +22,8 @@
 
 import zipfile
 import tempfile
-import string, sys, os
+import string
+import os
 from datetime import timedelta, datetime
 
 from indico.util.date_time import format_date
@@ -44,8 +45,8 @@ class ZIPFileHandler:
         try:
             self._file = zipfile.ZipFile(name, "w", zipfile.ZIP_DEFLATED, allowZip64=True)
         except:
-            self._file=zipfile.ZipFile(name, "w", allowZip64=True)
-        self._name=name
+            self._file = zipfile.ZipFile(name, "w", allowZip64=True)
+        self._name = name
 
     def _normalisePath(self, path):
         forbiddenChars = string.maketrans(" :()*?<>|\"", "__________")

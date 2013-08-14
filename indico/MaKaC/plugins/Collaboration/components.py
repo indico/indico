@@ -315,7 +315,6 @@ class EventCollaborationListener(Component):
             return
         obj.notifyLocationChange()
 
-
     def locationChanged(cls, obj, oldLocation, newLocation):
         csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         if obj.getStartDate() is not None:
@@ -323,14 +322,12 @@ class EventCollaborationListener(Component):
                 booking.unindex_talk(obj)
                 booking.index_talk(obj)
 
-
     def roomChanged(cls, obj, oldLocation, newLocation):
         csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         if obj.getStartDate() is not None:
             for booking in csBookingManager.getBookingList():
                 booking.unindex_talk(obj)
                 booking.index_talk(obj)
-
 
     def cloneEvent(cls, confToClone, params):
         """ we'll clone the collaboration managers"""

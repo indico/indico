@@ -32,7 +32,6 @@ from MaKaC.common.Configuration import Config
 from MaKaC.common.timezoneUtils import nowutc
 
 
-
 class IIndexableByUserId(Interface):
     pass
 
