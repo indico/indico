@@ -252,7 +252,7 @@ class RHSubmitMaterialBase(object):
                 if type(fileUpload) != str and fileUpload.filename.strip() != "":
                     fDict = {}
 
-                    fDict["fileName"] = fileUpload.filename
+                    fDict["fileName"] = fileUpload.filename.encode("utf-8")
                     estimSize = request.content_length
 
                     if maxUploadFilesTotalSize and estimSize > (maxUploadFilesTotalSize * BYTES_1MB):
@@ -396,7 +396,8 @@ class RHSubmitMaterialBase(object):
                 mat.addResource(resource, forcedFileId=None)
 
             #apply conversion
-            if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
+            file_ext = os.path.splitext(resource.getFileName())[1].strip().lower()
+            if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(file_ext):
                 #Logger.get('conv').debug('Queueing %s for conversion' % resource.getFilePath())
                 fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), "pdf", mat)
                 resource.setPDFConversionRequestDate(nowutc())
