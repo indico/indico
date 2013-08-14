@@ -38,7 +38,7 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
         self.click(name="save")
 
     def test_contributions(self):
-        self.go("/confModifContribList.py?confId=0")
+        self.go("/event/0/manage/contributions/")
         self.click(xpath="//input[@value='Add new']")
         self.type(id="addContributionFocusField", text="contribution 1")
         self.click(xpath="//input[@value='Add Indico User / Group']")
@@ -59,9 +59,8 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
         self.assertEqual("Are you sure you wish to delete the selected contributions? Note that you cannot undo this action.", alert.text)
         self.click(css="button.ui-button")
 
-
     def test_programme(self):
-        self.go("/confModifProgram.py?confId=0")
+        self.go("/event/0/manage/program/")
         self.click(css="input.btn")
         self.click(css="#inPlaceEditDescription > div > div > span > div > a")
         self.type(css="textarea", text="description text")
@@ -73,7 +72,7 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
         self.click(xpath="//input[@value='Remove Selected']")
 
     def test_call_for_abstracts(self):
-        self.go("/confModifCFA.py?confId=0")
+        self.go("/event/0/manage/call-for-abstracts/setup/")
         self.click(css="input.btn")
         self.click(xpath="//input[@value='Add user']")
         self.type(id="userSearchFocusField", text="fake")
@@ -115,7 +114,7 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
         self.click(css="input.btn")
 
     def test_layout(self):
-        self.go("/confModifDisplay.py/custom?confId=0")
+        self.go("/event/0/manage/layout/style/")
         self.click(ltext="Conference header")
         self.click(id="toggleSimpleTextButton")
         self.type(name="ttText", text="Announcement")
@@ -124,7 +123,7 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
         self.click(ltext="Images")
 
     def test_registration(self):
-        self.go("/confModifRegistrationForm.py?confId=0")
+        self.go("/event/0/manage/registration/setup/")
         self.click(css="input.btn")
         self.click(xpath="//tr[2]/td/a/img")
         self.click(xpath="//tr[3]/td/a/img")

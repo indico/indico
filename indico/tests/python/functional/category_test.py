@@ -24,7 +24,7 @@ import unittest, time, re, datetime
 class CategoryTests(LoggedInSeleniumTestCase):
 
     def test_general_settings(self):
-        self.go("/categoryModification.py?categId=0")
+        self.go("/category/0/manage/")
         self.click(css="input.btn")
         self.type(name="name", text="Sub-category")
         self.type(name="description", text="sub-category")
@@ -39,12 +39,12 @@ class CategoryTests(LoggedInSeleniumTestCase):
         self.click(name="confirm")
 
     def test_protection(self):
-        self.go("/categoryModification.py?categId=0")
+        self.go("/category/0/manage/")
         self.click(css="input.btn")
         self.type(name="name", text="Sub-category")
         self.type(name="description", text="sub-category")
         self.click(name="OK")
-        self.go("/categoryAC.py?categId=1")
+        self.go("/category/1/manage/access")
         self.click(id="inPlaceAddManagerButton")
         self.type(id="userSearchFocusField", text="fake")
         self.click(xpath="//input[@value='Search']")

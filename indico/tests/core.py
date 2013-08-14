@@ -130,7 +130,7 @@ class TestManager(object):
         smtpAddr = self._startSMTPServer()
         if 'functional' in testsToRun:
             serverAddr = self._runFakeWebServer()
-            baseURL = "http://{0}:{1}/indico".format(*serverAddr)
+            baseURL = "http://{0}:{1}".format(*serverAddr)
         else:
             baseURL = "http://localhost:8000/indico"
 
