@@ -1726,8 +1726,8 @@ class UHCategoryDisplay(URLHandler):
     _endpoint = 'category.categoryDisplay'
 
     @classmethod
-    def getURL(cls, target=None):
-        url = cls._getURL()
+    def getURL(cls, target=None, **params):
+        url = cls._getURL(**params)
         if target:
             if target.isRoot():
                 return UHWelcome.getURL()
