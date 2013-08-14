@@ -30,7 +30,7 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         super(RoomBookingTests, self).setUp()
 
     def test_admin(self):
-        self.go("/roomBooking.py/admin")
+        self.go("/admin/rooms/locations/")
         self.type(name="newLocationName", text="Test 1")
         self.click(xpath="//input[@value='Add']")
         self.click(ltext="Test 1")
@@ -48,10 +48,10 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         self.click(css="input.btn")
 
     def test_assistance(self):
-        self.go("/adminPlugins.py?pluginType=RoomBooking")
+        self.go("/admin/plugins/type/RoomBooking/")
         self.type(name="RoomBooking.assistanceNotificationEmails", text="assistance@test.pl")
         self.click(xpath="//input[@value='Save settings']")
-        self.go("/roomBooking.py/admin")
+        self.go("/admin/rooms/locations/")
         self.type(name="newLocationName", text="TestUniverseAssistence1")
         self.click(xpath="//input[@value='Add']")
         self.click(ltext="TestUniverseAssistence1")
@@ -68,7 +68,7 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         self.click(id="_GID1_existingAv0")
         self.click(css="div.ui-dialog-buttonset > span > button[type=button]")
         self.click(css="input.btn")
-        self.go("/roomBooking.py/search4Rooms?forNewBooking=True")
+        self.go("/rooms/search/rooms?forNewBooking=True")
         self.select(name="roomName", label="TestUniverseAssistence1:   1-1-1 - Room 1")
         self.click(css="span#bookButtonWrapper > input[type=button]")
         self.type(name="reason", text="Test reason")
@@ -86,7 +86,7 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
             self._rooms[1].resvsNeedConfirmation = True
         # end
 
-        self.go("/index.py")
+        self.go("/")
         self.click(css="li#userSettings a")
         self.click(ltext="Logout")
         self.click(ltext="Login")
@@ -109,7 +109,7 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         self.click(ltext="Rooms")
         self.click(ltext="Configuration")
         self.click(ltext="Universe")
-        self.select(name="roomID", label="1-b-c - DummyRoom2")
+        self.select(name="roomID", text="1-b-c - DummyRoom2")
         self.click(css="input.btn")
         self.wait(css="span.fakeLink")
         self.click(css="span.fakeLink")

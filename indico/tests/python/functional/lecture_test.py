@@ -25,7 +25,7 @@ class LectureBase(object):
 
     def setUp(self, event='lecture'):
         super(LectureBase, self).setUp()
-        self.go("/index.py")
+        self.go("/")
         self.click(css="span.dropDownMenu")
         self.click(ltext="Create %s" % event)
         self.type(name="title", text="%s test" % event)
@@ -42,9 +42,8 @@ class LectureBase(object):
         self.click(css="button")
         self.wait_remove(css="#inPlaceEditStartEndDate > div > span")
 
-
     def test_tools(self):
-        self.go("/confModifTools.py?confId=0")
+        self.go("/event/0/manage/tools/")
         self.click(xpath="(//a[contains(text(),'Lock')])[2]")
         self.click(name="confirm")
         self.click(ltext="Unlock")
@@ -52,12 +51,12 @@ class LectureBase(object):
         self.click(ltext="Clone Event")
         self.click(css="input[name=cloneOnce]")
         self.click(name="confirm")
-        self.go("/confModifTools.py?confId=0")
+        self.go("/event/0/manage/tools/")
         self.click(ltext="Clone Event")
         self.type(css="#cloneIntervalPlace_until > div.dateField > input[type=text]", text="18/07/2011")
         self.click(name="cloneWithInterval")
         self.click(name="confirm")
-        self.go("/confModifTools.py?confId=0")
+        self.go("/event/0/manage/tools/")
         self.click(ltext="Clone Event")
         self.click(name="cloneGivenDays")
         alert = self.elem(css=".ui-dialog-content")
@@ -77,7 +76,7 @@ class LectureBase(object):
         self.click(name="confirm")
 
     def test_general_settings(self, lecture=True):
-        self.go("/conferenceModification.py?confId=0")
+        self.go("/event/0/manage/")
         self.click(ltext="(edit)")
         title = self.elem(css="input[type=text]")
         title.clear()
@@ -126,14 +125,14 @@ class LectureBase(object):
         self.click(css=".ui-dialog-buttonset button")
 
     def test_participants(self):
-        self.go("/confModifParticipants.py?confId=0")
+        self.go("/event/0/manage/participants/")
         self.click(css=".ui-tabs-nav li:nth-child(2)")
         self.click(ltext="Add")
         self.click(ltext="Indico User")
         self.type(id="userSearchFocusField", text="fake")
         self.click(css="input[type=\"button\"]")
         self.click(id="_GID1_existingAv0")
-        self.click(xpath="//button[@type='button']")
+        self.click(css="button.ui-button")
 
         # wait for overlay to go away
         self.wait_remove(css='.ui-widget-overlay')
@@ -143,10 +142,10 @@ class LectureBase(object):
         self.type(id="_GID3", text="Ficticio")
         self.type(id="_GID4", text="Joaquim")
         self.type(xpath="(//input[@type='text'])[3]", text="CERN")
-        self.click(xpath="//button[@type='button']")
+        self.click(css="button.ui-button")
         self.click(id="_GID5")
         self.type(id="_GID5", text="ficticio.joaquim@example.com")
-        self.click(xpath="//button[@type='button']")
+        self.click(css="button.ui-button")
         self.click(id="checkParticipant2")
         self.click(id="remove_users")
 
@@ -178,7 +177,7 @@ class LectureBase(object):
         button.click()
 
     def test_evaluation(self):
-        self.go("/confModifEvaluation.py/setup?confId=0")
+        self.go("/event/0/manage/evaluation/setup/")
         self.click(ltext="Edit")
         self.click(xpath="//img[@alt='Insert a question of type TextBox']")
         self.type(name="questionValue", text="What is your name?")
@@ -214,7 +213,7 @@ class LectureBase(object):
         self.click(name="submit")
         self.click(xpath="//li")
         self.click(css=".ui-tabs-nav li a")
-        self.click(name="reinit")
+        self.click(id="reinit")
         self.click(css="button.ui-button")
         self.click(css="div > input.btn")
         edate = self.elem(css="#eDatePlace > div.dateField > input[type=text]")
@@ -223,7 +222,7 @@ class LectureBase(object):
         self.click(name="modify")
 
     def test_protection(self):
-        self.go("/confModifAC.py?confId=0")
+        self.go("/event/0/manage/access/")
         self.click(css="#inPlaceAddManagerButton")
         self.type(css="input#userSearchFocusField", text="fake")
         self.click(css=".searchUsersButtonDiv input")

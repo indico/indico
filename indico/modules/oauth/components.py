@@ -56,11 +56,11 @@ class UserOAuthAccessTokenIndex(OOIndex):
 
 class OAuthUtils:
     @classmethod
-    def OAuthCheckAccessResource(cls, req, query_string):
+    def OAuthCheckAccessResource(cls):
         from indico.modules.oauth.db import ConsumerHolder, AccessTokenHolder, OAuthServer
 
-        oauth_request = oauth.Request.from_request(req.get_method(), req.construct_url(req.get_uri()),
-                                                   headers=req.headers_in, query_string=urlencode(query_string))
+        oauth_request = oauth.Request.from_request(request.method, request.base_url, request.headers,
+                                                   parameters=create_flat_args())
         Logger.get('oauth.resource').info(oauth_request)
         try:
             now = nowutc()

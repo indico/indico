@@ -209,7 +209,7 @@ class LoggedInSeleniumTestCase(SeleniumTestCase):
         super(LoggedInSeleniumTestCase, self).setUp()
 
         # Login
-        self.go("/signIn.py")
+        self.go("/user/login")
         self.type(name="login", text="dummyuser")
         self.type(name="password", text="dummyuser")
         self.click(id="loginButton")
