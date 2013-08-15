@@ -122,14 +122,15 @@ class WPLiveSyncAdmin(WPAdminPlugins):
         WPAdminPlugins.__init__(self, rh, 'livesync', '')
         self._templateClass = templateClass
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        self._plugin_asset_env = PluginEnvironment('livesync', os.path.dirname(__file__), '/livesync')
+        self._plugin_asset_env = PluginEnvironment('livesync', os.path.dirname(__file__), 'livesync')
         self._plugin_asset_env.debug = info.isDebugActive()
         self._plugin_asset_env.register('livesync_js', Bundle('js/livesync.js',
                                                               filters='rjsmin',
                                                               output="livesync__%(version)s.min.js"))
-        self._plugin_asset_env.register('livesync_css', Bundle('livesync.css',
+        self._plugin_asset_env.register('livesync_css', Bundle('css/livesync.css',
                                                                filters='cssmin',
                                                                output="livesync__%(version)s.min.css"))
+
     def getJSFiles(self):
         return WPAdminPlugins.getJSFiles(self) + \
             self._plugin_asset_env['livesync_js'].urls()
