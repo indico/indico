@@ -2,7 +2,7 @@
 <div class="categoryTitle">
     ${ _("Video Services Overview")}
 </div>
-<div class="CADiv">
+<div class="CRLDiv CADiv">
     <div class="CATopBanner">
         <ul class="CAIndexList">
         <label>Select Video Service Index:</label>&nbsp;

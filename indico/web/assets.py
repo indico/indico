@@ -45,7 +45,7 @@ class PluginEnvironment(Environment):
         super(PluginEnvironment, self).__init__(output_dir, '{0}/static/assets/plugins/'.format(url_base_path)
                                                 + url_path)
 
-        self.append_path(os.path.join(plugin_dir, 'htdocs'), url=(url_base_path + url_path))
+        self.append_path(os.path.join(plugin_dir, 'htdocs'), url=os.path.join(url_base_path, url_path))
 
 
 def namespace(dir_ns, *list_files):

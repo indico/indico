@@ -27,7 +27,7 @@ blueprint = IndicoBlueprint('collaboration', __name__)
 
 # Speaker Agreement
 blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/', 'elecAgree',
-                       handlers.RHUploadElectronicAgreement)
+                       handlers.RHElectronicAgreement)
 blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/upload', 'uploadElecAgree',
                        handlers.RHUploadElectronicAgreement, methods=('POST',))
 blueprint.add_url_rule('/event/<confId>/manage/collaboration/elecAgree/download/<spkId>', 'getPaperAgree',
