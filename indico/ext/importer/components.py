@@ -45,28 +45,34 @@ class ImporterContributor(Component, Observable):
     zope.interface.implements(ITimetableContributor)
 
     @classmethod
-    def includeTimetableJSFiles(cls, obj, params = {}):
+    def includeTimetableJSFiles(cls, obj, params={}):
         """
         Includes additional javascript file.
         """
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        asset_env = PluginEnvironment('importer', os.path.dirname(__file__), '/importer')
+        asset_env = PluginEnvironment('importer', os.path.dirname(__file__), 'importer')
         asset_env.debug = info.isDebugActive()
 
-        asset_env.register('importer', Bundle('js/importer.js',
-                                                           filters='rjsmin',
-                                                           output="importer__%(version)s.min.js"))
-        params['paths'].extend(asset_env['importer'].urls())
+        asset_env.register('importer_js', Bundle('js/importer.js',
+                                                 filters='rjsmin',
+                                                 output="importer__%(version)s.min.js"))
+        params['paths'].extend(asset_env['importer_js'].urls())
 
     @classmethod
-    def includeTimetableCSSFiles(cls, obj, params = {}):
+    def includeTimetableCSSFiles(cls, obj, params={}):
         """
         Includes additional Css files.
         """
-        params['paths'].append("importer/importer.css")
+        info = HelperMaKaCInfo.getMaKaCInfoInstance()
+        asset_env = PluginEnvironment('importer', os.path.dirname(__file__), 'importer')
+        asset_env.debug = info.isDebugActive()
+        asset_env.register('importer_css', Bundle('css/importer.css',
+                                                  filters='cssmin',
+                                                  output="importer__%(version)s.min.css"))
+        params['paths'].extend(asset_env['importer_css'].urls())
 
     @classmethod
-    def customTimetableLinks(cls, obj, params = {}):
+    def customTimetableLinks(cls, obj, params={}):
         """
         Inserts an "Import" link in a timetable header.
         """

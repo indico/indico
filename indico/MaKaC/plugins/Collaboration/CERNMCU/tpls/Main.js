@@ -189,7 +189,7 @@
 
         var pinInfo;
         if (booking.bookingParams.hasPin) {
-            pinInfo = new HiddenText(booking.bookingParams.pin, Html.span("CERNMCUHiddenPIN", "****"), false).draw();
+            pinInfo = new HiddenText(booking.bookingParams.pin, Html.span("HiddenPIN", "****"), false).draw();
         } else {
             pinInfo = $T("No PIN was defined");
         }

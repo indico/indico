@@ -197,7 +197,7 @@
 
         var pinInfo;
         if (booking.bookingParams.hasPin) {
-            pinInfo = new HiddenText(booking.bookingParams.pin, Html.span("VidyoHiddenPIN", "********"), false).draw();
+            pinInfo = new HiddenText(booking.bookingParams.pin, Html.span("HiddenPIN", "********"), false).draw();
         } else {
             pinInfo = $T("No meeting PIN was defined");
         }

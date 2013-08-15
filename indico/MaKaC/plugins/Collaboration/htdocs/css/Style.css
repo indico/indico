@@ -714,3 +714,7 @@ td.collaborationDisplayInfoRightCol a {
 td.collaborationDisplayInfoLeftCol span {
     white-space: nowrap;
 }
+
+span.HiddenPIN {
+    color: #AAAAAA;
+}

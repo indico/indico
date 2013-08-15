@@ -70,7 +70,7 @@ class SearchCHContributor(Component):
         Includes additional javascript file.
         """
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        asset_env = PluginEnvironment('search', os.path.dirname(__file__), '/search')
+        asset_env = PluginEnvironment('search', os.path.dirname(__file__), 'search')
         asset_env.debug = info.isDebugActive()
 
         asset_env.register('search', Bundle('js/search.js',

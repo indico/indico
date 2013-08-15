@@ -57,8 +57,8 @@ from indico.core.index import Catalog
 from indico.core.db.event import SupportInfo
 from indico.ext import livesync
 from indico.util import console, i18n
-from indico.modules.scheduler.tasks import AlarmTask, FoundationSyncTask, \
-     CategoryStatisticsUpdaterTask
+from indico.modules.scheduler.tasks import AlarmTask
+from indico.modules.scheduler.tasks.periodic import FoundationSyncTask, CategoryStatisticsUpdaterTask
 from indico.modules import ModuleHolder
 from indico.util.redis import avatar_links
 from indico.util.redis import client as redis_client

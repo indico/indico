@@ -1945,12 +1945,12 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
         wc = self._getSchedule()
         return wc.getHTML(params)
 
-    def _getHeadContent( self ):
+    def _getHeadContent(self):
 
         baseurl = self._getBaseURL()
-        pluginCSSFiles = {"paths" : []}
+        pluginCSSFiles = {"paths": []}
         self._notify("includeTimetableCSSFiles", pluginCSSFiles)
-        return ".".join(["""<link rel="stylesheet" href="%s/%s">"""%(baseurl,path) for path in pluginCSSFiles['paths']])
+        return ".".join(["""<link rel="stylesheet" href="%s">""" % path for path in pluginCSSFiles['paths']])
 
     def _getPageContent(self, params):
         return self._getTTPage(params)

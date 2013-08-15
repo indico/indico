@@ -54,19 +54,22 @@ class WPConfModifChat(WPConferenceModifBase):
         self._tabCtrl = wcomponents.TabControl()
 
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        self._plugin_asset_env = PluginEnvironment('InstantMessaging', os.path.dirname(__file__), '/InstantMessaging')
+        self._plugin_asset_env = PluginEnvironment('InstantMessaging', os.path.dirname(__file__), 'InstantMessaging')
         self._plugin_asset_env.debug = info.isDebugActive()
-        self._plugin_asset_env.register('instant_messaging', Bundle('js/InstantMessaging.js',
-                                                                    filters='rjsmin',
-                                                                    output="InstantMessaging_%(version)s.min.js"))
+        self._plugin_asset_env.register('instant_messaging_js', Bundle('js/InstantMessaging.js',
+                                                                       filters='rjsmin',
+                                                                       output="InstantMessaging_%(version)s.min.js"))
+        self._plugin_asset_env.register('instant_messaging_css', Bundle('css/InstantMessaging.css',
+                                                                        filters='cssmin',
+                                                                        output="InstantMessaging_%(version)s.min.css"))
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + \
-            self._plugin_asset_env['instant_messaging'].urls()
+            self._plugin_asset_env['instant_messaging_js'].urls()
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + \
-            ['InstantMessaging/im.css']
+            self._plugin_asset_env['instant_messaging_css'].urls()
 
     def _createTabCtrl(self):
         for tabName in self._tabNames:

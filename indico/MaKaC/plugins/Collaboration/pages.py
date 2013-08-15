@@ -84,12 +84,14 @@ class WPCollaborationBase:
 
     def __init__(self):
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        self._plugin_asset_env = PluginEnvironment('Collaboration', os.path.dirname(__file__), '/Collaboration')
+        self._plugin_asset_env = PluginEnvironment('Collaboration', os.path.dirname(__file__), 'Collaboration')
         self._plugin_asset_env.debug = info.isDebugActive()
-        self._plugin_asset_env.register('collaboration', Bundle('js/Collaboration.js',
-                                                                    'js/bookings.js',
-                                                                    filters='rjsmin',
-                                                                    output="Collaboration_%(version)s.min.js"))
+        self._plugin_asset_env.register('collaboration_js', Bundle('js/Collaboration.js', 'js/bookings.js',
+                                                                   filters='rjsmin',
+                                                                   output="Collaboration_%(version)s.min.js"))
+        self._plugin_asset_env.register('collaboration_css', Bundle('css/Style.css',
+                                                                    filters='cssmin',
+                                                                    output="Collaboration_%(version)s.min.css"))
 
 ################################################### Server Wide pages #########################################
 
@@ -104,11 +106,11 @@ class WPAdminCollaboration(WPMainBase, WPCollaborationBase):
         self._buildExtraJS()
 
     def getJSFiles(self):
-        return WPMainBase.getJSFiles(self) + self._includeJSPackage('Display') + self._plugin_asset_env['collaboration'].urls()
+        return WPMainBase.getJSFiles(self) + self._includeJSPackage('Display')  \
+            + self._plugin_asset_env['collaboration_js'].urls()
 
     def getCSSFiles(self):
-        return WPMainBase.getCSSFiles(self) + ['Collaboration/Style.css']
-
+        return WPMainBase.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls()
 
     def _getHeader(self):
         wc = wcomponents.WHeader(self._getAW())
@@ -285,7 +287,7 @@ class WPConfModifCSBase (WPConferenceModifBase):
             self._pluginsDictMenuItem['Video Services'].setActive(True)
 
     def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + ['Collaboration/Style.css']
+        return WPConferenceModifBase.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls()
 
 
 class WPConfModifCollaboration(WPConfModifCSBase, WPCollaborationBase):
@@ -300,12 +302,12 @@ class WPConfModifCollaboration(WPConfModifCSBase, WPCollaborationBase):
         self._buildExtraJS()
 
     def getCSSFiles(self):
-        return WPConfModifCSBase.getCSSFiles(self) + ['Collaboration/Style.css' ] +\
+        return WPConfModifCSBase.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls() +\
             ['Collaboration/%s/Style.css' % plugin.getId() for plugin in self._tabPlugins]
 
     def getJSFiles(self):
-        return WPConfModifCSBase.getJSFiles(self) + self._includeJSPackage("Display") + self._includeJSPackage("Management") \
-            + self._plugin_asset_env['collaboration'].urls()
+        return WPConfModifCSBase.getJSFiles(self) + self._includeJSPackage("Display") \
+            + self._includeJSPackage("Management") + self._plugin_asset_env['collaboration_js'].urls()
 
     ######### private methods ###############
     def _buildExtraJS(self):
@@ -475,12 +477,11 @@ class WPCollaborationDisplay(WPConferenceDefaultDisplayBase, WPCollaborationBase
         self._sectionMenu.setCurrentItem(self._collaborationOpt)
 
     def getCSSFiles(self):
-        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-                   ['Collaboration/Style.css']
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls()
 
     def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage('Display') + self._plugin_asset_env['collaboration'].urls()
-
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage('Display') \
+            + self._plugin_asset_env['collaboration'].urls()
 
     def _getBody(self, params):
 
@@ -543,11 +544,11 @@ class WPElectronicAgreementForm(WPSimpleEventDisplay, WPCollaborationBase):
         self.authKey = authKey
 
     def getCSSFiles(self):
-        return WPSimpleEventDisplay.getCSSFiles(self) + \
-                   ['Collaboration/Style.css']
+        return WPSimpleEventDisplay.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls()
 
     def getJSFiles(self):
-        return WPSimpleEventDisplay.getJSFiles(self) + self._includeJSPackage("Display") + self._plugin_asset_env['collaboration'].urls()
+        return WPSimpleEventDisplay.getJSFiles(self) + self._includeJSPackage("Display")  \
+            + self._plugin_asset_env['collaboration_js'].urls()
 
     def _getBody(self, params):
         wc = WElectronicAgreementForm.forModule(Collaboration, self._conf, self.authKey)
@@ -560,13 +561,13 @@ class WPElectronicAgreementFormConference(WPConferenceDefaultDisplayBase, WPColl
         self.authKey = authKey
 
     def getCSSFiles(self):
-        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-                   ['Collaboration/Style.css']
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls()
 
     def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage("Display")  + self._plugin_asset_env['collaboration'].urls()
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage("Display") \
+            + self._plugin_asset_env['collaboration_js'].urls()
 
-    def _getBody( self, params ):
+    def _getBody(self, params):
         wc = WElectronicAgreementForm.forModule(Collaboration, self._conf, self.authKey)
         return wc.getHTML()
 
@@ -652,8 +653,7 @@ class WElectronicAgreementForm(wcomponents.WTemplated):
 class WPElectronicAgreement(WPConfModifCollaboration):
 
     def getCSSFiles(self):
-        return WPConfModifCollaboration.getCSSFiles(self) + \
-                   ['Collaboration/Style.css']
+        return WPConfModifCollaboration.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls()
 
     def _setActiveTab(self):
         self._tabs[self._activeTabName].setActive()
