@@ -186,42 +186,46 @@ class CDSConvFileConverter(FileConverter):
     _getMaterialObj=staticmethod(_getMaterialObj)
 
     def _getMaterial(locator):
-        ch=conference.ConferenceHolder()
-        if locator.has_key("confId") and locator.has_key("materialId"):
-            c=ch.getById(locator["confId"])
-            # ---------- Conference ----------
-            if c is not None:
-                # ---------- Session ----------
-                if locator.has_key("sessionId"):
-                    s=c.getSessionById(locator["sessionId"])
-                    if s is not None:
-                        # ---------- Contribution ----------
-                        if locator.has_key("contribId"):
-                            contrib=c.getContributionById(locator["contribId"])
-                            if contrib is not None:
-                                # ---------- Subcontribution ----------
-                                if locator.has_key("subContId"):
-                                    subContrib=contrib.getSubContributionById(locator["subContId"])
-                                    if subContrib is not None:
-                                        return CDSConvFileConverter._getMaterialObj(subContrib, locator["materialId"])
-                                else:
-                                    return CDSConvFileConverter._getMaterialObj(contrib, locator["materialId"])
-                        else:
-                            return CDSConvFileConverter._getMaterialObj(s, locator["materialId"])
-                # ---------- Contribution ----------
-                elif locator.has_key("contribId"):
-                    contrib=c.getContributionById(locator["contribId"])
-                    if contrib is not None:
-                        # ---------- Subcontribution ----------
-                        if locator.has_key("subContId"):
-                            subContrib=contrib.getSubContributionById(locator["subContId"])
-                            if subContrib is not None:
-                                return CDSConvFileConverter._getMaterialObj(subContrib, locator["materialId"])
-                        else:
-                            return CDSConvFileConverter._getMaterialObj(contrib, locator["materialId"])
-                else:
-                    return CDSConvFileConverter._getMaterialObj(c, locator["materialId"])
-
+        ch = conference.ConferenceHolder()
+        if locator.has_key("materialId"):
+            if locator.has_key("categId"):
+                categ = conference.CategoryManager().getById(locator["categId"])
+                if categ is not None:
+                    return CDSConvFileConverter._getMaterialObj(categ, locator["materialId"])
+            elif locator.has_key("confId"):
+                c=ch.getById(locator["confId"])
+                # ---------- Conference ----------
+                if c is not None:
+                    # ---------- Session ----------
+                    if locator.has_key("sessionId"):
+                        s=c.getSessionById(locator["sessionId"])
+                        if s is not None:
+                            # ---------- Contribution ----------
+                            if locator.has_key("contribId"):
+                                contrib = c.getContributionById(locator["contribId"])
+                                if contrib is not None:
+                                    # ---------- Subcontribution ----------
+                                    if locator.has_key("subContId"):
+                                        subContrib = contrib.getSubContributionById(locator["subContId"])
+                                        if subContrib is not None:
+                                            return CDSConvFileConverter._getMaterialObj(subContrib, locator["materialId"])
+                                    else:
+                                        return CDSConvFileConverter._getMaterialObj(contrib, locator["materialId"])
+                            else:
+                                return CDSConvFileConverter._getMaterialObj(s, locator["materialId"])
+                    # ---------- Contribution ----------
+                    elif locator.has_key("contribId"):
+                        contrib = c.getContributionById(locator["contribId"])
+                        if contrib is not None:
+                            # ---------- Subcontribution ----------
+                            if locator.has_key("subContId"):
+                                subContrib = contrib.getSubContributionById(locator["subContId"])
+                                if subContrib is not None:
+                                    return CDSConvFileConverter._getMaterialObj(subContrib, locator["materialId"])
+                            else:
+                                return CDSConvFileConverter._getMaterialObj(contrib, locator["materialId"])
+                    else:
+                        return CDSConvFileConverter._getMaterialObj(c, locator["materialId"])
         return None
     _getMaterial=staticmethod(_getMaterial)
 
