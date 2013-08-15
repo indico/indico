@@ -93,7 +93,14 @@ class WPCollaborationBase:
                                                                     filters='cssmin',
                                                                     output="Collaboration_%(version)s.min.css"))
 
+    def getJSFiles(self):
+        return self._plugin_asset_env['collaboration_js'].urls() + self._includeJSPackage("Display")
+
+    def getCSSFiles(self):
+        return self._plugin_asset_env['collaboration_css'].urls()
+
 ################################################### Server Wide pages #########################################
+
 
 class WPAdminCollaboration(WPMainBase, WPCollaborationBase):
 
@@ -106,11 +113,10 @@ class WPAdminCollaboration(WPMainBase, WPCollaborationBase):
         self._buildExtraJS()
 
     def getJSFiles(self):
-        return WPMainBase.getJSFiles(self) + self._includeJSPackage('Display')  \
-            + self._plugin_asset_env['collaboration_js'].urls()
+        return WPMainBase.getJSFiles(self) + WPCollaborationBase.getJSFiles(self)
 
     def getCSSFiles(self):
-        return WPMainBase.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls()
+        return WPMainBase.getCSSFiles(self) + WPCollaborationBase.getCSSFiles(self)
 
     def _getHeader(self):
         wc = wcomponents.WHeader(self._getAW())
@@ -245,17 +251,18 @@ class WAdminCollaboration(wcomponents.WTemplated):
 
 ################################################### Event Modif pages ###############################################
 
-class WPConfModifCSBase (WPConferenceModifBase):
+class WPConfModifCSBase (WPConferenceModifBase, WPCollaborationBase):
 
     _userData = ['favorite-user-list']
 
     def __init__(self, rh, conf):
         """ Constructor
-            The rh is expected to have the attributes _tabs, _activeTab, _tabPlugins (like for ex. RHConfModifCSBookings)
+            The rh is expected to have the attributes _tabs, _activeTab, _tabPlugins (for ex. RHConfModifCSBookings)
         """
         WPConferenceModifBase.__init__(self, rh, conf)
+        WPCollaborationBase.__init__(self)
         self._conf = conf
-        self._tabs = {} # list of Indico's Tab objects
+        self._tabs = {}  # list of Indico's Tab objects
         self._tabNames = rh._tabs
         self._activeTabName = rh._activeTabName
         self.rh = rh
@@ -287,27 +294,28 @@ class WPConfModifCSBase (WPConferenceModifBase):
             self._pluginsDictMenuItem['Video Services'].setActive(True)
 
     def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls()
+        return WPConferenceModifBase.getCSSFiles(self) + WPCollaborationBase.getCSSFiles(self)
+
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + WPCollaborationBase.getJSFiles(self)
 
 
-class WPConfModifCollaboration(WPConfModifCSBase, WPCollaborationBase):
+class WPConfModifCollaboration(WPConfModifCSBase):
 
     def __init__(self, rh, conf):
         """ Constructor
             The rh is expected to have the attributes _tabs, _activeTabName, _tabPlugins (like RHConfModifCSBookings)
         """
         WPConfModifCSBase.__init__(self, rh, conf)
-        WPCollaborationBase.__init__(self)
         self._tabPlugins = rh._tabPlugins
         self._buildExtraJS()
 
     def getCSSFiles(self):
-        return WPConfModifCSBase.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls() +\
-            ['Collaboration/%s/Style.css' % plugin.getId() for plugin in self._tabPlugins]
+        return WPConfModifCSBase.getCSSFiles(self)  \
+            + ['Collaboration/%s/Style.css' % plugin.getId() for plugin in self._tabPlugins]
 
     def getJSFiles(self):
-        return WPConfModifCSBase.getJSFiles(self) + self._includeJSPackage("Display") \
-            + self._includeJSPackage("Management") + self._plugin_asset_env['collaboration_js'].urls()
+        return WPConfModifCSBase.getJSFiles(self) + self._includeJSPackage("Management")
 
     ######### private methods ###############
     def _buildExtraJS(self):
@@ -477,11 +485,10 @@ class WPCollaborationDisplay(WPConferenceDefaultDisplayBase, WPCollaborationBase
         self._sectionMenu.setCurrentItem(self._collaborationOpt)
 
     def getCSSFiles(self):
-        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls()
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + WPCollaborationBase.getCSSFiles(self)
 
     def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage('Display') \
-            + self._plugin_asset_env['collaboration'].urls()
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + WPCollaborationBase.getJSFiles(self)
 
     def _getBody(self, params):
 
@@ -544,11 +551,10 @@ class WPElectronicAgreementForm(WPSimpleEventDisplay, WPCollaborationBase):
         self.authKey = authKey
 
     def getCSSFiles(self):
-        return WPSimpleEventDisplay.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls()
+        return WPSimpleEventDisplay.getCSSFiles(self) + WPCollaborationBase.getCSSFiles(self)
 
     def getJSFiles(self):
-        return WPSimpleEventDisplay.getJSFiles(self) + self._includeJSPackage("Display")  \
-            + self._plugin_asset_env['collaboration_js'].urls()
+        return WPSimpleEventDisplay.getJSFiles(self) + WPCollaborationBase.getJSFiles(self)
 
     def _getBody(self, params):
         wc = WElectronicAgreementForm.forModule(Collaboration, self._conf, self.authKey)
@@ -564,8 +570,7 @@ class WPElectronicAgreementFormConference(WPConferenceDefaultDisplayBase, WPColl
         return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls()
 
     def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._includeJSPackage("Display") \
-            + self._plugin_asset_env['collaboration_js'].urls()
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + WPCollaborationBase.getJSFiles(self)
 
     def _getBody(self, params):
         wc = WElectronicAgreementForm.forModule(Collaboration, self._conf, self.authKey)
@@ -652,9 +657,6 @@ class WElectronicAgreementForm(wcomponents.WTemplated):
 # Here the administration page
 class WPElectronicAgreement(WPConfModifCollaboration):
 
-    def getCSSFiles(self):
-        return WPConfModifCollaboration.getCSSFiles(self) + self._plugin_asset_env['collaboration_css'].urls()
-
     def _setActiveTab(self):
         self._tabs[self._activeTabName].setActive()
     #only for tests...
@@ -664,8 +666,9 @@ class WPElectronicAgreement(WPConfModifCollaboration):
     def _getPageContent(self, params):
         if len(self._tabNames) > 0:
             self._createTabCtrl()
-
-            wc = WElectronicAgreement.forModule(Collaboration, self._conf, self._rh.getAW().getUser(), self._activeTabName, self._tabPlugins, params.get("sortCriteria"), params.get("order"))
+            wc = WElectronicAgreement.forModule(Collaboration, self._conf, self._rh.getAW().getUser(),
+                                                self._activeTabName, self._tabPlugins, params.get("sortCriteria"),
+                                                params.get("order"))
             return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(wc.getHTML({}))
         else:
             return _("No available plugins, or no active plugins")
