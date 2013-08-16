@@ -285,7 +285,6 @@ Please specify the directory where you'd like it to be placed.
 %s
         ''' % _databaseText('etc')
 
-
     def _update_conf_dir_paths(self, filePath, dirs):
         fdata = open(filePath).read()
         for dir in dirs.items():

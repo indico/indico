@@ -553,7 +553,11 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
 
     if not force_no_db and dbpath:
         # change the db config files (paths + apache user/group)
-        _updateDbConfigFiles(dbpath, targetDirs['log'], targetDirs['etc'], targetDirs['tmp'], user)
+        _updateDbConfigFiles(targetDirs['etc'],
+                             log=targetDirs['log'],
+                             db=dbpath,
+                             tmp=targetDirs['tmp'],
+                             uid=user)
 
     # check permissions
     _checkDirPermissions(targetDirs, dbInstalledBySetupPy=dbParam, accessuser=user, accessgroup=group)
