@@ -128,19 +128,18 @@ class TestManager(object):
 
         # the SMTP server will choose a free port
         smtpAddr = self._startSMTPServer()
+        self._startManageDB()
+
+        self._setFakeConfig({"SmtpServer": smtpAddr})
+
         if 'functional' in testsToRun:
             serverAddr = self._runFakeWebServer()
             baseURL = "http://{0}:{1}".format(*serverAddr)
         else:
             baseURL = "http://localhost:8000/indico"
 
+        self._cfg._configVars.update({"BaseURL": baseURL})
         ContextManager.set('test_env', True)
-        self._setFakeConfig({
-                "SmtpServer": smtpAddr,
-                "BaseURL": baseURL
-                })
-
-        self._startManageDB()
 
         try:
             for test in testsToRun:
