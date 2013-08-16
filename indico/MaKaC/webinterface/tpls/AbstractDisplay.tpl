@@ -77,6 +77,11 @@
             <div>
                 <div class="abstractStatus ${statusClass}">${statusText}</div>
             </div>
+            %if isinstance(abstract.getCurrentStatus(), AbstractStatusAccepted):
+            <div class="abstractStatusSection">
+                <a href = "${str(urlHandlers.UHContributionDisplay.getURL(abstract.getContribution()))}"> ${_("Accepted")} </a>
+            </div>
+            % endif
         </div>
         % if abstract.getPrimaryAuthorList():
             <div class="abstractRightPanelSection">
