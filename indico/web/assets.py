@@ -279,7 +279,8 @@ base_js = Bundle(jquery, utils, presentation, calendar, indico_jquery, moment, i
 screen_sass = Bundle('sass/screen.scss',
                    filters=("pyscss", "cssrewrite", "cssmin"),
                    output="sass/screen_sass_%(version)s.css",
-                   depends=["sass/base/*.scss",
+                   depends=["sass/*.scss",
+                            "sass/base/*.scss",
                             "sass/partials/*.scss",
                             "sass/modules/*.scss"])
 
