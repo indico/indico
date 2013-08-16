@@ -1,26 +1,26 @@
     <script type="text/javascript">
-        function submit_cancel()
-        {
-            new ConfirmPopup($T("Cancel booking"),$T("Are you sure you want to CANCEL your booking?"), function(confirmed) {
-                if(confirmed) {
+        function submit_cancel(occurs){
+            new ConfirmPopupWithActionContent($T("Cancel booking"), $T("Are you sure you want to <strong>cancel the \
+                whole booking</strong>?"), "(" + occurs.length + $T(" occurrences)"), occurs, function(confirmed){
+                if(confirmed){
                     $("#submits").attr("action", "${ urlHandlers.UHRoomBookingCancelBooking.getURL(reservation)}");
                     $("#submits").submit();
                 }
             }, $T("Yes"), $T("No")).open();
         }
-        function submit_accept()
-        {
-            new ConfirmPopup($T("Accept booking"),$T("Are you sure you want to ACCEPT your booking?"), function(confirmed) {
-                if(confirmed) {
+        function submit_accept(){
+            new ConfirmPopupWithActionContent($T("Accept booking"), $T("Are you sure you want to <strong>accept</strong> \
+                your meeting?"), "", "", function(confirmed){
+                if(confirmed){
                     $("#submits").attr("action", "${ urlHandlers.UHRoomBookingAcceptBooking.getURL(reservation)}");
                     $("#submits").submit();
                 }
             }, $T("Yes"), $T("No")).open();
         }
-        function submit_reject()
-        {
-            new ConfirmPopupWithReason($T("Reject booking"),$T("Are you sure you want to REJECT THE _WHOLE_ BOOKING? If so, please give a reason"), function(confirmed) {
-                if(confirmed) {
+        function submit_reject(occurs){
+            new ConfirmPopupWithReason($T("Reject booking"), $T("Are you sure you want to <strong>reject the whole booking \
+                </strong>?"), "(" + occurs.length + $T(" occurrences)"), occurs, function(confirmed){
+                if(confirmed){
                     var reason = this.reason.get();
                     $("#submits").attr("action", build_url("${ urlHandlers.UHRoomBookingRejectBooking.getURL(reservation)}", {reason: reason}));
                     $("#submits").submit();
@@ -28,44 +28,43 @@
             }, $T("Yes"), $T("No")).open();
 
         }
-        function submit_reject_occurrence( action )
-        {
-            new ConfirmPopupWithReason($T("Reject occurrence"),$T("Are you sure you want to REJECT the booking for the selected date? If so, please give a reason:"), function(confirmed) {
-                if(confirmed) {
+        function submit_reject_occurrence(action, date){
+            new ConfirmPopupWithReason($T("Reject occurrence"), $T("Are you sure you want to <strong>reject</strong> \
+                the booking for the selected date? "), "("+ date + ")", "", function(confirmed){
+                if(confirmed){
                     var reason = this.reason.get();
                     $("#submits").attr("action", build_url(action, {reason: reason}));
                     $("#submits").submit();
                 }
             }, $T("Yes"), $T("No")).open();
         }
-        function submit_cancel_occurrence( action )
-        {
-            new ConfirmPopup($T("Cancel ocurrence"),$T("Are you sure you want to CANCEL the selected date from the booking?"), function(confirmed) {
-                if(confirmed) {
+        function submit_cancel_occurrence(action, date){
+            new ConfirmPopupWithActionContent($T("Cancel ocurrence"), $T("Are you sure you want to <strong>cancel</strong> \
+                the booking for the selected date? "), "("+ date + ")", "", function(confirmed){
+                if(confirmed){
                     $("#submits").attr("action", action);
                     $("#submits").submit();
                 }
             }, $T("Yes"), $T("No")).open();
         }
-        function submit_modify()
-        {
+        function submit_modify(){
             $("#submits").attr("action", "${ modifyBookingUH.getURL(reservation)}");
             $("#submits").submit();
         }
-        function submit_delete()
-        {
-            new ConfirmPopup($T("Delete booking"),$T("THIS ACTION IS IRREVERSIBLE. Are you sure you want to DELETE the booking?"), function(confirmed) {
+        function submit_delete(){
+            new ConfirmPopupWithActionContent($T("Delete booking"), $T("This action is irreversible.Are you sure you want \
+                to <strong>delete</strong> the booking?"), "", "", function(confirmed){
                 if(confirmed) {
                     $("#submits").attr("action", '${ urlHandlers.UHRoomBookingDeleteBooking.getURL( reservation ) }');
                     $("#submits").submit();
                 }
             }, $T("Yes"), $T("No")).open();
         }
-        function submit_clone()
-        {
+        function submit_clone(){
             $("#submits").attr("action", "${cloneURL}");
             $("#submits").submit();
         }
+
     </script>
 
     <!-- CONTEXT HELP DIVS -->
@@ -268,7 +267,7 @@
                                     <form id="submits" name="submits" action="" method="post">
                                         <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0 " style="float:left; padding-top: 15px">
                                         % if canCancel  and  not reservation.isCancelled and not reservation.isRejected:
-                                            <li class="button" style="margin-left: 10px" onclick="submit_cancel();return false;">
+                                            <li class="button" style="margin-left: 10px" onclick="submit_cancel(${[str(formatDate(period.startDT.date())) for period in reservation.splitToPeriods()]});return false;">
                                                 <a href="#" onClick="return false;">${ _("Cancel Booking")}</a>
                                             </li>
                                         % endif
@@ -278,7 +277,7 @@
                                             </li>
                                         % endif
                                         % if canReject  and not reservation.isCancelled and not reservation.isRejected:
-                                            <li class="button" style="margin-left: 10px" onclick="submit_reject();return false;">
+                                            <li class="button" style="margin-left: 10px" onclick="submit_reject(${[str(formatDate(period.startDT.date())) for period in reservation.splitToPeriods()]});return false;">
                                                 <a href="#" onClick="return false;">${ _("Reject")}</a>
                                             </li>
                                         % endif
@@ -434,12 +433,11 @@
                                             % for period in reservation.splitToPeriods():
                                                 ${ formatDate(period.startDT.date()) }
                                                 % if canReject:
-                                                    <a href="javascript: void( 0 )" onclick="submit_reject_occurrence( '${ urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( reservation, date=formatDate(period.startDT.date(), format='%Y-%m-%d') ) }');">Reject</a>
+                                                    <a class="roomBookingRejectOccurrence" data-date = "${ formatDate(period.startDT.date()) }" href="#" data-action = "${ urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( reservation, date=formatDate(period.startDT.date(), format='%Y-%m-%d') ) }">Reject</a>
                                                 % endif
                                                 % if canCancel:
-                                                    <a href="javascript: void( 0 )" onclick="submit_cancel_occurrence('${ urlHandlers.UHRoomBookingCancelBookingOccurrence.getURL( reservation, date=formatDate(period.startDT.date(), format='%Y-%m-%d') ) }');">Cancel</a>
+                                                    <a class="roomBookingCancelOccurrence" data-date = "${ formatDate(period.startDT.date()) }"href="#" data-action = "${ urlHandlers.UHRoomBookingCancelBookingOccurrence.getURL( reservation, date=formatDate(period.startDT.date(), format='%Y-%m-%d') ) }">Cancel</a>
                                                 % endif
-
                                                 <br />
                                             % endfor
                                             </td>
@@ -470,3 +468,13 @@
         </tr>
     </table>
     <br />
+    <script>
+        $( ".roomBookingRejectOccurrence" ).click(function() {
+            submit_reject_occurrence($(this).data('action'), $(this).data('date'));
+
+        });
+        $( ".roomBookingCancelOccurrence" ).click(function() {
+            submit_cancel_occurrence($(this).data('action'), $(this).data('date'));
+
+        });
+    </script>
