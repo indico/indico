@@ -276,9 +276,9 @@ moment = Bundle(
 base_js = Bundle(jquery, utils, presentation, calendar, indico_jquery, moment, indico_core,
                  indico_legacy, indico_common)
 
-base_sass = Bundle('sass/screen.scss',
+screen_sass = Bundle('sass/screen.scss',
                    filters=("pyscss", "cssrewrite", "cssmin"),
-                   output="sass/base_sass_%(version)s.css",
+                   output="sass/screen_sass_%(version)s.css",
                    depends=["sass/base/*.scss",
                             "sass/partials/*.scss",
                             "sass/modules/*.scss"])
@@ -324,4 +324,4 @@ def register_all_css(env, main_css_file):
 
     env.register('indico_badges_css', indico_badges_css)
     env.register('base_css', base_css)
-    env.register('base_sass', base_sass)
+    env.register('screen_sass', screen_sass)

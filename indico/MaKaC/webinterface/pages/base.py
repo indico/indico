@@ -101,7 +101,7 @@ class WPBase(OldObservable):
 
     def getCSSFiles(self):
         return self._asset_env['base_css'].urls() + \
-            self._asset_env['base_sass'].urls()
+            self._asset_env['screen_sass'].urls()
 
     def _getJavaScriptInclude(self, scriptPath):
         return '<script src="'+ scriptPath +'" type="text/javascript"></script>\n'
