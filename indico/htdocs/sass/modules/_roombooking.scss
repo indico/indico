@@ -1,0 +1,323 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty MERCHANTABILITY
+   of or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+#roomBookingCal {
+    width: 820px;
+}
+
+.tip {
+    border:solid 1px #888888;
+    color:#222222;
+    background-color:#f0f0f0;
+    font-size: 11px;
+    padding: 2px;
+
+    a {
+        font-size:11px;
+    }
+
+    ul, strong, em {
+        color:#222222;
+        font-size:11px;
+    }
+}
+
+.tip-no-borders {
+    @extend .tip;
+    border: none;
+}
+
+// Bars
+
+.barLegend {
+    @include border-radius();
+
+    float: left;
+    position: relative;
+    height: 12px;
+    margin: 4px;
+    padding: 2px 5px 2px 5px;
+    font-weight: bold;
+    font-size: 80%;
+    color: white;
+
+    &:hover {
+        opacity: 1 !important;
+    }
+
+    &:first-of-type ~ & {
+        @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05));
+    }
+}
+
+.barDefault {
+    @include border-radius(5px);
+    @include border-all();
+    @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05));
+
+    position: absolute;
+    top: 2px;
+    height: 12px;
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0);
+    filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+
+    &:hover {
+        @extend .barDefaultHover;
+    }
+}
+
+.barDefaultHover {
+    border-color: #06F !important;
+    opacity:0.7;
+    filter:alpha(opacity=70);
+}
+
+.barCand {  /* Bar representing candidate reservation */
+    background-color: #5BB75B;
+    background-image: -ms-linear-gradient(top, #62C462, #51A351);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#62C462), to(#51A351));
+    background-image: -webkit-linear-gradient(top, #62C462, #51A351);
+    background-image: -o-linear-gradient(top, #62C462, #51A351);
+    background-image: -moz-linear-gradient(top, #62C462, #51A351);
+    background-image: linear-gradient(top, #62C462, #51A351);
+    background-repeat: repeat-x;
+    border-color: #51A351 #51A351 #387038;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barUnaval { /* Bar representing unavailable period */
+    background-color: #FAA732;
+    background-repeat: repeat-x;
+    border-color: #F89406 #F89406 #AD6704;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barConf { /* Bar representing conflict */
+    background-color: #DA4F49;
+    background-repeat: repeat-x;
+    border-color: #BD362F #BD362F #802420;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barPreB { /* Bar representing PRE-booking */
+    background-color: #F5E916;
+    background-repeat: repeat-x;
+    border-color: #bcbc00;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barPreC { /* Bar representing conflict with PRE-booking */
+    background-color: #0074CC;
+    background-repeat: repeat-x;
+    border-color: #05C #05C #003580;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barPreConc { /* Bar representing concurrent PRE-bookings */
+    background-color: #49AFCD;
+    background-repeat: repeat-x;
+    border-color: #2F96B4 #2F96B4 #1F6377;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barProt.barCand {
+    background-image: none;
+    background-color: #DA4F49;
+    background-repeat: repeat-x;
+    border-color: #BD362F #BD362F #802420;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.dayDiv {
+    position: relative;
+    height: 10px;
+    font-size:0px;
+    margin-top: 6px;
+}
+
+.dayCalendarDiv {
+    position: relative;
+    height: 20px;
+    font-size:0px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.dayCalendarDivHeader {
+    height: 20px;
+    font-size:0px;
+    margin-top: 6px;
+    margin-left: 120px;
+    position: relative;
+}
+
+div.calHour {
+    margin-top: 2px;
+    position: absolute;
+    font-size: 8px;
+    height: 20px;
+    color: #666;
+}
+
+.dayCalendarDiv .time-bar {
+  background: url('../indico/images/rb_timebar_bg.png');
+  width: 675px;
+  height: 20px;
+}
+
+div.room-row {
+  min-height: 20px;
+  width: 100%;
+  margin-bottom: 5px;
+  clear: both;
+}
+
+div.room-row div.link {
+  line-height: 20px;
+  width: 120px;
+  padding-left: 5px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.wholeDayCalendarDiv {
+    clear: both;
+    float: left;
+    width: 800px;
+    padding-bottom: 20px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.wholeDayCalendarDayHighlight {
+    background-color: #D9EDF7;
+    padding: 5px 0px 0px 5px;
+}
+
+.qtip-bold {
+    font-weight: bold;
+}
+
+/* Form fields: field description width. */
+.subFieldWidth {
+    width: 160px;
+    color: #523D04;
+}
+.subFieldWidthSmaller
+{
+    width: 60px;
+    color: #523D04;
+}
+
+.actionSucceeded
+{
+    color: Green; margin-left: 6px; font-weight: bold;
+}
+
+.actionFailed
+{
+    color: Red; margin-left: 6px; font-weight: bold;
+}
+
+a.roomLink:hover, a.dateLink:hover {
+    text-decoration: underline;
+}
+
+a.basicRoom {
+    color: #0b63a5;
+}
+
+option.publicRoom, span.publicRoom, a.publicRoom {
+    color: Green;
+}
+
+option.moderatedRoom, span.moderatedRoom, a.moderatedRoom {
+    color: #D37209;
+}
+
+option.privateRoom, span.privateRoom, a.privateRoom, a.weekend {
+    color: Red;
+}
+
+a.blocked {
+    background-color: #f00;
+    color: #fff;
+}
+
+a.preblocked {
+    background-color: #fb0;
+    color: #000;
+}
+
+a.blocked_permitted {
+    background-color: #af5;
+    color: #000;
+}
+
+a.blocked_override {
+    background-color: #b5f;
+    color: #000;
+}
+
+span.unavailable {
+    background-color: #881122;
+    color: white;
+    padding: 1px;
+}
+
+a.weekday {
+    color: Black;
+}
+
+.bookingDisplayTitleCell {
+    width: 25%;
+}
+
+.bookingShowHideHistory {
+    margin-top: 9px;
+}
+
+.bookingDisplayEntryMoreInfo, .bookingDisplayEntryHideInfo {
+    white-space: nowrap;
+    padding-left: 7px;
+}
+
+.bookingDisplayHistoryTimestamp {
+    color: #999;
+    font-size: 11px;
+    display: table-cell;
+    white-space: pre;
+    padding-right: 10px;
+}
+
+.bookingDisplayHistoryInfo {
+    display: table-cell;
+    /* For GChrome and Safari*/
+    width: 1000px;
+}
+
+.bookingHistoryTooltip {
+    padding: 3px;
+    background-color: white;
+}

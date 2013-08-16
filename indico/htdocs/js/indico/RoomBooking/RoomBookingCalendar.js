@@ -371,7 +371,7 @@ type ("RoomBookingCalendarDrawer", [],
              */
             _ajaxClick: function(bar, url, element) {
                 // get conflicts per occurrence
-                var conflicts = $('.dayCalendarDivHover').closest('.dayCalendarDiv').map(function() {
+                var conflicts = $('.barDefaultHover').closest('.dayCalendarDiv').map(function() {
                     return $(this).find('.barDefault.barConf').length;
                 });
 
@@ -1110,10 +1110,10 @@ type ("RoomBookingCalendar", [],
                 $('.barCand').each(function() {
                     $(this).mouseover(function() {
                         $('.wholeDayCalendarDiv').find(".barCand#" + $(this).attr('id')).each(function() {
-                            $(this).addClass("dayCalendarDivHover");
+                            $(this).addClass("barDefaultHover");
                         });
                     }).mouseleave(function() {
-                        $('.barCand').removeClass("dayCalendarDivHover");
+                        $('.barCand').removeClass("barDefaultHover");
                     });
                 });
             }
