@@ -109,7 +109,7 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         self.click(ltext="Rooms")
         self.click(ltext="Configuration")
         self.click(ltext="Universe")
-        self.select(name="roomID", text="1-b-c - DummyRoom2")
+        self.select(id="roomID", label="1-b-c - DummyRoom2")
         self.click(css="input.btn")
         self.wait(css="span.fakeLink")
         self.click(css="span.fakeLink")

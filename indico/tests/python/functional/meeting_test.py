@@ -30,7 +30,7 @@ class MeetingBase(LectureBase):
         self.click(ltext="Add new")
         self.click(ltext="Session")
         self.type(id="sessionTitle", text="Session 1")
-        self.click(css="button.ui-button")
+        self.click(xpath="(//button[@type='button'])[5]")
 
         # wait for overlay to go away
         self.wait_remove(css='.ui-widget-overlay')
@@ -39,7 +39,7 @@ class MeetingBase(LectureBase):
         self.click(ltext="Add new")
         self.click(ltext="Contribution")
         self.type(id="addContributionFocusField", text="Contrib 1")
-        self.click(css="button.ui-button")
+        self.click(xpath="(//button[@type='button'])[5]")
 
         # wait for overlay to go away
         self.wait_remove(css='.ui-widget-overlay')
@@ -48,7 +48,7 @@ class MeetingBase(LectureBase):
         self.click(ltext="Add new")
         self.click(ltext="Break")
         self.type(id="breakTitle", text="coffe break")
-        self.click(css="button.ui-button")
+        self.click(xpath="(//button[@type='button'])[5]")
 
         self.wait_remove(css='.ui-widget-overlay')
         self.wait_for_jquery()
@@ -59,7 +59,7 @@ class MeetingBase(LectureBase):
         self.click(ltext="Session")
         self.click(ltext="Create a new session")
         self.type(id="sessionTitle", text="Session 2")
-        self.click(css="button.ui-button")
+        self.click(xpath="(//button[@type='button'])[5]")
 
         self.wait_remove(css='.ui-widget-overlay')
         self.wait_for_jquery()
@@ -67,13 +67,13 @@ class MeetingBase(LectureBase):
         self.click(ltext="Reschedule")
         self.click(id="startTimeRescheduleRB")
         self.type(xpath="//div[2]/input", text="10")
-        self.click(css="button.ui-button")
-        self.click(xpath="(//button[@type='button'])[3]")
+        self.click(xpath="(//button[@type='button'])[5]")
+        self.click(xpath="(//button[@type='button'])[8]")
         self.click(css="div.timetableBlock.timetableSession > div")
         self.click(ltext="Delete")
         alert = self.elem(css=".ui-dialog-content")
         self.assertEqual("Are you sure you want to delete this timetable entry?", alert.text)
-        self.click(css="button.ui-button")
+        self.click(xpath="(//button[@type='button'])[5]")
 
     def test_general_settings(self):
         super(MeetingBase, self).test_general_settings(lecture=False)
