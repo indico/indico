@@ -132,7 +132,7 @@ class LectureBase(object):
         self.type(id="userSearchFocusField", text="fake")
         self.click(css="input[type=\"button\"]")
         self.click(id="_GID1_existingAv0")
-        self.click(css="button.ui-button")
+        self.click(xpath="(//button[@type='button'])[5]")
 
         # wait for overlay to go away
         self.wait_remove(css='.ui-widget-overlay')
@@ -142,10 +142,10 @@ class LectureBase(object):
         self.type(id="_GID3", text="Ficticio")
         self.type(id="_GID4", text="Joaquim")
         self.type(xpath="(//input[@type='text'])[3]", text="CERN")
-        self.click(css="button.ui-button")
+        self.click(xpath="(//button[@type='button'])[5]")
         self.click(id="_GID5")
         self.type(id="_GID5", text="ficticio.joaquim@example.com")
-        self.click(css="button.ui-button")
+        self.click(xpath="(//button[@type='button'])[5]")
         self.click(id="checkParticipant2")
         self.click(id="remove_users")
 
@@ -154,7 +154,7 @@ class LectureBase(object):
         self.click(id="checkParticipant1")
         self.click(id="send_email")
         self.type(css="input[type=\"text\"]", text="test")
-        self.click(css="button.ui-button")
+        self.click(xpath="(//button[@type='button'])[5]")
 
         @self.retry()
         def _retry():
