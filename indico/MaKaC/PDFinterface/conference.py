@@ -3218,7 +3218,8 @@ class TicketToPDF(PDFBase):
             border=1
         )
 
-        qr_data = {"uuid": self._registrant.getCheckInUUID(),
+        qr_data = {"id": self._registrant.getId(),
+                   "secret": self._registrant.getCheckInUUID(),
                    "target": self._conf.getId(),
                    "application": "indico"}
         json_qr_data = json.dumps(qr_data)
