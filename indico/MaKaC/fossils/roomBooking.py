@@ -21,6 +21,7 @@ from MaKaC.common.fossilize import IFossil, Fossilizable, fossilizes
 from MaKaC.common.Conversion import Conversion
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 from MaKaC.common.TemplateExec import roomClass
+from datetime import datetime
 
 class IRoomFossil(IFossil):
 
@@ -113,6 +114,7 @@ class IReservationFossil(IFossil):
     def reason(self):
         """ Reason of the reservation """
 
+
 class IBarFossil(IFossil):
     """ Fossil interafce for reservation bar """
 
@@ -131,18 +133,11 @@ class IBarFossil(IFossil):
         """ Reservation out of which bar was created """
     forReservation.result = IReservationFossil
 
-#    def getCanReject(self):
-#        """
-#            Indicates if the current user can reject the reservation.
-#            This property is not stored in IReservationFossil because,
-#            in contrary to Bar objects, Reservation objects are stored
-#            in the database and this field has to recalculated for every
-#            user, so it cannot be stored there.
-#        """
-#    getCanReject.produce = lambda s: 1 if s.canReject and not s.forReservation.isCancelled and not s.forReservation.isRejected else 0
-#
-#    def rejectURL(self):
-#        """ URL to reject reservation webpage. Stored here for simillar reasons. """
+    def getBlocking(self):
+        pass
+    getBlocking.produce = lambda x: {"creator": x.forReservation.getBlockingCreator(datetime.date(x.startDT)),
+                                     "message": x.forReservation.getBlockingMessage(datetime.date(x.startDT))}
+
 
 class IRoomCalendarFossil( IRoomFossil ):
 

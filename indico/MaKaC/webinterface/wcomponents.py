@@ -3839,11 +3839,12 @@ class Bar( Fossilizable ):
     Keeps data necessary for graphical bar on calendar.
     """
     fossilizes(IBarFossil)
-    PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT = xrange( 0, 6 )
+    PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, BLOCKED, PRECONFLICT, CONFLICT = xrange(0, 7)
     # I know this names are not wisely choosed; it's due to unexpected additions
     # without refactoring
     # UNAVAILABLE :   represents confirmed reservation (bright-red)
     # CANDIDATE:      represents new reservation (green)
+    # BLOCKED:        room is blocked
     # CONFLICT:       overlap between candidate and confirmed resv. (dark red)
     # PREBOOKED:      represents pre-reservation (yellow)
     # PRECONFLICT:    represents conflict with pre-reservation (orange)
@@ -4210,8 +4211,12 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
         collisions = [] # only with confirmed resvs
         for candResv in candResvs:
             periodsOfCandResv = candResv.splitToPeriods()
+            blocked = candResv.getBlockingConflictState() == "active"
+            blockedDates = candResv.getBlockedDates()
             for p in periodsOfCandResv:
-                bars.append( Bar( Collision( (p.startDT, p.endDT), candResv ), Bar.CANDIDATE  ) )
+                bars.append(Bar(Collision((p.startDT, p.endDT), candResv), Bar.CANDIDATE))
+                if blocked and datetime.date(p.startDT) in blockedDates:
+                    bars.append(Bar(Collision((p.startDT, p.endDT), candResv), Bar.BLOCKED))
 
             # Bars: Conflicts all vs candidate
             candResvIsConfirmed = candResv.isConfirmed;
@@ -4297,7 +4302,6 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
                     rooms = []
 
             bars = introduceRooms( rooms, bars, calendarStartDT, calendarEndDT, showEmptyDays = showEmptyDays, showEmptyRooms = showEmptyRooms, user = rh._aw.getUser() )
-
 
         fossilizedBars = {}
         for key in bars:

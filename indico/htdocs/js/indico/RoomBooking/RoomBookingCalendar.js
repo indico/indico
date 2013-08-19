@@ -23,7 +23,7 @@ var START_H = 6;
 // Width of the calendar
 var DAY_WIDTH_PX = 35 * 12 * 2;
 // Room types, used for selecting proper CSS classes
-var barClasses = ['barPreB', 'barPreC', 'barUnaval', 'barCand',  'barPreConc', 'barConf'];
+var barClasses = ['barPreB', 'barPreC', 'barUnaval', 'barCand', 'barBlocked', 'barPreConc', 'barConf'];
 
 
 // Compares two rooms. Mainly used for sorting.
@@ -42,6 +42,7 @@ var calendarLegend = Html.div({style:{cssFloat: 'left', clear: 'both', padding: 
         Html.div( {className:'barLegend barCand'}, $T('Available')),
         Html.div( {className:'barLegend barUnaval'}, $T('Booked')),
         Html.div( {className:'barLegend barConf'}, $T('Conflict')),
+        Html.div( {className:'barLegend barBlocked'}, $T('Blocked')),
         Html.div( {className:'barLegend barPreB', style:{color: 'black'}}, $T('PRE-Booking')),
         Html.div( {className:'barLegend barPreC', style:{color: 'white'}}, $T('Conflict with PRE-Booking')),
         Html.div( {className:'barLegend barPreConc', style:{color: 'white'}}, $T('Concurrent PRE-Bookings')));
@@ -178,6 +179,7 @@ type ("RoomBookingCalendarBar", [],
             this.owner = barInfo["forReservation"]["bookedForName"];
             this.bookingUrl = barInfo["forReservation"]["bookingUrl"];
             this.inDB = barInfo.forReservation.id !== null;
+            this.blocking = barInfo["blocking"];
             this.type = barClasses[parseInt(barInfo["type"])];
         }
         );
@@ -304,13 +306,21 @@ type ("RoomBookingCalendarDrawer", [],
                 var left = ( startHour<0?0:startHour * 60 + bar.startDT.getMinutes() ) / (24*60) * DAY_WIDTH_PX;
                 var diff = ( bar.endDT.getHours() - bar.startDT.getHours() + (startHour<0?startHour:0) ) * 60 + ( bar.endDT.getMinutes() - bar.startDT.getMinutes() );
                 var width = diff / (24*60) * DAY_WIDTH_PX - 1;
+                var resvInfo;
                 if (width < 0) {
                     // TODO: This shouldn't happen! See ticket #942
                     return Html.div({});
                 }
-                var resvInfo = bar.startDT.print("%H:%M") + "  -  " +
-                               bar.endDT.print("%H:%M") + "<br />" + bar.owner +
-                               "<br />" + bar.reason;
+                if (bar.type == "barBlocked") {
+                    resvInfo = "Room blocked<br/>" +
+                               bar.blocking["creator"] + "<br/>" +
+                               bar.blocking["message"];
+                } else {
+                    resvInfo = bar.startDT.print("%H:%M") + "  -  " +
+                               bar.endDT.print("%H:%M") + "<br />" +
+                               bar.owner + "<br />" +
+                               bar.reason;
+                }
                 var newResvInfo = "Click to book it <br />" + bar.startDT.print("%H:%M") + "  -  " + bar.endDT.print("%H:%M");
                 var barDiv =  Html.div({
                     className: bar.type + " barDefault",

@@ -715,6 +715,22 @@ class ReservationBase( Fossilizable ):
                     dates.append(day)
         return dates
 
+    def getBlockingCreator(self, date):
+        from MaKaC.rb_factory import Factory
+        roomBlockings = Factory.newRoomBlocking().getByRoom(self.room)
+        for rbl in roomBlockings:
+            if rbl.block.startDate <= date and date <= rbl.block.endDate:
+                return rbl.block.createdByUser.getStraightFullName()
+        return None
+
+    def getBlockingMessage(self, date):
+        from MaKaC.rb_factory import Factory
+        roomBlockings = Factory.newRoomBlocking().getByRoom(self.room)
+        for rbl in roomBlockings:
+            if rbl.block.startDate <= date and date <= rbl.block.endDate:
+                return rbl.block.message
+        return None
+
     def getCollisions( self, sansID = None, rooms = None, boolResult = False ):
         """
         Returns all collisions with other reservations for the same room,
