@@ -2891,8 +2891,9 @@ class UHConferenceTicketPDF(URLHandler):
         user = ContextManager.get("currentUser")
         if user:
             registrant = user.getRegistrantById(conf.getId())
-            url.setParams(registrant.getLocator())
-            url.addParam('authkey', registrant.getRandomId())
+            if registrant:
+                url.setParams(registrant.getLocator())
+                url.addParam('authkey', registrant.getRandomId())
         return url
 
 
