@@ -69,7 +69,10 @@
     <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Organisation")}</span></td>
     <td><input type="text" name="sOrganisation"></td>
 </tr>
-
+<tr>
+    <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Show only active users")}</span></td>
+    <td><input type="checkbox" name="onlyActivated"/></td>
+</tr>
 <tr>
     <td>&nbsp;</td>
     <td><input type="submit" class="btn" value="${ _("apply")}"></input></td>
