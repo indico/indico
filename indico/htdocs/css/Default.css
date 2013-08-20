@@ -6022,6 +6022,7 @@ div.posterEntry {
     padding: 5px;
     margin-bottom: 5px;
     overflow: auto;
+    width: 100%;
 }
 
 div.posterEntry:hover {
