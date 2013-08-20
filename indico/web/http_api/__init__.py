@@ -23,6 +23,7 @@ Indico HTTP export API
 
 from indico.web.http_api.api import DataFetcher, LimitExceededException, HTTPAPIHook
 from indico.web.http_api.file import FileHook
+from indico.web.http_api.eticket import RegistrantHook
 
 
 API_MODE_KEY            = 0 # public requests without API key, authenticated requests with api key
