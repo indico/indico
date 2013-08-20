@@ -1007,8 +1007,14 @@ class Avatar(Persistent, Fossilizable):
             self.secondaryEmails.remove(email)
             self._p_changed = 1
 
-    def setSecondaryEmails(self, emailList):
-        self.secondaryEmails = emailList
+    def setSecondaryEmails(self, emailList, reindex=False):
+        if reindex:
+            idx = indexes.IndexesHolder().getById('email')
+            idx.unindexUser(self)
+            self.secondaryEmails = emailList
+            idx.indexUser(self)
+        else:
+            self.secondaryEmails = emailList
 
     def hasEmail(self, email):
         l=[self.email] + self.getSecondaryEmails()
