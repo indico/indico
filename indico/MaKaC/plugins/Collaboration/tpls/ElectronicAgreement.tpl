@@ -151,7 +151,7 @@ $(function() {
             var uniqueIdList = $('.speakerLine input:checked').map(function(){return this.id;}).toArray();
             var defaultText = "Dear {name},<br />" +
                             "<br />" +
-                            "The organiser asked to record the following event: <strong>${conf.getTitle()| n,j}</strong><br />" +
+                            "The organiser asked to record the following event: <strong>" + ${conf.getTitle()| n,j} +"</strong><br />" +
                             "In order to allow us to publish the video recording of your talk <strong>{talkTitle}</strong>, please sign the agreement form at this page:" +
                             "<br/><br/> {url} <br/>"+
                             "<br/>" +
