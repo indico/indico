@@ -306,31 +306,32 @@ type ("RoomBookingCalendarDrawer", [],
                 var left = ( startHour<0?0:startHour * 60 + bar.startDT.getMinutes() ) / (24*60) * DAY_WIDTH_PX;
                 var diff = ( bar.endDT.getHours() - bar.startDT.getHours() + (startHour<0?startHour:0) ) * 60 + ( bar.endDT.getMinutes() - bar.startDT.getMinutes() );
                 var width = diff / (24*60) * DAY_WIDTH_PX - 1;
-                var resvInfo;
+                var newResvInfo;
                 if (width < 0) {
                     // TODO: This shouldn't happen! See ticket #942
                     return Html.div({});
                 }
                 if (bar.type == "barBlocked") {
-                    resvInfo = "Room blocked<br/>" +
+                    newResvInfo = "Room blocked<br/>" +
                                bar.blocking["creator"] + "<br/>" +
                                bar.blocking["message"];
                 } else {
-                    resvInfo = bar.startDT.print("%H:%M") + "  -  " +
+                    newResvInfo = "Click to book it <br/>" +
+                                  bar.startDT.print("%H:%M") + "  -  " + bar.endDT.print("%H:%M");
+                }
+                var resvInfo = bar.startDT.print("%H:%M") + "  -  " +
                                bar.endDT.print("%H:%M") + "<br />" +
                                bar.owner + "<br />" +
                                bar.reason;
-                }
-                var newResvInfo = "Click to book it <br />" + bar.startDT.print("%H:%M") + "  -  " + bar.endDT.print("%H:%M");
                 var barDiv =  Html.div({
                     className: bar.type + " barDefault",
-                    style: {cursor: (bar.inDB || (bar.type == 'barCand' && showCandidateTip) ? 'pointer' : ''), width: pixels(parseInt(width)), left: pixels(parseInt(left))}});
+                    style: {cursor: (bar.inDB || ((bar.type == 'barCand' || bar.type == 'barBlocked') && showCandidateTip) ? 'pointer' : ''), width: pixels(parseInt(width)), left: pixels(parseInt(left))}});
                 if(bar.inDB) {
                     barDiv.observeClick(function(){
                         window.location = bar.bookingUrl;
                     });
                 }
-                if(bar.type == 'barCand' && showCandidateTip) {
+                if((bar.type == 'barCand' || bar.type == 'barBlocked') && showCandidateTip) {
                     $(barDiv.dom).click(function(){
                         var url = bar.room.getBookingFormUrl(bar.startDT.print("%Y/%m/%d %H:%M") + bar.endDT.print("%H:%M"), self.data.repeatability, self.data.flexibleDatesRange, true, self.data.finishDate, self.data.startD, self.data.endD);
                         self._ajaxClick(bar, url, $(this));
@@ -750,7 +751,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                     this.bars.sort(sortFunc);
                 each(this.bars,
                         function(bar){
-                            barsDiv.push(self.drawReservation(bar))
+                            barsDiv.push(self.drawReservation(bar));
                 });
                 this.sortedBy = sortBy;
                 this.ascendingSort = ascending;
@@ -764,7 +765,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
             drawReservation: function(bar){
                 // Conflict, prebooking conflict and concurrent prebooking bars don't represent bookings.
                 // They're added to the calendar to highlight some events.
-                if( !(bar.type == 'barPreC' || bar.type == 'barConf' || bar.type == 'barPreConc') ) {
+                if(!(bar.type == 'barPreC' || bar.type == 'barConf' || bar.type == 'barPreConc')) {
                     var showBookingLink = Html.p({className:"fakeLink"}, $T("Show"));
                     showBookingLink.observeClick(function(){
                         window.open(bar.bookingUrl);
@@ -798,8 +799,9 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                                     Html.p({style:{cssFloat:'left', width: pixels(90), height:pixels(40)}},bar.startDT.print("%d/%m/%Y")),
                                     Html.p({style:{cssFloat:'left', width: pixels(75), height:pixels(40)}},bar.startDT.print("%H:%M"), Html.br(), bar.endDT.print("%H:%M"))),
                                 Html.p({style:{cssFloat:'left', width: pixels(40), height:pixels(40)}},showBookingLink, rejectionLink));
-                } else
+                } else {
                     return null;
+                }
             },
 
             /**
@@ -1117,9 +1119,10 @@ type ("RoomBookingCalendar", [],
                     });
                 });
 
-                $('.barCand').each(function() {
+                $('.barCand, .barBlocked').each(function() {
+                    var id = $(this).hasClass("barCand")? $(this).attr("id") : $(this).prev(".barCand").attr("id");
                     $(this).mouseover(function() {
-                        $('.wholeDayCalendarDiv').find(".barCand#" + $(this).attr('id')).each(function() {
+                        $('.wholeDayCalendarDiv').find(".barCand#" + id).each(function() {
                             $(this).addClass("barDefaultHover");
                         });
                     }).mouseleave(function() {
