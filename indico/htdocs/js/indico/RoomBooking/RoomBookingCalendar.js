@@ -40,9 +40,9 @@ function compareRooms(elem1, elem2){
 var calendarLegend = Html.div({style:{cssFloat: 'left', clear: 'both', padding: pixels(5), marginBottom: pixels(10), border: "1px solid #eaeaea", textAlign: "center", borderRadius: pixels(10)}},
         Html.div( {className:'barLegend', style:{color: 'black'}}, $T('Legend:')),
         Html.div( {className:'barLegend barCand'}, $T('Available')),
-        Html.div( {className:'barLegend barUnaval'}, $T('Booked')),
         Html.div( {className:'barLegend barConf'}, $T('Conflict')),
         Html.div( {className:'barLegend barBlocked'}, $T('Blocked')),
+        Html.div( {className:'barLegend barUnaval'}, $T('Booked')),
         Html.div( {className:'barLegend barPreB', style:{color: 'black'}}, $T('PRE-Booking')),
         Html.div( {className:'barLegend barPreC', style:{color: 'white'}}, $T('Conflict with PRE-Booking')),
         Html.div( {className:'barLegend barPreConc', style:{color: 'white'}}, $T('Concurrent PRE-Bookings')));
@@ -382,7 +382,7 @@ type ("RoomBookingCalendarDrawer", [],
             _ajaxClick: function(bar, url, element) {
                 // get conflicts per occurrence
                 var conflicts = $('.barDefaultHover').closest('.dayCalendarDiv').map(function() {
-                    return $(this).find('.barDefault.barConf').length;
+                    return $(this).find('.barConf, .barBlocked').length;
                 });
 
                 var any_conflict = _.any(conflicts);
@@ -390,11 +390,11 @@ type ("RoomBookingCalendarDrawer", [],
 
                 if (all_conflicts) {
                     this._setDialog("search-again");
-                    $('#booking-dialog-content').html($T("This room cannot be booked at the time requested due a conflict with an existing reservation."));
+                    $('#booking-dialog-content').html($T("This room cannot be booked due to conflicts with existing reservations or room blockings."));
                     $('#booking-dialog').dialog("open");
                 } else if (any_conflict) {
                     this._setDialog("skip-conflict", url);
-                    $('#booking-dialog-content').html($T("This booking conflicts with existing reservations on some of the days"));
+                    $('#booking-dialog-content').html($T("This booking contains conflicts with existing reservations or blockings."));
                     $('#booking-dialog').dialog("open");
                 } else {
                     if (bar.room.type != "privateRoom") {
