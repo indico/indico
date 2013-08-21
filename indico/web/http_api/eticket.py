@@ -26,32 +26,55 @@ from indico.web.http_api.util import get_query_parameter
 from indico.util.date_time import format_datetime
 
 
-@HTTPAPIHook.register
-class RegistrantHook(HTTPAPIHook):
-    TYPES = ('registrant',)
-    RE = r'(?P<registrant_id>[\d]+)'
-    NO_CACHE = True
-
+class ETicketHook(HTTPAPIHook):
     def _getParams(self):
-        super(RegistrantHook, self)._getParams()
-        self._registrant_id = self._pathParams['registrant_id']
-        self._conf_id = get_query_parameter(self._queryParams, ['target'])
-        self._secret = get_query_parameter(self._queryParams, ['secret'])
-
-    def _checkProtection(self, aw):
+        self._registrant_id = self._pathParams["registrant_id"]
+        self._conf_id = get_query_parameter(self._queryParams, ["target"])
+        self._secret = get_query_parameter(self._queryParams, ["secret"])
         ch = ConferenceHolder()
         self._conf = ch.getById(self._conf_id)
         self._registrant = self._conf.getRegistrantById(self._registrant_id)
+
+    def _checkProtection(self, aw):
         user = aw.getUser()
         if not self._conf.canManageRegistration(user)\
             or self._secret != self._registrant.getCheckInUUID():
-            raise HTTPAPIError('Access denied', 403)
+            raise HTTPAPIError("Access denied", 403)
+
+
+@HTTPAPIHook.register
+class CheckInHook(ETicketHook):
+    TYPES = ("checkin",)
+    RE = r"(?P<registrant_id>[\d]+)"
+    NO_CACHE = True
+
+    def _getParams(self):
+        super(CheckInHook, self)._getParams()
+        self._check_in = get_query_parameter(self._queryParams, ["checked_in"])
+
+    def export_checkin(self, aw):
+        self._checkProtection(aw)
+        if self._check_in == "true":
+            self._registrant.setCheckedIn(True)
+        else:
+            self._registrant.setCheckedIn(False)
+
+        return {"success": True}
+
+
+@HTTPAPIHook.register
+class RegistrantHook(ETicketHook):
+    TYPES = ("registrant",)
+    RE = r"(?P<registrant_id>[\d]+)"
+    NO_CACHE = True
 
     def export_registrant(self, aw):
         self._checkProtection(aw)
 
         registration_date = format_datetime(
                                 self._registrant.getAdjustedRegistrationDate())
+        checkin_date = format_datetime(
+                                self._registrant.getAdjustedCheckInDate())
         regForm = self._conf.getRegistrationForm()
         if regForm.getReasonParticipationForm().isEnabled():
             participation_reason = self._registrant.getReasonParticipation()
@@ -71,7 +94,7 @@ class RegistrantHook(HTTPAPIHook):
             "registrant_home_page": self._registrant.getPersonalHomepage(),
             "registrant_payed": self._registrant.getPayed(),
             "registrant_checked_in": self._registrant.isCheckedIn(),
-            "registrant_check_in_date": self._registrant.getCheckInDate(),
+            "registrant_check_in_date": checkin_date,
             "registration_date": registration_date,
             "participation_reason": participation_reason
         }
