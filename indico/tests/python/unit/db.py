@@ -119,3 +119,20 @@ class DummyUser_Feature(IndicoTestFeature):
 
         with obj._context('database', sync=True):
             obj._dummy = default_actions.create_dummy_user()
+
+
+class FakeUsers_Feature(IndicoTestFeature):
+
+    """
+    Creates a dummy user - needs database
+    """
+
+    _requires = ['db.Database']
+
+    def start(self, obj):
+        super(FakeUsers_Feature, self).start(obj)
+
+        with obj._context('database', sync=True):
+            obj._avatars = default_actions.create_fake_users()
+            for i in xrange(1, 5):
+                setattr(obj, '_avatar%d' % i, obj._avatars[i-1])

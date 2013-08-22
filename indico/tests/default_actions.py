@@ -80,3 +80,21 @@ def create_dummy_user():
     dc = DefaultConference()
     HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(dc)
     return avatar
+
+
+def create_fake_users():
+        # Create few users
+        ah = AvatarHolder()
+        # Create dummy avatars in obj._avatarN
+        avatars = []
+        for i in xrange(1, 5):
+            avatar = Avatar()
+            avatar.setName("fake-%d" % i)
+            avatar.setSurName("fake")
+            avatar.setOrganisation("fake")
+            avatar.setLang("en_GB")
+            avatar.setEmail("fake%d@fake.fake" % i)
+            avatar.setId("fake-%d" % i)
+            ah.add(avatar)
+            avatars.append(avatar)
+        return avatars

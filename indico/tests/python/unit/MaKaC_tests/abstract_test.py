@@ -31,42 +31,24 @@ from MaKaC import conference
 from indico.tests.python.unit.util import IndicoTestCase, with_context
 from MaKaC.review import AbstractStatusWithdrawn, AbstractStatusSubmitted
 
+
 class TestAbstractSubmission(IndicoTestCase):
 
-    _requires = ['db.Database', 'db.DummyUser']
+    _requires = ['db.Database', 'db.DummyUser', 'db.FakeUsers']
 
     def setUp(self):
         super(TestAbstractSubmission, self).setUp()
 
-        self._startDBReq()
-
-        # Create few users
-        ah = AvatarHolder()
-        # Create dummy avatars in obj._avatarN
-        self._avatars = []
-        for i in xrange(1, 5):
-            avatar = Avatar()
-            avatar.setName("fake-%d" % i)
-            avatar.setSurName("fake")
-            avatar.setOrganisation("fake")
-            avatar.setLang("en_GB")
-            avatar.setEmail("fake%d@fake.fake" % i)
-            avatar.setId("fake-%d" % i)
-            ah.add(avatar)
-            self._avatars.append(avatar)
-            setattr(self, '_avatar%d' % i, avatar)
-
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar1)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
-
-        self._stopDBReq()
+        with self._context("database"):
+            # Create a conference
+            category = conference.CategoryManager().getById('0')
+            self._conf = category.newConference(self._avatar1)
+            self._conf.setTimezone('UTC')
+            sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
+            ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
+            self._conf.setDates(sd, ed)
+            ch = ConferenceHolder()
+            ch.add(self._conf)
 
     @with_context('database')
     def testSubmitAbstract(self):

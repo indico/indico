@@ -21,10 +21,10 @@ import os
 from datetime import datetime
 from pytz import timezone
 
-from MaKaC.user import Avatar
-from MaKaC.conference import AvatarHolder, ConferenceHolder
+from MaKaC.conference import ConferenceHolder
 from MaKaC import conference
 from indico.tests.python.unit.util import IndicoTestCase, with_context
+
 
 class TestProtection(IndicoTestCase):
 
@@ -33,56 +33,41 @@ class TestProtection(IndicoTestCase):
     def setUp(self):
         super(TestProtection, self).setUp()
 
-        self._startDBReq()
+        with self._context("database"):
+            # Create a conference
+            category = conference.CategoryManager().getById('0')
+            self._conf = category.newConference(self._dummy)
+            self._conf.setTimezone('UTC')
+            sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
+            ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
+            self._conf.setDates(sd, ed)
+            ch = ConferenceHolder()
+            ch.add(self._conf)
 
-        # Create a user
-        ah = AvatarHolder()
-        self._avatar = Avatar()
-        self._avatar.setName("fake")
-        self._avatar.setSurName("fake")
-        self._avatar.setOrganisation("fake")
-        self._avatar.setLang("en_GB")
-        self._avatar.setEmail("faked@fake.fake")
-        self._avatar.setId("fake")
-        ah.add(self._avatar)
+            self._contrib1 = conference.Contribution()
+            self._conf.addContribution(self._contrib1)
 
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
+            self._session1 = conference.Session()
+            self._conf.addSession(self._session1)
 
-        self._contrib1 = conference.Contribution()
-        self._conf.addContribution(self._contrib1)
+            self._session2 = conference.Session()
+            self._conf.addSession(self._session2)
 
-        self._session1 = conference.Session()
-        self._conf.addSession(self._session1)
+            self._contrib2 = conference.Contribution()
+            self._session1.addContribution(self._contrib2)
 
-        self._session2 = conference.Session()
-        self._conf.addSession(self._session2)
-
-        self._contrib2 = conference.Contribution()
-        self._session1.addContribution(self._contrib2)
-
-
-        #Now we create the material (id=0) and attach it to the contrib
-        self._material = conference.Material()
-        self._contrib1.addMaterial( self._material )
-        #Now we create a dummy file and attach it to the material
-        filePath = os.path.join( os.getcwd(), "test.txt" )
-        fh = open(filePath, "w")
-        fh.write("hola")
-        fh.close()
-        self._resource = conference.LocalFile()
-        self._resource.setFilePath( filePath )
-        self._resource.setFileName( "test.txt" )
-        self._material.addResource( self._resource )
-
-        self._stopDBReq()
+            #Now we create the material (id=0) and attach it to the contrib
+            self._material = conference.Material()
+            self._contrib1.addMaterial( self._material )
+            #Now we create a dummy file and attach it to the material
+            filePath = os.path.join( os.getcwd(), "test.txt" )
+            fh = open(filePath, "w")
+            fh.write("hola")
+            fh.close()
+            self._resource = conference.LocalFile()
+            self._resource.setFilePath( filePath )
+            self._resource.setFileName( "test.txt" )
+            self._material.addResource( self._resource )
 
     @with_context('database')
     def testOnlyPublic(self):
@@ -162,5 +147,3 @@ class TestProtection(IndicoTestCase):
         self.assertEqual(self._session1.getAccessController().isFullyPrivate(), True)
         self.assertEqual(self._session1.getAccessController().getPublicChildren(), [])
         self.assertEqual(self._conf.getAccessController().getPublicChildren(), [self._session2])
-
-

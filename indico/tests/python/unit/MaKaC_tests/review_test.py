@@ -29,42 +29,37 @@ from datetime import datetime
 from pytz import timezone
 from indico.tests.env import *
 
-from MaKaC.user import Avatar
+from MaKaC.user import AvatarHolder, Avatar
 from MaKaC.review import NotificationTemplate, NotifTplCondAccepted
 from indico.tests.python.unit.util import IndicoTestCase, with_context
-from MaKaC.conference import AvatarHolder, AdminList, Conference, Contribution, ConferenceHolder
+from MaKaC.conference import ConferenceHolder
 
 import MaKaC.conference as conference
 import MaKaC.review as review
 import MaKaC.errors as errors
 
 
-class TestCFADirectives(IndicoTestCase):
-    """Tests the setting of the main CFA directives.
-    """
+class TestReviewBase(IndicoTestCase):
     _requires = ['db.Database', 'db.DummyUser']
 
     def setUp(self):
-        super(TestCFADirectives, self).setUp()
+        super(TestReviewBase, self).setUp()
 
-        self._startDBReq()
+        with self._context("database"):
+            # Create a conference
+            category = conference.CategoryManager().getById('0')
+            self._conf = category.newConference(self._dummy)
+            self._conf.setTimezone('UTC')
+            sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
+            ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
+            self._conf.setDates(sd, ed)
+            ch = ConferenceHolder()
+            ch.add(self._conf)
 
-        # Get dummy user
-        ah = AvatarHolder()
-        avatar = ah.getById(0)
-        setattr(self, '_avatar', avatar)
 
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
-
-        self._stopDBReq()
+class TestCFADirectives(TestReviewBase):
+    """Tests the setting of the main CFA directives.
+    """
 
     @with_context('database')
     def testEnableCFA(self):
@@ -103,42 +98,22 @@ class TestCFADirectives(IndicoTestCase):
         self.assertFalse(cfa.inSubmissionPeriod(id))
 
 
-class TestAbstractSubmission(IndicoTestCase):
+class TestAbstractSubmission(TestReviewBase):
     """Tests different abstract submission scenarios
     """
-
-    _requires = ['db.Database', 'db.DummyUser']
 
     def setUp(self):
         super(TestAbstractSubmission, self).setUp()
 
-        self._startDBReq()
-
-        # Get dummy user
-        ah = AvatarHolder()
-        avatar = ah.getById(0)
-        setattr(self, '_avatar', avatar)
-
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
-
-        self._track1 = self._conf.newTrack()
-        self._track2 = self._conf.newTrack()
-        self._track3 = self._conf.newTrack()
-
-        self._stopDBReq()
+        with self._context("database"):
+            self._track1 = self._conf.newTrack()
+            self._track2 = self._conf.newTrack()
+            self._track3 = self._conf.newTrack()
 
     @with_context('database')
     def testSimpleSubmission(self):
         #creation of a new abstract
-        a = self._conf.getAbstractMgr().newAbstract(self._avatar)
+        a = self._conf.getAbstractMgr().newAbstract(self._dummy)
         #setting of abstract tracks
         a.setTracks([self._track1, self._track2])
         #checking that the abstract is in the conference and its status is
@@ -154,43 +129,23 @@ class TestAbstractSubmission(IndicoTestCase):
         self.assertTrue(a.isProposedForTrack(self._track2))
         self.assertFalse(a.isProposedForTrack(self._track3))
         #checking that the submitter is the abstract submitter
-        self.assertTrue(a.isSubmitter(self._avatar))
+        self.assertTrue(a.isSubmitter(self._dummy))
         #checking access privileges
         #checking modification privileges
 
 
-class TestAbstractModification(IndicoTestCase):
+class TestAbstractModification(TestReviewBase):
     """Tests different abstract modification scenarios
     """
-
-    _requires = ['db.Database', 'db.DummyUser']
 
     def setUp(self):
         super(TestAbstractModification, self).setUp()
 
-        self._startDBReq()
-
-        # Get dummy user
-        ah = AvatarHolder()
-        avatar = ah.getById(0)
-        setattr(self, '_avatar', avatar)
-
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
-
-        self._track1 = self._conf.newTrack()
-        self._track2 = self._conf.newTrack()
-        self._track3 = self._conf.newTrack()
-        self._abstract = self._conf.getAbstractMgr().newAbstract(avatar)
-
-        self._stopDBReq()
+        with self._context("database"):
+            self._track1 = self._conf.newTrack()
+            self._track2 = self._conf.newTrack()
+            self._track3 = self._conf.newTrack()
+            self._abstract = self._conf.getAbstractMgr().newAbstract(self._dummy)
 
     @with_context('database')
     def testTrackAssignment(self):
@@ -220,42 +175,22 @@ class TestAbstractModification(IndicoTestCase):
         self.assertTrue(self._abstract.isProposedForTrack(self._track3))
 
 
-class TestAbstractAcceptation(IndicoTestCase):
+class TestAbstractAcceptation(TestReviewBase):
     """Tests different abstract acceptation scenarios
     """
-
-    _requires = ['db.Database', 'db.DummyUser']
 
     def setUp(self):
         super(TestAbstractAcceptation, self).setUp()
 
-        self._startDBReq()
-
-        # Get dummy user
-        ah = AvatarHolder()
-        avatar = ah.getById(0)
-        setattr(self, '_avatar', avatar)
-
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
-
-        self._ctOral = conference.ContributionType("oral", "", self._conf)
-        self._ctPoster = conference.ContributionType("poster", "", self._conf)
-        self._conf.addContribType(self._ctOral)
-        self._conf.addContribType(self._ctPoster)
-        self._track1 = self._conf.newTrack()
-        self._track2 = self._conf.newTrack()
-        self._track3 = self._conf.newTrack()
-        self._abstract = self._conf.getAbstractMgr().newAbstract(avatar)
-
-        self._stopDBReq()
+        with self._context("database"):
+            self._ctOral = conference.ContributionType("oral", "", self._conf)
+            self._ctPoster = conference.ContributionType("poster", "", self._conf)
+            self._conf.addContribType(self._ctOral)
+            self._conf.addContribType(self._ctPoster)
+            self._track1 = self._conf.newTrack()
+            self._track2 = self._conf.newTrack()
+            self._track3 = self._conf.newTrack()
+            self._abstract = self._conf.getAbstractMgr().newAbstract(self._dummy)
 
     @with_context('database')
     def testBasicAcceptation(self):
@@ -275,7 +210,7 @@ class TestAbstractAcceptation(IndicoTestCase):
                       fax="test2_fax", title="test2_title")
         #accepting an abstract for a certain track
         self._abstract.setTracks([self._track1, self._track2])
-        res1 = self._avatar
+        res1 = self._dummy
         self._abstract.accept(res1, self._track1, self._ctOral)
         #check the status is changed to accept
         status = self._abstract.getCurrentStatus()
@@ -318,7 +253,7 @@ class TestAbstractAcceptation(IndicoTestCase):
         #   the ids
         contrib = conference.Contribution()
         self._conf.addContribution(contrib)
-        res1 = self._avatar
+        res1 = self._dummy
         abstract = self._conf.getAbstractMgr().newAbstract(res1)
         #accepting an abstract for a certain track
         self._abstract.accept(res1, self._track1, self._ctOral)
@@ -329,7 +264,7 @@ class TestAbstractAcceptation(IndicoTestCase):
         #an abstract can be accepted for a track for which it is not proposed
         self._abstract.setTracks([self._track1, self._track2])
         self.assertFalse(self._track3.hasAbstract(self._abstract))
-        res1 = self._avatar
+        res1 = self._dummy
         self._abstract.accept(res1, self._track3, self._ctOral)
         #check the status is changed to accept
         status = self._abstract.getCurrentStatus()
@@ -340,39 +275,19 @@ class TestAbstractAcceptation(IndicoTestCase):
         self.assertTrue(self._track3.hasAbstract(self._abstract))
 
 
-class TestAbstractDisplay(IndicoTestCase):
+class TestAbstractDisplay(TestReviewBase):
     """tests different abstract displaying scenarios.
     """
-
-    _requires = ['db.Database', 'db.DummyUser']
 
     def setUp(self):
         super(TestAbstractDisplay, self).setUp()
 
-        self._startDBReq()
-
-        # Get dummy user
-        ah = AvatarHolder()
-        avatar = ah.getById(0)
-        setattr(self, '_avatar', avatar)
-
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
-
-        self._track1 = self._conf.newTrack()
-        self._track2 = self._conf.newTrack()
-        self._track3 = self._conf.newTrack()
-        self._track4 = self._conf.newTrack()
-        self._abstract = self._conf.getAbstractMgr().newAbstract(avatar)
-
-        self._stopDBReq()
+        with self._context("database"):
+            self._track1 = self._conf.newTrack()
+            self._track2 = self._conf.newTrack()
+            self._track3 = self._conf.newTrack()
+            self._track4 = self._conf.newTrack()
+            self._abstract = self._conf.getAbstractMgr().newAbstract(self._dummy)
 
     @with_context('database')
     def testTrackOrder(self):
@@ -385,7 +300,7 @@ class TestAbstractDisplay(IndicoTestCase):
                         and l[2] == self._track3)
 
 
-class TestAbstractWithdrawal(IndicoTestCase):
+class TestAbstractWithdrawal(TestReviewBase):
     """tests different abstract withdrawal scenarios.
     """
 
@@ -394,104 +309,66 @@ class TestAbstractWithdrawal(IndicoTestCase):
     def setUp(self):
         super(TestAbstractWithdrawal, self).setUp()
 
-        self._startDBReq()
-
-        # Get dummy user
-        ah = AvatarHolder()
-        avatar = ah.getById(0)
-        setattr(self, '_avatar', avatar)
-
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
-
-        self._ctOral = conference.ContributionType("oral", "", self._conf)
-        self._conf.addContribType(self._ctOral)
-        self._track1 = self._conf.newTrack()
-        self._track2 = self._conf.newTrack()
-        self._track3 = self._conf.newTrack()
-        self._abstract = self._conf.getAbstractMgr().newAbstract(avatar)
-
-        self._stopDBReq()
+        with self._context("database"):
+            self._ctOral = conference.ContributionType("oral", "", self._conf)
+            self._conf.addContribType(self._ctOral)
+            self._track1 = self._conf.newTrack()
+            self._track2 = self._conf.newTrack()
+            self._track3 = self._conf.newTrack()
+            self._abstract = self._conf.getAbstractMgr().newAbstract(self._dummy)
 
     @with_context('database')
     def testNormal(self):
         #tests the normal flow of events of the withdrawal TC
-        self._abstract.withdraw(self._avatar, "hola")
+        self._abstract.withdraw(self._dummy, "hola")
         self.assertTrue(isinstance(self._abstract.getCurrentStatus(), review.AbstractStatusWithdrawn))
 
     @with_context('database')
     def testCannotAccWithdrawn(self):
         #tests that a withdrawn abstract cannot be accepted
         self._abstract.withdraw(None, "hola")
-        self.assertRaises(errors.MaKaCError, self._abstract.accept, self._avatar, self._track1, self._ctOral)
+        self.assertRaises(errors.MaKaCError, self._abstract.accept, self._dummy, self._track1, self._ctOral)
 
     @with_context('database')
     def testCannotRejWithdrawn(self):
         #tests that a withdrawn abstract cannot be rejected
         self._abstract.withdraw(None, "hola")
-        self.assertRaises(errors.MaKaCError, self._abstract.reject, self._avatar)
+        self.assertRaises(errors.MaKaCError, self._abstract.reject, self._dummy)
 
     @with_context('database')
     def testAccepted(self):
         #tests that it is possible to withdraw an accepted abstract and that it
         #   provokes the withdrawal of the associated contribution
-        self._abstract.accept(self._avatar, self._track1, self._ctOral)
+        self._abstract.accept(self._dummy, self._track1, self._ctOral)
         contrib = self._abstract.getContribution()
         self.assertFalse(isinstance(contrib, conference.ContribStatusWithdrawn))
-        self._abstract.withdraw(self._avatar, "hola")
+        self._abstract.withdraw(self._dummy, "hola")
         absStatus = self._abstract.getCurrentStatus()
         contribStatus = contrib.getCurrentStatus()
         self.assertTrue(isinstance(absStatus, review.AbstractStatusWithdrawn))
         self.assertTrue(isinstance(contribStatus, conference.ContribStatusWithdrawn))
 
 
-class TestAbstractRecovery(IndicoTestCase):
+class TestAbstractRecovery(TestReviewBase):
     """tests different abstract recovery scenarios.
     """
-
-    _requires = ['db.Database', 'db.DummyUser']
 
     def setUp(self):
         super(TestAbstractRecovery, self).setUp()
 
-        self._startDBReq()
-
-        # Get dummy user
-        ah = AvatarHolder()
-        avatar = ah.getById(0)
-        setattr(self, '_avatar', avatar)
-
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
-
-        self._track1 = self._conf.newTrack()
-        self._track2 = self._conf.newTrack()
-        self._track3 = self._conf.newTrack()
-        self._abstract = self._conf.getAbstractMgr().newAbstract(avatar)
-        self._abstract.addTrack(self._track1)
-        self._abstract.addTrack(self._track2)
-        self._abstract.addTrack(self._track3)
-
-        self._stopDBReq()
+        with self._context("database"):
+            self._track1 = self._conf.newTrack()
+            self._track2 = self._conf.newTrack()
+            self._track3 = self._conf.newTrack()
+            self._abstract = self._conf.getAbstractMgr().newAbstract(self._dummy)
+            self._abstract.addTrack(self._track1)
+            self._abstract.addTrack(self._track2)
+            self._abstract.addTrack(self._track3)
 
     @with_context('database')
     def testNormal(self):
         #tests the abstract recovery normal flow
-        self._abstract.withdraw(self._avatar)
+        self._abstract.withdraw(self._dummy)
         self._abstract.recover()
         self.assertTrue(isinstance(self._abstract.getCurrentStatus(), review.AbstractStatusSubmitted))
 
@@ -499,9 +376,9 @@ class TestAbstractRecovery(IndicoTestCase):
     def testTackJudgementClearing(self):
         #tests that after recovering an abstract which had some judgements
         #   they are cleared.
-        self._abstract.proposeToAccept(self._avatar, self._track1, "oral")
-        self._abstract.proposeToAccept(self._avatar, self._track3, "oral")
-        self._abstract.withdraw(self._avatar)
+        self._abstract.proposeToAccept(self._dummy, self._track1, "oral")
+        self._abstract.proposeToAccept(self._dummy, self._track3, "oral")
+        self._abstract.withdraw(self._dummy)
         self._abstract.recover()
         self.assertTrue(self._abstract.hasTrack(self._track1))
         self.assertTrue(self._abstract.hasTrack(self._track3))
@@ -510,44 +387,24 @@ class TestAbstractRecovery(IndicoTestCase):
         self.assertEqual(self._abstract.getNumJudgements(), 2)
 
 
-class TestAbstractReallocation(IndicoTestCase):
+class TestAbstractReallocation(TestReviewBase):
     """tests different abstract reallocation scenarios.
     """
-
-    _requires = ['db.Database', 'db.DummyUser']
 
     def setUp(self):
         super(TestAbstractReallocation, self).setUp()
 
-        self._startDBReq()
-
-        # Get dummy user
-        ah = AvatarHolder()
-        avatar = ah.getById(0)
-        setattr(self, '_avatar', avatar)
-
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
-
-        self._conf = conference.Conference(avatar)
-        self._track1 = self._conf.newTrack()
-        self._track2 = self._conf.newTrack()
-        self._track3 = self._conf.newTrack()
-        self._abstract = self._conf.getAbstractMgr().newAbstract(avatar)
-        self._abstract.addTrack(self._track1)
-
-        self._stopDBReq()
+        with self._context("database"):
+            self._conf = conference.Conference(self._dummy)
+            self._track1 = self._conf.newTrack()
+            self._track2 = self._conf.newTrack()
+            self._track3 = self._conf.newTrack()
+            self._abstract = self._conf.getAbstractMgr().newAbstract(self._dummy)
+            self._abstract.addTrack(self._track1)
 
     @with_context('database')
     def testSimpleReallocation(self):
-        self._abstract.proposeForOtherTracks(self._avatar, self._track1, "test",
+        self._abstract.proposeForOtherTracks(self._dummy, self._track1, "test",
                                              [self._track2, self._track3])
         self.assertTrue(self._abstract.hasTrack(self._track1))
         self.assertTrue(self._abstract.hasTrack(self._track2))
@@ -555,7 +412,7 @@ class TestAbstractReallocation(IndicoTestCase):
         self.assertEqual(self._abstract.getNumJudgements(), 1)
         t1jud = self._abstract.getTrackJudgement(self._track1)
         self.assertTrue(isinstance(t1jud, review.AbstractReallocation))
-        self.assertEqual(t1jud.getResponsible(), self._avatar)
+        self.assertEqual(t1jud.getResponsible(), self._dummy)
         self.assertTrue(self._track2 in t1jud.getProposedTrackList())
         self.assertTrue(self._track3 in t1jud.getProposedTrackList())
         self.assertFalse(self._track1 in t1jud.getProposedTrackList())
@@ -569,40 +426,20 @@ class TestAbstractReallocation(IndicoTestCase):
         self.assertFalse(t1jud in t1_tl)
 
 
-class TestNotification(IndicoTestCase):
+class TestNotification(TestReviewBase):
     """
     """
-
-    _requires = ['db.Database', 'db.DummyUser']
 
     def setUp(self):
         super(TestNotification, self).setUp()
 
-        self._startDBReq()
-
-        # Get dummy user
-        ah = AvatarHolder()
-        avatar = ah.getById(0)
-        setattr(self, '_avatar', avatar)
-
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
-
-        self._track1 = self._conf.newTrack()
-        self._track2 = self._conf.newTrack()
-        self._track3 = self._conf.newTrack()
-        absMgr = self._conf.getAbstractMgr()
-        self._contribTypeOral = "oral"
-        self._contribTypePoster = "poster"
-
-        self._stopDBReq()
+        with self._context("database"):
+            self._track1 = self._conf.newTrack()
+            self._track2 = self._conf.newTrack()
+            self._track3 = self._conf.newTrack()
+            absMgr = self._conf.getAbstractMgr()
+            self._contribTypeOral = "oral"
+            self._contribTypePoster = "poster"
 
     @with_context('database')
     def testBasicManagement(self):
@@ -635,17 +472,16 @@ class TestNotification(IndicoTestCase):
         cond2 = NotifTplCondRejected()
         tpl1.addCondition(cond1)
         tpl2.addCondition(cond2)
-        from MaKaC.user import Avatar
-        abs1 = absMgr.newAbstract(self._avatar)
+        abs1 = absMgr.newAbstract(self._dummy)
         tplRes = absMgr.getNotifTplForAbstract(abs1)
         self.assertTrue(tplRes is None)
-        abs1.accept(self._avatar, self._track1, self._contribTypeOral)
+        abs1.accept(self._dummy, self._track1, self._contribTypeOral)
         self.assertEqual(absMgr.getNotifTplForAbstract(abs1), tpl1)
-        abs2 = absMgr.newAbstract(self._avatar)
-        abs2.accept(self._avatar, self._track1, self._contribTypePoster)
+        abs2 = absMgr.newAbstract(self._dummy)
+        abs2.accept(self._dummy, self._track1, self._contribTypePoster)
         self.assertFalse(absMgr.getNotifTplForAbstract(abs2))
-        abs3 = absMgr.newAbstract(self._avatar)
-        abs3.reject(self._avatar)
+        abs3 = absMgr.newAbstract(self._dummy)
+        abs3.reject(self._dummy)
         self.assertEqual(absMgr.getNotifTplForAbstract(abs3), tpl2)
 
     @with_context('database')
@@ -657,14 +493,14 @@ class TestNotification(IndicoTestCase):
         absMgr.addNotificationTpl(tpl1)
         cond1 = NotifTplCondAccepted(track=self._track1, contribType=self._contribTypeOral)
         tpl1.addCondition(cond1)
-        abs1 = absMgr.newAbstract(self._avatar)
-        abs1.accept(self._avatar, self._track1, self._contribTypeOral)
+        abs1 = absMgr.newAbstract(self._dummy)
+        abs1.accept(self._dummy, self._track1, self._contribTypeOral)
         self.assertEqual(absMgr.getNotifTplForAbstract(abs1), tpl1)
-        abs2 = absMgr.newAbstract(self._avatar)
-        abs2.accept(self._avatar, self._track1, self._contribTypePoster)
+        abs2 = absMgr.newAbstract(self._dummy)
+        abs2.accept(self._dummy, self._track1, self._contribTypePoster)
         self.assertTrue(absMgr.getNotifTplForAbstract(abs2) is None)
-        abs3 = absMgr.newAbstract(self._avatar)
-        abs3.accept(self._avatar, self._track2, self._contribTypeOral)
+        abs3 = absMgr.newAbstract(self._dummy)
+        abs3.accept(self._dummy, self._track2, self._contribTypeOral)
         self.assertTrue(absMgr.getNotifTplForAbstract(abs3) is None)
 
     @with_context('database')
@@ -676,17 +512,17 @@ class TestNotification(IndicoTestCase):
         absMgr.addNotificationTpl(tpl1)
         cond1 = NotifTplCondAccepted(contribType=self._contribTypeOral)
         tpl1.addCondition(cond1)
-        abs1 = absMgr.newAbstract(self._avatar)
-        abs1.accept(self._avatar, self._track1, self._contribTypeOral)
+        abs1 = absMgr.newAbstract(self._dummy)
+        abs1.accept(self._dummy, self._track1, self._contribTypeOral)
         self.assertEqual(absMgr.getNotifTplForAbstract(abs1), tpl1)
-        abs2 = absMgr.newAbstract(self._avatar)
-        abs2.accept(self._avatar, self._track1, self._contribTypePoster)
+        abs2 = absMgr.newAbstract(self._dummy)
+        abs2.accept(self._dummy, self._track1, self._contribTypePoster)
         self.assertTrue(absMgr.getNotifTplForAbstract(abs2) is None)
-        abs3 = absMgr.newAbstract(self._avatar)
-        abs3.accept(self._avatar, self._track2, self._contribTypeOral)
+        abs3 = absMgr.newAbstract(self._dummy)
+        abs3.accept(self._dummy, self._track2, self._contribTypeOral)
         self.assertEqual(absMgr.getNotifTplForAbstract(abs3), tpl1)
-        abs4 = absMgr.newAbstract(self._avatar)
-        abs4.accept(self._avatar, None, self._contribTypeOral)
+        abs4 = absMgr.newAbstract(self._dummy)
+        abs4.accept(self._dummy, None, self._contribTypeOral)
         self.assertEqual(absMgr.getNotifTplForAbstract(abs4), tpl1)
 
     @with_context('database')
@@ -698,51 +534,27 @@ class TestNotification(IndicoTestCase):
         absMgr.addNotificationTpl(tpl1)
         cond1 = NotifTplCondAccepted(track=None, contribType=self._contribTypeOral)
         tpl1.addCondition(cond1)
-        abs1 = absMgr.newAbstract(self._avatar)
-        abs1.accept(self._avatar, self._track1, self._contribTypeOral)
+        abs1 = absMgr.newAbstract(self._dummy)
+        abs1.accept(self._dummy, self._track1, self._contribTypeOral)
         self.assertTrue(absMgr.getNotifTplForAbstract(abs1) is None)
-        abs2 = absMgr.newAbstract(self._avatar)
-        abs2.accept(self._avatar, self._track1, self._contribTypePoster)
+        abs2 = absMgr.newAbstract(self._dummy)
+        abs2.accept(self._dummy, self._track1, self._contribTypePoster)
         self.assertTrue(absMgr.getNotifTplForAbstract(abs2) is None)
-        abs3 = absMgr.newAbstract(self._avatar)
-        abs3.accept(self._avatar, None, self._contribTypeOral)
+        abs3 = absMgr.newAbstract(self._dummy)
+        abs3.accept(self._dummy, None, self._contribTypeOral)
         self.assertEqual(absMgr.getNotifTplForAbstract(abs3), tpl1)
 
 
-class TestAuthorSearch(IndicoTestCase):
-
-    _requires = ['db.Database', 'db.DummyUser']
-
-    def setUp(self):
-        super(TestAuthorSearch, self).setUp()
-
-        self._startDBReq()
-
-        # Get dummy user
-        ah = AvatarHolder()
-        avatar = ah.getById(0)
-        setattr(self, '_avatar', avatar)
-
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
-
-        self._stopDBReq()
+class TestAuthorSearch(TestReviewBase):
 
     @with_context('database')
     def testBasicSearch(self):
         absMgr = self._conf.getAbstractMgr()
-        abs1 = absMgr.newAbstract(self._avatar)
+        abs1 = absMgr.newAbstract(self._dummy)
         auth1 = abs1.newPrimaryAuthor(firstName="a", surName="a")
         auth2 = abs1.newPrimaryAuthor(firstName="b", surName="b")
         auth3 = abs1.newCoAuthor(firstName="b", surName="b")
-        abs2 = absMgr.newAbstract(self._avatar)
+        abs2 = absMgr.newAbstract(self._dummy)
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("")), 2)
         self.assertEqual(len(absMgr.getAbstractsMatchingAuth("a")), 1)
         self.assertTrue(abs1 in absMgr.getAbstractsMatchingAuth("a"))
@@ -770,125 +582,109 @@ class TestAuthorSearch(IndicoTestCase):
         self.assertFalse(abs1 in absMgr.getAbstractsMatchingAuth("b"))
 
 
-class TestAbstractJudgements(IndicoTestCase):
+class TestAbstractJudgements(TestReviewBase):
     """Tests different abstract judgements scenarios
     """
-
-    _requires = ['db.Database', 'db.DummyUser']
 
     def setUp(self):
         super(TestAbstractJudgements, self).setUp()
 
-        self._startDBReq()
+        with self._context("database"):
 
         # Get dummy user and create another one
-        ah = AvatarHolder()
-        avatar1 = ah.getById(0)
-        avatar2 = Avatar()
-        avatar2.setName("fake-2")
-        avatar2.setSurName("fake")
-        avatar2.setOrganisation("fake")
-        avatar2.setLang("en_GB")
-        avatar2.setEmail("fake2@fake.fake")
-        avatar2.setId("fake-2")
-        ah.add(avatar2)
-        setattr(self, '_avatar1', avatar1)
-        setattr(self, '_avatar2', avatar2)
+            ah = AvatarHolder()
+            avatar2 = Avatar()
+            avatar2.setName("fake-2")
+            avatar2.setSurName("fake")
+            avatar2.setOrganisation("fake")
+            avatar2.setLang("en_GB")
+            avatar2.setEmail("fake2@fake.fake")
+            avatar2.setId("fake-2")
+            ah.add(avatar2)
+            setattr(self, '_avatar2', avatar2)
 
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._avatar1)
-        self._conf.setTimezone('UTC')
-        sd = datetime(2011, 11, 1, 10, 0, tzinfo=timezone('UTC'))
-        ed = datetime(2011, 11, 1, 18, 0, tzinfo=timezone('UTC'))
-        self._conf.setDates(sd, ed)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
+            self._ctOral = conference.ContributionType("oral", "", self._conf)
+            self._conf.addContribType(self._ctOral)
 
-        self._ctOral = conference.ContributionType("oral", "", self._conf)
-        self._conf.addContribType(self._ctOral)
+            self._track1 = self._conf.newTrack()
+            self._track2 = self._conf.newTrack()
+            self._track3 = self._conf.newTrack()
 
-        self._track1 = self._conf.newTrack()
-        self._track2 = self._conf.newTrack()
-        self._track3 = self._conf.newTrack()
+            self._abstract1 = self._conf.getAbstractMgr().newAbstract(self._dummy)
+            self._abstract2 = self._conf.getAbstractMgr().newAbstract(self._dummy)
+            self._abstract3 = self._conf.getAbstractMgr().newAbstract(self._dummy)
+            self._abstract4 = self._conf.getAbstractMgr().newAbstract(self._dummy)
+            self._abstract5 = self._conf.getAbstractMgr().newAbstract(self._dummy)
 
-        self._abstract1 = self._conf.getAbstractMgr().newAbstract(self._avatar1)
-        self._abstract2 = self._conf.getAbstractMgr().newAbstract(self._avatar1)
-        self._abstract3 = self._conf.getAbstractMgr().newAbstract(self._avatar1)
-        self._abstract4 = self._conf.getAbstractMgr().newAbstract(self._avatar1)
-        self._abstract5 = self._conf.getAbstractMgr().newAbstract(self._avatar1)
-
-        self._abstract1.setTracks([self._track1, self._track2, self._track3])
-        self._abstract2.setTracks([self._track1, self._track2])
-        self._abstract3.setTracks([self._track1])
-        self._abstract4.setTracks([self._track2, self._track3])
-        self._abstract5.setTracks([self._track3])
-
-        self._stopDBReq()
+            self._abstract1.setTracks([self._track1, self._track2, self._track3])
+            self._abstract2.setTracks([self._track1, self._track2])
+            self._abstract3.setTracks([self._track1])
+            self._abstract4.setTracks([self._track2, self._track3])
+            self._abstract5.setTracks([self._track3])
 
     @with_context('database')
     def testJudgementStatus(self):
-        self.assertTrue(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1) is None)
+        self.assertTrue(self._abstract1.getLastJudgementPerReviewer(self._dummy, self._track1) is None)
         self.assertTrue(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1) is None)
         self.assertTrue(self._abstract1.getTrackJudgement(self._track1) is None)
         self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusSubmitted))
 
-        self._abstract1.proposeToAccept(self._avatar1, self._track1, "oral")
+        self._abstract1.proposeToAccept(self._dummy, self._track1, "oral")
 
-        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._dummy, self._track1), review.AbstractAcceptance))
         self.assertTrue(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1) is None)
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance))
         self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusUnderReview))
 
         self._abstract1.proposeToReject(self._avatar2, self._track1, "oral")
 
-        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._dummy, self._track1), review.AbstractAcceptance))
         self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1), review.AbstractRejection))
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractInConflict))
         self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusInConflict))
 
         self._abstract1.proposeToAccept(self._avatar2, self._track1, "oral")
 
-        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractAcceptance))
+        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._dummy, self._track1), review.AbstractAcceptance))
         self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1), review.AbstractAcceptance))
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance))
         self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusUnderReview))
 
-        self._abstract1.proposeToReject(self._avatar1, self._track1, "oral")
+        self._abstract1.proposeToReject(self._dummy, self._track1, "oral")
         self._abstract1.proposeToReject(self._avatar2, self._track1, "oral")
 
-        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar1, self._track1), review.AbstractRejection))
+        self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._dummy, self._track1), review.AbstractRejection))
         self.assertTrue(isinstance(self._abstract1.getLastJudgementPerReviewer(self._avatar2, self._track1), review.AbstractRejection))
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractRejection))
         self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusUnderReview))
 
-        self._abstract1.proposeToReject(self._avatar1, self._track2, "oral")
-        self._abstract1.proposeToReject(self._avatar1, self._track3, "oral")
+        self._abstract1.proposeToReject(self._dummy, self._track2, "oral")
+        self._abstract1.proposeToReject(self._dummy, self._track3, "oral")
 
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractRejection))
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractRejection))
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track3), review.AbstractRejection))
         self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToReject))
 
-        self._abstract1.proposeToAccept(self._avatar1, self._track1, "oral")
+        self._abstract1.proposeToAccept(self._dummy, self._track1, "oral")
         self._abstract1.proposeToAccept(self._avatar2, self._track1, "oral")
 
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance))
         self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToAccept))
 
-        self._abstract1.proposeToAccept(self._avatar1, self._track2, "oral")
+        self._abstract1.proposeToAccept(self._dummy, self._track2, "oral")
 
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance))
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractAcceptance))
         self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusInConflict))
 
-        self._abstract1.proposeToReject(self._avatar1, self._track2, "oral")
+        self._abstract1.proposeToReject(self._dummy, self._track2, "oral")
 
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance))
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track2), review.AbstractRejection))
         self.assertTrue(isinstance(self._abstract1.getCurrentStatus(), review.AbstractStatusProposedToAccept))
 
-        self._abstract1.proposeForOtherTracks(self._avatar1, self._track2, comment="", propTracks=[self._track1])
+        self._abstract1.proposeForOtherTracks(self._dummy, self._track2, comment="", propTracks=[self._track1])
         self._abstract1.proposeForOtherTracks(self._avatar2, self._track2, comment="", propTracks=[self._track3])
 
         self.assertTrue(isinstance(self._abstract1.getTrackJudgement(self._track1), review.AbstractAcceptance))
