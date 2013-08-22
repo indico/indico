@@ -147,7 +147,7 @@
                     errorList +="${error}. ";
                 % endfor
                 var span1 = Html.span('', $T(errorList));
-                return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block([span1, Html.br()]));
+                return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block([span1, Html.br()]), {maxWidth: pixels(500)});
             };
 
             popup.open();
