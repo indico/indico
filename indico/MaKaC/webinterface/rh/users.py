@@ -88,14 +88,17 @@ class RHUserCreation( RH ):
         if self._aw.getUser() and self._aw.getUser() in minfo.getAdminList().getList():
             return
         if not minfo.getAuthorisedAccountCreation():
-            raise MaKaCError( _("User registration has been disabled by the site administrator"))
+            raise MaKaCError(_("User registration has been disabled by the site administrator"))
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         self._params = params
-        RH._checkParams( self, params )
         self._save = params.get("Save", "")
+        self._email = params.get("email", "")
+        self._login = params.get("login", "")
+        self._password = params.get("password", "")
+        self._passwordBis = params.get("passwordBis", "")
 
-    def _process( self ):
+    def _process(self):
         save = False
         authManager = AuthenticatorMgr()
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -103,50 +106,51 @@ class RHUserCreation( RH ):
         if self._save:
             save = True
             #check submited data
-            if not self._params.get("name",""):
-                self._params["msg"] += _("You must enter a name.")+"<br>"
+            if not self._params.get("name", ""):
+                self._params["msg"] += _("You must enter a name.") + "<br>"
                 save = False
-            if not self._params.get("surName",""):
-                self._params["msg"] += _("You must enter a surname.")+"<br>"
+            if not self._params.get("surName", ""):
+                self._params["msg"] += _("You must enter a surname.") + "<br>"
                 save = False
-            if not self._params.get("organisation",""):
-                self._params["msg"] += _("You must enter the name of your organisation.")+"<br>"
+            if not self._params.get("organisation", ""):
+                self._params["msg"] += _("You must enter the name of your organisation.") + "<br>"
                 save = False
-            if not self._params.get("email",""):
-                self._params["msg"] += _("You must enter an email address.")+"<br>"
+            if not self._email:
+                self._params["msg"] += _("You must enter an email address.") + "<br>"
                 save = False
-            if not self._params.get("login",""):
-                self._params["msg"] += _("You must enter a login.")+"<br>"
+            if not self._login:
+                self._params["msg"] += _("You must enter a login.") + "<br>"
                 save = False
-            if not self._params.get("password",""):
-                self._params["msg"] += _("You must define a password.")+"<br>"
+            if not self._password:
+                self._params["msg"] += _("You must define a password.") + "<br>"
                 save = False
-            if self._params.get("password","") != self._params.get("passwordBis",""):
-                self._params["msg"] += _("You must enter the same password twice.")+"<br>"
+            if self._password != self._passwordBis:
+                self._params["msg"] += _("You must enter the same password twice.") + "<br>"
                 save = False
-            if not authManager.isLoginAvailable(self._params.get("login", "")):
-                self._params["msg"] += _("Sorry, the login you requested is already in use. Please choose another one.")+"<br>"
+            if not authManager.isLoginAvailable(self._login):
+                self._params["msg"] += _("""Sorry, the login you requested is already in use.
+                                            Please choose another one.""") + "<br>"
                 save = False
-            if not self._validMail(self._params.get("email","")):
-                self._params["msg"]+= _("You must enter a valid email address")
+            if not self._validMail(self._email):
+                self._params["msg"] += _("You must enter a valid email address")
                 save = False
         if save:
             #Data are OK, Now check if there is an existing user or create a new one
             ah = user.AvatarHolder()
-            res =  ah.match({"email": self._params["email"]}, exact=1, searchInAuthenticators=False)
+            res = ah.match({"email": self._email}, exact=1, searchInAuthenticators=False)
             if res:
                 #we find a user with the same email
                 a = res[0]
                 #check if the user have an identity:
                 if a.getIdentityList():
-                    self._redirect( urlHandlers.UHUserExistWithIdentity.getURL(a))
+                    self._redirect(urlHandlers.UHUserExistWithIdentity.getURL(a))
                     return
                 else:
                     #create the identity to the user and send the comfirmatio email
-                    _UserUtils.setUserData( a, self._params )
-                    li = user.LoginInfo( self._params["login"], self._params["password"] )
-                    id = authManager.createIdentity( li, a, "Local" )
-                    authManager.add( id )
+                    _UserUtils.setUserData(a, self._params)
+                    li = user.LoginInfo(self._login, self._password)
+                    id = authManager.createIdentity(li, a, "Local")
+                    authManager.add(id)
                     DBMgr.getInstance().commit()
                     if minfo.getModerateAccountCreation():
                         mail.sendAccountCreationModeration(a).send()
@@ -156,11 +160,11 @@ class RHUserCreation( RH ):
                             mail.sendAccountCreationNotification(a).send()
             else:
                 a = user.Avatar()
-                _UserUtils.setUserData( a, self._params )
+                _UserUtils.setUserData(a, self._params)
                 ah.add(a)
-                li = user.LoginInfo( self._params["login"], self._params["password"] )
-                id = authManager.createIdentity( li, a, "Local" )
-                authManager.add( id )
+                li = user.LoginInfo(self._login, self._password)
+                id = authManager.createIdentity(li, a, "Local")
+                authManager.add(id)
                 DBMgr.getInstance().commit()
                 if minfo.getModerateAccountCreation():
                     mail.sendAccountCreationModeration(a).send()
@@ -168,19 +172,19 @@ class RHUserCreation( RH ):
                     mail.sendConfirmationRequest(a).send()
                     if minfo.getNotifyAccountCreation():
                         mail.sendAccountCreationNotification(a).send()
-            self._redirect(urlHandlers.UHUserCreated.getURL( a ))
+            self._redirect(urlHandlers.UHUserCreated.getURL(a))
         else:
-            cp=None
-            if self._params.has_key("cpEmail"):
-                ph=pendingQueues.PendingQueuesHolder()
-                cp=ph.getFirstPending(self._params["cpEmail"])
+            cp = None
+            if "cpEmail" in self._params:
+                ph = pendingQueues.PendingQueuesHolder()
+                cp = ph.getFirstPending(self._params["cpEmail"])
             if self._aw.getUser() and self._aw.getUser() in minfo.getAdminList().getList():
-                p = adminPages.WPUserCreation( self, self._params, cp )
+                p = adminPages.WPUserCreation(self, self._params, cp)
             else:
-                p = adminPages.WPUserCreationNonAdmin( self, self._params, cp )
+                p = adminPages.WPUserCreationNonAdmin(self, self._params, cp)
             return p.display()
 
-    def _validMail(self,email):
+    def _validMail(self, email):
         if re.search("^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$",email):
             return True
         return False
