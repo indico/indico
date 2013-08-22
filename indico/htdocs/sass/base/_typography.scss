@@ -44,6 +44,104 @@ h3 {
     color: #B14300;
 }
 
+.groupTitle, .groupTitleNoBorder, .groupSubTitle {
+/*    font-family: Georgia, Times, "Times New Roman"; */
+   display: block;
+   width: 100%;
+   font-family: "Helvetica Neue", Helvetica, Verdana, Arial, Sans-serif;
+   font-size: 24px;
+   font-weight: normal;
+   color: #4a4a4a;
+   padding: 3px 3px 5px 3px;
+   border-bottom: 1px solid #AAA;
+   margin-bottom: 1em;
+}
+
+td.groupTitle, td.groupTitleNoBorder, td.groupSubTitle {
+  display: table-cell;
+}
+
+.groupTitle > [class*="icon-"],
+.groupTitleNoBorder > [class*="icon-"],
+.groupSubTitle > [class*="icon-"] {
+    color: #CCC;
+    font-size: 1.2em;
+    vertical-align: middle;
+}
+
+.reviewingsubtitle {
+   font-family: "Times New Roman", Verdana, Arial;
+   font-size: 15pt;
+   color: #4E4C46;
+   letter-spacing: 1px;
+   padding: 3px;
+   margin: 10px 0;
+}
+
+.groupTitleNoBorder {
+   border-bottom: none;
+}
+
+.groupSubTitle {
+    font-size: 20px;
+}
+
+.groupTitleSmall, .groupTitleSmallNoBackground {
+   font-weight: bold;
+   font-size: 14px;
+   color: #777777;
+   background: #EBEBEB;
+   padding: 3px;
+}
+
+.groupTitleSmallNoBackground {
+   background: none;
+}
+
+
+.greyGroupTitle{
+    font-weight: bold;
+    font-size: 16px;
+    color: #FFFFFF;
+    background: #777777;
+    letter-spacing: 6px;
+    padding: 3px;
+    background: #EBEBEB none repeat scroll 0 0;
+    color: gray;
+    text-align:left;
+}
+
+
+.subgroupTitle, .subgroupTitleNoBorder {
+   font-weight: bold;
+   font-size: 18px;
+   color: #888888;
+   padding: 3px;
+   border-bottom: 2px solid #777777;
+   vertical-align: bottom;
+}
+
+.subgroupTitleNoBorder {
+   border-bottom: none;
+}
+
+
+.displayTitle {
+   font-size: 18px;
+   color: #5294CC;
+   padding: 3px;
+   vertical-align: bottom;
+}
+
+.formTitle {
+   font-weight: bold;
+   font-size: 18px;
+   color: #888888;
+   padding: 3px;
+   border-bottom: 2px solid #777777;
+   vertical-align: bottom;
+}
+
 .quotation {
     margin: 10px;
     padding-left: 10px;
