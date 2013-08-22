@@ -1091,31 +1091,30 @@ class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
         self._hour = int(params["hour"])
         self._minute = int(params["minute"])
         self._timeBefore = int(params.get("timeBefore", 0))
-        if self._dateType == "2" and  self._timeBefore <= 0:
+        if self._dateType == "2" and self._timeBefore <= 0:
             raise FormValuesError(_("Time before the beginning of the event should be bigger than zero"))
         self._timeTypeBefore = params["timeTypeBefore"]
-        self._note = params.get("note","")
-        self._includeConf = params.get("includeConf",None)
-        self._alarmId = params.get("alarmId",None)
+        self._note = params.get("note", "")
+        self._includeConf = params.get("includeConf", None)
+        self._alarmId = params.get("alarmId", None)
         self._testAlarm = False
 
-    def _initializeAlarm(self, dryRun = False):
-        if dryRun: # sending now
+    def _initializeAlarm(self, dryRun=False):
+        if dryRun:  # sending now
             dtStart = timezoneUtils.nowutc()
             relative = None
         else:
-            if self._dateType == "1": # given date
-                dtStart = timezone(self._conf.getTimezone()).localize(
-                    datetime(self._year,
-                             self._month,
-                             self._day,
-                             self._hour,
-                             self._minute)).astimezone(timezone('UTC'))
+            if self._dateType == "1":  # given date
+                dtStart = timezone(self._conf.getTimezone()).localize(datetime(self._year,
+                                                                              self._month,
+                                                                              self._day,
+                                                                              self._hour,
+                                                                              self._minute)).astimezone(timezone('UTC'))
                 relative = None
-            elif self._dateType == "2": # N days/hours before the event
-                if self._timeTypeBefore=="days":
+            elif self._dateType == "2":  # N days/hours before the event
+                if self._timeTypeBefore == "days":
                     delta = timedelta(days=self._timeBefore)
-                elif self._timeTypeBefore=="hours":
+                elif self._timeTypeBefore == "hours":
                     delta = timedelta(0, self._timeBefore * 3600)
                 dtStart = self._target.getStartDate() - delta
                 relative = delta
