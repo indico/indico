@@ -7925,6 +7925,7 @@ ul.speaker_list > li .contributions li {
   padding: .7em 1em;
   float: left;
   position: relative;
+  font-weight: bold;
 }
 
 #breadcrumbs span:before{

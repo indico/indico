@@ -351,7 +351,10 @@
         </tr>
         <tr>
             <td>
-                <div class="groupTitle bookingTitle">${ _("Choose rooms") }</div>
+                <h2 class="group_title">
+                    <i class="icon-location"></i>
+                    ${_("Rooms")}
+                </h2>
             </td>
         </tr>
         <!-- ROOMS -->
@@ -439,7 +442,10 @@
         <!-- DATES -->
         <tr>
             <td>
-                <div class="groupTitle bookingTitle" style="padding-top: 20px;">${ _("Select date range") }</div>
+                <h2 class="group_title">
+                    <i class="icon-calendar"></i>
+                    ${_("Date range")}
+                </h2>
             </td>
         </tr>
         <tr>
@@ -485,7 +491,10 @@
         <!-- TIME -->
         <tr>
             <td>
-                <div class="groupTitle bookingTitle" style="padding-top: 30px;">${ _("Select time range") }</div>
+                <h2 class="group_title">
+                    <i class="icon-time"></i>
+                    ${ _("Time range") }
+                </h2>
             </td>
         </tr>
         <tr>

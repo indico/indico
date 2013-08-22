@@ -44,6 +44,20 @@ h3 {
     color: #B14300;
 }
 
+.group_title {
+    border-bottom: 2px solid #eaeaea;
+    display: block;
+    font-size: 2em;
+    font-weight: normal;
+
+    & > i {
+        font-size: 32px;
+        padding-right: 0.2em;
+        vertical-align: middle;
+    }
+}
+
+
 .groupTitle, .groupTitleNoBorder, .groupSubTitle {
 /*    font-family: Georgia, Times, "Times New Roman"; */
    display: block;
