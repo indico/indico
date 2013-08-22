@@ -68,7 +68,8 @@ selectivizr (http://selectivizr.com/) is freely distributed under MIT license.
 
 Werkzeug (http://werkzeug.pocoo.org) is a BSD-licensed WSGI utility library providing nice things like LocalProxy.
 
-jQuery placeholder (https://github.com/mathiasbynens/jquery-placeholder) is a MIT-licensed plugin for jQuery that provides
-a placeholder for objects.
+jQuery placeholder (https://github.com/mathiasbynens/jquery-placeholder) is a MIT-licensed plugin for jQuery that provides a placeholder for objects.
+
+WebHostingHub Glyphs (http://www.webhostinghub.com/glyphs/) is a huge gallery of free font icons licensed under Creative Commons.
 
 See also the AUTHORS and ChangeLog files.
