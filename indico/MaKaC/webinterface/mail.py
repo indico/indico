@@ -86,7 +86,7 @@ class GenericNotification :
         - binary: containing the file data
         """
 
-        self._attachments.append()
+        self._attachments.append(attachment)
 
     def getContentType(self):
         return self._contenttype
