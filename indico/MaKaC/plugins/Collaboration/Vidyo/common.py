@@ -152,7 +152,7 @@ class VidyoTools(object):
         authenticatorList option (order is respected)
         """
         availableAuths = getVidyoOptionValue("authenticatorList")
-        foundAvatarDict = AuthenticatorMgr.getInstance().getAvatarByLogin(accountName, availableAuths)
+        foundAvatarDict = AuthenticatorMgr().getAvatarByLogin(accountName, availableAuths)
 
         for authName in availableAuths:
             foundAvatar = foundAvatarDict.get(authName, None)

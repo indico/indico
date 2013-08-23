@@ -27,31 +27,33 @@ class TestAuthentication(IndicoTestCase):
 
     def setUp(self):
         super(TestAuthentication, self).setUp()
-        self._startDBReq()
-        # Create few users and groups
-        gh = GroupHolder()
-        ah = AvatarHolder()
-        self._authMgr = AuthenticatorMgr()
 
-        for i in xrange(1, 5):
-            group = Group()
-            group.setName("fake-group-%d" % i)
-            group.setDescription("fake")
-            group.setEmail("fake-group-%d@fake.fake" % i)
-            group.setId("fake-group-%d" % i)
-            avatar = Avatar()
-            avatar.setName("fake-%d" % i)
-            avatar.setSurName("fake")
-            avatar.setOrganisation("fake")
-            avatar.setLang("en_GB")
-            avatar.setEmail("fake%d@fake.fake" % i)
-            avatar.setId("fake-%d" % i)
-            avatar.activateAccount()
-            group.addMember(avatar)
-            ah.add(avatar)
-            gh.add(group)
-            self._authMgr.add(self._authMgr.createIdentity(LoginInfo("fake-%d"%i, "fake-%d"%i), avatar, "Local"))
-        self._stopDBReq()
+        with self._context("database"):
+
+            # Create few users and groups
+            gh = GroupHolder()
+            ah = AvatarHolder()
+            self._authMgr = AuthenticatorMgr()
+
+            for i in xrange(1, 5):
+                group = Group()
+                group.setName("fake-group-%d" % i)
+                group.setDescription("fake")
+                group.setEmail("fake-group-%d@fake.fake" % i)
+                group.setId("fake-group-%d" % i)
+                avatar = Avatar()
+                avatar.setName("fake-%d" % i)
+                avatar.setSurName("fake")
+                avatar.setOrganisation("fake")
+                avatar.setLang("en_GB")
+                avatar.setEmail("fake%d@fake.fake" % i)
+                avatar.setId("fake-%d" % i)
+                avatar.activateAccount()
+                group.addMember(avatar)
+                ah.add(avatar)
+                gh.add(group)
+                identity = self._authMgr.createIdentity(LoginInfo("fake-%d" % i, "fake-%d" % i), avatar, "Local")
+                self._authMgr.add(identity)
 
     @with_context('database')
     def testAvatarHolder(self):

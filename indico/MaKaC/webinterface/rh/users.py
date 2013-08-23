@@ -96,7 +96,7 @@ class RHUserCreation( RH ):
 
     def _process( self ):
         save = False
-        authManager = AuthenticatorMgr.getInstance()
+        authManager = AuthenticatorMgr()
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         self._params["msg"] = ""
         if self._save:
@@ -383,7 +383,7 @@ class RHUserIdentityCreation( RHUserIdentityBase ):
         msg = ""
         if self._ok:
             ok = True
-            authManager = AuthenticatorMgr.getInstance()
+            authManager = AuthenticatorMgr()
             #first, check if login is free
             if not authManager.isLoginAvailable(self._login):
                 msg += "Sorry, the login you requested is already in use. Please choose another one.<br>"
@@ -421,7 +421,7 @@ class RHUserIdPerformCreation( RHUserIdentityBase ):
         self._system = params.get("system", "")
 
     def _process( self ):
-        authManager = AuthenticatorMgr.getInstance()
+        authManager = AuthenticatorMgr()
         #first, check if login is free
         if not authManager.isLoginAvailable(self._login):
             self._redirect(self._fromURL + "&msg=Login not avaible")
@@ -478,7 +478,7 @@ class RHUserRemoveIdentity( RHUserIdentityBase ):
         self._identityList = self._normaliseListParam(params.get("selIdentities",[]))
 
     def _process( self ):
-        authManager = AuthenticatorMgr.getInstance()
+        authManager = AuthenticatorMgr()
         for i in self._identityList:
             identity = authManager.getIdentityById(i)
             if len(identity.getUser().getIdentityList()) > 1:

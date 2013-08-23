@@ -1366,7 +1366,7 @@ class WUserIdentitiesTable(wcomponents.WTemplated):
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         il = []
-        authTagList = [i.getId() for i in AuthenticatorMgr.getInstance().getList()]
+        authTagList = [i.getId() for i in AuthenticatorMgr().getList()]
 
         vars["identityItems"] = filter(lambda x: x.getAuthenticatorTag() in authTagList, self._avatar.getIdentityList())
         vars["avatar"] = self._avatar
@@ -1605,7 +1605,7 @@ class WIdentityModification(wcomponents.WTemplated):
 
         vars["locator"] = "\n".join(locatorList)
         html = ""
-        for auth in AuthenticatorMgr.getInstance().getList():
+        for auth in AuthenticatorMgr().getList():
             html = html + "<option value=" + auth.getId() + ">" + auth.getName() + "</option>\n"
         vars["systemList"] = html
         return vars

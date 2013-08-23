@@ -37,7 +37,7 @@ dbi = DBMgr.getInstance()
 dbi.startRequest()
 
 ah = AvatarHolder()
-am = AuthenticatorMgr.getInstance()
+am = AuthenticatorMgr()
 for aid, avatar in ah._getIdx().iteritems():
     for identity in avatar.getIdentityList():
         if isinstance(identity, LocalIdentity):

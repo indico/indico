@@ -98,7 +98,7 @@ def createUser(name, email, org, password):
     else:#user with no email address - identity not created
         return avatar
     try:
-        AuthenticatorMgr.getInstance().add(id)
+        AuthenticatorMgr().add(id)
     except (UserError):
         pass
     avatar.activateAccount()

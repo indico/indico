@@ -44,7 +44,7 @@ class SearchBase(ServiceBase):
             1 external authenticator, so we just see if a proper external authenticator is present or not
         """
         self._searchExt = False
-        for authenticatorName in AuthenticatorMgr.getInstance().getAuthenticatorIdList():
+        for authenticatorName in AuthenticatorMgr().getAuthenticatorIdList():
             authParamName = "searchExternal-" + authenticatorName
             if authParamName in self._params and self._params[authParamName]:
                 self._searchExt = True

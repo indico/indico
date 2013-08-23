@@ -275,7 +275,7 @@ class LDAPIdentity(PIdentity):
 
         log = Logger.get('auth.ldap')
         log.info("authenticate(%s)" % id.getLogin())
-        data = AuthenticatorMgr.getInstance().getById(self.getAuthenticatorTag()).checkLoginPassword(id.getLogin(),
+        data = AuthenticatorMgr().getById(self.getAuthenticatorTag()).checkLoginPassword(id.getLogin(),
                                                                                                      id.getPassword())
         if not data or self.getLogin() != id.getLogin():
             return None
@@ -550,7 +550,7 @@ class LDAPGroup(Group):
         pass
 
     def getMemberList(self):
-        uidList = AuthenticatorMgr.getInstance().getById('LDAP').getGroupMemberList(self.getName())
+        uidList = AuthenticatorMgr().getById('LDAP').getGroupMemberList(self.getName())
         avatarLists = []
         for uid in uidList:
             # First, try locally (fast)
@@ -573,7 +573,7 @@ class LDAPGroup(Group):
                 login = aid.getLogin()
         if not login:
             return False
-        return AuthenticatorMgr.getInstance().getById('LDAP').isUserInGroup((login, self.getName()))
+        return AuthenticatorMgr().getById('LDAP').isUserInGroup((login, self.getName()))
 
     def containsMember(self, avatar):
         return 0

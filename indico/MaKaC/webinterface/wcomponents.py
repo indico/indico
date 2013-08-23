@@ -1965,7 +1965,7 @@ class WSignIn(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        authManager = AuthenticatorMgr.getInstance()
+        authManager = AuthenticatorMgr()
         vars["postURL"] = quoteattr( str( vars.get( "postURL", "" ) ) )
         vars["returnURL"] = quoteattr( str( vars.get( "returnURL", "" ) ) )
         vars["forgotPasswordURL"] = quoteattr( str( vars.get( "forgotPassordURL", "" ) ) )

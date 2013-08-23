@@ -62,7 +62,7 @@ class RHSignInBase( base.RH ):
 
     def _makeLoginProcess( self ):
         #Check for automatic login
-        authManager = AuthenticatorMgr.getInstance()
+        authManager = AuthenticatorMgr()
         if (authManager.isSSOLoginActive() and len(authManager.getList()) == 1 and
            not Config.getInstance().getDisplayLoginPage()):
             self._redirect(urlHandlers.UHSignInSSO.getURL(authId=authManager.getDefaultAuthenticator().getId()))
@@ -121,7 +121,7 @@ class RHSignInSSO(RHSignInBase):
     def _process(self):
         authenticator = session.pop('Authenticator', None)
         if authenticator is not None:
-            authManager = AuthenticatorMgr.getInstance()
+            authManager = AuthenticatorMgr()
             if not authManager.isSSOLoginActive():
                 raise MaKaCError(_("SSO Login is not active."))
             av = authManager.SSOLogin(self, authenticator)
@@ -147,7 +147,7 @@ class RHSignOut(base.RH):
 
     def _process(self):
         if self._getUser():
-            self._returnURL = AuthenticatorMgr.getInstance().getLogoutCallbackURL(self) or self._returnURL
+            self._returnURL = AuthenticatorMgr().getLogoutCallbackURL(self) or self._returnURL
             self._setUser(None)
         session.clear()
         self._redirect(self._returnURL)

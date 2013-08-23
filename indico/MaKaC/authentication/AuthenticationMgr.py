@@ -25,8 +25,6 @@ from indico.util.importlib import import_module
 
 class AuthenticatorMgr:
 
-    _instance = None
-
     def __init__(self):
         self._authenticator_list = []
         for auth, config in Config.getInstance().getAuthenticatorList():
@@ -35,12 +33,6 @@ class AuthenticatorMgr:
                 self._authenticator_list.append(getattr(mod, auth + "Authenticator")())
             except ImportError:
                 raise MaKaCError("Impossible to load %s" % auth)
-
-    @classmethod
-    def getInstance(cls):
-        if cls._instance is None:
-            cls._instance = AuthenticatorMgr()
-        return cls._instance
 
     def add( self, newId):
         auth = self.getById( newId.getAuthenticatorTag() )

@@ -168,7 +168,7 @@ class RHConfUserCreation( conferenceBase.RHConferenceBase ):
 
     def _process( self ):
         save = False
-        authManager = AuthenticatorMgr.getInstance()
+        authManager = AuthenticatorMgr()
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         self._params["msg"] = ""
         if self._save:

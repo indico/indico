@@ -258,7 +258,7 @@ class GroupHolder(ObjectHolder):
             current_group.setDescription(group.getDescription())
 
     def _updateGroupMatch(self, name, exact=False):
-        for auth in AuthenticatorMgr.getInstance().getList():
+        for auth in AuthenticatorMgr().getList():
             for group in auth.matchGroup(name, exact):
                 if not self.hasKey(group.getId()):
                     self.add(group)
@@ -266,7 +266,7 @@ class GroupHolder(ObjectHolder):
                     self.update(group)
 
     def _updateGroupMatchFirstLetter(self, letter):
-        for auth in AuthenticatorMgr.getInstance().getList():
+        for auth in AuthenticatorMgr().getList():
             for group in auth.matchGroupFirstLetter(letter):
                 if not self.hasKey(group.getId()):
                     self.add(group)
@@ -827,7 +827,7 @@ class Avatar(Persistent, Fossilizable):
             if identity.getAuthenticatorTag() == authenticatorName:
                 result.append(identity)
         if not result:
-            identity = AuthenticatorMgr.getInstance().getById(authenticatorName).fetchIdentity(self)
+            identity = AuthenticatorMgr().getById(authenticatorName).fetchIdentity(self)
             if identity:
                 result.append(identity)
         return result
@@ -1112,7 +1112,7 @@ class AvatarHolder(ObjectHolder):
                     if not onlyActivated or av.isActivated():
                         result[av.getEmail()]=av
         if searchInAuthenticators:
-            for authenticator in AuthenticatorMgr.getInstance().getList():
+            for authenticator in AuthenticatorMgr().getList():
                 matches = authenticator.matchUserFirstLetter(index, letter)
                 if matches:
                     for email, record in matches.iteritems():
@@ -1146,7 +1146,7 @@ class AvatarHolder(ObjectHolder):
             if not onlyActivated or av.isActivated():
                 result[av.getEmail()]=av
         if searchInAuthenticators:
-            for authenticator in AuthenticatorMgr.getInstance().getList():
+            for authenticator in AuthenticatorMgr().getList():
                 matches = authenticator.matchUser(criteria, exact=exact)
                 if matches:
                     for email, record in matches.iteritems():
@@ -1226,7 +1226,7 @@ class AvatarHolder(ObjectHolder):
         av = self.match({"email":extId}, searchInAuthenticators=False)
         if av:
             return av[0]
-        user_data = AuthenticatorMgr.getInstance().getById(authId).searchUserById(extId)
+        user_data = AuthenticatorMgr().getById(authId).searchUserById(extId)
         av = Avatar(user_data)
         identity = user_data["identity"](user_data["login"], av)
         user_data["authenticator"].add(identity)
