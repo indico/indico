@@ -312,7 +312,7 @@ type ("RoomBookingCalendarDrawer", [],
                     return Html.div({});
                 }
                 if (bar.type == "barBlocked") {
-                    newResvInfo = "Room blocked<br/>" +
+                    newResvInfo = $T("Room blocked") + "<br/>" +
                                bar.blocking["creator"] + "<br/>" +
                                bar.blocking["message"];
                 } else {
