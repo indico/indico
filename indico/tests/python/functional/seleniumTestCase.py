@@ -203,6 +203,11 @@ class SeleniumTestCase(IndicoTestCase):
 
         raise Exception('timeout')
 
+    @classmethod
+    def tearDownClass(cls):
+        webd.close()
+
+
 class LoggedInSeleniumTestCase(SeleniumTestCase):
 
     def setUp(self):
