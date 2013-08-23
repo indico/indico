@@ -687,9 +687,8 @@ class ReservationBase( Fossilizable ):
         If a user is given, override permission is honored.
         """
         from MaKaC.rb_factory import Factory
-        roomBlockings = Factory.newRoomBlocking().getByRoom(self.room)
         res = None
-        for rbl in roomBlockings:
+        for rbl in Factory.newRoomBlocking().getByRoom(self.room):
             if rbl.block.canOverride(user, self.room):
                 continue
             if rbl.block.startDate <= self.endDT.date() and self.startDT.date() <= rbl.block.endDate:
@@ -705,9 +704,8 @@ class ReservationBase( Fossilizable ):
         If a user is given, override permission is honored.
         """
         from MaKaC.rb_factory import Factory
-        roomBlockings = Factory.newRoomBlocking().getByRoom(self.room)
         dates = []
-        for rbl in roomBlockings:
+        for rbl in Factory.newRoomBlocking().getByRoom(self.room):
             if not rbl.active or rbl.block.canOverride(user, self.room):
                 continue
             if rbl.block.startDate <= self.endDT.date() and self.startDT.date() <= rbl.block.endDate:
@@ -717,16 +715,14 @@ class ReservationBase( Fossilizable ):
 
     def getBlockingCreator(self, date):
         from MaKaC.rb_factory import Factory
-        roomBlockings = Factory.newRoomBlocking().getByRoom(self.room)
-        for rbl in roomBlockings:
+        for rbl in Factory.newRoomBlocking().getByRoom(self.room):
             if rbl.block.startDate <= date and date <= rbl.block.endDate:
                 return rbl.block.createdByUser.getStraightFullName()
         return None
 
     def getBlockingMessage(self, date):
         from MaKaC.rb_factory import Factory
-        roomBlockings = Factory.newRoomBlocking().getByRoom(self.room)
-        for rbl in roomBlockings:
+        for rbl in Factory.newRoomBlocking().getByRoom(self.room):
             if rbl.block.startDate <= date and date <= rbl.block.endDate:
                 return rbl.block.message
         return None
