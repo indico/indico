@@ -73,7 +73,7 @@ you can use the generic selector below, but it's slower:
     content: "\61";
 }
 .icon-time:before {
-    content: "\74";
+    content: "\e004";
 }
 .icon-location:before {
     content: "\e002";
@@ -242,4 +242,7 @@ you can use the generic selector below, but it's slower:
 }
 .icon-handle:before {
     content: "\e001";
+}
+.icon-alarm:before {
+    content: "\74";
 }
