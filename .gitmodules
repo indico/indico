@@ -17,3 +17,6 @@
 	path = ext_modules/underscore
 	url = git://github.com/documentcloud/underscore.git
     ignore = dirty
+[submodule "ext_modules/jquery-ui-multiselect-widget"]
+	path = ext_modules/jquery-ui-multiselect-widget
+	url = https://github.com/ehynds/jquery-ui-multiselect-widget.git
