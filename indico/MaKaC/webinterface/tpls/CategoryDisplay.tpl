@@ -80,7 +80,7 @@ containsCategories = len(categ.getSubCategoryList()) > 0
                 <%include file="WelcomeHeader.tpl" args="tz = timezone"/>
             % endif
             % if upcomingEvents:
-                <h2 class="icon-time">${_("Upcoming events")}</h2>
+                <h2 class="icon-alarm">${_("Upcoming events")}</h2>
                     ${upcomingEvents}
             % endif
         % else:
