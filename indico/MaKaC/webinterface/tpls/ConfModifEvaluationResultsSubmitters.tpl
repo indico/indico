@@ -23,15 +23,17 @@
           <br/>
           <input class="btn" type="submit" ${inputSubmitStyle} name="${mode}" value="${mode}" id="resultsAction"/>
           <input class="btn" type="submit" name="cancel" value="${ _("cancel")}"/>
+          <input type='hidden' id="action"/>
         </td>
       </tr>
   </table>
 </form>
 <script type="text/javascript">
 
-$("#resultsAction").click(function(){
-    new ConfirmPopup($T("Import evaluation"),$T("Are you sure you want to remove these submissions?"), function(confirmed) {
+$("input[name=remove]").click(function(e){
+    new ConfirmPopup($T("Import evaluation"),$T("Are you sure you want to remove these submissions?".format('${mode}')), function(confirmed) {
         if(confirmed) {
+            $("#action").attr("name", "remove").val("remove").appendTo($("[name=ResultsSubmitters]"));
             $("[name=ResultsSubmitters]").submit();
         }
     }).open();
