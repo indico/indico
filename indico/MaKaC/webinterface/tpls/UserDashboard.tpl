@@ -130,8 +130,6 @@ $(document).ready(function(){
         tz: "${timezone}"
     };
 
-    var TIMEZONE_OFFSET = "${offset}";
-
     // Your events
     % if redisEnabled:
         apiRequest("/user/linked_events", api_opts).done(function (resp) {
@@ -141,6 +139,17 @@ $(document).ready(function(){
                              <span class="event-title italic text-superfluous">' + $T("You have no events.") + '</span> \
                          </li>';
             } else {
+                var now = moment();
+                var past_events = _.filter(resp.results, function(e) {
+                    return momentDate(e.endDate) < now;
+                });
+                var current_events = _.filter(resp.results, function(e) {
+                    return momentDate(e.startDate) < now && now < momentDate(e.endDate);
+                });
+                var future_events = _.filter(resp.results, function(e){
+                    return now < momentDate(e.startDate);
+                });
+                resp.results = past_events.concat(current_events, future_events);
                 $.each(resp.results, function (i, item) {
                     html += '<li id="event-' + item.id + '" class="truncate"> \
                                  <a href="' + item.url + '" class="truncate"> \
@@ -185,12 +194,15 @@ $(document).ready(function(){
     });
     % endif
 
-    var getDate = function(startDate, endDate) {
-        var now = moment(),
-            start_date = moment(startDate.date + " " + startDate.time + " " + TIMEZONE_OFFSET),
-            end_date = moment(endDate.date + " " + endDate.time + " " + TIMEZONE_OFFSET);
+    var momentDate = function(date) {
+        var timezone_offset = "${offset}";
+        return moment(date.date + " " + date.time + " " + timezone_offset);
+    }
 
-        if (start_date < now && now < end_date) {
+    var getDate = function(startDate, endDate) {
+        var now = moment();
+
+        if (momentDate(startDate) < now && now < momentDate(endDate)) {
             return $T("Now");
         } else {
             return moment(startDate.date).calendar();
