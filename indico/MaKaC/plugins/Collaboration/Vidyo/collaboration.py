@@ -38,6 +38,8 @@ from MaKaC.plugins.Collaboration.Vidyo.pages import ServiceInformation
 from MaKaC.conference import Contribution, SessionSlot
 from indico.core.index import Catalog
 from MaKaC.plugins.Collaboration.Vidyo.indexes import IIndexableByVidyoRoom
+from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin,  \
+    RCVideoServicesManager
 
 
 class CSBooking(CSBookingBase):
@@ -537,6 +539,30 @@ class CSBooking(CSBookingBase):
         if isinstance(result, VidyoError):
             return result
         return self
+
+    @classmethod
+    def _search(cls, user, query, offset=0, limit=None):
+        if query == "":
+            return[]
+        result = VidyoOperations.searchRooms(query)
+        if isinstance(result, VidyoError):
+            return result
+
+        allowedRooms = []
+        for room in result:
+            av = VidyoTools.getAvatarByAccountName(room.ownerName)
+            for booking in VidyoTools.getIndexByVidyoRoom().getBookingList(room.roomID):
+                if av == user or booking.getConference() in user.getLinkTo("conference", "manager") \
+                        or user == booking.getConference().getCreator() \
+                        or RCVideoServicesManager.hasRights(user, booking.getConference(), ["Vidyo"]):
+                    bookingParams = booking.getBookingParams().copy()
+                    bookingParams["videoLinkType"] = "event"
+                    bookingParams["videoLinkSession"] = ""
+                    bookingParams["videoLinkContribution"] = ""
+                    allowedRooms.append(bookingParams)
+                    break
+        limit = limit if limit else (len(allowedRooms) - 1)
+        return allowedRooms[offset:offset+limit]
 
     def _checkStatus(self):
         """ Queries the data for the Vidyo Public room associated to this CSBooking

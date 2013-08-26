@@ -60,6 +60,9 @@ class CSBooking(CSBookingBase):
     def getStatusMessage(self):
         return self._statusMessage
 
+    def getStatusClass(self):
+        return self._statusClass
+
     def hasHappened(self):
         return False
 

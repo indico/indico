@@ -86,6 +86,10 @@ class CollaborationTools(object):
         return cls.getCollaborationPluginType().getPlugin(pluginId).getOption(optionName).getRooms()
 
     @classmethod
+    def hasOption(cls, pluginId, optionName):
+        return cls.getCollaborationPluginType().getPlugin(pluginId).hasOption(optionName)
+
+    @classmethod
     def hasCollaborationOption(cls, optionName):
         return cls.getCollaborationPluginType().hasOption(optionName)
 

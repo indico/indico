@@ -411,12 +411,11 @@ class VidyoOperations(object):
     @classmethod
     def searchRooms(cls, query):
         try:
-            userRooms = []
             searchFilter = SOAPObjectFactory.createFilter('admin', "%%%s%%" % VidyoTools.replaceSpacesInName(query))
             rooms = AdminApi.getRooms(searchFilter)
-            if rooms.total > 0:
-                userRooms = [room for room in rooms.room if room.RoomType == "Public"]
-            return userRooms
+            if rooms.total:
+                return rooms.room
+            return []
 
         except WebFault, e:
             Logger.get('Vidyo').exception("""Admin API's searchRooms operation got WebFault: %s"""

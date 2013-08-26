@@ -333,6 +333,22 @@ class CSBookingManager(Persistent, Observer):
                 return result
         return self._createBooking(bookingType, bookingParams, "_attach")
 
+    def searchBookings(self, bookingType, user, query, offset=0, limit=None):
+        """ Adds a new booking to the list of bookings.
+            The id of the new booking is auto-generated incrementally.
+            After generating the booking, its "performBooking" method will be called.
+
+            bookingType: a String with the booking's plugin. Example: "DummyPlugin", "EVO"
+            bookingParams: a dictionary with the parameters necessary to create the booking.
+                           "create the booking" usually means Indico deciding if the booking can take place.
+                           if "startDate" and "endDate" are among the keys, they will be taken out of the dictionary.
+        """
+        if CollaborationTools.hasOption(bookingType, "searchAllow") \
+                and CollaborationTools.getOptionValue(bookingType, "searchAllow"):
+            return CollaborationTools.getCSBookingClass(bookingType)._search(user, query, offset, limit)
+        else:
+            raise CollaborationException("Plugin type " + str(bookingType) + " does not allow search.")
+
     def _indexBooking(self, booking, index_names=None):
         indexes = self._getIndexList(booking)
         if index_names is not None:

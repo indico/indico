@@ -64,6 +64,11 @@ globalOptions = [
                           "editable": True,
                           "visible": True}),
 
+    ('searchAllow', {"description": "Search for bookings is allowed",
+                     "type": bool,
+                     "editable": True,
+                     "defaultValue": True}),
+
     ("indicoUsername" , {"description" : "Indico username for Vidyo",
                       "type": str,
                       "defaultValue": "indico"}),

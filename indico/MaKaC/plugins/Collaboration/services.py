@@ -49,6 +49,7 @@ from indico.util.i18n import N_
 
 MODULE_NAME = "Video Services"
 
+
 ## Base classes
 class CollaborationBase(ConferenceModifBase):
     """ This base class stores the _CSBookingManager attribute
@@ -68,13 +69,14 @@ class CollaborationBase(ConferenceModifBase):
 
         elif not hasAdminRights and not RCVideoServicesManager.hasRights(self._getUser(), self._conf, [plugin]):
             #we check if it's an event creator / manager (this will call ConferenceModifBase._checkProtection)
-            CollaborationBase._checkProtection(self)
+            ConferenceModifBase._checkProtection(self)
 
     def process(self):
         try:
             return ConferenceModifBase.process(self)
         except CollaborationException, e:
             raise CollaborationServiceException(e.getMsg(), str(e.getInner()))
+
 
 class CollaborationBookingModifBase(CollaborationBase):
     """ Base class for services that are passed a booking id.
@@ -97,14 +99,16 @@ class CollaborationBookingModifBase(CollaborationBase):
     def _checkProtection(self):
         CollaborationBase._checkCanManagePlugin(self, self._bookingType)
 
+
 class CollaborationAdminBookingModifBase(CollaborationBookingModifBase):
     """ Base class for services on booking objects that can only be requested by Server Admins,
         Video Services Admins, or Plugin admins, such as accept or reject a request, etc.
     """
 
     def _checkProtection(self):
-        if not RCCollaborationAdmin.hasRights(self._getUser()) and not RCCollaborationPluginAdmin.hasRights(self._getUser() [self._bookingPlugin]):
+        if not RCCollaborationAdmin.hasRights(self._getUser()) and not RCCollaborationPluginAdmin.hasRights(self._getUser(), [self._bookingPlugin]):
             raise CollaborationException(_("You don't have the rights to perform this operation on this booking"))
+
 
 class AdminCollaborationBase(AdminService):
     """ Base class for admin services in the Video Services Overview page, not directed towards a specific booking.
@@ -114,8 +118,8 @@ class AdminCollaborationBase(AdminService):
         if not RCCollaborationAdmin.hasRights(self._getUser()):
             AdminService._checkProtection(self)
 
-##! End of base classes
 
+##! End of base classes
 class CollaborationBookingModif(CollaborationBookingModifBase):
     """ Specific to check the authorised users and groups creating, editing and removing.
         It is different to CollaborationBookingModifBase because:
@@ -125,7 +129,7 @@ class CollaborationBookingModif(CollaborationBookingModifBase):
     def _checkProtection(self):
         CollaborationBookingModifBase._checkProtection(self)
         if not RCVideoServicesUser.hasRights(self.getAW().getUser(), self._bookingType):
-            raise CollaborationException(_("You dot have access to modify a %s booking")%self._bookingType)
+            raise NoReportError(_("You dot have access to modify a %s booking") % self._bookingType)
 
 
 class CollaborationCreateCSBookingBase(CollaborationBase, CollaborationBookingModif):
@@ -146,6 +150,7 @@ class CollaborationCreateCSBookingBase(CollaborationBase, CollaborationBookingMo
     def _checkProtection(self):
         CollaborationBookingModif._checkProtection(self)
 
+
 class CollaborationCreateCSBooking(CollaborationCreateCSBookingBase):
     """ Adds a new booking
     """
@@ -154,6 +159,7 @@ class CollaborationCreateCSBooking(CollaborationCreateCSBookingBase):
         return fossilize(self._CSBookingManager.createBooking(self._bookingType, bookingParams = self._bookingParams),
                          None, tz = self._conf.getTimezone())
 
+
 class CollaborationAttachCSBooking(CollaborationCreateCSBookingBase):
     """ Attach an new booking
     """
@@ -161,6 +167,7 @@ class CollaborationAttachCSBooking(CollaborationCreateCSBookingBase):
     def _getAnswer(self):
         return fossilize(self._CSBookingManager.attachBooking(self._bookingType, bookingParams = self._bookingParams),
                          None, tz = self._conf.getTimezone())
+
 
 class CollaborationRemoveCSBooking(CollaborationBookingModif):
     """ Removes a booking
@@ -195,12 +202,14 @@ class CollaborationStartCSBooking(CollaborationBookingModifBase):
         return fossilize(self._CSBookingManager.startBooking(self._bookingId),
                          None, tz = self._conf.getTimezone())
 
+
 class CollaborationStopCSBooking(CollaborationBookingModifBase):
     """ Performs server-side actions when a booking is stopped
     """
     def _getAnswer(self):
         return fossilize(self._CSBookingManager.stopBooking(self._bookingId),
                                   timezone = self._conf.getTimezone())
+
 
 class CollaborationCheckCSBookingStatus(CollaborationBookingModifBase):
     """ Performs server-side actions when a booking's status is checked
@@ -209,12 +218,14 @@ class CollaborationCheckCSBookingStatus(CollaborationBookingModifBase):
         return fossilize(self._CSBookingManager.checkBookingStatus(self._bookingId),
                          None, tz = self._conf.getTimezone())
 
+
 class CollaborationAcceptCSBooking(CollaborationAdminBookingModifBase):
     """ Performs server-side actions when a booking / request is accepted
     """
     def _getAnswer(self):
         return fossilize(self._CSBookingManager.acceptBooking(self._bookingId, self.getAW().getUser()),
                                   None, tz = self._conf.getTimezone())
+
 
 class CollaborationRejectCSBooking(CollaborationAdminBookingModifBase):
     """ Performs server-side actions when a booking / request is rejected
@@ -226,6 +237,26 @@ class CollaborationRejectCSBooking(CollaborationAdminBookingModifBase):
     def _getAnswer(self):
         return fossilize(self._CSBookingManager.rejectBooking(self._bookingId, self._reason),
                                   None, tz = self._conf.getTimezone())
+
+
+class CollaborationSearchBookings(CollaborationBase):
+    """ Performs server-side actions when a booking / request is rejected
+    """
+    def _checkParams(self):
+        CollaborationBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._bookingType = pm.extract("type", pType=str, allowEmpty=False)
+        self._query = pm.extract("query", pType=str, allowEmpty=False)
+        self._limit = pm.extract("limit", pType=int, allowEmpty=True, defaultValue=None)
+        self._offset = pm.extract("offset", pType=int, allowEmpty=True, defaultValue=0)
+
+    def _checkProtection(self):
+        CollaborationBase._checkCanManagePlugin(self, self._bookingType)
+
+    def _getAnswer(self):
+        return fossilize(self._CSBookingManager.searchBookings(self._bookingType, self.getAW().getUser(), self._query,
+                                                               self._offset, self._limit))
+
 
 class CollaborationChangePluginManagersBase(CollaborationBase):
     """ Base class for adding and removing plugin managers in an event
@@ -664,6 +695,7 @@ methodMap = {
     "collaboration.checkCSBookingStatus": CollaborationCheckCSBookingStatus,
     "collaboration.acceptCSBooking": CollaborationAcceptCSBooking,
     "collaboration.rejectCSBooking": CollaborationRejectCSBooking,
+    "collaboration.search": CollaborationSearchBookings,
     "collaboration.bookingIndexQuery": CollaborationBookingIndexQuery,
     "collaboration.addPluginManager": CollaborationAddPluginManager,
     "collaboration.removePluginManager": CollaborationRemovePluginManager,
