@@ -1,0 +1,175 @@
+td.chatCell {
+    padding: 0px;
+    padding-right: 30px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    /*text-align: center;*/
+    white-space: nowrap;
+}
+
+td.chatCellNarrow {
+    padding: 0px;
+    padding-right: 30px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    width: 0px;
+    white-space: nowrap;
+}
+
+td.titleChat {
+    padding-top: 5px;
+    font-size: 13px;
+    font-family: Verdana, Arial;
+    color: #523D04;
+}
+
+td.chatTitleCell {
+    color: #523D04;
+    /*text-align: center;*/
+    padding-bottom: 3px;
+    padding-right: 15px;
+    padding-left: 15px;
+    border-bottom: 1px solid #DDDDDD;
+}
+
+.chatInfoCell {
+    padding: 0px;
+    padding-top: 15px;
+    padding-left: 20px;
+    padding-bottom: 5px;
+    padding-right: 15px;
+    background-color: #FEFEFE;
+    -moz-box-shadow: 2px 2px 2px #444444;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+}
+
+div.chatListDiv {
+    margin-bottom: 10px;
+    height:200px;
+    width: 300px;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+    margin-top: 10px;
+}
+
+ul.chatList {
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;
+
+}
+
+ul.chatList li {
+    cursor: pointer;
+    padding: 5px;
+    border-bottom: 1px solid #DDDDDD;
+}
+
+ul.chatList li.selected {
+    background-color: #CDEB8B;
+}
+
+div.chatTable {
+    color: #523D04;
+    -moz-box-shadow: 4px 4px 4px #444444;
+    -moz-border-radius-bottomleft:10px;
+    -moz-border-radius-bottomright:10px;
+    -moz-border-radius-topleft:10px;
+    -moz-border-radius-topright:10px;
+}
+
+div.chatAdvancedTabTitle {
+    font-size:13px;
+    background:none repeat scroll 0 0 white;
+    position:absolute;
+    padding-right:5px;
+}
+
+div.chatAdvancedTabTitleLine {
+    height: 9px;
+    border-bottom: 1px dotted #777;
+    position: relative;
+    min-width: 200px;
+}
+
+div.chatAdvancedTabCheckboxDiv {
+    margin-left:50px;
+    padding-top:5px;
+}
+
+td.chatInfoLeftCol {
+    vertical-align: top;
+    text-align: left;
+    padding-right: 5px;
+    white-space: nowrap;
+    color: #523D04;
+}
+
+span.createBookingText {
+    font-size: 16px;
+}
+
+.chatWarning {
+    font-weight: bold;
+    color: #881122;
+}
+
+/* Instant Messaging display pages */
+
+.CRDisplayMoreInfo {
+    color: #0B63A5;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.CRDisplayHideInfo {
+    color: #B38B1F;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+div.CRDisplayInfoLine {
+    padding-bottom: 8px;
+}
+
+table.eventDetails td.chatDisplayInfoLeftCol {
+    padding: 0px;
+    padding-right: 10px;
+    padding-left: 5px;
+    padding-bottom: 1px;
+    padding-top: 1px;
+    vertical-align: top;
+    text-align: right;
+    white-space: nowrap;
+    width: 0px;
+    color: #222222;
+    font-size: 10px;
+}
+
+table.eventDetails td.chatDisplayInfoRightCol {
+    padding: 0px;
+    vertical-align: top;
+    font-size: 10px;
+    padding-bottom: 1px;
+    padding-top: 1px;
+    padding-right: 5px;
+}
+
+td.chatDisplayInfoRightCol a {
+    font-size: 10px;
+}
+
+
+td.chatDisplayInfoLeftCol span {
+    white-space: nowrap;
+}
+
+div.chatLinkTooltipMeetingLecture {
+    padding: 3px;
+    background-color: white;
+}

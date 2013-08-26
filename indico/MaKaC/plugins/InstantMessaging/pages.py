@@ -59,7 +59,7 @@ class WPConfModifChat(WPConferenceModifBase):
         self._plugin_asset_env.register('instant_messaging_js', Bundle('js/InstantMessaging.js',
                                                                        filters='rjsmin',
                                                                        output="InstantMessaging_%(version)s.min.js"))
-        self._plugin_asset_env.register('instant_messaging_css', Bundle('css/InstantMessaging.css',
+        self._plugin_asset_env.register('instant_messaging_css', Bundle('css/im.css',
                                                                         filters='cssmin',
                                                                         output="InstantMessaging_%(version)s.min.css"))
 
