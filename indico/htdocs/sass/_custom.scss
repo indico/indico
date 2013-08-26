@@ -19,8 +19,8 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-@import 'base';
-@import 'lib/compass/compass';
-@import 'partials';
-@import 'modules';
-@import 'custom';
+// ============================================================================
+// Use this for the sole purpose of ext_modules customization
+// ============================================================================
+
+@import "custom/jquery.multiselect"
