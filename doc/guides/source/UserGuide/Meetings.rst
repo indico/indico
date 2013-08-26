@@ -189,7 +189,7 @@ Manager adds participants
 
 In order to add participants, click on
 
-* *Add* >*Indico User / Group* if the participant or the e-group exists in Indico database;
+* *Add* >*Indico User* if the participant or the e-group exists in Indico database;
 * Otherwise, click on *Add->New user*.
 
 |image154|

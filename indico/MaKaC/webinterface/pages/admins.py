@@ -783,10 +783,9 @@ class WPAdminLayoutGeneral( WPTemplatesCommon ):
             "templateSetFormURL": urlHandlers.UHAdminLayoutSaveTemplateSet.getURL(),
             "socialFormURL": urlHandlers.UHAdminLayoutSaveSocial.getURL(),
             "socialActive": socialCfg.get('active', True),
-            # {'facebook': '269567379750914'}
             "facebookData": socialCfg.get('facebook', {})
-            }
-        return wc.getHTML( pars )
+        }
+        return wc.getHTML(pars)
 
 
 class WAdminLayoutGeneral(wcomponents.WTemplated):
