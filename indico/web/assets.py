@@ -190,15 +190,15 @@ class DebugLevelFilter(Filter):
 jquery = Bundle(
     'js/lib/underscore.js',
     'js/lib/jquery.js',
-    'js/lib/multiselect.js',
-    'js/lib/multiselect.filter.js',
     'js/lib/jquery.qtip.js',
+    'js/jquery/jquery-ui.js',
+    'js/lib/jquery.multiselect.js',
+    'js/lib/jquery.multiselect.filter.js',
     Bundle('js/jquery/jquery-migrate-silencer.js', filters=DebugLevelFilter(required_level=False),
            output='js/jquery_migrate_silencer_%(version)s.js'),
     *namespace('js/jquery',
 
         'jquery-migrate.js',
-        'jquery-ui.js',
         'jquery.form.js',
         'jquery.custom.js',
         'jquery.daterange.js',
@@ -318,9 +318,7 @@ def register_all_css(env, main_css_file):
                     'jquery.colorbox.css',
                     'jquery-ui-custom.css',
                     'jquery.qtip-custom.css',
-                    'jquery.colorpicker.css',
-                    'jquery.multiselect.filter.css',
-                    'jquery.multiselect.css'),
+                    'jquery.colorpicker.css'),
         filters=("cssmin", "cssrewrite"),
         output='css/base_%(version)s.min.css')
 
