@@ -39,6 +39,7 @@ import itertools
 # TODO: make this configurable
 # 0111 111 .... max signed int
 BTREE_MAX_INT = 0x7FFFFFFF
+BTREE_MIN_INT = 0x80000000
 
 
 class Index(Persistent):
@@ -776,6 +777,10 @@ class CalendarDayIndex(Persistent):
         res = set()
         #checking if 2038 problem occurs
         if sDay > BTREE_MAX_INT or eDay > BTREE_MAX_INT:
+            return res
+
+        #checking if 1901 problem ocurrs
+        if sDay < BTREE_MIN_INT or eDay < BTREE_MIN_INT:
             return res
         for event in self._idxDay.values(sDay, eDay):
             res.update(event)
