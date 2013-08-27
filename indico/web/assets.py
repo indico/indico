@@ -277,12 +277,13 @@ base_js = Bundle(jquery, utils, presentation, calendar, indico_jquery, moment, i
                  indico_legacy, indico_common)
 
 screen_sass = Bundle('sass/screen.scss',
-                   filters=("pyscss", "cssrewrite", "cssmin"),
-                   output="sass/screen_sass_%(version)s.css",
-                   depends=["sass/*.scss",
-                            "sass/base/*.scss",
-                            "sass/partials/*.scss",
-                            "sass/modules/*.scss"])
+                     filters=("pyscss", "cssrewrite", "cssmin"),
+                     output="sass/screen_sass_%(version)s.css",
+                     depends=["sass/*.scss",
+                              "sass/base/*.scss",
+                              "sass/custom/*.scss",
+                              "sass/modules/*.scss",
+                              "sass/partials/*.scss"])
 
 
 def register_all_js(env):
