@@ -34,7 +34,7 @@ from MaKaC.review import AbstractStatusWithdrawn, AbstractStatusSubmitted
 
 class TestAbstractSubmission(IndicoTestCase):
 
-    _requires = ['db.Database', 'db.DummyUser', 'db.FakeUsers']
+    _requires = ['db.Database', 'db.DummyUser']
 
     def setUp(self):
         super(TestAbstractSubmission, self).setUp()

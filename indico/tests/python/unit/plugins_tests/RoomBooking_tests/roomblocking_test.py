@@ -58,31 +58,6 @@ class RoomBooking_Feature(IndicoTestFeature):
             minfo._roomBookingModuleActive = True
             DALManagerCERN.connect()
 
-            # Create dummy avatars in obj._avatarN
-            ah = AvatarHolder()
-            obj._avatars = []
-            for i in xrange(1, 5):
-                avatar = Avatar()
-                avatar.setName("fake-%d" % i)
-                avatar.setSurName("fake")
-                avatar.setOrganisation("fake")
-                avatar.setLang("en_GB")
-                avatar.setEmail("fake%d@fake.fake" % i)
-                avatar.setId("rb-fake-%d" % i)
-
-                # setting up the login info
-                li = LoginInfo("fake-%d" % i, "fake-%d" % i)
-                authManager = AuthenticatorMgr()
-                userid = authManager.createIdentity(li, avatar, "Local")
-                authManager.add(userid)
-
-                # activate the account
-                avatar.activateAccount()
-
-                ah.add(avatar)
-                obj._avatars.append(avatar)
-                setattr(obj, '_avatar%d' % i, avatar)
-
             # Create dummy rooms in obj._roomN - owners are fake1 and fake2 (r1 has f1, r2 has f2, r3 has f1, ...)
             location = Location.getDefaultLocation()
             obj._rooms = []
@@ -99,7 +74,7 @@ class RoomBooking_Feature(IndicoTestFeature):
                 room.isActive = True
                 room.isReservable = True
                 room.resvsNeedConfirmation = False
-                room.responsibleId = 'rb-fake-%d' % (((i - 1) % 2) + 1)
+                room.responsibleId = 'fake-%d' % (((i - 1) % 2) + 1)
                 room.whereIsKey = 'Nowhere'
                 room.telephone = '123456789'
                 room.capacity = 10

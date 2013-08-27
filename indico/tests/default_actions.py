@@ -46,55 +46,47 @@ def initialize_new_db(root):
     return home
 
 
-def create_dummy_user():
+def create_user(name, login, authManager):
+        avatar = Avatar()
+        avatar.setName(name)
+        avatar.setSurName(name)
+        avatar.setOrganisation("fake")
+        avatar.setLang("en_GB")
+        avatar.setEmail("%s@fake.fake" % name)
+
+        # setting up the login info
+        li = LoginInfo(login, login)
+        userid = authManager.createIdentity(li, avatar, "Local")
+        authManager.add(userid)
+        # activate the account
+        avatar.activateAccount()
+        return avatar
+
+
+def create_dummy_users():
     """
     Creates a dummy user for testing purposes
     """
-    avatar = Avatar()
-
-    avatar.setName("fake")
-    avatar.setSurName("fake")
-    avatar.setOrganisation("fake")
-    avatar.setLang("en_GB")
-    avatar.setEmail("fake@fake.fake")
-
-    # registering user
+    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
     ah = AvatarHolder()
-    ah.add(avatar)
-
-    # setting up the login info
-    li = LoginInfo("dummyuser", "dummyuser")
     authManager = AuthenticatorMgr()
-    userid = authManager.createIdentity(li, avatar, "Local")
-    authManager.add(userid)
+    avatars = []
+    al = minfo.getAdminList()
 
-    # activate the account
-    avatar.activateAccount()
+    avatar = create_user("fake", "dummyuser", authManager)
+    ah.add(avatar)
+    avatars.append(avatar)
+    al.grant(avatar)
+
+    for i in xrange(1, 5):
+        avatar = create_user("fake-%d" % i, "fake-%d" % i, authManager)
+        avatar.setId("fake-%d" % i)
+        ah.add(avatar)
+        avatars.append(avatar)
 
     # since the DB is empty, we have to add dummy user as admin
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
 
-    al = minfo.getAdminList()
-    al.grant(avatar)
-
     dc = DefaultConference()
     HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(dc)
-    return avatar
-
-
-def create_fake_users():
-        # Create few users
-        ah = AvatarHolder()
-        # Create dummy avatars in obj._avatarN
-        avatars = []
-        for i in xrange(1, 5):
-            avatar = Avatar()
-            avatar.setName("fake-%d" % i)
-            avatar.setSurName("fake")
-            avatar.setOrganisation("fake")
-            avatar.setLang("en_GB")
-            avatar.setEmail("fake%d@fake.fake" % i)
-            avatar.setId("fake-%d" % i)
-            ah.add(avatar)
-            avatars.append(avatar)
-        return avatars
+    return avatars

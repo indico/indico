@@ -591,18 +591,6 @@ class TestAbstractJudgements(TestReviewBase):
 
         with self._context("database"):
 
-        # Get dummy user and create another one
-            ah = AvatarHolder()
-            avatar2 = Avatar()
-            avatar2.setName("fake-2")
-            avatar2.setSurName("fake")
-            avatar2.setOrganisation("fake")
-            avatar2.setLang("en_GB")
-            avatar2.setEmail("fake2@fake.fake")
-            avatar2.setId("fake-2")
-            ah.add(avatar2)
-            setattr(self, '_avatar2', avatar2)
-
             self._ctOral = conference.ContributionType("oral", "", self._conf)
             self._conf.addContribType(self._ctOral)
 

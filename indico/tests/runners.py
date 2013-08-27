@@ -272,7 +272,7 @@ class FunctionalTestRunner(NoseTestRunner):
             conn = dbi.getDBConnection()
 
             default_actions.initialize_new_db(conn.root())
-            default_actions.create_dummy_user()
+            default_actions.create_dummy_users()
             dbi.endRequest()
 
             raw_input("Press [ENTER] to finish recording... ")
