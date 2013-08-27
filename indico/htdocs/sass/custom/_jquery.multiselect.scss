@@ -19,6 +19,16 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+/* Indico styled multiselect */
+
+.ui-multiselect-widget {
+    background: none repeat scroll 0 0 #FAFAFA;
+    border: 1px solid #DADADA;
+}
+
+.ui-multiselect-menu { display:none; padding:0; position:absolute; z-index:10000}
+.ui-multiselect-checkboxes { position:relative; overflow-y:scroll }
+
 /* Indico roomBooking modifications */
 
 .RoomBooking.ui-multiselect {
