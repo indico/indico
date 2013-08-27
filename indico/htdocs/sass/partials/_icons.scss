@@ -246,3 +246,12 @@ you can use the generic selector below, but it's slower:
 .icon-alarm:before {
     content: "\74";
 }
+.icon-broadcast:before {
+    content: "\e005";
+}
+.icon-mic:before {
+    content: "\e006";
+}
+.icon-camera:before {
+    content: "\e007";
+}
