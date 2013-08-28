@@ -1330,7 +1330,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
                         _("View or modify your already registration")
                        </a></li>""") % (submitOpt,
                                         quoteattr(str(modify_registration_url)))
-            if registered and self._conf.getModETicket().isEnabled():
+            if registered and self._conf.getRegistrationForm().getETicket().isEnabled():
                 registrant = self._avatar.getRegistrantById(self._conf.getId())
                 e_ticket_url = url_for("event.e-ticket-pdf", registrant,
                                        authkey=registrant.getRandomId())
