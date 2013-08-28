@@ -105,7 +105,8 @@ indico_room_booking = Bundle(
 
                'MapOfRooms.js',
                'BookingForm.js',
-               'RoomBookingCalendar.js'),
+               'RoomBookingCalendar.js',
+               'roomselector.js'),
     filters='rjsmin', output='js/indico_room_booking_%(version)s.min.js')
 
 indico_admin = Bundle(
@@ -315,6 +316,8 @@ def register_all_css(env, main_css_file):
                     'calendar-blue.css',
                     'jquery-ui.css',
                     'lib/jquery.qtip.css',
+                    'lib/jquery.multiselect.css',
+                    'lib/jquery.multiselect.filter.css',
                     'jquery.colorbox.css',
                     'jquery-ui-custom.css',
                     'jquery.qtip-custom.css',
