@@ -729,22 +729,6 @@ def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
 
 
 @since('1.1')
-def indexConferenceTitle(dbi, withRBDB, prevVersion):
-    """
-    Indexing Conference Title
-    """
-    ch = ConferenceHolder()
-    nameIdx = IndexesHolder().getIndex('conferenceTitle')
-    i = 0
-
-    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
-        nameIdx.index(conf.getId(), conf.getTitle().decode('utf-8'))
-        i += 1
-        if i % 10000 == 0:
-            dbi.commit()
-
-
-@since('1.1')
 def convertLinkedTo(dbi, withRBDB, prevVersion):
     """Convert Avatar.linkedTo structure to use OOTreeSets
        and import linkedTo information into Redis (if enabled)"""
@@ -786,7 +770,7 @@ def convertLinkedTo(dbi, withRBDB, prevVersion):
     dbi.commit()
 
 
-@since('1.1')
+@since('1.1', never=True)
 def redisLinkedTo(dbi, withRBDB, prevVersion):
     """Import linkedTo information into Redis"""
     if not Config.getInstance().getRedisConnectionURL():
@@ -929,6 +913,24 @@ def lowercaseLDAPIdentities(dbi, withRBDB, prevVersion):
         if i % 1000 == 999:
             dbi.commit()
     print
+    dbi.commit()
+
+
+@since('1.2')
+def reindexCategoryNameAndConferenceTitle(dbi, withRBDB, prevVersion):
+    """
+    Indexing Conference Title with new WhooshTextIndex
+    """
+    IndexesHolder().removeById('conferenceTitle')
+    IndexesHolder().removeById('categoryName')
+
+    confTitleIdx = IndexesHolder().getIndex('conferenceTitle')
+    confTitleIdx.clear()
+    confTitleIdx.initialize(dbi, ConferenceHolder()._getIdx().itervalues())
+
+    categNameIdx = IndexesHolder().getIndex('categoryName')
+    categNameIdx.clear()
+    categNameIdx.initialize(dbi, CategoryManager()._getIdx().itervalues())
     dbi.commit()
 
 

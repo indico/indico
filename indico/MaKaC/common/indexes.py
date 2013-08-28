@@ -20,21 +20,29 @@
 """This file contains various indexes which will be used in the system in order
     to optimise some functionalities.
 """
+import os
 from persistent import Persistent
 from BTrees.IOBTree import IOBTree
 from BTrees.OOBTree import OOBTree, OOSet
+from whoosh.filedb.filestore import FileStorage
+from whoosh.fields import Schema, ID, TEXT, DATETIME
+from whoosh.qparser import QueryParser
+from whoosh.sorting import FieldFacet
+from whoosh import writing
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.timezoneUtils import date2utctimestamp, datetimeToUnixTime
 from MaKaC.errors import MaKaCError
 from datetime import datetime, timedelta
 from pytz import timezone
 from MaKaC.common.logger import Logger
+from indico.core.config import Config
 from MaKaC.plugins.base import extension_point
 from zope.index.text import textindex
 from indico.util.string import remove_accents
 import pytz
 import itertools
 import string
+from indico.util.redis.whoosh_storage import RedisStorage
 
 # BTrees are 32 bit by default
 # TODO: make this configurable
@@ -67,9 +75,8 @@ class Index(Persistent):
         letters = []
         words = self.getKeys()
         for word in words:
-            uletter = remove_accents(word.decode('utf-8').lower()[0])
-            if not uletter in letters:
-                letters.append(uletter)
+            if not word[0].lower() in letters:
+                letters.append(word[0].lower())
         letters.sort()
         return letters
 
@@ -90,51 +97,47 @@ class Index(Persistent):
                 words[value].remove(item)
                 self.setIndex(words)
 
-    def matchFirstLetter(self, letter, accent_sensitive=True):
+    def matchFirstLetter( self, letter ):
         result = []
-
-        cmpLetter = letter.lower()
-        if not accent_sensitive:
-            cmpLetter = remove_accents(cmpLetter)
-
         for key in self.getKeys():
-            uletter = key.decode('utf8')[0].lower()
-            if not accent_sensitive:
-                uletter = remove_accents(uletter)
-            if uletter == cmpLetter:
+            if key[0].lower() == letter.lower():
                 result += self._words[key]
-
         return result
 
-    def _match(self, value, cs=1, exact=1, accent_sensitive=True):
-        # if match is exact, retrieve directly from index
-        if exact == 1 and cs == 1 and accent_sensitive:
-            if value in self._words and len(self._words[value]) != 0:
+    def _match( self, value, cs=1, exact=1 ):
+
+        result = []
+        lowerCaseValue = value.lower()
+
+        if exact == 1 and cs == 1:
+            if self._words.has_key(value) and len(self._words[value]) != 0:
                 if '' in self._words[value]:
                     self._words[value].remove('')
                 return self._words[value]
             else:
                 return None
-        else:
-            result = []
-            cmpValue = value
-            if not accent_sensitive:
-                cmpValue = remove_accents(cmpValue)
-            if cs == 0:
-                cmpValue = cmpValue.lower()
-
-            for key in self._words.iterkeys():
-                if len(self._words[key]) != 0:
-                    cmpKey = key
-                    if not accent_sensitive:
-                        cmpKey = remove_accents(cmpKey)
-                    if cs == 0:
-                        cmpKey = cmpKey.lower()
-                    if (exact == 0 and cmpKey.find(cmpValue) != -1) or (exact == 1 and cmpKey == cmpValue):
-                        if '' in self._words[key]:
-                            self._words[key].remove('')
-                        result = result + self._words[key]
+        elif exact == 1 and cs == 0:
+            for key in self._words.keys():
+                if key.lower() == lowerCaseValue and len(self._words[key]) != 0:
+                    if '' in self._words[key]:
+                        self._words[key].remove('')
+                    result = result + self._words[key]
             return result
+        elif exact == 0 and cs == 1:
+            for key in self._words.keys():
+                if key.find(value) != -1 and len(self._words[key]) != 0:
+                    if '' in self._words[key]:
+                        self._words[key].remove('')
+                    result = result + self._words[key]
+            return result
+        else:
+            for key in self._words.keys():
+                if key.lower().find(lowerCaseValue) != -1 and len(self._words[key]) != 0:
+                    if '' in self._words[key]:
+                        self._words[key].remove('')
+                    result = result + self._words[key]
+            return result
+        return None
 
     def dump(self):
         return self._words
@@ -157,7 +160,7 @@ class EmailIndex(Index):
         for email in user.getEmails():
             self._withdrawItem(email, user.getId())
 
-    def matchUser(self, email, cs=0, exact=0, accent_sensitive=True):
+    def matchUser(self, email, cs=0, exact=0):
         """this match is an approximative case insensitive match"""
         return self._match(email, cs, exact)
 
@@ -173,9 +176,9 @@ class NameIndex(Index):
         name = user.getName()
         self._withdrawItem(name, user.getId())
 
-    def matchUser(self, name, cs=0, exact=0, accent_sensitive=False):
+    def matchUser(self, name, cs=0, exact=0):
         """this match is an approximative case insensitive match"""
-        return self._match(name, cs, exact, accent_sensitive)
+        return self._match(name, cs, exact)
 
 
 class SurNameIndex(Index):
@@ -189,9 +192,9 @@ class SurNameIndex(Index):
         surName = user.getSurName()
         self._withdrawItem(surName, user.getId())
 
-    def matchUser(self, surName, cs=0, exact=0, accent_sensitive=False):
+    def matchUser(self, surName, cs=0, exact=0):
         """this match is an approximative case insensitive match"""
-        return self._match(surName, cs, exact, accent_sensitive)
+        return self._match(surName, cs, exact)
 
 
 class OrganisationIndex(Index):
@@ -205,8 +208,8 @@ class OrganisationIndex(Index):
         org = user.getOrganisation()
         self._withdrawItem(org, user.getId())
 
-    def matchUser(self, org, cs=0, exact=0, accent_sensitive=False):
-        return self._match(org, cs, exact, accent_sensitive)
+    def matchUser(self, org, cs=0, exact=0):
+        return self._match(org, cs, exact)
 
 
 class StatusIndex(Index):
@@ -219,35 +222,33 @@ class StatusIndex(Index):
         for av in ah.getList():
             self.indexUser(av)
 
-    def indexUser(self, user):
+    def indexUser( self, user ):
         status = user.getStatus()
-        self._addItem(status, user.getId())
+        self._addItem( status, user.getId() )
 
-    def unindexUser(self, user):
+    def unindexUser( self, user ):
         status = user.getStatus()
-        self._withdrawItem(status, user.getId())
+        self._withdrawItem( status, user.getId() )
 
-    def matchUser(self, status, cs=0, exact=1, accent_sensitive=True):
+    def matchUser( self, status, cs=0, exact=1 ):
         """this match is an approximative case insensitive match"""
-        return self._match(status, cs, exact)
+        return self._match(status,cs,exact)
 
-
-class GroupIndex(Index):
+class GroupIndex( Index ):
     _name = "group"
 
-    def indexGroup(self, group):
+    def indexGroup( self, group ):
         name = group.getName()
-        self._addItem(name, group.getId())
+        self._addItem( name, group.getId() )
 
-    def unindexGroup(self, group):
+    def unindexGroup( self, group ):
         name = group.getName()
-        self._withdrawItem(name, group.getId())
+        self._withdrawItem( name, group.getId() )
 
-    def matchGroup(self, name, cs=0, exact=0):
+    def matchGroup( self, name, cs=0, exact=0 ):
         if name == "":
             return []
-        return self._match(name, cs, exact)
-
+        return self._match(name,cs,exact)
 
 class CategoryIndex(Persistent):
 
@@ -930,7 +931,7 @@ class CategoryDateIndex(Persistent):
         for conf in categ.getConferenceList():
             self.unindexConf(conf)
             self.indexConf(conf)
-#        from indico.core.db import DBMgr
+#        from MaKaC.common import DBMgr
 #        dbi = DBMgr.getInstance()
 #        for subcat in categ.getSubCategoryList():
 #            self.reindexCateg(subcat)
@@ -1264,7 +1265,110 @@ class TextIndex(IntStringMappedIndex):
         return [(self.getString(record[0]), record[1]) for record in records]
 
 
-class IndexesHolder( ObjectHolder ):
+class WhooshTextIndex(object):
+
+    def _getRepositoryPath(self):
+        destPath = os.path.join(Config.getInstance().getArchiveDir(), 'whoosh')
+        if not os.access(destPath, os.F_OK):
+            os.makedirs(destPath)
+        return destPath
+
+    def _getSchema(self):
+        return Schema(id=ID(unique=True, stored=True), content=TEXT(stored=True))
+
+    def __init__(self, index_name):
+
+        if Config.getInstance().getRedisConnectionURL():
+            storage = RedisStorage(Config.getInstance().getRedisConnectionURL(), index_name)
+        else:
+            indexDir = self._getRepositoryPath()
+            storage = FileStorage(indexDir)
+        schema = self._getSchema()
+        if storage.index_exists(index_name):
+            self._textIdx = storage.open_index(schema=schema, indexname=index_name)
+        else:
+            self._textIdx = storage.create_index(schema, indexname=index_name)
+
+    def __contains__(self, key):
+        searcher = self._textIdx.searcher()
+        query = QueryParser("id", self._textIdx.schema).parse(key)
+        exist_key = len(searcher.search(query)) > 0
+        searcher.close()
+        return exist_key
+
+    def index(self, obj):
+        if obj.getId() in self:
+            raise KeyError("Key '%s' already exists in index!" % obj.getId())
+        self._index(obj)
+
+    def unindex(self, obj):
+        if obj.getId() in self:
+            with self._textIdx.writer() as writer:
+                writer.delete_by_term("id", unicode(obj.getId()))
+        else:
+            Logger.get('indexes.text').error("No such entry '%s'" % obj.getId())
+
+    def search(self, text, limit=None):
+        #raise Exception("%s %s %s" % (text, limit, page))
+        results = []
+        with self._textIdx.searcher() as searcher:
+            qp = QueryParser("content", self._textIdx.schema)
+            query = qp.parse(text)
+            results = [(record["id"], record["content"]) for record in searcher.search(query, limit=limit)]
+        return results
+
+    def clear(self):
+        with self._textIdx.writer() as writer:
+            writer.mergetype = writing.CLEAR
+
+    def initialize(self, dbi, list):
+        writer = self._textIdx.writer(limitmb=512)
+        i = 0
+        for obj in list:
+            writer.add_document(id=unicode(obj.getId()), content=unicode(obj.getTitle().decode('utf-8')))
+            if i % 20000 == 19999:
+                writer.commit()
+                dbi.commit()
+                writer = self._textIdx.writer(limitmb=512)
+            i += 1
+        writer.commit(optimize=True)
+
+
+class WhooshConferenceIndex(WhooshTextIndex):
+
+    def _getSchema(self):
+        return Schema(id=ID(unique=True, stored=True), content=TEXT(stored=True), start_date=DATETIME(sortable=True))
+
+    def _index(self, obj):
+        with self._textIdx.writer() as writer:
+            writer.add_document(id=unicode(obj.getId()), content=unicode(obj.getTitle().decode('utf-8')),
+                                start_date=obj.getStartDate())
+
+    def search(self, text, limit=None):
+        results = []
+        with self._textIdx.searcher() as searcher:
+            qp = QueryParser("content", self._textIdx.schema)
+            query = qp.parse(text)
+            sort_by = FieldFacet("start_date", reverse=True)
+            results = [(record["id"], record["content"]) for record in searcher.search(query, limit=limit,
+                                                                                       sortedby=sort_by)]
+        return results
+
+    def initialize(self, dbi, list):
+        writer = self._textIdx.writer(limitmb=512)
+        i = 0
+        for obj in list:
+            writer.add_document(id=unicode(obj.getId()), content=unicode(obj.getTitle().decode('utf-8')),
+                                start_date=obj.getStartDate())
+            if i % 20000 == 19999:
+                writer.commit()
+                dbi.commit()
+                writer = self._textIdx.writer(limitmb=512)
+            i += 1
+        writer.commit(optimize=True)
+
+
+class IndexesHolder(ObjectHolder):
 
     idxName = "indexes"
     counterName = None
@@ -1312,9 +1416,9 @@ class IndexesHolder( ObjectHolder ):
             elif id=="categoryDateAll":
                 Idx[str(id)] = CategoryDayIndex(visibility=False)
             elif id=="categoryName":
-                Idx[str(id)] = TextIndex()
+                Idx[str(id)] = WhooshTextIndex(str(id))
             elif id=="conferenceTitle":
-                Idx[str(id)] = TextIndex()
+                Idx[str(id)] = WhooshConferenceIndex(str(id))
             elif id=="pendingSubmitters":
                 Idx[str(id)] = PendingSubmittersIndex()
             elif id=="pendingConfSubmitters":
