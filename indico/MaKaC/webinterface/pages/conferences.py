@@ -5349,12 +5349,13 @@ class WConfModAbstractBook(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         boaConfig = self._conf.getBOAConfig()
-        vars["sortByList"] = boaConfig.getCorrespondingAuthorTypes()
-        vars["previewURL"]=quoteattr(str(urlHandlers.UHConfAbstractBook.getURL(self._conf)))
+        vars["sortByList"] = boaConfig.getSortByTypes()
+        vars["modURL"] = quoteattr(str(urlHandlers.UHConfModAbstractBookEdit.getURL(self._conf)))
+        vars["previewURL"] = quoteattr(str(urlHandlers.UHConfAbstractBook.getURL(self._conf)))
         vars["sortBy"] = boaConfig.getSortBy()
         vars["boaConfig"] = boaConfig
-        vars["urlToogleShowIds"]=str(urlHandlers.UHConfModAbstractBookToogleShowIds.getURL(self._conf))
-        vars["conf"]=self._conf
+        vars["urlToogleShowIds"] = str(urlHandlers.UHConfModAbstractBookToogleShowIds.getURL(self._conf))
+        vars["conf"] = self._conf
         vars["bookOfAbstractsActive"] = self._conf.getAbstractMgr().getCFAStatus()
         vars["bookOfAbstractsMenuActive"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu().getLinkByName('abstractsBook').isEnabled()
         vars["correspondingAuthorList"] = boaConfig.getCorrespondingAuthorTypes()

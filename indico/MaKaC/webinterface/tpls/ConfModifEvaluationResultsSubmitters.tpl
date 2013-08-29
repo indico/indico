@@ -23,6 +23,7 @@
           <br/>
           <input class="btn" type="submit" ${inputSubmitStyle} name="${mode}" value="${mode}" id="resultsAction"/>
           <input class="btn" type="submit" name="cancel" value="${ _("cancel")}"/>
+          <input type='hidden' id="action"/>
         </td>
       </tr>
   </table>

@@ -399,44 +399,32 @@ class UserSetPersonalData(UserPersonalDataBase):
                     raise NoReportError(_("Invalid title value"))
             elif self._dataType == "surName":
                 self._user.setFieldSynced('surName', False)
-                surName = idxs.getById("surName")
-                surName.unindexUser(self._avatar)
-                self._user.setSurName(self._value)
-                surName.indexUser(self._avatar)
+                self._user.setSurName(self._value, reindex=True)
             elif self._dataType == "name":
                 self._user.setFieldSynced('firstName', False)
-                name = idxs.getById("name")
-                name.unindexUser(self._avatar)
-                self._user.setName(self._value)
-                name.indexUser(self._avatar)
+                self._user.setName(self._value, reindex=True)
             elif self._dataType == "organisation":
                 self._user.setFieldSynced('affiliation', False)
-                org = idxs.getById("organisation")
-                org.unindexUser(self._avatar)
-                self._user.setOrganisation(self._value)
-                org.indexUser(self._avatar)
+                self._user.setOrganisation(self._value, reindex=True)
             elif self._dataType == "email":
                 # Check if there is any user with this email address
                 if self._value != self._avatar.getEmail():
                     other = user.AvatarHolder().match({"email": self._value}, searchInAuthenticators=False)
                     if other and other[0] != self._avatar:
                         raise NoReportError(_("The email address %s is already used by another user.") % self._value)
-                email = idxs.getById("email")
-                email.unindexUser(self._avatar)
-                self._user.setEmail(self._value)
-                email.indexUser(self._avatar)
+                self._user.setEmail(self._value, reindex=True)
             elif self._dataType == "secondaryEmails":
                 emailList = self._buildEmailList()
                 secondaryEmails = []
                 # check if every secondary email is valid
-                for email in emailList:
-                    if email != "":
-                        av = user.AvatarHolder().match({"email": email}, searchInAuthenticators=False)
+                for sEmail in emailList:
+                    if sEmail != "":
+                        av = user.AvatarHolder().match({"email": sEmail}, searchInAuthenticators=False)
                         if av and av[0] != self._avatar:
-                            raise NoReportError(_("The email address %s is already used by another user.") % email)
+                            raise NoReportError(_("The email address %s is already used by another user.") % sEmail)
                         else:
-                            secondaryEmails.append(email)
-                self._user.setSecondaryEmails(secondaryEmails)
+                            secondaryEmails.append(sEmail)
+                self._user.setSecondaryEmails(secondaryEmails, reindex=True)
                 return ", ".join(self._user.getSecondaryEmails())
             elif self._dataType == "telephone":
                 self._user.setFieldSynced('phone', False)

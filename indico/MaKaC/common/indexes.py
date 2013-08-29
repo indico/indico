@@ -38,6 +38,7 @@ import itertools
 # TODO: make this configurable
 # 0111 111 .... max signed int
 BTREE_MAX_INT = 0x7FFFFFFF
+BTREE_MIN_INT = 0x80000000
 
 
 class Index(Persistent):
@@ -137,24 +138,22 @@ class Index(Persistent):
     def notifyModification(self):
         self._p_changed=1
 
-class EmailIndex( Index ):
+
+class EmailIndex(Index):
     _name = "email"
 
-    def indexUser( self, user ):
-        email = user.getEmail()
-        self._addItem( email, user.getId() )
-        for email in user.getSecondaryEmails():
-            self._addItem( email, user.getId() )
+    def indexUser(self, user):
+        for email in user.getEmails():
+            self._addItem(email, user.getId())
 
-    def unindexUser( self, user ):
-        email = user.getEmail()
-        self._withdrawItem( email, user.getId() )
-        for email in user.getSecondaryEmails():
-            self._withdrawItem( email, user.getId() )
+    def unindexUser(self, user):
+        for email in user.getEmails():
+            self._withdrawItem(email, user.getId())
 
-    def matchUser( self, email, cs=0, exact=0 ):
+    def matchUser(self, email, cs=0, exact=0):
         """this match is an approximative case insensitive match"""
-        return self._match(email,cs,exact)
+        return self._match(email, cs, exact)
+
 
 class NameIndex( Index ):
     _name = "name"
@@ -777,6 +776,10 @@ class CalendarDayIndex(Persistent):
         res = set()
         #checking if 2038 problem occurs
         if sDay > BTREE_MAX_INT or eDay > BTREE_MAX_INT:
+            return res
+
+        #checking if 1901 problem ocurrs
+        if sDay < BTREE_MIN_INT or eDay < BTREE_MIN_INT:
             return res
         for event in self._idxDay.values(sDay, eDay):
             res.update(event)

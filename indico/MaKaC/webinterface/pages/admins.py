@@ -1257,12 +1257,14 @@ class WPUserList(WPUserCommon):
 
     def _getTabContent(self, params):
         criteria = {}
+        onlyActivated = False
         if filter(lambda x: self._params[x], self._params):
             criteria["surName"] = self._params.get("sSurName", "")
             criteria["name"] = self._params.get("sName", "")
             criteria["email"] = self._params.get("sEmail", "")
             criteria["organisation"] = self._params.get("sOrganisation", "")
-        comp = WUserList(criteria, onlyActivated=False)
+            onlyActivated = "onlyActivated" in self._params
+        comp = WUserList(criteria, onlyActivated=onlyActivated)
         self._params["userDetailsURLGen"] = urlHandlers.UHUserDetails.getURL
 
         return comp.getHTML(self._params)

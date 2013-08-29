@@ -69,7 +69,7 @@
     </td>
   </tr>
   <tr>
-    <td colspan="2"><button id="cacheRefresh"">${_("Force cache refresh")}</button></td>
+    <td colspan="2"><button id="cacheRefresh">${_("Force cache refresh")}</button></td>
   </tr>
 </table>
 
