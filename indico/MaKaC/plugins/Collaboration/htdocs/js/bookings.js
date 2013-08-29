@@ -29,13 +29,11 @@ var TPL_DISPLAY_BUTTON = {
 
 var TPL_MANAGEMENT_BUTTON = {
     'disconnect': function(elem) {
-        elem.html(IndicoUI.Buttons.stopButtonText(format(
-            $T("Disconnect {0}"), [elem.data('location')]), "right").dom);
+        elem.html($('<a class="i-button icon-play" href="#"/>').text(format($T("Disconnect {0}"), [elem.data('location')])));
         elem.removeClass('connect_room').addClass('disconnect_room');
     },
     'connect': function(elem) {
-        elem.html(IndicoUI.Buttons.playButtonText(format(
-            $T("Connect {0}"), [elem.data('location')]), "right").dom);
+        elem.html($('<a class="i-button icon-play" href="#"/>').text(format($T("Connect {0}"), [elem.data('location')])));
         elem.removeClass('disconnect_room').addClass('connect_room');
     },
     'error': TPL_DISPLAY_BUTTON.error

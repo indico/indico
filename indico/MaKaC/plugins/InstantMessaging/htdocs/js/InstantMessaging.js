@@ -42,77 +42,20 @@ type ("ExistingChatroomsList", ["SelectableDynamicListWidget"],
 
             return item;
         },
-
-        getList: function() {
-            return this.getSelectedList();
-        },
-
-        /**
-         * Prepare the items for the format required later by the form.
-         */
-        _prepareItems: function(itemsRaw) {
-            var items = {};
-
-            each(itemsRaw, function(item) {
-                items[item.title + item.id] = item;
-            });
-
-            return items;
-        },
-
-        _setItems: function(itemsRaw) {
-            var self = this;
-            var items = self._prepareItems(itemsRaw);
-            var ks = keys(items);
-
-            for (k in ks) {
-                this.set(k, $O(items[ks[k]]));
-            }
-        },
-
-        _performCall: function(args) {
-            var self = this;
-
-            indicoRequest(self.APIMethod, args, function(result, error) {
-                if (!error) {
-                    self.tmpBuffer = result;
-
-                    if (self.tmpBuffer.length < self.getInterval()) {
-                        self._setComplete();
-                    }
-
-                    if (self._hasAjaxPending()) {
-                        self.ajaxPending.resolve();
-                    }
-                } else {
-                    IndicoUtil.errorReport(error);
-                }
-            });
-
-            return self.tmpBuffer;
-        }
     },
 
     /**
      * Constructor for FoundPeopleList
      */
     function(observer, conf) {
-        var self = this;
-        this.selected = new WatchList();
+        method = 'XMPP.getRoomsByUser',
+        args ={
+            usr: user,
+            limit: 10, // interval to load by.
+            excl: conf
+        }
 
-        var SDLWidgetParams = {
-                method: 'XMPP.getRoomsByUser',
-                args: {
-                    usr: user,
-                    limit: 10, // interval to load by.
-                    excl: conf
-                }
-        };
-
-        this.SelectableDynamicListWidget(observer, false, 'chatList', null,
-                                         null, null, SDLWidgetParams);
-
-        self.loadInterval();
+        this.SelectableDynamicListWidget(observer, method, args, 'chatList', false);
     }
 );
 

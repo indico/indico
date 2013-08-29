@@ -62,34 +62,6 @@ form.EAChoiceButton{
     vertical-align: middle;
 }
 
-.buttonWithPlay{
-    background: url(../images/green_arrow.png) no-repeat scroll left center #ECECEC;
-    padding: 5px 20px;
-    border: 1px solid #dcdcdc;
-    color: #555555;
-    border-radius: 5px;
-    display: inline;
-}
-
-.buttonWithPlay:hover{
-    color: #333;
-    border-color: #999;
-}
-
-.buttonWithStop{
-    background: url(../images/red_square.png) no-repeat scroll left center #ECECEC;
-    padding: 5px 20px;
-    border: 1px solid #dcdcdc;
-    color: #555555;
-    border-radius: 5px;
-    display: inline;
-}
-
-.buttonWithStop:hover{
-    color: #333;
-    border-color: #999;
-}
-
 .leftButton {
     -webkit-border-top-right-radius: 0;
     -moz-border-radius-topright: 0;
@@ -708,3 +680,45 @@ td.collaborationDisplayInfoLeftCol span {
 span.HiddenPIN {
     color: #AAAAAA;
 }
+
+div.bookingListDiv {
+    margin-bottom: 10px;
+    height: 350px;
+    width: auto;
+    border: 1px solid #CCCCCC;
+    overflow: auto;
+    margin-top: 10px;
+}
+
+ul.bookingList {
+    border: none;
+    display: block;
+    list-style-type: none;
+    padding-left: 0px;
+    margin: 0;
+
+}
+
+ul.bookingList li {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 1px solid #DDDDDD;
+}
+
+ul.bookingList li div.bookingDescription {
+    color: #666666;
+    margin-top: 0.5em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+div.bookingListDiv div.noSearchMsg{
+    margin-top: 10px;
+    vertical-align: center;
+    color: #666;
+    font-size: 1.2em;
+    text-align: center;
+}
+

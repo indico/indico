@@ -77,58 +77,6 @@ IndicoUI.Buttons = {
             }
         });
     },
-    /**
-     * Returns an image with an 'play' icon
-     */
-    playButton: function(faded, small){
-        var caption = faded ? 'Start (blocked)' : 'Start';
-        var imageName = "play";
-        if (faded) { imageName += "_faded"; }
-        if (small) { imageName += "_small"; }
-        return Html.img({
-            alt: caption,
-            title: caption,
-            src: imageSrc(imageName),
-            style: {
-                'marginLeft': '3px',
-                'marginRight': '3px',
-                'verticalAlign': 'middle'
-            }
-        });
-    },
-
-    /**
-     * Returns a text with a 'play' icon
-     */
-    playButtonText: function(text, position){
-        return Html.div({className: 'buttonWithPlay ' + "{0}Button".format(position) }, text);
-    },
-    /**
-     * Returns an image with an 'stop' icon
-     */
-    stopButton: function(faded, small){
-        var caption = faded ? 'Stop (blocked)' : 'Stop';
-        var imageName = "stop";
-        if (faded) { imageName += "_faded"; }
-        if (small) { imageName += "_small"; }
-        return Html.img({
-            alt: caption,
-            title: caption,
-            src: imageSrc(imageName),
-            style: {
-                'marginLeft': '3px',
-                'marginRight': '3px',
-                'verticalAlign': 'middle'
-            }
-        });
-    },
-
-    /**
-     * Returns a text with a 'play' icon
-     */
-    stopButtonText: function(text, position){
-        return Html.div({className: 'buttonWithStop ' + position}, text);
-    },
 
     /**
         * Hides/displays a target element, toggling an arrow-like "expand" icon

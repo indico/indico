@@ -47,6 +47,16 @@
             height: $thin-height;
         }
     }
+	
+    &.thinner {
+        $thinner-height: 1em;
+        height: $thinner-height;
+
+        & .i-button {
+            height: $thinner-height;
+            line-height: $thinner-height;
+        }
+    }
 
     & > .option {
         line-height: 2.5em;

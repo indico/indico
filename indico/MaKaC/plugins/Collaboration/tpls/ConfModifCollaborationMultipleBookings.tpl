@@ -16,14 +16,10 @@
                     <option value="${p.getId()}">${ p.getName() }</option>
                 % endfor
             </select>
-            <div id="createBookingDiv" style="display: inline;">
-
+            <div style="display: inline;">
+                <input id="createBooking" type="button" value="${_('Create')}"/>
+                <input id="searchBooking" type="button" style="display:none" value="${_('Search')}"/>
             </div>
-            <div id="createBookingHelp" style="display: inline;">
-            </div>
-            <span style="margin-left: 5em;font-size: 9pt;">
-                ${ _("Timezone: ")}${ Conference.getTimezone() }
-            </span>
         </td>
     </tr>
 </table>
@@ -31,6 +27,12 @@
     <tr>
         <td class="groupTitle" style="white-space: nowrap;padding-top: 1em;" colspan="2">
             ${ _("Current bookings")}
+            <div class="toolbar" style="float:right; height:1em">
+              <div class="group" style="font-size:13px; padding:0">
+                <a id="startAll" class="i-button icon-play highlight hidden" onclick="startAll()">${ _("Start All")}</a>
+                <a id="stopAll" class="i-button icon-stop highlight hidden" onclick="stopAll()">${ _("Stop All")}</a>
+              </div>
+            </div>
         </td>
     </tr>
     <tr>
@@ -44,18 +46,6 @@
                 <tbody id="bookingsTableBody">
                     <tr><td></td></tr>
                 </tbody>
-                <tr>
-                    <td colspan="10" style="text-align: center; padding-top: 20px;">
-                        <div id="startAll" style="display:none;">
-                            <img class="clickableImage" style="vertical-align: middle;" onClick="startAll()" src="${Config.getInstance().getSystemIconURL('play')}" alt="${ _("Start All")}" />
-                            <span class="clickableText" style="font-size: large; margin-left: 5px;" onClick="startAll()">${ _("Start All")}</span>
-                        </div>
-                        <div id="stopAll" style="display:none;">
-                            <img class="clickableImage" style="vertical-align: middle; margin-left: 20px;" onClick="stopAll()" src="${Config.getInstance().getSystemIconURL('stop')}" alt="${ _("Stop All")}" />
-                            <span class="clickableText" style="font-size: large; margin-left: 5px;" onClick="stopAll()">${ _("Stop All")}</span>
-                        </div>
-                    </td>
-                </tr>
             </table>
         </td>
     </tr>
@@ -107,8 +97,7 @@ var bookings = $L(${ jsonEncode(BookingsM) });
 
 var hasCreatePermissions = ${ jsonEncode(HasCreatePermissions) };
 var videoServiceSupport = ${ jsonEncode(VideoServiceSupport) };
-
-var createButton;
+var isAllowedToSearch = ${ jsonEncode(isAllowedToSearch) };
 
 var confId = ${ Conference.getId() };
 
@@ -127,24 +116,19 @@ var getSelectedPlugin = function() {
 var pluginSelectChanged = function() {
     selectedPlugin = getSelectedPlugin();
     if (exists(selectedPlugin)) {
-        createButton.disabledButtonWithTooltip('enable');
+        if (isAllowedToSearch[selectedPlugin]) {
+            $('#searchBooking').show();
+        }  else {
+            $('#searchBooking').hide();
+        }
+        $('#createBooking').disabledButtonWithTooltip('enable');
     } else {
-        createButton.disabledButtonWithTooltip('disable');
+        $('#searchBooking').hide();
+        $('#createBooking').disabledButtonWithTooltip('disable');
     }
 }
 
 /* ------------------------------ FUNCTIONS TO BE CALLED WHEN USER EVENTS HAPPEN -------------------------------*/
-
-/**
- * Function that will be called when the user presses the "Add" button.
- * It will call in turn 'createBooking' in Collaboration.js
- */
-var create = function() {
-    selectedPlugin = getSelectedPlugin();
-    if (exists(selectedPlugin)) {
-        createBooking(selectedPlugin, '${ Conference.getId() }');
-    }
-}
 
 /**
  * Function that will be called when the user presses the "Remove" button for a plugin.
@@ -169,24 +153,29 @@ $(function(){
     // This is strictly necessary in this page because the progress dialog touches the body element of the page,
     // and IE doesn't like when this is done at page load by a script that is not inside the body element.
 
-    // We configure the "create" button and the list of plugins.
-    createButton = $('<input/>', {type: 'button'}).css('marginLeft', '6px').val($T('Create'));
-    createButton.appendTo('#createBookingDiv');
-    createButton.disabledButtonWithTooltip({
+    // We configure the buttons and the list of plugins.
+
+    $('#createBooking').on('click', function() {
+        selectedPlugin = getSelectedPlugin();
+        if (exists(selectedPlugin)) {
+            createBooking(selectedPlugin, '${ Conference.getId() }');
+        }
+    });
+
+    $('#searchBooking').on('click', function() {
+        searchBookings(selectedPlugin, '${ Conference.getId() }');
+    });
+
+    $('#createBooking').disabledButtonWithTooltip({
         disabled: true,
         tooltip: $T('Please select a booking type from the list.')
     });
 
-    createButton.on('click', create);
-
-    var createHelpImg = Html.img({src: imageSrc("help"), style: {marginLeft: '5px', verticalAlign: 'middle'}});
-    $(createHelpImg.dom).qtip({
+    $("#pluginSelect").qtip({
         content: {
-            text: $T('Select a <strong>booking type<\/strong> from the drop-down list and press the "Create" button.')
+            text: $T('Select a booking type from the drop-down list and press the "Create" or "Search" button.')
         }
     });
-    $T('Select a <strong>booking type<\/strong> from the drop-down list and press the "Create" button.')
-    $E('createBookingHelp').set(createHelpImg);
 
     $E('pluginSelect').dom.value = 'noneSelected';
     pluginSelectChanged();

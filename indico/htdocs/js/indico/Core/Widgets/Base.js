@@ -250,6 +250,24 @@ type("SelectableListWidget", ["ListWidget"],
             this.ListWidget.prototype.setMessage.call(this, message);
         },
 
+        selectItem: function(listItem, pair){
+            var self = this;
+            if (exists(self.selectedList.get(pair.key))) {
+                self.selectedList.set(pair.key, null);
+                listItem.dom.className = self.unselectedCssClass;
+            } else {
+                if (self.onlyOne) {
+                    self.clearSelection();
+                }
+                self.selectedList.set(pair.key, pair.get());
+                listItem.dom.className = self.selectedCssClass;
+            }
+
+            if (exists(self.selectedObserver)) {
+                self.selectedObserver(self.selectedList);
+            }
+        },
+
         getReturnedDOM: function(self) {
             var dom = $B(self.domList, self,
 
@@ -261,24 +279,7 @@ type("SelectableListWidget", ["ListWidget"],
                         listItem.dom.className += ' unselectable';
 
                     } else {
-                        listItem.observeClick(function(event){
-
-                            if (exists(self.selectedList.get(pair.key))) {
-                                self.selectedList.set(pair.key, null);
-                                listItem.dom.className = self.unselectedCssClass;
-                            } else {
-                                if (self.onlyOne) {
-                                    self.clearSelection();
-                                }
-                                self.selectedList.set(pair.key, pair.get());
-                                listItem.dom.className = self.selectedCssClass;
-                            }
-
-                            if (exists(self.selectedObserver)) {
-                                self.selectedObserver(self.selectedList);
-                            }
-
-                        });
+                        listItem.observeClick(function(event){self.selectItem(listItem, pair)});
                     }
                     if (exists(self.mouseoverObserver)) {
                         listItem.observeEvent('mouseover', function(event){
@@ -336,7 +337,7 @@ type("SelectableListWidget", ["ListWidget"],
  * whereby it is anticipated that a lot of data may be returned to do so
  * gradually.
  */
-type("SelectableDynamicListWidget", ["SelectableListWidget"],
+type("SelectableDynamicListWidgetBase", ["SelectableListWidget"],
     {
         interval: null,
         offset: 0,
@@ -376,7 +377,7 @@ type("SelectableDynamicListWidget", ["SelectableListWidget"],
          */
         _waitHandler: function() {
             var self = this;
-            self.progress.dom.style.display = 'inline';
+            self.progress.dom.style.display = 'block';
         },
 
         /**
@@ -452,7 +453,8 @@ type("SelectableDynamicListWidget", ["SelectableListWidget"],
             self.ajaxPending = null;
             self.offset += self.getInterval();
             self._setItems(self.itemsBuffer);
-            self.progress.dom.style.display = 'none';
+            $(self.progress.dom).hide();
+            $('#sdlw-load').show();
             return self.draw();
         },
 
@@ -462,7 +464,8 @@ type("SelectableDynamicListWidget", ["SelectableListWidget"],
          */
         getListActions: function() {
             var self = this;
-            var noMoreEntries = Html.span({id: 'sdlw-complete'}, $T('No more to load'));
+            var noMoreEntries = Html.span({id: 'sdlw-complete'}, self.noMoreEntriesMsg);
+            var load = Html.span({id: 'sdlw-load', style: {'display': 'none'}});
 
             if (self._isComplete()) {
                 $('div#sdlw-actions').html(noMoreEntries.get());
@@ -470,23 +473,31 @@ type("SelectableDynamicListWidget", ["SelectableListWidget"],
                 return;
             }
 
-            var progressSpan = Html.span({id: 'sdlw-progress'}, self.progress);
+            var progressSpan = Html.div({id: 'sdlw-progress'}, self.progress);
             var loadMore = Html.span({
                 className: 'fakeLink'},
-                $T("Load " + self.getInterval() + " more"));
+                $T("See " + self.getInterval() + " results more"));
             var loadAll = Html.span({
                 className: 'fakeLink'},
-                $T("Load all"));
+                $T("See all"));
 
             loadMore.observeClick(function(evt) {
+                $(load.dom).hide();
+                progressSpan.set(self.progress);
                 self.loadInterval();
             });
 
             loadAll.observeClick(function(evt) {
+                $(load.dom).hide();
+                progressSpan.set(self.progress);
                 self.loadAll();
             });
 
-            return Html.div({id: 'sdlw-actions'}, loadMore, ' - ', loadAll, progressSpan);
+            load.append(loadMore);
+            load.append(' - ');
+            load.append(loadAll);
+
+            return Html.div({id: 'sdlw-actions'}, load, progressSpan);
         },
 
         /**
@@ -525,20 +536,94 @@ type("SelectableDynamicListWidget", ["SelectableListWidget"],
     },
 
     function (selectedObserver, onlyOne, listCssClass, selectedCssClass,
-              unselectedCssClass, mouseoverObserver, SDLParams) {
+              unselectedCssClass, mouseoverObserver, SDLParams, noMoreEntriesMsg) {
 
         var self = this;
         var defaultInterval = 15;
 
-        self.progress = progressIndicator(true);
+        self.progress = progressIndicator(false, true);
         self.APIMethod = SDLParams.method;
         self.APIArgs = SDLParams.args;
         self.interval = (self.APIArgs.limit === undefined)
                         ? defaultInterval
                         : self.APIArgs.limit;
 
+        self.noMoreEntriesMsg = any(noMoreEntriesMsg, $T('No more to load'));
+
         self.SelectableListWidget(selectedObserver, onlyOne, listCssClass,
-                selectedCssClass, unselectedCssClass, mouseoverObserver);
+                selectedCssClass, unselectedCssClass, mouseoverObserver, noMoreEntriesMsg);
+    }
+);
+
+
+type("SelectableDynamicListWidget", ["SelectableDynamicListWidgetBase"],
+    {
+
+        getList: function() {
+            return this.getSelectedList();
+        },
+
+         /**
+         * Prepare the items for the format required later by the form.
+         */
+
+        _prepareItems: function(itemsRaw) {
+            var items = {};
+
+            each(itemsRaw, function(item) {
+                items[item.name] = item;
+            });
+
+            return items;
+        },
+
+        _setItems: function(itemsRaw) {
+            var self = this;
+            var items = self._prepareItems(itemsRaw);
+            var ks = keys(items);
+
+            for (k in ks) {
+                this.set(k, $O(items[ks[k]]));
+            }
+        },
+
+        _performCall: function(args) {
+            var self = this;
+
+            indicoRequest(self.APIMethod, args, function(result, error) {
+                if (!error) {
+                    self.tmpBuffer = result;
+
+                    if (self.tmpBuffer.length < self.getInterval()) {
+                        self._setComplete();
+                    }
+
+                    if (self._hasAjaxPending()) {
+                        self.ajaxPending.resolve();
+                    }
+                } else {
+                    IndicoUtil.errorReport(error);
+                }
+            });
+
+            return self.tmpBuffer;
+        }
+    },
+
+    function (observer, method, args, listCssClass, onlyOne, noMoreEntriesMsg) {
+        var self = this;
+        this.selected = new WatchList();
+
+        var SDLWidgetParams = {
+                method: method,
+                args: args
+        };
+
+        this.SelectableDynamicListWidgetBase(observer, onlyOne, listCssClass, null,
+                                         null, null, SDLWidgetParams, noMoreEntriesMsg);
+
+        self.loadInterval();
+
     }
 );
 

@@ -108,3 +108,11 @@
     background-color: #EEFAEE;
     border: 1px solid #CDC;
 }
+
+.error-message-box {
+    @extend %message-box;
+    @include icon-before('icon-disabled');
+
+    background-color: $light-red;
+    border: 1px solid $dark-red;
+}

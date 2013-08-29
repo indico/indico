@@ -286,6 +286,13 @@ you can use the generic selector below, but it's slower:
     content: "\e48b";
 }
 
+.icon-play:before {
+    content: "\e00c";
+}
+.icon-stop:before {
+    content: "\e00d";
+}
+
 /* KEEP THE FOLLOWING DEFINITIONS: necessery when rendering the icon 'after' e.g. mixin icon-after */
 .icon-arrow-down-after:after {
     content: "\24";
