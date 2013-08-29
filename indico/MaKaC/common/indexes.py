@@ -136,7 +136,7 @@ class Index(Persistent):
         self._words = words
 
     def notifyModification(self):
-        self._p_changed=1
+        self._p_changed = 1
 
 
 class EmailIndex(Index):
@@ -155,56 +155,58 @@ class EmailIndex(Index):
         return self._match(email, cs, exact)
 
 
-class NameIndex( Index ):
+class NameIndex(Index):
     _name = "name"
 
-    def indexUser( self, user ):
+    def indexUser(self, user):
         name = user.getName()
-        self._addItem( name, user.getId() )
+        self._addItem(name, user.getId())
 
-    def unindexUser( self, user ):
+    def unindexUser(self, user):
         name = user.getName()
-        self._withdrawItem( name, user.getId() )
+        self._withdrawItem(name, user.getId())
 
-    def matchUser( self, name, cs=0, exact=0 ):
+    def matchUser(self, name, cs=0, exact=0):
         """this match is an approximative case insensitive match"""
-        return self._match(name,cs,exact)
+        return self._match(name, cs, exact)
 
-class SurNameIndex( Index ):
+
+class SurNameIndex(Index):
     _name = "surName"
 
-    def indexUser( self, user ):
+    def indexUser(self, user):
         surName = user.getSurName()
-        self._addItem( surName, user.getId() )
+        self._addItem(surName, user.getId())
 
-    def unindexUser( self, user ):
+    def unindexUser(self, user):
         surName = user.getSurName()
-        self._withdrawItem( surName, user.getId() )
+        self._withdrawItem(surName, user.getId())
 
-    def matchUser( self, surName, cs=0, exact=0 ):
+    def matchUser(self, surName, cs=0, exact=0):
         """this match is an approximative case insensitive match"""
-        return self._match(surName,cs,exact)
+        return self._match(surName, cs, exact)
 
-class OrganisationIndex( Index ):
+
+class OrganisationIndex(Index):
     _name = "organisation"
 
-    def indexUser( self, user ):
+    def indexUser(self, user):
         org = user.getOrganisation()
-        self._addItem( org, user.getId() )
+        self._addItem(org, user.getId())
 
-    def unindexUser( self, user ):
+    def unindexUser(self, user):
         org = user.getOrganisation()
-        self._withdrawItem( org, user.getId() )
+        self._withdrawItem(org, user.getId())
 
-    def matchUser( self, org, cs=0, exact=0 ):
-        """this match is an approximative case insensitive match"""
-        return self._match(org,cs,exact)
+    def matchUser(self, org, cs=0, exact=0):
+        return self._match(org, cs, exact)
 
-class StatusIndex( Index ):
+
+class StatusIndex(Index):
     _name = "status"
 
-    def __init__( self ):
-        Index.__init__( self )
+    def __init__(self):
+        Index.__init__(self)
         from MaKaC.user import AvatarHolder
         ah = AvatarHolder()
         for av in ah.getList():

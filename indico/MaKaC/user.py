@@ -756,7 +756,7 @@ class Avatar(Persistent, Fossilizable):
             self.secondaryEmails = emailList
 
     def hasEmail(self, email):
-        l=[self.email] + self.getSecondaryEmails()
+        l = [self.email] + self.getSecondaryEmails()
         return email.lower().strip() in l
 
 

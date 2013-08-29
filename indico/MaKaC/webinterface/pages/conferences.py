@@ -5357,18 +5357,20 @@ class WConfModAbstractBook(wcomponents.WTemplated):
         vars["urlToogleShowIds"] = str(urlHandlers.UHConfModAbstractBookToogleShowIds.getURL(self._conf))
         vars["conf"] = self._conf
         vars["bookOfAbstractsActive"] = self._conf.getAbstractMgr().getCFAStatus()
-        vars["bookOfAbstractsMenuActive"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu().getLinkByName('abstractsBook').isEnabled()
+        vars["bookOfAbstractsMenuActive"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(
+            self._conf).getMenu().getLinkByName('abstractsBook').isEnabled()
         vars["correspondingAuthorList"] = boaConfig.getCorrespondingAuthorTypes()
-        vars["correspondingAuthor"]= boaConfig.getCorrespondingAuthor()
+        vars["correspondingAuthor"] = boaConfig.getCorrespondingAuthor()
         return vars
+
 
 class WPModAbstractBook(WPConferenceModifAbstractBase):
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabBOA.setActive()
 
-    def _getTabContent( self, params ):
-        wc=WConfModAbstractBook(self._conf)
+    def _getTabContent(self, params):
+        wc = WConfModAbstractBook(self._conf)
         return wc.getHTML()
 
 
