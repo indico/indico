@@ -573,7 +573,7 @@ class LDAPGroup(Group):
                 login = aid.getLogin()
         if not login:
             return False
-        return AuthenticatorMgr().getById('LDAP').isUserInGroup((login, self.getName()))
+        return AuthenticatorMgr().getById('LDAP').isUserInGroup(login, self.getName())
 
     def containsMember(self, avatar):
         return 0
