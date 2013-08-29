@@ -2011,7 +2011,7 @@ class RadioItem(Persistent):
                 continue
             gf.getId() # for some reason it's empty when calling it for the first time
             item = mg.getResponseItemById(gf.getId())
-            if item is not None and item.getQuantity():
+            if item is not None and item.getQuantity() and item.getValue() == self.getCaption():
                 self.increaseNoPlaces()
 
     def clone(self, parent):
