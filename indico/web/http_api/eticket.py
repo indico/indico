@@ -26,7 +26,7 @@ from indico.web.http_api.util import get_query_parameter
 from indico.util.date_time import format_datetime
 
 
-class ETicketHook(HTTPAPIHook):
+class RegistrantBaseHook(HTTPAPIHook):
     def _getParams(self):
         self._registrant_id = self._pathParams["registrant_id"]
         self._conf_id = get_query_parameter(self._queryParams, ["target"])
@@ -43,10 +43,11 @@ class ETicketHook(HTTPAPIHook):
 
 
 @HTTPAPIHook.register
-class CheckInHook(ETicketHook):
+class CheckInHook(RegistrantBaseHook):
     TYPES = ("checkin",)
     RE = r"(?P<registrant_id>[\d]+)"
     NO_CACHE = True
+    COMMIT = True
 
     def _getParams(self):
         super(CheckInHook, self)._getParams()
@@ -58,12 +59,11 @@ class CheckInHook(ETicketHook):
             self._registrant.setCheckedIn(True)
         else:
             self._registrant.setCheckedIn(False)
-
         return {"success": True}
 
 
 @HTTPAPIHook.register
-class RegistrantHook(ETicketHook):
+class RegistrantHook(RegistrantBaseHook):
     TYPES = ("registrant",)
     RE = r"(?P<registrant_id>[\d]+)"
     NO_CACHE = True
@@ -98,3 +98,24 @@ class RegistrantHook(ETicketHook):
             "registration_date": registration_date,
             "participation_reason": participation_reason
         }
+
+
+@HTTPAPIHook.register
+class EventsHook(HTTPAPIHook):
+    TYPES = ("events",)
+    RE = r"(?P<user_id>[\d]+)"
+    NO_CACHE = True
+
+    def export_events(self, aw):
+        user = aw.getUser()
+        managed_conferences = user.getLinkTo('conference', 'creator')
+        managed_conferences.update(user.getLinkTo('conference', 'manager'))
+        events = []
+        for conf in managed_conferences:
+            event = {
+                "title": conf.getTitle(),
+                "date": conf.getAdjustedStartDate(),
+                "registrants": len(conf.getRegistrants())
+            }
+            events.append(event)
+        return {"events": events}
