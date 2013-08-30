@@ -71,10 +71,8 @@ class RegistrantHook(RegistrantBaseHook):
     def export_registrant(self, aw):
         self._checkProtection(aw)
 
-        registration_date = format_datetime(
-                                self._registrant.getAdjustedRegistrationDate())
-        checkin_date = format_datetime(
-                                self._registrant.getAdjustedCheckInDate())
+        registration_date = format_datetime(self._registrant.getAdjustedRegistrationDate())
+        checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate())
         regForm = self._conf.getRegistrationForm()
         if regForm.getReasonParticipationForm().isEnabled():
             participation_reason = self._registrant.getReasonParticipation()
@@ -101,6 +99,37 @@ class RegistrantHook(RegistrantBaseHook):
 
 
 @HTTPAPIHook.register
+class RegistrantsHook(HTTPAPIHook):
+    TYPES = ("registrants",)
+    RE = r"(?P<conf_id>[\d]+)"
+    NO_CACHE = True
+
+    def _getParams(self):
+        self._conf_id = self._pathParams["conf_id"]
+        ch = ConferenceHolder()
+        self._conf = ch.getById(self._conf_id)
+
+    def _checkProtection(self, aw):
+        user = aw.getUser()
+        if not self._conf.canManageRegistration(user):
+            raise HTTPAPIError("Access denied", 403)
+
+    def export_registrants(self, aw):
+        self._checkProtection(aw)
+        registrants = self._conf.getRegistrantsList()
+        registrant_list = []
+        for registrant in registrants:
+            reg = {
+                "id": registrant.getId(),
+                "full_name": registrant.getFullName(),
+                "checked_in": registrant.isCheckedIn(),
+                "secret": registrant.getCheckInUUID()
+            }
+            registrant_list.append(reg)
+        return {"registrants": registrant_list}
+
+
+@HTTPAPIHook.register
 class EventsHook(HTTPAPIHook):
     TYPES = ("events",)
     RE = r"(?P<user_id>[\d]+)"
@@ -113,6 +142,7 @@ class EventsHook(HTTPAPIHook):
         events = []
         for conf in managed_conferences:
             event = {
+                "id": conf.getId(),
                 "title": conf.getTitle(),
                 "date": conf.getAdjustedStartDate(),
                 "registrants": len(conf.getRegistrants())
