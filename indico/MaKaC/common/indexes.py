@@ -39,7 +39,7 @@ import itertools
 # TODO: make this configurable
 # 0111 111 .... max signed int
 BTREE_MAX_INT = 0x7FFFFFFF
-BTREE_MIN_INT = 0x80000000
+BTREE_MIN_INT = -0x80000000
 
 
 class Index(Persistent):
