@@ -94,7 +94,7 @@ class WPCollaborationBase:
                                                                     output="Collaboration_%(version)s.min.css"))
 
     def getJSFiles(self):
-        return self._plugin_asset_env['collaboration_js'].urls() + self._includeJSPackage("Display")
+        return self._includeJSPackage("Display") + self._plugin_asset_env['collaboration_js'].urls()
 
     def getCSSFiles(self):
         return self._plugin_asset_env['collaboration_css'].urls()
