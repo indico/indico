@@ -5350,7 +5350,7 @@ class WConfModAbstractBook(wcomponents.WTemplated):
         vars = wcomponents.WTemplated.getVars(self)
         boaConfig = self._conf.getBOAConfig()
         vars["sortByList"] = boaConfig.getSortByTypes()
-        vars["modURL"] = quoteattr(str(urlHandlers.UHConfModAbstractBookEdit.getURL(self._conf)))
+        vars["modURL"] = quoteattr(str(urlHandlers.UHConfModAbstractBook.getURL(self._conf)))
         vars["previewURL"] = quoteattr(str(urlHandlers.UHConfAbstractBook.getURL(self._conf)))
         vars["sortBy"] = boaConfig.getSortBy()
         vars["boaConfig"] = boaConfig
