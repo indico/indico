@@ -2737,6 +2737,9 @@ class Conference(CommonObjectBase, Locatable):
             if isinstance(manager, MaKaC.user.Avatar):
                 manager.unlinkTo(self, "manager")
 
+        creator = self.getCreator()
+        creator.unlinkTo(self, "creator")
+
         # Remove all links in redis
         if redis_write_client:
             avatar_links.delete_event(self)
