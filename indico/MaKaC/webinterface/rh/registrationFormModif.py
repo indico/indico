@@ -20,8 +20,9 @@ from flask import session
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
+from MaKaC.registration import Status, StatusValue
 import MaKaC.webinterface.rh.conferenceModif as conferenceModif
-from MaKaC.errors import FormValuesError,MaKaCError, ConferenceClosedError
+from MaKaC.errors import FormValuesError, MaKaCError, ConferenceClosedError
 from datetime import datetime
 from MaKaC.common import utils
 from MaKaC.i18n import _

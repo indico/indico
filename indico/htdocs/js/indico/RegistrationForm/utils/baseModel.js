@@ -43,6 +43,11 @@ var RegFormBaseModel = Backbone.Model.extend({
         options.type = 'POST';
         options.contentType = 'application/json; charset=utf-8';
         options.dataType = 'json';
+        options.headers = {};
+        var token = $('#csrf-token').attr('content');
+        if (token) {
+                options.headers["X-CSRF-Token"] =  token;
+        }
         var data = {
                 version: '1.1',
                 origin: document.URL,

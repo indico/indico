@@ -26,8 +26,8 @@
     <div id="section-create-popup"></div>
 
 <script type="text/javascript">
+    $.webshims.polyfill();
     $(document).ready(function(){
-        $.webshims.polyfill();
         var confId = ${ confId };
         var rfView = new RegFormEditionView({ el : $("div#registrationForm")});
         var model = rfView.getModel();

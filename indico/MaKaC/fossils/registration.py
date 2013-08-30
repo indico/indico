@@ -18,8 +18,8 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.common.fossilize import IFossil
-from MaKaC.common.Conversion import Conversion
 from indico.util.date_time import format_date
+
 
 ###################
 # item type fossil
@@ -46,6 +46,7 @@ class IRegFormRadioItemFossil(IFossil):
 
     def isBillable(self):
         """ Is item billable """
+
 
 class IRegFormAccommodationTypeItemFossil(IFossil):
 
@@ -74,6 +75,7 @@ class IRegFormAccommodationTypeItemFossil(IFossil):
     def isCancelled(self):
         """ Is cancelled """
     isCancelled.name = 'cancelled'
+
 
 class IRegFormRegistrationSessionItemFossil(IFossil):
 
@@ -137,15 +139,16 @@ class IRegFormSocialEventItemFossil(IFossil):
     def isPricePerPlace(self):
         """ Is the price per place """
 
+
 #####################
 # input type fossil
 #####################
-
 class IRegFormInputFieldBaseFossil(IFossil):
 
     def getHTMLName(self):
         """ Get the HTML name of the item """
     getHTMLName.name = 'HTMLName'
+
 
 class IRegFormTextInputFieldFossil(IRegFormInputFieldBaseFossil):
 
@@ -160,9 +163,11 @@ class IRegFormTextareaInputFieldFossil(IRegFormInputFieldBaseFossil):
     def getNumberOfColumns(self):
         """ Field number of columns """
 
+
 class IRegFormLabelInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     pass
+
 
 class IRegFormNumberInputFieldFossil(IRegFormInputFieldBaseFossil):
 
@@ -171,6 +176,7 @@ class IRegFormNumberInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     def getMinValue(self):
         """ Field minimum value """
+
 
 class IRegFormRadioGroupInputFieldFossil(IRegFormInputFieldBaseFossil):
 
@@ -188,23 +194,28 @@ class IRegFormRadioGroupInputFieldFossil(IRegFormInputFieldBaseFossil):
     getItemsList.name = 'radioitems'
     getItemsList.result = IRegFormRadioItemFossil
 
+
 class IRegFormCheckboxInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     pass
+
 
 class IRegFormYesNoInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     pass
 
+
 class IRegFormFileInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     pass
+
 
 class IRegFormCountryInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     def getCountriesList(self):
         """ the countries list """
     getCountriesList.name = 'radioitems'
+
 
 class IRegFormDateInputFieldFossil(IRegFormInputFieldBaseFossil):
 
@@ -222,6 +233,7 @@ class IRegFormTelephoneInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     def getLength(self):
         """ Field length """
+
 
 class IRegFormGeneralFieldFossil(IFossil):
 
@@ -255,7 +267,7 @@ class IRegFormGeneralFieldFossil(IFossil):
 
     def getPlacesLimit(self):
         """ Field places limit """
-        
+
     def getNoPlacesLeft(self):
         """ Number of left places """
 
@@ -296,6 +308,7 @@ class IRegFormSectionBaseFossil(IFossil):
         """ Section is enabled """
     isEnabled.name = 'enabled'
 
+
 class IRegFormGeneralSectionFossil(IRegFormSectionBaseFossil):
 
     def isRequired(self):
@@ -310,6 +323,7 @@ class IRegFormGeneralSectionFossil(IRegFormSectionBaseFossil):
     getSortedFields.name = 'items'
     getSortedFields.result = IRegFormGeneralFieldFossil
 
+
 class IRegFormFurtherInformationSectionFossil(IRegFormSectionBaseFossil):
 
     def getContent(self):
@@ -317,6 +331,7 @@ class IRegFormFurtherInformationSectionFossil(IRegFormSectionBaseFossil):
 
     def getItems(self):
         """ Section items list """
+
 
 class IRegFormAccommodationSectionFossil(IRegFormSectionBaseFossil):
 
@@ -351,6 +366,7 @@ class IRegFormReasonParticipationSectionFossil(IRegFormSectionBaseFossil):
     def getItems(self):
         """ section items """
 
+
 class IRegFormSessionSectionFossil(IRegFormSectionBaseFossil):
 
     def getDescription(self):
@@ -382,10 +398,10 @@ class IRegFormSocialEventSectionFossil(IRegFormSectionBaseFossil):
     getSocialEventList.name = 'items'
     getSocialEventList.result = IRegFormSocialEventItemFossil
 
+
 #############################################
 # Registration form registrant data fossil
 #############################################
-
 class IRegFormMiscellaneousInfoSimpleItemFossil(IFossil):
 
     def getId(self):
@@ -397,15 +413,16 @@ class IRegFormMiscellaneousInfoSimpleItemFossil(IFossil):
 
     def getValue(self):
         """ get value """
-    
+
     def getCurrency(self):
         """ get currency """
-    
+
     def getQuantity(self):
         """ get quantity """
-        
+
     def getPrice(self):
         """ get price """
+
 
 class IRegFormSocialEventFossil(IFossil):
 
@@ -414,17 +431,19 @@ class IRegFormSocialEventFossil(IFossil):
 
     def getNoPlaces(self):
         """ get number of places """
-        
+
     def getCurrency(self):
         """ get currency """
-        
+
     def getPrice(self):
         """ get currency """
-        
+
+
 class IRegFormSessionsFormFossil(IFossil):
 
     def getId(self):
         """ Get id """
+
 
 class IRegFormAccommodationFossil(IFossil):
 
@@ -440,6 +459,7 @@ class IRegFormAccommodationFossil(IFossil):
         """ Get accommodation type """
     getAccommodationType.result = IRegFormAccommodationTypeItemFossil
 
+
 class IRegFormMiscellaneousInfoGroupFossil(IFossil):
 
     def getId(self):
@@ -451,6 +471,7 @@ class IRegFormMiscellaneousInfoGroupFossil(IFossil):
     def getResponseItems(self):
         """ Get response items """
     getResponseItems.result = IRegFormMiscellaneousInfoSimpleItemFossil
+
 
 class IRegFormRegistrantFossil(IFossil):
 
