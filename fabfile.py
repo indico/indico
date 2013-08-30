@@ -243,6 +243,30 @@ def install_jquery_ui_multiselect():
             local('cp jquery.multiselect.filter.css {0}/'.format(dest_dir_css))
 
 
+@recipe('backbone')
+def install_backbone():
+    """
+    Install backbone from Git
+    """
+    with node_env():
+        with lcd(os.path.join(env.ext_dir, 'backbone')):
+            dest_dir_js = lib_dir(env.src_dir, 'js')
+            local('mkdir -p {0}'.format(dest_dir_js))
+            local('cp backbone.js {0}/'.format(dest_dir_js))
+
+
+@recipe('webshim')
+def install_webshim():
+    """
+    Install webshim from Git
+    """
+    with node_env():
+        with lcd(os.path.join(env.ext_dir, 'webshim')):
+            dest_dir_js = os.path.join(lib_dir(env.src_dir, 'js'), 'webshim')
+            local('mkdir -p {0}'.format(dest_dir_js))
+            local('cp -r src/* {0}/'.format(dest_dir_js))
+
+
 # Tasks
 
 @task

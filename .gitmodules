@@ -17,3 +17,9 @@
 [submodule "ext_modules/jquery-ui-multiselect"]
 	path = ext_modules/jquery-ui-multiselect
 	url = https://github.com/ehynds/jquery-ui-multiselect-widget.git
+[submodule "ext_modules/backbone"]
+	path = ext_modules/backbone
+	url = https://github.com/jashkenas/backbone.git
+[submodule "ext_modules/webshim"]
+	path = ext_modules/webshim
+	url = https://github.com/aFarkas/webshim.git

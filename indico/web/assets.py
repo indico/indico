@@ -173,12 +173,13 @@ indico_badges_css = Bundle('css/badges.css',
                            filters='cssmin', output='css/indico_badges_%(version)s.min.css')
 
 
-html5_cross_browser_compatibility = Bundle('js/html5/webshim/minified/extras/modernizr-custom.js',
-                                           'js/html5/webshim/minified/polyfiller.js',
-                                   filters='jsmin', output='html5_cross_browser_compatibility_%(version)s.min.js')
+html5_cross_browser_compatibility = Bundle('js/lib/webshim/extras/modernizr-custom.js',
+                                           'js/kib/webshim/polyfiller.js',
+                                           filters='jsmin',
+                                           output='html5_cross_browser_compatibility_%(version)s.min.js')
 
-indico_backbone = Bundle('js/backbone/backbone.js',
-                         'js/indico/Backbone/templateManager.js',
+indico_backbone = Bundle('js/lib/backbone.js',
+                         'js/indico/backbone/templateManager.js',
                          filters='jsmin', output='indico_backbone_%(version)s.min.js')
 
 indico_regform_base = Bundle(indico_backbone,
