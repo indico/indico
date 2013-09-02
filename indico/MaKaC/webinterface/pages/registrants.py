@@ -908,6 +908,8 @@ class WRegistrantModifETicket(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
+        vars["checkInUrl"] = url_for("event_mgmt.confModifRegistrants-modification-eticket-checkin",
+                             self._registrant)
         vars["eTicketUrl"] = url_for("event.e-ticket-pdf",
                                      self._registrant,
                                      authkey=self._registrant.getRandomId())

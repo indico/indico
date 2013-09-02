@@ -25,7 +25,6 @@ from MaKaC.webinterface.rh.fileAccess import RHFileAccess
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.export.excel import RegistrantsListToExcel
 import MaKaC.webinterface.common.regFilters as regFilters
-from indico.core.config import Config
 from MaKaC.errors import FormValuesError
 from MaKaC.common import utils
 from MaKaC.registration import SocialEvent, MiscellaneousInfoGroup
@@ -36,9 +35,7 @@ from MaKaC.i18n import _
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC.webinterface.rh import registrationFormModif
 from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
-import re
-import os
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, url_for
 
 class RHRegistrantListModifBase( registrationFormModif.RHRegistrationFormModifBase ):
     pass
@@ -435,6 +432,21 @@ class RHRegistrantModificationEticket(RHRegistrantModifBase):
     def _process(self):
         p = registrants.WPRegistrantModifETicket(self, self._registrant)
         return p.display()
+
+
+class RHRegistrantModificationEticketCheckIn(RHRegistrantModifBase):
+
+    def _checkParams(self, params):
+        RHRegistrantModifBase._checkParams(self, params)
+        self._newStatus = params["changeTo"]
+
+    def _process(self):
+        eticket = self._conf.getRegistrationForm().getETicket()
+        if self._newStatus == "True":
+            self._registrant.setCheckedIn(True)
+        else:
+            self._registrant.setCheckedIn(False)
+        self._redirect(url_for("event_mgmt.confModifRegistrants-modification-eticket", self._registrant))
 
 
 class RHRegistrantSendEmail( RHRegistrationFormModifBase ):
