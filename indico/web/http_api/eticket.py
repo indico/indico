@@ -141,11 +141,12 @@ class EventsHook(HTTPAPIHook):
         managed_conferences.update(user.getLinkTo('conference', 'manager'))
         events = []
         for conf in managed_conferences:
-            event = {
-                "id": conf.getId(),
-                "title": conf.getTitle(),
-                "date": conf.getAdjustedStartDate(),
-                "registrants": len(conf.getRegistrants())
-            }
-            events.append(event)
+            if conf.getRegistrationForm().getETicket().isEnabled():
+                event = {
+                    "id": conf.getId(),
+                    "title": conf.getTitle(),
+                    "date": conf.getAdjustedStartDate(),
+                    "registrants": len(conf.getRegistrants())
+                }
+                events.append(event)
         return {"events": events}
