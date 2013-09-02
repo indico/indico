@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import MaKaC.webinterface.pages.etickets as eTicket
+import indico.web.pages.etickets as eTicket
 import MaKaC.webinterface.rh.conferenceModif as conferenceModif
 from indico.web.flask.util import url_for
 
