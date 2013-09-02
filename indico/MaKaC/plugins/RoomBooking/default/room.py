@@ -508,6 +508,9 @@ class Room( Persistent, RoomBase, Fossilizable ):
         """ Has the room auto-confirmation of schedule? """
         return not self.resvsNeedConfirmation
 
+    def isPublic(self):
+        return self.isReservable and not self.customAtts.get('Booking Simba List')
+
     locationName = property( getLocationName, setLocationName )
 
 class NonBookableDate(Persistent):

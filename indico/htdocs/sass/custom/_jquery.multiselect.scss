@@ -26,7 +26,7 @@
     border: 1px solid #DADADA;
 }
 
-.ui-multiselect-menu { display:none; padding:0; position:absolute; z-index:10000}
+.ui-multiselect-menu { padding:0; position:relative; }
 .ui-multiselect-checkboxes { position:relative; overflow-y:scroll }
 
 /* Indico roomBooking modifications */

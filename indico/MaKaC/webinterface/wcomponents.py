@@ -3971,9 +3971,11 @@ class WRoomBookingBookRoom( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
+        rooms = self._rh._rooms
 
         vars["today"] = datetime.now()
-        vars["rooms"] = self._rh._rooms
+        vars["rooms"] = fossilize(rooms)
+        vars["maxRoomCapacity"] = max(room.capacity for room in rooms) if rooms else 0
         vars["roomBookingBookingListURL"] = urlHandlers.UHRoomBookingBookingListForBooking.getURL(newBooking = 'True')
 
         return vars

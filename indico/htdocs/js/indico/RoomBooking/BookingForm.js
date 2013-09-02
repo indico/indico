@@ -119,7 +119,7 @@ function saveFormData() {
                   "videoconference": $('#videoconference').is(':checked'),
                   "webcast": $('#webcast').is(':checked'),
                   "publicroom": $('#publicroom').is(':checked'),
-                  "filter":  $('.ui-multiselect-filter :input').val(),
+                  "filter":  $('#roomselector .ui-multiselect-filter :input').val(),
                   "selectedRooms":  selectedRooms,
                   "showAdvancedOptions":  $('#advancedOptions').is(":visible"),
                   "finishDate": $('#finishDate').val(),
@@ -129,65 +129,4 @@ function saveFormData() {
 
     $.jStorage.set(userId, rbDict);
     $.jStorage.setTTL(userId, 7200000); // 2 hours
-}
-
-// Restore selected rooms from local Storage
-function restoreSelection(selectedRooms) {
-     if ($("#roomGUID").multiselect("getChecked").length == 0)
-         $("#roomGUID").multiselect("widget").find(":checkbox").each(function(index) {
-             if (jQuery.inArray(index, selectedRooms) != -1) {
-                 this.click();
-             }
-         });
-}
-// Show advanced option search menu
-function showAdvancedOptions() {
-    if ($('#advancedOptions').is(":visible")) {
-        $("#advancedOptions input:checkbox").prop("checked", false);
-        $("#advancedOptions input:text").val('');
-        $('#advancedOptions').hide();
-        $('#advancedOptionsText').css('color', '#0B63A5');
-        $('#advancedOptionsText').html($T('Show advanced'));
-        advancedFilter();
-    } else {
-        $('#advancedOptions').show();
-        $('#advancedOptionsText').html($T('Hide advanced'));
-        updateCapacitySlider();
-    }
-}
-
-// Trigger filter basic or advanced filter
-function advancedFilter() {
-    $('.ui-multiselect-filter :input').watermark('');
-
-    var filterString = $("#videoconference").is(':checked') + ":" + $("#webcast").is(':checked') + ":" + $("#publicroom").is(':checked') + ":" + $("#capacity").val();
-    $('#roomGUID').multiselectfilter('advancedFilter', filterString);
-    $('.ui-multiselect-filter :input').watermark($T('Search: name, number, location...'));
-}
-
-//Refresh capacity slider
-function updateCapacitySlider(event, ui) {
-    if (event && event.type != "slidecreate" ) {
-        $("#capacity").val(ui.value);
-    }
-    $('#capacityRange').slider('value', $("#capacity").val());
-}
-
-// Multiselect style modification
-function changeSelectedStyle(selector) {
-    selector.parent().toggleClass('ui-state-selected', selector.prop('checked'));
-}
-
-function changeSelectedStyleAll() {
-    $('.RoomBooking.ui-multiselect-menu input:checkbox').each(function() {
-        changeSelectedStyle($(this));
-    });
-    updateSelectionCounter();
-}
-
-function updateSelectionCounter() {
-    var o = $("#roomGUID").multiselect("option");
-    if (o.autoOpen){
-        $('.RoomBooking .ui-multiselect-selection-counter').text(o.selectedText.replace('#', $(".RoomBooking.ui-multiselect-menu input:checked").length));
-    }
 }

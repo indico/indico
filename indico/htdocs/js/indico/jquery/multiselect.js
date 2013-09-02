@@ -18,7 +18,7 @@
 // Indico roomBooking jquery.multiselect specific settings
 $.extend($.ech.multiselectfilter.prototype, {
     advancedFilter: function(searchText) {
-        this.searchText = searchText;
+        this.searchText = searchText || "";
         this._handler(this);
     },
 

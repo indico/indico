@@ -46,6 +46,11 @@ class IRoomFossil(IFossil):
     def getBookingUrl(self):
         """ Room booking URL """
 
+    def getType(self):
+        """ Room type """
+    getType.produce = lambda s: roomClass(s)
+
+
 class IRoomMapFossil(IRoomFossil):
 
 
@@ -65,6 +70,9 @@ class IRoomMapFossil(IRoomFossil):
         """ Is the room active? """
 
     def isReservable(self):
+        """ Is the room reservable? """
+
+    def isPublic(self):
         """ Is the room public? """
 
     def hasBookingACL(self):
@@ -89,6 +97,7 @@ class IRoomMapFossil(IRoomFossil):
 
     def getAvailableVC(self):
         """ Available equipment for audio and video conference """
+
 
 
 def _produce_booking_url(resv):
@@ -140,10 +149,7 @@ class IBarFossil(IFossil):
 
 
 class IRoomCalendarFossil( IRoomFossil ):
-
-    def getType(self):
-        """ Room type """
-    getType.produce = lambda s: roomClass(s)
+    pass
 
 
 class IRoomBarFossil(IFossil):
