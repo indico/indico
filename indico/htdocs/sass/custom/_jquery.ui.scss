@@ -19,9 +19,6 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-// ============================================================================
-// Use this for the sole purpose of ext_modules customization
-// ============================================================================
-
-@import "custom/jquery.ui";
-@import "custom/jquery.multiselect";
+.ui-widget {
+    @extend %font-family-body;
+}
