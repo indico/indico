@@ -57,9 +57,14 @@ class CheckInHook(RegistrantBaseHook):
         self._checkProtection(aw)
         if self._check_in == "true":
             self._registrant.setCheckedIn(True)
+            checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate())
         else:
             self._registrant.setCheckedIn(False)
-        return {"success": True}
+            checkin_date = ""
+        return {
+            "success": True,
+            "checkin_date": checkin_date
+        }
 
 
 @HTTPAPIHook.register
@@ -73,29 +78,20 @@ class RegistrantHook(RegistrantBaseHook):
 
         registration_date = format_datetime(self._registrant.getAdjustedRegistrationDate())
         checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate())
-        regForm = self._conf.getRegistrationForm()
-        if regForm.getReasonParticipationForm().isEnabled():
-            participation_reason = self._registrant.getReasonParticipation()
-        else:
-            participation_reason = None
-        return {
-            "registrant_id": self._registrant_id,
-            "registrant_full_name": self._registrant.getFullName(),
-            "registrant_position": self._registrant.getPosition(),
-            "registrant_institution": self._registrant.getInstitution(),
-            "registrant_adress": self._registrant.getAddress(),
-            "registrant_city": self._registrant.getCity(),
-            "registrant_country": self._registrant.getCountry(),
-            "registrant_phone": self._registrant.getPhone(),
-            "registrant_fax": self._registrant.getFax(),
-            "registrant_email": self._registrant.getEmail(),
-            "registrant_home_page": self._registrant.getPersonalHomepage(),
-            "registrant_payed": self._registrant.getPayed(),
-            "registrant_checked_in": self._registrant.isCheckedIn(),
-            "registrant_check_in_date": checkin_date,
-            "registration_date": registration_date,
-            "participation_reason": participation_reason
+        payed = self._registrant.getPayed() if self._conf.getModPay().isActivated() else None
+        self._registrant.getPayed()
+        result = {
+            "registrantId": self._registrant_id,
+            "fullName": self._registrant.getFullName(),
+            "checkedIn": self._registrant.isCheckedIn(),
+            "checkInDate": checkin_date,
+            "registrationDate": registration_date,
+            "payed": payed
         }
+        regForm = self._conf.getRegistrationForm()
+        personalData = regForm.getPersonalData().getRegistrantValues(self._registrant)
+        result.update(personalData)
+        return result
 
 
 @HTTPAPIHook.register
