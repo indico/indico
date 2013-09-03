@@ -124,7 +124,8 @@ class WConfModifRegistrants(wcomponents.WTemplated):
         self._dispopts["Sessions"] = ["Sessions"]
         #if self._conf.getRegistrationForm().getReasonParticipationForm().isEnabled():
         self._dispopts["ReasonParticipation"]=["ReasonParticipation"]
-        self._dispopts["eTicket"] = ["checkedIn", "checkInDate"]
+        if self._conf.getRegistrationForm().getETicket().isEnabled():
+            self._dispopts["eTicket"] = ["checkedIn", "checkInDate"]
         self._dispopts["more"]=["RegistrationDate"]
         for sect in self._conf.getRegistrationForm().getGeneralSectionFormsList():
             self._dispopts[sect.getId()]=[]
@@ -506,6 +507,7 @@ class WConfModifRegistrants(wcomponents.WTemplated):
         vars["displayMenu"] = self._getDisplayMenu()%vars
         vars["filterMenu"] = self._getFilterMenu()
         vars["groups_order"] = self._groupsorder
+        vars["eTicketEnabled"] = self._conf.getRegistrationForm().getETicket().isEnabled()
 
         return vars
 

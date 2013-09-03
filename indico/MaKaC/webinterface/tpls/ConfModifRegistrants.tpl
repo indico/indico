@@ -90,7 +90,9 @@
                                   <div class="group left">
                                     <a href="#" class="i-button" id="add_new_user">${_("Add new")}</a>
                                     <a href="#" class="i-button" id="remove_users">${_("Remove")}</a>
+                                    % if eTicketEnabled:
                                     <a href="#" class="i-button" id="check_in">${_("Check in")}</a>
+                                    % endif
                                     <a href="#" class="i-button" id="send_email">${_("Email")}</a>
                                     <a href="#" class="i-button" id="print_badges">${_("Print Badges")}</a>
                                     <a href="#" class="i-button" id="attachments">${_("Attachments")}</a>
