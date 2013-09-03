@@ -123,45 +123,45 @@ textarea {
     box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
 }
 
-.group.selection > label.i-button:active {
-    background-color: #A5C4F3;
-    background-image: -ms-linear-gradient(top, #81ADEF, #A5C4F3);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#81ADEF), to(#A5C4F3));
-    background-image: -webkit-linear-gradient(top, #81ADEF, #A5C4F3);
-    background-image: -o-linear-gradient(top, #81ADEF, #A5C4F3);
-    background-image: -moz-linear-gradient(top, #81ADEF, #A5C4F3);
-    background-image: linear-gradient(bottom, #81ADEF, #A5C4F3);
-}
+.i-selection {
+    & > input[type=checkbox],
+    & > input[type=radio] {
+        display: none;
 
-.group.selection > input[type=checkbox]:checked + label,
-.group.selection > input[type=radio]:checked + label {
-    background-color: #5D95EA;
-    background: -moz-linear-gradient(top, #387EE5, #5D95EA);
-    background: -webkit-linear-gradient(top, #387EE5, #5D95EA);
-    background: -o-linear-gradient(top, #387EE5, #5D95EA);
-    background: -ms-linear-gradient(top, #387EE5, #5D95EA);
-    background: linear-gradient(top, #387EE5, #5D95EA);
-    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
-    color: #EEE !important;
-}
+        &:checked + label {
+            @include background-image(linear-gradient(top, #387EE5, #5D95EA));
+            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+            color: #EEE !important;
 
-.group.selection > input[type=checkbox]:checked + label:hover {
-    box-shadow: none !important;
-    color: #FFF !important;
-}
+            &:active {
+                @include background-image(linear-gradient(top, #81ADEF, #A5C4F3));
+                color: #555 !important;
+            }
+        }
+    }
 
-.group.selection > input[type=radio]:checked + label:hover {
-    cursor: default !important;
-}
+    & > input[type=checkbox] {
+        &:checked + label:hover {
+            box-shadow: none !important;
+            color: #FFF !important;
+        }
+    }
 
-.group.selection > input[type=checkbox]:checked + label:active,
-.group.selection > input[type=radio]:checked + label:active {
-    background-color: #A5C4F3;
-    background-image: -ms-linear-gradient(top, #81ADEF, #A5C4F3);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#81ADEF), to(#A5C4F3));
-    background-image: -webkit-linear-gradient(top, #81ADEF, #A5C4F3);
-    background-image: -o-linear-gradient(top, #81ADEF, #A5C4F3);
-    background-image: -moz-linear-gradient(top, #81ADEF, #A5C4F3);
-    background-image: linear-gradient(bottom, #81ADEF, #A5C4F3);
-    color: #555 !important;
+    & > input[type=radio] {
+        &:checked + label:hover {
+            cursor: default !important;
+        }
+    }
+
+    & > label.i-button {
+        &:hover {
+            @include background-image(linear-gradient(top, #E2E2E2, #F7F7F7));
+            border-color: $gray !important;
+            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+        }
+
+        &:active {
+            @include background-image(linear-gradient(top, #81ADEF, #A5C4F3));
+        }
+    }
 }

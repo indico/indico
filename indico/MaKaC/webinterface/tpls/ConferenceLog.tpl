@@ -19,7 +19,7 @@
 
 <div id="headPanel" class="follow-scroll">
     <div id="button-menu" class="toolbar">
-        <div id="eventFilter" class="group labelled selection left">
+        <div id="eventFilter" class="group labelled i-selection left">
             <span class="i-button label">${_("Filter by")}</span>
             <input type="checkbox" id="emailLog" name="view_filter" checked>
             <label for="emailLog" class="i-button">${_("Email")}</label>
@@ -161,12 +161,12 @@ $(document).ready(function(){
     };
 
     /* Event checkbox selector behavior */
-    $(".group.selection input[type=checkbox]").change(function() {
+    $(".i-selection input[type=checkbox]").change(function() {
         applyFilters();
     });
 
-    // Becasue IE8 does not trigger change event for input elements
-    $('.group.selection input[type=checkbox] + label').click(function () {
+    // Because IE8 does not trigger change event for input elements
+    $('.i-selection input[type=checkbox] + label').click(function () {
         var $checkbox = $(this).prev();
         $checkbox.prop("checked", !$checkbox.prop("checked"));
         $checkbox.trigger("change");
@@ -215,7 +215,7 @@ $(document).ready(function(){
     var allContentRows = $("tr.i-table.content-wrapper");
 
     var applyFilters = function(){
-        var checkboxes = $(".group.selection input:checkbox:checked");
+        var checkboxes = $("i-selection input:checkbox:checked");
         var items = getSearchFilteredItems().filter(getCheckboxFilteredItems(checkboxes));
 
         allTableTitles.show();

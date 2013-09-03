@@ -19,126 +19,128 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+.scrolling .toolbar {
+    margin: 0.5em 0em 0.5em 0em;
+}
+
 .toolbar {
     height: 2.5em;
     vertical-align: middle;
+
+    &.thin {
+        $thin-height: 1.5em;
+        height: $thin-height;
+
+        & .i-button {
+            height: $thin-height;
+            line-height: $thin-height;
+        }
+    }
+
+    & > .option {
+        line-height: 2.5em;
+        margin-right: 1em;
+    }
+
+    & .i-button {
+        display: block;
+        color: #777;
+        float: left;
+        font-size: 1.0em;
+        font-weight: bold;
+        height: 1.8em;
+        line-height: 1.8em;
+        padding: 0.2em 0.7em 0.1em 0.7em !important;
+        text-align: center;
+
+        &.open {
+            color: $dark-gray !important;
+            background: #ddd;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2) inset;
+        }
+
+        &.arrow {
+            @include after-icon("\24");
+
+            &:after {
+                vertical-align: -10%;
+            }
+        }
+    }
+
+    & .dropdown {
+        display: none;
+        z-index: 1;
+    }
+
+    & .group {
+        @extend %toolbar-group;
+    }
 }
 
-.toolbar.thin {
-    height: 1.5em;
-}
+%toolbar-group {
+    @extend %toolbar-group-inputs;
 
-.toolbar.thin .i-button {
-    height: 1.5em;
-    line-height: 1.5em;
-}
-
-.toolbar > .option {
-    line-height: 2.5em;
-    margin-right: 1em;
-}
-
-.toolbar .group {
     line-height: 2em;
     padding: 0.25em 0.5em 0.25em 0.25em;
     vertical-align: middle;
+
+    & > .i-button {
+        border-radius: 0;
+        border-right: none;
+
+        &:not(.label) {
+            &:hover ~ .i-button {
+                border-left-color: $dark-gray;
+            }
+
+            &:active ~ .i-button,
+            &:hover ~ .i-button ~ .i-button {
+                border-left-color: $gray;
+            }
+        }
+    }
+
+    & .i-button:not(.hidden) {
+        &:first-of-type {
+            border-bottom-left-radius: 0.2em;
+            border-top-left-radius: 0.2em;
+        }
+
+        &:last-of-type {
+            border-bottom-right-radius: 0.2em;
+            border-top-right-radius: 0.2em;
+            border-right: 1px solid $gray;
+
+            &:hover {
+                border-right-color: $dark-gray;
+            }
+
+            &:active {
+                border-right-color: $gray;
+            }
+        }
+
+        &.label {
+            border-right: none !important;
+            border-bottom-right-radius: 0em;
+            border-top-right-radius: 0em;
+
+            & ~ .i-button:not(.hidden):first-of-type {
+                border-bottom-left-radius: 0em;
+                border-top-left-radius: 0em;
+            }
+        }
+    }
 }
 
-.toolbar .group > .i-button {
-    border-radius: 0;
-    border-right: none;
-}
+%toolbar-group-inputs {
+    & > label.i-button {
 
-.toolbar .group > .i-button:hover ~ .i-button {
-    border-left-color: #999;
-}
-
-.toolbar .group > .i-button:active ~ .i-button,
-.toolbar .group > .i-button:hover ~ .i-button ~ .i-button {
-    border-left-color: #BBB !important;
-}
-
-.toolbar .group .i-button:not(.hidden):first-of-type {
-    border-bottom-left-radius: 0.2em;
-    border-top-left-radius: 0.2em;
-}
-
-.toolbar .group .i-button:not(.hidden):last-of-type {
-    border-bottom-right-radius: 0.2em;
-    border-top-right-radius: 0.2em;
-    border-right: 1px solid #BBB !important;
-}
-
-.toolbar .group .i-button:not(.hidden):last-of-type:hover {
-    border-right-color: #999 !important;
-}
-
-.toolbar .group.labelled .i-button:not(.hidden):first-of-type {
-    border-bottom-left-radius: 0em;
-    border-top-left-radius: 0em;
-}
-
-.toolbar .group.labelled .i-button:not(.hidden):last-of-type {
-    border-bottom-right-radius: 0em;
-    border-top-right-radius: 0em;
-    border-right: none !important;
-}
-
-.toolbar .group.labelled .i-button:not(.hidden):last-of-type ~ .i-button {
-    border-left-color: #BBB;
-}
-
-.toolbar .group.labelled .i-button:not(.hidden):first-child {
-    border-bottom-left-radius: 0.2em;
-    border-top-left-radius: 0.2em;
-}
-
-.toolbar .group.labelled .i-button:not(.hidden):last-child {
-    border-bottom-right-radius: 0.2em;
-    border-top-right-radius: 0.2em;
-    border-right: 1px solid #BBB !important;
-}
-
-.toolbar .i-button {
-    display: block;
-    color: #777;
-    float: left;
-    font-size: 1.0em;
-    font-weight: bold;
-    height: 1.8em;
-    line-height: 1.8em;
-    padding: 0.2em 0.7em 0.1em 0.7em !important;
-    padding-top: 0.4em;
-    text-align: center;
-}
-
-.toolbar .i-button.open {
-    color: #999 !important;
-    background: #ddd;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2) inset;
-}
-
-.toolbar .i-button:active {
-    color: #555;
-}
-
-.toolbar .i-button.arrow:after {
-    content: "\24";
-    font-family: 'icomoon-ultimate';
-    font-style: normal;
-    font-weight: normal;
-    margin-left: 0.2em;
-    speak: none;
-    text-align: right;
-    -webkit-font-smoothing: antialiased;
-    vertical-align: -10%;
-}
-
-.toolbar .dropdown {
-    display: none;
-    z-index: 1;
-}
-
-.scrolling .toolbar {
-    margin: 0.5em 0em 0.5em 0em;
+        &:not(.label) {
+            &:hover ~ .i-button {
+                border-left-color: $gray;
+            }
+        }
+    }
 }

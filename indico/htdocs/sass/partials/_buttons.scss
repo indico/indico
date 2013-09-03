@@ -25,7 +25,7 @@
     @include border-all($gray);
     display: inline-block;
     cursor: pointer;
-    color: $dark-gray;
+    color: $light-black;
     outline: none;
     text-align: center;
     vertical-align: middle;
@@ -44,7 +44,7 @@
     }
 
     &:hover i {
-        color: darken($dark-gray, $color-variation);
+        color: darken($light-black, $color-variation);
     }
 }
 
@@ -96,7 +96,7 @@ a.i-big-button {
     }
 
     &:hover {
-        background: $dark-gray;
+        background: $light-black;
         transition: background .25s ease-out;
 
         > i,
