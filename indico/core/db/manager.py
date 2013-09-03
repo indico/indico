@@ -28,7 +28,7 @@ from contextlib import contextmanager
 from ZEO.ClientStorage import ClientStorage
 import transaction
 
-from indico.core.db.migration import MigrationDB
+from indico.core.db.migration import MigratedDB
 
 from MaKaC.consoleScripts.installBase import getIndicoInstallMode
 skip_imports = getIndicoInstallMode()
@@ -70,7 +70,7 @@ class DBMgr:
         self._storage = ClientStorage((hostname, port), username=cfg.getDBUserName(),
                                       password=cfg.getDBPassword(), realm=cfg.getDBRealm(),
                                       max_disconnect_poll=max_disconnect_poll)
-        self._db = MigrationDB(self._storage)
+        self._db = MigratedDB(self._storage)
         self._conn = threading.local()
         self._conn.conn = None
 

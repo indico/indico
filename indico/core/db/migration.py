@@ -19,19 +19,31 @@
 
 from ZODB.DB import DB
 
+globalname_dict = {
+    "PersistentMapping": ("persistent.mapping", None),
+    "PersistentList": ("persistent.list", None),
+    "CERNGroup": ("MaKaC.authentication.LDAPAuthentication", "LDAPGroup")
+}
 
-class MigrationDB(DB):
+modulename_dict = {
+    "IndexedCatalog.BTrees.": "BTrees.",
+    "MaKaC.plugins.EPayment.CERNYellowPay.": "indico.ext.epayment.cern."
+}
+
+
+class MigratedDB(DB):
     """Subclass of ZODB.DB necessary to remove possible existing dependencies
         from IC"""
 
     def classFactory(self, connection, modulename, globalname):
-        if globalname == "PersistentMapping":
-            modulename = "persistent.mapping"
-        elif globalname == "PersistentList":
-            modulename = "persistent.list"
-        elif modulename.startswith("IndexedCatalog.BTrees."):
-            modulename = "BTrees.%s" % modulename[22:]
-        elif modulename.startswith("MaKaC.plugins.EPayment.CERNYellowPay."):
-            modulename = "indico.ext.epayment.cern.%s" \
-                % modulename[len("MaKaC.plugins.EPayment.CERNYellowPay."):]
+        if globalname in globalname_dict:
+            modulename = globalname_dict[globalname][0]
+            if globalname_dict[globalname][1]:
+                globalname = globalname_dict[globalname][1]
+        for mod_name in modulename_dict:
+            if mod_name[-1] == ".":
+                if modulename.startswith(mod_name):
+                    modulename = modulename_dict[mod_name] + modulename[len(mod_name):]
+            elif modulename == mod_name:
+                modulename = modulename_dict[modulename]
         return DB.classFactory(self, connection, modulename, globalname)

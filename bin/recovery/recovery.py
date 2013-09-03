@@ -23,7 +23,7 @@ import shutil
 from distutils import sysconfig
 from datetime import datetime
 import time
-from indico.core.db import MigrationDB
+from indico.core.db import MigratedDB
 from ZODB.FileStorage import FileStorage
 import transaction
 from MaKaC.common import DBMgr
@@ -1831,7 +1831,7 @@ class TmpDBMgr:
         log("%sSetting temporary database..."%pp)
         if self._createDBFile(dt, incPrintPrefix(pp)):
             self._storage = FileStorage(os.path.join(tmpPath, dataFile))
-            self._db = MigrationDB(self._storage)
+            self._db = MigratedDB(self._storage)
             if self._dr.proceed(dt, incPrintPrefix(pp)):
                 self._dbDatetime = dt
                 log("%sTemporary database set in %s."%(pp, datetime.now()-now))

@@ -18,4 +18,4 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.db.manager import DBMgr
-from indico.core.db.migration import MigrationDB
+from indico.core.db.migration import MigratedDB
