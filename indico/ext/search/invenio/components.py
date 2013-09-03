@@ -31,7 +31,7 @@ from indico.core.extpoint.plugins import IPluginImplementationContributor
 from indico.ext.search.invenio.implementation import InvenioSEA, InvenioRedirectSEA
 import indico.ext.search.invenio
 from MaKaC.plugins.base import PluginsHolder
-from indico.web.rh import RHHtdocs
+from indico.web.handlers import RHHtdocs
 
 
 class PluginImplementationContributor(Component, Observable):

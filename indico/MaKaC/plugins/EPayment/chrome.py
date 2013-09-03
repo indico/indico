@@ -30,7 +30,7 @@ import zope.interface
 # indico extpoint imports
 from indico.core.extpoint import Component
 from indico.core.extpoint.plugins import IPluginSettingsContributor
-from indico.web.rh import RHHtdocs
+from indico.web.handlers import RHHtdocs
 
 # legacy indico imports
 from MaKaC.webinterface.urlHandlers import URLHandler

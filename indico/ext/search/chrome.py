@@ -25,7 +25,7 @@ from indico.core.extpoint import Component
 import indico.ext.search
 from indico.core.extpoint.events import INavigationContributor
 from indico.core.extpoint.plugins import IPluginSettingsContributor
-from indico.web.rh import RHHtdocs
+from indico.web.handlers import RHHtdocs
 from indico.util.contextManager import ContextManager
 
 from MaKaC.i18n import _

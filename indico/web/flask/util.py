@@ -34,7 +34,7 @@ from werkzeug.routing import BaseConverter, UnicodeConverter, RequestRedirect
 from werkzeug.urls import url_parse
 
 from indico.util.caching import memoize
-from indico.web.rh import RHHtdocs
+from indico.web.handlers import RHHtdocs
 
 
 def _convert_request_value(x):

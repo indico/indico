@@ -26,7 +26,7 @@ from indico.core.extpoint import Component
 from indico.core.extpoint.events import INavigationContributor, IEventDisplayContributor, IMaterialDownloadListener
 from indico.core.extpoint.plugins import IPluginSettingsContributor
 from indico.ext.statistics.register import StatisticsRegister
-from indico.web.rh import RHHtdocs
+from indico.web.handlers import RHHtdocs
 
 from MaKaC.i18n import _
 from MaKaC.errors import PluginError

@@ -24,7 +24,7 @@ URL handlers for Collaboration plugins
 import os
 from werkzeug.exceptions import NotFound
 
-from indico.web.rh import RHHtdocs
+from indico.web.handlers import RHHtdocs
 
 from MaKaC.webinterface.urlHandlers import SecureURLHandler, URLHandler, OptionallySecureURLHandler
 from MaKaC.plugins import Collaboration

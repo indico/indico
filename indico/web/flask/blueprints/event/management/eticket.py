@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from indico.web.rh import eTicketModif
+from indico.web.handlers import eTicketModif
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 

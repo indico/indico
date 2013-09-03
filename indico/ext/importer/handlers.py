@@ -25,7 +25,7 @@ from MaKaC.services.implementation.base import ServiceBase
 from MaKaC.plugins.base import PluginsHolder
 
 # indico imports
-from indico.web.rh import RHHtdocs
+from indico.web.handlers import RHHtdocs
 from indico.ext.importer.helpers import ImporterHelper
 import indico.ext.importer
 

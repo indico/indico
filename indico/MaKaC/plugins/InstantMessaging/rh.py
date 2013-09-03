@@ -32,7 +32,7 @@ from MaKaC.i18n import _
 import urllib2
 import pkg_resources
 
-from indico.web.rh import RHHtdocs
+from indico.web.handlers import RHHtdocs
 
 
 class RHInstantMessagingHtdocs(RHHtdocs):

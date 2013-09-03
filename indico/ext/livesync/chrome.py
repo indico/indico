@@ -39,7 +39,7 @@ import indico.ext.livesync
 # indico extpoint imports
 from indico.core.extpoint import Component
 from indico.core.extpoint.plugins import IPluginSettingsContributor
-from indico.web.rh import RHHtdocs
+from indico.web.handlers import RHHtdocs
 from indico.util.date_time import nowutc, int_timestamp
 
 # legacy indico imports
