@@ -26,7 +26,7 @@ from persistent import Persistent
 
 # indico imports
 from indico.util.fossilize import fossilizes
-from indico.core.db.fossils import ISupportInfoFossil
+from indico.core.fossils.event import ISupportInfoFossil
 
 # legacy imports
 from MaKaC.common import Config, DBMgr, utils

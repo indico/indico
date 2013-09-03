@@ -21,7 +21,7 @@ from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.webinterface import urlHandlers
 
-from indico.core.db.fossils import ISupportInfoFossil
+from indico.core.fossils.event import ISupportInfoFossil
 
 
 class ICategoryFossil(IFossil):
