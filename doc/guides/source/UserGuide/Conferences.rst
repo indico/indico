@@ -704,6 +704,7 @@ From this list you can perform several actions on the registrants, as for exampl
 
 * **Add new**: It will open the registration form `(see Registration Form) <#registration-form>`_.
 * **Remove**: It will remove the selected registrants.
+* **Check in**: It will mark the selected registrants as checked in. *(This option is only available if the e-ticket module is enabled)*
 * **Email**: It will allow to send an email to the selected registrants. Indico will send one email per participant. Also, you can profit from the Available tags to make it personal; Indico will replace the tag with the real value of the registrant, e.g. {registrant_family_name} will be Smith.
 
 |image102|
@@ -722,8 +723,8 @@ Furthermore, clicking the 'PDF Layout Options' button provides access to further
 
 |image104|
 
-* **Excel icon**: It will create a CSV file with the selected registrants and the columns displayed.
-* **PDF icon**: It will allow you to create a PDF in two styles: *Table style* and *Book style*. If you want to print a large quantity of fields the *Book Style* is recommended.
+* **Export -> CSV**: It will create a CSV file with the selected registrants and the columns displayed.
+* **Export -> PDF**: It will allow you to create a PDF in two styles: *Table style* and *Book style*. If you want to print a large quantity of fields the *Book Style* is recommended.
 
 Also, beware that clicking on Select *All* or *None* will select or unselect all the registrants checkboxes.
 
@@ -732,6 +733,12 @@ and the information he provided in response to the form's
 questions. And you can also modify them.
 
 |image59|
+
+Additionally, if the e-ticket module is enabled an e-ticket tab will be shown.
+Where you can download the generated ticket for this registrant, as well as
+mark/unmark him as checked in.
+
+|image166|
 
 --------------
 
@@ -755,7 +762,23 @@ and the currency to use. See in the image below all the options.
 
 |image119|
 
+.. _eticket:
 
+E-ticket
+'''''''''
+
+You can choose to enable or disable the e-ticket module by clicking on
+*Enable*/*Disable*.
+
+|image164|
+
+After enabling it, for every registrant an unique electronic ticket will be generated.
+The ticket is a PDF document containing a QR code that can be used by the mobile
+check-in application to keep track of registrants. This ticket will be sent to every
+new registrant, attached to the registration e-mail. The registrant will also have the
+option to download the ticket after registration.
+
+|image165|
 
 -------------
 
@@ -2086,3 +2109,6 @@ session. You may also make a PDF of the session.
 .. |image161| image:: UserGuidePics/addAbstractFieldQtip.png
 .. |image162| image:: UserGuidePics/addAbstractFieldDialog1.png
 .. |image163| image:: UserGuidePics/addAbstractFieldDialog2.png
+.. |image164| image:: UserGuidePics/confreg17.png
+.. |image165| image:: UserGuidePics/confreg18.png
+.. |image166| image:: UserGuidePics/confreg19.png
