@@ -831,8 +831,8 @@ class Choice(Question):
         """returns a new Question which is a copy of the current one (self).
         """
         q = Question.clone(self)
-        for itemText,isSelected in self.getChoiceItems().items():
-            q.insertChoiceItem(itemText, isSelected)
+        for key in self.getChoiceItemsOrderedKeys():
+            q.insertChoiceItem(key, self.getChoiceItemsCorrespondingValue(key))
         return q
 
     def exportXml(self, xmlGen):
