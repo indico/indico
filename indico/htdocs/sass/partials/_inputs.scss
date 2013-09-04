@@ -20,6 +20,7 @@
 */
 
 %text-input {
+    @extend %font-size-body;
     @include border-all();
     @include box-sizing(border-box);
     @include single-transition(border-color);
@@ -39,10 +40,12 @@
 }
 
 input[type=text],
-input[type=password] {
+input[type=password],
+input[type=search] {
     @extend %text-input;
 
     height: 1.6em;
+    -webkit-appearance: textfield;
 
     &.placeholder {
         color: #aaa;
@@ -51,76 +54,6 @@ input[type=password] {
 
 textarea {
     @extend %text-input;
-}
-
-/* ********** */
-/* Text-input */
-/* ********** */
-.text-input {
-    border: 1px solid #BBB;
-    display: inline-block;
-    height: 2.1em;
-    padding: 0em 0.7em 0em 0.7em;
-    transition: color .25s ease-out, border-color .25s ease-out;
-    -webkit-transition: color .25s ease-out, border-color .25s ease-out;
-    -moz-transition: color .25s ease-out, border-color .25s ease-out;
-    vertical-align: middle;
-}
-
-.text-input:hover {
-    border-color: #999 ;
-    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
-}
-
-.text-input.active {
-    border-color: #999;
-    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
-}
-
-.text-input input[type=text] {
-    background: transparent;
-    border: none;
-    color: #555;
-    font-size: 13px;
-    font-weight: bold;
-    outline: none;
-    height: 1.9em;
-}
-
-.text-input > .reset-input {
-    color: #BBB;
-    visibility: hidden;
-    font-size: 1.2em;
-    vertical-align: -10%;
-}
-
-.text-input > .reset-input:hover {
-    color: #999;
-    cursor: pointer;
-}
-
-.text-input > .reset-input:active {
-    color: #555;
-}
-
-/* ******************* */
-/* Checkboxes & radios */
-/* ******************* */
-.group.selection > input[type=checkbox],
-.group.selection > input[type=radio] {
-    display: none;
-}
-
-.group.selection > label.i-button:hover {
-    background-color: #F7F7F7;
-    background-image: -ms-linear-gradient(top, #E2E2E2, #F7F7F7);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#E2E2E2), to(#F7F7F7));
-    background-image: -webkit-linear-gradient(top, #E2E2E2, #F7F7F7);
-    background-image: -o-linear-gradient(top, #E2E2E2, #F7F7F7);
-    background-image: -moz-linear-gradient(top, #E2E2E2, #F7F7F7);
-    background-image: linear-gradient(bottom, #E2E2E2, #F7F7F7);
-    border-color: #BBB;
-    box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
 }
 
 .i-selection {

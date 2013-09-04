@@ -20,6 +20,7 @@
 */
 
 %button {
+    @extend %font-size-body;
     @include user-select(none);
     @include border-radius();
     @include border-all($gray);
@@ -53,7 +54,6 @@
     @include transition();
     @include transition-property(color);
     background-color: #EAEAEA;
-    font-size: 13px;
     line-height: 1em;
     margin: 0;
     padding: 4px 10px 4px;

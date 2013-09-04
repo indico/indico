@@ -29,9 +29,14 @@
 
     &.thin {
         $thin-height: 1.5em;
-        height: $thin-height;
+        height: 2.2em;
 
         & .i-button {
+            height: $thin-height;
+            line-height: $thin-height;
+        }
+
+        & input[type=text] {
             height: $thin-height;
             line-height: $thin-height;
         }
@@ -66,6 +71,16 @@
                 vertical-align: -10%;
             }
         }
+    }
+
+    & input[type=text] {
+        @include box-sizing(content-box);
+        display: inline-block;
+        float: left;
+        font-weight: bold;
+        height: 2.4em;
+        margin: 0;
+        padding: 0.2em 0.7em 0.1em 0.7em;
     }
 
     & .dropdown {
@@ -141,6 +156,13 @@
             &:hover ~ .i-button {
                 border-left-color: $gray;
             }
+        }
+    }
+
+    & > input[type=text] {
+        &:last-of-type {
+            border-bottom-right-radius: 0.2em;
+            border-top-right-radius: 0.2em;
         }
     }
 }
