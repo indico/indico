@@ -49,9 +49,7 @@
 
     & .i-button {
         display: block;
-        color: #777;
         float: left;
-        font-size: 1.0em;
         font-weight: bold;
         height: 1.8em;
         line-height: 1.8em;
@@ -75,6 +73,7 @@
 
     & input[type=text] {
         @include box-sizing(content-box);
+        color: $black;
         display: inline-block;
         float: left;
         font-weight: bold;

@@ -20,7 +20,6 @@
 */
 
 %button {
-    @extend %font-size-body;
     @include user-select(none);
     @include border-radius();
     @include border-all($gray);
@@ -62,12 +61,12 @@
         @include background-image(linear-gradient(top, #F7F7F7, #E2E2E2));
         border-color: #999;
         box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
-        color: #555 !important;
+        color: $black !important;
     }
 
     &:active {
         @include background-image(linear-gradient(top, #E2E2E2, #F7F7F7));
-        border-color: #BBB;
+        border-color: $gray;
         box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
     }
 
@@ -135,9 +134,9 @@
     &.label,
     &.label:hover {
         background: transparent;
-        border-color: #BBB !important;
+        border-color: $gray !important;
         box-shadow: none !important;
-        color: #555 !important;
+        color: $black !important;
         cursor: default;
     }
 }
@@ -270,10 +269,10 @@ button::-moz-focus-inner {
 .i-button.disabled,
 .group.selection > input[type=checkbox]:disabled + label,
 .group.selection > input[type=radio]:disabled + label {
-    border: 1px solid #BBB;
+    border: 1px solid $gray;
     background: #EAEAEA !important;
     box-shadow: none !important;
-    color: #BBB !important;
+    color: $gray !important;
     cursor: default !important;
 }
 
