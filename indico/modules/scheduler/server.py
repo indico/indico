@@ -22,7 +22,7 @@ import os
 import time
 import random
 
-from MaKaC.common import db
+from indico.core.db import DBMgr
 from MaKaC.common.logger import Logger
 
 
@@ -78,7 +78,7 @@ class Scheduler(object):
 
         self._logger = logging.getLogger('scheduler')
 
-        self._dbi = db.DBMgr.getInstance()
+        self._dbi = DBMgr.getInstance()
 
         self._dbi.startRequest()
         self._schedModule = SchedulerModule.getDBInstance()

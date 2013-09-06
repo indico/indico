@@ -34,7 +34,7 @@ import os
 import posixpath
 
 from MaKaC.plugins.base import OldObservable
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 
 class WPBase(OldObservable):
     """

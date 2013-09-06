@@ -33,7 +33,7 @@ from collections import defaultdict
 
 from MaKaC import __version__
 from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex, CalendarDayIndex
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
 from MaKaC.common.Configuration import Config

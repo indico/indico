@@ -21,7 +21,7 @@
 Fixes possible encoding errors caused by older DB data
 """
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.conference import ConferenceHolder
 from indico.util.console import conferenceHolderIterator
 

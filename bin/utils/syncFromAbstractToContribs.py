@@ -23,7 +23,7 @@ Synchronizes contributions with the corresponding abstracts
 
 
 import sys
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.conference import ConferenceHolder, ContributionParticipation
 from MaKaC.review import AbstractStatusAccepted
 

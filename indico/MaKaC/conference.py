@@ -69,7 +69,7 @@ from MaKaC.schedule import ConferenceSchedule, SessionSchedule,SlotSchedule,\
      PosterSlotSchedule, SlotSchTypeFactory, ContribSchEntry, \
      LinkedTimeSchEntry, BreakTimeSchEntry
 import MaKaC.review as review
-from MaKaC.common import Config, DBMgr, utils
+from MaKaC.common import Config, utils
 from MaKaC.common.Counter import Counter
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
@@ -102,6 +102,7 @@ import zope.interface
 from indico.modules.scheduler import Client, tasks
 from indico.util.date_time import utc_timestamp
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
+from indico.core.db import DBMgr
 from indico.core.db.event import SupportInfo
 from MaKaC.schedule import ScheduleToJson
 

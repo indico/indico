@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import recovery
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC import conference
 from datetime import datetime
 

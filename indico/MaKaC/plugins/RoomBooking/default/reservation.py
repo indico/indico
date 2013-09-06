@@ -757,7 +757,7 @@ class Test( object ):
     def tmp():
         from MaKaC.rb_factory import Factory
         from MaKaC.rb_room import RoomBase
-        from MaKaC.common.db import DBMgr
+        from indico.core.db import DBMgr
         from BTrees.OOBTree import OOBTree
 
         DBMgr.getInstance().startRequest()
@@ -773,7 +773,7 @@ class Test( object ):
     def indexByDay():
         from MaKaC.rb_location import CrossLocationDB
         from MaKaC.rb_room import RoomBase
-        from MaKaC.common.db import DBMgr
+        from indico.core.db import DBMgr
 
         DBMgr.getInstance().startRequest()
         CrossLocationDB.connect()
@@ -795,7 +795,7 @@ class Test( object ):
 
     @staticmethod
     def rebuildRoomReservationsIndex():
-        from MaKaC.common.db import DBMgr
+        from indico.core.db import DBMgr
         from MaKaC.rb_location import CrossLocationDB
         from MaKaC.rb_room import RoomBase
         from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
@@ -834,7 +834,7 @@ class Test( object ):
     def play():
         from MaKaC.rb_location import CrossLocationDB
         from MaKaC.rb_room import RoomBase
-        from MaKaC.common.db import DBMgr
+        from indico.core.db import DBMgr
 
         DBMgr.getInstance().startRequest()
         CrossLocationDB.connect()

@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.user import AvatarHolder
 from MaKaC.conference import ConferenceHolder
 from MaKaC.review import AbstractStatusSubmitted

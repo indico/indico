@@ -22,7 +22,7 @@ from flask import current_app as app
 import pkg_resources
 import os.path
 import posixpath, re
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.Configuration import Config
 from MaKaC.common.utils import formatDateTime, formatDate, formatTime
 from MaKaC.user import Avatar

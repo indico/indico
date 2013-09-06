@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from BTrees import OOBTree
 from persistent import Persistent
 from MaKaC.common.Counter import Counter
@@ -27,10 +27,10 @@ class InternalPagesMgrRegistery:
     """
     Class to get the InternalPagesMgr for a conference
     """
-    
+
     def __init__(self):
         self._pagesMgrRegistery = None
-    
+
     def _getInternalPagesMgrRegistery( self ):
         #DBMgr.getInstance().commit()
         if not self._pagesMgrRegistery:
@@ -41,8 +41,8 @@ class InternalPagesMgrRegistery:
                 self._pagesMgrRegistery = OOBTree.OOBTree()
                 db_root["internalPagesRegistery"] = self._pagesMgrRegistery
         return self._pagesMgrRegistery
-    
-    
+
+
     def registerInternalPagesMgr( self, conference, intPagesMgr ):
         """Associates a given conference with a confDispplayMgr
         """
@@ -64,7 +64,7 @@ class InternalPagesMgr(Persistent):
     """
     base class for the InternalPagesMgr object
     """
-    
+
     def __init__(self, conf):
         self._conf=conf
         self._pages={}
@@ -86,7 +86,7 @@ class InternalPagesMgr(Persistent):
             page.setId(self._generateNewPageId())
         self._pages[page.getId()]=page
         self.notifyModification()
-        
+
     def removePage(self, page):
         if self._pages.has_key(page.getId()):
             self._pages.pop(page.getId())
@@ -125,7 +125,7 @@ class InternalPage(Persistent):
             return self._isHome
 
     def setHome(self, isHome=False):
-        self._isHome=isHome 
+        self._isHome=isHome
 
     def getConference(self):
         return self._conf
@@ -149,7 +149,7 @@ class InternalPage(Persistent):
         self._title=title
 
     def getLocator( self ):
-        """Gives back a globaly unique identification encapsulated in a Locator 
+        """Gives back a globaly unique identification encapsulated in a Locator
             object for the internal page instance
         """
         if self._conf == None:

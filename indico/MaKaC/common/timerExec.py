@@ -99,7 +99,7 @@ class toExec:
             self._initLog()
             self._printOutput("***Starting execute***\n")
             ### Get the connection in order to avoid that to threads share the same one
-            conn = db.DBMgr().getInstance()
+            conn = DBMgr().getInstance()
             conn.startRequest()
 
             minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -267,7 +267,7 @@ class HelperTaskList:
     """
 
     def getTaskListInstance(cls):
-        dbmgr = db.DBMgr.getInstance()
+        dbmgr = DBMgr.getInstance()
         root = dbmgr.getDBConnection().root()
         try:
             tlist = root["taskList"]["main"]
@@ -570,8 +570,8 @@ class FoundationSync( obj ):
         Run ONCE to add FoundationSync task
         """
         # Connect to Indico DB
-        db.DBMgr.getInstance().startRequest()
-        db.DBMgr.getInstance().sync()
+        DBMgr.getInstance().startRequest()
+        DBMgr.getInstance().sync()
         TASK_ID = 'FoundationSyncTask'
 
         t = task()
@@ -592,7 +592,7 @@ class FoundationSync( obj ):
         taskList.addTask( t )
 
         # Disconnect from Indico DB
-        db.DBMgr.getInstance().endRequest()
+        DBMgr.getInstance().endRequest()
         print "Successfully registered " + TASK_ID
 
 

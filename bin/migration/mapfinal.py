@@ -38,7 +38,7 @@ file_host = "agenda.cern.ch"
 agenda = MySQLdb.connect(host='cdsdb', user='agenda', passwd='PMslcqT1.', db='AGE')
 hosticonpath = "/soft/httpd/host/agenda/htdocs/images/levelicons"
 cf = agenda.cursor()
-db.DBMgr.getInstance().startRequest()
+DBMgr.getInstance().startRequest()
 ah = user.AvatarHolder()
 
 getfiles = 0 # do we fetch the files?
@@ -344,11 +344,11 @@ def getAgenda():
         CDom.setDescription("CERN domain")
         CDom.addFiltersFromStr("128.141;128.142;137.138;192.91;194.12;192.16")
         dh.add( CDom )
-        db.DBMgr.getInstance().commit()
+        DBMgr.getInstance().commit()
     error = False
     ch = conference.ConferenceHolder()
     while c!=None:
-        #db.DBMgr.getInstance().startRequest()
+        #DBMgr.getInstance().startRequest()
         try:
             log("add conference : %s" %c[1])
             cate.execute("select * from LEVEL where uid = \'" + c[17] + "\'")#gets the name of the Category the conf belongs in
@@ -362,7 +362,7 @@ def getAgenda():
             category = getCat(catWanted, level[1],level[7])#checks to see if this category already exists - if not creates it
             if category == None:#Conference is in a category to delete: don't add
                 log("Conference %s not added, it's inside a 'to delete' category"%c[1])
-                db.DBMgr.getInstance().abort()
+                DBMgr.getInstance().abort()
                 c = cc.fetchone()
                 continue
             user = getUser('CDS Agenda','cds.support@cern.ch', '', '') #creates a user representing creator
@@ -487,7 +487,7 @@ def getAgenda():
             c = cc.fetchone()#gets the next conference
         else:
             error = False
-            db.DBMgr.getInstance().commit()
+            DBMgr.getInstance().commit()
     log("End adding conferences")
     print "End"
 
@@ -898,9 +898,9 @@ def getSubTalks(t, talk):#method for mapping subtalks.
         st = cst.fetchone()
 
 #if __name__ == "__main__":
-#    db.DBMgr.getInstance().startRequest()
+#    DBMgr.getInstance().startRequest()
 #    getAgenda()
-#    db.DBMgr.getInstance().endRequest()
+#    DBMgr.getInstance().endRequest()
 
 def main():
     return getAgenda()
@@ -913,4 +913,4 @@ if __name__ == "__main__":
     #p = pstats.Stats('test_speed_prof')
     #p.sort_stats('cumulative').print_stats()
 
-db.DBMgr.getInstance().endRequest()
+DBMgr.getInstance().endRequest()

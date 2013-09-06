@@ -24,7 +24,7 @@ import transaction
 from ZODB.POSException import ConflictError
 
 # legacy imports
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 
 
 # indico imports

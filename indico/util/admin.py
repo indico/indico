@@ -27,7 +27,8 @@ import traceback
 import logging
 from getpass import getpass
 
-from MaKaC.common import DBMgr, info
+from indico.core.db import DBMgr
+from MaKaC.common import info
 from MaKaC.user import AvatarHolder, Avatar, LoginInfo
 from MaKaC.authentication import AuthenticatorMgr
 from indico.util import console

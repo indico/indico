@@ -31,7 +31,7 @@ from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
     isTomorrow
 from MaKaC.common import info
 from MaKaC import errors
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.webinterface.linking import RoomLinker
 from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.common.Configuration import Config

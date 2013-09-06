@@ -31,13 +31,13 @@ from persistent import Persistent
 from zope.interface import Interface, implements
 
 from MaKaC.common.Locators import Locator
-import MaKaC
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 from MaKaC.plugins import PluginLoader
 
 from indico.util.i18n import i18nformat
 from indico.core.index import IUniqueIdProvider
+from indico.core.db import DBMgr
 
 
 class IIndexableByManagerIds(Interface):
@@ -171,14 +171,14 @@ class Location( Persistent, object ):
 
     @staticmethod
     def setDefaultLocation( locationName ):
-        root = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
+        root = DBMgr.getInstance().getDBConnection().root()
         root[_DEFAULT_ROOM_BOOKING_LOCATION] = locationName
         from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
         RHGetVarsJs.removeTmpVarsFile()
 
     @staticmethod
     def getDefaultLocation():
-        root = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
+        root =DBMgr.getInstance().getDBConnection().root()
         if not root.has_key( _DEFAULT_ROOM_BOOKING_LOCATION ):
             root[_DEFAULT_ROOM_BOOKING_LOCATION] = ""
         locationName = root[_DEFAULT_ROOM_BOOKING_LOCATION]
@@ -195,7 +195,7 @@ class Location( Persistent, object ):
         if Location.parse(location.friendlyName):
             # location with same name already exists
             return False
-        root = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
+        root = DBMgr.getInstance().getDBConnection().root()
         locations = root[_ROOM_BOOKING_LOCATION_LIST]
         locations.append( location )
         root[_ROOM_BOOKING_LOCATION_LIST] = locations
@@ -206,7 +206,7 @@ class Location( Persistent, object ):
     def removeLocation( locationName ):
         if not isinstance( locationName, str ):
             raise MaKaCError('locationName attribute must be string')
-        root = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
+        root = DBMgr.getInstance().getDBConnection().root()
         locations = root[_ROOM_BOOKING_LOCATION_LIST]
         locations = [ loc for loc in locations if loc.friendlyName != locationName ]
         root[_ROOM_BOOKING_LOCATION_LIST] = locations
@@ -258,7 +258,7 @@ class Location( Persistent, object ):
     class GetAllLocations( object ):
         def __get__( self, obj, cls = None ):
 
-            root = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
+            root = DBMgr.getInstance().getDBConnection().root()
             return root.get(_ROOM_BOOKING_LOCATION_LIST, [])
 
     allLocations = GetAllLocations()
@@ -631,13 +631,13 @@ class Test:
 
 def connect2IndicoDB():
     from MaKaC.plugins.RoomBooking.CERN.dalManagerCERN import DALManagerCERN
-    from MaKaC.common.db import DBMgr
+    from indico.core.db import DBMgr
     DBMgr.getInstance().startRequest()
     DALManagerCERN.connect()
 
 def disconnectFromIndicoDB():
     from MaKaC.plugins.RoomBooking.CERN.dalManagerCERN import DALManagerCERN
-    from MaKaC.common.db import DBMgr
+    from indico.core.db import DBMgr
     DALManagerCERN.disconnect()
     DBMgr.getInstance().endRequest()
 
@@ -648,7 +648,7 @@ def clean():
     minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
     minfo.setRoomBookingModuleActive( False )
 
-    root = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
+    root = DBMgr.getInstance().getDBConnection().root()
     del root[_ROOM_BOOKING_LOCATION_LIST]
 
     disconnectFromIndicoDB()

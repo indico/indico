@@ -19,7 +19,7 @@
 
 
 import unittest
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.indexes import IndexesHolder, CategoryDateIndexLtd
 from BTrees.OOBTree import OOBTree
 from datetime import datetime

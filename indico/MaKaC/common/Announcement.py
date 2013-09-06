@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from persistent import Persistent
-from MaKaC.common import db
+from indico.core.db import DBMgr
 
 
 class AnnoucementMgr(Persistent):
@@ -42,7 +42,7 @@ class AnnoucementMgr(Persistent):
 
 
 def getAnnoucementMgrInstance():
-    dbmgr = db.DBMgr.getInstance()
+    dbmgr = DBMgr.getInstance()
     root = dbmgr.getDBConnection().root()
     try:
         am = root["AnnoucementMgr"]

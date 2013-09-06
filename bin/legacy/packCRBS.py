@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 DBMgr.getInstance().startRequest()
 from MaKaC.plugins.RoomBooking.CERN.dalManagerCERN import DALManagerCERN
 DALManagerCERN.pack(days=1)

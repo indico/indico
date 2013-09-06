@@ -20,14 +20,14 @@
 import sys
 
 
-from MaKaC.common import db
+from indico.core.db import DBMgr
 from MaKaC.conference import CategoryManager
 from MaKaC.common import indexes
 import transaction
 
 def main():
     """This script deletes existing category indexes and recreates them."""
-    db.DBMgr.getInstance().startRequest()
+    DBMgr.getInstance().startRequest()
     im = indexes.IndexesHolder()
     im.removeById('category')
     catIdx = im.getIndex('category')
@@ -43,13 +43,13 @@ def main():
                 transaction.commit()
                 break
             except:
-                db.DBMgr.getInstance().sync()
+                DBMgr.getInstance().sync()
         curnum += 1
         per = int(float(curnum)/float(totnum)*100)
         if per != curper:
             curper = per
             print "%s%%" % per
-    db.DBMgr.getInstance().endRequest()
+    DBMgr.getInstance().endRequest()
 
 if __name__ == "__main__":
     main()

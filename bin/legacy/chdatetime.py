@@ -21,26 +21,26 @@
 database into standard datetime and timedelta objects"""
 import sys
 
-from MaKaC.common import db
+from indico.core.db import DBMgr
 from MaKaC.conference import CategoryManager
 from MaKaC.common import indexes, timerExec
 from datetime import datetime,timedelta
 
 def main():
     """This script deletes existing category indexes and recreates them."""
-    db.DBMgr.getInstance().startRequest()
+    DBMgr.getInstance().startRequest()
     ch = CategoryManager()
     for cat in ch.getList():
       for conf in cat.getConferenceList():
         chconf(conf)
       get_transaction().commit()
-    
+
     # Tasks
     # tl = Supervisor.
     htl = timerExec.HelperTaskList.getTaskListInstance()
     for task in htl.getTasks():
         chtask(task)
-    db.DBMgr.getInstance().endRequest()
+    DBMgr.getInstance().endRequest()
 
 def chconf(conf):
     conf.startDate = chdt(conf.startDate)

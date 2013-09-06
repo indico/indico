@@ -23,7 +23,7 @@ from indico.tests.python.unit.util import IndicoTestFeature
 # legacy imports
 from MaKaC.plugins.base import Observable, PluginsHolder
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 
 class DummyObservable(Observable):
     pass

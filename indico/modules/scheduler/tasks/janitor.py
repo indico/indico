@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from indico.modules import ModuleHolder
 from MaKaC.common.timezoneUtils import nowutc
 from indico.modules.scheduler.tasks.periodic import PeriodicTask

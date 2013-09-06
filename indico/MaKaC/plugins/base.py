@@ -33,7 +33,7 @@ from flask import Blueprint
 from MaKaC.common.Counter import Counter
 from MaKaC.common.Locators import Locator
 from MaKaC.errors import PluginError
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.loader import PluginLoader, GlobalPluginOptions
 from MaKaC.common.ObjectHolders import ObjectHolder

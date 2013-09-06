@@ -41,7 +41,8 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
 
 from MaKaC.accessControl import AccessWrapper
-from MaKaC.common import DBMgr, Config, security
+from indico.core.db import DBMgr
+from MaKaC.common import Config, security
 from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlScriptError, HtmlForbiddenTag, ConferenceClosedError, HostnameResolveError, BadRefererError
 from indico.modules.oauth.errors import OAuthError
 from MaKaC.webinterface.mail import GenericMailer

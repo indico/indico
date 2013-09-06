@@ -23,7 +23,7 @@ from indico.modules.scheduler import PeriodicTask
 from indico.ext.calendaring.storage import getAvatarConferenceStorage, isUserPluginEnabled
 from indico.util.date_time import format_datetime
 from webassets.filter.cssrewrite import urlpath
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.webinterface import urlHandlers
 
@@ -113,7 +113,7 @@ class OutlookTaskRegistry(object):
     def register(interval=15):
         from indico.modules.scheduler import Client
         from dateutil.rrule import MINUTELY
-        from MaKaC.common import DBMgr
+        from indico.core.db import DBMgr
         DBMgr.getInstance().startRequest()
         task = OutlookUpdateCalendarNotificationTask(MINUTELY, interval=interval)
         client = Client()

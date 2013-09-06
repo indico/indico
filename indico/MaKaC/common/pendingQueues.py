@@ -19,7 +19,7 @@
 
 from datetime import datetime, timedelta
 import MaKaC.common.indexes as indexes
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.webinterface import mail, urlHandlers
 from MaKaC.common.info import HelperMaKaCInfo
 from indico.modules.scheduler import Scheduler

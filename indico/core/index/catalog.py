@@ -21,7 +21,7 @@ from BTrees.OOBTree import OOBTree
 
 from indico.core.index.event import CategoryEventStartDateIndex
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.plugins.base import extension_point
 from indico.modules.oauth.components import UserOAuthRequestTokenIndex, UserOAuthAccessTokenIndex
 

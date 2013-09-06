@@ -21,10 +21,10 @@ import threading
 from contextlib import contextmanager
 
 from MaKaC.common import Configuration
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.rb_dalManager import DALManagerBase
 from MaKaC.errors import MaKaCError
-from MaKaC.common import db, info
+from MaKaC.common import info
 from BTrees.IOBTree import IOBTree
 from BTrees.OOBTree import OOBTree
 

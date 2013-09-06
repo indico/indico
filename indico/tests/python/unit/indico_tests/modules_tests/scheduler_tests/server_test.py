@@ -25,7 +25,7 @@ import time
 from datetime import timedelta
 from dateutil import rrule
 
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 
 from indico.util.date_time import nowutc
 from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base

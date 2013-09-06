@@ -43,7 +43,7 @@ from indico.util import console
 ## indico legacy imports
 import MaKaC
 from MaKaC.common import Config
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.conference import Conference, Category, ConferenceHolder, CategoryManager
 from MaKaC.user import AvatarHolder, GroupHolder
 from MaKaC.common.info import HelperMaKaCInfo

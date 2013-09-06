@@ -19,7 +19,7 @@
 
 import sys
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.conference import ConferenceHolder
 from MaKaC.common.output import outputGenerator
 from MaKaC.accessControl import AccessWrapper

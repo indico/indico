@@ -37,9 +37,9 @@ from MaKaC.rb_location import RoomGUID, ReservationGUID, Location
 from MaKaC.plugins.RoomBooking.CERN.equipmentManagerCERN import EquipmentManagerCERN
 from MaKaC.plugins.RoomBooking.CERN.dalManagerCERN import DALManagerCERN
 from MaKaC.plugins.RoomBooking.CERN.factoryCERN import FactoryCERN
-import MaKaC
 
 from indico.core.index import Catalog
+from indico.core.db import DBMgr
 
 
 def deleteRoomBookingBranches( force = False ):
@@ -52,7 +52,7 @@ def deleteRoomBookingBranches( force = False ):
     if not force:
         raise Exception('nothing done')
 
-    indicoRoot = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
+    indicoRoot = DBMgr.getInstance().getDBConnection().root()
     root = DALManagerCERN().getRoot()
     minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
@@ -95,7 +95,7 @@ def initializeRoomBookingDB( location, force = False ):
     - bookings branch
     - several indexes
     """
-    indicoRoot = MaKaC.common.DBMgr.getInstance().getDBConnection().root()
+    indicoRoot = DBMgr.getInstance().getDBConnection().root()
     root = DALManagerCERN().getRoot()
     # 1. Location -----------------------------------------------------------
 
@@ -148,7 +148,7 @@ def main( **kwargs ):
     location = kwargs.get( 'location', 'Universe' )
 
     from MaKaC.rb_factory import Factory
-    from MaKaC.common.db import DBMgr
+    from indico.core.db import DBMgr
     DBMgr.getInstance().startRequest()
     Factory.getDALManager().connect()
 

@@ -20,7 +20,7 @@
 import sys
 sys.path.append("c:/MaKaC/indico/code/code")
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 
 def changePath(base, path):
     if path[:len(base)] == base:

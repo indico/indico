@@ -21,7 +21,7 @@
 # pylint: disable-all
 
 
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.conference import ConferenceHolder
 from random import Random
 from MaKaC.plugins.Collaboration.services import CollaborationRemoveCSBooking, CollaborationBookingIndexQuery, CollaborationCreateTestCSBooking

@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.pendingQueues import PendingSubmittersHolder, PendingManagersHolder, PendingConfManagersHolder,PendingCoordinatorsHolder
 
 

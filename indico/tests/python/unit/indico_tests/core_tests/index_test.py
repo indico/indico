@@ -27,7 +27,7 @@ from indico.core.index.base import IIIndex, IOIndex, IUniqueIdProvider, \
      ElementNotFoundException, ElementAlreadyInIndexException
 
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 
 from persistent import Persistent
 

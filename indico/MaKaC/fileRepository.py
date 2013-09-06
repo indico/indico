@@ -69,7 +69,7 @@ class MaterialLocalRepository(Persistent):
 
     @classmethod
     def getRepositoryFromDB(cls):
-        from MaKaC.common.db import DBMgr
+        from indico.core.db import DBMgr
         dbRoot = DBMgr.getInstance().getDBConnection().root()
         try:
             fr = dbRoot["local_repositories"][cls._repo_name]

@@ -19,7 +19,7 @@
 
 ### Script for object revocation
 import sys,os,re,getopt
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.conference import Conference
 from MaKaC.conference import Category

@@ -24,7 +24,7 @@ This module contains a basic setup for unit tests that
 should be included from each file
 """
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 
 def setup_module():
     DBMgr.getInstance().startRequest()

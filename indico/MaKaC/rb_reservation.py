@@ -1883,7 +1883,7 @@ class Test:
         # Available rooms
         from MaKaC.rb_factory import Factory
         from MaKaC.rb_room import RoomBase
-        from MaKaC.common.db import DBMgr
+        from indico.core.db import DBMgr
         DBMgr.getInstance().startRequest()
         Factory.getDALManager().connect()
 
@@ -1907,7 +1907,7 @@ class Test:
     def addUsesAVC():
         # Available rooms
         from MaKaC.rb_factory import Factory
-        from MaKaC.common.db import DBMgr
+        from indico.core.db import DBMgr
         DBMgr.getInstance().startRequest()
         Factory.getDALManager().connect()
 
@@ -1922,7 +1922,7 @@ class Test:
     def addNeedsAVCSupport():
         # Available rooms
         from MaKaC.rb_factory import Factory
-        from MaKaC.common.db import DBMgr
+        from indico.core.db import DBMgr
         DBMgr.getInstance().startRequest()
         Factory.getDALManager().connect()
 
@@ -1937,7 +1937,7 @@ class Test:
     def addLocationAVCSupportEmails():
         # Available rooms
         from MaKaC.rb_factory import Factory
-        from MaKaC.common.db import DBMgr
+        from indico.core.db import DBMgr
         DBMgr.getInstance().startRequest()
         Factory.getDALManager().connect()
 

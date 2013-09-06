@@ -17,4 +17,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.db import DBMgr
+"""
+Obsolete module where we raise a Warning and we
+"""
+import warnings
+warnings.warn("the MaKaC.common.db module is deprecated; use indico.core.db instead", DeprecationWarning, 2)
+
+from indico.core.db import DBMgr, MigratedDB

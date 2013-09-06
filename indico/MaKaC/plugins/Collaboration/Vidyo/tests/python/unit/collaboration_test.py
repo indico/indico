@@ -17,7 +17,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.Vidyo.collaboration import CSBooking
 from MaKaC.plugins.Collaboration.Vidyo.tests.python.unit.vidyoTestTools import VidyoTestSetup

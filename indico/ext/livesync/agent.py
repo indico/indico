@@ -40,7 +40,7 @@ from indico.ext.livesync.db import updateDBStructures
 
 # legacy indico imports
 from MaKaC import conference
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 
 class QueryException(Exception):
     """

@@ -19,7 +19,7 @@
 
 import sys
 sys.path.append("c:/development/indico/code/code")
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 
 DBMgr.getInstance().startRequest()
 from MaKaC.conference import ConferenceHolder,AcceptedContribution

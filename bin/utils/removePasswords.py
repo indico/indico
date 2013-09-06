@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import sys
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.user import AvatarHolder
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.authentication.LocalAuthentication import LocalIdentity

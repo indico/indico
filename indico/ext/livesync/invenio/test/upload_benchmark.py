@@ -25,7 +25,7 @@ from indico.ext.livesync.tasks import LiveSyncUpdateTask
 import logging
 from indico.tests.util import TestZEOServer
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.plugins import PluginsHolder
 from MaKaC.conference import CategoryManager, DefaultConference
 from MaKaC import user

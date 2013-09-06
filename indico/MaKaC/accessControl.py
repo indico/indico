@@ -22,7 +22,7 @@ import itertools
 from persistent import Persistent
 from functools import wraps
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common import info
 import MaKaC
 from MaKaC.common.contextManager import ContextManager

@@ -20,7 +20,7 @@
 import sys
 from datetime import datetime
 
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex
 
 def switchIndex():

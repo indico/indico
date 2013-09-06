@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import re, os, sys, time, datetime, urllib
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.webinterface import urlHandlers
 from MaKaC.conference import ConferenceHolder

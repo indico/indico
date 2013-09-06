@@ -37,7 +37,7 @@ from indico.tests import BaseTestRunner
 from indico.tests.config import TestConfig
 from indico.tests.python.unit.util import IndicoTestCase
 
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.Configuration import Config
 from MaKaC.conference import ConferenceHolder
 from MaKaC.errors import MaKaCError

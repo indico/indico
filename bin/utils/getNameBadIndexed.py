@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC import user
 from MaKaC.common.indexes import IndexesHolder
 

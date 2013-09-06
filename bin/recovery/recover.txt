@@ -1,7 +1,7 @@
 Material recovery example:
 
 import recovery
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC import conference
 from datetime import datetime
 ch=conference.ConferenceHolder()
@@ -16,7 +16,7 @@ mr.proceed(datetime(2005,6,14,16,30))
 Abstract recovery example:
 
 import recovery
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC import conference
 from datetime import datetime
 ch=conference.ConferenceHolder()
@@ -31,7 +31,7 @@ ar.proceed(datetime(2005,8,3,15,56))
 Subcontribution recovery example:
 
 import recovery
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC import conference
 from datetime import datetime
 ch=conference.ConferenceHolder()
@@ -47,7 +47,7 @@ scr.proceed(datetime(2005,7,13,12,4))
 Contribution recovery example:
 
 import recovery
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC import conference
 from datetime import datetime
 ch=conference.ConferenceHolder()
@@ -62,7 +62,7 @@ cr.proceed(datetime(2005,6,23,15,30))
 Session recovery example:
 
 import recovery
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC import conference
 from datetime import datetime
 ch=conference.ConferenceHolder()
@@ -77,7 +77,7 @@ sr.proceed(datetime(2005,8,4,15,30))
 Conference recovery example:
 
 import recovery
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC import conference
 from datetime import datetime
 ch=conference.ConferenceHolder()

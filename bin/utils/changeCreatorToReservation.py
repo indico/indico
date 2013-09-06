@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import getopt, sys
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 from MaKaC.plugins.RoomBooking.default.reservation import Reservation
 from MaKaC.rb_reservation import ReservationBase

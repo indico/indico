@@ -53,7 +53,7 @@ from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 
 # indico legacy imports
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.conference import CategoryManager
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.common.info import HelperMaKaCInfo

@@ -17,12 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common import db
+from indico.core.db import DBMgr
 from MaKaC.conference import CategoryManager
 from MaKaC.common import indexes
 
 def main():
-    db.DBMgr.getInstance().startRequest()
+    DBMgr.getInstance().startRequest()
     im = indexes.IndexesHolder()
     emailindex = im.getIndex('email')
     nameindex = im.getIndex('name')
@@ -37,7 +37,7 @@ email:        %s
 name:         %s
 surname:      %s
 organisation: %s""" % (len(repr(calendarindex.dump())),len(repr(categindex.dump())),len(repr(emailindex.dump())),len(repr(nameindex.dump())),len(repr(surnameindex.dump())),len(repr(organisationindex.dump())))
-    db.DBMgr.getInstance().endRequest(False)
+    DBMgr.getInstance().endRequest(False)
 
 if __name__ == "__main__":
     main()

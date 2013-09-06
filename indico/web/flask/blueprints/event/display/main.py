@@ -21,7 +21,7 @@ from flask import redirect, request, url_for
 from flask import current_app as app
 from werkzeug.exceptions import NotFound
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.webinterface.rh import conferenceDisplay
 from MaKaC.webinterface.urlHandlers import UHConferenceDisplay
 from indico.web.flask.blueprints.event.display import event

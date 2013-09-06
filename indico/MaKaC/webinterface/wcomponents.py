@@ -39,7 +39,6 @@ from xml.sax.saxutils import escape, quoteattr
 from MaKaC.i18n import _
 from MaKaC.plugins import PluginsHolder, OldObservable
 from MaKaC.plugins.base import extension_point
-from MaKaC.common.db import DBMgr
 from MaKaC import conference
 from MaKaC import user
 from MaKaC import schedule
@@ -71,6 +70,7 @@ from MaKaC.common.Announcement import getAnnoucementMgrInstance
 from MaKaC.roomMapping import RoomMapperHolder
 import MaKaC.common.TemplateExec as templateEngine
 
+from indico.core.db import DBMgr
 from indico.util.i18n import i18nformat, parseLocale, getLocaleDisplayNames
 from indico.util.date_time import utc_timestamp, is_same_month
 from indico.core.index import Catalog

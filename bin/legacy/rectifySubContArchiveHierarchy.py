@@ -43,7 +43,7 @@
 import os
 import sys
 import shutil
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC import conference
 from MaKaC.conference import LocalFile
 

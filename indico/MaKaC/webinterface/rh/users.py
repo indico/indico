@@ -32,7 +32,7 @@ from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.accessControl import AdminList
 from MaKaC.webinterface.rh.base import RH, RHProtected
 from MaKaC.authentication import AuthenticatorMgr
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common import pendingQueues
 from MaKaC.i18n import _
 

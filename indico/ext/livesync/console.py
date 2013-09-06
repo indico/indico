@@ -26,7 +26,7 @@ import argparse, sys, traceback, logging
 from dateutil.rrule import MINUTELY
 
 # indico legacy imports
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.conference import CategoryManager, ConferenceHolder
 
 # indico imports

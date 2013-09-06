@@ -26,7 +26,7 @@
 # default server timezone as origin of the conversion.
 
 import os,shutil
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 import MaKaC.common.info as info
 from pytz import timezone,common_timezones
 from MaKaC.conference import CategoryManager, ConferenceHolder, DeletedObjectHolder

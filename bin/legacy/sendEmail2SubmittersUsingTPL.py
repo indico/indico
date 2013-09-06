@@ -28,7 +28,8 @@ raise Exception("delete this line to run the code")
 #sys.path.append('/soft/python/lib/python2.3/site-packages')
 
 import smtplib
-from MaKaC.common import Config, DBMgr
+from MaKaC.common import Config
+from indico.core.db import DBMgr
 from MaKaC import conference
 from MaKaC.webinterface import urlHandlers
 

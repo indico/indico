@@ -26,7 +26,7 @@ import time
 from indico.core.db import MigratedDB
 from ZODB.FileStorage import FileStorage
 import transaction
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common import Config
 from MaKaC.review import Abstract, AbstractStatusSubmitted, AbstractStatusAccepted,\
 AbstractStatusRejected, AbstractStatusUnderReview, AbstractStatusProposedToAccept,\

@@ -27,7 +27,7 @@ from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.user import AvatarHolder

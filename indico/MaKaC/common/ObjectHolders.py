@@ -25,7 +25,7 @@ persistence.
 """
 from BTrees import OOBTree
 
-from db import DBMgr
+from indico.core.db import DBMgr
 from Counter import Counter
 from MaKaC.errors import MaKaCError
 

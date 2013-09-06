@@ -18,7 +18,7 @@
 # along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common import Config
 from MaKaC.common.mail import GenericMailer
 from indico.modules import ModuleHolder

@@ -21,7 +21,7 @@ import os
 from persistent import Persistent
 from persistent.dict import PersistentDict
 from BTrees import OOBTree
-from db import DBMgr
+from indico.core.db import DBMgr
 from Configuration import Config
 
 DEFAULT_PERSISTENT_ENABLE_AGREEMENT = 'Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.'

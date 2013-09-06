@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.conference import ConferenceHolder
 from indico.util.console import conferenceHolderIterator
 

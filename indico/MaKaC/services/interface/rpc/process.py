@@ -30,7 +30,8 @@ from MaKaC.services.interface.rpc import handlers
 from MaKaC.plugins.base import Observable
 import MaKaC.errors
 
-from MaKaC.common import DBMgr, Config, fossilize
+from indico.core.db import DBMgr
+from MaKaC.common import Config, fossilize
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.mail import GenericMailer
 

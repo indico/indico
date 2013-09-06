@@ -23,7 +23,7 @@ Tests for `indico.modules.scheduler.queue` module
 
 import unittest
 
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from indico.util.struct.queue import PersistentWaitingQueue, DuplicateElementException
 
 

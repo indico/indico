@@ -921,7 +921,7 @@ class CategoryDateIndex(Persistent):
         for conf in categ.getConferenceList():
             self.unindexConf(conf)
             self.indexConf(conf)
-#        from MaKaC.common import DBMgr
+#        from indico.core.db import DBMgr
 #        dbi = DBMgr.getInstance()
 #        for subcat in categ.getSubCategoryList():
 #            self.reindexCateg(subcat)

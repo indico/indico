@@ -65,7 +65,7 @@ def migrateConferences(catalog):
     print "[Done:%s]"%count
 
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 
 DBMgr.getInstance().startRequest()
 root=DBMgr.getInstance().getDBConnection().root()

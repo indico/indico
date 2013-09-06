@@ -20,7 +20,7 @@
 import sys
 sys.path.append("c:/development/indico/code/code")
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 
 DBMgr.getInstance().startRequest()
 root=DBMgr.getInstance().getDBConnection().root()

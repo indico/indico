@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 # legacy imports
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 
 # indico imports
 from indico.modules.scheduler import PeriodicTask

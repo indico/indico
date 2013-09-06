@@ -45,10 +45,10 @@ from indico.tests.config import TestConfig
 from indico.tests.base import BaseTestRunner, Option
 from indico.tests.util import openBrowser, relpathto
 from indico.tests import default_actions
+from indico.core.db import DBMgr
 
 # legacy indico modules
-from MaKaC.common import Config, DBMgr
-
+from MaKaC.common import Config
 
 __all__ = [
     'UnitTestRunner',

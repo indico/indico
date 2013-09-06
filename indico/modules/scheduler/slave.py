@@ -23,7 +23,7 @@ import multiprocessing
 import threading
 import os
 from ZODB.POSException import ConflictError
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.RoomBooking.default.dalManager import DBConnection, DALManager
 from MaKaC.common.info import HelperMaKaCInfo

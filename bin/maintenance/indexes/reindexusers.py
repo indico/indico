@@ -20,31 +20,31 @@
 import sys,os,re
 
 from MaKaC import user
-from MaKaC.common import db
+from indico.core.db import DBMgr
 import MaKaC.common.indexes as indexes
 
 
 def main():
     """This script deletes existing user indexes (email,name,surname,organisation) and recreates them."""
-    db.DBMgr.getInstance().startRequest()
+    DBMgr.getInstance().startRequest()
     try:
-      del db.DBMgr.getInstance().getDBConnection().root()['indexes']['email']
+      del DBMgr.getInstance().getDBConnection().root()['indexes']['email']
     except:
       pass
     try:
-      del db.DBMgr.getInstance().getDBConnection().root()['indexes']['name']
+      del DBMgr.getInstance().getDBConnection().root()['indexes']['name']
     except:
       pass
     try:
-      del db.DBMgr.getInstance().getDBConnection().root()['indexes']['surName']
+      del DBMgr.getInstance().getDBConnection().root()['indexes']['surName']
     except:
       pass
     try:
-      del db.DBMgr.getInstance().getDBConnection().root()['indexes']['organisation']
+      del DBMgr.getInstance().getDBConnection().root()['indexes']['organisation']
     except:
       pass
     try:
-      del db.DBMgr.getInstance().getDBConnection().root()['indexes']['status']
+      del DBMgr.getInstance().getDBConnection().root()['indexes']['status']
     except:
       pass
     ah = user.AvatarHolder()
@@ -61,7 +61,7 @@ def main():
     	surNameindex.indexUser(us)
     	orgindex.indexUser(us)
     	statindex.indexUser(us)
-    db.DBMgr.getInstance().endRequest()
+    DBMgr.getInstance().endRequest()
 
 if __name__ == "__main__":
     main()

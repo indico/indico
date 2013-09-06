@@ -25,10 +25,10 @@ from flask.blueprints import BlueprintSetupState
 from flask.wrappers import Request
 from werkzeug.utils import cached_property
 
-from MaKaC.common import HelperMaKaCInfo, DBMgr
+from MaKaC.common import HelperMaKaCInfo
 from indico.web.flask.session import IndicoSessionInterface
 from indico.web.flask.util import make_view_func
-
+from indico.core.db import DBMgr
 
 class IndicoRequest(Request):
     @cached_property

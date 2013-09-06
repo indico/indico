@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from persistent import Persistent
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.logger import Logger
 from MaKaC.errors import MaKaCError
 from urllib2 import HTTPError, URLError, urlopen

@@ -21,7 +21,7 @@
 Calculates total size of archive and number of files
 """
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.conference import LocalFile, ConferenceHolder
 from indico.util.console import conferenceHolderIterator
 

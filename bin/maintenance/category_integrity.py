@@ -26,7 +26,7 @@ It can be added as a periodic cronjob.
 
 import sys
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.conference import CategoryManager, ConferenceHolder
 
 

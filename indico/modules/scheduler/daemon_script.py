@@ -31,7 +31,7 @@ from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
 
 # legacy import
 from MaKaC.common.Configuration import Config
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
 

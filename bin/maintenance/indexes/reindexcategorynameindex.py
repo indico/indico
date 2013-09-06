@@ -26,7 +26,7 @@ import transaction
 
 def main():
     """This script deletes existing category indexes and recreates them."""
-    dbi = db.DBMgr.getInstance()
+    dbi = DBMgr.getInstance()
     dbi.startRequest()
     im = indexes.IndexesHolder()
     im.removeById('categoryName')

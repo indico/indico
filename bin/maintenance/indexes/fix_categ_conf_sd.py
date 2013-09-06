@@ -24,7 +24,7 @@ Checks consistency (fixing errors) of 'categ_conf_sd'
 
 from indico.core.index import Catalog
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.conference import CategoryManager
 
 if __name__ == '__main__':

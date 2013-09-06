@@ -1,4 +1,4 @@
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from MaKaC.user import Group, GroupHolder
 from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.urlHandlers import UHCategoryDisplay, UHConferenceDisplay

@@ -22,7 +22,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common.maintenanceMng import MaintenanceMng
 from MaKaC.common import Config
 from MaKaC.webinterface.pages import admins as adminPages
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 
 
 class RHMaintenanceBase(admins.RHAdminBase):
@@ -30,7 +30,7 @@ class RHMaintenanceBase(admins.RHAdminBase):
 
 class RHMaintenance( RHMaintenanceBase ):
     _uh = urlHandlers.UHMaintenance
-    
+
     def _process( self ):
         s = MaintenanceMng.getStat(Config.getInstance().getTempDir())
         dbSize = MaintenanceMng.humanReadableSize(DBMgr.getInstance().getDBSize(), 'm')
@@ -39,7 +39,7 @@ class RHMaintenance( RHMaintenanceBase ):
 
 class RHMaintenanceTmpCleanup( RHMaintenanceBase ):
     _uh = urlHandlers.UHMaintenanceTmpCleanup
-    
+
     def _process( self ):
         p = adminPages.WPMaintenanceTmpCleanup( self )
         return p.display()
@@ -51,7 +51,7 @@ class RHMaintenancePerformTmpCleanup( RHMaintenanceBase ):
         RHMaintenanceBase._checkParams(self, params)
         self._confirmed=params.has_key("confirm")
         self._cancel=params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._cancel:
             if not self._confirmed:
@@ -62,7 +62,7 @@ class RHMaintenancePerformTmpCleanup( RHMaintenanceBase ):
 
 class RHMaintenancePack( RHMaintenanceBase ):
     _uh = urlHandlers.UHMaintenancePack
-    
+
     def _process( self ):
         p = adminPages.WPMaintenancePack( self )
         return p.display()
@@ -74,7 +74,7 @@ class RHMaintenancePerformPack( RHMaintenanceBase ):
         RHMaintenanceBase._checkParams(self, params)
         self._confirmed=params.has_key("confirm")
         self._cancel=params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._cancel:
             if not self._confirmed:
