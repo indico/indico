@@ -41,6 +41,8 @@ from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 from MaKaC.webinterface.rh.fileAccess import RHFileAccess
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
+import subprocess, shlex, os
+
 
 class RHBaseCFA( RHConferenceBaseDisplay ):
 
@@ -382,7 +384,28 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
         tz = timezoneUtils.DisplayTZ(self._aw, self._conf).getDisplayTZ()
         filename = '%s - Abstract.pdf' % self._target.getTitle()
         pdf = AbstractToPDF(self._conf, self._target, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
+
+        
+        texname = '%s - Abstract.tex' % self._target.getTitle()
+        print texname
+
+        with open(texname,'w') as f:
+            f.write(pdf.getBody())
+
+        pdflatex_cmd = 'pdflatex --shell-escape \"%s\"' % texname
+        print pdflatex_cmd
+
+        proc=subprocess.Popen(shlex.split(pdflatex_cmd))
+        proc.communicate()
+        print proc.communicate()
+
+        os.unlink(filename[:-4] + '.tex')
+        os.unlink(filename[:-4] + '.log')
+        os.unlink(filename[:-4] + '.aux')
+        os.unlink(filename[:-4] + '.out')
+        
+        return send_file(filename, os.path.abspath(os.path.join(filename)), 'PDF')
+        #return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHUserAbstractsPDF(RHAbstractSubmissionBase):

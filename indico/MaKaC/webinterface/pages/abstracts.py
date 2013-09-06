@@ -41,7 +41,7 @@ from MaKaC.review import AbstractStatusSubmitted
 from MaKaC.review import AbstractTextField
 from MaKaC.common.TemplateExec import render
 
-from indico.util.string import m
+from indico.util.string import render_markdown as m
 
 
 class WConfCFADeactivated(WConfDisplayBodyBase):

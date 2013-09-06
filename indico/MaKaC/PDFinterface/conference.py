@@ -58,7 +58,8 @@ from MaKaC.webinterface.common.tools import strip_ml_tags
 import re
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat, ngettext
-
+from indico.util import mdx_latex
+import markdown, sys
 
 styles = getSampleStyleSheet()
 charRplace = [
@@ -195,6 +196,7 @@ class AbstractToPDF(PDFBase):
         text = i18nformat(""" _("Abstract ID"): %s""") % self._abstract.getId()
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text, 12)
+        to_latex = text + "\n\n"
         story.append(p)
 
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
@@ -204,6 +206,7 @@ class AbstractToPDF(PDFBase):
         style.fontSize = 25
         style.leading = 30
         text = escape(self._abstract.getTitle())
+        to_latex += text + "\n\n"
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
 
@@ -230,19 +233,23 @@ class AbstractToPDF(PDFBase):
         for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             fid = field.getId()
             name = field.getCaption()
-            value = str(self._abstract.getField(fid)).strip()
-            if value:  # id not in ["content"] and
-                if fid != "content" and fid != "summary":
-                    text = "%s: %s" % (name, value)
-                    p = SimpleParagraph(text, spaceAfter=5)
-                    story.append(p)
-                else:
-                    text = "%s:" % name
-                    p = SimpleParagraph(text, spaceAfter=5)
-                    story.append(p)
-                    p = Paragraph(escape(value), style, part=escape(self._abstract.getTitle()))
-                    story.append(p)
-
+            value = self._abstract.getField(fid).strip()
+            if value: #fid not in ["content"] and
+                #styleHead = ParagraphStyle({})
+                #styleHead.firstLineIndent = -45
+                #styleHead.leftIndent = 45
+                text = "%s :" % name
+                #p = Paragraph(text, styleHead, part=escape(self._abstract.getTitle()))
+                to_latex += text + "\n\n" + value + "\n\n"
+                p = SimpleParagraph(text, spaceAfter = 5)
+                story.append(p)
+                #l=value.split("\n")
+                #res=[]
+                #for line in l:
+                #    res.append(fill(line,85))
+                #res="\n".join(res)
+                p = Paragraph(escape(value), style, part=escape(self._abstract.getTitle()))
+                story.append(p)
                 story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
@@ -250,11 +257,14 @@ class AbstractToPDF(PDFBase):
         style.firstLineIndent = -80
         style.leftIndent = 80
         style.alignment = TA_JUSTIFY
-        text = i18nformat("""<b> _("Primary authors")</b>: """)
+        text = i18nformat("""<b> _("Primary authors")</b> : """)
+        to_latex += i18nformat("""{\\bf _("Primary authors")} : """)
         listAuthor = []
         for author in self._abstract.getPrimaryAuthorsList():
             listAuthor.append( "%s (%s)"%(escape(author.getFullName()), escape(author.getAffiliation()))  )
         text += " ; ".join(listAuthor)
+        to_latex += " ; ".join(listAuthor)
+        to_latex += "\n\n"
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
 
@@ -264,11 +274,14 @@ class AbstractToPDF(PDFBase):
         style.firstLineIndent = -35
         style.leftIndent = 35
         style.alignment = TA_JUSTIFY
-        text = i18nformat("""<b> _("Co-authors")</b>: """)
+        text = i18nformat("""<b> _("Co-authors")</b> : """)
+        to_latex += i18nformat("""{\\bf _("Co-authors")} : """)
         listAuthor = []
         for author in self._abstract.getCoAuthorList():
             listAuthor.append( "%s (%s)"%(escape(author.getFullName()), escape(author.getAffiliation()) )  )
         text += " ; ".join(listAuthor)
+        to_latex += " ; ".join(listAuthor)
+        #to_latex += "\n\n"
 
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
@@ -283,6 +296,8 @@ class AbstractToPDF(PDFBase):
         for speaker in self._abstract.getSpeakerList():
             listSpeaker.append( "%s (%s)"%(escape(speaker.getFullName()), escape(speaker.getAffiliation()) )  )
         text += " ; ".join(listSpeaker)
+        to_latex += " ; ".join(listSpeaker)
+        to_latex += "\n\n"
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
@@ -299,14 +314,16 @@ class AbstractToPDF(PDFBase):
         tmp= i18nformat("""--_("not specified")--""")
         if self._abstract.getContribType() is not None:
             tmp=self._abstract.getContribType().getName()
-        text = i18nformat("""_("Contribution type"): %s""")%escape(tmp)
+        text = i18nformat("""_("Contribution type") : %s""")%escape(tmp)
+        to_latex += text + "\n\n"
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
-        text = i18nformat("""_("Submitted by"): %s""")%escape(self._abstract.getSubmitter().getFullName())
+        text = i18nformat("""_("Submitted by") : %s""")%escape(self._abstract.getSubmitter().getFullName())
+        to_latex += text + "\n\n"
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
@@ -314,20 +331,23 @@ class AbstractToPDF(PDFBase):
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
         text = i18nformat("""_("Submitted on") %s""")%self._abstract.getSubmissionDate().strftime("%A %d %B %Y")
+        to_latex += text + "\n\n"
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
-        text = i18nformat("""_("Last modified on"): %s""")%self._abstract.getModificationDate().strftime("%A %d %B %Y")
+        text = i18nformat("""_("Last modified on") : %s""")%self._abstract.getModificationDate().strftime("%A %d %B %Y")
+        to_latex += text + "\n\n"
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
 
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
-        text = i18nformat("""_("Comments"): """)
+        text = i18nformat("""_("Comments") : """)
+        to_latex += text + "\n\n"
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         #p = SimpleParagraph(text)
         story.append(p)
@@ -336,10 +356,35 @@ class AbstractToPDF(PDFBase):
         style.leftIndent = 40
         style.alignment = TA_JUSTIFY
         text = "%s"%escape(self._abstract.getComments())
+        to_latex += text + "\n\n"
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
 
-        return story
+        md = markdown.Markdown()
+        latex_mdx = mdx_latex.LaTeXExtension()
+        latex_mdx.extendMarkdown(md, markdown.__dict__)
+
+        reload(sys)
+        sys.setdefaultencoding("utf-8")
+        latex_template=r'''\documentclass{article}
+\usepackage[pdftex]{graphicx}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage[colorlinks = true,
+            linkcolor = blue,
+            urlcolor  = blue,
+            citecolor = blue,
+            anchorcolor = blue]{hyperref}
+\begin{document}
+
+%s
+
+\end{document}
+''' % md.convert(to_latex)[7:-7]
+
+        #print latex_template
+        return latex_template
+        #return story
 
 
 class AbstractsToPDF(PDFWithTOC):

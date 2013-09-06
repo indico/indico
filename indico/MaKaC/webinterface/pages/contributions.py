@@ -41,7 +41,7 @@ from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date
 
-from indico.util.string import m
+from indico.util.string import render_markdown as m
 from MaKaC.common.TemplateExec import render
 
 
@@ -493,7 +493,7 @@ class WContribModifMain(wcomponents.WTemplated):
                     html += """
                     <tr>
                         <td class="dataCaptionTD"><span class="dataCaptionFormat">%s</span></td>
-                        <td bgcolor="white" class="blacktext"><table class="tablepre"><tr><td><pre>%s</pre></td></tr></table></td>
+                        <td bgcolor="white" class="blacktext"><table class="tablepre"><tr><td><pre><div style="white-space: nowrap;">%s</div></pre></td></tr></table></td>
                     </tr>""" % (caption, m(self.htmlText(value)))
         return html
 
