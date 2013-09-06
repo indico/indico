@@ -19,6 +19,20 @@
 
 from ZODB.DB import DB
 
+"""
+We have two dictionaries
+
+    - globalname_dict:   We declare the classes that are going to be moved or renamed.
+                                  The key is the name to be renamed or moved.capitalize(
+                                  The value is a tuple with the new module name and the new class.
+                                  It can be one of each to be changed or both.
+
+    - modulename_dict: We declare the modules that are going to be moved.
+                                  The key is the old module to be moved and if it finish by '.' means that
+                                  that module and all submodules are going to be moved.
+                                  The value is the new module and also have the same rules as key.
+"""
+
 globalname_dict = {
     "PersistentMapping": ("persistent.mapping", None),
     "PersistentList": ("persistent.list", None),
@@ -37,13 +51,17 @@ class MigratedDB(DB):
 
     def classFactory(self, connection, modulename, globalname):
         if globalname in globalname_dict:
-            modulename = globalname_dict[globalname][0]
+            if globalname_dict[globalname][0]:
+                modulename = globalname_dict[globalname][0]
             if globalname_dict[globalname][1]:
                 globalname = globalname_dict[globalname][1]
-        for mod_name in modulename_dict:
-            if mod_name[-1] == ".":
-                if modulename.startswith(mod_name):
-                    modulename = modulename_dict[mod_name] + modulename[len(mod_name):]
-            elif modulename == mod_name:
-                modulename = modulename_dict[modulename]
+        # There is an else in order to do not overwrite the rule.
+        # It could create some inconsistency
+        elif modulename in modulename_dict:
+            modulename = modulename_dict[modulename]
+        else:
+            # This is the case of a module with submodules
+            for mod_name in modulename_dict:
+                if mod_name[-1] == "." and modulename.startswith(mod_name):
+                        modulename = modulename_dict[mod_name] + modulename[len(mod_name):]
         return DB.classFactory(self, connection, modulename, globalname)
