@@ -156,6 +156,7 @@ indico_jquery = Bundle(
 
                'defaults.js',
                'global.js',
+               'clearableinput.js',
                'multiselect.js',
                'fieldarea.js'),
     filters='rjsmin', output='js/indico_jquery_%(version)s.min.js')

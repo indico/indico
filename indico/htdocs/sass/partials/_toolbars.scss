@@ -37,7 +37,7 @@
         }
 
         & input[type=text] {
-            height: $thin-height;
+            height: 2em;
             line-height: $thin-height;
         }
     }
@@ -72,12 +72,11 @@
     }
 
     & input[type=text] {
-        @include box-sizing(content-box);
         color: $black;
         display: inline-block;
         float: left;
         font-weight: bold;
-        height: 2.4em;
+        height: 2.25em;
         margin: 0;
         padding: 0.2em 0.7em 0.1em 0.7em;
     }
@@ -158,10 +157,9 @@
         }
     }
 
-    & > input[type=text] {
-        &:last-of-type {
-            border-bottom-right-radius: 0.2em;
-            border-top-right-radius: 0.2em;
-        }
+    & > input[type=text]:last-child,
+    & > .clearableinput:last-child input[type=text] {
+        border-bottom-right-radius: 0.2em;
+        border-top-right-radius: 0.2em;
     }
 }
