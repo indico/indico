@@ -33,6 +33,7 @@
             var input = self.element;
 
             var clear = $('<span class="icon-close"></span>')
+                .css("line-height", input.css("height"))
                 .click(function() {
                     self._clear();
                 });
@@ -47,7 +48,8 @@
                     }
                 })
                 .bind("keyup", function(e) {
-                    if (e.which == 27) {
+                    var K_ESC = 27;
+                    if (e.which == K_ESC) {
                         input.val('value');
                         self._clear();
                     }

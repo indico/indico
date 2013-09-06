@@ -1,8 +1,9 @@
 .clearableinput {
     position: relative;
+    float: left;
 
     & input {
-        padding-right: 1em !important;
+        padding-right: 2em !important;
     }
 
     & span {
@@ -11,8 +12,9 @@
         font-size: 1.2em;
         position: absolute;
         right: 0;
-        vertical-align: -10%;
         visibility: hidden;
+        padding: 0 0.4em;
+        top: 0.05em;
 
         &:hover {
             color: $dark-gray;
