@@ -28,13 +28,11 @@
             var self = this;
             self.rbUserData = self.options.rbUserData;
 
-            self._createSelect();
+            self._initData();
             self._initWidget();
             self._setDraw();
-            self._initbindings();
+            self._setBindings();
             self._restoreData();
-            self._drawLegend();
-            self._drawAdvancedOptions();
         },
 
         destroy: function() {
@@ -50,13 +48,14 @@
         },
 
         validate: function() {
+            var self = this;
             var isValid = true;
 
-            // var capacity = $('#capacity').val();
-            // if (capacity !== '' && (capacity < 0 || capacity > maxRoomCapacity || parseInt(capacity, 10).toString() == 'NaN')) {
-            //     capacity.addClass('invalid');
-            //     isValid = false;
-            // }
+            var capacity = self.filter.capacity.val();
+            if (capacity !== '' && (capacity < 0 || capacity > maxRoomCapacity || parseInt(capacity, 10).toString() == 'NaN')) {
+                capacity.addClass('invalid');
+                isValid = false;
+            }
 
             return isValid;
         },
@@ -66,7 +65,7 @@
             return self.select.val();
         },
 
-        _createSelect: function() {
+        _initData: function() {
             var self = this;
             var rooms = self.options["rooms"];
 
@@ -91,7 +90,6 @@
 
             self.select.multiselect({
                 height: 255,
-                minWidth: 490,
                 checkAllText: 'All',
                 uncheckAllText: 'None',
                 noneSelectedText: '0 selected',
@@ -101,10 +99,10 @@
                 },
                 classes: "RoomBooking",
                 appendTo: "#" + $(self.element).prop('id'),
-                position: {my: "left top", at: "left top"}
+                position: {my: "left top", at: "left top", collision: "fitflip"}
             }).multiselectfilter({
                 label: "",
-                placeholder: $T('Search: name, number, location...')
+                placeholder: $T('Name, number, location...')
             }).multiselectfilter('advancedFilter');
         },
 
@@ -116,36 +114,125 @@
                 var o = select.multiselect("option");
                 var menu = select.multiselect("widget");
 
+                self.element.find(".ui-multiselect").html("");
                 self._drawHeader(menu, o);
-
-                $('<div/>').addClass('ui-multiselect-search-advanced')
-                     .html(function(){
-                         return '<span id="advancedOptionsText" style="float: right; padding: 2px 10px 0px 20px" >&nbsp;</span>';
-                    }).appendTo(menu.children().first());
+                self._drawRooms();
 
                 $('<div/>').addClass('ui-multiselect-selection-counter').appendTo(menu);
                 $('<div/>').addClass('ui-multiselect-selection-summary').appendTo(menu);
 
-                self._drawRooms();
                 self._updateCounter();
-                self._changeSelectedStyleAll();
+                // self._changeSelectedStyleAll();
             });
         },
 
+        _setBindings: function() {
+            var self = this;
+            var select = self.select;
+
+            select.bind("multiselectclick", function(event, ui) {
+                self._changestyle($('.RoomBooking.ui-multiselect-menu input[value="' + ui.value + '"]'));
+                self._updateCounter();
+            });
+
+            select.bind("multiselectcheckall", function(event, ui) {
+                self._changeSelectedStyleAll();
+            });
+
+            select.bind("multiselectuncheckall", function(event, ui) {
+                self._changeSelectedStyleAll();
+            });
+
+            select.multiselect("widget").bind({
+                mouseleave: function(){
+                    select.multiselect("widget").find('ul label').removeClass('ui-state-hover');
+                }
+            });
+
+            select.bind("multiselectfilterfilter", function(event, matches) {
+                $('.RoomBooking .ui-multiselect-selection-summary').text($('.RoomBooking .ui-multiselect-checkboxes li:visible').length + " / " + $(".RoomBooking .ui-multiselect-checkboxes li").length + " items");
+                $('.RoomBooking .ui-multiselect-selection-summary').effect("pulsate", { times:1 }, 400);
+            });
+        },
+
+        _restoreData: function() {
+            var self = this;
+
+            function restoreSelection(selectedRooms) {
+                if (self.select.multiselect("getChecked").length === 0) {
+                    self.select.multiselect("widget").find(":checkbox").each(function(index) {
+                        if (jQuery.inArray(index, selectedRooms) != -1) {
+                            this.click();
+                        }
+                    });
+                }
+                self.select.multiselect("refresh");
+            }
+
+            function restoreFilter(filter) {
+                self.element.find(".ui-multiselect-filter :input").val(filter);
+                self._updateFilter();
+            }
+
+            $("#videoconference").prop('checked', rbUserData.videoconference);
+            $("#webcast").prop('checked', rbUserData.webcast);
+            $("#publicroom").prop('checked', rbUserData.publicroom);
+            $("#capacity").val(rbUserData.capacity);
+
+            restoreSelection(self.rbUserData.selectedRooms);
+            restoreFilter(self.rbUserData.filter);
+        },
+
         _drawHeader: function(menu, options) {
-            menu.find(".ui-widget-header .ui-helper-reset").html(
-                    '<li><span>Select: </span> <a class="ui-multiselect-all" href="#"><span class="ui-icon ui-icon-check"></span><span>' +
-                    options.checkAllText +
-                    '</span></a></li><li>, <a class="ui-multiselect-none" href="#"><span class="ui-icon ui-icon-close"></span><span>' +
-                    options.uncheckAllText +
-                    '</span></a>'
-                );
+            var self = this;
+            var header = menu.find(".ui-widget-header");
+            header.addClass("toolbar thin");
+
+            self.filter = {};
+            self.filter.videoconference = $("<input type='checkbox' id='videoconference' name='advanced_options'/>");
+            self.filter.webcast = $("<input type='checkbox' id='webcast' name='advanced_options'/>");
+            self.filter.publicroom = $("<input type='checkbox' id='publicroom' name='advanced_options'/>");
+            self.filter.capacity = $("<input type='text' value='0'/>");
+            var filter = self.filter;
+
+            var search = header.find(".ui-multiselect-filter input").attr("type", "text");
+            header.find(".ui-multiselect-filter").addClass("group left").html("")
+                .append($("<span class='i-button label icon-search'></span>"))
+                .append(search);
+            search.clearableinput();
+
+            var checkall = header.find(".ui-helper-reset .ui-multiselect-all").each(function() {
+                $(this).html($(this).find("span:last-child").text());
+            });
+            var checknone = header.find(".ui-helper-reset .ui-multiselect-none").each(function() {
+                $(this).html($(this).find("span:last-child").text());
+            });
+            var checktools = $("<div></div>").addClass("group left")
+                .append($("<span class='i-button label'>" + $T("Select") + "</span>"))
+                .append(checkall.addClass("i-button"))
+                .append(checknone.addClass("i-button"));
+            header.find(".ui-helper-reset").replaceWith(function() {
+                return checktools;
+            });
+
+            var filtertools = $("<div class='group i-selection left'></div>")
+                   .append($("<span class='i-button label'>" + $T("Require") + "</span>"))
+                   .append(filter.videoconference)
+                   .append($("<label for='videoconference' class='i-button icon-camera'></label>"))
+                   .append(filter.webcast)
+                   .append($("<label for='webcast' class='i-button icon-broadcast'></label>"))
+                   .append(filter.publicroom)
+                   .append($("<label for='public' class='i-button icon-locked'></label>"));
+            header.append(filtertools);
+
+            var slider = $("<div class='group left'></div>");
         },
 
         _drawRooms: function() {
             var self = this;
 
-            var advancedImages = ["images/rb_video.png","images/rb_webcast.png", "images/rb_public.png", "images/rb_capacity.png"];
+            // var advancedImages = ["images/rb_video.png","images/rb_webcast.png", "images/rb_public.png", "images/rb_capacity.png"];
+            var advancedImages = ["icon-camera", "icon-broadcast", "icon-locked", "icon-user"];
             var advancedImagesTitles = ["Video conference", "Webcast/Recording", "Public room", "Capacity"];
 
             self.select.find("option").each(function(index) {
@@ -153,7 +240,7 @@
                 var html = '</br><div style="padding: 4px 0px 0px 20px; color: gray">';
                 for (var i = 0; i < advLabelsParts.length; i++){
                     if (advLabelsParts[i] != 'None' && advLabelsParts[i].toLowerCase() !='false'){
-                       html += '<img title="' + advancedImagesTitles[i] + '" class="ui-multiselect-images" src="' + Indico.Urls.Base + '/' + advancedImages[i]+  '">';
+                        html += '<span class=' + advancedImages[i] + ' title=' + advancedImagesTitles[i] + '></span>';
                         if (advLabelsParts[i].toLowerCase() != "true") {
                             html += advLabelsParts[i];
                         }
@@ -164,54 +251,8 @@
             });
         },
 
-        _drawLegend: function() {
-            var self = this;
-
-            var legend = $('<div style="background: #F2F2F2; border-top: 1px solid #DDD; padding: 5px 0px 3px 0px; margin-top: -9px"></div>')
-                .attr("id", "bookingLegend");
-
-            $("<span><i class='icon-user'></i>" + $T("Capacity") + "</span>").appendTo(legend);
-            $("<span><i class='icon-camera'></i>" + $T("Videoconference") + "</span>").appendTo(legend);
-            $("<span><i class='icon-broadcast'></i>" + $T("Webcast/Recording") + "</span>").appendTo(legend);
-            $("<span><i class='icon-locked'></i>" + $T("Puclic room") + "</span>").appendTo(legend);
-
-            legend.appendTo(self.element);
-            self.legend = legend;
-
-            // Qtips
-            $("#publicRoomHelp").qtip({
-                content: {
-                    text: "room that can be booked by anyone without special permissions"
-                },
-                position: {
-                    target: 'mouse',
-                    adjust: { mouse: true, x: 11, y: 13 }
-                },
-                show: {
-
-                }
-            });
-
-            // $('#bookingLegend').width($('.ui-multiselect-menu').width());
-        },
-
         _drawAdvancedOptions: function() {
             var self = this;
-
-            function toggleAdvancedOptions() {
-                if ($('#advancedOptions').is(":visible")) {
-                    $("#advancedOptions input:checkbox").prop("checked", false);
-                    $("#advancedOptions input:text").val('');
-                    $('#advancedOptions').hide();
-                    $('#advancedOptionsText').css('color', '#0B63A5');
-                    $('#advancedOptionsText').html($T('Show advanced'));
-                    // advancedFilter();
-                } else {
-                    $('#advancedOptions').show();
-                    $('#advancedOptionsText').html($T('Hide advanced'));
-                    self._updateCapacitySlider();
-                }
-            }
 
             // Set watermarks
             // $('#capacity').watermark('0');
@@ -296,24 +337,7 @@
                 }
             });
 
-
-            $("#capacity").val(rbUserData.capacity);
-            $("#videoconference").prop('checked', rbUserData.videoconference);
-            $("#webcast").prop('checked', rbUserData.webcast);
-            $("#publicroom").prop('checked', rbUserData.publicroom);
-
-            $("#advancedOptions").css('left', parseInt($('.ui-multiselect-menu').css('left').replace('px','')) + parseInt($('.ui-multiselect-menu').width()) + 'px'  ).css('top', $('.ui-multiselect-menu').css('top') );
-            $("#advancedOptionsText").addClass('fakeLink');
             $("#maxRoomCapacity").text(self.options.roomMaxCapacity);
-
-
-            // Restore filter and advanced filter
-            $('#advancedOptions').toggle(!rbUserData.showAdvancedOptions);
-            toggleAdvancedOptions();
-
-            $("#advancedOptionsText").click(function () {
-                toggleAdvancedOptions();
-            });
         },
 
         _updateCapacitySlider: function(event, ui) {
@@ -336,71 +360,20 @@
         },
 
         _updateFilter: function() {
-            var filterString = $("#videoconference").is(':checked') + ":" + $("#webcast").is(':checked') + ":" + $("#publicroom").is(':checked') + ":" + $("#capacity").val();
+            var filter = this.filter;
+            var filterString = filter.videoconference.is(':checked') + ":" +
+                               filter.webcast.is(':checked') + ":" +
+                               filter.publicroom.is(':checked') + ":" +
+                               filter.capacity.val();
             this.select.multiselectfilter('advancedFilter', filterString);
         },
-
-        _initbindings: function() {
-            var self = this;
-            var select = self.select;
-
-
-            select.bind("multiselectclick", function(event, ui) {
-                self._changestyle($('.RoomBooking.ui-multiselect-menu input[value="' + ui.value + '"]'));
-                self._updateCounter();
-            });
-
-            select.bind("multiselectcheckall", function(event, ui) {
-                self._changeSelectedStyleAll();
-            });
-
-            select.bind("multiselectuncheckall", function(event, ui) {
-                self._changeSelectedStyleAll();
-            });
-
-            select.multiselect("widget").bind({
-                mouseleave: function(){
-                    select.multiselect("widget").find('label').removeClass('ui-state-hover');
-                }
-            });
-
-            select.bind("multiselectfilterfilter", function(event, matches) {
-                $('.RoomBooking .ui-multiselect-selection-summary').text($('.RoomBooking .ui-multiselect-checkboxes li:visible').length + " / " + $(".RoomBooking .ui-multiselect-checkboxes li").length + " items");
-                $('.RoomBooking .ui-multiselect-selection-summary').effect("pulsate", { times:1 }, 400);
-            });
-        },
-
-        _restoreData: function() {
-            var self = this;
-
-            function restoreSelection(selectedRooms) {
-                if (self.select.multiselect("getChecked").length === 0) {
-                    self.select.multiselect("widget").find(":checkbox").each(function(index) {
-                        if (jQuery.inArray(index, selectedRooms) != -1) {
-                            this.click();
-                        }
-                    });
-                }
-                self.select.multiselect("refresh");
-            }
-
-            function restoreFilter(filter) {
-                self.element.find(".ui-multiselect-filter :input").val(filter);
-                self._updateFilter();
-            }
-
-            restoreSelection(self.rbUserData.selectedRooms);
-            restoreFilter(self.rbUserData.filter);
-        },
-
-
 
         _changeSelectedStyleAll: function() {
             var self = this;
             var menu = self.select.multiselect("widget");
             var options = self.select.multiselect("option");
 
-            menu.find("input:checkbox").each(function() {
+            menu.find("ul input:checkbox").each(function() {
                 self._changestyle($(this));
             });
 

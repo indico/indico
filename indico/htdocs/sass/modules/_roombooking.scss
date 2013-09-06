@@ -314,3 +314,93 @@ a.weekday {
     padding: 3px;
     background-color: white;
 }
+
+#roomselector {
+    @include border-all();
+    @include border-radius();
+
+    & .ui-multiselect-menu {
+        padding: 0px 0px 5px 0px;
+        width: auto !important;
+    }
+
+    & .ui-multiselect-checkboxes
+
+
+        label {
+            display: block;
+            font-weight: normal;
+            border-left: 0;
+            border-right: 0;
+            border-top: 0;
+            border-bottom: 1px solid #DDD;
+        }
+    }
+
+    & .ui-multiselect {
+        visibility: hidden;
+        border: none;
+        font-size: 13px;
+        height: 0;
+        padding: 0;
+        width: 0 !important;
+    }
+
+    & .ui-multiselect-header {
+        @include box-shadow(0 8px 8px -8px gray);
+
+        padding: 0;
+        background: transparent !important;
+
+        & a:hover {
+            text-decoration: none;
+        }
+    }
+
+    & .ui-multiselect-hasfilter ul {
+        position: relative;
+        top: 2px
+    }
+
+    & .ui-multiselect-filter {
+        float: left;
+        margin-right: 0;
+        font-size: 1em;
+    }
+
+    & .ui-multiselect-filter input {
+        width: 200px;
+    }
+
+    & .ui-multiselect-selection-counter {
+        color: gray;
+        float: left;
+        padding: 10px 0px 0px 10px;
+    }
+
+    & .ui-multiselect-selection-summary {
+        float: right;
+        color: gray;
+        padding: 10px 0px 0px 10px;
+    }
+
+    & .ui-corner-all {
+        @include border-radius();
+    }
+
+    & .ui-state-hover {
+        // background: #FFF6DF !important;
+        background: $light-gray !important;
+        cursor: pointer;
+    }
+
+    & .ui-state-selected  {
+        // background: #CDEB8B !important;
+        background: $light-blue !important;
+    }
+
+    & .ui-state-active {
+        // background: #CDEB8B !important;
+        background: $light-blue !important;
+    }
+}
