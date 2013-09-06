@@ -41,3 +41,4 @@ bcrypt==1.0.2
 beautifulsoup4==4.2.1
 Pillow==2.1.0
 qrcode==3.0
+Markdown==2.3.1

@@ -44,7 +44,7 @@ TEMPLATE_DIR = Config.getInstance().getTPLDir()
 FILTER_IMPORTS = ['from indico.util.json import dumps as j',
                   'from indico.util.string import html_line_breaks as html_breaks',
                   'from indico.util.string import remove_tags',
-                  'from indico.util.string import m']
+                  'from indico.util.string import render_markdown as m']
 
 
 class IndicoTemplateLookup(TemplateLookup):

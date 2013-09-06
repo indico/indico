@@ -25,7 +25,7 @@ import re
 import unicodedata
 
 from HTMLParser import HTMLParser
-import markdown2, sys
+import markdown, sys
 
 
 def unicodeOrNone(string):
@@ -94,8 +94,8 @@ def remove_tags(text):
     return remove_extra_spaces(pattern.sub(' ', text))
 
 
-def m(text):
+def render_markdown(text):
     """ Mako markdown to html filter """
     reload(sys)
     sys.setdefaultencoding("utf-8")
-    return markdown2.markdown(HTMLParser().unescape(text))
+    return markdown.markdown(HTMLParser().unescape(text))
