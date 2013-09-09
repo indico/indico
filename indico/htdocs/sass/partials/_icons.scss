@@ -96,14 +96,8 @@ you can use the generic selector below, but it's slower:
 .icon-checkbox-unchecked:before {
     content: "\6f";
 }
-.icon-locked:before {
-    content: "\21";
-}
 .icon-remove:before {
     content: "\22";
-}
-.icon-unlocked:before {
-    content: "\23";
 }
 .icon-arrow-down:before {
     content: "\24";
@@ -254,4 +248,10 @@ you can use the generic selector below, but it's slower:
 }
 .icon-camera:before {
     content: "\e007";
+}
+.icon-lock:before {
+    content: "\e008";
+}
+.icon-unlocked:before {
+    content: "\e009";
 }
