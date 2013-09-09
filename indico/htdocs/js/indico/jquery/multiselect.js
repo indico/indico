@@ -16,7 +16,35 @@
  */
 
 // Indico roomBooking jquery.multiselect specific settings
+
+var oldcreate = $.ech.multiselect.prototype._create;
+
+$.extend($.ech.multiselect.prototype, {
+    _create: function() {
+        this.super = oldcreate;
+        this.super(this);
+        this._fixLabels();
+    },
+
+    _fixLabels: function() {
+        var self = this;
+        var menu = self.menu;
+
+        self.labels = menu.find('.ui-multiselect-checkboxes label');
+        self.inputs = self.labels.children('input');
+
+        menu.undelegate('label', 'mouseenter.multiselect');
+        menu.delegate('.ui-multiselect-checkboxes label', 'mouseenter.multiselect', function() {
+            if(!$(this).hasClass('ui-state-disabled')) {
+                self.labels.removeClass('ui-state-hover');
+                $(this).addClass('ui-state-hover').find('input').focus();
+            }
+        });
+    }
+});
+
 $.extend($.ech.multiselectfilter.prototype, {
+
     advancedFilter: function(searchText) {
         this.searchText = searchText || "";
         this._handler(this);
