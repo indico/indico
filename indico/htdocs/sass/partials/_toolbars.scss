@@ -24,21 +24,27 @@
 }
 
 .toolbar {
-    height: 2.5em;
+    $toolbar-height: 2.2em;
+    $toolbar-line-height: 1.8em;
+
+    height: $toolbar-height;
+    padding: 3px 0;
     vertical-align: middle;
 
     &.thin {
-        $thin-height: 1.5em;
-        height: 2.2em;
+        $thin-height: 1.9em;
+        $thin-line-height: 1.5em;
+
+        height: $thin-height;
 
         & .i-button {
             height: $thin-height;
-            line-height: $thin-height;
+            line-height: $thin-line-height;
         }
 
         & input[type=text] {
-            height: 2em;
-            line-height: $thin-height;
+            height: $thin-height;
+            line-height: $thin-line-height;
         }
     }
 
@@ -51,8 +57,8 @@
         display: block;
         float: left;
         font-weight: bold;
-        height: 1.8em;
-        line-height: 1.8em;
+        height: $toolbar-height;
+        line-height: $toolbar-line-height;
         padding: 0.2em 0.7em 0.1em 0.7em !important;
         text-align: center;
 
@@ -76,7 +82,7 @@
         display: inline-block;
         float: left;
         font-weight: bold;
-        height: 2.25em;
+        height: $toolbar-height;
         margin: 0;
         padding: 0.2em 0.7em 0.1em 0.7em;
     }
@@ -94,9 +100,7 @@
 %toolbar-group {
     @extend %toolbar-group-inputs;
 
-    line-height: 2em;
-    padding: 0.25em 0.5em 0.25em 0.25em;
-    vertical-align: middle;
+    padding: 0 0.4em;
 
     & > .i-button {
         border-radius: 0;
@@ -116,14 +120,14 @@
 
     & .i-button:not(.hidden) {
         &:first-of-type {
-            border-bottom-left-radius: 0.2em;
-            border-top-left-radius: 0.2em;
+            @include border-bottom-left-radius();
+            @include border-top-left-radius();
         }
 
         &:last-of-type {
-            border-bottom-right-radius: 0.2em;
-            border-top-right-radius: 0.2em;
-            border-right: 1px solid $gray;
+            @include border-bottom-right-radius();
+            @include border-top-right-radius();
+            @include border-right($gray);
 
             &:hover {
                 border-right-color: $dark-gray;
@@ -136,12 +140,12 @@
 
         &.label {
             border-right: none !important;
-            border-bottom-right-radius: 0em;
-            border-top-right-radius: 0em;
+            @include border-bottom-right-radius(0);
+            @include border-top-right-radius(0);
 
             & ~ .i-button:not(.hidden):first-of-type {
-                border-bottom-left-radius: 0em;
-                border-top-left-radius: 0em;
+                @include border-bottom-left-radius(0);
+                @include border-top-left-radius(0);
             }
         }
     }
@@ -159,7 +163,7 @@
 
     & > input[type=text]:last-child,
     & > .clearableinput:last-child input[type=text] {
-        border-bottom-right-radius: 0.2em;
-        border-top-right-radius: 0.2em;
+        @include border-bottom-right-radius();
+        @include border-top-right-radius();
     }
 }

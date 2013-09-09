@@ -23,6 +23,7 @@
     @include user-select(none);
     @include border-radius();
     @include border-all($gray);
+    @include box-sizing(border-box);
     display: inline-block;
     cursor: pointer;
     color: $light-black !important;
@@ -33,6 +34,7 @@
 
 @mixin i-button-custom($line-height: 1.6em, $font-size: 1.1em) {
     @extend %button;
+    @include box-sizing(content-box);
 
     border: none;
     width: $line-height;
@@ -71,7 +73,7 @@
     }
 
     &[class*=" icon-"] {
-        width: 1.2em;
+        width: 2.7em;
     }
 
     &.accept {
@@ -143,7 +145,6 @@
 
 a.i-big-button {
     $size: 55px;
-
     @extend %button;
 
     background: #FFF;
