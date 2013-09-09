@@ -110,7 +110,7 @@
             var self = this;
             var select = self.select;
 
-            select.bind("multiselectrefresh", function(event, ui) {
+            select.on("multiselectrefresh", function(event, ui) {
                 var o = select.multiselect("option");
                 var menu = select.multiselect("widget");
 
@@ -130,26 +130,26 @@
             var self = this;
             var select = self.select;
 
-            select.bind("multiselectclick", function(event, ui) {
+            select.on("multiselectclick", function(event, ui) {
                 self._changestyle($('.RoomBooking.ui-multiselect-menu input[value="' + ui.value + '"]'));
                 self._updateCounter();
             });
 
-            select.bind("multiselectcheckall", function(event, ui) {
+            select.on("multiselectcheckall", function(event, ui) {
                 self._changeSelectedStyleAll();
             });
 
-            select.bind("multiselectuncheckall", function(event, ui) {
+            select.on("multiselectuncheckall", function(event, ui) {
                 self._changeSelectedStyleAll();
             });
 
-            select.multiselect("widget").bind({
+            select.multiselect("widget").on({
                 mouseleave: function(){
                     select.multiselect("widget").find('ul label').removeClass('ui-state-hover');
                 }
             });
 
-            select.bind("multiselectfilterfilter", function(event, matches) {
+            select.on("multiselectfilterfilter", function(event, matches) {
                 $('.RoomBooking .ui-multiselect-selection-summary').text($('.RoomBooking .ui-multiselect-checkboxes li:visible').length + " / " + $(".RoomBooking .ui-multiselect-checkboxes li").length + " items");
                 $('.RoomBooking .ui-multiselect-selection-summary').effect("pulsate", { times:1 }, 400);
             });
