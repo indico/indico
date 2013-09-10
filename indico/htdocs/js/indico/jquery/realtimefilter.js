@@ -20,6 +20,7 @@
 
         options: {
             callback: function() {},
+            clearable: true,
             wait: 250
         },
 
@@ -35,12 +36,6 @@
                 }, wait);
             }
 
-            element.clearableinput({
-                callback: function() {
-                    delayedCallback();
-                }
-            });
-
             element.typeWatch({
                 callback: function() {
                     callback();
@@ -49,6 +44,14 @@
                 highlight: true,
                 captureLength: 0
             });
+
+            if (self.options.clearable) {
+                element.clearableinput({
+                    callback: function() {
+                        delayedCallback();
+                    }
+                });
+            }
 
             element.on("cut paste", function() {
                 delayedCallback();
