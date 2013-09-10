@@ -40,14 +40,14 @@
 
             input.wrap($('<span class="' + opt.clearClass + '"></span>'))
                 .after(clear)
-                .bind("input propertychange", function() {
+                .on("input propertychange", function() {
                     if (input.val() === "") {
                         clear.css("visibility", "hidden");
                     } else {
                         clear.css("visibility", "visible");
                     }
                 })
-                .bind("keyup", function(e) {
+                .on("keyup", function(e) {
                     var K_ESC = 27;
                     if (e.which == K_ESC) {
                         input.val('value');
