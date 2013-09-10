@@ -40,7 +40,6 @@ from indico.web.flask.util import send_file
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 from MaKaC.webinterface.rh.fileAccess import RHFileAccess
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
-
 import subprocess, shlex, os
 
 
@@ -387,17 +386,41 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
 
         
         texname = '%s - Abstract.tex' % self._target.getTitle()
-        print texname
+
+        latex_template=r'''\batchmode %% suppress output
+\documentclass[a4paper, 11pt]{article} %% document type
+\textwidth = 440pt
+\hoffset = -40pt %% - inch
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc} %% http://tex.stackexchange.com/questions/44694/fontenc-vs-inputenc
+\usepackage[final, babel]{microtype} %% texblog.net/latex-archive/layout/pdflatex-microtype/
+\usepackage[export]{adjustbox} %% images
+\usepackage{amsmath} %% math equations
+\usepackage{float} %% improved interface for floating objects
+\usepackage{times} %% font family
+\usepackage[pdftex,
+            final,
+            pdfstartview = FitV,
+            linktocpage  = false,
+            breaklinks   = true]{hyperref}  %% hyperlinks configuration
+\usepackage{sectsty}
+\allsectionsfont{\rmfamily}
+
+\begin{document}
+\setcounter{secnumdepth}{0} %% remove section heading numbering
+
+%s
+
+\end{document}
+''' % pdf.getLatex()
 
         with open(texname,'w') as f:
-            f.write(pdf.getBody())
+            f.write(latex_template)
 
-        pdflatex_cmd = 'pdflatex --shell-escape \"%s\"' % texname
-        print pdflatex_cmd
+        pdflatex_cmd = 'pdflatex --shell-escape -interaction=nonstopmode \"%s\"' % texname
 
         proc=subprocess.Popen(shlex.split(pdflatex_cmd))
         proc.communicate()
-        print proc.communicate()
 
         os.unlink(filename[:-4] + '.tex')
         os.unlink(filename[:-4] + '.log')
@@ -405,7 +428,6 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
         os.unlink(filename[:-4] + '.out')
         
         return send_file(filename, os.path.abspath(os.path.join(filename)), 'PDF')
-        #return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHUserAbstractsPDF(RHAbstractSubmissionBase):

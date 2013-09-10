@@ -35,6 +35,7 @@ from MaKaC.webinterface.rh.conferenceModif import CFAEnabled
 from MaKaC.paperReviewing import Answer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from indico.web.flask.util import send_file
+import subprocess, shlex, os
 
 
 class RHAbstractModifBase( RHAbstractBase, RHModificationBaseProtected ):
@@ -125,7 +126,51 @@ class RHAbstractToPDF(RHAbstractModifBase):
         tz = self._conf.getTimezone()
         filename = "%s - Abstract.pdf" % self._target.getTitle()
         pdf = ConfManagerAbstractToPDF(self._conf, self._target, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
+
+        
+        texname = '%s - Abstract.tex' % self._target.getTitle()
+
+        latex_template=r'''\batchmode %% suppress output
+\documentclass[a4paper, 11pt]{article} %% document type
+\textwidth = 440pt
+\hoffset = -40pt %% - inch
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc} %% http://tex.stackexchange.com/questions/44694/fontenc-vs-inputenc
+\usepackage[final, babel]{microtype} %% texblog.net/latex-archive/layout/pdflatex-microtype/
+\usepackage[export]{adjustbox} %% images
+\usepackage{amsmath} %% math equations
+\usepackage{float} %% improved interface for floating objects
+\usepackage{times} %% font family
+\usepackage[pdftex,
+            final,
+            pdfstartview = FitV,
+            linktocpage  = false,
+            breaklinks   = true]{hyperref}  %% hyperlinks configuration
+\usepackage{sectsty}
+\allsectionsfont{\rmfamily}
+
+\begin{document}
+\setcounter{secnumdepth}{0} %% remove section heading numbering
+
+%s
+
+\end{document}
+''' % pdf.getLatex()
+
+        with open(texname,'w') as f:
+            f.write(latex_template)
+
+        pdflatex_cmd = 'pdflatex --shell-escape -interaction=nonstopmode \"%s\"' % texname
+
+        proc=subprocess.Popen(shlex.split(pdflatex_cmd))
+        proc.communicate()
+
+        os.unlink(filename[:-4] + '.tex')
+        os.unlink(filename[:-4] + '.log')
+        os.unlink(filename[:-4] + '.aux')
+        os.unlink(filename[:-4] + '.out')
+        
+        return send_file(filename, os.path.abspath(os.path.join(filename)), 'PDF')
 
 
 class RHAbstractToXML(RHAbstractModifBase):

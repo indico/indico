@@ -166,6 +166,14 @@ class AbstractToPDF(PDFBase):
         #c.drawString(0.5*inch, 0.5*inch, Config.getInstance().getBaseURL())
         c.restoreState()
 
+    def firstPageLatex(self):
+        conf_title = "\\centerline{\\rmfamily\\fontsize{30}{40}\\selectfont\n"
+        conf_title += "{\\bf %s}" % escape(self._conf.getTitle())
+        conf_title += "}\n\\vspace{25 mm}\n\n"
+
+        return conf_title
+
+
     def _getTrackText(self):
         text = i18nformat("""_("Track classification") : """)
         status=self._abstract.getCurrentStatus()
@@ -196,7 +204,6 @@ class AbstractToPDF(PDFBase):
         text = i18nformat(""" _("Abstract ID"): %s""") % self._abstract.getId()
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text, 12)
-        to_latex = text + "\n\n"
         story.append(p)
 
         story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
@@ -206,7 +213,6 @@ class AbstractToPDF(PDFBase):
         style.fontSize = 25
         style.leading = 30
         text = escape(self._abstract.getTitle())
-        to_latex += text + "\n\n"
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
 
@@ -219,6 +225,7 @@ class AbstractToPDF(PDFBase):
         style.fontName = "LinuxLibertine"
         style.fontSize = 9
         style.alignment = TA_JUSTIFY
+        #to_latex += "{\\fontfamily{\"LinuxLibertineO-LF\"}\\selectfont\n"
         #XXX:Not optimal, but the only way I've found to do it
         #l=self._abstract.getField("content").split("\n")
         #res=[]
@@ -240,7 +247,6 @@ class AbstractToPDF(PDFBase):
                 #styleHead.leftIndent = 45
                 text = "%s :" % name
                 #p = Paragraph(text, styleHead, part=escape(self._abstract.getTitle()))
-                to_latex += text + "\n\n" + value + "\n\n"
                 p = SimpleParagraph(text, spaceAfter = 5)
                 story.append(p)
                 #l=value.split("\n")
@@ -258,13 +264,10 @@ class AbstractToPDF(PDFBase):
         style.leftIndent = 80
         style.alignment = TA_JUSTIFY
         text = i18nformat("""<b> _("Primary authors")</b> : """)
-        to_latex += i18nformat("""{\\bf _("Primary authors")} : """)
         listAuthor = []
         for author in self._abstract.getPrimaryAuthorsList():
             listAuthor.append( "%s (%s)"%(escape(author.getFullName()), escape(author.getAffiliation()))  )
         text += " ; ".join(listAuthor)
-        to_latex += " ; ".join(listAuthor)
-        to_latex += "\n\n"
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
 
@@ -275,13 +278,10 @@ class AbstractToPDF(PDFBase):
         style.leftIndent = 35
         style.alignment = TA_JUSTIFY
         text = i18nformat("""<b> _("Co-authors")</b> : """)
-        to_latex += i18nformat("""{\\bf _("Co-authors")} : """)
         listAuthor = []
         for author in self._abstract.getCoAuthorList():
             listAuthor.append( "%s (%s)"%(escape(author.getFullName()), escape(author.getAffiliation()) )  )
         text += " ; ".join(listAuthor)
-        to_latex += " ; ".join(listAuthor)
-        #to_latex += "\n\n"
 
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
@@ -291,13 +291,11 @@ class AbstractToPDF(PDFBase):
         #style = ParagraphStyle({})
         #style.firstLineIndent = -45
         #style.leftIndent = 45
-        text = i18nformat("""_("Presenter"): """)
+        text = _("Presenter") + " : "
         listSpeaker= []
         for speaker in self._abstract.getSpeakerList():
             listSpeaker.append( "%s (%s)"%(escape(speaker.getFullName()), escape(speaker.getAffiliation()) )  )
         text += " ; ".join(listSpeaker)
-        to_latex += " ; ".join(listSpeaker)
-        to_latex += "\n\n"
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
@@ -315,7 +313,6 @@ class AbstractToPDF(PDFBase):
         if self._abstract.getContribType() is not None:
             tmp=self._abstract.getContribType().getName()
         text = i18nformat("""_("Contribution type") : %s""")%escape(tmp)
-        to_latex += text + "\n\n"
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
@@ -323,7 +320,6 @@ class AbstractToPDF(PDFBase):
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
         text = i18nformat("""_("Submitted by") : %s""")%escape(self._abstract.getSubmitter().getFullName())
-        to_latex += text + "\n\n"
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
@@ -331,7 +327,6 @@ class AbstractToPDF(PDFBase):
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
         text = i18nformat("""_("Submitted on") %s""")%self._abstract.getSubmissionDate().strftime("%A %d %B %Y")
-        to_latex += text + "\n\n"
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
@@ -339,7 +334,6 @@ class AbstractToPDF(PDFBase):
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
         text = i18nformat("""_("Last modified on") : %s""")%self._abstract.getModificationDate().strftime("%A %d %B %Y")
-        to_latex += text + "\n\n"
         #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         p = SimpleParagraph(text)
         story.append(p)
@@ -347,7 +341,6 @@ class AbstractToPDF(PDFBase):
         story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
 
         text = i18nformat("""_("Comments") : """)
-        to_latex += text + "\n\n"
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         #p = SimpleParagraph(text)
         story.append(p)
@@ -356,35 +349,105 @@ class AbstractToPDF(PDFBase):
         style.leftIndent = 40
         style.alignment = TA_JUSTIFY
         text = "%s"%escape(self._abstract.getComments())
-        to_latex += text + "\n\n"
         p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
         story.append(p)
 
+        return story
+
+
+    def getBodyLatex(self):
+        text = i18nformat(""" _("Abstract ID") : %s""") % \
+                self._abstract.getId()
+        story = "{\\rmfamily\\large\\selectfont\n \\noindent\n%s \
+                    \n}\n\n\\vspace{10 mm}\n\n" % text
+        
+        text = escape(self._abstract.getTitle())
+        story += "\\centerline{\\sffamily\\fontsize{25}{30}\
+                    \\selectfont\n %s \n}\n\n" % text
+        
         md = markdown.Markdown()
         latex_mdx = mdx_latex.LaTeXExtension()
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
         reload(sys)
         sys.setdefaultencoding("utf-8")
-        latex_template=r'''\documentclass{article}
-\usepackage[pdftex]{graphicx}
-\usepackage{float}
-\usepackage{amsmath}
-\usepackage[colorlinks = true,
-            linkcolor = blue,
-            urlcolor  = blue,
-            citecolor = blue,
-            anchorcolor = blue]{hyperref}
-\begin{document}
 
-%s
+        for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
+            id = field.getId()
+            name = field.getName()
+            value = self._abstract.getField(id).strip()
+            if value: #id not in ["content"] and
+                #p = Paragraph(text, styleHead, part=escape(self._abstract.getTitle()))
+                story += "\n\\vspace{10 mm}\n\\noindent\n \
+                            {\\normalsize\\selectfont %s :}\n" % name
+                story += "\\begingroup\n\\footnotesize\\selectfont\n"
+                story += "\n\n" + md.convert(value)[7:-7] + "\n\n"
+                story += "\\endgroup\n\n"
 
-\end{document}
-''' % md.convert(to_latex)[7:-7]
+        story += "\n\\vspace{10 mm}"
 
-        #print latex_template
-        return latex_template
-        #return story
+        story += "{\\bf {\\sffamily\\selectfont %s }}" % \
+                i18nformat(""" _("Primary authors") : """)
+        listAuthor = []
+        for author in self._abstract.getPrimaryAuthorsList():
+            listAuthor.append( "%s (%s)" % \
+                (escape(author.getFullName()), escape(author.getAffiliation())))
+        story += "{\\sffamily\\selectfont %s }" % \
+                " ; ".join(listAuthor)
+        story += "\n\\vspace{2 mm}\n\n"
+        
+        story += "{\\bf {\\sffamily\\selectfont %s }}" % \
+                i18nformat(""" _("Co-authors") : """)
+        listAuthor = []
+        for author in self._abstract.getCoAuthorList():
+            listAuthor.append( "%s (%s)" % \
+                (escape(author.getFullName()), escape(author.getAffiliation())))
+        story += "{\\sffamily\\selectfont %s }" % " ; ".join(listAuthor)
+        story += "\n\\vspace{2 mm}\n\n"
+
+        story += i18nformat("""_("Presenter") : \n\\vspace{2 mm}""")
+        listSpeaker= []
+        for speaker in self._abstract.getSpeakerList():
+            listSpeaker.append( "%s (%s)" % \
+                (escape(speaker.getFullName()), escape(speaker.getAffiliation())))
+        story += " ; ".join(listSpeaker)
+        story += "\n\n"
+        
+        story += "{\\sffamily\\selectfont %s}\n\\vspace{2 mm}\n\n" % \
+                self._getTrackText()
+        
+        tmp= i18nformat("""--_("not specified")--""")
+        if self._abstract.getContribType() is not None:
+            tmp=self._abstract.getContribType().getName()
+        text = i18nformat("""_("Contribution type") : %s""")%escape(tmp)
+        story += text + "\n\\vspace{2 mm}\n\n"
+        
+        text = i18nformat("""_("Submitted by") : %s""") % \
+                escape(self._abstract.getSubmitter().getFullName())
+        story += text + "\n\\vspace{2 mm}\n\n"
+        
+        text = i18nformat("""_("Submitted on") %s""") % \
+                self._abstract.getSubmissionDate().strftime("%A %d %B %Y")
+        story += text + "\n\\vspace{2 mm}\n\n"
+        
+        text = i18nformat("""_("Last modified on") : %s""") % \
+                self._abstract.getModificationDate().strftime("%A %d %B %Y")
+        story += text + "\n\\vspace{2 mm}\n\n"
+        
+        text = i18nformat("""_("Comments") : """)
+        story += "{\\sffamily\\selectfont %s}\n\n" % text
+        
+        text = "%s"%escape(self._abstract.getComments())
+        story += "\\hspace{15 mm} {\\sffamily\\selectfont %s}" % text
+
+        return story
+
+
+    def getLatex(self):
+        template = self.firstPageLatex()
+        template += self.getBodyLatex()
+
+        return template
 
 
 class AbstractsToPDF(PDFWithTOC):
@@ -454,6 +517,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
         status=self._abstract.getCurrentStatus()
         text= i18nformat("""_("Contribution type") : %s""")%escape(str(self._abstract.getContribType()))
         return text
+
 
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
         if not story:
@@ -527,6 +591,67 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
             p = SimpleParagraph(text, indent = 80)
             story.append(p)
+
+
+    def getContribBodyLatex(self):
+        story = AbstractToPDF.getBodyLatex(self)
+
+        story += "\n\\vspace{5 mm}\n\n"
+        status = self._abstract.getCurrentStatus()
+
+        if status.__class__ == review.AbstractStatusDuplicated:
+            original=status.getOriginal()
+            st = i18nformat(""" _("DUPLICATED") (%s : %s)""")%(original.getId(), original.getTitle())
+        elif status.__class__ == review.AbstractStatusMerged:
+            target=status.getTargetAbstract()
+            st = i18nformat(""" _("MERGED") (%s : %s)""")%(target.getId(), target.getTitle())
+        else:
+            st = AbstractStatusList.getInstance().getCaption( status.__class__ ).upper()
+        story += i18nformat("""_("Status") : %s""")%escape(st)
+
+        story += "\n\\vspace{5 mm}\n\n"
+
+        story += i18nformat("""_("Track judgments") :""")
+
+        for track in self._abstract.getTrackListSorted():
+            status = self._abstract.getTrackJudgement(track)
+            if status.__class__ == review.AbstractAcceptance:
+                contribType = ""
+                if status.getContribType() is not None:
+                    contribType = "(%s)" % status.getContribType().getName()
+                st = i18nformat(""" _("Proposed to accept") %s""") % (contribType)
+            elif status.__class__ == review.AbstractRejection:
+                st = _("Proposed to reject")
+            elif status.__class__ == review.AbstractInConflict:
+                st = _("Conflict")
+            elif status.__class__ == review.AbstractReallocation:
+                l = []
+                for track in status.getProposedTrackList():
+                    l.append(track.getTitle())
+                st = i18nformat(""" _("Proposed for other tracks") (%s)""") % ", ".join(l)
+            else:
+                st = ""
+
+            story += "\n\\vspace{5 mm}\n\n"
+
+            status = self._abstract.getCurrentStatus()
+            story += i18nformat("""_("Track") : %s""") % \
+                    escape(track.getTitle())
+
+            story += "\n\\vspace{1 mm}\n\n"
+
+            status = self._abstract.getCurrentStatus()
+            story += i18nformat("""_("Judgment") : %s""") % st
+
+        return story
+
+
+    def getLatex(self):
+        template = AbstractToPDF.firstPageLatex(self)
+        template += self.getContribBodyLatex()
+
+        return template
+
 
 class ConfManagerAbstractsToPDF(AbstractsToPDF):
 
@@ -696,6 +821,15 @@ class ContribToPDF(PDFBase):
         #c.drawString(0.5*inch, 0.5*inch, Config.getInstance().getBaseURL())
         c.restoreState()
 
+
+    def firstPageLatex(self):
+        conf_title = "\\centerline{\\rmfamily\\fontsize{30}{40}\\selectfont\n"
+        conf_title += "{\\bf %s}" % escape(self._conf.getTitle())
+        conf_title += "}\n\\vspace{25 mm}\n\n"
+
+        return conf_title
+
+
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
         if not story:
             story = self._story
@@ -839,6 +973,111 @@ class ContribToPDF(PDFBase):
 
         return story
 
+
+    def getBodyLatex(self):
+        text = i18nformat(""" _("Contribution ID") : %s""") % \
+                self._contrib.getId()
+        story = "{\\rmfamily\\large\\selectfont\n \\noindent\n%s \
+                    \n}\n\n\\vspace{10 mm}\n\n" % text
+        
+        text = escape(self._contrib.getTitle())
+        story += "\\centerline{\\sffamily\\fontsize{25}{30}\
+                    \\selectfont\n %s \n}\n\n" % text
+        
+        if self._contrib.isScheduled():
+            text = "%s (%s)" % (escape(self._contrib.getAdjustedStartDate(self._tz).strftime("%A %d %b %Y at %H:%M")),escape((datetime(1900,1,1)+self._contrib.getDuration()).strftime("%Hh%M'")))
+            story += text
+
+        story += "\n\\vspace{10 mm}"
+
+        md = markdown.Markdown()
+        latex_mdx = mdx_latex.LaTeXExtension()
+        latex_mdx.extendMarkdown(md, markdown.__dict__)
+
+        reload(sys)
+        sys.setdefaultencoding("utf-8")
+
+        for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
+            fid = field.getId()
+            name = field.getName()
+            value = self._contrib.getField(fid).strip()
+            if value: #id not in ["content"] and
+                story += "\n\\vspace{10 mm}\n\\noindent\n \
+                            {\\bf {\\sffamily\\normalsize\\selectfont %s :}}\n" % name
+                story += "\\begingroup\n\\footnotesize\\selectfont\n"
+                story += "\n\n" + md.convert(value)[7:-7] + "\n\n"
+                story += "\\endgroup\n\n"
+                story += "\n\\vspace{2 mm}"
+
+
+        story += "\n\\vspace{5 mm}"
+
+        story += "{\\bf {\\sffamily\\selectfont %s }}" % \
+                i18nformat(""" _("Primary authors") : """)
+        listAuthor = []
+        for author in self._contrib.getPrimaryAuthorsList():
+            listAuthor.append( "%s (%s)" % \
+            (escape(author.getFullName()), escape(author.getAffiliation())))
+        story += "{\\sffamily\\selectfont %s }" % \
+                " ; ".join(listAuthor)
+        story += "\n\\vspace{2 mm}\n\n"
+        
+        story += "{\\bf {\\sffamily\\selectfont %s }}" % \
+                i18nformat(""" _("Co-authors") : """)
+        listAuthor = []
+        for author in self._contrib.getCoAuthorList():
+            listAuthor.append( "%s (%s)" % \
+                (escape(author.getFullName()), escape(author.getAffiliation())))
+        story += "{\\sffamily\\selectfont %s }" % " ; ".join(listAuthor)
+        story += "\n\\vspace{2 mm}\n\n"
+
+        story += "{\\bf {\\sffamily\\selectfont %s }}" % \
+                i18nformat("""_("Presenter") : """)
+        story += "\n\\vspace{2 mm}"
+        listSpeaker= []
+        for speaker in self._contrib.getSpeakerList():
+            listSpeaker.append( "%s (%s)" % \
+                (escape(speaker.getFullName()), escape(speaker.getAffiliation())))
+        story += "{\\sffamily\\selectfont %s }" % \
+                 " ; ".join(listSpeaker)
+        story += "\n\\vspace{5 mm}\n\n"
+
+        session = self._contrib.getSession()
+        if session!=None:
+            sessiontitle = session.getTitle()
+        else:
+            sessiontitle = i18nformat("""{\\sffamily\\selectfont --_("not yet classified")--}""")
+        story += i18nformat("""{\\bf {\\sffamily\\selectfont _("Session classification") }} :  %s""") % \
+                    escape(sessiontitle)
+
+        story += "\n\\vspace{5 mm}\n\n"
+
+        track = self._contrib.getTrack()
+        if track!=None:
+            tracktitle = track.getTitle()
+        else:
+            tracktitle = i18nformat("""{\\sffamily\\selectfont --_("not yet classified")--}""")
+        story += i18nformat("""{\\bf {\\sffamily\\selectfont _("Track classification")}} :  %s """) % \
+                    escape(tracktitle)
+
+        story += "\n\\vspace{2 mm}\n\n"
+        
+        tmp=i18nformat("""{\\sffamily\\selectfont --_("not specified")--}""")
+        if self._contrib.getType():
+            tmp=self._contrib.getType().getName()
+        story += i18nformat("""{\\bf {\\sffamily\\selectfont _("Type")}} : %s""") % \
+                    escape(tmp)
+
+        return story
+
+
+    def getLatex(self):
+        template = self.firstPageLatex()
+        template += self.getBodyLatex()
+
+        return template
+
+
 class ConfManagerContribToPDF(ContribToPDF):
 
     def getBody(self, story=None, indexedFlowable={}, level=1 ):
@@ -849,6 +1088,12 @@ class ConfManagerContribToPDF(ContribToPDF):
         ContribToPDF.getBody(self, story, indexedFlowable, level )
 
         #add info for the conference manager
+
+    def getLatex(self):
+        template = ContribToPDF.firstPageLatex(self)
+        template += ContribToPDF.getBodyLatex(self)
+
+        return template
 
 
 class ContributionBook(PDFBase):
