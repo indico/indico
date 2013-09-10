@@ -44,7 +44,6 @@
 
         & input[type=text] {
             height: $thin-height;
-            line-height: $thin-line-height;
         }
     }
 
@@ -139,9 +138,12 @@
         }
 
         &.label {
-            border-right: none !important;
-            @include border-bottom-right-radius(0);
-            @include border-top-right-radius(0);
+
+            &:not(:last-child) {
+                @include border-bottom-right-radius(0);
+                @include border-top-right-radius(0);
+                border-right: none !important;
+            }
 
             & ~ .i-button:not(.hidden):first-of-type {
                 @include border-bottom-left-radius(0);
@@ -159,6 +161,12 @@
                 border-left-color: $gray;
             }
         }
+    }
+
+    & > input[type=text]:first-child,
+    & > .clearableinput:first-child input[type=text] {
+        @include border-bottom-left-radius();
+        @include border-top-left-radius();
     }
 
     & > input[type=text]:last-child,
