@@ -61,6 +61,16 @@
             });
         },
 
+        update: function(delayed) {
+            var self = this;
+
+            if (delayed) {
+                self._delayedCallback();
+            } else {
+                self._callback();
+            }
+        },
+
         validate: function() {
             var self = this;
             return self.options.validation(self.element);
