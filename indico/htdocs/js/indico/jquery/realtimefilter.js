@@ -20,8 +20,10 @@
 
         options: {
             callback: function() {},
+            validation: function(e) { return true; },
             clearable: true,
             emptyvalue: "",
+            invalidclass: "invalid",
             wait: 250
         },
 
@@ -30,15 +32,9 @@
             var element = self.element;
             var opt = self.options;
 
-            function delayedCallback() {
-                setTimeout(function() {
-                    opt.callback();
-                }, opt.wait);
-            }
-
             element.typeWatch({
                 callback: function() {
-                    opt.callback();
+                    self._callback();
                 },
                 wait: opt.wait,
                 highlight: false,
@@ -48,14 +44,14 @@
             if (opt.clearable) {
                 element.clearableinput({
                     callback: function() {
-                        delayedCallback();
+                        self._delayedCallback();
                     },
                     emptyvalue: opt.emptyvalue
                 });
             }
 
             element.on("cut paste", function() {
-                delayedCallback();
+                self._delayedCallback();
             });
 
             element.on("focusout", function() {
@@ -63,6 +59,32 @@
                     $(this).val(opt.emptyvalue);
                 }
             });
+        },
+
+        validate: function() {
+            var self = this;
+            return self.options.validation(self.element);
+        },
+
+        _callback: function() {
+            var self = this;
+            var element = self.element;
+            var opt = self.options;
+
+            if (opt.validation(element)) {
+                element.removeClass(opt.invalidclass);
+                opt.callback();
+            } else {
+                element.addClass(opt.invalidclass);
+            }
+        },
+
+        _delayedCallback: function() {
+            var self = this;
+
+            setTimeout(function() {
+                self._callback();
+            }, self.options.wait);
         }
     });
 })(jQuery);
