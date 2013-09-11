@@ -24,6 +24,7 @@
         options: {
             callback: function() {},
             clearClass: "clearableinput",
+            emptyvalue: "",
             focusAfter: true
         },
 
@@ -61,7 +62,7 @@
             var opt = self.options;
             var input = self.element;
 
-            input.val('').trigger("propertychange");
+            input.val(opt.emptyvalue).trigger("propertychange");
             if (opt.focusAfter) {
                 input.focus();
             } else {

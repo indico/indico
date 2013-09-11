@@ -21,40 +21,47 @@
         options: {
             callback: function() {},
             clearable: true,
+            emptyvalue: "",
             wait: 250
         },
 
         _create: function() {
             var self = this;
             var element = self.element;
-            var callback = self.options.callback;
-            var wait = self.options.wait;
+            var opt = self.options;
 
             function delayedCallback() {
                 setTimeout(function() {
-                    callback();
-                }, wait);
+                    opt.callback();
+                }, opt.wait);
             }
 
             element.typeWatch({
                 callback: function() {
-                    callback();
+                    opt.callback();
                 },
-                wait: wait,
-                highlight: true,
+                wait: opt.wait,
+                highlight: false,
                 captureLength: 0
             });
 
-            if (self.options.clearable) {
+            if (opt.clearable) {
                 element.clearableinput({
                     callback: function() {
                         delayedCallback();
-                    }
+                    },
+                    emptyvalue: opt.emptyvalue
                 });
             }
 
             element.on("cut paste", function() {
                 delayedCallback();
+            });
+
+            element.on("focusout", function() {
+                if ($(this).val() === "") {
+                    $(this).val(opt.emptyvalue);
+                }
             });
         }
     });
