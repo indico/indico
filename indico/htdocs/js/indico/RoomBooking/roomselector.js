@@ -230,7 +230,7 @@
                 .append($("<span class='i-button label'/>").text($T("Capacity")))
                 .append($("<span class='i-button label capacityslider'/>").css("width", "150px")
                     .append($("<span/>").slider({
-                        range: "max",
+                        range: "min",
                         min: 0,
                         max: self.options.roomMaxCapacity,
                         value: 1,
@@ -275,22 +275,40 @@
         _drawRooms: function() {
             var self = this;
 
-            var advancedImages = ["icon-camera", "icon-broadcast", "icon-unlocked", "icon-user"];
-            var advancedImagesTitles = ["Video conference", "Webcast/Recording", "Public room", "Capacity"];
+            var icons = ["icon-camera", "icon-broadcast", "icon-unlocked", "icon-user"];
+            var icontitles = ["Video conference available",
+                              "Webcast/Recording available",
+                              "Public room",
+                              "Maximum capacity"];
 
             self.select.find("option").each(function(index) {
-                var advLabelsParts = $(this).attr('label').split(":");
-                var html = '</br><div style="padding: 4px 0px 0px 20px; color: gray">';
-                for (var i = 0; i < advLabelsParts.length; i++){
-                    if (advLabelsParts[i] != 'None' && advLabelsParts[i].toLowerCase() !='false'){
-                        html += '<span class=' + advancedImages[i] + ' title=' + advancedImagesTitles[i] + '></span>';
-                        if (advLabelsParts[i].toLowerCase() != "true") {
-                            html += advLabelsParts[i];
+                var labelparts = $(this).attr('label').split(":");
+                var item = self.parts.list.find('input[value="' + $(this).val() +'"]').parent();
+                item.find("span").addClass("roomname");
+
+                var attributes = $("<span class='attributes'/>")
+                    .append($("<span class='icon-camera'/>"))
+                    .append($("<span class='icon-broadcast'/>"))
+                    .append($("<span class='icon-unlocked'/>"))
+                    .appendTo(item);
+
+                var capacity = $("<span class='capacity'/>")
+                    .append($("<span/>"))
+                    .append($("<i class='icon-user'/>"))
+                    .appendTo(item);
+
+                for (var i = 0; i < labelparts.length; i++) {
+                    if (labelparts[i] != 'None' && labelparts[i].toLowerCase() != 'false') {
+                        attributes.find("." + icons[i])
+                            .attr("title", icontitles[i])
+                            .addClass("active");
+
+                        if (!isNaN(labelparts[i])) {
+                            capacity.attr("title", icontitles[i])
+                                .find("span").text(labelparts[i]);
                         }
                     }
                 }
-                var label = $('.RoomBooking.ui-multiselect-menu input[value="' + $(this).val() +'"]').next();
-                $(label).html(label.text() + html);
             });
         },
 

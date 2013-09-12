@@ -1,0 +1,152 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty MERCHANTABILITY
+   of or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+#roomselector {
+    @include border-all();
+    @include border-radius();
+
+    & .ui-multiselect {
+        visibility: hidden;
+        border: none;
+        height: 0;
+        padding: 0;
+        width: 0 !important;
+    }
+
+    & .ui-multiselect-menu {
+        padding: 0px 0px 15px 0px;
+        width: auto !important;
+    }
+
+    & .ui-multiselect-header {
+        @include box-shadow(0 8px 8px -8px gray);
+        background: transparent !important;
+
+        & a:hover {
+            text-decoration: none;
+        }
+
+        & .capacityslider {
+            padding-left: 1em !important;
+            padding-right: 1em !important;
+
+            & .ui-slider {
+                display: inline-block !important;
+                width: 100% !important;
+            }
+        }
+    }
+
+    & .ui-multiselect-checkboxes label {
+        display: block;
+        border-left: 0;
+        border-right: 0;
+        border-top: 0;
+        border-bottom: 1px solid $gray;
+        cursor: pointer;
+        font-size: 1.3em;
+        font-weight: normal;
+        padding: 0;
+
+        &.ui-corner-all {
+            @include border-radius(0);
+        }
+
+        &.ui-state-hover {
+            background: $light-gray !important;
+            cursor: pointer;
+        }
+
+        &.ui-state-selected  {
+            background: $light-blue !important;
+        }
+
+        &.ui-state-active {
+            background: $light-blue !important;
+        }
+
+        & .roomname {
+            color: $black;
+        }
+
+        & .capacity {
+            color: $dark-gray;
+            float: right;
+            padding: 0px 8px;
+
+            & i {
+                padding-left: 8px;
+            }
+        }
+
+        & .attributes {
+            background: $light-blue;
+            float: right;
+            @include border-left();
+
+            & span {
+                color: white;
+                padding: 5px 8px;
+                vertical-align: middle;
+
+                &.active {
+                    color: $blue;
+                }
+            }
+        }
+    }
+
+    & .ui-multiselect-filter {
+        float: left;
+        margin-right: 0;
+        font-size: 1em;
+
+        & input {
+            width: 200px;
+        }
+    }
+
+    & .ui-multiselect-header .capacityslider {
+        padding-left: 1em !important;
+        padding-right: 1em !important;
+        width: 150px;
+
+        & .ui-slider {
+            margin-top: 3px;
+        }
+
+        & ~ input[type=text] {
+            width: 60px;
+        }
+    }
+
+    & .ui-multiselect-selection-counter {
+        color: $dark-gray;
+        float: left;
+        padding: 10px 0px 0px 10px;
+    }
+
+    & .ui-multiselect-selection-summary {
+        color: $dark-gray;
+        float: right;
+        padding: 10px 10px 0px 0px;
+    }
+}

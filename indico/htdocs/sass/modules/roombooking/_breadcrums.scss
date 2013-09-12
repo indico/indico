@@ -1,0 +1,87 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty MERCHANTABILITY
+   of or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+$background: lighten($gray, $color-variation);
+$current: lighten($blue, $color-variation);
+
+#breadcrumbs {
+    overflow: hidden;
+    width: 100%;
+
+    & li {
+        float: left;
+        margin: 0 .5em 0 1em;
+
+        &:first-child span:before {
+            border-width: 0px;
+        }
+        &:last-child span:after {
+            border-width: 0px;
+        }
+    }
+
+    & span {
+        border-radius: 5px;
+        background: $background;
+        padding: .7em 1em .7em 1em;
+        float: left;
+        position: relative;
+
+        &.current {
+            cursor: default;
+            background: $current;
+            padding: .7em 1em;
+            float: left;
+            position: relative;
+            font-weight: bold;
+
+            &:before {
+                border-color: $current $current $current transparent !important;
+            }
+
+            &:after {
+                border-left: 1.3em solid $current !important;
+            }
+        }
+
+        &:before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            margin-top: -1.5em;
+            border-width: 1.5em 0 1.5em 1.24em;
+            border-style: solid;
+            border-color: $background $background $background transparent;
+            left: -1em;
+        }
+
+        &:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            margin-top: -1.5em;
+            border-top: 1.5em solid transparent;
+            border-bottom: 1.5em solid transparent;
+            border-left: 1.3em solid $background;
+            right: -1em;
+        }
+    }
+}

@@ -1,0 +1,112 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty MERCHANTABILITY
+   of or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+.barLegend {
+    @include border-radius();
+
+    float: left;
+    position: relative;
+    height: 12px;
+    margin: 4px;
+    padding: 2px 5px 2px 5px;
+    font-weight: bold;
+    font-size: 80%;
+    color: white;
+
+    &:hover {
+        opacity: 1 !important;
+    }
+
+    &:first-of-type ~ & {
+        @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05));
+    }
+}
+
+.barDefault {
+    @include transition;
+    @include transition-property(opacity);
+    @include border-radius(5px);
+    @include border-all();
+    @include box-shadow(inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05));
+
+    position: absolute;
+    top: 2px;
+    height: 12px;
+
+    &:hover {
+        @extend .barDefaultHover;
+    }
+}
+
+.barDefaultHover {
+    border-color: #06F !important;
+    opacity:0.7;
+    filter:alpha(opacity=70);
+}
+
+.barCand {  /* Bar representing candidate reservation */
+    background-color: #5BB75B;
+    border-color: #51A351 #51A351 #387038;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barBlocked {
+    background-color: $light-black;
+    border-color: #51A351 #51A351 #387038;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barUnaval { /* Bar representing unavailable period */
+    background-color: #FAA732;
+    border-color: #F89406 #F89406 #AD6704;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barConf { /* Bar representing conflict */
+    background-color: #DA4F49;
+    border-color: #BD362F #BD362F #802420;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barPreB { /* Bar representing PRE-booking */
+    background-color: #F5E916;
+    border-color: #bcbc00;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barPreC { /* Bar representing conflict with PRE-booking */
+    background-color: #0074CC;
+    border-color: #05C #05C #003580;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barPreConc { /* Bar representing concurrent PRE-bookings */
+    background-color: #49AFCD;
+    border-color: #2F96B4 #2F96B4 #1F6377;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+
+.barProt.barCand {
+    background-image: none;
+    background-color: #DA4F49;
+    border-color: #BD362F #BD362F #802420;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}

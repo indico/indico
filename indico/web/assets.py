@@ -284,8 +284,9 @@ screen_sass = Bundle('sass/screen.scss',
                      depends=["sass/*.scss",
                               "sass/base/*.scss",
                               "sass/custom/*.scss",
+                              "sass/partials/*.scss",
                               "sass/modules/*.scss",
-                              "sass/partials/*.scss"])
+                              "sass/modules/roombooking/*.scss"])
 
 
 def register_all_js(env):

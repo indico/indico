@@ -19,6 +19,24 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+.ui-corner-all {
+    @include border-radius();
+}
+
 .ui-widget {
     @extend %font-family-body;
+}
+
+.ui-slider {
+    @include border-all(darken($light-gray, $color-variation));
+    background: $light-gray !important;
+
+    & .ui-slider-handle {
+        outline: none;
+        cursor: pointer;
+    }
+
+    & .ui-slider-range {
+        background: $blue !important;
+    }
 }
