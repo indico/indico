@@ -15,10 +15,6 @@
         // Init
         var isValid = true;
 
-        if (!$("#roomselector").roomselector("validate")) {
-          isValid = false;
-        }
-
         // Holidays warning
         if (!onlyLocal) {
             saveCalendarData($('#finishDate').val());
@@ -64,9 +60,11 @@
 
     $(window).on('load', function() {
 
-        $("#roomselector").roomselector({rooms: ${rooms | j, n},
+        $("#roomselector").roomselector({allowEmpty: false,
+                                         rooms: ${rooms | j, n},
                                          roomMaxCapacity: maxRoomCapacity,
-                                         rbUserData: rbUserData});
+                                         userData: rbUserData,
+                                         selectName: "roomGUID"});
 
         // Calendars init
         $("#sDatePlace, #eDatePlace").datepicker({
@@ -141,8 +139,7 @@
 
         // Listeners
         $('#searchForm').delegate(':input', 'change keyup', function() {
-            if (validateForm(false)){
-                $("#roomselector").roomselector("update");
+            if (validateForm(false)) {
                 updateTimeSlider();
             }
         }).submit(function(e) {
@@ -150,9 +147,8 @@
             if (!validateForm(true)) {
                 new AlertPopup($T("Error"), $T("There are errors in the form. Please correct fields with red background.")).open();
                 e.preventDefault();
-            }
-            else if($("#roomselector").roomselector("value") === null) {
-                new AlertPopup($T("Error"), $T("Please select a room (or several rooms)..")).open();
+            } else if (!$("#roomselector").roomselector("validate")) {
+                new AlertPopup($T("Error"), $T("Please select a room (or several rooms).")).open();
                 e.preventDefault();
             }
         });

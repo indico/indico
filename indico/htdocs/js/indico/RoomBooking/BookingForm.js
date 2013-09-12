@@ -97,14 +97,8 @@ function saveCalendarData(finishDate) {
 
 // Store all fields in local storage
 function saveFormData() {
-    // Prepare selected rooms
-    var selectedRooms = new Array();
-    $('.ui-multiselect-menu input:checkbox').each(function(index) {
-        if ($(this).attr('aria-selected') == "true") {
-            selectedRooms.push(index);
-        }
-    });
-
+    var selectedRooms = $("#roomselector").roomselector("selection");
+    var filterData = $("#roomselector").roomselector("userdata");
     saveCalendarData($('#finishDate').val());
 
     var rbDict = {"sDay": $("#sDay").val(),
@@ -115,13 +109,12 @@ function saveFormData() {
                   "eYear": $("#eYear").val(),
                   "sTime": $('#sTime').val(),
                   "eTime": $('#eTime').val(),
-                  "capacity": $('#capacity').val(),
-                  "videoconference": $('#videoconference').is(':checked'),
-                  "webcast": $('#webcast').is(':checked'),
-                  "publicroom": $('#publicroom').is(':checked'),
-                  "filter":  $('#roomselector .ui-multiselect-filter :input').val(),
+                  "capacity": filterData.capacity,
+                  "videoconference": filterData.videoconference,
+                  "webcast": filterData.webcast,
+                  "publicroom": filterData.publicroom,
+                  "filter":  filterData.search,
                   "selectedRooms":  selectedRooms,
-                  "showAdvancedOptions":  $('#advancedOptions').is(":visible"),
                   "finishDate": $('#finishDate').val(),
                   "flexibleDates": $('#flexibleDates').is(':checked'),
                   "flexibleDatesRange": $('#flexibleDatesRange').val(),

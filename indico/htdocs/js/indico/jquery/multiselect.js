@@ -15,8 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-// Indico roomBooking jquery.multiselect specific settings
-
 var oldcreate = $.ech.multiselect.prototype._create;
 
 $.extend($.ech.multiselect.prototype, {
