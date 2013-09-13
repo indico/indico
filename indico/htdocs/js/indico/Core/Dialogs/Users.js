@@ -1338,7 +1338,7 @@ type("UserListWidget", ["ListWidget"],
          }
      },
 
-     function(style, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons,userListField) {
+     function(style, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons, userListField) {
 
          this.style = any(style, "UIPeopleList");
          this.allowSetRights = allowSetRights;
@@ -1379,13 +1379,11 @@ type("UserListField", ["IWidget"], {
         this.userList.clearList();
     },
 
-    privilegesOn: function()
-    {
+    privilegesOn: function() {
         return $('#grant-manager').attr("checked") || $('#presenter-grant-submission').attr("checked");
     },
 
-    bothPrivilegesOn: function()
-    {
+    bothPrivilegesOn: function() {
         return $('#grant-manager').attr("checked") && $('#presenter-grant-submission').attr("checked");
     },
 
@@ -1393,17 +1391,18 @@ type("UserListField", ["IWidget"], {
         /* set up basic components : div containers for message , a checkbox list ,
            a list of messages and a warning counter.*/
 
-        this.warningList = new Array();
-        this.warningList[0] = ($T("Please note that you have added a user that does not exist in Indico.\
+        this.warning_no_indico = ($T("Please note that you have added a user that does not exist in Indico.\
                                     Non existing users will be asked via email to create an account so\
                                     that they will be able to use the privileges below."));
-        this.warningList[1] = ($T("Please note that you have added a user without an email. Users without \
+        this.warning_no_email = ($T("Please note that you have added a user without an email. Users without \
                                     email will not be contacted by Indico and therefore they will \
                                     not be able to use the privileges below."));
         this.divList = new Array();
         this.messageDiv = $("<div/>", {css: {height: '58px',
-                                            width: '420px',
-                                            textAlign: 'left'
+                                            maxWidth: '420px',
+                                            textAlign: 'left',
+                                            width: 'auto',
+                                            overflow: 'auto'
                                         }}).addClass("warningMessage");
         this.messageContainer = $("<div/>", {css: {display: 'inline-block', position: 'absolute'}});
         this.containerDiv = $("<div/>", {css: {height: '80px',
@@ -1434,19 +1433,19 @@ type("UserListField", ["IWidget"], {
         });
     },
 
-    check: function(user){
+    check: function(user) {
         var self = this;
 
-        if(keys(this.privileges).length>0){
-            if(this.privilegesOn()){
-            if(!user.get('email')){
-                this.appendMessage(this.warningList[1]);
+        if(keys(this.privileges).length>0) {
+            if(this.privilegesOn()) {
+            if(!user.get('email')) {
+                this.appendMessage(this.warning_no_email);
             }
-            else{
-                indicoRequest('search.users', {email:user.get('email')}, function(result, error){
-                if (!error){
-                    if (result.length == 0){
-                        self.appendMessage(self.warningList[0]);
+            else {
+                indicoRequest('search.users', {email:user.get('email')}, function(result, error) {
+                if (!error) {
+                    if (result.length == 0) {
+                        self.appendMessage(self.warning_no_indico);
                     }
                 }});
             }
@@ -1454,8 +1453,8 @@ type("UserListField", ["IWidget"], {
     },
 
     inform: function() {
-        if(keys(this.privileges).length>0){
-            if(!this.userList.isEmpty()){
+        if(keys(this.privileges).length>0) {
+            if(!this.userList.isEmpty()) {
                 this.checkList(this.userList.getAll());
             }
             else{
@@ -1550,7 +1549,7 @@ type("UserListField", ["IWidget"], {
         }
 
         // User privileges (submission privilege, etc.)
-        var privilegesDiv = $("<span/>").css("marginTop","10px");
+        var privilegesDiv = $("<span/>").css("marginTop", "10px");
         var keysList = keys(this.privileges);
         if (keysList.length>0) {
             privilegesDiv.append($("<span/>").html($T("Grant all these users with privileges: ")));
@@ -1568,14 +1567,16 @@ type("UserListField", ["IWidget"], {
                     return;
                 }
                 else{
-                    if(!self.warning_flag)self.inform();
+                    if(!self.warning_flag) {
+                        self.inform();
+                    }
                 }
             });
             $B(this.selectedPrivileges.accessor(key), checkbox);
             privilegesDiv.append($("<span/>").append(checkbox).append(value[0] + comma));
         }
 
-        var containsUserListDiv = $("<div/>").css("display","inline-block");
+        var containsUserListDiv = $("<div/>").css("display", "inline-block");
         containsUserListDiv.append($("<div/>").addClass(this.userDivStyle).html(this.userList.draw().dom));
         this.containerDiv.append(containsUserListDiv);
         return Widget.block([this.containerDiv.get(0), privilegesDiv.get(0), buttonDiv]);
