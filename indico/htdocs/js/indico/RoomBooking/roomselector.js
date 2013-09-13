@@ -90,9 +90,7 @@
                         room.hasWebcastRecording + ":" +
                         room.isPublic + ":" +
                         (room.capacity || Number(0)))
-                    .attr("name", room.bookingUrl)
                     .attr("value", room.guid)
-                    .addClass(room.type)
                     .html(room.locationName + " " + room.name)
                     .appendTo(self.select);
             });
@@ -274,6 +272,7 @@
 
         _drawRooms: function() {
             var self = this;
+            var rooms = self.options.rooms;
 
             var icons = ["icon-camera", "icon-broadcast", "icon-unlocked", "icon-user"];
             var icontitles = ["Video conference available",
@@ -285,6 +284,12 @@
                 var labelparts = $(this).attr('label').split(":");
                 var item = self.parts.list.find('input[value="' + $(this).val() +'"]').parent();
                 item.find("span").addClass("roomname");
+
+                var pic = $("<img src='" + rooms[index].thumbnailPhotoURL + "'/>")
+                    .prependTo(item);
+                if (rooms[index].hasPhoto) {
+                    pic.wrap($("<a href='" + rooms[index].tipPhotoURL + "' rel='lightbox'/>"));
+                }
 
                 var attributes = $("<span class='attributes'/>")
                     .append($("<span class='icon-camera'/>"))

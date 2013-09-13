@@ -83,6 +83,17 @@
             background: $light-blue !important;
         }
 
+        & img {
+            @include border-all();
+            height: 3em;
+            margin: 5px;
+            vertical-align: middle;
+        }
+
+        & input[type=checkbox] {
+            display: none;
+        }
+
         & .roomname {
             color: $black;
         }
