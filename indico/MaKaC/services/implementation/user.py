@@ -15,18 +15,19 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
+import time
+from hashlib import md5
 from flask import session
 
 from MaKaC.services.implementation.base import LoggedOnlyService, AdminService
 from MaKaC.services.implementation.base import ServiceBase
 
 import MaKaC.user as user
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError, Warning, ResultWithWarning
 
 from MaKaC.common import info
-from MaKaC.common.logger import Logger
-
-import time
+from MaKaC.common.Configuration import Config
 from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 
@@ -35,11 +36,14 @@ from MaKaC.rb_location import CrossLocationQueries
 from indico.util.i18n import getLocaleDisplayNames, availableLocales
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.services.implementation.base import ParameterManager
+from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 import MaKaC.common.indexes as indexes
 from MaKaC.common.utils import validMail
 from indico.util.redis import avatar_links
 from indico.web.http_api.auth import APIKey
+from indico.web.flask.util import url_for
+
 
 class UserComparator(object):
 
@@ -369,9 +373,13 @@ class UserSetPersonalData(UserPersonalDataBase):
         UserPersonalDataBase._checkParams(self)
         if (self._dataType == "surName" or self._dataType == "name" or self._dataType == "organisation"):
             self._value = self._pm.extract("value", pType=str, allowEmpty=False)
-        elif (self._dataType == "email"):
+        elif self._dataType == "email":
             self._value = self._pm.extract("value", pType=str, allowEmpty=False)
             if not validMail(self._value):
+                raise ServiceAccessError(_("The email address is not valid"))
+        elif self._dataType == "secondaryEmails":
+            self._value = self._pm.extract("value", pType=str, allowEmpty=True)
+            if  self._value and not validMail(self._value):
                 raise ServiceAccessError(_("The email address is not valid"))
         else:
             self._value = self._pm.extract("value", pType=str, allowEmpty=True)
@@ -386,6 +394,25 @@ class UserSetPersonalData(UserPersonalDataBase):
             self._value = self._value.replace(";",",")
             emailList = self._value.split(",")
             return emailList
+
+    def _sendSecondaryEmailNotifiication(self, email):
+        data = {}
+        data["toList"] = [email]
+        data["fromAddr"] = Config.getInstance().getSupportEmail()
+        data["subject"] = """[Indico] Verification of email '%s'""" % email
+        data["body"] = """Dear %s,
+
+You have added a new email to your secondary email list.
+
+In order to activate this new email new, please open on your web browser the following URL:
+
+%s
+
+Once you've done it, the email will appear in your profile and will be able to identify you.
+
+Best regards,
+Indico Team""" % (self._user.getStraightFullName(), url_for('user.userRegistration-validateSecondaryEmail', userId=self._user.getId(), key=md5(email).hexdigest(), _external=True))
+        GenericMailer.send(GenericNotification(data))
 
     def _getAnswer( self):
         if self._user:
@@ -416,16 +443,26 @@ class UserSetPersonalData(UserPersonalDataBase):
             elif self._dataType == "secondaryEmails":
                 emailList = self._buildEmailList()
                 secondaryEmails = []
+                newSecondaryEmailAdded = False
                 # check if every secondary email is valid
                 for sEmail in emailList:
                     if sEmail != "":
                         av = user.AvatarHolder().match({"email": sEmail}, searchInAuthenticators=False)
                         if av and av[0] != self._avatar:
                             raise NoReportError(_("The email address %s is already used by another user.") % sEmail)
-                        else:
+                        elif self._user.hasSecondaryEmail(sEmail):
                             secondaryEmails.append(sEmail)
+                        else:
+                            newSecondaryEmailAdded = True
+                            self._user.addPendingSecondaryEmail(sEmail)
+                            self._sendSecondaryEmailNotifiication(sEmail)
                 self._user.setSecondaryEmails(secondaryEmails, reindex=True)
-                return ", ".join(self._user.getSecondaryEmails())
+                if newSecondaryEmailAdded:
+                    warn = Warning (_("New secondary email added"), _("You will receive an email in order to confirm your new email."))
+                    return ResultWithWarning(", ".join(self._user.getSecondaryEmails()), warn).fossilize()
+                else:
+                    return ", ".join(self._user.getSecondaryEmails())
+
             elif self._dataType == "telephone":
                 self._user.setFieldSynced('phone', False)
                 self._user.setTelephone(self._value)
@@ -455,6 +492,21 @@ class UserSyncPersonalData(UserPersonalDataBase):
             setter = "set%s%s" % (self._dataType[0].upper(), self._dataType[1:])
             getattr(self._user, setter)(val)
         return dict(val=val)
+
+
+class UserAcceptSecondaryEmail(UserModifyBase):
+
+    def _checkParams(self):
+        UserModifyBase._checkParams(self)
+        self._secondaryEmail = self._params.get("secondaryEmail", None)
+
+    def _getAnswer(self):
+        av = user.AvatarHolder().match({"email": self._secondaryEmai}, forceWithoutExtAuth=True)
+        if av and av[0] != self._user:
+            raise NoReportError(_("The email address %s is already used by another user.") % self._secondaryEmai)
+        self._user.addSecondaryEmail(self._secondaryEmail)
+        return True
+
 
 class UserSetPersistentSignatures(UserModifyBase):
 
@@ -521,6 +573,7 @@ methodMap = {
     "setDisplayTimezone": UserSetDisplayTimezone,
     "setPersonalData": UserSetPersonalData,
     "syncPersonalData": UserSyncPersonalData,
+    "acceptSecondaryEmail": UserAcceptSecondaryEmail,
     "togglePersistentSignatures": UserSetPersistentSignatures,
     "createKeyAndEnablePersistent": UserCreateKeyEnablePersistent,
     "refreshRedisLinks": UserRefreshRedisLinks

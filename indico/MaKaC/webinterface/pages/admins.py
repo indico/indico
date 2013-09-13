@@ -38,6 +38,7 @@ from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
 from MaKaC.webinterface.pages.main import WPMainBase
+from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.common.pendingQueues import PendingSubmitterReminder, PendingManagerReminder, PendingCoordinatorReminder
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC import roomMapping
@@ -1482,6 +1483,20 @@ class WUserDetails(wcomponents.WTemplated):
             html.append(")</small></font>")
         return "".join(html)
 
+
+class WUserActiveSecondaryEmail(wcomponents.WTemplated):
+
+    def __init__(self, av, email):
+        self._avatar = av
+        self._email = email
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["user"] = self._avatar
+        vars["email"] = self._email
+        return vars
+
+
 class WPPersonalArea(WPUserBase):
 
     def _getBody( self, params ):
@@ -1545,6 +1560,18 @@ class WPUserDetails( WPPersonalArea ):
 
     def _setActiveTab( self ):
         self._tabDetails.setActive()
+
+
+class WPUserActiveSecondaryEmail(WPDecorated):
+
+    def __init__(self, rh, av, email):
+        WPDecorated.__init__(self, rh)
+        self._avatar = av
+        self._email = email
+
+    def _getBody(self, params):
+        c = WUserActiveSecondaryEmail(self._avatar, self._email)
+        return c.getHTML(params)
 
 
 class WPUserBaskets( WPPersonalArea ):

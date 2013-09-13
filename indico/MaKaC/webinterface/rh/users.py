@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import re
+from hashlib import md5
 from flask import session
 
 import MaKaC.webinterface.rh.base as base
@@ -286,6 +287,7 @@ class RHUserDetails( RHUserBase):
         p = adminPages.WPUserDetails( self, self._avatar )
         return p.display()
 
+
 class RHUserBaskets( RHUserBase ):
     _uh = urlHandlers.UHUserBaskets
 
@@ -485,3 +487,26 @@ class RHUserRemoveIdentity( RHUserIdentityBase ):
                 authManager.removeIdentity(identity)
                 self._avatar.removeIdentity(identity)
         self._redirect( urlHandlers.UHUserDetails.getURL( self._avatar ) )
+
+
+class RHActiveSecondaryEmail(base.RH):
+
+    _isMobile = False
+
+    def _checkParams(self, params):
+        base.RH._checkParams(self, params)
+        self._userId = params.get("userId", "").strip()
+        self._key = params.get("key", "").strip()
+
+    def _process(self):
+
+        av = user.AvatarHolder().getById(self._userId)
+
+        for  sMail in av.getPendingSecondaryEmails():
+            if md5(sMail).hexdigest() == self._key:
+                av.removePendingSecondaryEmail(sMail)
+                av.addSecondaryEmail(sMail)
+                p = adminPages.WPUserActiveSecondaryEmail(self, av, sMail)
+                return p.display()
+        else:
+            raise MaKaCError(_("The email has already being validated or the key is wrong"))

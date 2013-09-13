@@ -29,6 +29,23 @@
     float: left;
 }
 
+.center {
+    margin: 0px auto;
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
 .inline-vcentered {
     display: inline-block;
     vertical-align: middle;
