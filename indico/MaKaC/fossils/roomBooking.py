@@ -60,9 +60,9 @@ class IRoomMapFossil(IRoomFossil):
     def comments(self):
         """ Room comments """
 
-    def getGuid(self):
+    def guid(self):
         """GUID of the room"""
-    getGuid.produce = lambda x: str(x.guid)
+    guid.convert = lambda x: str(x)
 
     def responsibleId(self):
         """ ID of the responsible person for the room """

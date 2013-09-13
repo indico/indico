@@ -126,7 +126,7 @@
             var self = this;
 
             self.select.on("multiselectrefresh", function(event, ui) {
-                self.element.find(".ui-multiselect").html("");
+                self.element.find(".ui-multiselect").empty();
                 self._drawHeader();
                 self._drawRooms();
                 self._drawFooter();

@@ -499,17 +499,13 @@ class Room( Persistent, RoomBase, Fossilizable ):
     def getTipPhotoURL(self):
         """ URL of the tip photo of the room """
         from MaKaC.webinterface.urlHandlers import UHRoomPhoto
-        photoId = self._doGetPhotoId()
-        if not photoId:
-            photoId = "NoPhoto"
+        photoId = self._doGetPhotoId() or "NoPhoto"
         return str(UHRoomPhoto.getURL(photoId))
 
     def getThumbnailPhotoURL(self):
         """ URL of the tip photo of the room """
         from MaKaC.webinterface.urlHandlers import UHRoomPhotoSmall
-        photoId = self._doGetPhotoId()
-        if not photoId:
-            photoId = "NoPhoto"
+        photoId = self._doGetPhotoId() or "NoPhoto"
         return str(UHRoomPhotoSmall.getURL(photoId))
 
     def hasPhoto(self):
