@@ -70,6 +70,12 @@ class IRoomMapFossil(IRoomFossil):
     def getTipPhotoURL(self):
         """ URL of the tip photo of the room """
 
+    def getThumbnailPhotoURL(self):
+        """ URL of the thumbnail photo of the room """
+
+    def hasPhoto(self):
+        """Check if the room has picture"""
+
     def isActive(self):
         """ Is the room active? """
 

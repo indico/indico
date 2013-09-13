@@ -504,6 +504,17 @@ class Room( Persistent, RoomBase, Fossilizable ):
             photoId = "NoPhoto"
         return str(UHRoomPhoto.getURL(photoId))
 
+    def getThumbnailPhotoURL(self):
+        """ URL of the tip photo of the room """
+        from MaKaC.webinterface.urlHandlers import UHRoomPhotoSmall
+        photoId = self._doGetPhotoId()
+        if not photoId:
+            photoId = "NoPhoto"
+        return str(UHRoomPhotoSmall.getURL(photoId))
+
+    def hasPhoto(self):
+        return self._doGetPhotoId() is not None
+
     def getIsAutoConfirm(self):
         """ Has the room auto-confirmation of schedule? """
         return not self.resvsNeedConfirmation
