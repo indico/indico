@@ -227,13 +227,13 @@ def install_qtip2():
             local('cp dist/jquery.qtip.css {0}/'.format(dest_dir_css))
 
 
-@recipe('jquery-ui-multiselect-widget')
-def install_jquery_ui_multiselect_widget():
+@recipe('jquery-ui-multiselect')
+def install_jquery_ui_multiselect():
     """
     Install jquery ui multiselect widget from Git
     """
     with node_env():
-        with lcd(os.path.join(env.ext_dir, 'jquery-ui-multiselect-widget')):
+        with lcd(os.path.join(env.ext_dir, 'jquery-ui-multiselect')):
             dest_dir_js = lib_dir(env.src_dir, 'js')
             dest_dir_css = lib_dir(env.src_dir, 'css')
             local('mkdir -p {0} {1}'.format(dest_dir_js, dest_dir_css))
@@ -241,6 +241,7 @@ def install_jquery_ui_multiselect_widget():
             local('cp src/jquery.multiselect.filter.js {0}/'.format(dest_dir_js))
             local('cp jquery.multiselect.css {0}/'.format(dest_dir_css))
             local('cp jquery.multiselect.filter.css {0}/'.format(dest_dir_css))
+
 
 # Tasks
 

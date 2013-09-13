@@ -2,21 +2,18 @@
 	path = ext_modules/jquery
 	url = git://github.com/jquery/jquery.git
     ignore = dirty
-
 [submodule "ext_modules/compass"]
 	path = ext_modules/compass
 	url = git://github.com/chriseppstein/compass.git
     ignore = dirty
-
 [submodule "ext_modules/qtip2"]
 	path = ext_modules/qtip2
 	url = git://github.com/Craga89/qTip2.git
     ignore = dirty
-
 [submodule "ext_modules/underscore"]
 	path = ext_modules/underscore
 	url = git://github.com/documentcloud/underscore.git
     ignore = dirty
-[submodule "ext_modules/jquery-ui-multiselect-widget"]
-	path = ext_modules/jquery-ui-multiselect-widget
+[submodule "ext_modules/jquery-ui-multiselect"]
+	path = ext_modules/jquery-ui-multiselect
 	url = https://github.com/ehynds/jquery-ui-multiselect-widget.git

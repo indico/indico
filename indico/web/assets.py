@@ -79,7 +79,8 @@ indico_core = Bundle(
                'Services.js',
                'Util.js',
                'Login.js',
-               'Dragndrop.js'),
+               'Dragndrop.js',
+               'keymap.js'),
     filters='rjsmin', output='js/indico_core_%(version)s.min.js')
 
 indico_management = Bundle(
