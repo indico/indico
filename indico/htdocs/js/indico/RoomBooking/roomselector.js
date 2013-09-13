@@ -275,10 +275,10 @@
             var rooms = self.options.rooms;
 
             var icons = ["icon-camera", "icon-broadcast", "icon-unlocked", "icon-user"];
-            var icontitles = ["Video conference available",
-                              "Webcast/Recording available",
-                              "Public room",
-                              "Maximum capacity"];
+            var icontitles = [$T("Video conference available"),
+                              $T("Webcast/Recording available"),
+                              $T("Public room"),
+                              $T("Maximum capacity")];
 
             self.select.find("option").each(function(index) {
                 var labelparts = $(this).attr('label').split(":");
