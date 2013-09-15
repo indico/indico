@@ -354,17 +354,22 @@ class AbstractToPDF(PDFBase):
 
         return story
 
-
-    def getBodyLatex(self):
+    def getHeaderLatex(self):
         text = i18nformat(""" _("Abstract ID") : %s""") % \
                 self._abstract.getId()
-        story = "{\\rmfamily\\large\\selectfont\n \\noindent\n%s \
+        header = "{\\rmfamily\\large\\selectfont\n \\noindent\n%s \
                     \n}\n\n\\vspace{10 mm}\n\n" % text
         
         text = escape(self._abstract.getTitle())
-        story += "\\centerline{\\sffamily\\fontsize{25}{30}\
+        header += "\\centerline{\\sffamily\\fontsize{25}{30}\
                     \\selectfont\n %s \n}\n\n" % text
-        
+
+        return header
+
+
+    def getBodyLatex(self):
+        story = ""
+
         md = markdown.Markdown()
         latex_mdx = mdx_latex.LaTeXExtension()
         latex_mdx.extendMarkdown(md, markdown.__dict__)
@@ -445,6 +450,7 @@ class AbstractToPDF(PDFBase):
 
     def getLatex(self):
         template = self.firstPageLatex()
+        template += self.getHeaderLatex()
         template += self.getBodyLatex()
 
         return template
@@ -477,6 +483,18 @@ class AbstractsToPDF(PDFWithTOC):
         c.drawString(0.5*inch, 0.5*inch, str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
         c.restoreState()
 
+
+    def firstPageLatex(self):
+        first_page = "\\centerline{\\rmfamily\\fontsize{30}{40}\\selectfont\n"
+        first_page += "{\\bf %s}" % escape(self._conf.getTitle())
+        first_page += "}\n\\vspace{90 mm}\n\n"
+        first_page += "\\centerline{\\rmfamily\\fontsize{35}{45}\\selectfont\n"
+        first_page += "{\\bf %s}" % self._title
+        first_page += "}\n\\newpage\n\n"
+
+        return first_page
+
+
     def laterPages(self, c, doc):
 
         c.saveState()
@@ -501,6 +519,34 @@ class AbstractsToPDF(PDFWithTOC):
             temp = AbstractToPDF(self._conf, abMgr.getAbstractById(abstract), tz=self._tz)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
+
+
+    def getBodyLatex(self):
+        abMgr = self._conf.getAbstractMgr()
+        body = ""
+        for abstract in self._abstracts:
+            temp = AbstractToPDF(self._conf, abMgr.getAbstractById(abstract), tz=self._tz)
+            #abstract_title = () + abMgr.getAbstractById(abstract).getTitle() * 3
+            abstract_title = abMgr.getAbstractById(abstract).getTitle()
+            abstract_id = i18nformat(""" _("Abstract ID") : %s""") % abstract
+            body +=r'''
+\newpage
+\fancyhead[R]{\small \selectfont \color{gray} %s}
+
+\chapter*{%s}
+\addcontentsline{toc}{chapter}{%s}
+
+{\rmfamily \large \selectfont
+\noindent
+%s
+}
+
+\vspace{10 mm}
+
+%s
+            ''' % (abstract_title, abstract_title, abstract_title, abstract_id, temp.getBodyLatex())
+
+        return body
 
 
 class ConfManagerAbstractToPDF(AbstractToPDF):

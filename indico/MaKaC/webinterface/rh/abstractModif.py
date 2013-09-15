@@ -141,11 +141,13 @@ class RHAbstractToPDF(RHAbstractModifBase):
 \usepackage{amsmath} %% math equations
 \usepackage{float} %% improved interface for floating objects
 \usepackage{times} %% font family
+\usepackage[usenames,dvipsnames]{xcolor}
 \usepackage[pdftex,
             final,
             pdfstartview = FitV,
-            linktocpage  = false,
-            breaklinks   = true]{hyperref}  %% hyperlinks configuration
+            colorlinks = true, 
+            urlcolor = Violet,
+            breaklinks = true]{hyperref}  %% hyperlinks configuration
 \usepackage{sectsty}
 \allsectionsfont{\rmfamily}
 
