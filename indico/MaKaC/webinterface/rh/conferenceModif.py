@@ -75,6 +75,7 @@ from indico.modules.scheduler import Client
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.flask.util import send_file
+import subprocess, shlex, os
 
 
 class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
@@ -1968,7 +1969,92 @@ class RHAbstractsToPDF(RHConfModifCFABase):
         if not self._abstractIds:
             return _("No abstract to print")
         pdf = ConfManagerAbstractsToPDF(self._conf, self._abstractIds, tz=tz)
-        return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF')
+
+        filename = 'Abstracts.pdf'
+        texname = 'Abstracts.tex'
+
+        latex_template = r'''
+\batchmode %% suppress output
+\documentclass[a4paper, 11pt, oneside]{book} %% document type
+\textwidth = 440pt
+\hoffset = -40pt %% - inch
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc} %% http://tex.stackexchange.com/questions/44694/fontenc-vs-inputenc
+\usepackage[final, babel]{microtype} %% texblog.net/latex-archive/layout/pdflatex-microtype/
+\usepackage[export]{adjustbox} %% images
+\usepackage{amsmath} %% math equations
+\usepackage{float} %% improved interface for floating objects
+\usepackage{times} %% font family
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[pdftex,
+            final,
+            pdfstartview = FitV,
+            colorlinks = true, 
+            urlcolor = Violet,
+            breaklinks = true]{hyperref}  %% hyperlinks configuration
+\usepackage{tocloft} %% table of contents
+\usepackage{sectsty} %% default font family
+\allsectionsfont{\rmfamily} %% default font family
+\usepackage{titlesec}
+\titleformat{\chapter}
+  {\sffamily \fontsize{25}{30} \selectfont \centering}{\thechapter.}{1em}{}
+\usepackage{fancyhdr} %% headers
+\pagestyle{fancyplain} { %% define first page header and footer
+\fancyhead[L]{}
+\fancyhead[C]{}
+\fancyhead[R]{}
+\fancyfoot[L]{}
+\fancyfoot[C]{}
+\fancyfoot[R]{}
+}
+
+\renewcommand{\headrulewidth}{0pt}
+
+\begin{document}
+\setcounter{secnumdepth}{0} %% remove section heading numbering
+\setcounter{tocdepth}{0} %% remove table of contents numbering
+
+%s
+
+\begingroup
+\hypersetup{linkcolor=black}
+\renewcommand{\contentsname}{\centerline{\fontsize{18}{20}\selectfont Table of contents}}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\tableofcontents
+\endgroup
+
+\newpage
+\fancyhead[L]{\small \selectfont \color{gray} %s / Abstracts Book}
+\fancyhead[C]{}
+\fancyhead[R]{}
+\fancyfoot[L]{\small \selectfont \color{gray} \today}
+\fancyfoot[C]{}
+\fancyfoot[R]{\small \selectfont \color{gray} %s \thepage}
+
+%s
+
+\end{document}
+        ''' % (pdf.firstPageLatex(), self._target.getTitle(), i18nformat(""" _("Page") """), pdf.getBodyLatex())
+
+        with open(texname,'w') as f:
+            f.write(latex_template)
+
+        pdflatex_cmd = 'pdflatex --shell-escape \"%s\"' % texname
+
+        proc=subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE)
+        proc.communicate()
+
+        proc=subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE)
+        proc.communicate()
+
+        os.unlink(filename[:-4] + '.tex')
+        os.unlink(filename[:-4] + '.log')
+        os.unlink(filename[:-4] + '.aux')
+        os.unlink(filename[:-4] + '.out')
+        os.unlink(filename[:-4] + '.toc')
+
+        return send_file(filename, os.path.abspath(os.path.join(filename)), 'PDF')
+        #return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF')
 
 
 class RHAbstractsToXML(RHConfModifCFABase):

@@ -709,6 +709,33 @@ class ConfManagerAbstractsToPDF(AbstractsToPDF):
             self._story.append(PageBreak())
 
 
+    def getBodyLatex(self):
+        abMgr = self._conf.getAbstractMgr()
+        body = ""
+        for abstract in self._abstracts:
+            temp = ConfManagerAbstractToPDF(self._conf, abMgr.getAbstractById(abstract),tz=self._tz)
+            abstract_title = abMgr.getAbstractById(abstract).getTitle()
+            abstract_id = i18nformat(""" _("Abstract ID") : %s""") % abstract
+            body +=r'''
+\newpage
+\fancyhead[R]{\small \selectfont \color{gray} %s}
+
+\chapter*{%s}
+\addcontentsline{toc}{chapter}{%s}
+
+{\rmfamily \large \selectfont
+\noindent
+%s
+}
+
+\vspace{10 mm}
+
+%s
+            ''' % (abstract_title, abstract_title, abstract_title, abstract_id, temp.getBodyLatex())
+
+        return body
+
+
 class TrackManagerAbstractToPDF(AbstractToPDF):
 
     def __init__(self, conf, abstract, track, doc=None, story=None, tz=None):
@@ -1020,16 +1047,21 @@ class ContribToPDF(PDFBase):
         return story
 
 
-    def getBodyLatex(self):
+    def getHeaderLatex(self):
         text = i18nformat(""" _("Contribution ID") : %s""") % \
                 self._contrib.getId()
-        story = "{\\rmfamily\\large\\selectfont\n \\noindent\n%s \
+        header = "{\\rmfamily\\large\\selectfont\n \\noindent\n%s \
                     \n}\n\n\\vspace{10 mm}\n\n" % text
         
         text = escape(self._contrib.getTitle())
-        story += "\\centerline{\\sffamily\\fontsize{25}{30}\
+        header += "\\centerline{\\sffamily\\fontsize{25}{30}\
                     \\selectfont\n %s \n}\n\n" % text
-        
+
+        return header
+
+
+    def getBodyLatex(self):
+        story = ""
         if self._contrib.isScheduled():
             text = "%s (%s)" % (escape(self._contrib.getAdjustedStartDate(self._tz).strftime("%A %d %b %Y at %H:%M")),escape((datetime(1900,1,1)+self._contrib.getDuration()).strftime("%Hh%M'")))
             story += text
@@ -1119,6 +1151,7 @@ class ContribToPDF(PDFBase):
 
     def getLatex(self):
         template = self.firstPageLatex()
+        template += self.getHeaderLatex()
         template += self.getBodyLatex()
 
         return template
@@ -1138,6 +1171,11 @@ class ConfManagerContribToPDF(ContribToPDF):
     def getLatex(self):
         template = ContribToPDF.firstPageLatex(self)
         template += ContribToPDF.getBodyLatex(self)
+
+        return template
+
+    def getBodyLatex(self):
+        template = ContribToPDF.getBodyLatex(self)
 
         return template
 
@@ -1331,13 +1369,52 @@ class ContribsToPDF(PDFWithTOC):
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 
+
 class ConfManagerContribsToPDF(ContribsToPDF):
+
+    def firstPageLatex(self):
+        first_page = "\\centerline{\\rmfamily\\fontsize{30}{40}\\selectfont\n"
+        first_page += "{\\bf %s}" % escape(self._conf.getTitle())
+        first_page += "}\n\\vspace{90 mm}\n\n"
+        first_page += "\\centerline{\\rmfamily\\fontsize{35}{45}\\selectfont\n"
+        first_page += "{\\bf %s}" % self._title
+        first_page += "}\n\\newpage\n\n"
+
+        return first_page
+
 
     def getBody(self):
         for contrib in self._contribs:
             temp = ConfManagerContribToPDF(self._conf, contrib,tz=self._tz)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
+
+
+    def getBodyLatex(self):
+        body = ""
+        for contrib in self._contribs:
+            temp = ConfManagerContribToPDF(self._conf, contrib,tz=self._tz)
+            #contrib_title = () + escape(self._contrib.getTitle()) * 3
+            contrib_title = contrib.getTitle()
+            contrib_id = i18nformat(""" _("Contribution ID") : %s""") % contrib.getId()
+            body += r'''
+\newpage
+\fancyhead[R]{\small \selectfont \color{gray} %s}
+
+\chapter*{%s}
+\addcontentsline{toc}{chapter}{%s}
+
+{\rmfamily \large \selectfont
+\noindent
+%s
+
+%s
+
+}
+            ''' % (contrib_title, contrib_title, contrib_title, contrib_id, temp.getBodyLatex())
+
+        return body
+
 
 class TimetablePDFFormat:
 
