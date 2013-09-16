@@ -46,7 +46,7 @@ $(document).ready(function() {
 
     $('.contextHelp[title]').qtip();
 
-    $(document).on("mouseenter", '.i-button[title]', function(event) {
+    $(document).on("mouseenter", '[title]', function(event) {
         $(this).qtip({
             overwrite: false,
             show: {
