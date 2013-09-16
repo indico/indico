@@ -46,14 +46,21 @@ $(document).ready(function() {
 
     $('.contextHelp[title]').qtip();
 
-    $('.i-button[title]').qtip({
-        events: {
-            show: function(event) {
-                if ($(event.originalEvent.target).hasClass('open')) {
-                    event.preventDefault();
+    $(document).on("mouseenter", '.i-button[title]', function(event) {
+        $(this).qtip({
+            overwrite: false,
+            show: {
+                event: event.type,
+                ready: true
+            },
+            events: {
+                show: function(event) {
+                    if ($(event.originalEvent.target).hasClass('open')) {
+                        event.preventDefault();
+                    }
                 }
             }
-        }
+        }, event);
     });
 
     $('.contextHelp[data-src]').qtip({
