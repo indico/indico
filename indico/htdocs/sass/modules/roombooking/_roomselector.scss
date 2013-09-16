@@ -34,6 +34,7 @@
     & .ui-multiselect-menu {
         padding: 0px 0px 15px 0px;
         width: auto !important;
+        z-index: auto;
     }
 
     & .ui-multiselect-header {
@@ -83,15 +84,27 @@
             background: $light-blue !important;
         }
 
-        & img {
-            @include border-all();
-            height: 3em;
-            margin: 5px;
-            vertical-align: middle;
+        & input {
+            visibility: hidden;
+            margin: 0;
+            padding: 0;
+            width: 0;
         }
 
-        & input[type=checkbox] {
-            display: none;
+        & .roompicture {
+            display: inline-block;
+            margin: 5px;
+            outline: none;
+
+            & img {
+                @include box-sizing(border-box);
+                height: 2em;
+                vertical-align: middle;
+
+                &.active {
+                    @include border-all();
+                }
+            }
         }
 
         & .roomname {
@@ -100,7 +113,10 @@
 
         & .capacity {
             color: $dark-gray;
+            display: inline-block;
             float: right;
+            height: 40px;
+            line-height: 40px;
             padding: 0px 8px;
 
             & i {
@@ -109,9 +125,12 @@
         }
 
         & .attributes {
-            background: $light-blue;
-            float: right;
             @include border-left();
+            background: $light-blue;
+            display: inline-block;
+            float: right;
+            height: 40px;
+            line-height: 40px;
 
             & span {
                 color: white;

@@ -33,6 +33,7 @@
             self._initWidget();
             self._draw();
             self._setBindings();
+            self._enableColorbox();
         },
 
         destroy: function() {
@@ -100,7 +101,7 @@
             var self = this;
 
             self.select.multiselect({
-                height: 255,
+                height: 355,
                 checkAllText: 'All',
                 uncheckAllText: 'None',
                 noneSelectedText: '0 selected',
@@ -166,6 +167,14 @@
 
             self.parts.list.on("mouseleave", function() {
                 $(this).find('label').removeClass('ui-state-hover');
+            });
+        },
+
+        _enableColorbox: function() {
+            var self = this;
+            self.widget.find("a[rel='lightbox']").colorbox({
+                maxHeight: '90%',
+                returnFocus: false
             });
         },
 
@@ -285,10 +294,15 @@
                 var item = self.parts.list.find('input[value="' + $(this).val() +'"]').parent();
                 item.find("span").addClass("roomname");
 
-                var pic = $("<img src='" + rooms[index].thumbnailPhotoURL + "'/>")
+                var pic = $("<a class='roompicture'/>")
+                    .append($("<img src='" + rooms[index].thumbnailPhotoURL + "'/>"))
                     .prependTo(item);
                 if (rooms[index].hasPhoto) {
-                    pic.wrap($("<a href='" + rooms[index].tipPhotoURL + "' rel='lightbox'/>"));
+                    pic.find("img")
+                        .attr("title", $T("Expand picture"))
+                        .addClass("active");
+                    pic.attr("href", rooms[index].tipPhotoURL);
+                    pic.attr("rel", "lightbox");
                 }
 
                 var attributes = $("<span class='attributes'/>")
