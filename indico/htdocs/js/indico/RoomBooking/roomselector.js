@@ -118,7 +118,7 @@
 
             self.widget = self.select.multiselect("widget");
             self.parts = {};
-            self.parts.list = self.widget.find(".ui-multiselect-checkboxes");
+            self.parts.list = self.widget.find(".ui-multiselect-checkboxes").scrollblocker();
             self.parts.header = self.widget.find(".ui-widget-header");
         },
 
