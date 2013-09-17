@@ -20,26 +20,30 @@
 */
 
 #roomselector {
+    $border-color: lighten($gray, $color-variation);
+
     @include border-all();
     @include border-radius();
-
-    & .ui-multiselect {
-        visibility: hidden;
-        border: none;
-        height: 0;
-        padding: 0;
-        width: 0 !important;
-    }
+    @include box-shadow(2px 2px 2px 0px rgba(100, 100, 100, 0.2));
+    max-width: 1000px;
+    min-width: 900px;
 
     & .ui-multiselect-menu {
-        padding: 0px 0px 15px 0px;
+        top: 0 !important;
         width: auto !important;
         z-index: auto;
     }
 
     & .ui-multiselect-header {
-        @include box-shadow(0 8px 8px -8px gray);
+        @include box-shadow(0 2px 2px 0px rgba(100, 100, 100, 0.2));
         background: transparent !important;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+
+        &.ui-corner-all {
+            @include border-radius(0);
+        }
 
         & a:hover {
             text-decoration: none;
@@ -72,130 +76,159 @@
         }
     }
 
-    & .ui-multiselect-checkboxes label {
-        display: block;
-        border-left: 0;
-        border-right: 0;
-        border-top: 0;
-        border-bottom: 1px solid $gray;
-        cursor: pointer;
-        font-size: 1.3em;
-        font-weight: normal;
-        padding: 0;
-
-        &.ui-corner-all {
-            @include border-radius(0);
+    & .ui-multiselect-checkboxes {
+        & li:last-child label{
+            border-bottom: none;
         }
 
-        &:hover {
-            background: $light-gray !important;
+        & label {
+            @include user-select(none);
+            display: block;
+            border-left: none;
+            border-right: none;
+            border-top: none;
+            border-bottom: 1px solid $border-color;
             cursor: pointer;
-        }
-
-        &.ui-state-active,
-        &.ui-state-hover,
-        &.ui-state-selected {
-            background: white;
-        }
-
-        & input {
-            visibility: hidden;
-            margin: 0;
+            font-size: 1.3em;
+            font-weight: normal;
             padding: 0;
-            width: 0;
-        }
 
-        & .checkbox {
-            @include transition;
-            @include transition-property(color, width);
-            background: $blue;
-            color: $blue;
-            display: inline-block;
-            height: 25px;
-            line-height: 25px;
-            text-align: center;
-            vertical-align: middle;
-            width: 5px;
-        }
+            &.ui-corner-all {
+                @include border-radius(0);
+            }
 
-        &:hover .checkbox,
-        &.ui-state-selected .checkbox {
-            width: 30px;
-        }
+            &:hover {
+                background: $light-gray !important;
+                cursor: pointer;
+            }
 
-        &.ui-state-selected .checkbox {
-            @include before-icon("\4d");
-            background: $blue;
-            color: white;
-        }
+            &.ui-state-active,
+            &.ui-state-hover,
+            &.ui-state-selected {
+                background: white;
+            }
 
-        & .roompicture {
-            display: inline-block;
-            margin: 5px;
-            outline: none;
-            cursor: nesw-resize;
+            & input {
+                visibility: hidden;
+                margin: 0;
+                padding: 0;
+                width: 0;
+            }
 
-            & img {
-                @include box-sizing(border-box);
+            & .checkbox {
+                @include transition;
+                @include transition-property(background, color, width);
+                background: $gray;
+                color: $blue;
+                display: inline-block;
                 height: 2em;
+                line-height: 2em;
+                text-align: center;
                 vertical-align: middle;
-
-                &.active {
-                    @include border-all();
-                }
+                width: 5px;
             }
-        }
 
-        & .roomname {
-            color: $black;
-            display: inline-block;
-            max-width: 590px;
-            overflow: hidden;
-            white-space: nowrap;
-        }
-
-        & .capacity {
-            color: $dark-gray;
-            display: inline-block;
-            float: right;
-            height: 40px;
-            line-height: 40px;
-            padding: 0px 8px;
-
-            & i {
-                padding-left: 8px;
+            &:hover .checkbox,
+            &.ui-state-selected .checkbox {
+                background: $blue;
             }
-        }
 
-        & .attributes {
-            @include border-left();
-            background: $light-blue;
-            display: inline-block;
-            float: right;
-            height: 40px;
-            line-height: 40px;
-
-            & span {
+            &.ui-state-selected .checkbox {
+                @include before-icon("\4d");
+                background: $blue;
                 color: white;
-                padding: 5px 8px;
-                vertical-align: middle;
+                width: 35px;
+            }
 
-                &.active {
-                    color: $blue;
+            & .roompicture {
+                display: inline-block;
+                margin: 5px;
+                outline: none;
+
+                & img {
+                    @include box-sizing(border-box);
+                    height: 2em;
+                    vertical-align: middle;
+                    opacity: 0.5;
+
+                    &.active {
+                        @include border-all();
+                        opacity: 1;
+
+                        &:hover {
+                            @include box-shadow(0 0 1px 1px rgba(100, 100, 100, 0.2));
+                            border-color: $blue;
+                        }
+                    }
+                }
+            }
+
+            & .roomname {
+                color: $black;
+                display: inline-block;
+                max-width: 590px;
+                overflow: hidden;
+                white-space: nowrap;
+
+                & .location {
+                    color: $gray;
+                    font-size: 0.8em;
+                    padding-left: 0.5em;
+                }
+            }
+
+            & .capacity {
+                color: $dark-gray;
+                display: inline-block;
+                float: right;
+                height: 40px;
+                line-height: 40px;
+                padding: 0px 8px;
+
+                & i {
+                    padding-left: 8px;
+                }
+            }
+
+            & .attributes {
+                @include border-left($border-color);
+                background: $light-gray;
+                cursor: default;
+                display: inline-block;
+                float: right;
+                height: 40px;
+                line-height: 40px;
+
+                & span {
+                    color: darken($light-gray, $color-variation);
+                    padding: 5px 8px;
+                    vertical-align: middle;
+
+                    &.active {
+                        color: $blue;
+                    }
                 }
             }
         }
     }
 
-    & .ui-multiselect-selection-counter {
-        color: $dark-gray;
-        float: left;
-        padding: 10px 0px 0px 10px;
-    }
+    & .ui-widget-footer {
+        @include box-shadow(0 -2px 2px 0px rgba(100, 100, 100, 0.2));
+        font-weight: bold;
+        padding: 5px 5px;
+        position: relative;
+        overflow: auto;
+        z-index: 1;
 
-    & .ui-multiselect-selection-summary {
-        color: $dark-gray;
-        float: right;
-        padding: 10px 10px 0px 0px;
+        & .ui-multiselect-selection-counter {
+            color: $dark-gray;
+            float: left;
+        }
+
+        & .ui-multiselect-selection-summary {
+            color: $dark-gray;
+            float: right;
+        }
+
     }
 }

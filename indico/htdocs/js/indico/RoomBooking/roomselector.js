@@ -92,7 +92,8 @@
                         room.isPublic + ":" +
                         (room.capacity || Number(0)))
                     .attr("value", room.guid)
-                    .html(room.locationName + " " + room.name)
+                    .append($("<span/>").text(room.name))
+                    .append($("<span class='location'/>").text(" (" + room.locationName + ")"))
                     .appendTo(self.select);
             });
         },
@@ -117,6 +118,7 @@
                 placeholder: $T('Filter rooms')
             }).multiselectfilter('advancedFilter');
 
+            self.element.find("button").css("display", "none");
             self.widget = self.select.multiselect("widget");
             self.parts = {};
             self.parts.list = self.widget.find(".ui-multiselect-checkboxes").scrollblocker();
@@ -143,26 +145,21 @@
 
             select.on("multiselectclick", function(event, ui) {
                 self._changestyle(self.parts.list.find('input[value="' + ui.value + '"]'));
-                self._updateCounter();
+                self._updateSelectionCounter();
             });
 
             select.on("multiselectcheckall", function(event, ui) {
                 self._changeSelectedStyleAll();
-                self._updateCounter();
+                self._updateSelectionCounter();
             });
 
             select.on("multiselectuncheckall", function(event, ui) {
                 self._changeSelectedStyleAll();
-                self._updateCounter();
+                self._updateSelectionCounter();
             });
 
-            select.on("multiselectfilterfilter", function(event, matches) {
-                var total = self.parts.list.find("li").length;
-                var displayed = self.parts.list.find('li:visible').length;
-
-                self.parts.footer.find(".ui-multiselect-selection-summary")
-                    .text(displayed + " / " + total + " items")
-                    .effect("pulsate", {times:1}, 400);
+            self.parts.list.on("click", ".attributes", function(e) {
+                e.preventDefault();
             });
 
             self.parts.list.on("mouseleave", function() {
@@ -292,7 +289,8 @@
             self.select.find("option").each(function(index) {
                 var labelparts = $(this).attr('label').split(":");
                 var item = self.parts.list.find('input[value="' + $(this).val() +'"]').parent();
-                item.find("span").addClass("roomname");
+                item.find("span").addClass("roomname")
+                    .find("span:last-child").addClass("location");
 
                 var pic = $("<a class='roompicture'/>")
                     .append($("<img src='" + rooms[index].thumbnailPhotoURL + "'/>"))
@@ -304,6 +302,8 @@
                     pic.attr("href", rooms[index].tipPhotoURL);
                     pic.attr("rel", "lightbox");
                 }
+
+                var checkbox = $("<span class='checkbox'/>").prependTo(item);
 
                 var attributes = $("<span class='attributes'/>")
                     .append($("<span class='icon-camera'/>"))
@@ -323,8 +323,9 @@
                             .addClass("active");
 
                         if (!isNaN(labelparts[i])) {
+                            var val = (labelparts[i] === "0") ? "?" : labelparts[i];
                             capacity.attr("title", icontitles[i])
-                                .find("span").text(labelparts[i]);
+                                .find("span").text(val);
                         }
                     }
                 }
@@ -334,12 +335,12 @@
         _drawFooter: function() {
             var self = this;
 
-            self.parts.footer = $('<div/>')
+            self.parts.footer = $('<div class="ui-widget-footer"/>')
                 .append($('<div/>').addClass('ui-multiselect-selection-counter'))
                 .append($('<div/>').addClass('ui-multiselect-selection-summary'))
                 .appendTo(self.widget);
 
-            self._updateCounter();
+            self._updateSelectionCounter();
         },
 
         _restoreData: function() {
@@ -379,7 +380,7 @@
             self.parts.header.find(".ui-slider").slider('value', capacity.val());
         },
 
-        _updateCounter: function() {
+        _updateSelectionCounter: function() {
             var self = this;
             var opt = self.select.multiselect("option");
 
@@ -398,12 +399,18 @@
                                filter.publicroom.is(':checked') + ":" +
                                filter.capacity.val();
             self.select.multiselectfilter('advancedFilter', filterString);
+
+            var total = self.parts.list.find("li").length;
+            var displayed = self.parts.list.find('li:visible').length;
+            self.parts.footer.find(".ui-multiselect-selection-summary")
+                .text(displayed + " / " + total + " rooms")
+                .effect("pulsate", {times:1}, 400);
         },
 
         _changeSelectedStyleAll: function() {
             var self = this;
 
-            self.parts.list.find("input:checkbox").each(function() {
+            self.parts.list.find("input").each(function() {
                 self._changestyle($(this));
             });
         },
