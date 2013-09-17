@@ -70,6 +70,8 @@ Werkzeug (http://werkzeug.pocoo.org) is a BSD-licensed WSGI utility library prov
 
 jQuery placeholder (https://github.com/mathiasbynens/jquery-placeholder) is a MIT-licensed plugin for jQuery that provides a placeholder for objects.
 
-WebHostingHub Glyphs (http://www.webhostinghub.com/glyphs/) is a huge gallery of free font icons licensed under Creative Commons.
+[WebHostingHub Glyphs](http://www.webhostinghub.com/glyphs/) is a huge gallery of free font icons licensed under Creative Commons.
+
+[Room icon](http://thenounproject.com/noun/room/#icon-No17576)Room designed by [Tiago Dos Reis Rodrigues](http://thenounproject.com/tiagor2) from The Noun Project.
 
 See also the AUTHORS and ChangeLog files.
