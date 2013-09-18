@@ -57,8 +57,8 @@ textarea {
 }
 
 .i-selection {
-    & > input[type=checkbox],
-    & > input[type=radio] {
+    input[type=checkbox],
+    input[type=radio] {
         display: none;
 
         &:checked + label {
@@ -73,20 +73,20 @@ textarea {
         }
     }
 
-    & > input[type=checkbox] {
+    input[type=checkbox] {
         &:checked + label:hover {
             box-shadow: none !important;
             color: #FFF !important;
         }
     }
 
-    & > input[type=radio] {
+    input[type=radio] {
         &:checked + label:hover {
             cursor: default !important;
         }
     }
 
-    & > label.i-button {
+    label.i-button {
         &:hover {
             @include background-image(linear-gradient(top, #E2E2E2, #F7F7F7));
             border-color: $gray !important;

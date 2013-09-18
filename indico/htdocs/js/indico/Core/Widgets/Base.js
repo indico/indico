@@ -1752,7 +1752,6 @@ type("AddItemWidget", [],
                 var addContainer = $("<div class='left group' style='display:none'/>");
                 var saveButton = $("<div class='i-button accept'/>").text("Add");
                 var cancelButton = $("<div class='i-button'/>").text("Cancel");
-                var inputContainer= $("<div class='text-input left'/>");
                 var input = $("<input type='text' id='consumer_name'/>");
 
                 addButton.click(function(){
@@ -1784,8 +1783,7 @@ type("AddItemWidget", [],
                             });
                     });
                 addButtonContainer.append(addButton);
-                inputContainer.append(input);
-                addContainer.append(inputContainer);
+                addContainer.append(input);
                 addContainer.append(saveButton);
                 addContainer.append(cancelButton);
                 container.append(addButtonContainer);

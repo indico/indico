@@ -35,7 +35,7 @@
         $thin-height: 1.9em;
         $thin-line-height: 1.5em;
 
-        height: $thin-height;
+        min-height: $thin-height;
 
         & .i-button {
             height: $thin-height;
@@ -67,12 +67,8 @@
             box-shadow: 0 0 4px rgba(0, 0, 0, 0.2) inset;
         }
 
-        &.arrow {
-            @include after-icon("\24");
-
-            &:after {
-                vertical-align: -10%;
-            }
+        &.arrow:last-of-type {
+            @include border-right($gray);
         }
     }
 
@@ -98,10 +94,12 @@
 
 %toolbar-group {
     @extend %toolbar-group-inputs;
+    display: inline-block;
     padding: 0 0.4em;
+    margin-bottom: -2px;
 
-    & > .i-button {
-        border-radius: 0;
+    .i-button {
+        @include rounded-corners(0);
         border-right: none;
 
         &:not(.label) {
@@ -114,15 +112,20 @@
                 border-left-color: $gray;
             }
         }
+
+        &.arrow:last-of-type {
+            @include border-bottom-right-radius();
+            @include border-top-right-radius();
+        }
     }
 
-    & .i-button:not(.hidden) {
-        &:first-of-type {
+    .i-button:not(.hidden) {
+        &:first-child {
             @include border-bottom-left-radius();
             @include border-top-left-radius();
         }
 
-        &:last-of-type {
+        &:last-child {
             @include border-bottom-right-radius();
             @include border-top-right-radius();
             @include border-right($gray);
@@ -137,14 +140,13 @@
         }
 
         &.label {
-
             &:not(:last-child) {
                 @include border-bottom-right-radius(0);
                 @include border-top-right-radius(0);
                 border-right: none !important;
             }
 
-            & ~ .i-button:not(.hidden):first-of-type {
+            & ~ .i-button:not(.hidden):first-child {
                 @include border-bottom-left-radius(0);
                 @include border-top-left-radius(0);
             }
@@ -153,12 +155,19 @@
 }
 
 %toolbar-group-inputs {
-    & > label.i-button {
-
+    label.i-button {
         &:not(.label) {
             &:hover ~ .i-button {
                 border-left-color: $gray;
             }
+        }
+    }
+
+    input[type=radio]:first-child,
+    input[type=text]:first-child {
+        & + .i-button {
+            @include border-bottom-left-radius();
+            @include border-top-left-radius();
         }
     }
 

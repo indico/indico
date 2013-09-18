@@ -72,8 +72,15 @@
         box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
     }
 
-    &[class*=" icon-"] {
-        width: 2.7em;
+    &[class*="icon-"] {
+        &:before {
+            font-size: 1.2em;
+            vertical-align: -15%;
+        }
+
+        &:not(:empty):before {
+            margin-right: 0.5em;
+        }
     }
 
     &.accept {
@@ -141,14 +148,21 @@
         color: $black !important;
         cursor: default;
     }
+
+    &.arrow {
+        @include after-icon("\24");
+
+        &:after {
+            vertical-align: -10%;
+        }
+    }
 }
 
 a.i-big-button {
-    $size: 55px;
+    $size: 60px;
     @extend %button;
 
     background: #FFF;
-    padding: 3px;
     width: $size;
     height: $size;
 
@@ -242,10 +256,6 @@ button::-moz-focus-inner {
     width: 100%;
 }
 
-.i-button i[class*="icon-"] {
-    font-size: 1.2em;
-}
-
 .i-button.right {
     margin-left: 5px;
     margin-top: 5px;
@@ -253,12 +263,6 @@ button::-moz-focus-inner {
 
 .i-button[class*="icon-"].icon-only:before {
     margin-right: 0;
-}
-
-.i-button[class*="icon-"]:before {
-    font-size: 1.2em;
-    margin-right: 0.5em;
-    vertical-align: -15%;
 }
 
 .i-button > [class*="icon-"]:before {

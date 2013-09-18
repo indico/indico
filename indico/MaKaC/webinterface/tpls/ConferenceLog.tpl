@@ -19,7 +19,7 @@
 
 <div id="headPanel" class="follow-scroll">
     <div id="button-menu" class="toolbar">
-        <div id="eventFilter" class="group labelled i-selection left">
+        <div id="eventFilter" class="group i-selection left">
             <span class="i-button label">${_("Filter by")}</span>
             <input type="checkbox" id="emailLog" name="view_filter" checked>
             <label for="emailLog" class="i-button">${_("Email")}</label>
@@ -34,14 +34,11 @@
                 <span class="icon-stack-minus" aria-hidden="true"></span>
             </a>
         </div>
-        <div id="searchBox" class="group labelled right">
+        <div id="searchBox" class="group right">
             <span class="i-button label">
                 <span class="icon-search" aria-hidden="true"></span>
             </span>
-            <div class="text-input">
-                <input type="text" id="searchInput"/>
-                <span class="reset-input icon-close" aria-hidden="true"></span>
-            </div>
+            <input type="text" id="searchInput"/>
         </div>
     </div>
 </div>
@@ -109,10 +106,6 @@ $(document).ready(function(){
     /* Initializations */
     if ($(".log-table").length === 0) {
         $("#emptyLog").removeClass("hidden");
-    }
-
-    if ($("#searchInput").val() !== "") {
-        $("#searchInput").val("");
     }
 
     /* UI animations */
@@ -184,28 +177,10 @@ $(document).ready(function(){
         $("tr.i-table.interactive").removeClass("active border-bottom-none").next().addClass("weak-hidden");
     });
 
-    /* Search behavior */
-    $("#searchBox input").on('focus', function() {
-        $(this).closest('.text-input').addClass('active');
-    }).on('focusout', function() {
-        $(this).closest('.text-input').removeClass('active');
-    });
-
-    $("#searchInput").typeWatch({
+    $("#searchInput").realtimefilter({
         callback: function() {
             applyFilters();
-            updateResetButton();
-        },
-        wait: 250,
-        highlight: true,
-        captureLength: 0
-    });
-
-    $("#searchBox .reset-input").click(function(e) {
-        e.preventDefault();
-        $("#searchInput").val("");
-        applyFilters();
-        updateResetButton();
+        }
     });
 
     var resultCache = [];
@@ -215,7 +190,7 @@ $(document).ready(function(){
     var allContentRows = $("tr.i-table.content-wrapper");
 
     var applyFilters = function(){
-        var checkboxes = $("i-selection input:checkbox:checked");
+        var checkboxes = $(".i-selection input:checkbox:checked");
         var items = getSearchFilteredItems().filter(getCheckboxFilteredItems(checkboxes));
 
         allTableTitles.show();
@@ -280,14 +255,5 @@ $(document).ready(function(){
             $("#nothingToShow").addClass("hidden");
         }
     };
-
-    var updateResetButton = function() {
-        if ($("#searchInput").val() === "") {
-            $(".reset-input").css('visibility', 'hidden');
-        } else {
-            $(".reset-input").css('visibility', 'visible');
-        }
-    };
-
 });
 </script>

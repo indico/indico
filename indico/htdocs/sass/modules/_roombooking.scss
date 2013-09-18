@@ -62,6 +62,12 @@
     font-size:0px;
     display: inline-block;
     vertical-align: middle;
+
+    & .time-bar {
+        background: url('../indico/images/rb_timebar_bg.png');
+        width: 675px;
+        height: 20px;
+    }
 }
 
 .dayCalendarDivHeader {
@@ -78,12 +84,6 @@ div.calHour {
     font-size: 8px;
     height: 20px;
     color: #666;
-}
-
-.dayCalendarDiv .time-bar {
-  background: url('../indico/images/rb_timebar_bg.png');
-  width: 675px;
-  height: 20px;
 }
 
 .room-row {
@@ -118,29 +118,26 @@ div.calHour {
     padding: 5px 0px 0px 5px;
 }
 
-.qtip-bold {
-    font-weight: bold;
-}
-
 /* Form fields: field description width. */
 .subFieldWidth {
     width: 160px;
     color: #523D04;
 }
-.subFieldWidthSmaller
-{
+.subFieldWidthSmaller {
     width: 60px;
     color: #523D04;
 }
 
-.actionSucceeded
-{
-    color: Green; margin-left: 6px; font-weight: bold;
+.actionSucceeded {
+    color: Green;
+    margin-left: 6px;
+    font-weight: bold;
 }
 
-.actionFailed
-{
-    color: Red; margin-left: 6px; font-weight: bold;
+.actionFailed {
+    color: Red;
+    margin-left: 6px;
+    font-weight: bold;
 }
 
 a.roomLink:hover, a.dateLink:hover {
@@ -229,7 +226,28 @@ a.weekday {
     color: #881122 !important;
 }
 
-#sDatePlace .ui-datepicker-inline, #eDatePlaceDiv .ui-datepicker-inline {
+#mapOfRoomAvailabilityForm {
+
+    & .subFieldWidth {
+        width: 60px;
+    }
+
+    & #repeatability {
+        width: 115px;
+    }
+
+    & div.dateField input {
+        width: 65px;
+    }
+}
+
+#eTime,
+#sTime {
+    width: 4em;
+}
+
+#sDatePlace .ui-datepicker-inline,
+#eDatePlaceDiv .ui-datepicker-inline {
     background-color: transparent;
 }
 
@@ -238,10 +256,10 @@ a.weekday {
     margin-right: 35px;
     padding: 10px;
     background-color: #FAFAFA;
-}
 
-.bookDateDiv span {
-    color: #777;
+    span {
+        color: #777;
+    }
 }
 
 #flexibleDatesDiv {

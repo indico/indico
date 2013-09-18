@@ -113,15 +113,6 @@ a.note:hover {
     margin-top: 18px;
 }
 
-
-body {
-    font-family: verdana, arial, serif;
-    background: #fff;
-    padding: 0px;
-    margin: 0px;
-    font-size: 13px;
-}
-
 body, html {
     height: 100%;
 }
@@ -6343,26 +6334,6 @@ table.schedTaskList th {
     padding-right: 0px;
     color: #555;
     border-bottom: 1px solid #EBEBEB;
-}
-
-/*
-    Map of rooms - availability filter form
-*/
-
-#mapOfRoomAvailabilityForm .subFieldWidth {
-    width: 60px;
-}
-
-#mapOfRoomAvailabilityForm #repeatability {
-    width: 115px;
-}
-
-#mapOfRoomAvailabilityForm div.dateField input {
-    width: 65px;
-}
-
-#mapOfRoomAvailabilityForm #sTime, #eTime {
-    width: 35px;
 }
 
 .infoTD {

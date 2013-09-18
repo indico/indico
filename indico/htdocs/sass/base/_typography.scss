@@ -27,6 +27,14 @@
     font-size: 13px;
 }
 
+body {
+    @extend %font-family-body;
+    @extend %font-size-body;
+    background: #fff;
+    padding: 0px;
+    margin: 0px;
+}
+
 h1 {
    font-family: "Roboto", "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
 }
@@ -67,7 +75,6 @@ h3 {
 
 
 .groupTitle, .groupTitleNoBorder, .groupSubTitle {
-/*    font-family: Georgia, Times, "Times New Roman"; */
    display: block;
    width: 100%;
    font-family: "Helvetica Neue", Helvetica, Verdana, Arial, Sans-serif;
