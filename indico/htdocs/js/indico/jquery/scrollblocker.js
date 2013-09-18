@@ -27,7 +27,7 @@
             var options = this.options;
 
             $("body").on("mousewheel wheel", function (e) {
-                var blocker = $(e.target).closest(element).filter(function(){
+                var blocker = $(e.target).parentsUntil(element.parent()).filter(function(){
                         return $(this).hasCSS("overflow-y", options.overflowType);
                     });
 
