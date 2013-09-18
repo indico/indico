@@ -49,8 +49,7 @@
                     }
                 })
                 .on("keyup", function(e) {
-                    var K_ESC = 27;
-                    if (e.which == K_ESC) {
+                    if (e.which == K.ESCAPE) {
                         input.val('value');
                         self._clear();
                     }
