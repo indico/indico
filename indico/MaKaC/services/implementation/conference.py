@@ -1022,17 +1022,14 @@ class ConferenceAddParticipants(ConferenceParticipantBase, ConferenceParticipant
             ph = PrincipalHolder()
             selected = ph.getById(user['id'])
             if selected is None and user["_type"] == "Avatar":
-                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
-            if isinstance(selected, Avatar) :
+                raise NoReportError(_("""The user with email %s that you are adding does
+                                    not exist anymore in the database""") % user["email"])
+            if isinstance(selected, Avatar):
                 self._addParticipant(self._generateParticipant(selected), participation)
-            elif isinstance(selected, Group) :
-                for member in selected.getMemberList() :
-                    self._addParticipant(self._generateParticipant(member), participation)
-
-            else :
+            else:
                 self._addParticipant(self._generateParticipant(), participation)
 
-        result["added"] = ("".join(self._added)).replace("\n","")
+        result["added"] = ("".join(self._added)).replace("\n", "")
         if self._usersPending:
             infoWarning.append(self._getWarningAlreadyAdded(self._usersPending, "pending"))
         if self._usersParticipant:
@@ -1087,16 +1084,11 @@ class ConferenceInviteParticipants(ConferenceParticipantBase, ConferenceParticip
         for user in self._userList:
             ph = PrincipalHolder()
             selected = ph.getById(user['id'])
-            if isinstance(selected, Avatar) :
-                participant =self._generateParticipant(selected)
+            if isinstance(selected, Avatar):
+                participant = self._generateParticipant(selected)
                 if self._inviteParticipant(participant, participation):
                     self._sendEmailWithFormat(participant, data)
-            elif isinstance(selected, Group) :
-                for member in selected.getMemberList() :
-                    participant =self._generateParticipant(member)
-                    if self._inviteParticipant(participant, participation):
-                        self._sendEmailWithFormat(participant, data)
-            else :
+            else:
                 participant = self._generateParticipant()
                 if self._inviteParticipant(participant, participation):
                     self._sendEmailWithFormat(participant, data)

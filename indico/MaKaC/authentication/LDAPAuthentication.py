@@ -71,7 +71,10 @@ from MaKaC.user import Group, PrincipalHolder
 
 RETRIEVED_FIELDS = ['uid', 'cn', 'mail', 'o', 'ou', 'company', 'givenName',
                     'sn', 'postalAddress', 'userPrincipalName', "telephoneNumber", "facsimileTelephoneNumber"]
-UID_FIELD = "cn" # or uid
+UID_FIELD = "cn"  # or uid
+MEMBER_ATTR = "member"
+MEMBER_PAGE_SIZE = 1500
+
 
 class LDAPAuthenticator(Authenthicator, SSOHandler):
     idxName = "LDAPIdentities"
@@ -484,38 +487,64 @@ class LDAPConnector(object):
         """
         Returns whether a user is in a group. Depends on groupStyle (SLAPD/ActiveDirectory)
         """
-        Logger.get('auth.ldap').debug('userInGroup(%s,%s) '%(login, group))
-        # In ActiveDirectory users have multivalued attribute 'memberof' with list of groups
+        Logger.get('auth.ldap').debug('userInGroup(%s,%s)' % (login, group))
+        # In ActiveDirectory users have attribute 'tokenGroups' with list of groups Sids
         # In SLAPD groups have multivalues attribute 'member' with list of users
-        if self.groupStyle=='ActiveDirectory':
-            query = 'memberof={0}'.format(self._findDNOfGroup(group))
-            res = self.l.search_s(self._findDNOfUser(login), ldap.SCOPE_BASE, query)
-        elif self.groupStyle=='SLAPD':
+        if self.groupStyle == 'ActiveDirectory':
+            groupSid = self.l.search_s(self._findDNOfGroup(group), ldap.SCOPE_BASE,
+                                       attrlist=['objectSid'])[0][1]['objectSid'][0]
+            res = self.l.search_s(self._findDNOfUser(login), ldap.SCOPE_BASE,
+                                  attrlist=['tokenGroups'])[0][1]['tokenGroups']
+            return groupSid in res
+        elif self.groupStyle == 'SLAPD':
             query = 'member={0}'.format(self._findDNOfUser(login))
             res = self.l.search_s(self._findDNOfGroup(group), ldap.SCOPE_BASE, query)
+            return res != []
         else:
             raise Exception("Unknown LDAP group style, choices are: SLAPD or ActiveDirectory")
 
-        return res != []
+    def nestedSearch(self, dnEgroup, visited):
+        if dnEgroup in visited:
+            return set()
+        members = set()
+        entries = []
+        index = 0
+        end_regex = '{0};range=[0-9]*-\*'.format(MEMBER_ATTR)
+        while True:
+            attr_filter = '{0};range={1}-{2}'.format(MEMBER_ATTR, index * MEMBER_PAGE_SIZE,
+                                                     ((index+1) * MEMBER_PAGE_SIZE) - 1)
+            member_found = self.l.search_s(dnEgroup, ldap.SCOPE_BASE, '(objectClass=Group)', [attr_filter])
+            if not member_found:
+                break
+            if not member_found[0][1]:
+                visited[dnEgroup] = True
+                return members
+            attr = member_found[0][1].keys()[0]
+            entries += member_found[0][1][attr]
+            if re.match(end_regex, attr):
+                break
+            index += 1
+
+        if not entries:
+            memberuid = LDAPTools.extractUIDFromDN(dnEgroup)
+            if memberuid:
+                members.add(memberuid)
+        else:
+            visited[dnEgroup] = True
+            for member in entries:
+                members.update(self.nestedSearch(member, visited))
+        return members
 
     def findGroupMemberUids(self, group):
         """
          Finds uids of users in a group. Depends on groupStyle (SLAPD/ActiveDirectory)
         """
-        Logger.get('auth.ldap').debug('findGroupMemberUids(%s) '%group)
+        Logger.get('auth.ldap').debug('findGroupMemberUids(%s)' % group)
         # In ActiveDirectory users have multivalued attribute 'memberof' with list of groups
         # In SLAPD groups have multivalues attribute 'member' with list of users
-        if self.groupStyle=='ActiveDirectory':
-            #!not tested, I have not ActiveDirectory instance to try test it
-            #search for users with attribute memberof=groupdn
-            memberUids = []
-            query = 'memberof={0}'.format(self._findDNOfGroup(group))
-            res = self.l.search_s(self.ldapPeopleDN, ldap.SCOPE_SUBTREE,query)
-            for dn, data in res:
-                if dn:
-                    memberUids.append( data[UID_FIELD] )
-            return memberUids
-        elif self.groupStyle=='SLAPD':
+        if self.groupStyle == 'ActiveDirectory':
+            return self.nestedSearch(self._findDNOfGroup(group), {})
+        elif self.groupStyle == 'SLAPD':
             #read member attibute values from the group object
             members = None
             res = self.l.search_s(self._findDNOfGroup(group), ldap.SCOPE_BASE)
@@ -526,11 +555,10 @@ class LDAPConnector(object):
                 return []
             memberUids = []
             for memberDN in members:
-                m = re.search('%s=([^,]*),'%UID_FIELD.upper(),memberDN)
-                if m:
-                    uid = m.group(1)
-                    memberUids.append( uid )
-            Logger.get('auth.ldap').debug('findGroupMemberUids(%s) returns %s'%(group, memberUids))
+                memberuid = LDAPTools.extractUIDFromDN(memberDN)
+                if memberuid:
+                    memberUids.add(memberuid)
+            Logger.get('auth.ldap').debug('findGroupMemberUids(%s) returns %s' % (group, memberUids))
             return memberUids
         else:
             raise Exception("Unknown LDAP group style, choices are: SLAPD or ActiveDirectory")
@@ -554,8 +582,7 @@ class LDAPGroup(Group):
         avatarLists = []
         for uid in uidList:
             # First, try locally (fast)
-            lst = PrincipalHolder().match(uid , exact=1, searchInAuthenticators=False)
-            print "Result", lst
+            lst = PrincipalHolder().match(uid, exact=1, searchInAuthenticators=False)
             if not lst:
                 # If not found, try external
                 lst = PrincipalHolder().match(uid, exact=1)
@@ -622,3 +649,10 @@ class LDAPTools:
         av["id"] = 'LDAP:'+udata["login"]
         av["status"] = "NotCreated"
         return av
+
+    @staticmethod
+    def extractUIDFromDN(dn):
+        m = re.search('%s=([^,]*),' % UID_FIELD.upper(), dn)
+        if m:
+            return m.group(1)
+        return None
