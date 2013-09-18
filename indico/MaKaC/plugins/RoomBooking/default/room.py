@@ -505,8 +505,12 @@ class Room( Persistent, RoomBase, Fossilizable ):
     def getThumbnailPhotoURL(self):
         """ URL of the tip photo of the room """
         from MaKaC.webinterface.urlHandlers import UHRoomPhotoSmall
-        photoId = self._doGetPhotoId() or "NoPhoto"
-        return str(UHRoomPhotoSmall.getURL(photoId))
+        if self._doGetPhotoId():
+            photoId = self._doGetPhotoId()
+            return str(UHRoomPhotoSmall.getURL(photoId))
+        else:
+            photoId = "NoPhoto"
+            return str(UHRoomPhotoSmall.getURL(photoId, "png"))
 
     def hasPhoto(self):
         return self._doGetPhotoId() is not None
