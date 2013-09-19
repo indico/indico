@@ -51,6 +51,16 @@ h3 {
     font-size: 1.3em;
 }
 
+sup, sub {
+    vertical-align: baseline;
+    position: relative;
+    top: -0.4em;
+}
+
+sub {
+    top: 0.4em;
+}
+
 /* Elements */
 
 .page_title {

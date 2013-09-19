@@ -222,8 +222,21 @@ a.weekday {
     background-color: white;
 }
 
-#roomBookingTable .ui-datepicker-week-end, .ui-datepicker-week-end .ui-state-default {
-    color: #881122 !important;
+#roomBookingTable {
+    sub, sup {
+        top: -0.3em;
+        right: -0.1em;
+    }
+
+    sub {
+        top: 0.3em;
+        right: 0.1em;
+    }
+
+    .ui-datepicker-week-end,
+    .ui-datepicker-week-end .ui-state-default {
+        color: #881122 !important;
+    }
 }
 
 #mapOfRoomAvailabilityForm {

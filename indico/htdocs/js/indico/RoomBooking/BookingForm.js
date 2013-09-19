@@ -116,9 +116,8 @@ function saveFormData() {
                   "filter":  filterData.search,
                   "selectedRooms":  selectedRooms,
                   "finishDate": $('#finishDate').val(),
-                  "flexibleDates": $('#flexibleDates').is(':checked'),
-                  "flexibleDatesRange": $('#flexibleDatesRange').val(),
-                  "repeatability": $('#repeatability').val()};
+                  "flexibleDatesRange": $("#flexibleDates input[name=flexibleDatesRange]:checked").val(),
+                  "repeatability": $('#repeatability input[name=repeatability]:checked').val()};
 
     $.jStorage.set(userId, rbDict);
     $.jStorage.setTTL(userId, 7200000); // 2 hours
