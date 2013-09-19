@@ -49,7 +49,7 @@ class WPConfModifRegFormBase( conferences.WPConferenceModifBase ):
 
     def getCSSFiles(self):
         return conferences.WPConferenceModifBase.getCSSFiles(self) + \
-                   ['js/indico/RegistrationForm/css/regForm.css']
+            self._asset_env['regform_css'].urls()
 
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
@@ -214,41 +214,40 @@ class WPConfModifRegFormDataModification( WPConfModifRegFormBase ):
         wc = WConfModifRegFormDataModification(self._conf)
         return wc.getHTML()
 
-class WConfModifRegFormDataModification( wcomponents.WTemplated ):
 
-    def __init__( self, conference ):
+class WConfModifRegFormDataModification(wcomponents.WTemplated):
+
+    def __init__(self, conference):
         self._conf = conference
 
-    def getVars( self ):
+    def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         regForm = self._conf.getRegistrationForm()
-        vars["postURL"]=urlHandlers.UHConfModifRegFormPerformDataModification.getURL(self._conf)
-        vars["sDay"]=""
-        vars["sMonth"]=""
-        vars["sYear"]=""
+        vars["postURL"] = urlHandlers.UHConfModifRegFormPerformDataModification.getURL(self._conf)
+        vars["sDay"] = ""
+        vars["sMonth"] = ""
+        vars["sYear"] = ""
         if regForm.getStartRegistrationDate() is not None:
             d = regForm.getStartRegistrationDate()
-            vars["sDay"]=d.day
-            vars["sMonth"]=d.month
-            vars["sYear"]=d.year
-        vars["eDay"]=""
-        vars["eMonth"]=""
-        vars["eYear"]=""
+            vars["sDay"] = d.day
+            vars["sMonth"] = d.month
+            vars["sYear"] = d.year
+        vars["eDay"] = ""
+        vars["eMonth"] = ""
+        vars["eYear"] = ""
         if regForm.getEndRegistrationDate() is not None:
             d = regForm.getEndRegistrationDate()
-            vars["eDay"]=d.day
-            vars["eMonth"]=d.month
-            vars["eYear"]=d.year
-        vars["meDay"]=""
-        vars["meMonth"]=""
-        vars["meYear"]=""
+            vars["eDay"] = d.day
+            vars["eMonth"] = d.month
+            vars["eYear"] = d.year
+        vars["meDay"] = ""
+        vars["meMonth"] = ""
+        vars["meYear"] = ""
         if regForm.getModificationEndDate() is not None:
             d = regForm.getModificationEndDate()
-            vars["meDay"]=d.day
-            vars["meMonth"]=d.month
-            vars["meYear"]=d.year
-        vars["calendarIconURL"] = Config.getInstance().getSystemIconURL("calendar")
-        vars["calendarSelectURL"] = urlHandlers.UHSimpleCalendar.getURL()
+            vars["meDay"] = d.day
+            vars["meMonth"] = d.month
+            vars["meYear"] = d.year
         vars["announcement"] = regForm.getAnnouncement()
         vars["contactInfo"] = regForm.getContactInfo()
         vars["usersLimit"] = regForm.getUsersLimit()
@@ -432,12 +431,12 @@ class WPRegistrationFormDisplay( conferences.WPConferenceDefaultDisplayBase ):
 
     def getJSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-               self._includeJSPackage('Management') + \
-               self._includeJSPackage('regform_display')
+            self._includeJSPackage('Management') + \
+            self._includeJSPackage('regform_display')
 
     def getCSSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-                   ['js/indico/RegistrationForm/css/regForm.css']
+            self._asset_env['regform_css'].urls()
 
     def _getBody(self, params):
         wc = WConfRegistrationFormDisplay(self._conf, self._rh._getUser())
@@ -1032,11 +1031,11 @@ class WPRegistrationFormModify( conferences.WPConferenceDefaultDisplayBase ):
 
     def getJSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-               self._includeJSPackage('regform_display')
+            self._includeJSPackage('regform_display')
 
     def getCSSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-                   ['js/indico/RegistrationForm/css/regForm.css']
+            self._asset_env['regform_css'].urls()
 
     def _getBody(self, params):
         wc = WConfRegistrationFormModify(self._conf, self._rh._getUser())

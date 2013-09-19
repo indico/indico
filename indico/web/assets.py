@@ -153,7 +153,6 @@ indico_display = Bundle('js/indico/Display/Dialogs.js',
 
 indico_jquery = Bundle(
     *namespace('js/indico/jquery',
-
                'defaults.js',
                'global.js',
                'clearableinput.js',
@@ -174,7 +173,7 @@ indico_badges_css = Bundle('css/badges.css',
 
 
 html5_cross_browser_compatibility = Bundle('js/lib/webshim/extras/modernizr-custom.js',
-                                           'js/kib/webshim/polyfiller.js',
+                                           'js/lib/webshim/polyfiller.js',
                                            filters='jsmin',
                                            output='html5_cross_browser_compatibility_%(version)s.min.js')
 
@@ -344,9 +343,10 @@ def register_all_js(env):
     env.register('base_js', base_js)
     env.register('ie_compatibility', ie_compatibility)
 
-indico_regform = Bundle('js/indico/RegistrationForm/css/regForm.css',
-                         filters=('cssmin'),
-                          output='indico_regform_%(version)s.min.css')
+indico_regform = Bundle('sass/modules/_registrationform.scss',
+                        filters=("pyscss", "cssrewrite", "cssmin"),
+                        output='sass/regform_%(version)s.min.css')
+
 
 def register_all_css(env, main_css_file):
 
