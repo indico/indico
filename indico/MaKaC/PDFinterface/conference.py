@@ -645,14 +645,14 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
         story += "\n\\vspace{5 mm}\n\n"
         status = self._abstract.getCurrentStatus()
 
-        if status.__class__ == review.AbstractStatusDuplicated:
+        if isinstance(status,  review.AbstractStatusDuplicated):
             original=status.getOriginal()
-            st = i18nformat(""" _("DUPLICATED") (%s : %s)""")%(original.getId(), original.getTitle())
-        elif status.__class__ == review.AbstractStatusMerged:
+            st = i18nformat(""" _("DUPLICATED") (%s : %s)""") % (original.getId(), original.getTitle())
+        elif isinstance(status, review.AbstractStatusMerged):
             target=status.getTargetAbstract()
-            st = i18nformat(""" _("MERGED") (%s : %s)""")%(target.getId(), target.getTitle())
+            st = i18nformat(""" _("MERGED") (%s : %s)""") % (target.getId(), target.getTitle())
         else:
-            st = AbstractStatusList.getInstance().getCaption( status.__class__ ).upper()
+            st = AbstractStatusList.getInstance().getCaption(status.__class__).upper()
         story += i18nformat("""_("Status") : %s""")%escape(st)
 
         story += "\n\\vspace{5 mm}\n\n"
@@ -661,16 +661,16 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
 
         for track in self._abstract.getTrackListSorted():
             status = self._abstract.getTrackJudgement(track)
-            if status.__class__ == review.AbstractAcceptance:
+            if isinstance(status, review.AbstractAcceptance):
                 contribType = ""
                 if status.getContribType() is not None:
                     contribType = "(%s)" % status.getContribType().getName()
                 st = i18nformat(""" _("Proposed to accept") %s""") % (contribType)
-            elif status.__class__ == review.AbstractRejection:
+            elif isinstance(status, review.AbstractRejection):
                 st = _("Proposed to reject")
-            elif status.__class__ == review.AbstractInConflict:
+            elif isinstance(status, review.AbstractInConflict):
                 st = _("Conflict")
-            elif status.__class__ == review.AbstractReallocation:
+            elif isinstance(status, review.AbstractReallocation):
                 l = []
                 for track in status.getProposedTrackList():
                     l.append(track.getTitle())
@@ -1225,6 +1225,29 @@ class ContributionBook(PDFBase):
                 nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
 
+
+    def firstPageLatex(self):
+        contrib_first = "\n\\topskip0pt\n\n\\vspace*{\\fill}\n\n"
+        contrib_first += "\\centerline{\\rmfamily\\fontsize{30}{40}\\selectfont\n"
+        contrib_first += "{\\bf %s}" % escape(self._conf.getTitle())
+        contrib_first += "}\n\\vspace{15 mm}\n"
+        contrib_first += "\\centerline{\\rmfamily\\Large\\selectfont\n"
+        contrib_first += "{\\bf %s - %s}" % \
+                (self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"),
+                self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y"))
+        if self._conf.getLocation():
+            contrib_first += "\\centerline{\\rmfamily\\Large\\selectfont\n"
+            contrib_first += "{\\bf %s}" % escape(self._conf.getLocation().getName())
+            contrib_first += "}\n\\vspace{40 mm}\n\n"
+        else:
+            contrib_first += "}\n\\vspace{50 mm}\n\n"
+        contrib_first += "\\centerline{\\rmfamily\\fontsize{30}{40}\\selectfont\n"
+        contrib_first += "{\\bf %s}" % self._title
+        contrib_first += "}\n\n\\vspace*{\\fill}\n"
+
+        return contrib_first
+
+
     def laterPages(self,c,doc):
         c.saveState()
         c.setFont('Times-Roman',9)
@@ -1265,6 +1288,7 @@ class ContributionBook(PDFBase):
         normalStyle.spaceAfter=5
         normalStyle.alignment=TA_LEFT
         self._styles["normal"]=normalStyle
+
 
     def getBody(self,story=None):
         self._defineStyles()
@@ -1315,6 +1339,70 @@ class ContributionBook(PDFBase):
             abs=KeepTogether([p1,p4,p2,p3])
             story.append(abs)
             story.append(Spacer(1,0.4*inch))
+
+
+    def getBodyLatex(self):
+        story = "\\newpage"
+        if self._conf.getBOAConfig().getText() != "":
+            text=self._conf.getBOAConfig().getText().replace("<BR>","<br>")
+            text=text.replace("<Br>","<br>")
+            text=text.replace("<bR>","<br>")
+            for par in text.split("<br>"):
+                story += "\n\\vspace{5 mm}\n\n"
+                story += "\\begingroup\n\\small\\sffamily\\selectfont\n"
+                story += par
+                story += "\n\\endgroup\n\n"
+                story += "\n\\vspace{5 mm}"
+            story += "\n\\newpage"
+        for contrib in self._contribList:
+            if not contrib.canAccess(self._aw):
+                continue
+            if self._sortedBy == "boardNo":
+                caption = "%s" % (contrib.getTitle())
+            else:
+                caption = "%s - %s" % (contrib.getId(),contrib.getTitle())
+
+            story += "\n\n{\\bf {\\sffamily\\Large\\selectfont %s :}}\n\n" % caption
+
+            md = markdown.Markdown()
+            latex_mdx = mdx_latex.LaTeXExtension()
+            latex_mdx.extendMarkdown(md, markdown.__dict__)
+
+            reload(sys)
+            sys.setdefaultencoding("utf-8")
+
+            lspk=[]
+            for spk in contrib.getSpeakerList():
+                fullName=spk.getFullName()
+                instit=spk.getAffiliation().strip()
+                if instit!="":
+                    fullName="%s (%s)" % (fullName, instit)
+                lspk.append("%s" % escape(fullName))
+            speakers = i18nformat("""\n{\\bf {\\sffamily\\normalsize\\selectfont _("Presenter"): %s }}\n""")%"; ".join(lspk)
+            story += speakers
+            abstract = contrib.getDescription()
+            story += "\n\n\\vspace{5 mm}\n\n"
+            story += "\n\\begingroup\n\\small\\sffamily\\selectfont\n"
+            story += "\n\n" + md.convert(abstract)[7:-7] + "\n\n"
+            story += "\n\\endgroup\n\n"
+            story += "\n\\vspace{5 mm}\n\n"
+            ses=""
+            if contrib.getSession() is not None:
+                ses=contrib.getSession().getTitle()
+            if contrib.getBoardNumber():
+                if ses != "":
+                    ses = "%s - " % ses
+                ses="%sBoard: %s" % (ses, contrib.getBoardNumber())
+            if contrib.isScheduled():
+                if ses != "":
+                    ses = "%s - " % ses
+                text="%s%s" % (ses,contrib.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y %H:%M"))
+            else:
+                text = ses
+            story += "\n\n{\\sffamily\\normalsize\\selectfont %s }\n\n" % text
+            story += "\n\n\\vspace{10 mm}\n\n"
+
+        return story
 
 
 class ContribsToPDF(PDFWithTOC):

@@ -37,7 +37,7 @@ from indico.web.flask.util import send_file
 from indico.web.http_api.api import ContributionHook
 from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
-import subprocess, shlex, os
+from MaKaC.PDFinterface.base import LatexRunner
 
 
 class RHContributionDisplayBase( RHContributionBase, RHDisplayBaseProtected ):
@@ -104,51 +104,13 @@ class RHContributionToPDF(RHContributionDisplay):
         filename = "%s - Contribution.pdf"%self._target.getTitle()
         pdf = ContribToPDF(self._target.getConference(), self._target, tz=tz)
         
-        texname = '%s - Contribution.tex' % self._target.getTitle()
+        latex_template = 'LatexRHContributionToPDF.tpl'
 
-        latex_template=r'''\batchmode %% suppress output
-\documentclass[a4paper, 11pt]{article} %% document type
-\textwidth = 440pt
-\hoffset = -40pt %% - inch
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc} %% http://tex.stackexchange.com/questions/44694/fontenc-vs-inputenc
-\usepackage[final, babel]{microtype} %% texblog.net/latex-archive/layout/pdflatex-microtype/
-\usepackage[export]{adjustbox} %% images
-\usepackage{amsmath} %% math equations
-\usepackage{float} %% improved interface for floating objects
-\usepackage{times} %% font family
-\usepackage[usenames,dvipsnames]{xcolor}
-\usepackage[pdftex,
-            final,
-            pdfstartview = FitV,
-            colorlinks = true, 
-            urlcolor = Violet,
-            breaklinks = true]{hyperref}  %% hyperlinks configuration
-\usepackage{sectsty}
-\allsectionsfont{\rmfamily}
+        latex = LatexRunner(filename)
+        pdffile = latex.run(latex_template, pdf.getLatex())
+        latex.cleanup()
 
-\begin{document}
-\setcounter{secnumdepth}{0} %% remove section heading numbering
-
-%s
-
-\end{document}
-''' % pdf.getLatex()
-
-        with open(texname,'w') as f:
-            f.write(latex_template)
-
-        pdflatex_cmd = 'pdflatex --shell-escape -interaction=nonstopmode \"%s\"' % texname
-
-        proc=subprocess.Popen(shlex.split(pdflatex_cmd))
-        proc.communicate()
-
-        os.unlink(filename[:-4] + '.tex')
-        os.unlink(filename[:-4] + '.log')
-        os.unlink(filename[:-4] + '.aux')
-        os.unlink(filename[:-4] + '.out')
-        
-        return send_file(filename, os.path.abspath(os.path.join(filename)), 'PDF')
+        return send_file(filename, pdffile, 'PDF')
 
 
 class RHContributionToiCal(RoomBookingDBMixin, RHContributionDisplay):
