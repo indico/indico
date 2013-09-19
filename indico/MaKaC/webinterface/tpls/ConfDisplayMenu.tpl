@@ -6,13 +6,7 @@
         % if link.isVisible():
 
           % if link.getType() == "spacer":
-            <%
-              index = link.getParent().getLinkList().index(link)-1
-              type = link.getParent().getLinkList()[index].getType()
-            %>
-            % if type in ["system", "extern"] and index != -1:
-                 <li class="spacer"></li>
-            % endif
+            <li class="spacer"></li>
           % else:
             <li id="menuLink_${link.getName()}"
               % if menu.isCurrentItem(link):
