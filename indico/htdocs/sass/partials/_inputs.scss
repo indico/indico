@@ -64,19 +64,18 @@ textarea {
         &:checked + label {
             @include background-image(linear-gradient(top, #387EE5, #5D95EA));
             box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
-            color: #EEE !important;
+            color: white !important;
+        }
 
-            &:active {
-                @include background-image(linear-gradient(top, #81ADEF, #A5C4F3));
-                color: #555 !important;
-            }
+        &:disabled + label.i-button {
+            @extend %button-disabled;
         }
     }
 
     input[type=checkbox] {
-        &:checked + label:hover {
-            box-shadow: none !important;
-            color: #FFF !important;
+        &:checked:active + label {
+            @include background-image(linear-gradient(top, #81ADEF, #A5C4F3));
+            color: $black !important;
         }
     }
 
@@ -86,7 +85,7 @@ textarea {
         }
     }
 
-    label.i-button {
+    label {
         &:hover {
             @include background-image(linear-gradient(top, #E2E2E2, #F7F7F7));
             border-color: $gray !important;

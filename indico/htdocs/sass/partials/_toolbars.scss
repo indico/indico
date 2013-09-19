@@ -28,6 +28,7 @@
     $toolbar-line-height: 1.8em;
 
     min-height: $toolbar-height;
+    margin-bottom: 0.5em;
     padding: 3px 0;
     vertical-align: middle;
 
@@ -97,6 +98,14 @@
     display: inline-block;
     padding: 0 0.4em;
     margin-bottom: -2px;
+
+    &:first-child {
+        padding-left: 0;
+    }
+
+    &:last-child {
+        padding-right: 0;
+    }
 
     .i-button {
         @include rounded-corners(0);

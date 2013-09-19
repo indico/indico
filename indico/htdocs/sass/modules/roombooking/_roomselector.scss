@@ -36,6 +36,7 @@
         @include single-box-shadow($voff: 2px);
         background: transparent !important;
         margin: 0;
+        padding: 3px;
         position: relative;
         z-index: 1;
 

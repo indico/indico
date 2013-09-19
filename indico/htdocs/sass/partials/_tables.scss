@@ -24,32 +24,12 @@ table.i-table {
     margin-top: 1.6em;
     table-layout: fixed;
     width: 100%;
-}
 
-h3.i-table {
-    color: #777;
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 0em;
-    margin-top: 1.6em;
-    padding: 3px 3px 5px 3px;
-}
+    &.no-margin {
+        margin-top: 0em;
+    }
 
-h3.i-table.emphasis {
-    font-style: italic;
-}
-
-h3.i-table.border {
-    border-bottom: 1px solid #E5E5E5;
-}
-
-h3.i-table + table.i-table,
-table.i-table.no-margin {
-    margin-top: 0em;
-}
-
-.i-table thead {
-    th {
+    thead th {
         padding: 5px;
         font-weight: bold;
         text-align: left;
@@ -63,33 +43,52 @@ tr.i-table {
 }
 
 td.i-table {
+    @include box-sizing(border-box);
     border-left: 2px solid transparent;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
     overflow: hidden;
     padding: 5px 3px 5px 3px;
     text-overflow: ellipsis;
     white-space: nowrap;
     vertical-align: middle;
+
+    &.empty {
+        color: $dark-gray;
+        font-style: italic;
+    }
+
+    &[class*="icon-"] {
+         width: 30px;
+
+         &:before {
+            color: $black !important;
+            font-size: 1.2em;
+         }
+    }
+
+    & ~ td.i-table {
+        border-left: none !important;
+    }
 }
 
-td.i-table ~ td.i-table {
-    border-left: none !important;
-}
-
-td.i-table.empty {
-    color: #999;
-    font-style: italic;
-}
-
-td.i-table[class*="icon-"] {
-     width: 30px;
-}
-
-td.i-table[class*="icon-"]:before {
-    color: #555 !important;
+h3.i-table {
+    color: $light-black;
     font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 0em;
+    margin-top: 1em;
+    padding: 3px 3px 5px 3px;
+
+    &.emphasis {
+        font-style: italic;
+    }
+
+    &.border {
+        border-bottom: 1px solid #E5E5E5;
+    }
+
+    & + table.i-table {
+        margin-top: 0em;
+    }
 }
 
 /* **************** */

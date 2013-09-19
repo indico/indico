@@ -32,6 +32,14 @@
     vertical-align: middle;
 }
 
+%button-disabled {
+    border-color: $gray;
+    background: #EAEAEA;
+    box-shadow: none;
+    color: $gray !important;
+    cursor: default;
+}
+
 @mixin i-button-custom($line-height: 1.6em, $font-size: 1.1em) {
     @extend %button;
     @include box-sizing(content-box);
@@ -70,6 +78,11 @@
         @include background-image(linear-gradient(top, #E2E2E2, #F7F7F7));
         border-color: $gray;
         box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+    }
+
+    .i-button:disabled,
+    .i-button.disabled {
+        @extend %button-disabled;
     }
 
     &[class*="icon-"] {
@@ -268,17 +281,6 @@ button::-moz-focus-inner {
 .i-button > [class*="icon-"]:before {
     font-size: 1.2em;
     vertical-align: -15%;
-}
-
-.i-button:disabled,
-.i-button.disabled,
-.group.selection > input[type=checkbox]:disabled + label,
-.group.selection > input[type=radio]:disabled + label {
-    border: 1px solid $gray;
-    background: #EAEAEA !important;
-    box-shadow: none !important;
-    color: $gray !important;
-    cursor: default !important;
 }
 
 /* ************** */
