@@ -41,7 +41,7 @@ from MaKaC.review import AbstractStatusSubmitted
 from MaKaC.review import AbstractTextField
 from MaKaC.common.TemplateExec import render
 
-from indico.util.string import render_markdown as m
+from indico.util.string import render_markdown
 
 
 class WConfCFADeactivated(WConfDisplayBodyBase):
@@ -729,7 +729,7 @@ class WAbstractManagment(wcomponents.WTemplated):
                         <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">%s</span></td>
                         <td bgcolor="white" valign="top"><table class="tablepre"><tr><td><pre><div style="white-space: nowrap;">%s</div></pre></td></tr></table></td>
                     </tr>
-                """ % (self.htmlText(caption), m(self.htmlText(value))))
+                """ % (self.htmlText(caption), render_markdown(self.htmlText(value)))
         return html
 
     def getVars(self):

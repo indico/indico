@@ -37,6 +37,9 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.fonts import addMapping
 from MaKaC.i18n import _
 from MaKaC.common.utils import isStringHTML
+from MaKaC.common.Configuration import Config
+import subprocess, shlex, os, tempfile
+
 
 from PIL import Image as PILImage
 
@@ -702,3 +705,64 @@ class PDFWithTOC(PDFBase):
         self.getBody()
         self._doc.multiBuild( self._story, onFirstPage=self.firstPage, onLaterPages=self.laterPages)
         return self._fileDummy.getData()
+
+
+
+class LatexRunner:
+    """ handles the PDF generation from a chosen LaTeX template
+    Works the same way for every run, except for the Contributions Book
+    that holds a Table of Contents, in this case the pdflatex command
+    has to run twice: the first one to generate the .toc file and the
+    second to compile it into the created .tex file
+    """
+
+    texname = ''
+    texdir = ''
+    tempdir = ''
+    has_toc = False
+
+    def __init__(self, filename, has_toc = False):
+        self.texname = filename[:-3] + 'tex'
+        self.has_toc = has_toc
+
+
+    def run(self, template_name, args = ()):
+        pdflatex_cmd = 'pdflatex --shell-escape \"%s\"' % self.texname
+
+        template_dir = Config.getInstance().getTPLDir()
+
+        with open(os.path.join(template_dir, template_name), "r") as tpl_file:
+            template = tpl_file.read()
+
+        template = template % args
+
+        self.tempdir = tempfile.mkdtemp()
+        self.texdir = os.path.join(self.tempdir, self.texname)
+
+        with open(self.texdir,'w') as f:
+            f.write(template)
+
+        pdflatex_cmd = 'pdflatex --shell-escape \"%s\"' % self.texdir
+
+        proc = subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE)
+        proc.communicate()
+
+        if self.has_toc:
+            proc = subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE)
+            proc.communicate()
+
+        pdfname = self.texname[:-3] + 'pdf'
+        proc = subprocess.Popen(shlex.split('mv \"%s\" %s' % (pdfname, self.tempdir)), stdout=subprocess.PIPE)
+        proc.communicate()
+
+        pdfname = os.path.join(self.tempdir, pdfname)
+
+        return pdfname
+
+    def cleanup(self):
+        for ext in ['log', 'aux', 'out']:
+            os.unlink(self.texname[:-3] + ext)
+        os.unlink(self.texdir)
+
+        if self.has_toc:
+            os.unlink(self.texname[:-3] + 'toc')
