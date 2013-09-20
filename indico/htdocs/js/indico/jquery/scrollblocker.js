@@ -38,10 +38,8 @@
                         return false;
                     }
 
-                    if (blocker.scrollTop()+1 >= (blocker.prop("scrollHeight") - blocker.outerHeight())) {
-                        if (!wheelup) {
-                            return false;
-                        }
+                    if ((blocker.scrollTop()+1 >= (blocker.prop("scrollHeight") - blocker.outerHeight())) && !wheelup) {
+                        return false;
                     }
                 }
 
