@@ -1,6 +1,6 @@
 <div id="headPanel" class="follow-scroll">
   <div class="toolbar">
-        <div class="group left">
+        <div class="group">
             <a href="#" class="i-button icon-plus" id="section_create" title="${ _('Create section')}"></a>
             <a href="#" class="i-button" id="sections_mgmt">${ _("Recover/Discard sections")}</a>
             <a href="#" class="i-button icon-stack-plus" id="expand_all" title="${ _('Expand All')}"></a>
@@ -22,8 +22,8 @@
         var rfView = new RegFormEditionView({el: $("div#registrationForm")});
         var model = rfView.getModel();
         var sectionsMgmt = new RegFormSectionsMgmtView({el: $('#section-mgmt-popup'), model: model});
-        var sectionCreate = new RegFormSectionsCreateView({el: $('#section-create-popup'), model :model});
-
+        var sectionCreate = new RegFormSectionsCreateView({el: $('#section-create-popup'), model :
+        
         $(window).scroll(function(){
             IndicoUI.Effect.followScroll();
         });
