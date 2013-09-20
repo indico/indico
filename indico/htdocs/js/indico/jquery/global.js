@@ -63,6 +63,15 @@ $(document).ready(function() {
         }, event);
     });
 
+    // Enable colorbox for links with rel="lightbox"
+    $('body').on('click', 'a[rel="lightbox"]', function() {
+        $(this).colorbox({
+            maxHeight: '90%',
+            maxWidth: '90%',
+            returnFocus: false
+        });
+    });
+
     $('.contextHelp[data-src]').qtip({
         content: {
             text: function() {
@@ -71,8 +80,6 @@ $(document).ready(function() {
         }
     });
 
-    // Enable colorbox for links with rel="lightbox"
-    $('a[rel="lightbox"]').colorbox({maxHeight: '90%'});
     $(".body").on("click", "[data-confirm]", function(event){
         var self = this;
         new ConfirmPopup($(this).data("title"), $(this).data("confirm"), function(confirmed){

@@ -33,7 +33,6 @@
             self._initWidget();
             self._draw();
             self._setBindings();
-            self._enableColorbox();
         },
 
         destroy: function() {
@@ -164,14 +163,6 @@
 
             self.parts.list.on("mouseleave", function() {
                 $(this).find('label').removeClass('ui-state-hover');
-            });
-        },
-
-        _enableColorbox: function() {
-            var self = this;
-            self.widget.find("a[rel='lightbox']").colorbox({
-                maxHeight: '90%',
-                returnFocus: false
             });
         },
 
