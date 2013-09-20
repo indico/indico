@@ -246,16 +246,12 @@
         // Reds out the invalid textboxes and returns false if something is invalid.
         // Returns true if form may be submited.
         function validateForm(onlyLocal) {
-
-            // Clean up - make all textboxes white again
             var searchForm = $('#searchForm');
-            $(':input', searchForm).removeClass('invalid');
+            $('.invalid', searchForm).removeClass('invalid');
 
-            // Init
             var isValid = true;
-            var repeatability = $("#repeatability input:radio[name='repeatability']").val();
+            var repeatability = $("#repeatability input:radio[name='repeatability']:checked").val();
 
-            // Holidays warning
             if (!onlyLocal) {
                 saveCalendarData($('#finishDate').val());
                 var holidaysWarning = indicoSource('roomBooking.getDateWarning', searchForm.serializeObject());
@@ -270,27 +266,24 @@
                 });
             }
 
-            updateDateRange();
-
-            // Date validator (repeatability)
-            if (repeatability != 'None') {
-                isValid = validate_period(true, true, 1) && isValid; // 1: validate dates
-            }
+            updateDateRange(repeatability);
+            isValid = validate_period(true, true, 1, repeatability) && isValid; // 1: validate dates
 
             // Time validator
             if ($('#sTime').val() != '') {
                 isValid = validate_period(false, false, 2) && isValid; // 2: validate only times
             }
-
             return isValid;
         }
 
-        function updateDateRange() {
+        function updateDateRange(repeatability) {
             var flexibilityrange = $("#flexibleDates input:radio[name='flexibleDatesRange']:checked").val();
             var sdate = new Date($('#sYear').val(), parseInt($('#sMonth').val() - 1), $('#sDay').val());
             var edate = new Date($('#eYear').val(), parseInt($('#eMonth').val() - 1), $('#eDay').val());
-            sdate.setDate(sdate.getDate() - parseInt(flexibilityrange));
-            edate.setDate(edate.getDate() + parseInt(flexibilityrange));
+            if (repeatability !== "0") {
+                sdate.setDate(sdate.getDate() - parseInt(flexibilityrange));
+                edate.setDate(edate.getDate() + parseInt(flexibilityrange));
+            }
             $('#sDay').val(sdate.getDate());
             $('#sMonth').val(parseInt(sdate.getMonth() + 1));
             $('#sYear').val(sdate.getFullYear());

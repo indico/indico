@@ -188,7 +188,7 @@
             self.filter.capacity = $("<input type='text' id='capacity' value='0'/>");
 
             // Searchbox
-            header.find(".ui-multiselect-filter").addClass("group").html("")
+            header.find(".ui-multiselect-filter").addClass("group").empty()
                 .append($("<span class='i-button label icon-search'/>"))
                 .append(filter.search);
             filter.search.realtimefilter({

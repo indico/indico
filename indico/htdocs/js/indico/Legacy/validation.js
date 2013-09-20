@@ -1,3 +1,4 @@
+
 /* This file is part of Indico.
  * Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
  *
@@ -140,7 +141,7 @@ sDay, sMonth, sYear, sTime
 eDay, eMonth, eYear, eTime
 repeatability
 */
-function validate_period(withRepeatability, allowPast, what )
+function validate_period(withRepeatability, allowPast, what, repeatability)
 {
     var DATES_AND_TIMES = 0; var ONLY_DATES = 1; var ONLY_TIMES = 2;
 
@@ -215,22 +216,20 @@ function validate_period(withRepeatability, allowPast, what )
     }
     // Repetition. Assume eDate >= sDate since the checking was made before
     if ( withRepeatability ) {
-
         var ms_in_one_day = 1000*60*60*24;
         var isRepeatabilityValid = true;
+        var message;
 
-        switch($('#repeatability').val()) {
+        switch(repeatability) {
         // Single Day
         case "None":
-            if( sDate.valueOf() != eDate.valueOf() ) {
-                isRepeatabilityValid = false;
-            }
             break;
         // Repeat Every Day
         case "0":
             if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 1 )
             {
                 isRepeatabilityValid = false;
+                message = $T("Period shorter than 1 day");
             }
             break;
         // Repeat Once a Week
@@ -238,6 +237,7 @@ function validate_period(withRepeatability, allowPast, what )
             if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 7 )
             {
                 isRepeatabilityValid = false;
+                message = $T("Period shorter than 1 week");
             }
             break;
         // Repeat Every Two Weeks
@@ -245,6 +245,7 @@ function validate_period(withRepeatability, allowPast, what )
             if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 14 )
             {
                 isRepeatabilityValid = false;
+                message = $T("Period shorter than 2 weeks");
             }
             break;
         // Repeat Every Three Weeks
@@ -252,6 +253,7 @@ function validate_period(withRepeatability, allowPast, what )
             if( Math.floor((eDate.getTime() - sDate.getTime()) / ms_in_one_day) < 21 )
             {
                 isRepeatabilityValid = false;
+                message = $T("Period shorter than 3 weeks");
             }
             break;
         // Repeat Every Month
@@ -264,6 +266,7 @@ function validate_period(withRepeatability, allowPast, what )
                                     eDate.getDate() < sDate.getDate() )))
             {
                 isRepeatabilityValid = false;
+                message = $T("Period shorter than 1 month");
             }
             break;
         // Otherwise
@@ -272,15 +275,31 @@ function validate_period(withRepeatability, allowPast, what )
             break;
         }
 
+        var label;
+        if ($('#repeatability .label').length) {
+            label = $('#repeatability .label');
+        } else {
+            label = $('#repeatability');
+        }
+
         if (!isRepeatabilityValid) {
-            $('#repeatability').addClass('invalid');
+            if (typeof label.data('qtip') !== "object") {
+                label.qtip({content: {text: message}});
+            } else {
+                label.qtip("api").set("content.text", message);
+            }
+            label.addClass('invalid');
             $('#edate').addClass('invalid');
             isValid = false;
+        } else {
+            label.removeClass('invalid');
+            if (typeof label.data('qtip') === "object") {
+                label.qtip("api").destroy();
+            }
         }
     }
 
-    return isValid
-
+    return isValid;
 }
 
 function validate_allow(allow)

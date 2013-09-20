@@ -53,6 +53,7 @@
 
 <script type="text/javascript">
 % if numRooms != 0 or not ofMyRooms:
+
     var roomBookingCalendar = new RoomBookingCalendar(
       ${jsonEncode(barsFossil)},
       ${jsonEncode(dayAttrs)},

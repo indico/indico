@@ -35,9 +35,7 @@
         var isValid = true;
         % if not infoBookingMode:
             // Date validator (repeatability)
-            if ($('#repeatability').val() != 'None') {
-                isValid = validate_period(true, ${allowPast}, 1) && isValid; // 1: validate dates
-            }
+            isValid = validate_period(true, ${allowPast}, 1, $('#repeatability').val()) && isValid; // 1: validate dates
             // Time validator
             isValid = validate_period(false, ${allowPast}, 2) && isValid; // 2: validate only times
         % endif
