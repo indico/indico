@@ -25,16 +25,12 @@ var RegFormSectionsCreateView = Backbone.View.extend({
 
     initialize: function(){
         var self = this;
-        if(self.options.model){
-            self.model = self.options.model;
-        }
-
         $(this.el).dialog({
             modal: true,
             autoOpen: false,
             resizable: false,
             width : 'auto',
-            title : '<h1>Create a new section</h1>',
+            title : $T('Create a new section'),
             autoResize:true,
             buttons: {
                     Create: function(){
@@ -61,7 +57,7 @@ var RegFormSectionsCreateView = Backbone.View.extend({
         $(self.el).append(self.getTpl('section-create'));
         return self;
     },
-    
+
     clearInput: function(){
         $('form#newSectionForm', this.el).find('input:text, textarea').val('');
     },

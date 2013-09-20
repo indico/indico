@@ -29,6 +29,7 @@ if(!Array.indexOf){
 }
 
 var getConfId = function (){
+    return $("#conf_id").val();
     var url = location.search.substring(1);
     var params = url.split("&");
     var val;

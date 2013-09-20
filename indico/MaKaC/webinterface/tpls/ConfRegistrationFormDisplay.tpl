@@ -63,7 +63,7 @@
     </table>
     <br>
     </form>
-
+    <input type="hidden" value="${confId}" id="conf_id">
     <script type="text/javascript">
 		$(document).ready(function(){
 		    var confId = ${ confId };

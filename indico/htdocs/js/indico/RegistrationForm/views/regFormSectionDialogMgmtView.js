@@ -28,9 +28,6 @@ var RegFormSectionsMgmtView = Backbone.View.extend({
 
     initialize: function(){
         var self = this;
-        if(self.options.model){
-            self.model = self.options.model;
-        }
         self.model.on('reset', this.render, this);
         self.model.on('change', this.render, this);
         $(this.el).dialog({
@@ -90,16 +87,17 @@ var RegFormSectionsMgmtView = Backbone.View.extend({
         var sectionDiv = $(event.target).closest('.regFormSectionMgmt');
         var data = { sectionId : $(sectionDiv).attr('id') };
 
-        var rep = true;
-        rep = confirm($T('Do you really want to remove this section ?\nThis action can\'t be undone'));
-        if(rep === true) {
-            $(sectionDiv).fadeOut('slow', function() {
-                var section = self.model.getRawSectionById($(sectionDiv).attr('id'));
-                self.displayMessage($T("The section '{0}' has been removed from the registration form").format(section.title));
-            });
-            this.model.removeSection(data, true);
-        }
-
+        new ConfirmPopup($T("Remove section"),
+                 $T('Are you sure you want to remove this section? <br/>This action is irreversible.'),
+                 function(action) {
+                    if (action) {
+                        $(sectionDiv).fadeOut('slow', function() {
+                            var section = self.model.getRawSectionById($(sectionDiv).attr('id'));
+                            self.displayMessage($T("The section '{0}' has been removed from the registration form").format(section.title));
+                        });
+                        self.model.removeSection(data, true);
+                    }
+                }, $T("Remove")).open();
     },
 
     createSection : function(event,ui){

@@ -86,9 +86,6 @@ var Indico = {
         ${ json.dumps(dict((k.lower(),v[2]) for k,v in config.getFileTypes().iteritems())) }
     ,
     Urls: {
-
-        BaseUrl: "${ Config.getInstance().getBaseURL() }",
-
         JsonRpcService: window.location.protocol == "https:"?"${ urlHandlers.UHJsonRpcService.getURL(secure=True) }":"${ urlHandlers.UHJsonRpcService.getURL() }",
 
         Base: (window.location.protocol == "https:" ? "${ Config.getInstance().getBaseSecureURL() }" : "${ Config.getInstance().getBaseURL() }"),

@@ -39,8 +39,10 @@ var RegFormEditionView = RegFormDisplayView.extend({
         'click #buttonFieldRemove'          : '_setFieldStatus',
         'click #buttonFieldDisable'         : '_setFieldStatus',
         'click #buttonFieldEnable'          : '_setFieldStatus',
-        'hover .editableItem'               : '_displayFieldOptions',
-        'hover .regFormFieldDisabled'       : '_displayDisabledFieldOptions',
+        'mouseenter .editableItem'          : '_displayFieldOptions',
+        'mouseleave .editableItem'          : '_displayFieldOptions',
+        'mouseenter .regFormFieldDisabled'  : '_displayDisabledFieldOptions',
+        'mouseleave .regFormFieldDisabled'  : '_displayDisabledFieldOptions',
         'click .editableText'               : '_editSectionHeader'
     },
 
@@ -174,7 +176,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
             $(select).effect("highlight", {}, 6000);
         });
     },
-    
+
 
 
     _getSectionId: function($element) {
@@ -237,7 +239,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
 
         // Add section options (add, remove, disable) according to the locks
         $('.'+this.classes.header, selected).each( function (ind, el) {
-            id = $(el).closest('.' + regForm.classes.section).data('id');
+            id = $(el).closest('.' + regForm.classes.section).data('sectionId');
             var actions = self.model.getSectionById(id).actions;
             $(el).before(self.getTplEditionItem('sectionButtons', { actions : actions }));
         });
@@ -271,16 +273,27 @@ var RegFormEditionView = RegFormDisplayView.extend({
     },
 
     _disableSection: function (event){
-        var rep = confirm($T('Are you sure you want to disable this field?\nThis action can be undone using "recover/discard sections" menu'));
-        if(rep === true) {
-            var data = { 'sectionId' : this._getSectionId($(event.target)) };
-            this.model.disableSection(data);
-            var sectionEl = $(event.currentTarget).closest('.'+this.classes.section);
-            $(sectionEl).fadeOut('slow',function(){ $(sectionEl).remove(); });
-        }
+        var self = this;
+        new ConfirmPopup($T("Disable section"),
+                         $T('Are you sure you want to disable this section? <br/>This action can be undone using "recover/discard sections" menu'),
+                         function(action) {
+                            if (action) {
+                                var data = { 'sectionId' : self._getSectionId($(event.target)) };
+                                self.model.disableSection(data);
+                                var sectionEl = $(event.currentTarget).closest('.'+self.classes.section);
+                                $(sectionEl).fadeOut('slow',function(){ $(sectionEl).remove(); });
+                            }
+                        }, $T("Disable")).open();
+    },
+
+    _performSetFieldStatus: function(field, data, silent) {
+        this.model.getSectionById(data.sectionId).setFieldStatus(data, silent);
+        $(field).fadeOut('slow',function(){ $(field).remove(); });
+
     },
 
     _setFieldStatus: function (event){
+        var self = this;
         var actionsList = {
                 'buttonFieldRemove'     : 'remove',
                 'buttonFieldDisable'    : 'disable',
@@ -292,17 +305,18 @@ var RegFormEditionView = RegFormDisplayView.extend({
             sectionId: this._getSectionId($(event.target)),
             fieldId: $(field).attr('id')
         };
-        var rep = true;
-        if (data.action == 'remove'){
-            rep = confirm($T('Are you sure you want to disable this field ?\nThis action is irreversible.'));
-        }
 
-        if(rep === true) {
-            var silent = data.action == 'remove';
-            this.model.getSectionById(data.sectionId).setFieldStatus(data, silent);
-            $(field).fadeOut('slow',function(){ $(field).remove(); });
+        if (data.action == 'remove') {
+            new ConfirmPopup($T("Disable field"),
+                             $T('Are you sure you want to disable this field? <br/>This action is irreversible.'),
+                             function(action) {
+                                if (action) {
+                                    self._performSetFieldStatus(field, data, true);
+                                }
+                            }, $T("Disable")).open();
+        } else {
+            this._performSetFieldStatus(field, data, false);
         }
-
     },
 
     _editSectionHeader: function (event){
@@ -390,7 +404,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
 
             var editHTML = this.getTplEditionItem('fieldButtons', dict);
             var selector = $(event.currentTarget).closest('.' + this.config.editableItemClass).find('tr:first');
-            $(selector).before('<tr><td colspan="2" align="right">'+$(editHTML).html()+'<td></tr>');
+            $(selector).before('<tr><td colspan="2" align="right">'+$(editHTML).html()+'</td></tr>');
             this.em.addTmp($(event.currentTarget).closest('.' + this.config.editableItemClass).find('tr:first'));
             this._iconifyFieldButtons();
         }
@@ -403,7 +417,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
         if(event.type == 'mouseenter' && this.editing === false){
             var editHTML = this.getTplEditionItem('fieldDisabledButtons',{});
             var selector = $(event.currentTarget).closest('.' + regForm.classes.fieldDisabled).find('tr:first');
-            $(selector).before('<tr><td colspan=2 align="right">'+$(editHTML).html()+'<td></tr>');
+            $(selector).before('<tr><td colspan=2 align="right">'+$(editHTML).html()+'</td></tr>');
             this.em.addTmp($(event.currentTarget).closest('.' + regForm.classes.fieldDisabled).find('tr:first'));
             this._iconifyFieldButtons();
         }
@@ -477,8 +491,8 @@ var RegFormEditionView = RegFormDisplayView.extend({
         // Save the initial position of the section/item
         $( '.sortableForm' ).bind( 'sortstart', function (event, ui){
             event.stopPropagation();
-            sectionId = self._getSectionId($(event.target));
-            fieldId = $(event.target).closest('.' + self.config.editableItemClass + ', .' + regForm.classes.fieldDisabled).attr('id');
+            sectionId = self._getSectionId($(ui.item));
+            fieldId = $(ui.item).closest('.' + self.config.editableItemClass + ', .' + regForm.classes.fieldDisabled).attr('id');
         });
     },
 

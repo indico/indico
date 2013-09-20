@@ -5,6 +5,7 @@
 </%block>
 
 <%block name="content">
+    <input type="hidden" value="${confId}" id="conf_id">
     <table width="100%">
         <tr>
             <td>
