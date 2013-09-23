@@ -1298,7 +1298,7 @@ class WhooshTextIndex(object):
 
     def index(self, obj):
         if obj.getId() in self:
-            raise KeyError("Key '%s' already exists in index!" % obj.getId())
+            raise KeyError("Key {0} already exists in index!".format(obj.getId())
         self._index(obj)
 
     def unindex(self, obj):
@@ -1306,10 +1306,9 @@ class WhooshTextIndex(object):
             with self._textIdx.writer() as writer:
                 writer.delete_by_term("id", unicode(obj.getId()))
         else:
-            Logger.get('indexes.text').error("No such entry '%s'" % obj.getId())
+            Logger.get('indexes.text').error("No such entry {0}".format(obj.getId()))
 
     def search(self, text, limit=None):
-        #raise Exception("%s %s %s" % (text, limit, page))
         results = []
         with self._textIdx.searcher() as searcher:
             qp = QueryParser("content", self._textIdx.schema)

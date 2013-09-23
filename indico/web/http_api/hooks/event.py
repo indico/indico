@@ -76,7 +76,7 @@ class EventSearchHook(HTTPAPIHook):
     def _getParams(self):
         super(EventSearchHook, self)._getParams()
         search = self._pathParams['search_term']
-        self._query = ' AND '.join(map(lambda y: "*%s*" % y, filter(lambda x: len(x) > 0, search.split(' '))))
+        self._query = ' '.join(map(lambda y: "*%s*" % y, self._searchString.split()))
 
     def export_event(self, aw):
         expInt = EventSearchFetcher(aw, self)
@@ -346,10 +346,7 @@ class EventSearchFetcher(IteratedDataFetcher):
         index = IndexesHolder().getById("conferenceTitle")
 
         def _iterate_objs(query):
-            try:
-                results = index.search(query)
-            except parsetree.ParseError:
-                results = []
+            results = index.search(query)
             for id, _ in results:
                 event = ch.getById(id)
                 if event is not None and event.canAccess(self._aw):

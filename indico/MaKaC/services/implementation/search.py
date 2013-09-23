@@ -137,16 +137,9 @@ class SearchCategoryNames(ServiceBase):
         import MaKaC.common.indexes as indexes
         nameIdx = indexes.IndexesHolder().getIndex('categoryName')
 
-        try:
-            query = ' AND '.join(map(lambda y: "*%s*" % y, filter(lambda x: len(x) > 0, self._searchString.split(' '))))
-            foundEntries = nameIdx.search(query)
-        except parsetree.ParseError:
-            foundEntries = []
-
+        query = ' '.join(map(lambda y: "*%s*" % y, self._searchString.split()))
+        foundEntries = nameIdx.search(query, limit=7)
         number = len(foundEntries)
-
-        # get only the first results
-        foundEntries = foundEntries[:7]
 
         entryNames = []
 
@@ -178,11 +171,8 @@ class SearchConferenceTitles(ServiceBase):
         import MaKaC.common.indexes as indexes
         nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
 
-        try:
-            query = ' AND '.join(map(lambda y: "*%s*" % y, filter(lambda x: len(x) > 0, self._searchString.split(' '))))
-            foundEntries = nameIdx.search(query)
-        except parsetree.ParseError:
-            foundEntries = []
+        query = ' '.join(map(lambda y: "*%s*" % y, self._searchString.split()))
+        foundEntries = nameIdx.search(query)
 
         number = len(foundEntries)
 
