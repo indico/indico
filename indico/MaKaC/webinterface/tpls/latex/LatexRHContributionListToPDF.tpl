@@ -48,7 +48,7 @@
 \endgroup
 
 \newpage
-\fancyhead[L]{\small \selectfont \color{gray} %s / Abstracts Book}
+\fancyhead[L]{\small \selectfont \color{gray} %s / Contributions Book}
 \fancyhead[C]{}
 \fancyhead[R]{}
 \fancyfoot[L]{\small \selectfont \color{gray} \today}

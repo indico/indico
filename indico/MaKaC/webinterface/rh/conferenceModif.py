@@ -3106,7 +3106,7 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
                             i18nformat(""" _("Page") """),
                             pdf.getBodyLatex())
 
-            latex = LatexRunner(filename, True)
+            latex = LatexRunner(filename)
             pdffile = latex.run(latex_template, template_args)
             latex.cleanup()
 

@@ -16,7 +16,6 @@
             colorlinks = true, 
             urlcolor = Violet,
             breaklinks = true]{hyperref}  %% hyperlinks configuration
-\usepackage{tocloft} %% table of contents
 \usepackage{sectsty} %% default font family
 \allsectionsfont{\rmfamily} %% default font family
 \usepackage{titlesec}
@@ -27,9 +26,9 @@
 \fancyhead[L]{}
 \fancyhead[C]{}
 \fancyhead[R]{}
-\fancyfoot[L]{}
+\fancyfoot[L]{\small \selectfont \color{gray} %s / Book of abstracts}
 \fancyfoot[C]{}
-\fancyfoot[R]{}
+\fancyfoot[R]{\small \selectfont \color{gray} \today}
 }
 
 \renewcommand{\headrulewidth}{0pt}
@@ -40,20 +39,20 @@
 
 %s
 
-\begingroup
-\hypersetup{linkcolor=black}
-\renewcommand{\contentsname}{\centerline{\fontsize{18}{20}\selectfont Table of contents}}
-\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
-\tableofcontents
-\endgroup
-
 \newpage
-\fancyhead[L]{\small \selectfont \color{gray} %s / Abstracts Book}
+\fancyhead[L]{\small \selectfont \color{gray} %s / Book of abstracts}
 \fancyhead[C]{}
 \fancyhead[R]{}
-\fancyfoot[L]{\small \selectfont \color{gray} \today}
-\fancyfoot[C]{}
-\fancyfoot[R]{\small \selectfont \color{gray} %s \thepage}
+\fancyfoot[L]{}
+\fancyfoot[C]{\small \selectfont \color{gray} %s \thepage}
+\fancyfoot[R]{}
+
+\newpage
+\vfill
+\newpage
+\vfill
+
+\allsectionsfont{\sffamily} %% default font family
 
 %s
 
