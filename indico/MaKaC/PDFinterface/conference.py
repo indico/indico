@@ -1235,13 +1235,14 @@ class ContributionBook(PDFBase):
         contrib_first += "{\\bf %s}" % escape(self._conf.getTitle())
         contrib_first += "}\n\\vspace{15 mm}\n"
         contrib_first += "\\centerline{\\rmfamily\\Large\\selectfont\n"
-        contrib_first += "{\\bf %s - %s}" % \
+        contrib_first += "{\\bf %s - %s}\n" % \
                 (self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"),
                 self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y"))
+        contrib_first += "}\n\\vspace{5 mm}\n\n"
         if self._conf.getLocation():
             contrib_first += "\\centerline{\\rmfamily\\Large\\selectfont\n"
             contrib_first += "{\\bf %s}" % escape(self._conf.getLocation().getName())
-            contrib_first += "}\n\\vspace{40 mm}\n\n"
+            contrib_first += "}\n\\vspace{50 mm}\n\n"
         else:
             contrib_first += "}\n\\vspace{50 mm}\n\n"
         contrib_first += "\\centerline{\\rmfamily\\fontsize{30}{40}\\selectfont\n"

@@ -725,11 +725,10 @@ class LatexRunner:
         self.texname = filename[:-3] + 'tex'
         self.has_toc = has_toc
 
-
     def run(self, template_name, args = ()):
         pdflatex_cmd = 'pdflatex --shell-escape \"%s\"' % self.texname
 
-        template_dir = Config.getInstance().getTPLDir()
+        template_dir = os.path.join(Config.getInstance().getTPLDir(),'latex')
 
         with open(os.path.join(template_dir, template_name), "r") as tpl_file:
             template = tpl_file.read()
@@ -742,7 +741,7 @@ class LatexRunner:
         with open(self.texdir,'w') as f:
             f.write(template)
 
-        pdflatex_cmd = 'pdflatex --shell-escape \"%s\"' % self.texdir
+        pdflatex_cmd = 'pdflatex -output-directory %s --shell-escape \"%s\"' % (self.tempdir, self.texdir)
 
         proc = subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE)
         proc.communicate()
@@ -751,18 +750,18 @@ class LatexRunner:
             proc = subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE)
             proc.communicate()
 
-        pdfname = self.texname[:-3] + 'pdf'
-        proc = subprocess.Popen(shlex.split('mv \"%s\" %s' % (pdfname, self.tempdir)), stdout=subprocess.PIPE)
-        proc.communicate()
-
-        pdfname = os.path.join(self.tempdir, pdfname)
+        pdfname = os.path.join(self.tempdir, self.texname[:-3] + 'pdf')
 
         return pdfname
 
     def cleanup(self):
         for ext in ['log', 'aux', 'out']:
-            os.unlink(self.texname[:-3] + ext)
-        os.unlink(self.texdir)
+            os.unlink(os.path.join(self.tempdir, self.texname[:-3] + ext))
+        os.unlink(os.path.join(self.tempdir, self.texdir))
 
         if self.has_toc:
+<<<<<<< HEAD
             os.unlink(self.texname[:-3] + 'toc')
+=======
+            os.unlink(os.path.join(self.tempdir, self.texname[:-3] + 'toc'))
+>>>>>>> [MIN] Minor fixes in LatexRunner() and templates
