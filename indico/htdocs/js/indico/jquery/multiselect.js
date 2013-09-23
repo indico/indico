@@ -18,9 +18,10 @@
 var oldcreate = $.ech.multiselect.prototype._create;
 
 $.extend($.ech.multiselect.prototype, {
+
     _create: function() {
-        this.super = oldcreate;
-        this.super(this);
+        this.oldcreate = oldcreate;
+        this.oldcreate(this);
         this._fixLabels();
     },
 

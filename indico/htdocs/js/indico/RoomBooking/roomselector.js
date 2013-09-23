@@ -92,7 +92,7 @@
                         (room.capacity || Number(0)))
                     .attr("value", room.guid)
                     .append($("<span/>").text(room.name))
-                    .append($("<span class='location'/>").text(" (" + room.locationName + ")"))
+                    .append($("<span/>").text(" (" + room.locationName + ")"))
                     .appendTo(self.select);
             });
         },
@@ -280,8 +280,9 @@
             self.select.find("option").each(function(index) {
                 var labelparts = $(this).attr('label').split(":");
                 var item = self.parts.list.find('input[value="' + $(this).val() +'"]').parent();
-                item.find("span").addClass("roomname")
-                    .find("span:last-child").addClass("location");
+                item.children("span").addClass("roomid")
+                    .children(":first-child").addClass("roomname")
+                    .next().addClass("roomlocation");
 
                 var pic = $("<a class='roompicture'/>")
                     .append($("<img src='" + rooms[index].thumbnailPhotoURL + "'/>"))

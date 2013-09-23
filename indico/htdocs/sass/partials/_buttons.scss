@@ -68,14 +68,14 @@
     padding: 4px 10px 4px;
 
     &:hover {
-        @include background-image(linear-gradient(top, #F7F7F7, #E2E2E2));
+        @include gradient(#F7F7F7, #E2E2E2);
         border-color: #999;
         box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
         color: $black !important;
     }
 
     &:active {
-        @include background-image(linear-gradient(top, #E2E2E2, #F7F7F7));
+        @include gradient(#E2E2E2, #F7F7F7);
         border-color: $gray;
         box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
     }
@@ -102,7 +102,7 @@
         border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
 
         &:hover {
-            @include background-image(linear-gradient(top, #0DA500, #0B8D00));
+            @include gradient(#0DA500, #0B8D00);
             color: #F4F4F4 important;
             text-shadow: 1px 1px 1px #888;
             filter: progid:dximagetransform.microsoft.gradient(startColorstr='#0088CC', endColorstr='#0055CC', GradientType=0);
@@ -116,7 +116,7 @@
         color: #EFEFEF !important;
 
         &:hover {
-            @include background-image(linear-gradient(top, #CF2323, #AF0000));
+            @include gradient(#CF2323, #AF0000);
             color: #f4f4f4 !important;
             text-shadow: 1px 1px 1px #444;
             filter: progid:dximagetransform.microsoft.gradient(startColorstr='#0088CC', endColorstr='#0055CC', GradientType=0);
@@ -130,7 +130,7 @@
         border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
 
         &:hover {
-            @include background-image(linear-gradient(top, #0E75BA, #0B63A5));
+            @include gradient(#0E75BA, #0B63A5);
             color: #F4F4F4 important;
             text-shadow: 1px 1px 1px #888;
             filter: progid:dximagetransform.microsoft.gradient(startColorstr='#0088CC', endColorstr='#0055CC', GradientType=0);
@@ -145,7 +145,7 @@
         font-weight: normal !important;
 
         &:hover {
-            @include background-image(linear-gradient(top, #F3BB08, #E99E18));
+            @include gradient(#F3BB08, #E99E18);
             color: #FDFDFD !important;
             text-shadow: 1px 1px 1px #888 !important;
             filter: progid:dximagetransform.microsoft.gradient(startColorstr='#0088cc', endColorstr='#0055cc', GradientType=0);
