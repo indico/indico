@@ -27,117 +27,183 @@ from indico.util.date_time import format_date
 class IRegFormRadioItemFossil(IFossil):
 
     def getId(self):
-        """ Item id """
+        """
+        Item id
+        """
 
     def getCaption(self):
-        """ Item caption """
+        """
+        Item caption
+        """
 
     def getPrice(self):
-        """ Item price """
+        """
+        Item price
+        """
 
     def getPlacesLimit(self):
-        """ Item places limit """
+        """
+        Item places limit
+        """
 
     def getNoPlacesLeft(self):
-        """ Number of remaining places """
+        """
+        Number of remaining places
+        """
 
     def isEnabled(self):
-        """ Is item enabled """
+        """
+        Is item enabled
+        """
 
     def isBillable(self):
-        """ Is item billable """
+        """
+        Is item billable
+        """
 
 
 class IRegFormAccommodationTypeItemFossil(IFossil):
 
     def getId(self):
-        """ Item id """
+        """
+        Item id
+        """
 
     def getCaption(self):
-        """ Item caption """
+        """
+        Item caption
+        """
 
     def getPlacesLimit(self):
-        """ Places limit """
+        """
+        Places limit
+        """
 
     def getPrice(self):
-        """ Accommodation price """
+        """
+        Accommodation price
+        """
 
     def getCurrency(self):
-        """ Accommodation price currency """
+        """
+        Accommodation price currency
+        """
 
     def getNoPlacesLeft(self):
-        """ Current number of left places """
+        """
+        Current number of left places
+        """
 
     def isBillable(self):
-        """ is billable """
+        """
+        is billable
+        """
     isBillable.name = 'billable'
 
     def isCancelled(self):
-        """ Is cancelled """
+        """
+        Is cancelled
+        """
     isCancelled.name = 'cancelled'
 
 
 class IRegFormRegistrationSessionItemFossil(IFossil):
 
     def getId(self):
-        """ Registration session id """
+        """
+        Registration session id
+        """
 
     def getCaption(self):
-        """ registration session title """
+        """
+        registration session title
+        """
 
     def getStartDate(self):
-        """ registration session start date """
+        """
+        registration session start date
+        """
 
     def getCode(self):
-        """ registration session start date """
+        """
+        registration session start date
+        """
 
     def getPrice(self):
-        """ registration session price """
+        """
+        registration session price
+        """
 
     def getCurrency(self):
-        """ registration session price currency """
+        """
+        registration session price currency
+        """
 
     def isBillable(self):
-        """ is billable """
+        """
+        is billable
+        """
     isBillable.name = 'billable'
 
 
 class IRegFormSocialEventItemFossil(IFossil):
 
     def getId(self):
-        """ item id """
+        """
+        item id
+        """
 
     def getCaption(self):
-        """ Item caption """
+        """
+        Item caption
+        """
 
     def getCancelledReason(self):
-        """ get cancelled reason """
+        """
+        get cancelled reason
+        """
 
     def getMaxPlacePerRegistrant(self):
-        """ Max place per registrant """
+        """
+        Max place per registrant
+        """
 
     def getPlacesLimit(self):
-        """ Places limit """
+        """
+        Places limit
+        """
 
     def getNoPlacesLeft(self):
-        """ Number of places left """
+        """
+        Number of places left
+        """
 
     def getPrice(self):
-        """ item price """
+        """
+        item price
+        """
 
     def getCurrency(self):
-        """ item currency """
+        """
+        item currency
+        """
 
     def isBillable(self):
-        """ Is billable """
+        """
+        Is billable
+        """
     isBillable.name = 'billable'
 
     def isCancelled(self):
-        """ Is cancelled """
+        """
+        Is cancelled
+        """
     isCancelled.name = 'cancelled'
 
     def isPricePerPlace(self):
-        """ Is the price per place """
+        """
+        Is the price per place
+        """
 
 
 #####################
@@ -146,22 +212,31 @@ class IRegFormSocialEventItemFossil(IFossil):
 class IRegFormInputFieldBaseFossil(IFossil):
 
     def getHTMLName(self):
-        """ Get the HTML name of the item """
+        """
+        Get the HTML name of the item
+        """
     getHTMLName.name = 'HTMLName'
 
 
 class IRegFormTextInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     def getLength(self):
-        """ Field length """
+        """
+        Field length
+        """
+
 
 class IRegFormTextareaInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     def getNumberOfRows(self):
-        """ Field number of rows """
+        """
+        Field number of rows
+        """
 
     def getNumberOfColumns(self):
-        """ Field number of columns """
+        """
+        Field number of columns
+        """
 
 
 class IRegFormLabelInputFieldFossil(IRegFormInputFieldBaseFossil):
@@ -172,25 +247,37 @@ class IRegFormLabelInputFieldFossil(IRegFormInputFieldBaseFossil):
 class IRegFormNumberInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     def getLength(self):
-        """ Field length """
+        """
+        Field length
+        """
 
     def getMinValue(self):
-        """ Field minimum value """
+        """
+        Field minimum value
+        """
 
 
 class IRegFormRadioGroupInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     def getDefaultItem(self):
-        """ default item """
+        """
+        default item
+        """
 
     def getInputType(self):
-        """ field input type """
+        """
+        field input type
+        """
 
     def getEmptyCaption(self):
-        """ field empty caption """
+        """
+        field empty caption
+        """
 
     def getItemsList(self):
-        """ Field Caption """
+        """
+        Field Caption
+        """
     getItemsList.name = 'radioitems'
     getItemsList.result = IRegFormRadioItemFossil
 
@@ -213,113 +300,158 @@ class IRegFormFileInputFieldFossil(IRegFormInputFieldBaseFossil):
 class IRegFormCountryInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     def getCountriesList(self):
-        """ the countries list """
+        """
+        the countries list
+        """
     getCountriesList.name = 'radioitems'
 
 
 class IRegFormDateInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     def getId(self):
-        """ Field Caption """
+        """
+        Field Caption
+        """
 
     def getDateFormat(self):
-        """ Date Format """
+        """
+        Date Format
+        """
 
     def getDisplayFormats(self):
-        """ Different available date formats """
+        """
+        Different available date formats
+        """
 
 
 class IRegFormTelephoneInputFieldFossil(IRegFormInputFieldBaseFossil):
 
     def getLength(self):
-        """ Field length """
+        """
+        Field length
+        """
 
 
 class IRegFormGeneralFieldFossil(IFossil):
 
     def getId(self):
-        """ Field id """
+        """
+        Field id
+        """
 
     def getCaption(self):
-        """ Field Caption """
+        """
+        Field Caption
+        """
 
     def getDescription(self):
-        """ Field description """
+        """
+        Field description
+        """
 
     def getLocked(self):
-        """ Field locks """
+        """
+        Field locks
+        """
     getLocked.name = 'lock'
 
     def isMandatory(self):
-        """ Is field mandatory """
+        """
+        Is field mandatory
+        """
     isMandatory.name = 'mandatory'
 
     def isDisabled(self):
-        """ Is field disabled """
+        """
+        Is field disabled
+        """
     isDisabled.name = 'disabled'
 
     def isBillable(self):
-        """ Is field disabled """
+        """
+        Is field disabled
+        """
     isBillable.name = 'billable'
 
     def getPrice(self):
-        """ Field price """
+        """
+        Field price
+        """
 
     def getPlacesLimit(self):
-        """ Field places limit """
+        """
+        Field places limit
+        """
 
     def getNoPlacesLeft(self):
-        """ Number of left places """
+        """
+        Number of left places
+        """
 
     def getInput(self):
-        """ Field Caption """
+        """
+        Field Caption
+        """
     getInput.convert = lambda x: x.getId()
 
     def getValues(self):
-        """ Field Values """
+        """
+        Field Values
+        """
     getValues.convert = lambda x: x['inputObj']
-    getValues.result = {
-                         "MaKaC.registration.TextInput":        IRegFormTextInputFieldFossil,
-                         "MaKaC.registration.TextareaInput":    IRegFormTextareaInputFieldFossil,
-                         "MaKaC.registration.LabelInput":       IRegFormLabelInputFieldFossil,
-                         "MaKaC.registration.NumberInput":      IRegFormNumberInputFieldFossil,
-                         "MaKaC.registration.RadioGroupInput":  IRegFormRadioGroupInputFieldFossil,
-                         "MaKaC.registration.CheckboxInput":    IRegFormCheckboxInputFieldFossil,
-                         "MaKaC.registration.YesNoInput":       IRegFormYesNoInputFieldFossil,
-                         "MaKaC.registration.CountryInput":     IRegFormCountryInputFieldFossil,
-                         "MaKaC.registration.DateInput":        IRegFormDateInputFieldFossil,
-                         "MaKaC.registration.TelephoneInput":   IRegFormTelephoneInputFieldFossil,
-                         "MaKaC.registration.FileInput":        IRegFormFileInputFieldFossil
-                         }
+    getValues.result = {"MaKaC.registration.TextInput":        IRegFormTextInputFieldFossil,
+                        "MaKaC.registration.TextareaInput":    IRegFormTextareaInputFieldFossil,
+                        "MaKaC.registration.LabelInput":       IRegFormLabelInputFieldFossil,
+                        "MaKaC.registration.NumberInput":      IRegFormNumberInputFieldFossil,
+                        "MaKaC.registration.RadioGroupInput":  IRegFormRadioGroupInputFieldFossil,
+                        "MaKaC.registration.CheckboxInput":    IRegFormCheckboxInputFieldFossil,
+                        "MaKaC.registration.YesNoInput":       IRegFormYesNoInputFieldFossil,
+                        "MaKaC.registration.CountryInput":     IRegFormCountryInputFieldFossil,
+                        "MaKaC.registration.DateInput":        IRegFormDateInputFieldFossil,
+                        "MaKaC.registration.TelephoneInput":   IRegFormTelephoneInputFieldFossil,
+                        "MaKaC.registration.FileInput":        IRegFormFileInputFieldFossil
+                        }
+
 
 ###########################
 # Section type fossil
 ###########################
-
 class IRegFormSectionBaseFossil(IFossil):
 
     def getId(self):
-        """ Section id """
+        """
+        Section id
+        """
 
     def getTitle(self):
-        """ Section title """
+        """
+        Section title
+        """
 
     def isEnabled(self):
-        """ Section is enabled """
+        """
+        Section is enabled
+        """
     isEnabled.name = 'enabled'
 
 
 class IRegFormGeneralSectionFossil(IRegFormSectionBaseFossil):
 
     def isRequired(self):
-        """ Section is required """
+        """
+        Section is required
+        """
     isRequired.name = 'required'
 
     def getDescription(self):
-        """ Section description """
+        """
+        Section description
+        """
 
     def getSortedFields(self):
-        """ Returns the sorted field in the section """
+        """
+        Returns the sorted field in the section
+        """
     getSortedFields.name = 'items'
     getSortedFields.result = IRegFormGeneralFieldFossil
 
@@ -327,33 +459,51 @@ class IRegFormGeneralSectionFossil(IRegFormSectionBaseFossil):
 class IRegFormFurtherInformationSectionFossil(IRegFormSectionBaseFossil):
 
     def getContent(self):
-        """ Section content """
+        """
+        Section content
+        """
 
     def getItems(self):
-        """ Section items list """
+        """
+        Section items list
+        """
 
 
 class IRegFormAccommodationSectionFossil(IRegFormSectionBaseFossil):
 
     def getDescription(self):
-        """ Section description """
+        """
+        Section description
+        """
 
     def getArrivalOffsetDates(self):
-        """ Arrival offset dates """
+        """
+        Arrival offset dates
+        """
 
     def getDepartureOffsetDates(self):
-        """ Departure offset dates """
+        """
+        Departure offset dates
+        """
 
     def getArrivalDates(self):
-        """ Get arrival dates """
-    getArrivalDates.convert = lambda x: [[format_date(date, "dd-MM-yyyy"),format_date(date, "dd-MMMM-yyyy")] for date in x]
+        """
+        Get arrival dates
+        """
+    getArrivalDates.convert = lambda x: [[format_date(date, "dd-MM-yyyy"), format_date(date, "dd-MMMM-yyyy")]
+                                         for date in x]
 
     def getDepartureDates(self):
-        """ Get departure dates """
-    getDepartureDates.convert = lambda x: [[format_date(date, "dd-MM-yyyy"),format_date(date, "dd-MMMM-yyyy")] for date in x]
+        """
+        Get departure dates
+        """
+    getDepartureDates.convert = lambda x: [[format_date(date, "dd-MM-yyyy"), format_date(date, "dd-MMMM-yyyy")]
+                                           for date in x]
 
     def getAccommodationTypesList(self):
-        """ Accommodation types list """
+        """
+        Accommodation types list
+        """
     getAccommodationTypesList.name = 'items'
     getAccommodationTypesList.result = IRegFormAccommodationTypeItemFossil
 
@@ -361,22 +511,32 @@ class IRegFormAccommodationSectionFossil(IRegFormSectionBaseFossil):
 class IRegFormReasonParticipationSectionFossil(IRegFormSectionBaseFossil):
 
     def getDescription(self):
-        """ Section description """
+        """
+        Section description
+        """
 
     def getItems(self):
-        """ section items """
+        """
+        Section items
+        """
 
 
 class IRegFormSessionSectionFossil(IRegFormSectionBaseFossil):
 
     def getDescription(self):
-        """ Section description """
+        """
+        Section description
+        """
 
     def getType(self):
-        """ Type of menu """
+        """
+        Type of menu
+        """
 
     def getSessionList(self, doSort=True):
-        """ Session list """
+        """
+        Session list
+        """
     getSessionList.name = 'items'
     getSessionList.result = IRegFormRegistrationSessionItemFossil
 
@@ -384,17 +544,25 @@ class IRegFormSessionSectionFossil(IRegFormSectionBaseFossil):
 class IRegFormSocialEventSectionFossil(IRegFormSectionBaseFossil):
 
     def getDescription(self):
-        """ Section description """
+        """
+        Section description
+        """
 
     def getIntroSentence(self):
-        """ Intro sentence """
+        """
+        Intro sentence
+        """
 
     def getSelectionTypeId(self):
-        """ Selection type """
-    getSelectionTypeId.name= 'selectionType'
+        """
+        Selection type
+        """
+    getSelectionTypeId.name = 'selectionType'
 
     def getSocialEventList(self, sort=True):
-        """ Social event List """
+        """
+        Social event List
+        """
     getSocialEventList.name = 'items'
     getSocialEventList.result = IRegFormSocialEventItemFossil
 
@@ -405,94 +573,140 @@ class IRegFormSocialEventSectionFossil(IRegFormSectionBaseFossil):
 class IRegFormMiscellaneousInfoSimpleItemFossil(IFossil):
 
     def getId(self):
-        """ Get item ID """
+        """
+        Get item ID
+        """
 
     def getHTMLName(self):
-        """ Get HTML Name """
+        """
+        Get HTML Name
+        """
     getHTMLName.name = 'HTMLName'
 
     def getValue(self):
-        """ get value """
+        """
+        Get value
+        """
 
     def getCurrency(self):
-        """ get currency """
+        """
+        Get currency
+        """
 
     def getQuantity(self):
-        """ get quantity """
+        """
+        Get quantity
+        """
 
     def getPrice(self):
-        """ get price """
+        """
+        Get price
+        """
 
 
 class IRegFormSocialEventFossil(IFossil):
 
     def getId(self):
-        """ Get id """
+        """
+        Get id
+        """
 
     def getNoPlaces(self):
-        """ get number of places """
+        """
+        get number of places
+        """
 
     def getCurrency(self):
-        """ get currency """
+        """
+        get currency
+        """
 
     def getPrice(self):
-        """ get currency """
+        """
+        get currency
+        """
 
 
 class IRegFormSessionsFormFossil(IFossil):
 
     def getId(self):
-        """ Get id """
+        """
+        Get id
+        """
 
 
 class IRegFormAccommodationFossil(IFossil):
 
     def getArrivalDate(self):
-        """ Get arrival dates """
+        """
+        Get arrival dates
+        """
     getArrivalDate.convert = lambda x: format_date(x, "dd-MM-yyyy")
 
     def getDepartureDate(self):
-        """ Get departure dates """
+        """
+        Get departure dates
+        """
     getDepartureDate.convert = lambda x: format_date(x, "dd-MM-yyyy")
 
     def getAccommodationType(self):
-        """ Get accommodation type """
+        """
+        Get accommodation type
+        """
     getAccommodationType.result = IRegFormAccommodationTypeItemFossil
 
 
 class IRegFormMiscellaneousInfoGroupFossil(IFossil):
 
     def getId(self):
-        """ Get section ID """
+        """
+        Get section ID
+        """
 
     def getTitle(self):
-        """ Get section Title """
+        """
+        Get section Title
+        """
 
     def getResponseItems(self):
-        """ Get response items """
+        """
+        Get response items
+        """
     getResponseItems.result = IRegFormMiscellaneousInfoSimpleItemFossil
 
 
 class IRegFormRegistrantFossil(IFossil):
 
     def getPayed(self):
-        """If the user payed"""
+        """
+        If the user payed
+        """
 
     def getAccommodation(self):
-        """Get Accommodation"""
+        """
+        Get Accommodation
+        """
     getAccommodation.result = IRegFormAccommodationFossil
 
     def getReasonParticipation(self):
-        """Get Reason Participation"""
+        """
+        Get Reason Participation
+        """
 
     def getSocialEvents(self):
-        """ Get the social events """
+        """
+        Get the social events
+        """
     getSocialEvents.result = IRegFormSocialEventFossil
 
     def getSessionList(self):
-        """ Get session list """
+        """
+        Get session list
+        """
     getSessionList.result = IRegFormSessionsFormFossil
 
     def getMiscellaneousGroupList(self):
-        """Get Miscellaneous group list"""
+        """
+        Get Miscellaneous group list
+        """
     getMiscellaneousGroupList.result = IRegFormMiscellaneousInfoGroupFossil

@@ -51,7 +51,15 @@ import string
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 
 from indico.util.fossilize import Fossilizable, fossilizes
-from MaKaC.fossils.registration import *
+from indico.core.fossils.registration import IRegFormTextInputFieldFossil, IRegFormTelephoneInputFieldFossil, \
+    IRegFormTextareaInputFieldFossil, IRegFormNumberInputFieldFossil, IRegFormLabelInputFieldFossil, \
+    IRegFormCheckboxInputFieldFossil, IRegFormYesNoInputFieldFossil, IRegFormFileInputFieldFossil, \
+    IRegFormRadioItemFossil, IRegFormRadioGroupInputFieldFossil, IRegFormCountryInputFieldFossil, \
+    IRegFormDateInputFieldFossil, IRegFormGeneralFieldFossil, IRegFormGeneralSectionFossil, \
+    IRegFormFurtherInformationSectionFossil, IRegFormAccommodationTypeItemFossil, IRegFormAccommodationSectionFossil, \
+    IRegFormReasonParticipationSectionFossil, IRegFormRegistrationSessionItemFossil, IRegFormSessionSectionFossil, \
+    IRegFormSocialEventItemFossil, IRegFormSocialEventSectionFossil, IRegFormRegistrantFossil, \
+    IRegFormSocialEventFossil, IRegFormMiscellaneousInfoGroupFossil
 
 PRICE_PATTERN = re.compile(r'^(\d+(?:[\.]\d+)?)$')
 
