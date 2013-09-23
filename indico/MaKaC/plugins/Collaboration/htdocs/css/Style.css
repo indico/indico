@@ -136,6 +136,11 @@ td.collaborationCell {
     white-space: nowrap;
 }
 
+td.collaborationCell.toolbarCell{
+    width: 100%;
+}
+
+
 td.collaborationCellNarrow {
     padding: 0px;
     padding-top: 3px;
@@ -152,9 +157,13 @@ td.collaborationCellNarrow {
 
 
 span.statusMessage {
-    font-size: medium;
+    font-size: 1.2em;
     font-weight: bold;
     vertical-align: middle;
+}
+
+span.bookingType {
+    font-size: 1.2em;
 }
 
 .statusMessageError {
@@ -705,8 +714,11 @@ ul.bookingList li {
     border-bottom: 1px solid #DDDDDD;
 }
 
+ul.bookingList li div.roomName {
+    color: #444;
+}
 ul.bookingList li div.bookingDescription {
-    color: #666666;
+    color: #555;
     margin-top: 0.5em;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -717,7 +729,7 @@ ul.bookingList li div.bookingDescription {
 div.bookingListDiv div.noSearchMsg{
     margin-top: 10px;
     vertical-align: center;
-    color: #666;
+    color: #555;
     font-size: 1.2em;
     text-align: center;
 }

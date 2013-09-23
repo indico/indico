@@ -561,17 +561,17 @@ type("CERNMCUBuildParticipantsInfo", ["IWidget"], {
             var group = $('<div class="group"/>');
 
             if (participant.get("callState") === "connected" || !self.booking.canBeStarted ) {
-                $('<a class="i-button icon-play icon-only disabled " href="#"/>').qtip({content:$T("This participant cannot be started")}).appendTo(group);
+                $('<a class="i-button icon-play disabled " href="#"/>').qtip({content:$T("This participant cannot be started")}).appendTo(group);
             } else {
-                $('<a class="i-button icon-play icon-only" href="#"/>').prop("title", $T("Start")).on('click', function(){
+                $('<a class="i-button icon-play" href="#"/>').prop("title", $T("Start")).on('click', function(){
                     self.__connectParticipant(participant);
                 }).appendTo(group);
             }
 
             if (participant.get("callState") === "disconnected" || participant.get("callState") === "dormant" || !self.booking.canBeStopped) {
-                $('<a class="i-button icon-stop icon-only disabled " href="#"/>').qtip({content:$T("This participant cannot be stopped")}).appendTo(group);
+                $('<a class="i-button icon-stop disabled" href="#"/>').qtip({content:$T("This participant cannot be stopped")}).appendTo(group);
             } else {
-                $('<a class="i-button icon-stop icon-only" href="#"/>').prop("title", $T("Stop")).on('click', function(){
+                $('<a class="i-button icon-stop" href="#"/>').prop("title", $T("Stop")).on('click', function(){
                     self.__disconnectParticipant(participant);
                 }).appendTo(group);
             }

@@ -355,7 +355,7 @@ var bookingTemplateM = function(booking) {
     row.append(cellShowInfo);
 
     var typeCell = $('<td class="collaborationCellNarrow"/>');
-    typeCell.append($('<span/>').css("font-size", "medium").text(booking.type));
+    typeCell.append($('<span/>').addClass("bookingType").text(booking.type));
     row.append(typeCell);
 
     var statusCell = $('<td class="collaborationCell"/>');
@@ -370,21 +370,24 @@ var bookingTemplateM = function(booking) {
     }
     row.append(cellCustom);
 
-    var cellToolbar = $('<td class="collaborationCell"/>').css("width", "100%");
+    var cellToolbar = $('<td class="collaborationCell toolbarCell"/>');
     var toolbar = $('<div class="toolbar"></div>');
     var group = $('<div class="group"></div>');
     if (booking.hasCheckStatus) {
-        var checkStatusButton = $('<a class="i-button icon-refresh icon-only" href="#"/>').prop("title",$T("Check Booking Status"));
+        var checkStatusButton = $('<a class="i-button icon-refresh" href="#"/>').prop("title",$T("Check Booking Status"));
         checkStatusButton.on('click', function(){checkBookingStatus(booking, booking.conference.id);})
         group.append(checkStatusButton);
     }
-    var editButton = $('<a class="i-button icon-edit icon-only" href="#"/>').prop("title",$T("Edit"));
+    var editButton = $('<a class="i-button icon-edit" href="#"/>').prop("title",$T("Edit"));
     editButton.on('click', function(){edit(booking);})
 
     if (booking.canBeDeleted) {
-        var removeButton = $('<a class="i-button icon-remove icon-only" href="#"/>').prop("title",$T("Delete")).on('click', function(){remove(booking);});
+        var removeButton = $('<a class="i-button icon-remove" href="#"/>').prop("title",$T("Delete"))
+            .on('click', function(){
+                remove(booking);
+            });
     } else {
-        var removeButton = $('<a class="i-button icon-remove icon-only disabled" href="#"/>').qtip({content:$T("This booking cannot be deleted")});;
+        var removeButton = $('<a class="i-button icon-remove disabled" href="#"/>').qtip({content:$T("This booking cannot be deleted")});;
     }
     group.append(editButton);
     group.append(removeButton);
@@ -393,11 +396,11 @@ var bookingTemplateM = function(booking) {
             if(booking.hasConnect || booking.hasDisconnect){
                 var playButton = $('<a class="i-button icon-play" href="#"/>').text($T("Start desktop"));
             }else{
-                var playButton = $('<a class="i-button icon-play icon-only" href="#"/>').prop("title",$T("Start"));
+                var playButton = $('<a class="i-button icon-play" href="#"/>').prop("title",$T("Start"));
             }
             playButton.on('click', function(){start(booking);})
         } else {
-            var playButton = $('<a class="i-button icon-play icon-only disabled" href="#"/>').qtip({content:$T("This booking cannot be started")});
+            var playButton = $('<a class="i-button icon-play disabled" href="#"/>').qtip({content:$T("This booking cannot be started")});
         }
         group.append(playButton);
     }
@@ -411,19 +414,28 @@ var bookingTemplateM = function(booking) {
     if (booking.hasStop) {
         var cellStop = Html.td({className : "collaborationCellNarrow"});
         if (booking.canBeStopped) {
-            var stopButton = $('<a class="i-button icon-stop icon-only" href="#"/>').prop("title",$T("Stop")).on('click', function(){stop(booking);})
+            var stopButton = $('<a class="i-button icon-stop" href="#"/>').prop("title",$T("Stop"))
+                .on('click', function(){
+                    stop(booking);
+                });
         } else {
-            var stopButton = $('<a class="i-button icon-stop icon-only disabled" href="#"/>').qtip({content:$T("This booking cannot be stoped")});
+            var stopButton = $('<a class="i-button icon-stopdisabled" href="#"/>').qtip({content:$T("This booking cannot be stoped")});
         }
         group.append(stopButton);
     }
 
     if (booking.hasAcceptReject && userIsAdmin) {
         if (booking.acceptRejectStatus !== true) { // Hides the accept button if already accepted.
-            var acceptButton = $('<a class="i-button accept" href="#"/>').text($T("Accept")).on('click', function(){accept(booking);})
+            var acceptButton = $('<a class="i-button accept" href="#"/>').text($T("Accept"))
+            .on('click', function(){
+                accept(booking);
+            });
             group.append(acceptButton);
         }
-        var rejectButton = $('<a class="i-button danger" href="#"/>').text($T("Reject")).on('click', function(){reject(booking);})
+        var rejectButton = $('<a class="i-button danger" href="#"/>').text($T("Reject"))
+            .on('click', function(){
+                reject(booking);
+            });
         group.append(rejectButton);
     }
 
@@ -435,10 +447,10 @@ var bookingTemplateM = function(booking) {
 
 var bookingTemplateS = function(booking) {
     var container = $("<div/>");
-    var toolbar = $('<div class="toolbar right"></div>');
-    var group = $('<div class="group"></div>').css({'font-size': '13px', 'padding': 0});
+    var toolbar = $('<div class="toolbar right"/>');
+    var group = $('<div class="group"/>').css({'font-size': '13px', 'padding': 0});
     var messageBoxClass = "info-message-box";
-    var groupTitle = $('<div class="groupTitle">');
+    var groupTitle = $('<div class="groupTitle"/>');
     if (booking.statusClass=="statusMessageOK") {
         messageBoxClass = "success-message-box";
     } else if (booking.statusClass=="statusMessageError") {
@@ -460,32 +472,45 @@ var bookingTemplateS = function(booking) {
     groupTitle.append($T("Manage Request"));
 
     if (booking.hasCheckStatus) {
-        var checkStatusButton = $('<a class="i-button icon-refresh" href="#"/>').text($T("Check Status")).on('click', function(){
-            checkBookingStatus(booking, booking.conference.id);
+        var checkStatusButton = $('<a class="i-button icon-refresh" href="#"/>').text($T("Check Status"))
+            .on('click', function(){
+                checkBookingStatus(booking, booking.conference.id);
         }).appendTo(group);
     }
 
     if (booking.hasStart) {
         if (booking.canBeStarted) {
-            $('<a class="i-button icon-play icon-only" href="#"/>').prop("title",$T("Start")).on('click', function(){start(booking);}).appendTo(group);
+            $('<a class="i-button icon-play" href="#"/>').prop("title",$T("Start"))
+                .on('click', function(){
+                    start(booking);
+                }).appendTo(group);
         } else {
-            $('<a class="i-button icon-play icon-only disabled"/>').qtip({content:$T("This booking cannot be started")}).appendTo(group);
+            $('<a class="i-button icon-play disabled"/>').qtip({content:$T("This booking cannot be started")}).appendTo(group);
         }
     }
 
     if (booking.hasStop) {
         if (booking.canBeStopped) {
-            $('<a class="i-button icon-stop icon-only" href="#"/>').prop("title",$T("Stop")).on('click', function(){stop(booking);}).appendTo(group);
+            $('<a class="i-button icon-stop" href="#"/>').prop("title",$T("Stop"))
+                .on('click', function(){
+                    stop(booking);
+                }).appendTo(group);
         } else {
-            $('<a class="i-button icon-stop icon-only disabled"/>').qtip({content:$T("This booking cannot be stopped")}).appendTo(group);
+            $('<a class="i-button icon-stop disabled"/>').qtip({content:$T("This booking cannot be stopped")}).appendTo(group);
         }
     }
 
     if (booking.hasAcceptReject && userIsAdmin) {
         if (booking.acceptRejectStatus !== true) { // Hides the accept button if already accepted.
-            $('<a class="i-button icon-checkmark accept" href="#"/>').text($T("Accept")).on('click', function(){accept(booking);}).appendTo(group);
+            $('<a class="i-button icon-checkmark accept" href="#"/>').text($T("Accept"))
+                .on('click', function(){
+                    accept(booking);
+                }).appendTo(group);
         }
-        $('<a class="i-button icon-reject danger" href="#"/>').text($T("Reject")).on('click', function(){reject(booking);}).appendTo(group);
+        $('<a class="i-button icon-reject danger" href="#"/>').text($T("Reject"))
+            .on('click', function(){
+                reject(booking);
+            }).appendTo(group);
     }
 
     toolbar.append(group);
@@ -1155,8 +1180,8 @@ type ("SearchBookingList", ["SelectableDynamicListWidget"],
         _drawItem: function(pair) {
             var elem = pair.get(); // elem is a WatchObject
             var item = $('<div/>');
-            item.append($('<div class="bold"/>').css("color", "#444").append(elem.get('roomName')));
-            item.append($('<div class="bookingDescription"/>').css("color", "#666").append(elem.get('roomDescription')));
+            item.append($('<div class="bold roomName"/>').append(elem.get('roomName')));
+            item.append($('<div class="bookingDescription"/>').append(elem.get('roomDescription')));
             return item.get(0);
         },
     },
@@ -1172,6 +1197,8 @@ type ("SearchBookingList", ["SelectableDynamicListWidget"],
         this.SelectableDynamicListWidget(observer, method, args, 'bookingList', true, $T('No more video services found'));
     }
 );
+
+
 type("SearchBookingPopup", ["ExclusivePopupWithButtons"], {
 
         _getButtons: function() {
