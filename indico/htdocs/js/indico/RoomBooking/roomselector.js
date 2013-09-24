@@ -316,8 +316,9 @@
 
                         if (!isNaN(labelparts[i])) {
                             var val = (labelparts[i] === "0") ? "?" : labelparts[i];
-                            capacity.attr("title", icontitles[i])
-                                .find("span").text(val);
+                            capacity.find("span")
+                                .text(val)
+                                .attr("title", icontitles[i]);
                         }
                     }
                 }
