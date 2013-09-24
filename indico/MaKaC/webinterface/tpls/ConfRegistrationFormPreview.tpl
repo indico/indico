@@ -22,8 +22,8 @@
         var rfView = new RegFormEditionView({el: $("div#registrationForm")});
         var model = rfView.getModel();
         var sectionsMgmt = new RegFormSectionsMgmtView({el: $('#section-mgmt-popup'), model: model});
-        var sectionCreate = new RegFormSectionsCreateView({el: $('#section-create-popup'), model :
-        
+        var sectionCreate = new RegFormSectionsCreateView({el: $('#section-create-popup'), model: model});
+
         $(window).scroll(function(){
             IndicoUI.Effect.followScroll();
         });
