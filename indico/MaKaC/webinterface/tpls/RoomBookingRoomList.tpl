@@ -10,7 +10,7 @@
                 <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
                     <tr>
                         <td class="maincell">
-                            <span class="formTitle" style="border-bottom-width: 0px">
+                            <h2 class="page_title">
                             % if not title:
                                 <!-- Generic title -->
                                 ${ len( rooms ) }
@@ -24,7 +24,7 @@
                             % if title:
                                 ${ title }:
                             % endif
-                            </span><br /><br />
+                            </h2>
 
 % if rooms:
 <table width="100%" class="filesTab">

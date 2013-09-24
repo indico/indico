@@ -1,4 +1,6 @@
-<span class="groupTitleNoBorder">${"My Blockings" if rh.onlyMine else "Blockings"}</span>
+<h2 class="page_title">
+    ${"My Blockings" if rh.onlyMine else "Blockings"}
+</h2>
 <br />
 % if blocks:
     <br />

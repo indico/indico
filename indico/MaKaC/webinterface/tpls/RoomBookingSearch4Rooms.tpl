@@ -196,7 +196,9 @@
             <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
                 <tr>
                     <td class="maincell">
-                        <p><span class="formTitle" style="border-bottom-width: 0px"> ${ _("Search for a room")}</span></p>
+                        <h2 class="page_title">
+                            ${ _("Search rooms")}
+                        </h2>
                         <!-- Background table (adds image) -->
                         <table width="100%" class="ACtab">
                             <tr>
@@ -204,7 +206,11 @@
                                     <!-- First section -->
                                     <table width="90%" align="center" border="0">
                                         <tr>
-                                            <td colspan="2" class="groupTitle">${ _("Choose a room")}</td>
+                                            <td colspan="2">
+                                                <h2 class="group_title">
+                                                    ${_("Choose a room")}
+                                                </h2>
+                                            </td>
                                         </tr>
                                         <tr>
                                         <td nowrap="nowrap" class="titleCellTD"><span class="titleCellFormat"> ${ _("Room")}</span></td>
@@ -241,7 +247,11 @@
                                     <form id="searchForm" method="post" action="${ roomBookingRoomListURL }">
                                     <table width="90%" align="center" border="0">
                                         <tr>
-                                            <td colspan="2" class="groupTitle">${ _("Search for a room") }</td>
+                                            <td colspan="2">
+                                                <h2 class="group_title">
+                                                    ${_("Search for a room")}
+                                                </h2>
+                                            </td>
                                         </tr>
                                         <!-- LOCATION (PLUGIN) -->
                                         <tr>

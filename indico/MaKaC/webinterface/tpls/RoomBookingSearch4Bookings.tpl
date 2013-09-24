@@ -138,7 +138,9 @@
             <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
                 <tr>
                     <td class="maincell">
-                        <p><span class="formTitle" style="border-bottom-width: 0px"> ${ _("Search for bookings")}</span></p>
+                        <h2 class="page_title">
+                            ${_("Search for bookings")}
+                        </h2>
                         <!-- Background table (adds image) -->
                         <table width="100%" class="ACtab">
                             <tr>
@@ -146,7 +148,11 @@
                                     <form id="searchForm" method="post" action="${ roomBookingBookingListURL }">
                                     <table width="90%" align="center" border="0">
                                         <tr>
-                                            <td colspan="2" class="groupTitle"> ${ _("Simple Search")}</td>
+                                            <td colspan="2">
+                                                <h2 class="group_title">
+                                                    ${ _("Simple Search")}
+                                                </h2>
+                                            </td>
                                         </tr>
                                         <!-- For room -->
                                         <tr>
@@ -238,7 +244,11 @@
                                     <br>
                                     <table width="90%" align="center" border="0">
                                         <tr>
-                                            <td colspan="2" class="groupTitle"> ${ _("Advanced search")}</td>
+                                            <td colspan="2">
+                                                <h2 class="group_title">
+                                                    ${ _("Advanced search")}
+                                                </h2>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td nowrap class="titleCellTD" style="width: 125px;"><span class="titleCellFormat"> ${ _("Attributes")}</td>

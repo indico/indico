@@ -1,11 +1,11 @@
     <div style="width:80%;">
-    <span class="groupTitleNoBorder">
+    <h2 class="page_title">
     % if rh._createNew:
          ${ _("New Blocking")}
     % else:
          ${ _("Modify Blocking")}
     % endif
-    </span><br />
+    </h2>
     % if rh._createNew:
         <em>When blocking rooms nobody but you, the rooms' managers and those users/groups you specify in the "Allowed users" list will be able to create bookings for the specified rooms in the given timeframe.
         You can also block rooms you do not own - however, those blockings have to be approved by the owners of those rooms.</em>
