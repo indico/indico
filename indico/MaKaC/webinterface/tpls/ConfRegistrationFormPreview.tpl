@@ -15,8 +15,9 @@
     <input type="hidden" value="${confId}" id="conf_id">
 
 <script type="text/javascript">
+    $('#registrationForm').html(progressIndicator(false, true).dom);
     $.webshims.polyfill();
-    $(document).ready(function(){
+    $(function(){
         var confId = ${confId};
         var rfView = new RegFormEditionView({el: $("div#registrationForm")});
         var model = rfView.getModel();

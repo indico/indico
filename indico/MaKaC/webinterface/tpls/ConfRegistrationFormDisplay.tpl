@@ -5,41 +5,6 @@
 </%block>
 
 <%block name="content">
-    <script>
-	  /* load all polyfill features */
-	  $.webshims.polyfill();
-      var validators = [];
-      var parameterManager = new IndicoUtil.parameterManager();
-      var addParam = parameterManager.add;
-
-      function addValidator(validator) {
-          validators.push(validator);
-      }
-
-      function enableAll(f) {
-        for (i = 0; i < f.elements.length; i++) {
-          f.elements[i].disabled=false
-        }
-      }
-
-      function formSubmit(f) {
-          if (!parameterManager.check()) {
-              new AlertPopup($T("Error"), $T("The form contains some errors. Please, correct them and submit again.")).open();
-              return false;
-          }
-
-          for (var i in validators) {
-              var validator = validators[i];
-              if (!validator()) {
-                  return false;
-              }
-          }
-
-          enableAll(f);
-          return true;
-      }
-    </script>
-
 <form id="registrationForm" action=${ postURL } method="POST" onSubmit="return formSubmit(this);" enctype="multipart/form-data">
     <table width="80%" align="left" style="padding-left: 5px;">
         % if title:
@@ -65,19 +30,52 @@
     </form>
     <input type="hidden" value="${confId}" id="conf_id">
     <script type="text/javascript">
-		$(document).ready(function(){
-		    var confId = ${ confId };
-		    var rfView = new RegFormDisplayView({el : $("div#registrationForm")} ,confId );
-		});
+        $("div#registrationForm").html(progressIndicator(false, true).dom);
+        /* load all polyfill features */
+        $.webshims.polyfill();
+        var validators = [];
+        var parameterManager = new IndicoUtil.parameterManager();
+        var addParam = parameterManager.add;
 
-    $(".regFormButton").click(function(){
-        var self = this;
-        new ConfirmPopup($T("Registration"),$T("Are you sure you want to submit this form?"), function(confirmed) {
-            if(confirmed) {
-                $(self).closest("form").submit();
+        function addValidator(validator) {
+            validators.push(validator);
+        }
+
+        function enableAll(f) {
+          for (i = 0; i < f.elements.length; i++) {
+            f.elements[i].disabled=false
+          }
+        }
+
+        function formSubmit(f) {
+            if (!parameterManager.check()) {
+                new AlertPopup($T("Error"), $T("The form contains some errors. Please, correct them and submit again.")).open();
+                return false;
             }
-        }).open();
-        return false;
-    });
+
+            for (var i in validators) {
+                var validator = validators[i];
+                if (!validator()) {
+                    return false;
+                }
+            }
+
+            enableAll(f);
+            return true;
+        }
+
+        $(function() {
+            var confId = ${ confId };
+            var rfView = new RegFormDisplayView({el : $("div#registrationForm")} ,confId );
+            $(".regFormButton").click(function(){
+                var self = this;
+                new ConfirmPopup($T("Registration"),$T("Are you sure you want to submit this form?"), function(confirmed) {
+                    if(confirmed) {
+                        $(self).closest("form").submit();
+                    }
+                }).open();
+                return false;
+              });
+          });
     </script>
 </%block>
