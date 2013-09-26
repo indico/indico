@@ -75,8 +75,11 @@ class InvenioRecordUploader(RecordUploader):
         self._logger.info('Metadata ready ')
 
         tgen = time.time() - tstart
-
-        result = self._server.upload_marcxml(data, "-ir").read()
+        try:
+            result = self._server.upload_marcxml(data, "-ir").read()
+        except Exception:
+            self._logger.exception("Failed uploading records to local invenio server")
+            raise
 
         tupload = time.time() - (tstart + tgen)
 
@@ -85,7 +88,11 @@ class InvenioRecordUploader(RecordUploader):
 
         self._logger.debug('rec %s result: %s' % (batch, result))
 
-        if result.startswith('[INFO]'):
+        if isinstance(result, long):
+            self._logger.info('Batch of %d records submitted (task %s)'
+                              '[%f s %f s]' % (len(batch), result, tgen, tupload))
+
+        elif result.startswith('[INFO]'):
             fpath = result.strip().split(' ')[-1]
             self._logger.info('Batch of %d records stored in server (%s) '
                               '[%f s %f s]' % \
