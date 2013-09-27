@@ -178,6 +178,7 @@ html5_cross_browser_compatibility = Bundle('js/lib/webshim/extras/modernizr-cust
                                            output='html5_cross_browser_compatibility_%(version)s.min.js')
 
 indico_backbone = Bundle('js/lib/backbone.js',
+                         'js/lib/nunjucks.js',
                          'js/indico/backbone/templateManager.js',
                          filters='jsmin', output='indico_backbone_%(version)s.min.js')
 

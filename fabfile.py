@@ -267,6 +267,18 @@ def install_webshim():
             local('cp -r src/* {0}/'.format(dest_dir_js))
 
 
+@recipe('nunjucks')
+def install_nunjucks():
+    """
+    Install Nunjucks from Git
+    """
+    with node_env():
+        with lcd(os.path.join(env.ext_dir, 'nunjucks')):
+            dest_dir = lib_dir(env.src_dir, 'js')
+            local('mkdir -p {0}'.format(dest_dir))
+            local('cp browser/nunjucks.js {0}/'.format(dest_dir))
+
+
 # Tasks
 
 @task
