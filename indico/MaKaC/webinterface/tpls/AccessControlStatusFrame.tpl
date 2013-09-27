@@ -7,7 +7,7 @@ termsDict={ 'Category': {'name':'category', 'paramsKey': 'categId', 'parentName'
             'InSessionContribution': {'name':'contribution', 'paramsKey': 'contribId', 'parentName':'session'},
             'SubContribution': {'name':'contribution', 'paramsKey': 'contribId', 'parentName':'contribution'}
           }
-from MaKaC.conference import Category
+from MaKaC import conference as cmod
 %>
 <tr>
     <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Current status")}</span></td>
@@ -35,7 +35,7 @@ from MaKaC.conference import Category
             % endif
         </div>
 
-        % if not isinstance(target, Category):
+        % if not isinstance(target, cmod.Category):
             % if (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')) and not target.getAccessController().isFullyPublic():
                     <div class="noninheriting_children_danger">
                       <span class="icon-shield"></span>
@@ -72,7 +72,7 @@ from MaKaC.conference import Category
         % endif
     </td>
 </tr>
-% if privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED') :
+% if isinstance(target, (cmod.Category, cmod.Conference)) and (privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED')) :
 <tr>
     <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Contact in case of no access")}</span></td>
     <td bgcolor="white" width="100%" valign="top" class="blacktext">
@@ -109,7 +109,7 @@ from MaKaC.conference import Category
 </tr>
 <script type="text/javascript">
 
-% if not isinstance(target, Category) and (not target.getAccessController().isFullyPublic() and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')) \
+% if not isinstance(target, cmod.Category) and (not target.getAccessController().isFullyPublic() and (privacy == 'PUBLIC' or (privacy == 'INHERITING' and parentPrivacy == 'PUBLIC')) \
     or not target.getAccessController().isFullyPrivate() and (privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED'))):
     $(".see_children").click(function(){
         var self = this;
