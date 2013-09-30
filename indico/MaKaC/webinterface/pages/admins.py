@@ -1669,14 +1669,13 @@ class WPIdentityChangePassword(WPUserDetails):
 
     def _getTabContent(self, params):
 
-        identity = self._avatar.getIdentityById(self._params["identityId"],"Local")
+        identity = self._avatar.getIdentityById(self._params["login"], 'Local')
         c = WIdentityModification( self._avatar, identity )
         postURL = urlHandlers.UHUserIdentityChangePassword.getURL()
         self._params["postURL"] = postURL
         self._params["WTitle"] = _("Change password for user")+" :<br>%s"%self._avatar.getFullName()
         self._params["disabledLogin"] = "disabled"
         self._params["disabledSystem"] = "disabled"
-        self._params["login"] = self._params["identityId"]
         return c.getHTML( self._params )
 
 

@@ -474,6 +474,11 @@ class RHUserIdentityChangePassword(RHUserIdentityBase):
                 p = adminPages.WPIdentityChangePassword( self, self._avatar, self._params )
                 return p.display()
             identity = self._avatar.getIdentityById(self._params["login"], "Local")
+            if not identity:
+                self._params["msg"] = _("You can NOT change others' passwords")
+                del self._params["OK"]
+                p = adminPages.WPIdentityChangePassword( self, self._avatar, self._params )
+                return p.display()
             identity.setPassword(self._params["password"])
             self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
         elif self._params.get("Cancel") is not None:
