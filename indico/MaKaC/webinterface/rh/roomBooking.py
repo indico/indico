@@ -1331,12 +1331,13 @@ class RHRoomBookingRoomStats( RHRoomBookingBase ):
         p = roomBooking_wp.WPRoomBookingRoomStats( self )
         return p.display()
 
-class RHRoomBookingBookingDetails( RHRoomBookingBase ):
 
-    def _checkParams( self, params ):
+class RHRoomBookingBookingDetails(RHRoomBookingBase):
+
+    def _checkParams(self, params):
 
         locator = locators.WebLocator()
-        locator.setRoomBooking( params )
+        locator.setRoomBooking(params)
         self._resv = self._target = locator.getObject()
         if not self._resv:
             raise NoReportError("""The specified booking with id "%s" does not exist or has been deleted""" % params["resvID"])
@@ -1355,12 +1356,12 @@ class RHRoomBookingBookingDetails( RHRoomBookingBase ):
         self._clearSessionState()
         self._isAssistenceEmailSetup = getRoomBookingOption('assistanceNotificationEmails')
 
-    def _businessLogic( self ):
+    def _businessLogic(self):
         pass
 
-    def _process( self ):
+    def _process(self):
         self._businessLogic()
-        p = roomBooking_wp.WPRoomBookingBookingDetails( self )
+        p = roomBooking_wp.WPRoomBookingBookingDetails(self)
         return p.display()
 
 # 4. New

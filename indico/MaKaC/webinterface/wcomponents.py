@@ -4628,31 +4628,30 @@ class WRoomBookingDetails(WTemplated):
         self._conf = conference
         self._standalone = (conference is None)
 
-    def getVars( self ):
-        vars=WTemplated.getVars( self )
-        vars["standalone"] = self._standalone
-        vars["reservation"] = self._resv
-        vars["collisions"] = self._rh._collisions
-        vars["config"] = Config.getInstance()
-        vars["actionSucceeded"] = self._rh._afterActionSucceeded
+    def getVars(self):
+        wvars = WTemplated.getVars( self )
+        wvars["standalone"] = self._standalone
+        wvars["reservation"] = self._resv
+        wvars["collisions"] = self._rh._collisions
+        wvars["config"] = Config.getInstance()
+        wvars["actionSucceeded"] = self._rh._afterActionSucceeded
         if self._rh._afterActionSucceeded:
-            vars["title"] = self._rh._title
-            vars["description"] = self._rh._description
+            wvars["title"] = self._rh._title
+            wvars["description"] = self._rh._description
 
         if self._standalone:
-            vars["roomDetailsUH"] = urlHandlers.UHRoomBookingRoomDetails
-            vars["modifyBookingUH"] = urlHandlers.UHRoomBookingModifyBookingForm
-            vars["cloneURL"] = urlHandlers.UHRoomBookingCloneBooking.getURL(self._resv)
+            wvars["roomDetailsUH"] = urlHandlers.UHRoomBookingRoomDetails
+            wvars["modifyBookingUH"] = urlHandlers.UHRoomBookingModifyBookingForm
+            wvars["cloneURL"] = urlHandlers.UHRoomBookingCloneBooking.getURL(self._resv)
         else:
-            vars["roomDetailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
-            vars["modifyBookingUH"] = urlHandlers.UHConfModifRoomBookingModifyBookingForm
-            vars["cloneURL"] = urlHandlers.UHConfModifRoomBookingCloneBooking.getURL(self._resv)
+            wvars["roomDetailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
+            wvars["modifyBookingUH"] = urlHandlers.UHConfModifRoomBookingModifyBookingForm
+            wvars["cloneURL"] = urlHandlers.UHConfModifRoomBookingCloneBooking.getURL(self._resv)
 
-        vars["bookMessage"] = "Book"
-        if not self._resv.isConfirmed:
-            vars["bookMessage"] = "PRE-Book"
+        wvars["isPreBooking"] = not self._resv.isConfirmed
+        wvars["bookMessage"] = _("PRE-Booking") if wvars["isPreBooking"] else _("Booking")
 
-        return vars
+        return wvars
 
 # 4. Booking Form
 

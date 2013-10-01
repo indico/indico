@@ -381,18 +381,19 @@ class WPRoomBookingRoomStats( WPRoomBookingBase ):
         wc = wcomponents.WRoomBookingRoomStats( self._rh, standalone = True )
         return wc.getHTML( params )
 
-class WPRoomBookingBookingDetails( WPRoomBookingBase ):
 
-    def __init__( self, rh ):
+class WPRoomBookingBookingDetails(WPRoomBookingBase):
+
+    def __init__(self, rh):
         self._rh = rh
-        WPRoomBookingBase.__init__( self, rh )
+        WPRoomBookingBase.__init__(self, rh)
 
-    def _setCurrentMenuItem( self ):
+    def _setCurrentMenuItem(self):
         self._bookRoomNewOpt.setActive(True)
 
-    def _getBody( self, params ):
-        wc = wcomponents.WRoomBookingDetails( self._rh )
-        return wc.getHTML( params )
+    def _getBody(self, params):
+        wc = wcomponents.WRoomBookingDetails(self._rh)
+        return wc.getHTML(params)
 
 # 4. New booking
 
