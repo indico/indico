@@ -304,24 +304,32 @@ type ("RoomMap", ["IWidget"],
         },
 
         createBuildingInfo: function(building) {
+            var self = this;
+
             // the building title
-            var title = Html.p({className:'mapBuildingTitle'}, building.title).dom;
+            var title = $("<p/>")
+                .addClass("mapBuildingTitle")
+                .text(building.title);
 
             // the div containing info about rooms
-            var roomsInfo = Html.div({className:'mapRoomsInfo'}).dom;
+            var roomsInfo = $("<div/>")
+                .addClass("mapRoomsInfo");
 
             // add info for each room
-            for (var j = 0; j < building.rooms.length; j++) {
-                var room = building.rooms[j];
+            $.each(building.rooms, function(index, room) {
                 if (room.showOnMap) {
-                    var roomInfo = this.createRoomInfo(building, room);
-                    roomsInfo.appendChild(roomInfo);
+                    var roomInfo = self.createRoomInfo(building, room);
+                    $(roomInfo).appendTo(roomsInfo);
                 }
-            }
+            });
 
             // building info box
-            var buildingInfo = Html.div({className:'mapBuildingInfo'}, title, roomsInfo);
-            return buildingInfo.dom;
+            var buildingInfo = $("<div/>")
+                .addClass("mapBuildingInfo")
+                .append(title)
+                .append(roomsInfo);
+
+            return buildingInfo.html();
         },
 
         showMarkers: function(isStartup) {
