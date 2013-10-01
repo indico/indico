@@ -84,13 +84,13 @@ var RegFormFieldsView = Backbone.View.extend({
         var attributes = "";
         if( dict.field.mandatory === true) {
             attributes = "required";
-        } 
+        }
         if ( dict.field.placesLimit !== 0 &&  dict.field.noPlacesLeft === 0){
             attributes = attributes + " disabled";
         }
         dict.attributes = attributes;
         var tpl = TemplateManager.getSync('RegistrationForm','regFormFields',tplId);
-        return _.template(tpl, dict);
+        return nunenv.render("regFormFields.tpl", dict);
     }
 });
 
@@ -148,7 +148,7 @@ var RegFormDisplayView = Backbone.View.extend({
         dict.classes = self.classes;
         dict.fields = self.rfFields;
         var tpl = TemplateManager.getCached('RegistrationForm','regFormSections', false);
-        return _.template(tpl, dict);
+        return nunenv.render("regFormSections.tpl", dict);
     },
 
     insertData: function(){
@@ -195,9 +195,9 @@ var RegFormDisplayView = Backbone.View.extend({
                } else {
                    $(section).find("[name = '" + item.HTMLName + "']").val(item.value);
                }
-               // If payed and that the item is billable set the save price and currency 
+               // If payed and that the item is billable set the save price and currency
                if (data.payed && $(section).find("[name = '" + item.HTMLName + "']").hasClass(regForm.classes.billable)){
-                   // Set currency 
+                   // Set currency
                    self._setItemCurrency(item);
                }
            });
@@ -267,12 +267,12 @@ var RegFormDisplayView = Backbone.View.extend({
             // Disable all billable element
             $("." + regForm.classes.billable, this.el).prop('disabled', true);
             $("." + regForm.classes.billable, this.el).attr('title', $T('No modification are allowed after payment'));
-            
+
             // If the billable element is a radio button disable all related radio buttons
             _.each($(".regFormIsBillable:radio", this.el), function(el, ind){
                 $('[name="' + el.name + '"]',this.el).prop('disabled',true);
             });
-            
+
             // Disable accommodation form
             $("#section-accommodation").find('select, *:radio').prop('disabled', true);
             $("#section-accommodation").find('select, *:radio').attr('title', $T('No modification are allowed after payment'));
@@ -286,7 +286,7 @@ var RegFormDisplayView = Backbone.View.extend({
 
         }
     },
-    
+
 
     getSectionElById: function(id){
         var section = "";
@@ -342,7 +342,7 @@ var RegFormDisplayView = Backbone.View.extend({
             }
         });
     },
-    
+
     _setItemCurrency: function(item){
         var itemSelector = $(this.el).find("[name = '" + item.HTMLName + "']").closest('tr');
         if(typeof item.currency != 'undefined'){
@@ -352,7 +352,7 @@ var RegFormDisplayView = Backbone.View.extend({
             $(itemSelector).find("." + regForm.classes.price).html(item.price);
         }
     },
-    
+
     _setCurrency: function(){
         $("." + this.classes.currency).html(this.model.get('currency'));
     }

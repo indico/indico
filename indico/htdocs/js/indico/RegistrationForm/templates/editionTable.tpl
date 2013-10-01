@@ -2,12 +2,12 @@
 <table>
     <thead>
         <tr role="rowheader">
-            <% if ( config.actions.indexOf("sortable") > -1 ) { %>
+            {% if config.actions.indexOf("sortable") > -1 %}
                 <th></th>
-            <% } %>
-            <% _.each(config.colNames, function(el, ind){ %>
-                <th style="width: <%= config.colModel[ind].width %>px;"><%= el %></th>
-            <% }); %>
+            {% endif %}
+            {% for el in config.colNames %}
+                <th style="width: {{config.colModel[loop.index0].width}}px;">{{ el }}</th>
+            {% endfor %}
         </tr>
     </thead>
 </table>
@@ -15,45 +15,55 @@
 
 <script type="text/template" id="row">
 <tbody>
-    <tr role="row" id="<%= item.id %>">
-        <% if ( config.actions.indexOf("sortable") > -1 ) { %>
+    <tr role="row" id="{{ item.id }}">
+
+        {% if config.actions.indexOf("sortable") > -1 %}
         <td>
             <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
         </td>
-        <% } %>
-        <% _.each(config.colModel, function (el, el_ind){ %>
-            <td role="gridcell" style="text-align: <%= el.align %> ;" name="<%= el.name %>" title="<%= item[el.index] %>">
-                <% if ( el.editable == undefined || el.editable == false ) { %>
-                    <%= item[el.index] %>
-                <% } else if ( el.edittype == "text" || el.edittype == undefined ) { %>
-                    <input type="text" size="<%= el.editoptions.size %>" maxlength="<%= el.editoptions.maxlength %>" name="<%= el.name %>" class="editable" value="<%= item[el.index] %>">
-                <% } else if ( el.edittype == "bool_select"  ) { %>
-                    <select name="<%= el.name %>" size="1" class="editable">
-                        <% var selected = el.defaultVal; %>
-                        <% if ( ! _.isUndefined(item[el.index]) ) { selected = item[el.index]; } %>
-                        <option role="option" value="true"  <% if (selected)  { print("SELECTED"); } %> ><%= $T("yes") %></option>
-                        <option role="option" value="false" <% if (!selected) { print("SELECTED"); } %> ><%= $T("no") %></option>
+        <% endif %>
+
+        {% for el in config.colModel %}
+            <td role="gridcell" style="text-align: {{ el.align }};" name="{{ el.name }}" title="{{ item[el.index] }}">
+                {% if el.editable == undefined and el.editable == false %}
+                    {{ item[el.index] }}
+                {% elif el.edittype == "text" and el.edittype == undefined %}
+                    <input type="text" size="{{ el.editoptions.size }}" maxlength="{{ el.editoptions.maxlength }}" name="{{ el.name }}" class="editable" value="{{ item[el.index] }}">
+                {% elif el.edittype == "bool_select" %}
+                    <select name="{{ el.name }}" size="1" class="editable">
+                        {% set selected = el.defaultVal; %}
+                        {% if not _.isUndefined(item[el.index]) %}
+                            {{ set selected = item[el.index] }}
+                        {% endif %}
+                        <option role="option" value="true"  {{ "SELECTED" if selected }}>
+                            {{ $T("yes") }}
+                        </option>
+                        <option role="option" value="false" {{ "SELECTED" if selected }}>
+                            {{ $T("no") }}
+                        </option>
                     </select>
-                <% } else if ( el.edittype == "radio" ) { %>
-                    <input type="radio" name="<%= el.name %>"/>
-                <% } %>
+                {% elif el.edittype == "radio" %}
+                    <input type="radio" name="{{ el.name }}"/>
+                {% endif %}
             </td>
-        <% }); %>
-        <% if ( config.actions.indexOf("remove") > -1 ) { %>
+        {% endfor %}
+
+        {% if config.actions.indexOf("remove") > -1 %}
         <td>
-            <button class="actionTrash"><%= $T("Remove") %></button>
+            <button class="actionTrash">{{ $T("Remove") }}</button>
         </td>
-        <% } %>
-        <% _.each( config.actions, function(action) { %>
-            <% if (_.isArray(action) ){%>
+        <% endif %>
+
+        {% for action in config.actions %}
+            {% if _.isArray(action) %}
                 <td>
-                    <button ref="<%= action[1] %>" class="actionTabSwitch ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" role="button" aria-disabled="false" title="<%= action[0] %>">
-                        <span class="ui-button-icon-primary ui-icon <%= action[2] %>"></span>
-                        <span class="ui-button-text">"<%= action[0] %></span>
+                    <button ref="{{ action[1] }}" class="actionTabSwitch ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" role="button" aria-disabled="false" title="{{ action[0] }}">
+                        <span class="ui-button-icon-primary ui-icon {{ action[2] }}"></span>
+                        <span class="ui-button-text">"{{ action[0] }}"</span>
                     </button>
                 </td>
-            <% } %>
-        <% }); %>
+            {% endif %}
+        {% endfor %}
     </tr>
 </tbody>
 </script>

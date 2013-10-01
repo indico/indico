@@ -276,7 +276,7 @@ def install_nunjucks():
         with lcd(os.path.join(env.ext_dir, 'nunjucks')):
             dest_dir = lib_dir(env.src_dir, 'js')
             local('mkdir -p {0}'.format(dest_dir))
-            local('cp browser/nunjucks.js {0}/'.format(dest_dir))
+            local('cp browser/nunjucks-dev.js {0}/'.format(dest_dir))
 
 
 # Tasks

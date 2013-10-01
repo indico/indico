@@ -126,7 +126,7 @@ var RegFormSectionBaseDialogView = Backbone.View.extend({
             tpl = $T("Error : Template not found!");
         }
         dict.getTabHtml = _.bind(this.getTabHtml, this);
-        return _.template( tpl, dict );
+        return nunenv.render("regFormSectionEditDialog.tpl", dict);
     },
 
     // Avoid form to but submitted when user presses enter

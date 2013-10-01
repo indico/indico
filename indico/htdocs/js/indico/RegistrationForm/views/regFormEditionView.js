@@ -498,12 +498,12 @@ var RegFormEditionView = RegFormDisplayView.extend({
 
     getTplEditionItem: function(tplId, dict) {
         var tpl = TemplateManager.getCached('RegistrationForm','regFormEdit', tplId);
-        return _.template(tpl, dict);
+        return nunenv.render("regFormEdit.tpl", dict);
     },
 
     getTplAddField: function(dict) {
         var tpl = TemplateManager.getCached('RegistrationForm','regFormAddField', false);
-        return _.template(tpl, {fields: dict} );
+        return nunenv.render("regFormAddField.tpl", {fields: dict} );
     }
 });
 

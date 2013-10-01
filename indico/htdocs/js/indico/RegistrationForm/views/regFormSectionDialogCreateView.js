@@ -71,7 +71,7 @@ var RegFormSectionsCreateView = Backbone.View.extend({
 
     getTpl: function(tplId, dict) {
         var tpl = TemplateManager.getSync('RegistrationForm', 'regFormSectionsMgmt', tplId);
-        return _.template(tpl, dict);
+        return nunenv.render("regFormSectionsMgmt.tpl", dict);
     },
 
     createSection : function(){

@@ -135,18 +135,18 @@ var RegFormFieldsEditView = Backbone.View.extend({
         if ( typeof this.fieldItemView == 'undefined' ){
             this.fieldItemView = new RadioFieldModel( this.field.values );
             this.tableView = new EditionTable(this.fieldItemView, $('#editionTable'));
-        }        
+        }
     },
 
     getFieldEdit: function(dict) {
         var tpl = TemplateManager.getSync('RegistrationForm', 'regFormFieldEdit', false);
-        return _.template(tpl, dict );
+        return nunenv.render("regFormFieldEdit.tpl", dict );
     },
 
     submitForm: function(event) {
         event.preventDefault();
     },
-    
+
     clean: function(){
         delete this.fieldItemView;
         delete this.tableView;

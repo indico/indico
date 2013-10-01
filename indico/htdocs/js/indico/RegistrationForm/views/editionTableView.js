@@ -118,6 +118,6 @@ var EditionTable = Backbone.View.extend({
 
     getTpl: function( tplId, dict ) {
         var tpl = TemplateManager.getSync('RegistrationForm','editionTable', tplId);
-        return _.template(tpl, dict);
+        return nunenv.render("editionTable.tpl", dict);
     }
 });

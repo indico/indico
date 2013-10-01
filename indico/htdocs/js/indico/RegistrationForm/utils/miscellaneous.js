@@ -75,4 +75,5 @@ var ElementManager = Backbone.Model.extend({
     }
 });
 
-
+var nunenv = new nunjucks.Environment(new nunjucks.HttpLoader('/indico/js/indico/RegistrationForm/templates'));
+nunenv.addExtension('i18nExtension', new i18nExtension());
