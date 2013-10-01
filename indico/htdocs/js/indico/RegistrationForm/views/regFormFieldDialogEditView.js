@@ -26,6 +26,7 @@ var RegFormFieldsEditView = Backbone.View.extend({
 
     initialize: function(el, model){
         var self = this;
+
         this.model = model;
         $(this.el).dialog({
             modal: true,
@@ -35,40 +36,41 @@ var RegFormFieldsEditView = Backbone.View.extend({
             autoResize:true,
             position: ['middle','middle'],
             buttons: {
-                    Save: function() {
-                            if($('form', self.el).checkValidity()){
-                                if(self.fieldId == 'isNew'){
-                                    self.commitCreate();
-                                } else {
-                                    self.commitUpdate();
-                                }
-                                self.clean();
-                                $(this).dialog('close');
-                            } else {
-                                alert($T('Correct the errors before saving.'));
-                                $('#form-opt-validate').trigger('click');
-                            }
-                    },
-                    Cancel: function() {
-                            self.clean();
-                            $(this).dialog('close');
+                Save: function() {
+                    if($('form', self.el).checkValidity()) {
+                        if(self.fieldId == 'isNew') {
+                            self.commitCreate();
+                        } else {
+                            self.commitUpdate();
+                        }
+                        self.clean();
+                        $(this).dialog('close');
+                    } else {
+                        alert($T('Correct the errors before saving.'));
+                        $('#form-opt-validate').trigger('click');
                     }
+                },
+                Cancel: function() {
+                    self.clean();
+                    $(this).dialog('close');
+                }
             }
-
         });
     },
 
-    render: function( sectionId, fieldId, field ){
-
+    render: function(sectionId, fieldId, field) {
         this.fieldId = fieldId;
         this.sectionId = sectionId;
-        if(fieldId == 'isNew'){
+
+        if(fieldId == 'isNew') {
             this.field = field;
         } else {
             this.field = this.model.getSectionById(sectionId).getFieldById(fieldId);
         }
-        $(this.el).html(this.getFieldEdit({field : this.field, sectionId : this.sectionId}));
+
+        $(this.el).html(this.getFieldEdit({field: this.field, sectionId: this.sectionId}));
         this.postRender();
+
         return this;
     },
 
@@ -139,8 +141,8 @@ var RegFormFieldsEditView = Backbone.View.extend({
     },
 
     getFieldEdit: function(dict) {
-        var tpl = TemplateManager.getSync('RegistrationForm', 'regFormFieldEdit', false);
-        return nunenv.render("regFormFieldEdit.tpl", dict );
+        dict.field.disabled = $.inArray(dict.field.lock, "mandatory");
+        return nunenv.render("regFormFieldEdit.tpl", dict);
     },
 
     submitForm: function(event) {

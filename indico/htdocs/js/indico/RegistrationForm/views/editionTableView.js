@@ -18,11 +18,11 @@
 
 var EditionTable = Backbone.View.extend({
 
-    initialize: function (model, el, config) {
+    initialize: function(model, el, config) {
         this.el = el;
         this.model = model;
         // if undefined default location in the model
-        if (typeof config == 'undefined'){
+        if (typeof config == 'undefined') {
             this.config = this.model.editTableConfig;
         } else {
             this.config = config;
@@ -32,39 +32,39 @@ var EditionTable = Backbone.View.extend({
         $(".actionTrash").live("click", removeRow);
     },
 
-    render: function () {
+    render: function() {
         var self = this;
         var data = this.model.get(this.config.data);
-        $(this.el).html(this.getTpl('table', { config : this.config, data : data }));
-        _.each(data, function(item, item_ind){
+        $(this.el).html(this.getTpl('table', {config: this.config, data: data}));
+        _.each(data, function(item, item_ind) {
             var cond = true;
             if (typeof self.config.displayCond != 'undefined'){
                 cond = self.config.displayCond(item);
             }
             if (cond === true) {
-                $('table',self.el).append(self.getTpl('row', {config : self.config, item : item}));
+                $('table', self.el).append(self.getTpl('row', {config: self.config, item: item}));
             }
         });
         this.postRender();
     },
 
-    appendRender: function (rowHTML) {
+    appendRender: function(rowHTML) {
         $('table',this.el).append(rowHTML);
         this.postRender();
     },
 
-    postRender: function () {
-        $( ".actionTrash" ).button({
+    postRender: function() {
+        $(".actionTrash").button({
             icons: { primary: "ui-icon-trash" },
             text: false
         });
         var actions = this.config.actions;
         if (actions.indexOf("sortable") > -1) {
-            $(this.el).sortable({ items: 'tbody', axis : "y" });
+            $(this.el).sortable({items: 'tbody', axis: "y"});
         }
     },
 
-    removeRow: function ( event, ui ) {
+    removeRow: function(event, ui) {
         rep = confirm($T('Are you sure you want to disable this field ?\nThis action is irreversible.'));
         if(rep === true) {
             $(event.target).closest("tr").data('remove', true);
@@ -72,12 +72,12 @@ var EditionTable = Backbone.View.extend({
         }
     },
 
-    addRow: function(item){
+    addRow: function(item) {
         var rowHTML = this.getTpl('row', { config : this.config, item : item });
         this.appendRender(rowHTML);
     },
 
-    sortRow: function(type, col){
+    sortRow: function(type, col) {
         var self = this;
         var rows = $('tbody', this.el);
         rows.sort(function(a, b){
@@ -94,20 +94,20 @@ var EditionTable = Backbone.View.extend({
         });
     },
 
-    toJSON: function () {
+    toJSON: function() {
         var self = this;
         var json = [];
-        $("table tr", this.el).each( function ( i, el ) {
-            if( $(el).attr('role') == "row" ) {
+        $("table tr", this.el).each(function(i, el) {
+            if($(el).attr('role') == "row") {
                 var dict = { id : $(el).attr('id') };
-                $( el ).children("td").each( function ( j, entry ) {
+                $( el ).children("td").each(function(j, entry) {
                     var val = $(entry).find("input[type=text],textarea,select,input[type=radio]").val();
                     if (val === null) {
                         val='';
                     }
                     dict[$(entry).attr('name')] = val;
                 });
-                if ( $(el).data('remove') ){
+                if ($(el).data('remove')) {
                     dict.remove = true;
                 }
                 json.push(dict);
@@ -116,8 +116,8 @@ var EditionTable = Backbone.View.extend({
         return json;
     },
 
-    getTpl: function( tplId, dict ) {
-        var tpl = TemplateManager.getSync('RegistrationForm','editionTable', tplId);
-        return nunenv.render("editionTable.tpl", dict);
+    getTpl: function(tplId, dict) {
+        var tpl = "edition/" + tplId + ".tpl";
+        return nunenv.render(tpl, dict);
     }
 });

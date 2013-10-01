@@ -23,35 +23,35 @@
  */
 var RegFormEditionView = RegFormDisplayView.extend({
 
-    config : {
-        sectionIdPrefix         : 'section-',
-        sortableFormClass       : 'sortableForm',
-        editableTextClass       : 'editableText',
-        editableItemClass       : 'editableItem'
-
+    config: {
+        sectionIdPrefix: 'section-',
+        sortableFormClass: 'sortableForm',
+        editableTextClass: 'editableText',
+        editableItemClass: 'editableItem'
     },
 
     additionalEvents: {
-        'click #buttonEditSection'          : '_editSectionDialog',
-        'click #buttonCollpaseSection'      : '_collapseSection',
-        'click #buttonDisableSection'       : '_disableSection',
-        'click #buttonFieldEdit'            : '_editField',
-        'click #buttonFieldRemove'          : '_setFieldStatus',
-        'click #buttonFieldDisable'         : '_setFieldStatus',
-        'click #buttonFieldEnable'          : '_setFieldStatus',
-        'mouseenter .editableItem'          : '_displayFieldOptions',
-        'mouseleave .editableItem'          : '_displayFieldOptions',
-        'mouseenter .regFormFieldDisabled'  : '_displayDisabledFieldOptions',
-        'mouseleave .regFormFieldDisabled'  : '_displayDisabledFieldOptions',
-        'click .editableText'               : '_editSectionHeader'
+        'click #buttonEditSection': '_editSectionDialog',
+        'click #buttonCollpaseSection': '_collapseSection',
+        'click #buttonDisableSection': '_disableSection',
+        'click #buttonFieldEdit': '_editField',
+        'click #buttonFieldRemove': '_setFieldStatus',
+        'click #buttonFieldDisable': '_setFieldStatus',
+        'click #buttonFieldEnable': '_setFieldStatus',
+        'mouseenter .editableItem': '_displayFieldOptions',
+        'mouseleave .editableItem': '_displayFieldOptions',
+        'mouseenter .regFormFieldDisabled': '_displayDisabledFieldOptions',
+        'mouseleave .regFormFieldDisabled': '_displayDisabledFieldOptions',
+        'click .editableText': '_editSectionHeader'
     },
 
     initialize: function(el){
         var self = this;
         _.bindAll(this);
+
         // Load cache
-        var templates = ['regFormEdit', 'regFormAddField', 'regFormSections', 'regFormFields',
-                         'editionTable', 'regFormFieldEdit', 'regFormSectionEditDialog', 'regFormSectionsMgmt'];
+        var templates = ['regFormEdit', 'regFormAddField', 'regFormSection', 'regFormFields',
+                         'regFormFieldEdit', 'regFormSectionEditDialog', 'regFormSectionsMgmt'];
         var defer = TemplateManager.loadCache('RegistrationForm', templates);
         // Only listen on events from the model once the template needed for the rendering are loaded.
         defer.then( function() {
@@ -176,8 +176,6 @@ var RegFormEditionView = RegFormDisplayView.extend({
             $(select).effect("highlight", {}, 6000);
         });
     },
-
-
 
     _getSectionId: function($element) {
         /*
@@ -400,7 +398,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
             var sectionId = this._getSectionId($(event.target));
             var fieldId = $(event.currentTarget).closest('.' + this.config.editableItemClass).attr('id');
             var field =  this.model.getSectionById(sectionId).getFieldById(fieldId);
-            var dict = {locks : any(field.lock,[]) };
+            var dict = {locks: any(field.lock,[])};
 
             var editHTML = this.getTplEditionItem('fieldButtons', dict);
             var selector = $(event.currentTarget).closest('.' + this.config.editableItemClass).find('tr:first');
@@ -413,7 +411,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
         }
     },
 
-    _displayDisabledFieldOptions: function (event, ui) {
+    _displayDisabledFieldOptions: function(event, ui) {
         if(event.type == 'mouseenter' && this.editing === false){
             var editHTML = this.getTplEditionItem('fieldDisabledButtons',{});
             var selector = $(event.currentTarget).closest('.' + regForm.classes.fieldDisabled).find('tr:first');
@@ -466,7 +464,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
     },
 
     /* Drag and drop functions */
-    _dragAndDropForm: function () {
+    _dragAndDropForm: function() {
         var self = this;
         var sectionId;
         var fieldId;
@@ -489,7 +487,7 @@ var RegFormEditionView = RegFormDisplayView.extend({
             }
         });
         // Save the initial position of the section/item
-        $( '.sortableForm' ).bind( 'sortstart', function (event, ui){
+        $('.sortableForm').bind('sortstart', function(event, ui) {
             event.stopPropagation();
             sectionId = self._getSectionId($(ui.item));
             fieldId = $(ui.item).closest('.' + self.config.editableItemClass + ', .' + regForm.classes.fieldDisabled).attr('id');
@@ -497,12 +495,11 @@ var RegFormEditionView = RegFormDisplayView.extend({
     },
 
     getTplEditionItem: function(tplId, dict) {
-        var tpl = TemplateManager.getCached('RegistrationForm','regFormEdit', tplId);
-        return nunenv.render("regFormEdit.tpl", dict);
+        var tpl = "edition/" + tplId + ".tpl";
+        return nunenv.render(tpl, dict);
     },
 
     getTplAddField: function(dict) {
-        var tpl = TemplateManager.getCached('RegistrationForm','regFormAddField', false);
         return nunenv.render("regFormAddField.tpl", {fields: dict} );
     }
 });

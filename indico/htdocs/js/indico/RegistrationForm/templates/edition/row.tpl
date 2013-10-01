@@ -1,19 +1,3 @@
-<script type="text/template" id="table">
-<table>
-    <thead>
-        <tr role="rowheader">
-            {% if config.actions.indexOf("sortable") > -1 %}
-                <th></th>
-            {% endif %}
-            {% for el in config.colNames %}
-                <th style="width: {{config.colModel[loop.index0].width}}px;">{{ el }}</th>
-            {% endfor %}
-        </tr>
-    </thead>
-</table>
-</script>
-
-<script type="text/template" id="row">
 <tbody>
     <tr role="row" id="{{ item.id }}">
 
@@ -21,7 +5,7 @@
         <td>
             <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
         </td>
-        <% endif %>
+        {% endif %}
 
         {% for el in config.colModel %}
             <td role="gridcell" style="text-align: {{ el.align }};" name="{{ el.name }}" title="{{ item[el.index] }}">
@@ -33,13 +17,13 @@
                     <select name="{{ el.name }}" size="1" class="editable">
                         {% set selected = el.defaultVal; %}
                         {% if not _.isUndefined(item[el.index]) %}
-                            {{ set selected = item[el.index] }}
+                            {% set selected = item[el.index] %}
                         {% endif %}
-                        <option role="option" value="true"  {{ "SELECTED" if selected }}>
-                            {{ $T("yes") }}
+                        <option role="option" value="true" {{ "selected" if selected }}>
+                            {% _ "yes" %}
                         </option>
-                        <option role="option" value="false" {{ "SELECTED" if selected }}>
-                            {{ $T("no") }}
+                        <option role="option" value="false" {{ "selected" if selected }}>
+                            {% _ "no" %}
                         </option>
                     </select>
                 {% elif el.edittype == "radio" %}
@@ -50,9 +34,9 @@
 
         {% if config.actions.indexOf("remove") > -1 %}
         <td>
-            <button class="actionTrash">{{ $T("Remove") }}</button>
+            <button class="actionTrash">{% _ "Remove" %}</button>
         </td>
-        <% endif %>
+        {% endif %}
 
         {% for action in config.actions %}
             {% if _.isArray(action) %}
@@ -66,4 +50,3 @@
         {% endfor %}
     </tr>
 </tbody>
-</script>

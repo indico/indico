@@ -2737,6 +2737,7 @@ class FieldInputs:
         return cls._availableInputs.keys()
     getAvailableInputKeys = classmethod(getAvailableInputKeys)
 
+
 class GeneralField(Persistent, Fossilizable):
 
     fossilizes(IRegFormGeneralFieldFossil)
@@ -2884,7 +2885,7 @@ class GeneralField(Persistent, Fossilizable):
         return self.getPlacesLimit() - self.getCurrentNoPlaces()
 
     def increaseNoPlaces(self):
-        if self.getPlacesLimit() > 0 :
+        if self.getPlacesLimit() > 0:
             if self.getCurrentNoPlaces() >= self.getPlacesLimit():
                 raise FormValuesError(_("""The limit for the number of places is smaller than the current amount registered for this item."""))
             self._currentNoPlaces += 1
@@ -2921,7 +2922,8 @@ class GeneralField(Persistent, Fossilizable):
 
     def getDescription(self):
         try:
-            if self._description: pass
+            if self._description:
+                pass
         except AttributeError:
             self._description = ''
         return self._description

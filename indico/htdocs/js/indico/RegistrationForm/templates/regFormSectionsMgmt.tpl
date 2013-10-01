@@ -9,7 +9,8 @@
         {% else %}
             <div style="float:right; font-size:14px;">
                 <button id="buttonRestore" class="regFormButton">{% _ 'Restore' %}</button>
-                {% if parseInt(section.id) > 0 %}
+                debugger;
+                {% if section.id > 0 %}
                 <button id="buttonRemove" class="regFormButton">{% _ 'Remove' %}</button>
                 {% endif %}
             </div>

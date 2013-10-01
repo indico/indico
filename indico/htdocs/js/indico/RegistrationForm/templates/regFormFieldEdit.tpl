@@ -18,15 +18,17 @@
                 {% if field.mandatory %}
                     {% set status = "CHECKED" %}
                 {% endif %}
-                {% if _.indexOf(field.lock, "mandatory") > -1 %}
-                    {% set status  = status +" DISABLED" %}
+                {% if field.disabled %}
+                    {% set status  = status + " DISABLED" %}
                 {% endif %}
                 <input type="checkbox" name="mandatory" id="input02" {{ status }}/> {% _ 'Mandatory' %}
            </div>
 
            <div class="regFormEditLine">
                 <label class="regFormDialogCaption">{% _ 'description' %}</label>
-                <textarea id="descriptionEdit" name="description" cols="40" rows="5">{{ any(field.description,'') }}</textarea>
+                <textarea id="descriptionEdit" name="description" cols="40" rows="5">
+                    {{ field.description }}
+                </textarea>
            </div>
 
            {% if field.input == "telephone" or field.input == "text" %}

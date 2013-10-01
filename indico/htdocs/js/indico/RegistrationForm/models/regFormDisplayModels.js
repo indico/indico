@@ -28,42 +28,50 @@ var RegFormDisplay = RegFormBaseModel.extend({
         sections: []
     },
 
-    setResult: function(result){
+    setResult: function(result) {
         this._setSections(result.sections);
-        this.set('currency',result.currency);
+        this.set('currency', result.currency);
     },
 
     getSectionById: function(id){
-        return _.find(this.get('sections'), function(section){ return section.id == id || section.get('elId') == id; });
+        return _.find(this.get('sections'), function(section) {
+            return section.id == id || section.get('elId') == id;
+        });
     },
 
     getSectionByType: function(type){
-        return _.find(this.get('sections'), function(section){ return section.get('_type') == type; });
+        return _.find(this.get('sections'), function(section) {
+            return section.get('_type') == type;
+        });
     },
 
     getAllDateInputs: function(){
         var dateInputs = [];
-        _.each( this.get('sections'), function(section){
-            if(section.get('_type') == "GeneralSectionForm" || section.get('_type') == "PersonalDataForm" ){
-                dateInputs = concat(dateInputs,_.filter(section.get('items'), function(item){ return  item.values._type == "DateInput"; }));
+        _.each( this.get('sections'), function(section) {
+            if (section.get('_type') == "GeneralSectionForm" || section.get('_type') == "PersonalDataForm") {
+                dateInputs = concat(dateInputs, _.filter(section.get('items'), function(item) {
+                    return item.values._type == "DateInput";
+                }));
             }
         });
         return dateInputs;
     },
 
     getFieldByHTMLName: function(HTMLName, sectionId){
-        return _.find(this.getSectionById(sectionId).toJSON().items,
-                function(item){ return  item.values.HTMLName == HTMLName; });
+        return _.find(this.getSectionById(sectionId).toJSON().items, function(item) {
+            return item.values.HTMLName == HTMLName;
+        });
     },
 
     getItemIdByCaption: function(caption, fieldId, sectionId){
-        var field = _.find(this.getSectionById(sectionId).getFieldById(fieldId).values.radioitems,
-                function(item){ return  item.caption == caption; });
+        var field = _.find(this.getSectionById(sectionId).getFieldById(fieldId).values.radioitems, function(item) {
+            return item.caption == caption;
+        });
         return field.id;
     },
 
     linkSectionToElId: function(sectionId, elId){
-        this.getSectionById(sectionId).set({ 'elId': elId }, {silent : true});
+        this.getSectionById(sectionId).set({'elId': elId}, {silent: true});
     },
 
     toJSON: function(){
@@ -71,13 +79,15 @@ var RegFormDisplay = RegFormBaseModel.extend({
     },
 
     _addSection: function(section) {
-        section.on('change',this.change,this);
+        section.on('change', this.change, this);
         this.get('sections').push(section);
     },
 
     _createSection: function (sectionJson){
         // remove disabled items
-        sectionJson.items = _.filter(sectionJson.items, function(item) { return ! item.disabled === true; });
+        sectionJson.items = _.filter(sectionJson.items, function(item) {
+            return !item.disabled === true;
+        });
         var newSection = new RegFormSectionDisplayModel(sectionJson);
         this._addSection(newSection);
     },
@@ -101,9 +111,10 @@ var RegFormDisplay = RegFormBaseModel.extend({
  */
 
 var RegFormSectionDisplayModel = Backbone.Model.extend({
-
     getFieldById: function(id){
-        return _.find(this.get('items'), function(item){ return item.id == id;});
+        return _.find(this.get('items'), function(item) {
+            return item.id == id;
+        });
     }
 });
 

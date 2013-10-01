@@ -23,59 +23,59 @@ var RegFormEdition = RegFormDisplay.extend({
 
     fetchMethod: 'regForm.registrationForm.FormModification',
 
-    setResult: function(result){
+    setResult: function(result) {
         this.set('result', result, {silent : true});
         this._setSections(result.sections);
         this.set('currency', result.currency);
     },
 
-    change: function(){
+    change: function() {
         this.trigger('change');
     },
 
-    createSection: function (data){
+    createSection: function (data) {
         this._commit("SectionCreate", data, false);
     },
 
-    moveSection: function(data){
+    moveSection: function(data) {
         this._commit("SectionMove", data, true);
     },
 
-    disableSection: function(data){
+    disableSection: function(data) {
         this._commit("SectionDisable", data, true);
     },
 
-    enableSection : function(data, silent){
+    enableSection : function(data, silent) {
         this._commit("SectionEnable", data, silent);
     },
 
-    removeSection : function(data, silent){
+    removeSection : function(data, silent) {
         this._commit('SectionRemove', data, silent);
     },
 
-    getRawData: function(){
+    getRawData: function() {
         return this.get('result');
     },
 
-    getRawSectionById: function(id){
+    getRawSectionById: function(id) {
         return _.find(this.get('result').sections, function(section){ return section.id == id; });
     },
 
-    _createSection: function (sectionJson){
+    _createSection: function(sectionJson) {
         // check if section is not already in the form
         var section = this.getSectionById(sectionJson.id);
-        if (typeof section == 'undefined'){
+        if (typeof section == 'undefined') {
             // create and add new section to the form
             var newSection = this.sectionMapper(sectionJson._type, sectionJson);
             this._addSection(newSection);
         }
     },
 
-    _commit: function(method, params, silent){
+    _commit: function(method, params, silent) {
         RegFormBaseModel.prototype._commit.call(this, method, params, _.bind(this._setSections, this), silent);
     },
 
-    sectionMapper: function(id,param){
+    sectionMapper: function(id,param) {
         var mapper = {
             'GeneralSectionForm'        : GeneralSection,
             'PersonalDataForm'          : PersonalDataSection,
@@ -113,7 +113,7 @@ var SectionBase = RegFormBaseModel.extend({
         this._commit('SectionSetHeader', data, true, false);
     },
 
-    commitDefaultParams: function(params){
+    commitDefaultParams: function(params) {
         params.confId = getConfId();
         params.sectionId = this.get('id');
         return params;
@@ -146,42 +146,40 @@ var GeneralSection = SectionBase.extend({
         }
     ),
 
-    createField: function(data){
+    createField: function(data) {
         this._commit('FieldCreate', data, true, false);
     },
 
-    setFieldStatus: function(data, silent){
+    setFieldStatus: function(data, silent) {
         silent = typeof silent !== 'undefined' ? silent: false;
         this._commit('FieldSetStatus', data, true, silent);
     },
 
-    updateField: function(data){
+    updateField: function(data) {
         this._commit('FieldSet', data, true, false);
     },
 
-    moveField: function(data){
+    moveField: function(data) {
         this._commit('FieldMove', data, true, false);
     },
 
-    setFieldItems: function(data){
+    setFieldItems: function(data) {
         this._commit('FieldRadioSetItems', data, true, false);
     },
 
-    getFieldById: function(id){
-        return _.find(this.get('items'), function(item){ return item.id == id;});
+    getFieldById: function(id) {
+        return _.find(this.get('items'), function(item) {
+            return item.id == id;
+        });
     }
 });
 
 var PersonalDataSection = GeneralSection.extend({
-
     actions: ['addField']
-
 });
 
 var ReasonParticipationSection = SectionBase.extend({
-
     actions: ['disable']
-
 });
 
 var SessionsSection = SectionBase.extend({
@@ -197,7 +195,7 @@ var SessionsSection = SectionBase.extend({
         }
     ),
 
-    hasSession: function(id){
+    hasSession: function(id) {
         var item = _.find(this.get('items'), function(item){ return item.id == id;});
         return typeof item != 'undefined';
     },
@@ -206,7 +204,7 @@ var SessionsSection = SectionBase.extend({
         this._commit('SectionSessionsSetItems', {items: items }, true, false );
     },
 
-    setConfig: function(data){
+    setConfig: function(data) {
         this._commit('SectionSessionsSetConfig', data, true, false);
     },
 
@@ -279,7 +277,7 @@ var AccommodationSection = SectionBase.extend({
             this._commit('SectionAccommodationSetItems', {items: items }, true, false );
         },
 
-        setDatesOffsets: function ( datesOffsets ){
+        setDatesOffsets: function(datesOffsets) {
             this._commit('SectionAccommodationSetConfig', { datesOffsets: datesOffsets  }, true, false );
         },
 
@@ -370,7 +368,7 @@ var SocialEventSection = SectionBase.extend({
         }
     ),
 
-    setItems: function (items) {
+    setItems: function(items) {
         this._commit('SectionSocialEventsSetItems', {items: items }, true, false );
     },
 
@@ -384,11 +382,11 @@ var SocialEventSection = SectionBase.extend({
       this.trigger('change');
     },
 
-    getSocialEventById: function(id){
+    getSocialEventById: function(id) {
         return _.find(this.get('items'), function(item){ return item.id == id;});
     },
 
-    getTabConfigById: function(divId){
+    getTabConfigById: function(divId) {
         var id = divId.split('-')[1];
         return _.find(this.get('tabs'), function(tab){ return tab.id == id;});
     },
@@ -506,16 +504,16 @@ var ConferenceSessions = RegFormBaseModel.extend({
         sessions:  []
     },
 
-    initialize: function () {
+    initialize: function() {
         this.fetch();
     },
 
-    setResult: function(result){
+    setResult: function(result) {
         this.set({result: result});
     },
 
     change: function () {
-        if  ( this.hasChanged('result') ) {
+        if (this.hasChanged('result')) {
             var sessions = [];
             _.each(this.get('result'), function (el,ind) {
                 // extract Id
@@ -543,7 +541,7 @@ var RadioFieldModel = Backbone.Model.extend({
         sortable: false,
         width : 'auto',
         actions: ['remove', 'sortable'],
-        colNames:[ $T("caption") , $T("billable"), $T("price"), $T("places limit"),  $T("enable")],
+        colNames:[$T("caption"), $T("billable"), $T("price"), $T("places limit"), $T("enable")],
         colModel:[
                    {
                        name:'caption',
