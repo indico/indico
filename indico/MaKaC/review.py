@@ -2202,9 +2202,11 @@ class Abstract(Persistent):
         #   problems with circular imports
         from MaKaC.conference import AcceptedContribution
         contrib = AcceptedContribution(self)
-        if session is not None:
+        if session:
             contrib.setSession(session)
             contrib.setDuration(dur=session.getContribDuration())
+        else:
+            contrib.setDuration()
         self.getCurrentStatus().setContribution(contrib)
         self._setContribution(contrib)
 
