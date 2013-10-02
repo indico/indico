@@ -59,7 +59,7 @@ class RHElectronicAgreement(RHConfModifCSBookings):
             raise MaKaCError(_("That Video Services tab doesn't exist"), _("Video Services"))
         else:
             p = WPElectronicAgreement(self, self._conf)
-            return p.display(sortCriteria = self.sortCriteria, order = self.order)
+            return p.display(sortCriteria=self.sortCriteria, order=self.order)
 
 
 class RHUploadElectronicAgreement(RHConferenceModifBase):
