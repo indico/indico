@@ -26,10 +26,9 @@
                 <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
                     <tr>
                         <td class="maincell">
-                            % if hasErrors:
-                                <span style="color: red; margin-left: 6px;"> ${ _("Saving failed.")}</span><br /><br />
+                            % if errorMessage:
+                                <p class="errorMessage">${ _("Saving failed.") }&nbsp;${ errorMessage }</p>
                             % endif
-                            <br />
                             <table width="100%" align="left" border="0">
                               <!-- WHEN -->
                               <tr>

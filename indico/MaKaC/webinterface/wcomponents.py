@@ -4992,17 +4992,19 @@ class WRoomBookingBlockingList(WTemplated):
         vars['blocks'] = self._blocks
         return vars
 
+
 class WRoomBookingBlockingForm(WTemplated):
 
-    def __init__(self, block, hasErrors):
+    def __init__(self, block, errorMessage):
         self._block = block
-        self._hasErrors = hasErrors
+        self._errorMessage = errorMessage
 
     def getVars(self):
-        vars = WTemplated.getVars(self)
-        vars['block'] = self._block
-        vars['hasErrors'] = self._hasErrors
-        return vars
+        wvars = WTemplated.getVars(self)
+        wvars['block'] = self._block
+        wvars['errorMessage'] = self._errorMessage
+        return wvars
+
 
 class WUtils:
     """A interface for creating easily some HTML elements..."""

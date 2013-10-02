@@ -470,16 +470,17 @@ class WPRoomBookingBlockingList(WPRoomBookingBase):
         wc = wcomponents.WRoomBookingBlockingList(self._blocks)
         return wc.getHTML(params)
 
+
 class WPRoomBookingBlockingForm(WPRoomBookingBase):
 
-    def __init__(self, rh, block, hasErrors):
+    def __init__(self, rh, block, errorMessage):
         WPRoomBookingBase.__init__(self, rh)
         self._block = block
-        self._hasErrors = hasErrors
+        self._errorMessage = errorMessage
 
-    def _setCurrentMenuItem( self ):
+    def _setCurrentMenuItem(self):
         self._blockRooms.setActive(True)
 
     def _getBody(self, params):
-        wc = wcomponents.WRoomBookingBlockingForm(self._block, self._hasErrors)
+        wc = wcomponents.WRoomBookingBlockingForm(self._block, self._errorMessage)
         return wc.getHTML(params)
