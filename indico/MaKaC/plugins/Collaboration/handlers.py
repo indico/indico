@@ -30,6 +30,7 @@ import pkg_resources
 from indico.util import json
 from indico.web.rh import RHHtdocs
 from MaKaC.webinterface.rh.collaboration import RHConfModifCSBookings
+from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.plugins import Collaboration
@@ -42,6 +43,7 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from MaKaC.webinterface.urlHandlers import URLHandler
 from MaKaC.common.logger import Logger
 from MaKaC.common import Config
+
 
 class RHElectronicAgreement(RHConfModifCSBookings):
     _url = r'^/Collaboration/elecAgree/?$'
@@ -58,6 +60,7 @@ class RHElectronicAgreement(RHConfModifCSBookings):
         else:
             p = WPElectronicAgreement(self, self._conf)
             return p.display(sortCriteria = self.sortCriteria, order = self.order)
+
 
 class RHUploadElectronicAgreement(RHConferenceModifBase):
     _url = r'^/Collaboration/uploadElecAgree/?$'
@@ -151,11 +154,12 @@ class RHElectronicAgreementGetFile(RHConfModifCSBookings):
         else:
             raise MaKaCError("The speaker wrapper id does not match any existing speaker.")
 
-class RHElectronicAgreementForm(RHConferenceBaseDisplay):
+
+class RHElectronicAgreementForm(RHConferenceBase):
     _url = r'^/Collaboration/elecAgreeForm/?$'
 
     def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
+        RHConferenceBase._checkParams(self, params)
         self.authKey = params['authKey']
 
     def _process(self):
