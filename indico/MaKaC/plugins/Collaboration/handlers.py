@@ -30,12 +30,13 @@ from werkzeug.exceptions import NotFound
 from indico.util import json
 from indico.web.flask.util import send_file
 from indico.web.rh import RHHtdocs
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.conference import LocalFile
 from MaKaC.common.logger import Logger
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
+from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from indico.core.index import Catalog
 from MaKaC.plugins import PluginsHolder, Plugin
@@ -311,9 +312,9 @@ class RHElectronicAgreementGetFile(RHConfModifCSBookings):
                          self.file.getCreationDate())
 
 
-class RHElectronicAgreementForm(RHConferenceBaseDisplay):
+class RHElectronicAgreementForm(RHConferenceBase):
     def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
+        RHConferenceBase._checkParams(self, params)
         self.authKey = params['authKey']
 
     def _process(self):
