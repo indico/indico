@@ -45,9 +45,11 @@ from MaKaC.webinterface.pages import conferences
 from MaKaC.i18n import _
 from MaKaC.webinterface.rh.admins import RCAdmin, RHAdminBase
 from MaKaC.user import Group, Avatar
-from MaKaC.plugins.Collaboration.pages import WPAdminCollaboration, WPCollaborationDisplay,  WPConfModifCollaboration, WPConfModifCollaborationProtection, \
-                WPElectronicAgreementFormConference, WPElectronicAgreementForm, WPElectronicAgreement
+from MaKaC.plugins.Collaboration.pages import WPAdminCollaboration, WPCollaborationDisplay, \
+    WPConfModifCollaboration, WPConfModifCollaborationProtection, WPElectronicAgreementFormConference, \
+    WPElectronicAgreementForm, WPElectronicAgreement
 from MaKaC.common.Configuration import Config
+
 
 class RCCollaborationAdmin(object):
     @staticmethod
@@ -238,7 +240,7 @@ class RHElectronicAgreement(RHConfModifCSBookings):
             raise MaKaCError(_("That Video Services tab doesn't exist"), _("Video Services"))
         else:
             p = WPElectronicAgreement(self, self._conf)
-            return p.display(sortCriteria = self.sortCriteria, order = self.order)
+            return p.display(sortCriteria=self.sortCriteria, order=self.order)
 
 
 class RHUploadElectronicAgreement(RHConferenceModifBase):
