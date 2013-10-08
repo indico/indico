@@ -859,6 +859,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
     def _process(self):
         params = self._getRequestParams()
         params["lang"] = self._aw.getSession().getLang()
+        params["user"] = self._aw.getSession().getUser().getId()
         html = self._cache.get(params)
         if not html:
             self._businessLogic()
