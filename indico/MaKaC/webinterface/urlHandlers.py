@@ -1172,6 +1172,8 @@ class UHConfModifDisplayUpLink(URLHandler):
 class UHConfModifDisplayDownLink(URLHandler):
     _endpoint = 'event_mgmt.confModifDisplay-downLink'
 
+class UHConfModifDisplayToggleTimetableView(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-toggleTimetableView'
 
 class UHConfModifFormatTitleBgColor(URLHandler):
     _endpoint = 'event_mgmt.confModifDisplay-formatTitleBgColor'

@@ -26,23 +26,22 @@ class NavigationEntry:
     _url = None
     _parent = None
 
+    @classmethod
     def getTitle(cls):
         return cls._title
-    getTitle = classmethod( getTitle)
 
+    @classmethod
     def getURL(cls, *arg):
         if cls._url is not None:
             return cls._url.getURL(*arg)
         return cls._url
-    getURL = classmethod( getURL)
 
+    @classmethod
     def getParent(cls, *arg):
         if cls._parent:
             return cls._parent()
         return None
-    getParent = classmethod( getParent)
 
-    
 class NEConferenceProgramme( NavigationEntry ):
     _url = urlHandlers.UHConferenceProgram
     _title = "Scientific Programme"
@@ -82,6 +81,7 @@ class NESpeakerIndex( NavigationEntry ):
 class NEConferenceTimeTable( NavigationEntry ):
     _url = urlHandlers.UHConferenceTimeTable
     _title = "Timetable"
+
 
 class NESessionDisplay( NavigationEntry ):
     _url = urlHandlers.UHSessionDisplay

@@ -1269,7 +1269,7 @@ class WConferenceTimeTable(WConfDisplayBodyBase):
         self._aw = aw
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
+        wvars = wcomponents.WTemplated.getVars(self)
         tz = DisplayTZ(self._aw, self._conf).getDisplayTZ()
         sf = schedule.ScheduleToJson.process(self._conf.getSchedule(),
                                              tz, self._aw,
@@ -1281,15 +1281,16 @@ class WConferenceTimeTable(WConfDisplayBodyBase):
             jsonf = ujson.encode
         except ImportError:
             jsonf = json.dumps
-        vars["ttdata"] = jsonf(sf)
+        wvars["ttdata"] = jsonf(sf)
         eventInfo = fossilize(self._conf, IConferenceEventInfoFossil, tz=tz)
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
-        vars['eventInfo'] = eventInfo
-        vars['timetableLayout'] = vars.get('ttLyt', '')
-        return vars
+        wvars['eventInfo'] = eventInfo
+        wvars['timetableLayout'] = wvars.get('ttLyt', '')
+        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
+        return wvars
 
 
-class WPConferenceTimeTable( WPConferenceDefaultDisplayBase ):
+class WPConferenceTimeTable(WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NEConferenceTimeTable
 
     def getJSFiles(self):
@@ -3714,7 +3715,11 @@ class WConfModifDisplayMenu(wcomponents.WTemplated):
                         "moveDownURL": quoteattr(str(urlHandlers.UHConfModifDisplayDownLink.getURL(self._link))), \
                         "imageDownURL": quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
                     }
-                vars["linkEdition"] = WSystemLinkModif(self._link).getHTML(p)
+                name = self._link.getName()
+                if name == "timetable":
+                    vars["linkEdition"] = WTimetableModif(self._link).getHTML(p)
+                else:
+                   vars["linkEdition"] = WSystemLinkModif(self._link).getHTML(p)
             elif isinstance(self._link, displayMgr.Spacer):
                 p = {
                         "removeLinkURL": quoteattr(str(urlHandlers.UHConfModifDisplayRemoveLink.getURL(self._link))), \
@@ -3989,6 +3994,19 @@ class WSystemLinkModif(wcomponents.WTemplated):
             vars["changeStatusTo"] = _("Disable")
         url=urlHandlers.UHConfModifDisplayToggleLinkStatus.getURL(self._link)
         vars["toggleLinkStatusURL"]=quoteattr(str(url))
+        return vars
+
+class WTimetableModif(WSystemLinkModif):
+
+    def getVars(self):
+        vars = WSystemLinkModif.getVars(self)
+        vars["viewMode"] = _("Generic")
+        vars["changeViewModeTo"] = _("Detailed")
+        if self._link.getMenu().isDetailed():
+            vars["viewMode"] = _("Detailed")
+            vars["changeViewModeTo"] = _("Generic")
+        url = urlHandlers.UHConfModifDisplayToggleTimetableView.getURL(self._link)
+        vars["toggleTimetableViewURL"] = str(url)
         return vars
 
 

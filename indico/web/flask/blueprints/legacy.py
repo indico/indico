@@ -286,5 +286,5 @@ legacy_endpoints = set([
     'userRegistration-active', 'userRegistration-created', 'userRegistration-disable', 'userRegistration-UserExist',
     'wcalendar', 'wcalendar-select', 'xmlGateway', 'xmlGateway-getCategoryInfo', 'xmlGateway-getStatsIndico',
     'xmlGateway-getStatsRoomBooking', 'xmlGateway-loginStatus', 'xmlGateway-signIn', 'xmlGateway-signOut',
-    'xmlGateway-webcastForthcomingEvents', 'xmlGateway-webcastOnAir'
+    'xmlGateway-webcastForthcomingEvents', 'xmlGateway-webcastOnAir', 'confModifDisplay-toggleTimetableView'
 ])

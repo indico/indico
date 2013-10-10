@@ -248,6 +248,7 @@ class Menu(Persistent):
         self._conf = conf
         self._indent = "&nbsp;&nbsp;&nbsp;&nbsp;"
         self._linkGenerator = Counter()
+        self._detailedView = False
 
     def clone( self, cdm ):
         newMenu = cdm.getMenu()
@@ -465,8 +466,21 @@ class Menu(Persistent):
         str = ""
         for link in self._listLink:
             if link.isEnabled():
-                str += "%s\n"%link
+                str += "%s\n" % link
         return str
+
+    def setViewMode(self, view):
+        self._detailedView = view
+
+    def toggleViewMode(self):
+        self.setViewMode(not self._detailedView)
+
+    def isDetailed(self):
+        try:
+            return self._detailedView
+        except AttributeError:
+            self._detailedView = False
+            return self._detailedView
 
 class Spacer(Persistent):
     Type = "spacer"
@@ -806,7 +820,17 @@ class SystemLink(Link):
         return handler.getURL(conf)
 
     def getURL(self):
-        return str(self._getURLObject())
+        url = str(self._getURLObject())
+
+        if self._name == 'timetable':
+            menu = self.getMenu()
+
+            if menu.isDetailed():
+                conf = menu.getConference()
+                startDate = conf.getSchedule().getStartDate()
+                url += startDate.strftime('#%Y%m%d')
+                url += '.detailed'
+        return url
 
     def getURLHandler(self):
         if not hasattr(self, '_URLHandler'):
@@ -829,7 +853,6 @@ class SystemLink(Link):
 
     def isVisible(self):
         return self._getURLObject().valid and super(SystemLink, self).isVisible()
-
 
 class SystemLinkData(Observable):
 

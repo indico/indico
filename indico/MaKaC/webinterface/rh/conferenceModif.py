@@ -2304,17 +2304,31 @@ class RHConfModifDisplayDownLink( RHConferenceModifBase ):
         self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
 
 
-class RHConfModifDisplayModifyData( RHConferenceModifBase ):
+class RHConfModifDisplayToggleTimetableView(RHConferenceModifBase):
+    _uh = urlHandlers.UHConfModifDisplayToggleTimetableView
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self._linkId = params.get("linkId", "")
+
+    def _process(self):
+        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
+        link = menu.getLinkById(self._linkId)
+        menu.toggleViewMode()
+        self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
+
+
+class RHConfModifDisplayModifyData(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifDisplayRemoveLink
 
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
         self._linkId = params.get("linkId", "")
         self._cancel = params.get("cancel", "")
         self._confirm = params.get("confirm", "")
         self._params = params
 
-    def _process( self ):
+    def _process(self):
 
         if self._cancel:
             menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
