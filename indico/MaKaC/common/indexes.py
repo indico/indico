@@ -31,8 +31,10 @@ from pytz import timezone
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import extension_point
 from zope.index.text import textindex
+from indico.util.string import remove_accents
 import pytz
 import itertools
+import string
 
 # BTrees are 32 bit by default
 # TODO: make this configurable
@@ -87,47 +89,45 @@ class Index(Persistent):
                 words[value].remove(item)
                 self.setIndex(words)
 
-    def matchFirstLetter( self, letter ):
+    def matchFirstLetter(self, letter, accents=True):
         result = []
+
+        compLetter = letter.lower()
+        if not accents:
+            compLetter = remove_accents(compLetter)
+
         for key in self.getKeys():
-            if key[0].lower() == letter.lower():
+            compKey = key[0].lower()
+            if not accents:
+                compKey = remove_accents(compKey)
+            if compKey == compLetter:
                 result += self._words[key]
+
         return result
 
-    def _match( self, value, cs=1, exact=1 ):
+    def _match(self, value, cs=1, exact=1, accents=True):
 
         result = []
-        lowerCaseValue = value.lower()
 
-        if exact == 1 and cs == 1:
-            if self._words.has_key(value) and len(self._words[value]) != 0:
-                if '' in self._words[value]:
-                    self._words[value].remove('')
-                return self._words[value]
-            else:
-                return None
-        elif exact == 1 and cs == 0:
-            for key in self._words.keys():
-                if key.lower() == lowerCaseValue and len(self._words[key]) != 0:
+        compValue = value
+        if not accents:
+            compValue = remove_accents(compValue)
+        if cs == 0:
+            compValue = compValue.lower()
+
+        for key in self._words.iterkeys():
+            if len(self._words[key]) != 0:
+                compKey = key
+                if not accents:
+                    compKey = remove_accents(compKey)
+                if cs == 0:
+                    compKey = compKey.lower()
+                if (exact == 0 and compKey.find(compValue) != -1) or (exact == 1 and compKey == compValue):
                     if '' in self._words[key]:
                         self._words[key].remove('')
                     result = result + self._words[key]
-            return result
-        elif exact == 0 and cs == 1:
-            for key in self._words.keys():
-                if key.find(value) != -1 and len(self._words[key]) != 0:
-                    if '' in self._words[key]:
-                        self._words[key].remove('')
-                    result = result + self._words[key]
-            return result
-        else:
-            for key in self._words.keys():
-                if key.lower().find(lowerCaseValue) != -1 and len(self._words[key]) != 0:
-                    if '' in self._words[key]:
-                        self._words[key].remove('')
-                    result = result + self._words[key]
-            return result
-        return None
+
+        return result
 
     def dump(self):
         return self._words
@@ -166,9 +166,9 @@ class NameIndex(Index):
         name = user.getName()
         self._withdrawItem(name, user.getId())
 
-    def matchUser(self, name, cs=0, exact=0):
+    def matchUser(self, name, cs=0, exact=0, accents=False):
         """this match is an approximative case insensitive match"""
-        return self._match(name, cs, exact)
+        return self._match(name, cs, exact, accents)
 
 
 class SurNameIndex(Index):
@@ -182,9 +182,9 @@ class SurNameIndex(Index):
         surName = user.getSurName()
         self._withdrawItem(surName, user.getId())
 
-    def matchUser(self, surName, cs=0, exact=0):
+    def matchUser(self, surName, cs=0, exact=0, accents=False):
         """this match is an approximative case insensitive match"""
-        return self._match(surName, cs, exact)
+        return self._match(surName, cs, exact, accents)
 
 
 class OrganisationIndex(Index):
@@ -198,8 +198,8 @@ class OrganisationIndex(Index):
         org = user.getOrganisation()
         self._withdrawItem(org, user.getId())
 
-    def matchUser(self, org, cs=0, exact=0):
-        return self._match(org, cs, exact)
+    def matchUser(self, org, cs=0, exact=0, accents=False):
+        return self._match(org, cs, exact, accents)
 
 
 class StatusIndex(Index):

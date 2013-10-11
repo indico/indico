@@ -46,6 +46,7 @@ from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 import indico.util.redis.avatar_links as avatar_links
+from indico.util.string import remove_accents
 
 """Contains the classes that implement the user management subsystem
 """
@@ -1128,13 +1129,16 @@ class AvatarHolder(ObjectHolder):
         result = {}
         if index not in self._indexes:
             return None
-        match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter)
-        if match != None:
+        if index in ["name", "surName", "organisation"]:
+            match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter, accents=False)
+        else:
+            match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter)
+        if match is not None:
             for userid in match:
                 if self.getById(userid) not in result:
-                    av=self.getById(userid)
+                    av = self.getById(userid)
                     if not onlyActivated or av.isActivated():
-                        result[av.getEmail()]=av
+                        result[av.getEmail()] = av
         if searchInAuthenticators:
             for authenticator in AuthenticatorMgr().getList():
                 matches = authenticator.matchUserFirstLetter(index, letter)
