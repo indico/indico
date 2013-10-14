@@ -30,3 +30,6 @@
 	path = ext_modules/nunjucks
 	url = https://github.com/jlongster/nunjucks.git
     ignore = dirty
+[submodule "ext_modules/angular"]
+	path = ext_modules/angular
+	url = https://github.com/angular/angular.js.git

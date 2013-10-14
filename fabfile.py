@@ -180,6 +180,22 @@ def _install_dependencies(mod_name, sub_path, dtype, dest_subpath=None):
 
 # Recipes
 
+@recipe('angular')
+def install_angular():
+    """
+    Install Angular.js from Git
+    """
+    with node_env():
+        with lcd(os.path.join(env.ext_dir, 'angular')):
+            local('npm install')
+            local('grunt')
+            dest_dir_js = lib_dir(env.src_dir, 'js')
+            dest_dir_css = lib_dir(env.src_dir, 'css')
+            local('mkdir -p {0}'.format(dest_dir_js))
+            local('cp build/angular.js {0}/'.format(dest_dir_js))
+            local('cp css/angular.css {0}'.format(dest_dir_css))
+
+
 @recipe('compass')
 def install_compass():
     """

@@ -223,6 +223,11 @@ class DebugLevelFilter(Filter):
         if self.required_level == self.env.debug:
             out.write(in_.read())
 
+angular = Bundle(
+    'js/lib/angular.js',
+    filters='jsmin',
+    output='angular_%(version)s.min.js'
+)
 
 jquery = Bundle(
     'js/lib/underscore.js',
@@ -310,7 +315,7 @@ moment = Bundle(
         'lang/fr.js'),
     filters='rjsmin', output='js/moment_%(version)s.min.js')
 
-base_js = Bundle(jquery, utils, presentation, calendar, indico_jquery, moment, indico_core,
+base_js = Bundle(jquery, angular, utils, presentation, calendar, indico_jquery, moment, indico_core,
                  indico_legacy, indico_common)
 
 screen_sass = Bundle('sass/screen.scss',
@@ -355,16 +360,17 @@ def register_all_css(env, main_css_file):
     base_css = Bundle(
         *namespace('css',
                    main_css_file,
-                    'category_display.css',
-                    'calendar-blue.css',
-                    'jquery-ui.css',
-                    'lib/jquery.qtip.css',
-                    'lib/jquery.multiselect.css',
-                    'lib/jquery.multiselect.filter.css',
-                    'jquery.colorbox.css',
-                    'jquery-ui-custom.css',
-                    'jquery.qtip-custom.css',
-                    'jquery.colorpicker.css'),
+                   'category_display.css',
+                   'calendar-blue.css',
+                   'jquery-ui.css',
+                   'lib/angular.css',
+                   'lib/jquery.qtip.css',
+                   'lib/jquery.multiselect.css',
+                   'lib/jquery.multiselect.filter.css',
+                   'jquery.colorbox.css',
+                   'jquery-ui-custom.css',
+                   'jquery.qtip-custom.css',
+                   'jquery.colorpicker.css'),
         filters=("cssmin", "cssrewrite"),
         output='css/base_%(version)s.min.css')
 
