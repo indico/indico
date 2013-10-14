@@ -3718,7 +3718,7 @@ class WConfModifDisplayMenu(wcomponents.WTemplated):
                 if name == "timetable":
                     vars["linkEdition"] = WTimetableModif(self._link).getHTML(p)
                 else:
-                   vars["linkEdition"] = WSystemLinkModif(self._link).getHTML(p)
+                    vars["linkEdition"] = WSystemLinkModif(self._link).getHTML(p)
             elif isinstance(self._link, displayMgr.Spacer):
                 p = {
                         "removeLinkURL": quoteattr(str(urlHandlers.UHConfModifDisplayRemoveLink.getURL(self._link))), \
@@ -3998,15 +3998,22 @@ class WSystemLinkModif(wcomponents.WTemplated):
 class WTimetableModif(WSystemLinkModif):
 
     def getVars(self):
-        vars = WSystemLinkModif.getVars(self)
-        vars["viewMode"] = _("Generic")
-        vars["changeViewModeTo"] = _("Detailed")
+        wvars = WSystemLinkModif.getVars(self)
+        # Timetable detailed view
+        wvars["viewMode"] = _("Generic")
+        wvars["changeViewModeTo"] = _("Detailed")
         if self._link.getMenu().is_timetable_detailed_view():
-            vars["viewMode"] = _("Detailed")
-            vars["changeViewModeTo"] = _("Generic")
-        url = urlHandlers.UHConfModifDisplayToggleTimetableView.getURL(self._link)
-        vars["toggleTimetableViewURL"] = str(url)
-        return vars
+            wvars["viewMode"] = _("Detailed")
+            wvars["changeViewModeTo"] = _("Generic")
+        wvars["toggleTimetableViewURL"] = str(urlHandlers.UHConfModifDisplayToggleTimetableView.getURL(self._link))
+        # Timeable Layout
+        wvars["defaultTTLayout"] = _("Normal")
+        wvars["changedefaultTTLayoutTo"] = _("By room")
+        if self._link.getMenu().getDefaultTTLayout() == 'room':
+            wvars["defaultTTLayout"] = _("By room")
+            wvars["changedefaultTTLayoutTo"] = _("Normal")
+        wvars["toggleTTDefaultLayoutURL"] = str(urlHandlers.UHConfModifDisplayToggleTTDefaultLayout.getURL(self._link))
+        return wvars
 
 
 class WSpacerModif(wcomponents.WTemplated):

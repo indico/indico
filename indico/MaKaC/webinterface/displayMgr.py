@@ -249,6 +249,7 @@ class Menu(Persistent):
         self._indent = "&nbsp;&nbsp;&nbsp;&nbsp;"
         self._linkGenerator = Counter()
         self._timetable_detailed_view = False
+        self._defaultTTLayout = 'normal'
 
     def clone(self, cdm):
         newMenu = cdm.getMenu()
@@ -462,6 +463,22 @@ class Menu(Persistent):
 
     def getCurrentItem(self):
         return getattr(self, '_v_currentItem', None)
+
+    def setDefaultTTLayout(self, layout):
+        self._defaultTTLayout = layout
+
+    def toggleDefaultTTLayout(self):
+        if self._defaultTTLayout == 'normal':
+            self.setDefaultTTLayout('room')
+        else:
+            self.setDefaultTTLayout('normal')
+
+    def getDefaultTTLayout(self):
+        try:
+            return self._defaultTTLayout
+        except AttributeError:
+            self._defaultTTLayout = 'normal'
+            return self._defaultTTLayout
 
     def __str__(self):
         str = ""
@@ -823,7 +840,8 @@ class SystemLink(Link):
 
         if self._name == 'timetable':
             menu = self.getMenu()
-
+            if menu.getDefaultTTLayout() == 'room':
+                url += '?ttLyt=room'
             if menu.is_timetable_detailed_view():
                 startDate = menu.getConference().getSchedule().getAdjustedStartDate()
                 url += startDate.strftime('#%Y%m%d')

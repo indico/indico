@@ -75,6 +75,8 @@ event_mgmt.add_url_rule('/layout/menu/add/page', 'confModifDisplay-addPage', con
                         methods=('POST',))
 event_mgmt.add_url_rule('/layout/menu/<linkId>/timetable', 'confModifDisplay-toggleTimetableView',
                         conferenceModif.RHConfModifDisplayToggleTimetableView, methods=('POST',))
+event_mgmt.add_url_rule('/layout/menu/<linkId>/timetable', 'confModifDisplay-toggleTTDefaultLayout',
+                        conferenceModif.RHConfModifDisplayToggleTTDefaultLayout, methods=('POST',))
 
 # Layout: Images
 event_mgmt.add_url_rule('/layout/images/', 'confModifDisplay-resources', conferenceModif.RHConfModifDisplayResources)

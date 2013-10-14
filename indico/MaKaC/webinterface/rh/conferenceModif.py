@@ -2318,6 +2318,20 @@ class RHConfModifDisplayToggleTimetableView(RHConferenceModifBase):
         self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
 
 
+class RHConfModifDisplayToggleTTDefaultLayout(RHConferenceModifBase):
+    _uh = urlHandlers.UHConfModifDisplayToggleTTDefaultLayout
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self._linkId = params.get("linkId", "")
+
+    def _process(self):
+        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
+        link = menu.getLinkById(self._linkId)
+        menu.toggleDefaultTTLayout()
+        self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
+
+
 class RHConfModifDisplayModifyData(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifDisplayRemoveLink
 
