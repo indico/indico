@@ -184,25 +184,25 @@ indico_backbone = Bundle('js/lib/backbone.js',
                          filters='jsmin', output='indico_backbone_%(version)s.min.js')
 
 indico_regform_base = Bundle(indico_backbone,
-                             'js/indico/RegistrationForm/utils/vars.js',
-                             'js/indico/RegistrationForm/utils/baseModel.js',
-                             'js/indico/RegistrationForm/utils/miscellaneous.js',
+                             'js/indico/RegistrationForm.old/utils/vars.js',
+                             'js/indico/RegistrationForm.old/utils/baseModel.js',
+                             'js/indico/RegistrationForm.old/utils/miscellaneous.js',
                              filters='jsmin', output='indico_regform_base_%(version)s.min.js')
 
 indico_regform_display = Bundle(html5_cross_browser_compatibility,
                                 indico_regform_base,
-                               'js/indico/RegistrationForm/models/regFormDisplayModels.js',
-                               'js/indico/RegistrationForm/views/regFormDisplayView.js',
+                               'js/indico/RegistrationForm.old/models/regFormDisplayModels.js',
+                               'js/indico/RegistrationForm.old/views/regFormDisplayView.js',
                                filters='jsmin', output='indico_regFormDisplay_%(version)s.min.js')
 
 indico_regform_edition = Bundle(indico_regform_display,
-                               'js/indico/RegistrationForm/views/editionTableView.js',
-                               'js/indico/RegistrationForm/models/regFormEditionModels.js',
-                               'js/indico/RegistrationForm/views/regFormEditionView.js',
-                               'js/indico/RegistrationForm/views/regFormFieldDialogEditView.js',
-                               'js/indico/RegistrationForm/views/regFormSectionDialogMgmtView.js',
-                               'js/indico/RegistrationForm/views/regFormSectionDialogCreateView.js',
-                               'js/indico/RegistrationForm/views/regFormSectionDialogEditView.js',
+                               'js/indico/RegistrationForm.old/views/editionTableView.js',
+                               'js/indico/RegistrationForm.old/models/regFormEditionModels.js',
+                               'js/indico/RegistrationForm.old/views/regFormEditionView.js',
+                               'js/indico/RegistrationForm.old/views/regFormFieldDialogEditView.js',
+                               'js/indico/RegistrationForm.old/views/regFormSectionDialogMgmtView.js',
+                               'js/indico/RegistrationForm.old/views/regFormSectionDialogCreateView.js',
+                               'js/indico/RegistrationForm.old/views/regFormSectionDialogEditView.js',
                                filters='jsmin', output='indico_regFormEdition_%(version)s.min.js')
 
 
