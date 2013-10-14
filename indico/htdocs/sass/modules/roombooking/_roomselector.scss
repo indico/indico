@@ -23,8 +23,7 @@
     @include border-all();
     @include border-radius();
     @include single-box-shadow($hoff: 2px, $voff: 2px);
-    max-width: 1000px;
-    min-width: 900px;
+    width: 900px;
 
     .ui-multiselect-menu {
         top: 0 !important;
@@ -79,7 +78,7 @@
         $row-border-color: lighten($gray, $color-variation);
         $row-height: 2.6em;
 
-        li:last-child label{
+        li:last-child label {
             border-bottom: none;
         }
 

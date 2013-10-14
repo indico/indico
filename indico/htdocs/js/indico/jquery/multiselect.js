@@ -22,22 +22,16 @@ $.extend($.ech.multiselect.prototype, {
     _create: function() {
         this.oldcreate = oldcreate;
         this.oldcreate(this);
-        this._fixLabels();
+        this._fixEventBindings();
     },
 
-    _fixLabels: function() {
-        var self = this;
-        var menu = self.menu;
+    _fixEventBindings: function() {
+        this.header.delegate('input[type="checkbox"], input[type="radio"]', 'click.multiselect', function(e) {
+            e.stopPropagation();
+        });
 
-        self.labels = menu.find('.ui-multiselect-checkboxes label');
-        self.inputs = self.labels.children('input');
-
-        menu.undelegate('label', 'mouseenter.multiselect');
-        menu.delegate('.ui-multiselect-checkboxes label', 'mouseenter.multiselect', function() {
-            if(!$(this).hasClass('ui-state-disabled')) {
-                self.labels.removeClass('ui-state-hover');
-                $(this).addClass('ui-state-hover').find('input').focus();
-            }
+        this.header.delegate('label', 'mouseenter.multiselect', function(e) {
+            e.stopPropagation();
         });
     }
 });

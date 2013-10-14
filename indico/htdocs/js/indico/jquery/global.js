@@ -59,6 +59,9 @@ $(document).ready(function() {
                         event.preventDefault();
                     }
                 }
+            },
+            hide: {
+                event: "mouseleave"
             }
         }, event);
     });

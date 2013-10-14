@@ -59,11 +59,11 @@
                     </div>
                 </div>
                 <div id="sDatePlaceDiv" class="titleCellFormat bookDateDiv" style="clear: both;" >
-                    <span id='sDatePlaceTitle' class='label'>${_("Booking date")}</span>
+                    <div id='sDatePlaceTitle' class='label'>${_("Booking date")}</div>
                     <div id="sDatePlace"></div>
                 </div>
                 <div id="eDatePlaceDiv" class="titleCellFormat bookDateDiv" style="display: none;" >
-                    <span id='eDatePlaceTitle' class='label'>${_("End date")}</span>
+                    <div id='eDatePlaceTitle' class='label'>${_("End date")}</div>
                     <div id="eDatePlace"></div>
                 </div>
                 <div class="infoMessage" id="holidays-warning" style="float: left; display: none"></div>

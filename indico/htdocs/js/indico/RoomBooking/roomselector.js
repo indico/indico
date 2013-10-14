@@ -272,10 +272,14 @@
             var rooms = self.options.rooms;
 
             var icons = ["icon-camera", "icon-broadcast", "icon-unlocked", "icon-user"];
-            var icontitles = [$T("Video conference available"),
-                              $T("Webcast/Recording available"),
-                              $T("Public room"),
-                              $T("Maximum capacity")];
+            var activetitles = [$T("Video conference available"),
+                                $T("Webcast/Recording available"),
+                                $T("Public room"),
+                                $T("Maximum capacity")];
+            var disabledtitles = [$T("Video conference not available"),
+                                  $T("Webcast/Recording not available"),
+                                  $T("Private room")];
+
 
             self.select.find("option").each(function(index) {
                 var labelparts = $(this).attr('label').split(":");
@@ -311,14 +315,22 @@
                 for (var i = 0; i < labelparts.length; i++) {
                     if (labelparts[i] != 'None' && labelparts[i].toLowerCase() != 'false') {
                         attributes.find("." + icons[i])
-                            .attr("title", icontitles[i])
+                            .attr("title", activetitles[i])
                             .addClass("active");
 
                         if (!isNaN(labelparts[i])) {
                             var val = (labelparts[i] === "0") ? "?" : labelparts[i];
-                            capacity.find("span")
-                                .text(val)
-                                .attr("title", icontitles[i]);
+                            capacity
+                                .attr("title", activetitles[i])
+                                .find("span").text(val);
+                        }
+                    } else {
+                        var attribute = attributes.find("." + icons[i]);
+                        attribute.attr("title", disabledtitles[i]);
+
+                        if (attribute.hasClass("icon-unlocked")) {
+                            attribute.removeClass("icon-unlocked");
+                            attribute.addClass("icon-lock");
                         }
                     }
                 }
@@ -381,7 +393,9 @@
             var count = self.parts.list.find("input:checked").length;
             var str = opt.selectedText.replace("#", count);
 
-            counter.text(str);
+            counter
+                .text(str)
+                .effect("pulsate", {times: 1});
         },
 
         _updateFilter: function() {
@@ -397,7 +411,7 @@
             var displayed = self.parts.list.find('li:visible').length;
             self.parts.footer.find(".ui-multiselect-selection-summary")
                 .text(displayed + " / " + total + " rooms")
-                .effect("pulsate", {times:1}, 400);
+                .effect("pulsate", {times: 1});
         },
 
         _changeSelectedStyleAll: function() {

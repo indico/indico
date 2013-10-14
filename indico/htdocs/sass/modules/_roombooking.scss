@@ -259,10 +259,20 @@ a.weekday {
     width: 4em;
 }
 
-#sDatePlace .ui-datepicker-inline,
-#eDatePlaceDiv .ui-datepicker-inline {
-    background-color: transparent;
+#sDatePlaceDiv,
+#eDatePlaceDiv {
+
+    #sDatePlaceTitle,
+    #eDatePlaceTitle {
+        text-align: center;
+    }
+
+    .ui-datepicker-inline {
+        background-color: transparent;
+    }
 }
+
+
 
 .bookDateDiv {
     float: left;
