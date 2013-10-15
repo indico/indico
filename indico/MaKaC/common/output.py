@@ -1265,25 +1265,25 @@ class outputGenerator(Observable):
             out = self._XMLGen
 
         out.writeTag("leader", "00000nmm  2200000uu 4500")
-        out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield","INDICO.%s" % uniqueId(cont), [["code","a"]])
+        out.openTag("datafield", [["tag", "035"], ["ind1", " "], ["ind2", " "]])
+        out.writeTag("subfield", "INDICO.%s" % uniqueId(cont), [["code", "a"]])
         out.closeTag("datafield")
 
-        out.openTag("datafield",[["tag","035"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", uniqueId(cont), [["code","a"]])
-        out.writeTag("subfield","Indico",[["code","9"]])
+        out.openTag("datafield", [["tag", "035"], ["ind1", " "], ["ind2", " "]])
+        out.writeTag("subfield", uniqueId(cont), [["code", "a"]])
+        out.writeTag("subfield", "Indico", [["code", "9"]])
         out.closeTag("datafield")
 
-        out.openTag("datafield",[["tag","245"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield",cont.getTitle(),[["code","a"]])
+        out.openTag("datafield", [["tag", "245"], ["ind1", " "], ["ind2", " "]])
+        out.writeTag("subfield", cont.getTitle(), [["code", "a"]])
         out.closeTag("datafield")
 
-        out.openTag("datafield",[["tag","300"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield",cont.getDuration(),[["code","a"]])
+        out.openTag("datafield", [["tag", "300"], ["ind1", " "], ["ind2", " "]])
+        out.writeTag("subfield", cont.getDuration(), [["code", "a"]])
         out.closeTag("datafield")
 
-        out.openTag("datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", uniqueId(cont.getConference()),[["code","g"]])
+        out.openTag("datafield", [["tag", "111"], ["ind1", " "], ["ind2", " "]])
+        out.writeTag("subfield", uniqueId(cont.getConference()), [["code", "g"]])
         out.closeTag("datafield")
 
         edate = cont.getModificationDate()
@@ -1295,27 +1295,33 @@ class outputGenerator(Observable):
         out.closeTag("datafield")
 
         for path in cont.getConference().getCategoriesPath():
-            out.openTag("datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
-            out.writeTag("subfield", ":".join(path), [["code","a"]])
+            out.openTag("datafield", [["tag", "650"], ["ind1", " "], ["ind2", "7"]])
+            out.writeTag("subfield", ":".join(path), [["code", "a"]])
             out.closeTag("datafield")
 
-        l=cont.getLocation()
+        l = cont.getLocation()
         if (l and l.getName() != "") or cont.getStartDate() is not None:
-            out.openTag("datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
+            out.openTag("datafield", [["tag", "518"], ["ind1", " "], ["ind2", " "]])
             if l:
                 if l.getName() != "":
-                    out.writeTag("subfield",l.getName(),[["code","r"]])
+                    out.writeTag("subfield", l.getName(), [["code", "r"]])
             if cont.getStartDate() is not None:
-                out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(cont.getStartDate().year, string.zfill(cont.getStartDate().month,2), string.zfill(cont.getStartDate().day,2), string.zfill(cont.getStartDate().hour,2), string.zfill(cont.getStartDate().minute,2)),[["code","d"]])
-                out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(cont.getEndDate().year, string.zfill(cont.getEndDate().month,2), string.zfill(cont.getEndDate().day,2), string.zfill(cont.getEndDate().hour,2), string.zfill(cont.getEndDate().minute,2)),[["code","h"]])
+                out.writeTag("subfield", "%d-%s-%sT%s:%s:00Z" % (cont.getStartDate().year,
+                             string.zfill(cont.getStartDate().month, 2), string.zfill(cont.getStartDate().day, 2),
+                             string.zfill(cont.getStartDate().hour, 2), string.zfill(cont.getStartDate().minute, 2)),
+                             [["code", "d"]])
+                out.writeTag("subfield", "%d-%s-%sT%s:%s:00Z" % (cont.getEndDate().year,
+                             string.zfill(cont.getEndDate().month, 2), string.zfill(cont.getEndDate().day, 2),
+                             string.zfill(cont.getEndDate().hour, 2), string.zfill(cont.getEndDate().minute, 2)),
+                             [["code", "h"]])
             out.closeTag("datafield")
 
-        out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield",cont.getDescription(),[["code","a"]])
+        out.openTag("datafield", [["tag", "520"], ["ind1", " "], ["ind2", " "]])
+        out.writeTag("subfield", cont.getDescription(), [["code", "a"]])
         out.closeTag("datafield")
 
-        out.openTag("datafield",[["tag","611"],["ind1","2"],["ind2","4"]])
-        out.writeTag("subfield",cont.getConference().getTitle(),[["code","a"]])
+        out.openTag("datafield", [["tag", "611"], ["ind1", "2"], ["ind2", "4"]])
+        out.writeTag("subfield", cont.getConference().getTitle(), [["code", "a"]])
         out.closeTag("datafield")
 
 
