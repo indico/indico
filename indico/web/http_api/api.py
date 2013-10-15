@@ -508,7 +508,9 @@ class CategoryEventHook(HTTPAPIHook):
     def export_categ_extra(self, aw, resultList):
         ids = set((event['categoryId'] for event in resultList))
         return {
-            'eventCategories': CategoryEventFetcher.getCategoryPath(ids, aw)
+            'eventCategories': CategoryEventFetcher.getCategoryPath(ids, aw),
+            "moreFutureEvents": True in [IndexesHolder().getById('categoryDateAll')
+                                         .hasObjectsAfter(catId, self._toDT) for catId in self._idList]
         }
 
     def export_event(self, aw):

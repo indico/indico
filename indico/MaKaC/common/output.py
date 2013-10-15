@@ -1286,6 +1286,14 @@ class outputGenerator(Observable):
         out.writeTag("subfield", uniqueId(cont.getConference()),[["code","g"]])
         out.closeTag("datafield")
 
+        edate = cont.getModificationDate()
+        modifDate = datetime(edate.year, edate.month, edate.day)
+
+        out.openTag("datafield", [["tag", "961"], ["ind1", " "], ["ind2", " "]])
+        out.writeTag("subfield", "%d-%s-%sT" % (modifDate.year, string.zfill(modifDate.month, 2),
+                     string.zfill(modifDate.day, 2)), [["code", "c"]])
+        out.closeTag("datafield")
+
         for path in cont.getConference().getCategoriesPath():
             out.openTag("datafield",[["tag","650"],["ind1"," "],["ind2","7"]])
             out.writeTag("subfield", ":".join(path), [["code","a"]])

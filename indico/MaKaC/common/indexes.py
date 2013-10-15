@@ -817,10 +817,16 @@ class CalendarDayIndex(Persistent):
             res = set([event for event in self._idxDay[int(datetimeToUnixTime(stDay))] if event.getStartDate() >= date])
         for day in self._idxDay.values(int(datetimeToUnixTime(nextDay))):
             res.update(set(day))
-        for day in self._idxDay.values(max = int(datetimeToUnixTime(previousDay))):
+        for day in self._idxDay.values(max=int(datetimeToUnixTime(previousDay))):
             res.difference_update(set(day))
-        res.difference_update(set([event for event in self._idxDay[int(datetimeToUnixTime(stDay))] if event.getStartDate() < date]))
+        res.difference_update(set([event for event in
+                              self._idxDay.get(int(datetimeToUnixTime(stDay)), []) if event.getStartDate() < date]))
         return res
+
+    def hasObjectsAfter(self, date):
+        stDay = datetime(date.year, date.month, date.day)
+        lastDay = self._idxDay.keys()[-1]
+        return lastDay > int(datetimeToUnixTime(stDay))
 
     def iterateObjectsIn(self, sDate, eDate):
         sDay = datetime(sDate.year, sDate.month, sDate.day) if sDate else None
@@ -946,7 +952,7 @@ class CategoryDateIndex(Persistent):
 
     def _indexConf(self, categid, conf):
         # only the more restrictive setup is taken into account
-        if self._idxCategItem.has_key(categid):
+        if categid in self._idxCategItem:
             res = self._idxCategItem[categid]
         else:
             res = CalendarIndex()
@@ -961,31 +967,39 @@ class CategoryDateIndex(Persistent):
 
     def getObjectsIn(self, categid, sDate, eDate):
         categid = str(categid)
-        if self._idxCategItem.has_key(categid):
+        if categid in self._idxCategItem:
             return self._idxCategItem[categid].getObjectsIn(sDate, eDate)
         else:
             return []
 
-    def getObjectsStartingIn( self, categid, sDate, eDate):
+    def getObjectsStartingIn(self, categid, sDate, eDate):
         categid = str(categid)
-        if self._idxCategItem.has_key(categid):
+        if categid in self._idxCategItem:
             return self._idxCategItem[categid].getObjectsStartingIn(sDate, eDate)
         else:
             return []
 
-    def getObjectsInDay( self, categid, sDate):
+    def getObjectsInDay(self, categid, sDate):
         categid = str(categid)
-        if self._idxCategItem.has_key(categid):
+        if categid in self._idxCategItem:
             return self._idxCategItem[categid].getObjectsInDay(sDate)
         else:
             return []
 
-    def getObjectsEndingAfter( self, categid, sDate):
+    def hasObjectsAfter(self, categid, sDate):
         categid = str(categid)
-        if self._idxCategItem.has_key(categid):
+        if categid in self._idxCategItem:
+            return self._idxCategItem[categid].hasObjectsAfter(sDate)
+        else:
+            return False
+
+    def getObjectsEndingAfter(self, categid, sDate):
+        categid = str(categid)
+        if categid in self._idxCategItem:
             return self._idxCategItem[categid].getObjectsEndingAfter(sDate)
         else:
             return []
+
 
 class CategoryDateIndexLtd(CategoryDateIndex):
     """ Version of CategoryDateIndex whiself.ch indexing events
