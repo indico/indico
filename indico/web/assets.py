@@ -184,6 +184,7 @@ indico_backbone = Bundle('js/lib/backbone.js',
                          filters='jsmin', output='indico_backbone_%(version)s.min.js')
 
 indico_regform_base = Bundle(indico_backbone,
+                             "js/indico/RegistrationForm/registrationform.js",
                              'js/indico/RegistrationForm.old/utils/vars.js',
                              'js/indico/RegistrationForm.old/utils/baseModel.js',
                              'js/indico/RegistrationForm.old/utils/miscellaneous.js',
@@ -225,6 +226,7 @@ class DebugLevelFilter(Filter):
 
 angular = Bundle(
     'js/lib/angular.js',
+    'js/lib/angular-resource.js',
     filters='jsmin',
     output='angular_%(version)s.min.js'
 )
