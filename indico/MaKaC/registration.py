@@ -29,9 +29,9 @@ from persistent import Persistent
 from persistent.mapping import PersistentMapping
 from persistent.list import PersistentList
 import MaKaC
-from MaKaC import eticket
+from indico.core.db import eticket
 from MaKaC.common.Counter import Counter
-from MaKaC.errors import FormValuesError,MaKaCError
+from MaKaC.errors import FormValuesError, MaKaCError
 from MaKaC.common.Locators import Locator
 from indico.core.config import Config
 from MaKaC.common.TemplateExec import inlineContextHelp
