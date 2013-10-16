@@ -39,6 +39,7 @@ from MaKaC.i18n import _
 from MaKaC.common.utils import isStringHTML
 from MaKaC.common.Configuration import Config
 import subprocess, shlex, os, tempfile
+from MaKaC.common.logger import Logger
 
 
 # PIL is the library used by reportlab to work with images.
@@ -735,8 +736,6 @@ class LatexRunner:
         self.has_toc = has_toc
 
     def run(self, template_name, args = ()):
-        pdflatex_cmd = 'pdflatex --shell-escape \"%s\"' % self.texname
-
         template_dir = os.path.join(Config.getInstance().getTPLDir(),'latex')
 
         with open(os.path.join(template_dir, template_name), "r") as tpl_file:
@@ -750,10 +749,16 @@ class LatexRunner:
         with open(self.texdir,'w') as f:
             f.write(template)
 
-        pdflatex_cmd = 'pdflatex -output-directory %s --shell-escape \"%s\"' % (self.tempdir, self.texdir)
+        pdflatex_cmd = 'pdflatex -interaction=nonstopmode -output-directory %s \"%s\"' % (self.tempdir, self.texdir)
 
-        proc = subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE)
-        proc.communicate()
+        proc = subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        errlog = proc.communicate()[0]
+
+        try:
+            subprocess.check_call(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            Logger.get('pdflatex').info("PDF created successfully!")
+        except subprocess.CalledProcessError:
+            Logger.get('pdflatex').error(errlog)
 
         if self.has_toc:
             proc = subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE)
