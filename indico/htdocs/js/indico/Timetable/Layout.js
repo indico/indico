@@ -21,12 +21,12 @@ type("TimetableLayoutManager", [],
          _buildCheckpointTable: function(data) {
              /* Checkpoints are time points where events either start or end */
              checkpoints = {};
-             var addCheckpoint = function(key, time, type, sessionId) {
+             var addCheckpoint = function(key, time, type, sessionId, sessionSlotId) {
 
                  if (!checkpoints[time]) {
                      checkpoints[time] = [];
                  }
-                 checkpoints[time].push([key, type, sessionId]);
+                 checkpoints[time].push([key, type, sessionId, sessionSlotId]);
              };
 
 
@@ -58,10 +58,10 @@ type("TimetableLayoutManager", [],
                  // If a poster session with a duration of > 7h then don't place
                  // it in the grid but rather on the top as a whole day event
                  if (value.isPoster && value.duration > (TimetableDefaults.wholeDay*60)) {
-                     addCheckpoint(key, sTime, 'wholeday', value.sessionId);
+                     addCheckpoint(key, sTime, 'wholeday', value.sessionId, value.sessionSlotId);
                  }
                  else {
-                     addCheckpoint(key, sTime, 'start', value.sessionId);
+                     addCheckpoint(key, sTime, 'start', value.sessionId, value.sessionSlotId);
 
                      if (eTime >= sTime) {
                          addCheckpoint(key, eTime, 'end');
@@ -113,8 +113,12 @@ type("TimetableLayoutManager", [],
 
          reorderAssigned: function(assigned, lastAssigned, currentGroup, currentPos) {
 
+             var getLastAssignedId = function(block) {
+                return "{0}l{1}".format(block.sessionId, block.sessionSlotId);
+             };
+
              var correctlyAssigned = function(block) {
-                 return exists(lastAssigned[block.sessionId]) && lastAssigned[block.sessionId].col == block.assigned;
+                 return exists(lastAssigned[getLastAssignedId(block)]) && lastAssigned[getLastAssignedId(block)].col == block.assigned;
              };
 
              // Returns number of previously processed session slots
@@ -128,13 +132,13 @@ type("TimetableLayoutManager", [],
              // Adds/updates a block in the lastAssigned dictionary
              var lastAssign = function(block, col) {
 
-                 if (!exists(lastAssigned[block.sessionId])) {
-                     lastAssigned[block.sessionId] = {'blocks': {}};
+                 if (!exists(lastAssigned[getLastAssignedId(block)])) {
+                     lastAssigned[getLastAssignedId(block)] = {'blocks': {}};
                  }
                  if (col !== undefined) {
-                     lastAssigned[block.sessionId].col = col;
+                     lastAssigned[getLastAssignedId(block)].col = col;
                  }
-                 lastAssigned[block.sessionId].blocks[block.id] = true;
+                 lastAssigned[getLastAssignedId(block)].blocks[block.id] = true;
              };
 
              // Changes the column of a block
@@ -162,7 +166,7 @@ type("TimetableLayoutManager", [],
                      continue;
                  }
 
-                 if (exists(lastAssigned[block.sessionId])) {
+                 if (exists(lastAssigned[getLastAssignedId(block)])) {
                      lastAssign(block);
                  } else {
                      // This block has never been assigned before. Just update the lastAssigned.
@@ -175,7 +179,7 @@ type("TimetableLayoutManager", [],
                      continue;
                  }
 
-                 var preferedCol = lastAssigned[block.sessionId].col;
+                 var preferedCol = lastAssigned[getLastAssignedId(block)].col;
                  var existingBlock = assigned[preferedCol];
 
                  // If there's no block on the prefered column
@@ -417,6 +421,7 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
 
                      block = self.getBlock(algData.blocks, point[0]);
                      block.sessionId = point[2];
+                     block.sessionSlotId = point[3];
 
                      block.start = algData.topPx;
                      algData.active++;
