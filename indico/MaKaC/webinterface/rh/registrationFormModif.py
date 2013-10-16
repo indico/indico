@@ -17,7 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import session
+from flask import jsonify
 
+from indico.util.fossilize import fossilize
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC.registration import Status, StatusValue
@@ -26,6 +28,7 @@ from MaKaC.errors import FormValuesError, MaKaCError, ConferenceClosedError
 from datetime import datetime
 from MaKaC.common import utils
 from MaKaC.i18n import _
+
 
 # indico legacy imports
 from MaKaC.services.implementation.base import AdminService, ParameterManager, \
@@ -321,3 +324,29 @@ class RHRegistrationFormModifStatusPerformModif( RHRegistrationFormModifStatusBa
             session.pop('tmpStatus', None)
         self._redirect("%s#statuses"%urlHandlers.UHConfModifRegForm.getURL(self._conf.getRegistrationForm()))
 
+
+class RHRegistrationPreviewSectionQuery(RHRegistrationFormModifBase):
+
+    def _process(self):
+        return jsonify(items=fossilize(self._conf.getRegistrationForm().getSortedForms()))
+
+
+class RHRegistrationPreviewSectionGet(RHRegistrationFormModifBase):
+
+    def _process(self):
+        sectionId = int(self.getRequestParams()["sectionId"])
+        return jsonify(fossilize(self._conf.getRegistrationForm().getSortedForms()[sectionId]))
+
+
+class RHRegistrationPreviewSectionSave(RHRegistrationFormModifBase):
+
+    def _process(self):
+        # TODO
+        pass
+
+
+class RHRegistrationPreviewSectionRemove(RHRegistrationFormModifBase):
+
+    def _process(self):
+        # TODO
+        pass

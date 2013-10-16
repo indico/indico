@@ -2971,6 +2971,22 @@ class UHConfModifRegistrationPreview(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrationPreview'
 
 
+class UHConfModifRegistrationPreviewSectionGet(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationPreviewSection-get'
+
+
+class UHConfModifRegistrationPreviewSectionSave(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationPreviewSection-save'
+
+
+class UHConfModifRegistrationPreviewSectionQuery(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationPreviewSection-query'
+
+
+class UHConfModifRegistrationPreviewSectionRemove(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationPreviewSection-remove'
+
+
 class UHConfModifRegistrantList(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrants'
 
