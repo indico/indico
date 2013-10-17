@@ -514,7 +514,8 @@ class CategoryEventHook(HTTPAPIHook):
         ids = set((event['categoryId'] for event in resultList))
         return {
             'eventCategories': CategoryEventFetcher.getCategoryPath(ids, aw),
-            "moreFutureEvents": True in [IndexesHolder().getById('categoryDateAll')
+            "moreFutureEvents": False if not self._toDT else
+                                True in [IndexesHolder().getById('categoryDateAll')
                                          .hasObjectsAfter(catId, self._toDT) for catId in self._idList]
         }
 
