@@ -3207,7 +3207,7 @@ class TicketToPDF(PDFBase):
         # e-Ticket
         c.setFont('Times-Bold', 30)
         height -= 2*cm
-        c.drawCentredString(self._PAGE_WIDTH/2.0, height, _("e-Ticket"))
+        c.drawCentredString(self._PAGE_WIDTH/2.0, height, _("e-ticket"))
 
         # QRCode (Version 6 with error correction L can contain up to 106 bytes)
         height -= 6*cm

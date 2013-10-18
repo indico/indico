@@ -169,7 +169,7 @@ class WConfModifRegistrants(wcomponents.WTemplated):
                        "amountToPay": _("Amount"),
                        "idpayment": _("Payment ID"),
                        "isPayed": _("Paid"),
-                       "eTicket": _("E-Ticket"),
+                       "eTicket": _("e-ticket"),
                        "checkedIn": _("Checked in"),
                        "checkInDate": _("Check in Date"),
                        "more": _("General info"),
@@ -862,11 +862,11 @@ class WPRegistrantModifBase( WPRegistrantBase ):
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
         self._tabMain = self._tabCtrl.newTab("main", _("Main"),
-                url_for("event_mgmt.confModifRegistrants-modification",
-                        self._target))
-        self._tabETicket = self._tabCtrl.newTab("eticket", _("E-Ticket"),
-                url_for("event_mgmt.confModifRegistrants-modification-eticket",
-                        self._target))
+                                             url_for("event_mgmt.confModifRegistrants-modification",
+                                                     self._target))
+        self._tabETicket = self._tabCtrl.newTab("eticket", _("e-ticket"),
+                                                url_for("event_mgmt.confModifRegistrants-modification-eticket",
+                                                        self._target))
         self._setActiveTab()
         self._setupTabCtrl()
 

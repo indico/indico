@@ -31,12 +31,9 @@
         % if pdfTicketURL:
         <tr>
             <td>
-                <span class="subGroupTitleRegForm">
-                    <a href="${ pdfTicketURL }">
-                        <i class="icon-file-pdf"></i>
-                        ${ _("Download ticket") }
-                    </a>
-                </span>
+                <a class="i-button icon-file-pdf" target="blank" href="${pdfTicketURL}">
+                    ${ _("Download e-ticket") }
+                </a>
             </td>
         </tr>
         % endif
