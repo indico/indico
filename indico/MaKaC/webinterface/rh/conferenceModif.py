@@ -1981,13 +1981,14 @@ class RHAbstractsToPDF(RHConfModifCFABase):
 
         latex_template = 'LatexRHAbstractsToPDF.tpl'
 
-        template_args = (pdf.firstPageLatex(),
-                        self._target.getTitle(),
-                        i18nformat(""" _("Page") """),
-                        pdf.getBodyLatex())
+        kwargs = {'first_page': pdf.firstPageLatex(),
+                'title': self._target.getTitle(),
+                'page_no': i18nformat(""" _("Page") """),
+                'body': pdf.getBodyLatex()
+                }
 
         latex = LatexRunner(filename, True)
-        pdffile = latex.run(latex_template, template_args)
+        pdffile = latex.run(latex_template, **kwargs)
         latex.cleanup()
 
         return send_file(filename, pdffile, 'PDF')
@@ -3107,14 +3108,15 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
 
             latex_template = 'LatexRHContribsToPDFMenu_bookOfAbstract.tpl'
 
-            template_args = (self._target.getTitle(),
-                            pdf.firstPageLatex(),
-                            self._target.getTitle(),
-                            i18nformat(""" _("Page") """),
-                            pdf.getBodyLatex())
+            kwargs = {'title_one': self._target.getTitle(),
+                    'first_page': pdf.firstPageLatex(),
+                    'title_two': self._target.getTitle(),
+                    'page_no': i18nformat(""" _("Page") """),
+                    'body': pdf.getBodyLatex()
+                    }
 
             latex = LatexRunner(filename)
-            pdffile = latex.run(latex_template, template_args)
+            pdffile = latex.run(latex_template, **kwargs)
             latex.cleanup()
 
             return send_file(filename, pdffile, 'PDF')
@@ -3134,13 +3136,14 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
 
             latex_template = 'LatexRHContribsToPDFMenu_ContributionList.tpl'
 
-            template_args = (pdf.firstPageLatex(),
-                            self._target.getTitle(),
-                            i18nformat(""" _("Page") """),
-                            pdf.getBodyLatex())
+            kwargs = {'first_page': pdf.firstPageLatex(),
+                    'title': self._target.getTitle(),
+                    'page_no': i18nformat(""" _("Page") """),
+                    'body': pdf.getBodyLatex()
+                    }
 
             latex = LatexRunner(filename, True)
-            pdffile = latex.run(latex_template, template_args)
+            pdffile = latex.run(latex_template, **kwargs)
             latex.cleanup()
 
             return send_file(filename, pdffile, 'PDF')

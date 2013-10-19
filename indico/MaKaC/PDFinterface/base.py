@@ -40,6 +40,7 @@ from MaKaC.common.utils import isStringHTML
 from MaKaC.common.Configuration import Config
 import subprocess, shlex, os, tempfile
 from MaKaC.common.logger import Logger
+from mako.template import Template
 
 
 from PIL import Image as PILImage
@@ -726,13 +727,11 @@ class LatexRunner:
         self.texname = filename[:-3] + 'tex'
         self.has_toc = has_toc
 
-    def run(self, template_name, args = ()):
-        template_dir = os.path.join(Config.getInstance().getTPLDir(),'latex')
+    def run(self, template_name, **kwargs):
+        template_dir = os.path.join(Config.getInstance().getTPLDir(), 'latex')
 
-        with open(os.path.join(template_dir, template_name), "r") as tpl_file:
-            template = tpl_file.read()
-
-        template = template % args
+        template = Template(filename=os.path.join(template_dir, template_name))
+        template = template.render(**kwargs)
 
         self.tempdir = tempfile.mkdtemp()
         self.texdir = os.path.join(self.tempdir, self.texname)

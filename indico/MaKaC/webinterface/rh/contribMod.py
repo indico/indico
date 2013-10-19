@@ -633,8 +633,10 @@ class RHContributionToPDF(RHContributionModification):
         
         latex_template = 'LatexRHContributionToPDF.tpl'
 
+        kwargs = {'body': pdf.getLatex()}
+
         latex = LatexRunner(filename)
-        pdffile = latex.run(latex_template, pdf.getLatex())
+        pdffile = latex.run(latex_template, **kwargs)
         latex.cleanup()
 
         return send_file(filename, pdffile, 'PDF')

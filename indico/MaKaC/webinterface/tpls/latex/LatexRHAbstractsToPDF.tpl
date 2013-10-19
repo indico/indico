@@ -38,7 +38,7 @@
 \setcounter{secnumdepth}{0} %% remove section heading numbering
 \setcounter{tocdepth}{0} %% remove table of contents numbering
 
-%s
+${ first_page }
 
 \begingroup
 \hypersetup{linkcolor=black}
@@ -48,13 +48,13 @@
 \endgroup
 
 \newpage
-\fancyhead[L]{\small \selectfont \color{gray} %s / Abstracts Book}
+\fancyhead[L]{\small \selectfont \color{gray} ${ title } / Abstracts Book}
 \fancyhead[C]{}
 \fancyhead[R]{}
 \fancyfoot[L]{\small \selectfont \color{gray} \today}
 \fancyfoot[C]{}
-\fancyfoot[R]{\small \selectfont \color{gray} %s \thepage}
+\fancyfoot[R]{\small \selectfont \color{gray} ${ page_no } \thepage}
 
-%s
+${ body }
 
 \end{document}
