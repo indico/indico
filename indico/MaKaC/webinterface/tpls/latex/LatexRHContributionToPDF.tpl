@@ -22,6 +22,6 @@
 \begin{document}
 \setcounter{secnumdepth}{0} %% remove section heading numbering
 
-%s
+${ body }
 
 \end{document}

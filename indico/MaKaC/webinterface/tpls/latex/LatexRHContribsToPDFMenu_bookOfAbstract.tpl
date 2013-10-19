@@ -26,7 +26,7 @@
 \fancyhead[L]{}
 \fancyhead[C]{}
 \fancyhead[R]{}
-\fancyfoot[L]{\small \selectfont \color{gray} %s / Book of abstracts}
+\fancyfoot[L]{\small \selectfont \color{gray} ${ title_one } / Book of abstracts}
 \fancyfoot[C]{}
 \fancyfoot[R]{\small \selectfont \color{gray} \today}
 }
@@ -37,14 +37,14 @@
 \setcounter{secnumdepth}{0} %% remove section heading numbering
 \setcounter{tocdepth}{0} %% remove table of contents numbering
 
-%s
+${ first_page }
 
 \newpage
-\fancyhead[L]{\small \selectfont \color{gray} %s / Book of abstracts}
+\fancyhead[L]{\small \selectfont \color{gray} ${ title_two } / Book of abstracts}
 \fancyhead[C]{}
 \fancyhead[R]{}
 \fancyfoot[L]{}
-\fancyfoot[C]{\small \selectfont \color{gray} %s \thepage}
+\fancyfoot[C]{\small \selectfont \color{gray} ${ page_no } \thepage}
 \fancyfoot[R]{}
 
 \newpage
@@ -54,6 +54,6 @@
 
 \allsectionsfont{\sffamily} %% default font family
 
-%s
+${ body }
 
 \end{document}
