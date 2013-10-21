@@ -3799,7 +3799,7 @@ class Conference(CommonObjectBase, Locatable):
             return True
 
         # Managers have always access
-        if self.canUserModify(aw.getUser()):
+        if self.canModify(aw):
             return True
 
         if self.isProtected():
@@ -6271,7 +6271,12 @@ class Session(CommonObjectBase, Locatable):
             return True
         #####################################################
 
-        if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
+        # Managers have always access
+        if self.canModify(aw):
+            return True
+
+        if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and \
+                not self.isAllowedToAccess(aw.getUser()):
             return False
         if not self.isProtected():
             return True
@@ -10991,8 +10996,12 @@ class Material(CommonObjectBase):
                self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
             return True
 
-        canUserAccess = self.isAllowedToAccess( aw.getUser() )
-        canIPAccess = self.canIPAccess( aw.getIP() )
+        # Managers have always access
+        if self.canModify(aw):
+            return True
+
+        canUserAccess = self.isAllowedToAccess(aw.getUser())
+        canIPAccess = self.canIPAccess(aw.getIP())
         if not self.isProtected():
             return canUserAccess or canIPAccess
         else:
@@ -11445,7 +11454,12 @@ class Resource(CommonObjectBase):
                self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
             return True
 
-        if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and not self.isAllowedToAccess( aw.getUser() ):
+        # Managers have always access
+        if self.canModify(aw):
+            return True
+
+        if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and \
+                not self.isAllowedToAccess(aw.getUser()):
             return False
         if not self.isProtected():
             return True
