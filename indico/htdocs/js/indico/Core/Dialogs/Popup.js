@@ -935,8 +935,8 @@ type("ContributionsPopup", ["ExclusivePopup"], {
             table.append(Html.tr({}, Html.td({style:{verticalAlign: 'top'}}, time), Html.td({}, title, infoDiv)));
         });
         this.innerHTML = Html.table({style: {marginBottom: pixels(10)}}, table).dom.innerHTML;
-        return this.ExclusivePopup.prototype.draw.call(this, Html.table({style: {marginBottom: pixels(10)}}, table),
-                                                       {maxHeight: Math.min($(window).height() - 50, 700)});
+        return this.ExclusivePopup.prototype.draw.call(this, Html.table({style: {marginBottom: pixels(10)}}, table), {},
+                                                       {overflowX: 'hidden', maxHeight: Math.min($(window).height() - 50, 700)});
     },
     postDraw: function(){
         this.ExclusivePopup.prototype.postDraw.call(this);
