@@ -19,7 +19,7 @@
 
 from MaKaC.conference import ConferenceHolder
 
-from indico.web.http_api.api import HTTPAPIHook
+from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 
@@ -37,8 +37,8 @@ class RegistrantBaseHook(HTTPAPIHook):
 
     def _checkProtection(self, aw):
         user = aw.getUser()
-        if not self._conf.canManageRegistration(user)\
-            or self._secret != self._registrant.getCheckInUUID():
+        if not self._conf.canManageRegistration(user) \
+                or self._secret != self._registrant.getCheckInUUID():
             raise HTTPAPIError("Access denied", 403)
 
 

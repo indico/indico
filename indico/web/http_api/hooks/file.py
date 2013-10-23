@@ -24,7 +24,7 @@ import re
 from indico.web.flask.util import send_file
 from indico.web.http_api.metadata.serializer import Serializer
 
-from indico.web.http_api.api import HTTPAPIHook
+from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
 
 # legacy imports

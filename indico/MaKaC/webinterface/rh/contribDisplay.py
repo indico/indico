@@ -34,7 +34,7 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.i18n import _
 from indico.web.flask.util import send_file
-from indico.web.http_api.api import ContributionHook
+from indico.web.http_api.hooks.event_categ import ContributionHook
 from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
