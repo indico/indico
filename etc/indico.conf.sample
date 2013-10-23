@@ -274,22 +274,6 @@ AuthenticatorList    = [('Local', {})]
 # the lifetime to 0 the cookie will expire when the browser is closed.
 # SessionLifetime = 86400 * 31
 
-#------------------------------------------------------------------------------
-# STYLING
-#------------------------------------------------------------------------------
-# If you want to customize how Indico l like you can create your own
-# CSS stylesheet, copy it to the folder "css" inside the HtdocsDir directory
-# and then put the name of the file here (without the .css).
-#
-# If you just want to modify small parts you can put at the beginning of your
-# stylesheet the following line:
-#
-#   @import "Default.css"
-#
-# And then just add the few changes that you want to make.
-
-CssStylesheetName    = "Default"
-
 
 #------------------------------------------------------------------------------
 # OFFLINE WEBSITE PACKAGES CREATION

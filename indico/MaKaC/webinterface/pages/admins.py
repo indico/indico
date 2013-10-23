@@ -766,11 +766,19 @@ class WPAdminLayoutGeneral( WPTemplatesCommon ):
 
         tplRE = re.compile('^([^\.]+)\.([^\.]+)\.wohl$')
 
-        fnames = os.listdir(os.path.join(tplDir,'chelp'));
+        fnames = os.listdir(os.path.join(tplDir, 'chelp'))
         for fname in fnames:
             m = tplRE.match(fname)
             if m:
                 templates[m.group(2)] = None
+
+        cssRE = re.compile('Default.([^\.]+)\.css$')
+
+        fnames = os.listdir(Config.getInstance().getCssDir())
+        for fname in fnames:
+            m = cssRE.match(fname)
+            if m:
+                templates[m.group(1)] = None
 
         return templates.keys()
 

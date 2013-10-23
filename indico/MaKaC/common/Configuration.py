@@ -466,7 +466,6 @@ class Config:
         'FileConverter'             : {"conversion_server": "", "response_url": "http://localhost/getConvertedFile.py"},
         'DisplayLoginPage'          : "yes",
         'AuthenticatorList'         : [('Local',{})],
-        'CssStylesheetName'         : 'indico.css',
         'ReportNumberSystems'       : {},
         'Profile'                   : 'no',
         'StaticFileMethod'          : None,
@@ -720,8 +719,8 @@ class Config:
         import MaKaC.common.info as info
         defTemplate = info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultTemplateSet()
 
-        if (defTemplate != None and os.path.exists("%s/css/%s.css" % (self.getHtdocsDir(), defTemplate))):
-            template = defTemplate
+        if (defTemplate is not None and os.path.exists("%s/css/Default.%s.css" % (self.getHtdocsDir(), defTemplate))):
+            template = "Default.%s" % defTemplate
 
         return '%s.css' % template
 
