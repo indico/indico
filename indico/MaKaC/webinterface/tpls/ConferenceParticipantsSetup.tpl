@@ -73,7 +73,7 @@ IndicoUI.executeOnLoad(function(){
     $("#inPlaceEditNotifyMgrNewParticipant").append($(new RemoteSwitchButton(${"true" if notifyMgrNewParticipant else "false"},
             Html.img({src:imageSrc("enabledSection.png")}), Html.img({src:imageSrc("disabledSection.png")}), "event.participation.notifyMgrNewParticipant", "event.participation.notifyMgrNewParticipant",{confId:${confId}}).draw().dom));
     $("#inPlaceEditNumMaxParticipants").append(new InputEditWidget('event.participation.setNumMaxParticipants',
-            {confId:${confId}}, ${ jsonEncode(numMaxParticipants) }, false, null, function(value){return IndicoUtil.isInteger(value);}, '${_("The value set is not a positive number")}', '${_("Please insert a positive number or 0 for unlimited")}',
+            {confId:${confId}}, ${ jsonEncode(numMaxParticipants) }, false, null, function(value){return IndicoUtil.isInteger(value);}, $T("The value set is not a positive number"), $T("Please insert a positive number or 0 for unlimited"),
             null).draw().dom);
 
     reloadOptions(${autoAccept | n,j});
