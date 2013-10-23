@@ -45,7 +45,7 @@ class WPConfModifRegFormBase( conferences.WPConferenceModifBase ):
 
     def getJSFiles(self):
         return conferences.WPConferenceModifBase.getJSFiles(self) + \
-               self._includeJSPackage('regform_edition')
+               self._includeJSPackage('regform')
 
     def getCSSFiles(self):
         return conferences.WPConferenceModifBase.getCSSFiles(self) + \
