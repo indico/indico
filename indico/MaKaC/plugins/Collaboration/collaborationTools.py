@@ -451,7 +451,7 @@ class CollaborationTools(object):
         roomNames = [r.locationName + ':' + r.name for r in capableRooms]
         location = obj.getLocation()
         room = obj.getRoom()
-        isAble = location and room and (location.getName() + ":" + room.getName() in roomNames)
+        isAble = location is not None and room is not None and (location.getName() + ":" + room.getName() in roomNames)
         if isinstance(obj, Contribution):
             isAble = isAble and obj.isScheduled()
         return isAble
