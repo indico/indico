@@ -18,16 +18,21 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-
+Schema of Generic Intervals for Nonbookable Days, Holidays
 """
 
-from sqlalchemy import Column, String, DateTime, Boolean, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, ForeignKey, DateTime
 
-Base = declarative_base()
+from indico.core.db.schema import Base
 
 
-class Equipment(Base):
-    __tablename__ = 'equipments'
+class Interval(Base):
+    __tablename__ = 'intervals'
 
-    equipmentId = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
+
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
+
+    room_id = Column(Integer, ForeignKey('rooms.id'), nullable=True)
+    reservation_id = Column(Integer, ForeignKey('reservations.id'), nullable=True)

@@ -18,16 +18,17 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-
+Schema of Photo for Rooms
 """
 
-from sqlalchemy import Column, String, DateTime, Boolean, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, ForeignKey, LargeBinary
 
-Base = declarative_base()
+from indico.core.db.schema import Base
 
 
 class Photo(Base):
     __tablename__ = 'photos'
 
-    photoId = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
+    room_id = Column(Integer, ForeignKey('rooms.id'))
+    content = Column(LargeBinary) # or path = Column(String)

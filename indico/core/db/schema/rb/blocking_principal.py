@@ -18,16 +18,22 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-
+Schema of the user who is responsible for the blocking
 """
 
-from sqlalchemy import Column, String, DateTime, Boolean, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Table, Column, String, Integer, ForeignKey
 
-Base = declarative_base()
+from indico.core.db.schema import Base
 
 
-class Holiday(Base):
-    __tablename__ = 'holidays'
+principals_blockings = Table('principals_blockings', Base.metadata,
+                             Column('blocking_id', Integer, ForeignKey('blockings.id'), primary_key=True),
+                             Column('blocking_principal_id', Integer, ForeignKey('blocking_principals.id'), primary_key=True))
 
-    holidayId = Column(Integer, primary_key=True)
+
+class BlockingPrincipal(Base):
+    __tablename__ = 'blocking_principals'
+
+    id = Column(Integer, primary_key=True)
+    avatar_id = Column(String, nullable=False)
+    access_right = Column(String, nullable=False)

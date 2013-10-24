@@ -18,16 +18,26 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-
+Holder of rooms in a place and its map view related data
 """
 
-from sqlalchemy import Column, String, DateTime, Boolean, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, Integer
+from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from indico.core.db.schema import Base
 
 
 class Location(Base):
     __tablename__ = 'locations'
 
-    locationId = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String, nullable=False)
+
+    aspects = relationship('Aspect',
+                           backref='location',
+                           cascade='all, delete, delete-orphan')
+
+    rooms = relationship('Room',
+                         backref='location',
+                         cascade='all, delete, delete-orphan')

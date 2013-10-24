@@ -18,16 +18,20 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-
+Schema of modifications done on a reservation
 """
 
-from sqlalchemy import Column, String, DateTime, Boolean, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String, DateTime, Integer, ForeignKey
 
-Base = declarative_base()
+from indico.core.db.schema import Base
 
 
-class CustomAttribute(Base):
-    __tablename__ = 'custom_attributes'
+class Edit(Base):
+    __tablename__ = 'edits'
 
-    customAttributeId = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
+
+    timestamp = Column(DateTime)
+    info = Column(String, nullable=False)
+    responsible_id = Column(String, nullable=False)
+    reservation_id = Column(Integer, ForeignKey('reservations.id'))

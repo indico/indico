@@ -17,17 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-
-"""
-
-from sqlalchemy import Column, String, DateTime, Boolean, Integer
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
-
-
-class Blocking(Base):
-    __tablename__ = 'blockings'
-
-    blockingId = Column(Integer, primary_key=True)

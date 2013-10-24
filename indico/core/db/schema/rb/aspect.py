@@ -18,16 +18,27 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-
+A view of map of rooms in a specific location
 """
 
-from sqlalchemy import Column, String, DateTime, Boolean, Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 
-Base = declarative_base()
+from indico.core.db.schema import Base
 
 
 class Aspect(Base):
     __tablename__ = 'aspects'
 
-    aspectId = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True)
+
+    name = Column(String, nullable=False)
+    default_on_startup = Column(Boolean, default=False)
+    center_latitude = Column(String)
+    center_longitude = Column(String)
+    zoom_level = Column(String)
+    topLeftLatitude = Column(String)
+    topLeftLongitude = Column(String)
+    bottomRightLatitude = Column(String)
+    bottomRightLongitude = Column(String)
+
+    location_id = Column(Integer, ForeignKey('locations.id'))
