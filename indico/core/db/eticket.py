@@ -27,6 +27,9 @@ class ETicket(Persistent):
 
     def __init__(self):
         self._enabled = False
+        self._attachEmail = False
+        self._showInConferenceMenu = False
+        self._showAfterRegistration = False
 
     def isEnabled(self):
         return self._enabled
@@ -34,7 +37,28 @@ class ETicket(Persistent):
     def setEnabled(self, enabled):
         self._enabled = enabled
 
+    def attachEmail(self):
+        return self._attachEmail
+
+    def setAttachEmail(self, attachEmail):
+        self._attachEmail = attachEmail
+
+    def showInConferenceMenu(self):
+        return self._showInConferenceMenu
+
+    def setShowInConferenceMenu(self, showInConferenceMenu):
+        self._showInConferenceMenu = showInConferenceMenu
+
+    def showAfterRegistration(self):
+        return self._showAfterRegistration
+
+    def setShowAfterRegistration(self, showAfterRegistration):
+        self._showAfterRegistration = showAfterRegistration
+
     def clone(self):
         e_ticket = ETicket()
         e_ticket.setEnabled(self.isEnabled())
+        e_ticket.setAttachEmail(self.attachEmail())
+        e_ticket.showInConferenceMenu(self.setShowInConferenceMenu())
+        e_ticket.showAfterRegistration(self.showAfterRegistration())
         return e_ticket

@@ -45,6 +45,7 @@ class WConfModifETicket(wcomponents.WTemplated):
         modETicket = self._conf.getRegistrationForm().getETicket()
         vars["statusURL"] = url_for("event_mgmt.confModifETicket-changeStatus",
                                     self._conf)
+        vars["conf"] = self._conf
 
         if modETicket.isEnabled():
             vars["changeTo"] = "False"

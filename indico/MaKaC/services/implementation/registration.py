@@ -18,34 +18,67 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Asynchronous request handlers for registrant-related data
+Asynchronous request handlers for registrantion-related data
 """
 
+from MaKaC.services.implementation.base import TextModificationBase, ParameterManager
 from MaKaC.services.implementation.conference import ConferenceModifBase
-from MaKaC.common.contextManager import ContextManager
 from indico.util.date_time import format_datetime
+from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 
 
-class RegistrantModifBase(ConferenceModifBase):
+class RegistrationModifBase(ConferenceModifBase):
+
+    def _checkProtection(self):
+        if not self._target.canManageRegistration(self.getAW().getUser()):
+            ConferenceModifBase._checkProtection(self)
+
+
+class ConferenceEticketAttachEmail(TextModificationBase, RegistrationModifBase):
+
+    def _handleSet(self):
+        e_ticket = self._conf.getRegistrationForm().getETicket()
+        e_ticket.setAttachEmail(self._value)
+
+    def _handleGet(self):
+        return self._conf.getRegistrationForm().getETicket().attachEmail()
+
+
+class ConferenceEticketShowInConferenceMenu(TextModificationBase, RegistrationModifBase):
+
+    def _handleSet(self):
+        e_ticket = self._conf.getRegistrationForm().getETicket()
+        e_ticket.setShowInConferenceMenu(self._value)
+
+    def _handleGet(self):
+        return self._conf.getRegistrationForm().getETicket().showInConferenceMenu()
+
+
+class ConferenceEticketAfterRegistration(TextModificationBase, RegistrationModifBase):
+
+    def _handleSet(self):
+        e_ticket = self._conf.getRegistrationForm().getETicket()
+        e_ticket.setShowAfterRegistration(self._value)
+
+    def _handleGet(self):
+        return self._conf.getRegistrationForm().getETicket().showAfterRegistration()
+
+
+class RegistrantModifBase(RegistrationModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
-        try:
-            self._registrant_ids = self._params["registrants"]
-        except KeyError:
-            raise ServiceError("", _("No registrants selected"))
-
-    def _checkProtection(self):
-        user = ContextManager.get("currentUser")
-        if not self._conf.canManageRegistration(user):
-            raise ServiceAccessError("Access denied")
+        pm = ParameterManager(self._params)
+        self._registrant_list = pm.extract("registrants", pType=list, allowEmpty=False)
 
 
 class RegistrantModifCheckIn(RegistrantModifBase):
 
     def _getAnswer(self):
+        if not self._registrant_list:
+            raise NoReportError(_("No registrants were selected to check-in"))
         dates_changed = {}
-        for registrant_id in self._registrant_ids:
+        for registrant_id in self._registrant_list:
             registrant = self._conf.getRegistrantById(registrant_id)
             if not registrant.isCheckedIn():
                 registrant.setCheckedIn(True)
@@ -55,5 +88,8 @@ class RegistrantModifCheckIn(RegistrantModifBase):
 
 
 methodMap = {
+    "eticket.attachEmail": ConferenceEticketAttachEmail,
+    "eticket.showInConferenceMenu": ConferenceEticketShowInConferenceMenu,
+    "eticket.showAfterRegistration": ConferenceEticketAfterRegistration,
     "eticket.checkIn": RegistrantModifCheckIn
 }

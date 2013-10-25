@@ -172,12 +172,15 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
         email = self._regForm.getNotification()\
             .createEmailNewRegistrant(self._regForm, rp)
 
-        attachment = {}
-        filename = "%s - Ticket.pdf" % self._target.getTitle()
-        attachment["name"] = filename
-        pdf = TicketToPDF(self._target, rp)
-        attachment["binary"] = pdf.getPDFBin()
-        email["attachments"] = [attachment]
+        modEticket = self._conf.getRegistrationForm().getETicket()
+
+        if modEticket.isEnabled() and modEticket.attachEmail():
+            attachment = {}
+            filename = "%s - Ticket.pdf" % self._target.getTitle()
+            attachment["name"] = filename
+            pdf = TicketToPDF(self._target, rp)
+            attachment["binary"] = pdf.getPDFBin()
+            email["attachments"] = [attachment]
 
         if email:
             GenericMailer.send(email)
