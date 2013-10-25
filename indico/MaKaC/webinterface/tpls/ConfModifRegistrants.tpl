@@ -378,7 +378,7 @@ IndicoUI.executeOnLoad(function(){
         if (atLeastOneRegistrantSelected()) {
             var selectedRegistrants = getSelectedRegistrants();
             var killProgress = IndicoUI.Dialogs.Util.progress($T("Checking in registrants..."));
-            indicoRequest("registration.eticket.checkIn",
+            indicoRequest("registration.eticket.checkin",
                 {
                     registrants: selectedRegistrants,
                     conference: "${ conferenceId }",

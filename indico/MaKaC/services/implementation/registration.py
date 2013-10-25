@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Asynchronous request handlers for registrantion-related data
+Asynchronous request handlers for registration-related data
 """
 
 from MaKaC.services.implementation.base import TextModificationBase, ParameterManager
@@ -34,34 +34,31 @@ class RegistrationModifBase(ConferenceModifBase):
             ConferenceModifBase._checkProtection(self)
 
 
-class ConferenceEticketAttachEmail(TextModificationBase, RegistrationModifBase):
+class ConferenceEticketSetAttachToEmail(TextModificationBase, RegistrationModifBase):
 
     def _handleSet(self):
-        e_ticket = self._conf.getRegistrationForm().getETicket()
-        e_ticket.setAttachEmail(self._value)
+        self._conf.getRegistrationForm().getETicket().setAttachedToEmail(self._value)
 
     def _handleGet(self):
-        return self._conf.getRegistrationForm().getETicket().attachEmail()
+        return self._conf.getRegistrationForm().getETicket().isAttachedToEmail()
 
 
-class ConferenceEticketShowInConferenceMenu(TextModificationBase, RegistrationModifBase):
+class ConferenceEticketSetShowInConferenceMenu(TextModificationBase, RegistrationModifBase):
 
     def _handleSet(self):
-        e_ticket = self._conf.getRegistrationForm().getETicket()
-        e_ticket.setShowInConferenceMenu(self._value)
+        self._conf.getRegistrationForm().getETicket().setShowInConferenceMenu(self._value)
 
     def _handleGet(self):
-        return self._conf.getRegistrationForm().getETicket().showInConferenceMenu()
+        return self._conf.getRegistrationForm().getETicket().isShownInConferenceMenu()
 
 
-class ConferenceEticketAfterRegistration(TextModificationBase, RegistrationModifBase):
+class ConferenceEticketSetAfterRegistration(TextModificationBase, RegistrationModifBase):
 
     def _handleSet(self):
-        e_ticket = self._conf.getRegistrationForm().getETicket()
-        e_ticket.setShowAfterRegistration(self._value)
+        self._conf.getRegistrationForm().getETicket().setShowAfterRegistration(self._value)
 
     def _handleGet(self):
-        return self._conf.getRegistrationForm().getETicket().showAfterRegistration()
+        return self._conf.getRegistrationForm().getETicket().isShownAfterRegistration()
 
 
 class RegistrantModifBase(RegistrationModifBase):
@@ -69,16 +66,16 @@ class RegistrantModifBase(RegistrationModifBase):
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._registrant_list = pm.extract("registrants", pType=list, allowEmpty=False)
+        self._registrant_ids = pm.extract("registrants", pType=list, allowEmpty=False)
 
 
 class RegistrantModifCheckIn(RegistrantModifBase):
 
     def _getAnswer(self):
-        if not self._registrant_list:
+        if not self._registrant_ids:
             raise NoReportError(_("No registrants were selected to check-in"))
         dates_changed = {}
-        for registrant_id in self._registrant_list:
+        for registrant_id in self._registrant_ids:
             registrant = self._conf.getRegistrantById(registrant_id)
             if not registrant.isCheckedIn():
                 registrant.setCheckedIn(True)
@@ -88,8 +85,8 @@ class RegistrantModifCheckIn(RegistrantModifBase):
 
 
 methodMap = {
-    "eticket.attachEmail": ConferenceEticketAttachEmail,
-    "eticket.showInConferenceMenu": ConferenceEticketShowInConferenceMenu,
-    "eticket.showAfterRegistration": ConferenceEticketAfterRegistration,
-    "eticket.checkIn": RegistrantModifCheckIn
+    "eticket.setAttachToEmail": ConferenceEticketSetAttachToEmail,
+    "eticket.setShowInConferenceMenu": ConferenceEticketSetShowInConferenceMenu,
+    "eticket.setShowAfterRegistration": ConferenceEticketSetAfterRegistration,
+    "eticket.checkin": RegistrantModifCheckIn
 }

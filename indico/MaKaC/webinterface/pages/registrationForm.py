@@ -1331,7 +1331,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
                        </a></li>""") % (submitOpt,
                                         quoteattr(str(modify_registration_url)))
             if registered and self._conf.getRegistrationForm().getETicket().isEnabled() and \
-                    self._conf.getRegistrationForm().getETicket().showAfterRegistration():
+                    self._conf.getRegistrationForm().getETicket().isShownAfterRegistration():
                 registrant = self._avatar.getRegistrantById(self._conf.getId())
                 e_ticket_url = url_for("event.e-ticket-pdf", registrant,
                                        authkey=registrant.getRandomId())
@@ -2378,7 +2378,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
 
         modEticket = self._conf.getRegistrationForm().getETicket()
 
-        if modEticket.isEnabled() and modEticket.showAfterRegistration():
+        if modEticket.isEnabled() and modEticket.isShownAfterRegistration():
             wvars["pdfTicketURL"] = url_for(
                 "event.e-ticket-pdf",
                 self._registrant,

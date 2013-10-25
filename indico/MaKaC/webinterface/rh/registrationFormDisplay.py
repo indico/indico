@@ -174,9 +174,9 @@ class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
 
         modEticket = self._conf.getRegistrationForm().getETicket()
 
-        if modEticket.isEnabled() and modEticket.attachEmail():
+        if modEticket.isEnabled() and modEticket.isAttachedToEmail():
             attachment = {}
-            filename = "%s - Ticket.pdf" % self._target.getTitle()
+            filename = "{0}- Ticket.pdf".format(self._target.getTitle())
             attachment["name"] = filename
             pdf = TicketToPDF(self._target, rp)
             attachment["binary"] = pdf.getPDFBin()
@@ -217,7 +217,7 @@ class RHRegistrationFormCreationDone( RHRegistrationFormRegistrantBase ):
 class RHConferenceTicketPDF(RHRegistrationFormCreationDone):
 
     def _process(self):
-        filename = "%s - Ticket.pdf" % self._target.getTitle()
+        filename = "{0}- Ticket.pdf".format(self._target.getTitle())
         pdf = TicketToPDF(self._target, self._registrant)
         return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
