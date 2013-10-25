@@ -199,6 +199,9 @@ class DebugLevelFilter(Filter):
 angular = Bundle(
     'js/lib/angular.js',
     'js/lib/angular-resource.js',
+    'js/indico/angular/app.js',
+    'js/indico/angular/directives.js',
+    'js/indico/angular/filters.js',
     filters='jsmin',
     output='angular_%(version)s.min.js'
 )
