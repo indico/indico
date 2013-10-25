@@ -55,7 +55,7 @@ from reportlab.platypus.doctemplate import LayoutError
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from indico.web.http_api.metadata.serializer import Serializer
-from indico.web.http_api.hooks.event_categ import CategoryEventHook
+from indico.web.http_api.hooks.event import CategoryEventHook
 from indico.web.flask.util import send_file
 from indico.util.contextManager import ContextManager
 
