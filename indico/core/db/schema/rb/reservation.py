@@ -23,7 +23,7 @@ Schema of Reservation for Room Booking module
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Short, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, SmallInteger, String
 from sqlalchemy.orm import relationship, backref
 
 from indico.core.db.schema import Base
@@ -39,7 +39,7 @@ class Reservation(Base):
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
-    repeatibility = Column(Short, default=0)
+    repeatibility = Column(SmallInteger, default=0)
 
     # user
     booked_for_id = Column(String, nullable=False)
