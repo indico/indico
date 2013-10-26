@@ -43,16 +43,6 @@ class WConfModifETicket(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         modETicket = self._conf.getRegistrationForm().getETicket()
-        vars["statusURL"] = url_for("event_mgmt.confModifETicket-changeStatus",
-                                    self._conf)
         vars["conf"] = self._conf
-
-        if modETicket.isEnabled():
-            vars["changeTo"] = "False"
-            vars["status"] = _("ENABLED")
-            vars["changeStatus"] = _("DISABLE")
-        else:
-            vars["changeTo"] = "True"
-            vars["status"] = _("DISABLED")
-            vars["changeStatus"] = _("ENABLE")
+        vars["isEnabled"] = modETicket.isEnabled()
         return vars

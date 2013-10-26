@@ -34,6 +34,14 @@ class RegistrationModifBase(ConferenceModifBase):
             ConferenceModifBase._checkProtection(self)
 
 
+class ConferenceEticketToggleActivation(TextModificationBase, RegistrationModifBase):
+
+    def _getAnswer(self):
+        eticket = self._conf.getRegistrationForm().getETicket()
+        eticket.setEnabled(not eticket.isEnabled())
+        return eticket.isEnabled()
+
+
 class ConferenceEticketSetAttachToEmail(TextModificationBase, RegistrationModifBase):
 
     def _handleSet(self):
@@ -85,6 +93,8 @@ class RegistrantModifCheckIn(RegistrantModifBase):
 
 
 methodMap = {
+
+    "eticket.toggleActivation": ConferenceEticketToggleActivation,
     "eticket.setAttachToEmail": ConferenceEticketSetAttachToEmail,
     "eticket.setShowInConferenceMenu": ConferenceEticketSetShowInConferenceMenu,
     "eticket.setShowAfterRegistration": ConferenceEticketSetAfterRegistration,

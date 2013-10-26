@@ -19,7 +19,6 @@
 
 import indico.web.views.etickets as eTicket
 import MaKaC.webinterface.rh.conferenceModif as conferenceModif
-from indico.web.flask.util import url_for
 
 
 class RHETicketModifBase(conferenceModif.RHConferenceModifBase):
@@ -33,18 +32,3 @@ class RHETicketModif(RHETicketModifBase):
     def _process(self):
         p = eTicket.WPConfModifETicket(self, self._conf)
         return p.display()
-
-
-class RHETicketModifChangeStatus(RHETicketModifBase):
-
-    def _checkParams(self, params):
-        RHETicketModifBase._checkParams(self, params)
-        self._newStatus = params["changeTo"]
-
-    def _process(self):
-        eticket = self._conf.getRegistrationForm().getETicket()
-        if self._newStatus == "True":
-            eticket.setEnabled(True)
-        else:
-            eticket.setEnabled(False)
-        self._redirect(url_for("event_mgmt.confModifETicket", self._conf))

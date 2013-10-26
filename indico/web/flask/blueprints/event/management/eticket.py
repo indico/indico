@@ -23,7 +23,3 @@ from indico.web.flask.blueprints.event.management import event_mgmt
 
 event_mgmt.add_url_rule('/registration/eticket/', 'confModifETicket',
                         eTicketModif.RHETicketModif)
-event_mgmt.add_url_rule('/registration/eticket/change-status/',
-                        'confModifETicket-changeStatus',
-                        eTicketModif.RHETicketModifChangeStatus,
-                        methods=('POST',))
