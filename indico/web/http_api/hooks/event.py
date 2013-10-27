@@ -236,7 +236,15 @@ class CategoryEventFetcher(IteratedDataFetcher):
         return self._process(_iterate_objs(idlist))
 
 
-class SessionContribHook(HTTPAPIHook):
+class EventBaseHook(HTTPAPIHook):
+    @classmethod
+    def _matchPath(cls, path):
+        if not hasattr(cls, '_RE'):
+            cls._RE = re.compile(r'/' + cls.PREFIX + '/event/' + cls.RE + r'\.(\w+)$')
+        return cls._RE.match(path)
+
+
+class SessionContribHook(EventBaseHook):
     DEFAULT_DETAIL = 'contributions'
     MAX_RECORDS = {
         'contributions': 500,
@@ -247,12 +255,6 @@ class SessionContribHook(HTTPAPIHook):
         super(SessionContribHook, self)._getParams()
         self._idList = self._pathParams['idlist'].split('-')
         self._eventId = self._pathParams['event']
-
-    @classmethod
-    def _matchPath(cls, path):
-        if not hasattr(cls, '_RE'):
-            cls._RE = re.compile(r'/' + cls.PREFIX + '/event/' + cls.RE + r'\.(\w+)$')
-        return cls._RE.match(path)
 
     def export_session(self, aw):
         expInt = SessionFetcher(aw, self)

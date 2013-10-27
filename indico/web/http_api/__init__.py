@@ -24,7 +24,7 @@ Indico HTTP export API
 from indico.web.http_api.hooks.base import DataFetcher, HTTPAPIHook
 from indico.web.http_api.exceptions import LimitExceededException
 from indico.web.http_api.hooks.file import FileHook
-from indico.web.http_api.hooks.registration import RegistrantHook
+from indico.web.http_api.hooks.registration import RegistrantsHook
 from indico.web.http_api.hooks.user import UserInfoHook
 
 

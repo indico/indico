@@ -17,14 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-# stdlib imports
-import re
-
 # indico imports
 from indico.web.flask.util import send_file
 from indico.web.http_api.metadata.serializer import Serializer
 
 from indico.web.http_api.hooks.base import HTTPAPIHook
+from indico.web.http_api.hooks.event import EventBaseHook
 from indico.web.http_api.responses import HTTPAPIError
 
 # legacy imports
@@ -32,7 +30,7 @@ from MaKaC.conference import LocalFile
 
 
 @HTTPAPIHook.register
-class FileHook(HTTPAPIHook):
+class FileHook(EventBaseHook):
     """
     Example: /export/event/1/session/2/contrib/3/subcontrib/4/material/Slides/5.bin?ak=00000000-0000-0000-0000-000000000000
     """
@@ -85,12 +83,6 @@ class FileHook(HTTPAPIHook):
 
     def _hasAccess(self, aw):
         return self._file.canAccess(aw)
-
-    @classmethod
-    def _matchPath(cls, path):
-        if not hasattr(cls, '_RE'):
-            cls._RE = re.compile(r'/' + cls.PREFIX + '/event/' + cls.RE + r'\.(\w+)$')
-        return cls._RE.match(path)
 
 
 class FileSerializer(Serializer):
