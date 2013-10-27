@@ -21,10 +21,18 @@
 Asynchronous request handlers for registration-related data
 """
 
+import base64
+from qrcode import QRCode, constants
+from cStringIO import StringIO
+
+from indico.util.date_time import format_datetime, format_date
+from indico.util import json
+from indico.modules.oauth.db import ConsumerHolder
+
+from MaKaC.common.Configuration import Config
 from MaKaC.services.implementation.base import TextModificationBase, ParameterManager
 from MaKaC.services.implementation.conference import ConferenceModifBase
-from indico.util.date_time import format_datetime
-from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
+from MaKaC.services.interface.rpc.common import NoReportError
 
 
 class RegistrationModifBase(ConferenceModifBase):
@@ -69,6 +77,46 @@ class ConferenceEticketSetAfterRegistration(TextModificationBase, RegistrationMo
         return self._conf.getRegistrationForm().getETicket().isShownAfterRegistration()
 
 
+class ConferenceEticketQRCode(RegistrationModifBase):
+
+    def _getAnswer(self):
+
+        consumers = dict((consumer.getName(), consumer) for consumer in ConsumerHolder().getList())
+
+        if "indico-checkin" not in consumers:
+            raise NoReportError(_("There is not indico-checkin consumer key for OAuth"))
+
+        # QRCode (Version 6 with error correction L can contain up to 106 bytes)
+        qr = QRCode(
+            version=6,
+            error_correction=constants.ERROR_CORRECT_M,
+            box_size=4,
+            border=1
+        )
+
+        oauth_checkin = consumers["indico-checkin"]
+        config = Config.getInstance()
+        baseURL = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
+        qr_data = {"id": self._conf.getId(),
+                   "title": self._conf.getTitle(),
+                   "date": format_date(self._conf.getAdjustedStartDate()),
+                   "server": {"baseUrl": baseURL,
+                              "consumerKey": oauth_checkin.getId(),
+                              "consumerSecret": oauth_checkin.getSecret(),
+                              }
+                   }
+        json_qr_data = json.dumps(qr_data)
+        qr.add_data(json_qr_data)
+        qr.make(fit=True)
+        qr_img = qr.make_image()
+
+        output = StringIO()
+        qr_img._img.save(output, format="png")
+        im_data = output.getvalue()
+
+        return 'data:image/png;base64,{0}'.format(base64.b64encode(im_data))
+
+
 class RegistrantModifBase(RegistrationModifBase):
 
     def _checkParams(self):
@@ -98,5 +146,6 @@ methodMap = {
     "eticket.setAttachToEmail": ConferenceEticketSetAttachToEmail,
     "eticket.setShowInConferenceMenu": ConferenceEticketSetShowInConferenceMenu,
     "eticket.setShowAfterRegistration": ConferenceEticketSetAfterRegistration,
+    "eticket.getQRCode": ConferenceEticketQRCode,
     "eticket.checkin": RegistrantModifCheckIn
 }
