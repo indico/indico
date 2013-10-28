@@ -1605,45 +1605,24 @@ class WPUserPreferences( WPPersonalArea ):
 
 class WIdentityModification(wcomponents.WTemplated):
 
-    def __init__( self, av, identity=None ):
+    def __init__(self, av, identity=None):
         self._avatar = av
         self._identity = identity
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
 
-        locatorList = ["""<input type="hidden" name="userId" value="%s">"""%self._avatar.getId() ]
-        if self._identity == None:
-            WTitle = _("New Identity for user")+" :<br>%s"%(self._avatar.getFullName())
-            WDescription = ""
-            login = vars.get("login",self._avatar.getEmail())
-            password = ""
+        wvars["avatarId"] = self._avatar.getId()
+        if self._identity:
+            wvars["actionLabel"] = _("Change password")
+            wvars["login"] = self._identity.getId()
         else:
-            WTitle, WDescription = "", ""
-            login = self._identity.getId()
-            password = ""
+            wvars["actionLabel"] = _("New Identity")
+            wvars["login"] = wvars.get("login", self._avatar.getEmail())
 
-        vars["login"] = login
-        vars["password"] = password
-
-        if vars.get("WTitle",None) is None :
-            vars["WTitle"] = WTitle
-        if vars.get("WDescription",None) is None :
-            vars["WDescription"] = WDescription
-        if vars.get("disabledLogin",None) is None :
-            vars["disabledLogin"] = ""
-            vars["hiddenLogin"] = ""
-        else :
-            vars["hiddenLogin"] = """<input type=hidden name="login" value="%s">"""%vars["login"]
-        if vars.get("disabledSystem",None) is None :
-            vars["disabledSystem"] = ""
-
-        vars["locator"] = "\n".join(locatorList)
-        html = ""
-        for auth in AuthenticatorMgr().getList():
-            html = html + "<option value=" + auth.getId() + ">" + auth.getName() + "</option>\n"
-        vars["systemList"] = html
-        return vars
+        auths = [{"id": auth.getId(), "name": auth.getName()} for auth in AuthenticatorMgr().getList()]
+        wvars["systemList"] = auths
+        return wvars
 
 
 class WPIdentityCreation(WPUserDetails):
@@ -1654,10 +1633,10 @@ class WPIdentityCreation(WPUserDetails):
         self._params = params
 
     def _getTabContent(self, params):
-        c = WIdentityModification( self._avatar )
-        self._params["identityId"] = ""
+        c = WIdentityModification(self._avatar)
         self._params["postURL"] = urlHandlers.UHUserIdentityCreation.getURL()
-        return c.getHTML( self._params )
+        self._params["isDisabled"] = False
+        return c.getHTML(self._params)
 
 
 class WPIdentityChangePassword(WPUserDetails):
@@ -1668,16 +1647,11 @@ class WPIdentityChangePassword(WPUserDetails):
         self._params = params
 
     def _getTabContent(self, params):
-
-        identity = self._avatar.getIdentityById(self._params["login"], 'Local')
-        c = WIdentityModification( self._avatar, identity )
-        postURL = urlHandlers.UHUserIdentityChangePassword.getURL()
-        self._params["postURL"] = postURL
-        self._params["WTitle"] = _("Change password for user")+" :<br>%s"%self._avatar.getFullName()
-        self._params["disabledLogin"] = "disabled"
-        self._params["disabledSystem"] = "disabled"
-        return c.getHTML( self._params )
-
+        identity = self._avatar.getIdentityById(self._params["login"], "Local")
+        c = WIdentityModification(self._avatar, identity)
+        self._params["postURL"] = urlHandlers.UHUserIdentityChangePassword.getURL()
+        self._params["isDisabled"] = True
+        return c.getHTML(self._params)
 
 
 class WPGroupCommon(WPUsersAndGroupsCommon):

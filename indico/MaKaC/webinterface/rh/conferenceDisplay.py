@@ -214,13 +214,13 @@ class RHConfUserCreation(conferenceBase.RHConferenceBase):
                 a = res[0]
                 #check if the user have an identity:
                 if a.getIdentityList():
-                    self._redirect( urlHandlers.UHConfUserExistWithIdentity.getURL( self._conf, a))
+                    self._redirect(urlHandlers.UHConfUserExistWithIdentity.getURL(self._conf, a))
                     return
                 else:
-                    #create the identity to the user and send the comfirmatio email
-                    li = user.LoginInfo( self._params["login"], self._params["password"] )
-                    id = authManager.createIdentity( li, a, "Local" )
-                    authManager.add( id )
+                    #create the identity to the user and send the comfirmation email
+                    li = user.LoginInfo(self._params["login"], self._params["password"])
+                    id = authManager.createIdentity(li, a, "Local")
+                    authManager.add(id)
                     DBMgr.getInstance().commit()
                     if minfo.getModerateAccountCreation():
                         mail.sendAccountCreationModeration(a).send()
