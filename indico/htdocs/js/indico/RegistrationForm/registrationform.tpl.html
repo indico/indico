@@ -1,0 +1,18 @@
+<div class="RegistrationForm">
+    <div ng-include="'/indico/js/indico/RegistrationForm/tpls/toolbar.tpl.html'"></div>
+
+    <div ng-repeat="section in sections">
+        <div ng-switch="section.id">
+            <div ng-switch-default nd-section nd-general-section></div>
+            <div ng-switch-when="0" nd-section nd-personal-data-section></div>
+            <div ng-switch-when="accommodation" nd-section nd-accommodation-section></div>
+            <div ng-switch-when="furtherInformation" nd-section nd-further-information-section></div>
+            <div ng-switch-when="reasonParticipation" nd-section nd-reason-section></div>
+            <div ng-switch-when="sessions" nd-section nd-sessions-section></div>
+            <div ng-switch-when="socialEvents" nd-section nd-social-event-section></div>
+        </div>
+    </div>
+</div>
+
+
+

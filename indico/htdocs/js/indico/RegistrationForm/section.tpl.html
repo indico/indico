@@ -1,0 +1,57 @@
+<div id="{{ section.id }}" class="regFormSectionMgmt">
+    <div class="regFormHeaderMgmt">
+        <span class="regFormSectionTitle">
+            {{ section.title }}
+        </span>
+        <span nd-section-toolbar
+            buttons="buttons"
+            dialogs="dialogs"
+            state="state">
+         </span>
+    </div>
+
+    <div ng-switch="section.id" class="regFormSectionContent regFormIsDragAndDrop">
+        <div class="regFormSectionDescription">
+            {{ section.description }}
+        </div>
+        <div ng-switch-default
+            ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/general.tpl.html'">
+        </div>
+        <div ng-switch-when="accommodation"
+            ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/accomodation.tpl.html'">
+        </div>
+        <div ng-switch-when="furtherInformation"
+            ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/furtherinfo.tpl.html'">
+        </div>
+        <div ng-switch-when="reasonParticipation"
+            ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/reason.tpl.html'">
+        </div>
+        <div ng-switch-when="sessions"
+            ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/sessions.tpl.html'">
+        </div>
+        <div ng-switch-when="socialEvents"
+            ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/socialevents.tpl.html'">
+        </div>
+    </div>
+
+    <div nd-dialog
+        heading="New field"
+        show="dialogs.newfield"
+        ok-button="{{ 'Add' | i18n }}"
+        cancel-button="{{ 'Cancel' | i18n }}"
+        ok-callback=""
+        cancel-callback="">
+        <div ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/dialogs/field.tpl.html'"></div>
+    </div>
+
+    <!-- TODO {{section.title}} is not rendered -->
+    <div nd-dialog
+        heading="Settings: {{ section.title }}"
+        show="dialogs.config"
+        ok-button="{{ 'Update' | i18n }}"
+        cancel-button="{{ 'Cancel' | i18n }}"
+        ok-callback=""
+        cancel-callback="">
+        <div ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/dialogs/base.tpl.html'"></div>
+    </div>
+</div>

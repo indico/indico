@@ -174,7 +174,8 @@ indico_badges_css = Bundle('css/badges.css',
 indico_regform = Bundle(
     *namespace('js/indico/RegistrationForm',
                'registrationform.js',
-               'section.js'),
+               'section.js',
+               'sectiontoolbar.js'),
     filters='jsmin',
     output='indico_regform_%(version)s.min.js')
 

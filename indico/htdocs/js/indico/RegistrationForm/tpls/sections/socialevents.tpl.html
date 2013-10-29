@@ -1,0 +1,61 @@
+<table>
+    <tr>
+        <td class="regFormSubGroupTitle" align="left" colspan="3">
+            {{ section.introSentence }}
+        </td>
+    </tr>
+
+    <tr ng-repeat="item in section.items">
+        <!-- if item.cancelled -->
+        <td ng-show="item.cancelled" class="regFormSectionLeftSpacing1">
+            <b>-</b> {{ item.caption }} <font color="red">({{ item.cancelledReason }})</font>
+        </td>
+
+        <!-- elif item.placesLimit != 0 and item.noPlacesLeft == 0 -->
+        <td ng-show="!item.cancelled && item.placesLimit != 0 && item.noPlacesLeft == 0"
+            ng-switch="section.selectionType"
+            class="regFormSectionLeftSpacing1">
+            <input ng-switch-when="multiple"
+                type="checkbox" name="socialEvents" value="{{ item.id }}" disabled/>
+            <input ng-switch-default
+                type="radio" name="socialEvents" value="{{ item.id }}" disabled/>
+            {{ item.caption }}
+            <font color="red">({{ 'no places left' | i18n }})</font>
+        </td>
+
+        <!-- else -->
+        <td ng-switch="section.selectionType"
+            class="regFormSectionLeftSpacing1">
+            <input ng-switch-when="multiple"
+                type="checkbox" name="socialEvents" value="{{ item.id }}"
+                ng-class="{regFormIsBillable: item.billable}"/>
+            <input ng-switch-default
+                type="radio" name="socialEvents" value="{{ item.id }}"
+                ng-class="{regFormIsBillable: item.billable}"/>
+            {{ item.caption }}
+        </td>
+        <td>
+            <select name="places-{{ item.id }}">
+                <!-- TODO calculate places -->
+                <!-- {% if item.placesLimit != 0 %}
+                    {% set maxReg = Math.min(item.maxPlacePerRegistrant,item.noPlacesLeft) %}
+                {% else %}
+                    {% set maxReg = item.maxPlacePerRegistrant %}
+                {% endif %}
+                {% for i in range(maxReg) %} -->
+                <option ng-repeat="n in [] | range:10"
+                    value="{{ $index }}">{{ $index }}</option>
+                {% endfor %}
+            </select>
+            <span ng-show="item.placesLimit != 0" class="placesLeft">
+                [{{item.noPlacesLeft}} {{ 'place(s) left' | i18n }}]
+            </span>
+        </td>
+        <td ng-show="item.billable" align="right">
+            <span class="regFormPrice">{{ item.price }}</span>
+            <span class="regFormCurrency"></span>
+            <span ng-show="item.isPricePerPlace">{{ "per place" | i18n }}</span>
+        </td>
+        <!-- endif -->
+    </tr>
+</table>

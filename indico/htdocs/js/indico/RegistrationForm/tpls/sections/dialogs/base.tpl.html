@@ -1,0 +1,14 @@
+<div class="tabbable tabs-left">
+    <ul class="nav nav-tabs">
+        <li ng-repeat="tab in tabs">
+            <a data-toggle="tab" id="tab-{{ tab.id }}" ref="#div-{{ tab.id }}">
+                {{ tab.name }}
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content regFormDialogTabContent" style="width: {{ contentWidth }}px; overflow: hidden; white-space: nowrap;">
+        <div ng-repeat="tab in tabs" class="tab-pane" id="div-{{ tab.id }}">
+            getTabHtml(tab)
+        </div>
+    </div>
+</div>

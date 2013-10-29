@@ -1,0 +1,30 @@
+<div class="toolbar right">
+    <div class="group">
+        <a ng-show="buttons.newfield"
+            ng-click="openNewField()"
+            class="buttonAddField i-button icon-plus"
+            title="{{ 'Click to add a field to this section' | i18n }}"></a>
+
+        <a ng-show="buttons.config"
+            ng-click="openConfig()"
+            id="buttonEditSection"
+            class="i-button icon-wrench"
+            title="{{ 'Edit this section' | i18n }}"></a>
+
+        <a ng-show="buttons.disable"
+            ng-click="toggleDisable()"
+            id="buttonDisableSection"
+            class="i-button icon-disable"
+            title="{{ 'Click to disable this section' | i18n }}"></a>
+    </div>
+
+    <div class="group">
+        <a ng-open-dialog
+            ng-click="toggleCollapse()"
+            ng-class="{'icon-prev': collapsed,
+                       'icon-expand': !collapsed}"
+            id="buttonCollpaseSection"
+            class="i-button"
+            title="{{ 'Click to toggle collapse status' | i18n }}"></a>
+    </div>
+</div>

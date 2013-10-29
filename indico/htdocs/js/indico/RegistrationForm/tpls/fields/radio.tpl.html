@@ -1,0 +1,37 @@
+<div ng-switch="field.values.inputType">
+    <!-- TODO selected and disabled -->
+    <select ng-switch-when="dropdown" name="{{ getName() }}">
+        <option value="">-- {{ 'Choose a value' | i18n }} --</option>
+        <option ng-repeat="item in field.values.radioitems"
+            value="{{ item.caption }}"
+            ng-controller="RadioCtrl"
+            ng-class="{regFormIsBillable: item.isBillable}">
+            {{ item.caption }}
+        </option>
+    </select>
+
+    <ul ng-switch-default>
+        <li ng-repeat="item in field.values.radioitems" ng-controller="RadioCtrl">
+            <input type="radio"
+                name="{{ getName() }}"
+                value="{{ item.id }}"
+                ng-class="{regFormIsBillable: item.isBillable}"
+                ng-disabled="isDisabled()"
+                {{ attributes }}/>
+            {{ item.caption }}
+            <span ng-show="isBillable()" class="regFormPrice">
+                {{ item.price }}
+            </span>
+            <span ng-show="isBillable()" class="regFormCurrency">
+            </span>
+            <font ng-show="isDisabled()" color="red" style="margin-left:25px;">
+                ({{ "no places left" | i18n }})
+            </font>
+            <font ng-show="hasPlacesLeft()" color="green" style="font-style:italic; margin-left:25px;">
+                [{{item.noPlacesLeft}} {{ 'place(s) left' | i18n }}]
+            </font>
+        </li>
+    </ul>
+</div>
+
+<span class="inputDescription">{{ field.description }}</span>
