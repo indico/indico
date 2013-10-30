@@ -15,16 +15,27 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-angular.module('nd', [
-    'ndDirectives',
-    'ndFilters',
-    'ndServices',
-    'nd.regform'
-])
+var ndServices = angular.module('ndServices', []);
 
-.controller('AppCtrl', function($scope) {
-    // Main application controller.
-    // This is a good place for logic not specific to the template or route
-    // such as menu logic or page title wiring.
-})
-;
+ndServices.provider('url', function() {
+    var baseUrl = Indico.Urls.Base;
+    var modulePath = '';
+
+    return {
+        setModulePath: function(path) {
+            if (path.substr(-1) == '/') {
+                path = path.substr(0, path.length - 1);
+            }
+
+            modulePath = path;
+        },
+
+        $get: function() {
+            return {
+                tpl: function(path) {
+                    return baseUrl + modulePath + '/tpls/' + path;
+                }
+            };
+        }
+    };
+});

@@ -203,6 +203,7 @@ angular = Bundle(
     'js/indico/angular/app.js',
     'js/indico/angular/directives.js',
     'js/indico/angular/filters.js',
+    'js/indico/angular/services.js',
     filters='jsmin',
     output='angular_%(version)s.min.js'
 )
