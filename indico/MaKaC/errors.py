@@ -86,12 +86,6 @@ class KeyAccessError(AccessControlError):
     pass
 
 
-class HostnameResolveError(MaKaCError):
-    """
-    Hostname resolution failed
-    """
-
-
 class ModificationError(AccessControlError):
     """
     """
@@ -171,12 +165,6 @@ class NotFoundError(MaKaCError):
 
 
 class PluginError(MaKaCError):
-    pass
-
-
-class HtmlScriptError(MaKaCError):
-    """
-    """
     pass
 
 

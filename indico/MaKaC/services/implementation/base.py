@@ -31,7 +31,7 @@ from MaKaC.common import security
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.utils import parseDateTime
 
-from MaKaC.errors import MaKaCError, HtmlScriptError, HtmlForbiddenTag, TimingError
+from MaKaC.errors import MaKaCError, HtmlForbiddenTag, TimingError
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, HTMLSecurityError, Warning,\
     ResultWithWarning
 
@@ -220,7 +220,7 @@ class ServiceBase(RequestHandlerBase):
             security.Sanitization.sanitizationCheck(self._target,
                                    self._params,
                                    self._aw)
-        except (HtmlScriptError, HtmlForbiddenTag), e:
+        except HtmlForbiddenTag, e:
             raise HTMLSecurityError('ERR-X0','HTML Security problem. %s ' % str(e))
 
         if self._doProcess:

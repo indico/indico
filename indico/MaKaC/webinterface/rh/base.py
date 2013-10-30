@@ -43,7 +43,7 @@ import MaKaC.webinterface.pages.errors as errors
 from MaKaC.accessControl import AccessWrapper
 from indico.core.db import DBMgr
 from MaKaC.common import security
-from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlScriptError, HtmlForbiddenTag, ConferenceClosedError, HostnameResolveError, BadRefererError
+from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlForbiddenTag, ConferenceClosedError, BadRefererError
 from indico.modules.oauth.errors import OAuthError
 from MaKaC.webinterface.mail import GenericMailer
 from xml.sax.saxutils import escape
@@ -334,13 +334,6 @@ class RH(RequestHandlerBase):
         p=errors.WPUnexpectedError(self)
         return p.display()
 
-    def _processHostnameResolveError(self, e):
-        """Unexpected errors"""
-
-        Logger.get('requestHandler').exception('Request %s failed: "%s"' % (request, e))
-        p=errors.WPHostnameResolveError(self)
-        return p.display()
-
     def _processAccessError(self, e):
         """Treats access errors occured during the process of a RH."""
         Logger.get('requestHandler').info('Request %s finished with AccessError: "%s"' % (request, e))
@@ -422,13 +415,6 @@ class RH(RequestHandlerBase):
         Logger.get('requestHandler').info('Request %s finished with FormValuesError: "%s"' % (request, e))
 
         p=errors.WPFormValuesError(self,e)
-        return p.display()
-
-    def _processHtmlScriptError(self, e):
-
-        Logger.get('requestHandler').info('Request %s finished with ProcessHtmlScriptError: "%s"' % (request, e))
-
-        p=errors.WPHtmlScriptError(self, escape(str(e)))
         return p.display()
 
     def _processRestrictedHTML(self, e):
@@ -581,10 +567,6 @@ class RH(RequestHandlerBase):
             res = self._processAccessError( e )
             self._endRequestSpecific2RH( False )
             DBMgr.getInstance().endRequest(False)
-        except HostnameResolveError, e:
-            res = self._processHostnameResolveError( e )
-            self._endRequestSpecific2RH( False )
-            DBMgr.getInstance().endRequest(False)
         except ModificationError, e:
             #Modification error treatment
             res = self._processModificationError( e )
@@ -628,9 +610,6 @@ class RH(RequestHandlerBase):
         except (NotFoundError, NotFound), e:
             # File not found error
             res = self._processNotFoundError(e)
-            DBMgr.getInstance().endRequest(False)
-        except HtmlScriptError,e:
-            res = self._processHtmlScriptError(e)
             DBMgr.getInstance().endRequest(False)
         except HtmlForbiddenTag,e:
             res = self._processRestrictedHTML(e)

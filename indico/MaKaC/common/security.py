@@ -20,7 +20,7 @@
 from indico.core.config import Config
 from MaKaC.common.utils import encodeUnicode
 
-from MaKaC.errors import MaKaCError, HtmlScriptError, HtmlForbiddenTag
+from MaKaC.errors import MaKaCError, HtmlForbiddenTag
 from MaKaC.webinterface.common.tools import escape_html, restrictedHTML
 
 """

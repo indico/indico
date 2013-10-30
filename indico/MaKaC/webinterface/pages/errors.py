@@ -233,25 +233,6 @@ class WPKeyAccessError( WPDecorated ):
         return wc.getHTML()
 
 
-class WHostnameError( WGenericError ):
-
-    def getVars( self ):
-        vars = WGenericError.getVars( self )
-        vars["msg"] = _("A problem has occurred while resolving your hostname. This can be due to proxy configuration and/or reverse DNS issues. If you believe this is not the case, please submit an error report. ")
-        vars["area"]= ""
-        return vars
-
-class WPHostnameResolveError( WPDecorated ):
-
-    def __init__( self, rh):
-        WPDecorated.__init__( self, rh )
-
-
-    def _getBody( self, params ):
-        wc = WHostnameError( self._rh, params.get("showDetails", False) )
-        return wc.getHTML()
-
-
 class WTimingError( WTemplated ):
 
     def __init__( self, rh, msg="" ):
@@ -441,27 +422,6 @@ class WPFormValuesError( WPDecorated ):
         wc = WFormValuesError( self._rh, self._msg )
         return wc.getHTML()
 
-
-class WPHtmlScriptError(WPDecorated):
-
-    def __init__( self, rh, msg="" ):
-        self._msg = msg
-        WPDecorated. __init__( self, rh)
-
-    def _getBody( self, params ):
-        wc = WHtmlScriptError( self._rh, self._msg )
-        return wc.getHTML()
-
-class WHtmlScriptError( WGenericError ):
-
-    def __init__( self, rh, msg="" ):
-        self._rh = rh
-        self._msg = msg
-
-    def getVars( self ):
-        vars = WGenericError.getVars( self )
-        vars["msg"] = self._msg
-        return vars
 
 class WPRestrictedHTML( WPDecorated ):
 
