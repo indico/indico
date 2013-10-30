@@ -18,23 +18,19 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Schema of blocked room (rejection and notification)
+
 """
 
-from sqlalchemy import Column, String, Boolean, Integer, ForeignKey
+from sqlalchemy import Column, ForeignKey, Integer, DateTime
 
 from indico.core.db.schema import Base
 
 
-class BlockedRoom(Base):
-    __tablename__ = 'blocked_rooms'
+class ExcludedDay(Base):
+    __tablename__ = 'reservation_excluded_days'
 
     id = Column(Integer, primary_key=True)
+    start_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
 
-    is_active = Column(Boolean, default=True)
-    notification_sent = Column(Boolean, default=True)
-    rejected_by = Column(String, nullable=False)
-    rejection_reason = Column(String, nullable=True)
-
-    blocking_id = Column(Integer, ForeignKey('blockings.id'))
-    room_id = Column(Integer, ForeignKey('rooms.id'))
+    reservation_id = Column(Integer, ForeignKey('reservations.id'))

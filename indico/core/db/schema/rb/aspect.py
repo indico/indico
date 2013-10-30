@@ -36,9 +36,9 @@ class Aspect(Base):
     center_latitude = Column(String)
     center_longitude = Column(String)
     zoom_level = Column(String)
-    topLeftLatitude = Column(String)
-    topLeftLongitude = Column(String)
-    bottomRightLatitude = Column(String)
-    bottomRightLongitude = Column(String)
+    top_left_latitude = Column(String)
+    top_left_longitude = Column(String)
+    bottom_right_latitude = Column(String)
+    bottom_right_longitude = Column(String)
 
     location_id = Column(Integer, ForeignKey('locations.id'))

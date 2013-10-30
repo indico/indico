@@ -28,7 +28,6 @@ from sqlalchemy import Column, String, Boolean, Integer, Time, ForeignKey
 from sqlalchemy.orm import relationship, backref
 
 from indico.core.db.schema import Base
-from indico.core.db.schema.rb.trait import traits_rooms
 
 
 class Room(Base):
@@ -83,6 +82,10 @@ class Room(Base):
                                 backref='room',
                                 cascade='all, delete, delete-orphan')
 
+    bookable_times = relationship('BookableTime',
+                                  backref=backref('room', order_by='BookableTime.start_time'),
+                                  cascade='all, delete, delete-orphan')
+
     nonbookable_dates = relationship('Interval',
                                      backref=backref('room', order_by='Interval.end_date desc'),
                                      cascade='all, delete, delete-orphan')
@@ -91,9 +94,9 @@ class Room(Base):
                           backref='room',
                           cascade='all, delete, delete-orphan')
 
-    traits = relationship('Trait',
-                          secondary=traits_rooms,
-                          backref='rooms')
+    attributes = relationship('RoomAttribute',
+                              backref='room',
+                              cascade='all, delete, delete-orphan')
 
     blocked_rooms = relationship('BlockedRoom',
                                  backref='room',

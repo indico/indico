@@ -27,7 +27,6 @@ from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, SmallInte
 from sqlalchemy.orm import relationship, backref
 
 from indico.core.db.schema import Base
-from indico.core.db.schema.rb.trait import traits_reservations
 
 
 class Reservation(Base):
@@ -68,10 +67,10 @@ class Reservation(Base):
                          backref='reservation',
                          cascade='all, delete, delete-orphan')
 
-    traits = relationship('Trait',
-                          secondary=traits_reservations,
-                          backref='reservations')
+    attributes = relationship('ReservationAttribute',
+                              backref='reservation',
+                              cascade='all, delete, delete-orphan')
 
-    exceluded_dates = relationship('Interval',
-                                   backref=backref('reservation', order_by='Interval.end_date desc'),
-                                   cascade='all, delete, delete-orphan')
+    excluded_dates = relationship('ExcludedDay',
+                                  backref=backref('reservation', order_by='ExcludedDay.start_date'),
+                                  cascade='all, delete, delete-orphan')
