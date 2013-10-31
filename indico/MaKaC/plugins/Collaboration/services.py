@@ -75,7 +75,7 @@ class CollaborationBase(ConferenceModifBase):
         try:
             return ConferenceModifBase.process(self)
         except CollaborationException, e:
-            raise CollaborationServiceException(e.getMsg(), str(e.getInner()))
+            raise CollaborationServiceException(e.getMessage(), str(e.getInner()))
 
 
 class CollaborationBookingModifBase(CollaborationBase):

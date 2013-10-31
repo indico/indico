@@ -134,7 +134,7 @@ class WMain (WJSBase):
             except MaKaCError, e:
                 initialRoomIp = "IP not found."
                 vars["IPRetrievalResult"] = 4
-                Logger.get("CERNMCU").warning("Location: " + locationName + "MaKaCError when retrieving a room's H.323 IP: " + e.getMsg())
+                Logger.get("CERNMCU").warning("Location: " + locationName + "MaKaCError when retrieving a room's H.323 IP: " + e.getMessage())
             except Exception, e:
                 initialRoomIp = "IP not found."
                 vars["IPRetrievalResult"] = 4
@@ -207,7 +207,7 @@ class WExtra (WJSBase):
                             Logger.get("CERNMCU").warning("Location: " + locationName + "Problem with CrossLocationQueries when retrieving the list of all rooms with a H323 IP: " + str(e))
 
                 except MaKaCError, e:
-                    Logger.get("CERNMCU").warning("Location: " + locationName + "MaKaCError when retrieving the list of all rooms with a H323 IP: " + e.getMsg())
+                    Logger.get("CERNMCU").warning("Location: " + locationName + "MaKaCError when retrieving the list of all rooms with a H323 IP: " + e.getMessage())
                 except Exception, e:
                     Logger.get("CERNMCU").warning("Location: " + locationName + "Exception when retrieving the list of all rooms with a H323 IP: " + str(e))
         else:

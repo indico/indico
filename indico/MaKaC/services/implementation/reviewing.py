@@ -863,7 +863,7 @@ class ContributionReviewingSetSubmitted(ContributionReviewingBase):
             try:
                 judgementObject.setSubmitted(not judgementObject.isSubmitted())
             except MaKaCError, e:
-                raise ServiceError("ERR-REV9", e.getMsg())
+                raise ServiceError("ERR-REV9", e.getMessage())
 
             judgementObject.setAuthor(self._getUser())
             judgementObject.sendNotificationEmail(withdrawn = not judgementObject.isSubmitted())

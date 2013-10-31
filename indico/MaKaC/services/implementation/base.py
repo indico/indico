@@ -424,7 +424,7 @@ class DateTimeModificationBase( TextModificationBase ):
             self._pTime = setAdjustedDate(naiveDate, self._conf)
             return self._setParam()
         except TimingError,e:
-            raise ServiceError("ERR-E2", e.getMsg())
+            raise ServiceError("ERR-E2", e.getMessage())
 
 class ListModificationBase:
     """ Base class for a list modification.

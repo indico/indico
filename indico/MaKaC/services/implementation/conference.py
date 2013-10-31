@@ -445,7 +445,7 @@ class ConferenceStartEndDateTimeModification(ConferenceModifBase):
                                   self._endDate,
                                   moveEntries=moveEntries)
         except TimingError, e:
-            raise TimingNoReportError(e.getMsg(),
+            raise TimingNoReportError(e.getMessage(),
                                       title=_("Cannot set event dates"),
                                       explanation=e.getExplanation())
 

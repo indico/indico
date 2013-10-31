@@ -43,7 +43,9 @@ import MaKaC.webinterface.pages.errors as errors
 from MaKaC.accessControl import AccessWrapper
 from indico.core.db import DBMgr
 from MaKaC.common import security
-from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlForbiddenTag, ConferenceClosedError, BadRefererError
+from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError,\
+    EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlForbiddenTag, ConferenceClosedError,\
+    BadRefererError, NotLoggedError
 from indico.modules.oauth.errors import OAuthError
 from MaKaC.webinterface.mail import GenericMailer
 from xml.sax.saxutils import escape
@@ -52,6 +54,7 @@ from MaKaC.common.utils import truncate
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 from indico.util.i18n import _, availableLocales
+from indico.util.json import create_json_error_answer
 
 from MaKaC.plugins import PluginsHolder
 from MaKaC.plugins.base import OldObservable
@@ -59,6 +62,16 @@ from MaKaC.plugins.RoomBooking.common import rb_check_user_access
 
 from indico.util.redis import RedisError
 from indico.core.config import Config
+
+def jsonify_error(func):
+    def decorator(*args, **keyargs):
+        e = args[1]
+        Logger.get('requestHandler').info('Request %s finished with %s: "%s"' % (request, e.__class__.__name__, e))
+        if request.headers.get("Content-Type") == "application/json":
+            return create_json_error_answer(e)
+        else:
+            return func(*args, **keyargs)
+    return decorator
 
 
 class RequestHandlerBase(OldObservable):
@@ -319,32 +332,32 @@ class RH(RequestHandlerBase):
             return
         raise BadRefererError('This operation is not allowed from an external referer.')
 
+    @jsonify_error
     def _processGeneralError(self, e):
         """Treats general errors occured during the process of a RH. """
 
-        Logger.get('requestHandler').info('Request %s finished with: "%s"' % (request, e))
+        if Config.getInstance().getPropagateAllExceptions():
+            raise
+        return errors.WPGenericError(self).display()
 
-        p=errors.WPGenericError(self)
-        return p.display()
-
+    @jsonify_error
     def _processUnexpectedError(self, e):
         """Unexpected errors"""
 
-        Logger.get('requestHandler').exception('Request %s failed: "%s"' % (request, e))
-        p=errors.WPUnexpectedError(self)
-        return p.display()
+        if Config.getInstance().getEmbeddedWebserver() or Config.getInstance().getPropagateAllExceptions():
+            # Re-raise to get the nice werkzeug exception view
+            raise
+        return errors.WPUnexpectedError(self).display()
 
+    @jsonify_error
     def _processAccessError(self, e):
         """Treats access errors occured during the process of a RH."""
-        Logger.get('requestHandler').info('Request %s finished with AccessError: "%s"' % (request, e))
 
-        self._responseUtil.status = 403
-        p=errors.WPAccessError(self)
-        return p.display()
+        return errors.WPAccessError(self).display()
 
+    @jsonify_error
     def _processKeyAccessError(self, e):
         """Treats access errors occured during the process of a RH."""
-        Logger.get('requestHandler').info('Request %s finished with KeyAccessError: "%s"' % (request, e))
 
         # We are going to redirect to the page asking for access key
         # and so it must be https if there is a BaseSecureURL. And that's
@@ -352,77 +365,60 @@ class RH(RequestHandlerBase):
         self._tohttps = True
         if self._checkHttpsRedirect():
             return
-        p=errors.WPKeyAccessError(self)
-        return p.display()
+        return errors.WPKeyAccessError(self).display()
 
+    @jsonify_error
     def _processModificationError(self, e):
         """Treats modification errors occured during the process of a RH."""
 
-        Logger.get('requestHandler').info('Request %s finished with ModificationError: "%s"' % (request, e))
+        return errors.WPModificationError(self).display()
 
-        p=errors.WPModificationError(self)
-        return p.display()
-
+    @jsonify_error
     def _processConferenceClosedError(self, e):
         """Treats access to modification pages for conferences when they are closed."""
-        p = WPConferenceModificationClosed( self, e._conf )
-        return p.display()
 
+        return WPConferenceModificationClosed(self, e._conf).display()
+
+    @jsonify_error
     def _processTimingError(self, e):
         """Treats timing errors occured during the process of a RH."""
 
-        Logger.get('requestHandler').info('Request %s finished with TimingError: "%s"' % (request, e))
+        return errors.WPTimingError(self, e).display()
 
-        p = errors.WPTimingError(self, e)
-        return p.display()
-
+    @jsonify_error
     def _processNoReportError(self, e):
         """Process errors without reporting"""
 
-        Logger.get('requestHandler').info('Request %s finished with NoReportError: "%s"' % (request, e))
+        return errors.WPNoReportError(self, e).display()
 
-        p=errors.WPNoReportError(self,e)
-        return p.display()
-
+    @jsonify_error
     def _processNotFoundError(self, e):
         """Process not found error; uses NoReportError template"""
 
-        Logger.get('requestHandler').info('Request %s finished with NotFoundError: "%s"' % (request, e))
+        return errors.WPNoReportError(self, e).display()
 
-        self._responseUtil.status = 404
-        p=errors.WPNoReportError(self,e)
-        return p.display()
-
+    @jsonify_error
     def _processParentTimingError(self, e):
         """Treats timing errors occured during the process of a RH."""
 
-        Logger.get('requestHandler').info('Request %s finished with ParentTimingError: "%s"' % (request, e))
+        return errors.WPParentTimingError(self, e).display()
 
-        p=errors.WPParentTimingError(self,e)
-        return p.display()
-
+    @jsonify_error
     def _processEntryTimingError(self, e):
         """Treats timing errors occured during the process of a RH."""
 
-        Logger.get('requestHandler').info('Request %s finished with EntryTimingError: "%s"' % (request, e))
+        return errors.WPEntryTimingError(self, e).display()
 
-        p=errors.WPEntryTimingError(self,e)
-        return p.display()
-
+    @jsonify_error
     def _processFormValuesError(self, e):
         """Treats user input related errors occured during the process of a RH."""
 
-        Logger.get('requestHandler').info('Request %s finished with FormValuesError: "%s"' % (request, e))
+        return errors.WPFormValuesError(self, e).display()
 
-        p=errors.WPFormValuesError(self,e)
-        return p.display()
-
+    @jsonify_error
     def _processRestrictedHTML(self, e):
 
-        Logger.get('requestHandler').info('Request %s finished with ProcessRestrictedHTMLError: "%s"' % (request, e))
-
-        p=errors.WPRestrictedHTML(self, escape(str(e)))
-        return p.display()
+        return errors.WPRestrictedHTML(self, escape(str(e))).display()
 
     def process(self, params):
         if request.method not in self.HTTP_VERBS:
@@ -559,38 +555,39 @@ class RH(RequestHandlerBase):
                     continue
         except KeyAccessError, e:
             #Key Access error treatment
-            res = self._processKeyAccessError( e )
-            self._endRequestSpecific2RH( False )
+            res = self._processKeyAccessError(e)
+            self._endRequestSpecific2RH(False)
             DBMgr.getInstance().endRequest(False)
         except AccessError, e:
             #Access error treatment
-            res = self._processAccessError( e )
-            self._endRequestSpecific2RH( False )
+            res = self._processAccessError(e)
+            self._responseUtil.status = 403
+            self._endRequestSpecific2RH(False)
             DBMgr.getInstance().endRequest(False)
         except ModificationError, e:
             #Modification error treatment
-            res = self._processModificationError( e )
-            self._endRequestSpecific2RH( False )
+            res = self._processModificationError(e)
+            self._endRequestSpecific2RH(False)
             DBMgr.getInstance().endRequest(False)
         except ParentTimingError, e:
             #Modification error treatment
-            res = self._processParentTimingError( e )
-            self._endRequestSpecific2RH( False )
+            res = self._processParentTimingError(e)
+            self._endRequestSpecific2RH(False)
             DBMgr.getInstance().endRequest(False)
         except EntryTimingError, e:
             #Modification error treatment
-            res = self._processEntryTimingError( e )
-            self._endRequestSpecific2RH( False )
+            res = self._processEntryTimingError(e)
+            self._endRequestSpecific2RH(False)
             DBMgr.getInstance().endRequest(False)
         except TimingError, e:
             #Modification error treatment
-            res = self._processTimingError( e )
-            self._endRequestSpecific2RH( False )
+            res = self._processTimingError(e)
+            self._endRequestSpecific2RH(False)
             DBMgr.getInstance().endRequest(False)
         except FormValuesError, e:
             #Error filling the values of a form
-            res = self._processFormValuesError( e )
-            self._endRequestSpecific2RH( False )
+            res = self._processFormValuesError(e)
+            self._endRequestSpecific2RH(False)
             DBMgr.getInstance().endRequest(False)
         except BadRequestKeyError, e:
             # The KeyError raised when accessing e.g. request.args['invalid']
@@ -600,30 +597,27 @@ class RH(RequestHandlerBase):
             DBMgr.getInstance().endRequest(False)
         except ConferenceClosedError, e:
             #Modification error treatment
-            res = self._processConferenceClosedError( e )
-            self._endRequestSpecific2RH( False )
+            res = self._processConferenceClosedError(e)
+            self._endRequestSpecific2RH(False)
             DBMgr.getInstance().endRequest(False)
         except NoReportError, e:
             #Error without report option
-            res = self._processNoReportError( e )
+            res = self._processNoReportError(e)
             DBMgr.getInstance().endRequest(False)
         except (NotFoundError, NotFound), e:
             # File not found error
             res = self._processNotFoundError(e)
+            self._responseUtil.status = 404
             DBMgr.getInstance().endRequest(False)
-        except HtmlForbiddenTag,e:
+        except HtmlForbiddenTag, e:
             res = self._processRestrictedHTML(e)
             DBMgr.getInstance().endRequest(False)
         except MaKaCError, e:
-            res = self._processGeneralError( e )
+            res = self._processGeneralError(e)
             DBMgr.getInstance().endRequest(False)
-            if Config.getInstance().getPropagateAllExceptions():
-                raise
         except ValueError, e:
-            res = self._processGeneralError( e )
+            res = self._processGeneralError(e)
             DBMgr.getInstance().endRequest(False)
-            if Config.getInstance().getPropagateAllExceptions():
-                raise
         except OAuthError, e:
             from indico.util import json
             res = json.dumps(e.fossilize())
@@ -636,10 +630,6 @@ class RH(RequestHandlerBase):
             res = self._processUnexpectedError(e)
             self._endRequestSpecific2RH(False)
             DBMgr.getInstance().endRequest(False)
-
-            if Config.getInstance().getEmbeddedWebserver() or Config.getInstance().getPropagateAllExceptions():
-                # Re-raise to get the nice werkzeug exception view
-                raise
 
             #cancels any redirection
             self._responseUtil.redirect = None
@@ -789,8 +779,11 @@ class RHProtected(RH):
 
     def _checkSessionUser(self):
         if self._getUser() is None:
-            self._redirect(self._getLoginURL())
-            self._doProcess = False
+            if request.headers.get("Content-Type") == "application/json":
+                raise NotLoggedError("You are currently not authenticated. Please log in again.")
+            else:
+                self._redirect(self._getLoginURL())
+                self._doProcess = False
 
     def _checkProtection(self):
         self._checkSessionUser()
@@ -801,8 +794,11 @@ class RHRoomBookingProtected(RHProtected):
     def _checkSessionUser(self):
         user = self._getUser()
         if user is None:
-            self._redirect(self._getLoginURL())
-            self._doProcess = False
+            if request.headers.get("Content-Type") == "application/json":
+                raise NotLoggedError("You are currently not authenticated. Please log in again.")
+            else:
+                self._redirect(self._getLoginURL())
+                self._doProcess = False
         else:
             try:
                 if PluginsHolder().getPluginType("RoomBooking").isActive():

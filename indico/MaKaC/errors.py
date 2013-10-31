@@ -21,19 +21,25 @@
 Module containing the MaKaC exception class hierarchy
 """
 
-class MaKaCError(Exception):
+from MaKaC.common.fossilize import fossilizes, Fossilizable
+from indico.core.fossils.errors import IErrorReportFossil, IErrorNoReportFossil
 
-    def __init__( self, msg="",area="", explanation = None):
+
+class MaKaCError(Exception, Fossilizable):
+
+    fossilizes(IErrorReportFossil)
+
+    def __init__(self, msg="", area="", explanation=None):
         self._msg = msg
         self._area = area
         self._explanation = explanation
 
-    def getMsg( self ):
+    def getMessage(self):
         return self._msg
 
     def __str__(self):
         if self._area != "":
-            return "%s - %s"%(self._area,self._msg)
+            return "%s - %s" % (self._area, self._msg)
         else:
             return self._msg
 
@@ -51,27 +57,31 @@ class MaKaCError(Exception):
 class AccessControlError(MaKaCError):
     """
     """
+
+    fossilizes(IErrorNoReportFossil)
+
     def __init__(self, objectType="object"):
+        MaKaCError.__init__(self)
         self.objType = objectType
 
-    def __str__( self ):
-        return _("you are not authorised to access this %s")%self.objType
+    def __str__(self):
+        return _("you are not authorised to access this %s") % self.objType
+
+    def getMessage(self):
+        return str(self)
 
 
 class ConferenceClosedError(MaKaCError):
     """
     """
+    fossilizes(IErrorNoReportFossil)
+
     def __init__(self, conf):
+        MaKaCError.__init__(self)
         self._conf = conf
 
-    def __str__( self ):
+    def __str__(self):
         return _("the event has been closed")
-
-
-class DomainNotAllowedError(AccessControlError):
-
-    def __str__( self ):
-        return _("your domain is not allowed to acces this %s")%self.objType
 
 
 class AccessError(AccessControlError):
@@ -89,22 +99,25 @@ class KeyAccessError(AccessControlError):
 class ModificationError(AccessControlError):
     """
     """
-    def __str__( self ):
-        return _("you are not authorised to modify this %s")%self.objType
+
+    def __str__(self):
+        return _("you are not authorised to modify this %s") % self.objType
 
 
 class AdminError(AccessControlError):
     """
     """
+
     def __str__(self):
-        return _("only administrators can access this %s")%self.objType
+        return _("only administrators can access this %s") % self.objType
 
 
 class WebcastAdminError(AccessControlError):
     """
     """
+
     def __str__(self):
-        return _("only webcast administrators can access this %s")%self.objType
+        return _("only webcast administrators can access this %s") % self.objType
 
 
 class TimingError(MaKaCError):
@@ -112,8 +125,7 @@ class TimingError(MaKaCError):
     Timetable problems
     """
 
-    def __init__(self, msg = "", area = "", explanation = None):
-        MaKaCError.__init__(self, msg, area, explanation)
+    fossilizes(IErrorNoReportFossil)
 
 
 class ParentTimingError(TimingError):
@@ -131,8 +143,6 @@ class EntryTimingError(TimingError):
 class UserError(MaKaCError):
     """
     """
-    def init(self, msg = ""):
-        self._msg = msg
 
     def __str__(self):
         if self._msg:
@@ -141,27 +151,28 @@ class UserError(MaKaCError):
             return _("Error creating user")
 
 
+class NotLoggedError(MaKaCError):
+    """
+    """
+    fossilizes(IErrorNoReportFossil)
+
+
 class FormValuesError(MaKaCError):
     """
     """
-    def __init__( self, msg="",area=""):
-        self._msg = msg
-        self._area = area
+    fossilizes(IErrorNoReportFossil)
 
 
 class NoReportError(MaKaCError):
     """
     """
-    def __init__( self, msg="", area=""):
-        self._msg = msg
-        self._area = area
+    fossilizes(IErrorNoReportFossil)
+
 
 class NotFoundError(MaKaCError):
     """
     """
-    def __init__( self, msg="", area=""):
-        self._msg = msg
-        self._area = area
+    fossilizes(IErrorNoReportFossil)
 
 
 class PluginError(MaKaCError):

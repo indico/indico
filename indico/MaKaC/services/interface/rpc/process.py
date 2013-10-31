@@ -122,7 +122,7 @@ class ServiceRunner(Observable):
                     try:
                         result = processRequest(method, copy.deepcopy(params))
                     except MaKaC.errors.NoReportError, e:
-                        raise NoReportError(e.getMsg())
+                        raise NoReportError(e.getMessage())
                     rh = ContextManager.get('currentRH')
 
                     # notify components that the request has ended
