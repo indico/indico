@@ -18,18 +18,26 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Dates to skip in a reservation
+A view of map of rooms in a specific location
 """
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer
+from sqlalchemy import Column, ForeignKey, Integer, SmallInteger, String
 
 from indico.core.db.schema import Base
 
 
-class ExcludedDay(Base):
-    __tablename__ = 'reservation_excluded_days'
+class Aspect(Base):
+    __tablename__ = 'aspects'
 
-    start_date = Column(DateTime, nullable=False, primary_key=True)
-    end_date = Column(DateTime, nullable=False, primary_key=True)
+    id = Column(Integer, primary_key=True)
 
-    reservation_id = Column(Integer, ForeignKey('reservations.id'))
+    name = Column(String, nullable=False)
+    center_latitude = Column(String)
+    center_longitude = Column(String)
+    zoom_level = Column(SmallInteger)
+    top_left_latitude = Column(String)
+    top_left_longitude = Column(String)
+    bottom_right_latitude = Column(String)
+    bottom_right_longitude = Column(String)
+
+    location_id = Column(Integer, ForeignKey('locations.id'))

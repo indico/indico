@@ -18,18 +18,31 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Custom attributes for rooms
+Holder of rooms in a place and its map view related data
 """
 
 from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 from indico.core.db.schema import Base
 
 
-class RoomAttribute(Base):
-    __tablename__ = 'room_attributes'
+class Location(Base):
+    __tablename__ = 'locations'
 
-    key = Column(String, nullable=False, primary_key=True)
-    value = Column(String, nullable=False)
+    id = Column(Integer, primary_key=True)
 
-    room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True)
+    name = Column(String, nullable=False)
+    support_emails = Column(String)
+
+    aspects = relationship('Aspect',
+                           backref='location',
+                           cascade='all, delete, delete-orphan')
+
+    default_aspect_id = Column(Integer, ForeignKey('aspects.id',
+                                                   use_alter=True,
+                                                   name='fk_default_aspect_id'))
+
+    rooms = relationship('Room',
+                         backref='location',
+                         cascade='all, delete, delete-orphan')

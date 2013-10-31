@@ -18,10 +18,10 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-
+Nonbookable dates of rooms
 """
 
-from sqlalchemy import Column, ForeignKey, Integer, DateTime
+from sqlalchemy import Column, DateTime, ForeignKey, Integer
 
 from indico.core.db.schema import Base
 
@@ -29,8 +29,7 @@ from indico.core.db.schema import Base
 class NonBookableDate(Base):
     __tablename__ = 'room_nonbookable_dates'
 
-    id = Column(Integer, primary_key=True)
-    start_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
+    start_date = Column(DateTime, nullable=False, primary_key=True)
+    end_date = Column(DateTime, nullable=False, primary_key=True)
 
-    room_id = Column(Integer, ForeignKey('rooms.id'))
+    room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True)

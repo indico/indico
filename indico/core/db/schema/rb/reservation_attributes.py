@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-
+Custom attributes for reservations
 """
 
 from sqlalchemy import Column, ForeignKey, Integer, String
@@ -29,8 +29,7 @@ from indico.core.db.schema import Base
 class ReservationAttribute(Base):
     __tablename__ = 'reservation_attributes'
 
-    id = Column(Integer, primary_key=True)
-    key = Column(String, nullable=False)
+    key = Column(String, nullable=False, primary_key=True)
     value = Column(String, nullable=False)
 
-    reservation_id = Column(Integer, ForeignKey('reservations.id'))
+    reservation_id = Column(Integer, ForeignKey('reservations.id'), primary_key=True)

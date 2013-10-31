@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Dates to skip in a reservation
+Sent notifications of a reservation
 """
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer
@@ -26,10 +26,8 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer
 from indico.core.db.schema import Base
 
 
-class ExcludedDay(Base):
-    __tablename__ = 'reservation_excluded_days'
+class ReservationNotification(Base):
+    __tablename__ = 'reservation_notifications'
 
-    start_date = Column(DateTime, nullable=False, primary_key=True)
-    end_date = Column(DateTime, nullable=False, primary_key=True)
-
-    reservation_id = Column(Integer, ForeignKey('reservations.id'))
+    reservation_id = Column(Integer, ForeignKey('reservations.id'), primary_key=True)
+    occurrence = Column(DateTime, nullable=False, primary_key=True)

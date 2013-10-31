@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-
+Available times to book for rooms
 """
 
 from sqlalchemy import Column, ForeignKey, Integer, Time
@@ -27,10 +27,9 @@ from indico.core.db.schema import Base
 
 
 class BookableTime(Base):
-    __tablename__ = 'room_bookable_time'
+    __tablename__ = 'room_bookable_times'
 
-    id = Column(Integer, primary_key=True)
-    start_time = Column(Time, nullable=False)
-    end_time = Column(Time, nullable=False)
+    start_time = Column(Time, nullable=False, primary_key=True)
+    end_time = Column(Time, nullable=False, primary_key=True)
 
-    room_id = Column(Integer, ForeignKey('rooms.id'))
+    room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True)

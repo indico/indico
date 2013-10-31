@@ -18,18 +18,17 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Dates to skip in a reservation
+Schema of a photo for rooms
 """
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer
+from sqlalchemy import Column, ForeignKey, Integer, LargeBinary
 
 from indico.core.db.schema import Base
 
 
-class ExcludedDay(Base):
-    __tablename__ = 'reservation_excluded_days'
+class Photo(Base):
+    __tablename__ = 'photos'
 
-    start_date = Column(DateTime, nullable=False, primary_key=True)
-    end_date = Column(DateTime, nullable=False, primary_key=True)
-
-    reservation_id = Column(Integer, ForeignKey('reservations.id'))
+    id = Column(Integer, primary_key=True)
+    room_id = Column(Integer, ForeignKey('rooms.id'))
+    content = Column(LargeBinary)  # or path, url = Column(String)

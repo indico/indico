@@ -18,18 +18,18 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Dates to skip in a reservation
+Schema of modifications done on a reservation
 """
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 
 from indico.core.db.schema import Base
 
 
-class ExcludedDay(Base):
-    __tablename__ = 'reservation_excluded_days'
+class Edit(Base):
+    __tablename__ = 'reservation_edits'
 
-    start_date = Column(DateTime, nullable=False, primary_key=True)
-    end_date = Column(DateTime, nullable=False, primary_key=True)
-
-    reservation_id = Column(Integer, ForeignKey('reservations.id'))
+    timestamp = Column(DateTime, primary_key=True)
+    info = Column(String, nullable=False)
+    avatar_id = Column(String, nullable=False, primary_key=True)
+    reservation_id = Column(Integer, ForeignKey('reservations.id'), primary_key=True)

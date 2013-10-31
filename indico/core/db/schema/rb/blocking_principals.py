@@ -18,18 +18,17 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Dates to skip in a reservation
+Schema of a principal (user or group that isn't affected by blocking)
 """
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer
+from sqlalchemy import Column, ForeignKey, Integer, String
 
 from indico.core.db.schema import Base
 
 
-class ExcludedDay(Base):
-    __tablename__ = 'reservation_excluded_days'
+class BlockingPrincipal(Base):
+    __tablename__ = 'blocking_principals'
 
-    start_date = Column(DateTime, nullable=False, primary_key=True)
-    end_date = Column(DateTime, nullable=False, primary_key=True)
-
-    reservation_id = Column(Integer, ForeignKey('reservations.id'))
+    blocking_id = Column(Integer, ForeignKey('blockings.id'), primary_key=True)
+    entity_type = Column(String, primary_key=True)
+    entity_id = Column(String, primary_key=True)
