@@ -73,7 +73,6 @@ class RedisStorage(Storage):
 
         def onclose_fn(sfile):
             self.client.hset("RedisStore:%s" % self.folder, name, sfile.file.getvalue())
-        #print "Opened file %s %s " % (name, self.__file(name))
         return StructFile(StringIO(self.__file(name)), name=name, onclose=onclose_fn, *args, **kwargs)
 
     def lock(self, name):

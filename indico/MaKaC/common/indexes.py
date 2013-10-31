@@ -1267,15 +1267,6 @@ class TextIndex(IntStringMappedIndex):
 
 class WhooshTextIndex(object):
 
-    def _getRepositoryPath(self):
-        destPath = os.path.join(Config.getInstance().getArchiveDir(), 'whoosh')
-        if not os.access(destPath, os.F_OK):
-            os.makedirs(destPath)
-        return destPath
-
-    def _getSchema(self):
-        return Schema(id=ID(unique=True, stored=True), content=TEXT(stored=True))
-
     def __init__(self, index_name):
 
         if Config.getInstance().getRedisConnectionURL():
@@ -1289,6 +1280,15 @@ class WhooshTextIndex(object):
         else:
             self._textIdx = storage.create_index(schema, indexname=index_name)
 
+    def _getRepositoryPath(self):
+        destPath = os.path.join(Config.getInstance().getArchiveDir(), 'whoosh')
+        if not os.access(destPath, os.F_OK):
+            os.makedirs(destPath)
+        return destPath
+
+    def _getSchema(self):
+        return Schema(id=ID(unique=True, stored=True), content=TEXT(stored=True))
+
     def __contains__(self, key):
         searcher = self._textIdx.searcher()
         query = QueryParser("id", self._textIdx.schema).parse(key)
@@ -1298,7 +1298,7 @@ class WhooshTextIndex(object):
 
     def index(self, obj):
         if obj.getId() in self:
-            raise KeyError("Key {0} already exists in index!".format(obj.getId())
+            raise KeyError(_("Key {0} already exists in index!").format(obj.getId()))
         self._index(obj)
 
     def unindex(self, obj):
@@ -1330,6 +1330,7 @@ class WhooshTextIndex(object):
                 dbi.commit()
                 writer = self._textIdx.writer(limitmb=512)
             i += 1
+        dbi.commit()
         writer.commit(optimize=True)
 
 
@@ -1364,6 +1365,7 @@ class WhooshConferenceIndex(WhooshTextIndex):
                 dbi.commit()
                 writer = self._textIdx.writer(limitmb=512)
             i += 1
+        dbi.commit()
         writer.commit(optimize=True)
 
 
