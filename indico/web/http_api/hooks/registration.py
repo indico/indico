@@ -87,26 +87,3 @@ class RegistrantsHook(EventBaseHook):
             reg.update(regForm.getPersonalData().getRegistrantValues(registrant))
             registrant_list.append(reg)
         return {"registrants": registrant_list}
-
-
-@HTTPAPIHook.register
-class EventsHook(HTTPAPIHook):
-    TYPES = ("events",)
-    RE = r"(?P<user_id>[\d]+)"
-    NO_CACHE = True
-
-    def export_events(self, aw):
-        user = aw.getUser()
-        managed_conferences = user.getLinkTo('conference', 'creator')
-        managed_conferences.update(user.getLinkTo('conference', 'manager'))
-        events = []
-        for conf in managed_conferences:
-            if conf.getRegistrationForm().getETicket().isEnabled():
-                event = {
-                    "id": conf.getId(),
-                    "title": conf.getTitle(),
-                    "date": conf.getAdjustedStartDate(),
-                    "registrants": len(conf.getRegistrants())
-                }
-                events.append(event)
-        return {"events": events}
