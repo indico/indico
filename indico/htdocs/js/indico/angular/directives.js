@@ -17,35 +17,76 @@
 
 var ndDirectives = angular.module("ndDirectives", []);
 
-ndDirectives.directive("ndDialog", function($timeout) {
+ndDirectives.directive("ndDialog", function() {
     return {
-        transclude: true,
-        template: "<div ng-transclude></div>",
-
+        restrict: 'E',
         scope: {
-            title: "@"
+            heading: '@',
+            show: '=',
+            okButton: '@',
+            okCallback: '&',
+            cancelButton: '@',
+            cancelCallback: '&',
+            data: "@"
+        },
+
+        controller: function($scope) {
+            $scope.close = function() {
+                $scope.show = false;
+                $scope.$apply($scope.show);
+            };
+
+            $scope.cancel = function() {
+                $scope.cancelCallback({dialogScope: $scope});
+                $scope.close();
+            };
+
+            $scope.ok = function() {
+                $scope.okCallback({dialogScope: $scope});
+                $scope.close();
+            };
         },
 
         link: function(scope, element, attrs) {
+            var dialog = new ExclusivePopupWithButtons(
+                attrs.heading,
+                scope.close,
+                false,
+                false,
+                true
+            );
 
-            var dialog = new ExclusivePopupWithButtons(attrs.title);
+            dialog._onClose = function() {};
+
+            dialog._getButtons = function() {
+                return [
+                    [attrs.okButton, function() {
+                        scope.ok();
+                    }],
+                    [attrs.cancelButton, function() {
+                        scope.cancel();
+                    }]
+                ];
+            };
 
             dialog.draw = function() {
                 return this.ExclusivePopupWithButtons.prototype.draw.call(this, element);
             };
 
-            dialog._onClose = function() {
-
-            };
-
-            attrs.$observe("show", function(val) {
-                if (scope.$eval(val) === true) {
+            scope.$watch("show", function() {
+                if (scope.show === true) {
                     dialog.open();
                 } else {
                     dialog.close();
                 }
             });
 
+            attrs.$observe('heading', function(val) {
+                dialog.title = val;
+                dialog.canvas = null;
+            });
+
+            dialog.draw();
         }
     };
 });
