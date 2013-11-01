@@ -17,25 +17,19 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import glob
+import importlib
+import os
+
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
 
-def init_rb():
-    from indico.core.db.schema.rb import (
-        aspects,
-        blocked_rooms,
-        blocking_principals,
-        blockings,
-        edits,
-        locations,
-        photos,
-        reservation_attributes,
-        reservation_excluded_days,
-        reservation_notifications,
-        reservations,room_attributes,
-        room_bookable_times,
-        room_nonbookable_dates,
-        rooms
-    )
+def load(package):
+    for f in glob.glob(os.path.dirname(__file__) + '/{0}/*.py'.format(package)):
+        importlib.import_module('.' + os.path.basename(f)[:-3], __package__ + '.' + package)
+
+
+def load_room_booking():
+    load('rb')

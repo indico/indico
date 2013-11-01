@@ -22,15 +22,12 @@ Schema and graph generator
 """
 
 import argparse
-import glob
-import importlib
-import os
 
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy_schemadisplay import create_schema_graph
 # from sqlalchemy.orm import sessionmaker
 
-from indico.core.db.schema import Base, init_rb
+from indico.core.db.schema import Base, load_room_booking
 
 
 def generate_schema_graph(db='test.db', output='test.png'):
@@ -41,13 +38,15 @@ def generate_schema_graph(db='test.db', output='test.png'):
                                 concentrate=False) # no joins of tables together
     graph.write_png(output)
 
+
 def generate_schema(db='test.db', checkfirst=True, echo=True):
     engine = create_engine('sqlite:///' + db, echo=echo)
-    init_rb()
+    load_room_booking()
     Base.metadata.create_all(engine, checkfirst=checkfirst)
     # Session = sessionmaker(bind=engine)
     # session = Session()
     print 'everything is fine for now!'
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

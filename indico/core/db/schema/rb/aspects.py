@@ -31,7 +31,7 @@ class Aspect(Base):
 
     id = Column(Integer, primary_key=True)
 
-    name = Column(String)
+    name = Column(String, nullable=False)
     center_latitude = Column(String, nullable=False)
     center_longitude = Column(String, nullable=False)
     zoom_level = Column(SmallInteger, nullable=False)
