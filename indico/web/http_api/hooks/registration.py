@@ -28,7 +28,6 @@ from indico.util.date_time import format_datetime
 
 @HTTPAPIHook.register
 class CheckInHook(EventBaseHook):
-    TYPES = ("checkin",)
     RE = r'(?P<event>[\w\s]+)/registrant/(?P<registrant_id>[\w\s]+)/checkin'
     NO_CACHE = True
     COMMIT = True
@@ -65,9 +64,10 @@ class RegistrantsHook(EventBaseHook):
         self._type = "registrants"
         self._conf = ConferenceHolder().getById(self._conf_id)
 
+    def _hasAccess(self, aw):
+        return self._conf.canManageRegistration(aw.getUser())
+
     def export_registrants(self, aw):
-        if not self._conf.canManageRegistration(aw.getUser()):
-            return {"registrants": []}
         registrants = self._conf.getRegistrantsList()
         registrant_list = []
         for registrant in registrants:
