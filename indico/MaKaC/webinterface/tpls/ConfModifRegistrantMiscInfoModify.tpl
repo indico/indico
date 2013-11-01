@@ -1,7 +1,4 @@
 <script>
- /* load all polyfill features */
-  $.webshims.polyfill();
-
   var validators = [];
   var parameterManager = new IndicoUtil.parameterManager();
   var addParam = parameterManager.add;

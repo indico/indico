@@ -31,8 +31,6 @@
     <input type="hidden" value="${confId}" id="conf_id">
     <script type="text/javascript">
         $("div#registrationForm").html(progressIndicator(false, true).dom);
-        /* load all polyfill features */
-        $.webshims.polyfill();
         var validators = [];
         var parameterManager = new IndicoUtil.parameterManager();
         var addParam = parameterManager.add;
