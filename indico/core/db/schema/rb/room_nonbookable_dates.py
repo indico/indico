@@ -33,3 +33,8 @@ class NonBookableDate(Base):
     end_date = Column(DateTime, nullable=False, primary_key=True)
 
     room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True)
+
+    def __repr__(self):
+        return '<NonBookableDate({0}, {1}, {2})>'.format(self.room_id,
+                                                         self.start_date,
+                                                         self.end_date)

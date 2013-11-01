@@ -33,3 +33,8 @@ class BookableTime(Base):
     end_time = Column(Time, nullable=False, primary_key=True)
 
     room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True)
+
+    def __repr__(self):
+        return '<BookableTime({0}, {1}, {2})>'.format(self.room_id,
+                                                      self.start_time,
+                                                      self.end_time)

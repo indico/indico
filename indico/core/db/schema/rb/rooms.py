@@ -95,3 +95,6 @@ class Room(Base):
     blocked_rooms = relationship('BlockedRoom',
                                  backref='room',
                                  cascade='all, delete, delete-orphan')
+
+    def __repr__(self):
+        return '<Room({0}, {1}, {2})>'.format(self.id, self.location_id, self.name)

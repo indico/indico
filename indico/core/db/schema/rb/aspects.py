@@ -31,13 +31,16 @@ class Aspect(Base):
 
     id = Column(Integer, primary_key=True)
 
-    name = Column(String, nullable=False)
-    center_latitude = Column(String)
-    center_longitude = Column(String)
-    zoom_level = Column(SmallInteger)
-    top_left_latitude = Column(String)
-    top_left_longitude = Column(String)
-    bottom_right_latitude = Column(String)
-    bottom_right_longitude = Column(String)
+    name = Column(String)
+    center_latitude = Column(String, nullable=False)
+    center_longitude = Column(String, nullable=False)
+    zoom_level = Column(SmallInteger, nullable=False)
+    top_left_latitude = Column(String, nullable=False)
+    top_left_longitude = Column(String, nullable=False)
+    bottom_right_latitude = Column(String, nullable=False)
+    bottom_right_longitude = Column(String, nullable=False)
 
     location_id = Column(Integer, ForeignKey('locations.id'))
+
+    def __repr__(self):
+        return '<Aspect({0}, {1}, {2})>'.format(self.id, self.location_id, self.name)

@@ -32,3 +32,8 @@ class BlockingPrincipal(Base):
     blocking_id = Column(Integer, ForeignKey('blockings.id'), primary_key=True)
     entity_type = Column(String, primary_key=True)
     entity_id = Column(String, primary_key=True)
+
+    def __repr__(self):
+        return '<BlockingPrincipal({0}, {1}, {2})>'.format(self.blocking_id,
+                                                           self.entity_id,
+                                                           self.entity_type)

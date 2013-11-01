@@ -31,3 +31,7 @@ class ReservationNotification(Base):
 
     reservation_id = Column(Integer, ForeignKey('reservations.id'), primary_key=True)
     occurrence = Column(DateTime, nullable=False, primary_key=True)
+
+    def __repr__(self):
+        return '<ReservationNotification({0}, {1})>'.format(self.reservation_id,
+                                                            self.occurrence)

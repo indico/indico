@@ -33,3 +33,7 @@ class Edit(Base):
     info = Column(String, nullable=False)
     avatar_id = Column(String, nullable=False, primary_key=True)
     reservation_id = Column(Integer, ForeignKey('reservations.id'), primary_key=True)
+
+    def __repr__(self):
+        return '<Edit({0}, {1}, {2}, {3})>'.format(self.avatar_id, self.reservation_id,
+                                                   self.timestamp, self.info)

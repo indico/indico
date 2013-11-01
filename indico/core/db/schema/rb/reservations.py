@@ -61,9 +61,9 @@ class Reservation(Base):
     contact_email = Column(String)
     contact_phone = Column(String)
 
-    is_confirmed = Column(Boolean, default=True)
-    is_cancelled = Column(Boolean, default=False)
-    is_rejected = Column(Boolean, default=False)
+    is_confirmed = Column(Boolean, nullable=False)
+    is_cancelled = Column(Boolean, nullable=False, default=False)
+    is_rejected = Column(Boolean, nullable=False, default=False)
 
     reason = Column(String, nullable=False)
 
@@ -79,7 +79,13 @@ class Reservation(Base):
                                   backref=backref('reservation', order_by='ExcludedDay.start_date'),
                                   cascade='all, delete, delete-orphan')
 
-    # moved to reservation (custom) attribute
+    # moved to reservation (custom) attributes
     # needs_video_conference_support = Column(Boolean, default=False)
     # needs_assistance = Column(Boolean, default=False)
     # uses_video_conference = Column(Boolean, default=False)
+
+    def __repr__(self):
+        return '<Reservation({0}, {1}, {2}, {3}, {4})>'.format(self.id, self.room_id,
+                                                               self.booked_for_name,
+                                                               self.start_date,
+                                                               self.end_date)

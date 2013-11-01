@@ -32,3 +32,6 @@ class Photo(Base):
     id = Column(Integer, primary_key=True)
     room_id = Column(Integer, ForeignKey('rooms.id'))
     content = Column(LargeBinary)  # or path, url = Column(String)
+
+    def __repr__(self):
+        return '<Photo({0}, {1})>'.format(self.id, self.room_id)

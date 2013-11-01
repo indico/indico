@@ -33,3 +33,8 @@ class ReservationAttribute(Base):
     value = Column(String, nullable=False)
 
     reservation_id = Column(Integer, ForeignKey('reservations.id'), primary_key=True)
+
+    def __repr__(self):
+        return '<ReservationAttribute({0}, {1}, {2})>'.format(self.reservation_id,
+                                                              self.key,
+                                                              self.value)

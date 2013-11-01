@@ -36,3 +36,7 @@ class BlockedRoom(Base):
 
     blocking_id = Column(Integer, ForeignKey('blockings.id'), primary_key=True)
     room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True)
+
+    def __repr__(self):
+        return '<BlockedRoom({0}, {1}, {2})>'.format(self.blocking_id, self.room_id,
+                                                     self.is_active)

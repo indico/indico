@@ -47,3 +47,8 @@ class Blocking(Base):
     blocked_rooms = relationship('BlockedRoom',
                                  backref='blocking',
                                  cascade='all, delete, delete-orphan')
+
+    def __repr__(self):
+        return '<Blocking({0}, {1}, {2}, {3}, {4})>'.format(self.id, self.created_by,
+                                                            self.reason, self.start_date,
+                                                            self.end_date)
