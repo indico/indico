@@ -59,6 +59,7 @@ from MaKaC.i18n import _
 from indico.util.i18n import i18nformat, ngettext
 from indico.util.date_time import format_date
 from indico.util import json
+from MaKaC.common.Configuration import Config
 
 
 styles = getSampleStyleSheet()
@@ -3217,11 +3218,13 @@ class TicketToPDF(PDFBase):
             box_size=4,
             border=1
         )
-
+        config = Config.getInstance()
+        baseURL = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
         qr_data = {"id": self._registrant.getId(),
                    "secret": self._registrant.getCheckInUUID(),
-                   "target": self._conf.getId(),
-                   "application": "indico"}
+                   "event_id": self._conf.getId(),
+                   "server_url": baseURL
+                  }
         json_qr_data = json.dumps(qr_data)
         qr.add_data(json_qr_data)
         qr.make(fit=True)
