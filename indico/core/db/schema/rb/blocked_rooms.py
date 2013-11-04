@@ -29,13 +29,13 @@ from indico.core.db.schema import Base
 class BlockedRoom(Base):
     __tablename__ = 'blocked_rooms'
 
-    is_active = Column(Boolean, default=False)
-    notification_sent = Column(Boolean, default=False)
+    is_active = Column(Boolean, nullable=False, default=False)
+    notification_sent = Column(Boolean, nullable=False, default=False)
     rejected_by = Column(String)
     rejection_reason = Column(String)
 
-    blocking_id = Column(Integer, ForeignKey('blockings.id'), primary_key=True)
-    room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True)
+    blocking_id = Column(Integer, ForeignKey('blockings.id'), primary_key=True, nullable=False)
+    room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True, nullable=False)
 
     def __repr__(self):
         return '<BlockedRoom({0}, {1}, {2})>'.format(self.blocking_id, self.room_id,

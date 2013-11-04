@@ -32,7 +32,7 @@ class RoomAttribute(Base):
     key = Column(String, nullable=False, primary_key=True)
     value = Column(String, nullable=False)
 
-    room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True)
+    room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True, nullable=False)
 
     def __repr__(self):
         return '<RoomAttribute({0}, {1}, {2})>'.format(self.room_id,

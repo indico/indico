@@ -21,6 +21,8 @@
 Schema of modifications done on a reservation
 """
 
+from datetime import datetime
+
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 
 from indico.core.db.schema import Base
@@ -29,10 +31,10 @@ from indico.core.db.schema import Base
 class Edit(Base):
     __tablename__ = 'reservation_edits'
 
-    timestamp = Column(DateTime, primary_key=True)
+    timestamp = Column(DateTime, primary_key=True, nullable=False, default=datetime.utcnow)
     info = Column(String, nullable=False)
     avatar_id = Column(String, nullable=False, primary_key=True)
-    reservation_id = Column(Integer, ForeignKey('reservations.id'), primary_key=True)
+    reservation_id = Column(Integer, ForeignKey('reservations.id'), primary_key=True, nullable=False)
 
     def __repr__(self):
         return '<Edit({0}, {1}, {2}, {3})>'.format(self.avatar_id, self.reservation_id,

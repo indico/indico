@@ -35,18 +35,18 @@ class Blocking(Base):
     id = Column(Integer, primary_key=True)
 
     created_by = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
 
     reason = Column(String, nullable=False)
     allowed = relationship('BlockingPrincipal',
                            backref='blocking',
-                           cascade='all, delete, delete-orphan')
+                           cascade='all, delete-orphan')
 
     blocked_rooms = relationship('BlockedRoom',
                                  backref='blocking',
-                                 cascade='all, delete, delete-orphan')
+                                 cascade='all, delete-orphan')
 
     def __repr__(self):
         return '<Blocking({0}, {1}, {2}, {3}, {4})>'.format(self.id, self.created_by,

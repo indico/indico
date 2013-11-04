@@ -40,7 +40,7 @@ class Aspect(Base):
     bottom_right_latitude = Column(String, nullable=False)
     bottom_right_longitude = Column(String, nullable=False)
 
-    location_id = Column(Integer, ForeignKey('locations.id'))
+    location_id = Column(Integer, ForeignKey('locations.id'), nullable=False)
 
     def __repr__(self):
         return '<Aspect({0}, {1}, {2})>'.format(self.id, self.location_id, self.name)

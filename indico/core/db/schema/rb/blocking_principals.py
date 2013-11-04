@@ -29,9 +29,9 @@ from indico.core.db.schema import Base
 class BlockingPrincipal(Base):
     __tablename__ = 'blocking_principals'
 
-    blocking_id = Column(Integer, ForeignKey('blockings.id'), primary_key=True)
-    entity_type = Column(String, primary_key=True)
-    entity_id = Column(String, primary_key=True)
+    blocking_id = Column(Integer, ForeignKey('blockings.id'), primary_key=True, nullable=False)
+    entity_type = Column(String, primary_key=True, nullable=False)
+    entity_id = Column(String, primary_key=True, nullable=False)
 
     def __repr__(self):
         return '<BlockingPrincipal({0}, {1}, {2})>'.format(self.blocking_id,

@@ -29,7 +29,7 @@ from indico.core.db.schema import Base
 class ReservationNotification(Base):
     __tablename__ = 'reservation_notifications'
 
-    reservation_id = Column(Integer, ForeignKey('reservations.id'), primary_key=True)
+    reservation_id = Column(Integer, ForeignKey('reservations.id'), primary_key=True, nullable=False)
     occurrence = Column(DateTime, nullable=False, primary_key=True)
 
     def __repr__(self):

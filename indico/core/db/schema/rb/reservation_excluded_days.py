@@ -32,7 +32,7 @@ class ExcludedDay(Base):
     start_date = Column(DateTime, nullable=False, primary_key=True)
     end_date = Column(DateTime, nullable=False, primary_key=True)
 
-    reservation_id = Column(Integer, ForeignKey('reservations.id'))
+    reservation_id = Column(Integer, ForeignKey('reservations.id'), nullable=False)
 
     def __repr__(self):
         return '<ExcludedDay({0}, {1}, {2})>'.format(self.reservation_id,

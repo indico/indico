@@ -33,7 +33,7 @@ class Room(Base):
     id = Column(Integer, primary_key=True)
 
     # location
-    location_id = Column(Integer, ForeignKey('locations.id'))
+    location_id = Column(Integer, ForeignKey('locations.id'), nullable=False)
 
     # user-facing identifier of the room
     name = Column(String, nullable=False)
@@ -46,11 +46,11 @@ class Room(Base):
     number = Column(String, nullable=False)
 
     # notifications
-    resv_end_notification = Column(Boolean, default=True)
+    resv_end_notification = Column(Boolean, nullable=False, default=True)
     resv_start_notification = Column(Integer, nullable=False, default=0)
-    resvs_need_confirmation = Column(Boolean, default=False)
-    resv_notification_to_assistance = Column(Boolean, default=True)
-    resv_notification_to_responsible = Column(Boolean, default=True)
+    resvs_need_confirmation = Column(Boolean, nullable=False, default=False)
+    resv_notification_to_assistance = Column(Boolean, nullable=False, default=True)
+    resv_notification_to_responsible = Column(Boolean, nullable=False, default=True)
 
     # extra info about room
     telephone = Column(String)
@@ -67,34 +67,34 @@ class Room(Base):
     owner_id = Column(String, nullable=False)
 
     # reservations
-    is_active = Column(Boolean, default=True)
-    is_reservable = Column(Boolean, default=True)
-    max_advance_days = Column(Integer, default=30)
+    is_active = Column(Boolean, nullable=False, default=True)
+    is_reservable = Column(Boolean, nullable=False, default=True)
+    max_advance_days = Column(Integer, nullable=False, default=30)
 
     # links to other tables
     reservations = relationship('Reservation',
                                 backref='room',
-                                cascade='all, delete, delete-orphan')
+                                cascade='all, delete-orphan')
 
     bookable_times = relationship('BookableTime',
                                   backref=backref('room', order_by='BookableTime.start_time'),
-                                  cascade='all, delete, delete-orphan')
+                                  cascade='all, delete-orphan')
 
     nonbookable_dates = relationship('Interval',
                                      backref=backref('room', order_by='Interval.end_date desc'),
-                                     cascade='all, delete, delete-orphan')
+                                     cascade='all, delete-orphan')
 
     photos = relationship('Photo',
                           backref='room',
-                          cascade='all, delete, delete-orphan')
+                          cascade='all, delete-orphan')
 
     attributes = relationship('RoomAttribute',
                               backref='room',
-                              cascade='all, delete, delete-orphan')
+                              cascade='all, delete-orphan')
 
     blocked_rooms = relationship('BlockedRoom',
                                  backref='room',
-                                 cascade='all, delete, delete-orphan')
+                                 cascade='all, delete-orphan')
 
     def __repr__(self):
         return '<Room({0}, {1}, {2})>'.format(self.id, self.location_id, self.name)

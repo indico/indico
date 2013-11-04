@@ -30,8 +30,9 @@ class Photo(Base):
     __tablename__ = 'photos'
 
     id = Column(Integer, primary_key=True)
-    room_id = Column(Integer, ForeignKey('rooms.id'))
-    content = Column(LargeBinary)  # or path, url = Column(String)
+    room_id = Column(Integer, ForeignKey('rooms.id'), nullable=False)
+    small_content = Column(LargeBinary, nullable=False)
+    large_content = Column(LargeBinary, nullable=False)  # or path, url = Column(String)
 
     def __repr__(self):
         return '<Photo({0}, {1})>'.format(self.id, self.room_id)

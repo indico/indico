@@ -37,7 +37,7 @@ class Location(Base):
 
     aspects = relationship('Aspect',
                            backref='location',
-                           cascade='all, delete, delete-orphan')
+                           cascade='all, delete-orphan')
 
     default_aspect_id = Column(Integer, ForeignKey('aspects.id',
                                                    use_alter=True,
@@ -45,7 +45,7 @@ class Location(Base):
 
     rooms = relationship('Room',
                          backref='location',
-                         cascade='all, delete, delete-orphan')
+                         cascade='all, delete-orphan')
 
     def __repr__(self):
         return '<Location({0}, {1}, {2})>'.format(self.id, self.default_aspect_id,

@@ -43,7 +43,7 @@ class Reservation(Base):
     id = Column(Integer, primary_key=True)
 
     # dates
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     start_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
     repeat_unit = Column(SmallInteger, nullable=False, default=0)  # week, month, year, etc.
@@ -55,7 +55,7 @@ class Reservation(Base):
     created_by = Column(String, nullable=False)
 
     # room
-    room_id = Column(Integer, ForeignKey('rooms.id'))
+    room_id = Column(Integer, ForeignKey('rooms.id'), nullable=False)
 
     # reservation specific
     contact_email = Column(String)
@@ -69,15 +69,15 @@ class Reservation(Base):
 
     edits = relationship('Edit',
                          backref='reservation',
-                         cascade='all, delete, delete-orphan')
+                         cascade='all, delete-orphan')
 
     attributes = relationship('ReservationAttribute',
                               backref='reservation',
-                              cascade='all, delete, delete-orphan')
+                              cascade='all, delete-orphan')
 
     excluded_dates = relationship('ExcludedDay',
                                   backref=backref('reservation', order_by='ExcludedDay.start_date'),
-                                  cascade='all, delete, delete-orphan')
+                                  cascade='all, delete-orphan')
 
     # moved to reservation (custom) attributes
     # needs_video_conference_support = Column(Boolean, default=False)
