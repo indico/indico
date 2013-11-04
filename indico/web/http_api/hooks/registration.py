@@ -52,6 +52,39 @@ class CheckInHook(EventBaseHook):
             "checkin_date": checkin_date
         }
 
+@HTTPAPIHook.register
+class RegistrantHook(EventBaseHook):
+    RE = r'(?P<event>[\w\s]+)/registrant/(?P<registrant_id>[\w\s]+)'
+    NO_CACHE = True
+
+    def _getParams(self):
+        super(RegistrantHook, self)._getParams()
+        self._secret = get_query_parameter(self._queryParams, ["secret"])
+        self._conf = ConferenceHolder().getById(self._pathParams['event'])
+        registrant_id = self._pathParams["registrant_id"]
+        self._registrant = self._conf.getRegistrantById(registrant_id)
+        self._type = "registrant"
+
+    def _hasAccess(self, aw):
+        return self._conf.canManageRegistration(aw.getUser()) and self._secret == self._registrant.getCheckInUUID()
+
+    def export_registrant(self, aw):
+        registration_date = format_datetime(self._registrant.getAdjustedRegistrationDate())
+        checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate())
+        self._registrant.getPayed()
+        result = {
+            "id": self._registrant.getId(),
+            "full_name": self._registrant.getFullName(),
+            "checked_in": self._registrant.isCheckedIn(),
+            "checkin_date": checkin_date if self._registrant.isCheckedIn() else None,
+            "registration_date": registration_date,
+            "payed": self._registrant.getPayed() if self._conf.getModPay().isActivated() else None,
+            "pay_amount": self._registrant.getTotal() if self._conf.getModPay().isActivated() else None
+        }
+        regForm = self._conf.getRegistrationForm()
+        personalData = regForm.getPersonalData().getRegistrantValues(self._registrant)
+        result.update(personalData)
+        return result
 
 @HTTPAPIHook.register
 class RegistrantsHook(EventBaseHook):
@@ -71,17 +104,10 @@ class RegistrantsHook(EventBaseHook):
         registrants = self._conf.getRegistrantsList()
         registrant_list = []
         for registrant in registrants:
-            registration_date = format_datetime(registrant.getAdjustedRegistrationDate())
-            checkin_date = format_datetime(registrant.getAdjustedCheckInDate())
             reg = {
                 "id": registrant.getId(),
                 "full_name": registrant.getFullName(title=True, firstNameFirst=True),
-                "checked_in": registrant.isCheckedIn(),
-                "checkin_date": checkin_date,
-                "registration_date": registration_date,
                 "secret": registrant.getCheckInUUID(),
-                "payed": registrant.getPayed() if self._conf.getModPay().isActivated() else None,
-                "pay_amount": registrant.getTotal() if self._conf.getModPay().isActivated() else None
             }
             regForm = self._conf.getRegistrationForm()
             reg.update(regForm.getPersonalData().getRegistrantValues(registrant))
