@@ -21,13 +21,14 @@ ndDirectives.directive("ndDialog", function() {
     return {
         restrict: 'E',
         scope: {
-            heading: '@',
             show: '=',
+            heading: '@',
             okButton: '@',
             okCallback: '&',
             cancelButton: '@',
             cancelCallback: '&',
-            data: "@"
+            data: "=",
+            asyncData: '@'
         },
 
         controller: function($scope) {
@@ -47,10 +48,31 @@ ndDirectives.directive("ndDialog", function() {
             };
         },
 
-        link: function(scope, element, attrs) {
+        link: function(scope, element) {
+            scope.$watch("show", function(val) {
+                if (scope.show === true) {
+                    dialog.open();
+                } else {
+                    dialog.close();
+                }
+            });
+
+            scope.$watch('heading', function(val) {
+                dialog.title = val;
+                dialog.canvas = null;
+            });
+
+            scope.$watch('okButton', function() {
+                scope.okButton = scope.okButton || $T('Ok');
+            });
+
+            scope.$watch('cancelButton', function() {
+                scope.cancelButton = scope.cancelButton || $T('Cancel');
+            });
+
             var dialog = new ExclusivePopupWithButtons(
-                attrs.heading,
-                scope.close,
+                scope.heading,
+                scope.cancel,
                 false,
                 false,
                 true
@@ -60,10 +82,10 @@ ndDirectives.directive("ndDialog", function() {
 
             dialog._getButtons = function() {
                 return [
-                    [attrs.okButton, function() {
+                    [scope.okButton, function() {
                         scope.ok();
                     }],
-                    [attrs.cancelButton, function() {
+                    [scope.cancelButton, function() {
                         scope.cancel();
                     }]
                 ];
@@ -72,19 +94,6 @@ ndDirectives.directive("ndDialog", function() {
             dialog.draw = function() {
                 return this.ExclusivePopupWithButtons.prototype.draw.call(this, element);
             };
-
-            scope.$watch("show", function() {
-                if (scope.show === true) {
-                    dialog.open();
-                } else {
-                    dialog.close();
-                }
-            });
-
-            attrs.$observe('heading', function(val) {
-                dialog.title = val;
-                dialog.canvas = null;
-            });
 
             dialog.draw();
         }
