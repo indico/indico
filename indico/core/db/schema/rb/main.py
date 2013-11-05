@@ -23,15 +23,14 @@ Schema and graph generator
 
 import argparse
 
-from sqlalchemy import create_engine, MetaData
 from sqlalchemy_schemadisplay import create_schema_graph
-# from sqlalchemy.orm import sessionmaker
 
-from indico.core.db.schema import Base, load_room_booking
+from indico.web.flask.app import make_app
+from indico.core.db.schema import db, load_room_booking
 
 
-def generate_schema_graph(db='test.db', output='test.png'):
-    graph = create_schema_graph(metadata=MetaData('sqlite:///' + db),
+def generate_schema_graph(uri='sqlite:///test.db', output='test.png'):
+    graph = create_schema_graph(metadata=db.MetaData(uri),
                                 show_datatypes=False,
                                 show_indexes=False,
                                 rankdir='LR', # or TP
@@ -39,13 +38,13 @@ def generate_schema_graph(db='test.db', output='test.png'):
     graph.write_png(output)
 
 
-def generate_schema(db='test.db', checkfirst=True, echo=True):
-    engine = create_engine('sqlite:///' + db, echo=echo)
+def generate_schema(uri='sqlite:///test.db', checkfirst=True, echo=True):
+    app = make_app()
+    app.config['SQLALCHEMY_DATABASE_URI'] = uri
     load_room_booking()
-    Base.metadata.create_all(engine, checkfirst=checkfirst)
-    # Session = sessionmaker(bind=engine)
-    # session = Session()
-    print 'everything is fine for now!'
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()
 
 
 if __name__ == '__main__':
