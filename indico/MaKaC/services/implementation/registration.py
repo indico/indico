@@ -97,7 +97,7 @@ class ConferenceEticketQRCode(RegistrationModifBase):
         oauth_checkin = consumers["indico-checkin"]
         config = Config.getInstance()
         baseURL = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
-        qr_data = {"id": self._conf.getId(),
+        qr_data = {"event_id": self._conf.getId(),
                    "title": self._conf.getTitle(),
                    "date": format_date(self._conf.getAdjustedStartDate()),
                    "server": {"baseUrl": baseURL,

@@ -3220,7 +3220,7 @@ class TicketToPDF(PDFBase):
         )
         config = Config.getInstance()
         baseURL = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
-        qr_data = {"id": self._registrant.getId(),
+        qr_data = {"registrant_id": self._registrant.getId(),
                    "secret": self._registrant.getCheckInUUID(),
                    "event_id": self._conf.getId(),
                    "server_url": baseURL

@@ -23,7 +23,7 @@ from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico.web.http_api.hooks.event import EventBaseHook
 from indico.web.http_api.util import get_query_parameter
 
-from indico.util.date_time import format_datetime
+from indico.util.date_time import format_datetime, format_date
 
 
 @HTTPAPIHook.register
@@ -69,12 +69,12 @@ class RegistrantHook(EventBaseHook):
         return self._conf.canManageRegistration(aw.getUser()) and self._secret == self._registrant.getCheckInUUID()
 
     def export_registrant(self, aw):
-        registration_date = format_datetime(self._registrant.getAdjustedRegistrationDate())
+        registration_date = format_date(self._registrant.getAdjustedRegistrationDate())
         checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate())
         self._registrant.getPayed()
         result = {
-            "id": self._registrant.getId(),
-            "full_name": self._registrant.getFullName(),
+            "registrant_id": self._registrant.getId(),
+            "full_name": self._registrant.getFullName(title=True, firstNameFirst=True),
             "checked_in": self._registrant.isCheckedIn(),
             "checkin_date": checkin_date if self._registrant.isCheckedIn() else None,
             "registration_date": registration_date,
@@ -105,7 +105,7 @@ class RegistrantsHook(EventBaseHook):
         registrant_list = []
         for registrant in registrants:
             reg = {
-                "id": registrant.getId(),
+                "registrant_id": registrant.getId(),
                 "full_name": registrant.getFullName(title=True, firstNameFirst=True),
                 "secret": registrant.getCheckInUUID(),
             }
