@@ -42,7 +42,7 @@ class DummyConnection():
     """
     Used so that we can use context managers for database connections
     without producing failures when RB is not active.
-    Of course tis is not the ideal solution, but it's the best possible
+    Of course this is not the ideal solution, but it's the best possible
     without changing the whole RB DB code.
     """
     def transaction(self):
