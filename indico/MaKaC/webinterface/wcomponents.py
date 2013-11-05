@@ -81,6 +81,8 @@ from indico.web.http_api.auth import APIKey
 from indico.web.http_api.util import generate_public_auth_request
 import pkgutil
 import pkg_resources
+from MaKaC.common.Announcement import getAnnoucementMgrInstance
+import hashlib
 
 
 MIN_PRESENT_EVENTS = 6
@@ -385,9 +387,14 @@ class WHeader(WTemplated):
         vars["adminItemList"] = adminItemList
         vars["getProtection"] = lambda x: self._getProtection(x)
 
+        announcement_header = getAnnoucementMgrInstance().getText()
+        vars["announcement_header"] = announcement_header
+        vars["md5_announcement_header"] = hashlib.sha224(announcement_header).hexdigest()
+
         return vars
 
-class WStaticWebHeader( WTemplated ):
+
+class WStaticWebHeader(WTemplated):
     """Templating web component for generating the HTML header for
         the static web interface when generating a DVD.
     """
