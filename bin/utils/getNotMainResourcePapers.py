@@ -52,6 +52,3 @@ if not error:
     print "No error. The change are saved"
 else:
     print "There were errors. The changes was not saved"
-
-
-
