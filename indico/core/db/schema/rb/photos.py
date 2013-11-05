@@ -21,18 +21,16 @@
 Schema of a photo for rooms
 """
 
-from sqlalchemy import Column, ForeignKey, Integer, LargeBinary
-
-from indico.core.db.schema import Base
+from indico.core.db.schema import db
 
 
-class Photo(Base):
+class Photo(db.Model):
     __tablename__ = 'photos'
 
-    id = Column(Integer, primary_key=True)
-    room_id = Column(Integer, ForeignKey('rooms.id'), nullable=False)
-    small_content = Column(LargeBinary, nullable=False)
-    large_content = Column(LargeBinary, nullable=False)  # or path, url = Column(String)
+    id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), nullable=False)
+    small_content = db.Column(db.LargeBinary, nullable=False)
+    large_content = db.Column(db.LargeBinary, nullable=False)  # or path, url = Column(String)
 
     def __repr__(self):
         return '<Photo({0}, {1})>'.format(self.id, self.room_id)

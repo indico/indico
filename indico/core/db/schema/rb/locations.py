@@ -21,31 +21,28 @@
 Holder of rooms in a place and its map view related data
 """
 
-from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
-
-from indico.core.db.schema import Base
+from indico.core.db.schema import db
 
 
-class Location(Base):
+class Location(db.Model):
     __tablename__ = 'locations'
 
-    id = Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
-    name = Column(String, nullable=False)
-    support_emails = Column(String)
+    name = db.Column(db.String, nullable=False)
+    support_emails = db.Column(db.String)
 
-    aspects = relationship('Aspect',
-                           backref='location',
-                           cascade='all, delete-orphan')
+    aspects = db.relationship('Aspect',
+                              backref='location',
+                              cascade='all, delete-orphan')
 
-    default_aspect_id = Column(Integer, ForeignKey('aspects.id',
-                                                   use_alter=True,
-                                                   name='fk_default_aspect_id'))
+    default_aspect_id = db.Column(db.Integer, db.ForeignKey('aspects.id',
+                                                            use_alter=True,
+                                                            name='fk_default_aspect_id'))
 
-    rooms = relationship('Room',
-                         backref='location',
-                         cascade='all, delete-orphan')
+    rooms = db.relationship('Room',
+                            backref='location',
+                            cascade='all, delete-orphan')
 
     def __repr__(self):
         return '<Location({0}, {1}, {2})>'.format(self.id, self.default_aspect_id,

@@ -21,18 +21,16 @@
 Dates to skip in a reservation
 """
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer
-
-from indico.core.db.schema import Base
+from indico.core.db.schema import db
 
 
-class ExcludedDay(Base):
+class ExcludedDay(db.Model):
     __tablename__ = 'reservation_excluded_days'
 
-    start_date = Column(DateTime, nullable=False, primary_key=True)
-    end_date = Column(DateTime, nullable=False, primary_key=True)
+    start_date = db.Column(db.DateTime, nullable=False, primary_key=True)
+    end_date = db.Column(db.DateTime, nullable=False, primary_key=True)
 
-    reservation_id = Column(Integer, ForeignKey('reservations.id'), nullable=False)
+    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), nullable=False)
 
     def __repr__(self):
         return '<ExcludedDay({0}, {1}, {2})>'.format(self.reservation_id,

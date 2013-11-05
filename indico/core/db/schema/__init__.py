@@ -21,9 +21,9 @@ import glob
 import importlib
 import os
 
-from sqlalchemy.ext.declarative import declarative_base
+from flask.ext.sqlalchemy import SQLAlchemy
 
-Base = declarative_base()
+db = SQLAlchemy()
 
 
 def load(package):

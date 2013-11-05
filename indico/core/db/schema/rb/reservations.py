@@ -23,61 +23,50 @@ Schema of a reservation
 
 from datetime import datetime
 
-from sqlalchemy import (
-    Boolean,
-    Column,
-    DateTime,
-    ForeignKey,
-    Integer,
-    SmallInteger,
-    String
-)
-from sqlalchemy.orm import relationship, backref
-
-from indico.core.db.schema import Base
+from indico.core.db.schema import db
 
 
-class Reservation(Base):
+class Reservation(db.Model):
     __tablename__ = 'reservations'
 
-    id = Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
     # dates
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    start_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
-    repeat_unit = Column(SmallInteger, nullable=False, default=0)  # week, month, year, etc.
-    repeat_period = Column(SmallInteger, nullable=False, default=0)  # 1, 2, 3, etc.
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    start_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
+    repeat_unit = db.Column(db.SmallInteger, nullable=False, default=0)  # week, month, year, etc.
+    repeat_period = db.Column(db.SmallInteger, nullable=False, default=0)  # 1, 2, 3, etc.
 
     # user
-    booked_for_id = Column(String, nullable=False)
-    booked_for_name = Column(String, nullable=False)
-    created_by = Column(String, nullable=False)
+    booked_for_id = db.Column(db.String, nullable=False)
+    booked_for_name = db.Column(db.String, nullable=False)
+    created_by = db.Column(db.String, nullable=False)
 
     # room
-    room_id = Column(Integer, ForeignKey('rooms.id'), nullable=False)
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), nullable=False)
 
     # reservation specific
-    contact_email = Column(String)
-    contact_phone = Column(String)
+    contact_email = db.Column(db.String)
+    contact_phone = db.Column(db.String)
 
-    is_confirmed = Column(Boolean, nullable=False)
-    is_cancelled = Column(Boolean, nullable=False, default=False)
-    is_rejected = Column(Boolean, nullable=False, default=False)
+    is_confirmed = db.Column(db.Boolean, nullable=False)
+    is_cancelled = db.Column(db.Boolean, nullable=False, default=False)
+    is_rejected = db.Column(db.Boolean, nullable=False, default=False)
 
-    reason = Column(String, nullable=False)
+    reason = db.Column(db.String, nullable=False)
 
-    edits = relationship('Edit',
-                         backref='reservation',
-                         cascade='all, delete-orphan')
+    edits = db.relationship('Edit',
+                            backref='reservation',
+                            cascade='all, delete-orphan')
 
-    attributes = relationship('ReservationAttribute',
-                              backref='reservation',
-                              cascade='all, delete-orphan')
+    attributes = db.relationship('ReservationAttribute',
+                                 backref='reservation',
+                                 cascade='all, delete-orphan')
 
-    excluded_dates = relationship('ExcludedDay',
-                                  backref=backref('reservation', order_by='ExcludedDay.start_date'),
-                                  cascade='all, delete-orphan')
+    excluded_dates = db.relationship('ExcludedDay',
+                                     backref=db.backref('reservation', order_by='ExcludedDay.start_date'),
+                                     cascade='all, delete-orphan')
 
     # moved to reservation (custom) attributes
     # needs_video_conference_support = Column(Boolean, default=False)

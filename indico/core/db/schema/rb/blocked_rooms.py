@@ -21,21 +21,19 @@
 Schema of a blocked room (rejection and notification info about blocking)
 """
 
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-
-from indico.core.db.schema import Base
+from indico.core.db.schema import db
 
 
-class BlockedRoom(Base):
+class BlockedRoom(db.Model):
     __tablename__ = 'blocked_rooms'
 
-    is_active = Column(Boolean, nullable=False, default=False)
-    notification_sent = Column(Boolean, nullable=False, default=False)
-    rejected_by = Column(String)
-    rejection_reason = Column(String)
+    is_active = db.Column(db.Boolean, nullable=False, default=False)
+    notification_sent = db.Column(db.Boolean, nullable=False, default=False)
+    rejected_by = db.Column(db.String)
+    rejection_reason = db.Column(db.String)
 
-    blocking_id = Column(Integer, ForeignKey('blockings.id'), primary_key=True, nullable=False)
-    room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True, nullable=False)
+    blocking_id = db.Column(db.Integer, db.ForeignKey('blockings.id'), primary_key=True, nullable=False)
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), primary_key=True, nullable=False)
 
     def __repr__(self):
         return '<BlockedRoom({0}, {1}, {2})>'.format(self.blocking_id, self.room_id,

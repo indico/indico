@@ -21,18 +21,16 @@
 Custom attributes for reservations
 """
 
-from sqlalchemy import Column, ForeignKey, Integer, String
-
-from indico.core.db.schema import Base
+from indico.core.db.schema import db
 
 
-class ReservationAttribute(Base):
+class ReservationAttribute(db.Model):
     __tablename__ = 'reservation_attributes'
 
-    key = Column(String, nullable=False, primary_key=True)
-    value = Column(String, nullable=False)
+    key = db.Column(db.String, nullable=False, primary_key=True)
+    value = db.Column(db.String, nullable=False)
 
-    reservation_id = Column(Integer, ForeignKey('reservations.id'), primary_key=True, nullable=False)
+    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), primary_key=True, nullable=False)
 
     def __repr__(self):
         return '<ReservationAttribute({0}, {1}, {2})>'.format(self.reservation_id,

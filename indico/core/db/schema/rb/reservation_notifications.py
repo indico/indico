@@ -21,16 +21,14 @@
 Sent notifications of a reservation
 """
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer
-
-from indico.core.db.schema import Base
+from indico.core.db.schema import db
 
 
-class ReservationNotification(Base):
+class ReservationNotification(db.Model):
     __tablename__ = 'reservation_notifications'
 
-    reservation_id = Column(Integer, ForeignKey('reservations.id'), primary_key=True, nullable=False)
-    occurrence = Column(DateTime, nullable=False, primary_key=True)
+    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), primary_key=True, nullable=False)
+    occurrence = db.Column(db.DateTime, nullable=False, primary_key=True)
 
     def __repr__(self):
         return '<ReservationNotification({0}, {1})>'.format(self.reservation_id,

@@ -21,18 +21,16 @@
 Available times to book for rooms
 """
 
-from sqlalchemy import Column, ForeignKey, Integer, Time
-
-from indico.core.db.schema import Base
+from indico.core.db.schema import db
 
 
-class BookableTime(Base):
+class BookableTime(db.Model):
     __tablename__ = 'room_bookable_times'
 
-    start_time = Column(Time, nullable=False, primary_key=True)
-    end_time = Column(Time, nullable=False, primary_key=True)
+    start_time = db.Column(db.Time, nullable=False, primary_key=True)
+    end_time = db.Column(db.Time, nullable=False, primary_key=True)
 
-    room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True, nullable=False)
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), primary_key=True, nullable=False)
 
     def __repr__(self):
         return '<BookableTime({0}, {1}, {2})>'.format(self.room_id,

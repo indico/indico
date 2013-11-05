@@ -21,26 +21,24 @@
 A view of map of rooms in a specific location
 """
 
-from sqlalchemy import Column, ForeignKey, Integer, SmallInteger, String
-
-from indico.core.db.schema import Base
+from indico.core.db.schema import db
 
 
-class Aspect(Base):
+class Aspect(db.Model):
     __tablename__ = 'aspects'
 
-    id = Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
-    name = Column(String, nullable=False)
-    center_latitude = Column(String, nullable=False)
-    center_longitude = Column(String, nullable=False)
-    zoom_level = Column(SmallInteger, nullable=False)
-    top_left_latitude = Column(String, nullable=False)
-    top_left_longitude = Column(String, nullable=False)
-    bottom_right_latitude = Column(String, nullable=False)
-    bottom_right_longitude = Column(String, nullable=False)
+    name = db.Column(db.String, nullable=False)
+    center_latitude = db.Column(db.String, nullable=False)
+    center_longitude = db.Column(db.String, nullable=False)
+    zoom_level = db.Column(db.SmallInteger, nullable=False)
+    top_left_latitude = db.Column(db.String, nullable=False)
+    top_left_longitude = db.Column(db.String, nullable=False)
+    bottom_right_latitude = db.Column(db.String, nullable=False)
+    bottom_right_longitude = db.Column(db.String, nullable=False)
 
-    location_id = Column(Integer, ForeignKey('locations.id'), nullable=False)
+    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
 
     def __repr__(self):
         return '<Aspect({0}, {1}, {2})>'.format(self.id, self.location_id, self.name)

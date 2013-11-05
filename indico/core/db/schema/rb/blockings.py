@@ -23,30 +23,27 @@ Schema of a blocking (dates, related rooms and principals)
 
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Integer, String
-from sqlalchemy.orm import relationship
-
-from indico.core.db.schema import Base
+from indico.core.db.schema import db
 
 
-class Blocking(Base):
+class Blocking(db.Model):
     __tablename__ = 'blockings'
 
-    id = Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
-    created_by = Column(String, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    start_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=False)
+    created_by = db.Column(db.String, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    start_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
 
-    reason = Column(String, nullable=False)
-    allowed = relationship('BlockingPrincipal',
-                           backref='blocking',
-                           cascade='all, delete-orphan')
+    reason = db.Column(db.String, nullable=False)
+    allowed = db.relationship('BlockingPrincipal',
+                              backref='blocking',
+                              cascade='all, delete-orphan')
 
-    blocked_rooms = relationship('BlockedRoom',
-                                 backref='blocking',
-                                 cascade='all, delete-orphan')
+    blocked_rooms = db.relationship('BlockedRoom',
+                                    backref='blocking',
+                                    cascade='all, delete-orphan')
 
     def __repr__(self):
         return '<Blocking({0}, {1}, {2}, {3}, {4})>'.format(self.id, self.created_by,

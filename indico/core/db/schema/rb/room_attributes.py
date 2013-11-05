@@ -21,18 +21,16 @@
 Custom attributes for rooms
 """
 
-from sqlalchemy import Column, ForeignKey, Integer, String
-
-from indico.core.db.schema import Base
+from indico.core.db.schema import db
 
 
-class RoomAttribute(Base):
+class RoomAttribute(db.Model):
     __tablename__ = 'room_attributes'
 
-    key = Column(String, nullable=False, primary_key=True)
-    value = Column(String, nullable=False)
+    key = db.Column(db.String, nullable=False, primary_key=True)
+    value = db.Column(db.String, nullable=False)
 
-    room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True, nullable=False)
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), primary_key=True, nullable=False)
 
     def __repr__(self):
         return '<RoomAttribute({0}, {1}, {2})>'.format(self.room_id,

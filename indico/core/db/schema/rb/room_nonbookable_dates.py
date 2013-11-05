@@ -21,18 +21,16 @@
 Nonbookable dates of rooms
 """
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer
-
-from indico.core.db.schema import Base
+from indico.core.db.schema import db
 
 
-class NonBookableDate(Base):
+class NonBookableDate(db.Model):
     __tablename__ = 'room_nonbookable_dates'
 
-    start_date = Column(DateTime, nullable=False, primary_key=True)
-    end_date = Column(DateTime, nullable=False, primary_key=True)
+    start_date = db.Column(db.DateTime, nullable=False, primary_key=True)
+    end_date = db.Column(db.DateTime, nullable=False, primary_key=True)
 
-    room_id = Column(Integer, ForeignKey('rooms.id'), primary_key=True, nullable=False)
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), primary_key=True, nullable=False)
 
     def __repr__(self):
         return '<NonBookableDate({0}, {1}, {2})>'.format(self.room_id,
