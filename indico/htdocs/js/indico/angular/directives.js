@@ -18,6 +18,8 @@
 var ndDirectives = angular.module("ndDirectives", []);
 
 ndDirectives.directive("ndDialog", function() {
+    var toclean = [];
+
     return {
         restrict: 'E',
         scope: {
@@ -27,12 +29,16 @@ ndDirectives.directive("ndDialog", function() {
             okCallback: '&',
             cancelButton: '@',
             cancelCallback: '&',
+            api: '=',
             data: "=",
             asyncData: '@'
         },
 
         controller: function($scope) {
+            $scope.cleanup = function() {};
+
             $scope.close = function() {
+                $scope.cleanup();
                 $scope.show = false;
                 $scope.$apply($scope.show);
             };
@@ -49,27 +55,6 @@ ndDirectives.directive("ndDialog", function() {
         },
 
         link: function(scope, element) {
-            scope.$watch("show", function(val) {
-                if (scope.show === true) {
-                    dialog.open();
-                } else {
-                    dialog.close();
-                }
-            });
-
-            scope.$watch('heading', function(val) {
-                dialog.title = val;
-                dialog.canvas = null;
-            });
-
-            scope.$watch('okButton', function() {
-                scope.okButton = scope.okButton || $T('Ok');
-            });
-
-            scope.$watch('cancelButton', function() {
-                scope.cancelButton = scope.cancelButton || $T('Cancel');
-            });
-
             var dialog = new ExclusivePopupWithButtons(
                 scope.heading,
                 scope.cancel,
@@ -94,6 +79,28 @@ ndDirectives.directive("ndDialog", function() {
             dialog.draw = function() {
                 return this.ExclusivePopupWithButtons.prototype.draw.call(this, element);
             };
+
+            scope.$watch("show", function(val) {
+                if (scope.show === true) {
+                    dialog.draw();
+                    dialog.open();
+                } else {
+                    dialog.close();
+                }
+            });
+
+            scope.$watch('heading', function(val) {
+                dialog.title = val;
+                dialog.canvas = null;
+            });
+
+            scope.$watch('okButton', function() {
+                scope.okButton = scope.okButton || $T('Ok');
+            });
+
+            scope.$watch('cancelButton', function() {
+                scope.cancelButton = scope.cancelButton || $T('Cancel');
+            });
 
             dialog.draw();
         }
