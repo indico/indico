@@ -43,11 +43,11 @@ class Room(db.Model):
     number = db.Column(db.String, nullable=False)
 
     # notifications
-    resv_end_notification = db.Column(db.Boolean, nullable=False, default=True)
-    resv_start_notification = db.Column(db.Integer, nullable=False, default=0)
-    resvs_need_confirmation = db.Column(db.Boolean, nullable=False, default=False)
-    resv_notification_to_assistance = db.Column(db.Boolean, nullable=False, default=True)
-    resv_notification_to_responsible = db.Column(db.Boolean, nullable=False, default=True)
+    notification_for_start = db.Column(db.Integer, nullable=False, default=0)
+    notification_for_end = db.Column(db.Boolean, nullable=False, default=True)
+    notification_for_responsible = db.Column(db.Boolean, nullable=False, default=True)
+    notification_for_assistance = db.Column(db.Boolean, nullable=False, default=True)
+    reservations_need_confirmation = db.Column(db.Boolean, nullable=False, default=False)
 
     # extra info about room
     telephone = db.Column(db.String)
