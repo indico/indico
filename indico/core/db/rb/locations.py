@@ -21,7 +21,7 @@
 Holder of rooms in a place and its map view related data
 """
 
-from indico.core.db.schema import db
+from indico.core.db import db
 
 
 class Location(db.Model):

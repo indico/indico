@@ -18,19 +18,22 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Schema of a photo for rooms
+Schema of modifications done on a reservation
 """
 
-from indico.core.db.schema import db
+from datetime import datetime
+
+from indico.core.db import db
 
 
-class Photo(db.Model):
-    __tablename__ = 'photos'
+class Edit(db.Model):
+    __tablename__ = 'reservation_edits'
 
-    id = db.Column(db.Integer, primary_key=True)
-    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), nullable=False)
-    small_content = db.Column(db.LargeBinary, nullable=False)
-    large_content = db.Column(db.LargeBinary, nullable=False)  # or path, url = Column(String)
+    timestamp = db.Column(db.DateTime, primary_key=True, nullable=False, default=datetime.utcnow)
+    info = db.Column(db.String, nullable=False)
+    avatar_id = db.Column(db.String, nullable=False, primary_key=True)
+    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), primary_key=True, nullable=False)
 
     def __repr__(self):
-        return '<Photo({0}, {1})>'.format(self.id, self.room_id)
+        return '<Edit({0}, {1}, {2}, {3})>'.format(self.avatar_id, self.reservation_id,
+                                                   self.timestamp, self.info)

@@ -21,7 +21,7 @@
 A view of map of rooms in a specific location
 """
 
-from indico.core.db.schema import db
+from indico.core.db import db
 
 
 class Aspect(db.Model):

@@ -18,21 +18,21 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Nonbookable dates of rooms
+Custom attributes for reservations
 """
 
-from indico.core.db.schema import db
+from indico.core.db import db
 
 
-class NonBookableDate(db.Model):
-    __tablename__ = 'room_nonbookable_dates'
+class ReservationAttribute(db.Model):
+    __tablename__ = 'reservation_attributes'
 
-    start_date = db.Column(db.DateTime, nullable=False, primary_key=True)
-    end_date = db.Column(db.DateTime, nullable=False, primary_key=True)
+    key = db.Column(db.String, nullable=False, primary_key=True)
+    value = db.Column(db.String, nullable=False)
 
-    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), primary_key=True, nullable=False)
+    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), primary_key=True, nullable=False)
 
     def __repr__(self):
-        return '<NonBookableDate({0}, {1}, {2})>'.format(self.room_id,
-                                                         self.start_date,
-                                                         self.end_date)
+        return '<ReservationAttribute({0}, {1}, {2})>'.format(self.reservation_id,
+                                                              self.key,
+                                                              self.value)

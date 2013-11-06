@@ -19,5 +19,23 @@
 
 __all__ = ['DBMgr', 'MigratedDB']
 
+import glob
+import importlib
+import os
+
+from flask.ext.sqlalchemy import SQLAlchemy
+
 from .manager import DBMgr
 from .migration import MigratedDB
+
+
+db = SQLAlchemy()
+
+
+def load(package):
+    for f in glob.glob(os.path.dirname(__file__) + '/{0}/*.py'.format(package)):
+        importlib.import_module('.' + os.path.basename(f)[:-3], __package__ + '.' + package)
+
+
+def load_room_booking():
+    load('rb')

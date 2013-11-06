@@ -17,19 +17,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import glob
-import importlib
-import os
+"""
+Dates to skip in a reservation
+"""
 
-from flask.ext.sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from indico.core.db import db
 
 
-def load(package):
-    for f in glob.glob(os.path.dirname(__file__) + '/{0}/*.py'.format(package)):
-        importlib.import_module('.' + os.path.basename(f)[:-3], __package__ + '.' + package)
+class ExcludedDay(db.Model):
+    __tablename__ = 'reservation_excluded_days'
 
+    start_date = db.Column(db.DateTime, nullable=False, primary_key=True)
+    end_date = db.Column(db.DateTime, nullable=False, primary_key=True)
 
-def load_room_booking():
-    load('rb')
+    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), nullable=False)
+
+    def __repr__(self):
+        return '<ExcludedDay({0}, {1}, {2})>'.format(self.reservation_id,
+                                                     self.start_date,
+                                                     self.end_date)

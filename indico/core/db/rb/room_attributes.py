@@ -18,20 +18,21 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Schema of a principal (user or group that isn't affected by blocking)
+Custom attributes for rooms
 """
 
-from indico.core.db.schema import db
+from indico.core.db import db
 
 
-class BlockingPrincipal(db.Model):
-    __tablename__ = 'blocking_principals'
+class RoomAttribute(db.Model):
+    __tablename__ = 'room_attributes'
 
-    blocking_id = db.Column(db.Integer, db.ForeignKey('blockings.id'), primary_key=True, nullable=False)
-    entity_type = db.Column(db.String, primary_key=True, nullable=False)
-    entity_id = db.Column(db.String, primary_key=True, nullable=False)
+    key = db.Column(db.String, nullable=False, primary_key=True)
+    value = db.Column(db.String, nullable=False)
+
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), primary_key=True, nullable=False)
 
     def __repr__(self):
-        return '<BlockingPrincipal({0}, {1}, {2})>'.format(self.blocking_id,
-                                                           self.entity_id,
-                                                           self.entity_type)
+        return '<RoomAttribute({0}, {1}, {2})>'.format(self.room_id,
+                                                       self.key,
+                                                       self.value)

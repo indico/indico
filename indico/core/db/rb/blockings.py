@@ -23,7 +23,7 @@ Schema of a blocking (dates, related rooms and principals)
 
 from datetime import datetime
 
-from indico.core.db.schema import db
+from indico.core.db import db
 
 
 class Blocking(db.Model):

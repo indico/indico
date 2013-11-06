@@ -18,22 +18,21 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Schema of modifications done on a reservation
+Available times to book for rooms
 """
 
-from datetime import datetime
-
-from indico.core.db.schema import db
+from indico.core.db import db
 
 
-class Edit(db.Model):
-    __tablename__ = 'reservation_edits'
+class BookableTime(db.Model):
+    __tablename__ = 'room_bookable_times'
 
-    timestamp = db.Column(db.DateTime, primary_key=True, nullable=False, default=datetime.utcnow)
-    info = db.Column(db.String, nullable=False)
-    avatar_id = db.Column(db.String, nullable=False, primary_key=True)
-    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), primary_key=True, nullable=False)
+    start_time = db.Column(db.Time, nullable=False, primary_key=True)
+    end_time = db.Column(db.Time, nullable=False, primary_key=True)
+
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), primary_key=True, nullable=False)
 
     def __repr__(self):
-        return '<Edit({0}, {1}, {2}, {3})>'.format(self.avatar_id, self.reservation_id,
-                                                   self.timestamp, self.info)
+        return '<BookableTime({0}, {1}, {2})>'.format(self.room_id,
+                                                      self.start_time,
+                                                      self.end_time)

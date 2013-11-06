@@ -21,7 +21,7 @@
 Schema of a room
 """
 
-from indico.core.db.schema import db
+from indico.core.db import db
 
 
 class Room(db.Model):

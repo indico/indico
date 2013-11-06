@@ -18,21 +18,19 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Dates to skip in a reservation
+Schema of a photo for rooms
 """
 
-from indico.core.db.schema import db
+from indico.core.db import db
 
 
-class ExcludedDay(db.Model):
-    __tablename__ = 'reservation_excluded_days'
+class Photo(db.Model):
+    __tablename__ = 'photos'
 
-    start_date = db.Column(db.DateTime, nullable=False, primary_key=True)
-    end_date = db.Column(db.DateTime, nullable=False, primary_key=True)
-
-    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), nullable=False)
+    small_content = db.Column(db.LargeBinary, nullable=False)
+    large_content = db.Column(db.LargeBinary, nullable=False)  # or path, url = Column(String)
 
     def __repr__(self):
-        return '<ExcludedDay({0}, {1}, {2})>'.format(self.reservation_id,
-                                                     self.start_date,
-                                                     self.end_date)
+        return '<Photo({0}, {1})>'.format(self.id, self.room_id)

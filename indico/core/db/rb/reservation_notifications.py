@@ -18,21 +18,18 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Available times to book for rooms
+Sent notifications of a reservation
 """
 
-from indico.core.db.schema import db
+from indico.core.db import db
 
 
-class BookableTime(db.Model):
-    __tablename__ = 'room_bookable_times'
+class ReservationNotification(db.Model):
+    __tablename__ = 'reservation_notifications'
 
-    start_time = db.Column(db.Time, nullable=False, primary_key=True)
-    end_time = db.Column(db.Time, nullable=False, primary_key=True)
-
-    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), primary_key=True, nullable=False)
+    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), primary_key=True, nullable=False)
+    occurrence = db.Column(db.DateTime, nullable=False, primary_key=True)
 
     def __repr__(self):
-        return '<BookableTime({0}, {1}, {2})>'.format(self.room_id,
-                                                      self.start_time,
-                                                      self.end_time)
+        return '<ReservationNotification({0}, {1})>'.format(self.reservation_id,
+                                                            self.occurrence)
