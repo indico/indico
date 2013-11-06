@@ -389,7 +389,7 @@ class WHeader(WTemplated):
 
         announcement_header = getAnnoucementMgrInstance().getText()
         vars["announcement_header"] = announcement_header
-        vars["md5_announcement_header"] = hashlib.sha224(announcement_header).hexdigest()
+        vars["announcement_header_hash"] = hashlib.sha224(announcement_header).hexdigest()
 
         return vars
 

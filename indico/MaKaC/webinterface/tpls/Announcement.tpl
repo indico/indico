@@ -7,12 +7,12 @@
     </div>
     <script type="text/javascript">
     $('#closeAnnouncement').click(function(){
-        $.jStorage.set("hideAnnouncement", "${ md5_announcement_header }");
+        $.jStorage.set("hideAnnouncement", "${ announcement_header_hash }");
         $('#announcementHeader').slideUp("fast");
     });
 
     $(function() {
-        if($.jStorage.get("hideAnnouncement") != "${ md5_announcement_header }"){
+        if($.jStorage.get("hideAnnouncement") != "${ announcement_header_hash }"){
             $("#announcementHeader").show();
         }
      });
