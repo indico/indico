@@ -1,0 +1,17 @@
+<form id="newSectionForm">
+    <div class="regFormSectionNewSection">
+        <input type="text" ng-model="newfield.title"
+            name="title"
+            size="50px"
+            class="regFormTitleInputMgmt"
+            placeholder="{{ 'new section name' | i18n }}"
+            required>
+        <textarea ng-model="newfield.description"
+            name="description"
+            rows="4"
+            cols="50px"
+            class="regFormDescriptionInputMgmt"
+            placeholder="{{ 'Description' | i18n }}">
+        </textarea>
+    </div>
+</form>

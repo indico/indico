@@ -19,23 +19,25 @@ var ndRegForm = angular.module('nd.regform', [
     'ngResource'
 ]);
 
-ndRegForm.directive('ndRegForm', function() {
-    var baseUrl = Indico.Urls.Base + '/js/indico/RegistrationForm/';
-    var ajaxUrl = Indico.Urls.Base + '/event/:confId/manage/registration/';
+ndRegForm.value('ajaxquery',
+    Indico.Urls.Base + '/event/:confId/manage/registration/preview/sections/:sectionId'
+);
 
+ndRegForm.config(function(urlProvider) {
+    urlProvider.setModulePath('/js/indico/RegistrationForm');
+});
+
+ndRegForm.directive('ndRegForm', function(url, ajaxquery) {
     return {
-        restrict: "A",
         replace: true,
-        templateUrl:  baseUrl + 'registrationform.tpl.html',
+        templateUrl:  url.tpl('registrationform.tpl.html'),
 
         scope: {
             confId: '@'
         },
 
         controller: function($scope, $resource) {
-            $scope.baseUrl = Indico.Urls.Base + '/js/indico/RegistrationForm/';
-
-            var Section = $resource(ajaxUrl + "preview/sections/:sectionId", {
+            var Section = $resource(ajaxquery, {
                 8000: ":8000",
                 confId: $scope.confId,
                 sectionId: "@sectionId"
@@ -44,58 +46,74 @@ ndRegForm.directive('ndRegForm', function() {
             var sections = Section.get(function() {
                 $scope.sections = sections["items"];
             });
+
+            $scope.dialogs = {
+                addsection: false,
+                management: false
+            };
+
+            $scope.actions = {
+                collapseAll: function() {
+                    $scope.$broadcast('collapse', true);
+                },
+                expandAll: function() {
+                    $scope.$broadcast('collapse', false);
+                },
+                openAddSection: function() {
+                    $scope.dialogs.addsection = true;
+                },
+                openManagement: function() {
+                    $scope.dialogs.management = true;
+                }
+            };
+
+            $scope.api = {
+                createSection: function(data) {
+                    $scope.sections.push({
+                        id: '-1',
+                        items: [],
+                        title: data.newfield.title,
+                        description: data.newfield.description
+                    });
+                },
+                removeSection: function() {
+                    // TODO
+                    console.log('removing setion');
+                },
+                restoreSection: function() {
+                    // TODO
+                    console.log('restoring setion');
+                }
+            };
         }
     };
 });
 
-ndRegForm.controller("FieldCtrl", function($scope) {
-    $scope.getName = function() {
-        if ($scope.field.input == 'date') {
-            return '_genfield_' + $scope.section.id + '_' + $scope.field.id;
-        } else {
-            return '*genfield*' + $scope.section.id + '-' + $scope.field.id;
+ndRegForm.directive('ndAddSectionDialog', function(url) {
+    return {
+        templateUrl: url.tpl('dialogs/sectioncreation.tpl.html'),
+        link: function(scope) {
+            scope.cleanup = function() {
+                scope.newfield = undefined;
+            };
         }
     };
 });
 
-ndRegForm.controller("RadioCtrl", function($scope) {
-    $scope.isDisabled = function() {
-        return ($scope.item.placesLimit !== 0 && $scope.item.noPlacesLeft === 0);
-    };
-
-    $scope.isBillable = function(item) {
-        return $scope.item.isBillable && !$scope.isDisabled();
-    };
-
-    $scope.hasPlacesLeft = function(item) {
-        return (!$scope.isDisabled() && $scope.item.placesLimit !== 0);
+ndRegForm.directive('ndManagementDialog', function(url) {
+    return {
+        templateUrl: url.tpl('dialogs/sectionmanagement.tpl.html')
     };
 });
 
+// TODO remove unused legacy jquery methods
+// $(function(){
+//     var rfView = new RegFormEditionView({el: $("div#registrationForm")});
+//     var model = rfView.getModel();
+//     var sectionsMgmt = new RegFormSectionsMgmtView({el: $('#section-mgmt-popup'), model: model});
+//     var sectionCreate = new RegFormSectionsCreateView({el: $('#section-create-popup'), model: model});
 
-    // $(function(){
-    //     var confId = ${confId};
-    //     var rfView = new RegFormEditionView({el: $("div#registrationForm")});
-    //     var model = rfView.getModel();
-    //     var sectionsMgmt = new RegFormSectionsMgmtView({el: $('#section-mgmt-popup'), model: model});
-    //     var sectionCreate = new RegFormSectionsCreateView({el: $('#section-create-popup'), model: model});
-
-    //     $(window).scroll(function(){
-    //         IndicoUI.Effect.followScroll();
-    //     });
-    //     // Menu function
-    //     $("#collapse_all").click(function(){
-    //         $("div.regFormSectionContent:visible").slideUp("slow");
-    //         $(".regFormButtonCollpase").button( "option", "icons", {primary: 'ui-icon-triangle-1-w'});
-    //     });
-    //     $("#expand_all").click(function(){
-    //         $("div.regFormSectionContent:hidden").slideDown("slow");
-    //         $(".regFormButtonCollpase").button("option", "icons", {primary: 'ui-icon-triangle-1-s'});
-    //     });
-    //     $("#sections_mgmt").click(function(){
-    //         sectionsMgmt.show();
-    //     });
-    //     $("#section_create").click(function(){
-    //         sectionCreate.show();
-    //     });
-    // });
+//     $(window).scroll(function(){
+//         IndicoUI.Effect.followScroll();
+//     });
+// });
