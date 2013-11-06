@@ -56,9 +56,9 @@ class Reservation(db.Model):
 
     reason = db.Column(db.String, nullable=False)
 
-    edits = db.relationship('Edit',
-                            backref='reservation',
-                            cascade='all, delete-orphan')
+    edit_logs = db.relationship('ReservationEditLog',
+                                backref='reservation',
+                                cascade='all, delete-orphan')
 
     attributes = db.relationship('ReservationAttribute',
                                  backref='reservation',

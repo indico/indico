@@ -26,8 +26,8 @@ from datetime import datetime
 from indico.core.db import db
 
 
-class Edit(db.Model):
-    __tablename__ = 'reservation_edits'
+class ReservationEditLog(db.Model):
+    __tablename__ = 'reservation_edit_logs'
 
     timestamp = db.Column(db.DateTime, primary_key=True, nullable=False, default=datetime.utcnow)
     info = db.Column(db.String, nullable=False)
