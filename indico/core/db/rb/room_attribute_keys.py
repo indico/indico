@@ -18,23 +18,21 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Custom attributes for reservations
+Custom attribute keys for rooms
 """
 
 from indico.core.db import db
 
 
-class ReservationAttribute(db.Model):
-    __tablename__ = 'reservation_attributes'
+class RoomAttributeKey(db.Model):
+    __tablename__ = 'room_attribute_keys'
 
-    key_id = db.Column(db.Integer, db.ForeignKey('reservation_attribute_keys.id'),
-                       nullable=False, primary_key=True)
-    value = db.Column(db.String, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
 
-    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'),
-                               primary_key=True, nullable=False)
+    attributes = db.relationship('RoomAttribute',
+                                 backref='key',
+                                 cascade='all, delete-orphan')
 
     def __repr__(self):
-        return '<ReservationAttribute({0}, {1}, {2})>'.format(self.reservation_id,
-                                                              self.key_id,
-                                                              self.value)
+        return '<RoomAttributeKey({0}, {1})>'.format(self.id, self.name)
