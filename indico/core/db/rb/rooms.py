@@ -77,8 +77,8 @@ class Room(db.Model):
                                      backref=db.backref('room', order_by='BookableTime.start_time'),
                                      cascade='all, delete-orphan')
 
-    nonbookable_dates = db.relationship('Interval',
-                                        backref=db.backref('room', order_by='Interval.end_date desc'),
+    nonbookable_dates = db.relationship('NonBookableDate',
+                                        backref=db.backref('room', order_by='NonBookableDate.end_date'), # desc'),
                                         cascade='all, delete-orphan')
 
     photos = db.relationship('Photo',
