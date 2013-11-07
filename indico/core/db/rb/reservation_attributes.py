@@ -34,6 +34,12 @@ class ReservationAttribute(db.Model):
     reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'),
                                primary_key=True, nullable=False)
 
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return self.value
+
     def __repr__(self):
         return '<ReservationAttribute({0}, {1}, {2})>'.format(self.reservation_id,
                                                               self.key_id,

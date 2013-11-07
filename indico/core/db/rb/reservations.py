@@ -73,8 +73,30 @@ class Reservation(db.Model):
     # needs_assistance = Column(Boolean, default=False)
     # uses_video_conference = Column(Boolean, default=False)
 
+    def __init__(self, **kwargs):
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
+
     def __repr__(self):
         return '<Reservation({0}, {1}, {2}, {3}, {4})>'.format(self.id, self.room_id,
                                                                self.booked_for_name,
                                                                self.start_date,
                                                                self.end_date)
+
+    def addEditLog(self, edit_log):
+        self.edit_logs.append(edit_log)
+
+    def removeEditLog(self, edit_log):
+        self.edit_logs.remove(edit_log)
+
+    def clearEditLogs(self):
+        del self.edit_logs[:]
+
+    def addExcludedDate(self, excluded_date):
+        self.excluded_dates.append(excluded_date)
+
+    def removeExcludedDate(self, excluded_date):
+        self.excluded_dates.remove(excluded_date)
+
+    def clearExcludedDates(self):
+        del self.excluded_dates[:]

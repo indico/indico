@@ -25,8 +25,8 @@ import argparse
 
 from sqlalchemy_schemadisplay import create_schema_graph
 
-from indico.web.flask.app import make_app
 from indico.core.db import db, load_room_booking
+from indico.web.flask.app import make_app
 
 
 def generate_schema_graph(uri='sqlite:///test.db', output='test.png'):

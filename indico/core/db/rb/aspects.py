@@ -40,5 +40,20 @@ class Aspect(db.Model):
 
     location_id = db.Column(db.Integer, db.ForeignKey('locations.id'), nullable=False)
 
+    def __init__(self, **kwargs):
+        for k, v in kwargs.iteritems():
+            setattr(self, k, v)
+
+    def __str__(self):
+        return self.name
+
     def __repr__(self):
         return '<Aspect({0}, {1}, {2})>'.format(self.id, self.location_id, self.name)
+
+    @staticmethod
+    def getAspectsByName(name):
+        return Aspect.query.filter(Aspect.name == name)
+
+    @staticmethod
+    def getAspectById(aid):
+        return Aspect.query.get(aid)

@@ -27,7 +27,8 @@ from indico.core.db import db
 class ReservationNotification(db.Model):
     __tablename__ = 'reservation_notifications'
 
-    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), primary_key=True, nullable=False)
+    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'),
+                               primary_key=True, nullable=False)
     occurrence = db.Column(db.DateTime, nullable=False, primary_key=True)
 
     def __repr__(self):

@@ -34,5 +34,37 @@ class RoomAttributeKey(db.Model):
                                  backref='key',
                                  cascade='all, delete-orphan')
 
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
     def __repr__(self):
         return '<RoomAttributeKey({0}, {1})>'.format(self.id, self.name)
+
+    def addAttribute(self, attribute):
+        self.attributes.append(attribute)
+
+    def removeAttribute(self, attribute):
+        self.attributes.remove(attribute)
+
+    def clearAttributes(self):
+        del self.attributes[:]
+
+    @staticmethod
+    def getAllKeys():
+        return RoomAttributeKey.query.all()
+
+    @staticmethod
+    def getAllKeyNames():
+        # TODO: replace with projection
+        return [k.name for k in RoomAttributeKey.getAllKeys()]
+
+    @staticmethod
+    def getKeysByName(name):
+        return RoomAttributeKey.query.filter(RoomAttributeKey.name == name)
+
+    @staticmethod
+    def getKeyById(kid):
+        return RoomAttributeKey.query.get(kid)

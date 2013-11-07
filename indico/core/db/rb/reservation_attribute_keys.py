@@ -34,5 +34,25 @@ class ReservationAttributeKey(db.Model):
                                  backref='key',
                                  cascade='all, delete-orphan')
 
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
     def __repr__(self):
         return '<ReservationAttributeKey({0}, {1})>'.format(self.id, self.name)
+
+    def addAttribute(self, attribute):
+        self.attributes.append(attribute)
+
+    def removeAttribute(self, attribute):
+        self.attributes.remove(attribute)
+
+    @staticmethod
+    def getKeysByName(name):
+        return ReservationAttributeKey.query.filter(ReservationAttributeKey.name == name)
+
+    @staticmethod
+    def getKeyById(kid):
+        return ReservationAttributeKey.query.get(kid)

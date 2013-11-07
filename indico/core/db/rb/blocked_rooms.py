@@ -35,6 +35,18 @@ class BlockedRoom(db.Model):
     blocking_id = db.Column(db.Integer, db.ForeignKey('blockings.id'), primary_key=True, nullable=False)
     room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), primary_key=True, nullable=False)
 
+    def __init__(self, is_active, notification_sent):
+        self.is_active = is_active
+        self.notification_sent = notification_sent
+
+    def __str__(self):
+        return 'Blocking is{0} active on {1}'.format('' if self.is_active else ' not',
+                                                     self.room)
+
     def __repr__(self):
         return '<BlockedRoom({0}, {1}, {2})>'.format(self.blocking_id, self.room_id,
                                                      self.is_active)
+
+    @staticmethod
+    def getBlockedRoomById(brid):
+        return BlockedRoom.query.get(brid)

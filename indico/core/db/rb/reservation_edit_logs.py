@@ -34,6 +34,14 @@ class ReservationEditLog(db.Model):
     avatar_id = db.Column(db.String, nullable=False, primary_key=True)
     reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), primary_key=True, nullable=False)
 
+    def __init__(self, info, timestamp, avatar_id):
+        self.info = info
+        self.timestamp = timestamp
+        self.avatar_id = avatar_id
+
+    def __str__(self):
+        return '{0} by {1} at {2}'.format(self.info, self.avatar_id, self.timestamp)
+
     def __repr__(self):
         return '<Edit({0}, {1}, {2}, {3})>'.format(self.avatar_id, self.reservation_id,
                                                    self.timestamp, self.info)
