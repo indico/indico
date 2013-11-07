@@ -49,7 +49,8 @@ class FeatureLoadingObject(object):
         global loadedFeatures
 
         if type(ftr) == str:
-            modName, ftrName = ftr.split('.')
+            ftrName, modName = map(lambda p: p[::-1],
+                                   ftr[::-1].split('.', 1))
 
             ftrClsName = "%s_Feature" % ftrName
 
@@ -144,8 +145,11 @@ class RequestEnvironment_Feature(IndicoTestFeature):
     def _action_startRequest(self):
         self._do._notify('requestStarted')
 
-    def _action_make_app_request_context(self):
+    def _action_make_app_request_context(self, config):
         app = make_app()
+        if config:
+            for k, v in config.iteritems():
+                app.config[k] = v
         env = {
             'environ_base': {
                 'REMOTE_ADDR': '127.0.0.1'
@@ -158,9 +162,9 @@ class RequestEnvironment_Feature(IndicoTestFeature):
         # If this changes, assign a avatar mock object here
         session.user = None
 
-    def _context_request(self):
+    def _context_request(self, config=None):
         self._startRequest()
-        with self._make_app_request_context():
+        with self._make_app_request_context(config):
             self._mock_session_user()
             setLocale('en_GB')
             yield
