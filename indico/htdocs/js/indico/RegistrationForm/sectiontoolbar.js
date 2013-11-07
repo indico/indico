@@ -91,7 +91,7 @@ ndRegForm.directive('ndFieldPicker', function($http, $compile, $templateCache, u
                 });
 
 
-
+                // TODO: delete this backbone implementation when replicated new field creation
                 // events: {
                 //     render: function(event, api) {
                 //         $('.regFormAddFieldEntry', this).bind('click', function(event,ui) {

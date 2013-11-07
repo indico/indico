@@ -18,6 +18,10 @@
 ndRegForm.controller('SectionCtrl', function($scope) {
     $scope.api = {};
 
+    $scope.api.createSection = function(section) {
+        // TODO see how to push a section into the list of sections
+    };
+
     $scope.api.disableSection = function(section) {
         section.enabled = false;
     };
@@ -25,7 +29,13 @@ ndRegForm.controller('SectionCtrl', function($scope) {
         section.enabled = true;
     };
     $scope.api.addField = function(section, field) {
-        section.items.push();
+        // TODO properly initialize field
+        section.items.push({
+            id: -1,
+            input: 'text',
+            caption: 'testcaption',
+            description: 'desc'
+        });
     };
 });
 
