@@ -1,5 +1,4 @@
 <div ng-switch="field.values.inputType">
-    <!-- TODO selected and disabled -->
     <select ng-switch-when="dropdown" name="{{ getName(field.input) }}">
         <option value="">-- {{ 'Choose a value' | i18n }} --</option>
         <option ng-repeat="item in field.values.radioitems"
@@ -15,8 +14,8 @@
                 name="{{ getName(field.input) }}"
                 value="{{ item.id }}"
                 ng-class="{regFormIsBillable: item.isBillable}"
-                ng-disabled="isDisabled()"
-                {{ attributes }}/>
+                ng-required="field.mandatory"
+                ng-disabled="!hasPlacesLeft(field)"/>
             {{ item.caption }}
             <span ng-show="isBillable()" class="regFormPrice">
                 {{ item.price }}
@@ -33,4 +32,6 @@
     </ul>
 </div>
 
-<span class="inputDescription">{{ field.description }}</span>
+<span class="inputDescription">
+    {{ field.description }}
+</span>

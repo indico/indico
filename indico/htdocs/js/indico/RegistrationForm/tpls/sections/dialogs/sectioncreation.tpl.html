@@ -1,3 +1,12 @@
+<!-- TODO defining ng-controller inside dialog tpl breaks ok-callback as it creates
+        a new scope that won't be passed
+    Example: newfield is created within the scope of SectionCtrl and not within the
+        scope of ndDialog, therefore okCallback will pass a scope that won't have
+        newfield
+    Line of action: finding a way to define controller: 'SectionCtrl' in the ndDialog subdirectives
+        allowing also dialogs without specifying a controller.
+        It should be possible as defining a controller in a directive is not mandatory,
+        but something must be wrong... -->
 <form id="newSectionForm" ng-controller="SectionCtrl">
     <div class="regFormSectionNewSection">
         <input type="text" ng-model="newfield.title"

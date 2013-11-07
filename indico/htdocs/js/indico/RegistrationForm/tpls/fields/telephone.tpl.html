@@ -1,0 +1,15 @@
+<input type="text"
+    id="{{ getName(field.input) }}"
+    name="{{ getName(field.input) }}"
+    value=""
+    size="30"
+    ng-required="field.mandatory"
+    ng-disabled="!hasPlacesLeft(field)">
+
+<span class="inputDescription">
+    (+) 999 99 99 99
+</span>
+
+<span class="inputDescription">
+    {{ field.description }}
+</span>

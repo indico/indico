@@ -1,0 +1,11 @@
+<div id="attachment{{ getName(field.input) }}" class="existingAttachment">
+    <input type="file"
+        id="{{ getName(field.input) }}"
+        name="{{ getName(field.input) }}"
+        ng-required="field.mandatory"
+        ng-disabled="!hasPlacesLeft(field)">
+</div>
+
+<span class="inputDescription">
+    {{ field.description }}
+</span>
