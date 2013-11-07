@@ -15,36 +15,100 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-ndRegForm.directive("ndSectionToolbar", function() {
-    var baseUrl = Indico.Urls.Base + '/js/indico/RegistrationForm/';
-
+ndRegForm.directive("ndSectionToolbar", function(url) {
     return {
         replace: true,
-        templateUrl: baseUrl + 'tpls/sectiontoolbar.tpl.html',
-
+        templateUrl: url.tpl('sectiontoolbar.tpl.html'),
+        controller: 'SectionCtrl',
         scope: {
+            section: '=',
             buttons: '=',
             dialogs: '=',
+            fieldtypes: '=',
             state: '='
         },
 
-        controller: function($scope) {
-            $scope.openConfig = function() {
-                $scope.dialogs.config = true;
+        link: function(scope) {
+            scope.openConfig = function() {
+                scope.dialogs.config = true;
             };
 
-            $scope.openNewField = function() {
-                $scope.dialogs.newfield = true;
+            scope.toggleCollapse = function(e) {
+                scope.state.collapsed = !scope.state.collapsed;
             };
+        }
+    };
+});
 
-            $scope.disable = function() {
-                // TODO implement disable
-                console.log("Disable");
-            };
+ndRegForm.directive('ndFieldPicker', function($http, $compile, $templateCache, url) {
+    return {
+        link: function(scope, element) {
+            $http.get(url.tpl('fieldpicker.tpl.html'), {cache: $templateCache})
+                .success(function(template) {
+                    var content = $compile(template)(scope);
 
-            $scope.toggleCollapse = function(e) {
-                $scope.state.collapsed = !$scope.state.collapsed;
-            };
+                    element.qtip({
+                        content: {
+                            title: {
+                                text: $T('Add new field')
+                            },
+                            text: content
+                        },
+
+                        position: {
+                            my: 'top center',
+                            at: 'bottom center'
+                        },
+
+                        show: {
+                            event: 'click',
+                            solo: true,
+                            modal: {
+                                on: true
+                            }
+                        },
+
+                        hide: {
+                            event: 'unfocus click',
+                            fixed: true
+                        },
+
+                        style: {
+                            classes: 'regFormAddField ui-tooltip-addField',
+                            width: '296px',
+                            padding: '20px',
+                            name: 'light'
+                        },
+
+                        events: {
+                            render: function(event, api) {
+                                $(api.elements.content).on('click', 'a', function() {
+                                    api.hide();
+                                });
+                            }
+                        }
+                    });
+                });
+
+
+
+                // events: {
+                //     render: function(event, api) {
+                //         $('.regFormAddFieldEntry', this).bind('click', function(event,ui) {
+                //             var newFieldType = $(event.target).closest('.regFormAddFieldEntry').data('fieldType').split('-');
+                //             var field = {
+                //                 input   : newFieldType[0],
+                //                 caption : '',
+                //                 values  : {}
+                //             };
+                //             if(newFieldType[1]){
+                //                 field.values.inputType = newFieldType[1];
+                //             }
+                //             self._createField(sectionId, field);
+                //         });
+                //     }
+                // }
+            // });
         }
     };
 });
