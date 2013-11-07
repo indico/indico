@@ -70,19 +70,16 @@ ndRegForm.directive('ndRegForm', function(url, ajaxquery) {
             $scope.api = {
                 createSection: function(data) {
                     $scope.sections.push({
-                        id: '-1',
+                        // TODO initialize properly
+                        // id: '-1',
                         items: [],
                         title: data.newfield.title,
                         description: data.newfield.description
                     });
                 },
-                removeSection: function() {
+                removeSection: function(sectionId) {
                     // TODO
                     console.log('removing setion');
-                },
-                restoreSection: function() {
-                    // TODO
-                    console.log('restoring setion');
                 }
             };
         }
@@ -93,7 +90,7 @@ ndRegForm.directive('ndAddSectionDialog', function(url) {
     return {
         templateUrl: url.tpl('dialogs/sectioncreation.tpl.html'),
         link: function(scope) {
-            scope.cleanup = function() {
+            scope.actions.cleanup = function() {
                 scope.newfield = undefined;
             };
         }
@@ -108,11 +105,6 @@ ndRegForm.directive('ndManagementDialog', function(url) {
 
 // TODO remove unused legacy jquery methods
 // $(function(){
-//     var rfView = new RegFormEditionView({el: $("div#registrationForm")});
-//     var model = rfView.getModel();
-//     var sectionsMgmt = new RegFormSectionsMgmtView({el: $('#section-mgmt-popup'), model: model});
-//     var sectionCreate = new RegFormSectionsCreateView({el: $('#section-create-popup'), model: model});
-
 //     $(window).scroll(function(){
 //         IndicoUI.Effect.followScroll();
 //     });

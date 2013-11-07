@@ -18,8 +18,6 @@
 var ndDirectives = angular.module("ndDirectives", []);
 
 ndDirectives.directive("ndDialog", function() {
-    var toclean = [];
-
     return {
         restrict: 'E',
         scope: {
@@ -35,29 +33,29 @@ ndDirectives.directive("ndDialog", function() {
         },
 
         controller: function($scope) {
-            $scope.cleanup = function() {};
-
-            $scope.close = function() {
-                $scope.cleanup();
-                $scope.show = false;
-                $scope.$apply($scope.show);
-            };
-
-            $scope.cancel = function() {
-                $scope.cancelCallback({dialogScope: $scope});
-                $scope.close();
-            };
-
-            $scope.ok = function() {
-                $scope.okCallback({dialogScope: $scope});
-                $scope.close();
+            $scope.actions = {
+                init: function() {},
+                cleanup: function() {},
+                close: function() {
+                    $scope.actions.cleanup();
+                    $scope.show = false;
+                    $scope.$apply($scope.show);
+                },
+                cancel: function() {
+                    $scope.cancelCallback({dialogScope: $scope});
+                    $scope.actions.close();
+                },
+                ok: function() {
+                    $scope.okCallback({dialogScope: $scope});
+                    $scope.actions.close();
+                }
             };
         },
 
         link: function(scope, element) {
             var dialog = new ExclusivePopupWithButtons(
                 scope.heading,
-                scope.cancel,
+                scope.actions.cancel,
                 false,
                 false,
                 true
@@ -68,10 +66,10 @@ ndDirectives.directive("ndDialog", function() {
             dialog._getButtons = function() {
                 return [
                     [scope.okButton, function() {
-                        scope.ok();
+                        scope.actions.ok();
                     }],
                     [scope.cancelButton, function() {
-                        scope.cancel();
+                        scope.actions.cancel();
                     }]
                 ];
             };
@@ -82,7 +80,7 @@ ndDirectives.directive("ndDialog", function() {
 
             scope.$watch("show", function(val) {
                 if (scope.show === true) {
-                    dialog.draw();
+                    scope.actions.init();
                     dialog.open();
                 } else {
                     dialog.close();
