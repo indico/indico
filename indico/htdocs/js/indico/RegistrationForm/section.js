@@ -15,56 +15,122 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-ndRegForm.directive('ndSection', function() {
+ndRegForm.controller('SectionCtrl', function($scope) {
+    $scope.api = {};
+
+    $scope.api.disableSection = function(section) {
+        section.enabled = false;
+    };
+    $scope.api.restoreSection = function(section) {
+        section.enabled = true;
+    };
+    $scope.api.addField = function(section, field) {
+        section.items.push();
+    };
+});
+
+ndRegForm.directive('ndSection', function(url) {
     return {
         replace: true,
-        templateUrl: Indico.Urls.Base + '/js/indico/RegistrationForm/section.tpl.html',
+        templateUrl: url.tpl('section.tpl.html'),
+        controller: 'SectionCtrl',
 
-        controller: function($scope) {
-            $scope.buttons = {
+        link: function(scope, element) {
+            scope.buttons = {
                 newfield: false,
                 config: false,
                 disable: false
             };
 
-            $scope.dialogs = {
+            scope.dialogs = {
                 newfield: false,
                 config: false
             };
 
-            $scope.state = {
+            scope.state = {
                 collapsed: false
             };
 
-            $scope.tabs = {};
-        },
+            scope.sectionApi = {
+                disableSection: function() {
+                    scope.section.enabled = false;
+                }
+            };
 
-        link: function(scope, element) {
-            element.attr("hi");
-            var content = angular.element(element.children()[1]);
+            scope.tabs = [];
+
+            scope.$on('collapse', function(event, collapsed) {
+                scope.state.collapsed = collapsed;
+            });
 
             scope.$watch('state.collapsed', function(val) {
+                var content = angular.element(element.children()[1]);
                 if (val) {
                     content.slideUp();
                 } else {
                     content.slideDown();
                 }
             });
+
+            scope.$watch('section', function(val) {
+                // TODO sync section with server
+                console.log('Syncing section');
+            });
         }
     };
 });
 
-ndRegForm.directive("ndGeneralSection", function() {
+ndRegForm.directive("ndGeneralSection", function($timeout) {
     return {
         require: 'ndSection',
         link: function(scope) {
             scope.buttons.newfield = true;
-            scope.buttons.disable = true;
+
+            // TODO can we move fieldtypes to the tpl? It only happens once
+            // scope.fieldtypes = [
+            //     {id: 'label',            desc: $T("Label")},
+            //     {id: 'text',             desc: $T("Text input")},
+            //     {id: 'number',           desc: $T("Number")},
+            //     {id: 'textarea',         desc: $T("Text area")},
+            //     {id: 'radio-dropdown',   desc: $T("Dropdown")},
+            //     {id: 'radio-radiogroup', desc: $T("Choice")},
+            //     {id: 'checkbox',         desc: $T("Checkbox")},
+            //     {id: 'date',             desc: $T("Date")},
+            //     {id: 'yesno',            desc: $T("Yes/No")},
+            //     {id: 'telephone',        desc: $T("Phone")},
+            //     {id: 'country',          desc: $T("Country")},
+            //     {id: 'file',             desc: $T("File")}
+            // ];
+
+            scope.sectionApi.addField = function(fieldType, inputType) {
+                var newfield = {
+                    id: -1,
+                    input: fieldType,
+                    inputType: inputType,
+                    caption: '',
+                    values: {}
+                };
+
+                scope.section.items.push(newfield);
+                scope.dialogs.newfield = true;
+            };
+
+            scope.sectionApi.removeNewField = function() {
+                if (scope.section.items[scope.section.items.length-1].id == -1) {
+                    $timeout(function() {
+                        scope.section.items.pop();
+                    }, 0);
+                }
+            };
+
+            scope.sectionApi.commitNewField = function() {
+
+            };
 
             scope.tabs = [
-                { id: 'config'              , name: $T("Configuration")     , type: 'config' },
-                { id: 'editEvents'          , name: $T("Edit events")       , type: 'editionTable' },
-                { id: 'canceledEvent'       , name: $T("Canceled events")   , type: 'cancelEvent' }
+                {id: 'config',          name: $T("Configuration"),     type: 'config'},
+                {id: 'editEvents',      name: $T("Edit events"),       type: 'editionTable'},
+                {id: 'canceledEvent',   name: $T("Canceled events"),   type: 'cancelEvent'}
             ];
         }
     };
@@ -78,8 +144,8 @@ ndRegForm.directive("ndAccommodationSection", function() {
             scope.buttons.disable = true;
 
             scope.tabs = [
-                { id: 'config',               name: $T("Configuration"),             type    : 'config' },
-                { id: 'editAccomodation',     name: $T("Edit accommodations"),       type    : 'editionTable' }
+                {id: 'config',              name: $T("Configuration"),          type: 'config' },
+                {id: 'editAccomodation',    name: $T("Edit accommodations"),    type: 'editionTable' }
             ];
         }
     };
@@ -90,15 +156,6 @@ ndRegForm.directive("ndFurtherInformationSection", function() {
         require: 'ndSection',
         link: function(scope) {
             scope.buttons.disable = true;
-        }
-    };
-});
-
-ndRegForm.directive("ndPersonalDataSection", function() {
-    return {
-        require: 'ndSection',
-        link: function(scope) {
-            scope.buttons.newfield = true;
         }
     };
 });
@@ -120,8 +177,8 @@ ndRegForm.directive("ndSessionsSection", function() {
             scope.buttons.disable = true;
 
             scope.tabs = [
-                { id: 'config',         name: $T("Configuration"),        type    : 'config' },
-                { id: 'editSessions',   name: $T("Manage sessions"),      type    : 'editionTable' }
+                {id: 'config',          name: $T("Configuration"),      type: 'config'},
+                {id: 'editSessions',    name: $T("Manage sessions"),    type: 'editionTable'}
             ];
         }
     };
@@ -134,5 +191,13 @@ ndRegForm.directive("ndSocialEventSection", function() {
             scope.buttons.config = true;
             scope.buttons.disable = true;
         }
+    };
+});
+
+ndRegForm.directive('ndSectionDialog', function(url) {
+    return {
+        require: 'ndDialog',
+        replace: true,
+        templateUrl: url.tpl('sections/dialogs/base.tpl.html')
     };
 });

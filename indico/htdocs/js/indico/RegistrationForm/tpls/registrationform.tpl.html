@@ -1,7 +1,7 @@
 <div class="RegistrationForm">
     <div ng-include="'/indico/js/indico/RegistrationForm/tpls/toolbar.tpl.html'"></div>
 
-    <div ng-repeat="section in sections">
+    <div ng-repeat="section in sections" ng-show="section.enabled">
         <div ng-switch="section.id">
             <div ng-switch-default nd-section nd-general-section></div>
             <div ng-switch-when="accommodation" nd-section nd-accommodation-section></div>

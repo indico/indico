@@ -1,13 +1,29 @@
-<div ng-controller="FieldCtrl">
-    <table class="regFormField" ng-class="{regFormFieldDisabled: field.disabled}" id="{{ field.id }}" >
+<div>
+    <table class="regFormField" ng-class="{regFormFieldDisabled: field.disabled}" id="{{ field.id }}">
         <tr>
             <td class="regFormCaption">
                 <span class="regFormCaption">{{ field.caption }}</span>
                 <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
             </td>
-            <td ng-include="'/indico/js/indico/RegistrationForm/tpls/fields/' + field.input + '.tpl.html'"></td>
+
+            <td>
+                <div ng-include="tplInput"></div>
+            </td>
+
+            <td>
+                <a ng-click="openFieldSettings()" class="icon-settings"></a>
+            </td>
         </tr>
     </table>
-</div>
 
+    <nd-dialog nd-field-dialog
+        heading="{{ dialogs.settings.title() }}"
+        show="dialogs.settings.open"
+        async-data="{{ field }}"
+        ok-button="{{ dialogs.settings.okButton() }}"
+        cancel-button="{{ 'Cancel' | i18n }}"
+        ok-callback="dialogs.settings.onOk(dialogScope)"
+        cancel-callback="dialogs.settings.onCancel()">
+    </nd-dialog>
+</div>
 

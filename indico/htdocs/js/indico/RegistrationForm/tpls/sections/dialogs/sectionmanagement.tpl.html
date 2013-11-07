@@ -1,0 +1,24 @@
+<div ng-repeat="section in data" ng-controller="SectionCtrl" class="regFormSectionMgmt">
+    <div class="regFormHeaderMgmt">
+        <div class="regFormSectionTitle" ng-show="!section.enabled">
+            {{ section.title }}
+            <div class="toolbar right">
+                <div class="group">
+                    <a ng-click="api.restoreSection(section)" class="i-button">
+                        {{ 'Restore' | i18n }}
+                    </a>
+                </div>
+                <div class="group" ng-show="section.id > 0">
+                    <a ng-click="api.removeSection(section)" class="i-button">
+                        {{ 'Remove' | i18n }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="regFormInfoMessage" ng-show="">
+    <!-- TODO alert message -->
+    {{ message }}
+</div>

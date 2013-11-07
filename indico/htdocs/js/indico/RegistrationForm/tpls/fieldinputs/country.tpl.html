@@ -1,9 +1,12 @@
-<select id="{{ getName() }}" name="{{ getName() }}" {{ attributes }}>
+<select
+    id="{{ getName(field.input) }}"
+    name="{{ getName(field.input) }}"
+    ng-required="field.mandatory"
+    ng-disabled="!hasPlacesLeft(field)">
     <option value="">
         {{ '-- Select a country --' | i18n }}
     </option>
     <option ng-repeat="item in field.values.radioitems"
-        ng-controller="RadioCtrl"
         value="{{ item.countryKey }}">
         {{ item.caption }}
     </option>

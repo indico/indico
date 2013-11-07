@@ -88,8 +88,12 @@ ndRegForm.directive('ndRegForm', function(url, ajaxquery) {
 
 ndRegForm.directive('ndAddSectionDialog', function(url) {
     return {
-        templateUrl: url.tpl('dialogs/sectioncreation.tpl.html'),
+        templateUrl: url.tpl('sections/dialogs/sectioncreation.tpl.html'),
         link: function(scope) {
+            scope.actions.init = function() {
+                scope.newfield = {};
+            };
+
             scope.actions.cleanup = function() {
                 scope.newfield = undefined;
             };
@@ -99,7 +103,7 @@ ndRegForm.directive('ndAddSectionDialog', function(url) {
 
 ndRegForm.directive('ndManagementDialog', function(url) {
     return {
-        templateUrl: url.tpl('dialogs/sectionmanagement.tpl.html')
+        templateUrl: url.tpl('sections/dialogs/sectionmanagement.tpl.html')
     };
 });
 

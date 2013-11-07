@@ -1,0 +1,191 @@
+<div class="tabbable tabs-left">
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a data-toggle="tab" id="tab-options" ref="#div-options">
+                {{ 'Options' | i18n }}
+            </a>
+        </li>
+        <li ng-show="field.input == radio">
+            <a data-toggle="tab" id="tab-editItems" ref="#div-editItems">
+                {{ 'Edit items' | i18n }}
+            </a>
+        </li>
+    </ul>
+    <div class="tab-content regFormDialogTabContent">
+        <div class="tab-pane active" id="div-options">
+            <form id="optionsForm">
+            <div class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'caption' | i18n }}
+                </label>
+                <input ng-model="field.caption"
+                    type="text"
+                    name="caption"
+                    id="input01"
+                    size="30"
+                    required>
+                <input ng-model="field.mandatory"
+                    type="checkbox"
+                    name="mandatory"
+                    id="input02"
+                    ng-checked="field.mandatory"
+                    ng-disabled="field.disabled"/>
+                {{ 'Mandatory' | i18n }}
+            </div>
+
+            <div class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'description' | i18n }}
+                </label>
+                <textarea ng-model="field.description"
+                    id="descriptionEdit"
+                    name="description"
+                    cols="40"
+                    rows="5">
+                </textarea>
+            </div>
+
+            <!-- if field.input == 'telephone' or field.input == 'text' -->
+            <div ng-show="settings.size" class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'size in char' | i18n }}
+                </label>
+                <input
+                    name="length" type="number" size="20" min="5" max="60" value="field.values.length if field.values.length != 'undefined'">
+                <span>({{ "Must be between 5 and 60" | i18n }})</span>
+            </div>
+           <!-- endif -->
+
+            <!-- if field.input == "textarea" -->
+            <div ng-show="settings.rowsAndColumns" class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'number of columns' | i18n }}
+                </label>
+                <input name="numberOfColumns" type="number" min=1 size="20" value="any(field.values.numberOfColumns,'')">
+            </div>
+            <div ng-show="settings.rowsAndColumns" class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'number of rows' | i18n }}
+                </label>
+                <input name="numberOfRows" type="number" min=1 size="20" value="any(field.values.numberOfRows,'')">
+            </div>
+           <!-- endif -->
+
+            <!-- if field.input == "number" -->
+            <div ng-show="settings.number" class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'minimum value' | i18n }}
+                </label>
+                <input name="minValue" type="number" size="20" value="any(field.values.minValue,'')">
+            </div>
+            <div ng-show="settings.number" class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'row length' | i18n }}
+                </label>
+                <input name="numberOfRows" type="number" min=0 size="20" value="any(field.values.length,'')">
+            </div>
+            <!-- endif -->
+
+            <!-- if field.input == "yesno" or field.input == "checkbox" -->
+            <div ng-show="settings.placesLimit"
+                class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'places limit' | i18n }}
+                </label>
+                <input name="placesLimit" type="number" size="20" min=0 value="any(field.placesLimit,'')">
+                <span>({{ "0 for unlimited" | i18n }})</span>
+            </div>
+            <!-- endif -->
+
+            <!-- if field.input == "yesno" or field.input == "number" or field.input == "label" or field.input == "checkbox" -->
+            <div ng-show="settings.billable" class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'Billable' | i18n }}
+                </label>
+                <input type="checkbox" name="billable" value="true" ng-checked="field.billable"/>
+            </div>
+            <div ng-show="settings.billable" class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'price' | i18n }}
+                </label>
+                <input type="number" min=0 name="price" class="input-xlarge" id="input01" size="20" value="any(field.price,'')">
+                <span ng-show="field.input == 'number'">
+                    ({{ "price multiplied with entered number" | i18n }})
+                </span>
+            </div>
+            <!-- endif -->
+
+            <!-- if field.input == "radio" -->
+            <div ng-show="settings.defaultValue" class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'default item' | i18n }}
+                </label>
+                <select id="defaultItem" name="defaultItem" >
+                    <option value="">{{ 'none' | i18n }}</option>
+                    <option ng-repeat="el in field.values.radioitems"
+                        ng-selected="field.values.defaultItem == el.caption"
+                        value="{{ el.caption }}">
+                        {{ el.caption }}
+                    </option>
+                </select>
+                <span>({{ "Only available for input type: drop down menu" | i18n }})</span>
+            </div>
+
+            <div ng-show="settings.defaultValue" class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'input type' | i18n }}
+                </label>
+                <select id="inputType" name="inputType" >
+                    <option value="dropdown" ng-selected="field.values.inputType == 'dropdown'">
+                        {{ 'drop down menu' | i18n }}
+                    </option>
+                    <option value="radiogroup" ng-selected="field.values.inputType == 'radiogroup'">
+                        {{ 'radio group' | i18n }}
+                    </option>
+                </select>
+            </div>
+            <!-- endif -->
+
+            <!-- if field.input == "date" -->
+            <div ng-show="settings.date" class="regFormEditLine">
+                <label class="regFormDialogCaption">
+                    {{ 'Date format' | i18n }}
+                </label>
+                <select id="dateFormat" name="dateFormat" >
+                    <!-- if _.isEmpty(field.values.displayFormats) -->
+                        <option value="%d/%m/%Y %H:%M" selected="selected">DD/MM/YYYY hh:mm</option>
+                        <option value="%d.%m.%Y %H:%M">DD.MM.YYYY hh:mm</option>
+                        <option value="%m/%d/%Y %H:%M">MM/DD/YYYY hh:mm</option>
+                        <option value="%m.%d.%Y %H:%M">MM.DD.YYYY hh:mm</option>
+                        <option value="%Y/%m/%d %H:%M">YYYY/MM/DD hh:mm</option>
+                        <option value="%Y.%m.%d %H:%M">YYYY.MM.DD hh:mm</option>
+                        <option value="%d/%m/%Y">DD/MM/YYYY</option>
+                        <option value="%d.%m.%Y">DD.MM.YYYY</option>
+                        <option value="%m/%d/%Y">MM/DD/YYYY</option>
+                        <option value="%m.%d.%Y">MM.DD.YYYY</option>
+                        <option value="%Y/%m/%d">YYYY/MM/DD</option>
+                        <option value="%Y.%m.%d">YYYY.MM.DD</option>
+                        <option value="%m/%Y">MM/YYYY</option>
+                        <option value="%m.%Y">MM.YYYY</option>
+                        <option value="%Y">YYYY</option>
+                    <!-- else -->
+                    <option ng-repeat="el in field.values.displayFormats"
+                        ng-selected="el[0] == field.values.dateFormat"
+                        value="{{ el[0] }}">
+                        {{ el[1] }}
+                    </option>
+                    <!-- endif -->
+                </select>
+            </div>
+            <!-- endif -->
+
+            <input type="submit" style="display:none;" value="submit" id="form-opt-validate">
+            </form>
+        </div>
+        <div class="tab-pane" id="div-editItems">
+            <button id="addButton" class="addItem">{{ 'Create new item' | i18n }}</button>
+            <button id="sortItem"  class="sortItem">{{ 'Sort alphabetically' | i18n }}</button>
+            <div id="editionTable" style="margin-right:20px;margin-top:20px;"></div>
+        </div>
+    </div>
+</div>

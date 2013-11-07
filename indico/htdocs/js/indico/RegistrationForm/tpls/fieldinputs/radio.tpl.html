@@ -1,19 +1,18 @@
 <div ng-switch="field.values.inputType">
     <!-- TODO selected and disabled -->
-    <select ng-switch-when="dropdown" name="{{ getName() }}">
+    <select ng-switch-when="dropdown" name="{{ getName(field.input) }}">
         <option value="">-- {{ 'Choose a value' | i18n }} --</option>
         <option ng-repeat="item in field.values.radioitems"
             value="{{ item.caption }}"
-            ng-controller="RadioCtrl"
             ng-class="{regFormIsBillable: item.isBillable}">
             {{ item.caption }}
         </option>
     </select>
 
     <ul ng-switch-default>
-        <li ng-repeat="item in field.values.radioitems" ng-controller="RadioCtrl">
+        <li ng-repeat="item in field.values.radioitems">
             <input type="radio"
-                name="{{ getName() }}"
+                name="{{ getName(field.input) }}"
                 value="{{ item.id }}"
                 ng-class="{regFormIsBillable: item.isBillable}"
                 ng-disabled="isDisabled()"

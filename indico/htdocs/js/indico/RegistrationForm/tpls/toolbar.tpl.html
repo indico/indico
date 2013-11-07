@@ -1,12 +1,22 @@
 <div id="headPanel" >
     <div class="toolbar" class="follow-scroll">
         <div class="group">
-            <a href="#" class="i-button icon-plus" id="section_create" title="{{ 'Create section' | i18n }}"></a>
-            <a href="#" class="i-button" id="sections_mgmt">
-                {{ "Recover/Discard sections" | i18n }}
+            <a ng-click="actions.openAddSection()"
+                class="i-button icon-plus"
+                title="{{ 'Create section' | i18n }}">
+                {{ 'Add section' | i18n }}
             </a>
-            <a href="#" class="i-button icon-stack-plus" id="expand_all" title="{{ 'Expand All' | i18n }}"></a>
-            <a href="#" class="i-button icon-stack-minus" id="collapse_all" title="{{ 'Collapse All' | i18n }}"></a>
+            <a ng-click="actions.openManagement()"
+                class="i-button icon-settings"
+                title="{{ 'Recover/Discard sections' | i18n }}">
+                {{ 'Manage sections' | i18n }}
+            </a>
+        </div>
+        <div class="group">
+            <a ng-click="actions.expandAll()"
+                class="i-button icon-stack-plus" title="{{ 'Expand All' | i18n }}"></a>
+            <a ng-click="actions.collapseAll()"
+                class="i-button icon-stack-minus" title="{{ 'Collapse All' | i18n }}"></a>
         </div>
     </div>
 </div>
