@@ -5296,36 +5296,36 @@ class WRoomBookingRoomDetails( WTemplated ):
         self._rh = rh
         self._standalone = standalone
 
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["room"] = self._rh._room
-        goodFactory = Location.parse( self._rh._room.locationName ).factory
-        attributes = goodFactory.getCustomAttributesManager().getAttributes( location = self._rh._room.locationName )
-        vars["attrs"] = {}
+    def getVars(self):
+        wvars = WTemplated.getVars(self)
+        wvars["room"] = self._rh._room
+        goodFactory = Location.parse(self._rh._room.locationName).factory
+        attributes = goodFactory.getCustomAttributesManager().getAttributes(location=self._rh._room.locationName)
+        wvars["attrs"] = {}
         for attribute in attributes:
-            if not attribute.get("hidden",False) or self._rh._getUser().isAdmin():
-                vars["attrs"][attribute['name']] = self._rh._room.customAtts.get(attribute['name'],"")
-                if attribute['name'] == 'notification email' :
-                    vars["attrs"][attribute['name']] = vars["attrs"][attribute['name']].replace(',', ', ')
-        vars["config"] = Config.getInstance()
-        #vars["roomPhoto"] = urlHandlers.UHSendRoomPhoto.getURL( self._rh._room.photoId, small = False )
-        vars["standalone"] = self._standalone
-        vars["actionSucceeded"] = self._rh._afterActionSucceeded
-        vars["deletionFailed"] = self._rh._afterDeletionFailed
+            if not attribute.get("hidden", False) or self._rh._getUser().isAdmin():
+                wvars["attrs"][attribute['name']] = self._rh._room.customAtts.get(attribute['name'], "")
+                if attribute['name'] == 'notification email':
+                    wvars["attrs"][attribute['name']] = wvars["attrs"][attribute['name']].replace(',', ', ')
+        wvars["config"] = Config.getInstance()
+        #wvars["roomPhoto"] = urlHandlers.UHSendRoomPhoto.getURL( self._rh._room.photoId, small = False )
+        wvars["standalone"] = self._standalone
+        wvars["actionSucceeded"] = self._rh._afterActionSucceeded
+        wvars["deletionFailed"] = self._rh._afterDeletionFailed
 
-        vars["roomStatsUH"] = urlHandlers.UHRoomBookingRoomStats
+        wvars["roomStatsUH"] = urlHandlers.UHRoomBookingRoomStats
 
         if self._standalone:
-            vars["bookingFormUH"] = urlHandlers.UHRoomBookingBookingForm
-            vars["modifyRoomUH"] = urlHandlers.UHRoomBookingRoomForm
-            vars["deleteRoomUH"] = urlHandlers.UHRoomBookingDeleteRoom
-            vars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
+            wvars["bookingFormUH"] = urlHandlers.UHRoomBookingBookingForm
+            wvars["modifyRoomUH"] = urlHandlers.UHRoomBookingRoomForm
+            wvars["deleteRoomUH"] = urlHandlers.UHRoomBookingDeleteRoom
+            wvars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
         else:
-            vars["bookingDetailsUH"] = urlHandlers.UHConfModifRoomBookingDetails
-            vars["conference"] = self._rh._conf
-            vars["bookingFormUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
-            vars["modifyRoomUH"] = urlHandlers.UHRoomBookingRoomForm
-            vars["deleteRoomUH"] = urlHandlers.UHRoomBookingDeleteRoom
+            wvars["bookingDetailsUH"] = urlHandlers.UHConfModifRoomBookingDetails
+            wvars["conference"] = self._rh._conf
+            wvars["bookingFormUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
+            wvars["modifyRoomUH"] = urlHandlers.UHRoomBookingRoomForm
+            wvars["deleteRoomUH"] = urlHandlers.UHRoomBookingDeleteRoom
 
         # Calendar range: 3 months
         if self._rh._searchingStartDT and self._rh._searchingEndDT:
@@ -5364,28 +5364,29 @@ class WRoomBookingRoomDetails( WTemplated ):
         if not self._standalone:
             for dt in bars.iterkeys():
                 for bar in bars[dt]:
-                    bar.forReservation.setOwner( self._rh._conf )
+                    bar.forReservation.setOwner(self._rh._conf)
 
-        vars["calendarStartDT"] = calendarStartDT
-        vars["calendarEndDT"] = calendarEndDT
-        bars = introduceRooms( [self._rh._room], bars, calendarStartDT, calendarEndDT, user = self._rh._aw.getUser() )
+        wvars["calendarStartDT"] = calendarStartDT
+        wvars["calendarEndDT"] = calendarEndDT
+        bars = introduceRooms([self._rh._room], bars, calendarStartDT, calendarEndDT, user=self._rh._aw.getUser())
         fossilizedBars = {}
         for key in bars:
             fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
-        vars["barsFossil"] = fossilizedBars
-        vars["dayAttrs"] = fossilize(dict((day.strftime("%Y-%m-%d"), getDayAttrsForRoom(day, self._rh._room)) for day in bars.iterkeys()))
-        vars["bars"] = bars
-        vars["iterdays"] = iterdays
-        vars["day_name"] = day_name
-        vars["Bar"] = Bar
-        vars["withConflicts"] = False
-        vars["currentUser"] = self._rh._aw.getUser()
+        wvars["barsFossil"] = fossilizedBars
+        wvars["dayAttrs"] = fossilize(dict((day.strftime("%Y-%m-%d"), getDayAttrsForRoom(day, self._rh._room))
+                                           for day in bars.iterkeys()))
+        wvars["bars"] = bars
+        wvars["iterdays"] = iterdays
+        wvars["day_name"] = day_name
+        wvars["Bar"] = Bar
+        wvars["withConflicts"] = False
+        wvars["currentUser"] = self._rh._aw.getUser()
         room_mapper = RoomMapperHolder().match({"placeName": self._rh._room.locationName}, exact=True)
         if room_mapper:
-            vars["show_on_map"] = room_mapper[0].getMapURL(self._rh._room.name)
+            wvars["show_on_map"] = room_mapper[0].getMapURL(self._rh._room.name)
         else:
-            vars["show_on_map"] = urlHandlers.UHRoomBookingMapOfRooms.getURL(roomID=self._rh._room.id)
-        return vars
+            wvars["show_on_map"] = urlHandlers.UHRoomBookingMapOfRooms.getURL(roomID=self._rh._room.id)
+        return wvars
 
 
 class WRoomBookingDetails(WTemplated):
