@@ -111,8 +111,10 @@ def checkAK(apiKey, signature, timestamp, path, query):
         onlyPublic = True
     return ak, onlyPublic
 
+
 def buildAW(ak, req, onlyPublic=False):
     aw = AccessWrapper()
+    aw.setIP(str(req.get_remote_ip()))
     if ak and not onlyPublic:
         # If we have an authenticated request, require HTTPS
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -122,6 +124,7 @@ def buildAW(ak, req, onlyPublic=False):
             raise HTTPAPIError('HTTPS is required', apache.HTTP_FORBIDDEN)
         aw.setUser(ak.getUser())
     return aw
+
 
 def handler(req, **params):
     ContextManager.destroy()
