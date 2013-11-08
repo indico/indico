@@ -75,7 +75,7 @@ ndRegForm.directive('ndFieldPicker', function($http, $compile, $templateCache, u
 
                         style: {
                             classes: 'regFormAddField ui-tooltip-addField',
-                            width: '296px',
+                            width: '267px',
                             padding: '20px',
                             name: 'light'
                         },
