@@ -68,6 +68,10 @@ class Reservation(db.Model):
                                      backref=db.backref('reservation', order_by='ExcludedDay.start_date'),
                                      cascade='all, delete-orphan')
 
+    notifications = db.relationship('ReservationNotification',
+                                    backref='reservation',
+                                    cascade='all, delete-orphan')
+
     # moved to reservation (custom) attributes
     # needs_video_conference_support = Column(Boolean, default=False)
     # needs_assistance = Column(Boolean, default=False)
