@@ -23,7 +23,7 @@ import types
 import exceptions
 import urllib
 import pkg_resources
-import hashlib
+import binascii
 from lxml import etree
 from operator import attrgetter
 from pytz import timezone
@@ -374,7 +374,7 @@ class WHeader(WTemplated):
 
         announcement_header = getAnnoucementMgrInstance().getText()
         vars["announcement_header"] = announcement_header
-        vars["announcement_header_hash"] = hashlib.sha224(announcement_header).hexdigest()
+        vars["announcement_header_hash"] = binascii.crc32(announcement_header)
 
         return vars
 
