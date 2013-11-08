@@ -17,73 +17,58 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from webassets import Environment
-from indico.web import assets
 
-from MaKaC.plugins import PluginsHolder, OldObservable
-from MaKaC.plugins.base import extension_point
-
-import os,types,string
-from xml.sax.saxutils import escape, quoteattr
-from copy import copy
-from datetime import timedelta,datetime,date
-from dateutil.relativedelta import relativedelta
+import os
+import types
 import exceptions
 import urllib
+import pkg_resources
+import hashlib
+from lxml import etree
 from operator import attrgetter
-from MaKaC.common.db import DBMgr
-import MaKaC.conference as conference
-from MaKaC.conference import CategoryManager
-import MaKaC.user as user
-import MaKaC.schedule as schedule
-import MaKaC.common.info as info
-import MaKaC.domain as domain
-import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.common.Configuration as Configuration
-from MaKaC import webcast
+from pytz import timezone
+from datetime import timedelta, datetime
+from dateutil.relativedelta import relativedelta
+from xml.sax.saxutils import escape, quoteattr
 
+from MaKaC.i18n import _
+from MaKaC.plugins import PluginsHolder, OldObservable
+from MaKaC.plugins.base import extension_point
+from MaKaC.common.db import DBMgr
+from MaKaC import conference
+from MaKaC import user
+from MaKaC import schedule
+from MaKaC.common import info
+from MaKaC import domain
+from MaKaC.webinterface import urlHandlers
+from MaKaC.common import Configuration
+from MaKaC import webcast
 from MaKaC.accessControl import AdminList
-from MaKaC.errors import UserError
 from MaKaC.common.url import URL
 from MaKaC.common import Config
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.conference import Conference, Category
-
 from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry
-import MaKaC.webinterface.common.timezones as convertTime
-from pytz import timezone
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, utctimestamp2date
-from MaKaC.webinterface.common import contribFilters as contribFilters
+from MaKaC.webinterface.common import contribFilters
 from MaKaC.common import filters, utils
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 from MaKaC.errors import MaKaCError
-import MaKaC.webinterface.displayMgr as displayMgr
-import MaKaC.common.TemplateExec as templateEngine
+from MaKaC.webinterface import displayMgr
 from MaKaC.common.ContextHelp import ContextHelp
 from MaKaC.rb_tools import FormMode, overlap
-from MaKaC.common.info import HelperMaKaCInfo
-
-from lxml import etree
-
-from MaKaC.i18n import _
-from indico.util.i18n import i18nformat, parseLocale, getLocaleDisplayNames
-
 from MaKaC.common.TemplateExec import truncateTitle
 from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.common.Announcement import getAnnoucementMgrInstance
+import MaKaC.common.TemplateExec as templateEngine
 
+from indico.util.i18n import i18nformat, parseLocale, getLocaleDisplayNames
 from indico.util.date_time import utc_timestamp, is_same_month
 from indico.core.index import Catalog
-
 from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
-from indico.web.http_api.auth import APIKey
 from indico.web.http_api.util import generate_public_auth_request
-import pkgutil
-import pkg_resources
-from MaKaC.common.Announcement import getAnnoucementMgrInstance
-import hashlib
-
 
 MIN_PRESENT_EVENTS = 6
 OPTIMAL_PRESENT_EVENTS = 10
