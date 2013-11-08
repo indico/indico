@@ -62,6 +62,7 @@ from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
+from MaKaC.roomMapping import RoomMapperHolder
 import MaKaC.common.TemplateExec as templateEngine
 
 from indico.util.i18n import i18nformat, parseLocale, getLocaleDisplayNames
@@ -5379,12 +5380,17 @@ class WRoomBookingRoomDetails( WTemplated ):
         vars["Bar"] = Bar
         vars["withConflicts"] = False
         vars["currentUser"] = self._rh._aw.getUser()
-
+        room_mapper = RoomMapperHolder().match({"placeName": self._rh._room.locationName}, exact=True)
+        if room_mapper:
+            vars["show_on_map"] = room_mapper[0].getMapURL(self._rh._room.name)
+        else:
+            vars["show_on_map"] = urlHandlers.UHRoomBookingMapOfRooms.getURL(roomID=self._rh._room.id)
         return vars
 
-class WRoomBookingDetails( WTemplated ):
 
-    def __init__(self, rh, conference = None):
+class WRoomBookingDetails(WTemplated):
+
+    def __init__(self, rh, conference=None):
         self._rh = rh
         self._resv = rh._resv
         self._conf = conference

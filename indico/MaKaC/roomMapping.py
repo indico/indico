@@ -136,34 +136,60 @@ class RoomMapper(Persistent):
         d["roomMapperId"] = self.getId()
         return d
 
-class _RoomMapperFFName(filters.FilterField):
-    _id="name"
 
-    def satisfies(self,roomMapper, exact=False):
+class _RoomMapperFFBasicName(filters.FilterField):
+    """
+    Use when the filter is comparing basic strings
+    """
+
+    def _getBasicNameFunc(self, room_mapper):
+        """
+        returns the method that will provide the string value to use in the comparison
+        """
+        pass
+
+    def satisfies(self, room_mapper, exact=False):
         for value in self._values:
             if value is not None and value.strip() != "":
                 if value.strip() == "*":
                     return True
                 if exact:
-                    if roomMapper.getName().lower().strip() == value.lower().strip():
+                    if self._getBasicNameFunc(room_mapper)().lower().strip() == value.lower().strip():
                         return True
                 else:
-                    if str(roomMapper.getName()).lower().find((str(value).strip().lower()))!=-1:
+                    if str(self._getBasicNameFunc(room_mapper)()).lower().find((str(value).strip().lower())) != -1:
                         return True
         return False
 
 
+class _RoomMapperFFName(_RoomMapperFFBasicName):
+    _id = "name"
+
+    def _getBasicNameFunc(self, room_mapper):
+        return room_mapper.getName
+
+
+class _RoomMapperFFPlaceName(_RoomMapperFFBasicName):
+    _id = "placename"
+
+    def _getBasicNameFunc(self, room_mapper):
+        return room_mapper.getPlaceName
+
+
 class _RoomMapperFilterCriteria(filters.FilterCriteria):
-    _availableFields={"name":_RoomMapperFFName}
 
-    def __init__(self,criteria={}):
-        filters.FilterCriteria.__init__(self,None,criteria)
+    _availableFields = {"name": _RoomMapperFFName,
+                        "placename": _RoomMapperFFPlaceName}
 
-    def satisfies( self, value, exact=False):
+    def __init__(self, criteria={}):
+        filters.FilterCriteria.__init__(self, None, criteria)
+
+    def satisfies(self, value, exact=False):
         for field in self._fields.values():
-            if not field.satisfies( value, exact ):
+            if not field.satisfies(value, exact):
                 return False
         return True
+
 
 class RoomMapperFilter(filters.SimpleFilter):
     """Performs filtering and sorting over a list of abstracts.
