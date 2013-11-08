@@ -67,6 +67,10 @@ ndRegForm.directive('ndRegForm', function(url, ajaxquery) {
                 }
             };
 
+            $scope.getTpl = function(file) {
+                return url.tpl(file);
+            };
+
             $scope.api = {
                 createSection: function(data) {
                     $scope.sections.push({

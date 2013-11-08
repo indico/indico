@@ -17,22 +17,22 @@
             {{ section.description }}
         </div>
         <div ng-switch-default
-            ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/general.tpl.html'">
+            ng-include="getTpl('sections/general.tpl.html')">
         </div>
         <div ng-switch-when="accommodation"
-            ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/accomodation.tpl.html'">
+            ng-include="getTpl('sections/accomodation.tpl.html')">
         </div>
         <div ng-switch-when="furtherInformation"
-            ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/furtherinfo.tpl.html'">
+            ng-include="getTpl('sections/furtherinfo.tpl.html')">
         </div>
         <div ng-switch-when="reasonParticipation"
-            ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/reason.tpl.html'">
+            ng-include="getTpl('sections/reason.tpl.html')">
         </div>
         <div ng-switch-when="sessions"
-            ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/sessions.tpl.html'">
+            ng-include="getTpl('sections/sessions.tpl.html')">
         </div>
         <div ng-switch-when="socialEvents"
-            ng-include="'/indico/js/indico/RegistrationForm/tpls/sections/socialevents.tpl.html'">
+            ng-include="getTpl('sections/socialevents.tpl.html')">
         </div>
     </div>
 
