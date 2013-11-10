@@ -19,7 +19,7 @@ var ndRegForm = angular.module('nd.regform', [
     'ngResource'
 ]);
 
-ndRegForm.value('ajaxquery',
+ndRegForm.value('sectionurl',
     Indico.Urls.Base + '/event/:confId/manage/registration/preview/sections/:sectionId'
 );
 
@@ -27,7 +27,7 @@ ndRegForm.config(function(urlProvider) {
     urlProvider.setModulePath('/js/indico/RegistrationForm');
 });
 
-ndRegForm.directive('ndRegForm', function(url, ajaxquery) {
+ndRegForm.directive('ndRegForm', function(url, sectionurl) {
     return {
         replace: true,
         templateUrl:  url.tpl('registrationform.tpl.html'),
@@ -37,14 +37,14 @@ ndRegForm.directive('ndRegForm', function(url, ajaxquery) {
         },
 
         controller: function($scope, $resource) {
-            var Section = $resource(ajaxquery, {
+            var Section = $resource(sectionurl, {
                 8000: ":8000",
                 confId: $scope.confId,
                 sectionId: "@sectionId"
             });
 
             var sections = Section.get(function() {
-                $scope.sections = sections["items"];
+                $scope.sections = sections["sections"];
             });
 
             $scope.dialogs = {
@@ -73,12 +73,9 @@ ndRegForm.directive('ndRegForm', function(url, ajaxquery) {
 
             $scope.api = {
                 createSection: function(data) {
-                    $scope.sections.push({
-                        // TODO initialize properly
-                        // id: '-1',
-                        items: [],
-                        title: data.newfield.title,
-                        description: data.newfield.description
+                    var newSection = new Section(data.newsection);
+                    newSection.$save(function(data, headers) {
+                        $scope.sections = data["sections"];
                     });
                 },
                 removeSection: function(sectionId) {
@@ -95,11 +92,11 @@ ndRegForm.directive('ndAddSectionDialog', function(url) {
         templateUrl: url.tpl('sections/dialogs/sectioncreation.tpl.html'),
         link: function(scope) {
             scope.actions.init = function() {
-                scope.newfield = {};
+                scope.newsection = {};
             };
 
             scope.actions.cleanup = function() {
-                scope.newfield = undefined;
+                scope.newsection = undefined;
             };
         }
     };

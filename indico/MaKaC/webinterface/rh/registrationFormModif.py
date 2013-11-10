@@ -18,28 +18,31 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import session
 from flask import jsonify
+from flask import request
 
 from indico.util.fossilize import fossilize
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
-from MaKaC.registration import Status, StatusValue
-import MaKaC.webinterface.rh.conferenceModif as conferenceModif
+from MaKaC.registration import Status, StatusValue, GeneralSectionForm
+from MaKaC.webinterface.rh.conferenceModif import RHModificationBaseProtected, RHConferenceBase
 from MaKaC.errors import FormValuesError, MaKaCError, ConferenceClosedError
 from datetime import datetime
 from MaKaC.common import utils
 from MaKaC.i18n import _
-
 
 # indico legacy imports
 from MaKaC.services.implementation.base import AdminService, ParameterManager, \
      ServiceError
 
 
-class RHRegistrationFormModifBase( conferenceModif.RHConferenceModifBase ):
+class RHRegistrationFormModifBase(RHConferenceBase, RHModificationBaseProtected):
+
+    def _checkParams( self, params ):
+        RHConferenceBase._checkParams( self, params )
 
     def _checkProtection( self ):
         if not self._target.canManageRegistration(self.getAW().getUser()):
-            conferenceModif.RHConferenceModifBase._checkProtection(self)
+            RHModificationBaseProtected._checkProtection(self)
         if self._target.getConference().isClosed():
             raise ConferenceClosedError(self._target.getConference())
 
@@ -325,28 +328,63 @@ class RHRegistrationFormModifStatusPerformModif( RHRegistrationFormModifStatusBa
         self._redirect("%s#statuses"%urlHandlers.UHConfModifRegForm.getURL(self._conf.getRegistrationForm()))
 
 
-class RHRegistrationPreviewSectionQuery(RHRegistrationFormModifBase):
+# START of RESTFUL
 
-    def _process(self):
-        return jsonify(items=fossilize(self._conf.getRegistrationForm().getSortedForms()))
+class RegistrationFormModifRESTBase(RHRegistrationFormModifBase):
+
+    def getFormFossil(self):
+        return { 'sections'     : fossilize( self._conf.getRegistrationForm().getSortedForms() ),
+                  'currency'    : self._conf.getRegistrationForm().getCurrency()
+               }
+    def getSectionsFossil(self):
+        return fossilize( self._conf.getRegistrationForm().getSortedForms() )
+
+    def parseJsonItem(self, item):
+        # Convert to boolean type
+        item['billable'] = item.get( 'billable', 'false' ) == 'true'
+        item['enabled'] = item.get( 'enabled', 'true' ) == 'true'
+        item['cancelled'] = item.get( 'cancelled', 'false' ) == 'true'
+        item['isEnabled'] = item.get( 'isEnabled', 'true' ) == 'true'
+        return item
+
+    def _checkParams(self, params):
+        RHRegistrationFormModifBase._checkParams(self, params)
+        self._pm = ParameterManager(params)
+        self._regForm = self._conf.getRegistrationForm()
 
 
-class RHRegistrationPreviewSectionGet(RHRegistrationFormModifBase):
+class RHRegistrationPreviewSectionQuery(RegistrationFormModifRESTBase):
 
-    def _process(self):
-        sectionId = int(self.getRequestParams()["sectionId"])
-        return jsonify(fossilize(self._conf.getRegistrationForm().getSortedForms()[sectionId]))
+    def _process_GET(self):
+        return jsonify(self.getFormFossil())
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._sectionHeader = {}
+        self._sectionHeader["title"] = post_pm.extract('title', pType=str, allowEmpty=False)
+        self._sectionHeader["descripcion"] = post_pm.extract('title', pType=str, allowEmpty=True)
+
+    def _process_POST(self):
+        pos = next((i for i, f in enumerate(self._regForm.getSortedForms()) if not f.isEnabled()), None)
+        section = GeneralSectionForm(self._regForm, data=self._sectionHeader)
+        print section
+        self._regForm.addGeneralSectionForm( section, preserveTitle=True, pos=pos )
+        return jsonify(self.getFormFossil())
 
 
-class RHRegistrationPreviewSectionSave(RHRegistrationFormModifBase):
+class RHRegistrationPreviewSection(RegistrationFormModifRESTBase):
 
-    def _process(self):
-        # TODO
-        pass
+    def _checkParams(self, params):
+        RegistrationFormModifRESTBase._checkParams(self, params)
+        self._sectionId = self._pm.extract('sectionId', pType=str, allowEmpty=False)
+        self._section = self._regForm.getSectionById( self._sectionId )
+        if not self._section:
+            raise MaKaCError(_( "Invalid section Id" ))
 
+    def _process_GET(self):
+        return jsonify(fossilize(self._section))
 
-class RHRegistrationPreviewSectionRemove(RHRegistrationFormModifBase):
-
-    def _process(self):
-        # TODO
-        pass
+    def _process_DELETE(self):
+        if not self._section.isRequired():
+            self._regForm.removeGeneralSectionForm(self._section)
+        return jsonify(self.getFormFossil())

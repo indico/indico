@@ -43,22 +43,14 @@ event_mgmt.add_url_rule('/registration/setup/statuses/<statusId>/modify',
 # Preview
 event_mgmt.add_url_rule('/registration/preview', 'confModifRegistrationPreview',
                         registrationFormModif.RHRegistrationPreview)
-event_mgmt.add_url_rule('/registration/preview/sections/',
+event_mgmt.add_url_rule('/registration/preview/sections',
                         'confModifRegistrationPreviewSection-query',
                         registrationFormModif.RHRegistrationPreviewSectionQuery,
-                        methods=('GET',))
+                        methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>',
                         'confModifRegistrationPreviewSection-get',
-                        registrationFormModif.RHRegistrationPreviewSectionGet,
-                        methods=('GET',))
-event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>',
-                        'confModifRegistrationPreviewSection-save',
-                        registrationFormModif.RHRegistrationPreviewSectionSave,
-                        methods=('POST',))
-event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>',
-                        'confModifRegistrationPreviewSection-remove',
-                        registrationFormModif.RHRegistrationPreviewSectionRemove,
-                        methods=('DELETE',))
+                        registrationFormModif.RHRegistrationPreviewSection,
+                        methods=('GET', 'POST', 'DELETE'))
 
 # Registrants
 event_mgmt.add_url_rule('/registration/users/', 'confModifRegistrants', registrantsModif.RHRegistrantListModif,
