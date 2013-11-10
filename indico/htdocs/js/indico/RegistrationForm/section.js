@@ -93,8 +93,10 @@ ndRegForm.directive('ndSection', function(url) {
 ndRegForm.directive("ndGeneralSection", function($timeout) {
     return {
         require: 'ndSection',
+        controller: 'SectionCtrl', //TODO check inheritance
         link: function(scope) {
             scope.buttons.newfield = true;
+            scope.buttons.disable = true;
 
             // TODO can we move fieldtypes to the tpl? It only happens once
             // scope.fieldtypes = [
@@ -141,6 +143,19 @@ ndRegForm.directive("ndGeneralSection", function($timeout) {
                 {id: 'config',          name: $T("Configuration"),     type: 'config'},
                 {id: 'editEvents',      name: $T("Edit events"),       type: 'editionTable'},
                 {id: 'canceledEvent',   name: $T("Canceled events"),   type: 'cancelEvent'}
+            ];
+        }
+    };
+});
+
+ndRegForm.directive("ndPersonalDataSection", function() {
+    return {
+        require: 'ndGeneralSection',
+        link: function(scope) {
+            scope.buttons.config = true;
+            scope.buttons.disable = false;
+            scope.tabs = [
+                {id: 'config',              name: $T("Configuration"),          type: 'config' },
             ];
         }
     };
