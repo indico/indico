@@ -122,8 +122,8 @@ def _getInstallRequires():
 
     These are the ones needed for runtime.'''
 
-    base = ['ZODB3==3.10.5', 'zope.index==3.6.4', 'zope.interface',
-            'pytz', 'lxml', 'cds-indico-extras', 'zc.queue',
+    base = ['ZODB3==3.10.5', 'zope.index==3.6.4', 'zope.interface==3.8.0',
+            'pytz', 'lxml', 'cds-indico-extras', 'zc.queue==1.3',
             'python-dateutil<2.0', 'pypdf', 'mako>=0.4.1', 'babel',
             'icalendar>=3.2', 'pyatom', 'jsmin', 'cssmin', 'webassets', 'pojson>=0.4',
             'requests>=1.2.0', 'simplejson>=2.1.0', 'reportlab', 'oauth2']
