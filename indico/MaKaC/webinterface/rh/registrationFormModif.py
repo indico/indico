@@ -418,3 +418,263 @@ class RHRegistrationFormSectionDisable(RHRegistrationFormModifSectionBase):
         # Move the section to the end
         self._regForm.addToSortedForms(self._section)
         return json.dumps(self._section.fossilize())
+
+
+class RegistrationFormSectionMove(RHRegistrationFormModifSectionBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._sectionEndPos = post_pm.extract('endPos', pType=int, allowEmpty=False)
+
+    def _process_POST(self):
+        self._regForm.addToSortedForms(self._section, self._sectionEndPos)
+        return json.dumps(self._section.fossilize())
+
+
+class RHRegistrationFormAccommodationSetConfig(RHRegistrationFormModifSectionBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._datesOffsets = post_pm.extract('datesOffsets', pType=dict, allowEmpty=False)
+
+    def _process_POST(self):
+        arrDates = [int(self._datesOffsets.get("aoffset1", -2)), int(self._datesOffsets.get("aoffset2", 0))]
+        depDates = [int(self._datesOffsets.get("doffset1", 1)), int(self._datesOffsets.get("doffset2", 3))]
+        self._section.setArrivalOffsetDates(arrDates)
+        self._section.setDepartureOffsetDates(depDates)
+        return json.dumps(self._section.fossilize())
+
+
+class RHRegistrationFormSocialEventsSetConfig(RHRegistrationFormModifSectionBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._intro = post_pm.extract('intro', pType=str, allowEmpty=False)
+        self._selectionType = post_pm.extract('selectionType', pType=str, allowEmpty=False)
+
+    def _process_POST(self):
+        self._section.setIntroSentence(self._intro)
+        self._section.setSelectionType(self._selectionType)
+        return json.dumps(self._section.fossilize())
+
+
+class RHRegistrationFormSessionsSetConfig(RHRegistrationFormModifSectionBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._type = post_pm.extract('type', pType=str, allowEmpty=False)
+
+    def _process_POST(self):
+        if self._type in ["all", "2priorities"]:
+            self._section.setType(self._type)
+        else:
+            raise MaKaCError(_("Unknown type"))
+        return json.dumps(self._section.fossilize())
+
+
+class RHRegistrationFormAccommodationSetItems(RHRegistrationFormModifSectionBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._items = map(self.parseJsonItem, post_pm.extract('items', pType=list, allowEmpty=False))
+
+    def _process_POST(self):
+        for item in self._items:
+            accoType = None
+            if item.get('id') == 'isNew':
+                accoType = AccommodationType(self._regForm)
+                self._section.addAccommodationType(accoType)
+            else:
+                accoType = self._section.getAccommodationTypeById(item.get('id'))
+
+            if 'remove' in item:
+                self._section.removeAccommodationType(accoType)
+            else:
+                accoType.setValues(item)
+
+        return self._section.fossilize()
+
+
+class RHRegistrationFormSocialEventsSetItems(RHRegistrationFormModifSectionBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._items = post_pm.extract('items', pType=list, allowEmpty=False)
+
+    def _process_POST(self):
+        for item in self._items:
+
+            # Convert to boolean type
+            if 'billable' in item:
+                item['billable'] = item['billable'] == 'true'
+            if 'pricePerPlace' in item:
+                item['pricePerPlace'] = item['pricePerPlace'] == 'true'
+            if 'cancelled' in item:
+                item['cancelled'] = item['cancelled'] == 'true'
+
+            # Load or create social event
+            socialEventItem = None
+            if item.get('id') == 'isNew':
+                socialEventItem = SocialEventItem(self._regForm)
+                self._section.addSocialEvent(socialEventItem)
+            else:
+                socialEventItem = self._section.getSocialEventById(item.get('id'))
+
+            # set or remove social event
+            if 'remove' in item:
+                self._section.removeSocialEvent(socialEventItem)
+            else:
+                socialEventItem.setValues(item)
+
+        return self._section.fossilize()
+
+
+class RHRegistrationFormSessionsSetItems(RHRegistrationFormModifSectionBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._items = post_pm.extract('items', pType=list, allowEmpty=False)
+
+    def _process_POST(self):
+        for item in self._items:
+
+            # Convert to boolean type
+            item['billable'] = item.get('billable', False) == 'true'
+            item['enabled'] = item.get('enabled', False) == 'true'
+
+            session = self._section.getSessionById(item.get('id'))
+            if session is not None:
+                session.setValues(item)
+                if not item.get('enabled'):
+                    self._section.removeSession(item.get('id'))
+            else:
+                session = self._conf.getSessionById(item.get('id'))
+                if(item.get('enabled')):
+                    s = self._conf.getSessionById(item.get('id'))
+                    rs = session.getRegistrationSession()
+                    if not rs:
+                        rs = RegistrationSession(s, self._regForm)
+                    else:
+                        rs.setRegistrationForm(self._regForm)
+                    self._section.addSession(rs)
+                    rs.setValues(item)
+
+        return self._section.fossilize()
+
+
+class RHRegistrationFormFieldCreate(RHRegistrationFormModifSectionBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._fieldData = post_pm.extract('field', pType=dict, allowEmpty=False)
+
+    def _process_POST(self):
+        if 'billable' in self._fieldData:
+            self._fieldData['billable'] = self._fieldData['billable'] == 'true'
+        if 'radioitems' in self._fieldData:
+            radioitems = self._fieldData['radioitems']
+            radioitems = [item for item in radioitems if not 'remove' in item]
+            self._fieldData['radioitems'] = map(self.parseJsonItem, radioitems)
+        # For compatibility reason the client side uses yesno
+        if (self._fieldData['input'] == 'yesno'):
+            self._fieldData['input'] = 'yes/no'
+        field = GeneralField(self._section, data=self._fieldData)
+        pos = next((i for i, f in enumerate(self._section.getSortedFields()) if f.isDisabled()), None)
+        self._section.addToSortedFields(field, i=pos)
+        return json.dumps(field.fossilize())
+
+
+class RHRegistrationFormModifFieldBase(RHRegistrationFormModifSectionBase):
+
+    def _checkParams(self, params):
+        RHRegistrationFormModifSectionBase._checkParams(self, params)
+        fieldId = self._pm.extract('fieldId', pType=str, allowEmpty=False)
+        self._field = self._section.getFieldById(fieldId)
+        if not self._field:
+            raise MaKaCError(_("Invalid field Id"))
+
+
+class RegistrationFormFieldSetStatus(RHRegistrationFormModifFieldBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._action = post_pm.extract('action', pType=str, allowEmpty=False)
+
+    def _process_POST(self):
+        if not self._field.isLocked('delete') and self._action == 'remove':
+            self._section.removeField(self._field)
+        elif not self._field.isLocked('disable') and self._action == 'disable':
+            # Move field to the end of the list
+            self._section.addToSortedFields(self._field)
+            self._field.setDisabled(True)
+        elif self._action == 'enable':
+            # Move field to the first position
+            self._section.addToSortedFields(self._field, 0)
+            self._field.setDisabled(False)
+        else:
+            raise MaKaCError(_("Action couldn't be perform"))
+
+        return json.dumps(self._field.fossilize())
+
+
+class RegistrationFormFieldSetItems(RHRegistrationFormModifFieldBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._items = post_pm.extract('items', pType=list, allowEmpty=False)
+
+    def _process_POST(self):
+        for i in range(0, len(self._items)):
+            itemValues = self._items[i]
+            itemValues["isEnabled"] = itemValues["isEnabled"] == "true"
+            itemValues["billable"] = itemValues["billable"] == "true"
+            item = self._field.getItemById(itemValues['id'])
+            if item is None:
+                self._field.createItem(itemValues, i)
+            else:
+                # remove else set and move
+                if 'remove' in itemValues:
+                    self._field.removeItem(item)
+                else:
+                    item.setValues(itemValues)
+                    self._field.addItem(item, i)
+
+        return json.dumps(self._field.fossilize())
+
+
+class RegistrationFormFieldMove(RHRegistrationFormModifFieldBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._sectionEndPos = post_pm.extract('endPos', pType=int, allowEmpty=False)
+
+    def _process_POST(self):
+        # If general section
+        if self._section.getId().isdigit():
+            # Enable field if moved out side of the disabled fields
+            if (self._sectionEndPos == 0 or not self._section.getSortedFields()[self._sectionEndPos].isDisabled()):
+                self._field.setDisabled(False)
+            else:
+                if self._field.isLocked('disable'):
+                    return json.dumps(self._section.fossilize())
+                    #w = Warning(_('Warning'), _('This field can\'t be disabled'))
+                    #return ResultWithWarning(self._section.fossilize(), w).fossilize()
+                else:
+                    self._field.setDisabled(True)
+            self._section.addToSortedFields(self._field, self._sectionEndPos)
+        else:
+            raise ServiceError("", _("Section id: " + self._section.getId() + " doesn't support field move"))
+
+        return self._section.fossilize()
+
+
+class RegistrationFormFieldSet(RHRegistrationFormModifFieldBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._updateFieldData = post_pm.extract('updateFieldData', pType=dict, allowEmpty=False)
+
+    def _process_POST(self):
+        self._updateFieldData['input'] = self._field.getInput().getId()
+        self._field.setValues(self._updateFieldData)
+        return json.dumps(self._section.fossilize())
