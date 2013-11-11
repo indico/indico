@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-ndRegForm.controller('SectionCtrl', function($scope) {
+ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI',  function($scope, $rootScope, RESTAPI) {
     $scope.api = {};
 
     $scope.api.createSection = function(section) {
@@ -23,11 +23,23 @@ ndRegForm.controller('SectionCtrl', function($scope) {
     };
 
     $scope.api.disableSection = function(section) {
-        section.enabled = false;
+        RESTAPI.Sections.disable({confId: $rootScope.confId, sectionId: section.id}, function(data) {
+            section.enabled = data.enabled; //TODO: See why we cannot put section=data
+        });
     };
+
     $scope.api.restoreSection = function(section) {
-        section.enabled = true;
+        RESTAPI.Sections.enable({confId: $rootScope.confId, sectionId: section.id}, function(data) {
+            section.enabled = data.enabled; //TODO: See why we cannot put section=data
+        });
     };
+
+    $scope.api.removeSection = function(section) {
+        RESTAPI.Sections.remove({confId: $rootScope.confId, sectionId: section.id}, function(data) {
+            //TODO: See how to update model!!
+        });
+    };
+
     $scope.api.addField = function(section, field) {
         // TODO properly initialize field
         section.items.push({
@@ -37,7 +49,7 @@ ndRegForm.controller('SectionCtrl', function($scope) {
             description: 'desc'
         });
     };
-});
+}]);
 
 ndRegForm.directive('ndSection', function(url) {
     return {
@@ -46,6 +58,7 @@ ndRegForm.directive('ndSection', function(url) {
         controller: 'SectionCtrl',
 
         link: function(scope, element) {
+
             scope.buttons = {
                 newfield: false,
                 config: false,
@@ -139,11 +152,6 @@ ndRegForm.directive("ndGeneralSection", function($timeout) {
 
             };
 
-            scope.tabs = [
-                {id: 'config',          name: $T("Configuration"),     type: 'config'},
-                {id: 'editEvents',      name: $T("Edit events"),       type: 'editionTable'},
-                {id: 'canceledEvent',   name: $T("Canceled events"),   type: 'cancelEvent'}
-            ];
         }
     };
 });
@@ -152,7 +160,6 @@ ndRegForm.directive("ndPersonalDataSection", function() {
     return {
         require: 'ndGeneralSection',
         link: function(scope) {
-            scope.buttons.config = true;
             scope.buttons.disable = false;
             scope.tabs = [
                 {id: 'config',              name: $T("Configuration"),          type: 'config' },
@@ -215,6 +222,11 @@ ndRegForm.directive("ndSocialEventSection", function() {
         link: function(scope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
+            scope.tabs = [
+                {id: 'config',          name: $T("Configuration"),     type: 'config'},
+                {id: 'editEvents',      name: $T("Edit events"),       type: 'editionTable'},
+                {id: 'canceledEvent',   name: $T("Canceled events"),   type: 'cancelEvent'}
+            ];
         }
     };
 });

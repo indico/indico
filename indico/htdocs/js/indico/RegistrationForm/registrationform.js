@@ -19,15 +19,29 @@ var ndRegForm = angular.module('nd.regform', [
     'ngResource'
 ]);
 
-ndRegForm.value('sectionurl',
-    Indico.Urls.Base + '/event/:confId/manage/registration/preview/sections/:sectionId'
+ndRegForm.value('baseurl',
+    Indico.Urls.Base + '/event/:confId/manage/registration/preview/'
 );
 
 ndRegForm.config(function(urlProvider) {
     urlProvider.setModulePath('/js/indico/RegistrationForm');
 });
 
-ndRegForm.directive('ndRegForm', function(url, sectionurl) {
+ndRegForm.factory('RESTAPI', ['$resource','baseurl', function($resource, baseurl) {
+
+    var sectionurl = baseurl + 'sections/:sectionId';
+    return {
+        Sections: $resource(sectionurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId"},
+                            {"enable": {method:'POST', url: sectionurl + "/enable"},
+                             "disable": {method:'POST', url: sectionurl + "/disable"},
+                             "remove": {method:'POST', url: sectionurl + "/remove"}
+                            }),
+    };
+}]);
+
+
+
+ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
     return {
         replace: true,
         templateUrl:  url.tpl('registrationform.tpl.html'),
@@ -37,13 +51,9 @@ ndRegForm.directive('ndRegForm', function(url, sectionurl) {
         },
 
         controller: function($scope, $resource) {
-            var Section = $resource(sectionurl, {
-                8000: ":8000",
-                confId: $scope.confId,
-                sectionId: "@sectionId"
-            });
+            $rootScope.confId = $scope.confId;
 
-            var sections = Section.get(function() {
+            var sections = RESTAPI.Sections.get({confId: $scope.confId}, function() {
                 $scope.sections = sections["sections"];
             });
 
@@ -73,14 +83,10 @@ ndRegForm.directive('ndRegForm', function(url, sectionurl) {
 
             $scope.api = {
                 createSection: function(data) {
-                    var newSection = new Section(data.newsection);
-                    newSection.$save(function(data, headers) {
-                        $scope.sections = data["sections"];
+                    var newSection = new RESTAPI.Sections(data.newsection);
+                    newSection.$save({confId: $scope.confId}, function(data, headers) {
+                        $scope.sections.push(data);
                     });
-                },
-                removeSection: function(sectionId) {
-                    // TODO
-                    console.log('removing setion');
                 }
             };
         }

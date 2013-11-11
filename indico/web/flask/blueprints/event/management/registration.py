@@ -51,6 +51,19 @@ event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>',
                         'confModifRegistrationPreviewSection-get',
                         registrationFormModif.RHRegistrationPreviewSection,
                         methods=('GET', 'POST', 'DELETE'))
+event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/enable',
+                        'confModifRegistrationPreviewSection-enable',
+                        registrationFormModif.RHRegistrationFormSectionEnable,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/disable',
+                        'confModifRegistrationPreviewSection-disable',
+                        registrationFormModif.RHRegistrationFormSectionDisable,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/remove',
+                        'confModifRegistrationPreviewSection-remove',
+                        registrationFormModif.RHRegistrationFormSectionRemove,
+                        methods=('POST',))
+
 
 # Registrants
 event_mgmt.add_url_rule('/registration/users/', 'confModifRegistrants', registrantsModif.RHRegistrantListModif,

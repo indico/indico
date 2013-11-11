@@ -21,6 +21,8 @@ from flask import jsonify
 from flask import request
 
 from indico.util.fossilize import fossilize
+from indico.util import json
+
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC.registration import Status, StatusValue, GeneralSectionForm
@@ -367,19 +369,21 @@ class RHRegistrationPreviewSectionQuery(RegistrationFormModifRESTBase):
     def _process_POST(self):
         pos = next((i for i, f in enumerate(self._regForm.getSortedForms()) if not f.isEnabled()), None)
         section = GeneralSectionForm(self._regForm, data=self._sectionHeader)
-        print section
-        self._regForm.addGeneralSectionForm( section, preserveTitle=True, pos=pos )
-        return jsonify(self.getFormFossil())
+        self._regForm.addGeneralSectionForm(section, preserveTitle=True, pos=pos)
+        return json.dumps(section.fossilize())
 
 
-class RHRegistrationPreviewSection(RegistrationFormModifRESTBase):
+class RHRegistrationFormModifSectionBase(RegistrationFormModifRESTBase):
 
     def _checkParams(self, params):
         RegistrationFormModifRESTBase._checkParams(self, params)
         self._sectionId = self._pm.extract('sectionId', pType=str, allowEmpty=False)
-        self._section = self._regForm.getSectionById( self._sectionId )
+        self._section = self._regForm.getSectionById(self._sectionId)
         if not self._section:
-            raise MaKaCError(_( "Invalid section Id" ))
+            raise MaKaCError(_("Invalid section Id"))
+
+
+class RHRegistrationPreviewSection(RHRegistrationFormModifSectionBase):
 
     def _process_GET(self):
         return jsonify(fossilize(self._section))
@@ -388,3 +392,29 @@ class RHRegistrationPreviewSection(RegistrationFormModifRESTBase):
         if not self._section.isRequired():
             self._regForm.removeGeneralSectionForm(self._section)
         return jsonify(self.getFormFossil())
+
+
+class RHRegistrationFormSectionRemove(RHRegistrationFormModifSectionBase):
+
+    def _process_POST(self):
+        if not self._section.isRequired():
+            self._regForm.removeGeneralSectionForm(self._section)
+        return json.dumps(self._section.fossilize())
+
+
+class RHRegistrationFormSectionEnable(RHRegistrationFormModifSectionBase):
+
+    def _process_POST(self):
+        self._section.setEnabled(True)
+        # Move the section to the first position
+        self._regForm.addToSortedForms(self._section, 0)
+        return json.dumps(self._section.fossilize())
+
+
+class RHRegistrationFormSectionDisable(RHRegistrationFormModifSectionBase):
+
+    def _process_POST(self):
+        self._section.setEnabled(False)
+        # Move the section to the end
+        self._regForm.addToSortedForms(self._section)
+        return json.dumps(self._section.fossilize())
