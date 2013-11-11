@@ -1,0 +1,20 @@
+<form>
+    <div class="regFormDialogEditLine">
+        <label class="regFormDialogCaptionLine">{{ 'Arrival dates (offset)' | i18n }}</label>
+        {{ 'event start date offset:' | i18n  }}
+        <input type="text" name="aoffset1" size="2" value="{{ section.arrivalOffsetDates[0] }}"/>
+        {{ 'days' }}-&gt;
+        {{ 'event end date offset:' | i18n  }}
+        <input type="text" name="aoffset2" size="2" value="{{ section.arrivalOffsetDates[1] }}">
+        {{ 'days' | i18n  }}
+    </div>
+    <div class="regFormDialogEditLine">
+        <label class="regFormDialogCaptionLine">{{ 'Departure dates (offset)' | i18n }}</label>
+        {{ 'event start date offset:' | i18n }}
+        <input type="text" name="doffset1" size="2" value="{{ section.departureOffsetDates[0] }}">
+        {{ 'days' }} -&gt;
+        {{ 'event end date offset:' | i18n }}
+        <input type="text" name="doffset2" size="2" value="{{ section.departureOffsetDates[1] }}">
+        {{ 'days' | i18n }}
+    </div>
+</form>

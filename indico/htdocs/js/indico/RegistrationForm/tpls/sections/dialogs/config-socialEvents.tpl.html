@@ -1,0 +1,17 @@
+<form>
+    <div class="regFormDialogEditLine">
+        <label class="regFormDialogCaption">{{ 'Selection type' | i18n }}</label>
+        <select name="selectionType">
+            <option value="unique" {{"selected" if section.selectionType == "unique" }}>
+                {{ 'Unique choice' | i18n }}
+            </option>
+            <option value="multiple" {{"selected" if section.selectionType == "multiple" }}>
+                {{ 'Multiple choice' | i18n }}
+            </option>
+        </select>
+    </div>
+    <div class="regFormDialogEditLine">
+        <label class="regFormDialogCaption">{{ 'Introduction sentence' | i18n }}</label>
+        <textarea id="descriptionEdit" name="introSentence" cols="40" rows="6">{{ section.introSentence }}</textarea>
+     </div>
+</form>

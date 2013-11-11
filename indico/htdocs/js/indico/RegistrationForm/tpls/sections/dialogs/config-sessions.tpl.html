@@ -1,13 +1,13 @@
 <form>
     <div class="regFormDialogEditLine">
         <label class="regFormDialogCaption" style="width : 180px">
-            {{ _ "Type of sessions' form" | i18n }}
+            {{ "Type of sessions' form" | i18n }}
         </label>
         <select name="type">
-            <option value="2priorities" {{ "selected" if type == "2priorities" }}>
+            <option value="2priorities" {{ "selected" if section.type == "2priorities" }}>
                 {{ '2 choices' | i18n }}
             </option>
-            <option value="all" {{ "selected" if type == "all" }}>
+            <option value="all" {{ "selected" if section.type == "all" }}>
                 {{ 'multiple' | i18n }}
             </option>
         </select>

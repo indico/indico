@@ -235,6 +235,12 @@ ndRegForm.directive('ndSectionDialog', function(url) {
     return {
         require: 'ndDialog',
         replace: true,
-        templateUrl: url.tpl('sections/dialogs/base.tpl.html')
+        templateUrl: url.tpl('sections/dialogs/base.tpl.html'),
+        link: function(scope) {
+            scope.section = scope.$parent.section;
+            scope.getTabTpl = function(tab_type) {
+                return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(tab_type, scope.section.id));
+            }
+        }
     };
 });
