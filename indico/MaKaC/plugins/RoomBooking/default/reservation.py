@@ -433,26 +433,42 @@ class Reservation( Persistent, ReservationBase, Observable ):
         ReservationBase.setExcludedDays( self, excludedDays )
         self._excludedDays = excludedDays
 
-    def excludeDay( self, dayD, unindex = False ):
+    def excludeDay( self, day, unindex = False ):
         """
-        Inserts dayD into list of excluded days.
-        dayD should be of date type (NOT datetime).
+        Inserts day into list of excluded days.
+        day should be of date type (NOT datetime).
         """
-        ReservationBase.excludeDay( self, dayD )
+        ReservationBase.excludeDay( self, day )
         lst = self._excludedDays
-        if not dayD in lst:
-            lst.append( dayD )
+
+        if not day in lst:
+            lst.append(day)
+
         self._excludedDays = lst  # Force update
 
         if unindex:
-            dayReservationsIndexBTree = Reservation.getDayReservationsIndexRoot()
-            if dayReservationsIndexBTree.has_key(dayD):
+            day_resv_idx = Reservation.getDayReservationsIndexRoot()
+            room_day_resv_idx = Reservation.getRoomDayReservationsIndexRoot()
+
+            if day in day_resv_idx:
                 try:
-                    resvs = dayReservationsIndexBTree[dayD]
-                    resvs.remove( self )
-                    dayReservationsIndexBTree[dayD] = resvs
+                    resvs = day_resv_idx[day]
+                    resvs.remove(self)
+                    day_resv_idx[day] = resvs
                 except ValueError, e:
-                    Logger.get('RoomBooking').debug("excludeDay: Unindexing a day (%s) which is not indexed"%dayD)
+                    Logger.get('RoomBooking').debug("excludeDay: DayReservationsIndex - unindexing "
+                                                    "a day ({0}) which is not indexed".format(day))
+
+            key = (self.room.id, day)
+
+            if key in room_day_resv_idx:
+                try:
+                    resvs = room_day_resv_idx[key]
+                    resvs.remove(self)
+                    room_day_resv_idx[key] = resvs
+                except ValueError, e:
+                    Logger.get('RoomBooking').debug("excludeDay: RoomDayReservationsIndex - unindexing "
+                                                    "a key ({0}) which is not indexed".format(key))
 
     def includeDay( self, dayD ):
         """

@@ -23,60 +23,59 @@ from indico.util.translations import LazyProxy
 from MaKaC.plugins import OldObservable
 from MaKaC.plugins.base import extension_point
 
-import os, types
-from xml.sax.saxutils import escape, quoteattr
-from datetime import timedelta,datetime,date
-from dateutil.relativedelta import relativedelta
+import os
+import types
 import exceptions
 import urllib
+import pkg_resources
+import binascii
+from lxml import etree
 from operator import attrgetter
-from MaKaC.common.db import DBMgr
-import MaKaC.conference as conference
-import MaKaC.user as user
-import MaKaC.schedule as schedule
-import MaKaC.common.info as info
-import MaKaC.domain as domain
-import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.common.Configuration as Configuration
-from MaKaC import webcast
+from pytz import timezone
+from datetime import timedelta, datetime
+from dateutil.relativedelta import relativedelta
+from xml.sax.saxutils import escape, quoteattr
 
+from MaKaC.i18n import _
+from MaKaC.plugins import PluginsHolder, OldObservable
+from MaKaC.plugins.base import extension_point
+from MaKaC.common.db import DBMgr
+from MaKaC import conference
+from MaKaC import user
+from MaKaC import schedule
+from MaKaC.common import info
+from MaKaC import domain
+from MaKaC.webinterface import urlHandlers
+from MaKaC.common import Configuration
+from MaKaC import webcast
 from MaKaC.accessControl import AdminList
 from MaKaC.common.url import URL
 from MaKaC.common import Config
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.conference import Conference, Category
-
 from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry
-from pytz import timezone
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc, utctimestamp2date
-from MaKaC.webinterface.common import contribFilters as contribFilters
+from MaKaC.webinterface.common import contribFilters
 from MaKaC.common import filters, utils
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 from MaKaC.errors import MaKaCError
-import MaKaC.webinterface.displayMgr as displayMgr
-import MaKaC.common.TemplateExec as templateEngine
+from MaKaC.webinterface import displayMgr
 from MaKaC.common.ContextHelp import ContextHelp
 from MaKaC.rb_tools import FormMode, overlap
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
-
-from lxml import etree
-
-from MaKaC.i18n import _
-from indico.util.i18n import i18nformat, parseLocale, getLocaleDisplayNames
-
 from MaKaC.common.TemplateExec import truncateTitle
 from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.common.Announcement import getAnnoucementMgrInstance
+from MaKaC.roomMapping import RoomMapperHolder
+import MaKaC.common.TemplateExec as templateEngine
 
+from indico.util.i18n import i18nformat, parseLocale, getLocaleDisplayNames
 from indico.util.date_time import utc_timestamp, is_same_month
 from indico.core.index import Catalog
-
 from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.http_api.util import generate_public_auth_request
-import pkgutil
-import pkg_resources
-
 
 MIN_PRESENT_EVENTS = 6
 OPTIMAL_PRESENT_EVENTS = 10
@@ -361,6 +360,19 @@ class WHeader(WTemplated):
         vars["adminItemList"] = adminItemList
         vars["getProtection"] = lambda x: self._getProtection(x)
 
+        announcement_header = getAnnoucementMgrInstance().getText()
+        vars["announcement_header"] = announcement_header
+        vars["announcement_header_hash"] = binascii.crc32(announcement_header)
+
+        return vars
+
+
+class WStaticWebHeader(WTemplated):
+    """Templating web component for generating the HTML header for
+        the static web interface when generating a DVD.
+    """
+    def getVars( self ):
+        vars = WTemplated.getVars( self )
         return vars
 
 class WManagementHeader( WHeader ):
@@ -4229,7 +4241,16 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
                 if c.withReservation.isConfirmed:
                     bars.append( Bar( c, Bar.CONFLICT ) )
                     collisions.append( c )
-                else:
+                else:% if 'login_as_orig_user' in _session:
+    <div class="impersonation-header clearfix">
+        <span class="text">
+            ${ _('Logged in as') }:
+            ${ _session['login_as_orig_user']['user_name'] } &raquo; ${ currentUser.getStraightFullName(upper=False) }
+        </span>
+        <span class="undo-login-as icon-close contextHelp" title="Switch back to ${ _session['login_as_orig_user']['user_name'] }"></span>
+    </div>
+% endif
+
                     bars.append( Bar( c, Bar.PRECONFLICT ) )
 
             if not candResv.isRejected and not candResv.isCancelled:
@@ -4507,35 +4528,35 @@ class WRoomBookingRoomDetails( WTemplated ):
         self._rh = rh
         self._standalone = standalone
 
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["room"] = self._rh._room
-        goodFactory = Location.parse( self._rh._room.locationName ).factory
-        attributes = goodFactory.getCustomAttributesManager().getAttributes( location = self._rh._room.locationName )
-        vars["attrs"] = {}
+    def getVars(self):
+        wvars = WTemplated.getVars(self)
+        wvars["room"] = self._rh._room
+        goodFactory = Location.parse(self._rh._room.locationName).factory
+        attributes = goodFactory.getCustomAttributesManager().getAttributes(location=self._rh._room.locationName)
+        wvars["attrs"] = {}
         for attribute in attributes:
-            if not attribute.get("hidden",False) or self._rh._getUser().isAdmin():
-                vars["attrs"][attribute['name']] = self._rh._room.customAtts.get(attribute['name'],"")
-                if attribute['name'] == 'notification email' :
-                    vars["attrs"][attribute['name']] = vars["attrs"][attribute['name']].replace(',', ', ')
-        vars["config"] = Config.getInstance()
-        vars["standalone"] = self._standalone
-        vars["actionSucceeded"] = self._rh._afterActionSucceeded
-        vars["deletionFailed"] = self._rh._afterDeletionFailed
+            if not attribute.get("hidden", False) or self._rh._getUser().isAdmin():
+                wvars["attrs"][attribute['name']] = self._rh._room.customAtts.get(attribute['name'], "")
+                if attribute['name'] == 'notification email':
+                    wvars["attrs"][attribute['name']] = wvars["attrs"][attribute['name']].replace(',', ', ')
+        wvars["config"] = Config.getInstance()
+        wvars["standalone"] = self._standalone
+        wvars["actionSucceeded"] = self._rh._afterActionSucceeded
+        wvars["deletionFailed"] = self._rh._afterDeletionFailed
 
-        vars["roomStatsUH"] = urlHandlers.UHRoomBookingRoomStats
+        wvars["roomStatsUH"] = urlHandlers.UHRoomBookingRoomStats
 
         if self._standalone:
-            vars["bookingFormUH"] = urlHandlers.UHRoomBookingBookingForm
-            vars["modifyRoomUH"] = urlHandlers.UHRoomBookingRoomForm
-            vars["deleteRoomUH"] = urlHandlers.UHRoomBookingDeleteRoom
-            vars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
+            wvars["bookingFormUH"] = urlHandlers.UHRoomBookingBookingForm
+            wvars["modifyRoomUH"] = urlHandlers.UHRoomBookingRoomForm
+            wvars["deleteRoomUH"] = urlHandlers.UHRoomBookingDeleteRoom
+            wvars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
         else:
-            vars["bookingDetailsUH"] = urlHandlers.UHConfModifRoomBookingDetails
-            vars["conference"] = self._rh._conf
-            vars["bookingFormUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
-            vars["modifyRoomUH"] = urlHandlers.UHRoomBookingRoomForm
-            vars["deleteRoomUH"] = urlHandlers.UHRoomBookingDeleteRoom
+            wvars["bookingDetailsUH"] = urlHandlers.UHConfModifRoomBookingDetails
+            wvars["conference"] = self._rh._conf
+            wvars["bookingFormUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
+            wvars["modifyRoomUH"] = urlHandlers.UHRoomBookingRoomForm
+            wvars["deleteRoomUH"] = urlHandlers.UHRoomBookingDeleteRoom
 
         # Calendar range: 3 months
         if self._rh._searchingStartDT and self._rh._searchingEndDT:
@@ -4574,28 +4595,34 @@ class WRoomBookingRoomDetails( WTemplated ):
         if not self._standalone:
             for dt in bars.iterkeys():
                 for bar in bars[dt]:
-                    bar.forReservation.setOwner( self._rh._conf )
+                    bar.forReservation.setOwner(self._rh._conf)
 
-        vars["calendarStartDT"] = calendarStartDT
-        vars["calendarEndDT"] = calendarEndDT
-        bars = introduceRooms( [self._rh._room], bars, calendarStartDT, calendarEndDT, user = self._rh._aw.getUser() )
+        wvars["calendarStartDT"] = calendarStartDT
+        wvars["calendarEndDT"] = calendarEndDT
+        bars = introduceRooms([self._rh._room], bars, calendarStartDT, calendarEndDT, user=self._rh._aw.getUser())
         fossilizedBars = {}
         for key in bars:
             fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
-        vars["barsFossil"] = fossilizedBars
-        vars["dayAttrs"] = fossilize(dict((day.strftime("%Y-%m-%d"), getDayAttrsForRoom(day, self._rh._room)) for day in bars.iterkeys()))
-        vars["bars"] = bars
-        vars["iterdays"] = iterdays
-        vars["day_name"] = day_name
-        vars["Bar"] = Bar
-        vars["withConflicts"] = False
-        vars["currentUser"] = self._rh._aw.getUser()
+        wvars["barsFossil"] = fossilizedBars
+        wvars["dayAttrs"] = fossilize(dict((day.strftime("%Y-%m-%d"), getDayAttrsForRoom(day, self._rh._room))
+                                           for day in bars.iterkeys()))
+        wvars["bars"] = bars
+        wvars["iterdays"] = iterdays
+        wvars["day_name"] = day_name
+        wvars["Bar"] = Bar
+        wvars["withConflicts"] = False
+        wvars["currentUser"] = self._rh._aw.getUser()
+        room_mapper = RoomMapperHolder().match({"placeName": self._rh._room.locationName}, exact=True)
+        if room_mapper:
+            wvars["show_on_map"] = room_mapper[0].getMapURL(self._rh._room.name)
+        else:
+            wvars["show_on_map"] = urlHandlers.UHRoomBookingMapOfRooms.getURL(roomID=self._rh._room.id)
+        return wvars
 
-        return vars
 
-class WRoomBookingDetails( WTemplated ):
+class WRoomBookingDetails(WTemplated):
 
-    def __init__(self, rh, conference = None):
+    def __init__(self, rh, conference=None):
         self._rh = rh
         self._resv = rh._resv
         self._conf = conference

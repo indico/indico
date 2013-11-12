@@ -81,7 +81,7 @@
                                         </tr>
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top">${ _("Building")}&nbsp;&nbsp;</td>
-                                            <td align="left" class="blacktext"><a href="http://building.web.cern.ch/map/building?bno=${ room.building }" title=" ${ _("Show on map")}">${ room.building }</a></td>
+                                            <td align="left" class="blacktext"><a href="${show_on_map}" title=" ${_("Show on map")}">${ room.building }</a></td>
                                         </tr>
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top">${ _("Floor")}&nbsp;&nbsp;</td>

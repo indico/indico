@@ -1,8 +1,3 @@
-<%
-from MaKaC.common.Announcement import getAnnoucementMgrInstance
-announcement = getAnnoucementMgrInstance().getText()
-%>
-
 % if 'login_as_orig_user' in _session:
     <div class="impersonation-header clearfix">
         <span class="text">
@@ -13,8 +8,23 @@ announcement = getAnnoucementMgrInstance().getText()
     </div>
 % endif
 
-% if announcement != '':
-    <div class="pageOverHeader clearfix">
-        ${ announcement }
+% if announcement_header:
+    <div class="pageOverHeader clearfix" id="announcementHeader">
+        <div class="left">
+        ${announcement_header}
+        </div>
+        <div class="icon-close icon-announcement" id="closeAnnouncement"></div>
     </div>
+    <script type="text/javascript">
+    $('#closeAnnouncement').click(function(){
+        $.jStorage.set("hideAnnouncement", "${announcement_header_hash}");
+        $('#announcementHeader').slideUp("fast");
+    });
+
+    $(function() {
+        if($.jStorage.get("hideAnnouncement") != "${announcement_header_hash}"){
+            $("#announcementHeader").show();
+        }
+     });
+    </script>
 % endif

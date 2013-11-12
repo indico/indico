@@ -742,8 +742,9 @@ class CSBooking(CSBookingBase):
                     """Could not send VidyoPublicRoomModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
                     (self.getId(), self.getConference().getId(), str(e)))
 
-
-        elif operation == 'remove':
+        # isCreated is False when the vidyo room has been remotely removed and
+        # this means that the vidyo room has been detached from all events in Indico
+        elif operation == 'remove' and not self.isCreated():
             #notification to admin
             try:
                 notification = notifications.VidyoPublicRoomRemovalNotificationAdmin(self)

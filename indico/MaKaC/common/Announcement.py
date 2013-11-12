@@ -21,31 +21,29 @@ from persistent import Persistent
 from MaKaC.common import db
 
 
-
 class AnnoucementMgr(Persistent):
-    
+
     def __init__(self):
         self.speed = "2"
         self.text = ""
-    
+
     # TODO: Speed should be removed since no longer used.
     def setSpeed(self, speed):
         self.speed = speed
-    
+
     def getSpeed(self):
         return self.speed
-    
+
     def setText(self, text):
         self.text = text
-    
+
     def getText(self):
         return self.text
 
 
-
 def getAnnoucementMgrInstance():
     dbmgr = db.DBMgr.getInstance()
-    root = dbmgr.getDBConnection().root()        
+    root = dbmgr.getDBConnection().root()
     try:
         am = root["AnnoucementMgr"]
     except KeyError, e:

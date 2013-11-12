@@ -123,8 +123,8 @@ def _getInstallRequires():
 
     These are the ones needed for runtime.'''
 
-    base = ['ZODB3==3.10.5', 'zope.index==3.6.4', 'zope.interface',
-            'pytz', 'lxml', 'cds-indico-extras', 'zc.queue',
+    base = ['ZODB3==3.10.5', 'zope.index==3.6.4', 'zope.interface==3.8.0',
+            'pytz', 'lxml', 'cds-indico-extras', 'zc.queue==1.3',
             'python-dateutil<2.0', 'pypdf', 'mako>=0.4.1', 'babel',
             'icalendar>=3.2', 'pyatom', 'jsmin', 'cssmin', 'webassets', 'pojson>=0.4',
             'requests>=1.2.0', 'simplejson>=2.1.0', 'reportlab', 'PIL', 'oauth2', 'pyscss==1.1.5', 'Werkzeug==0.9',
@@ -504,7 +504,7 @@ if __name__ == '__main__':
           author="Indico Team",
           author_email="indico-team@cern.ch",
           url="http://indico-software.org",
-          download_url="http://indico-software.org/wiki/Releases/Indico1.0",
+          download_url="http://indico-software.org/wiki/Releases/Indico1.1",
           platforms=["any"],
           long_description="Indico allows you to schedule conferences, from single talks to complex meetings with "
                            "sessions and contributions. It also includes an advanced user delegation mechanism, "

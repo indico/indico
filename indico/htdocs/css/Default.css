@@ -2892,6 +2892,15 @@ div.pageOverHeader
     font-family: Verdana;
     font-size: 12px;
     font-weight: bold;
+    display: none;
+}
+
+div.icon-announcement {
+  float: right;
+  color: #9C793B;
+  font-size: 1.5em;
+  line-height: 1em;
+  cursor:pointer;
 }
 
 div.impersonation-header {
