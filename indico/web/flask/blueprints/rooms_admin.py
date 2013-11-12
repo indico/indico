@@ -17,7 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import roomBookingPluginAdmin, roomBooking, roomMappers
+from indico.modules.rb.controllers.admin import (
+    index as index_handler,
+    locations as location_handlers,
+    mappers as mapper_handlers,
+    rooms as room_handlers
+)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -25,51 +30,112 @@ rooms_admin = IndicoBlueprint('rooms_admin', __name__, url_prefix='/admin/rooms'
 
 
 # Main settings
-rooms_admin.add_url_rule('/config/', 'roomBookingPluginAdmin', roomBookingPluginAdmin.RHRoomBookingPluginAdmin)
-rooms_admin.add_url_rule('/config/toggle', 'roomBookingPluginAdmin-switchRoomBookingModuleActive',
-                         roomBookingPluginAdmin.RHSwitchRoomBookingModuleActive)
-rooms_admin.add_url_rule('/config/save-db', 'roomBookingPluginAdmin-zodbSave', roomBookingPluginAdmin.RHZODBSave,
-                         methods=('POST',))
+rooms_admin.add_url_rule('/config/',
+                         'roomBookingPluginAdmin',
+                         index_handler.RHRoomBookingPluginAdmin)
+
+rooms_admin.add_url_rule('/config/toggle',
+                         'roomBookingPluginAdmin-switchRoomBookingModuleActive',
+                         index_handler.RHSwitchRoomBookingModuleActive)
+
 
 # Locations
-rooms_admin.add_url_rule('/locations/', 'roomBooking-admin', roomBooking.RHRoomBookingAdmin)
-rooms_admin.add_url_rule('/locations/delete', 'roomBooking-deleteLocation', roomBooking.RHRoomBookingDeleteLocation,
+rooms_admin.add_url_rule('/locations/',
+                         'roomBooking-admin',
+                         location_handlers.RHRoomBookingAdmin)
+
+rooms_admin.add_url_rule('/locations/delete',
+                         'roomBooking-deleteLocation',
+                         location_handlers.RHRoomBookingDeleteLocation,
                          methods=('POST',))
-rooms_admin.add_url_rule('/locations/add', 'roomBooking-saveLocation', roomBooking.RHRoomBookingSaveLocation,
+
+rooms_admin.add_url_rule('/locations/add',
+                         'roomBooking-saveLocation',
+                         location_handlers.RHRoomBookingSaveLocation,
                          methods=('POST',))
-rooms_admin.add_url_rule('/locations/set-default', 'roomBooking-setDefaultLocation',
-                         roomBooking.RHRoomBookingSetDefaultLocation, methods=('POST',))
-rooms_admin.add_url_rule('/location/<locationId>/', 'roomBooking-adminLocation',
-                         roomBooking.RHRoomBookingAdminLocation)
-rooms_admin.add_url_rule('/location/<locationId>/attribute/delete', 'roomBooking-deleteCustomAttribute',
-                         roomBooking.RHRoomBookingDeleteCustomAttribute)
-rooms_admin.add_url_rule('/location/<locationId>/attribute/save', 'roomBooking-saveCustomAttributes',
-                         roomBooking.RHRoomBookingSaveCustomAttribute, methods=('POST',))
-rooms_admin.add_url_rule('/location/<locationId>/equipment/delete', 'roomBooking-deleteEquipment',
-                         roomBooking.RHRoomBookingDeleteEquipment, methods=('POST',))
-rooms_admin.add_url_rule('/location/<locationId>/equipment/save', 'roomBooking-saveEquipment',
-                         roomBooking.RHRoomBookingSaveEquipment, methods=('POST',))
+
+rooms_admin.add_url_rule('/locations/set-default',
+                         'roomBooking-setDefaultLocation',
+                         location_handlers.RHRoomBookingSetDefaultLocation,
+                         methods=('POST',))
+
+rooms_admin.add_url_rule('/location/<locationId>/',
+                         'roomBooking-adminLocation',
+                         location_handlers.RHRoomBookingAdminLocation)
+
+rooms_admin.add_url_rule('/location/<locationId>/attribute/delete',
+                         'roomBooking-deleteCustomAttribute',
+                         location_handlers.RHRoomBookingDeleteCustomAttribute)
+
+rooms_admin.add_url_rule('/location/<locationId>/attribute/save',
+                         'roomBooking-saveCustomAttributes',
+                         location_handlers.RHRoomBookingSaveCustomAttribute,
+                         methods=('POST',))
+
+rooms_admin.add_url_rule('/location/<locationId>/equipment/delete',
+                         'roomBooking-deleteEquipment',
+                         location_handlers.RHRoomBookingDeleteEquipment,
+                         methods=('POST',))
+
+rooms_admin.add_url_rule('/location/<locationId>/equipment/save',
+                         'roomBooking-saveEquipment',
+                         location_handlers.RHRoomBookingSaveEquipment,
+                         methods=('POST',))
+
 
 # Rooms
-rooms_admin.add_url_rule('/room/<roomLocation>/<roomID>/delete', 'roomBooking-deleteRoom',
-                         roomBooking.RHRoomBookingDeleteRoom, methods=('POST',))
-rooms_admin.add_url_rule('/room/<roomLocation>/create', 'roomBooking-roomForm', roomBooking.RHRoomBookingRoomForm)
-rooms_admin.add_url_rule('/room/<roomLocation>/create/save', 'roomBooking-saveRoom',
-                         roomBooking.RHRoomBookingSaveRoom, methods=('POST',))
-rooms_admin.add_url_rule('/room/<roomLocation>/<roomID>/modify', 'roomBooking-roomForm',
-                         roomBooking.RHRoomBookingRoomForm, methods=('GET', 'POST'))
-rooms_admin.add_url_rule('/room/<roomLocation>/<roomID>/modify/save', 'roomBooking-saveRoom',
-                         roomBooking.RHRoomBookingSaveRoom, methods=('POST',))
+rooms_admin.add_url_rule('/room/<roomLocation>/<roomID>/delete',
+                         'roomBooking-deleteRoom',
+                         room_handlers.RHRoomBookingDeleteRoom,
+                         methods=('POST',))
+
+rooms_admin.add_url_rule('/room/<roomLocation>/create',
+                         'roomBooking-roomForm',
+                         room_handlers.RHRoomBookingRoomForm)
+
+rooms_admin.add_url_rule('/room/<roomLocation>/create/save',
+                         'roomBooking-saveRoom',
+                         room_handlers.RHRoomBookingSaveRoom,
+                         methods=('POST',))
+
+rooms_admin.add_url_rule('/room/<roomLocation>/<roomID>/modify',
+                         'roomBooking-roomForm',
+                         room_handlers.RHRoomBookingRoomForm,
+                         methods=('GET', 'POST'))
+
+rooms_admin.add_url_rule('/room/<roomLocation>/<roomID>/modify/save',
+                         'roomBooking-saveRoom',
+                         room_handlers.RHRoomBookingSaveRoom,
+                         methods=('POST',))
+
 
 # Mappers
-rooms_admin.add_url_rule('/mappers/', 'roomMapper', roomMappers.RHRoomMappers, methods=('GET', 'POST'))
-rooms_admin.add_url_rule('/mappers/create', 'roomMapper-creation', roomMappers.RHRoomMapperCreation,
+rooms_admin.add_url_rule('/mappers/',
+                         'roomMapper',
+                         mapper_handlers.RHRoomMappers,
                          methods=('GET', 'POST'))
-rooms_admin.add_url_rule('/mappers/create/save', 'roomMapper-performCreation', roomMappers.RHRoomMapperPerformCreation,
+
+rooms_admin.add_url_rule('/mappers/create',
+                         'roomMapper-creation',
+                         mapper_handlers.RHRoomMapperCreation,
                          methods=('GET', 'POST'))
-rooms_admin.add_url_rule('/mappers/<roomMapperId>/', 'roomMapper-details', roomMappers.RHRoomMapperDetails,
+
+rooms_admin.add_url_rule('/mappers/create/save',
+                         'roomMapper-performCreation',
+                         mapper_handlers.RHRoomMapperPerformCreation,
                          methods=('GET', 'POST'))
-rooms_admin.add_url_rule('/mappers/<roomMapperId>/modify', 'roomMapper-modify', roomMappers.RHRoomMapperModification,
+
+rooms_admin.add_url_rule('/mappers/<roomMapperId>/',
+                         'roomMapper-details',
+                         mapper_handlers.RHRoomMapperDetails,
                          methods=('GET', 'POST'))
-rooms_admin.add_url_rule('/mappers/<roomMapperId>/modify/save', 'roomMapper-performModify',
-                         roomMappers.RHRoomMapperPerformModification, methods=('GET', 'POST'))
+
+rooms_admin.add_url_rule('/mappers/<roomMapperId>/modify',
+                         'roomMapper-modify',
+                         mapper_handlers.RHRoomMapperModification,
+                         methods=('GET', 'POST'))
+
+rooms_admin.add_url_rule('/mappers/<roomMapperId>/modify/save',
+                         'roomMapper-performModify',
+                         mapper_handlers.RHRoomMapperPerformModification,
+                         methods=('GET', 'POST'))
