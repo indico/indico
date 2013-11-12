@@ -236,11 +236,24 @@ ndRegForm.directive('ndSectionDialog', function(url) {
         require: 'ndDialog',
         replace: true,
         templateUrl: url.tpl('sections/dialogs/base.tpl.html'),
-        link: function(scope) {
+        link: function(scope, element) {
             scope.section = scope.$parent.section;
+
             scope.getTabTpl = function(tab_type) {
                 return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(tab_type, scope.section.id));
-            }
+            };
+
+            scope.actions.init = function() {
+                scope.tabSelected = scope.data[0].id;
+            };
+
+            scope.setSelectedTab = function(tab_id) {
+                scope.tabSelected = tab_id;
+            };
+
+            scope.isTabSelected = function(tab_id) {
+                return scope.tabSelected === tab_id;
+            };
         }
     };
 });

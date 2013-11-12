@@ -37,6 +37,7 @@
     </div>
 
     <nd-dialog nd-section-dialog
+        ng-if="buttons.config"
         heading="Settings: {{ section.title }}"
         show="dialogs.config"
         data="tabs"
