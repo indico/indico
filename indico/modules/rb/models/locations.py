@@ -21,8 +21,10 @@
 Holder of rooms in a place and its map view related data
 """
 
+from MaKaC.common.Locators import Locator
+
 from indico.core.db import db
-from indico.core.db.rb.aspects import Aspect
+from indico.modules.rb.models.aspects import Aspect
 
 
 class Location(db.Model):
@@ -30,7 +32,7 @@ class Location(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False, unique=True)
     support_emails = db.Column(db.String)
 
     aspects = db.relationship('Aspect',
@@ -64,6 +66,11 @@ class Location(db.Model):
     def __cmp__(self, other):
         return cmp(self.name, other.name)
 
+    def getLocator( self ):
+        d = Locator()
+        d["locationId"] = self.name
+        return d
+
     def getSupportEmails(self):
         if self.support_emails:
             return self.getSupportEmails.split(',')
@@ -87,3 +94,15 @@ class Location(db.Model):
     @staticmethod
     def getLocationsByName(name):
         return Location.query.filter(Location.name == name)
+
+    @staticmethod
+    def getAllLocations():
+        return Location.query.all()
+
+    @staticmethod
+    def getDefaultLocation():
+        return Location.query.first()
+
+    @staticmethod
+    def removeLocationByName(name):
+        db.session.delete(Location.query.first(Location.name == name))
