@@ -22,15 +22,14 @@ from ZODB.DB import DB
 """
 We have two dictionaries
 
-    - globalname_dict:   We declare the classes that are going to be moved or renamed.
-                                  The key is the name to be renamed or moved.capitalize(
-                                  The value is a tuple with the new module name and the new class.
-                                  It can be one of each to be changed or both.
-
+    - globalname_dict: We declare the classes that are going to be moved or renamed.
+                       The key is the name to be renamed or moved.
+                       The value is a tuple with the new module name and the new class; it can have only one value
+                       or both.
     - modulename_dict: We declare the modules that are going to be moved.
-                                  The key is the old module to be moved and if it finish by '.' means that
-                                  that module and all submodules are going to be moved.
-                                  The value is the new module and also have the same rules as key.
+                       The key is the old module's name and if it finishes with '.' means that
+                       that module and all submodules are going to be moved.
+                       The value is the new module and also follows the same rules as the key.
 """
 
 globalname_dict = {
@@ -61,7 +60,7 @@ class MigratedDB(DB):
             modulename = modulename_dict[modulename]
         else:
             # This is the case of a module with submodules
-            for mod_name in modulename_dict:
-                if mod_name[-1] == "." and modulename.startswith(mod_name):
-                        modulename = modulename_dict[mod_name] + modulename[len(mod_name):]
+            for former_mod_name in modulename_dict:
+                if former_mod_name[-1] == "." and modulename.startswith(former_mod_name):
+                        modulename = modulename_dict[former_mod_name] + modulename[len(former_mod_name):]
         return DB.classFactory(self, connection, modulename, globalname)
