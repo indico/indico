@@ -23,6 +23,7 @@ from indico.web.flask.util import ResponseUtil
 
 
 import copy
+import inspect
 import time
 import os
 import sys
@@ -498,7 +499,13 @@ class RH(RequestHandlerBase):
 
                         self._checkCSRF()
                         self._reqParams = copy.copy(params)
-                        self._checkParams(self._reqParams)
+
+                        # old code gets parameters from call
+                        # new code utilizes of flask.request
+                        if inspect.getargspec(self._checkParams).args:
+                            self._checkParams(self._reqParams)
+                        else:
+                            self._checkParams()
                         func = getattr(self, '_checkParams_' + request.method, None)
                         if func:
                             func()
@@ -744,50 +751,6 @@ class RH(RequestHandlerBase):
     relativeURL = None
 
 
-from MaKaC.rb_location import CrossLocationDB
-import MaKaC.common.info as info
-
-class RoomBookingDBMixin:     # It's _not_ RH
-    """
-    Goal:
-    Only _some_ Request Handlers should connect to
-    room booking database.
-
-    Mix in this class into all Request Handlers,
-    which must use Room Booking backend.
-
-    Usage:
-
-    class RHExample( RoomBookingDBMixin, RHProtected ):
-        pass
-
-    NOTE: it is important to put RoomBookingDBMixin as first
-    base class.
-    """
-
-    def _startRequestSpecific2RH(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            CrossLocationDB.connect()
-
-    def _endRequestSpecific2RH(self, commit=True):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            if commit: CrossLocationDB.commit()
-            else: CrossLocationDB.rollback()
-            CrossLocationDB.disconnect()
-
-    def _syncSpecific2RH(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            CrossLocationDB.sync()
-
-    def _abortSpecific2RH(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            CrossLocationDB.rollback()
-
-
 class RHProtected(RH):
 
     def _getLoginURL(self):
@@ -861,4 +824,3 @@ class RHModificationBaseProtected(RHProtected):
         if hasattr(self._target, "getConference") and not self._allowClosed:
             if self._target.getConference().isClosed():
                 raise ConferenceClosedError(self._target.getConference())
-
