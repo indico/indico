@@ -63,6 +63,34 @@ event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/remove',
                         'confModifRegistrationPreviewSection-remove',
                         registrationFormModif.RHRegistrationFormSectionRemove,
                         methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/move',
+                        'confModifRegistrationPreviewSection-move',
+                        registrationFormModif.RHRegistrationFormSectionMove,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/accommodation/config',
+                        'confModifRegistrationPreviewSection-accommodation-config',
+                        registrationFormModif.RHRegistrationFormAccommodationSetConfig,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/socialEvents/config',
+                        'confModifRegistrationPreviewSection-socialEvents-config',
+                        registrationFormModif.RHRegistrationFormSocialEventsSetConfig,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/sessions/config',
+                        'confModifRegistrationPreviewSection-config',
+                        registrationFormModif.RHRegistrationFormSessionsSetConfig,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/accommodation/items',
+                        'confModifRegistrationPreviewSection-accommodation-items',
+                        registrationFormModif.RHRegistrationFormAccommodationSetItems,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/socialEvents/items',
+                        'confModifRegistrationPreviewSection-socialEvents-items',
+                        registrationFormModif.RHRegistrationFormSocialEventsSetItems,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/sessions/items',
+                        'confModifRegistrationPreviewSection-sessions-items',
+                        registrationFormModif.RHRegistrationFormSessionsSetItems,
+                        methods=('POST',))
 
 
 # Registrants

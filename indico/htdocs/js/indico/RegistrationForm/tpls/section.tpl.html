@@ -35,13 +35,15 @@
             ng-include="getTpl('sections/socialevents.tpl.html')">
         </div>
     </div>
-
     <nd-dialog nd-section-dialog
         ng-if="buttons.config"
         heading="Settings: {{ section.title }}"
-        show="dialogs.config"
+        show="dialogs.config.open"
         data="tabs"
+        async-data="{{ section }}"
         ok-button="{{ 'Save' | i18n }}"
-        cancel-button="{{ 'Cancel' | i18n }}">
+        cancel-button="{{ 'Cancel' | i18n }}"
+        ok-callback="dialogs.config.actions.onOk(dialogScope)"
+        cancel-callback="dialogs.config.actions.onCancel(dialogScope)">
     </nd-dialog>
 </div>

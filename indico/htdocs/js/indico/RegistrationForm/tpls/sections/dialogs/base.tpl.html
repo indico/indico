@@ -8,7 +8,7 @@
     </ul>
     <div class="tab-content regFormDialogTabContent" style="width: {{ contentWidth }}px; overflow: hidden; white-space: nowrap;">
         <div ng-repeat="tab in data" class="tab-pane" ng-class="{active: isTabSelected(tab.id)}" id="div-{{ tab.id }}">
-            <div ng-include="getTabTpl(tab.type)">
+            <div ng-include="getTabTpl(section.id, tab.type)">
             </div>
         </div>
     </div>

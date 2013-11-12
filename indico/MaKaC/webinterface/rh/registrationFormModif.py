@@ -25,7 +25,8 @@ from indico.util import json
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
-from MaKaC.registration import Status, StatusValue, GeneralSectionForm
+from MaKaC.registration import Status, StatusValue, GeneralSectionForm, SocialEventItem, AccommodationType, \
+    RegistrationSession, GeneralField
 from MaKaC.webinterface.rh.conferenceModif import RHModificationBaseProtected, RHConferenceBase
 from MaKaC.errors import FormValuesError, MaKaCError, ConferenceClosedError
 from datetime import datetime
@@ -33,8 +34,7 @@ from MaKaC.common import utils
 from MaKaC.i18n import _
 
 # indico legacy imports
-from MaKaC.services.implementation.base import AdminService, ParameterManager, \
-     ServiceError
+from MaKaC.services.implementation.base import ParameterManager
 
 
 class RHRegistrationFormModifBase(RHConferenceBase, RHModificationBaseProtected):
@@ -383,6 +383,27 @@ class RHRegistrationFormModifSectionBase(RegistrationFormModifRESTBase):
             raise MaKaCError(_("Invalid section Id"))
 
 
+class RHRegistrationFormModifAccomodationBase(RegistrationFormModifRESTBase):
+
+    def _checkParams(self, params):
+        RegistrationFormModifRESTBase._checkParams(self, params)
+        self._section = self._regForm.getSectionById("accommodation")
+
+
+class RHRegistrationFormModifSocialEventsBase(RegistrationFormModifRESTBase):
+
+    def _checkParams(self, params):
+        RegistrationFormModifRESTBase._checkParams(self, params)
+        self._section = self._regForm.getSectionById("socialEvents")
+
+
+class RHRegistrationFormModifSessionsBase(RegistrationFormModifRESTBase):
+
+    def _checkParams(self, params):
+        RegistrationFormModifRESTBase._checkParams(self, params)
+        self._section = self._regForm.getSectionById("sessions")
+
+
 class RHRegistrationPreviewSection(RHRegistrationFormModifSectionBase):
 
     def _process_GET(self):
@@ -420,7 +441,7 @@ class RHRegistrationFormSectionDisable(RHRegistrationFormModifSectionBase):
         return json.dumps(self._section.fossilize())
 
 
-class RegistrationFormSectionMove(RHRegistrationFormModifSectionBase):
+class RHRegistrationFormSectionMove(RHRegistrationFormModifSectionBase):
 
     def _checkParams_POST(self):
         post_pm = ParameterManager(request.json)
@@ -431,7 +452,7 @@ class RegistrationFormSectionMove(RHRegistrationFormModifSectionBase):
         return json.dumps(self._section.fossilize())
 
 
-class RHRegistrationFormAccommodationSetConfig(RHRegistrationFormModifSectionBase):
+class RHRegistrationFormAccommodationSetConfig(RHRegistrationFormModifAccomodationBase):
 
     def _checkParams_POST(self):
         post_pm = ParameterManager(request.json)
@@ -445,20 +466,20 @@ class RHRegistrationFormAccommodationSetConfig(RHRegistrationFormModifSectionBas
         return json.dumps(self._section.fossilize())
 
 
-class RHRegistrationFormSocialEventsSetConfig(RHRegistrationFormModifSectionBase):
+class RHRegistrationFormSocialEventsSetConfig(RHRegistrationFormModifSocialEventsBase):
 
     def _checkParams_POST(self):
         post_pm = ParameterManager(request.json)
-        self._intro = post_pm.extract('intro', pType=str, allowEmpty=False)
+        self._introSentence = post_pm.extract('introSentence', pType=str, allowEmpty=False)
         self._selectionType = post_pm.extract('selectionType', pType=str, allowEmpty=False)
 
     def _process_POST(self):
-        self._section.setIntroSentence(self._intro)
+        self._section.setIntroSentence(self._introSentence)
         self._section.setSelectionType(self._selectionType)
         return json.dumps(self._section.fossilize())
 
 
-class RHRegistrationFormSessionsSetConfig(RHRegistrationFormModifSectionBase):
+class RHRegistrationFormSessionsSetConfig(RHRegistrationFormModifSessionsBase):
 
     def _checkParams_POST(self):
         post_pm = ParameterManager(request.json)
@@ -472,7 +493,7 @@ class RHRegistrationFormSessionsSetConfig(RHRegistrationFormModifSectionBase):
         return json.dumps(self._section.fossilize())
 
 
-class RHRegistrationFormAccommodationSetItems(RHRegistrationFormModifSectionBase):
+class RHRegistrationFormAccommodationSetItems(RHRegistrationFormModifAccomodationBase):
 
     def _checkParams_POST(self):
         post_pm = ParameterManager(request.json)
@@ -492,10 +513,10 @@ class RHRegistrationFormAccommodationSetItems(RHRegistrationFormModifSectionBase
             else:
                 accoType.setValues(item)
 
-        return self._section.fossilize()
+        return json.dumps(self._section.fossilize())
 
 
-class RHRegistrationFormSocialEventsSetItems(RHRegistrationFormModifSectionBase):
+class RHRegistrationFormSocialEventsSetItems(RHRegistrationFormModifSocialEventsBase):
 
     def _checkParams_POST(self):
         post_pm = ParameterManager(request.json)
@@ -526,10 +547,10 @@ class RHRegistrationFormSocialEventsSetItems(RHRegistrationFormModifSectionBase)
             else:
                 socialEventItem.setValues(item)
 
-        return self._section.fossilize()
+        return json.dumps(self._section.fossilize())
 
 
-class RHRegistrationFormSessionsSetItems(RHRegistrationFormModifSectionBase):
+class RHRegistrationFormSessionsSetItems(RHRegistrationFormModifSessionsBase):
 
     def _checkParams_POST(self):
         post_pm = ParameterManager(request.json)
@@ -559,7 +580,7 @@ class RHRegistrationFormSessionsSetItems(RHRegistrationFormModifSectionBase):
                     self._section.addSession(rs)
                     rs.setValues(item)
 
-        return self._section.fossilize()
+        return json.dumps(self._section.fossilize())
 
 
 class RHRegistrationFormFieldCreate(RHRegistrationFormModifSectionBase):
@@ -663,9 +684,9 @@ class RegistrationFormFieldMove(RHRegistrationFormModifFieldBase):
                     self._field.setDisabled(True)
             self._section.addToSortedFields(self._field, self._sectionEndPos)
         else:
-            raise ServiceError("", _("Section id: " + self._section.getId() + " doesn't support field move"))
+            raise MaKaCError(_("Section id: " + self._section.getId() + " doesn't support field move"))
 
-        return self._section.fossilize()
+        return json.dumps(self._section.fossilize())
 
 
 class RegistrationFormFieldSet(RHRegistrationFormModifFieldBase):

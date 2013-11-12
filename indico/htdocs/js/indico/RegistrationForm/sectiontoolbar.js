@@ -30,7 +30,7 @@ ndRegForm.directive("ndSectionToolbar", function(url) {
 
         link: function(scope) {
             scope.openConfig = function() {
-                scope.dialogs.config = true;
+                scope.dialogs.config.open = true;
             };
 
             scope.toggleCollapse = function(e) {

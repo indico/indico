@@ -40,6 +40,22 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI',  function
         });
     };
 
+    $scope.api.saveConfig = function(section, data) {
+        var postData = {confId: $rootScope.confId, sectionId: section.id};
+        for(var key in data) { postData[key] = data[key]; }
+        RESTAPI.Sections.config(postData, function(data) {
+            //TODO: See how to update model!!
+        });
+    };
+
+    $scope.api.saveItems = function(section, items) {
+        var postData = {confId: $rootScope.confId, sectionId: section.id};
+        postData.items = items;
+        RESTAPI.Sections.items(postData, function(data) {
+            //TODO: See how to update model!!
+        });
+    };
+
     $scope.api.addField = function(section, field) {
         // TODO properly initialize field
         section.items.push({
@@ -67,7 +83,10 @@ ndRegForm.directive('ndSection', function(url) {
 
             scope.dialogs = {
                 newfield: false,
-                config: false
+                config: {
+                    open: false,
+                    actions: {}
+                }
             };
 
             scope.state = {
@@ -97,7 +116,6 @@ ndRegForm.directive('ndSection', function(url) {
 
             scope.$watch('section', function(val) {
                 // TODO sync section with server
-                console.log('Syncing section');
             });
         }
     };
@@ -161,9 +179,6 @@ ndRegForm.directive("ndPersonalDataSection", function() {
         require: 'ndGeneralSection',
         link: function(scope) {
             scope.buttons.disable = false;
-            scope.tabs = [
-                {id: 'config',              name: $T("Configuration"),          type: 'config' },
-            ];
         }
     };
 });
@@ -179,6 +194,16 @@ ndRegForm.directive("ndAccommodationSection", function() {
                 {id: 'config',              name: $T("Configuration"),          type: 'config' },
                 {id: 'editAccomodation',    name: $T("Edit accommodations"),    type: 'editionTable' }
             ];
+
+            scope.dialogs.config.actions.onOk = function(dialogScope) {
+                //TODO: Double binding not working...
+                scope.api.saveConfig(dialogScope.section,
+                                       {type: dialogScope.section.type});
+                scope.api.saveItems(dialogScope.section, dialogScope.section.items);
+            };
+
+            scope.dialogs.config.actions.onCancel = function(dialogScope) {
+            };
         }
     };
 });
@@ -212,6 +237,16 @@ ndRegForm.directive("ndSessionsSection", function() {
                 {id: 'config',          name: $T("Configuration"),      type: 'config'},
                 {id: 'editSessions',    name: $T("Manage sessions"),    type: 'editionTable'}
             ];
+
+            scope.dialogs.config.actions.onOk = function(dialogScope) {
+                //TODO: Double binding not working...
+                scope.api.saveConfig(dialogScope.section,
+                                       {type: dialogScope.section.type});
+                scope.api.saveItems(dialogScope.section, dialogScope.section.items);
+            };
+
+            scope.dialogs.config.actions.onCancel = function(dialogScope) {
+            };
         }
     };
 });
@@ -227,6 +262,18 @@ ndRegForm.directive("ndSocialEventSection", function() {
                 {id: 'editEvents',      name: $T("Edit events"),       type: 'editionTable'},
                 {id: 'canceledEvent',   name: $T("Canceled events"),   type: 'cancelEvent'}
             ];
+
+            scope.dialogs.config.actions.onOk = function(dialogScope) {
+                //TODO: Double binding not working...
+                scope.api.saveConfig(dialogScope.section,
+                                       {introSentence: dialogScope.section.introSentence,
+                                        selectionType: dialogScope.section.selectionType
+                });
+                scope.api.saveItems(dialogScope.section, dialogScope.section.items);
+            };
+
+            scope.dialogs.config.actions.onCancel = function(dialogScope) {
+            };
         }
     };
 });
@@ -237,14 +284,13 @@ ndRegForm.directive('ndSectionDialog', function(url) {
         replace: true,
         templateUrl: url.tpl('sections/dialogs/base.tpl.html'),
         link: function(scope, element) {
-            scope.section = scope.$parent.section;
-
-            scope.getTabTpl = function(tab_type) {
-                return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(tab_type, scope.section.id));
+            scope.getTabTpl = function(section_id, tab_type) {
+                return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(tab_type, section_id));
             };
 
             scope.actions.init = function() {
                 scope.tabSelected = scope.data[0].id;
+                scope.section = scope.$eval(scope.asyncData);
             };
 
             scope.setSelectedTab = function(tab_id) {
