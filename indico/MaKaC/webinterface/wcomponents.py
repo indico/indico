@@ -4241,16 +4241,7 @@ class WRoomBookingBookingList( WTemplated ): # Standalone version
                 if c.withReservation.isConfirmed:
                     bars.append( Bar( c, Bar.CONFLICT ) )
                     collisions.append( c )
-                else:% if 'login_as_orig_user' in _session:
-    <div class="impersonation-header clearfix">
-        <span class="text">
-            ${ _('Logged in as') }:
-            ${ _session['login_as_orig_user']['user_name'] } &raquo; ${ currentUser.getStraightFullName(upper=False) }
-        </span>
-        <span class="undo-login-as icon-close contextHelp" title="Switch back to ${ _session['login_as_orig_user']['user_name'] }"></span>
-    </div>
-% endif
-
+                else:
                     bars.append( Bar( c, Bar.PRECONFLICT ) )
 
             if not candResv.isRejected and not candResv.isCancelled:
