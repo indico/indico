@@ -43,12 +43,14 @@ event_mgmt.add_url_rule('/registration/setup/statuses/<statusId>/modify',
 # Preview
 event_mgmt.add_url_rule('/registration/preview', 'confModifRegistrationPreview',
                         registrationFormModif.RHRegistrationPreview)
+
+# Sections
 event_mgmt.add_url_rule('/registration/preview/sections',
                         'confModifRegistrationPreviewSection-query',
                         registrationFormModif.RHRegistrationPreviewSectionQuery,
                         methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>',
-                        'confModifRegistrationPreviewSection-get',
+                        'confModifRegistrationPreviewSection-modify',
                         registrationFormModif.RHRegistrationPreviewSection,
                         methods=('GET', 'POST', 'DELETE'))
 event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/enable',
@@ -58,10 +60,6 @@ event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/enable',
 event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/disable',
                         'confModifRegistrationPreviewSection-disable',
                         registrationFormModif.RHRegistrationFormSectionDisable,
-                        methods=('POST',))
-event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/remove',
-                        'confModifRegistrationPreviewSection-remove',
-                        registrationFormModif.RHRegistrationFormSectionRemove,
                         methods=('POST',))
 event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/move',
                         'confModifRegistrationPreviewSection-move',
@@ -92,6 +90,32 @@ event_mgmt.add_url_rule('/registration/preview/sections/sessions/items',
                         registrationFormModif.RHRegistrationFormSessionsSetItems,
                         methods=('POST',))
 
+# Fields
+
+event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/fields',
+                        'confModifRegistrationPreviewField-create',
+                        registrationFormModif.RHRegistrationFormFieldCreate,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/fields/<fieldId>',
+                        'confModifRegistrationPreviewField-modify',
+                        registrationFormModif.RHRegistrationFormField,
+                        methods=('POST', 'DELETE'))
+event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/fields/<fieldId>/enable',
+                        'confModifRegistrationPreviewField-enable',
+                        registrationFormModif.RHRegistrationFormFieldEnable,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/fields/<fieldId>/disable',
+                        'confModifRegistrationPreviewField-disable',
+                        registrationFormModif.RHRegistrationFormFieldDisable,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/fields/<fieldId>/move',
+                        'confModifRegistrationPreviewField-move',
+                        registrationFormModif.RHRegistrationFormFieldMove,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/fields/<fieldId>/items',
+                        'confModifRegistrationPreviewField-accommodation-items',
+                        registrationFormModif.RHRegistrationFormFieldSetItems,
+                        methods=('POST',))
 
 # Registrants
 event_mgmt.add_url_rule('/registration/users/', 'confModifRegistrants', registrantsModif.RHRegistrantListModif,

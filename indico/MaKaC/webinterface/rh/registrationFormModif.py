@@ -586,7 +586,7 @@ class RHRegistrationFormSessionsSetItems(RHRegistrationFormModifSessionsBase):
 class RHRegistrationFormFieldCreate(RHRegistrationFormModifSectionBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
+        post_pm = ParameterManager(json.loads(request.data))
         self._fieldData = post_pm.extract('field', pType=dict, allowEmpty=False)
 
     def _process_POST(self):
@@ -609,64 +609,57 @@ class RHRegistrationFormModifFieldBase(RHRegistrationFormModifSectionBase):
 
     def _checkParams(self, params):
         RHRegistrationFormModifSectionBase._checkParams(self, params)
+        self._pm = ParameterManager(params)
         fieldId = self._pm.extract('fieldId', pType=str, allowEmpty=False)
         self._field = self._section.getFieldById(fieldId)
         if not self._field:
             raise MaKaCError(_("Invalid field Id"))
 
 
-class RegistrationFormFieldSetStatus(RHRegistrationFormModifFieldBase):
+class RHRegistrationFormField(RHRegistrationFormModifFieldBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
-        self._action = post_pm.extract('action', pType=str, allowEmpty=False)
+        post_pm = ParameterManager(json.loads(request.data))
+        self._updateFieldData = post_pm.extract('updateFieldData', pType=dict, allowEmpty=False)
+        self._updateFieldData['input'] = self._field.getInput().getId()
 
     def _process_POST(self):
-        if not self._field.isLocked('delete') and self._action == 'remove':
-            self._section.removeField(self._field)
-        elif not self._field.isLocked('disable') and self._action == 'disable':
+        self._field.setValues(self._updateFieldData)
+        return json.dumps(self._section.fossilize())
+
+    def _process_DELETE(self):
+        if self._field.isLocked('delete'):
+            raise MaKaCError(_("Deleted action couldn't be perform"))
+        self._section.removeField(self._field)
+        return json.dumps(self._field.fossilize())
+
+
+class RHRegistrationFormFieldEnable(RHRegistrationFormModifFieldBase):
+
+    def _process_POST(self):
+        # Move field to the first position
+        self._section.addToSortedFields(self._field, 0)
+        self._field.setDisabled(False)
+        return json.dumps(self._field.fossilize())
+
+
+class RHRegistrationFormFieldDisable(RHRegistrationFormModifFieldBase):
+
+    def _process_POST(self):
+        if not self._field.isLocked('disable'):
             # Move field to the end of the list
             self._section.addToSortedFields(self._field)
             self._field.setDisabled(True)
-        elif self._action == 'enable':
-            # Move field to the first position
-            self._section.addToSortedFields(self._field, 0)
-            self._field.setDisabled(False)
         else:
             raise MaKaCError(_("Action couldn't be perform"))
 
         return json.dumps(self._field.fossilize())
 
 
-class RegistrationFormFieldSetItems(RHRegistrationFormModifFieldBase):
+class RHRegistrationFormFieldMove(RHRegistrationFormModifFieldBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
-        self._items = post_pm.extract('items', pType=list, allowEmpty=False)
-
-    def _process_POST(self):
-        for i in range(0, len(self._items)):
-            itemValues = self._items[i]
-            itemValues["isEnabled"] = itemValues["isEnabled"] == "true"
-            itemValues["billable"] = itemValues["billable"] == "true"
-            item = self._field.getItemById(itemValues['id'])
-            if item is None:
-                self._field.createItem(itemValues, i)
-            else:
-                # remove else set and move
-                if 'remove' in itemValues:
-                    self._field.removeItem(item)
-                else:
-                    item.setValues(itemValues)
-                    self._field.addItem(item, i)
-
-        return json.dumps(self._field.fossilize())
-
-
-class RegistrationFormFieldMove(RHRegistrationFormModifFieldBase):
-
-    def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
+        post_pm = ParameterManager(json.loads(request.data))
         self._sectionEndPos = post_pm.extract('endPos', pType=int, allowEmpty=False)
 
     def _process_POST(self):
@@ -689,13 +682,26 @@ class RegistrationFormFieldMove(RHRegistrationFormModifFieldBase):
         return json.dumps(self._section.fossilize())
 
 
-class RegistrationFormFieldSet(RHRegistrationFormModifFieldBase):
+class RHRegistrationFormFieldSetItems(RHRegistrationFormModifFieldBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
-        self._updateFieldData = post_pm.extract('updateFieldData', pType=dict, allowEmpty=False)
+        post_pm = ParameterManager(json.loads(request.data))
+        self._items = post_pm.extract('items', pType=list, allowEmpty=False)
 
     def _process_POST(self):
-        self._updateFieldData['input'] = self._field.getInput().getId()
-        self._field.setValues(self._updateFieldData)
-        return json.dumps(self._section.fossilize())
+        for i in range(0, len(self._items)):
+            itemValues = self._items[i]
+            itemValues["isEnabled"] = itemValues["isEnabled"] == "true"
+            itemValues["billable"] = itemValues["billable"] == "true"
+            item = self._field.getItemById(itemValues['id'])
+            if item is None:
+                self._field.createItem(itemValues, i)
+            else:
+                # remove else set and move
+                if 'remove' in itemValues:
+                    self._field.removeItem(item)
+                else:
+                    item.setValues(itemValues)
+                    self._field.addItem(item, i)
+
+        return json.dumps(self._field.fossilize())
