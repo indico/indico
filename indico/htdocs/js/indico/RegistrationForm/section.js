@@ -17,6 +17,7 @@
 
 ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI',  function($scope, $rootScope, RESTAPI) {
     $scope.api = {};
+    $scope.actions = {};
 
     $scope.api.createSection = function(section) {
         // TODO see how to push a section into the list of sections
@@ -56,13 +57,16 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI',  function
         });
     };
 
-    $scope.api.addField = function(section, field) {
+    $scope.actions.openAddField = function(section, field, type) {
+        $scope.dialogs.newfield = true;
         // TODO properly initialize field
         section.items.push({
             id: -1,
-            input: 'text',
-            caption: 'testcaption',
-            description: 'desc'
+            input: field,
+            caption : '',
+            values: {
+                inputType: type
+            }
         });
     };
 }]);
@@ -91,12 +95,6 @@ ndRegForm.directive('ndSection', function(url) {
 
             scope.state = {
                 collapsed: false
-            };
-
-            scope.sectionApi = {
-                disableSection: function() {
-                    scope.section.enabled = false;
-                }
             };
 
             scope.tabs = [];
@@ -145,20 +143,7 @@ ndRegForm.directive("ndGeneralSection", function($timeout) {
             //     {id: 'file',             desc: $T("File")}
             // ];
 
-            scope.sectionApi.addField = function(fieldType, inputType) {
-                var newfield = {
-                    id: -1,
-                    input: fieldType,
-                    inputType: inputType,
-                    caption: '',
-                    values: {}
-                };
-
-                scope.section.items.push(newfield);
-                scope.dialogs.newfield = true;
-            };
-
-            scope.sectionApi.removeNewField = function() {
+            scope.api.removeNewField = function() {
                 if (scope.section.items[scope.section.items.length-1].id == -1) {
                     $timeout(function() {
                         scope.section.items.pop();
@@ -166,7 +151,7 @@ ndRegForm.directive("ndGeneralSection", function($timeout) {
                 }
             };
 
-            scope.sectionApi.commitNewField = function() {
+            scope.api.commitNewField = function() {
 
             };
 

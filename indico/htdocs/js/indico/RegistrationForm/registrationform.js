@@ -30,14 +30,21 @@ ndRegForm.config(function(urlProvider) {
 ndRegForm.factory('RESTAPI', ['$resource','baseurl', function($resource, baseurl) {
 
     var sectionurl = baseurl + 'sections/:sectionId';
+    var fieldurl = sectionurl + '/fields/:fieldId';
     return {
         Sections: $resource(sectionurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId"},
                             {"enable": {method:'POST', url: sectionurl + "/enable"},
                              "disable": {method:'POST', url: sectionurl + "/disable"},
-                             "remove": {method:'POST', url: sectionurl + "/remove"},
+                             "move": {method:'POST', url: sectionurl + "/move"},
                              "config": {method:'POST', url: sectionurl + "/config"},
                              "items": {method:'POST', url: sectionurl + "/items"},
                              "header": {method:'POST', url: sectionurl + "/header"}
+                            }),
+        Fields: $resource(fieldurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId"},
+                            {"enable": {method:'POST', url: fieldurl + "/enable"},
+                             "disable": {method:'POST', url: fieldurl + "/disable"},
+                             "move": {method:'POST', url: fieldurl + "/move"},
+                             "items": {method:'POST', url: fieldurl + "/items"}
                             }),
     };
 }]);

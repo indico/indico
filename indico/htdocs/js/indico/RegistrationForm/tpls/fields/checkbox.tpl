@@ -1,7 +1,7 @@
 <input type="checkbox"
     id="{{ name }}"
     name="{{ name }}"
-    ng-class="{regFormIsBillable: el.isBillable}"
+    ng-class="{regFormIsBillable: isBillable(field)}"
     ng-required="field.mandatory"
     ng-disabled="!hasPlacesLeft(field)"/>
 

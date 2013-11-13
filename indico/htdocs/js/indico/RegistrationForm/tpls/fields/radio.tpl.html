@@ -25,7 +25,7 @@
             <font ng-show="isDisabled()" color="red" style="margin-left:25px;">
                 ({{ "no places left" | i18n }})
             </font>
-            <font ng-show="hasPlacesLeft()" color="green" style="font-style:italic; margin-left:25px;">
+            <font ng-show="hasPlacesLeft(field)" color="green" style="font-style:italic; margin-left:25px;">
                 [{{item.noPlacesLeft}} {{ 'place(s) left' | i18n }}]
             </font>
         </li>

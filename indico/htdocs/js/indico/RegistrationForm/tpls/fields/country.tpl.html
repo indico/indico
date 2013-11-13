@@ -1,8 +1,7 @@
 <select
     id="{{ getName(field.input) }}"
     name="{{ getName(field.input) }}"
-    ng-required="field.mandatory"
-    ng-disabled="!hasPlacesLeft(field)">
+    ng-required="field.mandatory">
     <option value="">
         {{ '-- Select a country --' | i18n }}
     </option>

@@ -21,7 +21,7 @@ ndRegForm.controller('FieldCtrl', function($scope) {
     // Explore the best way to implement it ;)
 });
 
-ndRegForm.directive('ndField', function(url) {
+ndRegForm.directive('ndField', function(url, RESTAPI) {
     return {
         restrict: 'E',
         replace: true,
@@ -40,12 +40,31 @@ ndRegForm.directive('ndField', function(url) {
                         return $scope.fieldApi.isNew()? $T('Add') : $T('Update');
                     },
                     onOk: function(dialogScope) {
-                        $scope.field = dialogScope.field;
-                        // TODO commit field to server
+                        //double way binding doesnt work...???
+                        if($scope.fieldApi.isNew())  {
+                            var newField = new RESTAPI.Fields({field: dialogScope.field});
+                            newField.$save({confId: $scope.confId, sectionId: $scope.section.id},
+                                function(data, headers) {
+                                    $scope.field = data;
+                                    dialogScope = {};
+                            });
+                        } else {
+                            var postData = {confId: $scope.confId,
+                                            sectionId: $scope.section.id,
+                                            fieldId: dialogScope.field.id,
+                                            updateFieldData: dialogScope.field
+                                        };
+
+                            RESTAPI.Fields.save(postData,
+                                function(data, headers) {
+                                    $scope.field = data;
+                                    dialogScope = {};
+                            });
+                        }
                     },
                     onCancel: function() {
                         if ($scope.fieldApi.isNew()) {
-                            $scope.sectionApi.removeNewField();
+                            $scope.api.removeNewField();
                         }
                     }
                 }
@@ -57,8 +76,6 @@ ndRegForm.directive('ndField', function(url) {
                 }
             };
 
-            // TODO set keys to true in ndWhateverField link function for activating
-            // that particular setting in its edition dialog
             $scope.settings = {
                 billable: false,
                 date: false,
@@ -77,13 +94,24 @@ ndRegForm.directive('ndField', function(url) {
                 }
             };
 
-            $scope.hasPlacesLeft = function(field) {
-                return (field.placesLimit !== 0 && field.noPlacesLeft >= 0);
-            };
 
             $scope.openFieldSettings = function() {
                 $scope.dialogs.settings.open = true;
             };
+
+            // TODO Consider moving it to fieldApi, or even better, FielCtrl
+            $scope.isDisabled = function(field) {
+                return field.placesLimit !== 0 && field.noPlacesLeft === 0;
+            };
+
+            $scope.isBillable = function(field) {
+                return field.billable && !$scope.isDisabled(field);
+            };
+
+            $scope.hasPlacesLeft = function(field) {
+                return !$scope.isDisabled(field) && field.placesLimit !== 0 && field.noPlacesLeft >= 0;
+            };
+
         },
 
         link: function(scope) {
@@ -104,6 +132,11 @@ ndRegForm.directive('ndCheckboxField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/checkbox.tpl.html');
+        },
+
+        link: function(scope) {
+            scope.settings.placesLimit = true;
+            scope.settings.billable = true;
         }
     };
 });
@@ -122,7 +155,11 @@ ndRegForm.directive('ndDateField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/date.tpl.html');
-            $scope.calendarimg = imageSrc("CalendarWidget");
+            $scope.calendarimg = imageSrc("calendarWidget");
+        },
+
+        link: function(scope) {
+            scope.settings.date = true;
         }
     };
 });
@@ -150,16 +187,22 @@ ndRegForm.directive('ndNumberField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/number.tpl.html');
+        },
 
-            $scope.change = function() {
+        link: function(scope) {
+            scope.settings.number = true;
+            scope.settings.billable = true;
+
+            scope.change = function() {
                 // TODO do this the angular way
                 // TODO var value = get value from input (avoid jQuery)
-                $E('subtotal-{{ name }}').dom.innerHTML =
+                /*$E('subtotal-{{ name }}').dom.innerHTML =
                     ((isNaN(parseInt(value, 10)) || parseInt(value, 10) < 0) ?
                     0:
-                    parseInt(value, 10)) * scope.field.price;
+                    parseInt(value, 10)) * scope.field.price;*/
             };
         }
+
     };
 });
 
@@ -169,19 +212,6 @@ ndRegForm.directive('ndRadioField', function(url) {
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/radio.tpl.html');
 
-            // TODO there are other fields using this
-            // Consider moving it to fieldApi, or even better, FielCtrl
-            $scope.isDisabled = function() {
-                return ($scope.item.placesLimit !== 0 && $scope.item.noPlacesLeft === 0);
-            };
-
-            $scope.isBillable = function(item) {
-                return $scope.item.isBillable && !$scope.isDisabled();
-            };
-
-            $scope.hasPlacesLeft = function(item) {
-                return (!$scope.isDisabled() && $scope.item.placesLimit !== 0);
-            };
         },
 
         link: function(scope) {
@@ -195,6 +225,10 @@ ndRegForm.directive('ndRadiogroupField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/radiogroup.tpl.html');
+        },
+
+        link: function(scope) {
+            scope.settings.defaultValue = true;
         }
     };
 });
@@ -204,7 +238,8 @@ ndRegForm.directive('ndTelephoneField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/telephone.tpl.html');
-        },
+        }
+        ,
         link: function(scope) {
             scope.settings.size = true;
         }
@@ -216,6 +251,10 @@ ndRegForm.directive('ndTextField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/text.tpl.html');
+        },
+
+        link: function(scope) {
+            scope.settings.size = true;
         }
     };
 });
@@ -226,6 +265,7 @@ ndRegForm.directive('ndTextareaField', function(url) {
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/textarea.tpl.html');
         },
+
         link: function(scope) {
             scope.settings.rowsAndColumns = true;
         }
@@ -237,6 +277,11 @@ ndRegForm.directive('ndYesnoField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/yesno.tpl.html');
+        },
+
+        link: function(scope) {
+            scope.settings.placesLimit = true;
+            scope.settings.billable = true;
         }
     };
 });
@@ -247,6 +292,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
         replace: true,
         templateUrl: url.tpl('fields/dialogs/base.tpl.html'),
         link: function(scope, element, attrs) {
+            scope.settings = scope.$parent.settings;
             scope.actions.init = function() {
                 scope.field = scope.$eval(scope.asyncData);
             };
