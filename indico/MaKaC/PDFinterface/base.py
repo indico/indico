@@ -17,7 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import os, math
+import os
+import math
+import cgi
 import xml.sax.saxutils as saxutils
 from HTMLParser import HTMLParser
 from reportlab.platypus import SimpleDocTemplate, PageTemplate, Table
@@ -75,7 +77,7 @@ class PDFHTMLParser(HTMLParser):
         return "".join(self.text)
 
     def handle_data(self, data):
-        self.text.append( saxutils.escape(data) )
+        self.text.append(data)
 
     def filterAttrs(self, attrs):
         filteredAttrs = []
@@ -104,20 +106,24 @@ class PDFHTMLParser(HTMLParser):
     def handle_endtag(self, tag):
         if tag in self._removedTags:
             return
-        self.text.append( "</%s>" % tag )
+        self.text.append("</%s>" % tag)
+
 
 def escape(text):
     if text is None:
         text = ""
     try:
-        text = PDFHTMLParser().parse(text)
-        if not isStringHTML(text):
-            text = text.replace("\r\n"," <br/>")
-            text = text.replace("\n"," <br/>")
-            text = text.replace("\r"," <br/>")
+        if isStringHTML(text):
+            text = PDFHTMLParser().parse(text)
+        else:
+            text = cgi.escape(text)
+            text = text.replace("\r\n", " <br/>")
+            text = text.replace("\n", " <br/>")
+            text = text.replace("\r", " <br/>")
         return text
     except Exception:
         return saxutils.escape(text)
+
 
 def modifiedFontSize(fontsize, lowerNormalHigher):
 
