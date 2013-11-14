@@ -372,6 +372,6 @@ class BookingPermission(LoggedOnlyService):
     def _getAnswer(self):
         user = self._aw.getUser()
         return {
-            'can_book': self._room.canBook(user),
+            'can_book': self._room.canBook(user) or self._room.canPrebook(user),
             'group': self._room.customAtts.get('Booking Simba List')
-            }
+        }
