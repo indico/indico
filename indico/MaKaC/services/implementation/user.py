@@ -379,8 +379,8 @@ class UserSetPersonalData(UserPersonalDataBase):
                 raise ServiceAccessError(_("The email address is not valid"))
         elif self._dataType == "secondaryEmails":
             self._value = self._pm.extract("value", pType=str, allowEmpty=True)
-            if  self._value and not validMail(self._value):
-                raise ServiceAccessError(_("The email address is not valid"))
+            if self._value and not validMail(self._value):
+                raise ServiceAccessError(_("The email address is not valid. Please, review it."))
         else:
             self._value = self._pm.extract("value", pType=str, allowEmpty=True)
 
@@ -399,22 +399,25 @@ class UserSetPersonalData(UserPersonalDataBase):
         data = {}
         data["toList"] = [email]
         data["fromAddr"] = Config.getInstance().getSupportEmail()
-        data["subject"] = """[Indico] Verification of email '%s'""" % email
+        data["subject"] = """[Indico] Email address confirmation"""
         data["body"] = """Dear %s,
 
 You have added a new email to your secondary email list.
 
-In order to activate this new email new, please open on your web browser the following URL:
+In order to confirm and activate this new email address, please open in your web browser the following URL:
 
 %s
 
-Once you've done it, the email will appear in your profile and will be able to identify you.
+Once you have done it, the email address will appear in your profile.
 
 Best regards,
-Indico Team""" % (self._user.getStraightFullName(), url_for('user.userRegistration-validateSecondaryEmail', userId=self._user.getId(), key=md5(email).hexdigest(), _external=True))
+Indico Team""" % (self._user.getStraightFullName(), url_for('user.userRegistration-validateSecondaryEmail',
+                                                            userId=self._user.getId(),
+                                                            key=md5(email).hexdigest(),
+                                                            _external=True))
         GenericMailer.send(GenericNotification(data))
 
-    def _getAnswer( self):
+    def _getAnswer(self):
         if self._user:
             idxs = indexes.IndexesHolder()
             funcGet = "get%s%s" % (self._dataType[0].upper(), self._dataType[1:])
@@ -446,10 +449,13 @@ Indico Team""" % (self._user.getStraightFullName(), url_for('user.userRegistrati
                 newSecondaryEmailAdded = False
                 # check if every secondary email is valid
                 for sEmail in emailList:
+                    sEmail = sEmail.lower().strip()
                     if sEmail != "":
                         av = user.AvatarHolder().match({"email": sEmail}, searchInAuthenticators=False)
                         if av and av[0] != self._avatar:
                             raise NoReportError(_("The email address %s is already used by another user.") % sEmail)
+                        elif self._user.getEmail() == sEmail:  # do not accept primary email address as secondary
+                            continue
                         elif self._user.hasSecondaryEmail(sEmail):
                             secondaryEmails.append(sEmail)
                         else:
@@ -458,7 +464,8 @@ Indico Team""" % (self._user.getStraightFullName(), url_for('user.userRegistrati
                             self._sendSecondaryEmailNotifiication(sEmail)
                 self._user.setSecondaryEmails(secondaryEmails, reindex=True)
                 if newSecondaryEmailAdded:
-                    warn = Warning (_("New secondary email added"), _("You will receive an email in order to confirm your new email."))
+                    warn = Warning(_("New secondary email address"), _("You will receive an email in order to confirm\
+                                      your new email address. Once confirmed, it will be shown in your profile."))
                     return ResultWithWarning(", ".join(self._user.getSecondaryEmails()), warn).fossilize()
                 else:
                     return ", ".join(self._user.getSecondaryEmails())

@@ -734,20 +734,19 @@ class Avatar(Persistent, Fossilizable):
             return self.secondaryEmails
 
     def addSecondaryEmail(self, email):
-        self.getSecondaryEmails() #create attribute if not exist
-
-        if not email in self.secondaryEmails:
+        email = email.strip().lower()
+        if not email in self.getSecondaryEmails():
             self.secondaryEmails.append(email)
             self._p_changed = 1
 
     def removeSecondaryEmail(self, email):
-        self.getSecondaryEmails() #create attribute if not exist
-
-        if email in self.secondaryEmails:
+        email = email.strip().lower()
+        if email in self.getSecondaryEmails():
             self.secondaryEmails.remove(email)
             self._p_changed = 1
 
     def setSecondaryEmails(self, emailList, reindex=False):
+        emailList = map(lambda email: email.lower().strip(), emailList)
         if reindex:
             idx = indexes.IndexesHolder().getById('email')
             idx.unindexUser(self)
@@ -771,11 +770,13 @@ class Avatar(Persistent, Fossilizable):
             return self.pendingSecondaryEmails
 
     def addPendingSecondaryEmail(self, email):
+        email = email.lower().strip()
         if not email in self.getPendingSecondaryEmails():  # create attribute if not exist
             self.pendingSecondaryEmails.append(email)
             self._p_changed = 1
 
     def removePendingSecondaryEmail(self, email):
+        email = email.lower().strip()
         if email in self.getPendingSecondaryEmails():  # create attribute if not exist
             self.pendingSecondaryEmails.remove(email)
             self._p_changed = 1

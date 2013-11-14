@@ -502,11 +502,14 @@ class RHActiveSecondaryEmail(base.RH):
 
         av = user.AvatarHolder().getById(self._userId)
 
-        for  sMail in av.getPendingSecondaryEmails():
+        if not av:
+            raise MaKaCError(_("The user id specified does not exist"))
+
+        for sMail in av.getPendingSecondaryEmails():
             if md5(sMail).hexdigest() == self._key:
                 av.removePendingSecondaryEmail(sMail)
                 av.addSecondaryEmail(sMail)
                 p = adminPages.WPUserActiveSecondaryEmail(self, av, sMail)
                 return p.display()
         else:
-            raise MaKaCError(_("The email has already being validated or the key is wrong"))
+            raise MaKaCError(_("The email has already being confirmed or the key is wrong"))

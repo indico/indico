@@ -46,7 +46,8 @@ user.add_url_rule('/register/send-activation', 'signIn-sendActivation', login.RH
 user.add_url_rule('/register', 'userRegistration', users.RHUserCreation, methods=('GET', 'POST'))
 user.add_url_rule('/register/exists', 'userRegistration-UserExist', users.RHUserExistWithIdentity)
 user.add_url_rule('/register/success', 'userRegistration-created', users.RHUserCreated, methods=('GET', 'POST'))
-user.add_url_rule('/register/activate-secondaryEmail', 'userRegistration-validateSecondaryEmail', users.RHActiveSecondaryEmail)
+user.add_url_rule('/register/activate-secondary-email', 'userRegistration-validateSecondaryEmail',
+                  users.RHActiveSecondaryEmail)
 
 with user.add_prefixed_rules('/<userId>'):
     # Identities
