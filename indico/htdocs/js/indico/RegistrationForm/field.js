@@ -40,27 +40,17 @@ ndRegForm.directive('ndField', function(url, RESTAPI) {
                         return $scope.fieldApi.isNew()? $T('Add') : $T('Update');
                     },
                     onOk: function(dialogScope) {
-                        //double way binding doesnt work...???
-                        if($scope.fieldApi.isNew())  {
-                            var newField = new RESTAPI.Fields({field: dialogScope.field});
-                            newField.$save({confId: $scope.confId, sectionId: $scope.section.id},
-                                function(data, headers) {
-                                    $scope.field = data;
-                                    dialogScope = {};
-                            });
-                        } else {
-                            var postData = {confId: $scope.confId,
+                        var postData = {confId: $scope.confId,
                                             sectionId: $scope.section.id,
-                                            fieldId: dialogScope.field.id,
-                                            updateFieldData: dialogScope.field
+                                            fieldData: dialogScope.formData
                                         };
 
-                            RESTAPI.Fields.save(postData,
-                                function(data, headers) {
-                                    $scope.field = data;
-                                    dialogScope = {};
+                        if(!$scope.fieldApi.isNew()) postData.fieldId = dialogScope.field.id;
+                        RESTAPI.Fields.save(postData,
+                            function(data, headers) {
+                                $scope.field = data;
+                                dialogScope.field = data;
                             });
-                        }
                     },
                     onCancel: function() {
                         if ($scope.fieldApi.isNew()) {
@@ -178,6 +168,10 @@ ndRegForm.directive('ndLabelField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/label.tpl.html');
+        },
+
+        link: function(scope) {
+            scope.settings.billable = true;
         }
     };
 });
@@ -291,10 +285,12 @@ ndRegForm.directive('ndFieldDialog', function(url) {
         require: 'ndDialog',
         replace: true,
         templateUrl: url.tpl('fields/dialogs/base.tpl.html'),
-        link: function(scope, element, attrs) {
-            scope.settings = scope.$parent.settings;
-            scope.actions.init = function() {
-                scope.field = scope.$eval(scope.asyncData);
+
+        controller: function($scope) {
+            $scope.settings = $scope.$parent.settings;
+            $scope.field = $scope.$eval($scope.asyncData);
+            $scope.formData = {
+                input: $scope.field.input
             };
         }
     };

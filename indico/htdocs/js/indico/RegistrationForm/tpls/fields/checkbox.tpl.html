@@ -9,15 +9,15 @@
 <span ng-show="field.billable" class="regFormCurrency"></span>
 
 <!-- TODO use isDisabled() and isBillable() from ndRadioField with ng-show -->
-{% if field.placesLimit != 0 and field.noPlacesLeft != 0 %}
-    <span class="placesLeft">
+<!-- if field.placesLimit != 0 and field.noPlacesLeft != 0 -->
+    <span ng-show="hasPlacesLeft(field)" class="placesLeft">
         [{{field.noPlacesLeft}} {{ 'place(s) left' | i18n }}]
     </span>
-{% elif field.placesLimit != 0 and field.noPlacesLeft == 0 %}
-    <font color="red">
+<!-- elif  field.placesLimit != 0 and field.noPlacesLeft == 0 -->
+    <font ng-show="!hasPlacesLeft(field)" color="red">
         ({{ 'no places left' | i18n }})
     </font>
-{% endif %}
+<!-- endif -->
 
 <span class="inputDescription">
     {{ field.description }}

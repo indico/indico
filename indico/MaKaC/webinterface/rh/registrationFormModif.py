@@ -587,11 +587,9 @@ class RHRegistrationFormFieldCreate(RHRegistrationFormModifSectionBase):
 
     def _checkParams_POST(self):
         post_pm = ParameterManager(json.loads(request.data))
-        self._fieldData = post_pm.extract('field', pType=dict, allowEmpty=False)
+        self._fieldData = post_pm.extract('fieldData', pType=dict, allowEmpty=False)
 
     def _process_POST(self):
-        if 'billable' in self._fieldData:
-            self._fieldData['billable'] = self._fieldData['billable'] == 'true'
         if 'radioitems' in self._fieldData:
             radioitems = self._fieldData['radioitems']
             radioitems = [item for item in radioitems if not 'remove' in item]
@@ -620,18 +618,18 @@ class RHRegistrationFormField(RHRegistrationFormModifFieldBase):
 
     def _checkParams_POST(self):
         post_pm = ParameterManager(json.loads(request.data))
-        self._updateFieldData = post_pm.extract('updateFieldData', pType=dict, allowEmpty=False)
+        self._updateFieldData = post_pm.extract('fieldData', pType=dict, allowEmpty=False)
         self._updateFieldData['input'] = self._field.getInput().getId()
 
     def _process_POST(self):
         self._field.setValues(self._updateFieldData)
-        return json.dumps(self._section.fossilize())
+        return json.dumps(self._field.fossilize())
 
     def _process_DELETE(self):
         if self._field.isLocked('delete'):
             raise MaKaCError(_("Deleted action couldn't be perform"))
         self._section.removeField(self._field)
-        return json.dumps(self._field.fossilize())
+        return json.dumps(self._section.fossilize())
 
 
 class RHRegistrationFormFieldEnable(RHRegistrationFormModifFieldBase):

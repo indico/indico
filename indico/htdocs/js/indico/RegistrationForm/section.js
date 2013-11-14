@@ -63,7 +63,6 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI',  function
         section.items.push({
             id: -1,
             input: field,
-            caption : '',
             values: {
                 inputType: type
             }

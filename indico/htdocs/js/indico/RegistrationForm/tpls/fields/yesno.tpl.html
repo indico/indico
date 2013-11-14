@@ -6,12 +6,12 @@
     ng-disabled="!hasPlacesLeft(field)">
 
     <option value="">-- {{ 'Choose a value' | i18n }} --</option>
-    <option value="yes">
+    <option ng-if="field.placesLimit !=0 " value="yes">
         {{ 'yes' | i18n }}
-        <!-- TODO ng-show within <option>? -->
-        {% if field.placesLimit != 0 %}
-            [{{field.noPlacesLeft}} {% _ 'place(s) left' %}]
-        {% endif %}
+            [{{field.noPlacesLeft}} {{ 'place(s) left' |i18n }}]
+    </option>
+    <option ng-if="field.placesLimit ==0 " value="yes">
+        {{ 'yes' | i18n }}
     </option>
     <option value="no">
         {{ 'no' | i18n }}
