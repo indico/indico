@@ -1,5 +1,5 @@
-<div ng-hide="field.id == -1">
-    <table class="regFormField" ng-class="{regFormFieldDisabled: field.disabled}" id="{{ field.id }}">
+<div ng-hide="field.id == -1" ng-mouseenter="show=true" ng-mouseleave="show=false">
+    <table class="regFormField editableItem" ng-class="{regFormFieldDisabled: field.disabled}" id="{{ field.id }}">
         <tr>
             <td class="regFormCaption">
                 <span class="regFormCaption">{{ field.caption }}</span>
@@ -10,7 +10,10 @@
                 <div ng-include="tplInput"></div>
             </td>
 
-            <td>
+            <td ng-show="show">
+                <a ng-if="field.disabled" ng-click="fieldApi.enableField(field)" class="icon-plus"></a>
+                <a ng-if="!field.disabled && field.lock.indexOf('disable') == -1" ng-click="fieldApi.disableField(field)" class="icon-disable"></a>
+                <a ng-if="field.lock.indexOf('delete') == -1" ng-click="fieldApi.removeField(field)" class="icon-remove"></a>
                 <a ng-click="openFieldSettings()" class="icon-settings"></a>
             </td>
         </tr>

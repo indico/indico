@@ -63,6 +63,30 @@ ndRegForm.directive('ndField', function(url, RESTAPI) {
             $scope.fieldApi = {
                 isNew: function() {
                     return $scope.field.id == -1;
+                },
+                disableField: function(field) {
+                    RESTAPI.Fields.disable({confId: $scope.confId,
+                                            sectionId: $scope.section.id,
+                                            fieldId: $scope.field.id},
+                        function(data) {
+                            $scope.field = data;
+                    });
+                },
+                enableField: function(field) {
+                    RESTAPI.Fields.enable({confId: $scope.confId,
+                                           sectionId: $scope.section.id,
+                                           fieldId: field.id},
+                        function(data) {
+                            $scope.field = data;
+                    });
+                },
+                removeField: function(field) {
+                    RESTAPI.Fields.remove({confId: $scope.confId,
+                                           sectionId: $scope.section.id,
+                                           fieldId: field.id},
+                        function(data) {
+                            $scope.section.items = data.items;
+                    });
                 }
             };
 

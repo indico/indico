@@ -93,9 +93,11 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
 
             $scope.api = {
                 createSection: function(data) {
-                    var newSection = new RESTAPI.Sections(data.newsection);
-                    newSection.$save({confId: $scope.confId}, function(data, headers) {
-                        $scope.sections.push(data);
+                    RESTAPI.Sections.save({confId: $scope.confId,
+                                            title: data.newsection.title,
+                                            description: data.newsection.description},
+                        function(newsection, headers) {
+                            $scope.sections.push(newsection);
                     });
                 }
             };

@@ -37,6 +37,7 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI',  function
 
     $scope.api.removeSection = function(section) {
         RESTAPI.Sections.remove({confId: $rootScope.confId, sectionId: section.id}, function(data) {
+            console.log($scope);
             //TODO: See how to update model!!
         });
     };
