@@ -892,6 +892,20 @@ def updateAbstractFields(dbi, withRBDB, prevVersion):
     dbi.commit()
 
 
+@since('1.2')
+def updateAvatarEmails(dbi, withRBDB, prevVersion):
+    """
+    Makes sure that all the secondary emails are lower case (otherwise it would be difficult to use indexes)
+    """
+    j = 0
+    for i, avatar in enumerate(AvatarHolder()._getIdx().itervalues()):
+        avatar.setSecondaryEmails(avatar.getSecondaryEmails())
+        if j % 1000 == 999:
+            dbi.commit()
+        j += 1
+    dbi.commit()
+
+
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
                  specified=[], dry_run=False, run_from=None):
 
