@@ -201,14 +201,14 @@ type ("RoomMap", ["IWidget"],
             var address = building.number + '/' + room.floor + '-' + room.roomNr;
 
             // caption
-            var caption = Html.span({}, $T("Room") + ' ' + address);
+            var caption = $("<span/>").text($T("Room") + ' ' + address);
 
             // room address
-            var addr = Html.span({className:'mapRoomAddress'}, address).dom;
+            var addr = $("<span/>").addClass('mapRoomAddress').text(address);
 
             // "Book" link
             var bookingUrl = room.bookingUrl;
-            if($E('isAvailable').dom.checked) {
+            if($("#isAvailable:checked")) {
                 bookingUrl += '&ignoreSession=on';
                 each({
                     sDay: 'day',
@@ -219,11 +219,11 @@ type ("RoomMap", ["IWidget"],
                     eYear: 'yearEnd',
                     repeatability: 'repeatability'
                 }, function(param, field) {
-                    bookingUrl += '&' + param + '=' + encodeURIComponent($E(field).dom.value);
+                    bookingUrl += '&' + param + '=' + encodeURIComponent($("#"+field).val());
                 });
 
-                var sTime = $E('sTime').dom.value.split(':');
-                var eTime = $E('eTime').dom.value.split(':');
+                var sTime = $('#sTime').val().split(':');
+                var eTime = $('#eTime').val().split(':');
                 if(sTime.length == 2 && eTime.length == 2) {
                     bookingUrl += '&hour=' + parseInt(sTime[0], 10);
                     bookingUrl += '&minute=' + parseInt(sTime[1], 10);
@@ -231,45 +231,31 @@ type ("RoomMap", ["IWidget"],
                     bookingUrl += '&minuteEnd=' + parseInt(eTime[1], 10);
                 }
             }
-            var book = Html.a({href:bookingUrl, target:'_blank', className:'mapBookRoomLink'}, $T("Book"));
-            /*book.observeClick(function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                indicoRequest('user.canBook', {
-                    roomLocation: room.locationName,
-                    roomID: room.id
-                }, function (result, error) {
-                    if (!error) {
-                        if (result) {
-                            parent.location.href = bookingUrl;
-                        } else {
-                            var popup = new ConfirmPopup('Booking Not Allowed', "You're not allowed to book this room. Do you want to view the room details to find out how to contact the room's owner?", function(result) {
-                                if(result) {
-                                    window.open(room.detailsUrl, '_blank');
-                                }
-                            }, 'Yes', 'No');
-                            popup.open();
-                        }
-                    } else {
-                        IndicoUtil.errorReport(error);
-                    }
-                });
-                return false;
-            });*/
+            var book = $("<a/>")
+                        .addClass("mapBookRoomLink")
+                        .attr("href", bookingUrl)
+                        .attr("target", "_blank")
+                        .text($T("Book"));
 
             // "More" link - for room details
-            var more = Html.a({href:"#", className:'mapRoomInfoLink'}, $T("More") + "...");
+            var more = $("<a/>")
+                        //.attr("href", "javascript: alert('hola');")
+                        .addClass("mapRoomInfoLink")
+                        .text($T("More") + "...");
 
             // "Room details" link
-            var details = Html.a({href:room.detailsUrl, target:'_blank'}, $T("Details") + "...");
-            details = Html.span({className:'mapRoomDetailsLink'}, details);
+            var details = $("<a/>")
+                        .attr("href", room.detailsUrl)
+                        .attr("target", "_blank")
+                        .text($T("Details") + "...");
+            details = $("<span/>").addClass("mapRoomDetailsLink").append(details);
 
             // room details elements
             var title = $('<div/>', {'class': 'mapRoomTooltipTitle'}).append(
-                $('<div/>').css('float', 'left').append(caption.dom),
+                $('<div/>').css('float', 'left').append(caption),
                 $('<div/>').css({
                     float: 'right'
-                }).append(details.dom)
+                }).append(details)
             );
             var help = $('<div/>').append(
                 $('<img/>', {
@@ -278,12 +264,12 @@ type ("RoomMap", ["IWidget"],
                     height: '140px',
                     'class': 'mapRoomTooltipImage'
                 }),
-                $('<div class="mapRoomTooltipDescription"/>').html(room.markerDescription)
+                $('<div class="mapRoomTooltipDescription"/>').append(room.markerDescription)
             );
             help.children().wrap('<p/>');
 
             // when the "More" link is clicked, show a tooltip with room details
-            $(more.dom).qtip({
+            more.qtip({
                 content: {
                     text: help,
                     title: {
@@ -299,8 +285,13 @@ type ("RoomMap", ["IWidget"],
                 }
             });
 
-            var roomInfo = Html.p({className:'mapRoomInfo'}, addr, ' - ', book.dom, more.dom);
-            return roomInfo.dom;
+            var roomInfo = $("<p/>")
+                            .addClass("mapRoomInfo")
+                            .append(addr)
+                            .append(' - ')
+                            .append(book)
+                            .append(more);
+            return roomInfo;
         },
 
         createBuildingInfo: function(building) {
@@ -319,7 +310,7 @@ type ("RoomMap", ["IWidget"],
             $.each(building.rooms, function(index, room) {
                 if (room.showOnMap) {
                     var roomInfo = self.createRoomInfo(building, room);
-                    $(roomInfo).appendTo(roomsInfo);
+                    roomsInfo.append(roomInfo);
                 }
             });
 
@@ -329,7 +320,7 @@ type ("RoomMap", ["IWidget"],
                 .append(title)
                 .append(roomsInfo);
 
-            return buildingInfo.html();
+            return buildingInfo.get(0);
         },
 
         showMarkers: function(isStartup) {

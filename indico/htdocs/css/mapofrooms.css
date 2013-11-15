@@ -36,6 +36,11 @@ div.caption {
 .mapBuildingInfo {
     max-height: 300px;
     overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.mapRoomsInfo {
+    width: 175px;
 }
 
 .mapRoomInfoLink {
