@@ -172,6 +172,7 @@ ndRegForm.directive("ndPersonalDataSection", function() {
 ndRegForm.directive("ndAccommodationSection", function() {
     return {
         require: 'ndSection',
+
         link: function(scope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
@@ -184,7 +185,7 @@ ndRegForm.directive("ndAccommodationSection", function() {
             scope.dialogs.config.actions.onOk = function(dialogScope) {
                 //TODO: Double binding not working...
                 scope.api.saveConfig(dialogScope.section,
-                                       {type: dialogScope.section.type});
+                                       {datesOffsets: dialogScope.formData.datesOffsets});
                 scope.api.saveItems(dialogScope.section, dialogScope.section.items);
             };
 
@@ -227,7 +228,7 @@ ndRegForm.directive("ndSessionsSection", function() {
             scope.dialogs.config.actions.onOk = function(dialogScope) {
                 //TODO: Double binding not working...
                 scope.api.saveConfig(dialogScope.section,
-                                       {type: dialogScope.section.type});
+                                       {type: dialogScope.formData.type});
                 scope.api.saveItems(dialogScope.section, dialogScope.section.items);
             };
 
@@ -252,8 +253,8 @@ ndRegForm.directive("ndSocialEventSection", function() {
             scope.dialogs.config.actions.onOk = function(dialogScope) {
                 //TODO: Double binding not working...
                 scope.api.saveConfig(dialogScope.section,
-                                       {introSentence: dialogScope.section.introSentence,
-                                        selectionType: dialogScope.section.selectionType
+                                       {introSentence: dialogScope.formData.introSentence,
+                                        selectionType: dialogScope.formData.selectionType
                 });
                 scope.api.saveItems(dialogScope.section, dialogScope.section.items);
             };
@@ -270,7 +271,10 @@ ndRegForm.directive('ndSectionDialog', function(url) {
         replace: true,
         templateUrl: url.tpl('sections/dialogs/base.tpl.html'),
         controller: function ($scope) {
+
             $scope.section = $scope.$eval($scope.asyncData);
+            $scope.formData = {}; //This is the way?
+
             $scope.getTabTpl = function(section_id, tab_type) {
                 return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(tab_type, section_id));
             };
