@@ -3,7 +3,7 @@
         <label class="regFormDialogCaption" style="width : 180px">
             {{ "Type of sessions' form" | i18n }}
         </label>
-        <select name="type">
+        <select name="type" ng-model="section.type">
             <option value="2priorities" {{ "selected" if section.type == "2priorities" }}>
                 {{ '2 choices' | i18n }}
             </option>

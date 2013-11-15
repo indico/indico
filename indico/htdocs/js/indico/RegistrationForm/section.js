@@ -45,22 +45,23 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI',  function
     $scope.api.saveConfig = function(section, data) {
         var postData = {confId: $rootScope.confId, sectionId: section.id};
         for(var key in data) { postData[key] = data[key]; }
-        RESTAPI.Sections.config(postData, function(data) {
-            //TODO: See how to update model!!
+        RESTAPI.Sections.config(postData, function(sectionUpdated) {
+            $scope.$parent.section = sectionUpdated;
+            //TODO: why not with section variable?
         });
     };
 
     $scope.api.saveItems = function(section, items) {
         var postData = {confId: $rootScope.confId, sectionId: section.id};
         postData.items = items;
-        RESTAPI.Sections.items(postData, function(data) {
-            //TODO: See how to update model!!
+        RESTAPI.Sections.items(postData, function(sectionUpdated) {
+            $scope.$parent.section = sectionUpdated;
+            //TODO: why not with section variable?
         });
     };
 
     $scope.actions.openAddField = function(section, field, type) {
         $scope.dialogs.newfield = true;
-        // TODO properly initialize field
         section.items.push({
             id: -1,
             input: field,
@@ -268,15 +269,20 @@ ndRegForm.directive('ndSectionDialog', function(url) {
         require: 'ndDialog',
         replace: true,
         templateUrl: url.tpl('sections/dialogs/base.tpl.html'),
-        link: function(scope, element) {
-            scope.getTabTpl = function(section_id, tab_type) {
+        controller: function ($scope) {
+            $scope.section = $scope.$eval($scope.asyncData);
+            $scope.getTabTpl = function(section_id, tab_type) {
                 return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(tab_type, section_id));
             };
 
-            scope.actions.init = function() {
-                scope.tabSelected = scope.data[0].id;
-                scope.section = scope.$eval(scope.asyncData);
+            $scope.actions.init = function() {
+                $scope.tabSelected = $scope.data[0].id;
+                //$scope.section = $scope.$eval($scope.asyncData);
             };
+
+        },
+
+        link: function(scope, element) {
 
             scope.setSelectedTab = function(tab_id) {
                 scope.tabSelected = tab_id;

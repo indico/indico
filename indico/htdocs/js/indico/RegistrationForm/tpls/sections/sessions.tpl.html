@@ -30,7 +30,7 @@
     </tr>
 
     <!-- Single options -->
-    <tr ng-if="section.type != '2priorities'">
+    <tr ng-if="section.type == 'all'">
         <td class="regFormSectionLeftSpacing1" colspan="3">
             <div ng-repeat="item in section.items">
                 <input type="checkbox"

@@ -29,8 +29,8 @@
                     ng-init="formData.mandatory=field.mandatory"
                     type="checkbox"
                     name="mandatory"
-                    id="input02">
-                   <!-- ng-disabled="field.disabled"-->
+                    id="input02"
+                    ng-disabled="field.lock.indexOf('mandatory')!=1">
                 {{ 'Mandatory' | i18n }}
             </div>
 
