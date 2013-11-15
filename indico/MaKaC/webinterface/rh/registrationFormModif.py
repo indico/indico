@@ -364,7 +364,7 @@ class RHRegistrationPreviewSectionQuery(RegistrationFormModifRESTBase):
         post_pm = ParameterManager(request.json)
         self._sectionHeader = {}
         self._sectionHeader["title"] = post_pm.extract('title', pType=str, allowEmpty=False)
-        self._sectionHeader["descripcion"] = post_pm.extract('title', pType=str, allowEmpty=True)
+        self._sectionHeader["description"] = post_pm.extract('description', pType=str, allowEmpty=True)
 
     def _process_POST(self):
         pos = next((i for i, f in enumerate(self._regForm.getSortedForms()) if not f.isEnabled()), None)
