@@ -127,63 +127,54 @@ choose from:
 Booking a Room
 ~~~~~~~~~~~~~~
 
-Essentially there are two steps: selecting a room and filling in a
-booking form. More detailed steps are:
+On the Indico main page, click the *Room Booking* menu option. This is how you access the Room Booking Module. From there, click the *Book a Room* menu option.
+
+The booking process consists essentially on three steps:
+
+* Specifying the search criteria
+* Selecting an available period
+* Confirming the reservation
 
 |image169|
 
-* On the Indico main page, click the *Room Booking* menu option. This is
-  how you access the Room Booking Module.
-* Click the *Book a Room* menu option.
-* If you know which room you want, simply select it and click
-  *Choose*. You will be taken directly to the booking form.
-* If you don't, make use of the room searching. Specify
-  dates (click the calendar icon to choose the day with your mouse).
-  You need to select hours and booking type (single day, repeating etc.).
-  Also select other criteria the room must meet, such as capacity and
-  necessary equipment (blackboard, computer projector, etc.). Then click
-  the *Search* button.
-* You will be presented with a list of available rooms meeting your
-  criteria.
-* Choose the room you wish to book, then click on the button *Book*. You
-  can also view the stats of the room by clocking on the button *Stats*.
-  If you have the correct rights, it is possible for  you to modify the
-  details of the room or to delete it by clicking on *Modify* or *Delete*.
+In the first step you can specify the rooms, date range and time range in which you want to search for bookings.
+
+* The *room picker* allows you to filter by name, technical requirements, and minimum capacity.
+  By clicking on a room you will mark it as a candidate for the booking.
+* The *date range* selector allows you to specify the frecuency and flexibility of the booking.
+  Frecuency allows to book the room a single time, daily, weekly or monthly.
+  Flexibility extends the search a few days before and after the specified date.
+* The *time range* simply serves the purpose of specifying the hours in which the room will be needed.
+
+When you are done, click the button *Search* to proceed to the next step.
 
 |image170|
 
-* Fill in a booking form. If you have searched for rooms, most fields
-  are already filled in for your convenience (this data comes from
-  the searching form). After filling in the form, click the *Re-check for
-  conflicts* button.
-* Scroll the page down to have a look at conflicts. Scroll more to see
-  the room availability calendar. Your booking is represented by a green
-  bar or dark red bar if it overlaps with existing bookings, which
-  are pink. This graphical room preview is useful especially
-  when doing a recurring booking. Give it a try: set the when/type
-  attribute to *Repeat once a week*, set the end date to be at least 2
-  months after the start date, and click the *Re-check for conflicts* again.
-  See the room calendar in its full glory.
-* If your booking conflicts with others, you have two options:
+In the second step, you will be presented with a calendar summarizing the rooms, dates and times you specified previously. In this view you can check all available periods (marked in green), other bookings (in yellow) or conflicts (in red).
 
-  - In general, it is better to resolve conflicts manually: by
-    changing dates, hours or maybe trying another room.
-  - The alternative is to automatically book everything except
-    conflicting days. This may be useful if you do long-term, recurring
-    booking, for example, *whole year, every week*. Imagine everything
-    looks perfect, except for several weeks when the room is not available.
-    In this case check the 'skip conflicting dates' option to book
-    everything except problematic dates.
+This view is very versatile. Give it a try: set the frecuency of the search to to *Weekly*, set the end date to be at least 2 months after the start date, and search again. See the room calendar in its full glory.
 
-*  Click the *Book* button.
-*  If your form is corectly filled, the system will ensure your new
-   booking does not conflict with others. When no conflicts are found,
-   you will be shown the confirmation page which lists the details of
-   your booking.
-*  Click *My bookings* from the menu. Your new booking now appears on
-   the list.
+If you click on an available period with you will be redirected to the next step in which you will confirm the reservation.
 
 |image171|
+
+In the third and final step, you will need to complete the booking form. Click *Book* to confirm the reservation.
+
+If your booking conflicts with others, you have two options:
+
+* In general, it is better to resolve conflicts manually: by
+  changing dates, hours or maybe trying another room.
+* The alternative is to automatically book everything except
+  conflicting days. This may be useful if you do long-term, recurring
+  booking, for example, *whole year, every week*. Imagine everything
+  looks perfect, except for several weeks when the room is not available.
+  In this case check the 'skip conflicting dates' option to book
+  everything except problematic dates.
+
+If your form is corectly filled, the system will ensure your new booking does not conflict with others. When no conflicts are found, you will be shown the confirmation page which lists the details of your booking.
+
+* Click *My bookings* from the menu. Your new booking now appears on
+  the list.
 
 Note: some rooms require confirmation. These rooms are usually coded
 in orange. In this case, you cannot directly book them. You
@@ -401,6 +392,6 @@ explicit permission to override the permission or own the rooms.
 .. |image167| image:: UserGuidePics/rb_room_name.png
 .. |image168| image:: UserGuidePics/rb_room_types.png
 .. |image169| image:: UserGuidePics/rb_booking_a_room.png
-.. |image170| image:: UserGuidePics/rb_booking_form.png
-.. |image171| image:: UserGuidePics/rb_conflicts.png
+.. |image170| image:: UserGuidePics/rb_conflicts.png
+.. |image171| image:: UserGuidePics/rb_booking_form.png
 .. |image172| image:: UserGuidePics/rb_booking_display.png
