@@ -17,7 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.webinterface.wcomponents import WTemplated
+
+from indico.modules.rb.models.location_attribute_keys import LocationAttributeKey
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.views.admin import WPRoomBookingPluginAdminBase
 
 
 class WPRoomBookingAdmin(WPRoomBookingPluginAdminBase):
@@ -59,7 +63,7 @@ class WPRoomBookingAdminLocation(WPRoomBookingPluginAdminBase):
         self._subTabConfig.setActive()
 
     def _getTabContent(self, params):
-        wc = wcomponents.WRoomBookingAdminLocation(self._rh, self._location)
+        wc = WRoomBookingAdminLocation(self._rh, self._location)
         params['actionSucceeded'] = self._actionSucceeded
         return wc.getHTML(params)
 
@@ -73,14 +77,14 @@ class WRoomBookingAdminLocation(WTemplated):
     def getVars(self):
         wvars = super(WRoomBookingAdminLocation, self).getVars()
         wvars["location"] = self._location
-        wvars["possibleEquipment"] = self._location.factory.getEquipmentManager().getPossibleEquipment(location=self._location.friendlyName)
-        wvars["AttsManager"] = self._location.factory.getCustomAttributesManager()
+        wvars["possibleEquipment"] = LocationAttributeKey.getAllAttributeKeys()
+        wvars['AttsManager'] = None
+        # wvars["AttsManager"] = self._location.factory.getCustomAttributesManager()
 
         # Rooms
-        rooms = self._location.factory.newRoom().getRooms(location=self._location.friendlyName)
-        rooms.sort()
-
-        wvars["Rooms"] = rooms
+        # rooms = self._location.factory.newRoom().getRooms(location=self._location.friendlyName)
+        # rooms.sort()
+        wvars["Rooms"] = self._location.getAllRoomsSortedByFullNames()
 
         rh = self._rh
 

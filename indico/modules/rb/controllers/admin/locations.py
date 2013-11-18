@@ -22,11 +22,11 @@ from flask import request
 from MaKaC.common.logger import Logger
 from MaKaC.errors import MaKaCError, FormValuesError
 from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.pages import admins as adminPages
 
 from indico.core.db import db
 from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.views.admin import locations as location_views
 
 
 logger = Logger.get('requestHandler')
@@ -35,7 +35,7 @@ logger = Logger.get('requestHandler')
 class RHRoomBookingAdmin(RHRoomBookingAdminBase):
 
     def _process(self):
-        return adminPages.WPRoomBookingAdmin(self).display()
+        return location_views.WPRoomBookingAdmin(self).display()
 
 
 class RHRoomBookingDeleteLocation(RHRoomBookingAdminBase):
@@ -93,15 +93,12 @@ class RHRoomBookingSetDefaultLocation(RHRoomBookingAdminBase):
 class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
 
     def _checkParams(self):
-        self._withKPI = request.args.get('withKPI') == 'True'
+        self._withKPI = request.args.get('withKPI', type=bool)
         self._actionSucceeded = request.args.get('actionSucceeded', default=False, type=bool)
-        name = request.args.get('locationId')
-        try:
-            # location_name | location_id
-            location_id = int(name.split('|')[1])
-            self._location = Location.getLocationById(location_id)
-        except:
-            raise MaKaCError(_("{}: Unknown Location".format(name)))
+        name = request.params.get('locationId')
+        self._location = Location.getLocationByName(name)
+        if not self._location:
+            raise MaKaCError(_("Unknown Location") + ": {}".format(name))
 
     def _process(self):
         if self._withKPI:
@@ -117,25 +114,22 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
             self._booking_stats = st
             self._totalBookings = sum(map(lambda k, v: v, st.iteritems()))
 
-        return adminPages.WPRoomBookingAdminLocation(self, self._location,
-                                                     actionSucceeded=self._actionSucceeded).display()
+        return location_views.WPRoomBookingAdminLocation(self, self._location,
+                                                         actionSucceeded=self._actionSucceeded).display()
 
 
 class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
 
     def _checkParams(self):
         self._attr = request.args.get('removeCustomAttributeName')
-        name = request.args.get('locationId')
-        try:
-            # location_name | location_id
-            location_id = int(name.split('|')[1])
-            self._location = Location.getLocationById(location_id)
-        except:
-            raise MaKaCError(_("{}: Unknown Location".format(name)))
+        name = request.params.get('locationId')
+        self._location = Location.getLocationByName(name)
+        if not self._location:
+            raise MaKaCError(_("Unknown Location") + ": {}".format(name))
 
     def _process(self):
         try:
-            self._location.removeAttribute(self._attr)
+            db.session.delete(self._location.getAttributeByName(self._attr))
             db.session.commit()
         except:
             db.session.rollback()
@@ -147,13 +141,10 @@ class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
 class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
 
     def _checkParams(self):
-        name = request.args.get('locationId')
-        try:
-            # location_name | location_id
-            location_id = int(name.split('|')[1])
-            self._location = Location.getLocationById(location_id)
-        except:
-            raise MaKaCError(_("{}: Unknown Location".format(name)))
+        name = request.params.get('locationId')
+        self._location = Location.getLocationByName(name)
+        if not self._location:
+            raise MaKaCError(_("Unknown Location") + ": {}".format(name))
 
         self._newAttr = None
         attrName = request.form.get('newCustomAttributeName').strip()
@@ -165,7 +156,7 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
                 'hidden': request.form.get('newCustomAttributeIsHidden') == 'on'
             }
 
-        # Set "required" for _all_ custom attributes
+        # Set "required" for _all_ custom attributes ??
         for attr in self._location.getAttributeNames():
             required = hidden = False
             # Try to find in params (found => required == True)
@@ -183,50 +174,55 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
             attr.setHidden(hidden)
             db.session.add(attr)
 
+    def _process(self):
+        if self._newAttr:
+            try:
+                # TODO: add self._newAttr
+                db.session.commit()
+            except:
+                db.session.rollback()
+                logger.warning("Location attribute couldn't be set for required/hidden! "
+                               "(Request {})".format(request))
+                # TODO: raise
+        self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
+
+
+# TODO
+class RHRoomBookingDeleteEquipment(RHRoomBookingAdminBase):
+
+    def _checkParams(self):
+        self._eq = request.form.get('removeEquipmentName')
+        name = request.params.get('locationId')
+        self._location = Location.getLocationByName(name)
+        if not self._location:
+            raise MaKaCError(_("Unknown Location") + ": {}".format(name))
+
+    def _process(self):
         try:
+            db.session.delete(self._location.getAttributeByName(self._eq))
             db.session.commit()
         except:
             db.session.rollback()
-            logger.warning("Location attribute couldn't be set for required/hidden! "
-                           "(Request {})".format(request))
             # TODO: raise
+        self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
 
 
 # TODO
-class RHRoomBookingDeleteEquipment( RHRoomBookingAdminBase ):
+class RHRoomBookingSaveEquipment(RHRoomBookingAdminBase):
 
-    def _checkParams( self , params ):
-        self._eq = params["removeEquipmentName"]
-        name = params.get("locationId","")
-        self._location = Location.parse(name)
-        if str(self._location) == "None":
-            raise MaKaCError( "%s: Unknown Location" % name )
+    def _checkParams(self):
+        self._eq = request.form.get('newEquipmentName').strip()
+        name = request.form.get('locationId')
+        self._location = Location.getLocationByName(name)
+        if not self._location:
+            raise MaKaCError(_("Unknown Location") + ": {}".format(name))
 
-    def _process( self ):
-        self._location.factory.getEquipmentManager().removeEquipment( self._eq, location=self._location.friendlyName )
-        url = urlHandlers.UHRoomBookingAdminLocation.getURL(self._location)
-        self._redirect( url )
-
-
-    def _process( self ):
-        if self._newAttr:
-            self._location.factory.getCustomAttributesManager().insertAttribute( self._newAttr, location=self._location.friendlyName )
-        url = urlHandlers.UHRoomBookingAdminLocation.getURL(self._location)
-        self._redirect( url )
-
-
-# TODO
-class RHRoomBookingSaveEquipment( RHRoomBookingAdminBase ):
-
-    def _checkParams( self , params ):
-        self._eq = params["newEquipmentName"].strip()
-        name = params.get("locationId","")
-        self._location = Location.parse(name)
-        if str(self._location) == "None":
-            raise MaKaCError( "%s: Unknown Location" % name )
-
-    def _process( self ):
+    def _process(self):
         if self._eq:
-            self._location.factory.getEquipmentManager().insertEquipment( self._eq, location=self._location.friendlyName )
-        url = urlHandlers.UHRoomBookingAdminLocation.getURL(self._location)
-        self._redirect( url )
+            try:
+                # TODO: create attribute
+                db.session.commit()
+            except:
+                db.session.rollback()
+                # TODO: raise
+        self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
