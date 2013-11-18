@@ -22,6 +22,7 @@ from MaKaC.webinterface.wcomponents import WTemplated
 from indico.modules.rb.models.location_attribute_keys import LocationAttributeKey
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.views.admin import WPRoomBookingPluginAdminBase
+from indico.modules.rb.views.utils import makePercentageString
 
 
 class WPRoomBookingAdmin(WPRoomBookingPluginAdminBase):
@@ -91,7 +92,7 @@ class WRoomBookingAdminLocation(WTemplated):
         wvars["withKPI"] = rh._withKPI
 
         if rh._withKPI:
-            wvars["kpiAverageOccupation"] = str( int( round( rh._kpiAverageOccupation * 100 ) ) ) + "%"
+            wvars["kpiAverageOccupation"] = makePercentageString(rh._kpiAverageOccupation)
 
             wvars["kpiTotalRooms"] = rh._kpiTotalRooms
             wvars["kpiActiveRooms"] = rh._kpiActiveRooms

@@ -200,3 +200,12 @@ def getDayAttrsForRoom(dayDT, room):
         attrs['className'] = "preblocked"
         attrs['tooltip'] = _('Blocking requested by %s:\n%s\n\n<b>If this blocking is approved, any colliding bookings will be rejected!</b>') % (block.createdByUser.getFullName(), block.message)
     return attrs
+
+
+def makePercentageString(val):
+    """ Converts a float in [0, 1] to a percentage string
+        ex:
+            0.626333 -> 63%
+            0.623333 -> 62%
+    """
+    return '{}%'.format(int(round(rh._kpiAverageOccupation * 100)))
