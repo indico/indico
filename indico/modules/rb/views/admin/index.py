@@ -17,6 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.webinterface.wcomponents import WTemplated
+
+from indico.modules.rb.views.admin import WPRoomBookingPluginAdminBase
+
 
 class WPRoomBookingPluginAdmin(WPRoomBookingPluginAdminBase):
 
@@ -32,7 +37,7 @@ class WPRoomBookingPluginAdmin(WPRoomBookingPluginAdminBase):
         return WRoomBookingPluginAdmin(self._rh).getHTML(params)
 
 
-class WRoomBookingPluginAdmin(wcomponents.WTemplated):
+class WRoomBookingPluginAdmin(WTemplated):
 
     def __init__(self, rh):
         self._rh = rh

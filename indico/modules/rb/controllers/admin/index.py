@@ -22,27 +22,28 @@ from flask import request
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.pages import admins as adminPages
-from MaKaC.webinterface.rh import admins
+from MaKaC.webinterface.rh.admins import RHAdminBase
+
+from indico.modules.rb.views import index as index_views
 
 
-class RHRoomBookingPluginAdminBase(admins.RHAdminBase):
+class RHRoomBookingPluginAdminBase(RHAdminBase):
     pass
 
 
 class RHRoomBookingPluginAdmin(RHRoomBookingPluginAdminBase):
 
     def _checkParams(self):
-        admins.RHAdminBase._checkParams(self, request.args)
+        super(self, RHRoomBookingPluginAdmin)._checkParams(request.args)
 
     def _process(self):
-        return adminPages.WPRoomBookingPluginAdmin(self, request.args).display()
+        return index_views.WPRoomBookingPluginAdmin(self, request.args).display()
 
 
 class RHSwitchRoomBookingModuleActive(RHRoomBookingPluginAdminBase):
 
     def _checkParams(self):
-        admins.RHAdminBase._checkParams(self, request.args)
+        super(self, RHSwitchRoomBookingModuleActive)._checkParams(request.args)
 
     def _process(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()

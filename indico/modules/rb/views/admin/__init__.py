@@ -17,43 +17,60 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.pages.admins import WPAdminsBase
+from MaKaC.webinterface.wcomponents import (
+    TabControl,
+    WSimpleNavigationDrawer,
+    WTabControl
+)
 
-class WPRoomsBase( WPAdminsBase ):
+
+class WPRoomsBase(WPAdminsBase):
+
     def _setActiveSideMenuItem(self):
         self._roomsMenuItem.setActive()
 
-    def _createTabCtrl( self ):
-        self._tabCtrl = wcomponents.TabControl()
+    def _createTabCtrl(self):
+        self._tabCtrl = TabControl()
 
         if self._rh._getUser().isAdmin():
-            self._subTabRoomBooking = self._tabCtrl.newTab( "booking", _("Room Booking"), \
-                    urlHandlers.UHRoomBookingPluginAdmin.getURL() )
-            self._subTabMain = self._subTabRoomBooking.newSubTab( "main", _("Main"), \
-                    urlHandlers.UHRoomBookingPluginAdmin.getURL() )
+            self._subTabRoomBooking = self._tabCtrl.newTab("booking",
+                                                           _("Room Booking"),
+                                                           urlHandlers.UHRoomBookingPluginAdmin.getURL())
+            self._subTabMain = self._subTabRoomBooking.newSubTab("main",
+                                                                 _("Main"),
+                                                                 urlHandlers.UHRoomBookingPluginAdmin.getURL())
         else:
-            self._subTabRoomBooking = self._tabCtrl.newTab( "booking", _("Room Booking"), \
-                    urlHandlers.UHRoomBookingAdmin.getURL() )
-        self._subTabConfig = self._subTabRoomBooking.newSubTab( "configuration", _("Configuration"), \
-                urlHandlers.UHRoomBookingAdmin.getURL() )
-        self._subTabRoomMappers = self._tabCtrl.newTab( "mappers", _("Room Mappers"), \
-                urlHandlers.UHRoomMappers.getURL() )
+            self._subTabRoomBooking = self._tabCtrl.newTab("booking",
+                                                           _("Room Booking"),
+                                                           urlHandlers.UHRoomBookingAdmin.getURL())
+
+        self._subTabConfig = self._subTabRoomBooking.newSubTab("configuration",
+                                                               _("Configuration"),
+                                                               urlHandlers.UHRoomBookingAdmin.getURL())
+        self._subTabRoomMappers = self._tabCtrl.newTab("mappers",
+                                                       _("Room Mappers"),
+                                                       urlHandlers.UHRoomMappers.getURL())
 
     def _getNavigationDrawer(self):
         if self._rh._getUser().isAdmin():
-            return wcomponents.WSimpleNavigationDrawer(_("Room Booking Admin"), urlHandlers.UHRoomBookingPluginAdmin.getURL, bgColor="white")
-        return wcomponents.WSimpleNavigationDrawer(_("Room Booking Admin"), urlHandlers.UHRoomBookingAdmin.getURL, bgColor="white")
+            return WSimpleNavigationDrawer(_("Room Booking Admin"),
+                                           urlHandlers.UHRoomBookingPluginAdmin.getURL,
+                                           bgColor="white")
+        return WSimpleNavigationDrawer(_("Room Booking Admin"),
+                                       urlHandlers.UHRoomBookingAdmin.getURL,
+                                       bgColor="white")
 
     def _getPageContent(self, params):
-        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
+        return WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
 
 
 class WPRoomBookingPluginAdminBase(WPRoomsBase):
 
-    def __init__(self, rh):
-        WPRoomsBase.__init__(self, rh)
-
     def getJSFiles(self):
-        return WPRoomsBase.getJSFiles(self) + self._includeJSPackage('Management')
+        return (super(WPRoomBookingPluginAdminBase, self).getJSFiles() +
+                self._includeJSPackage('Management'))
 
     def _setActiveTab(self):
         self._subTabRoomBooking.setActive()
