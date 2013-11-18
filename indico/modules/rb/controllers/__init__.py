@@ -19,7 +19,10 @@
 
 from MaKaC.webinterface.rh.base import RHProtected
 
-from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
+from indico.modules.rb.controllers.mixins import (
+    RoomBookingAvailabilityParamsMixin,
+    RoomBookingDBMixin
+)
 
 
 class CandidateDataFrom(object):

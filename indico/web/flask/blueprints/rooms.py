@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
+from indico.modules.rb.controllers.admin import reservations as reservation_admin_handlers
 from indico.modules.rb.controllers.user import (
     blockings as blocking_handlers,
     index as index_handler,
@@ -118,7 +119,7 @@ rooms.add_url_rule('/booking/<roomLocation>/<resvID>/reject',
 
 rooms.add_url_rule('/booking/<roomLocation>/<resvID>/delete',
                    'roomBooking-deleteBooking',
-                   reservation_handlers.RHRoomBookingDeleteBooking,
+                   reservation_admin_handlers.RHRoomBookingDeleteBooking,
                    methods=('POST',))
 
 rooms.add_url_rule('/booking/<roomLocation>/<resvID>/clone',

@@ -24,7 +24,7 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.common.logger import Logger
 
 from indico.core.db import db
-from indico.modules.rb.controllers import RHRoomBookingAdminBase
+from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
 from indico.modules.rb.controllers.utils import FormMode
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room

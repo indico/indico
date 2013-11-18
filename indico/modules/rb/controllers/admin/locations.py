@@ -25,7 +25,7 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages import admins as adminPages
 
 from indico.core.db import db
-from indico.modules.rb.controllers import RHRoomBookingAdminBase
+from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
 from indico.modules.rb.models.locations import Location
 
 

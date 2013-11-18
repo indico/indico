@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from indico.modules.rb.controllers import RHRoomBookingBase
+
 
 class RHRoomBookingBookRoom( RHRoomBookingBase ):
 
@@ -845,23 +847,6 @@ class RHRoomBookingRejectBooking( RHRoomBookingBase ):
         session['rbDescription'] = _("NOTE: rejection e-mail has been sent to the user. However, it's advisable to <strong>inform</strong> the user directly. Note that users often don't read e-mails.")
         url = urlHandlers.UHRoomBookingBookingDetails.getURL( self._resv )
         self._redirect( url ) # Redirect to booking details
-
-
-class RHRoomBookingDeleteBooking( RHRoomBookingAdminBase ):
-
-    def _checkParams( self , params ):
-        resvID = int( params.get( "resvID" ) )
-        roomLocation = params.get( "roomLocation" )
-        self._resv = CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation )
-        self._target = self._resv
-
-    def _process( self ):
-        # Booking deletion is always possible - just delete
-        self._resv.remove()
-        session['rbTitle'] = _("Booking has been deleted.")
-        session['rbDescription'] = _("You have successfully deleted the booking.")
-        url = urlHandlers.UHRoomBookingStatement.getURL()
-        self._redirect( url ) # Redirect to deletion confirmation
 
 
 class RHRoomBookingCloneBooking( RHRoomBookingBase ):

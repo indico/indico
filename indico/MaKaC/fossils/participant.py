@@ -33,4 +33,3 @@ class IParticipantMinimalFossil(IFossil):
 
     def getStatus(self):
         pass
-
