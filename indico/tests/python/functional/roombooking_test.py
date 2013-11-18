@@ -23,6 +23,7 @@ import unittest, time, re, datetime
 from indico.tests.python.unit.plugins_tests.RoomBooking_tests.roomblocking_test import RoomBooking_Feature
 from indico.tests.python.unit.plugins import Plugins_Feature
 
+
 class RoomBookingTests(LoggedInSeleniumTestCase):
     _requires = [RoomBooking_Feature, Plugins_Feature]
 
@@ -79,7 +80,6 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         self.click(id="needsAssistance")
         self.click(ltext="Save")
 
-
     def test_create_accept_booking(self):
         # DB setup
         with self._context('database'):
@@ -94,7 +94,7 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         self.type(name="password", text="fake-1")
         self.click(id="loginButton")
         self.click(ltext="Room booking")
-        self.click(css="li.moderatedRoom > label > input")
+        self.click(css="#roomselector li+li > label")
         self.click(ltext="Search")
         self.click(xpath="//div[@class='room-row'][1]/div[2]/div[2]")
         self.type(name="reason", text="Lecture")
