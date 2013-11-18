@@ -19,8 +19,8 @@
 
 from flask import request, session
 
-from MaKaC.webinterface.pages import admins as adminPages
 from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.pages import admins as adminPages
 from MaKaC.common.logger import Logger
 
 from indico.core.db import db
