@@ -165,3 +165,24 @@ class RoomBookingAvailabilityParamsMixin:
             self._today=True
             self._startDT = datetime.today().replace(hour=0,minute=0,second=0)
             self._endDT = self._startDT.replace(hour=23,minute=59,second=59)
+
+
+class AttributeSetterMixin():
+
+    """ Utility class to make retrieval of parameters from requests """
+
+    def setParam(self, attrName, params, paramName=None, default=None, callback=None):
+        """ Sets the given attribute from params
+            If there is no value to set, uses default
+            Otherwise, auto strips and if callback given, pre-processes value and then sets
+        """
+        if not paramName:
+            paramName = attrName
+        val = params.get(paramName)
+        if val and val.strip():
+            val = val.strip()
+            if callback:
+                val = callback(val)
+            setattr(self, attrName, val)
+        else:
+            setattr(self, attrName, default)

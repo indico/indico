@@ -176,3 +176,30 @@ class Location(db.Model):
 
     def isMapAvailable(self):
         pass
+
+    def getAllBuildings(self):
+        pass
+        # # break-down the rooms by buildings
+        # buildings = {}
+        # for room in rooms:
+        #     if room.building:
+
+        #         # if it's the first room in that building, initialize the building
+        #         building = buildings.get(room.building, None)
+        #         if building is None:
+        #             title = _("Building") + " %s" % room.building
+        #             building = {'has_coordinates':False, 'number':room.building, 'title':title, 'rooms':[]}
+        #             buildings[room.building] = building
+
+        #         # if the room has coordinates, set the building coordinates
+        #         if room.latitude and room.longitude:
+        #             building['has_coordinates'] = True
+        #             building['latitude'] = room.latitude
+        #             building['longitude'] = room.longitude
+
+        #         # add the room to its building
+        #         if not self._forVideoConference or room.needsAVCSetup:
+        #             building['rooms'].append(room.fossilize())
+
+        # # filter the buildings with rooms and coordinates and return them
+        # buildings_with_coords = [b for b in buildings.values() if b['rooms'] and b['has_coordinates']]

@@ -44,3 +44,7 @@ class LocationAttribute(db.Model):
         return '<LocationAttribute({0}, {1}, {2})>'.format(self.location_id,
                                                            self.key_id,
                                                            self.value)
+
+    @staticmethod
+    def getAllAttributeKeys():
+        pass

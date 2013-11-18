@@ -17,12 +17,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime, timedelta
+
 from flask import session
 
+from MaKaC.common.Configuration import Config
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 
+from indico.modules.rb.views.utils import makePercentageString
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.views import WPRoomBookingBase
@@ -33,7 +37,7 @@ class WPRoomBookingMapOfRooms(WPRoomBookingBase):
     def __init__(self, rh, **params):
         self._rh = rh
         self._params = params
-        WPRoomBookingBase.__init__(self, rh)
+        super(WPRoomBookingMapOfRooms, self).__init__(self, rh)
 
     def _getTitle(self):
         return super(WPRoomBookingMapOfRooms, self)._getTitle() + " - " + _("Map of rooms")
@@ -87,8 +91,10 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
         self._roomMapOpt.setActive(True)
 
     def _getBody(self, params):
-        return WRoomBookingMapOfRoomsWidget(self._aspects, self._buildings,
-                                            self._defaultLocation, self._forVideoConference,
+        return WRoomBookingMapOfRoomsWidget(self._aspects,
+                                            self._buildings,
+                                            self._defaultLocation,
+                                            self._forVideoConference,
                                             self._roomID).getHTML(params)
 
 
@@ -308,49 +314,50 @@ class WRoomBookingRoomDetails(WTemplated):
             calendarStartDT = datetime(now.year, now.month, now.day, 0, 0, 1)
             calendarEndDT = calendarStartDT + timedelta(3 * 31, 50, 0, 0, 59, 23)
 
-        # Example resv. to ask for other reservations
-        resvEx = CrossLocationFactory.newReservation(location = self._rh._room.locationName)
-        resvEx.startDT = calendarStartDT
-        resvEx.endDT = calendarEndDT
-        resvEx.repeatability = RepeatabilityEnum.daily
-        resvEx.room = self._rh._room
-        resvEx.isConfirmed = None # to include not also confirmed
+        # TODO
+        # # Example resv. to ask for other reservations
+        # resvEx = CrossLocationFactory.newReservation(location=self._rh._room.locationName)
+        # resvEx.startDT = calendarStartDT
+        # resvEx.endDT = calendarEndDT
+        # resvEx.repeatability = RepeatabilityEnum.daily
+        # resvEx.room = self._rh._room
+        # resvEx.isConfirmed = None # to include not also confirmed
 
-        # Bars: Existing reservations
-        collisionsOfResvs = resvEx.getCollisions()
+        # # Bars: Existing reservations
+        # collisionsOfResvs = resvEx.getCollisions()
 
-        bars = []
-        for c in collisionsOfResvs:
-            if c.withReservation.isConfirmed:
-                bars.append(Bar(c, Bar.UNAVAILABLE))
-            else:
-                bars.append(Bar(c, Bar.PREBOOKED))
+        # bars = []
+        # for c in collisionsOfResvs:
+        #     if c.withReservation.isConfirmed:
+        #         bars.append(Bar(c, Bar.UNAVAILABLE))
+        #     else:
+        #         bars.append(Bar(c, Bar.PREBOOKED))
 
-        bars = barsList2Dictionary(bars)
-        bars = addOverlappingPrebookings(bars)
-        bars = sortBarsByImportance(bars, calendarStartDT, calendarEndDT)
+        # bars = barsList2Dictionary(bars)
+        # bars = addOverlappingPrebookings(bars)
+        # bars = sortBarsByImportance(bars, calendarStartDT, calendarEndDT)
 
-        # Set owner for all
-        if not self._standalone:
-            for dt in bars.iterkeys():
-                for bar in bars[dt]:
-                    bar.forReservation.setOwner( self._rh._conf )
+        # # Set owner for all
+        # if not self._standalone:
+        #     for dt in bars.iterkeys():
+        #         for bar in bars[dt]:
+        #             bar.forReservation.setOwner(self._rh._conf)
 
         wvars["calendarStartDT"] = calendarStartDT
         wvars["calendarEndDT"] = calendarEndDT
-        bars = introduceRooms([self._rh._room], bars, calendarStartDT,
-                              calendarEndDT, user=self._rh._aw.getUser())
-        fossilizedBars = {}
-        for key in bars:
-            fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
-        wvars["barsFossil"] = fossilizedBars
-        wvars["dayAttrs"] = fossilize(dict((day.strftime("%Y-%m-%d"),
-                                           getDayAttrsForRoom(day, self._rh._room))
-                                           for day in bars.iterkeys()))
-        wvars["bars"] = bars
-        wvars["iterdays"] = iterdays
-        wvars["day_name"] = day_name
-        wvars["Bar"] = Bar
+        # bars = introduceRooms([self._rh._room], bars, calendarStartDT,
+        #                       calendarEndDT, user=self._rh._aw.getUser())
+        # fossilizedBars = {}
+        # for key in bars:
+        #     fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
+        # wvars["barsFossil"] = fossilizedBars
+        # wvars["dayAttrs"] = fossilize(dict((day.strftime("%Y-%m-%d"),
+        #                                    getDayAttrsForRoom(day, self._rh._room))
+        #                                    for day in bars.iterkeys()))
+        # wvars["bars"] = bars
+        # wvars["iterdays"] = iterdays
+        # wvars["day_name"] = day_name
+        # wvars["Bar"] = Bar
         wvars["withConflicts"] = False
         wvars["currentUser"] = self._rh._aw.getUser()
 
@@ -381,7 +388,7 @@ class WRoomBookingRoomStats(WTemplated):
         wvars["room"] = self._rh._room
         wvars["standalone"] = self._standalone
         wvars["period"] = self._rh._period
-        wvars["kpiAverageOccupation"] = str(int(round(self._rh._kpiAverageOccupation * 100 ))) + "%"
+        wvars["kpiAverageOccupation"] = makePercentageString(self._rh._kpiAverageOccupation)
         # Bookings
         wvars["kbiTotalBookings"] = self._rh._totalBookings
         # Next 9 KPIs

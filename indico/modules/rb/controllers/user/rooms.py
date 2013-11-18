@@ -17,9 +17,20 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import request
+from datetime import datetime, timedelta
+
+from flask import request, session
+
+from MaKaC.common.cache import GenericCache
+from MaKaC.webinterface.locators import WebLocator
 
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.controllers.mixins import AttributeSetterMixin
+from indico.modules.rb.models.location_attribute_keys import LocationAttributeKey
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.room_attribute_keys import RoomAttributeKey
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.views.user import rooms as room_views
 
 
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
@@ -32,116 +43,77 @@ class RHRoomBookingMapOfRooms(RHRoomBookingBase):
         params = {}
         if self._roomID:
             params['roomID'] = self._roomID
-        page = roomBooking_wp.WPRoomBookingMapOfRooms(self, **params)
-        return page.display()
+        return room_views.WPRoomBookingMapOfRooms(self, **params).display()
 
 
 class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 
     def __init__(self, *args, **kwargs):
-        RHRoomBookingBase.__init__(self, *args, **kwargs)
+        super(RHRoomBookingMapOfRoomsWidget, self).__init__(*args, **kwargs)
         self._cache = GenericCache('MapOfRooms')
 
-    def _setGeneralDefaultsInSession( self ):
+    def _setGeneralDefaultsInSession(self):
         now = datetime.now()
 
         # if it's saturday or sunday, postpone for monday as a default
         if now.weekday() in [5,6]:
-            now = now + timedelta( 7 - now.weekday() )
+            now = now + timedelta(7 - now.weekday())
 
         session["rbDefaultStartDT"] = datetime(now.year, now.month, now.day, 0, 0)
         session["rbDefaultEndDT"] = datetime(now.year, now.month, now.day, 0, 0)
 
-    def _checkParams(self, params):
+    def _checkParams(self):
         self._setGeneralDefaultsInSession()
-        RHRoomBookingBase._checkParams(self, params)
-        self._roomID = params.get('roomID')
+        super(RHRoomBookingMapOfRoomsWidget, self)._checkParams(request.args)
+        self._roomID = request.args.get('roomID')
 
     def _businessLogic(self):
-        # get all rooms
         defaultLocation = Location.getDefaultLocation()
-        rooms = RoomBase.getRooms(location=defaultLocation.friendlyName)
-        aspects = [aspect.toDictionary() for aspect in defaultLocation.getAspects()]
+        self._defaultLocation = defaultLocation.name
+        self._aspects = defaultLocation.getAllAspectsAsDict()
+        self._buildings = defaultLocation.getAllBuildings()
 
         # specialization for a video conference, CERN-specific
-        possibleEquipment = defaultLocation.factory.getEquipmentManager().getPossibleEquipment()
-        possibleVideoConference = 'Video conference' in possibleEquipment
-        self._forVideoConference = possibleVideoConference and self._getRequestParams().get("avc") == 'y'
-
-        # break-down the rooms by buildings
-        buildings = {}
-        for room in rooms:
-            if room.building:
-
-                # if it's the first room in that building, initialize the building
-                building = buildings.get(room.building, None)
-                if building is None:
-                    title = _("Building") + " %s" % room.building
-                    building = {'has_coordinates':False, 'number':room.building, 'title':title, 'rooms':[]}
-                    buildings[room.building] = building
-
-                # if the room has coordinates, set the building coordinates
-                if room.latitude and room.longitude:
-                    building['has_coordinates'] = True
-                    building['latitude'] = room.latitude
-                    building['longitude'] = room.longitude
-
-                # add the room to its building
-                if not self._forVideoConference or room.needsAVCSetup:
-                    building['rooms'].append(room.fossilize())
-
-        # filter the buildings with rooms and coordinates and return them
-        buildings_with_coords = [b for b in buildings.values() if b['rooms'] and b['has_coordinates']]
-        self._defaultLocation = defaultLocation.friendlyName
-        self._aspects = aspects
-        self._buildings = buildings_with_coords
+        possibleEquipments = LocationAttributeKey.getAllAttributeKeys()
+        # possibleEquipments = defaultLocation.factory.getEquipmentManager().getPossibleEquipment()
+        self._forVideoConference = ('Video conference' in possibleEquipments) and (request.args.get('avc') == 'y')
 
     def _process(self):
-        params = dict(self._getRequestParams())
-        params["lang"] = session.lang
-        params["user"] = self._aw.getSession().getUser().getId()
+        params = request.args
+        params['lang'] = session.lang
+        params['user'] = self._aw.getSession().getUser().getId()
         key = str(sorted(params.iteritems()))
         html = self._cache.get(key)
         if not html:
             self._businessLogic()
-            page = roomBooking_wp.WPRoomBookingMapOfRoomsWidget(self, self._aspects, self._buildings, self._defaultLocation, self._forVideoConference, self._roomID)
+            page = room_views.WPRoomBookingMapOfRoomsWidget(self,
+                                                            self._aspects,
+                                                            self._buildings,
+                                                            self._defaultLocation,
+                                                            self._forVideoConference,
+                                                            self._roomID)
             html = page.display()
             self._cache.set(key, html, 300)
         return html
 
 
-class RHRoomBookingRoomList( RHRoomBookingBase ):
+# TODO
+class RHRoomBookingRoomList(AttributeSetterMixin, RHRoomBookingBase):
 
-    def _checkParams( self, params ):
+    def _checkParams(self):
 
-        self._roomLocation = None
-        if params.get("roomLocation") and len( params["roomLocation"].strip() ) > 0:
-            self._roomLocation = params["roomLocation"].strip()
+        params = request.args if request.method == 'GET' else request.form  # else is POST
 
-        self._freeSearch = None
-        if params.get("freeSearch") and len( params["freeSearch"].strip() ) > 0:
-            s = params["freeSearch"].strip()
-            # Remove commas
-            self._freeSearch = ""
-            for c in s:
-                if c != ',': self._freeSearch += c
-
-        self._capacity = None
-        if params.get("capacity") and len( params["capacity"].strip() ) > 0:
-            self._capacity = int( params["capacity"].strip() )
-
-        self._availability = "Don't care"
-        if params.get("availability") and len( params["availability"].strip() ) > 0:
-            self._availability = params["availability"].strip()
+        self.setParam('_roomLocation', params, paramName='roomLocation')
+        self.setParam('_freeSearch', params, paramName='freeSearch', callback=lambda e: e.replace(',', ''))
+        self.setParam('_capacity', params, paramName='capacity', callback=int)
+        self.setParam('_availability', params, paramName='availability', default="Don't care")
 
         if self._availability != "Don't care":
-            self._checkParamsRepeatingPeriod( params )
+            self._checkParamsRepeatingPeriod(params)
 
-        self._includePrebookings = False
-        if params.get( 'includePrebookings' ) == "on": self._includePrebookings = True
-
-        self._includePendingBlockings = False
-        if params.get( 'includePendingBlockings' ) == "on": self._includePendingBlockings = True
+        self._includePrebookings = params.get('includePrebookings') == 'on'
+        self._includePendingBlockings = params.get('includePendingBlockings') == 'on'
 
         # The end of "avail/don't care"
 
@@ -149,104 +121,104 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
         self._equipment = []
         for k, v in params.iteritems():
             if k[0:4] == "equ_" and v == "on":
-                self._equipment.append( k[4:100] )
+                self._equipment.append(k[4:100])
 
         # Special
         self._isReservable = self._ownedBy = self._isAutoConfirmed = None
-        self._isActive = True
-
-        if params.get( 'isReservable' ) == "on": self._isReservable = True
-        if params.get( 'isAutoConfirmed' ) == "on": self._isAutoConfirmed = True
+        if params.get('isReservable') == 'on': self._isReservable = True
+        if params.get('isAutoConfirmed') == 'on': self._isAutoConfirmed = True
 
         # only admins can choose to consult non-active rooms
-        if self._getUser() and self._getUser().isRBAdmin() and params.get( 'isActive', None ) != "on":
+        self._isActive = True
+        if self._getUser() and self._getUser().isRBAdmin() and params.get('isActive', default=None) != 'on':
             self._isActive = None
 
-        self._onlyMy = params.get( 'onlyMy' ) == "on"
+        self._onlyMy = params.get('onlyMy') == 'on'
 
-    def _businessLogic( self ):
+    def _businessLogic(self):
         if self._onlyMy: # Can't be done in checkParams since it must be after checkProtection
             self._title = "My rooms"
             self._ownedBy = self._getUser()
 
-        r = RoomBase()
-        r.capacity = self._capacity
-        r.isActive = self._isActive
-        #r.responsibleId = self._responsibleId
-        if self._isAutoConfirmed:
-            r.resvsNeedConfirmation = False
-        for eq in self._equipment:
-            r.insertEquipment( eq )
+        # r = RoomBase()
+        # r.capacity = self._capacity
+        # r.isActive = self._isActive
+        # # r.responsibleId = self._responsibleId
+        # if self._isAutoConfirmed:
+        #     r.resvsNeedConfirmation = False
+        # for eq in self._equipment:
+        #     r.insertEquipment( eq )
 
         if self._onlyMy:
             rooms = self._ownedBy.getRooms()
         elif self._availability == "Don't care":
-            rooms = CrossLocationQueries.getRooms(location=self._roomLocation,
-                                                  freeText=self._freeSearch,
-                                                  ownedBy=self._ownedBy,
-                                                  roomExample=r,
-                                                  pendingBlockings=self._includePendingBlockings,
-                                                  onlyPublic=self._isReservable)
+            pass
+            # TODO
+            # rooms = CrossLocationQueries.getRooms(location=self._roomLocation,
+            #                                       freeText=self._freeSearch,
+            #                                       ownedBy=self._ownedBy,
+            #                                       roomExample=r,
+            #                                       pendingBlockings=self._includePendingBlockings,
+            #                                       onlyPublic=self._isReservable)
             # Special care for capacity (20% => greater than)
-            if len (rooms) == 0:
-                rooms = CrossLocationQueries.getRooms(location=self._roomLocation,
-                                                      freeText=self._freeSearch,
-                                                      ownedBy=self._ownedBy,
-                                                      roomExample=r,
-                                                      minCapacity=True,
-                                                      pendingBlockings=self._includePendingBlockings,
-                                                      onlyPublic=self._isReservable)
+            if not rooms:
+                pass
+                # rooms = CrossLocationQueries.getRooms(location=self._roomLocation,
+                #                                       freeText=self._freeSearch,
+                #                                       ownedBy=self._ownedBy,
+                #                                       roomExample=r,
+                #                                       minCapacity=True,
+                #                                       pendingBlockings=self._includePendingBlockings,
+                #                                       onlyPublic=self._isReservable)
         else:
             # Period specification
-            p = ReservationBase()
-            p.startDT = self._startDT
-            p.endDT = self._endDT
-            p.repeatability = self._repeatability
-            if self._includePrebookings:
-                p.isConfirmed = None   # because it defaults to True
+            # p = ReservationBase()
+            # p.startDT = self._startDT
+            # p.endDT = self._endDT
+            # p.repeatability = self._repeatability
+            # if self._includePrebookings:
+            #     p.isConfirmed = None   # because it defaults to True
 
-            # Set default values for later booking form
-            session["rbDefaultStartDT"] = p.startDT
-            session["rbDefaultEndDT"] = p.endDT
-            session["rbDefaultRepeatability"] = p.repeatability
+            # # Set default values for later booking form
+            # session["rbDefaultStartDT"] = p.startDT
+            # session["rbDefaultEndDT"] = p.endDT
+            # session["rbDefaultRepeatability"] = p.repeatability
 
-            available = ( self._availability == "Available" )
+            available = (self._availability == "Available")
 
-            rooms = CrossLocationQueries.getRooms( \
-                location = self._roomLocation,
-                freeText = self._freeSearch,
-                ownedBy = self._ownedBy,
-                roomExample = r,
-                resvExample = p,
-                available = available,
-                pendingBlockings = self._includePendingBlockings )
+            # rooms = CrossLocationQueries.getRooms(location=self._roomLocation,
+            #                                       freeText=self._freeSearch,
+            #                                       ownedBy=self._ownedBy,
+            #                                       roomExample=r,
+            #                                       resvExample=p,
+            #                                       available=available,
+            #                                       pendingBlockings=self._includePendingBlockings)
             # Special care for capacity (20% => greater than)
-            if len ( rooms ) == 0:
-                rooms = CrossLocationQueries.getRooms( \
-                    location = self._roomLocation,
-                    freeText = self._freeSearch,
-                    ownedBy = self._ownedBy,
-                    roomExample = r,
-                    resvExample = p,
-                    available = available,
-                    minCapacity = True,
-                    pendingBlockings = self._includePendingBlockings )
+            if not rooms:
+                pass
+                # rooms = CrossLocationQueries.getRooms(location=self._roomLocation,
+                #                                       freeText=self._freeSearch,
+                #                                       ownedBy=self._ownedBy,
+                #                                       roomExample=r,
+                #                                       resvExample=p,
+                #                                       available=available,
+                #                                       minCapacity=True,
+                #                                       pendingBlockings=self._includePendingBlockings)
 
+        # TODO: model should return sorted
         rooms.sort()
-
         self._rooms = rooms
-
         self._mapAvailable = Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable()
 
-    def _process( self ):
+    def _process(self):
         self._businessLogic()
-        p = roomBooking_wp.WPRoomBookingRoomList( self, self._onlyMy )
-        return p.display()
+        return room_views.WPRoomBookingRoomList(self, self._onlyMy).display()
 
 
-class RHRoomBookingSearch4Rooms( RHRoomBookingBase ):
+# TODO
+class RHRoomBookingSearch4Rooms(RHRoomBookingBase):
 
-    def _cleanDefaultsFromSession( self ):
+    def _cleanDefaultsFromSession(self):
         session.pop("rbDefaultStartDT", None)
         session.pop("rbDefaultEndDT", None)
         session.pop("rbDefaultRepeatability", None)
@@ -256,7 +228,7 @@ class RHRoomBookingSearch4Rooms( RHRoomBookingBase ):
         session.pop("rbAssign2Session", None)
         session.pop("rbAssign2Contribution", None)
 
-    def _setGeneralDefaultsInSession( self ):
+    def _setGeneralDefaultsInSession(self):
         now = datetime.now()
 
         # if it's saturday or sunday, postpone for monday as a default
@@ -266,28 +238,29 @@ class RHRoomBookingSearch4Rooms( RHRoomBookingBase ):
         session["rbDefaultStartDT"] = datetime(now.year, now.month, now.day, 8, 30)
         session["rbDefaultEndDT"] = datetime(now.year, now.month, now.day, 17, 30)
 
-    def _checkParams( self, params ):
+    def _checkParams(self):
+        params = request.args if request.method == 'GET' else request.form
         self._cleanDefaultsFromSession()
         self._setGeneralDefaultsInSession()
-        self._forNewBooking = False
         self._eventRoomName = None
-        if params.get( 'forNewBooking' ):
-            self._forNewBooking = params.get( 'forNewBooking' ) == 'True'
+        self._forNewBooking = params.get('forNewBooking', type=bool)  # == True
 
-    def _businessLogic( self ):
-        self._rooms = CrossLocationQueries.getRooms(allFast = True)
-        self._rooms.sort()
-        self._equipment = CrossLocationQueries.getPossibleEquipment()
+    def _businessLogic(self):
+        self._rooms = Room.getAllRooms()
+        # self._rooms = CrossLocationQueries.getRooms(allFast=True)
+        # self._rooms.sort()
+        self._equipment = RoomAttributeKey.getAllAttributeKeys()
+        # self._equipment = CrossLocationQueries.getPossibleEquipment()
 
-    def _process( self ):
+    def _process(self):
         self._businessLogic()
-        p = roomBooking_wp.WPRoomBookingSearch4Rooms( self, self._forNewBooking )
-        return p.display()
+        return room_views.WPRoomBookingSearch4Rooms(self, self._forNewBooking).display()
 
 
-class RHRoomBookingRoomDetails( RHRoomBookingBase ):
+# TODO
+class RHRoomBookingRoomDetails(RHRoomBookingBase):
 
-    def _setGeneralDefaultsInSession( self ):
+    def _setGeneralDefaultsInSession(self):
         now = datetime.now()
 
         # if it's saturday or sunday, postpone for monday as a default
@@ -297,9 +270,9 @@ class RHRoomBookingRoomDetails( RHRoomBookingBase ):
         session["rbDefaultStartDT"] = datetime(now.year, now.month, now.day, 0, 0)
         session["rbDefaultEndDT"] = datetime(now.year, now.month, now.day, 0, 0)
 
-    def _checkParams( self, params ):
-        locator = locators.WebLocator()
-        locator.setRoom( params )
+    def _checkParams(self):
+        locator = WebLocator()
+        locator.setRoom(request.args)
         self._setGeneralDefaultsInSession()
         self._room = self._target = locator.getObject()
 
@@ -308,40 +281,37 @@ class RHRoomBookingRoomDetails( RHRoomBookingBase ):
         self._formMode = session.get('rbFormMode')
 
         self._searchingStartDT = self._searchingEndDT = None
-        if not params.get('calendarMonths'):
+        if not request.args.get('calendarMonths'):
             self._searchingStartDT = session.get("rbDefaultStartDT")
             self._searchingEndDT = session.get("rbDefaultEndDT")
 
         self._clearSessionState()
 
-    def _businessLogic( self ):
-        pass
-
-    def _process( self ):
-        self._businessLogic()
-        p = roomBooking_wp.WPRoomBookingRoomDetails( self )
-        return p.display()
+    def _process(self):
+        return room_views.WPRoomBookingRoomDetails(self).display()
 
 
-class RHRoomBookingRoomStats( RHRoomBookingBase ):
+# TODO
+class RHRoomBookingRoomStats(RHRoomBookingBase):
 
-    def _checkParams( self, params ):
-        locator = locators.WebLocator()
-        locator.setRoom( params )
-        self._period = params.get("period","pastmonth")
+    def _checkParams(self):
+        params = request.args if request.method == 'GET' else request.form
+        locator = WebLocator()
+        locator.setRoom(params)
+        self._period = params.get('period', default='pastmonth')
         self._room = self._target = locator.getObject()
 
-    def _businessLogic( self ):
-        self._kpiAverageOccupation = self._room.getMyAverageOccupation(self._period)
-        self._kpiActiveRooms = RoomBase.getNumberOfActiveRooms()
-        self._kpiReservableRooms = RoomBase.getNumberOfReservableRooms()
-        self._kpiReservableCapacity, self._kpiReservableSurface = RoomBase.getTotalSurfaceAndCapacity()
-        # Bookings
-        st = ReservationBase.getRoomReservationStats(self._room)
-        self._booking_stats = st
-        self._totalBookings = st['liveValid'] + st['liveCancelled'] + st['liveRejected'] + st['archivalValid'] + st['archivalCancelled'] + st['archivalRejected']
+    def _businessLogic(self):
+        pass
+        # self._kpiAverageOccupation = self._room.getMyAverageOccupation(self._period)
+        # self._kpiActiveRooms = RoomBase.getNumberOfActiveRooms()
+        # self._kpiReservableRooms = RoomBase.getNumberOfReservableRooms()
+        # self._kpiReservableCapacity, self._kpiReservableSurface = RoomBase.getTotalSurfaceAndCapacity()
+        # # Bookings
+        # st = ReservationBase.getRoomReservationStats(self._room)
+        # self._booking_stats = st
+        # self._totalBookings = st['liveValid'] + st['liveCancelled'] + st['liveRejected'] + st['archivalValid'] + st['archivalCancelled'] + st['archivalRejected']
 
-    def _process( self ):
+    def _process(self):
         self._businessLogic()
-        p = roomBooking_wp.WPRoomBookingRoomStats( self )
-        return p.display()
+        return room_views.WPRoomBookingRoomStats(self).display()

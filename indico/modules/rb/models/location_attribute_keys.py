@@ -42,3 +42,7 @@ class LocationAttributeKey(db.Model):
 
     def __repr__(self):
         return '<LocationAttributeKey({0}, {1})>'.format(self.id, self.name)
+
+    @staticmethod
+    def getAllAttributeKeys():
+        pass

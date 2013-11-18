@@ -152,3 +152,9 @@ class Room(db.Model):
     @staticmethod
     def isAvatarResponsibleForRooms(self, avatar):
         pass
+
+    def getAverageOccupation(self, period=None):
+        pass
+
+    def getReservationStats(self):
+        pass
