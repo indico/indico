@@ -21,7 +21,12 @@
 Schema of a room
 """
 
+from datetime import datetime
+
+from MaKaC.common.Locators import Locator
+
 from indico.core.db import db
+from indico.modules.rb.models.reservations import Reservation
 
 
 class Room(db.Model):
@@ -93,5 +98,57 @@ class Room(db.Model):
                                     backref='room',
                                     cascade='all, delete-orphan')
 
+    def __init__(self, name):
+        self.name = name
+
     def __repr__(self):
         return '<Room({0}, {1}, {2})>'.format(self.id, self.location_id, self.name)
+
+    def getLocator(self):
+        loc = Locator()
+        loc["roomLocation"] = self.location.name
+        loc["roomID"] = self.id
+        return loc
+
+    @staticmethod
+    def getRoomById(rid):
+        return Room.query.get(rid)
+
+    def doesHaveLiveReservations(self):
+        return self.reservations.query.filter(not Reservation.is_cancelled,
+                                              not Reservation.is_rejected,
+                                              Reservation.end_date >= datetime.utcnow()).count() > 0
+
+    def getAllReservations(self):
+        return self.reservations
+
+    def getReservations(self, **filter_arguments):
+        q = self.reservations.query
+        for filter_column, value in filter_arguments.iteritems():
+            q = q.filter(getattr(Reservation, filter_column) == value)
+        return q.all()
+
+    def getTotalBookedTime(self, start_date, end_date):
+        reservations = self.reservations.query.filter(Reservation.start_date >= start_date,
+                                                      Reservation.start_date <= end_date,
+                                                      not Reservation.is_rejected,
+                                                      not Reservation.is_rejected).all()
+
+        for r in reservations:
+            pass
+
+
+
+    def getTotalBookableTime(self, start_date, end_date):
+        pass
+
+    def removeReservations(self):
+        for r in self.reservations:
+            db.session.delete(r)
+
+    def notifyAboutResponsibility(self):
+        pass
+
+    @staticmethod
+    def isAvatarResponsibleForRooms(self, avatar):
+        pass

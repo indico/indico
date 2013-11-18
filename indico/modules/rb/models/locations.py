@@ -21,10 +21,15 @@
 Holder of rooms in a place and its map view related data
 """
 
+from datetime import datetime, timedelta
+
+import pytz
+
 from MaKaC.common.Locators import Locator
 
 from indico.core.db import db
 from indico.modules.rb.models.aspects import Aspect
+from indico.modules.rb.models.rooms import Room
 
 
 class Location(db.Model):
@@ -34,6 +39,7 @@ class Location(db.Model):
 
     name = db.Column(db.String, nullable=False, unique=True)
     support_emails = db.Column(db.String)
+    is_default = db.Column(db.String, nullable=False)
 
     aspects = db.relationship('Aspect',
                               backref='location',
@@ -52,8 +58,14 @@ class Location(db.Model):
                             backref='location',
                             cascade='all, delete-orphan')
 
-    def __init__(self, name, support_emails=None):
+    attributes = db.relationship('LocationAttribute',
+                                 backref='location',
+                                 cascade='all, delete-orphan')
+
+
+    def __init__(self, name, is_default=False, support_emails=None):
         self.name = name
+        self.is_default = is_default
         self.support_emails = support_emails
 
     def __str__(self):
@@ -88,21 +100,79 @@ class Location(db.Model):
         self.rooms.remove(room)
 
     @staticmethod
+    def getDefaultLocation(self, name):
+        return Location.query.filter(Location.is_default).one()
+
+    @staticmethod
+    def setDefaultLocation(self, name):
+        default_location = Location.getDefaultLocation()
+        if default_location:
+            default_location.is_default = False
+            db.session.add(default_location)
+        new_default_location = Location.getLocationsByName()
+        new_default_location.is_default = True
+        db.session.add(new_default_location)
+
+    @staticmethod
     def getLocationById(lid):
         return Location.query.get(lid)
 
     @staticmethod
-    def getLocationsByName(name):
-        return Location.query.filter(Location.name == name)
+    def getLocationByName(name):
+        return Location.query.filter(Location.name == name).one()
 
     @staticmethod
     def getAllLocations():
         return Location.query.all()
 
     @staticmethod
-    def getDefaultLocation():
-        return Location.query.first()
-
-    @staticmethod
     def removeLocationByName(name):
         db.session.delete(Location.query.first(Location.name == name))
+
+    def getAverageOccupation(self):
+        rooms = self.rooms.query.filter(Room.is_active and
+                                        Room.is_reservable).all()
+
+        now = datetime.utcnow()
+        end_date = datetime(now.year, now.month, now.day, 17, 30, tzinfo=pytz.utc)
+        start_date = end_date - timedelta(30, 9*3600)  # 30 days + 9 hours
+
+        booked_time = sum(map(lambda room: room.getTotalBookedTime(start_date, end_date), rooms))
+        bookable_time = sum(map(lambda room: room.getTotalBookableTime(start_date, end_date), rooms))
+
+        if bookable_time:
+            return float(booked_time.seconds) / bookable_time.seconds
+        return 0
+
+    def getNumberOfRooms(self):
+        return self.rooms.query.count()
+
+    def getNumberOfActiveRooms(self):
+        return self.rooms.query.filter(Room.is_active).count()
+
+    def getNumberOfReservableRooms(self):
+        return self.rooms.query.filter(Room.is_reservable).count()
+
+    def getAllReservableRooms(self):
+        return self.rooms.query.filter(Room.is_reservable).all()
+
+    def getTotalReservableSurface(self):
+        return sum(map(lambda r: r.surface if r.surface else 0,
+                       self.getAllReservableRooms()))
+
+    def getTotalReservableCapacity(self):
+        return sum(map(lambda r: r.capacity,
+                       self.getAllReservableRooms()))
+
+    def getReservationStats(self):
+        return {
+            'liveValid': 0,
+            'liveCancelled': 0,
+            'liveRejected': 0,
+            'archivalValid': 0,
+            'archivalValid': 0,
+            'archivalValid': 0
+        }
+
+    def isMapAvailable(self):
+        pass

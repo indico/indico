@@ -19,11 +19,11 @@
 
 from flask import request
 
-import MaKaC.webinterface.pages.admins as adminPages
-import MaKaC.webinterface.rh.admins as admins
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.base import PluginsHolder
-import MaKaC.webinterface.urlHandlers as urlHandlers
+from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.pages import admins as adminPages
+from MaKaC.webinterface.rh import admins
 
 
 class RHRoomBookingPluginAdminBase(admins.RHAdminBase):

@@ -21,9 +21,15 @@
 Schema of a reservation
 """
 
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from datetime import datetime
 
 from indico.core.db import db
+
+
+class RepeatUnit(object):
+    HOUR, DAY, WEEK, MONTH, YEAR = xrange(5)
 
 
 class Reservation(db.Model):
@@ -86,6 +92,9 @@ class Reservation(db.Model):
                                                                self.booked_for_name,
                                                                self.start_date,
                                                                self.end_date)
+    @hybrid_property
+    def is_live(self):
+        return self.end_date >= datetime.utcnow()
 
     def addEditLog(self, edit_log):
         self.edit_logs.append(edit_log)

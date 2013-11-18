@@ -17,12 +17,17 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.webinterface import urlHandlers
 
-class RHRoomBookingWelcome( RHRoomBookingBase ):
-    _uh = urlHandlers.UHRoomBookingWelcome
+from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.models.locations import Location
 
-    def _process( self ):
-        if Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable():
-            self._redirect( urlHandlers.UHRoomBookingMapOfRooms.getURL())
+
+class RHRoomBookingWelcome(RHRoomBookingBase):
+
+    def _process(self):
+        default_location = Location.getDefaultLocation()
+        if default_location and default_location.isMapAvailable():
+            self._redirect(urlHandlers.UHRoomBookingMapOfRooms.getURL())
         else:
-            self._redirect( urlHandlers.UHRoomBookingBookRoom.getURL())
+            self._redirect(urlHandlers.UHRoomBookingBookRoom.getURL())

@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime, timedelta
+
 from flask.ext.testing import TestCase
 
 from indico.core.db import db

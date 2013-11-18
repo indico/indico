@@ -18,20 +18,21 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import MaKaC.webinterface.pages.admins as adminPages
-import MaKaC.roomMapping as roomMapping
-import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.rh.admins as admins
-from MaKaC.webinterface import locators
+# TODO: completely
+
+from MaKaC import roomMapping
 from MaKaC.errors import AccessError
+from MaKaC.webinterface import locators, urlHandlers
+from MaKaC.webinterface.pages import admins as adminPages
+from MaKaC.webinterface.rh import admins
 
 
-class RHRoomMapperProtected( admins.RHAdminBase ):
-    def _checkProtection( self ):
+class RHRoomMapperProtected(admins.RHAdminBase):
+    def _checkProtection(self):
         if self._getUser() is None:
             self._checkSessionUser()
         elif not self._getUser().isRBAdmin():
-            raise AccessError( "You are not authorized to take this action." )
+            raise AccessError('You are not authorized to take this action.')
 
 
 class RHRoomMapperBase( RHRoomMapperProtected ):

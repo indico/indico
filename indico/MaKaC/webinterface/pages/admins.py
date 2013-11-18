@@ -17,51 +17,70 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import datetime
+import os
+import re
+from cgi import escape
 from collections import OrderedDict
 
-import datetime
+from flask import current_app
 from pytz import timezone
-from MaKaC.fossils.user import IAvatarFossil
 
-import os
-import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.wcomponents as wcomponents
-import MaKaC.webinterface.pages.conferences as conferences
-from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
+# MaKaC
+import MaKaC.common.indexes as indexes
 import MaKaC.common.info as info
 import MaKaC.webcast as webcast
 from indico.core.config import Config
 import MaKaC.conference as conference
 import MaKaC.user as user
-from MaKaC.common import utils, timezoneUtils
-from MaKaC.webinterface.common.person_titles import TitlesRegistry
-from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry
-from MaKaC.common.Announcement import getAnnoucementMgrInstance
-from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.pages.base import WPDecorated
-from MaKaC.common.pendingQueues import PendingSubmitterReminder, PendingManagerReminder, PendingCoordinatorReminder
-from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.authentication.LDAPAuthentication import LDAPGroup
-from MaKaC import roomMapping
-from MaKaC import domain
-import MaKaC.common.indexes as indexes
+import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.personalization as personalization
-from cgi import escape
-import re
-from MaKaC.i18n import _
-from MaKaC.plugins import PluginLoader, PluginsHolder
-
+import MaKaC.webinterface.urlHandlers as urlHandlers
+import MaKaC.webinterface.wcomponents as wcomponents
+from MaKaC import (
+    domain,
+    roomMapping,
+)
+from MaKaC.authentication import AuthenticatorMgr
+from MaKaC.common import (
+    timezoneUtils,
+    utils,
+)
+from MaKaC.common.Announcement import getAnnoucementMgrInstance
+from MaKaC.common.Configuration import Config
 from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.modules import INewsItemFossil
-from indico.modules import ModuleHolder
-from MaKaC.errors import MaKaCError, NotFoundError
+from MaKaC.common.pendingQueues import (
+    PendingCoordinatorReminder,
+    PendingManagerReminder,
+    PendingSubmitterReminder,
+)
 from MaKaC.conference import ConferenceHolder
-from MaKaC.webinterface.locators import CategoryWebLocator
+from MaKaC.errors import MaKaCError
+from MaKaC.fossils.modules import INewsItemFossil
+from MaKaC.fossils.user import IAvatarFossil
+from MaKaC.i18n import _
+from MaKaC.plugins import (
+    PluginLoader,
+    PluginsHolder,
+)
 from MaKaC.services.implementation.user import UserComparator
+from MaKaC.webinterface.common.person_titles import TitlesRegistry
+from MaKaC.webinterface.common.timezones import (
+    DisplayTimezoneRegistry,
+    TimezoneRegistry,
+)
+from MaKaC.webinterface.locators import CategoryWebLocator
+from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
+from MaKaC.webinterface.pages.main import WPMainBase
 
+# indico
+from indico.modules import ModuleHolder
+from indico.util.date_time import timedelta_split
 from indico.util.i18n import i18nformat
 from indico.util.redis import client as redis_client
-from indico.util.date_time import timedelta_split
+from indico.web.flask.util import isRoomBookingActive
 
 
 class WPAdminsBase( WPMainBase ):
@@ -1893,172 +1912,6 @@ class WUserMerge(wcomponents.WTemplated):
         return vars
 
 
-class WPRoomsBase( WPAdminsBase ):
-    def _setActiveSideMenuItem(self):
-        self._roomsMenuItem.setActive()
-
-    def _createTabCtrl( self ):
-        self._tabCtrl = wcomponents.TabControl()
-
-        if self._rh._getUser().isAdmin():
-            self._subTabRoomBooking = self._tabCtrl.newTab( "booking", _("Room Booking"), \
-                    urlHandlers.UHRoomBookingPluginAdmin.getURL() )
-            self._subTabMain = self._subTabRoomBooking.newSubTab( "main", _("Main"), \
-                    urlHandlers.UHRoomBookingPluginAdmin.getURL() )
-        else:
-            self._subTabRoomBooking = self._tabCtrl.newTab( "booking", _("Room Booking"), \
-                    urlHandlers.UHRoomBookingAdmin.getURL() )
-        self._subTabConfig = self._subTabRoomBooking.newSubTab( "configuration", _("Configuration"), \
-                urlHandlers.UHRoomBookingAdmin.getURL() )
-        self._subTabRoomMappers = self._tabCtrl.newTab( "mappers", _("Room Mappers"), \
-                urlHandlers.UHRoomMappers.getURL() )
-
-    def _getNavigationDrawer(self):
-        if self._rh._getUser().isAdmin():
-            return wcomponents.WSimpleNavigationDrawer(_("Room Booking Admin"), urlHandlers.UHRoomBookingPluginAdmin.getURL, bgColor="white")
-        return wcomponents.WSimpleNavigationDrawer(_("Room Booking Admin"), urlHandlers.UHRoomBookingAdmin.getURL, bgColor="white")
-
-    def _getPageContent(self, params):
-        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-
-class WPRoomMapperBase( WPRoomsBase ):
-
-    def __init__( self, rh ):
-        WPRoomsBase.__init__( self, rh )
-
-    def _setActiveTab( self ):
-        self._subTabRoomMappers.setActive()
-
-class WRoomMapperList(wcomponents.WTemplated):
-
-    def __init__( self, criteria ):
-        self._criteria = criteria
-
-    def _performSearch( self, criteria ):
-        rmh = roomMapping.RoomMapperHolder()
-        res = rmh.match(criteria)
-        return res
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["createRoomMapperURL"] = urlHandlers.UHNewRoomMapper.getURL()
-        vars["searchRoomMappersURL"] = urlHandlers.UHRoomMappers.getURL()
-        vars["roomMappers"] = ""
-        if self._criteria:
-            vars["roomMappers"] = """<tr>
-                              <td>
-                    <br>
-                <table width="100%%" align="left" style="border-top: 1px solid #777777; padding-top:10px">"""
-            roomMapperList = self._performSearch(self._criteria)
-            ul = []
-            color="white"
-            ul = []
-            for rm in roomMapperList:
-                if color=="white":
-                    color="#F6F6F6"
-                else:
-                    color="white"
-                url = vars["roomMapperDetailsURLGen"]( rm )
-                ul.append("""<tr>
-                                <td bgcolor="%s"><a href="%s">%s</a></td>
-                            </tr>"""%(color, url, rm.getName() ) )
-            if ul:
-                vars["roomMappers"] += "".join( ul )
-            else:
-                vars["roomMappers"] += i18nformat("""<tr>
-                            <td><br><span class="blacktext">&nbsp;&nbsp;&nbsp; _("No room mappers for this search")</span></td></tr>""")
-            vars["roomMappers"] += """    </table>
-                      </td>
-                </tr>"""
-        return vars
-
-
-class WPRoomMapperList( WPRoomMapperBase ):
-
-    def __init__( self, rh, params ):
-        WPRoomMapperBase.__init__( self, rh )
-        self._params = params
-
-    def _getTabContent( self, params ):
-        criteria = {}
-        if filter(lambda x: self._params[x], self._params):
-            criteria["name"] = self._params.get("sName","")
-        comp = WRoomMapperList(criteria)
-        pars = {"roomMapperDetailsURLGen": urlHandlers.UHRoomMapperDetails.getURL }
-        return comp.getHTML(pars)
-
-
-class WRoomMapperDetails(wcomponents.WTemplated):
-
-    def __init__( self, rm):
-        self._roomMapper = rm
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["name"] = self._roomMapper.getName()
-        vars["description"] = self._roomMapper.getDescription()
-        vars["url"] = self._roomMapper.getBaseMapURL()
-        vars["placeName"] = self._roomMapper.getPlaceName()
-        vars["regexps"] = self._roomMapper.getRegularExpressions()
-        return vars
-
-
-class WPRoomMapperDetails( WPRoomMapperBase ):
-
-    def __init__(self, rh, roomMapper):
-        WPRoomMapperBase.__init__(self, rh)
-        self._roomMapper = roomMapper
-
-    def _getTabContent( self, params ):
-        comp = WRoomMapperDetails( self._roomMapper )
-        pars = {"modifyURL": urlHandlers.UHRoomMapperModification.getURL( self._roomMapper ) }
-        return comp.getHTML( pars )
-
-
-class WRoomMapperEdit(wcomponents.WTemplated):
-
-    def __init__( self, rm=None ):
-        self._roomMapper = rm
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["name"] = ""
-        vars["description"] = ""
-        vars["url"] = ""
-        vars["placeName"] = ""
-        vars["regexps"] = ""
-        vars["locator"] = ""
-        if self._roomMapper:
-            vars["name"] = self._roomMapper.getName()
-            vars["description"] = self._roomMapper.getDescription()
-            vars["url"] = self._roomMapper.getBaseMapURL()
-            vars["placeName"] = self._roomMapper.getPlaceName()
-            vars["regexps"] = "\r\n".join(self._roomMapper.getRegularExpressions())
-            vars["locator"] = self._roomMapper.getLocator().getWebForm()
-        return vars
-
-
-class WPRoomMapperModification( WPRoomMapperBase ):
-
-    def __init__(self, rh, domain):
-        WPRoomMapperBase.__init__(self, rh)
-        self._domain = domain
-
-    def _getTabContent( self, params ):
-        comp = WRoomMapperEdit( self._domain )
-        pars = {"postURL": urlHandlers.UHRoomMapperPerformModification.getURL(self._domain)}
-        return comp.getHTML( pars )
-
-
-class WPRoomMapperCreation( WPRoomMapperBase ):
-
-    def _getTabContent( self, params ):
-        comp = WRoomMapperEdit()
-        pars = {"postURL": urlHandlers.UHRoomMapperPerformCreation.getURL()}
-        return comp.getHTML( pars )
-
-
-
 class WPDomainBase( WPAdminsBase ):
 
     def __init__( self, rh ):
@@ -2234,115 +2087,6 @@ class WPDomainCreation( WPDomainBase ):
         comp = WDomainCreation()
         pars = {"postURL": urlHandlers.UHDomainPerformCreation.getURL()}
         return comp.getHTML( pars )
-
-
-
-# Room Booking Module ========================================
-
-
-class WPRoomBookingPluginAdminBase( WPRoomsBase ):
-
-    def __init__( self, rh ):
-        WPRoomsBase.__init__( self, rh )
-
-    def getJSFiles(self):
-        return WPRoomsBase.getJSFiles(self) + \
-               self._includeJSPackage('Management')
-
-    def _setActiveTab( self ):
-        self._subTabRoomBooking.setActive()
-
-    def _getSiteArea(self):
-        return 'Room Booking Administration'
-
-class WPRoomBookingPluginAdmin( WPRoomBookingPluginAdminBase ):
-
-    def __init__( self, rh, params ):
-        WPRoomBookingPluginAdminBase.__init__( self, rh )
-        self._params = params
-
-    def _setActiveTab( self ):
-        WPRoomBookingPluginAdminBase._setActiveTab( self )
-        self._subTabMain.setActive()
-
-    def _getTabContent( self, params ):
-        wc = WRoomBookingPluginAdmin( self._rh )
-        return wc.getHTML( params )
-
-class WRoomBookingPluginAdmin( wcomponents.WTemplated ):
-
-    def __init__( self, rh ):
-        self._rh = rh
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-
-        iconDisabled = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
-        iconEnabled = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
-        if minfo.getRoomBookingModuleActive():
-            vars["iconURL"] = iconEnabled
-            vars["activationText"] = _("Click to DEACTIVATE Room Booking Module")
-        else:
-            vars["iconURL"] = iconDisabled
-            vars["activationText"] = _("Click to ACTIVATE Room Booking Module")
-        rbPlugins = PluginLoader.getPluginsByType("RoomBooking")
-        vars["plugins"] = rbPlugins
-        vars["zodbHost"] = self._rh._host
-        vars["zodbPort"] = self._rh._port
-        vars["zodbRealm"] = self._rh._realm
-        vars["zodbUser"] = self._rh._user
-        vars["zodbPassword"] = self._rh._password
-
-        return vars
-
-
-class WPRoomBookingRoomForm( WPRoomBookingPluginAdminBase ):
-
-    _userData = ['favorite-user-list']
-
-    def __init__( self, rh ):
-        self._rh = rh
-        WPRoomBookingPluginAdminBase.__init__( self, rh )
-
-    def _setActiveTab( self ):
-        WPRoomBookingPluginAdminBase._setActiveTab( self )
-        self._subTabConfig.setActive()
-
-    def _getTabContent( self, params ):
-        wc = wcomponents.WRoomBookingRoomForm( self._rh )
-        return wc.getHTML( params )
-
-
-class WPRoomBookingAdmin(WPRoomBookingPluginAdminBase):
-
-    def __init__(self, rh):
-        self._rh = rh
-        WPRoomBookingPluginAdminBase.__init__(self, rh)
-
-    def _setActiveTab(self):
-        self._subTabConfig.setActive()
-
-    def _getTabContent(self, params):
-        wc = wcomponents.WRoomBookingAdmin(self._rh)
-        return wc.getHTML(params)
-
-
-class WPRoomBookingAdminLocation(WPRoomBookingPluginAdminBase):
-
-    def __init__(self, rh, location, actionSucceeded=False):
-        self._rh = rh
-        self._location = location
-        self._actionSucceeded = actionSucceeded
-        WPRoomBookingPluginAdminBase.__init__(self, rh)
-
-    def _setActiveTab(self):
-        self._subTabConfig.setActive()
-
-    def _getTabContent(self, params):
-        wc = wcomponents.WRoomBookingAdminLocation(self._rh, self._location)
-        params['actionSucceeded'] = self._actionSucceeded
-        return wc.getHTML(params)
 
 
 class WPAdminsSystemBase(WPAdminsBase):

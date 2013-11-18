@@ -17,12 +17,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from flask import request
+
+from indico.modules.rb.controllers import RHRoomBookingBase
+
 
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
 
-    def _checkParams(self, params):
-        RHRoomBookingBase._checkParams(self, params)
-        self._roomID = params.get('roomID')
+    def _checkParams(self):
+        super(RHRoomBookingMapOfRooms, self)._checkParams(self, request.args)
+        self._roomID = request.args.get('roomID')
 
     def _process(self):
         params = {}

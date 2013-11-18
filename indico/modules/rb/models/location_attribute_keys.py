@@ -17,24 +17,28 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-__all__ = [
-    'aspects',
-    'blocked_rooms',
-    'blocking_principals',
-    'blockings',
-    'location_attribute_keys',
-    'location_attributes',
-    'locations',
-    'photos',
-    'reservation_attribute_keys',
-    'reservation_attributes',
-    'reservation_edit_logs',
-    'reservation_excluded_days',
-    'reservation_notifications',
-    'reservations',
-    'room_attribute_keys',
-    'room_attributes',
-    'room_bookable_times',
-    'room_nonbookable_dates',
-    'rooms'
-]
+"""
+Custom attribute keys for locations
+"""
+
+from indico.core.db import db
+
+
+class LocationAttributeKey(db.Model):
+    __tablename__ = 'location_attribute_keys'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+
+    attributes = db.relationship('LocationAttribute',
+                                 backref='key',
+                                 cascade='all, delete-orphan')
+
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return '<LocationAttributeKey({0}, {1})>'.format(self.id, self.name)

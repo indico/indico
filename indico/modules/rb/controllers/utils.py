@@ -25,11 +25,12 @@ import time
 from datetime import datetime, timedelta
 
 
-class FormMode( object ):
+class FormMode(object):
     """
     Used to distinguish between insert and edit mode for the form.
     """
-    NEW, MODIF = xrange( 2 )
+    NEW, MODIF = xrange(2)
+
 
 class Period:
     """

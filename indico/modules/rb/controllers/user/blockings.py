@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from indico.modules.rb.controllers import RHRoomBookingBase
+
 
 class RHRoomBookingBlockingDetails(RHRoomBookingBase):
 
