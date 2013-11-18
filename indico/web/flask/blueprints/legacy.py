@@ -17,9 +17,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from indico.web.flask.wrappers import IndicoBlueprint
-
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
+
+from indico.modules.rb.controllers.xml import RHStatsRoomBooking
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
 legacy = IndicoBlueprint('legacy', __name__)
@@ -43,7 +44,7 @@ legacy.add_url_rule('/xmlGateway.py/getStatsIndico',
 
 legacy.add_url_rule('/xmlGateway.py/getStatsRoomBooking',
                     'xmlGateway-getStatsRoomBooking',
-                    mod_rh_xmlGateway.RHStatsRoomBooking,
+                    RHStatsRoomBooking,
                     methods=('GET', 'POST'))
 
 legacy.add_url_rule('/xmlGateway.py/loginStatus',
