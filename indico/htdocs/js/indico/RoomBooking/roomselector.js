@@ -84,6 +84,8 @@
             self.select = $("<select name='" + name + "' multiple='multiple'/>").appendTo(self.element);
 
             jQuery.map(rooms, function(room, i) {
+                var roomLoc = room.building + "-" + room.floor + "-" + room.roomNr;
+                var roomName = (roomLoc == room.name)? roomLoc : roomLoc + " - " + room.name;
                 option = $("<option/>")
                     .attr("label",
                         room.needsAVCSetup + ":" +
@@ -91,7 +93,7 @@
                         room.isPublic + ":" +
                         (room.capacity || Number(0)))
                     .attr("value", room.guid)
-                    .append($("<span/>").text(room.name))
+                    .append($("<span/>").text(roomName))
                     .append($("<span/>").text(" (" + room.locationName + ")"))
                     .appendTo(self.select);
             });
@@ -296,7 +298,7 @@
                         .attr("title", $T("Expand picture"))
                         .addClass("active");
                     pic.attr("href", rooms[index].tipPhotoURL);
-                    pic.attr("rel", "lightbox");
+                    pic.attr("nofollow", "lightbox");
                 }
 
                 var checkbox = $("<span class='checkbox'/>").prependTo(item);

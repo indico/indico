@@ -455,7 +455,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
         errors = []
         self._thereAreConflicts = False
         if not c.bookedForName and not c.bookedForUser:
-            errors.append(_("Booked for can not be blank")
+            errors.append(_("Booked for can not be blank"))
         if not c.reason:
             errors.append(_("Purpose can not be blank"))
         if not c.isRejected and not c.isCancelled:

@@ -34,7 +34,7 @@
             <tr>
                 <td class="subFieldWidth" align="right" valign="top"> ${ _("Interior")}&nbsp;&nbsp;</td>
                 <td align="left" class="thumbnail">
-                    <a href="${ room.getPhotoURL() }" rel="lightbox" title="${ room.photoId }">
+                    <a href="${ room.getPhotoURL() }" nofollow="lightbox" title="${ room.photoId }">
                         <img border="1px" src="${ room.getSmallPhotoURL() }" alt="${ str( room.photoId ) }"/>
                     </a>
                 </td>

@@ -23,7 +23,7 @@
     @include border-all();
     @include border-radius();
     @include single-box-shadow($hoff: 2px, $voff: 2px);
-    width: 900px;
+    width: 920px;
 
     .ui-multiselect-menu {
         top: 0 !important;
@@ -136,7 +136,7 @@
             }
 
             &.ui-state-selected .checkbox {
-                @include before-icon("\4d");
+                @include before-icon("\e372");
                 background: $blue;
                 color: white;
                 width: 35px;

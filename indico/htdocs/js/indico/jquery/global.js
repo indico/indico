@@ -67,10 +67,11 @@ $(document).ready(function() {
     });
 
     // Enable colorbox for links with rel="lightbox"
-    $('body').on('click', 'a[rel="lightbox"]', function() {
+    $('body').on('click', 'a[nofollow="lightbox"]', function() {
         $(this).colorbox({
             maxHeight: '90%',
             maxWidth: '90%',
+            loop: false,
             returnFocus: false
         });
     });

@@ -92,7 +92,7 @@ type ("RoomBookingRoom", [],
                         roomStartDate.setDate(roomStartDate.getDate() - repeatabilityDays);
                     roomStartDate.setDate(roomStartDate.getDate() + repeatabilityDays);
                     urlParams.year = roomStartDate.getFullYear();
-                    urlParams.month = roomStartDate.getFullYear();
+                    urlParams.month = roomStartDate.getMonth() + 1;
                     urlParams.day = roomStartDate.getDate();
                     urlParams.yearEnd = endD.substr(0, 4);
                     urlParams.monthEnd = endD.substr(5, 2);

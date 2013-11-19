@@ -186,6 +186,7 @@
 
             $("#sTime").val("8:30");
             $("#eTime").val("17:30");
+            updateTimeSlider();
         }
 
         function eventBindings() {
@@ -240,6 +241,7 @@
             if (rbUserData.sTime) {
                 $("#sTime").val(rbUserData.sTime);
                 $("#eTime").val(rbUserData.eTime);
+                updateTimeSlider();
             }
         }
 

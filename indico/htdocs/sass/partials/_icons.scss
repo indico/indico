@@ -171,9 +171,6 @@ you can use the generic selector below, but it's slower:
 .icon-grid:before {
     content: "\35";
 }
-.icon-list:before {
-    content: "\36";
-}
 .icon-trust:before {
     content: "\3d";
 }
@@ -222,9 +219,6 @@ you can use the generic selector below, but it's slower:
 .icon-next:before {
 	content: "\4c";
 }
-.icon-checkmark:before {
-	content: "\4d";
-}
 .icon-textarea:before {
     content: "\e000";
 }
@@ -254,4 +248,40 @@ you can use the generic selector below, but it's slower:
 }
 .icon-unlocked:before {
     content: "\e009";
+}
+.icon-disable:before {
+    content: "\e00a";
+}
+.icon-expand:before {
+    content: "\e00b";
+}
+.icon-checkbox-checked:before {
+    content: "\e432";
+}
+.icon-checkbox-unchecked:before {
+    content: "\e433";
+}
+.icon-checkmark:before {
+    content: "\e372";
+}
+.icon-earth:before {
+    content: "\e600";
+}
+.icon-tag:before {
+    content: "\e0b9";
+}
+.icon-list:before {
+    content: "\e299";
+}
+.icon-file:before {
+    content: "\e08d";
+}
+.icon-switchon:before {
+    content: "\e601";
+}
+.icon-switchoff:before {
+    content: "\e602";
+}
+.icon-seven-segment9:before {
+    content: "\e48b";
 }

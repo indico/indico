@@ -105,7 +105,7 @@
                                 </td>
                                 <td width="20%" align="right" class="thumbnail">
                                 % if room.photoId != None:
-                                    <a href="${ room.getPhotoURL() }" rel="lightbox" title="${ room.photoId }">
+                                    <a href="${ room.getPhotoURL() }" nofollow="lightbox" title="${ room.photoId }">
                                         <img border="1px" height="100" src="${ room.getPhotoURL() }" alt="${ str( room.photoId ) }"/>
                                     </a>
                                 % endif

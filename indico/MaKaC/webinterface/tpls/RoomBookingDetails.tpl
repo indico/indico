@@ -146,7 +146,7 @@
                                         % if reservation.room.photoId != None:
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top">${ _("Interior")}&nbsp;&nbsp;</td>
-                                            <td align="left" class="thumbnail"><a href="${ reservation.room.getPhotoURL() }" rel="lightbox" title="${ reservation.room.photoId }"><img border="1px" src="${ reservation.room.getSmallPhotoURL() }"/></a></td>
+                                            <td align="left" class="thumbnail"><a href="${ reservation.room.getPhotoURL() }" nofollow="lightbox" title="${ reservation.room.photoId }"><img border="1px" src="${ reservation.room.getSmallPhotoURL() }"/></a></td>
                                         </tr>
                                         % endif
                                         <tr>
