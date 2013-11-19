@@ -47,10 +47,6 @@ class WPConfModifRegFormBase( conferences.WPConferenceModifBase ):
         return conferences.WPConferenceModifBase.getJSFiles(self) + \
                self._includeJSPackage('regform')
 
-    def getCSSFiles(self):
-        return conferences.WPConferenceModifBase.getCSSFiles(self) + \
-            self._asset_env['regform_css'].urls()
-
     def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
@@ -433,10 +429,6 @@ class WPRegistrationFormDisplay( conferences.WPConferenceDefaultDisplayBase ):
         return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
             self._includeJSPackage('Management') + \
             self._includeJSPackage('regform_display')
-
-    def getCSSFiles(self):
-        return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-            self._asset_env['regform_css'].urls()
 
     def _getBody(self, params):
         wc = WConfRegistrationFormDisplay(self._conf, self._rh._getUser())
@@ -1032,10 +1024,6 @@ class WPRegistrationFormModify( conferences.WPConferenceDefaultDisplayBase ):
     def getJSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
             self._includeJSPackage('regform_display')
-
-    def getCSSFiles(self):
-        return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-            self._asset_env['regform_css'].urls()
 
     def _getBody(self, params):
         wc = WConfRegistrationFormModify(self._conf, self._rh._getUser())

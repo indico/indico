@@ -166,7 +166,7 @@ indico_jquery_authors = Bundle('js/indico/jquery/authors.js',
                                filters='rjsmin', output='js/indico_jquery_authors_%(version)s.min.js')
 
 indico_badges_js = Bundle('js/indico/Management/ConfModifBadgePosterPrinting.js',
-                          filters='jsmin', output='js/indico_badges_%(version)s.min.js')
+                          filters='rjsmin', output='js/indico_badges_%(version)s.min.js')
 
 indico_badges_css = Bundle('css/badges.css',
                            filters='cssmin', output='css/indico_badges_%(version)s.min.css')
@@ -177,8 +177,8 @@ indico_regform = Bundle(
                'section.js',
                'field.js',
                'sectiontoolbar.js'),
-    filters='jsmin',
-    output='indico_regform_%(version)s.min.js')
+    filters='rjsmin',
+    output='js/indico_regform_%(version)s.min.js')
 
 
 class DebugLevelFilter(Filter):
@@ -205,8 +205,8 @@ angular = Bundle(
     'js/indico/angular/directives.js',
     'js/indico/angular/filters.js',
     'js/indico/angular/services.js',
-    filters='jsmin',
-    output='angular_%(version)s.min.js'
+    filters='rjsmin',
+    output='js/angular_%(version)s.min.js'
 )
 
 jquery = Bundle(
@@ -352,4 +352,3 @@ def register_all_css(env, main_css_file):
     env.register('indico_badges_css', indico_badges_css)
     env.register('base_css', base_css)
     env.register('screen_sass', screen_sass)
-    env.register('regform_css',indico_regform)
