@@ -78,6 +78,14 @@ ndDirectives.directive("ndDialog", function() {
                 return this.ExclusivePopupWithButtons.prototype.draw.call(this, element);
             };
 
+            scope.setSelectedTab = function(tab_id) {
+                scope.tabSelected = tab_id;
+            };
+
+            scope.isTabSelected = function(tab_id) {
+                return scope.tabSelected === tab_id;
+            };
+
             scope.$watch("show", function(val) {
                 if (scope.show === true) {
                     scope.actions.init();

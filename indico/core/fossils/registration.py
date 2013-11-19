@@ -167,6 +167,7 @@ class IRegFormSocialEventItemFossil(IFossil):
         """
         Max place per registrant
         """
+    getMaxPlacePerRegistrant.name = 'maxPlace'
 
     def getPlacesLimit(self):
         """
@@ -204,6 +205,7 @@ class IRegFormSocialEventItemFossil(IFossil):
         """
         Is the price per place
         """
+    isPricePerPlace.name = 'pricePerPlace'
 
 
 #####################

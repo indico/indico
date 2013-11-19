@@ -36,8 +36,6 @@ ndRegForm.factory('RESTAPI', ['$resource','baseurl', function($resource, baseurl
                             {"enable": {method:'POST', url: sectionurl + "/enable"},
                              "disable": {method:'POST', url: sectionurl + "/disable"},
                              "move": {method:'POST', url: sectionurl + "/move"},
-                             "config": {method:'POST', url: sectionurl + "/config"},
-                             "items": {method:'POST', url: sectionurl + "/items"},
                              "header": {method:'POST', url: sectionurl + "/header"}
                             }),
         Fields: $resource(fieldurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId"},
@@ -123,6 +121,52 @@ ndRegForm.directive('ndAddSectionDialog', function(url) {
 ndRegForm.directive('ndManagementDialog', function(url) {
     return {
         templateUrl: url.tpl('sections/dialogs/sectionmanagement.tpl.html')
+    };
+});
+
+
+ndRegForm.directive("ndTable", function(url) {
+    return {
+
+        restrict: 'E',
+        scope: {
+            data: "=",
+            config: "=",
+            formData: "=",
+            filter: "=",
+            filterValue: "="
+        },
+        replace: true,
+        templateUrl: url.tpl('table.tpl.html'),
+
+        controller: function($scope) {
+
+            $scope.actionIsArray = function(action) {
+                return _.isArray(action);
+            };
+
+            $scope.actionItem = function(item, action) {
+                if(action == "remove") {
+                    item["remove"] = true;
+                } else if (action == "cancel") {
+                    item["cancelled"] = true;
+                } else if (action == "uncancel") {
+                    item["cancelled"] = false;
+                }
+            };
+
+            $scope.matchFilter = function(item) {
+                if(item.remove === true) {
+                    return false;
+                } else if(item.id == "isNew") {
+                    return true;
+                } else if($scope.filter !== undefined && $scope.filterValue !== undefined) {
+                    return item[$scope.filter] == $scope.filterValue;
+                } else {
+                    return true;
+                }
+            };
+        }
     };
 });
 

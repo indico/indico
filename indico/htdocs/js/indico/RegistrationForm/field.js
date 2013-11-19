@@ -316,6 +316,10 @@ ndRegForm.directive('ndFieldDialog', function(url) {
             $scope.formData = {
                 input: $scope.field.input
             };
+
+            $scope.actions.init = function() {
+                $scope.tabSelected = "tab-options";
+            };
         }
     };
 });

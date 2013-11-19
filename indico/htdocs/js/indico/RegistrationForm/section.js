@@ -44,17 +44,9 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI',  function
 
     $scope.api.saveConfig = function(section, data) {
         var postData = {confId: $rootScope.confId, sectionId: section.id};
-        for(var key in data) { postData[key] = data[key]; }
-        RESTAPI.Sections.config(postData, function(sectionUpdated) {
-            $scope.$parent.section = sectionUpdated;
-            //TODO: why not with section variable?
-        });
-    };
-
-    $scope.api.saveItems = function(section, items) {
-        var postData = {confId: $rootScope.confId, sectionId: section.id};
-        postData.items = items;
-        RESTAPI.Sections.items(postData, function(sectionUpdated) {
+        _.extend(postData, data);
+        //postData.items = _.values(postData.items);
+        RESTAPI.Sections.save(postData, function(sectionUpdated) {
             $scope.$parent.section = sectionUpdated;
             //TODO: why not with section variable?
         });
@@ -98,8 +90,6 @@ ndRegForm.directive('ndSection', function(url) {
                 collapsed: false
             };
 
-            scope.tabs = [];
-
             scope.$on('collapse', function(event, collapsed) {
                 scope.state.collapsed = collapsed;
             });
@@ -113,9 +103,12 @@ ndRegForm.directive('ndSection', function(url) {
                 }
             });
 
-            scope.$watch('section', function(val) {
-                // TODO sync section with server
-            });
+            scope.dialogs.config.actions.onOk = function(dialogScope) {
+                scope.api.saveConfig(dialogScope.section, dialogScope.formData);
+            };
+
+            scope.dialogs.config.actions.onCancel = function(dialogScope) {
+            };
         }
     };
 });
@@ -177,19 +170,69 @@ ndRegForm.directive("ndAccommodationSection", function() {
             scope.buttons.config = true;
             scope.buttons.disable = true;
 
-            scope.tabs = [
+            scope.dialogs.config.tabs = [
                 {id: 'config',              name: $T("Configuration"),          type: 'config' },
                 {id: 'editAccomodation',    name: $T("Edit accommodations"),    type: 'editionTable' }
             ];
 
-            scope.dialogs.config.actions.onOk = function(dialogScope) {
-                //TODO: Double binding not working...
-                scope.api.saveConfig(dialogScope.section,
-                                       {datesOffsets: dialogScope.formData.datesOffsets});
-                scope.api.saveItems(dialogScope.section, dialogScope.section.items);
-            };
+            scope.dialogs.config.contentWidth = 615;
 
-            scope.dialogs.config.actions.onCancel = function(dialogScope) {
+            scope.dialogs.config.editionTable = {
+                sortable: false,
+                colNames: [$T("caption"), $T("billable"),  $T("price"), $T("place limit"), $T("cancelled")],
+                actions: ['remove'],
+                colModel: [
+                       {
+                           name:'caption',
+                           index:'caption',
+                           align: 'center',
+                           sortable:false,
+                           width:100,
+                           editoptions: {size:"30",maxlength:"50"},
+                           editable: true
+                       },
+                       {
+                           name:'billable',
+                           index:'billable',
+                           sortable:false,
+                           width:60,
+                           editable: true,
+                           align: 'center',
+                           edittype:'bool_select',
+                           defaultVal: true
+
+                       },
+                       {
+                           name:'price',
+                           index:'price',
+                           align: 'center',
+                           sortable:false,
+                           width:50,
+                           editable: true,
+                           editoptions:{size:"7",maxlength:"20"}
+
+                       },
+                       {
+                           name:'placesLimit',
+                           index:'placesLimit',
+                           align: 'center',
+                           sortable:false,
+                           width:80,
+                           editable: true,
+                           editoptions:{size:"7",maxlength:"20"}
+                       },
+                       {
+                           name:'cancelled',
+                           index:'cancelled',
+                           sortable:false,
+                           width:60,
+                           editable: true,
+                           align: 'center',
+                           defaultVal: false,
+                           edittype:'bool_select'
+                       }
+
+                  ]
             };
         }
     };
@@ -220,19 +263,57 @@ ndRegForm.directive("ndSessionsSection", function() {
             scope.buttons.config = true;
             scope.buttons.disable = true;
 
-            scope.tabs = [
+            scope.dialogs.config.tabs = [
                 {id: 'config',          name: $T("Configuration"),      type: 'config'},
                 {id: 'editSessions',    name: $T("Manage sessions"),    type: 'editionTable'}
             ];
 
-            scope.dialogs.config.actions.onOk = function(dialogScope) {
-                //TODO: Double binding not working...
-                scope.api.saveConfig(dialogScope.section,
-                                       {type: dialogScope.formData.type});
-                scope.api.saveItems(dialogScope.section, dialogScope.section.items);
-            };
+            scope.dialogs.config.contentWidth = 750;
 
-            scope.dialogs.config.actions.onCancel = function(dialogScope) {
+            scope.dialogs.config.editionTable = {
+                sortable: false,
+                colNames:[$T('caption'),$T('billable'),$T('price'), $T('enabled')],
+                actions: [''],
+                colModel: [
+                       {
+                           name:'caption',
+                           index:'caption',
+                           align: 'left',
+                           sortable:false,
+                           width:200,
+                           editoptions:{size:"30",maxlength:"80"},
+                           editable: false
+                       },
+                       {
+                           name:'billable',
+                           index:'billable',
+                           sortable:false,
+                           width:60,
+                           editable: true,
+                           align: 'center',
+                           edittype:'bool_select',
+                           defaultVal: true
+                       },
+                       {
+                           name:'price',
+                           index:'price',
+                           align: 'center',
+                           sortable:false,
+                           width:80,
+                           editable: true,
+                           editoptions:{size:"7",maxlength:"20"}
+                       },
+                       {
+                           name:'enabled',
+                           index:'enabled',
+                           sortable:false,
+                           width:60,
+                           editable: true,
+                           align: 'center',
+                           edittype:'bool_select',
+                           defaultVal: true
+                       }
+                    ]
             };
         }
     };
@@ -244,22 +325,104 @@ ndRegForm.directive("ndSocialEventSection", function() {
         link: function(scope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
-            scope.tabs = [
+            scope.dialogs.config.tabs = [
                 {id: 'config',          name: $T("Configuration"),     type: 'config'},
                 {id: 'editEvents',      name: $T("Edit events"),       type: 'editionTable'},
                 {id: 'canceledEvent',   name: $T("Canceled events"),   type: 'cancelEvent'}
             ];
 
-            scope.dialogs.config.actions.onOk = function(dialogScope) {
-                //TODO: Double binding not working...
-                scope.api.saveConfig(dialogScope.section,
-                                       {introSentence: dialogScope.formData.introSentence,
-                                        selectionType: dialogScope.formData.selectionType
-                });
-                scope.api.saveItems(dialogScope.section, dialogScope.section.items);
+            scope.dialogs.config.contentWidth = 800;
+
+            scope.dialogs.config.editionTable = {
+                sortable: false,
+                colNames:[$T("caption"), $T("billabe"), $T("price"), $T("price/place"), $T("Nb places"), $T("Max./part.")],
+                actions: ['remove', ['cancel', $T('Cancel this event'),'#tab-canceledEvent','icon-cancel']],
+                colModel: [
+                        {
+                           name:'caption',
+                           index:'caption',
+                           align: 'center',
+                           sortable:false,
+                           width:160,
+                           editoptions:{size:"30",maxlength:"50"},
+                           editable: true
+                        },
+                        {
+                           name:'billable',
+                           index:'billable',
+                           sortable:false,
+                           width:60,
+                           editable: true,
+                           align: 'center',
+                           defaultVal : false,
+                           edittype:'bool_select'
+                        },
+
+                        {
+                           name:'price',
+                           index:'price',
+                           align: 'center',
+                           sortable:false,
+                           width:50,
+                           editable: true,
+                           editoptions:{size:"7",maxlength:"20"}
+                        },
+                        {
+                           name:'pricePerPlace',
+                           index:'pricePerPlace',
+                           sortable:false,
+                           width:80,
+                           editable: true,
+                           align: 'center',
+                           defaultVal : false,
+                           edittype:'bool_select'
+                        },
+
+                        {
+                           name:'placesLimit',
+                           index:'placesLimit',
+                           align: 'center',
+                           sortable:false,
+                           width:80,
+                           editable: true,
+                           editoptions:{size:"7",maxlength:"20"}
+                        },
+                        {
+                           name:'maxPlace',
+                           index:'maxPlace',
+                           align: 'center',
+                           sortable:false,
+                           width:80,
+                           editable: true,
+                           editoptions:{size:"7",maxlength:"20"}
+                        }
+                  ]
             };
 
-            scope.dialogs.config.actions.onCancel = function(dialogScope) {
+
+            scope.dialogs.config.canceledTable = {
+                sortable: false,
+                colNames:[$T("caption"), $T("Reason for cancellation")],
+                actions: ['remove', ['uncancel', $T('Uncancel this event'),'#tab-editEvents','icon-cancel']],
+                colModel: [
+                        {
+                            index:'caption',
+                            align: 'center',
+                            sortable:false,
+                            width:160,
+                            editoptions:{size:"30",maxlength:"50"},
+                            editable: false
+                        },
+                        {
+                            name:'reason',
+                            index:'cancelledReason',
+                            sortable:false,
+                            width:250,
+                            editoptions:{size:"30",maxlength:"50"},
+                            editable: true
+                        }
+
+                     ]
             };
         }
     };
@@ -273,28 +436,26 @@ ndRegForm.directive('ndSectionDialog', function(url) {
         controller: function ($scope) {
 
             $scope.section = $scope.$eval($scope.asyncData);
-            $scope.formData = {}; //This is the way?
+            $scope.formData = {
+                items: []
+            }; //This is the way?
+
+            _.each($scope.section.items, function (item, ind) {
+                $scope.formData.items[ind] = {id: item.id, cancelled: item.cancelled}; //A way to initialize properly
+            });
 
             $scope.getTabTpl = function(section_id, tab_type) {
                 return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(tab_type, section_id));
             };
 
             $scope.actions.init = function() {
-                $scope.tabSelected = $scope.data[0].id;
-                //$scope.section = $scope.$eval($scope.asyncData);
+                $scope.tabSelected = $scope.data.tabs[0].id;
             };
 
-        },
+            $scope.addItem = function () {
+                 $scope.formData.items.push({id:'isNew'});
+            }
 
-        link: function(scope, element) {
-
-            scope.setSelectedTab = function(tab_id) {
-                scope.tabSelected = tab_id;
-            };
-
-            scope.isTabSelected = function(tab_id) {
-                return scope.tabSelected === tab_id;
-            };
         }
     };
 });

@@ -1,18 +1,18 @@
 <div class="tabbable tabs-left">
     <ul class="nav nav-tabs">
-        <li class="active">
-            <a data-toggle="tab" id="tab-options" ref="#div-options">
+        <li ng-class="{active: isTabSelected('tab-options')}" >
+            <a ng-click="setSelectedTab('tab-options')">
                 {{ 'Options' | i18n }}
             </a>
         </li>
-        <li ng-show="field.input == radio">
-            <a data-toggle="tab" id="tab-editItems" ref="#div-editItems">
+        <li ng-if="field.input == 'radio'" ng-class="{active: isTabSelected('tab-editItems')}">
+            <a ng-click="setSelectedTab('tab-editItems')">
                 {{ 'Edit items' | i18n }}
             </a>
         </li>
     </ul>
     <div class="tab-content regFormDialogTabContent">
-        <div class="tab-pane active" id="div-options">
+        <div class="tab-pane" id="div-options" ng-class="{active: isTabSelected('tab-options')}">
             <form id="optionsForm" name="optionsForm">
             <div class="regFormEditLine">
                 <label class="regFormDialogCaption">
@@ -230,7 +230,7 @@
             <input type="submit" style="display:none;" value="submit" id="form-opt-validate">
             </form>
         </div>
-        <div class="tab-pane" id="div-editItems">
+        <div ng-if="field.input == 'radio'" class="tab-pane" ng-class="{active: isTabSelected('tab-editItems')}" id="div-editItems">
             <button id="addButton" class="addItem">{{ 'Create new item' | i18n }}</button>
             <button id="sortItem"  class="sortItem">{{ 'Sort alphabetically' | i18n }}</button>
             <div id="editionTable" style="margin-right:20px;margin-top:20px;"></div>

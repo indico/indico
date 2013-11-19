@@ -1,1 +1,9 @@
-<div id="editionCanceledTable" class="regFormDialogEditionTable"></div>
+<div id="editionCanceledTable" class="regFormDialogEditionTable">
+    <nd-table
+        data="section.items"
+        config="data.canceledTable"
+        form-data="formData.items"
+        filter="'cancelled'"
+        filter-value="true">
+    </nd-table>
+</div>

@@ -1,4 +1,10 @@
 <div class="regFormEditLine" style="margin-bottom: 20px;">
-    <button id="addButton" class="addItem">{{ 'Add a new accommodation' | i18n }}</button>
+    <button id="addButton" class="addItem" ng-click="addItem()">{{ 'Add a new accommodation' | i18n }}</button>
 </div>
-<div id="editionTable" class="regFormDialogEditionTable"></div>
+<div id="editionTable" class="regFormDialogEditionTable">
+    <nd-table
+        data="section.items"
+        config="data.editionTable"
+        form-data="formData.items">
+    </nd-table>
+</div>
