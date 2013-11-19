@@ -415,14 +415,6 @@ class RHRegistrationPreviewSection(RHRegistrationFormModifSectionBase):
         return jsonify(self.getFormFossil())
 
 
-class RHRegistrationFormSectionRemove(RHRegistrationFormModifSectionBase):
-
-    def _process_POST(self):
-        if not self._section.isRequired():
-            self._regForm.removeGeneralSectionForm(self._section)
-        return json.dumps(self._section.fossilize())
-
-
 class RHRegistrationFormSectionEnable(RHRegistrationFormModifSectionBase):
 
     def _process_POST(self):
@@ -457,49 +449,9 @@ class RHRegistrationFormAccommodationSetConfig(RHRegistrationFormModifAccomodati
     def _checkParams_POST(self):
         post_pm = ParameterManager(request.json)
         self._datesOffsets = post_pm.extract('datesOffsets', pType=dict, allowEmpty=False)
+        self._items = post_pm.extract('items', pType=list, allowEmpty=False)
 
-    def _process_POST(self):
-        arrDates = [int(self._datesOffsets.get("aoffset1", -2)), int(self._datesOffsets.get("aoffset2", 0))]
-        depDates = [int(self._datesOffsets.get("doffset1", 1)), int(self._datesOffsets.get("doffset2", 3))]
-        self._section.setArrivalOffsetDates(arrDates)
-        self._section.setDepartureOffsetDates(depDates)
-        return json.dumps(self._section.fossilize())
-
-
-class RHRegistrationFormSocialEventsSetConfig(RHRegistrationFormModifSocialEventsBase):
-
-    def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
-        self._introSentence = post_pm.extract('introSentence', pType=str, allowEmpty=False)
-        self._selectionType = post_pm.extract('selectionType', pType=str, allowEmpty=False)
-
-    def _process_POST(self):
-        self._section.setIntroSentence(self._introSentence)
-        self._section.setSelectionType(self._selectionType)
-        return json.dumps(self._section.fossilize())
-
-
-class RHRegistrationFormSessionsSetConfig(RHRegistrationFormModifSessionsBase):
-
-    def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
-        self._type = post_pm.extract('type', pType=str, allowEmpty=False)
-
-    def _process_POST(self):
-        if self._type in ["all", "2priorities"]:
-            self._section.setType(self._type)
-        else:
-            raise MaKaCError(_("Unknown type"))
-        return json.dumps(self._section.fossilize())
-
-
-class RHRegistrationFormAccommodationSetItems(RHRegistrationFormModifAccomodationBase):
-
-    def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
-        self._items = map(self.parseJsonItem, post_pm.extract('items', pType=list, allowEmpty=False))
-
-    def _process_POST(self):
+    def _setItems(self):
         for item in self._items:
             accoType = None
             if item.get('id') == 'isNew':
@@ -513,25 +465,25 @@ class RHRegistrationFormAccommodationSetItems(RHRegistrationFormModifAccomodatio
             else:
                 accoType.setValues(item)
 
+    def _process_POST(self):
+        arrDates = [int(self._datesOffsets.get("aoffset1", -2)), int(self._datesOffsets.get("aoffset2", 0))]
+        depDates = [int(self._datesOffsets.get("doffset1", 1)), int(self._datesOffsets.get("doffset2", 3))]
+        self._section.setArrivalOffsetDates(arrDates)
+        self._section.setDepartureOffsetDates(depDates)
+        self._setItems()
         return json.dumps(self._section.fossilize())
 
 
-class RHRegistrationFormSocialEventsSetItems(RHRegistrationFormModifSocialEventsBase):
+class RHRegistrationFormSocialEventsSetConfig(RHRegistrationFormModifSocialEventsBase):
 
     def _checkParams_POST(self):
         post_pm = ParameterManager(request.json)
+        self._introSentence = post_pm.extract('introSentence', pType=str, allowEmpty=False)
+        self._selectionType = post_pm.extract('selectionType', pType=str, allowEmpty=False)
         self._items = post_pm.extract('items', pType=list, allowEmpty=False)
 
-    def _process_POST(self):
+    def _setItems(self):
         for item in self._items:
-
-            # Convert to boolean type
-            if 'billable' in item:
-                item['billable'] = item['billable'] == 'true'
-            if 'pricePerPlace' in item:
-                item['pricePerPlace'] = item['pricePerPlace'] == 'true'
-            if 'cancelled' in item:
-                item['cancelled'] = item['cancelled'] == 'true'
 
             # Load or create social event
             socialEventItem = None
@@ -547,22 +499,22 @@ class RHRegistrationFormSocialEventsSetItems(RHRegistrationFormModifSocialEvents
             else:
                 socialEventItem.setValues(item)
 
+    def _process_POST(self):
+        self._section.setIntroSentence(self._introSentence)
+        self._section.setSelectionType(self._selectionType)
+        self._setItems()
         return json.dumps(self._section.fossilize())
 
 
-class RHRegistrationFormSessionsSetItems(RHRegistrationFormModifSessionsBase):
+class RHRegistrationFormSessionsSetConfig(RHRegistrationFormModifSessionsBase):
 
     def _checkParams_POST(self):
         post_pm = ParameterManager(request.json)
+        self._type = post_pm.extract('type', pType=str, allowEmpty=False)
         self._items = post_pm.extract('items', pType=list, allowEmpty=False)
 
-    def _process_POST(self):
+    def _setItems(self):
         for item in self._items:
-
-            # Convert to boolean type
-            item['billable'] = item.get('billable', False) == 'true'
-            item['enabled'] = item.get('enabled', False) == 'true'
-
             session = self._section.getSessionById(item.get('id'))
             if session is not None:
                 session.setValues(item)
@@ -580,6 +532,12 @@ class RHRegistrationFormSessionsSetItems(RHRegistrationFormModifSessionsBase):
                     self._section.addSession(rs)
                     rs.setValues(item)
 
+    def _process_POST(self):
+        if self._type in ["all", "2priorities"]:
+            self._section.setType(self._type)
+        else:
+            raise MaKaCError(_("Unknown type"))
+        self._setItems()
         return json.dumps(self._section.fossilize())
 
 
