@@ -27,12 +27,14 @@ from MaKaC.webinterface.user import UserListModificationBase
 from indico.core.config import Config
 from MaKaC.common.utils import sortCategoryByTitle, validMail
 import MaKaC.user as user
-from MaKaC.webinterface.rh.base import RHModificationBaseProtected,\
-    RoomBookingDBMixin
+from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.errors import MaKaCError,NoReportError,FormValuesError
 import MaKaC.conference as conference
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 from MaKaC.i18n import _
+
+from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
+
 
 class RHCategModifBase( RHModificationBaseProtected ):
 

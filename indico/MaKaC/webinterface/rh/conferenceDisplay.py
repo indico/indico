@@ -38,7 +38,6 @@ from indico.core.config import Config
 from indico.core.db import DBMgr
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
-from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.login import RHSignInBase, RHResetPasswordBase
 import MaKaC.common.filters as filters
@@ -54,6 +53,9 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 from reportlab.platypus.doctemplate import LayoutError
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+
+from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
+from indico.util.contextManager import ContextManager
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.hooks.event import CategoryEventHook
 from indico.web.flask.util import send_file

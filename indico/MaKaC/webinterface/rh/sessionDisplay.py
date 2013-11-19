@@ -20,15 +20,13 @@ from cStringIO import StringIO
 
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
-    RoomBookingDBMixin
+from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
 from MaKaC.webinterface.common.contribFilters import SortingCriteria
 from indico.core.config import Config
 from indico.web.flask.util import send_file
 from indico.web.http_api.hooks.event import SessionHook
 from indico.web.http_api.metadata.serializer import Serializer
-from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 
 class RHSessionDisplayBase( RHSessionBase, RHDisplayBaseProtected ):

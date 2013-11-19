@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import re
 from cStringIO import StringIO
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.pages.conferences as conferences
@@ -27,8 +28,7 @@ import MaKaC.user as user
 import MaKaC.conference as conference
 import MaKaC.schedule as schedule
 import MaKaC.domain as domain
-import re
-from MaKaC.webinterface.rh.base import RoomBookingDBMixin
+
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase, RHSessionSlotBase, RHSubmitMaterialBase
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
@@ -47,7 +47,10 @@ from MaKaC.errors import FormValuesError
 from MaKaC.conference import SessionChair
 from MaKaC.i18n import _
 from pytz import timezone
+
+from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
 from indico.web.flask.util import send_file
+
 
 class RHSessionModifBase( RHSessionBase, RHModificationBaseProtected ):
 

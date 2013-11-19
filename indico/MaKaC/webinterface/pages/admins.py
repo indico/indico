@@ -80,7 +80,6 @@ from indico.modules import ModuleHolder
 from indico.util.date_time import timedelta_split
 from indico.util.i18n import i18nformat
 from indico.util.redis import client as redis_client
-from indico.web.flask.util import isRoomBookingActive
 
 
 class WPAdminsBase( WPMainBase ):

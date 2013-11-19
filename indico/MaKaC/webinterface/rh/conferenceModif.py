@@ -40,7 +40,7 @@ import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.conference as conference
 from MaKaC.webinterface.general import *
-from MaKaC.webinterface.rh.base import RHModificationBaseProtected, RoomBookingDBMixin
+from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.base import RH   # Strange conflict was here: this line vs nothing
 from MaKaC.webinterface.pages import admins
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHAlarmBase, RHSubmitMaterialBase
@@ -71,6 +71,8 @@ import MaKaC.webinterface.pages.abstracts as abstracts
 from MaKaC.rb_tools import FormMode
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from MaKaC.fossils.conference import ISessionBasicFossil
+
+from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
 from indico.modules.scheduler import Client
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
@@ -3952,20 +3954,24 @@ class RHMaterialsShow(RHConferenceModifBase):
 # ============================================================================
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceSite
 
-from MaKaC.rb_room import RoomBase
-from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
-from MaKaC.rb_factory import Factory
-from MaKaC.rb_location import ReservationGUID, RoomGUID, Location
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.reservations import RepeatUnit, Reservation
+from indico.modules.rb.models.rooms import Room
 
-# 0. Base Classes
+from indico.modules.rb.controllers import RHRoomBookingProtected
+from indico.modules.rb.controllers.user.rooms import (
+    RHRoomBookingRoomDetails,
+    RHRoomBookingRoomList,
+    RHRoomBookingSearch4Rooms
+)
+from indico.modules.rb.controllers.user.reservations import (
+    RHRoomBookingBookingDetails,
+    RHRoomBookingBookingForm,
+    RHRoomBookingBookingList,
+    RHRoomBookingCloneBooking,
+    RHRoomBookingSaveBooking
 
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingSearch4Rooms, RHRoomBookingCloneBooking, RHRoomBookingProtected
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingRoomList
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingBookingList
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingRoomDetails
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingBookingDetails
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingBookingForm
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingSaveBooking
+)
 
 # 0. RHConfModifRoomBookingChooseEvent
 

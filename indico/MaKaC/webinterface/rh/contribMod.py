@@ -32,7 +32,6 @@ from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common.utils import parseDateTime
 from indico.core.config import Config
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
-from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.errors import FormValuesError
 from MaKaC.errors import MaKaCError
@@ -40,6 +39,8 @@ from MaKaC.i18n import _
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.webinterface.rh.materialDisplay import RHMaterialDisplayCommon
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+
+from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
 from indico.web.flask.util import send_file
 from MaKaC.PDFinterface.base import LatexRunner
 

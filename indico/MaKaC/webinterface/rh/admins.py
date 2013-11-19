@@ -26,9 +26,12 @@ import MaKaC.user as user
 import MaKaC.common.info as info
 from MaKaC.errors import AdminError, MaKaCError, PluginError, FormValuesError
 from MaKaC.common import HelperMaKaCInfo
-from MaKaC.webinterface.rh.base import RHProtected, RoomBookingDBMixin
+from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.plugins import PluginsHolder
 from MaKaC.i18n import _
+
+from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
+
 
 class RCAdmin(object):
     @staticmethod

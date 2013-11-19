@@ -34,9 +34,10 @@ from MaKaC.rb_location import CrossLocationQueries
 import MaKaC.common.info as info
 from MaKaC.common.utils import HolidaysHolder, isWeekend
 from MaKaC.errors import NoReportError
-from MaKaC.webinterface.rh.roomBooking import RoomBookingAvailabilityParamsMixin
 import MaKaC.webinterface.linking as linking
 from MaKaC.rb_factory import Factory
+
+from indico.modules.rb.controllers.mixins import RoomBookingAvailabilityParamsMixin
 
 
 class RoomBookingListLocations(ServiceBase):

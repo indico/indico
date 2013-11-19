@@ -21,7 +21,8 @@ from MaKaC.services.implementation.base import AdminService
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.plugins import PluginsHolder
 from MaKaC.webinterface.user import UserListModificationBase, UserModificationBase
-from MaKaC.webinterface.rh.base import RoomBookingDBMixin
+
+from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
 
 
 class PluginOptionsBase (AdminService):

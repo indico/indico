@@ -31,7 +31,6 @@ from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 #################################
 from MaKaC.common.url import ShortURLMapper
 import MaKaC.webinterface.rh.base as base
-from base import RoomBookingDBMixin
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.wcalendar as wcalendar
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
@@ -50,9 +49,12 @@ from MaKaC.webinterface.user import UserListModificationBase
 from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
+
+from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
 from indico.web.flask.util import send_file, endpoint_for_url
 from indico.web.http_api.hooks.event import CategoryEventHook
 from indico.web.http_api.metadata.serializer import Serializer
+
 
 class RHCategDisplayBase( base.RHDisplayBaseProtected ):
 

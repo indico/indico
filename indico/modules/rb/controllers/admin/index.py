@@ -24,7 +24,7 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
-from indico.modules.rb.views import index as index_views
+from indico.modules.rb.views.admin import index as index_views
 
 
 class RHRoomBookingPluginAdminBase(RHAdminBase):

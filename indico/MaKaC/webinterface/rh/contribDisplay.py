@@ -23,8 +23,7 @@ import sys
 
 import MaKaC.webinterface.pages.contributions as contributions
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
-    RoomBookingDBMixin
+from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHContributionBase
 from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.common.xmlGen import XMLGen
@@ -33,6 +32,9 @@ from MaKaC.errors import MaKaCError, ModificationError, NoReportError
 import MaKaC.common.timezoneUtils as timezoneUtils
 import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.i18n import _
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+
+from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
 from indico.web.flask.util import send_file
 from indico.web.http_api.hooks.event import ContributionHook
 from indico.web.http_api.metadata.serializer import Serializer
