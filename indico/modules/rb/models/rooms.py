@@ -98,8 +98,16 @@ class Room(db.Model):
                                     backref='room',
                                     cascade='all, delete-orphan')
 
-    def __init__(self, name):
+    def __init__(self, name, building, floor, number, owner_id, is_reservable=True):
         self.name = name
+        self.building = building
+        self.floor = floor
+        self.number = number
+        self.owner_id = owner_id
+        self.is_reservable = is_reservable
+
+    def __str__(self):
+        return '{}-{}-{}({})'.format(self.building, self.floor, self.number)
 
     def __repr__(self):
         return '<Room({0}, {1}, {2})>'.format(self.id, self.location_id, self.name)

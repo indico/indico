@@ -24,6 +24,7 @@ Holder of rooms in a place and its map view related data
 from datetime import datetime, timedelta
 
 import pytz
+from sqlalchemy import func
 
 from MaKaC.common.Locators import Locator
 
@@ -63,10 +64,10 @@ class Location(db.Model):
                                  cascade='all, delete-orphan')
 
 
-    def __init__(self, name, is_default=False, support_emails=None):
-        self.name = name
-        self.is_default = is_default
-        self.support_emails = support_emails
+    # def __init__(self, name, is_default=False, support_emails=None):
+    #     self.name = name
+    #     self.is_default = is_default
+    #     self.support_emails = support_emails
 
     def __str__(self):
         return self.name
@@ -100,11 +101,11 @@ class Location(db.Model):
         self.rooms.remove(room)
 
     @staticmethod
-    def getDefaultLocation(self, name):
+    def getDefaultLocation():
         return Location.query.filter(Location.is_default).one()
 
     @staticmethod
-    def setDefaultLocation(self, name):
+    def setDefaultLocation(name):
         default_location = Location.getDefaultLocation()
         if default_location:
             default_location.is_default = False
@@ -145,24 +146,42 @@ class Location(db.Model):
         return 0
 
     def getNumberOfRooms(self):
-        return self.rooms.query.count()
+        return (self.query
+                    .join(Location.rooms)
+                    .count())
 
     def getNumberOfActiveRooms(self):
-        return self.rooms.query.filter(Room.is_active).count()
+        return (self.query
+                    .join(Location.rooms)
+                    .filter(Room.is_active)
+                    .count())
 
     def getNumberOfReservableRooms(self):
-        return self.rooms.query.filter(Room.is_reservable).count()
+        return (self.query
+                    .join(Location.rooms)
+                    .filter(Room.is_reservable)
+                    .count())
 
     def getAllReservableRooms(self):
+        return (self.query
+                    .join(Location.rooms)
+                    .filter(Room.is_reservable)
+                    .all())
         return self.rooms.query.filter(Room.is_reservable).all()
 
-    def getTotalReservableSurface(self):
-        return sum(map(lambda r: r.surface if r.surface else 0,
-                       self.getAllReservableRooms()))
+    def getTotalReservableSurfaceArea(self):
+        return (self.query
+                    .with_entities(func.sum(Room.surface_area))
+                    .join(Location.rooms)
+                    .filter(Room.is_reservable)
+                    .scalar())
 
     def getTotalReservableCapacity(self):
-        return sum(map(lambda r: r.capacity,
-                       self.getAllReservableRooms()))
+        return (self.query
+                    .with_entities(func.sum(Room.capacity))
+                    .join(Location.rooms)
+                    .filter(Room.is_reservable)
+                    .scalar())
 
     def getReservationStats(self):
         return {

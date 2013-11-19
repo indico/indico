@@ -29,7 +29,7 @@ from indico.core.db import db
 
 
 class RepeatUnit(object):
-    HOUR, DAY, WEEK, MONTH, YEAR = xrange(5)
+    NEVER, HOUR, DAY, WEEK, MONTH, YEAR = xrange(6)
 
 
 class Reservation(db.Model):
@@ -42,7 +42,7 @@ class Reservation(db.Model):
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
     repeat_unit = db.Column(db.SmallInteger, nullable=False, default=0)  # week, month, year, etc.
-    repeat_period = db.Column(db.SmallInteger, nullable=False, default=0)  # 1, 2, 3, etc.
+    repeat_step = db.Column(db.SmallInteger, nullable=False, default=0)  # 1, 2, 3, etc.
 
     # user
     booked_for_id = db.Column(db.String, nullable=False)
@@ -77,11 +77,6 @@ class Reservation(db.Model):
     notifications = db.relationship('ReservationNotification',
                                     backref='reservation',
                                     cascade='all, delete-orphan')
-
-    # moved to reservation (custom) attributes
-    # needs_video_conference_support = Column(Boolean, default=False)
-    # needs_assistance = Column(Boolean, default=False)
-    # uses_video_conference = Column(Boolean, default=False)
 
     def __init__(self, **kwargs):
         for k, v in kwargs.iteritems():

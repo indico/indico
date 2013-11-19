@@ -49,7 +49,6 @@ class DBTest(TestCase):
         pass
 
     def init_db(self):
-
         # first add attribute keys and room equipments
         db.session.add_all([LocationAttributeKey(name=k)
                             for k in LOCATION_ATTRIBUTE_KEYS])
