@@ -23,7 +23,7 @@ var START_H = 6;
 // Width of the calendar
 var DAY_WIDTH_PX = 35 * 12 * 2;
 // Room types, used for selecting proper CSS classes
-var barClasses = ['barPreB', 'barPreC', 'barUnaval', 'barCand', 'barBlocked', 'barPreConc', 'barConf'];
+var barClasses = ['barBlocked', 'barPreB', 'barPreC', 'barUnaval', 'barCand', 'barPreConc', 'barConf'];
 
 
 // Compares two rooms. Mainly used for sorting.
@@ -41,11 +41,11 @@ var calendarLegend = Html.div({style:{cssFloat: 'left', clear: 'both', padding: 
         Html.div( {className:'barLegend', style:{color: 'black'}}, $T('Legend:')),
         Html.div( {className:'barLegend barCand'}, $T('Available')),
         Html.div( {className:'barLegend barConf'}, $T('Conflict')),
-        Html.div( {className:'barLegend barBlocked'}, $T('Blocked')),
         Html.div( {className:'barLegend barUnaval'}, $T('Booked')),
         Html.div( {className:'barLegend barPreB', style:{color: 'black'}}, $T('PRE-Booking')),
         Html.div( {className:'barLegend barPreC', style:{color: 'white'}}, $T('Conflict with PRE-Booking')),
-        Html.div( {className:'barLegend barPreConc', style:{color: 'white'}}, $T('Concurrent PRE-Bookings')));
+        Html.div( {className:'barLegend barPreConc', style:{color: 'white'}}, $T('Concurrent PRE-Bookings')),
+        Html.div( {className:'barLegend barBlocked'}, $T('Blocked')));
 
 /**
  * Represents a single room in the roombooking
