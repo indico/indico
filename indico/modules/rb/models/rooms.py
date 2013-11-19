@@ -158,3 +158,7 @@ class Room(db.Model):
 
     def getReservationStats(self):
         pass
+
+    @staticmethod
+    def isAvatarResponsibleForRooms(avatar):
+        pass
