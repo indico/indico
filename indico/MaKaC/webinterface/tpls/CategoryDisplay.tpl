@@ -14,25 +14,16 @@ containsCategories = len(categ.getSubCategoryList()) > 0
 <div class="category-container">
     <div class="category-header">
         <div id="category-toolbar" class="toolbar right">
-
-            % if isLoggedIn and not isRootCategory:
-            <div id="categFavorite" class="group right">
-                <a class="i-button fav-button icon-only icon-bookmark ${"enabled" if categ in favoriteCategs else ""}" href="#"></a>
-            </div>
-            % endif
-
-            <div class="group right">
+            <div class="group">
                 % if not isRootCategory:
                 <a class="i-button icon-arrow-up" href="${urlHandlers.UHCategoryDisplay.getURL(categ.owner)}">
                     Parent category
                 </a>
                 % endif
-
                 % if categ.conferences:
                     <a id="exportIcal${categ.getUniqueId()}" class="i-button icon-calendar arrow exportIcal" data-id="${categ.getUniqueId()}" title="${_("Export to scheduling tool")}"></a>
                     <span><%include file="CategoryICalExport.tpl" args="item=categ"/></span>
                 % endif
-
                 <a id="moreLink" class="i-button icon-eye arrow" data-toggle="dropdown" title="${_("View")}"></a>
                 <ul class="dropdown">
                     <li><a href="${urlHandlers.UHCategoryOverview.getURL(categ)}">${_("Today's events")}</a></li>
@@ -47,7 +38,6 @@ containsCategories = len(categ.getSubCategoryList()) > 0
                     <li><a href="${urlMeeting}">${_("Meeting")}</a></li>
                     <li><a href="${urlConference}">${_("Conference")}</a></li>
                 </ul>
-
                 % if allowUserModif:
                 <a id="manageLink" class="i-button icon-edit arrow" data-toggle="dropdown" title="${_("Management options")}"></a>
                 <ul class="dropdown">
@@ -56,6 +46,11 @@ containsCategories = len(categ.getSubCategoryList()) > 0
                 </ul>
                 % endif
             </div>
+            % if isLoggedIn and not isRootCategory:
+            <div id="categFavorite" class="group">
+                <a class="i-button fav-button icon-only icon-bookmark ${'enabled' if categ in favoriteCategs else ''}" href="#"></a>
+            </div>
+            % endif
         </div>
 
         <h1 class="category-title ${"sidebar-padding" if isRootCategory or materials or managers else ""}">
