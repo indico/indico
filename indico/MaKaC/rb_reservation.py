@@ -720,6 +720,13 @@ class ReservationBase( Fossilizable ):
                 return rbl.block.createdByUser.getStraightFullName()
         return None
 
+    def getBlockingId(self, date):
+        from MaKaC.rb_factory import Factory
+        for rbl in Factory.newRoomBlocking().getByRoom(self.room):
+            if rbl.block.startDate <= date and date <= rbl.block.endDate:
+                return rbl.block.id
+        return None
+
     def getBlockingMessage(self, date):
         from MaKaC.rb_factory import Factory
         for rbl in Factory.newRoomBlocking().getByRoom(self.room):

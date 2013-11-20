@@ -69,7 +69,7 @@ type ("RoomBookingRoom", [],
                     urlParams.ignoreSession = 1;
                 }
                 else {
-                    urlParams.infoBookingMode = 'True'
+                    urlParams.infoBookingMode = 'True';
                 }
 
                 if (minutes) {
@@ -80,7 +80,7 @@ type ("RoomBookingRoom", [],
                 }
                 if (typeof repeatability != 'undefined' && repeatability != 'None' && flexibleDatesRange > 0) {
                     var repeatabilityDays;
-                    if (repeatability == 0)
+                    if (repeatability === 0)
                         repeatabilityDays = 1;
                     else if (repeatability < 4)
                         repeatabilityDays = 7 * repeatability;
@@ -306,70 +306,68 @@ type ("RoomBookingCalendarDrawer", [],
                 var left = ( startHour<0?0:startHour * 60 + bar.startDT.getMinutes() ) / (24*60) * DAY_WIDTH_PX;
                 var diff = ( bar.endDT.getHours() - bar.startDT.getHours() + (startHour<0?startHour:0) ) * 60 + ( bar.endDT.getMinutes() - bar.startDT.getMinutes() );
                 var width = diff / (24*60) * DAY_WIDTH_PX - 1;
-                var newResvInfo;
+                var resvInfo;
+
+                // TODO: This shouldn't happen! See ticket #942
                 if (width < 0) {
-                    // TODO: This shouldn't happen! See ticket #942
                     return Html.div({});
                 }
-                if (bar.type == "barBlocked") {
-                    newResvInfo = $T("Room blocked") + "<br/>" +
-                               bar.blocking["creator"] + "<br/>" +
-                               bar.blocking["message"];
-                } else {
-                    newResvInfo = "Click to book it <br/>" +
+
+                if (bar.type == "barCand") {
+                    resvInfo = "Click to book it <br/>" +
                                   bar.startDT.print("%H:%M") + "  -  " + bar.endDT.print("%H:%M");
-                }
-                var resvInfo = bar.startDT.print("%H:%M") + "  -  " +
+                } else if (bar.type == "barBlocked") {
+                    resvInfo = $T("Room blocked by") + ":<br/>" +
+                                  bar.blocking["creator"] + "<br/>" +
+                                  $T('Reason') + ': ' + bar.blocking["message"];
+                } else {
+                    resvInfo = bar.startDT.print("%H:%M") + "  -  " +
                                bar.endDT.print("%H:%M") + "<br />" +
                                bar.owner + "<br />" +
                                bar.reason;
+                }
+
                 var barDiv =  Html.div({
                     className: bar.type + " barDefault",
-                    style: {cursor: (bar.inDB || ((bar.type == 'barCand' || bar.type == 'barBlocked') && showCandidateTip) ? 'pointer' : ''), width: pixels(parseInt(width)), left: pixels(parseInt(left))}});
+                    style: {
+                        cursor: (bar.inDB || (bar.type == 'barCand' && showCandidateTip) ? 'pointer' : ''),
+                        width: pixels(parseInt(width)),
+                        left: pixels(parseInt(left))
+                    }
+                });
+
                 if(bar.inDB) {
                     barDiv.observeClick(function(){
                         window.location = bar.bookingUrl;
                     });
                 }
-                if((bar.type == 'barCand' || bar.type == 'barBlocked') && showCandidateTip) {
+
+                if (bar.type == 'barCand' && showCandidateTip) {
                     $(barDiv.dom).click(function(){
                         var url = bar.room.getBookingFormUrl(bar.startDT.print("%Y/%m/%d %H:%M") + bar.endDT.print("%H:%M"), self.data.repeatability, self.data.flexibleDatesRange, true, self.data.finishDate, self.data.startD, self.data.endD);
                         self._ajaxClick(bar, url, $(this));
                     });
-                    $(barDiv.dom).qtip({
-                        content: {
-                            text: newResvInfo
-                        },
-                        style: {
-                            classes: "bold"
-                        },
-                        position: {
-                            target: 'mouse',
-                            adjust: { mouse: true, x: 11, y: 13 }
-                        },
-                        show: {
+                }
 
-                        },
-                        events: {
-                            show: function(event, api) {
-                                if ((navigator.platform.indexOf("iPad") != -1) || (navigator.platform.indexOf("iPhone") != -1)) {
-                                    event.preventDefault();
-                                }
+                $(barDiv.dom).qtip({
+                    content: {
+                        text: resvInfo
+                    },
+                    style: {
+                        classes: "bold"
+                    },
+                    position: {
+                        target: 'mouse',
+                        adjust: { mouse: true, x: 11, y: 13 }
+                    },
+                    events: {
+                        show: function(event, api) {
+                            if ((navigator.platform.indexOf("iPad") != -1) || (navigator.platform.indexOf("iPhone") != -1)) {
+                                event.preventDefault();
                             }
                         }
-                    });
-                }
-                else {
-                    $(barDiv.dom).qtip({
-                        content: {
-                            text: resvInfo
-                        },
-                        position: {
-                            target: 'mouse',
-                            adjust: { mouse: true, x: 11, y: 13 }
-                        }
-                    });
-                }
+                    }
+                });
 
                 return barDiv;
             },
@@ -383,40 +381,44 @@ type ("RoomBookingCalendarDrawer", [],
             _ajaxClick: function(bar, url, element) {
                 // get conflicts per occurrence
                 var conflicts = $('.barDefaultHover').closest('.dayCalendarDiv').map(function() {
-                    return $(this).find('.barConf, .barBlocked').length;
+                    return $(this).find('.barConf').length;
+                });
+
+                var blocked = $('.barDefaultHover').closest('.dayCalendarDiv').map(function() {
+                    return _.any($(this).find('.barBlocked').length);
                 });
 
                 var any_conflict = _.any(conflicts);
                 var all_conflicts = conflicts.length && _.every(conflicts, function(e) { return !!e; });
 
-                if (all_conflicts) {
+                if (all_conflicts && !blocked) {
                     this._setDialog("search-again");
                     $('#booking-dialog-content').html($T("This room cannot be booked due to conflicts with existing reservations or room blockings."));
                     $('#booking-dialog').dialog("open");
-                } else if (any_conflict) {
+                } else if (any_conflict && !blocked) {
                     this._setDialog("skip-conflict", url);
                     $('#booking-dialog-content').html($T("This booking contains conflicts with existing reservations or blockings."));
                     $('#booking-dialog').dialog("open");
                 } else {
-                    if (bar.room.type != "privateRoom") {
+                    if (bar.room.type != "privateRoom" && !blocked) {
                         window.location = url;
                     } else {
-                        this._handleProtected(element, bar.room.id, url);
+                        this._handleProtected(element, bar.room.id, bar.blocking.id, url);
                     }
                 }
             },
 
-            _handleProtected: function(element, room_id, url) {
+            _handleProtected: function(element, room_id, blocking_id, url) {
                 var self = this;
 
                 indicoRequest("roomBooking.room.bookingPermission", {
-                    room_id: room_id
+                    room_id: room_id,
+                    blocking_id: blocking_id
                 }, function(result, error) {
                     if (!error && !exists(result.error)) {
                         if (!result.can_book) {
-                            element.addClass("barProt");
                             self._setDialog("search-again");
-
+                            element.addClass("barProt");
                             if (result.group) {
                                 var protection = '<strong>' + result.group + '</strong>';
                                 $('#booking-dialog-content').html(format($T("Bookings of this room are limited to members of {0}."), [protection]));
@@ -424,7 +426,18 @@ type ("RoomBookingCalendarDrawer", [],
                                 $('#booking-dialog-content').html($T("You are not authorized to book this room"));
                             }
                             $('#booking-dialog').dialog("open");
-                        } else {
+                        }
+
+                        else if (result.blocked) {
+                            element.addClass("barConf");
+                            self._setDialog("search-again");
+                            $('#booking-dialog-content').html(
+                                $T("This room is blocked on this date and you don't have permissions to book it.")
+                            );
+                            $('#booking-dialog').dialog("open");
+                        }
+
+                        else {
                             window.location = url;
                         }
                     } else {

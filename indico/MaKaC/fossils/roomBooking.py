@@ -154,8 +154,9 @@ class IBarFossil(IFossil):
 
     def getBlocking(self):
         pass
-    getBlocking.produce = lambda x: {"creator": x.forReservation.getBlockingCreator(datetime.date(x.startDT)),
-                                     "message": x.forReservation.getBlockingMessage(datetime.date(x.startDT))}
+    getBlocking.produce = lambda x: {'id': x.forReservation.getBlockingId(datetime.date(x.startDT)),
+                                     'creator': x.forReservation.getBlockingCreator(datetime.date(x.startDT)),
+                                     'message': x.forReservation.getBlockingMessage(datetime.date(x.startDT))}
 
 
 class IRoomCalendarFossil( IRoomFossil ):

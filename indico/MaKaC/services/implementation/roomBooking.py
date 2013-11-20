@@ -368,10 +368,12 @@ class RoomBookingBlockingReject(RoomBookingBlockingProcessBase):
 class BookingPermission(LoggedOnlyService):
     def _checkParams(self):
         self._room = CrossLocationQueries.getRooms(roomID=self._params["room_id"])[0]
+        self._blocking = RoomBlockingBase.getById(self._params.get('blocking_id'))
 
     def _getAnswer(self):
         user = self._aw.getUser()
         return {
+            'blocked': not self._blocking.canOverride(user),
             'can_book': self._room.canBook(user) or self._room.canPrebook(user),
             'group': self._room.customAtts.get('Booking Simba List')
         }
