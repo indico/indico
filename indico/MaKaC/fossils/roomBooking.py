@@ -17,11 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common.fossilize import IFossil, Fossilizable, fossilizes
+from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 from MaKaC.common.TemplateExec import roomClass
 from datetime import datetime
+
 
 class IRoomFossil(IFossil):
 
@@ -52,7 +53,6 @@ class IRoomFossil(IFossil):
 
 
 class IRoomMapFossil(IRoomFossil):
-
 
     def capacity(self):
         """ Room capacity """
@@ -109,7 +109,6 @@ class IRoomMapFossil(IRoomFossil):
         """ Available equipment for audio and video conference """
 
 
-
 def _produce_booking_url(resv):
     if resv.id is None:
         # Booking is not saved yet
@@ -159,7 +158,7 @@ class IBarFossil(IFossil):
                                      'message': x.forReservation.getBlockingMessage(datetime.date(x.startDT))}
 
 
-class IRoomCalendarFossil( IRoomFossil ):
+class IRoomCalendarFossil(IRoomFossil):
     pass
 
 

@@ -24,8 +24,9 @@ Part of Room Booking Module (rb_)
 
 from datetime import datetime, time
 from MaKaC.rb_tools import fromUTC, toUTC
-from MaKaC.user import AvatarHolder, Avatar
+from MaKaC.user import AvatarHolder
 from MaKaC.rb_factory import Factory
+
 
 class RoomBlockingBase(object):
     """
