@@ -636,28 +636,3 @@ class RHRegistrationFormFieldMove(RHRegistrationFormModifFieldBase):
             raise MaKaCError(_("Section id: " + self._section.getId() + " doesn't support field move"))
 
         return json.dumps(self._section.fossilize())
-
-
-class RHRegistrationFormFieldSetItems(RHRegistrationFormModifFieldBase):
-
-    def _checkParams_POST(self):
-        post_pm = ParameterManager(json.loads(request.data))
-        self._items = post_pm.extract('items', pType=list, allowEmpty=False)
-
-    def _process_POST(self):
-        for i in range(0, len(self._items)):
-            itemValues = self._items[i]
-            itemValues["isEnabled"] = itemValues["isEnabled"] == "true"
-            itemValues["billable"] = itemValues["billable"] == "true"
-            item = self._field.getItemById(itemValues['id'])
-            if item is None:
-                self._field.createItem(itemValues, i)
-            else:
-                # remove else set and move
-                if 'remove' in itemValues:
-                    self._field.removeItem(item)
-                else:
-                    item.setValues(itemValues)
-                    self._field.addItem(item, i)
-
-        return json.dumps(self._field.fossilize())

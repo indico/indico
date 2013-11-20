@@ -100,10 +100,6 @@ event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/fields/<fiel
                         'confModifRegistrationPreviewField-move',
                         registrationFormModif.RHRegistrationFormFieldMove,
                         methods=('POST',))
-event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/fields/<fieldId>/items',
-                        'confModifRegistrationPreviewField-accommodation-items',
-                        registrationFormModif.RHRegistrationFormFieldSetItems,
-                        methods=('POST',))
 
 # Registrants
 event_mgmt.add_url_rule('/registration/users/', 'confModifRegistrants', registrantsModif.RHRegistrantListModif,

@@ -2128,19 +2128,24 @@ class RadioGroupInput(FieldInputType, Fossilizable):
         return d
 
     def setValues(self, data):
-        if data.has_key("radioitems"):
-            ris = data.get("radioitems", [])
-            if type(ris) != list:
-                ris = [ris]
-            for c in ris:
-                ri = RadioItem(self)
-                ri.setValues(c)
-                self.addItem(ri)
-        if data.has_key("defaultItem"):
+        if "radioitems" in data:
+            for i, itemValues in enumerate(data.get("radioitems", [])):
+                item = self.getItemById(itemValues['id'])
+                if item is None:
+                    self.createItem(itemValues, i)
+                else:
+                    # remove else set and move
+                    if 'remove' in itemValues:
+                        self.removeItem(item)
+                    else:
+                        item.setValues(itemValues)
+                        self.addItem(item, i)
+
+        if "defaultItem" in data:
             self.setDefaultItem(data.get("defaultItem", None))
-        if data.has_key("inputType"):
+        if "inputType" in data:
             self._inputType = data.get("inputType")
-        if data.has_key("emptyCaption"):
+        if "emptyCaption" in data:
             self._emptyCaption = data["emptyCaption"]
 
     def _beforeValueChange(self, item, newItem):
