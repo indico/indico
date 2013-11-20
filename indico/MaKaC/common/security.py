@@ -46,9 +46,11 @@ class Sanitization(object):
                 Sanitization._sanitize(param, level)
 
     @staticmethod
-    def _escapeHTML(params):
+    def _escapeHTML(params, doNotSanitize):
         index = 0
         for i in params:
+            if i in doNotSanitize:
+                continue
             # params can be a list or a dictonary
             # we need to define k depending if it is a list or a dictonary
             # in order to be able to do such a operation: params[k] = something.
@@ -105,9 +107,9 @@ class Sanitization(object):
 
         if level == 0:
             #Escape all HTML tags
-            Sanitization._escapeHTML(params)
+            Sanitization._escapeHTML(params, doNotSanitize)
 
-        elif level in [1,2]:
+        elif level in [1, 2]:
             #level 1 or default: raise error if script or style detected
             #level 2: raise error if script but style accepted
             Sanitization._sanitize(params, level, doNotSanitize)

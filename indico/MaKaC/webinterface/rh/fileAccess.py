@@ -72,6 +72,7 @@ class RHFileAccessStoreAccessKey(RHFileBase):
     def _checkParams(self, params):
         RHFileBase._checkParams(self, params)
         self._accesskey = params.get("accessKey", "").strip()
+        self._doNotSanitizeFields.append("accessKey")
 
     def _checkProtection(self):
         pass

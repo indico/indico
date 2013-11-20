@@ -226,15 +226,16 @@ class RHSubmitMaterialBase(object):
 
         self._files = []
         self._links = []
-        self._topdf=params.has_key("topdf")
+        self._topdf = "topdf" in params
 
-        self._displayName = params.get("displayName","").strip()
-        self._uploadType = params.get("uploadType","")
-        self._materialId = params.get("materialId","")
-        self._description = params.get("description","")
+        self._displayName = params.get("displayName", "").strip()
+        self._uploadType = params.get("uploadType", "")
+        self._materialId = params.get("materialId", "")
+        self._description = params.get("description", "")
         self._statusSelection = int(params.get("statusSelection", 1))
         self._visibility = int(params.get("visibility", 0))
-        self._password = params.get("password","")
+        self._password = params.get("password", "")
+        self._doNotSanitizeFields.append("password")
 
         self._userList = json.loads(params.get("userList", "[]"))
         maxUploadFilesTotalSize = float(self._cfg.getMaxUploadFilesTotalSize())

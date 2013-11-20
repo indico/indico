@@ -84,9 +84,10 @@ class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
 
     _isMobile = False
 
-    def _checkParams( self, params ):
-        conferenceBase.RHConferenceBase._checkParams(self, params )
-        self._accesskey = params.get( "accessKey", "" ).strip()
+    def _checkParams(self, params):
+        conferenceBase.RHConferenceBase._checkParams(self, params)
+        self._accesskey = params.get("accessKey", "").strip()
+        self._doNotSanitizeFields.append("accessKey")
 
     def _process(self):
         access_keys = session.setdefault("accessKeys", {})
@@ -152,22 +153,24 @@ class _UserUtils:
         ##################################
         # Fermi timezone awareness(end)  #
         ##################################
-    setUserData = classmethod( setUserData )
+    setUserData = classmethod(setUserData)
 
 
-class RHConfUserCreation( conferenceBase.RHConferenceBase ):
+class RHConfUserCreation(conferenceBase.RHConferenceBase):
     _uh = urlHandlers.UHConfUserCreation
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         pass
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         self._params = params
-        conferenceBase.RHConferenceBase._checkParams( self, params )
+        conferenceBase.RHConferenceBase._checkParams(self, params)
         self._save = params.get("Save", "")
-        self._returnURL = params.get( "returnURL", "").strip()
+        self._returnURL = params.get("returnURL", "").strip()
+        self._doNotSanitizeFields.append("password")
+        self._doNotSanitizeFields.append("passwordBis")
 
-    def _process( self ):
+    def _process(self):
         save = False
         authManager = AuthenticatorMgr()
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()

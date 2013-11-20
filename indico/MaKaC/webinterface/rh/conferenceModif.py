@@ -160,15 +160,17 @@ class RHConfScreenDatesEdit(RHConferenceModifBase):
             self._target.setScreenEndDate(self._eDate)
             self._redirect(url)
             return
-        p=conferences.WPScreenDatesEdit(self,self._target)
+        p = conferences.WPScreenDatesEdit(self, self._target)
         return p.display()
 
-class RHConferenceModifKey( RHConferenceModifBase ):
 
-    def _checkParams( self, params ):
-        RHConferenceBase._checkParams(self, params )
-        self._modifkey = params.get( "modifKey", "" ).strip()
-        self._redirectURL = params.get("redirectURL","")
+class RHConferenceModifKey(RHConferenceModifBase):
+
+    def _checkParams(self, params):
+        RHConferenceBase._checkParams(self, params)
+        self._modifkey = params.get("modifKey", "").strip()
+        self._doNotSanitizeFields.append("modifKey")
+        self._redirectURL = params.get("redirectURL", "")
 
     def _checkProtection(self):
         modif_keys = session.setdefault('modifKeys', {})
@@ -231,6 +233,7 @@ class RHConferenceCloseModifKey(RHConferenceBase):
     def _checkParams(self, params):
         RHConferenceBase._checkParams(self, params)
         self._modifkey = params.get("modifKey", "").strip()
+        self._doNotSanitizeFields.append("modifKey")
         self._redirectURL = params.get("redirectURL", "")
 
     def _process(self):

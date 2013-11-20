@@ -97,6 +97,8 @@ class RHUserCreation( RH ):
         self._login = params.get("login", "")
         self._password = params.get("password", "")
         self._passwordBis = params.get("passwordBis", "")
+        self._doNotSanitizeFields.append("password")
+        self._doNotSanitizeFields.append("passwordBis")
 
     def _process(self):
         save = False
@@ -380,6 +382,8 @@ class RHUserIdentityCreation( RHUserIdentityBase ):
         self._system = params.get("system", "")
         self._ok = params.get("OK", "")
         self._params = params
+        self._doNotSanitizeFields.append("password")
+        self._doNotSanitizeFields.append("passwordBis")
 
     def _process(self):
         if self._params.get("Cancel") is not None:
@@ -414,19 +418,20 @@ class RHUserIdentityCreation( RHUserIdentityBase ):
         return p.display()
 
 
-
-class RHUserIdPerformCreation( RHUserIdentityBase ):
+class RHUserIdPerformCreation(RHUserIdentityBase):
     _uh = urlHandlers.UHUserIdPerformCreation
 
-    def _checkParams( self, params ):
-        RHUserIdentityBase._checkParams( self, params )
+    def _checkParams(self, params):
+        RHUserIdentityBase._checkParams(self, params)
         self._login = params.get("login", "")
         self._pwd = params.get("password", "")
         self._pwdBis = params.get("passwordBis", "")
         self._fromURL = params.get("fromURL", "")
         self._system = params.get("system", "")
+        self._doNotSanitizeFields.append("password")
+        self._doNotSanitizeFields.append("passwordBis")
 
-    def _process( self ):
+    def _process(self):
         authManager = AuthenticatorMgr()
         #first, check if login is free
         if not authManager.isLoginAvailable(self._login):
@@ -444,15 +449,17 @@ class RHUserIdPerformCreation( RHUserIdentityBase ):
         DBMgr.getInstance().commit()
         scr = mail.sendConfirmationRequest(self._avatar)
         scr.send()
-        self._redirect( urlHandlers.UHUserDetails.getURL( self._avatar ) ) #to set to the returnURL
+        self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))  # to set to the returnURL
 
 
-class RHUserIdentityChangePassword( RHUserIdentityBase ):
+class RHUserIdentityChangePassword(RHUserIdentityBase):
     _uh = urlHandlers.UHUserIdentityChangePassword
 
-    def _checkParams( self, params ):
-        RHUserIdentityBase._checkParams( self, params )
+    def _checkParams(self, params):
+        RHUserIdentityBase._checkParams(self, params)
         self._params = params
+        self._doNotSanitizeFields.append("password")
+        self._doNotSanitizeFields.append("passwordBis")
 
     def _process(self):
         if self._params.get("OK") is not None:
