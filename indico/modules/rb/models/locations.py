@@ -63,35 +63,78 @@ class Location(db.Model):
                                  backref='location',
                                  cascade='all, delete-orphan')
 
-
-    # def __init__(self, name, is_default=False, support_emails=None):
-    #     self.name = name
-    #     self.is_default = is_default
-    #     self.support_emails = support_emails
+    #### Common ####
 
     def __str__(self):
         return self.name
 
     def __repr__(self):
-        return '<Location({0}, {1}, {2})>'.format(self.id, self.default_aspect_id,
-                                                  self.name)
+        return '<Location({0}, {1}, {2})>'.format(
+            self.id,
+            self.default_aspect_id,
+            self.name
+        )
 
     def __cmp__(self, other):
         return cmp(self.name, other.name)
 
+    # TODO: get rid of locators
     def getLocator( self ):
         d = Locator()
         d["locationId"] = self.name
         return d
 
-    def getSupportEmails(self):
+    #### Supports Emails ####
+
+    def getSupportEmails(self, to_list=True):
         if self.support_emails:
-            return self.getSupportEmails.split(',')
+            if to_list:
+                return self.support_emails.split(',')
+            else:
+                return self.support_emails
 
     def setSupportEmails(self, emails):
-        self.support_emails = ','.join(emails)
+        if isinstance(emails, list):
+            self.support_emails = ','.join(emails)
+        else:
+            self.support_emails = emails
 
-    def getRooms(self):
+    def addSupportEmails(self, *emails):
+        new_support_emails = sorted(set(self.getSupportEmails() + emails))
+        self.support_emails = ','.join(new_support_emails)
+
+    def deleteSupportEmails(self, *emails):
+        support_emails = self.getSupportEmails()
+        for email in emails:
+            if email in emails:
+                support_emails.remove(email)
+        self.setSupportEmails(support_emails)
+
+    #### Aspects #####
+
+    def getAllAspects(self):
+        return self.aspects
+
+    def addAspect(self, aspect):
+        self.aspects.append(aspect)
+
+    def deleteAspect(self, aspect):
+        self.aspects.remove(aspect)
+
+    def getDefaultAspect(self):
+        return self.default_aspect
+
+    def setDefaultAspect(self, aspect):
+        self.default_aspect = aspect
+
+    def isMapAvailable(self):
+        return (self.query
+                    .join(Location.aspects)
+                    .count() > 0)
+
+    #### Room Management ####
+
+    def getAllRooms(self):
         return self.rooms
 
     def addRoom(self, room):
@@ -99,6 +142,8 @@ class Location(db.Model):
 
     def deleteRoom(self, room):
         self.rooms.remove(room)
+
+    #### Default Location Management ####
 
     @staticmethod
     def getDefaultLocation():
@@ -108,11 +153,16 @@ class Location(db.Model):
     def setDefaultLocation(name):
         default_location = Location.getDefaultLocation()
         if default_location:
+            if default_location.name == name:
+                return
             default_location.is_default = False
             db.session.add(default_location)
-        new_default_location = Location.getLocationsByName()
+
+        new_default_location = Location.getLocationByName(name)
         new_default_location.is_default = True
         db.session.add(new_default_location)
+
+    #### Generic Location Management
 
     @staticmethod
     def getLocationById(lid):
@@ -128,7 +178,9 @@ class Location(db.Model):
 
     @staticmethod
     def removeLocationByName(name):
-        db.session.delete(Location.query.first(Location.name == name))
+        db.session.delete(Location.query.filter(Location.name == name).one())
+
+    #### Location Helpers ####
 
     def getAverageOccupation(self):
         rooms = self.rooms.query.filter(Room.is_active and
@@ -167,7 +219,6 @@ class Location(db.Model):
                     .join(Location.rooms)
                     .filter(Room.is_reservable)
                     .all())
-        return self.rooms.query.filter(Room.is_reservable).all()
 
     def getTotalReservableSurfaceArea(self):
         return (self.query
@@ -193,11 +244,14 @@ class Location(db.Model):
             'archivalValid': 0
         }
 
-    def isMapAvailable(self):
-        pass
-
     def getAllBuildings(self):
-        pass
+        return (self.query
+                    .with_entities(Room.building, Room)
+                    .join(Location.rooms)
+                    .filter(Room.building != None)
+                    .group_by(Room.building)
+                    .all())
+
         # # break-down the rooms by buildings
         # buildings = {}
         # for room in rooms:
