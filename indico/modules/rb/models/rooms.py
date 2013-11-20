@@ -26,6 +26,7 @@ from datetime import datetime
 from MaKaC.common.Locators import Locator
 
 from indico.core.db import db
+from indico.modules.rb.models.room_equipments import RoomEquipmentAssociation
 from indico.modules.rb.models.reservations import Reservation
 
 
@@ -74,37 +75,46 @@ class Room(db.Model):
     max_advance_days = db.Column(db.Integer, nullable=False, default=30)
 
     # links to other tables
-    reservations = db.relationship('Reservation',
-                                   backref='room',
-                                   cascade='all, delete-orphan')
+    reservations = db.relationship(
+        'Reservation',
+        backref='room',
+        cascade='all, delete-orphan'
+    )
 
-    bookable_times = db.relationship('BookableTime',
-                                     backref=db.backref('room', order_by='BookableTime.start_time'),
-                                     cascade='all, delete-orphan')
+    bookable_times = db.relationship(
+        'BookableTime',
+        backref=db.backref('room', order_by='BookableTime.start_time'),
+        cascade='all, delete-orphan'
+    )
 
-    nonbookable_dates = db.relationship('NonBookableDate',
-                                        backref=db.backref('room', order_by='NonBookableDate.end_date'), # desc'),
-                                        cascade='all, delete-orphan')
+    nonbookable_dates = db.relationship(
+        'NonBookableDate',
+        backref=db.backref('room', order_by='NonBookableDate.end_date'), # desc'),
+        cascade='all, delete-orphan'
+    )
 
-    photos = db.relationship('Photo',
-                             backref='room',
-                             cascade='all, delete-orphan')
+    photos = db.relationship(
+        'Photo',
+        backref='room',
+        cascade='all, delete-orphan')
 
-    attributes = db.relationship('RoomAttribute',
-                                 backref='room',
-                                 cascade='all, delete-orphan')
+    attributes = db.relationship(
+        'RoomAttribute',
+        backref='room',
+        cascade='all, delete-orphan'
+    )
 
-    blocked_rooms = db.relationship('BlockedRoom',
-                                    backref='room',
-                                    cascade='all, delete-orphan')
+    blocked_rooms = db.relationship(
+        'BlockedRoom',
+        backref='room',
+        cascade='all, delete-orphan'
+    )
 
-    def __init__(self, name, building, floor, number, owner_id, is_reservable=True):
-        self.name = name
-        self.building = building
-        self.floor = floor
-        self.number = number
-        self.owner_id = owner_id
-        self.is_reservable = is_reservable
+    equipments = db.relationship(
+        'RoomEquipment',
+        secondary=RoomEquipmentAssociation,
+        backref='rooms'
+    )
 
     def __str__(self):
         return '{}-{}-{}({})'.format(self.building, self.floor, self.number)

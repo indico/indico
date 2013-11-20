@@ -20,19 +20,62 @@
 """
 Custom attributes for rooms
 """
+import json
+
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 
 
 class RoomAttribute(db.Model):
     __tablename__ = 'room_attributes'
+    __table_args__ = (
+        db.ForeignKeyConstraint(
+            ['parent_key_id', 'parent_room_id'],
+            ['room_attributes.key_id', 'room_attributes.room_id']
+        ),
+        {}
+    )
 
-    key_id = db.Column(db.Integer, db.ForeignKey('room_attribute_keys.id'),
-                       nullable=False, primary_key=True)
-    value = db.Column(db.String, nullable=False)
+    key_id = db.Column(
+        db.Integer,
+        db.ForeignKey('room_attribute_keys.id'),
+        nullable=False,
+        primary_key=True
+    )
 
-    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'),
-                        primary_key=True, nullable=False)
+    raw_data = db.Column(
+        db.String,
+        nullable=False
+    )
+
+    room_id = db.Column(
+        db.Integer,
+        db.ForeignKey('rooms.id'),
+        nullable=False,
+        primary_key=True
+    )
+
+    parent_key_id = db.Column(
+        db.Integer
+    )
+
+    parent_room_id = db.Column(
+        db.Integer,
+    )
+
+    children = db.relationship(
+        'RoomAttribute',
+        backref=db.backref('parent', remote_side=[key_id, room_id])
+    )
+
+    @hybrid_property
+    def value(self):
+        return json.loads(self.raw_data)
+
+    @value.setter
+    def value(self, data):
+        self.raw_data = json.dumps(data)
 
     def __repr__(self):
         return '<RoomAttribute({0}, {1}, {2})>'.format(self.room_id,
