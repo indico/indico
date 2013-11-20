@@ -8,13 +8,16 @@
                     marginTop:'10px',
                     marginBottom: '10px',
                     overflow: 'auto',
-                    listStylePosition: 'inside'
+                    listStylePosition: 'inside',
+                    textAlign: 'left'
                 }});
                 occursdiv.append($T("This applies to all the following ocurrences ({0} in total):".format(occurs.length)));
                 occursdiv.addClass("warningMessage");
+                var occurslist = $("<ul/>")
                 for(var i=0; i<occurs.length; i++) {
-                    occursdiv.append($('<li/>').text(occurs[i]));
+                    occurslist.append($('<li/>').text(occurs[i]));
                 }
+                occursdiv.append(occurslist)
                 content.append(occursdiv);
             }
             return content.get(0);
@@ -452,10 +455,10 @@
                                             % for period in reservation.splitToPeriods():
                                                 ${ formatDate(period.startDT.date()) }
                                                 % if canReject:
-                                                    <a class="roomBookingRejectOccurrence" href="#" onclick="submit_reject_occurrence('${urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL(reservation, date=formatDate(period.startDT.date(), format='%Y-%m-%d'))}', '${formatDate(period.startDT.date())}')">Reject</a>
+                                                    <a class="roomBookingRejectOccurrence" href="#" onclick="submit_reject_occurrence('${urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL(reservation, date=formatDate(period.startDT.date(), format='%Y-%m-%d'))}', '${formatDate(period.startDT.date(), format='%d %b %Y')}');return false;">Reject</a>
                                                 % endif
                                                 % if canCancel:
-                                                    <a class="roomBookingCancelOccurrence" href="#" onclick="submit_cancel_occurrence('${urlHandlers.UHRoomBookingCancelBookingOccurrence.getURL(reservation, date=formatDate(period.startDT.date(), format='%Y-%m-%d'))}', '${formatDate(period.startDT.date())}')">Cancel</a>
+                                                    <a class="roomBookingCancelOccurrence" href="#" onclick="submit_cancel_occurrence('${urlHandlers.UHRoomBookingCancelBookingOccurrence.getURL(reservation, date=formatDate(period.startDT.date(), format='%Y-%m-%d'))}', '${formatDate(period.startDT.date(), format='%d %b %Y')}');return false;">Cancel</a>
                                                 % endif
                                                 <br />
                                             % endfor
