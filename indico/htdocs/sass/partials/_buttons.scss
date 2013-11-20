@@ -163,7 +163,7 @@
     }
 
     &.arrow {
-        @include after-icon("\24");
+        @include icon-after('icon-arrow-down');
 
         &:after {
             vertical-align: -10%;

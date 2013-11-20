@@ -72,6 +72,8 @@
 }
 
 .info-message-box {
+    @include icon-before('icon-info');
+
     background-color: #FAFAFA;
     padding: 8px 14px 8px 14px;
     margin-bottom: 18px;
@@ -82,8 +84,6 @@
 }
 
 .info-message-box:before {
-    font-family: 'icomoon-ultimate';
-    content: "\69";
     color: #BBB;
     display: block;
     float: left;
@@ -99,6 +99,8 @@
 }
 
 .success-message-box {
+    @include icon-before('icon-checkmark');
+
     background-color: #EEFAEE;
     padding: 8px 14px 8px 14px;
     margin-bottom: 18px;
@@ -109,8 +111,6 @@
 }
 
 .success-message-box:before {
-    font-family: 'icomoon-ultimate';
-    content: "\e372";
     color: #BBB;
     display: block;
     float: left;

@@ -136,7 +136,7 @@
             }
 
             &.ui-state-selected .checkbox {
-                @include before-icon("\e372");
+                @include icon-before('icon-checkmark');
                 background: $blue;
                 color: white;
                 width: 35px;

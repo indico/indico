@@ -30,7 +30,7 @@
     overflow-x: hidden;
 
     .handle {
-        @include before-icon("\e001");
+        @include icon-before('icon-handle');
         @include border-left-radius();
         @include border-left();
         @include border-vert();

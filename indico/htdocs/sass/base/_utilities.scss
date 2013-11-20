@@ -29,17 +29,17 @@
     -webkit-font-smoothing: antialiased;
 }
 
-@mixin after-icon($content) {
+@mixin icon-after($icon-class) {
+    @extend .#{$icon-class};
     &:after {
         @extend %adjacent-icon;
-        content: $content;
         margin-left: 0.2em;
     }
 }
 
-@mixin before-icon($content) {
+@mixin icon-before($icon-class) {
+    @extend .#{$icon-class};
     &:before {
         @extend %adjacent-icon;
-        content: $content;
     }
 }
