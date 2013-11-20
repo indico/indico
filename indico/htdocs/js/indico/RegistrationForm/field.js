@@ -229,11 +229,68 @@ ndRegForm.directive('ndRadioField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/radio.tpl.html');
-
         },
 
         link: function(scope) {
             scope.settings.defaultValue = true;
+            scope.dialogs.settings.contentWidth = 'auto';
+            scope.dialogs.settings.editionTable = {
+                sortable: false,
+                actions: ['remove', 'sortable'],
+                colNames:[$T("caption"), $T("billable"), $T("price"), $T("places limit"), $T("enable")],
+                colModel: [
+                        {
+                           name:'caption',
+                           index:'caption',
+                           align: 'center',
+                           sortable:false,
+                           width:160,
+                           editoptions:{size:"30",maxlength:"50"},
+                           editable: true
+                        },
+                        {
+                           name:'billable',
+                           index:'isBillable',
+                           sortable:false,
+                           width:60,
+                           editable: true,
+                           align: 'center',
+                           defaultVal: false,
+                           edittype:'bool_select'
+                        },
+
+                        {
+                           name:'price',
+                           index:'price',
+                           align: 'center',
+                           sortable:false,
+                           width:50,
+                           editable: true,
+                           editoptions:{size:"7",maxlength:"20"}
+
+                        },
+                        {
+                           name:'placesLimit',
+                           index:'placesLimit',
+                           align: 'center',
+                           sortable:false,
+                           width:80,
+                           editable: true,
+                           editoptions:{size:"7",maxlength:"20"}
+
+                        },
+                        {
+                           name:'isEnabled',
+                           index:'isEnabled',
+                           sortable:false,
+                           width:60,
+                           editable: true,
+                           align: 'center',
+                           edittype:'bool_select',
+                           defaultVal: true
+                        }
+                  ]
+            };
         }
     };
 });
@@ -312,13 +369,23 @@ ndRegForm.directive('ndFieldDialog', function(url) {
 
         controller: function($scope) {
             $scope.settings = $scope.$parent.settings;
+            $scope.settings.dialogs = $scope.data;
             $scope.field = $scope.$eval($scope.asyncData);
             $scope.formData = {
+                radioitems: [],
                 input: $scope.field.input
             };
 
+            _.each($scope.field.values.radioitems, function (item, ind) {
+                $scope.formData.radioitems[ind] = {id: item.id, cancelled: item.cancelled}; //A way to initialize properly
+            });
+
             $scope.actions.init = function() {
                 $scope.tabSelected = "tab-options";
+            };
+
+            $scope.addItem = function () {
+                 $scope.formData.radioitems.push({id:'isNew'});
             };
         }
     };

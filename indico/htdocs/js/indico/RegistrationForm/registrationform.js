@@ -41,8 +41,7 @@ ndRegForm.factory('RESTAPI', ['$resource','baseurl', function($resource, baseurl
         Fields: $resource(fieldurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId"},
                             {"enable": {method:'POST', url: fieldurl + "/enable"},
                              "disable": {method:'POST', url: fieldurl + "/disable"},
-                             "move": {method:'POST', url: fieldurl + "/move"},
-                             "items": {method:'POST', url: fieldurl + "/items"}
+                             "move": {method:'POST', url: fieldurl + "/move"}
                             }),
     };
 }]);

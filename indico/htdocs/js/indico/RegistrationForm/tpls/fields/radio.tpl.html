@@ -17,12 +17,12 @@
                 ng-required="field.mandatory"
                 ng-disabled="!hasPlacesLeft(field)"/>
             {{ item.caption }}
-            <span ng-show="isBillable()" class="regFormPrice">
+            <span ng-show="isBillable(field)" class="regFormPrice">
                 {{ item.price }}
             </span>
-            <span ng-show="isBillable()" class="regFormCurrency">
+            <span ng-show="isBillable(field)" class="regFormCurrency">
             </span>
-            <font ng-show="isDisabled()" color="red" style="margin-left:25px;">
+            <font ng-show="isDisabled(field)" color="red" style="margin-left:25px;">
                 ({{ "no places left" | i18n }})
             </font>
             <font ng-show="hasPlacesLeft(field)" color="green" style="font-style:italic; margin-left:25px;">

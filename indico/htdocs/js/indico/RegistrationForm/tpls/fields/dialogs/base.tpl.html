@@ -231,9 +231,15 @@
             </form>
         </div>
         <div ng-if="field.input == 'radio'" class="tab-pane" ng-class="{active: isTabSelected('tab-editItems')}" id="div-editItems">
-            <button id="addButton" class="addItem">{{ 'Create new item' | i18n }}</button>
+            <button id="addButton" class="addItem" ng-click="addItem()">{{ 'Create new item' | i18n }}</button>
             <button id="sortItem"  class="sortItem">{{ 'Sort alphabetically' | i18n }}</button>
-            <div id="editionTable" style="margin-right:20px;margin-top:20px;"></div>
+            <div id="editionTable" style="margin-right:20px;margin-top:20px;">
+            <nd-table
+                data="field.values.radioitems"
+                config="settings.dialogs.editionTable"
+                form-data="formData.radioitems">
+            </nd-table>
+            </div>
         </div>
     </div>
 </div>

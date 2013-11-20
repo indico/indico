@@ -22,6 +22,7 @@
     <nd-dialog nd-field-dialog
         heading="{{ dialogs.settings.title() }}"
         show="dialogs.settings.open"
+        data="dialogs.settings"
         async-data="{{ field }}"
         ok-button="{{ dialogs.settings.okButton() }}"
         cancel-button="{{ 'Cancel' | i18n }}"
