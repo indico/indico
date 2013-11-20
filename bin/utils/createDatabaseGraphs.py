@@ -68,16 +68,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     uml = parser.add_argument_group('UML')
-    uml.add_argument('-p', '--package', help='database connection uri',
-                     nargs='?')
-    uml.add_argument('-u', '--uml_output', help='uml diagram output path',
-                     nargs='?')
+    uml.add_argument('-p', '--package', help='database connection uri')
+    uml.add_argument('-u', '--uml_output', help='uml diagram output path')
 
     schema = parser.add_argument_group('SCHEMA')
-    schema.add_argument('-d', '--database', help='generate schema diagram',
-                        nargs='?')
-    schema.add_argument('-s', '--schema_output', help='schema graph output path',
-                        nargs='?')
+    schema.add_argument('-d', '--database', help='generate schema diagram')
+    schema.add_argument('-s', '--schema_output', help='schema graph output path')
 
     args = parser.parse_args()
 
