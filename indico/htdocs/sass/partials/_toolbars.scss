@@ -108,7 +108,7 @@
     }
 
     .i-button {
-        @include rounded-corners(0);
+        @include border-radius(0);
         border-right: none;
 
         &:not(.label) {

@@ -66,7 +66,3 @@ $color-variation: 15%;
     background: $start-color;
     @include background-image(linear-gradient(top, $start-color, $end-color));
 }
-
-@mixin rounded-corners($radius: 0.2em) {
-    @include border-radius($radius, $radius);
-}
