@@ -313,8 +313,7 @@ ndRegForm.directive('ndTelephoneField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/telephone.tpl.html');
-        }
-        ,
+        },
         link: function(scope) {
             scope.settings.size = true;
         }

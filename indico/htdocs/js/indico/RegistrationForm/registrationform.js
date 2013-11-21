@@ -120,8 +120,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
                 axis: 'y',
                 cursor: 'move',
                 delay: 150,
-                opacity: 0,
-                handle: ".regFormSortableHandle",
+                opacity: 0.5,
+                handle: ".regFormSectionSortableHandle",
                 placeholder: "regFormSortablePlaceHolder"
                 //items: "nd-section"
             };

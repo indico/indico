@@ -1,4 +1,4 @@
-<div ui-sortable><div ng-repeat="field in section.items">
+<div ui-sortable="fieldSortableOptions" ng-model="section.items"><div ng-repeat="field in section.items">
     <div ng-switch="field.input">
         <nd-field ng-switch-when="checkbox" nd-checkbox-field></nd-field>
         <nd-field ng-switch-when="country" nd-country-field></nd-field>

@@ -62,6 +62,16 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI',  function
             }
         });
     };
+
+    $scope.api.moveField = function(field, position) {
+        RESTAPI.Fields.move({confId: $rootScope.confId,
+                             sectionId: $scope.section.id,
+                             fieldId: field.id,
+                             endPos: position
+        },  function(data) {
+                $scope.field = data;
+            });
+    };
 }]);
 
 ndRegForm.directive('ndSection', function(url) {
@@ -147,6 +157,24 @@ ndRegForm.directive("ndGeneralSection", function($timeout) {
 
             scope.api.commitNewField = function() {
 
+            };
+
+            scope.fieldSortableOptions = {
+                start: function(e, ui ){
+                    ui.placeholder.height(ui.helper.outerHeight());
+                },
+
+                update: function(e, ui) {
+                    scope.api.moveField(ui.item.scope().field, ui.item.index());
+                },
+
+                axis: 'y',
+                cursor: 'move',
+                delay: 150,
+                opacity: 0.5,
+                handle: ".regFormFieldSortableHandle",
+                placeholder: "regFormSortablePlaceHolder"
+                //items: "nd-section"
             };
 
         }

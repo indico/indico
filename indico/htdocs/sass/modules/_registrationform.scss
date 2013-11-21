@@ -143,6 +143,7 @@
     width:700px;
     padding-bottom:25px;
     margin-top:25px;
+    background-color: #fff;
 }
 
 .regFormSectionNewSection {
@@ -567,16 +568,21 @@ div[data-field-type="file"] img.icon {
     background-position: -144px -96px;
 }
 
-.regFormSortableHandle {
+.regFormSectionSortableHandle {
     background-color: #CCC;
-    min-height: 10px;
+    height: 10px;
+    cursor: move;
+}
+
+.regFormFieldSortableHandle {
+    background-color: #CCC;
+    width: 5px;
     cursor: move;
 }
 
 .regFormSortablePlaceHolder {
     background-color: #EEE;
     min-height: 100%;
-    box-shadow: 2px 2px 3px $gray;
     display: block;
-    border: 1px solid #
+    border: 1px dashed #ccc;
 }
