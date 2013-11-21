@@ -1,0 +1,48 @@
+<table>
+    <thead>
+        <tr role="rowheader">
+            <th ng-if="config.actions.indexOf('sortable') > -1"></th>
+            <th ng-repeat="elem in config.colNames" style="width: {{config.colModel[$index].width}}px;">
+                {{ elem }}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="item in formData | filter: matchFilter" role="row" id="{{ item.id }}">
+            <td ng-if="config.actions.indexOf('sortable') > -1">
+                <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
+            </td>
+            <td ng-repeat="elem in config.colModel"
+                role="gridcell"
+                style="text-align: {{ elem.align }};"
+                name="{{ elem.name }}"
+                title="{{ item[elem.index] }}">
+                <span ng-if="elem.editable == undefined || elem.editable == false">
+                    {{ data[$parent.$parent.$index][elem.index] }}
+                </span>
+                <input ng-if="elem.editable == true && (elem.edittype == 'text' || elem.edittype == undefined)"
+                    ng-model="formData[$parent.$parent.$index][elem.index]"
+                    ng-init="formData[$parent.$parent.$index][elem.index]=data[$parent.$parent.$index][elem.index]"
+                    type="text"
+                    size="{{elem.editoptions.size}}"
+                    maxlength="{{elem.editoptions.maxlength}}"
+                    name="{{ elem.name }}"
+                    class="editable"/>
+                <input ng-if="elem.edittype == 'bool_select'"
+                    ng-model="formData[$parent.$parent.$index][elem.index]"
+                    ng-init="formData[$parent.$parent.$index][elem.index]=data[$parent.$parent.$index][elem.index]"
+                    type="checkbox"
+                    name="{{elem.name}}"/>
+            </td>
+
+            <td ng-if="config.actions.indexOf('remove') > -1">
+                <a class="i-button icon-remove" ng-click="actionItem(formData[$parent.$index], 'remove')"></a>
+            </td>
+            <td ng-repeat="action in config.actions | filter: actionIsArray" >
+                <a ng-if="actionIsArray(action)" ng-click="actionItem(formData[$parent.$parent.$index], action[0])" class="i-button {{ action[3] }}"
+                   title="{{ action[1] }}">
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
