@@ -566,3 +566,17 @@ div[data-field-type="country"] img.icon {
 div[data-field-type="file"] img.icon {
     background-position: -144px -96px;
 }
+
+.regFormSortableHandle {
+    background-color: #CCC;
+    min-height: 10px;
+    cursor: move;
+}
+
+.regFormSortablePlaceHolder {
+    background-color: #EEE;
+    min-height: 100%;
+    box-shadow: 2px 2px 3px $gray;
+    display: block;
+    border: 1px solid #
+}

@@ -1,16 +1,18 @@
 <div class="RegistrationForm">
     <div ng-include="getTpl('toolbar.tpl.html')"></div>
-    <div ng-repeat="section in sections" ng-show="section.enabled">
-        <div ng-switch="section._type">
-            <div ng-switch-default nd-section nd-general-section></div>
-            <div ng-switch-when="PersonalDataForm" nd-section nd-general-section nd-personal-data-section></div>
-            <div ng-switch-when="AccommodationForm" nd-section nd-accommodation-section></div>
-            <div ng-switch-when="FurtherInformationForm" nd-section nd-further-information-section></div>
-            <div ng-switch-when="ReasonParticipationForm" nd-section nd-reason-section></div>
-            <div ng-switch-when="SessionsForm" nd-section nd-sessions-section></div>
-            <div ng-switch-when="SocialEventForm" nd-section nd-social-event-section></div>
+    <div ui-sortable="sectionSortableOptions" ng-model="sections">
+        <div ng-repeat="section in sections" ng-show="section.enabled">
+            <div ng-switch="section._type">
+                <div ng-switch-default nd-section nd-general-section></div>
+                <div ng-switch-when="PersonalDataForm" nd-section nd-general-section nd-personal-data-section></div>
+                <div ng-switch-when="AccommodationForm" nd-section nd-accommodation-section></div>
+                <div ng-switch-when="FurtherInformationForm" nd-section nd-further-information-section></div>
+                <div ng-switch-when="ReasonParticipationForm" nd-section nd-reason-section></div>
+                <div ng-switch-when="SessionsForm" nd-section nd-sessions-section></div>
+                <div ng-switch-when="SocialEventForm" nd-section nd-social-event-section></div>
+            </div>
         </div>
-    </div>
+  </div>
 
     <nd-dialog nd-add-section-dialog
         show="dialogs.addsection"

@@ -16,6 +16,7 @@
  */
 
 var ndRegForm = angular.module('nd.regform', [
+    'ui.sortable',
     'ngResource'
 ]);
 
@@ -96,7 +97,33 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
                         function(newsection, headers) {
                             $scope.sections.push(newsection);
                     });
+                },
+                moveSection: function(section, position){
+                    RESTAPI.Sections.move({confId: $scope.confId,
+                                           sectionId: section.id,
+                                           endPos: position},
+                        function(section_updated, headers) {
+                            section = section_updated;
+                    });
+
                 }
+            };
+
+            $scope.sectionSortableOptions = {
+                start: function(e, ui ){
+                    ui.placeholder.height(ui.helper.outerHeight());
+                },
+
+                update: function(e, ui) {
+                    $scope.api.moveSection(ui.item.scope().section, ui.item.index());
+                },
+                axis: 'y',
+                cursor: 'move',
+                delay: 150,
+                opacity: 0,
+                handle: ".regFormSortableHandle",
+                placeholder: "regFormSortablePlaceHolder"
+                //items: "nd-section"
             };
         }
     };
