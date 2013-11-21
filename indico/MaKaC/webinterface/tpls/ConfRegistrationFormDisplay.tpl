@@ -12,7 +12,10 @@
             <td nowrap align="center" class="title" style="padding-bottom:20px;">${ title }</td>
         </tr>
         % endif
-    <div id="registrationForm"></div>
+        <div ng-app="nd" ng-controller="AppCtrl">
+            <div nd-reg-form conf-id="${confId}"></div>
+            <input type="hidden" value="${confId}" id="conf_id">
+        </div>
         <tr>
             <td class="regFormMandatoryInfo">
                 <span>${ _("(All the fields marked with ") }</span>
@@ -64,7 +67,7 @@
 
         $(function() {
             var confId = ${ confId };
-            var rfView = new RegFormDisplayView({el : $("div#registrationForm")} ,confId );
+            //var rfView = new RegFormDisplayView({el : $("div#registrationForm")} ,confId );
             $(".regFormButton").click(function(){
                 var self = this;
                 new ConfirmPopup($T("Registration"),$T("Are you sure you want to submit this form?"), function(confirmed) {

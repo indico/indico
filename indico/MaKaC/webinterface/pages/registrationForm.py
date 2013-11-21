@@ -428,7 +428,7 @@ class WPRegistrationFormDisplay( conferences.WPConferenceDefaultDisplayBase ):
     def getJSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
             self._includeJSPackage('Management') + \
-            self._includeJSPackage('regform_display')
+            self._includeJSPackage('regform')
 
     def _getBody(self, params):
         wc = WConfRegistrationFormDisplay(self._conf, self._rh._getUser())
@@ -1023,7 +1023,7 @@ class WPRegistrationFormModify( conferences.WPConferenceDefaultDisplayBase ):
 
     def getJSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-            self._includeJSPackage('regform_display')
+            self._includeJSPackage('regform')
 
     def _getBody(self, params):
         wc = WConfRegistrationFormModify(self._conf, self._rh._getUser())
