@@ -82,6 +82,8 @@ from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.common.TemplateExec import render
 
+from indico.modules.rb.views.user.index import WRoomBookingChooseEvent
+
 
 def stringToDate(str):
 
@@ -7611,18 +7613,18 @@ class WPConfModifRoomBookingBase( WPConferenceModifBase ):
 
 # 0. Choosing an "event" (conference / session / contribution)...
 
-class WPConfModifRoomBookingChooseEvent( WPConfModifRoomBookingBase ):
+class WPConfModifRoomBookingChooseEvent(WPConfModifRoomBookingBase):
 
-    def __init__( self, rh ):
+    def __init__(self, rh):
         self._rh = rh
-        WPConfModifRoomBookingBase.__init__( self, rh, rh._conf )
+        super(WPConfModifRoomBookingChooseEvent, self).__init__(rh, rh._conf)
 
-    def _getTabContent( self, params ):
-        wc = wcomponents.WRoomBookingChooseEvent( self._rh )
-        return wc.getHTML( params )
+    def _getTabContent(self, params):
+        return WRoomBookingChooseEvent(self._rh).getHTML(params)
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._tabNewBooking.setActive()
+
 
 # 1. Searching...
 

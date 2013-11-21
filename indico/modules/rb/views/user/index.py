@@ -36,3 +36,17 @@ class WRoomBookingWelcome(WTemplated):
 
     def getVars(self):
         return WTemplated.getVars(self)
+
+
+class WRoomBookingChooseEvent(WTemplated):
+
+    def __init__(self, rh):
+        self._rh = rh
+
+    def getVars(self):
+        wvars = super(WRoomBookingChooseEvent, self).getVars()
+
+        wvars["conference"] = self._rh._conf
+        wvars["contributions"] = [c for c in self._rh._conf.getContributionList() if c.getStartDate()]
+
+        return wvars
