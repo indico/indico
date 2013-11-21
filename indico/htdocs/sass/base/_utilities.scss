@@ -30,7 +30,7 @@
 }
 
 @mixin icon-after($icon-class) {
-    @extend .#{$icon-class};
+    @extend .#{$icon-class}-after;
     &:after {
         @extend %adjacent-icon;
         margin-left: 0.2em;

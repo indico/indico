@@ -285,3 +285,8 @@ you can use the generic selector below, but it's slower:
 .icon-seven-segment9:before {
     content: "\e48b";
 }
+
+/* KEEP THE FOLLOWING DEFINITIONS: necessery when rendering the icon 'after' e.g. mixin icon-after */
+.icon-arrow-down-after:after {
+    content: "\24";
+}
