@@ -3063,8 +3063,8 @@ class GeneralSectionForm(BaseForm, Fossilizable):
     def getDescription(self):
         return self._description
 
-    def setDescription(self, n):
-        self._description = n
+    def setDescription(self, description):
+        self._description = description
 
     def isRequired(self):
         try:

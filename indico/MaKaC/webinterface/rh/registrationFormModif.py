@@ -444,6 +444,28 @@ class RHRegistrationFormSectionMove(RHRegistrationFormModifSectionBase):
         return json.dumps(self._section.fossilize())
 
 
+class RHRegistrationFormSectionTitle(RHRegistrationFormModifSectionBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._sectionTitle = post_pm.extract('title', pType=str, allowEmpty=False)
+
+    def _process_POST(self):
+        self._section.setTitle(self._sectionTitle)
+        return json.dumps(self._section.fossilize())
+
+
+class RHRegistrationFormSectionDescription(RHRegistrationFormModifSectionBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._sectionDescription = post_pm.extract('description', pType=str, allowEmpty=True)
+
+    def _process_POST(self):
+        self._section.setDescription(self._sectionDescription)
+        return json.dumps(self._section.fossilize())
+
+
 class RHRegistrationFormAccommodationSetConfig(RHRegistrationFormModifAccomodationBase):
 
     def _checkParams_POST(self):

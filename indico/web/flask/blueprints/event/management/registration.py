@@ -65,6 +65,14 @@ event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/move',
                         'confModifRegistrationPreviewSection-move',
                         registrationFormModif.RHRegistrationFormSectionMove,
                         methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/title',
+                        'confModifRegistrationPreviewSection-title',
+                        registrationFormModif.RHRegistrationFormSectionTitle,
+                        methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/description',
+                        'confModifRegistrationPreviewSection-description',
+                        registrationFormModif.RHRegistrationFormSectionDescription,
+                        methods=('POST',))
 event_mgmt.add_url_rule('/registration/preview/sections/accommodation',
                         'confModifRegistrationPreviewSection-accommodation-config',
                         registrationFormModif.RHRegistrationFormAccommodationSetConfig,

@@ -1,8 +1,9 @@
 <div id="{{ section.id }}" class="regFormSectionMgmt">
     <div class="regFormSectionSortableHandle"/>
     <div class="regFormHeaderMgmt">
-        <span class="regFormSectionTitle">
-            {{ section.title }}
+        <span class="regFormSectionTitle"
+            ng-model="section.title"
+            contenteditable>
         </span>
         <span nd-section-toolbar
             section="section"
@@ -14,8 +15,9 @@
     </div>
 
     <div ng-switch="section.id" class="regFormSectionContent regFormIsDragAndDrop">
-        <div class="regFormSectionDescription">
-            {{ section.description }}
+        <div class="regFormSectionDescription"
+            ng-model="section.description"
+            contenteditable>
         </div>
         <div ng-switch-default
             ng-include="getTpl('sections/general.tpl.html')">
@@ -36,6 +38,7 @@
             ng-include="getTpl('sections/socialevents.tpl.html')">
         </div>
     </div>
+
     <nd-dialog nd-section-dialog
         ng-if="buttons.config"
         heading="Settings: {{ section.title }}"

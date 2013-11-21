@@ -15,9 +15,16 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI',  function($scope, $rootScope, RESTAPI) {
+ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function($scope, $rootScope, RESTAPI) {
     $scope.api = {};
     $scope.actions = {};
+
+    var getPostData = function(section) {
+        return {
+            confId: $rootScope.confId,
+            sectionId: section.id
+        };
+    };
 
     $scope.api.createSection = function(section) {
         // TODO see how to push a section into the list of sections
@@ -43,12 +50,30 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI',  function
     };
 
     $scope.api.saveConfig = function(section, data) {
-        var postData = {confId: $rootScope.confId, sectionId: section.id};
-        _.extend(postData, data);
+        var postData = getPostData(section);
+        postData = angular.extend(postData, data);
         //postData.items = _.values(postData.items);
         RESTAPI.Sections.save(postData, function(sectionUpdated) {
             $scope.$parent.section = sectionUpdated;
             //TODO: why not with section variable?
+        });
+    };
+
+    $scope.api.updateTitle = function(section, data) {
+        var postData = getPostData(section);
+        postData = angular.extend(postData, data);
+
+        RESTAPI.Sections.title(postData, function(sectionUpdated) {
+            $scope.$parent.section = sectionUpdated;
+        });
+    };
+
+    $scope.api.updateDescription = function(section, data) {
+        var postData = getPostData(section);
+        postData = angular.extend(postData, data);
+
+        RESTAPI.Sections.description(postData, function(sectionUpdated) {
+            $scope.$parent.section = sectionUpdated;
         });
     };
 
@@ -110,6 +135,18 @@ ndRegForm.directive('ndSection', function(url) {
                     content.slideUp();
                 } else {
                     content.slideDown();
+                }
+            });
+
+            scope.$watch('section.title', function(newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    scope.api.updateTitle(scope.section, {title: newVal});
+                }
+            });
+
+            scope.$watch('section.description', function(newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    scope.api.updateDescription(scope.section, {description: newVal});
                 }
             });
 
