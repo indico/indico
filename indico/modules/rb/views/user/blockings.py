@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from operator import attrgetter
+
 from MaKaC.webinterface.wcomponents import WTemplated
 
 from indico.modules.rb.views import WPRoomBookingBase

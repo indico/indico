@@ -155,8 +155,10 @@ class WRoomBookingRoomList(WTemplated):
         self._standalone = standalone
         self._title = None
         self._onlyMy = onlyMy
-        try: self._title = self._rh._title;
-        except: pass
+        try:
+            self._title = self._rh._title;
+        except:
+            pass
 
     def getVars(self):
         wvars = super(WRoomBookingRoomList, self).getVars()
@@ -236,12 +238,12 @@ class WRoomBookingSearch4Rooms(WTemplated):
             # URLs for standalone room booking
             wvars["roomBookingRoomListURL"] = urlHandlers.UHRoomBookingRoomList.getURL(None)
             wvars["detailsUH"] = urlHandlers.UHRoomBookingRoomDetails
-            wvars["bookingFormUH"] =  urlHandlers.UHRoomBookingBookingForm
+            wvars["bookingFormUH"] = urlHandlers.UHRoomBookingBookingForm
         else:
             # URLs for room booking in the event context
             wvars["roomBookingRoomListURL"] = urlHandlers.UHConfModifRoomBookingRoomList.getURL(self._rh._conf)
             wvars["detailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
-            wvars["bookingFormUH"] =  urlHandlers.UHConfModifRoomBookingBookingForm
+            wvars["bookingFormUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
 
         return wvars
 
@@ -276,14 +278,15 @@ class WRoomBookingRoomDetails(WTemplated):
     def getVars(self):
         wvars = super(WRoomBookingRoomDetails, self).getVars()
         wvars["room"] = self._rh._room
-        goodFactory = Location.parse( self._rh._room.locationName ).factory
+        goodFactory = Location.parse(self._rh._room.locationName).factory
         attributes = goodFactory.getCustomAttributesManager().getAttributes(location=self._rh._room.locationName)
         wvars["attrs"] = {}
         for attribute in attributes:
             if not attribute.get("hidden", False) or self._rh._getUser().isAdmin():
                 wvars["attrs"][attribute['name']] = self._rh._room.customAtts.get(attribute['name'],"")
-                if attribute['name'] == 'notification email' :
+                if attribute['name'] == 'notification email':
                     wvars["attrs"][attribute['name']] = wvars["attrs"][attribute['name']].replace(',', ', ')
+
         wvars["config"] = Config.getInstance()
         wvars["standalone"] = self._standalone
         wvars["actionSucceeded"] = self._rh._afterActionSucceeded
@@ -360,6 +363,12 @@ class WRoomBookingRoomDetails(WTemplated):
         # wvars["Bar"] = Bar
         wvars["withConflicts"] = False
         wvars["currentUser"] = self._rh._aw.getUser()
+
+        room_mapper = RoomMapperHolder().match({"placeName": self._rh._room.locationName}, exact=True)
+        if room_mapper:
+            wvars["show_on_map"] = room_mapper[0].getMapURL(self._rh._room.name)
+        else:
+            wvars["show_on_map"] = urlHandlers.UHRoomBookingMapOfRooms.getURL(roomID=self._rh._room.id)
 
         return wvars
 

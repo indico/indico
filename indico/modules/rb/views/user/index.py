@@ -34,9 +34,6 @@ class WRoomBookingWelcome(WTemplated):
     def __init__(self):
         self.__adminList = AdminList.getInstance()
 
-    def getVars(self):
-        return WTemplated.getVars(self)
-
 
 class WRoomBookingChooseEvent(WTemplated):
 

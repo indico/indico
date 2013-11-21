@@ -329,31 +329,33 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
             "useVC": getattr(c, 'useVC', False)
         }
 
-    def _getErrorsOfResvCandidate( self, c ):
+    def _getErrorsOfResvCandidate(self, c):
         errors = []
         self._thereAreConflicts = False
         if not c.bookedForName and not c.bookedForUser:
-            errors.append( "Booked for can not be blank" )
+            errors.append(_("Booked for can not be blank"))
         if not c.reason:
-            errors.append( "Purpose can not be blank" )
+            errors.append(_("Purpose can not be blank"))
         if not c.isRejected and not c.isCancelled:
-            collisions = c.getCollisions( sansID = self._candResv.id )
-            if len( collisions ) > 0:
+            collisions = c.getCollisions(sansID=self._candResv.id)
+            if len(collisions) > 0:
                 if self._skipConflicting and c.startDT.date() != c.endDT.date():
                     for collision in collisions:
-                        c.excludeDay( collision.startDT.date() )
+                        c.excludeDay(collision.startDT.date())
                 else:
                     self._thereAreConflicts = True
-                    errors.append( "There are conflicts with other bookings" )
+                    errors.append(_("There are conflicts with other bookings"))
             blockedDates = c.getBlockedDates(c.createdByUser())
-            if len( blockedDates ):
+            if len(blockedDates):
                 if self._skipConflicting and c.startDT.date() != c.endDT.date():
                     for blockedDate in blockedDates:
-                        c.excludeDay( blockedDate )
+                        c.excludeDay(blockedDate)
                 else:
                     self._thereAreConflicts = True
-                    errors.append( "There are conflicts with blockings" )
-
+                    errors.append(_("You cannot book this room on this date "
+                                    "because the reservations during this period "
+                                    "have been blocked by somebody else. "
+                                    "Please try with another room or date"))
         return errors
 
     def _loadResvCandidateFromSession( self, candResv, params ):

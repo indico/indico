@@ -59,8 +59,8 @@ class WRoomBookingRoomForm(WTemplated):
         wvars["showErrors"] = self._rh._showErrors
         wvars["errors"] = self._rh._errors
 
-        wvars["insert"] = ( candRoom.id == None)
-        wvars["attrs"] = goodFactory.getCustomAttributesManager().getAttributes(location=candRoom.locationName )
+        wvars["insert"] = (candRoom.id == None)
+        wvars["attrs"] = goodFactory.getCustomAttributesManager().getAttributes(location=candRoom.locationName)
         resp = candRoom.getResponsible()
         if resp:
             wvars["responsibleName"] = resp.getFullName()

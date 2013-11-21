@@ -79,19 +79,21 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         self._forVideoConference = ('Video conference' in possibleEquipments) and (request.args.get('avc') == 'y')
 
     def _process(self):
-        params = request.args
+        params = request.args  # dict(self._getRequestParams())
         params['lang'] = session.lang
-        params['user'] = self._aw.getSession().getUser().getId()
+        params['user'] = session.user.getId()
         key = str(sorted(params.iteritems()))
         html = self._cache.get(key)
         if not html:
             self._businessLogic()
-            page = room_views.WPRoomBookingMapOfRoomsWidget(self,
-                                                            self._aspects,
-                                                            self._buildings,
-                                                            self._defaultLocation,
-                                                            self._forVideoConference,
-                                                            self._roomID)
+            page = room_views.WPRoomBookingMapOfRoomsWidget(
+                self,
+                self._aspects,
+                self._buildings,
+                self._defaultLocation,
+                self._forVideoConference,
+                self._roomID
+            )
             html = page.display()
             self._cache.set(key, html, 300)
         return html

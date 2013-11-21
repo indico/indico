@@ -35,6 +35,16 @@ class RHRoomBookingBlockingDetails(RHRoomBookingBase):
 
 class RHRoomBookingBlockingForm(RHRoomBookingBase):
 
+    def _isOverlapping(self):
+        # date overlapping
+        for block in RoomBlockingBase.getByDateSpan(self._startDate, self._endDate):
+            # check for itself
+            if self._block.id != block.id:
+                # room overlapping
+                if any(block.getBlockedRoom(room) for room in self._blockedRooms):
+                    return True
+        return False
+
     def _checkParams(self, params):
 
         self._action = params.get('action')
@@ -48,7 +58,7 @@ class RHRoomBookingBlockingForm(RHRoomBookingBase):
             self._block.startDate = date.today()
             self._block.endDate = date.today()
 
-        self._hasErrors = False
+        self._errorMessage = False
         if self._action == 'save':
             from MaKaC.services.interface.rpc import json
             self._reason = params.get('reason', '').strip()
@@ -63,16 +73,19 @@ class RHRoomBookingBlockingForm(RHRoomBookingBase):
                 self._startDate = self._endDate = None
 
             self._blockedRooms = [RoomGUID.parse(guid).getRoom() for guid in blockedRoomGuids]
-            self._allowedUsers = [RoomBlockingPrincipal.getByTypeId(fossil['_type'], fossil['id']) for fossil in allowedUsers]
+            self._allowedUsers = [RoomBlockingPrincipal.getByTypeId(fossil['_type'], fossil['id'])
+                                  for fossil in allowedUsers]
 
             if not self._reason or not self._blockedRooms:
-                self._hasErrors = True
+                self._errorMessage = _('Please check blocked rooms and reason for blocking.')
             elif self._createNew and (not self._startDate or not self._endDate or self._startDate > self._endDate):
-                self._hasErrors = True
+                self._errorMessage = _('Please check your blocking dates.')
+            elif self._isOverlapping():
+                self._errorMessage = _('Your blocking is overlapping with other blockings.')
 
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
-        if not self._doProcess: # if we are not logged in
+        if not self._doProcess:  # if we are not logged in
             return
         if not self._createNew:
             if not self._block.canModify(self._getUser()):
@@ -82,7 +95,7 @@ class RHRoomBookingBlockingForm(RHRoomBookingBase):
                 raise MaKaCError("Only users who own at least one room are allowed to create blockings.")
 
     def _process(self):
-        if self._action == 'save' and not self._hasErrors:
+        if self._action == 'save' and not self._errorMessage:
             self._block.message = self._reason
             if self._createNew:
                 self._block.createdByUser = self._getUser()
@@ -109,7 +122,7 @@ class RHRoomBookingBlockingForm(RHRoomBookingBase):
                 self._block.update()
             self._redirect(urlHandlers.UHRoomBookingBlockingsBlockingDetails.getURL(self._block))
 
-        elif self._action == 'save' and self._createNew and self._hasErrors:
+        elif self._action == 'save' and self._createNew and self._errorMessage:
             # If we are creating a new blocking and there are errors, populate the block object anyway to preserve the entered values
             self._block.message = self._reason
             self._block.startDate = self._startDate
@@ -118,8 +131,8 @@ class RHRoomBookingBlockingForm(RHRoomBookingBase):
             for room in self._blockedRooms:
                 self._block.addBlockedRoom(BlockedRoom(room))
 
-        p = roomBooking_wp.WPRoomBookingBlockingForm(self, self._block, self._hasErrors)
-        return p.display()
+        return roomBooking_wp.WPRoomBookingBlockingForm(self, self._block,
+                                                        self._errorMessage).display()
 
     @property
     def _createNew(self):

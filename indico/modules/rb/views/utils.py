@@ -32,43 +32,43 @@ class Bar( Fossilizable ):
     Keeps data necessary for graphical bar on calendar.
     """
     fossilizes(IBarFossil)
-    PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT = xrange( 0, 6 )
+    BLOCKED, PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT = xrange(0, 7)
     # I know this names are not wisely choosed; it's due to unexpected additions
     # without refactoring
-    # UNAVAILABLE :   represents confirmed reservation (bright-red)
+    # BLOCKED:        room is blocked (dark-gray)
     # CANDIDATE:      represents new reservation (green)
     # CONFLICT:       overlap between candidate and confirmed resv. (dark red)
     # PREBOOKED:      represents pre-reservation (yellow)
     # PRECONFLICT:    represents conflict with pre-reservation (orange)
     # PRECONCURRENT:  conflicting pre-reservations
+    # UNAVAILABLE :   represents confirmed reservation (bright-red)
 
-    def __init__( self, c, barType ):
+    def __init__(self, c, barType):
         self.startDT = c.startDT
         self.endDT = c.endDT
         self.forReservation = c.withReservation
         self.type = barType
 
-    def __cmp__( self, obj ):
-        return cmp( self.type, obj.type )
+    def __cmp__(self, obj):
+        return cmp(self.type, obj.type)
 
 
-class RoomBars( Fossilizable ):
+class RoomBars(Fossilizable):
 
     fossilizes(IRoomBarFossil)
 
     room = None
     bars = []
 
-    def __init__( self, room, bars ):
+    def __init__(self, room, bars):
         self.room = room
         self.bars = bars
-    def __cmp__( self, obj ):
-        return cmp( self.room, obj.room )
+
+    def __cmp__(self, obj):
+        return cmp(self.room, obj.room)
 
 
-# 3. Details of...
-
-def barsList2Dictionary( bars ):
+def barsList2Dictionary(bars):
     """
     Converts:
     list of bars => dictionary of bars, key = datetime, value = list of bars
@@ -76,13 +76,14 @@ def barsList2Dictionary( bars ):
     h = {}
     for bar in bars:
         d = bar.startDT.date()
-        if h.has_key( d ):
-            h[d].append( bar )
+        if h.has_key(d):
+            h[d].append(bar)
         else:
             h[d] = [bar]
     return h
 
-def addOverlappingPrebookings( bars ):
+
+def addOverlappingPrebookings(bars):
     """
     Adds bars representing overlapping pre-bookings.
     Returns new bars dictionary.
@@ -93,26 +94,28 @@ def addOverlappingPrebookings( bars ):
         dayBars = bars[dt]
 
         # For each (prebooked) bar i
-        for i in xrange( 0, len( dayBars ) ):
+        for i in xrange(0, len(dayBars)):
             bar = dayBars[i]
             if bar.type == Bar.PREBOOKED:
 
                 # For each (prebooked) bar j
-                for j in xrange( i+1, len( dayBars ) ):
+                for j in xrange(i+1, len(dayBars)):
                     collCand = dayBars[j]
                     if collCand.type == Bar.PREBOOKED:
 
                         # If there is an overlap, add PRECONCURRENT bar
-                        over = overlap( bar.startDT, bar.endDT, collCand.startDT, collCand.endDT )
-                        if over and bar.forReservation.room == collCand.forReservation.room and collCand.forReservation != bar.forReservation:
-                            collision = Collision( over, collCand.forReservation )
-                            dayBars.append( Bar( collision, Bar.PRECONCURRENT ) )
+                        over = overlap(bar.startDT, bar.endDT, collCand.startDT, collCand.endDT)
+                        if (over and bar.forReservation.room == collCand.forReservation.room and
+                            collCand.forReservation != bar.forReservation):
+                            collision = Collision(over, collCand.forReservation)
+                            dayBars.append(Bar(collision, Bar.PRECONCURRENT))
 
         bars[dt] = dayBars # With added concurrent prebooking bars
 
     return bars
 
-def sortBarsByImportance( bars, calendarStartDT, calendarEndDT ):
+
+def sortBarsByImportance(bars, calendarStartDT, calendarEndDT):
     """
     Moves conflict bars to the end of the list,
     so they will be drawn last and therefore be visible.
@@ -124,22 +127,25 @@ def sortBarsByImportance( bars, calendarStartDT, calendarEndDT ):
         dayBars.sort()
         bars[dt] = dayBars
 
-    for day in iterdays( calendarStartDT, calendarEndDT ):
-        if not bars.has_key( day.date() ):
+    for day in iterdays(calendarStartDT, calendarEndDT):
+        if not bars.has_key(day.date()):
            bars[day.date()] = []
 
     return bars
 
-def getRoomBarsList( rooms ):
+
+def getRoomBarsList(rooms):
     roomBarsList = []
     if rooms is None:
-        rooms=[]
+        rooms = []
     for room in rooms:
-        roomBarsList.append( RoomBars( room, [] ) )
+        roomBarsList.append(RoomBars(room, []))
     roomBarsList.sort()
     return roomBarsList
 
-def introduceRooms( rooms, dayBarsDic, calendarStartDT, calendarEndDT, showEmptyDays=True, showEmptyRooms=True, user = None ):
+
+def introduceRooms(rooms, dayBarsDic, calendarStartDT, calendarEndDT,
+                   showEmptyDays=True, showEmptyRooms=True, user=None):
     # Input:
     # dayBarsDic is a dictionary date => [bar1, bar2, bar3, ...]
     #
@@ -147,30 +153,31 @@ def introduceRooms( rooms, dayBarsDic, calendarStartDT, calendarEndDT, showEmpty
     # newDayBarsDic is a dictionary date => [roomBars1, roomBars2, roomBars3, ...],
     # where roomBars is object JSON:{ room: RoomBase, bars: [bar1, bar2, bar3, ...] }
     #import copy
-    #cleanRoomBarsList = getRoomBarsList( rooms )
+    #cleanRoomBarsList = getRoomBarsList(rooms)
     newDayBarsDic = {}
     from MaKaC.common.utils import formatDate
-    for day in iterdays( calendarStartDT, calendarEndDT ):
+    for day in iterdays(calendarStartDT, calendarEndDT):
         dayBars = dayBarsDic[day.date()]
         roomBarsDic = {}
         for bar in dayBars:
-#            bar.canReject = False
-#            bar.canReject = bar.forReservation.id is not None and bar.forReservation.canReject(user)
-#            if bar.forReservation.repeatability != None:
-#                bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( bar.forReservation, formatDate(bar.startDT.date()) ))
-#            else:
-#                bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBooking.getURL( bar.forReservation ))
+           # bar.canReject = False
+           # bar.canReject = bar.forReservation.id is not None and bar.forReservation.canReject(user)
+           # if bar.forReservation.repeatability != None:
+           #     bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBookingOccurrence
+           #                                    .getURL(bar.forReservation, formatDate(bar.startDT.date())))
+           # else:
+           #     bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBooking.getURL(bar.forReservation))
             room = bar.forReservation.room
-            if not roomBarsDic.has_key( room ):
+            if not roomBarsDic.has_key(room):
                 roomBarsDic[room] = []
             # Bars order should be preserved
-            roomBarsDic[room].append( bar )
+            roomBarsDic[room].append(bar)
 
         if showEmptyRooms:
-            dayRoomBarsList = getRoomBarsList( rooms ) #copy.copy( cleanRoomBarsList )
+            dayRoomBarsList = getRoomBarsList(rooms)  # copy.copy(cleanRoomBarsList)
 
             for roomBar in dayRoomBarsList:
-                roomBar.bars = roomBarsDic.get( roomBar.room, [] )
+                roomBar.bars = roomBarsDic.get(roomBar.room, [])
         else:
             dayRoomBarsList = []
             for room in roomBarsDic.keys():
@@ -181,6 +188,7 @@ def introduceRooms( rooms, dayBarsDic, calendarStartDT, calendarEndDT, showEmpty
 
     return newDayBarsDic
 
+
 def getDayAttrsForRoom(dayDT, room):
     attrs = {'tooltip': '', 'className': ''}
     roomBlocked = room.getBlockedDay(dayDT)
@@ -188,17 +196,22 @@ def getDayAttrsForRoom(dayDT, room):
         block = roomBlocked.block
     if roomBlocked and block.canOverride(ContextManager.get('currentUser'), explicitOnly=True):
         attrs['className'] = "blocked_permitted"
-        attrs['tooltip'] = _('Blocked by %s:\n%s\n\n<b>You are permitted to override the blocking.</b>') % (block.createdByUser.getFullName(), block.message)
+        attrs['tooltip'] = _('Blocked by %s:\n%s\n\n<b>You are permitted to '
+                             'override the blocking.</b>') % (block.createdByUser.getFullName(), block.message)
     elif roomBlocked and roomBlocked.active is True:
         if block.canOverride(ContextManager.get('currentUser'), room):
             attrs['className'] = "blocked_override"
-            attrs['tooltip'] = _('Blocked by %s:\n%s\n\n<b>You own this room or are an administrator and are thus permitted to override the blocking. Please use this privilege with care!</b>') % (block.createdByUser.getFullName(), block.message)
+            attrs['tooltip'] = _('Blocked by %s:\n%s\n\n<b>You own this room or are an administrator '
+                                 'and are thus permitted to override the blocking. Please use this '
+                                 'privilege with care!</b>') % (block.createdByUser.getFullName(), block.message)
         else:
             attrs['className'] = "blocked"
             attrs['tooltip'] = _('Blocked by %s:\n%s') % (block.createdByUser.getFullName(), block.message)
     elif roomBlocked and roomBlocked.active is None:
         attrs['className'] = "preblocked"
-        attrs['tooltip'] = _('Blocking requested by %s:\n%s\n\n<b>If this blocking is approved, any colliding bookings will be rejected!</b>') % (block.createdByUser.getFullName(), block.message)
+        attrs['tooltip'] = _('Blocking requested by %s:\n%s\n\n'
+                             '<b>If this blocking is approved, any colliding bookings will be rejected!</b>'
+                             ) % (block.createdByUser.getFullName(), block.message)
     return attrs
 
 

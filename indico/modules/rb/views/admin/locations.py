@@ -45,6 +45,7 @@ class WRoomBookingAdmin(WTemplated):
 
     def getVars(self):
         wvars = super(WRoomBookingAdmin, self).getVars()
+        # TODO: logic should be here wvars["Location"] = Location
         wvars['locations'] = Location.getAllLocations()
         defaultLocation = Location.getDefaultLocation()
         wvars['defaultLocationName'] = defaultLocation.name if defaultLocation else None
