@@ -18,15 +18,17 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import pycountry
+from MaKaC.common.Configuration import Config
 
 
 class CountryHolder(object):
     """
     Contains all countries in the world
     """
-   
+
     _countries = dict((country.alpha2.encode('utf-8'), country.name.encode('utf-8'))
                       for country in pycountry.countries)
+    _countries.update(Config.getInstance().getCustomCountries())
 
     @classmethod
     def getCountries(cls):
@@ -47,8 +49,14 @@ class CountryHolder(object):
         """
         Returns the country, given its ID
         """
-        return cls._countries.get(cid,
-                                  pycountry.historic_countries.get(alpha2=cid).name.encode('utf-8'))
+        country_name = cls._countries.get(cid, None)
+        if country_name:
+            return country_name
+        else:
+            try:
+                return pycountry.historic_countries.get(alpha2=cid).name.encode('utf-8')
+            except KeyError:
+                return None
 
     @classmethod
     def getCountryKeys(cls):

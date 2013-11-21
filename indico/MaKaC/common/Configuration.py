@@ -470,17 +470,18 @@ class Config:
         'Profile'                   : 'no',
         'StaticFileMethod'          : None,
         'AuthenticatedEnforceSecure': 'no',
-        'MaxUploadFilesTotalSize' : '0',
-        'MaxUploadFileSize' : '0',
-        'ForceConflicts' : 0,
-        'PropagateAllExceptions' : False,
-        'EmbeddedWebserver' : False,
-        'EmbeddedWebserverBaseURL': None,
-        'OAuthAccessTokenTTL' : 10000,
-        'MobileURL' : '',
-        'SCSSDebugInfo': True,
-        'SessionLifetime' : 86400*31,
-        'RouteOldUrls': False
+        'MaxUploadFilesTotalSize'   : '0',
+        'MaxUploadFileSize'         : '0',
+        'ForceConflicts'            : 0,
+        'PropagateAllExceptions'    : False,
+        'EmbeddedWebserver'         : False,
+        'EmbeddedWebserverBaseURL'  : None,
+        'OAuthAccessTokenTTL'       : 10000,
+        'MobileURL'                 : '',
+        'SCSSDebugInfo'             : True,
+        'SessionLifetime'           : 86400 * 31,
+        'RouteOldUrls'              : False,
+        'CustomCountries'           : {}
     }
 
     if sys.platform == 'win32':
