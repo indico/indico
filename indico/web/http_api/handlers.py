@@ -115,9 +115,9 @@ def checkAK(apiKey, signature, timestamp, path, query):
     return ak, onlyPublic
 
 
-def buildAW(ak, req, onlyPublic=False):
+def buildAW(ak, onlyPublic=False):
     aw = AccessWrapper()
-    aw.setIP(str(req.get_remote_ip()))
+    aw.setIP(str(request.remote_addr))
     if ak and not onlyPublic:
         # If we have an authenticated request, require HTTPS
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -187,10 +187,10 @@ def handler(prefix, path):
                 if enforceOnlyPublic:
                     onlyPublic = True
                 # Create an access wrapper for the API key's user
-                aw = buildAW(ak, req, onlyPublic)
-            else: # Access Token (OAuth)
+                aw = buildAW(ak, onlyPublic)
+            else:  # Access Token (OAuth)
                 at = OAuthUtils.OAuthCheckAccessResource()
-                aw = buildAW(at, req, onlyPublic)
+                aw = buildAW(at, onlyPublic)
             # Get rid of API key in cache key if we did not impersonate a user
             if ak and aw.getUser() is None:
                 cacheKey = normalizeQuery(path, query,
