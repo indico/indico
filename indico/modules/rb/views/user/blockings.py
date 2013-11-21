@@ -45,28 +45,28 @@ class WRoomBookingBlockingDetails(WTemplated):
 
 class WPRoomBookingBlockingForm(WPRoomBookingBase):
 
-    def __init__(self, rh, block, hasErrors):
+    def __init__(self, rh, block, errorMessage):
         super(WPRoomBookingBlockingDetails, self).__init__(rh)
         self._block = block
-        self._hasErrors = hasErrors
+        self._errorMessage = errorMessage
 
     def _setCurrentMenuItem(self):
         self._blockRooms.setActive(True)
 
     def _getBody(self, params):
-        return WRoomBookingBlockingForm(self._block, self._hasErrors).getHTML(params)
+        return WRoomBookingBlockingForm(self._block, self._errorMessage).getHTML(params)
 
 
 class WRoomBookingBlockingForm(WTemplated):
 
-    def __init__(self, block, hasErrors):
+    def __init__(self, block, errorMessage):
         self._block = block
-        self._hasErrors = hasErrors
+        self._errorMessage = errorMessage
 
     def getVars(self):
         wvars = super(WRoomBookingBlockingForm, self).getVars()
         wvars['block'] = self._block
-        wvars['hasErrors'] = self._hasErrors
+        wvars['errorMessage'] = self._errorMessage
         return wvars
 
 
