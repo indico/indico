@@ -220,7 +220,8 @@ AuthenticatorList    = ['Local']
 
 # Uncomment/customize the following lines if you want to use LDAP authentication
 #
-# LDAPConfig = {'host': 'myldapserver.example.com',
+# LDAPConfig = {'uri': '[ldap|ldaps]://myldapserver.example.com:port',
+#               # by default the port is 389 if you do not specify.
 #
 #               # use TLS (do so, if your server allows)
 #               'useTLS': True,

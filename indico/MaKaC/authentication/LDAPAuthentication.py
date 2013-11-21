@@ -56,6 +56,8 @@ try:
 except:
     pass
 
+from urlparse import urlparse
+
 # legacy indico imports
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity
 from MaKaC.errors import MaKaCError
@@ -186,7 +188,7 @@ class LDAPConnector(object):
     def __init__(self):
         conf = Configuration.Config.getInstance()
         ldapConfig = conf.getLDAPConfig()
-        self.ldapHost = ldapConfig.get('host')
+        self.ldapUri = ldapConfig.get('uri')
         self.ldapPeopleFilter, self.ldapPeopleDN = \
                                ldapConfig.get('peopleDNQuery')
         self.ldapGroupsFilter, self.ldapGroupsDN = \
@@ -222,7 +224,7 @@ class LDAPConnector(object):
         """
         Opens an anonymous LDAP connection
         """
-        self.l = ldap.open(self.ldapHost)
+        self.l = ldap.initialize(self.ldapUri)
         self.l.protocol_version = ldap.VERSION3
 
         if self.ldapUseTLS:
@@ -230,7 +232,7 @@ class LDAPConnector(object):
         else:
             self.l.set_option(ldap.OPT_X_TLS, ldap.OPT_X_TLS_NEVER)
 
-        if self.ldapUseTLS:
+        if urlparse(self.ldapUri)[0] != "ldaps" and self.ldapUseTLS:
             self.l.start_tls_s()
 
         return self.l
