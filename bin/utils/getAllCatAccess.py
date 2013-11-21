@@ -17,10 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common import DBMgr
-from MaKaC.user import Group, GroupHolder
+from MaKaC.user import GroupHolder
 from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.urlHandlers import UHCategoryDisplay, UHConferenceDisplay
+
+from indico.core.db import DBMgr
 
 
 def checkGroup (obj, group):
