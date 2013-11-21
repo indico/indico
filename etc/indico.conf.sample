@@ -217,7 +217,7 @@ MaxUploadFileSize = 0
 # If you want to setup SSO in your authenticator you should setup the variable
 # SSOActive to True.
 #
-#     AuthenticatorList = [('MyAuthSystem', {'SSOActive': True})]
+# AuthenticatorList = [('MyAuthSystem', {'SSOActive': True})]
 #
 # You can also can configure the mapping of the SSO attributes with the variable SSOMapping. An example:
 #
@@ -244,23 +244,24 @@ MaxUploadFileSize = 0
 #
 # As an example if you want to setup the LDAP Authenticator you should define as following:
 #
-# AuthenticatorList  = [('LDAP', { 'host': 'myldapserver.example.com',
+# AuthenticatorList  = [('LDAP', {# by default the port is 389 if you do not specify.
+#                                 'uri': '[ldap|ldaps]://myldapserver.example.com:port',
 #
-#                                   # use TLS (do so, if your server allows)
-#                                   'useTLS': True,
+#                                 # use TLS (do so, if your server allows)
+#                                 'useTLS': True,
 #
-#                                   # filter parameters for users, base DN to use
-#                                   'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
+#                                 # filter parameters for users, base DN to use
+#                                 'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
 #
-#                                   # filter parameters for groups, base DN to use
-#                                   'groupDNQuery': ('cn={0}', 'OU=Groups,DC=example,DC=com'),
+#                                 # filter parameters for groups, base DN to use
+#                                 'groupDNQuery': ('cn={0}', 'OU=Groups,DC=example,DC=com'),
 #
-#                                   # SLAPD or ActiveDirectory
-#                                   'groupStyle': 'SLAPD',
+#                                 # SLAPD or ActiveDirectory
+#                                 'groupStyle': 'SLAPD',
 #
-#                                   # access credentials of a user with read access
-#                                    'accessCredentials': ('CN=user,OU=Users,DC=example,DC=com','secret_password')
-#                                   }
+#                                 # access credentials of a user with read access
+#                                  'accessCredentials': ('CN=user,OU=Users,DC=example,DC=com','secret_password')
+#                                 }
 #
 #
 # The default configuration will use only Indico's authentication system.

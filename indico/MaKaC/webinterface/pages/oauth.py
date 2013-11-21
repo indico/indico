@@ -18,15 +18,14 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from indico.util.date_time import format_datetime
-from indico.modules.oauth.db import  ConsumerHolder, AccessTokenHolder
+from indico.modules.oauth.db import ConsumerHolder, AccessTokenHolder
 from indico.core.index import Catalog
 from MaKaC.common.logger import Logger
-from MaKaC.common.timezoneUtils import utctimestamp2date
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.pages.admins import WPServicesCommon, WPPersonalArea
 from MaKaC.webinterface.wcomponents import WTemplated
-from MaKaC.common.url import URL
+
 
 class WPAdminOAuthConsumers(WPServicesCommon):
 
@@ -34,18 +33,20 @@ class WPAdminOAuthConsumers(WPServicesCommon):
         c = WAdminOAuthConsumers()
         return c.getHTML(params)
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._subTabOauth.setActive()
         self._subTabOauth_Consumers.setActive()
+
 
 class WAdminOAuthConsumers(WTemplated):
 
     def getVars(self):
-        vars = WTemplated.getVars(self)
+        wvars = WTemplated.getVars(self)
         ch = ConsumerHolder()
 
-        vars['consumers'] = sorted(ch.getList(), key=lambda c: c.getName())
-        return vars
+        wvars['consumers'] = sorted(ch.getList(), key=lambda c: c.getName())
+        return wvars
+
 
 class WPAdminOAuthAuthorized(WPServicesCommon):
 
@@ -53,44 +54,45 @@ class WPAdminOAuthAuthorized(WPServicesCommon):
         c = WAdminOAuthAuthorized()
         return c.getHTML(params)
 
-    def _setActiveTab( self ):
+    def _setActiveTab(self):
         self._subTabOauth.setActive()
         self._subTabOauth_Authorized.setActive()
+
 
 class WAdminOAuthAuthorized(WTemplated):
 
     def getVars(self):
-        vars = WTemplated.getVars(self)
+        wvars = WTemplated.getVars(self)
         ath = AccessTokenHolder()
-        vars["formatTimestamp"] = lambda ts: format_datetime(utctimestamp2date(ts), format='d/M/yyyy H:mm')
-        vars['tokens'] = sorted(ath.getList(), key=lambda t: t.getUser().getId())
-        return vars
+        wvars["formatTimestamp"] = lambda ts: format_datetime(ts, format='d/M/yyyy H:mm')
+        wvars['tokens'] = sorted(ath.getList(), key=lambda t: t.getUser().getId())
+        return wvars
 
 
-class WPOAuthThirdPartyAuth( WPDecorated ):
+class WPOAuthThirdPartyAuth(WPDecorated):
 
-    def __init__( self, rh ):
-        WPDecorated. __init__( self, rh )
+    def __init__(self, rh):
+        WPDecorated. __init__(self, rh)
 
-    def _getHeader( self ):
+    def _getHeader(self):
         return ""
 
-    def _getFooter( self ):
+    def _getFooter(self):
         return ""
 
-    def _getBody( self, params ):
+    def _getBody(self, params):
         Logger.get('oaut.authorize').info(params)
         wc = WOAuthThirdPartyAuth()
         return wc.getHTML(params)
+
 
 class WOAuthThirdPartyAuth(WTemplated):
 
     def getVars(self):
         wvars = WTemplated.getVars(self)
-#        returnURL = URL(wvars['returnURL'])
         urlParams = {'userId': wvars["userId"],
-                    'callback': wvars["callback"],
-                    'third_party_app': wvars["third_party_app"]}
+                     'callback': wvars["callback"],
+                     'third_party_app': wvars["third_party_app"]}
 
         allowURL = urlHandlers.UHOAuthAuthorizeConsumer.getURL()
         allowURL.addParams(urlParams)
@@ -104,14 +106,16 @@ class WOAuthThirdPartyAuth(WTemplated):
 
         return wvars
 
-class WPOAuthUserThirdPartyAuth( WPPersonalArea ):
 
-    def _getTabContent( self, params ):
-        c = WOAuthUserThirdPartyAuth( self._avatar )
-        return c.getHTML( params )
+class WPOAuthUserThirdPartyAuth(WPPersonalArea):
 
-    def _setActiveTab( self ):
+    def _getTabContent(self, params):
+        c = WOAuthUserThirdPartyAuth(self._avatar)
+        return c.getHTML(params)
+
+    def _setActiveTab(self):
         self._tabThirdPartyAuth.setActive()
+
 
 class WOAuthUserThirdPartyAuth(WTemplated):
 
@@ -119,9 +123,9 @@ class WOAuthUserThirdPartyAuth(WTemplated):
         self._avatar = av
 
     def getVars(self):
-        vars = WTemplated.getVars( self )
-        vars['user'] = self._avatar
-        vars['currentUser'] = self._rh._getUser()
-        vars["tokens"] = Catalog.getIdx('user_oauth_access_token').get(self._avatar.getId(), [])
-        vars["formatTimestamp"] = lambda ts: format_datetime(utctimestamp2date(ts), format='d/M/yyyy H:mm')
-        return vars
+        wvars = WTemplated.getVars(self)
+        wvars['user'] = self._avatar
+        wvars['currentUser'] = self._rh._getUser()
+        wvars["tokens"] = Catalog.getIdx('user_oauth_access_token').get(self._avatar.getId(), [])
+        wvars["formatTimestamp"] = lambda ts: format_datetime(ts, format='d/M/yyyy H:mm')
+        return wvars
