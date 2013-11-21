@@ -112,3 +112,22 @@ ndDirectives.directive("ndDialog", function() {
         }
     };
 });
+
+ndDirectives.directive("contenteditable", function() {
+    return {
+        require: 'ngModel',
+        link: function(scope, elem, attrs, ctrl) {
+            // view -> model
+            elem.on('blur', function() {
+                scope.$apply(function() {
+                    ctrl.$setViewValue(elem.html());
+                });
+            });
+
+            // model -> view
+            ctrl.$render = function() {
+                elem.html(ctrl.$viewValue);
+            };
+        }
+    };
+});
