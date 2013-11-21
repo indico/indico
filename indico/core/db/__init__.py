@@ -35,17 +35,3 @@ db = SQLAlchemy()
 def load(package):
     for f in glob.glob(os.path.dirname(__file__) + '/{0}/*.py'.format(package)):
         importlib.import_module('.' + os.path.basename(f)[:-3], __package__ + '.' + package)
-
-
-def load_room_booking():
-    return [m for m in _load_all_modules('indico.modules.rb.models')]
-
-
-def _load_all_modules(pkg_name):
-    directory = os.path.dirname(importlib.import_module(pkg_name).__file__)
-    for f in os.listdir(directory):
-        if f.endswith('.py'):
-            yield importlib.import_module('.' + f[:-3], pkg_name)
-        elif os.path.isdir(os.path.join(directory, f)):
-            for m in _load_all_modules(pkg_name + '.' + f):
-                yield m
