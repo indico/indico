@@ -22,3 +22,6 @@
 	path = ext_modules/angular
 	url = https://github.com/angular/angular.js.git
     ignore = dirty
+[submodule "ext_modules/ui-sortable"]
+	path = ext_modules/ui-sortable
+	url = https://github.com/angular-ui/ui-sortable

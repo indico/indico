@@ -197,6 +197,18 @@ def install_angular():
             local('cp css/angular.css {0}'.format(dest_dir_css))
 
 
+@recipe('ui-sortable')
+def install_ui_sortable():
+    """
+    Install angular ui-sortable from Git
+    """
+    with node_env():
+        with lcd(os.path.join(env.ext_dir, 'ui-sortable')):
+            dest_dir_js = lib_dir(env.src_dir, 'js')
+            local('mkdir -p {0}'.format(dest_dir_js))
+            local('cp src/sortable.js {0}/'.format(dest_dir_js))
+
+
 @recipe('compass')
 def install_compass():
     """

@@ -201,6 +201,7 @@ class DebugLevelFilter(Filter):
 angular = Bundle(
     'js/lib/angular.js',
     'js/lib/angular-resource.js',
+    'js/lib/sortable.js',
     'js/indico/angular/app.js',
     'js/indico/angular/directives.js',
     'js/indico/angular/filters.js',
