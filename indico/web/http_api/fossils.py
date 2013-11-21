@@ -25,7 +25,7 @@ from indico.util.fossilize import IFossil, fossilize
 from indico.util.fossilize.conversion import Conversion
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.linking import RoomLinker
-from MaKaC.fossils.conference import ISessionFossil
+from MaKaC.fossils.conference import ISessionSlotFossil
 
 
 class IHTTPAPIErrorFossil(IFossil):
@@ -353,7 +353,26 @@ class IConferenceMetadataWithSubContribsFossil(_IncludeMaterialFossil, IConferen
     getContributionList.filterBy = 'access'
 
 
-class ISessionMetadataFossil(ISessionFossil):
+class ISessionMetadataBaseFossil(ISessionSlotFossil):
+
+    def getId(self):
+        pass
+    getId.produce = lambda ss: "{0}-{1}".format(ss.getSession().getId(), ss.getId())
+
+    def getLocator(self):
+        pass
+    getLocator.convert = Conversion.url(urlHandlers.UHSessionDisplay)
+    getLocator.name = 'url'
+
+    def getFullTitle(self):
+        pass
+    getFullTitle.name = 'title'
+
+    def getDescription(self):
+        pass
+
+
+class ISessionMetadataFossil(ISessionMetadataBaseFossil):
 
     def getContributionList(self):
         pass
@@ -362,7 +381,7 @@ class ISessionMetadataFossil(ISessionFossil):
     getContributionList.filterBy = 'access'
 
 
-class ISessionMetadataWithContributionsFossil(ISessionFossil):
+class ISessionMetadataWithContributionsFossil(ISessionMetadataBaseFossil):
 
     def getContributionList(self):
         pass
@@ -370,7 +389,8 @@ class ISessionMetadataWithContributionsFossil(ISessionFossil):
     getContributionList.name = 'contributions'
     getContributionList.filterBy = 'access'
 
-class ISessionMetadataWithSubContribsFossil(ISessionFossil):
+
+class ISessionMetadataWithSubContribsFossil(ISessionMetadataBaseFossil):
 
     def getContributionList(self):
         pass
@@ -378,13 +398,14 @@ class ISessionMetadataWithSubContribsFossil(ISessionFossil):
     getContributionList.name = 'subcontributions'
     getContributionList.filterBy = 'access'
 
+
 class IConferenceMetadataWithSessionsFossil(_IncludeMaterialFossil, IConferenceMetadataFossil):
 
-    def getSessionList(self):
+    def getSessionSlotList(self):
         pass
-    getSessionList.result = ISessionMetadataFossil
-    getSessionList.name = 'sessions'
-    getSessionList.filterBy = 'access'
+    getSessionSlotList.result = ISessionMetadataFossil
+    getSessionSlotList.name = 'sessions'
+    getSessionSlotList.filterBy = 'access'
 
     def getContributionListWithoutSessions(self):
         pass

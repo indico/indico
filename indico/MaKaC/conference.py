@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from itertools import ifilter
+
 # fossil classes
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.plugins import PluginsHolder, Observable
@@ -3406,10 +3408,13 @@ class Conference(CommonObjectBase, Locatable):
                     res.append(session)
         return res
 
-    def getNumberOfSessions( self ):
+    def getSessionSlotList(self):
+        return [slot for session in self.sessions.values() for slot in session.getSlotList()]
+
+    def getNumberOfSessions(self):
         return len(self.sessions)
 
-    def _generateNewContributionId( self ):
+    def _generateNewContributionId(self):
         """Returns a new unique identifier for the current conference
             contributions
         """
@@ -6873,18 +6878,22 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
     def getSession(self):
         return self.session
 
-    def getOwner( self ):
+    def getOwner(self):
         return self.session
 
-    def _setSchedule(self,klass):
-        old_sch=self.getSchedule()
-        self._schedule=klass(self)
+    def getContributionList(self):
+        return [e.getOwner() for e in ifilter(lambda e: isinstance(e, ContribSchEntry),
+                                              self.getSchedule().getEntries())]
+
+    def _setSchedule(self, klass):
+        old_sch = self.getSchedule()
+        self._schedule = klass(self)
         #after removing old entries, one could try to fit them into the new
         #   schedule, but there are several things to consider which are left
         #   for later implementation (breaks, entries not fitting in the
         #   slots,...)
-        while len(old_sch.getEntries())>0:
-            entry=old_sch.getEntries()[0]
+        while len(old_sch.getEntries()) > 0:
+            entry = old_sch.getEntries()[0]
             old_sch.removeEntry(entry)
         self.notifyModification()
 
