@@ -192,6 +192,21 @@ ndRegForm.directive("ndTable", function(url) {
                     return true;
                 }
             };
+
+            $scope.itemSortableOptions = {
+                start: function(e, ui ){
+                    ui.placeholder.height(ui.helper.outerHeight());
+                },
+
+                disabled: $scope.config.actions.indexOf('sortable') == -1,
+                axis: 'y',
+                cursor: 'move',
+                delay: 150,
+                opacity: 0.5,
+                handle: ".regFormItemSortableHandle",
+                placeholder: "regFormSortablePlaceHolder",
+                items: "tr"
+            };
         }
     };
 });

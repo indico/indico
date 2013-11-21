@@ -7,9 +7,9 @@
             </th>
         </tr>
     </thead>
-    <tbody>
+    <tbody ui-sortable="itemSortableOptions" ng-model="formData">
         <tr ng-repeat="item in formData | filter: matchFilter" role="row" id="{{ item.id }}">
-            <td ng-if="config.actions.indexOf('sortable') > -1">
+            <td ng-if="config.actions.indexOf('sortable') > -1" class="regFormItemSortableHandle">
                 <span class="ui-icon ui-icon-arrowthick-2-n-s"></span>
             </td>
             <td ng-repeat="elem in config.colModel"
