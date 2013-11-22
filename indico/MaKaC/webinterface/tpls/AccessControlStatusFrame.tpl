@@ -133,7 +133,9 @@ from MaKaC import conference as cmod
 % endif
 
 % if privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED') :
-    new IndicoUI.Widgets.Generic.textField($E('inPlaceEditContact'), '${termsDict[type]['name'] + '.protection.changeContactInfo'}', ${dict([(termsDict[type]['paramsKey'], target.getId())])}, '${contactInfo or _("no contact info defined")}');
+    % if isinstance(target, (cmod.Category, cmod.Conference)):
+        new IndicoUI.Widgets.Generic.textField($E('inPlaceEditContact'), '${termsDict[type]['name'] + '.protection.changeContactInfo'}', ${dict([(termsDict[type]['paramsKey'], target.getId())])}, '${contactInfo or _("no contact info defined")}');
+    % endif
 
     var allowedList = ${fossilize(target.getAllowedToAccessList()) | n,j};
 
