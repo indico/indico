@@ -2314,7 +2314,7 @@ class RHConfModifDisplayToggleTimetableView(RHConferenceModifBase):
     def _process(self):
         menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
         link = menu.getLinkById(self._linkId)
-        menu.toggleViewMode()
+        menu.set_timetable_detailed_view(not menu.is_timetable_detailed_view())
         self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
 
 

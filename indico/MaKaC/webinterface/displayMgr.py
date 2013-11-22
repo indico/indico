@@ -248,10 +248,11 @@ class Menu(Persistent):
         self._conf = conf
         self._indent = "&nbsp;&nbsp;&nbsp;&nbsp;"
         self._linkGenerator = Counter()
-        self._detailedView = False
+        self._timetable_detailed_view = False
 
-    def clone( self, cdm ):
+    def clone(self, cdm):
         newMenu = cdm.getMenu()
+        newMenu.set_timetable_detailed_view(self.is_timetable_detailed_view())
         newMenu._linkGenerator = self._linkGenerator.clone()
         newList = []
         for link in self.getLinkList():
@@ -469,18 +470,16 @@ class Menu(Persistent):
                 str += "%s\n" % link
         return str
 
-    def setViewMode(self, view):
-        self._detailedView = view
+    def set_timetable_detailed_view(self, view):
+        self._timetable_detailed_view = view
 
-    def toggleViewMode(self):
-        self.setViewMode(not self._detailedView)
-
-    def isDetailed(self):
+    def is_timetable_detailed_view(self):
         try:
-            return self._detailedView
+            return self._timetable_detailed_view
         except AttributeError:
-            self._detailedView = False
-            return self._detailedView
+            self._timetable_detailed_view = False
+            return self._timetable_detailed_view
+
 
 class Spacer(Persistent):
     Type = "spacer"
@@ -825,9 +824,8 @@ class SystemLink(Link):
         if self._name == 'timetable':
             menu = self.getMenu()
 
-            if menu.isDetailed():
-                conf = menu.getConference()
-                startDate = conf.getSchedule().getStartDate()
+            if menu.is_timetable_detailed_view():
+                startDate = menu.getConference().getSchedule().getAdjustedStartDate()
                 url += startDate.strftime('#%Y%m%d')
                 url += '.detailed'
         return url

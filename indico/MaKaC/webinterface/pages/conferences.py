@@ -1286,7 +1286,6 @@ class WConferenceTimeTable(WConfDisplayBodyBase):
         eventInfo['isCFAEnabled'] = self._conf.getAbstractMgr().isActive()
         wvars['eventInfo'] = eventInfo
         wvars['timetableLayout'] = wvars.get('ttLyt', '')
-        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
         return wvars
 
 
@@ -4002,7 +4001,7 @@ class WTimetableModif(WSystemLinkModif):
         vars = WSystemLinkModif.getVars(self)
         vars["viewMode"] = _("Generic")
         vars["changeViewModeTo"] = _("Detailed")
-        if self._link.getMenu().isDetailed():
+        if self._link.getMenu().is_timetable_detailed_view():
             vars["viewMode"] = _("Detailed")
             vars["changeViewModeTo"] = _("Generic")
         url = urlHandlers.UHConfModifDisplayToggleTimetableView.getURL(self._link)
