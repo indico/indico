@@ -249,11 +249,12 @@ class Menu(Persistent):
         self._indent = "&nbsp;&nbsp;&nbsp;&nbsp;"
         self._linkGenerator = Counter()
         self._timetable_detailed_view = False
-        self._defaultTTLayout = 'normal'
+        self._timetable_layout = 'normal'
 
     def clone(self, cdm):
         newMenu = cdm.getMenu()
         newMenu.set_timetable_detailed_view(self.is_timetable_detailed_view())
+        newMenu.set_timetable_layout(self.get_timetable_layout())
         newMenu._linkGenerator = self._linkGenerator.clone()
         newList = []
         for link in self.getLinkList():
@@ -464,28 +465,21 @@ class Menu(Persistent):
     def getCurrentItem(self):
         return getattr(self, '_v_currentItem', None)
 
-    def setDefaultTTLayout(self, layout):
-        self._defaultTTLayout = layout
+    def set_timetable_layout(self, layout):
+        self._timetable_layout = layout
 
-    def toggleDefaultTTLayout(self):
-        if self._defaultTTLayout == 'normal':
-            self.setDefaultTTLayout('room')
+    def toggle_timetable_layout(self):
+        if self._timetable_layout == 'normal':
+            self.set_timetable_layout('room')
         else:
-            self.setDefaultTTLayout('normal')
+            self.set_timetable_layout('normal')
 
-    def getDefaultTTLayout(self):
+    def get_timetable_layout(self):
         try:
-            return self._defaultTTLayout
+            return self._timetable_layout
         except AttributeError:
-            self._defaultTTLayout = 'normal'
-            return self._defaultTTLayout
-
-    def __str__(self):
-        str = ""
-        for link in self._listLink:
-            if link.isEnabled():
-                str += "%s\n" % link
-        return str
+            self._timetable_layout = 'normal'
+            return self._timetable_layout
 
     def set_timetable_detailed_view(self, view):
         self._timetable_detailed_view = view
@@ -496,6 +490,13 @@ class Menu(Persistent):
         except AttributeError:
             self._timetable_detailed_view = False
             return self._timetable_detailed_view
+
+    def __str__(self):
+        str = ""
+        for link in self._listLink:
+            if link.isEnabled():
+                str += "%s\n" % link
+        return str
 
 
 class Spacer(Persistent):
@@ -837,10 +838,9 @@ class SystemLink(Link):
 
     def getURL(self):
         url = str(self._getURLObject())
-
         if self._name == 'timetable':
             menu = self.getMenu()
-            if menu.getDefaultTTLayout() == 'room':
+            if menu.get_timetable_layout() == 'room':
                 url += '?ttLyt=room'
             if menu.is_timetable_detailed_view():
                 startDate = menu.getConference().getSchedule().getAdjustedStartDate()

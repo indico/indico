@@ -4009,7 +4009,7 @@ class WTimetableModif(WSystemLinkModif):
         # Timeable Layout
         wvars["defaultTTLayout"] = _("Normal")
         wvars["changedefaultTTLayoutTo"] = _("By room")
-        if self._link.getMenu().getDefaultTTLayout() == 'room':
+        if self._link.getMenu().get_timetable_layout() == 'room':
             wvars["defaultTTLayout"] = _("By room")
             wvars["changedefaultTTLayoutTo"] = _("Normal")
         wvars["toggleTTDefaultLayoutURL"] = str(urlHandlers.UHConfModifDisplayToggleTTDefaultLayout.getURL(self._link))

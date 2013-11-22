@@ -2328,7 +2328,7 @@ class RHConfModifDisplayToggleTTDefaultLayout(RHConferenceModifBase):
     def _process(self):
         menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getMenu()
         link = menu.getLinkById(self._linkId)
-        menu.toggleDefaultTTLayout()
+        menu.toggle_timetable_layout()
         self._redirect(urlHandlers.UHConfModifDisplayMenu.getURL(link))
 
 
