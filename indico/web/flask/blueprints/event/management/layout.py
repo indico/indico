@@ -73,9 +73,9 @@ event_mgmt.add_url_rule('/layout/menu/add/spacer', 'confModifDisplay-addSpacer',
                         conferenceModif.RHConfModifDisplayAddSpacer, methods=('POST',))
 event_mgmt.add_url_rule('/layout/menu/add/page', 'confModifDisplay-addPage', conferenceModif.RHConfModifDisplayAddPage,
                         methods=('POST',))
-event_mgmt.add_url_rule('/layout/menu/<linkId>/timetable', 'confModifDisplay-toggleTimetableView',
+event_mgmt.add_url_rule('/layout/menu/<linkId>/timetable-view', 'confModifDisplay-toggleTimetableView',
                         conferenceModif.RHConfModifDisplayToggleTimetableView, methods=('POST',))
-event_mgmt.add_url_rule('/layout/menu/<linkId>/timetable', 'confModifDisplay-toggleTTDefaultLayout',
+event_mgmt.add_url_rule('/layout/menu/<linkId>/timetable-layout', 'confModifDisplay-toggleTTDefaultLayout',
                         conferenceModif.RHConfModifDisplayToggleTTDefaultLayout, methods=('POST',))
 
 # Layout: Images
