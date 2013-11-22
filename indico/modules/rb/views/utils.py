@@ -221,4 +221,5 @@ def makePercentageString(val):
             0.626333 -> 63%
             0.623333 -> 62%
     """
-    return '{}%'.format(int(round(rh._kpiAverageOccupation * 100)))
+    assert 0 <= val <= 1
+    return '{}%'.format(int(round(val * 100)))

@@ -28,7 +28,7 @@ class RoomAttributeKey(db.Model):
     __tablename__ = 'room_attribute_keys'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False, unique=True)
 
     attributes = db.relationship('RoomAttribute',
                                  backref='key',
