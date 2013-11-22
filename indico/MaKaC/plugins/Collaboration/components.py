@@ -34,7 +34,7 @@ from MaKaC.plugins.Collaboration.pages import WEventDetailBanner, WVideoService,
 from MaKaC.plugins import Collaboration, Plugin
 
 from MaKaC.user import Group, Avatar
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.common.utils import daysBetween
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.webinterface.rh.admins import RCAdmin

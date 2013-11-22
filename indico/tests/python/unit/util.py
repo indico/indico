@@ -34,7 +34,7 @@ from indico.util.fossilize import clearCache
 from indico.util.i18n import setLocale
 
 # indico legacy imports
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from indico.web.flask.app import make_app
 
 loadedFeatures = []

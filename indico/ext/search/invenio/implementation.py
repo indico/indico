@@ -24,7 +24,7 @@ import indico.ext.search.invenio
 import MaKaC.conference as conference
 from indico.core.config import Config
 from MaKaC.common.output import XSLTransformer
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.common.contextManager import ContextManager
 
 from xml.dom import minidom

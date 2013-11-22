@@ -30,7 +30,7 @@ import indico.util.date_time as date_time_util
 from indico.core.config import Config
 from MaKaC.common.info import HelperMaKaCInfo
 from indico.util.i18n import gettext, ngettext
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI

@@ -31,7 +31,7 @@ DEFAULT_PERSISTENT_USER_AGREEMENT = """In conjunction with a having a key associ
 DEFAULT_PROTECTION_DISCLAINER_RESTRICTED = 'Circulation to people other than the intended audience is not authorized. You are obliged to treat the information with the appropriate level of confidentiality.'
 DEFAULT_PROTECTION_DISCLAINER_PROTECTED = 'As such, this information is intended for an internal audience only. You are obliged to treat the information with the appropriate level of confidentiality.'
 
-#from MaKaC.common.logger import Logger
+#from indico.core.logging import Logger
 
 #the singleton pattern should be applied to this class to ensure that it is
 #   unique, but as Extended classes seem not to support classmethods it will

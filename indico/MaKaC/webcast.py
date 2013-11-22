@@ -19,7 +19,7 @@
 
 from persistent import Persistent
 from indico.core.db import DBMgr
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.errors import MaKaCError
 from urllib2 import HTTPError, URLError, urlopen
 from BaseHTTPServer import BaseHTTPRequestHandler

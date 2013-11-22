@@ -25,7 +25,7 @@ from indico.modules import ModuleHolder
 from indico.modules.scheduler.tasks import OneShotTask
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.webinterface.urlHandlers import UHOfflineEventAccess
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.webinterface.rh.conferenceBase import RHCustomizable
 from indico.util.contextManager import ContextManager

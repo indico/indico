@@ -31,7 +31,7 @@ from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.fossils.modules import IObservedObjectFossil
 import MaKaC.conference as conference
 
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.common.utils import formatTime, formatDateTime
 import MaKaC.webinterface.wcomponents as wcomponents
 

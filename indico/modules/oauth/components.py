@@ -27,8 +27,8 @@ from zope.interface import Interface
 from indico.core.index import OOIndex
 from indico.web.flask.util import create_flat_args
 from indico.modules.oauth.errors import OAuthError
-from MaKaC.common.logger import Logger
 from indico.core.config import Config
+from indico.core.logging import Logger
 from MaKaC.common.timezoneUtils import nowutc
 
 

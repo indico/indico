@@ -16,7 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from HTMLParser import HTMLParser, HTMLParseError
 from xml.sax.saxutils import  unescape
 

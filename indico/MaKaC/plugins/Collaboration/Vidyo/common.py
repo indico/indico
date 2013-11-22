@@ -29,7 +29,7 @@ from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 from MaKaC.plugins.Collaboration.Vidyo.indexes import EventEndDateIndex, BOOKINGS_BY_VIDYO_ROOMS_INDEX
 from MaKaC.common.timezoneUtils import nowutc
 from datetime import timedelta
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from MaKaC.common import info
 from indico.core.index import Catalog

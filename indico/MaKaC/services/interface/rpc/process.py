@@ -24,7 +24,7 @@ import copy
 
 from ZODB.POSException import ConflictError
 from ZEO.Exceptions import ClientDisconnected
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 
 from MaKaC.services.interface import rpc
 from MaKaC.services.interface.rpc import handlers

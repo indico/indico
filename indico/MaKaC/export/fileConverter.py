@@ -22,9 +22,9 @@ import mimetypes, urlparse
 import httplib
 
 from indico.util.json import  loads
-
-from MaKaC.common.logger import Logger
 from indico.core.config import Config
+from indico.core.logging import Logger
+
 from MaKaC import conference
 from MaKaC.conference import LocalFile
 

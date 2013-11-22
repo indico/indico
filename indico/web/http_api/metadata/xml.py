@@ -23,7 +23,7 @@ from datetime import datetime
 
 # module imports
 from indico.web.http_api.metadata.serializer import Serializer
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 
 
 class XMLSerializer(Serializer):

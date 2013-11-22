@@ -25,7 +25,7 @@ from MaKaC.plugins.Collaboration.Vidyo.pages import WShowOldRoomIndexActionResul
     WDeleteOldRoomsActionResult
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.common.mail import GenericMailer
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.plugins.Collaboration.Vidyo.mail import VidyoCleaningDoneNotification
 from MaKaC.conference import CategoryManager, ConferenceHolder
 from indico.core.index import Catalog

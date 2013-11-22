@@ -35,7 +35,7 @@ from MaKaC.rb_reservation import RepeatabilityEnum, ReservationBase
 from MaKaC.user import Group, Avatar
 from MaKaC.webinterface.urlHandlers import UHRoomBookingBookingDetails
 from MaKaC.rb_room import RoomBase
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.rb_location import CrossLocationFactory, CrossLocationQueries, Location
 from MaKaC.rb_tools import doesPeriodOverlap
 from MaKaC.authentication import AuthenticatorMgr

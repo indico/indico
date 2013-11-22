@@ -34,7 +34,7 @@ from MaKaC.common.timezoneUtils import date2utctimestamp, datetimeToUnixTime
 from MaKaC.errors import MaKaCError
 from datetime import datetime, timedelta
 from pytz import timezone
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from indico.core.config import Config
 from MaKaC.plugins.base import extension_point
 from zope.index.text import textindex

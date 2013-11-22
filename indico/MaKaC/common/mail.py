@@ -30,7 +30,7 @@ from indico.core.config import Config
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.common.contextManager import ContextManager
 
 # Prevent base64 encoding of utf-8 e-mails

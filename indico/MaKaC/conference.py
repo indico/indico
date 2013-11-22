@@ -96,7 +96,7 @@ from MaKaC.common.PickleJar import if_else
 from MaKaC.schedule import ScheduleToJson
 from MaKaC.webinterface import urlHandlers
 
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.webinterface.common.tools import escape_html
 import zope.interface

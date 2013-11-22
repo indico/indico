@@ -31,7 +31,7 @@ from MaKaC.plugins import PluginsHolder
 from MaKaC.errors import MaKaCError, NoReportError
 from MaKaC.services.interface.rpc.common import ServiceError
 from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools,\
     MailTools

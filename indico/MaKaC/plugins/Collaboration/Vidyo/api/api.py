@@ -17,7 +17,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from contextlib import contextmanager
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.plugins.Collaboration.Vidyo.api.client import AdminClient, UserClient
 from suds import WebFault
 from MaKaC.plugins.Collaboration.Vidyo.common import VidyoConnectionException

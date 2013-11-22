@@ -20,7 +20,7 @@
 from indico.util.date_time import format_datetime
 from indico.modules.oauth.db import ConsumerHolder, AccessTokenHolder
 from indico.core.index import Catalog
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.pages.admins import WPServicesCommon, WPPersonalArea

@@ -21,7 +21,7 @@ from zope.interface import implements
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree
 from BTrees.IOBTree import IOBTree
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.common.timezoneUtils import unixTimeToDatetime,\
     datetimeToUnixTimeInt
 from MaKaC.conference import ConferenceHolder, CategoryManager, Contribution

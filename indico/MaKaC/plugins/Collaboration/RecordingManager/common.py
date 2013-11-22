@@ -21,7 +21,7 @@ from MaKaC.plugins.Collaboration.base import CSErrorBase
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
 from MaKaC.webinterface.common.contribFilters import PosterFilterField
 from MaKaC.conference import ConferenceHolder
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.errors import MaKaCError, NoReportError
 try:
     import MySQLdb

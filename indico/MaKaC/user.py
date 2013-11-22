@@ -34,7 +34,7 @@ import MaKaC.common.info as info
 from MaKaC.i18n import _
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
                             IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
 from MaKaC.common.fossilize import Fossilizable, fossilizes

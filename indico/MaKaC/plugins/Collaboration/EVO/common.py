@@ -25,7 +25,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 from MaKaC.common.url import URL
 from array import array
 from MaKaC.common.timezoneUtils import nowutc, datetimeToUnixTime
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.plugins.Collaboration.EVO.fossils import IEVOWarningFossil,\

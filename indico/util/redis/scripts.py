@@ -21,7 +21,7 @@ import glob
 import os
 import re
 from collections import OrderedDict
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 
 import indico.util.json as json
 

@@ -31,6 +31,8 @@ import transaction
 from indico.core.db.migration import MigratedDB
 
 from MaKaC.consoleScripts.installBase import getIndicoInstallMode
+skip_imports = getIndicoInstallMode()
+
 
 class DBMgr:
     """This class provides the access point to the Shelf (every client will
@@ -70,6 +72,8 @@ class DBMgr:
 
     @classmethod
     def getInstance(cls, *args, **kwargs):
+
+        from indico.core.logging import Logger
         pid = os.getpid()
         if os.getpid() not in cls._instances:
             cls._instances[pid] = DBMgr(*args, **kwargs)

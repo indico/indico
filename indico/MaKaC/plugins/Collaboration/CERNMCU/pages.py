@@ -25,7 +25,7 @@ from MaKaC.plugins.Collaboration.CERNMCU.common import getCERNMCUOptionValueByNa
     RoomWithH323, getMinStartDate, getMaxEndDate
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from MaKaC.errors import MaKaCError
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.common import info
 from MaKaC.i18n import _
 from MaKaC.plugins.Collaboration.pages import WAdvancedTabBase

@@ -23,7 +23,7 @@ from MaKaC.errors import MaKaCError
 
 from indico.core.config import Config
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 
 class SendErrorReport(ServiceBase):
     """

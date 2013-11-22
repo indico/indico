@@ -27,7 +27,7 @@ from MaKaC.plugins.Collaboration.WebcastRequest.mail import NewRequestNotificati
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.Collaboration.WebcastRequest.common import WebcastRequestError
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from indico.core.index import Catalog
 from MaKaC.i18n import _

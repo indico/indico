@@ -24,7 +24,7 @@ from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingMan
 from indico.util.contextManager import ContextManager
 import re
 from indico.core.index import Catalog
-#from MaKaC.common.logger import Logger
+#from indico.core.logging import Logger
 
 class WNewBookingForm(WCSPageTemplateBase):
 

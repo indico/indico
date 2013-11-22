@@ -34,7 +34,7 @@ from MaKaC.conference import Conference,Session,Contribution,SubContribution
 from MaKaC.i18n import _
 from MaKaC.user import AvatarHolder, GroupHolder
 
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.common.timezoneUtils import nowutc
 
 from indico.util import json

@@ -19,7 +19,7 @@
 
 from Configuration import Config
 from MaKaC.errors import MaKaCError
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.common import timezoneUtils
 from MaKaC.common.utils import OSSpecific
 from MaKaC.common.contextManager import ContextManager

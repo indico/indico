@@ -22,7 +22,7 @@ from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi, UserApi
 from MaKaC.plugins.Collaboration.ravem import RavemApi
 from suds import WebFault
 from MaKaC.plugins.Collaboration.base import CollaborationException
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 
 
 class VidyoOperations(object):

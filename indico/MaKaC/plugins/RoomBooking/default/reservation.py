@@ -29,7 +29,7 @@ from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
 from MaKaC.rb_tools import qbeMatch, containsExactly_OR_containsAny, fromUTC
 from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.plugins.RoomBooking.default.factory import Factory
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.base import Observable
 from MaKaC.plugins.RoomBooking.notifications import ReservationStartEndNotification

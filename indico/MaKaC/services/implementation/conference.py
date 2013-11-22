@@ -39,7 +39,7 @@ from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTim
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 
 from MaKaC.errors import TimingError
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder

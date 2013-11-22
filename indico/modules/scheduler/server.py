@@ -23,7 +23,7 @@ import time
 import random
 
 from indico.core.db import DBMgr
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 
 
 from indico.modules.scheduler import SchedulerModule, base

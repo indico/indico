@@ -33,7 +33,7 @@ from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebEx.common import getMinStartDate, getMaxEndDate,\
     Participant, sendXMLRequest, WebExError, getWebExOptionValueByName, makeTime, findDuration, unescape
 from MaKaC.plugins.Collaboration.WebEx.api.operations import WebExOperations
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 from MaKaC.i18n import _
 from MaKaC.common.Counter import Counter
 from MaKaC.plugins.Collaboration.WebEx.mail import NewWebExMeetingNotificationAdmin, \

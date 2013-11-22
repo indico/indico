@@ -21,7 +21,7 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.user import Avatar, Group
 from MaKaC.conference import Category
 
-from MaKaC.common.logger import Logger
+from indico.core.logging import Logger
 
 class RecordingManagerMarcTagGenerator(object):
 
