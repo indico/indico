@@ -1,24 +1,26 @@
-<div id="{{ section.id }}" class="regFormSectionMgmt">
-    <div class="regFormSectionSortableHandle"/>
-    <div class="regFormHeaderMgmt">
-        <span class="regFormSectionTitle"
-            ng-model="section.title"
-            contenteditable>
-        </span>
+<div id="{{ section.id }}" class="regFormSection">
+    <div class="sortable-handle"/>
+    <div class="regFormHeader">
         <span nd-section-toolbar
             section="section"
             buttons="buttons"
             dialogs="dialogs"
             state="state"
             api="sectionApi">
-         </span>
-    </div>
-
-    <div ng-switch="section.id" class="regFormSectionContent regFormIsDragAndDrop">
+        </span>
+        <div class="regFormSectionTitle"
+            ng-model="section.title"
+            contenteditable>
+        </div>
         <div class="regFormSectionDescription"
             ng-model="section.description"
             contenteditable>
         </div>
+
+    </div>
+
+    <div ng-switch="section.id" class="regFormSectionContent regFormIsDragAndDrop">
+
         <div ng-switch-default
             ng-include="getTpl('sections/general.tpl.html')">
         </div>

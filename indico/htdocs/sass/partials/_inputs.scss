@@ -56,6 +56,21 @@ textarea {
     @extend %text-input;
 }
 
+div[contenteditable],
+span[contenteditable] {
+    @include single-transition(margin);
+
+    &:hover {
+        outline: 1px dashed $gray;
+    }
+
+    &:focus {
+        box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+        outline: 1px solid $blue;
+        margin: 5px 0;
+    }
+}
+
 .i-selection {
     input[type=checkbox],
     input[type=radio] {

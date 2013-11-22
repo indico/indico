@@ -23,6 +23,14 @@
     font-family: verdana, arial, serif;
 }
 
+%font-family-title {
+    font-family: "Roboto", "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+}
+
+%font-family-title-light {
+    font-family: "Roboto Light", "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+}
+
 %font-size-body {
     font-size: 13px;
 }
@@ -36,11 +44,11 @@ body {
 }
 
 h1 {
-   font-family: "Roboto", "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+    @extend %font-family-title;
 }
 
 h2, h3, h4 {
-    font-family: "Roboto Light", "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+    @extend %font-family-title-light;
 }
 
 h2 {

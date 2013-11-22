@@ -7,20 +7,18 @@
         allowing also dialogs without specifying a controller.
         It should be possible as defining a controller in a directive is not mandatory,
         but something must be wrong... -->
-<form id="newSectionForm" ng-controller="SectionCtrl">
-    <div class="regFormSectionNewSection">
-        <input type="text" ng-model="newsection.title"
-            name="title"
-            size="50px"
-            class="regFormTitleInputMgmt"
-            placeholder="{{ 'new section name' | i18n }}"
-            required>
-        <textarea ng-model="newsection.description"
-            name="description"
-            rows="4"
-            cols="50px"
-            class="regFormDescriptionInputMgmt"
-            placeholder="{{ 'Description' | i18n }}">
-        </textarea>
-    </div>
-</form>
+<div class="regFormSectionNewSection" ng-controller="SectionCtrl">
+    <input type="text" ng-model="newsection.title"
+        name="title"
+        size="50px"
+        class="regFormTitleInputMgmt"
+        placeholder="{{ 'New section title' | i18n }}"
+        required>
+    <textarea ng-model="newsection.description"
+        name="description"
+        rows="4"
+        cols="50px"
+        class="regFormDescriptionInputMgmt"
+        placeholder="{{ 'Description' | i18n }}">
+    </textarea>
+</div>
