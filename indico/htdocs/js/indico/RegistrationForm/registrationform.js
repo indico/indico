@@ -56,7 +56,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
         templateUrl:  url.tpl('registrationform.tpl.html'),
 
         scope: {
-            confId: '@'
+            confId: '@',
+            editMode: '@'
         },
 
         controller: function($scope, $resource) {
@@ -109,6 +110,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
 
                 }
             };
+            console.log($scope.editMode);
 
             $scope.sectionSortableOptions = {
                 start: function(e, ui ){
@@ -123,7 +125,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
                 delay: 150,
                 opacity: 0.5,
                 handle: ".sortable-handle",
-                placeholder: "regFormSortablePlaceHolder"
+                placeholder: "regFormSortablePlaceHolder",
+                disabled: !$scope.editMode
                 //items: "nd-section"
             };
         }

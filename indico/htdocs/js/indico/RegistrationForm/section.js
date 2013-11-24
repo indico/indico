@@ -107,6 +107,8 @@ ndRegForm.directive('ndSection', function(url) {
 
         link: function(scope, element) {
 
+            scope.editMode = scope.$parent.editMode;
+
             scope.buttons = {
                 newfield: false,
                 config: false,

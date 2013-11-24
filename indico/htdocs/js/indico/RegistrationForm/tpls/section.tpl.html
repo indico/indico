@@ -1,25 +1,34 @@
 <div id="{{ section.id }}" class="regFormSection">
-    <div class="sortable-handle"/>
-    <div class="regFormHeader">
-        <span nd-section-toolbar
-            section="section"
-            buttons="buttons"
-            dialogs="dialogs"
-            state="state"
-            api="sectionApi">
-        </span>
-        <div class="regFormSectionTitle"
-            ng-model="section.title"
-            contenteditable>
+    <div ng-switch="editMode" class="regFormHeader">
+        <div ng-switch-default>
+            <div class="regFormSectionTitle">
+                {{section.title}}
+            </div>
+            <div class="regFormSectionDescription">
+                {{section.description}}
+            </div>
         </div>
-        <div class="regFormSectionDescription"
-            ng-model="section.description"
-            contenteditable>
+        <div ng-switch-when="true">
+            <div class="sortable-handle"/>
+            <span nd-section-toolbar
+                section="section"
+                buttons="buttons"
+                dialogs="dialogs"
+                state="state"
+                api="sectionApi">
+            </span>
+            <div class="regFormSectionTitle"
+                ng-model="section.title"
+                contenteditable>
+            </div>
+            <div class="regFormSectionDescription"
+                ng-model="section.description"
+                contenteditable>
+            </div>
         </div>
-
     </div>
 
-    <div ng-switch="section.id" class="regFormSectionContent regFormIsDragAndDrop">
+    <div ng-switch="section.id" class="regFormSectionContent">
 
         <div ng-switch-default
             ng-include="getTpl('sections/general.tpl.html')">
@@ -42,7 +51,7 @@
     </div>
 
     <nd-dialog nd-section-dialog
-        ng-if="buttons.config"
+        ng-if="buttons.config && editMode"
         heading="Settings: {{ section.title }}"
         show="dialogs.config.open"
         data="dialogs.config"
