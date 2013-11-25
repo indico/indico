@@ -26,13 +26,17 @@ import unicodedata
 
 
 def unicodeOrNone(string):
-    return None if string == None else string.decode('utf-8')
+    return None if string is None else string.decode('utf-8')
 
 
-def remove_accents(text):
+def remove_accents(text, reencode=True):
     if not isinstance(text, unicode):
-        text = text.decode('utf8')
-    return ''.join((c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn'))
+        text = text.decode('utf-8')
+    result = u''.join((c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn'))
+    if reencode:
+        return result.encode('utf-8')
+    else:
+        return result
 
 
 def remove_non_alpha(text):

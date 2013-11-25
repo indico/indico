@@ -1159,11 +1159,11 @@ class AvatarHolder(ObjectHolder):
     def match(self, criteria, exact=0, onlyActivated=True, searchInAuthenticators=True):
         result = {}
         iset = set()
-        for f,v in criteria.items():
+        for f, v in criteria.items():
             v = str(v).strip()
             if v and f in self._indexes:
-                match = indexes.IndexesHolder().getById(f).matchUser(v, exact=exact)
-                if match!= None:
+                match = indexes.IndexesHolder().getById(f).matchUser(v, exact=exact, accent_sensitive=False)
+                if match is not None:
                     if len(iset) == 0:
                         iset = set(match)
                     else:

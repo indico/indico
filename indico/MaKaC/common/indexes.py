@@ -67,8 +67,9 @@ class Index(Persistent):
         letters = []
         words = self.getKeys()
         for word in words:
-            if not word[0].lower() in letters:
-                letters.append(word[0].lower())
+            uletter = remove_accents(word.decode('utf-8').lower()[0])
+            if not uletter in letters:
+                letters.append(uletter)
         letters.sort()
         return letters
 
@@ -97,10 +98,10 @@ class Index(Persistent):
             cmpLetter = remove_accents(cmpLetter)
 
         for key in self.getKeys():
-            cmpKey = key[0].lower()
+            uletter = key.decode('utf8')[0].lower()
             if not accent_sensitive:
-                cmpKey = remove_accents(cmpKey)
-            if cmpKey == cmpLetter:
+                uletter = remove_accents(uletter)
+            if uletter == cmpLetter:
                 result += self._words[key]
 
         return result
@@ -156,7 +157,7 @@ class EmailIndex(Index):
         for email in user.getEmails():
             self._withdrawItem(email, user.getId())
 
-    def matchUser(self, email, cs=0, exact=0):
+    def matchUser(self, email, cs=0, exact=0, accent_sensitive=True):
         """this match is an approximative case insensitive match"""
         return self._match(email, cs, exact)
 
@@ -218,33 +219,35 @@ class StatusIndex(Index):
         for av in ah.getList():
             self.indexUser(av)
 
-    def indexUser( self, user ):
+    def indexUser(self, user):
         status = user.getStatus()
-        self._addItem( status, user.getId() )
+        self._addItem(status, user.getId())
 
-    def unindexUser( self, user ):
+    def unindexUser(self, user):
         status = user.getStatus()
-        self._withdrawItem( status, user.getId() )
+        self._withdrawItem(status, user.getId())
 
-    def matchUser( self, status, cs=0, exact=1 ):
+    def matchUser(self, status, cs=0, exact=1, accent_sensitive=True):
         """this match is an approximative case insensitive match"""
-        return self._match(status,cs,exact)
+        return self._match(status, cs, exact)
 
-class GroupIndex( Index ):
+
+class GroupIndex(Index):
     _name = "group"
 
-    def indexGroup( self, group ):
+    def indexGroup(self, group):
         name = group.getName()
-        self._addItem( name, group.getId() )
+        self._addItem(name, group.getId())
 
-    def unindexGroup( self, group ):
+    def unindexGroup(self, group):
         name = group.getName()
-        self._withdrawItem( name, group.getId() )
+        self._withdrawItem(name, group.getId())
 
-    def matchGroup( self, name, cs=0, exact=0 ):
+    def matchGroup(self, name, cs=0, exact=0):
         if name == "":
             return []
-        return self._match(name,cs,exact)
+        return self._match(name, cs, exact)
+
 
 class CategoryIndex(Persistent):
 

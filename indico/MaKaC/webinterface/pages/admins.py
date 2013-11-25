@@ -1142,10 +1142,13 @@ class WBrowseUsers(wcomponents.WTemplated):
 
         vars["browseResult"] = ""
 
-        if self._letter != None:
+        if self._letter is not None:
             ah = user.AvatarHolder()
             if self._letter != "all":
-                res = ah.matchFirstLetter(self._browseIndex, self._letter, onlyActivated=False, searchInAuthenticators=True)
+                res = ah.matchFirstLetter(self._browseIndex,
+                                          self._letter,
+                                          onlyActivated=False,
+                                          searchInAuthenticators=False)
             else:
                 res = ah.getValuesToList()
             if self._browseIndex == "surName" or self._browseIndex == "status":
