@@ -285,12 +285,14 @@ you can use the generic selector below, but it's slower:
 .icon-seven-segment9:before {
     content: "\e48b";
 }
-
 .icon-play:before {
     content: "\e00c";
 }
 .icon-stop:before {
     content: "\e00d";
+}
+.icon-sort:before {
+    content: "\e00e";
 }
 
 /* KEEP THE FOLLOWING DEFINITIONS: necessery when rendering the icon 'after' e.g. mixin icon-after */
