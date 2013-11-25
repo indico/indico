@@ -1,9 +1,9 @@
-<div ng-hide="field.id == -1" ng-mouseenter="show=true" ng-mouseleave="show=false">
-    <table class="regFormField editableItem"
-        ng-class="{disabled: field.disabled}"
+<div ng-show="isFieldActive(field)" ng-mouseenter="show=true" ng-mouseleave="show=false">
+    <table class="regFormField"
+        ng-class="{disabled: field.disabled, regFormField: editMode}"
         id="{{ field.id }}">
         <tr>
-            <td class="regFormFieldSortableHandle"/>
+            <td ng-if="editMode" class="regFormFieldSortableHandle"/>
             <td class="regFormCaption">
                 <span class="regFormCaption">{{ field.caption }}</span>
                 <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
@@ -13,7 +13,7 @@
                 <div ng-include="tplInput"></div>
             </td>
 
-            <td ng-show="show">
+            <td ng-if="editMode" ng-show="show">
                 <a ng-if="field.disabled" ng-click="fieldApi.enableField(field)" class="icon-plus"></a>
                 <a ng-if="!field.disabled && field.lock.indexOf('disable') == -1" ng-click="fieldApi.disableField(field)" class="icon-disable"></a>
                 <a ng-if="field.lock.indexOf('delete') == -1" ng-click="fieldApi.removeField(field)" class="icon-remove"></a>
@@ -23,6 +23,7 @@
     </table>
 
     <nd-dialog nd-field-dialog
+        ng-if="editMode"
         heading="{{ dialogs.settings.title() }}"
         show="dialogs.settings.open"
         data="dialogs.settings"

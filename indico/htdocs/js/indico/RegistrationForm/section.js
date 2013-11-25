@@ -99,15 +99,13 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function(
     };
 }]);
 
-ndRegForm.directive('ndSection', function(url) {
+ndRegForm.directive('ndSection', function($rootScope, url) {
     return {
         replace: true,
         templateUrl: url.tpl('section.tpl.html'),
         controller: 'SectionCtrl',
 
         link: function(scope, element) {
-
-            scope.editMode = scope.$parent.editMode;
 
             scope.buttons = {
                 newfield: false,

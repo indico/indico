@@ -21,7 +21,7 @@ ndRegForm.controller('FieldCtrl', function($scope) {
     // Explore the best way to implement it ;)
 });
 
-ndRegForm.directive('ndField', function(url, RESTAPI) {
+ndRegForm.directive('ndField', function($rootScope, url, RESTAPI) {
     return {
         restrict: 'E',
         replace: true,
@@ -124,6 +124,10 @@ ndRegForm.directive('ndField', function(url, RESTAPI) {
 
             $scope.hasPlacesLeft = function(field) {
                 return !$scope.isDisabled(field) && field.placesLimit !== 0 && field.noPlacesLeft >= 0;
+            };
+
+            $scope.isFieldActive = function (field) {
+                return field.id != -1 && (field.disabled === false || $rootScope.editMode);
             };
 
         },

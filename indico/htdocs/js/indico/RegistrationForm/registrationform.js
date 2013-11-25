@@ -62,9 +62,11 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
 
         controller: function($scope, $resource) {
             $rootScope.confId = $scope.confId;
+            $rootScope.editMode = $scope.editMode;
 
             var sections = RESTAPI.Sections.get({confId: $scope.confId}, function() {
                 $scope.sections = sections["sections"];
+                $rootScope.currency = sections["currency"];
             });
 
             $scope.dialogs = {
@@ -110,7 +112,6 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
 
                 }
             };
-            console.log($scope.editMode);
 
             $scope.sectionSortableOptions = {
                 start: function(e, ui ){
@@ -126,7 +127,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
                 opacity: 0.5,
                 handle: ".sortable-handle",
                 placeholder: "regFormSortablePlaceHolder",
-                disabled: !$scope.editMode
+                disabled: !$rootScope.editMode
                 //items: "nd-section"
             };
         }
