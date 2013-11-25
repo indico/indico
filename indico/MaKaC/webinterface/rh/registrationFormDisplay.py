@@ -34,6 +34,8 @@ from MaKaC.common.utils import validMail
 from MaKaC.PDFinterface.conference import TicketToPDF
 from indico.web.flask.util import send_file
 
+from indico.util import json
+
 
 class RHBaseRegistrationForm( RHConferenceBaseDisplay ):
 
@@ -301,3 +303,21 @@ class RHRegistrationFormConditions( RHRegistrationFormDisplayBase ):
     def _process( self ):
         p = registrationForm.WPRegistrationFormConditions(self, self._conf)
         return p.display()
+
+
+class RHRegistrationFormUserData(RHRegistrationFormDisplayBase):
+
+    def _checkProtection(self):
+        RHBaseRegistrationForm._checkProtection(self)
+
+    def _process(self):
+        user = self._aw.getUser()
+        reg_data = {}
+        if user is not None:
+            if user.isRegisteredInConf(self._conf):
+                registrant = user.getRegistrantById(self._conf.getId())
+                reg_data = registrant.fossilize()
+            else:
+                personalData = self._regForm.getPersonalData()
+                reg_data['avatar'] = personalData.getFormValuesFromAvatar(user)
+        return json.dumps(reg_data)
