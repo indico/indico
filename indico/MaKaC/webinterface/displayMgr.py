@@ -829,12 +829,13 @@ class SystemLink(Link):
         # TOREMOVE: fix events with "absolute" URL
         if not hasattr(self, '_URLHandler'):
             self.getMenu().updateSystemLink()
-        conf = self.getMenu().getConference()
         if isinstance(self._URLHandler, str):
+            if self._URLHandler.startswith("http"):  # Fix for hardcoded URLs
+                self.getMenu().updateSystemLink()
             handler = getattr(urlHandlers, self._URLHandler)
         else:
             handler = self._URLHandler
-        return handler.getURL(conf)
+        return handler.getURL(self.getMenu().getConference())
 
     def getURL(self):
         url = str(self._getURLObject())
