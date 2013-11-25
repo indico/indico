@@ -390,6 +390,12 @@ ndRegForm.directive('ndFieldDialog', function(url) {
             $scope.addItem = function () {
                  $scope.formData.radioitems.push({id:'isNew'});
             };
+
+            $scope.sortItems = function () {
+                $scope.formData.radioitems = _.sortBy($scope.formData.radioitems, function(radioitem) {
+                    return radioitem.caption.toLowerCase();
+                });
+            };
         }
     };
 });
