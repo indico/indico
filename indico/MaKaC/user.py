@@ -46,7 +46,6 @@ from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 import indico.util.redis.avatar_links as avatar_links
-from indico.util.string import remove_accents
 
 """Contains the classes that implement the user management subsystem
 """
@@ -1130,7 +1129,7 @@ class AvatarHolder(ObjectHolder):
         if index not in self._indexes:
             return None
         if index in ["name", "surName", "organisation"]:
-            match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter, accents=False)
+            match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter, accent_sensitive=False)
         else:
             match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter)
         if match is not None:
