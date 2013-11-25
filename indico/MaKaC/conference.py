@@ -6275,25 +6275,25 @@ class Session(CommonObjectBase, Locatable):
         if self.canModify(aw):
             return True
 
+        flag_allowed_to_access = self.isAllowedToAccess(aw.getUser())
         if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and \
-                not self.isAllowedToAccess(aw.getUser()):
+                not flag_allowed_to_access:
             return False
         if not self.isProtected():
             return True
-        flag = self.isAllowedToAccess( aw.getUser() )
-        return flag or self.conference.canKeyAccess( aw )
+        return flag_allowed_to_access or self.conference.canKeyAccess(aw)
 
-    def grantModification( self, sb, sendEmail=True ):
+    def grantModification(self, sb, sendEmail=True):
         if isinstance(sb, SessionChair) or isinstance(sb, SlotChair):
             ah = AvatarHolder()
-            results=ah.match({"email":sb.getEmail()}, exact=1)
-            r=None
+            results = ah.match({"email": sb.getEmail()}, exact=1)
+            r = None
             for i in results:
                 if sb.getEmail().lower().strip() in [j.lower().strip() for j in i.getEmails()]:
-                    r=i
+                    r = i
                     break
             if r is not None and r.isActivated():
-                self.__ac.grantModification( r )
+                self.__ac.grantModification(r)
                 r.linkTo(self, "manager")
             elif sb.getEmail() != "":
                 modificationEmailGranted = self.__ac.grantModificationEmail(sb.getEmail())
