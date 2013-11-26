@@ -616,7 +616,7 @@ class RHRegistrationFormFieldEnable(RHRegistrationFormModifFieldBase):
 
     def _process_POST(self):
         # Move field to the first position
-        self._section.addToSortedFields(self._field, 0)
+        self._section.addToSortedFields(self._field)
         self._field.setDisabled(False)
         return json.dumps(self._field.fossilize())
 
