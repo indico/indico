@@ -1,20 +1,20 @@
 <div ng-show="isFieldActive(field)" ng-mouseenter="show=true" ng-mouseleave="show=false">
-    <table class="regFormField"
-        ng-class="{disabled: field.disabled, regFormField: editMode}"
+    <table border="0" cellpadding="0" cellspacing="0"
+        class="regform-field"
+        ng-class="{disabled: field.disabled, editable: editMode}"
         id="{{ field.id }}">
         <tr>
-            <td ng-if="editMode" class="regFormFieldSortableHandle"/>
-            <td class="regFormCaption">
-                <span class="regFormCaption">{{ field.caption }}</span>
+            <td ng-if="editMode" class="sortable-handle"/>
+            <td class="field-caption">
+                <span>{{ field.caption }}</span>
                 <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
             </td>
 
-            <td>
-                <div ng-include="tplInput"></div>
-            </td>
+            <td ng-include="tplInput" class="field-input"></td>
 
-            <td ng-if="editMode" ng-show="show">
+            <td ng-if="editMode" ng-show="show" class="field-actions">
                 <a ng-if="field.disabled" ng-click="fieldApi.enableField(field)" class="icon-plus"></a>
+                <!-- TODO move logic to controller -->
                 <a ng-if="!field.disabled && field.lock.indexOf('disable') == -1" ng-click="fieldApi.disableField(field)" class="icon-disable"></a>
                 <a ng-if="field.lock.indexOf('delete') == -1" ng-click="fieldApi.removeField(field)" class="icon-remove"></a>
                 <a ng-click="openFieldSettings()" class="icon-settings"></a>

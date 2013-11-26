@@ -1,20 +1,19 @@
 <table>
     <tr>
-        <td class="regFormSubGroupTitle" align="left" colspan="3">
+        <td class="bold" align="left" colspan="3">
             {{ section.introSentence }}
         </td>
     </tr>
 
     <tr ng-repeat="item in section.items">
         <!-- if item.cancelled -->
-        <td ng-show="item.cancelled" class="regFormSectionLeftSpacing1">
+        <td ng-show="item.cancelled">
             <b>-</b> {{ item.caption }} <font color="red">({{ item.cancelledReason }})</font>
         </td>
 
         <!-- elif item.placesLimit != 0 and item.noPlacesLeft == 0 -->
         <td ng-show="!item.cancelled && item.placesLimit != 0 && item.noPlacesLeft == 0"
-            ng-switch="section.selectionType"
-            class="regFormSectionLeftSpacing1">
+            ng-switch="section.selectionType">
             <input ng-switch-when="multiple"
                 type="checkbox" name="socialEvents" value="{{ item.id }}" disabled/>
             <input ng-switch-default
@@ -24,8 +23,7 @@
         </td>
 
         <!-- else -->
-        <td ng-switch="section.selectionType"
-            class="regFormSectionLeftSpacing1">
+        <td ng-switch="section.selectionType">
             <input ng-switch-when="multiple"
                 type="checkbox" name="socialEvents" value="{{ item.id }}"
                 ng-class="{regFormIsBillable: item.billable}"/>

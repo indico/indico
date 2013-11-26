@@ -19,23 +19,15 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-#registrationform {
-    // TODO Fill with SASS magic
-
-    & .section {
-
-    }
-}
-
-%regFormSection {
+%regform-section {
     @include border-radius();
     @include box-sizing(border-box);
     margin-top: 25px;
     width:700px;
 }
 
-.regFormSection {
-    @extend %regFormSection;
+.regform-section {
+    @extend %regform-section;
     @include border-all();
 
     background: white;
@@ -43,32 +35,49 @@
     opacity: 1 !important;
     padding: 10px;
 
-    & .regFormHeader {
-        margin-bottom: 20px;
+    & .section-content {
+        margin-top: 20px;
     }
 
-    & .sortable-handle {
+    & > .sortable-handle {
+        @include icon-before('icon-handle');
         @include transition(
             background-color $default-transition-duration $default-transition-function,
             height $default-transition-duration $default-transition-function
         );
 
-        background-color: $gray;
-        height: 10px;
+        background-color: lighten($dark-gray, $color-variation);
         cursor: move;
+        font-size: 1.2em;
+        height: 10px;
         margin: -10px -10px 10px -10px;
+        text-align: center;
 
         &:hover,
         &:active {
             @include border-bottom();
-            // @include icon-before('icon-telephone'); // TODO change icon
-            background-color: white;
+            background-color: $light-gray;
             height: 20px;
+
+            &:before {
+                color: $dark-gray;
+                top: 3px;
+            }
+        }
+
+        &:before {
+            @include rotate(90deg);
+            @include single-transition(top);
+            color: $light-gray;
+            display: inline-block;
+            position: relative;
+            top: -3px;
         }
     }
 }
 
-.regFormSectionTitle,
+// TODO no event?
+.regform-section-title,
 .regFormSectionTitleNoEvent {
     @extend %font-family-title-light;
 
@@ -77,12 +86,97 @@
     font-weight: bold;
 }
 
-.regFormField {
+// TODO no event?
+.regform-section-description,
+.regFormSectionDescriptionNoEvent {
+    @extend %font-family-description;
+    color: darken($gray, $color-variation);
+    font-size: 14px;
+    font-style: italic;
+
+    &:empty {
+        // TODO contenteditable placeholder?
+        color: $gray;
+    }
+}
+
+.regform-field {
+    min-height: 27px;
+    margin: 2px 0;
     width: 100%;
 
     &.disabled {
-        background : #EBEBEB;
+        background : darken($light-gray, $color-variation);
     }
+
+    & .field-actions {
+        float: right;
+        line-height: 27px;
+        padding: 0 5px;
+    }
+
+    & .field-caption {
+        width: 125px;
+        vertical-align: top;
+        line-height: 27px;
+    }
+
+    & .field-input {
+        vertical-align: top;
+    }
+
+    &.editable {
+        &:hover {
+            background-color:#ECEEFC;
+        }
+
+        & .sortable-handle {
+            line-height: 27px;
+            vertical-align: top;
+            width: 15px;
+            cursor: move;
+        }
+
+        &:hover .sortable-handle {
+            @include icon-before('icon-handle');
+        }
+    }
+}
+
+.regform-add-field-qtip {
+    max-width: 267px;
+    background: #fff;
+    border: 1px solid #ccc;
+    width: 267px;
+
+    & .ui-tooltip-content {
+        padding: 0px;
+    }
+
+    & .ui-tooltip-titlebar {
+        border-bottom: none !important;
+        background: transparent;
+    }
+}
+
+// Field-specific
+
+.regform-field {
+    & .accommodation-option-item {
+        padding-left : 15px;
+    }
+}
+
+// Dialogs
+
+.regFormSectionNewSection {
+    @extend %font-family-title-light;
+    width:625px;
+    font-size: 20px;
+    color: #0C4566;
+    padding: 10px;
+    font-weight: bold;
+    margin: 0px;
 }
 
 .regFormInfoMessage {
@@ -112,8 +206,8 @@
 }
 
 .regFormDialogEditLine {
-    clear : both;
-    margin-right : 30px;
+    clear: both;
+    margin-right: 30px;
     margin-bottom: 15px;
 }
 
@@ -135,80 +229,28 @@
     padding-bottom : 7px;
 }
 
-.regFormSectionLeftSpacing1 {
-    padding-left : 15px;
-}
-.regFormPadding1 {
-    padding: 5px 0 5px 15px;
-}
-
-.regFormPadding2 {
-    padding: 10px 0 5px 15px;
-}
-
-// Dialogs
-
-.regFormSectionNewSection {
-    @extend %font-family-title-light;
-    width:625px;
-    font-size: 20px;
-    color: #0C4566;
-    padding: 10px;
-    font-weight: bold;
-    margin: 0px;
-}
-
 /* Form Edition CSS */
 
-.editableItem:hover,
-.editableText:hover  {
-    background-color:#ECEEFC;
-}
-
-.regFormFloatRight{
-    align: right;
-    text-align: right;
-    overflow: 'visible';
-    background-color: #ECEEFC;
-}
-
-.regFormHeader {
-    margin-bottom: 15px;
-}
-
 input.regFormTitleInputMgmt {
+    @extend %font-family-title-light;
     width : 600px;
     font-size: 20px;
     color: rgb(12, 69, 102);
-    font-family: 'Times New Roman', Verdana, Arial;
     font-style: normal;
     font-weight: bold;
 }
 
 textarea.regFormDescriptionInputMgmt {
+    @extend %font-family-description;
     width : 600px;
     font-size: 14px;
     color: rgb(34, 34, 34);
-    font-family: 'Times New Roman', Verdana, Arial;
     font-style: italic;
     font-weight: normal;
 }
 
-
-.regFormSectionDescription,
-.regFormSectionDescriptionNoEvent {
-    font-family: "Times New Roman", Verdana, Arial;
-    font-size: 14px;
-    margin: 0px;
-    font-style: italic;
-    clear: left;
-}
-
-.regFormSectionContent {
-    // padding-left: 10px;
-}
-
-.regFormSectionTable, .regFormDoneTable {
+.regFormSectionTable,
+.regFormDoneTable {
     border: 1px solid #CCC;
     border-radius: 5px;
     -moz-border-radius: 5px;
@@ -218,57 +260,16 @@ textarea.regFormDescriptionInputMgmt {
     margin-top: 10px;
 }
 
-.regFormMandatoryInfo {
-    padding-bottom: 10px;
-    text-align: center;
-    color: #3B4145;
-    font-style: italic;
-}
-
 .regFormMandatoryField {
     color: #812;
 }
 
-.regFormCaption {
-    width: 125px;
-    vertical-align: top;
-    padding-top : 6px;
-}
-
-.regFormSubGroupTitle {
-    font-size: 13px;
-    font-family: Verdana, Arial;
-    font-weight: bold;
-}
-
-.regFormSectionEditDialog {
-    //width : 95% !important;
-    margin: 0 0;
-    postition: absolute;
-}
-
 /* CSS for the tabs */
-.regFormItalic {
-    font-style: italic;
-}
 
 .regFormDonePlacesNeeded {
     font-style: italic;
     padding-left: 5px;
 }
-
-.regFormButton {
-    background-color: #0C4566;
-    border-color: #FFFFFF;
-    font-weight: bold;
-    width: 100px;
-    color: #FFFFFF;
-    height: 30px;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    cursor: pointer;
-}
-
 
 .regFormDoneData {
     padding-left: 5px;
@@ -297,42 +298,6 @@ textarea.regFormDescriptionInputMgmt {
 .navbar-fixed-top .container,
 .navbar-fixed-bottom .container {
   width: 940px;
-}
-.span12 {
-  width: 940px;
-}
-.span11 {
-  width: 860px;
-}
-.span10 {
-  width: 780px;
-}
-.span9 {
-  width: 700px;
-}
-.span8 {
-  width: 620px;
-}
-.span7 {
-  width: 540px;
-}
-.span6 {
-  width: 460px;
-}
-.span5 {
-  width: 380px;
-}
-.span4 {
-  width: 300px;
-}
-.span3 {
-  width: 220px;
-}
-.span2 {
-  width: 140px;
-}
-.span1 {
-  width: 60px;
 }
 
 /* CSS for the tabs */
@@ -467,96 +432,12 @@ textarea.regFormDescriptionInputMgmt {
   display: block;
 }
 
-.regFormAddField {
-    max-width: 267px;
-    background: #fff;
-    border: 1px solid #ccc;
-    width: 267px;
-}
 
-.regFormAddField .ui-tooltip-content {
-    padding: 0px;
-}
-
-.regFormAddField .ui-tooltip-titlebar {
-    border-bottom: none !important;
-    background: transparent;
-}
-
-.regFormAddField .icon_desc {
-    text-align: center;
-    color: #555;
-    clear:both;
-    font-size:10px;
-}
-
-.regFormAddField .icon {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 48px;
-    height: 48px;
-    background-image: url("../../../../images/regform_buttons.png");
-}
-
-div[data-field-type="label"] img.icon {
-    background-position: 0 0;
-}
-
-div[data-field-type="text"] img.icon {
-    background-position: -48px 0;
-}
-
-div[data-field-type="number"] img.icon {
-    background-position: -96px 0;
-}
-
-div[data-field-type="textarea"] img.icon {
-    background-position: -144px 0;
-}
-
-div[data-field-type="radio-dropdown"] img.icon {
-    background-position: 0 -48px;
-}
-
-div[data-field-type="radio-radiogroup"] img.icon {
-    background-position: -48px -48px;
-}
-
-div[data-field-type="checkbox"] img.icon {
-    background-position: -96px -48px;
-}
-
-div[data-field-type="date"] img.icon {
-    background-position: -144px -48px;
-}
-
-div[data-field-type="yesno"] img.icon {
-    background-position: 0px -96px;
-}
-
-div[data-field-type="telephone"] img.icon {
-    background-position: -48px -96px;
-}
-
-div[data-field-type="country"] img.icon {
-    background-position: -96px -96px;
-}
-
-div[data-field-type="file"] img.icon {
-    background-position: -144px -96px;
-}
 
 // Sortable
 
-.regFormFieldSortableHandle {
-    background-color: #CCC;
-    width: 5px;
-    cursor: move;
-}
-
 .regFormSortablePlaceHolder {
-    @extend %regFormSection;
+    @extend %regform-section;
 
     background-color: $light-gray;
     min-height: 100%;

@@ -1,15 +1,15 @@
-<div id="{{ section.id }}" class="regFormSection">
+<div id="{{ section.id }}" class="regform-section">
+    <div class="sortable-handle"/>
     <div ng-switch="editMode" class="regFormHeader">
         <div ng-switch-default>
-            <div class="regFormSectionTitle">
+            <div class="regform-section-title">
                 {{section.title}}
             </div>
-            <div class="regFormSectionDescription">
+            <div class="regform-section-description">
                 {{section.description}}
             </div>
         </div>
         <div ng-switch-when="true">
-            <div class="sortable-handle"/>
             <span nd-section-toolbar
                 section="section"
                 buttons="buttons"
@@ -17,19 +17,18 @@
                 state="state"
                 api="sectionApi">
             </span>
-            <div class="regFormSectionTitle"
+            <div class="regform-section-title"
                 ng-model="section.title"
                 contenteditable>
             </div>
-            <div class="regFormSectionDescription"
+            <div class="regform-section-description"
                 ng-model="section.description"
                 contenteditable>
             </div>
         </div>
     </div>
 
-    <div ng-switch="section.id" class="regFormSectionContent">
-
+    <div ng-switch="section.id" class="section-content">
         <div ng-switch-default
             ng-include="getTpl('sections/general.tpl.html')">
         </div>

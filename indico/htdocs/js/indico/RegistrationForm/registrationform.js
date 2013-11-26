@@ -44,7 +44,7 @@ ndRegForm.factory('RESTAPI', ['$resource','baseurl', function($resource, baseurl
                             {"enable": {method:'POST', url: fieldurl + "/enable"},
                              "disable": {method:'POST', url: fieldurl + "/disable"},
                              "move": {method:'POST', url: fieldurl + "/move"}
-                            }),
+                            })
     };
 }]);
 
@@ -114,7 +114,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
             };
 
             $scope.sectionSortableOptions = {
-                start: function(e, ui ){
+                start: function(e, ui) {
                     ui.placeholder.height(ui.helper.outerHeight());
                 },
 

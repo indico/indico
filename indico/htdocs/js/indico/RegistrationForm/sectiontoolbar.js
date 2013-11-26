@@ -74,9 +74,7 @@ ndRegForm.directive('ndFieldPicker', function($http, $compile, $templateCache, u
                         },
 
                         style: {
-                            classes: 'regFormAddField ui-tooltip-addField',
-                            width: '267px',
-                            padding: '20px',
+                            classes: 'regform-add-field-qtip',
                             name: 'light'
                         },
 
@@ -89,26 +87,6 @@ ndRegForm.directive('ndFieldPicker', function($http, $compile, $templateCache, u
                         }
                     });
                 });
-
-
-                // TODO: delete this backbone implementation when replicated new field creation
-                // events: {
-                //     render: function(event, api) {
-                //         $('.regFormAddFieldEntry', this).bind('click', function(event,ui) {
-                //             var newFieldType = $(event.target).closest('.regFormAddFieldEntry').data('fieldType').split('-');
-                //             var field = {
-                //                 input   : newFieldType[0],
-                //                 caption : '',
-                //                 values  : {}
-                //             };
-                //             if(newFieldType[1]){
-                //                 field.values.inputType = newFieldType[1];
-                //             }
-                //             self._createField(sectionId, field);
-                //         });
-                //     }
-                // }
-            // });
         }
     };
 });

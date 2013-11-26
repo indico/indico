@@ -130,7 +130,8 @@ ndRegForm.directive('ndSection', function($rootScope, url) {
             });
 
             scope.$watch('state.collapsed', function(val) {
-                var content = angular.element(element.children()[1]);
+                // TODO this will probably cause trouble in not-edit mode
+                var content = angular.element(element.children()[2]);
                 if (val) {
                     content.slideUp();
                 } else {
@@ -209,7 +210,7 @@ ndRegForm.directive("ndGeneralSection", function($timeout) {
                 cursor: 'move',
                 delay: 150,
                 opacity: 0.5,
-                handle: ".regFormFieldSortableHandle",
+                handle: ".sortable-handle",
                 placeholder: "regFormSortablePlaceHolder"
                 //items: "nd-section"
             };
