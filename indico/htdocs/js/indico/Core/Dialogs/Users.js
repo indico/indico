@@ -1394,21 +1394,17 @@ type("UserListField", ["IWidget"], {
         this.warning_no_indico = ($T("Please note that you have added a user that does not exist in Indico.\
                                     Non existing users will be asked via email to create an account so\
                                     that they will be able to use the privileges below."));
-        this.warning_no_email = ($T("Please note that you have added a user without an email. Users without \
-                                    email will not be contacted by Indico and therefore they will \
-                                    not be able to use the privileges below."));
-        this.divList = new Array();
+        this.warning_no_email = ($T("Please note that you have added a user without an email address. Users without \
+                                    email will not be able to use the privileges below."));
         this.messageDiv = $("<div/>", {css: {height: '58px',
                                             maxWidth: '420px',
                                             textAlign: 'left',
                                             width: 'auto',
-                                            overflow: 'auto'
+                                            overflow: 'auto',
+                                            marginLeft: '5px'
                                         }}).addClass("warningMessage");
         this.messageContainer = $("<div/>", {css: {display: 'inline-block', position: 'absolute'}});
-        this.containerDiv = $("<div/>", {css: {height: '80px',
-                                              overflow: 'hidden',
-                                              marginBottom: '10px'
-                                        }});
+        this.containerDiv = $("<div/>");
         this.warning_flag = false;
     },
 
@@ -1561,7 +1557,7 @@ type("UserListField", ["IWidget"], {
             }
             var key = keysList[i];
             var value = this.privileges[key];
-            var checkbox = $('<input>', {type:"checkbox" , id: key}).change(function(){
+            var checkbox = $('<input>', {type:"checkbox" , id: key, name:key}).change(function(){
                 if(!self.privilegesOn()){
                     self.clearMessages();
                     return;

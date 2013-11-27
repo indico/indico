@@ -42,7 +42,7 @@
             <td nowrap class="titleCellTD">
                 <span class="titleCellFormat">${ _("Speaker") }</span>
             </td>
-            <%include file="EventChairpersonAddition.tpl"/>
+            <%include file="EventParticipantAddition.tpl"/>
         </tr>
         <tr>
             <td>&nbsp;</td>

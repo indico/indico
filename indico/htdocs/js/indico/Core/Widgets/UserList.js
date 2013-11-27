@@ -81,7 +81,7 @@ type("ListOfUsersManager", [], {
     },
 
     _personName: function(user) {
-        if (user._type.indexOf("Group") != -1) {
+        if (user._type && user._type.indexOf("Group") != -1) {
             var fullName = user.name;
         } else {
             if (user.pending) {

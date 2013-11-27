@@ -90,7 +90,7 @@
                     <td nowrap class="titleCellTD">
                         <span class="titleCellFormat">${ _("Chairperson") }</span>
                     </td>
-                    <%include file="EventChairpersonAddition.tpl"/>
+                    <%include file="EventParticipantAddition.tpl"/>
                 </tr>
                 <tr>
                     <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Keywords")}<br><small>( ${ _("one per line")})</small></span></td>
