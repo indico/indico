@@ -2130,7 +2130,7 @@ class RadioGroupInput(FieldInputType, Fossilizable):
     def setValues(self, data):
         if "radioitems" in data:
             for i, itemValues in enumerate(data.get("radioitems", [])):
-                item = self.getItemById(itemValues['id'])
+                item = self.getItemById(itemValues.get('id'))
                 if item is None:
                     self.createItem(itemValues, i)
                 else:
