@@ -13,7 +13,7 @@
       % for template in templateList:
         <li>
           <span class="name">${template['name']}</span>
-          <div class="toolbar right thin">
+          <div class="toolbar right thin inline">
             <div class="group">
               <a href="${template['urlEdit']}" class="i-button icon-edit icon-only" title="${_("Edit template")}"></a>
               <a href="${template['urlDelete']}" class="i-button icon-remove icon-only" title="${_("Delete template")}"></a>
@@ -38,7 +38,7 @@
 
 <form method="post" action="${urlHandlers.UHTemplatesSetDefaultPDFOptions.getURL()}">
   <div class="bs-alert bs-alert-info">
-    <input name="savePDFOptions" class="i-button right accept" value="${ _("Save")}" type="submit">
+    <input name="savePDFOptions" class="i-button accept right" value="${ _("Save")}" type="submit">
     ${_('Once you have modified the default settings, please click save to put the amendments into effect.')}
   </div>
   ${PDFOptions}

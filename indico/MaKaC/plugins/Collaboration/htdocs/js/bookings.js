@@ -2,19 +2,17 @@ var videoServiceLaunchInfo = {};
 
 var TPL_DISPLAY_BUTTON = {
     'disconnect': function(elem) {
-        elem.show();
-        elem.text(format($T('Disconnect {0}'), [elem.data('location')]));
+        elem.children(".button-text").text(format($T("Disconnect {0}"), [elem.data('location')]));
         elem.removeClass('connect_room').addClass('disconnect_room');
     },
     'connect': function(elem) {
-        elem.show();
-        elem.text(format($T('Connect {0}'), [elem.data('location')]));
+        elem.children(".button-text").text(format($T("Connect {0}"), [elem.data('location')]));
         elem.removeClass('disconnect_room').addClass('connect_room');
     },
     'error' : function(elem) {
         elem.css('display', 'inline-block');
-        elem.text('');
-        elem.addClass('error');
+        elem.text(elem.data('location'));
+        elem.addClass('icon-warning');
         elem.qtip({
             content: {
                 text: $T("Indico cannot reach this room right now. Please reload the page to try again.")
@@ -22,6 +20,9 @@ var TPL_DISPLAY_BUTTON = {
             position: {
                 my: 'top center',
                 at: 'bottom center'
+            },
+            hide: {
+                fixed: true
             }
         });
     }
@@ -29,14 +30,31 @@ var TPL_DISPLAY_BUTTON = {
 
 var TPL_MANAGEMENT_BUTTON = {
     'disconnect': function(elem) {
-        elem.html($('<a class="i-button icon-play" href="#"/>').text(format($T("Disconnect {0}"), [elem.data('location')])));
+        elem.removeClass("icon-play").addClass("icon-stop").children(".button-text").text(format($T("Disconnect {0}"), [elem.data('location')]));
         elem.removeClass('connect_room').addClass('disconnect_room');
     },
     'connect': function(elem) {
-        elem.html($('<a class="i-button icon-play" href="#"/>').text(format($T("Connect {0}"), [elem.data('location')])));
+        elem.removeClass("icon-stop").addClass("icon-play").children(".button-text").text(format($T("Connect {0}"), [elem.data('location')]));
         elem.removeClass('disconnect_room').addClass('connect_room');
     },
-    'error': TPL_DISPLAY_BUTTON.error
+    'error' : function(elem) {
+        elem.css('display', 'inline-block');
+        elem.text(elem.data('location'));
+        elem.removeClass("icon-stop").removeClass("icon-play");
+        elem.addClass('i-button icon-warning disabled');
+        elem.qtip({
+            content: {
+                text: $T("Indico cannot reach this room right now. Please reload the page to try again.")
+            },
+            position: {
+                my: 'top center',
+                at: 'bottom center'
+            },
+            hide: {
+                fixed: true
+            }
+        });
+    }
 };
 
 
@@ -79,14 +97,14 @@ type("ConnectButton", [], {
 
     set_progress: function() {
         this.in_progress = true;
-        this.$el.hide();
-        this.$el.siblings(".progress").html(progressIndicator(true, true).dom);
+        this.$el.children(".button-text").text('');
+        this.$el.children(".progress").show();
+        this.$el.children(".progress").html(progressIndicator(true, true).dom);
     },
 
     hide_progress: function() {
         this.in_progress = false;
-        this.$el.show();
-        this.$el.siblings(".progress").html('');
+        this.$el.children(".progress").hide();
     },
 
     on_click: function() {
@@ -107,7 +125,7 @@ type("ConnectButton", [], {
 
     check_room_connection: function(on_result) {
         var self = this;
-        this.$el.siblings(".progress").html(progressIndicator(true, true).dom);
+        this.$el.children(".progress").html(progressIndicator(true, true).dom);
 
         indicoRequest(
             'vidyo.checkVidyoBookingConnection',
@@ -284,7 +302,6 @@ $(function() {
     $('.connect_room').each(function() {
         var conf_id = $(this).data('event');
         var booking = bookings[$(this).data('booking-id')];
-        $(this).hide()
         var button = new ConnectButton($(this), booking, conf_id);
     });
 

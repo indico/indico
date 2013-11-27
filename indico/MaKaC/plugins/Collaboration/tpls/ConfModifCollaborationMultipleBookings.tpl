@@ -25,9 +25,9 @@
 </table>
 <table>
     <tr>
-        <td class="groupTitle" style="white-space: nowrap;padding-top: 1em;" colspan="2">
+        <td class="group_title" style="display: block; padding:10px 0px 0px;" colspan="2">
             ${ _("Current bookings")}
-            <div class="toolbar" style="float:right; height:1em">
+            <div class="toolbar right">
               <div class="group" style="font-size:13px; padding:0">
                 <a id="startAll" class="i-button icon-play highlight hidden" onclick="startAll()">${ _("Start All")}</a>
                 <a id="stopAll" class="i-button icon-stop highlight hidden" onclick="stopAll()">${ _("Stop All")}</a>
@@ -36,7 +36,7 @@
         </td>
     </tr>
     <tr>
-        <td colspan="2" style="padding-top: 20px;">
+        <td colspan="2">
             <table style="border-collapse: collapse;">
                 <thead>
                     <tr id="tableHeadRow" style="margin-bottom: 5px;">
@@ -174,6 +174,9 @@ $(function(){
     $("#pluginSelect").qtip({
         content: {
             text: $T('Select a booking type from the drop-down list and press the "Create" or "Search" button.')
+        },
+        hide: {
+            fixed: true
         }
     });
 

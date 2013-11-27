@@ -26,6 +26,26 @@
 		{
 			"icon": {
 				"paths": [
+					"M512 158.724l-344.834 737.276h689.668l-344.834-737.276zM512 0v0c22.070 0 44.14 14.882 60.884 44.648l437.072 871.112c33.49 59.532 5 108.24-63.302 108.24h-869.308c-68.304 0-96.79-48.708-63.304-108.24l437.074-871.112c16.744-29.766 38.814-44.648 60.884-44.648zM448 768c0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64-35.346 0-64-28.654-64-64zM512 384c35.346 0 64 28.654 64 64l-20 192h-88l-20-192c0-35.346 28.654-64 64-64z"
+				],
+				"tags": [
+					"warning",
+					"sign"
+				],
+				"grid": 16
+			},
+			"properties": {
+				"order": 2,
+				"id": 245,
+				"prevSize": 16,
+				"code": 58883,
+				"name": "warning",
+				"ligatures": ""
+			}
+		},
+		{
+			"icon": {
+				"paths": [
 					"M192 128l640 384-640 384z"
 				],
 				"tags": [
@@ -37,7 +57,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 2,
+				"order": 3,
 				"id": 902,
 				"prevSize": 16,
 				"code": 57356,
@@ -62,7 +82,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 3,
+				"order": 4,
 				"id": 3,
 				"prevSize": 16,
 				"code": 109,
@@ -85,7 +105,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 4,
+				"order": 5,
 				"id": 904,
 				"prevSize": 32,
 				"code": 57357,
@@ -108,7 +128,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 5,
+				"order": 6,
 				"id": 4,
 				"prevSize": 32,
 				"code": 97,
@@ -129,7 +149,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 6,
+				"order": 7,
 				"id": 1063,
 				"prevSize": 32,
 				"code": 57358,
@@ -151,7 +171,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 7,
+				"order": 8,
 				"id": 5,
 				"prevSize": 32,
 				"code": 116,
@@ -174,7 +194,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 8,
+				"order": 9,
 				"id": 6,
 				"prevSize": 32,
 				"code": 99,
@@ -197,7 +217,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 9,
+				"order": 10,
 				"id": 7,
 				"prevSize": 32,
 				"code": 105,
@@ -220,7 +240,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 10,
+				"order": 11,
 				"id": 8,
 				"prevSize": 32,
 				"code": 100,
@@ -245,7 +265,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 11,
+				"order": 12,
 				"id": 9,
 				"prevSize": 32,
 				"code": 119,
@@ -268,7 +288,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 12,
+				"order": 13,
 				"id": 58,
 				"prevSize": 32,
 				"name": "map-pin-fill",
@@ -291,7 +311,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 13,
+				"order": 14,
 				"id": 12,
 				"prevSize": 32,
 				"code": 34,
@@ -313,7 +333,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 14,
+				"order": 15,
 				"id": 13,
 				"prevSize": 32,
 				"code": 36,
@@ -335,7 +355,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 15,
+				"order": 16,
 				"id": 57,
 				"prevSize": 32,
 				"name": "menu",
@@ -359,7 +379,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 16,
+				"order": 17,
 				"id": 14,
 				"prevSize": 32,
 				"code": 37,
@@ -381,7 +401,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 17,
+				"order": 18,
 				"id": 1164,
 				"prevSize": 32,
 				"code": 58507,
@@ -400,7 +420,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 18,
+				"order": 19,
 				"id": 2047,
 				"prevSize": 32,
 				"code": 58881,
@@ -422,7 +442,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 19,
+				"order": 20,
 				"id": 15,
 				"prevSize": 32,
 				"code": 39,
@@ -447,7 +467,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 20,
+				"order": 21,
 				"id": 16,
 				"prevSize": 32,
 				"code": 40,
@@ -466,7 +486,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 21,
+				"order": 22,
 				"id": 2048,
 				"prevSize": 32,
 				"code": 58882,
@@ -489,7 +509,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 22,
+				"order": 23,
 				"id": 17,
 				"prevSize": 32,
 				"code": 41,
@@ -511,7 +531,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 23,
+				"order": 24,
 				"id": 18,
 				"prevSize": 32,
 				"code": 38,
@@ -535,7 +555,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 24,
+				"order": 25,
 				"id": 19,
 				"prevSize": 32,
 				"code": 43,
@@ -568,7 +588,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 25,
+				"order": 26,
 				"id": 20,
 				"prevSize": 32,
 				"code": 44,
@@ -589,7 +609,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 26,
+				"order": 27,
 				"id": 21,
 				"prevSize": 32,
 				"code": 45,
@@ -610,7 +630,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 27,
+				"order": 28,
 				"id": 22,
 				"prevSize": 32,
 				"code": 42,
@@ -632,7 +652,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 28,
+				"order": 29,
 				"id": 23,
 				"prevSize": 32,
 				"code": 47,
@@ -654,7 +674,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 29,
+				"order": 30,
 				"id": 24,
 				"prevSize": 32,
 				"code": 48,
@@ -679,7 +699,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 30,
+				"order": 31,
 				"id": 25,
 				"prevSize": 32,
 				"code": 46,
@@ -701,7 +721,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 31,
+				"order": 32,
 				"id": 26,
 				"prevSize": 32,
 				"code": 49,
@@ -722,7 +742,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 32,
+				"order": 33,
 				"id": 27,
 				"prevSize": 32,
 				"code": 50,
@@ -748,7 +768,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 33,
+				"order": 34,
 				"id": 28,
 				"prevSize": 32,
 				"code": 51,
@@ -771,7 +791,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 34,
+				"order": 35,
 				"id": 29,
 				"prevSize": 32,
 				"code": 55,
@@ -793,7 +813,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 35,
+				"order": 36,
 				"id": 30,
 				"prevSize": 32,
 				"code": 52,
@@ -816,7 +836,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 36,
+				"order": 37,
 				"id": 31,
 				"prevSize": 32,
 				"code": 56,
@@ -839,7 +859,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 37,
+				"order": 38,
 				"id": 32,
 				"prevSize": 32,
 				"code": 57,
@@ -862,7 +882,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 38,
+				"order": 39,
 				"id": 33,
 				"prevSize": 32,
 				"code": 58,
@@ -884,7 +904,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 39,
+				"order": 40,
 				"id": 34,
 				"prevSize": 32,
 				"code": 60,
@@ -908,7 +928,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 40,
+				"order": 41,
 				"id": 35,
 				"prevSize": 32,
 				"code": 59,
@@ -930,7 +950,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 41,
+				"order": 42,
 				"id": 36,
 				"prevSize": 32,
 				"code": 53,
@@ -954,7 +974,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 42,
+				"order": 43,
 				"id": 38,
 				"prevSize": 32,
 				"code": 61,
@@ -976,7 +996,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 43,
+				"order": 44,
 				"id": 39,
 				"prevSize": 32,
 				"code": 62,
@@ -999,7 +1019,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 44,
+				"order": 45,
 				"id": 40,
 				"prevSize": 32,
 				"code": 63,
@@ -1020,7 +1040,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 45,
+				"order": 46,
 				"id": 41,
 				"prevSize": 32,
 				"code": 64,
@@ -1043,7 +1063,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 46,
+				"order": 47,
 				"id": 42,
 				"prevSize": 32,
 				"code": 65,
@@ -1065,7 +1085,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 47,
+				"order": 48,
 				"id": 43,
 				"prevSize": 32,
 				"code": 66,
@@ -1088,7 +1108,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 48,
+				"order": 49,
 				"id": 44,
 				"prevSize": 32,
 				"code": 68,
@@ -1109,7 +1129,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 49,
+				"order": 50,
 				"id": 45,
 				"prevSize": 32,
 				"code": 69,
@@ -1131,7 +1151,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 50,
+				"order": 51,
 				"id": 46,
 				"prevSize": 32,
 				"code": 70,
@@ -1156,7 +1176,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 51,
+				"order": 52,
 				"id": 47,
 				"prevSize": 32,
 				"code": 71,
@@ -1181,7 +1201,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 52,
+				"order": 53,
 				"id": 48,
 				"prevSize": 32,
 				"code": 72,
@@ -1205,7 +1225,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 53,
+				"order": 54,
 				"id": 49,
 				"prevSize": 32,
 				"code": 73,
@@ -1226,7 +1246,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 54,
+				"order": 55,
 				"id": 50,
 				"prevSize": 32,
 				"code": 74,
@@ -1248,7 +1268,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 55,
+				"order": 56,
 				"id": 51,
 				"prevSize": 32,
 				"code": 75,
@@ -1270,7 +1290,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 56,
+				"order": 57,
 				"id": 52,
 				"prevSize": 32,
 				"code": 76,
@@ -1290,7 +1310,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 57,
+				"order": 58,
 				"id": 54,
 				"prevSize": 32,
 				"code": 57344,
@@ -1310,7 +1330,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 58,
+				"order": 59,
 				"id": 55,
 				"prevSize": 32,
 				"code": 62933,
@@ -1330,7 +1350,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 59,
+				"order": 60,
 				"id": 56,
 				"prevSize": 32,
 				"code": 61605,
@@ -1354,7 +1374,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 60,
+				"order": 61,
 				"id": 59,
 				"prevSize": 32,
 				"code": 57347,
@@ -1376,7 +1396,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 61,
+				"order": 62,
 				"id": 60,
 				"prevSize": 32,
 				"code": 57348,
@@ -1401,7 +1421,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 62,
+				"order": 63,
 				"id": 61,
 				"prevSize": 32,
 				"code": 57349,
@@ -1425,7 +1445,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 63,
+				"order": 64,
 				"id": 62,
 				"prevSize": 32,
 				"code": 57350,
@@ -1449,7 +1469,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 64,
+				"order": 65,
 				"id": 63,
 				"prevSize": 32,
 				"code": 57351,
@@ -1472,7 +1492,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 65,
+				"order": 66,
 				"id": 64,
 				"prevSize": 32,
 				"code": 57352,
@@ -1493,7 +1513,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 66,
+				"order": 67,
 				"id": 65,
 				"prevSize": 32,
 				"code": 57353,
@@ -1518,7 +1538,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 67,
+				"order": 68,
 				"id": 66,
 				"prevSize": 32,
 				"code": 57354,
@@ -1540,7 +1560,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 68,
+				"order": 69,
 				"id": 67,
 				"prevSize": 32,
 				"code": 57355,
@@ -1563,7 +1583,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 69,
+				"order": 70,
 				"id": 1075,
 				"prevSize": 16,
 				"code": 58418,
@@ -1584,7 +1604,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 70,
+				"order": 71,
 				"id": 1076,
 				"prevSize": 16,
 				"code": 58419,
@@ -1608,7 +1628,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 71,
+				"order": 72,
 				"id": 883,
 				"prevSize": 32,
 				"code": 58226,
@@ -1632,7 +1652,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 72,
+				"order": 73,
 				"id": 195,
 				"prevSize": 32,
 				"code": 58880,
@@ -1653,7 +1673,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 73,
+				"order": 74,
 				"id": 186,
 				"prevSize": 32,
 				"code": 57529,
@@ -1677,7 +1697,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 74,
+				"order": 75,
 				"id": 666,
 				"prevSize": 32,
 				"code": 58009,
@@ -1703,7 +1723,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 75,
+				"order": 76,
 				"id": 142,
 				"prevSize": 32,
 				"code": 57485,

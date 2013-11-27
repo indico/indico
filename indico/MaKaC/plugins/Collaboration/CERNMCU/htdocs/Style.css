@@ -60,8 +60,9 @@ ul.CERNMCU_H323RoomList div.unselectedRoom {
 
 .CERNMCUParticipantsListDisplay div {
     display: inline-block;
-    vertical-align: top;
+    padding-right: 5px;
 }
 .CERNMCUParticipantsListDisplay div.icon {
-    font-size: 1.5em;
+    font-size: 1em;
+    padding-right: 5px;
 }

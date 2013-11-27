@@ -6,7 +6,7 @@
                <div>${message}</div>
                </div>
               % if showUnlockButton:
-              <div class="i-buttons">
+              <div class="toolbar">
                 <input type="submit" class="i-button accept" value="${ unlockButtonCaption }"/>
               </div>
               % endif

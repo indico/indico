@@ -46,7 +46,7 @@ class Sanitization(object):
                 Sanitization._sanitize(param, level)
 
     @staticmethod
-    def _escapeHTML(params, doNotSanitize):
+    def _escapeHTML(params, doNotSanitize=[]):
         index = 0
         for i in params:
             if i in doNotSanitize:

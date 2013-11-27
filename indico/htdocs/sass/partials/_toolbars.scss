@@ -32,6 +32,11 @@
     padding: 3px 0;
     vertical-align: middle;
 
+    &.inline {
+        margin-bottom: 0;
+        padding: 0;
+    }
+
     &.thin {
         $thin-height: 1.9em;
         $thin-line-height: 1.4em;
@@ -47,15 +52,21 @@
             height: $thin-height;
         }
     }
-	
+
     &.thinner {
-        $thinner-height: 1em;
-        height: $thinner-height;
+        min-height: 1em;
+        margin-bottom: 0px;
+        padding: 0px;
 
         & .i-button {
-            height: $thinner-height;
-            line-height: $thinner-height;
+            height: 1.5em;
+            line-height: 1.0em;
         }
+        & .i-button[class*="icon-"]:before {
+            font-size: 1em;
+            vertical-align: 0%;
+        }
+
     }
 
     & > .option {
@@ -122,13 +133,8 @@
         border-right: none;
 
         &:not(.label) {
-            &:hover ~ .i-button {
+            &:hover + .i-button {
                 border-left-color: $dark-gray;
-            }
-
-            &:active ~ .i-button,
-            &:hover ~ .i-button ~ .i-button {
-                border-left-color: $gray;
             }
         }
 

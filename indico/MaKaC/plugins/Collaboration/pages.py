@@ -487,10 +487,10 @@ class WPCollaborationDisplay(WPConferenceDefaultDisplayBase, WPCollaborationBase
         self._sectionMenu.setCurrentItem(self._collaborationOpt)
 
     def getCSSFiles(self):
-        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + WPCollaborationBase.getCSSFiles(self)
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self)
 
     def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + WPCollaborationBase.getJSFiles(self)
+        return WPConferenceDefaultDisplayBase.getJSFiles(self)
 
     def _getBody(self, params):
 

@@ -81,7 +81,7 @@ form.EAChoiceButton{
 }
 
 .error {
-    background: url(../images/warning_small.png);
+    background: url(../../images/warning_small.png);
     display: inline-block;
     width: 16px;
     height: 16px;

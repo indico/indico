@@ -111,7 +111,7 @@
 
 .error-message-box {
     @extend %message-box;
-    @include icon-before('icon-disabled');
+    @include icon-before('icon-disable');
 
     background-color: $light-red;
     border: 1px solid $dark-red;

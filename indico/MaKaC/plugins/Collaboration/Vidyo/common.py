@@ -226,11 +226,14 @@ class FakeAvatarOwner(Persistent, Fossilizable):
 
     def __init__(self, accountName):
         self._accountName = accountName
+
     @classmethod
     def getId(cls):
         return None
+
     def getName(self):
         return self._accountName
+    getStraightFullName = getName
 
 
 class VidyoError(CSErrorBase):

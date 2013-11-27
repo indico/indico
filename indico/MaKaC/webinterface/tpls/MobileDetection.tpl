@@ -1,9 +1,13 @@
 <%page args="conf=None"/>
 <div class="mobile-device-header" style="display:none">
     <div class="text">${_("There is a Mobile version of Indico. Would you like to try it?")}</div>
-    <div class="i-buttons">
-        <div id="useMobile" class="i-button accept">${_("Yes")}</div>
-        <div id="useFullVersion" class="i-button">${_("Not now")}</div>
+    <div class="toolbar">
+        <div class="group">
+            <div id="useMobile" class="i-button accept">${_("Yes")}</div>
+        </div>
+        <div class="group">
+            <div id="useFullVersion" class="i-button">${_("Not now")}</div>
+        </div>
     </div>
 </div>
 
