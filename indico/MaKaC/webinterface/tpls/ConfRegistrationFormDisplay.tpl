@@ -6,32 +6,25 @@
 
 <%block name="content">
 <form id="registrationForm" action=${ postURL } method="POST" onSubmit="return formSubmit(this);" enctype="multipart/form-data">
-    <table width="80%" align="left" style="padding-left: 5px;">
-        % if title:
-        <tr>
-            <td nowrap align="center" class="title" style="padding-bottom:20px;">${ title }</td>
-        </tr>
+    <div>
+        % if title_regform:
+            <div nowrap align="center" class="title">${ title_regform }</div>
         % endif
         <div ng-app="nd" ng-controller="AppCtrl">
             <div nd-reg-form conf-id="${confId}" edit-mode="false"></div>
             <input type="hidden" value="${confId}" id="conf_id">
         </div>
-        <tr>
-            <td class="regFormMandatoryInfo">
-                <span>${ _("(All the fields marked with ") }</span>
-                <span class="regFormMandatoryField">*</span>
-                <span>${ _(" are mandantory)") }</span>
-            </td>
-        </tr>
-        <tr>
-            <td align="center" style="padding-bottom: 40px;">
-                <input type="submit" class="regFormButton" value="Register">
-            </td>
-        </tr>
-    </table>
-    <br>
-    </form>
+        <div class="regform-mandatory-info ">
+            <span>${ _("(All the fields marked with ") }</span>
+            <span class="regFormMandatoryField">*</span>
+            <span>${ _(" are mandantory)") }</span>
+        </div>
+        <div align="center">
+                <input type="submit" class="i-button highlight" value="${_('Register')}">
+        </div>
+    </div>
     <input type="hidden" value="${confId}" id="conf_id">
+</form>
     <script type="text/javascript">
         $("div#registrationForm").html(progressIndicator(false, true).dom);
         var validators = [];

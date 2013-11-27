@@ -229,6 +229,15 @@
     padding-bottom : 7px;
 }
 
+/* Form Display CSS */
+
+.regform-mandatory-info {
+    margin: 10px 0px;
+    text-align: center;
+    color: $black;
+    font-style: italic;
+}
+
 /* Form Edition CSS */
 
 input.regFormTitleInputMgmt {

@@ -448,7 +448,7 @@ class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
         wvars = wcomponents.WTemplated.getVars(self)
         regForm = self._conf.getRegistrationForm()
         wvars["body_title"] = self._getTitle()
-        wvars["title"] = regForm.getTitle()
+        wvars["title_regform"] = regForm.getTitle()
         wvars["confId"] = self._conf.getId()
         wvars["postURL"] = quoteattr(str(urlHandlers.UHConfRegistrationFormCreation.getURL(self._conf)))
         return wvars
