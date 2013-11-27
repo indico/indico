@@ -32,20 +32,7 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function(
 
     $scope.api.disableSection = function(section) {
         RESTAPI.Sections.disable({confId: $rootScope.confId, sectionId: section.id}, function(data) {
-            section.enabled = data.enabled; //TODO: See why we cannot put section=data
-        });
-    };
-
-    $scope.api.restoreSection = function(section) {
-        RESTAPI.Sections.enable({confId: $rootScope.confId, sectionId: section.id}, function(data) {
-            section.enabled = data.enabled; //TODO: See why we cannot put section=data
-        });
-    };
-
-    $scope.api.removeSection = function(section) {
-        RESTAPI.Sections.remove({confId: $rootScope.confId, sectionId: section.id}, function(data) {
-            console.log($scope);
-            //TODO: See how to update model!!
+            section.enabled = data.enabled;
         });
     };
 

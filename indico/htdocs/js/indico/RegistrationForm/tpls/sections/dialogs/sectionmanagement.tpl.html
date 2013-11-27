@@ -1,4 +1,4 @@
-<div ng-repeat="section in disabled = (data | filter:{enabled:'false'})" ng-controller="SectionCtrl" class="regform-section">
+<div ng-repeat="section in disabled = (data | filter:{enabled:'false'})" class="regform-section">
         <div class="toolbar" style="margin-bottom: 0">
             <div class="regform-section-title left" ng-show="!section.enabled">
             {{ section.title }}

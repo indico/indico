@@ -117,7 +117,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableopti
                     RESTAPI.Sections.save({confId: $scope.confId,
                                             title: data.newsection.title,
                                             description: data.newsection.description},
-                        function(newsection, headers) {
+                        function(newsection) {
                             $scope.sections.push(newsection);
                     });
                 },
@@ -125,10 +125,24 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableopti
                     RESTAPI.Sections.move({confId: $scope.confId,
                                            sectionId: section.id,
                                            endPos: position},
-                        function(section_updated, headers) {
-                            section = section_updated;
+                        function(response) {
+                            section = response;
                     });
-
+                },
+                restoreSection: function(section) {
+                    RESTAPI.Sections.enable({confId: $rootScope.confId,
+                                             sectionId: section.id},
+                        function(response) {
+                            section.enabled = response.enabled;
+                     });
+                },
+                removeSection: function(section) {
+                    RESTAPI.Sections.remove({confId: $rootScope.confId,
+                                            sectionId: section.id},
+                        function(response) {
+                            $scope.sections = response["sections"];
+                            $rootScope.currency = response["currency"];
+                    });
                 }
             };
 
@@ -163,6 +177,7 @@ ndRegForm.directive('ndAddSectionDialog', function(url) {
 
 ndRegForm.directive('ndManagementDialog', function(url) {
     return {
+        require: 'ndDialog',
         templateUrl: url.tpl('sections/dialogs/sectionmanagement.tpl.html')
     };
 });
