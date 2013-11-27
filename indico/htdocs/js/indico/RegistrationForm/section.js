@@ -92,6 +92,7 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function(
         $scope.dialogs.newfield = true;
         section.items.push({
             id: -1,
+            disabled: false,
             input: field,
             values: {
                 inputType: type
