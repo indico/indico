@@ -162,7 +162,7 @@ ndRegForm.directive('ndSection', function($rootScope, url) {
     };
 });
 
-ndRegForm.directive("ndGeneralSection", function($timeout, url) {
+ndRegForm.directive("ndGeneralSection", function($timeout, url, sortableoptions) {
     return {
         require: 'ndSection',
         controller: 'SectionCtrl', //TODO check inheritance
@@ -190,23 +190,14 @@ ndRegForm.directive("ndGeneralSection", function($timeout, url) {
             };
 
             scope.fieldSortableOptions = {
-                start: function(e, ui ){
-                    var borderOffset = 2;
-                    ui.placeholder.height(ui.helper.outerHeight() - borderOffset);
-                },
-
                 update: function(e, ui) {
                     scope.api.moveField(ui.item.scope().field, ui.item.index());
                 },
-
-                axis: 'y',
-                cursor: 'move',
-                delay: 150,
-                opacity: 0.85,
-                handle: ".regform-field .sortable-handle",
-                placeholder: "regform-field-sortable-placeholder",
-                tolerance: 'pointer'
+                handle: ".regform-field .field-sortable-handle",
+                placeholder: "regform-field-sortable-placeholder"
             };
+
+            angular.extend(scope.fieldSortableOptions, sortableoptions);
         }
     };
 });

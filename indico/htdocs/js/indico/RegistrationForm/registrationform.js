@@ -20,9 +20,26 @@ var ndRegForm = angular.module('nd.regform', [
     'ngResource'
 ]);
 
+// ============================================================================
+// Initialization
+// ============================================================================
+
 ndRegForm.value('baseurl',
     Indico.Urls.Base + '/event/:confId/manage/registration/preview/'
 );
+
+ndRegForm.value('sortableoptions', {
+    start: function(e, ui) {
+        var borderOffset = 2;
+        ui.placeholder.height(ui.helper.outerHeight() - borderOffset);
+    },
+    axis: 'y',
+    cursor: 'move',
+    delay: 150,
+    distance: 10,
+    opacity: 0.95,
+    tolerance: 'pointer'
+});
 
 ndRegForm.config(function(urlProvider) {
     urlProvider.setModulePath('/js/indico/RegistrationForm');
@@ -48,9 +65,11 @@ ndRegForm.factory('RESTAPI', ['$resource','baseurl', function($resource, baseurl
     };
 }]);
 
+// ============================================================================
+// Directives
+// ============================================================================
 
-
-ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
+ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableoptions, RESTAPI) {
     return {
         replace: true,
         templateUrl:  url.tpl('registrationform.tpl.html'),
@@ -114,23 +133,15 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
             };
 
             $scope.sectionSortableOptions = {
-                start: function(e, ui) {
-                    var borderOffset = 2;
-                    ui.placeholder.height(ui.helper.outerHeight() - borderOffset);
-                },
-
                 update: function(e, ui) {
                     $scope.api.moveSection(ui.item.scope().section, ui.item.index());
                 },
-                axis: 'y',
-                cursor: 'move',
-                delay: 150,
                 disabled: !$rootScope.editMode,
-                handle: ".sortable-handle",
-                opacity: 0.95,
-                placeholder: "regform-section-sortable-placeholder",
-                tolerance: 'pointer'
+                handle: ".regform-section .section-sortable-handle",
+                placeholder: "regform-section-sortable-placeholder"
             };
+
+            angular.extend($scope.sectionSortableOptions, sortableoptions);
         }
     };
 });
@@ -157,10 +168,12 @@ ndRegForm.directive('ndManagementDialog', function(url) {
 });
 
 
-ndRegForm.directive("ndTable", function(url) {
+ndRegForm.directive("ndTable", function(url, sortableoptions) {
     return {
-
         restrict: 'E',
+        replace: true,
+        templateUrl: url.tpl('table.tpl.html'),
+
         scope: {
             data: "=",
             config: "=",
@@ -168,11 +181,8 @@ ndRegForm.directive("ndTable", function(url) {
             filter: "=",
             filterValue: "="
         },
-        replace: true,
-        templateUrl: url.tpl('table.tpl.html'),
 
         controller: function($scope) {
-
             $scope.actionIsArray = function(action) {
                 return _.isArray(action);
             };
@@ -200,20 +210,13 @@ ndRegForm.directive("ndTable", function(url) {
             };
 
             $scope.itemSortableOptions = {
-                start: function(e, ui ){
-                    ui.placeholder.height(ui.helper.outerHeight());
-                },
-
                 disabled: $scope.config.actions.indexOf('sortable') == -1,
-                axis: 'y',
-                cursor: 'move',
-                delay: 150,
-                opacity: 0.5,
-                handle: ".regform-section .sortable-handle",
+                handle: ".sortable-handle",
                 placeholder: "regFormSortablePlaceHolder",
-                tolerance: 'pointer',
                 items: "tr"
             };
+
+            angular.extend($scope.itemSortableOptions, sortableoptions);
         }
     };
 });

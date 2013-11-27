@@ -39,7 +39,7 @@
         margin-top: 20px;
     }
 
-    & > .sortable-handle {
+    & .section-sortable-handle {
         @include icon-before('icon-handle');
         @include transition(
             background-color $default-transition-duration $default-transition-function,
@@ -164,14 +164,15 @@
         }
     }
 
-    & .sortable-handle {
+    & .field-sortable-handle {
+        color: $dark-gray;
         line-height: 26px;
         vertical-align: top;
         width: 15px;
     }
 
-    &:not(.disabled):hover .sortable-handle,
-    &:not(.disabled):active .sortable-handle {
+    &:not(.disabled):hover .field-sortable-handle,
+    &:not(.disabled):active .field-sortable-handle {
         @include icon-before('icon-handle');
         cursor: move;
     }

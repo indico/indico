@@ -4,7 +4,7 @@
         ng-class="{disabled: field.disabled, editable: editMode}"
         id="{{ field.id }}">
         <tr>
-            <td ng-if="editMode" class="sortable-handle"/>
+            <td ng-if="editMode" class="field-sortable-handle"/>
             <td class="field-caption">
                 <span>{{ field.caption }}</span>
                 <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
