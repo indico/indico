@@ -57,7 +57,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
 
         scope: {
             confId: '@',
-            editMode: '@'
+            editMode: '=editMode'
         },
 
         controller: function($scope, $resource) {
