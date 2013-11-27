@@ -35,6 +35,13 @@
     opacity: 1 !important;
     padding: 10px;
 
+    & .section-header {
+        @include border-bottom();
+        background-color: $light-gray;
+        margin: -10px -10px;
+        padding: 10px 10px;
+    }
+
     & .section-content {
         margin-top: 20px;
     }

@@ -1,12 +1,12 @@
 <div id="{{ section.id }}" class="regform-section">
-    <div class="section-sortable-handle"/>
-    <div ng-switch="editMode" class="regFormHeader">
+    <div ng-if="editMode" class="section-sortable-handle"></div>
+    <div ng-switch="editMode" class="section-header">
         <div ng-switch-default>
             <div class="regform-section-title">
-                {{section.title}}
+                {{ section.title }}
             </div>
             <div class="regform-section-description">
-                {{section.description}}
+                {{ section.description }}
             </div>
         </div>
         <div ng-switch-when="true">
