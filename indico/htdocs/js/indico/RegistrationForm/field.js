@@ -127,7 +127,7 @@ ndRegForm.directive('ndField', function($rootScope, url, RESTAPI) {
             };
 
             $scope.isFieldActive = function (field) {
-                return field.id != -1 && (field.disabled === false || $rootScope.editMode);
+                return field.id != -1;
             };
 
         },
