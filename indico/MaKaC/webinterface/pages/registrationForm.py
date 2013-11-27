@@ -397,6 +397,8 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
         regForm = self._conf.getRegistrationForm()
+
+        wvars["confId"] = self._conf.getId()
         wvars["body_title"] = self._getTitle()
         wvars["startDate"] = regForm.getStartRegistrationDate().strftime("%d %B %Y")
         wvars["endDate"] = regForm.getEndRegistrationDate().strftime("%d %B %Y")
@@ -441,7 +443,7 @@ class WPRegistrationFormDisplay( conferences.WPConferenceDefaultDisplayBase ):
 
 class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
 
-    _linkname = "newEvaluation"
+    _linkname = "NewRegistration"
 
     def __init__(self, conf, user):
         self._currentUser = user
