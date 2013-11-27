@@ -163,29 +163,20 @@ ndRegForm.directive('ndSection', function($rootScope, url) {
     };
 });
 
-ndRegForm.directive("ndGeneralSection", function($timeout) {
+ndRegForm.directive("ndGeneralSection", function($timeout, url) {
     return {
         require: 'ndSection',
         controller: 'SectionCtrl', //TODO check inheritance
         link: function(scope) {
             scope.buttons.newfield = true;
             scope.buttons.disable = true;
+            scope.tplGeneralField = url.tpl('sections/generalfield.tpl.html');
 
-            // TODO can we move fieldtypes to the tpl? It only happens once
-            // scope.fieldtypes = [
-            //     {id: 'label',            desc: $T("Label")},
-            //     {id: 'text',             desc: $T("Text input")},
-            //     {id: 'number',           desc: $T("Number")},
-            //     {id: 'textarea',         desc: $T("Text area")},
-            //     {id: 'radio-dropdown',   desc: $T("Dropdown")},
-            //     {id: 'radio-radiogroup', desc: $T("Choice")},
-            //     {id: 'checkbox',         desc: $T("Checkbox")},
-            //     {id: 'date',             desc: $T("Date")},
-            //     {id: 'yesno',            desc: $T("Yes/No")},
-            //     {id: 'telephone',        desc: $T("Phone")},
-            //     {id: 'country',          desc: $T("Country")},
-            //     {id: 'file',             desc: $T("File")}
-            // ];
+            scope.hasDisabledFields = function() {
+                return _.any(scope.section.items, function(field) {
+                    return field.disabled === true;
+                });
+            };
 
             scope.api.removeNewField = function() {
                 if (scope.section.items[scope.section.items.length-1].id == -1) {
