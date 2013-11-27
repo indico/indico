@@ -118,10 +118,19 @@ ndDirectives.directive("contenteditable", function() {
         require: 'ngModel',
         link: function(scope, elem, attrs, ctrl) {
             // view -> model
-            elem.on('blur', function() {
-                scope.$apply(function() {
-                    ctrl.$setViewValue(elem.html());
-                });
+            elem.on('blur', function(e, param) {
+                elem.html(ctrl.$viewValue);
+            });
+
+            elem.on('keydown keypress', function(e) {
+                if(e.keyCode === K['ESCAPE']) {
+                    elem.blur();
+                } else if(e.keyCode === K['ENTER']) {
+                    scope.$apply(function() {
+                        ctrl.$setViewValue(elem.html());
+                    });
+                    elem.blur();
+                }
             });
 
             // model -> view
