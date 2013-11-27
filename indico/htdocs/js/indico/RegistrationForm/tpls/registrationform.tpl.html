@@ -1,5 +1,6 @@
 <div class="RegistrationForm">
-    <div ng-if="editMode" ng-include="getTpl('toolbar.tpl.html')"></div>
+    <div ng-if="editMode"
+        ng-include="getTpl('toolbar.tpl.html')"></div>
     <div ui-sortable="sectionSortableOptions" ng-model="sections">
         <div ng-repeat="section in sections | filter: {enabled: true}">
             <div ng-switch="section._type">
@@ -12,7 +13,7 @@
                 <div ng-switch-when="SocialEventForm" nd-section nd-social-event-section></div>
             </div>
         </div>
-  </div>
+    </div>
 
     <nd-dialog nd-add-section-dialog
         show="dialogs.addsection"

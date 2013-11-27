@@ -220,10 +220,3 @@ ndRegForm.directive("ndTable", function(url, sortableoptions) {
         }
     };
 });
-
-// TODO remove unused legacy jquery methods
-// $(function(){
-//     $(window).scroll(function(){
-//         IndicoUI.Effect.followScroll();
-//     });
-// });

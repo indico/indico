@@ -3,3 +3,10 @@
     <input type="hidden" value="${confId}" id="conf_id">
 </div>
 
+<script>
+    $(function(){
+        $(window).scroll(function(){
+            IndicoUI.Effect.followScroll();
+        });
+    });
+</script>

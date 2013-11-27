@@ -372,7 +372,7 @@ IndicoUI.Effect = {
 
     },
 
-    followScroll:function(){
+    followScroll: function() {
         $.each($('.follow-scroll'),function(){
             if (!$(this).data('original-offset')) {
                 $(this).data('original-offset', $(this).offset());
