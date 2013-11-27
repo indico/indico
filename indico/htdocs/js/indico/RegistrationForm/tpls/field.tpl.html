@@ -12,12 +12,23 @@
 
             <td ng-include="tplInput" class="field-input"></td>
 
-            <td ng-if="editMode" ng-show="show" class="field-actions">
-                <a ng-if="field.disabled" ng-click="fieldApi.enableField(field)" class="icon-plus"></a>
+            <td ng-if="editMode" class="field-actions">
+                <a ng-if="field.disabled"
+                    ng-click="fieldApi.enableField(field)"
+                    class="icon-plus"
+                    title="{{ 'Enable field' | i18n }}"/>
                 <!-- TODO move logic to controller -->
-                <a ng-if="!field.disabled && field.lock.indexOf('disable') == -1" ng-click="fieldApi.disableField(field)" class="icon-disable"></a>
-                <a ng-if="field.lock.indexOf('delete') == -1" ng-click="fieldApi.removeField(field)" class="icon-remove"></a>
-                <a ng-click="openFieldSettings()" class="icon-settings"></a>
+                <a ng-if="!field.disabled && field.lock.indexOf('disable') == -1"
+                    ng-click="fieldApi.disableField(field)"
+                    class="icon-disable"
+                    title="{{ 'Disable field' | i18n }}"/>
+                <a ng-if="field.lock.indexOf('delete') == -1"
+                    ng-click="fieldApi.removeField(field)"
+                    class="icon-remove"
+                    title="{{ 'Remove field' | i18n }}"/>
+                <a ng-click="openFieldSettings()"
+                    class="icon-settings"
+                    title="{{ 'Configure field' | i18n }}"/>
             </td>
         </tr>
     </table>
