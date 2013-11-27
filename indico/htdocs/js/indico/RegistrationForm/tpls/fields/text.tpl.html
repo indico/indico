@@ -3,7 +3,7 @@
     name="{{ getName(field.input) }}"
     value=""
     size="{{ field.values.length || 60}}"
-    {{ attributes }}/>
+    ng-required="field.mandatory"/>
 
 <span class="inputDescription">
     {{ field.description }}
