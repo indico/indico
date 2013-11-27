@@ -1,16 +1,16 @@
 <div class="toolbar right">
     <div class="group">
         <a nd-field-picker
-            ng-show="buttons.newfield"
+            ng-if="buttons.newfield"
             class="buttonAddField i-button icon-plus"
             title="{{ 'Click to add a field to this section' | i18n }}"></a>
 
-        <a ng-show="buttons.config"
+        <a ng-if="buttons.config"
             ng-click="openConfig()"
             class="i-button icon-wrench"
             title="{{ 'Edit this section' | i18n }}"></a>
 
-        <a ng-show="buttons.disable"
+        <a ng-if="buttons.disable"
             ng-click="api.disableSection(section)"
             class="i-button icon-disable"
             title="{{ 'Click to disable this section' | i18n }}"></a>
