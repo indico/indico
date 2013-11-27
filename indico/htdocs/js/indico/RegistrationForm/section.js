@@ -77,6 +77,16 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function(
         });
     };
 
+    $scope.api.moveField = function(field, position) {
+        RESTAPI.Fields.move({confId: $rootScope.confId,
+                             sectionId: $scope.section.id,
+                             fieldId: field.id,
+                             endPos: position},
+            function(data) {
+                $scope.field = data;
+            });
+    };
+
     $scope.actions.openAddField = function(section, field, type) {
         $scope.dialogs.newfield = true;
         section.items.push({
@@ -88,15 +98,7 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function(
         });
     };
 
-    $scope.api.moveField = function(field, position) {
-        RESTAPI.Fields.move({confId: $rootScope.confId,
-                             sectionId: $scope.section.id,
-                             fieldId: field.id,
-                             endPos: position
-        },  function(data) {
-                $scope.field = data;
-            });
-    };
+
 }]);
 
 ndRegForm.directive('ndSection', function($rootScope, url) {
