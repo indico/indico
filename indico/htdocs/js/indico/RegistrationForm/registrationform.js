@@ -115,7 +115,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
 
             $scope.sectionSortableOptions = {
                 start: function(e, ui) {
-                    ui.placeholder.height(ui.helper.outerHeight());
+                    var borderOffset = 2;
+                    ui.placeholder.height(ui.helper.outerHeight() - borderOffset);
                 },
 
                 update: function(e, ui) {
@@ -124,11 +125,11 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, RESTAPI) {
                 axis: 'y',
                 cursor: 'move',
                 delay: 150,
-                opacity: 0.5,
+                disabled: !$rootScope.editMode,
                 handle: ".sortable-handle",
-                placeholder: "regFormSortablePlaceHolder",
-                disabled: !$rootScope.editMode
-                //items: "nd-section"
+                opacity: 0.95,
+                placeholder: "regform-section-sortable-placeholder",
+                tolerance: 'pointer'
             };
         }
     };
@@ -208,8 +209,9 @@ ndRegForm.directive("ndTable", function(url) {
                 cursor: 'move',
                 delay: 150,
                 opacity: 0.5,
-                handle: ".regFormItemSortableHandle",
+                handle: ".regform-section .sortable-handle",
                 placeholder: "regFormSortablePlaceHolder",
+                tolerance: 'pointer',
                 items: "tr"
             };
         }

@@ -101,15 +101,24 @@
 }
 
 .regform-field {
+    @include single-transition(background-color);
+
     min-height: 27px;
-    margin: 2px 0;
-    width: 100%;
+    margin: 2px -10px;
+    padding: 0 10px;
+    // TODO Any better idea? This is hackish as hell
+    width: 103%;
 
     &.disabled {
-        background : darken($light-gray, $color-variation);
+        background: $light-gray;
+
+        & .field-caption {
+            color: $dark-gray;
+        }
     }
 
     & .field-actions {
+        display: none;
         float: right;
         line-height: 27px;
         padding: 0 5px;
@@ -117,29 +126,13 @@
 
     & .field-caption {
         width: 125px;
+        padding: 4px 0;
         vertical-align: top;
-        line-height: 27px;
     }
 
     & .field-input {
         vertical-align: top;
-    }
-
-    &.editable {
-        &:hover {
-            background-color:#ECEEFC;
-        }
-
-        & .sortable-handle {
-            line-height: 27px;
-            vertical-align: top;
-            width: 15px;
-            cursor: move;
-        }
-
-        &:hover .sortable-handle {
-            @include icon-before('icon-handle');
-        }
+        padding-top: 3px;
     }
 }
 
@@ -156,6 +149,31 @@
     & .ui-tooltip-titlebar {
         border-bottom: none !important;
         background: transparent;
+    }
+}
+
+// Editable-specific
+
+.regform-field.editable {
+    &:hover,
+    &:active {
+        background-color: $light-blue;
+
+        & .field-actions {
+            display: block !important;
+        }
+    }
+
+    & .sortable-handle {
+        line-height: 26px;
+        vertical-align: top;
+        width: 15px;
+    }
+
+    &:not(.disabled):hover .sortable-handle,
+    &:not(.disabled):active .sortable-handle {
+        @include icon-before('icon-handle');
+        cursor: move;
     }
 }
 
@@ -441,15 +459,24 @@ textarea.regFormDescriptionInputMgmt {
   display: block;
 }
 
-
-
 // Sortable
 
-.regFormSortablePlaceHolder {
-    @extend %regform-section;
-
+%regform-sortable-placeholder {
     background-color: $light-gray;
-    min-height: 100%;
     display: block;
-    border: 1px dashed #ccc;
+}
+
+.regform-field-sortable-placeholder {
+    @extend %regform-sortable-placeholder;
+    @include border-vert($gray, dashed);
+    margin: 2px -10px;
+    // TODO Any better idea? This is hackish as hell
+    width: 102.9%;
+}
+
+.regform-section-sortable-placeholder,
+.regFormSortablePlaceHolder {
+    @extend %regform-sortable-placeholder;
+    @extend %regform-section;
+    @include border-all($gray, dashed);
 }

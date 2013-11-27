@@ -83,6 +83,7 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function(
                              fieldId: field.id,
                              endPos: position},
             function(data) {
+                // TODO we are breaking two-way binding here
                 $scope.field = data;
             });
     };
@@ -97,8 +98,6 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function(
             }
         });
     };
-
-
 }]);
 
 ndRegForm.directive('ndSection', function($rootScope, url) {
@@ -187,12 +186,13 @@ ndRegForm.directive("ndGeneralSection", function($timeout, url) {
             };
 
             scope.api.commitNewField = function() {
-
+                // TODO is this needed?
             };
 
             scope.fieldSortableOptions = {
                 start: function(e, ui ){
-                    ui.placeholder.height(ui.helper.outerHeight());
+                    var borderOffset = 2;
+                    ui.placeholder.height(ui.helper.outerHeight() - borderOffset);
                 },
 
                 update: function(e, ui) {
@@ -202,12 +202,11 @@ ndRegForm.directive("ndGeneralSection", function($timeout, url) {
                 axis: 'y',
                 cursor: 'move',
                 delay: 150,
-                opacity: 0.5,
-                handle: ".sortable-handle",
-                placeholder: "regFormSortablePlaceHolder"
-                //items: "nd-section"
+                opacity: 0.85,
+                handle: ".regform-field .sortable-handle",
+                placeholder: "regform-field-sortable-placeholder",
+                tolerance: 'pointer'
             };
-
         }
     };
 });
