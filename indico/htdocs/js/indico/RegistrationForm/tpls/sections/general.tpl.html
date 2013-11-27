@@ -7,6 +7,8 @@
 <div ng-if="editMode">
     <div ng-if="hasDisabledFields()" class="titled-rule">
         {{ "Disabled fields" | i18n }}
+        <!-- TODO use icomoon icon -->
+        <span title="{{ 'These fields won\'t be displayed to registrants.' | i18n }}">?</span>
     </div>
     <div ng-repeat="field in section.items | filter: {disabled: 'true'}">
         <div ng-include="tplGeneralField"/>
