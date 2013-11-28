@@ -42,7 +42,7 @@
             % if field.getType() == "textarea":
                 <div class="wmd-panel">
                 <div id="wmd-button-bar-${fid}"></div>
-                    <textarea class="wmd-input" id="wmd-input-${fid}" name="${fid}" width="100%" rows="${ nbRows }" style="width:100%">${ fieldsDict[fid] }</textarea>
+                    <textarea class="wmd-input" id="wmd-input-${fid}" name="${fid}" width="100%" rows="${ nbRows }" style="width:100%">${ fdict[fid] }</textarea>
                 </div>
 
                 <div id="wmd-preview-${fid}" class="wmd-panel wmd-preview"></div>

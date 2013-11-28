@@ -3175,6 +3175,15 @@ class WPConfModifCFAPreview(WPConferenceModifAbstractBase):
     def _setActiveTab(self):
         self._tabCFAPreview.setActive()
 
+    def getCSSFiles(self):
+        return WPConferenceModifAbstractBase.getCSSFiles(self) + \
+            self._asset_env['pagedown_sass'].urls()
+
+    def getJSFiles(self):
+        return WPConferenceModifAbstractBase.getJSFiles(self) + \
+            self._asset_env['pagedown_js'].urls() + \
+            self._asset_env['mathjax_js'].urls()
+
     def _getTabContent(self, params):
         import MaKaC.webinterface.pages.abstracts as abstracts
         wc = abstracts.WAbstractDataModification(self._conf)
