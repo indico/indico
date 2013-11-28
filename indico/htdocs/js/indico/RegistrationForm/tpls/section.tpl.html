@@ -5,7 +5,8 @@
             <div class="regform-section-title">
                 {{ section.title }}
             </div>
-            <div class="regform-section-description">
+            <div ng-if="section.description"
+                class="regform-section-description">
                 {{ section.description }}
             </div>
         </div>
@@ -21,7 +22,8 @@
                 ng-model="section.title"
                 contenteditable>
             </div>
-            <div class="regform-section-description"
+            <div ng-if="section.description"
+                class="regform-section-description"
                 ng-model="section.description"
                 contenteditable>
             </div>

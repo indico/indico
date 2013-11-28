@@ -279,7 +279,13 @@ ndRegForm.directive("ndFurtherInformationSection", function() {
     return {
         require: 'ndSection',
         link: function(scope) {
+            scope.buttons.config = true;
             scope.buttons.disable = true;
+
+            scope.dialogs.config.tabs = [
+                {id: 'config',          name: $T("Configuration"),      type: 'config'}
+            ];
+
         }
     };
 });
@@ -436,7 +442,6 @@ ndRegForm.directive("ndSocialEventSection", function() {
                   ]
             };
 
-
             scope.dialogs.config.canceledTable = {
                 sortable: false,
                 colNames:[$T("caption"), $T("Reason for cancellation")],
@@ -475,7 +480,7 @@ ndRegForm.directive('ndSectionDialog', function(url) {
             $scope.section = $scope.$eval($scope.asyncData);
             $scope.formData = {
                 items: []
-            }; //This is the way?
+            }; // TODO This is the way?
 
             _.each($scope.section.items, function (item, ind) {
                 $scope.formData.items[ind] = {id: item.id, cancelled: item.cancelled}; //A way to initialize properly
@@ -491,8 +496,7 @@ ndRegForm.directive('ndSectionDialog', function(url) {
 
             $scope.addItem = function () {
                  $scope.formData.items.push({id:'isNew'});
-            }
-
+            };
         }
     };
 });

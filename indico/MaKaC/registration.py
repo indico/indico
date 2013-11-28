@@ -3448,12 +3448,15 @@ class FurtherInformationForm(BaseForm, Fossilizable):
     def getContent(self):
         return self._content
 
-    def setContent(self, n):
-        self._content = n
+    def setContent(self, content):
+        self._content = content
+
+    # Fallback for setDescription
     setDescription = setContent
 
     def getItems(self):
         return ""
+
 
 class AccommodationType(Persistent, Fossilizable):
 

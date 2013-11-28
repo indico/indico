@@ -50,18 +50,18 @@ ndRegForm.factory('RESTAPI', ['$resource','baseurl', function($resource, baseurl
     var sectionurl = baseurl + 'sections/:sectionId';
     var fieldurl = sectionurl + '/fields/:fieldId';
     return {
-        Sections: $resource(sectionurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId"},
-                            {"enable": {method:'POST', url: sectionurl + "/enable"},
-                             "disable": {method:'POST', url: sectionurl + "/disable"},
-                             "move": {method:'POST', url: sectionurl + "/move"},
-                             "title": {method:'POST', url: sectionurl + "/title"},
-                             "description": {method:'POST', url: sectionurl + "/description"}
-                            }),
-        Fields: $resource(fieldurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId"},
-                            {"enable": {method:'POST', url: fieldurl + "/enable"},
-                             "disable": {method:'POST', url: fieldurl + "/disable"},
-                             "move": {method:'POST', url: fieldurl + "/move"}
-                            })
+        Sections: $resource(sectionurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId"}, {
+            "enable": {method: 'POST', url: sectionurl + "/enable"},
+            "disable": {method: 'POST', url: sectionurl + "/disable"},
+            "move": {method: 'POST', url: sectionurl + "/move"},
+            "title": {method: 'POST', url: sectionurl + "/title"},
+            "description": {method: 'POST', url: sectionurl + "/description"}
+        }),
+        Fields: $resource(fieldurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId"}, {
+            "enable": {method:'POST', url: fieldurl + "/enable"},
+            "disable": {method:'POST', url: fieldurl + "/disable"},
+            "move": {method:'POST', url: fieldurl + "/move"}
+        })
     };
 }]);
 

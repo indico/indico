@@ -390,6 +390,13 @@ class RHRegistrationFormModifAccomodationBase(RegistrationFormModifRESTBase):
         self._section = self._regForm.getSectionById("accommodation")
 
 
+class RHRegistrationFormModifFurtherInformationBase(RegistrationFormModifRESTBase):
+
+    def _checkParams(self, params):
+        RegistrationFormModifRESTBase._checkParams(self, params)
+        self._section = self._regForm.getSectionById("furtherInformation")
+
+
 class RHRegistrationFormModifSocialEventsBase(RegistrationFormModifRESTBase):
 
     def _checkParams(self, params):
@@ -493,6 +500,17 @@ class RHRegistrationFormAccommodationSetConfig(RHRegistrationFormModifAccomodati
         self._section.setArrivalOffsetDates(arrDates)
         self._section.setDepartureOffsetDates(depDates)
         self._setItems()
+        return json.dumps(self._section.fossilize())
+
+
+class RHRegistrationFormFurtherInformationSetConfig(RHRegistrationFormModifFurtherInformationBase):
+
+    def _checkParams_POST(self):
+        post_pm = ParameterManager(request.json)
+        self._content = post_pm.extract('content', pType=str, allowEmpty=True)
+
+    def _process_POST(self):
+        self._section.setContent(self._content)
         return json.dumps(self._section.fossilize())
 
 

@@ -77,6 +77,10 @@ event_mgmt.add_url_rule('/registration/preview/sections/accommodation',
                         'confModifRegistrationPreviewSection-accommodation-config',
                         registrationFormModif.RHRegistrationFormAccommodationSetConfig,
                         methods=('POST',))
+event_mgmt.add_url_rule('/registration/preview/sections/furtherInformation',
+                        'confModifRegistrationPreviewSection-furtherInformation-config',
+                        registrationFormModif.RHRegistrationFormFurtherInformationSetConfig,
+                        methods=('POST',))
 event_mgmt.add_url_rule('/registration/preview/sections/socialEvents',
                         'confModifRegistrationPreviewSection-socialEvents-config',
                         registrationFormModif.RHRegistrationFormSocialEventsSetConfig,

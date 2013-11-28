@@ -464,7 +464,6 @@ class IRegFormFurtherInformationSectionFossil(IRegFormSectionBaseFossil):
         """
         Section content
         """
-    getContent.name = 'description'
 
     def getItems(self):
         """

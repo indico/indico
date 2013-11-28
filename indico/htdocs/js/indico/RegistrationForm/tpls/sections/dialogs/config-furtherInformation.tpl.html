@@ -1,0 +1,14 @@
+<form>
+    <div class="regFormDialogEditLine">
+        <label class="regFormDialogCaption">
+            {{ 'Further information message' | i18n }}
+        </label>
+        <textarea ng-model="formData.content"
+            ng-init="formData.introSentence=section.content"
+            id="descriptionEdit"
+            name="content"
+            cols="40"
+            rows="6">
+        </textarea>
+    </div>
+</form>
