@@ -32,9 +32,9 @@ from types import GeneratorType
 from ZODB.POSException import ConflictError
 
 # indico imports
+from indico.core.db import DBMgr
 from indico.util.date_time import nowutc
 from indico.util.fossilize import fossilize
-
 from indico.web.http_api.metadata import Serializer
 from indico.web.http_api.metadata.html import HTML4Serializer
 from indico.web.http_api.metadata.jsonp import JSONPSerializer
@@ -45,7 +45,6 @@ from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.exceptions import ArgumentParseError, LimitExceededException
 
 # indico legacy imports
-from MaKaC.common.db import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.common.logger import Logger
