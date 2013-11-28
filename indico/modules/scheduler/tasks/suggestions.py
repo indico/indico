@@ -18,7 +18,7 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.user import AvatarHolder
-from indico.modules.scheduler.tasks import PeriodicTask
+from indico.modules.scheduler.tasks.periodic import PeriodicTask
 from indico.util.suggestions import get_category_scores
 from indico.util.redis import write_client as redis_write_client
 import indico.util.redis.suggestions as redis_suggestions
