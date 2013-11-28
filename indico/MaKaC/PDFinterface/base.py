@@ -773,8 +773,4 @@ class LatexRunner:
         os.unlink(os.path.join(self.tempdir, self.texdir))
 
         if self.has_toc:
-<<<<<<< HEAD
-            os.unlink(self.texname[:-3] + 'toc')
-=======
             os.unlink(os.path.join(self.tempdir, self.texname[:-3] + 'toc'))
->>>>>>> [MIN] Minor fixes in LatexRunner() and templates
