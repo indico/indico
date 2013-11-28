@@ -767,16 +767,21 @@ and the currency to use. See in the image below all the options.
 E-ticket
 '''''''''
 
-You can choose to enable or disable the e-ticket module by clicking on
-*Enable*/*Disable*.
+You can choose to enable or disable the e-ticket module by clicking on *On*/*Off*.
 
 |image164|
 
-After enabling it, for every registrant an unique electronic ticket will be generated.
-The ticket is a PDF document containing a QR code that can be used by the mobile
-check-in application to keep track of registrants. This ticket will be sent to every
-new registrant, attached to the registration e-mail. The registrant will also have the
-option to download the ticket after registration.
+Once enabled, Indico will be ready to generate a unique electronic ticket for every
+participant. The e-ticket is a PDF document containing a QR code that can be used to
+check-in attendees at the Conference Registration Desk. In order to read the QR codes,
+Indico provides a mobile app named 'Indico check-in' that will list all the registrants
+and provides the necessary tools to check them in.
+
+Managers can choose how Indico will distribute the e-tickets. Currently, there are three options:
+
+1. The e-ticket can be attached to the email sent to the user after registration.
+2. The e-ticket can be downloaded from the conference homepage menu.
+3. The e-ticket can be downloaded from the summary page right after registration.
 
 |image165|
 
