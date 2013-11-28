@@ -59,6 +59,7 @@ from indico.ext import livesync
 from indico.util import console, i18n
 from indico.modules.scheduler.tasks import AlarmTask
 from indico.modules.scheduler.tasks.periodic import FoundationSyncTask, CategoryStatisticsUpdaterTask
+from indico.modules.scheduler.tasks.suggestions import CategorySuggestionTask
 from indico.modules import ModuleHolder
 from indico.util.redis import avatar_links
 from indico.util.redis import client as redis_client
@@ -799,6 +800,18 @@ def redisLinkedTo(dbi, withRBDB, prevVersion):
             sys.stdout.flush()
         pipe.execute()
     print '\r  Done   '
+
+
+@since('1.2')
+def addSuggestionsTask(dbi, withRBDB, prevVersion):
+    """Add Category Suggestion Task to scheduler (Redis needed)"""
+    if not Config.getInstance().getRedisConnectionURL():
+        print console.colored("  Redis not configured, skipping", 'yellow')
+        return
+    task = CategorySuggestionTask(rrule.DAILY)
+    client = Client()
+    client.enqueue(task)
+    dbi.commit()
 
 
 @since('1.2')
