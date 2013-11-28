@@ -46,6 +46,7 @@ from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import avatar_links, suggestions
+from flask import request
 
 """Contains the classes that implement the user management subsystem
 """
@@ -487,6 +488,8 @@ class Avatar(Persistent, Fossilizable):
                 continue
             aw = AccessWrapper()
             aw.setUser(self)
+            if request:
+                aw.setIP(request.remote_addr)
             if not categ.canAccess(aw):
                 continue
             res.append({
