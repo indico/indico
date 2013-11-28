@@ -18,10 +18,15 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import sessionModif
+from MaKaC.webinterface.rh import conferenceModif
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Main
+
+event_mgmt.add_url_rule('/sessions', 'conferenceSessions-query', conferenceModif.RConferenceGetSessions,
+                        methods=('GET',))
+
 event_mgmt.add_url_rule('/session/<sessionId>/', 'sessionModification', sessionModif.RHSessionModification)
 event_mgmt.add_url_rule('/session/<sessionId>/modify', 'sessionModification-modify',
                         sessionModif.RHSessionDataModification, methods=('GET', 'POST'))

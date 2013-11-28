@@ -70,7 +70,7 @@ from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept
 import MaKaC.webinterface.pages.abstracts as abstracts
 from MaKaC.rb_tools import FormMode
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
-
+from MaKaC.fossils.conference import ISessionBasicFossil
 from indico.modules.scheduler import Client
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
@@ -428,6 +428,13 @@ class RHScheduleDataEdit(RHConferenceModifBase):
             return
         p=conferences.WPModScheduleDataEdit(self,self._target)
         return p.display()
+
+
+class RConferenceGetSessions(RHConferenceModifBase):
+
+    def _process(self):
+        from MaKaC.common.fossilize import fossilize
+        return json.dumps(fossilize(self._conf.getSessionList(), ISessionBasicFossil))
 
 
 #-------------------------------------------------------------------------------------

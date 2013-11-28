@@ -270,17 +270,20 @@ class IMaterialFossil(IMaterialMinimalFossil):
     def isBuiltin(self):
         """ The material is a default one (builtin) """
 
-class ISessionFossil(IFossil):
+
+class ISessionBasicFossil(IFossil):
 
     def getId(self):
         """ Session Id """
-    #getId.name = "sessionId"
 
     def getTitle(self):
         """ Session Title """
 
     def getDescription(self):
         """ Session Description """
+
+
+class ISessionFossil(ISessionBasicFossil):
 
     def getAllMaterialList(self):
         """ Session List of all material """
