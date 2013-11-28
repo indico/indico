@@ -19,11 +19,11 @@
 
 <div id="headPanel" class="follow-scroll">
     <div id="button-menu" class="toolbar">
-        <div id="eventFilter" class="group i-selection left">
+        <div class="group i-selection left">
             <span class="i-button label">${_("Filter by")}</span>
-            <input type="checkbox" id="emailLog" name="view_filter" checked>
+            <input type="checkbox" id="emailLog" checked>
             <label for="emailLog" class="i-button">${_("Email")}</label>
-            <input type="checkbox" id="actionLog" name="view_filter" checked>
+            <input type="checkbox" id="actionLog" checked>
             <label for="actionLog" class="i-button">${_("Action")}</label>
         </div>
         <div id="expandControlls" class="group left">

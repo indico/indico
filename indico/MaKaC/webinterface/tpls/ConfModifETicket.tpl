@@ -23,8 +23,8 @@
                         ${_("The ticket is a PDF document containing a QR code that can be used by the mobile check-in application to keep track of registrants. This ticket will be sent to every new registrant, attached to the registration e-mail. The organiser of the event could use the application 'Indico check-in' in order to register the registrants. For that is necessary to configure install the mobile application. In order to configure the event you need to scan a QR Code.")}
                     </div>
                     <div id="button-menu" class="toolbar" style="padding-left: 2.5em">
-                        <div id="eventFilter" class="group selection">
-                            <input type="checkbox" id="toggleShowQRCode" name="view_filter">
+                        <div class="group i-selection">
+                            <input type="checkbox" id="toggleShowQRCode">
                             <label for="toggleShowQRCode" class="i-button">${_("Show QR Code")}</label>
                         </div>
                     </div>
