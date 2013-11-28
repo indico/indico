@@ -59,12 +59,6 @@
                       <% content = str(abstract.getField(f.getId()))%>
                       <div class="abstractSection">
                         <h2 class="abstractSectionTitle">${f.getCaption()}</h2>
-                        <div class="wmd-panel">
-                            <div id="wmd-button-bar-${f.getCaption()}" style="display: none;"></div>
-                            <textarea class="wmd-input" id="wmd-input-${f.getName()}" style="display: none;">${content}</textarea>
-                        </div>
-
-                        <div id="wmd-preview-${f.getCaption()}" class="wmd-panel wmd-preview" style="background: white"></div>
                         <div class="abstractSectionContent" style="white-space: nowrap;">
                              ${content | h, m}
                          </div>

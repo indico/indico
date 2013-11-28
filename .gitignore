@@ -24,6 +24,7 @@ indico/htdocs/ihelp/pdf
 indico/htdocs/static/assets
 indico/htdocs/sass/.sass-cache
 .webassets-cache
+.sass-cache
 *.min.css
 *.min.js
 jquery_migrate_silencer_*.js
@@ -33,6 +34,7 @@ indico/htdocs/js/indico/i18n/*.js
 # fetched external dependencies
 indico/htdocs/*/lib/
 node_env
+node_modules
 
 # IDE files
 .idea

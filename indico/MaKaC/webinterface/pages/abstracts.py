@@ -393,6 +393,11 @@ class WAbstractDisplay(wcomponents.WTemplated):
 class WPAbstractDisplay(WPAbstractDisplayBase):
     navigationEntry = navigation.NEAbstractDisplay
 
+    def _getHeadContent(self):
+        return WPAbstractDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                       for url in self._asset_env['mathjax_js'].urls()])
+
     def _getBody(self, params):
         wc = WAbstractDisplay(self._getAW(), self._abstract)
         return wc.getHTML()
@@ -459,10 +464,19 @@ class WAbstractDataModification(WConfDisplayBodyBase):
 class WPAbstractModify(WPAbstractDisplayBase):
     navigationEntry = navigation.NEAbstractModify
 
+    def _getHeadContent(self):
+        return WPAbstractDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                       for url in self._asset_env['mathjax_js'].urls()])
+
+    def getCSSFiles(self):
+        return WPAbstractDisplayBase.getCSSFiles(self) + \
+            self._asset_env['pagedown_sass'].urls()
+
     def getJSFiles(self):
         return WPAbstractDisplayBase.getJSFiles(self) + \
             self._includeJSPackage('Management') + \
-            self._asset_env['mathjax_js'].urls()
+            self._asset_env['pagedown_js'].urls()
 
     def _getBody(self, params):
         params["postURL"] = urlHandlers.UHAbstractModify.getURL(self._abstract)

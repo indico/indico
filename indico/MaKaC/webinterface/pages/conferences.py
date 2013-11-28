@@ -3194,14 +3194,18 @@ class WPConfModifCFAPreview(WPConferenceModifAbstractBase):
     def _setActiveTab(self):
         self._tabCFAPreview.setActive()
 
+    def _getHeadContent(self):
+        return WPConferenceModifAbstractBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                       for url in self._asset_env['mathjax_js'].urls()])
+
     def getCSSFiles(self):
         return WPConferenceModifAbstractBase.getCSSFiles(self) + \
             self._asset_env['pagedown_sass'].urls()
 
     def getJSFiles(self):
         return WPConferenceModifAbstractBase.getJSFiles(self) + \
-            self._asset_env['pagedown_js'].urls() + \
-            self._asset_env['mathjax_js'].urls()
+            self._asset_env['pagedown_js'].urls()
 
     def _getTabContent(self, params):
         import MaKaC.webinterface.pages.abstracts as abstracts
