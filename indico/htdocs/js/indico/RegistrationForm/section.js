@@ -477,7 +477,7 @@ ndRegForm.directive('ndSectionDialog', function(url) {
         templateUrl: url.tpl('sections/dialogs/base.tpl.html'),
         controller: function ($scope) {
 
-            $scope.section = $scope.$eval($scope.asyncData);
+            $scope.section = $scope.data;
             $scope.formData = {
                 items: []
             }; // TODO This is the way?
@@ -491,7 +491,7 @@ ndRegForm.directive('ndSectionDialog', function(url) {
             };
 
             $scope.actions.init = function() {
-                $scope.tabSelected = $scope.data.tabs[0].id;
+                $scope.tabSelected = $scope.config.tabs[0].id;
             };
 
             $scope.addItem = function () {

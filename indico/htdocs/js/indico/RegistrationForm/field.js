@@ -372,8 +372,8 @@ ndRegForm.directive('ndFieldDialog', function(url) {
 
         controller: function($scope) {
             $scope.settings = $scope.$parent.settings;
-            $scope.settings.dialogs = $scope.data;
-            $scope.field = $scope.$eval($scope.asyncData);
+            $scope.settings.dialogs = $scope.config;
+            $scope.field = $scope.data;
             $scope.formData = {
                 radioitems: [],
                 input: $scope.field.input
