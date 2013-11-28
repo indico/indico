@@ -21,7 +21,6 @@ from cStringIO import StringIO
 from flask import session, request
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrants as registrants
-import MaKaC.webinterface.rh.conferenceModif as conferenceModif
 from MaKaC.webinterface.rh.fileAccess import RHFileAccess
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.export.excel import RegistrantsListToExcel
@@ -408,15 +407,15 @@ class RHRegistrantListEmail:
         p=registrants.WPEMail(self._rh, self._conf, self._regList, self._from, self._cc, self._subject, self._body)
         return p.display()
 
-class RHRegistrantModifBase( conferenceModif.RHConferenceModifBase ):
+class RHRegistrantModifBase( RHRegistrationFormModifBase ):
 
     def _checkProtection( self ):
-        conferenceModif.RHConferenceModifBase._checkProtection(self)
+        RHRegistrationFormModifBase._checkProtection(self)
         if not self._conf.hasEnabledSection("regForm"):
             raise MaKaCError( _("The registrants' management was disabled by the conference managers"))
 
     def _checkParams( self, params ):
-        conferenceModif.RHConferenceModifBase._checkParams(self, params)
+        RHRegistrationFormModifBase._checkParams(self, params)
         regId=params.get("registrantId",None)
         if regId is None:
             raise MaKaCError(_("registrant id not set"))
