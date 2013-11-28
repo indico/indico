@@ -80,33 +80,52 @@ from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.general import WebFactory
+from MaKaC.common.TemplateExec import render
 
 
-def stringToDate( str ):
-    #Don't delete this dictionary inside comment. Its purpose is to add the dictionary in the language dictionary during the extraction!
-    #months = { _("January"):1, _("February"):2, _("March"):3, _("April"):4, _("May"):5, _("June"):6, _("July"):7, _("August"):8, _("September"):9, _("October"):10, _("November"):11, _("December"):12 }
-    months = { "January":1, "February":2, "March":3, "April":4, "May":5, "June":6, "July":7, "August":8, "September":9, "October":10, "November":11, "December":12 }
-    [ day, month, year ] = str.split("-")
-    return datetime(int(year),months[month],int(day))
+def stringToDate(str):
+
+    # Don't delete this dictionary inside comment. Its purpose is to
+    # add the dictionary in the language dictionary during the extraction!
+    # months = { _("January"): 1, _("February"): 2, _("March"): 3, _("April"): 4,
+    #            _("May"): 5, _("June"): 6, _("July"): 7, _("August"): 8,
+    #            _("September"): 9, _("October"): 10, _("November"): 11, _("December"): 12 }
+
+    months = {
+        "January": 1,
+        "February": 2,
+        "March": 3,
+        "April": 4,
+        "May": 5,
+        "June": 6,
+        "July": 7,
+        "August": 8,
+        "September": 9,
+        "October": 10,
+        "November": 11,
+        "December": 12
+    }
+    [day, month, year] = str.split("-")
+    return datetime(int(year), months[month], int(day))
 
 
-class WPConferenceBase( base.WPDecorated ):
+class WPConferenceBase(base.WPDecorated):
 
-    def __init__( self, rh, conference ):
-        WPDecorated.__init__( self, rh )
+    def __init__(self, rh, conference):
+        WPDecorated.__init__(self, rh)
         self._navigationTarget = self._conf = conference
-        tz = self._tz = DisplayTZ(rh._aw,self._conf).getDisplayTZ()
+        tz = self._tz = DisplayTZ(rh._aw, self._conf).getDisplayTZ()
         sDate = self.sDate = self._conf.getAdjustedScreenStartDate(tz)
         eDate = self.eDate = self._conf.getAdjustedScreenEndDate(tz)
-        dates=" (%s)"%format_date(sDate, format='long')
+        dates = " (%s)" % format_date(sDate, format='long')
         if sDate.strftime("%d%B%Y") != eDate.strftime("%d%B%Y"):
             if sDate.strftime("%B%Y") == eDate.strftime("%B%Y"):
-                dates=" (%s-%s)"%(sDate.strftime("%d"), format_date(eDate, format='long'))
+                dates = " (%s-%s)" % (sDate.strftime("%d"), format_date(eDate, format='long'))
             else:
-                dates=" (%s - %s)"%(format_date(sDate, format='long'), format_date(eDate, format='long'))
-        self._setTitle( "%s %s"%(strip_ml_tags(self._conf.getTitle()), dates ))
+                dates = " (%s - %s)" % (format_date(sDate, format='long'), format_date(eDate, format='long'))
+        self._setTitle("%s %s" % (strip_ml_tags(self._conf.getTitle()), dates))
 
-    def _getFooter( self ):
+    def _getFooter(self):
         """
         """
         wc = wcomponents.WFooter()
