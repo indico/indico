@@ -20,6 +20,7 @@ from flask import request, session
 
 import time
 import sys, traceback
+import copy
 
 from ZODB.POSException import ConflictError
 from ZEO.Exceptions import ClientDisconnected
@@ -31,7 +32,6 @@ from MaKaC.plugins.base import Observable
 import MaKaC.errors
 
 from indico.core.db import DBMgr
-from MaKaC.common import Config, fossilize
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.mail import GenericMailer
 
@@ -39,8 +39,9 @@ from MaKaC.services.interface.rpc.common import CausedError, NoReportError, CSRF
 from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
 
-import copy
 from indico.util.redis import RedisError
+from indico.util import fossilize
+from indico.core.config import Config
 
 
 def lookupHandler(method):

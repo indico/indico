@@ -21,7 +21,7 @@ from MaKaC.webinterface.pages import conferences
 from MaKaC.webinterface.pages import registrationForm
 from MaKaC.webinterface import wcomponents
 from xml.sax.saxutils import quoteattr
-from MaKaC.common import Configuration
+from indico.core import config as Configuration
 from MaKaC.webinterface import urlHandlers
 import MaKaC
 

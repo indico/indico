@@ -23,7 +23,6 @@ from MaKaC.webinterface             import wcomponents,urlHandlers
 from MaKaC.webinterface.wcomponents import WUtils
 from MaKaC.webinterface.pages       import conferences
 from xml.sax.saxutils               import quoteattr
-from MaKaC.common.Configuration     import Config
 from MaKaC.evaluation               import Evaluation,Question,Box,Choice,Textbox,Textarea,Password,Select,Radio,Checkbox,Submission
 from MaKaC.webinterface.navigation  import NEEvaluationMainInformation,NEEvaluationDisplay,NEEvaluationDisplayModif
 from MaKaC.errors                   import FormValuesError
@@ -35,6 +34,7 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 
+from indico.core.config import Config
 
 ##############
 #Display Area#

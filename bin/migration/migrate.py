@@ -36,7 +36,7 @@ from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex, CalendarDayInd
 from indico.core.db import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Counter import Counter
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.conference import ConferenceHolder, CategoryManager, Conference, CustomLocation, CustomRoom
 from MaKaC.common.timerExec import HelperTaskList
 from MaKaC.plugins.base import PluginType, PluginsHolder

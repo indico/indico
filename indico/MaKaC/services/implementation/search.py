@@ -29,7 +29,7 @@ from MaKaC.common.fossilize import fossilize
 from zope.index.text import parsetree
 from MaKaC.services.implementation.user import UserComparator
 
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
 #################################

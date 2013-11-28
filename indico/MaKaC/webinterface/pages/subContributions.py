@@ -27,7 +27,7 @@ from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceBase, WPConferenceModifBase
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from datetime import datetime
 from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _

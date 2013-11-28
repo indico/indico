@@ -24,7 +24,7 @@ import unittest
 from indico.tests.env import *
 
 import shutil, sys
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.consoleScripts.installBase import modifyOnDiskIndicoConfOption
 
 

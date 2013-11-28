@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.services.implementation.base import ServiceBase
-from MaKaC.common import Config
+from indico.core.config import Config
 
 
 class GetTimezones(ServiceBase):

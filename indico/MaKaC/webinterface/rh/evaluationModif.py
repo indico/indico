@@ -29,7 +29,7 @@ from MaKaC.common             import utils
 from MaKaC.errors             import FormValuesError, MaKaCError
 from MaKaC.export.excel       import ExcelGenerator
 from xml.dom.minidom          import parseString,Element
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.i18n import _
 from indico.web.flask.util import send_file
 

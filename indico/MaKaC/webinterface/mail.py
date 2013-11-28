@@ -22,7 +22,7 @@ from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.i18n import _
 
 from indico.web.flask.util import url_for

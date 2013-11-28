@@ -28,12 +28,12 @@ from MaKaC import registration
 from MaKaC.webinterface import wcomponents
 from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
-from MaKaC.common import Configuration
+from indico.core import config as Configuration
 from datetime import timedelta
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.webinterface.pages.base import WPBase
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.registration import RadioGroupInput, TextareaInput

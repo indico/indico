@@ -67,7 +67,7 @@ from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, S
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.errors import MaKaCError
 from MaKaC.common.logger import Logger
-from MaKaC.common import Configuration
+from indico.core import config as Configuration
 from MaKaC.user import Group, PrincipalHolder
 
 

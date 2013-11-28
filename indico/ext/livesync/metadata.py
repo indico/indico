@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC import conference
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.common.output import outputGenerator
 from MaKaC import accessControl
 

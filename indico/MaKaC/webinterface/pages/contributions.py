@@ -29,7 +29,7 @@ import MaKaC.webinterface.materialFactories as materialFactories
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.common.utils import isStringHTML, formatDateTime
 from MaKaC.common import info
 from MaKaC.i18n import _

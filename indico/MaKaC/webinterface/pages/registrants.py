@@ -26,7 +26,7 @@ from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 from MaKaC.webinterface import wcomponents
 from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.webinterface.common.registrantNotificator import EmailNotificator

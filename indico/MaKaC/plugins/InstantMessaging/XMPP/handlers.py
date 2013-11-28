@@ -23,7 +23,7 @@ from MaKaC.plugins.InstantMessaging.handlers import ChatroomServiceBase
 from MaKaC.services.implementation.base import ServiceBase, ParameterManager
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.common import log
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.logger import Logger
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager

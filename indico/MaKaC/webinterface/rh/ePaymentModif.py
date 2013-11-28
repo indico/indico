@@ -1,3 +1,5 @@
+
+
 # -*- coding: utf-8 -*-
 ##
 ##
@@ -127,7 +129,7 @@ class RHRegistrationFormDisplayBase( RHConferenceBaseDisplay ):
 
     def _getLoginURL( self ):
         urlLogin = str(urlHandlers.UHConfRegistrationFormSignIn.getURL(self._conf, request.url))
-        from MaKaC.common import Config
+        from indico.core.config import Config
         if Config.getInstance().getLoginURL().startswith("https"):
             urlLogin = urlLogin.replace("http://", "https://")
         return urlLogin

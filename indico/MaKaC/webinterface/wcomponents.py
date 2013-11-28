@@ -45,11 +45,11 @@ from MaKaC import schedule
 from MaKaC.common import info
 from MaKaC import domain
 from MaKaC.webinterface import urlHandlers
-from MaKaC.common import Configuration
+from indico.core import config as Configuration
 from MaKaC import webcast
 from MaKaC.accessControl import AdminList
 from MaKaC.common.url import URL
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.conference import Conference, Category
 from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry

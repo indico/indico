@@ -25,7 +25,7 @@ from MaKaC.webinterface.rh.fileAccess import RHFileAccess
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.export.excel import RegistrantsListToExcel
 import MaKaC.webinterface.common.regFilters as regFilters
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.errors import FormValuesError
 from MaKaC.common import utils
 from MaKaC.registration import SocialEvent, MiscellaneousInfoGroup

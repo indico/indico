@@ -19,7 +19,7 @@
 
 import MaKaC.webinterface.pages.errors as errors
 from MaKaC.webinterface.rh.base import RH
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 class RHErrorReporting(RH):

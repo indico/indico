@@ -24,6 +24,9 @@ from MaKaC.consoleScripts.installBase import getIndicoInstallMode
 skip_imports = getIndicoInstallMode()
 
 if not skip_imports:
-    from info import HelperMaKaCInfo
-    from url import URL
-    from Configuration import Config
+
+    __all__ = ['HelperMaKaCInfo', 'URL', 'Config']
+
+    from .Configuration import Config
+    from .info import HelperMaKaCInfo
+    from .url import URL

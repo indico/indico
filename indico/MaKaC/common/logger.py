@@ -22,7 +22,7 @@ import os, string, copy
 import logging.handlers, logging.config, logging
 import ConfigParser
 
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.contextManager import ContextManager
 
 

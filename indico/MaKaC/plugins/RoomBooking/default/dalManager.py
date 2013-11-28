@@ -20,7 +20,7 @@
 import threading
 from contextlib import contextmanager
 
-from MaKaC.common import Configuration
+from indico.core import config as Configuration
 from indico.core.db import DBMgr
 from MaKaC.rb_dalManager import DALManagerBase
 from MaKaC.errors import MaKaCError

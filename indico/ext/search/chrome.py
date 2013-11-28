@@ -37,7 +37,7 @@ from MaKaC.webinterface.rh.conferenceBase import RHCustomizable
 from MaKaC.webinterface.pages.category import WPCategoryDisplayBase
 from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
 
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.conference import CategoryManager, ConferenceHolder, Conference
 from indico.ext.search.register import SearchRegister
 from MaKaC.common.info import HelperMaKaCInfo

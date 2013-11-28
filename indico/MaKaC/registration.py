@@ -31,7 +31,7 @@ import MaKaC
 from MaKaC.common.Counter import Counter
 from MaKaC.errors import FormValuesError,MaKaCError
 from MaKaC.common.Locators import Locator
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.common.TemplateExec import inlineContextHelp
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common.info import HelperMaKaCInfo

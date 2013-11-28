@@ -28,7 +28,7 @@ from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
 from MaKaC.webinterface.rh.conferenceBase import RHContributionBase
 from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.common.xmlGen import XMLGen
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.errors import MaKaCError, ModificationError, NoReportError
 import MaKaC.common.timezoneUtils as timezoneUtils
 import MaKaC.webinterface.materialFactories as materialFactories

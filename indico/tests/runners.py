@@ -48,7 +48,7 @@ from indico.tests import default_actions
 from indico.core.db import DBMgr
 
 # legacy indico modules
-from MaKaC.common import Config
+from indico.core.config import Config
 
 __all__ = [
     'UnitTestRunner',

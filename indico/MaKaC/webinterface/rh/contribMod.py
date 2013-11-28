@@ -30,7 +30,7 @@ from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.common import log
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common.utils import parseDateTime
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.PDFinterface.conference import ConfManagerContribToPDF

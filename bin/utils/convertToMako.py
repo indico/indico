@@ -23,7 +23,7 @@ import os
 import re
 import stat
 
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 TEMPLATE_DIR = Config.getInstance().getTPLDir()
 NEW_TEMPLATE_DIR = "%s/Mako" % TEMPLATE_DIR

@@ -34,7 +34,7 @@ from BTrees import OOBTree
 from MaKaC.common.Counter import Counter
 
 from MaKaC.common.logger import Logger
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.review import Abstract
 from MaKaC.registration import Registrant
 

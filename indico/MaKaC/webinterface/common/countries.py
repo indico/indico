@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import pycountry
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 class CountryHolder(object):

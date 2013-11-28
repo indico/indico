@@ -31,7 +31,7 @@ from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 # Branch name in ZODB root
 _ROOMBLOCKING = 'RoomBlocking'

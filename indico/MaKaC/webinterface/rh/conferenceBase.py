@@ -27,7 +27,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common import log
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.errors import MaKaCError
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.conference import LocalFile,Link,Category
 from MaKaC.export import fileConverter
 from MaKaC.conference import Conference,Session,Contribution,SubContribution

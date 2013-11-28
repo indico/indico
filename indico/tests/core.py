@@ -45,7 +45,7 @@ from indico.tests.base import TestOptionException, FakeMailThread
 from indico.tests.runners import *
 
 # Indico legacy
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 TEST_RUNNERS = {'unit': UnitTestRunner,

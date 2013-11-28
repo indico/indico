@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import session
 
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.errors import MaKaCError
 
 from indico.util.importlib import import_module

@@ -25,7 +25,7 @@ from webassets import Bundle
 
 # legacy imports
 from MaKaC.plugins.base import Observable
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.info import HelperMaKaCInfo
 
 # indico imports

@@ -23,7 +23,7 @@ import pkg_resources
 import os.path
 import posixpath, re
 from indico.core.db import DBMgr
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime, formatDate, formatTime
 from MaKaC.user import Avatar
 from mako.lookup import TemplateLookup

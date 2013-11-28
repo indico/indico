@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 import urllib, hmac, hashlib, time
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 def get_query_parameter(queryParams, keys, default=None, integer=False):

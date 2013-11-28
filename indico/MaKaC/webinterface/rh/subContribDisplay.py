@@ -23,7 +23,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
     RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHSubContributionBase
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from indico.web.flask.util import send_file
 

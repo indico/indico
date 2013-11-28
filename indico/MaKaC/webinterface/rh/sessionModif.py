@@ -39,7 +39,7 @@ import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.webinterface.common.slotDataWrapper import Slot
 from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
-from MaKaC.common import Config
+from indico.core.config import Config
 from BTrees.OOBTree import OOBTree
 from BTrees.IOBTree import IOBTree
 from datetime import datetime,timedelta,date

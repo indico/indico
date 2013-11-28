@@ -21,7 +21,7 @@ from webassets import Bundle
 from indico.web.assets import PluginEnvironment
 from indico.util.date_time import now_utc
 
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.common.utils import formatTwoDates
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools

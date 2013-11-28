@@ -25,7 +25,7 @@ from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase, wit
 from MaKaC.user import AvatarHolder, Avatar, Group, GroupHolder, LoginInfo
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common import Configuration
+from indico.core import config as Configuration
 from MaKaC.plugins.RoomBooking.CERN.dalManagerCERN import DALManagerCERN
 from MaKaC.plugins.RoomBooking.CERN.initialize import initializeRoomBookingDB
 from MaKaC.rb_location import Location

@@ -34,7 +34,7 @@ from MaKaC import errors
 from indico.core.db import DBMgr
 from MaKaC.webinterface.linking import RoomLinker
 from MaKaC.rb_location import CrossLocationQueries
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 # indico imports
 from indico.util.i18n import currentLocale

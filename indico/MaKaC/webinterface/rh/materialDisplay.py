@@ -25,7 +25,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.conference as conference
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHMaterialBase
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.export import fileConverter
 from MaKaC.i18n import _
 

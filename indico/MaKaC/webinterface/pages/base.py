@@ -25,7 +25,7 @@ from indico.web import assets
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _

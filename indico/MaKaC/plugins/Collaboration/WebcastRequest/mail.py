@@ -21,7 +21,7 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.plugins.Collaboration.WebcastRequest.common import getCommonTalkInformation
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 class WebcastRequestNotificationBase(GenericNotification):

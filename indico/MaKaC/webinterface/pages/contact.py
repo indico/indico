@@ -21,7 +21,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 class WPContact(WPMainBase):

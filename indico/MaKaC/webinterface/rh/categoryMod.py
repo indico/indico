@@ -24,7 +24,7 @@ import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
 from MaKaC.webinterface.user import UserListModificationBase
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.utils import sortCategoryByTitle, validMail
 import MaKaC.user as user
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected,\

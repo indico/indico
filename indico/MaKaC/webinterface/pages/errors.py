@@ -25,7 +25,7 @@ import sys
 from xml.sax.saxutils import quoteattr
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.webinterface.pages.main import WPMainBase

@@ -35,7 +35,7 @@ from MaKaC.common import indexes, timerExec
 from datetime import datetime
 import MaKaC.common.indexes as indexes
 from time import sleep
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 LOG_FILE = ""
 logfile = None

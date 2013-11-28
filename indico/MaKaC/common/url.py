@@ -23,7 +23,7 @@ from flask import url_for
 from werkzeug.urls import url_encode, url_parse, url_unparse, url_join
 from werkzeug.routing import BuildError
 
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import MaKaCError
 from indico.web.flask.util import url_rule_to_js

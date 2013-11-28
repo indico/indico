@@ -29,7 +29,7 @@ from MaKaC.common.timezoneUtils import getAdjustedDate, nowutc
 from persistent import Persistent
 from MaKaC.errors import MaKaCError
 from MaKaC.paperReviewing import ConferencePaperReview
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.i18n import _
 from MaKaC.fossils.reviewing import IReviewManagerFossil,\
     IReviewFossil, IJudgementFossil

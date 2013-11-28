@@ -24,7 +24,7 @@ from MaKaC.review import AbstractStatusSubmitted, AbstractStatusAccepted,\
                 AbstractStatusProposedToAccept, AbstractStatusProposedToReject,\
                 AbstractStatusInConflict,AbstractStatusWithdrawn,\
                 AbstractStatusDuplicated,AbstractStatusMerged
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.i18n import _
 
 

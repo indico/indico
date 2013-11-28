@@ -27,7 +27,7 @@ import MaKaC.user as user
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError, Warning, ResultWithWarning
 
 from MaKaC.common import info
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 

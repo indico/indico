@@ -23,7 +23,7 @@ from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from MaKaC.webinterface import wcomponents, navigation, urlHandlers
 from MaKaC.errors import MaKaCError
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.common.fossilize import fossilize
 from MaKaC.i18n import _
 from MaKaC.conference import Link

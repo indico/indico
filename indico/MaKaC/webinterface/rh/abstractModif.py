@@ -28,7 +28,7 @@ from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.errors import MaKaCError, ModificationError, FormValuesError, NoReportError
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 from MaKaC.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import CFAEnabled

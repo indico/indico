@@ -26,7 +26,7 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import navigation
 from MaKaC.webinterface import wcomponents
 from xml.sax.saxutils import quoteattr
-from MaKaC.common import Configuration
+from indico.core import config as Configuration
 from datetime import timedelta,datetime
 from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.webinterface.pages import registrationForm

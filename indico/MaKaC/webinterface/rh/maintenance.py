@@ -20,7 +20,7 @@
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common.maintenanceMng import MaintenanceMng
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.pages import admins as adminPages
 from indico.core.db import DBMgr
 

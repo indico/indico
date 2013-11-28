@@ -34,7 +34,7 @@ import MaKaC.user as user
 import MaKaC.webinterface.mail as mail
 from MaKaC.webinterface.pages.errors import WPAccessError, WPError404
 import MaKaC.conference as conference
-from MaKaC.common import Config
+from indico.core.config import Config
 from indico.core.db import DBMgr
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected

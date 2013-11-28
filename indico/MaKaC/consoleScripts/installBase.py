@@ -460,7 +460,7 @@ What do you want to do [c/a]? ''')
 
 
 def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db = False, uid=None, gid=None, dbDir=LOCALDATABASEDIR):
-    from MaKaC.common.Configuration import Config
+    from indico.core.config import Config
 
     if 'db' in targetDirs:
         # we don't want that the db directory be created

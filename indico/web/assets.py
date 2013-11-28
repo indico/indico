@@ -31,7 +31,7 @@ from webassets.filter import Filter
 
 # legacy imports
 from MaKaC.common import HelperMaKaCInfo
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 class PluginEnvironment(Environment):

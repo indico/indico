@@ -37,7 +37,7 @@ from MaKaC.errors import AccessControlError, MaKaCError
 from MaKaC.webinterface.rh.services import RHServicesBase
 from MaKaC.webinterface.rh.users import RHUserBase
 from MaKaC.webinterface.pages.oauth import WPAdminOAuthConsumers, WPAdminOAuthAuthorized, WPOAuthThirdPartyAuth, WPOAuthUserThirdPartyAuth
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 class RHOAuth(base.RH):

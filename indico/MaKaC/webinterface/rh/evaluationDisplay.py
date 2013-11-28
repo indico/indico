@@ -20,10 +20,11 @@
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface                      import urlHandlers
 from MaKaC.webinterface.pages                import evaluations
-from MaKaC.common                            import Config
 from MaKaC.evaluation                        import Evaluation,Question,Submission
 from MaKaC.errors                            import FormValuesError
 from MaKaC.common.info import HelperMaKaCInfo
+
+from indico.core.config import Config
 
 
 class RHBaseEvaluation( RHConferenceBaseDisplay ):

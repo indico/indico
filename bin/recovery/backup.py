@@ -23,7 +23,7 @@ import sys
 #sys.path.append('C:/Documents and Settings/smilenko/My Documents/project/indico/code/code')
 from distutils import sysconfig
 from datetime import datetime
-from MaKaC.common import Config
+from indico.core.config import Config
 
 # The folder that contains the current database file.
 currentPath = Config.getInstance().getCurrentDBDir()

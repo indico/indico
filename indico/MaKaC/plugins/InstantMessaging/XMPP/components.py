@@ -39,7 +39,7 @@ import zope.interface
 from indico.core.extpoint import Component
 from indico.core.extpoint.events import INavigationContributor
 from indico.core.extpoint.plugins import IPluginDocumentationContributor
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 class ChatSMContributor(Component, Observable):

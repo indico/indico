@@ -27,7 +27,7 @@ from datetime import datetime, date
 
 from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
-from MaKaC.common import security, Config
+from MaKaC.common import security
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.utils import parseDateTime
 
@@ -43,6 +43,8 @@ from MaKaC.accessControl import AccessWrapper
 from MaKaC.i18n import _
 from MaKaC.common.contextManager import ContextManager
 import MaKaC.common.info as info
+
+from indico.core.config import Config
 
 """
 base module for asynchronous server requests

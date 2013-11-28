@@ -21,7 +21,7 @@ import re
 from flask import request
 
 import MaKaC.webinterface.rh.base as base
-from MaKaC.common import Config
+from indico.core.config import Config
 
 class RHChangeLang(base.RH):
 

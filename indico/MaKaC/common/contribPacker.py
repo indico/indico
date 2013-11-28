@@ -32,7 +32,7 @@ from MaKaC.common.utils import utf8rep
 from MaKaC.errors import MaKaCError
 from MaKaC import conference
 from MaKaC import schedule
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.PDFinterface.conference import ProceedingsTOC, ProceedingsChapterSeparator
 from MaKaC.i18n import _
 

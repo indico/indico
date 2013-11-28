@@ -27,7 +27,7 @@ from indico.core.db import MigratedDB
 from ZODB.FileStorage import FileStorage
 import transaction
 from indico.core.db import DBMgr
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.review import Abstract, AbstractStatusSubmitted, AbstractStatusAccepted,\
 AbstractStatusRejected, AbstractStatusUnderReview, AbstractStatusProposedToAccept,\
 AbstractStatusProposedToReject, AbstractStatusInConflict, AbstractStatusWithdrawn,\

@@ -23,7 +23,7 @@ import urlparse
 from flask import request, session, url_for
 
 from MaKaC.common.url import URL, EndpointURL
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 import MaKaC.user as user
 from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc

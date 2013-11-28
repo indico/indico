@@ -31,7 +31,7 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from indico.modules.scheduler import Client
 from indico.modules.scheduler.tasks import AlarmTask
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 class Evaluation(Persistent):

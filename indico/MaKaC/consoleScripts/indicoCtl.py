@@ -19,7 +19,7 @@
 import subprocess
 import sys
 
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 def main():
     subprocess.call(['zdctl.py', '-C', '%s/zdctl.conf' % Config.getInstance().getConfigurationDir(), sys.argv[-1]])

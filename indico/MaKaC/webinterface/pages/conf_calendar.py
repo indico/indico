@@ -28,7 +28,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.pages.base import WPNotDecorated
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC import conference
 from copy import copy
 from MaKaC.common.Counter import Counter

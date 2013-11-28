@@ -42,7 +42,7 @@ import MaKaC.webinterface.pages.errors as errors
 
 from MaKaC.accessControl import AccessWrapper
 from indico.core.db import DBMgr
-from MaKaC.common import Config, security
+from MaKaC.common import security
 from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError, EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlScriptError, HtmlForbiddenTag, ConferenceClosedError, HostnameResolveError, BadRefererError
 from indico.modules.oauth.errors import OAuthError
 from MaKaC.webinterface.mail import GenericMailer
@@ -58,6 +58,7 @@ from MaKaC.plugins.base import OldObservable
 from MaKaC.plugins.RoomBooking.common import rb_check_user_access
 
 from indico.util.redis import RedisError
+from indico.core.config import Config
 
 
 class RequestHandlerBase(OldObservable):

@@ -48,7 +48,7 @@ from MaKaC.user import Group, Avatar
 from MaKaC.plugins.Collaboration.pages import WPAdminCollaboration, WPCollaborationDisplay, \
     WPConfModifCollaboration, WPConfModifCollaborationProtection, WPElectronicAgreementFormConference, \
     WPElectronicAgreementForm, WPElectronicAgreement
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 class RCCollaborationAdmin(object):

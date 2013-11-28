@@ -42,7 +42,7 @@ from MaKaC.errors import MaKaCError,FormValuesError,NoReportError
 import MaKaC.conference as conference
 from MaKaC.conference import ConferenceChair
 import MaKaC.statistics as statistics
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 import MaKaC.user as user
 import MaKaC.common.info as info
 from MaKaC.i18n import _

@@ -24,7 +24,7 @@ import httplib
 from indico.util.json import  loads
 
 from MaKaC.common.logger import Logger
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC import conference
 from MaKaC.conference import LocalFile
 

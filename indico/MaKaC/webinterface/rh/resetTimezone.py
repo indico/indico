@@ -21,7 +21,7 @@
 from flask import session, request
 import MaKaC.webinterface.rh.base as base
 import MaKaC.common.info as info
-from MaKaC.common import Config
+from indico.core.config import Config
 
 class RHResetTZ(base.RH):
 

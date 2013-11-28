@@ -27,7 +27,7 @@ import traceback
 import logging
 from getpass import getpass
 
-from indico.core.db import DBMgr
+from indico.core import db
 from MaKaC.common import info
 from MaKaC.user import AvatarHolder, Avatar, LoginInfo
 from MaKaC.authentication import AuthenticatorMgr
@@ -43,7 +43,7 @@ class AdminCommand(object):
         raise Exception("Unimplemented method")
 
     def run(self, args):
-        self._dbi = DBMgr.getInstance()
+        self._dbi = db.DBMgr.getInstance()
         self._dbi.startRequest()
         result = self._run(args)
         self._dbi.endRequest(True)

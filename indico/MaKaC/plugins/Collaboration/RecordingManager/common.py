@@ -556,7 +556,7 @@ def createCDSRecord(aw, IndicoID, LODBID, lectureTitle, lectureSpeakers, content
     # generate the basic XML from which we will produce MARC XML for CDS and lecture.xml for micala
     basexml = getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
 
-    from MaKaC.common import Config
+    from indico.core.config import Config
 
     marcxml = ""
 
@@ -684,7 +684,7 @@ def submitMicalaMetadata(aw, IndicoID, contentType, LODBID, LOID, videoFormat, l
 
     basexml = getBasicXMLRepresentation(aw, IndicoID, contentType, videoFormat, languages)
 
-    from MaKaC.common import Config
+    from indico.core.config import Config
 
     micalaxml = ""
 

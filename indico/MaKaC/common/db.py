@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Obsolete module where we raise a Warning and we
+Obsolete module
 """
 import warnings
 warnings.warn("the MaKaC.common.db module is deprecated; use indico.core.db instead", DeprecationWarning, 2)

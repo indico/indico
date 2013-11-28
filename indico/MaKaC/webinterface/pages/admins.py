@@ -30,7 +30,7 @@ import MaKaC.webinterface.pages.conferences as conferences
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 import MaKaC.common.info as info
 import MaKaC.webcast as webcast
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 import MaKaC.conference as conference
 import MaKaC.user as user
 from MaKaC.common import utils, timezoneUtils

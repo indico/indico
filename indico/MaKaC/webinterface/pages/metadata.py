@@ -25,7 +25,8 @@ from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MO
 from indico.web.http_api.util import generate_public_auth_request
 
 import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC.common import Config, info
+from MaKaC.common import info
+from indico.core.config import Config
 
 
 class WICalExportBase(wcomponents.WTemplated):

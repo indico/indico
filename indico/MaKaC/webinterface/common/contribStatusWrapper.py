@@ -19,7 +19,7 @@
 
 """
 """
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.conference import ContribStatusSch,ContribStatusNotSch
 from MaKaC.conference import ContribStatusWithdrawn
 from MaKaC.i18n import _    

@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.common.utils import encodeUnicode
 
 from MaKaC.errors import MaKaCError, HtmlScriptError, HtmlForbiddenTag

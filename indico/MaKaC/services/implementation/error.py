@@ -21,7 +21,7 @@ from MaKaC.services.implementation.base import ParameterManager, ServiceBase
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.errors import MaKaCError
 
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.logger import Logger
 

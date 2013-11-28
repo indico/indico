@@ -30,7 +30,7 @@ import MaKaC.webinterface.linking as linking
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, \
     WPConferenceDefaultDisplayBase, WContribParticipantList, WPConferenceModifBase
 from MaKaC.webinterface.pages.metadata import WICalExportBase
-from MaKaC.common import Config, info
+from MaKaC.common import info
 import MaKaC.webinterface.timetable as timetable
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 import MaKaC.common.filters as filters
@@ -50,6 +50,9 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
 from MaKaC.user import Avatar
+
+from indico.core.config import Config
+
 
 class WPSessionBase(WPConferenceBase):
 

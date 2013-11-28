@@ -28,7 +28,7 @@ from persistent import Persistent
 from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common import mail
 ###---------------------------- General Pending Queues ---------------------------------
 

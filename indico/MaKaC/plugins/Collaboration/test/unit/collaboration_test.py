@@ -29,7 +29,7 @@ from MaKaC.plugins.Collaboration.actions import DeleteAllBookingsAction
 from indico.core.index import Catalog
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.errors import MaKaCError
-from MaKaC.common import Config
+from indico.core.config import Config
 
 from util import TestZEOServer
 

@@ -49,7 +49,7 @@ class TestMaterialRepository(IndicoTestCase):
             pass
         #the MaterialLocalRepository takes the repository base path from
         #   the system configuration so we have to set it up to the new dir
-        from MaKaC.common import Config
+        from indico.core.config import Config
         cfg = Config.getInstance()
         #we overrride the system repository path with the temp one
         cfg._archivePath = self._archivePath

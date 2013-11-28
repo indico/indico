@@ -45,7 +45,7 @@ from MaKaC.webinterface.rh.base import RH   # Strange conflict was here: this li
 from MaKaC.webinterface.pages import admins
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHAlarmBase, RHSubmitMaterialBase
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.errors import MaKaCError, FormValuesError,ModificationError,\
     ConferenceClosedError, NoReportError, NotFoundError
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerContribsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF

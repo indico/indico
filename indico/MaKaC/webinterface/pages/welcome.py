@@ -21,7 +21,7 @@ import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.conference as conference
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 import MaKaC.common.info as info
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ

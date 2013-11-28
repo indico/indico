@@ -20,7 +20,7 @@
 import MaKaC.conference as conference
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.i18n import _
 
 class MaterialFactory:

@@ -19,7 +19,7 @@
 
 import os
 from indico.core.db import DBMgr
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.common.mail import GenericMailer
 from indico.modules import ModuleHolder
 from indico.modules.scheduler.tasks import OneShotTask

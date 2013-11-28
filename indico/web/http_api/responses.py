@@ -28,7 +28,7 @@ import time
 from indico.web.http_api.fossils import IHTTPAPIErrorFossil, IHTTPAPIResultFossil
 
 # indico legacy imports
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 
 class HTTPAPIError(Exception, Fossilizable):

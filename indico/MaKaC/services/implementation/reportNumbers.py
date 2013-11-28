@@ -20,7 +20,7 @@
 from MaKaC.services.implementation.base import ParameterManager, LoggedOnlyService
 from MaKaC.services.implementation.contribution import ContributionModifBase
 from MaKaC.services.implementation.conference import ConferenceModifBase
-from MaKaC.common import Config
+from indico.core.config import Config
 
 class GetReportNumberSystems(LoggedOnlyService):
 

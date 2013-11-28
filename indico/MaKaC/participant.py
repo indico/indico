@@ -28,7 +28,7 @@ from MaKaC.webinterface.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common import utils
 from MaKaC.i18n import _
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.participant import IParticipantMinimalFossil
 

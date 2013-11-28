@@ -24,7 +24,7 @@
 from datetime import datetime
 from pytz import timezone
 from xml.sax.saxutils import quoteattr, escape
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.i18n import _
 
 

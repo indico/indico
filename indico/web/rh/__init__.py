@@ -22,7 +22,7 @@ import os.path
 
 # legacy imports
 from werkzeug.exceptions import NotFound
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 class RH(object):

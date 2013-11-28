@@ -34,7 +34,7 @@ from pytz import timezone
 from MaKaC.i18n import _
 from MaKaC import domain, conference as conference
 
-from MaKaC.common import indexes, info, filters, log, Config, timezoneUtils
+from MaKaC.common import indexes, info, filters, log, timezoneUtils
 from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTime
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize
@@ -66,6 +66,8 @@ from indico.modules.scheduler.tasks.offlineEventGenerator import OfflineEventGen
 from indico.modules.scheduler import tasks, Client
 from indico.util.i18n import i18nformat
 from indico.web.http_api.util import generate_public_auth_request
+from indico.core.config import Config
+
 
 class ConferenceBase:
     """

@@ -29,7 +29,7 @@ from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationElectronicAgreementForm
 from MaKaC.plugins.Collaboration.mail import ElectronicAgreementNotification, ElectronicAgreementOrganiserNotification
 from MaKaC.common.mail import GenericMailer
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.utils import setValidEmailSeparators
 from indico.util.string import permissive_format
 from pytz import timezone

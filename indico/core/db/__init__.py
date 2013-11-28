@@ -17,5 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.db.manager import DBMgr
-from indico.core.db.migration import MigratedDB
+__all__ = ['DBMgr', 'MigratedDB']
+
+from .manager import DBMgr
+from .migration import MigratedDB

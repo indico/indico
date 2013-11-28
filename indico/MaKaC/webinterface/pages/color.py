@@ -19,7 +19,7 @@
 
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
-from MaKaC.common import Config
+from indico.core.config import Config
 
 class WPSimpleColorChart( WPNotDecorated ):
     

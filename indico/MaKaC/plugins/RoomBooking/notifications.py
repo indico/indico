@@ -30,7 +30,7 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.plugins.RoomBooking.common import getRoomBookingOption
 from MaKaC.plugins.RoomBooking.tasks import RoomReservationEndTask
 from MaKaC.webinterface import urlHandlers
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.rb_tools import fromUTC, toUTC, Period
 from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
 from MaKaC.rb_room import RoomBase

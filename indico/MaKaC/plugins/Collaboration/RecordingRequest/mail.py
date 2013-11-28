@@ -22,7 +22,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.plugins.Collaboration.RecordingRequest.common import \
     postingUrgency, getTalks
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 class RecordingRequestNotificationBase(GenericNotification):

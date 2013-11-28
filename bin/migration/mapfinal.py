@@ -26,7 +26,7 @@ from MaKaC import user,schedule
 from MaKaC.webinterface import webFactoryRegistry
 import MaKaC.webinterface.displayMgr as displayMgr
 from MaKaC.errors import UserError, MaKaCError
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC import domain
 from MaKaC.common import db
 import MaKaC.common.indexes as indexes

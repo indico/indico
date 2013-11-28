@@ -30,7 +30,7 @@ import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.wcalendar import Overview
 import MaKaC.conference as conference
 from MaKaC.conference import CategoryManager
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 import MaKaC.webinterface.wcalendar as wcalendar
 import MaKaC.webinterface.linking as linking
 from MaKaC.webinterface.pages.metadata import WICalExportBase

@@ -26,7 +26,7 @@ from MaKaC.webinterface.pages.conferences import WContribParticipantList
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import wcomponents
 from MaKaC import review
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.common import filters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.i18n import _

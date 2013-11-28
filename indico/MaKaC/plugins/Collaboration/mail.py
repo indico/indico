@@ -21,7 +21,7 @@ from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.common.TemplateExec import beautify
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 class CollaborationNotificationBase(GenericNotification):
     """ Base class to build an email notification for the Recording request plugin.

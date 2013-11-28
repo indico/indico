@@ -25,7 +25,7 @@ from MaKaC.rb_room import RoomBase
 from MaKaC.rb_location import CrossLocationQueries, Location
 from MaKaC.plugins.RoomBooking.default.factory import Factory
 from MaKaC.rb_tools import qbeMatch
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from indico.core.db import DBMgr
 from MaKaC.webinterface import urlHandlers
 

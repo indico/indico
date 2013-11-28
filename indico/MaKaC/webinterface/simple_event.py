@@ -28,7 +28,7 @@ import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.pages.material as material
 import MaKaC.webinterface.navigation as navigation
 import MaKaC.webinterface.displayMgr as displayMgr
-from MaKaC.common import Config
+from indico.core.config import Config
 from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData

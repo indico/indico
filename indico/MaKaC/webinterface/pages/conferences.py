@@ -46,7 +46,7 @@ from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.pages.signIn import WPResetPasswordBase
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
 from MaKaC.webinterface.materialFactories import ConfMFRegistry,PaperFactory,SlidesFactory,PosterFactory
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.common.output import outputGenerator
@@ -72,11 +72,11 @@ from MaKaC.common.Conversion import Conversion
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import OldObservable
 from MaKaC.plugins.base import extension_point
-from MaKaC.common import Configuration
+from indico.core import config as Configuration
 from indico.modules import ModuleHolder
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
 from MaKaC.conference import Session, Contribution, LocalFile
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.general import WebFactory

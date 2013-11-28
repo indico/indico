@@ -29,7 +29,7 @@ from MaKaC.common.timezoneUtils import getAdjustedDate
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.logger import Logger
 from MaKaC.common.TemplateExec import escape
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 

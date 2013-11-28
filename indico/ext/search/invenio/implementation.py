@@ -22,7 +22,7 @@ import os, re, datetime, cgi, time, copy
 from indico.ext.search.base.implementation import SearchEngineCallAPIAdapter, SearchEngineRedirectAdapter, Author, SearchResult, SubContributionEntry, ContributionEntry, ConferenceEntry, SEATranslator
 import indico.ext.search.invenio
 import MaKaC.conference as conference
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.common.output import XSLTransformer
 from MaKaC.common.logger import Logger
 from MaKaC.common.contextManager import ContextManager

@@ -31,12 +31,6 @@ import transaction
 from indico.core.db.migration import MigratedDB
 
 from MaKaC.consoleScripts.installBase import getIndicoInstallMode
-skip_imports = getIndicoInstallMode()
-
-
-if not skip_imports:
-    from MaKaC.common.logger import Logger
-
 
 class DBMgr:
     """This class provides the access point to the Shelf (every client will
@@ -59,7 +53,7 @@ class DBMgr:
 
     def __init__(self, hostname=None, port=None, max_disconnect_poll=30):
         # Please leave this import here, db.py is imported during installation process
-        from MaKaC.common import Configuration
+        from indico.core import config as Configuration
         cfg = Configuration.Config.getInstance()
 
         if not hostname:
@@ -78,6 +72,7 @@ class DBMgr:
     def getInstance(cls, *args, **kwargs):
         pid = os.getpid()
         if os.getpid() not in cls._instances:
+            from MaKaC.common.logger import Logger
             Logger.get('dbmgr').debug('cls._instance is None')
             cls._instances[pid] = DBMgr(*args, **kwargs)
         return cls._instances[pid]

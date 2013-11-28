@@ -30,7 +30,7 @@ from datetime import timedelta,datetime
 import MaKaC.conference as conference
 from MaKaC.errors import MaKaCError
 from MaKaC.common import Locators,indexes
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.conference import CategoryManager
 from MaKaC.conference import Category
 from MaKaC.i18n import _

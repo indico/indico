@@ -33,7 +33,7 @@ from MaKaC.webinterface.pages.static import WPStaticConferenceTimeTable, WPStati
     WPStaticMaterialConfDisplayBase, WPStaticSubContributionDisplay, \
     WPStaticAuthorDisplay, WPTPLStaticConferenceDisplay, \
     WPStaticConferenceDisplay
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.contribPacker import ZIPFileHandler
 from MaKaC.errors import MaKaCError
 from MaKaC.common import timezoneUtils, info

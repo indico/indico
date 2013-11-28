@@ -41,7 +41,7 @@ from indico.web.http_api.util import generate_public_auth_request
 from indico.util.redis import write_client as redis_write_client
 import MaKaC.common.info as info
 from MaKaC import domain
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.webinterface.urlHandlers import UHCategModifAC
 

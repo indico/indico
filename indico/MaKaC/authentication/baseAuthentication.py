@@ -23,7 +23,7 @@ from persistent import Persistent
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import UserError, MaKaCError
 from MaKaC.i18n import _
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.user import LoginInfo
 
 """

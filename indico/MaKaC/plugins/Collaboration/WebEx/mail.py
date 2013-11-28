@@ -21,7 +21,7 @@
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.plugins.Collaboration.WebEx.common import getWebExOptionValueByName
 import re
 

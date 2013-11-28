@@ -25,7 +25,7 @@ from flask import send_from_directory, request
 from flask import current_app as app
 from werkzeug.exceptions import NotFound
 
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory

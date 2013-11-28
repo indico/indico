@@ -20,7 +20,7 @@
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 import MaKaC.webinterface.navigation as navigation
 from MaKaC.webinterface.general import strfFileSize
 from MaKaC.webinterface.pages.base import WPNotDecorated

@@ -20,7 +20,7 @@
 from persistent import Persistent
 from MaKaC.common.Counter import Counter
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 from indico.modules import Module
 

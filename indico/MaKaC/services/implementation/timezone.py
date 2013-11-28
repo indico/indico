@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-from MaKaC.common import Config
+from indico.core.config import Config
 import time
 
 from MaKaC.services.implementation.base import ServiceBase

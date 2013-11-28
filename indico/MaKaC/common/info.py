@@ -21,8 +21,8 @@ import os
 from persistent import Persistent
 from persistent.dict import PersistentDict
 from BTrees import OOBTree
-from indico.core.db import DBMgr
-from Configuration import Config
+from indico.core.config import Config
+from indico.core import db
 
 DEFAULT_PERSISTENT_ENABLE_AGREEMENT = 'Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.'
 DEFAULT_PERSISTENT_DISABLE_AGREEMENT = 'When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'
@@ -508,7 +508,7 @@ class HelperMaKaCInfo:
     """
 
     def getMaKaCInfoInstance(cls):
-        dbmgr = DBMgr.getInstance()
+        dbmgr = db.DBMgr.getInstance()
         root = dbmgr.getDBConnection().root()
         try:
             minfo = root["MaKaCInfo"]["main"]

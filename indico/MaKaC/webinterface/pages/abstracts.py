@@ -28,13 +28,13 @@ import MaKaC.webinterface.navigation as navigation
 import MaKaC.review as review
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase, WPConferenceModifAbstractBase
 from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
-from MaKaC.common import Configuration
+from indico.core import config as Configuration
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.review import AbstractStatusSubmitted

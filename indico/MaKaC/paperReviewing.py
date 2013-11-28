@@ -27,7 +27,7 @@ from datetime import datetime
 from persistent import Persistent
 from MaKaC.errors import MaKaCError
 import tempfile
-from MaKaC.common import Config
+from indico.core.config import Config
 import conference
 from MaKaC.common.Counter import Counter
 from MaKaC.fossils.reviewing import IReviewingQuestionFossil, IReviewingStatusFossil

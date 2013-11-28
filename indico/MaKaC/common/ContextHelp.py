@@ -20,7 +20,7 @@
 import xml.dom.minidom as minidom
 from lxml import etree, builder, html as lhtml
 from MaKaC.errors import MaKaCError
-from MaKaC.common import Config
+from indico.core.config import Config
 import xml.sax
 import xml.sax.saxutils as saxutils
 import re, StringIO

@@ -20,7 +20,7 @@
 import smtplib
 from email.utils import formatdate
 
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 

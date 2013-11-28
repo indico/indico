@@ -194,7 +194,7 @@ def url_for(endpoint, target=None, **values):
 
     secure = values.pop('_secure', None)
     if secure is not None:
-        from MaKaC.common import Config
+        from indico.core.config import Config
         if secure and Config.getInstance().getBaseSecureURL():
             values['_scheme'] = 'https'
         elif not secure:
@@ -267,7 +267,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         inline = False
     if mimetype.isupper() and '/' not in mimetype:
         # Indico file type such as "JPG" or "CSV"
-        from MaKaC.common import Config
+        from indico.core.config import Config
         mimetype = Config.getInstance().getFileTypeMimeType(mimetype)
     try:
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,

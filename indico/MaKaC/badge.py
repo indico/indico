@@ -23,7 +23,7 @@ import tempfile
 
 from indico.util.json import loads
 from MaKaC.common.Counter import Counter
-from MaKaC.common import Config
+from indico.core.config import Config
 
 
 class BadgeTemplateManager(Persistent):

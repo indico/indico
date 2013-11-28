@@ -30,7 +30,7 @@ from MaKaC.rb_location import ReservationGUID, Location, CrossLocationQueries
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder, Avatar
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.cache import GenericCache
 from MaKaC.conference import ConferenceHolder

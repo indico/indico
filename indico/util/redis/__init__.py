@@ -22,7 +22,7 @@ from werkzeug.local import LocalProxy
 
 from indico.util.contextManager import ContextManager
 from indico.util.redis.scripts import LazyScriptLoader
-from MaKaC.common import Config
+from indico.core.config import Config
 
 try:
     import redis
