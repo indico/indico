@@ -29,7 +29,6 @@ import urlparse
 import socket
 import sys
 
-from MaKaC.errors import MaKaCError
 import MaKaC
 
 
@@ -613,6 +612,8 @@ class Config:
         self._configVars = {}
 
         from MaKaC.common import MaKaCConfig
+        from MaKaC.errors import MaKaCError
+
         declared_values = dir(MaKaCConfig)
 
         # When populating configuration variables indico.conf's values have priority
