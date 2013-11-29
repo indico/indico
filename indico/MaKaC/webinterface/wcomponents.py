@@ -284,13 +284,12 @@ class WHeader(WTemplated):
         Returns an array with the status (Public, Protected, Restricted) and extra info(domain list)
     """
     def _getProtection(self, target):
-        if not target.hasAnyProtection():
-            return ["Public", _("Public")]
-        if target.isItselfProtected():
+        if target.isProtected():
             return ["Restricted", _("Restricted")]
-        if target.getDomainList() != []:
-            return ["DomainProtected", _("%s domain only")%(", ".join(map(lambda x: x.getName(), target.getDomainList())))]
-        return self._getProtection(target.getOwner())
+        domain_list = target.getAccessController().getAnyDomainProtection()
+        if domain_list:
+            return ["DomainProtected", _("%s domain only")%(", ".join(map(lambda x: x.getName(), domain_list)))]
+        return ["Public", _("Public")]
 
     def getVars( self ):
         vars = WTemplated.getVars( self )

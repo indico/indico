@@ -357,6 +357,21 @@ class AccessController( Persistent, Observable ):
         """
         return self.requiredDomains
 
+    def getAnyDomainProtection(self):
+        """
+        Checks if the element is protected by domain at any level. It stops checking
+        when it finds some domain protection or a restricted owner.
+
+        Returns the list of domains from which the item can be accessed.
+        """
+        if self.isItselfProtected():
+            return []
+        elif self.isDomainProtected():
+            return self.getRequiredDomainList()
+        else:
+            return self.getOwner().getOwner().getAccessController().getAnyDomainProtection()
+
+
     def isDomainProtected(self):
         if self.getRequiredDomainList():
             return 1
