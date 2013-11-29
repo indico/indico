@@ -46,6 +46,15 @@
         margin-top: 20px;
     }
 
+    & .section-field-divisor {
+        & > span {
+            color: $gray;
+            font-size: 1.2em;
+            margin-left: 4px;
+            vertical-align: -8%;
+        }
+    }
+
     & .section-sortable-handle {
         @include icon-before('icon-handle');
         @include transition(

@@ -1730,14 +1730,42 @@
 				"name": "file",
 				"ligatures": ""
 			}
+		},
+		{
+			"icon": {
+				"paths": [
+					"M512 0c-282.77 0-512 229.23-512 512s229.226 512 512 512c282.77 0 512-229.23 512-512s-229.23-512-512-512zM576 832h-128v-128h128v128zM768 448c0 70.58-57.42 128-128 128h-63.884c-0.040 0.034-0.082 0.076-0.116 0.116v63.884h-128v-64c0-70.58 57.42-128 128-128h63.884c0.040-0.034 0.082-0.076 0.116-0.114v-127.77c-0.034-0.040-0.074-0.082-0.116-0.116h-319.884v-128h320c70.58 0 128 57.42 128 128v128z"
+				],
+				"tags": [
+					"question",
+					"help",
+					"support"
+				],
+				"defaultCode": 58204,
+				"grid": 16
+			},
+			"properties": {
+				"order": 77,
+				"id": 861,
+				"prevSize": 32,
+				"code": 58204,
+				"name": "question",
+				"ligatures": ""
+			}
 		}
 	],
 	"height": 1024,
-	"metadata": {},
+	"metadata": {
+		"name": "icomoon",
+		"url": "http://indico-software.org"
+	},
 	"preferences": {
 		"fontPref": {
 			"prefix": "icon-",
-			"metadata": {},
+			"metadata": {
+				"fontFamily": "icomoon",
+				"fontURL": "http://indico-software.org"
+			},
 			"showGlyphs": true,
 			"metrics": {
 				"emSize": 1024,
@@ -1748,7 +1776,7 @@
 			"showQuickUse": true,
 			"quickUsageToken": false,
 			"showMetrics": true,
-			"showMetadata": false
+			"showMetadata": true
 		},
 		"imagePref": {
 			"color": 0,

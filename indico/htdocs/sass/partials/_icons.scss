@@ -297,6 +297,10 @@ you can use the generic selector below, but it's slower:
 .icon-warning:before {
     content: "\e603";
 }
+.icon-question:before {
+    content: "\e35c";
+}
+
 
 /* KEEP THE FOLLOWING DEFINITIONS: necessery when rendering the icon 'after' e.g. mixin icon-after */
 .icon-arrow-down-after:after {
