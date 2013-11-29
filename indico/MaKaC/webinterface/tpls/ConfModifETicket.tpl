@@ -20,7 +20,7 @@
                 <span id="eTicketShowAfterRegistration"></span>
                 <div id="qrcodeActivation" class="info-message-box" style="max-width:800px">
                     <div class="message-text" style="text-align: justify">
-                        ${_("The ticket is a PDF document containing a QR code that can be used by the mobile check-in application to keep track of registrants. This ticket will be sent to every new registrant, attached to the registration e-mail. The organiser of the event could use the application 'Indico check-in' in order to register the registrants. For that is necessary to configure install the mobile application. In order to configure the event you need to scan a QR Code.")}
+                        ${_("The e-ticket is a PDF document containing a QR code that can be used to identify and check-in attendees at the registration desk of the conference. Every registrant will own a personal e-ticket. In order to register participants, the organiser of the event could use the application 'Indico check-in', that can be downloaded from here. Once the app is installed, one needs to configure it and download this event simply by scanning the following QR Code.")}
                     </div>
                     <div id="button-menu" class="toolbar" style="padding-left: 2.5em">
                         <div class="group i-selection">
@@ -50,12 +50,12 @@
 
       $('#eTicketShowInConferenceMenu').html(new SwitchOptionButton('registration.eticket.setShowInConferenceMenu',
                                                                     {conference: '${conf.getId()}'},
-                                                                    $T('Give the possibility to the user of downloading the e-ticket PDF from the conference menu'),
+                                                                    $T('Give the possibility to the user of downloading the e-ticket PDF from the conference homepage menu'),
                                                                     $T("Saved"), null, false).draw());
 
       $('#eTicketShowAfterRegistration').html(new SwitchOptionButton('registration.eticket.setShowAfterRegistration',
                                                                      {conference: '${conf.getId()}'},
-                                                                     $T('Give the possibility to the user of downloading the e-ticket PDF after registration'),
+                                                                     $T('Give the possibility to the user of downloading the e-ticket PDF from the summary page right after registration'),
                                                                      $T("Saved"), null, false).draw());
 
       $('#enableEticket').on("click", function(){

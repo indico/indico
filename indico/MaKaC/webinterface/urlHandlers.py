@@ -2880,8 +2880,6 @@ class UHConfRegistrationFormCreationDone(URLHandler):
         return url
 
 
-# This URL handler is used to generate a PDF e-ticket download link
-# in the menu for logged in users.
 class UHConferenceTicketPDF(URLHandler):
     _endpoint = 'event.e-ticket-pdf'
 

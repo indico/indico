@@ -920,7 +920,7 @@ def updateAvatarEmails(dbi, withRBDB, prevVersion):
 
 
 @since('1.2')
-def addLinkToMenu(dbi, withRBDB, prevVersion):
+def addETicketLinkToMenu(dbi, withRBDB, prevVersion):
     """
     Add download e-ticket PDF link to the menu
     """

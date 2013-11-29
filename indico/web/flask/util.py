@@ -24,7 +24,7 @@ import os
 import re
 import time
 
-from flask import request, redirect, Blueprint, jsonify
+from flask import request, redirect, Blueprint
 from flask import current_app as app
 from flask import url_for as _url_for
 from flask import send_file as _send_file
