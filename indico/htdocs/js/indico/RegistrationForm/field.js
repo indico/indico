@@ -374,16 +374,17 @@ ndRegForm.directive('ndFieldDialog', function(url) {
             $scope.settings = $scope.$parent.settings;
             $scope.settings.dialogs = $scope.config;
             $scope.field = $scope.data;
-            $scope.formData = {
-                radioitems: [],
-                input: $scope.field.input
-            };
-
-            _.each($scope.field.values.radioitems, function (item, ind) {
-                $scope.formData.radioitems[ind] = {id: item.id, cancelled: item.cancelled}; //A way to initialize properly
-            });
 
             $scope.actions.init = function() {
+                $scope.formData = {
+                    radioitems: [],
+                    input: $scope.field.input
+                };
+
+                _.each($scope.field.values.radioitems, function (item, ind) {
+                    $scope.formData.radioitems[ind] = {id: item.id, cancelled: item.cancelled}; //A way to initialize properly
+                });
+
                 $scope.tabSelected = "tab-options";
             };
 

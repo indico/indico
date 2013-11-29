@@ -299,9 +299,26 @@ ndRegForm.directive("ndReasonSection", function() {
     };
 });
 
-ndRegForm.directive("ndSessionsSection", function() {
+ndRegForm.directive("ndSessionsSection", function($rootScope, RESTAPI) {
     return {
         require: 'ndSection',
+
+
+        controller: function($scope) {
+
+            $scope._hasSession= function(id) {
+                return _.find($scope.section.items, function(session){ return session.id == id;}) !== undefined;
+            };
+
+            var sessions = RESTAPI.Sessions.query({confId: $rootScope.confId}, function() {
+                _.each(sessions, function (item, ind) {
+                    if(!$scope._hasSession(item.id)) {
+                        $scope.section.items.push({id: item.id, caption: item.title, billable: false, price: 0, enabled: false});
+                    }
+                });
+            });
+        },
+
         link: function(scope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
@@ -476,21 +493,21 @@ ndRegForm.directive('ndSectionDialog', function(url) {
         replace: true,
         templateUrl: url.tpl('sections/dialogs/base.tpl.html'),
         controller: function ($scope) {
-
             $scope.section = $scope.data;
-            $scope.formData = {
-                items: []
-            }; // TODO This is the way?
-
-            _.each($scope.section.items, function (item, ind) {
-                $scope.formData.items[ind] = {id: item.id, cancelled: item.cancelled}; //A way to initialize properly
-            });
 
             $scope.getTabTpl = function(section_id, tab_type) {
                 return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(tab_type, section_id));
             };
 
             $scope.actions.init = function() {
+                $scope.formData = {
+                    items: []
+                }; // TODO This is the way?
+
+                _.each($scope.section.items, function (item, ind) {
+                    $scope.formData.items[ind] = {id: item.id, cancelled: item.cancelled}; //A way to initialize properly
+                });
+
                 $scope.tabSelected = $scope.config.tabs[0].id;
             };
 

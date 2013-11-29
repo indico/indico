@@ -129,6 +129,13 @@ class IRegFormRegistrationSessionItemFossil(IFossil):
         registration session start date
         """
 
+    def isEnabled(self):
+        """
+        is billable
+        """
+    isEnabled.produce = lambda s: True
+    isEnabled.name = 'enabled'
+
     def getPrice(self):
         """
         registration session price

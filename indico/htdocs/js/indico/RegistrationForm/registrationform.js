@@ -61,7 +61,8 @@ ndRegForm.factory('RESTAPI', ['$resource','baseurl', function($resource, baseurl
             "enable": {method:'POST', url: fieldurl + "/enable"},
             "disable": {method:'POST', url: fieldurl + "/disable"},
             "move": {method:'POST', url: fieldurl + "/move"}
-        })
+        }),
+        Sessions: $resource(Indico.Urls.Base + '/event/:confId/manage/sessions', {8000: ":8000", confId: '@confId'}, {})
     };
 }]);
 
