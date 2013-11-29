@@ -29,10 +29,12 @@ $default-transition-function: ease-out;
 $default-border-color: $gray;
 $default-border-style: solid;
 
-$default-box-shadow-color: rgba(150, 150, 150, 0.2);
-$default-box-shadow-blur: 3px;
-
 $color-variation: 15%;
+
+$default-box-shadow-color: lighten($gray, $color-variation);
+$default-box-shadow-blur: 1px;
+$default-box-shadow-h-offset: 1px;
+$default-box-shadow-v-offset: 1px;
 
 // =======================================
 // Custom mixins
