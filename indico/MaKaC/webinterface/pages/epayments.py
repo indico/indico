@@ -87,9 +87,8 @@ class WConfModifEPayment( wcomponents.WTemplated ):
         vars["enablePic"]=quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "enabledSection" )))
         vars["disablePic"]=quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "disabledSection" )))
         if modPay.isActivated():
+            vars["activated"] = True
             vars["changeTo"] = "False"
-            vars["status"] = _("ENABLED")
-            vars["changeStatus"] = _("DISABLE")
             vars["disabled"] = ""
             vars["detailPayment"] = self._conf.getModPay().getPaymentDetails()
             vars["conditionsPayment"] = self._conf.getModPay().getPaymentConditions()
@@ -101,9 +100,8 @@ class WConfModifEPayment( wcomponents.WTemplated ):
                 vars["conditionsEnabled"] = "ENABLED"
             vars["Currency"]=self._conf.getRegistrationForm().getCurrency() or _("not selected")
         else:
+            vars["activated"] = False
             vars["changeTo"] = "True"
-            vars["status"] = _("DISABLED")
-            vars["changeStatus"] = _("ENABLE")
             vars["disabled"] = "disabled"
             vars["detailPayment"] = ""
             vars["conditionsPayment"] = ""

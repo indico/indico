@@ -127,8 +127,6 @@ class WConfModifRegForm(wcomponents.WTemplated):
         if regForm.isActivated():
             wvars["activated"] = True
             wvars["changeTo"] = "False"
-            wvars["status"] = _("ENABLED")
-            wvars["changeStatus"] = _("DISABLE")
             d = ""
             if regForm.getStartRegistrationDate() is not None:
                 d = regForm.getStartRegistrationDate().strftime("%A %d %B %Y")
@@ -178,8 +176,6 @@ class WConfModifRegForm(wcomponents.WTemplated):
         else:
             wvars["activated"] = False
             wvars["changeTo"] = "True"
-            wvars["status"] = _("DISABLED")
-            wvars["changeStatus"] = _("ENABLE")
             wvars["startDate"] = ""
             wvars["endDate"] = ""
             wvars["extraTimeAmount"] = ""

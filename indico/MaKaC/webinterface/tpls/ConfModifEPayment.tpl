@@ -1,13 +1,16 @@
-
-<br>
 <table width="90%" align="left" border="0">
     <tr>
-        <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Current status")}</span></td>
+        <td class="dataCaptionTD" style="vertical-align: middle">
+            <span class="dataCaptionFormat">${ _("Current status")}</span>
+        </td>
         <td bgcolor="white" width="100%" class="blacktext" colspan="2">
-            <form action="${ setStatusURL }" method="POST">
-                <input name="changeTo" type="hidden" value="${ changeTo }">
-                <b>${ status }</b>
-                <small><input type="submit" value="${ changeStatus }"></small>
+            <form action="${setStatusURL}" id="enableEPaymentForm" method="POST">
+                <label class="switch">
+                    <input type="checkbox" class="switch-input" id="enableEPayment" ${"checked" if activated else ""}>
+                    <span class="switch-label" data-on="On" data-off="Off"></span>
+                    <span class="switch-handle"></span>
+                </label>
+                <input name="changeTo" type="hidden" value="${changeTo}" />
             </form>
         </td>
     </tr>
@@ -91,4 +94,10 @@ al = minfo.getAdminList()
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
 </table>
-<br>
+<script type="text/javascript">
+    $(function() {
+        $('#enableEPayment').on("click", function(){
+            $('#enableEPaymentForm').submit();
+        });
+});
+</script>

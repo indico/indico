@@ -1,15 +1,17 @@
-<br/>
 <table>
   <tr>
-    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Current status")}</span></td>
+    <td class="dataCaptionTD" style="vertical-align: middle">
+        <span class="dataCaptionFormat">${ _("Current status")}</span>
+    </td>
     <td class="blacktext" colspan="2">
-      <form action="${ setStatusURL }" method="POST">
-    <div>
-      <input name="changeTo" type="hidden" value="${ changeTo }" />
-      <b>${ status }</b>
-      <small><input type="submit" class="btn" value="${ changeStatus }" /></small>
-    </div>
-      </form>
+        <form action="${setStatusURL}" id="activateForm" method="POST">
+            <label class="switch">
+                <input type="checkbox" class="switch-input" id="enableRegForm" ${"checked" if activated else ""}>
+                <span class="switch-label" data-on="On" data-off="Off"></span>
+                <span class="switch-handle"></span>
+            </label>
+            <input name="changeTo" type="hidden" value="${changeTo}" />
+        </form>
     </td>
   </tr>
   <tr>
@@ -133,4 +135,10 @@
     <td colspan="3" class="horizontalLine">&nbsp;</td>
   </tr>
 </table>
-<br/>
+<script type="text/javascript">
+    $(function() {
+        $('#enableRegForm').on("click", function(){
+            $('#activateForm').submit();
+        });
+});
+</script>
