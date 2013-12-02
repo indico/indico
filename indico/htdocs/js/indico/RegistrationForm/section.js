@@ -181,6 +181,8 @@ ndRegForm.directive("ndGeneralSection", function($timeout, url, sortableoptions)
                 update: function(e, ui) {
                     scope.api.moveField(ui.item.scope().field, ui.item.index());
                 },
+                // TODO Re-enable when solved: http://bugs.jqueryui.com/ticket/5772
+                // containment: '.field-list',
                 handle: ".regform-field .field-sortable-handle",
                 placeholder: "regform-field-sortable-placeholder"
             };

@@ -29,10 +29,9 @@
 .regform-section {
     @extend %regform-section;
     @include border-all();
+    @include single-box-shadow();
 
     background: white;
-    box-shadow: 1px 1px 1px lighten($gray, $color-variation);
-    opacity: 1 !important;
     padding: 10px;
 
     & .section-header {
@@ -168,36 +167,39 @@
     }
 }
 
+// ============================================================================
 // Editable-specific
+// ============================================================================
 
 .regform-field.editable {
     &:hover,
     &:active {
         background-color: $light-blue;
 
-        & .field-actions {
+        .field-actions {
             display: block !important;
         }
     }
+}
 
-    & .field-sortable-handle {
-        color: $dark-gray;
-        line-height: 26px;
-        vertical-align: top;
-        width: 15px;
+.regform-table {
+    td {
+        padding: 2px 0;
     }
 
-    &:not(.disabled):hover .field-sortable-handle,
-    &:not(.disabled):active .field-sortable-handle {
-        @include icon-before('icon-handle');
-        cursor: move;
+    tr:hover .remove-row {
+        visibility: visible;
+    }
+
+    .remove-row {
+        visibility: hidden;
     }
 }
 
 // Field-specific
 
 .regform-field {
-    & .accommodation-option-item {
+    .accommodation-option-item {
         padding-left : 15px;
     }
 }
@@ -476,11 +478,12 @@ textarea.regFormDescriptionInputMgmt {
   display: block;
 }
 
-// Sortable
+// ============================================================================
+// Sortable-related
+// ============================================================================
 
 %regform-sortable-placeholder {
     background-color: $light-gray;
-    display: block;
 }
 
 .regform-field-sortable-placeholder {
@@ -491,9 +494,41 @@ textarea.regFormDescriptionInputMgmt {
     width: 102.9%;
 }
 
-.regform-section-sortable-placeholder,
-.regFormSortablePlaceHolder {
+.regform-section-sortable-placeholder {
     @extend %regform-sortable-placeholder;
     @extend %regform-section;
     @include border-all($gray, dashed);
+}
+
+.regform-table-sortable-placeholder {
+    background-color: $light-blue;
+    line-height: 1.6em;
+}
+
+.regform-field.editable {
+    .field-sortable-handle {
+        color: $dark-gray;
+        line-height: 26px;
+        vertical-align: top;
+        width: 15px;
+    }
+
+    &:not(.disabled):hover .field-sortable-handle,
+    &:not(.disabled):active .field-sortable-handle {
+        @include icon-before('icon-handle');
+        cursor: move;
+    }
+}
+
+.regform-table {
+    tr:hover .table-sortable-handle,
+    td:active .table-sortable-handle{
+        @include icon-before('icon-handle');
+    }
+
+    .table-sortable-handle {
+        color: $dark-gray;
+        width: 15px;
+        cursor: move;
+    }
 }

@@ -1,7 +1,7 @@
 <div class="RegistrationForm">
     <div ng-if="editMode"
         ng-include="getTpl('toolbar.tpl.html')"></div>
-    <div ui-sortable="sectionSortableOptions" ng-model="sections">
+    <div ng-model="sections" class="regform-section-list" ui-sortable="sectionSortableOptions">
         <div ng-repeat="section in sections | filter: {enabled: true}">
             <div ng-switch="section._type">
                 <div ng-switch-default nd-section nd-general-section></div>

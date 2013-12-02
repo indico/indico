@@ -1,4 +1,4 @@
-<div ui-sortable="fieldSortableOptions" ng-model="section.items">
+<div ng-model="section.items" ui-sortable="fieldSortableOptions" class="field-list">
     <div ng-repeat="field in section.items | filter: {disabled: 'false'}">
         <div ng-include="tplGeneralField"/>
     </div>

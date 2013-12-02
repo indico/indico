@@ -37,7 +37,7 @@ ndRegForm.value('sortableoptions', {
     cursor: 'move',
     delay: 150,
     distance: 10,
-    opacity: 0.95,
+    opacity: 0.90,
     tolerance: 'pointer'
 });
 
@@ -151,6 +151,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableopti
                 update: function(e, ui) {
                     $scope.api.moveSection(ui.item.scope().section, ui.item.index());
                 },
+                // TODO Re-enable when solved: http://bugs.jqueryui.com/ticket/5772
+                // containment: '.regform-section-list',
                 disabled: !$rootScope.editMode,
                 handle: ".regform-section .section-sortable-handle",
                 placeholder: "regform-section-sortable-placeholder"
@@ -180,59 +182,5 @@ ndRegForm.directive('ndManagementDialog', function(url) {
     return {
         require: 'ndDialog',
         templateUrl: url.tpl('sections/dialogs/sectionmanagement.tpl.html')
-    };
-});
-
-
-ndRegForm.directive("ndTable", function(url, sortableoptions) {
-    return {
-        restrict: 'E',
-        replace: true,
-        templateUrl: url.tpl('table.tpl.html'),
-
-        scope: {
-            data: "=",
-            config: "=",
-            formData: "=",
-            filter: "=",
-            filterValue: "="
-        },
-
-        controller: function($scope) {
-            $scope.actionIsArray = function(action) {
-                return _.isArray(action);
-            };
-
-            $scope.actionItem = function(item, action) {
-                if(action == "remove") {
-                    item["remove"] = true;
-                } else if (action == "cancel") {
-                    item["cancelled"] = true;
-                } else if (action == "uncancel") {
-                    item["cancelled"] = false;
-                }
-            };
-
-            $scope.matchFilter = function(item) {
-                if(item.remove === true) {
-                    return false;
-                } else if(item.id == "isNew") {
-                    return true;
-                } else if($scope.filter !== undefined && $scope.filterValue !== undefined) {
-                    return item[$scope.filter] == $scope.filterValue;
-                } else {
-                    return true;
-                }
-            };
-
-            $scope.itemSortableOptions = {
-                disabled: $scope.config.actions.indexOf('sortable') == -1,
-                handle: ".sortable-handle",
-                placeholder: "regFormSortablePlaceHolder",
-                items: "tr"
-            };
-
-            angular.extend($scope.itemSortableOptions, sortableoptions);
-        }
     };
 });
