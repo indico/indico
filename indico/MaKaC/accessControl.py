@@ -368,9 +368,9 @@ class AccessController( Persistent, Observable ):
             return []
         elif self.isDomainProtected():
             return self.getRequiredDomainList()
-        else:
+        elif self.getOwner().getOwner():
             return self.getOwner().getOwner().getAccessController().getAnyDomainProtection()
-
+        return []
 
     def isDomainProtected(self):
         if self.getRequiredDomainList():
