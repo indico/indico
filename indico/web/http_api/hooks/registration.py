@@ -46,10 +46,10 @@ class CheckInHook(EventBaseHook):
 
     def export_checkin(self, aw):
         self._registrant.setCheckedIn(self._check_in)
-        checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate()) if self._check_in else None
+        checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate(), format="short")
         return {
-            "success": True,
-            "checkin_date": checkin_date
+            "checkin_in": self._check_in,
+            "checkin_date": checkin_date if self._check_in else None
         }
 
 @HTTPAPIHook.register
@@ -69,8 +69,8 @@ class RegistrantHook(EventBaseHook):
         return self._conf.canManageRegistration(aw.getUser()) and self._secret == self._registrant.getCheckInUUID()
 
     def export_registrant(self, aw):
-        registration_date = format_date(self._registrant.getAdjustedRegistrationDate())
-        checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate())
+        registration_date = format_datetime(self._registrant.getAdjustedRegistrationDate(), format="short")
+        checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate(), format="short")
         self._registrant.getPayed()
         result = {
             "registrant_id": self._registrant.getId(),
@@ -106,6 +106,7 @@ class RegistrantsHook(EventBaseHook):
         for registrant in registrants:
             reg = {
                 "registrant_id": registrant.getId(),
+                "checked_in": registrant.isCheckedIn(),
                 "full_name": registrant.getFullName(title=True, firstNameFirst=True),
                 "secret": registrant.getCheckInUUID(),
             }
