@@ -28,8 +28,8 @@ ndDirectives.directive("ndDialog", function() {
             cancelButton: '@',
             cancelCallback: '&',
             api: '=',
-            config: "=",
-            data: '='
+            data: '=',
+            config: "="
         },
 
         controller: function($scope) {

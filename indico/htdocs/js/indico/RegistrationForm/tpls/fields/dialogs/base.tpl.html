@@ -23,14 +23,12 @@
                     name="caption"
                     id="input01"
                     size="30"
-                    required
-                    ng-init="formData.caption=field.caption">
+                    required>
                 <input ng-model="formData.mandatory"
-                    ng-init="formData.mandatory=field.mandatory"
                     type="checkbox"
                     name="mandatory"
                     id="input02"
-                    ng-disabled="field.lock.indexOf('mandatory')!=1">
+                    ng-disabled="field.lock.indexOf('mandatory') != 1">
                 {{ 'Mandatory' | i18n }}
             </div>
 
@@ -39,20 +37,19 @@
                     {{ 'description' | i18n }}
                 </label>
                 <textarea ng-model="formData.description"
-                    ng-init="formData.description=field.description"
                     id="descriptionEdit"
                     name="description"
                     cols="40"
                     rows="5">
                 </textarea>
             </div>
+
             <!-- if field.input == 'telephone' or field.input == 'text' -->
             <div ng-if="settings.size" class="regFormEditLine">
                 <label class="regFormDialogCaption">
                     {{ 'size in char' | i18n }}
                 </label>
                 <input ng-model="formData.length"
-                    ng-init="formData.length=field.values.length"
                     name="length"
                     type="number"
                     size="20"
@@ -68,24 +65,20 @@
                     {{ 'number of columns' | i18n }}
                 </label>
                 <input ng-model="formData.numberOfColumns"
-                    ng-init="formData.numberOfColumns=field.values.numberOfColumns"
                     name="numberOfColumns"
                     type="number"
-                    min=1
+                    min="1"
                     size="20">
-
             </div>
             <div ng-if="settings.rowsAndColumns" class="regFormEditLine">
                 <label class="regFormDialogCaption">
                     {{ 'number of rows' | i18n }}
                 </label>
                 <input ng-model="formData.numberOfRows"
-                    ng-init="formData.numberOfColumns=field.values.numberOfColumns"
                     name="numberOfRows"
                     type="number"
-                    min=1
-                    size="20"
-                    value="{{field.values.numberOfRows}}">
+                    min="1"
+                    size="20">
             </div>
            <!-- endif -->
 
@@ -95,7 +88,6 @@
                     {{ 'minimum value' | i18n }}
                 </label>
                 <input ng-model="formData.minValue"
-                    ng-init="formData.minValue=field.values.minValue"
                     name="minValue"
                     type="number"
                     size="20">
@@ -105,10 +97,9 @@
                     {{ 'row length' | i18n }}
                 </label>
                 <input ng-model="formData.length"
-                    ng-init="formData.length=field.values.length"
                     name="numberOfRows"
                     type="number"
-                    min=0
+                    min="0"
                     size="20">
             </div>
             <!-- endif -->
@@ -120,11 +111,10 @@
                     {{ 'places limit' | i18n }}
                 </label>
                 <input ng-model="formData.placesLimit"
-                    ng-init="formData.placesLimit=field.values.placesLimit"
                     name="placesLimit"
                     type="number"
                     size="20"
-                    min=0>
+                    min="0">
                 <span>({{ "0 for unlimited" | i18n }})</span>
             </div>
             <!-- endif -->
@@ -135,7 +125,6 @@
                     {{ 'Billable' | i18n }}
                 </label>
                 <input ng-model="formData.billable"
-                    ng-init="formData.billable=field.billable"
                     type="checkbox"
                     name="billable"
                     ng-checked="field.billable"/>
@@ -145,9 +134,8 @@
                     {{ 'price' | i18n }}
                 </label>
                 <input ng-model="formData.price"
-                    ng-init="formData.price=field.price"
                     type="number"
-                    min=0
+                    min="0"
                     name="price"
                     class="input-xlarge"
                     id="input01"
@@ -164,10 +152,11 @@
                     {{ 'default item' | i18n }}
                 </label>
                 <select ng-model="formData.defaultItem"
-                    ng-init="formData.defaultItem=field.values.defaultItem"
                     id="defaultItem"
                     name="defaultItem" ng-model="formData.defaultItem">
-                    <option value="" ng-selected="field.values.defaultItem == null">{{ 'none' | i18n }}</option>
+                    <option value="" ng-selected="field.values.defaultItem == null">
+                        {{ 'none' | i18n }}
+                    </option>
                     <option ng-repeat="el in field.values.radioitems"
                         ng-selected="field.values.defaultItem == el.caption"
                         value="{{ el.caption }}">
@@ -182,7 +171,6 @@
                     {{ 'input type' | i18n }}
                 </label>
                 <select  ng-model="formData.inputType"
-                    ng-init="formData.inputType=field.values.inputType"
                     id="inputType" name="inputType">
                     <option value="dropdown" ng-selected="field.values.inputType == 'dropdown'">
                         {{ 'drop down menu' | i18n }}
@@ -239,7 +227,7 @@
             </div>
             <nd-table
                 data="field.values.radioitems"
-                config="settings.dialogs.editionTable"
+                config="settings.editionTable"
                 form-data="formData.radioitems">
             </nd-table>
         </div>

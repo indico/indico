@@ -100,7 +100,12 @@ ndRegForm.directive('ndField', function($rootScope, url, RESTAPI) {
                 number: false,
                 placesLimit: false,
                 rowsAndColumns: false,
-                size: false
+                size: false,
+                formData: [
+                    'caption',
+                    'description',
+                    'mandatory'
+                ]
             };
 
             $scope.getName = function(input) {
@@ -110,7 +115,6 @@ ndRegForm.directive('ndField', function($rootScope, url, RESTAPI) {
                     return '*genfield*' + $scope.section.id + '-' + $scope.field.id;
                 }
             };
-
 
             $scope.openFieldSettings = function() {
                 $scope.dialogs.settings.open = true;
@@ -132,7 +136,6 @@ ndRegForm.directive('ndField', function($rootScope, url, RESTAPI) {
             $scope.isFieldActive = function (field) {
                 return field.id != -1;
             };
-
         },
 
         link: function(scope) {
@@ -156,8 +159,11 @@ ndRegForm.directive('ndCheckboxField', function(url) {
         },
 
         link: function(scope) {
-            scope.settings.placesLimit = true;
             scope.settings.billable = true;
+            scope.settings.placesLimit = true;
+            scope.settings.formData.push('billable');
+            scope.settings.formData.push('price');
+            scope.settings.formData.push(['value', 'placesLimit']);
         }
     };
 });
@@ -203,6 +209,8 @@ ndRegForm.directive('ndLabelField', function(url) {
 
         link: function(scope) {
             scope.settings.billable = true;
+            scope.settings.formData.push('billable');
+            scope.settings.formData.push('price');
         }
     };
 });
@@ -215,8 +223,12 @@ ndRegForm.directive('ndNumberField', function(url) {
         },
 
         link: function(scope) {
-            scope.settings.number = true;
             scope.settings.billable = true;
+            scope.settings.number = true;
+            scope.settings.formData.push('billable');
+            scope.settings.formData.push('price');
+            scope.settings.formData.push(['value', 'minValue']);
+            scope.settings.formData.push(['value', 'length']);
 
             scope.change = function() {
                 // TODO do this the angular way
@@ -240,63 +252,62 @@ ndRegForm.directive('ndRadioField', function(url) {
 
         link: function(scope) {
             scope.settings.defaultValue = true;
-            scope.dialogs.settings.contentWidth = 'auto';
-            scope.dialogs.settings.editionTable = {
+            scope.settings.formData.push(['values', 'defaultItem']);
+            scope.settings.formData.push(['values', 'inputType']);
+
+            scope.settings.editionTable = {
                 sortable: false,
                 actions: ['remove', 'sortable'],
                 colNames:[$T("caption"), $T("billable"), $T("price"), $T("places limit"), $T("enable")],
                 colModel: [
-                        {
-                           name:'caption',
-                           index:'caption',
-                           align: 'center',
-                           sortable:false,
-                           width:160,
-                           editoptions:{size:"30",maxlength:"50"},
-                           editable: true
-                        },
-                        {
-                           name:'billable',
-                           index:'isBillable',
-                           sortable:false,
-                           width:60,
-                           editable: true,
-                           align: 'center',
-                           defaultVal: false,
-                           edittype:'bool_select'
-                        },
+                    {name:'caption',
+                     index:'caption',
+                     align: 'center',
+                     sortable:false,
+                     width:160,
+                     editable: true,
+                     editoptions: {
+                        size: "30",
+                        maxlength: "50"}},
 
-                        {
-                           name:'price',
-                           index:'price',
-                           align: 'center',
-                           sortable:false,
-                           width:50,
-                           editable: true,
-                           editoptions:{size:"7",maxlength:"20"}
+                    {name:'billable',
+                     index:'isBillable',
+                     sortable: false,
+                     width: 60,
+                     editable: true,
+                     align: 'center',
+                     defaultVal: false,
+                     edittype: 'bool_select'},
 
-                        },
-                        {
-                           name:'placesLimit',
-                           index:'placesLimit',
-                           align: 'center',
-                           sortable:false,
-                           width:80,
-                           editable: true,
-                           editoptions:{size:"7",maxlength:"20"}
+                    {name: 'price',
+                     index: 'price',
+                     align: 'center',
+                     sortable: false,
+                     width: 50,
+                     editable: true,
+                     editoptions: {
+                        size: "7",
+                        maxlength: "20"}},
 
-                        },
-                        {
-                           name:'isEnabled',
-                           index:'isEnabled',
-                           sortable:false,
-                           width:60,
-                           editable: true,
-                           align: 'center',
-                           edittype:'bool_select',
-                           defaultVal: true
-                        }
-                  ]
+                    {name: 'placesLimit',
+                     index: 'placesLimit',
+                     align: 'center',
+                     sortable: false,
+                     width: 80,
+                     editable: true,
+                     editoptions: {
+                        size: "7",
+                        maxlength: "20"}},
+
+                    {name: 'isEnabled',
+                     index: 'isEnabled',
+                     sortable: false,
+                     width: 60,
+                     editable: true,
+                     align: 'center',
+                     edittype: 'bool_select',
+                     defaultVal: true}
+                ]
             };
         }
     };
@@ -311,6 +322,8 @@ ndRegForm.directive('ndRadiogroupField', function(url) {
 
         link: function(scope) {
             scope.settings.defaultValue = true;
+            scope.settings.formData.push(['values', 'defaultItem']);
+            scope.settings.formData.push(['values', 'inputType']);
         }
     };
 });
@@ -323,6 +336,7 @@ ndRegForm.directive('ndTelephoneField', function(url) {
         },
         link: function(scope) {
             scope.settings.size = true;
+            scope.settings.formData.push(['values', 'length']);
         }
     };
 });
@@ -336,6 +350,7 @@ ndRegForm.directive('ndTextField', function(url) {
 
         link: function(scope) {
             scope.settings.size = true;
+            scope.settings.formData.push(['values', 'length']);
         }
     };
 });
@@ -349,6 +364,8 @@ ndRegForm.directive('ndTextareaField', function(url) {
 
         link: function(scope) {
             scope.settings.rowsAndColumns = true;
+            scope.settings.formData.push(['values', 'numberOfColumns']);
+            scope.settings.formData.push(['values', 'numberOfRows']);
         }
     };
 });
@@ -361,8 +378,11 @@ ndRegForm.directive('ndYesnoField', function(url) {
         },
 
         link: function(scope) {
-            scope.settings.placesLimit = true;
             scope.settings.billable = true;
+            scope.settings.placesLimit = true;
+            scope.settings.formData.push('billable');
+            scope.settings.formData.push('price');
+            scope.settings.formData.push(['value', 'placesLimit']);
         }
     };
 });
@@ -374,18 +394,28 @@ ndRegForm.directive('ndFieldDialog', function(url) {
         templateUrl: url.tpl('fields/dialogs/base.tpl.html'),
 
         controller: function($scope) {
-            $scope.settings = $scope.$parent.settings;
-            $scope.settings.dialogs = $scope.config;
-            $scope.field = $scope.data;
-            $scope.formData = {};
-
             $scope.actions.init = function() {
+                $scope.field = $scope.data;
+                $scope.settings = $scope.config;
+
+                $scope.formData = {};
                 $scope.formData.radioitems = [];
                 $scope.formData.input = $scope.field.input;
                 $scope.formData.disabled = $scope.field.disabled;
 
-                _.each($scope.field.values.radioitems, function (item, ind) {
-                    $scope.formData.radioitems[ind] = {id: item.id, cancelled: item.cancelled}; //A way to initialize properly
+                _.each($scope.settings.formData, function(item) {
+                    if (Array.isArray(item) && $scope.field[item[0]] !== undefined) {
+                        $scope.formData[item[1]] = $scope.field[item[0]][item[1]];
+                    } else {
+                        $scope.formData[item] = $scope.field[item];
+                    }
+                });
+
+                _.each($scope.field.values.radioitems, function(item, ind) {
+                    $scope.formData.radioitems[ind] = {
+                        id: item.id,
+                        cancelled: item.cancelled
+                    };
                 });
 
                 $scope.tabSelected = "tab-options";

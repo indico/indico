@@ -35,14 +35,14 @@
 
     <nd-dialog nd-field-dialog
         ng-if="editMode"
-        heading="{{ dialogs.settings.title() }}"
         show="dialogs.settings.open"
-        config="dialogs.settings"
-        data="field"
+        heading="{{ dialogs.settings.title() }}"
         ok-button="{{ dialogs.settings.okButton() }}"
         cancel-button="{{ 'Cancel' | i18n }}"
         ok-callback="dialogs.settings.onOk(dialogScope)"
-        cancel-callback="dialogs.settings.onCancel()">
+        cancel-callback="dialogs.settings.onCancel()"
+        config="settings"
+        data="field">
     </nd-dialog>
 </div>
 
