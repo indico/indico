@@ -40,16 +40,19 @@ ndRegForm.directive('ndField', function($rootScope, url, RESTAPI) {
                         return $scope.fieldApi.isNew()? $T('Add') : $T('Update');
                     },
                     onOk: function(dialogScope) {
-                        var postData = {confId: $scope.confId,
-                                            sectionId: $scope.section.id,
-                                            fieldData: dialogScope.formData
-                                        };
+                        var postData = {
+                            confId: $scope.confId,
+                            sectionId: $scope.section.id,
+                            fieldData: dialogScope.formData
+                        };
 
-                        if(!$scope.fieldApi.isNew()) postData.fieldId = dialogScope.field.id;
+                        if(!$scope.fieldApi.isNew()) {
+                            postData.fieldId = dialogScope.field.id;
+                        }
+
                         RESTAPI.Fields.save(postData,
                             function(data, headers) {
                                 $scope.field = data;
-                                dialogScope.field = data;
                             });
                     },
                     onCancel: function() {
@@ -374,12 +377,12 @@ ndRegForm.directive('ndFieldDialog', function(url) {
             $scope.settings = $scope.$parent.settings;
             $scope.settings.dialogs = $scope.config;
             $scope.field = $scope.data;
+            $scope.formData = {};
 
             $scope.actions.init = function() {
-                $scope.formData = {
-                    radioitems: [],
-                    input: $scope.field.input
-                };
+                $scope.formData.radioitems = [];
+                $scope.formData.input = $scope.field.input;
+                $scope.formData.disabled = $scope.field.disabled;
 
                 _.each($scope.field.values.radioitems, function (item, ind) {
                     $scope.formData.radioitems[ind] = {id: item.id, cancelled: item.cancelled}; //A way to initialize properly

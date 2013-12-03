@@ -2795,7 +2795,7 @@ class GeneralField(Persistent, Fossilizable):
             self.setMandatory(data['mandatory'] if 'mandatory' in data else False)
         if self.isLocked('disable'):
             self.setDisabled(False)
-        else:
+        elif 'disabled' in data:
             self.setDisabled(data.get("disabled", False))
         self.setBillable(data.get("billable", False))
         self.setPrice(str(data.get("price", "")))

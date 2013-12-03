@@ -39,7 +39,6 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function(
     $scope.api.saveConfig = function(section, data) {
         var postData = getPostData(section);
         postData = angular.extend(postData, data);
-        //postData.items = _.values(postData.items);
         RESTAPI.Sections.save(postData, function(sectionUpdated) {
             $scope.$parent.section = sectionUpdated;
             //TODO: why not with section variable?
