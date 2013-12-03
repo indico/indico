@@ -14,211 +14,64 @@
     <div class="tab-content regFormDialogTabContent">
         <div class="tab-pane" id="div-options" ng-class="{active: isTabSelected('tab-options')}">
             <form id="optionsForm" name="optionsForm">
-            <div class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'caption' | i18n }}
-                </label>
-                <input ng-model="formData.caption"
-                    type="text"
-                    name="caption"
-                    id="input01"
-                    size="30"
-                    required>
-                <input ng-model="formData.mandatory"
-                    type="checkbox"
-                    name="mandatory"
-                    id="input02"
-                    ng-disabled="field.lock.indexOf('mandatory') != 1">
-                {{ 'Mandatory' | i18n }}
-            </div>
+                <div class="regFormEditLine">
+                    <label class="regFormDialogCaption">
+                        {{ 'caption' | i18n }}
+                    </label>
+                    <input ng-model="formData.caption"
+                        type="text"
+                        name="caption"
+                        id="input01"
+                        size="30"
+                        required>
+                    <input ng-model="formData.mandatory"
+                        type="checkbox"
+                        name="mandatory"
+                        id="input02"
+                        ng-disabled="field.lock.indexOf('mandatory') != 1">
+                    {{ 'Mandatory' | i18n }}
+                </div>
 
-            <div class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'description' | i18n }}
-                </label>
-                <textarea ng-model="formData.description"
-                    id="descriptionEdit"
-                    name="description"
-                    cols="40"
-                    rows="5">
-                </textarea>
-            </div>
+                <div class="regFormEditLine">
+                    <label class="regFormDialogCaption">
+                        {{ 'description' | i18n }}
+                    </label>
+                    <textarea ng-model="formData.description"
+                        id="descriptionEdit"
+                        name="description"
+                        cols="40"
+                        rows="5">
+                    </textarea>
+                </div>
 
-            <!-- if field.input == 'telephone' or field.input == 'text' -->
-            <div ng-if="settings.size" class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'size in char' | i18n }}
-                </label>
-                <input ng-model="formData.length"
-                    name="length"
-                    type="number"
-                    size="20"
-                    min="5"
-                    max="60">
-                <span>({{ "Must be between 5 and 60" | i18n }})</span>
-            </div>
-           <!-- endif -->
+                <div ng-if="settings.size"
+                    ng-include="getTpl('fields/dialogs/size.tpl.html')"></div>
 
-            <!-- if field.input == "textarea" -->
-            <div ng-if="settings.rowsAndColumns" class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'number of columns' | i18n }}
-                </label>
-                <input ng-model="formData.numberOfColumns"
-                    name="numberOfColumns"
-                    type="number"
-                    min="1"
-                    size="20">
-            </div>
-            <div ng-if="settings.rowsAndColumns" class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'number of rows' | i18n }}
-                </label>
-                <input ng-model="formData.numberOfRows"
-                    name="numberOfRows"
-                    type="number"
-                    min="1"
-                    size="20">
-            </div>
-           <!-- endif -->
+                <div ng-if="settings.rowsAndColumns"
+                    ng-include="getTpl('fields/dialogs/rowsandcolumns.tpl.html')"></div>
 
-            <!-- if field.input == "number" -->
-            <div ng-if="settings.number" class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'minimum value' | i18n }}
-                </label>
-                <input ng-model="formData.minValue"
-                    name="minValue"
-                    type="number"
-                    size="20">
-            </div>
-            <div ng-if="settings.number" class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'row length' | i18n }}
-                </label>
-                <input ng-model="formData.length"
-                    name="numberOfRows"
-                    type="number"
-                    min="0"
-                    size="20">
-            </div>
-            <!-- endif -->
+                <div ng-if="settings.number"
+                    ng-include="getTpl('fields/dialogs/number.tpl.html')"></div>
 
-            <!-- if field.input == "yesno" or field.input == "checkbox" -->
-            <div ng-if="settings.placesLimit"
-                class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'places limit' | i18n }}
-                </label>
-                <input ng-model="formData.placesLimit"
-                    name="placesLimit"
-                    type="number"
-                    size="20"
-                    min="0">
-                <span>({{ "0 for unlimited" | i18n }})</span>
-            </div>
-            <!-- endif -->
+                <div ng-if="settings.placesLimit"
+                    ng-include="getTpl('fields/dialogs/placeslimit.tpl.html')"></div>
 
-            <!-- if field.input == "yesno" or field.input == "number" or field.input == "label" or field.input == "checkbox" -->
-            <div ng-if="settings.billable" class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'Billable' | i18n }}
-                </label>
-                <input ng-model="formData.billable"
-                    type="checkbox"
-                    name="billable"
-                    ng-checked="field.billable"/>
-            </div>
-            <div ng-if="settings.billable" class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'price' | i18n }}
-                </label>
-                <input ng-model="formData.price"
-                    type="number"
-                    min="0"
-                    name="price"
-                    class="input-xlarge"
-                    id="input01"
-                    size="20">
-                <span ng-if="field.input == 'number'">
-                    ({{ "price multiplied with entered number" | i18n }})
-                </span>
-            </div>
-            <!-- endif -->
+                <div ng-if="settings.billable"
+                    ng-include="getTpl('fields/dialogs/billable.tpl.html')"></div>
 
-            <!-- if field.input == "radio" -->
-            <div ng-if="settings.defaultValue" class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'default item' | i18n }}
-                </label>
-                <select ng-model="formData.defaultItem"
-                    id="defaultItem"
-                    name="defaultItem" ng-model="formData.defaultItem">
-                    <option value="" ng-selected="field.values.defaultItem == null">
-                        {{ 'none' | i18n }}
-                    </option>
-                    <option ng-repeat="el in field.values.radioitems"
-                        ng-selected="field.values.defaultItem == el.caption"
-                        value="{{ el.caption }}">
-                        {{ el.caption }}
-                    </option>
-                </select>
-                <span>({{ "Only available for input type: drop down menu" | i18n }})</span>
-            </div>
+                <div ng-if="settings.defaultValue"
+                    ng-include="getTpl('fields/dialogs/defaultvalue.tpl.html')"></div>
 
-            <div ng-if="settings.defaultValue" class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'input type' | i18n }}
-                </label>
-                <select  ng-model="formData.inputType"
-                    id="inputType" name="inputType">
-                    <option value="dropdown" ng-selected="field.values.inputType == 'dropdown'">
-                        {{ 'drop down menu' | i18n }}
-                    </option>
-                    <option value="radiogroup" ng-selected="field.values.inputType == 'radiogroup'">
-                        {{ 'radio group' | i18n }}
-                    </option>
-                </select>
-            </div>
-            <!-- endif -->
+                <div ng-if="settings.date"
+                    ng-include="getTpl('fields/dialogs/date.tpl.html')"></div>
 
-            <!-- if field.input == "date" -->
-            <div ng-if="settings.date" class="regFormEditLine">
-                <label class="regFormDialogCaption">
-                    {{ 'Date format' | i18n }}
-                </label>
-                <select id="dateFormat" name="dateFormat" ng-model="formData.dateFormat" >
-                    <!-- if _.isEmpty(field.values.displayFormats) -->
-                        <option value="%d/%m/%Y %H:%M" selected="selected">DD/MM/YYYY hh:mm</option>
-                        <option value="%d.%m.%Y %H:%M">DD.MM.YYYY hh:mm</option>
-                        <option value="%m/%d/%Y %H:%M">MM/DD/YYYY hh:mm</option>
-                        <option value="%m.%d.%Y %H:%M">MM.DD.YYYY hh:mm</option>
-                        <option value="%Y/%m/%d %H:%M">YYYY/MM/DD hh:mm</option>
-                        <option value="%Y.%m.%d %H:%M">YYYY.MM.DD hh:mm</option>
-                        <option value="%d/%m/%Y">DD/MM/YYYY</option>
-                        <option value="%d.%m.%Y">DD.MM.YYYY</option>
-                        <option value="%m/%d/%Y">MM/DD/YYYY</option>
-                        <option value="%m.%d.%Y">MM.DD.YYYY</option>
-                        <option value="%Y/%m/%d">YYYY/MM/DD</option>
-                        <option value="%Y.%m.%d">YYYY.MM.DD</option>
-                        <option value="%m/%Y">MM/YYYY</option>
-                        <option value="%m.%Y">MM.YYYY</option>
-                        <option value="%Y">YYYY</option>
-                    <!-- else -->
-                    <option ng-repeat="el in field.values.displayFormats"
-                        ng-selected="el[0] == field.values.dateFormat"
-                        value="{{ el[0] }}">
-                        {{ el[1] }}
-                    </option>
-                    <!-- endif -->
-                </select>
-            </div>
-            <!-- endif -->
-
-            <input type="submit" style="display:none;" value="submit" id="form-opt-validate">
+                <input type="submit" style="display:none;" value="submit" id="form-opt-validate">
             </form>
         </div>
-        <div ng-if="field.input == 'radio'" class="tab-pane" ng-class="{active: isTabSelected('tab-editItems')}" id="div-editItems">
+
+        <div ng-if="field.input == 'radio'"
+            class="tab-pane"
+            ng-class="{active: isTabSelected('tab-editItems')}" id="div-editItems">
             <div class="toolbar thin">
                 <div class="group">
                     <a class="i-button" ng-click="addItem()">{{ 'Create new item' | i18n }}</a>

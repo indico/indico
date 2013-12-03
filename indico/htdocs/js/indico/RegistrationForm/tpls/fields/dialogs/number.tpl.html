@@ -1,0 +1,19 @@
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'minimum value' | i18n }}
+    </label>
+    <input ng-model="formData.minValue"
+        name="minValue"
+        type="number"
+        size="20">
+</div>
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'row length' | i18n }}
+    </label>
+    <input ng-model="formData.length"
+        name="numberOfRows"
+        type="number"
+        min="0"
+        size="20">
+</div>

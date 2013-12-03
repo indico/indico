@@ -430,6 +430,12 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                     return radioitem.caption.toLowerCase();
                 });
             };
+        },
+
+        link: function(scope) {
+            scope.getTpl = function(file) {
+                return url.tpl(file);
+            };
         }
     };
 });
