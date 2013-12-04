@@ -117,7 +117,7 @@ body, html {
     height: 100%;
 }
 
-br,dl,em,h1,h2,h3,h4,h5,h6,td,blockquote,ol {
+br,dl,h1,h2,h3,h4,h5,h6,td,blockquote,ol {
    font-size: 13px;
    color: #444444;
 }

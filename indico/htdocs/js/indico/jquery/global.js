@@ -53,6 +53,14 @@ $(document).ready(function() {
                 event: event.type,
                 ready: true
             },
+
+            content: {
+                text: function() {
+                    var html = $(this).attr('title');
+                    return html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                }
+            },
+
             events: {
                 show: function(event) {
                     if ($(event.originalEvent.target).hasClass('open')) {

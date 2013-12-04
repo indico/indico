@@ -22,3 +22,27 @@
 #qtip-add-field {
     background: $light-gray;
 }
+
+.qtip.informational {
+   @include sbox-shadow(rgba($dark-gray, 0.2) 0px 0px 3px 3px, lighten($light-gray, 20%) 0px 1px 0px 0px inset);
+   @include border-all($gray);
+   background: $light-gray;
+
+   color: $light-black;
+
+   ul {
+      list-style-type: none;
+      padding-left: 2em;
+
+      li {
+         margin: 0.3em 0 0.3em 0;
+         line-height: 1.5em;
+      }
+
+      .mono {
+         padding: 0.2em;
+         background: #fff;
+      }
+   }
+
+}

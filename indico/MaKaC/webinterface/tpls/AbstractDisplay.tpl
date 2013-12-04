@@ -59,7 +59,7 @@
                       <% content = str(abstract.getField(f.getId()))%>
                       <div class="abstractSection">
                         <h2 class="abstractSectionTitle">${f.getCaption()}</h2>
-                        <div class="abstractSectionContent" style="white-space: nowrap;">
+                        <div class="abstractSectionContent md-preview-wrapper display" style="white-space: nowrap;">
                              ${content | h, m}
                          </div>
                     </div>

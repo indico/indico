@@ -182,12 +182,12 @@ class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
 
     def getCSSFiles(self):
         return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-            self._asset_env['pagedown_sass'].urls()
+            self._asset_env['abstracts_sass'].urls()
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
             self._includeJSPackage('Management') + \
-            self._asset_env['pagedown_js'].urls()
+            self._asset_env['abstracts_js'].urls()
 
     def _getHeadContent(self):
         return WPConferenceDefaultDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
@@ -270,17 +270,17 @@ class WPAbstractDisplayBase( WPConferenceDefaultDisplayBase ):
 
     def getCSSFiles(self):
         return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-            self._asset_env['pagedown_sass'].urls()
+            self._asset_env['abstracts_sass'].urls()
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
             self._includeJSPackage('Management') + \
-            self._asset_env['pagedown_js'].urls()
+            self._asset_env['abstracts_js'].urls()
 
 
-class WAbstractCannotBeModified( wcomponents.WTemplated ):
+class WAbstractCannotBeModified(wcomponents.WTemplated):
 
-    def __init__( self, abstract ):
+    def __init__(self, abstract):
         self._abstract = abstract
 
     def getVars(self):
@@ -469,14 +469,9 @@ class WPAbstractModify(WPAbstractDisplayBase):
             '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
                        for url in self._asset_env['mathjax_js'].urls()])
 
-    def getCSSFiles(self):
-        return WPAbstractDisplayBase.getCSSFiles(self) + \
-            self._asset_env['pagedown_sass'].urls()
-
     def getJSFiles(self):
         return WPAbstractDisplayBase.getJSFiles(self) + \
-            self._includeJSPackage('Management') + \
-            self._asset_env['pagedown_js'].urls()
+            self._includeJSPackage('Management')
 
     def _getBody(self, params):
         params["postURL"] = urlHandlers.UHAbstractModify.getURL(self._abstract)

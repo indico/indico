@@ -6,6 +6,23 @@
 </%block>
 
 <%block name="content">
+
+<script type="text/html" id="markdown-info-text">
+<p>${_("Markdown is a lightweight markup language that makes it easier to write rich text content. Here are some examples:")}</p>
+<ul>
+    <li><span class="mono">*apples*</span> - <em>apples</em></li>
+    <li><span class="mono">**oranges**</span> - <strong>oranges</strong></li>
+    <li><span class="mono">[CERN][http://www.google.com]</span> - <a href="http://www.google.com">Google</a></li>
+</ul>
+<p>${_("Check the icon bar for more options, or consult the {0}language reference{1}.").format('<a href="http://daringfireball.net/projects/markdown/syntax">', '</a>')}</p>
+</script>
+
+<script type="text/html" id="latex-info-text">
+
+<p>${_("Several LaTeX commands are supported:")}</p>
+<p><a href="http://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">http://docs.mathjax.org/en/latest/tex.html#supported-latex-commands</a></p>
+</script>
+
 % if origin == "display":
 <form action=${ postURL } enctype="multipart/form-data" method="POST" width="100%" onsubmit="return onsubmitDisplayActions();">
     <table width="100%" align="center">
@@ -26,7 +43,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <table align="center" width="100%">
+                            <table align="center" width="100%" id="abstract-field-table">
                                 <tr>
                                     <td align="right" valign="top" white-space="nowrap">
                                         <span class="dataCaptionFormat">${ _("Title")}</span>
@@ -414,52 +431,5 @@ function checkLimitedFields() {
 createLimitedFieldsMgr();
 addPMToMandatoryFields();
 
-// Drag and drop for the authors
-$('#sortspace').tablesorter({
-
-    onDropFail: function() {
-        var popup = new AlertPopup($T('Warning'), $T('You cannot move the author to this list because there is already an author with the same email address.'));
-        popup.open();
-    },
-    canDrop: function(sortable, element) {
-        if (sortable.attr('id') == 'inPlacePrAuthors') {
-            return authorsManager.canDropElement('pr', element.attr('id'));
-        } else if (sortable.attr('id') == 'inPlaceCoAuthors') {
-            return authorsManager.canDropElement('co', element.attr('id'));
-        }
-        return false;
-    },
-    onUpdate: function() {
-        authorsManager.updatePositions();
-        authorsManager.checkPrAuthorsList();
-        return;
-    },
-    sortables: '.sortblock ul', // relative to element
-    sortableElements: '> li', // relative to sortable
-    handle: '.authorTable', // relative to sortable element - the handle to start sorting
-    placeholderHTML: '<li></li>' // the html to put inside the placeholder element
-});
-
-// Pagedown editor stuff
-
-
-function block_handler(text, rbg) {
-    return text.replace(/^ {0,3}""" *\n((?:.*?\n)+?) {0,3}""" *$/gm, function (whole, inner) {
-        return "<blockquote>" + rbg(inner) + "</blockquote>\n";
-    });
-}
-
-$(function() {
-    $('textarea.wmd-input').each(function(i, elem) {
-        var fieldId = $(elem).closest('td').data('fieldId');
-
-        converter = Markdown.getSanitizingConverter();
-        converter.hooks.chain("preBlockGamut", block_handler);
-
-        var editor = new Markdown.Editor(converter, "-f_" + fieldId);
-        PageDownMathJax.mathjaxEditing().prepareWmdForMathJax(editor, "-f_" + fieldId, [["$$", "$$"], ["\\\\(","\\\\)"]]);
-        editor.run();
-    });
-});
 </script>
 </%block>

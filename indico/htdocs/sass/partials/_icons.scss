@@ -304,6 +304,37 @@ you can use the generic selector below, but it's slower:
     content: "\e0d4";
 }
 
+.icon-type:before {
+    content: "\e449";
+}
+.icon-redo:before {
+    content: "\e14c";
+}
+.icon-pagebreak:before {
+    content: "\e463";
+}
+.icon-code:before {
+    content: "\e480";
+}
+.icon-bubble-quote:before {
+    content: "\e16d";
+}
+.icon-link:before {
+    content: "\e2cd";
+}
+.icon-image:before {
+    content: "\e02b";
+}
+.icon-numbered-list:before {
+    content: "\e29c";
+}
+.icon-italic:before {
+    content: "\e456";
+}
+.icon-bold:before {
+    content: "\e454";
+}
+
 /* KEEP THE FOLLOWING DEFINITIONS: necessery when rendering the icon 'after' e.g. mixin icon-after */
 .icon-arrow-down-after:after {
     content: "\24";

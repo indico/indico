@@ -317,11 +317,11 @@ class WPContributionModifBase(WPConferenceModifBase):
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + \
-            self._asset_env['pagedown_sass'].urls()
+            self._asset_env['abstracts_sass'].urls()
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + \
-            self._asset_env['pagedown_js'].urls() + \
+            self._asset_env['abstracts_js'].urls() + \
             self._asset_env['mathjax_js'].urls()
 
 

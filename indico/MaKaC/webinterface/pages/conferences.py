@@ -3201,11 +3201,11 @@ class WPConfModifCFAPreview(WPConferenceModifAbstractBase):
 
     def getCSSFiles(self):
         return WPConferenceModifAbstractBase.getCSSFiles(self) + \
-            self._asset_env['pagedown_sass'].urls()
+            self._asset_env['abstracts_sass'].urls()
 
     def getJSFiles(self):
         return WPConferenceModifAbstractBase.getJSFiles(self) + \
-            self._asset_env['pagedown_js'].urls()
+            self._asset_env['abstracts_js'].urls()
 
     def _getTabContent(self, params):
         import MaKaC.webinterface.pages.abstracts as abstracts

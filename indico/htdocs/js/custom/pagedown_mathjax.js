@@ -179,7 +179,22 @@ PageDownMathJax.mathjaxEditing = (function() {
         var converterObject = editorObject.getConverter();
         converterObject.hooks.chain("preConversion", removeMath);
         converterObject.hooks.chain("postConversion", replaceMath);
-        editorObject.hooks.chain("onPreviewRefresh", UpdateMJ);
+        editorObject.hooks.chain("onPreviewRefresh", function() {
+            UpdateMJ();
+            var $preview = $(preview),
+                new_height =  $preview.outerHeight(),
+                $wrapper = $preview.closest('.md-preview-wrapper'),
+                is_empty = ($preview.text() == '');
+
+            $wrapper.toggleClass('empty', is_empty);
+            if (is_empty) {
+                $wrapper.css('height', '');
+            } else {
+                $wrapper.css('height', new_height);
+            }
+
+            $preview.scrollTop(new_height);
+        });
     }
 
     return {

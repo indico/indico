@@ -35,6 +35,14 @@
     font-family: Georgia, Times, "Times New Roman", serif;
 }
 
+%font-family-monospace {
+    font-family: "Inconsolata", "Monaco", "Droid Sans Mono", "Profont", courier, monospace;
+}
+
+%font-family-serif {
+    font-family: "Georgia", "Garamond", "Droid serif", "Linux Libertine", "Palatino", serif;
+}
+
 %font-size-body {
     font-size: 13px;
 }
@@ -246,4 +254,8 @@ td.groupTitle, td.groupTitleNoBorder, td.groupSubTitle {
 a.small-link {
     color: $light-black;
     font-size: 11px;
+}
+
+.mono {
+  @extend %font-family-monospace;
 }

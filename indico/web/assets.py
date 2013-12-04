@@ -222,21 +222,21 @@ jquery = Bundle(
            output='js/jquery_migrate_silencer_%(version)s.js'),
     *namespace('js/jquery',
 
-        'jquery-migrate.js',
-        'jquery.form.js',
-        'jquery.custom.js',
-        'jquery.daterange.js',
-        'jquery.form.js',
-        'jquery.dttbutton.js',
-        'jquery.colorbox.js',
-        'jquery.menu.js',
-        'date.js',
-        'jquery.colorpicker.js',
-        'jquery-extra-selectors.js',
-        'jquery.typewatch.js',
-        'jstorage.js',
-        'jquery.watermark.js',
-        'jquery.placeholder.js'),
+               'jquery-migrate.js',
+               'jquery.form.js',
+               'jquery.custom.js',
+               'jquery.daterange.js',
+               'jquery.form.js',
+               'jquery.dttbutton.js',
+               'jquery.colorbox.js',
+               'jquery.menu.js',
+               'date.js',
+               'jquery.colorpicker.js',
+               'jquery-extra-selectors.js',
+               'jquery.typewatch.js',
+               'jstorage.js',
+               'jquery.watermark.js',
+               'jquery.placeholder.js'),
     filters='rjsmin', output='js/jquery_code_%(version)s.min.js')
 
 utils = Bundle('js/utils/routing.js', filters='rjsmin', output='js/utils_%(version)s.min.js')
@@ -248,43 +248,43 @@ calendar = Bundle(
 presentation = Bundle(
     *namespace('js/presentation',
 
-        'Core/Primitives.js',
-        'Core/Iterators.js',
-        'Core/Tools.js',
-        'Core/String.js',
-        'Core/Type.js',
-        'Core/Interfaces.js',
-        'Core/Commands.js',
-        'Core/MathEx.js',
-        'Data/Bag.js',
-        'Data/Watch.js',
-        'Data/WatchValue.js',
-        'Data/WatchList.js',
-        'Data/WatchObject.js',
-        'Data/Binding.js',
-        'Data/Logic.js',
-        'Data/Json.js',
-        'Data/Remote.js',
-        'Data/DateTime.js',
-        'Ui/MimeTypes.js',
-        'Ui/XElement.js',
-        'Ui/Html.js',
-        'Ui/Dom.js',
-        'Ui/Style.js',
-        'Ui/Extensions/Lookup.js',
-        'Ui/Extensions/Layout.js',
-        'Ui/Text.js',
-        'Ui/Styles/SimpleStyles.js',
-        'Ui/Widgets/WidgetBase.js',
-        'Ui/Widgets/WidgetPage.js',
-        'Ui/Widgets/WidgetComponents.js',
-        'Ui/Widgets/WidgetControl.js',
-        'Ui/Widgets/WidgetEditor.js',
-        'Ui/Widgets/WidgetTable.js',
-        'Ui/Widgets/WidgetField.js',
-        'Ui/Widgets/WidgetEditable.js',
-        'Ui/Widgets/WidgetMenu.js',
-        'Ui/Widgets/WidgetGrid.js'),
+               'Core/Primitives.js',
+               'Core/Iterators.js',
+               'Core/Tools.js',
+               'Core/String.js',
+               'Core/Type.js',
+               'Core/Interfaces.js',
+               'Core/Commands.js',
+               'Core/MathEx.js',
+               'Data/Bag.js',
+               'Data/Watch.js',
+               'Data/WatchValue.js',
+               'Data/WatchList.js',
+               'Data/WatchObject.js',
+               'Data/Binding.js',
+               'Data/Logic.js',
+               'Data/Json.js',
+               'Data/Remote.js',
+               'Data/DateTime.js',
+               'Ui/MimeTypes.js',
+               'Ui/XElement.js',
+               'Ui/Html.js',
+               'Ui/Dom.js',
+               'Ui/Style.js',
+               'Ui/Extensions/Lookup.js',
+               'Ui/Extensions/Layout.js',
+               'Ui/Text.js',
+               'Ui/Styles/SimpleStyles.js',
+               'Ui/Widgets/WidgetBase.js',
+               'Ui/Widgets/WidgetPage.js',
+               'Ui/Widgets/WidgetComponents.js',
+               'Ui/Widgets/WidgetControl.js',
+               'Ui/Widgets/WidgetEditor.js',
+               'Ui/Widgets/WidgetTable.js',
+               'Ui/Widgets/WidgetField.js',
+               'Ui/Widgets/WidgetEditable.js',
+               'Ui/Widgets/WidgetMenu.js',
+               'Ui/Widgets/WidgetGrid.js'),
     filters='rjsmin', output='js/presentation_%(version)s.min.js')
 
 ie_compatibility = Bundle('js/selectivizr.js',
@@ -292,9 +292,9 @@ ie_compatibility = Bundle('js/selectivizr.js',
 
 moment = Bundle(
     *namespace('js/moment',
-        'moment.js',
-        'lang/es.js',
-        'lang/fr.js'),
+               'moment.js',
+               'lang/es.js',
+               'lang/fr.js'),
     filters='rjsmin', output='js/moment_%(version)s.min.js')
 
 mathjax_js = Bundle(
@@ -302,25 +302,34 @@ mathjax_js = Bundle(
     'js/custom/pagedown_mathjax.js',
     filters='rjsmin', output='js/mathjax_%(version)s.min.js')
 
-pagedown_js = Bundle(
+abstracts_js = Bundle(
+    'js/indico/Management/abstracts.js',
     *namespace('js/lib/pagedown',
                'Markdown.Converter.js',
                'Markdown.Editor.js',
                'Markdown.Sanitizer.js'),
-    filters='rjsmin', output='js/pagedown_%(version)s.min.js')
+    filters='rjsmin',
+    output='js/abstracts_%(version)s.min.js')
 
 base_js = Bundle(jquery, angular, utils, presentation, calendar, indico_jquery, moment, indico_core,
                  indico_legacy, indico_common)
 
+SASS_BASE_MODULES = ["sass/*.scss",
+                     "sass/base/*.scss",
+                     "sass/custom/*.scss",
+                     "sass/partials/*.scss",
+                     "sass/modules/*.scss",
+                     "sass/modules/roombooking/*.scss"]
+
+abstracts_sass = Bundle('sass/modules/abstracts.scss',
+                        filters=("pyscss", "cssrewrite", "cssmin"),
+                        output="sass/abstracts_editor_%(version)s.min.css",
+                        depends=SASS_BASE_MODULES)
+
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
                      output="sass/screen_sass_%(version)s.css",
-                     depends=["sass/*.scss",
-                              "sass/base/*.scss",
-                              "sass/custom/*.scss",
-                              "sass/partials/*.scss",
-                              "sass/modules/*.scss",
-                              "sass/modules/roombooking/*.scss"])
+                     depends=SASS_BASE_MODULES)
 
 
 def register_all_js(env):
@@ -342,15 +351,11 @@ def register_all_js(env):
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
     env.register('ie_compatibility', ie_compatibility)
-    env.register('pagedown_js', pagedown_js)
+    env.register('abstracts_js', abstracts_js)
     env.register('mathjax_js', mathjax_js)
 
 
 def register_all_css(env, main_css_file):
-
-    pagedown_sass = Bundle('sass/modules/pagedown.scss',
-                           filters=("pyscss", "cssrewrite", "cssmin"),
-                           output="sass/pagedown_editor_%(version)s.min.css")
 
     base_css = Bundle(
         *namespace('css',
@@ -371,6 +376,6 @@ def register_all_css(env, main_css_file):
         output='css/base_%(version)s.min.css')
 
     env.register('indico_badges_css', indico_badges_css)
-    env.register('pagedown_sass', pagedown_sass)
+    env.register('abstracts_sass', abstracts_sass)
     env.register('base_css', base_css)
     env.register('screen_sass', screen_sass)

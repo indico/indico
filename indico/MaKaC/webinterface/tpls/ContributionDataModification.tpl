@@ -1,5 +1,5 @@
 <form id="ContributionDataModificationForm" method="POST" action="${ postURL }">
-    <table width="60%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table width="60%" align="center" border="0" style="border-left: 1px solid #777777" id="abstract-field-table">
         <tr>
             <td class="groupTitle" colspan="2"> ${ _("Edit contribution data")}</td>
         </tr>
