@@ -16,8 +16,6 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from indico.core import logging, utils
-import string
 import types
 from copy import deepcopy
 from textwrap import wrap, fill
@@ -65,6 +63,8 @@ from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.common.tools import strip_ml_tags
 import re
 from MaKaC.i18n import _
+from MaKaC.common import utils
+
 from indico.util.i18n import i18nformat, ngettext
 from indico.util.date_time import format_date
 from indico.util import json

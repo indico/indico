@@ -27,7 +27,7 @@ from MaKaC.common import info
 import MaKaC
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.plugins import Observable
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 
 def isFullyAccess(level):
     def wrap(func):

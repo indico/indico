@@ -20,7 +20,7 @@ from persistent import Persistent
 from BTrees import LOBTree, OOBTree
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt, unixTimeToDatetime
 from BTrees.Length import Length
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.conference import ConferenceHolder
 from zope.interface import Interface
 from indico.core.index import SIndex

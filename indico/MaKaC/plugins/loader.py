@@ -29,7 +29,7 @@ import os, sys, pkg_resources, pkgutil
 from persistent import Persistent
 
 # legacy MaKaC imports
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.errors import PluginError
 
 # package

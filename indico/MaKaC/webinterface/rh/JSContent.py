@@ -21,7 +21,7 @@ import os
 from email.Utils import formatdate
 
 from indico.core.config import Config
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.rh import base
 import MaKaC.common.TemplateExec as templateEngine

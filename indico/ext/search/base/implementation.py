@@ -24,7 +24,7 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface import urlHandlers
 from MaKaC.conference import ConferenceHolder
 
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.common.timezoneUtils import DisplayTZ
 from pytz import timezone
 from indico.core.extpoint import Component

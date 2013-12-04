@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.plugins.Collaboration.Vidyo.common import getVidyoOptionValue
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.plugins.Collaboration.Vidyo.cache import SudsCache
 from suds import client, transport
 

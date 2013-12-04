@@ -21,7 +21,7 @@ import glob
 import os
 import re
 from collections import OrderedDict
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 
 import indico.util.json as json
 

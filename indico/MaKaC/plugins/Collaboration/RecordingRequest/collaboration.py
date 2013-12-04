@@ -28,7 +28,7 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.mail import GenericMailer
 from MaKaC.plugins.Collaboration.RecordingRequest.common import RecordingRequestException, \
     RecordingRequestError
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from indico.core.index import Catalog
 

@@ -48,7 +48,7 @@ from MaKaC.conference import Conference, Category, ConferenceHolder, CategoryMan
 from MaKaC.user import AvatarHolder, GroupHolder
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.indexes import IndexesHolder
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
 

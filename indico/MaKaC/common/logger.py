@@ -22,6 +22,6 @@ Obsolete module for logging
 """
 import warnings
 warnings.warn("the 'MaKaC.common.logger' module is deprecated; "
-              "instead use indico.core.logging", DeprecationWarning, 2)
+              "use indico.core.logger instead", DeprecationWarning, 2)
 
-from indico.core.logging import *
+from indico.core.logger import *

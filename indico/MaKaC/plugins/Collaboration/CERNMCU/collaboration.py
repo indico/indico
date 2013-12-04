@@ -29,7 +29,7 @@ from MaKaC.i18n import _
 
 from xmlrpclib import Fault
 from datetime import timedelta
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.common.Counter import Counter
 from MaKaC.services.interface.rpc.json import unicodeToUtf8
 import socket

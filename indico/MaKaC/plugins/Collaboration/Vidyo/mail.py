@@ -27,7 +27,7 @@ from MaKaC.common import info
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate
 from MaKaC.common.mail import GenericMailer
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.common.TemplateExec import escape
 from indico.core.config import Config
 

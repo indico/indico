@@ -19,7 +19,7 @@
 
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 import re
 
 try:

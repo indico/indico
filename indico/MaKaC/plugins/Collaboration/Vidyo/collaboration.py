@@ -32,7 +32,7 @@ from MaKaC.plugins.Collaboration.Vidyo.fossils import ICSBookingConfModifFossil,
     ICSBookingIndexingFossil
 from MaKaC.common.utils import unicodeLength
 from MaKaC.common.timezoneUtils import nowutc
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.plugins.Collaboration.Vidyo.pages import ServiceInformation

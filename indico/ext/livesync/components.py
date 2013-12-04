@@ -39,7 +39,7 @@ from indico.ext.livesync.agent import SyncManager
 
 # legacy indico imports
 from MaKaC.common.contextManager import ContextManager, DummyDict
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC import conference, accessControl
 
 

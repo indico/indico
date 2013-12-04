@@ -74,7 +74,7 @@ class WMain (WJSBase):
         vars["MinStartDate"] = formatDateTime(getMinStartDate(self._conf))
         vars["MaxEndDate"] = formatDateTime(getMaxEndDate(self._conf))
         vars["AllowedMarginMinutes"] = self._WebExOptions["allowedMinutes"].getValue()
-        # from indico.core.logging import Logger
+        # from indico.core.logger import Logger
         vars["LoggedInEmail"] = self._user.getEmail()
         # Logger.get('WebEx').error(self._user.getEmail())
         return vars

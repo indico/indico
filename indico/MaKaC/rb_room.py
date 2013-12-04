@@ -20,6 +20,8 @@
 Part of Room Booking Module (rb_)
 """
 
+from string import Formatter
+
 from MaKaC.plugins.RoomBooking.common import rb_check_user_access
 from MaKaC.rb_tools import checkPresence, iterdays
 from MaKaC.rb_location import Location, RoomGUID, CrossLocationQueries
@@ -698,7 +700,6 @@ notificationAssistance: #{self.resvNotificationAssistance}
       surfaceArea: #{self.surfaceArea}
          division: #{self.division}
           photoId: #{self.photoId}
-       externalId: #{self.externalId}
 
         telephone: #{self.telephone}
        whereIsKey: #{self.whereIsKey}

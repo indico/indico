@@ -34,7 +34,7 @@ from MaKaC.common.Counter import Counter
 from MaKaC.common.Locators import Locator
 from MaKaC.errors import PluginError
 from indico.core.db import DBMgr
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.plugins.loader import PluginLoader, GlobalPluginOptions
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.plugins.util import processPluginMetadata

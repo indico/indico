@@ -41,12 +41,12 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC import (
     domain,
-    roomMapping,
+    roomMapping
 )
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common import (
     timezoneUtils,
-    utils,
+    utils
 )
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
 from MaKaC.common.Configuration import Config
@@ -63,17 +63,18 @@ from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.i18n import _
 from MaKaC.plugins import (
     PluginLoader,
-    PluginsHolder,
+    PluginsHolder
 )
 from MaKaC.services.implementation.user import UserComparator
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.webinterface.common.timezones import (
     DisplayTimezoneRegistry,
-    TimezoneRegistry,
+    TimezoneRegistry
 )
 from MaKaC.webinterface.locators import CategoryWebLocator
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
+from MaKaC.webinterface.pages.base import WPDecorated
 
 # indico
 from indico.modules import ModuleHolder

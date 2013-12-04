@@ -25,7 +25,7 @@ from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.common import log
 from indico.core.config import Config
 from MaKaC.common.contextManager import ContextManager
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 from MaKaC.common.fossilize import fossilize

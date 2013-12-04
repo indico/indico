@@ -69,7 +69,7 @@ from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.plugins.base import OldObservable
 from MaKaC.plugins.base import extension_point
 from indico.core import config as Configuration

@@ -28,7 +28,7 @@ from MaKaC.services.interface.rpc.common import CausedError
 from MaKaC.services.interface.rpc.common import NoReportError
 from MaKaC.services.interface.rpc.process import ServiceRunner
 
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from indico.util.json import dumps, loads
 
 class Json:

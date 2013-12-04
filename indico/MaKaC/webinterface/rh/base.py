@@ -53,7 +53,7 @@ from MaKaC.webinterface.mail import GenericMailer
 from xml.sax.saxutils import escape
 
 from MaKaC.common.utils import truncate
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 from indico.util.i18n import _, availableLocales
 from indico.util.json import create_json_error_answer

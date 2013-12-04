@@ -26,7 +26,7 @@ from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEV
     getMinStartDate, getMaxEndDate, OverlappedError, EVOError, ChangesFromEVOError, getRequestURL, EVOWarning, getEVOOptionValueByName
 from MaKaC.plugins.Collaboration.EVO.mail import NewEVOMeetingNotificationAdmin, EVOMeetingModifiedNotificationAdmin, EVOMeetingRemovalNotificationAdmin
 from MaKaC.common.mail import GenericMailer
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.plugins.Collaboration.EVO.fossils import ICSBookingConfModifFossil,\
     ICSBookingIndexingFossil

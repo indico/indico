@@ -33,7 +33,7 @@ from indico.web.handlers import RHHtdocs
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.conference import LocalFile
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase

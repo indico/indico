@@ -49,7 +49,7 @@ from indico.modules.oauth.components import OAuthUtils
 # indico legacy imports
 from indico.core.db import DBMgr
 from indico.core.config import Config
-from indico.core.logging import logger
+from indico.core.logger import Logger
 from MaKaC.common.fossilize import fossilize, clearCache
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo

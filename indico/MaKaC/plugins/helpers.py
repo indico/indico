@@ -18,7 +18,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.webinterface import urlHandlers
 from MaKaC.plugins.InstantMessaging.indexes import CounterIndex, IndexByConf, IndexByID, IndexByUser
