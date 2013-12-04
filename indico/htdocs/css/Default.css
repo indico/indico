@@ -6216,30 +6216,6 @@ div.cloneElements {
     height: 24px;
 }
 
-/*
-    Date field widget
-*/
-
-div.dateField {
-    border: 1px solid #AAAAAA;
-    width: 140px;
-    display: inline;
-    padding: 3px;
-    background: white;
-}
-
-div.dateField img {
-    vertical-align: middle;
-    padding: 2px;
-    cursor: pointer;
-}
-
-div.dateField input {
-    border: none;
-    vertical-align: middle;
-    width: 115px;
-}
-
 div.invalid {
     background: white;
 }

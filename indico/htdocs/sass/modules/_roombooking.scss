@@ -241,16 +241,16 @@ a.weekday {
 
 #mapOfRoomAvailabilityForm {
 
-    & .subFieldWidth {
+    .subFieldWidth {
         width: 60px;
     }
 
-    & #repeatability {
+    #repeatability {
         width: 115px;
     }
 
-    & div.dateField input {
-        width: 65px;
+    .dateField input {
+        width: 137px;
     }
 }
 
