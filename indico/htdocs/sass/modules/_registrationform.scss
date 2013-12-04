@@ -152,18 +152,35 @@
 }
 
 .regform-add-field-qtip {
-    max-width: 267px;
-    background: #fff;
-    border: 1px solid #ccc;
-    width: 267px;
+    @include border-all();
+    background: white;
 
-    & .ui-tooltip-content {
+    .qtip-content {
+        text-align: center;
+    }
+
+    .qtip-titlebar {
+        @include border-bottom();
+        padding: 5px 0;
+    }
+
+    .qtip-title {
+        color: $light-black;
+        text-align: center;
+        font-size: 1.2em;
+    }
+
+    .ui-tooltip-content {
         padding: 0px;
     }
 
-    & .ui-tooltip-titlebar {
+    .ui-tooltip-titlebar {
         border-bottom: none !important;
         background: transparent;
+    }
+
+    .i-big-button {
+        margin: 2px 0;
     }
 }
 
