@@ -172,10 +172,12 @@ a.i-big-button {
     @extend %button;
 
     background: #FFF;
+    display: inline-block;
     width: $size;
     height: $size;
 
     i {
+        display: block;
         font-size: 3em;
         line-height: ($size/3)*2;
     }
