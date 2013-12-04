@@ -21,7 +21,7 @@ ndRegForm.controller('FieldCtrl', function($scope) {
     // Explore the best way to implement it ;)
 });
 
-ndRegForm.directive('ndField', function($rootScope, url, RESTAPI) {
+ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
     return {
         restrict: 'E',
         replace: true,
@@ -50,7 +50,7 @@ ndRegForm.directive('ndField', function($rootScope, url, RESTAPI) {
                             postData.fieldId = dialogScope.field.id;
                         }
 
-                        RESTAPI.Fields.save(postData,
+                        regFormFactory.Fields.save(postData,
                             function(data, headers) {
                                 $scope.field = data;
                             });
@@ -68,7 +68,7 @@ ndRegForm.directive('ndField', function($rootScope, url, RESTAPI) {
                     return $scope.field.id == -1;
                 },
                 disableField: function(field) {
-                    RESTAPI.Fields.disable({confId: $scope.confId,
+                    regFormFactory.Fields.disable({confId: $scope.confId,
                                             sectionId: $scope.section.id,
                                             fieldId: $scope.field.id},
                         function(response) {
@@ -76,7 +76,7 @@ ndRegForm.directive('ndField', function($rootScope, url, RESTAPI) {
                     });
                 },
                 enableField: function(field) {
-                    RESTAPI.Fields.enable({confId: $scope.confId,
+                    regFormFactory.Fields.enable({confId: $scope.confId,
                                            sectionId: $scope.section.id,
                                            fieldId: field.id},
                         function(response) {
@@ -84,7 +84,7 @@ ndRegForm.directive('ndField', function($rootScope, url, RESTAPI) {
                     });
                 },
                 removeField: function(field) {
-                    RESTAPI.Fields.remove({confId: $scope.confId,
+                    regFormFactory.Fields.remove({confId: $scope.confId,
                                            sectionId: $scope.section.id,
                                            fieldId: field.id},
                         function(response) {

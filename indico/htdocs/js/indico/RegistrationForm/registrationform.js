@@ -45,7 +45,7 @@ ndRegForm.config(function(urlProvider) {
     urlProvider.setModulePath('/js/indico/RegistrationForm');
 });
 
-ndRegForm.factory('RESTAPI', ['$resource','baseurl', function($resource, baseurl) {
+ndRegForm.factory('regFormFactory', ['$resource','baseurl', function($resource, baseurl) {
 
     var sectionurl = baseurl + 'sections/:sectionId';
     var fieldurl = sectionurl + '/fields/:fieldId';
@@ -70,7 +70,7 @@ ndRegForm.factory('RESTAPI', ['$resource','baseurl', function($resource, baseurl
 // Directives
 // ============================================================================
 
-ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableoptions, RESTAPI) {
+ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableoptions, regFormFactory) {
     return {
         replace: true,
         templateUrl:  url.tpl('registrationform.tpl.html'),
@@ -84,7 +84,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableopti
             $rootScope.confId = $scope.confId;
             $rootScope.editMode = $scope.editMode;
 
-            var sections = RESTAPI.Sections.get({confId: $scope.confId}, function() {
+            var sections = regFormFactory.Sections.get({confId: $scope.confId}, function() {
                 $scope.sections = sections["sections"];
                 $rootScope.currency = sections["currency"];
             });
@@ -115,7 +115,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableopti
 
             $scope.api = {
                 createSection: function(data) {
-                    RESTAPI.Sections.save({confId: $scope.confId,
+                    regFormFactory.Sections.save({confId: $scope.confId,
                                             title: data.newsection.title,
                                             description: data.newsection.description},
                         function(newsection) {
@@ -123,7 +123,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableopti
                     });
                 },
                 moveSection: function(section, position){
-                    RESTAPI.Sections.move({confId: $scope.confId,
+                    regFormFactory.Sections.move({confId: $scope.confId,
                                            sectionId: section.id,
                                            endPos: position},
                         function(response) {
@@ -131,14 +131,14 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableopti
                     });
                 },
                 restoreSection: function(section) {
-                    RESTAPI.Sections.enable({confId: $rootScope.confId,
+                    regFormFactory.Sections.enable({confId: $rootScope.confId,
                                              sectionId: section.id},
                         function(response) {
                             section.enabled = response.enabled;
                      });
                 },
                 removeSection: function(section) {
-                    RESTAPI.Sections.remove({confId: $rootScope.confId,
+                    regFormFactory.Sections.remove({confId: $rootScope.confId,
                                             sectionId: section.id},
                         function(response) {
                             $scope.sections = response["sections"];

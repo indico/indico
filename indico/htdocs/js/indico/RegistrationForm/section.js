@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function($scope, $rootScope, RESTAPI) {
+ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','regFormFactory', function($scope, $rootScope, regFormFactory) {
     $scope.api = {};
     $scope.actions = {};
 
@@ -31,7 +31,7 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function(
     };
 
     $scope.api.disableSection = function(section) {
-        RESTAPI.Sections.disable({confId: $rootScope.confId, sectionId: section.id}, function(data) {
+        regFormFactory.Sections.disable({confId: $rootScope.confId, sectionId: section.id}, function(data) {
             section.enabled = data.enabled;
         });
     };
@@ -39,7 +39,7 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function(
     $scope.api.saveConfig = function(section, data) {
         var postData = getPostData(section);
         postData = angular.extend(postData, data);
-        RESTAPI.Sections.save(postData, function(sectionUpdated) {
+        regFormFactory.Sections.save(postData, function(sectionUpdated) {
             $scope.$parent.section = sectionUpdated;
             //TODO: why not with section variable?
         });
@@ -49,7 +49,7 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function(
         var postData = getPostData(section);
         postData = angular.extend(postData, data);
 
-        RESTAPI.Sections.title(postData, function(sectionUpdated) {
+        regFormFactory.Sections.title(postData, function(sectionUpdated) {
             $scope.$parent.section = sectionUpdated;
         });
     };
@@ -58,13 +58,13 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','RESTAPI', function(
         var postData = getPostData(section);
         postData = angular.extend(postData, data);
 
-        RESTAPI.Sections.description(postData, function(sectionUpdated) {
+        regFormFactory.Sections.description(postData, function(sectionUpdated) {
             $scope.$parent.section = sectionUpdated;
         });
     };
 
     $scope.api.moveField = function(field, position) {
-        RESTAPI.Fields.move({confId: $rootScope.confId,
+        regFormFactory.Fields.move({confId: $rootScope.confId,
                              sectionId: $scope.section.id,
                              fieldId: field.id,
                              endPos: position},
@@ -300,7 +300,7 @@ ndRegForm.directive("ndReasonSection", function() {
     };
 });
 
-ndRegForm.directive("ndSessionsSection", function($rootScope, RESTAPI) {
+ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
     return {
         require: 'ndSection',
 
@@ -311,7 +311,7 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, RESTAPI) {
                 return _.find($scope.section.items, function(session){ return session.id == id;}) !== undefined;
             };
 
-            var sessions = RESTAPI.Sessions.query({confId: $rootScope.confId}, function() {
+            var sessions = regFormFactory.Sessions.query({confId: $rootScope.confId}, function() {
                 _.each(sessions, function (item, ind) {
                     if(!$scope._hasSession(item.id)) {
                         $scope.section.items.push({id: item.id, caption: item.title, billable: false, price: 0, enabled: false});
