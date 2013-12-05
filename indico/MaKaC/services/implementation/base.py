@@ -16,7 +16,10 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
+
 from flask import request, session
+import distutils
 
 from MaKaC.conference import Category
 
@@ -111,7 +114,9 @@ class ParameterManager(object):
             elif pType == float:
                 value = float(value)
             elif pType == bool:
-                if not type(value) == bool:
+                try:
+                    value = distutils.util.strtobool(value)
+                except ValueError:
                     raise ExpectedParameterException(paramName, bool, type(value))
             elif pType == dict:
                 if not type(value) == dict:
