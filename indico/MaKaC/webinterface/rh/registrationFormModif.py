@@ -334,12 +334,16 @@ class RHRegistrationFormModifStatusPerformModif( RHRegistrationFormModifStatusBa
 
 class RegistrationFormModifRESTBase(RHRegistrationFormModifBase):
 
-    def getFormFossil(self):
-        return { 'sections'     : fossilize( self._conf.getRegistrationForm().getSortedForms() ),
-                  'currency'    : self._conf.getRegistrationForm().getCurrency()
-               }
+    def getFormFossil(self, editMode=True):
+        sectionList = [section for section in self._conf.getRegistrationForm().getSortedForms()
+                       if editMode or section.isEnabled()]
+        return {
+            'sections': fossilize(sectionList),
+            'currency': self._conf.getRegistrationForm().getCurrency()
+        }
+
     def getSectionsFossil(self):
-        return fossilize( self._conf.getRegistrationForm().getSortedForms() )
+        return fossilize(self._conf.getRegistrationForm().getSortedForms())
 
     def parseJsonItem(self, item):
         # Convert to boolean type
@@ -357,8 +361,12 @@ class RegistrationFormModifRESTBase(RHRegistrationFormModifBase):
 
 class RHRegistrationPreviewSectionQuery(RegistrationFormModifRESTBase):
 
+    def _checkParams_GET(self):
+        get_pm = ParameterManager(request.args)
+        self._editMode = get_pm.extract('editMode', pType=bool, allowEmpty=False)
+
     def _process_GET(self):
-        return jsonify(self.getFormFossil())
+        return json.dumps(self.getFormFossil(self._editMode))
 
     def _checkParams_POST(self):
         post_pm = ParameterManager(request.json)

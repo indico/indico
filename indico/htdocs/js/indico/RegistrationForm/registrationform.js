@@ -84,7 +84,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableopti
             $rootScope.confId = $scope.confId;
             $rootScope.editMode = $scope.editMode;
 
-            var sections = regFormFactory.Sections.get({confId: $scope.confId}, function() {
+            var sections = regFormFactory.Sections.get({confId: $scope.confId, editMode: $scope.editMode}, {}, function() {
                 $scope.sections = sections["sections"];
                 $rootScope.currency = sections["currency"];
             });
