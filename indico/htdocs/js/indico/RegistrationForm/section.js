@@ -19,7 +19,7 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','regFormFactory', fu
     $scope.api = {};
     $scope.actions = {};
 
-    var getPostData = function(section) {
+    var getRequestParams = function(section) {
         return {
             confId: $rootScope.confId,
             sectionId: section.id
@@ -31,47 +31,47 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','regFormFactory', fu
     };
 
     $scope.api.disableSection = function(section) {
-        regFormFactory.Sections.disable({confId: $rootScope.confId, sectionId: section.id}, function(data) {
-            section.enabled = data.enabled;
+        regFormFactory.Sections.disable(getRequestParams(section), function(updatedSection) {
+            section.enabled = updatedSection.enabled;
         });
     };
 
     $scope.api.saveConfig = function(section, data) {
-        var postData = getPostData(section);
-        postData = angular.extend(postData, data);
-        regFormFactory.Sections.save(postData, function(sectionUpdated) {
-            $scope.$parent.section = sectionUpdated;
+        var requestParams = angular.extend(getRequestParams(section), data);
+        regFormFactory.Sections.save(requestParams, function(updatedSection) {
+            $scope.$parent.section = updatedSection;
             //TODO: why not with section variable?
         });
     };
 
     $scope.api.updateTitle = function(section, data) {
-        var postData = getPostData(section);
-        postData = angular.extend(postData, data);
+        var requestParams = angular.extend(getRequestParams(section), data);
 
-        regFormFactory.Sections.title(postData, function(sectionUpdated) {
-            $scope.$parent.section = sectionUpdated;
+        regFormFactory.Sections.title(requestParams, function(updatedSection) {
+            $scope.section.title = updatedSection.title;
         });
     };
 
     $scope.api.updateDescription = function(section, data) {
-        var postData = getPostData(section);
-        postData = angular.extend(postData, data);
+        var requestParams = angular.extend(getRequestParams(section), data);
 
-        regFormFactory.Sections.description(postData, function(sectionUpdated) {
-            $scope.$parent.section = sectionUpdated;
+        regFormFactory.Sections.description(requestParams, function(updatedSection) {
+            $scope.section.description = updatedSection.description;
         });
     };
 
-    $scope.api.moveField = function(field, position) {
-        regFormFactory.Fields.move({confId: $rootScope.confId,
-                             sectionId: $scope.section.id,
-                             fieldId: field.id,
-                             endPos: position},
-            function(data) {
-                // TODO we are breaking two-way binding here
-                $scope.field = data;
-            });
+    $scope.api.moveField = function(section, field, position) {
+        var requestParams = angular.extend(getRequestParams(section), {
+            fieldId: field.id,
+            endPos: position
+        });
+
+        regFormFactory.Fields.move(requestParams, function(updatedSection) {
+            // TODO in case backend rejects request we should update scope with something like:
+            // if (response.error) {
+            //     $scope.section.items = response.updatedSection.items;
+            // }
+        });
     };
 
     $scope.actions.openAddField = function(section, field, type) {
@@ -152,7 +152,8 @@ ndRegForm.directive('ndSection', function($rootScope, url) {
 ndRegForm.directive("ndGeneralSection", function($timeout, url, sortableoptions) {
     return {
         require: 'ndSection',
-        controller: 'SectionCtrl', //TODO check inheritance
+        controller: 'SectionCtrl',
+
         link: function(scope) {
             scope.buttons.newfield = true;
             scope.buttons.disable = true;
@@ -172,13 +173,9 @@ ndRegForm.directive("ndGeneralSection", function($timeout, url, sortableoptions)
                 }
             };
 
-            scope.api.commitNewField = function() {
-                // TODO is this needed?
-            };
-
             scope.fieldSortableOptions = {
                 update: function(e, ui) {
-                    scope.api.moveField(ui.item.scope().field, ui.item.index());
+                    scope.api.moveField(scope.section, ui.item.scope().field, ui.item.index());
                 },
                 // TODO Re-enable when solved: http://bugs.jqueryui.com/ticket/5772
                 // containment: '.field-list',
@@ -217,7 +214,13 @@ ndRegForm.directive("ndAccommodationSection", function() {
 
             scope.dialogs.config.editionTable = {
                 sortable: false,
-                colNames: [$T("caption"), $T("billable"),  $T("price"), $T("place limit"), $T("cancelled")],
+                colNames: [
+                    $T("caption"),
+                    $T("billable"),
+                    $T("price"),
+                    $T("place limit"),
+                    $T("cancelled")
+                ],
                 actions: ['remove'],
                 colModel: [
                        {
@@ -304,17 +307,22 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
     return {
         require: 'ndSection',
 
-
         controller: function($scope) {
-
             $scope._hasSession= function(id) {
-                return _.find($scope.section.items, function(session){ return session.id == id;}) !== undefined;
+                return _.find($scope.section.items, function(session) {
+                    return session.id == id;
+                }) !== undefined;
             };
 
             var sessions = regFormFactory.Sessions.query({confId: $rootScope.confId}, function() {
                 _.each(sessions, function (item, ind) {
                     if(!$scope._hasSession(item.id)) {
-                        $scope.section.items.push({id: item.id, caption: item.title, billable: false, price: 0, enabled: false});
+                        $scope.section.items.push({
+                            id: item.id,
+                            caption: item.title,
+                            billable: false,
+                            price: 0, enabled: false
+                        });
                     }
                 });
             });

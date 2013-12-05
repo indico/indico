@@ -15,10 +15,116 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-ndRegForm.controller('FieldCtrl', function($scope) {
-    // TODO: do something similar to SectionCtrl
-    // The purpose is having a field api to which several directives may need to work with
-    // Explore the best way to implement it ;)
+ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
+    $scope.fieldApi = {};
+
+    var getResquestParams = function(field) {
+        return {
+            confId: $scope.confId,
+            sectionId: $scope.section.id,
+            fieldId: field.id
+        };
+    };
+
+    $scope.fieldApi.disableField = function(field) {
+        regFormFactory.Fields.disable(getResquestParams(field), function(response) {
+            $scope.field.disabled = response.disabled;
+        });
+    };
+
+    $scope.fieldApi.enableField = function(field) {
+        regFormFactory.Fields.enable(getResquestParams(field), function(response) {
+            $scope.field.disabled = response.disabled;
+        });
+    };
+
+    $scope.fieldApi.removeField = function(field) {
+        regFormFactory.Fields.remove(getResquestParams(field), function(response) {
+            $scope.section.items = response.items;
+        });
+    };
+
+    $scope.getName = function(input) {
+        if (input == 'date') {
+            return '_genfield_' + $scope.section.id + '_' + $scope.field.id;
+        } else {
+            return '*genfield*' + $scope.section.id + '-' + $scope.field.id;
+        }
+    };
+
+    $scope.openFieldSettings = function() {
+        $scope.dialog.open = true;
+    };
+
+    $scope.canBeDeleted = function(field) {
+        return field.lock? field.lock.indexOf('delete') == -1 : false;
+    };
+
+    $scope.canBeDisabled = function(field) {
+        return field.lock? field.lock.indexOf('disable') == -1 : false;
+    };
+
+    $scope.isBillable = function(field) {
+        return field.billable && !$scope.isDisabled(field);
+    };
+
+    $scope.isDisabled = function(field) {
+        return field.placesLimit !== 0 && field.noPlacesLeft === 0;
+    };
+
+    $scope.isNew = function() {
+        return $scope.field.id == -1;
+    };
+
+    $scope.hasPlacesLeft = function(field) {
+        return !$scope.isDisabled(field) && field.placesLimit !== 0 && field.noPlacesLeft >= 0;
+    };
+
+    $scope.settings = {
+        billable: false,
+        date: false,
+        defaultValue: false,
+        number: false,
+        placesLimit: false,
+        rowsAndColumns: false,
+        size: false,
+        formData: [
+            'caption',
+            'description',
+            'mandatory'
+        ]
+    };
+
+    $scope.dialog = {
+        open: false,
+        title: function() {
+            return $scope.isNew()? $T('New Field') : $T('Edit Field');
+        },
+        okButton: function() {
+            return $scope.isNew()? $T('Add') : $T('Update');
+        },
+        onOk: function(dialogScope) {
+            var postData = {
+                confId: $scope.confId,
+                sectionId: $scope.section.id,
+                fieldData: dialogScope.formData
+            };
+
+            if(!$scope.isNew()) {
+                postData.fieldId = dialogScope.field.id;
+            }
+
+            regFormFactory.Fields.save(postData,
+                function(data, headers) {
+                    $scope.field = data;
+                });
+        },
+        onCancel: function() {
+            if ($scope.isNew()) {
+                $scope.api.removeNewField();
+            }
+        }
+    };
 });
 
 ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
@@ -26,124 +132,14 @@ ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
         restrict: 'E',
         replace: true,
         templateUrl: url.tpl('field.tpl.html'),
-
-        controller: function($scope) {
-            // TODO If we go for having a FieldCtrl, all this fiddling with the scope must be
-            // moved to the link function
-            $scope.dialogs = {
-                settings: {
-                    title: function() {
-                        return $scope.fieldApi.isNew()? $T('New Field') : $T('Edit Field');
-                    },
-                    open: false,
-                    okButton: function() {
-                        return $scope.fieldApi.isNew()? $T('Add') : $T('Update');
-                    },
-                    onOk: function(dialogScope) {
-                        var postData = {
-                            confId: $scope.confId,
-                            sectionId: $scope.section.id,
-                            fieldData: dialogScope.formData
-                        };
-
-                        if(!$scope.fieldApi.isNew()) {
-                            postData.fieldId = dialogScope.field.id;
-                        }
-
-                        regFormFactory.Fields.save(postData,
-                            function(data, headers) {
-                                $scope.field = data;
-                            });
-                    },
-                    onCancel: function() {
-                        if ($scope.fieldApi.isNew()) {
-                            $scope.api.removeNewField();
-                        }
-                    }
-                }
-            };
-
-            $scope.fieldApi = {
-                isNew: function() {
-                    return $scope.field.id == -1;
-                },
-                disableField: function(field) {
-                    regFormFactory.Fields.disable({confId: $scope.confId,
-                                            sectionId: $scope.section.id,
-                                            fieldId: $scope.field.id},
-                        function(response) {
-                            $scope.field.disabled = response.disabled;
-                    });
-                },
-                enableField: function(field) {
-                    regFormFactory.Fields.enable({confId: $scope.confId,
-                                           sectionId: $scope.section.id,
-                                           fieldId: field.id},
-                        function(response) {
-                            $scope.field.disabled = response.disabled;
-                    });
-                },
-                removeField: function(field) {
-                    regFormFactory.Fields.remove({confId: $scope.confId,
-                                           sectionId: $scope.section.id,
-                                           fieldId: field.id},
-                        function(response) {
-                            $scope.section.items = response.items;
-                    });
-                }
-            };
-
-            $scope.settings = {
-                billable: false,
-                date: false,
-                defaultValue: false,
-                number: false,
-                placesLimit: false,
-                rowsAndColumns: false,
-                size: false,
-                formData: [
-                    'caption',
-                    'description',
-                    'mandatory'
-                ]
-            };
-
-            $scope.getName = function(input) {
-                if (input == 'date') {
-                    return '_genfield_' + $scope.section.id + '_' + $scope.field.id;
-                } else {
-                    return '*genfield*' + $scope.section.id + '-' + $scope.field.id;
-                }
-            };
-
-            $scope.openFieldSettings = function() {
-                $scope.dialogs.settings.open = true;
-            };
-
-            // TODO Consider moving it to fieldApi, or even better, FielCtrl
-            $scope.isDisabled = function(field) {
-                return field.placesLimit !== 0 && field.noPlacesLeft === 0;
-            };
-
-            $scope.isBillable = function(field) {
-                return field.billable && !$scope.isDisabled(field);
-            };
-
-            $scope.hasPlacesLeft = function(field) {
-                return !$scope.isDisabled(field) && field.placesLimit !== 0 && field.noPlacesLeft >= 0;
-            };
-
-            $scope.isFieldActive = function (field) {
-                return field.id != -1;
-            };
-        },
+        controller: 'FieldCtrl',
 
         link: function(scope) {
             // This is a broadcast message from parent (section) scope
             // TODO look for broadcast messages to children the angular way
             scope.$parent.$watch('dialogs.newfield', function(val) {
-                if (val && scope.fieldApi.isNew()) {
-                    scope.dialogs.settings.open = true;
+                if (val && scope.isNew()) {
+                    scope.dialog.open = true;
                     scope.$parent.dialogs.newfield = false;
                 }
             });
@@ -265,10 +261,17 @@ ndRegForm.directive('ndRadioField', function(url) {
             scope.settings.formData.push(['values', 'defaultItem']);
             scope.settings.formData.push(['values', 'inputType']);
 
+            // TODO remove unused colmodel
             scope.settings.editionTable = {
                 sortable: false,
                 actions: ['remove', 'sortable'],
-                colNames:[$T("caption"), $T("billable"), $T("price"), $T("places limit"), $T("enable")],
+                colNames:[
+                    $T("caption"),
+                    $T("billable"),
+                    $T("price"),
+                    $T("places limit"),
+                    $T("enable")],
+
                 colModel: [
                     {name:'caption',
                      index:'caption',

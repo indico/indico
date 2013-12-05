@@ -1,4 +1,4 @@
-<div ng-show="isFieldActive(field)">
+<div ng-hide="isNew()">
     <table border="0" cellpadding="0" cellspacing="0"
         class="regform-field"
         ng-class="{disabled: field.disabled, editable: editMode}"
@@ -13,19 +13,18 @@
             <td ng-include="tplInput" class="field-input"></td>
 
             <td ng-if="editMode" class="field-actions">
-                <a ng-if="field.disabled"
-                    ng-click="fieldApi.enableField(field)"
-                    class="icon-plus"
-                    title="{{ 'Enable field' | i18n }}"/>
-                <!-- TODO move logic to controller -->
-                <a ng-if="!field.disabled && field.lock.indexOf('disable') == -1"
-                    ng-click="fieldApi.disableField(field)"
-                    class="icon-disable"
-                    title="{{ 'Disable field' | i18n }}"/>
-                <a ng-if="field.lock.indexOf('delete') == -1"
+                <a ng-if="canBeDeleted(field)"
                     ng-click="fieldApi.removeField(field)"
                     class="icon-remove"
                     title="{{ 'Remove field' | i18n }}"/>
+                <a ng-if="field.disabled"
+                    ng-click="fieldApi.enableField(field)"
+                    class="icon-checkmark"
+                    title="{{ 'Enable field' | i18n }}"/>
+                <a ng-if="canBeDisabled(field) && !field.disabled"
+                    ng-click="fieldApi.disableField(field)"
+                    class="icon-disable"
+                    title="{{ 'Disable field' | i18n }}"/>
                 <a ng-click="openFieldSettings()"
                     class="icon-settings"
                     title="{{ 'Configure field' | i18n }}"/>
@@ -35,12 +34,12 @@
 
     <nd-dialog nd-field-dialog
         ng-if="editMode"
-        show="dialogs.settings.open"
-        heading="{{ dialogs.settings.title() }}"
-        ok-button="{{ dialogs.settings.okButton() }}"
+        show="dialog.open"
+        heading="{{ dialog.title() }}"
+        ok-button="{{ dialog.okButton() }}"
         cancel-button="{{ 'Cancel' | i18n }}"
-        ok-callback="dialogs.settings.onOk(dialogScope)"
-        cancel-callback="dialogs.settings.onCancel()"
+        ok-callback="dialog.onOk(dialogScope)"
+        cancel-callback="dialog.onCancel()"
         config="settings"
         data="field">
     </nd-dialog>

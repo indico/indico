@@ -7,9 +7,10 @@
         </li>
     </ul>
     <div class="tab-content regFormDialogTabContent" style="width: {{ config.contentWidth }}px; overflow: hidden; white-space: nowrap;">
-        <div ng-repeat="tab in config.tabs" class="tab-pane" ng-class="{active: isTabSelected(tab.id)}" id="div-{{ tab.id }}">
-            <div ng-include="getTabTpl(section.id, tab.type)">
-            </div>
+        <div ng-repeat="tab in config.tabs"
+            class="tab-pane"
+            ng-class="{active: isTabSelected(tab.id)}" id="div-{{ tab.id }}">
+            <div ng-include="getTabTpl(section.id, tab.type)"></div>
         </div>
     </div>
 </div>
