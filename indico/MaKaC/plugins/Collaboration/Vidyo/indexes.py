@@ -193,9 +193,12 @@ class BookingsByVidyoRoomIndex(SIndex):
         i = 0
         self.clear()
         for conf in ConferenceHolder().getList():
-            csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
+            idx = Catalog.getIdx("cs_bookingmanager_conference")
+            if idx is None:
+                idx = Catalog.create_idx("cs_bookingmanager_conference")
+            csbm = idx.get(conf.getId())
             for booking in csbm.getBookingList():
-                if booking.getType() == "Vidyo"and booking.isCreated():
+                if booking.getType() == "Vidyo" and booking.isCreated():
                     self.indexBooking(booking)
             i += 1
             if dbi and i % 100 == 0:

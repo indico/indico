@@ -818,14 +818,8 @@ def addSuggestionsTask(dbi, withRBDB, prevVersion):
 def removeVideoServicesLinksFromCore(dbi, withRBDB, prevVersion):
     """Video Services migration remove from core"""
     ch = ConferenceHolder()
-    idx = Catalog.getIdx("cs_bookingmanager_conference")
     i = 0
     for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
-        # Store CSBookingManager in the index
-        csbm = getattr(conf, "_CSBookingManager", None)
-        if csbm is None:
-            continue
-        idx.index(conf.getId(), csbm)
         # Update Menu Links
         menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf).getMenu()
         if menu:

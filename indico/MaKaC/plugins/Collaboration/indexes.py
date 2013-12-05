@@ -26,6 +26,7 @@ from MaKaC.common.timezoneUtils import unixTimeToDatetime,\
     datetimeToUnixTimeInt
 from MaKaC.conference import ConferenceHolder, CategoryManager, Contribution
 from datetime import datetime
+from MaKaC.plugins.Collaboration.base import CSBookingManager
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.fossilize import fossilize, Fossilizable, fossilizes
 from MaKaC.plugins.Collaboration.fossils import IIndexInformationFossil,\
@@ -614,10 +615,18 @@ class BookingManagerConferenceIndex(Persistent):
 
     def __init__(self):
         self._tree = OOBTree()
-        self._name =  "bookingManagerByConf"
+        self._name = "bookingManagerByConf"
 
     def initialize(self, dbi=None):
-        pass
+        for i, conf in enumerate(ConferenceHolder()._getIdx().itervalues()):
+            # Store CSBookingManager in the index
+            csbm = getattr(conf, "_CSBookingManager", None)
+            if csbm is None:
+                csbm = CSBookingManager(conf)
+            self.index(conf.getId(), csbm)
+            if dbi and i % 1000 == 999:
+                dbi.commit()
+        dbi.commit()
 
     def getName(self):
         return self._name
