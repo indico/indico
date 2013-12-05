@@ -140,3 +140,45 @@ ndDirectives.directive("contenteditable", function() {
         }
     };
 });
+
+ndDirectives.directive('ndDatepicker', function() {
+    return {
+        restrict: 'E',
+        scope: {
+            showTime: '=',
+            hiddenInputs: '@',
+            dateFormat: '@'
+        },
+
+        link: function(scope, element) {
+            var hiddenInputs =
+                scope.$eval(scope.hiddenInputs) ||
+                ['day', 'month', 'year', 'hour', 'min'];
+
+            scope.init = function() {
+                element.html(scope.getDatePicker().dom);
+                _.each(hiddenInputs, function(id) {
+                    element.append(
+                        '<input type="hidden" value="" name="{0}" id="{1}"/>'.format(id, id)
+                    );
+                });
+            };
+
+            scope.getDatePicker = function() {
+                return IndicoUI.Widgets.Generic.dateField(
+                    scope.showTime,
+                    null,
+                    hiddenInputs,
+                    null,
+                    scope.dateFormat
+                );
+            };
+
+            scope.$watch('dateFormat', function(newVal, oldVal) {
+                scope.init();
+            });
+
+            scope.init();
+        }
+    };
+});
