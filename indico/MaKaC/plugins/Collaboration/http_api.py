@@ -21,7 +21,7 @@ import icalendar as ical
 from datetime import timedelta
 
 from indico.core.index import Catalog
-from indico.web.http_api.api import HTTPAPIHook, IteratedDataFetcher
+from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 from indico.web.http_api.metadata.ical import ICalSerializer
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.responses import HTTPAPIError

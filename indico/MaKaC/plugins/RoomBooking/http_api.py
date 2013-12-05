@@ -43,7 +43,7 @@ from MaKaC.plugins.RoomBooking.common import rb_check_user_access
 
 # indico imports
 from indico.web.http_api.responses import HTTPAPIError
-from indico.web.http_api.api import IteratedDataFetcher, HTTPAPIHook
+from indico.web.http_api.hooks.base import IteratedDataFetcher, HTTPAPIHook
 from indico.web.http_api.util import get_query_parameter
 from indico.util.fossilize import fossilize, IFossil
 from indico.util.fossilize.conversion import Conversion
