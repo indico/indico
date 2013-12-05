@@ -74,6 +74,7 @@ from MaKaC.user import Group, PrincipalHolder
 RETRIEVED_FIELDS = ['uid', 'cn', 'mail', 'o', 'ou', 'company', 'givenName',
                     'sn', 'postalAddress', 'userPrincipalName', "telephoneNumber", "facsimileTelephoneNumber"]
 UID_FIELD = "cn"  # or uid
+SEARCH_EXTRA_FILTER = "(objectCategory=user)"  # Specific for CERN Active Directory for user lookup
 MEMBER_ATTR = "member"
 MEMBER_PAGE_SIZE = 1500
 
@@ -166,7 +167,8 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             return {}
         ldapc = LDAPConnector()
         ldapc.open()
-        fquery = "(&%s)" % ''.join(lfilter)
+        fquery = "(&{0}{1})".format(SEARCH_EXTRA_FILTER, ''.join(lfilter))
+
         d = ldapc.findUsers(fquery)
         ldapc.close()
         return d
@@ -648,7 +650,7 @@ class LDAPTools:
         av["address"] = [udata["address"]]
         av["phone"] = udata["phone"]
         av["fax"] = udata["fax"]
-        av["id"] = 'LDAP:'+udata["login"]
+        av["id"] = 'LDAP:{0}:{1}'.format(udata["login"], udata["email"])
         av["status"] = "NotCreated"
         return av
 

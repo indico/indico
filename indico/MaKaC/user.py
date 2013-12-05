@@ -1275,10 +1275,10 @@ class AvatarHolder(ObjectHolder):
         except:
             pass
         try:
-            authId, extId = id.split(":")
+            authId, extId, email = id.split(":")
         except:
             return None
-        av = self.match({"email":extId}, searchInAuthenticators=False)
+        av = self.match({"email": email}, searchInAuthenticators=False)
         if av:
             return av[0]
         user_data = AuthenticatorMgr().getById(authId).searchUserById(extId)
