@@ -182,11 +182,21 @@ ndRegForm.directive('ndDateField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/date.tpl.html');
-            $scope.calendarimg = imageSrc("calendarWidget");
         },
 
         link: function(scope) {
             scope.settings.date = true;
+            scope.dateInputs = [
+                '{0}_Day'.format(scope.getName(scope.field.input)),
+                '{0}_Month'.format(scope.getName(scope.field.input)),
+                '{0}_Year'.format(scope.getName(scope.field.input)),
+                '{0}_Hour'.format(scope.getName(scope.field.input)),
+                '{0}_Min'.format(scope.getName(scope.field.input))
+            ];
+
+            scope.showTime = function(str) {
+                return str? str.match('H') !== null : false;
+            };
         }
     };
 });

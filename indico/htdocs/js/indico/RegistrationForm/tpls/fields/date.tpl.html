@@ -1,20 +1,14 @@
 <span id="{{ getName(field.input) }}_DatePlace">
-    <span class="dateField">
-        <input type="text"
-            ng-required="field.mandatory">
-        <img src="{{ calendarimg }}">
-    </span>
+    <nd-datepicker
+        show-time="showTime(field.values.dateFormat)"
+        hidden-inputs="{{ dateInputs }}"
+        date-format="{{ field.values.dateFormat }}">
+    </nd-datepicker>
 </span>
-
-<input type="hidden" value="" name="{{ getName(field.input) }}_Day" id="{{ getName(field.input) }}_Day">
-<input type="hidden" value="" name="{{ getName(field.input) }}_Month" id="{{ getName(field.input) }}_Month">
-<input type="hidden" value="" name="{{ getName(field.input) }}_Year" id="{{ getName(field.input) }}_Year">
-<input type="hidden" value="" name="{{ getName(field.input) }}_Hour" id="{{ getName(field.input) }}_Hour">
-<input type="hidden" value="" name="{{ getName(field.input) }}_Min" id="{{ getName(field.input) }}_Min">
 
 <span class="inputDescription">
     <span ng-repeat="el in field.values.displayFormats" ng-show="el[0] == field.values.dateFormat">
-            {{ el[1] }}
+        {{ el[1] }}
     </span>
 </span>
 
