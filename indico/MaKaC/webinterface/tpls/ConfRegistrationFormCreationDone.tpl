@@ -21,7 +21,7 @@
     }
     -->
     </script>
-    <table width="80%" align="center">
+    <table>
         <tr>
             <td style="padding: 0 0 15px 0">
                 ${ _("Thank you for completing the registration form which has been sent to the organisers for their attention.")}
