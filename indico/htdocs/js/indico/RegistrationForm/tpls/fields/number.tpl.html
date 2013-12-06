@@ -1,18 +1,24 @@
 <input type="number"
+    ng-model="numberInput"
+    ng-init="numberInput = field.values.minValue"
     id="{{ getName(field.input) }}"
     name="{{ getName(field.input) }}"
-    value="{{ field.values.minValue }}"
     size="{{ field.values.length }}"
     min="{{ field.values.minValue }}"
     ng-class="{regFormIsBillable: isBillable(field)}"
-    ng-required="field.mandatory">
-    <!--ng-change="change()"/-->
+    ng-required="field.mandatory"
+    ng-change="updateSubtotal(numberInput)"/>
 
-<span ng-show="field.billable" class="regFormPrice">{{ field.price }}</span>
-<span ng-show="field.billable" class="regFormCurrency">{{ currency }}</span>
-<span class="regFormSubtotal">{{ 'Total' | i18n }}:</span>
-<span id="subtotal-{{ getName(field.input) }}">0</span>
-<span ng-show="field.billable" class="regFormCurrency">{{ currency }}</span>
+<span ng-if="isBillable(field)">
+    <span class="regFormPrice">{{ field.price }}</span>
+    <span class="regFormCurrency">{{ currency }}</span>
+    <span class="regFormSubtotal">{{ 'Total' | i18n }}:</span>
+    <span id="subtotal">
+        {{ subtotal }}
+    </span>
+    <span class="regFormCurrency">{{ currency }}</span>
+</span>
+
 <span class="inputDescription">
     {{ field.description }}
 </span>

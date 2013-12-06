@@ -233,17 +233,18 @@ ndRegForm.directive('ndNumberField', function(url) {
             scope.settings.number = true;
             scope.settings.formData.push('billable');
             scope.settings.formData.push('price');
-            scope.settings.formData.push(['value', 'minValue']);
-            scope.settings.formData.push(['value', 'length']);
+            scope.settings.formData.push(['values', 'minValue']);
+            scope.settings.formData.push(['values', 'length']);
 
-            scope.change = function() {
-                // TODO do this the angular way
-                // TODO var value = get value from input (avoid jQuery)
-                /*$E('subtotal-{{ name }}').dom.innerHTML =
-                    ((isNaN(parseInt(value, 10)) || parseInt(value, 10) < 0) ?
-                    0:
-                    parseInt(value, 10)) * scope.field.price;*/
+            scope.updateSubtotal = function(value) {
+                if ((isNaN(parseInt(value, 10)) || parseInt(value, 10) < 0)) {
+                    scope.subtotal = 0;
+                } else {
+                    scope.subtotal = parseInt(value, 10) * parseInt(scope.field.price, 10);
+                }
             };
+
+            scope.updateSubtotal(scope.field.values.minValue);
         }
 
     };
