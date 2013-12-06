@@ -209,8 +209,8 @@ ndRegForm.directive("ndAccommodationSection", function() {
             scope.dialogs.config.formData.push('arrivalOffsetDates');
             scope.dialogs.config.formData.push('departureOffsetDates');
             scope.dialogs.config.tabs = [
-                {id: 'config',              name: $T("Configuration"),          type: 'config' },
-                {id: 'editAccomodation',    name: $T("Edit accommodations"),    type: 'editionTable' }
+                {id: 'config', name: $T("Configuration"), type: 'config' },
+                {id: 'editAccomodation', name: $T("Edit accommodations"), type: 'editionTable' }
             ];
 
             scope.dialogs.config.contentWidth = 615;
@@ -337,8 +337,8 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
 
             scope.dialogs.config.formData.push('type');
             scope.dialogs.config.tabs = [
-                {id: 'config',          name: $T("Configuration"),      type: 'config'},
-                {id: 'editSessions',    name: $T("Manage sessions"),    type: 'editionTable'}
+                {id: 'config', name: $T("Configuration"), type: 'config'},
+                {id: 'editSessions', name: $T("Manage sessions"), type: 'editionTable'}
             ];
 
             scope.dialogs.config.contentWidth = 750;
@@ -553,7 +553,7 @@ ndRegForm.directive('ndSectionDialog', function(url) {
 
         link: function(scope) {
             scope.getTabTpl = function(section_id, tab_type) {
-                return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(tab_type, section_id));
+                return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(section_id, tab_type));
             };
         }
     };
