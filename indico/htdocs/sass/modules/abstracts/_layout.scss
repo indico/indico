@@ -20,6 +20,7 @@
 */
 
 @import "base/utilities";
+@import "base/grid";
 @import "partials/icons";
 @import "compass/css3/user-interface";
 
@@ -92,8 +93,8 @@ $box-border-color: lighten($gray, 10%);
       padding: 0 1em 0 1em;
 
       .column {
+        @include grid-column(3);
         @include box-sizing(border-box);
-        width: 33.3%;
         float: left;
         padding-left: 1em;
 
@@ -117,10 +118,6 @@ $box-border-color: lighten($gray, 10%);
               color: $light-black;
             }
           }
-        }
-
-        &:nth-child(4n) {
-          clear: both;
         }
 
         font-size: 1em;
