@@ -35,6 +35,7 @@ from MaKaC.PDFinterface.conference import TicketToPDF
 from indico.web.flask.util import send_file
 
 from indico.util import json
+from indico.util.fossilize import fossilize
 
 
 class RHBaseRegistrationForm( RHConferenceBaseDisplay ):
@@ -95,6 +96,7 @@ class RHRegistrationFormDisplayBase( RHBaseRegistrationForm ):
             self._redirect( self._getLoginURL() )
             self._doProcess = False
 
+
 class RHRegistrationFormDisplay( RHRegistrationFormDisplayBase ):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 
@@ -109,6 +111,13 @@ class RHRegistrationFormDisplay( RHRegistrationFormDisplayBase ):
             else:
                 p = registrationForm.WPRegistrationFormDisplay(self, self._conf)
         return p.display()
+
+
+class RHRegistrationDisplaySectionQuery(RHBaseRegistrationForm):
+
+    def _process(self):
+        return json.dumps(fossilize(section for section in self._regForm.getSortedForms() if section.isEnabled()))
+
 
 class RHRegistrationFormCreation( RHRegistrationFormDisplayBase ):
     _uh = urlHandlers.UHConfRegistrationFormDisplay

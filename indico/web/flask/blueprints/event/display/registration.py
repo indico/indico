@@ -25,6 +25,10 @@ from indico.web.flask.blueprints.event.display import event
 event.add_url_rule('/registration/registrants', 'confRegistrantsDisplay-list', registrantsDisplay.RHRegistrantsList)
 
 # Registration
+# Sections
+event.add_url_rule('/registration/sections', 'confRegistrationFormDisplaySection-query',
+                   registrationFormDisplay.RHRegistrationDisplaySectionQuery, methods=('GET',))
+event.add_url_rule('/registration/', 'confRegistrationFormDisplay', registrationFormDisplay.RHRegistrationForm)
 event.add_url_rule('/registration/', 'confRegistrationFormDisplay', registrationFormDisplay.RHRegistrationForm)
 event.add_url_rule('/registration/conditions', 'confRegistrationFormDisplay-conditions',
                    registrationFormDisplay.RHRegistrationFormConditions)

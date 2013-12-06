@@ -24,8 +24,12 @@ var ndRegForm = angular.module('nd.regform', [
 // Initialization
 // ============================================================================
 
-ndRegForm.value('baseurl',
+ndRegForm.value('editionurl',
     Indico.Urls.Base + '/event/:confId/manage/registration/preview/'
+);
+
+ndRegForm.value('displayurl',
+    Indico.Urls.Base + '/event/:confId/registration/sections'
 );
 
 ndRegForm.value('sortableoptions', {
@@ -45,12 +49,14 @@ ndRegForm.config(function(urlProvider) {
     urlProvider.setModulePath('/js/indico/RegistrationForm');
 });
 
-ndRegForm.factory('regFormFactory', ['$resource','baseurl', function($resource, baseurl) {
+ndRegForm.factory('regFormFactory', function($resource, editionurl, displayurl) {
 
-    var sectionurl = baseurl + 'sections/:sectionId';
+    var sectionurl = editionurl + 'sections/:sectionId';
     var fieldurl = sectionurl + '/fields/:fieldId';
     return {
         Sections: $resource(sectionurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId"}, {
+            "getAllSections": {method: 'GET', isArray: true},
+            "getVisibleSections": {url: displayurl, method: 'GET', isArray: true},
             "enable": {method: 'POST', url: sectionurl + "/enable"},
             "disable": {method: 'POST', url: sectionurl + "/disable"},
             "move": {method: 'POST', url: sectionurl + "/move"},
@@ -64,13 +70,13 @@ ndRegForm.factory('regFormFactory', ['$resource','baseurl', function($resource, 
         }),
         Sessions: $resource(Indico.Urls.Base + '/event/:confId/manage/sessions', {8000: ":8000", confId: '@confId'}, {})
     };
-}]);
+});
 
 // ============================================================================
 // Directives
 // ============================================================================
 
-ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableoptions, regFormFactory) {
+ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regFormFactory) {
     return {
         replace: true,
         templateUrl:  url.tpl('registrationform.tpl.html'),
@@ -86,7 +92,12 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableopti
             $rootScope.editMode = $scope.editMode;
             $rootScope.currency = $scope.currency;
 
-            $scope.sections = regFormFactory.Sections.query({confId: $scope.confId, editMode: $scope.editMode}, {});
+            if($rootScope.editMode) {
+                $scope.sections = regFormFactory.Sections.getAllSections({confId: $scope.confId}, {});
+            } else {
+                $scope.sections = regFormFactory.Sections.getVisibleSections({confId: $scope.confId}, {});
+            }
+
 
             $scope.dialogs = {
                 addsection: false,
