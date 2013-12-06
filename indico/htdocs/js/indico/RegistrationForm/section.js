@@ -26,10 +26,6 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','regFormFactory', fu
         };
     };
 
-    $scope.api.createSection = function(section) {
-        // TODO see how to push a section into the list of sections
-    };
-
     $scope.api.disableSection = function(section) {
         regFormFactory.Sections.disable(getRequestParams(section), function(updatedSection) {
             section.enabled = updatedSection.enabled;

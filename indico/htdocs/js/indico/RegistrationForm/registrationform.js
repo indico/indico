@@ -125,33 +125,38 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
             $scope.api = {
                 createSection: function(data) {
-                    regFormFactory.Sections.save({confId: $scope.confId,
-                                            title: data.newsection.title,
-                                            description: data.newsection.description},
-                        function(newsection) {
-                            $scope.sections.push(newsection);
+                    regFormFactory.Sections.save({
+                        confId: $scope.confId,
+                        title: data.newsection.title,
+                        description: data.newsection.description
+                    }, function(newsection) {
+                        $scope.sections.push(newsection);
                     });
                 },
                 moveSection: function(section, position){
-                    regFormFactory.Sections.move({confId: $scope.confId,
-                                           sectionId: section.id,
-                                           endPos: position},
-                        function(response) {
-                            section = response;
+                    regFormFactory.Sections.move({
+                        confId: $scope.confId,
+                        sectionId: section.id,
+                        endPos: position
+                    }, function(updatedSection) {
+                        section = updatedSection;
                     });
                 },
                 restoreSection: function(section) {
-                    regFormFactory.Sections.enable({confId: $rootScope.confId,
-                                             sectionId: section.id},
-                        function(response) {
-                            section.enabled = response.enabled;
-                     });
+                    regFormFactory.Sections.enable({
+                        confId: $rootScope.confId,
+                        sectionId: section.id
+                    }, function(updatedSection) {
+                        section.enabled = updatedSection.enabled;
+                    });
                 },
                 removeSection: function(section) {
-                    regFormFactory.Sections.remove({confId: $rootScope.confId,
-                                            sectionId: section.id},
-                        function(response) {
-                            $scope.sections = response;
+                    regFormFactory.Sections.remove({
+                        confId: $rootScope.confId,
+                        sectionId: section.id
+                    }, function(updatedSections) {
+                        $scope.sections = updatedSections;
+
                     });
                 }
             };

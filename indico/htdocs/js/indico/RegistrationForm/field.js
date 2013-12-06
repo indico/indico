@@ -27,20 +27,20 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 
     $scope.fieldApi.disableField = function(field) {
-        regFormFactory.Fields.disable(getResquestParams(field), function(response) {
-            $scope.field.disabled = response.disabled;
+        regFormFactory.Fields.disable(getResquestParams(field), function(updatedField) {
+            $scope.field.disabled = updatedField.disabled;
         });
     };
 
     $scope.fieldApi.enableField = function(field) {
-        regFormFactory.Fields.enable(getResquestParams(field), function(response) {
-            $scope.field.disabled = response.disabled;
+        regFormFactory.Fields.enable(getResquestParams(field), function(updatedField) {
+            $scope.field.disabled = updatedField.disabled;
         });
     };
 
     $scope.fieldApi.removeField = function(field) {
-        regFormFactory.Fields.remove(getResquestParams(field), function(response) {
-            $scope.section.items = response.items;
+        regFormFactory.Fields.remove(getResquestParams(field), function(updatedSection) {
+            $scope.section.items = updatedSection.items;
         });
     };
 
