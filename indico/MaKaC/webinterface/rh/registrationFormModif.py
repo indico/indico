@@ -472,9 +472,30 @@ class RHRegistrationFormSectionDescription(RHRegistrationFormModifSectionBase):
 class RHRegistrationFormAccommodationSetConfig(RHRegistrationFormModifAccomodationBase):
 
     def _checkParams_POST(self):
+        defaultArrivalOffset = [-2, 0]
+        defaultDepartureOffset = [1, 3]
+
         post_pm = ParameterManager(request.json)
-        self._datesOffsets = post_pm.extract('datesOffsets', pType=dict, allowEmpty=False)
+        self._arrivalOffsetDates = post_pm.extract(
+            'arrivalOffsetDates',
+            pType=list,
+            allowEmpty=False,
+            defaultValue=defaultArrivalOffset)
+        self._departureOffsetDates = post_pm.extract(
+            'departureOffsetDates',
+            pType=list,
+            allowEmpty=False,
+            defaultValue=defaultDepartureOffset)
         self._items = post_pm.extract('items', pType=list, allowEmpty=False)
+
+        if (len(self._arrivalOffsetDates) != 2 or
+                self._arrivalOffsetDates[0] == '' or
+                self._arrivalOffsetDates[1] == ''):
+            self._arrivalOffsetDates = defaultArrivalOffset
+        if (len(self._departureOffsetDates) != 2 or
+                self._departureOffsetDates[0] == '' or
+                self._departureOffsetDates[1] == ''):
+            self._departureOffsetDates = defaultDepartureOffset
 
     def _setItems(self):
         for item in self._items:
@@ -491,10 +512,8 @@ class RHRegistrationFormAccommodationSetConfig(RHRegistrationFormModifAccomodati
                 accoType.setValues(item)
 
     def _process_POST(self):
-        arrDates = [int(self._datesOffsets.get("aoffset1", -2)), int(self._datesOffsets.get("aoffset2", 0))]
-        depDates = [int(self._datesOffsets.get("doffset1", 1)), int(self._datesOffsets.get("doffset2", 3))]
-        self._section.setArrivalOffsetDates(arrDates)
-        self._section.setDepartureOffsetDates(depDates)
+        self._section.setArrivalOffsetDates([int(d) for d in self._arrivalOffsetDates])
+        self._section.setDepartureOffsetDates([int(d) for d in self._departureOffsetDates])
         self._setItems()
         return json.dumps(self._section.fossilize())
 

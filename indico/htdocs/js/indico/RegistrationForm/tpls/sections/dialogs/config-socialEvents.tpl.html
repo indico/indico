@@ -1,8 +1,9 @@
 <form>
     <div class="regFormDialogEditLine">
-        <label class="regFormDialogCaption">{{ 'Selection type' | i18n }}</label>
+        <label class="regFormDialogCaption">
+            {{ 'Selection type' | i18n }}
+        </label>
         <select ng-model="formData.selectionType"
-            ng-init="formData.selectionType=section.selectionType"
             name="selectionType">
             <option value="unique" {{"selected" if section.selectionType == "unique" }}>
                 {{ 'Unique choice' | i18n }}
@@ -15,7 +16,6 @@
     <div class="regFormDialogEditLine">
         <label class="regFormDialogCaption">{{ 'Introduction sentence' | i18n }}</label>
         <textarea ng-model="formData.introSentence"
-            ng-init="formData.introSentence=section.introSentence"
             id="descriptionEdit"
             name="introSentence"
             cols="40"

@@ -40,7 +40,7 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','regFormFactory', fu
         var requestParams = angular.extend(getRequestParams(section), data);
         regFormFactory.Sections.save(requestParams, function(updatedSection) {
             $scope.$parent.section = updatedSection;
-            //TODO: why not with section variable?
+            //TODO: inject updatedSection into $scope.section
         });
     };
 
@@ -105,7 +105,8 @@ ndRegForm.directive('ndSection', function($rootScope, url) {
                 newfield: false,
                 config: {
                     open: false,
-                    actions: {}
+                    actions: {},
+                    formData: []
                 }
             };
 
@@ -205,6 +206,8 @@ ndRegForm.directive("ndAccommodationSection", function() {
             scope.buttons.config = true;
             scope.buttons.disable = true;
 
+            scope.dialogs.config.formData.push('arrivalOffsetDates');
+            scope.dialogs.config.formData.push('departureOffsetDates');
             scope.dialogs.config.tabs = [
                 {id: 'config',              name: $T("Configuration"),          type: 'config' },
                 {id: 'editAccomodation',    name: $T("Edit accommodations"),    type: 'editionTable' }
@@ -286,10 +289,10 @@ ndRegForm.directive("ndFurtherInformationSection", function() {
             scope.buttons.config = true;
             scope.buttons.disable = true;
 
+            scope.dialogs.config.formData.push('content');
             scope.dialogs.config.tabs = [
-                {id: 'config',          name: $T("Configuration"),      type: 'config'}
+                {id: 'config', name: $T("Configuration"), type: 'config'}
             ];
-
         }
     };
 });
@@ -332,6 +335,7 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
 
+            scope.dialogs.config.formData.push('type');
             scope.dialogs.config.tabs = [
                 {id: 'config',          name: $T("Configuration"),      type: 'config'},
                 {id: 'editSessions',    name: $T("Manage sessions"),    type: 'editionTable'}
@@ -394,18 +398,33 @@ ndRegForm.directive("ndSocialEventSection", function() {
         link: function(scope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
-            scope.dialogs.config.tabs = [
-                {id: 'config',          name: $T("Configuration"),     type: 'config'},
-                {id: 'editEvents',      name: $T("Edit events"),       type: 'editionTable'},
-                {id: 'canceledEvent',   name: $T("Canceled events"),   type: 'cancelEvent'}
-            ];
 
             scope.dialogs.config.contentWidth = 800;
+            scope.dialogs.config.formData.push('introSentence');
+            scope.dialogs.config.formData.push('selectionType');
+            scope.dialogs.config.tabs = [
+                {id: 'config', name: $T("Configuration"), type: 'config'},
+                {id: 'editEvents', name: $T("Edit events"), type: 'editionTable'},
+                {id: 'canceledEvent', name: $T("Canceled events"), type: 'cancelEvent'}
+            ];
 
             scope.dialogs.config.editionTable = {
                 sortable: false,
-                colNames:[$T("caption"), $T("billabe"), $T("price"), $T("price/place"), $T("Nb places"), $T("Max./part.")],
-                actions: ['remove', ['cancel', $T('Cancel this event'),'#tab-canceledEvent','icon-cancel']],
+
+                colNames: [
+                    $T("caption"),
+                    $T("billabe"),
+                    $T("price"),
+                    $T("price/place"),
+                    $T("Nb places"),
+                    $T("Max./part.")
+                ],
+
+                actions: [
+                    'remove',
+                    ['cancel', $T('Cancel this event'),'#tab-canceledEvent','icon-cancel']
+                ],
+
                 colModel: [
                         {
                            name:'caption',
@@ -501,20 +520,27 @@ ndRegForm.directive('ndSectionDialog', function(url) {
         require: 'ndDialog',
         replace: true,
         templateUrl: url.tpl('sections/dialogs/base.tpl.html'),
-        controller: function ($scope) {
-            $scope.section = $scope.data;
 
-            $scope.getTabTpl = function(section_id, tab_type) {
-                return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(tab_type, section_id));
-            };
-
+        controller: function($scope) {
             $scope.actions.init = function() {
-                $scope.formData = {
-                    items: []
-                }; // TODO This is the way?
+                $scope.section = $scope.data;
+
+                $scope.formData = {};
+                $scope.formData.items = [];
+
+                _.each($scope.config.formData, function(item) {
+                    if (Array.isArray(item) && $scope.section[item[0]] !== undefined) {
+                        $scope.formData[item[1]] = angular.copy($scope.section[item[0]][item[1]]);
+                    } else {
+                        $scope.formData[item] = angular.copy($scope.section[item]);
+                    }
+                });
 
                 _.each($scope.section.items, function (item, ind) {
-                    $scope.formData.items[ind] = {id: item.id, cancelled: item.cancelled}; //A way to initialize properly
+                    $scope.formData.items[ind] = {
+                        id: item.id,
+                        cancelled: item.cancelled
+                    };
                 });
 
                 $scope.tabSelected = $scope.config.tabs[0].id;
@@ -522,6 +548,12 @@ ndRegForm.directive('ndSectionDialog', function(url) {
 
             $scope.addItem = function () {
                  $scope.formData.items.push({id:'isNew'});
+            };
+        },
+
+        link: function(scope) {
+            scope.getTabTpl = function(section_id, tab_type) {
+                return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(tab_type, section_id));
             };
         }
     };

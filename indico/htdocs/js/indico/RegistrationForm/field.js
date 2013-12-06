@@ -418,9 +418,9 @@ ndRegForm.directive('ndFieldDialog', function(url) {
 
                 _.each($scope.settings.formData, function(item) {
                     if (Array.isArray(item) && $scope.field[item[0]] !== undefined) {
-                        $scope.formData[item[1]] = $scope.field[item[0]][item[1]];
+                        $scope.formData[item[1]] = angular.copy($scope.field[item[0]][item[1]]);
                     } else {
-                        $scope.formData[item] = $scope.field[item];
+                        $scope.formData[item] = angular.copy($scope.field[item]);
                     }
                 });
 

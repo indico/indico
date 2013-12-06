@@ -4,7 +4,6 @@
             {{ "Type of sessions' form" | i18n }}
         </label>
         <select ng-model="formData.type"
-            ng-init="formData.type=section.type"
             name="type">
             <option value="2priorities" {{ "selected" if section.type == "2priorities" }}>
                 {{ '2 choices' | i18n }}
