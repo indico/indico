@@ -932,6 +932,12 @@ class Avatar(Persistent, Fossilizable):
     def isRegisteredInConf(self, conf):
         if conf.getId() in self.getRegistrants().keys():
             return True
+        for email in self.getEmails():
+            registrant = conf.getRegistrantsByEmail(email)
+            if registrant:
+                self.addRegistrant(registrant)
+                registrant.setAvatar(self)
+                return True
         return False
 
     def hasSubmittedEvaluation(self, evaluation):

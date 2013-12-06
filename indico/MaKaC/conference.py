@@ -4700,13 +4700,19 @@ class Conference(CommonObjectBase, Locatable):
             self.notifyModification()
         return self._registrants
 
-    def getRegistrantsByEmail(self):
+    def getRegistrantsByEmail(self, email=None):
+        """
+        Returns the index of registrants by email OR a specific registrant if an email address
+        is passed as argument.
+        """
         try:
             if self._registrantsByEmail:
                 pass
         except AttributeError, e:
             self._registrantsByEmail = self._createRegistrantsByEmail()
             self.notifyModification()
+        if email:
+            return self._registrantsByEmail.get(email)
         return self._registrantsByEmail
 
     def _createRegistrantsByEmail(self):
