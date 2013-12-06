@@ -8,11 +8,11 @@
     ng-required="field.mandatory">
     <!--ng-change="change()"/-->
 
-<span class="regFormPrice">{{ field.price }}</span>
-<span class="regFormCurrency"></span>
+<span ng-show="field.billable" class="regFormPrice">{{ field.price }}</span>
+<span ng-show="field.billable" class="regFormCurrency">{{ currency }}</span>
 <span class="regFormSubtotal">{{ 'Total' | i18n }}:</span>
 <span id="subtotal-{{ getName(field.input) }}">0</span>
-<span class="regFormCurrency"></span>
+<span ng-show="field.billable" class="regFormCurrency">{{ currency }}</span>
 <span class="inputDescription">
     {{ field.description }}
 </span>

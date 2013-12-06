@@ -76,7 +76,7 @@
                     </td>
                     <td align="right">
                         <span ng-show="item.billable" class="regFormPrice">{{ item.price }}</span>
-                        <span ng-show="item.billable" class="regFormCurrency"></span>
+                        <span ng-show="item.billable" class="regFormCurrency">{{ currency }}</span>
                         <span ng-show="item.billable">{{ "per night" | i18n }}</span>
                     </td>
                 </tr>

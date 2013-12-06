@@ -39,7 +39,7 @@
                     ng-class="{regFormIsBillable: item.billable}"/>
                 {{ item.caption }}
                 <span ng-show="item.billable" class="regFormPrice">{{ item.price }}</span>
-                <span ng-show="item.billable" class="regFormCurrency"></span>
+                <span ng-show="item.billable" class="regFormCurrency">{{ currency }}</span>
             </div>
         <td>
     </tr>

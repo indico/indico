@@ -6,7 +6,7 @@
     ng-disabled="!hasPlacesLeft(field)"/>
 
 <span ng-show="field.billable" class="regFormPrice">{{ field.price }}</span>
-<span ng-show="field.billable" class="regFormCurrency"></span>
+<span ng-show="field.billable" class="regFormCurrency">{{ currency }}</span>
 
 <!-- TODO use isDisabled() and isBillable() from ndRadioField with ng-show -->
 <!-- if field.placesLimit != 0 and field.noPlacesLeft != 0 -->
