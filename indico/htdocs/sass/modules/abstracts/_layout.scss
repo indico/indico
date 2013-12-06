@@ -34,8 +34,6 @@ $box-border-color: lighten($gray, 10%);
 }
 
 .abstract-display {
-  font-family: "Roboto" sans;
-
   .wrapper {
     overflow: auto;
     position: relative;
@@ -53,6 +51,8 @@ $box-border-color: lighten($gray, 10%);
     }
 
     .aside {
+      @extend %font-family-sans;
+
       margin-top: 0.5em;
       float: right;
       width: 150px;
@@ -76,7 +76,9 @@ $box-border-color: lighten($gray, 10%);
   }
 
   .information {
+    @extend %font-family-sans;
     @include padded-box(0);
+
     overflow: auto;
     position: relative;
 
@@ -112,6 +114,7 @@ $box-border-color: lighten($gray, 10%);
 
             &:before {
               margin-right: 0.5em;
+              color: $light-black;
             }
           }
         }
@@ -176,9 +179,4 @@ $box-border-color: lighten($gray, 10%);
         color: $light-black;
         border-bottom: 1px solid $light-black;
     }
-}
-
-.abstract-display-title {
-    font-family: "Roboto";
-    font-size: 1.5em;
 }

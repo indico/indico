@@ -68,19 +68,23 @@ $display-preview-bg-color: white;
     @include transition-property(height, background-color, color);
     @include transition-duration(.25s, 1s, 1s);
     @include transition-timing-function(ease-out, ease-in, ease-in);
+    @extend %font-family-serif;
 
     background-color: $background-color;
+    font-size: 1.1em;
 
     color: $black;
     max-height: $max-height;
     overflow-y: auto;
 
     &.empty {
+       @extend %font-family-sans;
         background-color: lighten($background-color, 2%);
         color: $gray;
         min-height: 2em;
         text-align: center;
         overflow-y: hidden;
+         font-size: 1em;
 
         .instructions {
             padding: 10px;
@@ -97,8 +101,6 @@ $display-preview-bg-color: white;
     }
 
     .wmd-preview {
-        @extend %font-family-serif;
-
         padding: 10px;
     }
 }

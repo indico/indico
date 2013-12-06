@@ -48,6 +48,10 @@ $default-box-shadow-v-offset: 1px;
     font-family: "Georgia", "Garamond", "Droid serif", "Linux Libertine", "Palatino", serif;
 }
 
+%font-family-sans {
+    font-family: "Roboto", "Helvetica", sans;
+}
+
 %font-size-body {
     font-size: 13px;
 }

@@ -24,11 +24,11 @@
         <h1 class="page_title">${"Abstract"}</h1>
     </div>
     <div class="wrapper clear">
-        <div class="aside">
-            <time datetime="${abstract.getSubmissionDate().isoformat()}" title="${_("Submission date")}">
+        <div class="aside" title="${_("Submission details (date, time and user)")}">
+            <time datetime="${abstract.getSubmissionDate().isoformat()}">
                 ${formatDateTime(abstract.getSubmissionDate())}
             </time>
-            <div class="user icon-user" title="${_("Submitter")}">
+            <div class="user icon-user">
                 ${abstract.getSubmitter().getStraightFullName()}
             </div>
         </div>
