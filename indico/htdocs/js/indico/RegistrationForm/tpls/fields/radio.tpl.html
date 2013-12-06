@@ -1,9 +1,9 @@
-<div ng-switch="field.values.inputType">
+<div ng-switch="field.values.inputType" ng-controller="BillableCtrl">
     <select ng-switch-when="dropdown" name="{{ getName(field.input) }}">
         <option value="">-- {{ 'Choose a value' | i18n }} --</option>
-        <option ng-repeat="item in field.values.radioitems"
+        <option ng-repeat="item in field.values.radioitems | filter: {isEnabled: true}"
             value="{{ item.caption }}"
-            ng-class="{regFormIsBillable: item.isBillable}">
+            ng-class="{regFormIsBillable: isBillable(item)}">
             {{ item.caption }}
         </option>
     </select>
@@ -13,20 +13,22 @@
             <input type="radio"
                 name="{{ getName(field.input) }}"
                 value="{{ item.id }}"
-                ng-class="{regFormIsBillable: item.isBillable}"
+                ng-class="{regFormIsBillable: isBillable(item)}"
                 ng-required="field.mandatory"
-                ng-disabled="!hasPlacesLeft(field)"/>
+                ng-disabled="isDisabled(item)"/>
             {{ item.caption }}
-            <span ng-show="isBillable(field)" class="regFormPrice">
-                {{ item.price }}
+
+            <span ng-if="isBillable(item)" class="regFormPrice">{{ item.price }}</span>
+            <span ng-if="isBillable(item)" class="regFormCurrency">{{ currency }}</span>
+
+            <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item)">
+                <font ng-switch-when="false" color="red" style="margin-left:25px;">
+                    ({{ "no places left" | i18n }})
+                </font>
+                <font ng-switch-when="true" color="green" style="margin-left:25px;">
+                    [{{ item.noPlacesLeft }} {{ 'place(s) left' | i18n }}]
+                </font>
             </span>
-            <span ng-show="isBillable(field)" class="regFormCurrency">{{ currency }}</span>
-            <font ng-show="isDisabled(field)" color="red" style="margin-left:25px;">
-                ({{ "no places left" | i18n }})
-            </font>
-            <font ng-show="hasPlacesLeft(field)" color="green" style="font-style:italic; margin-left:25px;">
-                [{{item.noPlacesLeft}} {{ 'place(s) left' | i18n }}]
-            </font>
         </li>
     </ul>
 </div>

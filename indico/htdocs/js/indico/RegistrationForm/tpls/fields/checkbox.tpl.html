@@ -1,24 +1,24 @@
-<input type="checkbox"
-    id="{{ name }}"
-    name="{{ name }}"
-    ng-class="{regFormIsBillable: isBillable(field)}"
-    ng-required="field.mandatory"
-    ng-disabled="!hasPlacesLeft(field)"/>
+<div ng-controller="BillableCtrl">
+    <input type="checkbox"
+        id="{{ name }}"
+        name="{{ name }}"
+        ng-class="{regFormIsBillable: isBillable(field)}"
+        ng-required="field.mandatory"
+        ng-disabled="!hasPlacesLeft(field)"/>
 
-<span ng-show="field.billable" class="regFormPrice">{{ field.price }}</span>
-<span ng-show="field.billable" class="regFormCurrency">{{ currency }}</span>
+    <span ng-if="isBillable(field)" class="regFormPrice">{{ field.price }}</span>
+    <span ng-if="isBillable(field)" class="regFormCurrency">{{ currency }}</span>
 
-<!-- TODO use isDisabled() and isBillable() from ndRadioField with ng-show -->
-<!-- if field.placesLimit != 0 and field.noPlacesLeft != 0 -->
-    <span ng-show="hasPlacesLeft(field)" class="placesLeft">
-        [{{field.noPlacesLeft}} {{ 'place(s) left' | i18n }}]
+    <span ng-if="hasPlacesLimit(field)" ng-switch="hasPlacesLeft(field)">
+        <span ng-switch-when="true" class="placesLeft">
+            [{{field.noPlacesLeft}} {{ 'place(s) left' | i18n }}]
+        </span>
+        <font ng-switch-when="false" color="red">
+            ({{ 'no places left' | i18n }})
+        </font>
     </span>
-<!-- elif  field.placesLimit != 0 and field.noPlacesLeft == 0 -->
-    <font ng-show="!hasPlacesLeft(field)" color="red">
-        ({{ 'no places left' | i18n }})
-    </font>
-<!-- endif -->
 
-<span class="inputDescription">
-    {{ field.description }}
-</span>
+    <span class="inputDescription">
+        {{ field.description }}
+    </span>
+</div>

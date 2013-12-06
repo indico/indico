@@ -1,86 +1,74 @@
-<table>
-    <tr>
-        <td>
-            <table>
-                <tr>
-                    <td align="left">
-                        <span>{{ 'Arrival date' | i18n }}</span>
-                        <span class="regFormMandatoryField">*</span>
-                    </td>
-                    <td align="left">
-                        <select id="arrivalDate" name="arrivalDate" required>
-                            <option value="" selected>--{{ 'select a date' | i18n }}--</option>
-                            <option ng-repeat="date in section.arrivalDates"
-                                value="{{ date[0] }}">
-                                {{ date[1] }}
-                            </option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td align="left">
-                        <span>Departure date</span>
-                        <span class="regFormMandatoryField">*</span>
-                    </td>
-                    <td align="left">
-                        <select id="departureDate" name="departureDate" required>
-                            <option value="" selected>--{{ 'select a date' | i18n }}--</option>
-                            <option ng-repeat="date in section.departureDates"
-                                value="{{ date[0] }}">
-                                {{ date[1] }}
-                            </option>
-                        </select>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <table>
-                <tr>
-                    <td>
-                        <span id="accommodationTypeLabel" class="bold">
-                            {{ 'Select your accommodation' | i18n }}
-                        </span>
-                        <span class="regFormMandatoryField">*</span>
-                    </td>
-                </tr>
-                <tr ng-repeat="item in section.items">
-                    <td align="left" class="accommodation-option-item">
-                        <!-- TODO set attributes -->
-                        <!--
-                        if item.cancelled
-                            set attributes = "disabled"
-                        elif item.placesLimit != 0 and item.noPlacesLeft == 0
-                            set attributes = "disabled"
-                        else
-                            set attributes = "required"
-                        endif
-                        -->
+<div ng-controller="BillableCtrl">
+    <table>
+        <tr>
+            <td align="left">
+                <span>{{ 'Arrival date' | i18n }}</span>
+                <span class="regFormMandatoryField">*</span>
+            </td>
+            <td align="left">
+                <select id="arrivalDate" name="arrivalDate" required>
+                    <option value="" selected>--{{ 'select a date' | i18n }}--</option>
+                    <option ng-repeat="date in section.arrivalDates"
+                        value="{{ date[0] }}">
+                        {{ date[1] }}
+                    </option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td align="left">
+                <span>Departure date</span>
+                <span class="regFormMandatoryField">*</span>
+            </td>
+            <td align="left">
+                <select id="departureDate" name="departureDate" required>
+                    <option value="" selected>--{{ 'select a date' | i18n }}--</option>
+                    <option ng-repeat="date in section.departureDates"
+                        value="{{ date[0] }}">
+                        {{ date[1] }}
+                    </option>
+                </select>
+            </td>
+        </tr>
+    </table>
 
-                        <input type="radio" id="{{ item.id }}"
-                            ng-class="{regFormIsBillable: item.billable }" name="accommodation_type" value="{{ item.id }}" {{ attributes }}/>
-                        {{ item.caption }}
+    <table>
+        <tr>
+            <td>
+                <span id="accommodationTypeLabel" class="bold">
+                    {{ 'Select your accommodation' | i18n }}
+                </span>
+                <span class="regFormMandatoryField">*</span>
+            </td>
+        </tr>
+        <tr ng-repeat="item in section.items">
+            <td align="left" class="accommodation-option-item">
+                <input type="radio"
+                    id="{{ item.id }}"
+                    name="accommodation_type"
+                    value="{{ item.id }}"
+                    ng-class="{regFormIsBillable: item.billable}"
+                    ng-disabled="item.cancelled || isDisabled(item)"/>
+                {{ item.caption }}
 
-                        <font ng-show="item.cancelled" color="red">
-                            ({{ 'not available at present' | i18n }})
-                        </font>
-                        <font ng-show="!item.cancelled && item.placesLimit != 0 && item.noPlacesLeft == 0" color="red">
-                            {% _ '(no places left)' %}
-                        </font>
-                        <font ng-show="!item.cancelled && item.placesLimit != 0 && item.noPlacesLeft != 0" color="green" style="font-style:italic;">
-                            [{{ item.noPlacesLeft }} {{ "place(s) left" | i18n }}]
-                        </font>
+                <font ng-if="item.cancelled" color="red">
+                    ({{ 'currently not available' | i18n }})
+                </font>
+                <span ng-if="hasPlacesLimit(item)">
+                    <font ng-if="!item.cancelled && !hasPlacesLeft(item)" color="red">
+                        ({{ 'no places left' | i18n }})
+                    </font>
+                    <font ng-if="!item.cancelled && hasPlacesLeft(item)" color="green">
+                        [{{ item.noPlacesLeft }} {{ "place(s) left" | i18n }}]
+                    </font>
+                </span>
 
-                    </td>
-                    <td align="right">
-                        <span ng-show="item.billable" class="regFormPrice">{{ item.price }}</span>
-                        <span ng-show="item.billable" class="regFormCurrency">{{ currency }}</span>
-                        <span ng-show="item.billable">{{ "per night" | i18n }}</span>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
+            </td>
+            <td align="right">
+                <span ng-if="item.billable" class="regFormPrice">{{ item.price }}</span>
+                <span ng-if"item.billable" class="regFormCurrency">{{ currency }}</span>
+                <span ng-if="item.billable">{{ "per night" | i18n }}</span>
+            </td>
+        </tr>
+    </table>
+</div>

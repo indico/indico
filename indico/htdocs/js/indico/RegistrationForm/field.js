@@ -64,20 +64,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         return field.lock? field.lock.indexOf('disable') == -1 : false;
     };
 
-    $scope.isBillable = function(field) {
-        return field.billable && !$scope.isDisabled(field);
-    };
-
-    $scope.isDisabled = function(field) {
-        return field.placesLimit !== 0 && field.noPlacesLeft === 0;
-    };
-
     $scope.isNew = function() {
         return $scope.field.id == -1;
-    };
-
-    $scope.hasPlacesLeft = function(field) {
-        return !$scope.isDisabled(field) && field.placesLimit !== 0 && field.noPlacesLeft >= 0;
     };
 
     $scope.settings = {
@@ -127,6 +115,32 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 });
 
+ndRegForm.controller('BillableCtrl', function($scope) {
+    $scope.isBillable = function(item) {
+        return (item.billable === true || item.isBillable === true) && !$scope.isDisabled(item);
+    };
+
+    $scope.isDisabled = function(item) {
+        return (item.disabled === true || item.isEnabled === false) || !$scope.hasPlacesLeft(item);
+    };
+
+    $scope.isRequired = function(item) {
+        return item.required && !scope.isItemDisabled(item);
+    };
+
+    $scope.hasPlacesLeft = function(item) {
+        if (!$scope.hasPlacesLimit) {
+            return true;
+        } else {
+            return item.noPlacesLeft >= 0;
+        }
+    };
+
+    $scope.hasPlacesLimit = function(item) {
+        return item.placesLimit !== 0;
+    };
+});
+
 ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
     return {
         restrict: 'E',
@@ -159,7 +173,7 @@ ndRegForm.directive('ndCheckboxField', function(url) {
             scope.settings.placesLimit = true;
             scope.settings.formData.push('billable');
             scope.settings.formData.push('price');
-            scope.settings.formData.push(['value', 'placesLimit']);
+            scope.settings.formData.push('placesLimit');
         }
     };
 });
@@ -396,7 +410,7 @@ ndRegForm.directive('ndYesnoField', function(url) {
             scope.settings.placesLimit = true;
             scope.settings.formData.push('billable');
             scope.settings.formData.push('price');
-            scope.settings.formData.push(['value', 'placesLimit']);
+            scope.settings.formData.push('placesLimit');
         }
     };
 });

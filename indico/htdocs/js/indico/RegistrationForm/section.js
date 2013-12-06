@@ -201,19 +201,17 @@ ndRegForm.directive("ndPersonalDataSection", function() {
 ndRegForm.directive("ndAccommodationSection", function() {
     return {
         require: 'ndSection',
-
         link: function(scope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
 
             scope.dialogs.config.formData.push('arrivalOffsetDates');
             scope.dialogs.config.formData.push('departureOffsetDates');
+            scope.dialogs.config.contentWidth = 615;
             scope.dialogs.config.tabs = [
                 {id: 'config', name: $T("Configuration"), type: 'config' },
                 {id: 'editAccomodation', name: $T("Edit accommodations"), type: 'editionTable' }
             ];
-
-            scope.dialogs.config.contentWidth = 615;
 
             scope.dialogs.config.editionTable = {
                 sortable: false,
@@ -398,6 +396,30 @@ ndRegForm.directive("ndSocialEventSection", function() {
         link: function(scope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
+
+            scope.getMaxRegistrations = function(item) {
+                if (item.placesLimit !== 0) {
+                    return Math.min(item.maxPlace, item.noPlacesLeft);
+                } else {
+                    return item.maxPlace;
+                }
+            };
+
+            scope.noAvailableEvent =function() {
+                if (scope.section.items.length === 0) {
+                    return true;
+                } else {
+                    return _.every(scope.section.items, function(item) {
+                        return item.cancelled;
+                    });
+                }
+            };
+
+            scope.anyCancelledEvent = function() {
+                return _.any(scope.section.items, function(item) {
+                    return item.cancelled;
+                });
+            };
 
             scope.dialogs.config.contentWidth = 800;
             scope.dialogs.config.formData.push('introSentence');
