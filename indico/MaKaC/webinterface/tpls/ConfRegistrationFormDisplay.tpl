@@ -11,7 +11,7 @@
             <div nowrap align="center" class="title">${ title_regform }</div>
         % endif
         <div ng-app="nd" ng-controller="AppCtrl">
-            <div nd-reg-form conf-id="${confId}" edit-mode="false"></div>
+            <div nd-reg-form conf-id="${confId}" currency="${currency}" edit-mode="false"></div>
             <input type="hidden" value="${confId}" id="conf_id">
         </div>
         <div class="regform-mandatory-info ">

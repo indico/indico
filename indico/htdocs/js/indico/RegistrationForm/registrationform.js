@@ -77,17 +77,16 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableopti
 
         scope: {
             confId: '@',
-            editMode: '=editMode'
+            editMode: '=editMode',
+            currency: "@"
         },
 
         controller: function($scope, $resource) {
             $rootScope.confId = $scope.confId;
             $rootScope.editMode = $scope.editMode;
+            $rootScope.currency = $scope.currency;
 
-            var sections = regFormFactory.Sections.get({confId: $scope.confId, editMode: $scope.editMode}, {}, function() {
-                $scope.sections = sections["sections"];
-                $rootScope.currency = sections["currency"];
-            });
+            $scope.sections = regFormFactory.Sections.query({confId: $scope.confId, editMode: $scope.editMode}, {});
 
             $scope.dialogs = {
                 addsection: false,
@@ -141,8 +140,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, baseurl, sortableopti
                     regFormFactory.Sections.remove({confId: $rootScope.confId,
                                             sectionId: section.id},
                         function(response) {
-                            $scope.sections = response["sections"];
-                            $rootScope.currency = response["currency"];
+                            $scope.sections = response;
                     });
                 }
             };
