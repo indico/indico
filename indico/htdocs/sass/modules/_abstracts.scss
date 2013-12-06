@@ -19,7 +19,10 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-@import 'base';
-@import 'lib/compass/compass';
-@import 'partials';
-@import 'custom';
+@import "base/palette";
+@import "base/defaults";
+@import "compass";
+
+@import "abstracts/layout";
+@import "abstracts/display";
+@import "abstracts/editor";

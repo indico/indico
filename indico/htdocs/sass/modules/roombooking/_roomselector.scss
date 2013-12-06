@@ -19,6 +19,8 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+@import "partials/icons";
+
 #roomselector {
     @include border-all();
     @include border-radius();

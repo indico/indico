@@ -36,6 +36,10 @@ class WPRoomBookingBase( WPMainBase ):
         return WPMainBase.getJSFiles(self) + \
                 self._includeJSPackage('Management')
 
+    def getCSSFiles(self):
+        return WPMainBase.getCSSFiles(self) + \
+            self._asset_env['roombooking_sass'].urls()
+
     def _getHeadContent( self ):
         """
         !!!! WARNING

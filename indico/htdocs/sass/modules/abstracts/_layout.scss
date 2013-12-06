@@ -1,0 +1,184 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+@import "base/utilities";
+@import "partials/icons";
+@import "compass/css3/user-interface";
+
+$box-bg-color: #fefefe;
+$box-border-color: lighten($gray, 10%);
+
+@mixin padded-box($padding: 1em) {
+  @include single-box-shadow;
+  @include border-all($box-border-color);
+  padding: $padding;
+  background-color: $box-bg-color;
+}
+
+.abstract-display {
+  font-family: "Roboto" sans;
+
+  .wrapper {
+    overflow: auto;
+    position: relative;
+
+    &> h1 {
+      &.page_title {
+        padding-bottom: 0.5em;
+        margin: 0;
+        border-bottom: 1px solid $box-border-color;
+      }
+
+      display: block;
+      font-size: 2em;
+      margin-top: 0.5em;
+    }
+
+    .aside {
+      margin-top: 0.5em;
+      float: right;
+      width: 150px;
+      padding: 0.5em;
+
+      text-align: right;
+
+      time {
+        line-height: 1em;
+        display: inline-block;
+        font-size: 1em;
+        color: $gray;
+      }
+
+      .user {
+        display: inline-block;
+        font-size: 1em;
+        color: $light-black;
+      }
+    }
+  }
+
+  .information {
+    @include padded-box(0);
+    overflow: auto;
+    position: relative;
+
+    .status {
+      color: #f8f8f8;
+      line-height: 2em;
+      text-align: center;
+    }
+
+    .wrapper {
+      padding: 0 1em 0 1em;
+
+      .column {
+        @include box-sizing(border-box);
+        width: 33.3%;
+        float: left;
+        padding-left: 1em;
+
+        &> h2 {
+          font-size: 1.2em;
+        }
+
+        &> ul {
+          list-style-type: none;
+          padding: 0;
+
+          li {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 1.5em;
+            margin-bottom: 0.5em;
+
+            &:before {
+              margin-right: 0.5em;
+            }
+          }
+        }
+
+        &:nth-child(4n) {
+          clear: both;
+        }
+
+        font-size: 1em;
+      }
+    }
+
+    .trigger {
+      @include user-select(none);
+      @include single-transition(color);
+      position: absolute;
+      cursor: pointer;
+      right: 0.5em;
+      bottom: 0.5em;
+      color: $gray;
+
+      &:hover {
+        color: $dark-gray;
+      }
+    }
+
+    ul.extra-parameters {
+      border-top: 1px solid darken($light-gray, 10%);
+      @include box-shadow(rgba(200, 200, 200, 0.2) 0 1px 2px inset);
+      display: none;
+      color: $gray;
+      background: $light-gray;
+      font-size: 0.9em;
+      list-style-type: none;
+      padding: 1em;
+      margin: 0;
+
+      .name {
+        color: $dark-gray;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .section {
+    h2 {
+      margin: 1.2em 0 0.2em 0;
+    }
+
+    &> .content {
+    @include padded-box;
+  }
+}
+
+#abstract-field-table {
+    border-spacing: 1.5em;
+}
+
+.abstract-section {
+    &> h2 {
+        font-size: 1.1em;
+        color: $light-black;
+        border-bottom: 1px solid $light-black;
+    }
+}
+
+.abstract-display-title {
+    font-family: "Roboto";
+    font-size: 1.5em;
+}

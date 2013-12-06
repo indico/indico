@@ -382,8 +382,8 @@ class AbstractToPDF(PDFBase):
 
         for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             id = field.getId()
-            name = field.getName()
-            value = self._abstract.getField(id).strip()
+            name = field.getCaption()
+            value = str(self._abstract.getField(id)).strip()
             if value: #id not in ["content"] and
                 #p = Paragraph(text, styleHead, part=escape(self._abstract.getTitle()))
                 story += "\n\\vspace{10 mm}\n\\noindent\n \
@@ -403,7 +403,7 @@ class AbstractToPDF(PDFBase):
         story += "{\\sffamily\\selectfont %s }" % \
                 " ; ".join(listAuthor)
         story += "\n\\vspace{2 mm}\n\n"
-        
+
         story += "{\\bf {\\sffamily\\selectfont %s }}" % \
                 i18nformat(""" _("Co-authors") : """)
         listAuthor = []
@@ -420,31 +420,31 @@ class AbstractToPDF(PDFBase):
                 (escape(speaker.getFullName()), escape(speaker.getAffiliation())))
         story += " ; ".join(listSpeaker)
         story += "\n\n"
-        
+
         story += "{\\sffamily\\selectfont %s}\n\\vspace{2 mm}\n\n" % \
                 self._getTrackText()
-        
+
         tmp= i18nformat("""--_("not specified")--""")
         if self._abstract.getContribType() is not None:
             tmp=self._abstract.getContribType().getName()
         text = i18nformat("""_("Contribution type") : %s""")%escape(tmp)
         story += text + "\n\\vspace{2 mm}\n\n"
-        
+
         text = i18nformat("""_("Submitted by") : %s""") % \
                 escape(self._abstract.getSubmitter().getFullName())
         story += text + "\n\\vspace{2 mm}\n\n"
-        
+
         text = i18nformat("""_("Submitted on") %s""") % \
                 self._abstract.getSubmissionDate().strftime("%A %d %B %Y")
         story += text + "\n\\vspace{2 mm}\n\n"
-        
+
         text = i18nformat("""_("Last modified on") : %s""") % \
                 self._abstract.getModificationDate().strftime("%A %d %B %Y")
         story += text + "\n\\vspace{2 mm}\n\n"
-        
+
         text = i18nformat("""_("Comments") : """)
         story += "{\\sffamily\\selectfont %s}\n\n" % text
-        
+
         text = "%s"%escape(self._abstract.getComments())
         story += "\\hspace{15 mm} {\\sffamily\\selectfont %s}" % text
 

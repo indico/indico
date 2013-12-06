@@ -317,14 +317,19 @@ base_js = Bundle(jquery, angular, utils, presentation, calendar, indico_jquery, 
 SASS_BASE_MODULES = ["sass/*.scss",
                      "sass/base/*.scss",
                      "sass/custom/*.scss",
-                     "sass/partials/*.scss",
-                     "sass/modules/*.scss",
-                     "sass/modules/roombooking/*.scss"]
+                     "sass/partials/*.scss"]
 
-abstracts_sass = Bundle('sass/modules/abstracts.scss',
-                        filters=("pyscss", "cssrewrite", "cssmin"),
-                        output="sass/abstracts_editor_%(version)s.min.css",
-                        depends=SASS_BASE_MODULES)
+
+def sass_module_bundle(module_name, depends=[]):
+    return Bundle('sass/modules/_{0}.scss'.format(module_name),
+                  filters=("pyscss", "cssrewrite", "cssmin"),
+                  output="sass/{0}_%(version)s.min.css".format(module_name),
+                  depends = SASS_BASE_MODULES + ['sass/modules/{0}/*.scss'.format(module_name)] + depends)
+
+abstracts_sass = sass_module_bundle('abstracts')
+roombooking_sass = sass_module_bundle('roombooking')
+dashboard_sass = sass_module_bundle('dashboard')
+
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
@@ -375,7 +380,11 @@ def register_all_css(env, main_css_file):
         filters=("cssmin", "cssrewrite"),
         output='css/base_%(version)s.min.css')
 
-    env.register('indico_badges_css', indico_badges_css)
-    env.register('abstracts_sass', abstracts_sass)
     env.register('base_css', base_css)
+    env.register('indico_badges_css', indico_badges_css)
+
+    # SASS/SCSS
+    env.register('roombooking_sass', roombooking_sass)
+    env.register('abstracts_sass', abstracts_sass)
+    env.register('dashboard_sass', dashboard_sass)
     env.register('screen_sass', screen_sass)

@@ -1552,6 +1552,9 @@ class WPPersonalArea(WPUserBase):
 
 class WPUserDashboard(WPPersonalArea):
 
+    def getCSSFiles(self):
+        return WPPersonalArea.getCSSFiles(self) + self._asset_env['dashboard_sass'].urls()
+
     def _getTabContent(self, params):
         c = WUserDashboard(self._avatar, self._getAW())
         return c.getHTML(params)

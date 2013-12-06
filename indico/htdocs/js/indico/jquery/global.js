@@ -46,7 +46,7 @@ $(document).ready(function() {
 
     $('.contextHelp[title]').qtip();
 
-    $(document).on("mouseenter", '[title]', function(event) {
+    $(document).on("mouseenter", '[title]:not([title=""])', function(event) {
         $(this).qtip({
             overwrite: false,
             show: {
@@ -56,8 +56,8 @@ $(document).ready(function() {
 
             content: {
                 text: function() {
-                    var html = $(this).attr('title');
-                    return html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                    var html = $(this).attr('title') || $(this).attr('alt');
+                    return html ? html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;") : '';
                 }
             },
 

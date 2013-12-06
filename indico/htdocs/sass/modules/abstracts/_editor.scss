@@ -15,117 +15,24 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
-@import 'compass';
-
 $editor-preview-bg-color: $light-gray;
-$display-preview-bg-color: white;
 
 .wmd-input {
     @extend %font-family-monospace;
     @include border-all($gray);
     @include single-box-shadow();
+    @include single-transition(height, .25s, ease-out);
 
-    height: 300px;
+    &:focus {
+        height: 300px;
+    }
+
+    height: 100px;
+
     width: 100%;
-    border: 1px solid;
+    max-width: 800px;
     padding: 1em;
     font-size: 0.9em;
-}
-
-
-@mixin md-display-rules($background-color) {
-    h1, h2, h3, h4 {
-        @extend %font-family-serif;
-    }
-
-    h1 {
-        font-size: 1.5em;
-    }
-
-    h2 {
-        font-size: 1.3em;
-    }
-
-    h3 {
-        font-size: 1.2em;
-    }
-
-    h4 {
-        font-size: 1.1em;
-    }
-
-    pre {
-        color: darken($background-color, 40%);
-        font-size: 1em;
-        padding: 1em;
-        background-color: lighten($background-color, 10%);
-    }
-
-    blockquote {
-        font-style: italic;
-        border-left: 2px solid darken($background-color, 10%);
-        padding: 0.2em 0.2em 0.2em 1em;
-        margin-left: 0;
-        background-color: darken($background-color, 5%);
-    }
-}
-
-
-@mixin md-preview-wrapper-mixin($background-color, $max-height: 500px) {
-    @include md-display-rules($background-color);
-    @include transition-property(height, background-color, color);
-    @include transition-duration(.25s, 1s, 1s);
-    @include transition-function(ease-out, ease-in, ease-in);
-
-    background-color: $background-color;
-
-    color: $black;
-    max-height: $max-height;
-    overflow-y: auto;
-
-    &.empty {
-        background-color: lighten($background-color, 2%);
-        color: $gray;
-        min-height: 2em;
-        text-align: center;
-        overflow-y: hidden;
-
-
-        .instructions {
-            padding: 10px;
-            display: block;
-        }
-
-        .wmd-preview {
-            display: none;
-        }
-    }
-
-    .instructions {
-        display: none;
-    }
-
-    .wmd-preview {
-        @extend %font-family-serif;
-
-        padding: 10px;
-        font-family: $serif-font !important;
-    }
-}
-
-.md-preview-wrapper {
-
-    &.edit {
-        @include border-all($gray);
-        @include single-box-shadow();
-        @include md-preview-wrapper-mixin($editor-preview-bg-color);
-    }
-
-    &.display {
-        padding: 10px;
-        @include md-preview-wrapper-mixin($display-preview-bg-color, none);
-    }
 }
 
 .wmd-panel {
@@ -224,6 +131,15 @@ $display-preview-bg-color: white;
     content: "\e14c";
 }
 
+.wmd-help-button {
+    span:before {
+        content: "\69";
+    }
+
+    position: absolute;
+    margin-right: 1em;
+}
+
 
 .wmd-prompt-background
 {
@@ -253,11 +169,13 @@ $display-preview-bg-color: white;
     font-weight: bold;
 }
 
+.md-preview-wrapper.edit {
+    @include border-all($gray);
+    @include single-box-shadow();
+    @include md-preview-wrapper-mixin($editor-preview-bg-color);
+}
+
 input[type=text] {
     height: 2em;
     padding: 0.5em;
-}
-
-#abstract-field-table {
-    border-spacing: 1.5em;
 }

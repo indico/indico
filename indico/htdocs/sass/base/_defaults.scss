@@ -36,6 +36,22 @@ $default-box-shadow-blur: 1px;
 $default-box-shadow-h-offset: 1px;
 $default-box-shadow-v-offset: 1px;
 
+%font-family-body {
+    font-family: verdana, arial, serif;
+}
+
+%font-family-monospace {
+    font-family: "Inconsolata", "Monaco", "Droid Sans Mono", "Profont", courier, monospace;
+}
+
+%font-family-serif {
+    font-family: "Georgia", "Garamond", "Droid serif", "Linux Libertine", "Palatino", serif;
+}
+
+%font-size-body {
+    font-size: 13px;
+}
+
 // =======================================
 // Custom mixins
 // =======================================

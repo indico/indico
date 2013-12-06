@@ -7226,7 +7226,7 @@ a.lightGreyLink:hover {
     margin-bottom: 5px;
 }
 
-.contributionTitle, .subContributionTitle, .sessionTitle, .materialTitle, .abstractTitle {
+.contributionTitle, .subContributionTitle, .sessionTitle, .materialTitle {
     font-size: 18px;
     font-weight: bold;
     line-height: 24px;
@@ -7242,7 +7242,7 @@ a.lightGreyLink:hover {
     font-weight: normal;
 }
 
-.contributionMainContent, .subContributionMainContent, .materialMainContent, .abstractMainContent {
+.contributionMainContent, .subContributionMainContent, .materialMainContent {
     float:left;
     width:500px;
 }
@@ -7252,7 +7252,7 @@ a.lightGreyLink:hover {
     padding-bottom: 10px;
 }
 
-.contributionRightPanel, .subContributionRightPanel, .materialRightPanel, .abstractRightPanel {
+.contributionRightPanel, .subContributionRightPanel, .materialRightPanel {
     float:right;
     width: 200px;
     min-height: 500px;
@@ -7262,7 +7262,7 @@ a.lightGreyLink:hover {
 .sessionRightPanel {
     min-height: 0px;
 }
-.contributionRightPanelSection, .subContributionRightPanelSection, .sessionRightPanelSection, .abstractRightPanelSection {
+.contributionRightPanelSection, .subContributionRightPanelSection, .sessionRightPanelSection {
     border-bottom: 1px solid #EAEAEA;
     font-size: 11px;
     color: #888;
@@ -7301,7 +7301,7 @@ a.titleWithLink:hover{
     text-decoration: underline;
 }
 
-.contributionInformation, .subContributionInformation, .sessionInformation, .abstractInformation {
+.contributionInformation, .subContributionInformation, .sessionInformation {
     border-bottom: 1px solid #EAEAEA;
     margin-bottom: 15px;
     padding-bottom: 10px;
@@ -7368,7 +7368,7 @@ ul.conveners ul.names .affiliation {
 }
 
 
-.contributionSectionTitle, .subContributionSectionTitle, .sessionSectionTitle, .abstractSectionTitle {
+.contributionSectionTitle, .subContributionSectionTitle, .sessionSectionTitle {
     color: #444;
     font-size: 14px;
     font-weight: bold;
@@ -7376,7 +7376,7 @@ ul.conveners ul.names .affiliation {
     margin-top: 0;
     display: inline;
 }
-.contributionSectionContent, .subContributionSectionContent, .sessionSectionContent, .materialSectionContent, .abstractSectionContent {
+.contributionSectionContent, .subContributionSectionContent, .sessionSectionContent, .materialSectionContent {
     font-size: 12px;
     line-height: 1.5em;
     text-align:justify;
@@ -7385,7 +7385,7 @@ ul.conveners ul.names .affiliation {
     white-space: pre-wrap;
 }
 
-.contributionSpeakerList, .subContributionSpeakerList, .sessionDateInformation, .abstractSubmitter {
+.contributionSpeakerList, .subContributionSpeakerList, .sessionDateInformation {
     margin-bottom:3px;
     color:#666666;
 }
