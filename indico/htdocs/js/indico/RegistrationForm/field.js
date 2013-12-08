@@ -92,6 +92,9 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             return $scope.isNew()? $T('Add') : $T('Update');
         },
         onOk: function(dialogScope) {
+            if(dialogScope.optionsForm.$invalid === true) {
+                return false;
+            }
             var postData = {
                 confId: $scope.confId,
                 sectionId: $scope.section.id,
@@ -106,6 +109,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
                 function(data, headers) {
                     $scope.field = data;
                 });
+            return true;
         },
         onCancel: function() {
             if ($scope.isNew()) {
