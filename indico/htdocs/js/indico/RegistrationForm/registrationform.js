@@ -125,6 +125,11 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
             $scope.api = {
                 createSection: function(data) {
+                    // TODO: Check why creteSectionForm is not in the data scope!
+                    if(data.$$childHead.sectionCreationForm.$invalid === true){
+                        return false;
+                    }
+
                     regFormFactory.Sections.save({
                         confId: $scope.confId,
                         title: data.newsection.title,
@@ -132,6 +137,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                     }, function(newsection) {
                         $scope.sections.push(newsection);
                     });
+                    return true;
                 },
                 moveSection: function(section, position){
                     regFormFactory.Sections.move({

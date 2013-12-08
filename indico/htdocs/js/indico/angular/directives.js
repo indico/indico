@@ -27,6 +27,7 @@ ndDirectives.directive("ndDialog", function() {
             okCallback: '&',
             cancelButton: '@',
             cancelCallback: '&',
+            validate: "=",
             api: '=',
             data: '=',
             config: "="
@@ -46,8 +47,10 @@ ndDirectives.directive("ndDialog", function() {
                     $scope.actions.close();
                 },
                 ok: function() {
-                    $scope.okCallback({dialogScope: $scope});
-                    $scope.actions.close();
+                    var resultOkCallback = $scope.okCallback({dialogScope: $scope});
+                    if($scope.validate === true && resultOkCallback === true || $scope.validate !== true) {
+                        $scope.actions.close();
+                    }
                 }
             };
         },
