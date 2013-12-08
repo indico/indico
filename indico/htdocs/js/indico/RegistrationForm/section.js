@@ -224,15 +224,14 @@ ndRegForm.directive("ndAccommodationSection", function() {
                            name:'caption',
                            index:'caption',
                            align: 'center',
-                           sortable:false,
                            width:100,
                            editoptions: {size:"30",maxlength:"50"},
-                           editable: true
+                           editable: true,
+                           edittype: "text",
                        },
                        {
                            name:'billable',
                            index:'billable',
-                           sortable:false,
                            width:60,
                            editable: true,
                            align: 'center',
@@ -244,9 +243,9 @@ ndRegForm.directive("ndAccommodationSection", function() {
                            name:'price',
                            index:'price',
                            align: 'center',
-                           sortable:false,
                            width:50,
                            editable: true,
+                           edittype: "text",
                            editoptions:{size:"7",maxlength:"20"}
 
                        },
@@ -254,15 +253,14 @@ ndRegForm.directive("ndAccommodationSection", function() {
                            name:'placesLimit',
                            index:'placesLimit',
                            align: 'center',
-                           sortable:false,
                            width:80,
                            editable: true,
+                           edittype: "text",
                            editoptions:{size:"7",maxlength:"20"}
                        },
                        {
                            name:'cancelled',
                            index:'cancelled',
-                           sortable:false,
                            width:60,
                            editable: true,
                            align: 'center',
@@ -346,15 +344,14 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
                            name:'caption',
                            index:'caption',
                            align: 'left',
-                           sortable:false,
                            width:200,
                            editoptions:{size:"30",maxlength:"80"},
-                           editable: false
+                           editable: false,
+                           edittype: "text",
                        },
                        {
                            name:'billable',
                            index:'billable',
-                           sortable:false,
                            width:60,
                            editable: true,
                            align: 'center',
@@ -365,15 +362,14 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
                            name:'price',
                            index:'price',
                            align: 'center',
-                           sortable:false,
                            width:80,
                            editable: true,
+                           edittype: "text",
                            editoptions:{size:"7",maxlength:"20"}
                        },
                        {
                            name:'enabled',
                            index:'enabled',
-                           sortable:false,
                            width:60,
                            editable: true,
                            align: 'center',
@@ -448,15 +444,14 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            name:'caption',
                            index:'caption',
                            align: 'center',
-                           sortable:false,
                            width:160,
                            editoptions:{size:"30",maxlength:"50"},
-                           editable: true
+                           editable: true,
+                           edittype: "text",
                         },
                         {
                            name:'billable',
                            index:'billable',
-                           sortable:false,
                            width:60,
                            editable: true,
                            align: 'center',
@@ -468,15 +463,14 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            name:'price',
                            index:'price',
                            align: 'center',
-                           sortable:false,
                            width:50,
                            editable: true,
+                           edittype: "text",
                            editoptions:{size:"7",maxlength:"20"}
                         },
                         {
                            name:'pricePerPlace',
                            index:'pricePerPlace',
-                           sortable:false,
                            width:80,
                            editable: true,
                            align: 'center',
@@ -491,15 +485,16 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            sortable:false,
                            width:80,
                            editable: true,
+                           edittype: "text",
                            editoptions:{size:"7",maxlength:"20"}
                         },
                         {
                            name:'maxPlace',
                            index:'maxPlace',
                            align: 'center',
-                           sortable:false,
                            width:80,
                            editable: true,
+                           edittype: "text",
                            editoptions:{size:"7",maxlength:"20"}
                         }
                   ]
@@ -513,15 +508,14 @@ ndRegForm.directive("ndSocialEventSection", function() {
                         {
                             index:'caption',
                             align: 'center',
-                            sortable:false,
                             width:160,
                             editoptions:{size:"30",maxlength:"50"},
-                            editable: false
+                            editable: false,
+                            edittype: "text",
                         },
                         {
                             name:'reason',
                             index:'cancelledReason',
-                            sortable:false,
                             width:250,
                             editoptions:{size:"30",maxlength:"50"},
                             editable: true

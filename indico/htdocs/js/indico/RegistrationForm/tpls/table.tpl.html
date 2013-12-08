@@ -14,11 +14,11 @@
             <td ng-repeat="elem in config.colModel"
                 style="text-align: {{ elem.align }};"
                 name="{{ elem.name }}">
-                <span ng-if="elem.editable == undefined || elem.editable == false">
+                <span ng-if="elem.editable == false">
                     {{ data[$parent.$parent.$index][elem.index] }}
                 </span>
                 <!-- TODO $parent.$parent??? Look for a better way to pass down the information -->
-                <input ng-if="elem.editable == true && (elem.edittype == 'text' || elem.edittype == undefined)"
+                <input ng-if="elem.editable == true && elem.edittype == 'text'"
                     ng-model="formData[$parent.$parent.$index][elem.index]"
                     ng-init="formData[$parent.$parent.$index][elem.index]=data[$parent.$parent.$index][elem.index]"
                     type="text"
