@@ -24,15 +24,24 @@ Dates to skip in a reservation
 from indico.core.db import db
 
 
-class ExcludedDay(db.Model):
+class ReservationExcludedDay(db.Model):
     __tablename__ = 'reservation_excluded_days'
 
-    start_date = db.Column(db.DateTime, nullable=False, primary_key=True)
-    end_date = db.Column(db.DateTime, nullable=False, primary_key=True)
+    excluded_day = db.Column(
+        db.Date,
+        nullable=False,
+        primary_key=True
+    )
 
-    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'), nullable=False)
+    reservation_id = db.Column(
+        db.Integer,
+        db.ForeignKey('reservations.id'),
+        nullable=False,
+        primary_key=True
+    )
 
     def __repr__(self):
-        return '<ExcludedDay({0}, {1}, {2})>'.format(self.reservation_id,
-                                                     self.start_date,
-                                                     self.end_date)
+        return '<ExcludedDay({0}, {1})>'.format(
+            self.reservation_id,
+            self.excluded_day
+        )

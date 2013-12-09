@@ -20,7 +20,8 @@
 import importlib
 import os
 
+
 for f in os.listdir(os.path.dirname(__file__)):
     if f.endswith('.py'):
-        module = importlib.import_module('.' + f[:-3], __package__)
+        module = importlib.import_module('indico.modules.rb.models.{}'.format(f[:-3]))
         globals().update(module.__dict__)

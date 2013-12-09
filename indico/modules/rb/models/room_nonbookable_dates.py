@@ -27,12 +27,30 @@ from indico.core.db import db
 class NonBookableDate(db.Model):
     __tablename__ = 'room_nonbookable_dates'
 
-    start_date = db.Column(db.DateTime, nullable=False, primary_key=True)
-    end_date = db.Column(db.DateTime, nullable=False, primary_key=True)
+    # columns
 
-    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), primary_key=True, nullable=False)
+    # dates
+    start_date = db.Column(
+        db.DateTime,
+        nullable=False,
+        primary_key=True
+    )
+    end_date = db.Column(
+        db.DateTime,
+        nullable=False,
+        primary_key=True
+    )
+    # room
+    room_id = db.Column(
+        db.Integer,
+        db.ForeignKey('rooms.id'),
+        primary_key=True,
+        nullable=False
+    )
 
     def __repr__(self):
-        return '<NonBookableDate({0}, {1}, {2})>'.format(self.room_id,
-                                                         self.start_date,
-                                                         self.end_date)
+        return '<NonBookableDate({0}, {1}, {2})>'.format(
+            self.room_id,
+            self.start_date,
+            self.end_date
+        )

@@ -29,23 +29,52 @@ from indico.core.db import db
 class Blocking(db.Model):
     __tablename__ = 'blockings'
 
-    id = db.Column(db.Integer, primary_key=True)
+    # columns
 
-    created_by = db.Column(db.String, nullable=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    start_date = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=False)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    created_by = db.Column(
+        db.String,
+        nullable=False
+    )
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow
+    )
+    start_date = db.Column(
+        db.DateTime,
+        nullable=False
+    )
+    end_date = db.Column(
+        db.DateTime,
+        nullable=False
+    )
+    reason = db.Column(
+        db.String,
+        nullable=False
+    )
 
-    reason = db.Column(db.String, nullable=False)
-    allowed = db.relationship('BlockingPrincipal',
-                              backref='blocking',
-                              cascade='all, delete-orphan')
+    # relationships
 
-    blocked_rooms = db.relationship('BlockedRoom',
-                                    backref='blocking',
-                                    cascade='all, delete-orphan')
+    allowed = db.relationship(
+        'BlockingPrincipal',
+        backref='blocking',
+        cascade='all, delete-orphan'
+    )
+    blocked_rooms = db.relationship(
+        'BlockedRoom',
+        backref='blocking',
+        cascade='all, delete-orphan'
+    )
 
     def __repr__(self):
-        return '<Blocking({0}, {1}, {2}, {3}, {4})>'.format(self.id, self.created_by,
-                                                            self.reason, self.start_date,
-                                                            self.end_date)
+        return '<Blocking({0}, {1}, {2}, {3}, {4})>'.format(
+            self.id,
+            self.created_by,
+            self.reason,
+            self.start_date,
+            self.end_date
+        )

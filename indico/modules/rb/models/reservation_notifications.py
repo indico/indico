@@ -27,10 +27,26 @@ from indico.core.db import db
 class ReservationNotification(db.Model):
     __tablename__ = 'reservation_notifications'
 
-    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'),
-                               primary_key=True, nullable=False)
-    occurrence = db.Column(db.DateTime, nullable=False, primary_key=True)
+    reservation_id = db.Column(
+        db.Integer,
+        db.ForeignKey('reservations.id'),
+        nullable=False,
+        primary_key=True
+    )
+    occurrence = db.Column(
+        db.DateTime,
+        nullable=False,
+        primary_key=True
+    )
+    is_sent = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
 
     def __repr__(self):
-        return '<ReservationNotification({0}, {1})>'.format(self.reservation_id,
-                                                            self.occurrence)
+        return '<ReservationNotification({0}, {1}, {2})>'.format(
+            self.reservation_id,
+            self.occurrence,
+            self.is_sent
+        )

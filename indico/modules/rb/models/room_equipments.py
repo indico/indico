@@ -22,19 +22,66 @@ Equipments for rooms
 """
 
 from indico.core.db import db
+from indico.modules.rb.models import utils
 
 
-RoomEquipmentAssociation = db.Table('rooms_equipments', db.metadata,
-    db.Column('equipment_id', db.Integer, db.ForeignKey('room_equipments.id')),
-    db.Column('room_id', db.Integer, db.ForeignKey('rooms.id'))
+RoomEquipmentAssociation = db.Table(
+    'rooms_equipments',
+    db.metadata,
+    db.Column(
+        'equipment_id',
+        db.Integer,
+        db.ForeignKey(
+            'room_equipments.id',
+            ondelete='cascade'
+        ),
+        primary_key=True,
+    ),
+    db.Column(
+        'room_id',
+        db.Integer,
+        db.ForeignKey(
+            'rooms.id',
+            ondelete='cascade'
+        ),
+        primary_key=True
+    )
 )
 
 
 class RoomEquipment(db.Model):
     __tablename__ = 'room_equipments'
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, unique=True)
+    # columns
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    name = db.Column(
+        db.String,
+        nullable=False,
+        unique=True,
+        index=True
+    )
+
+    # core
 
     def __repr__(self):
         return '<RoomEquipment({0}, {1})>'.format(self.id, self.name)
+
+    # getters
+
+    @staticmethod
+    def getEquipmentById(eid):
+        return RoomEquipment.query.get(eid)
+
+    @staticmethod
+    @utils.filtered
+    def getEquipments(**filters):
+        return RoomEquipment, RoomEquipment.query
+
+    @staticmethod
+    def getEquipmentByName(name):
+        return RoomEquipment.query.filter_by(name=name).first()
+        # return RoomEquipment.getEquipments(name=name)

@@ -22,29 +22,37 @@ Custom attributes for locations
 """
 
 from indico.core.db import db
+from indico.modules.rb.models import utils
 
 
-class LocationAttribute(db.Model):
+class LocationAttribute(utils.JSONStringBridgeMixin, db.Model):
     __tablename__ = 'location_attributes'
 
-    key_id = db.Column(db.Integer, db.ForeignKey('location_attribute_keys.id'),
-                       nullable=False, primary_key=True)
-    value = db.Column(db.String, nullable=False)
+    # columns
 
-    location_id = db.Column(db.Integer, db.ForeignKey('locations.id'),
-                            primary_key=True, nullable=False)
-
-    def __init__(self, value):
-        self.value = value
+    key_id = db.Column(
+        db.Integer,
+        db.ForeignKey('location_attribute_keys.id'),
+        nullable=False,
+        primary_key=True
+    )
+    raw_data = db.Column(
+        db.String,
+        nullable=False
+    )
+    location_id = db.Column(
+        db.Integer,
+        db.ForeignKey('locations.id'),
+        primary_key=True,
+        nullable=False
+    )
 
     def __str__(self):
         return self.value
 
     def __repr__(self):
-        return '<LocationAttribute({0}, {1}, {2})>'.format(self.location_id,
-                                                           self.key_id,
-                                                           self.value)
-
-    @staticmethod
-    def getAllAttributeKeys():
-        pass
+        return '<LocationAttribute({0}, {1}, {2})>'.format(
+            self.location_id,
+            self.key_id,
+            self.value
+        )

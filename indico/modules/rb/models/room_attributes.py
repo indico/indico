@@ -20,14 +20,12 @@
 """
 Custom attributes for rooms
 """
-import json
-
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
+from indico.modules.rb.models import utils
 
 
-class RoomAttribute(db.Model):
+class RoomAttribute(utils.JSONStringBridgeMixin, db.Model):
     __tablename__ = 'room_attributes'
     __table_args__ = (
         db.ForeignKeyConstraint(
@@ -69,15 +67,9 @@ class RoomAttribute(db.Model):
         backref=db.backref('parent', remote_side=[key_id, room_id])
     )
 
-    @hybrid_property
-    def value(self):
-        return json.loads(self.raw_data)
-
-    @value.setter
-    def value(self, data):
-        self.raw_data = json.dumps(data)
-
     def __repr__(self):
-        return '<RoomAttribute({0}, {1}, {2})>'.format(self.room_id,
-                                                       self.key_id,
-                                                       self.value)
+        return '<RoomAttribute({0}, {1}, {2})>'.format(
+            self.room_id,
+            self.key_id,
+            self.value
+        )

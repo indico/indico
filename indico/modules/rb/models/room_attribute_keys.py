@@ -21,21 +21,31 @@
 Custom attribute keys for rooms
 """
 
+from sqlalchemy.orm.exc import NoResultFound
+
 from indico.core.db import db
+from indico.modules.rb.models import utils
 
 
 class RoomAttributeKey(db.Model):
     __tablename__ = 'room_attribute_keys'
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, unique=True)
-
-    attributes = db.relationship('RoomAttribute',
-                                 backref='key',
-                                 cascade='all, delete-orphan')
-
-    def __init__(self, name):
-        self.name = name
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    name = db.Column(
+        db.String,
+        nullable=False,
+        unique=True,
+        index=True
+    )
+    attributes = db.relationship(
+        'RoomAttribute',
+        backref='key',
+        cascade='all, delete-orphan',
+        lazy='dynamic'
+    )
 
     def __str__(self):
         return self.name
@@ -57,14 +67,21 @@ class RoomAttributeKey(db.Model):
         return RoomAttributeKey.query.all()
 
     @staticmethod
-    def getAllKeyNames():
-        # TODO: replace with projection
-        return [k.name for k in RoomAttributeKey.getAllKeys()]
-
-    @staticmethod
-    def getKeysByName(name):
-        return RoomAttributeKey.query.filter(RoomAttributeKey.name == name)
-
-    @staticmethod
     def getKeyById(kid):
         return RoomAttributeKey.query.get(kid)
+
+    @staticmethod
+    @utils.filtered
+    def getKeys(**filters):
+        return RoomAttributeKey, RoomAttributeKey.query
+
+    @staticmethod
+    @utils.filtered
+    def getKeyNames(**filters):
+        return (RoomAttributeKey,
+                RoomAttributeKey.query
+                                .with_entities(RoomAttributeKey.name))
+
+    @staticmethod
+    def getKeyByName(name):
+        return RoomAttributeKey.query.filter_by(name=name).first()

@@ -22,25 +22,43 @@ Custom attributes for reservations
 """
 
 from indico.core.db import db
+from indico.modules.rb.models import utils
 
 
-class ReservationAttribute(db.Model):
+class ReservationAttribute(utils.JSONStringBridgeMixin, db.Model):
     __tablename__ = 'reservation_attributes'
 
-    key_id = db.Column(db.Integer, db.ForeignKey('reservation_attribute_keys.id'),
-                       nullable=False, primary_key=True)
-    value = db.Column(db.String, nullable=False)
+    # columns
 
-    reservation_id = db.Column(db.Integer, db.ForeignKey('reservations.id'),
-                               primary_key=True, nullable=False)
+    key_id = db.Column(
+        db.Integer,
+        db.ForeignKey('reservation_attribute_keys.id'),
+        nullable=False,
+        primary_key=True
+    )
 
-    def __init__(self, value):
-        self.value = value
+    raw_data = db.Column(
+        db.String,
+        nullable=False
+    )
+
+    reservation_id = db.Column(
+        db.Integer,
+        db.ForeignKey('reservations.id'),
+        primary_key=True,
+        nullable=False
+    )
 
     def __str__(self):
-        return self.value
+        return '{} has value of {} for key {}'.format(
+            self.reservation,
+            self.key,
+            self.value
+        )
 
     def __repr__(self):
-        return '<ReservationAttribute({0}, {1}, {2})>'.format(self.reservation_id,
-                                                              self.key_id,
-                                                              self.value)
+        return '<ReservationAttribute({0}, {1}, {2})>'.format(
+            self.reservation_id,
+            self.key_id,
+            self.value
+        )

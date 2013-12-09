@@ -24,46 +24,81 @@ Holder of rooms in a place and its map view related data
 from datetime import datetime, timedelta
 
 import pytz
-from sqlalchemy import func
+from sqlalchemy import func, or_
+from sqlalchemy.orm.exc import NoResultFound
 
 from MaKaC.common.Locators import Locator
 
 from indico.core.db import db
+from indico.modules.rb.models import utils
 from indico.modules.rb.models.aspects import Aspect
+from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 
 
 class Location(db.Model):
     __tablename__ = 'locations'
 
-    id = db.Column(db.Integer, primary_key=True)
+    # columns
 
-    name = db.Column(db.String, nullable=False, unique=True)
-    support_emails = db.Column(db.String)
-    is_default = db.Column(db.String, nullable=False)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    name = db.Column(
+        db.String,
+        nullable=False,
+        unique=True,
+        index=True
+    )
+    support_emails = db.Column(
+        db.String
+    )
+    is_default = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    default_aspect_id = db.Column(
+        db.Integer,
+        db.ForeignKey(
+            'aspects.id',
+            use_alter=True,
+            name='fk_default_aspect_id'
+        )
+    )
 
-    aspects = db.relationship('Aspect',
-                              backref='location',
-                              cascade='all, delete-orphan',
-                              primaryjoin=id==Aspect.location_id)
+    # relationships
 
-    default_aspect_id = db.Column(db.Integer, db.ForeignKey('aspects.id',
-                                                            use_alter=True,
-                                                            name='fk_default_aspect_id'))
+    aspects = db.relationship(
+        'Aspect',
+        backref='location',
+        cascade='all, delete-orphan',
+        primaryjoin=id==Aspect.location_id,
+        lazy='dynamic'
+    )
 
-    default_aspect = db.relationship('Aspect',
-                                     primaryjoin=default_aspect_id==Aspect.id,
-                                     post_update=True)
+    default_aspect = db.relationship(
+        'Aspect',
+        primaryjoin=default_aspect_id==Aspect.id,
+        post_update=True,
+    )
 
-    rooms = db.relationship('Room',
-                            backref='location',
-                            cascade='all, delete-orphan')
+    rooms = db.relationship(
+        'Room',
+        backref='location',
+        cascade='all, delete-orphan',
+        lazy='dynamic'
+    )
 
-    attributes = db.relationship('LocationAttribute',
-                                 backref='location',
-                                 cascade='all, delete-orphan')
+    attributes = db.relationship(
+        'LocationAttribute',
+        backref='location',
+        cascade='all, delete-orphan',
+        lazy='dynamic'
+    )
 
-    #### Common ####
+    # core
 
     def __str__(self):
         return self.name
@@ -76,15 +111,22 @@ class Location(db.Model):
         )
 
     def __cmp__(self, other):
+        if not (self and other):
+            return cmp(
+                1 if self else None,
+                1 if other else None
+            )
+        if self.id == other.id:
+            return 0
         return cmp(self.name, other.name)
 
-    # TODO: get rid of locators
-    def getLocator( self ):
+    # TODO: get rid of locators, may use id field instead
+    def getLocator(self):
         d = Locator()
-        d["locationId"] = self.name
+        d['locationId'] = self.name
         return d
 
-    #### Supports Emails ####
+    # support emails
 
     def getSupportEmails(self, to_list=True):
         if self.support_emails:
@@ -92,6 +134,8 @@ class Location(db.Model):
                 return self.support_emails.split(',')
             else:
                 return self.support_emails
+        else:
+            return ('', [])[to_list]
 
     def setSupportEmails(self, emails):
         if isinstance(emails, list):
@@ -100,7 +144,7 @@ class Location(db.Model):
             self.support_emails = emails
 
     def addSupportEmails(self, *emails):
-        new_support_emails = sorted(set(self.getSupportEmails() + emails))
+        new_support_emails = sorted(set(self.getSupportEmails() + list(emails)))
         self.support_emails = ','.join(new_support_emails)
 
     def deleteSupportEmails(self, *emails):
@@ -110,10 +154,11 @@ class Location(db.Model):
                 support_emails.remove(email)
         self.setSupportEmails(support_emails)
 
-    #### Aspects #####
+    # aspects
 
-    def getAllAspects(self):
-        return self.aspects
+    @utils.filtered
+    def getAspects(self, **filters):
+        return Aspect, self.aspects
 
     def addAspect(self, aspect):
         self.aspects.append(aspect)
@@ -128,14 +173,13 @@ class Location(db.Model):
         self.default_aspect = aspect
 
     def isMapAvailable(self):
-        return (self.query
-                    .join(Location.aspects)
-                    .count() > 0)
+        return self.aspects.count() > 0
 
-    #### Room Management ####
+    # room management
 
-    def getAllRooms(self):
-        return self.rooms
+    @utils.filtered
+    def getRooms(self, **filters):
+        return Room, self.rooms
 
     def addRoom(self, room):
         self.rooms.append(room)
@@ -143,26 +187,26 @@ class Location(db.Model):
     def deleteRoom(self, room):
         self.rooms.remove(room)
 
-    #### Default Location Management ####
+    # default location management
 
     @staticmethod
     def getDefaultLocation():
-        return Location.query.filter(Location.is_default).one()
+        return Location.query.filter_by(is_default=True).first()
 
     @staticmethod
-    def setDefaultLocation(name):
-        default_location = Location.getDefaultLocation()
-        if default_location:
-            if default_location.name == name:
-                return
-            default_location.is_default = False
-            db.session.add(default_location)
+    def setDefaultLocation(loc):
+        (Location.query
+                 .filter(
+                     or_(
+                        Location.is_default == True,
+                        Location.id == loc.id
+                    )
+                 )
+                 .update({
+                    'is_default': func.not_(Location.is_default)
+                 }, synchronize_session='fetch'))
 
-        new_default_location = Location.getLocationByName(name)
-        new_default_location.is_default = True
-        db.session.add(new_default_location)
-
-    #### Generic Location Management
+    # generic location management
 
     @staticmethod
     def getLocationById(lid):
@@ -170,109 +214,123 @@ class Location(db.Model):
 
     @staticmethod
     def getLocationByName(name):
-        return Location.query.filter(Location.name == name).one()
+        return Location.query.filter_by(name=name).first()
 
     @staticmethod
-    def getAllLocations():
+    def getLocations():
         return Location.query.all()
 
     @staticmethod
-    def removeLocationByName(name):
-        db.session.delete(Location.query.filter(Location.name == name).one())
+    def getNumberOfLocations():
+        return Location.query.count()
 
-    #### Location Helpers ####
+    @staticmethod
+    def removeLocationByName(name):
+        Location.query.filter_by(name=name).delete()
+
+    # location helpers
 
     def getAverageOccupation(self):
-        rooms = self.rooms.query.filter(Room.is_active and
-                                        Room.is_reservable).all()
-
         now = datetime.utcnow()
         end_date = datetime(now.year, now.month, now.day, 17, 30, tzinfo=pytz.utc)
         start_date = end_date - timedelta(30, 9*3600)  # 30 days + 9 hours
 
-        booked_time = sum(map(lambda room: room.getTotalBookedTime(start_date, end_date), rooms))
-        bookable_time = sum(map(lambda room: room.getTotalBookableTime(start_date, end_date), rooms))
+        booked_time = self.getTotalBookedTimeInLastMonth(start_date, end_date)
+        bookable_time = self.getTotalBookableTime(start_date, end_date)
 
         if bookable_time:
-            return float(booked_time.seconds) / bookable_time.seconds
+            return float(booked_time) / bookable_time
         return 0
 
-    def getNumberOfRooms(self):
+    def getTotalBookedTime(self, *dates):
         return (self.query
+                    .with_entities(func.sum())
                     .join(Location.rooms)
-                    .count())
+                    .join(Room.reservations)
+                    .filter(
+                        Room.is_active,
+                        Room.is_reservable,
+                        or_(
+                            Reservation.start_date.in_(dates),
+                            Reservation.end_date.in_(dates)
+                        )
+                    ))  # TODO
+
+    def getTotalBookableTime(self):
+        pass
+
+    def getNumberOfRooms(self):
+        return self.rooms.count()
 
     def getNumberOfActiveRooms(self):
-        return (self.query
-                    .join(Location.rooms)
-                    .filter(Room.is_active)
-                    .count())
+        return self.rooms.filter_by(is_active=True).count()
 
     def getNumberOfReservableRooms(self):
-        return (self.query
-                    .join(Location.rooms)
-                    .filter(Room.is_reservable)
-                    .count())
+        return self.rooms.filter_by(is_reservable=True).count()
 
-    def getAllReservableRooms(self):
-        return (self.query
-                    .join(Location.rooms)
-                    .filter(Room.is_reservable)
-                    .all())
+    def getReservableRooms(self):
+        return self.rooms.filter_by(is_reservable=True).all()
 
     def getTotalReservableSurfaceArea(self):
-        return (self.query
+        return (self.rooms
                     .with_entities(func.sum(Room.surface_area))
-                    .join(Location.rooms)
-                    .filter(Room.is_reservable)
+                    .filter_by(is_reservable=True)
                     .scalar())
 
     def getTotalReservableCapacity(self):
-        return (self.query
+        return (self.rooms
                     .with_entities(func.sum(Room.capacity))
-                    .join(Location.rooms)
-                    .filter(Room.is_reservable)
+                    .filter_by(is_reservable=True)
                     .scalar())
 
     def getReservationStats(self):
-        return {
-            'liveValid': 0,
-            'liveCancelled': 0,
-            'liveRejected': 0,
-            'archivalValid': 0,
-            'archivalValid': 0,
-            'archivalValid': 0
-        }
+        return utils.results_to_dict(
+            self.query
+                .with_entities(
+                    Reservation.is_live,
+                    Reservation.is_cancelled,
+                    Reservation.is_rejected,
+                    func.count(Reservation.id)
+                )
+                .join(Location.rooms)
+                .join(Room.reservations)
+                .group_by(
+                    Reservation.is_live,
+                    Reservation.is_cancelled,
+                    Reservation.is_rejected
+                )
+                .all())
 
-    def getAllBuildings(self):
-        return (self.query
-                    .with_entities(Room.building, Room)
-                    .join(Location.rooms)
-                    .filter(Room.building != None)
-                    .group_by(Room.building)
-                    .all())
+    def _hasCoordinates(self, rids):
+        coordinates = Room.getBuildingCoordinatesByRoomIds(rids)
+        if coordinates:
+            return {
+                'has_coordinates': True,
+                'latitude': coordinates[0],
+                'longtude': coordinates[1]
+            }
+        return {'has_coordinates': False}
 
-        # # break-down the rooms by buildings
-        # buildings = {}
-        # for room in rooms:
-        #     if room.building:
+    def getBuildings(self, with_rooms=True):
 
-        #         # if it's the first room in that building, initialize the building
-        #         building = buildings.get(room.building, None)
-        #         if building is None:
-        #             title = _("Building") + " %s" % room.building
-        #             building = {'has_coordinates':False, 'number':room.building, 'title':title, 'rooms':[]}
-        #             buildings[room.building] = building
+        results = (self.rooms
+                       .with_entities(
+                           Room.building,
+                           func.group_concat(Room.id)  # db specific
+                       )
+                      .filter(Room.building != None)
+                      .group_by(Room.building)
+                      .all())
 
-        #         # if the room has coordinates, set the building coordinates
-        #         if room.latitude and room.longitude:
-        #             building['has_coordinates'] = True
-        #             building['latitude'] = room.latitude
-        #             building['longitude'] = room.longitude
-
-        #         # add the room to its building
-        #         if not self._forVideoConference or room.needsAVCSetup:
-        #             building['rooms'].append(room.fossilize())
-
-        # # filter the buildings with rooms and coordinates and return them
-        # buildings_with_coords = [b for b in buildings.values() if b['rooms'] and b['has_coordinates']]
+        buildings = []
+        for building, room_id_list in results:
+            rids = map(int, room_id_list.split(','))
+            building_details = {
+                'number': building,
+                'title': _('Building') + ' {}'.format(building),
+                'rooms': (Room.getRoomsRequireVideoConferenceSetupByIds(rids)
+                          if with_rooms else [])
+            }
+            building_details.update(self._hasCoordinates(rids))
+            buildings.append(building_details)
+        return buildings

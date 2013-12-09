@@ -27,10 +27,23 @@ from indico.core.db import db
 class Photo(db.Model):
     __tablename__ = 'photos'
 
-    id = db.Column(db.Integer, primary_key=True)
-    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), nullable=False)
-    small_content = db.Column(db.LargeBinary, nullable=False)
-    large_content = db.Column(db.LargeBinary, nullable=False)  # or path, url = Column(String)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    room_id = db.Column(
+        db.Integer,
+        db.ForeignKey('rooms.id'),
+        nullable=False
+    )
+    small_content = db.Column(
+        db.LargeBinary,
+        nullable=False
+    )
+    large_content = db.Column(
+        db.LargeBinary,
+        nullable=False
+    )
 
     def __repr__(self):
         return '<Photo({0}, {1})>'.format(self.id, self.room_id)

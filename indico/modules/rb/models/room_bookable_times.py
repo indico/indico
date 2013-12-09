@@ -27,12 +27,26 @@ from indico.core.db import db
 class BookableTime(db.Model):
     __tablename__ = 'room_bookable_times'
 
-    start_time = db.Column(db.Time, nullable=False, primary_key=True)
-    end_time = db.Column(db.Time, nullable=False, primary_key=True)
-
-    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'), primary_key=True, nullable=False)
+    start_time = db.Column(
+        db.Time,
+        nullable=False,
+        primary_key=True
+    )
+    end_time = db.Column(
+        db.Time,
+        nullable=False,
+        primary_key=True
+    )
+    room_id = db.Column(
+        db.Integer,
+        db.ForeignKey('rooms.id'),
+        primary_key=True,
+        nullable=False
+    )
 
     def __repr__(self):
-        return '<BookableTime({0}, {1}, {2})>'.format(self.room_id,
-                                                      self.start_time,
-                                                      self.end_time)
+        return '<BookableTime({0}, {1}, {2})>'.format(
+            self.room_id,
+            self.start_time,
+            self.end_time
+        )

@@ -27,21 +27,35 @@ from indico.core.db import db
 class ReservationAttributeKey(db.Model):
     __tablename__ = 'reservation_attribute_keys'
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    # columns
 
-    attributes = db.relationship('ReservationAttribute',
-                                 backref='key',
-                                 cascade='all, delete-orphan')
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    name = db.Column(
+        db.String,
+        nullable=False,
+        unique=True,
+        index=True
+    )
 
-    def __init__(self, name):
-        self.name = name
+    # relationships
+
+    attributes = db.relationship(
+        'ReservationAttribute',
+        backref='key',
+        cascade='all, delete-orphan'
+    )
 
     def __str__(self):
         return self.name
 
     def __repr__(self):
-        return '<ReservationAttributeKey({0}, {1})>'.format(self.id, self.name)
+        return '<ReservationAttributeKey({0}, {1})>'.format(
+            self.id,
+            self.name
+        )
 
     def addAttribute(self, attribute):
         self.attributes.append(attribute)
@@ -50,9 +64,13 @@ class ReservationAttributeKey(db.Model):
         self.attributes.remove(attribute)
 
     @staticmethod
-    def getKeysByName(name):
-        return ReservationAttributeKey.query.filter(ReservationAttributeKey.name == name)
+    def getKeyByName(name):
+        return ReservationAttributeKey.query.filter_by(name=name).first()
 
     @staticmethod
     def getKeyById(kid):
         return ReservationAttributeKey.query.get(kid)
+
+    @staticmethod
+    def getAllKeys():
+        return ReservationAttributeKey.query.all()

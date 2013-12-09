@@ -27,15 +27,28 @@ from indico.core.db import db
 class LocationAttributeKey(db.Model):
     __tablename__ = 'location_attribute_keys'
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    # columns
 
-    attributes = db.relationship('LocationAttribute',
-                                 backref='key',
-                                 cascade='all, delete-orphan')
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    name = db.Column(
+        db.String,
+        nullable=False,
+        unique=True,
+        index=True
+    )
 
-    def __init__(self, name):
-        self.name = name
+    # relationships
+
+    attributes = db.relationship(
+        'LocationAttribute',
+        backref='key',
+        cascade='all, delete-orphan'
+    )
+
+    # core
 
     def __str__(self):
         return self.name
@@ -43,6 +56,12 @@ class LocationAttributeKey(db.Model):
     def __repr__(self):
         return '<LocationAttributeKey({0}, {1})>'.format(self.id, self.name)
 
+    # getters
+
     @staticmethod
-    def getAllAttributeKeys():
-        pass
+    def getAllKeys():
+        return LocationAttributeKey.query.all()
+
+    @staticmethod
+    def getKeyByName(name):
+        return LocationAttributeKey.query.filter_by(name=name).first()
