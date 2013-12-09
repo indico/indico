@@ -106,8 +106,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             }
 
             regFormFactory.Fields.save(postData,
-                function(data, headers) {
-                    $scope.field = data;
+                function(response) {
+                    $scope.field = angular.extend($scope.field, response);
                 });
             return true;
         },
