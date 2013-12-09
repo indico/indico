@@ -19,6 +19,7 @@
 
 from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
 
+
 class DALManagerCERN( DALManager ):
     """ CERN specific implementation. Inherits from the default plugin"""
     pass
