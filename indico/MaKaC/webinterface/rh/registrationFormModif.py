@@ -415,7 +415,7 @@ class RHRegistrationPreviewSection(RHRegistrationFormModifSectionBase):
     def _process_DELETE(self):
         if not self._section.isRequired():
             self._regForm.removeGeneralSectionForm(self._section)
-        return jsonify(self.getSectionsFossil())
+        return json.dumps(self.getSectionsFossil())
 
 
 class RHRegistrationFormSectionEnable(RHRegistrationFormModifSectionBase):

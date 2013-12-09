@@ -55,6 +55,7 @@ ndRegForm.factory('regFormFactory', function($resource, editionurl, displayurl) 
     var fieldurl = sectionurl + '/fields/:fieldId';
     return {
         Sections: $resource(sectionurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId"}, {
+            remove: {url: sectionurl, method: 'DELETE', isArray: true},
             "getAllSections": {method: 'GET', isArray: true},
             "getVisibleSections": {url: displayurl, method: 'GET', isArray: true},
             "enable": {method: 'POST', url: sectionurl + "/enable"},
