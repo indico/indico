@@ -32,20 +32,21 @@ class ReservationAttribute(utils.JSONStringBridgeMixin, db.Model):
 
     key_id = db.Column(
         db.Integer,
-        db.ForeignKey('reservation_attribute_keys.id'),
+        db.ForeignKey('attribute_keys.id'),
         nullable=False,
         primary_key=True
     )
-
-    raw_data = db.Column(
-        db.String,
-        nullable=False
-    )
-
     reservation_id = db.Column(
         db.Integer,
         db.ForeignKey('reservations.id'),
-        primary_key=True,
+        nullable=False,
+        primary_key=True
+    )
+    caption = db.Column(
+        db.String
+    )
+    raw_data = db.Column(
+        db.String,
         nullable=False
     )
 

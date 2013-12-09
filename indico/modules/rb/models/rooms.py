@@ -36,7 +36,6 @@ from MaKaC.user import Avatar, AvatarHolder
 from indico.core.db import db, group_concat
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.reservations import Reservation
-from indico.modules.rb.models.room_attribute_keys import RoomAttributeKey
 from indico.modules.rb.models.room_attributes import RoomAttribute
 from indico.modules.rb.models.room_equipments import (
     RoomEquipment,
@@ -381,18 +380,18 @@ notificationAssistance: {notification_for_assistance}
     def getAttributes(self, **filters):
         return RoomAttribute, self.attributes
 
-    def getAttributeByName(self, name):
-        aval = (self.attributes
-                    .with_entities(RoomAttribute.value)
-                    .outerjoin(RoomAttribute.key)
-                    .filter(
-                        self.id == RoomAttribute.room_id,
-                        RoomAttribute.key_id == RoomAttributeKey.id,
-                        RoomAttributeKey.name == name
-                    )
-                    .first())
-        if aval:
-            return aval[0]
+    # def getAttributeByName(self, name):
+    #     aval = (self.attributes
+    #                 .with_entities(RoomAttribute.value)
+    #                 .outerjoin(RoomAttribute.key)
+    #                 .filter(
+    #                     self.id == RoomAttribute.room_id,
+    #                     RoomAttribute.key_id == RoomAttributeKey.id,
+    #                     RoomAttributeKey.name == name
+    #                 )
+    #                 .first())
+    #     if aval:
+    #         return aval[0]
 
     def hasBookingACL(self):
         return self.getAttributeByName('Booking Simba List') is not None

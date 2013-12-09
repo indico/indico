@@ -26,24 +26,27 @@ from indico.modules.rb.models import utils
 
 
 class LocationAttribute(utils.JSONStringBridgeMixin, db.Model):
-    __tablename__ = 'location_attributes'
+    __tablename__ = 'location_room_attributes'
 
     # columns
 
     key_id = db.Column(
         db.Integer,
-        db.ForeignKey('location_attribute_keys.id'),
+        db.ForeignKey('attribute_keys.id'),
         nullable=False,
         primary_key=True
-    )
-    raw_data = db.Column(
-        db.String,
-        nullable=False
     )
     location_id = db.Column(
         db.Integer,
         db.ForeignKey('locations.id'),
-        primary_key=True,
+        nullable=False,
+        primary_key=True
+    )
+    caption = db.Column(
+        db.String
+    )
+    raw_data = db.Column(
+        db.String,
         nullable=False
     )
 
@@ -51,8 +54,9 @@ class LocationAttribute(utils.JSONStringBridgeMixin, db.Model):
         return self.value
 
     def __repr__(self):
-        return '<LocationAttribute({0}, {1}, {2})>'.format(
+        return '<LocationAttribute({0}, {1}, {2}, {3})>'.format(
             self.location_id,
             self.key_id,
+            self.caption,
             self.value
         )

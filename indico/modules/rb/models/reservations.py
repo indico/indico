@@ -36,7 +36,6 @@ from indico.core.db import db
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.utils import apply_filters, RBFormatter
 from indico.modules.rb.models.reservation_attributes import ReservationAttribute
-from indico.modules.rb.models.reservation_attribute_keys import ReservationAttributeKey
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_excluded_days import ReservationExcludedDay
 
@@ -275,18 +274,18 @@ class Reservation(db.Model):
         if email_list:
             return email_list.split(',')
 
-    def getAttributeByName(self, name):
-        aval = (self.attributes
-                    .with_entities(ReservationAttribute.value)
-                    .outerjoin(ReservationAttribute.key)
-                    .filter(
-                        self.id == ReservationAttribute.reservation_id,
-                        ReservationAttribute.key_id == ReservationAttributeKey.id,
-                        ReservationAttributeKey.name == name
-                    )
-                    .first())
-        if aval:
-            return aval[0]
+    # def getAttributeByName(self, name):
+    #     aval = (self.attributes
+    #                 .with_entities(ReservationAttribute.value)
+    #                 .outerjoin(ReservationAttribute.key)
+    #                 .filter(
+    #                     self.id == ReservationAttribute.reservation_id,
+    #                     ReservationAttribute.key_id == ReservationAttributeKey.id,
+    #                     ReservationAttributeKey.name == name
+    #                 )
+    #                 .first())
+    #     if aval:
+    #         return aval[0]
 
     # emails
 

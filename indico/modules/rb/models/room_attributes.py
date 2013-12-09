@@ -27,44 +27,25 @@ from indico.modules.rb.models import utils
 
 class RoomAttribute(utils.JSONStringBridgeMixin, db.Model):
     __tablename__ = 'room_attributes'
-    __table_args__ = (
-        db.ForeignKeyConstraint(
-            ['parent_key_id', 'parent_room_id'],
-            ['room_attributes.key_id', 'room_attributes.room_id']
-        ),
-        {}
-    )
 
     key_id = db.Column(
         db.Integer,
-        db.ForeignKey('room_attribute_keys.id'),
+        db.ForeignKey('attribute_keys.id'),
         nullable=False,
         primary_key=True
     )
-
-    raw_data = db.Column(
-        db.String,
-        nullable=False
-    )
-
     room_id = db.Column(
         db.Integer,
         db.ForeignKey('rooms.id'),
         nullable=False,
         primary_key=True
     )
-
-    parent_key_id = db.Column(
-        db.Integer
+    caption = db.Column(
+        db.String
     )
-
-    parent_room_id = db.Column(
-        db.Integer,
-    )
-
-    children = db.relationship(
-        'RoomAttribute',
-        backref=db.backref('parent', remote_side=[key_id, room_id])
+    raw_data = db.Column(
+        db.String,
+        nullable=False
     )
 
     def __repr__(self):
