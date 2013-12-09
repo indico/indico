@@ -115,7 +115,6 @@ ndRegForm.directive('ndSection', function($rootScope, url) {
             });
 
             scope.$watch('state.collapsed', function(val) {
-                // TODO this will probably cause trouble in not-edit mode
                 var content = angular.element(element.children()[2]);
                 if (val) {
                     content.slideUp();
