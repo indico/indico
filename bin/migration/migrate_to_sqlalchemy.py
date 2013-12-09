@@ -92,6 +92,8 @@ def convert_to_unicode(val):
             return unicode(val, 'latin1')
     elif isinstance(val, unicode):
         return val
+    elif isinstance(val, int):
+        return unicode(val)
     elif val is None:
         return u''
     raise RuntimeError('Unexpected type is found for unicode conversion')
@@ -230,14 +232,28 @@ def migrate_rooms(main_root, rb_root, photo_path):
                 if e:
                     r.equipments.append(e)
                 else:
-                    r.equipments.append(RoomEquipment(name=old_equipment))
+                    # r.equipments.append(RoomEquipment(name=old_equipment))
+                    r.equipment_names.append(old_equipment)  # by assoc proxy
 
-        for k, v in getattr(old_room, 'customAtts', {}).iteritems():
-            name = convert_to_unicode(k)
+        for old_custom_attribute in getattr(old_room, 'customAtts', []):
+            if isinstance(old_custom_attribute, str):
+                name = convert_to_unicode(old_custom_attribute)
+                value = {}
+            elif isinstance(old_custom_attribute, dict):
+                if 'name' in old_custom_attribute:
+                    name = convert_to_unicode(old_custom_attribute['name'])
+                    del old_custom_attribute['name']
+                else:
+                    name = 'unknown'
+                value = old_custom_attribute
+            else:
+                raise RuntimeError('Unexpected custom attribute type')
+
             k = RoomAttributeKey.getKeyByName(name)
             if not k:
                 k = RoomAttributeKey(name=name)
-            a = RoomAttribute(value=convert_to_unicode(v))
+            a = RoomAttribute()
+            a.value = value
             k.attributes.append(a)
             r.attributes.append(a)
 
@@ -247,7 +263,7 @@ def migrate_rooms(main_root, rb_root, photo_path):
             ck = RoomAttributeKey.getKeyByName(child_name)
             if not ck:
                 ck = RoomAttributeKey(name=child_name)
-            ca = RoomAttribute(value=u'')
+            ca = RoomAttribute(raw_data=u'{}')
             ck.attributes.append(ca)
             for attr in a.attributes:
                 attr.children.append(ca)
@@ -281,11 +297,11 @@ def migrate_reservations(main_root, rb_root):
             created_at=convert_date(v._utcCreatedDT),
             start_date=convert_date(v._utcStartDT),
             end_date=convert_date(v._utcEndDT),
-            booked_for_id=(v.bookedForId or '1073'),
+            booked_for_id=convert_to_unicode(v.bookedForId or u'1073'),
             booked_for_name=convert_to_unicode(v.bookedForName),
-            contact_email=v.contactEmail,
-            contact_phone=v.contactPhone,
-            created_by=(v.createdBy or '1073'),
+            contact_email=convert_to_unicode(v.contactEmail),
+            contact_phone=convert_to_unicode(v.contactPhone),
+            created_by=convert_to_unicode(v.createdBy or u'1073'),
             is_cancelled=v.isCancelled,
             is_confirmed=v.isConfirmed,
             is_rejected=v.isRejected,
@@ -303,24 +319,28 @@ def migrate_reservations(main_root, rb_root):
                 )
                 r.edit_logs.append(l)
 
-        for d in v._excludedDays:
-            ex = ReservationExcludedDay(
-                start_date=convert_date(d),
-                end_date=convert_date(d)
-            )
-            r.excluded_dates.append(ex)
+        r.excluded_days.extend(map(convert_date, v._excludedDays))
 
         for e in extra_attributes:
-            a = ReservationAttribute(value=getattr(v, e, False) or False)
+            a = ReservationAttribute()
+            a.value = {'required': getattr(v, e, False) or False}
             k = ReservationAttributeKey.getKeyByName(e)
             k.attributes.append(a)
             r.attributes.append(a)
 
         for e in getattr(v, 'useVC', []):
-            a = ReservationAttribute(value=True)
+            a = ReservationAttribute()
+            a.value = {'required': True}
             k = ReservationAttributeKey.getKeyByName(e)
             k.attributes.append(a)
             r.attributes.append(a)
+
+        for d in getattr(v, 'startEndNotification', []):
+            n = ReservationNotification(
+                occurrence=convert_date(d),
+                is_sent=True
+            )
+            r.notifications.append(n)
 
         room = Room.getRoomById(v.room.id)
         room.reservations.append(r)
@@ -333,10 +353,10 @@ def migrate_blockings(main_root, rb_root):
     for old_blocking_id, old_blocking in rb_root['RoomBlocking']['Blockings'].iteritems():
         b = Blocking(
             id=old_blocking.id,
-            created_by=old_blocking._createdBy,
-            created_at=old_blocking._utcCreatedDT,
-            start_date=old_blocking.startDate,
-            end_date=old_blocking.endDate,
+            created_by=convert_to_unicode(old_blocking._createdBy),
+            created_at=convert_date(old_blocking._utcCreatedDT),
+            start_date=convert_date(old_blocking.startDate),
+            end_date=convert_date(old_blocking.endDate),
             reason=convert_to_unicode(old_blocking.message)
         )
 
@@ -365,15 +385,17 @@ def migrate(*args):
     migrate_locations(*args[:-1])
     migrate_rooms(*args)
     migrate_reservations(*args[:-1])
-    migrate_blockings(*args[:-1])
+    # migrate_blockings(*args[:-1])
 
 
 def main(*args):
     main_root, rb_root, app = setup(*args[:3])
 
     with app.app_context():
+        if args[-1]:
+            db.drop_all()
         db.create_all()
-        migrate(main_root, rb_root, args[-1])
+        migrate(main_root, rb_root, args[-2])
 
 
 if __name__ == '__main__':
@@ -381,7 +403,8 @@ if __name__ == '__main__':
     parser.add_argument('main', help='main zodb storage path')
     parser.add_argument('rb', help='room booking zodb file storage path')
     parser.add_argument('uri', help='sqlalchemy database uri')
+    parser.add_argument('-d', '--drop', help='drop existing', action='store_true')
     parser.add_argument('-p', '--photo', help='photos path')
 
     args = parser.parse_args()
-    main(args.main, args.rb, args.uri, args.photo)
+    main(args.main, args.rb, args.uri, args.photo, args.drop)
