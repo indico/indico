@@ -99,7 +99,6 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                 $scope.sections = regFormFactory.Sections.getVisibleSections({confId: $scope.confId}, {});
             }
 
-
             $scope.dialogs = {
                 addsection: false,
                 management: false
@@ -126,8 +125,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
             $scope.api = {
                 createSection: function(data) {
-                    // TODO: Check why creteSectionForm is not in the data scope!
-                    if(data.$$childHead.sectionCreationForm.$invalid === true){
+                    if(data.sectionCreationForm.$invalid === true){
                         return false;
                     }
 
@@ -138,6 +136,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                     }, function(newsection) {
                         $scope.sections.push(newsection);
                     });
+
                     return true;
                 },
                 moveSection: function(section, position){
@@ -186,7 +185,9 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
 ndRegForm.directive('ndAddSectionDialog', function(url) {
     return {
+        require: 'ndDialog',
         templateUrl: url.tpl('sections/dialogs/sectioncreation.tpl.html'),
+
         link: function(scope) {
             scope.actions.init = function() {
                 scope.newsection = {};

@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','regFormFactory', function($scope, $rootScope, regFormFactory) {
+ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory) {
     $scope.api = {};
     $scope.actions = {};
 
@@ -81,7 +81,7 @@ ndRegForm.controller('SectionCtrl', ['$scope', '$rootScope','regFormFactory', fu
             }
         });
     };
-}]);
+});
 
 ndRegForm.directive('ndSection', function($rootScope, url) {
     return {
