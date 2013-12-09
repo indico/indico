@@ -19,7 +19,7 @@
 
 from flask import request
 
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 from MaKaC.errors import MaKaCError, FormValuesError
 from MaKaC.webinterface import urlHandlers
 

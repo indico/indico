@@ -21,7 +21,7 @@ from flask import request, session
 
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages import admins as adminPages
-from indico.core.logging import Logger
+from indico.core.logger import Logger
 
 from indico.core.db import db
 from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase

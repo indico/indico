@@ -31,4 +31,4 @@ class RHRoomBookingAdminBase(RHRoomBookingBase):
         if self._getUser() == None:
             self._checkSessionUser()
         elif not self._getUser().isRBAdmin():
-            raise MaKaCError("You are not authorized to take this action.")
+            raise MaKaCError(_('You are not authorized to take this action.'))
