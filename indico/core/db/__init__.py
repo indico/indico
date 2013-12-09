@@ -19,11 +19,9 @@
 
 __all__ = ['DBMgr', 'MigratedDB']
 
-import glob
-import importlib
-import os
-
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy.ext import compiler
+from sqlalchemy.sql.expression import FunctionElement
 
 from .manager import DBMgr
 from .migration import MigratedDB
@@ -32,6 +30,19 @@ from .migration import MigratedDB
 db = SQLAlchemy()
 
 
-def load(package):
-    for f in glob.glob(os.path.dirname(__file__) + '/{0}/*.py'.format(package)):
-        importlib.import_module('.' + os.path.basename(f)[:-3], __package__ + '.' + package)
+# engine specific group concat
+class group_concat(FunctionElement):
+    name = "group_concat"
+
+
+@compiler.compiles(group_concat, 'sqlite')
+def _group_concat_sqlite(element, compiler, **kwargs):
+    if len(element.clauses) == 2:
+        separator = compiler.process(element.clauses.clauses[1])
+    else:
+        separator = ', '
+
+    return 'GROUP_CONCAT(%s SEPARATOR %s)'.format(
+        compiler.process(element.clauses.clauses[0]),
+        separator
+    )
