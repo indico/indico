@@ -20,7 +20,7 @@ from cStringIO import StringIO
 
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
+from MaKaC.webinterface.rh.base import RHDisplayBaseProtected, RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
 from MaKaC.webinterface.common.contribFilters import SortingCriteria
 from indico.core.config import Config
