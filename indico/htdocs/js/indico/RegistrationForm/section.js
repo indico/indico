@@ -155,12 +155,6 @@ ndRegForm.directive("ndGeneralSection", function($timeout, url, sortableoptions)
             scope.buttons.disable = true;
             scope.tplGeneralField = url.tpl('sections/generalfield.tpl.html');
 
-            scope.hasDisabledFields = function() {
-                return _.any(scope.section.items, function(field) {
-                    return field.disabled === true;
-                });
-            };
-
             scope.api.removeNewField = function() {
                 if (scope.section.items[scope.section.items.length-1].id == -1) {
                     $timeout(function() {
