@@ -22,13 +22,17 @@ import importlib
 import os
 
 try:
+    from flask import Flask
     from sqlalchemy_schemadisplay import create_schema_graph, create_uml_graph
     from sqlalchemy import MetaData
     from sqlalchemy.orm import class_mapper
 except ImportError:
-    print 'You should install sqlalchemy and sqlalchemy-schemadisplay to create graphs'
+    print ('You should install flask, sqlalchemy and sqlalchemy-schemadisplay'
+           ' to create graphs')
     import sys
     sys.exit(0)
+
+from indico.core.db import db
 
 
 def load_all_modules(pkg_name):
@@ -39,6 +43,15 @@ def load_all_modules(pkg_name):
         elif os.path.isdir(os.path.join(directory, f)):
             for m in load_all_modules(pkg_name + '.' + f):
                 yield m
+
+
+def create_schema(uri, pkg_name):
+    app = Flask('schema generator')
+    app.config['SQLALCHEMY_DATABASE_URI'] = uri
+    list(load_all_modules(pkg_name))
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()
 
 
 def generate_schema_graph(uri, output):
@@ -72,10 +85,16 @@ if __name__ == '__main__':
     uml.add_argument('-u', '--uml_output', help='uml diagram output path')
 
     schema = parser.add_argument_group('SCHEMA')
+    schema.add_argument('-c', '--create', help='first create the database from the package')
     schema.add_argument('-d', '--database', help='generate schema diagram')
     schema.add_argument('-s', '--schema_output', help='schema graph output path')
 
     args = parser.parse_args()
+
+    if args.create and args.database:
+        create_schema(args.database, args.create)
+    elif args.create and not args.database:
+        print '-c and -d must be supplied together'
 
     if args.database and args.schema_output:
         generate_schema_graph(args.database, args.schema_output)
