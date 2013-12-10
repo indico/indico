@@ -489,6 +489,7 @@ class IRegFormAccommodationSectionFossil(IRegFormSectionBaseFossil):
         """
         Arrival offset dates
         """
+    getArrivalOffsetDates.convert = lambda x: [-el for el in x]
 
     def getDepartureOffsetDates(self):
         """

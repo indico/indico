@@ -11,8 +11,11 @@
             <div nowrap align="center" class="title">${ title_regform }</div>
         % endif
         <div ng-app="nd" ng-controller="AppCtrl">
-            <div nd-reg-form conf-id="${confId}" currency="${currency}" edit-mode="false"></div>
-            <input type="hidden" value="${confId}" id="conf_id">
+            <div nd-reg-form
+                conf-id="${conf.getId()}"
+                currency="${currency}"
+                edit-mode="false"></div>
+            <input type="hidden" value="${conf.getId()}" id="conf_id">
         </div>
         <div class="regform-mandatory-info ">
             <span>${ _("(All the fields marked with ") }</span>
@@ -23,7 +26,7 @@
                 <input type="submit" class="i-button highlight" value="${_('Register')}">
         </div>
     </div>
-    <input type="hidden" value="${confId}" id="conf_id">
+    <input type="hidden" value="${conf.getId()}" id="conf_id">
 </form>
     <script type="text/javascript">
         $("div#registrationForm").html(progressIndicator(false, true).dom);
@@ -59,7 +62,7 @@
         }
 
         $(function() {
-            var confId = ${ confId };
+            var confId = ${ conf.getId() };
             //var rfView = new RegFormDisplayView({el : $("div#registrationForm")} ,confId );
             $(".regFormButton").click(function(){
                 var self = this;

@@ -512,7 +512,7 @@ class RHRegistrationFormAccommodationSetConfig(RHRegistrationFormModifAccomodati
                 accoType.setValues(item)
 
     def _process_POST(self):
-        self._section.setArrivalOffsetDates([int(d) for d in self._arrivalOffsetDates])
+        self._section.setArrivalOffsetDates([int(-d) for d in self._arrivalOffsetDates])
         self._section.setDepartureOffsetDates([int(d) for d in self._departureOffsetDates])
         self._setItems()
         return json.dumps(self._section.fossilize())

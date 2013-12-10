@@ -1,6 +1,11 @@
 <div ng-app="nd" ng-controller="AppCtrl">
-    <div nd-reg-form conf-id="${confId}" currency="${currency}" edit-mode="true"></div>
-    <input type="hidden" value="${confId}" id="conf_id">
+    <div nd-reg-form
+        conf-id="${conf.getId()}"
+        conf-sdate="${conf.getStartDate()}"
+        conf-edate="${conf.getEndDate()}"
+        currency="${currency}"
+        edit-mode="true"></div>
+    <input type="hidden" value="${conf.getId()}" id="conf_id">
 </div>
 
 <script>

@@ -208,12 +208,48 @@ ndRegForm.directive("ndPersonalDataSection", function() {
     };
 });
 
-ndRegForm.directive("ndAccommodationSection", function() {
+ndRegForm.directive("ndAccommodationSection", function($rootScope) {
     return {
         require: 'ndSection',
         link: function(scope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
+
+            scope.dialogs.config.arrivalDates = {
+                sDate: moment($rootScope.confSdate).format('DD/MM/YYYY'),
+                eDate: moment($rootScope.confEdate).format('DD/MM/YYYY')
+            };
+
+            scope.dialogs.config.departureDates = {
+                sDate: moment($rootScope.confSdate).format('DD/MM/YYYY'),
+                eDate: moment($rootScope.confEdate).format('DD/MM/YYYY')
+            };
+
+            scope.dialogs.config.updateArrivalDates = function(offset) {
+                offset = offset || [0, 0];
+                scope.dialogs.config.arrivalDates.sDate =
+                    moment($rootScope.confSdate)
+                        .subtract('d', parseInt(offset[0], 10))
+                        .format('DD/MM/YYYY');
+                scope.dialogs.config.arrivalDates.eDate =
+                    moment($rootScope.confEdate)
+                        .subtract('d', parseInt(offset[1], 10))
+                        .format('DD/MM/YYYY');
+            };
+            scope.dialogs.config.updateArrivalDates(scope.section.arrivalOffsetDates);
+
+            scope.dialogs.config.updateDepartureDates = function(offset) {
+                offset = offset || [0, 0];
+                scope.dialogs.config.departureDates.sDate =
+                    moment($rootScope.confSdate)
+                        .add('d', parseInt(offset[0], 10))
+                        .format('DD/MM/YYYY');
+                scope.dialogs.config.departureDates.eDate =
+                    moment($rootScope.confEdate)
+                        .add('d', parseInt(offset[1], 10))
+                        .format('DD/MM/YYYY');
+            };
+            scope.dialogs.config.updateDepartureDates(scope.section.departureOffsetDates);
 
             scope.dialogs.config.formData.push('arrivalOffsetDates');
             scope.dialogs.config.formData.push('departureOffsetDates');

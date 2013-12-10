@@ -445,9 +445,9 @@ class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
         regForm = self._conf.getRegistrationForm()
         wvars["body_title"] = self._getTitle()
         wvars["title_regform"] = regForm.getTitle()
-        wvars["confId"] = self._conf.getId()
         wvars["currency"] = self._conf.getRegistrationForm().getCurrency()
         wvars["postURL"] = quoteattr(str(urlHandlers.UHConfRegistrationFormCreation.getURL(self._conf)))
+        wvars["conf"] = self._conf
         return wvars
 
 

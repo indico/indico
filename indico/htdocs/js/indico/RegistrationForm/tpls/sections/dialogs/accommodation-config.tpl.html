@@ -1,34 +1,79 @@
 <form>
-    <div class="regFormDialogEditLine">
-        <label class="regFormDialogCaptionLine">
-            {{ 'Arrival dates (offset)' | i18n }}
-        </label>
-        {{ 'event start date offset:' | i18n  }}
-        <input ng-model="formData.arrivalOffsetDates[0]"
-            type="text"
-            name="aoffset1"
-            size="2"/>
-        {{ 'days' }}-&gt;
-        {{ 'event end date offset' | i18n  }}:
-        <input ng-model="formData.arrivalOffsetDates[1]"
-            type="text"
-            name="aoffset2"
-            size="2">
-        {{ 'days' | i18n  }}
-    </div>
-    <div class="regFormDialogEditLine">
-        <label class="regFormDialogCaptionLine">{{ 'Departure dates (offset)' | i18n }}</label>
-        {{ 'event start date offset:' | i18n }}
-        <input ng-model="formData.departureOffsetDates[0]"
-            type="text"
-            name="doffset1"
-            size="2">
-        {{ 'days' }} -&gt;
-        {{ 'event end date offset:' | i18n }}
-        <input  ng-model="formData.departureOffsetDates[1]"
-            type="text"
-            name="doffset2"
-            size="2">
-        {{ 'days' | i18n }}
-    </div>
+    <table class="regFormDialogEditDatesOffset">
+        <tr class="regFormDialogCaptionLine">
+            <td colspan="4">
+                <label class="regFormDialogCaptionLine">
+                    <span>{{ 'Arrival dates' | i18n }}:</span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>{{ 'From' | i18n  }}</td>
+            <td>
+                <input type="number"
+                    ng-model="formData.arrivalOffsetDates[0]"
+                    ng-change="config.updateArrivalDates(formData.arrivalOffsetDates)"
+                    name="aoffset1"
+                    min="0"
+                    size="2"/>
+            </td>
+            <td>{{ 'days before the event starts' | i18n  }}.</td>
+            <td class="text-superfluous">
+                ({{ config.arrivalDates.sDate }})
+            </td>
+        </tr>
+        <tr>
+            <td>{{ 'To' | i18n  }}</td>
+            <td>
+                <input type="number"
+                    ng-model="formData.arrivalOffsetDates[1]"
+                    ng-change="config.updateArrivalDates(formData.arrivalOffsetDates)"
+                    name="aoffset2"
+                    min="0"
+                    size="2"/>
+            </td>
+            <td>{{ 'days before the event ends' | i18n  }}.</td>
+            <td class="text-superfluous">
+                ({{ config.arrivalDates.eDate }})
+            </td>
+        </tr>
+
+        <tr class="regFormDialogCaptionLine">
+            <td colspan="3">
+                <label class="regFormDialogCaptionLine">
+                    <span>{{ 'Departure dates' | i18n }}:</span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>{{ 'From' | i18n  }}</td>
+            <td>
+                <input type="number"
+                    ng-model="formData.departureOffsetDates[0]"
+                    ng-change="config.updateDepartureDates(formData.departureOffsetDates)"
+                    name="doffset1"
+                    min="0"
+                    size="2"/>
+            </td>
+            <td>{{ 'days after the event starts' | i18n  }}.</td>
+            <td class="text-superfluous">
+                ({{ config.departureDates.sDate }})
+            </td>
+        </tr>
+        <tr>
+            <td>{{ 'To' | i18n  }}</td>
+            <td>
+                <input type="number"
+                    ng-model="formData.departureOffsetDates[1]"
+                    ng-change="config.updateDepartureDates(formData.departureOffsetDates)"
+                    name="doffset2"
+                    min="0"
+                    size="2"/>
+            </td>
+            <td>{{ 'days after the event ends' | i18n  }}.</td>
+            <td class="text-superfluous">
+                ({{ config.departureDates.eDate }})
+            </td>
+        </tr>
+    </table>
 </form>

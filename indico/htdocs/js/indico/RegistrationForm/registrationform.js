@@ -84,12 +84,16 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
         scope: {
             confId: '@',
-            editMode: '=editMode',
-            currency: "@"
+            confSdate: '@',
+            confEdate: '@',
+            editMode: '=',
+            currency: '@'
         },
 
         controller: function($scope, $resource) {
             $rootScope.confId = $scope.confId;
+            $rootScope.confSdate = $scope.confSdate;
+            $rootScope.confEdate = $scope.confEdate;
             $rootScope.editMode = $scope.editMode;
             $rootScope.currency = $scope.currency;
 

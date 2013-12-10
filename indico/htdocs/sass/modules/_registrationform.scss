@@ -213,7 +213,9 @@
     }
 }
 
+// ============================================================================
 // Field-specific
+// ============================================================================
 
 .regform-field {
     .accommodation-option-item {
@@ -221,7 +223,9 @@
     }
 }
 
-// Dialogs
+// ============================================================================
+// Dialog-specific
+// ============================================================================
 
 .regFormSectionNewSection {
     @extend %font-family-title-light;
@@ -234,12 +238,12 @@
 }
 
 .regFormDialogTabContent {
-    margin-bottom: 30px;
     margin-top: 20px;
     min-width: 480px;
 }
 
 .regFormDialogEditionTable {
+    margin-bottom: 20px;
     margin-right: 20px;
 }
 
@@ -247,6 +251,27 @@
     clear: both;
     margin-right: 30px;
     margin-bottom: 15px;
+}
+
+.regFormDialogEditDatesOffset {
+    border-collapse: collapse;
+    margin-bottom: 15px;
+
+    td {
+        padding: 3px;
+    }
+
+    tr:not(.regFormDialogCaptionLine) td:first-child {
+        padding-left: 20px;
+    }
+
+    tr.regFormDialogCaptionLine td {
+        padding-top: 0.5em;
+    }
+
+    input {
+        width: 40px;
+    }
 }
 
 .regFormDialogCaption {
@@ -259,8 +284,7 @@
 
 .regFormDialogCaptionLine {
     min-width: 180px;
-    display: block;
-    margin-bottom: 15px
+    margin-bottom: 7px
 }
 
 .regFormEditLine{
@@ -282,7 +306,7 @@ input.regFormTitleInputMgmt {
     @extend %font-family-title-light;
     width : 600px;
     font-size: 20px;
-    color: rgb(12, 69, 102);
+    color: $dark-blue
     font-style: normal;
     font-weight: bold;
 }
@@ -347,11 +371,12 @@ textarea.regFormDescriptionInputMgmt {
   width: 940px;
 }
 
-/* CSS for the tabs */
+// ============================================================================
+// Tabs-related
+// ============================================================================
 
 .tabbable {
   *zoom: 1;
-
 }
 .tabbable:before,
 .tabbable:after {
