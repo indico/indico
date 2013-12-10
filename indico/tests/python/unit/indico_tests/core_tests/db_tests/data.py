@@ -56,42 +56,22 @@ BLOCKINGS = [
 ]
 
 
-RESERVATION_ATTRIBUTE_KEYS = [
-    'usesAVC',
-    'needsAVCSupport',
-    'needsAssistance',
-    'HERMES collaboration',
-    'ISDN point2point',
-    'VRVS',
-    'EVO',
-    'Built-in (MCU) Bridge',
-    'ESnet collaboration',
-    'Audio Conference',
-    'H323 point2point',
-    'Vidyo',
-    'I don\'t know',
-    'CERN MCU',
-    'Phone Conference',
-    'ESnet MCU'
-]
-
-
 RESERVATION_ATTRIBUTES = [
     {
-        'name': 'usesAVC',
-        'raw_data': '{"required": false}'
+        'name': 'AVC',
+        'raw_data': '{"is_used": false}'
     },
     {
         'name': 'Vidyo',
-        'raw_data': '{"required": true, "comment": "actually optional in case needed"}'
+        'raw_data': '{"is_used": true, "comment": "actually optional in case needed"}'
     },
     {
-        'name': 'needsAssistance',
-        'raw_data': '{"required": true}'
+        'name': 'Assistance',
+        'raw_data': '{"is_used": true}'
     },
     {
-        'name': 'HERMES collaboration',
-        'raw_data': '{"required": true}'
+        'name': 'HERMES Collaboration',
+        'raw_data': '{"is_used": true}'
     },
 ]
 
@@ -251,37 +231,9 @@ RESERVATIONS = [
 ]
 
 
-ROOM_ATTRIBUTE_KEYS = [
-    'Simba List',
-    'notification email',
-    'IP',
-    'documentation',
-    'event recording',
-    'H323 IP',
-    'Live Webcast',
-    'Radiation Level',
-    'live webcast',
-    'Map URL',
-    'Booking Simba List',
-    'H323 point2point',
-    'Vidyo',
-    'Audio Conference',
-    'CERN MCU',
-    'ESnet MCU',
-    'I don\'t know',
-    'EVO',
-    'VidyoPanorama ID',
-    'Built-in (MCU) Bridge',
-    'Test',
-    'ESnet collaboration',
-    'Phone Conference',
-    'HERMES collaboration',
-]
-
-
 ROOM_ATTRIBUTES = [
     {
-        'name': 'Simba List',
+        'name': 'Manager Group',
         'raw_data': '{"access_list": ["a@abc.com", "b@abc.com"]}'
     },
     {
@@ -332,12 +284,12 @@ ROOM_NONBOOKABLE_DATES = [
 
 PHOTOS = [
     {
-        'small_content': urandom(randint(0, 4096)),
-        'large_content': urandom(randint(4097, 8000000))
+        'small_content': urandom(randint(0, 1024)),
+        'large_content': urandom(randint(1025, 4096))
     },
     {
         'small_content': urandom(randint(0, 1024)),
-        'large_content': urandom(randint(1025, 16000000))
+        'large_content': urandom(randint(1025, 4096))
     }
 ]
 
@@ -440,20 +392,6 @@ ASPECTS = [
 ]
 
 
-LOCATION_ATTRIBUTE_KEYS = [
-    'Test',
-    'Simba List',
-    'IP',
-    'H323 IP',
-    'Live Webcast',
-    'Map URL',
-    'documentation',
-    'Booking Simba List',
-    'notification email',
-    'VidyoPanorama ID'
-]
-
-
 LOCATION_ATTRIBUTES = [
     {
         'name': 'Live Webcast',
@@ -479,5 +417,149 @@ LOCATIONS = [
     {
         'name': 'FermiLab',
         'rooms': ROOMS[3:]
+    }
+]
+
+
+ATTRIBUTE_KEYS = [
+    {
+        'name': 'Test',
+        'is_for_rooms': True,
+        'is_for_reservations': False
+    },
+    {
+        'name': 'Manager Group',
+        'is_for_rooms': True,
+        'is_for_reservations': False
+    },
+    {
+        'name': 'IP',
+        'is_for_rooms': True,
+        'is_for_reservations': False
+    },
+    {
+        'name': 'H323 IP',
+        'is_for_rooms': True,
+        'is_for_reservations': False
+    },
+    {
+        'name': 'Live Webcast',
+        'is_for_rooms': True,
+        'is_for_reservations': False
+    },
+    {
+        'name': 'Map URL',
+        'is_for_rooms': True,
+        'is_for_reservations': False
+    },
+    {
+        'name': 'Documentation',
+        'is_for_rooms': True,
+        'is_for_reservations': False
+    },
+    {
+        'name': 'Allowed Booking Group',
+        'is_for_rooms': True,
+        'is_for_reservations': False
+    },
+    {
+        'name': 'Notification Email',
+        'is_for_rooms': True,
+        'is_for_reservations': False
+    },
+    {
+        'name': 'VidyoPanorama ID',
+        'is_for_rooms': True,
+        'is_for_reservations': False
+    },
+    {
+        'name': 'Event Recording',
+        'is_for_rooms': True,
+        'is_for_reservations': False
+    },
+    {
+        'name': 'Radiation Level',
+        'is_for_rooms': True,
+        'is_for_reservations': False
+    },
+    {
+        'name': 'H323 Point2Point',
+        'is_for_rooms': True,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'Vidyo',
+        'is_for_rooms': True,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'Audio Conference',
+        'is_for_rooms': True,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'CERN MCU',
+        'is_for_rooms': True,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'ESnet MCU',
+        'is_for_rooms': True,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'I don\'t know',
+        'is_for_rooms': True,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'EVO',
+        'is_for_rooms': True,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'Built-in (MCU) Bridge',
+        'is_for_rooms': True,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'ESnet Collaboration',
+        'is_for_rooms': True,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'Phone Conference',
+        'is_for_rooms': True,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'HERMES Collaboration',
+        'is_for_rooms': True,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'AVC',
+        'is_for_rooms': False,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'AVC Support',
+        'is_for_rooms': False,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'Assistance',
+        'is_for_rooms': False,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'ISDN Point2Point',
+        'is_for_rooms': False,
+        'is_for_reservations': True
+    },
+    {
+        'name': 'VRVS',
+        'is_for_rooms': False,
+        'is_for_reservations': True
     }
 ]
