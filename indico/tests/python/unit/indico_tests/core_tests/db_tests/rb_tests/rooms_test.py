@@ -20,7 +20,7 @@
 from datetime import datetime
 
 from indico.core.db import db
-from indico.modules.rb.models.room_attribute_keys import RoomAttributeKey
+# from indico.modules.rb.models.room_attribute_keys import RoomAttributeKey
 from indico.modules.rb.models.room_attributes import RoomAttribute
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.modules.rb.models.rooms import Room
@@ -75,4 +75,3 @@ class TestRoom(DBTest):
         db.session.commit()
 
         assert ','.join(['eq1', 'eq2']) == Room.getRoomById(5).getVerboseEquipment()
-

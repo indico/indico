@@ -47,19 +47,10 @@ class DBTest(TestCase):
         pass
 
     def init_db(self):
-        # first add attribute keys and room equipments
-        db.session.add_all([LocationAttributeKey(name=k)
-                            for k in LOCATION_ATTRIBUTE_KEYS])
+        # first add attribute keys
 
-        db.session.add_all([RoomAttributeKey(name=k)
-                            for k in ROOM_ATTRIBUTE_KEYS])
-
-        db.session.add_all([ReservationAttributeKey(name=k)
-                            for k in RESERVATION_ATTRIBUTE_KEYS])
-
-        db.session.add_all([RoomEquipment(name=k)
-                            for k in ROOM_EQUIPMENTS])
-
+        db.session.add_all([AttributeKey(**k) for k in ATTRIBUTE_KEYS])
+        db.session.add_all([RoomEquipment(name=k) for k in ROOM_EQUIPMENTS])
         db.session.commit()
 
         # locations
@@ -78,9 +69,9 @@ class DBTest(TestCase):
 
             # location attributes
             for attr in loc.get('attributes', []):
-                k = LocationAttributeKey.getKeyByName(attr['name'])
+                k = AttributeKey.getKeyByName(attr['name'])
                 v = LocationAttribute(**self.get_without(attr, ['name']))
-                k.attributes.append(v)
+                k.location_attributes.append(v)
                 location.attributes.append(v)
 
             # rooms
@@ -97,9 +88,9 @@ class DBTest(TestCase):
 
                 # room attributes
                 for attr in r.get('attributes', []):
-                    k = RoomAttributeKey.getKeyByName(attr['name'])
+                    k = AttributeKey.getKeyByName(attr['name'])
                     v = RoomAttribute(**self.get_without(attr, ['name']))
-                    k.attributes.append(v)
+                    k.room_attributes.append(v)
                     room.attributes.append(v)
 
                 # room equipments
@@ -134,9 +125,9 @@ class DBTest(TestCase):
 
                     # reservation attributes
                     for attr in resv.get('attributes', []):
-                        k = ReservationAttributeKey.getKeyByName(attr['name'])
+                        k = AttributeKey.getKeyByName(attr['name'])
                         v = ReservationAttribute(**self.get_without(attr, ['name']))
-                        k.attributes.append(v)
+                        k.reservation_attributes.append(v)
                         reservation.attributes.append(v)
 
                     # reservation edit_logs

@@ -54,7 +54,7 @@ class AttributeKey(db.Model):
 
     # relationships
 
-    parent = db.relationship(
+    children = db.relationship(
         'AttributeKey',
         backref=db.backref(
             'parent',
@@ -87,6 +87,10 @@ class AttributeKey(db.Model):
             self.is_for_rooms,
             self.is_for_reservations
         )
+
+    @staticmethod
+    def getKeyByName(name):
+        return AttributeKey.query.filter_by(name=name).first()
 
     @staticmethod
     def getAllKeys():

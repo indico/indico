@@ -26,9 +26,9 @@ from MaKaC.webinterface.locators import WebLocator
 
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.mixins import AttributeSetterMixin
-from indico.modules.rb.models.location_attribute_keys import LocationAttributeKey
+# from indico.modules.rb.models.location_attribute_keys import LocationAttributeKey
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.room_attribute_keys import RoomAttributeKey
+# from indico.modules.rb.models.room_attribute_keys import RoomAttributeKey
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.views.user import rooms as room_views
 
@@ -74,7 +74,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         self._buildings = defaultLocation.getAllBuildings()
 
         # specialization for a video conference, CERN-specific
-        possibleEquipments = LocationAttributeKey.getAllAttributeKeys()
+        # possibleEquipments = LocationAttributeKey.getAllAttributeKeys()
         # possibleEquipments = defaultLocation.factory.getEquipmentManager().getPossibleEquipment()
         self._forVideoConference = ('Video conference' in possibleEquipments) and (request.args.get('avc') == 'y')
 
@@ -251,7 +251,7 @@ class RHRoomBookingSearch4Rooms(RHRoomBookingBase):
         self._rooms = Room.getAllRooms()
         # self._rooms = CrossLocationQueries.getRooms(allFast=True)
         # self._rooms.sort()
-        self._equipment = RoomAttributeKey.getAllAttributeKeys()
+        # self._equipment = RoomAttributeKey.getAllAttributeKeys()
         # self._equipment = CrossLocationQueries.getPossibleEquipment()
 
     def _process(self):

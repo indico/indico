@@ -41,6 +41,7 @@ from indico.modules.rb.models.room_equipments import (
     RoomEquipment,
     RoomEquipmentAssociation
 )
+from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 
 
@@ -361,6 +362,46 @@ notificationAssistance: {notification_for_assistance}
                     )
                     .scalar())
 
+    # bookable times
+
+    def getBookableTimes(self):
+        return self.bookable_times.all()
+
+    def addBookableTime(self, bookable_time):
+        self.bookable_times.append(bookable_time)
+
+    def clearBookableTimes(self):
+        del self.bookable_times[:]
+
+    # nonbookable dates
+
+    def getNonBookableDates(self, skip_past=False):
+        q = self.nonbookable_dates
+        if skip_past:
+            q = q.filter(NonBookableDate.start_date >= datetime.utcnow())
+        return q.all()
+
+    def addNonBookableDate(self, nonbookable_date):
+        self.nonbookable_dates.append(nonbookable_date)
+
+    def clearNonBookableDates(self):
+        del self.nonbookable_dates[:]
+
+    def getBlockedDay(self, day):
+        pass
+
+    def getAllManagers(self):
+        # managers = set([self.getResponsible()])
+        pass
+
+    @staticmethod
+    def isAvatarResponsibleForRooms(avatar):
+        return Room.query.filter(exists(Room.responsible_id == avatar.getId())).scalar()
+
+    @staticmethod
+    def getRoomsOfUser():
+        return Room.query.filter_by(responsible_id=avatar.getId()).all()
+
     # TODO
     def isAvailable(self, potential_reservation):
         if self.getCollisions(potential_reservation):
@@ -369,6 +410,9 @@ notificationAssistance: {notification_for_assistance}
 
     def getResponsible(self):
         return AvatarHolder().getById(self.responsible_id)
+
+    def getLocationName(self):
+        return self.location.name
 
     # photos
 

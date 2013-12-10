@@ -19,7 +19,7 @@
 
 from MaKaC.webinterface.wcomponents import WTemplated
 
-from indico.modules.rb.models.location_attribute_keys import LocationAttributeKey
+# from indico.modules.rb.models.location_attribute_keys import LocationAttributeKey
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.views.admin import WPRoomBookingPluginAdminBase
 from indico.modules.rb.views.utils import makePercentageString
@@ -79,7 +79,7 @@ class WRoomBookingAdminLocation(WTemplated):
     def getVars(self):
         wvars = super(WRoomBookingAdminLocation, self).getVars()
         wvars["location"] = self._location
-        wvars["possibleEquipment"] = LocationAttributeKey.getAllAttributeKeys()
+        # wvars["possibleEquipment"] = LocationAttributeKey.getAllAttributeKeys()
         wvars['AttsManager'] = None
         # wvars["AttsManager"] = self._location.factory.getCustomAttributesManager()
 

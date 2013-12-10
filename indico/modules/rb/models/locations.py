@@ -25,7 +25,6 @@ from datetime import datetime, timedelta
 
 import pytz
 from sqlalchemy import func, or_
-from sqlalchemy.orm.exc import NoResultFound
 
 from MaKaC.common.Locators import Locator
 
