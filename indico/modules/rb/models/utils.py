@@ -98,47 +98,12 @@ def apply_filters(q, entity, **filters):
 
 def filtered(func):
     """
-    apply keyword arguments as filters
-
-    func returns a class and an initial query on which
-    filters will be applied by using class attributes
-
-    eq   => ==
-    ne   => !=
-    ge   => >=
-    gt   => >
-    lt   => <
-    le   => <=
-    like => like
-    in   => in_
-
-    don't forget putting % for extra chars in both side
-    it's not here to give flexibility to the caller
+    apply filters and returns all objects
     """
     assert re.match(r'get\w+s', func.__name__)
     def add_filters(*args, **filters):
         cls, q = func(*args, **filters)
-        for k, v in filters.iteritems():
-            column = getattr(cls, k)
-
-            if isinstance(v, tuple):
-                requested_operator, value = v
-            else:
-                requested_operator, value = 'eq', v
-
-            try:
-                mapped_operator = filter(
-                    lambda possible_attr: hasattr(
-                        column,
-                        possible_attr % requested_operator
-                    ),
-                    ['%s', '%s_', '__%s__']
-                )[0] % requested_operator
-            except IndexError:
-                raise RuntimeError('Invalid filter operator')
-
-            q = q.filter(getattr(column, mapped_operator)(value))
-        return q[:]  # to specify access than filtering
+        return apply_filters(q, cls, **filters)[:]
     return add_filters
 
 
@@ -262,6 +227,22 @@ class JSONStringBridgeMixin:
     @value.setter
     def value(self, data):
         self.raw_data = json.dumps(data)
+
+    @hybrid_property
+    def is_value_required(self):
+        return self.value.get('is_required', False)
+
+    @hybrid_property
+    def is_value_hidden(self):
+        return self.value.get('is_hidden', False)
+
+    @hybrid_property
+    def is_value_used(self):
+        return self.value.get('is_used', False)
+
+    @hybrid_property
+    def is_value_equipped(self):
+        return self.value.get('is_equipped', False)
 
 
 class Period:
