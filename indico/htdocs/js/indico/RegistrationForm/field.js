@@ -18,7 +18,7 @@
 ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     $scope.fieldApi = {};
 
-    var getResquestParams = function(field) {
+    var getRequestParams = function(field) {
         return {
             confId: $scope.confId,
             sectionId: $scope.section.id,
@@ -27,21 +27,19 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 
     $scope.fieldApi.disableField = function(field) {
-        regFormFactory.Fields.disable(getResquestParams(field), function(updatedField) {
+        regFormFactory.Fields.disable(getRequestParams(field), function(updatedField) {
             $scope.field.disabled = updatedField.disabled;
         });
     };
 
     $scope.fieldApi.enableField = function(field) {
-        regFormFactory.Fields.enable(getResquestParams(field), function(updatedField) {
+        regFormFactory.Fields.enable(getRequestParams(field), function(updatedField) {
             $scope.field.disabled = updatedField.disabled;
         });
     };
 
     $scope.fieldApi.removeField = function(field) {
-        regFormFactory.Fields.remove(getResquestParams(field), function(updatedSection) {
-            $scope.section.items = updatedSection.items;
-        });
+        $scope.sectionApi.removeField($scope.section, field);
     };
 
     $scope.getName = function(input) {
@@ -113,7 +111,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         },
         onCancel: function() {
             if ($scope.isNew()) {
-                $scope.api.removeNewField();
+                $scope.sectionApi.removeNewField();
             }
         }
     };

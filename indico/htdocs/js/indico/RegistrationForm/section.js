@@ -16,7 +16,7 @@
  */
 
 ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory) {
-    $scope.api = {};
+    $scope.sectionApi = {};
     $scope.actions = {};
 
     var getRequestParams = function(section) {
@@ -26,13 +26,13 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
         };
     };
 
-    $scope.api.disableSection = function(section) {
+    $scope.sectionApi.disableSection = function(section) {
         regFormFactory.Sections.disable(getRequestParams(section), function(updatedSection) {
             section.enabled = updatedSection.enabled;
         });
     };
 
-    $scope.api.saveConfig = function(section, data) {
+    $scope.sectionApi.saveConfig = function(section, data) {
         var requestParams = angular.extend(getRequestParams(section), data);
         regFormFactory.Sections.save(requestParams, function(updatedSection) {
             $scope.$parent.section = updatedSection;
@@ -40,7 +40,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
         });
     };
 
-    $scope.api.updateTitle = function(section, data) {
+    $scope.sectionApi.updateTitle = function(section, data) {
         var requestParams = angular.extend(getRequestParams(section), data);
 
         regFormFactory.Sections.title(requestParams, function(updatedSection) {
@@ -48,7 +48,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
         });
     };
 
-    $scope.api.updateDescription = function(section, data) {
+    $scope.sectionApi.updateDescription = function(section, data) {
         var requestParams = angular.extend(getRequestParams(section), data);
 
         regFormFactory.Sections.description(requestParams, function(updatedSection) {
@@ -56,7 +56,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
         });
     };
 
-    $scope.api.moveField = function(section, field, position) {
+    $scope.sectionApi.moveField = function(section, field, position) {
         var requestParams = angular.extend(getRequestParams(section), {
             fieldId: field.id,
             endPos: position
@@ -68,6 +68,24 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
             //     $scope.section.items = response.updatedSection.items;
             // }
         });
+    };
+
+    $scope.sectionApi.removeField = function(section, field) {
+        $scope.dialogs.removefield.field = field;
+
+        $scope.dialogs.removefield.callback = function(success) {
+            if (success) {
+                var requestParams = angular.extend(getRequestParams(section), {
+                    fieldId: field.id
+                });
+
+                $scope.$apply(regFormFactory.Fields.remove(requestParams, function(updatedSection) {
+                    $scope.section.items = updatedSection.items;
+                }));
+            }
+        };
+
+        $scope.dialogs.removefield.open = true;
     };
 
     $scope.actions.openAddField = function(section, field, type) {
@@ -103,6 +121,9 @@ ndRegForm.directive('ndSection', function($rootScope, url) {
                     open: false,
                     actions: {},
                     formData: []
+                },
+                removefield: {
+                    open: false
                 }
             };
 
@@ -125,18 +146,18 @@ ndRegForm.directive('ndSection', function($rootScope, url) {
 
             scope.$watch('section.title', function(newVal, oldVal) {
                 if (newVal !== oldVal) {
-                    scope.api.updateTitle(scope.section, {title: newVal});
+                    scope.sectionApi.updateTitle(scope.section, {title: newVal});
                 }
             });
 
             scope.$watch('section.description', function(newVal, oldVal) {
                 if (newVal !== oldVal) {
-                    scope.api.updateDescription(scope.section, {description: newVal});
+                    scope.sectionApi.updateDescription(scope.section, {description: newVal});
                 }
             });
 
             scope.dialogs.config.actions.onOk = function(dialogScope) {
-                scope.api.saveConfig(dialogScope.section, dialogScope.formData);
+                scope.sectionApi.saveConfig(dialogScope.section, dialogScope.formData);
             };
 
             scope.dialogs.config.actions.onCancel = function(dialogScope) {
@@ -155,7 +176,7 @@ ndRegForm.directive("ndGeneralSection", function($timeout, url, sortableoptions)
             scope.buttons.disable = true;
             scope.tplGeneralField = url.tpl('sections/generalfield.tpl.html');
 
-            scope.api.removeNewField = function() {
+            scope.sectionApi.removeNewField = function() {
                 if (scope.section.items[scope.section.items.length-1].id == -1) {
                     $timeout(function() {
                         scope.section.items.pop();
@@ -165,7 +186,7 @@ ndRegForm.directive("ndGeneralSection", function($timeout, url, sortableoptions)
 
             scope.fieldSortableOptions = {
                 update: function(e, ui) {
-                    scope.api.moveField(scope.section, ui.item.scope().field, ui.item.index());
+                    scope.sectionApi.moveField(scope.section, ui.item.scope().field, ui.item.index());
                 },
                 // TODO Re-enable when solved: http://bugs.jqueryui.com/ticket/5772
                 // containment: '.field-list',
@@ -220,7 +241,7 @@ ndRegForm.directive("ndAccommodationSection", function() {
                            width:100,
                            editoptions: {size:"30",maxlength:"50"},
                            editable: true,
-                           edittype: "text",
+                           edittype: "text"
                        },
                        {
                            name:'billable',

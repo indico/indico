@@ -185,3 +185,29 @@ ndDirectives.directive('ndDatepicker', function() {
         }
     };
 });
+
+ndDirectives.directive('ndConfirmationPopup', function() {
+    return {
+        restrict: 'E',
+        scope: {
+            heading: '@',
+            content: '@',
+            callback: '=',
+            show: '='
+        },
+
+        link: function(scope) {
+            var open = function() {
+                var popup = new ConfirmPopup(scope.heading, scope.content, scope.callback);
+                popup.open();
+            };
+
+            scope.$watch('show', function() {
+                if (scope.show === true) {
+                    scope.show = false;
+                    open();
+                }
+            });
+        }
+    };
+});
