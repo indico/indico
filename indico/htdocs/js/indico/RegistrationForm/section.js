@@ -104,6 +104,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
 ndRegForm.directive('ndSection', function($rootScope, url) {
     return {
         replace: true,
+        restrict: 'E',
         templateUrl: url.tpl('section.tpl.html'),
         controller: 'SectionCtrl',
 
@@ -397,7 +398,7 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
                            width:200,
                            editoptions:{size:"30",maxlength:"80"},
                            editable: false,
-                           edittype: "text",
+                           edittype: "text"
                        },
                        {
                            name:'billable',
@@ -561,7 +562,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
                             width:160,
                             editoptions:{size:"30",maxlength:"50"},
                             editable: false,
-                            edittype: "text",
+                            edittype: "text"
                         },
                         {
                             name:'reason',
