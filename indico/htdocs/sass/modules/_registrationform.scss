@@ -23,7 +23,7 @@
     @include border-radius();
     @include box-sizing(border-box);
     margin-top: 25px;
-    width:700px;
+    width:750px;
 }
 
 .regform-section {
@@ -225,6 +225,15 @@
     .accommodation-option-item {
         padding-left : 15px;
     }
+
+    ul {
+        margin: 0;
+        padding-left: 0;
+    }
+
+    li {
+        list-style: none;
+    }
 }
 
 // ============================================================================
@@ -310,7 +319,7 @@ input.regFormTitleInputMgmt {
     @extend %font-family-title-light;
     width : 600px;
     font-size: 20px;
-    color: $dark-blue
+    color: $dark-blue;
     font-style: normal;
     font-weight: bold;
 }

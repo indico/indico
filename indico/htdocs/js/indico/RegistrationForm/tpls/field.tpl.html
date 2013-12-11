@@ -35,7 +35,7 @@
     <nd-dialog nd-field-dialog
         ng-if="editMode"
         show="dialog.open"
-        heading="{{ dialog.title() }}"
+        heading="{{ dialog.title() }}: {{ field.input }}"
         ok-button="{{ dialog.okButton() }}"
         cancel-button="{{ 'Cancel' | i18n }}"
         ok-callback="dialog.onOk(dialogScope)"
