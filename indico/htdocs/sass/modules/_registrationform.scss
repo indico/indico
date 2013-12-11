@@ -204,11 +204,15 @@
         padding: 2px 0;
     }
 
-    tr:hover .remove-row {
-        visibility: visible;
+    tr:hover {
+        .remove-row,
+        .action-button {
+            visibility: visible;
+        }
     }
 
-    .remove-row {
+    .remove-row,
+    .action-button {
         visibility: hidden;
     }
 }

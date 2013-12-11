@@ -487,7 +487,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
 
                 actions: [
                     'remove',
-                    ['cancel', $T('Cancel this event'),'#tab-canceledEvent','icon-cancel']
+                    ['cancel', $T('Cancel this event'),'#tab-canceledEvent','icon-disable']
                 ],
 
                 colModel: [
@@ -554,22 +554,22 @@ ndRegForm.directive("ndSocialEventSection", function() {
             scope.dialogs.config.canceledTable = {
                 sortable: false,
                 colNames:[$T("caption"), $T("Reason for cancellation")],
-                actions: ['remove', ['uncancel', $T('Uncancel this event'),'#tab-editEvents','icon-cancel']],
+                actions: ['remove', ['uncancel', $T('Uncancel this event'),'#tab-editEvents','icon-checkmark']],
                 colModel: [
                         {
                             index:'caption',
                             align: 'center',
                             width:160,
                             editoptions:{size:"30",maxlength:"50"},
-                            editable: false,
-                            edittype: "text"
+                            editable: false
                         },
                         {
                             name:'reason',
                             index:'cancelledReason',
                             width:250,
                             editoptions:{size:"30",maxlength:"50"},
-                            editable: true
+                            editable: true,
+                            edittype: 'text'
                         }
 
                      ]

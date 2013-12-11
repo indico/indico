@@ -32,15 +32,14 @@
                     type="checkbox"
                     name="{{elem.name}}"/>
             </td>
-
-            <td ng-if="config.actions.indexOf('remove') > -1">
-                <a class="icon-remove remove-row"
-                    title="{{ 'Remove row' | i18n }}"
-                    ng-click="actionItem(formData[$parent.$index], 'remove')"></a>
-            </td>
-            <td ng-repeat="action in config.actions | filter: actionIsArray" >
-                <a ng-if="actionIsArray(action)" ng-click="actionItem(formData[$parent.$parent.$index], action[0])" class="i-button {{ action[3] }}"
-                   title="{{ action[1] }}">
+            <td>
+                <a class="icon-remove remove-row" ng-if="config.actions.indexOf('remove') > -1"
+                    ng-click="actionItem(formData[$parent.$index], 'remove')"
+                    title="{{ 'Remove row' | i18n }}"></a>
+                <a ng-repeat="action in config.actions | filter: actionIsArray"
+                    ng-click="actionItem(formData[$parent.$index], action[0])"
+                    title="{{ action[1] }}"
+                    class="action-button {{ action[3] }}">
                 </a>
             </td>
         </tr>
