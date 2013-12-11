@@ -87,7 +87,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             confSdate: '@',
             confEdate: '@',
             editMode: '=',
-            currency: '@'
+            currency: '@',
+            postUrl: '='
         },
 
         controller: function($scope, $resource) {
@@ -183,6 +184,23 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             };
 
             angular.extend($scope.sectionSortableOptions, sortableoptions);
+
+        },
+
+        link: function(scope, element) {
+            scope.validationStarted = false;
+
+            element.on('submit', function(e) {
+                if (!scope.validate()) {
+                    e.preventDefault();
+                }
+            });
+
+            scope.validate = function() {
+                scope.validationStarted = true;
+
+                return false;
+            };
         }
     };
 });

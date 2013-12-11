@@ -5,29 +5,14 @@
 </%block>
 
 <%block name="content">
-<form id="registrationForm" action=${ postURL } method="POST" onSubmit="return formSubmit(this);" enctype="multipart/form-data">
-    <div>
-        % if title_regform:
-            <div nowrap align="center" class="title">${ title_regform }</div>
-        % endif
-        <div ng-app="nd" ng-controller="AppCtrl">
-            <div nd-reg-form
-                conf-id="${conf.getId()}"
-                currency="${currency}"
-                edit-mode="false"></div>
-            <input type="hidden" value="${conf.getId()}" id="conf_id">
-        </div>
-        <div class="regform-mandatory-info ">
-            <span>${ _("(All the fields marked with ") }</span>
-            <span class="regFormMandatoryField">*</span>
-            <span>${ _(" are mandantory)") }</span>
-        </div>
-        <div align="center">
-                <input type="submit" class="i-button highlight" value="${_('Register')}">
-        </div>
+    <div ng-app="nd" ng-controller="AppCtrl">
+        <div nd-reg-form
+            conf-id="${conf.getId()}"
+            currency="${currency}"
+            edit-mode="false"
+            post-url='${postURL}'></div>
     </div>
-    <input type="hidden" value="${conf.getId()}" id="conf_id">
-</form>
+
     <script type="text/javascript">
         $("div#registrationForm").html(progressIndicator(false, true).dom);
         var validators = [];

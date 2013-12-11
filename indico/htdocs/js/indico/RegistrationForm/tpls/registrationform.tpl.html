@@ -1,4 +1,12 @@
-<div class="RegistrationForm">
+<form novalidate
+    id="registrationForm"
+    name="registrationForm"
+    class="RegistrationForm"
+    action="{{ postUrl }}"
+    method="POST"
+    enctype="multipart/form-data"
+    ng-submit="submit()">
+
     <div ng-if="editMode"
         ng-include="getTpl('toolbar.tpl.html')"></div>
 
@@ -23,7 +31,21 @@
         </div>
     </div>
 
+    <div ng-if="!editMode" align="center">
+        <div class="regform-mandatory-info">
+            <span>({{ 'All the fields marked with' | i18n }}</span>
+            <span class="regFormMandatoryField">*</span>
+            <span>{{ ' are mandantory' | i18n }})</span>
+        </div>
+        <div>
+            <input type="submit" class="i-button highlight" value="{{ 'Register' | i18n }}">
+        </div>
+    </div>
+
+    <input type="hidden" value="{{ confId }}" id="conf_id">
+
     <nd-dialog nd-add-section-dialog
+        ng-if="editMode"
         show="dialogs.addsection"
         heading="{{ 'New section' | i18n }}"
         ok-button="{{ 'Add' | i18n }}"
@@ -33,10 +55,10 @@
     </nd-dialog>
 
     <nd-dialog nd-management-dialog
+        ng-if="editMode"
         show="dialogs.management"
         heading="{{ 'Section Management' | i18n }}"
         api="api"
         data="sections">
     </nd-dialog>
-</div>
-
+</form>
