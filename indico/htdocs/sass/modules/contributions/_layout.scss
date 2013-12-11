@@ -34,8 +34,19 @@ $box-border-color: lighten($gray, 10%);
   background-color: $box-bg-color;
 }
 
-.abstract-display {
-  .wrapper {
+@mixin tag-like($fg_color, $bg_color) {
+    @include border-radius(0.4em);
+    color: $fg_color;
+    line-height: 1.5em;
+    background: $bg_color;
+    text-align: center;
+    display: inline-block;
+    padding: 0.2em 0.7em;
+}
+
+
+.contribution-display {
+  .layout-wrapper {
     overflow: auto;
     position: relative;
 
@@ -56,10 +67,19 @@ $box-border-color: lighten($gray, 10%);
 
       margin-top: 0.5em;
       float: right;
-      width: 150px;
+      width: 200px;
       padding: 0.5em;
 
       text-align: right;
+
+      &.left-align {
+        text-align: left;
+      }
+
+      *:before {
+        margin-right: 0.5em;
+        color: $light-black;
+      }
 
       time {
         line-height: 1em;
@@ -76,6 +96,18 @@ $box-border-color: lighten($gray, 10%);
     }
   }
 
+  .paper-reviewing-info {
+
+  }
+
+  .track-assignment {
+    @include tag-like(#eee, #888);
+  }
+
+  .session-assignment {
+   @include tag-like(#888, #eee);
+  }
+
   .information {
     @extend %font-family-sans;
     @include padded-box(0);
@@ -87,41 +119,6 @@ $box-border-color: lighten($gray, 10%);
       color: #f8f8f8;
       line-height: 2em;
       text-align: center;
-    }
-
-    .wrapper {
-      padding: 0 1em 0 1em;
-
-      .column {
-        @include grid-column(3);
-        @include box-sizing(border-box);
-        float: left;
-        padding-left: 1em;
-
-        &> h2 {
-          font-size: 1.2em;
-        }
-
-        &> ul {
-          list-style-type: none;
-          padding: 0;
-
-          li {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-height: 1.5em;
-            margin-bottom: 0.5em;
-
-            &:before {
-              margin-right: 0.5em;
-              color: $light-black;
-            }
-          }
-        }
-
-        font-size: 1em;
-      }
     }
 
     .trigger {
@@ -146,7 +143,7 @@ $box-border-color: lighten($gray, 10%);
       background: $light-gray;
       font-size: 0.9em;
       list-style-type: none;
-      padding: 1em;
+      padding: 2em 1em 1em 1em;
       margin: 0;
 
       .name {
@@ -162,18 +159,94 @@ $box-border-color: lighten($gray, 10%);
     }
 
     &> .content {
-    @include padded-box;
+      @include padded-box;
+    }
+  }
+
+  #contribution-field-table {
+      border-spacing: 1.5em;
+  }
+
+  .contribution-section {
+      &> h2 {
+          font-size: 1.1em;
+          color: $light-black;
+          border-bottom: 1px solid $light-black;
+      }
+  }
+
+  .row.files {
+    background-color: $light-gray;
+
+    margin-bottom: 2em;
+
+    .column {
+      @include single-transition(background-color);
+      margin-right: -1em;
+
+      #manageMaterial {
+        @include single-transition(box-shadow);
+        margin: 1em 2em 0 0;
+      }
+    }
+  }
+
+  .column.reviewing-actions {
+    @include box-sizing(border-box);
+
+    margin: 1em 0 1em 0em;
+    background-color: $light-gray;
+
+    ul {
+      li#rev-submit {
+        height: 2.5em;
+      }
+    }
   }
 }
 
-#abstract-field-table {
-    border-spacing: 1.5em;
-}
+.layout-wrapper {
+  padding: 0 1em 0 1em;
 
-.abstract-section {
+  .row {
+    width: 100%;
+    clear: both;
+    overflow: auto;
+  }
+
+  .column {
+    @include grid-column(3);
+    @include box-sizing(border-box);
+    float: left;
+    padding: 0 1em 0 1em;
+
     &> h2 {
-        font-size: 1.1em;
-        color: $light-black;
-        border-bottom: 1px solid $light-black;
+      font-size: 1.2em;
     }
+
+    h3 {
+      margin-top: 0;
+      font-size: 1.1em;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+
+      li {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-height: 1.5em;
+        margin-bottom: 0.5em;
+
+        &:before {
+          margin-right: 0.5em;
+          color: $light-black;
+        }
+      }
+    }
+
+    font-size: 1em;
+  }
 }

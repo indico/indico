@@ -3,7 +3,7 @@
 <% from MaKaC.review import AbstractStatusWithdrawn %>
 
 
-<div class="abstract-display">
+<div class="contribution-display">
     <div class="wrapper">
         <div id="buttonBar" class="toolbar right">
             <div class="group">
@@ -114,7 +114,7 @@
             </div>
         </div>
         <div class="main-content">
-            <div class="abstractDetail">
+            <div class="contributionDetail">
                 % for f in abstract.getConference().getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
                         % if abstract.getField(f.getId()):
                           <% content = str(abstract.getField(f.getId()))%>
@@ -144,5 +144,9 @@
         }
     });
 % endif
+
+$(function() {
+    $('.section .content').mathJax();
+})
 
 </script>

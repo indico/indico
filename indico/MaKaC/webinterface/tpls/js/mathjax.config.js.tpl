@@ -14,7 +14,7 @@ MathJax.Hub.Config({
   displayAlign: "center",
   displayIndent: "0em",
   delayStartupUntil: "none",
-  skipStartupTypeset: false,
+  skipStartupTypeset: true,
   elements: [],
   positionToHash: false,
   showMathMenu: true,

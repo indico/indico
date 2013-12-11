@@ -3201,7 +3201,7 @@ class WPConfModifCFAPreview(WPConferenceModifAbstractBase):
 
     def getCSSFiles(self):
         return WPConferenceModifAbstractBase.getCSSFiles(self) + \
-            self._asset_env['abstracts_sass'].urls()
+            self._asset_env['contributions_sass'].urls()
 
     def getJSFiles(self):
         return WPConferenceModifAbstractBase.getJSFiles(self) + \

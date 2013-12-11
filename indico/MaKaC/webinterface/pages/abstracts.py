@@ -182,7 +182,7 @@ class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
 
     def getCSSFiles(self):
         return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-            self._asset_env['abstracts_sass'].urls()
+            self._asset_env['contributions_sass'].urls()
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
@@ -270,7 +270,7 @@ class WPAbstractDisplayBase( WPConferenceDefaultDisplayBase ):
 
     def getCSSFiles(self):
         return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
-            self._asset_env['abstracts_sass'].urls()
+            self._asset_env['contributions_sass'].urls()
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \

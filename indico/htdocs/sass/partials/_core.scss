@@ -25,6 +25,10 @@
     float: right;
 }
 
+.right-must {
+    float: right !important;
+}
+
 .left {
     float: left;
 }
@@ -95,16 +99,7 @@
     color: #aaa;
 }
 
-.highlighted_area {
-    background-color: #fafafa !important;
-}
-
-.highlighted_area:hover {
-    -webkit-transition: background-color .5s;
-    background-color: #f4f4f4 !important;
-}
-
-.highlighted_area:hover .i-button {
+.highlighted-area:hover .i-button {
     -webkit-transition: box-shadow .5s;
     box-shadow: 0 0 1px 1px rgba(100, 100, 100, 0.2);
 }

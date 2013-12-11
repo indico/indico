@@ -59,7 +59,17 @@ class WPContributionDefaultDisplayBase(WPConferenceDefaultDisplayBase, WPContrib
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
             self._includeJSPackage('Management') + \
-            self._includeJSPackage('MaterialEditor')
+            self._includeJSPackage('MaterialEditor') + \
+            self._asset_env['contributions_js'].urls()
+
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
+            self._asset_env['contributions_sass'].urls()
+
+    def _getHeadContent(self):
+        return WPConferenceDefaultDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                       for url in self._asset_env['mathjax_js'].urls()])
 
     def __init__(self, rh, contribution, hideFull=0):
         WPContributionBase.__init__(self, rh, contribution, hideFull)
@@ -184,16 +194,6 @@ class WPContributionDisplay(WPContributionDefaultDisplayBase):
         wc = WContributionDisplay(self._getAW(), self._contrib, self._hideFull)
         return wc.getHTML()
 
-    def _getHeadContent(self):
-        return WPContributionDefaultDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
-            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
-                       for url in self._asset_env['mathjax_js'].urls()])
-
-    def getJSFiles(self):
-        return WPContributionDefaultDisplayBase.getJSFiles(self) + \
-               self._asset_env['mathjax_js'].urls()
-
-
 
 class WPContributionModifBase(WPConferenceModifBase):
 
@@ -317,7 +317,7 @@ class WPContributionModifBase(WPConferenceModifBase):
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + \
-            self._asset_env['abstracts_sass'].urls()
+            self._asset_env['contributions_sass'].urls()
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + \

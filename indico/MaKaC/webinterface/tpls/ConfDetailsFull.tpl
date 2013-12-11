@@ -84,8 +84,8 @@ ${ actions }
          });
 
 % if isSubmitter:
-    $('.info_line.material').addClass('highlighted_area');
-    $('.info_line.material').css('background-color', '#eee');
+    $('.info_line.material').addClass('highlighted-area');
+    $('.info_line.material').css('background-color', '#f2f2f2');
     $('.info_line.material').append('<span title="${_("Manage materials")}" class="right i-button icon-edit icon-only" style="float: right" id="manageMaterials" aria-hidden="true" ></span>');
 
 

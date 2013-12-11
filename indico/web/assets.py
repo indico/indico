@@ -302,8 +302,12 @@ mathjax_js = Bundle(
     'js/custom/pagedown_mathjax.js',
     filters='rjsmin', output='js/mathjax_%(version)s.min.js')
 
+contributions_js = Bundle('js/indico/Display/contributions.js',
+                          filters='rjsmin',
+                          output="js/contributions_%(version)s.min.js")
+
 abstracts_js = Bundle(
-    'js/indico/Management/abstracts.js',
+    contributions_js,
     *namespace('js/lib/pagedown',
                'Markdown.Converter.js',
                'Markdown.Editor.js',
@@ -326,7 +330,7 @@ def sass_module_bundle(module_name, depends=[]):
                   output="sass/{0}_%(version)s.min.css".format(module_name),
                   depends = SASS_BASE_MODULES + ['sass/modules/{0}/*.scss'.format(module_name)] + depends)
 
-abstracts_sass = sass_module_bundle('abstracts')
+contributions_sass = sass_module_bundle('contributions')
 roombooking_sass = sass_module_bundle('roombooking')
 dashboard_sass = sass_module_bundle('dashboard')
 
@@ -357,6 +361,7 @@ def register_all_js(env):
     env.register('base_js', base_js)
     env.register('ie_compatibility', ie_compatibility)
     env.register('abstracts_js', abstracts_js)
+    env.register('contributions_js', contributions_js)
     env.register('mathjax_js', mathjax_js)
 
 
@@ -385,6 +390,6 @@ def register_all_css(env, main_css_file):
 
     # SASS/SCSS
     env.register('roombooking_sass', roombooking_sass)
-    env.register('abstracts_sass', abstracts_sass)
+    env.register('contributions_sass', contributions_sass)
     env.register('dashboard_sass', dashboard_sass)
     env.register('screen_sass', screen_sass)

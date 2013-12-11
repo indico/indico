@@ -1,22 +1,12 @@
 <%inherit file="ContributionDisplayMin.tpl"/>
 
 <%block name="speakers">
-    <div class="contributionSpeakerList">
-        <% speakers = [] %>
+    <div class="column">
+        <h2>${_("Speakers")}</h2>
+        <ul>
         % for speaker in Contribution.getSpeakerList():
-            <% speakers.append(speaker.getDirectFullName()) %>
+            <li class="icon-user">${speaker.getDirectFullName()}</li>
         % endfor
-        % if speakers:
-            ${_("Presented by")} <span style="font-weight: bold">${", ".join(speakers)} </span>
-        % endif
-        % if Contribution.isScheduled():
-            ${_("on")}
-            <span style="font-weight: bold">${formatDate(Contribution.getStartDate())}</span>
-            ${_("from")}
-            <span style="font-weight: bold">${formatTime(Contribution.getStartDate())}</span>
-            ${_("to")}
-            <span style="font-weight: bold">${formatTime(Contribution.getEndDate())}</span>
-        % endif
     </div>
 </%block>
 
@@ -43,18 +33,18 @@
 <%block name="detail">
     % if not Contribution.getConference().getAbstractMgr().isActive() or not Contribution.getConference().hasEnabledSection("cfa") or not Contribution.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
         % if Contribution.getDescription().strip()!="":
-        <div class="contributionSection">
-            <h2 class="contributionSectionTitle">Description</h2>
-            <div class="contributionSectionContent">${Contribution.getDescription()}</div>
+        <div class="section">
+            <h2>Description</h2>
+            <div class="content">${Contribution.getDescription()}</div>
         </div>
         % endif
     % else:
         % for f in Contribution.getConference().getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             % if Contribution.getField(f.getId()):
             <% content = Contribution.getField(f.getId()) %>
-            <div class="contributionSection">
-                <h2 class="contributionSectionTitle">${f.getCaption()}</h2>
-                <div class="contributionSectionContent">${content | h}</div>
+            <div class="section">
+                <h2>${f.getCaption()}</h2>
+                <div class="content">${content | m}</div>
             </div>
             % endif
         % endfor
@@ -63,26 +53,22 @@
 
 <%block name="paperReview">
     % if reviewingActive:
-    <div class="contributionReviewingSection">
-        <h2 class="contributionSectionTitle">${_("Call for papers")}</h2>
-            <div>
-                <div class="contributionReviewingStatus ${statusClass}">${statusText}</div>
-                % if showSubmit:
-                    <div class="fakeLink" id="revSubmit" style="font-weight: bold; margin-bottom:3px;">${prefixUpload}Upload paper</div>
-                % endif
-                <div style="white-space: nowrap">
-                % if showHistory and len(Contribution.getReviewManager().getVersioning()) > 1:
-                    <span class="fakeLink" id="revHistory">${_("History")}</span>
-                % endif
-                % if showHistory and len(Contribution.getReviewManager().getVersioning()) > 1 and showMaterial:
-                 |
-                % endif
-                % if showMaterial:
-                    <span class="fakeLink" id="revMaterial">${_("View Paper")}</span>
-                % endif
-                </div>
-            </div>
-        </div>
+    <div class="column reviewing-actions right-must highlighted-area">
+        <h2>${_("Reviewing")}</h2>
+        <div class="status ${statusClass}" title="${_("Call for papers")}">${statusText}</div>
+        <ul>
+            % if showSubmit:
+                <li id="rev-submit"><a id="revSubmit" class="i-button icon-upload" href="#">${prefixUpload}Upload paper</a></li>
+            % endif
+            % if showHistory and len(Contribution.getReviewManager().getVersioning()) > 1:
+                <li><a id="revHistory" href="#">${_("History")}</a></li>
+            % endif
+            % if showMaterial:
+                <li><a id="revMaterial" href="#">${_("View Paper")}</a></li>
+            % endif
+
+        </ul>
+    </div>
     % endif
 </%block>
 
@@ -91,48 +77,47 @@
     <% location = Contribution.getLocation() %>
     <% room = Contribution.getRoom() %>
     % if location or room:
-    <div class="contributionRightPanelSection">
-        <h2 class="contributionSectionTitle">${_("Place")}</h2>
-        <div>
+    <div class="place icon-location">
         % if location:
-            <div><span style="font-weight:bold">${_("Location")}: </span>${location.getName()}</div>
-            % if location.getAddress() is not None and location.getAddress()!="":
-            <div><span style="font-weight:bold">${_("Address")}: </span>${location.getAddress()}</div>
-            % endif
+            <span>
+                ${location.getName()}
+                % if room:
+                    ${linking.RoomLinker().getHTMLLink(room,location)}
+                % endif
+            </span>
         % endif
-        % if room:
-            <div><span style="font-weight:bold">${_("Room")}: </span>${linking.RoomLinker().getHTMLLink(room,location)}</div>
-        % endif
-        </div>
     </div>
     % endif
 </%block>
 
 <%block name="authors">
+    <div class="column">
     % if Contribution.getPrimaryAuthorList():
-        <div class="contributionRightPanelSection">
-            <h2 class="contributionSectionTitle">${_("Primary authors")}</h2>
-            <ul>
-            % for pa in Contribution.getPrimaryAuthorList()[:4]:
-                <li><a href="${getAuthorURL(pa)}">${pa.getDirectFullName()}</a>
-                    <span style="font-size:10px">${pa.getAffiliation()}</span>
-            % endfor
-            </ul>
-            <a class="fakeLink" id="moreAuthors">${_("More")}</a>
-        </div>
+        <h2>${_("Primary authors")}</h2>
+        <ul>
+        % for pa in Contribution.getPrimaryAuthorList():
+            <li class="icon-user">
+                <a href="${getAuthorURL(pa)}">${pa.getDirectFullName()}</a> (${pa.getAffiliation()})
+            </li>
+        % endfor
+        </ul>
     % endif
+    </div>
+</%block>
+
+<%block name="coauthors">
+    <div class="column">
     % if Contribution.getCoAuthorList():
-        <div class="contributionRightPanelSection">
-            <h2 class="contributionSectionTitle">${_("Co-authors")}</h2>
-            <ul>
-            % for ca in Contribution.getCoAuthorList()[:4]:
-                <li><a href="${getAuthorURL(ca)}">${ca.getDirectFullName()}</a>
-                    <span style="font-size:10px">${ca.getAffiliation()}</span>
-            % endfor
-            </ul>
-            <a class="fakeLink" id="moreCoAuthors">${_("More")}</a>
-        </div>
+        <h2>${_("Co-authors")}</h2>
+        <ul>
+        % for ca in Contribution.getCoAuthorList():
+            <li class="icon-user">
+                <a href="${getAuthorURL(ca)}">${ca.getDirectFullName()}</a> (${ca.getAffiliation()})
+            </li>
+        % endfor
+        </ul>
     % endif
+    </div>
 </%block>
 
 <%block name="scripts">
@@ -199,5 +184,6 @@
             });
         });
 
+    $(".contributionSectionContent").mathJax();
 </script>
 </%block>
