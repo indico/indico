@@ -4,7 +4,7 @@
 
 
 <div class="contribution-display">
-    <div class="wrapper">
+    <div class="layout-wrapper">
         <div id="buttonBar" class="toolbar right">
             <div class="group">
                 % if abstract.canModify(accessWrapper):
@@ -23,7 +23,7 @@
         </div>
         <h1 class="page_title">${"Abstract"}</h1>
     </div>
-    <div class="wrapper clear">
+    <div class="layout-wrapper clear">
         <div class="aside" title="${_("Submission details (date, time and user)")}">
             <time datetime="${abstract.getSubmissionDate().isoformat()}">
                 ${formatDateTime(abstract.getSubmissionDate())}
@@ -40,7 +40,7 @@
         <div>
             <div class="information">
                 <div class="status ${statusClass}" title="${_("Abstract status")}">${statusText}</div>
-                <div class="wrapper">
+                <div class="layout-wrapper">
                     % if abstract.getPrimaryAuthorList():
                         <div class="column">
                             <h2>${_("Primary authors")}</h2>
