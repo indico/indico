@@ -1,8 +1,9 @@
 <div class="regFormEditLine">
     <label class="regFormDialogCaption">
-        {{ 'size in char' | i18n }}
+        {{ 'Size in char' | i18n }}
     </label>
     <input ng-model="formData.length"
+        ng-class="{hasError: validationStarted && optionsForm.length.$invalid}"
         name="length"
         type="number"
         size="20"

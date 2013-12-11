@@ -13,13 +13,14 @@
     </ul>
     <div class="tab-content regFormDialogTabContent">
         <div class="tab-pane" id="div-options" ng-class="{active: isTabSelected('tab-options')}">
-            <form novalidate id="optionsForm" name="optionsForm">
+            <form id="optionsForm" name="optionsForm">
                 <div class="regFormEditLine">
                     <label class="regFormDialogCaption">
-                        {{ 'caption' | i18n }}
+                        {{ 'Caption' | i18n }}
+                        <span class="regFormMandatoryField">*</span>
                     </label>
                     <input ng-model="formData.caption"
-                        ng-class="{error: optionsForm.caption.$dirty && optionsForm.caption.$invalid}"
+                        ng-class="{hasError: validationStarted && optionsForm.caption.$invalid}"
                         type="text"
                         name="caption"
                         id="input01"
@@ -35,7 +36,7 @@
 
                 <div class="regFormEditLine">
                     <label class="regFormDialogCaption">
-                        {{ 'description' | i18n }}
+                        {{ 'Description' | i18n }}
                     </label>
                     <textarea ng-model="formData.description"
                         id="descriptionEdit"

@@ -1,12 +1,10 @@
 <div class="regFormEditLine">
     <label class="regFormDialogCaption">
-        {{ 'default item' | i18n }}
+        {{ 'Default item' | i18n }}
     </label>
-    <select ng-model="formData.defaultItem"
-        id="defaultItem"
-        name="defaultItem" ng-model="formData.defaultItem">
+    <select ng-model="formData.defaultItem" name="defaultItem">
         <option value="" ng-selected="field.values.defaultItem == null">
-            {{ 'none' | i18n }}
+            {{ 'None' | i18n }}
         </option>
         <option ng-repeat="el in field.values.radioitems"
             ng-selected="field.values.defaultItem == el.caption"
@@ -21,11 +19,9 @@
 
 <div class="regFormEditLine">
     <label class="regFormDialogCaption">
-        {{ 'input type' | i18n }}
+        {{ 'Input type' | i18n }}
     </label>
-    <select ng-model="formData.inputType"
-        id="inputType"
-        name="inputType">
+    <select ng-model="formData.inputType" name="inputType">
         <option value="dropdown" ng-selected="field.values.inputType == 'dropdown'">
             {{ 'drop down menu' | i18n }}
         </option>

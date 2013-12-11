@@ -7,15 +7,15 @@
         name="billable"
         ng-checked="field.billable"/>
 </div>
-<div class="regFormEditLine">
+<div ng-if="formData.billable == true" class="regFormEditLine">
     <label class="regFormDialogCaption">
-        {{ 'price' | i18n }}
+        {{ 'Price' | i18n }}
     </label>
     <input ng-model="formData.price"
+        ng-class="{hasError: validationStarted && optionsForm.price.$invalid}"
         type="number"
         min="0"
         name="price"
-        class="input-xlarge"
         id="input01"
         size="20">
     <span ng-if="field.input == 'number'">

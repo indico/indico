@@ -1,12 +1,14 @@
 <div class="regFormEditLine">
     <label class="regFormDialogCaption">
-        {{ 'places limit' | i18n }}
+        {{ 'Places limit' | i18n }}
     </label>
-    <input ng-model="formData.placesLimit"
+    <input type="number"
+        ng-model="formData.placesLimit"
+        ng-class="{hasError: validationStarted && optionsForm.placesLimit.$invalid}"
         name="placesLimit"
-        type="number"
         size="20"
-        min="0">
+        min="0"
+        required>
     <span>
         ({{ "0 for unlimited" | i18n }})
     </span>

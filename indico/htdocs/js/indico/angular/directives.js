@@ -47,8 +47,9 @@ ndDirectives.directive("ndDialog", function() {
                     $scope.actions.close();
                 },
                 ok: function() {
+                    $scope.$apply($scope.validationStarted = true);
                     var resultOkCallback = $scope.okCallback({dialogScope: $scope});
-                    if($scope.validate === true && resultOkCallback === true || $scope.validate !== true) {
+                    if(($scope.validate === true && resultOkCallback === true) || $scope.validate !== true) {
                         $scope.actions.close();
                     }
                 }

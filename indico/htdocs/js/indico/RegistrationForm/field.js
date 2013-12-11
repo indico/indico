@@ -199,6 +199,7 @@ ndRegForm.directive('ndDateField', function(url) {
         link: function(scope) {
             scope.settings.date = true;
             scope.settings.formData.push(['values', 'displayFormats']);
+            scope.settings.formData.push(['values', 'dateFormat']);
             scope.dateInputs = [
                 '{0}_Day'.format(scope.getName(scope.field.input)),
                 '{0}_Month'.format(scope.getName(scope.field.input)),

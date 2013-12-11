@@ -1,8 +1,9 @@
 <div class="regFormEditLine">
     <label class="regFormDialogCaption">
-        {{ 'number of columns' | i18n }}
+        {{ 'Columns' | i18n }}
     </label>
     <input ng-model="formData.numberOfColumns"
+        ng-class="{hasError: validationStarted && optionsForm.numberOfColumns.$invalid}"
         name="numberOfColumns"
         type="number"
         min="1"
@@ -10,9 +11,10 @@
 </div>
 <div class="regFormEditLine">
     <label class="regFormDialogCaption">
-        {{ 'number of rows' | i18n }}
+        {{ 'Rows' | i18n }}
     </label>
     <input ng-model="formData.numberOfRows"
+        ng-class="{hasError: validationStarted && optionsForm.numberOfRows.$invalid}"
         name="numberOfRows"
         type="number"
         min="1"

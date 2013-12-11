@@ -37,6 +37,11 @@
         @include border-all($blue);
         outline: none;
     }
+
+    &.hasError {
+        @include border-all($red);
+        background-color: $light-red;
+    }
 }
 
 input[type=text],
@@ -55,6 +60,13 @@ input[type=search] {
 
 textarea {
     @extend %text-input;
+}
+
+select {
+    &.hasError {
+        @include border-all($red);
+        color: $red;
+    }
 }
 
 div[contenteditable],
