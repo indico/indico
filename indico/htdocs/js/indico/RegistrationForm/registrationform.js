@@ -184,7 +184,6 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             };
 
             angular.extend($scope.sectionSortableOptions, sortableoptions);
-
         },
 
         link: function(scope, element) {
@@ -198,8 +197,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
             scope.validate = function() {
                 scope.validationStarted = true;
-
-                return false;
+                return scope.registrationForm.$valid;
             };
         }
     };

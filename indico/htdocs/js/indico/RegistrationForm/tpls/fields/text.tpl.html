@@ -1,10 +1,15 @@
-<input type="text"
-    id="{{ getName(field.input) }}"
-    name="{{ getName(field.input) }}"
-    value=""
-    size="{{ field.values.length || 60}}"
-    ng-required="field.mandatory"/>
-
+<ng-form name="nestedForm">
+    <input type="text"
+        id="{{ getName(field.input) }}"
+        name="{{ getName(field.input) }}"
+        value=""
+        size="{{ field.values.length || 60}}"
+        ng-model="input"
+        ng-required="field.mandatory"
+        ng-class="{
+            hasError: validationStarted && nestedForm.$invalid
+        }"/>
+</ng-form>
 <span class="inputDescription">
     {{ field.description }}
 </span>

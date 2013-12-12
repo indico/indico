@@ -1,15 +1,21 @@
-<select
-    id="{{ getName(field.input) }}"
-    name="{{ getName(field.input) }}"
-    ng-required="field.mandatory">
-    <option value="">
-        {{ '-- Select a country --' | i18n }}
-    </option>
-    <option ng-repeat="item in field.values.radioitems"
-        value="{{ item.countryKey }}">
-        {{ item.caption }}
-    </option>
-</select>
+<ng-form name="nestedForm">
+    <select
+        id="{{ getName(field.input) }}"
+        name="{{ getName(field.input) }}"
+        ng-model="input"
+        ng-required="field.mandatory"
+        ng-class="{
+            hasError: validationStarted && nestedForm.$invalid
+        }">
+        <option value="">
+            {{ '-- Select a country --' | i18n }}
+        </option>
+        <option ng-repeat="item in field.values.radioitems"
+            value="{{ item.countryKey }}">
+            {{ item.caption }}
+        </option>
+    </select>
+</ng-form>
 
 <span class="inputDescription">
     {{ field.description }}

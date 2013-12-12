@@ -1,8 +1,12 @@
 <div id="attachment{{ getName(field.input) }}">
-    <input type="file"
-        id="{{ getName(field.input) }}"
-        name="{{ getName(field.input) }}"
-        ng-required="field.mandatory"/>
+    <ng-form name="nestedForm">
+        <input type="file" nd-valid-file
+            id="{{ getName(field.input) }}"
+            name="{{ getName(field.input) }}"
+            ng-model="input"
+            ng-required="field.mandatory"
+            ng-class="{hasError: validationStarted && nestedForm.$invalid}"/>
+    </ng-form>
 </div>
 
 <span class="inputDescription">

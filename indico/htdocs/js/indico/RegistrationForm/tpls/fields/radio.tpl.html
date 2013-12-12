@@ -1,38 +1,50 @@
 <div ng-switch="field.values.inputType" ng-controller="BillableCtrl">
-    <select ng-switch-when="dropdown" name="{{ getName(field.input) }}">
-        <option value="">-- {{ 'Choose a value' | i18n }} --</option>
-        <option ng-repeat="item in field.values.radioitems | filter: {isEnabled: true}"
-            value="{{ item.caption }}"
-            ng-class="{regFormIsBillable: isBillable(item)}"
-            ng-selected="field.values.defaultItem == item.caption">
-            {{ item.caption }}
-        </option>
-    </select>
-
-    <ul ng-switch-default>
-        <li ng-repeat="item in field.values.radioitems">
-            <input type="radio"
-                name="{{ getName(field.input) }}"
-                value="{{ item.id }}"
-                ng-checked="field.values.defaultItem == item.caption"
+    <ng-form name="nestedForm" ng-switch-when="dropdown">
+        <select
+            name="{{ getName(field.input) }}"
+            ng-model="input"
+            ng-init="input = field.values.defaultItem"
+            ng-required="field.mandatory"
+            ng-class="{hasError: validationStarted && nestedForm.$invalid}">
+            <option value="">-- {{ 'Choose a value' | i18n }} --</option>
+            <option ng-repeat="item in field.values.radioitems | filter: {isEnabled: true}"
+                value="{{ item.caption }}"
                 ng-class="{regFormIsBillable: isBillable(item)}"
-                ng-required="field.mandatory"
-                ng-disabled="isDisabled(item)"/>
-            {{ item.caption }}
+                ng-selected="field.values.defaultItem == item.caption">
+                {{ item.caption }}
+            </option>
+        </select>
+    </ng-form>
 
-            <span ng-if="isBillable(item)" class="regFormPrice">{{ item.price }}</span>
-            <span ng-if="isBillable(item)" class="regFormCurrency">{{ currency }}</span>
+    <ng-form name="nestedForm" ng-switch-default ng-init="input = {input: field.values.defaultItem}">
+        <ul>
+            <li ng-repeat="item in field.values.radioitems">
+                <input type="radio"
+                    name="{{ getName(field.input) }}"
+                    value="{{ item.id }}"
+                    ng-model="input.input"
+                    ng-checked="field.values.defaultItem == item.caption"
+                    ng-class="{regFormIsBillable: isBillable(item)}"
+                    ng-required="field.mandatory"
+                    ng-disabled="isDisabled(item)"/>
+                <span ng-class="{'text-error': validationStarted && nestedForm.$invalid}">
+                    {{ item.caption }}
+                </span>
 
-            <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item)">
-                <font ng-switch-when="false" color="red" style="margin-left:25px;">
-                    ({{ "no places left" | i18n }})
-                </font>
-                <font ng-switch-when="true" color="green" style="margin-left:25px;">
-                    [{{ item.noPlacesLeft }} {{ 'place(s) left' | i18n }}]
-                </font>
-            </span>
-        </li>
-    </ul>
+                <span ng-if="isBillable(item)" class="regFormPrice">{{ item.price }}</span>
+                <span ng-if="isBillable(item)" class="regFormCurrency">{{ currency }}</span>
+
+                <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item)">
+                    <font ng-switch-when="false" color="red" style="margin-left:25px;">
+                        ({{ "no places left" | i18n }})
+                    </font>
+                    <font ng-switch-when="true" color="green" style="margin-left:25px;">
+                        [{{ item.noPlacesLeft }} {{ 'place(s) left' | i18n }}]
+                    </font>
+                </span>
+            </li>
+        </ul>
+    </ng-form>
 </div>
 
 <span class="inputDescription">

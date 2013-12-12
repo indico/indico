@@ -1,9 +1,14 @@
-<textarea
-    id="{{ getName(field.input) }}"
-    name="{{ getName(field.input) }}"
-    cols="{{ field.values.numberOfColumns }}"
-    rows="{{ field.values.numberOfRows }}"
-    ng-required="field.mandatory"></textarea>
+<ng-form name="nestedForm">
+    <textarea
+        id="{{ getName(field.input) }}"
+        name="{{ getName(field.input) }}"
+        cols="{{ field.values.numberOfColumns }}"
+        rows="{{ field.values.numberOfRows }}"
+        ng-model="input"
+        ng-required="field.mandatory"
+        ng-class="{hasError: validationStarted && nestedForm.$invalid}">
+    </textarea>
+</ng-form>
 
 <span class="inputDescription">
     {{ field.description }}

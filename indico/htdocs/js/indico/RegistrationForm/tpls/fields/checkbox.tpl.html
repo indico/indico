@@ -1,10 +1,16 @@
 <div ng-controller="BillableCtrl">
-    <input type="checkbox"
-        id="{{ name }}"
-        name="{{ name }}"
-        ng-class="{regFormIsBillable: isBillable(field)}"
-        ng-required="field.mandatory"
-        ng-disabled="!hasPlacesLeft(field)"/>
+    <ng-form name="nestedForm">
+        <input type="checkbox"
+            id="{{ name }}"
+            name="{{ name }}"
+            ng-model="input"
+            ng-required="isRequired(field)"
+            ng-disabled="!hasPlacesLeft(field)"
+            ng-class="{regFormIsBillable: isBillable(field)}"/>
+            <span ng-show="validationStarted && nestedForm.$invalid" class="error-message-tag">
+                {{ 'must be checked' | i18n }}
+            </span>
+    </ng-form>
 
     <span ng-if="isBillable(field)" class="regFormPrice">{{ field.price }}</span>
     <span ng-if="isBillable(field)" class="regFormCurrency">{{ currency }}</span>

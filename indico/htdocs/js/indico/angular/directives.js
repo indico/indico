@@ -213,3 +213,32 @@ ndDirectives.directive('ndConfirmationPopup', function() {
         }
     };
 });
+
+ndDirectives.directive('ndValidFile', function() {
+    return {
+        require: 'ngModel',
+        link: function (scope, el, attrs, ngModel) {
+            ngModel.$render = function () {
+                ngModel.$setViewValue(el.val());
+            };
+
+            el.bind('change', function() {
+                scope.$apply(function() {
+                    ngModel.$render();
+                });
+            });
+        }
+    };
+});
+
+ndDirectives.directive('ndRadioExtend', function($rootScope){
+    return {
+        require: 'ngModel',
+        restrict: 'A',
+        link: function(scope, element, iAttrs, controller) {
+            element.bind('click', function() {
+                $rootScope.$$phase || $rootScope.$apply();
+            });
+        }
+    };
+});

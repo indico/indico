@@ -1,9 +1,13 @@
-<input type="text"
-    id="{{ getName(field.input) }}"
-    name="{{ getName(field.input) }}"
-    value=""
-    size="30"
-    ng-required="field.mandatory">
+<ng-form name="nestedForm">
+    <input type="text"
+        id="{{ getName(field.input) }}"
+        name="{{ getName(field.input) }}"
+        size="30"
+        ng-model="input"
+        ng-required="field.mandatory"
+        ng-class="{hasError: validationStarted && nestedForm.$invalid}"
+        ng-pattern="/(\+?\s*(\d\s*))/">
+</ng-form>
 
 <span class="inputDescription">
     (+) 999 99 99 99

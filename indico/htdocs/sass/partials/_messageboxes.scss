@@ -41,6 +41,11 @@
     }
 }
 
+%message-tag {
+    @include border-radius();
+    padding: 0 4px;
+}
+
 .infoMessage {
     color: #3A87AD;
     background-color: #D9EDF7;
@@ -115,4 +120,10 @@
 
     background-color: $light-red;
     border: 1px solid $dark-red;
+}
+
+.error-message-tag {
+    @extend %message-tag;
+    background-color: $red;
+    color: $light-gray;
 }

@@ -58,6 +58,14 @@ input[type=search] {
     }
 }
 
+input[type=file] {
+    &.hasError {
+        @include border-all($red);
+        color: $red;
+        background: $light-red;
+    }
+}
+
 textarea {
     @extend %text-input;
 }

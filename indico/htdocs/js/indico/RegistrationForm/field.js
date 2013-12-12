@@ -123,11 +123,12 @@ ndRegForm.controller('BillableCtrl', function($scope) {
     };
 
     $scope.isDisabled = function(item) {
-        return (item.disabled === true || item.isEnabled === false) || !$scope.hasPlacesLeft(item);
+        return (item.disabled === true || item.isEnabled === false) ||
+            !$scope.hasPlacesLeft(item) || item.cancelled === true;
     };
 
     $scope.isRequired = function(item) {
-        return item.required && !scope.isItemDisabled(item);
+        return item.required && !scope.isDisabled(item);
     };
 
     $scope.hasPlacesLeft = function(item) {

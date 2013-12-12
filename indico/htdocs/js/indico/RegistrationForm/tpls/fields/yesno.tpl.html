@@ -1,23 +1,36 @@
 <div ng-controller="BillableCtrl">
-    <select
-        id="{{ getName(field.input) }}"
-        name="{{ getName(field.input) }}"
-        ng-class="{regFormIsBillable: item.isBillable}"
-        ng-required="field.mandatory"
-        ng-disabled="!hasPlacesLeft(field)">
+    <ng-form name="nestedForm">
+        <select
+            id="{{ getName(field.input) }}"
+            name="{{ getName(field.input) }}"
+            ng-model="input"
+            ng-required="field.mandatory"
+            ng-disabled="!hasPlacesLeft(field)"
+            ng-class="{
+                regFormIsBillable: item.isBillable,
+                hasError: validationStarted && nestedForm.$invalid
+            }">
 
-        <option value="">-- {{ 'Choose a value' | i18n }} --</option>
-        <option ng-if="hasPlacesLimit(field)" value="yes">
-            {{ 'yes' | i18n }}
-            [{{ field.noPlacesLeft }} {{ 'place(s) left' |i18n }}]
-        </option>
-        <option ng-if="!hasPlacesLimit(field)" value="yes">
-            {{ 'yes' | i18n }}
-        </option>
-        <option value="no">
-            {{ 'no' | i18n }}
-        </option>
-    </select>
+            <option value="">-- {{ 'Choose a value' | i18n }} --</option>
+            <option ng-if="hasPlacesLimit(field)" value="yes">
+                {{ 'yes' | i18n }}
+                [{{ field.noPlacesLeft }} {{ 'place(s) left' |i18n }}]
+            </option>
+            <option ng-if="!hasPlacesLimit(field)" value="yes">
+                {{ 'yes' | i18n }}
+            </option>
+            <option ng-if="!field.mandatory" value="no">
+                {{ 'no' | i18n }}
+            </option>
+            <option ng-if="field.mandatory" value="">
+                {{ 'no' | i18n }}
+            </option>
+        </select>
+
+        <span class="error-message-tag" ng-if="validationStarted && nestedForm.$invalid">
+            {{ "You must say 'yes'" | i18n }}
+        </span>
+    </ng-form>
 
     <span ng-if="field.billable" class="regFormPrice">{{ field.price }}</span>
     <span ng-if="field.billable" class="regFormCurrency">{{ currency }}</span>
