@@ -8,7 +8,7 @@
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
             <option value="">-- {{ 'Choose a value' | i18n }} --</option>
             <option ng-repeat="item in field.values.radioitems | filter: {isEnabled: true}"
-                value="{{ item.caption }}"
+                value="{{ item.id }}"
                 ng-class="{regFormIsBillable: isBillable(item)}"
                 ng-selected="field.values.defaultItem == item.caption">
                 {{ item.caption }}
