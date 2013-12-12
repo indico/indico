@@ -113,16 +113,7 @@ function block_handler(text, rbg) {
 
 $(function() {
     $('textarea.wmd-input').each(function(i, elem) {
-        var fieldId = $(elem).closest('td').data('fieldId'),
-            preview = $(elem).sibling('.wmd-preview'),
-            converter = Markdown.getSanitizingConverter();
-
-        converter.hooks.chain("preBlockGamut", block_handler);
-
-        var editor = new Markdown.Editor(converter, "-" + fieldId);
-
-        PageDownMathJax().WMDMathJax(editor, preview.get(0), [["$$", "$$"], ["\\\\(","\\\\)"]]);
-        editor.run();
+         PageDownMathJax().createEditor(elem);
     });
 });
 
