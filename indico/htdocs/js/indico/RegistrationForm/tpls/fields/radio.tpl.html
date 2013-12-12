@@ -3,7 +3,8 @@
         <option value="">-- {{ 'Choose a value' | i18n }} --</option>
         <option ng-repeat="item in field.values.radioitems | filter: {isEnabled: true}"
             value="{{ item.caption }}"
-            ng-class="{regFormIsBillable: isBillable(item)}">
+            ng-class="{regFormIsBillable: isBillable(item)}"
+            ng-selected="field.values.defaultItem == item.caption">
             {{ item.caption }}
         </option>
     </select>
@@ -13,6 +14,7 @@
             <input type="radio"
                 name="{{ getName(field.input) }}"
                 value="{{ item.id }}"
+                ng-checked="field.values.defaultItem == item.caption"
                 ng-class="{regFormIsBillable: isBillable(item)}"
                 ng-required="field.mandatory"
                 ng-disabled="isDisabled(item)"/>
