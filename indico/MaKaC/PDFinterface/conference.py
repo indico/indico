@@ -1080,7 +1080,7 @@ class ContribToPDF(PDFBase):
 
         for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
             fid = field.getId()
-            name = field.getName()
+            name = field.getCaption()
             value = self._contrib.getField(fid).strip()
             if value: #id not in ["content"] and
                 story += "\n\\vspace{10 mm}\n\\noindent\n \

@@ -78,7 +78,7 @@
                         </div>
                     % endif
                     % if len(attachments) != 0:
-                        <div class="column">
+                        <div class="column files">
                             <h2>${_("Attached files")}</h2>
                             <ul>
                                 % for file in attachments:

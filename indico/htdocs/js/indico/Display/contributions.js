@@ -15,7 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-
 $(function() {
     $('.information .trigger').click(function() {
             var $this = $(this),
@@ -33,10 +32,12 @@ $(function() {
         }
     });
 
-    $('.icon-user').bind('mouseenter', function (){
+    $('.icon-user, .track-assignment, .session-assignment').bind('mouseenter', function (){
         var $this = $(this);
         if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
             $this.attr('title', $this.text());
         }
     });
+
+    $('.content, h1').mathJax();
 });

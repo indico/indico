@@ -338,7 +338,20 @@ you can use the generic selector below, but it's slower:
     content: "\e3b0";
 }
 
+.icon-stack:before {
+    content: "\e097";
+}
+
+
 /* KEEP THE FOLLOWING DEFINITIONS: necessery when rendering the icon 'after' e.g. mixin icon-after */
 .icon-arrow-down-after:after {
     content: "\24";
+}
+
+.icon-time-after:after {
+    content: "\e004";
+}
+
+.icon-location-after:after {
+    content: "\e002";
 }

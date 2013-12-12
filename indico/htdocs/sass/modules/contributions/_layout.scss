@@ -27,6 +27,15 @@
 $box-bg-color: #fefefe;
 $box-border-color: lighten($gray, 10%);
 
+$line-gray: darken($light-gray, 10%);
+
+%ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
 @mixin padded-box($padding: 1em) {
   @include single-box-shadow;
   @include border-all($box-border-color);
@@ -35,15 +44,26 @@ $box-border-color: lighten($gray, 10%);
 }
 
 @mixin tag-like($fg_color, $bg_color) {
-    @include border-radius(0.4em);
+    @include box-sizing(border-box);
+    @include border-radius(0.1em);
+    vertical-align: middle;
     color: $fg_color;
     line-height: 1.5em;
     background: $bg_color;
-    text-align: center;
     display: inline-block;
-    padding: 0.2em 0.7em;
-}
+    padding: 0.5em;
+    max-width: 12em;
 
+    @extend %ellipsis;
+
+    &:before {
+      vertical-align: middle;
+    }
+
+    & * {
+      vertical-align: middle;
+    }
+}
 
 .contribution-display {
   .layout-wrapper {
@@ -55,10 +75,16 @@ $box-border-color: lighten($gray, 10%);
         padding-bottom: 0.5em;
         margin: 0;
         border-bottom: 1px solid $box-border-color;
+
+        .type {
+          color: $gray;
+          margin-left: 0.5em;
+          font-size: 0.7em;
+        }
       }
 
       display: block;
-      font-size: 2em;
+      font-size: 1.7em;
       margin-top: 0.5em;
     }
 
@@ -68,17 +94,24 @@ $box-border-color: lighten($gray, 10%);
       margin-top: 0.5em;
       float: right;
       width: 200px;
-      padding: 0.5em;
-
+      padding: 0.5em 0 0.5em 0.5em;
       text-align: right;
 
       &.left-align {
         text-align: left;
       }
 
-      *:before {
-        margin-right: 0.5em;
+
+      :after, :before {
         color: $light-black;
+      }
+
+      :before {
+        margin-right: 0.5em;
+      }
+
+      :after {
+        margin-left: 0.5em;
       }
 
       time {
@@ -96,16 +129,43 @@ $box-border-color: lighten($gray, 10%);
     }
   }
 
-  .paper-reviewing-info {
+  .aside.assignments {
+    * {
+      text-align: left;
+    }
 
+    padding: 1em 0 1em 0;
+    width: 25em;
   }
 
   .track-assignment {
-    @include tag-like(#eee, #888);
+    @include icon-before(icon-stack);
+    @include tag-like($light-gray, $dark-gray);
   }
 
   .session-assignment {
-   @include tag-like(#888, #eee);
+    @include tag-like($light-black, darken($light-gray, 5%));
+    .square {
+      vertical-align: middle;
+      border: 1px solid $light-black;
+      display: inline-block;
+      height: 12px;
+      width: 12px;
+    }
+
+    :after, :before {
+      color: $light-black;
+    }
+  }
+
+  .schedule-info {
+    time {
+      @include icon-after(icon-time);
+    }
+
+    .place {
+     @include icon-after(icon-location);
+    }
   }
 
   .information {
@@ -176,26 +236,38 @@ $box-border-color: lighten($gray, 10%);
   }
 
   .row.files {
+    border-top: 1px solid $line-gray;
+    @include box-shadow(rgba(200, 200, 200, 0.2) 0 1px 2px inset);
     background-color: $light-gray;
-
-    margin-bottom: 2em;
+    padding-bottom: 2em;
 
     .column {
       @include single-transition(background-color);
       margin-right: -1em;
 
+      h2 {
+        padding-bottom: 0.5em;
+        border-bottom: 1px solid $line-gray;
+      }
+
       #manageMaterial {
         @include single-transition(box-shadow);
-        margin: 1em 2em 0 0;
+        margin: 1em 0 0 0;
       }
     }
+  }
+
+  .column.files:nth-child(4) {
+    clear: both;
   }
 
   .column.reviewing-actions {
     @include box-sizing(border-box);
 
-    margin: 1em 0 1em 0em;
+    clear: right;
     background-color: $light-gray;
+    border-left: 1px solid $line-gray;
+    border-bottom: 1px solid $line-gray;
 
     ul {
       li#rev-submit {
@@ -206,8 +278,6 @@ $box-border-color: lighten($gray, 10%);
 }
 
 .layout-wrapper {
-  padding: 0 1em 0 1em;
-
   .row {
     width: 100%;
     clear: both;
@@ -234,9 +304,7 @@ $box-border-color: lighten($gray, 10%);
       padding: 0;
 
       li {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        @extend %ellipsis;
         min-height: 1.5em;
         margin-bottom: 0.5em;
 

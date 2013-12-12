@@ -44,7 +44,7 @@
             <% content = Contribution.getField(f.getId()) %>
             <div class="section">
                 <h2>${f.getCaption()}</h2>
-                <div class="content">${content | m}</div>
+                <div class="content md-preview-wrapper display">${content | m}</div>
             </div>
             % endif
         % endfor
@@ -77,11 +77,14 @@
     <% location = Contribution.getLocation() %>
     <% room = Contribution.getRoom() %>
     % if location or room:
-    <div class="place icon-location">
+    <div class="place">
         % if location:
             <span>
                 ${location.getName()}
                 % if room:
+                    % if location.getName():
+                     -
+                    % endif
                     ${linking.RoomLinker().getHTMLLink(room,location)}
                 % endif
             </span>

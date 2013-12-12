@@ -4,32 +4,55 @@
 <div class="contribution-display">
     <div class="layout-wrapper">
         <div id="buttonBar" class="toolbar right">
+            % if Contribution.canModify(accessWrapper):
             <div class="group">
-                % if Contribution.canModify(accessWrapper):
-                        <a href="${str(urlHandlers.UHContributionModification.getURL(Contribution))}" class="i-button icon-edit" title="${_("Edit")}"></a>
-                % endif
+              <a href="${str(urlHandlers.UHContributionModification.getURL(Contribution))}" class="i-button icon-edit" title="${_("Edit")}"></a>
+            </div>
+            % endif
+            <div class="group">
                 <a href="${str(urlHandlers.UHContribToPDF.getURL(Contribution))}"
                    class="i-button icon-file-pdf" target="_blank" title="${_("Generate PDF")}"></a>
                 <a href="${str(urlHandlers.UHContribToXML.getURL(Contribution))}"
                    class="i-button icon-file-xml" target="_blank" title="${_("Generate XML")}"></a>
                 % if Contribution.isScheduled():
                     <a id="exportIcal${Contribution.getUniqueId()}" class="i-button icon-calendar exportIcal" data-id="${Contribution.getUniqueId()}"></a>
-                    <%include file="ContributionICalExport.tpl" args="item=Contribution"/>
                 % endif
             </div>
+            <%include file="ContributionICalExport.tpl" args="item=Contribution"/>
         </div>
-        <h1 class="page_title">${"Contribution"} ${"({0})".format(_("WITHDRAWN")) if isWithdrawn else "" }</h1>
+        <h1 class="page_title">
+            ${"Contribution"}
+            % if Contribution.getType() is not None:
+                <span class="type">${Contribution.getType().getName()}</span>
+            % endif
+
+            ${"({0})".format(_("WITHDRAWN")) if isWithdrawn else "" }
+        </h1>
     </div>
 
-    <div class="layout-wrapper clear">
-        <div class="aside left-align">
+    <div class="schedule-info layout-wrapper clear">
+        <div class="aside">
             % if Contribution.isScheduled():
-                <time datetime="${Contribution.getStartDate().isoformat()}" class="icon-time">
+                <time datetime="${Contribution.getStartDate().isoformat()}">
                     ${formatDateTime(Contribution.getStartDate())}
                     - ${formatTime(Contribution.getEndDate())}
                 </time>
                 <%block name="place">
                 </%block>
+            % endif
+        </div>
+        <div class="clear aside assignments">
+            % if Contribution.getTrack():
+                <div class="track-assignment">${Contribution.getTrack().getTitle()}</div>
+            % endif
+
+            % if Contribution.getSession():
+                <div class="session-assignment">
+                  <div style="background-color: ${Contribution.getSession().getColor()};" class="square"></div>
+                  <a href="${str(urlHandlers.UHSessionDisplay.getURL(Contribution.getSession()))}">
+                    ${Contribution.getSession().getTitle()}
+                  </a>
+                </div>
             % endif
         </div>
         <h1>
@@ -39,35 +62,21 @@
 
      <div class="clear">
             <div>
-                <div>
-                    % if Contribution.getTrack():
-                        <div class="track-assignment">${Contribution.getTrack().getTitle()}</div>
-                    % endif
-
-                    % if Contribution.getSession():
-                        <div class="session-assignement">
-                          <a class="lightGreyLink" href="${str(urlHandlers.UHSessionDisplay.getURL(Contribution.getSession()))}">
-                            ${Contribution.getSession().getTitle()}
-                          </a>
-                          <div style="background-color: ${Contribution.getSession().getColor()};" class="sessionSquare"></div>
-                        </div>
-                    % endif
-                </div>
                 <div class="information">
                     <div class="layout-wrapper">
-                        <%block name="paperReview">
-                        </%block>
-
                         <%block name="speakers">
                         </%block>
 
                         <%block name="authors">
                         </%block>
 
+                        <%block name="paperReview">
+                        </%block>
+
                         <%block name="coauthors">
                         </%block>
 
-                        <div class="row files">
+                        <div class="row files extra-parameters">
 
                             % if showAttachedFiles and abstractAttachments:
                             <div class="column">
@@ -114,20 +123,8 @@
                                 </div>
                                 % endif
                             </div>
+                            <div class="trigger icon-collapse" data-hidden="false"></div>
                         </div>
-                        <ul class="extra-parameters clear">
-                            % if Contribution.getType() != None:
-                                <li>
-                                    <span class="name">${_("Contribution type")}:</span>
-                                    <span class="value">${Contribution.getType().getName()}</span>
-                                </li>
-                            % endif
-                            <%block name="board">
-                            </%block>
-                            <%block name="reportNumber">
-                            </%block>
-                        </ul>
-                        <div class="trigger icon-expand" data-hidden="true"></div>
                     </div>
                 </div>
             </div>

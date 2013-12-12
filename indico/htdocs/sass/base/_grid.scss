@@ -22,7 +22,7 @@
 @mixin grid-column($ncols) {
     width: 100% / $ncols;
 
-    &:nth-child(#{$ncols + 1}n) {
-        clear:both;
+    &:nth-child(#{$ncols}n) {
+        clear: right;
     }
 }

@@ -7213,14 +7213,6 @@ a.lightGreyLink:hover {
     font-size: 12px;
 }
 
-.sessionSquare {
-    vertical-align: middle;
-    border: 1px solid #EAEAEA;
-    display: inline-block;
-    height: 12px;
-    width: 12px;
-}
-
 .contributionButtonBar, .subContributionButtonBar, .sessionButtonBar, .materialButtonBar, .abstractButtonBar {
     text-align: right;
     margin-bottom: 5px;

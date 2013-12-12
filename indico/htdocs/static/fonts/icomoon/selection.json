@@ -2017,6 +2017,71 @@
 				"name": "file-xml",
 				"ligatures": ""
 			}
+		},
+		{
+			"icon": {
+				"paths": [
+					"M1024 384l-192-192-320 320-320-320-192 192 512 511.998z"
+				],
+				"tags": [
+					"arrow-down",
+					"download",
+					"bottom"
+				],
+				"defaultCode": 57355,
+				"grid": 16
+			},
+			"properties": {
+				"order": 87,
+				"id": 68,
+				"prevSize": 32,
+				"code": 57359,
+				"name": "arrow-down",
+				"ligatures": ""
+			}
+		},
+		{
+			"icon": {
+				"paths": [
+					"M0 640l192 192 320-320 320 320 192-192-511.998-512z"
+				],
+				"tags": [
+					"arrow-up",
+					"upload",
+					"top"
+				],
+				"defaultCode": 58288,
+				"grid": 16
+			},
+			"properties": {
+				"order": 88,
+				"id": 945,
+				"prevSize": 32,
+				"code": 58288,
+				"name": "arrow-up",
+				"ligatures": ""
+			}
+		},
+		{
+			"icon": {
+				"paths": [
+					"M512 576l-512-256 512-256 512 256zM921.444 460.722l102.556 51.278-512 256-512-256 102.556-51.278 409.444 204.722zM921.444 652.722l102.556 51.278-512 256-512-256 102.556-51.278 409.444 204.722z"
+				],
+				"tags": [
+					"stack",
+					"layers"
+				],
+				"defaultCode": 57495,
+				"grid": 16
+			},
+			"properties": {
+				"order": 89,
+				"id": 152,
+				"prevSize": 32,
+				"code": 57495,
+				"name": "stack",
+				"ligatures": ""
+			}
 		}
 	],
 	"height": 1024,
