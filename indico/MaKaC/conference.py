@@ -11612,6 +11612,10 @@ class Link(Resource):
     def getURL( self ):
         return self.url
 
+    def getLocator(self):
+        locator = Resource.getLocator(self)
+        locator['fileExt'] = 'link'
+        return locator
 
 class LocalFile(Resource):
     """Specialises Resource class in order to represent files which can be
