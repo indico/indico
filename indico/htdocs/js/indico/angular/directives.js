@@ -38,6 +38,7 @@ ndDirectives.directive("ndDialog", function() {
                 init: function() {},
                 cleanup: function() {},
                 close: function() {
+                    $scope.$apply($scope.validationStarted = false);
                     $scope.actions.cleanup();
                     $scope.show = false;
                     $scope.$apply($scope.show);
