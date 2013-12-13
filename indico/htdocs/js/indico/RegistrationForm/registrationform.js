@@ -228,7 +228,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 ndRegForm.directive('ndAddSectionDialog', function(url) {
     return {
         require: 'ndDialog',
-        templateUrl: url.tpl('sections/dialogs/sectioncreation.tpl.html'),
+        templateUrl: url.tpl('dialogs/sectioncreation.tpl.html'),
 
         link: function(scope) {
             scope.actions.init = function() {
@@ -245,7 +245,7 @@ ndRegForm.directive('ndAddSectionDialog', function(url) {
 ndRegForm.directive('ndManagementDialog', function(url) {
     return {
         require: 'ndDialog',
-        templateUrl: url.tpl('sections/dialogs/sectionmanagement.tpl.html')
+        templateUrl: url.tpl('dialogs/sectionmanagement.tpl.html')
     };
 });
 

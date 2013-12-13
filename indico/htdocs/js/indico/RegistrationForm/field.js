@@ -42,6 +42,19 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         $scope.sectionApi.removeField($scope.section, field);
     };
 
+    $scope.fieldApi.updateField = function(field, data) {
+        var postData = getRequestParams(field);
+        postData = angular.extend(postData, {fieldData: data});
+
+        if ($scope.isNew()) {
+            delete postData['fieldId'];
+        }
+
+        regFormFactory.Fields.save(postData, function(response) {
+            $scope.field = angular.extend($scope.field, response);
+        });
+    };
+
     $scope.getName = function(input) {
         if (input == 'date') {
             return '_genfield_' + $scope.section.id + '_' + $scope.field.id;
@@ -93,20 +106,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             if(dialogScope.optionsForm.$invalid === true) {
                 return false;
             }
-            var postData = {
-                confId: $scope.confId,
-                sectionId: $scope.section.id,
-                fieldData: dialogScope.formData
-            };
 
-            if(!$scope.isNew()) {
-                postData.fieldId = dialogScope.field.id;
-            }
-
-            regFormFactory.Fields.save(postData,
-                function(response) {
-                    $scope.field = angular.extend($scope.field, response);
-                });
+            $scope.fieldApi.updateField($scope.field, dialogScope.formData);
             return true;
         },
         onCancel: function() {
