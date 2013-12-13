@@ -5,6 +5,12 @@
         </td>
     </tr>
 
+    <tr ng-if="section.selectionType!=multiple">
+        <td>
+            <input type="radio" name="socialEvents" value="" checked/>
+            {{ 'None' | i18n }}
+        </td>
+    </tr>
     <tr ng-repeat="item in section.items | filter: {cancelled: 'false'}">
         <td ng-switch="section.selectionType">
             <input ng-switch-when="multiple"

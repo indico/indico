@@ -4846,7 +4846,7 @@ class Registrant(Persistent, Fossilizable):
                     self.removeSocialEventById(seItem.getId())
             for seItem in data.get("socialEvents", []):
                 # Only add item if the registrant hasn't paid yet or the item is not billable
-                if not self.getPayed() or not seItem.isBillable():
+                if seItem and (not self.getPayed() or not seItem.isBillable()):
                     newSE = SocialEvent(seItem, int(data.get("places-%s" % seItem.getId(), "1")))
                     self.addSocialEvent(newSE)
         else:
