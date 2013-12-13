@@ -3,7 +3,7 @@
         id="{{ getName(field.input) }}"
         name="{{ getName(field.input) }}"
         size="30"
-        ng-model="input"
+        ng-model="userdata[getName(field.input)]"
         ng-required="field.mandatory"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
         ng-pattern="/(\+?\s*(\d\s*))/">

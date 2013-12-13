@@ -32,6 +32,10 @@ ndRegForm.value('displayurl',
     Indico.Urls.Base + '/event/:confId/registration/sections'
 );
 
+ndRegForm.value('userurl',
+    Indico.Urls.Base + '/event/:confId/registration/userdata'
+);
+
 ndRegForm.value('sortableoptions', {
     start: function(e, ui) {
         var borderOffset = 2;
@@ -49,10 +53,11 @@ ndRegForm.config(function(urlProvider) {
     urlProvider.setModulePath('/js/indico/RegistrationForm');
 });
 
-ndRegForm.factory('regFormFactory', function($resource, editionurl, displayurl) {
-
+ndRegForm.factory('regFormFactory', function($resource, editionurl, displayurl, userurl) {
     var sectionurl = editionurl + 'sections/:sectionId';
     var fieldurl = sectionurl + '/fields/:fieldId';
+    var sessionsurl = Indico.Urls.Base + '/event/:confId/manage/sessions';
+
     return {
         Sections: $resource(sectionurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId"}, {
             "remove": {url: sectionurl, method: 'DELETE', isArray: true},
@@ -69,7 +74,8 @@ ndRegForm.factory('regFormFactory', function($resource, editionurl, displayurl) 
             "disable": {method:'POST', url: fieldurl + "/disable"},
             "move": {method:'POST', url: fieldurl + "/move"}
         }),
-        Sessions: $resource(Indico.Urls.Base + '/event/:confId/manage/sessions', {8000: ":8000", confId: '@confId'}, {})
+        Sessions: $resource(sessionsurl, {8000: ":8000", confId: '@confId'}, {}),
+        UserData: $resource(userurl, {8000: ":8000", confId: '@confId'}, {})
     };
 });
 
@@ -99,7 +105,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             $rootScope.editMode = $scope.editMode;
             $rootScope.currency = $scope.currency;
 
-            if($rootScope.editMode) {
+            if ($rootScope.editMode) {
                 $scope.sections = regFormFactory.Sections.getAllSections({confId: $scope.confId}, {});
             } else {
                 $scope.sections = regFormFactory.Sections.getVisibleSections({confId: $scope.confId}, {});
@@ -189,6 +195,19 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
         link: function(scope, element) {
             scope.validationStarted = false;
+
+            // User data retrieval
+            if (scope.editMode) {
+                scope.userdata = {};
+            } else {
+                scope.userdata = regFormFactory.UserData.get({confId: scope.confId}, function() {
+                    generalSection = _.each(scope.userdata.miscellaneousGroupList, function(e) {
+                        _.each(e.responseItems, function(e) {
+                            scope.userdata[e.HTMLName] = e.value;
+                        });
+                    });
+                });
+            }
 
             element.on('submit', function(e) {
                 if (!scope.validate()) {

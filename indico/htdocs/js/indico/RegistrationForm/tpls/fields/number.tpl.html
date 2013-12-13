@@ -1,17 +1,14 @@
 <ng-form name="nestedForm">
     <input type="number"
         ng-model="numberInput"
-        ng-init="numberInput = field.values.minValue"
+        ng-init="numberInput = getValue(getName(field.input))"
         id="{{ getName(field.input) }}"
         name="{{ getName(field.input) }}"
         size="{{ field.values.length }}"
         min="{{ field.values.minValue }}"
         ng-required="isRequired(field)"
         ng-change="updateSubtotal(numberInput)"
-        ng-class="{
-            regFormIsBillable: isBillable(field),
-            hasError: validationStarted && nestedForm.$invalid
-        }"/>
+        ng-class="{hasError: validationStarted && nestedForm.$invalid}"/>
 </ng-form>
 
 <span ng-if="isBillable(field)">

@@ -4,7 +4,7 @@
         name="{{ getName(field.input) }}"
         value=""
         size="{{ field.values.length || 60}}"
-        ng-model="input"
+        ng-model="userdata[getName(field.input)]"
         ng-required="field.mandatory"
         ng-class="{
             hasError: validationStarted && nestedForm.$invalid

@@ -1,5 +1,5 @@
 <div ng-switch="section.type">
-    <table ng-switch-when="2priorities">
+    <table ng-switch-when="2priorities" ng-init="input = userdata.sessionList[0].id">
         <tr>
             <td>
                 <span>{{ 'Select your preferred choice' | i18n }}</span>
@@ -7,12 +7,15 @@
             </td>
             <td>
                 <ng-form name="nestedForm">
-                    <select id="session1" name="session1" ng-model="input" required
+                    <select id="session1" name="session1" required
+                        ng-model="input"
                         ng-class="{hasError: validationStarted && nestedForm.$invalid}">
                         <option value="">{{ '--Select a session--' | i18n }}</option>
                         <option ng-repeat="item in section.items"
-                            value="{{ item.id }}">
-                            {{ item.caption }}</option>
+                            value="{{ item.id }}"
+                            ng-selected="item.id == userdata.sessionList[0].id">
+                            {{ item.caption }}
+                        </option>
                     </select>
                 </ng-form>
             </td>
@@ -26,8 +29,10 @@
                 <select id="session2" name="session2">
                     <option value="">{{ '--Select a session--' | i18n }}</option>
                     <option ng-repeat="item in section.items | filter:{id: '!'+(input||' ')}"
-                        value="{{ item.id }}">
-                        {{ item.caption }}</option>
+                        value="{{ item.id }}"
+                        ng-selected="item.id == userdata.sessionList[1].id">
+                        {{ item.caption }}
+                    </option>
                 </select>
             </td>
         </tr>
@@ -40,7 +45,7 @@
                     <input type="checkbox"
                         name="sessions"
                         value="{{ item.id }}"
-                        ng-class="{regFormIsBillable: item.billable}"/>
+                        ng-checked="isSelected(item.id)"/>
                     {{ item.caption }}
                     <span ng-show="item.billable" class="regFormPrice">{{ item.price }}</span>
                     <span ng-show="item.billable" class="regFormCurrency">{{ currency }}</span>

@@ -379,6 +379,12 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
 
+            scope.isSelected = function(sessionId) {
+                return _.any(scope.userdata.sessionList, function(e) {
+                    return sessionId == e.id;
+                });
+            };
+
             scope.dialogs.config.formData.push('type');
             scope.dialogs.config.tabs = [
                 {id: 'config', name: $T("Configuration"), type: 'config'},
@@ -441,6 +447,12 @@ ndRegForm.directive("ndSocialEventSection", function() {
             scope.buttons.config = true;
             scope.buttons.disable = true;
 
+            scope.isSelected = function(eventId) {
+                return _.any(scope.userdata.socialEvents, function(e) {
+                    return eventId == e.id;
+                });
+            };
+
             scope.getMaxRegistrations = function(item) {
                 if (item.placesLimit !== 0) {
                     return Math.min(item.maxPlace, item.noPlacesLeft);
@@ -499,7 +511,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            width:160,
                            editoptions:{size:"30",maxlength:"50"},
                            editable: true,
-                           edittype: "text",
+                           edittype: "text"
                         },
                         {
                            name:'billable',

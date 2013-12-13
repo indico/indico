@@ -255,6 +255,14 @@ ndRegForm.directive('ndNumberField', function(url) {
             scope.settings.formData.push(['values', 'minValue']);
             scope.settings.formData.push(['values', 'length']);
 
+            scope.getValue = function(fieldName) {
+                if (scope.userdata[fieldName] !== undefined) {
+                    return scope.userdata[fieldName];
+                } else {
+                    return scope.field.values.minValue;
+                }
+            };
+
             scope.updateSubtotal = function(value) {
                 if ((isNaN(parseInt(value, 10)) || parseInt(value, 10) < 0)) {
                     scope.subtotal = 0;
@@ -278,6 +286,15 @@ ndRegForm.directive('ndRadioField', function(url) {
 
         link: function(scope) {
             scope.settings.defaultValue = true;
+
+            scope.getValue = function(fieldName) {
+                if (scope.userdata[fieldName] !== '') {
+                    return scope.userdata[fieldName];
+                } else {
+                    return scope.field.values.defaultItem;
+                }
+            };
+
             scope.settings.formData.push(['values', 'defaultItem']);
             scope.settings.formData.push(['values', 'inputType']);
 

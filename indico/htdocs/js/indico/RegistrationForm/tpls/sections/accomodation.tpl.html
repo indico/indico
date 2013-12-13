@@ -1,4 +1,4 @@
-<div ng-controller="BillableCtrl" ng-init="input = {}">
+<div ng-controller="BillableCtrl">
     <table>
         <tr>
             <td align="left">
@@ -8,11 +8,12 @@
             <td align="left">
                 <ng-form name="nestedFormArrival">
                     <select id="arrivalDate" name="arrivalDate" required
-                        ng-model="input.arrival"
+                        ng-model="userdata.accommodation.arrivalDate"
                         ng-class="{hasError: validationStarted && nestedFormArrival.$invalid}">
                         <option value="" selected>--{{ 'select a date' | i18n }}--</option>
                         <option ng-repeat="date in section.arrivalDates"
-                            value="{{ date[0] }}">
+                            value="{{ date[0] }}"
+                            ng-selected="date[0] === userdata.accommodation.arrivalDate">
                             {{ date[1] }}
                         </option>
                     </select>
@@ -27,11 +28,12 @@
             <td align="left">
                 <ng-form name="nestedFormDeparture">
                     <select id="departureDate" name="departureDate" required
-                        ng-model="input.departure"
+                        ng-model="userdata.accommodation.departureDate"
                         ng-class="{hasError: validationStarted && nestedFormDeparture.$invalid}">
                         <option value="" selected>--{{ 'select a date' | i18n }}--</option>
                         <option ng-repeat="date in section.departureDates"
-                            value="{{ date[0] }}">
+                            value="{{ date[0] }}"
+                            ng-selected="date[0] === userdata.accommodation.departureDate">
                             {{ date[1] }}
                         </option>
                     </select>
@@ -61,10 +63,10 @@
                         id="{{ item.id }}"
                         name="accommodation_type"
                         value="{{ item.id }}"
-                        ng-model="input.accommodation"
+                        ng-model="userdata.accommodation.accommodationType.id"
+                        ng-disabled="isDisabled(item)"
                         ng-required="hasPlacesLeft(item) && !item.cancelled"
-                        ng-class="{regFormIsBillable: isBillable(item)}"
-                        ng-disabled="isDisabled(item)"/>
+                        ng-checked="item.id == userdata.accommodation.accommodationType.id"/>
                     {{ item.caption }}
 
                     <font ng-if="item.cancelled && !hasPlacesLeft(item)" color="red">
@@ -78,7 +80,6 @@
                             [{{ item.noPlacesLeft }} {{ "place(s) left" | i18n }}]
                         </font>
                     </span>
-
                 </td>
                 <td align="right">
                     <span ng-if="item.billable" class="regFormPrice">{{ item.price }}</span>

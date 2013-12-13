@@ -4,7 +4,7 @@
         name="{{ getName(field.input) }}"
         cols="{{ field.values.numberOfColumns }}"
         rows="{{ field.values.numberOfRows }}"
-        ng-model="input"
+        ng-model="userdata[getName(field.input)]"
         ng-required="field.mandatory"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}">
     </textarea>

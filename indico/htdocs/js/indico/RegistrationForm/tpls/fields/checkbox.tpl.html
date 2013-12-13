@@ -1,12 +1,11 @@
 <div ng-controller="BillableCtrl">
     <ng-form name="nestedForm">
         <input type="checkbox"
-            id="{{ name }}"
-            name="{{ name }}"
+            name="{{ getName(field.id) }}"
             ng-model="input"
+            ng-checked="userdata[getName(field.id)] === 'yes'"
             ng-required="isRequired(field)"
-            ng-disabled="!hasPlacesLeft(field)"
-            ng-class="{regFormIsBillable: isBillable(field)}"/>
+            ng-disabled="!hasPlacesLeft(field)"/>
             <span ng-show="validationStarted && nestedForm.$invalid" class="error-message-tag">
                 {{ 'must be checked' | i18n }}
             </span>

@@ -5,7 +5,7 @@
         </td>
     </tr>
 
-    <tr ng-if="section.selectionType!=multiple">
+    <tr ng-if="section.selectionType!='multiple'">
         <td>
             <input type="radio" name="socialEvents" value="" checked/>
             {{ 'None' | i18n }}
@@ -15,11 +15,11 @@
         <td ng-switch="section.selectionType">
             <input ng-switch-when="multiple"
                 type="checkbox" name="socialEvents" value="{{ item.id }}"
-                ng-class="{regFormIsBillable: item.billable}"
+                ng-checked="isSelected(item.id)"
                 ng-disabled="!hasPlacesLeft(item)"/>
             <input ng-switch-default
                 type="radio" name="socialEvents" value="{{ item.id }}"
-                ng-class="{regFormIsBillable: item.billable}"
+                ng-checked="item.id == userdata.socialEvents[0].id"
                 ng-disabled="!hasPlacesLeft(item)"/>
             {{ item.caption }}
             <font ng-if="!hasPlacesLeft(item)" color="red">

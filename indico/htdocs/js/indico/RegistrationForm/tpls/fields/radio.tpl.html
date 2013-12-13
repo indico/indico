@@ -3,14 +3,12 @@
         <select
             name="{{ getName(field.input) }}"
             ng-model="input"
-            ng-init="input = field.values.defaultItem"
             ng-required="field.mandatory"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
             <option value="">-- {{ 'Choose a value' | i18n }} --</option>
             <option ng-repeat="item in field.values.radioitems | filter: {isEnabled: true}"
                 value="{{ item.id }}"
-                ng-class="{regFormIsBillable: isBillable(item)}"
-                ng-selected="field.values.defaultItem == item.caption">
+                ng-selected="item.caption == getValue(getName(field.input))">
                 {{ item.caption }}
             </option>
         </select>
@@ -23,8 +21,7 @@
                     name="{{ getName(field.input) }}"
                     value="{{ item.id }}"
                     ng-model="input.input"
-                    ng-checked="field.values.defaultItem == item.caption"
-                    ng-class="{regFormIsBillable: isBillable(item)}"
+                    ng-checked="item.caption == getValue(getName(field.input))"
                     ng-required="field.mandatory"
                     ng-disabled="isDisabled(item)"/>
                 <span ng-class="{'text-error': validationStarted && nestedForm.$invalid}">
