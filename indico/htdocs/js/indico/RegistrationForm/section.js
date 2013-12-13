@@ -217,6 +217,21 @@ ndRegForm.directive("ndAccommodationSection", function($rootScope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
 
+            scope.updateArrival = function(arrival) {
+                scope.arrival = arrival;
+                scope.arrivalUpdated = true;
+            };
+
+            scope.possibleDeparture = function(departure) {
+                if (scope.arrival !== undefined) {
+                    var arrival = moment(scope.arrival, 'DD/MM/YYY');
+                    departure = moment(departure[0], 'DD/MM/YYY');
+                    return arrival.isBefore(departure);
+                }
+
+                return true;
+            };
+
             scope.dialogs.config.arrivalDates = {
                 sDate: moment($rootScope.confSdate).format('DD/MM/YYYY'),
                 eDate: moment($rootScope.confEdate).format('DD/MM/YYYY')

@@ -1,4 +1,4 @@
-<div ng-controller="BillableCtrl">
+<div ng-controller="BillableCtrl" ng-init="input = {}">
     <table>
         <tr>
             <td align="left">
@@ -6,9 +6,11 @@
                 <span class="regFormMandatoryField">*</span>
             </td>
             <td align="left">
-                <ng-form name="nestedFormArrival">
+                <ng-form name="nestedFormArrival"
+                    ng-init="input.arrival = userdata.accommodation.arrivalDate">
                     <select id="arrivalDate" name="arrivalDate" required
-                        ng-model="userdata.accommodation.arrivalDate"
+                        ng-model="input.arrival"
+                        ng-change="updateArrival(input.arrival); input.departure = ''"
                         ng-class="{hasError: validationStarted && nestedFormArrival.$invalid}">
                         <option value="" selected>--{{ 'select a date' | i18n }}--</option>
                         <option ng-repeat="date in section.arrivalDates"
@@ -26,12 +28,13 @@
                 <span class="regFormMandatoryField">*</span>
             </td>
             <td align="left">
-                <ng-form name="nestedFormDeparture">
+                <ng-form name="nestedFormDeparture"
+                    ng-init="input.departure = userdata.accommodation.departureDate">
                     <select id="departureDate" name="departureDate" required
-                        ng-model="userdata.accommodation.departureDate"
+                        ng-model="input.departure"
                         ng-class="{hasError: validationStarted && nestedFormDeparture.$invalid}">
                         <option value="" selected>--{{ 'select a date' | i18n }}--</option>
-                        <option ng-repeat="date in section.departureDates"
+                        <option ng-repeat="date in section.departureDates | filter:possibleDeparture"
                             value="{{ date[0] }}"
                             ng-selected="date[0] === userdata.accommodation.departureDate">
                             {{ date[1] }}
