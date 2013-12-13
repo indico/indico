@@ -87,6 +87,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             confSdate: '@',
             confEdate: '@',
             editMode: '=',
+            updateMode: '=',
             currency: '@',
             postUrl: '='
         },

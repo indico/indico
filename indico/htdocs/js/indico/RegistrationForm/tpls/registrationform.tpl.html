@@ -37,8 +37,11 @@
             <span class="regFormMandatoryField">*</span>
             <span>{{ ' are mandantory' | i18n }})</span>
         </div>
-        <div>
-            <input type="submit" class="i-button highlight" value="{{ 'Register' | i18n }}">
+        <div ng-switch="updateMode">
+            <input ng-switch-default
+                type="submit" class="i-button highlight" value="{{ 'Register' | i18n }}">
+            <input ng-switch-when="true"
+                type="submit" class="i-button highlight" value="{{ 'Modify' | i18n }}">
         </div>
     </div>
 

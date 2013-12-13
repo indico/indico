@@ -5,61 +5,45 @@
 </%block>
 
 <%block name="content">
-    <script>
-      var validators = [];
-      var parameterManager = new IndicoUtil.parameterManager();
-      var addParam = parameterManager.add;
+    <div ng-app="nd" ng-controller="AppCtrl">
+        <div nd-reg-form
+            conf-id="${conf.getId()}"
+            currency="${currency}"
+            edit-mode="false"
+            update-mode="true"
+            post-url='${postURL}'></div>
+    </div>
 
-      function addValidator(validator) {
-          validators.push(validator);
-      }
+    <script type="text/javascript">
+        var validators = [];
+        var parameterManager = new IndicoUtil.parameterManager();
+        var addParam = parameterManager.add;
 
-      function enableAll(f) {
-        for (i = 0; i < f.elements.length; i++) {
-          f.elements[i].disabled=false
+        function addValidator(validator) {
+            validators.push(validator);
         }
-      }
 
-      function formSubmit(f) {
-          if (!parameterManager.check()) {
-              new AlertPopup($T("Error"), $T("The form contains some errors. Please, correct them and submit again.")).open();
-              return false;
-          }
+        function enableAll(f) {
+            for (i = 0; i < f.elements.length; i++) {
+                f.elements[i].disabled=false
+            }
+        }
 
-          for (var i in validators) {
-              var validator = validators[i];
-              if (!validator()) {
-                  return false;
-              }
-          }
+        function formSubmit(f) {
+            if (!parameterManager.check()) {
+                new AlertPopup($T("Error"), $T("The form contains some errors. Please, correct them and submit again.")).open();
+                return false;
+            }
 
-          enableAll(f);
-          return true;
-      }
+            for (var i in validators) {
+                var validator = validators[i];
+                if (!validator()) {
+                    return false;
+                }
+            }
+
+            enableAll(f);
+            return true;
+        }
     </script>
-
-    <form action=${ postURL } method="POST" onSubmit="return formSubmit(this);" enctype="multipart/form-data">
-    <table width="70%" align="center">
-    <div id="registrationForm"></div>
-        <tr>
-            <td class="regFormMandatoryInfo">
-                <span>${ _("(All the fields marked with ") }</span>
-                <span class="regFormMandatoryField">*</span>
-                <span>${ _(" are mandantory)") }</span>
-            </td>
-        </tr>
-        <tr>
-            <td align="center" style="padding-bottom: 40px;">
-                <input type="submit" class="regFormButton" value="${ _("Modify")}">
-            </td>
-        </tr>
-    </table>
-    <br>
-    </form>
-	<script type="text/javascript">
-		$(document).ready(function(){
-		    var confId = ${ confId };
-		    var rfView = new RegFormDisplayView({el : $("div#registrationForm")} ,confId );
-		});
-	</script>
 </%block>
