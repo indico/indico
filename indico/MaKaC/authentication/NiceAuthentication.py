@@ -56,8 +56,8 @@ class NiceAuthenticator(Authenthicator):
         req.add_common_vars()
         if  req.subprocess_env.has_key("ADFS_EMAIL"):
             email = req.subprocess_env["ADFS_EMAIL"]
-            login = req.subprocess_env["ADFS_LOGIN"]
-            personId = req.subprocess_env["ADFS_PERSONID"]
+            login = req.subprocess_env.get("ADFS_LOGIN")
+            personId = req.subprocess_env.get("ADFS_PERSONID")
             phone = req.subprocess_env.get("ADFS_PHONENUMBER","")
             fax = req.subprocess_env.get("ADFS_FAXNUMBER","")
             lastname = req.subprocess_env.get("ADFS_LASTNAME","")
