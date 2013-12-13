@@ -60,8 +60,16 @@
     <nd-dialog nd-management-dialog
         ng-if="editMode"
         show="dialogs.management"
+        ok-button="{{ 'Close' | i18n }}"
+        ok-only="true"
         heading="{{ 'Section Management' | i18n }}"
         api="api"
         data="sections">
     </nd-dialog>
+
+    <nd-dialog nd-error-dialog
+        heading="{{ 'Error'| i18n }}"
+        show="dialogs.error"
+        ok-only="true">
+    </nd-confirmation-popup>
 </form>

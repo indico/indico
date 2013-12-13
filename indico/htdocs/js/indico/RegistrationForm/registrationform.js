@@ -113,7 +113,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
             $scope.dialogs = {
                 addsection: false,
-                management: false
+                management: false,
+                error: false
             };
 
             $scope.actions = {
@@ -212,6 +213,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             element.on('submit', function(e) {
                 if (!scope.validate()) {
                     e.preventDefault();
+                    scope.dialogs.error = true;
                 }
             });
 
@@ -244,5 +246,12 @@ ndRegForm.directive('ndManagementDialog', function(url) {
     return {
         require: 'ndDialog',
         templateUrl: url.tpl('sections/dialogs/sectionmanagement.tpl.html')
+    };
+});
+
+ndRegForm.directive('ndErrorDialog', function(url) {
+    return {
+        require: 'ndDialog',
+        templateUrl: url.tpl('dialogs/errors.tpl.html')
     };
 });

@@ -25,6 +25,7 @@ ndDirectives.directive("ndDialog", function() {
             heading: '@',
             okButton: '@',
             okCallback: '&',
+            okOnly: '=',
             cancelButton: '@',
             cancelCallback: '&',
             validate: "=",
@@ -69,14 +70,19 @@ ndDirectives.directive("ndDialog", function() {
             dialog._onClose = function() {};
 
             dialog._getButtons = function() {
-                return [
-                    [scope.okButton, function() {
-                        scope.actions.ok();
-                    }],
-                    [scope.cancelButton, function() {
+                var buttons = [];
+
+                buttons.push([scope.okButton, function() {
+                    scope.actions.ok();
+                }]);
+
+                if (!scope.okOnly) {
+                    buttons.push([scope.cancelButton, function() {
                         scope.actions.cancel();
-                    }]
-                ];
+                    }]);
+                }
+
+                return buttons;
             };
 
             dialog.draw = function() {
