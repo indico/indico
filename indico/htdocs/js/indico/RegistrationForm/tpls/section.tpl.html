@@ -1,33 +1,47 @@
 <div id="{{ section.id }}" class="regform-section">
     <div ng-if="editMode" class="section-sortable-handle"></div>
-    <div ng-switch="editMode" class="section-header">
-        <div ng-switch-default>
-            <div class="regform-section-title">
-                {{ section.title }}
-            </div>
-            <div ng-if="section.description"
-                class="regform-section-description">
-                {{ section.description }}
-            </div>
-        </div>
-        <div ng-switch-when="true">
-            <span nd-section-toolbar
-                section="section"
-                buttons="buttons"
-                dialogs="dialogs"
-                state="state"
-                api="sectionApi">
-            </span>
-            <div class="regform-section-title"
-                ng-model="section.title"
-                contenteditable>
-            </div>
-            <div ng-if="section.description"
-                class="regform-section-description"
-                ng-model="section.description"
-                contenteditable>
-            </div>
-        </div>
+    <div class="section-header">
+        <table ng-switch="editMode">
+            <tr ng-switch-default>
+                <td>
+                    <div>
+                        <div class="regform-section-title">
+                            {{ section.title }}
+                        </div>
+                        <div ng-if="section.description"
+                            class="regform-section-description">
+                            {{ section.description }}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr ng-switch-when="true">
+                <td class="section-header-content">
+                    <div class="regform-section-title"
+                        ng-model="section.title"
+                        placeholder="Fill the title"
+                        contenteditable>
+                    </div>
+                    <div ng-if="section.description !== undefined"
+                        class="regform-section-description"
+                        ng-model="section.description"
+                        placeholder="Fill the description"
+                        contenteditable>
+                    </div>
+                </td>
+                <td>
+                    <div class="section-toolbar">
+                        <span nd-section-toolbar
+                            section="section"
+                            buttons="buttons"
+                            dialogs="dialogs"
+                            state="state"
+                            api="sectionApi">
+                        </span>
+                    </div>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div ng-switch="section.id" class="section-content">

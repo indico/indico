@@ -34,18 +34,32 @@
     background: white;
     padding: 10px;
 
-    & .section-header {
+    .section-header {
         @include border-bottom();
         background-color: $light-gray;
         margin: -10px -10px;
         padding: 10px 10px;
+
+        table {
+            .section-header-content {
+                width: 100%;
+            }
+
+            .section-toolbar {
+                width: 150px;
+            }
+        }
+
+        div[contenteditable] + div[contenteditable] {
+            margin-top: 3px;
+        }
     }
 
-    & .section-content {
+    .section-content {
         margin-top: 20px;
     }
 
-    & .section-field-divisor {
+    .section-field-divisor {
         & > span {
             color: $gray;
             font-size: 1.2em;
@@ -54,7 +68,7 @@
         }
     }
 
-    & .section-sortable-handle {
+    .section-sortable-handle {
         @include icon-before('icon-handle');
         @include transition(
             background-color $default-transition-duration $default-transition-function,
@@ -71,7 +85,7 @@
         &:hover,
         &:active {
             @include border-bottom();
-            background-color: $light-gray;
+            background-color: white;
             height: 20px;
 
             &:before {
@@ -91,9 +105,7 @@
     }
 }
 
-// TODO no event?
-.regform-section-title,
-.regFormSectionTitleNoEvent {
+.regform-section-title {
     @extend %font-family-title-light;
 
     color: $dark-blue;
@@ -101,18 +113,10 @@
     font-weight: bold;
 }
 
-// TODO no event?
-.regform-section-description,
-.regFormSectionDescriptionNoEvent {
+.regform-section-description {
     @extend %font-family-description;
-    color: darken($gray, $color-variation);
+    color: $dark-gray;
     font-size: 14px;
-    font-style: italic;
-
-    &:empty {
-        // TODO contenteditable placeholder?
-        color: $gray;
-    }
 }
 
 .regform-field {
@@ -571,14 +575,3 @@ textarea.regFormDescriptionInputMgmt {
         cursor: move;
     }
 }
-
-
-// ============================================================================
-// Form validation
-// ============================================================================
-
-
-.ng-pristine {}
-.ng-dirty {}
-.ng-valid {}
-.ng-invalid {}
