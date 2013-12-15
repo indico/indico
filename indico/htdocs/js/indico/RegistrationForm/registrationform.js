@@ -94,7 +94,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             confEdate: '@',
             editMode: '=',
             updateMode: '=',
-            currency: '@',
+            confCurrency: '@',
             postUrl: '='
         },
 
@@ -103,7 +103,6 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             $rootScope.confSdate = $scope.confSdate;
             $rootScope.confEdate = $scope.confEdate;
             $rootScope.editMode = $scope.editMode;
-            $rootScope.currency = $scope.currency;
 
             if ($rootScope.editMode) {
                 $scope.sections = regFormFactory.Sections.getAllSections({confId: $scope.confId}, {});
@@ -196,6 +195,13 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
         link: function(scope, element) {
             scope.validationStarted = false;
+
+            // Set default currency
+            if(scope.confCurrency === 'not selected') {
+                scope.currency = '$';
+            } else {
+                scope.currency = scope.confCurrency;
+            }
 
             // User data retrieval
             if (scope.editMode) {

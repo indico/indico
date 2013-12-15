@@ -3,7 +3,7 @@
         conf-id="${conf.getId()}"
         conf-sdate="${conf.getStartDate()}"
         conf-edate="${conf.getEndDate()}"
-        currency="${currency}"
+        conf-currency="${currency}"
         edit-mode="true"></div>
     <input type="hidden" value="${conf.getId()}" id="conf_id">
 </div>
