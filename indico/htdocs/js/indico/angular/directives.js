@@ -128,9 +128,31 @@ ndDirectives.directive("contenteditable", function() {
     return {
         require: 'ngModel',
         link: function(scope, elem, attrs, ctrl) {
+            var updateHtml = function() {
+                if(ctrl.$viewValue === '') {
+                    elem.html(attrs.placeholder);
+                    elem.addClass('empty');
+                } else {
+                    elem.html(ctrl.$viewValue);
+                }
+            };
+
             // view -> model
             elem.on('blur', function(e, param) {
-                elem.html(ctrl.$viewValue);
+                updateHtml();
+            });
+
+            // model -> view
+            ctrl.$render = function() {
+                updateHtml();
+            };
+
+            // remove placeholder
+            elem.on('focus', function() {
+                elem.removeClass('empty');
+                if (ctrl.$viewValue === '') {
+                    elem.html('');
+                }
             });
 
             elem.on('keydown keypress', function(e) {
@@ -143,11 +165,6 @@ ndDirectives.directive("contenteditable", function() {
                     elem.blur();
                 }
             });
-
-            // model -> view
-            ctrl.$render = function() {
-                elem.html(ctrl.$viewValue);
-            };
         }
     };
 });

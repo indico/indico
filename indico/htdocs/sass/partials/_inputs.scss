@@ -80,16 +80,19 @@ select {
 
 div[contenteditable],
 span[contenteditable] {
-    @include single-transition(margin);
-
     &:hover {
         outline: 1px dashed $gray;
     }
 
     &:focus {
+        background: white;
         box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
         outline: 1px solid $blue;
-        margin: 5px 0;
+    }
+
+    &.empty {
+        color: $gray;
+        font-style: italic;
     }
 }
 
