@@ -11,9 +11,9 @@
     <label class="regFormDialogCaption">
         {{ 'Price' | i18n }}
     </label>
-    <input ng-model="formData.price"
+    <input type="number"
+        ng-model="formData.price"
         ng-class="{hasError: validationStarted && optionsForm.price.$invalid}"
-        type="number"
         min="0"
         name="price"
         id="input01"

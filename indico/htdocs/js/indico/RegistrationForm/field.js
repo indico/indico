@@ -477,13 +477,24 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 });
 
                 $scope.tabSelected = "tab-options";
+
+                $scope.parsePrice();
             };
 
-            $scope.addItem = function () {
+            $scope.parsePrice = function() {
+                if ($scope.formData.price !== undefined) {
+                    $scope.formData.price = parseFloat($scope.formData.price);
+                    if (isNaN($scope.formData.price)) {
+                        $scope.formData.price = "";
+                    }
+                }
+            };
+
+            $scope.addItem = function() {
                  $scope.formData.radioitems.push({id:'isNew'});
             };
 
-            $scope.sortItems = function () {
+            $scope.sortItems = function() {
                 $scope.formData.radioitems = _.sortBy($scope.formData.radioitems, function(radioitem) {
                     return radioitem.caption.toLowerCase();
                 });
