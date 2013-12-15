@@ -6,8 +6,15 @@
         <tr>
             <td ng-if="editMode" class="field-sortable-handle"/>
             <td class="field-caption">
-                <span>{{ field.caption }}</span>
-                <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
+                <div>
+                    <span>{{ field.caption }}</span>
+                    <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
+                </div>
+                <div>
+                    <span class="inputDescription">
+                        {{ field.description }}
+                    </span>
+                </div>
             </td>
 
             <td ng-include="tplInput" class="field-input"></td>
