@@ -100,31 +100,22 @@ class RHContributionToXML(RHContributionDisplay):
 class RHContributionToPDF(RHContributionDisplay):
 
     def _process( self ):
-        tz = timezoneUtils.DisplayTZ(self._aw,self._target.getConference()).getDisplayTZ()
-        filename = "%s - Contribution.pdf"%self._target.getTitle()
-        pdf = ContribToPDF(self._target.getConference(), self._target, tz=tz)
-        
-        latex_template = 'LatexRHContributionToPDF.tpl'
-
-        kwargs = {'body': pdf.getLatex()}
-
-        latex = LatexRunner(filename)
-        pdffile = latex.run(latex_template, **kwargs)
-        latex.cleanup()
-
-        return send_file(filename, pdffile, 'PDF')
+        filename = "{0} - Contribution.pdf".format(self._target.getTitle())
+        contrib_pdf = ContribToPDF(self._target)
+        fpath = contrib_pdf.generate()
+        return send_file(filename, fpath, 'PDF')
 
 
 class RHContributionToiCal(RoomBookingDBMixin, RHContributionDisplay):
 
-    def _process( self ):
+    def _process(self):
 
         if not self._target.isScheduled():
-            raise NoReportError(_("You cannot export the contribution with id %s because it is not scheduled")%self._target.getId())
+            raise NoReportError(_("You cannot export the contribution with id {0} because it is not scheduled").format(self._target.getId()))
 
-        filename = "%s-Contribution.ics"%self._target.getTitle()
+        filename = "{0}-Contribution.ics".format(self._target.getTitle())
 
-        hook = ContributionHook({}, 'contribution', {'event': self._conf.getId(), 'idlist':self._contrib.getId(), 'dformat': 'ics'})
+        hook = ContributionHook({}, 'contribution', {'event': self._conf.getId(), 'idlist': self._contrib.getId(), 'dformat': 'ics'})
         res = hook(self.getAW())
         resultFossil = {'results': res[0]}
 

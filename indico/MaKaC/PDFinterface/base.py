@@ -20,6 +20,7 @@
 import os
 import math
 import cgi
+import shutil
 import xml.sax.saxutils as saxutils
 from HTMLParser import HTMLParser
 from reportlab.platypus import SimpleDocTemplate, PageTemplate, Table
@@ -38,11 +39,13 @@ from reportlab.lib.fonts import addMapping
 from MaKaC.i18n import _
 from MaKaC.common.utils import isStringHTML
 from MaKaC.common.Configuration import Config
+from MaKaC.common.TemplateExec import render as tpl_render
 import subprocess, shlex, os, tempfile
 from MaKaC.common.logger import Logger
 from mako.template import Template
 
-
+from indico.util import mdx_latex
+import markdown
 from PIL import Image as PILImage
 
 ratio = math.sqrt(math.sqrt(2.0))
@@ -418,6 +421,7 @@ pagesizeNameToCanvas = {'A4': Canvas,
                         'Letter': Canvas,
                         }
 
+
 class PDFBase:
 
     def __init__(self, doc=None, story=None, pagesize = 'A4', printLandscape=False):
@@ -540,6 +544,35 @@ class PDFBase:
                 if drawTitle:
                     self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
         return 0
+
+    def _getLogo(self, c, drawTitle = True):
+        logo = self._conf.getLogo()
+        if logo:
+            img_path = logo.getFilePath()
+            if img_path:
+                try:
+                    img = PILImage.open(imagePath)
+                    width, height = img.size
+
+                    # resize in case too big for page
+                    if width > self._PAGE_WIDTH / 2:
+                        ratio =  float(height)/width
+                        width = self._PAGE_WIDTH / 2
+                        height = width * ratio
+                    startHeight = self._PAGE_HEIGHT
+
+                    if drawTitle:
+                        startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
+
+                    # lower edge of the image
+                    startHeight = startHeight - inch / 2 - height
+
+                    # draw horizontally centered, with recalculated width and height
+                    c.drawImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height, mask="auto")
+                    return startHeight
+                except IOError:
+                    if drawTitle:
+                        self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
 
 
 def _doNothing(canvas, doc):
@@ -709,6 +742,24 @@ class PDFWithTOC(PDFBase):
         return self._fileDummy.getData()
 
 
+class PDFLaTeXBase(object):
+    def __init__(self):
+
+        # Markdown -> LaTeX rendered
+        md = markdown.Markdown()
+        latex_mdx = mdx_latex.LaTeXExtension()
+        latex_mdx.extendMarkdown(md, markdown.__dict__)
+
+        self._args = {
+            'md_convert': md.convert
+        }
+
+    def generate(self):
+        latex = LatexRunner()
+        pdffile = latex.run(self._tpl_filename, **self._args)
+        latex.cleanup()
+        return pdffile
+
 
 class LatexRunner:
     """ handles the PDF generation from a chosen LaTeX template
@@ -723,23 +774,21 @@ class LatexRunner:
     tempdir = ''
     has_toc = False
 
-    def __init__(self, filename, has_toc = False):
-        self.texname = filename[:-3] + 'tex'
+    def __init__(self, has_toc=False):
         self.has_toc = has_toc
 
     def run(self, template_name, **kwargs):
         template_dir = os.path.join(Config.getInstance().getTPLDir(), 'latex')
+        template = tpl_render(os.path.join(template_dir, template_name), kwargs)
 
-        template = Template(filename=os.path.join(template_dir, template_name))
-        template = template.render(**kwargs)
+        self._dir = tempfile.mkdtemp(prefix="indico-texgen-")
+        source_file = os.path.join(self._dir, template_name + '.tex')
+        target_file = os.path.join(self._dir, template_name + '.pdf')
 
-        self.tempdir = tempfile.mkdtemp()
-        self.texdir = os.path.join(self.tempdir, self.texname)
-
-        with open(self.texdir,'w') as f:
+        with open(source_file, 'w') as f:
             f.write(template)
 
-        pdflatex_cmd = 'pdflatex -interaction=nonstopmode -output-directory %s \"%s\"' % (self.tempdir, self.texdir)
+        pdflatex_cmd = 'pdflatex -interaction=nonstopmode -output-directory={1} {0}'.format(source_file, self._dir)
 
         proc = subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         errlog = proc.communicate()[0]
@@ -747,21 +796,15 @@ class LatexRunner:
         try:
             subprocess.check_call(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             Logger.get('pdflatex').info("PDF created successfully!")
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError, e:
             Logger.get('pdflatex').error(errlog)
 
         if self.has_toc:
             proc = subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE)
             proc.communicate()
 
-        pdfname = os.path.join(self.tempdir, self.texname[:-3] + 'pdf')
-
-        return pdfname
+        return target_file
 
     def cleanup(self):
-        for ext in ['log', 'aux', 'out']:
-            os.unlink(os.path.join(self.tempdir, self.texname[:-3] + ext))
-        os.unlink(os.path.join(self.tempdir, self.texdir))
-
-        if self.has_toc:
-            os.unlink(os.path.join(self.tempdir, self.texname[:-3] + 'toc'))
+        pass
+        #shutil.rmtree(self._dir)

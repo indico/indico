@@ -21,6 +21,7 @@ from flask import session, g, request
 from flask import current_app as app
 import pkg_resources
 import os.path
+import re
 import posixpath, re
 from indico.core.db import DBMgr
 from indico.core.config import Config
@@ -321,6 +322,26 @@ def escapeHTMLForJS(s):
     res = s.replace("\\", "\\\\").replace("\'", "\\\'").replace("\"", "\\\"").replace("&", "\\&").replace("/", "\\/").replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r").replace("\b", "\\b").replace("\f", "\\f")
     return res
 
+def latex_escape(text):
+    chars = {
+        "#": r"\#",
+        "$": r"\$",
+        "%": r"\%",
+        "&": r"\&",
+        "~": r"\~{}",
+        "_": r"\_",
+        "^": r"\^{}",
+        "\\": r"\textbackslash",
+        "{": r"\{",
+        "}": r"\}"
+    }
+
+    def substitute(x):
+        return chars[x.group()]
+
+    pattern = re.compile('|'.join(re.escape(k) for k in chars.keys()))
+    return pattern.sub(substitute, text)
+
 def registerHelpers(objDict):
     """
     Adds helper methods to the dictionary.
@@ -397,6 +418,8 @@ def registerHelpers(objDict):
         objDict['deepstr'] = deepstr
     if not 'beautify' in objDict:
         objDict['beautify'] = beautify
+    if not 'latex_escape' in objDict:
+        objDict['latex_escape'] = latex_escape
     # allow fossilization
     if not 'fossilize' in objDict:
         from MaKaC.common.fossilize import fossilize

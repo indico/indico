@@ -179,18 +179,13 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
                 subcontent += self.tolatex(child)
 
         if ournode.tag == 'h1':
-            buffer += '\n\\title{%s}\n' % subcontent
-            buffer += """
-% ----------------------------------------------------------------
-\maketitle
-% ----------------------------------------------------------------
-"""
-        elif ournode.tag == 'h2':
             buffer += '\n\n\\section{%s}\n' % subcontent
-        elif ournode.tag == 'h3':
+        elif ournode.tag == 'h2':
             buffer += '\n\n\\subsection{%s}\n' % subcontent
-        elif ournode.tag == 'h4':
+        elif ournode.tag == 'h3':
             buffer += '\n\\subsubsection{%s}\n' % subcontent
+        elif ournode.tag == 'h4':
+            buffer += '\n\\paragraph{%s}\n' % subcontent
         elif ournode.tag == 'hr':
             buffer += '\\noindent\makebox[\linewidth]{\\rule{\paperwidth}{0.4pt}}'
         elif ournode.tag == 'ul':

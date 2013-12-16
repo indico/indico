@@ -308,6 +308,7 @@ contributions_js = Bundle('js/indico/Display/contributions.js',
 
 abstracts_js = Bundle(
     contributions_js,
+    'js/indico/Management/abstracts.js',
     *namespace('js/lib/pagedown',
                'Markdown.Converter.js',
                'Markdown.Editor.js',

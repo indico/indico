@@ -28,6 +28,7 @@ from indico.util.i18n import currentLocale
 from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_time as _format_time
 from babel.dates import format_date as _format_date
+from babel.dates import format_timedelta as _format_timedelta
 from babel.numbers import format_number as _format_number
 
 now_utc = nowutc
@@ -64,6 +65,16 @@ def format_time(t, format='short', locale=None, timezone=None):
         locale = currentLocale()
 
     return _format_time(t, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
+
+
+def format_timedelta(td, format='short', locale=None, timezone=None):
+    """
+    Basically a wrapper around Babel's own format_timedelta
+    """
+    if not locale:
+        locale = currentLocale()
+
+    return _format_timedelta(td, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
 
 
 def format_human_date(dt, format='medium', locale=None):

@@ -24,7 +24,7 @@ from datetime import datetime, date, timedelta
 
 # 3rd party imports
 from BTrees.OOBTree import OOBTree
-from babel.dates import format_datetime
+from indico.util.date_time import format_datetime, format_date, format_time
 
 # indico legacy imports
 from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
@@ -424,28 +424,29 @@ def daysBetween(dtStart, dtEnd):
 
 
 def formatDateTime(dateTime, showWeek=False, format=None, locale=None):
-    week = ""
-    locale = str(locale or currentLocale())
-    if showWeek:
-        week = "EEEE "
+    week = "EEEE" if showWeek else ""
+
     if not format:
         return format_datetime(dateTime, week+'d/M/yyyy H:mm', locale=locale).encode('utf-8')
     else:
         return format_datetime(dateTime, format, locale=locale).encode('utf-8')
 
 
-def formatDate(date, showWeek=False, format=None):
+def formatDate(date, showWeek=False, format=None, locale=None):
     week = ""
     if showWeek:
         week = "%a "
     if not format:
-        return datetime.strftime(date, week+'%d/%m/%Y')
+        return format_date(date, week+'d/M/yyyy', locale=locale).encode('utf-8')
     else:
-        return datetime.strftime(date, format)
+        return format_date(date, format, locale=locale).encode('utf-8')
 
 
-def formatTime(time):
-    return time.strftime('%H:%M')
+def formatTime(tm, format=None, locale=None):
+    if not format:
+        return format_time(tm, 'H:mm', locale=locale).encode('utf-8')
+    else:
+        return format_time(tm, format, locale=locale).encode('utf-8')
 
 
 def parseDate(dateStr, format='%d/%m/%Y'):

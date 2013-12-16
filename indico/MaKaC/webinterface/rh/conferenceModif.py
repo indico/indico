@@ -3102,7 +3102,7 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
 
         elif self._displayType == "bookOfAbstract":
             tz = self._target.getTimezone()
-            filename = "%s - Book of abstracts.pdf" % self._target.getTitle()
+            filename = "{0} - Book of abstracts.pdf".format(self._target.getTitle())
 
             pdf = ContributionBook(self._target, self._contribs, self.getAW(),tz=tz)
 
@@ -3123,30 +3123,20 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
 
         elif self._displayType == "bookOfAbstractBoardNo":
             tz = self._target.getTimezone()
-            filename = "%s - Book of abstracts.pdf"%self._target.getTitle()
+            filename = "{0} - Book of abstracts.pdf".format(self._target.getTitle())
             pdf = ContributionBook(self._target, self._contribs, self.getAW(),tz=tz, sortedBy="boardNo")
             return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
         elif self._displayType == "ContributionList":
             tz = self._conf.getTimezone()
-            filename = "Contributions.pdf"
+            filename = "{0} - Contributions.pdf".format(self._target.getTitle())
             if not self._contribs:
                 return "No contributions to print"
-            pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
 
-            latex_template = 'LatexRHContribsToPDFMenu_ContributionList.tpl'
+            contrib_pdf = ConfManagerContribsToPDF(self._conf, tz)
+            fpath = contrib_pdf.generate()
 
-            kwargs = {'first_page': pdf.firstPageLatex(),
-                    'title': self._target.getTitle(),
-                    'page_no': i18nformat(""" _("Page") """),
-                    'body': pdf.getBodyLatex()
-                    }
-
-            latex = LatexRunner(filename, True)
-            pdffile = latex.run(latex_template, **kwargs)
-            latex.cleanup()
-
-            return send_file(filename, pdffile, 'PDF')
+            return send_file(filename, fpath, 'PDF')
 
 
 class RHContribsToPDF(RHConferenceModifBase):

@@ -16,9 +16,9 @@
             colorlinks = true, 
             urlcolor = Violet,
             breaklinks = true]{hyperref}  %% hyperlinks configuration
+
+
 \usepackage{tocloft} %% table of contents
-\usepackage{sectsty} %% default font family
-\allsectionsfont{\rmfamily} %% default font family
 \usepackage{titlesec}
 \titleformat{\chapter}
   {\sffamily \fontsize{25}{30} \selectfont \centering}{\thechapter.}{1em}{}
