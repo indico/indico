@@ -35,8 +35,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
     $scope.sectionApi.saveConfig = function(section, data) {
         var requestParams = angular.extend(getRequestParams(section), data);
         regFormFactory.Sections.save(requestParams, function(updatedSection) {
-            $scope.$parent.section = updatedSection;
-            //TODO: inject updatedSection into $scope.section
+            $scope.section = angular.extend($scope.section, updatedSection);
         });
     };
 
