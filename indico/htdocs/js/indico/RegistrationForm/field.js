@@ -222,6 +222,11 @@ ndRegForm.directive('ndFileField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/file.tpl.html');
+        },
+        link: function(scope) {
+            scope.removeAttachment = function() {
+                delete scope.userdata[scope.getName(scope.field.input)];
+            };
         }
     };
 });

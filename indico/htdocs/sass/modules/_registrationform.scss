@@ -146,20 +146,20 @@
         }
     }
 
-    & .field-actions {
+    .field-actions {
         display: none;
         float: right;
         line-height: 27px;
         padding: 0 5px;
     }
 
-    & .field-caption {
+    .field-caption {
         width: 125px;
         padding: 4px 0;
         vertical-align: top;
     }
 
-    & .field-input {
+    .field-input {
         vertical-align: top;
         padding-top: 3px;
     }
@@ -243,6 +243,21 @@
     .label-price {
         margin-left: 2px;
         padding-left: 2px;
+    }
+
+    .file-link {
+        @include icon-before('icon-file');
+        padding-left: 2px;
+    }
+
+    .remove-file {
+        @include icon-before('icon-close');
+        color: $light-black;
+        font-size: 1.1em;
+
+        &:hover {
+            color: $red;
+        }
     }
 
     ul {

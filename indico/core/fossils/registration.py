@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.common.fossilize import IFossil
+from MaKaC.webinterface.urlHandlers import UHFileAccess
 from indico.util.date_time import format_date
 
 
@@ -597,6 +598,9 @@ class IRegFormMiscellaneousInfoSimpleItemFossil(IFossil):
         """
         Get value
         """
+    getValue.convert = lambda x: {
+        'name': x.getFileName(), 'path': str(UHFileAccess.getURL(x))
+    } if (x.__class__.__name__ == 'LocalFile') else x
 
     def getCurrency(self):
         """
