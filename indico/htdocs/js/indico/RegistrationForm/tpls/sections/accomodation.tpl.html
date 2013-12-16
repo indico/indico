@@ -49,15 +49,12 @@
         <table>
             <tr>
                 <td>
-                    <span id="accommodationTypeLabel" class="bold">
+                    <span id="accommodationTypeLabel"
+                        class="bold"
+                        ng-class="{'error-message-underline: validationStarted && nestedFormAccommodation.$invalid}">
                         {{ 'Select your accommodation:' | i18n }}
                     </span>
                     <span class="regFormMandatoryField">*</span>
-                </td>
-                <td ng-if="validationStarted && nestedFormAccommodation.$invalid">
-                    <span class="error-message-tag">
-                        {{ 'You must chose one accommodation option' | i18n }}
-                    </span>
                 </td>
             </tr>
             <tr ng-if="section.items.length === 0">

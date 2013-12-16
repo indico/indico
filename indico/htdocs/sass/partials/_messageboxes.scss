@@ -127,3 +127,7 @@
     background-color: $red;
     color: $light-gray;
 }
+
+.error-message-underline {
+    @include border-bottom($red);
+}
