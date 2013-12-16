@@ -174,14 +174,26 @@ ndDirectives.directive('ndDatepicker', function() {
         restrict: 'E',
         scope: {
             showTime: '=',
+            dateFormat: '@',
             hiddenInputs: '@',
-            dateFormat: '@'
+            required: '@'
         },
 
         link: function(scope, element) {
             var hiddenInputs =
                 scope.$eval(scope.hiddenInputs) ||
                 ['day', 'month', 'year', 'hour', 'min'];
+
+
+            var getAttributes = function() {
+                var attributes = {};
+
+                if (scope.required) {
+                    attributes.required = "required";
+                }
+
+                return attributes;
+            };
 
             scope.init = function() {
                 element.html(scope.getDatePicker().dom);
@@ -195,7 +207,7 @@ ndDirectives.directive('ndDatepicker', function() {
             scope.getDatePicker = function() {
                 return IndicoUI.Widgets.Generic.dateField(
                     scope.showTime,
-                    null,
+                    getAttributes(),
                     hiddenInputs,
                     null,
                     scope.dateFormat

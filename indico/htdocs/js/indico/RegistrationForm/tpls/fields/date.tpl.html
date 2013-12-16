@@ -1,10 +1,9 @@
-<span id="{{ getName(field.input) }}_DatePlace">
-    <nd-datepicker
-        show-time="showTime(field.values.dateFormat)"
-        hidden-inputs="{{ dateInputs }}"
-        date-format="{{ field.values.dateFormat }}">
-    </nd-datepicker>
-</span>
+<nd-datepicker
+    show-time="showTime(field.values.dateFormat)"
+    hidden-inputs="{{ dateInputs }}"
+    date-format="{{ field.values.dateFormat }}"
+    required="{{field.mandatory}}">
+</nd-datepicker>
 
 <span class="inputDescription">
     <span ng-repeat="el in field.values.displayFormats" ng-show="el[0] == field.values.dateFormat">
