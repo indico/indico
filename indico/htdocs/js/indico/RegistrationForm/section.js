@@ -370,7 +370,13 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
         require: 'ndSection',
 
         controller: function($scope) {
-            $scope._hasSession= function(id) {
+            $scope.anySessionEnabled = function() {
+                return _.any($scope.section.items, function(session) {
+                    return session.enabled === true;
+                });
+            };
+
+            $scope._hasSession = function(id) {
                 return _.find($scope.section.items, function(session) {
                     return session.id == id;
                 }) !== undefined;

@@ -60,6 +60,11 @@
                     </span>
                 </td>
             </tr>
+            <tr ng-if="section.items.length === 0">
+                <td class="section-placeholder">
+                    {{ 'There are no available accommodation options' | i18n }}.
+                </td>
+            </tr>
             <tr ng-repeat="item in section.items">
                 <td align="left" class="accommodation-option-item">
                     <input type="radio" nd-radio-extend
@@ -86,7 +91,7 @@
                 </td>
                 <td align="right">
                     <span ng-if="item.billable" class="regFormPrice">{{ item.price }}</span>
-                    <span ng-if"item.billable" class="regFormCurrency">{{ currency }}</span>
+                    <span ng-if="item.billable" class="regFormCurrency">{{ currency }}</span>
                     <span ng-if="item.billable">{{ "per night" | i18n }}</span>
                 </td>
             </tr>

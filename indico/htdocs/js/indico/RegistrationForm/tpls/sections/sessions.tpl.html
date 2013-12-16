@@ -1,8 +1,13 @@
 <div ng-switch="section.type">
     <table ng-switch-when="2priorities" ng-init="input = userdata.sessionList[0].id">
+        <td colspan="2">
+            <span class="section-group-title">
+                {{ 'Select the sessions you wish to attend to' | i18n }}:
+            </span>
+        </td>
         <tr>
             <td>
-                <span>{{ 'Select your preferred choice' | i18n }}</span>
+                <span>{{ 'Preferred choice' | i18n }}</span>
                 <span class="regFormMandatoryField">*</span>
             </td>
             <td>
@@ -22,7 +27,7 @@
         </tr>
         <tr>
             <td>
-                <span>{{ 'Select your second choice' | i18n }}</span>
+                <span>{{ 'Secondary choice' | i18n }}</span>
                 <span class="italic">(Optional)</span>
             </td>
             <td>
@@ -39,9 +44,21 @@
     </table>
 
     <table ng-switch-when="all">
-        <tr ng-if="section.type == 'all'">
-            <td colspan="3">
-                <div ng-repeat="item in section.items">
+        <tr>
+            <td>
+                <span class="section-group-title">
+                    {{ 'Select the sessions you wish to attend to' | i18n }}:
+                </span>
+            </td>
+        </tr>
+        <tr ng-if="!anySessionEnabled()">
+            <td class="section-placeholder">
+                {{ 'There are no sessions for this event' | i18n }}.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div ng-repeat="item in section.items | filter: {enabled: true}">
                     <input type="checkbox"
                         name="sessions"
                         value="{{ item.id }}"

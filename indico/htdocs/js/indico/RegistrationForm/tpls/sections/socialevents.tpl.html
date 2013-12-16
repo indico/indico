@@ -42,7 +42,9 @@
         </td>
     </tr>
     <tr ng-if="noAvailableEvent()">
-        <td>{{ 'There are no events' | i18n }}</td>
+        <td class="section-placeholder">
+            {{ 'There are no social events available' | i18n }}.
+        </td>
     </tr>
     <tr ng-if="anyCancelledEvent()">
         <td class="bold" align="left" colspan="3">

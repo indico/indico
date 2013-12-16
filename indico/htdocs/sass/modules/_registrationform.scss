@@ -68,6 +68,15 @@
         }
     }
 
+    .section-group-title {
+        font-weight: bold;
+    }
+
+    .section-placeholder {
+        color: $gray;
+        font-style: italic;
+    }
+
     .section-sortable-handle {
         @include icon-before('icon-handle');
         @include transition(
@@ -228,6 +237,11 @@
 .regform-field {
     .accommodation-option-item {
         padding-left : 15px;
+    }
+
+    .label-price {
+        margin-left: 2px;
+        padding-left: 2px;
     }
 
     ul {
