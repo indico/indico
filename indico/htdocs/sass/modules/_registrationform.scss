@@ -136,6 +136,7 @@
     padding: 0 10px;
     // TODO Any better idea? This is hackish as hell
     width: 102.8%;
+    word-break: break-word;
 
     &.disabled {
         background: $light-gray;
