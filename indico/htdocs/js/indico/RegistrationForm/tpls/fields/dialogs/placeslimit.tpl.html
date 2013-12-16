@@ -4,12 +4,12 @@
     </label>
     <input type="number"
         ng-model="formData.placesLimit"
+        ng-init="formData.placesLimit = formData.placesLimit || 0"
         ng-class="{hasError: validationStarted && optionsForm.placesLimit.$invalid}"
         name="placesLimit"
         size="20"
         min="0"
         required>
-    <span>
-        ({{ "0 for unlimited" | i18n }})
-    </span>
+    <span class="icon-question text-superfluous"
+        title="{{ 'Leave 0 for unlimited places' | i18n }}"></span>
 </div>
