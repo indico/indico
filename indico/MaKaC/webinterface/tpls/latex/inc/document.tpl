@@ -1,5 +1,8 @@
-\documentclass[a4paper, 11pt]{article} %% document type
 
+
+<%block name="document_class">
+\documentclass[a4paper, 11pt]{article} %% document type
+</%block>
 
 \usepackage[a4paper, top=4em, bottom=2em, left=5em, right=5em]{geometry}
 
@@ -15,19 +18,28 @@
 \usepackage[export]{adjustbox}
 \usepackage[usenames,dvipsnames]{xcolor}
 \usepackage{scrextend}
-
-\usepackage[final,
-            pdfstartview = FitV,
-            colorlinks = true,
-            urlcolor = Violet,
-            breaklinks = true]{hyperref}  %% hyperlinks configuration
+\usepackage{hyperref}
 \usepackage{sectsty}
+\usepackage{xstring}
+
+
+<%block name="header_extra">
+</%block>
+
 
 \begin{document}
 
     %% set fonts
     \renewcommand{\sfdefault}{cmbr}
     \renewcommand*{\familydefault}{\sfdefault}
+
+    %% helper commands
+
+    \newcommand{\truncateellipses}[2]{
+       \StrLeft{#1}{#2}[\truncated]
+       \truncated
+       \IfStrEq{\truncated}{#1}{}{\dots}
+    }
 
     %% remove section heading numbering
     \setcounter{secnumdepth}{0}

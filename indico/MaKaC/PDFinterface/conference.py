@@ -863,52 +863,6 @@ class TrackManagerAbstractsToPDF(AbstractsToPDF):
             self._story.append(PageBreak())
 
 
-
-class ContribToPDF(PDFLaTeXBase):
-
-    _tpl_filename = 'LatexRHContributionToPDF.tpl'
-
-    def __init__(self, contrib):
-        super(ContribToPDF, self).__init__()
-
-        self._contrib = contrib
-        conf = contrib.getConference()
-
-        self._args.update({
-            'contrib': contrib,
-            'conf': conf,
-            'tz': conf.getTimezone(),
-            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields()
-        })
-
-        logo = conf.getLogo()
-        if logo:
-            self._args['logo_img'] = logo.getFilePath()
-
-
-class ConfManagerContribToPDF(ContribToPDF):
-
-    def getBody(self, story=None, indexedFlowable={}, level=1 ):
-        if not story:
-            story = self._story
-
-        #get the common contribution content from parent
-        ContribToPDF.getBody(self, story, indexedFlowable, level)
-
-        #add info for the conference manager
-
-    def getLatex(self):
-        template = ContribToPDF.firstPageLatex(self)
-        template += ContribToPDF.getBodyLatex(self)
-
-        return template
-
-    def getBodyLatex(self):
-        template = ContribToPDF.getBodyLatex(self)
-
-        return template
-
-
 class ContributionBook(PDFBase):
 
     def __init__(self,conf,contribList,aw,tz=None, sortedBy=""):
@@ -1128,57 +1082,43 @@ class ContributionBook(PDFBase):
         return story
 
 
-class ContribsToPDF(PDFWithTOC):
+class ContribToPDF(PDFLaTeXBase):
 
-    def __init__(self, conf, contribList, tz=None):
-        self._conf = conf
-        if not tz:
-            self._tz = self._conf.getTimezone()
-        else:
-            self._tz = tz
-        self._contribs = contribList
-        self._title = _("Contributions book")
-        PDFWithTOC.__init__(self)
+    _tpl_filename = 'LatexRHContributionToPDF.tpl'
 
-    def firstPage(self, c, doc):
-        c.saveState()
-        showLogo = False
-        c.setFont('Times-Bold', 30)
-        if not self._drawLogo(c):
-            self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
-        c.setFont('Times-Bold', 35)
-        c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT/2, self._title)
-        c.setLineWidth(3)
-        c.setStrokeGray(0.7)
-        #c.line(inch, self._PAGE_HEIGHT - inch - 6*cm, self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - inch - 6*cm)
-        #c.line(inch, inch , self._PAGE_WIDTH - inch, inch)
-        c.setFont('Times-Roman', 10)
-        c.drawString(0.5*inch, 0.5*inch, str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
-        c.restoreState()
+    def __init__(self, contrib):
+        super(ContribToPDF, self).__init__()
 
-    def laterPages(self, c, doc):
+        self._contrib = contrib
+        conf = contrib.getConference()
 
-        c.saveState()
-        c.setFont('Times-Roman', 9)
-        c.setFillColorRGB(0.5, 0.5, 0.5)
-        confTitle = escape(self._conf.getTitle())
-        if len(self._conf.getTitle())>30:
-            confTitle = escape(self._conf.getTitle()[:30] + "...")
-        c.drawString(inch, self._PAGE_HEIGHT - 0.75 * inch, "%s / %s"%(confTitle, self._title))
-        title = doc.getCurrentPart()
-        if len(doc.getCurrentPart())>50:
-            title = utils.unicodeSlice(doc.getCurrentPart(), 0, 50) + "..."
-        c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, "%s"%title)
-        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, i18nformat(""" _("Page") %d """)%doc.page)
-        c.drawString(inch,  0.75 * inch, nowutc().strftime("%A %d %B %Y"))
-        c.restoreState()
+        self._args.update({
+            'contrib': contrib,
+            'conf': conf,
+            'tz': conf.getTimezone(),
+            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields()
+        })
+
+        logo = conf.getLogo()
+        if logo:
+            self._args['logo_img'] = logo.getFilePath()
 
 
-    def getBody(self):
-        for contrib in self._contribs:
-            temp = ContribToPDF(self._conf, contrib, tz=self._tz)
-            temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
-            self._story.append(PageBreak())
+class ContribsToPDF(PDFLaTeXBase):
+
+    _table_of_contents = True
+    _tpl_filename = "LatexRHContribsToPDFMenu_ContributionList.tpl"
+
+    def __init__(self, conf, contribs):
+        super(ContribsToPDF, self).__init__()
+
+        self._contribs = contribs
+
+        self._args.update({
+            'title': conf.getTitle(),
+            'contribs': contribs,
+            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields()
+        })
 
 
 class ConfManagerContribsToPDF(ContribsToPDF):
@@ -1225,6 +1165,31 @@ class ConfManagerContribsToPDF(ContribsToPDF):
             ''' % (contrib_title, contrib_title, contrib_title, contrib_id, temp.getBodyLatex())
 
         return body
+
+
+class ConfManagerContribToPDF(ContribToPDF):
+
+    _tpl_filename = 'LatexRHContributionToPDF.tpl'
+
+    def getBody(self, story=None, indexedFlowable={}, level=1 ):
+        if not story:
+            story = self._story
+
+        #get the common contribution content from parent
+        ContribToPDF.getBody(self, story, indexedFlowable, level)
+
+        #add info for the conference manager
+
+    def getLatex(self):
+        template = ContribToPDF.firstPageLatex(self)
+        template += ContribToPDF.getBodyLatex(self)
+
+        return template
+
+    def getBodyLatex(self):
+        template = ContribToPDF.getBodyLatex(self)
+
+        return template
 
 
 class TimetablePDFFormat:

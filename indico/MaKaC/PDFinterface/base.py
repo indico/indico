@@ -743,6 +743,9 @@ class PDFWithTOC(PDFBase):
 
 
 class PDFLaTeXBase(object):
+
+    _table_of_contents = False
+
     def __init__(self):
 
         # Markdown -> LaTeX rendered
@@ -755,7 +758,7 @@ class PDFLaTeXBase(object):
         }
 
     def generate(self):
-        latex = LatexRunner()
+        latex = LatexRunner(has_toc=self._table_of_contents)
         pdffile = latex.run(self._tpl_filename, **self._args)
         latex.cleanup()
         return pdffile

@@ -3133,7 +3133,7 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
             if not self._contribs:
                 return "No contributions to print"
 
-            contrib_pdf = ConfManagerContribsToPDF(self._conf, tz)
+            contrib_pdf = ConfManagerContribsToPDF(self._conf, self._contribs)
             fpath = contrib_pdf.generate()
 
             return send_file(filename, fpath, 'PDF')
