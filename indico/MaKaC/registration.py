@@ -1961,8 +1961,8 @@ class RadioItem(Persistent, Fossilizable):
     def setValues(self, data):
         if data.has_key("caption"):
             self.setCaption(data["caption"])
-        if data.has_key("billable"):
-            self.setBillable(data["billable"])
+        if data.has_key("isBillable"):
+            self.setBillable(data["isBillable"])
         if data.has_key("price"):
             self.setPrice(data["price"])
         if data.has_key("isEnabled"):
