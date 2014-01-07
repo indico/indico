@@ -11,13 +11,9 @@
                     <select id="arrivalDate" name="arrivalDate" required
                         ng-model="input.arrival"
                         ng-change="updateArrival(input.arrival); input.departure = ''"
-                        ng-class="{hasError: validationStarted && nestedFormArrival.$invalid}">
+                        ng-class="{hasError: validationStarted && nestedFormArrival.$invalid}"
+                        ng-options="s_date as l_date for (s_date, l_date) in section.arrivalDates">
                         <option value="" selected>--{{ 'select a date' | i18n }}--</option>
-                        <option ng-repeat="date in section.arrivalDates"
-                            value="{{ date[0] }}"
-                            ng-selected="date[0] === userdata.accommodation.arrivalDate">
-                            {{ date[1] }}
-                        </option>
                     </select>
                 </ng-form>
             </td>
@@ -32,13 +28,9 @@
                     ng-init="input.departure = userdata.accommodation.departureDate">
                     <select id="departureDate" name="departureDate" required
                         ng-model="input.departure"
-                        ng-class="{hasError: validationStarted && nestedFormDeparture.$invalid}">
+                        ng-class="{hasError: validationStarted && nestedFormDeparture.$invalid}"
+                        ng-options="s_date as l_date for (s_date, l_date) in section.departureDates | filter:possibleDeparture">
                         <option value="" selected>--{{ 'select a date' | i18n }}--</option>
-                        <option ng-repeat="date in section.departureDates | filter:possibleDeparture"
-                            value="{{ date[0] }}"
-                            ng-selected="date[0] === userdata.accommodation.departureDate">
-                            {{ date[1] }}
-                        </option>
                     </select>
                 </ng-form>
             </td>

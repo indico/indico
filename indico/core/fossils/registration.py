@@ -501,15 +501,15 @@ class IRegFormAccommodationSectionFossil(IRegFormSectionBaseFossil):
         """
         Get arrival dates
         """
-    getArrivalDates.convert = lambda x: [[format_date(date, "dd-MM-yyyy"), format_date(date, "dd-MMMM-yyyy")]
-                                         for date in x]
+    getArrivalDates.convert = lambda x: dict((format_date(date, "dd-MM-yyyy"), format_date(date, "dd-MMMM-yyyy"))
+                                             for date in x)
 
     def getDepartureDates(self):
         """
         Get departure dates
         """
-    getDepartureDates.convert = lambda x: [[format_date(date, "dd-MM-yyyy"), format_date(date, "dd-MMMM-yyyy")]
-                                           for date in x]
+    getDepartureDates.convert = lambda x: dict((format_date(date, "dd-MM-yyyy"), format_date(date, "dd-MMMM-yyyy"))
+                                               for date in x)
 
     def getAccommodationTypesList(self):
         """
