@@ -91,7 +91,11 @@
                         popup.close();
                     }
                 };
-                new ConfirmPopup($T('Attach room'), Html.div({style: {width: pixels(500)}}, error.userMessage), handler, $T("Attach room")).open();
+                var container = $('<div/>').css("max-width", "550px");
+                var warningMessage = $('<div/>').addClass("warningMessage").css("text-align", "justify").append($T('Please be aware that if you attach the room, the data you may have filled in the form (Meeting PIN, Moderator PIN, description, owner, etc) will not be taken into account. Instead, the data from the original attached room will be used.'));
+                container.append(warningMessage);
+                container.append(error.userMessage);
+                new ConfirmPopup($T('Attach room'), container.get(0), handler, $T("Attach room")).open();
             }
             if (error.errorType === 'badOwner') {
                 CSErrorPopup($T("Invalid owner"), [$T("The user ") + this.vidyoComponents["ownerField"].get().name + $T(" does not have a Vidyo account.")]);
