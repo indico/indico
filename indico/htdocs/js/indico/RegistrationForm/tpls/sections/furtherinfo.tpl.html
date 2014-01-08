@@ -1,7 +1,17 @@
-<div ng-if="section.content == ''" class="section-placeholder">
-    {{ 'There is no further information. ' | i18n }}
-</div>
-
-<div class="regFormText">
-    {{ section.content }}
+<div ng-switch="editMode">
+    <div ng-switch-default>
+        <div ng-if="section.content == ''" class="section-placeholder">
+            {{ 'There is no further information. ' | i18n }}
+        </div>
+        <div class="regFormText">
+            {{ section.content }}
+        </div>
+    </div>
+    <div ng-switch-when="true">
+        <div class="regFormText"
+            ng-model="section.content"
+            placeholder="Fill the further information content"
+            contenteditable>
+        </div>
+    </div>
 </div>

@@ -351,6 +351,12 @@ ndRegForm.directive("ndFurtherInformationSection", function() {
             scope.dialogs.config.tabs = [
                 {id: 'config', name: $T("Configuration"), type: 'config'}
             ];
+
+            scope.$watch('section.content', function(newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    scope.sectionApi.updateDescription(scope.section, {description: newVal});
+                }
+            });
         }
     };
 });
