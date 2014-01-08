@@ -344,13 +344,7 @@ ndRegForm.directive("ndFurtherInformationSection", function() {
     return {
         require: 'ndSection',
         link: function(scope) {
-            scope.buttons.config = true;
             scope.buttons.disable = true;
-
-            scope.dialogs.config.formData.push('content');
-            scope.dialogs.config.tabs = [
-                {id: 'config', name: $T("Configuration"), type: 'config'}
-            ];
 
             scope.$watch('section.content', function(newVal, oldVal) {
                 if (newVal !== oldVal) {
