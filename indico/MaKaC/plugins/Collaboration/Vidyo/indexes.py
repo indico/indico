@@ -142,6 +142,8 @@ class EventEndDateIndex(Persistent):
             i += 1
             if dbi and i % 100 == 0:
                 dbi.commit()
+        if dbi:
+            dbi.commit()
 
 class DateBookingList(Persistent):
     """ Simple set of booking objects with a count attribute.
@@ -203,6 +205,8 @@ class BookingsByVidyoRoomIndex(SIndex):
             i += 1
             if dbi and i % 100 == 0:
                 dbi.commit()
+        if dbi:
+            dbi.commit()
 
     def dump(self):
         return [(k, [b for b in self.get(k)]) for k in self.__iter__()]
