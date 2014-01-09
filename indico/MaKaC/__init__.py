@@ -17,5 +17,4 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-DEVELOPMENT = 0
-__version__="1.2-dev"
+__version__ = "1.2-dev"
