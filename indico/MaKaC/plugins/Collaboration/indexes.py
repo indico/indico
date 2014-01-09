@@ -626,7 +626,8 @@ class BookingManagerConferenceIndex(Persistent):
             self.index(conf.getId(), csbm)
             if dbi and i % 1000 == 999:
                 dbi.commit()
-        dbi.commit()
+        if dbi:
+            dbi.commit()
 
     def getName(self):
         return self._name
