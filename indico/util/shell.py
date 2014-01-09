@@ -55,7 +55,11 @@ from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
 
 try:
     HAS_IPYTHON = True
-    from IPython.frontend.terminal.embed import InteractiveShellEmbed
+    try:
+        # IPython >=1.0
+        from IPython.terminal.embed import InteractiveShellEmbed
+    except ImportError:
+        from IPython.frontend.terminal.embed import InteractiveShellEmbed
     from IPython.config.loader import Config as IPConfig
     OLD_IPYTHON = False
 except ImportError:
