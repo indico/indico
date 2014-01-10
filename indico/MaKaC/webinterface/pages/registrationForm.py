@@ -31,6 +31,9 @@ from MaKaC.webinterface.pages.base import WPBase
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 
+import inspect
+from MaKaC.registration import LabelInput
+
 
 # ----------------- MANAGEMENT AREA ---------------------------
 
@@ -705,7 +708,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
         regForm = self._conf.getRegistrationForm()
         miscGroup = self._registrant.getMiscellaneousGroupById(gsf.getId())
         html = ["""<table>"""]
-        for f in gsf.getSortedFields():
+        for f in (f for f in gsf.getSortedFields() if not isinstance(f.getInput(), LabelInput)):
             miscItem = None
             price = ""
             currency = ""
@@ -734,15 +737,15 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                     </tr>
                     """ % (f.getCaption(), self._formatValue(fieldInput, v), price, currency))
         if miscGroup is not None:
-            for miscItem in miscGroup.getResponseItemList():
-                    f = gsf.getFieldById(miscItem.getId())
-                    if f is None:
-                        html.append(i18nformat("""
-                                    <tr>
-                                       <td align="right" nowrap><b>%s:</b></td>
-                                       <td align="left">%s <span class="not-selected">(_("Cancelled"))</span></td>
-                                    </tr>
-                                    """) % (miscItem.getCaption(), self._formatValue(fieldInput, miscItem.getValue())))
+            for miscItem in (f for f in miscGroup.getResponseItemList() if not isinstance(f.getGeneralField().getInput(), LabelInput)):
+                f = gsf.getFieldById(miscItem.getId())
+                if f is None:
+                    html.append(i18nformat("""
+                                <tr>
+                                   <td class="regform-done-caption">%s</td>
+                                   <td class="regform-done-data">%s <span class="not-selected">(_("Cancelled"))</span></td>
+                                </tr>
+                                """) % (miscItem.getCaption(), self._formatValue(fieldInput, miscItem.getValue())))
         if len(html) == 1:
             html.append(i18nformat("""
                         <tr><td><font color="black"><i>--_("No fields")--</i></font></td></tr>
