@@ -165,6 +165,49 @@
     }
 }
 
+.regform-done {
+    @extend %regform-section;
+    @include border-all();
+    @include single-box-shadow();
+    margin-top: 0;
+    padding: 10px;
+
+    ul {
+        margin: 0;
+        padding-left: 14px;
+    }
+
+    .regform-done-title {
+        @include border-bottom(lighten($gray, $color-variation));
+        display: block;
+        font-size: 1.3em;
+        margin: 15px 0 5px 0;
+    }
+
+    tr:first-child .regform-done-title {
+        margin-top: 0;
+    }
+
+    .regform-done-caption {
+        border-bottom: 1px dashed lighten($gray, $color-variation);
+        border-right: 1px dashed lighten($gray, $color-variation);
+        color: $dark-gray;
+        text-align: right;
+        padding-right: 8px;
+        width: 120px;
+    }
+
+    .regform-done-data {
+        padding-left: 5px;
+        vertical-align: top;
+    }
+
+    .not-selected {
+        color: $gray;
+        font-style: italic;
+    }
+}
+
 .regform-add-field-qtip {
     @include border-all();
     background: white;
@@ -408,14 +451,6 @@ textarea.regFormDescriptionInputMgmt {
 .regFormDonePlacesNeeded {
     font-style: italic;
     padding-left: 5px;
-}
-
-.regFormDoneData {
-    padding-left: 5px;
-}
-
-.regFormDoneCaption {
-    color: black;
 }
 
 .row {

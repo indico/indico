@@ -51,16 +51,12 @@
         </tr>
         <tr>
         <td colspan="3">
-            <table width="100%" align="left" class="regFormDoneTable">
-                <tr>
-                    <td>
-                        <table width="100%" align="left">
-                            ${ otherSections }
-                            ${ paymentInfo }
-                        </table>
-                    </td>
-                </tr>
-            </table>
+            <div class="regform-done">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                    ${ otherSections }
+                    ${ paymentInfo }
+                </table>
+            </div>
         </td>
         </tr>
     </table>

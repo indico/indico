@@ -534,44 +534,44 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
         sessions = self._registrant.getSessionList()
         if regForm.getSessionsForm().isEnabled():
             if regForm.getSessionsForm().getType() == "2priorities":
-                session1 = i18nformat("""<font color=\"red\">--_("not selected")--</font>""")
-                session2 = "-- not selected --"
+                session1 = i18nformat("""<span class="not-selected">_("Not selected")</span>""")
+                session2 = i18nformat("""<span class="not-selected">_("Not selected")</span>""")
                 if len(sessions) > 0:
                     session1 = sessions[0].getTitle()
                     if sessions[0].isCancelled():
-                        session1 = i18nformat("""%s <font color=\"red\">( _("cancelled"))""") % session1
+                        session1 = i18nformat("""%s <span class="not-selected">(_("Cancelled"))</span>""") % session1
                 if len(sessions) > 1:
                     session2 = sessions[1].getTitle()
                     if sessions[1].isCancelled():
-                        session2 = i18nformat("""%s <font color=\"red\">( _("cancelled"))""") % session2
+                        session2 = i18nformat("""%s <span class="not-selected">(_("Cancelled"))</span>""") % session2
                 text = i18nformat("""
                         <table>
                           <tr>
-                            <td align="left" class="regFormDoneCaption">_("First Priority"):</td>
-                            <td align="left" class="regFormDoneData">%s</td>
+                            <td class="regform-done-caption">_("Preferred choice")</td>
+                            <td class="regform-done-data">%s</td>
                           </tr>
                           <tr>
-                            <td align="left" class="regFormDoneCaption">_("Other option"):</td>
-                            <td align="left" class="regFormDoneData">%s</td>
+                            <td class="regform-done-caption">_("Secondary choice")</td>
+                            <td class="regform-done-data">%s</td>
                           </tr>
                         </table>
                         """) % (session1, session2)
                 return _("""
                         <tr>
-                          <td class="regFormDoneTitle">%s</td>
+                          <td class="regform-done-title">%s</td>
                         </tr>
                         <tr>
-                          <td style="padding-bottom: 15px;">%s</td>
+                          <td>%s</td>
                         </tr>
                         """) % (regForm.getSessionsForm().getTitle(), text)
             if regForm.getSessionsForm().getType() == "all":
-                sessionList = i18nformat("""<font color=\"red\">--_("not selected")--</font>""")
+                sessionList = i18nformat("""<span class="not-selected">_("No sessions selected")</span>""")
                 if len(sessions) > 0:
                     sessionList = ["<ul>"]
                     for ses in sessions:
                         sesText = "<li>%s</li>" % ses.getTitle()
                         if ses.isCancelled():
-                            sesText = i18nformat("""<li>%s <font color=\"red\">( _("cancelled"))</font></li>""") % ses.getTitle()
+                            sesText = i18nformat("""<li>%s <span class="not-selected">(_("Cancelled"))</span></li>""") % ses.getTitle()
                         sessionList.append(sesText)
                     sessionList.append("</ul>")
                     sessionList = "".join(sessionList)
@@ -584,10 +584,10 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                         """ % (sessionList)
                 return _("""
                         <tr>
-                          <td class="regFormDoneTitle">%s</td>
+                          <td class="regform-done-title">%s</td>
                         </tr>
                         <tr>
-                          <td style="padding-bottom: 15px;">%s</td>
+                          <td>%s</td>
                         </tr>
                         """) % (regForm.getSessionsForm().getTitle(), text)
         return ""
@@ -596,45 +596,45 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
         regForm = self._conf.getRegistrationForm()
         if regForm.getAccommodationForm().isEnabled():
             accommodation = self._registrant.getAccommodation()
-            accoType = i18nformat("""<font color=\"red\">--_("not selected")--</font>""")
+            accoType = i18nformat("""<span class="not-selected">_("Not selected")</span>""")
             cancelled = ""
             if accommodation is not None and accommodation.getAccommodationType() is not None:
                 accoType = accommodation.getAccommodationType().getCaption()
                 if accommodation.getAccommodationType().isCancelled():
-                    cancelled = """<font color=\"red\">( """ + _("disabled") + """)</font>"""
-            arrivalDate = """<font color=\"red\">--""" + _("not selected") + """--</font>"""
+                    cancelled = """<span class="not-selected">( """ + _("disabled") + """)</span>"""
+            arrivalDate = """<span class="not-selected">""" + _("Not selected") + """</span>"""
             if accommodation is not None and accommodation.getArrivalDate() is not None:
                 arrivalDate = accommodation.getArrivalDate().strftime("%d-%B-%Y")
-            departureDate = """<font color=\"red\">--""" + _("not selected") + """--</font>"""
+            departureDate = """<span class="not-selected">""" + _("Not selected") + """</span>"""
             if accommodation is not None and accommodation.getDepartureDate() is not None:
                 departureDate = accommodation.getDepartureDate().strftime("%d-%B-%Y")
             accoTypeHTML = ""
             if regForm.getAccommodationForm().getAccommodationTypesList() != []:
-                accoTypeHTML = """
+                accoTypeHTML = i18nformat("""
                           <tr>
-                            <td align="left" class="regFormDoneCaption">Accommodation type</td>
-                            <td align="left" class="regFormDoneData">%s %s</td>
-                          </tr>""" % (accoType, cancelled)
+                            <td align="left" class="regform-done-caption">_("Type")</td>
+                            <td align="left" class="regform-done-data">%s %s</td>
+                          </tr>""" % (accoType, cancelled))
 
             text = i18nformat("""
                         <table>
                           <tr>
-                            <td align="left" class="regFormDoneCaption">_("Arrival date")</td>
-                            <td align="left" class="regFormDoneData">%s</td>
+                            <td align="left" class="regform-done-caption">_("Arrival")</td>
+                            <td align="left" class="regform-done-data">%s</td>
                           </tr>
                           <tr>
-                            <td align="left" class="regFormDoneCaption">_("Departure date")</td>
-                            <td align="left" class="regFormDoneData">%s</td>
+                            <td align="left" class="regform-done-caption">_("Departure")</td>
+                            <td align="left" class="regform-done-data">%s</td>
                           </tr>
                           %s
                         </table>
                         """) % (arrivalDate, departureDate, accoTypeHTML)
             return i18nformat("""
                     <tr>
-                      <td class="regFormDoneTitle">_("Accommodation")</td>
+                      <td class="regform-done-title">_("Accommodation")</td>
                     </tr>
                     <tr>
-                      <td style="padding-bottom: 15px;">%s</td>
+                      <td>%s</td>
                     </tr>
                     """) % (text)
         return ""
@@ -648,20 +648,20 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
             for se in socialEvents:
                 cancelled = ""
                 if se.isCancelled():
-                    cancelled = i18nformat("""<font color=\"red\">( _("cancelled"))</font>""")
+                    cancelled = i18nformat("""<span class="not-selected">(_("Cancelled"))</span>""")
                     if se.getCancelledReason().strip():
-                        cancelled = i18nformat("""<font color=\"red\">( _("cancelled"): %s)</font>""") % se.getCancelledReason().strip()
+                        cancelled = i18nformat("""<span class="not-selected">(_("Cancelled"): %s)</span>""") % se.getCancelledReason().strip()
                 r.append(i18nformat("""
                             <tr>
                               <td align="left">
-                                  <span class="regFormDoneCaption">%s</span>
-                                  <span class="regFormDonePlacesNeeded">(%s  _("place(s) needed"))</span>
+                                  <span class="regform-done-caption">%s</span>
+                                  <span class="regFormDonePlacesNeeded">%s _("place(s) needed")</span>
                                   <span>%s</span>
                             </td>
                             </tr>
                          """) % (se.getCaption(), se.getNoPlaces(), cancelled))
             if r == []:
-                text = i18nformat("""--  _("no social events selected") --""")
+                text = """<span class="not-selected">""" + _("No social events selected") + """</span>"""
             else:
                 text = """
                         <table>
@@ -670,10 +670,10 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                         """ % ("".join(r))
             text = _("""
                     <tr>
-                      <td class="regFormDoneTitle">%s</td>
+                      <td class="regform-done-title">%s</td>
                     </tr>
                     <tr>
-                      <td style="padding-bottom: 15px;">%s</td>
+                      <td>%s</td>
                     </tr>
                     """) % (regForm.getSocialEventForm().getTitle(), text)
         return text
@@ -681,14 +681,18 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
     def _getReasonParticipationHTML(self):
         regForm = self._conf.getRegistrationForm()
         if regForm.getReasonParticipationForm().isEnabled():
+            if self.htmlText(self._registrant.getReasonParticipation()) is not "":
+                text = self.htmlText(self._registrant.getReasonParticipation())
+            else:
+                text = """<span class="not-selected">""" + _("No reason given") + """</span>"""
             return i18nformat("""
                     <tr>
-                      <td class="regFormDoneTitle">_("Reason for participation")</td>
+                      <td class="regform-done-title">_("Reason for participation")</td>
                     </tr>
                     <tr>
-                      <td class="regFormDoneData" style="padding-bottom: 15px;">%s</td>
+                      <td>%s</td>
                     </tr>
-                    """) % (self.htmlText(self._registrant.getReasonParticipation()))
+                    """) % (text)
         return ""
 
     def _formatValue(self, fieldInput, value):
@@ -701,35 +705,34 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
         regForm = self._conf.getRegistrationForm()
         miscGroup = self._registrant.getMiscellaneousGroupById(gsf.getId())
         html = ["""<table>"""]
-        #jmf
         for f in gsf.getSortedFields():
             miscItem = None
             price = ""
-            currancy = ""
+            currency = ""
             fieldInput = None
             if miscGroup is not None:
                 miscItem = miscGroup.getResponseItemById(f.getId())
                 if miscItem is None:  # for fields created after the registration of the user, we skip it.
                     continue
                 fieldInput = miscItem.getGeneralField().getInput()
-            v = i18nformat("""--_("no value selected")--""")
+            v = """<span class="not-selected">""" + _("No value selected") + """</span>"""
             if f.isBillable():
                 price = f.getPrice()
-                currancy = regForm.getCurrency()
+                currency = regForm.getCurrency()
             if miscItem is not None:
                 v = miscItem.getValue()
                 if miscItem.isBillable():
                     price = miscItem.getPrice()
-                    currancy = regForm.getCurrency()
+                    currency = regForm.getCurrency()
             if v is None:
                 v = ""
             html.append("""
                     <tr>
-                       <td align="left" class="regFormDoneCaption">%s</td>
-                       <td class="regFormDoneData">%s</td>
-                       <td align="right" class="regFormDoneData">%s&nbsp;&nbsp;%s</td>
+                       <td class="regform-done-caption">%s</td>
+                       <td class="regform-done-data">%s</td>
+                       <td align="right" class="regform-done-data">%s&nbsp;&nbsp;%s</td>
                     </tr>
-                    """ % (f.getCaption(), self._formatValue(fieldInput, v), price, currancy))
+                    """ % (f.getCaption(), self._formatValue(fieldInput, v), price, currency))
         if miscGroup is not None:
             for miscItem in miscGroup.getResponseItemList():
                     f = gsf.getFieldById(miscItem.getId())
@@ -737,7 +740,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                         html.append(i18nformat("""
                                     <tr>
                                        <td align="right" nowrap><b>%s:</b></td>
-                                       <td align="left">%s <font color="red">( _("cancelled"))</font></td>
+                                       <td align="left">%s <span class="not-selected">(_("Cancelled"))</span></td>
                                     </tr>
                                     """) % (miscItem.getCaption(), self._formatValue(fieldInput, miscItem.getValue())))
         if len(html) == 1:
@@ -803,10 +806,10 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
         if gsf.isEnabled():
             html.append("""
                 <tr>
-                  <td class="regFormDoneTitle">%s</td>
+                  <td class="regform-done-title">%s</td>
                 </tr>
                 <tr>
-                  <td style="padding-bottom: 15px;">%s</td>
+                  <td>%s</td>
                 </tr>
                 """ % (gsf.getTitle(), self._getMiscInfoItemsHTML(gsf)))
         return "".join(html)
@@ -820,7 +823,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
             total["value"] = 0
             html.append(i18nformat(""" <tr><td colspan="2"><table width="100%" cellpadding="3">
                             <tr>
-                                <td colspan="4" class="regFormDoneTitle">_("Payment summary")</td>
+                                <td colspan="4" class="regform-done-title">_("Payment summary")</td>
                             </tr>
                             <tr>
                                 <td class="subGroupTitleRegForm" style="padding-left: 5px;">_("Item")</td>
