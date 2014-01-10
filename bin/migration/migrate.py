@@ -923,15 +923,15 @@ def reindexCategoryNameAndConferenceTitle(dbi, withRBDB, prevVersion):
     """
     IndexesHolder().removeById('conferenceTitle')
     IndexesHolder().removeById('categoryName')
-
     confTitleIdx = IndexesHolder().getIndex('conferenceTitle')
+    categNameIdx = IndexesHolder().getIndex('categoryName')
+    dbi.commit()
+
     confTitleIdx.clear()
     confTitleIdx.initialize(dbi, ConferenceHolder()._getIdx().itervalues())
 
-    categNameIdx = IndexesHolder().getIndex('categoryName')
     categNameIdx.clear()
     categNameIdx.initialize(dbi, CategoryManager()._getIdx().itervalues())
-    dbi.commit()
 
 
 @since('1.2')
