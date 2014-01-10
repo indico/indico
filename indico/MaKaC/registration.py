@@ -4137,21 +4137,21 @@ class SocialEventItem(Persistent, Fossilizable):
         self._pricePerPlace = False
 
     def setValues(self, data):
-        if data.has_key("caption"):
+        if "caption" in data:
             self.setCaption(data["caption"])
-        if data.has_key("cancelled"):
+        if "cancelled" in data:
             self.setCancelled(data["cancelled"])
-        if data.has_key("reason"):
-            self.setCancelledReason(data["reason"])
-        if data.has_key("maxPlace"):
+        if "cancelledReason" in data:
+            self.setCancelledReason(data["cancelledReason"])
+        if "maxPlace" in data:
             self.setMaxPlacePerRegistrant(int(data["maxPlace"]))
-        if data.has_key("placesLimit"):
+        if "placesLimit" in data:
             self.setPlacesLimit(data["placesLimit"])
-        if data.has_key("billable"):
+        if "billable" in data:
             self.setBillable(data["billable"])
-        if data.has_key("billable"):
+        if "billable" in data:
             self.setPricePerPlace(data["pricePerPlace"])
-        if data.has_key("price"):
+        if "price" in data:
             self.setPrice(data["price"])
 
     def getValues(self):
@@ -4159,7 +4159,7 @@ class SocialEventItem(Persistent, Fossilizable):
         data["caption"] = self.getCaption()
         if self.isCancelled():
             data["cancelled"] = self.isCancelled()
-        data["reason"] = self.getCancelledReason()
+        data["cancelledReason"] = self.getCancelledReason()
         data["maxPlace"] = self.getMaxPlacePerRegistrant()
         data["placesLimit"] = self.getPlacesLimit()
         if self.isBillable():
