@@ -633,17 +633,14 @@ ndRegForm.directive('ndSectionDialog', function(url) {
                 });
 
                 _.each($scope.section.items, function (item, ind) {
-                    $scope.formData.items[ind] = {
-                        id: item.id,
-                        cancelled: item.cancelled
-                    };
+                    $scope.formData.items[ind] = angular.copy(item);
                 });
 
                 $scope.tabSelected = $scope.config.tabs[0].id;
             };
 
             $scope.addItem = function () {
-                 $scope.formData.items.push({id:'isNew'});
+                 $scope.formData.items.push({id:'isNew', cancelled: false});
             };
         },
 

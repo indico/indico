@@ -475,10 +475,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 });
 
                 _.each($scope.field.values.radioitems, function(item, ind) {
-                    $scope.formData.radioitems[ind] = {
-                        id: item.id,
-                        cancelled: item.cancelled
-                    };
+                    $scope.formData.radioitems[ind] =  angular.copy(item);
                 });
 
                 $scope.tabSelected = "tab-options";

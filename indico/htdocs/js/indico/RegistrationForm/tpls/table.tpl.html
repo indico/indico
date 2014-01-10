@@ -8,36 +8,33 @@
         </tr>
     </thead>
     <tbody ui-sortable="itemSortableOptions" ng-model="formData">
-        <tr ng-repeat="item in formData | filter: matchFilter" id="{{ item.id }}">
+        <tr ng-repeat="item in formData | filter: matchFilter">
             <td ng-if="isSortable()"
                 class="table-sortable-handle"></td>
             <td ng-repeat="elem in config.colModel"
                 style="text-align: {{ elem.align }};"
                 name="{{ elem.name }}">
                 <span ng-if="elem.editable == false">
-                    {{ data[$parent.$parent.$index][elem.index] }}
+                    {{ item[elem.index] }}
                 </span>
-                <!-- TODO $parent.$parent??? Look for a better way to pass down the information -->
                 <input ng-if="elem.editable == true && elem.edittype == 'text'"
-                    ng-model="formData[$parent.$parent.$index][elem.index]"
-                    ng-init="formData[$parent.$parent.$index][elem.index]=data[$parent.$parent.$index][elem.index]"
+                    ng-model="item[elem.index]"
                     type="text"
                     size="{{elem.editoptions.size}}"
                     maxlength="{{elem.editoptions.maxlength}}"
                     name="{{ elem.name }}"
                     class="editable"/>
                 <input ng-if="elem.edittype == 'bool_select'"
-                    ng-model="formData[$parent.$parent.$index][elem.index]"
-                    ng-init="formData[$parent.$parent.$index][elem.index]=data[$parent.$parent.$index][elem.index]"
+                    ng-model="item[elem.index]"
                     type="checkbox"
                     name="{{elem.name}}"/>
             </td>
             <td>
                 <a class="icon-remove remove-row" ng-if="config.actions.indexOf('remove') > -1"
-                    ng-click="actionItem(formData[$parent.$index], 'remove')"
+                    ng-click="actionItem(item, 'remove')"
                     title="{{ 'Remove row' | i18n }}"></a>
                 <a ng-repeat="action in config.actions | filter: actionIsArray"
-                    ng-click="actionItem(formData[$parent.$index], action[0])"
+                    ng-click="actionItem(item, action[0])"
                     title="{{ action[1] }}"
                     class="action-button {{ action[3] }}">
                 </a>

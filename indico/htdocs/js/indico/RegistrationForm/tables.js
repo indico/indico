@@ -23,7 +23,6 @@ ndRegForm.directive("ndTable", function(url, sortableoptions) {
         templateUrl: url.tpl('table.tpl.html'),
 
         scope: {
-            data: "=",
             config: "=",
             formData: "=",
             filter: "=",
@@ -52,10 +51,10 @@ ndRegForm.directive("ndTable", function(url, sortableoptions) {
             $scope.matchFilter = function(item) {
                 if(item.remove === true) {
                     return false;
+                } else if($scope.filter !== undefined && $scope.filterValue !== undefined) {
+                    return item[$scope.filter] === $scope.filterValue;
                 } else if(item.id == "isNew") {
                     return true;
-                } else if($scope.filter !== undefined && $scope.filterValue !== undefined) {
-                    return item[$scope.filter] == $scope.filterValue;
                 } else {
                     return true;
                 }
