@@ -928,10 +928,10 @@ def reindexCategoryNameAndConferenceTitle(dbi, withRBDB, prevVersion):
     dbi.commit()
 
     confTitleIdx.clear()
-    confTitleIdx.initialize(dbi, ConferenceHolder()._getIdx().itervalues())
+    confTitleIdx.initialize(dbi, ConferenceHolder().itervalues())
 
     categNameIdx.clear()
-    categNameIdx.initialize(dbi, CategoryManager()._getIdx().itervalues())
+    categNameIdx.initialize(dbi, CategoryManager().itervalues())
 
 
 @since('1.2')

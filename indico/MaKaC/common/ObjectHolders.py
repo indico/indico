@@ -155,6 +155,9 @@ class ObjectHolder:
         """
         return self._getIdx().values()
 
+    def itervalues(self):
+        return self._getIdx().itervalues()
+
     def getValuesToList( self ):
         l = []
         for i in self._getIdx().values():
