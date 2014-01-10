@@ -770,7 +770,7 @@ def convertLinkedTo(dbi, withRBDB, prevVersion):
     dbi.commit()
 
 
-@since('1.1', never=True)
+@since('1.1')
 def redisLinkedTo(dbi, withRBDB, prevVersion):
     """Import linkedTo information into Redis"""
     if not Config.getInstance().getRedisConnectionURL():

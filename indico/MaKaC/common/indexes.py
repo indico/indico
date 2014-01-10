@@ -75,8 +75,9 @@ class Index(Persistent):
         letters = []
         words = self.getKeys()
         for word in words:
-            if not word[0].lower() in letters:
-                letters.append(word[0].lower())
+            uletter = remove_accents(word.decode('utf-8').lower()[0])
+            if not uletter in letters:
+                letters.append(uletter)
         letters.sort()
         return letters
 
@@ -97,47 +98,51 @@ class Index(Persistent):
                 words[value].remove(item)
                 self.setIndex(words)
 
-    def matchFirstLetter( self, letter ):
+    def matchFirstLetter(self, letter, accent_sensitive=True):
         result = []
+
+        cmpLetter = letter.lower()
+        if not accent_sensitive:
+            cmpLetter = remove_accents(cmpLetter)
+
         for key in self.getKeys():
-            if key[0].lower() == letter.lower():
+            uletter = key.decode('utf8')[0].lower()
+            if not accent_sensitive:
+                uletter = remove_accents(uletter)
+            if uletter == cmpLetter:
                 result += self._words[key]
+
         return result
 
-    def _match( self, value, cs=1, exact=1 ):
-
-        result = []
-        lowerCaseValue = value.lower()
-
-        if exact == 1 and cs == 1:
-            if self._words.has_key(value) and len(self._words[value]) != 0:
+    def _match(self, value, cs=1, exact=1, accent_sensitive=True):
+        # if match is exact, retrieve directly from index
+        if exact == 1 and cs == 1 and accent_sensitive:
+            if value in self._words and len(self._words[value]) != 0:
                 if '' in self._words[value]:
                     self._words[value].remove('')
                 return self._words[value]
             else:
                 return None
-        elif exact == 1 and cs == 0:
-            for key in self._words.keys():
-                if key.lower() == lowerCaseValue and len(self._words[key]) != 0:
-                    if '' in self._words[key]:
-                        self._words[key].remove('')
-                    result = result + self._words[key]
-            return result
-        elif exact == 0 and cs == 1:
-            for key in self._words.keys():
-                if key.find(value) != -1 and len(self._words[key]) != 0:
-                    if '' in self._words[key]:
-                        self._words[key].remove('')
-                    result = result + self._words[key]
-            return result
         else:
-            for key in self._words.keys():
-                if key.lower().find(lowerCaseValue) != -1 and len(self._words[key]) != 0:
-                    if '' in self._words[key]:
-                        self._words[key].remove('')
-                    result = result + self._words[key]
+            result = []
+            cmpValue = value
+            if not accent_sensitive:
+                cmpValue = remove_accents(cmpValue)
+            if cs == 0:
+                cmpValue = cmpValue.lower()
+
+            for key in self._words.iterkeys():
+                if len(self._words[key]) != 0:
+                    cmpKey = key
+                    if not accent_sensitive:
+                        cmpKey = remove_accents(cmpKey)
+                    if cs == 0:
+                        cmpKey = cmpKey.lower()
+                    if (exact == 0 and cmpKey.find(cmpValue) != -1) or (exact == 1 and cmpKey == cmpValue):
+                        if '' in self._words[key]:
+                            self._words[key].remove('')
+                        result = result + self._words[key]
             return result
-        return None
 
     def dump(self):
         return self._words
@@ -160,7 +165,7 @@ class EmailIndex(Index):
         for email in user.getEmails():
             self._withdrawItem(email, user.getId())
 
-    def matchUser(self, email, cs=0, exact=0):
+    def matchUser(self, email, cs=0, exact=0, accent_sensitive=True):
         """this match is an approximative case insensitive match"""
         return self._match(email, cs, exact)
 
@@ -176,9 +181,9 @@ class NameIndex(Index):
         name = user.getName()
         self._withdrawItem(name, user.getId())
 
-    def matchUser(self, name, cs=0, exact=0):
+    def matchUser(self, name, cs=0, exact=0, accent_sensitive=False):
         """this match is an approximative case insensitive match"""
-        return self._match(name, cs, exact)
+        return self._match(name, cs, exact, accent_sensitive)
 
 
 class SurNameIndex(Index):
@@ -192,9 +197,9 @@ class SurNameIndex(Index):
         surName = user.getSurName()
         self._withdrawItem(surName, user.getId())
 
-    def matchUser(self, surName, cs=0, exact=0):
+    def matchUser(self, surName, cs=0, exact=0, accent_sensitive=False):
         """this match is an approximative case insensitive match"""
-        return self._match(surName, cs, exact)
+        return self._match(surName, cs, exact, accent_sensitive)
 
 
 class OrganisationIndex(Index):
@@ -208,8 +213,8 @@ class OrganisationIndex(Index):
         org = user.getOrganisation()
         self._withdrawItem(org, user.getId())
 
-    def matchUser(self, org, cs=0, exact=0):
-        return self._match(org, cs, exact)
+    def matchUser(self, org, cs=0, exact=0, accent_sensitive=False):
+        return self._match(org, cs, exact, accent_sensitive)
 
 
 class StatusIndex(Index):
@@ -222,33 +227,35 @@ class StatusIndex(Index):
         for av in ah.getList():
             self.indexUser(av)
 
-    def indexUser( self, user ):
+    def indexUser(self, user):
         status = user.getStatus()
-        self._addItem( status, user.getId() )
+        self._addItem(status, user.getId())
 
-    def unindexUser( self, user ):
+    def unindexUser(self, user):
         status = user.getStatus()
-        self._withdrawItem( status, user.getId() )
+        self._withdrawItem(status, user.getId())
 
-    def matchUser( self, status, cs=0, exact=1 ):
+    def matchUser(self, status, cs=0, exact=1, accent_sensitive=True):
         """this match is an approximative case insensitive match"""
-        return self._match(status,cs,exact)
+        return self._match(status, cs, exact)
 
-class GroupIndex( Index ):
+
+class GroupIndex(Index):
     _name = "group"
 
-    def indexGroup( self, group ):
+    def indexGroup(self, group):
         name = group.getName()
-        self._addItem( name, group.getId() )
+        self._addItem(name, group.getId())
 
-    def unindexGroup( self, group ):
+    def unindexGroup(self, group):
         name = group.getName()
-        self._withdrawItem( name, group.getId() )
+        self._withdrawItem(name, group.getId())
 
-    def matchGroup( self, name, cs=0, exact=0 ):
+    def matchGroup(self, name, cs=0, exact=0):
         if name == "":
             return []
-        return self._match(name,cs,exact)
+        return self._match(name, cs, exact)
+
 
 class CategoryIndex(Persistent):
 
@@ -931,7 +938,7 @@ class CategoryDateIndex(Persistent):
         for conf in categ.getConferenceList():
             self.unindexConf(conf)
             self.indexConf(conf)
-#        from MaKaC.common import DBMgr
+#        from indico.core.db import DBMgr
 #        dbi = DBMgr.getInstance()
 #        for subcat in categ.getSubCategoryList():
 #            self.reindexCateg(subcat)
@@ -1327,10 +1334,9 @@ class WhooshTextIndex(object):
             writer.add_document(id=unicode(obj.getId()), content=unicode(obj.getTitle().decode('utf-8')))
             if i % 20000 == 19999:
                 writer.commit()
-                dbi.commit()
+                dbi.sync()
                 writer = self._textIdx.writer(limitmb=512)
             i += 1
-        dbi.commit()
         writer.commit(optimize=True)
 
 
@@ -1362,10 +1368,9 @@ class WhooshConferenceIndex(WhooshTextIndex):
                                 start_date=obj.getStartDate())
             if i % 20000 == 19999:
                 writer.commit()
-                dbi.commit()
+                dbi.sync()
                 writer = self._textIdx.writer(limitmb=512)
             i += 1
-        dbi.commit()
         writer.commit(optimize=True)
 
 
@@ -1416,10 +1421,6 @@ class IndexesHolder(ObjectHolder):
                 Idx[str(id)] = CategoryDayIndex()
             elif id=="categoryDateAll":
                 Idx[str(id)] = CategoryDayIndex(visibility=False)
-            elif id=="categoryName":
-                Idx[str(id)] = WhooshTextIndex(str(id))
-            elif id=="conferenceTitle":
-                Idx[str(id)] = WhooshConferenceIndex(str(id))
             elif id=="pendingSubmitters":
                 Idx[str(id)] = PendingSubmittersIndex()
             elif id=="pendingConfSubmitters":
@@ -1440,6 +1441,10 @@ class IndexesHolder(ObjectHolder):
                 Idx[str(id)] = PendingManagersIndex()
             elif id=="pendingCoordinatorsTasks":
                 Idx[str(id)] = PendingManagersTasksIndex()
+            elif id=="categoryName":
+                return WhooshTextIndex(str(id))
+            elif id=="conferenceTitle":
+                return WhooshConferenceIndex(str(id))
             else:
                 extension_point("indexHolderProvider", Idx, id)
             return Idx[str(id)]
