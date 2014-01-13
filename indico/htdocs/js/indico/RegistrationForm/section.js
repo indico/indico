@@ -39,6 +39,9 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
         regFormFactory.Sections.save(requestParams, function(updatedSection) {
                 regFormFactory.checkError(updatedSection, function(updatedSection)  {
                     $scope.section = angular.extend($scope.section, updatedSection);
+                    if (updatedSection.id == 'sessions') {
+                        $scope.fetchSessions();
+                    }
                 });
         });
     };
@@ -365,30 +368,35 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
         require: 'ndSection',
 
         controller: function($scope) {
+            var hasSession = function(id) {
+                return _.find($scope.section.items, function(session) {
+                    return session.id == id;
+                }) !== undefined;
+            };
+
             $scope.anySessionEnabled = function() {
                 return _.any($scope.section.items, function(session) {
                     return session.enabled === true;
                 });
             };
 
-            $scope._hasSession = function(id) {
-                return _.find($scope.section.items, function(session) {
-                    return session.id == id;
-                }) !== undefined;
+            $scope.fetchSessions = function() {
+                var sessions = regFormFactory.Sessions.query({confId: $rootScope.confId}, function() {
+                    _.each(sessions, function (item, ind) {
+                        if(!hasSession(item.id)) {
+                            $scope.section.items.push({
+                                id: item.id,
+                                caption: item.title,
+                                billable: false,
+                                price: 0,
+                                enabled: false
+                            });
+                        }
+                    });
+                });
             };
 
-            var sessions = regFormFactory.Sessions.query({confId: $rootScope.confId}, function() {
-                _.each(sessions, function (item, ind) {
-                    if(!$scope._hasSession(item.id)) {
-                        $scope.section.items.push({
-                            id: item.id,
-                            caption: item.title,
-                            billable: false,
-                            price: 0, enabled: false
-                        });
-                    }
-                });
-            });
+            $scope.fetchSessions();
         },
 
         link: function(scope) {

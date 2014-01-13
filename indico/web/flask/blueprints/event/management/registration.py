@@ -91,7 +91,6 @@ event_mgmt.add_url_rule('/registration/preview/sections/sessions',
                         methods=('POST',))
 
 # Fields
-
 event_mgmt.add_url_rule('/registration/preview/sections/<sectionId>/fields',
                         'confModifRegistrationPreviewField-create',
                         registrationFormModif.RHRegistrationFormFieldCreate,
