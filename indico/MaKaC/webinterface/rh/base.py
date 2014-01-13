@@ -67,7 +67,7 @@ def jsonify_error(func):
     def decorator(*args, **keyargs):
         e = args[1]
         Logger.get('requestHandler').info('Request %s finished with %s: "%s"' % (request, e.__class__.__name__, e))
-        if request.headers.get("Content-Type") == "application/json":
+        if request.headers.get("Content-Type").find("application/json") != -1:
             return create_json_error_answer(e)
         else:
             return func(*args, **keyargs)
@@ -667,6 +667,9 @@ class RH(RequestHandlerBase):
         if self._responseUtil.call:
             return self._responseUtil.make_call()
 
+        if request.headers.get("Content-Type").find("application/json") != -1:
+            self._responseUtil.content_type = 'application/json'
+
         # In case of no process needed, we should return empty string to avoid erroneous ouput
         # specially with getVars breaking the JS files.
         if not self._doProcess or res is None:
@@ -779,7 +782,7 @@ class RHProtected(RH):
 
     def _checkSessionUser(self):
         if self._getUser() is None:
-            if request.headers.get("Content-Type") == "application/json":
+            if request.headers.get("Content-Type").find("application/json") != -1:
                 raise NotLoggedError("You are currently not authenticated. Please log in again.")
             else:
                 self._redirect(self._getLoginURL())
@@ -794,7 +797,7 @@ class RHRoomBookingProtected(RHProtected):
     def _checkSessionUser(self):
         user = self._getUser()
         if user is None:
-            if request.headers.get("Content-Type") == "application/json":
+            if request.headers.get("Content-Type").find("application/json") != -1:
                 raise NotLoggedError("You are currently not authenticated. Please log in again.")
             else:
                 self._redirect(self._getLoginURL())

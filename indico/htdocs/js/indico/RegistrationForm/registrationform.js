@@ -53,7 +53,11 @@ ndRegForm.config(function(urlProvider) {
     urlProvider.setModulePath('/js/indico/RegistrationForm');
 });
 
-ndRegForm.factory('regFormFactory', function($resource, editionurl, displayurl, userurl) {
+ndRegForm.factory('regFormFactory', function($resource, $http, editionurl, displayurl, userurl) {
+    var defaults = $http.defaults.headers;
+    defaults.get = defaults.get || {};
+    defaults.common = defaults.common || {};
+    defaults.get['Content-Type'] = defaults.common['Content-Type'] = 'application/json';
     var sectionurl = editionurl + 'sections/:sectionId';
     var fieldurl = sectionurl + '/fields/:fieldId';
     var sessionsurl = Indico.Urls.Base + '/event/:confId/manage/sessions';
@@ -172,7 +176,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                     regFormFactory.Sections.remove({
                         confId: $rootScope.confId,
                         sectionId: section.id
-                    }, function(updatedSections) {
+                    }, {}, function(updatedSections) {
                         $scope.sections = updatedSections;
 
                     });

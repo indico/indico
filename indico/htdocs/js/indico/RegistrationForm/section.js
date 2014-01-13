@@ -78,7 +78,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
                     fieldId: field.id
                 });
 
-                $scope.$apply(regFormFactory.Fields.remove(requestParams, function(updatedSection) {
+                $scope.$apply(regFormFactory.Fields.remove(requestParams, {}, function(updatedSection) {
                     $scope.section.items = updatedSection.items;
                 }));
             }
