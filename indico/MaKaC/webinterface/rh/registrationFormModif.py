@@ -339,10 +339,16 @@ class RegistrationFormModifRESTBase(RHRegistrationFormModifBase):
 
     def parseJsonItem(self, item):
         # Convert to boolean type
-        item['billable'] = item.get( 'billable', 'false' ) == 'true'
-        item['enabled'] = item.get( 'enabled', 'true' ) == 'true'
-        item['cancelled'] = item.get( 'cancelled', 'false' ) == 'true'
-        item['isEnabled'] = item.get( 'isEnabled', 'true' ) == 'true'
+        if item.get('billable') and not isinstance(item.get('billable'), bool):
+            item['billable'] = item.get('billable', 'false') == 'true'
+        if item.get('enabled') and not isinstance(item.get('enabled'), bool):
+            item['enabled'] = item.get('enabled', 'true') == 'true'
+        if item.get('cancelled') and not isinstance(item.get('cancelled'), bool):
+            item['cancelled'] = item.get('cancelled', 'false') == 'true'
+        if item.get('isEnabled') and not isinstance(item.get('isEnabled'), bool):
+            item['isEnabled'] = item.get('isEnabled', 'true') == 'true'
+        if item.get('isBillable') and not isinstance(item.get('isBillable'), bool):
+            item['isBillable'] = item.get('isBillable', 'false') == 'true'
         return item
 
     def _checkParams(self, params):

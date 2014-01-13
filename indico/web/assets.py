@@ -177,7 +177,7 @@ indico_regform = Bundle(
                'section.js',
                'field.js',
                'sectiontoolbar.js',
-               'tables.js'),
+               'table.js'),
     filters='rjsmin',
     output='js/indico_regform_%(version)s.min.js')
 

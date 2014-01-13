@@ -71,19 +71,9 @@
             </form>
         </div>
 
-        <div ng-if="field.input == 'radio'"
+        <div ng-if="settings.itemtable"
+            ng-include="getTpl('fields/dialogs/itemtable.tpl.html')"
             class="tab-pane"
-            ng-class="{active: isTabSelected('tab-editItems')}" id="div-editItems">
-            <div class="toolbar thin">
-                <div class="group">
-                    <a class="i-button" ng-click="addItem()">{{ 'Create new item' | i18n }}</a>
-                    <a class="i-button" ng-click="sortItems()">{{ 'Sort alphabetically' | i18n }}</a>
-                </div>
-            </div>
-            <nd-table
-                config="settings.editionTable"
-                form-data="formData.radioitems">
-            </nd-table>
-        </div>
+            ng-class="{active: isTabSelected('tab-editItems')}"></div>
     </div>
 </div>

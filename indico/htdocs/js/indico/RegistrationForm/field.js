@@ -90,6 +90,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         billable: false,
         date: false,
         defaultValue: false,
+        itemtable: false,
         number: false,
         placesLimit: false,
         rowsAndColumns: false,
@@ -299,6 +300,7 @@ ndRegForm.directive('ndRadioField', function(url) {
 
         link: function(scope) {
             scope.settings.defaultValue = true;
+            scope.settings.itemtable = true;
 
             scope.getValue = function(fieldName) {
                 if (scope.userdata[fieldName] !== '') {
@@ -500,7 +502,13 @@ ndRegForm.directive('ndFieldDialog', function(url) {
             };
 
             $scope.addItem = function() {
-                 $scope.formData.radioitems.push({id:'isNew'});
+                $scope.formData.radioitems.push({
+                    id:'isNew',
+                    placesLimit: 0,
+                    price: 0,
+                    isEnabled: true,
+                    isBillable: false
+                });
             };
 
             $scope.sortItems = function() {
