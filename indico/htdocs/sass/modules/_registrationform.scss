@@ -169,12 +169,33 @@
     @extend %regform-section;
     @include border-all();
     @include single-box-shadow();
-    margin-top: 0;
+    margin: 0 0 15px 0;
     padding: 10px;
 
     ul {
         margin: 0;
         padding-left: 14px;
+    }
+
+    .regform-done-header {
+        @include border-bottom();
+        background-color: $light-gray;
+        margin: -10px -10px 10px -10px;
+        padding: 10px 10px;
+
+        table {
+            .section-header-content {
+                width: 100%;
+            }
+
+            .section-toolbar {
+                width: 150px;
+            }
+        }
+
+        div[contenteditable] + div[contenteditable] {
+            margin-top: 3px;
+        }
     }
 
     .regform-done-title {
@@ -200,6 +221,40 @@
     .regform-done-data {
         padding-left: 5px;
         vertical-align: top;
+    }
+
+    .regform-done-table-title {
+        @include border-bottom(lighten($gray, $color-variation));
+        font-weight: bold;
+    }
+
+    .regform-done-table-item:nth-child(odd) {
+        background: $light-gray;
+    }
+
+    .regform-done-table-total {
+        @include border-top(lighten($gray, $color-variation));
+        font-weight: bold;
+        padding-top: 5px;
+    }
+
+    .regform-done-conditions {
+        margin-top: 5px;
+
+        input[type=checkbox] {
+            float: left;
+            margin-top: 5px;
+        }
+
+        div {
+            margin-left: 25px;
+        }
+    }
+
+    .regform-done-checkout {
+        font-size: 1.1em;
+        margin-top: 10px;
+        width: 100%
     }
 
     .not-selected {

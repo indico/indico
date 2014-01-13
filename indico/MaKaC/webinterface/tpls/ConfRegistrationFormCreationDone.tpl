@@ -12,12 +12,11 @@
             if (!document.epay.conditions.checked) {
                 new AlertPopup($T("Warning"), $T("Please, confirm that you have read the conditions.")).open();
             }else{
-                return true;
+                document.forms['epay'].submit();
             }
         }else {
-            return true;
+            document.forms['epay'].submit();
         }
-        return false;
     }
     -->
     </script>
@@ -52,8 +51,22 @@
         <tr>
         <td colspan="3">
             <div class="regform-done">
+                <div class="regform-done-header">
+                    <div class="regform-section-title">
+                        ${ _('Registration Summary') }
+                    </div>
+                </div>
                 <table width="100%" cellpadding="0" cellspacing="0">
                     ${ otherSections }
+                </table>
+            </div>
+            <div class="regform-done">
+                <div class="regform-done-header">
+                    <div class="regform-section-title">
+                        ${ _('Payment Summary') }
+                    </div>
+                </div>
+                <table width="100%" cellpadding="0" cellspacing="0">
                     ${ paymentInfo }
                 </table>
             </div>

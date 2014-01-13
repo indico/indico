@@ -766,7 +766,6 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                 if miscItem is not None:
                     fieldInput = miscItem.getGeneralField().getInput()
                     if miscItem.isBillable():
-                        #caption = miscItem.getValue()
                         value = miscItem.getValue()
                         price = string.atof(miscItem.getPrice())
                         quantity = miscItem.getQuantity()
@@ -775,11 +774,11 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                     value = ":%s" % value
                 if(quantity > 0):
                     html.append("""
-                            <tr>
-                               <td style="padding-left: 5px;">%s:%s%s</td>
-                               <td align="right" style="padding-right:10px;">%i</td>
-                               <td align="right" style="padding-right:10px" nowrap >%s</td>
-                               <td align="right"nowrap >%s&nbsp;&nbsp;%s</td>
+                            <tr class="regform-done-table-item">
+                               <td>%s: %s%s</td>
+                               <td align="right">%i</td>
+                               <td align="right" nowrap>%s</td>
+                               <td align="right">%s %s</td>
                             </tr>
                             """ % (gsf.getTitle(), caption, self._formatValue(fieldInput, value),
                                    quantity, price, price * quantity, currency))
@@ -795,11 +794,11 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
             total["value"] += price * quantity
             if quantity > 0:
                 html.append("""
-                        <tr>
-                           <td align="left" style="padding-left: 5px;">%s</td>
-                           <td align="right" style="padding-right:10px;">%i</td>
-                           <td align="right" style="padding-right:10px" nowrap >%s</td>
-                           <td align="right"nowrap >%s&nbsp;&nbsp;%s</td>
+                        <tr class="regform-done-table-item">
+                           <td align="left">%s</td>
+                           <td align="right">%i</td>
+                           <td align="right" nowrap>%s</td>
+                           <td align="right">%s %s</td>
                         </tr>
                         """ % (caption, quantity, price, price * quantity, currency))
         return "".join(html)
@@ -824,15 +823,21 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
         if modPay.isActivated() and self._registrant.doPay():
             total = {}
             total["value"] = 0
-            html.append(i18nformat(""" <tr><td colspan="2"><table width="100%" cellpadding="3">
+            html.append(i18nformat(""" <tr><td colspan="2">
+                        <table width="100%" cellpadding="3" cellspacing="0">
                             <tr>
-                                <td colspan="4" class="regform-done-title">_("Payment summary")</td>
-                            </tr>
-                            <tr>
-                                <td class="subGroupTitleRegForm" style="padding-left: 5px;">_("Item")</td>
-                                <td class="subGroupTitleRegForm" style="padding-right:10px;">_("Quantity")</td>
-                                <td nowrap class="subGroupTitleRegForm" style="padding-right:10px;">_("Unit Price")</td>
-                                <td align="right" class="subGroupTitleRegForm">_("Cost")</td>
+                                <td class="regform-done-table-title">
+                                    _("Item")
+                                </td>
+                                <td align="right" class="regform-done-table-title">
+                                    _("Quantity")
+                                </td>
+                                <td align="right" class="regform-done-table-title" nowrap>
+                                    _("Unit Price")
+                                </td>
+                                <td align="right" class="regform-done-table-title">
+                                    _("Cost")
+                                </td>
                             </tr>
                         """))
             for gsf in self._registrant.getMiscellaneousGroupList():
@@ -846,32 +851,40 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
 
             condChecking = ""
             if modPay.hasPaymentConditions():
-                condChecking = """<!--<tr><td>Please ensure that you have read the terms and conditions before continuing.</td></tr>
-                                <tr><td>I have read and agree to the terms and conditions and understand that by confirming this order I will be entering into a binding transaction.</td></tr>-->
+                condChecking = i18nformat("""
                                 <tr>
-                                    <td><input type="checkbox" name="conditions"/>I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction (<a href="#" onClick="window.open('%s','Conditions','width=400,height=200,resizable = yes,scrollbars = yes'); return false;">Terms and conditions</a>).</td>
-                                </tr>
-                                <tr>
-                                    <td><br></td>
-                                </tr>""" % str(urlHandlers.UHConfRegistrationFormConditions.getURL(self._conf))
+                                    <td>
+                                        <div class="regform-done-conditions">
+                                            <input type="checkbox" name="conditions"/>
+                                            <div>_("I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction") (<a href="#" onClick="window.open('%s','Conditions','width=400,height=200,resizable = yes,scrollbars = yes'); return false;">Terms and conditions</a>).</div>
+                                        </div>
+                                    </td>
+                                </tr>""" % str(urlHandlers.UHConfRegistrationFormConditions.getURL(self._conf)))
 
             html.append(i18nformat("""
-                            <tr>
-                               <td></td>
-                               <td></td>
-                               <td align="right" class="subGroupTitleRegForm" style="padding: 10px 10px 0 0;">_("TOTAL")</td>
-                               <td align="right" nowrap class="subGroupTitleRegForm" style="padding-top: 10px;">%s&nbsp;&nbsp;%s</td>
-                            </tr>
-                            <form name="epay" action="%s" method="POST">
-                            <tr>
-                              <table width="100%%">
-                                %s
                                 <tr>
-                                  <td align="right" nowrap><input type="submit" class="regFormButton" value="Next ->" onclick="return checkConditions()" ></td>
+                                    <td align="right" class="regform-done-table-total" colspan="3">
+                                        _("TOTAL")
+                                    </td>
+                                    <td align="right" class="regform-done-table-total">
+                                        %s %s
+                                    </td>
                                 </tr>
-                               </table>
-                            </tr>
-                            </form></tr>
+                                <form name="epay" action="%s" method="POST">
+                                <tr>
+                                  <table width="100%%">
+                                    %s
+                                    <tr>
+                                        <td align="right">
+                                            <div class="i-button highlight regform-done-checkout" onclick="checkConditions()">
+                                                _('Checkout')
+                                                <i class="icon-next"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                   </table>
+                                </tr>
+                                </form></tr>
                             </table></td></tr>
                             """) % (total["value"], regForm.getCurrency(), url, condChecking))
         return "".join(html)
