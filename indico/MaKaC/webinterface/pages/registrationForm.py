@@ -710,8 +710,6 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
         html = ["""<table>"""]
         for f in (f for f in gsf.getSortedFields() if not isinstance(f.getInput(), LabelInput)):
             miscItem = None
-            price = ""
-            currency = ""
             fieldInput = None
             if miscGroup is not None:
                 miscItem = miscGroup.getResponseItemById(f.getId())
@@ -719,23 +717,16 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                     continue
                 fieldInput = miscItem.getGeneralField().getInput()
             v = """<span class="not-selected">""" + _("No value selected") + """</span>"""
-            if f.isBillable():
-                price = f.getPrice()
-                currency = regForm.getCurrency()
             if miscItem is not None:
                 v = miscItem.getValue()
-                if miscItem.isBillable():
-                    price = miscItem.getPrice()
-                    currency = regForm.getCurrency()
             if v is None:
                 v = ""
             html.append("""
                     <tr>
                        <td class="regform-done-caption">%s</td>
                        <td class="regform-done-data">%s</td>
-                       <td align="right" class="regform-done-data">%s&nbsp;&nbsp;%s</td>
                     </tr>
-                    """ % (f.getCaption(), self._formatValue(fieldInput, v), price, currency))
+                    """ % (f.getCaption(), self._formatValue(fieldInput, v)))
         if miscGroup is not None:
             for miscItem in (f for f in miscGroup.getResponseItemList() if not isinstance(f.getGeneralField().getInput(), LabelInput)):
                 f = gsf.getFieldById(miscItem.getId())
