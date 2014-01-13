@@ -58,6 +58,7 @@
                     ${ otherSections }
                 </table>
             </div>
+            %if paymentInfo:
             <div id="payment-summary" class="regform-done">
                 <div class="regform-done-header">
                     <div class="regform-section-title">
@@ -68,6 +69,7 @@
                     ${ paymentInfo }
                 </table>
             </div>
+            %endif
         </td>
         </tr>
     </table>
