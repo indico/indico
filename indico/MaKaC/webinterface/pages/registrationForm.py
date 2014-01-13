@@ -767,9 +767,9 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                     html.append("""
                             <tr class="regform-done-table-item">
                                <td>%s: %s%s</td>
-                               <td align="right">%i</td>
+                               <td align="right" nowrap>%i</td>
                                <td align="right" nowrap>%s</td>
-                               <td align="right">%s %s</td>
+                               <td align="right" nowrap>%s <em>%s</em></td>
                             </tr>
                             """ % (gsf.getTitle(), caption, self._formatValue(fieldInput, value),
                                    quantity, price, price * quantity, currency))
@@ -787,9 +787,9 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                 html.append("""
                         <tr class="regform-done-table-item">
                            <td align="left">%s</td>
-                           <td align="right">%i</td>
+                           <td align="right" nowrap>%i</td>
                            <td align="right" nowrap>%s</td>
-                           <td align="right">%s %s</td>
+                           <td align="right" nowrap>%s <em>%s</em></td>
                         </tr>
                         """ % (caption, quantity, price, price * quantity, currency))
         return "".join(html)
@@ -857,8 +857,8 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                                     <td align="right" class="regform-done-table-total" colspan="3">
                                         _("TOTAL")
                                     </td>
-                                    <td align="right" class="regform-done-table-total">
-                                        %s %s
+                                    <td align="right" class="regform-done-table-total" nowrap>
+                                        %s <em>%s</em>
                                     </td>
                                 </tr>
                                 <form name="epay" action="%s" method="POST">

@@ -227,10 +227,24 @@
     .regform-done-table-title {
         @include border-bottom(lighten($gray, $color-variation));
         font-weight: bold;
+
+        &:not(:first-child) {
+            padding-left: 15px;
+        }
     }
 
-    .regform-done-table-item:nth-child(odd) {
-        background: $light-gray;
+    .regform-done-table-item {
+        td {
+            vertical-align: top;
+
+            &:not(:first-child) {
+                padding-left: 15px;
+            }
+        }
+
+        &:nth-child(odd) {
+            background: $light-gray;
+        }
     }
 
     .regform-done-table-total {
@@ -244,11 +258,11 @@
 
         input[type=checkbox] {
             float: left;
-            margin-left: 0px;
+            margin-left: 1px;
         }
 
         div {
-            margin-left: 20px;
+            margin-left: 21px;
         }
     }
 
