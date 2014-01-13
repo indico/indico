@@ -16,7 +16,7 @@
                         ng-model="input"
                         ng-class="{hasError: validationStarted && nestedForm.$invalid}">
                         <option value="">{{ '--Select a session--' | i18n }}</option>
-                        <option ng-repeat="item in section.items"
+                        <option ng-repeat="item in section.items | filter: {enabled: true}"
                             value="{{ item.id }}"
                             ng-selected="item.id == userdata.sessionList[0].id">
                             {{ item.caption }}
@@ -33,7 +33,7 @@
             <td>
                 <select id="session2" name="session2">
                     <option value="">{{ '--Select a session--' | i18n }}</option>
-                    <option ng-repeat="item in section.items | filter:{id: '!'+(input||' ')}"
+                    <option ng-repeat="item in section.items | filter: {enabled: true} | filter: {id: '!'+(input||' ')}"
                         value="{{ item.id }}"
                         ng-selected="item.id == userdata.sessionList[1].id">
                         {{ item.caption }}
