@@ -656,11 +656,11 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                         cancelled = i18nformat("""<span class="not-selected">(_("Cancelled"): %s)</span>""") % se.getCancelledReason().strip()
                 r.append(i18nformat("""
                             <tr>
-                              <td align="left">
-                                  <span class="regform-done-caption">%s</span>
-                                  <span class="regFormDonePlacesNeeded">%s _("place(s) needed")</span>
-                                  <span>%s</span>
-                            </td>
+                                <td align="left">
+                                    <span class="regform-done-caption">%s</span>
+                                    <span class="regFormDonePlacesNeeded">%s _("place(s) needed")</span>
+                                    <span>%s</span>
+                                </td>
                             </tr>
                          """) % (se.getCaption(), se.getNoPlaces(), cancelled))
             if r == []:
@@ -744,7 +744,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
         html.append("</table>")
         return "".join(html)
 
-    def _getMiscInfoItemsHTMLBilllable(self, gsf, total):
+    def _getMiscInfoItemsHTMLBillable(self, gsf, total):
         miscGroup = self._registrant.getMiscellaneousGroupById(gsf.getId())
         html = [""""""]
         if miscGroup is not None:
@@ -775,7 +775,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                                    quantity, price, price * quantity, currency))
         return "".join(html)
 
-    def _getFormItemsHTMLBilllable(self, bf, total):
+    def _getFormItemsHTMLBillable(self, bf, total):
         html = [""]
         for item in bf.getBilledItems():
             caption = item.getCaption()
@@ -832,9 +832,9 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                             </tr>
                         """))
             for gsf in self._registrant.getMiscellaneousGroupList():
-                html.append("""<tr>%s</tr>""" % (self._getMiscInfoItemsHTMLBilllable(gsf, total)))
+                html.append("""%s""" % (self._getMiscInfoItemsHTMLBillable(gsf, total)))
             for bf in self._registrant.getBilledForms():
-                html.append("""<tr>%s</tr>""" % (self._getFormItemsHTMLBilllable(bf, total)))
+                html.append("""%s""" % (self._getFormItemsHTMLBillable(bf, total)))
 
             url = urlHandlers.UHConfRegistrationFormconfirmBooking.getURL(self._registrant)
             url.addParam("registrantId", self._registrant.getId())
@@ -862,20 +862,20 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                                     </td>
                                 </tr>
                                 <form name="epay" action="%s" method="POST">
-                                <tr>
-                                  <table width="100%%">
-                                    %s
                                     <tr>
-                                        <td align="right">
-                                            <div class="i-button highlight regform-done-checkout" onclick="checkConditions()">
-                                                _('Checkout')
-                                                <i class="icon-next"></i>
-                                            </div>
-                                        </td>
+                                      <table width="100%%">
+                                        %s
+                                        <tr>
+                                            <td align="right">
+                                                <div class="i-button highlight regform-done-checkout" onclick="checkConditions()">
+                                                    _('Checkout')
+                                                    <i class="icon-next"></i>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                       </table>
                                     </tr>
-                                   </table>
-                                </tr>
-                                </form></tr>
+                                </form>
                             </table></td></tr>
                             """) % (total["value"], regForm.getCurrency(), url, condChecking))
         return "".join(html)
