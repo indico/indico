@@ -124,14 +124,20 @@
 
     &.highlight {
         color: #FDFDFD !important;
-        background: #0B63A5;
-        border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
+        background: $blue;
+        border-color: $dark-blue;
 
         &:hover:not(.disabled):not(:disabled) {
-            @include gradient(#0E75BA, #0B63A5);
+            @include gradient($blue, darken($blue, $color-variation));
             color: #F4F4F4 !important;
-            border-color: #999;
+            border-color: $dark-blue;
             box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
+        }
+
+        &:active:not(.disabled):not(:disabled) {
+            @include gradient(darken($blue, $color-variation), $blue);
+            border-color: $dark-blue;
+            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
         }
     }
 
