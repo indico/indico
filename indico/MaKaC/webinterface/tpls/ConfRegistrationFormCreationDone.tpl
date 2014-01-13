@@ -41,7 +41,7 @@
         </tr>
         <tr>
         <td colspan="3">
-            <div class="regform-done">
+            <div id="registration-summary" class="regform-done">
                 <div class="regform-done-header">
                     <div class="regform-section-title">
                         ${ _('Registration Summary') }
@@ -58,7 +58,7 @@
                     ${ otherSections }
                 </table>
             </div>
-            <div class="regform-done">
+            <div id="payment-summary" class="regform-done">
                 <div class="regform-done-header">
                     <div class="regform-section-title">
                         ${ _('Payment Summary') }

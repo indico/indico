@@ -920,7 +920,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                 authkey=self._registrant.getRandomId())
 
         if self._conf.getModPay().isActivated() and self._registrant.doPay():
-            wvars["epaymentAnnounce"] = """<br><span>Please proceed to the <b>payment of your order</b> (by using the "Next" button down this page). You will then receive the payment details.</span>"""
+            wvars["epaymentAnnounce"] = """<br><span>Please, checkout your <a href="#payment-summary">payment</a> in order to proceed.</span>"""
         return wvars
 
 
