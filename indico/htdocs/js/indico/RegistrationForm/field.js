@@ -111,7 +111,13 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             return $scope.isNew()? $T('Add') : $T('Update');
         },
         onOk: function(dialogScope) {
-            if(dialogScope.optionsForm.$invalid === true) {
+            if (dialogScope.optionsForm.$invalid === true) {
+                dialogScope.$apply(dialogScope.setSelectedTab('tab-options'));
+                return false;
+            }
+
+            if ($scope.settings.itemtable && !dialogScope.hasRadioItems()) {
+                dialogScope.$apply(dialogScope.setSelectedTab('tab-editItems'));
                 return false;
             }
 
@@ -521,6 +527,12 @@ ndRegForm.directive('ndFieldDialog', function(url) {
         link: function(scope) {
             scope.getTpl = function(file) {
                 return url.tpl(file);
+            };
+
+            scope.hasRadioItems = function () {
+                return _.any(scope.formData.radioitems, function(item) {
+                    return item.remove !== true;
+                });
             };
         }
     };

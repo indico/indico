@@ -4,7 +4,12 @@
         <a class="i-button" ng-click="sortItems()">{{ 'Sort alphabetically' | i18n }}</a>
     </div>
 </div>
+
 <nd-table
     config="settings.editionTable"
     form-data="formData.radioitems">
 </nd-table>
+
+<div ng-if="validationStarted && !hasRadioItems()" class="error-message-tag">
+    {{ 'Add at least one item' | i18n }}
+</div>
