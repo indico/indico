@@ -16,7 +16,8 @@
             <form novalidate id="optionsForm" name="optionsForm">
                 <div class="regFormEditLine">
                     <label class="regFormDialogCaption">
-                        {{ 'Caption' | i18n }}
+                        <span ng-if="settings.caption">{{ 'Caption' | i18n }}</span>
+                        <span ng-if="!settings.caption">{{ 'Text' | i18n }}</span>
                         <span class="regFormMandatoryField">*</span>
                     </label>
                     <input ng-model="formData.caption"

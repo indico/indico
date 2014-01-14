@@ -156,6 +156,7 @@
         float: right;
         line-height: 27px;
         padding: 0 5px;
+        white-space: nowrap;
     }
 
     .field-caption {
@@ -167,8 +168,18 @@
     .field-input {
         vertical-align: top;
         padding-top: 3px;
+
+        .field-input-only-content {
+            display: inline-block;
+            max-width: 570px;
+            padding-bottom: 3px;
+        }
     }
 }
+
+// ============================================================================
+// Post-registration page
+// ============================================================================
 
 .regform-done {
     @extend %regform-section;
@@ -356,9 +367,17 @@
         padding-left : 15px;
     }
 
+    .checkbox-info {
+        margin: 3px 0 0 21px;
+    }
+
     .label-price {
         margin-left: 2px;
         padding-left: 2px;
+    }
+
+    .label-text {
+        text-align: justify;
     }
 
     .file-link {
