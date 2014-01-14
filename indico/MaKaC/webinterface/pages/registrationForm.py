@@ -845,7 +845,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                 condChecking = i18nformat("""
                                 <tr>
                                     <td>
-                                        <div class="regform-done-conditions">
+                                        <div class="regform-done-conditions checkbox-with-text">
                                             <input type="checkbox" name="conditions"/>
                                             <div>_("I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction") (<a href="#" onClick="window.open('%s','Conditions','width=400,height=200,resizable = yes,scrollbars = yes'); return false;">Terms and conditions</a>).</div>
                                         </div>

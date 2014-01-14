@@ -139,6 +139,17 @@ span[contenteditable] {
     }
 }
 
+.checkbox-with-text {
+    input[type=checkbox] {
+        float: left;
+        margin-left: 1px;
+    }
+
+    div {
+        margin-left: 21px;
+    }
+}
+
 // Simple toogle switch
 
 $switchTransition: .15s ease-out;
