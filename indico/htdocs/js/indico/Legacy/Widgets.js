@@ -935,7 +935,7 @@ IndicoUI.Widgets = {
          * @param {Dictionary} elemInfo Additional parameters attached to the input element (optional).
          * @return {XElement} The text input field with the calendar attached.
          */
-        dateField: function(showTime, attributes, hiddenFields, elemInfo, format){
+        dateField: function(showTime, attributes, hiddenFields, elemInfo, format, callback){
             attributes = attributes || {};
             elemInfo = elemInfo || {};
             extend(elemInfo, attributes);
@@ -962,6 +962,10 @@ IndicoUI.Widgets = {
             tab.dom.onchange = function(){
                 if(typeof(elem.dom.onchange) === 'function') {
                     elem.dom.onchange();
+                }
+
+                if (callback !== undefined) {
+                    callback();
                 }
             };
             tab.processDate = elem.processDate;

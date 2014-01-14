@@ -169,14 +169,15 @@ ndDirectives.directive("contenteditable", function() {
     };
 });
 
-ndDirectives.directive('ndDatepicker', function() {
+ndDirectives.directive('ndDatepicker', function($compile) {
     return {
         restrict: 'E',
         scope: {
             showTime: '=',
             dateFormat: '@',
             hiddenInputs: '@',
-            required: '@'
+            required: '@',
+            validation: '='
         },
 
         link: function(scope, element) {
@@ -184,6 +185,11 @@ ndDirectives.directive('ndDatepicker', function() {
                 scope.$eval(scope.hiddenInputs) ||
                 ['day', 'month', 'year', 'hour', 'min'];
 
+            var updateModel = function() {
+                _.each(element.find('input'), function(e) {
+                    $(e).trigger('input');
+                });
+            };
 
             var getAttributes = function() {
                 var attributes = {};
@@ -192,16 +198,31 @@ ndDirectives.directive('ndDatepicker', function() {
                     attributes.required = "required";
                 }
 
+                attributes['ng-class'] = "{hasError: validation && nestedForm.$invalid}";
+
                 return attributes;
             };
 
+            var getInputHtml = function(inputId) {
+                var required = '';
+
+                if (inputId.match('Year') !== null) {
+                    required = 'ng-required="required"';
+                }
+
+                return '<input type="text" value="" name="{0}" id="{0}" ng-model="date[\'{0}\']" {1} style="display: none"/>'.format(inputId, required);
+            };
+
             scope.init = function() {
-                element.html(scope.getDatePicker().dom);
-                _.each(hiddenInputs, function(id) {
-                    element.append(
-                        '<input type="hidden" value="" name="{0}" id="{1}"/>'.format(id, id)
-                    );
+                var form = $('<ng-form name="nestedForm" ng-init="date={}"/>');
+                var datepicker = scope.getDatePicker().dom;
+
+                form.append(datepicker);
+                _.each(hiddenInputs, function(inputId) {
+                    form.append(getInputHtml(inputId));
                 });
+
+                element.html($compile(form)(scope));
             };
 
             scope.getDatePicker = function() {
@@ -210,7 +231,8 @@ ndDirectives.directive('ndDatepicker', function() {
                     getAttributes(),
                     hiddenInputs,
                     null,
-                    scope.dateFormat
+                    scope.dateFormat,
+                    updateModel
                 );
             };
 
