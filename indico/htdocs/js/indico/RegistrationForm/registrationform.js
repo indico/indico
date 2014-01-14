@@ -63,6 +63,13 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionurl, displ
     var sessionsurl = Indico.Urls.Base + '/event/:confId/manage/sessions';
 
     return {
+        checkError: function(data, callback) {
+            if(exists(data.error)) {
+                IndicoUtil.errorReport(data.error);
+            } else {
+                callback(data)
+            }
+        },
         Sections: $resource(sectionurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId"}, {
             "remove": {url: sectionurl, method: 'DELETE', isArray: true},
             "getAllSections": {method: 'GET', isArray: true},
@@ -150,7 +157,9 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         title: data.newsection.title,
                         description: data.newsection.description
                     }, function(newsection) {
-                        $scope.sections.push(newsection);
+                        regFormFactory.checkError(newsection, function(newsection)  {
+                            $scope.sections.push(newsection);
+                        });
                     });
 
                     return true;
@@ -161,7 +170,9 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         sectionId: section.id,
                         endPos: position
                     }, function(updatedSection) {
-                        section = updatedSection;
+                        regFormFactory.checkError(updatedSection, function(updatedSection)  {
+                            section = updatedSection;
+                        });
                     });
                 },
                 restoreSection: function(section) {
@@ -169,7 +180,9 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         confId: $rootScope.confId,
                         sectionId: section.id
                     }, function(updatedSection) {
-                        section.enabled = updatedSection.enabled;
+                        regFormFactory.checkError(updatedSection, function(updatedSection)  {
+                            section.enabled = updatedSection.enabled;
+                        });
                     });
                 },
                 removeSection: function(section) {
@@ -177,8 +190,9 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         confId: $rootScope.confId,
                         sectionId: section.id
                     }, {}, function(updatedSections) {
-                        $scope.sections = updatedSections;
-
+                        regFormFactory.checkError(updatedSections, function(updatedSections)  {
+                            $scope.sections = updatedSections;
+                        });
                     });
                 }
             };

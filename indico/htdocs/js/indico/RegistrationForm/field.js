@@ -28,13 +28,18 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
 
     $scope.fieldApi.disableField = function(field) {
         regFormFactory.Fields.disable(getRequestParams(field), function(updatedField) {
-            $scope.field.disabled = updatedField.disabled;
+            regFormFactory.checkError(updatedField, function(updatedField)  {
+                    $scope.field.disabled = updatedField.disabled;
+            });
+
         });
     };
 
     $scope.fieldApi.enableField = function(field) {
         regFormFactory.Fields.enable(getRequestParams(field), function(updatedField) {
-            $scope.field.disabled = updatedField.disabled;
+            regFormFactory.checkError(updatedField, function(updatedField)  {
+                $scope.field.disabled = updatedField.disabled;
+            });
         });
     };
 
@@ -51,7 +56,9 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         }
 
         regFormFactory.Fields.save(postData, function(response) {
-            $scope.field = angular.extend($scope.field, response);
+            regFormFactory.checkError(response, function(response)  {
+                $scope.field = angular.extend($scope.field, response);
+            });
         });
     };
 
