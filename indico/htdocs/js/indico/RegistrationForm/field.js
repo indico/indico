@@ -64,7 +64,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
 
     $scope.getName = function(input) {
         if (input == 'date') {
-            return '_genfield_' + $scope.section.id + '_' + $scope.field.id;
+            return '_genfield_' + $scope.section.id + '_' + $scope.field.id + '_';
         } else {
             return '*genfield*' + $scope.section.id + '-' + $scope.field.id;
         }
@@ -219,11 +219,11 @@ ndRegForm.directive('ndDateField', function(url) {
             scope.settings.formData.push(['values', 'displayFormats']);
             scope.settings.formData.push(['values', 'dateFormat']);
             scope.dateInputs = [
-                '{0}_Day'.format(scope.getName(scope.field.input)),
-                '{0}_Month'.format(scope.getName(scope.field.input)),
-                '{0}_Year'.format(scope.getName(scope.field.input)),
-                '{0}_Hour'.format(scope.getName(scope.field.input)),
-                '{0}_Min'.format(scope.getName(scope.field.input))
+                '{0}Day'.format(scope.getName(scope.field.input)),
+                '{0}Month'.format(scope.getName(scope.field.input)),
+                '{0}Year'.format(scope.getName(scope.field.input)),
+                '{0}Hour'.format(scope.getName(scope.field.input)),
+                '{0}Min'.format(scope.getName(scope.field.input))
             ];
 
             scope.showTime = function(str) {

@@ -175,17 +175,27 @@ ndDirectives.directive('ndDatepicker', function($compile) {
         replace: 'true',
         template: '<ng-form name="dateForm"></ng-form>',
         scope: {
-            showTime: '=',
             dateFormat: '@',
             hiddenInputs: '@',
             required: '@',
-            validation: '='
+            showTime: '=',
+            validation: '=',
+            value: '='
         },
 
         link: function(scope, element) {
             var hiddenInputs =
                 scope.$eval(scope.hiddenInputs) ||
                 ['day', 'month', 'year', 'hour', 'min'];
+
+            var mapMomentFormat = function(format) {
+                format = format.replace('%Y', 'YYYY');
+                format = format.replace('%m', 'MM');
+                format = format.replace('%d', 'DD');
+                format = format.replace('%H', 'HH');
+                format = format.replace('%M', 'mm');
+                return format;
+            };
 
             var updateModel = function() {
                 _.each(element.find('input'), function(e) {
@@ -204,7 +214,15 @@ ndDirectives.directive('ndDatepicker', function($compile) {
                 return attributes;
             };
 
-            var getDatePicker = function() {
+            var getDatetime = function() {
+                if (scope.value) {
+                    return moment('{0} {1}'.format(scope.value.date, scope.value.time), 'YYYY-MM-DD HH:mm:ss');
+                } else {
+                    return null;
+                }
+            };
+
+            var createDatePicker = function() {
                 return IndicoUI.Widgets.Generic.dateField(
                     scope.showTime,
                     getAttributes(),
@@ -217,30 +235,49 @@ ndDirectives.directive('ndDatepicker', function($compile) {
 
             var getInputHtml = function(inputId) {
                 var required = '';
+                var value = null;
 
                 if (inputId.match('Year') !== null) {
                     required = 'ng-required="required"';
                 }
 
-                return '<input type="text" value="" name="{0}" id="{0}" ng-model="{0}" {1} style="display: none"/>'.format(inputId, required);
+                if (scope.value) {
+                    if (inputId.match('Year') !== null) {
+                        value = getDatetime().year();
+                    } else if (inputId.match('Month') !== null) {
+                        value = getDatetime().month() + 1;
+                    } else if (inputId.match('Day') !== null) {
+                        value = getDatetime().date();
+                    } else if (inputId.match('Hour') !== null) {
+                        value = getDatetime().hour();
+                    } else if (inputId.match('Min') !== null) {
+                        value = getDatetime().minute();
+                    }
+                }
+
+                return '<input type="text" name="{0}" id="{0}" ng-model="{0}" ng-init="{0}={1}" {2} style="display: none"/>'.format(inputId, value, required);
             };
 
-            scope.init = function() {
-                var datepicker = getDatePicker().dom;
+            var init = function() {
+                var datepicker = createDatePicker();
 
-                element.html(datepicker);
+                element.html(datepicker.dom);
                 _.each(hiddenInputs, function(inputId) {
                     element.append(getInputHtml(inputId));
                 });
+
+                if (scope.value) {
+                    datepicker.set(getDatetime().format(mapMomentFormat(scope.dateFormat)));
+                }
 
                 $compile(element)(scope);
             };
 
             scope.$watch('dateFormat', function(newVal, oldVal) {
-                scope.init();
+                init();
             });
 
-            scope.init();
+            init();
         }
     };
 });

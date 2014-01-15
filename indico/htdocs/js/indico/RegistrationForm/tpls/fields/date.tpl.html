@@ -3,7 +3,8 @@
     hidden-inputs="{{ dateInputs }}"
     required="{{field.mandatory}}"
     show-time="showTime(field.values.dateFormat)"
-    validation="validationStarted">
+    validation="validationStarted"
+    value="userdata[getName(field.input)]">
 </nd-datepicker>
 
 <span class="inputDescription">
