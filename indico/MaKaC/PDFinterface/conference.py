@@ -1116,9 +1116,15 @@ class ContribsToPDF(PDFLaTeXBase):
 
         self._args.update({
             'title': conf.getTitle(),
+            'conf': conf,
             'contribs': contribs,
-            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields()
+            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields(),
+            'url': conf.getURL()
         })
+
+        logo = conf.getLogo()
+        if logo:
+            self._args['logo_img'] = logo.getFilePath()
 
 
 class ConfManagerContribsToPDF(ContribsToPDF):

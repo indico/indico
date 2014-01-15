@@ -8,7 +8,9 @@
     \usepackage{tocloft} %% table of contents
     \usepackage{titlesec}
     \usepackage{fancyhdr} %% headers
+    \usepackage[inline]{enumitem}
 
+    \setlength{\headheight}{60pt}
     \pagestyle{fancy}
     \renewcommand{\headrulewidth}{0pt}
 </%block>
@@ -18,12 +20,35 @@
     \setcounter{tocdepth}{0} %% remove table of contents numbering
 
     %% first page
+    \begin{center}
+        \huge \sffamily{${conf.getTitle() | latex_escape}}
+    \end{center}
+
+    \vspace{2em}
+
+    % if logo_img:
+        \begin{figure}[h!]
+            \includegraphics[max width=0.85\linewidth]{${logo_img}}
+            \centering
+        \end{figure}
+    % endif
+
+    \vspace{2em}
+
+    \begin{center}
+        \huge \sffamily \textbf{${_("Book of Contributions")}}
+    \end{center}
+
+    \cfoot{\tt ${url}}
+    \pagebreak
+    \cfoot{}
 
     %% TOC
     \begingroup
     \hypersetup{linkcolor=black}
-    \renewcommand{\contentsname}{\centerline{\fontsize{18}{20}\selectfont Table of contents}}
-    \renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+    \renewcommand{\cftchapfont}{}
+    \renewcommand{\contentsname}{${_("Table of contents")}}
+    \renewcommand{\cftchapleader}{\cftdotfill{}}
     \tableofcontents
     \endgroup
 
@@ -31,9 +56,9 @@
 
     % for contrib in contribs:
         \newpage
-        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${title}}{20} / Contributions Book}
-        \fancyhead[R]{\small \rmfamily \color{gray} \truncateellipses{${contrib.getTitle()}}{45}}
-        \addcontentsline{toc}{chapter}{${contrib.getTitle()}}
+        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${title | latex_escape}}{20} / Contributions Book}
+        \fancyhead[R]{\small \rmfamily \color{gray} \truncateellipses{${contrib.getTitle() | latex_escape}}{45}}
+        \addcontentsline{toc}{chapter}{${contrib.getTitle() | latex_escape}}
 
         <%include file="inc/contribution.tpl" args="contrib=contrib"/>
 

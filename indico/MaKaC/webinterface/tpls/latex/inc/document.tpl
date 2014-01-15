@@ -1,10 +1,10 @@
-
+\batchmode
 
 <%block name="document_class">
 \documentclass[a4paper, 11pt]{article} %% document type
 </%block>
 
-\usepackage[a4paper, top=4em, bottom=2em, left=5em, right=5em]{geometry}
+\usepackage[a4paper, top=1em, bottom=10em, left=5em, right=5em]{geometry}
 
 \usepackage{cmbright}
 \usepackage[T1]{fontenc}

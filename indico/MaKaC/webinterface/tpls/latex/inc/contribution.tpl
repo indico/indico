@@ -17,7 +17,7 @@
     \textbf {
         \LARGE
         \sffamily
-        ${escape(contrib.getTitle())}
+        ${contrib.getTitle()}
     }
 \end{center}
 
@@ -53,7 +53,7 @@
             \sectionfont{\normalsize\rmfamily}
             \subsectionfont{\small\rmfamily}
             \small
-            ${md_convert(str(contrib.getField(field.getId())).strip())[7:-7]}
+            ${md_convert(contrib.getField(field.getId()).decode('utf-8'))[7:-7].encode('utf-8')}
         }
         \vspace{1.5em}
     \end{addmargin}
@@ -66,20 +66,25 @@
 <%include file="person_list.tpl" args="caption=_('Co-author(s)'), list=contrib.getCoAuthorList()" />
 <%include file="person_list.tpl" args="caption=_('Presenter(s)'), list=contrib.getSpeakerList()" />
 
+% if contrib.getSession():
 {
     {
         \bf
         \noindent ${_("Session Classification")} :
     }
-    ${escape(contrib.getSession().getTitle()) or _("not yet classified")}
+    ${latex_escape(contrib.getSession().getTitle()) or _("not yet classified")}
 }
+
+% endif
 
 \vspace{1em}
 
+% if contrib.getTrack():
 {
     {
         \bf
         \noindent ${_("Track Classification")} :
     }
-    ${escape(contrib.getTrack().getTitle()) or _("not specified")}
+    ${latex_escape(contrib.getTrack().getTitle()) or _("not specified")}
 }
+% endif

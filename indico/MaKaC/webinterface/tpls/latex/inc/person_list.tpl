@@ -9,13 +9,18 @@
         }
         \vspace{0.5em}
 
+        \begin{itemize*}[label=,itemjoin={{;}}]
         % for person in list:
-            {
+            \item {
                 \small
                 \rmfamily
-                ${escape(person.getFullName())} (${escape(person.getAffiliation())})
+                ${latex_escape(person.getFullName())}
+                %if person.getAffiliation():
+                    (${latex_escape(person.getAffiliation())})
+                %endif
             }
         % endfor
+        \end{itemize*}
     }
 
     \vspace{1.5em}

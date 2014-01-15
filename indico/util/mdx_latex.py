@@ -274,32 +274,38 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
         """Convert all math sections in {text} whether latex, asciimathml or
         latexmathml formatted to latex.
 
-        This assumes you are using $ for inline math and $$ for blocks as your
-        mathematics delimiter (*not* the standard asciimathml or latexmathml
-        delimiter).
+        This assumes you are using $$ as your mathematics delimiter (*not* the
+        standard asciimathml or latexmathml delimiter).
         """
         def repl_1(matchobj):
             text = unescape_latex_entities(matchobj.group(1))
-            return '\\[%s\\]' % text
+            tmp = text.strip()
+            if tmp.startswith('\\[') or tmp.startswith('\\begin'):
+                return text
+            else:
+                return '\\[%s\\]\n' % text
 
         def repl_2(matchobj):
             text = unescape_latex_entities(matchobj.group(1))
-            return '\\(%s\\)' % text
+            return '$%s$' % text
 
-        # This $$x=3$$ is block math
-        pat = re.compile('\$\$([^\$]*)\$\$')
+        # $$ ..... $$
+        pat = re.compile('^\$\$([^\$]*)\$\$\s*$', re.MULTILINE)
         out = pat.sub(repl_1, instr)
-        # This $x=3$ is inline math
-        pat2 = re.compile('\$([^\$]*)\$')
-        out = pat2.sub(repl_2, out)
+        # Jones, $x=3$, is ...
+        pat3 = re.compile(r'\$([^\$]+)\$(?:\s|$)')
+        out = pat3.sub(repl_2, out)
+        # # $100 million
+        # pat2 = re.compile('([^\$])\$([^\$])')
+        # out = pat2.sub('\g<1>\\$\g<2>', out)
         # some extras due to asciimathml
         out = out.replace('\\lt', '<')
         out = out.replace(' * ', ' \\cdot ')
         out = out.replace('\\del', '\\partial')
         return out
 
-
 # ========================= TABLES =================================
+
 
 class TableTextPostProcessor(markdown.postprocessors.Postprocessor):
 

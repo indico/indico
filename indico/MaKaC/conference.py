@@ -7821,7 +7821,7 @@ class Contribution(CommonObjectBase, Locatable):
                 self.getFields()[fid] = AbstractFieldContent(f, v)
 
     def getField(self, field):
-        if self.getFields().has_key(field):
+        if field in self.getFields():
             value = self.getFields()[field]
             if type(value) is list:
                 return "".join(value)
