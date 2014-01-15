@@ -172,6 +172,8 @@ ndDirectives.directive("contenteditable", function() {
 ndDirectives.directive('ndDatepicker', function($compile) {
     return {
         restrict: 'E',
+        replace: 'true',
+        template: '<ng-form name="dateForm"></ng-form>',
         scope: {
             showTime: '=',
             dateFormat: '@',
@@ -194,13 +196,23 @@ ndDirectives.directive('ndDatepicker', function($compile) {
             var getAttributes = function() {
                 var attributes = {};
 
+                attributes['ng-class'] = "{hasError: validation && dateForm.$invalid}";
                 if (scope.required) {
                     attributes.required = "required";
                 }
 
-                attributes['ng-class'] = "{hasError: validation && nestedForm.$invalid}";
-
                 return attributes;
+            };
+
+            var getDatePicker = function() {
+                return IndicoUI.Widgets.Generic.dateField(
+                    scope.showTime,
+                    getAttributes(),
+                    hiddenInputs,
+                    null,
+                    scope.dateFormat,
+                    updateModel
+                );
             };
 
             var getInputHtml = function(inputId) {
@@ -210,30 +222,18 @@ ndDirectives.directive('ndDatepicker', function($compile) {
                     required = 'ng-required="required"';
                 }
 
-                return '<input type="text" value="" name="{0}" id="{0}" ng-model="date[\'{0}\']" {1} style="display: none"/>'.format(inputId, required);
+                return '<input type="text" value="" name="{0}" id="{0}" ng-model="{0}" {1} style="display: none"/>'.format(inputId, required);
             };
 
             scope.init = function() {
-                var form = $('<ng-form name="nestedForm" ng-init="date={}"/>');
-                var datepicker = scope.getDatePicker().dom;
+                var datepicker = getDatePicker().dom;
 
-                form.append(datepicker);
+                element.html(datepicker);
                 _.each(hiddenInputs, function(inputId) {
-                    form.append(getInputHtml(inputId));
+                    element.append(getInputHtml(inputId));
                 });
 
-                element.html($compile(form)(scope));
-            };
-
-            scope.getDatePicker = function() {
-                return IndicoUI.Widgets.Generic.dateField(
-                    scope.showTime,
-                    getAttributes(),
-                    hiddenInputs,
-                    null,
-                    scope.dateFormat,
-                    updateModel
-                );
+                $compile(element)(scope);
             };
 
             scope.$watch('dateFormat', function(newVal, oldVal) {
