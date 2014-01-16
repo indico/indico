@@ -396,10 +396,12 @@ def main():
                                                 exit_msg='Good luck',
                                                 user_ns=namespace)
 
-            ipshell()
+            with make_app().app_context():
+                ipshell()
         else:
             iconsole = code.InteractiveConsole(namespace)
-            iconsole.interact(SHELL_BANNER)
+            with make_app().app_context():
+                iconsole.interact(SHELL_BANNER)
 
         dbi.abort()
         dbi.endRequest()
