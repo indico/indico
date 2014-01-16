@@ -96,12 +96,16 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
     def __init__(self):
         Authenthicator.__init__(self)
 
+    def _transformLogin(self, login):
+        return login.lower()
+
     def canUserBeActivated(self):
         return True
 
     def createIdentity(self, li, avatar):
         Logger.get("auth.ldap").info("createIdentity %s (%s %s)" % (li.getLogin(), avatar.getId(), avatar.getEmail()))
-        if self.checkLoginPassword(li.getLogin(), li.getPassword()):
+        data = self.checkLoginPassword(li.getLogin(), li.getPassword())
+        if data:
             return LDAPIdentity(li.getLogin(), avatar)
         else:
             return None
@@ -127,6 +131,9 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         if not data:
             return None
 
+        # Use the correct case
+        li.setLogin(data[UID_FIELD])
+
         # Search if user already exist, using email address
         import MaKaC.user as user
         ah = user.AvatarHolder()
@@ -148,13 +155,12 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
                 raise MaKaCError("LDAP account does not contain the mandatory"
                                  "data to create an Indico account.")
         else:
-            # user founded
+            # user found
             Logger.get('auth.ldap').info("found user '%s'" % li.getLogin())
             av = userList[0]
         #now create the LDAP identity for the user
         na = LDAPAuthenticator()
-        id = na.createIdentity(li, av)
-        na.add(id)
+        na.add(na.createIdentity(li, av))
         return av
 
     def matchUser(self, criteria, exact=0):
@@ -204,7 +210,6 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             Logger.get('auth.ldap').info("Username: %s - empty password" % userName)
             return None
         try:
-            ret = {}
             ldapc = LDAPConnector()
             ldapc.openAsUser(userName, password)
             ret = ldapc.lookupUser(userName)
@@ -212,9 +217,9 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             Logger.get('auth.ldap').debug("Username: %s checked: %s" % (userName, ret))
             if not ret :
                 return None
-            #LDAP search is case-insensitive, we want case-sensitive match
-            if ret.get(UID_FIELD)!=userName :
-                Logger.get('auth.ldap').info('user %s invalid case %s' % (userName,ret.get(UID_FIELD)))
+            # I have no idea if this check is needed at all (probably it's not), but it cannot hurt!
+            if ret.get(UID_FIELD, '').lower() != userName.lower():
+                Logger.get('auth.ldap').info('user %s != %s' % (userName, ret.get(UID_FIELD)))
                 return None
             return ret
         except ldap.INVALID_CREDENTIALS:
@@ -271,6 +276,9 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
 
 class LDAPIdentity(PIdentity):
 
+    def getId(self):
+        return PIdentity.getId(self).lower()
+
     def __str__(self):
         return '<LDAPIdentity{login:%s, tag:%s}>' % \
                (self.getLogin(), self.getAuthenticatorTag())
@@ -284,7 +292,7 @@ class LDAPIdentity(PIdentity):
         log.info("authenticate(%s)" % id.getLogin())
         data = AuthenticatorMgr().getById(self.getAuthenticatorTag()).checkLoginPassword(id.getLogin(),
                                                                                                      id.getPassword())
-        if not data or self.getLogin() != id.getLogin():
+        if not data or self.getLogin().lower() != id.getLogin().lower():
             return None
         # modify Avatar with the up-to-date info from LDAP
         av = self.user

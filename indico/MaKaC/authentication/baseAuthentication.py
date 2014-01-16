@@ -52,6 +52,10 @@ class Authenthicator(ObjectHolder):
         tree[ id ] = newId
         return id
 
+    def _transformLogin(self, login):
+        """Override to convert login names e.g. to lowercase"""
+        return login
+
     def getAvatar(self, li):
         """ Returns an Avatar object, checking that the password is right.
 
@@ -59,11 +63,12 @@ class Authenthicator(ObjectHolder):
             :type li: MaKaC.user.LoginInfo
         """
 
-        if self.hasKey(li.getLogin()):
-            identity = self.getById(li.getLogin())
+        login = self._transformLogin(li.getLogin())
+        if self.hasKey(login):
+            identity = self.getById(login)
             avatar = identity.authenticate(li)
             if avatar:
-                self._postLogin(li.getLogin(), avatar)
+                self._postLogin(login, avatar)
                 return avatar
         return None
 
@@ -74,6 +79,7 @@ class Authenthicator(ObjectHolder):
             :param login: the person's login string
             :type login: str
         """
+        login = self._transformLogin(login)
         if self.hasKey(login):
             return self.getById(login).getUser()
         return None

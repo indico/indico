@@ -48,7 +48,7 @@ from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools
 from MaKaC.plugins.Collaboration import urlHandlers
 from MaKaC.webinterface import displayMgr
 from MaKaC.authentication.LocalAuthentication import LocalAuthenticator, LocalIdentity
-from MaKaC.authentication.LDAPAuthentication import LDAPIdentity
+from MaKaC.authentication.LDAPAuthentication import LDAPIdentity, LDAPAuthenticator
 from MaKaC.user import AvatarHolder
 from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.review import AbstractField
@@ -860,6 +860,26 @@ def removeNiceIdentities(dbi, withRBDB, prevVersion):
                 avatar.removeIdentity(identity)
         if i % 100 == 99:
             dbi.commit()
+    dbi.commit()
+
+
+@since('1.2')
+def lowercaseLDAPIdentities(dbi, withRBDB, prevVersion):
+    """Convert all LDAP identities to lowercase"""
+    auth = LDAPAuthenticator()
+    total = len(auth.getList())
+    idx = auth.getIdx()
+    for i, identity in enumerate(auth.getList()):
+        print '\r  Processing %d/%d' % (i + 1, total),
+        # getId() returns getLogin().lower()
+        if identity.getLogin() == identity.getId() or not idx.has_key(identity.getLogin()):
+            continue
+        del idx[identity.getLogin()]
+        assert not idx.has_key(identity.getId())
+        idx[identity.getId()] = identity
+        if i % 1000 == 999:
+            dbi.commit()
+    print
     dbi.commit()
 
 
