@@ -38,7 +38,7 @@
                 % endif
             % endif
         </td>
-        <td width="100%" data-field-id="${field.getId()}">
+        <td data-field-id="${field.getId()}">
             % if field.getType() == "textarea":
                 <div class="wmd-panel">
                     <div id="wmd-button-bar-${fid}"></div>

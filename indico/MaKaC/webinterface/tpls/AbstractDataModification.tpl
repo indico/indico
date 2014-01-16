@@ -7,29 +7,7 @@
 
 <%block name="content">
 
-<script type="text/html" id="markdown-info-text">
-    <p>${_("Markdown is a lightweight markup language that makes it easier to write rich text content. Here are some examples:")}</p>
-    <ul>
-        <li><span class="mono">*apples*</span> - <em>apples</em></li>
-        <li><span class="mono">**oranges**</span> - <strong>oranges</strong></li>
-        <li><span class="mono">[Google][http://www.google.com]</span> - <a href="http://www.google.com">Google</a></li>
-    </ul>
-    <p>${_("Check the icon bar for more options, or consult the {0}language reference{1}.").format('<a href="http://daringfireball.net/projects/markdown/syntax">', '</a>')}</p>
-</script>
-
-<script type="text/html" id="latex-info-text">
-    <p>${_("Several {0}LaTeX commands{1} are supported.").format('<a href="http://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">', '</a>')}</p>
-</script>
-
-<script type="text/html" id="wmd-help-button-text">
-    <p>You can use <a href="http://daringfireball.net/projects/markdown/syntax">Markdown</a> and <a href="http://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">LaTeX</a> in your abstracts.</p>
-    <p>Here are some nice examples:</p>
-    <ul>
-        <li><span class="mono">**oranges**</span> - <strong>oranges</strong></li>
-        <li><span class="mono">![A logo](http://is.gd/VBDpT0)</span> - <img src="http://indico.cern.ch/images/indico.ico" title="A logo"></li>
-    </ul>
-</script>
-
+<%include file="MarkdownMathJaxHelp.tpl"/>
 
 % if origin == "display":
 <form action=${ postURL } enctype="multipart/form-data" method="POST" width="100%" onsubmit="return onsubmitDisplayActions();">
@@ -42,7 +20,7 @@
         <input type="hidden" name="origin" value=${ origin }>
         <tr>
             <td>
-                <table width="100%" class="groupTable" align="center">
+                <table class="groupTable">
                     <tr>
                         <td class="groupTitle">${ _("Abstract")}</td>
                     </tr>
@@ -51,13 +29,13 @@
                     </tr>
                     <tr>
                         <td>
-                            <table align="center" width="100%" id="abstract-field-table">
+                            <table id="abstract-field-table" style="min-width: 800px;">
                                 <tr>
                                     <td align="right" valign="top" white-space="nowrap">
                                         <span class="dataCaptionFormat">${ _("Title")}</span>
-                                        <span class="mandatoryField">*</span>
+                                        <span class="mandatoryField title">*</span>
                                     </td>
-                                    <td width="100%">
+                                    <td>
                                         <input id="abstractTitle" type="text" name="title" value=${abstractTitle} style="width:100%">
                                     </td>
                                 </tr>

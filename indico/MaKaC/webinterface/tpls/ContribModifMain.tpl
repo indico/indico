@@ -21,7 +21,7 @@
                 </tr>
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Title")}</span></td>
-                    <td bgcolor="white" class="blacktext"><b>${ title }</b></td>
+                    <td bgcolor="white" class="blacktext title"><b>${ title }</b></td>
                     <form action="${ dataModificationURL }" method="POST">
                     <td rowspan="${ rowspan }" valign="bottom" align="right" width="1%">
                         <input type="submit" class="btn" value="${ _("modify")}">
@@ -29,7 +29,16 @@
                     </form>
                 </tr>
                 % if self_._rh._target.getConference().getAbstractMgr().isActive() and self_._rh._target.getConference().hasEnabledSection("cfa") and self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-                ${ additionalFields }
+                    % for f in additionalFields:
+                        <tr>
+                            <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">${f.getCaption() | escape}</span></td>
+                            <td bgcolor="white" valign="top">
+                                <div class="md-preview-wrapper display">
+                                    ${contrib.getField(f.getId()) | m}
+                                </div>
+                            </td>
+                        </tr>
+                    % endfor
                 % else:
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Description")}</span></td>
@@ -318,7 +327,6 @@ $('#sortspace').tablesorter({
     handle: '.authorMove', // relative to sortable element - the handle to start sorting
     placeholderHTML: '<li></li>' // the html to put inside the placeholder element
 });
-
 
 </script>
 

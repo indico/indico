@@ -2,7 +2,7 @@
     <div class="groupTitleNoBorder" style="font-style: italic; font-size: 12pt; margin: 0; padding: 0">
         ${type}
     </div>
-    <div class="groupTitleNoBorder" style="color: #B14300; margin: 0; padding: 0">
+    <div class="groupTitleNoBorder title" style="color: #B14300; margin: 0; padding: 0">
         ${title}
     </div>
     <div class="horizontalLine" style="margin-top: 5px"></div>
@@ -31,4 +31,8 @@
     % endif
 </div>
 
-
+<script type="text/javascript">
+    $(function() {
+        $('.md-preview-wrapper.display, .title').mathJax();
+    })
+</script>

@@ -4,10 +4,11 @@
     var DELIMITERS = [["$", "$"], ["$$","$$"]];
 
     window.PageDownMathJax = (function() {
-        var ready = false; // true after initial typeset is complete
-        var pending = false; // true when MathJax has been requested
-        var $preview = null; // the preview container
-        var inline = "$"; // the inline math delimiter
+        var ready = false, // true after initial typeset is complete
+            pending = false, // true when MathJax has been requested
+            $preview = null, // the preview container
+            inline = "$",
+            ready_listeners = []; // the inline math delimiter
 
         var blocks, start, end, last, braces; // used in searching for math
         var math; // stores math until markdone is done
@@ -29,6 +30,10 @@
                     EqnChunk: 10,
                     EqnChunkFactor: 1
                 }
+            });
+
+            _(ready_listeners).each(function(listener) {
+                listener();
             });
         });
 
@@ -184,7 +189,7 @@
             converterObject.hooks.chain("preConversion", removeMath);
             converterObject.hooks.chain("postConversion", replaceMath);
 
-            editorObject.hooks.chain("onPreviewRefresh", function() {
+            var preview = function() {
                 updateMJ(function() {
                     var new_height =  $preview.outerHeight(),
                         $wrapper = $preview.closest('.md-preview-wrapper'),
@@ -199,9 +204,13 @@
 
                     $preview.scrollTop(new_height);
                 });
-            });
+            };
+
+            editorObject.hooks.chain("onPreviewRefresh", preview);
 
             typeset($preview.get(0));
+
+            addListener(preview);
         }
 
         function createEditor(elem) {
@@ -234,20 +243,25 @@
             typeset(elem);
         }
 
+        function addListener(listener) {
+           ready_listeners.push(listener);
+        }
+
         return {
             createPreview: createPreview,
             mathJax: mathJax,
             restartMJ: restartMJ,
             updateMJ: updateMJ,
-            createEditor: createEditor
+            createEditor: createEditor,
+            addListener: addListener
         };
     });
 
-    $.fn.mathJax = function() {
-        var pd = PageDownMathJax(),
-            that = this;
+    var pd = PageDownMathJax();
 
-        $(that).each(function(i, elem) {
+    $.fn.mathJax = function() {
+
+        $(this).each(function(i, elem) {
             pd.mathJax(this);
         });
         return this;

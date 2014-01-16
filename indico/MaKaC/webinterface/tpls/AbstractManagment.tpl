@@ -1,4 +1,3 @@
-
 <table border="0" width="90%" cellspacing="0" cellpadding="0" align="center">
     % if abstractAccepted:
     <tr>
@@ -14,7 +13,7 @@
             <table width="100%">
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Abstract ID")}</span></td>
-                    <td bgcolor="white">${ abstractId }</td>
+                    <td bgcolor="white">${ abstract.getId() }</td>
                     <td align="right">
                         <table border="0" cellspacing="0" cellpadding="0">
                             <tr>
@@ -31,11 +30,20 @@
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Title")}</span></td>
                     <td bgcolor="white" width="100%">
-                        <b>${ title }</b>
+                        <b>${ abstract.getTitle() }</b>
                     </td>
                     <td>&nbsp;</td>
                 </tr>
-                ${ additionalFields }
+                % for f in additionalFields:
+                    <tr>
+                        <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">${f.getCaption() | escape}</span></td>
+                        <td bgcolor="white" valign="top">
+                            <div class="md-preview-wrapper display">
+                                ${abstract.getField(f.getId()) | m}
+                            </div>
+                        </td>
+                    </tr>
+                % endfor
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Primary authors")}</span></td>
                     <td bgcolor="white" valign="top">${ primary_authors }</td>
@@ -126,7 +134,7 @@
                     <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Submitted by")}</span></td>
                     <td>
                         <div id="submitterPlace">
-                            <a href="mailto:${ submitterEmail }?subject=[${ confTitle }] ${ _("Abstract") } ${ abstractId }: ${ title }">${ submitterFullName } (${ submitterAffiliation })</a>
+                            <a href="mailto:${ submitterEmail }?subject=[${ confTitle }] ${ _("Abstract") } ${ abstractId }: ${ abstract.getTitle }">${ submitterFullName } (${ submitterAffiliation })</a>
                         </div>
                     </td>
                     <td bgcolor="white" valign="bottom" align="right" colspan="2"><input type="button" value="${ _("change submitter")}" id="changeSubmitter" ${"disabled" if abstractAccepted else ""}></td>
@@ -252,7 +260,7 @@ var changeSubmitterHandler = function(user) {
             function(result,error) {
                 if (!error) {
                     // update the submitter
-                    var link = Html.a({href: 'mailto:'+result['email']+'?subject=['+'${escapeHTMLForJS(confTitle)}'+'] '+$T("Abstract ")+'${ abstractId }'+': '+'${escapeHTMLForJS(title)}'},
+                    var link = Html.a({href: 'mailto:'+result['email']+'?subject=['+'${escapeHTMLForJS(confTitle)}'+'] '+$T("Abstract ")+'${ abstractId }'+': '+'${escapeHTMLForJS(abstract.getTitle())}'},
                                       result['name']+' ('+result['affiliation']+')');
                     $E('submitterPlace').set(link);
                 } else {

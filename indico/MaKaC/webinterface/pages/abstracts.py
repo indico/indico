@@ -473,6 +473,10 @@ class WPAbstractModify(WPAbstractDisplayBase):
         return WPAbstractDisplayBase.getJSFiles(self) + \
             self._includeJSPackage('Management')
 
+    def getCSSFiles(self):
+        return WPAbstractDisplayBase.getCSSFiles(self) + \
+            self._asset_env['contributions_sass'].urls()
+
     def _getBody(self, params):
         params["postURL"] = urlHandlers.UHAbstractModify.getURL(self._abstract)
         wc = WAbstractDataModification(self._abstract.getConference())
@@ -567,6 +571,19 @@ class WPAbstractManagementBase( WPConferenceModifBase ):
 
     def _getTabContent( self, params ):
         return "nothing"
+
+    def _getHeadContent(self):
+        return WPConferenceModifBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                       for url in self._asset_env['mathjax_js'].urls()])
+
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + \
+            self._asset_env['abstracts_js'].urls()
+
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + \
+            self._asset_env['contributions_sass'].urls()
 
 
 class WAbstractManagment(wcomponents.WTemplated):
@@ -726,25 +743,12 @@ class WAbstractManagment(wcomponents.WTemplated):
                     <td bgcolor="white" valign="top" colspan="3">%s</td>
                 </tr>""") % "".join(l)
 
-    def _getAdditionalFieldsHTML(self):
-        html = ""
-        afm = self._abstract.getConference().getAbstractMgr().getAbstractFieldsMgr()
-        for f in afm.getActiveFields():
-            id = f.getId()
-            caption = f.getCaption()
-            value = str(self._abstract.getField(id))
-            html += """
-                    <tr>
-                        <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">%s</span></td>
-                        <td bgcolor="white" valign="top"><table class="tablepre"><tr><td><pre><div style="white-space: nowrap;">%s</div></pre></td></tr></table></td>
-                    </tr>
-                """ % (self.htmlText(caption), render_markdown(self.htmlText(value)))
-        return html
-
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        vars["title"] = self.htmlText(self._abstract.getTitle())
-        vars["additionalFields"] = self._getAdditionalFieldsHTML()
+        vars["abstract"] = self._abstract
+
+        afm = self._abstract.getConference().getAbstractMgr().getAbstractFieldsMgr()
+        vars["additionalFields"] = afm.getActiveFields()
         vars["organisation"] = self.htmlText(self._abstract.getSubmitter().getAffiliation())
         vars["status"] = self._getStatusHTML()
         vars["statusName"] = AbstractStatusList.getInstance().getCaption(self._abstract.getCurrentStatus().__class__).upper()
@@ -805,7 +809,6 @@ class WAbstractManagment(wcomponents.WTemplated):
         vars["abstractListURL"] = quoteattr(str(urlHandlers.UHConfAbstractManagment.getURL(self._conf)))
         vars["viewTrackDetailsURL"] = quoteattr(str(urlHandlers.UHAbstractTrackProposalManagment.getURL(self._abstract)))
         vars["comments"] = self._abstract.getComments()
-        vars["abstractId"] = self._abstract.getId()
         vars["contribution"] = self._getContributionHTML()
         vars["abstractPDF"] = urlHandlers.UHAbstractConfManagerDisplayPDF.getURL(self._abstract)
         vars["printIconURL"] = Config.getInstance().getSystemIconURL("pdf")

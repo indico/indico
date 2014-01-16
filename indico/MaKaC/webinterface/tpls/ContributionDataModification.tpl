@@ -1,3 +1,6 @@
+<%include file="MarkdownMathJaxHelp.tpl"/>
+
+
 <form id="ContributionDataModificationForm" method="POST" action="${ postURL }">
     <table width="60%" align="center" border="0" style="border-left: 1px solid #777777" id="abstract-field-table">
         <tr>
@@ -110,11 +113,5 @@ function block_handler(text, rbg) {
         return "<blockquote>" + rbg(inner) + "</blockquote>\n";
     });
 }
-
-$(function() {
-    $('textarea.wmd-input').each(function(i, elem) {
-         PageDownMathJax().createEditor(elem);
-    });
-});
 
 </script>

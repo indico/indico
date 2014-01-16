@@ -321,8 +321,7 @@ class WPContributionModifBase(WPConferenceModifBase):
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + \
-            self._asset_env['abstracts_js'].urls() + \
-            self._asset_env['mathjax_js'].urls()
+            self._asset_env['abstracts_js'].urls()
 
 
 class WPContribModifMain(WPContributionModifBase):
@@ -482,21 +481,6 @@ class WContribModifMain(wcomponents.WTemplated):
             """) % (d, resp, comment)
         return html
 
-    def _getAdditionalFieldsHTML(self):
-        html = ""
-        if self._contrib.getConference().getAbstractMgr().isActive() and self._contrib.getConference().hasEnabledSection("cfa") and self._contrib.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-            for f in self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr().getFields():
-                if f.isActive():
-                    id = f.getId()
-                    caption = f.getCaption()
-                    value = str(self._contrib.getField(id))
-                    html += """
-                    <tr>
-                        <td class="dataCaptionTD"><span class="dataCaptionFormat">%s</span></td>
-                        <td bgcolor="white" class="blacktext"><table class="tablepre"><tr><td><pre><div style="white-space: nowrap;">%s</div></pre></td></tr></table></td>
-                    </tr>""" % (caption, render_markdown(self.htmlText(value)))
-        return html
-
     def _getParticipantsList(self, participantList):
         result = []
         for part in participantList:
@@ -523,7 +507,10 @@ class WContribModifMain(wcomponents.WTemplated):
             vars["description"] = self._contrib.getDescription()
         else:
             vars["description"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._contrib.getDescription()
-        vars["additionalFields"] = self._getAdditionalFieldsHTML()
+
+        afm = self._contrib.getConference().getAbstractMgr().getAbstractFieldsMgr()
+        vars["additionalFields"] = afm.getActiveFields()
+
         vars["rowspan"] = "6"
         vars["place"] = ""
         if self._contrib.getLocation():

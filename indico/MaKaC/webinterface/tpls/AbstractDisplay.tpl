@@ -145,8 +145,4 @@
     });
 % endif
 
-$(function() {
-    $('.section .content').mathJax();
-})
-
 </script>
