@@ -22,6 +22,7 @@ fabfile for Indico development operations
 """
 
 import os
+import re
 import sys
 import glob
 import shutil
@@ -178,6 +179,8 @@ def _cp_tree(dfrom, dto, exclude=[]):
     if dto[0] != '/':
         dto = os.path.join(env.lcwd, dto)
 
+    print "{0} -> {1}".format(dfrom, dto)
+
     shutil.copytree(dfrom, dto, ignore=shutil.ignore_patterns(*exclude))
 
 
@@ -287,12 +290,25 @@ def install_mathjax():
     """
     Install MathJax from Git
     """
+
+    dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'mathjax/')
+    mathjax_js = os.path.join(dest_dir, 'MathJax.js')
+
     with lcd(os.path.join(env.ext_dir, 'mathjax')):
-        dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'mathjax/')
         local('rm -rf {0}'.format(os.path.join(dest_dir)))
         _cp_tree('unpacked/', dest_dir, exclude=["AM*", "MML*", "Accessible*", "Safe*"])
         _cp_tree('images/', os.path.join(dest_dir, 'images'))
         _cp_tree('fonts/', os.path.join(dest_dir, 'fonts'), exclude=["png"])
+
+    with open(mathjax_js, 'r') as f:
+        data = f.read()
+        # Uncomment 'isPacked = true' line
+        data = re.sub(r'//\s*(MathJax\.isPacked\s*=\s*true\s*;)', r'\1', data, re.MULTILINE)
+
+    with open(mathjax_js, 'w') as f:
+        f.write(data)
+
+    print data[:10000]
 
 
 @recipe('PageDown')
