@@ -29,7 +29,9 @@
                 </span>
 
                 <span ng-if="isBillable(item)" class="regFormPrice">{{ item.price }}</span>
-                <span ng-if="isBillable(item)" class="regFormCurrency">{{ currency }}</span>
+                <span ng-if="isBillable(item)">
+                    <nd-currency currency="currency"></nd-currency>
+                </span>
 
                 <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item)">
                     <font ng-switch-when="false" color="red" style="margin-left:25px;">

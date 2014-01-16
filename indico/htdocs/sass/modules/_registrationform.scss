@@ -123,6 +123,10 @@
     font-weight: bold;
 }
 
+.no-currency-selected {
+    color: $gray;
+}
+
 .regform-section-description {
     @extend %font-family-description;
     color: $dark-gray;

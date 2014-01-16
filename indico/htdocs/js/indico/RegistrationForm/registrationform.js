@@ -214,12 +214,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
         link: function(scope, element) {
             scope.validationStarted = false;
 
-            // Set default currency
-            if(scope.confCurrency === 'not selected') {
-                scope.currency = '$';
-            } else {
-                scope.currency = scope.confCurrency;
-            }
+            scope.currency = scope.confCurrency;
 
             // User data retrieval
             if (scope.editMode) {
@@ -281,5 +276,13 @@ ndRegForm.directive('ndErrorDialog', function(url) {
     return {
         require: 'ndDialog',
         templateUrl: url.tpl('dialogs/errors.tpl.html')
+    };
+});
+
+ndRegForm.directive('ndCurrency', function(url) {
+    return {
+        restrict: 'E',
+        replace: true,
+        templateUrl:  url.tpl('currency.tpl.html'),
     };
 });

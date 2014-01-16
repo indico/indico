@@ -37,7 +37,9 @@
         </td>
         <td ng-if="hasPlacesLeft(item) && isBillable(item)" align="right">
             <span class="regFormPrice">{{ item.price }}</span>
-            <span ng-show="item.billable" class="regFormCurrency">{{ currency }}</span>
+            <span ng-show="item.billable">
+                <nd-currency currency="currency"></nd-currency>
+            </span>
             <span ng-show="item.isPricePerPlace">{{ "per place" | i18n }}</span>
         </td>
     </tr>

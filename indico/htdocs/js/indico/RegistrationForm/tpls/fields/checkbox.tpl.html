@@ -12,7 +12,9 @@
     </ng-form>
 
     <span ng-if="isBillable(field)" class="regFormPrice">{{ field.price }}</span>
-    <span ng-if="isBillable(field)" class="regFormCurrency">{{ currency }}</span>
+    <span ng-if="isBillable(field)">
+        <nd-currency currency="currency"></nd-currency>
+    </span>
 
     <span ng-if="hasPlacesLimit(field)" ng-switch="hasPlacesLeft(field)">
         <span ng-switch-when="true" class="placesLeft">

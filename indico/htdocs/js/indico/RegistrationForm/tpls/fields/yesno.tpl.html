@@ -34,5 +34,7 @@
     </ng-form>
 
     <span ng-if="field.billable" class="regFormPrice">{{ field.price }}</span>
-    <span ng-if="field.billable" class="regFormCurrency">{{ currency }}</span>
+    <span ng-if="field.billable">
+        <nd-currency currency="currency"></nd-currency>
+    </span>
 </div>

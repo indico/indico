@@ -65,7 +65,9 @@
                         ng-checked="isSelected(item.id)"/>
                     {{ item.caption }}
                     <span ng-show="item.billable" class="regFormPrice">{{ item.price }}</span>
-                    <span ng-show="item.billable" class="regFormCurrency">{{ currency }}</span>
+                    <span ng-show="item.billable">
+                        <nd-currency currency="currency"></nd-currency>
+                    </span>
                 </div>
             <td>
         </tr>
