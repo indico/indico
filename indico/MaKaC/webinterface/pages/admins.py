@@ -41,6 +41,7 @@ from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.common.pendingQueues import PendingSubmitterReminder, PendingManagerReminder, PendingCoordinatorReminder
 from MaKaC.authentication import AuthenticatorMgr
+from MaKaC.authentication.LDAPAuthentication import LDAPGroup
 from MaKaC import roomMapping
 from MaKaC import domain
 import MaKaC.common.indexes as indexes
@@ -1805,7 +1806,7 @@ class WGroupModification(wcomponents.WTemplated):
         else:
             self.__setGroupVars( self._group, vars )
             vars["locator"] = self._group.getLocator().getWebForm()
-            if isinstance(self._group, user.LDAPGroup):
+            if isinstance(self._group, LDAPGroup):
                 vars["allowModif"] = False
         return vars
 

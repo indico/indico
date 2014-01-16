@@ -22,6 +22,7 @@ import MaKaC.webinterface.pages.admins as adminPages
 import MaKaC.user as user
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.errors as errors
+from MaKaC.authentication.LDAPAuthentication import LDAPGroup
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.i18n import _
@@ -115,7 +116,7 @@ class RHGroupPerformModification( RHGroupBase ):
         self._grpData = params
 
     def _process( self ):
-        if not isinstance(self._group, user.LDAPGroup):
+        if not isinstance(self._group, LDAPGroup):
             _GroupUtils.setGroupValues( self._group, self._grpData )
         else:
             self._group.setObsolete(self._grpData.has_key('obsolete'))
