@@ -25,7 +25,6 @@ from flask import request, session, url_for
 from MaKaC.common.url import URL, EndpointURL
 from indico.core.config import Config
 import MaKaC.user as user
-from MaKaC.user import AvatarHolder
 from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
@@ -91,7 +90,12 @@ class URLHandler(object):
                 params - (dict) parameters to be added to the URL.
         """
 
-        secure = _force_secure if _force_secure is not None else request.is_secure
+        try:
+            secure = _force_secure if _force_secure is not None else request.is_secure
+        except RuntimeError:
+            # Outside Flask request context
+            secure = False
+
         if not Config.getInstance().getBaseSecureURL():
             secure = False
 

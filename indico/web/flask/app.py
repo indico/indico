@@ -24,6 +24,7 @@ import re
 from flask import send_from_directory, request
 from flask import current_app as app
 from werkzeug.exceptions import NotFound
+from werkzeug.urls import url_parse
 
 from indico.core.config import Config
 from MaKaC.common.logger import Logger
@@ -66,7 +67,7 @@ def fix_root_path(app):
     app.root_path = os.path.normpath(os.path.join(__file__, *up_segments))
 
 
-def configure_app(app):
+def configure_app(app, set_path=False):
     cfg = Config.getInstance()
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
@@ -74,6 +75,11 @@ def configure_app(app):
     app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
     app.config['INDICO_HTDOCS'] = cfg.getHtdocsDir()
     app.config['INDICO_COMPAT_ROUTES'] = cfg.getRouteOldUrls()
+    if set_path:
+        base = url_parse(cfg.getBaseURL())
+        app.config['SERVER_NAME'] = base.netloc
+        if base.path:
+            app.config['APPLICATION_ROOT'] = base.path
     static_file_method = cfg.getStaticFileMethod()
     if static_file_method:
         app.config['USE_X_SENDFILE'] = True
@@ -140,14 +146,16 @@ def handle_exception(exception):
     return WErrorWSGI(msg).getHTML(), 500
 
 
-def make_app():
+def make_app(set_path=False):
     # If you are reading this code and wonder how to access the app:
     # >>> from flask import current_app as app
     # This only works while inside an application context but you really shouldn't have any
     # reason to access it outside this method without being inside an application context.
+    # When set_path is enabled, SERVER_NAME and APPLICATION_ROOT are set according to BaseURL
+    # so URLs can be generated without an app context, e.g. in the indico shell
     app = IndicoFlask('indico', static_folder=None)
     fix_root_path(app)
-    configure_app(app)
+    configure_app(app, set_path)
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)
