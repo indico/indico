@@ -332,10 +332,13 @@ class LDAPConnector(object):
         conf = Configuration.Config.getInstance()
         ldapConfig = conf.getAuthenticatorConfigById("LDAP")
         self.ldapUri = ldapConfig.get('uri')
-        self.ldapPeopleFilter, self.ldapPeopleDN = \
-                               ldapConfig.get('peopleDNQuery')
-        self.ldapGroupsFilter, self.ldapGroupsDN = \
-                               ldapConfig.get('groupDNQuery')
+        self.ldapPeopleFilter, self.ldapPeopleDN = ldapConfig.get('peopleDNQuery')
+        self.groupsEnabled = ldapConfig.get('groupDNQuery') is not None
+        if self.groupsEnabled:
+            self.ldapGroupsFilter, self.ldapGroupsDN = ldapConfig.get('groupDNQuery')
+        else:
+            self.ldapGroupsFilter = None
+            self.ldapGroupsDN = None
         self.ldapAccessCredentials = ldapConfig.get('accessCredentials')
         self.ldapUseTLS = ldapConfig.get('useTLS')
         self.groupStyle = ldapConfig.get('groupStyle')
@@ -469,6 +472,8 @@ class LDAPConnector(object):
         Returns an array of groups matching the group name, each group
         is represented by a map with keys cn and description
         """
+        if not self.groupsEnabled:
+            return []
         if exact == 0:
             star = '*'
         else:
@@ -488,6 +493,8 @@ class LDAPConnector(object):
         Returns an array of groups matching the group name, each group
         is represented by a map with keys cn and description
         """
+        if not self.groupsEnabled:
+            return []
         if len(letter) == 1:
             gfilter = self.ldapGroupsFilter.format(letter + "*")
         else:
@@ -500,6 +507,8 @@ class LDAPConnector(object):
         Returns whether a user is in a group. Depends on groupStyle (SLAPD/ActiveDirectory)
         """
         Logger.get('auth.ldap').debug('userInGroup(%s,%s)' % (login, group))
+        if not self.groupsEnabled:
+            return False
         # In ActiveDirectory users have attribute 'tokenGroups' with list of groups Sids
         # In SLAPD groups have multivalues attribute 'member' with list of users
         if self.groupStyle == 'ActiveDirectory':
