@@ -4,19 +4,22 @@
   <table class="noticeMain" align="center">
     <tr>
       <td class="td">
-
-        <br><br>
-        <table class="noticeInside" align="center">
-          <tr>
-            <td>${ msg }<br>
+        % if canManageRegistration:
+            <div class="error-message-box">
+                <div class="message-text text-left">
+                    ${_("No currency is selected. Please click in 'e-payment' tab and select the currency you want to use.")}
+                </div>
+            </div>
+        % endif
+        <div class="info-message-box">
+            <div class="message-text text-left">
+                ${ msg }<br>
               <ul>
                 <li><b> ${ _("Registration start date")}:</b> ${ startDate }</li>
                 <li><b> ${ _("Registration end date")}:</b> ${ endDate }</li>
               </ul>
-            </td>
-          </tr>
-        </table>
-
+            </div>
+        </div>
       </td>
     </tr>
   </table>

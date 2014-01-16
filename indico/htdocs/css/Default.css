@@ -1525,12 +1525,6 @@ table.noticeMain td.td{
 table.noticeMain td.title{
     text-align:center;
 }
-table.noticeInside {
-    border:2px solid #777777;
-}
-table.noticeInside td{
-    padding:10px;
-}
 
 /* Results */
 fieldset.evalationResultsFieldset{

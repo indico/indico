@@ -106,7 +106,9 @@ class RHRegistrationFormDisplay( RHRegistrationFormDisplayBase ):
         else:
             if self._conf.getRegistrationForm().isFull():
                 p = registrationForm.WPRegistrationFormFull(self, self._conf)
-            elif not self._conf.getRegistrationForm().inRegistrationPeriod():
+                return registrationForm.WPRegistrationFormFull(self, self._conf)
+            elif not self._conf.getRegistrationForm().inRegistrationPeriod() or \
+                    self._conf.getRegistrationForm().getCurrency() == "not selected":
                 p = registrationForm.WPRegistrationFormClosed(self, self._conf)
             else:
                 p = registrationForm.WPRegistrationFormDisplay(self, self._conf)
