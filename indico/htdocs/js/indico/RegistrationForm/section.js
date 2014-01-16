@@ -227,21 +227,6 @@ ndRegForm.directive("ndAccommodationSection", function($rootScope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
 
-            scope.updateArrival = function(arrival) {
-                scope.arrival = arrival;
-                scope.arrivalUpdated = true;
-            };
-
-            scope.possibleDeparture = function(departure) {
-                if (scope.arrival !== undefined) {
-                    var arrival = moment(scope.arrival, 'DD/MM/YYY');
-                    departure = moment(departure[0], 'DD/MM/YYY');
-                    return arrival.isBefore(departure);
-                }
-
-                return true;
-            };
-
             scope.dialogs.config.arrivalDates = {
                 sDate: moment($rootScope.confSdate).format('DD/MM/YYYY'),
                 eDate: moment($rootScope.confEdate).format('DD/MM/YYYY')
@@ -660,5 +645,24 @@ ndRegForm.directive('ndSectionDialog', function(url) {
                 return url.tpl('sections/dialogs/{0}-{1}.tpl.html'.format(section_id, tab_type));
             };
         }
+    };
+});
+
+ndRegForm.filter('possibleDeparture', function () {
+    return function (departure, scope) {
+        if (scope.input.arrival !== undefined) {
+            var arrival = moment(scope.input.arrival, 'DD/MM/YYY');
+            var possibleDepartures = {};
+            _.each(scope.section.departureDates, function(value, key) {
+                var departure = moment(key, 'DD/MM/YYY');
+                if(arrival.isBefore(departure)) {
+                    possibleDepartures[key] = value;
+                }
+            });
+            return possibleDepartures;
+        } else {
+            return scope.section.departureDates;
+        }
+
     };
 });

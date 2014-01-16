@@ -10,7 +10,6 @@
                     ng-init="input.arrival = userdata.accommodation.arrivalDate">
                     <select id="arrivalDate" name="arrivalDate" required
                         ng-model="input.arrival"
-                        ng-change="updateArrival(input.arrival); input.departure = ''"
                         ng-class="{hasError: validationStarted && nestedFormArrival.$invalid}"
                         ng-options="s_date as l_date for (s_date, l_date) in section.arrivalDates">
                         <option value="" selected>--{{ 'select a date' | i18n }}--</option>
@@ -29,7 +28,7 @@
                     <select id="departureDate" name="departureDate" required
                         ng-model="input.departure"
                         ng-class="{hasError: validationStarted && nestedFormDeparture.$invalid}"
-                        ng-options="s_date as l_date for (s_date, l_date) in section.departureDates | filter:possibleDeparture">
+                        ng-options="s_date as l_date for (s_date, l_date) in section.departureDates | possibleDeparture:this">
                         <option value="" selected>--{{ 'select a date' | i18n }}--</option>
                     </select>
                 </ng-form>
