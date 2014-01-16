@@ -569,7 +569,7 @@ class Config:
         # THIS IS THE PLACE TO ADD NEW SHORTHAND OPTIONS, DONT CREATE A FUNCTION IF THE VALUE NEVER CHANGES,
         # Configuration.py will become fat again if you don't follow this advice.
         self._configVars.update({
-            'TPLVars'                   : {"MaKaCHomeURL": "%sindex.py" % self.getBaseURL()},
+            'TPLVars'                   : {"MaKaCHomeURL": self.getBaseURL()},
             'FileTypes'                 : FILE_TYPES,
             'HelpDir'                   : os.path.join(self.getHtdocsDir(), 'ihelp'),
             'WorkerName'                : socket.getfqdn(),

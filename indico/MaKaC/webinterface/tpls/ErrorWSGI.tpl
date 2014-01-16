@@ -62,7 +62,7 @@
     <body>
         <div class="wrapper">
             <div class="pageHeader" align="center">
-                <a href="${ Config.getInstance().getBaseURL() }/index.py">
+                <a href="${ Config.getInstance().getBaseURL() }/">
                     <img alt="logo" class="headerLogo" src="${ Config.getInstance().getSystemIconURL("logoIndico") }" />
                 </a>
             </div>
@@ -77,7 +77,7 @@
                             ${ _("Click the following link to go to the main page:") }
                         </div>
                         <div id="errorBoxLink">
-                            <a href="${ Config.getInstance().getBaseURL() }/index.py">${ _("Indico main page") }</a>
+                            <a href="${ Config.getInstance().getBaseURL() }/">${ _("Indico main page") }</a>
                         </div>
                     </div>
                 </div>
