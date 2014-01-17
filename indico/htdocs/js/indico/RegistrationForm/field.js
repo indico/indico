@@ -423,15 +423,6 @@ ndRegForm.directive('ndTextField', function(url) {
         link: function(scope) {
             scope.settings.size = true;
             scope.settings.formData.push(['values', 'length']);
-
-            scope.getType = function() {
-                // TODO There is no other way to distinguish the email field from the
-                //      information coming from the server
-                if (scope.field.id == 10) {
-                    return 'email';
-                }
-                return 'text';
-            };
         }
     };
 });
