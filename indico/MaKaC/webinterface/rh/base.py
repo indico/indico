@@ -547,7 +547,7 @@ class RH(RequestHandlerBase):
 
     def _process_success(self):
         Logger.get('requestHandler').info('Request {} successful'.format(request))
-        #request succesfull, now, doing tas that must be done only once
+        # request is succesfull, now, doing tasks that must be done only once
         try:
             GenericMailer.flushQueue(True) # send emails
             self._deleteTempFiles()
@@ -648,10 +648,7 @@ class RH(RequestHandlerBase):
         if self._responseUtil.call:
             return self._responseUtil.make_call()
 
-        if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
-            self._responseUtil.content_type = 'application/json'
-
-        # In case of no process needed, we should return empty string to avoid erroneous ouput
+        # In case of no process needed, we should return empty string to avoid erroneous output
         # specially with getVars breaking the JS files.
         if not self._doProcess or res is None:
             return self._responseUtil.make_empty()
