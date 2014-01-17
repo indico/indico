@@ -4,17 +4,31 @@
             name="{{ getName(field.input) }}"
             ng-model="input"
             ng-required="field.mandatory"
-            ng-class="{hasError: validationStarted && nestedForm.$invalid}">
+            ng-class="{hasError: validationStarted && nestedForm.$invalid}"
+            ng-init="selectedItem = getSelectedItem(input) || {}"
+            ng-change="selectedItem = getSelectedItem(input) || {}">
             <option value="">-- {{ 'Choose a value' | i18n }} --</option>
             <option ng-repeat="item in field.values.radioitems | filter: {isEnabled: true}"
                 value="{{ item.id }}"
+                ng-disabled="!hasPlacesLeft(item)"
                 ng-selected="item.caption == getValue(getName(field.input))">
                 {{ item.caption }}
+                {{ getBillableStr(item) }}
+                </span>
             </option>
         </select>
+        <span>
+            <span ng-if="isBillable(selectedItem)" class="regFormPrice">
+                {{ selectedItem.price }}
+            </span>
+            <span ng-if="isBillable(selectedItem)" class="regFormCurrency">
+                {{ currency }}
+            </span>
+        </span>
     </ng-form>
 
-    <ng-form name="nestedForm" ng-switch-default ng-init="input = {input: field.values.defaultItem}">
+    <ng-form name="nestedForm" ng-switch-default
+        ng-init="input={input: field.values.defaultItem}">
         <ul>
             <li ng-repeat="item in field.values.radioitems">
                 <input type="radio"

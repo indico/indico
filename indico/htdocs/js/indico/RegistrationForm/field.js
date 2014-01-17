@@ -133,7 +133,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 });
 
-ndRegForm.controller('BillableCtrl', function($scope) {
+ndRegForm.controller('BillableCtrl', function($scope, $filter) {
     $scope.isBillable = function(item) {
         return (item.billable === true || item.isBillable === true) && !$scope.isDisabled(item);
     };
@@ -157,6 +157,24 @@ ndRegForm.controller('BillableCtrl', function($scope) {
 
     $scope.hasPlacesLimit = function(item) {
         return item.placesLimit !== 0;
+    };
+
+    $scope.getBillableStr = function(item) {
+        var str = '';
+
+        if ($scope.isBillable(item)) {
+            str += ' {0} {1}'.format(item.price, $scope.currency);
+        }
+
+        if ($scope.hasPlacesLimit(item)) {
+            if ($scope.hasPlacesLeft(item)) {
+                str += ' [{0} {1}]'.format(item.noPlacesLeft, $filter('i18n')('place(s) left'));
+            } else {
+                str += ' [{0}]'.format($filter('i18n')('no places left'));
+            }
+        }
+
+        return str;
     };
 });
 
@@ -317,6 +335,12 @@ ndRegForm.directive('ndRadioField', function(url) {
                 } else {
                     return scope.field.values.defaultItem;
                 }
+            };
+
+            scope.getSelectedItem = function(itemId) {
+                return _.find(scope.field.values.radioitems, function(item) {
+                    return item.id == itemId;
+                });
             };
 
             scope.settings.formData.push(['values', 'defaultItem']);
