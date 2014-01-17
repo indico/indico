@@ -1890,6 +1890,7 @@ class YesNoInput(FieldInputType, Fossilizable):
                 </tr>""") % (self._parent.getPlacesLimit())
         return html
 
+
 class FileInput(FieldInputType, Fossilizable):
 
     fossilizes(IRegFormFileInputFieldFossil)
@@ -1920,8 +1921,8 @@ class FileInput(FieldInputType, Fossilizable):
         item.setMandatory(self.getParent().isMandatory())
         item.setHTMLName(self.getHTMLName())
         # There was no file saved on DB
-        if item.getValue () == None:
-            if not newValueEmpty: # user submits a new file
+        if item.getValue() is None:
+            if not newValueEmpty:  # user submits a new file
                 f = registrant.saveFile(v)
                 item.setValue(f)
         # There was already a file on DB
