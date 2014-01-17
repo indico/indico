@@ -610,8 +610,7 @@ class RH(RequestHandlerBase):
             self._process_success()
         except Exception as e:
             transaction.abort()
-            method_name = self._getMethodNameByExceptionName(e)
-            res = getattr(self, '_process{}'.format(method_name))(e)
+            res = self._getMethodByExceptionName(e)(e)
         finally:
             # notify components that the request has finished
             self._notify('requestFinished')
@@ -659,7 +658,7 @@ class RH(RequestHandlerBase):
 
         return self._responseUtil.make_response(res)
 
-    def _getMethodNameByExceptionName(self, e):
+    def _getMethodByExceptionName(self, e):
         d = dict([
             ('NotFound', 'NotFoundError'),
             ('MaKaCError', 'GeneralError'),
@@ -668,9 +667,7 @@ class RH(RequestHandlerBase):
             ('Exception', 'UnexpectedError')
         ])
         exception_name = d.get(e.__class__.__name__, e.__class__.__name__)
-        if not hasattr(self, '_process{}'.format(exception_name)):
-            exception_name = 'UnexpectedError'
-        return exception_name
+        return getattr(self, '_process{}'.format(exception_name), getattr(self, '_processUnexpectedError'))
 
     def _deleteTempFiles(self):
         if len(self._tempFilesToDelete) > 0:
