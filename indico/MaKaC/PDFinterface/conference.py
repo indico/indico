@@ -875,7 +875,7 @@ class ContributionBook(PDFLaTeXBase):
 
         if sortedBy == "boardNo":
             try:
-                self._contribList = sorted(self._contribList, key=lambda x: int(x.getBoardNumber()))
+                contribs = sorted(contribs, key=lambda x: int(x.getBoardNumber()))
             except ValueError, e:
                 raise MaKaCError(
                     _("In order to generate this PDF, all the contributions must contain a board number "
