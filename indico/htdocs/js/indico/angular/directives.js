@@ -238,7 +238,7 @@ ndDirectives.directive('ndDatepicker', function($compile) {
                 var value = null;
 
                 if (inputId.match('Year') !== null) {
-                    required = 'ng-required="required"';
+                    required = 'ng-required="{{required}}"';
                 }
 
                 if (scope.value) {
