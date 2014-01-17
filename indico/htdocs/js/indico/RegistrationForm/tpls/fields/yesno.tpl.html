@@ -1,5 +1,5 @@
 <div ng-controller="BillableCtrl">
-    <ng-form name="nestedForm">
+    <ng-form name="nestedForm" ng-init="input = userdata[getName(field.input)]">
         <select
             id="{{ getName(field.input) }}"
             name="{{ getName(field.input) }}"
@@ -7,7 +7,6 @@
             ng-required="field.mandatory"
             ng-disabled="!hasPlacesLeft(field)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
-
             <option value="">-- {{ 'Choose a value' | i18n }} --</option>
             <option ng-if="hasPlacesLimit(field)" value="yes"
                 ng-selected="userdata[getName(field.input)] === 'yes'">

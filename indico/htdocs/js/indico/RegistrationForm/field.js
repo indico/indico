@@ -329,8 +329,14 @@ ndRegForm.directive('ndRadioField', function(url) {
             scope.settings.defaultValue = true;
             scope.settings.itemtable = true;
 
+            scope.getId = function(fieldValue) {
+                return _.find(scope.field.values.radioitems, function(item) {
+                    return item.caption == fieldValue;
+                }).id;
+            };
+
             scope.getValue = function(fieldName) {
-                if (scope.userdata[fieldName] !== '') {
+                if (scope.userdata[fieldName] !== undefined) {
                     return scope.userdata[fieldName];
                 } else {
                     return scope.field.values.defaultItem;

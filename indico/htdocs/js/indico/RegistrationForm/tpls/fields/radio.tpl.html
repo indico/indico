@@ -1,5 +1,6 @@
 <div ng-switch="field.values.inputType" ng-controller="BillableCtrl">
-    <ng-form name="nestedForm" ng-switch-when="dropdown">
+    <ng-form name="nestedForm" ng-switch-when="dropdown"
+        ng-init="input = getId(userdata[getName(field.input)])">
         <select
             name="{{ getName(field.input) }}"
             ng-model="input"
