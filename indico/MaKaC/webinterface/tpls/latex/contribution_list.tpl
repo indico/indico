@@ -19,28 +19,7 @@
     \setcounter{tocdepth}{0} %% remove table of contents numbering
 
     %% first page
-    \begin{center}
-        \huge \sffamily{${conf.getTitle() | latex_escape}}
-    \end{center}
-
-    \vspace{2em}
-
-    % if logo_img:
-        \begin{figure}[h!]
-            \includegraphics[max width=0.85\linewidth]{${logo_img}}
-            \centering
-        \end{figure}
-    % endif
-
-    \vspace{2em}
-
-    \begin{center}
-        \huge \sffamily \textbf{${_("Book of Contributions")}}
-    \end{center}
-
-    \cfoot{\tt ${url}}
-    \pagebreak
-    \cfoot{}
+    <%include file="inc/first_page.tpl" args="conf=conf,title=_('Book of Contributions')"/>
 
     %% TOC
     \begingroup

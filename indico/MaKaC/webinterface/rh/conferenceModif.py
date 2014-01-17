@@ -1975,23 +1975,9 @@ class RHAbstractsToPDF(RHConfModifCFABase):
         tz = self._conf.getTimezone()
         if not self._abstractIds:
             return _("No abstract to print")
+
         pdf = ConfManagerAbstractsToPDF(self._conf, self._abstractIds, tz=tz)
-
-        filename = 'Abstracts.pdf'
-
-        latex_template = 'LatexRHAbstractsToPDF.tpl'
-
-        kwargs = {'first_page': pdf.firstPageLatex(),
-                'title': self._target.getTitle(),
-                'page_no': i18nformat(""" _("Page") """),
-                'body': pdf.getBodyLatex()
-                }
-
-        latex = LatexRunner(filename, True)
-        pdffile = latex.run(latex_template, **kwargs)
-        latex.cleanup()
-
-        return send_file(filename, pdffile, 'PDF')
+        return send_file('Abstracts.pdf', pdf.generate(), 'PDF')
 
 
 class RHAbstractsToXML(RHConfModifCFABase):
@@ -3104,22 +3090,8 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
             tz = self._target.getTimezone()
             filename = "{0} - Book of abstracts.pdf".format(self._target.getTitle())
 
-            pdf = ContributionBook(self._target, self._contribs, self.getAW(),tz=tz)
-
-            latex_template = 'LatexRHContribsToPDFMenu_bookOfAbstract.tpl'
-
-            kwargs = {'title_one': self._target.getTitle(),
-                    'first_page': pdf.firstPageLatex(),
-                    'title_two': self._target.getTitle(),
-                    'page_no': i18nformat(""" _("Page") """),
-                    'body': pdf.getBodyLatex()
-                    }
-
-            latex = LatexRunner(filename)
-            pdffile = latex.run(latex_template, **kwargs)
-            latex.cleanup()
-
-            return send_file(filename, pdffile, 'PDF')
+            pdf = ContributionBook(self._target, self._contribs, self.getAW(), tz=tz)
+            return send_file(filename, pdf.generate(), 'PDF')
 
         elif self._displayType == "bookOfAbstractBoardNo":
             tz = self._target.getTimezone()

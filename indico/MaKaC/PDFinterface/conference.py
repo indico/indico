@@ -863,223 +863,37 @@ class TrackManagerAbstractsToPDF(AbstractsToPDF):
             self._story.append(PageBreak())
 
 
-class ContributionBook(PDFBase):
+class ContributionBook(PDFLaTeXBase):
 
-    def __init__(self,conf,contribList,aw,tz=None, sortedBy=""):
-        self._conf=conf
+    _tpl_filename = "contribution_list_boa.tpl"
+
+    def __init__(self, conf, contribs, aw, tz=None, sortedBy=""):
+        super(ContributionBook, self).__init__()
+
         if not tz:
-            self._tz = self._conf.getTimezone()
-        else:
-            self._tz = tz
-        self._contribList = contribList
-        self._aw=aw
-        PDFBase.__init__(self)
-        self._title=_("Book of abstracts")
-        self._sortedBy = sortedBy
-        if self._sortedBy == "boardNo":
+            tz = conf.getTimezone()
+
+        if sortedBy == "boardNo":
             try:
-                self._contribList = sorted(self._contribList, key=lambda x:int(x.getBoardNumber()))
-            except ValueError,e:
-                raise MaKaCError(_("In order to generate this PDF, all the contributions must contain a board number and it must only contain digits. There is a least one contribution with a wrong board number."))
-        self._doc.leftMargin=1*cm
-        self._doc.rightMargin=1*cm
-        self._doc.topMargin=1.5*cm
-        self._doc.bottomMargin=1*cm
+                self._contribList = sorted(self._contribList, key=lambda x: int(x.getBoardNumber()))
+            except ValueError, e:
+                raise MaKaCError(
+                    _("In order to generate this PDF, all the contributions must contain a board number "
+                      "and it must only contain digits. There is a least one contribution with a wrong board number."))
 
-    def firstPage(self,c,doc):
-        c.saveState()
-        self._drawLogo(c, False)
-        height=self._drawWrappedString(c, self._conf.getTitle())
-        c.setFont('Times-Bold',15)
-        height-=2*cm
-        c.drawCentredString(self._PAGE_WIDTH/2.0,height,
-                "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"),
-                self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")))
-        if self._conf.getLocation():
-            height-=1*cm
-            c.drawCentredString(self._PAGE_WIDTH/2.0,height,
-                    escape(self._conf.getLocation().getName()))
-        c.setFont('Times-Bold', 30)
-        height-=6*cm
-        c.drawCentredString(self._PAGE_WIDTH/2.0,height,\
-                self._title)
-        self._drawWrappedString(c, "%s / %s"%(self._conf.getTitle(),self._title), width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
-        c.drawRightString(self._PAGE_WIDTH-inch,0.75*inch,
-                nowutc().strftime("%A %d %B %Y"))
-        c.restoreState()
+        self._args.update({
+            'contribs': contribs,
+            'conf': conf,
+            'tz': tz or conf.getTimezone(),
+            'show_url': False,
+            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields(),
+            'sorted_by': sortedBy,
+            'aw': aw
+        })
 
-
-    def firstPageLatex(self):
-        contrib_first = "\n\\topskip0pt\n\n\\vspace*{\\fill}\n\n"
-        contrib_first += "\\centerline{\\rmfamily\\fontsize{30}{40}\\selectfont\n"
-        contrib_first += "{\\bf %s}" % escape(self._conf.getTitle())
-        contrib_first += "}\n\\vspace{15 mm}\n"
-        contrib_first += "\\centerline{\\rmfamily\\Large\\selectfont\n"
-        contrib_first += "{\\bf %s - %s}\n" % \
-                (self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"),
-                self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y"))
-        contrib_first += "}\n\\vspace{5 mm}\n\n"
-        if self._conf.getLocation():
-            contrib_first += "\\centerline{\\rmfamily\\Large\\selectfont\n"
-            contrib_first += "{\\bf %s}" % escape(self._conf.getLocation().getName())
-            contrib_first += "}\n\\vspace{50 mm}\n\n"
-        else:
-            contrib_first += "}\n\\vspace{50 mm}\n\n"
-        contrib_first += "\\centerline{\\rmfamily\\fontsize{30}{40}\\selectfont\n"
-        contrib_first += "{\\bf %s}" % self._title
-        contrib_first += "}\n\n\\vspace*{\\fill}\n"
-
-        return contrib_first
-
-
-    def laterPages(self,c,doc):
-        c.saveState()
-        c.setFont('Times-Roman',9)
-        c.setFillColorRGB(0.5,0.5,0.5)
-        c.drawString(1*cm,self._PAGE_HEIGHT-1*cm,
-            "%s / %s"%(escape(self._conf.getTitle()),self._title))
-        c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,"Page %d "%doc.page)
-        c.restoreState()
-
-    def _defineStyles(self):
-        self._styles={}
-        titleStyle=getSampleStyleSheet()["Heading1"]
-        titleStyle.fontSize=13.0
-        titleStyle.spaceBefore=0
-        titleStyle.spaceAfter=4
-        titleStyle.leading=14
-        self._styles["title"]=titleStyle
-        spkStyle=getSampleStyleSheet()["Heading2"]
-        spkStyle.fontSize=10.0
-        spkStyle.spaceBefore=0
-        spkStyle.spaceAfter=0
-        spkStyle.leading=14
-        self._styles["speakers"]=spkStyle
-        abstractStyle=getSampleStyleSheet()["Normal"]
-        abstractStyle.fontSize=10.0
-        abstractStyle.spaceBefore=0
-        abstractStyle.spaceAfter=0
-        abstractStyle.alignment=TA_LEFT
-        self._styles["abstract"]=abstractStyle
-        ttInfoStyle=getSampleStyleSheet()["Normal"]
-        ttInfoStyle.fontSize=10.0
-        ttInfoStyle.spaceBefore=0
-        ttInfoStyle.spaceAfter=0
-        self._styles["tt_info"]=ttInfoStyle
-        normalStyle=getSampleStyleSheet()["Normal"]
-        normalStyle.fontSize=10.0
-        normalStyle.spaceBefore=5
-        normalStyle.spaceAfter=5
-        normalStyle.alignment=TA_LEFT
-        self._styles["normal"]=normalStyle
-
-
-    def getBody(self,story=None):
-        self._defineStyles()
-        if not story:
-            story=self._story
-        story.append(PageBreak())
-        if self._conf.getBOAConfig().getText() != "":
-            text=self._conf.getBOAConfig().getText().replace("<BR>","<br>")
-            text=text.replace("<Br>","<br>")
-            text=text.replace("<bR>","<br>")
-            for par in text.split("<br>"):
-                p=Paragraph(par,self._styles["normal"])
-                story.append(p)
-            story.append(PageBreak())
-        for contrib in self._contribList:
-            if not contrib.canAccess(self._aw):
-                continue
-            if self._sortedBy == "boardNo":
-                caption="%s"%(contrib.getTitle())
-            else:
-                caption="%s - %s"%(contrib.getId(),contrib.getTitle())
-            p1=Paragraph(escape(caption),self._styles["title"])
-            lspk=[]
-            for spk in contrib.getSpeakerList():
-                fullName=spk.getFullName()
-                instit=spk.getAffiliation().strip()
-                if instit!="":
-                    fullName="%s (%s)"%(fullName, instit)
-                lspk.append("%s"%escape(fullName))
-            speakers= i18nformat("""<b>_("Presenter"): %s</b>""")%"; ".join(lspk)
-            p2=Paragraph(speakers,self._styles["speakers"])
-            abstract = contrib.getDescription()
-            p3=Paragraph(escape(abstract),self._styles["abstract"])
-            ses=""
-            if contrib.getSession() is not None:
-                ses=contrib.getSession().getTitle()
-            if contrib.getBoardNumber():
-                if ses != "":
-                    ses = "%s - "%ses
-                ses="%sBoard: %s"%(ses, contrib.getBoardNumber())
-            if contrib.isScheduled():
-                if ses != "":
-                    ses = "%s - "%ses
-                text="%s%s"%(ses,contrib.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y %H:%M"))
-            else:
-                text = ses
-            p4=Paragraph(escape(text),self._styles["tt_info"])
-            abs=KeepTogether([p1,p4,p2,p3])
-            story.append(abs)
-            story.append(Spacer(1,0.4*inch))
-
-
-    def getBodyLatex(self):
-        story = "\\newpage"
-        if self._conf.getBOAConfig().getText() != "":
-            text=self._conf.getBOAConfig().getText().replace("<BR>","<br>")
-            text=text.replace("<Br>","<br>")
-            text=text.replace("<bR>","<br>")
-            for par in text.split("<br>"):
-                story += "\n\\vspace{5 mm}\n\n"
-                story += "\\begingroup\n\\small\\sffamily\\selectfont\n"
-                story += par
-                story += "\n\\endgroup\n\n"
-                story += "\n\\vspace{5 mm}"
-            story += "\n\\newpage"
-        for contrib in self._contribList:
-            if not contrib.canAccess(self._aw):
-                continue
-            if self._sortedBy == "boardNo":
-                caption = "%s" % (contrib.getTitle())
-            else:
-                caption = "%s - %s" % (contrib.getId(),contrib.getTitle())
-
-            story += "\n\n{\\bf {\\sffamily\\Large\\selectfont %s :}}\n\n" % caption
-
-            lspk=[]
-            for spk in contrib.getSpeakerList():
-                fullName=spk.getFullName()
-                instit=spk.getAffiliation().strip()
-                if instit!="":
-                    fullName="%s (%s)" % (fullName, instit)
-                lspk.append("%s" % escape(fullName))
-            speakers = i18nformat("""\n{\\bf {\\sffamily\\normalsize\\selectfont _("Presenter"): %s }}\n""")%"; ".join(lspk)
-            story += speakers
-            abstract = contrib.getDescription()
-            story += "\n\n\\vspace{5 mm}\n\n"
-            story += "\n\\begingroup\n\\small\\sffamily\\selectfont\n"
-            story += "\n\n" + self._args['md_convert'](abstract)[7:-7] + "\n\n"
-            story += "\n\\endgroup\n\n"
-            story += "\n\\vspace{5 mm}\n\n"
-            ses=""
-            if contrib.getSession() is not None:
-                ses=contrib.getSession().getTitle()
-            if contrib.getBoardNumber():
-                if ses != "":
-                    ses = "%s - " % ses
-                ses="%sBoard: %s" % (ses, contrib.getBoardNumber())
-            if contrib.isScheduled():
-                if ses != "":
-                    ses = "%s - " % ses
-                text="%s%s" % (ses,contrib.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y %H:%M"))
-            else:
-                text = ses
-            story += "\n\n{\\sffamily\\normalsize\\selectfont %s }\n\n" % text
-            story += "\n\n\\vspace{10 mm}\n\n"
-
-        return story
+        logo = conf.getLogo()
+        if logo:
+            self._args['logo_img'] = logo.getFilePath()
 
 
 class ContribToPDF(PDFLaTeXBase):
@@ -1119,6 +933,7 @@ class ContribsToPDF(PDFLaTeXBase):
             'conf': conf,
             'contribs': contribs,
             'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields(),
+            'show_url': True,
             'url': conf.getURL()
         })
 
