@@ -325,13 +325,35 @@ ndDirectives.directive('ndValidFile', function() {
     };
 });
 
-ndDirectives.directive('ndRadioExtend', function($rootScope){
+ndDirectives.directive('ndRadioExtend', function($rootScope) {
     return {
         require: 'ngModel',
         restrict: 'A',
-        link: function(scope, element, iAttrs, controller) {
+        link: function(scope, element) {
             element.bind('click', function() {
                 $rootScope.$$phase || $rootScope.$apply();
+            });
+        }
+    };
+});
+
+ndDirectives.directive('ndBlacklist', function() {
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attrs, ngModel) {
+            var blacklist = attrs.ndBlacklist.split(',');
+
+            // DOM -> Model validation
+            ngModel.$parsers.unshift(function(value) {
+                var valid = blacklist.indexOf(value) === -1;
+                ngModel.$setValidity('blacklist', valid);
+                return valid ? value : undefined;
+            });
+
+            // model -> DOM validation
+            ngModel.$formatters.unshift(function(value) {
+                ngModel.$setValidity('blacklist', blacklist.indexOf(value) === -1);
+                return value;
             });
         }
     };

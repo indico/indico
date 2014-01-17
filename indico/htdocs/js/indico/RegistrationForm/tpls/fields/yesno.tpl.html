@@ -5,6 +5,7 @@
             name="{{ getName(field.input) }}"
             ng-model="input"
             ng-required="field.mandatory"
+            nd-blacklist="no"
             ng-disabled="!hasPlacesLeft(field)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
             <option value="">-- {{ 'Choose a value' | i18n }} --</option>
@@ -21,19 +22,17 @@
                 ng-selected="userdata[getName(field.input)] === 'no'">
                 {{ 'no' | i18n }}
             </option>
-            <option ng-if="field.mandatory" value=""
+            <option ng-if="field.mandatory" value="no"
                 ng-selected="userdata[getName(field.input)] === 'no'">
                 {{ 'no' | i18n }}
             </option>
         </select>
 
+        <span ng-if="field.billable" class="regFormPrice">{{ field.price }}</span>
+        <span ng-if="field.billable" class="regFormCurrency">{{ currency }}</span>
+
         <span class="error-message-tag" ng-if="validationStarted && nestedForm.$invalid">
             {{ "You must say 'yes'" | i18n }}
         </span>
     </ng-form>
-
-    <span ng-if="field.billable" class="regFormPrice">{{ field.price }}</span>
-    <span ng-if="field.billable">
-        <nd-currency currency="currency"></nd-currency>
-    </span>
 </div>
