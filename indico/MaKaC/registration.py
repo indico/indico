@@ -4789,11 +4789,10 @@ class Registrant(Persistent, Fossilizable):
         if self.getRegistrationForm().getReasonParticipationForm().isEnabled():
             self.setReasonParticipation(data.get("reason", ""))
 
-
         if self.getRegistrationForm().getSessionsForm().isEnabled():
             sessions = data.get("sessions", [])
             if not isinstance(sessions, list):
-                sessions = [ sessions ]
+                sessions = [sessions]
             if not self.getPayed():
                 self.setSessions(sessions)
             else:
@@ -4825,7 +4824,7 @@ class Registrant(Persistent, Fossilizable):
                 self._accommodation.setArrivalDate(ad)
                 self._accommodation.setDepartureDate(dd)
             accoType = data.get("accommodationType", None)
-            if accoType != None and accoType.isCancelled():
+            if accoType is not None and accoType.isCancelled():
                 accoType = None
             if self.getRegistrationForm().getAccommodationForm().getAccommodationTypesList() != []:
                 # Only change the accommodation type if:

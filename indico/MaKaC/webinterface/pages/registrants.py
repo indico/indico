@@ -1544,7 +1544,7 @@ class WConfModifRegistrantAccommodationModify(wcomponents.WTemplated):
                 if type.isBillable():
                     priceCol = """<td align="right">%s %s per night</td>""" % (type.getPrice(), type.getRegistrationForm().getCurrency())
                 html.append("""<tr>
-                                    <td align="left" style="padding-left:10px"><input type="radio" name="accommodationType" value="%s" %s%s>%s</td>
+                                    <td align="left" style="padding-left:10px"><input type="radio" name="accommodation_type" value="%s" %s%s>%s</td>
                                     %s
                                 </tr>
                             """%(type.getId(), selected, disabled, type.getCaption(), priceCol ) )
