@@ -33,7 +33,7 @@ from MaKaC.common.utils import parseDateTime
 from indico.core.config import Config
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 from MaKaC.webinterface.rh.base import RoomBookingDBMixin
-from MaKaC.PDFinterface.conference import ConfManagerContribToPDF
+from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.errors import FormValuesError
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
@@ -629,17 +629,8 @@ class RHContributionToPDF(RHContributionModification):
     def _process(self):
         tz = self._target.getConference().getTimezone()
         filename = "%s - Contribution.pdf"%self._target.getTitle()
-        pdf = ConfManagerContribToPDF(self._target.getConference(), self._target, tz=tz)
-        
-        latex_template = 'LatexRHContributionToPDF.tpl'
-
-        kwargs = {'body': pdf.getLatex()}
-
-        latex = LatexRunner(filename)
-        pdffile = latex.run(latex_template, **kwargs)
-        latex.cleanup()
-
-        return send_file(filename, pdffile, 'PDF')
+        pdf = ContribToPDF(self._target)
+        return send_file(filename, pdf.generate(), 'PDF')
 
 
 class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):

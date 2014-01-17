@@ -48,7 +48,7 @@ from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from indico.core.config import Config
 from MaKaC.errors import MaKaCError, FormValuesError,ModificationError,\
     ConferenceClosedError, NoReportError, NotFoundError
-from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ConfManagerContribsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
+from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, ContribsToPDF, RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.webinterface.common import AbstractStatusList, abstractFilters
 from MaKaC.webinterface import locators
 from MaKaC.common.xmlGen import XMLGen
@@ -3133,7 +3133,7 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
             if not self._contribs:
                 return "No contributions to print"
 
-            contrib_pdf = ConfManagerContribsToPDF(self._conf, self._contribs)
+            contrib_pdf = ContribsToPDF(self._conf, self._contribs)
             fpath = contrib_pdf.generate()
 
             return send_file(filename, fpath, 'PDF')
@@ -3153,8 +3153,8 @@ class RHContribsToPDF(RHConferenceModifBase):
         filename = "Contributions.pdf"
         if not self._contribs:
             return "No contributions to print"
-        pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
+        pdf = ContribsToPDF(self._conf, self._contribs)
+        return send_file(filename, pdf.generate(), 'PDF')
 
 
 class RHContribsToExcel(RHConferenceModifBase):

@@ -40,7 +40,7 @@ from MaKaC.common import timezoneUtils, info
 from MaKaC.conference import LocalFile
 from MaKaC.fileRepository import OfflineRepository
 from MaKaC.PDFinterface.conference import ProgrammeToPDF, TimeTablePlain, AbstractBook, ContribToPDF, \
-    ConfManagerContribsToPDF
+    ContribsToPDF
 from indico.util.contextManager import ContextManager
 from indico.web.assets import ie_compatibility
 
@@ -316,7 +316,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         # Getting conference timetable in PDF
         self._addPdf(self._conf, urlHandlers.UHConfTimeTablePDF, TimeTablePlain, conf=self._conf, aw=self._rh._aw)
         # Generate contributions in PDF
-        self._addPdf(self._conf, urlHandlers.UHContributionListToPDF, ConfManagerContribsToPDF, conf=self._conf,
+        self._addPdf(self._conf, urlHandlers.UHContributionListToPDF, ContribsToPDF, conf=self._conf,
                      contribList=self._conf.getContributionList())
 
         # Getting specific pages for contributions
@@ -420,4 +420,4 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         tz = timezoneUtils.DisplayTZ(self._rh._aw, self._conf).getDisplayTZ()
         filename = os.path.join(self._mainPath, pdfUrlHandler.getStaticURL(event))
         pdf = generatorClass(tz=tz, **generatorParams)
-        self._fileHandler.addNewFile(filename, pdf.getPDFBin())
+        self._fileHandler.addNewFile(filename, pdf.generate())

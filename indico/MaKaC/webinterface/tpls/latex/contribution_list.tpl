@@ -8,7 +8,6 @@
     \usepackage{tocloft} %% table of contents
     \usepackage{titlesec}
     \usepackage{fancyhdr} %% headers
-    \usepackage[inline]{enumitem}
 
     \setlength{\headheight}{60pt}
     \pagestyle{fancy}

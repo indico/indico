@@ -1084,7 +1084,7 @@ class ContributionBook(PDFBase):
 
 class ContribToPDF(PDFLaTeXBase):
 
-    _tpl_filename = 'LatexRHContributionToPDF.tpl'
+    _tpl_filename = 'contribution.tpl'
 
     def __init__(self, contrib):
         super(ContribToPDF, self).__init__()
@@ -1107,7 +1107,7 @@ class ContribToPDF(PDFLaTeXBase):
 class ContribsToPDF(PDFLaTeXBase):
 
     _table_of_contents = True
-    _tpl_filename = "LatexRHContribsToPDFMenu_ContributionList.tpl"
+    _tpl_filename = "contribution_list.tpl"
 
     def __init__(self, conf, contribs):
         super(ContribsToPDF, self).__init__()
@@ -1125,77 +1125,6 @@ class ContribsToPDF(PDFLaTeXBase):
         logo = conf.getLogo()
         if logo:
             self._args['logo_img'] = logo.getFilePath()
-
-
-class ConfManagerContribsToPDF(ContribsToPDF):
-
-    def firstPageLatex(self):
-        first_page = "\\centerline{\\rmfamily\\fontsize{30}{40}\\selectfont\n"
-        first_page += "{\\bf %s}" % escape(self._conf.getTitle())
-        first_page += "}\n\\vspace{90 mm}\n\n"
-        first_page += "\\centerline{\\rmfamily\\fontsize{35}{45}\\selectfont\n"
-        first_page += "{\\bf %s}" % self._title
-        first_page += "}\n\\newpage\n\n"
-
-        return first_page
-
-
-    def getBody(self):
-        for contrib in self._contribs:
-            temp = ConfManagerContribToPDF(self._conf, contrib,tz=self._tz)
-            temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
-            self._story.append(PageBreak())
-
-
-    def getBodyLatex(self):
-        body = ""
-        for contrib in self._contribs:
-            temp = ConfManagerContribToPDF(self._conf, contrib,tz=self._tz)
-            #contrib_title = () + escape(self._contrib.getTitle()) * 3
-            contrib_title = contrib.getTitle()
-            contrib_id = i18nformat(""" _("Contribution ID") : %s""") % contrib.getId()
-            body += r'''
-\newpage
-\fancyhead[R]{\small \selectfont \color{gray} %s}
-
-\chapter*{%s}
-\addcontentsline{toc}{chapter}{%s}
-
-{\rmfamily \large \selectfont
-\noindent
-%s
-
-%s
-
-}
-            ''' % (contrib_title, contrib_title, contrib_title, contrib_id, temp.getBodyLatex())
-
-        return body
-
-
-class ConfManagerContribToPDF(ContribToPDF):
-
-    _tpl_filename = 'LatexRHContributionToPDF.tpl'
-
-    def getBody(self, story=None, indexedFlowable={}, level=1 ):
-        if not story:
-            story = self._story
-
-        #get the common contribution content from parent
-        ContribToPDF.getBody(self, story, indexedFlowable, level)
-
-        #add info for the conference manager
-
-    def getLatex(self):
-        template = ContribToPDF.firstPageLatex(self)
-        template += ContribToPDF.getBodyLatex(self)
-
-        return template
-
-    def getBodyLatex(self):
-        template = ContribToPDF.getBodyLatex(self)
-
-        return template
 
 
 class TimetablePDFFormat:

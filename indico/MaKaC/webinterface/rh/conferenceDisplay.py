@@ -879,22 +879,10 @@ class RHContributionListToPDF(RHConferenceBaseDisplay):
         filename = "Contributions.pdf"
         if not self._contribs:
             return "No contributions to print"
-        from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
-        pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
+        from MaKaC.PDFinterface.conference import ContribsToPDF
+        pdf = ContribsToPDF(self._conf, self._contribs)
 
-        latex_template = 'LatexRHContributionListToPDF.tpl'
-
-        kwargs = {'first_page': pdf.firstPageLatex(),
-                'title': self._target.getTitle(),
-                'page_no': i18nformat(""" _("Page") """),
-                'body': pdf.getBodyLatex()
-                }
-
-        latex = LatexRunner(filename, True)
-        pdffile = latex.run(latex_template, **kwargs)
-        latex.cleanup()
-
-        return send_file(filename, pdffile, 'PDF')
+        return send_file(filename, pdf.generate(), 'PDF')
 
 
 class RHAbstractBook(RHConferenceBaseDisplay):

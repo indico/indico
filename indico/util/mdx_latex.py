@@ -287,13 +287,13 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
 
         def repl_2(matchobj):
             text = unescape_latex_entities(matchobj.group(1))
-            return '$%s$' % text
+            return '$%s$%s' % (text, matchobj.group(2))
 
         # $$ ..... $$
         pat = re.compile('^\$\$([^\$]*)\$\$\s*$', re.MULTILINE)
         out = pat.sub(repl_1, instr)
         # Jones, $x=3$, is ...
-        pat3 = re.compile(r'\$([^\$]+)\$(?:\s|$)')
+        pat3 = re.compile(r'\$([^\$]+)\$(\s|$)')
         out = pat3.sub(repl_2, out)
         # # $100 million
         # pat2 = re.compile('([^\$])\$([^\$])')

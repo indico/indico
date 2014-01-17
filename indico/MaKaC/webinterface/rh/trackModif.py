@@ -34,7 +34,7 @@ from indico.core.config import Config
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
-from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
+from MaKaC.PDFinterface.conference import ContribsToPDF
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
 from MaKaC.abstractReviewing import ConferenceAbstractReview
@@ -918,8 +918,8 @@ class RHContribsToPDF(RHTrackAbstractsBase):
         tz = self._conf.getTimezone()
         if not self._contribs:
             return "No contributions to print"
-        pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-        return send_file('Contributions.pdf', StringIO(pdf.getPDFBin()), 'PDF')
+        pdf = ContribsToPDF(self._conf, self._contribs)
+        return send_file('Contributions.pdf', pdf.generate(), 'PDF')
 
 
 class RHContribsParticipantList(RHTrackAbstractsBase):

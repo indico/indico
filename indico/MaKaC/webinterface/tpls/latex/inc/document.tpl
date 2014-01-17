@@ -21,7 +21,7 @@
 \usepackage{hyperref}
 \usepackage{sectsty}
 \usepackage{xstring}
-
+\usepackage[inline]{enumitem}
 
 <%block name="header_extra">
 </%block>

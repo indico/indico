@@ -38,7 +38,7 @@ import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.webinterface.common.slotDataWrapper import Slot
-from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
+from MaKaC.PDFinterface.conference import ContribsToPDF
 from indico.core.config import Config
 from BTrees.OOBTree import OOBTree
 from BTrees.IOBTree import IOBTree
@@ -679,8 +679,8 @@ class RHContribsToPDF(RHSessionModUnrestrictedContribMngCoordBase):
         tz = self._conf.getTimezone()
         if not self._contribs:
             return "No contributions to print"
-        pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-        return send_file('Contributions.pdf', StringIO(pdf.getPDFBin()), 'PDF')
+        pdf = ContribsToPDF(self._conf, self._contribs)
+        return send_file('Contributions.pdf', pdf.generate(), 'PDF')
 
 
 class RHContribQuickAccess(RHSessionModCoordinationBase):
