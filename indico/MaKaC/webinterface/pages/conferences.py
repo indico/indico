@@ -3591,6 +3591,20 @@ class WPModNewAbstract(WPConfAbstractList):
         wc = WAbstractDataModification(self._conf)
         return wc.getHTML(params)
 
+    def getCSSFiles(self):
+        return WPConfAbstractList.getCSSFiles(self) + \
+            self._asset_env['contributions_sass'].urls()
+
+    def getJSFiles(self):
+        return WPConfAbstractList.getJSFiles(self) + \
+            self._includeJSPackage('Management') + \
+            self._asset_env['abstracts_js'].urls()
+
+    def _getHeadContent(self):
+        return WPConfAbstractList._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                       for url in self._asset_env['mathjax_js'].urls()])
+
 
 class WConfModAbstractsMerge(wcomponents.WTemplated):
 
