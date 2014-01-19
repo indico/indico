@@ -314,10 +314,11 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         # Getting all menu items
         self._getMenuItems()
         # Getting conference timetable in PDF
-        self._addPdf(self._conf, urlHandlers.UHConfTimeTablePDF, TimeTablePlain, conf=self._conf, aw=self._rh._aw)
+        self._addPdf(self._conf, urlHandlers.UHConfTimeTablePDF, TimeTablePlain,
+                     conf=self._conf, aw=self._rh._aw, legacy=True)
         # Generate contributions in PDF
         self._addPdf(self._conf, urlHandlers.UHContributionListToPDF, ContribsToPDF, conf=self._conf,
-                     contribList=self._conf.getContributionList())
+                     contribs=self._conf.getContributionList())
 
         # Getting specific pages for contributions
         for cont in self._conf.getContributionList():
@@ -371,7 +372,8 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         if link.getName() == 'abstractsBook':
             self._addPdf(self._conf, urlHandlers.UHConfAbstractBook, AbstractBook, conf=self._conf, aw=self._rh._aw)
         if link.getName() == 'programme':
-            self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF, conf=self._conf)
+            self._addPdf(self._conf, urlHandlers.UHConferenceProgramPDF, ProgrammeToPDF,
+                         conf=self._conf, legacy=True)
 
     def _getInternalPage(self, link):
         page = link.getPage()
@@ -386,7 +388,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
     def _getContrib(self, contrib):
         html = WPStaticContributionDisplay(self._rh, contrib, 0).display()
         self._addPage(html, urlHandlers.UHContributionDisplay, target=contrib)
-        self._addPdf(contrib, urlHandlers.UHContribToPDF, ContribToPDF, conf=self._conf, contrib=contrib)
+        self._addPdf(contrib, urlHandlers.UHContribToPDF, ContribToPDF, contrib=contrib)
 
         for author in contrib.getAuthorList():
             self._getAuthor(contrib, author)
@@ -414,10 +416,20 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         htmlContrib = self._get_static_files(htmlContrib)
         self._fileHandler.addNewFile(sessionContribfile, htmlContrib)
         self._addPdf(session, urlHandlers.UHConfTimeTablePDF, TimeTablePlain, conf=self._conf, aw=self._rh._aw,
-                     showSessions=[session.getId()])
+                     showSessions=[session.getId()], legacy=True)
 
-    def _addPdf(self, event, pdfUrlHandler, generatorClass, **generatorParams):
+    def _addPdf(self, event, pdfUrlHandler, generatorClass,
+                legacy=False, **generatorParams):
+        """
+        `legacy` specifies whether reportlab should be used instead of the
+        new LaTeX generation mechanism
+        """
         tz = timezoneUtils.DisplayTZ(self._rh._aw, self._conf).getDisplayTZ()
         filename = os.path.join(self._mainPath, pdfUrlHandler.getStaticURL(event))
         pdf = generatorClass(tz=tz, **generatorParams)
-        self._fileHandler.addNewFile(filename, pdf.generate())
+
+        if legacy:
+            self._fileHandler.addNewFile(filename, pdf.getPDFBin())
+        else:
+            with open(pdf.generate()) as f:
+                self._fileHandler.addNewFile(filename, f.read())

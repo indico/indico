@@ -370,11 +370,14 @@ class ContribToPDF(PDFLaTeXBase):
 
     _tpl_filename = 'single_doc.tpl'
 
-    def __init__(self, contrib):
+    def __init__(self, contrib, tz=None):
         super(ContribToPDF, self).__init__()
 
         self._contrib = contrib
         conf = contrib.getConference()
+
+        if tz is None:
+            tz = conf.getTimezone()
 
         affiliations, author_mapping, coauthor_mapping = extract_affiliations(contrib)
 
@@ -399,8 +402,11 @@ class ContribsToPDF(PDFLaTeXBase):
     _table_of_contents = True
     _tpl_filename = "report.tpl"
 
-    def __init__(self, conf, contribs):
+    def __init__(self, conf, contribs, tz=None):
         super(ContribsToPDF, self).__init__()
+
+        if tz is None:
+            tz = conf.getTimezone()
 
         self._contribs = contribs
 
