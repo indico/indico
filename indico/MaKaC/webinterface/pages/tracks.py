@@ -840,26 +840,22 @@ class WTrackAbstractModification( wcomponents.WTemplated ):
             res = """<a href=%s>%s - %s</a>"""%(quoteattr(str(url)),id,title)
         return res
 
-    def _getAdditionalFieldsHTML(self):
-        html=""
+    def _getAdditionalFields(self):
+        fields = []
         afm = self._abstract.getConference().getAbstractMgr().getAbstractFieldsMgr()
         for f in afm.getActiveFields():
-            id = f.getId()
-            caption = f.getName()
-            html+="""
-                    <tr>
-                        <td class="dataCaptionTD"><span class="dataCaptionFormat">%s</span></td>
-                        <td bgcolor="white"><pre>%s</pre></td>
-                    </tr>
-                """%(self.htmlText(caption), self.htmlText(self._abstract.getField(id)) )
-        return html
+            fid = f.getId()
+            caption = f.getCaption()
+            fields.append((self.htmlText(caption),
+                          str(self._abstract.getField(fid))))
+        return fields
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
         vars["title"] = self.htmlText( self._abstract.getTitle() )
         vars["abstractPDF"] = urlHandlers.UHAbstractTrackManagerDisplayPDF.getURL( self._track, self._abstract )
         vars["printIconURL"] = Config.getInstance().getSystemIconURL( "pdf" )
-        vars["additionalFields"] = self._getAdditionalFieldsHTML()
+        vars["additionalFields"] = self._getAdditionalFields()
         primary = []
         for author in self._abstract.getPrimaryAuthorList():
             primary.append(self._getAuthorHTML(author))

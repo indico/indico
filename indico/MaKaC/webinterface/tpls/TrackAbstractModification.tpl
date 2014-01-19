@@ -26,7 +26,14 @@
             </table>
         </td>
     </tr>
-    ${ additionalFields }
+
+    % for caption, field in additionalFields:
+        <tr>
+            <td class="dataCaptionTD"><span class="dataCaptionFormat">${caption}</span></td>
+            <td bgcolor="white">${field | m}</td>
+        </tr>
+    % endfor
+
     <tr>
         <td class="dataCaptionTD">
             <span class="dataCaptionFormat"> ${ _("Primary authors")}</span>
