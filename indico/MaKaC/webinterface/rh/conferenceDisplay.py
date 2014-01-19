@@ -915,11 +915,15 @@ class RHAbstractBook(RHConferenceBaseDisplay):
         if boaConfig.isCacheEnabled() and not self._noCache and mtime and mtime > boaConfig.lastChanged:
             return send_file(pdfFilename, cacheFile, 'PDF')
         else:
-            tz = timezoneUtils.DisplayTZ(self._aw,self._target).getDisplayTZ()
-            pdf = AbstractBook(self._target,self.getAW(), tz=tz)
-            data = pdf.getPDFBin()
+            tz = timezoneUtils.DisplayTZ(self._aw, self._target).getDisplayTZ()
+            pdf = AbstractBook(self._target, self.getAW(), tz=tz)
+            fname = pdf.generate()
+
+            with open(fname, 'rb') as f:
+                data = f.read()
             with open(cacheFile, 'wb') as f:
                 f.write(data)
+
             return send_file(pdfFilename, cacheFile, 'PDF')
 
 

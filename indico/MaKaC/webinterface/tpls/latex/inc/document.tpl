@@ -1,25 +1,27 @@
 \batchmode
 
 <%block name="document_class">
-\documentclass[a4paper, 11pt]{article} %% document type
+\documentclass[a4paper, 15pt]{article} %% document type
 </%block>
 
-\usepackage[a4paper, top=1em, bottom=10em, left=5em, right=5em]{geometry}
+<%block name="geometry">
+\usepackage[a4paper, top=1em, bottom=10em]{geometry}
+</%block>
 
 \usepackage{cmbright}
 \usepackage[T1]{fontenc}
 \usepackage[utf8x]{inputenc}
-\usepackage{textcomp}
-\usepackage{textgreek}
+\usepackage{lmodern}
+\usepackage{hyperref}
+
+
 \usepackage[english]{babel}
 \usepackage[final, babel]{microtype} %% texblog.net/latex-archive/layout/pdflatex-microtype/
-\usepackage{amsmath} %% math equations
+
 \usepackage{float} %% improved interface for floating objects
 \usepackage[export]{adjustbox}
-\usepackage[usenames,dvipsnames]{xcolor}
-\usepackage{scrextend}
-\usepackage{hyperref}
-\usepackage{sectsty}
+\usepackage[usenames,dvipsnames]{xcolor} %% named colors
+\usepackage{sectsty} %% style sections
 \usepackage{xstring}
 \usepackage[inline]{enumitem}
 
@@ -32,6 +34,9 @@
     %% set fonts
     \renewcommand{\sfdefault}{cmbr}
     \renewcommand*{\familydefault}{\sfdefault}
+
+    %% no indentation
+    \setlength{\parindent}{0cm}
 
     %% helper commands
 

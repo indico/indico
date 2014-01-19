@@ -42,7 +42,9 @@ from MaKaC.common.Configuration import Config
 from MaKaC.common.TemplateExec import render as tpl_render
 import subprocess, shlex, os, tempfile
 from MaKaC.common.logger import Logger
+
 from mako.template import Template
+from mako import runtime as mako_runtime
 
 from indico.util import mdx_latex
 import markdown
@@ -754,7 +756,8 @@ class PDFLaTeXBase(object):
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
         self._args = {
-            'md_convert': md.convert
+            'md_convert': md.convert,
+            'runtime': mako_runtime
         }
 
     def generate(self):
@@ -771,11 +774,6 @@ class LatexRunner:
     has to run twice: the first one to generate the .toc file and the
     second to compile it into the created .tex file
     """
-
-    texname = ''
-    texdir = ''
-    tempdir = ''
-    has_toc = False
 
     def __init__(self, has_toc=False):
         self.has_toc = has_toc

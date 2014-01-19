@@ -74,6 +74,28 @@ charRplace = [
 ]
 
 
+def extract_affiliations(contrib):
+
+    affiliations = dict()
+
+    def enumerate_affil(lst):
+        counter = 1
+        auth_list = []
+
+        for author in lst:
+            affil = author.getAffiliation()
+            if affil:
+                if affil not in affiliations:
+                    affiliations[affil] = counter
+                    counter += 1
+            auth_list.append((author, affiliations[affil] if affil else None))
+        return auth_list
+
+    authors = enumerate_affil(contrib.getPrimaryAuthorList())
+    coauthors = enumerate_affil(contrib.getCoAuthorList())
+
+    return affiliations, authors, coauthors
+
 
 class ProgrammeToPDF(PDFBase):
 
@@ -136,604 +158,150 @@ class ProgrammeToPDF(PDFBase):
             story.append(Spacer(1, 0.4*inch))
 
 
+class AbstractToPDF(PDFLaTeXBase):
 
-class AbstractToPDF(PDFBase):
+    _tpl_filename = 'single_doc.tpl'
 
-    def __init__(self, conf, abstract, doc=None, story=None, tz=None):
-        self._conf = conf
-        if not tz:
-            self._tz = self._conf.getTimezone()
-        else:
-            self._tz = tz
+    def __init__(self, abstract, tz=None):
+        super(AbstractToPDF, self).__init__()
+
+        if tz is None:
+            tz = conf.getTimezone()
+
         self._abstract = abstract
-        if not story:
-            story = [Spacer(inch, 5*cm)]
-        PDFBase.__init__(self, doc, story)
-        self._title = _("Abstract")
-        self._PAGE_HEIGHT = defaultPageSize[1]
-        self._PAGE_WIDTH = defaultPageSize[0]
+        conf = abstract.getConference()
 
-    def firstPage(self, c, doc):
-        c.saveState()
-        c.setFont('Times-Bold', 30)
-        if not self._drawLogo(c):
-            self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
+        self._args.update({
+            'doc_type': 'abstract',
+            'abstract': abstract,
+            'conf': conf,
+            'tz': tz,
+            'track_class': self._get_track_classification(abstract),
+            'contrib_type': self._get_contrib_type(abstract),
+            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields()
+        })
 
-        c.setFont('Times-Bold', 25)
-        #c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT - inch - 5*cm, self._abstract.getTitle())
-        c.setLineWidth(3)
-        c.setStrokeGray(0.7)
-        #c.line(inch, self._PAGE_HEIGHT - inch - 6*cm, self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - inch - 6*cm)
-        #c.line(inch, inch , self._PAGE_WIDTH - inch, inch)
-        c.setFont('Times-Roman', 10)
-        #c.drawString(0.5*inch, 0.5*inch, Config.getInstance().getBaseURL())
-        c.restoreState()
+        logo = conf.getLogo()
+        if logo:
+            self._args['logo_img'] = logo.getFilePath()
 
-    def firstPageLatex(self):
-        conf_title = "\\centerline{\\rmfamily\\fontsize{30}{40}\\selectfont\n"
-        conf_title += "{\\bf %s}" % escape(self._conf.getTitle())
-        conf_title += "}\n\\vspace{25 mm}\n\n"
-
-        return conf_title
-
-
-    def _getTrackText(self):
-        text = i18nformat("""_("Track classification") : """)
-        status=self._abstract.getCurrentStatus()
-        if isinstance(status,review.AbstractStatusAccepted):
+    @staticmethod
+    def _get_track_classification(abstract):
+        status = abstract.getCurrentStatus()
+        if isinstance(status, review.AbstractStatusAccepted):
             if status.getTrack() is not None:
-                text="%s%s"%(text,escape(status.getTrack().getTitle()))
+                return escape(status.getTrack().getTitle())
         else:
-            listTrack= []
-            for track in self._abstract.getTrackListSorted():
-                listTrack.append( escape(track.getTitle()))
-            text += " ; ".join(listTrack)
-        return text
+            listTrack = []
+            for track in abstract.getTrackListSorted():
+                listTrack.append(escape(track.getTitle()))
+            return "; ".join(listTrack)
 
-    def _getContribTypeText(self):
-        status=self._abstract.getCurrentStatus()
-        if isinstance(status,review.AbstractStatusAccepted):
-            text= i18nformat(""" _("Contribution type") : %s""")%(escape(str(status.getType())))
+    @staticmethod
+    def _get_contrib_type(abstract):
+        status = abstract.getCurrentStatus()
+        if isinstance(status, review.AbstractStatusAccepted):
+            return status.getType()
         else:
-            text= i18nformat(""" _("Contribution type") : %s""")%escape(str(self._abstract.getContribType()))
-        return text
-
-    def getBody(self, story=None, indexedFlowable={}, level=1 ):
-        if not story:
-            story = self._story
-
-        #style = ParagraphStyle({})
-        #style.fontSize = 12
-        text = i18nformat(""" _("Abstract ID"): %s""") % self._abstract.getId()
-        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        p = SimpleParagraph(text, 12)
-        story.append(p)
-
-        story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
-
-        style = ParagraphStyle({})
-        style.alignment = TA_CENTER
-        style.fontSize = 25
-        style.leading = 30
-        text = escape(self._abstract.getTitle())
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        story.append(p)
-
-        flowableText = escape(self._abstract.getTitle())
-        if self._conf.getBOAConfig().getShowIds():
-            flowableText += """ (%s)"""%self._abstract.getId()
-        indexedFlowable[p] = {"text":escape(flowableText), "level":1}
-
-        style = ParagraphStyle({})
-        style.fontName = "LinuxLibertine"
-        style.fontSize = 9
-        style.alignment = TA_JUSTIFY
-        #to_latex += "{\\fontfamily{\"LinuxLibertineO-LF\"}\\selectfont\n"
-        #XXX:Not optimal, but the only way I've found to do it
-        #l=self._abstract.getField("content").split("\n")
-        #res=[]
-        #for line in l:
-        #    res.append(fill(line,85))
-        #res="\n".join(res)
-        #p = Preformatted(escape(res), style, part=escape(self._abstract.getTitle()))
-        #story.append(p)
-
-        story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
-
-        for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
-            fid = field.getId()
-            name = field.getCaption()
-            value = self._abstract.getField(fid).strip()
-            if value: #fid not in ["content"] and
-                #styleHead = ParagraphStyle({})
-                #styleHead.firstLineIndent = -45
-                #styleHead.leftIndent = 45
-                text = "%s :" % name
-                #p = Paragraph(text, styleHead, part=escape(self._abstract.getTitle()))
-                p = SimpleParagraph(text, spaceAfter = 5)
-                story.append(p)
-                #l=value.split("\n")
-                #res=[]
-                #for line in l:
-                #    res.append(fill(line,85))
-                #res="\n".join(res)
-                p = Paragraph(escape(value), style, part=escape(self._abstract.getTitle()))
-                story.append(p)
-                story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-
-        story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
-        style = ParagraphStyle({})
-        style.firstLineIndent = -80
-        style.leftIndent = 80
-        style.alignment = TA_JUSTIFY
-        text = i18nformat("""<b> _("Primary authors")</b> : """)
-        listAuthor = []
-        for author in self._abstract.getPrimaryAuthorsList():
-            listAuthor.append( "%s (%s)"%(escape(author.getFullName()), escape(author.getAffiliation()))  )
-        text += " ; ".join(listAuthor)
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        story.append(p)
-
-        story.append(Spacer(inch, 0.2*cm))
-
-        style = ParagraphStyle({})
-        style.firstLineIndent = -35
-        style.leftIndent = 35
-        style.alignment = TA_JUSTIFY
-        text = i18nformat("""<b> _("Co-authors")</b> : """)
-        listAuthor = []
-        for author in self._abstract.getCoAuthorList():
-            listAuthor.append( "%s (%s)"%(escape(author.getFullName()), escape(author.getAffiliation()) )  )
-        text += " ; ".join(listAuthor)
-
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        story.append(p)
-
-        story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-
-        #style = ParagraphStyle({})
-        #style.firstLineIndent = -45
-        #style.leftIndent = 45
-        text = _("Presenter") + " : "
-        listSpeaker= []
-        for speaker in self._abstract.getSpeakerList():
-            listSpeaker.append( "%s (%s)"%(escape(speaker.getFullName()), escape(speaker.getAffiliation()) )  )
-        text += " ; ".join(listSpeaker)
-        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        p = SimpleParagraph(text)
-        story.append(p)
-
-        story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
-        style = ParagraphStyle({})
-        style.firstLineIndent = -90
-        style.leftIndent = 90
-        p = Paragraph(self._getTrackText(), style, part=escape(self._abstract.getTitle()))
-        #p = SimpleParagraph(self._getTrackText())
-        story.append(p)
-
-        story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-        tmp= i18nformat("""--_("not specified")--""")
-        if self._abstract.getContribType() is not None:
-            tmp=self._abstract.getContribType().getName()
-        text = i18nformat("""_("Contribution type") : %s""")%escape(tmp)
-        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        p = SimpleParagraph(text)
-        story.append(p)
-
-        story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-
-        text = i18nformat("""_("Submitted by") : %s""")%escape(self._abstract.getSubmitter().getFullName())
-        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        p = SimpleParagraph(text)
-        story.append(p)
-
-        story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-
-        text = i18nformat("""_("Submitted on") %s""")%self._abstract.getSubmissionDate().strftime("%A %d %B %Y")
-        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        p = SimpleParagraph(text)
-        story.append(p)
-
-        story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-
-        text = i18nformat("""_("Last modified on") : %s""")%self._abstract.getModificationDate().strftime("%A %d %B %Y")
-        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        p = SimpleParagraph(text)
-        story.append(p)
-
-        story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-
-        text = i18nformat("""_("Comments") : """)
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        #p = SimpleParagraph(text)
-        story.append(p)
-
-        style = ParagraphStyle({})
-        style.leftIndent = 40
-        style.alignment = TA_JUSTIFY
-        text = "%s"%escape(self._abstract.getComments())
-        p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        story.append(p)
-
-        return story
-
-    def getHeaderLatex(self):
-        text = i18nformat(""" _("Abstract ID") : %s""") % \
-                self._abstract.getId()
-        header = "{\\rmfamily\\large\\selectfont\n \\noindent\n%s \
-                    \n}\n\n\\vspace{10 mm}\n\n" % text
-        
-        text = escape(self._abstract.getTitle())
-        header += "\\centerline{\\sffamily\\fontsize{25}{30}\
-                    \\selectfont\n %s \n}\n\n" % text
-
-        return header
+            return abstract.getContribType()
 
 
-    def getBodyLatex(self):
-        story = ""
+class AbstractsToPDF(PDFLaTeXBase):
 
-        md = markdown.Markdown()
-        latex_mdx = mdx_latex.LaTeXExtension()
-        latex_mdx.extendMarkdown(md, markdown.__dict__)
+    _tpl_filename = "report.tpl"
 
-        for field in self._conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields():
-            id = field.getId()
-            name = field.getCaption()
-            value = str(self._abstract.getField(id)).strip()
-            if value: #id not in ["content"] and
-                #p = Paragraph(text, styleHead, part=escape(self._abstract.getTitle()))
-                story += "\n\\vspace{10 mm}\n\\noindent\n \
-                            {\\normalsize\\selectfont %s :}\n" % name
-                story += "\\begingroup\n\\footnotesize\\selectfont\n"
-                story += "\n\n" + md.convert(value)[7:-7] + "\n\n"
-                story += "\\endgroup\n\n"
-
-        story += "\n\\vspace{10 mm}"
-
-        story += "{\\bf {\\sffamily\\selectfont %s }}" % \
-                i18nformat(""" _("Primary authors") : """)
-        listAuthor = []
-        for author in self._abstract.getPrimaryAuthorsList():
-            listAuthor.append( "%s (%s)" % \
-                (escape(author.getFullName()), escape(author.getAffiliation())))
-        story += "{\\sffamily\\selectfont %s }" % \
-                " ; ".join(listAuthor)
-        story += "\n\\vspace{2 mm}\n\n"
-
-        story += "{\\bf {\\sffamily\\selectfont %s }}" % \
-                i18nformat(""" _("Co-authors") : """)
-        listAuthor = []
-        for author in self._abstract.getCoAuthorList():
-            listAuthor.append( "%s (%s)" % \
-                (escape(author.getFullName()), escape(author.getAffiliation())))
-        story += "{\\sffamily\\selectfont %s }" % " ; ".join(listAuthor)
-        story += "\n\\vspace{2 mm}\n\n"
-
-        story += i18nformat("""_("Presenter") : \n\\vspace{2 mm}""")
-        listSpeaker= []
-        for speaker in self._abstract.getSpeakerList():
-            listSpeaker.append( "%s (%s)" % \
-                (escape(speaker.getFullName()), escape(speaker.getAffiliation())))
-        story += " ; ".join(listSpeaker)
-        story += "\n\n"
-
-        story += "{\\sffamily\\selectfont %s}\n\\vspace{2 mm}\n\n" % \
-                self._getTrackText()
-
-        tmp= i18nformat("""--_("not specified")--""")
-        if self._abstract.getContribType() is not None:
-            tmp=self._abstract.getContribType().getName()
-        text = i18nformat("""_("Contribution type") : %s""")%escape(tmp)
-        story += text + "\n\\vspace{2 mm}\n\n"
-
-        text = i18nformat("""_("Submitted by") : %s""") % \
-                escape(self._abstract.getSubmitter().getFullName())
-        story += text + "\n\\vspace{2 mm}\n\n"
-
-        text = i18nformat("""_("Submitted on") %s""") % \
-                self._abstract.getSubmissionDate().strftime("%A %d %B %Y")
-        story += text + "\n\\vspace{2 mm}\n\n"
-
-        text = i18nformat("""_("Last modified on") : %s""") % \
-                self._abstract.getModificationDate().strftime("%A %d %B %Y")
-        story += text + "\n\\vspace{2 mm}\n\n"
-
-        text = i18nformat("""_("Comments") : """)
-        story += "{\\sffamily\\selectfont %s}\n\n" % text
-
-        text = "%s"%escape(self._abstract.getComments())
-        story += "\\hspace{15 mm} {\\sffamily\\selectfont %s}" % text
-
-        return story
-
-
-    def getLatex(self):
-        template = self.firstPageLatex()
-        template += self.getHeaderLatex()
-        template += self.getBodyLatex()
-
-        return template
-
-
-class AbstractsToPDF(PDFWithTOC):
-
-    def __init__(self, conf, abstractList, tz=None):
+    def __init__(self, conf, abstract_ids, tz=None):
+        super(AbstractsToPDF, self).__init__()
         self._conf = conf
-        if not tz:
-            self._tz = self._conf.getTimezone()
-        else:
-            self._tz = tz
-        self._abstracts = abstractList
-        self._title = _("Abstracts book")
-        PDFWithTOC.__init__(self)
 
-    def firstPage(self, c, doc):
-        c.saveState()
-        showLogo = False
-        c.setFont('Times-Bold', 30)
-        if not self._drawLogo(c):
-            self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
+        if tz is None:
+            self._tz = conf.getTimezone()
 
-        c.setFont('Times-Bold', 35)
-        c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT/2, self._title)
-        c.setLineWidth(3)
-        c.setStrokeGray(0.7)
-        c.setFont('Times-Roman', 10)
-        c.drawString(0.5*inch, 0.5*inch, str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
-        c.restoreState()
+        ab_mgr = conf.getAbstractMgr()
 
+        abstracts = [ab_mgr.getAbstractById(aid) for aid in abstract_ids]
 
-    def firstPageLatex(self):
-        first_page = "\\centerline{\\rmfamily\\fontsize{30}{40}\\selectfont\n"
-        first_page += "{\\bf %s}" % escape(self._conf.getTitle())
-        first_page += "}\n\\vspace{90 mm}\n\n"
-        first_page += "\\centerline{\\rmfamily\\fontsize{35}{45}\\selectfont\n"
-        first_page += "{\\bf %s}" % self._title
-        first_page += "}\n\\newpage\n\n"
-
-        return first_page
-
-
-    def laterPages(self, c, doc):
-
-        c.saveState()
-        c.setFont('Times-Roman', 9)
-        c.setFillColorRGB(0.5, 0.5, 0.5)
-        confTitle = escape(self._conf.getTitle())
-        if len(self._conf.getTitle())>30:
-            confTitle = escape(self._conf.getTitle()[:30] + "...")
-        c.drawString(inch, self._PAGE_HEIGHT - 0.75 * inch, "%s / %s"%(confTitle, self._title))
-        title = doc.getCurrentPart()
-        if len(doc.getCurrentPart())>50:
-            title = utils.unicodeSlice(doc.getCurrentPart(), 0, 50) + "..."
-        c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, "%s"%title)
-        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, i18nformat(""" _("Page") %d """)%doc.page)
-        c.drawString(inch,  0.75 * inch, nowutc().strftime("%A %d %B %Y"))
-        c.restoreState()
-
-
-    def getBody(self):
-        abMgr = self._conf.getAbstractMgr()
-        for abstract in self._abstracts:
-            temp = AbstractToPDF(self._conf, abMgr.getAbstractById(abstract), tz=self._tz)
-            temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
-            self._story.append(PageBreak())
-
-
-    def getBodyLatex(self):
-        abMgr = self._conf.getAbstractMgr()
-        body = ""
-        for abstract in self._abstracts:
-            temp = AbstractToPDF(self._conf, abMgr.getAbstractById(abstract), tz=self._tz)
-            #abstract_title = () + abMgr.getAbstractById(abstract).getTitle() * 3
-            abstract_title = abMgr.getAbstractById(abstract).getTitle()
-            abstract_id = i18nformat(""" _("Abstract ID") : %s""") % abstract
-            body +=r'''
-\newpage
-\fancyhead[R]{\small \selectfont \color{gray} %s}
-
-\chapter*{%s}
-\addcontentsline{toc}{chapter}{%s}
-
-{\rmfamily \large \selectfont
-\noindent
-%s
-}
-
-\vspace{10 mm}
-
-%s
-            ''' % (abstract_title, abstract_title, abstract_title, abstract_id, temp.getBodyLatex())
-
-        return body
+        self._args.update({
+            'conf': conf,
+            'doc_type': 'abstract',
+            'title': _("Report of Abstracts"),
+            'get_track_classification': AbstractToPDF._get_track_classification,
+            'get_contrib_type': AbstractToPDF._get_contrib_type,
+            'items': abstracts,
+            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields()
+        })
 
 
 class ConfManagerAbstractToPDF(AbstractToPDF):
 
-    def _getTrackText(self):
-        text = i18nformat("""_("Track classification") : """)
-        listTrack= []
-        for track in self._abstract.getTrackListSorted():
-            listTrack.append( escape(track.getTitle()))
-        text += " ; ".join(listTrack)
-        return text
+    def __init__(self, abstract, tz=None):
+        super(ConfManagerAbstractToPDF, self).__init__(abstract, tz)
 
-    def _getContribTypeText(self):
-        status=self._abstract.getCurrentStatus()
-        text= i18nformat("""_("Contribution type") : %s""")%escape(str(self._abstract.getContribType()))
-        return text
+        self._args.update({
+            'doc_type': 'abstract_manager',
+            'status': self._get_status(abstract),
+            'track_judgements': self._get_track_judgements(abstract)
+        })
 
-
-    def getBody(self, story=None, indexedFlowable={}, level=1 ):
-        if not story:
-            story = self._story
-        #get the common abstract content from parent
-        AbstractToPDF.getBody(self, story, indexedFlowable, level )
-        #add info for the conference manager
-        story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
-        status = self._abstract.getCurrentStatus()
+    @staticmethod
+    def _get_status(abstract):
+        status = abstract.getCurrentStatus()
         #style = ParagraphStyle({})
         #style.firstLineIndent = -90
         #style.leftIndent = 90
-        if status.__class__ == review.AbstractStatusDuplicated:
-            original=status.getOriginal()
-            st = i18nformat(""" _("DUPLICATED") (%s: %s)""")%(original.getId(), original.getTitle())
-        elif status.__class__ == review.AbstractStatusMerged:
-            target=status.getTargetAbstract()
-            st = i18nformat(""" _("MERGED") (%s: %s)""")%(target.getId(), target.getTitle())
-        else:
-            st = AbstractStatusList.getInstance().getCaption( status.__class__ ).upper()
-        text = i18nformat("""_("Status"): %s""")%escape(st)
-        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        p = SimpleParagraph(text)
-        story.append(p)
-        story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
-        #style = ParagraphStyle({})
-        #style.firstLineIndent = -90
-        #style.leftIndent = 90
-        text = i18nformat("""_("Track judgments"):""")
-        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        p = SimpleParagraph(text)
-        story.append(p)
-
-        for track in self._abstract.getTrackListSorted():
-            status = self._abstract.getTrackJudgement(track)
-            if status.__class__ == review.AbstractAcceptance:
-                contribType = ""
-                if status.getContribType() is not None:
-                    contribType = "(%s)"%status.getContribType().getName()
-                st = i18nformat(""" _("Proposed to accept") %s""")%(contribType)
-            elif status.__class__ == review.AbstractRejection:
-                st = _("Proposed to reject")
-            elif status.__class__ == review.AbstractInConflict:
-                st = _("Conflict")
-            elif status.__class__ == review.AbstractReallocation:
-                l = []
-                for track in status.getProposedTrackList():
-                    l.append( track.getTitle() )
-                st = i18nformat(""" _("Proposed for other tracks") (%s)""")%", ".join(l)
-            else:
-                st = ""
-
-            story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
-
-            status = self._abstract.getCurrentStatus()
-            #style = ParagraphStyle({})
-            #style.firstLineIndent = -90
-            #style.leftIndent = 130
-            text = i18nformat("""_("Track") : %s""")%escape(track.getTitle())
-            #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-            p = SimpleParagraph(text, indent = 40)
-            story.append(p)
-
-            story.append(Spacer(inch, 0.1*cm, part=escape(self._abstract.getTitle())))
-
-            status = self._abstract.getCurrentStatus()
-            #style = ParagraphStyle({})
-            #style.firstLineIndent = -90
-            #style.leftIndent = 170
-            text = i18nformat("""_("Judgment") : %s""")%st
-            #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-            p = SimpleParagraph(text, indent = 80)
-            story.append(p)
-
-
-    def getContribBodyLatex(self):
-        story = AbstractToPDF.getBodyLatex(self)
-
-        story += "\n\\vspace{5 mm}\n\n"
-        status = self._abstract.getCurrentStatus()
-
-        if isinstance(status,  review.AbstractStatusDuplicated):
-            original=status.getOriginal()
-            st = i18nformat(""" _("DUPLICATED") (%s : %s)""") % (original.getId(), original.getTitle())
+        if isinstance(status, review.AbstractStatusDuplicated):
+            original = status.getOriginal()
+            return _("DUPLICATED ({0}: {1})").format(original.getId(), original.getTitle())
         elif isinstance(status, review.AbstractStatusMerged):
-            target=status.getTargetAbstract()
-            st = i18nformat(""" _("MERGED") (%s : %s)""") % (target.getId(), target.getTitle())
+            target = status.getTargetAbstract()
+            return _("MERGED ({0}: {1})").format(target.getId(), target.getTitle())
         else:
-            st = AbstractStatusList.getInstance().getCaption(status.__class__).upper()
-        story += i18nformat("""_("Status") : %s""")%escape(st)
+            return AbstractStatusList.getInstance().getCaption(status.__class__).upper()
 
-        story += "\n\\vspace{5 mm}\n\n"
+    @staticmethod
+    def _get_track_judgements(abstract):
+        judgements = []
 
-        story += i18nformat("""_("Track judgments") :""")
-
-        for track in self._abstract.getTrackListSorted():
-            status = self._abstract.getTrackJudgement(track)
+        for track in abstract.getTrackListSorted():
+            status = abstract.getTrackJudgement(track)
             if isinstance(status, review.AbstractAcceptance):
-                contribType = ""
-                if status.getContribType() is not None:
-                    contribType = "(%s)" % status.getContribType().getName()
-                st = i18nformat(""" _("Proposed to accept") %s""") % (contribType)
+                if status.getContribType() is None:
+                    contribType = ""
+                else:
+                    contribType = status.getContribType().getName()
+                st = _("Proposed to accept: {0}").format(contribType)
+
             elif isinstance(status, review.AbstractRejection):
                 st = _("Proposed to reject")
+
             elif isinstance(status, review.AbstractInConflict):
                 st = _("Conflict")
+
             elif isinstance(status, review.AbstractReallocation):
                 l = []
                 for track in status.getProposedTrackList():
                     l.append(track.getTitle())
-                st = i18nformat(""" _("Proposed for other tracks") (%s)""") % ", ".join(l)
+                st = _("Proposed for other tracks (%s)").format(", ".join(l))
+
             else:
                 st = ""
 
-            story += "\n\\vspace{5 mm}\n\n"
-
-            status = self._abstract.getCurrentStatus()
-            story += i18nformat("""_("Track") : %s""") % \
-                    escape(track.getTitle())
-
-            story += "\n\\vspace{1 mm}\n\n"
-
-            status = self._abstract.getCurrentStatus()
-            story += i18nformat("""_("Judgment") : %s""") % st
-
-        return story
-
-
-    def getLatex(self):
-        template = AbstractToPDF.firstPageLatex(self)
-        template += self.getContribBodyLatex()
-
-        return template
+            judgements.append((track.getTitle(), st))
+        return judgements
 
 
 class ConfManagerAbstractsToPDF(AbstractsToPDF):
 
-    def getBody(self):
-        abMgr = self._conf.getAbstractMgr()
-        for abstract in self._abstracts:
-            temp = ConfManagerAbstractToPDF(self._conf, abMgr.getAbstractById(abstract),tz=self._tz)
-            temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
-            self._story.append(PageBreak())
+    def __init__(self, conf, abstract_ids, tz=None):
+        super(ConfManagerAbstractsToPDF, self).__init__(conf, abstract_ids, tz)
 
-
-    def getBodyLatex(self):
-        abMgr = self._conf.getAbstractMgr()
-        body = ""
-        for abstract in self._abstracts:
-            temp = ConfManagerAbstractToPDF(self._conf, abMgr.getAbstractById(abstract),tz=self._tz)
-            abstract_title = abMgr.getAbstractById(abstract).getTitle()
-            abstract_id = i18nformat(""" _("Abstract ID") : %s""") % abstract
-            body +=r'''
-\newpage
-\fancyhead[R]{\small \selectfont \color{gray} %s}
-
-\chapter*{%s}
-\addcontentsline{toc}{chapter}{%s}
-
-{\rmfamily \large \selectfont
-\noindent
-%s
-}
-
-\vspace{10 mm}
-
-%s
-            ''' % (abstract_title, abstract_title, abstract_title, abstract_id, temp.getBodyLatex())
-
-        return body
+        self._args.update({
+            'doc_type': 'abstract_manager',
+            'get_track_classification': AbstractToPDF._get_track_classification,
+            'get_contrib_type': AbstractToPDF._get_contrib_type,
+            'get_status': ConfManagerAbstractToPDF._get_status,
+            'get_track_judgements': ConfManagerAbstractToPDF._get_track_judgements
+        })
 
 
 class TrackManagerAbstractToPDF(AbstractToPDF):
@@ -863,42 +431,9 @@ class TrackManagerAbstractsToPDF(AbstractsToPDF):
             self._story.append(PageBreak())
 
 
-class ContributionBook(PDFLaTeXBase):
-
-    _tpl_filename = "contribution_list_boa.tpl"
-
-    def __init__(self, conf, contribs, aw, tz=None, sortedBy=""):
-        super(ContributionBook, self).__init__()
-
-        if not tz:
-            tz = conf.getTimezone()
-
-        if sortedBy == "boardNo":
-            try:
-                contribs = sorted(contribs, key=lambda x: int(x.getBoardNumber()))
-            except ValueError, e:
-                raise MaKaCError(
-                    _("In order to generate this PDF, all the contributions must contain a board number "
-                      "and it must only contain digits. There is a least one contribution with a wrong board number."))
-
-        self._args.update({
-            'contribs': contribs,
-            'conf': conf,
-            'tz': tz or conf.getTimezone(),
-            'show_url': False,
-            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields(),
-            'sorted_by': sortedBy,
-            'aw': aw
-        })
-
-        logo = conf.getLogo()
-        if logo:
-            self._args['logo_img'] = logo.getFilePath()
-
-
 class ContribToPDF(PDFLaTeXBase):
 
-    _tpl_filename = 'contribution.tpl'
+    _tpl_filename = 'single_doc.tpl'
 
     def __init__(self, contrib):
         super(ContribToPDF, self).__init__()
@@ -906,7 +441,13 @@ class ContribToPDF(PDFLaTeXBase):
         self._contrib = contrib
         conf = contrib.getConference()
 
+        affiliations, author_mapping, coauthor_mapping = extract_affiliations(contrib)
+
         self._args.update({
+            'doc_type': 'contribution',
+            'affiliations': affiliations,
+            'authors_affil': author_mapping,
+            'coauthors_affil': coauthor_mapping,
             'contrib': contrib,
             'conf': conf,
             'tz': conf.getTimezone(),
@@ -921,7 +462,7 @@ class ContribToPDF(PDFLaTeXBase):
 class ContribsToPDF(PDFLaTeXBase):
 
     _table_of_contents = True
-    _tpl_filename = "contribution_list.tpl"
+    _tpl_filename = "report.tpl"
 
     def __init__(self, conf, contribs):
         super(ContribsToPDF, self).__init__()
@@ -929,17 +470,135 @@ class ContribsToPDF(PDFLaTeXBase):
         self._contribs = contribs
 
         self._args.update({
-            'title': conf.getTitle(),
+            'doc_type': 'contribution',
+            'title': _("Report of Contributions"),
             'conf': conf,
-            'contribs': contribs,
+            'items': contribs,
             'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields(),
-            'show_url': True,
             'url': conf.getURL()
         })
 
         logo = conf.getLogo()
         if logo:
             self._args['logo_img'] = logo.getFilePath()
+
+
+class ContributionBook(PDFLaTeXBase):
+
+    _tpl_filename = "contribution_list_boa.tpl"
+
+    def _sort_contribs(self, contribs, sort_by):
+        if sort_by == "boardNo":
+            try:
+                return sorted(contribs, key=lambda x: int(x.getBoardNumber()))
+            except ValueError, e:
+                raise MaKaCError(
+                    _("In order to generate this PDF, all the contributions must contain a board number "
+                      "and it must only contain digits. There is a least one contribution with a wrong board number."))
+
+        elif sort_by == "schedule":
+            # TODO: this ignores contribution list param
+            # Maybe it would be worth ordering the incoming contribs
+            # by schedule time, if such a use case makes sense
+
+            res = []
+            for entry in self._conf.getSchedule().getEntries():
+                entry_owner = entry.getOwner()
+                if isinstance(entry, schedule.LinkedTimeSchEntry) and isinstance(entry_owner, conference.SessionSlot):
+                    if entry_owner.canAccess(aw):
+                        for slotentry in entry_owner.getSchedule().getEntries():
+                            owner = slotentry.getOwner()
+                            if isinstance(owner, conference.Contribution):
+                                contribs.append(owner)
+
+                elif isinstance(entry, schedule.LinkedTimeSchEntry) and isinstance(entry_owner, conference.Contribution):
+                    contribs.append(entry_owner)
+            return contribs
+        else:
+            fc = FilterCriteria(self._conf, {
+                "status": [ContribStatusList.getId(conference.ContribStatusSch),
+                           ContribStatusList.getId(conference.ContribStatusNotSch)]
+                })
+            sc = contribFilters.SortingCriteria((sort_by,))
+            f = filters.SimpleFilter(fc, sc)
+
+            res = []
+            for contrib in f.apply(contribs):
+                res.append(contrib)
+            return res
+
+    def __init__(self, conf, aw, contribs=None, tz=None, sort_by=""):
+        super(ContributionBook, self).__init__()
+
+        self._conf = conf
+
+        if not tz:
+            tz = conf.getTimezone()
+
+        if contribs is None:
+            contribs = conf.getContributionList()
+
+        contribs = self._sort_contribs(contribs, sort_by)
+
+
+        affiliation_contribs = {}
+        for contrib in contribs:
+            affiliations, author_mapping, coauthor_mapping = extract_affiliations(contrib)
+
+            affiliation_contribs[contrib.getId()] = {
+                'affiliations': affiliations,
+                'authors_affil': author_mapping,
+                'coauthors_affil': coauthor_mapping
+            }
+
+        corresp_authors = []
+
+        # figure out "corresponding author(s)"
+        if conf.getBOAConfig().getCorrespondingAuthor() == "submitter":
+            if isinstance(contrib, conference.AcceptedContribution):
+                corresp_authors.append(contrib.getAbstract().getSubmitter().getEmail())
+            elif contrib.getSubmitterList():
+                corresp_authors.append(contrib.getSubmitterList()[0].getEmail())
+
+        elif conf.getBOAConfig().getCorrespondingAuthor() == "speakers":
+            corresp_authors = [speaker.getEmail() for speaker in contrib.getSpeakerList()]
+
+        abstract = contrib.getDescription()
+
+        self._args.update({
+            'affiliation_contribs': affiliation_contribs,
+            'corresp_authors': corresp_authors,
+            'contribs': contribs,
+            'conf': conf,
+            'tz': tz or conf.getTimezone(),
+            'url': conf.getURL(),
+            'fields': conf.getAbstractMgr().getAbstractFieldsMgr().getActiveFields(),
+            'sorted_by': sort_by,
+            'aw': aw,
+            'boa_text': conf.getBOAConfig().getText()
+        })
+
+        logo = conf.getLogo()
+        if logo:
+            self._args['logo_img'] = logo.getFilePath()
+
+
+class AbstractBook(ContributionBook):
+
+    _tpl_filename = "book_of_abstracts.tpl"
+    _table_of_contents = True
+
+    def __init__(self, conf, aw, tz=None):
+        if not tz:
+            tz = conf.getTimezone()
+
+        sort_by = conf.getBOAConfig().getSortBy()
+        if not sort_by.strip() or sort_by not in ["number", "name", "sessionTitle", "speaker", "schedule"]:
+            sort_by = "number"
+
+        super(AbstractBook, self).__init__(conf, aw, None, tz, sort_by)
+
+        del self._args["url"]
 
 
 class TimetablePDFFormat:
@@ -1828,205 +1487,6 @@ class SimplifiedTimeTablePlain(PDFBase):
             for entry in dayEntries:
                 story.append(entry)
             currentDay+=timedelta(days=1)
-
-class AbstractBook(PDFWithTOC):
-
-    def __init__(self,conf,aw,tz=None):
-        self._conf=conf
-        if not tz:
-            self._tz = self._conf.getTimezone()
-        else:
-            self._tz = tz
-        self._aw=aw
-        self._sortBy=self._conf.getBOAConfig().getSortBy()
-        if self._sortBy.strip()=="" or\
-                self._sortBy not in ["number", "name", "sessionTitle", "speaker", "schedule"]:
-            self._sortBy="number"
-        self._title= _("Book of abstracts")
-        PDFWithTOC.__init__(self)
-
-    def firstPage(self,c,doc):
-        c.saveState()
-        self._drawLogo(c, False)
-        height=self._drawWrappedString(c,self._conf.getTitle())
-        c.setFont('Times-Bold',15)
-        height-=2*cm
-        c.drawCentredString(self._PAGE_WIDTH/2.0,height,
-                "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"),
-                self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")))
-        if self._conf.getLocation():
-            height-=1*cm
-            c.drawCentredString(self._PAGE_WIDTH/2.0,height,
-                    escape(self._conf.getLocation().getName()))
-        c.setFont('Times-Bold', 30)
-        height-=6*cm
-        c.drawCentredString(self._PAGE_WIDTH/2.0,height,\
-                self._title)
-        self._drawWrappedString(c, "%s / %s"%(self._conf.getTitle(),self._title), width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
-        c.drawRightString(self._PAGE_WIDTH-inch,0.75*inch,
-                nowutc().strftime("%A %d %B %Y"))
-        c.restoreState()
-
-    def laterPages(self,c,doc):
-        c.saveState()
-        c.setFont('Times-Roman',9)
-        c.setFillColorRGB(0.5,0.5,0.5)
-        c.drawString(1*cm,self._PAGE_HEIGHT-1*cm,
-            "%s / %s"%(escape(self._conf.getTitle()),self._title))
-        c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,"%d "%doc.page)
-        c.restoreState()
-
-    def _defineStyles(self):
-        self._styles={}
-        titleStyle=getSampleStyleSheet()["Heading1"]
-        titleStyle.fontName="LinuxLibertine-Bold"
-        titleStyle.fontSize=14.0
-        titleStyle.spaceBefore=0
-        titleStyle.spaceAfter=10
-        titleStyle.leading=14
-        self._styles["title"]=titleStyle
-        subtitleStyle=getSampleStyleSheet()["Heading1"]
-        subtitleStyle.fontName="LinuxLibertine-Bold"
-        subtitleStyle.fontSize=11.0
-        subtitleStyle.spaceBefore=0
-        subtitleStyle.spaceAfter=4
-        subtitleStyle.leading=14
-        self._styles["subtitle"]=subtitleStyle
-        authStyle=getSampleStyleSheet()["Heading3"]
-        authStyle.fontName="LinuxLibertine"
-        authStyle.fontSize=8.0
-        authStyle.spaceBefore=0
-        authStyle.spaceAfter=0
-        authStyle.leading=14
-        self._styles["authors"]=authStyle
-        abstractStyle=getSampleStyleSheet()["Normal"]
-        abstractStyle.fontName="LinuxLibertine"
-        abstractStyle.fontSize=10.0
-        abstractStyle.spaceBefore=0
-        abstractStyle.spaceAfter=0
-        abstractStyle.alignment=TA_JUSTIFY
-        self._styles["abstract"]=abstractStyle
-        ttInfoStyle=getSampleStyleSheet()["Normal"]
-        ttInfoStyle.fontName="LinuxLibertine"
-        ttInfoStyle.fontSize=10.0
-        ttInfoStyle.spaceBefore=0
-        ttInfoStyle.spaceAfter=0
-        ttInfoStyle.alignment=TA_JUSTIFY
-        self._styles["tt_info"]=ttInfoStyle
-        normalStyle=getSampleStyleSheet()["Normal"]
-        normalStyle.fontName="LinuxLibertine"
-        normalStyle.fontSize=10.0
-        normalStyle.spaceBefore=5
-        normalStyle.spaceAfter=5
-        normalStyle.alignment=TA_JUSTIFY
-        self._styles["normal"]=normalStyle
-
-    def _addAuthors(self, authorList, institutions):
-        lauth = []
-        for auth in authorList:
-            fullName=auth.getFullName()
-            instit=auth.getAffiliation().strip()
-            if instit!="":
-                try:
-                    indexInsti = institutions.index(instit) + 1
-                except:
-                    institutions.append(instit)
-                    indexInsti = len(institutions)
-                fullName="%s <sup>%s</sup>"%(fullName,indexInsti)
-            lauth.append("%s"%escape(fullName))
-        return lauth
-
-    def _addContribution(self, contrib, story):
-        if not contrib.canAccess(self._aw):
-            return
-        paragraphs=[]
-        ses=""
-        if contrib.getSession() is not None:
-            ses=contrib.getSession().getTitle()
-        if contrib.getBoardNumber():
-            if ses != "":
-                ses = "%s - "%ses
-                ses="%sBoard %s"%(ses, contrib.getBoardNumber())
-        if ses!="":
-            ses = "%s / "%ses
-
-        caption = "%s%s"%(ses,contrib.getId())
-        paragraphs.append(Paragraph(escape(caption),self._styles["subtitle"]))
-        caption="%s"%(contrib.getTitle())
-        p = Paragraph(escape(caption),self._styles["title"])
-        paragraphs.append(p)
-        flowableText = escape(contrib.getTitle())
-        if self._conf.getBOAConfig().getShowIds():
-            flowableText += """ (%s)"""%contrib.getId()
-        self._indexedFlowable[p] = {"text":escape(flowableText), "level":1}
-
-        lauth=[]
-        institutions=[]
-        authors = self._addAuthors(contrib.getPrimaryAuthorList(), institutions)
-        if authors and contrib.getCoAuthorList():
-            authors = i18nformat("""<b>_("%s"):</b> %s""")%(ngettext("Author", "Authors", len(authors)), "; ".join(authors))
-        else:
-            authors = "; ".join(authors)
-        paragraphs.append(Paragraph(authors, self._styles["authors"]))
-        coauthors = self._addAuthors(contrib.getCoAuthorList(), institutions)
-        if coauthors:
-            paragraphs.append(Paragraph(i18nformat("""<b>_("Co-%s"):</b> %s""")%(ngettext("Author", "Authors", len(coauthors)), "; ".join(coauthors)),self._styles["authors"]))
-        if institutions:
-            linst=[]
-            for instit in institutions:
-                linst.append("<sup>%s</sup> <i>%s</i>"%(institutions.index(instit)+1, instit))
-            institutionsText="<br/>".join(linst)
-            paragraphs.append(Paragraph(institutionsText,self._styles["authors"]))
-
-        if self._conf.getBOAConfig().getCorrespondingAuthor() == "submitter":
-            submitterEmail=""
-            if isinstance(contrib, conference.AcceptedContribution):
-                submitterEmail=contrib.getAbstract().getSubmitter().getEmail()
-            elif contrib.getSubmitterList():
-                submitterEmail=contrib.getSubmitterList()[0].getEmail()
-
-            if submitterEmail!="":
-                submitter = i18nformat("""<b>_("Corresponding Author"):</b> %s""")%submitterEmail
-                paragraphs.append(Paragraph(escape(submitter),self._styles["normal"]))
-        elif self._conf.getBOAConfig().getCorrespondingAuthor() == "speakers":
-            speakersEmail = [speaker.getEmail() for speaker in contrib.getSpeakerList()]
-            if speakersEmail:
-                speakers = i18nformat("""<b>_("Corresponding %s"):</b> %s""")%(ngettext("Author", "Authors", len(speakersEmail)), ", ".join(speakersEmail))
-                paragraphs.append(Paragraph(escape(speakers),self._styles["normal"]))
-        abstract = contrib.getDescription()
-        paragraphs.append(Paragraph(escape(abstract), self._styles["abstract"]))
-
-        abs=KeepTogether(paragraphs)
-        story.append(abs)
-        story.append(Spacer(1,0.4*inch))
-
-    def getBody(self,story=None):
-        self._defineStyles()
-        if not story:
-            story=self._story
-        if self._conf.getBOAConfig().getText():
-            text=self._conf.getBOAConfig().getText().replace("<BR>","<br>")
-            text=text.replace("<Br>","<br>")
-            text=text.replace("<bR>","<br>")
-            for par in text.split("<br>"):
-                p=Paragraph(par,self._styles["normal"])
-                story.append(p)
-            story.append(PageBreak())
-        if self._sortBy == "schedule":
-            for entry in self._conf.getSchedule().getEntries():
-                if isinstance(entry,schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(),conference.SessionSlot):
-                    if entry.getOwner().canAccess(self._aw):
-                        for slotentry in entry.getOwner().getSchedule().getEntries():
-                            if isinstance(slotentry.getOwner(), conference.Contribution):
-                                self._addContribution(slotentry.getOwner(), story)
-                elif isinstance(entry,schedule.LinkedTimeSchEntry) and isinstance(entry.getOwner(),conference.Contribution):
-                    self._addContribution(entry.getOwner(), story)
-        else:
-            fc=FilterCriteria(self._conf,{"status":[ContribStatusList.getId(conference.ContribStatusSch),ContribStatusList.getId(conference.ContribStatusNotSch)]})
-            sc=contribFilters.SortingCriteria((self._sortBy,))
-            f=filters.SimpleFilter(fc,sc)
-            for contrib in f.apply(self._conf.getContributionList()):
-                self._addContribution(contrib, story)
 
 
 class FilterCriteria(filters.FilterCriteria):

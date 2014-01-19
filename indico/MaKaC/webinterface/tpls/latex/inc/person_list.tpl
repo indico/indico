@@ -6,10 +6,7 @@
         { \bf
           \noindent
           ${caption} :
-        }
-        \vspace{0.5em}
-
-        \begin{itemize*}[label=,itemjoin={{;}}]
+        }\begin{itemize*}[label=,itemjoin={{;}}]
         % for person in list:
             \item {
                 \small
@@ -23,5 +20,5 @@
         \end{itemize*}
     }
 
-    \vspace{1.5em}
+    \vspace{0.5em}
 %endif

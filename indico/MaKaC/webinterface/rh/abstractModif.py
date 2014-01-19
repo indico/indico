@@ -125,17 +125,8 @@ class RHAbstractToPDF(RHAbstractModifBase):
     def _process( self ):
         tz = self._conf.getTimezone()
         filename = "%s - Abstract.pdf" % self._target.getTitle()
-        pdf = ConfManagerAbstractToPDF(self._conf, self._target, tz=tz)
-
-        latex_template = 'LatexRHAbstractToPDF.tpl'
-
-        kwargs = {'body': pdf.getLatex()}
-
-        latex = LatexRunner(filename)
-        pdffile = latex.run(latex_template, **kwargs)
-        latex.cleanup()
-
-        return send_file(filename, pdffile, 'PDF')
+        pdf = ConfManagerAbstractToPDF(self._target, tz=tz)
+        return send_file(filename, pdf.generate(), 'PDF')
 
 
 class RHAbstractToXML(RHAbstractModifBase):

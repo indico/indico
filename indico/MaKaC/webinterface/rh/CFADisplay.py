@@ -382,46 +382,24 @@ class RHAbstractDisplayPDF( RHAbstractDisplayBase ):
     def _process(self):
         tz = timezoneUtils.DisplayTZ(self._aw, self._conf).getDisplayTZ()
         filename = '%s - Abstract.pdf' % self._target.getTitle()
-        pdf = AbstractToPDF(self._conf, self._target, tz=tz)
-
-        latex_template = 'LatexRHAbstractDisplayPDF.tpl'
-
-        kwargs = {'body': pdf.getLatex()}
-
-        latex = LatexRunner(filename)
-        pdffile = latex.run(latex_template, **kwargs)
-        latex.cleanup()
-
-        return send_file(filename, pdffile, 'PDF')
+        pdf = AbstractToPDF(self._target, tz=tz)
+        return send_file(filename, pdf.generate(), 'PDF')
 
 
 class RHUserAbstractsPDF(RHAbstractSubmissionBase):
 
-    def _processIfActive( self ):
-        tz = timezoneUtils.DisplayTZ(self._aw,self._conf).getDisplayTZ()
+    def _processIfActive(self):
+        tz = timezoneUtils.DisplayTZ(self._aw, self._conf).getDisplayTZ()
         cfaMgr = self._conf.getAbstractMgr()
-        abstracts = cfaMgr.getAbstractListForAvatar( self._aw.getUser() )
-        abstracts += cfaMgr.getAbstractListForAuthorEmail(self._aw.getUser().getEmail())
-        self._abstractIds = [abstract.getId() for abstract in abstracts]
+        abstracts = set(cfaMgr.getAbstractListForAvatar(self._aw.getUser()))
+        abstracts |= set(cfaMgr.getAbstractListForAuthorEmail(self._aw.getUser().getEmail()))
+        self._abstractIds = sorted(abstract.getId() for abstract in abstracts)
         if not self._abstractIds:
             return _("No abstract to print")
 
         filename = 'my-abstracts.pdf'
         pdf = AbstractsToPDF(self._conf, self._abstractIds, tz=tz)
-
-        latex_template = 'LatexRHUserAbstractsPDF.tpl'
-
-        kwargs = {'first_page': pdf.firstPageLatex(),
-                'title': self._target.getTitle(),
-                'page_no': i18nformat(""" _("Page") """),
-                'body': pdf.getBodyLatex()
-                }
-
-        latex = LatexRunner(filename, True)
-        pdffile = latex.run(latex_template, **kwargs)
-        latex.cleanup()
-
-        return send_file(filename, pdffile, 'PDF')
+        return send_file(filename, pdf.generate(), 'PDF')
 
 
 class RHAbstractModificationBase(RHAbstractDisplayBase, RHModificationBaseProtected):

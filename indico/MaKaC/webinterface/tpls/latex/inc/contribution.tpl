@@ -21,18 +21,14 @@
     }
 \end{center}
 
-
-\vspace{1em}
-
 % if contrib.isScheduled():
-
-    \begin{flushright}
+    {
+        \hfill
         \em
         \small
-        \hfill
+        \color{gray}
         ${formatDate(contrib.getAdjustedStartDate(tz), format="full")} ${formatTime(contrib.getAdjustedStartDate(tz), format="short")} (${':'.join(str(contrib.getDuration()).split(':')[:2])})
-
-    \end{flushright}
+    }
 % endif
 
 \vspace{1em}
