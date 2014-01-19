@@ -318,7 +318,7 @@ class UHConferenceOverview(URLHandler):
     @classmethod
     def getURL(cls, target):
         if ContextManager.get('offlineMode', False):
-            return UHConferenceDisplay.getStaticURL(target)
+            return URL(UHConferenceDisplay.getStaticURL(target))
         return super(UHConferenceOverview, cls).getURL(target)
 
 
