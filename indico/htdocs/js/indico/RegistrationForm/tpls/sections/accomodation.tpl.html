@@ -11,7 +11,8 @@
                     <select id="arrivalDate" name="arrivalDate" required
                         ng-model="input.arrival"
                         ng-class="{hasError: validationStarted && nestedFormArrival.$invalid}"
-                        ng-options="s_date as l_date for (s_date, l_date) in section.arrivalDates">
+                        ng-options="s_date as l_date for (s_date, l_date) in section.arrivalDates"
+                        ng-disabled="billableOptionPayed(userdata)">
                         <option value="" selected>--{{ 'select a date' | i18n }}--</option>
                     </select>
                 </ng-form>
@@ -28,7 +29,8 @@
                     <select id="departureDate" name="departureDate" required
                         ng-model="input.departure"
                         ng-class="{hasError: validationStarted && nestedFormDeparture.$invalid}"
-                        ng-options="s_date as l_date for (s_date, l_date) in section.departureDates | possibleDeparture:this">
+                        ng-options="s_date as l_date for (s_date, l_date) in section.departureDates | possibleDeparture:this"
+                        ng-disabled="billableOptionPayed(userdata)">
                         <option value="" selected>--{{ 'select a date' | i18n }}--</option>
                     </select>
                 </ng-form>
@@ -60,7 +62,7 @@
                         name="accommodation_type"
                         value="{{ item.id }}"
                         ng-model="userdata.accommodation.accommodationType.id"
-                        ng-disabled="isDisabled(item)"
+                        ng-disabled="isDisabled(item) || paymentBlocked(item, userdata) || billableOptionPayed(userdata)"
                         ng-required="hasPlacesLeft(item) && !item.cancelled"
                         ng-checked="item.id == userdata.accommodation.accommodationType.id"/>
                     {{ item.caption }}

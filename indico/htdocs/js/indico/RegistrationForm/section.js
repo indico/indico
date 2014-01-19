@@ -230,6 +230,14 @@ ndRegForm.directive("ndAccommodationSection", function($rootScope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
 
+            scope.billableOptionPayed = function(userdata) {
+                if (userdata.accommodation !== undefined) {
+                    return userdata.accommodation.accommodationType.billable === true;
+                } else {
+                    return false;
+                }
+            };
+
             scope.updateArrival = function(arrival) {
                 scope.arrival = arrival;
                 scope.arrivalUpdated = true;
