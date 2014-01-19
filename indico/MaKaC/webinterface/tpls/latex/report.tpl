@@ -11,7 +11,6 @@
 </%block>
 
 <%block name="header_extra">
-    \usepackage{titlesec}
     \usepackage{fancyhdr} %% headers
     \usepackage{scrextend}
 

@@ -1,5 +1,3 @@
-\batchmode
-
 <%block name="document_class">
 \documentclass[a4paper, 15pt]{article} %% document type
 </%block>

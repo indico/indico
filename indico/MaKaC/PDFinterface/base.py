@@ -761,7 +761,6 @@ class PDFLaTeXBase(object):
     def generate(self):
         latex = LatexRunner(has_toc=self._table_of_contents)
         pdffile = latex.run(self._tpl_filename, **self._args)
-        latex.cleanup()
         return pdffile
 
 
@@ -789,21 +788,18 @@ class LatexRunner:
 
         pdflatex_cmd = 'pdflatex -interaction=nonstopmode -output-directory={1} {0}'.format(source_file, self._dir)
 
-        proc = subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        errlog = proc.communicate()[0]
-
         try:
             subprocess.check_call(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            Logger.get('pdflatex').info("PDF created successfully!")
+
+            if self.has_toc:
+                subprocess.check_call(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+            Logger.get('pdflatex').debug("PDF created successfully!")
+
         except subprocess.CalledProcessError, e:
             Logger.get('pdflatex').error(errlog)
-
-        if self.has_toc:
-            proc = subprocess.Popen(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE)
-            proc.communicate()
 
         return target_file
 
     def cleanup(self):
-        pass
-        #shutil.rmtree(self._dir)
+        shutil.rmtree(self._dir)
