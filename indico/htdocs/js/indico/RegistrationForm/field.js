@@ -134,31 +134,6 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
 });
 
 ndRegForm.controller('BillableCtrl', function($scope, $filter) {
-    $scope.isBillable = function(item) {
-        return (item.billable === true || item.isBillable === true) && !$scope.isDisabled(item);
-    };
-
-    $scope.isDisabled = function(item) {
-        return (item.disabled === true || item.isEnabled === false) ||
-            !$scope.hasPlacesLeft(item) || item.cancelled === true;
-    };
-
-    $scope.isRequired = function(item) {
-        return item.required && !scope.isDisabled(item);
-    };
-
-    $scope.hasPlacesLeft = function(item) {
-        if (!$scope.hasPlacesLimit) {
-            return true;
-        } else {
-            return item.noPlacesLeft >= 0;
-        }
-    };
-
-    $scope.hasPlacesLimit = function(item) {
-        return item.placesLimit !== 0;
-    };
-
     $scope.getBillableStr = function(item) {
         var str = '';
 
@@ -175,6 +150,45 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         }
 
         return str;
+    };
+
+    $scope.isBillable = function(item) {
+        item = item || {};
+        return (item.billable === true || item.isBillable === true) && !$scope.isDisabled(item);
+    };
+
+    $scope.isDisabled = function(item) {
+        item = item || {};
+        return (item.disabled === true || item.isEnabled === false) ||
+            !$scope.hasPlacesLeft(item) || item.cancelled === true;
+    };
+
+    $scope.isRequired = function(item) {
+        item = item || {};
+        return item.required && !scope.isDisabled(item);
+    };
+
+    $scope.hasPlacesLeft = function(item) {
+        item = item || {};
+        if (!$scope.hasPlacesLimit) {
+            return true;
+        } else {
+            return item.noPlacesLeft >= 0;
+        }
+    };
+
+    $scope.hasPlacesLimit = function(item) {
+        item = item || {};
+        return item.placesLimit !== 0;
+    };
+
+    $scope.paymentBlocked = function(item, userdata, validation) {
+        item = item || {};
+        if (validation !== undefined) {
+            return ($scope.isBillable(item) && userdata.payed) || validation(userdata);
+        } else {
+            return $scope.isBillable(item) && userdata.payed;
+        }
     };
 });
 
