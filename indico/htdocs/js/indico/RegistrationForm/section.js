@@ -524,6 +524,16 @@ ndRegForm.directive("ndSocialEventSection", function() {
                 });
             };
 
+            scope.anyBillableEventPayed = function(userdata) {
+                if (userdata.payed) {
+                    return _.any(userdata.socialEvents, function(item) {
+                        return item.price !== 0;
+                    });
+                }
+
+                return false;
+            };
+
             scope.dialogs.config.contentWidth = 800;
             scope.dialogs.config.formData.push('introSentence');
             scope.dialogs.config.formData.push('selectionType');

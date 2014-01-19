@@ -7,7 +7,8 @@
 
     <tr ng-if="section.selectionType!='multiple'">
         <td>
-            <input type="radio" name="socialEvents" value="" checked/>
+            <input type="radio" name="socialEvents" value="" checked
+                ng-disabled="anyBillableEventPayed(userdata)"/>
             {{ 'None' | i18n }}
         </td>
     </tr>
@@ -16,18 +17,19 @@
             <input ng-switch-when="multiple"
                 type="checkbox" name="socialEvents" value="{{ item.id }}"
                 ng-checked="isSelected(item.id)"
-                ng-disabled="!hasPlacesLeft(item)"/>
+                ng-disabled="!hasPlacesLeft(item) || paymentBlocked(item, userdata) "/>
             <input ng-switch-default
                 type="radio" name="socialEvents" value="{{ item.id }}"
                 ng-checked="item.id == userdata.socialEvents[0].id"
-                ng-disabled="!hasPlacesLeft(item)"/>
+                ng-disabled="!hasPlacesLeft(item) || paymentBlocked(item, userdata) || anyBillableEventPayed(userdata)"/>
             {{ item.caption }}
             <font ng-if="!hasPlacesLeft(item)" color="red">
                 ({{ 'no places left' | i18n }})
             </font>
         </td>
         <td ng-if="hasPlacesLeft(item)">
-            <select name="places-{{ item.id }}">
+            <select name="places-{{ item.id }}"
+                ng-disabled="paymentBlocked(item, userdata) || (section.selectionType == 'unique' && anyBillableEventPayed(userdata))">
                 <option ng-repeat="n in [] | range: getMaxRegistrations(item)"
                     value="{{ $index+1 }}">{{ $index+1 }}</option>
             </select>
