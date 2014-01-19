@@ -782,22 +782,28 @@ class LatexRunner:
         self._dir = tempfile.mkdtemp(prefix="indico-texgen-")
         source_file = os.path.join(self._dir, template_name + '.tex')
         target_file = os.path.join(self._dir, template_name + '.pdf')
+        log_file = open(os.path.join(self._dir, 'output.log'), 'a+')
 
         with open(source_file, 'w') as f:
             f.write(template)
 
-        pdflatex_cmd = 'pdflatex -interaction=nonstopmode -output-directory={1} {0}'.format(source_file, self._dir)
+        pdflatex_cmd = 'pdflatex -interaction=nonstopmode -output-directory={1} {0}'.format(
+            source_file, self._dir)
 
         try:
-            subprocess.check_call(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
+            subprocess.check_call(shlex.split(pdflatex_cmd), stdout=log_file)
             if self.has_toc:
-                subprocess.check_call(shlex.split(pdflatex_cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                subprocess.check_call(shlex.split(pdflatex_cmd), stdout=log_file)
 
             Logger.get('pdflatex').debug("PDF created successfully!")
 
         except subprocess.CalledProcessError, e:
-            Logger.get('pdflatex').error(errlog)
+            # flush log, go to beginning and read it
+            log_file.flush()
+            log_file.seek(0)
+            Logger.get('pdflatex').error(log_file.read())
+        finally:
+            log_file.close()
 
         return target_file
 
