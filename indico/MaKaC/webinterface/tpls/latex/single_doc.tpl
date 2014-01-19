@@ -30,5 +30,7 @@
         \end{figure}
     % endif
 
-        <%include file="inc/${doc_type}.tpl" args="status=status,track_judgements=track_judgements"/>
+        <%include file="inc/${doc_type}.tpl" args="status=status,
+            track_view=track_view,
+            track_judgements=track_judgements"/>
 </%block>

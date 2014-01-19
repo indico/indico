@@ -44,6 +44,11 @@
                 contrib_type=get_contrib_type(item),
                 status=get_status(item),
                 track_judgements=get_track_judgements(item)"/>
+        % elif doc_type == 'abstract_track_manager':
+            <%include file="inc/abstract_track_manager.tpl" args="abstract=item,
+                track_class=get_track_classification(item),
+                contrib_type=get_contrib_type(item),
+                track_view=get_track_view(track, item)"/>
         % elif doc_type == 'contribution':
             <%include file="inc/contribution.tpl" args="contrib=item"/>
         % endif

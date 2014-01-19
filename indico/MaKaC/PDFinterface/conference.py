@@ -43,7 +43,16 @@ from MaKaC.badge import BadgeTemplateItem
 from MaKaC.poster import PosterTemplateItem
 from MaKaC.registration import Registrant
 from MaKaC.PDFinterface.base import PDFLaTeXBase, PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak, Preformatted, FileDummy, setTTFonts, PDFSizes, modifiedFontSize, SimpleParagraph
-from MaKaC.webinterface.pages.tracks import AbstractStatusTrackViewFactory, _ASTrackViewPFOT, _ASTrackViewPA, _ASTrackViewDuplicated, _ASTrackViewMerged,_ASTrackViewAccepted, _ASTrackViewIC
+from MaKaC.webinterface.pages.tracks import (
+    AbstractStatusTrackViewFactory,
+    _ASTrackViewPFOT,
+    _ASTrackViewPA,
+    _ASTrackViewDuplicated,
+    _ASTrackViewMerged,
+    _ASTrackViewAccepted,
+    _ASTrackViewIC,
+    _ASTrackViewAcceptedForOther
+)
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
@@ -297,8 +306,6 @@ class ConfManagerAbstractsToPDF(AbstractsToPDF):
 
         self._args.update({
             'doc_type': 'abstract_manager',
-            'get_track_classification': AbstractToPDF._get_track_classification,
-            'get_contrib_type': AbstractToPDF._get_contrib_type,
             'get_status': ConfManagerAbstractToPDF._get_status,
             'get_track_judgements': ConfManagerAbstractToPDF._get_track_judgements
         })
@@ -306,129 +313,57 @@ class ConfManagerAbstractsToPDF(AbstractsToPDF):
 
 class TrackManagerAbstractToPDF(AbstractToPDF):
 
-    def __init__(self, conf, abstract, track, doc=None, story=None, tz=None):
-        AbstractToPDF.__init__(self, conf, abstract, doc, story, tz=tz)
+    def __init__(self, abstract, track, tz=None):
+        super(TrackManagerAbstractToPDF, self).__init__(abstract, tz=tz)
         self._track = track
-#        self._tz = tz
 
-    def _getTrackText(self):
-        text = i18nformat("""<b> _("Track classification")</b>: """)
-        listTrack= []
-        for track in self._abstract.getTrackListSorted():
-            listTrack.append( escape(track.getTitle()))
-        text += " ; ".join(listTrack)
-        return text
+        self._args.update({
+            'doc_type': 'abstract_track_manager',
+            'track_view': self._get_abstract_track_view(track, abstract)
+        })
 
-    def _getContribTypeText(self):
-        status=self._abstract.getCurrentStatus()
-        text= i18nformat("""<b> _("Contribution type")</b>: %s""")%escape(str(self._abstract.getContribType()))
-        return text
-
-    def getBody(self, story=None, indexedFlowable={}, level=1 ):
-        if not story:
-            story = self._story
-        #get the common abstract content from parent
-        AbstractToPDF.getBody(self, story, indexedFlowable, level )
-
-        #add info for the track manager
-        status=AbstractStatusTrackViewFactory.getStatus(self._track,self._abstract)
+    @staticmethod
+    def _get_abstract_track_view(track, abstract):
+        status = AbstractStatusTrackViewFactory.getStatus(track, abstract)
         comments = escape(status.getComment())
         st = status.getLabel().upper()
-        conflictText, res = "", ""
+
         if isinstance(status, _ASTrackViewPFOT):
-            l = []
-            for track in status.getProposedTrackList():
-                l.append( escape(track.getTitle()) )
-            res = "%s"%", ".join(l)
+            tracks = [escape(track.getId(), track.getTitle()) for track in status.getProposedTrackList()]
+            return (st, tracks)
+
         elif isinstance(status, _ASTrackViewPA):
-            contribType = ""
-            if status.getContribType() is not None:
-                contribType = "(%s)"%status.getContribType().getName()
-            res = "%s %s"%( status.getLabel().upper(), \
-                              contribType )
-            conflicts = status.getConflicts()
-            if conflicts:
-                l = []
-                for jud in conflicts:
-                    if jud.getTrack() != self._track:
-                        l.append( "%s ( %s )"%( jud.getTrack().getTitle(), \
-                                escape(jud.getResponsible().getFullName()) ) )
-                conflictText = ",\n".join(l)
+            ctype = status.getContribType()
+            conflicts = [
+                (jud.getTrack().getTitle(), jud.getResponsible().getFullName())
+                for jud in status.getConflicts()]
+            return (st, conflicts)
+
+        elif isinstance(status, _ASTrackViewAcceptedForOther):
+            return (st, status.getTrack())
+
         elif isinstance(status, _ASTrackViewIC):
-            st = self.htmlText(status.getLabel().upper())
+            return (st, None)
+
         elif isinstance(status, _ASTrackViewDuplicated):
-            orig = status.getOriginal()
-            st =  "%s (%s : %s)"%(status.getLabel().upper(), orig.getId(), orig.getTitle())
+            return (st, status.getOriginal())
+
         elif isinstance(status, _ASTrackViewMerged):
-            target=status.getTarget()
-            st = "%s (%s : %s)"%(status.getLabel().upper(), target.getId(), target.getTitle())
-        elif isinstance(status,_ASTrackViewAccepted):
-            if status.getContribType() is not None and \
-                                                status.getContribType()!="":
-                contribType = ""
-                if status.getContribType() is not None:
-                    contribType = "(%s)"%status.getContribType().getName()
-                st = "%s %s"%(status.getLabel().upper(),contribType)
-        story.append(Spacer(inch, 0.5*cm, part=escape(self._abstract.getTitle())))
-        status = self._abstract.getCurrentStatus()
-        #style = ParagraphStyle({})
-        #style.firstLineIndent = -90
-        #style.leftIndent = 90
-        if st:
-            text = i18nformat("""_("Status") : %s""")%st
+            return (st, status.getTarget())
+
         else:
-            text = i18nformat("""_("Status") : _("SUBMITTED")""")
-        #p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-        p = SimpleParagraph(text)
-        story.append(p)
-
-
-
-        #story.append(Spacer(inch, 0.1*cm, part=self._abstract.getTitle()))
-
-        if res:
-            status = self._abstract.getCurrentStatus()
-            style = ParagraphStyle({})
-            style.leftIndent = 60
-            text = "(<i>%s</i>)"%res
-            p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-            story.append(p)
-
-
-        if comments:
-            status = self._abstract.getCurrentStatus()
-            style = ParagraphStyle({})
-            style.leftIndent = 40
-            text = "\"<i>%s</i>\""%comments
-            p = Paragraph(text, style, part=escape(self._abstract.getTitle()))
-            story.append(p)
-
-        story.append(Spacer(inch, 0.2*cm, part=escape(self._abstract.getTitle())))
-
-        if conflictText:
-            style = ParagraphStyle({})
-            style.leftIndent = 40
-            p = Paragraph( i18nformat(""" _("In conflict with"): """), style, part=escape(self._abstract.getTitle()))
-            story.append(p)
-
-            style = ParagraphStyle({})
-            style.leftIndent = 60
-            p = Preformatted(conflictText, style, part=escape(self._abstract.getTitle()))
-            story.append(p)
+            return (st, None)
 
 
 class TrackManagerAbstractsToPDF(AbstractsToPDF):
+    def __init__(self, conf, track, abstract_ids, tz=None):
+        super(TrackManagerAbstractsToPDF, self).__init__(conf, abstract_ids, tz)
 
-    def __init__(self, conf, track, abstractList, tz=None):
-        AbstractsToPDF.__init__(self, conf, abstractList, tz)
-        self._track = track
-
-    def getBody(self):
-        abMgr = self._conf.getAbstractMgr()
-        for abstract in self._abstracts:
-            temp = TrackManagerAbstractToPDF(self._conf, abMgr.getAbstractById(abstract), self._track, tz=self._tz)
-            temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
-            self._story.append(PageBreak())
+        self._args.update({
+            'track': track,
+            'doc_type': 'abstract_track_manager',
+            'get_track_view': TrackManagerAbstractToPDF._get_abstract_track_view
+        })
 
 
 class ContribToPDF(PDFLaTeXBase):

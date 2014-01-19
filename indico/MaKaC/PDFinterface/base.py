@@ -44,7 +44,6 @@ import subprocess, shlex, os, tempfile
 from MaKaC.common.logger import Logger
 
 from mako.template import Template
-from mako import runtime as mako_runtime
 
 from indico.util import mdx_latex
 import markdown
@@ -756,8 +755,7 @@ class PDFLaTeXBase(object):
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
         self._args = {
-            'md_convert': md.convert,
-            'runtime': mako_runtime
+            'md_convert': md.convert
         }
 
     def generate(self):

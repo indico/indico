@@ -574,8 +574,8 @@ class RHAbstractToPDF(RHTrackAbstractBase):
     def _process(self):
         tz = self._conf.getTimezone()
         filename = "%s - Abstract.pdf" % self._target.getTitle()
-        pdf = TrackManagerAbstractToPDF(self._conf, self._abstract, self._track, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
+        pdf = TrackManagerAbstractToPDF(self._abstract, self._track, tz=tz)
+        return send_file(filename, pdf.generate(), 'PDF')
 
 
 class RHAbstractsActions:
@@ -689,7 +689,7 @@ class RHAbstractsToPDF(RHTrackAbstractsBase):
         if not self._abstractIds:
             return "No abstract to print"
         pdf = TrackManagerAbstractsToPDF(self._conf, self._track, self._abstractIds,tz=tz)
-        return send_file('Abstracts.pdf', StringIO(pdf.getPDFBin()), 'PDF')
+        return send_file('Abstracts.pdf', pdf.generate(), 'PDF')
 
 
 class RHAbstractIntComments( RHTrackAbstractBase ):

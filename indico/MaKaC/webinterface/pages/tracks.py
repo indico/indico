@@ -235,7 +235,7 @@ class _ASTrackViewAcceptedForOther( _AbstractStatusTrackView ):
     _id = "accepted_other"
     _icon = "ats_accepted_other"
     #don't modify it _("accepted for other track")
-    _label = "accepted for other track"
+    _label = "accepted for another track"
 
     def getComment( self ):
         return  self._abstract.getCurrentStatus().getComments()
