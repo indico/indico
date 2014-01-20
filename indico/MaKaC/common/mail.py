@@ -84,6 +84,9 @@ class GenericMailer:
         msg["To"] = ', '.join(filter(None, toList))
         msg["Cc"] = ', '.join(filter(None, ccList))
 
+        if not (msg["To"] or msg["Cc"]):
+            return
+
         try:
             ct = notification.getContentType()
         except:
