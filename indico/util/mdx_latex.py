@@ -3,7 +3,7 @@
 
 Authored by Rufus Pollock: <http://www.rufuspollock.org/>
 Reworked by Julian Wulfheide (ju.wulfheide@gmail.com) and
-Pedro Gaudencio (pmgaudencio@gmail.com)
+Indico Project (indico-team@cern.ch)
 
 Usage:
 ======
@@ -101,9 +101,11 @@ def latex_escape(text, ignore_math=True):
         "~": r"\~{}",
         "_": r"\_",
         "^": r"\^{}",
-        "\\": r"\textbackslash",
+        "\\": r"\textbackslash{}",
         "{": r"\{",
-        "}": r"\}"
+        "}": r"\}",
+        "\x0c": "",
+        "\x0b": ""
     }
 
     math_segments = []
@@ -122,7 +124,7 @@ def latex_escape(text, ignore_math=True):
     res = pattern.sub(substitute, text)
 
     if ignore_math:
-        res = re.sub(r'\[\*LaTeXmath\*\]', lambda _: math_segments.pop(0), res)
+        res = re.sub(r'\[\*LaTeXmath\*\]', lambda _: "\\protect " + math_segments.pop(0), res)
 
     return res
 
@@ -329,9 +331,9 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
         # pat2 = re.compile('([^\$])\$([^\$])')
         # out = pat2.sub('\g<1>\\$\g<2>', out)
         # some extras due to asciimathml
-        out = out.replace('\\lt', '<')
-        out = out.replace(' * ', ' \\cdot ')
-        out = out.replace('\\del', '\\partial')
+        # out = out.replace('\\lt', '<')
+        # out = out.replace(' * ', ' \\cdot ')
+        # out = out.replace('\\del', '\\partial')
         return out
 
 # ========================= TABLES =================================

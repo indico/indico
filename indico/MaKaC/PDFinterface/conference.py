@@ -426,7 +426,7 @@ class ContributionBook(PDFLaTeXBase):
 
     _tpl_filename = "contribution_list_boa.tpl"
 
-    def _sort_contribs(self, contribs, sort_by):
+    def _sort_contribs(self, contribs, sort_by, aw):
         if sort_by == "boardNo":
             try:
                 return sorted(contribs, key=lambda x: int(x.getBoardNumber()))
@@ -477,8 +477,7 @@ class ContributionBook(PDFLaTeXBase):
         if contribs is None:
             contribs = conf.getContributionList()
 
-        contribs = self._sort_contribs(contribs, sort_by)
-
+        contribs = self._sort_contribs(contribs, sort_by, aw)
 
         affiliation_contribs = {}
         for contrib in contribs:

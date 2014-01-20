@@ -9,9 +9,10 @@
 \usepackage{cmbright}
 \usepackage[T1]{fontenc}
 \usepackage[utf8x]{inputenc}
+\usepackage{ucs}
 \usepackage{lmodern}
 \usepackage{hyperref}
-
+\usepackage{textgreek}
 
 \usepackage[english]{babel}
 \usepackage[final, babel]{microtype} %% texblog.net/latex-archive/layout/pdflatex-microtype/
@@ -22,6 +23,7 @@
 \usepackage{sectsty} %% style sections
 \usepackage{xstring}
 \usepackage[inline]{enumitem}
+
 
 <%block name="header_extra">
 </%block>

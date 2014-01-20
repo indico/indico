@@ -37,6 +37,7 @@ import xml.sax.saxutils
 from indico.util.date_time import format_number
 from indico.util.i18n import ngettext
 from indico.util.contextManager import ContextManager
+from indico.util.mdx_latex import latex_escape
 from indico.web.flask.util import url_for, url_rule_to_js
 
 
@@ -321,41 +322,6 @@ def escapeHTMLForJS(s):
     """
     res = s.replace("\\", "\\\\").replace("\'", "\\\'").replace("\"", "\\\"").replace("&", "\\&").replace("/", "\\/").\
         replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r").replace("\b", "\\b").replace("\f", "\\f")
-    return res
-
-
-def latex_escape(text, ignore_math=True):
-    chars = {
-        "#": r"\#",
-        "$": r"\$",
-        "%": r"\%",
-        "&": r"\&",
-        "~": r"\~{}",
-        "_": r"\_",
-        "^": r"\^{}",
-        "\\": r"\textbackslash",
-        "{": r"\{",
-        "}": r"\}"
-    }
-
-    math_segments = []
-
-    def substitute(x):
-        return chars[x.group()]
-
-    def math_replace(m):
-        math_segments.append(m.group(0))
-        return "[*LaTeXmath*]"
-
-    if ignore_math:
-        text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', math_replace, text)
-
-    pattern = re.compile('|'.join(re.escape(k) for k in chars.keys()))
-    res = pattern.sub(substitute, text)
-
-    if ignore_math:
-        res = re.sub(r'\[\*LaTeXmath\*\]', lambda _: math_segments.pop(0), res)
-
     return res
 
 

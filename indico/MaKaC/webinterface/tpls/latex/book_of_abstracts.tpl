@@ -24,10 +24,7 @@
             \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{100} / ${_("Book of Abstracts")}}
             \fancyhead[R]{}
 
-            \addcontentsline{toc}{chapter}{${contrib.getTitle() | latex_escape}
-                % if conf.getBOAConfig().getShowIds():
-                    (${contrib.getId()})
-                % endif
+            \addcontentsline{toc}{chapter}{${contrib.getTitle() | latex_escape} ${('{0}').format(contrib.getId()) if conf.getBOAConfig().getShowIds() else ''}
             }
 
             <%include file="inc/contribution_condensed.tpl" args="contrib=contrib"/>

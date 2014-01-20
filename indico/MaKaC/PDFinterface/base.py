@@ -807,7 +807,7 @@ class LatexRunner:
         try:
             self.run_latex(source_file, log_file)
             if self.has_toc:
-                self.run_latex(source_file)
+                self.run_latex(source_file, log_file)
         finally:
             log_file.close()
 

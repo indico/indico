@@ -2,7 +2,7 @@
 \noindent
 \rmfamily
 % if contrib.getSession():
-\small \textbf {${contrib.getSession().getTitle()}}
+\small \textbf {${contrib.getSession().getTitle() | latex_escape}}
 % endif
 % if contrib.getBoardNumber():
     % if contrib.getSession():
@@ -55,7 +55,7 @@
     \vspace{0.5em}
     \footnotesize \begin{description}
         % for affil, affil_id in sorted(affiliation_contribs[contrib.getId()]['affiliations'].items(), key=lambda x: x[1]):
-            \item[]\textsuperscript{${affil_id}} {\em ${affil}}
+            \item[]\textsuperscript{${affil_id}} {\em ${affil | latex_escape}}
         % endfor
     \end{description}
 % endif
