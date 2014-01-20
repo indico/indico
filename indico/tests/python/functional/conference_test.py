@@ -130,7 +130,7 @@ class ConferenceTests(MeetingBase, LoggedInSeleniumTestCase):
         self.click(css="ul.ui-tabs-nav li:nth-child(2) a")
         self.click(id="add_new_user")
         self.type(name="*genfield*0-6", text="Geneva")
-        self.select(name="*genfield*0-7", label="SWITZERLAND")
+        self.select(name="*genfield*0-7", label="Switzerland")
         self.select(name="arrivalDate", label="12-July-2011")
         self.select(name="departureDate", label="15-July-2011")
         self.click(xpath="//input[@name='accommodationType' and @value='own-accommodation']")

@@ -116,5 +116,5 @@ class RoomBookingTests(LoggedInSeleniumTestCase):
         self.click(xpath="//div[@id='roomBookingCal']/div[2]/div[2]/div/div[2]/div/div/p[2]")
         self.click(ltext="Accept")
         alert = self.elem(css=".ui-dialog-content")
-        self.assertEqual("Are you sure you want to ACCEPT your booking?", alert.text)
+        self.assertEqual("Are you sure you want to accept this booking?", alert.text)
         self.click(css="button.ui-button")
