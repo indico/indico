@@ -170,7 +170,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
 
     $scope.hasPlacesLeft = function(item) {
         item = item || {};
-        if (!$scope.hasPlacesLimit) {
+        if (!$scope.hasPlacesLimit(item)) {
             return true;
         } else {
             return item.noPlacesLeft >= 0;
@@ -179,7 +179,12 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
 
     $scope.hasPlacesLimit = function(item) {
         item = item || {};
-        return item.placesLimit !== 0;
+
+        if (item.placesLimit !== undefined) {
+            return item.placesLimit !== 0;
+        }
+
+        return false;
     };
 
     $scope.paymentBlocked = function(item, userdata, validation) {
