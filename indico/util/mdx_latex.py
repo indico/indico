@@ -193,11 +193,8 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         """Walk the dom converting relevant nodes to text nodes with relevant
         content."""
         latex_text = self.tolatex(doc)
-
         doc.clear()
-        latex_node = markdown.util.etree.Element('root')
-        latex_node.text = latex_text
-        doc.append(latex_node)
+        doc.text = latex_text
 
     def tolatex(self, ournode):
         buffer = ""

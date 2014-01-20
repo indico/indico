@@ -73,5 +73,5 @@
     \sectionfont{\normalsize\rmfamily}
     \subsectionfont{\small\rmfamily}
     \small
-    ${md_convert(str(contrib.getDescription()).decode('utf-8'))[7:-7].encode('utf-8')}
+    ${md_convert(str(contrib.getDescription()).decode('utf-8')).encode('utf-8')}
 }

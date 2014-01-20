@@ -42,7 +42,7 @@
             \sectionfont{\normalsize\rmfamily}
             \subsectionfont{\small\rmfamily}
             \small
-            ${md_convert(str(abstract.getField(field.getId())).decode('utf-8'))[7:-7].encode('utf-8')}
+            ${md_convert(str(abstract.getField(field.getId())).decode('utf-8')).encode('utf-8')}
         }
         \vspace{1.5em}
     \end{addmargin}

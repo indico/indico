@@ -42,7 +42,7 @@
             \vspace{1em}
             \normalsize {
                 \rmfamily {
-                    ${md_convert(str(conf.getBOAConfig().getText()).decode('utf-8'))[7:-7].encode('utf-8')}
+                    ${md_convert(str(conf.getBOAConfig().getText()).decode('utf-8')).encode('utf-8')}
                 }
             }
             \fancyfoot[C]{\thepage}
