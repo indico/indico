@@ -189,6 +189,8 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
 
     $scope.paymentBlocked = function(item, userdata, validation) {
         item = item || {};
+        userdata = userdata || {};
+
         if (validation !== undefined) {
             return ($scope.isBillable(item) && userdata.payed) || validation(userdata);
         } else {

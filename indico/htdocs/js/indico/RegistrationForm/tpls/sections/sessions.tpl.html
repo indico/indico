@@ -1,4 +1,4 @@
-<div ng-switch="section.type">
+<div ng-switch="section.type" ng-controller="BillableCtrl">
     <table ng-switch-when="2priorities" ng-init="input = userdata.sessionList[0].id">
         <td colspan="2">
             <span class="section-group-title">
@@ -14,12 +14,17 @@
                 <ng-form name="nestedForm">
                     <select id="session1" name="session1" required
                         ng-model="input"
-                        ng-class="{hasError: validationStarted && nestedForm.$invalid}">
-                        <option value="">{{ '--Select a session--' | i18n }}</option>
+                        ng-class="{hasError: validationStarted && nestedForm.$invalid}"
+                        ng-disabled="anyBillableSessionPayed(userdata)">
+                        <option value="" ng-disabled="anyBillableSessionPayed(userdata)">
+                            {{ '--Select a session--' | i18n }}
+                        </option>
                         <option ng-repeat="item in section.items | filter: {enabled: true}"
                             value="{{ item.id }}"
-                            ng-selected="item.id == userdata.sessionList[0].id">
+                            ng-selected="item.id == userdata.sessionList[0].id"
+                            ng-disabled="paymentBlocked(item, userdata)">
                             {{ item.caption }}
+                            {{ getBillableStr(item) }}
                         </option>
                     </select>
                 </ng-form>
@@ -31,12 +36,16 @@
                 <span class="italic">(Optional)</span>
             </td>
             <td>
-                <select id="session2" name="session2">
-                    <option value="">{{ '--Select a session--' | i18n }}</option>
+                <select id="session2" name="session2" ng-disabled="anyBillableSessionPayed(userdata)">
+                    <option value="" ng-disabled="anyBillableSessionPayed(userdata)">
+                        {{ '--Select a session--' | i18n }}
+                    </option>
                     <option ng-repeat="item in section.items | filter: {enabled: true} | filter: {id: '!'+(input||' ')}"
                         value="{{ item.id }}"
-                        ng-selected="item.id == userdata.sessionList[1].id">
+                        ng-selected="item.id == userdata.sessionList[1].id"
+                        ng-disabled="paymentBlocked(item, userdata)">
                         {{ item.caption }}
+                        {{ getBillableStr(item) }}
                     </option>
                 </select>
             </td>
@@ -62,10 +71,11 @@
                     <input type="checkbox"
                         name="sessions"
                         value="{{ item.id }}"
-                        ng-checked="isSelected(item.id)"/>
+                        ng-checked="isSelected(item.id)"
+                        ng-disabled="paymentBlocked(item, userdata)"/>
                     {{ item.caption }}
-                    <span ng-show="item.billable" class="regFormPrice">{{ item.price }}</span>
-                    <span ng-show="item.billable">
+                    <span ng-show="isBillable(item)" class="regFormPrice">{{ item.price }}</span>
+                    <span ng-show="isBillable(item)">
                         <nd-currency currency="currency"></nd-currency>
                     </span>
                 </div>

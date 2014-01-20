@@ -397,6 +397,20 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
                 }) !== undefined;
             };
 
+            $scope.anyBillableSessionPayed = function(userdata) {
+                if (userdata.payed) {
+                    return _.any(userdata.sessionList, function(item) {
+                        var session = _.find($scope.section.items, function(session) {
+                            return session.id == item.id;
+                        });
+
+                        return session.billable && session.price !== 0;
+                    });
+                }
+
+                return false;
+            };
+
             $scope.anySessionEnabled = function() {
                 return _.any($scope.section.items, function(session) {
                     return session.enabled === true;
