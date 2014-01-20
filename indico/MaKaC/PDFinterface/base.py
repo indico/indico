@@ -38,13 +38,13 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.fonts import addMapping
 from MaKaC.i18n import _
 from MaKaC.common.utils import isStringHTML
-from MaKaC.common.Configuration import Config
 from MaKaC.common.TemplateExec import render as tpl_render
 import subprocess, shlex, os, tempfile
 from MaKaC.common.logger import Logger
 
 from mako.template import Template
 
+from indico.core.config import Config
 from indico.util import mdx_latex
 import markdown
 from PIL import Image as PILImage
@@ -796,7 +796,7 @@ class LatexRunner:
         template_dir = os.path.join(Config.getInstance().getTPLDir(), 'latex')
         template = tpl_render(os.path.join(template_dir, template_name), kwargs)
 
-        self._dir = tempfile.mkdtemp(prefix="indico-texgen-")
+        self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=Config.getInstance().getTempDir())
         source_file = os.path.join(self._dir, template_name + '.tex')
         target_file = os.path.join(self._dir, template_name + '.pdf')
         log_file = open(os.path.join(self._dir, 'output.log'), 'a+')
