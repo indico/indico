@@ -67,10 +67,10 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionurl, displ
             if(exists(data.error)) {
                 IndicoUtil.errorReport(data.error);
             } else {
-                callback(data)
+                callback(data);
             }
         },
-        Sections: $resource(sectionurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId"}, {
+        Sections: $resource(sectionurl, {confId: '@confId', sectionId: "@sectionId"}, {
             "remove": {url: sectionurl, method: 'DELETE', isArray: true},
             "getAllSections": {method: 'GET', isArray: true},
             "getVisibleSections": {url: displayurl, method: 'GET', isArray: true},
@@ -80,13 +80,13 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionurl, displ
             "title": {method: 'POST', url: sectionurl + "/title"},
             "description": {method: 'POST', url: sectionurl + "/description"}
         }),
-        Fields: $resource(fieldurl, {8000: ":8000", confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId"}, {
+        Fields: $resource(fieldurl, {confId: '@confId', sectionId: "@sectionId", fieldId: "@fieldId"}, {
             "enable": {method:'POST', url: fieldurl + "/enable"},
             "disable": {method:'POST', url: fieldurl + "/disable"},
             "move": {method:'POST', url: fieldurl + "/move"}
         }),
-        Sessions: $resource(sessionsurl, {8000: ":8000", confId: '@confId'}, {}),
-        UserData: $resource(userurl, {8000: ":8000", confId: '@confId'}, {})
+        Sessions: $resource(sessionsurl, {confId: '@confId'}, {}),
+        UserData: $resource(userurl, {confId: '@confId'}, {})
     };
 });
 
