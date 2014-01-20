@@ -5,13 +5,14 @@
             name="{{ getName(field.input) }}"
             ng-model="input"
             ng-required="field.mandatory"
+            ng-disabled="anyBillableItemPayed(userdata)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}"
             ng-init="selectedItem = getSelectedItem(input) || {}"
             ng-change="selectedItem = getSelectedItem(input) || {}">
             <option value="">-- {{ 'Choose a value' | i18n }} --</option>
             <option ng-repeat="item in field.values.radioitems | filter: {isEnabled: true}"
                 value="{{ item.id }}"
-                ng-disabled="!hasPlacesLeft(item)"
+                ng-disabled="!hasPlacesLeft(item) || paymentBlocked(item, userdata)"
                 ng-selected="item.caption == getValue(getName(field.input))">
                 {{ item.caption }}
                 {{ getBillableStr(item) }}
@@ -38,7 +39,7 @@
                     ng-model="input.input"
                     ng-checked="item.caption == getValue(getName(field.input))"
                     ng-required="field.mandatory"
-                    ng-disabled="isDisabled(item)"/>
+                    ng-disabled="isDisabled(item) || paymentBlocked(item, userdata) || anyBillableItemPayed(userdata)"/>
                 <span ng-class="{'text-error': validationStarted && nestedForm.$invalid}">
                     {{ item.caption }}
                 </span>

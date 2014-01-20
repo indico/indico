@@ -350,6 +350,18 @@ ndRegForm.directive('ndRadioField', function(url) {
             scope.settings.defaultValue = true;
             scope.settings.itemtable = true;
 
+            scope.anyBillableItemPayed = function(userdata) {
+                if (userdata.payed) {
+                    var item = _.find(scope.field.values.radioitems, function(item) {
+                        return item.caption == userdata[scope.getName(scope.field.input)];
+                    }) || {};
+
+                    return item.price !== '' && item.price !== 0;
+                }
+
+                return false;
+            };
+
             scope.getId = function(fieldValue) {
                 var id;
 

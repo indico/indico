@@ -6,7 +6,7 @@
             ng-model="input"
             ng-required="field.mandatory"
             nd-blacklist="no"
-            ng-disabled="!hasPlacesLeft(field)"
+            ng-disabled="!hasPlacesLeft(field) || paymentBlocked(field, userdata)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
             <option value="">-- {{ 'Choose a value' | i18n }} --</option>
             <option ng-if="hasPlacesLimit(field)" value="yes"
@@ -28,8 +28,10 @@
             </option>
         </select>
 
-        <span ng-if="field.billable" class="regFormPrice">{{ field.price }}</span>
-        <span ng-if="field.billable" class="regFormCurrency">{{ currency }}</span>
+        <span ng-if="isBillable(field) && input == 'yes'">
+            <span class="regFormPrice">{{ field.price }}</span>
+            <span class="regFormCurrency">{{ currency }}</span>
+        </span>
 
         <span class="error-message-tag" ng-if="validationStarted && nestedForm.$invalid">
             {{ "You must say 'yes'" | i18n }}
