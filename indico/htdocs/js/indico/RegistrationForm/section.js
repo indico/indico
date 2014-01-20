@@ -232,10 +232,11 @@ ndRegForm.directive("ndAccommodationSection", function($rootScope) {
 
             scope.billableOptionPayed = function(userdata) {
                 if (userdata.accommodation !== undefined) {
-                    return userdata.accommodation.accommodationType.billable === true;
-                } else {
-                    return false;
+                    var accommodation = userdata.accommodation.accommodationType || {};
+                    return accommodation.billable === true;
                 }
+
+                return false;
             };
 
             scope.updateArrival = function(arrival) {
@@ -402,7 +403,7 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
                     return _.any(userdata.sessionList, function(item) {
                         var session = _.find($scope.section.items, function(session) {
                             return session.id == item.id;
-                        });
+                        }) || {};
 
                         return session.billable && session.price !== 0;
                     });

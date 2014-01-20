@@ -356,7 +356,7 @@ ndRegForm.directive('ndRadioField', function(url) {
                         return item.caption == userdata[scope.getName(scope.field.input)];
                     }) || {};
 
-                    return item.price !== '' && item.price !== 0;
+                    return item.isBillable && item.price !== '' && item.price !== 0;
                 }
 
                 return false;
