@@ -17,7 +17,7 @@
 
 \vspace{1em}
 
-\textbf {\Large ${contrib.getTitle()}
+\textbf {\Large ${contrib.getTitle() | latex_escape}
 }
 
 \vspace{0.5em}
@@ -54,8 +54,8 @@
 % if affiliation_contribs[contrib.getId()]['affiliations']:
     \vspace{0.5em}
     \footnotesize \begin{description}
-        % for affil, affil_id in affiliation_contribs[contrib.getId()]['affiliations'].items():
-            \item[]\textsuperscript{${affil_id}} \em{${affil}}
+        % for affil, affil_id in sorted(affiliation_contribs[contrib.getId()]['affiliations'].items(), key=lambda x: x[1]):
+            \item[]\textsuperscript{${affil_id}} {\em ${affil}}
         % endfor
     \end{description}
 % endif

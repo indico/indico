@@ -92,21 +92,51 @@ def unescape_html_entities(text):
     return out
 
 
+def latex_escape(text, ignore_math=True):
+    chars = {
+        "#": r"\#",
+        "$": r"\$",
+        "%": r"\%",
+        "&": r"\&",
+        "~": r"\~{}",
+        "_": r"\_",
+        "^": r"\^{}",
+        "\\": r"\textbackslash",
+        "{": r"\{",
+        "}": r"\}"
+    }
+
+    math_segments = []
+
+    def substitute(x):
+        return chars[x.group()]
+
+    def math_replace(m):
+        math_segments.append(m.group(0))
+        return "[*LaTeXmath*]"
+
+    if ignore_math:
+        text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', math_replace, text)
+
+    pattern = re.compile('|'.join(re.escape(k) for k in chars.keys()))
+    res = pattern.sub(substitute, text)
+
+    if ignore_math:
+        res = re.sub(r'\[\*LaTeXmath\*\]', lambda _: math_segments.pop(0), res)
+
+    return res
+
+
 def escape_latex_entities(text):
     """Escape latex reserved characters."""
     out = text
     out = unescape_html_entities(out)
-    out = out.replace('%', '\\%')
-    out = out.replace('&', '\\&')
-    out = out.replace('#', '\\#')
     out = start_single_quote_re.sub('\g<1>`', out)
     out = start_double_quote_re.sub('\g<1>``', out)
     out = end_double_quote_re.sub("''\g<1>", out)
-    # people should escape these themselves as it conflicts with maths
-    # out = out.replace('{', '\\{')
-    # out = out.replace('}', '\\}')
-    # do not do '$' here because it is dealt with by convert_maths
-    # out = out.replace('$', '\\$')
+
+    out = latex_escape(out)
+
     return out
 
 

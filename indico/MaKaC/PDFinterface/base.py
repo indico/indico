@@ -775,6 +775,23 @@ class LatexRunner:
     def __init__(self, has_toc=False):
         self.has_toc = has_toc
 
+    def run_latex(self, source_file, log_file=None):
+        pdflatex_cmd = 'pdflatex -interaction=nonstopmode -output-directory={1} {0}'.format(
+            source_file, self._dir)
+
+        try:
+            subprocess.check_call(shlex.split(pdflatex_cmd), stdout=log_file)
+            Logger.get('pdflatex').debug("PDF created successfully!")
+
+        except subprocess.CalledProcessError, e:
+            # flush log, go to beginning and read it
+            if log_file:
+                log_file.flush()
+                log_file.seek(0)
+                Logger.get('pdflatex').error(log_file.read())
+            else:
+                Logger.get('pdflatex').error("Error running pdflatex")
+
     def run(self, template_name, **kwargs):
         template_dir = os.path.join(Config.getInstance().getTPLDir(), 'latex')
         template = tpl_render(os.path.join(template_dir, template_name), kwargs)
@@ -787,21 +804,10 @@ class LatexRunner:
         with open(source_file, 'w') as f:
             f.write(template)
 
-        pdflatex_cmd = 'pdflatex -interaction=nonstopmode -output-directory={1} {0}'.format(
-            source_file, self._dir)
-
         try:
-            subprocess.check_call(shlex.split(pdflatex_cmd), stdout=log_file)
+            self.run_latex(source_file, log_file)
             if self.has_toc:
-                subprocess.check_call(shlex.split(pdflatex_cmd), stdout=log_file)
-
-            Logger.get('pdflatex').debug("PDF created successfully!")
-
-        except subprocess.CalledProcessError, e:
-            # flush log, go to beginning and read it
-            log_file.flush()
-            log_file.seek(0)
-            Logger.get('pdflatex').error(log_file.read())
+                self.run_latex(source_file)
         finally:
             log_file.close()
 

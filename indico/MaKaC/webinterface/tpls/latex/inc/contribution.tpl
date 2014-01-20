@@ -17,7 +17,7 @@
     \textbf {
         \LARGE
         \sffamily
-        ${contrib.getTitle()}
+        ${contrib.getTitle() | latex_escape}
     }
 \end{center}
 

@@ -319,10 +319,12 @@ def escapeHTMLForJS(s):
         explore use of regular expressions, or maybe split the string and then join it manually, or just replace them by
         looping through the string and using an if...elif... etc.
     """
-    res = s.replace("\\", "\\\\").replace("\'", "\\\'").replace("\"", "\\\"").replace("&", "\\&").replace("/", "\\/").replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r").replace("\b", "\\b").replace("\f", "\\f")
+    res = s.replace("\\", "\\\\").replace("\'", "\\\'").replace("\"", "\\\"").replace("&", "\\&").replace("/", "\\/").\
+        replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r").replace("\b", "\\b").replace("\f", "\\f")
     return res
 
-def latex_escape(text):
+
+def latex_escape(text, ignore_math=True):
     chars = {
         "#": r"\#",
         "$": r"\$",
@@ -336,11 +338,26 @@ def latex_escape(text):
         "}": r"\}"
     }
 
+    math_segments = []
+
     def substitute(x):
         return chars[x.group()]
 
+    def math_replace(m):
+        math_segments.append(m.group(0))
+        return "[*LaTeXmath*]"
+
+    if ignore_math:
+        text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', math_replace, text)
+
     pattern = re.compile('|'.join(re.escape(k) for k in chars.keys()))
-    return pattern.sub(substitute, text)
+    res = pattern.sub(substitute, text)
+
+    if ignore_math:
+        res = re.sub(r'\[\*LaTeXmath\*\]', lambda _: math_segments.pop(0), res)
+
+    return res
+
 
 def registerHelpers(objDict):
     """

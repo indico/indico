@@ -26,7 +26,7 @@
 
             \addcontentsline{toc}{chapter}{${contrib.getTitle() | latex_escape}
                 % if conf.getBOAConfig().getShowIds():
-                    (${contrib._abstract.getId()})
+                    (${contrib.getId()})
                 % endif
             }
 

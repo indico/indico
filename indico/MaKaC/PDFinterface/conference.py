@@ -88,15 +88,13 @@ def extract_affiliations(contrib):
     affiliations = dict()
 
     def enumerate_affil(lst):
-        counter = 1
         auth_list = []
 
         for author in lst:
             affil = author.getAffiliation()
             if affil:
                 if affil not in affiliations:
-                    affiliations[affil] = counter
-                    counter += 1
+                    affiliations[affil] = len(affiliations) + 1
             auth_list.append((author, affiliations[affil] if affil else None))
         return auth_list
 
