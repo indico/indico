@@ -106,7 +106,9 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         caption: true,
         date: false,
         defaultValue: false,
+        description: true,
         itemtable: false,
+        mandatory: true,
         number: false,
         placesLimit: false,
         rowsAndColumns: false,
@@ -244,6 +246,7 @@ ndRegForm.directive('ndCheckboxField', function(url) {
         link: function(scope) {
             scope.settings.billable = true;
             scope.settings.caption = false;
+            scope.settings.description = false;
             scope.settings.placesLimit = true;
             scope.settings.formData.push('billable');
             scope.settings.formData.push('price');
@@ -311,6 +314,8 @@ ndRegForm.directive('ndLabelField', function(url) {
         link: function(scope) {
             scope.settings.billable = true;
             scope.settings.caption = false;
+            scope.settings.description = false;
+            scope.settings.mandatory = false;
             scope.settings.formData.push('billable');
             scope.settings.formData.push('price');
         }

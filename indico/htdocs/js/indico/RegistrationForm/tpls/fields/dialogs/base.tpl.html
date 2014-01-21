@@ -1,4 +1,4 @@
-<div class="tabbable tabs-left">
+<div class="regform-dialog tabbable tabs-left">
     <ul class="nav nav-tabs">
         <li ng-class="{active: isTabSelected('tab-options')}" >
             <a ng-click="setSelectedTab('tab-options')">
@@ -11,64 +11,64 @@
             </a>
         </li>
     </ul>
+
     <div class="tab-content regFormDialogTabContent">
-        <div class="tab-pane" id="div-options" ng-class="{active: isTabSelected('tab-options')}">
-            <form novalidate id="optionsForm" name="optionsForm">
+        <div class="tab-pane" ng-class="{active: isTabSelected('tab-options')}">
+            <form name="optionsForm" novalidate>
                 <div class="regFormEditLine">
-                    <label class="regFormDialogCaption">
+                    <label class="regFormDialogCaption" ng-switch="settings.caption">
                         <span ng-if="settings.caption">{{ 'Caption' | i18n }}</span>
                         <span ng-if="!settings.caption">{{ 'Text' | i18n }}</span>
                         <span class="regFormMandatoryField">*</span>
                     </label>
-                    <input ng-model="formData.caption"
+                    <input type="text" name="caption" required
+                        ng-if="settings.caption"
+                        ng-model="formData.caption"
                         ng-class="{hasError: validationStarted && optionsForm.caption.$invalid}"
-                        type="text"
-                        name="caption"
-                        id="input01"
-                        size="30"
-                        required>
-                    <input ng-model="formData.mandatory"
-                        type="checkbox"
-                        name="mandatory"
-                        id="input02"
-                        ng-disabled="field.lock.indexOf('mandatory') != -1">
-                    {{ 'Mandatory' | i18n }}
+                        class="caption-input"/>
+                    <textarea name="caption" required
+                        ng-if="!settings.caption"
+                        ng-model="formData.caption"
+                        ng-class="{hasError: validationStarted && optionsForm.caption.$invalid}"
+                        class="caption-input" rows="5">
+                    </textarea>
+                    <span ng-if="settings.mandatory">
+                        <span class="mandatory-check">
+                            <input type="checkbox" name="mandatory"
+                                ng-model="formData.mandatory"
+                                ng-disabled="field.lock.indexOf('mandatory') != -1">
+                            <span>
+                                {{ 'Mandatory' | i18n }}
+                            </span>
+                        </span>
+                    </span>
                 </div>
 
-                <div class="regFormEditLine">
+                <div class="regFormEditLine" ng-if="settings.description">
                     <label class="regFormDialogCaption">
                         {{ 'Description' | i18n }}
                     </label>
-                    <textarea ng-model="formData.description"
-                        id="descriptionEdit"
-                        name="description"
-                        cols="40"
+                    <textarea name="description"
+                        ng-model="formData.description"
+                        class="description-input"
                         rows="5">
                     </textarea>
                 </div>
 
                 <div ng-if="settings.size"
                     ng-include="getTpl('fields/dialogs/size.tpl.html')"></div>
-
                 <div ng-if="settings.rowsAndColumns"
                     ng-include="getTpl('fields/dialogs/rowsandcolumns.tpl.html')"></div>
-
                 <div ng-if="settings.number"
                     ng-include="getTpl('fields/dialogs/number.tpl.html')"></div>
-
                 <div ng-if="settings.placesLimit"
                     ng-include="getTpl('fields/dialogs/placeslimit.tpl.html')"></div>
-
                 <div ng-if="settings.billable"
                     ng-include="getTpl('fields/dialogs/billable.tpl.html')"></div>
-
                 <div ng-if="settings.defaultValue"
                     ng-include="getTpl('fields/dialogs/defaultvalue.tpl.html')"></div>
-
                 <div ng-if="settings.date"
                     ng-include="getTpl('fields/dialogs/date.tpl.html')"></div>
-
-                <input type="submit" style="display:none;" value="submit" id="form-opt-validate">
             </form>
         </div>
 
