@@ -1,21 +1,10 @@
 <div class="regFormEditLine">
     <label class="regFormDialogCaption">
-        {{ 'Minimum value' | i18n }}
+        {{ 'Minimum' | i18n }}
     </label>
     <input ng-model="formData.minValue"
         ng-class="{hasError: validationStarted && optionsForm.minValue.$invalid}"
         name="minValue"
         type="number"
-        size="20">
-</div>
-<div class="regFormEditLine">
-    <label class="regFormDialogCaption">
-        {{ 'Row length' | i18n }}
-    </label>
-    <input ng-model="formData.length"
-        ng-class="{hasError: validationStarted && optionsForm.numberOfRows.$invalid}"
-        name="numberOfRows"
-        type="number"
-        min="0"
-        size="20">
+        size="20"/>
 </div>

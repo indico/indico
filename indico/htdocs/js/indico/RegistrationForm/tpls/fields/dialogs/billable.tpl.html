@@ -2,23 +2,20 @@
     <label class="regFormDialogCaption">
         {{ 'Billable' | i18n }}
     </label>
-    <input ng-model="formData.billable"
-        type="checkbox"
-        name="billable"
+    <input type="checkbox" name="billable"
+        ng-model="formData.billable"
         ng-checked="field.billable"/>
 </div>
-<div ng-if="formData.billable == true" class="regFormEditLine">
+<div ng-if="formData.billable" class="regFormEditLine">
     <label class="regFormDialogCaption">
         {{ 'Price' | i18n }}
     </label>
-    <input type="number"
+    <input type="number" name="price"
         ng-model="formData.price"
         ng-class="{hasError: validationStarted && optionsForm.price.$invalid}"
-        min="0"
-        name="price"
-        id="input01"
-        size="20">
-    <span ng-if="field.input == 'number'">
-        ({{ "price multiplied times the number entered" | i18n }})
+        min="0" size="20">
+    <span ng-if="field.input == 'number'"
+        class="icon-question text-superfluous"
+        title="{{ 'This price will be multiplied times the number entered by the user' | i18n }}">
     </span>
 </div>
