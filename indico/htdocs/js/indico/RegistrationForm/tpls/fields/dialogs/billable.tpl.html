@@ -12,6 +12,7 @@
     </label>
     <input type="number" name="price"
         ng-model="formData.price"
+        ng-init="formData.price = formData.price || 0"
         ng-class="{hasError: validationStarted && optionsForm.price.$invalid}"
         min="0" size="20">
     <span ng-if="field.input == 'number'"

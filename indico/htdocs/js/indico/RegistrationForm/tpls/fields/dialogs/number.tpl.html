@@ -4,6 +4,7 @@
     </label>
     <input type="number" name="minValue"
         ng-model="formData.minValue"
+        ng-init="formData.minValue = formData.minValue || 0"
         ng-class="{hasError: validationStarted && optionsForm.minValue.$invalid}"
         size="20"
         min="0"/>

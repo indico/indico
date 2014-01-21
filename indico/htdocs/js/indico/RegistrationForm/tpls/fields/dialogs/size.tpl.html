@@ -2,14 +2,12 @@
     <label class="regFormDialogCaption">
         {{ 'Size in char' | i18n }}
     </label>
-    <input ng-model="formData.length"
+    <input type="number" name="length"
+        ng-model="formData.length"
         ng-class="{hasError: validationStarted && optionsForm.length.$invalid}"
-        name="length"
-        type="number"
-        size="20"
         min="5"
         max="60">
-    <span>
-        ({{ "Must be between 5 and 60" | i18n }})
+    <span class="icon-question text-superfluous"
+        title="{{ 'Must be between 5 and 60' | i18n }}">
     </span>
 </div>

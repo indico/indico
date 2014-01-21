@@ -74,9 +74,9 @@
             </form>
         </div>
 
-        <div ng-if="settings.itemtable"
+        <div class="tab-pane"
+            ng-if="settings.itemtable"
             ng-include="getTpl('fields/dialogs/itemtable.tpl.html')"
-            class="tab-pane"
             ng-class="{active: isTabSelected('tab-editItems')}"></div>
     </div>
 </div>

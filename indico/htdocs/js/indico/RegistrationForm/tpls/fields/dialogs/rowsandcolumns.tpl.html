@@ -2,21 +2,20 @@
     <label class="regFormDialogCaption">
         {{ 'Columns' | i18n }}
     </label>
-    <input ng-model="formData.numberOfColumns"
+    <input type="number" name="numberOfColumns"
+        ng-model="formData.numberOfColumns"
         ng-class="{hasError: validationStarted && optionsForm.numberOfColumns.$invalid}"
-        name="numberOfColumns"
-        type="number"
-        min="1"
-        size="20">
+        size="20"
+        min="1">
 </div>
+
 <div class="regFormEditLine">
     <label class="regFormDialogCaption">
         {{ 'Rows' | i18n }}
     </label>
-    <input ng-model="formData.numberOfRows"
+    <input type="number" name="numberOfRows"
+        ng-model="formData.numberOfRows"
         ng-class="{hasError: validationStarted && optionsForm.numberOfRows.$invalid}"
-        name="numberOfRows"
-        type="number"
-        min="1"
-        size="20">
+        size="20"
+        min="1">
 </div>

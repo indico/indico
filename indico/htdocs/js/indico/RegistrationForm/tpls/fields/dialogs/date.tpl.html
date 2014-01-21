@@ -5,7 +5,8 @@
 
     <span ng-if="field.values.displayFormats === undefined"
         ng-init="formData.dateFormat='%d/%m/%Y'">
-        <select name="dateFormat" ng-model="formData.dateFormat" required
+        <select name="dateFormat" required
+            ng-model="formData.dateFormat"
             ng-class="{hasError: validationStarted && optionsForm.dateFormat.$invalid}">
             <option value="%d/%m/%Y %H:%M">DD/MM/YYYY hh:mm</option>
             <option value="%d.%m.%Y %H:%M">DD.MM.YYYY hh:mm</option>
@@ -26,7 +27,8 @@
     </span>
 
     <span ng-if="field.values.displayFormats !== undefined">
-        <select name="dateFormat" ng-model="formData.dateFormat" required
+        <select name="dateFormat" required
+            ng-model="formData.dateFormat"
             ng-class="{hasError: validationStarted && optionsForm.dateFormat.$invalid}">
             <option ng-repeat="el in field.values.displayFormats"
                 ng-selected="el[0] == field.values.dateFormat"
