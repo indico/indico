@@ -452,13 +452,13 @@
     .description-input {
         margin: 0 2px;
         width: 345px;
-        max-width: 345px;
+        resize: none;
     }
 
     .caption-input {
         margin: 0 2px;
         width: 230px;
-        max-width: 230px;
+        resize: none;
     }
 }
 

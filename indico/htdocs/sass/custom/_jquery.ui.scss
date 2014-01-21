@@ -25,6 +25,11 @@
 
 .ui-widget {
     @extend %font-family-body;
+
+    textarea,
+    button {
+        @extend %font-family-body;
+    }
 }
 
 .ui-slider {
