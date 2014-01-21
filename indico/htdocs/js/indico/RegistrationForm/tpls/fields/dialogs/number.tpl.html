@@ -2,9 +2,9 @@
     <label class="regFormDialogCaption">
         {{ 'Minimum' | i18n }}
     </label>
-    <input ng-model="formData.minValue"
+    <input type="number" name="minValue"
+        ng-model="formData.minValue"
         ng-class="{hasError: validationStarted && optionsForm.minValue.$invalid}"
-        name="minValue"
-        type="number"
-        size="20"/>
+        size="20"
+        min="0"/>
 </div>
