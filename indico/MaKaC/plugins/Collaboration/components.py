@@ -176,7 +176,7 @@ class IMEventDisplayComponent(Component):
     # EventDisplayContributor
 
     def injectCSSFiles(self, obj):
-        return ['Collaboration/Style.css']
+        return ['Collaboration/css/Style.css']
 
     def injectJSFiles(self, obj):
         return ['Collaboration/js/bookings.js', 'Collaboration/js/Collaboration.js']
