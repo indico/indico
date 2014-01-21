@@ -358,3 +358,15 @@ ndDirectives.directive('ndBlacklist', function() {
         }
     };
 });
+
+ndDirectives.directive('ndInitFocus', function() {
+    var timer;
+
+    return function(scope, element, attrs) {
+        if (timer) clearTimeout(timer);
+
+        timer = setTimeout(function() {
+            element.focus();
+        }, 0);
+    };
+});
