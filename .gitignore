@@ -13,7 +13,7 @@
 # python packaging
 /dist
 *.egg-info
-*.egg/
+*.egg
 
 # assets and generated stuff
 doc/guides/build
