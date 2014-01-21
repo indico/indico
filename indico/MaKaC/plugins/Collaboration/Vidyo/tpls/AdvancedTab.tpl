@@ -3,13 +3,13 @@
     <div class="collaborationAdvancedTabTitle">Information displayed in event page</div>
 </div>
 
-<div class="collaborationAdvancedTabCheckboxDiv" style="margin-top:10px">
+<!--div class="collaborationAdvancedTabCheckboxDiv" style="margin-top:10px">
     <input type="checkbox" id="displayPin" class="centeredCheckBox" name="displayPin" value="yes"></input>
     <label for="displayPin" class="normal">${ _("Display the Public room's PIN") }</label>
     <img id="displayPinHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
-</div>
+</div-->
 
-<div class="collaborationAdvancedTabCheckboxDiv">
+<div class="collaborationAdvancedTabCheckboxDiv" style="margin-top:10px">
     <input type="checkbox" id="displayURL" class="centeredCheckBox" name="displayURL" value="yes" checked="checked" />
     <label for="displayURL" class="normal">${ _("Display auto-join URL in event page") }</label>
     <img id="displayURLHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />

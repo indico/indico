@@ -21,15 +21,19 @@
             <td class="collaborationConfDisplayInfoLeftCol">
                 ${ _('Meeting PIN')}
             </td>
-            % if Booking.getBookingParamByName("displayPin"):
+            <!-- if Booking.getBookingParamByName("displayPin"):
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ Booking.getPin() }
             </td>
-            % else:
+             else:
             <td class="collaborationConfDisplayInfoRightCol">
                 ${ _("This Vidyo room is protected by a PIN.") }
             </td>
-            % endif
+             endif
+            -->
+            <td class="collaborationConfDisplayInfoRightCol">
+                ${ _("This Vidyo room is protected by a PIN.") }
+            </td>
         </tr>
         % endif
         <tr>
