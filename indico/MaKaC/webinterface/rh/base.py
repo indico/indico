@@ -667,7 +667,7 @@ class RH(RequestHandlerBase):
         if self._responseUtil.call:
             return self._responseUtil.make_call()
 
-        if request.headers.get("Content-Type").find("application/json") != -1:
+        if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
             self._responseUtil.content_type = 'application/json'
 
         # In case of no process needed, we should return empty string to avoid erroneous ouput
