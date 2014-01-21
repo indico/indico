@@ -1971,7 +1971,6 @@ class RadioItem(Persistent, Fossilizable):
         if data.has_key("placesLimit"):
             self.setPlacesLimit(data["placesLimit"])
 
-    #def getQuantity(self):return 1
     def getId(self):
         return self._id
 
@@ -2780,8 +2779,11 @@ class GeneralField(Persistent, Fossilizable):
         if caption == "":
             caption = _("General Field")
         self.setCaption(caption)
-        if firstTime:
+        ## The following commented lines were removed, but it is unclear if they are not needed anymore.
+        if firstTime: # or not self.isLocked('input'):
             self.setInput(FieldInputs.getAvailableInputKlassById(data.get("input", "text"))(self))
+        #else:
+        #    self.setInput(FieldInputs.getAvailableInputKlassById(self.getInput().getId())(self))
         if data.has_key("inputObj"):
             self._input.setValues(data["inputObj"].getValues())
         elif data.has_key('inputValues'):
