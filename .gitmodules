@@ -18,10 +18,6 @@
 	path = ext_modules/jquery-ui-multiselect
 	url = https://github.com/ehynds/jquery-ui-multiselect-widget.git
     ignore = dirty
-[submodule "ext_modules/angular"]
-	path = ext_modules/angular
-	url = https://github.com/angular/angular.js.git
-    ignore = dirty
 [submodule "ext_modules/ui-sortable"]
 	path = ext_modules/ui-sortable
 	url = https://github.com/angular-ui/ui-sortable
