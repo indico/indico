@@ -67,7 +67,7 @@ def jsonify_error(func):
     def decorator(*args, **keyargs):
         e = args[1]
         Logger.get('requestHandler').info('Request %s finished with %s: "%s"' % (request, e.__class__.__name__, e))
-        if request.headers.get("Content-Type").find("application/json") != -1:
+        if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
             return create_json_error_answer(e)
         else:
             return func(*args, **keyargs)
@@ -782,7 +782,7 @@ class RHProtected(RH):
 
     def _checkSessionUser(self):
         if self._getUser() is None:
-            if request.headers.get("Content-Type").find("application/json") != -1:
+            if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
                 raise NotLoggedError("You are currently not authenticated. Please log in again.")
             else:
                 self._redirect(self._getLoginURL())
@@ -797,7 +797,7 @@ class RHRoomBookingProtected(RHProtected):
     def _checkSessionUser(self):
         user = self._getUser()
         if user is None:
-            if request.headers.get("Content-Type").find("application/json") != -1:
+            if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
                 raise NotLoggedError("You are currently not authenticated. Please log in again.")
             else:
                 self._redirect(self._getLoginURL())
