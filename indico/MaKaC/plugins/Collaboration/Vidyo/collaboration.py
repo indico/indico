@@ -415,8 +415,11 @@ class CSBooking(CSBookingBase):
                 self._bookingParams["roomDescription"] = recoveredDescription
             else:
                 self._warning = "invalidDescription"
-            self.setPin(str(result.RoomMode.roomPIN))
-            self.setModeratorPin(str(result.RoomMode.moderatorPIN))
+            # roomPIN and moderatorPIN comes encrypted in the new version of vidyo
+            # self.setPin(str(result.RoomMode.roomPIN))
+            # self.setModeratorPin(str(result.RoomMode.moderatorPIN))
+            # We need to take from one of the linked bookings to the attached room
+            self._setPINFromAttachedRoom()
             self._bookingParams["autoMute"] = self._getAutomute()
             self.setBookingOK()
             VidyoTools.getEventEndDateIndex().indexBooking(self)
@@ -452,6 +455,13 @@ class CSBooking(CSBookingBase):
             or if there are no more checks to do.
         """
         pass
+
+    def _setPINFromAttachedRoom(self):
+        bookingList = VidyoTools.getIndexByVidyoRoom().getBookingList(self.getRoomId())
+        if bookingList:
+            booking = bookingList[0]
+            self.setPin(booking.getPin())
+            self.setModeratorPin(booking.getModeratorPin())
 
     def _updateRelatedBookings(self):
         for booking in VidyoTools.getIndexByVidyoRoom().getBookingList(self.getRoomId()):
@@ -587,6 +597,11 @@ class CSBooking(CSBookingBase):
 
             self._extension = str(adminApiResult.extension)
 
+            """
+
+            We do not update the PIN because in the new version of Vidyo comes
+            encrypted.
+
             if bool(adminApiResult.RoomMode.hasPIN):
                 self._pin = str(adminApiResult.RoomMode.roomPIN)
             else:
@@ -596,7 +611,7 @@ class CSBooking(CSBookingBase):
                 self._moderatorPin = str(adminApiResult.RoomMode.moderatorPIN)
             else:
                 self._moderatorPin = ""
-
+            """
             self._url = str(adminApiResult.RoomMode.roomURL)
             self.setOwnerAccount(str(adminApiResult.ownerName), updateAvatar = True)
 
