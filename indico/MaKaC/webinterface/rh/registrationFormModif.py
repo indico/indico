@@ -428,8 +428,8 @@ class RHRegistrationFormSectionEnable(RHRegistrationFormModifSectionBase):
 
     def _process_POST(self):
         self._section.setEnabled(True)
-        # Move the section to the first position
-        self._regForm.addToSortedForms(self._section, 0)
+        # Move the section to the last position
+        self._regForm.addToSortedForms(self._section)
         return json.dumps(self._section.fossilize())
 
 
@@ -437,7 +437,7 @@ class RHRegistrationFormSectionDisable(RHRegistrationFormModifSectionBase):
 
     def _process_POST(self):
         self._section.setEnabled(False)
-        # Move the section to the end
+        # Move the section to the last position
         self._regForm.addToSortedForms(self._section)
         return json.dumps(self._section.fossilize())
 

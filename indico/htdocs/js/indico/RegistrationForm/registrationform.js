@@ -181,7 +181,14 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         sectionId: section.id
                     }, function(updatedSection) {
                         regFormFactory.checkError(updatedSection, function(updatedSection)  {
+                            var index = -1;
+                            _.find($scope.sections, function(section) {
+                                index++;
+                                return section.id == updatedSection.id;
+                            });
                             section.enabled = updatedSection.enabled;
+                            $scope.sections.splice(index, 1);
+                            $scope.sections.push(section);
                         });
                     });
                 },

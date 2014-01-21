@@ -29,16 +29,31 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     $scope.fieldApi.disableField = function(field) {
         regFormFactory.Fields.disable(getRequestParams(field), function(updatedField) {
             regFormFactory.checkError(updatedField, function(updatedField)  {
-                    $scope.field.disabled = updatedField.disabled;
-            });
+                    var index = -1;
+                    _.find($scope.section.items, function(item) {
+                        index++;
+                        return item.id == $scope.field.id;
+                    });
 
+                    $scope.field.disabled = updatedField.disabled;
+                    $scope.section.items.splice(index, 1);
+                    $scope.section.items.push($scope.field);
+            });
         });
     };
 
     $scope.fieldApi.enableField = function(field) {
         regFormFactory.Fields.enable(getRequestParams(field), function(updatedField) {
             regFormFactory.checkError(updatedField, function(updatedField)  {
+                var index = -1;
+                _.find($scope.section.items, function(item) {
+                    index++;
+                    return item.id == $scope.field.id;
+                });
+
                 $scope.field.disabled = updatedField.disabled;
+                $scope.section.items.splice(index, 1);
+                $scope.section.items.push($scope.field);
             });
         });
     };
