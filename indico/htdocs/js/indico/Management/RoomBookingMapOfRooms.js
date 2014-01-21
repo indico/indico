@@ -182,7 +182,7 @@ type("MapAspectListField", ["IWidget"], {
         var select;
         var buttonDiv = Html.div({style:{marginTop: pixels(10)}});
 
-        var addNewAspectButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Map Aspect') );
+        var addNewAspectButton = Html.input("button", {style: {marginRight: pixels(5)}, class: 'i-button'}, $T('Add Map Aspect') );
 
         addNewAspectButton.observeClick(function(){
 
