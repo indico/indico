@@ -1177,8 +1177,10 @@ class UHConfModifDisplayUpLink(URLHandler):
 class UHConfModifDisplayDownLink(URLHandler):
     _endpoint = 'event_mgmt.confModifDisplay-downLink'
 
+
 class UHConfModifDisplayToggleTimetableView(URLHandler):
     _endpoint = 'event_mgmt.confModifDisplay-toggleTimetableView'
+
 
 class UHConfModifDisplayToggleTTDefaultLayout(URLHandler):
     _endpoint = 'event_mgmt.confModifDisplay-toggleTTDefaultLayout'
@@ -2971,20 +2973,8 @@ class UHConfModifRegistrationPreview(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrationPreview'
 
 
-class UHConfModifRegistrationPreviewSectionGet(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationPreviewSection-get'
-
-
-class UHConfModifRegistrationPreviewSectionSave(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationPreviewSection-save'
-
-
 class UHConfModifRegistrationPreviewSectionQuery(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrationPreviewSection-query'
-
-
-class UHConfModifRegistrationPreviewSectionRemove(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationPreviewSection-remove'
 
 
 class UHConfModifRegistrantList(URLHandler):
@@ -3009,14 +2999,6 @@ class UHRegistrantModification(URLHandler):
 
 class UHRegistrantAttachmentFileAccess(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrants-getAttachedFile'
-
-
-class UHConfModifRegFormEnableSection(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-enableSection'
-
-
-class UHConfModifRegFormEnablePersonalField(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationForm-enablePersonalField'
 
 
 class UHCategoryStatistics(URLHandler):
