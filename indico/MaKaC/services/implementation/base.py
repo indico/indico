@@ -114,10 +114,11 @@ class ParameterManager(object):
             elif pType == float:
                 value = float(value)
             elif pType == bool:
-                try:
-                    value = distutils.util.strtobool(value)
-                except ValueError:
-                    raise ExpectedParameterException(paramName, bool, type(value))
+                if not type(value) == bool:
+                    try:
+                        value = distutils.util.strtobool(str(value))
+                    except ValueError:
+                        raise ExpectedParameterException(paramName, bool, type(value))
             elif pType == dict:
                 if not type(value) == dict:
                     raise ExpectedParameterException(paramName, dict, type(value))
