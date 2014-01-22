@@ -32,8 +32,12 @@ import bleach
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small']
 
 
-def unicodeOrNone(string):
-    return None if string is None else string.decode('utf-8')
+def encode_if_unicode(s):
+    return s.encode('utf-8') if isinstance(s, unicode) else s
+
+
+def unicodeOrNone(s):
+    return None if s is None else s.decode('utf-8')
 
 
 def remove_accents(text, reencode=True):
