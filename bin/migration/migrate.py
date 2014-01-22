@@ -872,10 +872,10 @@ def lowercaseLDAPIdentities(dbi, withRBDB, prevVersion):
     for i, identity in enumerate(auth.getList()):
         print '\r  Processing %d/%d' % (i + 1, total),
         # getId() returns getLogin().lower()
-        if identity.getLogin() == identity.getId() or not idx.has_key(identity.getLogin()):
+        if identity.getLogin() == identity.getId() or identity.getLogin() not in idx:
             continue
         del idx[identity.getLogin()]
-        assert not idx.has_key(identity.getId())
+        assert identity.getId() not in idx
         idx[identity.getId()] = identity
         if i % 1000 == 999:
             dbi.commit()
