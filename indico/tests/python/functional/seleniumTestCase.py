@@ -27,6 +27,7 @@ from functools import wraps
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, StaleElementReferenceException
 from selenium.webdriver.common.alert import Alert
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
@@ -144,6 +145,11 @@ class SeleniumTestCase(IndicoTestCase):
     @name_or_id_target
     def type(cls, elem, text=''):
         elem.send_keys(text)
+
+    @classmethod
+    @name_or_id_target
+    def blur(cls, elem):
+        elem.send_keys(Keys.TAB)
 
     @classmethod
     @name_or_id_target
