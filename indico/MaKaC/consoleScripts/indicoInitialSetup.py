@@ -94,6 +94,8 @@ def main():
         if hasattr(os, 'symlink'):
             wsgi_file = os.path.join(targetDirs['htdocs'], 'indico.wsgi')
             print "Creating wsgi symlink... %s" % wsgi_file
+            if os.path.exists(wsgi_file):
+                os.unlink(wsgi_file)
             os.symlink(os.path.join(eggDir, 'indico/web/indico.wsgi'), wsgi_file)
         print "done!"
 
