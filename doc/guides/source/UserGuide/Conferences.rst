@@ -592,22 +592,6 @@ Registration Form
 You can access the registration module from the option *Registration*
 in the menu on the left.
 
-From the Setup tab you can enable or disable the registration.
-You can also modify the start/end dates of registration, the
-maximum number of registrants you will take, any announcements
-and if you wish to receive an email when a new registrant applies.
-
-|image51|
-
-The registration form is split in *sections*. Each section is a part of
-the registration form, and it contains many fields.
-You can choose which sections of the form you wish to use
-(see the following sections listed below). To enable or disable one of these
-sections, click on the |image52| image next to that section; when it is
-red it is disabled and when it is green it is enabled. Clicking on the
-section name will let you modify it to allow the registrants to enter the
-information you need `(see Registration Area) <#registration-area>`_.
-
 --------------
 
 .. _registration_setup:
@@ -615,36 +599,63 @@ information you need `(see Registration Area) <#registration-area>`_.
 Setup tab
 '''''''''
 
-In here, you can control all the features of the registration form.
-To access the following options, you need to click on *Modify* in the
-first part of the setup tab
+From the Setup tab you can control the main features of the registration form: enable or disable the registration, modify the period of registration, the maximum number of registrants you will take, any announcements and if you wish to receive an email when a new registrant applies. Click on *Modify*, on the right side of the setup tab, to access the configuration page.
 
-* Current status: this is where you enable/disable the registration
+The last part of this tab is *Custom statuses*. This is the status of the
+registrant; you can add or delete statuses.
 
-* Registration start/end date: choose the registration start and end dates. You can also allow late registrations by choosing *Allow x days/weeks late*
+|image51|
 
-* Modification end date: If you want the registrants to be able to modify their registration after the end date of the registration, you can set a modification end date
+Here is an exhaustive list of the parameters that can be configured:
 
-* Title: you can change the title of the registration form
+* Current status: this is where you enable/disable the registration.
 
-* Contact info: Type here any information you wish to appear under the option *Registration* in the event page
+* Registration start/end date: choose the registration start and end dates. You can also allow late registrations by choosing *Allow x days/weeks late*.
 
-* Announcement: You can enter any announcement that you wish to appear in the registration form
+* Modification end date: If you want the registrants to be able to modify their registration after the end date of the registration, you can set a modification end date.
 
-* Max no. of registrants: You can limit the number of users who can register for your conference
+* Title: you can change the title of the registration form.
 
-* Email notification sender address: The FROM address that will appear in any email notification sent
+* Contact info: Type here any information you wish to appear under the option *Registration* in the event page.
 
-* Email notification: If you wish a notification to be sent when a registration is submitted, enter here the addresses of the persons you want to receive the notification
+* Announcement: You can enter any announcement that you wish to appear in the registration form.
 
-* Email registrant: Choose when/if to email a registrant (e.g. after registration, after successful payment etc)
+* Max no. of registrants: You can limit the number of users who can register for your conference.
 
-* Must have account: You can choose if the registrants to your conference must have an account or not to be able to register
+* Email notification sender address: The FROM address that will appear in any email notification sent.
 
-You can then choose what personal data to ask for in your form (title, position, institution etc. ). To enable or disable one of these sections, click on the |image52| image next to that section; when it is red it is disabled and when it is green it is enabled.
+* Email notification: If you wish a notification to be sent when a registration is submitted, enter here the addresses of the persons you want to receive the notification.
 
+* Email registrant: Choose when/if to email a registrant (e.g. after registration, after successful payment etc).
 
-You can also choose which sections your form will contain; reason for participation, social events, etc. You can also remove/add a section by clicking on the buttons *remove sect.* and *new sect.*. Enabling and disabling sections works as above.
+* Must have account: You can choose if the registrants to your conference must have an account or not to be able to register.
+
+--------------
+
+.. _registration_edit:
+
+Edit tab
+''''''''
+
+Within this tab resides all edition capabilities of the registration form content. You will be presented with an interactive editor of the registration form. Whatever change you make on it, it will be instantly saved.
+
+|image167|
+
+The registration form is organized in *sections*. Each one is an essential part of the registration form, and it may contain several *fields* to be filled in by the user later on. The edition view allows you to edit, disable, recover and sort sections, create new ones, and delete them. Also, they can be expanded and collapsed to have a more comfortable view.
+
+The first thing you will find above the sections is a floating toolbar with buttons to create new sections, recover disabled ones (if applies), and extend/collapse all. In order to modify the order of the sections, if you grab the 3 horizontal dots on the upper part of the section box, you can drag and drop it to the desired location. Should you need to finally dispose of any custom section that is disabled, you can do so from within the recover sections dialog.
+
+|image168|
+
+In the header of each section you can modify the title and description simply by clicking on the text to start editing it and saving it by pressing ENTER. On the right side there are some buttons that allow you to add new *fields*, open the configuration dialog, disable the section, or collapsing/extending it. Please, note that not all the sections allow the same actions, as some don't accept new fields or can't be disabled nor have further configuration options. Some of their peculiarities are as follows.
+
+* **Personal Data**: Personal data registrants will be asked. Any number of fields can be added. There are several types of fields available from the *Add Field* button, covering the most common use cases. Also, these fields will have the option to be billable, meaning that they can have a price attached. Therefore, the form can be used with an online payment system.
+
+|image169|
+
+A highlighted field can be removed, disabled and configured by clicking on the icons that appear on the right side. Depending on the type of field, different options will appear in the configuration dialog. Disabled fields will be moved to the bottom of the section and they won't be displayed in the registration form. You can sort the fields by grabbing the 3 dots on the left side of the row and drag & dropping it on the desired location. Here is an example of how it looks a configuration dialog.
+
+|image170|
 
 * **Reason for Participation**: The Reason for participation form allows you to ask the
   registrant why he or she wants to participate. From this page you can
@@ -676,17 +687,7 @@ You can also choose which sections your form will contain; reason for participat
 
 |image57|
 
-* **General Sections**: From the button *New sect.*, you can create a customizable section
-  for your form. Inside the section, you can create any number of fields
-  of different kinds (text, textarea, checkbox, etc).
-  Also, these fields will have the option to be billable, meaning that
-  they can have a price attached. Therefore, the form can be used with
-  an online payment system.
-
-|image99|
-
-The last part of this tab is *Custom statuses*. This is the status of the
-registrant; you can add or delete statuses.
+* **General Sections**: These are custom sessions created by the manager of the conference. As with the *Personal Data* section, you can add as many fields as needed.
 
 -------------
 
@@ -739,14 +740,6 @@ Where you can download the generated ticket for this registrant, as well as
 mark/unmark him as checked in.
 
 |image166|
-
---------------
-
-Preview
-'''''''
-
-A preview of the registration form you have set. Feel free to try it,
-no registration submitted from this tab will be recorded.
 
 -------------
 
@@ -2002,13 +1995,13 @@ session. You may also make a PDF of the session.
 .. |image48| image:: UserGuidePics/confm28.png
 .. |image49| image:: UserGuidePics/confm29.png
 .. |image50| image:: UserGuidePics/confm30.png
-.. |image51| image:: UserGuidePics/confreg1.png
+.. |image51| image:: UserGuidePics/regform-setup.png
 .. |image52| image:: UserGuidePics/confreg2.png
-.. |image53| image:: UserGuidePics/confreg3.png
-.. |image54| image:: UserGuidePics/confreg4.png
-.. |image55| image:: UserGuidePics/confreg5.png
-.. |image56| image:: UserGuidePics/confreg6.png
-.. |image57| image:: UserGuidePics/confreg7.png
+.. |image53| image:: UserGuidePics/regform-section-reason.png
+.. |image54| image:: UserGuidePics/regform-section-session.png
+.. |image55| image:: UserGuidePics/regform-section-accommodation.png
+.. |image56| image:: UserGuidePics/regform-section-events.png
+.. |image57| image:: UserGuidePics/regform-section-info.png
 .. |image58| image:: UserGuidePics/confreg12.png
 .. |image59| image:: UserGuidePics/confreg13.png
 .. |image60| image:: UserGuidePics/confm31.png
@@ -2050,7 +2043,6 @@ session. You may also make a PDF of the session.
 .. |image96| image:: UserGuidePics/confd20.png
 .. |image97| image:: UserGuidePics/confsm01.png
 .. |image98| image:: UserGuidePics/confsm02.png
-.. |image99| image:: UserGuidePics/confrf01.png
 .. |image100| image:: UserGuidePics/confd21.png
 .. |image101| image:: UserGuidePics/confrb1.png
 .. |image102| image:: UserGuidePics/confreg14.png
@@ -2068,7 +2060,7 @@ session. You may also make a PDF of the session.
 .. |image115| image:: UserGuidePics/adjustDuration.png
 .. |image116| image:: UserGuidePics/addNewSession.png
 .. |image117| image:: UserGuidePics/addBlockSession.png
-.. |image118| image:: UserGuidePics/registration.png
+.. |image118| image:: UserGuidePics/regform-link.png
 .. |image119| image:: UserGuidePics/epayment.png
 .. |image120| image:: UserGuidePics/announcement.png
 .. |image121| image:: UserGuidePics/addLink.png
@@ -2117,3 +2109,7 @@ session. You may also make a PDF of the session.
 .. |image164| image:: UserGuidePics/confreg17.png
 .. |image165| image:: UserGuidePics/confreg18.png
 .. |image166| image:: UserGuidePics/confreg19.png
+.. |image167| image:: UserGuidePics/regform-edit.png
+.. |image168| image:: UserGuidePics/regform-section.png
+.. |image169| image:: UserGuidePics/regform-add-field.png
+.. |image170| image:: UserGuidePics/regform-dialog.png
