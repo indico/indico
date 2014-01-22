@@ -1,3 +1,5 @@
+<%include file="MarkdownMathJaxHelp.tpl"/>
+
 <div style="padding:20px 0px">
 
 <a href="${urlHandlers.UHConfAbstractBook.getURL(conf)}">${_("Download book of abstracts")}</a>
