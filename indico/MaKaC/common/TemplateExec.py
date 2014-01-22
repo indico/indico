@@ -43,10 +43,13 @@ from indico.web.flask.util import url_for, url_rule_to_js
 
 # The main template directory
 TEMPLATE_DIR = Config.getInstance().getTPLDir()
-FILTER_IMPORTS = ['from indico.util.json import dumps as j',
-                  'from indico.util.string import html_line_breaks as html_breaks',
-                  'from indico.util.string import remove_tags',
-                  'from indico.util.string import render_markdown as m']
+FILTER_IMPORTS = [
+    'from indico.util.json import dumps as j',
+    'from indico.util.string import encode_if_unicode',
+    'from indico.util.string import html_line_breaks as html_breaks',
+    'from indico.util.string import remove_tags',
+    'from indico.util.string import render_markdown as m'
+]
 
 
 class IndicoTemplateLookup(TemplateLookup):
@@ -106,13 +109,19 @@ class IndicoTemplateLookup(TemplateLookup):
                         return self._load(srcfile, uri)
 
                 # We do not find anything, so we raise the Exception
-                raise exceptions.TopLevelLookupException(
-                                "Cant locate template for uri %r" % uri)
+                raise exceptions.TopLevelLookupException('Can\'t locate template for uri {0!r}'.format(uri))
+
 
 def _define_lookup():
+    # TODO: disable_unicode shouldn't be used
+    # since unicode is disabled, template waits for
+    # byte strings provided by default_filters
+    # i.e converting SQLAlchemy model unicode properties to byte strings
     return IndicoTemplateLookup(directories=[TEMPLATE_DIR],
                                 module_directory=os.path.join(Config.getInstance().getTempDir(), "mako_modules"),
                                 disable_unicode=True,
+                                input_encoding='utf-8',
+                                default_filters=['encode_if_unicode', 'str'],
                                 filesystem_checks=True,
                                 imports=FILTER_IMPORTS,
                                 cache_enabled=not ContextManager.get('offlineMode'))
@@ -130,7 +139,7 @@ def render(tplPath, params={}, module=None):
     # outside of the main tpls directory (e.g. plugins) wants
     # to include another template from the main directory.
     # Usage example: <%include file="${TPLS}/SomeTemplate.tpl"/>
-    params["TPLS"] = TEMPLATE_DIR
+    params['TPLS'] = TEMPLATE_DIR
 
     return template.render(**params)
 
@@ -220,12 +229,12 @@ def quoteattr(s):
 
 
 def roomClass(room):
-    if not room.isReservable or room.hasBookingACL():
-        roomCls = "privateRoom"
-    elif room.isReservable and room.resvsNeedConfirmation:
-        roomCls = "moderatedRoom"
-    elif room.isReservable:
-        roomCls = "basicRoom"
+    if not room.is_reservable or room.hasAllowedBookingGroups():
+        roomCls = 'privateRoom'
+    elif room.is_reservable and room.reservations_need_confirmation:
+        roomCls = 'moderatedRoom'
+    elif room.is_reservable:
+        roomCls = 'basicRoom'
     return roomCls
 
 
