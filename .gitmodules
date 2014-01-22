@@ -14,23 +14,21 @@
     path = ext_modules/underscore
     url = git://github.com/documentcloud/underscore.git
     ignore = dirty
-
 [submodule "ext_modules/mathjax"]
     path = ext_modules/mathjax
     url = git://github.com/mathjax/MathJax.git
     ignore = dirty
-
 [submodule "ext_modules/pagedown"]
     path = ext_modules/pagedown
-    url = git@github.com:ujifgc/pagedown.git
+    url = git://github.com/ujifgc/pagedown.git
     ignore = dirty
 [submodule "ext_modules/jquery-ui-multiselect"]
-	path = ext_modules/jquery-ui-multiselect
-	url = https://github.com/ehynds/jquery-ui-multiselect-widget.git
+    path = ext_modules/jquery-ui-multiselect
+    url = git://github.com/ehynds/jquery-ui-multiselect-widget.git
     ignore = dirty
 [submodule "ext_modules/ui-sortable"]
-	path = ext_modules/ui-sortable
-	url = https://github.com/angular-ui/ui-sortable
+    path = ext_modules/ui-sortable
+    url = git://github.com/angular-ui/ui-sortable
 [submodule "ext_modules/angular"]
-	path = ext_modules/angular
-	url = https://github.com/indico/angular.js.git
+    path = ext_modules/angular
+    url = git://github.com/indico/angular.js.git

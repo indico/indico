@@ -38,7 +38,7 @@ ASSET_TYPES = ['js', 'sass', 'css']
 PYTHONBREW_PATH = os.path.expanduser('~/.pythonbrew')
 DOC_DIRS = ['guides']
 
-DEFAULT_NODE_VERSION = '0.10.10'
+DEFAULT_NODE_VERSION = '0.10.24'
 DEFAULT_VERSIONS = ['2.6', '2.7']
 
 # Generated vars
