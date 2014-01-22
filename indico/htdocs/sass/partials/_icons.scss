@@ -342,8 +342,11 @@ you can use the generic selector below, but it's slower:
     content: "\e097";
 }
 
+.icon-disk:before {
+    content: "\e134";
+}
 
-/* KEEP THE FOLLOWING DEFINITIONS: necessery when rendering the icon 'after' e.g. mixin icon-after */
+/* KEEP THE FOLLOWING DEFINITIONS: necessary when rendering the icon 'after' e.g. mixin icon-after */
 .icon-arrow-down-after:after {
     content: "\24";
 }

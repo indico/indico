@@ -1973,6 +1973,28 @@
 		{
 			"icon": {
 				"paths": [
+					"M1024 384l-192-192-320 320-320-320-192 192 512 511.998z"
+				],
+				"tags": [
+					"arrow-down",
+					"download",
+					"bottom"
+				],
+				"defaultCode": 57355,
+				"grid": 16
+			},
+			"properties": {
+				"order": 88,
+				"id": 68,
+				"prevSize": 32,
+				"code": 57359,
+				"name": "arrow-down3",
+				"ligatures": ""
+			}
+		},
+		{
+			"icon": {
+				"paths": [
 					"M384 832h640v128h-640zM384 448h640v128h-640zM384 64h640v128h-640zM192 0v256h-64v-192h-64v-64zM128 526v50h128v64h-192v-146l128-60v-50h-128v-64h192v146zM256 704v320h-192v-64h128v-64h-128v-64h128v-64h-128v-64z"
 				],
 				"tags": [
@@ -1985,11 +2007,33 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 88,
+				"order": 89,
 				"id": 669,
 				"prevSize": 32,
 				"code": 58012,
 				"name": "numbered-list",
+				"ligatures": ""
+			}
+		},
+		{
+			"icon": {
+				"paths": [
+					"M0 640l192 192 320-320 320 320 192-192-511.998-512z"
+				],
+				"tags": [
+					"arrow-up",
+					"upload",
+					"top"
+				],
+				"defaultCode": 58288,
+				"grid": 16
+			},
+			"properties": {
+				"order": 90,
+				"id": 945,
+				"prevSize": 32,
+				"code": 58288,
+				"name": "arrow-up2",
 				"ligatures": ""
 			}
 		},
@@ -2010,55 +2054,11 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 89,
+				"order": 91,
 				"id": 16,
 				"prevSize": 32,
 				"code": 54,
 				"name": "file-xml",
-				"ligatures": ""
-			}
-		},
-		{
-			"icon": {
-				"paths": [
-					"M1024 384l-192-192-320 320-320-320-192 192 512 511.998z"
-				],
-				"tags": [
-					"arrow-down",
-					"download",
-					"bottom"
-				],
-				"defaultCode": 57355,
-				"grid": 16
-			},
-			"properties": {
-				"order": 87,
-				"id": 68,
-				"prevSize": 32,
-				"code": 57359,
-				"name": "arrow-down",
-				"ligatures": ""
-			}
-		},
-		{
-			"icon": {
-				"paths": [
-					"M0 640l192 192 320-320 320 320 192-192-511.998-512z"
-				],
-				"tags": [
-					"arrow-up",
-					"upload",
-					"top"
-				],
-				"defaultCode": 58288,
-				"grid": 16
-			},
-			"properties": {
-				"order": 88,
-				"id": 945,
-				"prevSize": 32,
-				"code": 58288,
-				"name": "arrow-up",
 				"ligatures": ""
 			}
 		},
@@ -2075,11 +2075,33 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 89,
+				"order": 92,
 				"id": 152,
 				"prevSize": 32,
 				"code": 57495,
 				"name": "stack",
+				"ligatures": ""
+			}
+		},
+		{
+			"icon": {
+				"paths": [
+					"M896 0h-896v1024h1024v-896l-128-128zM512 128h128v256h-128v-256zM896 896h-768v-768h64v320h576v-320h74.978l53.022 53.018v714.982z"
+				],
+				"tags": [
+					"disk",
+					"save",
+					"floppy"
+				],
+				"defaultCode": 57652,
+				"grid": 16
+			},
+			"properties": {
+				"id": 308,
+				"order": 93,
+				"prevSize": 32,
+				"code": 57652,
+				"name": "disk",
 				"ligatures": ""
 			}
 		}
@@ -2089,37 +2111,21 @@
 		"name": "icomoon"
 	},
 	"preferences": {
+		"showGlyphs": true,
+		"showQuickUse": true,
 		"fontPref": {
 			"prefix": "icon-",
 			"metadata": {
 				"fontFamily": "icomoon"
 			},
-			"showGlyphs": true,
 			"metrics": {
 				"emSize": 1024,
 				"baseline": 6.25,
 				"whitespace": 50
-			},
-			"resetPoint": 58880,
-			"showQuickUse": true,
-			"quickUsageToken": false,
-			"showMetrics": true,
-			"showMetadata": false
+			}
 		},
-		"imagePref": {
-			"color": 0,
-			"height": 32,
-			"columns": 16,
-			"margin": 16,
-			"png": false,
-			"sprites": true
-		},
+		"imagePref": {},
 		"historySize": 100,
-		"showCodes": true,
-		"gridSize": 16,
-		"showLiga": false,
-		"showGrid": true,
-		"showGlyphs": true,
-		"showQuickUse": true
+		"showCodes": true
 	}
 }

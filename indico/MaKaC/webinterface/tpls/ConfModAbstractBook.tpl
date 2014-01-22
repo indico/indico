@@ -19,8 +19,20 @@
 <table width="90%" align="center" border="0">
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Additional text")}</span></td>
-        <td>
-            <div class="blacktext" id="inPlaceEditAdditionalText">${ boaConfig.getText() }</div>
+        <td id="inPlaceEditAdditionalText" data-field-id="boa-text">
+            <div class="wmd-panel">
+              <div id="wmd-button-bar-f_boa-text" class="wmd-button-bar">
+                <button class="save-button i-button icon-disk">${_("Save")}</button>
+              </div>
+              <textarea class="wmd-input" id="wmd-input-f_boa-text" width="100%" rows="10" style="width:100%">${boaConfig.getText()}</textarea>
+            </div>
+            <div class="md-preview-wrapper edit">
+              <div id="wmd-preview-f_boa-text" class="wmd-preview"></div>
+              <div class="icon-arrow-up instructions">
+                  ${_('You can use {0} and {1} formulae.').format('<a href="#" class="markdown-info">Markdown</a>',
+                                                                  '<a href="#" class="latex-info">LaTeX</a>')}
+              </div>
+            </div>
         </td>
     </tr>
     <tr>
@@ -76,8 +88,25 @@
 <script type="text/javascript">
 
 $(function() {
-    <%  from MaKaC.common import info %>
-        $E('inPlaceEditAdditionalText').set(new RichTextInlineEditWidget('abstract.abstractsbook.changeAdditionalText', ${ jsonEncode(dict(conference="%s"%conf.getId())) }, ${ boaConfig.getText() | n,j }, 300, 45, "${_('No additional text')}").draw());
+
+    $('#inPlaceEditAdditionalText .wmd-input').pagedown('auto-save', {
+      wait_time: 10000,
+      save: function(data, success_cb) {
+        indicoRequest("abstract.abstractsbook.changeAdditionalText",
+          {
+            conference: '${conf.getId()}',
+            value: data
+          },
+          function(result, error) {
+              if (error) {
+                IndicoUtil.errorReport(error);
+              } else {
+                success_cb();
+              }
+          });
+      }
+    });
+
         new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditSortBy'), 'abstract.abstractsbook.changeSortBy', ${dict(conference="%s"%conf.getId())}, ${sortByList|n,j}, '${sortBy}');
         $('#inPlaceEditCorrespondingAuthor').html(new SelectEditWidget('abstract.abstractsbook.changeCorrespondingAuthor',
                 {'conference':'${conf.getId()}'}, ${correspondingAuthorList|n,j}, ${ jsonEncode(correspondingAuthor) }, null).draw().dom);

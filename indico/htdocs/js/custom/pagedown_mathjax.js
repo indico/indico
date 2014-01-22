@@ -260,10 +260,82 @@
     var pd = PageDownMathJax();
 
     $.fn.mathJax = function() {
-
         $(this).each(function(i, elem) {
             pd.mathJax(this);
         });
         return this;
+    };
+
+    $.fn.pagedown = function(arg1, arg2) {
+        function _pagedown(elem) {
+            var options = {},
+                pd_context = elem.data('pagedown'),
+                last_change = null,
+                $save_button = elem.siblings('.wmd-button-bar').find('.save-button');
+
+            function _set_saving() {
+                $save_button.attr('disabled', 'disabled').addClass('saved').
+                                            removeClass('saving wairing-save').
+                                            text($T('Saving...'));
+                        // the 'save' function will trigger a callback that sets
+                        // the final state
+                        options.save(elem.val(), function() {
+                            $save_button.text($T('Saved')).
+                                        addClass('saved').
+                                        removeClass('saving waiting-save');
+                        });
+            }
+
+            function _save_cycle(my_time) {
+                return function() {
+                    // if there's been a change meanwhile, don't do anything
+                    if (last_change <= my_time) {
+                        // otherwise, start saving
+                        _set_saving();
+                    }
+                };
+            }
+
+            if (pd_context) {
+                if (arg1 == 'auto-save' && $save_button.length) {
+                    /*
+                     * This is the 'auto-save' feature
+                     * options:
+                     *   - 'wait_time' - time to wait after a change, before saving
+                     *   - save - function to be called on save (passed current data and callback)
+                     *
+                     * This feature also requires a '.save-button' button element to exist
+                     * inside '.wmd-button-bar'
+                     */
+
+                    _.extend(options, arg2 || {});
+                    elem.on('input', function() {
+                        $save_button.addClass('waiting-save').
+                                    removeClass('saving saved').
+                                    text($T('Save')).attr('disabled', null);
+
+                        // let handlers (_save_cyle) know that they're out-of-date
+                        // by updating last_change with the current time
+                        last_change = new Date().getTime();
+                        setTimeout(_save_cycle(last_change), options.wait_time || 2000);
+                    });
+
+                    $save_button.on('click', function() {
+                        // let's kill handlers that may have been triggered
+                        // by setting last_change to now
+                        last_change = new Date().getTime();
+                        _set_saving();
+                    });
+                }
+            } else {
+                pd_context = PageDownMathJax();
+                elem.data('pagedown', pd_context);
+                pd_context.createEditor(elem.get(0));
+            }
+        }
+
+        $(this).each(function(i, elem) {
+            _pagedown($(elem));
+        });
     };
 })();

@@ -5450,6 +5450,20 @@ class WPModAbstractBook(WPConferenceModifAbstractBase):
         wc = WConfModAbstractBook(self._conf)
         return wc.getHTML()
 
+    def getCSSFiles(self):
+        return WPConferenceModifAbstractBase.getCSSFiles(self) + \
+            self._asset_env['contributions_sass'].urls()
+
+    def getJSFiles(self):
+        return WPConferenceModifAbstractBase.getJSFiles(self) + \
+            self._includeJSPackage('Management') + \
+            self._asset_env['abstracts_js'].urls()
+
+    def _getHeadContent(self):
+        return WPConferenceModifAbstractBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                       for url in self._asset_env['mathjax_js'].urls()])
+
 
 class WPFullMaterialPackage(WPConfModifToolsBase):
 

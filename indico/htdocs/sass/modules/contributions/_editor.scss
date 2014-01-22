@@ -37,11 +37,13 @@ $editor-preview-bg-color: $light-gray;
 
 .wmd-panel {
     @include single-box-shadow();
+    max-width: 800px;
 }
 
 .wmd-button-row
 {
     @include border-all();
+    max-width: 800px;
     border-bottom: none;
     position: relative;
     padding: .5em;
@@ -59,6 +61,42 @@ $editor-preview-bg-color: $light-gray;
     background-color: $dark-gray;
     display: inline-block;
     list-style: none;
+}
+
+.wmd-button-bar {
+    position: relative;
+
+    .save-button {
+        @include single-transition(opacity);
+        @include single-transition(background-color);
+        @include single-box-shadow(0, 0, 1px, 1px, #fff);
+        position: absolute;
+        right: 50px;
+        display: inline-block;
+        color: white;
+        z-index: 1;
+        top: 8px;
+        opacity: 0;
+        visibility: hidden;
+
+        &.waiting-save {
+            visibility: visible;
+            opacity: 1.0;
+        }
+
+        &.saving {
+            background-color: #E4E4B0;
+            visibility: visible;
+            opacity: 1.0;
+            color: $dark-gray !important;
+        }
+
+        &.saved {
+            background-color: #E2F0E2;
+            visibility: visible;
+            opacity: 0.8;
+        }
+    }
 }
 
 .wmd-button {
@@ -170,6 +208,7 @@ $editor-preview-bg-color: $light-gray;
 }
 
 .md-preview-wrapper.edit {
+    max-width: 800px;
     @include border-all($gray);
     @include single-box-shadow();
     @include md-preview-wrapper-mixin($editor-preview-bg-color);

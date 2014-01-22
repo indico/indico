@@ -54,8 +54,8 @@ function block_handler(text, rbg) {
 
 $(function() {
 
-    $('textarea.wmd-input').each(function(i, elem) {
-        PageDownMathJax().createEditor(elem);
+    $('textarea.wmd-input:visible').each(function(i, elem) {
+        $(elem).pagedown();
     });
 
     _(['markdown-info', 'latex-info', 'wmd-help-button']).each(function(name) {

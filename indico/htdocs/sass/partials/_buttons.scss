@@ -98,7 +98,7 @@
 
     &.accept {
         color: #FDFDFD !important;
-        background: #0B8D00;
+        background: $green;
         border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
 
         &:hover:not(.disabled):not(:disabled) {
@@ -142,7 +142,7 @@
     }
 
     &.warning {
-        background: #E99E18;
+        background: $yellow;
         border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
         color: #EFEFEF !important;
         font-weight: normal !important;
