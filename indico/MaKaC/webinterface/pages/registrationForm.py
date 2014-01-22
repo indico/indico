@@ -79,6 +79,10 @@ class WPConfModifRegFormBase(conferences.WPConferenceModifBase):
     def _setActiveTab(self):
         pass
 
+    def getCSSFiles(self):
+        return conferences.WPConferenceModifBase.getCSSFiles(self) + \
+            self._asset_env['registrationform_sass'].urls()
+
 
 class WPConfModifRegFormPreview(WPConfModifRegFormBase):
     def _setActiveTab(self):
@@ -434,6 +438,10 @@ class WPRegistrationFormDisplay(conferences.WPConferenceDefaultDisplayBase):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._newRegFormOpt)
 
+    def getCSSFiles(self):
+        return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
+            self._asset_env['registrationform_sass'].urls()
+
 
 class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
 
@@ -522,6 +530,10 @@ class WPRegistrationFormCreationDone(conferences.WPConferenceDefaultDisplayBase)
     def _defineSectionMenu(self):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
+
+    def getCSSFiles(self):
+        return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
+            self._asset_env['registrationform_sass'].urls()
 
 
 class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
@@ -1006,6 +1018,10 @@ class WPRegistrationFormModify(conferences.WPConferenceDefaultDisplayBase):
     def _defineSectionMenu(self):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._viewRegFormOpt)
+
+    def getCSSFiles(self):
+        return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
+            self._asset_env['registrationform_sass'].urls()
 
 
 class WConfRegistrationFormModify(WConfRegistrationFormDisplay):

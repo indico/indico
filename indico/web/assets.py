@@ -332,6 +332,7 @@ def sass_module_bundle(module_name, depends=[]):
                   depends = SASS_BASE_MODULES + ['sass/modules/{0}/*.scss'.format(module_name)] + depends)
 
 contributions_sass = sass_module_bundle('contributions')
+registrationform_sass = sass_module_bundle('registrationform')
 roombooking_sass = sass_module_bundle('roombooking')
 dashboard_sass = sass_module_bundle('dashboard')
 
@@ -389,6 +390,7 @@ def register_all_css(env, main_css_file):
     env.register('indico_badges_css', indico_badges_css)
 
     # SASS/SCSS
+    env.register('registrationform_sass', registrationform_sass)
     env.register('roombooking_sass', roombooking_sass)
     env.register('contributions_sass', contributions_sass)
     env.register('dashboard_sass', dashboard_sass)

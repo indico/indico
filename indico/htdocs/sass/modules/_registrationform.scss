@@ -19,6 +19,9 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+@import "base";
+@import "compass";
+
 %regform-section {
     @include border-radius();
     @include box-sizing(border-box);
