@@ -91,6 +91,10 @@ def main():
         # we need to copy htdocs/ bin/ doc/ etc/ to its proper place
         print "Copying Indico tree... "
         copy_egg_datafiles_to_base(targetDirs)
+        if hasattr(os, 'symlink'):
+            wsgi_file = os.path.join(targetDirs['htdocs'], 'indico.wsgi')
+            print "Creating wsgi symlink... %s" % wsgi_file
+            os.symlink(os.path.join(eggDir, 'indico/web/indico.wsgi'), wsgi_file)
         print "done!"
 
 
