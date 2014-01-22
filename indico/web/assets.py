@@ -381,8 +381,7 @@ def register_all_css(env, main_css_file):
                    'jquery.colorbox.css',
                    'jquery-ui-custom.css',
                    'jquery.qtip-custom.css',
-                   'jquery.colorpicker.css',
-                   'pagedown_editor.css'),
+                   'jquery.colorpicker.css'),
         filters=("cssmin", "cssrewrite"),
         output='css/base_%(version)s.min.css')
 
