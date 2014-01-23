@@ -28,21 +28,25 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
 
     $scope.sectionApi.disableSection = function(section) {
         regFormFactory.Sections.disable(getRequestParams(section), function(updatedSection) {
-                regFormFactory.checkError(updatedSection, function(updatedSection)  {
+            regFormFactory.processResponse(updatedSection, {
+                success: function(updatedSection)  {
                     section.enabled = updatedSection.enabled;
-                });
+                }
+            });
         });
     };
 
     $scope.sectionApi.saveConfig = function(section, data) {
         var requestParams = angular.extend(getRequestParams(section), data);
         regFormFactory.Sections.save(requestParams, function(updatedSection) {
-                regFormFactory.checkError(updatedSection, function(updatedSection)  {
+            regFormFactory.processResponse(updatedSection, {
+                success: function(updatedSection)  {
                     $scope.section = angular.extend($scope.section, updatedSection);
                     if (updatedSection.id == 'sessions') {
                         $scope.fetchSessions();
                     }
-                });
+                }
+            });
         });
     };
 
@@ -50,9 +54,11 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
         var requestParams = angular.extend(getRequestParams(section), data);
 
         regFormFactory.Sections.title(requestParams, function(updatedSection) {
-                regFormFactory.checkError(updatedSection, function(updatedSection)  {
+            regFormFactory.processResponse(updatedSection, {
+                success: function(updatedSection) {
                     $scope.section.title = updatedSection.title;
-                });
+                }
+            });
         });
     };
 
@@ -60,9 +66,11 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
         var requestParams = angular.extend(getRequestParams(section), data);
 
         regFormFactory.Sections.description(requestParams, function(updatedSection) {
-                regFormFactory.checkError(updatedSection, function(updatedSection)  {
+            regFormFactory.processResponse(updatedSection, {
+                success: function(updatedSection)  {
                     $scope.section.description = updatedSection.description;
-                });
+                }
+            });
         });
     };
 
@@ -73,7 +81,9 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
         });
 
         regFormFactory.Fields.move(requestParams, function(updatedSection) {
-            regFormFactory.checkError(updatedSection, function(updatedSection)  {});
+            regFormFactory.processResponse(updatedSection, {
+                success: function(updatedSection) {}
+            });
             // TODO in case backend rejects request we should update scope with something like:
             // if (response.error) {
             //     $scope.section.items = response.updatedSection.items;
@@ -91,8 +101,10 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
                 });
 
                 $scope.$apply(regFormFactory.Fields.remove(requestParams, {}, function(updatedSection) {
-                    regFormFactory.checkError(updatedSection, function(updatedSection)  {
-                        $scope.section.items = updatedSection.items;
+                    regFormFactory.processResponse(updatedSection, {
+                        success: function(updatedSection) {
+                            $scope.section.items = updatedSection.items;
+                        }
                     });
                 }));
             }

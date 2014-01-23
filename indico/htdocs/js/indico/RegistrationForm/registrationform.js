@@ -55,19 +55,24 @@ ndRegForm.config(function(urlProvider) {
 
 ndRegForm.factory('regFormFactory', function($resource, $http, editionurl, displayurl, userurl) {
     var defaults = $http.defaults.headers;
-    defaults.get = defaults.get || {};
     defaults.common = defaults.common || {};
+    defaults.get = defaults.get || {};
     defaults.get['Content-Type'] = defaults.common['Content-Type'] = 'application/json';
+
     var sectionurl = editionurl + 'sections/:sectionId';
-    var fieldurl = sectionurl + '/fields/:fieldId';
     var sessionsurl = Indico.Urls.Base + '/event/:confId/manage/sessions';
+    var fieldurl = sectionurl + '/fields/:fieldId';
 
     return {
-        checkError: function(data, callback) {
-            if(exists(data.error)) {
+        processResponse: function(data, callback) {
+            callback = callback || {};
+            if(data.error) {
                 IndicoUtil.errorReport(data.error);
-            } else {
-                callback(data);
+                if (callback.error) {
+                    callback.error(data);
+                }
+            } else if (callback.success) {
+                callback.success(data);
             }
         },
         Sections: $resource(sectionurl, {confId: '@confId', sectionId: "@sectionId"}, {
@@ -148,7 +153,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
             $scope.api = {
                 createSection: function(data) {
-                    if(data.sectionCreationForm.$invalid === true){
+                    if (data.sectionCreationForm.$invalid === true){
                         return false;
                     }
 
@@ -157,8 +162,10 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         title: data.newsection.title,
                         description: data.newsection.description
                     }, function(newsection) {
-                        regFormFactory.checkError(newsection, function(newsection)  {
-                            $scope.sections.push(newsection);
+                        regFormFactory.processResponse(newsection, {
+                            success: function(newsection)  {
+                                $scope.sections.push(newsection);
+                            }
                         });
                     });
 
@@ -170,8 +177,10 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         sectionId: section.id,
                         endPos: position
                     }, function(updatedSection) {
-                        regFormFactory.checkError(updatedSection, function(updatedSection)  {
-                            section = updatedSection;
+                        regFormFactory.processResponse(updatedSection, {
+                            success: function(updatedSection)  {
+                                section = updatedSection;
+                            }
                         });
                     });
                 },
@@ -180,15 +189,17 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         confId: $rootScope.confId,
                         sectionId: section.id
                     }, function(updatedSection) {
-                        regFormFactory.checkError(updatedSection, function(updatedSection)  {
-                            var index = -1;
-                            _.find($scope.sections, function(section) {
-                                index++;
-                                return section.id == updatedSection.id;
-                            });
-                            section.enabled = updatedSection.enabled;
-                            $scope.sections.splice(index, 1);
-                            $scope.sections.push(section);
+                        regFormFactory.processResponse(updatedSection, {
+                            success: function(updatedSection)  {
+                                var index = -1;
+                                _.find($scope.sections, function(section) {
+                                    index++;
+                                    return section.id == updatedSection.id;
+                                });
+                                section.enabled = updatedSection.enabled;
+                                $scope.sections.splice(index, 1);
+                                $scope.sections.push(section);
+                            }
                         });
                     });
                 },
@@ -197,8 +208,10 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         confId: $rootScope.confId,
                         sectionId: section.id
                     }, {}, function(updatedSections) {
-                        regFormFactory.checkError(updatedSections, function(updatedSections)  {
-                            $scope.sections = updatedSections;
+                        regFormFactory.processResponse(updatedSections, {
+                            success: function(updatedSections)  {
+                                $scope.sections = updatedSections;
+                            }
                         });
                     });
                 }
@@ -290,6 +303,6 @@ ndRegForm.directive('ndCurrency', function(url) {
     return {
         restrict: 'E',
         replace: true,
-        templateUrl:  url.tpl('currency.tpl.html'),
+        templateUrl:  url.tpl('currency.tpl.html')
     };
 });
