@@ -123,7 +123,7 @@ def add_plugin_blueprints(app):
 def handle_404(exception):
     try:
         if re.search(r'\.py(?:/\S+)?$', request.path):
-            # While not dangerous per so, we never serve *.py files as static
+            # While not dangerous per se, we never serve *.py files as static
             raise NotFound
         try:
             return send_from_directory(app.config['INDICO_HTDOCS'], request.path[1:], conditional=True)
