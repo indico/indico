@@ -1084,10 +1084,15 @@ class WConfRegistrationFormClosed(wcomponents.WTemplated):
         wvars["canManageRegistration"] = self._conf.canManageRegistration(self._rh._getUser())
         if nowutc() < regForm.getStartRegistrationDate():
             wvars["title"] = _("Registration is not open yet")
-            wvars["msg"] = _("Sorry but the registration is not open yet:")
-        elif regForm.getAllowedEndRegistrationDate() < nowutc() or regForm.getCurrency() == "not selected":
+            wvars["msg"] = _("Sorry, but the registration is not open yet:")
+        elif regForm.getAllowedEndRegistrationDate() < nowutc():
             wvars["title"] = _("Registration is closed")
-            wvars["msg"] = _("Sorry but the registration is now closed:")
+            wvars["msg"] = _("Sorry, but the registration is now closed:")
+        elif regForm.getCurrency() == "not selected":
+            wvars['error'] = True
+            wvars['title'] = _('Registration not available')
+            wvars['msg'] = _('Sorry, but the registration is not currently available. \
+                              Please, contact the conference manager for more information.')
         wvars["startDate"] = self._conf.getRegistrationForm().getStartRegistrationDate().strftime("%A %d %B %Y")
         wvars["endDate"] = self._conf.getRegistrationForm().getEndRegistrationDate().strftime("%A %d %B %Y")
         return wvars

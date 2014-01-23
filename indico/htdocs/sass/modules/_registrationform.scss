@@ -129,10 +129,6 @@
     font-weight: bold;
 }
 
-.no-currency-selected {
-    color: $gray;
-}
-
 .regform-section-description {
     @extend %font-family-description;
     color: $dark-gray;
@@ -374,6 +370,19 @@
 // ============================================================================
 
 .regform-field {
+    textarea {
+        resize: none;
+    }
+
+    ul {
+        margin: 0;
+        padding-left: 0;
+
+        li {
+            list-style: none;
+        }
+    }
+
     .accommodation-option-item {
         padding-left : 15px;
     }
@@ -406,19 +415,6 @@
         }
     }
 
-    textarea {
-        resize: none;
-    }
-
-    ul {
-        margin: 0;
-        padding-left: 0;
-
-        li {
-            list-style: none;
-        }
-    }
-
     .dateField {
         img {
             right: 22px;
@@ -427,6 +423,11 @@
         input[type=text] {
             margin: 0 2px;
         }
+    }
+
+    .no-currency-selected {
+        color: $red;
+        vertical-align: -5%;
     }
 }
 

@@ -97,10 +97,10 @@ class RHRegistrationFormDisplayBase( RHBaseRegistrationForm ):
             self._doProcess = False
 
 
-class RHRegistrationFormDisplay( RHRegistrationFormDisplayBase ):
+class RHRegistrationFormDisplay(RHRegistrationFormDisplayBase):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 
-    def _processIfActive( self ):
+    def _processIfActive(self):
         if self._getUser() is not None and self._getUser().isRegisteredInConf(self._conf):
             p = registrationForm.WPRegistrationFormAlreadyRegistered(self, self._conf)
         else:
@@ -108,7 +108,8 @@ class RHRegistrationFormDisplay( RHRegistrationFormDisplayBase ):
                 p = registrationForm.WPRegistrationFormFull(self, self._conf)
                 return registrationForm.WPRegistrationFormFull(self, self._conf)
             elif not self._conf.getRegistrationForm().inRegistrationPeriod() or \
-                    self._conf.getRegistrationForm().getCurrency() == "not selected":
+                    (self._conf.getModPay().isActivated() and
+                     self._conf.getRegistrationForm().getCurrency() == "not selected"):
                 p = registrationForm.WPRegistrationFormClosed(self, self._conf)
             else:
                 p = registrationForm.WPRegistrationFormDisplay(self, self._conf)
