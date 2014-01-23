@@ -100,8 +100,8 @@ class WTemplated(OldObservable):
         tplobj._for_module = module
         return tplobj
 
-    def __init__( self, tpl_name = None):
-        if tpl_name != None:
+    def __init__(self, tpl_name=None):
+        if tpl_name is not None:
             self.tplId = tpl_name
 
         self._rh = ContextManager.get('currentRH', None)

@@ -259,3 +259,9 @@ a.small-link {
 .mono {
   @extend %font-family-monospace;
 }
+
+textarea.log {
+  color: $dark-gray;
+  font-size: 0.7em;
+  @extend .mono;
+}

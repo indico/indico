@@ -24,8 +24,11 @@ String manipulation functions
 import re
 import unicodedata
 
-from HTMLParser import HTMLParser
-import markdown, sys
+import markdown
+import bleach
+
+
+BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small']
 
 
 def unicodeOrNone(string):
@@ -44,6 +47,7 @@ def remove_accents(text, reencode=True):
 
 def remove_non_alpha(text):
     return ''.join(c for c in text if c.isalnum())
+
 
 def html_line_breaks(text):
     return '<p>' + text.replace('\n\n', '</p><p>').replace('\n', '<br/>') + '</p>'
@@ -66,6 +70,7 @@ def truncate(text, max_size, ellipsis='...', encoding='utf-8'):
         text = text.encode(encoding)
 
     return text
+
 
 def permissive_format(text, params):
     """
@@ -96,6 +101,4 @@ def remove_tags(text):
 
 def render_markdown(text):
     """ Mako markdown to html filter """
-    reload(sys)
-    sys.setdefaultencoding("utf-8")
-    return markdown.markdown(HTMLParser().unescape(text))
+    return markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS))

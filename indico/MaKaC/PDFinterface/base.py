@@ -22,6 +22,8 @@ import math
 import cgi
 import shutil
 import xml.sax.saxutils as saxutils
+import uuid
+
 from HTMLParser import HTMLParser
 from reportlab.platypus import SimpleDocTemplate, PageTemplate, Table
 from reportlab.platypus.tableofcontents import TableOfContents
@@ -749,8 +751,9 @@ class PDFLaTeXBase(object):
 
     def __init__(self):
 
-        # Markdown -> LaTeX rendered
-        md = markdown.Markdown()
+        # Markdown -> LaTeX renderer
+        # safe_mode - strip out all HTML
+        md = markdown.Markdown(safe_mode='remove')
         latex_mdx = mdx_latex.LaTeXExtension()
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
@@ -764,12 +767,21 @@ class PDFLaTeXBase(object):
         return pdffile
 
 
-class LatexRunner:
-    """ handles the PDF generation from a chosen LaTeX template
-    Works the same way for every run, except for the Contributions Book
-    that holds a Table of Contents, in this case the pdflatex command
-    has to run twice: the first one to generate the .toc file and the
-    second to compile it into the created .tex file
+class LaTeXRuntimeException(Exception):
+    def __init__(self, source_file, log_file, report_id, params):
+        self.report_id = report_id
+        self.source_file = source_file
+        self.log_file = log_file
+        self.params = params
+
+    @property
+    def message(self):
+        return "Impossible to compile '{0}'. Read '{1}' for details".format(self.source_file, self.log_file)
+
+
+class LatexRunner(object):
+    """
+    Handles the PDF generation from a chosen LaTeX template
     """
 
     def __init__(self, has_toc=False):
@@ -787,31 +799,51 @@ class LatexRunner:
             # flush log, go to beginning and read it
             if log_file:
                 log_file.flush()
-                log_file.seek(0)
-                Logger.get('pdflatex').error(log_file.read())
-            else:
-                Logger.get('pdflatex').error("Error running pdflatex")
+            raise
+
+    def _save_error_report(self, source_filename, log_filename):
+        config = Config.getInstance()
+
+        # create a unique report identifier
+        report_id = uuid.uuid4().hex
+        target_dir = os.path.join(config.getSharedTempDir(), 'reports', report_id)
+
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+
+        shutil.copy(source_filename, os.path.join(target_dir, 'source.tex'))
+        shutil.copy(log_filename, os.path.join(target_dir, 'pdflatex.log'))
+
+        Logger.get('pdflatex').info("Error report saved under {0}".format(target_dir))
+
+        return report_id
 
     def run(self, template_name, **kwargs):
         template_dir = os.path.join(Config.getInstance().getTPLDir(), 'latex')
         template = tpl_render(os.path.join(template_dir, template_name), kwargs)
 
         self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=Config.getInstance().getTempDir())
-        source_file = os.path.join(self._dir, template_name + '.tex')
-        target_file = os.path.join(self._dir, template_name + '.pdf')
-        log_file = open(os.path.join(self._dir, 'output.log'), 'a+')
+        source_filename = os.path.join(self._dir, template_name + '.tex')
+        target_filename = os.path.join(self._dir, template_name + '.pdf')
+        log_filename = os.path.join(self._dir, 'output.log')
+        log_file = open(log_filename, 'a+')
 
-        with open(source_file, 'w') as f:
+        with open(source_filename, 'w') as f:
             f.write(template)
 
         try:
-            self.run_latex(source_file, log_file)
+            self.run_latex(source_filename, log_file)
             if self.has_toc:
-                self.run_latex(source_file, log_file)
+                self.run_latex(source_filename, log_file)
         finally:
             log_file.close()
 
-        return target_file
+            if not os.path.exists(target_filename):
+                report_no = self._save_error_report(source_filename, log_filename)
+                # something went terribly wrong, no LaTeX file was produced
+                raise LaTeXRuntimeException(source_filename, log_filename, report_no, kwargs)
+
+        return target_filename
 
     def cleanup(self):
         shutil.rmtree(self._dir)

@@ -209,7 +209,7 @@ class WAccessKeyError( WTemplated ):
 class WPAccessError( WPDecorated ):
 
     def __init__( self, rh ):
-        WPDecorated. __init__( self, rh )
+        WPDecorated.__init__( self, rh )
 
     def _getBody( self, params ):
         wc = WAccessError( self._rh )
@@ -219,7 +219,7 @@ class WPAccessError( WPDecorated ):
 class WPKeyAccessError( WPDecorated ):
 
     def __init__( self, rh ):
-        WPDecorated. __init__( self, rh )
+        WPDecorated.__init__( self, rh )
 
     def _getBody( self, params ):
         tgt = self._rh._target
@@ -231,6 +231,23 @@ class WPKeyAccessError( WPDecorated ):
             msg = ""
         wc = WAccessKeyError( self._rh, msg )
         return wc.getHTML()
+
+
+class WPLaTeXError(WPDecorated):
+
+    def __init__(self, rh, error):
+        WPDecorated.__init__(self, rh)
+        self._error = error
+
+    def _getBody( self, params ):
+        wc = WTemplated('LaTeXError')
+        conf = self._error.params['conf']
+        return wc.getHTML({
+            'report_id': self._error.report_id,
+            'is_manager': conf.canModify(self._getAW()),
+            'log': open(self._error.log_file, 'r').read(),
+            'source_code': open(self._error.source_file, 'r').read()
+            })
 
 
 class WTimingError( WTemplated ):

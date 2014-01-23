@@ -120,7 +120,7 @@
                           <% content = str(abstract.getField(f.getId()))%>
                           <div class="section">
                             <h2>${f.getCaption()}</h2>
-                            <div class="content md-preview-wrapper display">${content | h, m}</div>
+                            <div class="content md-preview-wrapper display">${content | m}</div>
                         </div>
                         % endif
                 % endfor

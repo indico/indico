@@ -46,6 +46,7 @@ from MaKaC.common import security
 from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError,\
     EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlForbiddenTag, ConferenceClosedError,\
     BadRefererError, NotLoggedError
+from MaKaC.PDFinterface.base import LaTeXRuntimeException
 from indico.modules.oauth.errors import OAuthError
 from MaKaC.webinterface.mail import GenericMailer
 from xml.sax.saxutils import escape
@@ -416,6 +417,12 @@ class RH(RequestHandlerBase):
         return errors.WPFormValuesError(self, e).display()
 
     @jsonify_error
+    def _processLaTeXError(self, e):
+        """Treats access errors occured during the process of a RH."""
+
+        return errors.WPLaTeXError(self, e).display()
+
+    @jsonify_error
     def _processRestrictedHTML(self, e):
 
         return errors.WPRestrictedHTML(self, escape(str(e))).display()
@@ -611,6 +618,9 @@ class RH(RequestHandlerBase):
             DBMgr.getInstance().endRequest(False)
         except HtmlForbiddenTag, e:
             res = self._processRestrictedHTML(e)
+            DBMgr.getInstance().endRequest(False)
+        except LaTeXRuntimeException, e:
+            res = self._processLaTeXError(e)
             DBMgr.getInstance().endRequest(False)
         except MaKaCError, e:
             res = self._processGeneralError(e)
