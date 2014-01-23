@@ -203,7 +203,7 @@ def install_angular():
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'angular')):
             local('npm install')
-            local('grunt')
+            local('grunt clean buildall copy write compress')
             dest_dir_js = lib_dir(env.src_dir, 'js')
             dest_dir_css = lib_dir(env.src_dir, 'css')
             local('mkdir -p {0}'.format(dest_dir_js))
