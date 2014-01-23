@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -35,25 +35,25 @@ class UHConfModifEPayment(EPURLHandler):
 
 
 class UHConfModifEPaymentYellowPay( UHConfModifEPayment ):
-    _requestTag = "modifYellowPay"  
+    _requestTag = "modifYellowPay"
 class UHConfModifEPaymentYellowPayDataModif( UHConfModifEPayment ):
-    _requestTag = "modifYellowPayData"    
+    _requestTag = "modifYellowPayData"
 class UHConfModifEPaymentYellowPayPerformDataModif( UHConfModifEPayment ):
-    _requestTag = "modifYellowPayPerformDataModif"      
+    _requestTag = "modifYellowPayPerformDataModif"
 
 
 class UHPay(EPURLHandler):
     _endpoint = 'misc.payment'
 
-    
+
 class UHPayConfirmYellowPay( UHPay ):
-    _requestTag = "effectuer"      
+    _requestTag = "effectuer"
 class UHPayNotconfirmYellowPay( UHPay ):
-    _requestTag = "noneffectuer"      
+    _requestTag = "noneffectuer"
 class UHPayCancelYellowPay( UHPay ):
-    _requestTag = "annuler"        
+    _requestTag = "annuler"
 class UHPayParamsYellowPay( UHPay ):
-    _requestTag = "params"  
+    _requestTag = "params"
 
 
 

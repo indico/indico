@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -52,7 +52,7 @@ class EquipmentManager( EquipmentManagerBase ):
     def setPossibleEquipment( equipmentList, *args, **kwargs ):
         from MaKaC.rb_location import Location
         location = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
-        
+
         lst = EquipmentManager.getRoot()
         lst[location] = equipmentList
         Factory.getDALManager().getRoot()[_EQUIPMENT_LIST] = lst     # Force update
@@ -79,8 +79,8 @@ class EquipmentManager( EquipmentManagerBase ):
 
     @staticmethod
     def removalIsPossible( equipmentName, *args, **kwargs ):
-        """ Checks whether any room has specified equipment. 
+        """ Checks whether any room has specified equipment.
         If so, returns false.
         Else returns true. """
         pass
-    
+

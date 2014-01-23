@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,21 +24,21 @@ import MaKaC.webinterface.pages.admins as admins
 
 
 class RHAnnouncementModif(RHAdminBase):
-    
+
     def _process( self ):
         p = admins.WPAnnouncementModif( self )
         return p.display()
 
 class RHAnnouncementModifSave(RHAdminBase):
-    
+
     def _checkParams( self, params ):
         RHAdminBase._checkParams( self, params )
         self.text = params.get("announcement", "")
-        
-    
+
+
     def _process( self ):
         an = getAnnoucementMgrInstance()
         an.setText(self.text)
         self._redirect(urlHandlers.UHAnnouncement.getURL())
-            
-        
+
+

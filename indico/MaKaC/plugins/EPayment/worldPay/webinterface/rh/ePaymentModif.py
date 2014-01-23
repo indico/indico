@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,7 +32,7 @@ from MaKaC.plugins.EPayment.worldPay import MODULE_ID, epayment as ePayment
 # world pay information page
 class RHEPaymentmodifWorldPay( RHEPaymentModifBase ):
     _requestTag = "modifWorldPay"
-    
+
     def _process( self ):
         p = ePayments.WPConfModifEPaymentWorldPay( self, self._conf)
         return p.display()
@@ -41,7 +41,7 @@ class RHEPaymentmodifWorldPay( RHEPaymentModifBase ):
 # world pay modification page
 class RHEPaymentmodifWorldPayDataModif( RHEPaymentModifBase ):
     _requestTag = "modifWorldPayData"
-    
+
     def _process( self ):
         p = ePayments.WPConfModifEPaymentWorldPayDataModif( self, self._conf)
         return p.display()
@@ -50,7 +50,7 @@ class RHEPaymentmodifWorldPayDataModif( RHEPaymentModifBase ):
 # submission page for configuration modifications
 class RHEPaymentmodifWorldPayPerformDataModif( RHEPaymentModifBase ):
     _requestTag = "modifWorldPayPerformDataModif"
-    
+
     def _checkParams( self, params ):
         RHEPaymentModifBase._checkParams( self, params)
         self._params = params
@@ -92,7 +92,7 @@ class RHEPaymentConfirmWorldPay( RHConferenceBaseDisplay ):
             return p.display()
         else:
             if self._registrant is not None:
-                
+
                 if self._params.get('transStatus',"").lower() == 'y':
                     self._registrant.setPayed(True)
                     d={}
@@ -127,7 +127,7 @@ class RHEPaymentConfirmWorldPay( RHConferenceBaseDisplay ):
                     tr=ePayment.TransactionWorldPay(d)
                     self._registrant.setTransactionInfo(tr)
                     self._regForm.getNotification().sendEmailNewRegistrantConfirmPay(self._regForm,self._registrant)
-                    
+
                     p = ePayments.WPEPaymentWorldPayAccepted(self, self._conf, self._registrant )
                     d["registrantTitle"] = self._registrant.getTitle()
                     d["registrantFirstName"] = self._registrant.getFirstName()
@@ -172,7 +172,7 @@ class RHEPaymentConfirmWorldPay( RHConferenceBaseDisplay ):
                     d["countryString"]=self._params.get('countryString',"")
                     d["authCurrency"]=self._params.get('authCurrency',"")
                     d["payment_date"]= datetime.utcfromtimestamp(int(long(d["transTime"])/1000))
-                    
+
                     p = ePayments.WPEPaymentWorldPayCancelled(self, self._conf, self._registrant )
                     d["registrantTitle"] = self._registrant.getTitle()
                     d["registrantFirstName"] = self._registrant.getFirstName()
@@ -191,14 +191,14 @@ class RHEPaymentConfirmWorldPay( RHConferenceBaseDisplay ):
 
 class RHEPaymentCancelWorldPay( RHRegistrationFormDisplayBase ):
     _requestTag = "cancel"
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormDisplayBase._checkParams( self, params )
         self._registrant=None
         regId=params.get("registrantId","")
         if regId is not None:
-            self._registrant=self._conf.getRegistrantById(regId)                
-        
+            self._registrant=self._conf.getRegistrantById(regId)
+
     def _processIfActive( self ):
         if self._registrant is not None:
             p = ePayments.WPCancelEPaymentWorldPay(self, self._conf ,self._registrant)

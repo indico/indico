@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,14 +32,14 @@ class EPURLHandler(MainURLHandler):
 # URL for Skipjack configuration
 class UHConfModifEPayment(EPURLHandler):
     _endpoint = 'event_mgmt.confModifEpayment-modifModule'
-    
+
 
 class UHConfModifEPaymentSkipjack( UHConfModifEPayment ):
     _requestTag = "modifSkipjack"
 
 class UHConfModifEPaymentSkipjackDataModif( UHConfModifEPayment ):
     _requestTag = "modifSkipjackData"
-    
+
 class UHConfModifEPaymentSkipjackPerformDataModif( UHConfModifEPayment ):
     _requestTag = "modifSkipjackPerformDataModif"
 

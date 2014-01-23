@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -34,19 +34,19 @@ class UHConfModifEPayment(EPURLHandler):
 
 
 class UHConfModifEPaymentPayPal( UHConfModifEPayment ):
-    _requestTag = "modifPayPal"  
+    _requestTag = "modifPayPal"
 class UHConfModifEPaymentPayPalDataModif( UHConfModifEPayment ):
-    _requestTag = "modifPayPalData"    
+    _requestTag = "modifPayPalData"
 class UHConfModifEPaymentPayPalPerformDataModif( UHConfModifEPayment ):
-    _requestTag = "modifPayPalPerformDataModif"   
+    _requestTag = "modifPayPalPerformDataModif"
 
 
 class UHPay(EPURLHandler):
     _endpoint = 'misc.payment'
 
 class UHPayConfirmPayPal( UHPay ):
-    _requestTag = "confirm"      
+    _requestTag = "confirm"
 class UHPayCancelPayPal( UHPay ):
-    _requestTag = "cancel"        
+    _requestTag = "cancel"
 class UHPayParamsPayPal( UHPay ):
-    _requestTag = "params"  
+    _requestTag = "params"

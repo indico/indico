@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -35,30 +35,30 @@ class CustomAttributesManager( CustomAttributesManagerBase ):
     @staticmethod
     def supportsAttributeManagement( *args, **kwargs ):
         location = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
-        
+
         # CERN uses generic ZODB-based plugin which DOES allow
         # dynamic room attributes management.
-        # However, CERN-specific needs require to turn off this 
+        # However, CERN-specific needs require to turn off this
         # feature, because rooms are managed centrally, and we
         # just import them.
         #if location == "CERN":
         #    return False
-        
+
         return True
 
     @staticmethod
     def getRoot():
         return Factory.getDALManager().getRoot(_CUSTOM_ATTRIBUTES_LIST)
-    
+
     @staticmethod
     def getAttributes( *args, **kwargs ):
         location = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
-        
+
         root = CustomAttributesManager.getRoot()
-        
+
         if not root.has_key( location ):
             CustomAttributesManager.setAttributes( [], location = location )
-        
+
         return CustomAttributesManager.getRoot()[location]
 
     @staticmethod
@@ -73,12 +73,12 @@ class CustomAttributesManager( CustomAttributesManagerBase ):
         dic[location] = attsList
         root = Factory.getDALManager().getRoot()
         root[_CUSTOM_ATTRIBUTES_LIST] = dic
-    
+
     @staticmethod
     def insertAttribute( customAttribute, *args, **kwargs ):
         """ Adds new attribute to the list of custom attributes."""
         location = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
-        
+
         errors = []
         errors = CustomAttributesManagerBase.checkAttribute( customAttribute )
         if errors: raise str( errors )
@@ -86,12 +86,12 @@ class CustomAttributesManager( CustomAttributesManagerBase ):
         attsList = CustomAttributesManager.getAttributes( location = location )
         attsList.append( customAttribute )
         CustomAttributesManager.setAttributes( attsList, location = location )
-    
+
     @staticmethod
     def removeAttribute( customAttributeName, *args, **kwargs ):
         """ Deletes attribute from the list of custom attributes. """
         location = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
-        
+
         attsList = CustomAttributesManager.getAttributes( location = location )
         for at in attsList:
             if at['name'] == customAttributeName:
@@ -110,7 +110,7 @@ class CustomAttributesManager( CustomAttributesManagerBase ):
                 at['required'] = isRequired
                 break;
         CustomAttributesManager.setAttributes( attsList, location = location )
-  
+
     @staticmethod
     def setHidden( customAttributeName, isHidden, *args, **kwargs ):
         """ Makes attribute hidden."""
@@ -122,6 +122,6 @@ class CustomAttributesManager( CustomAttributesManagerBase ):
                 at['hidden'] = isHidden
                 break;
         CustomAttributesManager.setAttributes( attsList, location = location )
-              
+
 if __name__ == '__main__':
     pass

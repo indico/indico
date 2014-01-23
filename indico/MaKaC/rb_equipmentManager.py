@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,18 +24,18 @@ Responsible: Piotr Wlodarek
 
 
 class EquipmentManagerBase:
-    """ 
-    Generic equipment manager, Data Access Layer independant. 
-    
+    """
+    Generic equipment manager, Data Access Layer independant.
+
     It manages the list of rooms' possible equipment.
     Equipment is just a string.
-    
+
     The list of possible equipment is defined by CRBS admin.
-    
+
     This list is used mainly for generating user web interface.
     (System must know, what equipment user may ask for to generate [v] checkboxes)
     """
-    
+
     @staticmethod
     def getPossibleEquipment():
         """ Returns the List of rooms' possible equipment. """
@@ -45,23 +45,23 @@ class EquipmentManagerBase:
     def setPossibleEquipment( equipmentList ):
         """ Sets the List of rooms' possible equipment. """
         pass
-    
+
     @staticmethod
     def insertEquipment( equipmentName ):
         """ Adds new equipment to the list of possible equipment. """
         pass
-    
+
     @staticmethod
     def removeEquipment( equipmentName ):
         """ Deletes the equipment from the list of possible equipment. """
         pass
-    
+
     @staticmethod
     def removalIsPossible( equipmentName ):
-        """ Checks whether any room has the str equipment. 
+        """ Checks whether any room has the str equipment.
         If so, returns false.
         Else returns true. """
         pass
-    
+
 if __name__ == '__main__':
     pass

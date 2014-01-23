@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,72 +31,72 @@ from MaKaC.plugins.EPayment.payPal import MODULE_ID
 
 class RHEPaymentmodifPayPal( RHEPaymentModifBase ):
     _requestTag = "modifPayPal"
-    
+
     def _process( self ):
         p = ePayments.WPConfModifEPaymentPayPal( self, self._conf )
         return p.display()
-        
+
 class RHEPaymentmodifPayPalDataModif( RHEPaymentModifBase ):
     _requestTag = "modifPayPalData"
-    
+
     def _process( self ):
         p = ePayments.WPConfModifEPaymentPayPalDataModif( self, self._conf )
         return p.display()
 
 class RHEPaymentmodifPayPalPerformDataModif( RHEPaymentModifBase ):
     _requestTag = "modifPayPalPerformDataModif"
-    
+
     def _checkParams( self, params ):
         RHEPaymentModifBase._checkParams( self, params )
         self._params=params
         self._cancel = params.has_key("cancel")
-    
+
     def _process( self ):
         if not self._cancel:
             ses = self._conf.getModPay().getPayModByTag(MODULE_ID)
             ses.setValues(self._params)
-        self._redirect(localUrlHandlers.UHConfModifEPaymentPayPal.getURL(self._conf)) 
-        
+        self._redirect(localUrlHandlers.UHConfModifEPaymentPayPal.getURL(self._conf))
+
 
 
 
 class RHEPaymentconfirmPayPal( RHRegistrationFormDisplayBase ):
     _requestTag = "confirm"
-    
+
     def _checkParams( self, params ):
-        RHRegistrationFormDisplayBase._checkParams( self, params )                   
+        RHRegistrationFormDisplayBase._checkParams( self, params )
         self._registrant=None
         regId= params.get("registrantId","")
         if regId is not None:
-            self._registrant=self._conf.getRegistrantById(regId)                
-        
+            self._registrant=self._conf.getRegistrantById(regId)
+
     def _processIfActive( self ):
         if self._registrant is not None:
             p = ePayments.WPconfirmEPaymentPayPal( self,self._conf,self._registrant)
             return p.display()
-            
+
 class RHEPaymentCancelPayPal( RHRegistrationFormDisplayBase ):
     _requestTag = "cancel"
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormDisplayBase._checkParams( self, params )
         self._registrant=None
         regId=params.get("registrantId","")
         if regId is not None:
-            self._registrant=self._conf.getRegistrantById(regId)                
-        
+            self._registrant=self._conf.getRegistrantById(regId)
+
     def _processIfActive( self ):
         if self._registrant is not None:
             p = ePayments.WPCancelEPaymentPayPal( self,self._conf ,self._registrant)
             return p.display()
-    
-                
+
+
 class RHEPaymentValideParamPayPal( RHConferenceBaseDisplay ):
     _requestTag = "params"
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams(self, params)
-        self._regForm = self._conf.getRegistrationForm()     
+        self._regForm = self._conf.getRegistrationForm()
         self._params=params
         self._registrant=None
         regId=params.get("registrantId","")
@@ -113,7 +113,7 @@ class RHEPaymentValideParamPayPal( RHConferenceBaseDisplay ):
         if not regForm.isActivated() or not self._conf.hasEnabledSection("regForm"):
             p = registrationForm.WPRegFormInactive( self, self._conf )
             return p.display()
-        else:              
+        else:
             if self._registrant is not None:
                 self._registrant.setPayed(True)
                 d={}
@@ -121,7 +121,7 @@ class RHEPaymentValideParamPayPal( RHConferenceBaseDisplay ):
                 d["payer_id"]=self._params.get("payer_id")
                 d["mc_currency"]=self._params.get("mc_currency")
                 d["mc_gross"]=self._params.get("mc_gross")
-                d["verify_sign"]=self._params.get("verify_sign")                               
+                d["verify_sign"]=self._params.get("verify_sign")
                 tr=ePayment.TransactionPayPal(d)
                 self._registrant.setTransactionInfo(tr)
                 self._regForm.getNotification().sendEmailNewRegistrantConfirmPay(self._regForm,self._registrant )

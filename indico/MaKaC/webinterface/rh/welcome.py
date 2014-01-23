@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,10 +25,10 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 
 class RHWelcome( base.RHDisplayBaseProtected ):
     _uh = urlHandlers.UHWelcome
-    
+
     def _checkParams( self, params ):
         self._target = conference.CategoryManager().getRoot()
-    
+
     def _process( self ):
         wfReg = webFactoryRegistry.WebFactoryRegistry()
         p = welcome.WPWelcome( self, self._target, wfReg )

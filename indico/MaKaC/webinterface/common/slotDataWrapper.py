@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ from MaKaC.errors import MaKaCError, NoReportError
 from pytz import timezone
 
 class Convener:
-    
+
     def __init__(self,id,data={}):
         self._id=id
         self.setValues(data)
@@ -64,11 +64,11 @@ class Convener:
         return self._email
 
 class Slot:
-    
+
     def __init__(self, data={}):
         self.setValues(data)
-    
-    def setValues(self, data):       
+
+    def setValues(self, data):
         self._id=data.get("id","")
         self._session=data.get("session",None)
         self._title=data.get("title", "")
@@ -83,7 +83,7 @@ class Slot:
         self._endDate=None
         if data:
             tz = self._session.getConference().getTimezone()
-            
+
             if data.has_key("sDate"):
                 self._startDate=data["sDate"]
             elif data.get("sYear","")!="" and data.get("sMonth","")!="" and \
@@ -94,12 +94,12 @@ class Slot:
                                         int( data["sDay"] ), \
                                         int( data["sHour"] ), \
                                         int( data["sMinute"] ) ) )
-            
-            if data.has_key("eDate"):           
+
+            if data.has_key("eDate"):
                 self._endDate=data["eDate"]
             elif data.get("eYear","")!="" and data.get("eMonth","")!="" and \
                     data.get("eDay","")!="" and data.get("eHour","")!="" and \
-                    data.get("eMinute","")!="": 
+                    data.get("eMinute","")!="":
                 self._endDate=timezone(tz).localize(datetime( int( data["eYear"] ), \
                                     int( data["eMonth"] ), \
                                     int( data["eDay"] ), \
@@ -156,7 +156,7 @@ class Slot:
 
     def getSession(self):
         return self._session
-    
+
     def getTitle(self):
         return self._title
 
@@ -174,13 +174,13 @@ class Slot:
 
     def getAdjustedStartDate(self):
         return self._startDate.astimezone(timezone(self.getSession().getTimezone()))
-    
+
     def getEndDate(self):
         return self._endDate
 
     def getAdjustedEndDate(self):
         return self._endDate.astimezone(timezone(self.getSession().getTimezone()))
-    
+
     def getDuration(self):
         return self._duration
 
@@ -238,7 +238,7 @@ class Slot:
         for conv in l:
             conv.setId(i)
             i += 1
-    
+
     def removeConveners(self,idList):
         toRem=[]
         for conv in self._conveners:

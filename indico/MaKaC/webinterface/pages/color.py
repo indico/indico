@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ from MaKaC.webinterface.wcomponents import WTemplated
 from indico.core.config import Config
 
 class WPSimpleColorChart( WPNotDecorated ):
-    
+
     def __init__(self, rh, colorCodeTarget, colorPreviewTarget, formId=0):
         WPNotDecorated.__init__(self, rh)
         self._colorCodeTarget = colorCodeTarget
@@ -30,7 +30,7 @@ class WPSimpleColorChart( WPNotDecorated ):
         if formId.strip()=="":
             formId="0"
         self._formId=formId
-        
+
     def _getBody( self, params ):
         wc = WSimpleColorChart()
         #color=""
@@ -40,17 +40,17 @@ class WPSimpleColorChart( WPNotDecorated ):
         #    colorpreview="backgroundColorpreview"
         #elif self._colorTarget=="text":
         #    color="textColor"
-        #    colorpreview="textColorpreview" 
+        #    colorpreview="textColorpreview"
         pars = {"imgColortable": Config.getInstance().getSystemIconURL("colortable"), \
                 "colorString":self._colorCodeTarget, \
                 "colorPreviewString":self._colorPreviewTarget, \
                 "formId":self._formId}
-        
+
         return wc.getHTML( pars )
 
 
 class WSimpleColorChart( WTemplated ):
-    
+
     def getVars( self ):
         vars = WTemplated.getVars( self )
         return vars

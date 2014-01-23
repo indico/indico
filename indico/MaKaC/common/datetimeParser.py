@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,15 +19,15 @@
 
 """
     Simple robust time and date parsing.
-    
+
     Note: Follows the Australian standard, dd/mm/yyyy.
           Americans should replace '%d %m %Y' with '%m %d %Y' and '%d %m %y' with '%m %d %y' below.
-    
+
     Routines will either
      - return a date or time
      - return None if the string is empty
      - throw a ValueError
-     
+
     TODO: Handle 1st 2nd 3rd etc
 
     This file is placed in the public domain by Paul Harrison, 2006
@@ -51,23 +51,23 @@ date_formats_without_year = ['%d %B', '%B %d',
 def parse_time(string):
     string = string.strip()
     if not string: return None
-    
+
     for format in time_formats:
         try:
             result = time.strptime(string, format)
             return datetime.time(result.tm_hour, result.tm_min)
         except ValueError:
             pass
-            
+
     raise ValueError()
 
-    
+
 def parse_date(string):
     string = string.strip()
     if not string: return None
-    
+
     string = string.replace('/',' ').replace('-',' ').replace(',',' ')
-    
+
     for format in date_formats_with_year:
         try:
             result = time.strptime(string, format)
@@ -82,7 +82,7 @@ def parse_date(string):
             return datetime.date(year, result.tm_mon, result.tm_mday)
         except ValueError:
             pass
-            
+
     raise ValueError()
 
 

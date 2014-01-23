@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,36 +22,36 @@
 from indico.core.config import Config
 from MaKaC.conference import ContribStatusSch,ContribStatusNotSch
 from MaKaC.conference import ContribStatusWithdrawn
-from MaKaC.i18n import _    
+from MaKaC.i18n import _
 
 class ContribStatusList:
     """
     """
-    
+
     _statusProps = {"ns":[ "not scheduled","", "NS"], \
                         "s":[ "scheduled","", "S"], \
                         "withdrawn":[ "withdrawn","", "W"] }
-                        
+
     _statusIds = { ContribStatusSch: "s", \
                             ContribStatusNotSch: "ns", \
                             ContribStatusWithdrawn: "withdrawn" }
-        
+
     @classmethod
     def _getCaption( cls, statusId ):
         return _(cls._statusProps.get(statusId,[""])[0])
-    
+
     @classmethod
     def _getCode(cls,statusId):
         return _(cls._statusProps.get(statusId,["","",""])[2])
-    
+
     @classmethod
     def _getIconURL(cls,statusId):
         return Config.getInstance().getSystemIconURL(cls._statusProps.get(statusId,["","",""])[1])
-    
+
     @classmethod
     def getId(cls,statusClass):
         return cls._statusIds.get(statusClass, "")
-    
+
     @classmethod
     def getStatus(cls,id):
         for i in cls._statusIds.iteritems():
@@ -70,7 +70,7 @@ class ContribStatusList:
         """
         """
         return cls._getCode(cls.getId(statusClass))
-    
+
     @classmethod
     def getIconURL(cls,statusClass):
         """
@@ -82,5 +82,5 @@ class ContribStatusList:
         """Gives a list of all the abstract status.
         """
         return cls._statusIds.keys()
-    
+
 

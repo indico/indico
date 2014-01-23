@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -82,9 +82,9 @@ def run(path, ntxn, orderTransactions):
 
     for i in iterator:
         transactions.append({"tid": TimeStamp(i.tid), "user": i.user, "desc": i.description, "len": header.length, "objs": None})
-        
-        header = header.next_txn()   
-    
+
+        header = header.next_txn()
+
         object_types = {}
         for o in i:
             ot = reader.getIdentity(o.data)
@@ -96,14 +96,14 @@ def run(path, ntxn, orderTransactions):
 
         keys = object_types.keys()
         transactions[-1]["objs"] = object_types
-            
+
     f.close()
     if orderTransactions:
         transactions = sorted(transactions, key=lambda (d): d["len"], reverse=True)
     for tr in transactions:
         print "\n\nTRANSACTION: ", tr["tid"], tr["user"], tr["desc"], pretty_size(tr["len"])
-        object_types = tr["objs"]        
-        keys = object_types.keys()        
+        object_types = tr["objs"]
+        keys = object_types.keys()
         for k in sorted(keys, key=lambda (k): object_types[k][0], reverse=True):
             # count, class, size (aggregate)
             print " - ", object_types[k][1], k, pretty_size(object_types[k][0])
@@ -113,7 +113,7 @@ def main():
     parser = OptionParser(usage=usage)
     parser.add_option("-n", "--number", dest="num",
                   help="display the last 'n' transactions (Default 100)", default=100, type="int")
-    parser.add_option("-o", "--order", dest="order", action="store_false", 
+    parser.add_option("-o", "--order", dest="order", action="store_false",
                   help="order the transactions by size and not by date")
 
     (options, args) = parser.parse_args()
