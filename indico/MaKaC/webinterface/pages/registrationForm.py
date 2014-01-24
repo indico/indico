@@ -50,7 +50,7 @@ class WPConfModifRegFormBase(conferences.WPConferenceModifBase):
         self._tabRegFormSetup = self._tabCtrl.newTab("regformsetup", _("Setup"),
                                                      urlHandlers.UHConfModifRegForm.getURL(self._conf))
         self._tabRegistrationPreview = self._tabCtrl.newTab("edit", _("Edit"),
-                                                        urlHandlers.UHConfModifRegistrationPreview.getURL(self._conf))
+                                                        urlHandlers.UHConfModifRegistrationModification.getURL(self._conf))
         self._tabRegistrants = self._tabCtrl.newTab("registrants", _("Registrants"),
                                                     urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
         self._tabEPay = self._tabCtrl.newTab("epay", _("e-payment"), urlHandlers.UHConfModifEPayment.getURL(self._conf))

@@ -25,7 +25,7 @@ var ndRegForm = angular.module('nd.regform', [
 // ============================================================================
 
 ndRegForm.value('editionurl',
-    Indico.Urls.Base + '/event/:confId/manage/registration/preview/'
+    Indico.Urls.Base + '/event/:confId/manage/registration/modify/'
 );
 
 ndRegForm.value('displayurl',

@@ -2969,12 +2969,12 @@ class UHConfModifRegFormStatusPerformModif(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrationForm-performModifStatus'
 
 
-class UHConfModifRegistrationPreview(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationPreview'
+class UHConfModifRegistrationModification(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationModification'
 
 
-class UHConfModifRegistrationPreviewSectionQuery(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrationPreviewSection-query'
+class UHConfModifRegistrationModificationSectionQuery(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationModificationSection-query'
 
 
 class UHConfModifRegistrantList(URLHandler):

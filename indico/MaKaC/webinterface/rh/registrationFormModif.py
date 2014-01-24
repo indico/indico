@@ -49,7 +49,7 @@ class RHRegistrationFormModifBase(RHConferenceBase, RHModificationBaseProtected)
             raise ConferenceClosedError(self._target.getConference())
 
 
-class RHRegistrationPreview ( RHRegistrationFormModifBase ):
+class RHRegistrationModification ( RHRegistrationFormModifBase ):
 
     def _process( self ):
         p = registrationForm.WPConfModifRegFormPreview( self, self._conf )
@@ -357,7 +357,7 @@ class RegistrationFormModifRESTBase(RHRegistrationFormModifBase):
         self._regForm = self._conf.getRegistrationForm()
 
 
-class RHRegistrationPreviewSectionQuery(RegistrationFormModifRESTBase):
+class RHRegistrationModificationSectionQuery(RegistrationFormModifRESTBase):
 
     def _process_GET(self):
         return json.dumps(self.getSectionsFossil())
@@ -413,7 +413,7 @@ class RHRegistrationFormModifSessionsBase(RegistrationFormModifRESTBase):
         self._section = self._regForm.getSectionById("sessions")
 
 
-class RHRegistrationPreviewSection(RHRegistrationFormModifSectionBase):
+class RHRegistrationModificationSection(RHRegistrationFormModifSectionBase):
 
     def _process_GET(self):
         return jsonify(fossilize(self._section))
