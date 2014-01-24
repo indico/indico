@@ -813,22 +813,69 @@ def addSuggestionsTask(dbi, withRBDB, prevVersion):
     client.enqueue(task)
     dbi.commit()
 
-
 @since('1.2')
-def removeVideoServicesLinksFromCore(dbi, withRBDB, prevVersion):
-    """Video Services migration remove from core"""
-    ch = ConferenceHolder()
-    i = 0
-    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
+def conferenceMigration1_2(dbi, withRBDB, prevVersion):
+    """
+    Tasks: 1. Removing Video Services from core
+           2. Migrates old AbstractField to new AbstractField subclasses
+           3. Add download e-ticket PDF link to the menu
+    """
+
+    def removeVideoServicesLinksFromCore(conf):
+        ############################################
+        # Video Services migration remove from core
+        ############################################
+
         # Update Menu Links
         menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf).getMenu()
         if menu:
             link = menu.getLinkByName("collaboration")
             if link:
                 link.setURLHandler(urlHandlers.UHCollaborationDisplay)
-        i += 1
-        if dbi and i % 1000 == 999:
+
+    def updateAbstractFields(conf):
+        #############################################################
+        # Migrates old AbstractField to new AbstractField subclasses
+        #############################################################
+
+        afm = conf.getAbstractMgr().getAbstractFieldsMgr()
+        for index, field in enumerate(afm._fields):
+            if field is not None:
+                if type(field) != AbstractField:
+                    continue  # Database already contains AbstractField objects created on v1.2.
+                params = {}
+                params["id"] = field._id
+                params["type"] = field._type
+                params["caption"] = field._caption
+                params["isMandatory"] = field._isMandatory
+                try:
+                    params["maxLength"] = field._maxLength
+                except:
+                    pass
+                try:
+                    params["limitation"] = field._limitation
+                except:
+                    pass
+                afm._fields[index] = AbstractField.makefield(params)
+                afm._p_changed = 1
+        # Delete all None items in the field list
+        afm._fields = filter(None, afm._fields)
+
+
+    cdmr = displayMgr.ConfDisplayMgrRegistery()
+    ch = ConferenceHolder()
+    i = 0
+
+    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
+
+        removeVideoServicesLinksFromCore(conf)
+        updateAbstractFields(conf)
+        # Add download e-ticket PDF link to the menu:
+        _fixDefaultStyle(conf, cdmr)
+
+        if i % 10000 == 9999:
             dbi.commit()
+        i += 1
     dbi.commit()
 
 
@@ -884,42 +931,6 @@ def lowercaseLDAPIdentities(dbi, withRBDB, prevVersion):
 
 
 @since('1.2')
-def updateAbstractFields(dbi, withRBDB, prevVersion):
-    """
-    Migrates old AbstractField to new AbstractField subclasses
-    """
-
-    i = 0
-    for (__, conf) in console.conferenceHolderIterator(ConferenceHolder(), deepness='event'):
-        afm = conf.getAbstractMgr().getAbstractFieldsMgr()
-        for index, field in enumerate(afm._fields):
-            if field is not None:
-                if type(field) != AbstractField:
-                    continue  # Database already contains AbstractField objects created on v1.2.
-                params = {}
-                params["id"] = field._id
-                params["type"] = field._type
-                params["caption"] = field._caption
-                params["isMandatory"] = field._isMandatory
-                try:
-                    params["maxLength"] = field._maxLength
-                except:
-                    pass
-                try:
-                    params["limitation"] = field._limitation
-                except:
-                    pass
-                afm._fields[index] = AbstractField.makefield(params)
-                afm._p_changed = 1
-        # Delete all None items in the field list
-        afm._fields = filter(None, afm._fields)
-        if i % 100 == 99:
-            dbi.commit()
-        i += 1
-    dbi.commit()
-
-
-@since('1.2')
 def updateAvatarEmails(dbi, withRBDB, prevVersion):
     """
     Makes sure that all the secondary emails are lower case (otherwise it would be difficult to use indexes)
@@ -930,24 +941,6 @@ def updateAvatarEmails(dbi, withRBDB, prevVersion):
         if j % 1000 == 999:
             dbi.commit()
         j += 1
-    dbi.commit()
-
-
-@since('1.2')
-def addETicketLinkToMenu(dbi, withRBDB, prevVersion):
-    """
-    Add download e-ticket PDF link to the menu
-    """
-
-    cdmr = displayMgr.ConfDisplayMgrRegistery()
-    ch = ConferenceHolder()
-    i = 0
-
-    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
-        _fixDefaultStyle(conf, cdmr)
-        i += 1
-        if i % 1000 == 0:
-            dbi.commit()
     dbi.commit()
 
 
