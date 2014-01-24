@@ -1,3 +1,10 @@
+
+
+// General MathJax configuration
+(function() {
+    MathJax.Ajax.config.root = Indico.Urls.Base + "/js/lib/mathjax";
+})();
+
 (function() {
     "use strict";
 
