@@ -224,7 +224,7 @@ MaxUploadFileSize = 0
 # AuthenticatorList = [ ('Local', {}),
 #                        ('MyAuthSystem', {'SSOActive': True,
 #                                          'LogoutCallbackURL': 'https://example.com/wsignout',
-#                                          'SSOMapping' = { 'email': 'ADFS_EMAIL',
+#                                          'SSOMapping': { 'email': 'ADFS_EMAIL',
 #                                                           'login': 'ADFS_LOGIN',
 #                                                           'personId': 'ADFS_PERSONID',
 #                                                           'phone': 'ADFS_PHONENUMBER',
@@ -232,7 +232,7 @@ MaxUploadFileSize = 0
 #                                                           'lastname': 'ADFS_LASTNAME',
 #                                                           'firstname': 'ADFS_FIRSTNAME',
 #                                                           'institute': 'ADFS_HOMEINSTITUTE'},
-#                                                           'ResetPasswordMessage': 'Please contact helpdesk or access this url: http://example.com'
+#                                          'ResetPasswordMessage': 'Please contact helpdesk or access this url: http://example.com'
 #                                          })]
 #
 #
