@@ -396,11 +396,12 @@ class RHSubmitMaterialBase(object):
                 mat.addResource(resource, forcedFileId=None)
 
             #apply conversion
-            file_ext = os.path.splitext(resource.getFileName())[1].strip().lower()
-            if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(file_ext):
-                #Logger.get('conv').debug('Queueing %s for conversion' % resource.getFilePath())
-                fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), "pdf", mat)
-                resource.setPDFConversionRequestDate(nowutc())
+            if self._topdf and not isinstance(resource, Link):
+                file_ext = os.path.splitext(resource.getFileName())[1].strip().lower()
+                if fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(file_ext):
+                    # Logger.get('conv').debug('Queueing %s for conversion' % resource.getFilePath())
+                    fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), 'pdf', mat)
+                    resource.setPDFConversionRequestDate(nowutc())
 
             # store the repo id, for files
             if isinstance(resource, LocalFile) and self._repositoryIds is None:
