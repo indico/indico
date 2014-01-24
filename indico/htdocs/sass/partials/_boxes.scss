@@ -19,17 +19,31 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
-@import "partials/boxes";
-@import "partials/buttons";
-@import "partials/core";
-@import "partials/dialogs";
-@import "partials/icons";
-@import "partials/lists";
-@import "partials/inputs";
-@import "partials/qtips";
-@import "partials/tables";
-@import "partials/toolbars";
-@import "partials/fonts";
-@import "partials/messageboxes";
-@import "partials/typography";
-@import "partials/widgets";
+.i-box {
+    @include border-radius();
+    @include box-sizing(border-box);
+    @include border-all();
+    @include single-box-shadow();
+
+    background: white;
+    padding: 10px;
+
+    .i-box-header {
+        @include border-bottom();
+        background-color: $light-gray;
+        margin: -10px -10px;
+        padding: 10px 10px;
+
+        .i-box-title {
+            @extend %font-family-title-light;
+
+            color: $dark-blue;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+    }
+
+    .i-box-body {
+        margin-top: 20px;
+    }
+}

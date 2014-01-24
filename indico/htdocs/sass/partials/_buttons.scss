@@ -212,6 +212,21 @@ a.i-big-button {
     }
 }
 
+.i-button.signin {
+    display: block;
+    text-align: left;
+    margin-top: 5px;
+
+    .auth-id {
+        font-weight: bold;
+    }
+
+    .login-arrow {
+        float: right;
+        @include icon-before('icon-arrow-right');
+    }
+}
+
 button::-moz-focus-inner {
   border: 0;
 }

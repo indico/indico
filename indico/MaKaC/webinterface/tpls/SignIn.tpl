@@ -1,84 +1,94 @@
 
 <div class="container" style="width: 100%; margin: 50px auto; max-width: 420px">
 
-<div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt; white-space: nowrap;">${ _("Log in to Indico")}</div>
+<div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt; white-space: nowrap;">
+    ${ _("Log in to Indico")}
+</div>
 <div id="cookiesEnabled" style="display:none; text-align:center; color:#881122; font-size:large; padding-bottom:15px" colspan="2">
     ${("Please enable cookies in your browser!")}
 </div>
-% if isSSOLoginActive:
-<div style="margin:10px auto;color:#444;font-size:14px">
-    <div>${_("You can login through SSO:")}</div>
-    <form name="signInSSOForm" action=${ ssoURL } method="POST">
-    <div style="text-align:center;margin:10px">
-        % for auth in authenticators:
-            % if auth.isSSOLoginActive():
-                <input type="submit" id="loginButton" value="${ auth.getId()}" name="authId">
-            % endif
-        % endfor
-    </div>
-    </form>
-    <div>${_("or you can enter your credentials in the following form:")}</div>
-</div>
 
+% if isSSOLoginActive:
+<form name="signInSSOForm" action=${ ssoURL } method="POST">
+    % for auth in authenticators:
+        % if auth.isSSOLoginActive():
+            <input id="authId" type="hidden" name="authId">
+            <a href="#" onclick="authFormSubmit('${ auth.getId()}')" class="i-button highlight signin">
+                <span class="auth-id">${ _('Login with Single SignOn') }</span>
+                <i class="login-arrow"></i>
+            </a>
+        % endif
+    % endfor
+</form>
+
+<div class="titled-rule">
+    ${_('Or')}
+</div>
 % endif
 
-<form name="signInForm" action=${ postURL } method="POST">
-<input type="hidden" name="returnURL" value=${ returnURL }>
+<div class="i-box">
+    <div class="i-box-header">
+        <div class="i-box-title">
+            ${ _('Local Login') }
+        </div>
+    </div>
+    <div class="i-box-body">
+        <form name="signInForm" action=${ postURL } method="POST">
+            <input type="hidden" name="returnURL" value=${ returnURL }>
+            <table>
+                % if 'passwordChanged' in _request.args:
+                <tr>
+                    <td class="titleCellTD">&nbsp;</td>
+                    <td class="contentCellTD">
+                        <em>${ _("You may now log in using your new password") }</em>
+                    </td>
+                </tr>
+                % endif
+                <tr>
+                    <td class="titleCellTD">
+                        <span class="titleCellFormat">${ _('Username') }</span>
+                    </td>
+                    <td class="contentCellTD" id="usernameInput">
+                        <input type="text" name="login" style="width: 100%;" value=${ login }>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="titleCellTD">
+                        <span class="titleCellFormat">${ _('Password') }</span>
+                    </td>
+                    <td class="contentCellTD" id="passwordInput">
+                        <input type="password" name="password" style="width: 100%;">
+                    </td>
+                </tr>
+                % if hasExternalAuthentication:
+                <tr>
+                    <td class="titleCellTD">&nbsp;</td>
+                    <td class="contentCellTD">
+                        <em>${_("Please note you can use your external") + " (%s) "%", ".join(externalAuthenticators)  + _("account")}</em>
+                    </td>
+                </tr>
+                % endif
+                % if msg:
+                    <tr>
+                        <td class="titleCellTD">&nbsp;</td>
+                        <td class="contentCellTD">
+                            <span style="color: darkred">${ msg }</span>
+                        </td>
+                    </tr>
+                % endif
+                <tr>
+                    <td colspan="2">
+                        <input type="submit"
+                            id="loginButton"
+                            value="${ _('Login') }"
+                            class="i-button highlight right"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
 
-<table style="border: 1px solid #DDDDDD; padding: 20px; margin:auto; border-radius:6px">
-    % if 'passwordChanged' in _request.args:
-        <tr>
-            <td class="titleCellTD">&nbsp;</td>
-            <td class="contentCellTD">
-                <em>${_("You may now log in using your new password")}</em>
-            </td>
-        </tr>
-    % endif
-    <tr>
-        <td class="titleCellTD">
-            <span class="titleCellFormat">${ _("Login")}</span>
-        </td>
-        <td class="contentCellTD" id="usernameInput">
-            <input type="text" name="login" style="width: 99%;" value=${ login }>
-        </td>
-    </tr>
-    <tr>
-        <td class="titleCellTD">
-            <span class="titleCellFormat">${ _("Password")}</span>
-        </td>
-        <td class="contentCellTD" id="passwordInput">
-            <input type="password" name="password" style="width: 99%;">
-        </td>
-    </tr>
-
-    % if hasExternalAuthentication:
-    <tr>
-        <td class="titleCellTD">&nbsp;</td>
-        <td class="contentCellTD">
-            <em>${_("Please note you can use your external") + " (%s) "%", ".join(externalAuthenticators)  + _("account")}</em>
-        </td>
-    </tr>
-    % endif
-
-    % if msg:
-        <tr>
-            <td class="titleCellTD">&nbsp;</td>
-            <td class="contentCellTD">
-                <span style="color: darkred">${ msg }</span>
-            </td>
-        </tr>
-    % endif
-
-    <tr>
-        <td class="titleCellTD">&nbsp;</td>
-        <td class="contentCellTD">
-            <div class="i-buttons">
-                <input type="submit" id="loginButton" class="i-button right" value="${ _("Login")}" name="signIn">
-            </div>
-        </td>
-    </tr>
-</table>
-</form>
 <div style="margin-top: 20px;">
     <div style="padding: 5px 0; color: #444">
         % if isAuthorisedAccountCreation:
@@ -105,4 +115,9 @@
     if (document.cookie.indexOf("Enabled=true") == -1) $("#cookiesEnabled").show();
 
     document.signInForm.login.focus();
+
+    var authFormSubmit = function(value) {
+        $('#authId')[0].value = value;
+        signInSSOForm.submit();
+    }
 </script>
