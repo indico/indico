@@ -277,8 +277,8 @@ class SSOHandler:
 
         if config.get('email', 'ADFS_EMAIL') in request.environ:
             email = request.environ[config.get("email", "ADFS_EMAIL")]
-            login = request.environ[config.get("personId", "ADFS_LOGIN")]
-            personId = request.environ[config.get("personId", "ADFS_PERSONID")]
+            login = request.environ.get(config.get("login", "ADFS_LOGIN"))
+            personId = request.environ.get(config.get("personId", "ADFS_PERSONID"))
             phone = request.environ.get(config.get("phone", "ADFS_PHONENUMBER"), "")
             fax = request.environ.get(config.get("fax", "ADFS_FAXNUMBER"), "")
             lastname = request.environ.get(config.get("lastname", "ADFS_LASTNAME"), "")
