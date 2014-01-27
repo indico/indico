@@ -18,47 +18,6 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class RoomBookingDBMixin:
-    """
-    Goal:
-    Only _some_ Request Handlers should connect to
-    room booking database.
-
-    Mix in this class into all Request Handlers,
-    which must use Room Booking backend.
-
-    Usage:
-
-    class RHExample( RoomBookingDBMixin, RHProtected ):
-        pass
-
-    NOTE: it is important to put RoomBookingDBMixin as first
-    base class.
-    """
-
-    def _startRequestSpecific2RH(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            CrossLocationDB.connect()
-
-    def _endRequestSpecific2RH(self, commit=True):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            if commit: CrossLocationDB.commit()
-            else: CrossLocationDB.rollback()
-            CrossLocationDB.disconnect()
-
-    def _syncSpecific2RH(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            CrossLocationDB.sync()
-
-    def _abortSpecific2RH(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            CrossLocationDB.rollback()
-
-
 class RoomBookingAvailabilityParamsMixin:
     def _checkParamsRepeatingPeriod( self, params ):
         """
