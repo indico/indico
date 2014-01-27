@@ -18,13 +18,29 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.services.interface.rpc.json import process as jsonrpc_handler
+
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.web.http_api.handlers import handler as api_handler
 
 
 api = IndicoBlueprint('api', __name__)
-api.add_url_rule('/services/json-rpc', view_func=jsonrpc_handler, endpoint='jsonrpc', methods=('POST',))
-api.add_url_rule('/api/<path:path>', view_func=api_handler, endpoint='httpapi', defaults={'prefix': 'api'},
+
+api.add_url_rule('/services/json-rpc',
+                 view_func=jsonrpc_handler,
+                 endpoint='jsonrpc',
+                 methods=('POST',))
+
+api.add_url_rule('/api/<path:path>',
+                 view_func=api_handler,
+                 endpoint='httpapi',
+                 defaults={'prefix': 'api'},
                  methods=('POST', ))
-api.add_url_rule('/export/<path:path>', view_func=api_handler, endpoint='httpapi', defaults={'prefix': 'export'})
-api.add_url_rule('/<any(api, export):prefix>', endpoint='httpapi', build_only=True)
+
+api.add_url_rule('/export/<path:path>',
+                 view_func=api_handler,
+                 endpoint='httpapi',
+                 defaults={'prefix': 'export'})
+
+api.add_url_rule('/<any(api, export):prefix>',
+                 endpoint='httpapi',
+                 build_only=True)
