@@ -52,14 +52,14 @@ type("MapAspectDataPopup", ["ExclusivePopupWithButtons"],
 
             var form = IndicoUtil.createFormFromMap([
                 this.param(aspectData, 'Name', 'name'),
-                this.param(aspectData, 'Center latitude', 'centerLatitude'),
-                this.param(aspectData, 'Center longitude', 'centerLongitude'),
-                this.param(aspectData, 'Top-left latitude', 'topLeftLatitude'),
-                this.param(aspectData, 'Top-left longitude', 'topLeftLongitude'),
-                this.param(aspectData, 'Bottom-right latitude', 'bottomRightLatitude'),
-                this.param(aspectData, 'Bottom-right longitude', 'bottomRightLongitude'),
-                this.param(aspectData, 'Zoom level', 'zoomLevel'),
-                [$T('Default on start-up'), $B(Html.checkbox({}), aspectData.accessor('defaultOnStartup'))]
+                this.param(aspectData, 'Center latitude', 'center_latitude'),
+                this.param(aspectData, 'Center longitude', 'center_longitude'),
+                this.param(aspectData, 'Top-left latitude', 'top_left_latitude'),
+                this.param(aspectData, 'Top-left longitude', 'top_left_longitude'),
+                this.param(aspectData, 'Bottom-right latitude', 'bottom_right_latitude'),
+                this.param(aspectData, 'Bottom-right longitude', 'bottom_right_longitude'),
+                this.param(aspectData, 'Zoom level', 'zoom_level'),
+                [$T('Default on start-up'), $B(Html.checkbox({}), aspectData.accessor('default_on_startup'))]
             ]);
 
             return this.ExclusivePopupWithButtons.prototype.draw.call(this, form);
@@ -96,71 +96,66 @@ type("MapAspectDataPopup", ["ExclusivePopupWithButtons"],
  * @param {Function} editProcess. A function that will be called when a aspect is edited. The function
  *                                will be passed the new data as a WatchObject.
  */
-type("MapAspectListWidget", ["ListWidget"],
-     {
-         _drawItem: function(aspect) {
-             var self = this;
-             var aspectData = aspect.get();
+type("MapAspectListWidget", ["ListWidget"], {
 
-             var editButton = Widget.link(command(function() {
-                 var editPopup = new MapAspectDataPopup(
-                     'Change map aspect data',
-                     aspectData.clone(),
-                     function(newData, suicideHook) {
-                         if (editPopup.parameterManager.check()) {
-                             //  editProcess will be passed a WatchObject representing the aspect.
-                             self.editProcess(aspectData, function(result) {
-                                 if (result) {
-                                     aspectData.update(newData.getAll());
-                                     if (!exists(newAspect.get('defaultOnStartup'))) {
-                                         newAspect.set('defaultOnStartup', false);
-                                     }
-                                     if (!startsWith(aspectData.get('id'), 'newAspect')) {
-                                         aspectData.set('id', 'edited' + aspectData.get('id'));
-                                     }
-                                 }
-                             }, newData);
-                             suicideHook();
-                         }
-                     }
-                 );
-                 editPopup.open();
-             }, IndicoUI.Buttons.editButton()));
+    _drawItem: function(aspect) {
+        var self = this;
+        var aspectData = aspect.get();
 
-             var removeButton =
-                 Widget.link(command(function() {
-                             // removeProcess will be passed a WatchObject representing the aspect.
-                             self.removeProcess(aspectData, function(result) {
-                                     if (result) {
-                                         self.set(aspect.key, null);
-                                     }
-                                 });
+        var editButton = Widget.link(command(function() {
+            var editPopup = new MapAspectDataPopup(
+                'Change map aspect data',
+                aspectData.clone(),
+                function(newData, suicideHook) {
+                    if (editPopup.parameterManager.check()) {
+                        //  editProcess will be passed a WatchObject representing the aspect.
+                        self.editProcess(aspectData, function(result) {
+                            if (result) {
+                                if (!exists(newData.get('default_on_startup'))) {
+                                    newData.set('default_on_startup', false);
+                                }
+                                aspectData.update(newData.getAll());
+                            }
+                        }, newData);
+                        suicideHook();
+                    }
+                }
+            );
+            editPopup.open();
+        }, IndicoUI.Buttons.editButton()));
 
-             }, IndicoUI.Buttons.removeButton()));
+        var removeButton = Widget.link(command(function() {
+            // removeProcess will be passed a WatchObject representing the aspect.
+            self.removeProcess(aspectData, function(result) {
+                if (result) {
+                    self.set(aspect.key, null);
+                }
+            });
+        }, IndicoUI.Buttons.removeButton()));
 
-             var buttonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10)}});
+        var buttonDiv = Html.div({style: {cssFloat: 'right', paddingRight: pixels(10)}});
 
-             buttonDiv.append(editButton) ;
-             buttonDiv.append(removeButton);
+        buttonDiv.append(editButton) ;
+        buttonDiv.append(removeButton);
 
-             var b1 = $B(Html.span(), aspectData.accessor('name'));
-             var b2 = $B(Html.span(), aspectData.accessor('defaultOnStartup'), function(x) {return x ? ' (' + $T('Default') + ')' : ''});
+        var b1 = $B(Html.span(), aspectData.accessor('name'));
+        var b2 = $B(Html.span(), aspectData.accessor('default_on_startup'), function(x) {return x ? ' (' + $T('Default') + ')' : ''});
 
-             var aspectName = Html.span({}, b1, b2);
+        var aspectName = Html.span({}, b1, b2);
 
-             return Html.span({}, buttonDiv, aspectName);
-         }
-     },
+        return Html.span({}, buttonDiv, aspectName);
+    }
+},
 
-     function(style, editProcess, removeProcess) {
+    function(style, editProcess, removeProcess) {
 
-         this.style = any(style, "UIAspectsList");
-         this.editProcess = any(editProcess, singleAspectNothing);
-         this.removeProcess = any(removeProcess, singleAspectNothing);
+        this.style = any(style, "UIAspectsList");
+        this.editProcess = any(editProcess, singleAspectNothing);
+        this.removeProcess = any(removeProcess, singleAspectNothing);
 
-         this.ListWidget(style);
-     }
-    );
+        this.ListWidget(style);
+    }
+);
 
 
 /**
@@ -184,23 +179,21 @@ type("MapAspectListField", ["IWidget"], {
 
         var addNewAspectButton = Html.input("button", {style: {marginRight: pixels(5)}, class: 'i-button'}, $T('Add Map Aspect') );
 
-        addNewAspectButton.observeClick(function(){
-
-            var newAspectId = self.newAspectCounter++;
-            var newAspect = $O({'id': newAspectId});
-
+        addNewAspectButton.observeClick(function() {
+            var newAspect = $O({});
             var newAspectPopup = new MapAspectDataPopup(
                 $T('New map aspect'),
                 newAspect,
                 function(newData, suicideHook) {
                     if (newAspectPopup.parameterManager.check()) {
                         newAspect.update(newData.getAll());
-                        if (!exists(newAspect.get('defaultOnStartup'))) {
-                            newAspect.set('defaultOnStartup', false);
+                        if (!exists(newAspect.get('default_on_startup'))) {
+                            newAspect.set('default_on_startup', false);
                         }
                         self.newProcess(newAspect, function(result) {
-                            if (result) {
-                                self.aspectList.set(newAspectId, newAspect);
+                            if (result.ok) {
+                                newAspect.set('id', result.id)
+                                self.aspectList.set(result.id, newAspect);
                             }
                         });
                         suicideHook();
@@ -211,26 +204,21 @@ type("MapAspectListField", ["IWidget"], {
         });
         buttonDiv.append(addNewAspectButton);
 
-        return Widget.block([Html.div(this.aspectDivStyle,this.aspectList.draw()), buttonDiv]);
+        return Widget.block([Html.div(this.aspectDivStyle, this.aspectList.draw()), buttonDiv]);
 
     }
 },
     function(aspectDivStyle, aspectListStyle, initialAspects, newProcess, editProcess, removeProcess) {
         var self = this;
         this.aspectList = new MapAspectListWidget(aspectListStyle, editProcess, removeProcess);
-        if (initialAspects.length > 0) {
-            this.newAspectCounter = initialAspects[initialAspects.length - 1].id + 1;
-        } else {
-            this.newAspectCounter = 0;
-        }
         this.aspectDivStyle = any(aspectDivStyle, "UIAspectsListDiv");
 
         if (exists(initialAspects)) {
-            each(initialAspects, function(aspect){
+            each(initialAspects, function(aspect) {
                 self.aspectList.set(aspect.id, $O(aspect));
             });
         }
 
         this.newProcess = any(newProcess, aspectListNothing);
-     }
+    }
 );
