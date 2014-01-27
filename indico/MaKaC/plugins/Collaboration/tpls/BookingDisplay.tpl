@@ -22,7 +22,7 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
             % elif isTomorrow(Booking.getStartDate(), Timezone) :
                 tomorrow
             % else:
-                ${ formatDate(Booking.getAdjustedStartDate(Timezone).date(), format = "%a %d/%m") }
+                ${ formatDate(Booking.getAdjustedStartDate(Timezone).date(), format="EEE d/MMM") }
             % endif
             </span>
             from
@@ -37,7 +37,7 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
                 % elif isTomorrow(Booking.getStartDate(), Timezone) :
                     tomorrow at
                 % else:
-                    ${ formatDate(Booking.getAdjustedStartDate(Timezone).date(), format = "%a %d/%m") } at
+                    ${ formatDate(Booking.getAdjustedStartDate(Timezone).date(), format="EEE d/MMM") } at
                 % endif
 
                 ${ formatTime(Booking.getAdjustedStartDate(Timezone).time()) }
@@ -55,7 +55,7 @@ firstLineInfo = Booking._getFirstLineInfo(Timezone)
             % elif isTomorrow(Booking.getEndDate(), Timezone) :
                 tomorrow at
             % else:
-                ${ formatDate(Booking.getAdjustedEndDate(Timezone).date(), format = "%a %d/%m") } at
+                ${ formatDate(Booking.getAdjustedEndDate(Timezone).date(), format="EEE d/MMM") } at
             % endif
 
             ${ formatTime(Booking.getAdjustedEndDate(Timezone).time()) }

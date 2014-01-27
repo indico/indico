@@ -289,7 +289,7 @@
                                     <form id="submits" name="submits" action="" method="post">
                                         <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0 " style="float:left; padding-top: 15px">
                                         % if canCancel  and  not reservation.isCancelled and not reservation.isRejected:
-                                            <li class="button" style="margin-left: 10px" onclick="submit_cancel(${[str(formatDate(period.startDT.date(), format='%d %b %Y')) for period in reservation.splitToPeriods()]});return false;">
+                                            <li class="button" style="margin-left: 10px" onclick="submit_cancel(${[str(formatDate(period.startDT.date(), format='d MMM yyyy')) for period in reservation.splitToPeriods()]});return false;">
                                                 <a href="#" onClick="return false;">${ _("Cancel Booking")}</a>
                                             </li>
                                         % endif
@@ -299,7 +299,7 @@
                                             </li>
                                         % endif
                                         % if canReject  and not reservation.isCancelled and not reservation.isRejected:
-                                            <li class="button" style="margin-left: 10px" onclick="submit_reject(${[str(formatDate(period.startDT.date(), format='%d %b %Y')) for period in reservation.splitToPeriods()]});return false;">
+                                            <li class="button" style="margin-left: 10px" onclick="submit_reject(${[str(formatDate(period.startDT.date(), format='d MMM yyyy')) for period in reservation.splitToPeriods()]});return false;">
                                                 <a href="#" onClick="return false;">${ _("Reject")}</a>
                                             </li>
                                         % endif
@@ -455,10 +455,10 @@
                                             % for period in reservation.splitToPeriods():
                                                 ${ formatDate(period.startDT.date()) }
                                                 % if canReject:
-                                                    <a class="roomBookingRejectOccurrence" href="#" onclick="submit_reject_occurrence('${urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL(reservation, date=formatDate(period.startDT.date(), format='%Y-%m-%d'))}', '${formatDate(period.startDT.date(), format='%d %b %Y')}');return false;">Reject</a>
+                                                    <a class="roomBookingRejectOccurrence" href="#" onclick="submit_reject_occurrence('${urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL(reservation, date=formatDate(period.startDT.date(), format='yyyy-M-d'))}', '${formatDate(period.startDT.date(), format='d MMM yyyy')}');return false;">Reject</a>
                                                 % endif
                                                 % if canCancel:
-                                                    <a class="roomBookingCancelOccurrence" href="#" onclick="submit_cancel_occurrence('${urlHandlers.UHRoomBookingCancelBookingOccurrence.getURL(reservation, date=formatDate(period.startDT.date(), format='%Y-%m-%d'))}', '${formatDate(period.startDT.date(), format='%d %b %Y')}');return false;">Cancel</a>
+                                                    <a class="roomBookingCancelOccurrence" href="#" onclick="submit_cancel_occurrence('${urlHandlers.UHRoomBookingCancelBookingOccurrence.getURL(reservation, date=formatDate(period.startDT.date(), format='yyyy-M-d'))}', '${formatDate(period.startDT.date(), format='d MMM yyyy')}');return false;">Cancel</a>
                                                 % endif
                                                 <br />
                                             % endfor
