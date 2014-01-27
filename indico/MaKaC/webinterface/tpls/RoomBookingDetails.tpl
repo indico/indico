@@ -293,30 +293,32 @@
                                                 <a href="#" onClick="return false;">${ _("Cancel Booking")}</a>
                                             </li>
                                         % endif
-                                        % if canReject  and  not reservation.isConfirmed and not reservation.isCancelled and not reservation.isRejected:
-                                            <li class="button" style="margin-left: 10px" onclick="submit_accept();return false; return false;">
-                                                <a href="#" onClick="return false;">${ _("Accept")}</a>
-                                            </li>
+                                        % if not reservation.isCancelled and not reservation.isRejected:
+                                            % if canReject  and  not reservation.isConfirmed:
+                                                <li class="button" style="margin-left: 10px" onclick="submit_accept();return false; return false;">
+                                                    <a href="#" onClick="return false;">${ _("Accept")}</a>
+                                                </li>
+                                            % endif
+                                            % if canReject:
+                                                <li class="button" style="margin-left: 10px" onclick="submit_reject(${[str(formatDate(period.startDT.date(), format='d MMM yyyy')) for period in reservation.splitToPeriods()]});return false;">
+                                                    <a href="#" onClick="return false;">${ _("Reject")}</a>
+                                                </li>
+                                            % endif
+                                            % if reservation.canModify(user):
+                                                <li class="button" style="margin-left: 10px" onclick="submit_modify();return false;">
+                                                    <a href="#" onClick="return false;">${ _("Modify")}</a>
+                                                </li>
+                                            % endif
+                                            % if reservation.canDelete(user):
+                                                <li class="button" style="margin-left: 10px" onclick="submit_delete();return false;">
+                                                    <a href="#" onClick="return false;">${ _("Delete")}</a>
+                                                </li>
+                                            % endif
                                         % endif
-                                        % if canReject  and not reservation.isCancelled and not reservation.isRejected:
-                                            <li class="button" style="margin-left: 10px" onclick="submit_reject(${[str(formatDate(period.startDT.date(), format='d MMM yyyy')) for period in reservation.splitToPeriods()]});return false;">
-                                                <a href="#" onClick="return false;">${ _("Reject")}</a>
-                                            </li>
-                                        % endif
-                                        % if reservation.canModify( user ):
-                                            <li class="button" style="margin-left: 10px" onclick="submit_modify();return false;">
-                                                <a href="#" onClick="return false;">${ _("Modify")}</a>
-                                            </li>
-                                        % endif
-                                        % if reservation.canDelete( user ):
-                                            <li class="button" style="margin-left: 10px" onclick="submit_delete();return false;">
-                                                <a href="#" onClick="return false;">${ _("Delete")}</a>
-                                            </li>
-                                        % endif
-                                            <li class="button" style="margin-left: 10px" onclick="submit_clone();return false;">
-                                                <a href="#" onClick="return false;">${ _("Clone")}</a>
-                                            </li>
-                                            <li style="display: none"></li>
+                                        <li class="button" style="margin-left: 10px" onclick="submit_clone();return false;">
+                                            <a href="#" onClick="return false;">${ _("Clone")}</a>
+                                        </li>
+                                        <li style="display: none"></li>
                                         </ul>
                                     </form>
                                 </td>
