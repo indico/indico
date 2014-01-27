@@ -17,46 +17,46 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from flask import request, session
+
+from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface.rh.base import RHProtected
 
-from indico.modules.rb.controllers.mixins import (
-    RoomBookingAvailabilityParamsMixin,
-    RoomBookingDBMixin
-)
+from indico.core.errors import AccessError
 
-
-class CandidateDataFrom(object):
-    DEFAULTS, PARAMS, SESSION = xrange(3)
+from .mixins import RoomBookingAvailabilityParamsMixin
+from .utils import rb_check_user_access, FormMode
 
 
 class RHRoomBookingProtected(RHProtected):
 
     def _checkSessionUser(self):
         user = self._getUser()
-        if user is None:
-            self._redirect(self._getLoginURL())
-            self._doProcess = False
-        else:
+        if user:
             try:
-                if PluginsHolder().getPluginType("RoomBooking").isActive():
+                if PluginsHolder().getPluginType('RoomBooking').isActive():
                     if not rb_check_user_access(user):
                         raise AccessError()
             except KeyError:
                 pass
+        else:
+            self._redirect(self._getLoginURL())
+            self._doProcess = False
 
 
-class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin, RHRoomBookingProtected ):
+class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtected):
     """
-    All room booking related hanlders are derived from this class.
+    All room booking related handlers are derived from this class.
     This gives them:
     - several general use methods
     - login-protection
     - auto connecting/disconnecting from room booking db
     """
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         RHRoomBookingProtected._checkProtection(self)
 
+    # TODO: naming of variables
     def _clearSessionState(self):
         session.pop('rbActionSucceeded', None)
         session.pop('rbTitle', None)
@@ -73,46 +73,12 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
 
     # Room
 
-    def _saveRoomCandidateToSession( self, c ):
-        # TODO: is this method needed anymore??
+    def _saveRoomCandidateToSession(self, room):
         if self._formMode == FormMode.MODIF:
-            session['rbRoomID'] = c.id
-            session['rbRoomLocation'] = c.locationName
+            session['rbRoomID'] = room.id
+        session['rbRoomCand'] = room
 
-        session['rbRoomCand'] = {
-            "name": c.name,
-            "site": c.site,
-            "building": c.building,
-            "floor": c.floor,
-            "roomNr": c.roomNr,
-            "latitude": c.latitude,
-            "longitude": c.longitude,
-
-            "isActive": c.isActive,
-            "isReservable": c.isReservable,
-            "resvsNeedConfirmation": c.resvsNeedConfirmation,
-            "resvStartNotification": c.resvStartNotification,
-            "resvStartNotificationBefore": c.resvStartNotificationBefore,
-            "resvEndNotification": c.resvEndNotification,
-            "resvNotificationToResponsible": c.resvNotificationToResponsible,
-            "resvNotificationAssistance": c.resvNotificationAssistance,
-
-            "responsibleId": c.responsibleId,
-            "whereIsKey": c.whereIsKey,
-            "telephone": c.telephone,
-
-            "capacity": c.capacity,
-            "division": c.division,
-            "surfaceArea": c.surfaceArea,
-            "maxAdvanceDays": c.maxAdvanceDays,
-            "comments": c.comments,
-
-            "equipment": c.getEquipment(),
-            "cattrs": dict(c.customAtts.iteritems())
-        }
-
-
-    def _getErrorsOfRoomCandidate( self, c ):
+    def _getErrorsOfRoomCandidate(self, room):
         errors = []
         #if not c.site:
         #    errors.append( "Site can not be blank" )
@@ -165,7 +131,8 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
 
         return errors
 
-    def _loadRoomCandidateFromDefaults( self, candRoom ):
+    # TODO: check because this should be handled by sqlalchemy
+    def _loadRoomCandidateFromDefaults(self, candRoom):
         candRoom.isActive = True
 
         candRoom.building = None
