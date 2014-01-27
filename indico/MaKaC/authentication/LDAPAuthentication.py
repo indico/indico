@@ -65,7 +65,7 @@ from urlparse import urlparse
 # legacy indico imports
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
 from MaKaC.authentication import AuthenticatorMgr
-from MaKaC.errors import MaKaCError
+from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.common.logger import Logger
 from indico.core import config as Configuration
 from MaKaC.user import Group, PrincipalHolder
@@ -357,6 +357,8 @@ class LDAPConnector(object):
             if dn:
                 # return just DN
                 return dn
+        else:
+            raise NotFoundError(_("There is no result for this DN"))
 
     def _findDNOfUser(self, userName):
         return self._findDN(self.ldapPeopleDN,

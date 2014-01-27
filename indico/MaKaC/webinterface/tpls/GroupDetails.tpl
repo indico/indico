@@ -40,6 +40,7 @@
 <tr>
   <td>
     <br>
+    % if groupExists:
     <table width="70%" align="left" border="0">
     <tr>
       <td colspan="3" class="groupTitle">${ _("Members") }</td>
@@ -60,7 +61,14 @@
         </td>
     </tr>
     </table>
-  </td>
+    % else:
+        <div class="error-message-box" style="display: inline-block">
+            <div class="message-text">
+                ${_("The group memberlist could not be retrieved. It seems this group does not exist anymore. Please click in 'modify' and set is as obsolete.")}
+            </div>
+        </div>
+    </td>
+    % endif
 </tr>
 </table>
 

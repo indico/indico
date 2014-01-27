@@ -54,7 +54,7 @@ from MaKaC.plugins import PluginLoader, PluginsHolder
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.modules import INewsItemFossil
 from indico.modules import ModuleHolder
-from MaKaC.errors import MaKaCError
+from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.locators import CategoryWebLocator
 from MaKaC.services.implementation.user import UserComparator
@@ -1840,7 +1840,12 @@ class WGroupDetails(wcomponents.WTemplated):
         vars["locator"] = self._group.getLocator().getWebForm()
         vars["obsolete"] = self._group.isObsolete()
         vars["groupId"] = self._group.getId()
-        vars["members"] = fossilize(self._group.getMemberList())
+        try:
+            vars["members"] = fossilize(self._group.getMemberList())
+            vars["groupExists"] = True
+        except NotFoundError as e:
+            vars["members"] = []
+            vars["groupExists"] = False
         return vars
 
 
