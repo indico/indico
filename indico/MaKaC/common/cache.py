@@ -406,7 +406,12 @@ class FileCacheClient(CacheClient):
             namespace, filename = parts
         dir = os.path.join(self._dir, namespace, filename[:4], filename[:8])
         if mkdir and not os.path.exists(dir):
-            os.makedirs(dir)
+            try:
+                os.makedirs(dir)
+            except OSError:
+                # Handle race condition
+                if not os.path.exists(dir):
+                    raise
         return os.path.join(dir, filename)
 
     def set(self, key, val, ttl=0):
@@ -427,7 +432,7 @@ class FileCacheClient(CacheClient):
 
     def get(self, key):
         try:
-            path = self._getFilePath(key)
+            path = self._getFilePath(key, False)
             if not os.path.exists(path):
                 return None
 
