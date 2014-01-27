@@ -233,7 +233,6 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
         link: function(scope, element) {
             scope.validationStarted = false;
-
             scope.currency = scope.confCurrency;
 
             // User data retrieval
@@ -241,7 +240,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                 scope.userdata = {};
             } else if (!scope.updateMode) {
                 scope.userdata = regFormFactory.UserData.get({confId: scope.confId}, function() {
-                    scope.userdata = scope.userdata.avatar;
+                    scope.userdata = scope.userdata.avatar || {};
                 });
             } else {
                 scope.userdata = regFormFactory.UserData.get({confId: scope.confId}, function() {
