@@ -18,81 +18,79 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 
-# TODO: completely
-
 from MaKaC import roomMapping
-from MaKaC.errors import AccessError
 from MaKaC.webinterface import locators, urlHandlers
 from MaKaC.webinterface.pages import admins as adminPages
-from MaKaC.webinterface.rh import admins
+
+from MaKaC.webinterface.rh.admins import RHAdminBase
+
+from indico.core.errors import AccessError
+from indico.util.i18n import _
+
+from ...views.admin import mappers as mapper_views
 
 
-class RHRoomMapperProtected(admins.RHAdminBase):
+class RHRoomMapperProtected(RHAdminBase):
     def _checkProtection(self):
-        if self._getUser() is None:
+        if not self._getUser():
             self._checkSessionUser()
         elif not self._getUser().isRBAdmin():
-            raise AccessError('You are not authorized to take this action.')
+            raise AccessError(_('You are not authorized to take this action.'))
 
 
-class RHRoomMapperBase( RHRoomMapperProtected ):
+class RHRoomMapperBase(RHRoomMapperProtected):
 
-    def _checkParams( self, params ):
-        RHRoomMapperProtected._checkParams( self, params )
-        self._roomMapper = locators.RoomMapperWebLocator( params ).getObject()
-        self._doNotSanitizeFields.append("regexps")
+    def _checkParams(self, params):
+        RHRoomMapperProtected._checkParams(self, params)
+        self._roomMapper = locators.RoomMapperWebLocator(params).getObject()
+        self._doNotSanitizeFields.append('regexps')
 
 
-class RHRoomMappers( RHRoomMapperProtected ):
+class RHRoomMappers(RHRoomMapperProtected):
     _uh = urlHandlers.UHRoomMappers
 
-    def _checkParams( self, params ):
-        admins.RHAdminBase._checkParams( self, params )
+    def _checkParams(self, params):
+        RHAdminBase._checkParams(self, params)
         self._params = params
 
-    def _process( self ):
-        p = adminPages.WPRoomMapperList( self, self._params )
-        return p.display()
+    def _process(self):
+        return mapper_views.WPRoomMapperList(self, self._params).display()
 
 
-class RHRoomMapperCreation( RHRoomMapperProtected ):
+class RHRoomMapperCreation(RHRoomMapperProtected):
     _uh = urlHandlers.UHNewRoomMapper
 
-    def _process( self ):
-        p = adminPages.WPRoomMapperCreation( self )
-        return p.display()
+    def _process(self):
+        return mapper_views.WPRoomMapperCreation(self).display()
 
 
-class RHRoomMapperPerformCreation( RHRoomMapperProtected ):
+class RHRoomMapperPerformCreation(RHRoomMapperProtected):
     _uh = urlHandlers.UHRoomMapperPerformCreation
 
-    def _process( self ):
+    def _process(self):
         rm = roomMapping.RoomMapper()
         rm.setValues(self._getRequestParams())
-        rmh = roomMapping.RoomMapperHolder()
-        rmh.add( rm )
-        self._redirect( urlHandlers.UHRoomMapperDetails.getURL( rm ) )
+        roomMapping.RoomMapperHolder().add(rm)
+        self._redirect( urlHandlers.UHRoomMapperDetails.getURL(rm))
 
 
-class RHRoomMapperDetails( RHRoomMapperBase ):
+class RHRoomMapperDetails(RHRoomMapperBase):
     _uh = urlHandlers.UHRoomMapperDetails
 
-    def _process( self ):
-        p = adminPages.WPRoomMapperDetails( self, self._roomMapper )
-        return p.display()
+    def _process(self):
+        return mapper_views.WPRoomMapperDetails(self, self._roomMapper).display()
 
 
-class RHRoomMapperModification( RHRoomMapperBase ):
+class RHRoomMapperModification(RHRoomMapperBase):
     _uh = urlHandlers.UHRoomMapperModification
 
-    def _process( self ):
-        p = adminPages.WPRoomMapperModification( self, self._roomMapper )
-        return p.display()
+    def _process(self):
+        return mapper_views.WPRoomMapperModification(self, self._roomMapper).display()
 
 
-class RHRoomMapperPerformModification( RHRoomMapperBase ):
+class RHRoomMapperPerformModification(RHRoomMapperBase):
     _uh = urlHandlers.UHRoomMapperPerformModification
 
-    def _process( self ):
+    def _process(self):
         self._roomMapper.setValues(self._getRequestParams())
-        self._redirect( urlHandlers.UHRoomMapperDetails.getURL( self._roomMapper ) )
+        self._redirect(urlHandlers.UHRoomMapperDetails.getURL(self._roomMapper))
