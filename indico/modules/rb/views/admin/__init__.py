@@ -25,6 +25,8 @@ from MaKaC.webinterface.wcomponents import (
     WTabControl
 )
 
+from indico.util.i18n import _
+
 
 class WPRoomsBase(WPAdminsBase):
 
@@ -35,30 +37,44 @@ class WPRoomsBase(WPAdminsBase):
         self._tabCtrl = TabControl()
 
         if self._rh._getUser().isAdmin():
-            self._subTabRoomBooking = self._tabCtrl.newTab("booking",
-                                                           _("Room Booking"),
-                                                           urlHandlers.UHRoomBookingPluginAdmin.getURL())
-            self._subTabMain = self._subTabRoomBooking.newSubTab("main",
-                                                                 _("Main"),
-                                                                 urlHandlers.UHRoomBookingPluginAdmin.getURL())
-        else:
-            self._subTabRoomBooking = self._tabCtrl.newTab("booking",
-                                                           _("Room Booking"),
-                                                           urlHandlers.UHRoomBookingAdmin.getURL())
+            self._subTabRoomBooking = self._tabCtrl.newTab(
+                'booking',
+                _('Room Booking'),
+                urlHandlers.UHRoomBookingPluginAdmin.getURL()
+            )
 
-        self._subTabConfig = self._subTabRoomBooking.newSubTab("configuration",
-                                                               _("Configuration"),
-                                                               urlHandlers.UHRoomBookingAdmin.getURL())
-        self._subTabRoomMappers = self._tabCtrl.newTab("mappers",
-                                                       _("Room Mappers"),
-                                                       urlHandlers.UHRoomMappers.getURL())
+            self._subTabMain = self._subTabRoomBooking.newSubTab(
+                'main',
+                _('Main'),
+                urlHandlers.UHRoomBookingPluginAdmin.getURL()
+            )
+        else:
+            self._subTabRoomBooking = self._tabCtrl.newTab(
+                'booking',
+                _('Room Booking'),
+                urlHandlers.UHRoomBookingAdmin.getURL()
+            )
+
+        self._subTabConfig = self._subTabRoomBooking.newSubTab(
+            'configuration',
+            _('Configuration'),
+            urlHandlers.UHRoomBookingAdmin.getURL()
+        )
+        self._subTabRoomMappers = self._tabCtrl.newTab(
+            'mappers',
+            _('Room Mappers'),
+            urlHandlers.UHRoomMappers.getURL()
+        )
 
     def _getNavigationDrawer(self):
         if self._rh._getUser().isAdmin():
-            return WSimpleNavigationDrawer(_("Room Booking Admin"),
-                                           urlHandlers.UHRoomBookingPluginAdmin.getURL,
-                                           bgColor="white")
-        return WSimpleNavigationDrawer(_("Room Booking Admin"),
+            return WSimpleNavigationDrawer(
+                _('Room Booking Admin'),
+                urlHandlers.UHRoomBookingPluginAdmin.getURL,
+                bgColor='white'
+            )
+
+        return WSimpleNavigationDrawer(_('Room Booking Admin'),
                                        urlHandlers.UHRoomBookingAdmin.getURL,
                                        bgColor="white")
 
@@ -69,8 +85,7 @@ class WPRoomsBase(WPAdminsBase):
 class WPRoomBookingPluginAdminBase(WPRoomsBase):
 
     def getJSFiles(self):
-        return (super(WPRoomBookingPluginAdminBase, self).getJSFiles() +
-                self._includeJSPackage('Management'))
+        return WPRoomsBase.getJSFiles(self) + self._includeJSPackage('Management')
 
     def _setActiveTab(self):
         self._subTabRoomBooking.setActive()
