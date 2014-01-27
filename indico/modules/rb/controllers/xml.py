@@ -19,10 +19,8 @@
 
 from MaKaC.webinterface.rh.xmlGateway import RHXMLHandlerBase
 
-from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
 
-
-class RHStatsRoomBooking(RoomBookingDBMixin, RHXMLHandlerBase):
+class RHStatsRoomBooking(RHXMLHandlerBase):
 
     def _createIndicator( self, XG, name, fullname, value ):
         XG.openTag("indicator")
