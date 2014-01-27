@@ -69,8 +69,6 @@ class DBMgr:
 
     @classmethod
     def getInstance(cls, *args, **kwargs):
-
-        from indico.core.logger import Logger
         pid = os.getpid()
         if os.getpid() not in cls._instances:
             cls._instances[pid] = DBMgr(*args, **kwargs)
