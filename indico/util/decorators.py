@@ -17,6 +17,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from functools import wraps
+
+from flask import request
+
+from ..core.error import IndicoError
+from ..core.logger import Logger
+from .json import create_json_error_answer
+
 
 class classproperty(property):
     def __get__(self, obj, type=None):
@@ -62,3 +70,44 @@ def cached_writable_property(cache_attr, cache_on_set=True):
                 pass
 
     return _cached_writable_property
+
+
+def jsonify_error(function=None, logger_name=None, logger_message=None, logging_level='info'):
+    """
+    Returns response of error handlers in JSON if requested in JSON
+    and logs the exception that ended the request.
+    """
+    def _jsonify_error(f):
+        @wraps(f)
+        def wrapper(*args, **kw):
+            for e in list(args) + kw.values():
+                if isinstance(e, Exception):
+                    exception = e
+                    break
+            else:
+                raise IndicoError('Wrong usage of jsonify_error: No error found in params')
+
+            getattr(Logger.get(logger_name), logging_level)(
+                logger_message if logger_message else
+                'Request {0} finished with {1}: {2}'.format(
+                    request, exception.__class__.__name__, exception
+                ))
+
+            if request.headers.get('Content-Type') == 'application/json':
+                return create_json_error_answer(exception)
+            else:
+                return f(*args, **kw)
+        return wrapper
+    if function:
+        return _jsonify_error(function)
+    return _jsonify_error
+
+
+def rename(new_name):
+    def _rename(f):
+        @wraps(f)
+        def wrapper(*args, **kw):
+            f.__name__ = new_name
+            return f(*args, **kw)
+        return wrapper
+    return _rename
