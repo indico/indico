@@ -22,10 +22,12 @@ try:
 except ImportError:
     import json as _json
 
-from persistent.dict import PersistentDict
 from datetime import datetime
-from indico.util.i18n import LazyProxy
-from MaKaC.common.fossilize import fossilize, NonFossilizableException
+
+from persistent.dict import PersistentDict
+
+from ..core.config import Config
+from .i18n import LazyProxy
 
 
 class _JSONEncoder(_json.JSONEncoder):
@@ -66,28 +68,9 @@ def loads(string):
     return _json.loads(string)
 
 
-def json_filter(obj):
-    """
-    Mako filter
-    """
-    return _json.dumps(obj)
-
-
-def create_json_error_answer(e):
-    responseBody = {
-        "version": "1.1",
-        "result": None,
-        "error": None
-    }
-
-    try:
-        responseBody["error"] = fossilize(e)
-    except NonFossilizableException:
-        from MaKaC.errors import MaKaCError
-        responseBody["error"] = fossilize(MaKaCError(e.message))
-    except Exception, e2:
-        responseBody["error"] = {'code': '', 'message': str(e2)}
-        from MaKaC.common.logger import Logger
-        Logger.get('dev').exception('Exception occurred while fossilizing: {0}'.format(str(e2)))
-
-    return dumps(responseBody)
+def create_json_error_answer(exception):
+    return dumps({
+        'version': Config.getInstance().getVersion(),
+        'result': None,
+        'error': exception.toDict()
+    })
