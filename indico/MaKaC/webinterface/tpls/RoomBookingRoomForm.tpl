@@ -1,25 +1,25 @@
     <!-- CONTEXT HELP DIVS -->
     <div id="tooltipPool" style="display: none">
         <div id="nameCH" class="tip">
-             ${ _("""If you live it blank, system will auto generate "building-floor-room" name.""")} <br />
+             ${ _('If you live it blank, system will auto generate "building-floor-room" name.') } <br />
         </div>
         <div id="siteCH" class="tip">
-            <b> ${ _("Required.")}</b>
+            <b> ${ _('Required.') }</b>
         </div>
         <div id="buildingCH" class="tip">
-            <b> ${ _("Required.")}</b>  ${ _("Must be a positive number.")}<br />
+            <b> ${ _('Required.') }</b>  ${ _('Must be a positive number.') }<br />
         </div>
         <div id="floorCH" class="tip">
-            <b> ${ _("Required.")}</b>
+            <b> ${ _('Required.') }</b>
         </div>
         <div id="roomCH" class="tip">
-            <b> ${ _("Required.")}</b>  ${ _("Room number.")}
+            <b> ${ _('Required.') }</b>  ${ _('Room number.') }
         </div>
         <div id="latitudeCH" class="tip">
-            <b> ${ _("Latitude.")}
+            <b> ${ _('Latitude.') } </b>
         </div>
         <div id="longitudeCH" class="tip">
-            <b> ${ _("Longitude.")}
+            <b> ${ _('Longitude.') } </b>
         </div>
         <div id="isActiveCH" class="tip">
              ${ _("Whether the room exists. Turn it off if room is no longer suitable for meetings, but for some reason you don't want to delete it.")}
@@ -82,9 +82,9 @@
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
 
-    <form action="${ urlHandlers.UHRoomBookingSaveRoom.getURL(room) if not insert else urlHandlers.UHRoomBookingSaveRoom.getURL(roomLocation=room.locationName) }" method="post" enctype="multipart/form-data">
+    <form action="${ urlHandlers.UHRoomBookingSaveRoom.getURL(room) if not insert else urlHandlers.UHRoomBookingSaveRoom.getURL(roomLocation=room.location.name) }" method="post" enctype="multipart/form-data">
                 <table width="95%" cellpadding="0" cellspacing="0" border="0" align="center">
-                    <tr><td class="formTitle"><a href="${urlHandlers.UHRoomBookingAdminLocation.getURL(Location.parse(room.locationName))}">&lt;&lt;Back</a></td></tr>
+                    <tr><td class="formTitle"><a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(room.location) }">&lt;&lt;Back</a></td></tr>
                     <tr>
                         <td>
                             <span class="formTitle" style="border-bottom-width: 0px">
@@ -95,7 +95,7 @@
                                  ${ _("Modify Room")}
                                 <input type="hidden" name="roomID" id="roomID" value="${room.id}" />
                             % endif
-                            <input type="hidden" name="roomLocation" id="roomLocation" value="${room.locationName}" />
+                            <input type="hidden" name="roomLocation" id="roomLocation" value="${room.location.name}" />
                             </span>
                             <br />
                             % if showErrors:
@@ -116,20 +116,20 @@
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Location")}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
-                                                ${ room.locationName }
+                                                ${ room.location.name }
                                             </td>
                                         </tr>
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Name")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="text" id="name" name="name" value="${ verbose( room.name ) }" />${contextHelp('nameCH' )}</td>
+                                            <td align="left" class="blacktext"><input type="text" id="name" name="name" value="${ verbose( room.name ) }" />${ contextHelp('nameCH') }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Site")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="text" id="site" name="site" value="${ verbose( room.site ) }" />${contextHelp('siteCH' )}</td>
+                                            <td align="left" class="blacktext"><input type="text" id="site" name="site" value="${ verbose( room.site ) }" />${ contextHelp('siteCH') }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Building")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="text" id="building" name="building" value="${ verbose( room.building ) }" />${contextHelp('buildingCH' )}</td>
+                                            <td align="left" class="blacktext"><input type="text" id="building" name="building" value="${ verbose( room.building ) }" />${ contextHelp('buildingCH') }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Floor")}&nbsp;&nbsp;</small></td>
@@ -137,7 +137,7 @@
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Room")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="text" id="roomNr" name="roomNr" value="${ verbose( room.roomNr ) }" />${contextHelp('roomCH' )}</td>
+                                            <td align="left" class="blacktext"><input type="text" id="number" name="number" value="${ verbose( room.number ) }" />${contextHelp('roomCH' )}</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Latitude")}&nbsp;&nbsp;</small></td>
@@ -159,35 +159,35 @@
                                     <table>
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Active")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="checkbox" ${' checked="checked" ' if room.isActive else ""} id="isActive" name="isActive"/> ${contextHelp('isActiveCH' )}</td>
+                                            <td align="left" class="blacktext"><input type="checkbox" ${'checked' if room.is_active else ''} id="is_active" name="is_active"/> ${ contextHelp('isActiveCH') }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Public")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="checkbox" ${' checked="checked" ' if room.isReservable else ""} id="isReservable" name="isReservable" /> ${contextHelp('isReservableCH' )}</td>
+                                            <td align="left" class="blacktext"><input type="checkbox" ${ 'checked' if room.is_reservable else '' } id="is_reservable" name="is_reservable" /> ${contextHelp('isReservableCH' )}</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Confirmations")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="checkbox" ${' checked="checked" ' if room.resvsNeedConfirmation else ""} id="resvsNeedConfirmation" name="resvsNeedConfirmation" /> ${contextHelp('resvsNeedConfirmationCH' )}</td>
+                                            <td align="left" class="blacktext"><input type="checkbox" ${ 'checked' if room.reservations_need_confirmation else '' } id="reservations_need_confirmation" name="reservations_need_confirmation" /> ${contextHelp('resvsNeedConfirmationCH' )}</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Assistance")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="checkbox" ${'checked="checked"' if room.resvNotificationAssistance else ''} id="resvNotificationAssistance" name="resvNotificationAssistance" />${ contextHelp( 'resvNotificationAssistanceCH' ) }</td>
+                                            <td align="left" class="blacktext"><input type="checkbox" ${ 'checked' if room.notification_for_assistance else '' } id="notification_for_assistance" name="notification_for_assistance" />${ contextHelp( 'resvNotificationAssistanceCH' ) }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Notification on booking start")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="checkbox" ${'checked="checked"' if room.resvStartNotification else ''} id="resvStartNotification" name="resvStartNotification" /> ${ contextHelp( 'resvStartNotificationCH' ) }</td>
+                                            <td align="left" class="blacktext"><input type="checkbox" ${ 'checked' if room.notification_for_start else '' } id="notification_for_start" name="notification_for_start" /> ${ contextHelp( 'resvStartNotificationCH' ) }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Notification on booking start - X days before")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="text" style="width: 15px;" maxlength="1" id="resvStartNotificationBefore" name="resvStartNotificationBefore" value="${'' if not room.resvStartNotificationBefore else room.resvStartNotificationBefore}" /> ${ contextHelp( 'resvStartNotificationBeforeCH' ) }</td>
+                                            <td align="left" class="blacktext"><input type="text" style="width: 15px;" maxlength="1" id="notification_for_start" name="notification_for_start" value="${'' if not room.notification_for_start else room.notification_for_start}" /> ${ contextHelp( 'resvStartNotificationBeforeCH' ) }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Notification on booking end")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="checkbox" ${'checked="checked"' if room.resvEndNotification else ''} id="resvEndNotification" name="resvEndNotification" /> ${ contextHelp( 'resvEndNotificationCH' ) }</td>
+                                            <td align="left" class="blacktext"><input type="checkbox" ${ 'checked' if room.notification_for_end else '' } id="notification_for_end" name="notification_for_end" /> ${ contextHelp( 'resvEndNotificationCH' ) }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Notification to responsible, too")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="checkbox" ${'checked="checked"' if room.resvNotificationToResponsible else ''} id="resvNotificationToResponsible" name="resvNotificationToResponsible" /> ${ contextHelp( 'resvNotificationToResponsibleCH' ) }</td>
+                                            <td align="left" class="blacktext"><input type="checkbox" ${ 'checked' if room.notification_for_responsible else '' } id="notification_for_responsible" name="notification_for_responsible" /> ${ contextHelp( 'resvNotificationToResponsibleCH' ) }</td>
                                         </tr>
                                     </table>
                                 </td>
@@ -201,19 +201,19 @@
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Responsible")}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
-                                                <input type="hidden" id="responsibleId" name="responsibleId" value="${ room.responsibleId }" />
-                                                <input type="text" readonly="readonly" id="responsibleName" name="responsibleName" value="${ responsibleName }" />
+                                                <input type="hidden" id="owner_id" name="owner_id" value="${ room.owner_id }" />
+                                                <input type="text" readonly="readonly" id="owner_name" name="owner_name" value="${ owner_name }" />
                                                 <input type="button" value="${ _('Search') }" onclick="searchForUsers();" />
-                                                ${contextHelp('responsibleCH' )}
+                                                ${ contextHelp('responsibleCH') }
                                             </td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Where is key?")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="text" id="whereIsKey" name="whereIsKey" value="${ verbose( room.whereIsKey ) }" />${contextHelp('whereIsKeyCH' )}</td>
+                                            <td align="left" class="blacktext"><input type="text" id="key_location" name="key_location" value="${ verbose(room.key_location) }" />${contextHelp('whereIsKeyCH' )}</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Telephone")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="text" id="telephone" name="telephone" value="${ verbose( room.telephone ) }" />${contextHelp('telephoneCH' )}</td>
+                                            <td align="left" class="blacktext"><input type="text" id="telephone" name="telephone" value="${ verbose(room.telephone) }" />${contextHelp('telephoneCH' )}</td>
                                         </tr>
                                     </table>
                                 </td>
@@ -251,7 +251,7 @@
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Surface area")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><input type="text" id="surfaceArea" name="surfaceArea" value="${ verbose( room.surfaceArea ) }" /> m2${contextHelp('surfaceCH' )}</td>
+                                            <td align="left" class="blacktext"><input type="text" id="surface_area" name="surface_area" value="${ verbose(room.surface_area) }" /> m2${contextHelp('surfaceCH' )}</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Comments")}&nbsp;&nbsp;</small></td>
@@ -301,7 +301,7 @@
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Maximum advance time for bookings")}&nbsp;&nbsp;</small></td>
                                             <td align="left" class="blacktext">
-                                                <input type="text" id="maxAdvanceDays" name="maxAdvanceDays" value="${ verbose( room.maxAdvanceDays ) }" size="10"/> days
+                                                <input type="text" id="max_advance_days" name="max_advance_days" value="${ verbose(room.max_advance_days) }" size="10"/> days
                                             </td>
                                         </tr>
 

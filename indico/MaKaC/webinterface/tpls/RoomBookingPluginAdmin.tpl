@@ -6,12 +6,25 @@
   <td style="padding-left: 20px; padding-top: 20px;">
     <table>
     <tr>
-      <td colspan="3" class="groupTitle">${ _("Room Booking Module")}</td>
+      <td colspan="3" class="groupTitle">
+        ${ _("Room Booking Module")}
+      </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD" style="vertical-align: middle"><span class="titleCellFormat">${ _("Status")}: </span></td>
+      <td nowrap class="titleCellTD" style="vertical-align: middle">
+        <span class="titleCellFormat">
+          ${ _("Status")}:
+        </span>
+      </td>
       <td>
-        <p>${ activationStatusText }</p>
+        <p>
+          ${ activationStatusText }
+        </p>
+      </td>
+      <td>
+        <a class="i-button i-button-fit" href="${ toggleURL }" rel="no-follow">
+            ${ activationText }
+        </a>
       </td>
     </tr>
     </table>
