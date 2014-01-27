@@ -50,6 +50,7 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
 from MaKaC.user import Avatar
+from MaKaC.common.TemplateExec import render
 
 from indico.core.config import Config
 
@@ -233,8 +234,22 @@ class WPSessionModifBase( WPConferenceModifBase ):
         self._createTabCtrl()
 
         banner = wcomponents.WTimetableBannerModif(self._getAW(), self._session).getHTML()
-        body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
+        body = wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
         return banner + body
+
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + \
+            self._asset_env['contributions_js'].urls()
+
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + \
+            self._asset_env['contributions_sass'].urls()
+
+    def _getHeadContent(self):
+        return WPConferenceModifBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                       for url in self._asset_env['mathjax_js'].urls()])
+
 
 class WSessionModifMainType(wcomponents.WTemplated):
 
