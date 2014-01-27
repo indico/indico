@@ -39,8 +39,13 @@ files.add_url_rule('/category/<categId>/material/<materialId>/', 'materialDispla
 files.add_url_rule(
     '/event/<confId>/session/<sessionId>/contribution/<contribId>/material/<materialId>/<resId>.<fileExt>',
     'getFile-access', fileAccess.RHFileAccess)
+files.add_url_rule(
+    '/event/<confId>/session/<sessionId>/contribution/<contribId>/<subContId>/material/<materialId>/<resId>.<fileExt>',
+    'getFile-access', fileAccess.RHFileAccess)
 files.add_url_rule('/event/<confId>/contribution/<contribId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',
                    fileAccess.RHFileAccess)
+files.add_url_rule('/event/<confId>/contribution/<contribId>/<subContId>/material/<materialId>/<resId>.<fileExt>',
+                   'getFile-access', fileAccess.RHFileAccess)
 files.add_url_rule('/event/<confId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access', fileAccess.RHFileAccess)
 files.add_url_rule('/event/<confId>/registration/attachments/<registrantId>-<resId>.<fileExt>', 'getFile-access',
                    fileAccess.RHFileAccess)
