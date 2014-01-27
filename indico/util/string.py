@@ -45,6 +45,17 @@ def remove_accents(text, reencode=True):
         return result
 
 
+def fix_broken_string(text):
+    try:
+        text = text.decode('utf-8')
+    except UnicodeDecodeError:
+        try:
+            text = text.decode('latin1')
+        except UnicodeDecodeError:
+            text = unicode(text, 'utf-8', errors='replace')
+    return text.encode('utf-8')
+
+
 def remove_non_alpha(text):
     return ''.join(c for c in text if c.isalnum())
 

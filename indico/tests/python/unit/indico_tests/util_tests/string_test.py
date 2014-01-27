@@ -22,7 +22,8 @@ Tests for `indico.util.string` module
 """
 
 import unittest
-from indico.util.string import permissive_format, remove_extra_spaces, remove_tags
+from indico.util.string import permissive_format, remove_extra_spaces, remove_tags, fix_broken_string
+
 
 class TestPermissiveFormat(unittest.TestCase):
 
@@ -74,3 +75,15 @@ class TestRemoveTags(unittest.TestCase):
 
         for text, result in zip(texts, results):
             self.assertEqual(remove_tags(text), result)
+
+
+class TestDecodingEncoding(unittest.TestCase):
+
+    def testUnicodeDecoding(self):
+        string_value = "mettre à l'essai"
+        self.assertEqual(string_value, u"mettre à l'essai".encode("utf-8"))
+
+    def testFixBrokenStrings(self):
+        string_value = u"mettre à l'essai".encode("latin1")
+        fixed_string = fix_broken_string(string_value)
+        self.assertEqual(string_value.decode("latin1").encode("utf-8"), fixed_string)
