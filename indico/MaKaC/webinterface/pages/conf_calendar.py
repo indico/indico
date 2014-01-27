@@ -110,8 +110,8 @@ class WCalendarMonthItem:
             title = conf.getTitle()
             res.append("""
           <tr bgcolor="#ECECEC" %s>
-            <td valign=top>%s<a href="%s?confId=%s">%s</a></td>
-          </tr>""" % (maincolor,"\n".join(colors),urlHandlers.UHConferenceDisplay.getURL(), conf.getId(),title))
+            <td valign=top>%s<a href="%s">%s</a></td>
+          </tr>""" % (maincolor, "\n".join(colors), urlHandlers.UHConferenceDisplay.getURL(conf), title))
         res.append("""
         </table>
       </td>
