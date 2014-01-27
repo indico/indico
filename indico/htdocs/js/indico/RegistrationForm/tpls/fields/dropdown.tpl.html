@@ -1,7 +1,7 @@
 <ng-form name="nestedForm"
-    ng-init="input = getId(userdata[getName(field.input)])">
+    ng-init="input = getId(userdata[fieldName])">
     <select
-        name="{{ getName(field.input) }}"
+        name="{{ fieldName }}"
         ng-model="input"
         ng-required="field.mandatory"
         ng-disabled="anyBillableItemPayed(userdata)"
@@ -12,7 +12,7 @@
         <option ng-repeat="item in field.values.radioitems | filter: {isEnabled: true}"
             value="{{ item.id }}"
             ng-disabled="!hasPlacesLeft(item) || paymentBlocked(item, userdata)"
-            ng-selected="item.caption == getValue(getName(field.input))">
+            ng-selected="item.caption == getValue(fieldName)">
             {{ item.caption }}
             {{ getBillableStr(item) }}
             </span>

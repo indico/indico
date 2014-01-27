@@ -1,8 +1,7 @@
 <ng-form name="nestedForm">
     <select
-        id="{{ getName(field.input) }}"
-        name="{{ getName(field.input) }}"
-        ng-model="userdata[getName(field.input)]"
+        name="{{ fieldName }}"
+        ng-model="userdata[fieldName]"
         ng-required="field.mandatory"
         ng-class="{
             hasError: validationStarted && nestedForm.$invalid
@@ -11,7 +10,7 @@
             {{ '-- Select a country --' | i18n }}
         </option>
         <option ng-repeat="item in field.values.radioitems"
-            ng-selected="item.countryKey === userdata[getName(field.input)]"
+            ng-selected="item.countryKey === userdata[fieldName]"
             value="{{ item.countryKey }}">
             {{ item.caption }}
         </option>

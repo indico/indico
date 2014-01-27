@@ -154,6 +154,8 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             }
         }
     };
+
+    $scope.fieldName = $scope.getName($scope.field.input);
 });
 
 ndRegForm.controller('BillableCtrl', function($scope, $filter) {

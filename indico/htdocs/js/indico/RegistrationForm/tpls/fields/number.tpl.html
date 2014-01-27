@@ -2,9 +2,9 @@
     <ng-form name="nestedForm">
         <input type="number"
             ng-model="numberInput"
-            ng-init="numberInput = getValue(getName(field.input))"
-            id="{{ getName(field.input) }}"
-            name="{{ getName(field.input) }}"
+            ng-init="numberInput = getValue(fieldName)"
+            id="{{ fieldName }}"
+            name="{{ fieldName }}"
             size="{{ field.values.length }}"
             min="{{ field.values.minValue }}"
             ng-required="isRequired(field)"

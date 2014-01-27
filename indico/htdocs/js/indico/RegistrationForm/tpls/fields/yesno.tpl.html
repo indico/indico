@@ -1,8 +1,7 @@
 <div ng-controller="BillableCtrl">
-    <ng-form name="nestedForm" ng-init="input = userdata[getName(field.input)]">
+    <ng-form name="nestedForm" ng-init="input = userdata[fieldName]">
         <select
-            id="{{ getName(field.input) }}"
-            name="{{ getName(field.input) }}"
+            name="{{ fieldName }}"
             ng-model="input"
             ng-required="field.mandatory"
             nd-blacklist="no"
@@ -10,20 +9,20 @@
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
             <option value="">-- {{ 'Choose a value' | i18n }} --</option>
             <option ng-if="hasPlacesLimit(field)" value="yes"
-                ng-selected="userdata[getName(field.input)] === 'yes'">
+                ng-selected="userdata[fieldName] === 'yes'">
                 {{ 'yes' | i18n }}
                 [{{ field.noPlacesLeft }} {{ 'place(s) left' |i18n }}]
             </option>
             <option ng-if="!hasPlacesLimit(field)" value="yes"
-                ng-selected="userdata[getName(field.input)] === 'yes'">
+                ng-selected="userdata[fieldName] === 'yes'">
                 {{ 'yes' | i18n }}
             </option>
             <option ng-if="!field.mandatory" value="no"
-                ng-selected="userdata[getName(field.input)] === 'no'">
+                ng-selected="userdata[fieldName] === 'no'">
                 {{ 'no' | i18n }}
             </option>
             <option ng-if="field.mandatory" value="no"
-                ng-selected="userdata[getName(field.input)] === 'no'">
+                ng-selected="userdata[fieldName] === 'no'">
                 {{ 'no' | i18n }}
             </option>
         </select>

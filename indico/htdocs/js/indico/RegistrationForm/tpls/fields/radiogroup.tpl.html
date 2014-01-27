@@ -3,10 +3,10 @@
     <ul>
         <li ng-repeat="item in field.values.radioitems">
             <input type="radio"
-                name="{{ getName(field.input) }}"
+                name="{{ fieldName }}"
                 value="{{ item.id }}"
                 ng-model="input.input"
-                ng-checked="item.caption == getValue(getName(field.input))"
+                ng-checked="item.caption == getValue(fieldName)"
                 ng-required="field.mandatory"
                 ng-disabled="isDisabled(item) || paymentBlocked(item, userdata) || anyBillableItemPayed(userdata)"/>
             <span ng-class="{'text-error': validationStarted && nestedForm.$invalid}">

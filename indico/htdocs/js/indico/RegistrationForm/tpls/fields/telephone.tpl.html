@@ -1,9 +1,8 @@
 <ng-form name="nestedForm">
     <input type="text"
-        id="{{ getName(field.input) }}"
-        name="{{ getName(field.input) }}"
+        name="{{ fieldName }}"
         size="30"
-        ng-model="userdata[getName(field.input)]"
+        ng-model="userdata[fieldName]"
         ng-required="field.mandatory"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
         ng-pattern="/(\+?\s*(\d\s*))/">
