@@ -40,6 +40,10 @@ class _Worker(object):
         self._config = configData
         self._executionDelay = delay
 
+        # Import it here to avoid circular import
+        from indico.web.flask.app import make_app
+        self._app = make_app(True)
+
     def _prepare(self):
         """
         This acts as a second 'constructor', that is executed in the
@@ -110,7 +114,8 @@ class _Worker(object):
                         # clear the fossile cache at the start of each task
                         fossilize.clearCache()
 
-                        self._task.start(self._executionDelay)
+                        with self._app.app_context():
+                            self._task.start(self._executionDelay)
                         break
 
             except TaskDelayed, e:
