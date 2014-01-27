@@ -50,7 +50,6 @@ from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
 
-from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
 from indico.web.flask.util import send_file, endpoint_for_url
 from indico.web.http_api.hooks.event import CategoryEventHook
 from indico.web.http_api.metadata.serializer import Serializer
@@ -100,7 +99,8 @@ class RHCategoryStatistics( RHCategDisplayBase ):
         p = category.WPCategoryStatistics( self, self._target, wfReg, stats )
         return p.display()
 
-class RHCategOverviewDisplay( RoomBookingDBMixin, RHCategDisplayBase ):
+
+class RHCategOverviewDisplay(RHCategDisplayBase):
 
     def _checkParams( self, params ):
         id = params.get("selCateg", "")
@@ -127,6 +127,7 @@ class RHCategOverviewDisplay( RoomBookingDBMixin, RHCategDisplayBase ):
         p = category.WPCategOverview( self, self._target, self._cal )
         return p.display()
 
+
 class RHConferenceCreationBase( RHCategoryDisplay ):
 
     def _checkProtection( self ):
@@ -152,7 +153,7 @@ class RHConferenceCreationBase( RHCategoryDisplay ):
 
 #-------------------------------------------------------------------------------------
 
-class RHConferenceCreation( RoomBookingDBMixin, RHConferenceCreationBase ):
+class RHConferenceCreation(RHConferenceCreationBase):
     _uh = urlHandlers.UHConferenceCreation
 
     def _checkProtection( self ):
@@ -176,7 +177,7 @@ class RHConferenceCreation( RoomBookingDBMixin, RHConferenceCreationBase ):
 
 #-------------------------------------------------------------------------------------
 
-class RHConferencePerformCreation( RoomBookingDBMixin, RHConferenceCreationBase ):
+class RHConferencePerformCreation(RHConferenceCreationBase):
     _uh = urlHandlers.UHConferencePerformCreation
 
     def _checkParams( self, params ):
@@ -535,7 +536,7 @@ class RHCategoryGetIcon(RHCategDisplayBase):
         return send_file(icon.getFileName(), icon.getFilePath(), icon.getFileType())
 
 
-class RHCategoryToiCal(RoomBookingDBMixin, RHCategDisplayBase):
+class RHCategoryToiCal(RHCategDisplayBase):
 
     def _process(self):
         filename = "%s-Categ.ics" % self._target.getName().replace("/", "")
@@ -558,7 +559,8 @@ class RHTodayCategoryToRSS(RHCategoryToRSS):
     def _process( self ):
         self._redirect(urlHandlers.UHCategoryToAtom.getURL(self._target), status=301)
 
-class RHCategoryToAtom(RoomBookingDBMixin, RHCategDisplayBase):
+
+class RHCategoryToAtom(RHCategDisplayBase):
     _uh = urlHandlers.UHCategoryToAtom
 
     def _process(self):

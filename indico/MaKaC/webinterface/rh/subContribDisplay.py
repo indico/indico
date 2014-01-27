@@ -22,10 +22,9 @@ import MaKaC.webinterface.pages.subContributions as subContributions
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHSubContributionBase
-from indico.core.config import Config
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
-from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
+from indico.core.config import Config
 from indico.web.flask.util import send_file
 
 
@@ -38,7 +37,7 @@ class RHSubContributionDisplayBase( RHSubContributionBase, RHDisplayBaseProtecte
         RHDisplayBaseProtected._checkProtection( self )
 
 
-class RHSubContributionDisplay( RoomBookingDBMixin, RHSubContributionDisplayBase ):
+class RHSubContributionDisplay(RHSubContributionDisplayBase):
     _uh = urlHandlers.UHSubContributionDisplay
 
     def _process( self ):

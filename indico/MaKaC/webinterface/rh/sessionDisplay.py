@@ -20,7 +20,7 @@ from cStringIO import StringIO
 
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected, RoomBookingDBMixin
+from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
 from MaKaC.webinterface.common.contribFilters import SortingCriteria
 from indico.core.config import Config
@@ -29,7 +29,7 @@ from indico.web.http_api.hooks.event import SessionHook
 from indico.web.http_api.metadata.serializer import Serializer
 
 
-class RHSessionDisplayBase( RHSessionBase, RHDisplayBaseProtected ):
+class RHSessionDisplayBase(RHSessionBase, RHDisplayBaseProtected):
 
     def _checkParams( self, params ):
         RHSessionBase._checkParams( self, params )
@@ -38,7 +38,7 @@ class RHSessionDisplayBase( RHSessionBase, RHDisplayBaseProtected ):
         RHDisplayBaseProtected._checkProtection( self )
 
 
-class RHSessionDisplay( RoomBookingDBMixin, RHSessionDisplayBase ):
+class RHSessionDisplay(RHSessionDisplayBase):
     _uh = urlHandlers.UHSessionDisplay
 
     def _checkParams( self, params ):
@@ -51,7 +51,7 @@ class RHSessionDisplay( RoomBookingDBMixin, RHSessionDisplayBase ):
             p=wf.getSessionDisplay(self,self._session)
         return p.display()
 
-class RHSessionToiCal(RoomBookingDBMixin, RHSessionDisplay):
+class RHSessionToiCal(RHSessionDisplay):
 
     def _process( self ):
         filename = "%s-Session.ics"%self._session.getTitle()

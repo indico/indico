@@ -40,7 +40,6 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.webinterface.rh.materialDisplay import RHMaterialDisplayCommon
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
-from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
 from indico.web.flask.util import send_file
 from MaKaC.PDFinterface.base import LatexRunner
 
@@ -383,7 +382,7 @@ class RHContributionTools(RHContribModifBaseSpecialSesCoordRights):
         return p.display()
 
 
-class RHContributionData( RoomBookingDBMixin, RHContribModifBaseSpecialSesCoordRights ):
+class RHContributionData(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionDataModif
 
     def _checkParams( self, params ):
@@ -402,7 +401,7 @@ class RHContributionData( RoomBookingDBMixin, RHContribModifBaseSpecialSesCoordR
         return p.display(**self._getRequestParams())
 
 
-class RHContributionModifData(RoomBookingDBMixin, RHContribModifBaseSpecialSesCoordRights):
+class RHContributionModifData(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionDataModification
 
     def _checkParams(self, params):

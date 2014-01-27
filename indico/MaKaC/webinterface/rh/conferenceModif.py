@@ -72,7 +72,6 @@ from MaKaC.rb_tools import FormMode
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from MaKaC.fossils.conference import ISessionBasicFossil
 
-from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
 from indico.modules.scheduler import Client
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
@@ -103,7 +102,7 @@ class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
         return self._displayDefaultPage()
 
 
-class RHConferenceModification( RoomBookingDBMixin, RHConferenceModifBase ):
+class RHConferenceModification(RHConferenceModifBase):
     _uh = urlHandlers.UHConferenceModification
 
     def _process( self ):
@@ -301,7 +300,7 @@ class RHConferenceOpen(RHConferenceModifBase):
         self._redirect(url)
 
 
-class RHConfDataModif(RoomBookingDBMixin, RHConferenceModifBase):
+class RHConfDataModif(RHConferenceModifBase):
     _uh = urlHandlers.UHConfDataModif
 
     def _displayCustomPage(self, wf):
@@ -316,7 +315,7 @@ class RHConfDataModif(RoomBookingDBMixin, RHConferenceModifBase):
         return p.display(**pars)
 
 
-class RHConfPerformDataModif( RoomBookingDBMixin, RHConferenceModifBase ):
+class RHConfPerformDataModif(RHConferenceModifBase):
     _uh = urlHandlers.UHConfPerformDataModif
 
     def _checkParams( self, params ):
@@ -333,7 +332,7 @@ class RHConfPerformDataModif( RoomBookingDBMixin, RHConferenceModifBase ):
 
 #----------------------------------------------------------------
 
-class RHConfModifSchedule( RoomBookingDBMixin, RHConferenceModifBase ):
+class RHConfModifSchedule(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifSchedule
 
     def _checkParams( self, params ):
@@ -512,7 +511,8 @@ class RHConfModifTools( RHConferenceModifBase ):
         p = conferences.WPConfDisplayAlarm(self, self._target)
         return p.display()
 
-class RHConfDeletion( RoomBookingDBMixin, RHConferenceModifBase ):
+
+class RHConfDeletion(RHConferenceModifBase):
     _uh = urlHandlers.UHConfDeletion
 
     def _checkParams( self, params ):
@@ -793,7 +793,7 @@ class RHContribParticipantsSendEmail( RHConferenceModifBase  ):
 #######################################################################################
 
 
-class RHConfPerformCloning( RoomBookingDBMixin, RHConferenceModifBase, Observable ):
+class RHConfPerformCloning(RHConferenceModifBase, Observable):
     """
     New version of clone functionality -
     fully replace the old one, based on three different actions,
@@ -1079,7 +1079,8 @@ class RHConfAddAlarm( RHConferenceModifBase ):
         p = conferences.WPConfAddAlarm( self, self._conf )
         return p.display()
 
-class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
+
+class RHCreateAlarm(RHConferenceModifBase):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
@@ -2526,7 +2527,8 @@ class RHConfRemoveCSS( RHConferenceModifBase ):
         sm.useLocalCSS()
         self._redirect( "%s#css"%urlHandlers.UHConfModifDisplayCustomization.getURL( self._conf ) )
 
-class RHConfModifPreviewCSS(RoomBookingDBMixin, RHConferenceModifBase):
+
+class RHConfModifPreviewCSS(RHConferenceModifBase):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
@@ -2736,7 +2738,7 @@ class ContribFilterCrit(filters.FilterCriteria):
 
 
 class ContribSortingCrit(filters.SortingCriteria):
-    _availableFields={\
+    _availableFields = {
         contribFilters.NumberSF.getId():contribFilters.NumberSF,
         contribFilters.DateSF.getId():contribFilters.DateSF,
         contribFilters.ContribTypeSF.getId():contribFilters.ContribTypeSF,
@@ -2745,7 +2747,8 @@ class ContribSortingCrit(filters.SortingCriteria):
         contribFilters.BoardNumberSF.getId():contribFilters.BoardNumberSF,
         contribFilters.SessionSF.getId():contribFilters.SessionSF,
         contribFilters.TitleSF.getId():contribFilters.TitleSF
-        }
+    }
+
 
 class RHContributionListBase(RHConferenceModifBase):
 
@@ -2755,7 +2758,7 @@ class RHContributionListBase(RHConferenceModifBase):
             RHConferenceModifBase._checkProtection(self)
 
 
-class RHContributionList( RoomBookingDBMixin, RHContributionListBase ):
+class RHContributionList(RHContributionListBase):
     _uh = urlHandlers.UHConfModifContribList
 
     def _checkProtection(self):
@@ -3837,7 +3840,8 @@ class RHScheduleMoveEntryDown(RHConferenceModifBase):
         else:
             self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf),date.strftime("%Y-%m-%d")))
 
-class RHReschedule(RoomBookingDBMixin, RHConferenceModifBase):
+
+class RHReschedule(RHConferenceModifBase):
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
@@ -3975,7 +3979,7 @@ from indico.modules.rb.controllers.user.reservations import (
 
 # 0. RHConfModifRoomBookingChooseEvent
 
-class RHConferenceModifRoomBookingBase( RoomBookingDBMixin, RHConferenceModifBase, RHRoomBookingProtected):
+class RHConferenceModifRoomBookingBase(RHConferenceModifBase, RHRoomBookingProtected):
 
     def _checkProtection( self ):
         self._checkSessionUser()

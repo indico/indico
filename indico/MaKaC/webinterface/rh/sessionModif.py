@@ -19,6 +19,10 @@
 
 import re
 from cStringIO import StringIO
+from datetime import timedelta
+
+from pytz import timezone
+
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -42,13 +46,11 @@ from MaKaC.PDFinterface.conference import ContribsToPDF
 from indico.core.config import Config
 from BTrees.OOBTree import OOBTree
 from BTrees.IOBTree import IOBTree
-from datetime import datetime,timedelta,date
 from MaKaC.errors import FormValuesError
 from MaKaC.conference import SessionChair
-from MaKaC.i18n import _
-from pytz import timezone
 
-from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
+from indico.core.config import Config
+from indico.util.i18n import _
 from indico.web.flask.util import send_file
 
 
@@ -113,8 +115,7 @@ class RHSessionModification(RHSessionModifBase):
 
 #--------------------------------------------------------------------------
 
-
-class RHSessionDataModification(RoomBookingDBMixin, RHSessionModifBase):
+class RHSessionDataModification(RHSessionModifBase):
     _uh = urlHandlers.UHSessionDataModification
 
     def _checkParams(self, params):
@@ -247,7 +248,7 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHSessionModCoordinationBase):
         RHSubmitMaterialBase._checkParams(self, params)
 
 
-class RHSessionModifSchedule(RoomBookingDBMixin, RHSessionModCoordinationBase):
+class RHSessionModifSchedule(RHSessionModCoordinationBase):
     _uh = urlHandlers.UHSessionModifSchedule
 
     def _checkParams(self,params):

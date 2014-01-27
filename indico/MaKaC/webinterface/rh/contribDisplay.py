@@ -27,14 +27,13 @@ from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHContributionBase
 from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.common.xmlGen import XMLGen
-from indico.core.config import Config
 from MaKaC.errors import MaKaCError, ModificationError, NoReportError
 import MaKaC.common.timezoneUtils as timezoneUtils
 import MaKaC.webinterface.materialFactories as materialFactories
-from MaKaC.i18n import _
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
-from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
+from indico.core.config import Config
+from indico.util.i18n import _
 from indico.web.flask.util import send_file
 from indico.web.http_api.hooks.event import ContributionHook
 from indico.web.http_api.metadata.serializer import Serializer
@@ -51,7 +50,7 @@ class RHContributionDisplayBase( RHContributionBase, RHDisplayBaseProtected ):
         RHDisplayBaseProtected._checkProtection( self )
 
 
-class RHContributionDisplay( RoomBookingDBMixin, RHContributionDisplayBase ):
+class RHContributionDisplay(RHContributionDisplayBase):
     _uh = urlHandlers.UHContributionDisplay
 
     def _checkParams( self, params ):
@@ -108,7 +107,7 @@ class RHContributionToPDF(RHContributionDisplay):
         return send_file(filename, fpath, 'PDF')
 
 
-class RHContributionToiCal(RoomBookingDBMixin, RHContributionDisplay):
+class RHContributionToiCal(RHContributionDisplay):
 
     def _process(self):
 
