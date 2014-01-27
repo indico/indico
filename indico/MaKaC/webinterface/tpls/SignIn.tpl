@@ -5,15 +5,15 @@
     ${ _("Log in to Indico")}
 </div>
 <div id="cookiesEnabled" style="display:none; text-align:center; color:#881122; font-size:large; padding-bottom:15px" colspan="2">
-    ${("Please enable cookies in your browser!")}
+    ${_("Please enable cookies in your browser!")}
 </div>
 
 % if isSSOLoginActive:
-<form name="signInSSOForm" action=${ ssoURL } method="POST">
+<form id="signInSSOForm" action="${ ssoURL }" method="POST">
+    <input id="authId" type="hidden" name="authId" value="">
     % for auth in authenticators:
         % if auth.isSSOLoginActive():
-            <input id="authId" type="hidden" name="authId">
-            <a href="#" onclick="authFormSubmit('${ auth.getId()}')" class="i-button highlight signin">
+            <a href="#" data-id="${ auth.getId() }" class="i-button highlight signin js-sso-submit">
                 <span class="auth-id">${ _('Login with Single SignOn') }</span>
                 <i class="login-arrow"></i>
             </a>
@@ -116,8 +116,8 @@
 
     document.signInForm.login.focus();
 
-    var authFormSubmit = function(value) {
-        $('#authId')[0].value = value;
-        signInSSOForm.submit();
-    }
+    $('.js-sso-submit').on('click', function(e) {
+        $('#authId').val($(this).data('id'));
+        $('#signInSSOForm').submit();
+    });
 </script>

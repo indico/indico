@@ -36,13 +36,12 @@ import MaKaC.common.info as info
 from indico.web.flask.util import send_file
 
 
-class RHSignInBase( base.RH ):
+class RHSignInBase(base.RH):
 
     _tohttps = True
     _isMobile = False
 
     def _checkParams(self, params):
-        self._signIn = params.get("signIn", "").strip()
         self._login = params.get("login", "").strip()
         self._password = params.get("password", "")
         self._doNotSanitizeFields.append("password")
@@ -68,8 +67,8 @@ class RHSignInBase( base.RH ):
            not Config.getInstance().getDisplayLoginPage()):
             self._redirect(urlHandlers.UHSignInSSO.getURL(authId=authManager.getDefaultAuthenticator().getId()))
             return
-        if not self._signIn:
-            return self._signInPage.display( returnURL = self._returnURL )
+        if request.method != 'POST':
+            return self._signInPage.display(returnURL=self._returnURL)
         else:
             li = LoginInfo( self._login, self._password )
             av = authManager.getAvatar(li)
