@@ -28,8 +28,8 @@ from MaKaC.webinterface.wcomponents import (
     SideMenuSection
 )
 
-from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.models.locations import Location
+from ..models.rooms import Room
+from ..models.locations import Location
 
 
 class WPRoomBookingBase(WPMainBase):
