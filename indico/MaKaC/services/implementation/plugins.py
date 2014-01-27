@@ -22,8 +22,6 @@ from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.plugins import PluginsHolder
 from MaKaC.webinterface.user import UserListModificationBase, UserModificationBase
 
-from indico.modules.rb.controllers.mixins import RoomBookingDBMixin
-
 
 class PluginOptionsBase (AdminService):
 
@@ -87,7 +85,9 @@ class PluginOptionsRemoveUser ( PluginOptionsBase, UserModificationBase ):
 
         return True
 
-class PluginOptionsAddRooms ( RoomBookingDBMixin, PluginOptionsBase ):
+
+# TODO: DB mixin
+class PluginOptionsAddRooms(PluginOptionsBase):
 
     def _checkParams(self):
         PluginOptionsBase._checkParams(self)
@@ -103,6 +103,7 @@ class PluginOptionsAddRooms ( RoomBookingDBMixin, PluginOptionsBase ):
             raise ServiceError('ERR-PLUG2', "option %s.%s.%s is not of type 'rooms'" % (self._pluginType, self._plugin, self._targetOption))
 
         return True
+
 
 class PluginOptionsRemoveRooms ( PluginOptionsBase ):
 
