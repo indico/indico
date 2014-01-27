@@ -506,20 +506,17 @@ class HelperMaKaCInfo:
         ZODB4 is released and the Persistent classes are no longer Extension
         ones.
     """
-
+    @classmethod
     def getMaKaCInfoInstance(cls):
         dbmgr = db.DBMgr.getInstance()
         root = dbmgr.getDBConnection().root()
         try:
-            minfo = root["MaKaCInfo"]["main"]
-        except KeyError, e:
+            minfo = root['MaKaCInfo']['main']
+        except KeyError:
             minfo = MaKaCInfo()
-            root["MaKaCInfo"] = OOBTree.OOBTree()
-            root["MaKaCInfo"]["main"] = minfo
-
+            root['MaKaCInfo'] = OOBTree.OOBTree()
+            root['MaKaCInfo']['main'] = minfo
         return minfo
-
-    getMaKaCInfoInstance = classmethod( getMaKaCInfoInstance )
 
 
 class StyleManager(Persistent):
