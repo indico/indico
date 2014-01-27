@@ -18,19 +18,22 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.wcomponents import WTemplated
 
-from indico.modules.rb.views.admin import WPRoomBookingPluginAdminBase
+from indico.util.i18n import _
+
+from . import WPRoomBookingPluginAdminBase
 
 
 class WPRoomBookingPluginAdmin(WPRoomBookingPluginAdminBase):
 
     def __init__(self, rh, params):
-        super(WPRoomBookingPluginAdmin, self).__init__(rh)
+        WPRoomBookingPluginAdminBase.__init__(self, rh)
         self._params = params
 
     def _setActiveTab(self):
-        super(WPRoomBookingPluginAdmin, self)._setActiveTab(self)
+        WPRoomBookingPluginAdminBase._setActiveTab(self)
         self._subTabMain.setActive()
 
     def _getTabContent(self, params):
@@ -43,11 +46,13 @@ class WRoomBookingPluginAdmin(WTemplated):
         self._rh = rh
 
     def getVars(self):
-        wvars = super(WRoomBookingPluginAdmin, self).getVars()
+        wvars = WTemplated.getVars(self)
 
         if HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive():
             wvars['activationStatusText'] = _('Room Booking is currently active')
+            wvars['activationText'] = _('Deactivate')
         else:
             wvars['activationStatusText'] = _('Room Booking is currently not active')
-
+            wvars['activationText'] = _('Activate')
+        wvars['toggleURL'] = urlHandlers.UHRoomBookingModuleActive.getURL()
         return wvars

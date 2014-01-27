@@ -19,17 +19,17 @@
 
 from MaKaC.webinterface.wcomponents import WTemplated
 
-# from indico.modules.rb.models.location_attribute_keys import LocationAttributeKey
-from indico.modules.rb.models.locations import Location
-from indico.modules.rb.views.admin import WPRoomBookingPluginAdminBase
-from indico.modules.rb.views.utils import makePercentageString
+from . import WPRoomBookingPluginAdminBase
+from ..utils import makePercentageString
+from ...models.room_attributes import RoomAttribute
+from ...models.locations import Location
 
 
 class WPRoomBookingAdmin(WPRoomBookingPluginAdminBase):
 
     def __init__(self, rh):
         self._rh = rh
-        super(WPRoomBookingAdmin, self).__init__(rh)
+        WPRoomBookingPluginAdminBase.__init__(self, rh)
 
     def _setActiveTab(self):
         self._subTabConfig.setActive()
@@ -44,12 +44,10 @@ class WRoomBookingAdmin(WTemplated):
         self._rh = rh
 
     def getVars(self):
-        wvars = super(WRoomBookingAdmin, self).getVars()
-        # TODO: logic should be here wvars["Location"] = Location
-        wvars['locations'] = Location.getAllLocations()
+        wvars = WTemplated.getVars(self)
+        wvars['locations'] = Location.getLocations()
         defaultLocation = Location.getDefaultLocation()
-        wvars['defaultLocationName'] = defaultLocation.name if defaultLocation else None
-
+        wvars['defaultLocationName'] = defaultLocation.name if defaultLocation else ''
         return wvars
 
 
@@ -59,7 +57,7 @@ class WPRoomBookingAdminLocation(WPRoomBookingPluginAdminBase):
         self._rh = rh
         self._location = location
         self._actionSucceeded = actionSucceeded
-        super(WPRoomBookingAdminLocation, self).__init__(rh)
+        WPRoomBookingPluginAdminBase.__init__(self, rh)
 
     def _setActiveTab(self):
         self._subTabConfig.setActive()
@@ -77,36 +75,33 @@ class WRoomBookingAdminLocation(WTemplated):
         self._location = location
 
     def getVars(self):
-        wvars = super(WRoomBookingAdminLocation, self).getVars()
-        wvars["location"] = self._location
-        # wvars["possibleEquipment"] = LocationAttributeKey.getAllAttributeKeys()
-        wvars['AttsManager'] = None
-        # wvars["AttsManager"] = self._location.factory.getCustomAttributesManager()
+        wvars = WTemplated.getVars(self)
+        wvars['location'] = self._location
+        wvars['possibleEquipments'] = self._location.getEquipmentNames()
+        wvars['attributes'] = self._location.getAttributes()
+
+        # TODO: rest
+        wvars['keys'] = RoomAttribute
 
         # Rooms
-        # rooms = self._location.factory.newRoom().getRooms(location=self._location.friendlyName)
-        # rooms.sort()
-        wvars["Rooms"] = self._location.getAllRoomsSortedByFullNames()
+        wvars['rooms'] = self._location.getRoomsOrderedByNames()
 
         rh = self._rh
-
-        wvars["withKPI"] = rh._withKPI
-
+        wvars['withKPI'] = rh._withKPI
         if rh._withKPI:
-            wvars["kpiAverageOccupation"] = makePercentageString(rh._kpiAverageOccupation)
+            wvars['kpiAverageOccupation'] = makePercentageString(rh._kpiAverageOccupation)
 
-            wvars["kpiTotalRooms"] = rh._kpiTotalRooms
-            wvars["kpiActiveRooms"] = rh._kpiActiveRooms
-            wvars["kpiReservableRooms"] = rh._kpiReservableRooms
+            wvars['kpiTotalRooms'] = rh._kpiTotalRooms
+            wvars['kpiActiveRooms'] = rh._kpiActiveRooms
+            wvars['kpiReservableRooms'] = rh._kpiReservableRooms
 
-            wvars["kpiReservableCapacity"] = rh._kpiReservableCapacity
-            wvars["kpiReservableSurface"] = rh._kpiReservableSurface
+            wvars['kpiReservableCapacity'] = rh._kpiReservableCapacity
+            wvars['kpiReservableSurface'] = rh._kpiReservableSurface
 
             # Bookings
-
-            wvars["kbiTotalBookings"] = rh._totalBookings
+            wvars['kbiTotalBookings'] = rh._totalBookings
 
             # Next 9 KPIs
-            wvars["stats"] = rh._booking_stats
+            wvars['stats'] = rh._booking_stats
 
         return wvars

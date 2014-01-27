@@ -17,11 +17,15 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.roomMapping import RoomMapperHolder
+from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.wcomponents import WTemplated
+
+from . import WPRoomsBase
+
 
 class WPRoomMapperBase(WPRoomsBase):
-
-    def __init__(self, rh):
-        super(WPRoomMapperBase, self).__init__(rh)
 
     def _setActiveTab(self):
         self._subTabRoomMappers.setActive()
@@ -30,16 +34,16 @@ class WPRoomMapperBase(WPRoomsBase):
 class WPRoomMapperList(WPRoomMapperBase):
 
     def __init__(self, rh, params):
-        super(WPRoomMapperList, self).__init__(rh)
+        WPRoomMapperBase.__init__(self, rh)
         self._params = params
 
     def _getTabContent(self, params):
         criteria = {}
         if filter(lambda x: self._params[x], self._params):
-            criteria["name"] = self._params.get("sName","")
-        comp = WRoomMapperList(criteria)
-        pars = {"roomMapperDetailsURLGen": urlHandlers.UHRoomMapperDetails.getURL }
-        return comp.getHTML(pars)
+            criteria['name'] = self._params.get('sName', '')
+        return WRoomMapperList(criteria).getHTML({
+            'roomMapperDetailsURLGen': urlHandlers.UHRoomMapperDetails.getURL
+        })
 
 
 class WRoomMapperList(WTemplated):
@@ -48,89 +52,62 @@ class WRoomMapperList(WTemplated):
         self._criteria = criteria
 
     def _performSearch(self, criteria):
-        rmh = roomMapping.RoomMapperHolder()
-        res = rmh.match(criteria)
-        return res
+        return RoomMapperHolder().match(criteria)
 
     def getVars(self):
-        wvars = super(WRoomMapperList, self).getVars()
-        wvars["createRoomMapperURL"] = urlHandlers.UHNewRoomMapper.getURL()
-        wvars["searchRoomMappersURL"] = urlHandlers.UHRoomMappers.getURL()
-        wvars["roomMappers"] = ""
-        if self._criteria:
-            wvars["roomMappers"] = """<tr>
-                              <td>
-                    <br>
-                <table width="100%%" align="left" style="border-top: 1px solid #777777; padding-top:10px">"""
-            roomMapperList = self._performSearch(self._criteria)
-            ul = []
-            color="white"
-            ul = []
-            for rm in roomMapperList:
-                if color=="white":
-                    color="#F6F6F6"
-                else:
-                    color="white"
-                url = wvars["roomMapperDetailsURLGen"]( rm )
-                ul.append("""<tr>
-                                <td bgcolor="%s"><a href="%s">%s</a></td>
-                            </tr>"""%(color, url, rm.getName() ) )
-            if ul:
-                wvars["roomMappers"] += "".join( ul )
-            else:
-                wvars["roomMappers"] += i18nformat("""<tr>
-                            <td><br><span class="blacktext">&nbsp;&nbsp;&nbsp; _("No room mappers for this search")</span></td></tr>""")
-            wvars["roomMappers"] += """    </table>
-                      </td>
-                </tr>"""
+        wvars = WTemplated.getVars(self)
+        wvars['createRoomMapperURL'] = urlHandlers.UHNewRoomMapper.getURL()
+        wvars['searchRoomMappersURL'] = urlHandlers.UHRoomMappers.getURL()
+        wvars['roomMappers'] = self._performSearch(self._criteria) if self._criteria else []
         return wvars
 
 
 class WPRoomMapperDetails(WPRoomMapperBase):
 
     def __init__(self, rh, roomMapper):
-        super(WPRoomMapperDetails, self).__init__(rh)
+        WPRoomMapperBase.__init__(self, rh)
         self._roomMapper = roomMapper
 
     def _getTabContent(self, params):
-        comp = WRoomMapperDetails( self._roomMapper )
-        pars = {"modifyURL": urlHandlers.UHRoomMapperModification.getURL( self._roomMapper ) }
-        return comp.getHTML( pars )
+        return WRoomMapperDetails(self._roomMapper).getHTML({
+            'modifyURL': urlHandlers.UHRoomMapperModification.getURL(self._roomMapper)
+        })
 
 
 class WRoomMapperDetails(WTemplated):
 
-    def __init__( self, rm):
+    def __init__(self, rm):
+        WTemplated.__init__(self)
         self._roomMapper = rm
 
-    def getVars( self ):
-        wvars = super(WRoomMapperDetails, self).getVars()
-        wvars["name"] = self._roomMapper.getName()
-        wvars["description"] = self._roomMapper.getDescription()
-        wvars["url"] = self._roomMapper.getBaseMapURL()
-        wvars["placeName"] = self._roomMapper.getPlaceName()
-        wvars["regexps"] = self._roomMapper.getRegularExpressions()
+    def getVars(self):
+        wvars = WTemplated.getVars(self)
+        wvars['name'] = self._roomMapper.getName()
+        wvars['description'] = self._roomMapper.getDescription()
+        wvars['url'] = self._roomMapper.getBaseMapURL()
+        wvars['placeName'] = self._roomMapper.getPlaceName()
+        wvars['regexps'] = self._roomMapper.getRegularExpressions()
         return wvars
 
 
 class WPRoomMapperCreation(WPRoomMapperBase):
 
     def _getTabContent(self, params):
-        comp = WRoomMapperEdit()
-        pars = {"postURL": urlHandlers.UHRoomMapperPerformCreation.getURL()}
-        return comp.getHTML( pars )
+        return WRoomMapperEdit().getHTML({
+            'postURL': urlHandlers.UHRoomMapperPerformCreation.getURL()
+        })
 
 
 class WPRoomMapperModification(WPRoomMapperBase):
 
     def __init__(self, rh, domain):
-        super(WPRoomMapperModification, self).__init__(rh)
+        WPRoomMapperBase.__init__(self, rh)
         self._domain = domain
 
-    def _getTabContent( self, params ):
-        comp = WRoomMapperEdit( self._domain )
-        pars = {"postURL": urlHandlers.UHRoomMapperPerformModification.getURL(self._domain)}
-        return comp.getHTML( pars )
+    def _getTabContent(self, params):
+        return WRoomMapperEdit(self._domain).getHTML({
+            'postURL': urlHandlers.UHRoomMapperPerformModification.getURL(self._domain)
+        })
 
 
 class WRoomMapperEdit(WTemplated):
@@ -139,18 +116,15 @@ class WRoomMapperEdit(WTemplated):
         self._roomMapper = rm
 
     def getVars(self):
-        wvars = super(WRoomMapperEdit, self).getVars()
-        wvars["name"] = ""
-        wvars["description"] = ""
-        wvars["url"] = ""
-        wvars["placeName"] = ""
-        wvars["regexps"] = ""
-        wvars["locator"] = ""
+        wvars = WTemplated.getVars(self)
+        wvars['name'] = wvars['description'] = wvars['url'] = \
+        wvars['placeName'] = wvars['regexps'] = wvars['locator'] = ''
+        wvars['is_rb_active'] = HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
         if self._roomMapper:
-            wvars["name"] = self._roomMapper.getName()
-            wvars["description"] = self._roomMapper.getDescription()
-            wvars["url"] = self._roomMapper.getBaseMapURL()
-            wvars["placeName"] = self._roomMapper.getPlaceName()
-            wvars["regexps"] = "\r\n".join(self._roomMapper.getRegularExpressions())
-            wvars["locator"] = self._roomMapper.getLocator().getWebForm()
+            wvars['name'] = self._roomMapper.getName()
+            wvars['description'] = self._roomMapper.getDescription()
+            wvars['url'] = self._roomMapper.getBaseMapURL()
+            wvars['placeName'] = self._roomMapper.getPlaceName()
+            wvars['regexps'] = '\r\n'.join(self._roomMapper.getRegularExpressions())
+            wvars['locator'] = self._roomMapper.getLocator().getWebForm()
         return wvars
