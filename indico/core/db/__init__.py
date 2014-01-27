@@ -36,7 +36,7 @@ from sqlalchemy.types import Numeric
 from zope.sqlalchemy import ZopeTransactionExtension
 
 
-from .. import IndicoError
+from ..errors import IndicoError
 from .manager import DBMgr
 from .migration import MigratedDB
 
