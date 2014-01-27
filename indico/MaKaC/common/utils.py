@@ -435,7 +435,7 @@ def formatDateTime(dateTime, showWeek=False, format=None, locale=None):
 def formatDate(date, showWeek=False, format=None, locale=None):
     week = ""
     if showWeek:
-        week = "%a "
+        week = "EEE "
     if not format:
         return format_date(date, week+'d/M/yyyy', locale=locale).encode('utf-8')
     else:
