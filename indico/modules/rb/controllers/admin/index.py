@@ -34,7 +34,7 @@ class RHRoomBookingPluginAdminBase(RHAdminBase):
 class RHRoomBookingPluginAdmin(RHRoomBookingPluginAdminBase):
 
     def _checkParams(self):
-        super(self, RHRoomBookingPluginAdmin)._checkParams(request.args)
+        RHRoomBookingPluginAdminBase._checkParams(self, request.args)
 
     def _process(self):
         return index_views.WPRoomBookingPluginAdmin(self, request.args).display()
@@ -43,7 +43,7 @@ class RHRoomBookingPluginAdmin(RHRoomBookingPluginAdminBase):
 class RHSwitchRoomBookingModuleActive(RHRoomBookingPluginAdminBase):
 
     def _checkParams(self):
-        super(self, RHSwitchRoomBookingModuleActive)._checkParams(request.args)
+        RHRoomBookingPluginAdminBase._checkParams(self, request.args)
 
     def _process(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -51,8 +51,8 @@ class RHSwitchRoomBookingModuleActive(RHRoomBookingPluginAdminBase):
         active = minfo.getRoomBookingModuleActive()
         if not active:
             PluginsHolder().reloadAllPlugins()
-            if not PluginsHolder().getPluginType("RoomBooking").isActive():
-                PluginsHolder().getPluginType("RoomBooking").setActive(True)
+            if not PluginsHolder().getPluginType('RoomBooking').isActive():
+                PluginsHolder().getPluginType('RoomBooking').setActive(True)
 
         minfo.setRoomBookingModuleActive(not active)
         self._redirect(urlHandlers.UHRoomBookingPluginAdmin.getURL())
