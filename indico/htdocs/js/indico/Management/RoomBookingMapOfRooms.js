@@ -138,7 +138,7 @@ type("MapAspectListWidget", ["ListWidget"],
 
              }, IndicoUI.Buttons.removeButton()));
 
-             var buttonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}});
+             var buttonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10)}});
 
              buttonDiv.append(editButton) ;
              buttonDiv.append(removeButton);
