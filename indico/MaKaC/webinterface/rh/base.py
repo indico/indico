@@ -590,7 +590,8 @@ class RH(RequestHandlerBase):
             for i, retry in enumerate(transaction.attempts(max_retries)):
                 with retry:
                     if i > 0:
-                        self._notify('requestRetry', retry)  # notify components about retry
+                        self._notify('requestRetry', i)  # notify components about retry
+
                     try:
                         Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), request.remote_addr))
                         if i < forced_conflicts:  # raise conflict error if enabled to easily handle conflict error case
@@ -599,14 +600,16 @@ class RH(RequestHandlerBase):
                         transaction.commit()
                         break
                     except (ConflictError, POSKeyError):
+                        transaction.abort()
                         import traceback
                         # only log conflict if it wasn't forced
-                        if retry >= forced_conflicts:
+                        if i >= forced_conflicts:
                             Logger.get('requestHandler').warning('Conflict in Database! (Request %s)\n%s' % (request, traceback.format_exc()))
                         raise
                     except ClientDisconnected:
+                        transaction.abort()
                         Logger.get('requestHandler').warning('Client Disconnected! (Request {})'.format(request))
-                        time.sleep(retry)
+                        time.sleep(i)
             self._process_success()
         except Exception as e:
             transaction.abort()
