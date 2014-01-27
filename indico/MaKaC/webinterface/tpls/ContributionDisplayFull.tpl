@@ -7,6 +7,7 @@
         % for speaker in Contribution.getSpeakerList():
             <li class="icon-user">${speaker.getDirectFullName()}</li>
         % endfor
+        </ul>
     </div>
 </%block>
 
