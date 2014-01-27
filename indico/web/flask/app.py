@@ -35,7 +35,7 @@ from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
-from indico.core.db import db
+from indico.core.db import db, drop_database, DBMgr
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoFlask
@@ -132,16 +132,19 @@ def configure_db(app):
     app.config['SQLALCHEMY_MAX_OVERFLOW'] = cfg.getSqlalchemyMaxOverflow()
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = cfg.getSqlalchemyCommitOnTeardown()
 
-    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-    if cfg.getIsRoomBookingActive():
-        minfo.setRoomBookingModuleActive(True)
-        from indico.modules.rb.models import *
-    else:
-        minfo.setRoomBookingModuleActive()
+    with DBMgr.getInstance().global_connection(commit=True):
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        if cfg.getIsRoomBookingActive():
+            minfo.setRoomBookingModuleActive(True)
+            from indico.modules.rb.models import *
+        else:
+            minfo.setRoomBookingModuleActive()
 
     db.init_app(app)
-    with app.app_context():
-        db.create_all()
+    if cfg.getCreateTables():
+        with app.app_context():
+            drop_database(db)  # favorable to `drop_all` under foreign keys
+            db.create_all()
 
 
 def extend_url_map(app):
