@@ -27,11 +27,11 @@ import time
 def nowutc():
     return timezone('UTC').localize(datetime.utcnow())
 
-def server2utc( date ):
+def server2utc(date):
     servertz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
     return timezone(servertz).localize(date).astimezone(timezone('UTC'))
 
-def utc2server( date, naive=True ):
+def utc2server(date, naive=True):
     date = date.replace(tzinfo=None)
     servertz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
     servertime = timezone('UTC').localize(date).astimezone(timezone(servertz))
@@ -39,20 +39,20 @@ def utc2server( date, naive=True ):
         return servertime.replace(tzinfo=None)
     return servertime
 
-def date2utctimestamp( date ):
+def date2utctimestamp(date):
     """ Note by DavidMC: I believe this implementation is flawed. At least in my PC
         it is not correct. I think the result depends on the local time of the PC
         executing it. Use timezoneUtils.datetimeToUnixTime & timezoneUtils.unixTimeToDatetime instead.
         As a test, try the 13th February 2009 at 23:31:30 UTC, the timestamp should be 1234567890.
         With this function it's 1234564290 .
     """
-    return int(time.mktime( date.utctimetuple() ))
+    return int(time.mktime(date.utctimetuple()))
 
-def utctimestamp2date( ts ):
+def utctimestamp2date(ts):
     """ Note by DavidMC: This function returns a naive datetime.
         You should use timezoneUtils.unixTimeToDatetime instead.
     """
-    return datetime.utcfromtimestamp( ts )
+    return datetime.utcfromtimestamp(ts)
 
 def isTimezoneAware(datetime):
     """ Takes a datetime object and returns True if it is timezone-aware (has tzinfo)
