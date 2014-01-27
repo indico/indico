@@ -281,16 +281,17 @@
                 $save_button = elem.siblings('.wmd-button-bar').find('.save-button');
 
             function _set_saving() {
-                $save_button.attr('disabled', 'disabled').addClass('saved').
-                                            removeClass('saving wairing-save').
-                                            text($T('Saving...'));
-                        // the 'save' function will trigger a callback that sets
-                        // the final state
-                        options.save(elem.val(), function() {
-                            $save_button.text($T('Saved')).
-                                        addClass('saved').
-                                        removeClass('saving waiting-save');
-                        });
+                $save_button.prop('disabled', true)
+                            .addClass('saved')
+                            .removeClass('saving waiting-save')
+                            .text($T('Saving...'));
+                // the 'save' function will trigger a callback that sets
+                // the final state
+                options.save(elem.val(), function() {
+                    $save_button.text($T('Saved'))
+                                .addClass('saved')
+                                .removeClass('saving waiting-save');
+                });
             }
 
             function _save_cycle(my_time) {
@@ -317,9 +318,10 @@
 
                     _.extend(options, arg2 || {});
                     elem.on('input', function() {
-                        $save_button.addClass('waiting-save').
-                                    removeClass('saving saved').
-                                    text($T('Save')).attr('disabled', null);
+                        $save_button.addClass('waiting-save')
+                                    .removeClass('saving saved')
+                                    .text($T('Save'))
+                                    .prop('disabled', false);
 
                         // let handlers (_save_cyle) know that they're out-of-date
                         // by updating last_change with the current time
