@@ -16,55 +16,56 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import request, session
 
-import time
-import sys, traceback
 import copy
+import time
 
+import transaction
+from flask import request, session
 from ZODB.POSException import ConflictError
 from ZEO.Exceptions import ClientDisconnected
-from indico.core.logger import Logger
 
-from MaKaC.services.interface import rpc
-from MaKaC.services.interface.rpc import handlers
 from MaKaC.plugins.base import Observable
-import MaKaC.errors
-
-from indico.core.db import DBMgr
+from MaKaC.errors import NoReportError
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.mail import GenericMailer
-
-from MaKaC.services.interface.rpc.common import CausedError, NoReportError, CSRFError
+from MaKaC.services.interface.rpc import handlers
+from MaKaC.services.interface.rpc.common import(
+    CausedError,
+    NoReportError as ServiceNoReportError,
+    CSRFError
+)
 from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
 
+from indico.core.config import Config
+from indico.core.db import DBMgr
+from indico.core.logger import Logger
+from indico.core.errors import NoReportError as NoReportIndicoError
 from indico.util.redis import RedisError
 from indico.util import fossilize
-from indico.core.config import Config
 
 
 def lookupHandler(method):
     # TODO: better way to do this without the need of DB connection?
     handlers.updateMethodMapWithPlugins()
 
-    endpoint = handlers
-    functionName = method
+    endpoint, functionName = handlers, method
     while True:
         handler = endpoint.methodMap.get(functionName, None)
-        if handler != None:
+        if handler:
             break
         try:
-            endpointName, functionName = method.split(".", 1)
-        except:
-            raise RequestError("ERR-R1", "Unsupported method.")
+            endpointName, functionName = method.split('.', 1)
+        except Exception:
+            raise RequestError('ERR-R1', 'Unsupported method.')
 
         if 'endpointMap' in dir(endpoint):
             endpoint = endpoint.endpointMap.get(endpointName, None)
-            if endpoint == None:
-                raise RequestError("ERR-R0", "Unknown endpoint: %s" % endpointName)
+            if not endpoint:
+                raise RequestError('ERR-R0', 'Unknown endpoint: {0}'.format(endpointName))
         else:
-            raise RequestError("ERR-R1", "Unsupported method")
+            raise RequestError('ERR-R1', 'Unsupported method')
     return handler
 
 
@@ -77,7 +78,7 @@ def processRequest(method, params, internal=False):
             raise CSRFError()
 
     # invoke handler
-    if hasattr(handler, "process"):
+    if hasattr(handler, 'process'):
         result = handler(params).process()
     else:
         result = handler(params)
@@ -87,104 +88,73 @@ def processRequest(method, params, internal=False):
 
 class ServiceRunner(Observable):
 
-    def invokeMethod(self, method, params):
-
-        MAX_RETRIES = 10
-
+    def _invokeMethodBefore(self):
         # clear the context
         ContextManager.destroy()
-
-        DBMgr.getInstance().startRequest()
-
-        # room booking database
-        _startRequestSpecific2RH()
-
         # notify components that the request has started
+        DBMgr.getInstance().startRequest()
         self._notify('requestStarted')
 
-        forcedConflicts = Config.getInstance().getForceConflicts()
-        retry = MAX_RETRIES
+    def _invokeMethodRetryBefore(self):
+        # clear/init fossil cache
+        fossilize.clearCache()
+        # delete all queued emails
+        GenericMailer.flushQueue(False)
+        DBMgr.getInstance().sync()
+
+    def _invokeMethodSuccess(self):
+        rh = ContextManager.get('currentRH')
+
+        GenericMailer.flushQueue(True) # send emails
+        if rh._redisPipeline:
+            try:
+                rh._redisPipeline.execute()
+            except RedisError:
+                Logger.get('redis').exception('Could not execute pipeline')
+
+    def invokeMethod(self, method, params):
+        cfg = Config.getInstance()
+        forced_conflicts, max_retries = cfg.getForceConflicts(), cfg.getMaxRetries()
+        result = None
+
+        self._invokeMethodBefore()
+
         try:
-            while retry > 0:
-                if retry < MAX_RETRIES:
-                    # notify components that the request is being retried
-                    self._notify('requestRetry', MAX_RETRIES - retry)
+            for i, retry in enumerate(transaction.attempts(max_retries)):
+                with retry:
+                    if i > 0:
+                        # notify components that the request is being retried
+                        self._notify('requestRetry', i)
 
-                # clear/init fossil cache
-                fossilize.clearCache()
-
-                try:
-                    # delete all queued emails
-                    GenericMailer.flushQueue(False)
-
-                    DBMgr.getInstance().sync()
-
+                    self._invokeMethodRetryBefore()
                     try:
-                        result = processRequest(method, copy.deepcopy(params))
-                    except MaKaC.errors.NoReportError, e:
-                        raise NoReportError(e.getMessage())
-                    rh = ContextManager.get('currentRH')
-
-                    # notify components that the request has ended
-                    self._notify('requestFinished')
-                    # Raise a conflict error if enabled. This allows detecting conflict-related issues easily.
-                    if retry > (MAX_RETRIES - forcedConflicts):
-                        raise ConflictError
-                    _endRequestSpecific2RH( True )
-                    DBMgr.getInstance().endRequest(True)
-                    GenericMailer.flushQueue(True) # send emails
-                    if rh._redisPipeline:
+                        # Raise a conflict error if enabled.
+                        # This allows detecting conflict-related issues easily.
+                        if i < forced_conflicts:
+                            raise ConflictError
                         try:
-                            rh._redisPipeline.execute()
-                        except RedisError:
-                            Logger.get('redis').exception('Could not execute pipeline')
-                    break
-                except ConflictError:
-                    _abortSpecific2RH()
-                    DBMgr.getInstance().abort()
-                    retry -= 1
-                    continue
-                except ClientDisconnected:
-                    _abortSpecific2RH()
-                    DBMgr.getInstance().abort()
-                    retry -= 1
-                    time.sleep(MAX_RETRIES - retry)
-                    continue
-        except CausedError:
-            _endRequestSpecific2RH(False)
-            DBMgr.getInstance().endRequest(False)
-            raise
-        except Exception:
-            _endRequestSpecific2RH(False)
-            DBMgr.getInstance().endRequest(False)
-            raise ProcessError("ERR-P0", "Error processing method.")
+                            result = processRequest(method, copy.deepcopy(params))
+                        except NoReportError as e:
+                            raise ServiceNoReportError(e.getMsg())
+                        except NoReportIndicoError as e:
+                            raise ServiceNoReportError(e.getMessage())
+
+                        transaction.commit()
+                        break
+                    except ConflictError:
+                        transaction.abort()
+                    except ClientDisconnected:
+                        transaction.abort()
+                        time.sleep(i)
+            self._invokeMethodSuccess()
+        except Exception as e:
+            transaction.abort()
+            if isinstance(e, CausedError):
+                raise
+            raise ProcessError('ERR-P0', 'Error processing method.')
+        finally:
+            # notify components that the request has ended
+            self._notify('requestFinished')
+            DBMgr.getInstance().endRequest()
 
         return result
-
-from MaKaC.rb_location import CrossLocationDB
-import MaKaC.common.info as info
-
-
-def _startRequestSpecific2RH():
-    minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-    if minfo.getRoomBookingModuleActive():
-        CrossLocationDB.connect()
-
-def _endRequestSpecific2RH(commit=True):
-    minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-    if minfo.getRoomBookingModuleActive():
-        if commit:
-            CrossLocationDB.commit()
-        else:
-            CrossLocationDB.rollback()
-        CrossLocationDB.disconnect()
-
-def _syncSpecific2RH():
-    minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-    if minfo.getRoomBookingModuleActive():
-        CrossLocationDB.sync()
-
-def _abortSpecific2RH():
-    minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-    if minfo.getRoomBookingModuleActive():
-        CrossLocationDB.rollback()
