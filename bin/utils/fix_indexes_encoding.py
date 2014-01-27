@@ -35,7 +35,7 @@ def fix_indexes():
         idx = ih.getById(idx_name)
         words = idx._words
         for key in words.iterkeys():
-            newKey = fix_broken_strings(key)
+            newKey = fix_broken_string(key)
             values = words[key]
             del words[key]
             words[newKey] = values
