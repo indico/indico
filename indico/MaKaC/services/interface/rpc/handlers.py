@@ -18,11 +18,18 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.services.implementation import resources
-from MaKaC.services.implementation import roomBooking
 from MaKaC.services.implementation import error
 
 from MaKaC.services.interface.rpc import description
 from MaKaC.plugins import PluginsHolder
+
+from indico.modules.rb import services as rb_services
+from indico.modules.rb.services import (
+    aspects as rb_aspect_services,
+    blockings as rb_blocking_services,
+    locations as rb_location_services,
+    rooms as rb_room_services
+)
 
 
 def importModule(name):
@@ -34,35 +41,38 @@ def importModule(name):
 
 
 def updateMethodMapWithPlugins():
-    methodMap.update(PluginsHolder().getById("ajaxMethodMap").getAJAXDict())
+    methodMap.update(PluginsHolder().getById('ajaxMethodMap').getAJAXDict())
+
 
 methodMap = {
-
-    "roomBooking.locations.list": roomBooking.RoomBookingListLocations,
-    "roomBooking.rooms.list": roomBooking.RoomBookingListRooms,
-    "roomBooking.rooms.availabilitySearch": roomBooking.RoomBookingAvailabilitySearchRooms,
-    "roomBooking.rooms.fullNameList": roomBooking.RoomBookingFullNameListRooms,
-    "roomBooking.locationsAndRooms.list": roomBooking.RoomBookingListLocationsAndRooms,
-    "roomBooking.locationsAndRooms.listWithGuids": roomBooking.RoomBookingListLocationsAndRoomsWithGuids,
-    "roomBooking.getDateWarning": roomBooking.GetDateWarning,
-
-    "roomBooking.mapaspects.create": roomBooking.RoomBookingMapCreateAspect,
-    "roomBooking.mapaspects.update": roomBooking.RoomBookingMapUpdateAspect,
-    "roomBooking.mapaspects.remove": roomBooking.RoomBookingMapRemoveAspect,
-    "roomBooking.mapaspects.list": roomBooking.RoomBookingMapListAspects,
-    "roomBooking.locationsAndRooms.getLink": roomBooking.RoomBookingLocationsAndRoomsGetLink,
-    "roombooking.blocking.approve": roomBooking.RoomBookingBlockingApprove,
-    "roombooking.blocking.reject": roomBooking.RoomBookingBlockingReject,
-    "roomBooking.room.bookingPermission": roomBooking.BookingPermission,
-
-    "resources.timezones.getAll": resources.GetTimezones,
-
-    "system.describe": description.describe,
-    "system.error.report": error.SendErrorReport
+    'resources.timezones.getAll': resources.GetTimezones,
+    # rb base
+    'roomBooking.getDateWarning': rb_services.GetDateWarning,
+    # rb locations
+    'roomBooking.locations.list': rb_location_services.RoomBookingListLocations,
+    # rb rooms
+    'roomBooking.rooms.list': rb_room_services.RoomBookingListRooms,
+    'roomBooking.rooms.availabilitySearch': rb_room_services.RoomBookingAvailabilitySearchRooms,
+    'roomBooking.rooms.fullNameList': rb_room_services.RoomBookingFullNameListRooms,
+    'roomBooking.locationsAndRooms.list': rb_room_services.RoomBookingListLocationsAndRooms,
+    'roomBooking.locationsAndRooms.listWithGuids': rb_room_services.RoomBookingListLocationsAndRoomsWithGuids,
+    'roomBooking.locationsAndRooms.getLink': rb_room_services.RoomBookingLocationsAndRoomsGetLink,
+    'roomBooking.room.bookingPermission': rb_room_services.BookingPermission,
+    # rb aspects
+    'roomBooking.mapaspects.create': rb_aspect_services.RoomBookingMapCreateAspect,
+    'roomBooking.mapaspects.update': rb_aspect_services.RoomBookingMapUpdateAspect,
+    'roomBooking.mapaspects.remove': rb_aspect_services.RoomBookingMapRemoveAspect,
+    'roomBooking.mapaspects.list': rb_aspect_services.RoomBookingMapListAspects,
+    # rb blockings
+    'roombooking.blocking.approve': rb_blocking_services.RoomBookingBlockingApprove,
+    'roombooking.blocking.reject': rb_blocking_services.RoomBookingBlockingReject,
+    # system
+    'system.describe': description.describe,
+    'system.error.report': error.SendErrorReport
 }
 
-endpointMap = {
 
+endpointMap = {
     "event": importModule("MaKaC.services.implementation.conference"),
     "user": importModule('MaKaC.services.implementation.user'),
     "contribution": importModule('MaKaC.services.implementation.contribution'),
