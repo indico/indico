@@ -31,14 +31,14 @@ from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
     isTomorrow
 from MaKaC.common import info
 from MaKaC import errors
-from indico.core.db import DBMgr
 from MaKaC.webinterface.linking import RoomLinker
-from MaKaC.rb_location import CrossLocationQueries
-from indico.core.config import Config
 
 # indico imports
+from indico.core.config import Config
+from indico.core.db import DBMgr
 from indico.util.i18n import currentLocale
-
+# backward compatibility
+from indico.util.string import truncate
 
 # fcntl is only available for POSIX systems
 if os.name == 'posix':
@@ -49,50 +49,45 @@ _FAKENAME_SIZEMIN = 5
 _FAKENAME_SIZEMAX = 10
 
 
-### Backward-compatible utilities
-
-from indico.util.string import truncate
-
-
-
-def isWeekend( d ):
+def isWeekend(d):
     """
     Accepts date or datetime object.
     """
     return d.weekday() in [5, 6]
 
 
+# TODO: why don't we just use a set?
 HOLIDAYS_KEY = 'Holidays'
 class HolidaysHolder:
 
     @classmethod
-    def isWorkingDay( cls, d ):
-        if isinstance( d, datetime ):
+    def isWorkingDay(cls, d):
+        if isinstance(d, datetime):
             d = d.date()
-        if isWeekend( d ):
+        if isWeekend(d):
             return False
-        return not cls.__getBranch().has_key( d )
+        return not cls.__getBranch().has_key(d)
 
     @classmethod
-    def getHolidays( cls ):
+    def getHolidays(cls):
         """
         Returns list of holidays
         """
         return cls.__getBranch().keys()
 
     @classmethod
-    def insertHoliday( cls, d ):
+    def insertHoliday(cls, d):
         cls.__getBranch()[d] = None
 
     @classmethod
-    def clearHolidays( cls ):
+    def clearHolidays(cls):
         root = DBMgr.getInstance().getDBConnection().root()
         root[HOLIDAYS_KEY] = OOBTree()
 
     @staticmethod
     def __getBranch():
         root = DBMgr.getInstance().getDBConnection().root()
-        if not root.has_key( HOLIDAYS_KEY ):
+        if not root.has_key(HOLIDAYS_KEY):
             root[HOLIDAYS_KEY] = OOBTree()
         return root[HOLIDAYS_KEY]
 
