@@ -6,7 +6,10 @@
         ng-model="formData.numberOfColumns"
         ng-class="{hasError: validationStarted && optionsForm.numberOfColumns.$invalid}"
         size="20"
-        min="1">
+        min="1"
+        max="60">
+    <span class="icon-question text-superfluous"
+            title="{{ 'Maximum 60. Leave empty for default.' | i18n }}"></span>
 </div>
 
 <div class="regFormEditLine">
@@ -17,5 +20,8 @@
         ng-model="formData.numberOfRows"
         ng-class="{hasError: validationStarted && optionsForm.numberOfRows.$invalid}"
         size="20"
-        min="1">
+        min="1"
+        max="20">
+    <span class="icon-question text-superfluous"
+            title="{{ 'Maximum 20. Leave empty for default.' | i18n }}"></span>
 </div>
