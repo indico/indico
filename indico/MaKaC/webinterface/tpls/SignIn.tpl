@@ -117,6 +117,7 @@
     document.signInForm.login.focus();
 
     $('.js-sso-submit').on('click', function(e) {
+        e.preventDefault();
         $('#authId').val($(this).data('id'));
         $('#signInSSOForm').submit();
     });
