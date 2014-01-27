@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 import urllib
+from MaKaC.common.TemplateExec import render
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -45,15 +46,25 @@ class WPSubContributionBase( WPMainBase, WPConferenceBase ):
         WPConferenceBase.__init__( self, rh, self._conf )
 
 
-class WPSubContributionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPSubContributionBase ):
+class WPSubContributionDefaultDisplayBase(WPConferenceDefaultDisplayBase, WPSubContributionBase):
+    def __init__(self, rh, contribution):
+        WPSubContributionBase.__init__(self, rh, contribution)
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-            self._includeJSPackage('Management') + \
-               self._includeJSPackage('MaterialEditor')
+               self._includeJSPackage('Management') + \
+               self._includeJSPackage('MaterialEditor') + \
+               self._asset_env['contributions_js'].urls()
 
-    def __init__( self, rh, contribution ):
-        WPSubContributionBase.__init__( self, rh, contribution )
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
+               self._asset_env['contributions_sass'].urls()
+
+    def _getHeadContent(self):
+        return WPConferenceDefaultDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+               '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                          for url in self._asset_env['mathjax_js'].urls()])
+
 
 class WSubContributionDisplayBase(wcomponents.WTemplated):
     def __init__(self, aw, subContrib):
@@ -103,6 +114,19 @@ class WPSubContributionModifBase( WPConferenceModifBase ):
         self._subContrib = self._target = subContribution
         self._conf = self._target.getConference()
         self._contrib = self._subContrib.getOwner()
+
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + \
+               self._asset_env['contributions_js'].urls()
+
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + \
+               self._asset_env['contributions_sass'].urls()
+
+    def _getHeadContent(self):
+        return WPConferenceModifBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+               '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                          for url in self._asset_env['mathjax_js'].urls()])
 
     def _getNavigationDrawer(self):
         pars = {"target": self._subContrib, "isModif": True}
