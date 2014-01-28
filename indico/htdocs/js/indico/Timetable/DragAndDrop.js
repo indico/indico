@@ -372,6 +372,7 @@ type("ResizableBlockMixin", [],
              this.resizable = this.element.reset_resizable({
 
                  // properties
+                 ignoreShift: true,
                  containment: $('#timetable_canvas'),
                  maxWidth: this.element.width(),
                  minWidth: this.element.width(),

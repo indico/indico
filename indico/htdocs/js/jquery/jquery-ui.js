@@ -2795,6 +2795,7 @@ $.widget("ui.resizable", $.ui.mouse, {
 		maxWidth: null,
 		minHeight: 10,
 		minWidth: 10,
+		ignoreShift: false,
 		// See #7960
 		zIndex: 90,
 
@@ -3086,7 +3087,7 @@ $.widget("ui.resizable", $.ui.mouse, {
 		data = trigger.apply(this, [event, dx, dy]);
 
 		// Put this in the mouseDrag handler since the user can start pressing shift while resizing
-		this._updateVirtualBoundaries(event.shiftKey);
+		this._updateVirtualBoundaries(event.shiftKey && !this.options.ignoreShift);
 		if (this._aspectRatio || event.shiftKey) {
 			data = this._updateRatio(data, event);
 		}
