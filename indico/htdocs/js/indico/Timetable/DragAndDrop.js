@@ -94,16 +94,19 @@ type("TimeDisplacementManager", [],
 
              var self = this;
 
-             var startDT = (startHour === null) ? eventData.startDate :
-                 { 'date': eventData.startDate.date,
-                   'time': startHour + ":" + startMinute };
+             var startDT = (startHour === null || startHour === undefined) ? eventData.startDate : {
+                 'date': eventData.startDate.date,
+                 'time': startHour + ":" + startMinute
+             };
 
              var endDT;
-             if (endHour === null) {
+             if (endHour === null || endHour === undefined) {
                  endDT = new Date(Util.dateTimeIndicoToJS(startDT).getTime() + eventData.duration*60000);
              } else {
-                 endDT = { 'date': eventData.endDate.date,
-                           'time': endHour + ":" + endMinute };
+                 endDT = {
+                     'date': eventData.endDate.date,
+                     'time': endHour + ":" + endMinute
+                 };
              }
 
              self.managementActions.editEntryStartEndDate(
