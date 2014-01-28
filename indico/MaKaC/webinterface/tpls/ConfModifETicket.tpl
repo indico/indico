@@ -77,23 +77,26 @@
       });
 
       $('#toggleShowQRCode').on("click", function(){
-          if($(this).is(":checked")){
-              $("#QRCodePlace").show();
-              if(!$("#QRCodePlace" ).has("#QRCodeImg").length) {
+          var self = this;
+          if(this.checked){
+              if(!$("#QRCodeImg").length) {
                   $("#QRCodePlace").html(progressIndicator(false, false).dom);
                   indicoRequest('registration.eticket.getQRCode',
                           {
-                              conference: '${conf.getId()}',
+                              conference: '${conf.getId()}'
                           },
                       function(result, error){
                           if (!error) {
                               $("#QRCodePlace").html($("<img />", {id: "QRCodeImg" ,src: result}));
                           } else {
                               IndicoUtil.errorReport(error);
+                              $('#QRCodePlace').html('');
+                              self.checked = false;
                           }
                       }
                   );
               }
+              $("#QRCodePlace").show();
           }
           else {
               $("#QRCodePlace").hide();
