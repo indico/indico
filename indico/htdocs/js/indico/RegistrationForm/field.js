@@ -376,6 +376,10 @@ ndRegForm.directive('ndRadioField', function(url) {
             scope.settings.defaultValue = true;
             scope.settings.itemtable = true;
 
+            scope.getInputTpl = function(inputType) {
+                return url.tpl('fields/{0}.tpl.html'.format(inputType));
+            }
+
             scope.anyBillableItemPayed = function(userdata) {
                 if (userdata.payed) {
                     var item = _.find(scope.field.values.radioitems, function(item) {
@@ -480,21 +484,6 @@ ndRegForm.directive('ndRadioField', function(url) {
                      defaultVal: true}
                 ]
             };
-        }
-    };
-});
-
-ndRegForm.directive('ndRadiogroupField', function(url) {
-    return {
-        require: 'ndField',
-        controller: function($scope) {
-            $scope.tplInput = url.tpl('fields/radiogroup.tpl.html');
-        },
-
-        link: function(scope) {
-            scope.settings.defaultValue = true;
-            scope.settings.formData.push(['values', 'defaultItem']);
-            scope.settings.formData.push(['values', 'inputType']);
         }
     };
 });

@@ -19,7 +19,6 @@
 
             <td ng-if="settings.caption" ng-include="tplInput" class="field-input"></td>
             <td ng-if="!settings.caption" ng-include="tplInput" class="field-input" colspan="2"></td>
-
             <td ng-if="editMode" class="field-actions">
                 <a ng-if="canBeDeleted(field)"
                     ng-click="fieldApi.removeField(field)"

@@ -1,0 +1,29 @@
+<ng-form name="nestedForm"
+    ng-init="input = getId(userdata[getName(field.input)])">
+    <select
+        name="{{ getName(field.input) }}"
+        ng-model="input"
+        ng-required="field.mandatory"
+        ng-disabled="anyBillableItemPayed(userdata)"
+        ng-class="{hasError: validationStarted && nestedForm.$invalid}"
+        ng-init="selectedItem = getSelectedItem(input) || {}"
+        ng-change="selectedItem = getSelectedItem(input) || {}">
+        <option value="">-- {{ 'Choose a value' | i18n }} --</option>
+        <option ng-repeat="item in field.values.radioitems | filter: {isEnabled: true}"
+            value="{{ item.id }}"
+            ng-disabled="!hasPlacesLeft(item) || paymentBlocked(item, userdata)"
+            ng-selected="item.caption == getValue(getName(field.input))">
+            {{ item.caption }}
+            {{ getBillableStr(item) }}
+            </span>
+        </option>
+    </select>
+    <span>
+        <span ng-if="isBillable(selectedItem)" class="regFormPrice">
+            {{ selectedItem.price }}
+        </span>
+            <span ng-if="isBillable(selectedItem)">
+                <nd-currency currency="currency"></nd-currency>
+            </span>
+    </span>
+</ng-form>
