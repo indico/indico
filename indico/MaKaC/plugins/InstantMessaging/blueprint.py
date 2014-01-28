@@ -25,7 +25,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 blueprint = IndicoBlueprint('instantmessaging', __name__)
 
 blueprint.add_url_rule('/event/<confId>/manage/chat/', 'confModifChat', handlers.RHChatFormModif)
-blueprint.add_url_rule('/event/<confId>/manage/chat/logs', 'confModifChat-logs', handlers.RHChatSeeLogs)
+blueprint.add_url_rule('/event/<confId>/manage/chat/logs/<chatroom>', 'confModifChat-logs', handlers.RHChatSeeLogs)
 blueprint.add_url_rule('/event/<confId>/chat', 'conferenceInstantMessaging',
                        handlers.RHInstantMessagingDisplay)
 
