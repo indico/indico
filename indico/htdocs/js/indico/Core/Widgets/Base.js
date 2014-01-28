@@ -745,7 +745,7 @@ type("JTabWidget", ["IWidget"], {
         var arrowsTopMargin = '4px';
         var arrowsCommonCss = {
             cursor: 'pointer',
-            zIndex: 100,
+            zIndex: 99,
             position: 'absolute',
             top: '1px',
             height: '26px'
@@ -755,7 +755,7 @@ type("JTabWidget", ["IWidget"], {
         // Create buttons to scroll left/right
         self.scrollButtons = $('<div/>').disableSelection().css({
             position: 'relative',
-            zIndex: 101
+            zIndex: 100
         });
         $('<span/>')
             .disableSelection()
