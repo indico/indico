@@ -274,6 +274,15 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         ldapc.close()
         return ret
 
+    def groupExists(self, group):
+        ldapc = LDAPConnector()
+        ldapc.open()
+        ldapc.login()
+        ret = ldapc.groupExists(group)
+        ldapc.close()
+        return ret
+
+
 class LDAPIdentity(PIdentity):
 
     def getId(self):
@@ -358,7 +367,7 @@ class LDAPConnector(object):
                 # return just DN
                 return dn
         else:
-            raise NotFoundError(_("There is no result for this DN"))
+            return None
 
     def _findDNOfUser(self, userName):
         return self._findDN(self.ldapPeopleDN,
@@ -504,6 +513,9 @@ class LDAPConnector(object):
         Logger.get('auth.ldap').debug('findGroupsFirstLEtter(%s) '%letter)
         return self._findGroups(gfilter)
 
+    def groupExists(self, group):
+        return self._findDNOfGroup(group) is not None
+
     def userInGroup(self, login, group):
         """
         Returns whether a user is in a group. Depends on groupStyle (SLAPD/ActiveDirectory)
@@ -514,7 +526,10 @@ class LDAPConnector(object):
         # In ActiveDirectory users have attribute 'tokenGroups' with list of groups Sids
         # In SLAPD groups have multivalues attribute 'member' with list of users
         if self.groupStyle == 'ActiveDirectory':
-            groupSid = self.l.search_s(self._findDNOfGroup(group), ldap.SCOPE_BASE,
+            groupDN = self._findDNOfGroup(group)
+            if not groupDN:
+                return False
+            groupSid = self.l.search_s(groupDN, ldap.SCOPE_BASE,
                                        attrlist=['objectSid'])[0][1]['objectSid'][0]
             res = self.l.search_s(self._findDNOfUser(login), ldap.SCOPE_BASE,
                                   attrlist=['tokenGroups'])[0][1]['tokenGroups']
@@ -566,6 +581,9 @@ class LDAPConnector(object):
         # In ActiveDirectory users have multivalued attribute 'memberof' with list of groups
         # In SLAPD groups have multivalues attribute 'member' with list of users
         if self.groupStyle == 'ActiveDirectory':
+            groupDN = self._findDNOfGroup(group)
+            if not groupDN:
+                return []
             return self.nestedSearch(self._findDNOfGroup(group), {})
         elif self.groupStyle == 'SLAPD':
             #read member attibute values from the group object
@@ -627,6 +645,10 @@ class LDAPGroup(Group):
 
     def containsMember(self, avatar):
         return 0
+
+    def exists(self):
+        return AuthenticatorMgr().getById('LDAP').groupExists(self.getName())
+
 
 class LDAPTools:
 

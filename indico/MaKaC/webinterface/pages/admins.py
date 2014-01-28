@@ -1840,12 +1840,8 @@ class WGroupDetails(wcomponents.WTemplated):
         vars["locator"] = self._group.getLocator().getWebForm()
         vars["obsolete"] = self._group.isObsolete()
         vars["groupId"] = self._group.getId()
-        try:
-            vars["members"] = fossilize(self._group.getMemberList())
-            vars["groupExists"] = True
-        except NotFoundError as e:
-            vars["members"] = []
-            vars["groupExists"] = False
+        vars["members"] = fossilize(self._group.getMemberList())
+        vars["groupExists"] = self._group.exists()
         return vars
 
 

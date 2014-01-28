@@ -167,6 +167,10 @@ class Group(Persistent, Fossilizable):
         d["groupId"] = self.getId()
         return d
 
+    def exists(self):
+        return True
+
+
 class _GroupFFName(filters.FilterField):
     _id="name"
 
