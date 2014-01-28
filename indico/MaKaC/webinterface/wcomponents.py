@@ -4208,7 +4208,7 @@ class WRoomBookingBookingList(WTemplated):  # Standalone version
         #                  (not self._rh._ofMyRooms and not self._rh._onlyMy) ) and \
         #                  not self._rh._search
 
-        showEmptyDays = showEmptyRooms = not (self._rh._newBooking or self._rh._onlyMy)
+        showEmptyDays = showEmptyRooms = not self._rh._newBooking
 
         # Calendar related stuff ==========
 

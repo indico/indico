@@ -1033,7 +1033,7 @@ type("RoomBookingPrevNext", [],
                     'class': 'toggle',
                     'text': $T('Hide empty rooms/days'),
                     'data': {
-                        'state': $.jStorage.get(keyHideEmpty, false)
+                        'state': $.jStorage.get(keyHideEmpty, true)
                     }
                 }).on('menu_toggle', toggleHideEmpty).appendTo(filterDropdown);
 
