@@ -20,7 +20,8 @@
 from datetime import datetime, timedelta
 import MaKaC.common.indexes as indexes
 from indico.core.db import DBMgr
-from MaKaC.webinterface import mail, urlHandlers
+from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from indico.modules.scheduler import Scheduler
 from indico.modules.scheduler.tasks import OneShotTask
@@ -110,43 +111,37 @@ class PendingHolder(object):
         return self._getTasksIdx().matchTask(email) != []
 
 
-class _PendingNotification(object):
+class _PendingNotification(GenericNotification):
 
-    def __init__( self, psList ):
+    def __init__(self, psList):
         self._psList = psList
-        self._participationsByConf=self._calculateParticipationsByConf()
-        self._forceIndicoFromAddress=len(self._participationsByConf)>1
-        self._ccList = []
+        self._participationsByConf = self._calculateParticipationsByConf()
+        self._forceIndicoFromAddress = len(self._participationsByConf) > 1
+        data = {}
+        data["subject"] = "[Indico] User account creation required"
+        data["toList"] = [self._psList[0].getEmail()]
+        GenericNotification.__init__(self, data)
 
     def getFromAddr(self):
         # TODO: There will be on "from address" from a conference, but what if there are more different conferences
         supEmail = self._psList[0].getConference().getSupportInfo().getEmail(returnNoReply=True)
-        if self._forceIndicoFromAddress or supEmail.strip()=="":
+        if self._forceIndicoFromAddress or supEmail.strip() == "":
             info = HelperMaKaCInfo.getMaKaCInfoInstance()
-            return "%s <%s>"%(info.getTitle(), Config.getInstance().getSupportEmail())
+            return "%s <%s>".format(info.getTitle(), Config.getInstance().getSupportEmail())
         return supEmail
 
-    def getToList( self ):
-        return [self._psList[0].getEmail()]
-
-    def getCCList(self):
-        return []
-
-    def getSubject( self ):
-        return "[Indico] User account creation required"
-
-    def getBody( self ):
-        """We must implement the body of the email depending of the type of queue"""
+    def getBody(self):
+        # We must implement the body of the email depending of the type of queue
         pass
 
     def _calculateParticipationsByConf(self):
-        d={}
+        d = {}
         for ps in self._psList:
-            conf=ps.getConference()
-            if d.has_key(conf):
+            conf = ps.getConference()
+            if conf in d:
                 d[conf].append(ps)
             else:
-                d[conf]=[ps]
+                d[conf] = [ps]
         return d
 
 
