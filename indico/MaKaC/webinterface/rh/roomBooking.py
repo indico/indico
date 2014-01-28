@@ -2081,7 +2081,7 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
             tmpConfirmed = resv.isConfirmed
             resv.isConfirmed = None
             if resv.getCollisions( sansID = resv.id, boolResult = True ):
-                resv.rejectionReason = "Your PRE-booking conflicted with exiting booking. (Please note it IS possible even if you were the first one to PRE-book the room)."
+                resv.rejectionReason = "Your PRE-booking conflicted with an existing booking. (Please note it IS possible even if you were the first one to PRE-book the room)."
                 resv.reject()    # Just sets isRejected = True
                 resv.update()
                 emailsToBeSent += resv.notifyAboutRejection()
