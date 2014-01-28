@@ -30,6 +30,7 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.webinterface.pages.base import WPBase
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.util.fossilize import fossilize
 
 import inspect
 from MaKaC.registration import LabelInput
@@ -451,6 +452,9 @@ class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
         self._currentUser = user
         self._conf = conf
 
+    def getSections(self):
+        return self._conf.getRegistrationForm().getSortedForms()
+
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
         regForm = self._conf.getRegistrationForm()
@@ -459,6 +463,7 @@ class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
         wvars["currency"] = self._conf.getRegistrationForm().getCurrency()
         wvars["postURL"] = quoteattr(str(urlHandlers.UHConfRegistrationFormCreation.getURL(self._conf)))
         wvars["conf"] = self._conf
+        wvars['sections'] = fossilize(section for section in self.getSections() if section.isEnabled())
         return wvars
 
 
@@ -466,6 +471,7 @@ class WConfRegistrationFormPreview(WConfRegistrationFormDisplay):
 
     def getVars(self):
         wvars = WConfRegistrationFormDisplay.getVars(self)
+        wvars["sections"] = fossilize(WConfRegistrationFormDisplay.getSections(self))
         return wvars
 
     def getHTML(self):

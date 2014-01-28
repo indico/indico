@@ -1,6 +1,7 @@
 <div ng-app="nd" ng-controller="AppCtrl">
     <div nd-reg-form
         conf-id="${conf.getId()}"
+        conf-sections="${sections | n, j, h}"
         conf-sdate="${conf.getStartDate()}"
         conf-edate="${conf.getEndDate()}"
         conf-currency="${currency}"

@@ -115,25 +115,22 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
         scope: {
             confId: '@',
+            confCurrency: '@',
+            confSections: '@',
             confSdate: '@',
             confEdate: '@',
             editMode: '=',
             updateMode: '=',
-            confCurrency: '@',
             postUrl: '='
         },
 
         controller: function($scope, $resource) {
+            $scope.sections = $scope.$eval($scope.confSections);
+
             $rootScope.confId = $scope.confId;
             $rootScope.confSdate = $scope.confSdate;
             $rootScope.confEdate = $scope.confEdate;
             $rootScope.editMode = $scope.editMode;
-
-            if ($rootScope.editMode) {
-                $scope.sections = regFormFactory.Sections.getAllSections({confId: $scope.confId}, {});
-            } else {
-                $scope.sections = regFormFactory.Sections.getVisibleSections({confId: $scope.confId}, {});
-            }
 
             $scope.dialogs = {
                 addsection: false,

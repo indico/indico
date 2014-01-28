@@ -8,6 +8,7 @@
     <div ng-app="nd" ng-controller="AppCtrl">
         <div nd-reg-form
             conf-id="${conf.getId()}"
+            conf-sections="${sections | n, j, h}"
             conf-currency="${currency}"
             post-url='${postURL}'
             update-mode="true"></div>
