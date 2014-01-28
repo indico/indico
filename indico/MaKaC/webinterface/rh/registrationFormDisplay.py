@@ -105,7 +105,6 @@ class RHRegistrationFormDisplay(RHRegistrationFormDisplayBase):
         else:
             if self._conf.getRegistrationForm().isFull():
                 p = registrationForm.WPRegistrationFormFull(self, self._conf)
-                return registrationForm.WPRegistrationFormFull(self, self._conf)
             elif not self._conf.getRegistrationForm().inRegistrationPeriod() or \
                     (self._conf.getModPay().isActivated() and
                      self._conf.getRegistrationForm().getCurrency() == "not selected"):
