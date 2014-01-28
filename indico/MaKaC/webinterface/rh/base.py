@@ -510,7 +510,7 @@ class RH(RequestHandlerBase):
         profile_name, res = '', ''
         # old code gets parameters from call
         # new code utilizes of flask.request
-        if inspect.getargspec(self._checkParams).args == ['self']:
+        if len(inspect.getargspec(self._checkParams).args) < 2:
             self._checkParams()
         else:
             self._checkParams(self._reqParams)
