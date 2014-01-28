@@ -2871,6 +2871,9 @@ class Tab:
         self._hidden = hidden
         self._className = className
 
+    def __repr__(self):
+        return '<Tab(%s, %s, %s, %s)>' % (self._id, self._caption, self._url, int(self.isActive()))
+
     def getId( self ):
         return self._id
 
@@ -2939,7 +2942,9 @@ class WTabControl(WTemplated):
     def _getTabs(self):
         tabs = []
         for tab in self._tabCtrl.getTabList():
-            if not tab.isEnabled() or tab.isHidden():
+            if (not tab.isEnabled() or tab.isHidden()) and not tab.isActive():
+                # The active tab may never be skipped. If we skipped it jQuery would consider the first tab active and
+                # send an AJAX request to load its contents, which would break the whole page.
                 continue
             tabs.append((tab.getCaption(), tab.getURL(), tab.isActive(), tab.getClassName()))
         return tabs
@@ -2947,10 +2952,10 @@ class WTabControl(WTemplated):
     def _getActiveTabId(self):
         skipped = 0
         for i, tab in enumerate(self._tabCtrl.getTabList()):
-            if not tab.isEnabled() or tab.isHidden():
-                skipped += 1
             if tab.isActive():
                 return i - skipped
+            if not tab.isEnabled() or tab.isHidden():
+                skipped += 1
         return 0
 
     def _getActiveTab(self):
