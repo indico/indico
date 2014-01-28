@@ -50,12 +50,12 @@
 
       $('#eTicketShowInConferenceMenu').html(new SwitchOptionButton('registration.eticket.setShowInConferenceMenu',
                                                                     {conference: '${conf.getId()}'},
-                                                                    $T('Give the possibility to the user of downloading the e-ticket PDF from the conference homepage menu'),
+                                                                    $T('Allow users to download their e-ticket from the conference homepage menu'),
                                                                     $T("Saved"), null, false).draw());
 
       $('#eTicketShowAfterRegistration').html(new SwitchOptionButton('registration.eticket.setShowAfterRegistration',
                                                                      {conference: '${conf.getId()}'},
-                                                                     $T('Give the possibility to the user of downloading the e-ticket PDF from the summary page right after registration'),
+                                                                     $T('Allow users to download their e-ticket from the summary page right after registration'),
                                                                      $T("Saved"), null, false).draw());
 
       $('#enableEticket').on("click", function(){

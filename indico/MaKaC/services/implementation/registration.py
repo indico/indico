@@ -84,7 +84,7 @@ class ConferenceEticketQRCode(RegistrationModifBase):
         consumers = dict((consumer.getName(), consumer) for consumer in ConsumerHolder().getList())
 
         if "indico-checkin" not in consumers:
-            raise NoReportError(_("There is not indico-checkin consumer key for OAuth"))
+            raise NoReportError(_("There is no indico-checkin consumer key for OAuth"))
 
         # QRCode (Version 6 with error correction L can contain up to 106 bytes)
         qr = QRCode(
