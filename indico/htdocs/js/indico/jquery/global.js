@@ -70,6 +70,10 @@ $(document).ready(function() {
             },
             hide: {
                 event: "mouseleave"
+            },
+            onHide: function() {
+                // If the parent element is destroyed we need to destroy the qTip too
+                $(this).qtip('destroy');
             }
         }, event);
     });
