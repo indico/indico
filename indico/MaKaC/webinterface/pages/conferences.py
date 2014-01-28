@@ -7559,6 +7559,9 @@ class WPConfModifRoomBookingBase( WPConferenceModifBase ):
         return WPConferenceModifBase.getJSFiles(self) + \
                self._includeJSPackage('RoomBooking')
 
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['roombooking_sass'].urls()
+
     def _getHeadContent( self ):
         """
         !!!! WARNING
