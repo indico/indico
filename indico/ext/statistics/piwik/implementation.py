@@ -18,12 +18,12 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import indico.ext.statistics.piwik
+from flask import request
 
 from indico.ext.statistics.base.implementation import BaseStatisticsImplementation, JSHookBase
 
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.i18n import _
-from MaKaC.webinterface.urlHandlers import UHFileAccess
 from MaKaC.conference import LocalFile
 
 
@@ -195,7 +195,7 @@ class PiwikStatisticsImplementation(BaseStatisticsImplementation):
         from indico.ext.statistics.piwik.queries import PiwikQueryTrackDownload
         tracker = PiwikQueryTrackDownload()
 
-        downloadLink = str(UHFileAccess().getURL(material)) if isinstance(material, LocalFile) else material.getURL()
+        downloadLink = request.url if isinstance(material, LocalFile) else material.getURL()
         downloadTitle = _('Download') + ' - ' + (material.getFileName() if isinstance(material, LocalFile) else material.getURL())
 
         tracker.trackDownload(downloadLink, downloadTitle)

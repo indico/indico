@@ -40,7 +40,7 @@ event.add_url_rule('/call-for-abstracts/<abstractId>/recover', 'abstractWithdraw
 
 # View abstract
 event.add_url_rule('/call-for-abstracts/<abstractId>/', 'abstractDisplay', CFADisplay.RHAbstractDisplay)
-event.add_url_rule('/call-for-abstracts/<abstractId>/file/<resId>', 'abstractDisplay-getAttachedFile',
+event.add_url_rule('/call-for-abstracts/<abstractId>/file/<resId>.<fileExt>', 'abstractDisplay-getAttachedFile',
                    CFADisplay.RHGetAttachedFile)
 event.add_url_rule('/call-for-abstracts/<abstractId>/Abstract.pdf', 'abstractDisplay-pdf',
                    CFADisplay.RHAbstractDisplayPDF)
