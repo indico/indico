@@ -17,7 +17,7 @@
 
 var ndDirectives = angular.module("ndDirectives", []);
 
-ndDirectives.directive("ndDialog", function() {
+ndDirectives.directive("ndDialog", function($http, $compile, $timeout) {
     return {
         restrict: 'E',
         scope: {
@@ -59,34 +59,65 @@ ndDirectives.directive("ndDialog", function() {
         },
 
         link: function(scope, element) {
-            var dialog = new ExclusivePopupWithButtons(
-                scope.heading,
-                scope.actions.cancel,
-                false,
-                false,
-                true
-            );
+            var dialog;
 
-            dialog._onClose = function() {};
+            var initDialog = function() {
+                dialog = new ExclusivePopupWithButtons(
+                    scope.heading,
+                    scope.actions.cancel,
+                    false,
+                    false,
+                    true
+                );
 
-            dialog._getButtons = function() {
-                var buttons = [];
+                dialog._onClose = function() {};
 
-                buttons.push([scope.okButton, function() {
-                    scope.actions.ok();
-                }]);
+                dialog._getButtons = function() {
+                    var buttons = [];
+                    var ok = scope.okButton || $T('Ok');
+                    var cancel = scope.cancelButton || $T('Cancel');
 
-                if (!scope.okOnly) {
-                    buttons.push([scope.cancelButton, function() {
-                        scope.actions.cancel();
+                    buttons.push([ok, function() {
+                        scope.actions.ok();
                     }]);
-                }
 
-                return buttons;
+                    if (!scope.okOnly) {
+                        buttons.push([cancel, function() {
+                            scope.actions.cancel();
+                        }]);
+                    }
+
+                    return buttons;
+                };
+
+                dialog.draw = function() {
+                    return this.ExclusivePopupWithButtons.prototype.draw.call(this, element);
+                };
             };
 
-            dialog.draw = function() {
-                return this.ExclusivePopupWithButtons.prototype.draw.call(this, element);
+            var openDialog = function() {
+                if (dialog) {
+                    showDialog();
+                } else {
+                    $http.get(
+                        scope.templateUrl, {}
+                    ).success(function(response, status, header, config) {
+                        element = angular.element(response);
+                        $compile(element)(scope);
+                        initDialog();
+                        showDialog();
+                    }). error(function(data, status, header, config) {
+                        console.error('error');
+                    });
+                }
+            };
+
+            var showDialog = function() {
+                scope.actions.init();
+                dialog.open();
+                $timeout(function() {
+                    dialog.center();
+                }, 0);
             };
 
             scope.setSelectedTab = function(tab_id) {
@@ -99,27 +130,11 @@ ndDirectives.directive("ndDialog", function() {
 
             scope.$watch("show", function(val) {
                 if (scope.show === true) {
-                    scope.actions.init();
-                    dialog.open();
-                } else {
+                    openDialog();
+                } else if (dialog) {
                     dialog.close();
                 }
             });
-
-            scope.$watch('heading', function(val) {
-                dialog.title = val;
-                dialog.canvas = null;
-            });
-
-            scope.$watch('okButton', function() {
-                scope.okButton = scope.okButton || $T('Ok');
-            });
-
-            scope.$watch('cancelButton', function() {
-                scope.cancelButton = scope.cancelButton || $T('Cancel');
-            });
-
-            dialog.draw();
         }
     };
 });
