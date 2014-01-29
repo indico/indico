@@ -26,7 +26,11 @@ import re
 import sys
 import glob
 import shutil
+import requests
+import json
+import getpass
 from contextlib import contextmanager
+from urlparse import urljoin
 
 from fabric.api import local, lcd, task, env
 from fabric.context_managers import prefix, settings
@@ -35,31 +39,16 @@ from fabric.contrib import console
 
 
 ASSET_TYPES = ['js', 'sass', 'css']
-PYTHONBREW_PATH = os.path.expanduser('~/.pythonbrew')
 DOC_DIRS = ['guides']
-
-DEFAULT_NODE_VERSION = '0.10.24'
-DEFAULT_VERSIONS = ['2.6', '2.7']
-
-# Generated vars
-
-DEFAULT_INDICO_DIR = os.path.dirname(__file__)
-DEFAULT_BUILD_DIR = os.path.join(DEFAULT_INDICO_DIR, 'dist', 'indico-build')
-
 RECIPES = {}
 
-env.update({
-    'global_node': False,
-    'node_version': DEFAULT_NODE_VERSION,
-    'node_env_path': os.path.join(DEFAULT_INDICO_DIR, 'ext_modules', 'node_env'),
-    'versions': DEFAULT_VERSIONS,
-
-    'build_dir': DEFAULT_BUILD_DIR,
-    'src_dir': DEFAULT_INDICO_DIR,
-    'ext_dir': os.path.join(DEFAULT_INDICO_DIR, 'ext_modules'),
-    'target_dir': os.path.join(DEFAULT_INDICO_DIR, 'indico/htdocs'),
-    'system_node': False
-})
+env.conf = 'fabfile.conf'
+env.src_dir = os.path.dirname(__file__)
+execfile(env.conf, {}, env)
+env.build_dir = os.path.join(env.src_dir, env.build_dirname)
+env.ext_dir = os.path.join(env.src_dir, env.ext_dirname)
+env.target_dir = os.path.join(env.src_dir, env.target_dirname)
+node_env_path = os.path.join(env.src_dir, env.node_env_dirname)
 
 
 def recipe(name):
@@ -79,20 +68,14 @@ def node_env():
             yield
 
 
-def pythonbrew():
-    return prefix('. {0}'.format(os.path.join(PYTHONBREW_PATH, 'etc', 'bashrc')))
-
-
 @contextmanager
-def pythonbrew_env(version, env):
-    with pythonbrew():
-        with prefix('pythonbrew venv use {0} -p {1}'.format(env, version)):
-            yield
+def pyenv_env(env):
+    with prefix('pyenv activate {0}'.format(env)):
+        yield
 
 
-def pythonbrew_cmd(cmd, **kwargs):
-    with pythonbrew():
-        return local('pythonbrew {0}'.format(cmd), **kwargs)
+def pyenv_cmd(cmd, **kwargs):
+    return local('pyenv {0}'.format(cmd), **kwargs)
 
 
 # Util functions
@@ -107,48 +90,33 @@ def lib_dir(src_dir, dtype):
     return os.path.join(target_dir, dtype, 'lib')
 
 
-def _check_pythonbrew(versions):
+def _check_pyenv(py_versions):
     """
-    Check that pythonbrew is installed and set up the compilers/virtual envs
+    Check that pyenv is installed and set up the compilers/virtual envs
     in case they do not exist
     """
 
-    try:
-        import pythonbrew
-        HAS_PYTHONBREW = True
-    except ImportError:
-        HAS_PYTHONBREW = False
-
-    if not HAS_PYTHONBREW:
-        print red("Can't find pythonbrew!")
-        print yellow("Are you sure you have installed it? (pip install pythonbrew)")
+    if not os.path.isdir(env.pyenv_dir):
+        print red("Can't find pyenv!")
+        print yellow("Are you sure you have installed it?")
         sys.exit(-2)
 
-    elif not os.path.exists(PYTHONBREW_PATH):
-        print yellow("Running pythonbrew_install")
-        local('pythonbrew_install')
-
     # list available pythonbrew versions
-    av_versions = list(entry.strip() for entry in
-                       pythonbrew_cmd('list', capture=True).split('\n')[1:])
+    av_versions = list(entry.strip() for entry in pyenv_cmd('versions', capture=True).split('\n')[1:])
 
-    for version in versions:
-        if ('Python-' + version) not in av_versions:
-            print green('Installing Python {0}'.format(version))
-            pythonbrew_cmd('install {0}'.format(version), capture=True)
+    for py_version in py_versions:
+        if (py_version) not in av_versions:
+            print green('Installing Python {0}'.format(py_version))
+            pyenv_cmd('install {0}'.format(py_version), capture=True)
 
-        # check envs that are available
-        envs = list(entry.strip() for entry in
-                    pythonbrew_cmd('venv -p {0} list'.format(version), capture=True).split('\n')[1:])
-
-        if 'indico' not in envs:
-            pythonbrew_cmd('venv -p {0} create indico'.format(version))
+        local("echo \'y\' | pyenv virtualenv {0} indico-build-{0}".format(py_version))
 
 
 def _check_present(executable, message="Please install it first."):
     """
     Check that executable exists in $PATH
     """
+
     with settings(warn_only=True):
         if local('which {0} > /dev/null && echo $?'.format(executable), capture=True) != '0':
             print red('{0} is not available in this system. {1}'.format(executable, message))
@@ -341,6 +309,7 @@ def init_submodules(src_dir='.'):
 
     print green("Initializing submodules")
     with lcd(src_dir):
+        local('pwd')
         local('git submodule update --init --recursive')
 
 
@@ -453,43 +422,47 @@ def make_docs(src_dir=None, build_dir=None):
 
 
 @task
-def package_release(versions=None, build_dir=None, system_node=False):
+def package_release(py_versions=None, build_dir=None, system_node=False, indico_versions=None, upstream=None):
     """
     Create an Indico release - source and binary distributions
     """
 
-    versions = versions or env.versions
+    py_versions = py_versions or env.py_versions
     build_dir = build_dir or env.build_dir
-
-    # get current branch
-    current_branch = local('git rev-parse --abbrev-ref HEAD', capture=True)
+    upstream = upstream or env.upstream
+    indico_versions = indico_versions or env.indico_versions
 
     local('mkdir -p {0}'.format(build_dir))
 
-    _check_pythonbrew(versions)
+    _check_pyenv(py_versions)
 
     with lcd(build_dir):
         # clone this same repo
         if os.path.exists(os.path.join(build_dir, 'indico')):
             print yellow("Repository seems to already exist.")
             with lcd('indico'):
-                local('git fetch')
+                local('git fetch {0}'.format(upstream))
+                local('git reset --hard FETCH_HEAD')
+                local('git clean -df')
         else:
-            local('git clone {0} indico'.format(os.path.dirname(__file__)))
+            local('git clone {0}'.format(upstream))
         with lcd('indico'):
-            print green("Checking out branch '{0}'".format(current_branch))
-            local('git checkout origin/{0}'.format(current_branch))
+            for indico_version in indico_versions:
+                print green("Checking out branch \'{0}\'".format(indico_version))
+                local('git checkout origin/{0}'.format(indico_version))
 
-            with settings(system_node=system_node):
-                # Build source tarball
-                tarball(os.path.join(build_dir, 'indico'))
+                with settings(system_node=system_node):
+                    # Build source tarball
+                    tarball(os.path.join(build_dir, 'indico'))
 
-            # Build binaries (EGG)
-            for version in versions:
-                with pythonbrew_env(version, 'indico'):
-                    local('pip -q install -r requirements.txt')
-                    local('python setup.py -q bdist_egg')
-                    pass
-            print green(local('ls -lah dist/', capture=True))
+                # Build binaries (EGG)
+                for py_version in py_versions:
+                    cmd_dir = os.path.join(env.pyenv_dir, 'versions', 'indico-build-{0}'.format(py_version), 'bin')
+                    local('{0} -q install {1} --allow-all-external -r requirements.txt'
+                          .format(os.path.join(cmd_dir, 'pip'),
+                                  ' '.join("--allow-unverified {0}".format(pkg) for pkg in env.unverified)))
+                    local('{0} setup.py -q bdist_egg'.format(os.path.join(cmd_dir, 'python')))
+                local('pwd')
+                print green(local('ls -lah dist/', capture=True))
 
     cleanup(build_dir, force=True)
