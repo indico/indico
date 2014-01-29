@@ -45,7 +45,7 @@
             <span ng-show="item.isPricePerPlace">{{ "per place" | i18n }}</span>
         </td>
     </tr>
-    <tr ng-if="noAvailableEvent()">
+    <tr ng-if="section.selectionType == 'multiple' && noAvailableEvent()">
         <td class="section-placeholder">
             {{ 'There are no social events available' | i18n }}.
         </td>
