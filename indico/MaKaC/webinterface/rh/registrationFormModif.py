@@ -113,18 +113,17 @@ class RHRegistrationFormModifPerformDataModification( RHRegistrationFormModifBas
                                   int( params["eDay"] ) )
             except ValueError,e:
                 raise FormValuesError("The end date you have entered is not correct: %s"%e, "RegistrationForm")
-            if eDate < sDate :
+            if eDate < sDate:
                 raise FormValuesError("End date can't be before start date!", "RegistrationForm")
             try:
                 meDate = None
                 if params["meYear"] or params["meMonth"] or params["meDay"]:
-                    meDate = datetime( int( params["meYear"] ), \
-                                  int( params["meMonth"] ), \
-                                  int( params["meDay"] ) )
-            except ValueError,e:
-                raise FormValuesError("The modification end date you have entered is not correct: %s"%e, "RegistrationForm")
-            if meDate is not None and (meDate < sDate or meDate < eDate):
-                raise FormValuesError("End date must be after end date!", "RegistrationForm")
+                    meDate = datetime(int(params["meYear"]), int(params["meMonth"]), int(params["meDay"]))
+            except ValueError, e:
+                raise FormValuesError("The modification end date you have entered is not correct: %s" % e,
+                                      "RegistrationForm")
+            if meDate is not None and meDate < eDate:
+                raise FormValuesError("Modification end date must be after end date!", "RegistrationForm")
             regForm.setStartRegistrationDate(sDate)
             regForm.setEndRegistrationDate(eDate)
             regForm.setEndExtraTimeAmount(self._extraTimeAmount)

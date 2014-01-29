@@ -1410,18 +1410,16 @@ class RHCFAPerformDataModification( RHConfModifCFABase ):
                                         int( params["eDay"] ) )
             except ValueError,e:
                 raise FormValuesError("The end date you have entered is not correct: %s"%e, "Abstracts")
-            if eDate < sDate :
+            if eDate < sDate:
                 raise FormValuesError("End date can't be before start date!", "Abstracts")
             try:
                 mDate = None
                 if params["mYear"] or params["mMonth"] or params["mDay"]:
-                    mDate = datetime( int( params["mYear"] ), \
-                                  int( params["mMonth"] ), \
-                                  int( params["mDay"] ) )
-            except ValueError,e:
-                raise FormValuesError("The modification end date you have entered is not correct: %s"%e, "Abstracts")
-            if mDate is not None and (mDate < sDate or mDate < eDate):
-                raise FormValuesError("End date must be after end date!", "Abstracts")
+                    mDate = datetime(int(params["mYear"]), int(params["mMonth"]), int(params["mDay"]))
+            except ValueError, e:
+                raise FormValuesError("The modification end date you have entered is not correct: %s" % e, "Abstracts")
+            if mDate is not None and mDate < eDate:
+                raise FormValuesError("Modification end date must be after end date!", "Abstracts")
 
             abMgr.setAnnouncement(params["announcement"])
             abMgr.setModificationDeadline( self._modifDL )
