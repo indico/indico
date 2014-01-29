@@ -82,7 +82,7 @@
             <br/><a href="${ mandatoryUrl }"><img src="${ iconEnabled if areTracksMandatory else iconDisabled }" border="0"> ${ _("Make track selection mandatory") }</a>
             <br/><a href="${ attachUrl }"><img src="${ iconEnabled if canAttachFiles else iconDisabled }" border="0"> ${ _("Allow to attach files") }</a>
             <br/><a href="${ showSpeakerUrl }"><img src="${ iconEnabled if showSelectAsSpeaker else iconDisabled }" border="0"> ${ _("Allow to choose the presenter(s) of the abstracts") }</a>
-            <% makeMandSpk = _("Make mandatory the selection of at least one author as presenter") %>
+            <% makeMandSpk = _("Make the selection of at least one author as presenter mandatory") %>
             % if showSelectAsSpeaker:
                 <br/><a href="${ speakerMandatoryUrl }"><img src="${ iconEnabled if isSelectSpeakerMandatory else iconDisabled }" border="0"> ${makeMandSpk}</a>
             % else:
