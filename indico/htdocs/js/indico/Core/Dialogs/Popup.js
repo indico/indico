@@ -103,10 +103,6 @@ type("ExclusivePopup", ["Printable"], {
         }
     },
 
-    center: function() {
-        this.canvas.dialog("option", "position", "center");
-    },
-
     _getDialogOptions: function() {
         return {};
     },

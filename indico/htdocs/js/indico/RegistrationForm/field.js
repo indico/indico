@@ -552,10 +552,9 @@ ndRegForm.directive('ndYesnoField', function(url) {
 ndRegForm.directive('ndFieldDialog', function(url) {
     return {
         require: 'ndDialog',
-        replace: true,
-        templateUrl: url.tpl('fields/dialogs/base.tpl.html'),
-
         controller: function($scope) {
+            $scope.templateUrl = url.tpl('fields/dialogs/base.tpl.html');
+
             $scope.actions.init = function() {
                 $scope.field = $scope.data;
                 $scope.settings = $scope.config;
@@ -578,7 +577,6 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 });
 
                 $scope.tabSelected = "tab-options";
-
                 $scope.parsePrice();
             };
 

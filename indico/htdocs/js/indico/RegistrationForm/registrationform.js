@@ -266,10 +266,20 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
     };
 });
 
+ndRegForm.directive('ndCurrency', function(url) {
+    return {
+        restrict: 'E',
+        replace: true,
+        templateUrl: url.tpl('currency.tpl.html')
+    };
+});
+
 ndRegForm.directive('ndAddSectionDialog', function(url) {
     return {
         require: 'ndDialog',
-        templateUrl: url.tpl('dialogs/sectioncreation.tpl.html'),
+        controller: function($scope) {
+            $scope.templateUrl = url.tpl('dialogs/sectioncreation.tpl.html');
+        },
 
         link: function(scope) {
             scope.actions.init = function() {
@@ -286,21 +296,17 @@ ndRegForm.directive('ndAddSectionDialog', function(url) {
 ndRegForm.directive('ndManagementDialog', function(url) {
     return {
         require: 'ndDialog',
-        templateUrl: url.tpl('dialogs/sectionmanagement.tpl.html')
+        controller: function($scope) {
+            $scope.templateUrl = url.tpl('dialogs/sectionmanagement.tpl.html');
+        }
     };
 });
 
 ndRegForm.directive('ndErrorDialog', function(url) {
     return {
         require: 'ndDialog',
-        templateUrl: url.tpl('dialogs/errors.tpl.html')
-    };
-});
-
-ndRegForm.directive('ndCurrency', function(url) {
-    return {
-        restrict: 'E',
-        replace: true,
-        templateUrl:  url.tpl('currency.tpl.html')
+        controller: function($scope) {
+            $scope.templateUrl = url.tpl('dialogs/errors.tpl.html');
+        }
     };
 });

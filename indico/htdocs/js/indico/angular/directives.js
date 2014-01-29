@@ -93,6 +93,11 @@ ndDirectives.directive("ndDialog", function($http, $compile, $timeout) {
                 dialog.draw = function() {
                     return this.ExclusivePopupWithButtons.prototype.draw.call(this, element);
                 };
+
+                dialog.postDraw = function() {
+                    this.canvas.dialog('option', 'draggable', false);
+                    this.canvas.dialog('option', 'position', 'center');
+                };
             };
 
             var openDialog = function() {
@@ -104,10 +109,14 @@ ndDirectives.directive("ndDialog", function($http, $compile, $timeout) {
                     ).success(function(response, status, header, config) {
                         element = angular.element(response);
                         $compile(element)(scope);
-                        initDialog();
-                        showDialog();
+                        $timeout(function(){
+                            initDialog();
+                            showDialog();
+                        }, 0);
                     }). error(function(data, status, header, config) {
-                        console.error('error');
+                        scope.show = false;
+                        var msg = $T('The content of this dialog is currently unavailable.');
+                        new AlertPopup(scope.heading, msg).open();
                     });
                 }
             };
@@ -115,9 +124,6 @@ ndDirectives.directive("ndDialog", function($http, $compile, $timeout) {
             var showDialog = function() {
                 scope.actions.init();
                 dialog.open();
-                $timeout(function() {
-                    dialog.center();
-                }, 0);
             };
 
             scope.setSelectedTab = function(tab_id) {

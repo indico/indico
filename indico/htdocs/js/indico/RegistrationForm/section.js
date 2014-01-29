@@ -304,7 +304,6 @@ ndRegForm.directive("ndAccommodationSection", function($rootScope) {
 
             scope.dialogs.config.formData.push('arrivalOffsetDates');
             scope.dialogs.config.formData.push('departureOffsetDates');
-            scope.dialogs.config.contentWidth = 615;
             scope.dialogs.config.tabs = [
                 {id: 'config', name: $T("Configuration"), type: 'config' },
                 {id: 'editAccomodation', name: $T("Edit accommodations"), type: 'editionTable' }
@@ -465,8 +464,6 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
                 {id: 'editSessions', name: $T("Manage sessions"), type: 'editionTable'}
             ];
 
-            scope.dialogs.config.contentWidth = 750;
-
             scope.dialogs.config.editionTable = {
                 sortable: false,
                 colNames:[$T('caption'),$T('billable'),$T('price'), $T('enabled')],
@@ -561,7 +558,6 @@ ndRegForm.directive("ndSocialEventSection", function() {
                 return false;
             };
 
-            scope.dialogs.config.contentWidth = 800;
             scope.dialogs.config.formData.push('introSentence');
             scope.dialogs.config.formData.push('selectionType');
             scope.dialogs.config.tabs = [
@@ -678,10 +674,9 @@ ndRegForm.directive("ndSocialEventSection", function() {
 ndRegForm.directive('ndSectionDialog', function(url) {
     return {
         require: 'ndDialog',
-        replace: true,
-        templateUrl: url.tpl('sections/dialogs/base.tpl.html'),
 
         controller: function($scope) {
+            $scope.templateUrl = url.tpl('sections/dialogs/base.tpl.html');
             $scope.actions.init = function() {
                 $scope.section = $scope.data;
 
