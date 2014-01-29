@@ -131,3 +131,33 @@ def sanitize_for_platypus(text):
     # Convert to XHTML
     doc = html.fromstring(res)
     return etree.tostring(doc)
+
+
+# TODO: reference implementation from MaKaC
+# but, it's not totally correct according to RFC, see test cases
+# However, this regex is pretty good in term of practicality
+# but it may be updated to cover all cases
+VALID_EMAIL_REGEX = re.compile(r"""[-a-zA-Z0-9!#$%&'*+/=?\^_`{|}~]+
+                                   (?:.[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+)*
+                                   @
+                                   (?:[a-zA-Z0-9](?:[-a-zA-Z0-9]*[a-zA-Z0-9])?.)+
+                                   [a-zA-Z0-9](?:[-a-zA-Z0-9]*[a-zA-Z0-9])?""", re.X)
+
+
+def is_valid_mail(emails_string, multi=True):
+    """
+    Checks the validity of an email address or a series of email addresses
+
+    - emails_string: a string representing a single email address or several
+    email addresses separated by separators
+    - multi: flag if multiple email addresses are allowed
+
+    Returns True if emails are valid.
+    """
+
+    emails = re.split(r'[\s;,]+', emails_string)
+
+    if not multi and len(emails) > 1:
+        return False
+
+    return all(re.match(VALID_EMAIL_REGEX, email) for email in emails if email)
