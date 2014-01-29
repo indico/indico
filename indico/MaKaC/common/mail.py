@@ -101,8 +101,8 @@ class GenericMailer:
             raise MaKaCError(_("Unknown MIME type: %s") % (ct))
         msg.attach(part1)
 
-        attachments = notification.getAttachments()
-        if attachments:
+        if hasattr(notification, 'getAttachments'):
+            attachments = notification.getAttachments() or []
             for attachment in attachments:
                 part2 = MIMEApplication(attachment["binary"])
                 part2.add_header("Content-Disposition",
