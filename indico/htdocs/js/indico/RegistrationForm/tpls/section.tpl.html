@@ -58,7 +58,7 @@
             ng-include="getTpl('sections/reason.tpl.html')">
         </div>
         <div ng-switch-when="sessions"
-            ng-include="getTpl('sections/sessions.tpl.html')">
+            ng-include="getTpl('sections/sessions_{0}.tpl.html'.format(section.type))">
         </div>
         <div ng-switch-when="socialEvents"
             ng-include="getTpl('sections/socialevents.tpl.html')">
