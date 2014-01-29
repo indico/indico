@@ -253,9 +253,11 @@ class ICollaborationMetadataFossil(IFossil):
 
     def getStartDate(self):
         pass
+    getStartDate.produce = lambda s: s.getStartDate() or s.getConference().getStartDate()
 
     def getEndDate(self):
         pass
+    getEndDate.produce = lambda s: s.getEndDate() or s.getConference().getEndDate()
 
     def _getTitle(self):
         pass
