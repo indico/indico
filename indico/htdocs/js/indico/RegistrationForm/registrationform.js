@@ -86,8 +86,6 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionurl, displ
         },
         Sections: $resource(sectionurl, {confId: '@confId', sectionId: "@sectionId"}, {
             "remove": {url: sectionurl, method: 'DELETE', isArray: true},
-            "getAllSections": {method: 'GET', isArray: true},
-            "getVisibleSections": {url: displayurl, method: 'GET', isArray: true},
             "enable": {method: 'POST', url: sectionurl + "/enable"},
             "disable": {method: 'POST', url: sectionurl + "/disable"},
             "move": {method: 'POST', url: sectionurl + "/move"},

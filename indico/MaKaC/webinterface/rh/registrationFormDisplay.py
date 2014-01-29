@@ -114,12 +114,6 @@ class RHRegistrationFormDisplay(RHRegistrationFormDisplayBase):
         return p.display()
 
 
-class RHRegistrationDisplaySectionQuery(RHBaseRegistrationForm):
-
-    def _process(self):
-        return json.dumps(fossilize(section for section in self._regForm.getSortedForms() if section.isEnabled()))
-
-
 class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 

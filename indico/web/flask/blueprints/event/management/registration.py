@@ -48,11 +48,11 @@ event_mgmt.add_url_rule('/registration/modify', 'confModifRegistrationModificati
 event_mgmt.add_url_rule('/registration/modify/sections',
                         'confModifRegistrationModificationSection-query',
                         registrationFormModif.RHRegistrationModificationSectionQuery,
-                        methods=('GET', 'POST'))
+                        methods=('POST',))
 event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>',
-                        'confModifRegistrationModificationSection-modify',
-                        registrationFormModif.RHRegistrationModificationSection,
-                        methods=('GET', 'POST', 'DELETE'))
+                        'confModifRegistrationModificationSection-delete',
+                        registrationFormModif.RHRegistrationDeleteSection,
+                        methods=('DELETE',))
 event_mgmt.add_url_rule('/registration/modify/sections/<sectionId>/enable',
                         'confModifRegistrationModificationSection-enable',
                         registrationFormModif.RHRegistrationFormSectionEnable,

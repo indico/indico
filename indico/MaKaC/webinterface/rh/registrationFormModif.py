@@ -359,9 +359,6 @@ class RegistrationFormModifRESTBase(RHRegistrationFormModifBase):
 
 class RHRegistrationModificationSectionQuery(RegistrationFormModifRESTBase):
 
-    def _process_GET(self):
-        return json.dumps(self.getSectionsFossil())
-
     def _checkParams_POST(self):
         post_pm = ParameterManager(request.json)
         self._sectionHeader = {}
@@ -413,10 +410,7 @@ class RHRegistrationFormModifSessionsBase(RegistrationFormModifRESTBase):
         self._section = self._regForm.getSectionById("sessions")
 
 
-class RHRegistrationModificationSection(RHRegistrationFormModifSectionBase):
-
-    def _process_GET(self):
-        return jsonify(fossilize(self._section))
+class RHRegistrationDeleteSection(RHRegistrationFormModifSectionBase):
 
     def _process_DELETE(self):
         if not self._section.isRequired():

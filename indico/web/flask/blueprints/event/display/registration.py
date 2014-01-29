@@ -26,8 +26,6 @@ event.add_url_rule('/registration/registrants', 'confRegistrantsDisplay-list', r
 
 # Registration
 # Sections
-event.add_url_rule('/registration/sections', 'confRegistrationFormDisplaySection-query',
-                   registrationFormDisplay.RHRegistrationDisplaySectionQuery, methods=('GET',))
 event.add_url_rule('/registration/', 'confRegistrationFormDisplay', registrationFormDisplay.RHRegistrationForm)
 event.add_url_rule('/registration/', 'confRegistrationFormDisplay', registrationFormDisplay.RHRegistrationForm)
 event.add_url_rule('/registration/conditions', 'confRegistrationFormDisplay-conditions',
