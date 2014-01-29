@@ -1392,24 +1392,16 @@ class RHCFAPerformDataModification( RHConfModifCFABase ):
             abMgr = self._conf.getAbstractMgr()
             params = self._getRequestParams()
 
-            abMgr.setStartSubmissionDate( datetime( int( params["sYear"] ), \
-                                        int( params["sMonth"] ), \
-                                        int( params["sDay"] ) ))
-            abMgr.setEndSubmissionDate( datetime( int( params["eYear"] ), \
-                                        int( params["eMonth"] ), \
-                                        int( params["eDay"] ) ))
+            abMgr.setStartSubmissionDate(datetime(int(params["sYear"]), int(params["sMonth"]), int(params["sDay"])))
+            abMgr.setEndSubmissionDate(datetime(int(params["eYear"]), int(params["eMonth"]), int(params["eDay"])))
             try:
-                sDate = datetime( int( params["sYear"] ), \
-                                        int( params["sMonth"] ), \
-                                        int( params["sDay"] ) )
-            except ValueError,e:
-                raise FormValuesError("The start date you have entered is not correct: %s"%e, "Abstracts")
+                sDate = datetime(int(params["sYear"]), int(params["sMonth"]), int(params["sDay"]))
+            except ValueError, e:
+                raise FormValuesError("The start date you have entered is not correct: %s" % e, "Abstracts")
             try:
-                eDate = datetime( int( params["eYear"] ), \
-                                        int( params["eMonth"] ), \
-                                        int( params["eDay"] ) )
-            except ValueError,e:
-                raise FormValuesError("The end date you have entered is not correct: %s"%e, "Abstracts")
+                eDate = datetime(int(params["eYear"]), int(params["eMonth"]), int(params["eDay"]))
+            except ValueError, e:
+                raise FormValuesError("The end date you have entered is not correct: %s" % e, "Abstracts")
             if eDate < sDate:
                 raise FormValuesError("End date can't be before start date!", "Abstracts")
             try:
@@ -1422,10 +1414,10 @@ class RHCFAPerformDataModification( RHConfModifCFABase ):
                 raise FormValuesError("Modification end date must be after end date!", "Abstracts")
 
             abMgr.setAnnouncement(params["announcement"])
-            abMgr.setModificationDeadline( self._modifDL )
-            abMgr.getSubmissionNotification().setToList( utils.getEmailList(params.get("toList", "")) )
-            abMgr.getSubmissionNotification().setCCList( utils.getEmailList(params.get("ccList", "")) )
-            self._redirect( urlHandlers.UHConfModifCFA.getURL( self._conf ) )
+            abMgr.setModificationDeadline(self._modifDL)
+            abMgr.getSubmissionNotification().setToList(utils.getEmailList(params.get("toList", "")))
+            abMgr.getSubmissionNotification().setCCList(utils.getEmailList(params.get("ccList", "")))
+            self._redirect(urlHandlers.UHConfModifCFA.getURL(self._conf))
 
 
 class AbstractStatusFilter( filters.FilterField ):

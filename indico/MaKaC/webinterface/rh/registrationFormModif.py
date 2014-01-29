@@ -102,17 +102,13 @@ class RHRegistrationFormModifPerformDataModification( RHRegistrationFormModifBas
             regForm = self._conf.getRegistrationForm()
             params = self._getRequestParams()
             try:
-                sDate = datetime( int( params["sYear"] ), \
-                                  int( params["sMonth"] ), \
-                                  int( params["sDay"] ) )
-            except ValueError,e:
-                raise FormValuesError("The start date you have entered is not correct: %s"%e, "RegistrationForm")
+                sDate = datetime(int(params["sYear"]), int(params["sMonth"]), int(params["sDay"]))
+            except ValueError, e:
+                raise FormValuesError("The start date you have entered is not correct: %s" % e, "RegistrationForm")
             try:
-                eDate = datetime( int( params["eYear"] ), \
-                                  int( params["eMonth"] ), \
-                                  int( params["eDay"] ) )
-            except ValueError,e:
-                raise FormValuesError("The end date you have entered is not correct: %s"%e, "RegistrationForm")
+                eDate = datetime(int(params["eYear"]), int(params["eMonth"]), int(params["eDay"]))
+            except ValueError, e:
+                raise FormValuesError("The end date you have entered is not correct: %s" % e, "RegistrationForm")
             if eDate < sDate:
                 raise FormValuesError("End date can't be before start date!", "RegistrationForm")
             try:
