@@ -111,7 +111,8 @@ event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/withdraw', '
 
 # Abstract: Track judgments
 event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/tracks/judgements',
-                        'abstractManagment-trackProposal', abstractModif.RHAbstractTrackManagment)
+                        'abstractManagment-trackProposal', abstractModif.RHAbstractTrackManagment,
+                        methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/tracks/ratings', 'abstractManagment-orderByRating',
                         abstractModif.RHAbstractTrackOrderByRating)
 
