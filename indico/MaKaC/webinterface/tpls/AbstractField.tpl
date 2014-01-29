@@ -55,7 +55,7 @@
                 <input id=${fid} name=${fid} value="${fdict[fid]}" style="width:100%">
             % elif field.getType() == "selection":
                 <select id=${fid} name=${fid}>
-                    <% nooption = "{}...".format(_("Choose")) %>
+                    <% nooption = "{0}...".format(_("Choose")) %>
                     <% selected = "selected" if fdict[fid] == "" else "" %>
                     <% disabled = "disabled" if field.isMandatory() else "" %>
                     <option value="" ${disabled} ${selected}>${nooption}</option>

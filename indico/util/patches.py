@@ -38,7 +38,7 @@ def _version_data(ver):
         m = m.groups()
         return (m[0], int(m[1]), int(m[2]))
     else:
-        raise Exception("Wrong version specification: '{}'".format(ver))
+        raise Exception("Wrong version specification: '{0}'".format(ver))
 
 
 def _version_matches(my_ver, op, rule_ver):
