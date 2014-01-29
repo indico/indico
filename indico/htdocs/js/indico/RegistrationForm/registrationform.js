@@ -53,15 +53,6 @@ ndRegForm.config(function(urlProvider) {
     urlProvider.setModulePath('/js/indico/RegistrationForm');
 });
 
-// Hack for disabling cache in Internet Explorer
-ndRegForm.config(['$httpProvider', function($httpProvider) {
-    if (!$httpProvider.defaults.headers.get) {
-        $httpProvider.defaults.headers.get = {};
-    }
-    //disable IE ajax request caching
-    $httpProvider.defaults.headers.get['If-Modified-Since'] = '0';
-}]);
-
 ndRegForm.factory('regFormFactory', function($resource, $http, editionurl, displayurl, userurl) {
     var defaults = $http.defaults.headers;
     defaults.common = defaults.common || {};
@@ -97,8 +88,12 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionurl, displ
             "disable": {method:'POST', url: fieldurl + "/disable"},
             "move": {method:'POST', url: fieldurl + "/move"}
         }),
-        Sessions: $resource(sessionsurl, {confId: '@confId'}, {}),
-        UserData: $resource(userurl, {confId: '@confId'}, {})
+        Sessions: $resource(sessionsurl, {confId: '@confId'}, {
+            "query": {method:'GET', isArray: true, cache: false},
+        }),
+        UserData: $resource(userurl, {confId: '@confId'}, {
+            "query": {method:'GET', isArray: true, cache: false},
+        })
     };
 });
 
