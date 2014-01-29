@@ -107,6 +107,9 @@ class _AbstractSubmissionNotification:
         self._conf = self._abstract.getConference()
         self._subject = _("Abstract submission confirmation (%s)") % self._conf.getTitle()
 
+    def getAttachments(self):
+        return []
+
     def getSubject(self):
         return self._subject
 
