@@ -543,7 +543,7 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
                                 escape(jud.getResponsible().getFullName()) ) )
                 conflictText = ",\n".join(l)
         elif isinstance(status, _ASTrackViewIC):
-            st = self.htmlText(status.getLabel().upper())
+            st = status.getLabel().upper()
         elif isinstance(status, _ASTrackViewDuplicated):
             orig = status.getOriginal()
             st =  "%s (%s : %s)"%(status.getLabel().upper(), orig.getId(), orig.getTitle())
