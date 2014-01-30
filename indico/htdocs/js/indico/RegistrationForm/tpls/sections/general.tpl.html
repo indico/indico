@@ -14,3 +14,14 @@
         <div ng-include="tplGeneralField"/>
     </div>
 </div>
+
+<div ng-if="filtered.length === 0" ng-switch="editMode" class="section-placeholder">
+    <span ng-switch-default>
+        {{ 'This section doesn\'t contain any field' | i18n }}
+    </span>
+    <span ng-switch-when="true">
+        {{ 'Press the ' | i18n }}
+        <i class="icon-plus"></i>
+        {{ ' button to add fields' | i18n }}
+    </span>
+</div>
