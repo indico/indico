@@ -293,11 +293,18 @@ ndRegForm.directive('ndAddSectionDialog', function(url) {
     };
 });
 
-ndRegForm.directive('ndManagementDialog', function(url) {
+ndRegForm.directive('ndSectionManagementDialog', function(url) {
     return {
         require: 'ndDialog',
         controller: function($scope) {
             $scope.templateUrl = url.tpl('dialogs/sectionmanagement.tpl.html');
+        },
+        link: function(scope) {
+            scope.$watch('disabled.length', function(val) {
+                if (val === 0) {
+                    scope.show = false;
+                }
+            });
         }
     };
 });
