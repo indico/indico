@@ -229,6 +229,7 @@ ndRegForm.directive("ndGeneralSection", function($timeout, url, sortableoptions)
 ndRegForm.directive("ndPersonalDataSection", function() {
     return {
         require: 'ndGeneralSection',
+        priority: -1,
         link: function(scope) {
             scope.buttons.disable = false;
         }
