@@ -89,10 +89,10 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionurl, displ
             "move": {method:'POST', url: fieldurl + "/move"}
         }),
         Sessions: $resource(sessionsurl, {confId: '@confId'}, {
-            "query": {method:'GET', isArray: true, cache: false},
+            "query": {method:'GET', isArray: true, cache: false}
         }),
         UserData: $resource(userurl, {confId: '@confId'}, {
-            "query": {method:'GET', isArray: true, cache: false},
+            "query": {method:'GET', isArray: true, cache: false}
         })
     };
 });
@@ -117,7 +117,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             postUrl: '='
         },
 
-        controller: function($scope, $resource) {
+        controller: function($scope, $resource, $location, $anchorScroll) {
             $scope.sections = $scope.$eval($scope.confSections);
 
             $rootScope.confId = $scope.confId;
@@ -164,6 +164,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         regFormFactory.processResponse(newsection, {
                             success: function(newsection)  {
                                 $scope.sections.push(newsection);
+                                $location.hash(newsection.id);
+                                $anchorScroll();
                             }
                         });
                     });
