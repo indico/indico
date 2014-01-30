@@ -497,7 +497,6 @@ ndRegForm.directive('ndTelephoneField', function(url) {
             $scope.tplInput = url.tpl('fields/telephone.tpl.html');
         },
         link: function(scope) {
-            scope.settings.size = true;
             scope.settings.formData.push(['values', 'length']);
         }
     };
