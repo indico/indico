@@ -73,6 +73,8 @@ i18n.setLocale('en_GB')
 
 def since(version, always=False, never=False):
     def _since(f):
+        if not f.__doc__:
+            raise ValueError('Function {0} has no docstring'.format(f.__name__))
         MIGRATION_TASKS.append((version, f, always, never))
         return f
     return _since
