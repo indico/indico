@@ -111,27 +111,33 @@
 
     &.danger {
         background: $red;
-        border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
-        color: #EFEFEF !important;
+        border-color: $dark-red;
+        color: #FDFDFD !important;
 
         &:hover:not(.disabled):not(:disabled) {
-            @include gradient(#CF2323, #AF0000);
-            color: #f4f4f4 !important;
-            border-color: #999;
+            @include gradient($red, darken($red, $color-variation));
+            border-color: $dark-red;
             box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
+            color: #FDFDFD !important;
+        }
+
+        &:active:not(.disabled):not(:disabled) {
+            @include gradient(darken($red, $color-variation), $red);
+            border-color: $dark-red;
+            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
         }
     }
 
     &.highlight {
-        color: #FDFDFD !important;
         background: $blue;
         border-color: $dark-blue;
+        color: #FDFDFD !important;
 
         &:hover:not(.disabled):not(:disabled) {
             @include gradient($blue, darken($blue, $color-variation));
-            color: #F4F4F4 !important;
             border-color: $dark-blue;
             box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
+            color: #FDFDFD !important;
         }
 
         &:active:not(.disabled):not(:disabled) {
