@@ -11,7 +11,7 @@
         ng-include="getTpl('toolbar.tpl.html')"></div>
 
     <div ng-model="sections" class="regform-section-list" ui-sortable="sectionSortableOptions">
-        <div ng-repeat="section in sections | filter: {enabled: true}">
+        <div ng-animate="sectionAnimation" ng-repeat="section in sections | filter: {enabled: true}">
             <div ng-switch="section._type">
                 <nd-section nd-general-section
                     ng-switch-default></nd-section>
@@ -33,7 +33,7 @@
 
     <div ng-if="!editMode" align="center">
         <div class="regform-mandatory-info">
-            <span>({{ 'All the fields marked with' | i18n }}</span>
+            <span>({{ 'All the fields marked with ' | i18n }}</span>
             <span class="regFormMandatoryField">*</span>
             <span>{{ ' are mandantory' | i18n }})</span>
         </div>

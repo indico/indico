@@ -119,6 +119,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
         controller: function($scope, $resource, $location, $anchorScroll) {
             $scope.sections = $scope.$eval($scope.confSections);
+            $scope.sectionAnimation = '';
 
             $rootScope.confId = $scope.confId;
             $rootScope.confSdate = $scope.confSdate;
@@ -146,10 +147,6 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                 }
             };
 
-            $scope.getTpl = function(file) {
-                return url.tpl(file);
-            };
-
             $scope.api = {
                 createSection: function(data) {
                     if (data.sectionCreationForm.$invalid === true){
@@ -164,7 +161,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         regFormFactory.processResponse(newsection, {
                             success: function(newsection)  {
                                 $scope.sections.push(newsection);
-                                $location.hash(newsection.id);
+                                $scope.sectionAnimation = 'section-highlight';
+                                $location.hash('section' + newsection.id);
                                 $anchorScroll();
                             }
                         });
@@ -227,6 +225,10 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                 disabled: !$rootScope.editMode,
                 handle: ".regform-section .section-sortable-handle",
                 placeholder: "regform-section-sortable-placeholder"
+            };
+
+            $scope.getTpl = function(file) {
+                return url.tpl(file);
             };
 
             angular.extend($scope.sectionSortableOptions, sortableoptions);

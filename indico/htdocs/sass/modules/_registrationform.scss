@@ -794,3 +794,17 @@ textarea.regFormDescriptionInputMgmt {
         cursor: move;
     }
 }
+
+// ============================================================================
+// Animation-related
+// ============================================================================
+
+.section-header {
+    @include single-transition(background, 1s, ease-out);
+}
+
+.section-highlight-enter {
+    .section-header {
+        background: $yellow;
+    }
+}
