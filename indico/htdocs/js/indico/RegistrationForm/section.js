@@ -27,6 +27,7 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
     };
 
     $scope.sectionApi.disableSection = function(section) {
+        $scope.$parent.animations.recoverSectionButton = 'button-highlight';
         regFormFactory.Sections.disable(getRequestParams(section), function(updatedSection) {
             regFormFactory.processResponse(updatedSection, {
                 success: function(updatedSection)  {

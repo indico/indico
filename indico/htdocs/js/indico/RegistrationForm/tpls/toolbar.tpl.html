@@ -7,7 +7,8 @@
         </a>
         <a ng-click="actions.openManagement()"
             ng-if="(sections | filter:{enabled:'false'}).length > 0"
-            class="i-button icon-settings"
+            ng-animate="animations.recoverSectionButton"
+            class="i-button icon-settings highlightable"
             title="{{ 'Recover/Discard sections' | i18n }}">
             {{ 'Recover sections' | i18n }}
         </a>

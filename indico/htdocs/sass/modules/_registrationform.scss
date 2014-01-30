@@ -799,12 +799,12 @@ textarea.regFormDescriptionInputMgmt {
 // Animation-related
 // ============================================================================
 
-.section-header {
+.section-header,
+.i-button.highlightable {
     @include single-transition(background, 1s, ease-out);
 }
 
-.section-highlight-enter {
-    .section-header {
-        background: $yellow;
-    }
+.section-highlight-enter .section-header,
+.button-highlight-enter {
+    background: $yellow;
 }

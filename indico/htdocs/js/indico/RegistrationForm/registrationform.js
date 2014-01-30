@@ -119,7 +119,6 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
 
         controller: function($scope, $resource, $location, $anchorScroll) {
             $scope.sections = $scope.$eval($scope.confSections);
-            $scope.sectionAnimation = '';
 
             $rootScope.confId = $scope.confId;
             $rootScope.confSdate = $scope.confSdate;
@@ -161,7 +160,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                         regFormFactory.processResponse(newsection, {
                             success: function(newsection)  {
                                 $scope.sections.push(newsection);
-                                $scope.sectionAnimation = 'section-highlight';
+                                $scope.animations.section = 'section-highlight';
                                 $location.hash('section' + newsection.id);
                                 $anchorScroll();
                             }
@@ -237,6 +236,11 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
         link: function(scope, element) {
             scope.validationStarted = false;
             scope.currency = scope.confCurrency;
+
+            scope.animations = {
+                recoverSectionButton: '',
+                section: ''
+            };
 
             // User data retrieval
             if (scope.editMode) {
