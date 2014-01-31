@@ -3741,7 +3741,6 @@ class AccommodationForm(BaseForm, Fossilizable):
         values = {}
         values["title"] = self.getTitle()
         values["description"] = self.getDescription()
-        values["currency"] = self.getCurrency()
         values["enabled"] = self.isEnabled()
         values["aoffset1"] = self.getArrivalOffsetDates()[0]
         values["aoffset2"] = self.getArrivalOffsetDates()[1]

@@ -59,6 +59,6 @@ class ETicket(Persistent):
         e_ticket = ETicket()
         e_ticket.setEnabled(self.isEnabled())
         e_ticket.setAttachedToEmail(self.isAttachedToEmail())
-        e_ticket.showInConferenceMenu(self.isShownInConferenceMenu())
-        e_ticket.showAfterRegistration(self.isShownAfterRegistration())
+        e_ticket.setShowInConferenceMenu(self.isShownInConferenceMenu())
+        e_ticket.setShowAfterRegistration(self.isShownAfterRegistration())
         return e_ticket
