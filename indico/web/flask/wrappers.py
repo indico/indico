@@ -36,7 +36,8 @@ class IndicoRequest(Request):
         """The remote address of the client."""
         with DBMgr.getInstance().global_connection():
             if HelperMaKaCInfo.getMaKaCInfoInstance().useProxy():
-                return self.access_route[0]
+                if self.access_route:
+                    return self.access_route[0]
         return super(IndicoRequest, self).remote_addr
 
     def __repr__(self):
