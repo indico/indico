@@ -512,7 +512,8 @@ class Config:
         'SCSSDebugInfo'             : True,
         'SessionLifetime'           : 86400 * 31,
         'RouteOldUrls'              : False,
-        'CustomCountries'           : {}
+        'CustomCountries'           : {},
+        'PDFLatexProgram'           : 'pdflatex'
     }
 
     if sys.platform == 'win32':

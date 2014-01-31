@@ -41,7 +41,9 @@ from reportlab.lib.fonts import addMapping
 from MaKaC.i18n import _
 from MaKaC.common.utils import isStringHTML
 from MaKaC.common.TemplateExec import render as tpl_render
-import subprocess, shlex, os, tempfile
+import subprocess
+import os
+import tempfile
 from MaKaC.common.logger import Logger
 
 from mako.template import Template
@@ -788,11 +790,13 @@ class LatexRunner(object):
         self.has_toc = has_toc
 
     def run_latex(self, source_file, log_file=None):
-        pdflatex_cmd = 'pdflatex -interaction=nonstopmode -output-directory={1} {0}'.format(
-            source_file, self._dir)
+        pdflatex_cmd = [Config.getInstance().getPDFLatexProgram(),
+                        '-interaction', 'nonstopmode',
+                        '-output-directory', self._dir,
+                        source_file]
 
         try:
-            subprocess.check_call(shlex.split(pdflatex_cmd), stdout=log_file)
+            subprocess.check_call(pdflatex_cmd, stdout=log_file)
             Logger.get('pdflatex').debug("PDF created successfully!")
 
         except subprocess.CalledProcessError, e:
