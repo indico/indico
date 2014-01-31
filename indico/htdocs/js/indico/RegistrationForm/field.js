@@ -179,7 +179,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
 
     $scope.isBillable = function(item) {
         item = item || {};
-        return (item.billable === true || item.isBillable === true) && !$scope.isDisabled(item);
+        return item.billable || item.isBillable;
     };
 
     $scope.isDisabled = function(item) {
