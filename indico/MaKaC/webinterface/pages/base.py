@@ -16,6 +16,9 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+import os
+import posixpath
+
 from flask import request, session
 
 from urlparse import urlparse
@@ -26,12 +29,9 @@ from indico.web import assets
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from indico.core.config import Config
-from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
-import os
-import posixpath
 
 from MaKaC.plugins.base import OldObservable
 from indico.core.db import DBMgr
@@ -117,10 +117,9 @@ class WPBase(OldObservable):
         if not isinstance(pkg_names, list):
             pkg_names = [pkg_names]
 
-        urls = []
-        for pkg_name in pkg_names:
-            urls += self._asset_env['indico_' + pkg_name.lower()].urls()
-        return urls
+        return [url
+                for pkg_name in pkg_names
+                for url in self._asset_env['indico_' + pkg_name.lower()].urls()]
 
     def _getJavaScriptUserData(self):
         """
