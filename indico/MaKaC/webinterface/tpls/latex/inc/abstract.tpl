@@ -92,5 +92,5 @@
 
 ${_("Submitted by {0} on {1}").format(
     r"\textbf{{{0}}}".format(abstract.getSubmitter().getFullName()),
-    r"\textbf{{{0}}}".format(abstract.getSubmissionDate().strftime("%A %d %B %Y")))}}
+    r"\textbf{{{0}}}".format(abstract.getSubmissionDate().strftime("%A %d %B %Y")))}
 \fancyfoot[C]{\color{gray} ${_("Last modified:")} ${abstract.getModificationDate().strftime("%A %d %B %Y")}}
