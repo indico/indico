@@ -7401,27 +7401,27 @@ ul.conveners ul.names .affiliation {
     font-weight: bold;
 }
 
-.offlineTasksGenerated{
+.offlineTasksGenerated {
     text-align: center;
-    width: 65px;
+    width: 80px;
     background: none repeat scroll 0 0 #9AC33A;
 }
 
 .offlineTasksQueued {
     text-align: center;
-    width: 65px;
+    width: 80px;
     background: none repeat scroll 0 0 #A4CCC9;
 }
 
 .offlineTasksFailed {
     text-align: center;
-    width: 65px;
+    width: 80px;
     background: none repeat scroll 0 0 #B93725;
 }
 
 .offlineTasksExpired {
     text-align: center;
-    width: 65px;
+    width: 80px;
     background: none repeat scroll 0 0 #E0A565;
 }
 
