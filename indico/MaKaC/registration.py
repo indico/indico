@@ -1693,7 +1693,7 @@ class LabelInput(FieldInputType, Fossilizable):
             billable = item.isBillable()
             currency = item.getCurrency()
             #pass
-        tmp = """ <td>%s</td><td align="right" align="bottom">""" % self.getModifLabelCol()
+        tmp = """ <td align="right" valign="bottom">"""
         if billable:
             tmp = """%s&nbsp;&nbsp;%s&nbsp;%s</td> """ % (tmp, price, currency)
         else:
