@@ -193,7 +193,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         if (!$scope.hasPlacesLimit(item)) {
             return true;
         } else {
-            return item.noPlacesLeft >= 0;
+            return item.noPlacesLeft > 0;
         }
     };
 
