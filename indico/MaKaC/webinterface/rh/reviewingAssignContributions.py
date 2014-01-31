@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import os
+from MaKaC.errors import NoReportError
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.pages.reviewing import WPConfReviewingAssignContributions
@@ -49,4 +51,6 @@ class RHDownloadAcceptedPapers(RHConferenceModifBase):
     def _process(self):
         p = ReviewingPacker(self._conf)
         path = p.pack(ZIPFileHandler())
+        if not os.path.getsize(path):
+            raise NoReportError(_('There are no accepted papers.'))
         return send_file('accepted-papers.zip', path, 'ZIP', inline=False)
