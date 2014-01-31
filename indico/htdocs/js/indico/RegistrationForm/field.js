@@ -190,7 +190,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
 
     $scope.isRequired = function(item) {
         item = item || {};
-        return item.required && !scope.isDisabled(item);
+        return (item.mandatory || item.required) && !$scope.isDisabled(item);
     };
 
     $scope.hasPlacesLeft = function(item) {
