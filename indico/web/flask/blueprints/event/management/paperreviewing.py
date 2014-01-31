@@ -44,7 +44,9 @@ event_mgmt.add_url_rule('/paper-reviewing/competences/', 'confModifUserCompetenc
 # Assign papers
 event_mgmt.add_url_rule('/paper-reviewing/assign/', 'assignContributions',
                         reviewingAssignContributions.RHReviewingAssignContributionsList)
-event_mgmt.add_url_rule('/paper-reviewing/assign/accepted-papers.zip', 'assignContributions-downloadAcceptedPapers',
+
+# Accepted papers
+event_mgmt.add_url_rule('/paper-reviewing/accepted-papers.zip', 'assignContributions-downloadAcceptedPapers',
                         reviewingAssignContributions.RHDownloadAcceptedPapers)
 
 # Assess papers
