@@ -7,7 +7,7 @@
             name="{{ fieldName }}"
             size="{{ field.values.length }}"
             min="{{ field.values.minValue }}"
-            ng-required="isRequired(field)"
+            ng-required="field.mandatory"
             ng-disabled="paymentBlocked(field, userdata)"
             ng-change="updateSubtotal(numberInput)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}"/>
