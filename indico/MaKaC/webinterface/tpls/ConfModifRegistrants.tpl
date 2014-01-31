@@ -195,34 +195,6 @@ function unselectDisplay()
     }
 }
 
-function selectAll()
-{
-    if (!document.registrantsForm.registrant.length)
-    {
-        document.registrantsForm.registrant.checked=true;
-    }else{
-        for (i = 0; i < document.registrantsForm.registrant.length; i++)
-        {
-            document.registrantsForm.registrant[i].checked=true;
-        }
-    }
-    isSelected("registrantsItems");
-}
-
-function selectNone()
-{
-    if (!document.registrantsForm.registrant.length)
-    {
-        document.registrantsForm.registrant.checked=false;
-    }else{
-        for (i = 0; i < document.registrantsForm.registrant.length; i++)
-        {
-            document.registrantsForm.registrant[i].checked=false;
-        }
-    }
-    isSelected("registrantsItems");
-}
-
 
     function showFilters() {
         if ($E("displayMenu").dom.style.display == "") {
@@ -409,11 +381,15 @@ IndicoUI.executeOnLoad(function(){
     });
 
     $('#selectAll').click(function() {
-        $('#registrantsItems input:visible').prop('checked', true);
+        $('#registrantsItems input:visible').prop('checked', true).trigger('change');
     });
 
     $('#selectNone').click(function() {
-        $('#registrantsItems input:visible').prop('checked', false);
+        $('#registrantsItems input:visible').prop('checked', false).trigger('change');
+    });
+
+    $("#registrantsItems input:visible").on('change', function(){
+        $(this).closest('tr').toggleClass('selected', this.checked);
     });
 });
 
