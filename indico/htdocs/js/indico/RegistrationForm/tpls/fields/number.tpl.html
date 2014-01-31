@@ -3,7 +3,6 @@
         <input type="number"
             ng-model="numberInput"
             ng-init="numberInput = getValue(fieldName)"
-            id="{{ fieldName }}"
             name="{{ fieldName }}"
             size="{{ field.values.length }}"
             min="{{ field.values.minValue }}"
@@ -22,9 +21,7 @@
         <span class="regFormPrice">{{ field.price }}</span>
         <nd-currency currency="currency"></nd-currency>
         <span class="regFormSubtotal">{{ 'Total' | i18n }}:</span>
-        <span id="subtotal">
-            {{ subtotal }}
-        </span>
+        <span ng-init="updateSubtotal(numberInput)">{{ subtotal }}</span>
         <nd-currency currency="currency"></nd-currency>
     </span>
 </div>

@@ -1582,11 +1582,11 @@ class NumberInput(FieldInputType, Fossilizable):
             raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it.") % self.getParent().getCaption())
         if not override and self.getParent().isMandatory() and (not v.isalnum() or int(v) < 0):
             raise FormValuesError(_("The field \"%s\" is mandatory. Please fill it with a number.") % self.getParent().getCaption())
-        if (not v.isalnum() or int(v) < 1):
+        if not v.isalnum() or int(v) < 1:
             quantity = 0
         else:
             quantity = int(v)
-        if quantity < self.getMinValue():
+        if v.strip() != '' and quantity < self.getMinValue():
             raise FormValuesError(_("The field \"%s\" needs to be filled with a number greater than or equal to %d.") % (self.getParent().getCaption(), self.getMinValue()))
         item.setQuantity(quantity)
         item.setValue(quantity)
@@ -1854,8 +1854,6 @@ class YesNoInput(FieldInputType, Fossilizable):
         if description:
             tmp = """%s</tr><tr><td colspan="2">%s</td>""" % (tmp, self._getDescriptionHTML(description))
         return tmp
-
-
 
     def _setResponseValue(self, item, params, registrant, override=False, validate=True):
         if (registrant is not None and self._parent.isBillable() and registrant.getPayed()):

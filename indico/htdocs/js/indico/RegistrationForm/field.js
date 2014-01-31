@@ -342,9 +342,9 @@ ndRegForm.directive('ndNumberField', function(url) {
 
             scope.getValue = function(fieldName) {
                 if (scope.userdata[fieldName] !== undefined) {
-                    return scope.userdata[fieldName];
-                } else {
-                    return scope.field.values.minValue;
+                    if ((scope.userdata[fieldName] !== 0) || (scope.field.values.minValue === 0)) {
+                        return scope.userdata[fieldName];
+                    }
                 }
             };
 
@@ -355,10 +355,7 @@ ndRegForm.directive('ndNumberField', function(url) {
                     scope.subtotal = parseInt(value, 10) * parseInt(scope.field.price, 10);
                 }
             };
-
-            scope.updateSubtotal(scope.field.values.minValue);
         }
-
     };
 });
 
@@ -375,7 +372,7 @@ ndRegForm.directive('ndRadioField', function(url) {
 
             scope.getInputTpl = function(inputType) {
                 return url.tpl('fields/{0}.tpl.html'.format(inputType));
-            }
+            };
 
             scope.anyBillableItemPayed = function(userdata) {
                 if (userdata.payed) {
