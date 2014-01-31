@@ -3,25 +3,17 @@
         <select
             name="{{ fieldName }}"
             ng-model="input"
-            ng-required="field.mandatory"
-            nd-blacklist="no"
-            ng-disabled="!hasPlacesLeft(field) || paymentBlocked(field, userdata)"
+            ng-required="field.required || !paymentBlocked(field, userdata)"
+            ng-disabled="paymentBlocked(field, userdata)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
             <option value="">-- {{ 'Choose a value' | i18n }} --</option>
-            <option ng-if="hasPlacesLimit(field)" value="yes"
+            <option value="yes"
+                ng-disabled="!hasPlacesLeft(field)"
                 ng-selected="userdata[fieldName] === 'yes'">
                 {{ 'yes' | i18n }}
-                [{{ field.noPlacesLeft }} {{ 'place(s) left' |i18n }}]
+                {{ getBillableStr(field) }}
             </option>
-            <option ng-if="!hasPlacesLimit(field)" value="yes"
-                ng-selected="userdata[fieldName] === 'yes'">
-                {{ 'yes' | i18n }}
-            </option>
-            <option ng-if="!field.mandatory" value="no"
-                ng-selected="userdata[fieldName] === 'no'">
-                {{ 'no' | i18n }}
-            </option>
-            <option ng-if="field.mandatory" value="no"
+            <option value="no"
                 ng-selected="userdata[fieldName] === 'no'">
                 {{ 'no' | i18n }}
             </option>
@@ -33,7 +25,7 @@
         </span>
 
         <span class="error-message-tag" ng-if="validationStarted && nestedForm.$invalid">
-            {{ "You must say 'yes'" | i18n }}
+            {{ "You must chose an option" | i18n }}
         </span>
     </ng-form>
 </div>
