@@ -24,9 +24,10 @@ ndFilters.filter("i18n", function() {
 });
 
 ndFilters.filter("range", function() {
-    return function(input, total) {
-        total = parseInt(total, 10);
-        for (var i=0; i<total; i++) {
+    return function(input, min, max) {
+        min = parseInt(min, 10) || 0;
+        max = parseInt(max, 10);
+        for (var i=min; i<=max; i++) {
             input.push(i);
         }
         return input;

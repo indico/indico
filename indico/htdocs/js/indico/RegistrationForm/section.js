@@ -528,7 +528,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
 
             scope.getMaxRegistrations = function(item) {
                 if (item.placesLimit !== 0) {
-                    return Math.min(item.maxPlace, item.noPlacesLeft);
+                    return Math.min(item.maxPlace, item.noPlacesLeft) + scope.getNoPlaces(item, scope.userdata);
                 } else {
                     return item.maxPlace;
                 }
@@ -559,6 +559,18 @@ ndRegForm.directive("ndSocialEventSection", function() {
 
                 return false;
             };
+
+            scope.getNoPlaces = function(item, userdata) {
+                var e = _.find(userdata.socialEvents, function(e) {
+                    return item.id == e.id;
+                });
+
+                if (e !== undefined) {
+                    return e.noPlaces;
+                } else {
+                    return 0;
+                }
+            }
 
             scope.dialogs.config.formData.push('introSentence');
             scope.dialogs.config.formData.push('selectionType');
