@@ -624,7 +624,7 @@ var IndicoUtil = {
                     error = Html.span({}, $T("Field is mandatory"));
                 }
                 if (exists(extraCheckFunction)) {
-                    error = extraCheckFunction(component.get());
+                    error = error || extraCheckFunction(component.get());
                 }
                 //--------------------------------
 
