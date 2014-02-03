@@ -58,7 +58,7 @@
             }
         }
 
-        div[contenteditable] + div[contenteditable] {
+        .clearableinput + .clearableinput {
             margin-top: 3px;
         }
     }

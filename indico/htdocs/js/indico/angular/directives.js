@@ -148,9 +148,12 @@ ndDirectives.directive("ndDialog", function($http, $compile, $timeout) {
 ndDirectives.directive("contenteditable", function() {
     return {
         require: 'ngModel',
+        restrict: 'A',
         link: function(scope, elem, attrs, ctrl) {
+            scope.edition = false;
+
             var updateHtml = function() {
-                if(ctrl.$viewValue === '') {
+                if (ctrl.$viewValue === '') {
                     elem.html(attrs.placeholder);
                     elem.addClass('empty');
                 } else {
@@ -158,31 +161,61 @@ ndDirectives.directive("contenteditable", function() {
                 }
             };
 
-            // view -> model
-            elem.on('blur', function(e, param) {
-                updateHtml();
-            });
+            var actions = {
+                init: function() {
+                    elem.addClass('focus');
+                    elem.clearableinput('setIconsVisibility', 'visible');
+                    elem.clearableinput('setEmptyValue', elem.html());
+                    elem.clearableinput('initSize', elem.css('font-size'), elem.css('height'));
+                    elem.removeClass('empty');
+
+                    if (ctrl.$viewValue === '' && !scope.edition) {
+                        elem.html('');
+                    }
+
+                    scope.edition = true;
+                },
+                close: function() {
+                    elem.removeClass('focus');
+                    elem.clearableinput('setIconsVisibility', 'hidden');
+                    scope.edition = false;
+                    updateHtml();
+                }
+            };
 
             // model -> view
             ctrl.$render = function() {
                 updateHtml();
             };
 
-            // remove placeholder
-            elem.on('focus', function() {
-                elem.removeClass('empty');
-                if (ctrl.$viewValue === '') {
-                    elem.html('');
+            // creation
+            elem.clearableinput({
+                focusAfter: false,
+
+                // view -> model
+                callback: function() {
+                    elem.html(elem.val());
+                    actions.close();
+                },
+
+                onchange: function() {
+                    elem.val(elem.html());
                 }
             });
 
+            elem.clearableinput('setIconsVisibility', 'hidden');
+
+            // input init
+            elem.on('focus', function() {
+                actions.init();
+            });
+
             elem.on('keydown keypress', function(e) {
-                if(e.keyCode === K['ESCAPE']) {
-                    elem.blur();
-                } else if(e.keyCode === K['ENTER']) {
+                if (e.keyCode === K['ENTER']) {
                     scope.$apply(function() {
                         ctrl.$setViewValue(elem.html());
                     });
+                    actions.close();
                     elem.blur();
                 }
             });

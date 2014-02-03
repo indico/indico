@@ -196,6 +196,10 @@
         }
     }
 
+    & > .clearableinput {
+        float: left;
+    }
+
     & > input[type=text]:first-child,
     & > .clearableinput:first-child input[type=text] {
         @include border-bottom-left-radius();

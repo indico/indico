@@ -22,9 +22,10 @@
 (function($) {
     $.widget("indico.clearableinput", {
         options: {
+            onchange: function() {},
             callback: function() {},
-            clearClass: "clearableinput",
-            emptyvalue: "",
+            clearClass: 'clearableinput',
+            emptyvalue: '',
             focusAfter: true
         },
 
@@ -33,19 +34,21 @@
             var opt = self.options;
             var input = self.element;
 
-            var clear = $('<span class="icon-close"></span>')
+            input.addClass('clearabletext');
+
+            self.clearIcon = $('<span class="icon-close"></span>')
                 .css("line-height", input.css("height"))
                 .click(function() {
                     self._clear();
                 });
 
-            input.wrap($('<span class="' + opt.clearClass + '"></span>'))
-                .after(clear)
+            input.wrap($('<div class="' + opt.clearClass + '"></div>'))
                 .on("input propertychange", function() {
+                    opt.onchange();
                     if (input.val() === "") {
-                        clear.css("visibility", "hidden");
+                        self.clearIcon.css("visibility", "hidden");
                     } else {
-                        clear.css("visibility", "visible");
+                        self.clearIcon.css("visibility", "visible");
                     }
                 })
                 .on("keyup", function(e) {
@@ -54,6 +57,12 @@
                         self._clear();
                     }
                 });
+
+            input.after(self.clearIcon);
+
+            if (opt.focus) {
+                input.focus();
+            }
         },
 
         _clear: function() {
@@ -62,12 +71,39 @@
             var input = self.element;
 
             input.val(opt.emptyvalue).trigger("propertychange");
+            opt.callback();
+
             if (opt.focusAfter) {
                 input.focus();
             } else {
                 input.blur();
             }
-            opt.callback();
+        },
+
+        initSize: function(fontSize, lineHeight) {
+            var self = this;
+
+            if (self.size === undefined) {
+                self.size = {
+                    fontSize: fontSize,
+                    lineHeight: lineHeight
+                };
+            }
+
+            self.clearIcon.css('font-size', self.size.fontSize);
+            self.clearIcon.css('line-height', self.size.lineHeight);
+        },
+
+        setEmptyValue: function(value) {
+            var self = this;
+
+            self.options.emptyvalue = value;
+        },
+
+        setIconsVisibility: function(visibility) {
+            var self = this;
+
+            self.clearIcon.css('visibility', visibility);
         }
     });
 })(jQuery);

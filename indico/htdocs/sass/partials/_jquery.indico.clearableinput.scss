@@ -1,28 +1,27 @@
 .clearableinput {
     position: relative;
-    float: left;
 
-    & input {
+    .clearabletext {
         padding-right: 2em !important;
     }
 
-    & span {
+    span {
         color: $gray;
         display: block;
         font-size: 1.2em;
         position: absolute;
         right: 0;
         visibility: hidden;
-        padding: 0 0.4em;
-        top: 0.05em;
+        padding: 0 4px;
+        top: 1px;
 
         &:hover {
-            color: $dark-gray;
+            color: $red;
             cursor: pointer;
         }
 
         &:active {
-            color: $black;
+            color: $dark-red;
         }
     }
 }

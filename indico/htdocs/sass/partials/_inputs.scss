@@ -84,7 +84,8 @@ span[contenteditable] {
         outline: 1px dashed $gray;
     }
 
-    &:focus {
+    &:focus,
+    &.focus {
         background: white;
         box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
         outline: 1px solid $blue;
