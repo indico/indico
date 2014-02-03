@@ -27,6 +27,13 @@ else:
             <span style="vertical-align: middle;">${ _("Powered by ")} <a href="http://indico-software.org">Indico</a></span>
   </%block>
 </div>
-% if Config.getInstance().getWorkerName()!="":
+
+% if Config.getInstance().getWorkerName():
   <!-- worker: ${ Config.getInstance().getWorkerName() } -->
+% endif
+% if debugActive:
+  <!-- endpoint: ${ _request.endpoint } -->
+  % if rh:
+  <!-- rh: ${ rh.__class__.__module__ }.${ rh.__class__.__name__ } -->
+  % endif
 % endif
