@@ -1752,6 +1752,7 @@ class CheckboxInput(FieldInputType, Fossilizable):
             currency = item.getCurrency()
             htmlName = item.getHTMLName()
             quantity = item.getQuantity()
+            mandatory = """<span class="regFormMandatoryField">*</span>""" if self._parent.isMandatory() else ""
         if (registrant is not None and billable and registrant.getPayed()) or (not self.getParent().hasAvailablePlaces() and not quantity):
             disable = "disabled=\"disabled\""
         if v == "yes":
@@ -1759,7 +1760,7 @@ class CheckboxInput(FieldInputType, Fossilizable):
         pm = ''
         if self._parent.isMandatory():
             pm = """<script>addParam($E('%s'), 'checkBox', false);</script>""" % htmlName
-        tmp = """<input type="checkbox" id="%s" name="%s" %s %s> %s%s""" % (htmlName, htmlName, checked, disable, caption, pm)
+        tmp = """<input type="checkbox" id="%s" name="%s" %s %s> %s %s%s""" % (htmlName, htmlName, checked, disable, caption, mandatory, pm)
         tmp = """ <td>%s</td><td align="right" align="bottom">""" % tmp
         if billable:
             tmp = """%s&nbsp;&nbsp;%s&nbsp;%s """ % (tmp, price, currency)
