@@ -47,7 +47,12 @@ class RHAbstractModifBase( RHAbstractBase, RHModificationBaseProtected ):
         RHAbstractBase._checkParams( self, params )
 
     def _checkProtection( self ):
-        RHModificationBaseProtected._checkProtection( self )
+        target = self._target
+        try:
+            self._target = self._conf
+            RHModificationBaseProtected._checkProtection(self)
+        finally:
+            self._target = target
         CFAEnabled.checkEnabled(self)
 
     def _displayCustomPage( self, wf ):
