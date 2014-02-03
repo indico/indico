@@ -4803,6 +4803,8 @@ class Registrant(Persistent, Fossilizable):
         else:
             self.setSessions([])
 
+        self.setSessionBillingEnabled(self.getRegistrationForm().getSessionsForm().getType() != "2priorities")
+
         if self.getRegistrationForm().getAccommodationForm().isEnabled():
             ad = data.get("arrivalDate", None)
             dd = data.get("departureDate", None)

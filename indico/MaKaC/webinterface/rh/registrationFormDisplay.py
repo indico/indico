@@ -170,7 +170,6 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
         rp = registration.Registrant()
         self._conf.addRegistrant(rp, user)
         rp.setValues(self._getRequestParams(), user)
-        rp.setSessionBillingEnabled(self._regForm.getSessionsForm().getType() != "2priorities")
         if user is not None:
             user.addRegistrant(rp)
             rp.setAvatar(user)
