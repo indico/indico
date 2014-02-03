@@ -60,26 +60,6 @@ class Committer():
             db.session.commit()
 
 
-# ==================================== group concat
-
-# engine specific group concat
-class group_concat(FunctionElement):
-    name = 'group_concat'
-
-
-# TODO: revisit for postgresql
-@compiles(group_concat, 'sqlite')
-def _group_concat_sqlite(element, compiler, **kwargs):
-    if len(element.clauses) == 2:
-        separator = compiler.process(element.clauses.clauses[1])
-    else:
-        separator = ', '
-
-    return 'GROUP_CONCAT(%s SEPARATOR %s)'.format(
-        compiler.process(element.clauses.clauses[0]),
-        separator
-    )
-
 # ================================== time diff
 
 # engine specific time differences
