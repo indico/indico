@@ -1076,6 +1076,7 @@ class Category(CommonObjectBase):
         sc._notify('created', self)
 
         self._addSubCategory(sc)
+        sc.setOrder(self.getSubCategoryList()[-1].getOrder() + 1)
 
         return sc
 
