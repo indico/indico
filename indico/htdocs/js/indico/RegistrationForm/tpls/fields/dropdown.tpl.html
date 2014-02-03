@@ -1,5 +1,5 @@
 <ng-form name="nestedForm"
-    ng-init="input = getId(userdata[fieldName])">
+    ng-init="input = getId(getValue(fieldName))">
     <select
         name="{{ fieldName }}"
         ng-model="input"
