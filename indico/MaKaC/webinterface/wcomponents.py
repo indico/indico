@@ -24,6 +24,7 @@ from MaKaC.plugins import OldObservable
 from MaKaC.plugins.base import extension_point
 
 import os
+import sys
 import types
 import exceptions
 import urllib
@@ -2727,41 +2728,59 @@ class WCategoryStatisticsListRow(WTemplated):
         return vars
 
 
-class WCategoryStatisticsList(WTemplated):
+class WCategoryStatisticsListRowEmpty(WTemplated):
+    def __init__(self, year, end_year):
+        self._year = year
+        self._end_year = end_year
 
-    def __init__( self, statsName, stats ):
+    def getVars(self):
+        v = WTemplated.getVars(self)
+        v['year'] = self._year
+        v['end_year'] = self._end_year
+        return v
+
+
+class WCategoryStatisticsList(WTemplated):
+    def __init__(self, statsName, stats):
         self._stats = stats
         self._statsName = statsName
 
-    def getHTML( self, aw ):
+    def getHTML(self, aw):
         self._aw = aw
-        return WTemplated.getHTML( self )
+        return WTemplated.getHTML(self)
 
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
+    def getVars(self):
+        v = WTemplated.getVars(self)
         # Construction of the tables from the dictionary (stats).
-        # Initialization:
         tmp = []
-        maximum = 0
         stats = {}
         years = self._stats.keys()
         years.sort()
         for y in range(years[0], min(datetime.now().year + 4, years[-1] + 1)):
-            stats[y] = self._stats.get(y,0)
+            stats[y] = self._stats.get(y, 0)
         maximum = max(stats.values())
         years = stats.keys()
         years.sort()
-        for y in years:
-            nb = stats[y]
-            percent = (nb*100)/maximum
+        year, last_year = years[0], years[-1]
+        while year < last_year:
+            nb = stats[year]
+            # We hide holes >=10 years
+            if not nb and not any(stats[y] for y in xrange(year, year + 10)):
+                end = next((y - 1 for y in xrange(year, last_year) if stats[y]), sys.maxint)
+                tmp.append(WCategoryStatisticsListRowEmpty(year, end).getHTML())
+                year = end + 1
+                continue
+            percent = (nb * 100) / maximum
             if nb > 0 and percent == 0:
                 percent = 1
-            wcslr = WCategoryStatisticsListRow( y, percent, stats[y] )
-            tmp.append(wcslr.getHTML( self._aw ))
-        vars["statsName"] = self._statsName
-        vars["statsRows"] = "".join( tmp )
-        vars["total"] = sum(stats.values())
-        return vars
+            wcslr = WCategoryStatisticsListRow(year, percent, stats[year])
+            tmp.append(wcslr.getHTML(self._aw))
+            year += 1
+        v['statsName'] = self._statsName
+        v['statsRows'] = ''.join(tmp)
+        v['total'] = sum(stats.values())
+        return v
+
 
 class WConfCreationControlFrame(WTemplated):
 
