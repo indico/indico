@@ -513,7 +513,8 @@ class Config:
         'SessionLifetime'           : 86400 * 31,
         'RouteOldUrls'              : False,
         'CustomCountries'           : {},
-        'PDFLatexProgram'           : 'pdflatex'
+        'PDFLatexProgram'           : 'pdflatex',
+        'StrictLatex'               : True
     }
 
     if sys.platform == 'win32':

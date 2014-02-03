@@ -799,11 +799,14 @@ class LatexRunner(object):
             subprocess.check_call(pdflatex_cmd, stdout=log_file)
             Logger.get('pdflatex').debug("PDF created successfully!")
 
-        except subprocess.CalledProcessError, e:
-            # flush log, go to beginning and read it
-            if log_file:
-                log_file.flush()
-            raise
+        except subprocess.CalledProcessError:
+            Logger.get('pdflatex').warning('PDF creation possibly failed (non-zero exit code)!')
+            # Only fail if we are in strict mode
+            if Config.getInstance().getStrictLatex():
+                # flush log, go to beginning and read it
+                if log_file:
+                    log_file.flush()
+                raise
 
     def _save_error_report(self, source_filename, log_filename):
         config = Config.getInstance()
