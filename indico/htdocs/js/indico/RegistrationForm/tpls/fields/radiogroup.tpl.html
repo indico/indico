@@ -8,7 +8,7 @@
                 ng-model="input.input"
                 ng-checked="item.caption == getValue(fieldName)"
                 ng-required="field.mandatory"
-                ng-disabled="isDisabled(item) || paymentBlocked(item, userdata) || anyBillableItemPayed(userdata)"/>
+                ng-disabled="isDisabled(item, getValue(fieldName), field.input) || paymentBlocked(item, userdata) || anyBillableItemPayed(userdata)"/>
             <span ng-class="{'text-error': validationStarted && nestedForm.$invalid}">
                 {{ item.caption }}
             </span>
@@ -18,12 +18,12 @@
                 <nd-currency currency="currency"></nd-currency>
             </span>
 
-            <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item)">
+            <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item, getValue(fieldName), field.input)">
                 <font ng-switch-when="false" color="red" style="margin-left:25px;">
                     ({{ "no places left" | i18n }})
                 </font>
                 <font ng-switch-when="true" color="green" style="margin-left:25px;">
-                    [{{ item.noPlacesLeft }} {{ 'place(s) left' | i18n }}]
+                    [{{ getNoPlacesLeft(item, getValue(fieldName), field.input) }} {{ 'place(s) left' | i18n }}]
                 </font>
             </span>
         </li>

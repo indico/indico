@@ -159,7 +159,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
 });
 
 ndRegForm.controller('BillableCtrl', function($scope, $filter) {
-    $scope.getBillableStr = function(item) {
+    $scope.getBillableStr = function(item, userValue, type) {
         var str = '';
 
         if ($scope.isBillable(item)) {
@@ -167,8 +167,8 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         }
 
         if ($scope.hasPlacesLimit(item)) {
-            if ($scope.hasPlacesLeft(item)) {
-                str += ' [{0} {1}]'.format(item.noPlacesLeft, $filter('i18n')('place(s) left'));
+            if ($scope.hasPlacesLeft(item, userValue, type)) {
+                str += ' [{0} {1}]'.format($scope.getNoPlacesLeft(item, userValue, type), $filter('i18n')('place(s) left'));
             } else {
                 str += ' [{0}]'.format($filter('i18n')('no places left'));
             }
@@ -182,18 +182,18 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         return item.billable || item.isBillable;
     };
 
-    $scope.isDisabled = function(item) {
+    $scope.isDisabled = function(item, userValue, type) {
         item = item || {};
         return (item.disabled === true || item.isEnabled === false) ||
-            !$scope.hasPlacesLeft(item) || item.cancelled === true;
+            !$scope.hasPlacesLeft(item, userValue, type) || item.cancelled === true;
     };
 
-    $scope.hasPlacesLeft = function(item) {
+    $scope.hasPlacesLeft = function(item, userValue, type) {
         item = item || {};
         if (!$scope.hasPlacesLimit(item)) {
             return true;
         } else {
-            return item.noPlacesLeft > 0;
+            return $scope.getNoPlacesLeft(item, userValue, type) > 0;
         }
     };
 
@@ -216,6 +216,20 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         } else {
             return $scope.isBillable(item) && userdata.payed;
         }
+    };
+
+    $scope.getNoPlacesLeft = function(item, userValue, type) {
+        var noPlaces = item.noPlacesLeft;
+        if(type === 'checkbox' && userValue === 'yes'){
+            noPlaces += 1;
+        } else if (type === 'radio' && item.caption === userValue) {
+            noPlaces += 1;
+        } else if (type === 'accomodation' && item.id === userValue) {
+            noPlaces += 1;
+        } else if (type === 'socialEvent') {
+            noPlaces += userValue;
+        }
+        return noPlaces;
     };
 });
 

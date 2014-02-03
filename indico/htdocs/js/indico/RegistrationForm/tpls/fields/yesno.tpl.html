@@ -8,10 +8,10 @@
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
             <option value="">-- {{ 'Choose a value' | i18n }} --</option>
             <option value="yes"
-                ng-disabled="!hasPlacesLeft(field)"
+                ng-disabled="!hasPlacesLeft(field, userdata[fieldName], 'checkbox')"
                 ng-selected="userdata[fieldName] === 'yes'">
                 {{ 'yes' | i18n }}
-                {{ getBillableStr(field) }}
+                {{ getBillableStr(field, userdata[fieldName], 'checkbox') }}
             </option>
             <option value="no"
                 ng-selected="userdata[fieldName] === 'no'">

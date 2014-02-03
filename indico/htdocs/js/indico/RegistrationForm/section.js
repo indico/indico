@@ -247,7 +247,7 @@ ndRegForm.directive("ndAccommodationSection", function($rootScope) {
             scope.billableOptionPayed = function(userdata) {
                 if (userdata.accommodation !== undefined) {
                     var accommodation = userdata.accommodation.accommodationType || {};
-                    return accommodation.billable === true;
+                    return accommodation.billable === true && userdata.payed === true;
                 }
 
                 return false;

@@ -6,7 +6,7 @@
                 ng-model="input"
                 ng-checked="userdata[getName(field.id)] === 'yes'"
                 ng-required="field.mandatory"
-                ng-disabled="!hasPlacesLeft(field)"/>
+                ng-disabled="!hasPlacesLeft(field, userdata[getName(field.id)], field.input)"/>
             <div>
                 {{field.caption}}
                 <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
@@ -23,9 +23,9 @@
             <nd-currency currency="currency"></nd-currency>
         </span>
 
-        <span ng-if="hasPlacesLimit(field)" ng-switch="hasPlacesLeft(field)">
+        <span ng-if="hasPlacesLimit(field)" ng-switch="hasPlacesLeft(field, userdata[getName(field.id)], field.input)">
             <span ng-switch-when="true" class="placesLeft">
-                [{{field.noPlacesLeft}} {{ 'place(s) left' | i18n }}]
+                [{{getNoPlacesLeft(field, userdata[getName(field.id)], field.input)}} {{ 'place(s) left' | i18n }}]
             </span>
             <font ng-switch-when="false" color="red">
                 ({{ 'no places left' | i18n }})

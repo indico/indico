@@ -62,20 +62,20 @@
                         name="accommodation_type"
                         value="{{ item.id }}"
                         ng-model="userdata.accommodation.accommodationType.id"
-                        ng-disabled="isDisabled(item) || paymentBlocked(item, userdata) || billableOptionPayed(userdata)"
-                        ng-required="hasPlacesLeft(item) && !item.cancelled"
+                        ng-disabled="isDisabled(item, userdata.accommodation.accommodationType.id, 'accomodation') || paymentBlocked(item, userdata) || billableOptionPayed(userdata)"
+                        ng-required="hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accomodation') && !item.cancelled"
                         ng-checked="item.id == userdata.accommodation.accommodationType.id"/>
                     {{ item.caption }}
 
-                    <font ng-if="item.cancelled && !hasPlacesLeft(item)" color="red">
+                    <font ng-if="item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accomodation')" color="red">
                         ({{ 'currently not available' | i18n }})
                     </font>
                     <span ng-if="hasPlacesLimit(item)">
-                        <font ng-if="!item.cancelled && !hasPlacesLeft(item)" color="red">
+                        <font ng-if="!item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accomodation')" color="red">
                             ({{ 'no places left' | i18n }})
                         </font>
-                        <font ng-if="!item.cancelled && hasPlacesLeft(item)" color="green">
-                            [{{ item.noPlacesLeft }} {{ "place(s) left" | i18n }}]
+                        <font ng-if="!item.cancelled && hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accomodation')" color="green">
+                            [{{ getNoPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accomodation') }} {{ "place(s) left" | i18n }}]
                         </font>
                     </span>
                 </td>
