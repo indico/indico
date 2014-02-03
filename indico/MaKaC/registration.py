@@ -1984,6 +1984,8 @@ class RadioItem(Persistent, Fossilizable):
         return self._caption
 
     def setCaption(self, cap):
+        if self._caption != cap:
+            self.updateRegistrantSelection(cap)
         self._caption = cap
 
     def setEnabled(self, en=True):
@@ -2069,8 +2071,6 @@ class RadioItem(Persistent, Fossilizable):
     def updateCurrentNoPlaces(self):
         # self -> RadioGroupInput -> GeneralField -> GeneralSectionForm
         gf = self._parent._parent
-        if gf.isTemporary():
-            return
         self._currentNoPlaces = 0
         gsf = gf._parent
         regform = gsf.getRegistrationForm()
@@ -2081,6 +2081,20 @@ class RadioItem(Persistent, Fossilizable):
             gf.getId() # for some reason it's empty when calling it for the first time
             item = mg.getResponseItemById(gf.getId())
             if item is not None and item.getQuantity() and item.getValue() == self.getCaption():
+                self.increaseNoPlaces()
+
+    def updateRegistrantSelection(self, caption):
+        gf = self._parent._parent
+        self._currentNoPlaces = 0
+        gsf = gf._parent
+        regform = gsf.getRegistrationForm()
+        for reg in regform.getConference().getRegistrantsList():
+            mg = reg.getMiscellaneousGroupById(gsf.getId())
+            if not mg:
+                continue
+            item = mg.getResponseItemById(gf.getId())
+            if item is not None and item.getQuantity() and item.getValue() == self.getCaption():
+                item.setValue(caption)
                 self.increaseNoPlaces()
 
     def clone(self, parent):
