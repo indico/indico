@@ -850,8 +850,8 @@ Please use this information for your payment (except for e-payment):\n
 """) % (date, getTitle, idRegistrant, strip_ml_tags(detailPayment))
         booking = []
         total = 0
-        booking.append(_("""
-\tQuantity\t\tItem\t\tunit.price\t\tCost"""))
+        booking.append(_("""{0}{1}{2}{3}""".format("Quantity".ljust(20), "Item".ljust(50),
+                                                   "Unit price".ljust(15), "Cost".ljust(20))))
         #All billable general fields
         for gsf in registrant.getMiscellaneousGroupList():
             miscGroup = registrant.getMiscellaneousGroupById(gsf.getId())
@@ -874,7 +874,9 @@ Please use this information for your payment (except for e-payment):\n
                     if value != "":
                         value = ":%s" % value
                     if(quantity > 0):
-                        booking.append("""%i\t\t%s : %s%s\t\t%s\t\t%s %s""" % (quantity, miscGroup.getTitle(), caption, value, price, price * quantity, currency))
+                        booking.append("{0}{1}{2}{3}".format(str(quantity).ljust(20),
+                            "{0} : {1}{2}".format(miscGroup.getTitle(), caption, value).ljust(50), str(price).ljust(15),
+                            "{0} {1}".format(price * quantity, currency).ljust(20)))
         #All billable standard fields (accommodation, sessions, social events)
         for bf in registrant.getBilledForms():
             for item in bf.getBilledItems():
@@ -884,9 +886,11 @@ Please use this information for your payment (except for e-payment):\n
                 quantity = item.getQuantity()
                 total += price * quantity
                 if quantity > 0:
-                    booking.append("""%i\t\t%s\t\t%s\t\t%s %s""" % (quantity, caption, price, price * quantity, currency))
+                    booking.append("\n{0}{1}{2}{3}".format(str(quantity).ljust(20), caption.ljust(50),
+                                                           str(price).ljust(15),
+                                                           "{0} {1}".format(price * quantity, currency).ljust(20)))
 
-        booking.append("""\nTOTAL\t\t\t\t\t\t\t%s %s""" % (total, regForm.getCurrency()))
+        booking.append("{0}{1}".format("TOTAL".ljust(85), "{0}{1}".format(total, regForm.getCurrency()).ljust(20)))
         # send email to organisers
         #if self.getToList() != [] or self.getCCList() != []:
         #    bodyOrg = """
