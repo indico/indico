@@ -787,6 +787,8 @@ textarea.regFormDescriptionInputMgmt {
 }
 
 .regform-table {
+    padding-bottom: 20px;
+
     tr:hover .table-sortable-handle,
     td:active .table-sortable-handle{
         @include icon-before('icon-handle');
