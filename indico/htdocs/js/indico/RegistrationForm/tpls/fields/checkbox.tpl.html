@@ -6,7 +6,7 @@
                 ng-model="input"
                 ng-checked="userdata[getName(field.id)] === 'yes'"
                 ng-required="field.mandatory"
-                ng-disabled="!hasPlacesLeft(field, userdata[getName(field.id)], field.input)"/>
+                ng-disabled="!hasPlacesLeft(field, userdata[getName(field.id)], field.input) || paymentBlocked(field, userdata)"/>
             <div>
                 {{field.caption}}
                 <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
