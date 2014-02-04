@@ -151,6 +151,15 @@ ndDirectives.directive("contenteditable", function() {
         restrict: 'A',
         link: function(scope, elem, attrs, ctrl) {
             scope.edition = false;
+            scope.multiline = scope.$eval(attrs.ndMultiline) || false;
+
+            var sanitizeHtml = function() {
+                var sanitized = elem.html().replace(/<div[^<]*?>/g, '<br>').replace(/<\/div[^<]*?>/g, '');
+                sanitized = sanitized.replace(/<br>(<br>)+/g, '<br>');
+                sanitized = sanitized.replace(/^<br>/, '');
+                sanitized = sanitized.replace(/<br>$/, '');
+                elem.html(sanitized);
+            };
 
             var updateHtml = function() {
                 if (ctrl.$viewValue === '') {
@@ -161,12 +170,19 @@ ndDirectives.directive("contenteditable", function() {
                 }
             };
 
+            var getOneLineHeight = function() {
+                var html = elem.html();
+                var height = elem.html('').css('height');
+                elem.html(html);
+                return height;
+            };
+
             var actions = {
                 init: function() {
                     elem.addClass('focus');
-                    elem.clearableinput('setIconsVisibility', 'visible');
-                    elem.clearableinput('setEmptyValue', elem.html());
-                    elem.clearableinput('initSize', elem.css('font-size'), elem.css('height'));
+                    elem.actioninput('setIconsVisibility', 'visible');
+                    elem.actioninput('setEmptyValue', elem.html());
+                    elem.actioninput('initSize', elem.css('font-size'), getOneLineHeight());
                     elem.removeClass('empty');
 
                     if (ctrl.$viewValue === '' && !scope.edition) {
@@ -177,7 +193,7 @@ ndDirectives.directive("contenteditable", function() {
                 },
                 close: function() {
                     elem.removeClass('focus');
-                    elem.clearableinput('setIconsVisibility', 'hidden');
+                    elem.actioninput('setIconsVisibility', 'hidden');
                     scope.edition = false;
                     updateHtml();
                 }
@@ -189,36 +205,36 @@ ndDirectives.directive("contenteditable", function() {
             };
 
             // creation
-            elem.clearableinput({
+            elem.actioninput({
                 focusAfter: false,
+                enterKeyEnabled: !scope.multiline,
 
                 // view -> model
                 callback: function() {
-                    elem.html(elem.val());
                     actions.close();
                 },
 
+                // view -> model
+                actionCallback: function() {
+                    sanitizeHtml();
+                    scope.$apply(function() {
+                        ctrl.$setViewValue(elem.html());
+                    });
+                    actions.close();
+                },
+
+                // angular -> jquery
                 onchange: function() {
                     elem.val(elem.html());
                 }
             });
-
-            elem.clearableinput('setIconsVisibility', 'hidden');
 
             // input init
             elem.on('focus', function() {
                 actions.init();
             });
 
-            elem.on('keydown keypress', function(e) {
-                if (e.keyCode === K['ENTER']) {
-                    scope.$apply(function() {
-                        ctrl.$setViewValue(elem.html());
-                    });
-                    actions.close();
-                    elem.blur();
-                }
-            });
+            elem.actioninput('setIconsVisibility', 'hidden');
         }
     };
 });

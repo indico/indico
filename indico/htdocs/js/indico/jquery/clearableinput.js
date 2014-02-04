@@ -24,6 +24,7 @@
         options: {
             onchange: function() {},
             callback: function() {},
+            alwaysClearable: false,
             clearClass: 'clearableinput',
             emptyvalue: '',
             focusAfter: true
@@ -36,7 +37,9 @@
 
             input.addClass('clearabletext');
 
-            self.clearIcon = $('<span class="icon-close"></span>')
+            self.buttonBox = $('<span class="button-box"></span>');
+
+            self.clearIcon = $('<span class="input-clear icon-close"></span>')
                 .css("line-height", input.css("height"))
                 .click(function() {
                     self._clear();
@@ -45,7 +48,7 @@
             input.wrap($('<div class="' + opt.clearClass + '"></div>'))
                 .on("input propertychange", function() {
                     opt.onchange();
-                    if (input.val() === "") {
+                    if (input.val() === "" && !opt.alwaysClearable) {
                         self.clearIcon.css("visibility", "hidden");
                     } else {
                         self.clearIcon.css("visibility", "visible");
@@ -58,7 +61,8 @@
                     }
                 });
 
-            input.after(self.clearIcon);
+            self.buttonBox.append(self.clearIcon);
+            input.after(self.buttonBox);
 
             if (opt.focus) {
                 input.focus();

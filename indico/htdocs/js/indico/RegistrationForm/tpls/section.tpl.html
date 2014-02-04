@@ -17,16 +17,17 @@
             </tr>
             <tr ng-switch-when="true">
                 <td class="section-header-content">
-                    <div class="regform-section-title"
+                    <div contenteditable
+                        class="regform-section-title"
                         ng-model="section.title"
-                        placeholder="Fill the title"
-                        contenteditable>
+                        placeholder="Fill the title">
                     </div>
-                    <div ng-if="section.description !== undefined"
+                    <div contenteditable
+                        ng-if="section.description !== undefined"
                         class="regform-section-description"
                         ng-model="section.description"
                         placeholder="Fill the description"
-                        contenteditable>
+                        nd-multiline="true">
                     </div>
                 </td>
                 <td>
