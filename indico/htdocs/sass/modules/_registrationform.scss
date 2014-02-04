@@ -51,6 +51,7 @@
 
             .section-header-content {
                 width: 100%;
+                max-width: 568px;
             }
 
             .section-toolbar {
@@ -124,7 +125,6 @@
 
 .regform-section-title {
     @extend %font-family-title-light;
-
     color: $dark-blue;
     font-size: 1.5em;
     font-weight: bold;
