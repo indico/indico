@@ -158,6 +158,7 @@ ndDirectives.directive("contenteditable", function() {
 
                 // Chrome sanitization
                 sanitized = sanitized
+                    .replace(/<div><br><\/div>/g, '<div><\/div>')
                     .replace(/<div[^<]*?>/g, '<br>')
                     .replace(/<\/div[^<]*?>/g, '');
 
