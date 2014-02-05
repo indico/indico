@@ -20,6 +20,7 @@
 from MaKaC.webinterface.pages import registrationForm
 from MaKaC.webinterface import wcomponents
 from indico.web.flask.util import url_for
+from indico.core.config import Config
 
 
 class WPConfModifETicketBase(registrationForm.WPConfModifRegFormBase):
@@ -45,4 +46,5 @@ class WConfModifETicket(wcomponents.WTemplated):
         modETicket = self._conf.getRegistrationForm().getETicket()
         vars["conf"] = self._conf
         vars["isEnabled"] = modETicket.isEnabled()
+        vars["downloadURL"] = Config.getInstance().getCheckinURL()
         return vars

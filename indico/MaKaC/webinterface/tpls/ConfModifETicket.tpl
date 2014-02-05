@@ -20,7 +20,7 @@
                 <div id="eTicketShowAfterRegistration"></div>
                 <div id="qrcodeActivation" class="info-message-box" style="max-width:800px">
                     <div class="message-text" style="text-align: justify">
-                        ${_("The e-ticket is a PDF document containing a QR code that can be used to identify and check-in attendees at the registration desk of the conference. Every registrant will own a personal e-ticket. In order to register participants, the organiser of the event could use the application 'Indico check-in', that can be downloaded from here. Once the app is installed, one needs to configure it and download this event simply by scanning the following QR Code.")}
+                        ${_("The e-ticket is a PDF document containing a QR code that can be used to identify and check-in attendees at the registration desk of the conference. Every registrant will own a personal e-ticket. In order to register participants, the organiser of the event could use the application 'Indico check-in', that can be downloaded from {0}. Once the app is installed, one needs to configure it and download this event simply by scanning the following QR Code.").format('<a href="{url}">{url}</a>'.format(url=downloadURL))}
                     </div>
                     <div id="button-menu" class="toolbar" style="padding-left: 2.5em">
                         <div class="group i-selection">
