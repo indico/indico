@@ -421,7 +421,7 @@ var IndicoUtil = {
      * @return {Boolean} true if the string is a valid string, false otherwise
      */
     parseShortURL: function(s) {
-        if (!isNaN(+s)) {
+        if (/^[0-9]+$/.test(s)) {
             // Just a number
             return false;
         }
