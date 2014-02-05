@@ -616,7 +616,9 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
     this.typeSelector = new TypeSelector(this.types,
                                         {style:{width: '150px'}},
                                         {style:{width: '150px'}, maxlength: '50'});
-    this.typeSelector.plugParameterManager(this.pm);
+    if (!forReviewing) {
+        this.typeSelector.plugParameterManager(this.pm);
+    }
 });
 
 type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {
