@@ -9067,7 +9067,7 @@ class Contribution(CommonObjectBase, Locatable):
         self.materials[ newMat.getId() ] =  newMat
         self.notifyModification()
 
-    def removeMaterial( self, mat ):
+    def removeMaterial(self, mat):
         if mat.getId() in self.materials.keys():
             mat.delete()
             self.materials[mat.getId()].setOwner(None)
@@ -9083,6 +9083,8 @@ class Contribution(CommonObjectBase, Locatable):
             self.removeVideo()
         elif mat.getId().lower() == 'poster':
             self.removePoster()
+        elif mat.getId().lower() == 'reviewing':
+            self.removeReviewing()
 
     def recoverMaterial(self, recMat):
     # Id must already be set in recMat.
