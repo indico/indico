@@ -101,6 +101,9 @@
         var clean_params = {};
         for (var key in params) {
             var value = params[key];
+            if (value === '') {
+                continue;
+            }
             if (value === undefined || value === null) {
                 // convert them to a string
                 value = '' + value
