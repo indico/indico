@@ -182,7 +182,7 @@ ndDirectives.directive("contenteditable", function() {
                     elem.html(attrs.placeholder);
                     elem.addClass('empty');
                 } else {
-                    elem.html(ctrl.$viewValue);
+                    elem.html(_.unescape(ctrl.$viewValue));
                 }
             };
 
@@ -206,6 +206,7 @@ ndDirectives.directive("contenteditable", function() {
                     }
 
                     scope.edition = true;
+                    elem.text(elem.html());
                 },
                 close: function() {
                     elem.removeClass('focus');
@@ -234,7 +235,7 @@ ndDirectives.directive("contenteditable", function() {
                 actionCallback: function() {
                     sanitizeHtml();
                     scope.$apply(function() {
-                        ctrl.$setViewValue(elem.html());
+                        ctrl.$setViewValue(_.unescape(elem.html()));
                     });
                     actions.close();
                 },
