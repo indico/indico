@@ -873,22 +873,22 @@ class Avatar(Persistent, Fossilizable):
         """
         if create_identities:
             for authenticator in AuthenticatorMgr().getList():
-                identities = self.getIdentityByAuthenticatorName(authenticator.getName())
+                identities = self.getIdentityByAuthenticatorId(authenticator.getId())
                 for identity in identities:
                     self.addIdentity(identity)
         return self.identities
 
-    def getIdentityByAuthenticatorName(self, authenticatorName):
+    def getIdentityByAuthenticatorId(self, authenticatorId):
         """ Return a list of PIdentity objects given an authenticator name
-            :param authenticatorName: the name of an authenticator, e.g. 'Local', 'LDAP', etc
-            :type authenticatorName: str
+            :param authenticatorId: the id of an authenticator, e.g. 'Local', 'LDAP', etc
+            :type authenticatorId: str
         """
         result = []
         for identity in self.identities:
-            if identity.getAuthenticatorTag() == authenticatorName:
+            if identity.getAuthenticatorTag() == authenticatorId:
                 result.append(identity)
         if not result:
-            identity = AuthenticatorMgr().getById(authenticatorName).fetchIdentity(self)
+            identity = AuthenticatorMgr().getById(authenticatorId).fetchIdentity(self)
             if identity:
                 result.append(identity)
         return result

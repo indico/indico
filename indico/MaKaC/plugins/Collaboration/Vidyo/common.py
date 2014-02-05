@@ -141,8 +141,8 @@ class VidyoTools(object):
     @classmethod
     def getAvatarLoginList(cls, avatar):
         loginList = []
-        for authenticatorName in getVidyoOptionValue("authenticatorList"):
-            loginList.extend([identity.getLogin() for identity in avatar.getIdentityByAuthenticatorName(authenticatorName)])
+        for authenticatorId in getVidyoOptionValue("authenticatorList"):
+            loginList.extend([identity.getLogin() for identity in avatar.getIdentityByAuthenticatorId(authenticatorId)])
         return loginList
 
     @classmethod
