@@ -871,7 +871,7 @@ class Avatar(Persistent, Fossilizable):
         """ Returns a list of identities for this Avatar.
             Each identity will be a PIdentity or inheriting object
         """
-        if createIdentities:
+        if create_identities:
             for authenticator in AuthenticatorMgr().getList():
                 identities = self.getIdentityByAuthenticatorName(authenticator.getName())
                 for identity in identities:
