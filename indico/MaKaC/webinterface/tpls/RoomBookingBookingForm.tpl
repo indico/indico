@@ -230,7 +230,7 @@
                     <input type="hidden" value="${ endT }" name="eTime" id="eTime"/>
                     <ul id="breadcrumbs" style="margin:0px 0px 0px -15px; padding: 0; list-style: none;">
                         <li><span><a href="${ urlHandlers.UHRoomBookingBookRoom.getURL() }">${_("Specify Search Criteria")}</a></span></li>
-                        <li><span><a href="#" onclick="history.back(); return false;">${_("Select Available Period")}</a></span></li>
+                        <li><span><a href="${ url_for('rooms.roomBooking-bookingListForBooking', fromSession=1) }">${_("Select Available Period")}</a></span></li>
                         <li><span class="current">${_("Confirm Reservation")}</span></li>
                     </ul>
                 % elif formMode == FormMode.NEW:

@@ -16,7 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import session
+from flask import request, session
 
 from MaKaC.plugins.base import pluginId
 # Most of the following imports are probably not necessary - to clean
@@ -989,6 +989,8 @@ class RHRoomBookingRoomList( RHRoomBookingBase ):
 class RHRoomBookingBookingList( RHRoomBookingBase ):
 
     def _checkParams( self, params ):
+        if params.get('fromSession') == '1':
+            params = session.pop('rbBookingListParams', params)
         self._roomGUIDs = []
         self._candResvs = []
         self._allRooms = False
@@ -1179,6 +1181,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         self._subtitle = session.pop('rbTitle', None)
         self._description = session.pop('rbDescription', None)
         self._resvEx = resvEx
+        session['rbBookingListParams'] = params
 
     def _process( self ):
         # Init
