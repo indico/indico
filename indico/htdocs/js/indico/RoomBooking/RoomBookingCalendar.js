@@ -382,11 +382,11 @@ type ("RoomBookingCalendarDrawer", [],
                 // get conflicts per occurrence
                 var conflicts = $('.barDefaultHover').closest('.dayCalendarDiv').map(function() {
                     return $(this).find('.barConf').length;
-                });
+                }).get();
 
-                var blocked = $('.barDefaultHover').closest('.dayCalendarDiv').map(function() {
-                    return _.any($(this).find('.barBlocked').length);
-                });
+                var blocked = _.any($('.barDefaultHover').closest('.dayCalendarDiv').map(function() {
+                    return $(this).find('.barBlocked').length;
+                }).get());
 
                 var any_conflict = _.any(conflicts);
                 var all_conflicts = conflicts.length && _.every(conflicts, function(e) { return !!e; });
