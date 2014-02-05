@@ -445,16 +445,15 @@ ndRegForm.directive('ndRadioField', function(url) {
             scope.settings.formData.push(['values', 'defaultItem']);
             scope.settings.formData.push(['values', 'inputType']);
 
-            // TODO remove unused colmodel
             scope.settings.editionTable = {
                 sortable: false,
                 actions: ['remove', 'sortable'],
                 colNames:[
-                    $T("caption"),
-                    $T("billable"),
-                    $T("price"),
-                    $T("places limit"),
-                    $T("enable")],
+                    $T("Caption"),
+                    $T("Billable"),
+                    $T("Price"),
+                    $T("Places limit"),
+                    $T("Enabled")],
 
                 colModel: [
                     {name:'caption',

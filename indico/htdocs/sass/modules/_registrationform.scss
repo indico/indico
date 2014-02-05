@@ -354,20 +354,53 @@
 }
 
 .regform-table {
-    td {
-        padding: 2px 0;
+    thead {
+        th {
+            @include border-bottom();
+            padding-bottom: 4px;
+            vertical-align: top;
+        }
+
+        td {
+            background: white !important;
+        }
+
+        th:first-of-type {
+            text-align: left;
+        }
     }
 
-    tr:hover {
-        .remove-row,
-        .action-button {
+    td, th {
+        padding: 4px 4px;
+    }
+
+    tr {
+        &:hover td {
+            background: $light-blue;
+        }
+
+        &.empty-row:hover td {
+            background: white !important;
+        }
+
+        td.row-actions {
+            span {
+                padding-right: 6px;
+            }
+
+            a {
+                color: $blue;
+                visibility: hidden;
+            }
+        }
+
+        &:hover td.row-actions a {
             visibility: visible;
         }
     }
 
-    .remove-row,
-    .action-button {
-        visibility: hidden;
+    .accompanying-col {
+        background: $light-gray;
     }
 }
 
@@ -622,6 +655,7 @@ textarea.regFormDescriptionInputMgmt {
 
 .tabbable {
   *zoom: 1;
+  white-space: nowrap;
 }
 .tabbable:before,
 .tabbable:after {
@@ -645,7 +679,8 @@ textarea.regFormDescriptionInputMgmt {
   margin-bottom: 3px;
 }
 .tabs-left > .nav-tabs {
-  float: left;
+  display: inline-block;
+  vertical-align: top;
   margin-right: 19px;
   border-right: 1px solid #ddd;
 }
@@ -732,8 +767,8 @@ textarea.regFormDescriptionInputMgmt {
   cursor: default;
 }
 .tab-content {
+  display: inline-block;
   overflow: auto;
-  float : left;
 }
 .tabs-below > .nav-tabs,
 .tabs-right > .nav-tabs,
@@ -792,7 +827,7 @@ textarea.regFormDescriptionInputMgmt {
 }
 
 .regform-table {
-    padding-bottom: 20px;
+    padding-bottom: 25px;
 
     tr:hover .table-sortable-handle,
     td:active .table-sortable-handle{

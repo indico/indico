@@ -2,16 +2,38 @@
     <thead>
         <tr role="rowheader">
             <td ng-if="isSortable()"></td>
-            <th ng-repeat="name in config.colNames" style="width: {{config.colModel[$index].width}}px;">
-                {{ name }}
+            <th ng-repeat="name in config.colNames"
+                class="column-title {{ config.colModel[$index].class }}"
+                style="width: {{ config.colModel[$index].width }}px;">
+                <span ng-if="!config.colHelp">
+                    {{ name }}
+                </span>
+                <span ng-if="config.colHelp" title="{{ config.colHelp[$index] }}">
+                    {{ name }}
+                </span>
+            </th>
+            <th>
+                <span ng-if="config.colHelp"
+                    class="icon-question text-superfluous"
+                    title="{{ 'Hover the table headers to get more information' | i18n }}">
+                </span>
             </th>
         </tr>
     </thead>
     <tbody ui-sortable="itemSortableOptions" ng-model="formData">
+        <tr ng-if="!(formData | filter: matchFilter).length" class="empty-row">
+            <td ng-if="isSortable()"></td>
+            <td>
+                <span class="text-superfluous italic">
+                    {{ 'No items' | i18n }}
+                </span>
+            </td>
+        </tr>
         <tr ng-repeat="item in formData | filter: matchFilter">
             <td ng-if="isSortable()"
                 class="table-sortable-handle"></td>
             <td ng-repeat="elem in config.colModel"
+                class="{{ elem.class }}"
                 style="text-align: {{ elem.align }};"
                 name="{{ elem.name }}">
                 <span ng-if="elem.editable == false">
@@ -29,15 +51,16 @@
                     type="checkbox"
                     name="{{elem.name}}"/>
             </td>
-            <td>
-                <a class="icon-remove remove-row" ng-if="config.actions.indexOf('remove') > -1"
-                    ng-click="actionItem(item, 'remove')"
-                    title="{{ 'Remove row' | i18n }}"></a>
-                <a ng-repeat="action in config.actions | filter: actionIsArray"
-                    ng-click="actionItem(item, action[0])"
-                    title="{{ action[1] }}"
-                    class="action-button {{ action[3] }}">
-                </a>
+            <td class="row-actions">
+                <span>
+                    <a class="icon-remove remove-row" ng-if="config.actions.indexOf('remove') > -1"
+                        ng-click="actionItem(item, 'remove')"
+                        title="{{ 'Remove row' | i18n }}"></a>
+                    <a ng-repeat="action in config.actions | filter: actionIsArray"
+                        ng-click="actionItem(item, action[0])"
+                        title="{{ action[1] }}"
+                        class="action-button {{ action[3] }}"></a>
+                </span>
             </td>
         </tr>
     </tbody>

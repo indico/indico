@@ -314,11 +314,11 @@ ndRegForm.directive("ndAccommodationSection", function($rootScope) {
             scope.dialogs.config.editionTable = {
                 sortable: false,
                 colNames: [
-                    $T("caption"),
-                    $T("billable"),
-                    $T("price"),
-                    $T("place limit"),
-                    $T("cancelled")
+                    $T("Accommodation option"),
+                    $T("Billable"),
+                    $T("Price"),
+                    $T("Places limit"),
+                    $T("Cancelled")
                 ],
                 actions: ['remove'],
                 colModel: [
@@ -468,7 +468,14 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
 
             scope.dialogs.config.editionTable = {
                 sortable: false,
-                colNames:[$T('caption'),$T('billable'),$T('price'), $T('enabled')],
+
+                colNames:[
+                    $T('Session'),
+                    $T('Billable'),
+                    $T('Price'),
+                    $T('Enabled')
+                ],
+
                 actions: [''],
                 colModel: [
                        {
@@ -570,7 +577,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
                 } else {
                     return 0;
                 }
-            }
+            };
 
             scope.dialogs.config.formData.push('introSentence');
             scope.dialogs.config.formData.push('selectionType');
@@ -584,12 +591,23 @@ ndRegForm.directive("ndSocialEventSection", function() {
                 sortable: false,
 
                 colNames: [
-                    $T("caption"),
-                    $T("billabe"),
-                    $T("price"),
-                    $T("price/place"),
-                    $T("Nb places"),
-                    $T("Max./part.")
+                    $T("Event name"),
+                    $T("Billabe"),
+                    $T("Price"),
+                    $T("Capacity"),
+                    '',
+                    $T("Accompanying"),
+                    $T("Must pay")
+                ],
+
+                colHelp: [
+                    '',
+                    $T('Uncheck to make the attendance free of charge without changing the price'),
+                    $T('Price for attending the event'),
+                    $T('Maximum amount of participants on the event'),
+                    '',
+                    $T('Limit of accompanying persons a participant can bring'),
+                    $T('Whether accompanying persons have to pay attendance or not')
                 ],
 
                 actions: [
@@ -602,8 +620,8 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            name:'caption',
                            index:'caption',
                            align: 'center',
-                           width:160,
-                           editoptions:{size:"30",maxlength:"50"},
+                           width:140,
+                           editoptions:{size:"25",maxlength:"50"},
                            editable: true,
                            edittype: "text"
                         },
@@ -616,7 +634,6 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            defaultVal : false,
                            edittype:'bool_select'
                         },
-
                         {
                            name:'price',
                            index:'price',
@@ -627,16 +644,6 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            editoptions:{size:"7",maxlength:"20"}
                         },
                         {
-                           name:'pricePerPlace',
-                           index:'pricePerPlace',
-                           width:80,
-                           editable: true,
-                           align: 'center',
-                           defaultVal : false,
-                           edittype:'bool_select'
-                        },
-
-                        {
                            name:'placesLimit',
                            index:'placesLimit',
                            align: 'center',
@@ -644,28 +651,40 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            width:80,
                            editable: true,
                            edittype: "text",
-                           editoptions:{size:"7",maxlength:"20"}
+                           editoptions:{size:"5",maxlength:"20"}
                         },
+                        {width: 20},
                         {
-                           name:'maxPlace',
-                           index:'maxPlace',
+                           name: 'maxPlace',
+                           index: 'maxPlace',
                            align: 'center',
-                           width:80,
+                           class: 'accompanying-col',
+                           width: 60,
                            editable: true,
                            edittype: "text",
-                           editoptions:{size:"7",maxlength:"20"}
+                           editoptions: {size:"6", maxlength:"20"}
+                        },
+                        {
+                           name:'pricePerPlace',
+                           index:'pricePerPlace',
+                           width:80,
+                           editable: true,
+                           align: 'center',
+                           class: 'accompanying-col',
+                           defaultVal : false,
+                           edittype:'bool_select'
                         }
                   ]
             };
 
             scope.dialogs.config.canceledTable = {
                 sortable: false,
-                colNames:[$T("caption"), $T("Reason for cancellation")],
+                colNames:[$T("Event name"), $T("Reason for cancellation")],
                 actions: ['remove', ['uncancel', $T('Uncancel this event'),'#tab-editEvents','icon-checkmark']],
                 colModel: [
                         {
                             index:'caption',
-                            align: 'center',
+                            align: 'left',
                             width:160,
                             editoptions:{size:"30",maxlength:"50"},
                             editable: false
