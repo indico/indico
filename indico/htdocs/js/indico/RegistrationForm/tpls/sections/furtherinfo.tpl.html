@@ -3,7 +3,7 @@
         <div ng-if="section.content == ''" class="section-placeholder">
             {{ 'There is no further information. ' | i18n }}
         </div>
-        <div class="regFormText">
+        <div class="regFormText" ng-bind-html="section.content">
             {{ section.content }}
         </div>
     </div>
