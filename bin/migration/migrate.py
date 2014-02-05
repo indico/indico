@@ -821,12 +821,13 @@ def conferenceMigration1_2(dbi, withRBDB, prevVersion):
     Tasks: 1. Removing Video Services from core
            2. Migrates old AbstractField to new AbstractField subclasses
            3. Add download e-ticket PDF link to the menu
+           4. Merges RegForm label caption and description
     """
 
     def removeVideoServicesLinksFromCore(conf):
-        ############################################
-        # Video Services migration remove from core
-        ############################################
+        """
+        Video Services migration remove from core
+        """
 
         # Update Menu Links
         menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf).getMenu()
@@ -836,9 +837,9 @@ def conferenceMigration1_2(dbi, withRBDB, prevVersion):
                 link.setURLHandler(urlHandlers.UHCollaborationDisplay)
 
     def updateAbstractFields(conf):
-        #############################################################
-        # Migrates old AbstractField to new AbstractField subclasses
-        #############################################################
+        """
+        Migrates old AbstractField to new AbstractField subclasses
+        """
 
         afm = conf.getAbstractMgr().getAbstractFieldsMgr()
         for index, field in enumerate(afm._fields):
@@ -863,6 +864,18 @@ def conferenceMigration1_2(dbi, withRBDB, prevVersion):
         # Delete all None items in the field list
         afm._fields = filter(None, afm._fields)
 
+    def mergeLabelCaptionAndDescription(conf):
+        """
+        Merges RegForm label caption and description
+        """
+
+        regForm = conf.getRegistrationForm()
+        for section in regForm.getGeneralSectionFormsList():
+            for field in section.getSortedFields():
+                inputField = field.getInput()
+                if inputField.getId() == "label" and field.getDescription() != "":
+                    field.setCaption("{0}<br/><small>{1}</small>".format(field.getCaption(), field.getDescription()))
+                    field.setDescription("")
 
     cdmr = displayMgr.ConfDisplayMgrRegistery()
     ch = ConferenceHolder()
@@ -872,6 +885,7 @@ def conferenceMigration1_2(dbi, withRBDB, prevVersion):
 
         removeVideoServicesLinksFromCore(conf)
         updateAbstractFields(conf)
+        mergeLabelCaptionAndDescription(conf)
         # Add download e-ticket PDF link to the menu:
         _fixDefaultStyle(conf, cdmr)
 
