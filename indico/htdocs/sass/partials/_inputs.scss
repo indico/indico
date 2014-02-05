@@ -80,6 +80,10 @@ select {
 
 div[contenteditable],
 span[contenteditable] {
+    p {
+        margin: 0px;
+    }
+
     &:hover {
         outline: 1px dashed $gray;
     }

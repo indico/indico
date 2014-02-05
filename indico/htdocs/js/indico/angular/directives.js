@@ -154,9 +154,25 @@ ndDirectives.directive("contenteditable", function() {
             scope.multiline = scope.$eval(attrs.ndMultiline) || false;
 
             var sanitizeHtml = function() {
-                var sanitized = elem.html().replace(/<div[^<]*?>/g, '<br>').replace(/<\/div[^<]*?>/g, '');
-                sanitized = sanitized.replace(/^(<br>)*/, '');
-                sanitized = sanitized.replace(/(<br>)*$/, '');
+                var sanitized = elem.html();
+
+                // Chrome sanitization
+                sanitized = sanitized
+                    .replace(/<div[^<]*?>/g, '<br>')
+                    .replace(/<\/div[^<]*?>/g, '');
+
+                // IE sanitization
+                sanitized = sanitized
+                    .replace(/<p>&nbsp;<\/p>/g, '<p><\/p>')
+                    .replace(/<p[^<]*?>/g, '<br>')
+                    .replace(/<\/p[^<]*?>/g, '');
+
+                // Trimming
+                sanitized = sanitized
+                    .replace(/&nbsp;/g, ' ')
+                    .replace(/^(( )*(<br>))*/, '')
+                    .replace(/(( )*(<br>)( )*)*$/, '');
+
                 elem.html(sanitized);
             };
 
