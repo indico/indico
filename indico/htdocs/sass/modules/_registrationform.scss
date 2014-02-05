@@ -824,7 +824,8 @@ textarea.regFormDescriptionInputMgmt {
 // ============================================================================
 
 .regform-section-title,
-.regform-section-description {
+.regform-section-description,
+.regFormText {
     &[contenteditable]+.button-box {
         a {
             text-shadow: none;
@@ -864,15 +865,14 @@ textarea.regFormDescriptionInputMgmt {
     }
 }
 
-.regform-section-description {
-    &[contenteditable] {
-        &.focus {
-            min-height: 27px !important;
-        }
+.regform-section-description[contenteditable],
+.regFormText[contenteditable] {
+    &.focus {
+        min-height: 27px !important;
+    }
 
-        &+.button-box a {
-            font-size: 1.5em !important;
-            line-height: 27px !important;
-        }
+    &+.button-box a {
+        font-size: 1.5em !important;
+        line-height: 27px !important;
     }
 }
