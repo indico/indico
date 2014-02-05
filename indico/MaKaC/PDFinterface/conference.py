@@ -480,6 +480,8 @@ class ContributionBook(PDFLaTeXBase):
         contribs = self._sort_contribs(contribs, sort_by, aw)
 
         affiliation_contribs = {}
+        corresp_authors = {}
+
         for contrib in contribs:
             affiliations, author_mapping, coauthor_mapping = extract_affiliations(contrib)
 
@@ -489,19 +491,14 @@ class ContributionBook(PDFLaTeXBase):
                 'coauthors_affil': coauthor_mapping
             }
 
-        corresp_authors = []
-
-        # figure out "corresponding author(s)"
-        if conf.getBOAConfig().getCorrespondingAuthor() == "submitter":
-            if isinstance(contrib, conference.AcceptedContribution):
-                corresp_authors.append(contrib.getAbstract().getSubmitter().getEmail())
-            elif contrib.getSubmitterList():
-                corresp_authors.append(contrib.getSubmitterList()[0].getEmail())
-
-        elif conf.getBOAConfig().getCorrespondingAuthor() == "speakers":
-            corresp_authors = [speaker.getEmail() for speaker in contrib.getSpeakerList()]
-
-        abstract = contrib.getDescription()
+            # figure out "corresponding author(s)"
+            if conf.getBOAConfig().getCorrespondingAuthor() == "submitter":
+                if isinstance(contrib, conference.AcceptedContribution):
+                    corresp_authors[contrib.getId()] = [contrib.getAbstract().getSubmitter().getEmail()]
+                elif contrib.getSubmitterList():
+                    corresp_authors[contrib.getId()] = [contrib.getSubmitterList()[0].getEmail()]
+            elif conf.getBOAConfig().getCorrespondingAuthor() == "speakers":
+                corresp_authors[contrib.getId()] = [speaker.getEmail() for speaker in contrib.getSpeakerList()]
 
         self._args.update({
             'affiliation_contribs': affiliation_contribs,

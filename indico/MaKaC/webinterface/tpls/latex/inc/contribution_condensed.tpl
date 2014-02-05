@@ -60,9 +60,9 @@
     \end{description}
 % endif
 
-% if corresp_authors:
+% if corresp_authors[contrib.getId()]:
 \textbf {${_("Corresponding Author(s):")}}
-        ${",".join(corresp_authors)}
+        ${", ".join(corresp_authors[contrib.getId()])}
 % endif
 
 \vspace{0.5em}
