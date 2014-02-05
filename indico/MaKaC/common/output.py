@@ -186,7 +186,7 @@ class outputGenerator(Observable):
 
     def _getExternalUserAccounts(self, user):
         accounts = []
-        for identity in user.getIdentityList():
+        for identity in user.getIdentityList(create_identities=True):
             if identity.getAuthenticatorTag() != 'Local':
                 accounts.append(identity.getLogin())
 

@@ -636,7 +636,7 @@ class LDAPGroup(Group):
         if not avatar:
             return False
         login = None
-        for aid in avatar.getIdentityList():
+        for aid in avatar.getIdentityList(create_identities=True):
             if aid.getAuthenticatorTag() == 'LDAP':
                 login = aid.getLogin()
         if not login:

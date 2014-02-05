@@ -867,10 +867,15 @@ class Avatar(Persistent, Fossilizable):
             self.identities.remove(Id)
             self._p_changed = 1
 
-    def getIdentityList(self):
+    def getIdentityList(self, create_identities=False):
         """ Returns a list of identities for this Avatar.
             Each identity will be a PIdentity or inheriting object
         """
+        if createIdentities:
+            for authenticator in AuthenticatorMgr().getList():
+                identities = self.getIdentityByAuthenticatorName(authenticator.getName())
+                for identity in identities:
+                    self.addIdentity(identity)
         return self.identities
 
     def getIdentityByAuthenticatorName(self, authenticatorName):
@@ -1485,7 +1490,7 @@ class AvatarHolder(ObjectHolder):
         # add merged email and logins to prin and merge users
         for mail in merged.getEmails():
             prin.addSecondaryEmail(mail)
-        for id in merged.getIdentityList():
+        for id in merged.getIdentityList(create_identities=True):
             id.setUser(prin)
             prin.addIdentity(id)
 
@@ -1511,7 +1516,7 @@ class AvatarHolder(ObjectHolder):
         for mail in merged.getEmails():
             prin.removeSecondaryEmail(mail)
 
-        for id in merged.getIdentityList():
+        for id in merged.getIdentityList(create_identities=True):
             prin.removeIdentity(id)
             id.setUser(merged)
 
