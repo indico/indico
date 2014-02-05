@@ -96,6 +96,7 @@
 
             self.clearIcon.css('font-size', self.size.fontSize);
             self.clearIcon.css('line-height', self.size.lineHeight);
+            self.element.css('min-height', self.size.lineHeight);
         },
 
         setEmptyValue: function(value) {

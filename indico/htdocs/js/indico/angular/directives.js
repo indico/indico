@@ -187,7 +187,7 @@ ndDirectives.directive("contenteditable", function() {
 
             var getOneLineHeight = function() {
                 var html = elem.html();
-                var height = elem.html('').css('height');
+                var height = elem.html('.').css('height');
                 elem.html(html);
                 return height;
             };
