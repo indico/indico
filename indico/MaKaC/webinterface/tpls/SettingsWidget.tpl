@@ -45,7 +45,6 @@ $("#settingsWidget a").click(function(){
 });
 
 $(".userSettings").qtip({
-
     style: {
         minWidth: '200px',
         classes: 'qtip-rounded qtip-shadow qtip-popup',
@@ -59,9 +58,7 @@ $(".userSettings").qtip({
         my: 'top center',
         at: 'bottom center'
     },
-    content: function(api){
-        return $('#settingsWidget');
-        },
+    content: $('#settingsWidget'),
     show: {
         event: "click",
         effect: function() {
