@@ -261,6 +261,7 @@ ndRegForm.directive('ndCheckboxField', function(url) {
         },
 
         link: function(scope) {
+            scope.settings.fieldName = $T("Multiple choices/checkbox");
             scope.settings.billable = true;
             scope.settings.caption = false;
             scope.settings.description = false;
@@ -277,6 +278,10 @@ ndRegForm.directive('ndCountryField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/country.tpl.html');
+        },
+
+        link: function(scope) {
+            scope.settings.fieldName = $T("Country");
         }
     };
 });
@@ -286,9 +291,11 @@ ndRegForm.directive('ndDateField', function(url) {
         require: 'ndField',
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/date.tpl.html');
+
         },
 
         link: function(scope) {
+            scope.settings.fieldName = $T("Date");
             scope.settings.date = true;
             scope.settings.formData.push(['values', 'displayFormats']);
             scope.settings.formData.push(['values', 'dateFormat']);
@@ -313,7 +320,9 @@ ndRegForm.directive('ndFileField', function(url) {
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/file.tpl.html');
         },
+
         link: function(scope) {
+            scope.settings.fieldName = $T("File");
             scope.removeAttachment = function() {
                 delete scope.userdata[scope.getName(scope.field.input)];
             };
@@ -329,6 +338,7 @@ ndRegForm.directive('ndLabelField', function(url) {
         },
 
         link: function(scope) {
+            scope.settings.fieldName = $T("Free Text");
             scope.settings.billable = true;
             scope.settings.caption = false;
             scope.settings.description = false;
@@ -347,6 +357,7 @@ ndRegForm.directive('ndNumberField', function(url) {
         },
 
         link: function(scope) {
+            scope.settings.fieldName = $T("Number");
             scope.settings.billable = true;
             scope.settings.number = true;
             scope.settings.formData.push('billable');
@@ -381,6 +392,7 @@ ndRegForm.directive('ndRadioField', function(url) {
         },
 
         link: function(scope) {
+            scope.settings.fieldName = $T("Multiple options/One choice");
             scope.settings.defaultValue = true;
             scope.settings.itemtable = true;
 
@@ -502,7 +514,9 @@ ndRegForm.directive('ndTelephoneField', function(url) {
         controller: function($scope) {
             $scope.tplInput = url.tpl('fields/telephone.tpl.html');
         },
+
         link: function(scope) {
+            scope.settings.fieldName = $T("Telephone");
             scope.settings.formData.push(['values', 'length']);
         }
     };
@@ -516,6 +530,7 @@ ndRegForm.directive('ndTextField', function(url) {
         },
 
         link: function(scope) {
+            scope.settings.fieldName = $T("Text");
             scope.settings.size = true;
             scope.settings.formData.push(['values', 'length']);
         }
@@ -530,6 +545,7 @@ ndRegForm.directive('ndTextareaField', function(url) {
         },
 
         link: function(scope) {
+            scope.settings.fieldName = $T("Textarea");
             scope.settings.rowsAndColumns = true;
             scope.settings.formData.push(['values', 'numberOfColumns']);
             scope.settings.formData.push(['values', 'numberOfRows']);
@@ -545,6 +561,7 @@ ndRegForm.directive('ndYesnoField', function(url) {
         },
 
         link: function(scope) {
+            scope.settings.fieldName = $T("Yes/No");
             scope.settings.billable = true;
             scope.settings.placesLimit = true;
             scope.settings.formData.push('billable');
