@@ -510,7 +510,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             [
                 [
                     $T('Title'),
-                    $B(this.parameterManager.add(Html.edit({id:'addContributionFocusField'}), 'text', false),
+                    $B(this.parameterManager.add(Html.edit({id:'addContributionFocusField', autocomplete: 'off'}), 'text', false),
                        info.accessor('title'))
                 ],
                 [$T('Place'), Html.div({style: {marginBottom: '15px'}}, this.roomEditor.draw())],
@@ -1039,7 +1039,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              var colorPickerComponent = ['Color', Html.div({style: {padding: '5px 0 10px 0'}}, colorPicker.getLink(null, 'Choose a color'))];
 
              var contentDiv = IndicoUtil.createFormFromMap([
-                 [$T('Title'), $B(self.parameterManager.add(Html.edit({ id: 'breakTitle'})), this.info.accessor('title'))],
+                 [$T('Title'), $B(self.parameterManager.add(Html.edit({id: 'breakTitle', autocomplete: 'off'})), this.info.accessor('title'))],
                  [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), this.info.accessor('description'))],
                  [$T('Place'), this.roomEditor.draw()],
                  [$T('Date'), this.conferenceDays],
