@@ -155,9 +155,8 @@ ndDirectives.directive("contenteditable", function() {
 
             var sanitizeHtml = function() {
                 var sanitized = elem.html().replace(/<div[^<]*?>/g, '<br>').replace(/<\/div[^<]*?>/g, '');
-                sanitized = sanitized.replace(/<br>(<br>)+/g, '<br>');
-                sanitized = sanitized.replace(/^<br>/, '');
-                sanitized = sanitized.replace(/<br>$/, '');
+                sanitized = sanitized.replace(/^(<br>)*/, '');
+                sanitized = sanitized.replace(/(<br>)*$/, '');
                 elem.html(sanitized);
             };
 
