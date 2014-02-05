@@ -143,12 +143,14 @@
         popupCoAuthors.open();
     });
 
-    $("#revSubmit").click(function(){
+    $("#revSubmit").click(function(e){
+        e.preventDefault();
         var popupSubmit = new SubmitPopup($T("Paper selection and submission"), args);
         popupSubmit.open();
     });
 
-    $("#revMaterial").click(function(){
+    $("#revMaterial").click(function(e){
+        e.preventDefault();
         var killProgress = IndicoUI.Dialogs.Util.progress();
         jsonRpc(Indico.Urls.JsonRpcService, "material.reviewing.list", args,
                 function(result, error){
@@ -162,7 +164,8 @@
         });
     });
 
-    $("#revHistory").click(function(){
+    $("#revHistory").click(function(e){
+        e.preventDefault();
         var killProgress = IndicoUI.Dialogs.Util.progress();
             jsonRpc(Indico.Urls.JsonRpcService, "contribution.review.getReviewHistory",
                     {confId: '${Contribution.getConference().getId()}',
