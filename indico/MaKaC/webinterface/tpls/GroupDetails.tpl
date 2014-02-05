@@ -64,7 +64,7 @@
     % else:
         <div class="error-message-box" style="display: inline-block">
             <div class="message-text">
-                ${_("The group memberlist could not be retrieved. It seems this group does not exist anymore. Please click in 'modify' and set is as obsolete.")}
+                ${_("The group memberlist could not be retrieved. It might be that this group does not exist anymore. If this is the case, please set it as obsolete.")}
             </div>
         </div>
     </td>
