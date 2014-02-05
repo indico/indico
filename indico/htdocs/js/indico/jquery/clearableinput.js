@@ -39,7 +39,7 @@
 
             self.buttonBox = $('<span class="button-box"></span>');
 
-            self.clearIcon = $('<span class="input-clear icon-close"></span>')
+            self.clearIcon = $('<a class="input-clear icon-close"></a>')
                 .css("line-height", input.css("height"))
                 .click(function() {
                     self._clear();

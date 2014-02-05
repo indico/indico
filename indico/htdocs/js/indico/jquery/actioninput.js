@@ -34,7 +34,7 @@
 
             self._super();
 
-            self.actionIcon = $('<span class="input-action {0}"></span>'.format(self.options.actionIcon))
+            self.actionIcon = $('<a class="input-action {0}"></a>'.format(self.options.actionIcon))
                 .css("line-height", input.css("height"))
                 .click(function() {
                     self._action();

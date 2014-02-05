@@ -194,10 +194,10 @@ ndDirectives.directive("contenteditable", function() {
 
             var actions = {
                 init: function() {
-                    elem.addClass('focus');
+                    elem.actioninput('initSize', elem.css('font-size'), getOneLineHeight());
                     elem.actioninput('setIconsVisibility', 'visible');
                     elem.actioninput('setEmptyValue', elem.html());
-                    elem.actioninput('initSize', elem.css('font-size'), getOneLineHeight());
+                    elem.addClass('focus');
                     elem.removeClass('empty');
 
                     if (ctrl.$viewValue === '' && !scope.edition) {
