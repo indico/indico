@@ -17,7 +17,8 @@
 
 var ndRegForm = angular.module('nd.regform', [
     'ui.sortable',
-    'ngResource'
+    'ngResource',
+    'ngSanitize'
 ]);
 
 // ============================================================================

@@ -209,6 +209,7 @@ def install_angular():
             local('mkdir -p {0}'.format(dest_dir_js))
             local('cp build/angular.js {0}/'.format(dest_dir_js))
             local('cp build/angular-resource.js {0}/'.format(dest_dir_js))
+            local('cp build/angular-sanitize.js {0}/'.format(dest_dir_js))
             local('cp css/angular.css {0}'.format(dest_dir_css))
 
 
