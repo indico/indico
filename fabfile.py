@@ -47,7 +47,7 @@ env.src_dir = os.path.dirname(__file__)
 execfile(env.conf, {}, env)
 env.ext_dir = os.path.join(env.src_dir, env.ext_dirname)
 env.target_dir = os.path.join(env.src_dir, env.target_dirname)
-node_env_path = os.path.join(env.src_dir, env.node_env_dirname)
+env.node_env_path = os.path.join(env.src_dir, env.node_env_dirname)
 
 
 def recipe(name):
