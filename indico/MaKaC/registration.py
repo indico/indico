@@ -760,7 +760,7 @@ class Notification(Persistent):
                 pass
             else:
                 sects.append("""%s""" % self._printMiscellaneousInfo(formSection, rp.getMiscellaneousGroupById(formSection.getId())))
-        return "".join(sects)
+        return "".join(s.decode('utf-8') for s in sects).encode('utf-8')
 
     def _cleanBody(self, body):
         # format the line-breaks in unix-style

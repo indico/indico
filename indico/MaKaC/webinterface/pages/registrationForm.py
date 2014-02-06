@@ -914,7 +914,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                 pass
             else:
                 sects.append(self._getMiscellaneousInfoHTML(formSection))
-        return "".join(sects)
+        return "".join(s.decode('utf-8') for s in sects).encode('utf-8')
 
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
