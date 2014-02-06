@@ -457,7 +457,7 @@ type("AlertPopup", ["ExclusivePopupWithButtons"],
 type("ConfirmPopup", ["ExclusivePopupWithButtons"],
     {
         draw: function() {
-            return this.ExclusivePopup.prototype.draw.call(this, this.content);
+            return this.ExclusivePopup.prototype.draw.call(this, this.content, this.style);
         },
         _getButtons: function() {
             var self = this;
@@ -474,11 +474,12 @@ type("ConfirmPopup", ["ExclusivePopupWithButtons"],
         }
     },
 
-    function(title, content, handler, buttonTitle, cancelButtonTitle) {
+    function(title, content, handler, buttonTitle, cancelButtonTitle, style) {
         var self = this;
 
         this.buttonTitle = buttonTitle || 'OK';
         this.cancelButtonTitle = cancelButtonTitle || 'Cancel';
+        this.style = style || {};
         this.content = content;
         this.handler = handler;
         this.ExclusivePopupWithButtons(title, function() {

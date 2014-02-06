@@ -381,7 +381,7 @@ ndDirectives.directive('ndConfirmationPopup', function() {
 
         link: function(scope) {
             var open = function() {
-                var popup = new ConfirmPopup(scope.heading, scope.content, scope.callback);
+                var popup = new ConfirmPopup(scope.heading, scope.content, scope.callback, null, null, {'max-width': '300px'});
                 popup.open();
             };
 
