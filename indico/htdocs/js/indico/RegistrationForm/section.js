@@ -592,7 +592,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
 
                 colNames: [
                     $T("Event name"),
-                    $T("Billabe"),
+                    $T("Billable"),
                     $T("Price"),
                     $T("Capacity"),
                     '',
