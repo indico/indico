@@ -155,7 +155,7 @@
     }
 
     .field-actions {
-        display: none;
+        visibility: hidden;
         float: right;
         line-height: 27px;
         padding: 0 5px;
@@ -348,7 +348,7 @@
         background-color: $light-blue;
 
         .field-actions {
-            display: block !important;
+            visibility: visible;
         }
     }
 }
