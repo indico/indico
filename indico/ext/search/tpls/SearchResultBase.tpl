@@ -29,6 +29,7 @@
                 <div>
                   <input style="width: 300px; height:20px; font-size:17px; vertical-align: middle;" type="text" name="p" value=${ quoteattr(p) } />
                   <input type="submit" value="${ _('Search')}" style="vertical-align: middle;"/>
+                  <%block name='searchFieldTooltip'></%block>
                 </div>
 
                 <div style="padding-top: 4px;"><span id="advancedOptionsText" class='fakeLink'>${_("Show advanced options") }</span></div>

@@ -6,12 +6,12 @@
         <div class="searchButton">
 
         </div>
-        <div id="moreOptions" class="${ moreOptionsClass }" onclick="javascript:return expandMenu(this);"></div>
+        <div id="moreOptions" class="${ moreOptionsClass }" onclick="expandMenu(this);"></div>
         <input style="background-color: transparent;" type="text" id="searchText" name="p" />
 </div>
 
     <div id="extraOptions">
-        <div id="advancedOptionsLabel">${ _("Advanced options")}</div>
+        <div id="advancedOptionsLabel">${ _("Advanced options")} <%block name='searchSyntaxTooltip'></%block></div>
         <table id="extraOptionsTable">
         <tr>
                 <td style="text-align: right;">${ _("Search in")}</td>
@@ -58,7 +58,6 @@ function expandMenu(domElem)
 
     if(!exists(elem.dom.extraShown))
     {
-        var controls = searchControls;
         $('#extraOptions').width($('#searchControls').width()).slideDown('fast');
         $('#extraOptions').position({
             of: $('#searchControls'),

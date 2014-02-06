@@ -1956,6 +1956,18 @@ ul.UIPeopleList li.UIError
 {
 }
 
+#search-advanced-help-tooltip code {
+    font-size: 1.1em;
+}
+
+#search-advanced-help-tooltip .field {
+    color: #8a8a45;
+}
+
+#search-advanced-help-tooltip .negation {
+    color: #b00;
+}
+
 div#UISearchBox
 {
     position: absolute;
@@ -2018,10 +2030,14 @@ div#UISearchBox #extraOptions table {
     width:auto;
 }
 
+div#UISearchBox #extraOptions table td:first-child {
+    padding-left: 10px;
+}
+
 div#UISearchBox #extraOptions input {
     margin-left: 8px;
     font-size: 12px;
-    width: 110px;
+    width: 148px;
 }
 
 div#UISearchBox #extraOptions select {
