@@ -205,8 +205,11 @@ ndDirectives.directive("contenteditable", function() {
                         elem.html('');
                     }
 
+                    if (!scope.edition) {
+                        elem.text(elem.html());
+                    }
+
                     scope.edition = true;
-                    elem.text(elem.html());
                 },
                 close: function() {
                     elem.removeClass('focus');
