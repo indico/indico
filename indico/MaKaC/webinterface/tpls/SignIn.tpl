@@ -29,7 +29,7 @@
 <div class="i-box">
     <div class="i-box-header">
         <div class="i-box-title">
-            ${ _('Local Login') }
+            ${ _('Login') }
         </div>
     </div>
     <div class="i-box-body">
