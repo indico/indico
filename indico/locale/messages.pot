@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 1.2-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-01-27 17:31+0100\n"
+"POT-Creation-Date: 2014-02-06 13:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -145,7 +145,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/VideoCreation.tpl:9
 #: indico/ext/search/invenio/tpls/SearchResult.tpl:25
 #: indico/ext/search/tpls/SearchBoxBase.tpl:21
-#: indico/ext/search/tpls/SearchResultBase.tpl:42
+#: indico/ext/search/tpls/SearchResultBase.tpl:43
 msgid "Title"
 msgstr ""
 
@@ -361,50 +361,50 @@ msgstr ""
 msgid "Fixed Elements"
 msgstr ""
 
-#: MaKaC/conference.py:408 MaKaC/conference.py:4088 indico/MaKaC/conference.py:408
-#: indico/MaKaC/conference.py:4088
+#: MaKaC/conference.py:408 MaKaC/conference.py:4089 indico/MaKaC/conference.py:408
+#: indico/MaKaC/conference.py:4089
 msgid "The paper for this conference has already been set"
 msgstr ""
 
 #: MaKaC/conference.py:408 MaKaC/conference.py:435 MaKaC/conference.py:462
-#: MaKaC/conference.py:489 MaKaC/conference.py:523 MaKaC/conference.py:4088
-#: MaKaC/conference.py:4115 MaKaC/conference.py:4142 MaKaC/conference.py:4169
-#: MaKaC/conference.py:4203 MaKaC/webinterface/pages/conferences.py:7179
+#: MaKaC/conference.py:489 MaKaC/conference.py:523 MaKaC/conference.py:4089
+#: MaKaC/conference.py:4116 MaKaC/conference.py:4143 MaKaC/conference.py:4170
+#: MaKaC/conference.py:4204 MaKaC/webinterface/pages/conferences.py:7179
 #: MaKaC/webinterface/pages/conferences.py:7192
 #: MaKaC/webinterface/tpls/CategoryDisplay.tpl:39 indico/MaKaC/conference.py:408
 #: indico/MaKaC/conference.py:435 indico/MaKaC/conference.py:462
 #: indico/MaKaC/conference.py:489 indico/MaKaC/conference.py:523
-#: indico/MaKaC/conference.py:4088 indico/MaKaC/conference.py:4115
-#: indico/MaKaC/conference.py:4142 indico/MaKaC/conference.py:4169
-#: indico/MaKaC/conference.py:4203
+#: indico/MaKaC/conference.py:4089 indico/MaKaC/conference.py:4116
+#: indico/MaKaC/conference.py:4143 indico/MaKaC/conference.py:4170
+#: indico/MaKaC/conference.py:4204
 #: indico/MaKaC/webinterface/pages/conferences.py:7179
 #: indico/MaKaC/webinterface/pages/conferences.py:7192
 #: indico/MaKaC/webinterface/tpls/CategoryDisplay.tpl:39
 msgid "Conference"
 msgstr ""
 
-#: MaKaC/conference.py:435 MaKaC/conference.py:4115 indico/MaKaC/conference.py:435
-#: indico/MaKaC/conference.py:4115
+#: MaKaC/conference.py:435 MaKaC/conference.py:4116 indico/MaKaC/conference.py:435
+#: indico/MaKaC/conference.py:4116
 msgid "The slides for this conference have already been set"
 msgstr ""
 
-#: MaKaC/conference.py:462 MaKaC/conference.py:4142 indico/MaKaC/conference.py:462
-#: indico/MaKaC/conference.py:4142
+#: MaKaC/conference.py:462 MaKaC/conference.py:4143 indico/MaKaC/conference.py:462
+#: indico/MaKaC/conference.py:4143
 msgid "The video for this conference has already been set"
 msgstr ""
 
-#: MaKaC/conference.py:489 MaKaC/conference.py:4169 indico/MaKaC/conference.py:489
-#: indico/MaKaC/conference.py:4169
+#: MaKaC/conference.py:489 MaKaC/conference.py:4170 indico/MaKaC/conference.py:489
+#: indico/MaKaC/conference.py:4170
 msgid "the poster for this conference has already been set"
 msgstr ""
 
-#: MaKaC/conference.py:516 MaKaC/conference.py:4196 indico/MaKaC/conference.py:516
-#: indico/MaKaC/conference.py:4196
+#: MaKaC/conference.py:516 MaKaC/conference.py:4197 indico/MaKaC/conference.py:516
+#: indico/MaKaC/conference.py:4197
 msgid "The Minutes for this conference has already been set"
 msgstr ""
 
-#: MaKaC/conference.py:523 MaKaC/conference.py:4203 indico/MaKaC/conference.py:523
-#: indico/MaKaC/conference.py:4203
+#: MaKaC/conference.py:523 MaKaC/conference.py:4204 indico/MaKaC/conference.py:523
+#: indico/MaKaC/conference.py:4204
 msgid "The minutes for this conference have already been created"
 msgstr ""
 
@@ -413,11 +413,11 @@ msgid "Root category cannot be deleted"
 msgstr ""
 
 #: MaKaC/conference.py:973 MaKaC/conference.py:976 MaKaC/conference.py:1052
-#: MaKaC/conference.py:1100 MaKaC/conference.py:1102
+#: MaKaC/conference.py:1101 MaKaC/conference.py:1103
 #: MaKaC/webinterface/tpls/CategModifHeader.tpl:7
 #: MaKaC/webinterface/tpls/CategoryModifFrame.tpl:2 indico/MaKaC/conference.py:973
 #: indico/MaKaC/conference.py:976 indico/MaKaC/conference.py:1052
-#: indico/MaKaC/conference.py:1100 indico/MaKaC/conference.py:1102
+#: indico/MaKaC/conference.py:1101 indico/MaKaC/conference.py:1103
 #: indico/MaKaC/webinterface/tpls/CategModifHeader.tpl:7
 #: indico/MaKaC/webinterface/tpls/CategoryModifFrame.tpl:2
 msgid "Category"
@@ -431,103 +431,103 @@ msgstr ""
 msgid "Cannot add subcategory: the current category already contains events"
 msgstr ""
 
-#: MaKaC/conference.py:1100 indico/MaKaC/conference.py:1100
+#: MaKaC/conference.py:1101 indico/MaKaC/conference.py:1101
 msgid "Cannot add event: the current category already contains some sub-categories"
 msgstr ""
 
-#: MaKaC/conference.py:1102 indico/MaKaC/conference.py:1102
+#: MaKaC/conference.py:1103 indico/MaKaC/conference.py:1103
 msgid "Cannot add to a category an event which is not registered"
 msgstr ""
 
-#: MaKaC/conference.py:2031 indico/MaKaC/conference.py:2031
+#: MaKaC/conference.py:2032 indico/MaKaC/conference.py:2032
 msgid "A creator must be specified when creating a new Event"
 msgstr ""
 
-#: MaKaC/conference.py:2031 MaKaC/conference.py:2772 MaKaC/conference.py:2903
-#: MaKaC/conference.py:2980 MaKaC/conference.py:2982 MaKaC/conference.py:3463
-#: MaKaC/conference.py:3471 MaKaC/schedule.py:616 MaKaC/schedule.py:619
-#: MaKaC/schedule.py:621 indico/MaKaC/conference.py:2031
-#: indico/MaKaC/conference.py:2772 indico/MaKaC/conference.py:2903
-#: indico/MaKaC/conference.py:2980 indico/MaKaC/conference.py:2982
-#: indico/MaKaC/conference.py:3463 indico/MaKaC/conference.py:3471
+#: MaKaC/conference.py:2032 MaKaC/conference.py:2773 MaKaC/conference.py:2904
+#: MaKaC/conference.py:2981 MaKaC/conference.py:2983 MaKaC/conference.py:3464
+#: MaKaC/conference.py:3472 MaKaC/schedule.py:616 MaKaC/schedule.py:619
+#: MaKaC/schedule.py:621 indico/MaKaC/conference.py:2032
+#: indico/MaKaC/conference.py:2773 indico/MaKaC/conference.py:2904
+#: indico/MaKaC/conference.py:2981 indico/MaKaC/conference.py:2983
+#: indico/MaKaC/conference.py:3464 indico/MaKaC/conference.py:3472
 #: indico/MaKaC/schedule.py:616 indico/MaKaC/schedule.py:619
 #: indico/MaKaC/schedule.py:621
 msgid "Event"
 msgstr ""
 
-#: MaKaC/conference.py:2371 indico/MaKaC/conference.py:2371
+#: MaKaC/conference.py:2372 indico/MaKaC/conference.py:2372
 msgid "NO TITLE ASSIGNED"
 msgstr ""
 
-#: MaKaC/conference.py:2772 indico/MaKaC/conference.py:2772
+#: MaKaC/conference.py:2773 indico/MaKaC/conference.py:2773
 msgid "Start date cannot be after the end date"
 msgstr ""
 
-#: MaKaC/conference.py:2799 indico/MaKaC/conference.py:2799
+#: MaKaC/conference.py:2800 indico/MaKaC/conference.py:2800
 msgid ""
 "The start/end dates were not changed since the selected timespan is not large"
 " enough to accomodate the contained timetable entries and spacings."
 msgstr ""
 
-#: MaKaC/conference.py:2802 indico/MaKaC/conference.py:2802
+#: MaKaC/conference.py:2803 indico/MaKaC/conference.py:2803
 msgid "You should try using a larger timespan."
 msgstr ""
 
-#: MaKaC/conference.py:2903 indico/MaKaC/conference.py:2903
+#: MaKaC/conference.py:2904 indico/MaKaC/conference.py:2904
 msgid "End date cannot be before the Start date"
 msgstr ""
 
-#: MaKaC/conference.py:2980 indico/MaKaC/conference.py:2980
+#: MaKaC/conference.py:2981 indico/MaKaC/conference.py:2981
 msgid "End date cannot be before the start date"
 msgstr ""
 
-#: MaKaC/conference.py:2982 indico/MaKaC/conference.py:2982
+#: MaKaC/conference.py:2983 indico/MaKaC/conference.py:2983
 #, python-format
 msgid ""
 "Cannot change end date to %s: some entries in the timetable would be outside "
 "this date (%s)"
 msgstr ""
 
-#: MaKaC/conference.py:3364 indico/MaKaC/conference.py:3364
+#: MaKaC/conference.py:3365 indico/MaKaC/conference.py:3365
 #, python-format
 msgid ""
 "Cannot add this session  (Start:%s - End:%s) Outside of the event's time "
 "table(Start:%s - End:%s)"
 msgstr ""
 
-#: MaKaC/conference.py:3463 indico/MaKaC/conference.py:3463
+#: MaKaC/conference.py:3464 indico/MaKaC/conference.py:3464
 msgid "Cannot add a contribution which has been withdrawn"
 msgstr ""
 
-#: MaKaC/conference.py:3471 indico/MaKaC/conference.py:3471
+#: MaKaC/conference.py:3472 indico/MaKaC/conference.py:3472
 #, python-format
 msgid "Cannot add this contribution id:(%s) as it has already been used"
 msgstr ""
 
-#: MaKaC/conference.py:4597 indico/MaKaC/conference.py:4597
+#: MaKaC/conference.py:4598 indico/MaKaC/conference.py:4598
 #, python-format
 msgid "Error with id: expected '%s', found '%s'."
 msgstr ""
 
-#: MaKaC/conference.py:4965 indico/MaKaC/conference.py:4965
+#: MaKaC/conference.py:4966 indico/MaKaC/conference.py:4966
 msgid ""
 "There are no admin users. The \"default\" conference that stores the template"
 " cannot be created.\n"
 "                                Please add at least 1 user to the admin list."
 msgstr ""
 
-#: MaKaC/conference.py:4996 indico/MaKaC/conference.py:4996
+#: MaKaC/conference.py:4997 indico/MaKaC/conference.py:4997
 #, python-format
 msgid "The specified event with id \"%s\" does not exist or has been deleted."
 msgstr ""
 
-#: MaKaC/conference.py:5577 indico/MaKaC/conference.py:5577
+#: MaKaC/conference.py:5578 indico/MaKaC/conference.py:5578
 msgid "A session must have at least one slot"
 msgstr ""
 
-#: MaKaC/conference.py:5577 MaKaC/conference.py:5894 MaKaC/conference.py:5968
-#: MaKaC/conference.py:5981 MaKaC/conference.py:5995 MaKaC/conference.py:6011
-#: MaKaC/conference.py:6023 MaKaC/conference.py:6451
+#: MaKaC/conference.py:5578 MaKaC/conference.py:5895 MaKaC/conference.py:5969
+#: MaKaC/conference.py:5982 MaKaC/conference.py:5996 MaKaC/conference.py:6012
+#: MaKaC/conference.py:6024 MaKaC/conference.py:6452
 #: MaKaC/plugins/Collaboration/WebEx/collaboration.py:365
 #: MaKaC/plugins/Collaboration/WebEx/tpls/NewBookingForm.tpl:28
 #: MaKaC/webinterface/pages/conferences.py:5286
@@ -539,10 +539,10 @@ msgstr ""
 #: MaKaC/webinterface/tpls/ContribModifMain.tpl:99
 #: MaKaC/webinterface/tpls/SessionModifHeader.tpl:1
 #: MaKaC/webinterface/tpls/TrackModContribList.tpl:72
-#: indico/MaKaC/conference.py:5577 indico/MaKaC/conference.py:5894
-#: indico/MaKaC/conference.py:5968 indico/MaKaC/conference.py:5981
-#: indico/MaKaC/conference.py:5995 indico/MaKaC/conference.py:6011
-#: indico/MaKaC/conference.py:6023 indico/MaKaC/conference.py:6451
+#: indico/MaKaC/conference.py:5578 indico/MaKaC/conference.py:5895
+#: indico/MaKaC/conference.py:5969 indico/MaKaC/conference.py:5982
+#: indico/MaKaC/conference.py:5996 indico/MaKaC/conference.py:6012
+#: indico/MaKaC/conference.py:6024 indico/MaKaC/conference.py:6452
 #: indico/MaKaC/plugins/Collaboration/WebEx/collaboration.py:365
 #: indico/MaKaC/plugins/Collaboration/WebEx/tpls/NewBookingForm.tpl:28
 #: indico/MaKaC/webinterface/pages/conferences.py:5286
@@ -557,44 +557,44 @@ msgstr ""
 msgid "Session"
 msgstr ""
 
-#: MaKaC/conference.py:5756 indico/MaKaC/conference.py:5756
+#: MaKaC/conference.py:5757 indico/MaKaC/conference.py:5757
 msgid "Impossible to move the session because it would be out of the conference dates"
 msgstr ""
 
-#: MaKaC/conference.py:5894 indico/MaKaC/conference.py:5894
+#: MaKaC/conference.py:5895 indico/MaKaC/conference.py:5895
 msgid "The session starting date cannot be prior to the event starting date"
 msgstr ""
 
-#: MaKaC/conference.py:5968 indico/MaKaC/conference.py:5968
+#: MaKaC/conference.py:5969 indico/MaKaC/conference.py:5969
 msgid "End date cannot be prior to the Start date"
 msgstr ""
 
-#: MaKaC/conference.py:5978 indico/MaKaC/conference.py:5978
+#: MaKaC/conference.py:5979 indico/MaKaC/conference.py:5979
 #, python-format
 msgid "The end date has to be between the event dates (%s - %s)"
 msgstr ""
 
-#: MaKaC/conference.py:5995 indico/MaKaC/conference.py:5995
+#: MaKaC/conference.py:5996 indico/MaKaC/conference.py:5996
 msgid ""
 "Cannot change end date: some entries in the session schedule end after the "
 "new date"
 msgstr ""
 
-#: MaKaC/conference.py:6011 indico/MaKaC/conference.py:6011
+#: MaKaC/conference.py:6012 indico/MaKaC/conference.py:6012
 #, python-format
 msgid "The end date (%s) cannot be prior to the start date (%s)"
 msgstr ""
 
-#: MaKaC/conference.py:6023 MaKaC/conference.py:7127
-#: indico/MaKaC/conference.py:6023 indico/MaKaC/conference.py:7127
+#: MaKaC/conference.py:6024 MaKaC/conference.py:7128
+#: indico/MaKaC/conference.py:6024 indico/MaKaC/conference.py:7128
 msgid "The duration cannot be less than zero"
 msgstr ""
 
-#: MaKaC/conference.py:6451 indico/MaKaC/conference.py:6451
+#: MaKaC/conference.py:6452 indico/MaKaC/conference.py:6452
 msgid "The minutes for this session have already been created"
 msgstr ""
 
-#: MaKaC/conference.py:6764 MaKaC/schedule.py:445 indico/MaKaC/conference.py:6764
+#: MaKaC/conference.py:6765 MaKaC/schedule.py:445 indico/MaKaC/conference.py:6765
 #: indico/MaKaC/schedule.py:445
 #, python-format
 msgid ""
@@ -602,99 +602,99 @@ msgid ""
 "duration less than zero minutes. Please, choose another time"
 msgstr ""
 
-#: MaKaC/conference.py:7000 indico/MaKaC/conference.py:7000
+#: MaKaC/conference.py:7001 indico/MaKaC/conference.py:7001
 msgid "End date cannot be prior to Start date"
 msgstr ""
 
-#: MaKaC/conference.py:7000 MaKaC/conference.py:7034 MaKaC/conference.py:7127
-#: MaKaC/conference.py:7129 MaKaC/conference.py:7140 MaKaC/conference.py:7146
-#: MaKaC/conference.py:7155 MaKaC/schedule.py:749 MaKaC/schedule.py:751
+#: MaKaC/conference.py:7001 MaKaC/conference.py:7035 MaKaC/conference.py:7128
+#: MaKaC/conference.py:7130 MaKaC/conference.py:7141 MaKaC/conference.py:7147
+#: MaKaC/conference.py:7156 MaKaC/schedule.py:749 MaKaC/schedule.py:751
 #: MaKaC/schedule.py:757 MaKaC/schedule.py:864 MaKaC/schedule.py:867
-#: indico/MaKaC/conference.py:7000 indico/MaKaC/conference.py:7034
-#: indico/MaKaC/conference.py:7127 indico/MaKaC/conference.py:7129
-#: indico/MaKaC/conference.py:7140 indico/MaKaC/conference.py:7146
-#: indico/MaKaC/conference.py:7155 indico/MaKaC/schedule.py:749
+#: indico/MaKaC/conference.py:7001 indico/MaKaC/conference.py:7035
+#: indico/MaKaC/conference.py:7128 indico/MaKaC/conference.py:7130
+#: indico/MaKaC/conference.py:7141 indico/MaKaC/conference.py:7147
+#: indico/MaKaC/conference.py:7156 indico/MaKaC/schedule.py:749
 #: indico/MaKaC/schedule.py:751 indico/MaKaC/schedule.py:757
 #: indico/MaKaC/schedule.py:864 indico/MaKaC/schedule.py:867
 msgid "Slot"
 msgstr ""
 
-#: MaKaC/conference.py:7031 indico/MaKaC/conference.py:7031
+#: MaKaC/conference.py:7032 indico/MaKaC/conference.py:7032
 #, python-format
 msgid "The slot \"%s\" cannot start (%s) before its parent session starts (%s)"
 msgstr ""
 
-#: MaKaC/conference.py:7129 indico/MaKaC/conference.py:7129
+#: MaKaC/conference.py:7130 indico/MaKaC/conference.py:7130
 msgid "The duration cannot be more than one day"
 msgstr ""
 
-#: MaKaC/conference.py:7137 indico/MaKaC/conference.py:7137
+#: MaKaC/conference.py:7138 indico/MaKaC/conference.py:7138
 #, python-format
 msgid "The session slot cannot end (%s) after its parent session (%s)"
 msgstr ""
 
-#: MaKaC/conference.py:7146 indico/MaKaC/conference.py:7146
+#: MaKaC/conference.py:7147 indico/MaKaC/conference.py:7147
 msgid "The time slot must end on the same day it has started"
 msgstr ""
 
-#: MaKaC/conference.py:7152 indico/MaKaC/conference.py:7152
+#: MaKaC/conference.py:7153 indico/MaKaC/conference.py:7153
 #, python-format
 msgid ""
 "The session slot cannot end at (%s) because there is a contribution (%s) "
 "ending after that time. "
 msgstr ""
 
-#: MaKaC/conference.py:7653 indico/MaKaC/conference.py:7653
+#: MaKaC/conference.py:7654 indico/MaKaC/conference.py:7654
 msgid ""
 "Cannot index an author of a contribution which has not been included in a "
 "Conference"
 msgstr ""
 
-#: MaKaC/conference.py:7653 MaKaC/conference.py:7655 MaKaC/conference.py:7666
-#: MaKaC/conference.py:7668 indico/MaKaC/conference.py:7653
-#: indico/MaKaC/conference.py:7655 indico/MaKaC/conference.py:7666
-#: indico/MaKaC/conference.py:7668
+#: MaKaC/conference.py:7654 MaKaC/conference.py:7656 MaKaC/conference.py:7667
+#: MaKaC/conference.py:7669 indico/MaKaC/conference.py:7654
+#: indico/MaKaC/conference.py:7656 indico/MaKaC/conference.py:7667
+#: indico/MaKaC/conference.py:7669
 msgid "Author Index"
 msgstr ""
 
-#: MaKaC/conference.py:7655 indico/MaKaC/conference.py:7655
+#: MaKaC/conference.py:7656 indico/MaKaC/conference.py:7656
 msgid ""
 "cannot index an author of a contribution which does not belong to this "
 "Conference"
 msgstr ""
 
-#: MaKaC/conference.py:7666 indico/MaKaC/conference.py:7666
+#: MaKaC/conference.py:7667 indico/MaKaC/conference.py:7667
 msgid ""
 "Cannot unindex an author of a contribution which is not included in a "
 "conference"
 msgstr ""
 
-#: MaKaC/conference.py:7668 indico/MaKaC/conference.py:7668
+#: MaKaC/conference.py:7669 indico/MaKaC/conference.py:7669
 msgid ""
 "Cannot unindex an author of a contribution which does not belong to this "
 "conference"
 msgstr ""
 
-#: MaKaC/conference.py:8319 indico/MaKaC/conference.py:8319
+#: MaKaC/conference.py:8320 indico/MaKaC/conference.py:8320
 #, python-format
 msgid "The contribution <i>\"%s\"</i> cannot start before (%s) its parent (%s)"
 msgstr ""
 
-#: MaKaC/conference.py:8322 MaKaC/conference.py:8332 MaKaC/conference.py:8341
-#: MaKaC/conference.py:8414 MaKaC/conference.py:8841 MaKaC/conference.py:9198
-#: MaKaC/conference.py:9303 MaKaC/conference.py:9337 MaKaC/conference.py:10459
-#: MaKaC/conference.py:10481 MaKaC/schedule.py:1436
+#: MaKaC/conference.py:8323 MaKaC/conference.py:8333 MaKaC/conference.py:8342
+#: MaKaC/conference.py:8415 MaKaC/conference.py:8842 MaKaC/conference.py:9201
+#: MaKaC/conference.py:9306 MaKaC/conference.py:9340 MaKaC/conference.py:10462
+#: MaKaC/conference.py:10484 MaKaC/schedule.py:1436
 #: MaKaC/webinterface/pages/conferences.py:7205
 #: MaKaC/webinterface/tpls/AbstractManagment.tpl:162
 #: MaKaC/webinterface/tpls/ConfMyContributions.tpl:12
 #: MaKaC/webinterface/tpls/ConfPaperMyContributions.tpl:9
 #: MaKaC/webinterface/tpls/ContribModifHeader.tpl:9
 #: MaKaC/webinterface/tpls/TrackAbstractModification.tpl:201
-#: indico/MaKaC/conference.py:8322 indico/MaKaC/conference.py:8332
-#: indico/MaKaC/conference.py:8341 indico/MaKaC/conference.py:8414
-#: indico/MaKaC/conference.py:8841 indico/MaKaC/conference.py:9198
-#: indico/MaKaC/conference.py:9303 indico/MaKaC/conference.py:9337
-#: indico/MaKaC/conference.py:10459 indico/MaKaC/conference.py:10481
+#: indico/MaKaC/conference.py:8323 indico/MaKaC/conference.py:8333
+#: indico/MaKaC/conference.py:8342 indico/MaKaC/conference.py:8415
+#: indico/MaKaC/conference.py:8842 indico/MaKaC/conference.py:9201
+#: indico/MaKaC/conference.py:9306 indico/MaKaC/conference.py:9340
+#: indico/MaKaC/conference.py:10462 indico/MaKaC/conference.py:10484
 #: indico/MaKaC/schedule.py:1436
 #: indico/MaKaC/webinterface/pages/conferences.py:7205
 #: indico/MaKaC/webinterface/tpls/AbstractManagment.tpl:162
@@ -705,137 +705,137 @@ msgstr ""
 msgid "Contribution"
 msgstr ""
 
-#: MaKaC/conference.py:8329 indico/MaKaC/conference.py:8329
+#: MaKaC/conference.py:8330 indico/MaKaC/conference.py:8330
 #, python-format
 msgid "The contribution <i>\"%s\"</i> cannot start after (%s) its parent end date(%s)"
 msgstr ""
 
-#: MaKaC/conference.py:8410 indico/MaKaC/conference.py:8410
+#: MaKaC/conference.py:8411 indico/MaKaC/conference.py:8411
 #, python-format
 msgid ""
 "The contribution \"%s\" ending date (%s) has to fit between its parent's "
 "dates (%s - %s)"
 msgstr ""
 
-#: MaKaC/conference.py:8841 indico/MaKaC/conference.py:8841
+#: MaKaC/conference.py:8842 indico/MaKaC/conference.py:8842
 msgid "The Specified speaker is not the Author"
 msgstr ""
 
-#: MaKaC/conference.py:9198 indico/MaKaC/conference.py:9198
+#: MaKaC/conference.py:9201 indico/MaKaC/conference.py:9201
 msgid "The paper for this contribution has already been set"
 msgstr ""
 
-#: MaKaC/conference.py:9220 indico/MaKaC/conference.py:9220
+#: MaKaC/conference.py:9223 indico/MaKaC/conference.py:9223
 msgid "The slides for this contribution have already been set"
 msgstr ""
 
-#: MaKaC/conference.py:9220 MaKaC/plugins/Collaboration/Vidyo/collaboration.py:333
+#: MaKaC/conference.py:9223 MaKaC/plugins/Collaboration/Vidyo/collaboration.py:333
 #: MaKaC/webinterface/tpls/ConfContributionListFilters.tpl:69
 #: MaKaC/webinterface/tpls/ConfModifContribList.tpl:69
-#: indico/MaKaC/conference.py:9220
+#: indico/MaKaC/conference.py:9223
 #: indico/MaKaC/plugins/Collaboration/Vidyo/collaboration.py:333
 #: indico/MaKaC/webinterface/tpls/ConfContributionListFilters.tpl:69
 #: indico/MaKaC/webinterface/tpls/ConfModifContribList.tpl:69
 msgid "contribution"
 msgstr ""
 
-#: MaKaC/conference.py:9242 indico/MaKaC/conference.py:9242
+#: MaKaC/conference.py:9245 indico/MaKaC/conference.py:9245
 msgid "the video for this contribution has already been set"
 msgstr ""
 
-#: MaKaC/conference.py:9269 indico/MaKaC/conference.py:9269
+#: MaKaC/conference.py:9272 indico/MaKaC/conference.py:9272
 msgid "the poster for this contribution has already been set"
 msgstr ""
 
-#: MaKaC/conference.py:9296 indico/MaKaC/conference.py:9296
+#: MaKaC/conference.py:9299 indico/MaKaC/conference.py:9299
 msgid "the Minutes for this contribution has already been set"
 msgstr ""
 
-#: MaKaC/conference.py:9303 indico/MaKaC/conference.py:9303
+#: MaKaC/conference.py:9306 indico/MaKaC/conference.py:9306
 msgid "The minutes for this contribution have already been created"
 msgstr ""
 
-#: MaKaC/conference.py:9337 indico/MaKaC/conference.py:9337
+#: MaKaC/conference.py:9340 indico/MaKaC/conference.py:9340
 msgid "The reviewing maretial for this contribution has already been set"
 msgstr ""
 
-#: MaKaC/conference.py:10459 indico/MaKaC/conference.py:10459
+#: MaKaC/conference.py:10462 indico/MaKaC/conference.py:10462
 msgid "The paper for this subcontribution has already been set"
 msgstr ""
 
-#: MaKaC/conference.py:10481 indico/MaKaC/conference.py:10481
+#: MaKaC/conference.py:10484 indico/MaKaC/conference.py:10484
 msgid "The slides for this subcontribution have already been set"
 msgstr ""
 
-#: MaKaC/conference.py:10503 indico/MaKaC/conference.py:10503
+#: MaKaC/conference.py:10506 indico/MaKaC/conference.py:10506
 msgid "the video for this subcontribution has already been set"
 msgstr ""
 
-#: MaKaC/conference.py:10530 indico/MaKaC/conference.py:10530
+#: MaKaC/conference.py:10533 indico/MaKaC/conference.py:10533
 msgid "the poster for this subcontribution has already been set"
 msgstr ""
 
-#: MaKaC/conference.py:10557 indico/MaKaC/conference.py:10557
+#: MaKaC/conference.py:10560 indico/MaKaC/conference.py:10560
 msgid "the Minutes for this subcontribution has already been set"
 msgstr ""
 
-#: MaKaC/conference.py:10564 indico/MaKaC/conference.py:10564
+#: MaKaC/conference.py:10567 indico/MaKaC/conference.py:10567
 msgid "The minutes for this subcontribution have already been created"
 msgstr ""
 
-#: MaKaC/conference.py:10564 MaKaC/webinterface/pages/contributions.py:221
-#: MaKaC/webinterface/tpls/ContribModifSC.tpl:5 indico/MaKaC/conference.py:10564
+#: MaKaC/conference.py:10567 MaKaC/webinterface/pages/contributions.py:221
+#: MaKaC/webinterface/tpls/ContribModifSC.tpl:5 indico/MaKaC/conference.py:10567
 #: indico/MaKaC/webinterface/pages/contributions.py:221
 #: indico/MaKaC/webinterface/tpls/ContribModifSC.tpl:5
 msgid "Sub Contribution"
 msgstr ""
 
-#: MaKaC/conference.py:11209 indico/MaKaC/conference.py:11209
+#: MaKaC/conference.py:11212 indico/MaKaC/conference.py:11212
 msgid "Unexpected object type in Resource List : "
 msgstr ""
 
-#: MaKaC/conference.py:11677 indico/MaKaC/conference.py:11677
+#: MaKaC/conference.py:11680 indico/MaKaC/conference.py:11680
 msgid "The file name of an archived file cannot be changed"
 msgstr ""
 
-#: MaKaC/conference.py:11677 MaKaC/conference.py:11708 MaKaC/conference.py:11741
-#: MaKaC/conference.py:11746 indico/MaKaC/conference.py:11677
-#: indico/MaKaC/conference.py:11708 indico/MaKaC/conference.py:11741
-#: indico/MaKaC/conference.py:11746
+#: MaKaC/conference.py:11680 MaKaC/conference.py:11711 MaKaC/conference.py:11744
+#: MaKaC/conference.py:11749 indico/MaKaC/conference.py:11680
+#: indico/MaKaC/conference.py:11711 indico/MaKaC/conference.py:11744
+#: indico/MaKaC/conference.py:11749
 msgid "File Archiving"
 msgstr ""
 
-#: MaKaC/conference.py:11708 indico/MaKaC/conference.py:11708
+#: MaKaC/conference.py:11711 indico/MaKaC/conference.py:11711
 msgid "The path of an archived file cannot be changed"
 msgstr ""
 
-#: MaKaC/conference.py:11710 indico/MaKaC/conference.py:11710
+#: MaKaC/conference.py:11713 indico/MaKaC/conference.py:11713
 #, python-format
 msgid "File does not exist : %s"
 msgstr ""
 
-#: MaKaC/conference.py:11741 MaKaC/conference.py:11746
-#: indico/MaKaC/conference.py:11741 indico/MaKaC/conference.py:11746
+#: MaKaC/conference.py:11744 MaKaC/conference.py:11749
+#: indico/MaKaC/conference.py:11744 indico/MaKaC/conference.py:11749
 msgid "File not available until it has been archived"
 msgstr ""
 
-#: MaKaC/conference.py:11751 indico/MaKaC/conference.py:11751
+#: MaKaC/conference.py:11754 indico/MaKaC/conference.py:11754
 msgid "File is already archived"
 msgstr ""
 
-#: MaKaC/conference.py:11753 indico/MaKaC/conference.py:11753
+#: MaKaC/conference.py:11756 indico/MaKaC/conference.py:11756
 msgid "Destination repository not set"
 msgstr ""
 
-#: MaKaC/conference.py:11755 indico/MaKaC/conference.py:11755
+#: MaKaC/conference.py:11758 indico/MaKaC/conference.py:11758
 msgid "Nothing to archive"
 msgstr ""
 
-#: MaKaC/conference.py:11767 indico/MaKaC/conference.py:11767
+#: MaKaC/conference.py:11770 indico/MaKaC/conference.py:11770
 msgid "File is not archived, so it cannot be recovered."
 msgstr ""
 
-#: MaKaC/conference.py:11769 indico/MaKaC/conference.py:11769
+#: MaKaC/conference.py:11772 indico/MaKaC/conference.py:11772
 msgid "Destination repository not set."
 msgstr ""
 
@@ -1271,18 +1271,16 @@ msgid ""
 "%s\n"
 msgstr ""
 
-#: MaKaC/registration.py:853 indico/MaKaC/registration.py:853
-msgid ""
-"\n"
-"\tQuantity\t\tItem\t\tunit.price\t\tCost"
+#: MaKaC/registration.py:854 indico/MaKaC/registration.py:854
+msgid "{0}{1}{2}{3}"
 msgstr ""
 
-#: MaKaC/registration.py:901 indico/MaKaC/registration.py:901
+#: MaKaC/registration.py:905 indico/MaKaC/registration.py:905
 #, python-format
 msgid "If you haven't paid for your registration yet, you can do it at %s"
 msgstr ""
 
-#: MaKaC/registration.py:903 indico/MaKaC/registration.py:903
+#: MaKaC/registration.py:907 indico/MaKaC/registration.py:907
 #, python-format
 msgid ""
 "%s\n"
@@ -1294,12 +1292,12 @@ msgid ""
 "%s"
 msgstr ""
 
-#: MaKaC/registration.py:916 indico/MaKaC/registration.py:916
+#: MaKaC/registration.py:920 indico/MaKaC/registration.py:920
 #, python-format
 msgid "Payment successful for '%s': %s"
 msgstr ""
 
-#: MaKaC/registration.py:917 indico/MaKaC/registration.py:917
+#: MaKaC/registration.py:921 indico/MaKaC/registration.py:921
 #, python-format
 msgid ""
 "- detail of payment  : \n"
@@ -1309,7 +1307,7 @@ msgid ""
 "- registration id    : %s"
 msgstr ""
 
-#: MaKaC/registration.py:960 indico/MaKaC/registration.py:960
+#: MaKaC/registration.py:964 indico/MaKaC/registration.py:964
 #, python-format
 msgid ""
 "\n"
@@ -1319,7 +1317,7 @@ msgid ""
 "                      "
 msgstr ""
 
-#: MaKaC/registration.py:970 indico/MaKaC/registration.py:970
+#: MaKaC/registration.py:974 indico/MaKaC/registration.py:974
 #, python-format
 msgid ""
 "%s\n"
@@ -1329,12 +1327,12 @@ msgid ""
 "%s"
 msgstr ""
 
-#: MaKaC/registration.py:979 indico/MaKaC/registration.py:979
+#: MaKaC/registration.py:983 indico/MaKaC/registration.py:983
 #, python-format
 msgid "Registration modified for '%s': %s"
 msgstr ""
 
-#: MaKaC/registration.py:1010 indico/MaKaC/registration.py:1010
+#: MaKaC/registration.py:1014 indico/MaKaC/registration.py:1014
 #, python-format
 msgid ""
 "\n"
@@ -1344,196 +1342,196 @@ msgid ""
 "%s\n"
 msgstr ""
 
-#: MaKaC/registration.py:1246 MaKaC/registration.py:1340 MaKaC/registration.py:1448
-#: MaKaC/registration.py:1582 MaKaC/registration.py:1870 MaKaC/registration.py:1919
-#: MaKaC/registration.py:2407 MaKaC/registration.py:2570 MaKaC/registration.py:2683
-#: indico/MaKaC/registration.py:1246 indico/MaKaC/registration.py:1340
-#: indico/MaKaC/registration.py:1448 indico/MaKaC/registration.py:1582
-#: indico/MaKaC/registration.py:1870 indico/MaKaC/registration.py:1919
-#: indico/MaKaC/registration.py:2407 indico/MaKaC/registration.py:2570
-#: indico/MaKaC/registration.py:2683
+#: MaKaC/registration.py:1250 MaKaC/registration.py:1344 MaKaC/registration.py:1452
+#: MaKaC/registration.py:1586 MaKaC/registration.py:1873 MaKaC/registration.py:1922
+#: MaKaC/registration.py:2424 MaKaC/registration.py:2587 MaKaC/registration.py:2700
+#: indico/MaKaC/registration.py:1250 indico/MaKaC/registration.py:1344
+#: indico/MaKaC/registration.py:1452 indico/MaKaC/registration.py:1586
+#: indico/MaKaC/registration.py:1873 indico/MaKaC/registration.py:1922
+#: indico/MaKaC/registration.py:2424 indico/MaKaC/registration.py:2587
+#: indico/MaKaC/registration.py:2700
 #, python-format
 msgid "The field \"%s\" is mandatory. Please fill it."
 msgstr ""
 
-#: MaKaC/registration.py:1343 indico/MaKaC/registration.py:1343
+#: MaKaC/registration.py:1347 indico/MaKaC/registration.py:1347
 #, python-format
 msgid ""
 "The field \"%s\" is in wrong format. Please fill it in the correct format: "
 "(+) 999 99 99 99"
 msgstr ""
 
-#: MaKaC/registration.py:1584 indico/MaKaC/registration.py:1584
+#: MaKaC/registration.py:1588 indico/MaKaC/registration.py:1588
 #, python-format
 msgid "The field \"%s\" is mandatory. Please fill it with a number."
 msgstr ""
 
-#: MaKaC/registration.py:1590 indico/MaKaC/registration.py:1590
+#: MaKaC/registration.py:1594 indico/MaKaC/registration.py:1594
 #, python-format
 msgid "The field \"%s\" needs to be filled with a number greater than or equal to %d."
 msgstr ""
 
-#: MaKaC/registration.py:1783 indico/MaKaC/registration.py:1783
+#: MaKaC/registration.py:1788 indico/MaKaC/registration.py:1788
 #, python-format
 msgid "The checkbox \"%s\" is mandatory. Please enable it."
 msgstr ""
 
-#: MaKaC/registration.py:2019 MaKaC/registration.py:2861 MaKaC/registration.py:3610
-#: MaKaC/registration.py:3954 MaKaC/registration.py:4318
-#: indico/MaKaC/registration.py:2019 indico/MaKaC/registration.py:2861
-#: indico/MaKaC/registration.py:3610 indico/MaKaC/registration.py:3954
-#: indico/MaKaC/registration.py:4318
+#: MaKaC/registration.py:2024 MaKaC/registration.py:2878 MaKaC/registration.py:3627
+#: MaKaC/registration.py:3970 MaKaC/registration.py:4334
+#: indico/MaKaC/registration.py:2024 indico/MaKaC/registration.py:2878
+#: indico/MaKaC/registration.py:3627 indico/MaKaC/registration.py:3970
+#: indico/MaKaC/registration.py:4334
 msgid "The price is in incorrect format!"
 msgstr ""
 
-#: MaKaC/registration.py:2036 MaKaC/registration.py:2878
-#: indico/MaKaC/registration.py:2036 indico/MaKaC/registration.py:2878
+#: MaKaC/registration.py:2041 MaKaC/registration.py:2895
+#: indico/MaKaC/registration.py:2041 indico/MaKaC/registration.py:2895
 msgid "Please enter a number for the limit of places"
 msgstr ""
 
-#: MaKaC/registration.py:2059 indico/MaKaC/registration.py:2059
+#: MaKaC/registration.py:2064 indico/MaKaC/registration.py:2064
 msgid "The place limit has been exceeded."
 msgstr ""
 
-#: MaKaC/registration.py:2489 indico/MaKaC/registration.py:2489
+#: MaKaC/registration.py:2506 indico/MaKaC/registration.py:2506
 msgid "Use 0 for unlimited places"
 msgstr ""
 
-#: MaKaC/registration.py:2505 MaKaC/webinterface/pages/registrationForm.py:619
-#: indico/MaKaC/registration.py:2505
-#: indico/MaKaC/webinterface/pages/registrationForm.py:619
+#: MaKaC/registration.py:2522 MaKaC/webinterface/pages/registrationForm.py:625
+#: indico/MaKaC/registration.py:2522
+#: indico/MaKaC/webinterface/pages/registrationForm.py:625
 msgid "disabled"
 msgstr ""
 
-#: MaKaC/registration.py:2507 MaKaC/webinterface/tpls/AdminsStyles.tpl:73
-#: indico/MaKaC/registration.py:2507
+#: MaKaC/registration.py:2524 MaKaC/webinterface/tpls/AdminsStyles.tpl:73
+#: indico/MaKaC/registration.py:2524
 #: indico/MaKaC/webinterface/tpls/AdminsStyles.tpl:73
 msgid "default"
 msgstr ""
 
-#: MaKaC/registration.py:2704 indico/MaKaC/registration.py:2704
+#: MaKaC/registration.py:2721 indico/MaKaC/registration.py:2721
 msgid ""
 "</select>\n"
 "          </td>\n"
 "        </tr>"
 msgstr ""
 
-#: MaKaC/registration.py:2780 indico/MaKaC/registration.py:2780
+#: MaKaC/registration.py:2797 indico/MaKaC/registration.py:2797
 msgid "General Field"
 msgstr ""
 
-#: MaKaC/registration.py:2901 indico/MaKaC/registration.py:2901
+#: MaKaC/registration.py:2918 indico/MaKaC/registration.py:2918
 msgid ""
 "The limit for the number of places is smaller than the current amount "
 "registered for this item."
 msgstr ""
 
-#: MaKaC/registration.py:3000 indico/MaKaC/registration.py:3000
+#: MaKaC/registration.py:3017 indico/MaKaC/registration.py:3017
 msgid "Miscellaneous information"
 msgstr ""
 
-#: MaKaC/registration.py:3018 indico/MaKaC/registration.py:3018
+#: MaKaC/registration.py:3035 indico/MaKaC/registration.py:3035
 #, python-format
 msgid "Miscellaneous information %s"
 msgstr ""
 
-#: MaKaC/registration.py:3529 MaKaC/registration.py:4206
-#: indico/MaKaC/registration.py:3529 indico/MaKaC/registration.py:4206
+#: MaKaC/registration.py:3546 MaKaC/registration.py:4222
+#: indico/MaKaC/registration.py:3546 indico/MaKaC/registration.py:4222
 msgid "Please introduce a number for the limit of places"
 msgstr ""
 
-#: MaKaC/registration.py:3554 indico/MaKaC/registration.py:3554
+#: MaKaC/registration.py:3571 indico/MaKaC/registration.py:3571
 msgid ""
 "The limit for the number of places is smaller than the current amount "
 "registered for this accommodation. Please, set a higher limit."
 msgstr ""
 
-#: MaKaC/registration.py:4076 indico/MaKaC/registration.py:4076
+#: MaKaC/registration.py:4092 indico/MaKaC/registration.py:4092
 msgid "Please, choose at least one session in order to register"
 msgstr ""
 
-#: MaKaC/registration.py:4078 indico/MaKaC/registration.py:4078
+#: MaKaC/registration.py:4094 indico/MaKaC/registration.py:4094
 msgid "You cannot choose the same session twice"
 msgstr ""
 
-#: MaKaC/registration.py:4229 indico/MaKaC/registration.py:4229
+#: MaKaC/registration.py:4245 indico/MaKaC/registration.py:4245
 #, python-format
 msgid ""
 "We are sorry but there are not enough places for the social event \"%s\"."
 "                          "
 msgstr ""
 
-#: MaKaC/registration.py:4236 indico/MaKaC/registration.py:4236
+#: MaKaC/registration.py:4252 indico/MaKaC/registration.py:4252
 #, python-format
 msgid ""
 "Impossible to decrease %s places for \"%s\" because the current number of"
 "                         places would be less than zero"
 msgstr ""
 
-#: MaKaC/registration.py:4813 indico/MaKaC/registration.py:4813
+#: MaKaC/registration.py:4831 indico/MaKaC/registration.py:4831
 msgid "Arrival date cannot be empty."
 msgstr ""
 
-#: MaKaC/registration.py:4815 indico/MaKaC/registration.py:4815
+#: MaKaC/registration.py:4833 indico/MaKaC/registration.py:4833
 msgid "Departure date cannot be empty."
 msgstr ""
 
-#: MaKaC/registration.py:4822 indico/MaKaC/registration.py:4822
+#: MaKaC/registration.py:4840 indico/MaKaC/registration.py:4840
 msgid "Arrival date has to be earlier than departure date"
 msgstr ""
 
-#: MaKaC/registration.py:4839 indico/MaKaC/registration.py:4839
+#: MaKaC/registration.py:4857 indico/MaKaC/registration.py:4857
 msgid "It is mandatory to choose an accommodation in order to register"
 msgstr ""
 
-#: MaKaC/registration.py:5861 MaKaC/plugins/InstantMessaging/XMPP/components.py:102
+#: MaKaC/registration.py:5879 MaKaC/plugins/InstantMessaging/XMPP/components.py:102
 #: MaKaC/plugins/InstantMessaging/tpls/ConferenceInstantMessaging.tpl:37
 #: MaKaC/plugins/InstantMessaging/tpls/EventDetailBanner.tpl:38
-#: MaKaC/webinterface/wcomponents.py:2013 MaKaC/webinterface/pages/category.py:1563
+#: MaKaC/webinterface/wcomponents.py:2016 MaKaC/webinterface/pages/category.py:1563
 #: MaKaC/webinterface/pages/category.py:1587
 #: MaKaC/webinterface/pages/conferences.py:2206
 #: MaKaC/webinterface/pages/evaluations.py:382
 #: MaKaC/webinterface/pages/evaluations.py:386
 #: MaKaC/webinterface/pages/evaluations.py:390
-#: MaKaC/webinterface/pages/registrationForm.py:170
-#: MaKaC/webinterface/pages/registrationForm.py:174
-#: MaKaC/webinterface/pages/registrationForm.py:177
-#: MaKaC/webinterface/pages/registrationForm.py:180
+#: MaKaC/webinterface/pages/registrationForm.py:171
+#: MaKaC/webinterface/pages/registrationForm.py:175
+#: MaKaC/webinterface/pages/registrationForm.py:178
+#: MaKaC/webinterface/pages/registrationForm.py:181
 #: MaKaC/webinterface/pages/sessions.py:683
-#: MaKaC/webinterface/pages/subContributions.py:235
+#: MaKaC/webinterface/pages/subContributions.py:259
 #: MaKaC/webinterface/tpls/AdminAPIKeys.tpl:26
 #: MaKaC/webinterface/tpls/AdminLayoutGeneral.tpl:42
 #: MaKaC/webinterface/tpls/Analytics.tpl:12
-#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:395
+#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:367
 #: MaKaC/webinterface/tpls/MobileDetection.tpl:6
 #: MaKaC/webinterface/tpls/RegistrantModifETicket.tpl:14
-#: indico/MaKaC/registration.py:5861
+#: indico/MaKaC/registration.py:5879
 #: indico/MaKaC/plugins/InstantMessaging/XMPP/components.py:102
 #: indico/MaKaC/plugins/InstantMessaging/tpls/ConferenceInstantMessaging.tpl:37
 #: indico/MaKaC/plugins/InstantMessaging/tpls/EventDetailBanner.tpl:38
-#: indico/MaKaC/webinterface/wcomponents.py:2013
+#: indico/MaKaC/webinterface/wcomponents.py:2016
 #: indico/MaKaC/webinterface/pages/category.py:1563
 #: indico/MaKaC/webinterface/pages/category.py:1587
 #: indico/MaKaC/webinterface/pages/conferences.py:2206
 #: indico/MaKaC/webinterface/pages/evaluations.py:382
 #: indico/MaKaC/webinterface/pages/evaluations.py:386
 #: indico/MaKaC/webinterface/pages/evaluations.py:390
-#: indico/MaKaC/webinterface/pages/registrationForm.py:170
-#: indico/MaKaC/webinterface/pages/registrationForm.py:174
-#: indico/MaKaC/webinterface/pages/registrationForm.py:177
-#: indico/MaKaC/webinterface/pages/registrationForm.py:180
+#: indico/MaKaC/webinterface/pages/registrationForm.py:171
+#: indico/MaKaC/webinterface/pages/registrationForm.py:175
+#: indico/MaKaC/webinterface/pages/registrationForm.py:178
+#: indico/MaKaC/webinterface/pages/registrationForm.py:181
 #: indico/MaKaC/webinterface/pages/sessions.py:683
-#: indico/MaKaC/webinterface/pages/subContributions.py:235
+#: indico/MaKaC/webinterface/pages/subContributions.py:259
 #: indico/MaKaC/webinterface/tpls/AdminAPIKeys.tpl:26
 #: indico/MaKaC/webinterface/tpls/AdminLayoutGeneral.tpl:42
 #: indico/MaKaC/webinterface/tpls/Analytics.tpl:12
-#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:395
+#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:367
 #: indico/MaKaC/webinterface/tpls/MobileDetection.tpl:6
 #: indico/MaKaC/webinterface/tpls/RegistrantModifETicket.tpl:14
 msgid "Yes"
 msgstr ""
 
-#: MaKaC/registration.py:5863 MaKaC/plugins/InstantMessaging/XMPP/components.py:102
+#: MaKaC/registration.py:5881 MaKaC/plugins/InstantMessaging/XMPP/components.py:102
 #: MaKaC/plugins/InstantMessaging/tpls/ConferenceInstantMessaging.tpl:37
 #: MaKaC/plugins/InstantMessaging/tpls/EventDetailBanner.tpl:38
 #: MaKaC/webinterface/pages/category.py:1564
@@ -1544,18 +1542,18 @@ msgstr ""
 #: MaKaC/webinterface/pages/evaluations.py:384
 #: MaKaC/webinterface/pages/evaluations.py:388
 #: MaKaC/webinterface/pages/evaluations.py:392
-#: MaKaC/webinterface/pages/registrationForm.py:172
-#: MaKaC/webinterface/pages/registrationForm.py:176
-#: MaKaC/webinterface/pages/registrationForm.py:179
-#: MaKaC/webinterface/pages/registrationForm.py:182
+#: MaKaC/webinterface/pages/registrationForm.py:173
+#: MaKaC/webinterface/pages/registrationForm.py:177
+#: MaKaC/webinterface/pages/registrationForm.py:180
+#: MaKaC/webinterface/pages/registrationForm.py:183
 #: MaKaC/webinterface/pages/sessions.py:666
 #: MaKaC/webinterface/pages/sessions.py:683
-#: MaKaC/webinterface/pages/subContributions.py:236
+#: MaKaC/webinterface/pages/subContributions.py:260
 #: MaKaC/webinterface/tpls/AdminAPIKeys.tpl:26
 #: MaKaC/webinterface/tpls/AdminLayoutGeneral.tpl:45
 #: MaKaC/webinterface/tpls/Analytics.tpl:15
 #: MaKaC/webinterface/tpls/RegistrantModifETicket.tpl:16
-#: indico/MaKaC/registration.py:5863
+#: indico/MaKaC/registration.py:5881
 #: indico/MaKaC/plugins/InstantMessaging/XMPP/components.py:102
 #: indico/MaKaC/plugins/InstantMessaging/tpls/ConferenceInstantMessaging.tpl:37
 #: indico/MaKaC/plugins/InstantMessaging/tpls/EventDetailBanner.tpl:38
@@ -1567,13 +1565,13 @@ msgstr ""
 #: indico/MaKaC/webinterface/pages/evaluations.py:384
 #: indico/MaKaC/webinterface/pages/evaluations.py:388
 #: indico/MaKaC/webinterface/pages/evaluations.py:392
-#: indico/MaKaC/webinterface/pages/registrationForm.py:172
-#: indico/MaKaC/webinterface/pages/registrationForm.py:176
-#: indico/MaKaC/webinterface/pages/registrationForm.py:179
-#: indico/MaKaC/webinterface/pages/registrationForm.py:182
+#: indico/MaKaC/webinterface/pages/registrationForm.py:173
+#: indico/MaKaC/webinterface/pages/registrationForm.py:177
+#: indico/MaKaC/webinterface/pages/registrationForm.py:180
+#: indico/MaKaC/webinterface/pages/registrationForm.py:183
 #: indico/MaKaC/webinterface/pages/sessions.py:666
 #: indico/MaKaC/webinterface/pages/sessions.py:683
-#: indico/MaKaC/webinterface/pages/subContributions.py:236
+#: indico/MaKaC/webinterface/pages/subContributions.py:260
 #: indico/MaKaC/webinterface/tpls/AdminAPIKeys.tpl:26
 #: indico/MaKaC/webinterface/tpls/AdminLayoutGeneral.tpl:45
 #: indico/MaKaC/webinterface/tpls/Analytics.tpl:15
@@ -1889,14 +1887,14 @@ msgstr ""
 #: MaKaC/services/implementation/schedule.py:482
 #: MaKaC/services/implementation/schedule.py:718
 #: MaKaC/services/implementation/schedule.py:1237
-#: MaKaC/webinterface/rh/conferenceModif.py:3239
+#: MaKaC/webinterface/rh/conferenceModif.py:3229
 #: MaKaC/webinterface/rh/sessionModif.py:79
 #: MaKaC/webinterface/rh/sessionModif.py:88 indico/MaKaC/schedule.py:434
 #: indico/MaKaC/schedule.py:452 indico/MaKaC/schedule.py:462
 #: indico/MaKaC/services/implementation/schedule.py:482
 #: indico/MaKaC/services/implementation/schedule.py:718
 #: indico/MaKaC/services/implementation/schedule.py:1237
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:3239
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:3229
 #: indico/MaKaC/webinterface/rh/sessionModif.py:79
 #: indico/MaKaC/webinterface/rh/sessionModif.py:88
 #, python-format
@@ -1997,80 +1995,80 @@ msgstr ""
 msgid "It is not possible to add a group as member of itself"
 msgstr ""
 
-#: MaKaC/user.py:1304 indico/MaKaC/user.py:1304
+#: MaKaC/user.py:1313 indico/MaKaC/user.py:1313
 msgid "User not created. You must enter an email address"
 msgstr ""
 
-#: MaKaC/user.py:1307 indico/MaKaC/user.py:1307
+#: MaKaC/user.py:1316 indico/MaKaC/user.py:1316
 #, python-format
 msgid "User not created. The email address %s is already used."
 msgstr ""
 
-#: MaKaC/user.py:1626 indico/MaKaC/user.py:1626
+#: MaKaC/user.py:1635 indico/MaKaC/user.py:1635
 msgid "Unknown Element Type"
 msgstr ""
 
-#: MaKaC/PDFinterface/base.py:68 MaKaC/PDFinterface/base.py:146
-#: indico/MaKaC/PDFinterface/base.py:68 indico/MaKaC/PDFinterface/base.py:146
+#: MaKaC/PDFinterface/base.py:70 MaKaC/PDFinterface/base.py:148
+#: indico/MaKaC/PDFinterface/base.py:70 indico/MaKaC/PDFinterface/base.py:148
 msgid "xxx-small"
 msgstr ""
 
-#: MaKaC/PDFinterface/base.py:68 MaKaC/PDFinterface/base.py:144
+#: MaKaC/PDFinterface/base.py:70 MaKaC/PDFinterface/base.py:146
 #: MaKaC/webinterface/tpls/ConfModifBadgeDesign.tpl:737
-#: indico/MaKaC/PDFinterface/base.py:68 indico/MaKaC/PDFinterface/base.py:144
+#: indico/MaKaC/PDFinterface/base.py:70 indico/MaKaC/PDFinterface/base.py:146
 #: indico/MaKaC/webinterface/tpls/ConfModifBadgeDesign.tpl:737
 msgid "xx-small"
 msgstr ""
 
-#: MaKaC/PDFinterface/base.py:68 MaKaC/PDFinterface/base.py:142
+#: MaKaC/PDFinterface/base.py:70 MaKaC/PDFinterface/base.py:144
 #: MaKaC/webinterface/tpls/ConfModifBadgeDesign.tpl:738
-#: indico/MaKaC/PDFinterface/base.py:68 indico/MaKaC/PDFinterface/base.py:142
+#: indico/MaKaC/PDFinterface/base.py:70 indico/MaKaC/PDFinterface/base.py:144
 #: indico/MaKaC/webinterface/tpls/ConfModifBadgeDesign.tpl:738
 msgid "x-small"
 msgstr ""
 
-#: MaKaC/PDFinterface/base.py:68 MaKaC/PDFinterface/base.py:140
-#: indico/MaKaC/PDFinterface/base.py:68 indico/MaKaC/PDFinterface/base.py:140
+#: MaKaC/PDFinterface/base.py:70 MaKaC/PDFinterface/base.py:142
+#: indico/MaKaC/PDFinterface/base.py:70 indico/MaKaC/PDFinterface/base.py:142
 msgid "smaller"
 msgstr ""
 
-#: MaKaC/PDFinterface/base.py:68 MaKaC/PDFinterface/base.py:136
+#: MaKaC/PDFinterface/base.py:70 MaKaC/PDFinterface/base.py:138
 #: MaKaC/webinterface/tpls/ConfModifBadgeDesign.tpl:739
-#: indico/MaKaC/PDFinterface/base.py:68 indico/MaKaC/PDFinterface/base.py:136
+#: indico/MaKaC/PDFinterface/base.py:70 indico/MaKaC/PDFinterface/base.py:138
 #: indico/MaKaC/webinterface/tpls/ConfModifBadgeDesign.tpl:739
 msgid "small"
 msgstr ""
 
-#: MaKaC/PDFinterface/base.py:68 MaKaC/PDFinterface/base.py:134
-#: indico/MaKaC/PDFinterface/base.py:68 indico/MaKaC/PDFinterface/base.py:134
+#: MaKaC/PDFinterface/base.py:70 MaKaC/PDFinterface/base.py:136
+#: indico/MaKaC/PDFinterface/base.py:70 indico/MaKaC/PDFinterface/base.py:136
 msgid "normal"
 msgstr ""
 
-#: MaKaC/PDFinterface/base.py:68 MaKaC/PDFinterface/base.py:138
+#: MaKaC/PDFinterface/base.py:70 MaKaC/PDFinterface/base.py:140
 #: MaKaC/webinterface/tpls/ConfModifBadgeDesign.tpl:741
-#: indico/MaKaC/PDFinterface/base.py:68 indico/MaKaC/PDFinterface/base.py:138
+#: indico/MaKaC/PDFinterface/base.py:70 indico/MaKaC/PDFinterface/base.py:140
 #: indico/MaKaC/webinterface/tpls/ConfModifBadgeDesign.tpl:741
 msgid "large"
 msgstr ""
 
-#: MaKaC/PDFinterface/base.py:68 MaKaC/PDFinterface/base.py:148
-#: indico/MaKaC/PDFinterface/base.py:68 indico/MaKaC/PDFinterface/base.py:148
+#: MaKaC/PDFinterface/base.py:70 MaKaC/PDFinterface/base.py:150
+#: indico/MaKaC/PDFinterface/base.py:70 indico/MaKaC/PDFinterface/base.py:150
 msgid "larger"
 msgstr ""
 
-#: MaKaC/PDFinterface/base.py:206 indico/MaKaC/PDFinterface/base.py:206
+#: MaKaC/PDFinterface/base.py:208 indico/MaKaC/PDFinterface/base.py:208
 #, python-format
 msgid "expected integer, got %s"
 msgstr ""
 
-#: MaKaC/PDFinterface/base.py:208 indico/MaKaC/PDFinterface/base.py:208
+#: MaKaC/PDFinterface/base.py:210 indico/MaKaC/PDFinterface/base.py:210
 msgid "Int to Roman Error: Argument must be between 1 and 3999"
 msgstr ""
 
-#: MaKaC/PDFinterface/base.py:629 MaKaC/PDFinterface/base.py:726
-#: MaKaC/PDFinterface/conference.py:709 indico/MaKaC/PDFinterface/base.py:629
-#: indico/MaKaC/PDFinterface/base.py:726
-#: indico/MaKaC/PDFinterface/conference.py:709
+#: MaKaC/PDFinterface/base.py:631 MaKaC/PDFinterface/base.py:728
+#: MaKaC/PDFinterface/conference.py:706 indico/MaKaC/PDFinterface/base.py:631
+#: indico/MaKaC/PDFinterface/base.py:728
+#: indico/MaKaC/PDFinterface/conference.py:706
 msgid "Table of contents"
 msgstr ""
 
@@ -2123,127 +2121,85 @@ msgid ""
 "with a wrong board number."
 msgstr ""
 
-#: MaKaC/PDFinterface/conference.py:692
+#: MaKaC/PDFinterface/conference.py:689
 #: MaKaC/webinterface/pages/conferences.py:1403
 #: MaKaC/webinterface/tpls/AbstractReviewingTeam.tpl:13
-#: indico/MaKaC/PDFinterface/conference.py:692
+#: indico/MaKaC/PDFinterface/conference.py:689
 #: indico/MaKaC/webinterface/pages/conferences.py:1403
 #: indico/MaKaC/webinterface/tpls/AbstractReviewingTeam.tpl:13
 msgid "Programme"
 msgstr ""
 
-#: MaKaC/PDFinterface/conference.py:1288
-#: indico/MaKaC/PDFinterface/conference.py:1288
+#: MaKaC/PDFinterface/conference.py:1285
+#: indico/MaKaC/PDFinterface/conference.py:1285
 msgid "Simplified Programme"
 msgstr ""
 
-#: MaKaC/PDFinterface/conference.py:1450 MaKaC/PDFinterface/conference.py:1600
+#: MaKaC/PDFinterface/conference.py:1447 MaKaC/PDFinterface/conference.py:1597
 #: MaKaC/webinterface/tpls/ConfModifContribList.tpl:134
 #: MaKaC/webinterface/tpls/ConfModifContribList.tpl:200
-#: indico/MaKaC/PDFinterface/conference.py:1450
-#: indico/MaKaC/PDFinterface/conference.py:1600
+#: indico/MaKaC/PDFinterface/conference.py:1447
+#: indico/MaKaC/PDFinterface/conference.py:1597
 #: indico/MaKaC/webinterface/tpls/ConfModifContribList.tpl:134
 #: indico/MaKaC/webinterface/tpls/ConfModifContribList.tpl:200
 msgid "Proceedings"
 msgstr ""
 
-#: MaKaC/PDFinterface/conference.py:1493
-#: indico/MaKaC/PDFinterface/conference.py:1493
+#: MaKaC/PDFinterface/conference.py:1490
+#: indico/MaKaC/PDFinterface/conference.py:1490
 msgid "Table of Contents"
 msgstr ""
 
-#: MaKaC/PDFinterface/conference.py:1641
-#: indico/MaKaC/PDFinterface/conference.py:1641
+#: MaKaC/PDFinterface/conference.py:1638
+#: indico/MaKaC/PDFinterface/conference.py:1638
 msgid "Registrant"
 msgstr ""
 
-#: MaKaC/PDFinterface/conference.py:1746 MaKaC/PDFinterface/conference.py:1755
-#: indico/MaKaC/PDFinterface/conference.py:1746
-#: indico/MaKaC/PDFinterface/conference.py:1755
+#: MaKaC/PDFinterface/conference.py:1743 MaKaC/PDFinterface/conference.py:1752
+#: indico/MaKaC/PDFinterface/conference.py:1743
+#: indico/MaKaC/PDFinterface/conference.py:1752
 #, python-format
 msgid "<b> %s</b>: %s"
 msgstr ""
 
-#: MaKaC/PDFinterface/conference.py:1768
-#: indico/MaKaC/PDFinterface/conference.py:1768
+#: MaKaC/PDFinterface/conference.py:1765
+#: indico/MaKaC/PDFinterface/conference.py:1765
 msgid "Registrants Book"
 msgstr ""
 
-#: MaKaC/PDFinterface/conference.py:1820
-#: indico/MaKaC/PDFinterface/conference.py:1820
+#: MaKaC/PDFinterface/conference.py:1817
+#: indico/MaKaC/PDFinterface/conference.py:1817
 msgid "Registrants List"
 msgstr ""
 
-#: MaKaC/PDFinterface/conference.py:2117
-#: indico/MaKaC/PDFinterface/conference.py:2117
+#: MaKaC/PDFinterface/conference.py:2114
+#: indico/MaKaC/PDFinterface/conference.py:2114
 msgid "The template dimensions are too large for the page size you selected"
 msgstr ""
 
-#: MaKaC/PDFinterface/conference.py:2199 MaKaC/PDFinterface/conference.py:2214
-#: MaKaC/PDFinterface/conference.py:2216 MaKaC/PDFinterface/conference.py:2432
-#: MaKaC/PDFinterface/conference.py:2458 MaKaC/PDFinterface/conference.py:2460
+#: MaKaC/PDFinterface/conference.py:2196 MaKaC/PDFinterface/conference.py:2211
+#: MaKaC/PDFinterface/conference.py:2213 MaKaC/PDFinterface/conference.py:2429
+#: MaKaC/PDFinterface/conference.py:2455 MaKaC/PDFinterface/conference.py:2457
 #: MaKaC/services/implementation/conference.py:908
-#: indico/MaKaC/PDFinterface/conference.py:2199
-#: indico/MaKaC/PDFinterface/conference.py:2214
-#: indico/MaKaC/PDFinterface/conference.py:2216
-#: indico/MaKaC/PDFinterface/conference.py:2432
-#: indico/MaKaC/PDFinterface/conference.py:2458
-#: indico/MaKaC/PDFinterface/conference.py:2460
+#: indico/MaKaC/PDFinterface/conference.py:2196
+#: indico/MaKaC/PDFinterface/conference.py:2211
+#: indico/MaKaC/PDFinterface/conference.py:2213
+#: indico/MaKaC/PDFinterface/conference.py:2429
+#: indico/MaKaC/PDFinterface/conference.py:2455
+#: indico/MaKaC/PDFinterface/conference.py:2457
 #: indico/MaKaC/services/implementation/conference.py:908
 msgid "Error"
 msgstr ""
 
-#: MaKaC/PDFinterface/conference.py:2546
+#: MaKaC/PDFinterface/conference.py:2543
 #: MaKaC/webinterface/pages/registrants.py:172
 #: MaKaC/webinterface/pages/registrants.py:867
-#: MaKaC/webinterface/pages/registrationForm.py:57
-#: indico/MaKaC/PDFinterface/conference.py:2546
+#: MaKaC/webinterface/pages/registrationForm.py:58
+#: indico/MaKaC/PDFinterface/conference.py:2543
 #: indico/MaKaC/webinterface/pages/registrants.py:172
 #: indico/MaKaC/webinterface/pages/registrants.py:867
-#: indico/MaKaC/webinterface/pages/registrationForm.py:57
+#: indico/MaKaC/webinterface/pages/registrationForm.py:58
 msgid "e-ticket"
-msgstr ""
-
-#: MaKaC/authentication/LDAPAuthentication.py:361
-#: indico/MaKaC/authentication/LDAPAuthentication.py:361
-msgid "There is no result for this DN"
-msgstr ""
-
-#: MaKaC/authentication/NiceAuthentication.py.BACKUP.81178.py:217
-#: MaKaC/authentication/NiceAuthentication.py.BACKUP.81278.py:217
-#: MaKaC/authentication/NiceAuthentication.py.BASE.81178.py:217
-#: MaKaC/authentication/NiceAuthentication.py.BASE.81278.py:217
-#: MaKaC/authentication/NiceAuthentication.py.REMOTE.81178.py:217
-#: MaKaC/authentication/NiceAuthentication.py.REMOTE.81278.py:217
-#: indico/MaKaC/authentication/NiceAuthentication.py.BACKUP.81178.py:217
-#: indico/MaKaC/authentication/NiceAuthentication.py.BACKUP.81278.py:217
-#: indico/MaKaC/authentication/NiceAuthentication.py.BASE.81178.py:217
-#: indico/MaKaC/authentication/NiceAuthentication.py.BASE.81278.py:217
-#: indico/MaKaC/authentication/NiceAuthentication.py.REMOTE.81178.py:217
-#: indico/MaKaC/authentication/NiceAuthentication.py.REMOTE.81278.py:217
-msgid ""
-"Sorry, due to a temporary unavailability of the NICE service, we are unable "
-"to authenticate you. Please try later or use your local Indico account if you"
-" have one."
-msgstr ""
-
-#: MaKaC/authentication/NiceAuthentication.py.BACKUP.81178.py:377
-#: MaKaC/authentication/NiceAuthentication.py.BACKUP.81278.py:377
-#: MaKaC/authentication/NiceAuthentication.py.BASE.81178.py:377
-#: MaKaC/authentication/NiceAuthentication.py.BASE.81278.py:377
-#: MaKaC/authentication/NiceAuthentication.py.REMOTE.81178.py:377
-#: MaKaC/authentication/NiceAuthentication.py.REMOTE.81278.py:377
-#: indico/MaKaC/authentication/NiceAuthentication.py.BACKUP.81178.py:377
-#: indico/MaKaC/authentication/NiceAuthentication.py.BACKUP.81278.py:377
-#: indico/MaKaC/authentication/NiceAuthentication.py.BASE.81178.py:377
-#: indico/MaKaC/authentication/NiceAuthentication.py.BASE.81278.py:377
-#: indico/MaKaC/authentication/NiceAuthentication.py.REMOTE.81178.py:377
-#: indico/MaKaC/authentication/NiceAuthentication.py.REMOTE.81278.py:377
-msgid ""
-"NICE account does not contain the mandatory data to create"
-"                                   an Indico account. You can create an "
-"Indico                                   account manually in order to use "
-"your NICE login"
 msgstr ""
 
 #: MaKaC/authentication/baseAuthentication.py:47
@@ -4897,13 +4853,13 @@ msgstr ""
 
 #: MaKaC/plugins/Collaboration/WebcastRequest/mail.py:98
 #: MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:176
-#: MaKaC/webinterface/wcomponents.py:292
+#: MaKaC/webinterface/wcomponents.py:293
 #: MaKaC/webinterface/tpls/CategoryCreation.tpl:52
 #: MaKaC/webinterface/tpls/EventSetProtection.tpl:18
 #: MaKaC/webinterface/tpls/RoomBookingRoomForm.tpl:165
 #: indico/MaKaC/plugins/Collaboration/WebcastRequest/mail.py:98
 #: indico/MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:176
-#: indico/MaKaC/webinterface/wcomponents.py:292
+#: indico/MaKaC/webinterface/wcomponents.py:293
 #: indico/MaKaC/webinterface/tpls/CategoryCreation.tpl:52
 #: indico/MaKaC/webinterface/tpls/EventSetProtection.tpl:18
 #: indico/MaKaC/webinterface/tpls/RoomBookingRoomForm.tpl:165
@@ -5443,28 +5399,28 @@ msgstr ""
 #: MaKaC/plugins/EPayment/payPal/webinterface/pages/ePayments.py:40
 #: MaKaC/webinterface/pages/abstractReviewing.py:270
 #: MaKaC/webinterface/pages/abstracts.py:538 MaKaC/webinterface/pages/admins.py:367
-#: MaKaC/webinterface/pages/admins.py:1050 MaKaC/webinterface/pages/admins.py:1910
+#: MaKaC/webinterface/pages/admins.py:1050 MaKaC/webinterface/pages/admins.py:1906
 #: MaKaC/webinterface/pages/contributions.py:217
 #: MaKaC/webinterface/pages/contributions.py:577
 #: MaKaC/webinterface/pages/registrants.py:864
 #: MaKaC/webinterface/pages/sessions.py:200
 #: MaKaC/webinterface/pages/sessions.py:337
-#: MaKaC/webinterface/pages/subContributions.py:113
-#: MaKaC/webinterface/pages/subContributions.py:249
+#: MaKaC/webinterface/pages/subContributions.py:137
+#: MaKaC/webinterface/pages/subContributions.py:273
 #: MaKaC/webinterface/pages/tracks.py:92 MaKaC/webinterface/pages/tracks.py:708
 #: indico/MaKaC/plugins/EPayment/payPal/webinterface/pages/ePayments.py:40
 #: indico/MaKaC/webinterface/pages/abstractReviewing.py:270
 #: indico/MaKaC/webinterface/pages/abstracts.py:538
 #: indico/MaKaC/webinterface/pages/admins.py:367
 #: indico/MaKaC/webinterface/pages/admins.py:1050
-#: indico/MaKaC/webinterface/pages/admins.py:1910
+#: indico/MaKaC/webinterface/pages/admins.py:1906
 #: indico/MaKaC/webinterface/pages/contributions.py:217
 #: indico/MaKaC/webinterface/pages/contributions.py:577
 #: indico/MaKaC/webinterface/pages/registrants.py:864
 #: indico/MaKaC/webinterface/pages/sessions.py:200
 #: indico/MaKaC/webinterface/pages/sessions.py:337
-#: indico/MaKaC/webinterface/pages/subContributions.py:113
-#: indico/MaKaC/webinterface/pages/subContributions.py:249
+#: indico/MaKaC/webinterface/pages/subContributions.py:137
+#: indico/MaKaC/webinterface/pages/subContributions.py:273
 #: indico/MaKaC/webinterface/pages/tracks.py:92
 #: indico/MaKaC/webinterface/pages/tracks.py:708
 msgid "Main"
@@ -6343,7 +6299,7 @@ msgstr ""
 
 #: MaKaC/services/implementation/registration.py:87
 #: indico/MaKaC/services/implementation/registration.py:87
-msgid "There is not indico-checkin consumer key for OAuth"
+msgid "There is no indico-checkin consumer key for OAuth"
 msgstr ""
 
 #: MaKaC/services/implementation/registration.py:132
@@ -6720,10 +6676,10 @@ msgid "alarm id not set"
 msgstr ""
 
 #: MaKaC/webinterface/locators.py:251 MaKaC/webinterface/rh/registrantsModif.py:418
-#: MaKaC/webinterface/rh/registrationFormDisplay.py:212
+#: MaKaC/webinterface/rh/registrationFormDisplay.py:204
 #: indico/MaKaC/webinterface/locators.py:251
 #: indico/MaKaC/webinterface/rh/registrantsModif.py:418
-#: indico/MaKaC/webinterface/rh/registrationFormDisplay.py:212
+#: indico/MaKaC/webinterface/rh/registrationFormDisplay.py:204
 msgid "registrant id not set"
 msgstr ""
 
@@ -6866,7 +6822,7 @@ msgstr ""
 #: MaKaC/webinterface/pages/conferences.py:1395
 #: MaKaC/webinterface/pages/conferences.py:7027
 #: MaKaC/webinterface/pages/contributions.py:219
-#: MaKaC/webinterface/pages/subContributions.py:116
+#: MaKaC/webinterface/pages/subContributions.py:140
 #: MaKaC/webinterface/tpls/ConfModifContribList.tpl:174
 #: MaKaC/webinterface/tpls/MaterialModifFrame.tpl:20
 #: MaKaC/webinterface/tpls/MaterialModifHeader.tpl:9
@@ -6883,7 +6839,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/pages/conferences.py:1395
 #: indico/MaKaC/webinterface/pages/conferences.py:7027
 #: indico/MaKaC/webinterface/pages/contributions.py:219
-#: indico/MaKaC/webinterface/pages/subContributions.py:116
+#: indico/MaKaC/webinterface/pages/subContributions.py:140
 #: indico/MaKaC/webinterface/tpls/ConfModifContribList.tpl:174
 #: indico/MaKaC/webinterface/tpls/MaterialModifFrame.tpl:20
 #: indico/MaKaC/webinterface/tpls/MaterialModifHeader.tpl:9
@@ -6996,85 +6952,85 @@ msgstr ""
 msgid "imposible to set this detail level"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:216
-#: indico/MaKaC/webinterface/wcomponents.py:216
+#: MaKaC/webinterface/wcomponents.py:217
+#: indico/MaKaC/webinterface/wcomponents.py:217
 msgid "Template  produced empty output, and it has a .wohl file. Error: "
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:288
+#: MaKaC/webinterface/wcomponents.py:289
 #: MaKaC/webinterface/tpls/CategoryCreation.tpl:43
 #: MaKaC/webinterface/tpls/EventSetProtection.tpl:10
-#: indico/MaKaC/webinterface/wcomponents.py:288
+#: indico/MaKaC/webinterface/wcomponents.py:289
 #: indico/MaKaC/webinterface/tpls/CategoryCreation.tpl:43
 #: indico/MaKaC/webinterface/tpls/EventSetProtection.tpl:10
 msgid "Restricted"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:291
-#: indico/MaKaC/webinterface/wcomponents.py:291
+#: MaKaC/webinterface/wcomponents.py:292
+#: indico/MaKaC/webinterface/wcomponents.py:292
 #, python-format
 msgid "%s domain only"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:354
-#: indico/MaKaC/webinterface/wcomponents.py:354
+#: MaKaC/webinterface/wcomponents.py:355
+#: indico/MaKaC/webinterface/wcomponents.py:355
 msgid "Server admin"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:357
-#: indico/MaKaC/webinterface/wcomponents.py:357
+#: MaKaC/webinterface/wcomponents.py:358
+#: indico/MaKaC/webinterface/wcomponents.py:358
 msgid "Webcast Admin"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:876 MaKaC/webinterface/wcomponents.py:878
-#: MaKaC/webinterface/wcomponents.py:880
-#: indico/MaKaC/webinterface/wcomponents.py:876
-#: indico/MaKaC/webinterface/wcomponents.py:878
-#: indico/MaKaC/webinterface/wcomponents.py:880
+#: MaKaC/webinterface/wcomponents.py:879 MaKaC/webinterface/wcomponents.py:881
+#: MaKaC/webinterface/wcomponents.py:883
+#: indico/MaKaC/webinterface/wcomponents.py:879
+#: indico/MaKaC/webinterface/wcomponents.py:881
+#: indico/MaKaC/webinterface/wcomponents.py:883
 msgid "Contributions list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:890
-#: indico/MaKaC/webinterface/wcomponents.py:890
+#: MaKaC/webinterface/wcomponents.py:893
+#: indico/MaKaC/webinterface/wcomponents.py:893
 msgid "Notification template list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:898
-#: indico/MaKaC/webinterface/wcomponents.py:898
+#: MaKaC/webinterface/wcomponents.py:901
+#: indico/MaKaC/webinterface/wcomponents.py:901
 msgid "Abstracts list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:909
-#: indico/MaKaC/webinterface/wcomponents.py:909
+#: MaKaC/webinterface/wcomponents.py:912
+#: indico/MaKaC/webinterface/wcomponents.py:912
 msgid "Abstract list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:911
-#: indico/MaKaC/webinterface/wcomponents.py:911
+#: MaKaC/webinterface/wcomponents.py:914
+#: indico/MaKaC/webinterface/wcomponents.py:914
 msgid "Track list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:926
-#: indico/MaKaC/webinterface/wcomponents.py:926
+#: MaKaC/webinterface/wcomponents.py:929
+#: indico/MaKaC/webinterface/wcomponents.py:929
 msgid "Registrants list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:935
-#: indico/MaKaC/webinterface/wcomponents.py:935
+#: MaKaC/webinterface/wcomponents.py:938
+#: indico/MaKaC/webinterface/wcomponents.py:938
 msgid "Registration form setup"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:944
-#: indico/MaKaC/webinterface/wcomponents.py:944
+#: MaKaC/webinterface/wcomponents.py:947
+#: indico/MaKaC/webinterface/wcomponents.py:947
 msgid "Epayment setup"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:953
-#: indico/MaKaC/webinterface/wcomponents.py:953
+#: MaKaC/webinterface/wcomponents.py:956
+#: indico/MaKaC/webinterface/wcomponents.py:956
 msgid "Participants list"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:1548
+#: MaKaC/webinterface/wcomponents.py:1551
 #: MaKaC/webinterface/pages/conferences.py:6115
 #: MaKaC/webinterface/tpls/AbstractDisplay.tpl:70
 #: MaKaC/webinterface/tpls/AbstractManagment.tpl:58
@@ -7084,7 +7040,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/SubContribModifMain.tpl:36
 #: MaKaC/webinterface/tpls/SubContributionDataModification.tpl:28
 #: MaKaC/webinterface/tpls/TrackAbstractModification.tpl:51
-#: indico/MaKaC/webinterface/wcomponents.py:1548
+#: indico/MaKaC/webinterface/wcomponents.py:1551
 #: indico/MaKaC/webinterface/pages/conferences.py:6115
 #: indico/MaKaC/webinterface/tpls/AbstractDisplay.tpl:70
 #: indico/MaKaC/webinterface/tpls/AbstractManagment.tpl:58
@@ -7097,52 +7053,52 @@ msgstr ""
 msgid "Presenters"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:1885
-#: indico/MaKaC/webinterface/wcomponents.py:1885
+#: MaKaC/webinterface/wcomponents.py:1888
+#: indico/MaKaC/webinterface/wcomponents.py:1888
 msgid "Creating a new Indico user"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:1898
-#: indico/MaKaC/webinterface/wcomponents.py:1898
+#: MaKaC/webinterface/wcomponents.py:1901
+#: indico/MaKaC/webinterface/wcomponents.py:1901
 msgid "Modifying an Indico user"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:1912
-#: indico/MaKaC/webinterface/wcomponents.py:1912
+#: MaKaC/webinterface/wcomponents.py:1915
+#: indico/MaKaC/webinterface/wcomponents.py:1915
 msgid "After the submission of your personal data, an email will be sent to you"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:1912
-#: indico/MaKaC/webinterface/wcomponents.py:1912
+#: MaKaC/webinterface/wcomponents.py:1915
+#: indico/MaKaC/webinterface/wcomponents.py:1915
 msgid ""
 "You will able to use your account only after you activate it by clicking on "
 "the link inside the email."
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:1914
-#: indico/MaKaC/webinterface/wcomponents.py:1914
+#: MaKaC/webinterface/wcomponents.py:1917
+#: indico/MaKaC/webinterface/wcomponents.py:1917
 msgid ""
 "The site manager has to accept your account creation request. You will be "
 "informed of the decision by email."
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:1949
-#: indico/MaKaC/webinterface/wcomponents.py:1949
+#: MaKaC/webinterface/wcomponents.py:1952
+#: indico/MaKaC/webinterface/wcomponents.py:1952
 msgid ""
 "However, you will not be able to log into the system until you have activated"
 " your new account. To do this please follow the instructions in the mail that"
 " we have already sent you"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:1951
-#: indico/MaKaC/webinterface/wcomponents.py:1951
+#: MaKaC/webinterface/wcomponents.py:1954
+#: indico/MaKaC/webinterface/wcomponents.py:1954
 msgid ""
 "However, you will not be able to log into the system until the site "
 "administrator has accepted your account creation request. You will be "
 "notified of the decision by email"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2014 MaKaC/webinterface/wcomponents.py:2036
+#: MaKaC/webinterface/wcomponents.py:2017 MaKaC/webinterface/wcomponents.py:2039
 #: MaKaC/webinterface/pages/conferences.py:2477
 #: MaKaC/webinterface/tpls/AbsModAcceptConfirmation.tpl:31
 #: MaKaC/webinterface/tpls/AbsModRejectConfirmation.tpl:28
@@ -7157,8 +7113,8 @@ msgstr ""
 #: MaKaC/webinterface/tpls/IdentityModification.tpl:58
 #: MaKaC/webinterface/tpls/SetAlarm.tpl:113
 #: MaKaC/webinterface/tpls/UserModify.tpl:71
-#: indico/MaKaC/webinterface/wcomponents.py:2014
-#: indico/MaKaC/webinterface/wcomponents.py:2036
+#: indico/MaKaC/webinterface/wcomponents.py:2017
+#: indico/MaKaC/webinterface/wcomponents.py:2039
 #: indico/MaKaC/webinterface/pages/conferences.py:2477
 #: indico/MaKaC/webinterface/tpls/AbsModAcceptConfirmation.tpl:31
 #: indico/MaKaC/webinterface/tpls/AbsModRejectConfirmation.tpl:28
@@ -7176,81 +7132,81 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2035
+#: MaKaC/webinterface/wcomponents.py:2038
 #: MaKaC/webinterface/tpls/ConfModifReschedule.tpl:27
 #: MaKaC/webinterface/tpls/Confirmation.tpl:1
-#: indico/MaKaC/webinterface/wcomponents.py:2035
+#: indico/MaKaC/webinterface/wcomponents.py:2038
 #: indico/MaKaC/webinterface/tpls/ConfModifReschedule.tpl:27
 #: indico/MaKaC/webinterface/tpls/Confirmation.tpl:1
 msgid "OK"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2774 MaKaC/webinterface/pages/abstracts.py:157
-#: indico/MaKaC/webinterface/wcomponents.py:2774
+#: MaKaC/webinterface/wcomponents.py:2795 MaKaC/webinterface/pages/abstracts.py:157
+#: indico/MaKaC/webinterface/wcomponents.py:2795
 #: indico/MaKaC/webinterface/pages/abstracts.py:157
 msgid "OPENED"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:2777
+#: MaKaC/webinterface/wcomponents.py:2798
 #: MaKaC/webinterface/tpls/AccessControlStatusFrame.tpl:96
 #: MaKaC/webinterface/tpls/HomeAccessControlStatusFrame.tpl:10
 #: MaKaC/webinterface/tpls/HomeAccessControlStatusFrame.tpl:91
-#: indico/MaKaC/webinterface/wcomponents.py:2777
+#: indico/MaKaC/webinterface/wcomponents.py:2798
 #: indico/MaKaC/webinterface/tpls/AccessControlStatusFrame.tpl:96
 #: indico/MaKaC/webinterface/tpls/HomeAccessControlStatusFrame.tpl:10
 #: indico/MaKaC/webinterface/tpls/HomeAccessControlStatusFrame.tpl:91
 msgid "RESTRICTED"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:3001
-#: indico/MaKaC/webinterface/wcomponents.py:3001
+#: MaKaC/webinterface/wcomponents.py:3027
+#: indico/MaKaC/webinterface/wcomponents.py:3027
 msgid ""
 "Please make your selection if you want to add the submitter/s directly to any"
 " of the following roles:"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:3014
-#: indico/MaKaC/webinterface/wcomponents.py:3014
+#: MaKaC/webinterface/wcomponents.py:3040
+#: indico/MaKaC/webinterface/wcomponents.py:3040
 msgid "Please make your selection if you want to add the submitter/s directly to:"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:3037
-#: indico/MaKaC/webinterface/wcomponents.py:3037
+#: MaKaC/webinterface/wcomponents.py:3063
+#: indico/MaKaC/webinterface/wcomponents.py:3063
 msgid ""
 "Please make your selection if you want to add the result/s directly to the "
 "role of session Convener:"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:3061
-#: indico/MaKaC/webinterface/wcomponents.py:3061
+#: MaKaC/webinterface/wcomponents.py:3087
+#: indico/MaKaC/webinterface/wcomponents.py:3087
 msgid ""
 "Please check the boxes indicating which elements of the lecture you want to "
 "clone"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:3144 MaKaC/webinterface/wcomponents.py:3146
-#: indico/MaKaC/webinterface/wcomponents.py:3144
-#: indico/MaKaC/webinterface/wcomponents.py:3146
+#: MaKaC/webinterface/wcomponents.py:3170 MaKaC/webinterface/wcomponents.py:3172
+#: indico/MaKaC/webinterface/wcomponents.py:3170
+#: indico/MaKaC/webinterface/wcomponents.py:3172
 msgid "No Session Comment Entered"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:3689
-#: indico/MaKaC/webinterface/wcomponents.py:3689
+#: MaKaC/webinterface/wcomponents.py:3715
+#: indico/MaKaC/webinterface/wcomponents.py:3715
 msgid "Existing material"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4044
-#: indico/MaKaC/webinterface/wcomponents.py:4044
+#: MaKaC/webinterface/wcomponents.py:4070
+#: indico/MaKaC/webinterface/wcomponents.py:4070
 msgid "You are not the owner of any room"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4046
-#: indico/MaKaC/webinterface/wcomponents.py:4046
+#: MaKaC/webinterface/wcomponents.py:4072
+#: indico/MaKaC/webinterface/wcomponents.py:4072
 msgid "There are no rooms with this search criteria"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4491
-#: indico/MaKaC/webinterface/wcomponents.py:4491
+#: MaKaC/webinterface/wcomponents.py:4517
+#: indico/MaKaC/webinterface/wcomponents.py:4517
 #, python-format
 msgid ""
 "Blocked by %s:\n"
@@ -7259,8 +7215,8 @@ msgid ""
 "<b>You are permitted to override the blocking.</b>"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4495
-#: indico/MaKaC/webinterface/wcomponents.py:4495
+#: MaKaC/webinterface/wcomponents.py:4521
+#: indico/MaKaC/webinterface/wcomponents.py:4521
 #, python-format
 msgid ""
 "Blocked by %s:\n"
@@ -7270,16 +7226,16 @@ msgid ""
 "override the blocking. Please use this privilege with care!</b>"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4498
-#: indico/MaKaC/webinterface/wcomponents.py:4498
+#: MaKaC/webinterface/wcomponents.py:4524
+#: indico/MaKaC/webinterface/wcomponents.py:4524
 #, python-format
 msgid ""
 "Blocked by %s:\n"
 "%s"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4501
-#: indico/MaKaC/webinterface/wcomponents.py:4501
+#: MaKaC/webinterface/wcomponents.py:4527
+#: indico/MaKaC/webinterface/wcomponents.py:4527
 #, python-format
 msgid ""
 "Blocking requested by %s:\n"
@@ -7288,13 +7244,13 @@ msgid ""
 "<b>If this blocking is approved, any colliding bookings will be rejected!</b>"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4651
-#: indico/MaKaC/webinterface/wcomponents.py:4651
+#: MaKaC/webinterface/wcomponents.py:4677
+#: indico/MaKaC/webinterface/wcomponents.py:4677
 msgid "PRE-Booking"
 msgstr ""
 
-#: MaKaC/webinterface/wcomponents.py:4651
-#: indico/MaKaC/webinterface/wcomponents.py:4651
+#: MaKaC/webinterface/wcomponents.py:4677
+#: indico/MaKaC/webinterface/wcomponents.py:4677
 msgid "Booking"
 msgstr ""
 
@@ -7610,7 +7566,7 @@ msgstr ""
 #: MaKaC/webinterface/pages/conferences.py:1452
 #: MaKaC/webinterface/pages/contributions.py:226
 #: MaKaC/webinterface/pages/sessions.py:215
-#: MaKaC/webinterface/pages/subContributions.py:118
+#: MaKaC/webinterface/pages/subContributions.py:142
 #: MaKaC/webinterface/tpls/DomainList.tpl:12
 #: MaKaC/webinterface/tpls/GroupList.tpl:12 MaKaC/webinterface/tpls/UserList.tpl:10
 #: indico/MaKaC/webinterface/pages/abstracts.py:551
@@ -7618,7 +7574,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/pages/conferences.py:1452
 #: indico/MaKaC/webinterface/pages/contributions.py:226
 #: indico/MaKaC/webinterface/pages/sessions.py:215
-#: indico/MaKaC/webinterface/pages/subContributions.py:118
+#: indico/MaKaC/webinterface/pages/subContributions.py:142
 #: indico/MaKaC/webinterface/tpls/DomainList.tpl:12
 #: indico/MaKaC/webinterface/tpls/GroupList.tpl:12
 #: indico/MaKaC/webinterface/tpls/UserList.tpl:10
@@ -7806,13 +7762,13 @@ msgstr ""
 #: MaKaC/webinterface/pages/conferences.py:1558
 #: MaKaC/webinterface/pages/conferences.py:2219
 #: MaKaC/webinterface/pages/evaluations.py:322
-#: MaKaC/webinterface/pages/registrationForm.py:50
+#: MaKaC/webinterface/pages/registrationForm.py:51
 #: MaKaC/webinterface/pages/reviewing.py:56
 #: indico/MaKaC/webinterface/pages/admins.py:463
 #: indico/MaKaC/webinterface/pages/conferences.py:1558
 #: indico/MaKaC/webinterface/pages/conferences.py:2219
 #: indico/MaKaC/webinterface/pages/evaluations.py:322
-#: indico/MaKaC/webinterface/pages/registrationForm.py:50
+#: indico/MaKaC/webinterface/pages/registrationForm.py:51
 #: indico/MaKaC/webinterface/pages/reviewing.py:56
 msgid "Setup"
 msgstr ""
@@ -7990,59 +7946,59 @@ msgstr ""
 msgid "Modifying group basic data"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1908 MaKaC/webinterface/pages/admins.py:1913
+#: MaKaC/webinterface/pages/admins.py:1904 MaKaC/webinterface/pages/admins.py:1909
 #: MaKaC/webinterface/pages/roomBooking.py:33
 #: MaKaC/webinterface/tpls/RoomBookingWelcome.tpl:3
-#: indico/MaKaC/webinterface/pages/admins.py:1908
-#: indico/MaKaC/webinterface/pages/admins.py:1913
+#: indico/MaKaC/webinterface/pages/admins.py:1904
+#: indico/MaKaC/webinterface/pages/admins.py:1909
 #: indico/MaKaC/webinterface/pages/roomBooking.py:33
 #: indico/MaKaC/webinterface/tpls/RoomBookingWelcome.tpl:3
 msgid "Room Booking"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1915 MaKaC/webinterface/pages/admins.py:2362
+#: MaKaC/webinterface/pages/admins.py:1911 MaKaC/webinterface/pages/admins.py:2358
 #: MaKaC/webinterface/tpls/Analytics.tpl:1
-#: indico/MaKaC/webinterface/pages/admins.py:1915
-#: indico/MaKaC/webinterface/pages/admins.py:2362
+#: indico/MaKaC/webinterface/pages/admins.py:1911
+#: indico/MaKaC/webinterface/pages/admins.py:2358
 #: indico/MaKaC/webinterface/tpls/Analytics.tpl:1
 msgid "Configuration"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1917
+#: MaKaC/webinterface/pages/admins.py:1913
 #: MaKaC/webinterface/tpls/RoomMapperList.tpl:13
-#: indico/MaKaC/webinterface/pages/admins.py:1917
+#: indico/MaKaC/webinterface/pages/admins.py:1913
 #: indico/MaKaC/webinterface/tpls/RoomMapperList.tpl:13
 msgid "Room Mappers"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:1922 MaKaC/webinterface/pages/admins.py:1923
-#: indico/MaKaC/webinterface/pages/admins.py:1922
-#: indico/MaKaC/webinterface/pages/admins.py:1923
+#: MaKaC/webinterface/pages/admins.py:1918 MaKaC/webinterface/pages/admins.py:1919
+#: indico/MaKaC/webinterface/pages/admins.py:1918
+#: indico/MaKaC/webinterface/pages/admins.py:1919
 msgid "Room Booking Admin"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:2152
-#: indico/MaKaC/webinterface/pages/admins.py:2152
+#: MaKaC/webinterface/pages/admins.py:2148
+#: indico/MaKaC/webinterface/pages/admins.py:2148
 msgid "no name"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:2289
-#: indico/MaKaC/webinterface/pages/admins.py:2289
+#: MaKaC/webinterface/pages/admins.py:2285
+#: indico/MaKaC/webinterface/pages/admins.py:2285
 msgid "Click to DEACTIVATE Room Booking Module"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:2292
-#: indico/MaKaC/webinterface/pages/admins.py:2292
+#: MaKaC/webinterface/pages/admins.py:2288
+#: indico/MaKaC/webinterface/pages/admins.py:2288
 msgid "Click to ACTIVATE Room Booking Module"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:2364
-#: indico/MaKaC/webinterface/pages/admins.py:2364
+#: MaKaC/webinterface/pages/admins.py:2360
+#: indico/MaKaC/webinterface/pages/admins.py:2360
 msgid "Task Manager"
 msgstr ""
 
-#: MaKaC/webinterface/pages/admins.py:2366
-#: indico/MaKaC/webinterface/pages/admins.py:2366
+#: MaKaC/webinterface/pages/admins.py:2362
+#: indico/MaKaC/webinterface/pages/admins.py:2362
 msgid "Maintenance"
 msgstr ""
 
@@ -8424,28 +8380,28 @@ msgstr ""
 
 #: MaKaC/webinterface/pages/conferences.py:1709
 #: MaKaC/webinterface/pages/contributions.py:587
-#: MaKaC/webinterface/pages/subContributions.py:259
+#: MaKaC/webinterface/pages/subContributions.py:283
 #: indico/MaKaC/webinterface/pages/conferences.py:1709
 #: indico/MaKaC/webinterface/pages/contributions.py:587
-#: indico/MaKaC/webinterface/pages/subContributions.py:259
+#: indico/MaKaC/webinterface/pages/subContributions.py:283
 msgid "The event is currently locked and you cannot modify it in this status. "
 msgstr ""
 
 #: MaKaC/webinterface/pages/conferences.py:1711
 #: MaKaC/webinterface/pages/contributions.py:589
-#: MaKaC/webinterface/pages/subContributions.py:261
+#: MaKaC/webinterface/pages/subContributions.py:285
 #: indico/MaKaC/webinterface/pages/conferences.py:1711
 #: indico/MaKaC/webinterface/pages/contributions.py:589
-#: indico/MaKaC/webinterface/pages/subContributions.py:261
+#: indico/MaKaC/webinterface/pages/subContributions.py:285
 msgid "If you unlock the event, you will be able to modify its details again."
 msgstr ""
 
 #: MaKaC/webinterface/pages/conferences.py:1715
 #: MaKaC/webinterface/pages/contributions.py:591
-#: MaKaC/webinterface/pages/subContributions.py:263
+#: MaKaC/webinterface/pages/subContributions.py:287
 #: indico/MaKaC/webinterface/pages/conferences.py:1715
 #: indico/MaKaC/webinterface/pages/contributions.py:591
-#: indico/MaKaC/webinterface/pages/subContributions.py:263
+#: indico/MaKaC/webinterface/pages/subContributions.py:287
 msgid "Unlock event"
 msgstr ""
 
@@ -8483,7 +8439,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/ConfModifContribList.tpl:188
 #: MaKaC/webinterface/tpls/ContribModifTool.tpl:6
 #: MaKaC/webinterface/tpls/RoomBookingBlockingDetails.tpl:56
-#: MaKaC/webinterface/tpls/RoomBookingDetails.tpl:314
+#: MaKaC/webinterface/tpls/RoomBookingDetails.tpl:315
 #: MaKaC/webinterface/tpls/RoomBookingRoomDetails.tpl:277
 #: MaKaC/webinterface/tpls/SessionModifTools.tpl:6
 #: MaKaC/webinterface/tpls/SubContribModifTool.tpl:6
@@ -8495,7 +8451,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/ConfModifContribList.tpl:188
 #: indico/MaKaC/webinterface/tpls/ContribModifTool.tpl:6
 #: indico/MaKaC/webinterface/tpls/RoomBookingBlockingDetails.tpl:56
-#: indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:314
+#: indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:315
 #: indico/MaKaC/webinterface/tpls/RoomBookingRoomDetails.tpl:277
 #: indico/MaKaC/webinterface/tpls/SessionModifTools.tpl:6
 #: indico/MaKaC/webinterface/tpls/SubContribModifTool.tpl:6
@@ -9292,37 +9248,37 @@ msgid ""
 "coordinators?"
 msgstr ""
 
-#: MaKaC/webinterface/pages/conferences.py:7742
-#: MaKaC/webinterface/pages/conferences.py:8030
-#: indico/MaKaC/webinterface/pages/conferences.py:7742
-#: indico/MaKaC/webinterface/pages/conferences.py:8030
+#: MaKaC/webinterface/pages/conferences.py:7745
+#: MaKaC/webinterface/pages/conferences.py:8033
+#: indico/MaKaC/webinterface/pages/conferences.py:7745
+#: indico/MaKaC/webinterface/pages/conferences.py:8033
 msgid "Blank Page"
 msgstr ""
 
-#: MaKaC/webinterface/pages/conferences.py:7884
-#: indico/MaKaC/webinterface/pages/conferences.py:7884
+#: MaKaC/webinterface/pages/conferences.py:7887
+#: indico/MaKaC/webinterface/pages/conferences.py:7887
 msgid "Creating new badge template"
 msgstr ""
 
-#: MaKaC/webinterface/pages/conferences.py:7893
-#: MaKaC/webinterface/pages/conferences.py:8178
-#: indico/MaKaC/webinterface/pages/conferences.py:7893
-#: indico/MaKaC/webinterface/pages/conferences.py:8178
+#: MaKaC/webinterface/pages/conferences.py:7896
+#: MaKaC/webinterface/pages/conferences.py:8181
+#: indico/MaKaC/webinterface/pages/conferences.py:7896
+#: indico/MaKaC/webinterface/pages/conferences.py:8181
 msgid "No template id given"
 msgstr ""
 
-#: MaKaC/webinterface/pages/conferences.py:7902
-#: indico/MaKaC/webinterface/pages/conferences.py:7902
+#: MaKaC/webinterface/pages/conferences.py:7905
+#: indico/MaKaC/webinterface/pages/conferences.py:7905
 msgid "Editing badge template"
 msgstr ""
 
-#: MaKaC/webinterface/pages/conferences.py:8167
-#: indico/MaKaC/webinterface/pages/conferences.py:8167
+#: MaKaC/webinterface/pages/conferences.py:8170
+#: indico/MaKaC/webinterface/pages/conferences.py:8170
 msgid "Creating new poster template"
 msgstr ""
 
-#: MaKaC/webinterface/pages/conferences.py:8189
-#: indico/MaKaC/webinterface/pages/conferences.py:8189
+#: MaKaC/webinterface/pages/conferences.py:8192
+#: indico/MaKaC/webinterface/pages/conferences.py:8192
 msgid "Editing poster template"
 msgstr ""
 
@@ -9373,28 +9329,28 @@ msgstr ""
 
 #: MaKaC/webinterface/pages/contributions.py:581
 #: MaKaC/webinterface/pages/sessions.py:341
-#: MaKaC/webinterface/pages/subContributions.py:253
+#: MaKaC/webinterface/pages/subContributions.py:277
 #: indico/MaKaC/webinterface/pages/contributions.py:581
 #: indico/MaKaC/webinterface/pages/sessions.py:341
-#: indico/MaKaC/webinterface/pages/subContributions.py:253
+#: indico/MaKaC/webinterface/pages/subContributions.py:277
 msgid "The session is currently locked and you cannot modify it in this status. "
 msgstr ""
 
 #: MaKaC/webinterface/pages/contributions.py:583
 #: MaKaC/webinterface/pages/sessions.py:343
-#: MaKaC/webinterface/pages/subContributions.py:255
+#: MaKaC/webinterface/pages/subContributions.py:279
 #: indico/MaKaC/webinterface/pages/contributions.py:583
 #: indico/MaKaC/webinterface/pages/sessions.py:343
-#: indico/MaKaC/webinterface/pages/subContributions.py:255
+#: indico/MaKaC/webinterface/pages/subContributions.py:279
 msgid "If you unlock the session, you will be able to modify its details again."
 msgstr ""
 
 #: MaKaC/webinterface/pages/contributions.py:585
 #: MaKaC/webinterface/pages/sessions.py:347
-#: MaKaC/webinterface/pages/subContributions.py:257
+#: MaKaC/webinterface/pages/subContributions.py:281
 #: indico/MaKaC/webinterface/pages/contributions.py:585
 #: indico/MaKaC/webinterface/pages/sessions.py:347
-#: indico/MaKaC/webinterface/pages/subContributions.py:257
+#: indico/MaKaC/webinterface/pages/subContributions.py:281
 msgid "Unlock session"
 msgstr ""
 
@@ -9441,7 +9397,7 @@ msgid "Sorry, but the evaluation period has finished."
 msgstr ""
 
 #: MaKaC/webinterface/pages/evaluations.py:324
-#: MaKaC/webinterface/pages/registrationForm.py:52
+#: MaKaC/webinterface/pages/registrationForm.py:53
 #: MaKaC/webinterface/tpls/AbstractDisplay.tpl:12
 #: MaKaC/webinterface/tpls/ConfMyContributions.tpl:33
 #: MaKaC/webinterface/tpls/ConfPaperMyContributions.tpl:30
@@ -9450,7 +9406,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/SessionDisplayFull.tpl:10
 #: MaKaC/webinterface/tpls/SubContributionDisplayMin.tpl:6
 #: indico/MaKaC/webinterface/pages/evaluations.py:324
-#: indico/MaKaC/webinterface/pages/registrationForm.py:52
+#: indico/MaKaC/webinterface/pages/registrationForm.py:53
 #: indico/MaKaC/webinterface/tpls/AbstractDisplay.tpl:12
 #: indico/MaKaC/webinterface/tpls/ConfMyContributions.tpl:33
 #: indico/MaKaC/webinterface/tpls/ConfPaperMyContributions.tpl:30
@@ -9467,10 +9423,10 @@ msgid "Results"
 msgstr ""
 
 #: MaKaC/webinterface/pages/evaluations.py:349
-#: MaKaC/webinterface/pages/registrants.py:892
+#: MaKaC/webinterface/pages/registrants.py:896
 #: MaKaC/webinterface/pages/tracks.py:123 MaKaC/webinterface/pages/tracks.py:721
 #: indico/MaKaC/webinterface/pages/evaluations.py:349
-#: indico/MaKaC/webinterface/pages/registrants.py:892
+#: indico/MaKaC/webinterface/pages/registrants.py:896
 #: indico/MaKaC/webinterface/pages/tracks.py:123
 #: indico/MaKaC/webinterface/pages/tracks.py:721
 msgid "nothing"
@@ -9663,8 +9619,8 @@ msgstr ""
 msgid "Please note you will permanently lose all the information about them"
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrants.py:1284
-#: indico/MaKaC/webinterface/pages/registrants.py:1284
+#: MaKaC/webinterface/pages/registrants.py:1288
+#: indico/MaKaC/webinterface/pages/registrants.py:1288
 #, python-format
 msgid ""
 "\n"
@@ -9677,48 +9633,48 @@ msgid ""
 "                                    "
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:54
-#: indico/MaKaC/webinterface/pages/registrationForm.py:54
+#: MaKaC/webinterface/pages/registrationForm.py:55
+#: indico/MaKaC/webinterface/pages/registrationForm.py:55
 msgid "Registrants"
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:56
-#: indico/MaKaC/webinterface/pages/registrationForm.py:56
+#: MaKaC/webinterface/pages/registrationForm.py:57
+#: indico/MaKaC/webinterface/pages/registrationForm.py:57
 msgid "e-payment"
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:124
-#: indico/MaKaC/webinterface/pages/registrationForm.py:124
+#: MaKaC/webinterface/pages/registrationForm.py:125
+#: indico/MaKaC/webinterface/pages/registrationForm.py:125
 msgid "No statuses defined yet."
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:124
-#: indico/MaKaC/webinterface/pages/registrationForm.py:124
+#: MaKaC/webinterface/pages/registrationForm.py:125
+#: indico/MaKaC/webinterface/pages/registrationForm.py:125
 msgid ""
 "You can use this option in order to create general statuses you will be able "
 "to use afterwards in the list of registrants. For instance, you can create a "
 "status \"paid\" in order to check if someone has paid or not."
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:281
-#: indico/MaKaC/webinterface/pages/registrationForm.py:281
+#: MaKaC/webinterface/pages/registrationForm.py:282
+#: indico/MaKaC/webinterface/pages/registrationForm.py:282
 msgid "-- unnamed status --"
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:283
-#: indico/MaKaC/webinterface/pages/registrationForm.py:283
+#: MaKaC/webinterface/pages/registrationForm.py:284
+#: indico/MaKaC/webinterface/pages/registrationForm.py:284
 msgid "Are you sure you want to delete the following registration statuses?"
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:285
-#: indico/MaKaC/webinterface/pages/registrationForm.py:285
+#: MaKaC/webinterface/pages/registrationForm.py:286
+#: indico/MaKaC/webinterface/pages/registrationForm.py:286
 msgid "Please note that any existing registrants will lose this information"
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:574
-#: MaKaC/webinterface/pages/registrationForm.py:600
-#: indico/MaKaC/webinterface/pages/registrationForm.py:574
-#: indico/MaKaC/webinterface/pages/registrationForm.py:600
+#: MaKaC/webinterface/pages/registrationForm.py:580
+#: MaKaC/webinterface/pages/registrationForm.py:606
+#: indico/MaKaC/webinterface/pages/registrationForm.py:580
+#: indico/MaKaC/webinterface/pages/registrationForm.py:606
 #, python-format
 msgid ""
 "\n"
@@ -9731,20 +9687,20 @@ msgid ""
 "                        "
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:620
-#: MaKaC/webinterface/pages/registrationForm.py:623
-#: indico/MaKaC/webinterface/pages/registrationForm.py:620
-#: indico/MaKaC/webinterface/pages/registrationForm.py:623
+#: MaKaC/webinterface/pages/registrationForm.py:626
+#: MaKaC/webinterface/pages/registrationForm.py:629
+#: indico/MaKaC/webinterface/pages/registrationForm.py:626
+#: indico/MaKaC/webinterface/pages/registrationForm.py:629
 msgid "Not selected"
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:679
-#: indico/MaKaC/webinterface/pages/registrationForm.py:679
+#: MaKaC/webinterface/pages/registrationForm.py:685
+#: indico/MaKaC/webinterface/pages/registrationForm.py:685
 msgid "No social events selected"
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:686
-#: indico/MaKaC/webinterface/pages/registrationForm.py:686
+#: MaKaC/webinterface/pages/registrationForm.py:692
+#: indico/MaKaC/webinterface/pages/registrationForm.py:692
 #, python-format
 msgid ""
 "\n"
@@ -9757,53 +9713,53 @@ msgid ""
 "                    "
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:702
-#: indico/MaKaC/webinterface/pages/registrationForm.py:702
+#: MaKaC/webinterface/pages/registrationForm.py:708
+#: indico/MaKaC/webinterface/pages/registrationForm.py:708
 msgid "No reason given"
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:731
-#: indico/MaKaC/webinterface/pages/registrationForm.py:731
+#: MaKaC/webinterface/pages/registrationForm.py:737
+#: indico/MaKaC/webinterface/pages/registrationForm.py:737
 msgid "No value selected"
-msgstr ""
-
-#: MaKaC/webinterface/pages/registrationForm.py:1081
-#: indico/MaKaC/webinterface/pages/registrationForm.py:1081
-msgid "Impossible to register"
-msgstr ""
-
-#: MaKaC/webinterface/pages/registrationForm.py:1082
-#: indico/MaKaC/webinterface/pages/registrationForm.py:1082
-msgid "No period for registration"
-msgstr ""
-
-#: MaKaC/webinterface/pages/registrationForm.py:1086
-#: indico/MaKaC/webinterface/pages/registrationForm.py:1086
-msgid "Registration is not open yet"
 msgstr ""
 
 #: MaKaC/webinterface/pages/registrationForm.py:1087
 #: indico/MaKaC/webinterface/pages/registrationForm.py:1087
-msgid "Sorry, but the registration is not open yet:"
+msgid "Impossible to register"
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:1089
-#: indico/MaKaC/webinterface/pages/registrationForm.py:1089
-msgid "Registration is closed"
+#: MaKaC/webinterface/pages/registrationForm.py:1088
+#: indico/MaKaC/webinterface/pages/registrationForm.py:1088
+msgid "No period for registration"
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:1090
-#: indico/MaKaC/webinterface/pages/registrationForm.py:1090
-msgid "Sorry, but the registration is now closed:"
+#: MaKaC/webinterface/pages/registrationForm.py:1092
+#: indico/MaKaC/webinterface/pages/registrationForm.py:1092
+msgid "Registration is not open yet"
 msgstr ""
 
 #: MaKaC/webinterface/pages/registrationForm.py:1093
 #: indico/MaKaC/webinterface/pages/registrationForm.py:1093
+msgid "Sorry, but the registration is not open yet:"
+msgstr ""
+
+#: MaKaC/webinterface/pages/registrationForm.py:1095
+#: indico/MaKaC/webinterface/pages/registrationForm.py:1095
+msgid "Registration is closed"
+msgstr ""
+
+#: MaKaC/webinterface/pages/registrationForm.py:1096
+#: indico/MaKaC/webinterface/pages/registrationForm.py:1096
+msgid "Sorry, but the registration is now closed:"
+msgstr ""
+
+#: MaKaC/webinterface/pages/registrationForm.py:1099
+#: indico/MaKaC/webinterface/pages/registrationForm.py:1099
 msgid "Registration not available"
 msgstr ""
 
-#: MaKaC/webinterface/pages/registrationForm.py:1094
-#: indico/MaKaC/webinterface/pages/registrationForm.py:1094
+#: MaKaC/webinterface/pages/registrationForm.py:1100
+#: indico/MaKaC/webinterface/pages/registrationForm.py:1100
 msgid ""
 "Sorry, but the registration is not currently available."
 "                               Please, contact the conference manager for "
@@ -10079,13 +10035,13 @@ msgid ""
 "deleted"
 msgstr ""
 
-#: MaKaC/webinterface/pages/subContributions.py:226
-#: indico/MaKaC/webinterface/pages/subContributions.py:226
+#: MaKaC/webinterface/pages/subContributions.py:250
+#: indico/MaKaC/webinterface/pages/subContributions.py:250
 msgid "Are you sure that you want to delete the following subcontributions?"
 msgstr ""
 
-#: MaKaC/webinterface/pages/subContributions.py:284
-#: indico/MaKaC/webinterface/pages/subContributions.py:284
+#: MaKaC/webinterface/pages/subContributions.py:308
+#: indico/MaKaC/webinterface/pages/subContributions.py:308
 msgid "<input type=\"submit\" class=\"btn\" value=\"_(\"modify\")\">"
 msgstr ""
 
@@ -10102,66 +10058,66 @@ msgstr ""
 msgid "Abstract submission confirmation (%s)"
 msgstr ""
 
-#: MaKaC/webinterface/rh/CFADisplay.py:147
-#: indico/MaKaC/webinterface/rh/CFADisplay.py:147
+#: MaKaC/webinterface/rh/CFADisplay.py:150
+#: indico/MaKaC/webinterface/rh/CFADisplay.py:150
 msgid "The submission of your abstract has been successfully processed."
 msgstr ""
 
-#: MaKaC/webinterface/rh/CFADisplay.py:242
-#: indico/MaKaC/webinterface/rh/CFADisplay.py:242
+#: MaKaC/webinterface/rh/CFADisplay.py:245
+#: indico/MaKaC/webinterface/rh/CFADisplay.py:245
 #, python-format
 msgid "[Indico] New abstract submission: %s"
 msgstr ""
 
-#: MaKaC/webinterface/rh/CFADisplay.py:356
-#: indico/MaKaC/webinterface/rh/CFADisplay.py:356
+#: MaKaC/webinterface/rh/CFADisplay.py:359
+#: indico/MaKaC/webinterface/rh/CFADisplay.py:359
 msgid "The abstract you are trying to access does not exist or has been deleted"
 msgstr ""
 
-#: MaKaC/webinterface/rh/CFADisplay.py:380
+#: MaKaC/webinterface/rh/CFADisplay.py:383
 #: MaKaC/webinterface/rh/conferenceDisplay.py:898
-#: indico/MaKaC/webinterface/rh/CFADisplay.py:380
+#: indico/MaKaC/webinterface/rh/CFADisplay.py:383
 #: indico/MaKaC/webinterface/rh/conferenceDisplay.py:898
 msgid "The Call For Abstracts was disabled by the conference managers"
 msgstr ""
 
-#: MaKaC/webinterface/rh/CFADisplay.py:398
-#: MaKaC/webinterface/rh/conferenceModif.py:1977
-#: indico/MaKaC/webinterface/rh/CFADisplay.py:398
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:1977
+#: MaKaC/webinterface/rh/CFADisplay.py:401
+#: MaKaC/webinterface/rh/conferenceModif.py:1967
+#: indico/MaKaC/webinterface/rh/CFADisplay.py:401
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:1967
 msgid "No abstract to print"
 msgstr ""
 
-#: MaKaC/webinterface/rh/CFADisplay.py:456
-#: indico/MaKaC/webinterface/rh/CFADisplay.py:456
+#: MaKaC/webinterface/rh/CFADisplay.py:459
+#: indico/MaKaC/webinterface/rh/CFADisplay.py:459
 msgid ""
 "this abstract cannot be withdrawn, please contact the conference organisers "
 "in order to do so"
 msgstr ""
 
-#: MaKaC/webinterface/rh/CFADisplay.py:482
-#: indico/MaKaC/webinterface/rh/CFADisplay.py:482
+#: MaKaC/webinterface/rh/CFADisplay.py:485
+#: indico/MaKaC/webinterface/rh/CFADisplay.py:485
 msgid "you are not allowed to recover this abstract"
 msgstr ""
 
-#: MaKaC/webinterface/rh/abstractModif.py:273
+#: MaKaC/webinterface/rh/abstractModif.py:278
 #: MaKaC/webinterface/rh/trackModif.py:543
-#: indico/MaKaC/webinterface/rh/abstractModif.py:273
+#: indico/MaKaC/webinterface/rh/abstractModif.py:278
 #: indico/MaKaC/webinterface/rh/trackModif.py:543
 msgid "invalid original abstract id"
 msgstr ""
 
-#: MaKaC/webinterface/rh/abstractModif.py:388
-#: indico/MaKaC/webinterface/rh/abstractModif.py:388
+#: MaKaC/webinterface/rh/abstractModif.py:393
+#: indico/MaKaC/webinterface/rh/abstractModif.py:393
 msgid ""
 "You have to choose a track in order to do the proposal. If there are not "
 "tracks to select, please change the track assignment of the abstract from its"
 " management page"
 msgstr ""
 
-#: MaKaC/webinterface/rh/abstractModif.py:398
+#: MaKaC/webinterface/rh/abstractModif.py:403
 #: MaKaC/webinterface/rh/trackModif.py:448
-#: indico/MaKaC/webinterface/rh/abstractModif.py:398
+#: indico/MaKaC/webinterface/rh/abstractModif.py:403
 #: indico/MaKaC/webinterface/rh/trackModif.py:448
 #, python-format
 msgid ""
@@ -10169,17 +10125,17 @@ msgid ""
 "answer."
 msgstr ""
 
-#: MaKaC/webinterface/rh/abstractModif.py:566
-#: indico/MaKaC/webinterface/rh/abstractModif.py:566
+#: MaKaC/webinterface/rh/abstractModif.py:571
+#: indico/MaKaC/webinterface/rh/abstractModif.py:571
 #, python-format
 msgid ""
 "The abstract with id '%s' cannot be edited because it has already been "
 "accepted."
 msgstr ""
 
-#: MaKaC/webinterface/rh/abstractModif.py:610
+#: MaKaC/webinterface/rh/abstractModif.py:615
 #: MaKaC/webinterface/rh/trackModif.py:733
-#: indico/MaKaC/webinterface/rh/abstractModif.py:610
+#: indico/MaKaC/webinterface/rh/abstractModif.py:615
 #: indico/MaKaC/webinterface/rh/trackModif.py:733
 msgid "the internal comment identifier hasn't been specified"
 msgstr ""
@@ -10441,16 +10397,16 @@ msgid "The webpage, you are trying to access, does not exist"
 msgstr ""
 
 #: MaKaC/webinterface/rh/conferenceDisplay.py:1140
-#: MaKaC/webinterface/rh/conferenceModif.py:3381
+#: MaKaC/webinterface/rh/conferenceModif.py:3371
 #: indico/MaKaC/webinterface/rh/conferenceDisplay.py:1140
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:3381
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:3371
 msgid "The selected package does not contain any items."
 msgstr ""
 
 #: MaKaC/webinterface/rh/conferenceDisplay.py:1144
-#: MaKaC/webinterface/rh/conferenceModif.py:3383
+#: MaKaC/webinterface/rh/conferenceModif.py:3373
 #: indico/MaKaC/webinterface/rh/conferenceDisplay.py:1144
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:3383
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:3373
 msgid "You have to select at least one material type"
 msgstr ""
 
@@ -10557,150 +10513,150 @@ msgstr ""
 msgid "You cannot access this option because \"Abstracts\" was disabled"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:1774
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:1774
+#: MaKaC/webinterface/rh/conferenceModif.py:1764
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:1764
 msgid "No ABSTRACT TO BE MERGED has been specified"
+msgstr ""
+
+#: MaKaC/webinterface/rh/conferenceModif.py:1770
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:1770
+#, python-format
+msgid "ABSTRACT TO BE MERGED ID '%s' is not valid"
 msgstr ""
 
 #: MaKaC/webinterface/rh/conferenceModif.py:1780
 #: indico/MaKaC/webinterface/rh/conferenceModif.py:1780
 #, python-format
-msgid "ABSTRACT TO BE MERGED ID '%s' is not valid"
-msgstr ""
-
-#: MaKaC/webinterface/rh/conferenceModif.py:1790
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:1790
-#, python-format
 msgid "ABSTRACT TO BE MERGED %s is in status which does not allow to merge (%s)"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:1793
-#: MaKaC/webinterface/rh/conferenceModif.py:1799
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:1793
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:1799
+#: MaKaC/webinterface/rh/conferenceModif.py:1783
+#: MaKaC/webinterface/rh/conferenceModif.py:1789
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:1783
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:1789
 msgid "Invalid TARGET ABSTRACT ID"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:1796
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:1796
+#: MaKaC/webinterface/rh/conferenceModif.py:1786
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:1786
 msgid "TARGET ABSTRACT ID is among the ABSTRACT IDs TO BE MERGED"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:1809
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:1809
+#: MaKaC/webinterface/rh/conferenceModif.py:1799
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:1799
 #, python-format
 msgid "TARGET ABSTRACT is in status which does not allow to merge (%s)"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:2228
-#: MaKaC/webinterface/rh/conferenceModif.py:2241
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:2228
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:2241
+#: MaKaC/webinterface/rh/conferenceModif.py:2218
+#: MaKaC/webinterface/rh/conferenceModif.py:2231
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:2218
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:2231
 msgid "You cannot remove a system link"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:2239
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:2239
+#: MaKaC/webinterface/rh/conferenceModif.py:2229
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:2229
 msgid "The link you are trying to delete no longer exists"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:2365
-#: MaKaC/webinterface/rh/conferenceModif.py:2380
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:2365
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:2380
+#: MaKaC/webinterface/rh/conferenceModif.py:2355
+#: MaKaC/webinterface/rh/conferenceModif.py:2370
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:2355
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:2370
 msgid "You cannot modify a system link"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:2511
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:2511
+#: MaKaC/webinterface/rh/conferenceModif.py:2501
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:2501
 msgid "Please, choose the file to upload first"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:2594
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:2594
+#: MaKaC/webinterface/rh/conferenceModif.py:2584
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:2584
 msgid "No file has been attached"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:2955
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:2955
+#: MaKaC/webinterface/rh/conferenceModif.py:2945
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:2945
 msgid "There is no abstract."
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:3274
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:3274
+#: MaKaC/webinterface/rh/conferenceModif.py:3264
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:3264
 #, python-format
 msgid ""
 "The contribution \"%s\" cannot be moved because it is inside of the session "
 "\"%s\" that is closed"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:3295
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:3295
+#: MaKaC/webinterface/rh/conferenceModif.py:3285
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:3285
 msgid "No abstract selected"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:3316
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:3316
+#: MaKaC/webinterface/rh/conferenceModif.py:3306
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:3306
 msgid "The selected package does not contain any items"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:3765
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:3765
+#: MaKaC/webinterface/rh/conferenceModif.py:3755
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:3755
 msgid "The field that you are trying to enable/disable does not exist"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:3861
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:3861
+#: MaKaC/webinterface/rh/conferenceModif.py:3851
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:3851
 msgid "Error while rescheduling timetable: not target day"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:3868
+#: MaKaC/webinterface/rh/conferenceModif.py:3858
 #: MaKaC/webinterface/rh/sessionModif.py:400
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:3868
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:3858
 #: indico/MaKaC/webinterface/rh/sessionModif.py:400
 msgid ""
 "Please write the time with the format HH:MM. For instance, 00:05 to indicate "
 "'O hours' and '5 minutes'"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:3873
+#: MaKaC/webinterface/rh/conferenceModif.py:3863
 #: MaKaC/webinterface/rh/sessionModif.py:405
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:3873
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:3863
 #: indico/MaKaC/webinterface/rh/sessionModif.py:405
 msgid ""
 "Please write a number to specify the time HH:MM. For instance, 00:05 to "
 "indicate 'O hours' and '5 minutes'"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:3906
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:3906
+#: MaKaC/webinterface/rh/conferenceModif.py:3896
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:3896
 msgid "Cannot find target item"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:3908
+#: MaKaC/webinterface/rh/conferenceModif.py:3898
 #: MaKaC/webinterface/rh/sessionModif.py:771
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:3908
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:3898
 #: indico/MaKaC/webinterface/rh/sessionModif.py:771
 msgid "No contribution to relocate"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:4430
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:4430
+#: MaKaC/webinterface/rh/conferenceModif.py:4420
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:4420
 msgid "There are no registrants, so no badges to print."
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:4432
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:4432
+#: MaKaC/webinterface/rh/conferenceModif.py:4422
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:4422
 msgid "There is no badge template selected for this conference."
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:4675
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:4675
+#: MaKaC/webinterface/rh/conferenceModif.py:4665
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:4665
 msgid "Poster not selected"
 msgstr ""
 
-#: MaKaC/webinterface/rh/conferenceModif.py:4823
-#: indico/MaKaC/webinterface/rh/conferenceModif.py:4823
+#: MaKaC/webinterface/rh/conferenceModif.py:4813
+#: indico/MaKaC/webinterface/rh/conferenceModif.py:4813
 msgid "This feature is not enabled"
 msgstr ""
 
@@ -10839,9 +10795,9 @@ msgid "The registrants' management was disabled by the conference managers"
 msgstr ""
 
 #: MaKaC/webinterface/rh/registrantsModif.py:421
-#: MaKaC/webinterface/rh/registrationFormDisplay.py:215
+#: MaKaC/webinterface/rh/registrationFormDisplay.py:207
 #: indico/MaKaC/webinterface/rh/registrantsModif.py:421
-#: indico/MaKaC/webinterface/rh/registrationFormDisplay.py:215
+#: indico/MaKaC/webinterface/rh/registrationFormDisplay.py:207
 #, python-format
 msgid "The registrant with id %s does not exist or has been deleted"
 msgstr ""
@@ -10855,20 +10811,20 @@ msgid ""
 msgstr ""
 
 #: MaKaC/webinterface/rh/registrantsModif.py:518
-#: MaKaC/webinterface/rh/registrationFormDisplay.py:305
+#: MaKaC/webinterface/rh/registrationFormDisplay.py:297
 #: indico/MaKaC/webinterface/rh/registrantsModif.py:518
-#: indico/MaKaC/webinterface/rh/registrationFormDisplay.py:305
+#: indico/MaKaC/webinterface/rh/registrationFormDisplay.py:297
 #, python-format
 msgid "There is already a user with the email \"%s\". Please choose another one"
 msgstr ""
 
-#: MaKaC/webinterface/rh/registrationFormDisplay.py:151
-#: indico/MaKaC/webinterface/rh/registrationFormDisplay.py:151
+#: MaKaC/webinterface/rh/registrationFormDisplay.py:144
+#: indico/MaKaC/webinterface/rh/registrationFormDisplay.py:144
 msgid "An email address has to be set in order to make the registration in the event."
 msgstr ""
 
-#: MaKaC/webinterface/rh/registrationFormDisplay.py:153
-#: indico/MaKaC/webinterface/rh/registrationFormDisplay.py:153
+#: MaKaC/webinterface/rh/registrationFormDisplay.py:146
+#: indico/MaKaC/webinterface/rh/registrationFormDisplay.py:146
 msgid "The given email address is not valid."
 msgstr ""
 
@@ -10882,39 +10838,44 @@ msgstr ""
 msgid "The extra allowed time unit is not valid!"
 msgstr ""
 
-#: MaKaC/webinterface/rh/registrationFormModif.py:315
-#: indico/MaKaC/webinterface/rh/registrationFormModif.py:315
+#: MaKaC/webinterface/rh/registrationFormModif.py:310
+#: indico/MaKaC/webinterface/rh/registrationFormModif.py:310
 msgid "Error trying to modify the status"
 msgstr ""
 
-#: MaKaC/webinterface/rh/registrationFormModif.py:385
-#: indico/MaKaC/webinterface/rh/registrationFormModif.py:385
+#: MaKaC/webinterface/rh/registrationFormModif.py:377
+#: indico/MaKaC/webinterface/rh/registrationFormModif.py:377
 msgid "Invalid section Id"
 msgstr ""
 
-#: MaKaC/webinterface/rh/registrationFormModif.py:600
-#: indico/MaKaC/webinterface/rh/registrationFormModif.py:600
+#: MaKaC/webinterface/rh/registrationFormModif.py:589
+#: indico/MaKaC/webinterface/rh/registrationFormModif.py:589
 msgid "Unknown type"
 msgstr ""
 
-#: MaKaC/webinterface/rh/registrationFormModif.py:633
-#: indico/MaKaC/webinterface/rh/registrationFormModif.py:633
+#: MaKaC/webinterface/rh/registrationFormModif.py:622
+#: indico/MaKaC/webinterface/rh/registrationFormModif.py:622
 msgid "Invalid field Id"
 msgstr ""
 
-#: MaKaC/webinterface/rh/registrationFormModif.py:649
-#: indico/MaKaC/webinterface/rh/registrationFormModif.py:649
+#: MaKaC/webinterface/rh/registrationFormModif.py:638
+#: indico/MaKaC/webinterface/rh/registrationFormModif.py:638
 msgid "Deleted action couldn't be perform"
 msgstr ""
 
-#: MaKaC/webinterface/rh/registrationFormModif.py:671
-#: indico/MaKaC/webinterface/rh/registrationFormModif.py:671
+#: MaKaC/webinterface/rh/registrationFormModif.py:660
+#: indico/MaKaC/webinterface/rh/registrationFormModif.py:660
 msgid "Action couldn't be perform"
 msgstr ""
 
-#: MaKaC/webinterface/rh/registrationFormModif.py:697
-#: indico/MaKaC/webinterface/rh/registrationFormModif.py:697
+#: MaKaC/webinterface/rh/registrationFormModif.py:686
+#: indico/MaKaC/webinterface/rh/registrationFormModif.py:686
 msgid "Section id:  doesn't support field move"
+msgstr ""
+
+#: MaKaC/webinterface/rh/reviewingAssignContributions.py:55
+#: indico/MaKaC/webinterface/rh/reviewingAssignContributions.py:55
+msgid "There are no accepted papers."
 msgstr ""
 
 #: MaKaC/webinterface/rh/reviewingListContribToJudge.py:35
@@ -10981,178 +10942,178 @@ msgstr ""
 msgid "Building"
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1575
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1575
+#: MaKaC/webinterface/rh/roomBooking.py:1578
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1578
 #, python-format
 msgid "You cannot book this room during the following periods: %s"
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1582
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1582
+#: MaKaC/webinterface/rh/roomBooking.py:1585
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1585
 #, python-format
 msgid "You must book this room in one of the following time periods: %s"
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1587
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1587
+#: MaKaC/webinterface/rh/roomBooking.py:1590
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1590
 #, python-format
 msgid "You cannot book this room more than %s days in advance."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1649
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1649
+#: MaKaC/webinterface/rh/roomBooking.py:1652
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1652
 msgid "You have successfully made a booking."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1650
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1650
+#: MaKaC/webinterface/rh/roomBooking.py:1653
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1653
 msgid ""
 "NOTE: Your booking is complete. However, be <b>aware</b> that in special "
 "cases the person responsible for a room may reject your booking. In that case"
 " you would be instantly notified by e-mail."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1652
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1652
+#: MaKaC/webinterface/rh/roomBooking.py:1655
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1655
 msgid "You have successfully made a <span style=\"color: Red;\">PRE</span>-booking."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1653
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1653
+#: MaKaC/webinterface/rh/roomBooking.py:1656
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1656
 msgid ""
 "NOTE: PRE-bookings are subject to acceptance or rejection. Expect an e-mail "
 "with acceptance/rejection information."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1675
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1675
+#: MaKaC/webinterface/rh/roomBooking.py:1678
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1678
 msgid "Booking updated."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1676
+#: MaKaC/webinterface/rh/roomBooking.py:1679
 #: MaKaC/webinterface/tpls/RoomBookingRoomDetails.tpl:52
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1676
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1679
 #: indico/MaKaC/webinterface/tpls/RoomBookingRoomDetails.tpl:52
 msgid "Please review details below."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1905
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1905
+#: MaKaC/webinterface/rh/roomBooking.py:1908
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1908
 msgid "Room has been deleted."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1906
+#: MaKaC/webinterface/rh/roomBooking.py:1909
 #: MaKaC/webinterface/tpls/RoomBookingStatement.tpl:16
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1906
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1909
 #: indico/MaKaC/webinterface/tpls/RoomBookingStatement.tpl:16
 msgid ""
 "You have successfully deleted the room. All its archival, cancelled and "
 "rejected bookings have also been deleted."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1926
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1926
+#: MaKaC/webinterface/rh/roomBooking.py:1929
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1929
 msgid "Booking has been deleted."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1927
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1927
+#: MaKaC/webinterface/rh/roomBooking.py:1930
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1930
 msgid "You have successfully deleted the booking."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1963
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1963
+#: MaKaC/webinterface/rh/roomBooking.py:1966
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1966
 msgid "Booking has been cancelled."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:1964
-#: indico/MaKaC/webinterface/rh/roomBooking.py:1964
+#: MaKaC/webinterface/rh/roomBooking.py:1967
+#: indico/MaKaC/webinterface/rh/roomBooking.py:1967
 msgid "You have successfully cancelled the booking."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2003
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2003
+#: MaKaC/webinterface/rh/roomBooking.py:2006
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2006
 msgid "Selected occurrence has been cancelled."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2004
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2004
+#: MaKaC/webinterface/rh/roomBooking.py:2007
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2007
 msgid "You have successfully cancelled an occurrence of this booking."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2045
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2045
+#: MaKaC/webinterface/rh/roomBooking.py:2048
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2048
 msgid "Booking has been rejected."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2046
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2046
+#: MaKaC/webinterface/rh/roomBooking.py:2049
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2049
 msgid ""
 "NOTE: rejection e-mail has been sent to the user. However, it's advisable to "
 "<strong>inform</strong> the user directly. Note that users often don't read "
 "e-mails."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2097
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2097
+#: MaKaC/webinterface/rh/roomBooking.py:2100
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2100
 #, python-format
 msgid "%d conflicting PRE-bookings have been rejected."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2098
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2098
+#: MaKaC/webinterface/rh/roomBooking.py:2101
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2101
 msgid ""
 "Rejection e-mails have been sent to the users, with explanation that their "
 "PRE-bookings conflicted with the present confirmed bookings."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2100
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2100
+#: MaKaC/webinterface/rh/roomBooking.py:2103
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2103
 msgid "There are no conflicting PRE-bookings for your rooms."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2142
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2142
+#: MaKaC/webinterface/rh/roomBooking.py:2145
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2145
 msgid "Booking has been accepted."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2143
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2143
+#: MaKaC/webinterface/rh/roomBooking.py:2146
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2146
 msgid "NOTE: confirmation e-mail has been sent to the user."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2154
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2154
+#: MaKaC/webinterface/rh/roomBooking.py:2157
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2157
 msgid "PRE-Booking conflicts with other (confirmed) bookings."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2228
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2228
+#: MaKaC/webinterface/rh/roomBooking.py:2231
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2231
 msgid "Location name may not contain slashes"
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2387
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2387
+#: MaKaC/webinterface/rh/roomBooking.py:2390
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2390
 msgid "Selected occurrence of this booking has been rejected."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2388
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2388
+#: MaKaC/webinterface/rh/roomBooking.py:2391
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2391
 msgid "NOTE: rejection e-mail has been sent to the user."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2496
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2496
+#: MaKaC/webinterface/rh/roomBooking.py:2499
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2499
 msgid "Please check blocked rooms and reason for blocking."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2498
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2498
+#: MaKaC/webinterface/rh/roomBooking.py:2501
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2501
 msgid "Please check your blocking dates."
 msgstr ""
 
-#: MaKaC/webinterface/rh/roomBooking.py:2500
-#: indico/MaKaC/webinterface/rh/roomBooking.py:2500
+#: MaKaC/webinterface/rh/roomBooking.py:2503
+#: indico/MaKaC/webinterface/rh/roomBooking.py:2503
 msgid "Your blocking is overlapping with other blockings."
 msgstr ""
 
@@ -12620,15 +12581,15 @@ msgstr ""
 #: MaKaC/webinterface/tpls/ConfModifContribList.tpl:85
 #: MaKaC/webinterface/tpls/ConfModifContribList.tpl:228
 #: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:24
-#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:235
-#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:250
+#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:207
+#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:222
 #: MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:38
 #: indico/MaKaC/webinterface/tpls/Abstracts.tpl:41
 #: indico/MaKaC/webinterface/tpls/ConfModifContribList.tpl:85
 #: indico/MaKaC/webinterface/tpls/ConfModifContribList.tpl:228
 #: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:24
-#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:235
-#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:250
+#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:207
+#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:222
 #: indico/MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:38
 msgid "Show filters"
 msgstr ""
@@ -12637,15 +12598,15 @@ msgstr ""
 #: MaKaC/webinterface/tpls/ConfModifContribList.tpl:87
 #: MaKaC/webinterface/tpls/ConfModifContribList.tpl:230
 #: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:26
-#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:237
-#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:252
+#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:209
+#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:224
 #: MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:38
 #: indico/MaKaC/webinterface/tpls/Abstracts.tpl:43
 #: indico/MaKaC/webinterface/tpls/ConfModifContribList.tpl:87
 #: indico/MaKaC/webinterface/tpls/ConfModifContribList.tpl:230
 #: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:26
-#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:237
-#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:252
+#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:209
+#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:224
 #: indico/MaKaC/webinterface/tpls/TrackModifAbstracts.tpl:38
 msgid "Apply filters"
 msgstr ""
@@ -14088,7 +14049,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/UserMerge.tpl:91
 #: indico/MaKaC/webinterface/tpls/UserRegistration.tpl:52
 #: indico/ext/search/tpls/SearchBoxBase.tpl:24
-#: indico/ext/search/tpls/SearchResultBase.tpl:45
+#: indico/ext/search/tpls/SearchResultBase.tpl:46
 msgid "Affiliation"
 msgstr ""
 
@@ -16630,7 +16591,7 @@ msgstr ""
 
 #: MaKaC/webinterface/tpls/ConfModifCFA.tpl:85
 #: indico/MaKaC/webinterface/tpls/ConfModifCFA.tpl:85
-msgid "Make mandatory the selection of at least one author as presenter"
+msgid "Make the selection of at least one author as presenter mandatory"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/ConfModifCFA.tpl:94
@@ -16757,9 +16718,9 @@ msgid "Total duration of displayed contributions"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/ConfModifContribList.tpl:235
-#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:242
+#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:214
 #: indico/MaKaC/webinterface/tpls/ConfModifContribList.tpl:235
-#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:242
+#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:214
 msgid "Hide filters"
 msgstr ""
 
@@ -17273,7 +17234,7 @@ msgid ""
 "identify and check-in attendees at the registration desk of the conference. "
 "Every registrant will own a personal e-ticket. In order to register "
 "participants, the organiser of the event could use the application 'Indico "
-"check-in', that can be downloaded from here. Once the app is installed, one "
+"check-in', that can be downloaded from {0}. Once the app is installed, one "
 "needs to configure it and download this event simply by scanning the "
 "following QR Code."
 msgstr ""
@@ -17296,7 +17257,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/ConfModifEvaluationEditQuestion.tpl:18
 #: indico/MaKaC/webinterface/tpls/ConfModifEvaluationEditQuestion.tpl:18
 #: indico/ext/search/tpls/SearchBoxBase.tpl:26
-#: indico/ext/search/tpls/SearchResultBase.tpl:47
+#: indico/ext/search/tpls/SearchResultBase.tpl:48
 msgid "Keyword"
 msgstr ""
 
@@ -18043,25 +18004,25 @@ msgstr ""
 msgid "There are no registrants yet"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:229
-#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:258
-#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:229
-#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:258
+#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:201
+#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:230
+#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:201
+#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:230
 msgid "Select columns to display"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:262
-#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:262
+#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:234
+#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:234
 msgid "Close selection"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:281
-#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:281
+#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:253
+#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:253
 msgid "Table Style"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:282
-#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:282
+#: MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:254
+#: indico/MaKaC/webinterface/tpls/ConfModifRegistrants.tpl:254
 msgid "Book Style"
 msgstr ""
 
@@ -20839,8 +20800,8 @@ msgstr ""
 #: MaKaC/webinterface/tpls/GroupDetails.tpl:67
 #: indico/MaKaC/webinterface/tpls/GroupDetails.tpl:67
 msgid ""
-"The group memberlist could not be retrieved. It seems this group does not "
-"exist anymore. Please click in 'modify' and set is as obsolete."
+"The group memberlist could not be retrieved. It might be that this group does"
+" not exist anymore. If this is the case, please set it as obsolete."
 msgstr ""
 
 #: MaKaC/webinterface/tpls/GroupList.tpl:5
@@ -22363,8 +22324,8 @@ msgstr ""
 msgid "Rejection"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/RoomBookingDetails.tpl:293
-#: indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:293
+#: MaKaC/webinterface/tpls/RoomBookingDetails.tpl:294
+#: indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:294
 msgid "Cancel Booking"
 msgstr ""
 
@@ -22393,13 +22354,13 @@ msgstr ""
 msgid "These days are booked."
 msgstr ""
 
-#: MaKaC/webinterface/tpls/RoomBookingDetails.tpl:477
-#: indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:477
+#: MaKaC/webinterface/tpls/RoomBookingDetails.tpl:479
+#: indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:479
 msgid "Conflicts at the same time"
 msgstr ""
 
-#: MaKaC/webinterface/tpls/RoomBookingDetails.tpl:481
-#: indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:481
+#: MaKaC/webinterface/tpls/RoomBookingDetails.tpl:483
+#: indico/MaKaC/webinterface/tpls/RoomBookingDetails.tpl:483
 msgid "show this booking"
 msgstr ""
 
@@ -22616,7 +22577,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/RoomBookingPeriodFormOld.tpl:66
 #: indico/MaKaC/webinterface/tpls/RoomBookingSearch4Bookings.tpl:184
 #: indico/ext/search/tpls/SearchBoxBase.tpl:33
-#: indico/ext/search/tpls/SearchResultBase.tpl:54
+#: indico/ext/search/tpls/SearchResultBase.tpl:55
 msgid "Start Date"
 msgstr ""
 
@@ -22625,7 +22586,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/RoomBookingPeriodFormOld.tpl:75
 #: indico/MaKaC/webinterface/tpls/RoomBookingSearch4Bookings.tpl:193
 #: indico/ext/search/tpls/SearchBoxBase.tpl:41
-#: indico/ext/search/tpls/SearchResultBase.tpl:62
+#: indico/ext/search/tpls/SearchResultBase.tpl:63
 msgid "End Date"
 msgstr ""
 
@@ -25193,27 +25154,27 @@ msgid "Saved!"
 msgstr ""
 
 #: indico/ext/search/tpls/SearchBoxBase.tpl:17
-#: indico/ext/search/tpls/SearchResultBase.tpl:38
+#: indico/ext/search/tpls/SearchResultBase.tpl:39
 msgid "Search in"
 msgstr ""
 
 #: indico/ext/search/tpls/SearchBoxBase.tpl:20
-#: indico/ext/search/tpls/SearchResultBase.tpl:41
+#: indico/ext/search/tpls/SearchResultBase.tpl:42
 msgid "Anywhere"
 msgstr ""
 
 #: indico/ext/search/tpls/SearchBoxBase.tpl:22
-#: indico/ext/search/tpls/SearchResultBase.tpl:43
+#: indico/ext/search/tpls/SearchResultBase.tpl:44
 msgid "Talk description/Abstract"
 msgstr ""
 
 #: indico/ext/search/tpls/SearchBoxBase.tpl:23
-#: indico/ext/search/tpls/SearchResultBase.tpl:44
+#: indico/ext/search/tpls/SearchResultBase.tpl:45
 msgid "Author/Speaker"
 msgstr ""
 
 #: indico/ext/search/tpls/SearchBoxBase.tpl:25
-#: indico/ext/search/tpls/SearchResultBase.tpl:46
+#: indico/ext/search/tpls/SearchResultBase.tpl:47
 msgid "Fulltext"
 msgstr ""
 
@@ -25223,7 +25184,7 @@ msgid ""
 "appear."
 msgstr ""
 
-#: indico/ext/search/tpls/SearchResultBase.tpl:34
+#: indico/ext/search/tpls/SearchResultBase.tpl:35
 msgid "Show advanced options"
 msgstr ""
 

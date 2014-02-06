@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 1.2-dev\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-01-27 17:31+0100\n"
+"POT-Creation-Date: 2014-02-06 13:56+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -262,7 +262,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/AdminPluginsOptionList.tpl:252
 #: indico/MaKaC/webinterface/tpls/AdminPluginsOptionList.tpl:329
 #: indico/htdocs/js/indico/Management/Timetable.js:581
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:667
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:669
 msgid "Type"
 msgstr ""
 
@@ -398,16 +398,14 @@ msgstr ""
 
 #: MaKaC/webinterface/tpls/ConfModifETicket.tpl:53
 #: indico/MaKaC/webinterface/tpls/ConfModifETicket.tpl:53
-msgid ""
-"Give the possibility to the user of downloading the e-ticket PDF from the "
-"conference homepage menu"
+msgid "Allow users to download their e-ticket from the conference homepage menu"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/ConfModifETicket.tpl:58
 #: indico/MaKaC/webinterface/tpls/ConfModifETicket.tpl:58
 msgid ""
-"Give the possibility to the user of downloading the e-ticket PDF from the "
-"summary page right after registration"
+"Allow users to download their e-ticket from the summary page right after "
+"registration"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/ConfModifEvaluationEditQuestion.tpl:85
@@ -735,10 +733,10 @@ msgstr ""
 
 #: MaKaC/webinterface/tpls/RoomBookingBookingForm.tpl:137
 #: indico/MaKaC/webinterface/tpls/RoomBookingBookingForm.tpl:137
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:822
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:823
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:663
 #: indico/htdocs/js/indico/Management/Timetable.js:237
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1771
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1773
 msgid "Close"
 msgstr ""
 
@@ -1191,8 +1189,8 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Admin/Upcoming.js:132
 #: indico/htdocs/js/indico/Common/TimezoneSelector.js:118
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:555
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:604
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:556
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:605
 #: indico/htdocs/js/indico/Core/Dialogs/PopupWidgets.js:29
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:761
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1100
@@ -1212,9 +1210,9 @@ msgstr ""
 #: indico/htdocs/js/indico/Management/Timetable.js:1609
 #: indico/htdocs/js/indico/Management/eventCreation.js:333
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:83
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:634
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:843
-#: indico/htdocs/js/indico/angular/directives.js:119
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:636
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:845
+#: indico/htdocs/js/indico/angular/directives.js:78
 msgid "Cancel"
 msgstr ""
 
@@ -1312,11 +1310,11 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:525
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:526
 msgid "Reason: "
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:596
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:597
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1090
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1150
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:336
@@ -1327,19 +1325,19 @@ msgstr ""
 #: indico/htdocs/js/indico/Management/RoomBookingMapOfRooms.js:71
 #: indico/htdocs/js/indico/Management/Timetable.js:623
 #: indico/htdocs/js/indico/Management/Timetable.js:885
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:840
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:842
 msgid "Save"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:600
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:601
 msgid "Don't Save"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:734
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:735
 msgid "Email author"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:735
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:736
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1077
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1137
 #: indico/htdocs/js/indico/Display/Dialogs.js:49
@@ -1347,57 +1345,58 @@ msgstr ""
 msgid "Affiliation"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:766
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:767
 msgid "Submitting paper for reviewing..."
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:794
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:795
 msgid ""
 "First you should add the materials and then by clicking on this button you "
 "will submit them for reviewing. They will be locked until the end of the "
 "process."
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:813
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:814
 msgid "Submit"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:814
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:815
 msgid ""
 "Do you want to send the paper for reviewing? After sending it, you will not "
 "be able to submit another file until it is reviewed."
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:849
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:850
 msgid "File name"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:850
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:851
 msgid "File size"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:851
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:852
 msgid "File creation date"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:857
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1712
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:858
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1714
 msgid "No paper uploaded"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:987
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:988
 #: indico/htdocs/js/indico/Timetable/Draw.js:1125
 #: indico/htdocs/js/indico/Timetable/Draw.js:1150
 #: indico/htdocs/js/indico/Timetable/Draw.js:1854
 msgid "Edit protection"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:990
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:668
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:991
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:670
+#: indico/htdocs/js/indico/RegistrationForm/field.js:325
 msgid "File"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:991
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:992
 msgid "Material"
 msgstr ""
 
@@ -1478,7 +1477,7 @@ msgstr ""
 #: indico/htdocs/js/indico/Management/Timetable.js:149
 #: indico/htdocs/js/indico/Management/Timetable.js:758
 #: indico/htdocs/js/indico/Management/Timetable.js:860
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:758
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:760
 msgid "Loading dialog..."
 msgstr ""
 
@@ -1557,7 +1556,7 @@ msgstr ""
 #: indico/htdocs/js/indico/Management/Timetable.js:33
 #: indico/htdocs/js/indico/Management/Timetable.js:512
 #: indico/htdocs/js/indico/Management/Timetable.js:1042
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:969
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:971
 msgid "Title"
 msgstr ""
 
@@ -1622,6 +1621,7 @@ msgstr ""
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1139
 #: indico/htdocs/js/indico/Display/Dialogs.js:52
 #: indico/htdocs/js/indico/Display/Dialogs.js:67
+#: indico/htdocs/js/indico/RegistrationForm/field.js:519
 msgid "Telephone"
 msgstr ""
 
@@ -1820,18 +1820,18 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/Inline.js:1165
 #: indico/htdocs/js/indico/Core/Widgets/Inline.js:1181
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:707
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:720
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:709
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:722
 msgid "or"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/Inline.js:1170
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:711
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:713
 msgid "other"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/Inline.js:1186
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:724
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:726
 msgid "select from list"
 msgstr ""
 
@@ -2064,9 +2064,9 @@ msgstr ""
 #: indico/htdocs/js/indico/Management/Timetable.js:557
 #: indico/htdocs/js/indico/Management/Timetable.js:1043
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:422
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:669
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:974
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1074
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:671
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:976
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1076
 msgid "Description"
 msgstr ""
 
@@ -2074,6 +2074,7 @@ msgstr ""
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:494
 #: indico/htdocs/js/indico/Management/Timetable.js:434
 #: indico/htdocs/js/indico/Management/Timetable.js:1045
+#: indico/htdocs/js/indico/RegistrationForm/field.js:298
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:702
 msgid "Date"
 msgstr ""
@@ -2440,6 +2441,7 @@ msgid "Max length"
 msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:967
+#: indico/htdocs/js/indico/RegistrationForm/field.js:533
 msgid "Text"
 msgstr ""
 
@@ -3083,7 +3085,7 @@ msgid "The only available file formats are: "
 msgstr ""
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:166
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1070
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1072
 msgid "URL"
 msgstr ""
 
@@ -3131,7 +3133,7 @@ msgstr ""
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:297
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:310
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:813
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:815
 msgid ""
 "Restricted: Can only be viewed by you and users/groups chosen by you from the"
 " list of users"
@@ -3139,7 +3141,7 @@ msgstr ""
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:298
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:311
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:814
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:816
 msgid "Public: Can be viewed by everyone"
 msgstr ""
 
@@ -3152,7 +3154,7 @@ msgid "Please select who will be able to access this material type:"
 msgstr ""
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:343
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:826
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:828
 msgid "You can specify users using this tab"
 msgstr ""
 
@@ -3173,37 +3175,37 @@ msgid "'Display name' will be used instead of the original file name"
 msgstr ""
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:543
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:929
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:931
 msgid ""
 "The link for this material will <strong>visible</strong> from the event page,"
 " to everyone"
 msgstr ""
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:544
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:930
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:932
 msgid ""
 "The link will be <strong>invisible</strong> by default - only people who can "
 "access the material will be able to see it"
 msgstr ""
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:565
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:937
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1045
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:939
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1047
 msgid "Allowed users and groups"
 msgstr ""
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:569
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:941
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:943
 msgid "Visibility"
 msgstr ""
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:573
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:945
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:947
 msgid "Access key"
 msgstr ""
 
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:587
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:859
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:861
 msgid "Protection"
 msgstr ""
 
@@ -3215,130 +3217,130 @@ msgstr ""
 msgid "Upload Material"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:627
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:629
 msgid "Upload"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:629
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:631
 msgid "Uploading..."
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:666
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1065
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:668
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1067
 msgid "Name"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:809
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:811
 msgid "Please select who will be able to access "
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:857
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:859
 msgid "Information"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:962
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:964
 msgid ""
 "This is a default material type and its name cannot be changed. You should "
 "create a new type instead."
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:971
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:973
 msgid "'Title' will be used instead of the original name"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1067
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1069
 msgid "'Name' will be used instead of the url"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1164
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1166
 msgid ""
 "Modifying this material is currently not possible because it is not under "
 "review."
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1169
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1171
 msgid "Mark as main resource."
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1174
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1176
 msgid "Unmark main resource."
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1190
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1450
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1192
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1452
 msgid "Removing..."
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1209
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1211
 msgid "Delete Resource"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1209
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1211
 msgid "Are you sure you want to delete"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1213
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1234
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1215
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1236
 msgid "Setting main resource..."
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1285
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1287
 msgid "This resource is protected"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1350
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1352
 msgid ""
 "Indico is currently performing the conversion of the file to PDF. The "
 "conversion may take a few seconds."
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1469
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1471
 msgid "Delete Material"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1469
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1471
 msgid "Are you sure you want to delete '"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1515
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1517
 msgid "This material is protected"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1532
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1534
 msgid ""
 "The paper has been set to be corrected, therefore the material can not be "
 "shown yet. If you want to see the previous paper, please click in 'History'"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1535
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1537
 msgid ""
 "The paper has not been submitted yet, therefore the material can not be shown"
 " yet."
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1638
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1640
 msgid "Add Material"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1693
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1695
 msgid "Upload paper"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1830
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1832
 msgid ""
 "Indico is currently performing the conversion to PDF of the "
 "file:<br>{fileName}<br>The conversion may take a few seconds."
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1879
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1881
 msgid "Edit Material"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1884
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1886
 msgid "Edit Resource"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1889
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1891
 msgid "Edit Materials"
 msgstr ""
 
@@ -3350,94 +3352,122 @@ msgstr ""
 msgid "Edit Field"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:429
-#: indico/htdocs/js/indico/RegistrationForm/section.js:316
-#: indico/htdocs/js/indico/RegistrationForm/section.js:472
-#: indico/htdocs/js/indico/RegistrationForm/section.js:577
-#: indico/htdocs/js/indico/RegistrationForm/section.js:653
+#: indico/htdocs/js/indico/RegistrationForm/field.js:264
+msgid "Multiple choices/checkbox"
+msgstr ""
+
+#: indico/htdocs/js/indico/RegistrationForm/field.js:284
+msgid "Country"
+msgstr ""
+
+#: indico/htdocs/js/indico/RegistrationForm/field.js:341
+msgid "Free Text"
+msgstr ""
+
+#: indico/htdocs/js/indico/RegistrationForm/field.js:360
+msgid "Number"
+msgstr ""
+
+#: indico/htdocs/js/indico/RegistrationForm/field.js:395
+msgid "Multiple options/One choice"
+msgstr ""
+
+#: indico/htdocs/js/indico/RegistrationForm/field.js:453
+#: indico/htdocs/js/indico/RegistrationForm/section.js:317
+#: indico/htdocs/js/indico/RegistrationForm/section.js:471
+#: indico/htdocs/js/indico/RegistrationForm/section.js:587
+#: indico/htdocs/js/indico/RegistrationForm/section.js:663
 msgid "caption"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:430
-#: indico/htdocs/js/indico/RegistrationForm/section.js:317
-#: indico/htdocs/js/indico/RegistrationForm/section.js:472
+#: indico/htdocs/js/indico/RegistrationForm/field.js:454
+#: indico/htdocs/js/indico/RegistrationForm/section.js:318
+#: indico/htdocs/js/indico/RegistrationForm/section.js:471
 msgid "billable"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:431
-#: indico/htdocs/js/indico/RegistrationForm/section.js:318
-#: indico/htdocs/js/indico/RegistrationForm/section.js:472
-#: indico/htdocs/js/indico/RegistrationForm/section.js:579
+#: indico/htdocs/js/indico/RegistrationForm/field.js:455
+#: indico/htdocs/js/indico/RegistrationForm/section.js:319
+#: indico/htdocs/js/indico/RegistrationForm/section.js:471
+#: indico/htdocs/js/indico/RegistrationForm/section.js:589
 msgid "price"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:432
+#: indico/htdocs/js/indico/RegistrationForm/field.js:456
 msgid "places limit"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:433
+#: indico/htdocs/js/indico/RegistrationForm/field.js:457
 msgid "enable"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:309
-#: indico/htdocs/js/indico/RegistrationForm/section.js:464
-#: indico/htdocs/js/indico/RegistrationForm/section.js:568
-msgid "Configuration"
+#: indico/htdocs/js/indico/RegistrationForm/field.js:548
+msgid "Textarea"
+msgstr ""
+
+#: indico/htdocs/js/indico/RegistrationForm/field.js:564
+msgid "Yes/No"
 msgstr ""
 
 #: indico/htdocs/js/indico/RegistrationForm/section.js:310
+#: indico/htdocs/js/indico/RegistrationForm/section.js:465
+#: indico/htdocs/js/indico/RegistrationForm/section.js:578
+msgid "Configuration"
+msgstr ""
+
+#: indico/htdocs/js/indico/RegistrationForm/section.js:311
 msgid "Edit accommodations"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:319
+#: indico/htdocs/js/indico/RegistrationForm/section.js:320
 msgid "place limit"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:320
+#: indico/htdocs/js/indico/RegistrationForm/section.js:321
 msgid "cancelled"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:465
+#: indico/htdocs/js/indico/RegistrationForm/section.js:466
 msgid "Manage sessions"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:472
+#: indico/htdocs/js/indico/RegistrationForm/section.js:471
 msgid "enabled"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:569
+#: indico/htdocs/js/indico/RegistrationForm/section.js:579
 msgid "Edit events"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:570
+#: indico/htdocs/js/indico/RegistrationForm/section.js:580
 msgid "Canceled events"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:578
+#: indico/htdocs/js/indico/RegistrationForm/section.js:588
 msgid "billabe"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:580
+#: indico/htdocs/js/indico/RegistrationForm/section.js:590
 msgid "price/place"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:581
+#: indico/htdocs/js/indico/RegistrationForm/section.js:591
 msgid "Nb places"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:582
+#: indico/htdocs/js/indico/RegistrationForm/section.js:592
 msgid "Max./part."
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:587
+#: indico/htdocs/js/indico/RegistrationForm/section.js:597
 msgid "Cancel this event"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:653
+#: indico/htdocs/js/indico/RegistrationForm/section.js:663
 msgid "Reason for cancellation"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:654
+#: indico/htdocs/js/indico/RegistrationForm/section.js:664
 msgid "Uncancel this event"
 msgstr ""
 
@@ -3457,25 +3487,25 @@ msgstr ""
 msgid "Search criteria"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:555
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:561
 #: indico/htdocs/js/indico/Timetable/Base.js:190
 #: indico/htdocs/js/indico/Timetable/Base.js:382
 msgid "Filter"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:560
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:566
 msgid "Reset"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:847
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:853
 msgid "Total"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:848
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:854
 msgid "room(s)"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:849
+#: indico/htdocs/js/indico/RoomBooking/MapOfRooms.js:855
 msgid "building(s)"
 msgstr ""
 
@@ -3842,13 +3872,13 @@ msgstr ""
 msgid "move to resize"
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/DragAndDrop.js:424
+#: indico/htdocs/js/indico/Timetable/DragAndDrop.js:428
 msgid ""
 "<span class=\"key light\">Shift</span> is currently pressed. Changes will be "
 "applied to blocks after."
 msgstr ""
 
-#: indico/htdocs/js/indico/Timetable/DragAndDrop.js:566
+#: indico/htdocs/js/indico/Timetable/DragAndDrop.js:570
 msgid "Drop to move block inside session"
 msgstr ""
 
@@ -3979,8 +4009,12 @@ msgstr ""
 msgid "Undo last operation"
 msgstr ""
 
-#: indico/htdocs/js/indico/angular/directives.js:115
+#: indico/htdocs/js/indico/angular/directives.js:77
 msgid "Ok"
+msgstr ""
+
+#: indico/htdocs/js/indico/angular/directives.js:118
+msgid "The content of this dialog is currently unavailable."
 msgstr ""
 
 #: indico/htdocs/js/indico/jquery/authors.js:19
