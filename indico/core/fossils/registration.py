@@ -314,7 +314,6 @@ class IRegFormCountryInputFieldFossil(IRegFormInputFieldBaseFossil):
         the countries list
         """
     getCountriesList.name = 'radioitems'
-    getCountriesList.convert = lambda x: dict((item['countryKey'], item['caption']) for item in x)
 
 
 class IRegFormDateInputFieldFossil(IRegFormInputFieldBaseFossil):
