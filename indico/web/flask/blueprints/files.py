@@ -49,11 +49,13 @@ files.add_url_rule('/event/<confId>/contribution/<contribId>/<subContId>/materia
 files.add_url_rule('/event/<confId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access', fileAccess.RHFileAccess)
 files.add_url_rule('/event/<confId>/registration/attachments/<registrantId>-<resId>.<fileExt>', 'getFile-access',
                    fileAccess.RHFileAccess)
+files.add_url_rule('/event/<confId>/material/<materialId>/<resId>', 'getFile-access', fileAccess.RHFileAccess)
 
 
 # File access (category)
 files.add_url_rule('/category/<categId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',
                    fileAccess.RHFileAccess)
+files.add_url_rule('/category/<categId>/material/<materialId>/<resId>', 'getFile-access', fileAccess.RHFileAccess)
 
 # File access (generic)
 files.add_url_rule('/file/video.swf', 'getFile-flash', fileAccess.RHVideoFlashAccess)
