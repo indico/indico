@@ -45,7 +45,6 @@ RECIPES = {}
 env.conf = 'fabfile.conf'
 env.src_dir = os.path.dirname(__file__)
 execfile(env.conf, {}, env)
-env.build_dir = os.path.join(env.src_dir, env.build_dirname)
 env.ext_dir = os.path.join(env.src_dir, env.ext_dirname)
 env.target_dir = os.path.join(env.src_dir, env.target_dirname)
 node_env_path = os.path.join(env.src_dir, env.node_env_dirname)
@@ -69,13 +68,15 @@ def node_env():
 
 
 @contextmanager
-def pyenv_env(env):
-    with prefix('pyenv activate {0}'.format(env)):
+def pyenv_env(version):
+    cmd_dir = os.path.join(env.pyenv_dir, 'versions', 'indico-build-{0}'.format(version), 'bin')
+    with prefix('PATH={0}:$PATH'.format(cmd_dir)):
         yield
 
 
 def pyenv_cmd(cmd, **kwargs):
-    return local('pyenv {0}'.format(cmd), **kwargs)
+    cmd_dir = os.path.join(env.pyenv_dir, 'bin')
+    return local('{0}/pyenv {1}'.format(cmd_dir, cmd), **kwargs)
 
 
 # Util functions
@@ -101,7 +102,7 @@ def _check_pyenv(py_versions):
         print yellow("Are you sure you have installed it?")
         sys.exit(-2)
 
-    # list available pythonbrew versions
+    # list available pyenv versions
     av_versions = list(entry.strip() for entry in pyenv_cmd('versions', capture=True).split('\n')[1:])
 
     for py_version in py_versions:
@@ -408,6 +409,9 @@ def make_docs(src_dir=None, build_dir=None):
             with lcd(d):
                 local('make html')
                 local('make latex')
+
+                print d
+
                 local('rm -rf {0}/*'.format(os.path.join(target_dir, 'html')))
                 local('mv build/html/* {0}'.format(os.path.join(target_dir, 'html')))
 
@@ -422,47 +426,39 @@ def make_docs(src_dir=None, build_dir=None):
 
 
 @task
-def package_release(py_versions=None, build_dir=None, system_node=False, indico_versions=None, upstream=None):
+def package_release(py_versions=None, system_node=False, indico_versions=None, upstream=None, no_clean=False, force_clean=False):
     """
     Create an Indico release - source and binary distributions
     """
 
-    py_versions = py_versions or env.py_versions
-    build_dir = build_dir or env.build_dir
-    upstream = upstream or env.upstream
-    indico_versions = indico_versions or env.indico_versions
+    from setup import DEVELOP_REQUIRES
 
-    local('mkdir -p {0}'.format(build_dir))
-
+    py_versions = py_versions.split('/') if py_versions else env.py_versions
     _check_pyenv(py_versions)
 
-    with lcd(build_dir):
-        # clone this same repo
-        if os.path.exists(os.path.join(build_dir, 'indico')):
-            print yellow("Repository seems to already exist.")
-            with lcd('indico'):
-                local('git fetch {0}'.format(upstream))
-                local('git reset --hard FETCH_HEAD')
-                local('git clean -df')
-        else:
-            local('git clone {0}'.format(upstream))
-        with lcd('indico'):
-            for indico_version in indico_versions:
-                print green("Checking out branch \'{0}\'".format(indico_version))
-                local('git checkout origin/{0}'.format(indico_version))
+    if not no_clean:
+        if not force_clean and not console.confirm(red("This will reset your repository to its initial "
+            "state (you will lose all files that are not under Git version control). Do you want to continue?"),
+            default=False):
+            sys.exit(2)
 
-                with settings(system_node=system_node):
-                    # Build source tarball
-                    tarball(os.path.join(build_dir, 'indico'))
+        local('git clean -dx')
 
-                # Build binaries (EGG)
-                for py_version in py_versions:
-                    cmd_dir = os.path.join(env.pyenv_dir, 'versions', 'indico-build-{0}'.format(py_version), 'bin')
-                    local('{0} -q install {1} --allow-all-external -r requirements.txt'
-                          .format(os.path.join(cmd_dir, 'pip'),
-                                  ' '.join("--allow-unverified {0}".format(pkg) for pkg in env.unverified)))
-                    local('{0} setup.py -q bdist_egg'.format(os.path.join(cmd_dir, 'python')))
-                local('pwd')
-                print green(local('ls -lah dist/', capture=True))
+    with pyenv_env(py_versions[-1]):
+        local('pip -q install {0}'.format(' '.join(DEVELOP_REQUIRES + ['babel'])))
 
-    cleanup(build_dir, force=True)
+
+        print green('Generating '), cyan('tarball')
+
+        with settings(system_node=system_node):
+            # Build source tarball
+            tarball(os.path.dirname(__file__))
+
+    # Build binaries (EGG)
+    for py_version in py_versions:
+        with pyenv_env(py_version):
+            print green('Generating '), cyan('egg for Python {0}'.format(py_version))
+            local('pip -q install {0}'.format(' '.join(DEVELOP_REQUIRES + ['babel'])))
+            local('python setup.py -q bdist_egg')
+
+    print green(local('ls -lah dist/', capture=True))
