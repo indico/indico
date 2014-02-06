@@ -18,6 +18,10 @@
             </span>
         </option>
     </select>
+    <input type="hidden"
+        ng-if="anyBillableItemPayed(userdata)"
+        name="{{ fieldName }}"
+        value="{{ getId(getValue(fieldName)) }}"/>
     <span>
         <span ng-if="isBillable(selectedItem)" class="regFormPrice">
             {{ selectedItem.price }}

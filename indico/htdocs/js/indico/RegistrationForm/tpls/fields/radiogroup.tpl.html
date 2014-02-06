@@ -27,4 +27,8 @@
             </span>
         </li>
     </ul>
+    <input type="hidden"
+        ng-if="anyBillableItemPayed(userdata)"
+        name="{{ fieldName }}"
+        value="{{ getId(getValue(fieldName)) }}">
 </ng-form>

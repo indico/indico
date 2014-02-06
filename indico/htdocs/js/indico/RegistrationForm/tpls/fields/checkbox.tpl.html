@@ -4,7 +4,7 @@
             <input type="checkbox"
                 name="{{ getName(field.id) }}"
                 ng-model="input"
-                ng-checked="userdata[getName(field.id)] === 'yes'"
+                ng-init="input = userdata[getName(field.id)] === 'yes'"
                 ng-required="field.mandatory"
                 ng-disabled="!hasPlacesLeft(field, userdata[getName(field.id)], field.input) || paymentBlocked(field, userdata)"/>
             <div>
@@ -12,9 +12,9 @@
                 <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
             </div>
         </div>
-            <span ng-show="validationStarted && nestedForm.$invalid" class="error-message-tag">
-                {{ 'must be checked' | i18n }}
-            </span>
+        <span ng-show="validationStarted && nestedForm.$invalid" class="error-message-tag">
+            {{ 'must be checked' | i18n }}
+        </span>
     </ng-form>
 
     <div class="checkbox-info">
