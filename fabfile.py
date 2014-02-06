@@ -26,7 +26,6 @@ import re
 import sys
 import glob
 import shutil
-import requests
 import json
 import getpass
 from contextlib import contextmanager
@@ -110,7 +109,7 @@ def _check_pyenv(py_versions):
             print green('Installing Python {0}'.format(py_version))
             pyenv_cmd('install {0}'.format(py_version), capture=True)
 
-        local("echo \'y\' | pyenv virtualenv {0} indico-build-{0}".format(py_version))
+        pyenv_cmd("virtualenv -f {0} indico-build-{0}".format(py_version))
 
 
 def _check_present(executable, message="Please install it first."):
@@ -278,8 +277,6 @@ def install_mathjax():
     with open(mathjax_js, 'w') as f:
         f.write(data)
 
-    print data[:10000]
-
 
 @recipe('PageDown')
 def install_pagedown():
@@ -431,7 +428,7 @@ def package_release(py_versions=None, system_node=False, indico_versions=None, u
     Create an Indico release - source and binary distributions
     """
 
-    from setup import DEVELOP_REQUIRES
+    DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor', 'werkzeug', 'nodeenv', 'fabric', 'sphinx', 'repoze.sphinx.autointerface']
 
     py_versions = py_versions.split('/') if py_versions else env.py_versions
     _check_pyenv(py_versions)
@@ -446,7 +443,6 @@ def package_release(py_versions=None, system_node=False, indico_versions=None, u
 
     with pyenv_env(py_versions[-1]):
         local('pip -q install {0}'.format(' '.join(DEVELOP_REQUIRES + ['babel'])))
-
 
         print green('Generating '), cyan('tarball')
 
