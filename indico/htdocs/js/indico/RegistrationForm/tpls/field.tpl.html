@@ -5,12 +5,12 @@
         <tr>
             <td ng-if="editMode" class="field-sortable-handle"/>
             <td ng-if="settings.caption" class="field-caption">
-                <div ng-bind-html="field.caption">
-                    <span>{{ field.caption }}</span>
-                    <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
+                <div>
+                    <span ng-bind-html="field.caption">{{ field.caption }}</span>
+                    <span class="regFormMandatoryField">*</span>
                 </div>
-                <div ng-bind-html="field.description">
-                    <span class="inputDescription">
+                <div>
+                    <span ng-bind-html="field.description" class="inputDescription">
                         {{ field.description }}
                     </span>
                 </div>
