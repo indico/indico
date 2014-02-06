@@ -35,6 +35,7 @@ from MaKaC.i18n import _
 
 # indico legacy imports
 from MaKaC.services.implementation.base import ParameterManager
+from MaKaC.services.interface.rpc.json import decode
 
 
 class RHRegistrationFormModifBase(RHConferenceBase, RHModificationBaseProtected):
@@ -594,7 +595,7 @@ class RHRegistrationFormSessionsSetConfig(RHRegistrationFormModifSessionsBase):
 class RHRegistrationFormFieldCreate(RHRegistrationFormModifSectionBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(json.loads(request.data))
+        post_pm = ParameterManager(decode(request.data))
         self._fieldData = post_pm.extract('fieldData', pType=dict, allowEmpty=False)
 
     def _process_POST(self):
@@ -625,7 +626,7 @@ class RHRegistrationFormModifFieldBase(RHRegistrationFormModifSectionBase):
 class RHRegistrationFormField(RHRegistrationFormModifFieldBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(json.loads(request.data))
+        post_pm = ParameterManager(decode(request.data))
         self._updateFieldData = post_pm.extract('fieldData', pType=dict, allowEmpty=False)
         self._updateFieldData['input'] = self._field.getInput().getId()
 
@@ -665,7 +666,7 @@ class RHRegistrationFormFieldDisable(RHRegistrationFormModifFieldBase):
 class RHRegistrationFormFieldMove(RHRegistrationFormModifFieldBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(json.loads(request.data))
+        post_pm = ParameterManager(decode(request.data))
         self._sectionEndPos = post_pm.extract('endPos', pType=int, allowEmpty=False)
 
     def _process_POST(self):
