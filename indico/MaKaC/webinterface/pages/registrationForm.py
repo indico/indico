@@ -747,6 +747,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                     """ % (f.getCaption(), self._formatValue(fieldInput, v)))
         if miscGroup is not None:
             for miscItem in (f for f in miscGroup.getResponseItemList() if not isinstance(f.getGeneralField().getInput(), LabelInput)):
+                fieldInput = miscItem.getGeneralField().getInput()
                 f = gsf.getFieldById(miscItem.getId())
                 if f is None:
                     html.append(i18nformat("""
@@ -773,6 +774,10 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                 caption = miscItem.getCaption()
                 currency = miscItem.getCurrency()
                 if miscItem is not None:
+                    if gsf.getGeneralSection().getFieldById(miscItem.getId()) is None:
+                        continue
+                    if miscItem.getGeneralField().isDisabled():
+                        continue
                     fieldInput = miscItem.getGeneralField().getInput()
                     if miscItem.isBillable():
                         value = miscItem.getValue()
@@ -781,7 +786,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                         total["value"] += price * quantity
                 if value != "":
                     value = ":%s" % value
-                if(quantity > 0):
+                if quantity > 0:
                     html.append("""
                             <tr class="regform-done-table-item">
                                <td>%s: %s%s</td>

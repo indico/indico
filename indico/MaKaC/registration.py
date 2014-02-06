@@ -5337,7 +5337,7 @@ class BilledItemsWrapper(object):
         self._items = items
 
     def getBilledItems(self):
-        return [item.getBilledItem() for item in self._items if item.isBillable()]
+        return [item.getBilledItem() for item in self._items if item.isBillable() and not item.isCancelled()]
 
 class BilledItem(object):
 
@@ -5369,6 +5369,9 @@ class Accommodation(Persistent):
         self._price = 0
         self._billable = False
         self._currency = ""
+
+    def isCancelled(self):
+        return self._accommodationType.isCancelled()
 
     def getRegistrant(self):
         try:
