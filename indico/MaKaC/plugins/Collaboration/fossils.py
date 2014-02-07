@@ -271,6 +271,11 @@ class ICollaborationMetadataFossil(IFossil):
     def getUniqueId(self):
         pass
 
+    def getConference(self):
+        pass
+    getConference.name = 'event_id'
+    getConference.convert = lambda e: e.getId()
+
     def getLocation(self):
         pass
 
