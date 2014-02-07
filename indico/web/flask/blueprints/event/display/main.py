@@ -83,6 +83,7 @@ event.add_url_rule('/accesskey', 'conferenceDisplay-accessKey', conferenceDispla
 event.add_url_rule('/style.css', 'conferenceDisplay-getCSS', conferenceDisplay.RHConferenceGetCSS)
 event.add_url_rule('/logo', 'conferenceDisplay-getLogo', conferenceDisplay.RHConferenceGetLogo, methods=('GET', 'POST'))
 event.add_url_rule('/picture/<picId>.<picExt>', 'conferenceDisplay-getPic', conferenceDisplay.RHConferenceGetPic)
+event.add_url_rule('/picture/<picId>', 'conferenceDisplay-getPic', conferenceDisplay.RHConferenceGetPic)
 
 # Machine-readable formats
 event.add_url_rule('/event.ics', 'conferenceDisplay-ical', conferenceDisplay.RHConferenceToiCal)
