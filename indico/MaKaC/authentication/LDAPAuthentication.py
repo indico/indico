@@ -370,8 +370,8 @@ class LDAPConnector(object):
             return None
 
     def _findDNOfUser(self, userName):
-        return self._findDN(self.ldapPeopleDN,
-                            self.ldapPeopleFilter, userName)
+        return self._findDN(self.ldapPeopleDN, "(&{0}({1}))".format(SEARCH_EXTRA_FILTER, self.ldapPeopleFilter),
+                            userName)
 
     def _findDNOfGroup(self, groupName):
         return self._findDN(self.ldapGroupsDN,
