@@ -189,7 +189,7 @@ class IMEventDisplayComponent(Component):
     def detailSessionContribs(self, obj, conf, params):
         manager = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
         if manager:
-            items = conf.getSessionList() + conf.getContributionList()
+            items = conf.getSessionSlotList() + conf.getContributionList()
             for item in items:
                 if manager.hasVideoService(item.getUniqueId()):
                     if not params.has_key(item.getUniqueId()):
