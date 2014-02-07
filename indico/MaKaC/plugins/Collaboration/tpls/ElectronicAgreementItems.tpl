@@ -39,7 +39,9 @@ contribution = conf.getContributionById(contribId)  %>
   </td>
   <td class="CRLabstractLeftDataCell">
 <%
-if isAdminUser or manager.isVideoServicesManager(user):
+if contribution is None:
+    contLink = urlHandlers.UHConferenceDisplay.getURL(conf)
+elif isAdminUser or manager.isVideoServicesManager(user):
     contLink = urlHandlers.UHContributionModification.getURL(contribution)
 else:
     contLink = urlHandlers.UHContributionDisplay.getURL(contribution)
