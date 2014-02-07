@@ -41,14 +41,14 @@
             'roomDescription' : ['text', false],
             'pin': ['non_negative_int', true],
             'moderatorPin': ['non_negative_int', true],
-            'videoLinkSession': ['text', false, function(option, values){
+            'videoLinkSession': ['text', true, function(option, values){
                 var errors = [];
                 if(self.vidyoComponents["link"].get()=="session" && ["","None"].indexOf(option)!=-1){
                     errors.push($T("No session has been defined."));
                 }
                 return errors;
             }],
-            'videoLinkContribution': ['text', false, function(option, values){
+            'videoLinkContribution': ['text', true, function(option, values){
                 var errors = [];
                 if(self.vidyoComponents["link"].get()=="contribution" && ["","None"].indexOf(option)!=-1){
                     errors.push($T("No contribution has been defined."));
