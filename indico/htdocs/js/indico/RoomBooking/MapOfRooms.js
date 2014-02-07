@@ -15,22 +15,14 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-var gmapVer = '';
-if(Browser.Gecko) {
-    // firefox/gecko has an issue with the canvas used by 3.4+: http://stackoverflow.com/q/982000/298479
-    gmapVer = '&v=3.3';
-}
-include((location.protocol=='https:'?'https://maps-api-ssl.google.com':'http://maps.google.com') +
-        "/maps/api/js?sensor=false" + gmapVer);
-
-function contains(collection, item) {
-    for(var i = 0; i < collection.length; i++){
-        if(collection[i] == item){
-            return true;
-        }
-    }
-    return false;
-}
+// firefox/gecko has an issue with the canvas used by 3.4+
+// http://stackoverflow.com/q/982000/298479
+include(
+    location.protocol + '//maps' +
+    (location.protocol == 'https:' ? '-api-ssl' : '') +
+    ".google.com/maps/api/js?sensor=false" +
+    (Browser.Gecko ? '&v=3.3' : '')
+);
 
 /**
  * A Google Map of rooms.
@@ -59,12 +51,9 @@ type ("RoomMap", ["IWidget"],
             this.startupBuildingFilters = startupBuildingFilters;
 
             // save a reference to the building number filter
-            for (var i = 0; i < filters.length; i++) {
-                var filter = filters[i];
-                if (filter.filterType == 'building' && filter.property == 'number') {
-                    this.buildingNumberFilter = filter;
-                }
-            }
+            this.buildingNumberFilter = _.find(this.filters, function(f) {
+                return f.filterType == 'building' && f.property == 'number';
+            });
         },
 
         createMap: function(mapCanvas) {
@@ -82,15 +71,11 @@ type ("RoomMap", ["IWidget"],
         },
 
         createMapClickHandler: function() {
-            var self = this;
-            return function() {
-                self.closeInfoBaloon();
-            }
+            return _.bind(function() { this.closeInfoBaloon(); }, this);
         },
 
         createBuildingMarkers: function() {
-            for (var i in this.buildings) {
-                var building = this.buildings[i];
+            _.each(this.buildings, function(building) {
                 building.point = new google.maps.LatLng(building.latitude, building.longitude);
 
                 // create marker for the building
@@ -109,25 +94,23 @@ type ("RoomMap", ["IWidget"],
                 google.maps.event.addListener(marker, "click", marker.onClick);
 
                 this.markers.push(marker);
-            }
+            }, this);
         },
 
         createMarkerClickHandler: function(marker) {
-            var self = this;
-            return function() {
+            return _.bind(function() {
                 // it the info baloon is shown for a first time, create it
                 if (!exists(marker.infoWindow)) {
-                    var info = self.createBuildingInfo(marker.building);
-                    marker.infoWindow = new google.maps.InfoWindow({content: info});
+                    marker.infoWindow = new google.maps.InfoWindow({
+                        content: this.createBuildingInfo(marker.building)
+                    });
                 }
-
                 // closed the tooltips and info baloon
-                self.closeInfoBaloon();
-
+                this.closeInfoBaloon();
                 // show the info baloon
-                self.activeInfoWindow = marker.infoWindow;
+                this.activeInfoWindow = marker.infoWindow;
                 marker.infoWindow.open(self.map, marker);
-            }
+            }, this);
         },
 
         closeInfoBaloon: function() {
@@ -150,41 +133,38 @@ type ("RoomMap", ["IWidget"],
         },
 
         createAspectChangeFunction: function(aspect, link) {
-            var self = this;
             // execute this every time the user clicks on some aspect and changes the visible map area
-            return function() {
-                self.activeAspect = aspect;
-                self.map.setCenter(new google.maps.LatLng(aspect.centerLatitude, aspect.centerLongitude));
-                self.map.setZoom(parseInt(aspect.zoomLevel));
-                self.setSelectedAspectStyle(link);
-            }
+            return _.bind(function() {
+                this.activeAspect = aspect;
+                this.map.setCenter(new google.maps.LatLng(aspect.center_latitude, aspect.center_longitude));
+                this.map.setZoom(aspect.zoom_level);
+                this.setSelectedAspectStyle(link);
+            }, this);
         },
 
         constructBrowserSpecificCss: function() {
             return this.isBrowserIE7() ? 'browserIE7' : 'browserDefault';
         },
 
-        constructAspectCss: function (selected) {
+        constructAspectCss: function(selected) {
             var selectionClass = selected ? 'mapAspectSelected' : 'mapAspectUnselected';
             return 'mapAspectsItem ' + selectionClass;
         },
 
         createAspectChangeLinks: function(aspectsCanvas) {
-            var links = Html.ul({className:'mapAspectsList'}).dom;
-            for (var i = 0; i < this.aspects.length; i++) {
-                var aspect = this.aspects[i];
-
+            var links = Html.ul({className: 'mapAspectsList'}).dom;
+            _.each(this.aspects, function(aspect, i) {
                 // construct a link that changes the map aspect if clicked
                 var link = Html.a({'href': '#', className: this.constructAspectCss(false)}, aspect.name);
-                var itemClassName = i == 0 ? 'first ' : i == this.aspects.length - 1 ? 'last ' : '';
-                var item = Html.li({className:itemClassName + this.constructBrowserSpecificCss()}, link.dom);
+                var itemClassName = i == 0 ? 'first ' : (i == this.aspects.length - 1 ? 'last ' : '');
+                var item = Html.li({className: itemClassName + this.constructBrowserSpecificCss()}, link.dom);
                 aspect.applyAspect = this.createAspectChangeFunction(aspect, link);
 
                 // store the link for the aspect
                 aspect.link = link;
 
                 // if the aspect is a default one, apply it on start
-                if (aspect.defaultOnStartup) {
+                if (aspect.default_on_startup) {
                     aspect.applyAspect();
                 }
 
@@ -192,13 +172,12 @@ type ("RoomMap", ["IWidget"],
                 link.observeClick(aspect.applyAspect);
 
                 links.appendChild(item.dom);
-            }
+            }, this);
             aspectsCanvas.appendChild(links);
         },
 
         createRoomInfo: function(building, room) {
-            var self = this;
-            var address = building.number + '/' + room.floor + '-' + room.roomNr;
+            var address = building.number + '/' + room.floor + '-' + room.number;
 
             // caption
             var caption = $("<span/>").text($T("Room") + ' ' + address);
@@ -207,10 +186,10 @@ type ("RoomMap", ["IWidget"],
             var addr = $("<span/>").addClass('mapRoomAddress').text(address);
 
             // "Book" link
-            var bookingUrl = room.bookingUrl;
+            var bookingUrl = room.booking_url;
             if($("#isAvailable:checked")) {
                 bookingUrl += '&ignoreSession=on';
-                each({
+                var domMapping = {
                     sDay: 'day',
                     sMonth: 'month',
                     sYear: 'year',
@@ -218,8 +197,9 @@ type ("RoomMap", ["IWidget"],
                     eMonth: 'monthEnd',
                     eYear: 'yearEnd',
                     repeatability: 'repeatability'
-                }, function(param, field) {
-                    bookingUrl += '&' + param + '=' + encodeURIComponent($("#"+field).val());
+                }
+                _.each(_.keys(domMapping), function(key) {
+                    bookingUrl += '&' + domMapping[key] + '=' + encodeURIComponent($("#" + key).val());
                 });
 
                 var sTime = $('#sTime').val().split(':');
@@ -231,40 +211,36 @@ type ("RoomMap", ["IWidget"],
                     bookingUrl += '&minuteEnd=' + parseInt(eTime[1], 10);
                 }
             }
-            var book = $("<a/>")
-                        .addClass("mapBookRoomLink")
-                        .attr("href", bookingUrl)
-                        .attr("target", "_blank")
-                        .text($T("Book"));
+            var book = $('<a/>')
+                        .addClass('mapBookRoomLink')
+                        .attr('href', bookingUrl)
+                        .attr('target', '_blank')
+                        .text($T('Book'));
 
             // "More" link - for room details
-            var more = $("<a/>")
-                        //.attr("href", "javascript: alert('hola');")
-                        .addClass("mapRoomInfoLink")
-                        .text($T("More") + "...");
-
+            var more = $('<a/>')
+                        .addClass('mapRoomInfoLink')
+                        .text($T('More') + '...');
             // "Room details" link
-            var details = $("<a/>")
-                        .attr("href", room.detailsUrl)
-                        .attr("target", "_blank")
-                        .text($T("Details") + "...");
-            details = $("<span/>").addClass("mapRoomDetailsLink").append(details);
+            var details = $('<a/>')
+                        .attr('href', room.details_url)
+                        .attr('target', '_blank')
+                        .text($T('Details') + '...');
+            details = $('<span/>').addClass('mapRoomDetailsLink').append(details);
 
             // room details elements
             var title = $('<div/>', {'class': 'mapRoomTooltipTitle'}).append(
-                $('<div/>').css('float', 'left').append(caption),
-                $('<div/>').css({
-                    float: 'right'
-                }).append(details)
+                $('<div/>').css({float: 'left'}).append(caption),
+                $('<div/>').css({float: 'right'}).append(details)
             );
             var help = $('<div/>').append(
                 $('<img/>', {
-                    src: room.tipPhotoURL,
+                    src: room.tip_photo_url,
                     width: '212px',
                     height: '140px',
                     'class': 'mapRoomTooltipImage'
                 }),
-                $('<div class="mapRoomTooltipDescription"/>').append(room.markerDescription)
+                $('<div class="mapRoomTooltipDescription"/>').append(room.marker_description)
             );
             help.children().wrap('<p/>');
 
@@ -277,16 +253,16 @@ type ("RoomMap", ["IWidget"],
                         button: true
                     }
                 },
-                show: { event: 'click' },
-                hide: { event: 'unfocus' },
+                show: {event: 'click'},
+                hide: {event: 'unfocus'},
                 position: {
                     target: 'mouse',
-                    adjust: { mouse: false }
+                    adjust: {mouse: false}
                 }
             });
 
-            var roomInfo = $("<p/>")
-                            .addClass("mapRoomInfo")
+            var roomInfo = $('<p/>')
+                            .addClass('mapRoomInfo')
                             .append(addr)
                             .append(' - ')
                             .append(book)
@@ -295,8 +271,6 @@ type ("RoomMap", ["IWidget"],
         },
 
         createBuildingInfo: function(building) {
-            var self = this;
-
             // the building title
             var title = $("<p/>")
                 .addClass("mapBuildingTitle")
@@ -307,12 +281,11 @@ type ("RoomMap", ["IWidget"],
                 .addClass("mapRoomsInfo");
 
             // add info for each room
-            $.each(building.rooms, function(index, room) {
-                if (room.showOnMap) {
-                    var roomInfo = self.createRoomInfo(building, room);
-                    roomsInfo.append(roomInfo);
+            _.each(building.rooms, function(room) {
+                if (room.show_on_map) {
+                    roomsInfo.append(this.createRoomInfo(building, room));
                 }
-            });
+            }, this);
 
             // building info box
             var buildingInfo = $("<div/>")
@@ -329,7 +302,6 @@ type ("RoomMap", ["IWidget"],
 
             // 'alone' building - a bulding that is displayed alone on the screen
             this.aloneBuilding = null;
-
             // 'exact' building - a building whose number was entered in the building filter
             this.exactBuilding = null;
 
@@ -339,11 +311,9 @@ type ("RoomMap", ["IWidget"],
                 exactBuildingNumber = this.getFilterValue(this.buildingNumberFilter);
             }
 
-            for (var i = 0; i < this.buildings.length; i++) {
-                var building = this.buildings[i];
-
+            _.each(this.buildings, function(building) {
                 // if the building is filtered as visible on map
-                if (building.showOnMap) {
+                if (building.show_on_map) {
                     // if only 1 building is visible - that's the 'alone' building
                     if (this.visibleBuildingsCount == 1) {
                         this.aloneBuilding = building;
@@ -358,107 +328,93 @@ type ("RoomMap", ["IWidget"],
                     var pos = new google.maps.LatLng(building.latitude, building.longitude);
 
                     // count the number of rooms in each of the aspect areas
-                    for (var j = 0; j < this.bounds.length; j++) {
-                        if (this.bounds[j].contains(pos)) {
-                            this.boundCounters[j] += building.visibleRoomsSize;
-                        }
-                    }
+                    _.each(this.bounds, function(bound, i) {
+                        this.boundCounters[i] += bound.contains(pos) ? building.visibleRoomsSize : 0;
+                    }, this);
                 }
 
                 // show only the filtered buildings
-                building.marker.setVisible(building.showOnMap);
-            }
+                building.marker.setVisible(building.show_on_map);
+            }, this);
         },
 
         centerBuilding: function(building) {
-            var center = new google.maps.LatLng(building.latitude, building.longitude);
-            this.map.setCenter(center);
+            this.map.setCenter(new google.maps.LatLng(building.latitude, building.longitude));
         },
 
-        getFilterPropertyOptions: function(filter) {
-            var options = [];
-            function addOption(option) {
-                if (contains(options, option)) options.push(option);
-            }
-
-            for (var i = 0; i < this.buildings.length; i++) {
-                var building = this.buildings[i];
-                if (filter.filterType == 'building') {
-                    addOption(building[filter.property]);
-                } else {
-                    for (var j = 0; j < building.rooms.length; j++) {
-                        var room = building.rooms[j];
-                        addOption(room[filter.property]);
+        getFilterPropertyOptions: function(room_building_filter) {
+            return _.uniq(_.flatten(
+                _.map(this.buildings, function(building) {
+                    if (room_building_filter.filterType == 'building') {
+                        return building[room_building_filter.property];
                     }
-                }
-            }
-
-            return options;
+                    return _.map(building.rooms, function(room) {
+                        room[room_building_filter.property];
+                    });
+                })
+            ));
         },
 
         updateFiltersState: function() {
-            for (var i = 0; i < this.filters.length; i++) {
-                var filter = this.filters[i];
+            _.each(this.filters, function(f) {
+                // the corresponding function calculates
+                // if the filter input is enabled (default: yes)
+                f.enabled = !exists(f.enabledIf) || f.enabledIf(this);
+                f.input.dom.disabled = !f.enabled;
 
-                // the corresponding function calculates if the filter input is enabled (default: yes)
-                filter.enabled = !exists(filter.enabledIf) || filter.enabledIf(this);
-                filter.input.dom.disabled = !filter.enabled;
-
-                // the corresponding function calculates if the filter is active (default: yes)
-                filter.active = !exists(filter.activeIf) || filter.activeIf(this);
-            }
+                // the corresponding function calculates
+                // if the filter is active (default: yes)
+                f.active = !exists(f.activeIf) || f.activeIf(this);
+            }, this);
         },
 
-        createFilterWidget: function(filter) {
+        createFilterWidget: function(room_building_filter) {
             // value type
             var input;
-            if (filter.inputType == 'text' || filter.inputType == 'subtext') {
+            if (_.contains(['text', 'subtext'], room_building_filter.inputType)) {
                 // text input for text and sub-text filters
                 input = Html.input('text', {className: 'mapFilterTextbox'});
-            } else if (filter.inputType == 'boolean') {
+            } else if (room_building_filter.inputType == 'boolean') {
                 // checkbox input for boolean filters
                 input = Html.checkbox({className: 'mapFilterCheckbox'});
-            } else if (filter.inputType == 'list_contains') {
+            } else if (room_building_filter.inputType == 'list_contains') {
                 // checkbox input for 'list containts' filters
                 input = Html.checkbox({className: 'mapFilterCheckbox'});
-            } else if (filter.inputType == 'hidden') {
+            } else if (room_building_filter.inputType == 'hidden') {
                 // no input for hidden filters
                 input = null;
-            } else if (filter.inputType == 'combo') {
+            } else if (room_building_filter.inputType == 'combo') {
                 // drop-down box input for combo filters
-                var options = [];
-                var optionValues = this.getFilterPropertyOptions(filter);
-                for (var i = 0; i < optionValues.length; i++) {
-                    var optionValue = optionValues[i];
-                    var option = Html.option({value: optionValue}, optionValue);
-                    options.push(option);
-                }
-                input = Html.select({className: 'mapFilterCombo'}, options);
+                input = Html.select({className: 'mapFilterCombo'},
+                    _.map(this.getFilterPropertyOptions(room_building_filter), function(option) {
+                        return Html.option({value: option}, option);
+                    })
+                );
             }
 
             if (input) {
-                filter.input = input;
+                room_building_filter.input = input;
 
                 // observe change of the filter inputs
-                var self = this;
-                input.observeKeyPress(function(key) {
-                    self.onFiltersInputChanged();
-                });
-                input.observeChange(function(key) {
-                    self.onFiltersInputChanged();
-                });
+                input.observeKeyPress(
+                    _.bind(function(key) {
+                        this.onFiltersInputChanged();
+                    }, this)
+                );
+                input.observeChange(
+                    _.bind(function(key) {
+                        this.onFiltersInputChanged();
+                    }, this)
+                );
 
                 // title
-                var label = Html.span({className: 'mapFilterLabel'}, filter.label);
+                var label = Html.span({className: 'mapFilterLabel'}, room_building_filter.label);
 
                 // layout order
-                var order;
-                if (filter.inputType == 'text' || filter.inputType == 'subtext' || filter.inputType == 'combo') {
-                    order = [label, input];
-                } else {
-                    order = [input, label];
+                if (_.contains(['text', 'subtext', 'combo'], room_building_filter.inputType)) {
+                    return Widget.inline([label, input]);
                 }
-                return Widget.inline(order);
+                return Widget.inline([input, label]);
             } else {
                 return null;
             }
@@ -468,38 +424,40 @@ type ("RoomMap", ["IWidget"],
             this.updateFiltersState();
         },
 
-        setDefaultFilterValue: function(filter) {
-            if (filter.group !== undefined) {
-                if (filter.defaultValue !== undefined) {
-                    filter.mainCheckbox.dom.checked = filter.defaultValue;
-                    filter.mainCheckbox.dispatchEvent("change");
+        setDefaultFilterValue: function(room_building_filter) {
+            if (room_building_filter.group !== undefined) {
+                if (room_building_filter.defaultValue !== undefined) {
+                    room_building_filter.mainCheckbox.dom.checked = room_building_filter.defaultValue;
+                    room_building_filter.mainCheckbox.dispatchEvent('change');
                 }
-                for (var i = 0; i < filter.group.length; i++) {
-                    this.setDefaultFilterValue(filter.group[i]);
-                }
+                _.each(room_building_filter.group, function(filterGroup) {
+                    this.setDefaultFilterValue(filterGroup);
+                }, this);
             } else {
-                if (filter.defaultValue !== undefined && filter.input) {
-                    if (filter.inputType == 'boolean' || filter.inputType == 'list_contains') {
-                        filter.input.dom.checked = filter.defaultValue;
+                if (room_building_filter.defaultValue !== undefined && room_building_filter.input) {
+                    if (_.contains(['boolean', 'list_contains'], room_building_filter.inputType)) {
+                        room_building_filter.input.dom.checked = room_building_filter.defaultValue;
                     } else {
-                        filter.input.dom.value = filter.defaultValue;
+                        room_building_filter.input.dom.value = room_building_filter.defaultValue;
                     }
-                    filter.input.dispatchEvent("change");
+                    room_building_filter.input.dispatchEvent('change');
                 }
             }
         },
 
         setDefaultFilterValues: function() {
-            for (var i = 0; i < this.filters.length; i++) {
-                this.setDefaultFilterValue(this.filters[i]);
-            }
-            for (var i = 0; i < this.customWidgets.length; i++) {
-                this.customWidgets[i].resetFields();
-            }
+            _.each(this.filters, function(room_building_filter) {
+                this.setDefaultFilterValue(room_building_filter);
+            }, this);
+            _.each(this.customWidgets, function(customWidget) {
+                customWidget.resetFields();
+            });
         },
 
-        createGroupWidget: function(filter) {
-            var widgets = Html.div({className: "mapFilterGroup"}, this.createFilterWidgets(filter.group));
+        createGroupWidget: function(room_building_filter) {
+            var widgets = Html.div({className: "mapFilterGroup"},
+                this.createFilterWidgets(room_building_filter.group)
+            );
 
             var mainCheckbox = Html.checkbox({className: 'mapFilterCheckbox'});
 
@@ -514,40 +472,32 @@ type ("RoomMap", ["IWidget"],
             mainCheckbox.observeChange(onMainCheckboxClick);
             onMainCheckboxClick();
 
-            var label = Html.span({className: 'mapFilterLabel'}, filter.label);
-
+            var label = Html.span({className: 'mapFilterLabel'}, room_building_filter.label);
             var top = Html.div({}, mainCheckbox, label);
 
-            filter.widgets = widgets;
-            filter.mainCheckbox = mainCheckbox;
+            room_building_filter.widgets = widgets;
+            room_building_filter.mainCheckbox = mainCheckbox;
             return Html.div({}, top, widgets);
         },
 
         createFilterWidgets: function(filters) {
-            var widgets = [];
-            for (var i = 0; i < filters.length; i++) {
-                var filter = filters[i];
-                var widget;
-                if (exists(filter.group)) {
-                    widget = this.createGroupWidget(filter);
-                } else {
-                    widget = this.createFilterWidget(filter);
-                }
-                widgets.push(widget);
-            }
-            return Widget.lines(widgets);
+            return Widget.lines(
+                _.map(filters, function(f) {
+                    return exists(f.group) ? this.createGroupWidget(f) : this.createFilterWidget(f);
+                }, this)
+            )
         },
 
         createFilters: function(filterCanvas) {
             var lines = [];
 
-            var title = Html.div({className: 'mapFilterTitle'}, $T("Search criteria")+":");
+            var title = Html.div({className: 'mapFilterTitle'}, $T('Search criteria') + ':');
             lines.push(title);
 
             var filterWidgets = this.createFilterWidgets(this.filters);
             lines.push(filterWidgets);
 
-            this.customWidgetsHolder = Html.div('mapCustomWidgetsHolder', "");
+            this.customWidgetsHolder = Html.div('mapCustomWidgetsHolder', '');
             lines.push(this.customWidgetsHolder);
 
             var self = this;
@@ -559,76 +509,65 @@ type ("RoomMap", ["IWidget"],
             });
 
             var filterButton = Html.button('mapButton', $T("Filter"));
-            filterButton.observeClick(function() {
-                self.filterMarkers(false);
-            });
+            filterButton.observeClick(
+                _.bind(function() {
+                    this.filterMarkers(false);
+                }, this)
+            );
 
             var resetButton = Html.button('mapButton', $T("Reset"));
-            resetButton.observeClick(function() {
-                self.setDefaultFilterValues();
-                self.filterMarkers(false);
-                self.resetAspectPosition();
-            });
+            resetButton.observeClick(
+                _.bind(function() {
+                    this.setDefaultFilterValues();
+                    this.filterMarkers(false);
+                    this.resetAspectPosition();
+                }, this)
+            );
 
             this.buttons = Html.div({}, filterButton, resetButton);
             lines.push(this.buttons);
 
             this.progress = Html.span({}, progressIndicator(true, true)).dom;
 
-            this.resultsInfo = Html.span('mapResultsInfo', "");
+            this.resultsInfo = Html.span('mapResultsInfo', '');
             lines.push(this.resultsInfo);
 
             filterCanvas.appendChild(Widget.lines(lines).dom);
         },
 
         matchesCriteria: function(x, criteria) {
-            for (var i = 0; i < criteria.length; i++) {
-                var criterium = criteria[i];
-                if (!criterium(x)) {
-                    return false;
-                }
-            }
-            return true;
+            return _.all(criteria, function(criterium) {
+                return criterium(x);
+            });
         },
 
         filterByCriteria: function(items, criteria) {
-            var count = 0;
-            for (var i = 0; i < items.length; i++) {
-                var item = items[i];
-                item.showOnMap = this.matchesCriteria(item, criteria);
-                if (item.showOnMap) {
-                    count++;
-                }
-            }
-            return count;
+            return _.reduce(items, function(mem, item) {
+                return mem + this.matchesCriteria(item, criteria);
+            }, 0, this);
         },
 
         filterBuildingsByCriteria: function(buildingCriteria, roomCriteria) {
             this.filterByCriteria(this.buildings, buildingCriteria);
-            for (var i = 0; i < this.buildings.length; i++) {
-                var building = this.buildings[i];
-                if (building.showOnMap) {
+            _.each(this.buildings, function(building) {
+                if (building.show_on_map) {
                     building.visibleRoomsSize = this.filterByCriteria(building.rooms, roomCriteria);
                     this.visibleRoomsCount += building.visibleRoomsSize;
                     if (building.visibleRoomsSize > 0) {
                         this.visibleBuildingsCount++;
                     } else {
-                        building.showOnMap = false;
+                        building.show_on_map = false;
                     }
                 } else {
                     building.visibleRoomsSize = 0;
                 }
-            }
+            }, this);
         },
 
         building: function(number) {
-            for (var i = 0; i < this.buildings.length; i++) {
-                var building = this.buildings[i];
-                if (building.number == number) {
-                    return building;
-                }
-            }
-            return null;
+            return _.find(this.buildings, function(building) {
+                return building.number == number;
+            });
         },
 
         filterInput: function(index) {
@@ -639,7 +578,7 @@ type ("RoomMap", ["IWidget"],
             if (inputType == 'list_contains') {
                 return function(obj) {
                     // search for element in the list
-                    return contains(obj[propertyName], expectedValue);
+                    return _.contains(obj[propertyName], expectedValue);
                 }
             } else if (inputType == 'subtext') {
                 return function(obj) {
@@ -653,25 +592,28 @@ type ("RoomMap", ["IWidget"],
             }
         },
 
-        getFilterValue: function(filter) {
+        getFilterValue: function(room_building_filter) {
             var value; // the filter value
-            if (filter.inputType == 'boolean') {
+            if (room_building_filter.inputType == 'boolean') {
                 // boolean value that tells if checkbox is checked
-                value = filter.input.dom.checked;
-                if (value && filter.checkedValue !== undefined) {
-                    // if the checkbox is checked, the boolean value can be replaced with arbitrary one
-                    value = filter.checkedValue;
-                } else if (value && filter.filterFunction !== undefined) {
-                    // for more complex filtering logic, a custom filter function can be specified
-                    value = filter.filterFunction;
+                value = room_building_filter.input.dom.checked;
+                if (value && room_building_filter.checkedValue !== undefined) {
+                    // if the checkbox is checked,
+                    // the boolean value can be replaced with arbitrary one
+                    value = room_building_filter.checkedValue;
+                } else if (value && room_building_filter.filterFunction !== undefined) {
+                    // for more complex filtering logic,
+                    // a custom filter function can be specified
+                    value = room_building_filter.filterFunction;
                 }
-            } else if (filter.inputType == 'list_contains') {
-                // if the checkbox is checked, the filter value is the specified one
-                value = filter.input.dom.checked ? filter.value : '';
-            } else if (filter.inputType == 'hidden') {
-                value = filter.defaultValue;
+            } else if (room_building_filter.inputType == 'list_contains') {
+                // if the checkbox is checked,
+                // the filter value is the specified one
+                value = room_building_filter.input.dom.checked ? room_building_filter.value : '';
+            } else if (room_building_filter.inputType == 'hidden') {
+                value = room_building_filter.defaultValue;
             } else {
-                value = filter.input.dom.value;
+                value = room_building_filter.input.dom.value;
             }
             return value;
         },
@@ -685,36 +627,35 @@ type ("RoomMap", ["IWidget"],
         },
 
         addFiltersToCriteria: function(filters, buildingCriteria, roomCriteria) {
-            for (var i = 0; i < filters.length; i++) {
-                var filter = filters[i];
+            _.each(filters, function(f) {
                 // check if the filter is a group of filters
-                if (filter.group !== undefined) {
-                    var value = filter.mainCheckbox.dom.checked;
+                if (f.group !== undefined) {
+                    var value = f.mainCheckbox.dom.checked;
                     // the group filter shoud be enabled
-                    if (!filter.optional || value) {
-                        if (filter.property) {
+                    if (!f.optional || value) {
+                        if (f.property) {
                             // a filter function that checks the specified property for the specified value
-                            var func = this.createPropertyFilter('boolean', filter.property, value);
-                            this.addFilterFunctionToCriteria(filter, func, buildingCriteria, roomCriteria);
+                            var func = this.createPropertyFilter('boolean', f.property, value);
+                            this.addFilterFunctionToCriteria(f, func, buildingCriteria, roomCriteria);
                         }
-                        this.addFiltersToCriteria(filter.group, buildingCriteria, roomCriteria);
+                        this.addFiltersToCriteria(f.group, buildingCriteria, roomCriteria);
                     }
                 } else {
-                    var value = this.getFilterValue(filter);
-                    if ((!filter.optional || value) && filter.active && filter.enabled) {
+                    var value = this.getFilterValue(f);
+                    if ((!f.optional || value) && f.active && f.enabled) {
                         var func;
-                        if (filter.filterFunction) {
+                        if (f.filterFunction) {
                             // the first argument of the custom filter function is the calling instance
                             // specify the calling instance (this) and derivate a proper predicate function
-                            func = curry(filter.filterFunction, this);
+                            func = _.partial(f.filterFunction, this);
                         } else {
                             // a filter function that checks the specified property for the specified value
-                            func = this.createPropertyFilter(filter.inputType, filter.property, value);
+                            func = this.createPropertyFilter(f.inputType, f.property, value);
                         }
-                        this.addFilterFunctionToCriteria(filter, func, buildingCriteria, roomCriteria);
+                        this.addFilterFunctionToCriteria(f, func, buildingCriteria, roomCriteria);
                     }
                 }
-            }
+            }, this);
         },
 
         resetFilteringCycle: function() {
@@ -722,15 +663,12 @@ type ("RoomMap", ["IWidget"],
             this.visibleRoomsCount = 0;
 
             // the info balloons whould be re-created after each filtering
-            for (var i = 0; i < this.buildings.length; i++) {
-                var building = this.buildings[i];
+            _.each(this.buildings, function(building) {
                 building.marker.infoWindow = null;
-            }
+            });
 
             // reset the counters for the aspects (areas)
-            for (var i = 0; i < this.boundCounters.length; i++) {
-                this.boundCounters[i] = 0;
-            }
+            this.boundCounters = _.map(this.boundCounters, function() { return 0; })
         },
 
         addCustomWidgetFiltersToCriteria: function(buildingCriteria, roomCriteria, filterCallback) {
@@ -739,35 +677,34 @@ type ("RoomMap", ["IWidget"],
 
             function filtersCallback(buildingFilters, roomFilters) {
                 counter++;
-                for (var k = 0; k < buildingFilters.length; k++) {
-                    buildingCriteria.push(buildingFilters[k]);
-                }
-                for (var k = 0; k < roomFilters.length; k++) {
-                    roomCriteria.push(roomFilters[k]);
-                }
+                _.each(buildingFilters, function(bf) {
+                    buildingCriteria.push(bf);
+                })
+                _.each(roomFilters, function(rf) {
+                    roomCriteria.push(rf);
+                })
             }
 
-            for (var i = 0; i < total; i++) {
-                this.customWidgets[i].getFilters(filtersCallback);
-            }
+            _.each(this.customWidgets, function(customWidget) {
+                customWidget.getFilters(filtersCallback);
+            });
 
-            function waitResponses() {
-                if(counter == total) {
+            setTimeout(function() {
+                if (counter == total) {
                     filterCallback();
                 } else {
                     setTimeout(waitResponses, 50);
                 }
-            }
-            setTimeout(waitResponses, 50);
+            }, 50);
         },
 
         addStartupFiltersToCriteria: function(buildingCriteria, roomCriteria) {
-            for (var k = 0; k < this.startupBuildingFilters.length; k++) {
-                buildingCriteria.push(this.startupBuildingFilters[k]);
-            }
-            for (var k = 0; k < this.startupRoomFilters.length; k++) {
-                roomCriteria.push(this.startupRoomFilters[k]);
-            }
+            _.each(this.startupBuildingFilters, function(sbf) {
+                buildingCriteria.push(sbf);
+            });
+            _.each(this.startupRoomFilters, function(srf) {
+                roomCriteria.push(srf);
+            });
         },
 
         resetAspectPosition: function() {
@@ -779,20 +716,26 @@ type ("RoomMap", ["IWidget"],
             var isDefaultAspectEmpty = false;
             var maxResultsAspect;
             var maxResults = 0;
-            for (var i = 0; i < this.aspects.length; i++) {
+
+            function adjust(aspect, boundCounter) {
                 // check if the default aspect is empty
-                if (this.aspects[i] == this.activeAspect && this.boundCounters[i] == 0) {
+                if (aspect == this.activeAspect && boundCounter == 0) {
                     isDefaultAspectEmpty = true;
                 }
 
                 // find the aspect with max. number of results
-                if (maxResults < this.boundCounters[i]) {
-                    maxResults = this.boundCounters[i];
-                    maxResultsAspect = this.aspects[i];
+                if (maxResults < boundCounter) {
+                    maxResults = boundCounter;
+                    maxResultsAspect = aspect;
                 }
             }
 
-            // if the default aspect hasn't results, show the aspect with max. number of results
+            _.each(_.zip(this.aspects, this.boundCounters), function(pair, i) {
+                adjust.apply(this, pair);
+            }, this);
+
+            // if the default aspect hasn't results,
+            // show the aspect with max. number of results
             if (isDefaultAspectEmpty && maxResults > 0) {
                 maxResultsAspect.applyAspect();
             }
@@ -858,38 +801,35 @@ type ("RoomMap", ["IWidget"],
         initializeBounds: function() {
             this.bounds = [];
             this.boundCounters = [];
-            for (var i = 0; i < this.aspects.length; i++) {
-                var aspect = this.aspects[i];
-
+            _.each(this.aspects, function(aspect) {
                 // initialize the bounds of the area descripbed in the aspect
-                var sw = new google.maps.LatLng(aspect.topLeftLatitude, aspect.topLeftLongitude);
-                var ne = new google.maps.LatLng(aspect.bottomRightLatitude, aspect.bottomRightLongitude);
+                var sw = new google.maps.LatLng(aspect.top_left_latitude, aspect.top_left_longitude);
+                var ne = new google.maps.LatLng(aspect.bottom_right_latitude, aspect.bottom_right_longitude);
                 this.bounds.push(new google.maps.LatLngBounds(sw, ne));
 
                 // initialize the array of counters for the aspect areas
                 this.boundCounters.push(0);
-            }
+            }, this);
         },
 
         updateAspectsInfo: function() {
-            for (var i = 0; i < this.aspects.length; i++) {
-                var aspect = this.aspects[i];
-                var counter = this.boundCounters[i];
-                aspect.link.dom.innerHTML = aspect.name + " (" + counter + ")";
+            function format(aspect, counter) {
+                aspect.link.dom.innerHTML = aspect.name + '(' + counter + ')';
             }
+            _.each(_.zip(this.aspects, this.boundCounters), function(pair) {
+                format.apply(this, pair);
+            }, this);
         },
 
         isBrowserIE7: function() {
-            var isIE = window.ActiveXObject ? true : false;
             var agent = navigator.userAgent.toLowerCase();
-            return isIE && (/msie 7/.test(agent) || document.documentMode == 7);
+            return window.ActiveXObject && (/msie 7/.test(agent) || document.documentMode == 7);
         },
 
         embedWidgets: function() {
-            for (var i = 0; i < this.customWidgets.length; i++) {
-                var widget = this.customWidgets[i].widget;
-                this.customWidgetsHolder.dom.appendChild(widget);
-            }
+            _.each(this.customWidgets, function(customWidget) {
+                this.customWidgetsHolder.dom.appendChild(customWidget.widget);
+            }, this);
         }
 
     },
