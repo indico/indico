@@ -1,11 +1,11 @@
 <ng-form name="nestedForm"
-    ng-init="input = getId(getValue(fieldName))">
+    ng-init="input = {checked: getId(getValue(fieldName))}">
     <ul>
         <li ng-repeat="item in field.values.radioitems">
             <input type="radio"
                 name="{{ fieldName }}"
                 value="{{ item.id }}"
-                ng-model="input"
+                ng-model="input.checked"
                 ng-required="field.mandatory"
                 ng-disabled="isDisabled(item, getValue(fieldName), field.input) || paymentBlocked(item, userdata) || anyBillableItemPayed(userdata)"/>
             <span ng-class="{'text-error': validationStarted && nestedForm.$invalid}">
