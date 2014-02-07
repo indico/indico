@@ -173,6 +173,14 @@
         vertical-align: top;
     }
 
+    .field-description {
+        color: $dark-gray;
+        font-size: 11px;
+        padding: 2px;
+        text-align: justify;
+        max-width: 440px;
+    }
+
     .field-input {
         vertical-align: top;
         padding-top: 3px;

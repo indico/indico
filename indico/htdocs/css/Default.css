@@ -6270,31 +6270,12 @@ div.invalid {
     margin-left: 0px;
 }
 
-.beforeRegistrationInput {
-    width: 7px;
-}
-
-.regSection {
-    border-left: 1px solid #777777;
-    border-top: 1px solid #777777;
-}
-
-.regSectionBackground{
-    background: #E5E5E5;
-    color: gray;
-}
-
-.regFormSubtotal{
+.regFormSubtotal {
     margin-left: 10px;
     font-size: 13px;
     font-family: Verdana, Arial;
     color: #3B4145;
     font-weight: bold;
-}
-
-.regFormBottomLine {
-    border-top: 2px solid #777777;
-    padding-top:10px;
 }
 
 /*
