@@ -428,7 +428,8 @@ def package_release(py_versions=None, system_node=False, indico_versions=None, u
     Create an Indico release - source and binary distributions
     """
 
-    DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor', 'werkzeug', 'nodeenv', 'fabric', 'sphinx', 'repoze.sphinx.autointerface']
+    DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor', 'werkzeug', 'nodeenv', 'fabric',
+                        'sphinx', 'repoze.sphinx.autointerface']
 
     py_versions = py_versions.split('/') if py_versions else env.py_versions
     _check_pyenv(py_versions)

@@ -43,7 +43,7 @@ from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from MaKaC.plugins.base import Observable
-from MaKaC.user import Avatar
+from MaKaC.user import Avatar, Group
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 from indico.util.event import uniqueId
