@@ -39,6 +39,7 @@ from MaKaC.common.utils import daysBetween
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.webinterface.rh.admins import RCAdmin
 from MaKaC.webinterface import wcomponents
+import MaKaC.webinterface.displayMgr as displayMgr
 
 from indico.core.index import OOIndex, Index, Catalog
 from indico.core.index.adapter import IIndexableByStartDateTime
@@ -368,6 +369,9 @@ class NavigationContributor(Component):
         obj._collaborationOpt = obj._sectionMenu.getLinkByName("collaboration")
         csbm = Catalog.getIdx("cs_bookingmanager_conference").get(obj._conf.getConference().getId())
         if csbm is not None and (not csbm.hasBookings() or not csbm.isCSAllowed()):
+            if obj._collaborationOpt is None:
+                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(obj._conf.getConference(), True) # updating menu
+                obj._collaborationOpt = obj._sectionMenu.getLinkByName("collaboration")
             obj._collaborationOpt.setVisible(False)
 
 
