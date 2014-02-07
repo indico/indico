@@ -115,7 +115,7 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         return LDAPIdentity(login, avatar)
 
     def fetchIdentity(self, avatar):
-        Logger.get("auth.ldap").info("fetchIdentity (%s %s)" % (avatar.getId(), avatar.getEmail()))
+        Logger.get("auth.ldap").debug("fetchIdentity (%s %s)" % (avatar.getId(), avatar.getEmail()))
         user = self.matchUser({"email": avatar.getEmail()}, exact=1)
         if user:
             user = user.values()[0]
