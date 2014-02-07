@@ -1418,6 +1418,20 @@ Conference Tools
 The conference Tools allow you to carry out certain actions on the
 whole of the conference.
 
+
+--------------
+
+Alarm Control
+^^^^^^^^^^^^^
+
+You can set an alarm/reminder to alert people about the
+conference; the alert will be in the form of an email. To do so, click on
+the button *add new alarm* in the *Alarms* tab.
+
+|image172|
+
+
+
 --------------
 
 .. _clone_event:
@@ -1479,6 +1493,8 @@ badges for each of them. You can customize them in this tab, and then print them
 As for posters, you have the option to create a new template or to upload
 an already existing one.
 
+|image171|
+
 ------------------
 
 Lock
@@ -1509,6 +1525,17 @@ Using the Material package option you can create a package of all the
 material that has been used in the conference.
 
 |image69|
+
+--------------
+
+Create an Offline version of a Lecture
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Using the *Offline version* option you can create a
+copy of your lecture that can be used offline for example if you
+wish to store your lecture to a dvd.
+
+|image173|
 
 --------------
 
@@ -2011,9 +2038,9 @@ session. You may also make a PDF of the session.
 .. |image64| image:: UserGuidePics/confm35.png
 .. |image65| image:: UserGuidePics/confm36.png
 .. |image66| image:: UserGuidePics/confm37.png
-.. |image67| image:: UserGuidePics/confm37del.png
-.. |image68| image:: UserGuidePics/confm38.png
-.. |image69| image:: UserGuidePics/confm39.png
+.. |image67| image:: UserGuidePics/conferenceDelete.png
+.. |image68| image:: UserGuidePics/conferenceClone.png
+.. |image69| image:: UserGuidePics/conferenceMaterial2.png
 .. |image70| image:: UserGuidePics/confm40.png
 .. |image71| image:: UserGuidePics/confm41.png
 .. |image72| image:: UserGuidePics/confd1.png
@@ -2069,8 +2096,8 @@ session. You may also make a PDF of the session.
 .. |image124| image:: UserGuidePics/addPageEventPage.png
 .. |image125| image:: UserGuidePics/addSpacer.png
 .. |image126| image:: UserGuidePics/spacerEventPage.png
-.. |image127| image:: UserGuidePics/posters.png
-.. |image128| image:: UserGuidePics/lock.png
+.. |image127| image:: UserGuidePics/conferencePoster.png
+.. |image128| image:: UserGuidePics/conferenceLock.png
 .. |image129| image:: UserGuidePics/pdf2.png
 .. |image130| image:: UserGuidePics/normalView.png
 .. |image131| image:: UserGuidePics/detailedView.png
@@ -2113,3 +2140,7 @@ session. You may also make a PDF of the session.
 .. |image168| image:: UserGuidePics/regform-section.png
 .. |image169| image:: UserGuidePics/regform-add-field.png
 .. |image170| image:: UserGuidePics/regform-dialog.png
+.. |image171| image:: UserGuidePics/conferenceBadge.png
+.. |image172| image:: UserGuidePics/conferenceAlarm.png
+.. |image173| image:: UserGuidePics/conferenceOffline.png
+..
