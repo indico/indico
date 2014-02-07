@@ -60,7 +60,7 @@
     \end{description}
 % endif
 
-% if corresp_authors[contrib.getId()]:
+% if corresp_authors.get(contrib.getId()):
 \textbf {${_("Corresponding Author(s):")}}
         ${", ".join(corresp_authors[contrib.getId()])}
 % endif
