@@ -719,7 +719,7 @@ def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
     for booking in VidyoTools.getIndexByVidyoRoom().itervalues():
         if hasattr(booking, '_originalConferenceId'):
             roomName = booking.getBookingParamByName("roomName") + '_indico_' + booking._originalConferenceId
-            booking._bookingParams["roomName"] = roomName.decode("utf-8")
+            booking._bookingParams["roomName"] = roomName
             del booking._originalConferenceId
         i += 1
         if i % 10000 == 0:
