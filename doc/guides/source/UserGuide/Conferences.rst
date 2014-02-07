@@ -884,7 +884,9 @@ submitted to the conference:
 
 |image150|
 
-You will need to fill in the form and click on *submit* .
+    You will need to fill in the form and click on *submit* .
+
+    From Indico version *1.2* a rich abstract editor is provided supporting *LaTeX* commands and the *Markdown* markup language.
 
 * **Accept**: If you have the correct rights, you can accept abstracts (if not, you can only propose to accept). Tick the corresponding box, and then click on *Accept*.  A new page will appear, where you can choose the destination track, session, the type of contribution and if you wish to send an email notification or not. Once you have chosen all the options, click on *accept*.
 
@@ -1719,7 +1721,7 @@ You need to be logged in as a user and the dates of submission
 must be in the time range to allow you to submit an abstract. Once
 logged in you can fill in the form to submit your abstract.
 
-|image80|
+|image150|
 
 You need to fill in the title, content, and the mandatory fields specified
 (if any). You have to add/select at least one primary author. If you
@@ -1729,6 +1731,8 @@ if the option has been set by the manager. You can also choose which track
 you would like your abstract to be included in as well as any
 comments you would like to add. You will receive an email notification
 after submitting.
+
+From Indico version *1.2* a rich abstract editor is provided supporting *LaTeX* commands and the *Markdown* markup language.
 
 --------------
 
@@ -2051,7 +2055,6 @@ session. You may also make a PDF of the session.
 .. |image77| image:: UserGuidePics/confd6.png
 .. |image78| image:: UserGuidePics/confd7.png
 .. |image79| image:: UserGuidePics/confd8.png
-.. |image80| image:: UserGuidePics/confd9.png
 .. |image81| image:: UserGuidePics/confd10.png
 .. |image82| image:: UserGuidePics/confd11.png
 .. |image83| image:: UserGuidePics/confd12.png
@@ -2119,7 +2122,7 @@ session. You may also make a PDF of the session.
 .. |image147| image:: UserGuidePics/contrew3.png
 .. |image148| image:: UserGuidePics/contrew4.png
 .. |image149| image:: UserGuidePics/layrew1.png
-.. |image150| image:: UserGuidePics/absSubForm.PNG
+.. |image150| image:: UserGuidePics/absSubForm.png
 .. |image151| image:: UserGuidePics/tt_changetime.png
 .. |image152| image:: UserGuidePics/tt_changeend.png
 .. |image153| image:: UserGuidePics/tt_contribintosession.png
