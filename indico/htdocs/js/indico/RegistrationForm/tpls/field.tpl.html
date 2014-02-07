@@ -7,7 +7,7 @@
             <td ng-if="settings.caption" class="field-caption">
                 <div>
                     <span ng-bind-html="field.caption">{{ field.caption }}</span>
-                    <span class="regFormMandatoryField">*</span>
+                    <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
                 </div>
                 <div>
                     <span ng-bind-html="field.description" class="inputDescription">
