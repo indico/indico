@@ -1713,13 +1713,14 @@ class WConfModifRegistrantMiscInfoModify(wcomponents.WTemplated):
                 miscItem=self._miscGroup.getResponseItemById(f.getId())
                 v=miscItem.getValue()
                 price=v=miscItem.getPrice()
-                columCaption = colspan = ""
-                labelCol = f.getInput().getModifLabelCol()
-                if labelCol:
-                    columCaption = """<td nowrap="nowrap" valign="top">%s</td>
-                                   <td valign="top" style="width:10px;">%s</td>""" % (labelCol, f.getInput().getMandatoryCol(miscItem))
-                else:
-                    colspan = "colspan='3'"
+            columCaption = colspan = ""
+            labelCol = f.getInput().getModifLabelCol()
+            if labelCol:
+                columCaption = """<td nowrap="nowrap" valign="top">%s</td>
+                            <td valign="top" style="width:10px;">%s</td>""" % (labelCol,
+                                                                               f.getInput().getMandatoryCol(miscItem))
+            else:
+                colspan = "colspan='3'"
 
             html.append("""
                         <tr>
