@@ -42,14 +42,14 @@
                 <input ng-if="elem.editable == true && elem.edittype == 'text'"
                     ng-model="item[elem.index]"
                     type="text"
-                    size="{{elem.editoptions.size}}"
-                    maxlength="{{elem.editoptions.maxlength}}"
+                    size="{{ elem.editoptions.size }}"
+                    maxlength="{{ elem.editoptions.maxlength }}"
                     name="{{ elem.name }}"
                     class="editable"/>
                 <input ng-if="elem.edittype == 'bool_select'"
                     ng-model="item[elem.index]"
                     type="checkbox"
-                    name="{{elem.name}}"/>
+                    name="{{ elem.name }}"/>
             </td>
             <td class="row-actions">
                 <span>
