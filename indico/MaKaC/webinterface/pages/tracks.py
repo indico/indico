@@ -35,6 +35,7 @@ import MaKaC.user as user
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from MaKaC.webinterface.pages.abstracts import WAbstractManagmentAccept, WAbstractManagmentReject
+from MaKaC.common.TemplateExec import render
 
 
 class WPTrackBase(WPConferenceBase):
@@ -121,6 +122,11 @@ class WPTrackModifBase( WPConferenceModifBase ):
 
     def _getTabContent( self, params ):
         return  _("nothing")
+
+    def _getHeadContent(self):
+        return WPConferenceModifBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                       for url in self._asset_env['mathjax_js'].urls()])
 
 
 class WTrackModifMain(wcomponents.WTemplated):
