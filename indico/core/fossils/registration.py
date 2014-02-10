@@ -669,6 +669,17 @@ class IRegFormAccommodationFossil(IFossil):
         """
     getAccommodationType.result = IRegFormAccommodationTypeItemFossil
 
+    def getPrice(self):
+        """
+        Accommodation price
+        """
+
+    def isBillable(self):
+        """
+        Accommodation billability
+        """
+    isBillable.name = 'billable'
+
 
 class IRegFormMiscellaneousInfoGroupFossil(IFossil):
 

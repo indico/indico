@@ -3637,6 +3637,7 @@ class AccommodationType(Persistent, Fossilizable):
     def delete(self):
         self.setRegistrationForm(None)
         TrashCanManager().add(self)
+
     def recover(self, rf):
         self.setRegistrationForm(rf)
         TrashCanManager().remove(self)
@@ -3644,11 +3645,12 @@ class AccommodationType(Persistent, Fossilizable):
     def getLocator(self):
         """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the AccommodationType instance """
-        if self.getRegistrationForm().getConference() == None:
+        if self.getRegistrationForm().getConference() is None:
             return Locator()
         lconf = self.getRegistrationForm().getLocator()
         lconf["accoTypeId"] = self.getId()
         return lconf
+
 
 class AccommodationForm(BaseForm, Fossilizable):
 
@@ -5436,6 +5438,7 @@ class Accommodation(Persistent):
                 self._billable = False
                 self._currency = ""
             self._accommodationType = at
+
 
 class SocialEvent(Persistent, Fossilizable):
 

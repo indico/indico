@@ -56,7 +56,8 @@
         </span>
         <span class="regFormMandatoryField">*</span>
     </div>
-    <ng-form name="nestedFormAccommodation">
+    <ng-form name="nestedFormAccommodation"
+        ng-init="input.accommodation = userdata.accommodation.accommodationType.id">
         <table cellspacing="0">
             <tr ng-if="section.items.length === 0">
                 <td class="section-placeholder">
@@ -69,7 +70,7 @@
                         id="{{ item.id }}"
                         name="accommodation_type"
                         value="{{ item.id }}"
-                        ng-model="userdata.accommodation.accommodationType.id"
+                        ng-model="input.accommodation"
                         ng-disabled="isDisabled(item, userdata.accommodation.accommodationType.id, 'accomodation') || paymentBlocked(item, userdata) || billableOptionPayed(userdata)"
                         ng-required="hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accomodation') && !item.cancelled"
                         />
@@ -88,11 +89,17 @@
                     </span>
                 </td>
                 <td align="right">
-                    <span ng-if="item.billable" class="regFormPrice">{{ item.price }}</span>
-                    <span ng-if="item.billable">
+                    <span ng-if="item.id == userdata.accommodation.accommodationType.id && userdata.accommodation.billable">
+                        <span class="regFormPrice">{{ userdata.accommodation.price }}</span>
                         <nd-currency currency="currency"></nd-currency>
+                        <span ng-if="item.billable">{{ "per night" | i18n }}</span>
                     </span>
-                    <span ng-if="item.billable">{{ "per night" | i18n }}</span>
+
+                    <span ng-if="item.id != userdata.accommodation.accommodationType.id && item.billable">
+                        <span class="regFormPrice">{{ item.price }}</span>
+                        <nd-currency currency="currency"></nd-currency>
+                        <span ng-if="item.billable">{{ "per night" | i18n }}</span>
+                    </span>
                 </td>
             </tr>
         </table>
