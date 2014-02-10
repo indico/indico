@@ -30,6 +30,7 @@ import json
 import getpass
 from contextlib import contextmanager
 from urlparse import urljoin
+import operator
 
 from fabric.api import local, lcd, task, env
 from fabric.context_managers import prefix, settings
@@ -150,6 +151,25 @@ def _cp_tree(dfrom, dto, exclude=[]):
     print "{0} -> {1}".format(dfrom, dto)
 
     shutil.copytree(dfrom, dto, ignore=shutil.ignore_patterns(*exclude))
+
+
+def _find_most_recent(path, cmp=operator.gt, maxt=0):
+    for dirpath, __, fnames in os.walk(path):
+        for fname in fnames:
+
+            # ignore hidden files and ODTs
+            if fname.startswith(".") or fname.endswith(".odt"):
+                continue
+
+            mtime = os.stat(os.path.join(dirpath, fname)).st_mtime
+            if cmp(mtime, maxt):
+                maxt = mtime
+    return maxt
+
+
+
+def _find_least_recent(path):
+    return _find_most_recent(path, cmp=operator.lt, maxt=sys.maxint)
 
 
 def _install_dependencies(mod_name, sub_path, dtype, dest_subpath=None):
@@ -387,28 +407,34 @@ def tarball(src_dir=None):
 
 
 @task
-def make_docs(src_dir=None, build_dir=None):
+def make_docs(src_dir=None, build_dir=None, force=False):
     """
     Generate Indico docs
     """
-    _check_present('pdflatex')
 
     src_dir = src_dir or env.src_dir
+    doc_src_dir = os.path.join(src_dir, 'doc')
 
     if build_dir is None:
         target_dir = os.path.join(src_dir, 'indico', 'htdocs', 'ihelp')
     else:
         target_dir = os.path.join(build_dir or env.build_dir, 'indico', 'htdocs', 'ihelp')
 
+    if not force:
+        print yellow("Checking if docs need to be generated... "),
+        if _find_most_recent(target_dir) > _find_most_recent(doc_src_dir):
+            print green("Nope.")
+            return
+
+    print red("Yes :(")
+    _check_present('pdflatex')
+
     print green('Generating documentation')
-    with lcd(os.path.join(src_dir, 'doc')):
+    with lcd(doc_src_dir):
         for d in DOC_DIRS:
             with lcd(d):
                 local('make html')
                 local('make latex')
-
-                print d
-
                 local('rm -rf {0}/*'.format(os.path.join(target_dir, 'html')))
                 local('mv build/html/* {0}'.format(os.path.join(target_dir, 'html')))
 
