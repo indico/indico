@@ -1809,7 +1809,8 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
     }
 },
 
-     function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, title, width, height, refresh, addMaterialMode) {
+     function(categId, confId, sessId, contId, subContId, parentProtected, types, uploadAction, title, width, height, refresh, addMaterialMode) {
+         this.categId = categId;
          this.confId = confId;
          this.sessId = sessId;
          this.contId = contId;
@@ -1887,8 +1888,8 @@ IndicoUI.Dialogs.Material = {
         dialog.execute();
     },
 
-    editor: function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, refresh, addMaterialMode) {
-        var dialog = new MaterialEditorDialog(confId, sessId, contId, subContId, parentProtected, types, uploadAction, $T("Edit Materials"), 400, 300, refresh, addMaterialMode);
+    editor: function(categId, confId, sessId, contId, subContId, parentProtected, types, uploadAction, refresh, addMaterialMode) {
+        var dialog = new MaterialEditorDialog(categId, confId, sessId, contId, subContId, parentProtected, types, uploadAction, $T("Edit Materials"), 400, 300, refresh, addMaterialMode);
         dialog.open();
         if (addMaterialMode) {
             dialog.close();

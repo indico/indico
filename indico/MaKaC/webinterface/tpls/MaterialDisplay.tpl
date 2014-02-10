@@ -57,7 +57,8 @@
 
 <script type="text/javascript">
     $("#manageMaterial").click(function(){
-        IndicoUI.Dialogs.Material.editor('${material.getConference().getId() if material.getConference() else ""}', '${material.getSession().getId() if material.getSession() else ""}',
+        IndicoUI.Dialogs.Material.editor('${material.getConference().getOwner().getId() if material.getConference() else ""}',
+            '${material.getConference().getId() if material.getConference() else ""}', '${material.getSession().getId() if material.getSession() else ""}',
                 '${material.getContribution().getId() if material.getContribution() else ""}','${material.getSubContribution().getId() if material.getSubContribution() else ""}',
                 ${jsonEncode(material.getOwner().getAccessController().isProtected())}, ${jsonEncode(material.getOwner().getMaterialRegistry().getMaterialList(material.getOwner()))}, ${uploadAction}, true);
      });

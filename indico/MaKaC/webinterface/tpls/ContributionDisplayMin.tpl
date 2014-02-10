@@ -156,7 +156,8 @@
     </div>
 <script type="text/javascript">
     $("#manageMaterial").click(function(){
-        IndicoUI.Dialogs.Material.editor('${Contribution.getConference().getId()}', '${Contribution.getSession().getId() if Contribution.getSession() else ""}','${Contribution.getId()}','',
+        IndicoUI.Dialogs.Material.editor('${Contribution.getOwner().getId()}', '${Contribution.getConference().getId()}',
+            '${Contribution.getSession().getId() if Contribution.getSession() else ""}','${Contribution.getId()}','',
                 ${jsonEncode(Contribution.getAccessController().isProtected())}, ${jsonEncode(Contribution.getMaterialRegistry().getMaterialList(Contribution.getConference()))}, ${'Indico.Urls.UploadAction.contribution'}, true);
      });
 </script>

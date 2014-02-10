@@ -80,7 +80,7 @@
 
             % if 'materialLink' in info:
                 menuOptions['addMaterial'] = {action: function(m) {
-                    IndicoUI.Dialogs.Material.editor('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
+                    IndicoUI.Dialogs.Material.editor('${conf.getOwner().getId()}', '${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
                         ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, true);
                     m.close();
                     return false;}, display: $T('Add material')};
@@ -89,7 +89,7 @@
                 getItemType(item) == 'Contribution' and item.getContribution().getAllMaterialList() or \
                 getItemType(item) == 'Session' and item.getSession().getAllMaterialList():
                     menuOptions['editMaterial'] = {action: function(m) {
-                         IndicoUI.Dialogs.Material.editor('${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
+                         IndicoUI.Dialogs.Material.editor('${conf.getOwner().getId()}', '${conf.getId()}', '${info["sessId"]}','${info["contId"]}','${info["subContId"]}',
                              ${dumps(info['parentProtection'])}, ${dumps(info['materialList'])}, ${info['uploadURL']}, true, false);
                          m.close();
                          return false;}, display: $T('Edit material')};
