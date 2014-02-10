@@ -9,6 +9,8 @@ urlMeeting = urlHandlers.UHConferenceCreation.getURL(categ)
 urlMeeting.addParam("event_type","meeting")
 
 containsCategories = len(categ.getSubCategoryList()) > 0
+
+from MaKaC.webinterface.general import strfFileSize
 %>
 
 <div class="category-container">
@@ -80,10 +82,32 @@ containsCategories = len(categ.getSubCategoryList()) > 0
             % endif
         % else:
             % if materials:
-                <h2 class="icon-material-download">${ _("Files") }</h2>
-                <ul id="manager-list">
-                % for mat in materials:
-                    <li><a href="${getMaterialURL(mat)}">${mat.getTitle()}</a></li>
+                <div>
+                    <div class="right">
+                        <a href="#" id="manageMaterial" class="i-button icon-edit"></a>
+                    </div>
+                    <h2 class="icon-material-download">${ _("Files") }</h2>
+                </div>
+                <ul>
+                % for material in materials:
+                    <li>
+                        <div class="left trigger icon-expand" data-hidden="true"></div>
+                        <span title="${material.getDescription()}">
+                            <h3>${material.getTitle()}</h3>
+                        </span>
+                        <ul class="resource-list" style="display: none">
+                        % for resource in material.getResourceList():
+                            <li class="icon-file">
+                                <a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank" class="resource"
+                                   data-name="${getResourceName(resource)}"
+                                   data-size="${strfFileSize(resource.getSize())}"
+                                   data-date="${resource.getCreationDate().strftime("%d %b %Y %H:%M")}">
+                                    ${getResourceName(resource)}
+                                </a>
+                            </li>
+                        % endfor
+                        </ul>
+                     </li>
                 % endfor
                 </ul>
             % endif
@@ -150,12 +174,47 @@ $(document).ready(function(){
             at: 'bottom center'
         }
     })
+
+    $('a.resource').qtip({
+        content: {
+            text: function() {
+                var content = $("<div/>");
+                var list = $("<ul/>").addClass("category-resource-qtip");
+                $("<li/>").append($("<span/>").addClass("bold").append("{0}: ".format($T("File Name")))).append($(this).data("name")).appendTo(list);
+                $("<li/>").append($("<span/>").addClass("bold").append("{0}: ".format($T("File size")))).append($(this).data("size")).appendTo(list);
+                $("<li/>").append($("<span/>").addClass("bold").append("{0}: ".format($T("File creation date")))).append($(this).data("date")).appendTo(list);
+                list.appendTo(content);
+                return content;
+            }
+        }
+    });
+
+    $('.trigger').click(function() {
+        var $this = $(this),
+            transition_opts = {
+                duration: 250,
+                easing: 'easeInQuad'
+            };
+
+        if ($this.data('hidden')) {
+            $this.siblings('.resource-list').slideDown(transition_opts);
+            $this.data('hidden', false).removeClass('icon-expand').addClass('icon-collapse');
+        } else {
+            $this.siblings('.resource-list').slideUp(transition_opts);
+            $this.data('hidden', true).removeClass('icon-collapse').addClass('icon-expand');
+        }
+    });
 });
 </script>
 
 % if isLoggedIn:
     <script type="text/javascript">
         $(document).ready(function(){
+            $("#manageMaterial").click(function(){
+                    IndicoUI.Dialogs.Material.editor('${categ.getId()}', null, null, null, null,
+                            ${jsonEncode(categ.getAccessController().isProtected())}, ${jsonEncode(categ.getMaterialRegistry().getMaterialList(categ))},
+                            ${'Indico.Urls.UploadAction.category'}, true);
+                 });
 
             $('.toolbar .i-button').qtip({
                 position: {

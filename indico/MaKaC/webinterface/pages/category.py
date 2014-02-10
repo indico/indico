@@ -87,12 +87,20 @@ class WCategoryDisplay(WICalExportBase):
                 l.append(mat)
         return l
 
-    def getHTML( self, aw, params ):
-        self._aw = aw
-        return wcomponents.WTemplated.getHTML( self, params )
+    def _getResourceName(self, resource):
+        if isinstance(resource, conference.Link):
+            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() \
+                else resource.getURL()
+        else:
+            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getFileName() \
+                else resource.getFileName()
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getHTML(self, aw, params):
+        self._aw = aw
+        return wcomponents.WTemplated.getHTML(self, params)
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         isRootCategory = self._target.getId() == "0"
 
         vars["name"] = self._target.getName()
@@ -104,7 +112,7 @@ class WCategoryDisplay(WICalExportBase):
         vars["timezone"] = self._timezone
         vars["materials"] = self._getMaterials()
         vars["getMaterialURL"] = lambda mat: urlHandlers.UHMaterialDisplay.getURL(mat)
-
+        vars["getResourceName"] = lambda resource: self._getResourceName(resource)
         subcats = self._target.subcategories
 
         confs = self._target.conferences
@@ -157,13 +165,16 @@ class WCategoryDisplay(WICalExportBase):
 
 class WPCategoryDisplay(WPCategoryDisplayBase):
 
-    def __init__( self, rh, target, wfReg ):
-        WPCategoryDisplayBase.__init__( self, rh, target )
+    def __init__(self, rh, target, wfReg):
+        WPCategoryDisplayBase.__init__(self, rh, target)
         self._wfReg = wfReg
-        tzUtil = DisplayTZ(self._getAW(),target)#None,useServerTZ=1)
+        tzUtil = DisplayTZ(self._getAW(), target)  # None,useServerTZ=1)
         self._locTZ = tzUtil.getDisplayTZ()
 
-    def _getHeadContent( self ):
+    def getJSFiles(self):
+        return WPCategoryDisplayBase.getJSFiles(self) + self._includeJSPackage('MaterialEditor')
+
+    def _getHeadContent(self):
         # add RSS feed
         url = urlHandlers.UHCategoryToAtom.getURL(self._target)
 
