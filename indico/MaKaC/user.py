@@ -145,6 +145,8 @@ class Group(Persistent, Fossilizable):
 
     def containsUser(self, avatar):
         group_membership = GenericCache('groupmembership')
+        if avatar is None:
+            return False
         key = "{0}-{1}".format(self.getId(), avatar.getId())
         user_in_group = group_membership.get(key)
         if user_in_group is None:
