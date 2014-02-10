@@ -1416,6 +1416,15 @@ update the status:
   reason). Indico checks for this and informs you if it is the case,
   listing the changed fields.
 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Search option for Vidyo
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The user has also the option to search for Vidyo rooms that either belong to him or to
+events that he is manager of.
+
+|figure83|
+
 ~~~~~~~~~~~~~~~~~~
 Event display page
 ~~~~~~~~~~~~~~~~~~
@@ -2056,3 +2065,4 @@ Once the file submited, the page will refresh and a pdf icon will appear. Clicki
 .. |figure80| image:: images/fig80.png
 .. |figure81| image:: images/fig81.png
 .. |figure82| image:: images/fig82.png
+.. |figure83| image:: images/search_vidyo.png
