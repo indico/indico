@@ -26,6 +26,7 @@ from MaKaC.plugins.Collaboration.WebcastRequest.fossils import IContributionWRFo
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.timezoneUtils import isSameDay
 from MaKaC.plugins.Collaboration import urlHandlers as collaborationUrlHandlers
+from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
 from indico.core.index import Catalog
 
 class WNewBookingForm(WCSPageTemplateBase):
