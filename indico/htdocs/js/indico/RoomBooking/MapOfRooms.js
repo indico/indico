@@ -543,7 +543,8 @@ type ("RoomMap", ["IWidget"],
 
         filterByCriteria: function(items, criteria) {
             return _.reduce(items, function(mem, item) {
-                return mem + this.matchesCriteria(item, criteria);
+                item.show_on_map = this.matchesCriteria(item, criteria);
+                return mem + item.show_on_map;
             }, 0, this);
         },
 
