@@ -79,6 +79,7 @@
 
     .section-group-title {
         font-weight: bold;
+        margin-top: 15px;
     }
 
     .section-placeholder {
@@ -176,9 +177,9 @@
     .field-description {
         color: $dark-gray;
         font-size: 11px;
-        padding: 2px;
-        text-align: justify;
         max-width: 440px;
+        text-align: justify;
+        padding: 5px 2px 10px 2px;
     }
 
     .field-input {
@@ -637,6 +638,7 @@ textarea.regFormDescriptionInputMgmt {
 
 .regFormMandatoryField {
     color: #812;
+    font-weight: normal;
 }
 
 /* CSS for the tabs */
@@ -928,5 +930,11 @@ textarea.regFormDescriptionInputMgmt {
     &+.button-box a {
         font-size: 1.5em !important;
         line-height: 27px !important;
+    }
+}
+
+.regform-section-description[contenteditable] {
+    &.focus {
+        padding-right: 3.6em !important;
     }
 }
