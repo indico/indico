@@ -82,8 +82,8 @@ containsCategories = len(categ.getSubCategoryList()) > 0
             % if materials:
                 <h2 class="icon-material-download">${ _("Files") }</h2>
                 <ul id="manager-list">
-                % for mat, url in materials:
-                    <li><a href="${url}">${mat.getTitle()}</a></li>
+                % for mat in materials:
+                    <li><a href="${getMaterialURL(mat)}">${mat.getTitle()}</a></li>
                 % endfor
                 </ul>
             % endif

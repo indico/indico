@@ -82,10 +82,9 @@ class WCategoryDisplay(WICalExportBase):
 
     def _getMaterials(self):
         l = []
-        for mat in self._target.getAllMaterialList():
+        for mat in sorted(self._target.getAllMaterialList()):
             if mat.canView(self._aw):
-                url = urlHandlers.UHMaterialDisplay.getURL(mat)
-                l.append((mat, url))
+                l.append(mat)
         return l
 
     def getHTML( self, aw, params ):
@@ -104,6 +103,7 @@ class WCategoryDisplay(WICalExportBase):
         vars["isRootCategory"] = isRootCategory
         vars["timezone"] = self._timezone
         vars["materials"] = self._getMaterials()
+        vars["getMaterialURL"] = lambda mat: urlHandlers.UHMaterialDisplay.getURL(mat)
 
         subcats = self._target.subcategories
 
