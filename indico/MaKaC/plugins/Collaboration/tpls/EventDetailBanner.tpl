@@ -50,7 +50,7 @@
             ${getBookingType(booking)}
             ${formatTwoDates(booking.getAdjustedStartDate(timezone),
                              booking.getAdjustedEndDate(timezone),
-                             useToday=True, useTomorrow=True, dayFormat='%a %d/%m', capitalize=False)}\
+                             useToday=True, useTomorrow=True, dayFormat='EEE d/MMM', capitalize=False)}\
         % endif
         % if data.getFirstLineInfo(booking):
     : ${data.getFirstLineInfo(booking)}\
