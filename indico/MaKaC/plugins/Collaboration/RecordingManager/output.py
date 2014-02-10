@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from MaKaC.user import Avatar
+from MaKaC.user import Avatar, Group
 from MaKaC.conference import Category
 
 from MaKaC.common.logger import Logger
