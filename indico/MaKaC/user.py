@@ -25,6 +25,7 @@ from persistent import Persistent
 from accessControl import AdminList, AccessWrapper
 import MaKaC
 from MaKaC.common import filters, indexes
+from MaKaC.common.cache import GenericCache
 from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import UserError, MaKaCError
@@ -134,13 +135,22 @@ class Group(Persistent, Fossilizable):
     def getMemberList(self):
         return self.members
 
-    def containsUser(self, avatar):
+    def _containsUser(self, avatar):
         if avatar == None:
             return 0
         for member in self.members:
             if member.containsUser(avatar):
                 return 1
         return 0
+
+    def containsUser(self, avatar):
+        group_membership = GenericCache('groupmembership')
+        key = "{0}-{1}".format(self.getId(), avatar.getId())
+        user_in_group = group_membership.get(key)
+        if user_in_group is None:
+            user_in_group = self._containsUser(avatar)
+            group_membership.set(key, user_in_group, time=1800)
+        return user_in_group
 
     def containsMember(self, member):
         if member == None:

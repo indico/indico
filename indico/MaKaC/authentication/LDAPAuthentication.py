@@ -630,7 +630,7 @@ class LDAPGroup(Group):
             avatarLists.append(lst)
         return [avList[0] for avList in avatarLists if avList]
 
-    def containsUser(self, avatar):
+    def _containsUser(self, avatar):
 
         # used when checking acces to private events restricted for certain groups
         if not avatar:
