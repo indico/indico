@@ -327,7 +327,7 @@ class TrackManagerAbstractToPDF(AbstractToPDF):
         st = status.getLabel().upper()
 
         if isinstance(status, _ASTrackViewPFOT):
-            tracks = [escape(track.getId(), track.getTitle()) for track in status.getProposedTrackList()]
+            tracks = [(track.getId(), escape(track.getTitle())) for track in status.getProposedTrackList()]
             return (st, tracks)
 
         elif isinstance(status, _ASTrackViewPA):
