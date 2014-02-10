@@ -113,6 +113,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         date: false,
         defaultValue: false,
         description: true,
+        descriptionInCaption: false,
         itemtable: false,
         mandatory: true,
         number: false,
@@ -339,9 +340,8 @@ ndRegForm.directive('ndLabelField', function(url) {
 
         link: function(scope) {
             scope.settings.fieldName = $T("Free Text");
+            scope.settings.descriptionInCaption = true;
             scope.settings.billable = true;
-            scope.settings.caption = false;
-            scope.settings.description = false;
             scope.settings.mandatory = false;
             scope.settings.formData.push('billable');
             scope.settings.formData.push('price');
