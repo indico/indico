@@ -2037,7 +2037,7 @@ class RHAbstractsToXML(RHConfModifCFABase):
 
         x.closeTag("AbstractBook")
 
-        return send_file('Abstracts.pdf', StringIO(x.getXml()), 'XML')
+        return send_file('Abstracts.xml', StringIO(x.getXml()), 'XML')
 
 
 #-------------------------------------------------------------------------------------
