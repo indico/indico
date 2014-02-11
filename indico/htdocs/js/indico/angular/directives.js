@@ -265,6 +265,7 @@ ndDirectives.directive('ndDatepicker', function($compile) {
         replace: 'true',
         template: '<ng-form name="dateForm"></ng-form>',
         scope: {
+            id: '@',
             dateFormat: '@',
             hiddenInputs: '@',
             required: '@',
@@ -296,6 +297,9 @@ ndDirectives.directive('ndDatepicker', function($compile) {
             var getAttributes = function() {
                 var attributes = {};
 
+                if (scope.id) {
+                    attributes.id = scope.id;
+                }
                 attributes['ng-class'] = "{hasError: validation && dateForm.$invalid}";
                 if (scope.required) {
                     attributes.required = "required";

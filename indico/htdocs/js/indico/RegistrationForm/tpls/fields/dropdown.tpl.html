@@ -1,6 +1,7 @@
 <ng-form name="nestedForm"
     ng-init="input = getId(getValue(fieldName))">
     <select
+        id="field-{{ section.id }}-{{ field.id }}"
         name="{{ fieldName }}"
         ng-model="input"
         ng-required="field.mandatory"

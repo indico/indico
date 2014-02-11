@@ -2,6 +2,7 @@
     <div ng-switch-default>
         <ng-form name="nestedForm">
             <input type="file" nd-valid-file
+                id="field-{{ section.id }}-{{ field.id }}"
                 name="{{ fieldName }}"
                 ng-model="input"
                 ng-required="field.mandatory"

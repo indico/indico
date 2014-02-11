@@ -1,6 +1,7 @@
 <div ng-controller="BillableCtrl">
     <ng-form name="nestedForm">
         <input type="number"
+            id="field-{{ section.id }}-{{ field.id }}"
             ng-model="numberInput"
             ng-init="numberInput = getValue(fieldName)"
             name="{{ fieldName }}"

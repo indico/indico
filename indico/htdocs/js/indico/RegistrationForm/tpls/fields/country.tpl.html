@@ -1,5 +1,6 @@
 <ng-form name="nestedForm">
     <select
+        id="field-{{ section.id }}-{{ field.id }}"
         name="{{ fieldName }}"
         ng-model="userdata[fieldName]"
         ng-required="field.mandatory"

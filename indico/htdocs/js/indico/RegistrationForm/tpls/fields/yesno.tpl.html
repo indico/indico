@@ -1,6 +1,7 @@
 <div ng-controller="BillableCtrl">
     <ng-form name="nestedForm" ng-init="input = userdata[fieldName]">
         <select
+            id="field-{{ section.id }}-{{ field.id }}"
             name="{{ fieldName }}"
             ng-model="input"
             ng-required="field.required || !paymentBlocked(field, userdata)"

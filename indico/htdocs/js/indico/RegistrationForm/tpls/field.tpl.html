@@ -6,7 +6,7 @@
             <td ng-if="editMode" class="field-sortable-handle"/>
             <td ng-if="!settings.singleColumn" class="field-caption">
                 <div>
-                    <span ng-bind-html="field.caption">{{ field.caption }}</span>
+                    <label for="field-{{ section.id }}-{{ field.id }}" ng-bind-html="field.caption">{{ field.caption }}</label>
                     <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
                 </div>
             </td>

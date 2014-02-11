@@ -21,7 +21,7 @@
 
 @import 'base';
 @import 'compass';
-@import 'partials/icons'
+@import 'partials/icons';
 
 %regform-section {
     @include border-radius();
@@ -417,6 +417,10 @@
 // ============================================================================
 
 .regform-field {
+    label {
+        font-weight: normal;
+    }
+
     textarea {
         resize: none;
     }
