@@ -635,13 +635,12 @@ class LDAPGroup(Group):
         # used when checking acces to private events restricted for certain groups
         if not avatar:
             return False
-        login = None
         for aid in avatar.getIdentityList(create_identities=True):
             if aid.getAuthenticatorTag() == 'LDAP':
                 login = aid.getLogin()
-        if not login:
-            return False
-        return AuthenticatorMgr().getById('LDAP').isUserInGroup(login, self.getName())
+                if login and AuthenticatorMgr().getById('LDAP').isUserInGroup(login, self.getName()):
+                    return True
+        return False
 
     def containsMember(self, avatar):
         return 0
