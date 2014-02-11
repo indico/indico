@@ -5,7 +5,7 @@
 </%block>
 
 <%block name="content">
-    <p>Number of parcitipants: ${numRegistrants}</p>
+    <p>Number of participants: ${numRegistrants}</p>
     <table cellspacing="0" border="0">
         ${ filterOptions }
         <tr>
