@@ -34,6 +34,8 @@ files.add_url_rule('/event/<confId>/material/<materialId>/accesskey', 'materialD
 
 # Material (category)
 files.add_url_rule('/category/<categId>/material/<materialId>/', 'materialDisplay', materialDisplay.RHMaterialDisplay)
+files.add_url_rule('/category/<categId>/material/<materialId>/accesskey', 'materialDisplay-accessKey',
+                   materialDisplay.RHMaterialDisplayStoreAccessKey, methods=('POST',))
 
 # File access (event)
 files.add_url_rule(
