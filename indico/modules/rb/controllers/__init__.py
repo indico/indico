@@ -17,15 +17,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
+
 from flask import request, session
 
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface.rh.base import RHProtected
 
+from indico.core.db import db
 from indico.core.errors import AccessError
+from indico.util.i18n import _
 
 from .mixins import RoomBookingAvailabilityParamsMixin
 from .utils import rb_check_user_access, FormMode
+from ..models.rooms import Room
+from ..models.room_bookable_times import BookableTime
+from ..models.room_nonbookable_dates import NonBookableDate
 
 
 class RHRoomBookingProtected(RHProtected):
@@ -56,224 +63,138 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
     def _checkProtection(self):
         RHRoomBookingProtected._checkProtection(self)
 
-    # TODO: naming of variables
-    def _clearSessionState(self):
-        session.pop('rbActionSucceeded', None)
-        session.pop('rbTitle', None)
-        session.pop('rbDescription', None)
-        session.pop('rbDeletionFailed', None)
-        session.pop('rbFormMode', None)
-        session.pop('rbCandDataInSession', None)
-        session.pop('rbShowErrors', None)
-        session.pop('rbErrors', None)
-        session.pop('rbThereAreConflicts', None)
-        session.pop('rbRoomID', None)
-        session.pop('rbRoomLocation', None)
-        session.pop('rbResvID', None)
-
     # Room
 
-    def _saveRoomCandidateToSession(self, room):
-        if self._formMode == FormMode.MODIF:
-            session['rbRoomID'] = room.id
-        session['rbRoomCand'] = room
+    def _checkAndSetParams(self):
+        errors, c, f = [], self._room, request.form
 
-    def _getErrorsOfRoomCandidate(self, room):
-        errors = []
-        #if not c.site:
-        #    errors.append( "Site can not be blank" )
-        if not c.floor:
-            errors.append( "Floor can not be blank" )
-        if not c.roomNr:
-            errors.append( "Room number can not be blank" )
-        if not c.responsibleId:
-            errors.append( "Room must have a responsible person" )
-        if not c.building or c.building < 1:
-            errors.append( "Building must be a positive integer" )
-        if not c.capacity or c.capacity < 1:
-            errors.append( "Capacity must be a positive integer" )
+        def testAndSet(ls):
+            for l in ls:
+                p, e, extra, t = l + [None]*(4 - len(l))
+                v = f.get(p)
+                setattr(self._room, p, v)
+                try:
+                    if t:
+                        v = t(v)
+                        setattr(self._room, p, v)
+                    if extra and not extra(v):
+                        raise RuntimeError
+                except Exception:
+                    errors.append(e)
 
-        try:
-            if c.longitude and float(c.longitude) < 0:
-                errors.append("Longitude must be a positive number")
-        except ValueError:
-            errors.append("Longitude must be a number")
+        not_empty, positive, on, empty_or_int, empty_or_positive = (
+            lambda e: e != '',
+            lambda e: e > 0,
+            lambda e: e == 'on',
+            lambda e: int(e) if e else 0,
+            lambda e: True if e == '' else float(e) > 0
+        )
+        testAndSet([
+            ['name'],
+            ['floor', _('Floor can not be blank'), not_empty],
+            ['number', _('Room number can not be blank'), not_empty],
+            ['building', _('Building can not be blank'), not_empty],
+            ['owner_id', _('Room must have a responsible person'), not_empty],
+            ['capacity', _('Capacity must be a positive integer'), positive, int],
+            ['longitude', _('Longitude must be a positive number'), empty_or_positive],
+            ['latitude', _('Latitude must be a positive number'), empty_or_positive],
+            ['notification_for_start', _('Notification for start'
+             ' must be nonnegative number. Put zero to cancel.'), lambda e: e >= 0, int],
+            ['max_advance_days', _('Maximum days before a'
+             ' reservation must be a positive number'), positive, int],
+            ['surface_area', _('Surface area must be a positive number'), lambda e: e >= 0, empty_or_int],
+            ['is_active', '', None, on],
+            ['is_reservable', '', None, on],
+            ['notification_for_end', '', None, on],
+            ['reservations_need_confirmation', '', None, on],
+            ['notification_for_responsible', '', None, on],
+            ['notification_for_assistance', '', None, on],
+            ['comments']
+        ])
 
-        try:
-            if c.latitude and float(c.latitude) < 0:
-                errors.append("Latitude must be a positive number")
-        except ValueError:
-            errors.append("Latitude must be a number")
+        # set name: building-floor-name
+        self._room.updateName()
 
-        try:
-            for dailyBookablePeriod in c.getDailyBookablePeriods():
-                if datetime.strptime(dailyBookablePeriod.getStartTime(), "%H:%M").time() > datetime.strptime(dailyBookablePeriod.getEndTime(), "%H:%M").time():
-                    errors.append("period start time should be before end time in daily availability period field")
-                    break
-        except ValueError:
-            errors.append("Daily availability periods must be in correct time format 'HH:MM'")
+        # bookable-times
+        self._bookable_times, bookable_times_count = [], f.get('dailyBookablePeriodCounter', type=int)
+        exist_error, format_error, valid_error = False, False, False
+        for i in xrange(bookable_times_count):
+            try:
+                s, e = f.get('startTimeDailyBookablePeriod{}'.format(i)), f.get('endTimeDailyBookablePeriod{}'.format(i))
+                if s and e:
+                    start_time = datetime.strptime(s, '%H:%M').time()
+                    end_time = datetime.strptime(e, '%H:%M').time()
+                    if start_time < end_time:
+                        self._bookable_times.append(BookableTime(start_time=start_time, end_time=end_time))
+                    else:
+                        valid_error = True
+                elif s + e:
+                    exist_error = True
+            except ValueError:
+                format_error = True
 
-        params = self._params
-        if ( params['largePhotoPath'] != '' ) ^ ( params['smallPhotoPath'] != '' ):
-            errors.append( "Either upload both photos or none")
+        if exist_error:
+            errors.append(_('Daily availability periods must have start and end.'))
+
+        if format_error:
+            errors.append(_('Daily availability periods must be '
+                            'in correct time format \'HH:MM\''))
+
+        if valid_error:
+            errors.append(_('Period start time should come before end time '
+                            'in daily availability period field'))
+
+        # nonbookable_dates
+        self._nonbookable_dates, nonbookable_dates_count = [], f.get('nonBookablePeriodCounter', type=int)
+        exist_error, format_error, valid_error = False, False, False
+        for i in xrange(nonbookable_dates_count):
+            try:
+                s, e = f.get('startDateNonBookablePeriod{}'.format(i)), f.get('endDateNonBookablePeriod{}'.format(i))
+                if s and e:
+                    st, et = datetime.strptime(s, '%d/%m/%Y %H:%M'), datetime.strptime(e, '%d/%m/%Y %H:%M')
+                    if st < et:
+                        self._nonbookable_dates.append(NonBookableDate(start_date=st, end_date=et))
+                    else:
+                        valid_error = True
+                elif s + e:
+                    exist_error = True
+            except ValueError:
+                format_error = True
+
+        if exist_error:
+            errors.append(_('Unavailable dates must have start and end.'))
+        if format_error:
+            errors.append(_('Unavailable dates must be in the form of \'DD/MM/YYYY HH:MM\''))
+        if valid_error:
+            errors.append(_('End must be later than start date in unavailable dates'))
+
+        self._equipments = []
+        for eq in self._location.getEquipments():
+            if f.get('equ_{}'.format(eq.name), None) == 'on':
+                self._equipments.append(eq)
+
+        if not self._bookable_times and errors:
+            self._bookable_times.append(BookableTime(start_time=None, end_time=None))
+            self._nonbookable_dates.append(NonBookableDate(start_date=None, end_date=None))
+
+        # if (request.files.get('largePhotoPath') != '') ^ (request.files.get('smallPhotoPath') != ''):
+        #     errors.append(_('Either upload both photos or none'))
 
         # Custom attributes
-        manager = CrossLocationQueries.getCustomAttributesManager( c.locationName )
-        for ca in manager.getAttributes( location = c.locationName ):
-            if ca['name'] == 'notification email' :
-                if c.customAtts[ 'notification email' ] and not validMail(c.customAtts['notification email']) :
-                    errors.append( "Invalid format for the notification email" )
-            if ca['required']:
-                if not c.customAtts.has_key( ca['name'] ): # not exists
-                    errors.append( ca['name'] + " can not be blank" )
-                elif not c.customAtts[ ca['name'] ]:       # is empty
-                    errors.append( ca['name'] + " can not be blank" )
+        # for attr in self._location.getAttributes():
+        #     if attr['name'] == 'notification email':
+        #         if c.customAtts['notification email'] and not validMail(c.customAtts['notification email']):
+        #             errors.append(_('Invalid format for the notification email'))
+        #     if attr['required']:
+        #         if attr['name'] not in c.customAtts and c.customAtts[attr['name']]:
+        #             errors.append(_('{0} can not be blank'.format(attr['name']))
 
         return errors
 
-    # TODO: check because this should be handled by sqlalchemy
-    def _loadRoomCandidateFromDefaults(self, candRoom):
-        candRoom.isActive = True
-
-        candRoom.building = None
-        candRoom.floor = ''
-        candRoom.roomNr = ''
-        candRoom.longitude = ''
-        candRoom.latitude = ''
-
-        candRoom.capacity = 20
-        candRoom.site = ''
-        candRoom.division = None
-        candRoom.isReservable = True
-        candRoom.resvsNeedConfirmation = False
-        candRoom.resvStartNotification = False
-        candRoom.resvStartNotificationBefore = None
-        candRoom.resvEndNotification = False
-        candRoom.resvNotificationToResponsible = False
-        candRoom.resvNotificationAssistance = False
-        candRoom.photoId = None
-        candRoom.externalId = None
-
-        candRoom.telephone = ''      # str
-        candRoom.surfaceArea = None
-        candRoom.maxAdvanceDays = 0
-        candRoom.whereIsKey = ''
-        candRoom.comments = ''
-        candRoom.responsibleId = None
-
-    def _loadRoomCandidateFromSession(self, candRoom):
-        sessionCand = session['rbRoomCand']
-
-        candRoom.name = sessionCand["name"]
-        candRoom.site = sessionCand["site"]
-        candRoom.building = intd(sessionCand["building"])
-        candRoom.floor = sessionCand["floor"]
-        candRoom.roomNr = sessionCand["roomNr"]
-        candRoom.latitude = sessionCand["latitude"]
-        candRoom.longitude = sessionCand["longitude"]
-
-        candRoom.isActive = bool(sessionCand["isActive"])
-        candRoom.isReservable = bool(sessionCand["isReservable"])
-        candRoom.resvsNeedConfirmation = bool(sessionCand["resvsNeedConfirmation"])
-        candRoom.resvStartNotification = sessionCand["resvStartNotification"]
-        candRoom.resvStartNotificationBefore = sessionCand["resvStartNotificationBefore"]
-        candRoom.resvEndNotification = bool(sessionCand["resvEndNotification"])
-        candRoom.resvNotificationToResponsible = bool(sessionCand["resvNotificationToResponsible"])
-        candRoom.resvNotificationAssistance = bool(sessionCand["resvNotificationAssistance"])
-
-        candRoom.responsibleId = sessionCand["responsibleId"]
-        candRoom.whereIsKey = sessionCand["whereIsKey"]
-        candRoom.telephone = sessionCand["telephone"]
-
-        candRoom.capacity = intd(sessionCand["capacity"])
-        candRoom.division = sessionCand["division"]
-        candRoom.surfaceArea = intd(sessionCand["surfaceArea"])
-        candRoom.maxAdvanceDays = intd(sessionCand["maxAdvanceDays"])
-        candRoom.comments = sessionCand["comments"]
-
-        candRoom.setEquipment(sessionCand["equipment"])
-
-        manager = CrossLocationQueries.getCustomAttributesManager( candRoom.locationName )
-        for ca in manager.getAttributes( location = candRoom.locationName ):
-            value = sessionCand['cattrs'].get(ca['name'])
-            if value != None:
-                if ca['name'] == 'notification email' :
-                    candRoom.customAtts[ 'notification email' ] = setValidEmailSeparators(value)
-                else :
-                    candRoom.customAtts[ ca['name'] ] = value
-
-
-    def _loadRoomCandidateFromParams( self, candRoom, params ):
-        candRoom.name = params.get( "name" )
-        candRoom.site = params.get( "site" )
-        candRoom.building = intd( params.get( "building" ) )
-        candRoom.floor = params.get( "floor" )
-        candRoom.roomNr = params.get( "roomNr" )
-        candRoom.latitude = params.get( "latitude" )
-        candRoom.longitude = params.get( "longitude" )
-
-        candRoom.isActive = bool( params.get( "isActive" ) ) # Safe
-        candRoom.isReservable = bool( params.get( "isReservable" ) ) # Safe
-        candRoom.resvsNeedConfirmation = bool( params.get( "resvsNeedConfirmation" ) ) # Safe
-        candRoom.resvStartNotification = bool( params.get( "resvStartNotification" ) )
-        tmp = params.get("resvStartNotificationBefore")
-        candRoom.resvStartNotificationBefore = intd(tmp) if tmp else None
-        candRoom.resvEndNotification = bool( params.get( "resvEndNotification" ) )
-        candRoom.resvNotificationToResponsible = bool(params.get('resvNotificationToResponsible'))
-        candRoom.resvNotificationAssistance = bool(params.get('resvNotificationAssistance'))
-
-
-        candRoom.responsibleId = params.get( "responsibleId" )
-        if candRoom.responsibleId == "None":
-            candRoom.responsibleId = None
-        candRoom.whereIsKey = params.get( "whereIsKey" )
-        candRoom.telephone = params.get( "telephone" )
-
-        candRoom.capacity = intd( params.get( "capacity" ) )
-        candRoom.division = params.get( "division" )
-        candRoom.surfaceArea = intd( params.get( "surfaceArea" ) )
-        candRoom.comments = params.get( "comments" )
-        candRoom.maxAdvanceDays = intd(params.get( "maxAdvanceDays" ))
-        candRoom.clearNonBookableDates()
-        candRoom.clearDailyBookablePeriods()
-
-        for periodNumber in range(int(params.get("nonBookablePeriodCounter"))):
-            if params.get("startDateNonBookablePeriod" + str(periodNumber)):
-                # adding formated data to be compatible with the old DB version
-                try:
-                    candRoom.addNonBookableDates(datetime.strptime(params.get("startDateNonBookablePeriod" + str(periodNumber)), '%d/%m/%Y %H:%M'),
-                                             datetime.strptime(params.get("endDateNonBookablePeriod" + str(periodNumber)), '%d/%m/%Y %H:%M'))
-                except ValueError:
-                    continue
-
-        for periodNumber in range(int(params.get("dailyBookablePeriodCounter"))):
-            if params.get("startTimeDailyBookablePeriod" + str(periodNumber)):
-                try:
-                    cStartTime = datetime.strptime(params.get("startTimeDailyBookablePeriod" + str(periodNumber)), "%H:%M")
-                    cEndTime = datetime.strptime(params.get("endTimeDailyBookablePeriod" + str(periodNumber)), "%H:%M")
-                    candRoom.addDailyBookablePeriod(cStartTime.strftime("%H:%M"), cEndTime.strftime("%H:%M"))
-                except ValueError:
-                    continue
-
-        eqList = []
-        vcList = []
-        for k, v in params.iteritems():
-            if k.startswith( "equ_" ) and v:
-                eqList.append(k[4:len(k)])
-            if k.startswith( "vc_" ) and v:
-                vcList.append(k[3:])
-        candRoom.setEquipment( eqList )
-        candRoom.setAvailableVC(vcList)
-
-        for k, v in params.iteritems():
-            if k.startswith( "cattr_" ):
-                attrName = k[6:len(k)]
-                if attrName == 'notification email' :
-                    candRoom.customAtts['notification email'] = setValidEmailSeparators(v)
-                else :
-                    candRoom.customAtts[attrName] = v
-
     # Resv
+
+    def _checkAndSetParamsForReservation(self):
+        pass
 
     def _saveResvCandidateToSession( self, c ):
         if self._formMode == FormMode.MODIF:
