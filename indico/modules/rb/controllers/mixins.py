@@ -17,9 +17,21 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime as DT
+
+from indico.core.errors import NoReportError
+from indico.util.i18n import _
+
+from ..models.utils import (
+    get_checked_param_dict,
+    is_false_valued_dict,
+    is_none_valued_dict
+)
+
 
 class RoomBookingAvailabilityParamsMixin:
-    def _checkParamsRepeatingPeriod( self, params ):
+
+    def _checkParamsRepeatingPeriod(self, f):
         """
         Extracts startDT, endDT and repeatability
         from the form, if present.
@@ -27,103 +39,41 @@ class RoomBookingAvailabilityParamsMixin:
         Assigns these values to self, or Nones if values
         are not present.
         """
-
-        sDay = params.get( "sDay" )
-        eDay = params.get( "eDay" )
-        sMonth = params.get( "sMonth" )
-        eMonth = params.get( "eMonth" )
-        sYear = params.get( "sYear" )
-        eYear = params.get( "eYear" )
-
-        if sDay and len( sDay.strip() ) > 0:
-            sDay = int( sDay.strip() )
-
-        if eDay and len( eDay.strip() ) > 0:
-            eDay = int( eDay.strip() )
-
-        if sMonth and len( sMonth.strip() ) > 0:
-            sMonth = int( sMonth.strip() )
-
-#        if sYear and sMonth and sDay:
-#            # For format checking
-#            try:
-#                time.strptime(sDay.strip() + "/" + sMonth.strip() + "/" + sYear.strip() , "%d/%m/%Y")
-#            except ValueError:
-#                raise NoReportError(_("The Start Date must be of the form DD/MM/YYYY and must be a valid date."))
-
-        if eMonth and len( eMonth.strip() ) > 0:
-            eMonth = int( eMonth.strip() )
-
-        if sYear and len( sYear.strip() ) > 0:
-            sYear = int( sYear.strip() )
-
-        if eYear and len( eYear.strip() ) > 0:
-            eYear = int( eYear.strip() )
-
-#        if eYear and eMonth and eDay:
-#            # For format checking
-#            try:
-#                time.strptime(eDay.strip() + "/" + eMonth.strip() + "/" + eYear.strip() , "%d/%m/%Y")
-#            except ValueError:
-#                raise NoReportError(_("The End Date must be of the form DD/MM/YYYY and must be a valid date."))
-
-
-        sTime = params.get( "sTime" )
-        if sTime and len( sTime.strip() ) > 0:
-            sTime = sTime.strip()
-        eTime = params.get( "eTime" )
-        if eTime and len( eTime.strip() ) > 0:
-            eTime = eTime.strip()
-
-        # process sTime and eTime
-        if sTime and eTime:
-
+        # time
+        times = get_checked_param_dict(f, ['sTime', 'eTime'])
+        is_time_supplied = not is_false_valued_dict(times)
+        if is_time_supplied:
             try:
-                time.strptime(sTime, "%H:%M")
+                times = dict((k, DT.strptime(v, '%H:%M').time()) for k, v in times.items())
             except ValueError:
-                raise NoReportError(_("The Start Time must be of the form HH:MM and must be a valid time."))
+                raise NoReportError(_('The Start Time must be of the form \'HH:MM\''
+                                      ' and must be a valid time.'))
 
-            t = sTime.split( ':' )
-            sHour = int( t[0] )
-            sMinute = int( t[1] )
+        # date
+        date_keys = [i+j for i in 's e'.split() for j in 'Year Month Day'.split()]
+        dates = get_checked_param_dict(f, date_keys, converter=int)
+        is_date_supplied = not is_none_valued_dict(dates)
+        def get_date_from_dict(initial):
+            return DT(*(dates[initial + p] for p in 'Year Month Day'.split())).date()
 
-            try:
-                time.strptime(eTime, "%H:%M")
-            except ValueError:
-                raise NoReportError(_("The End Time must be of the form HH:MM and must be a valid time."))
+        # combine date and time
+        self._today = f.get('day') == 'today'
+        self._start_date = self._end_date = None
+        if is_date_supplied and is_time_supplied:
+            self._start_date = DT.combine(get_date_from_dict('s'), times['sTime'])
+            self._end_date = DT.combine(get_date_from_dict('e'), times['eTime'])
+        elif is_date_supplied:
+            self._start_date = DT.combine(get_date_from_dict('s'), DT.min.time())
+            self._end_date = DT.combine(get_date_from_dict('e'), DT.max.time())
+        elif is_time_supplied:
+            self._start_date = DT.combine(DT.min.date(), times['sTime'])
+            self._end_date = DT.combine(DT.max.date(), times['eTime'])
+        elif self._today:
+            self._start_date = DT.combine(DT.today().date(), DT.min.time())
+            self._end_date = DT.combine(DT.today().date(), DT.max.time())
 
-            t = eTime.split( ':' )
-            eHour = int( t[0] )
-            eMinute = int( t[1] )
-
-        repeatability = params.get( "repeatability" )
-        if repeatability and len( repeatability.strip() ) > 0:
-            if repeatability == "None":
-                repeatability = None
-            else:
-                repeatability = int( repeatability.strip() )
-
-        self._startDT = None
-        self._endDT = None
-        self._repeatability = repeatability
-
-        if sYear and sMonth and sDay and sTime and eYear and eMonth and eDay and eTime:
-            # Full period specified
-            self._startDT = datetime( sYear, sMonth, sDay, sHour, sMinute )
-            self._endDT = datetime( eYear, eMonth, eDay, eHour, eMinute )
-        elif sYear and sMonth and sDay and eYear and eMonth and eDay:
-            # There are no times
-            self._startDT = datetime( sYear, sMonth, sDay, 0, 0, 0 )
-            self._endDT = datetime( eYear, eMonth, eDay, 23, 59, 59 )
-        elif sTime and eTime:
-            # There are no dates
-            self._startDT = datetime( 1990, 1, 1, sHour, sMinute )
-            self._endDT = datetime( 2030, 12, 31, eHour, eMinute )
-        self._today=False
-        if params.get( "day", "" ) == "today":
-            self._today=True
-            self._startDT = datetime.today().replace(hour=0,minute=0,second=0)
-            self._endDT = self._startDT.replace(hour=23,minute=59,second=59)
+        # repeat
+        self._repeatability = get_checked_param_dict(f, ['repeat_unit', 'repeat_step'], converter=int)
 
 
 class AttributeSetterMixin():
