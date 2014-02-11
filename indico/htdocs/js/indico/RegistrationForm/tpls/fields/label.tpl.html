@@ -1,5 +1,5 @@
 <div class="field-input-only-content label-text">
-    <span> <span ng-bind-html="field.caption">{{field.caption}}</span> <br> <small ng-bind-html="field.description">{{ field.description }}</small> </span>
+    <span> <span ng-bind-html="field.caption">{{field.caption}}</span> <br> <small ng-bind-html="field.description" class="field-description">{{ field.description }}</small> </span>
     <span class="label-price">
         <span ng-show="field.billable" class="regFormPrice">{{ field.price }}</span>
         <span ng-if="field.billable">

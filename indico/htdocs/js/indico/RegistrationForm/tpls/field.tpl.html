@@ -4,20 +4,20 @@
         ng-class="{disabled: field.disabled, editable: editMode}">
         <tr>
             <td ng-if="editMode" class="field-sortable-handle"/>
-            <td ng-if="settings.caption && !settings.descriptionInCaption" class="field-caption">
+            <td ng-if="!settings.singleColumn" class="field-caption">
                 <div>
                     <span ng-bind-html="field.caption">{{ field.caption }}</span>
                     <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
                 </div>
             </td>
 
-            <td ng-if="settings.caption && !settings.descriptionInCaption">
+            <td ng-if="!settings.singleColumn">
                 <div ng-include="tplInput" class="field-input"></div>
                 <div ng-bind-html="field.description" class="field-description">
                     {{ field.description }}
                 </div>
             </td>
-            <td ng-if="!settings.caption || settings.descriptionInCaption" ng-include="tplInput" class="field-input" colspan="2"></td>
+            <td ng-if="settings.singleColumn" ng-include="tplInput" class="field-input" colspan="2"></td>
             <td ng-if="editMode" class="field-actions">
                 <a ng-if="canBeDeleted(field)"
                     ng-click="fieldApi.removeField(field)"

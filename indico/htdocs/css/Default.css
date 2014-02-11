@@ -6820,6 +6820,10 @@ span.num_events {
     padding-left: 5px;
 }
 
+.noPlacesLeft {
+    color: red;
+}
+
 .roleSmall {
     font-weight: bold;
     padding-left: 5px;

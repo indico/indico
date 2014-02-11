@@ -8,8 +8,9 @@
                 ng-required="field.mandatory"
                 ng-disabled="!hasPlacesLeft(field, userdata[getName(field.id)], field.input) || paymentBlocked(field, userdata)"/>
             <div>
-                {{field.caption}}
+                <span ng-bind-html="field.caption">{{field.caption}}</span>
                 <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
+                <br><small ng-bind-html="field.description" class="field-description">{{ field.description }}</small>
             </div>
         </div>
         <span ng-show="validationStarted && nestedForm.$invalid" class="error-message-tag">
@@ -27,9 +28,9 @@
             <span ng-switch-when="true" class="placesLeft">
                 [{{getNoPlacesLeft(field, userdata[getName(field.id)], field.input)}} {{ 'place(s) left' | i18n }}]
             </span>
-            <font ng-switch-when="false" color="red">
+            <span ng-switch-when="false" class="noPlacesLeft">
                 ({{ 'no places left' | i18n }})
-            </font>
+            </span>
         </span>
     </div>
 </div>
