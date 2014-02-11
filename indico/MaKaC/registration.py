@@ -4364,6 +4364,7 @@ class SocialEventItem(Persistent, Fossilizable):
     def _cmpCaption(se1, se2):
         return cmp(se1.getCaption().lower(), se2.getCaption().lower())
 
+
 class SocialEventForm(BaseForm, Fossilizable):
 
     fossilizes(IRegFormSocialEventSectionFossil)

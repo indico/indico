@@ -535,9 +535,9 @@ ndRegForm.directive("ndSocialEventSection", function() {
 
             scope.getMaxRegistrations = function(item) {
                 if (item.placesLimit !== 0) {
-                    return Math.min(item.maxPlace, item.noPlacesLeft) + scope.getNoPlaces(item, scope.userdata);
+                    return Math.min(item.maxPlace + 1, item.noPlacesLeft + scope.getNoPlaces(item, scope.userdata));
                 } else {
-                    return item.maxPlace;
+                    return item.maxPlace + 1;
                 }
             };
 

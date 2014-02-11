@@ -31,12 +31,13 @@
             </font>
         </td>
         <td ng-if="hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent')">
-            <select name="places-{{ item.id }}"
-                ng-init="input.noPlaces = getNoPlaces(item, userdata) + 1"
+            <select
+                ng-init="input.noPlaces = getNoPlaces(item, userdata) || 1"
                 ng-model="input.noPlaces"
                 ng-disabled="paymentBlocked(item, userdata) || (section.selectionType == 'unique' && anyBillableEventPayed(userdata))"
-                ng-options="n as n -1 for n in [] | range:1:getMaxRegistrations(item) + 1">
+                ng-options="n for n in [] | range:1:getMaxRegistrations(item)">
             </select>
+            <input type="hidden" name="places-{{ item.id }}" value="{{ input.noPlaces }}">
             <span ng-show="hasPlacesLimit(item, getNoPlaces(item, userdata), 'socialEvent')" class="placesLeft">
                 [{{ getNoPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent')}} {{ 'place(s) left' | i18n }}]
             </span>
