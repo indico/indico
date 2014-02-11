@@ -30,7 +30,7 @@ from flask import url_for as _url_for
 from flask import send_file as _send_file
 from werkzeug.datastructures import Headers, FileStorage
 from werkzeug.exceptions import NotFound, HTTPException
-from werkzeug.routing import BaseConverter, UnicodeConverter, RequestRedirect
+from werkzeug.routing import BaseConverter, UnicodeConverter, RequestRedirect, BuildError
 from werkzeug.urls import url_parse
 
 from indico.util.caching import memoize
@@ -129,7 +129,10 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None):
         # Ugly hack to get non-list arguments unless they are used multiple times.
         # This is necessary since passing a list for an URL path argument breaks things.
         args = dict((k, v[0] if len(v) == 1 else v) for k, v in request.args.iterlists())
-        target = _url_for('%s.%s' % (blueprint.name, endpoint), **args)
+        try:
+            target = _url_for('%s.%s' % (blueprint.name, endpoint), **args)
+        except BuildError:
+            raise NotFound
         return redirect(target, 302 if app.debug else 301)
     return _redirect
 
