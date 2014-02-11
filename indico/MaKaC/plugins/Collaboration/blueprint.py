@@ -56,6 +56,8 @@ blueprint.add_url_rule('/Collaboration/<path:filepath>', 'htdocs', RHCollaborati
 
 # we can't use make_compat_blueprint here because the old url doesn't end in .py
 compat = IndicoBlueprint('compat_collaboration', __name__)
+compat.add_url_rule('/collaborationDisplay.py', 'collaborationDisplay',
+                    make_compat_redirect_func(blueprint, 'collaborationDisplay'))
 compat.add_url_rule('/Collaboration/elecAgree', 'elecAgree',
                     make_compat_redirect_func(blueprint, 'elecAgree'))
 compat.add_url_rule('/Collaboration/elecAgreeForm', 'elecAgreeForm',
