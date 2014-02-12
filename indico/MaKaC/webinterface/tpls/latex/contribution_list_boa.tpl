@@ -57,7 +57,7 @@
     <%block name="book_body">
         % for contrib in contribs:
             % if contrib.canAccess(aw):
-                \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{100} / ${_("Report of Abstracts")}}
+                \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{300pt} / ${_("Report of Abstracts")}}
                 \addcontentsline{toc}{chapter}{${contrib.getTitle() | latex_escape}}
 
                 \vspace{3em}

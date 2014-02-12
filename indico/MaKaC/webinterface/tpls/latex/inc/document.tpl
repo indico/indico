@@ -23,7 +23,7 @@
 \usepackage{sectsty} %% style sections
 \usepackage{xstring}
 \usepackage[inline]{enumitem}
-
+\usepackage[breakall]{truncate}
 
 <%block name="header_extra">
 </%block>
@@ -41,9 +41,7 @@
     %% helper commands
 
     \newcommand{\truncateellipses}[2]{
-       \StrLeft{#1}{#2}[\truncated]
-       \truncated
-       \IfStrEq{\truncated}{#1}{}{\dots}
+       \truncate{#2}{#1}
     }
 
     %% remove section heading numbering

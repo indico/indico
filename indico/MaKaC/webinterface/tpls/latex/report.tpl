@@ -29,8 +29,8 @@
 
     % for item in items:
         \newpage
-        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{20} / ${title}}
-        \fancyhead[R]{\small \rmfamily \color{gray} \truncateellipses{${item.getTitle() | latex_escape}}{45}}
+        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{80pt} / ${title}}
+        \fancyhead[R]{\small \rmfamily \color{gray} \truncateellipses{${item.getTitle() | latex_escape}}{150pt}}
         \addcontentsline{toc}{section}{${item.getTitle() | latex_escape}}
 
         % if doc_type == 'abstract':
