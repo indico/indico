@@ -63,6 +63,7 @@ from indico.modules.scheduler.tasks.suggestions import CategorySuggestionTask
 from indico.modules import ModuleHolder
 from indico.util.redis import avatar_links
 from indico.util.redis import client as redis_client
+from indico.util.string import fix_broken_string
 
 from indico.modules.scheduler import Client
 
@@ -943,6 +944,27 @@ def updateAvatarEmails(dbi, withRBDB, prevVersion):
             dbi.commit()
         j += 1
     dbi.commit()
+
+
+@since('1.2')
+def fixIndexesEncoding(dbi, withRBDB, prevVersion):
+    """
+    Fix indexes encoding. They may be in unicode and they has to be encoded in utf-8
+    """
+
+    INDEXES = ["name", "surName", "organisation"]
+
+    ih = IndexesHolder()
+    for idx_name in INDEXES:
+        idx = ih.getById(idx_name)
+        words = idx._words
+        for key in words.iterkeys():
+            newKey = fix_broken_string(key)
+            values = words[key]
+            del words[key]
+            words[newKey] = values
+        idx.setIndex(words)
+        dbi.commit()
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
