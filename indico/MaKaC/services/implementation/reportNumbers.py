@@ -17,12 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.services.implementation.base import ParameterManager, LoggedOnlyService
+from MaKaC.services.implementation.base import ParameterManager, ServiceBase
 from MaKaC.services.implementation.contribution import ContributionModifBase
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from indico.core.config import Config
 
-class GetReportNumberSystems(LoggedOnlyService):
+
+class GetReportNumberSystems(ServiceBase):
 
     def _getAnswer(self):
         systems = Config.getInstance().getReportNumberSystems()
