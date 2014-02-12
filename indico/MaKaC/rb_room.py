@@ -29,13 +29,13 @@ from MaKaC.errors import MaKaCError
 from datetime import datetime, timedelta
 
 
-class RoomBase( object ):
+class RoomBase(object):
     """
     Generic room, Data Access Layer independant.
     Represents physical room suitable for meetings and/or conferences.
     """
 
-    def __init__( self ):
+    def __init__(self):
         """
         Do NOT insert object into database in the constructor.
         """
@@ -43,25 +43,25 @@ class RoomBase( object ):
         self._photoId = None
         self._locationName = None
 
-    def insert( self ):
+    def insert(self):
         """
         Inserts room into database
         """
         self.checkIntegrity()
 
-    def update( self ):
+    def update(self):
         """
         Updates room in database
         """
         self.checkIntegrity()
 
-    def remove( self ):
+    def remove(self):
         """
         Removes room from database
         """
         pass
 
-    def notifyAboutResponsibility( self ):
+    def notifyAboutResponsibility(self):
         """
         FINAL (not intented to be overriden)
         Notifies (e-mails) previous and new responsible about
@@ -72,7 +72,7 @@ class RoomBase( object ):
     # Query ------------------------------------------------------------------
 
     @staticmethod
-    def getRooms( *args, **kwargs ):
+    def getRooms(*args, **kwargs):
         """
         Returns list of rooms meeting specified conditions.
 
@@ -140,9 +140,9 @@ class RoomBase( object ):
         """
         # Simply redirect to the plugin
         from MaKaC.rb_factory import Factory
-        return Factory.newRoom().getRooms( **kwargs )
+        return Factory.newRoom().getRooms(**kwargs)
 
-    def getReservations( self, resvExample = None, archival = None ):
+    def getReservations(self, resvExample=None, archival=None):
         """
         FINAL (not intented to be overriden)
         Returns reservations of this room, meeting specified criteria.
@@ -151,9 +151,9 @@ class RoomBase( object ):
         # Simply redirect to the plugin
         from MaKaC.rb_reservation import ReservationBase
 
-        return ReservationBase.getReservations( resvExample = resvExample, rooms = [self], archival = archival )
+        return ReservationBase.getReservations(resvExample=resvExample, rooms=[self], archival=archival)
 
-    def getLiveReservations( self, resvExample = None ):
+    def getLiveReservations(self, resvExample=None):
         """
         FINAL (not intented to be overriden)
         Returns valid, non archival reservations of this room,
@@ -162,94 +162,94 @@ class RoomBase( object ):
         from MaKaC.rb_factory import Factory
         from MaKaC.rb_reservation import ReservationBase
 
-        if resvExample == None:
+        if resvExample is None:
             resvExample = Factory.newReservation()
         resvExample.isCancelled = False
         resvExample.isRejected = False
 
-        return ReservationBase.getReservations( resvExample = resvExample,
-                                                rooms = [self], archival = False )
+        return ReservationBase.getReservations(resvExample=resvExample,
+                                               rooms=[self], archival=False)
 
-    def isAvailable( self, potentialReservation ):
+    def isAvailable(self, potentialReservation):
         """
         FINAL (not intented to be overriden)
         Checks whether the room is available for the potentialReservation.
         potentialReservation is of type ReservationBase. It specifies the period.
         """
-        if potentialReservation.getCollisions( boolResult = True ):
+        if potentialReservation.getCollisions(boolResult=True):
             return False
         return True
 
-    def getResponsible( self ):
+    def getResponsible(self):
         """
         FINAL (not intented to be overriden)
         Returns responsible person (Avatar object).
         """
-        avatar = AvatarHolder().getById( self.responsibleId )#match( { 'id': self.responsibleId } )[0]
+        avatar = AvatarHolder().getById(self.responsibleId)  # match( { 'id': self.responsibleId } )[0]
 
         return avatar
 
     # Statistical ------------------------------------------------------------
 
     @staticmethod
-    def getNumberOfRooms( **kwargs ):
+    def getNumberOfRooms(**kwargs):
         """
         FINAL (not intented to be overriden)
         Returns total number of rooms in database.
         """
-        name = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
+        name = kwargs.get('location', Location.getDefaultLocation().friendlyName)
         location = Location.parse(name)
         return location.factory.newRoom().getNumberOfRooms(location=name)
 
     @staticmethod
-    def getNumberOfActiveRooms( **kwargs ):
+    def getNumberOfActiveRooms(**kwargs):
         """
         FINAL (not intented to be overriden)
         Returns number of rooms that are active (not logicaly deleted).
         """
-        name = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
+        name = kwargs.get('location', Location.getDefaultLocation().friendlyName)
         location = Location.parse(name)
         return location.factory.newRoom().getNumberOfActiveRooms(location=name)
 
     @staticmethod
-    def getNumberOfReservableRooms( **kwargs ):
+    def getNumberOfReservableRooms(**kwargs):
         """
         FINAL (not intented to be overriden)
         Returns number of rooms which can be reserved.
         """
-        name = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
+        name = kwargs.get('location', Location.getDefaultLocation().friendlyName)
         location = Location.parse(name)
         return location.factory.newRoom().getNumberOfReservableRooms(location=name)
 
     @staticmethod
-    def getTotalSurfaceAndCapacity( **kwargs ):
+    def getTotalSurfaceAndCapacity(**kwargs):
         """
         FINAL (not intented to be overriden)
         Returns (total_surface, total_capacity) of all Active rooms.
         """
-        name = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
+        name = kwargs.get('location', Location.getDefaultLocation().friendlyName)
         location = Location.parse(name)
         roomEx = location.factory.newRoom()
         roomEx.isActive = True
         roomEx.isReservable = True
-        rooms = CrossLocationQueries.getRooms( roomExample = roomEx, location = name )
+        rooms = CrossLocationQueries.getRooms(roomExample=roomEx, location=name)
         totalSurface, totalCapacity = 0, 0
         for r in rooms:
             if r.surfaceArea:
                 totalSurface += r.surfaceArea
             if r.capacity:
                 totalCapacity += r.capacity
-        return ( totalSurface, totalCapacity )
+        return (totalSurface, totalCapacity)
 
     @staticmethod
-    def getAverageOccupation( **kwargs ):
+    def getAverageOccupation(**kwargs):
         """
         FINAL (not intented to be overriden)
         Returns float <0, 1> representing how often - on the avarage -
         the rooms are booked during the working hours. (1 == all the time, 0 == never).
         """
 
-        name = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
+        name = kwargs.get('location', Location.getDefaultLocation().friendlyName)
 
         # Get active, publically reservable rooms
         from MaKaC.rb_factory import Factory
@@ -257,41 +257,40 @@ class RoomBase( object ):
         roomEx.isActive = True
         roomEx.isReservable = True
 
-        rooms = CrossLocationQueries.getRooms( roomExample = roomEx, location = name )
+        rooms = CrossLocationQueries.getRooms(roomExample=roomEx, location=name)
 
         # Find collisions with last month period
         from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
         resvEx = ReservationBase()
         now = datetime.now()
-        resvEx.endDT = datetime( now.year, now.month, now.day, 17, 30 )
-        resvEx.startDT = resvEx.endDT - timedelta( 30, 9 * 3600 ) # - 30 days and 9 hours
+        resvEx.endDT = datetime(now.year, now.month, now.day, 17, 30)
+        resvEx.startDT = resvEx.endDT - timedelta(30, 9 * 3600)  # - 30 days and 9 hours
         resvEx.repeatability = RepeatabilityEnum.daily
-        collisions = resvEx.getCollisions( rooms = rooms )
+        collisions = resvEx.getCollisions(rooms=rooms)
 
         totalWorkingDays = 0
         weekends = 0
-        for day in iterdays( resvEx.startDT, resvEx.endDT ):
-            if day.weekday() in [5,6]: # Skip Saturday and Sunday
+        for day in iterdays(resvEx.startDT, resvEx.endDT):
+            if day.weekday() in [5, 6]:  # Skip Saturday and Sunday
                 weekends += 1
                 continue
             # if c.startDT is CERN Holiday: continue
             totalWorkingDays += 1
 
-        booked = timedelta( 0 )
+        booked = timedelta(0)
         for c in collisions:
-            if c.startDT.weekday() in [5,6]: # Skip Saturday and Sunday
+            if c.startDT.weekday() in [5, 6]:  # Skip Saturday and Sunday
                 continue
             # if c.startDT is CERN Holiday: continue
-            booked = booked + ( c.endDT - c.startDT )
-        totalBookableTime = totalWorkingDays * 9 * len( rooms ) # Hours
-        bookedTime = booked.days * 24 + 1.0 * booked.seconds / 3600 # Hours
+            booked = booked + (c.endDT - c.startDT)
+        totalBookableTime = totalWorkingDays * 9 * len(rooms)  # Hours
+        bookedTime = booked.days * 24 + 1.0 * booked.seconds / 3600  # Hours
         if totalBookableTime > 0:
             return bookedTime / totalBookableTime
         else:
-            return 0 # Error (no rooms in db)
+            return 0  # Error (no rooms in db)
 
-
-    def getMyAverageOccupation( self, period="pastmonth" ):
+    def getMyAverageOccupation(self, period="pastmonth"):
         """
         FINAL (not intented to be overriden)
         Returns float <0, 1> representing how often - on the avarage -
@@ -302,84 +301,83 @@ class RoomBase( object ):
         resvEx = ReservationBase()
         now = datetime.now()
         if period == "pastmonth":
-            resvEx.endDT = datetime( now.year, now.month, now.day, 17, 30 )
-            resvEx.startDT = resvEx.endDT - timedelta( 30, 9 * 3600 ) # - 30 days and 9 hours
+            resvEx.endDT = datetime(now.year, now.month, now.day, 17, 30)
+            resvEx.startDT = resvEx.endDT - timedelta(30, 9 * 3600)  # - 30 days and 9 hours
         elif period == "thisyear":
-            resvEx.endDT = datetime( now.year, now.month, now.day, 17, 30 )
-            resvEx.startDT = datetime( now.year, 1, 1, 0, 0 )
+            resvEx.endDT = datetime(now.year, now.month, now.day, 17, 30)
+            resvEx.startDT = datetime(now.year, 1, 1, 0, 0)
         resvEx.repeatability = RepeatabilityEnum.daily
-        collisions = resvEx.getCollisions( rooms = [self] )
+        collisions = resvEx.getCollisions(rooms=[self])
 
         totalWorkingDays = 0
         weekends = 0
-        for day in iterdays( resvEx.startDT, resvEx.endDT ):
-            if day.weekday() in [5,6]: # Skip Saturday and Sunday
+        for day in iterdays(resvEx.startDT, resvEx.endDT):
+            if day.weekday() in [5, 6]:  # Skip Saturday and Sunday
                 weekends += 1
                 continue
             # if c.startDT is CERN Holiday: continue
             totalWorkingDays += 1
 
-        booked = timedelta( 0 )
+        booked = timedelta(0)
         for c in collisions:
-            if c.startDT.weekday() in [5,6]: # Skip Saturday and Sunday
+            if c.startDT.weekday() in [5, 6]:  # Skip Saturday and Sunday
                 continue
             # if c.startDT is CERN Holiday: continue
-            booked = booked + ( c.endDT - c.startDT )
-        totalBookableTime = totalWorkingDays * 9 # Hours
-        bookedTime = booked.days * 24 + 1.0 * booked.seconds / 3600 # Hours
+            booked = booked + (c.endDT - c.startDT)
+        totalBookableTime = totalWorkingDays * 9  # Hours
+        bookedTime = booked.days * 24 + 1.0 * booked.seconds / 3600  # Hours
         if totalBookableTime > 0:
             return bookedTime / totalBookableTime
         else:
             return 0
 
-
     # Equipment ------------------------------------------------------------
 
-    def setEquipment( self, eq ):
+    def setEquipment(self, eq):
         """
         Sets (replaces) the equipment list with the new one.
         It may be list ['eq1', 'eq2', ...] or str 'eq1`eq2`eq3`...'
         """
-        if isinstance( eq, list ):
-            self._equipment = '`'.join( eq )
+        if isinstance(eq, list):
+            self._equipment = '`'.join(eq)
             return
-        elif isinstance( eq, str ):
+        elif isinstance(eq, str):
             self._equipment = eq
             return
         raise MaKaCError('Invalid equipment list')
 
-    def getEquipment( self ):
+    def getEquipment(self):
         """
         Returns the room's equipment list.
         """
-        return self._equipment.split( '`' )
+        return self._equipment.split('`')
 
-    def insertEquipment( self, equipmentName ):
+    def insertEquipment(self, equipmentName):
         """ Adds new equipment to the room. """
-        if len( self._equipment ) > 0:
+        if len(self._equipment) > 0:
             self._equipment += '`'
         self._equipment += equipmentName
 
-    def removeEquipment( self, equipmentName ):
+    def removeEquipment(self, equipmentName):
         """ Removes equipment from the room. """
         e = self.getEquipment()
-        e.remove( equipmentName )
-        self.setEquipment( e )
+        e.remove(equipmentName)
+        self.setEquipment(e)
 
-    def hasEquipment( self, equipmentName ):
+    def hasEquipment(self, equipmentName):
         return equipmentName in self._equipment
 
-    def isCloseToBuilding( self, buildingNr ):
+    def isCloseToBuilding(self, buildingNr):
         """ Returns true if room is close to the specified building """
         raise NotImplementedError('Not implemented')
 
-    def belongsTo( self, user ):
+    def belongsTo(self, user):
         """ Returns true if current CrbsUser is responsible for this room """
         raise NotImplementedError('Not implemented')
 
     # "System" ---------------------------------------------------------------
 
-    def checkIntegrity( self ):
+    def checkIntegrity(self):
         """
         FINAL (not intented to be overriden)
         Checks whether:
@@ -393,14 +391,14 @@ class RoomBase( object ):
 
         # check presence and types of arguments
         # =====================================================
-        if self.id != None:         # Only for existing objects
-            checkPresence( self, errors, 'id', int )
-        checkPresence( self, errors, '_locationName', str )
+        if self.id is not None:         # Only for existing objects
+            checkPresence(self, errors, 'id', int)
+        checkPresence(self, errors, '_locationName', str)
         # check semantic integrity
         # =====================================================
 
         if errors:
-            raise str( errors )
+            raise str(errors)
 
     # Photos -----------------------------------------------------------------
 
@@ -408,23 +406,23 @@ class RoomBase( object ):
     # This exception is because we want to allow other room booking systems
     # to override room photos.
 
-    def getPhotoURL( self ):
+    def getPhotoURL(self):
         # Used to send photos via Python script
         from MaKaC.webinterface.urlHandlers import UHRoomPhoto
-        return UHRoomPhoto.getURL( self.photoId )
+        return UHRoomPhoto.getURL(self.photoId)
 
-    def getSmallPhotoURL( self ):
+    def getSmallPhotoURL(self):
         # Used to send photos via Python script
         from MaKaC.webinterface.urlHandlers import UHRoomPhotoSmall
-        return UHRoomPhotoSmall.getURL( self.photoId )
+        return UHRoomPhotoSmall.getURL(self.photoId)
 
-    def savePhoto( self, photoPath ):
+    def savePhoto(self, photoPath):
         """
         Saves room's photo on the server.
         """
         pass
 
-    def saveSmallPhoto( self, photoPath ):
+    def saveSmallPhoto(self, photoPath):
         """
         Saves room's small photo on the server.
         """
@@ -434,7 +432,7 @@ class RoomBase( object ):
 
     __owner = None
 
-    def getLocator( self ):
+    def getLocator(self):
         """
         FINAL (not intented to be overriden)
         Returns a globaly unique identification encapsulated in a Locator object
@@ -445,7 +443,7 @@ class RoomBase( object ):
         loc["roomID"] = self.id
         return loc
 
-    def isProtected( self ):
+    def isProtected(self):
         """
         FINAL (not intented to be overriden)
         The one must be logged in to do anything in RB module.
@@ -455,7 +453,7 @@ class RoomBase( object ):
     def hasBookingACL(self):
         return hasattr(self, 'customAtts') and (self.customAtts.get('Booking Simba List') or "").strip() != ""
 
-    def canView( self, accessWrapper ):
+    def canView(self, accessWrapper):
         """
         FINAL (not intented to be overriden)
         Room details are public - anyone can view.
@@ -480,10 +478,10 @@ class RoomBase( object ):
                     return True
             else:
                 return True
-        if user == None:
+        if user is None:
             return False
 
-        if (self.isOwnedBy( user ) and self.isActive) \
+        if (self.isOwnedBy(user) and self.isActive) \
                 or user.isRBAdmin():
             return True
         return False
@@ -506,34 +504,34 @@ class RoomBase( object ):
                         return True
             else:
                 return True
-        if user == None:
+        if user is None:
             return False
-        if (self.isOwnedBy( user ) and self.isActive) \
+        if (self.isOwnedBy(user) and self.isActive) \
                 or user.isRBAdmin():
             return True
         return False
 
-    def canModify( self, accessWrapper ):
+    def canModify(self, accessWrapper):
         """
         FINAL (not intented to be overriden)
         Only admin can modify rooms.
         """
-        if accessWrapper == None:
+        if accessWrapper is None:
             return False
-        if isinstance( accessWrapper, AccessWrapper ):
+        if isinstance(accessWrapper, AccessWrapper):
             if accessWrapper.getUser():
                 return accessWrapper.getUser().isRBAdmin()
             else:
                 return False
-        elif isinstance( accessWrapper, Avatar ):
+        elif isinstance(accessWrapper, Avatar):
             return accessWrapper.isRBAdmin()
 
         raise MaKaCError('canModify requires either AccessWrapper or Avatar object')
 
-    def canDelete( self, user ):
-        return self.canModify( user )
+    def canDelete(self, user):
+        return self.canModify(user)
 
-    def isOwnedBy( self, user ):
+    def isOwnedBy(self, user):
         """
         Returns True if user is responsible for this room. False otherwise.
         """
@@ -546,8 +544,8 @@ class RoomBase( object ):
                 return self._v_isOwnedBy[user]
         except:
             self._v_isOwnedBy = {}
-        if self.customAtts.get( 'Simba List' ):
-            simbaList = self.customAtts.get( 'Simba List' )
+        if self.customAtts.get('Simba List'):
+            simbaList = self.customAtts.get('Simba List')
             if simbaList != "Error: unknown mailing list" and simbaList != "":
                 if user.isMemberOfSimbaList(simbaList):
                     self._v_isOwnedBy[user] = True
@@ -555,26 +553,27 @@ class RoomBase( object ):
         self._v_isOwnedBy[user] = False
         return False
 
-    def getLocationName( self ):
+    def getLocationName(self):
         if self.__class__.__name__ == 'RoomBase':
             return Location.getDefaultLocation().friendlyName
             #raise 'This method is purely virtual. Call it only on derived objects.'
-        return self.getLocationName() # Subclass
+        return self.getLocationName()  # Subclass
 
-    def setLocationName( self, locationName ):
+    def setLocationName(self, locationName):
         if self.__class__.__name__ == 'RoomBase':
             raise MaKaCError('This method is purely virtual. Call it only on derived objects.')
-        return self.setLocationName( locationName ) # Subclass
+        return self.setLocationName(locationName)  # Subclass
 
-    def getAccessKey( self ): return ""
+    def getAccessKey(self):
+        return ""
 
-    def getFullName( self ):
+    def getFullName(self):
         name = ""
-        if self.building != None and self.floor != None and self.building != None:
-            s = str( self.building ) + '-' + str( self.floor ) + '-' + str( self.roomNr )
+        if self.building is not None and self.floor is not None and self.building is not None:
+            s = str(self.building) + '-' + str(self.floor) + '-' + str(self.roomNr)
             if s != '--':
                 name = s
-        if self._name != None and len( self._name.strip() ) > 0:
+        if self._name is not None and len(self._name.strip()) > 0:
             name += " - %s" % self._name
         return name
 
@@ -583,32 +582,32 @@ class RoomBase( object ):
     _name = None
     _equipment = ''   # str, 'eq1`eq2`eq3' - list of room's equipment, joined by '`'
 
-    def _getGuid( self ):
-        if self.id == None or self.locationName == None:
+    def _getGuid(self):
+        if self.id is None or self.locationName is None:
             return None
-        if Location.parse( self.locationName ):
-            return RoomGUID( Location.parse( self.locationName ), self.id )
+        if Location.parse(self.locationName):
+            return RoomGUID(Location.parse(self.locationName), self.id)
         return None
 
-    def _getName( self ):
-        if self._name != None and len( self._name.strip() ) > 0:
+    def _getName(self):
+        if self._name is not None and len(self._name.strip()) > 0:
             return self._name
-        if self.building != None and self.floor != None and self.building != None:
-            s = str( self.building ) + '-' + str( self.floor ) + '-' + str( self.roomNr )
+        if self.building is not None and self.floor is not None and self.building is not None:
+            s = str(self.building) + '-' + str(self.floor) + '-' + str(self.roomNr)
             if s != '--':
                 return s
             return ''
         return None
 
-    def _setName( self, s ):
+    def _setName(self, s):
         # Try to parse the name
-        if s == None:
+        if s is None:
             self._name = None
             return
-        parts = s.split( '-' )
-        if len( parts ) == 3:
+        parts = s.split('-')
+        if len(parts) == 3:
             try:
-                self.building = int( parts[0] )
+                self.building = int(parts[0])
                 self.floor = parts[1]
                 self.roomNr = parts[2]
                 return
@@ -618,58 +617,59 @@ class RoomBase( object ):
         self._name = s
 
     # CERN specific; don't bother
-    def _getNeedsAVCSetup( self ):
+    def _getNeedsAVCSetup(self):
         eq = self.getEquipment()
         if not self.locationName or not eq:
             return None
-        return 'Video conference' in ' '.join( eq )
+        return 'Video conference' in ' '.join(eq)
 
     # CERN specific; don't bother
-    def hasWebcastRecording( self ):
+    def hasWebcastRecording(self):
         eq = self.getEquipment()
         if not self.locationName or not eq:
             return None
-        return 'Webcast/Recording' in ' '.join( eq )
+        return 'Webcast/Recording' in ' '.join(eq)
 
-    def _eval_str( self, s ):
+    def _eval_str(self, s):
         ixPrv = 0
         ret = ""
 
         while True:
-            ix = s.find( "#{", ixPrv )
+            ix = s.find("#{", ixPrv)
             if ix == -1:
                 break
-            ret += s[ixPrv:ix] # verbatim
-            ixPrv = s.index( "}", ix + 2 ) + 1
-            ret += str( eval( s[ix+2:ixPrv-1] ) )
+            ret += s[ixPrv:ix]  # verbatim
+            ixPrv = s.index("}", ix + 2) + 1
+            ret += str(eval(s[ix+2:ixPrv-1]))
         ret += s[ixPrv:len(s)]
 
         return ret
 
-    def _getVerboseEquipment( self ):
+    def _getVerboseEquipment(self):
         s = ""
         eqList = self.getEquipment()
         for eq in eqList:
             s = s + eq + ", "
-        if len( eqList ) > 0: s = s[0:len(s)-2] # Cut off last ','
+        if len(eqList) > 0:
+            s = s[0:len(s)-2]  # Cut off last ','
         return s
 
-    def _getPhotoId( self ):
+    def _getPhotoId(self):
         """
         Feel free to override this in your inherited class.
         """
         return self._doGetPhotoId()
 
-    def _setPhotoId( self, value ):
+    def _setPhotoId(self, value):
         self._photoId = value
 
-    def _doGetPhotoId( self ):
-        if '_photoId' in dir( self ): return self._photoId
+    def _doGetPhotoId(self):
+        if '_photoId' in dir(self):
+            return self._photoId
         return None
 
-    def __str__( self ):
-        s = self._eval_str(
-"""
+    def __str__(self):
+        s = self._eval_str("""
                id: #{self.id}
          isActive: #{self.isActive}
 
@@ -697,32 +697,31 @@ notificationAssistance: #{self.resvNotificationAssistance}
        whereIsKey: #{self.whereIsKey}
          comments: #{self.comments}
     responsibleId: #{self.responsibleId}
-        equipment: """
-        )
+        equipment: """)
         s += self.verboseEquipment + "\n"
         return s
 
-    def __cmp__( self, other ):
+    def __cmp__(self, other):
         if self.__class__.__name__ == 'NoneType' and other.__class__.__name__ == 'NoneType':
             return 0
         if self.__class__.__name__ == 'NoneType':
-            return cmp( None, 1 )
+            return cmp(None, 1)
         if other.__class__.__name__ == 'NoneType':
-            return cmp( 1, None )
+            return cmp(1, None)
 
-        if self.id != None  and  other.id != None:
+        if self.id is not None and other.id != None:
             if self.id == other.id:
                 return 0
 
-        c = cmp( self.locationName, other.locationName )
+        c = cmp(self.locationName, other.locationName)
         if c == 0:
-            c = cmp( self.building, other.building )
+            c = cmp(self.building, other.building)
             if c == 0:
-                c = cmp( self.floor, other.floor )
+                c = cmp(self.floor, other.floor)
                 if c == 0:
-                    c = cmp( self.roomNr, other.roomNr )
+                    c = cmp(self.roomNr, other.roomNr)
                     if c == 0:
-                        c = cmp( self.name, other.name )
+                        c = cmp(self.name, other.name)
 
         return c
 
@@ -731,10 +730,10 @@ notificationAssistance: #{self.resvNotificationAssistance}
     # DO NOT set default values here, since query-by-example will change!!!
 
     id = None             # int - artificial ID; initialy value from oracle db
-    locationName = property( getLocationName, setLocationName ) # location (plugin) name
-    guid = property( _getGuid ) # RoomGUID
+    locationName = property(getLocationName, setLocationName)  # location (plugin) name
+    guid = property(_getGuid)  # RoomGUID
     isActive = None       # bool - whether the room is active (not logicaly removed) [STSCRBOK]
-    resvsNeedConfirmation = None # bool - whether reservations for this room must be confirmed by responsible
+    resvsNeedConfirmation = None  # bool - whether reservations for this room must be confirmed by responsible
 
     building = None       # int, positive
     floor = None          # str, alphanumeric
@@ -742,20 +741,20 @@ notificationAssistance: #{self.resvNotificationAssistance}
     latitude = None       # str
     longitude = None      # str
 
-    name = property( _getName, _setName ) # str - room name
+    name = property(_getName, _setName)  # str - room name
 
     capacity = None       # int, positive
     site = None           # str - global room localisation, i.e. city
     division = None       # str, TODO
     isReservable = None   # bool - whether the room is reservable
-    photoId = property( _getPhotoId, _setPhotoId )        # str - room picture id
+    photoId = property(_getPhotoId, _setPhotoId)        # str - room picture id
     externalId = None     # str - custom external room id, i.e. for locating on the map
 
-    resvStartNotification = False # bool - whether to send notifications on booking start
-    resvStartNotificationBefore = None # bool - whether to send notifications on booking start
-    resvEndNotification = False # bool - whether to send notifications on booking end
-    resvNotificationToResponsible = False # bool - whether to send notifications to the room responsible, too
-    resvNotificationAssistance = False # bool - whether to send notifications on assistance
+    resvStartNotification = False  # bool - whether to send notifications on booking start
+    resvStartNotificationBefore = None  # bool - whether to send notifications on booking start
+    resvEndNotification = False  # bool - whether to send notifications on booking end
+    resvNotificationToResponsible = False  # bool - whether to send notifications to the room responsible, too
+    resvNotificationAssistance = False  # bool - whether to send notifications on assistance
 
     telephone = None      # str
     surfaceArea = None    # int, positive - in meters^2
@@ -766,8 +765,9 @@ notificationAssistance: #{self.resvNotificationAssistance}
 
     #customAtts = {}      # Must behave like name-value dictionary of custom attributes. Must be put in derived classes.
 
-    verboseEquipment = property( _getVerboseEquipment )
-    needsAVCSetup = property( _getNeedsAVCSetup )
+    verboseEquipment = property(_getVerboseEquipment)
+    needsAVCSetup = property(_getNeedsAVCSetup)
+
 
 # ============================================================================
 # ================================== TEST ====================================
@@ -781,16 +781,15 @@ class Test:
         dalManager = Factory.getDALManager()
         dalManager.connect()
 
-        amphitheatre = RoomBase.getRooms( roomName = 'IT AMPHITHEATRE' )
-        print "All reservations for IT AMPHITHEATRE: %d" % len( amphitheatre.getReservations() )
+        amphitheatre = RoomBase.getRooms(roomName='IT AMPHITHEATRE')
+        print "All reservations for IT AMPHITHEATRE: %d" % len(amphitheatre.getReservations())
 
         resvEx = Factory.newReservation()
-        resvEx.startDT = datetime( 2006, 9, 23, 0 )
-        resvEx.endDT = datetime( 2006, 9, 30, 23, 59 )
+        resvEx.startDT = datetime(2006, 9, 23, 0)
+        resvEx.endDT = datetime(2006, 9, 30, 23, 59)
 
         dalManager.disconnect()
 
 
 if __name__ == '__main__':
     Test.getReservations()
-

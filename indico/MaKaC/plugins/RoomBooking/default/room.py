@@ -42,7 +42,7 @@ from indico.core.index import Catalog
 _ROOMS = 'Rooms'
 
 
-class Room( Persistent, RoomBase, Fossilizable ):
+class Room(Persistent, RoomBase, Fossilizable):
     """
     ZODB specific implementation.
 
@@ -55,7 +55,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
     vcList = []
 
     def __init__(self):
-        RoomBase.__init__( self )
+        RoomBase.__init__(self)
         self.customAtts = PersistentMapping()
         self.avaibleVC = []
         self._nonBookableDates = []
@@ -132,32 +132,32 @@ class Room( Persistent, RoomBase, Fossilizable ):
                 managers |= set(groups[0].getMemberList())
         return list(managers)
 
-    def insert( self ):
+    def insert(self):
         """ Documentation in base class. """
-        RoomBase.insert( self )
+        RoomBase.insert(self)
         roomsBTree = Room.getRoot()
         # Ensure ID
-        if self.id == None:
+        if self.id is None:
             # Maximum ID + 1
-            if len( roomsBTree ) > 0:
+            if len(roomsBTree) > 0:
                 self.id = roomsBTree.maxKey() + 1
             else:
-                self.id = 1 # Can not use maxKey for 1st record in a tree
+                self.id = 1  # Can not use maxKey for 1st record in a tree
         # Add self to the BTree
         roomsBTree[self.id] = self
         Catalog.getIdx('user_room').index_obj(self.guid)
 
-    def update( self ):
+    def update(self):
         """ Documentation in base class. """
-        RoomBase.update( self )
+        RoomBase.update(self)
 
         # Check Simba mailing list
-        listName = self.customAtts.get( 'Simba List' )
+        listName = self.customAtts.get('Simba List')
         if listName:
             from MaKaC.user import GroupHolder
-            groups = GroupHolder().match( { 'name': listName }, searchInAuthenticators = False )
+            groups = GroupHolder().match({'name': listName}, searchInAuthenticators=False)
             if not groups:
-                groups = GroupHolder().match( { 'name': listName } )
+                groups = GroupHolder().match({'name': listName})
             if not groups:
                 self.customAtts['Simba List'] = 'Error: unknown mailing list'
 
@@ -168,9 +168,9 @@ class Room( Persistent, RoomBase, Fossilizable ):
 
         self._p_changed = True
 
-    def remove( self ):
+    def remove(self):
         """ Documentation in base class. """
-        RoomBase.remove( self )
+        RoomBase.remove(self)
         roomsBTree = Room.getRoot()
         del roomsBTree[self.id]
         if Catalog.getIdx('user_room').has_obj(self.guid):
@@ -186,69 +186,69 @@ class Room( Persistent, RoomBase, Fossilizable ):
 
     # Typical actions
     @staticmethod
-    def getRooms( *args, **kwargs ):
+    def getRooms(*args, **kwargs):
         """ Documentation in base class. """
 
         roomsBTree = Room.getRoot()
-        location = kwargs.get( 'location' )
+        location = kwargs.get('location')
 
-        if kwargs.get( 'allFast' ) == True:
-            return [ room for room in roomsBTree.values() if room.isActive and (not location or room.locationName == location) ]
+        if kwargs.get('allFast') is True:
+            return [room for room in roomsBTree.values() if room.isActive and (not location or room.locationName == location)]
 
-        if kwargs.get( 'reallyAllFast' ) == True:
-            return [ room for room in roomsBTree.values() if (not location or room.locationName == location) ]
+        if kwargs.get('reallyAllFast') is True:
+            return [room for room in roomsBTree.values() if (not location or room.locationName == location)]
 
-        if len( kwargs ) == 0:
+        if len(kwargs) == 0:
             ret_lst = []
             for room in roomsBTree.values():
-                ret_lst.append( room )
+                ret_lst.append(room)
 
-        roomID = kwargs.get( 'roomID' )
-        roomName = kwargs.get( 'roomName' )
-        roomEx = kwargs.get( 'roomExample' )
-        resvEx = kwargs.get( 'resvExample' )
-        freeText = kwargs.get( 'freeText' )
-        available = kwargs.get( 'available' )
-        countOnly = kwargs.get( 'countOnly' )
-        minCapacity = kwargs.get( 'minCapacity' )
-        location = kwargs.get( 'location' )
-        ownedBy = kwargs.get( 'ownedBy' )
-        customAtts = kwargs.get( 'customAtts' )
+        roomID = kwargs.get('roomID')
+        roomName = kwargs.get('roomName')
+        roomEx = kwargs.get('roomExample')
+        resvEx = kwargs.get('resvExample')
+        freeText = kwargs.get('freeText')
+        available = kwargs.get('available')
+        countOnly = kwargs.get('countOnly')
+        minCapacity = kwargs.get('minCapacity')
+        location = kwargs.get('location')
+        ownedBy = kwargs.get('ownedBy')
+        customAtts = kwargs.get('customAtts')
 #        responsibleID = kwargs.get( 'responsibleID' )
-        pendingBlockings = kwargs.get( 'pendingBlockings' )
+        pendingBlockings = kwargs.get('pendingBlockings')
 
         # onlyPublic - there are no restrictions to booking (no ACL)
         onlyPublic = kwargs.get('onlyPublic')
 
         ret_lst = []
         counter = 0
-        if roomID != None:
-            return roomsBTree.get( roomID )
-        if roomName != None:
+        if roomID is not None:
+            return roomsBTree.get(roomID)
+        if roomName is not None:
             for room in roomsBTree.itervalues():
                 if room.name == roomName:
-                    if location == None or room.locationName == location:
+                    if location is None or room.locationName == location:
                         return room
             return None
 
         for room in roomsBTree.itervalues():
             # Apply all conditions =========
-            if location != None:
+            if location is not None:
                 if room.locationName != location:
                     continue
             if onlyPublic and (not room.isReservable or room.hasBookingACL()):
                     continue
-            if roomEx != None:
-                if not qbeMatch( roomEx, room, Room.__attrSpecialEqual, minCapacity = minCapacity ):
+            if roomEx is not None:
+                if not qbeMatch(roomEx, room, Room.__attrSpecialEqual, minCapacity=minCapacity):
                     continue
-                if not room.__hasEquipment( roomEx.getEquipment() ):
+                if not room.__hasEquipment(roomEx.getEquipment()):
                     continue
-            if freeText != None:
-                if not room.__hasFreeText( freeText.split() ):
+            if freeText is not None:
+                if not room.__hasFreeText(freeText.split()):
                     continue
-            if resvEx != None:
+            if resvEx is not None:
                 resvEx.room = room
-                aval = room.isAvailable( resvEx )
+                aval = room.isAvailable(resvEx)
                 if aval != available:
                     continue
                 blockState = resvEx.getBlockingConflictState(ContextManager.get('currentUser'))
@@ -256,8 +256,8 @@ class Room( Persistent, RoomBase, Fossilizable ):
                     continue
                 elif blockState == 'pending' and pendingBlockings:
                     continue
-            if ownedBy != None:
-                if not room.isOwnedBy( ownedBy ):
+            if ownedBy is not None:
+                if not room.isOwnedBy(ownedBy):
                     continue
             if customAtts is not None:
                 if not hasattr(room, "customAtts"):
@@ -282,7 +282,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
             # All conditions are met: add room to the results
             counter += 1
             if not countOnly:
-                ret_lst.append( room )
+                ret_lst.append(room)
 
         #print "Found %d rooms." % counter
         if countOnly:
@@ -293,178 +293,182 @@ class Room( Persistent, RoomBase, Fossilizable ):
     # Statistics ====================================
 
     @staticmethod
-    def countRooms( *args, **kwargs ):
+    def countRooms(*args, **kwargs):
         """ Documentation in base class. """
         kwargs['countOnly'] = True
-        return Room.getRooms( **kwargs )
+        return Room.getRooms(**kwargs)
 
     @staticmethod
-    def getNumberOfRooms( *args, **kwargs ):
+    def getNumberOfRooms(*args, **kwargs):
         """ Documentation in base class. """
-        location = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
-        return Room.countRooms( location = location )
+        location = kwargs.get('location', Location.getDefaultLocation().friendlyName)
+        return Room.countRooms(location=location)
 
     @staticmethod
-    def getNumberOfActiveRooms( *args, **kwargs ):
+    def getNumberOfActiveRooms(*args, **kwargs):
         """ Documentation in base class. """
-        location = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
+        location = kwargs.get('location', Location.getDefaultLocation().friendlyName)
         room = Factory.newRoom()
         room.isActive = True
-        return Room.countRooms( roomExample = room, location = location )
+        return Room.countRooms(roomExample=room, location=location)
 
     @staticmethod
-    def getNumberOfReservableRooms( *args, **kwargs ):
+    def getNumberOfReservableRooms(*args, **kwargs):
         """ Documentation in base class. """
-        location = kwargs.get( 'location', Location.getDefaultLocation().friendlyName )
+        location = kwargs.get('location', Location.getDefaultLocation().friendlyName)
         room = Factory.newRoom()
         room.isReservable = True
         room.isActive = True
-        return Room.countRooms( roomExample = room, location = location )
+        return Room.countRooms(roomExample=room, location=location)
 
-    def getLocationName( self ):
+    def getLocationName(self):
         #from MaKaC.plugins.RoomBooking.default.factory import Factory
         #return Factory.locationName
         return self._locationName
 
-    def setLocationName( self, locationName ):
+    def setLocationName(self, locationName):
         self._locationName = locationName
 
-    def savePhoto( self, photoPath ):
+    def savePhoto(self, photoPath):
         filePath = Config.getInstance().getRoomPhotosDir()
-        fileName = self._doGetPhotoId( force = True ) + ".jpg"
-        try: os.makedirs( filePath )
-        except: pass
-        fullPath = os.path.join( filePath, fileName )
+        fileName = self._doGetPhotoId(force=True) + ".jpg"
+        try:
+            os.makedirs(filePath)
+        except:
+            pass
+        fullPath = os.path.join(filePath, fileName)
 
-        f = open( fullPath, "wb" )
-        f.write( photoPath.file.read() )
+        f = open(fullPath, "wb")
+        f.write(photoPath.file.read())
         f.close()
 
-    def saveSmallPhoto( self, photoPath ):
+    def saveSmallPhoto(self, photoPath):
         filePath = Config.getInstance().getRoomSmallPhotosDir()
-        fileName = self._doGetPhotoId( force = True ) + ".jpg"
-        try: os.makedirs( filePath )
-        except: pass
-        fullPath = os.path.join( filePath, fileName )
+        fileName = self._doGetPhotoId(force=True) + ".jpg"
+        try:
+            os.makedirs(filePath)
+        except:
+            pass
+        fullPath = os.path.join(filePath, fileName)
 
-        f = open( fullPath, "wb" )
-        f.write( photoPath.file.read() )
+        f = open(fullPath, "wb")
+        f.write(photoPath.file.read())
         f.close()
-
 
     # ==== Private ===================================================
 
-    def _getSafeLocationName( self ):
-        if self.locationName == None:
+    def _getSafeLocationName(self):
+        if self.locationName is None:
             return None
         s = ""
-        for i in xrange( 0, len( self.locationName ) ):
-            code = ord( self.locationName[i] )
-            if ( code in xrange( ord( 'a' ), ord( 'z' ) + 1 ) ) or \
-               ( code in xrange( ord( 'A' ), ord( 'Z' ) + 1 ) ) or \
-               ( code in xrange( ord( '0' ), ord( '9' ) + 1 ) ):
+        for i in xrange(0, len(self.locationName)):
+            code = ord(self.locationName[i])
+            if (code in xrange(ord('a'), ord('z') + 1)) or \
+               (code in xrange(ord('A'), ord('Z') + 1)) or \
+               (code in xrange(ord('0'), ord('9') + 1)):
                 # Valid
                 s += self.locationName[i]
             else:
-                s += '_' # Replace all other characters with underscore
+                s += '_'  # Replace all other characters with underscore
         return s
 
-    def _doGetPhotoId( self, force = False ):
-        photoId = "%s-%s-%s-%s" % ( str( self._getSafeLocationName() ), str( self.building ).strip(), str( self.floor ).strip(), str( self.roomNr ).strip() )
+    def _doGetPhotoId(self, force=False):
+        photoId = "%s-%s-%s-%s" % (str(self._getSafeLocationName()), str(self.building).strip(), str(self.floor).strip(), str(self.roomNr).strip())
 
         filePath = Config.getInstance().getRoomPhotosDir()
         fileName = photoId + ".jpg"
-        fullPath = os.path.join( filePath, fileName )
+        fullPath = os.path.join(filePath, fileName)
         from os.path import exists
-        if exists( fullPath ) or force:
+        if exists(fullPath) or force:
             return photoId
         else:
             return None
 
-    def _doSetPhotoId( self ):
+    def _doSetPhotoId(self):
         """
         For this plugin, photoId is always composed of location-building-floor-room.jpg
         """
         pass
 
-    def __hasFreeText( self, freeTextList ):
+    def __hasFreeText(self, freeTextList):
         # OR
         for freeText in freeTextList:
             freeText = freeText.lower()
-            if self.__hasOneFreeText( freeText ):
+            if self.__hasOneFreeText(freeText):
                 return True
         return False
 
-    def __hasOneFreeText( self, freeText ):
+    def __hasOneFreeText(self, freeText):
         # Look for freeText in all string and int attributes
-        for attrName in dir( self ):
+        for attrName in dir(self):
             if attrName[0] == '_':
                 continue
-            attrType = eval( 'self.' + attrName + '.__class__.__name__' )
+            attrType = eval('self.' + attrName + '.__class__.__name__')
             if attrType == 'str':
-                attrVal = eval( 'self.' + attrName )
-                if attrVal.lower().find( freeText ) != -1:
+                attrVal = eval('self.' + attrName)
+                if attrVal.lower().find(freeText) != -1:
                     return True
 
         # Look for freeText in equipment
-        if self.__hasEquipment( [ freeText ] ):
+        if self.__hasEquipment([freeText]):
             return True
 
         # Look for freeText in responsible
-        if self.responsibleId != None:
-            user = self.getResponsible();
-            if freeText in user.getFullName().lower()  or  freeText in user.getEmail().lower():
+        if self.responsibleId is not None:
+            user = self.getResponsible()
+            if freeText in user.getFullName().lower() or freeText in user.getEmail().lower():
                 return True
 
         # Look for freeText in custom attributes
         for value in self.customAtts.itervalues():
-            if value and ( freeText in value.lower() ):
+            if value and (freeText in value.lower()):
                 return True
 
         # Not found
         return False
 
     @staticmethod
-    def __goodCapacity( val1, val2, minCapacity = None ):
+    def __goodCapacity(val1, val2, minCapacity=None):
         # Difference in capacity less than 20%
-        if val1 < 1: val1 = 1
+        if val1 < 1:
+            val1 = 1
 
         if not minCapacity:
-            return abs( val1 - val2 ) / float( val1 ) <= 0.2
+            return abs(val1 - val2) / float(val1) <= 0.2
         else:
             return val2 > val1
 
     @classmethod
-    def __attrSpecialEqual( cls, attrName, exampleVal, candidateVal, **kwargs ):
-        if attrName in ( 'guid', 'locationName', 'name', 'photoId', 'needsAVCSetup' ):
-            return True # Skip by stating they match
-        if attrName in ( 'responsibleId', 'responsibleID' ):
-            return exampleVal == candidateVal # Just exact string matching
+    def __attrSpecialEqual(cls, attrName, exampleVal, candidateVal, **kwargs):
+        if attrName in ('guid', 'locationName', 'name', 'photoId', 'needsAVCSetup'):
+            return True  # Skip by stating they match
+        if attrName in ('responsibleId', 'responsibleID'):
+            return exampleVal == candidateVal  # Just exact string matching
         if attrName[0:7] == 'verbose':
             return True
-        if attrName.find( 'capacity' ) != -1:
-            minCapacity = kwargs.get( 'minCapacity' )
-            return cls.__goodCapacity( exampleVal, candidateVal, minCapacity )
+        if attrName.find('capacity') != -1:
+            minCapacity = kwargs.get('minCapacity')
+            return cls.__goodCapacity(exampleVal, candidateVal, minCapacity)
         if attrName == 'customAtts':
             # Check if all values in exampleVal are contained
             # in corresponding values of candidateVal
             for k, v in exampleVal.iteritems():
-                if v: # If value is specified
-                    if candidateVal.get( k ) == None:
+                if v:  # If value is specified
+                    if candidateVal.get(k) is None:
                         # Candidate does not have the attribute
                         return False
-                    if not ( v in candidateVal[k] ):
+                    if not (v in candidateVal[k]):
                         # Candidate's attribute value does not match example
                         return False
             return True
         return None
 
-    def __hasEquipment( self, requiredEquipmentList ):
+    def __hasEquipment(self, requiredEquipmentList):
         iHave = self.getEquipment()
         for reqEq in requiredEquipmentList:
             have = False
             for myEq in iHave:
-                if myEq.lower().find( reqEq.lower() ) != -1:
+                if myEq.lower().find(reqEq.lower()) != -1:
                     have = True
                     break
             if not have:
@@ -483,7 +487,7 @@ class Room( Persistent, RoomBase, Fossilizable ):
         """ Room description for the map marker """
         infos = []
         if self.capacity:
-            infos.append("%s %s" % (self.capacity , _("people")))
+            infos.append("%s %s" % (self.capacity, _("people")))
         if self.isReservable and not self.hasBookingACL():
             infos.append(_("public"))
         else:
@@ -522,7 +526,8 @@ class Room( Persistent, RoomBase, Fossilizable ):
     def isPublic(self):
         return self.isReservable and not self.customAtts.get('Booking Simba List')
 
-    locationName = property( getLocationName, setLocationName )
+    locationName = property(getLocationName, setLocationName)
+
 
 class NonBookableDate(Persistent):
 
@@ -564,6 +569,7 @@ class NonBookableDate(Persistent):
     def isPast(self):
         return self.getEndDate() <= datetime.datetime.now()
 
+
 class DailyBookablePeriod(Persistent):
 
     def __init__(self, startTime, endTime):
@@ -590,34 +596,34 @@ class DailyBookablePeriod(Persistent):
     def setEndTime(self, endTime):
         self._endTime = endTime
 
-    def doesPeriodFit(self, startTime, endTime):#
+    def doesPeriodFit(self, startTime, endTime):
         periodStart = datetime.datetime.strptime(self.getStartTime(), "%H:%M").time()
         periodEnd = datetime.datetime.strptime(self.getEndTime(), "%H:%M").time()
         return startTime >= periodStart and endTime <= periodEnd
+
 
 # ============================================================================
 # ================================== TEST ====================================
 # ============================================================================
 
-class Test( object ):
+class Test(object):
 
     dalManager = Factory.getDALManager()
 
     @staticmethod
     def do():
-
         # Set equipment
         Test.dalManager.connect()
         em = Factory.getEquipmentManager()
-        saved = ['a ', 'bbb', 'c' ]
-        em.setPossibleEquipment( saved )
+        saved = ['a ', 'bbb', 'c']
+        em.setPossibleEquipment(saved)
         Test.dalManager.commit()
         Test.dalManager.disconnect()
 
         # Get equipment
         Test.dalManager.connect()
         loaded = em.getPossibleEquipment()
-        assert( loaded == saved )
+        assert(loaded == saved)
         Test.dalManager.disconnect()
 
     @staticmethod
@@ -625,26 +631,26 @@ class Test( object ):
         Test.dalManager.connect()
 
         # By ID
-        room = RoomBase.getRooms( roomID = 176 )
-        assert( room.name == '4-1-021' )
+        room = RoomBase.getRooms(roomID=176)
+        assert(room.name == '4-1-021')
 
         # By other attributes
         roomEx = Factory.newRoom()
         roomEx.site = 'prevessin'
         roomEx.comments = 'res'
-        rooms = RoomBase.getRooms( roomExample = roomEx )
-        assert( len( rooms ) == 8 ) # 20
+        rooms = RoomBase.getRooms(roomExample=roomEx)
+        assert(len(rooms) == 8)  # 20
 
         roomEx = Factory.newRoom()
         roomEx.capacity = 20
-        rooms = RoomBase.getRooms( roomExample = roomEx )
-        assert( len( rooms ) == 26 )
+        rooms = RoomBase.getRooms(roomExample=roomEx)
+        assert(len(rooms) == 26)
 
         roomEx = Factory.newRoom()
         roomEx.isReservable = True
-        roomEx.setEquipment( [ 'Video projector', 'Wireless' ] )
-        rooms = RoomBase.getRooms( roomExample = roomEx )
-        assert( len( rooms ) == 33 )
+        roomEx.setEquipment(['Video projector', 'Wireless'])
+        rooms = RoomBase.getRooms(roomExample=roomEx)
+        assert(len(rooms) == 33)
 
         Test.dalManager.disconnect()
 
@@ -652,8 +658,8 @@ class Test( object ):
     def getRoomsByFreeText():
         Test.dalManager.connect()
 
-        rooms = RoomBase.getRooms( freeText = 'meyrin vrvs' ) # 78828
-        assert( len( rooms ) == 12 )
+        rooms = RoomBase.getRooms(freeText='meyrin vrvs')  # 78828
+        assert(len(rooms) == 12)
 
         Test.dalManager.disconnect()
 
@@ -666,7 +672,7 @@ class Test( object ):
         roomEx.building = 513
         roomEx.capacity = 20
 
-        rooms = CrossLocationQueries.getRooms( roomExample = roomEx )
+        rooms = CrossLocationQueries.getRooms(roomExample=roomEx)
 
         for room in rooms:
             print "============================="
@@ -693,14 +699,14 @@ class Test( object ):
         roomEx.isReservable = True
 
         resvEx = Factory.newReservation()
-        resvEx.startDT = datetime( 2006, 12, 01, 10 )
-        resvEx.endDT = datetime( 2006, 12, 14, 15 )
-        resvEx.repeatability = 0 # Daily
+        resvEx.startDT = datetime(2006, 12, 01, 10)
+        resvEx.endDT = datetime(2006, 12, 14, 15)
+        resvEx.repeatability = 0  # Daily
 
-        rooms = RoomBase.getRooms( \
-            roomExample = roomEx,
-            resvExample = resvEx,
-            available = True )
+        rooms = RoomBase.getRooms(
+            roomExample=roomEx,
+            resvExample=resvEx,
+            available=True)
 
         for room in rooms:
             print "\n=======================================\n"
@@ -716,4 +722,3 @@ if __name__ == '__main__':
 #        Test.getRoomsByFreeText()
 #        Test.getRoomsByExample()
 #        Test.stats()
-
