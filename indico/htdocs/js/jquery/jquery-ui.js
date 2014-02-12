@@ -9018,6 +9018,9 @@ $.widget( "ui.dialog", {
 	},
 
 	_moveToTop: function( event, silent ) {
+		if ( event && this.options.modal ) {
+			return;
+		}
 		var moved = !!this.uiDialog.nextAll(":visible").insertBefore( this.uiDialog ).length;
 		if ( moved && !silent ) {
 			this._trigger( "focus", event );
@@ -9513,6 +9516,25 @@ $.widget( "ui.dialog", {
 
 	_allowInteraction: function( event ) {
 		if ( $( event.target ).closest(".ui-dialog").length ) {
+			return true;
+		}
+
+		// address interaction issues with general iframes with the dialog
+		if ( event.target.ownerDocument != this.document[ 0 ] ) {
+			return true;
+		}
+
+		// address interaction issues with dialog window
+		if ( $( event.target ).closest( ".cke_dialog" ).length ) {
+			return true;
+		}
+
+		// address interaction issues with iframe based drop downs in IE
+		if ( $( event.target ).closest( ".cke" ).length ) {
+			return true;
+		}
+
+		if ( $( event.target ).closest( ".cke_panel" ).length ) {
 			return true;
 		}
 
