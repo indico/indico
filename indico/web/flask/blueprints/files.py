@@ -39,6 +39,11 @@ files.add_url_rule('/category/<categId>/material/<materialId>/accesskey', 'mater
 
 # File access (event)
 files.add_url_rule(
+    '/event/<confId>/session/<sessionId>/material/<materialId>/<resId>.<fileExt>', 'getFile-access',
+    fileAccess.RHFileAccess)
+files.add_url_rule(
+    '/event/<confId>/session/<sessionId>/material/<materialId>/<resId>', 'getFile-access', fileAccess.RHFileAccess)
+files.add_url_rule(
     '/event/<confId>/session/<sessionId>/contribution/<contribId>/material/<materialId>/<resId>.<fileExt>',
     'getFile-access', fileAccess.RHFileAccess)
 files.add_url_rule(
