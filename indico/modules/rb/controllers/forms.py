@@ -30,10 +30,24 @@ from wtforms_alchemy import model_form_factory
 
 from indico.core.errors import IndicoError
 
-from ..models.reservations import Reservation
+from ..models.reservations import Reservation, RepeatUnit
 
 
 ModelForm = model_form_factory(Form, strip_string_fields=True)
+
+
+def repeat_step_check(form, field):
+    if form.repeat_unit.validate():
+        if form.repeat_unit.data == RepeatUnit.DAY:
+            pass
+        elif form.repeat_unit.data == RepeatUnit.WEEK:
+            pass
+        elif form.repeat_unit.data == RepeatUnit.MONTH:
+            pass
+        elif form.repeat_unit.data == RepeatUnit.YEAR:
+            pass
+    else:
+        raise validators.ValidationError('Repeat Step only makes sense with Repeat Unit')
 
 
 class BookingListForm(ModelForm):
@@ -51,6 +65,10 @@ class BookingListForm(ModelForm):
 
     flexible_dates_range = IntegerField('Flexible Date Range', default=0)
     finish_date = DateTimeField('Finish Date', default=False, display_format='%Y-%m-%d %H:%M:%S')
+
+    repeat_unit = IntegerField('Repeat Unit', default=RepeatUnit.NEVER,
+                               validators=[validators.NumberRange(min=RepeatUnit.NEVER, max=RepeatUnit.YEAR)])
+    repeat_step = IntegerField('Repeat Step', default=0, validators=[repeat_step_check])
 
     room_id_list = FieldList(IntegerField('Room IDs'))
 
