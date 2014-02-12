@@ -294,9 +294,10 @@ class SessionFetcher(SessionContribFetcher):
 
         def _iterate_objs(objIds):
             for objId in objIds:
-                obj = event.getSessionById(objId)
-                if obj is not None:
-                    yield obj
+                session = event.getSessionById(objId)
+                for obj in session.getSlotList():
+                    if obj is not None:
+                        yield obj
 
         return self._process(_iterate_objs(idlist))
 
