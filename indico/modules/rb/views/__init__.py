@@ -28,6 +28,8 @@ from MaKaC.webinterface.wcomponents import (
     SideMenuSection
 )
 
+from indico.util.i18n import _
+
 from ..models.rooms import Room
 from ..models.locations import Location
 
@@ -35,12 +37,10 @@ from ..models.locations import Location
 class WPRoomBookingBase(WPMainBase):
 
     def _getTitle(self):
-        return (super(WPRoomBookingBase, self)._getTitle() +
-                " - " + _("Room Booking"))
+        return '{} - {}'.format(WPMainBase._getTitle(self), _("Room Booking"))
 
     def getJSFiles(self):
-        return (super(WPRoomBookingBase, self).getJSFiles(self) +
-                self._includeJSPackage('Management'))
+        return WPMainBase.getJSFiles(self) + self._includeJSPackage('Management')
 
     def _getHeadContent(self):
         """
@@ -70,7 +70,7 @@ class WPRoomBookingBase(WPMainBase):
         self._showResponsible = False
 
 
-        if minfo.getRoomBookingModuleActive():  # and CrossLocationDB.isConnected():
+        if minfo.getRoomBookingModuleActive():
             self._showResponsible = ((self._getAW().getUser() != None)
                                      and (Room.isAvatarResponsibleForRooms(self._getAW().getUser())
                                      or self._getAW().getUser().isAdmin()
@@ -79,105 +79,105 @@ class WPRoomBookingBase(WPMainBase):
         self._roomsBookingOpt = SideMenuSection(currentPage=urlHandlers.UHRoomBookingBookRoom.getURL())
 
         self._bookRoomNewOpt = SideMenuItem(
-            _("Book a Room"),
+            _('Book a Room'),
             urlHandlers.UHRoomBookingBookRoom.getURL(),
             enabled=True
         )
 
         self._roomMapOpt = SideMenuItem(
-            _("Map of rooms"),
+            _('Map of rooms'),
             urlHandlers.UHRoomBookingMapOfRooms.getURL(),
             enabled=True
         )
 
         self._bookingListCalendarOpt = SideMenuItem(
-            _("Calendar"),
-            urlHandlers.UHRoomBookingBookingList.getURL(today=True, allRooms=True),
+            _('Calendar'),
+            urlHandlers.UHRoomBookingBookingList.getURL(today=True, is_all_rooms=True),
             enabled=True
         )
 
         self._bookingsOpt = SideMenuSection(
-            _("View My Bookings"),
+            _('View My Bookings'),
             urlHandlers.UHRoomBookingSearch4Bookings.getURL()
         )
 
         self._bookARoomOpt = SideMenuItem(
-            _("Book a Room (Old)"),
-            urlHandlers.UHRoomBookingSearch4Rooms.getURL(forNewBooking=True),
+            _('Book a Room (Old)'),
+            urlHandlers.UHRoomBookingSearch4Rooms.getURL(is_new_booking=True),
             enabled=True
         )
         self._bookARoomOpt.setVisible(False)
 
         self._myBookingListOpt = SideMenuItem(
-            _("My bookings"),
-            urlHandlers.UHRoomBookingBookingList.getURL(onlyMy=True,autoCriteria=True),
+            _('My bookings'),
+            urlHandlers.UHRoomBookingBookingList.getURL(is_only_mine=True, is_auto=True),
             enabled=True
         )
 
         self._myPreBookingListOpt = SideMenuItem(
-            _("My PRE-bookings"),
-            urlHandlers.UHRoomBookingBookingList.getURL(onlyMy=True, onlyPrebookings=True, autoCriteria=True),
+            _('My PRE-bookings'),
+            urlHandlers.UHRoomBookingBookingList.getURL(is_only_mine=True, is_only_pre_bookings=True, autoCriteria=True),
             enabled=True
         )
 
         self._usersBookings = SideMenuItem(
-            _("Bookings in my rooms"),
-            urlHandlers.UHRoomBookingBookingList.getURL(ofMyRooms=True, autoCriteria=True),
+            _('Bookings in my rooms'),
+            urlHandlers.UHRoomBookingBookingList.getURL(is_only_my_rooms=True, is_auto=True),
             enabled=self._showResponsible
         )
 
         self._usersPrebookings = SideMenuItem(
-            _("PRE-bookings in my rooms"),
-            urlHandlers.UHRoomBookingBookingList.getURL(ofMyRooms=True, onlyPrebookings=True, autoCriteria=True),
+            _('PRE-bookings in my rooms'),
+            urlHandlers.UHRoomBookingBookingList.getURL(is_only_my_rooms=True, is_only_pre_bookings=True, is_auto=True),
             enabled=self._showResponsible
         )
 
         self._bookingListSearchOpt = SideMenuItem(
-            _("Search bookings"),
+            _('Search bookings'),
             urlHandlers.UHRoomBookingSearch4Bookings.getURL(),
             enabled=True
         )
 
-        self._blockingsOpt = SideMenuSection(_("Room Blocking"))
+        self._blockingsOpt = SideMenuSection(_('Room Blocking'))
 
         self._usersBlockings = SideMenuItem(
-            _("Blockings for my rooms"),
-            urlHandlers.UHRoomBookingBlockingsMyRooms.getURL(filterState='pending'),
+            _('Blockings for my rooms'),
+            urlHandlers.UHRoomBookingBlockingsMyRooms.getURL(filter_state='pending'),
             enabled=self._showResponsible
         )
 
         self._roomsOpt = SideMenuSection(
-            _("View Rooms"),
+            _('View Rooms'),
             urlHandlers.UHRoomBookingSearch4Rooms.getURL()
         )
 
         self._roomSearchOpt = SideMenuItem(
-            _("Search rooms"),
+            _('Search rooms'),
             urlHandlers.UHRoomBookingSearch4Rooms.getURL(),
             enabled=True
         )
 
         self._myRoomListOpt = SideMenuItem(
-            _("My rooms"),
-            urlHandlers.UHRoomBookingRoomList.getURL(onlyMy=True),
+            _('My rooms'),
+            urlHandlers.UHRoomBookingRoomList.getURL(is_only_mine=True),
             enabled=self._showResponsible
         )
 
         if self._showResponsible:
             self._myBlockingListOpt = SideMenuItem(
-                _("My blockings"),
-                urlHandlers.UHRoomBookingBlockingList.getURL(onlyMine=True, onlyRecent=True),
+                _('My blockings'),
+                urlHandlers.UHRoomBookingBlockingList.getURL(is_only_mine=True, is_only_recent=True),
                 enabled=True
             )
         else:
             self._myBlockingListOpt = SideMenuItem(
-                _("Blockings"),
-                urlHandlers.UHRoomBookingBlockingList.getURL(onlyRecent=True),
+                _('Blockings'),
+                urlHandlers.UHRoomBookingBlockingList.getURL(is_only_recent=True),
                 enabled=True
             )
 
         self._blockRooms = SideMenuItem(
-            _("Block rooms"),
+            _('Block rooms'),
             urlHandlers.UHRoomBookingBlockingForm.getURL(),
             enabled=self._showResponsible
         )
@@ -185,12 +185,12 @@ class WPRoomBookingBase(WPMainBase):
 
         if self._rh._getUser().isRBAdmin():
             self._adminSect = SideMenuSection(
-                _("Administration"),
+                _('Administration'),
                 urlHandlers.UHRoomBookingAdmin.getURL()
             )
 
             self._adminOpt = SideMenuItem(
-                _("Administration"),
+                _('Administration'),
                 urlHandlers.UHRoomBookingAdmin.getURL()
             )
 
