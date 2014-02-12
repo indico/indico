@@ -21,7 +21,7 @@ import indico.ext.statistics.chrome as handlers
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-blueprint = IndicoBlueprint('statistics', __name__, url_prefix='/statistics')
+blueprint = IndicoBlueprint('statistics', __name__)
 
-blueprint.add_url_rule('', 'view', handlers.RHStatisticsView)
-blueprint.add_url_rule('/<path:filepath>', 'htdocs', handlers.RHStatisticsHtdocs)
+blueprint.add_url_rule('/event/<confId>/manage/statistics', 'view', handlers.RHStatisticsView)
+blueprint.add_url_rule('/statistics/<path:filepath>', 'htdocs', handlers.RHStatisticsHtdocs)
