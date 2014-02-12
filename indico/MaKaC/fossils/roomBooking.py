@@ -105,6 +105,9 @@ class IRoomMapFossil(IRoomFossil):
     def hasWebcastRecording(self):
         """ Setup for webcast/recording """
 
+    def hasProjector(self):
+        """ Projector available """
+
     def getAvailableVC(self):
         """ Available equipment for audio and video conference """
 

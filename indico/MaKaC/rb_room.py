@@ -630,6 +630,13 @@ class RoomBase(object):
             return None
         return 'Webcast/Recording' in ' '.join(eq)
 
+    # CERN specific; don't bother
+    def hasProjector(self):
+        eq = self.getEquipment()
+        if not self.locationName or not eq:
+            return None
+        return 'Computer Projector' in ' '.join(eq)
+
     def _eval_str(self, s):
         ixPrv = 0
         ret = ""

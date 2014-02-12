@@ -60,6 +60,7 @@
             data.search = self.filter.search.val();
             data.videoconference = self.filter.videoconference.prop("checked");
             data.webcast = self.filter.webcast.prop("checked");
+            data.projector = self.filter.projector.prop('checked');
             data.publicroom = self.filter.publicroom.prop("checked");
             data.capacity = self.filter.capacity.val();
 
@@ -90,6 +91,7 @@
                     .attr("label",
                         room.needsAVCSetup + ":" +
                         room.hasWebcastRecording + ":" +
+                        room.hasProjector + ':' +
                         room.isPublic + ":" +
                         (room.capacity || Number(0)))
                     .attr("value", room.guid)
@@ -177,6 +179,7 @@
             self.filter.search = header.find(".ui-multiselect-filter input").attr("type", "text");
             self.filter.videoconference = $("<input type='checkbox' id='videoconference' name='advanced_options'/>");
             self.filter.webcast = $("<input type='checkbox' id='webcast' name='advanced_options'/>");
+            self.filter.projector = $("<input type='checkbox' id='projector' name='advanced_options'/>");
             self.filter.publicroom = $("<input type='checkbox' id='publicroom' name='advanced_options'/>");
             self.filter.capacity = $("<input type='text' id='capacity' value='0'/>");
 
@@ -214,6 +217,9 @@
                    .append(filter.webcast)
                    .append($("<label for='webcast' class='i-button icon-broadcast'/>")
                            .attr("title", $T('Webcast')))
+                   .append(filter.projector)
+                   .append($("<label for='projector' class='i-button icon-projector'/>")
+                           .attr("title", $T('Projector')))
                    .append(filter.publicroom)
                    .append($("<label for='publicroom' class='i-button icon-unlocked'/>")
                            .attr("title", $T('Public room')))
@@ -225,7 +231,7 @@
             // Capacity slider
             self.slider = $("<div class='group'/>")
                 .append($("<span class='i-button label'/>").text($T("Capacity")))
-                .append($("<span class='i-button label capacityslider'/>").css("width", "150px")
+                .append($("<span class='i-button label capacityslider'/>").css("width", "110px")
                     .append($("<span/>").slider({
                         range: "min",
                         min: 0,
@@ -273,15 +279,16 @@
             var self = this;
             var rooms = self.options.rooms;
 
-            var icons = ["icon-camera", "icon-broadcast", "icon-unlocked", "icon-user"];
+            var icons = ["icon-camera", "icon-broadcast", 'icon-projector', "icon-unlocked", "icon-user"];
             var activetitles = [$T("Video conference available"),
                                 $T("Webcast/Recording available"),
+                                $T('Projector available'),
                                 $T("Public room"),
                                 $T("Maximum capacity")];
             var disabledtitles = [$T("Video conference not available"),
                                   $T("Webcast/Recording not available"),
+                                  $T('Projector not available'),
                                   $T("Private room")];
-
 
             self.select.find("option").each(function(index) {
                 var labelparts = $(this).attr('label').split(":");
@@ -306,6 +313,7 @@
                 var attributes = $("<span class='attributes'/>")
                     .append($("<span class='icon-camera'/>"))
                     .append($("<span class='icon-broadcast'/>"))
+                    .append($('<span class="icon-projector"/>'))
                     .append($("<span class='icon-unlocked'/>"))
                     .appendTo(item);
 
@@ -370,6 +378,7 @@
                 self.filter.search.val(data.filter).trigger("propertychange");
                 self.filter.videoconference.prop('checked', data.videoconference);
                 self.filter.webcast.prop('checked', data.webcast);
+                self.filter.projector.prop('checked', data.projector);
                 self.filter.publicroom.prop('checked', data.publicroom);
                 self.filter.capacity.val(data.capacity).trigger("focusout");
                 self._updateFilter();
@@ -405,6 +414,7 @@
             var filter = self.filter;
             var filterString = filter.videoconference.is(':checked') + ":" +
                                filter.webcast.is(':checked') + ":" +
+                               filter.projector.is(':checked') + ':' +
                                filter.publicroom.is(':checked') + ":" +
                                filter.capacity.val();
             self.select.multiselectfilter('advancedFilter', filterString);
