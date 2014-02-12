@@ -116,7 +116,7 @@ class WPRoomBookingBase(WPMainBase):
 
         self._myPreBookingListOpt = SideMenuItem(
             _('My PRE-bookings'),
-            urlHandlers.UHRoomBookingBookingList.getURL(is_only_mine=True, is_only_pre_bookings=True, autoCriteria=True),
+            urlHandlers.UHRoomBookingBookingList.getURL(is_only_mine=True, is_only_pre_bookings=True, is_auto=True),
             enabled=True
         )
 
