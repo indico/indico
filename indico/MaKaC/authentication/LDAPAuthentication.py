@@ -532,7 +532,7 @@ class LDAPConnector(object):
             groupSid = self.l.search_s(groupDN, ldap.SCOPE_BASE,
                                        attrlist=['objectSid'])[0][1]['objectSid'][0]
             res = self.l.search_s(self._findDNOfUser(login), ldap.SCOPE_BASE,
-                                  attrlist=['tokenGroups'])[0][1]['tokenGroups']
+                                  attrlist=['tokenGroups'])[0][1].get("tokenGroups", [])
             return groupSid in res
         elif self.groupStyle == 'SLAPD':
             query = 'member={0}'.format(self._findDNOfUser(login))
