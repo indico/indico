@@ -46,7 +46,10 @@ $(document).ready(function() {
 
     $('.contextHelp[title]').qtip();
 
-    $(document).on("mouseenter", '[title]:not([title=""])', function(event) {
+    $(document).on("mouseenter", '[title]:not([title=""]):not(iframe)', function(event) {
+        if (!$(this).attr('title').trim()) {
+            return;
+        }
         $(this).qtip({
             overwrite: false,
             show: {
