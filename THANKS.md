@@ -74,6 +74,8 @@ jQuery placeholder (https://github.com/mathiasbynens/jquery-placeholder) is a MI
 
 [Room icon](http://thenounproject.com/noun/room/#icon-No17576)Room designed by [Tiago Dos Reis Rodrigues](http://thenounproject.com/tiagor2) from The Noun Project.
 
+[Projector icon](http://thenounproject.com/term/projector/24148/) Projector designed by [Örn Smári Gíslason](http://thenounproject.com/%C3%96rn%20Sm%C3%A1ri/) from the Noun Project.
+
 Simple Toogle switch CSS (http://www.cssflow.com) is freely distributed under MIT license.
 
 See also the AUTHORS and ChangeLog files.
