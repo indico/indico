@@ -30,9 +30,9 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
 
 
-class BooleanOnMixin:
-    """Mixin to convert True to 'on' and remove False altogether."""
-    _true = 'on'
+class BooleanMixin:
+    """Mixin to convert True to 'y' and remove False altogether."""
+    _true = 'y'
 
     @classmethod
     def _translateParams(cls, params):
@@ -41,7 +41,7 @@ class BooleanOnMixin:
                     if value is not False)
 
 
-class BooleanTrueMixin(BooleanOnMixin):
+class BooleanTrueMixin(BooleanMixin):
     _true = 'True'
 
 
@@ -412,7 +412,7 @@ class UHRoomBookingWelcome(URLHandler):
 
 class UHRoomBookingSearch4Rooms(URLHandler):
     _endpoint = 'rooms.roomBooking-search4Rooms'
-    _defaultParams = dict(forNewBooking=False)
+    _defaultParams = dict(is_new_booking='n')
 
 
 class UHRoomBookingSearch4Bookings(URLHandler):
@@ -423,39 +423,39 @@ class UHRoomBookingBookRoom(URLHandler):
     _endpoint = 'rooms.roomBooking-bookRoom'
 
 
-class UHRoomBookingRoomList(BooleanOnMixin, URLHandler):
+class UHRoomBookingRoomList(BooleanMixin, URLHandler):
     _endpoint = 'rooms.roomBooking-roomList'
 
 
-class UHRoomBookingBookingList(URLHandler):
+class UHRoomBookingBookingList(BooleanMixin, URLHandler):
     _endpoint = 'rooms.roomBooking-bookingList'
 
-    @classmethod
-    def getURL(cls, onlyMy=False, newBooking=False, ofMyRooms=False, onlyPrebookings=False, autoCriteria=False,
-               newParams=None, today=False, allRooms=False):
-        """
-        onlyMy - only bookings of the current user
-        ofMyRooms - only bookings for rooms managed by the current user
-        autoCriteria - some reasonable constraints, like "only one month ahead"
-        """
-        url = cls._getURL()
-        if onlyMy:
-            url.addParam('onlyMy', 'on')
-        if newBooking:
-            url.addParam('newBooking', 'on')
-        if ofMyRooms:
-            url.addParam('ofMyRooms', 'on')
-        if onlyPrebookings:
-            url.addParam('onlyPrebookings', 'on')
-        if autoCriteria:
-            url.addParam('autoCriteria', 'True')
-        if today:
-            url.addParam('day', 'today')
-        if allRooms:
-            url.addParam('roomGUID', 'allRooms')
-        if newParams:
-            url.setParams(newParams)
-        return url
+    # @classmethod
+    # def getURL(cls, onlyMy=False, newBooking=False, ofMyRooms=False, onlyPrebookings=False, autoCriteria=False,
+    #            newParams=None, today=False, allRooms=False):
+    #     """
+    #     onlyMy - only bookings of the current user
+    #     ofMyRooms - only bookings for rooms managed by the current user
+    #     autoCriteria - some reasonable constraints, like "only one month ahead"
+    #     """
+    #     url = cls._getURL()
+    #     if onlyMy:
+    #         url.addParam('is_only_mine', 'y')
+    #     if newBooking:
+    #         url.addParam('is_new_nooking', 'y')
+    #     if ofMyRooms:
+    #         url.addParam('is_only_my_rooms', 'y')
+    #     if onlyPrebookings:
+    #         url.addParam('is_only_pre_bookings', 'y')
+    #     if autoCriteria:
+    #         url.addParam('is_auto_criteria', 'y')
+    #     if today:
+    #         url.addParam('is_today', 'y')
+    #     if allRooms:
+    #         url.addParam('room_id_list', '-1')
+    #     if newParams:
+    #         url.setParams(newParams)
+    #     return url
 
 
 class UHRoomBookingBookingListForBooking(UHRoomBookingBookingList):
@@ -597,9 +597,9 @@ class UHRoomBookingBlockingsBlockingDetails(URLHandler):
     _endpoint = 'rooms.roomBooking-blockingDetails'
 
 
-class UHRoomBookingBlockingList(BooleanOnMixin, URLHandler):
+class UHRoomBookingBlockingList(BooleanMixin, URLHandler):
     _endpoint = 'rooms.roomBooking-blockingList'
-    _defaultParams = dict(onlyThisYear=True)
+    _defaultParams = dict(is_only_this_year=True)
 
 
 class UHRoomBookingBlockingForm(URLHandler):
