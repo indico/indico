@@ -2242,6 +2242,8 @@ class WSignIn(WTemplated):
 
 class WConfirmation(WTemplated):
 
+    DEFAULT_CHALLENGE = _('Are you sure you want to perform this action?')
+
     def getHTML(self, message, postURL, passingArgs, loading=False, severity="warning", **opts):
         params = {}
         params["message"] = message

@@ -23,5 +23,6 @@ from MaKaC.webinterface.rh import admins
 def index(req, **params):
     return admins.RHSystem(req).process(params)
 
+
 def modify(req, **params):
     return admins.RHSystemModify(req).process(params)
