@@ -5655,8 +5655,8 @@ class MiscellaneousInfoSimpleItem(Persistent):
 
     def getHTMLName(self):
         try:
-            if not self._HTMLName:
-                self._HTMLName = self.getGeneralSection().getInput().getHTMLName()
+            if self._HTMLName == "":
+                self._HTMLName = self.getGeneralField().getInput().getHTMLName()
         except:
             self._HTMLName = ""
         return self._HTMLName
