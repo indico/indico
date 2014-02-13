@@ -163,25 +163,25 @@ class RegistrationForm(Persistent):
         form.personalData = self.getPersonalData().clone(form)
         form.generalSectionForms[form.personalData.getId()] = form.personalData
         acf = self.getAccommodationForm()
-        if acf is not None :
+        if acf is not None:
             form.accommodationForm = acf.clone(form)
         fif = self.getFurtherInformationForm()
-        if fif is not None :
+        if fif is not None:
             form.furtherInformation = fif.clone()
         rpf = self.getReasonParticipationForm()
-        if rpf is not None :
+        if rpf is not None:
             form.reasonParticipationForm = rpf.clone()
         form.setAllSessions()
         ses = self.getSessionsForm()
-        if ses is not None :
+        if ses is not None:
             form.sessionsForm = ses.clone(form.sessionsForm.getSessionList())
         sef = self.getSocialEventForm()
-        if sef is not None :
+        if sef is not None:
             form.socialEventForm = sef.clone(form)
         form._sortedForms = []
         for item in self.getSortedForms():
             clonedItem = form.getSectionById(item.getId())
-            if clonedItem is None: # General Section, not cloned yet
+            if clonedItem is None:  # General Section, not cloned yet
                 clonedItem = item.clone(form)
                 form.generalSectionForms[clonedItem.getId()] = clonedItem
             form.addToSortedForms(clonedItem)
@@ -299,13 +299,13 @@ class RegistrationForm(Persistent):
     def setUsersLimit(self, newLimit):
         if isinstance(newLimit, int):
             self.usersLimit = newLimit
-        elif isinstance(newLimit, str) :
+        elif isinstance(newLimit, str):
             if newLimit.strip() == "":
                 self.usersLimit = 0
             else:
                 self.usersLimit = int(newLimit.strip())
-        if self.usersLimit < 0: self.usersLimit = 0
-
+        if self.usersLimit < 0:
+            self.usersLimit = 0
 
     def getUsersLimit(self):
         return self.usersLimit
@@ -515,7 +515,7 @@ class RegistrationForm(Persistent):
 
     def addGeneralSectionForm(self, gsf, preserveTitle=False, pos=None):
         id = str(self._getGeneralSectionGenerator().newCount())
-        while self.getGeneralSectionFormById(id) != None:
+        while self.getGeneralSectionFormById(id) is not None:
             id = str(self._getGeneralSectionGenerator().newCount())
         gsf.setId(id)
         if not preserveTitle:
@@ -570,7 +570,7 @@ class RegistrationForm(Persistent):
     def getLocator(self):
         """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the RegistrationForm instance """
-        if self.getConference() == None:
+        if self.getConference() is None:
             return Locator()
         lconf = self.getConference().getLocator()
         return lconf
@@ -582,7 +582,7 @@ class RegistrationForm(Persistent):
             if accoType is not None:
                 accoType.decreaseNoPlaces()
         for se in reg.getSocialEvents():
-            se.delete() # It'll decrease the no of places
+            se.delete()  # It'll decrease the no of places
         for mg in reg.getMiscellaneousGroupList():
             for item in mg.getResponseItemList():
                 item.getGeneralField().getInput()._beforeValueChange(item, False)
@@ -606,6 +606,7 @@ class RegistrationForm(Persistent):
         except AttributeError:
             self._eTicket = eticket.ETicket()
             return self._eTicket
+
 
 class Notification(Persistent):
 
@@ -1027,6 +1028,7 @@ A registrant has modified his/her registration for '%s'. See information below:
         xmlGen.writeTag("ccList", ", ".join(self.getCCList()))
         xmlGen.closeTag("notification")
 
+
 class BaseForm(Persistent):
 
     """
@@ -1188,6 +1190,7 @@ class FieldInputType(Persistent):
         fi = FieldInputs().getAvailableInputKlassById(self.getId())(gf)
         return fi
 
+
 class TextInput(FieldInputType, Fossilizable):
 
     fossilizes(IRegFormTextInputFieldFossil)
@@ -1290,6 +1293,7 @@ class TextInput(FieldInputType, Fossilizable):
     def setLength(self, value):
         self._length = value
 
+
 class TelephoneInput(FieldInputType, Fossilizable):
 
     fossilizes(IRegFormTelephoneInputFieldFossil)
@@ -1378,13 +1382,15 @@ class TelephoneInput(FieldInputType, Fossilizable):
 
     def getLength(self):
         try:
-            if self._length: pass
+            if self._length:
+                pass
         except AttributeError:
             self._length = ''
         return self._length
 
     def setLength(self, value):
         self._length = value
+
 
 class TextareaInput(FieldInputType, Fossilizable):
 
@@ -1513,6 +1519,7 @@ class TextareaInput(FieldInputType, Fossilizable):
 
     def setNumberOfColumns(self, value):
         self._numberOfColumns = value
+
 
 class NumberInput(FieldInputType, Fossilizable):
 
@@ -1674,6 +1681,7 @@ class NumberInput(FieldInputType, Fossilizable):
     def getModifLabelCol(self):
         return self._parent.getCaption()
 
+
 class LabelInput(FieldInputType, Fossilizable):
 
     fossilizes(IRegFormLabelInputFieldFossil)
@@ -1804,6 +1812,7 @@ class CheckboxInput(FieldInputType, Fossilizable):
                   </td>
                 </tr>""") % (self._parent.getPlacesLimit())
         return html
+
 
 class YesNoInput(FieldInputType, Fossilizable):
 
@@ -1947,6 +1956,7 @@ class FileInput(FieldInputType, Fossilizable):
     def clone(self, gf):
         ti = FieldInputType.clone(self, gf)
         return ti
+
 
 class RadioItem(Persistent, Fossilizable):
 
@@ -2110,11 +2120,13 @@ class RadioItem(Persistent, Fossilizable):
         return cmp(r1.getCaption(), r2.getCaption())
     _cmpCaption = staticmethod(_cmpCaption)
 
+
 class RadioGroupInput(FieldInputType, Fossilizable):
 
     fossilizes(IRegFormRadioGroupInputFieldFossil)
 
     _id = "radio"
+
     def getName(cls):
         return "Multiple options/One choice"
     getName = classmethod(getName)
@@ -2532,6 +2544,7 @@ class RadioGroupInput(FieldInputType, Fossilizable):
         html.append("""</table></td></tr>""")
         return "".join(html)
 
+
 class CountryInput(FieldInputType, Fossilizable):
 
     fossilizes(IRegFormCountryInputFieldFossil)
@@ -2593,6 +2606,7 @@ class CountryInput(FieldInputType, Fossilizable):
 
     def _getSpecialOptionsHTML(self):
         return ""
+
 
 class DateInput(FieldInputType, Fossilizable):
 
@@ -2732,7 +2746,6 @@ class DateInput(FieldInputType, Fossilizable):
                 value = display
                 break
         return value
-
 
 
 class FieldInputs:
@@ -3006,6 +3019,7 @@ class GeneralField(Persistent, Fossilizable):
         lconf["sectionFieldId"] = self.getId()
         return lconf
 
+
 class GeneralSectionForm(BaseForm, Fossilizable):
 
     fossilizes(IRegFormGeneralSectionFossil)
@@ -3147,6 +3161,7 @@ class GeneralSectionForm(BaseForm, Fossilizable):
     def notifyModification(self):
         self._p_changed = 1
 
+
 class PersonalDataForm(GeneralSectionForm):
     def __init__(self, regForm, createFields=True):
         GeneralSectionForm.__init__(self, regForm, {'title': 'Personal Data'}, True)
@@ -3257,6 +3272,7 @@ class PersonalDataForm(GeneralSectionForm):
         r['personalHomepage'] = reg.getPersonalHomepage()
         return r
 
+
 class PersonalDataFormItem(Persistent): # old
 
     def __init__(self, data=None):
@@ -3308,6 +3324,7 @@ class PersonalDataFormItem(Persistent): # old
     def setMandatory(self, v):
         self._mandatory = v
         self._p_changed = 1
+
 
 class PersonalData(Persistent):
 
@@ -4010,6 +4027,7 @@ class RegistrationSession(Persistent, Fossilizable):
             return 0
         return cmp(s1.getTitle(), s2.getTitle())
 
+
 class SessionsForm(BaseForm, Fossilizable):
 
     fossilizes(IRegFormSessionSectionFossil)
@@ -4530,6 +4548,7 @@ class SocialEventForm(BaseForm, Fossilizable):
         lconf["sectionFieldId"] = self.getId()
         return lconf
 
+
 class StatusValue(Persistent):
 
     def __init__(self, st, data=None):
@@ -4605,7 +4624,6 @@ class Status(Persistent):
         for v in self.getStatusValuesList()[:]:
             if v.getId() not in ids:
                 self.removeStatusValue(v)
-
 
     def getValues(self):
         d = {}
@@ -4731,7 +4749,6 @@ class Registrant(Persistent, Fossilizable):
         self._hasPay = False
         self._transactionInfo = None
 
-
         self._randomId = self._generateRandomId()
         self._attachmentsCounter = Counter()
 
@@ -4747,7 +4764,7 @@ class Registrant(Persistent, Fossilizable):
         return cmp(self.getConference(), other.getConference())
 
     def isPayedText(self):
-        if self.getPayed() :
+        if self.getPayed():
             return "Yes"
         elif not self.doPay():
             return "-"
@@ -5342,6 +5359,7 @@ class BilledItemsWrapper(object):
     def getBilledItems(self):
         return [item.getBilledItem() for item in self._items if item.isBillable() and not item.isCancelled()]
 
+
 class BilledItem(object):
 
     def __init__(self, caption, price, quantity, currency):
@@ -5361,6 +5379,7 @@ class BilledItem(object):
 
     def getCurrency(self):
         return self._currency
+
 
 class Accommodation(Persistent):
 
@@ -5522,6 +5541,7 @@ class SocialEvent(Persistent, Fossilizable):
     def delete(self):
         self._socialEventItem.decreaseNoPlaces(self._noPlaces)
 
+
 class RegistrantSession(Persistent):
 
     def __init__(self, ses, reg=None):
@@ -5575,6 +5595,7 @@ class RegistrantSession(Persistent):
 
     def isCancelled(self):
         return self._regSession.isCancelled()
+
 
 class MiscellaneousInfoGroup(Persistent, Fossilizable):
 
@@ -5691,6 +5712,7 @@ class MiscellaneousInfoSimpleItem(Persistent):
         except:
             self.setQuantity(0)
         return self._quantity
+
     def setQuantity(self, quantity):
         self._quantity = quantity
 
@@ -5733,6 +5755,7 @@ class MiscellaneousInfoSimpleItem(Persistent):
     def setValue(self, v):
         self._value = v
 
+
 class RegistrantStatus(Persistent):
 
     def __init__(self, reg, st, data=None):
@@ -5763,6 +5786,7 @@ class RegistrantStatus(Persistent):
 
     def setStatusValue(self, v):
         self._value = v
+
 
 class RegistrantMapping(object):
 
@@ -5857,7 +5881,7 @@ class RegistrantMapping(object):
         if st.getStatusValue() is not None:
             return st.getStatusValue().getCaption()
         else:
-            return  i18nformat("""<span style="white-space:nowrap">--  _("not set") --</span>""")
+            return i18nformat("""<span style="white-space:nowrap">--  _("not set") --</span>""")
 
     def _getGroup(self, groupId):
         if self._registrant.getMiscellaneousGroupById(groupId):
