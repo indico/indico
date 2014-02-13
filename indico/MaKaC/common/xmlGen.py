@@ -37,7 +37,7 @@ class XMLGen:
         self.xml=["""<?xml version="1.0" encoding="UTF-8"?>\n"""]
 
     def getXml(self):
-        return "".join(self.xml).encode('utf-8')
+        return "".join(self.xml)
 
     def escapeString(self,text):
         tmp = encodeUnicode(text, self._sourceEncoding)
