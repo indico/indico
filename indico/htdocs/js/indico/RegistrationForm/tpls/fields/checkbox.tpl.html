@@ -9,9 +9,11 @@
                 ng-required="field.mandatory"
                 ng-disabled="!hasPlacesLeft(field, userdata[getName(field.id)], field.input) || paymentBlocked(field, userdata)"/>
             <div>
-                <label for="field-{{ section.id }}-{{ field.id }}" ng-bind-html="field.caption">{{field.caption}}</label>
-                <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
-                <br><small ng-bind-html="field.description" class="field-description">{{ field.description }}</small>
+                <label for="field-{{ section.id }}-{{ field.id }}"
+                    ng-bind-html="field.caption"></label>
+                <span ng-show="field.mandatory" class="regFormMandatoryField">*</span><br>
+                <small class="field-description"
+                    ng-bind-html="field.description"></small>
             </div>
         </div>
         <span ng-show="validationStarted && nestedForm.$invalid" class="error-message-tag">

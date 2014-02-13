@@ -1,7 +1,8 @@
 <div class="field-input-only-content label-text">
     <span>
-        <span ng-bind-html="field.caption">{{ field.caption }}</span> <br>
-        <small ng-bind-html="field.description" class="field-description">{{ field.description }}</small> 
+        <span ng-bind-html="field.caption"></span><br>
+        <small class="field-description"
+            ng-bind-html="field.description"></small>
     </span>
     <span ng-if="field.billable" class="label-price">
         <span class="regFormPrice">{{ field.price }}</span>

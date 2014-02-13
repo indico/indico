@@ -5,13 +5,11 @@
             <tr ng-switch-default>
                 <td>
                     <div>
-                        <div class="regform-section-title" ng-bind-html="section.title">
-                            {{ section.title }}
-                        </div>
-                        <div ng-if="section.description"  ng-bind-html="section.description"
-                            class="regform-section-description">
-                            {{ section.description }}
-                        </div>
+                        <div class="regform-section-title"
+                            ng-bind-html="section.title"></div>
+                        <div ng-if="section.description"
+                            class="regform-section-description"
+                            ng-bind-html="section.description"></div>
                     </div>
                 </td>
             </tr>

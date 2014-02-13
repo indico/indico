@@ -3,15 +3,14 @@
         <div ng-if="section.content == ''" class="section-placeholder">
             {{ 'There is no further information. ' | i18n }}
         </div>
-        <div class="regFormText" ng-bind-html="section.content">
-            {{ section.content }}
-        </div>
+        <div class="regFormText"
+            ng-bind-html="section.content"></div>
     </div>
     <div ng-switch-when="true">
-        <div class="regFormText"
+        <div contenteditable
+            class="regFormText"
             ng-model="section.content"
             placeholder="Fill the further information content"
-            contenteditable
             nd-multiline="true">
         </div>
     </div>
