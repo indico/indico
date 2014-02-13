@@ -18,7 +18,6 @@
 var oldcreate = $.ech.multiselect.prototype._create;
 
 $.extend($.ech.multiselect.prototype, {
-
     _create: function() {
         this.oldcreate = oldcreate;
         this.oldcreate(this);
@@ -30,9 +29,7 @@ $.extend($.ech.multiselect.prototype, {
             e.stopPropagation();
         });
 
-        this.header.delegate('label', 'mouseenter.multiselect', function(e) {
-            e.stopPropagation();
-        });
+        this.menu.undelegate('label', 'mouseenter.multiselect');
     }
 });
 
