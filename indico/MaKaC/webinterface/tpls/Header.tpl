@@ -41,8 +41,6 @@
             <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHContact.getURL() }">Contact</a></li>
             <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHCategoryMap.getURL(categId=0) }">Site Map</a></li>
             <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHAbout.getURL() }">About Indico</a></li>
-
-            <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''" style="display: none;"><a href="urlHandlers.UHGetUserEventPage.getURL()">${ _("My Indico") }</a></li>
         </ul>
     </div>
 </div>
