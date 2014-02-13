@@ -5651,6 +5651,7 @@ class MiscellaneousInfoSimpleItem(Persistent):
         self._quantity = 0
         self._currency = ""
         self._mandatory = False
+        # TODO: When migrate to new database, take into account that HTMLName cannot be empty string
         self._HTMLName = ""
 
     def getHTMLName(self):
