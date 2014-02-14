@@ -226,7 +226,7 @@ class Conversion(object):
         allowed_groups = []
         for allowed in obj.getRecursiveAllowedToAccessList():
             if isinstance(allowed, Avatar):
-                allowed_emails.append(allowed.getEmail())
+                allowed_emails.extend(allowed.getEmails())
             else:
                 allowed_groups.append(allowed.getId())
 
