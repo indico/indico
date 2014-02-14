@@ -7287,6 +7287,9 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
     def getAllMaterialList(self, sort=True):
         return self.getSession().getAllMaterialList(sort=sort)
 
+    def getRecursiveAllowedToAccessList(self):
+        return self.getSession().getRecursiveAllowedToAccessList()
+
 
 class ContributionParticipation(Persistent, Fossilizable):
 

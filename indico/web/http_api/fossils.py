@@ -164,7 +164,16 @@ class _IncludeMaterialFossil(IFossil):
     getAllMaterialList.filterBy = 'access'
 
 
-class IConferenceMetadataFossil(_IncludeMaterialFossil, IFossil):
+class _IncludeACLFossil(IFossil):
+
+    def getRecursiveAllowedToAccessList(self):
+        pass
+    getRecursiveAllowedToAccessList.produce = Conversion.allowedList
+    getRecursiveAllowedToAccessList.name = 'allowed'
+    getRecursiveAllowedToAccessList.onlyIf = 'canModify'
+
+
+class IConferenceMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFossil):
 
     def getId(self):
         pass
@@ -227,6 +236,13 @@ class IConferenceMetadataFossil(_IncludeMaterialFossil, IFossil):
     def getAddress(self):
         pass
 
+    def getCreator(self):
+        pass
+    getCreator.result = IConferenceChairMetadataFossil
+
+    def getCreationDate(self):
+        pass
+
     def getModificationDate(self):
         pass
 
@@ -235,7 +251,7 @@ class IConferenceMetadataFossil(_IncludeMaterialFossil, IFossil):
     getRoomMapURL.produce = lambda x: RoomLinker().getURL(x.getRoom(), x.getLocation())
 
 
-class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
+class IContributionMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFossil):
 
     def getId(self):
         pass
@@ -309,7 +325,7 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
     getKeywords.produce = lambda x: x.getKeywords().splitlines() if x.getKeywords().strip() else []
 
 
-class ISubContributionMetadataFossil(IFossil):
+class ISubContributionMetadataFossil(IFossil, _IncludeACLFossil):
 
     def getId(self):
         pass
@@ -353,7 +369,7 @@ class IConferenceMetadataWithSubContribsFossil(_IncludeMaterialFossil, IConferen
     getContributionList.filterBy = 'access'
 
 
-class ISessionMetadataBaseFossil(ISessionSlotFossil):
+class ISessionMetadataBaseFossil(ISessionSlotFossil,  _IncludeACLFossil):
 
     def getId(self):
         pass

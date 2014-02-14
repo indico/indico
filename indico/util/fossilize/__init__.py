@@ -286,6 +286,13 @@ class Fossilizable(object):
             tags = method.getTaggedValueTags()
             isAttribute = False
 
+            if 'onlyIf' in tags:
+                onlyIf = method.getTaggedValue('onlyIf')
+
+                # If the condition not in the kwargs or the condition False, we do not fossilize the method
+                if not kwargs.get(onlyIf, False):
+                    continue
+
             # In some cases it is better to use the attribute cache to
             # speed up the fossilization
             cacheUsed = False

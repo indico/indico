@@ -22,6 +22,8 @@ Conversion functions for fossils
 """
 
 import pytz
+from MaKaC.user import Avatar
+
 
 class Conversion(object):
 
@@ -217,3 +219,16 @@ class Conversion(object):
     def getReportNumbers(cls, obj):
         from MaKaC.common import utils
         return utils.getReportNumberItems(obj)
+
+    @classmethod
+    def allowedList(cls, obj):
+        allowed_emails = []
+        allowed_groups = []
+        for allowed in obj.getRecursiveAllowedToAccessList():
+            if isinstance(allowed, Avatar):
+                allowed_emails.append(allowed.getEmail())
+            else:
+                allowed_groups.append(allowed.getId())
+
+        return {'users': allowed_emails,
+                'groups': allowed_groups}

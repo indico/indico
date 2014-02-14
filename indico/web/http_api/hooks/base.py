@@ -379,6 +379,7 @@ class IteratedDataFetcher(DataFetcher):
             yield self._postprocess(obj,
                                     fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
                                               filters={'access': self._userAccessFilter},
+                                              canModify=obj.canModify(self._aw),
                                               mapClassType={'AcceptedContribution': 'Contribution'}),
                                     iface)
 
