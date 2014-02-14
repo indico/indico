@@ -301,13 +301,14 @@ class EventCollaborationListener(Component):
             Catalog.getIdx("cs_bookingmanager_conference").index(obj.getId(), csbm)
 
     def deleted(cls, obj, params={}):
-        if obj.__class__ == Conference:
-            obj = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
-            obj.notifyDeletion()
-        elif obj.__class__ == Contribution and obj.getStartDate() is not None:
-            csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
+        csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
+        if isinstance(obj, Conference):
+            # If an Event is deleted, all related Video Services are deleted
+            csBookingManager.notifyDeletion()
+        else:
+            # Only for Contributions, Sessions slots
             for booking in csBookingManager.getBookingList():
-                booking.unindex_talk(obj)
+                booking.notifyDeletion(obj)
 
     # ILocationActionListener
     def placeChanged(cls, obj):

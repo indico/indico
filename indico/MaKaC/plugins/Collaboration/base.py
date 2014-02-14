@@ -2231,6 +2231,13 @@ class CSBookingBase(Persistent, Fossilizable):
     def checkAttachParams(self, bookingParams):
         return None
 
+    def notifyDeletion(self, obj):
+        """ To be overriden by inheriting classes
+            This method is called when the parent object has been deleted and some actions are needed.
+        """
+        pass
+
+
 class WCSTemplateBase(wcomponents.WTemplated):
     """ Base class for Collaboration templates.
         It stores the following attributes:

@@ -19,6 +19,7 @@
 from zope.interface import implements
 import time
 
+from MaKaC.conference import SessionSlot, Contribution
 from MaKaC.common.fossilize import fossilizes, fossilize
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.i18n import _
@@ -705,6 +706,13 @@ class CSBooking(CSBookingBase):
         for booking in VidyoTools.getIndexByVidyoRoom().getBookingList(self.getRoomId()):
             VidyoTools.getIndexByVidyoRoom().unindexBooking(booking)
             booking.setCreated(False)
+
+    def notifyDeletion(self, obj):
+        # If the object it is a Conference we already made the deletion process
+        # Take into account SessionSlot or Contributions
+        if isinstance(obj, (SessionSlot, Contribution)):
+            csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
+            csBookingManager.removeBooking(self.getId())
 
     def _sendNotificationToOldNewOwner(self, oldOwner):
 

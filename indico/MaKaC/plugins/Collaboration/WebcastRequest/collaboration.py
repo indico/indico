@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+
+from MaKaC.conference import Contribution
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.WebcastRequest.mail import NewRequestNotification, RequestModifiedNotification, RequestDeletedNotification,\
     RequestRejectedNotification, RequestAcceptedNotification,\
@@ -216,3 +218,8 @@ class CSBooking(CSBookingBase):
         idx = Catalog.getIdx('cs_booking_instance')
         idx['WebcastRequest'].unindex_talk(self, talk)
         idx['All Requests'].unindex_talk(self, talk)
+
+    def notifyDeletion(self, obj):
+        # The talk is unindexed if it is a Contribution and it has startDate
+        if isinstance(obj, Contribution) and obj.getStartDate() is not None:
+            self.unindex_talk(obj)
