@@ -3,7 +3,7 @@
         <tr role="rowheader">
             <td ng-if="isSortable()"></td>
             <th ng-repeat="name in config.colNames"
-                class="column-title {{ config.colModel[$index].class }}"
+                class="column-title {{ config.colModel[$index].className }}"
                 style="width: {{ config.colModel[$index].width }}px;">
                 <span ng-if="!config.colHelp">
                     {{ name }}
@@ -33,7 +33,7 @@
             <td ng-if="isSortable()"
                 class="table-sortable-handle"></td>
             <td ng-repeat="elem in config.colModel"
-                class="{{ elem.class }}"
+                class="{{ elem.className }}"
                 style="text-align: {{ elem.align }};"
                 name="{{ elem.name }}">
                 <span ng-if="elem.editable == false">

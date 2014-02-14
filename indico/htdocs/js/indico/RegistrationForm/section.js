@@ -658,7 +658,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            name: 'maxPlace',
                            index: 'maxPlace',
                            align: 'center',
-                           class: 'accompanying-col',
+                           className: 'accompanying-col',
                            width: 60,
                            editable: true,
                            edittype: "text",
@@ -670,7 +670,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            width:80,
                            editable: true,
                            align: 'center',
-                           class: 'accompanying-col',
+                           className: 'accompanying-col',
                            defaultVal : false,
                            edittype:'bool_select'
                         }
