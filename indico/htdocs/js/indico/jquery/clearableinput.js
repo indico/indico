@@ -46,18 +46,17 @@
                 });
 
             input.wrap($('<div class="' + opt.clearClass + '"></div>'))
-                .on("input propertychange", function() {
-                    opt.onchange();
-                    if (input.val() === "" && !opt.alwaysClearable) {
-                        self.clearIcon.css("visibility", "hidden");
-                    } else {
-                        self.clearIcon.css("visibility", "visible");
-                    }
+                .on("input", function() {
+                    self._onInput();
                 })
                 .on("keyup", function(e) {
                     if (e.which == K.ESCAPE) {
                         input.val('value');
                         self._clear();
+                    }
+                    // TODO remove when support for IE9 is dropped
+                    if (e.which == K.BACKSPACE || e.which == K.DELETE) {
+                        self._onInput();
                     }
                 });
 
@@ -81,6 +80,19 @@
                 input.focus();
             } else {
                 input.blur();
+            }
+        },
+
+        _onInput: function() {
+            var self = this;
+            var opt = self.options;
+            var input = self.element;
+
+            opt.onchange();
+            if (input.val() === "" && !opt.alwaysClearable) {
+                self.clearIcon.css("visibility", "hidden");
+            } else {
+                self.clearIcon.css("visibility", "visible");
             }
         },
 
