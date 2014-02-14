@@ -332,16 +332,12 @@ Tools Tab
 The meeting Tools allow you to make certain actions on the whole
 of the meeting. See following sub-sections.
 
-
 --------------
 
-Deleting a Meeting
-^^^^^^^^^^^^^^^^^^
+Alarm Control
+^^^^^^^^^^^^^
 
-The Delete meeting option will delete the whole meeting. You will
-be asked to confirm deletion beforehand.
-
-|image122|
+You can set an alarm/reminder in the same way as it's done for conferences; see :ref:`conference_alarms`.
 
 --------------
 
@@ -358,36 +354,6 @@ or on certain dates. For more on cloning, see :ref:`clone_event` for conferences
 
 --------------
 
-Packaging Material
-^^^^^^^^^^^^^^^^^^
-
-Using the *Material package* option you can create a package
-of all the materials that have been used in the meeting.
-
-|image124|
-
---------------
-
-.. Create an Offline version of a Meeting
-.. ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. Using the 'Offline web for your meeting' option you can create a
-.. copy of your meeting that can be used offline for example if you
-.. wish to store your meeting to a dvd.
-
-.. .. |image125|
-
---------------
-
-Alarm Control
-^^^^^^^^^^^^^
-
-You can set an alarm/reminder to alert people about the
-meeting. The alert will be in the form of an email, and in
-the date that you have selected.
-
-|image126|
-
 Posters
 ^^^^^^^
 
@@ -396,7 +362,7 @@ create your own, or create one from a template.
 
 |image146|
 
--------------
+--------------
 
 Lock
 ^^^^
@@ -407,6 +373,33 @@ an administrator of the system/category can unlock an event. You will be
 asked to confirm.
 
 |image121|
+
+--------------
+
+Deleting a Meeting
+^^^^^^^^^^^^^^^^^^
+
+The Delete meeting option will delete the whole meeting. You will
+be asked to confirm deletion beforehand.
+
+|image122|
+
+-------------
+
+Packaging Material
+^^^^^^^^^^^^^^^^^^
+
+Using the *Material package* option you can create a package
+of all the materials that have been used in the meeting.
+
+|image124|
+
+--------------
+
+Create an Offline version of a Meeting
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You can create an offline copy of a meeting in the same way it's done for conferences; see :ref:`offline_conference`.
 
 --------------
 
@@ -551,12 +544,10 @@ The Parellel style:
 .. |image118| image:: UserGuidePics/meet20.png
 .. |image119| image:: UserGuidePics/meet21.png
 .. |image120| image:: UserGuidePics/confm30.png
-.. |image121| image:: UserGuidePics/meet22.png
-.. |image122| image:: UserGuidePics/meet23.png
-.. |image123| image:: UserGuidePics/meet24.png
-.. |image124| image:: UserGuidePics/meet25.png
-.. |image125| image:: UserGuidePics/meet26.png
-.. |image126| image:: UserGuidePics/meet27.png
+.. |image121| image:: UserGuidePics/meetingLock.png
+.. |image122| image:: UserGuidePics/meetingDelete.png
+.. |image123| image:: UserGuidePics/meetingClone.png
+.. |image124| image:: UserGuidePics/meetingMaterial2.png
 .. |image127| image:: UserGuidePics/meetma2.png
 .. |image128| image:: UserGuidePics/meet28.png
 .. |image129| image:: UserGuidePics/meet29.png
@@ -575,7 +566,7 @@ The Parellel style:
 .. |image143| image:: UserGuidePics/meetingMaterial.png
 .. |image144| image:: UserGuidePics/edit.png
 .. |image145| image:: UserGuidePics/delete.png
-.. |image146| image:: UserGuidePics/meetPosters.png
+.. |image146| image:: UserGuidePics/meetingPoster.png
 .. |image147| image:: UserGuidePics/home.png
 .. |image148| image:: UserGuidePics/a1.png
 .. |image149| image:: UserGuidePics/a2.png

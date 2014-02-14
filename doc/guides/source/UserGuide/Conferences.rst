@@ -880,11 +880,7 @@ submitted to the conference:
 
 * **Columns to display**: Clicking on this link will open a box with the columns to display for each abstract.
 
-* **Add New**:  Submit a new abstract. When you click on this, a window will open:
-
-|image150|
-
-You will need to fill in the form and click on *submit* .
+* **Add New**:  Submit a new abstract. This will bring you to a page similar to the one any user will see. For further information about the abstract submission form, please see :ref:`submit_abstract`.
 
 * **Accept**: If you have the correct rights, you can accept abstracts (if not, you can only propose to accept). Tick the corresponding box, and then click on *Accept*.  A new page will appear, where you can choose the destination track, session, the type of contribution and if you wish to send an email notification or not. Once you have chosen all the options, click on *accept*.
 
@@ -1420,6 +1416,19 @@ whole of the conference.
 
 --------------
 
+.. _conference_alarms:
+
+Alarm Control
+^^^^^^^^^^^^^
+
+You can set an alarm/reminder to alert people about the
+conference; the alert will be in the form of an email. To do so, click on
+the button *add new alarm* in the *Alarms* tab.
+
+|image172|
+
+--------------
+
 .. _clone_event:
 
 Clone event
@@ -1479,6 +1488,8 @@ badges for each of them. You can customize them in this tab, and then print them
 As for posters, you have the option to create a new template or to upload
 an already existing one.
 
+|image171|
+
 ------------------
 
 Lock
@@ -1509,6 +1520,19 @@ Using the Material package option you can create a package of all the
 material that has been used in the conference.
 
 |image69|
+
+--------------
+
+.. _offline_conference:
+
+Create an Offline version of a Conference
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Within the *Offline version* tab you can generate an offline copy of your lecture. This is useful if you want to make it available where no Internet connection is available or to distribute it in external devices.
+
+After clicking on *Generate*, your request will appear in the list along with it's status. Once the generation has finished, you will be able to download the offline website from the same list.
+
+|image173|
 
 --------------
 
@@ -1685,6 +1709,8 @@ and view the abstracts they have submitted.
 
 --------------
 
+.. _submit_abstract:
+
 Submitting an Abstract
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1692,7 +1718,9 @@ You need to be logged in as a user and the dates of submission
 must be in the time range to allow you to submit an abstract. Once
 logged in you can fill in the form to submit your abstract.
 
-|image80|
+|image150|
+
+A rich text editor is provided to write an abstract. It supports *LaTeX* commands and *Markdown* syntax, an easy-to-write plain text format that is converted to valid HTML.
 
 You need to fill in the title, content, and the mandatory fields specified
 (if any). You have to add/select at least one primary author. If you
@@ -1702,6 +1730,8 @@ if the option has been set by the manager. You can also choose which track
 you would like your abstract to be included in as well as any
 comments you would like to add. You will receive an email notification
 after submitting.
+
+Once everything is filled in click on *submit* to submit the form.
 
 --------------
 
@@ -2011,9 +2041,9 @@ session. You may also make a PDF of the session.
 .. |image64| image:: UserGuidePics/confm35.png
 .. |image65| image:: UserGuidePics/confm36.png
 .. |image66| image:: UserGuidePics/confm37.png
-.. |image67| image:: UserGuidePics/confm37del.png
-.. |image68| image:: UserGuidePics/confm38.png
-.. |image69| image:: UserGuidePics/confm39.png
+.. |image67| image:: UserGuidePics/conferenceDelete.png
+.. |image68| image:: UserGuidePics/conferenceClone.png
+.. |image69| image:: UserGuidePics/conferenceMaterial2.png
 .. |image70| image:: UserGuidePics/confm40.png
 .. |image71| image:: UserGuidePics/confm41.png
 .. |image72| image:: UserGuidePics/confd1.png
@@ -2024,7 +2054,6 @@ session. You may also make a PDF of the session.
 .. |image77| image:: UserGuidePics/confd6.png
 .. |image78| image:: UserGuidePics/confd7.png
 .. |image79| image:: UserGuidePics/confd8.png
-.. |image80| image:: UserGuidePics/confd9.png
 .. |image81| image:: UserGuidePics/confd10.png
 .. |image82| image:: UserGuidePics/confd11.png
 .. |image83| image:: UserGuidePics/confd12.png
@@ -2069,8 +2098,8 @@ session. You may also make a PDF of the session.
 .. |image124| image:: UserGuidePics/addPageEventPage.png
 .. |image125| image:: UserGuidePics/addSpacer.png
 .. |image126| image:: UserGuidePics/spacerEventPage.png
-.. |image127| image:: UserGuidePics/posters.png
-.. |image128| image:: UserGuidePics/lock.png
+.. |image127| image:: UserGuidePics/conferencePoster.png
+.. |image128| image:: UserGuidePics/conferenceLock.png
 .. |image129| image:: UserGuidePics/pdf2.png
 .. |image130| image:: UserGuidePics/normalView.png
 .. |image131| image:: UserGuidePics/detailedView.png
@@ -2092,7 +2121,7 @@ session. You may also make a PDF of the session.
 .. |image147| image:: UserGuidePics/contrew3.png
 .. |image148| image:: UserGuidePics/contrew4.png
 .. |image149| image:: UserGuidePics/layrew1.png
-.. |image150| image:: UserGuidePics/absSubForm.PNG
+.. |image150| image:: UserGuidePics/absSubForm.png
 .. |image151| image:: UserGuidePics/tt_changetime.png
 .. |image152| image:: UserGuidePics/tt_changeend.png
 .. |image153| image:: UserGuidePics/tt_contribintosession.png
@@ -2113,3 +2142,7 @@ session. You may also make a PDF of the session.
 .. |image168| image:: UserGuidePics/regform-section.png
 .. |image169| image:: UserGuidePics/regform-add-field.png
 .. |image170| image:: UserGuidePics/regform-dialog.png
+.. |image171| image:: UserGuidePics/conferenceBadge.png
+.. |image172| image:: UserGuidePics/conferenceAlarm.png
+.. |image173| image:: UserGuidePics/conferenceOffline.png
+..
