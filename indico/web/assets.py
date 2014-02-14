@@ -374,7 +374,6 @@ def register_all_css(env, main_css_file):
     base_css = Bundle(
         *namespace('css',
                    main_css_file,
-                   'category_display.css',
                    'calendar-blue.css',
                    'jquery-ui.css',
                    'lib/angular.css',

@@ -66,7 +66,7 @@ from MaKaC.webinterface.general import strfFileSize
         </h1>
     </div>
 
-    % if isRootCategory or materials or managers:
+    % if isRootCategory or materials or managers or allowUserModif:
     <div class="category-sidebar">
         % if isRootCategory:
             % if isNewsActive:
@@ -81,20 +81,22 @@ from MaKaC.webinterface.general import strfFileSize
                     ${upcomingEvents}
             % endif
         % else:
-            % if materials:
+            % if materials or allowUserModif:
                 <div>
-                    <div class="right">
-                        <a href="#" id="manageMaterial" class="i-button icon-edit"></a>
-                    </div>
+                    % if allowUserModif:
+                        <div class="right">
+                            <a href="#" id="manageMaterial" class="i-button icon-edit"></a>
+                        </div>
+                    % endif
                     <h2 class="icon-material-download">${ _("Files") }</h2>
                 </div>
                 <ul>
                 % for material in materials:
                     <li>
-                        <div class="left trigger icon-expand" data-hidden="true"></div>
-                        <span title="${material.getDescription()}">
-                            <h3>${material.getTitle()}</h3>
-                        </span>
+                        <a class="material-show" data-hidden="true" title="${material.getDescription()}">
+                           <div class="left material-title-icon icon-next" ></div>
+                           <h3>${material.getTitle()}</h3>
+                        </a>
                         <ul class="resource-list" style="display: none">
                         % for resource in material.getResourceList():
                             <li class="icon-file">
@@ -189,7 +191,7 @@ $(document).ready(function(){
         }
     });
 
-    $('.trigger').click(function() {
+    $('.material-show').click(function() {
         var $this = $(this),
             transition_opts = {
                 duration: 250,
@@ -198,10 +200,12 @@ $(document).ready(function(){
 
         if ($this.data('hidden')) {
             $this.siblings('.resource-list').slideDown(transition_opts);
-            $this.data('hidden', false).removeClass('icon-expand').addClass('icon-collapse');
+            $this.data('hidden', false);
+            $this.children(".material-title-icon").removeClass('icon-next').addClass('icon-collapse');
         } else {
             $this.siblings('.resource-list').slideUp(transition_opts);
-            $this.data('hidden', true).removeClass('icon-collapse').addClass('icon-expand');
+            $this.data('hidden', true);
+            $this.children(".material-title-icon").removeClass('icon-collapse').addClass('icon-next');
         }
     });
 });
