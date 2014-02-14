@@ -81,7 +81,7 @@
     <td class="leftCol">${_("Other occasions")}</td>
     <td>
     % for lecture in lectures:
-        <a href="materialDisplay.py?materialId=${lecture.getId()}&confId=${conf.getId()}">\
+        <a href="${urlHandlers.UHMaterialDisplay.getURL(lecture)}">\
 <img src="${Config.getInstance().getBaseURL()}/images/${lecture.title}.png" alt="${lecture.title}"/></a>&nbsp;
     % endfor
     </td>
