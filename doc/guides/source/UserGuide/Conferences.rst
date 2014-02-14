@@ -1523,8 +1523,10 @@ material that has been used in the conference.
 
 --------------
 
-Create an Offline version of a Lecture
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. _offline_conference:
+
+Create an Offline version of a Conference
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Within the *Offline version* tab you can generate an offline copy of your lecture. This is useful if you want to make it available where no Internet connection is available or to distribute it in external devices.
 

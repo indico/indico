@@ -399,11 +399,7 @@ of all the materials that have been used in the meeting.
 Create an Offline version of a Meeting
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Using the 'Offline web for your meeting' option you can create a
-copy of your meeting that can be used offline for example if you
-wish to store your meeting to a dvd.
-
-|image125|
+You can create an offline copy of a meeting in the same way it's done for conferences; see :ref:`offline_conference`.
 
 --------------
 
@@ -552,7 +548,6 @@ The Parellel style:
 .. |image122| image:: UserGuidePics/meetingDelete.png
 .. |image123| image:: UserGuidePics/meetingClone.png
 .. |image124| image:: UserGuidePics/meetingMaterial2.png
-.. |image125| image:: UserGuidePics/meetingOffline.png
 .. |image127| image:: UserGuidePics/meetma2.png
 .. |image128| image:: UserGuidePics/meet28.png
 .. |image129| image:: UserGuidePics/meet29.png

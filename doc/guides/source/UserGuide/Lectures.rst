@@ -266,11 +266,7 @@ of all the materials that have been used in the lecture.
 Create an Offline version of a Lecture
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Using the *Offline version* option you can create a
-copy of your lecture that can be used offline for example if you
-wish to store your lecture to a dvd.
-
-|image151|
+You can create an offline copy of a lecture in the same way it's done for conferences; see :ref:`offline_conference`.
 
 --------------
 
@@ -360,7 +356,6 @@ The Event style:
 .. |image148| image:: UserGuidePics/lectureDelete.png
 .. |image149| image:: UserGuidePics/lectureClone.png
 .. |image150| image:: UserGuidePics/lectureMaterial.png
-.. |image151| image:: UserGuidePics/lectureOffline.png
 .. |image153| image:: UserGuidePics/meetma2.png
 .. |image154| image:: UserGuidePics/lect17.png
 .. |image155| image:: UserGuidePics/conf2.png
