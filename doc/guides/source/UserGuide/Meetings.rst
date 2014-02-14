@@ -337,11 +337,7 @@ of the meeting. See following sub-sections.
 Alarm Control
 ^^^^^^^^^^^^^
 
-You can set an alarm/reminder to alert people about the
-meeting. The alert will be in the form of an email, and in
-the date that you have selected.
-
-|image126|
+You can set an alarm/reminder in the same way as it's done for conferences; see :ref:`conference_alarms`.
 
 --------------
 
@@ -557,7 +553,6 @@ The Parellel style:
 .. |image123| image:: UserGuidePics/meetingClone.png
 .. |image124| image:: UserGuidePics/meetingMaterial2.png
 .. |image125| image:: UserGuidePics/meetingOffline.png
-.. |image126| image:: UserGuidePics/meetingAlarm.png
 .. |image127| image:: UserGuidePics/meetma2.png
 .. |image128| image:: UserGuidePics/meet28.png
 .. |image129| image:: UserGuidePics/meet29.png

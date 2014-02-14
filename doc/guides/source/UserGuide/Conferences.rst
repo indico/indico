@@ -1423,6 +1423,8 @@ whole of the conference.
 
 --------------
 
+.. _conference_alarms:
+
 Alarm Control
 ^^^^^^^^^^^^^
 

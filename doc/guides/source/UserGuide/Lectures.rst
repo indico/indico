@@ -203,11 +203,7 @@ of the lecture.
 Alarm Control
 ^^^^^^^^^^^^^
 
-You can set an alarm/reminder to alert people about the
-lecture; the alert will be in the form of an email. To do so, click on
-the button *add new alarm* in the *Alarms* tab.
-
-|image152|
+You can set an alarm/reminder in the same way as it's done for conferences; see :ref:`conference_alarms`.
 
 --------------
 
@@ -365,7 +361,6 @@ The Event style:
 .. |image149| image:: UserGuidePics/lectureClone.png
 .. |image150| image:: UserGuidePics/lectureMaterial.png
 .. |image151| image:: UserGuidePics/lectureOffline.png
-.. |image152| image:: UserGuidePics/lectureAlarm.png
 .. |image153| image:: UserGuidePics/meetma2.png
 .. |image154| image:: UserGuidePics/lect17.png
 .. |image155| image:: UserGuidePics/conf2.png
