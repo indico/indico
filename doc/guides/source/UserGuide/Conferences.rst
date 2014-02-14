@@ -880,13 +880,7 @@ submitted to the conference:
 
 * **Columns to display**: Clicking on this link will open a box with the columns to display for each abstract.
 
-* **Add New**:  Submit a new abstract. When you click on this, a window will open:
-
-|image150|
-
-    You will need to fill in the form and click on *submit* .
-
-    From Indico version *1.2* a rich abstract editor is provided supporting *LaTeX* commands and the *Markdown* markup language.
+* **Add New**:  Submit a new abstract. This will bring you to a page similar to the one any user will see. For further information about the abstract submission form, please see :ref:`submit_abstract`.
 
 * **Accept**: If you have the correct rights, you can accept abstracts (if not, you can only propose to accept). Tick the corresponding box, and then click on *Accept*.  A new page will appear, where you can choose the destination track, session, the type of contribution and if you wish to send an email notification or not. Once you have chosen all the options, click on *accept*.
 
@@ -1420,7 +1414,6 @@ Conference Tools
 The conference Tools allow you to carry out certain actions on the
 whole of the conference.
 
-
 --------------
 
 .. _conference_alarms:
@@ -1433,8 +1426,6 @@ conference; the alert will be in the form of an email. To do so, click on
 the button *add new alarm* in the *Alarms* tab.
 
 |image172|
-
-
 
 --------------
 
@@ -1535,9 +1526,9 @@ material that has been used in the conference.
 Create an Offline version of a Lecture
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Using the *Offline version* option you can create a
-copy of your lecture that can be used offline for example if you
-wish to store your lecture to a dvd.
+Within the *Offline version* tab you can generate an offline copy of your lecture. This is useful if you want to make it available where no Internet connection is available or to distribute it in external devices.
+
+After clicking on *Generate*, your request will appear in the list along with it's status. Once the generation has finished, you will be able to download the offline website from the same list.
 
 |image173|
 
@@ -1716,6 +1707,8 @@ and view the abstracts they have submitted.
 
 --------------
 
+.. _submit_abstract:
+
 Submitting an Abstract
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1724,6 +1717,8 @@ must be in the time range to allow you to submit an abstract. Once
 logged in you can fill in the form to submit your abstract.
 
 |image150|
+
+A rich text editor is provided to write an abstract. It supports *LaTeX* commands and *Markdown* syntax, an easy-to-write plain text format that is converted to valid HTML.
 
 You need to fill in the title, content, and the mandatory fields specified
 (if any). You have to add/select at least one primary author. If you
@@ -1734,7 +1729,7 @@ you would like your abstract to be included in as well as any
 comments you would like to add. You will receive an email notification
 after submitting.
 
-From Indico version *1.2* a rich abstract editor is provided supporting *LaTeX* commands and the *Markdown* markup language.
+Once everything is filled in click on *submit* to submit the form.
 
 --------------
 
