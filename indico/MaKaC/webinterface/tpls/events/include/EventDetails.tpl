@@ -33,7 +33,7 @@
 % endif
 
 % if webcastOnAirURL or forthcomingWebcastURL:
-<tr id="webCastRow"">
+<tr id="webCastRow">
     <td class="leftCol">
     % if webcastOnAirURL:
         ${_("Live Webcast")}
@@ -121,7 +121,7 @@ ${pluginDetails}
         <span style="font-weight:bold; font-style:italic; color:#444">Email:</span> <a href="mailto:${conf.getSupportInfo().getEmail()}">${conf.getSupportInfo().getEmail()}</a>
     % endif
     % if conf.getSupportInfo().getTelephone():
-        <span style="font-weight:bold; font-style:italic; color:#444"">Telephone:</span> ${conf.getSupportInfo().getTelephone()}
+        <span style="font-weight:bold; font-style:italic; color:#444">Telephone:</span> ${conf.getSupportInfo().getTelephone()}
     % endif
     </td>
 </tr>
