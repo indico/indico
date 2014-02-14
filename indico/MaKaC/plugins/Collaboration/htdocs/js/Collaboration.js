@@ -1176,7 +1176,7 @@ type ("SearchBookingList", ["SelectableDynamicListWidget"],
             item.append($('<div class="bold roomName"/>').append(elem.get('roomName')));
             item.append($('<div class="bookingDescription"/>').append(elem.get('roomDescription')));
             return item.get(0);
-        },
+        }
     },
 
     function(observer, conf, pluginName, query) {
