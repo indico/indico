@@ -79,7 +79,7 @@
 
             if (error.errorType === 'duplicated') {
                 // the name is duplicated
-                var message = $T("There is already a Vidyo Public Room in this event with the same name. Please give a different name to the room.");
+                var message = $T("There is already a Vidyo Room in the system with the same name. Please give a different name to the room.");
                 IndicoUtil.markInvalidField($E('roomName'), message);
 
             }
