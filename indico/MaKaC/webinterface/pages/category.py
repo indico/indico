@@ -65,6 +65,9 @@ class WPCategoryBase ( main.WPMainBase ):
         self._setTitle(title)
         self._conf = None
 
+    def getCSSFiles(self):
+        return main.WPMainBase.getCSSFiles(self) + self._asset_env['category_sass'].urls()
+
     def _currentCategory(self):
         return self._target
 

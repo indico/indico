@@ -19,6 +19,8 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+@import 'base';
+@import 'compass';
 
 .confirmation-dialog .body ul.categ-list {
     padding-left: 13px;
@@ -30,7 +32,7 @@
         margin: 0;
     }
     span.event-title {
-        font-weight: italic;
+        font-style: italic;
     }
 }
 
