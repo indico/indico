@@ -356,7 +356,7 @@ class RegistrationFormModifRESTBase(RHRegistrationFormModifBase):
 class RHRegistrationModificationSectionQuery(RegistrationFormModifRESTBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
+        post_pm = ParameterManager(decode(request.data))
         self._sectionHeader = {}
         self._sectionHeader["title"] = post_pm.extract('title', pType=str, allowEmpty=False)
         self._sectionHeader["description"] = post_pm.extract('description', pType=str, allowEmpty=True)
@@ -435,7 +435,7 @@ class RHRegistrationFormSectionDisable(RHRegistrationFormModifSectionBase):
 class RHRegistrationFormSectionMove(RHRegistrationFormModifSectionBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
+        post_pm = ParameterManager(decode(request.data))
         self._sectionEndPos = post_pm.extract('endPos', pType=int, allowEmpty=False)
 
     def _process_POST(self):
@@ -446,7 +446,7 @@ class RHRegistrationFormSectionMove(RHRegistrationFormModifSectionBase):
 class RHRegistrationFormSectionTitle(RHRegistrationFormModifSectionBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
+        post_pm = ParameterManager(decode(request.data))
         self._sectionTitle = post_pm.extract('title', pType=str, allowEmpty=False)
 
     def _process_POST(self):
@@ -457,7 +457,7 @@ class RHRegistrationFormSectionTitle(RHRegistrationFormModifSectionBase):
 class RHRegistrationFormSectionDescription(RHRegistrationFormModifSectionBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
+        post_pm = ParameterManager(decode(request.data))
         self._sectionDescription = post_pm.extract('description', pType=str, allowEmpty=True)
 
     def _process_POST(self):
@@ -471,7 +471,7 @@ class RHRegistrationFormAccommodationSetConfig(RHRegistrationFormModifAccomodati
         defaultArrivalOffset = [-2, 0]
         defaultDepartureOffset = [1, 3]
 
-        post_pm = ParameterManager(request.json)
+        post_pm = ParameterManager(decode(request.data))
         self._arrivalOffsetDates = post_pm.extract(
             'arrivalOffsetDates',
             pType=list,
@@ -517,7 +517,7 @@ class RHRegistrationFormAccommodationSetConfig(RHRegistrationFormModifAccomodati
 class RHRegistrationFormFurtherInformationSetConfig(RHRegistrationFormModifFurtherInformationBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
+        post_pm = ParameterManager(decode(request.data))
         self._content = post_pm.extract('content', pType=str, allowEmpty=True)
 
     def _process_POST(self):
@@ -528,7 +528,7 @@ class RHRegistrationFormFurtherInformationSetConfig(RHRegistrationFormModifFurth
 class RHRegistrationFormSocialEventsSetConfig(RHRegistrationFormModifSocialEventsBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
+        post_pm = ParameterManager(decode(request.data))
         self._introSentence = post_pm.extract('introSentence', pType=str, allowEmpty=False)
         self._selectionType = post_pm.extract('selectionType', pType=str, allowEmpty=False)
         self._items = post_pm.extract('items', pType=list, allowEmpty=False)
@@ -560,7 +560,7 @@ class RHRegistrationFormSocialEventsSetConfig(RHRegistrationFormModifSocialEvent
 class RHRegistrationFormSessionsSetConfig(RHRegistrationFormModifSessionsBase):
 
     def _checkParams_POST(self):
-        post_pm = ParameterManager(request.json)
+        post_pm = ParameterManager(decode(request.data))
         self._type = post_pm.extract('type', pType=str, allowEmpty=False)
         self._items = post_pm.extract('items', pType=list, allowEmpty=False)
 
