@@ -31,7 +31,7 @@ from MaKaC.common.contextManager import ContextManager
 
 class AddIPFilter(logging.Filter):
     def filter(self, record):
-        if not super(AddIPFilter, self).filter(record):
+        if not logging.Filter.filter(self, record):
             return False
         # Add request ID if available
         try:
@@ -45,7 +45,7 @@ class ExtraIndicoFilter(AddIPFilter):
     def filter(self, record):
         if record.name.split('.')[0] == 'indico':
             return False
-        return super(ExtraIndicoFilter, self).filter(record)
+        return AddIPFilter.filter(self, record)
 
 
 class IndicoMailFormatter(logging.Formatter):
