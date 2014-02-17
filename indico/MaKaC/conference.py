@@ -7290,6 +7290,9 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
     def getRecursiveAllowedToAccessList(self):
         return self.getSession().getRecursiveAllowedToAccessList()
 
+    def canModify(self, aw):
+        return self.getSession().canModify(aw)
+
 
 class ContributionParticipation(Persistent, Fossilizable):
 
