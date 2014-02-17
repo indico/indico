@@ -39,23 +39,25 @@ from indico.web.flask.util import url_for
 from xml.sax.saxutils import escape
 import string
 
-# ----------------- MANAGEMENT AREA ---------------------------
-class WPConfModifRegistrantListBase( registrationForm.WPConfModifRegFormBase ):
 
-    def _setActiveTab( self ):
+# ----------------- MANAGEMENT AREA ---------------------------
+class WPConfModifRegistrantListBase(registrationForm.WPConfModifRegFormBase):
+
+    def _setActiveTab(self):
         self._tabRegistrants.setActive()
 
-class WPConfModifRegistrantList( WPConfModifRegistrantListBase ):
-    def __init__( self, rh, conference, filterUsed = False ):
+
+class WPConfModifRegistrantList(WPConfModifRegistrantListBase):
+    def __init__(self, rh, conference, filterUsed=False):
         WPConfModifRegistrantListBase.__init__(self, rh, conference)
         self._filterUsed = filterUsed
 
-    def _getTabContent( self, params ):
-        filterCrit=params.get("filterCrit",None)
-        sortingCrit=params.get("sortingCrit",None)
-        display = params.get("display",None)
-        order = params.get("order",None)
-        sessionFilterName=params.get("sessionFilterName", "session")
+    def _getTabContent(self, params):
+        filterCrit = params.get("filterCrit", None)
+        sortingCrit = params.get("sortingCrit", None)
+        display = params.get("display", None)
+        order = params.get("order", None)
+        sessionFilterName = params.get("sessionFilterName", "session")
 
         filterParams = {}
         fields = getattr(filterCrit, '_fields')
@@ -177,55 +179,55 @@ class WConfModifRegistrants(wcomponents.WTemplated):
                            """_("Registration date") (%s)""") % self._conf.getTimezone()
                        }
 
-            tit=self._conf.getRegistrationForm().getSessionsForm().getTitle()
+            tit = self._conf.getRegistrationForm().getSessionsForm().getTitle()
             if not self._conf.getRegistrationForm().getSessionsForm().isEnabled():
-                tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
-            columns["Sessions"]=tit
-            tit=self._conf.getRegistrationForm().getAccommodationForm().getTitle()
+                tit = '%s <span style="color:red;font-size: 75%%">(disabled)</span>' % tit
+            columns["Sessions"] = tit
+            tit = self._conf.getRegistrationForm().getAccommodationForm().getTitle()
             if not self._conf.getRegistrationForm().getAccommodationForm().isEnabled():
-                tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
-            columns["Accommodation"]=tit
-            tit=self._conf.getRegistrationForm().getSocialEventForm().getTitle()
+                tit = '%s <span style="color:red;font-size: 75%%">(disabled)</span>' % tit
+            columns["Accommodation"] = tit
+            tit = self._conf.getRegistrationForm().getSocialEventForm().getTitle()
             if not self._conf.getRegistrationForm().getSocialEventForm().isEnabled():
-                tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
-            columns["SocialEvents"]=tit
-            tit=self._conf.getRegistrationForm().getReasonParticipationForm().getTitle()
+                tit = '%s <span style="color:red;font-size: 75%%">(disabled)</span>' % tit
+            columns["SocialEvents"] = tit
+            tit = self._conf.getRegistrationForm().getReasonParticipationForm().getTitle()
             if not self._conf.getRegistrationForm().getReasonParticipationForm().isEnabled():
-                tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
-            columns["ReasonParticipation"]=tit
+                tit = '%s <span style="color:red;font-size: 75%%">(disabled)</span>' % tit
+            columns["ReasonParticipation"] = tit
 
             for st in self._conf.getRegistrationForm().getStatusesList(False):
-                columns["s-%s"%st.getId()]=st.getCaption()
+                columns["s-%s" % st.getId()] = st.getCaption()
             for sect in self._conf.getRegistrationForm().getGeneralSectionFormsList():
-                tit=sect.getTitle()
+                tit = sect.getTitle()
                 if not sect.isEnabled():
-                    tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
-                columns[sect.getId()]=tit
+                    tit = '%s <span style="color:red;font-size: 75%%">(disabled)</span>' % tit
+                columns[sect.getId()] = tit
                 ############
                 # jmf-start
                 #for fld in sect.getFields():
                 #    columns["%s-%s"%(sect.getId(),fld.getId())]=fld.getCaption()
                 for fld in sect.getSortedFields():
                     if not fld.getPDField():
-                        columns["%s-%s"%(sect.getId(),fld.getId())]=fld.getCaption()
+                        columns["%s-%s" % (sect.getId(), fld.getId())] = fld.getCaption()
                 # jmf-end
                 ############
-            self._columns=columns
+            self._columns = columns
         return self._columns
 
     def _getDisplay(self):
         """
             These are the 'display' options selected by the user. In case no options were selected we add some of them by default.
         """
-        display=self._display[:]
+        display = self._display[:]
 
         if display == []:
-            display=["Email", "Institution","Phone","City","Country"]
+            display = ["Email", "Institution", "Phone", "City", "Country"]
             if self._conf.getModPay().isActivated():
-                display.extend(["isPayed","idpayment","amountToPay"])
+                display.extend(["isPayed", "idpayment", "amountToPay"])
         return display
 
-    def _getURL( self ):
+    def _getURL(self):
         #builds the URL to the contribution list page
         #   preserving the current filter and sorting status in the websesion
         url = urlHandlers.UHConfModifRegistrantList.getURL(self._conf)
@@ -242,21 +244,21 @@ class WConfModifRegistrants(wcomponents.WTemplated):
         """
         Filtering criteria: table with all the options for the columns we need to display.
         """
-        res=["""<table width="100%%" cellpadding="0" cellspacing="0" valign="top">"""]
-        columns=self._getColumnTitlesDict()
+        res = ["""<table width="100%%" cellpadding="0" cellspacing="0" valign="top">"""]
+        columns = self._getColumnTitlesDict()
         checked = " checked"
-        display=self._getDisplay()
-        counter=0
+        display = self._getDisplay()
+        counter = 0
         # sorting dispopts by
-        auxdict={}
+        auxdict = {}
         for key in self._dispopts.keys():
             if not auxdict.has_key(len(self._dispopts[key])):
-                auxdict[len(self._dispopts[key])]=[]
+                auxdict[len(self._dispopts[key])] = []
             auxdict[len(self._dispopts[key])].append(key)
-        auxlens=auxdict.keys()
+        auxlens = auxdict.keys()
         auxlens.sort()
         auxlens.reverse()
-        dispoptssortedkeys=[]
+        dispoptssortedkeys = []
         for l in auxlens:
             for k in auxdict[l]:
                 dispoptssortedkeys.append(k)
@@ -269,96 +271,95 @@ class WConfModifRegistrants(wcomponents.WTemplated):
             res.append("""<td style="border-bottom:1px solid lightgrey; width:33%%" valign="top" align="left"><span style="color:black"><b>%s</b></span><br>"""%(columns[key]))
             for keyfld in self._dispopts[key]:
                 res.append("""<table width="100%%" cellpadding="0" cellspacing="0" valign="top">""")
-                checked =""
+                checked = ""
                 if keyfld in display:
-                    checked=" checked"
+                    checked = " checked"
                 res.append("""<tr><td align="left" valign="top"><input type="checkbox" name="disp" value="%s"%s></td><td width="100%%" align="left" valign="top">%s</td></tr>"""%(keyfld,checked,columns[keyfld].replace('<span style="color:red;font-size: 75%">(disabled)</span>','')))
                 res.append("""</table>""")
             res.append("""</td>""")
-            if counter==2:
-                counter=0
+            if counter == 2:
+                counter = 0
                 res.append("""</tr>""")
 
             else:
-                counter+=1
-        if counter in [1,2]:
+                counter += 1
+        if counter in [1, 2]:
             res.append("""<td colspan="2" style="border-bottom:1px solid lightgrey; width:100%%">&nbsp;</td>""")
         res.append("""</table>""")
         return "".join(res)
-
 
     def _getRegColumnHTML(self, sortingField):
         """
         Titles for the columns of the list.
         """
-        resgroups={}
-        columns=self._getColumnTitlesDict()
-        currentSorting=""
+        resgroups = {}
+        columns = self._getColumnTitlesDict()
+        currentSorting = ""
         if sortingField is not None:
-            currentSorting=sortingField.getSpecialId()
+            currentSorting = sortingField.getSpecialId()
         currentSortingHTML = ""
-        display=self._getDisplay()
-        resgroups["PersonalData"]=[]
+        display = self._getDisplay()
+        resgroups["PersonalData"] = []
         if "Id" in display:
-            url=self._getURL()
-            url.addParam("sortBy","Id")
-            idImg=""
+            url = self._getURL()
+            url.addParam("sortBy", "Id")
+            idImg = ""
             if currentSorting == "Id":
                 currentSortingHTML = """<input type="hidden" name="sortBy" value="Id">"""
                 if self._order == "down":
-                    idImg = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                    url.addParam("order","up")
+                    idImg = """<img src=%s alt="down">""" % (quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                    url.addParam("order", "up")
                 elif self._order == "up":
-                    idImg = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                    url.addParam("order","down")
-            idSortingURL=quoteattr("%s#results"%str(url))
-            resgroups["PersonalData"]=[ i18nformat("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;">%s<a href=%s> _("Id")</a></td>""")%(idImg, idSortingURL)]
+                    idImg = """<img src=%s alt="up">""" % (quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                    url.addParam("order", "down")
+            idSortingURL = quoteattr("%s#results" % str(url))
+            resgroups["PersonalData"] = [i18nformat("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;">%s<a href=%s> _("Id")</a></td>""") % (idImg, idSortingURL)]
 
-        url=self._getURL()
-        url.addParam("sortBy","Name")
-        nameImg=""
+        url = self._getURL()
+        url.addParam("sortBy", "Name")
+        nameImg = ""
         if currentSorting == "Name":
             currentSortingHTML = """<input type="hidden" name="sortBy" value="Name">"""
             if self._order == "down":
-                nameImg = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                url.addParam("order","up")
+                nameImg = """<img src=%s alt="down">""" % (quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                url.addParam("order", "up")
             elif self._order == "up":
-                nameImg = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                url.addParam("order","down")
-        nameSortingURL=quoteattr("%s#results"%str(url))
+                nameImg = """<img src=%s alt="up">""" % (quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                url.addParam("order", "down")
+        nameSortingURL = quoteattr("%s#results" % str(url))
 
-        resgroups["PersonalData"].append( i18nformat("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;">%s<a href=%s> _("Name")</a></td>""")%(nameImg, nameSortingURL))
+        resgroups["PersonalData"].append(i18nformat("""<td nowrap class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;">%s<a href=%s> _("Name")</a></td>""") % (nameImg, nameSortingURL))
         if "Id" in display:
-            pdil=["Id", "Name"]
+            pdil = ["Id", "Name"]
         else:
-            pdil=["Name"]
-        self._groupsorder={"PersonalData":pdil}#list used to display the info of the registrants in the same order
+            pdil = ["Name"]
+        self._groupsorder = {"PersonalData": pdil}  # list used to display the info of the registrants in the same order
         for key in display:
             if key == "Id" or not columns.has_key(key):
                 continue
-            url=self._getURL()
-            url.addParam("sortBy",key)
-            img=""
+            url = self._getURL()
+            url.addParam("sortBy", key)
+            img = ""
             if currentSorting == key:
-                currentSortingHTML = """<input type="hidden" name="sortBy" value="%s">"""%key
+                currentSortingHTML = """<input type="hidden" name="sortBy" value="%s">""" % key
                 if self._order == "down":
-                    img = """<img src=%s alt="down">"""%(quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
-                    url.addParam("order","up")
+                    img = """<img src=%s alt="down">""" % (quoteattr(Config.getInstance().getSystemIconURL("downArrow")))
+                    url.addParam("order", "up")
                 elif self._order == "up":
-                    img = """<img src=%s alt="up">"""%(quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
-                    url.addParam("order","down")
-            sortingURL=quoteattr("%s#results"%str(url))
-            kg=self._getKeyDispOpts(key)
+                    img = """<img src=%s alt="up">""" % (quoteattr(Config.getInstance().getSystemIconURL("upArrow")))
+                    url.addParam("order", "down")
+            sortingURL = quoteattr("%s#results" % str(url))
+            kg = self._getKeyDispOpts(key)
             if not resgroups.has_key(kg):
-                self._groupsorder[kg]=[]
-                resgroups[kg]=[]
+                self._groupsorder[kg] = []
+                resgroups[kg] = []
             self._groupsorder[kg].append(key)
             resgroups[kg].append("""<td class="titleCellFormat" style="border-left:5px solid #FFFFFF;border-bottom: 1px solid #888;">%s<a href=%s>%s</a></td>"""%(img, sortingURL, self.htmlText(columns[key].replace('<span style="color:red;font-size: 75%">(disabled)</span>',''))))
-        fields=["""
+        fields = ["""
                 <tr>
                     <td align="right" nowrap></td>"""]
         # First we want to display the personal data...
-        groupkey="PersonalData"
+        groupkey = "PersonalData"
         fields += resgroups[groupkey]
         del resgroups[groupkey]
         #...and them all the other info:
@@ -370,7 +371,7 @@ class WConfModifRegistrants(wcomponents.WTemplated):
         return "\r\n".join(fields)
 
     def _getDisplayOptionsHTML(self):
-        html=[]
+        html = []
         if self._display == []:
             html.append("""<input type="hidden" name="disp" value="Email">""")
             html.append("""<input type="hidden" name="disp" value="Institution">""")
@@ -382,8 +383,8 @@ class WConfModifRegistrants(wcomponents.WTemplated):
             html.append("""<input type="hidden" name="disp" value="amountToPay">""")
         else:
             for d in self._display:
-                html.append("""<input type="hidden" name="disp" value="%s">"""%(d))
-        html.append("""<input type="hidden" name="sortBy" value="%s">"""%(self._sortingCrit.getField().getId()))
+                html.append("""<input type="hidden" name="disp" value="%s">""" % (d))
+        html.append("""<input type="hidden" name="sortBy" value="%s">""" % (self._sortingCrit.getField().getId()))
         return "".join(html)
 
     def _getFilterMenu(self):
@@ -394,7 +395,7 @@ class WConfModifRegistrants(wcomponents.WTemplated):
             ('accomm', regForm.getAccommodationForm()),
             ('event', regForm.getSocialEventForm()),
             (self._sessionFilterName, regForm.getSessionsForm())
-            ]
+        ]
 
         extraInfo = ""
         if self._conf.getRegistrationForm().getStatusesList(False):
@@ -406,14 +407,14 @@ class WConfModifRegistrants(wcomponents.WTemplated):
                                     <td valign="top">%s</td>
                                 </tr>
                             </table>
-                        """)%(quoteattr(Config.getInstance().getSystemIconURL("checkAll")),quoteattr(Config.getInstance().getSystemIconURL("uncheckAll")),self._getStatusesHTML())
+                        """) % (quoteattr(Config.getInstance().getSystemIconURL("checkAll")),quoteattr(Config.getInstance().getSystemIconURL("uncheckAll")), self._getStatusesHTML())
 
         p = WFilterCriteriaRegistrants(options, self._filterCrit, extraInfo)
 
         return p.getHTML()
 
     def _getDisplayMenu(self):
-        menu =  i18nformat("""<div class="CRLDiv" style="display: none;" id="displayMenu"><table width="95%%" align="center" border="0">
+        menu = i18nformat("""<div class="CRLDiv" style="display: none;" id="displayMenu"><table width="95%%" align="center" border="0">
         <tr>
             <td>
                 <table width="100%%">
@@ -443,61 +444,60 @@ class WConfModifRegistrants(wcomponents.WTemplated):
     </table></div>""")
         return menu
 
-    def getVars( self ):
+    def getVars(self):
 
-        vars = wcomponents.WTemplated.getVars( self )
+        vars = wcomponents.WTemplated.getVars(self)
 
         vars["conferenceId"] = self._conf.getId()
         vars["filterUrl"] = str(self._filterUrl)
 
         sortingField = self._sortingCrit.getField()
-        vars["filterPostURL"]=quoteattr("%s#results"%str(urlHandlers.UHConfModifRegistrantList.getURL(self._conf)))
+        vars["filterPostURL"] = quoteattr("%s#results" % str(urlHandlers.UHConfModifRegistrantList.getURL(self._conf)))
         cl = self._conf.getRegistrantsList(False)
-        f = filters.SimpleFilter(self._filterCrit,self._sortingCrit)
-        vars["eve"]=""
-        vars["columns"]=self._getRegColumnHTML(sortingField)
+        f = filters.SimpleFilter(self._filterCrit, self._sortingCrit)
+        vars["eve"] = ""
+        vars["columns"] = self._getRegColumnHTML(sortingField)
         filtered = f.apply(cl)
 
         regl = [reg.getId() for reg in filtered]
-        if self._order =="up":
+        if self._order == "up":
             filtered.reverse()
             regl.reverse()
 
         vars["registrants"] = zip(filtered, (registration.RegistrantMapping(reg) for reg in filtered))
 
-        vars["filteredNumberRegistrants"]=str(len(filtered))
-        vars["totalNumberRegistrants"]=str(len(cl))
+        vars["filteredNumberRegistrants"] = str(len(filtered))
+        vars["totalNumberRegistrants"] = str(len(cl))
         vars["filterUsed"] = self._filterUsed
 
+        vars["actionPostURL"] = quoteattr(str(urlHandlers.UHConfModifRegistrantListAction.getURL(self._conf)))
+        vars["reglist"] = ",".join(regl)
 
-        vars["actionPostURL"]=quoteattr(str(urlHandlers.UHConfModifRegistrantListAction.getURL(self._conf)))
-        vars ["reglist"] = ",".join(regl)
-
-        vars["emailIconURL"]="""<input type="image" name="email" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("envelope")))
-        vars["infoIconURL"]="""<input type="image" name="info" src=%s border="0">"""%quoteattr(str(Config.getInstance().getSystemIconURL("info")))
-        vars["excelIconURL"]=quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
+        vars["emailIconURL"] = """<input type="image" name="email" src=%s border="0">""" % quoteattr(str(Config.getInstance().getSystemIconURL("envelope")))
+        vars["infoIconURL"] = """<input type="image" name="info" src=%s border="0">""" % quoteattr(str(Config.getInstance().getSystemIconURL("info")))
+        vars["excelIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
         vars["pdfIconURL"] = quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
         vars["excelUrl"] = quoteattr(str(Config.getInstance().getSystemIconURL("excel")))
 
-        vars ["disp"]= self._getDispHTML()
-        tit=self._conf.getRegistrationForm().getAccommodationForm().getTitle()
+        vars["disp"] = self._getDispHTML()
+        tit = self._conf.getRegistrationForm().getAccommodationForm().getTitle()
         if not self._conf.getRegistrationForm().getAccommodationForm().isEnabled():
-            tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
-        vars ["accomtitle"]=tit
-        tit=self._conf.getRegistrationForm().getSessionsForm().getTitle()
+            tit = '%s <span style="color:red;font-size: 75%%">(disabled)</span>' % tit
+        vars["accomtitle"] = tit
+        tit = self._conf.getRegistrationForm().getSessionsForm().getTitle()
         if not self._conf.getRegistrationForm().getSessionsForm().isEnabled():
-            tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
-        vars["sesstitle"]=tit
-        tit=self._conf.getRegistrationForm().getSocialEventForm().getTitle()
+            tit = '%s <span style="color:red;font-size: 75%%">(disabled)</span>' % tit
+        vars["sesstitle"] = tit
+        tit = self._conf.getRegistrationForm().getSocialEventForm().getTitle()
         if not self._conf.getRegistrationForm().getSocialEventForm().isEnabled():
-            tit='%s <span style="color:red;font-size: 75%%">(disabled)</span>'%tit
-        vars["eventtitle"]=tit
-        vars["displayOptions"]=self._getDisplayOptionsHTML()
-        vars["sortingOptions"]="""<input type="hidden" name="sortBy" value="%s">
-                                  <input type="hidden" name="order" value="%s">"""%(self._sortingCrit.getField().getId(), self._order)
+            tit = '%s <span style="color:red;font-size: 75%%">(disabled)</span>' % tit
+        vars["eventtitle"] = tit
+        vars["displayOptions"] = self._getDisplayOptionsHTML()
+        vars["sortingOptions"] = """<input type="hidden" name="sortBy" value="%s">
+                                  <input type="hidden" name="order" value="%s">""" % (self._sortingCrit.getField().getId(), self._order)
 
-        vars["checkAcco"] = """<img src=%s border="0" alt="Select all" onclick="javascript:selectAcco()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
-        vars["uncheckAcco"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectAcco()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
+        vars["checkAcco"] = """<img src=%s border="0" alt="Select all" onclick="javascript:selectAcco()">""" % quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
+        vars["uncheckAcco"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectAcco()">""" % quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
         vars["checkEvent"] = """<img src=%s border="0" alt="Select all" onclick="javascript:selectEvent()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
         vars["uncheckEvent"] = """<img src=%s border="0" alt="Unselect all" onclick="javascript:unselectEvent()">"""%quoteattr(Config.getInstance().getSystemIconURL("uncheckAll"))
         vars["checkSession"] = """<img src=%s border="0" alt="Select all" onclick="javascript:selectSession()">"""%quoteattr(Config.getInstance().getSystemIconURL("checkAll"))
