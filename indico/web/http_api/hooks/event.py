@@ -76,7 +76,7 @@ class EventSearchHook(HTTPAPIHook):
     def _getParams(self):
         super(EventSearchHook, self)._getParams()
         search = self._pathParams['search_term']
-        self._query = ' '.join(map(lambda y: "*%s*" % y, self._searchString.split()))
+        self._query = ' '.join(map(lambda y: "*%s*" % y, search.split()))
 
     def export_event(self, aw):
         expInt = EventSearchFetcher(aw, self)
