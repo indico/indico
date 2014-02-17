@@ -16,22 +16,36 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import request
 
-import os, string, copy
-import logging.handlers, logging.config, logging
+import copy
+import os
+import logging
+import logging.handlers
+import logging.config
 import ConfigParser
+from flask import request
 
 from indico.core.config import Config
 from MaKaC.common.contextManager import ContextManager
 
 
-class ExtraIndicoFilter(logging.Filter):
+class AddIPFilter(logging.Filter):
+    def filter(self, record):
+        if not super(AddIPFilter, self).filter(record):
+            return False
+        # Add request ID if available
+        try:
+            record.request_id = request.id
+        except RuntimeError:
+            record.request_id = '0' * 12
+        return True
 
+
+class ExtraIndicoFilter(AddIPFilter):
     def filter(self, record):
         if record.name.split('.')[0] == 'indico':
-            return 0
-        return 1
+            return False
+        return super(ExtraIndicoFilter, self).filter(record)
 
 
 class IndicoMailFormatter(logging.Formatter):
@@ -44,6 +58,7 @@ class IndicoMailFormatter(logging.Formatter):
         info = ['Additional information:']
 
         try:
+            info.append('Request: %s' % request.id)
             info.append('URL: %s' % request.url)
             info.append('Endpoint: %s' % request.url_rule.endpoint)
             info.append('Method: %s' % request.method)
@@ -100,7 +115,8 @@ class LoggerUtils:
 
         # if there is a problem with the config file, set some sane defaults
         if not parsed_files:
-            formatters['defaultFormatter'] = logging.Formatter("%(asctime)s %(name)-16s: %(levelname)-8s %(message)s")
+            formatters['defaultFormatter'] = logging.Formatter(
+                '%(asctime)s  %(levelname)-7s  %(request_id)s  %(name)-25s %(message)s')
             cls._bootstrap_cp(cp, defaultArgs)
 
         logging._acquireLock()
@@ -183,9 +199,9 @@ class Logger:
     @classmethod
     def initialize(cls):
         # Lists of filters for each handler
-        filters = {'indico' : [logging.Filter('indico')],
-                   'other'  : [ExtraIndicoFilter()],
-                   'smtp'   : [logging.Filter('indico')]}
+        filters = {'indico': [AddIPFilter('indico')],
+                   'other': [ExtraIndicoFilter()],
+                   'smtp': [AddIPFilter('indico')]}
 
         config = Config.getInstance()
 

@@ -467,7 +467,7 @@ class RH(RequestHandlerBase):
                     self._notify('requestRetry', MAX_RETRIES - retry)
 
                 try:
-                    Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), request.remote_addr))
+                    Logger.get('requestHandler').info('[pid=%s] from host %s' % (os.getpid(), request.remote_addr))
                     try:
                         # clear the fossile cache at the start of each request
                         fossilize.clearCache()

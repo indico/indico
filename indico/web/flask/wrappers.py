@@ -40,6 +40,10 @@ class IndicoRequest(Request):
                     return self.access_route[0]
         return super(IndicoRequest, self).remote_addr
 
+    @cached_property
+    def id(self):
+        return '{0:012x}'.format(id(self))
+
     def __repr__(self):
         rv = super(IndicoRequest, self).__repr__()
         if isinstance(rv, unicode):
