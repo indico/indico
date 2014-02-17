@@ -1934,10 +1934,10 @@
 					"M651.131 344.402c26.747 0 50.135 14.254 63.181 35.512l51.159-31.283c-23.572-38.492-65.905-64.246-114.34-64.246v60.017z",
 					"M88.33 761.405h847.35v59.976h-847.35v-59.976z"
 				],
-				"grid": 16,
 				"tags": [
 					"projector"
-				]
+				],
+				"grid": 16
 			},
 			"properties": {
 				"order": 79,
@@ -1947,8 +1947,8 @@
 				"name": "projector",
 				"ligatures": ""
 			},
-			"setIdx": 1,
-			"iconIdx": 1
+			"setIdx": 0,
+			"iconIdx": 78
 		},
 		{
 			"icon": {
@@ -1971,7 +1971,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 78
+			"iconIdx": 79
 		},
 		{
 			"icon": {
@@ -1995,7 +1995,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 79
+			"iconIdx": 80
 		},
 		{
 			"icon": {
@@ -2019,7 +2019,7 @@
 				"code": 40
 			},
 			"setIdx": 0,
-			"iconIdx": 80
+			"iconIdx": 81
 		},
 		{
 			"icon": {
@@ -2042,7 +2042,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 81
+			"iconIdx": 82
 		},
 		{
 			"icon": {
@@ -2065,7 +2065,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 82
+			"iconIdx": 83
 		},
 		{
 			"icon": {
@@ -2091,7 +2091,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 83
+			"iconIdx": 84
 		},
 		{
 			"icon": {
@@ -2117,7 +2117,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 84
+			"iconIdx": 85
 		},
 		{
 			"icon": {
@@ -2142,7 +2142,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 85
+			"iconIdx": 86
 		},
 		{
 			"icon": {
@@ -2165,30 +2165,6 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 86
-		},
-		{
-			"icon": {
-				"paths": [
-					"M1024 384l-192-192-320 320-320-320-192 192 512 511.998z"
-				],
-				"tags": [
-					"arrow-down",
-					"download",
-					"bottom"
-				],
-				"defaultCode": 57355,
-				"grid": 16
-			},
-			"properties": {
-				"order": 89,
-				"id": 68,
-				"prevSize": 16,
-				"code": 57359,
-				"name": "arrow-down3",
-				"ligatures": ""
-			},
-			"setIdx": 0,
 			"iconIdx": 87
 		},
 		{
@@ -2206,7 +2182,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 90,
+				"order": 89,
 				"id": 669,
 				"prevSize": 16,
 				"code": 58012,
@@ -2230,7 +2206,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 91,
+				"order": 90,
 				"id": 945,
 				"prevSize": 16,
 				"code": 58288,
@@ -2257,7 +2233,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 92,
+				"order": 91,
 				"id": 16,
 				"prevSize": 16,
 				"code": 54,
@@ -2280,7 +2256,7 @@
 				"grid": 16
 			},
 			"properties": {
-				"order": 93,
+				"order": 92,
 				"id": 152,
 				"prevSize": 16,
 				"code": 57495,
@@ -2305,7 +2281,7 @@
 			},
 			"properties": {
 				"id": 308,
-				"order": 94,
+				"order": 93,
 				"prevSize": 16,
 				"code": 57652,
 				"name": "disk",
@@ -2313,6 +2289,28 @@
 			},
 			"setIdx": 0,
 			"iconIdx": 92
+		},
+		{
+			"icon": {
+				"paths": [
+					"M320 512c0-106.039 85.961-192 192-192 106.039 0 192 85.961 192 192 0 106.039-85.961 192-192 192-106.039 0-192-85.961-192-192z"
+				],
+				"tags": [
+					"circle-small"
+				],
+				"defaultCode": 58027,
+				"grid": 16
+			},
+			"properties": {
+				"order": 94,
+				"id": 684,
+				"prevSize": 16,
+				"code": 58027,
+				"name": "circle-small",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 93
 		}
 	],
 	"height": 1024,
@@ -2325,7 +2323,9 @@
 			"prefix": "icon-",
 			"metadata": {
 				"fontFamily": "icomoon",
-				"fontURL": "http://indico-software.org"
+				"fontURL": "http://indico-software.org",
+				"majorVersion": 1,
+				"minorVersion": 0
 			},
 			"showGlyphs": true,
 			"metrics": {

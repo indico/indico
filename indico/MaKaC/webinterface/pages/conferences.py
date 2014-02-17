@@ -1175,6 +1175,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             vars['getItemType'] = lambda item : self._getItemType(item)
             vars['getLocationInfo'] = MaKaC.common.utils.getLocationInfo
             vars['dumps'] = json.dumps
+            vars['timedelta'] = timedelta
         else:
             outGen = outputGenerator(self._rh._aw)
             varsForGenerator = self._getBodyVariables()

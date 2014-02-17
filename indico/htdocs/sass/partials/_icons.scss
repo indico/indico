@@ -303,7 +303,6 @@ you can use the generic selector below, but it's slower:
 .icon-coins:before {
     content: "\e0d4";
 }
-
 .icon-type:before {
     content: "\e449";
 }
@@ -337,17 +336,17 @@ you can use the generic selector below, but it's slower:
 .icon-collapse:before {
     content: "\e3b0";
 }
-
 .icon-stack:before {
     content: "\e097";
 }
-
 .icon-disk:before {
     content: "\e134";
 }
-
 .icon-projector:before {
     content: "\e604";
+}
+.icon-circle-small:before {
+    content: "\e2ab";
 }
 
 
