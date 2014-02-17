@@ -201,11 +201,11 @@ $(document).ready(function(){
         if ($this.data('hidden')) {
             $this.siblings('.resource-list').slideDown(transition_opts);
             $this.data('hidden', false);
-            $this.children(".material-title-icon").removeClass('icon-next').addClass('icon-collapse');
+            $this.children(".material-title-icon").removeClass('icon-next').addClass('icon-expand');
         } else {
             $this.siblings('.resource-list').slideUp(transition_opts);
             $this.data('hidden', true);
-            $this.children(".material-title-icon").removeClass('icon-collapse').addClass('icon-next');
+            $this.children(".material-title-icon").removeClass('icon-expand').addClass('icon-next');
         }
     });
 });
