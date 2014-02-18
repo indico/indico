@@ -7,7 +7,7 @@
 
     <tr ng-if="section.selectionType!='multiple'">
         <td>
-            <input type="radio" name="socialEvents" value="" checked
+            <input type="radio" name="socialEvents" value="" ng-checked="userdata.socialEvents.length === 0 || userdata.socialEvents === undefined"
                 ng-disabled="anyBillableEventPayed(userdata)"/>
             {{ 'None' | i18n }}
         </td>
