@@ -47,8 +47,14 @@ class APIKey(Persistent):
         self._oldKeys = PersistentList()
         self._persistentAllowed = False
 
+    def __repr__(self):
+        return '<APIKey({0}, {1!r}, {2})>'.format(self._key, self._user, self._lastUsedDT)
+
     def getUser(self):
         return self._user
+
+    def setUser(self, user):
+        self._user = user
 
     def getKey(self):
         return self._key
