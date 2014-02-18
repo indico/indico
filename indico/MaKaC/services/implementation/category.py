@@ -283,6 +283,10 @@ class CategoryAddExistingControlUser(CategoryControlUserListBase):
         self._sendEmailManagers = pm.extract("sendEmailManagers", pType=bool, allowEmpty=True, defaultValue = True)
 
     def _sendMail(self, currentList, newManager):
+        if isinstance(newManager, Avatar):
+            managerName = newManager.getStraightFullName()
+        else:
+            managerName = newManager.getName()
         text = _("""Dear managers,
 
 %s has been added as manager for the category '%s':
@@ -291,7 +295,7 @@ class CategoryAddExistingControlUser(CategoryControlUserListBase):
 
 Best regards,
 Indico Team
-        """) % (newManager.getStraightFullName(), self._categ.getName(), UHCategModifAC.getURL(self._categ))
+        """) % (managerName, self._categ.getName(), UHCategModifAC.getURL(self._categ))
         maildata = { "fromAddr": "%s" % Config.getInstance().getNoReplyEmail(), "toList": [manager.getEmail() for manager in currentList], "subject": "New category manager", "body": text }
         GenericMailer.send(GenericNotification(maildata))
 
