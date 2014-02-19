@@ -20,6 +20,7 @@
 from indico.modules.scheduler import SchedulerModule, base
 from indico.util.date_time import int_timestamp
 
+
 class Client(object):
 
     """

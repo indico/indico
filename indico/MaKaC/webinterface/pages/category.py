@@ -42,12 +42,12 @@ from indico.util.date_time import format_datetime
 
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.common.tools import escape_html
-from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
+from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
 from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
 
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import Avatar
+from MaKaC.user import Avatar, AvatarHolder
 
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
@@ -971,66 +971,79 @@ class WPCategoryMap( WPCategoryDisplayBase ):
         pars = {"target": self._target, "isModif": False}
         return wcomponents.WNavigationDrawer( pars, type = "Map" )
 
+
 class WCategoryStatistics(wcomponents.WTemplated):
 
-    def __init__( self, target, wfReg, stats ):
+    def __init__(self, target, wfReg, stats):
         self.__target = target
         self._wfReg = wfReg
         self._stats = stats
 
-    def getHTML( self, aw ):
+    def getHTML(self, aw):
         self._aw = aw
-        return wcomponents.WTemplated.getHTML( self )
+        return wcomponents.WTemplated.getHTML(self)
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["name"] = self.__target.getName()
-        vars["img"] = self.__target.getIconURL()
-        vars["categDisplayURL"] = urlHandlers.UHCategoryDisplay.getURL(self.__target)
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["name"] = self.__target.getName()
+        wvars["img"] = self.__target.getIconURL()
+        wvars["categDisplayURL"] = urlHandlers.UHCategoryDisplay.getURL(self.__target)
 
-        if self._stats != None:
-            stats = []
+        stats = []
+        if self._stats is not None:
             # Number of events:
             if self._stats["events"]:
-                wcsl=wcomponents.WCategoryStatisticsList( _("Number of events"), self._stats["events"] )
-                stats.append(wcsl.getHTML( self._aw ))
+                wcsl = wcomponents.WCategoryStatisticsList(_("Number of events"),
+                                                           self._stats["events"], 'left', 'events')
+                plots = wcsl.getHTML(self._aw)
+                plots = plots + """<div style="height:300px; width:6%; float:left; margin-bottom:40px;"></div>"""
                 # Number of contributions:
-                if self._stats["contributions"] != {}:
-                    wcsl=wcomponents.WCategoryStatisticsList( _("Number of contributions"), self._stats["contributions"] )
-                    stats.append(wcsl.getHTML( self._aw ))
-                else:
-                    stats.append( i18nformat("""<b> _("Number of contributions"): 0</b>"""))
-                stats.append( i18nformat("""<b> _("Number of resources"): %s</b>""")%self._stats["resources"])
-                vars["updated"] = self._stats["updated"].strftime("%d %B %Y %H:%M")
+                wcsl = wcomponents.WCategoryStatisticsList(_("Number of contributions"),
+                                                           self._stats["contributions"], 'right', 'contributions')
+                plots = plots + wcsl.getHTML(self._aw)
+                stats.append(plots)
+                stats.append(i18nformat("""<b> _("Number of resources"): {0}</b>""").format(self._stats["resources"]))
+                wvars["updated"] = self._stats["updated"].strftime("%d %B %Y %H:%M")
             else:
                 stats.append(i18nformat("""<b> _("No statistics for the events").</b>"""))
                 stats.append(i18nformat("""<b> _("No statistics for the contributions").</b>"""))
                 stats.append(i18nformat("""<b> _("No statistics for the resources").</b>"""))
-                vars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
-            vars["contents"] = "<br><br>".join( stats )
+                wvars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
         else:
-            vars["contents"] = _("This category doesn't contain any event. No statistics are available.")
-            vars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
-        return vars
+            stats.append(_("This category doesn't contain any event. No statistics are available."))
+            wvars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
+        users = len(AvatarHolder().getList())
+        stats.append(i18nformat("""<b> _("Number of users"): {0}</b>""").format(users))
+        wvars["contents"] = "<br><br>".join(stats)
+        return wvars
 
-class WPCategoryStatistics( WPCategoryDisplayBase ):
 
-    def __init__( self, rh, target, wfReg, stats ):
-        WPCategoryDisplayBase.__init__( self, rh, target )
+class WPCategoryStatistics(WPCategoryDisplayBase):
+
+    def __init__(self, rh, target, wfReg, stats):
+        WPCategoryDisplayBase.__init__(self, rh, target)
         self._wfReg = wfReg
         self._stats = stats
 
     def _getTitle(self):
         return WPCategoryDisplayBase._getTitle(self) + " - " + _("Category Statistics")
 
-    def _getBody( self, params ):
-        wcs = WCategoryStatistics( self._target, self._wfReg, self._stats )
-        return wcs.getHTML( self._getAW() )
+    def _getBody(self, params):
+        wcs = WCategoryStatistics(self._target, self._wfReg, self._stats)
+        return wcs.getHTML(self._getAW())
 
     def _getNavigationDrawer(self):
         #link = [{"url": urlHandlers.UHCategoryStatistics.getURL(self._target), "title": _("Category statistics")}]
         pars = {"target": self._target, "isModif": False}
-        return wcomponents.WNavigationDrawer( pars, type = "Statistics" )
+        return wcomponents.WNavigationDrawer(pars, type="Statistics")
+
+    def getJSFiles(self):
+        extraJS = ['/statistics/js/lib/jqPlot/jquery.jqplot.min.js']
+        return WPCategoryDisplayBase.getJSFiles(self) + extraJS
+
+    def getCSSFiles(self):
+        extraCSS = ['/statistics/js/lib/jqPlot/jquery.jqplot.css']
+        return WPCategoryDisplayBase.getCSSFiles(self) + extraCSS
 
 
 #---------------------------------------------------------------------------

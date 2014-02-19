@@ -231,8 +231,7 @@ class WPStatisticsView(WPConferenceModifBase):
         plugin = self._register.getPluginByName(self._activeTabName)
 
         if not plugin:
-            raise Exception(_('There is no tab called %s available.') % \
-                            self._activeTabName)
+            raise Exception(_('There is no tab called {0} available.').format(self._activeTabName))
 
         return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(
             self._templateClass.forModule(plugin.getImplementationPackage(),
@@ -247,9 +246,9 @@ class WPStatisticsView(WPConferenceModifBase):
 
     def getJSFiles(self):
         extraJS = ['/statistics/js/statistics.js',
-                    '/statistics/js/lib/jqPlot/excanvas.min.js',
-                    '/statistics/js/lib/jqTree/tree.jquery.js',
-                    '/statistics/js/lib/jqPlot/jquery.jqplot.min.js']
+                   '/statistics/js/lib/jqPlot/excanvas.min.js',
+                   '/statistics/js/lib/jqTree/tree.jquery.js',
+                   '/statistics/js/lib/jqPlot/jquery.jqplot.min.js']
 
         jqPlotPlugins = ['dateAxisRenderer', 'highlighter', 'cursor']
 

@@ -1,22 +1,20 @@
+<div id="chartdiv_${tagName}" align="${align}" style="height:300px; width:45%; float:${align}; margin-bottom:40px; padding:0% 1% 0% 1%;"></div>
 
-<b>${ statsName }:</b>
-<br>
-<table width="80%" border="0" align="center" cellpadding="0" cellspacing="3">
-  <tr>
-    <td width="15%" align="right" valign="middle"> ${ _("Year")}</td>
-    <td colspan="2">&nbsp;</td>
-  </tr>
-  ${ statsRows }
-  <tr>
-    <td width="15%">&nbsp;</td>
-    <td width="70%">
-      <table width="100%" border="0" cellspacing="0" cellpadding="0">
-        <tr>
-          <td width="100%" align="right" valign="middle"> ${ _("Total")}:</td>
-          <td>&nbsp;<td>
-        </tr>
-      </table>
-    </td>
-    <td width="15%" align="left" valign="middle"><b>${ total }</b></td><td></td>
-  </tr>
-</table>
+<script type="text/javascript">
+  var json_stats = ${stats};
+  var stats = [];
+  for (var i in json_stats)
+    stats.push([i, json_stats[i]]);
+  if (stats.length == 0)
+    stats = [null];
+  $.jqplot('chartdiv_${tagName}',
+           [stats],
+           { title:'${statsName}: ${total}',
+             axesDefaults: {
+               tickInterval: 1,
+               tickOptions:{formatString: '%d'}
+             },
+             axes:{xaxis:{min:${min}, max:${max}}},
+             series:[{color:'#5FAB78'}]
+           });
+</script>

@@ -1,4 +1,3 @@
-
 <div class="container">
     <div class="categoryHeader">
         <ul>
