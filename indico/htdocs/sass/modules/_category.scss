@@ -77,6 +77,19 @@
     margin: 0 0 2em 0;
 }
 
+.category-statistics {
+    max-width: 1600px;
+}
+
+.category-statistics h2 {
+    color: #999;
+    font-weight: normal;
+}
+
+.category-statistics h2 b {
+    color: #555;
+}
+
 .category-sidebar {
     @include box-sizing(border-box);
     background: #FAFAFA;

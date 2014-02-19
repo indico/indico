@@ -446,7 +446,7 @@ class Category(CommonObjectBase):
         self.__confCreators = []
         self._visibility = 999
         self._statistics = {"events": None, "contributions": None, "resources": None,
-                            "updated": None}
+                            "users": None, "updated": None}
         self._icon = None
         self._tasksAllowed = False
         self._tasks = {}

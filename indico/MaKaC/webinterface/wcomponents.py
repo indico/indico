@@ -1414,61 +1414,42 @@ class WCategoryList(WTemplated):
 
         return vars
 
-class WCategoryStatisticsListRow(WTemplated):
-
-    def __init__( self, year, percent, number ):
-        self._year = year
-        self._percent = percent
-        self._number = number
-
-    def getHTML( self, aw ):
-        self._aw = aw
-        return WTemplated.getHTML( self )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["year"] = self._year
-        vars["percent"] = self._percent
-        vars["percentCompl"] = 100-self._percent
-        vars["number"] = self._number
-        return vars
-
 
 class WCategoryStatisticsList(WTemplated):
 
-    def __init__( self, statsName, stats ):
+    def __init__(self, statsName, stats, align, tagName):
         self._stats = stats
         self._statsName = statsName
+        self._align = align
+        self._tagName = tagName
 
-    def getHTML( self, aw ):
+    def getHTML(self, aw):
         self._aw = aw
-        return WTemplated.getHTML( self )
+        return WTemplated.getHTML(self)
 
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
+    def getVars(self):
+        wvars = WTemplated.getVars(self)
         # Construction of the tables from the dictionary (stats).
         # Initialization:
-        tmp = []
-        maximum = 0
         stats = {}
         years = self._stats.keys()
         years.sort()
-        for y in range(years[0], min(datetime.now().year + 4, years[-1] + 1)):
-            stats[y] = self._stats.get(y,0)
-        maximum = max(stats.values())
-        years = stats.keys()
-        years.sort()
-        for y in years:
-            nb = stats[y]
-            percent = (nb*100)/maximum
-            if nb > 0 and percent == 0:
-                percent = 1
-            wcslr = WCategoryStatisticsListRow( y, percent, stats[y] )
-            tmp.append(wcslr.getHTML( self._aw ))
-        vars["statsName"] = self._statsName
-        vars["statsRows"] = "".join( tmp )
-        vars["total"] = sum(stats.values())
-        return vars
+        min_year = datetime.now().year
+        max_year = datetime.now().year + 1
+        if len(years) > 0:
+            min_year = min(min_year, years[0])
+            max_year = max(max_year, years[-1])
+            for y in range(min_year, max_year+1):
+                stats[y] = self._stats.get(y, 0)
+        wvars["min"] = min_year
+        wvars["max"] = max_year
+        wvars["stats"] = stats
+        wvars["statsName"] = self._statsName
+        wvars["align"] = self._align
+        wvars["tagName"] = self._tagName
+        wvars["total"] = sum(stats.values())
+        return wvars
+
 
 class WConfCreationControlFrame(WTemplated):
 

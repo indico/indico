@@ -20,6 +20,8 @@ from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.util.date_time import nowutc
 
+from MaKaC.user import AvatarHolder
+
 
 class Statistics(object):
     """
@@ -88,7 +90,6 @@ class CategoryStatistics(Statistics):
 
     @classmethod
     def _updateStatistics(cls, cat, dbi, level=0, logger=None):
-
         stats = cat.getStatistics()
         stats["events"] = {}
         stats["contributions"] = {}
@@ -120,6 +121,7 @@ class CategoryStatistics(Statistics):
                 cls._processEvent(dbi, event, stats)
 
         stats["updated"] = nowutc()
+        stats["users"] = len(AvatarHolder()._getIdx())
         cat._statistics = stats
         cat._p_changed = 1
 
