@@ -1,0 +1,260 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+.category-container {
+    font-family: 'Helvetica Neue', Helvetica, Verdana, Arial, Sans;
+
+    background: #FFFFFF;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.category-header {
+    border-bottom: 1px solid #E6E6E6;
+    border-top: 1px solid #FFFFFF;
+    padding: 20px 20px 20px 20px;
+    background-image: -ms-linear-gradient(top, #FCFCFC, #F2F2F2);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#FCFCFC), to(#F2F2F2));
+    background-image: -webkit-linear-gradient(top, #FCFCFC, #F2F2F2);
+    background-image: -o-linear-gradient(top, #FCFCFC, #F2F2F2);
+    background-image: -moz-linear-gradient(top, #FCFCFC, #F2F2F2);
+    background-image: linear-gradient(bottom, #FCFCFC, #F2F2F2);
+}
+
+.category-title {
+    font-size: 2em;
+    color: #B14300;
+    font-weight: normal;
+    margin: auto;
+    max-width: 850px;
+}
+
+.category-title.sidebar-padding {
+    padding-right: 340px;
+}
+
+.category-content-wrapper {
+    overflow: hidden;
+    padding: 2em 2em;
+}
+
+.category-content {
+    width: 100%;
+    max-width: 850px;
+    padding: 0 1em 0 0;
+    margin: auto;
+}
+
+.category-info {
+    color: #888;
+    font-size: 1.2em;
+    font-family: Georgia, Times, Serif;
+    min-height: 0.3em;
+    margin: 0 0 2em 0;
+}
+
+.category-sidebar {
+    background-color: #fafafa;
+    background-image: linear-gradient(top, #fafafa 95%, #fff 100%);
+    background-image: -o-linear-gradient(top, #fafafa 95%, #fff 100%);
+    background-image: -moz-linear-gradient(top, #fafafa 95%, #fff 100%);
+    background-image: -webkit-linear-gradient(top, #fafafa 95%, #fff 100%);
+    background-image: -ms-linear-gradient(top, #fafafa 95%, #fff 100%);
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        left bottom,
+        color-stop(0.95, #fafafa),
+        color-stop(1, rgb(255,255,255))
+    );
+
+    border-left: 1px solid #F2F2F2;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    color: #666;
+    float: right;
+    height: 100%;
+    padding: 1em;
+    width: 340px;
+}
+
+.category-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    font-size: 1.1em;
+}
+
+.category-sidebar h2 {
+    border-bottom: 1px solid #EBEBEB;
+    box-shadow: 0 1px 0 #FAFAFA;
+    color: #999;
+    font-weight: normal;
+    margin-top: 20px;
+    padding-bottom: 0.2em;
+}
+
+.category-sidebar h2 .more-icon {
+    float: right;
+    font-size: 0.6em;
+    margin: 0.8em 1em 0 0;
+}
+
+.category-sidebar h2:before {
+    margin-right: 0.5em;
+    vertical-align: -10%;
+}
+
+.main-page-list li {
+    margin-bottom: 0.5em;
+    list-style-type: none;
+}
+
+.main-page-list li .title {
+    font-size: 1em;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.main-page-list li .timing {
+    font-size: 0.8em;
+    display: block;
+    margin-top: 0.2em;
+    color: #777;
+    text-shadow: 1px 1px 0px #FEFEFE;
+}
+
+#manager-list li {
+    margin-bottom: 0.2em;
+}
+
+#manager-list li:before {
+    margin-right: 0.5em;
+}
+
+#manager-list li.avatar:before {
+    content: "\48";
+    font-family: 'icomoon-ultimate';
+}
+
+#manager-list li.group:before {
+    content: "\47";
+    font-family: 'icomoon-ultimate';
+}
+
+a.invisible-block {
+    color: inherit !important;
+    text-decoration: inherit !important;
+    display: block;
+    padding: 0 !important;
+}
+
+ul.category-list {
+    font-size: 1.2em;
+    list-style-type: none;
+    padding: 0;
+
+    border-left: 1px solid #fafafa;
+    border-right: 1px solid #e6e6e6;
+}
+
+ul.category-list li {
+    display: block;
+    line-height: 2.5em;
+    color: #b3b3b3;
+    cursor: pointer;
+
+    border-top: 1px solid #fafafa;
+    border-bottom: 1px solid #e6e6e6;
+
+    background-color: #f2f2f2;
+    background-image: -ms-linear-gradient(top, #F7F7F7, #F2F2F2);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#F7F7F7), to(#F2F2F2));
+    background-image: -webkit-linear-gradient(top, #F7F7F7, #F2F2F2);
+    background-image: -o-linear-gradient(top, #F7F7F7, #F2F2F2);
+    background-image: -moz-linear-gradient(top, #F7F7F7, #F2F2F2);
+    background-image: linear-gradient(top, #F7F7F7, #F2F2F2);
+
+    transition: color .25s ease-out;
+    -webkit-transition: color .25s ease-out;
+    -moz-transition: color .25s ease-out;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+ul.category-list li .number-events {
+    float: right;
+    margin-right: 1em;
+}
+
+ul.category-list li .protection {
+    float: right;
+}
+
+ul.category-list li .protection[data-type="restricted"] {
+    color: #A36264;
+}
+
+ul.category-list li .protection[data-type="domain"] {
+    color: #ADA644;
+}
+
+ul.category-list li a {
+    display: block;
+    color: #2C95E0;
+    padding: 0 0 0 1em;
+
+    outline: none;
+
+    transition: color .25s ease-out;
+    -webkit-transition: color .25s ease-out;
+    -moz-transition: color .25s ease-out;
+}
+
+ul.category-list li:hover {
+    color: #777;
+}
+
+ul.category-list li:hover a {
+    color: #0b63a5;
+}
+
+ul.category-list li:hover:before {
+    color: #777;
+}
+
+ul.category-list li:before {
+    color: #ccc;
+    float: right;
+    content: "\46";
+    font-family: 'icomoon-ultimate';
+    margin-right: 1em;
+    margin-left: 1em;
+
+    transition: color .25s ease-out;
+    -webkit-transition: color .25s ease-out;
+    -moz-transition: color .25s ease-out;
+}

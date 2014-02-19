@@ -40,7 +40,7 @@ from indico.util.i18n import i18nformat
 
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.common.tools import escape_html
-from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
+from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
 from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
 
@@ -947,67 +947,93 @@ class WPCategoryMap( WPCategoryDisplayBase ):
         pars = {"target": self._target, "isModif": False}
         return wcomponents.WNavigationDrawer( pars, type = "Map" )
 
+
 class WCategoryStatistics(wcomponents.WTemplated):
 
-    def __init__( self, target, wfReg, stats ):
+    def __init__(self, target, wfReg, stats):
         self.__target = target
         self._wfReg = wfReg
         self._stats = stats
 
-    def getHTML( self, aw ):
+    def getHTML(self, aw):
         self._aw = aw
-        return wcomponents.WTemplated.getHTML( self )
+        return wcomponents.WTemplated.getHTML(self)
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["name"] = self.__target.getName()
-        vars["img"] = self.__target.getIconURL()
-        vars["categDisplayURL"] = urlHandlers.UHCategoryDisplay.getURL(self.__target)
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["name"] = self.__target.getName()
+        wvars["img"] = self.__target.getIconURL()
+        wvars["categDisplayURL"] = urlHandlers.UHCategoryDisplay.getURL(self.__target)
+        wvars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
 
-        if self._stats != None:
-            stats = []
+        stats = []
+        plots = []
+        if self._stats is not None:
             # Number of events:
             if self._stats["events"]:
-                wcsl=wcomponents.WCategoryStatisticsList( _("Number of events"), self._stats["events"] )
-                stats.append(wcsl.getHTML( self._aw ))
+                wcsl = wcomponents.WCategoryStatisticsList(_("Number of events"),
+                                                           self._stats["events"], 'left', 'events')
+                plots.append(wcsl.getHTML(self._aw))
+                plots.append("""<div style="height:350px; width:6%; float:left; margin-bottom:50px;"></div>""")
                 # Number of contributions:
-                if self._stats["contributions"] != {}:
-                    wcsl=wcomponents.WCategoryStatisticsList( _("Number of contributions"), self._stats["contributions"] )
-                    stats.append(wcsl.getHTML( self._aw ))
-                else:
-                    stats.append( i18nformat("""<b> _("Number of contributions"): 0</b>"""))
+                wcsl = wcomponents.WCategoryStatisticsList(_("Number of contributions"),
+                                                           self._stats["contributions"], 'right', 'contributions')
+                plots.append(wcsl.getHTML(self._aw))
                 stats.append("<strong>{}</strong>: {}".format(
                     _("Number of attached files"), self._stats.get("files", _("Not available"))))
-                vars["updated"] = self._stats["updated"].strftime("%d %B %Y %H:%M")
+                wvars["updated"] = self._stats["updated"].strftime("%d %B %Y %H:%M")
             else:
-                stats.append(i18nformat("""<b> _("No statistics for the events").</b>"""))
-                stats.append(i18nformat("""<b> _("No statistics for the contributions").</b>"""))
+                stats.append(i18nformat("""<h2> _("No statistics for the events").</h2>"""))
+                stats.append(i18nformat("""<h2> _("No statistics for the contributions").</h2>"""))
                 stats.append(i18nformat("<strong>{}</strong>".format(_("No statistics for attached files"))))
-                vars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
-            vars["contents"] = "<br><br>".join( stats )
+            stats.append(i18nformat("""<h2> _("Number of users"): <b>{0}</b></h2>""").format(self._stats["users"]))
         else:
-            vars["contents"] = _("This category doesn't contain any event. No statistics are available.")
-            vars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
-        return vars
+            stats.append(_("This category doesn't contain any event. No statistics are available."))
+        wvars["plots"] = "".join(plots)
+        wvars["contents"] = "".join(stats)
+        return wvars
 
-class WPCategoryStatistics( WPCategoryDisplayBase ):
 
-    def __init__( self, rh, target, wfReg, stats ):
-        WPCategoryDisplayBase.__init__( self, rh, target )
+class WPCategoryStatistics(WPCategoryDisplayBase):
+
+    def __init__(self, rh, target, wfReg, stats):
+        WPCategoryDisplayBase.__init__(self, rh, target)
         self._wfReg = wfReg
         self._stats = stats
 
     def _getTitle(self):
         return WPCategoryDisplayBase._getTitle(self) + " - " + _("Category Statistics")
 
-    def _getBody( self, params ):
-        wcs = WCategoryStatistics( self._target, self._wfReg, self._stats )
-        return wcs.getHTML( self._getAW() )
+    def _getBody(self, params):
+        wcs = WCategoryStatistics(self._target, self._wfReg, self._stats)
+        return wcs.getHTML(self._getAW())
 
     def _getNavigationDrawer(self):
         #link = [{"url": urlHandlers.UHCategoryStatistics.getURL(self._target), "title": _("Category statistics")}]
         pars = {"target": self._target, "isModif": False}
-        return wcomponents.WNavigationDrawer( pars, type = "Statistics" )
+        return wcomponents.WNavigationDrawer(pars, type="Statistics")
+
+    def _addjqPlotPlugins(self, plugins, extraJS):
+        """
+        Util function to include jqPlot plugins easier.
+        """
+        if not isinstance(plugins, list):
+            plugins = list(plugins)
+
+        prefix = '/statistics/js/lib/jqPlot/plugins/jqplot.'
+        suffix = '.min.js'
+        for plugin in plugins:
+            extraJS.append(prefix + plugin + suffix)
+
+    def getJSFiles(self):
+        extraJS = ['/statistics/js/lib/jqPlot/jquery.jqplot.min.js']
+        jqPlotPlugins = ['highlighter', 'cursor']
+        self._addjqPlotPlugins(jqPlotPlugins, extraJS)
+        return WPCategoryDisplayBase.getJSFiles(self) + extraJS
+
+    def getCSSFiles(self):
+        extraCSS = ['/statistics/js/lib/jqPlot/jquery.jqplot.css']
+        return WPCategoryDisplayBase.getCSSFiles(self) + extraCSS
 
 
 #---------------------------------------------------------------------------
