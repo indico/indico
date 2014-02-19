@@ -2737,7 +2737,7 @@ class WCategoryStatisticsList(WTemplated):
                 stats[y] = self._stats.get(y, 0)
         wvars["min"] = min_year-1
         wvars["max"] = max_year+1
-        wvars["stats"] = json.dumps(stats)
+        wvars["stats"] = stats
         wvars["statsName"] = self._statsName
         wvars["align"] = self._align
         wvars["tagName"] = self._tagName
