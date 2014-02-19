@@ -134,7 +134,7 @@
                     <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Submitted by")}</span></td>
                     <td>
                         <div id="submitterPlace">
-                            <a href="mailto:${ submitterEmail }?subject=[${ confTitle }] ${ _("Abstract") } ${ abstractId }: ${ abstract.getTitle }">${ submitterFullName } (${ submitterAffiliation })</a>
+                            <a href="mailto:${ submitterEmail }?subject=[${ confTitle }] ${ _("Abstract") } ${ abstractId }: ${ abstract.getTitle() }">${ submitterFullName } (${ submitterAffiliation })</a>
                         </div>
                     </td>
                     <td bgcolor="white" valign="bottom" align="right" colspan="2"><input type="button" value="${ _("change submitter")}" id="changeSubmitter" ${"disabled" if abstractAccepted else ""}></td>
