@@ -146,7 +146,7 @@ class WPConferenceBase(base.WPDecorated):
         return urlHandlers.UHSignOut.getURL(str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
 
 
-class WPConferenceDisplayBase( WPConferenceBase, OldObservable ):
+class WPConferenceDisplayBase(WPConferenceBase, OldObservable):
 
     def getCSSFiles(self):
         # flatten returned list
@@ -1087,7 +1087,11 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
         confMetadata = WConfMetadata(self._conf).getHTML()
 
-        return styleText + confMetadata
+        mathJax = render('js/mathjax.config.js.tpl') + \
+                  '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url) for url in
+                             self._asset_env['mathjax_js'].urls()])
+
+        return styleText + confMetadata + mathJax
 
     def _getFooter( self ):
         """
