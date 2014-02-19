@@ -949,7 +949,7 @@ def updateAvatarEmails(dbi, withRBDB, prevVersion):
 @since('1.2')
 def fixIndexesEncoding(dbi, withRBDB, prevVersion):
     """
-    Fix indexes encoding. They may be in unicode and they has to be encoded in utf-8
+    Fix indexes encoding. They may be in unicode and they have to be encoded in utf-8
     """
 
     INDEXES = ["name", "surName", "organisation"]
@@ -958,7 +958,7 @@ def fixIndexesEncoding(dbi, withRBDB, prevVersion):
     for idx_name in INDEXES:
         idx = ih.getById(idx_name)
         words = idx._words
-        for key in words.iterkeys():
+        for key in list(words):
             newKey = fix_broken_string(key)
             values = words[key]
             del words[key]
