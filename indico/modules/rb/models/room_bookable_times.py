@@ -21,7 +21,10 @@
 Available times to book for rooms
 """
 
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from indico.core.db import db
+from indico.modules.rb.models.utils import getTimeDiff
 
 
 class BookableTime(db.Model):
@@ -50,3 +53,19 @@ class BookableTime(db.Model):
             self.start_time,
             self.end_time
         )
+
+    def toDict(self):
+        return {
+            'start_time': self.start_time,
+            'end_time': self.end_time
+        }
+
+    def saveFromDict(self, d):
+        if 'start_time' in d:
+            self.start_time = d['start_time']
+
+        if 'end_time' in d:
+            self.start_time = d['end_time']
+
+    def isFit(self, st, et):
+        return self.start_time >= st and self.end_time <= et
