@@ -21,6 +21,8 @@
 Nonbookable dates of rooms
 """
 
+from datetime import datetime
+
 from indico.core.db import db
 
 
@@ -54,3 +56,22 @@ class NonBookableDate(db.Model):
             self.start_date,
             self.end_date
         )
+
+    def toDict(self):
+        return {
+            'startDate': self.start_date,
+            'endDate': self.end_date
+        }
+
+    def saveFromDict(self, d):
+        if 'startDate' in d:
+            self.start_date = d['startDate']
+
+        if 'endDate' in d:
+            self.start_date = d['endDate']
+
+    def overlaps(self, st, et):
+        return not (self.start_date >= et or self.end_date <= st)
+
+    def isPast(self):
+        return self.end_date <= datetime.utcnow()
