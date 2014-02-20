@@ -27,11 +27,26 @@ from indico.core.db import db
 class BlockingPrincipal(db.Model):
     __tablename__ = 'blocking_principals'
 
-    blocking_id = db.Column(db.Integer, db.ForeignKey('blockings.id'), primary_key=True, nullable=False)
-    entity_type = db.Column(db.String, primary_key=True, nullable=False)
-    entity_id = db.Column(db.String, primary_key=True, nullable=False)
+    blocking_id = db.Column(
+        db.Integer,
+        db.ForeignKey('blockings.id'),
+        primary_key=True,
+        nullable=False
+    )
+    entity_type = db.Column(
+        db.String,
+        primary_key=True,
+        nullable=False
+    )
+    entity_id = db.Column(
+        db.String,
+        primary_key=True,
+        nullable=False
+    )
 
     def __repr__(self):
-        return '<BlockingPrincipal({0}, {1}, {2})>'.format(self.blocking_id,
-                                                           self.entity_id,
-                                                           self.entity_type)
+        return '<BlockingPrincipal({0}, {1}, {2})>'.format(
+            self.blocking_id,
+            self.entity_id,
+            self.entity_type
+        )
