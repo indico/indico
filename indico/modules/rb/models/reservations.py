@@ -22,50 +22,91 @@ Schema of a reservation
 """
 
 from copy import deepcopy
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from operator import attrgetter
 
-from sqlalchemy.ext.associationproxy import association_proxy
+from dateutil.relativedelta import relativedelta
+from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from MaKaC.common.Configuration import Config
+from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.wcomponents import WTemplated
 
 from indico.core.db import db
-from indico.modules.rb.models import utils
-from indico.modules.rb.models.utils import apply_filters, RBFormatter
-from indico.modules.rb.models.reservation_attributes import ReservationAttribute
-from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
-from indico.modules.rb.models.reservation_excluded_days import ReservationExcludedDay
-
-# old imports
-from BTrees.OOBTree import OOSet
-from ZODB import FileStorage, DB
-from ZODB.DB import DB, transaction
-from ZODB.PersistentMapping import PersistentMapping
-from persistent import Persistent
-from pytz import timezone
-from datetime import datetime
-
-from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
-from MaKaC.rb_tools import qbeMatch, containsExactly_OR_containsAny, fromUTC
-from MaKaC.rb_location import CrossLocationQueries
-from MaKaC.plugins.RoomBooking.default.factory import Factory
 from indico.core.logger import Logger
-from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.plugins.base import Observable
-from MaKaC.plugins.RoomBooking.notifications import ReservationStartEndNotification
+from indico.modules.rb.models import utils
+from indico.modules.rb.models.utils import (
+    RBFormatter,
+    apply_filters,
+    filtered,
+    getWeekNumber
+)
 
-from indico.modules.scheduler import Client, tasks
+from pytz import timezone
+
+from MaKaC.common.info import HelperMaKaCInfo
+
+from indico.core.errors import IndicoError
+from indico.util.i18n import _
+
+# from indico.modules.scheduler import Client, tasks
+# from indico.modules.rb.models.reservation_attributes import ReservationAttribute
+from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+
+
+from .utils import next_day_skip_if_weekend, unimplemented, Serializer
 
 
 class RepeatUnit(object):
-    NEVER, HOUR, DAY, WEEK, MONTH, YEAR = xrange(6)
+    NEVER, DAY, WEEK, MONTH, YEAR = xrange(5)
 
 
-class Reservation(db.Model):
+class RepeatMapping(object):
+
+    _mapping = {
+        (RepeatUnit.NEVER, 0): (_('Single reservation'), None),
+        (RepeatUnit.DAY, 1): (_('Repeat daily'), 0),
+        (RepeatUnit.WEEK, 1): (_('Repeat once a week'), 1),
+        (RepeatUnit.WEEK, 2): (_('Repeat once every two week'), 2),
+        (RepeatUnit.WEEK, 3): (_('Repeat once every three week'), 3),
+        (RepeatUnit.MONTH, 1): (_('Repeat every month'), 4)
+    }
+
+    @classmethod
+    @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
+    def getMessage(cls, repeat_unit, repeat_step):
+        return cls._mapping[(repeat_unit, repeat_step)][0]
+
+    @classmethod
+    @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
+    def getOldMapping(cls, repeat_unit, repeat_step):
+        return cls._mapping[(repeat_unit, repeat_step)][1]
+
+    @classmethod
+    @unimplemented(exceptions=(KeyError,), message=_('Unknown old repeatability'))
+    def getNewMapping(cls, repeat):
+        if repeat is None or repeat < 5:
+            for k, (_, v) in cls._mapping.iteritems():
+                if v == repeat:
+                    return k
+        else:
+            raise KeyError('Undefined old repeat: {}'.format(repeat))
+
+    @classmethod
+    def getMapping(cls):
+        return cls._mapping
+
+
+class Reservation(Serializer, db.Model):
     __tablename__ = 'reservations'
+    __public__ = []
+    __calendar_public__ = [
+        'id', ('booked_for_name', 'bookedForName'),
+        ('booking_reason', 'reason'), ('details_url', 'bookingUrl')
+    ]
 
     # columns
 
@@ -138,71 +179,87 @@ class Reservation(db.Model):
         nullable=False,
         default=False
     )
-    reason = db.Column(
+    booking_reason = db.Column(
         db.String,
-        nullable=False
+        nullable=False,
+        default=''
+    )
+    rejection_reason = db.Column(
+        db.String,
+        nullable=False,
+        default=''
+    )
+    # extras
+    uses_video_conference = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    needs_video_conference_setup = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    needs_general_assistance = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
     )
 
     # relationships
 
-    attributes = db.relationship(
-        'ReservationAttribute',
-        backref='reservation',
-        cascade='all, delete-orphan'
-    )
-
+    # attributes = db.relationship(
+    #     'ReservationAttribute',
+    #     backref='reservation',
+    #     cascade='all, delete-orphan',
+    #     lazy='dynamic'
+    # )
     edit_logs = db.relationship(
         'ReservationEditLog',
         backref='reservation',
-        cascade='all, delete-orphan'
+        cascade='all, delete-orphan',
+        lazy='dynamic'
+    )
+    occurrences = db.relationship(
+        'ReservationOccurrence',
+        backref=db.backref(
+            'reservation',
+            order_by='ReservationOccurrence.start'
+        ),
+        cascade='all, delete-orphan',
+        lazy='dynamic'
     )
 
-    ed = db.relationship(
-        'ReservationExcludedDay',
-        backref='reservation',
-        order_by=ReservationExcludedDay.excluded_day.desc(),
-        cascade='all, delete-orphan'
-    )
-    excluded_days = association_proxy(
-        'ed',
-        'excluded_day',
-        creator=lambda d: ReservationExcludedDay(excluded_day=d)
-    )
-
-    notifications = db.relationship(
-        'ReservationNotification',
-        backref='reservation',
-        cascade='all, delete-orphan'
-    )
+    # core
 
     # TODO
     def __str__(self):
         s = """
-               id: {self.id}
+               id: {id}
 
              room: {room_name}
        start_date: {start_date}
          end_date: {end_date}
         createdDT: {created_at}
 
-      repeat_unit: {self.repeat_unit}
-    repeatability: {self.repeatability}
-          weekDay: {self.weekDay}
-       weekNumber: {self.weekNumber}
+      repeat_unit: {repeat_unit}
+    repeatability: {repeat_step}
+          weekDay: {week_day}
+       weekNumber: {week_number}
 
-    bookedForName: {self.bookedForName}
-     contactEmail: {self.contactEmail}
-     contactPhone: {self.contactPhone}
-        createdBy: {self.createdBy}
-           reason: {self.reason}
+    bookedForName: {booked_for_name}
+     contactEmail: {contact_email}
+     contactPhone: {contact_phone}
+        createdBy: {created_by}
+           reason: {reason}
 
-       isRejected: {self.isRejected}
-      isCancelled: {self.isCancelled}
+       isRejected: {is_rejected}
+      isCancelled: {is_cancelled}
 
       isConfirmed: {is_confirmed}
           isValid: {is_valid}
-       isArchival: {self.is_archival}
-          isHeavy: {self.is_heavy}
+       isArchival: {is_archival}
+          isHeavy: {is_heavy}
 """
         return utils.formatString(s, self)
 
@@ -226,39 +283,22 @@ class Reservation(db.Model):
     def is_repeating(self):
         return self.repeat_unit != RepeatUnit.NEVER
 
-    def addEditLog(self, edit_log):
-        self.edit_logs.append(edit_log)
+    @staticmethod
+    def getReservationWithDefaults():
+        dt = next_day_skip_if_weekend()
 
-    def removeEditLog(self, edit_log):
-        self.edit_logs.remove(edit_log)
+        return Reservation(
+            start_date=dt,
+            end_date=dt,
+            repeat_unit=RepeatUnit.NEVER,
+            repeat_step=0
+        )
 
-    def clearEditLogs(self):
-        del self.edit_logs[:]
-
-    def addExcludedDate(self, excluded_date):
-        self.excluded_dates.append(excluded_date)
-
-    def removeExcludedDate(self, excluded_date):
-        self.excluded_dates.remove(excluded_date)
-
-    def clearExcludedDates(self):
-        del self.excluded_dates[:]
-
-    def getRepetitions(self):
-        pass
+    # reservations
 
     @staticmethod
-    def getReservationById(rid):
-        return Reservation.query.get(rid)
-
-    @staticmethod
-    @utils.filtered
-    def getReservations(**filters):
-        return Reservation, Reservation.query
-
-    @staticmethod
-    def getOverlappingPeriods(start_date, end_date):
-        return Reservation.getReservations(**locals())
+    def getReservationByCreationTime(dt):
+        return Reservation.query.filter_by(created_at=dt).first()
 
     def getCreator(self):
         return AvatarHolder().getById(self.created_by)
@@ -274,6 +314,125 @@ class Reservation(db.Model):
         if email_list:
             return email_list.split(',')
 
+    # TODO: attribute names to the top
+    def getNotificationEmailList(self):
+        notification_list = self.getAttributeByName('Notification Email')
+        if notification_list:
+            return notification_list.split(',')
+        return []
+
+    @staticmethod
+    def getReservationById(rid):
+        return Reservation.query.get(rid)
+
+    @staticmethod
+    @utils.filtered
+    def filterReservations(**filters):
+        return Reservation, Reservation.query
+
+    def getReservations(**filters):
+        raise NotImplementedError('todo')
+
+    # edit logs
+
+    def addEditLog(self, edit_log):
+        self.edit_logs.append(edit_log)
+
+    def removeEditLog(self, edit_log):
+        self.edit_logs.remove(edit_log)
+
+    def clearEditLogs(self):
+        del self.edit_logs[:]
+
+    # ================================================
+
+    def getOccurrences(self):
+        return self.occurrences.all()
+
+    def getExcludedDays(self):
+        return self.occurrences.filter_by(is_cancelled=False).all()
+
+    def getNumberOfExcludedDays(self):
+        return self.occurences.filter_by(is_cancelled=False).count()
+
+    def cancelOccurrences(self, ds):
+        if ds:
+            (self.occurrences
+                 .filter(
+                     func.DATE(ReservationOccurrence.start).in_(ds)
+                 ).update({
+                     'is_cancelled': True
+                 }, synchronize_session='fetch'))
+
+    def cancelOccurrence(self, d):
+        (self.occurrences
+             .filter(
+                func.DATE(ReservationOccurrence.start) == d
+             ).update({
+                'is_cancelled': True
+             }, synchronize_session='fetch'))
+
+    def createOccurrences(self, fromGiven=None, excluded=None):
+        for start, end in fromGiven or self.iterOccurrences():
+            self.occurrences.append(
+                ReservationOccurrence(
+                    start=start,
+                    end=end,
+                    is_sent=False,
+                    is_cancelled=(start.date() in excluded if excluded else False)
+                )
+            )
+
+    def iterOccurrences(self):
+        start_time, end_time = self.start_date.time(), self.end_date.time()
+        start, end = self.start_date.date(), self.end_date.date()
+        while start <= end:
+            yield datetime.combine(start, start_time), datetime.combine(start, end_time)
+            start = self.getNextOccurrenceDate(start)
+
+    def getNextOccurrenceDate(self, start):
+        if self.repeat_unit == RepeatUnit.NEVER:
+            return date.max
+        elif self.repeat_unit == RepeatUnit.DAY:
+            return start + timedelta(days=self.repeat_step)
+        elif self.repeat_unit == RepeatUnit.WEEK:
+            if 0 < self.repeat_step < 4:
+                return start + timedelta(weeks=self.repeat_step)
+            return MaKaCError(_('Unsupported now'))
+        elif self.repeat_unit == RepeatUnit.MONTH:
+            if self.repeat_step == 1:
+                cand = start + timedelta(1)
+                weekDayDiff = (start.weekday() - cand.weekday())%7
+                cand += timedelta(weekDayDiff)
+                startWeekNumber = utils.getWeekNumber(start)
+                while utils.getWeekNumber(cand) != startWeekNumber:
+                    cand += timedelta(7)
+                return cand
+            return MaKaCError(_('Unsupported now'))
+        elif self.repeat_unit == RepeatUnit.YEAR:
+            raise MaKaCError(_('Unsupported now'))
+        raise MaKaCError(_('Unexpected repeatability'))
+
+    def getSoonestOccurrence(self, d):
+        return self.occurrences.filter(ReservationOccurrence.start >= d).first()
+
+    def getNextRepeatingWithUtil(self, current):
+        if self.repeat_unit == RepeatUnit.NEVER:
+            return timedelta.max
+        elif self.repeat_unit == RepeatUnit.DAY:
+            return current + relativedelta(days=self.repeat_step)
+        elif self.repeat_unit == RepeatUnit.WEEK:
+            return current + relativedelta(weeks=self.repeat_step)
+        elif self.repeat_unit == RepeatUnit.MONTH:
+            return current + relativedelta(months=self.srepeat_step)
+        elif self.repeat_unit == RepeatUnit.YEAR:
+            return current + relativedelta(years=self.repeat_step)
+        raise MaKaCError(_('Unexpected repeat unit: ') + self.repeat_unit)
+
+    @staticmethod
+    def getOverlappingPeriods(start_date, end_date):
+        return Reservation.getReservations(**locals())
+
     # def getAttributeByName(self, name):
     #     aval = (self.attributes
     #                 .with_entities(ReservationAttribute.value)
@@ -287,13 +446,9 @@ class Reservation(db.Model):
     #     if aval:
     #         return aval[0]
 
-    # emails
+    # =========================================================
 
-    def getNotificationEmailList(self):
-        notification_list = self.getAttributeByName('notification email')
-        if notification_list:
-            return notification_list.split(',')
-        return []
+    # notification emails
 
     def _getEmailDateAndOccurrenceText(self, date=None):
         if date:
@@ -320,14 +475,11 @@ class Reservation(db.Model):
     def _getCreatorAndContactEmail(self, **mail_params):
         creator = self.getCreator()
         if creator:
-            # toList
             to = creator.getEmail()
             to2 = self.getContactEmailList()
 
-            # subject
             subject = self._getEmailSubject()
 
-            # content
             body = WTemplated(mail_params.get('template_name')).getHTML(
                 dict(mail_params, **{
                     'reservation': self,
@@ -335,7 +487,6 @@ class Reservation(db.Model):
                 })
             )
 
-            # mail
             return {
                 'fromAddr': Config.getInstance.getNoReplyEmail(),
                 'toList': set((to and [to] or []) + to2),
@@ -361,6 +512,7 @@ class Reservation(db.Model):
             'body': body
         }
 
+    # TODO: naming
     def _getAVCSupportEmail(self, **mail_params):
         if self.is_confirmed and self.getAttributeByName('usesAVC'):
             to = self.room.location.getSupportEmails()
@@ -597,34 +749,15 @@ class Reservation(db.Model):
             template_name='RoomBookingEmail_2ResponsibleConsiderRejecting'
         )]
 
+    # ===============================================================
+
     def getCollisions(self):
         pass
 
-    @utils.filtered
-    def getExcludedDays(self, **filters):
-        return ReservationExcludedDay, self.excluded_days.query
-
-    def setExcludedDays(self, excluded_days):
-        self.clearCalendarCache()
-        self.excluded_days = map(lambda excluded_day: ReservationExcludedDay(excluded_day=excluded_day),
-            excluded_days)
-
-    def addExcludedDay(self, excluded_day):
-        self.clearCalendarCache()
-        self.excluded_days.append(excluded_day)
-
-    def removeExcludedDay(self, excluded_day):
-        self.clearCalendarCache()
-        if excluded_day in self.excluded_days:
-            self.excluded_days.remove(excluded_day)
-
-    def containsExcludedDay(self, excluded_day):
-        return excluded_day in self.excluded_days
-
-    @staticmethod
-    @utils.filtered
-    def getCountOfReservations(**filters):
-        return len(Reservation.getReservations(**filters))
+    # @staticmethod
+    # @utils.filtered
+    # def getCountOfReservations(**filters):
+    #     return len(Reservation.getReservations(**filters))
 
     @staticmethod
     def getClosestReservation(resvs=[], after=None):
@@ -640,6 +773,8 @@ class Reservation(db.Model):
 
     def getLocator(self):
         pass
+
+    # access
 
     def isProtected(self):
         """
@@ -770,6 +905,13 @@ class Reservation(db.Model):
         tz = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
         return timezone(tz).localize(self.end_date)
 
+    # reservations
+
+    @staticmethod
+    @utils.filtered
+    def filterReservations(**filters):
+        return Reservation, Reservation.query
+
     @staticmethod
     def getReservations(**filters):
         return apply_filters(Reservation.query, Reservation, **filters).all()
@@ -822,6 +964,7 @@ class Reservation(db.Model):
     def addEditLog(self, e):
         self.edit_logs.append(e)
 
+    # TODO: new style delete everywhere
     def removeEditLogs(self):
         self.edit_logs.delete()
 
@@ -858,3 +1001,10 @@ class Reservation(db.Model):
                 # else :
                 #     info.append("The %s was changed from '%s' to '%s'" %(attrName, prevValue, newValue))
         return info
+
+
+class Collision(object):
+
+    def __init__(self, period, resv):
+        self.start_date, self.end_date = period
+        self.collides_with = resv
