@@ -24,16 +24,25 @@ Small functions and classes widely used in Room Booking Module.
 import json
 import re
 import string
+import struct
 import time
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from dateutil.relativedelta import MO, TU, WE, TH, FR, SA, SU
+from dateutil.rrule import rrule, DAILY
+from functools import wraps
+from random import randrange
 
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import class_mapper
 
 from MaKaC import user as user_mod
 from MaKaC.accessControl import AdminList
-from MaKaC.errors import MaKaCError
 from MaKaC.plugins.base import PluginsHolder
+
+from indico.core.errors import IndicoError
+from indico.core.logger import Logger
+from indico.util.i18n import _
+from indico.util.json import dumps
 
 
 def getDefaultValue(cls, attr):
@@ -100,11 +109,23 @@ def filtered(func):
     """
     apply filters and returns all objects
     """
-    assert re.match(r'get\w+s', func.__name__)
+    assert re.match(r'filter\w+s', func.__name__)
     def add_filters(*args, **filters):
         cls, q = func(*args, **filters)
-        return apply_filters(q, cls, **filters)[:]
+        return apply_filters(q, cls, **filters).all()
     return add_filters
+
+
+def unimplemented(exceptions=(Exception,), message='Unimplemented'):
+    def _unimplemented(func):
+        @wraps(func)
+        def _wrapper(*args, **kw):
+            try:
+                return func(*args, **kw)
+            except exceptions:
+                raise IndicoError(message)
+        return _wrapper
+    return _unimplemented
 
 
 def getRoomBookingOption(opt):
@@ -120,8 +141,8 @@ def accessChecked(func):
         try:
             avatar = args[-1]
         except IndexError:
-            MaKaCError(_('accessChecked decorator expects '
-                         'an avatar as a positional argument'))
+            IndicoError(_('accessChecked decorator expects '
+                          'an avatar as a positional argument'))
 
         if AdminList.getInstance().isAdmin(avatar):
             return True
@@ -149,8 +170,14 @@ def accessChecked(func):
     return check_access
 
 
+def add_to_session():
+    """
+    Automatically add modified objects to session
+    """
+    pass
 
-def results_to_dict(results):
+
+def stats_to_dict(results):
     """ Creates dictionary from stat rows of reservations
 
         results = [
@@ -244,38 +271,119 @@ class JSONStringBridgeMixin:
     def is_value_equipped(self):
         return self.value.get('is_equipped', False)
 
+    @hybrid_property
+    def is_value_x(self, x):
+        return self.value.get('is_' + x, False)
 
-class Period:
+
+def requiresDateOrDatetime(func):
+    def is_date_or_datetime(d):
+        return isinstance(d, date) or isinstance(d, datetime)
+
+    def _wrapper(*args, **kw):
+        if all(map(is_date_or_datetime, args)) and all(map(is_date_or_datetime, kw.values())):
+            return func(*args, **kw)
+        raise IndicoError(_(''))
+    return _wrapper
+
+
+def is_none_valued_dict(d):
+    return filter(lambda e: e is None, d.values())
+
+
+def is_false_valued_dict(d):
+    return len(filter(None, d.values())) != len(d)
+
+
+def sifu(e):
+    return e.strip() if e and isinstance(e, unicode) else e
+strip_if_unicode = sifu
+
+
+def get_checked_param_dict(f, params, converter=unicode):
+    return dict((k, strip_if_unicode(f.get(k, type=converter))) for k in params)
+
+
+def iterdays(start, end):
     """
-    Composed of two dates. Comparable by start date.
+    Iterate days between two dates:
+    Example:
+    for day in iterdays(datetime.now(), datetime.now() + timedelta(21)):
+        pass
     """
-    startDT = None
-    endDT = None
-
-    def __init__(self, start, end):
-        self.start = start
-        self.end = end
-
-    def __cmp__(self, other):
-        if not (self and other):
-            return cmp(
-                1 if self else None,
-                1 if other else None
-            )
-
-        return cmp(self.start, other.start)
-
-    def __hash__(self):
-        return hash((self.start, self.end))
-
-    def __repr__(self):
-        return 'Period(%r, %r)' % (self.startDT, self.endDT)
-
-    def __str__(self):
-        return '{} -- {}'.format(self.start, self.end)
+    for day in range((end - start).days + 1):
+        yield start + timedelta(day)
 
 
-def intd(s, default=None):
+def iterdaysByUtil(start, end):
+    return rrule(DAILY, dtstart=start, until=end)
+
+
+def is_weekend(d):
+    assert isinstance(d, date) or isinstance(d, datetime)
+    return d.weekday() in [e.weekday for e in [SA, SU]]
+
+
+def next_work_day(dtstart=None, neglect_time=True):
+    if not dtstart:
+        dtstart = datetime.utcnow()
+    if neglect_time:
+        dtstart = datetime.combine(dtstart.date(), datetime.min.time())
+    return list(rrule(DAILY, count=1, byweekday=(MO, TU, WE, TH, FR),
+                      dtstart=dtstart))[0]
+
+
+def next_day_skip_if_weekend(dtstart=None):
+    if not dtstart:
+        dtstart = datetime.utcnow()
+    dtstart += timedelta(1)
+    return next_work_day(dtstart=dtstart, neglect_time=False)
+
+
+def getWeekNumber(dt):
+    """
+    Lets assume dt is Friday.
+    Then weekNumber(dt) will return WHICH Friday of the month it is: 1st - 5th.
+    """
+    weekDay, weekNumber = dt.weekday(), 0
+    for day in iterdays(date(dt.year, dt.month, 1), dt):
+        if day.weekday() == weekDay:
+            weekNumber += 1
+    return weekNumber
+
+
+def getTimeDiff(start, end):
+    diff = datetime.combine(date.today(), end) - datetime.combine(date.today(), start)
+    return diff.total_seconds()
+
+
+def getRandomDatetime(start, end):
+    """
+    Returns a random datetime between two datetime objects.
+    """
+    delta = end - start
+    int_delta = (delta.days * 24 * 60 * 60) + delta.seconds
+    random_second = randrange(int_delta)
+    return start + timedelta(seconds=random_second)
+
+
+def getRandomDate(start, end):
+    """
+    Returns a random date between two date objects.
+    """
+    r = getRandomDatetime(start, end)
+    return r.date() if isinstance(r, datetime) else r
+
+
+def isShortInt(n):
+    try:
+        struct.pack('H', n)  # i.e. 0 <= n < (1 << 16)
+        return True
+    except:
+        return False
+
+
+def intOrDefault(s, default=None):
     """
     Like int() but returns default value if conversion failed.
     """
@@ -367,19 +475,25 @@ def containsExactly_OR_containsAny( attrValExample, attrValCandidate ):
 
     return False
 
+def get_overlap(st1, et1, st2, et2):
+    st, et = max(st1, st2), min(et1, et2)
+    if st <= et:
+        return st, et
 
-def doesPeriodOverlap( *args, **kwargs ):
+
+def doesPeriodOverlap(*args):
     """
     Returns true if periods do overlap. This requires both dates and times to overlap.
     Pass it either (period, period) or ( start1, end1, start2, end2 ).
     """
-    if len( args ) == 4:
-        return __doesPeriodOverlap( args[0], args[1], args[2], args[3] )
-    if len( args ) == 2:
-        return __doesPeriodOverlap( args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT )
+    largs = len(args)
+    if largs == 4:
+        return __doesPeriodOverlap(*args)
+    if largs == 2:
+        return __doesPeriodOverlap(args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT)
     raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
 
-def __doesPeriodOverlap( startDT1, endDT1, startDT2, endDT2 ):
+def __doesPeriodOverlap(startDT1, endDT1, startDT2, endDT2):
     # Dates must overlap
     if endDT1.date() < startDT2.date() or endDT2.date() < startDT1.date():
         return False
@@ -389,14 +503,14 @@ def __doesPeriodOverlap( startDT1, endDT1, startDT2, endDT2 ):
         return False
     return True
 
-def overlap( *args, **kwargs ):
+def overlap(*args, **kwargs):
     """
     Returns two datetimes - the common part of two given periods.
     """
     if len( args ) == 4:
-        return __overlap( args[0], args[1], args[2], args[3] )
+        return __overlap(args[0], args[1], args[2], args[3])
     if len( args ) == 2:
-        return __overlap( args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT )
+        return __overlap(args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT)
     raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
 
 
@@ -442,39 +556,15 @@ def __overlapTimes( startT1, endT1, startT2, endT2 ):
     return __overlapTimes( startT2, endT2, startT1, endT1 )
 
 
-def iterdays(first, last):
-    """
-    Iterate days between two dates:
-    Example:
-    for day in iterdays( datetime.now(), datetime.now() + timedelta( 21 ) ):
-        pass
-    """
-    if not isinstance( first, datetime ): raise TypeError('pass datetime') #first = datetime( first.year, first.month, first.day )
-    if not isinstance( last, datetime ): raise TypeError('pass datetime')  #last = datetime(  last.year, last.month, last.day )
-    for day in range((last - first).days + 1):
-        yield first + timedelta(day)
+class Impersistant(object):
 
-def weekNumber( dt ):
-    """
-    Lets assume dt is Friday.
-    Then weekNumber( dt ) will return WHICH Friday of the month it is: 1st - 5th.
-    """
-    weekDay = dt.weekday()
-    weekNumber = 0
-    for day in iterdays( datetime( dt.year, dt.month, 1 ), dt ):
-        if day.weekday() == weekDay:
-            weekNumber += 1
-    return weekNumber
-
-class Impersistant( object ):
-
-    def __init__( self, obj ):
+    def __init__(self, obj):
         self.__obj = obj
 
-    def getObject( self ):
+    def getObject(self):
         return self.__obj
 
-def checkPresence( self, errors, attrName, type ):
+def checkPresence(self, errors, attrName, type):
     at = self.__dict__[attrName]
     if at == None:
         errors.append( attrName + ' is not present' )
@@ -484,7 +574,7 @@ def checkPresence( self, errors, attrName, type ):
         errors.append( attrName + ' has invalid type' )
     return None
 
-def toUTC( localNaiveDT ):
+def toUTC(localNaiveDT):
     """
     Converts naive (timezone-less) datetime to UTC.
     It assumes localNaiveDT to be in local/DTS timezone.
@@ -496,7 +586,7 @@ def toUTC( localNaiveDT ):
     return localNaiveDT + timedelta( 0, time.altzone )
 
 
-def fromUTC( utcNaiveDT ):
+def fromUTC(utcNaiveDT):
     #if utcNaiveDT == None:
     #    return None
     try:
@@ -521,6 +611,38 @@ def dateAdvanceAllowed(date, days):
     return dayDifference(naive2local(date, tz), nowutc(), tz) > days
 
 
+class Serializer(object):
+    __public__ = []
+
+    def to_serializable(self, attr='__public__'):
+        j = {}
+        for k in getattr(self, attr):
+            try:
+                if isinstance(k, tuple):
+                    k, name = k
+                else:
+                    k, name = k, k
+
+                v = getattr(self, k)
+                if callable(v):  # to make it generic, we can get rid of it by properties
+                    v = v()
+                if isinstance(v, Serializer):
+                    v = v.to_serializable()
+                elif isinstance(v, list):
+                    v = map(lambda e: e.to_serializable(), v)
+                elif isinstance(v, dict):
+                    v = dict((k, vv.to_serializable() if isinstance(vv, Serializer) else vv)
+                             for k, vv in v.iteritems())
+                j[name] = v
+            except Exception:
+                import traceback
+                Logger.get('Serializer{}'.format(self.__class__.__name__))\
+                      .error(traceback.format_exc())
+                raise IndicoError(
+                    _('There was an error on the retrieval of {} of {}.')
+                    .format(k, self.__class__.__name__.lower())
+                )
+        return j
 # ============================================================================
 # ================================== TEST ====================================
 # ============================================================================
