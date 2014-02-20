@@ -19,19 +19,20 @@
 
 from MaKaC.webinterface.wcomponents import WTemplated
 
-from indico.modules.rb.views.admin import WPRoomBookingPluginAdminBase
+from ...models.rooms import Room
+from . import WPRoomBookingPluginAdminBase
 
 
 class WPRoomBookingRoomForm(WPRoomBookingPluginAdminBase):
 
     _userData = ['favorite-user-list']
 
-    def __init__( self, rh ):
+    def __init__(self, rh):
         self._rh = rh
-        super(WPRoomBookingRoomForm, self).__init__(rh)
+        WPRoomBookingPluginAdminBase.__init__(self, rh)
 
-    def _setActiveTab( self ):
-        super(WPRoomBookingRoomForm, self)._setActiveTab()
+    def _setActiveTab(self):
+        WPRoomBookingPluginAdminBase._setActiveTab(self)
         self._subTabConfig.setActive()
 
     def _getTabContent(self, params):
@@ -44,39 +45,24 @@ class WRoomBookingRoomForm(WTemplated):
         self._rh = rh
 
     def getVars(self):
-        wvars = super(WRoomBookingRoomForm, self).getVars()
+        wvars = WTemplated.getVars(self)
+        wvars['is_new'] = self._rh._new
 
-        candRoom = self._rh._candRoom
-        goodFactory = Location.parse(candRoom.locationName).factory
+        location, room = self._rh._location, self._rh._room
+        wvars['location'] = location
+        wvars['room'] = room
 
-        wvars["Location"] = Location
-        wvars["room"] = candRoom
-        wvars["largePhotoPath"] = None
-        wvars["smallPhotoPath"] = None
-        wvars["config"] = Config.getInstance()
-        wvars["possibleEquipment"] = goodFactory.getEquipmentManager().getPossibleEquipment(location=candRoom.locationName)
+        wvars['largePhotoPath'] = room.getLargePhotoURL()
+        wvars['smallPhotoPath'] = room.getSmallPhotoURL()
+        wvars['possibleEquipments'] = dict((eq.name, eq.id in self._rh._equipments)
+                                            for eq in location.getEquipments())
 
-        wvars["showErrors"] = self._rh._showErrors
-        wvars["errors"] = self._rh._errors
+        wvars['errors'] = self._rh._errors
 
-        wvars["insert"] = (candRoom.id == None)
-        wvars["attrs"] = goodFactory.getCustomAttributesManager().getAttributes(location=candRoom.locationName)
-        resp = candRoom.getResponsible()
-        if resp:
-            wvars["responsibleName"] = resp.getFullName()
-        else:
-            wvars["responsibleName"] = ""
+        wvars['owner_name'] = getattr(room.getResponsible(), 'name', '')
 
-        nbd = candRoom.getNonBookableDates()
-        if len(nbd) == 0:
-            from MaKaC.plugins.RoomBooking.default.room import NonBookableDate
-            nbd = [NonBookableDate(None, None)]
-        wvars["nonBookableDates"] = nbd
-
-        nbp = candRoom.getDailyBookablePeriods()
-        if len(nbp) == 0:
-            from MaKaC.plugins.RoomBooking.default.room import DailyBookablePeriod
-            nbp = [DailyBookablePeriod(None, None)]
-        wvars["dailyBookablePeriods"] = nbp
+        wvars['attrs'] = []
+        wvars['nonBookableDates'] = self._rh._nonbookable_dates
+        wvars['dailyBookablePeriods'] = self._rh._bookable_times
 
         return wvars
