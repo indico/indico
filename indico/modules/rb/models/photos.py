@@ -38,11 +38,11 @@ class Photo(db.Model):
     )
     small_content = db.Column(
         db.LargeBinary,
-        nullable=False
+        nullable=True
     )
     large_content = db.Column(
         db.LargeBinary,
-        nullable=False
+        nullable=True
     )
 
     def __repr__(self):
