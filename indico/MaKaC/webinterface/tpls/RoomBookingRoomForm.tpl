@@ -102,7 +102,7 @@
           <input type="hidden" name="roomLocation" id="roomLocation" value="${ location.name }" />
         </span>
         <br />
-        % if showErrors:
+        % if errors:
           <br />
           <span style="color: Red; margin-left: 6px;">
             ${ _('Saving failed. There is/are {0} error(s)').format(len(errors)) }:
@@ -127,7 +127,7 @@
                   <small> ${ _('Location') }&nbsp;&nbsp;</small>
                 </td>
                 <td align="left" class="blacktext">
-                  ${ room.location.name }
+                  ${ location.name }
                 </td>
               </tr>
               <tr>
@@ -194,7 +194,7 @@
         <!-- OPTIONS -->
         <tr>
           <td class="titleUpCellTD">
-            <span class="titleCellFormat"> ${ _("Options")}</span>
+            <span class="titleCellFormat"> ${ _('Options')}</span>
           </td>
           <td colspan="2">
             <table>
@@ -203,7 +203,7 @@
                   <small> ${ _('Active') }&nbsp;&nbsp;</small>
                 </td>
                 <td align="left" class="blacktext">
-                  <input type="checkbox" ${'checked' if room.is_active else ''} id="is_active" name="is_active"/> ${ contextHelp('isActiveCH') }
+                  <input type="checkbox" ${ 'checked' if room.is_active else '' } id="is_active" name="is_active"/> ${ contextHelp('isActiveCH') }
                 </td>
               </tr>
               <tr>
@@ -231,19 +231,12 @@
                 </td>
               </tr>
               <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Notification on booking start') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="checkbox" ${ 'checked' if room.notification_for_start else '' } id="notification_for_start" name="notification_for_start" /> ${ contextHelp( 'resvStartNotificationCH') }
-                </td>
-              </tr>
-              <tr>
+                <!-- TODO: update help -->
                 <td align="right" valign="top">
                   <small> ${ _('Notification on booking start - X days before') }&nbsp;&nbsp;</small>
                 </td>
                 <td align="left" class="blacktext">
-                  <input type="text" style="width: 15px;" maxlength="1" id="notification_for_start" name="notification_for_start" value="${'' if not room.notification_for_start else room.notification_for_start}" /> ${ contextHelp( 'resvStartNotificationBeforeCH' ) }
+                  <input type="text" style="width: 20px;" maxlength="1" id="notification_for_start" name="notification_for_start" value="${ room.notification_for_start }" /> ${ contextHelp( 'resvStartNotificationBeforeCH' ) }
                 </td>
               </tr>
               <tr>
@@ -273,11 +266,11 @@
             <table>
               <tr>
                 <td class="subFieldWidth" align="right" valign="top">
-                  <small> ${ _("Responsible")}&nbsp;&nbsp;</small>
+                  <small> ${ _("Responsible") }&nbsp;&nbsp;</small>
                 </td>
                 <td align="left" class="blacktext">
-                  <input type="hidden" id="owner_id" name="owner_id" value="${ room.owner_id }" />
-                  <input type="text" readonly="readonly" id="owner_name" name="owner_name" value="${ owner_name }" />
+                  <input type="hidden" id="owner_id" name="owner_id" value="${ verbose(room.owner_id) }" />
+                  <input type="text" readonly="readonly" id="owner_name" name="owner_name" value="${ verbose(owner_name) }" />
                   <input type="button" value="${ _('Search') }" onclick="searchForUsers();" />
                   ${ contextHelp('responsibleCH') }
                 </td>
@@ -309,12 +302,19 @@
           <td colspan="2">
             <table>
               <tr>
-                <td class="subFieldWidth" align="right" valign="top"><small> ${ _("Large photo")}&nbsp;&nbsp;</small></td>
-                <td align="left" class="blacktext"><input type="file" id="largePhotoPath" name="largePhotoPath" value="<% verbose( largePhotoPath ) %>" /> ${contextHelp('photoCH' )}</td>
+                <td class="subFieldWidth" align="right" valign="top">
+                  <small> ${ _('Large photo') }&nbsp;&nbsp;</small>
+                </td>
+                <td align="left" class="blacktext">
+                  <input type="file" id="largePhotoPath" name="largePhotoPath" value="${ verbose(largePhotoPath) }"/> ${ contextHelp('photoCH' ) }</td>
               </tr>
               <tr>
-                <td align="right" valign="top"><small> ${ _("Small photo")}&nbsp;&nbsp;</small></td>
-                <td align="left" class="blacktext"><input type="file" id="smallPhotoPath" name="smallPhotoPath" value="${ verbose( smallPhotoPath ) }" /></td>
+                <td align="right" valign="top">
+                  <small> ${ _('Small photo') }&nbsp;&nbsp;</small>
+                </td>
+                <td align="left" class="blacktext">
+                  <input type="file" id="smallPhotoPath" name="smallPhotoPath" value="${ verbose(smallPhotoPath) }" />
+                </td>
               </tr>
             </table>
           </td>
@@ -332,7 +332,7 @@
                   <small> ${ _('Capacity') }&nbsp;&nbsp;</small>
                 </td>
                 <td align="left" class="blacktext">
-                  <input type="text" id="capacity" name="capacity" value="${ verbose(room.capacity) }" /> ${ _('people') } ${contextHelp('capacityCH') }
+                  <input type="text" id="capacity" name="capacity" value="${ verbose(room.capacity) }" /> ${ _('people') } ${ contextHelp('capacityCH') }
                 </td>
               </tr>
               <tr>
@@ -340,7 +340,7 @@
                   <small> ${ _('Department') }&nbsp;&nbsp;</small>
                 </td>
                 <td align="left" class="blacktext">
-                  <input type="text" id="division" name="division" value="${ verbose(room.division) }" />${ contextHelp('departmentCH' ) }
+                  <input type="text" id="division" name="division" value="${ verbose(room.division) }" />${ contextHelp('departmentCH') }
                 </td>
               </tr>
               <tr>
@@ -348,15 +348,15 @@
                   <small> ${ _('Surface area') }&nbsp;&nbsp;</small>
                 </td>
                 <td align="left" class="blacktext">
-                  <input type="text" id="surface_area" name="surface_area" value="${ verbose(room.surface_area) }" /> ${ _('m2') }${ contextHelp('surfaceCH') }
+                  <input type="text" id="surface_area" name="surface_area" value="${ verbose(room.surface_area) }" /> ${ _('m2') } ${ contextHelp('surfaceCH') }
                 </td>
               </tr>
               <tr>
                 <td align="right" valign="top">
-                  <small> ${ _('Comments')}&nbsp;&nbsp;</small>
+                  <small> ${ _('Comments') }&nbsp;&nbsp;</small>
                 </td>
                 <td align="left" class="blacktext">
-                  <textarea cols="40" id="comments" name="comments" >${ verbose(room.comments )}</textarea>${ contextHelp('commentsCH') }
+                  <textarea cols="40" id="comments" name="comments">${ verbose(room.comments) }</textarea>${ contextHelp('commentsCH') }
                 </td>
               </tr>
               <tr>
@@ -429,48 +429,56 @@
             <span class="titleCellFormat"> ${ _('Custom attributes') }</span>
           </td>
           <td colspan="2">
-            <table width="100%">
-            % for ca in attrs:
-              <tr>
-                <td class="subFieldWidth" align="right" valign="top">
-                  <small>${ ca['name'] }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" name="cattr_${ ca['name'] }" value="${ verbose(room.customAtts.get(ca['name'])) }" />
-                  % if ca['name'] == 'notification email' :
-                    % if ca['required'] :
-                      ${ inlineContextHelp('<b>Required.</b> You can specify more than one email address separated by commas, semicolons or whitespaces.') }
-                    % else :
-                      ${ inlineContextHelp('You can specify more than one email address separated by commas, semicolons or whitespaces.') }
+            <!-- TODO: Hiding field when there is no one to choose may be better -->
+            % if attrs:
+              <table width="100%">
+              % for ca in attrs:
+                <tr>
+                  <td class="subFieldWidth" align="right" valign="top">
+                    <small>${ ca['name'] }&nbsp;&nbsp;</small>
+                  </td>
+                  <td align="left" class="blacktext">
+                    <input type="text" name="cattr_${ ca['name'] }" value="${ verbose(room.customAtts.get(ca['name'])) }" />
+                    % if ca['name'] == 'notification email':
+                      % if ca['required'] :
+                        ${ inlineContextHelp('<b>Required.</b> You can specify more than one email address separated by commas, semicolons or whitespaces.') }
+                      % else :
+                        ${ inlineContextHelp('You can specify more than one email address separated by commas, semicolons or whitespaces.') }
+                      % endif
+                    % elif ca['required'] :
+                      ${ inlineContextHelp('<b>Required.</b>') }
                     % endif
-                  % elif ca['required'] :
-                    ${ inlineContextHelp('<b>Required.</b>') }
-                  % endif
-                </td>
-              </tr>
-            % endfor
-            </table>
+                  </td>
+                </tr>
+              % endfor
+              </table>
+            % else:
+              ${ _('There are no custom attributes to pick.') }
+              <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location) }">${ _('You may first add some to location, {0}.').format(location.name) }</a>
+            % endif
           </td>
         </tr>
         <tr><td>&nbsp;</td></tr>
         <!-- EQUIPMENT -->
         <tr>
           <td class="titleUpCellTD">
-            <span class="titleCellFormat">${ _('Equipment') }</span>
+            <span class="titleCellFormat">${ _('Equipments') }</span>
           </td>
           <td colspan="2">
+            % if possibleEquipments:
             <table width="100%">
               <tr>
                 <td class="subFieldWidth" align="right" valign="top">
                   <small> ${ _('Room has') }:&nbsp;&nbsp;</small>
                 </td>
                 <td align="left" class="blacktext">
-                % for eq in possibleEquipment:
-                  <input id="${ 'equ_' + eq }" name="${ 'equ_' + eq }" type="checkbox" ${' checked' if room.hasEquipment(eq) else ''} >
+                % for eq, is_checked in possibleEquipments.items():
+                  <input id="${ 'equ_' + eq }" name="${ 'equ_' + eq }" type="checkbox" ${' checked' if is_checked else ''} >
                     ${ eq }
                   </input>
                   <br />
-                  % if "video conference" in eq.lower():
+
+                  % if False: #"video conference" in eq.lower():
                     % for vc in room.__class__.vcList:
                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                       <input id="${ 'vc_' + vc }" name="${ 'vc_' + vc }" type="checkbox" ${' checked' if vc in room.getAvailableVC() else ''} >
@@ -483,6 +491,10 @@
                 </td>
               </tr>
             </table>
+            % else:
+              ${ _('There are no equipments to pick.') }
+              <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location) }">${ _('You may add some to location, {0}.').format(location.name) }</a>
+            % endif
           </td>
         </tr>
         <tr><td>&nbsp;</td></tr>
@@ -508,70 +520,65 @@
     $('#dailyBookablePeriodCounter').val(dailyBookablePeriodCounter);
 
     IndicoUI.executeOnLoad(function() {
-    % for nbd in nonBookableDates:
-        var startDateField = IndicoUI.Widgets.Generic.dateField(
-            true,
-            {
-                id: 'startDateNonBookablePeriod${ loop.index }',
-                name: 'startDateNonBookablePeriod${ loop.index }'
-            }
-        );
-        var endDateField = IndicoUI.Widgets.Generic.dateField(
-            true,
-            {
-                id: 'endDateNonBookablePeriod${ loop.index }',
-                name:'endDateNonBookablePeriod${ loop.index }'
-            }
-        );
+        % for nbd in nonBookableDates:
+            var startDateField = IndicoUI.Widgets.Generic.dateField(
+                true,
+                {
+                    id: 'startDateNonBookablePeriod${ loop.index }',
+                    name: 'startDateNonBookablePeriod${ loop.index }'
+                }
+            );
+            var endDateField = IndicoUI.Widgets.Generic.dateField(
+                true,
+                {
+                    id: 'endDateNonBookablePeriod${ loop.index }',
+                    name:'endDateNonBookablePeriod${ loop.index }'
+                }
+            );
 
-        $E('startDateNonBookablePeriod${ loop.index }').set(startDateField);
-        $E('endDateNonBookablePeriod${ loop.index }').set(endDateField);
+            $E('startDateNonBookablePeriod${ loop.index }').set(startDateField);
+            $E('endDateNonBookablePeriod${ loop.index }').set(endDateField);
 
-        startDateField.set(
-            '${ nbd.getStartDate().strftime("%d/%m/%Y %H:%M") if nbd.getStartDate() else ""}'
-        )
-        endDateField.set(
-            '${ nbd.getEndDate().strftime("%d/%m/%Y %H:%M") if nbd.getEndDate() else ""}'
-        )
-    % endfor
+            startDateField.set(
+                '${ nbd.start_date.strftime("%d/%m/%Y %H:%M") if nbd.start_date else ""}'
+            );
+            endDateField.set(
+                '${ nbd.end_date.strftime("%d/%m/%Y %H:%M") if nbd.end_date else ""}'
+            );
+        % endfor
 
-    % for dbp in dailyBookablePeriods:
-        var dateStartEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
-            '${ dbp.getStartTime() if dbp.getStartTime() else ""}',
-            '${ dbp.getEndTime() if dbp.getEndTime() else ""}',
-            {
-                id: 'startTimeDailyBookablePeriod${ loop.index }',
-                name: 'startTimeDailyBookablePeriod${ loop.index }',
-                style: { width: '50px' }
-            },
-            {
-                id: 'endTimeDailyBookablePeriod${ loop.index }',
-                name: 'endTimeDailyBookablePeriod${ loop.index }',
-                style: { width: '50px' }
-            }
-        );
-        $E('startTimeDailyBookablePeriod${ loop.index }').set(
-            dateStartEndTimeField.startTimeField
-        );
-        $E('endTimeDailyBookablePeriod${ loop.index }').set(
-            dateStartEndTimeField.endTimeField
-        );
-    % endfor
+        % for dbp in dailyBookablePeriods:
+            var dateStartEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
+                '${ dbp.start_time.strftime("%H:%M") if dbp.start_time else ""}',
+                '${ dbp.end_time.strftime("%H:%M") if dbp.end_time else ""}',
+                {
+                    id: 'startTimeDailyBookablePeriod${ loop.index }',
+                    name: 'startTimeDailyBookablePeriod${ loop.index }',
+                    style: { width: '50px' }
+                },
+                {
+                    id: 'endTimeDailyBookablePeriod${ loop.index }',
+                    name: 'endTimeDailyBookablePeriod${ loop.index }',
+                    style: { width: '50px' }
+                }
+            );
+            $E('startTimeDailyBookablePeriod${ loop.index }').set(
+                dateStartEndTimeField.startTimeField
+            );
+            $E('endTimeDailyBookablePeriod${ loop.index }').set(
+                dateStartEndTimeField.endTimeField
+            );
+        % endfor
     });
 
-    // TODO: use a template
     function addNonBookablePeriod() {
         $("#nonBookablePeriodsTable tr:last").after(
-            '<tr class="startEndDate">
-               <td class="startEndDateEntry">${ _("from") }:</td>
-               <td>
-                  <span id="startDateNonBookablePeriod' + nonBookablePeriodCounter + '"></span>
-               </td>
-               <td class="startEndDateEntry">${ _("to") }:</td>
-               <td>
-                 <span id="endDateNonBookablePeriod' + nonBookablePeriodCounter +'"></span>
-               </td>
-            </tr>'
+            '<tr class="startEndDate"> \
+              <td class="startEndDateEntry">${ _("from") }:</td> \
+              <td><span id="startDateNonBookablePeriod{0}"></span></td> \
+              <td class="startEndDateEntry">${ _("to") }:</td> \
+              <td><span id="endDateNonBookablePeriod{0}"></span></td> \
+            </tr>'.format(nonBookablePeriodCounter)
         );
 
         $E('startDateNonBookablePeriod' + nonBookablePeriodCounter).set(
@@ -599,16 +606,12 @@
 
     function addDailyBookablePeriod() {
         $('#dailyBookablePeriodsTable tr:last').after(
-            '<tr class="startEndDate">
-              <td class="startEndDateEntry">${ _("from") }:</td>
-              <td>
-                <span id="startTimeDailyBookablePeriod' + dailyBookablePeriodCounter + '"></span>
-              </td>
-              <td class="startEndDateEntry">${ _("to") }:</td>
-              <td>
-                <span id="endTimeDailyBookablePeriod' + dailyBookablePeriodCounter +'"></span>
-              </td>
-            </tr>'
+            '<tr class="startEndDate"> \
+              <td class="startEndDateEntry">${ _("from") }:</td> \
+              <td><span id="startTimeDailyBookablePeriod{0}"></span></td> \
+              <td class="startEndDateEntry">${ _("to") }:</td> \
+              <td><span id="endTimeDailyBookablePeriod{0}"></span></td> \
+            </tr>'.format(dailyBookablePeriodCounter)
         );
 
         newDateStartEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
@@ -643,8 +646,8 @@
             true, null,
             true, true, false,
             function(users) {
-                $E('responsibleName').set(users[0].name);
-                $E('responsibleId').set(users[0].id);
+                $E('owner_name').set(users[0].name);
+                $E('owner_id').set(users[0].id);
         }).execute();
     }
 </script>
