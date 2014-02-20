@@ -390,6 +390,9 @@ class AlarmTask(SendMailTask):
         alarm.setToAllParticipants(self.getToAllParticipants())
         return alarm
 
+    def delete(self):
+        self.getConference().removeAlarm(self)
+
     def getTimeBefore(self):
         # TODO: remove this
         if not hasattr(self, '_relative'):

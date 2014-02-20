@@ -441,12 +441,11 @@ class Evaluation(Persistent):
 
     def removeAlarm(self, alarm):
         """Remove given Alarm."""
-        if alarm != None :
-            if self.getConference().getAlarmById(alarm.getConfRelativeId()) != None :
+        if alarm is not None:
+            if self.getConference().getAlarmById(alarm.getConfRelativeId()) is not None:
                 self.getConference().removeAlarm(alarm)
-            else :
-                self.getAlarms().pop(alarm.getNotificationKey(), None)
-                self.notifyModification()
+            self.getAlarms().pop(alarm.getNotificationKey(), None)
+            self.notifyModification()
 
     def removeAllAlarms(self):
         """remove all alarms."""
@@ -505,10 +504,9 @@ class EvaluationAlarm(AlarmTask):
 
     def delete(self):
         evaluation = self.getEvaluation()
-        if evaluation != None:
+        if evaluation is not None:
             evaluation.removeAlarm(self)
         self.setEvaluation(None)
-        Alarm.delete(self)
 
     def _prepare(self, check=True):
 

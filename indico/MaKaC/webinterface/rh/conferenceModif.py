@@ -1194,7 +1194,7 @@ class RHConfDeleteAlarm( RHAlarmBase ):
     def _process(self):
         if self._alarm.getEndedOn():
             raise MaKaCError(_("The alarm can not be deleted"))
-        self._conf.removeAlarm(self._alarm)
+        self._alarm.delete()
         self._redirect( urlHandlers.UHConfDisplayAlarm.getURL( self._conf ) )
 
 

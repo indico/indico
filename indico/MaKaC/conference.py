@@ -2719,11 +2719,11 @@ class Conference(CommonObjectBase, Locatable):
         for owner in self.__owners:
             owner.removeConference( self, notify=False )
 
+        self.removeAllEvaluations()
+
         for alarm in self.getAlarmList():
             if not alarm.getEndedOn():
                 self.removeAlarm(alarm)
-
-        self.removeAllEvaluations()
 
         #Delete the RoomBooking associated reservations
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
