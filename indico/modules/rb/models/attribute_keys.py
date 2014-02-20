@@ -45,11 +45,13 @@ class AttributeKey(db.Model):
     )
     is_for_rooms = db.Column(
         db.Boolean,
-        nullable=False
+        nullable=False,
+        default=False
     )
     is_for_reservations = db.Column(
         db.Boolean,
-        nullable=False
+        nullable=False,
+        default=False
     )
 
     # relationships
@@ -64,17 +66,20 @@ class AttributeKey(db.Model):
     location_attributes = db.relationship(
         'LocationAttribute',
         backref='key',
-        cascade='all, delete-orphan'
+        cascade='all, delete-orphan',
+        lazy='dynamic'
     )
-    room_attributes = db.relationship(
-        'RoomAttribute',
-        backref='key',
-        cascade='all, delete-orphan'
-    )
+    # room_attributes = db.relationship(
+    #     'RoomAttribute',
+    #     backref='key',
+    #     cascade='all, delete-orphan',
+    #     lazy='dynamic'
+    # )
     reservation_attributes = db.relationship(
         'ReservationAttribute',
         backref='key',
-        cascade='all, delete-orphan'
+        cascade='all, delete-orphan',
+        lazy='dynamic'
     )
 
     def __str__(self):
@@ -104,3 +109,11 @@ class AttributeKey(db.Model):
     @staticmethod
     def getAllRoomKeys():
         return AttributeKey.query.filter_by(is_for_rooms=True).all()
+
+    @staticmethod
+    def supportsAttributeManagement():
+        return True
+
+    @staticmethod
+    def getLocationAttributes(location_name):
+        AttributeKey.location_attributes

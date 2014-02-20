@@ -58,8 +58,9 @@ class ReservationAttribute(utils.JSONStringBridgeMixin, db.Model):
         )
 
     def __repr__(self):
-        return '<ReservationAttribute({0}, {1}, {2})>'.format(
+        return '<ReservationAttribute({0}, {1}, {2, {3})>'.format(
             self.reservation_id,
             self.key_id,
+            self.caption,
             self.value
         )
