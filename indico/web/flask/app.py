@@ -142,7 +142,7 @@ def configure_db(app):
             minfo.setRoomBookingModuleActive()
 
     db.init_app(app)
-    # apply_db_loggers(app.debug)
+    apply_db_loggers(app.debug)
     if cfg.getCreateTables():
         with app.app_context():
             drop_database(db)  # favorable to `drop_all` under foreign keys
