@@ -84,7 +84,7 @@ rooms_admin.add_url_rule('/location/<locationId>/equipment/save',
 
 
 # Rooms
-rooms_admin.add_url_rule('/room/<roomLocation>/<roomID>/delete',
+rooms_admin.add_url_rule('/room/<roomLocation>/<int:roomID>/delete',
                          'roomBooking-deleteRoom',
                          room_handlers.RHRoomBookingDeleteRoom,
                          methods=('POST',))
@@ -98,12 +98,11 @@ rooms_admin.add_url_rule('/room/<roomLocation>/create/save',
                          room_handlers.RHRoomBookingSaveRoom,
                          methods=('POST',))
 
-rooms_admin.add_url_rule('/room/<roomLocation>/<roomID>/modify',
+rooms_admin.add_url_rule('/room/<roomLocation>/<int:roomID>/modify',
                          'roomBooking-roomForm',
-                         room_handlers.RHRoomBookingRoomForm,
-                         methods=('GET', 'POST'))
+                         room_handlers.RHRoomBookingRoomForm)
 
-rooms_admin.add_url_rule('/room/<roomLocation>/<roomID>/modify/save',
+rooms_admin.add_url_rule('/room/<roomLocation>/<int:roomID>/modify/save',
                          'roomBooking-saveRoom',
                          room_handlers.RHRoomBookingSaveRoom,
                          methods=('POST',))

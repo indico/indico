@@ -79,7 +79,7 @@ rooms.add_url_rule('/book/search',
                    'roomBooking-bookingListForBooking',
                    reservation_handlers.RHRoomBookingBookingList,
                    methods=('GET', 'POST'),
-                   defaults={'newBooking': 'on'})
+                   defaults={'is_new_booking': 'y'})
 
 rooms.add_url_rule('/book/confirm',
                    'roomBooking-bookingForm',
@@ -97,12 +97,12 @@ rooms.add_url_rule('/show-message',
                    'roomBooking-statement',
                    reservation_handlers.RHRoomBookingStatement)
 
-rooms.add_url_rule('/booking/<roomLocation>/<resvID>/modify',
+rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/modify',
                    'roomBooking-modifyBookingForm',
                    reservation_handlers.RHRoomBookingBookingForm,
                    methods=('GET', 'POST'))
 
-rooms.add_url_rule('/booking/<roomLocation>/<resvID>/cancel',
+rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/cancel',
                    'roomBooking-cancelBooking',
                    reservation_handlers.RHRoomBookingCancelBooking,
                    methods=('POST',))
@@ -143,17 +143,17 @@ rooms.add_url_rule('/bookings/reject-all-conflicting',
 
 
 # Booking info
-rooms.add_url_rule('/booking/<roomLocation>/<resvID>/',
+rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/',
                    'roomBooking-bookingDetails',
                    reservation_handlers.RHRoomBookingBookingDetails)
 
 
 # Room info
-rooms.add_url_rule('/room/<roomLocation>/<roomID>/',
+rooms.add_url_rule('/room/<roomLocation>/<int:roomID>/',
                    'roomBooking-roomDetails',
                    room_handlers.RHRoomBookingRoomDetails)
 
-rooms.add_url_rule('/room/<roomLocation>/<roomID>/stats',
+rooms.add_url_rule('/room/<roomLocation>/<int:roomID>/stats',
                    'roomBooking-roomStats',
                    room_handlers.RHRoomBookingRoomStats,
                    methods=('GET', 'POST'))
