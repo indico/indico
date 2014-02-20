@@ -92,3 +92,25 @@ class Aspect(db.Model):
     @staticmethod
     def getAspectsByName(name):
         return Aspect.query.filter(Aspect.name == name).all()
+
+    def toDictionary(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'center_latitude': self.center_latitude,
+            'center_longitude': self.center_longitude,
+            'zoom_level': self.zoom_level,
+            'top_left_latitude': self.top_left_latitude,
+            'top_left_longitude': self.top_left_longitude,
+            'bottom_right_latitude': self.bottom_right_latitude,
+            'bottom_right_longitude': self.bottom_right_longitude,
+            'default_on_startup': self.is_default_on_startup()
+        }
+
+    def is_default_on_startup(self):
+        return self.id == self.location.default_aspect_id
+
+    def updateFromDictionary(self, aspectDict):
+        for k, v in aspectDict.iteritems():
+            setattr(self, k, v)
+        return self
