@@ -19,9 +19,12 @@
 
 __all__ = ['DBMgr', 'MigratedDB']
 
+import logging
+import time
+
 from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy.engine import reflection
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.engine import reflection, Engine
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.schema import (
     MetaData,
@@ -30,25 +33,46 @@ from sqlalchemy.schema import (
     ForeignKeyConstraint,
     DropConstraint,
 )
-
 from sqlalchemy.sql.expression import FunctionElement
 from sqlalchemy.types import Numeric
 from zope.sqlalchemy import ZopeTransactionExtension
 
+from indico.core.logger import Logger
 
 from ..errors import IndicoError
 from .manager import DBMgr
 from .migration import MigratedDB
 
 
+logger = Logger.get('db')
+logger.setLevel(logging.DEBUG)
+
+
 db = SQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
+
+
+def apply_db_loggers(debug=False):
+    if debug:
+        @listens_for(Engine, 'before_cursor_execute')
+        def before_cursor_execute(conn, cursor, statement,
+                                  parameters, context, executemany):
+            context._query_start_time = time.time()
+            logger.debug('Start Query: {}'.format(statement))
+
+
+        @listens_for(Engine, 'after_cursor_execute')
+        def after_cursor_execute(conn, cursor, statement,
+                                 parameters, context, executemany):
+            total = time.time() - context._query_start_time
+            logger.debug('Query Complete!')
+            logger.debug('Total Time: {}'.format(total))
 
 
 class IndicoDBError(IndicoError):
     pass
 
 
-class Committer():
+class Committer(object):
 
     def __enter__(self):
         pass
@@ -91,7 +115,7 @@ def default_greatest(element, compiler, **kw):
 @compiles(greatest, 'postgresql')
 def case_greatest(element, compiler, **kw):
     arg1, arg2 = list(element.clauses)
-    return "CASE WHEN %s > %s THEN %s ELSE %s END" % (
+    return 'CASE WHEN %s > %s THEN %s ELSE %s END' % (
         compiler.process(arg1),
         compiler.process(arg2),
         compiler.process(arg1),
@@ -112,7 +136,7 @@ def default_least(element, compiler, **kw):
 @compiles(least, 'postgresql')
 def case_least(element, compiler, **kw):
     arg1, arg2 = list(element.clauses)
-    return "CASE WHEN %s > %s THEN %s ELSE %s END" % (
+    return 'CASE WHEN %s > %s THEN %s ELSE %s END' % (
         compiler.process(arg1),
         compiler.process(arg2),
         compiler.process(arg2),
