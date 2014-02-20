@@ -22,10 +22,10 @@ Custom attributes for locations
 """
 
 from indico.core.db import db
-from indico.modules.rb.models import utils
+from .utils import JSONStringBridgeMixin
 
 
-class LocationAttribute(utils.JSONStringBridgeMixin, db.Model):
+class LocationAttribute(JSONStringBridgeMixin, db.Model):
     __tablename__ = 'location_room_attributes'
 
     # columns
