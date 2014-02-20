@@ -17,55 +17,148 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.rb_reservation import ReservationBase, Collision, RepeatabilityEnum
-from MaKaC.rb_factory import Factory
-from MaKaC.plugins.RoomBooking.default.room import Room
-from MaKaC.rb_tools import iterdays
 from calendar import day_name
-from MaKaC.rb_location import Location, CrossLocationFactory
-from indico.util.fossilize import Fossilizable, fossilizes
-from MaKaC.fossils.roomBooking import IRoomBarFossil, IBarFossil
+from datetime import time
+
+from MaKaC.webinterface import urlHandlers as UH
+
+from ..models.utils import Serializer
 
 
-class Bar( Fossilizable ):
-    """
-    Keeps data necessary for graphical bar on calendar.
-    """
-    fossilizes(IBarFossil)
-    BLOCKED, PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT = xrange(0, 7)
-    # I know this names are not wisely choosed; it's due to unexpected additions
-    # without refactoring
+class Bar(Serializer):
+    __public__ = [
+        'forReservation', 'startDT', 'endDT', ('kind', 'type'), 'blocking'
+    ]
+
+    BLOCKED, PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT = range(7)
     # BLOCKED:        room is blocked (dark-gray)
     # CANDIDATE:      represents new reservation (green)
     # CONFLICT:       overlap between candidate and confirmed resv. (dark red)
     # PREBOOKED:      represents pre-reservation (yellow)
-    # PRECONFLICT:    represents conflict with pre-reservation (orange)
-    # PRECONCURRENT:  conflicting pre-reservations
-    # UNAVAILABLE :   represents confirmed reservation (bright-red)
+    # PRECONFLICT:    represents conflict with pre-reservation (dark blue)
+    # PRECONCURRENT:  conflicting pre-reservations (light blue)
+    # UNAVAILABLE :   represents confirmed reservation (orange)
 
-    def __init__(self, c, barType):
-        self.startDT = c.startDT
-        self.endDT = c.endDT
-        self.forReservation = c.withReservation
-        self.type = barType
+    def __init__(self, date, start_time, end_time, kind,
+                 reservation_id, reservation_reason,
+                 reservation_booked_for_name, reservation_location_name,
+                 blocking):
+        self.date = date
+        self.start_time = start_time
+        self.end_time = end_time
 
-    def __cmp__(self, obj):
-        return cmp(self.type, obj.type)
+        self.reservation_id = reservation_id
+        self.booked_for_name = reservation_booked_for_name
+        self.reservation_reason = reservation_reason
+        self.reservation_location = reservation_location_name
+
+        self.kind = kind
+        self.blocking = blocking
+
+    def __cmp__(self, other):
+        return cmp(self.kind, other.kind)
+
+    @staticmethod
+    def get_kind(rid, is_confirmed):
+        if rid:
+            return Bar.UNAVAILABLE if is_confirmed else Bar.PREBOOKED
+        else:
+            return Bar.CANDIDATE
+
+    @staticmethod
+    def get_mutual_kind(rid1, is_confirmed1, rid2, is_confirmed2):
+        if is_confirmed1:
+            return Bar.CONFLICT
+        else:
+            if not rid2:
+                return Bar.PRECONFLICT
+            elif is_confirmed2:
+                return Bar.CONFLICT
+            else:
+                return Bar.PRECONCURRENT
+
+    def get_time(self, attr):
+        return {
+            'date': self.date,
+            'tz': None,
+            'time': time.strftime(getattr(self, attr), '%H:%M')
+        }
+
+    @property
+    def forReservation(self):
+        return {
+            'id': self.reservation_id,
+            'bookedForName': self.booked_for_name,
+            'reason': self.reservation_reason,
+            'bookingUrl': UH.UHRoomBookingBookingDetails.getURL(
+                roomLocation=self.reservation_location,
+                resvID=self.reservation_id
+            ) if self.reservation_id else None
+        }
+
+    @property
+    def startDT(self):
+        return self.get_time('start_time')
+
+    @property
+    def endDT(self):
+        return self.get_time('end_time')
 
 
-class RoomBars(Fossilizable):
+class BlockingDetailsForBars(Serializer):
+    __public__ = ['id', 'message', 'creator']
 
-    fossilizes(IRoomBarFossil)
+    def __init__(self, bid, message, creator_id):
+        self.id = bid
+        self.message = message
+        self.creator_id = creator_id
 
-    room = None
-    bars = []
+    @property
+    def creator(self):
+        return self.creator_id
 
-    def __init__(self, room, bars):
+
+class RoomDetailsForBars(Serializer):
+    __public__ = [
+        'building', 'name', 'floor',
+        ('number', 'roomNr'), ('location_name', 'locationName'),
+        'id', ('kind', 'type'), ('booking_url', 'bookingUrl')
+    ]
+
+    def __init__(self, room, location_name):
         self.room = room
-        self.bars = bars
+        self.location_name = location_name
 
-    def __cmp__(self, obj):
-        return cmp(self.room, obj.room)
+    def __getattr__(self, attr):
+        return getattr(self.room, attr)
+
+
+class DayBar(Serializer):
+    __public__ = [('room_details', 'room'), 'bars']
+
+    def __init__(self, room_details, bars=None):
+        self.room_details = room_details
+        self.bars = bars or []
+
+    def addBar(self, bar):
+        self.bars.append(bar)
+
+    def __cmp__(self, other):
+        return cmp(self.room_details, other.room_details)
+
+
+def updateOldDateStyle(d):
+    for t in ['e', 's']:
+        dt = d['start_date' if t == 's' else 'end_date']
+        for p in ['Day', 'Month', 'Year']:
+            d[t + p] = getattr(dt, p.lower())
+
+
+def getNewDictOnlyWith(d, keys=[], **kw):
+    for k in keys:
+        if k in d:
+            kw[k] = d[k]
+    return kw
 
 
 def barsList2Dictionary(bars):
@@ -75,7 +168,7 @@ def barsList2Dictionary(bars):
     """
     h = {}
     for bar in bars:
-        d = bar.startDT.date()
+        d = bar.start_date.date()
         if h.has_key(d):
             h[d].append(bar)
         else:
