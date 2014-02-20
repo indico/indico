@@ -19,28 +19,32 @@
 
 from datetime import datetime, timedelta
 
+from dateutil.relativedelta import relativedelta
 from flask import session
 
-from MaKaC.common.Configuration import Config
-from MaKaC.webinterface import urlHandlers
+from MaKaC.roomMapping import RoomMapperHolder
+from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 
-from indico.modules.rb.views.utils import makePercentageString
-from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.views import WPRoomBookingBase
+from ...models.locations import Location
+from ...models.reservations import RepeatMapping
+from ...models.rooms import Room
+from ...views import WPRoomBookingBase
+from ...views.utils import makePercentageString
+
+from indico.util.i18n import _
 
 
 class WPRoomBookingMapOfRooms(WPRoomBookingBase):
 
     def __init__(self, rh, **params):
+        WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
         self._params = params
-        super(WPRoomBookingMapOfRooms, self).__init__(self, rh)
 
     def _getTitle(self):
-        return super(WPRoomBookingMapOfRooms, self)._getTitle() + " - " + _("Map of rooms")
+        return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Map of rooms'))
 
     def _setCurrentMenuItem(self):
         self._roomMapOpt.setActive(True)
@@ -52,23 +56,19 @@ class WPRoomBookingMapOfRooms(WPRoomBookingBase):
 class WRoomBookingMapOfRooms(WTemplated):
 
     def __init__(self, **params):
-        if params:
-            self._params = params
-        else:
-            self._params = {}
-        super(WRoomBookingMapOfRooms, self).__init__()
+        WTemplated.__init__(self)
+        self._params = params if params else {}
 
     def getVars(self):
-        wvars = super(WRoomBookingMapOfRooms, self).getVars()
-        wvars["mapOfRoomsWidgetURL"] = urlHandlers.UHRoomBookingMapOfRoomsWidget.getURL(None, **self._params)
-
+        wvars = WTemplated.getVars(self)
+        wvars['mapOfRoomsWidgetURL'] = UH.UHRoomBookingMapOfRoomsWidget.getURL(None, **self._params)
         return wvars
 
 
 class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
 
     def __init__(self, rh, aspects, buildings, defaultLocation, forVideoConference, roomID):
-        super(WPRoomBookingMapOfRoomsWidget, self).__init__(rh)
+        WPNotDecorated.__init__(self, rh)
         self._aspects = aspects
         self._buildings = buildings
         self._defaultLocation = defaultLocation
@@ -76,16 +76,13 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
         self._roomID = roomID
 
     def getCSSFiles(self):
-        return (super(WPRoomBookingMapOfRoomsWidget, self).getCSSFiles() +
-                ['css/mapofrooms.css'])
+        return WPNotDecorated.getCSSFiles(self) + ['css/mapofrooms.css']
 
     def getJSFiles(self):
-        return (super(WPRoomBookingMapOfRoomsWidget, self).getJSFiles() +
-                self._includeJSPackage('RoomBooking'))
+        return WPNotDecorated.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
     def _getTitle(self):
-        return (super(WPRoomBookingMapOfRoomsWidget, self)._getTitle() +
-                " - " + _("Map of rooms"))
+        return '{} - {}'.format(WPNotDecorated._getTitle(self), _('Map of rooms'))
 
     def _setCurrentMenuItem(self):
         self._roomMapOpt.setActive(True)
@@ -100,28 +97,30 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
 
 class WRoomBookingMapOfRoomsWidget(WTemplated):
 
-    def __init__(self, aspects, buildings, defaultLocation, forVideoConference, roomID):
+    def __init__(self, aspects, buildings, defaultLocationName, forVideoConference, roomID):
         self._aspects = aspects
         self._buildings = buildings
-        self._defaultLocation = defaultLocation
+        self._default_location_name = defaultLocationName
         self._forVideoConference = forVideoConference
         self._roomID = roomID
 
     def getVars(self):
-        wvars = super(WRoomBookingMapOfRoomsWidget, self).getVars()
+        wvars = WTemplated.getVars(self)
 
-        wvars["aspects"] = self._aspects
-        wvars["buildings"] = self._buildings
-        wvars["defaultLocation"] = self._defaultLocation
-        wvars["forVideoConference"] = self._forVideoConference
-        wvars["roomID"] = self._roomID
+        wvars['aspects'] = self._aspects
+        wvars['buildings'] = self._buildings
+        wvars['defaultLocation'] = self._default_location_name
+        wvars['forVideoConference'] = self._forVideoConference
+        wvars['roomID'] = self._roomID
 
-        wvars["roomBookingRoomListURL"] = urlHandlers.UHRoomBookingRoomList.getURL(None)
-        wvars["startDT"] = session.get("rbDefaultStartDT")
-        wvars["endDT"] = session.get("rbDefaultEndDT")
-        wvars["startT"] = session.get("rbDefaultStartDT").time().strftime("%H:%M")
-        wvars["endT"] = session.get("rbDefaultEndDT").time().strftime("%H:%M")
-        wvars["repeatability"] = session.get("rbDefaultRepeatability")
+        wvars['roomBookingRoomListURL'] = UH.UHRoomBookingRoomList.getURL(None)
+        wvars['startDT'] = session.get('_rb_default_start')
+        wvars['endDT'] = session.get('_rb_default_end')
+        wvars['startT'] = session.get('_rb_default_start').time().strftime('%H:%M')
+        wvars['endT'] = session.get('_rb_default_end').time().strftime('%H:%M')
+
+        wvars['repeat_mapping'] = RepeatMapping.getMapping()
+        wvars['default_repeat'] = session.get('_rb_default_repeatability')
 
         return wvars
 
@@ -173,12 +172,12 @@ class WRoomBookingRoomList(WTemplated):
             wvars["noResultsMsg"] = _("There are no rooms with this search criteria")
 
         if self._standalone:
-            wvars["detailsUH"] = urlHandlers.UHRoomBookingRoomDetails
-            wvars["bookingFormUH"] = urlHandlers.UHRoomBookingBookingForm
+            wvars["detailsUH"] = UH.UHRoomBookingRoomDetails
+            wvars["bookingFormUH"] = UH.UHRoomBookingBookingForm
         else:
             wvars["conference"] = self._rh._conf
-            wvars["detailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
-            wvars["bookingFormUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
+            wvars["detailsUH"] = UH.UHConfModifRoomBookingRoomDetails
+            wvars["bookingFormUH"] = UH.UHConfModifRoomBookingBookingForm
 
         return wvars
 
@@ -236,14 +235,14 @@ class WRoomBookingSearch4Rooms(WTemplated):
 
         if self._standalone:
             # URLs for standalone room booking
-            wvars["roomBookingRoomListURL"] = urlHandlers.UHRoomBookingRoomList.getURL(None)
-            wvars["detailsUH"] = urlHandlers.UHRoomBookingRoomDetails
-            wvars["bookingFormUH"] = urlHandlers.UHRoomBookingBookingForm
+            wvars["roomBookingRoomListURL"] = UH.UHRoomBookingRoomList.getURL(None)
+            wvars["detailsUH"] = UH.UHRoomBookingRoomDetails
+            wvars["bookingFormUH"] = UH.UHRoomBookingBookingForm
         else:
             # URLs for room booking in the event context
-            wvars["roomBookingRoomListURL"] = urlHandlers.UHConfModifRoomBookingRoomList.getURL(self._rh._conf)
-            wvars["detailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
-            wvars["bookingFormUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
+            wvars["roomBookingRoomListURL"] = UH.UHConfModifRoomBookingRoomList.getURL(self._rh._conf)
+            wvars["detailsUH"] = UH.UHConfModifRoomBookingRoomDetails
+            wvars["bookingFormUH"] = UH.UHConfModifRoomBookingBookingForm
 
         return wvars
 
@@ -252,18 +251,16 @@ class WPRoomBookingRoomDetails(WPRoomBookingBase):
 
     def __init__(self, rh):
         self._rh = rh
-        super(WPRoomBookingRoomDetails, self).__init__(rh)
+        WPRoomBookingBase.__init__(self, self._rh)
 
     def _getTitle(self):
-        return (super(WPRoomBookingRoomDetails, self)._getTitle() +
-                " - " + _("Room Details"))
+        return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Room Details'))
 
     def _setCurrentMenuItem(self):
         self._roomSearchOpt.setActive(True)
 
     def getJSFiles(self):
-        return (super(WPRoomBookingRoomDetails, self).getJSFiles() +
-                self._includeJSPackage('RoomBooking'))
+        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
     def _getBody(self, params):
         return WRoomBookingRoomDetails(self._rh, standalone=True).getHTML(params)
@@ -271,51 +268,57 @@ class WPRoomBookingRoomDetails(WPRoomBookingBase):
 
 class WRoomBookingRoomDetails(WTemplated):
 
+    DEFAULT_CALENDAR_RANGE = relativedelta(month=3)
+
     def __init__(self, rh, standalone=False):
         self._rh = rh
         self._standalone = standalone
 
     def getVars(self):
-        wvars = super(WRoomBookingRoomDetails, self).getVars()
-        wvars["room"] = self._rh._room
-        goodFactory = Location.parse(self._rh._room.locationName).factory
-        attributes = goodFactory.getCustomAttributesManager().getAttributes(location=self._rh._room.locationName)
-        wvars["attrs"] = {}
-        for attribute in attributes:
-            if not attribute.get("hidden", False) or self._rh._getUser().isAdmin():
-                wvars["attrs"][attribute['name']] = self._rh._room.customAtts.get(attribute['name'],"")
-                if attribute['name'] == 'notification email':
-                    wvars["attrs"][attribute['name']] = wvars["attrs"][attribute['name']].replace(',', ', ')
+        wvars = WTemplated.getVars(self)
+        room = self._rh._room
 
-        wvars["config"] = Config.getInstance()
-        wvars["standalone"] = self._standalone
-        wvars["actionSucceeded"] = self._rh._afterActionSucceeded
-        wvars["deletionFailed"] = self._rh._afterDeletionFailed
+        wvars['standalone'] = self._standalone
+        wvars['room'] = room
 
-        wvars["roomStatsUH"] = urlHandlers.UHRoomBookingRoomStats
+        # goodFactory = Location.parse(self._rh._room.locationName).factory
+        # attributes = goodFactory.getCustomAttributesManager().getAttributes(location=self._rh._room.locationName)
+        # wvars["attrs"] = {}
+        # for attribute in attributes:
+        #     if not attribute.get("hidden", False) or self._rh._getUser().isAdmin():
+        #         wvars["attrs"][attribute['name']] = self._rh._room.customAtts.get(attribute['name'],"")
+        #         if attribute['name'] == 'notification email':
+        #             wvars["attrs"][attribute['name']] = wvars["attrs"][attribute['name']].replace(',', ', ')
 
+        wvars['attrs'] = []
+
+        wvars['actionSucceeded'] = self._rh._afterActionSucceeded
+        wvars['deletionFailed'] = self._rh._afterDeletionFailed
+
+        wvars['owner_name'] = room.getResponsibleName()
+
+        wvars['bookable_times'] = room.getBookableTimes()
+        wvars['nonbookable_dates'] = room.getNonBookableDates()
+
+        # URLs
+        wvars['stats_url'] = UH.UHRoomBookingRoomStats.getURL(room)
         if self._standalone:
-            wvars["bookingFormUH"] = urlHandlers.UHRoomBookingBookingForm
-            wvars["modifyRoomUH"] = urlHandlers.UHRoomBookingRoomForm
-            wvars["deleteRoomUH"] = urlHandlers.UHRoomBookingDeleteRoom
-            wvars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
+            wvars['booking_details_url'] = UH.UHRoomBookingBookingDetails.getURL()
+            wvars['booking_form_url'] = UH.UHRoomBookingBookingForm.getURL()
+            wvars['delete_room_url'] = UH.UHRoomBookingDeleteRoom.getURL(room)
+            wvars['modify_room_url'] = UH.UHRoomBookingRoomForm.getURL(room)
         else:
-            wvars["bookingDetailsUH"] = urlHandlers.UHConfModifRoomBookingDetails
-            wvars["conference"] = self._rh._conf
-            wvars["bookingFormUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
-            wvars["modifyRoomUH"] = urlHandlers.UHRoomBookingRoomForm
-            wvars["deleteRoomUH"] = urlHandlers.UHRoomBookingDeleteRoom
+            wvars['booking_form_url'] = UH.UHConfModifRoomBookingBookingForm.getURL()
+            wvars['booking_details_url'] = UH.UHConfModifRoomBookingDetails.getURL()
+            wvars['conference'] = self._rh._conf
+            wvars['delete_room_url'] = UH.UHRoomBookingDeleteRoom.getURL(room)
+            wvars['modify_room_url'] = UH.UHRoomBookingRoomForm.getURL(room)
 
-        # Calendar range: 3 months
-        if self._rh._searchingStartDT and self._rh._searchingEndDT:
-            sd = self._rh._searchingStartDT
-            calendarStartDT = datetime(sd.year, sd.month, sd.day, 0, 0, 1)
-            ed = self._rh._searchingEndDT
-            calendarEndDT = datetime(ed.year, ed.month, ed.day, 23, 59)
-        else:
-            now = datetime.now()
-            calendarStartDT = datetime(now.year, now.month, now.day, 0, 0, 1)
-            calendarEndDT = calendarStartDT + timedelta(3 * 31, 50, 0, 0, 59, 23)
+        s, e = self._rh._searching_start, self._rh._searching_end
+        if s and e:
+            s = datetime.utcnow()
+            e = s + self.__class__.DEFAULT_CALENDAR_RANGE
+        wvars['calendar_start'], wvars['calendar_end'] = s, e
 
         # TODO
         # # Example resv. to ask for other reservations
@@ -346,8 +349,6 @@ class WRoomBookingRoomDetails(WTemplated):
         #         for bar in bars[dt]:
         #             bar.forReservation.setOwner(self._rh._conf)
 
-        wvars["calendarStartDT"] = calendarStartDT
-        wvars["calendarEndDT"] = calendarEndDT
         # bars = introduceRooms([self._rh._room], bars, calendarStartDT,
         #                       calendarEndDT, user=self._rh._aw.getUser())
         # fossilizedBars = {}
@@ -361,14 +362,16 @@ class WRoomBookingRoomDetails(WTemplated):
         # wvars["iterdays"] = iterdays
         # wvars["day_name"] = day_name
         # wvars["Bar"] = Bar
-        wvars["withConflicts"] = False
-        wvars["currentUser"] = self._rh._aw.getUser()
+        wvars['withConflicts'] = False
+        wvars['currentUser'] = self._rh._aw.getUser()
+        wvars['barsFossil'] = None
+        wvars['dayAttrs'] = None
 
-        room_mapper = RoomMapperHolder().match({"placeName": self._rh._room.locationName}, exact=True)
+        room_mapper = RoomMapperHolder().match({'placeName': self._rh._location.name}, exact=True)
         if room_mapper:
-            wvars["show_on_map"] = room_mapper[0].getMapURL(self._rh._room.name)
+            wvars['show_on_map'] = room_mapper[0].getMapURL(self._rh._room.name)
         else:
-            wvars["show_on_map"] = urlHandlers.UHRoomBookingMapOfRooms.getURL(roomID=self._rh._room.id)
+            wvars['show_on_map'] = UH.UHRoomBookingMapOfRooms.getURL(roomID=self._rh._room.id)
 
         return wvars
 
@@ -394,7 +397,7 @@ class WRoomBookingRoomStats(WTemplated):
 
     def getVars(self):
         wvars = super(WRoomBookingRoomStats, self).getVars()
-        wvars["room"] = self._rh._room
+        wvars['room'] = self._rh._room
         wvars["standalone"] = self._standalone
         wvars["period"] = self._rh._period
         wvars["kpiAverageOccupation"] = makePercentageString(self._rh._kpiAverageOccupation)
@@ -402,5 +405,5 @@ class WRoomBookingRoomStats(WTemplated):
         wvars["kbiTotalBookings"] = self._rh._totalBookings
         # Next 9 KPIs
         wvars["stats"] = self._rh._booking_stats
-        wvars["statsURL"] = urlHandlers.UHRoomBookingRoomStats.getURL(self._rh._room)
+        wvars["statsURL"] = UH.UHRoomBookingRoomStats.getURL(self._rh._room)
         return wvars
