@@ -22,7 +22,8 @@ Equipments for rooms
 """
 
 from indico.core.db import db
-from indico.modules.rb.models import utils
+
+from . import utils
 
 
 RoomEquipmentAssociation = db.Table(
@@ -58,17 +59,34 @@ class RoomEquipment(db.Model):
         db.Integer,
         primary_key=True
     )
+    parent_id = db.Column(
+        db.Integer,
+        db.ForeignKey('room_equipments.id')
+    )
     name = db.Column(
         db.String,
         nullable=False,
         unique=True,
         index=True
     )
+    location_id = db.Column(
+        db.Integer,
+        db.ForeignKey('locations.id'),
+        nullable=False
+    )
+
+    children = db.relationship(
+        'RoomEquipment',
+        backref=db.backref(
+            'parent',
+            remote_side=[id]
+        )
+    )
 
     # core
 
     def __repr__(self):
-        return '<RoomEquipment({0}, {1})>'.format(self.id, self.name)
+        return '<RoomEquipment({0}, {1}, {2})>'.format(self.id, self.name, self.location_id)
 
     # getters
 
@@ -78,10 +96,17 @@ class RoomEquipment(db.Model):
 
     @staticmethod
     @utils.filtered
-    def getEquipments(**filters):
+    def filterEquipments(**filters):
         return RoomEquipment, RoomEquipment.query
+
+    @staticmethod
+    def getEquipments():
+        return RoomEquipment.query.all()
+
+    @staticmethod
+    def getEquipmentNames():
+        return RoomEquipment.query.with_entities(RoomEquipment.name).all()
 
     @staticmethod
     def getEquipmentByName(name):
         return RoomEquipment.query.filter_by(name=name).first()
-        # return RoomEquipment.getEquipments(name=name)
