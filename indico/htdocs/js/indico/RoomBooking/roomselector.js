@@ -85,18 +85,18 @@
             self.select = $("<select name='" + name + "' multiple='multiple'/>").appendTo(self.element);
 
             jQuery.map(rooms, function(room, i) {
-                var roomLoc = room.building + "-" + room.floor + "-" + room.roomNr;
-                var roomName = (roomLoc == room.name)? roomLoc : roomLoc + " - " + room.name;
+                var roomLoc = room.building + "-" + room.floor + "-" + room.number;
+                var roomName = roomLoc + (roomLoc == room.name ?  '' : ' - ' + room.name);
                 option = $("<option/>")
                     .attr("label",
-                        room.needsAVCSetup + ":" +
-                        room.hasWebcastRecording + ":" +
-                        room.hasProjector + ':' +
-                        room.isPublic + ":" +
-                        (room.capacity || Number(0)))
-                    .attr("value", room.guid)
+                        room.needs_video_conference_setup + ":" +
+                        room.has_webcast_recording + ":" +
+                        room.is_public + ":" +
+                        (room.capacity || '?')
+                    )
+                    .attr("value", room.id)
                     .append($("<span/>").text(roomName))
-                    .append($("<span/>").text(" (" + room.locationName + ")"))
+                    .append($("<span/>").text(" (" + room.location_name + ")"))
                     .appendTo(self.select);
             });
         },
@@ -298,13 +298,13 @@
                     .next().addClass("roomlocation");
 
                 var pic = $("<a class='roompicture'/>")
-                    .append($("<img src='" + rooms[index].thumbnailPhotoURL + "'/>"))
+                    .append($("<img src='" + rooms[index].small_photo_url + "'/>"))
                     .prependTo(item);
                 if (rooms[index].hasPhoto) {
                     pic.find("img")
                         .attr("title", $T("Expand picture"))
                         .addClass("active");
-                    pic.attr("href", rooms[index].tipPhotoURL);
+                    pic.attr("href", rooms[index].large_photo_url);
                     pic.attr("nofollow", "lightbox");
                 }
 
