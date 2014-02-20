@@ -103,6 +103,7 @@ indico_management = Bundle(
 indico_room_booking = Bundle(
     *namespace('js/indico/RoomBooking',
 
+               'util.js',
                'MapOfRooms.js',
                'BookingForm.js',
                'RoomBookingCalendar.js',
