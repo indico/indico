@@ -18,14 +18,17 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
+from pprint import pprint
+
+import transaction
 
 from indico.core.db import db
-# from indico.modules.rb.models.room_attribute_keys import RoomAttributeKey
 from indico.modules.rb.models.room_attributes import RoomAttribute
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.modules.rb.models.rooms import Room
-from indico.tests.python.unit.indico_tests.core_tests.db_tests.data import *
-from indico.tests.python.unit.indico_tests.core_tests.db_tests.db import DBTest
+from ..data import *
+from ..db import DBTest
+from ..util import diff
 
 
 class TestRoom(DBTest):
@@ -35,7 +38,7 @@ class TestRoom(DBTest):
             room = Room.getRoomByName(r['name'])
             yield r, room
             db.session.add(room)
-        db.session.commit()
+        transaction.commit()
 
     def testGetLocator(self):
         for r, room in self.iterRooms():
@@ -45,7 +48,7 @@ class TestRoom(DBTest):
 
     def testGetRooms(self):
         for r, room in self.iterRooms():
-            pass
+            assert diff(r, room)
 
     def testDoesHaveLiveReservations(self):
         for r, room in self.iterRooms():
@@ -55,15 +58,35 @@ class TestRoom(DBTest):
             assert c == room.doesHaveLiveReservations()
 
     def testGetAttributeByName(self):
-        rak = RoomAttributeKey(name='rak')
-        room = Room.getRoomById(1)
-        ra = RoomAttribute(value='test_value')
-        rak.attributes.append(ra)
-        room.attributes.append(ra)
-        db.session.add(room)
-        db.session.commit()
+        for r, room in self.iterRooms():
+            for attr in r.get('attributes', []):
+                print room.getAttributeByName(attr['name'])
+                # assert attr['name'] == room.getAttributeByName(attr['name']).name
 
-        assert Room.getRoomById(1).getAttributeByName('rak') == 'test_value'
+    def testGetCollisions(self):
+        for r, room in self.iterRooms():
+            assert r.get('excluded_days') == room.getCollisions()
+
+    def testGetReservationStats(self):
+        for r, room in self.iterRooms():
+            print room.getReservationStats()
+
+    def testGetBookableTimes(self):
+        for r, room in self.iterRooms():
+            assert r.get('bookable_times', []) == map(lambda b: b.toDict(), room.getBookableTimes())
+
+    def testGetTotalBookableTime(self):
+        for r, room in self.iterRooms():
+            pprint(room.getTotalBookableTime())
+            print
+
+    def testGetTotalBookedTime(self):
+        for r, room in self.iterRooms():
+            pprint(room.getTotalBookedTime())
+
+    def testGetAverageOccupation(self):
+        for r, room in self.iterRooms():
+            pprint(room.getAverageOccupation(datetime(2012, 1, 1), datetime(2015, 1, 1)))
 
     def testGetVerboseEquipment(self):
         e1 = RoomEquipment(name='eq1')

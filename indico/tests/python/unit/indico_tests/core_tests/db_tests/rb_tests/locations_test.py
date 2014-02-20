@@ -20,6 +20,7 @@
 from pprint import pprint
 
 from dictdiffer import diff
+from sqlalchemy import exists
 
 from indico.core.db import db
 from indico.modules.rb.models.aspects import Aspect
@@ -213,7 +214,8 @@ class TestLocation(DBTest):
             assert total == (loc.getTotalReservableSurfaceArea() or 0)
 
     def testGetReservationStats(self):
-        pass
+        for l, loc in self.iterLocations():
+            print loc.getReservationStats()
 
     def testGetBuildings(self):
         for l, loc in self.iterLocations():

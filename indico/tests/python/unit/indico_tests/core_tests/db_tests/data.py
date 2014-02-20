@@ -96,10 +96,14 @@ RESERVATION_NOTIFICATIONS = [
 
 
 RESERVATION_EXCLUDED_DAYS = [
-    date(2013, 5, 1),
-    date(2013, 8, 30),
-    date(2013, 9, 29),
-    date(2013, 11, 10),
+    date(2013, 12, 8),
+    date(2014, 4, 6),
+    date(2013, 12, 19),
+    date(2014, 1, 1),
+    date(2014, 1, 2),
+    date(2014, 1, 3),
+    date(2014, 1, 4),
+    date(2014, 1, 5),
 ]
 
 
@@ -116,7 +120,6 @@ RESERVATIONS = [
         'reason': 'This is what I want',
         'attributes': RESERVATION_ATTRIBUTES,
         'edit_logs': RESERVATION_EDIT_LOGS,
-        'excluded_days': RESERVATION_EXCLUDED_DAYS
     },
     {
         'created_at': datetime(2013, 11, 2, 11, 30),
@@ -131,20 +134,21 @@ RESERVATIONS = [
         'reason': 'weekly group meetings',
         'contact_email': 'admin@cern.ch',
         'attributes': RESERVATION_ATTRIBUTES[1:3],
-        'excluded_days': RESERVATION_EXCLUDED_DAYS
+        'excluded_days': RESERVATION_EXCLUDED_DAYS[:1]
     },
     {
         'created_at': datetime(2013, 11, 30, 17),
         'start_date': datetime(2013, 12, 1, 15),
         'end_date': datetime(2014, 12, 1, 15),
         'repeat_unit': RepeatUnit.MONTH,
+        'repeat_step': 1,
         'booked_for_id': 'admin',
         'booked_for_name': 'admin root',
         'created_by': 'admin',
         'is_confirmed': True,
         'reason': 'confidential',
         'attributes': RESERVATION_ATTRIBUTES[1:3],
-        'excluded_days': RESERVATION_EXCLUDED_DAYS
+        'excluded_days': RESERVATION_EXCLUDED_DAYS[1:2]
     },
     {
         'created_at': datetime(2013, 12, 1, 11, 30),
@@ -158,7 +162,6 @@ RESERVATIONS = [
         'is_cancelled': True,
         'reason': 'can not be null',
         'attributes': RESERVATION_ATTRIBUTES[3:],
-        'excluded_days': RESERVATION_EXCLUDED_DAYS
     },
     {
         'created_at': datetime(2013, 12, 20),
@@ -172,7 +175,6 @@ RESERVATIONS = [
         'is_rejected': True,
         'reason': 'extra',
         'attributes': RESERVATION_ATTRIBUTES[3:],
-        'excluded_days': RESERVATION_EXCLUDED_DAYS
     },
     {
         'created_at': datetime(2012, 1, 1, 12),
@@ -185,7 +187,6 @@ RESERVATIONS = [
         'is_confirmed': True,
         'reason': 'no reason, he just wanted me to book',
         'attributes': RESERVATION_ATTRIBUTES,
-        'excluded_days': RESERVATION_EXCLUDED_DAYS
     },
     {
         'created_at': datetime(2008, 3, 3, 3, 3, 3),
@@ -198,12 +199,11 @@ RESERVATIONS = [
         'is_confirmed': True,
         'reason': 'big day for me',
         'attributes': RESERVATION_ATTRIBUTES,
-        'excluded_days': RESERVATION_EXCLUDED_DAYS
     },
     {
         'created_at': datetime(2013, 11, 11, 11, 1, 1),
         'start_date': datetime(2013, 12, 5, 10),
-        'end_date': datetime(2013, 12, 5, 12),
+        'end_date': datetime(2013, 1, 2, 12),
         'repeat_unit': RepeatUnit.WEEK,
         'repeat_step': 2,
         'booked_for_id': 'felmas',
@@ -213,20 +213,33 @@ RESERVATIONS = [
         'is_rejected': True,
         'reason': 'testing',
         'attributes': RESERVATION_ATTRIBUTES,
-        'excluded_days': RESERVATION_EXCLUDED_DAYS
+        'excluded_days': RESERVATION_EXCLUDED_DAYS[2:3]
     },
     {
         'created_at': datetime(2013, 12, 1, 23, 59),
         'start_date': datetime(2013, 9, 17, 8),
         'end_date': datetime(2014, 3, 15, 17),
         'repeat_unit': RepeatUnit.DAY,
+        'repeat_step': 1,
         'booked_for_id': 'felmas',
         'booked_for_name': 'ferhat elmas',
         'created_by': 'pferreir',
         'is_confirmed': True,
         'reason': 'special testing',
         'attributes': RESERVATION_ATTRIBUTES,
-        'excluded_days': RESERVATION_EXCLUDED_DAYS
+        'excluded_days': RESERVATION_EXCLUDED_DAYS[3:]
+    },
+    {
+        'created_at': datetime(2013, 12, 31, 23, 59),
+        'start_date': datetime(2014, 1, 1, 0),
+        'end_date': datetime(2014, 1, 1, 1),
+        'repeat_unit': RepeatUnit.NEVER,
+        'repeat_step': 1,
+        'booked_for_id': 'felmas',
+        'booked_for_name': 'ferhat elmas',
+        'created_by': 'pferreir',
+        'is_confirmed': True,
+        'reason': 'special testing',
     }
 ]
 
@@ -269,10 +282,11 @@ ROOM_BOOKABLE_TIMES = [
         'end_time': time(18, 30)
     },
     {
-        'start_time': time(0),
+        'start_time': time(19),
         'end_time': time(23, 59, 59)
     }
 ]
+
 
 ROOM_NONBOOKABLE_DATES = [
     {
@@ -307,7 +321,7 @@ ROOMS = [
         'owner_id': 'admin',
         'nonbookable_dates': ROOM_NONBOOKABLE_DATES,
         'bookable_times': ROOM_BOOKABLE_TIMES[:1],
-        'reservations': RESERVATIONS,
+        'reservations': RESERVATIONS[:9],
         'photos': PHOTOS,
         'equipments': ['PC']
     },
@@ -328,6 +342,7 @@ ROOMS = [
         'longitude': '11.09',
         'comments': u'☢ Please do not book unless really really necessary ☢',
         'max_advance_days': 45,
+        'bookable_times': ROOM_BOOKABLE_TIMES[:1],
         'nonbookable_dates': ROOM_NONBOOKABLE_DATES,
         'equipments': ['PC', 'Video conference'],
         'attributes': ROOM_ATTRIBUTES[:2]
@@ -345,6 +360,7 @@ ROOMS = [
         'reservations_need_confirmation': True,
         'capacity': 5,
         'max_advance_days': 7,
+        'bookable_times': ROOM_BOOKABLE_TIMES[1:],
         'nonbookable_dates': ROOM_NONBOOKABLE_DATES
     },
     {
@@ -355,7 +371,8 @@ ROOMS = [
         'floor': '0',
         'number': '1',
         'owner_id': 'fred',
-        'equipments': ['Whiteboard']
+        'equipments': ['Whiteboard'],
+        'bookable_times': ROOM_BOOKABLE_TIMES[:1]
     },
     {
         'name': 'F2',
@@ -363,6 +380,7 @@ ROOMS = [
         'floor': '0',
         'number': '2',
         'owner_id': 'frankenstein',
+        'reservations': RESERVATIONS[9:],
         'attributes': ROOM_ATTRIBUTES[2:]
     }
 ]

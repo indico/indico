@@ -18,17 +18,19 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from flask.ext.testing import TestCase
+import transaction
 
 from indico.core.db import db
 from indico.modules.rb.models import *
-from indico.tests.python.unit.indico_tests.core_tests.db_tests.data import *
 from indico.web.flask.app import make_app
+
+from .data import *
 
 
 class DBTest(TestCase):
 
     # SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-    SQLALCHEMY_DATABASE_URI = 'postgres://127.0.0.1/testing'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://127.0.0.1/testing'
     TESTING = True
 
     def create_app(self):
@@ -43,15 +45,12 @@ class DBTest(TestCase):
     def get_without(self, d, ks=[]):
         return dict((k, v) for k, v in d.items() if k not in ks)
 
-    def get_occurrences(self, r):
-        pass
-
     def init_db(self):
         # first add attribute keys
 
         db.session.add_all([AttributeKey(**k) for k in ATTRIBUTE_KEYS])
         db.session.add_all([RoomEquipment(name=k) for k in ROOM_EQUIPMENTS])
-        db.session.commit()
+        transaction.commit()
 
         # locations
         for loc in LOCATIONS:
@@ -120,9 +119,6 @@ class DBTest(TestCase):
                     ])
                     reservation = Reservation(**only_resv)
 
-                    # reservation excluded days
-                    reservation.excluded_days.extend(resv.get('excluded_days', []))
-
                     # reservation attributes
                     for attr in resv.get('attributes', []):
                         k = AttributeKey.getKeyByName(attr['name'])
@@ -135,13 +131,13 @@ class DBTest(TestCase):
                         ReservationEditLog(**ed) for ed in resv.get('edit_logs', [])
                     ])
 
-                    # reservation notifications
-                    # reservation.notifications.extend(self.get_occurrences(reservation))
+                    # reservation occurrences and excluded days
+                    reservation.createOccurrences(excluded=resv.get('excluded_days', []))
 
                     room.reservations.append(reservation)
                 location.rooms.append(room)
             db.session.add(location)
-        db.session.commit()
+        transaction.commit()
 
         # blockings
         for bl in BLOCKINGS:
@@ -158,7 +154,7 @@ class DBTest(TestCase):
                 block.blocked_rooms.append(br)
 
             db.session.add(block)
-        db.session.commit()
+        transaction.commit()
 
     def tearDown(self):
         db.session.remove()
