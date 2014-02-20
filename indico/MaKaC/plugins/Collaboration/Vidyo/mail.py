@@ -161,13 +161,10 @@ Public room details:<br />
             return 'No'
 
     def _getShowPin(self):
-        """
         if self._booking.getBookingParamByName("displayPin"):
             return 'Yes'
         else:
             return 'No'
-        """
-        return 'No'
 
     def _getAutoJoinURL(self, typeOfMail):
         if typeOfMail == "remove":
