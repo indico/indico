@@ -17,440 +17,135 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.rb.controllers import RHRoomBookingBase
+from datetime import datetime, timedelta
+
+from flask import flash, request, session
+
+from indico.core.errors import IndicoError, FormValuesError, NoReportError
+from indico.util.i18n import _
+
+from .. import RHRoomBookingBase
+from ...models.reservations import Reservation
+from ...models.rooms import Room
+from ...models.utils import sifu
+from ...views.user import reservations as reservation_views
+from ..forms import BookingForm, BookingListForm
 
 
-class RHRoomBookingBookRoom( RHRoomBookingBase ):
+class RHRoomBookingBookRoom(RHRoomBookingBase):
 
-    def _businessLogic( self ):
-        self._rooms = CrossLocationQueries.getRooms( allFast = True )
-        self._rooms.sort()
-
-    def _process( self ):
-        self._businessLogic()
-        p = roomBooking_wp.WPRoomBookingBookRoom( self )
-        return p.display()
+    def _process(self):
+        self._rooms, self._max_capacity = Room.getRoomsWithMaxCapacity()
+        return reservation_views.WPRoomBookingBookRoom(self).display()
 
 
-class RHRoomBookingBookingDetails( RHRoomBookingBase ):
+class RHRoomBookingBookingDetails(RHRoomBookingBase):
 
-    def _checkParams( self, params ):
+    def _checkParams(self):
+        resv_id = request.view_args.get('resvID')
+        self._reservation = Reservation.getById(request.view_args.get('resvID'))
+        if not self._reservation:
+            raise IndicoError('No booking with id: {}'.format(resv_id))
 
-        locator = locators.WebLocator()
-        locator.setRoomBooking( params )
-        self._resv = self._target = locator.getObject()
-        if not self._resv:
-            raise NoReportError("""The specified booking with id "%s" does not exist or has been deleted""" % params["resvID"])
-        self._afterActionSucceeded = session.pop('rbActionSucceeded', False)
-        self._title = session.pop('rbTitle', None)
-        self._description = session.pop('rbDescription', None)
-        self._afterDeletionFailed = session.pop('rbDeletionFailed', None)
-
-        self._collisions = []
-        if not self._resv.isConfirmed:
-            self._resv.isConfirmed = None
-            # find pre-booking collisions
-            self._collisions = self._resv.getCollisions(sansID=self._resv.id)
-            self._resv.isConfirmed = False
-
-        self._clearSessionState()
-        self._isAssistenceEmailSetup = getRoomBookingOption('assistanceNotificationEmails')
-
-    def _businessLogic( self ):
-        pass
-
-    def _process( self ):
-        self._businessLogic()
-        p = roomBooking_wp.WPRoomBookingBookingDetails( self )
-        return p.display()
+    def _process(self):
+        return reservation_views.WPRoomBookingBookingDetails(self).display()
 
 
-class RHRoomBookingBookingList( RHRoomBookingBase ):
+class RHRoomBookingBookingList(RHRoomBookingBase):
 
-    def _checkParams( self, params ):
-        self._roomGUIDs = []
-        self._candResvs = []
-        self._allRooms = False
-        self._dayLimit = 500
-        self._resvLimit = 5000
-        roomGUIDs = params.get( "roomGUID" )
-        if isinstance( roomGUIDs, list ) and 'allRooms' in roomGUIDs:
-            roomGUIDs = 'allRooms'
-        if isinstance( roomGUIDs, str ):
-            if roomGUIDs == "allRooms":
-                self._allRooms = True
-                roomGUIDs = [ str(room.guid) for room in CrossLocationQueries.getRooms( allFast = True )]
+    def __getTitle(self):
+        return {
+                (True, False, False, False, False): _('Select a Room'),
+                (False, False, False, False, False): _('Bookings'),
+                (False, True, False, False, False): _('PRE-Bookings'),
+                (False, False, True, False, False): _('My Bookings'),
+                (False, True, True, False, False): _('My PRE-Bookings'),
+                (False, False, False, True, False): _('Bookings for my rooms'),
+                (False, True, False, True, False): _('Pre-Bookings for my rooms'),
+                (False, False, True, True, False): _('My Bookings for my rooms'),
+                (False, True, True, True, False): _('My Pre-Bookings for my rooms'),
+                (False, False, True, True, True): _('Search My Bookings for my rooms'),
+                (False, True, True, True, True): _('Search My Pre-Bookings for my rooms'),
+                (False, False, True, False, True): _('Search My Bookings'),
+                (False, True, True, False, True): _('Search My Pre-Bookings'),
+                (False, False, False, True, True): _('Search Bookings for my rooms'),
+                (False, True, False, True, True): _('Search Pre-Bookings for my rooms'),
+                (False, False, False, False, True): _('Search Bookings'),
+                (False, True, False, False, True): _('Search Pre-Bookings'),
+            }.get(
+                (
+                    self._form.is_new_booking.data,
+                    self._form.is_only_pre_bookings.data,
+                    self._form.is_only_mine.data,
+                    self._form.is_only_my_rooms.data,
+                    self._form.is_search.data
+                ),
+                _('{} Booking(s) found').format(self._reservation_count)
+            )
+
+    def _checkParams(self):
+        self._form = BookingListForm(request.values)
+
+    def _process(self):
+        if self._form.validate():
+            if self._form.is_search.data:
+                self._reservations = Room.getFilteredReservationsInSpecifiedRooms(
+                    self._form,
+                    self._getUser()
+                )
+                print 'SEARCH =================================='
             else:
-                roomGUIDs = [roomGUIDs.strip()]
-        if isinstance( roomGUIDs, list )  and  roomGUIDs != ['']:
-            self._roomGUIDs = roomGUIDs
-
-        resvEx = ReservationBase()
-        self._checkParamsRepeatingPeriod( params )
-        resvEx.startDT = self._startDT
-        resvEx.endDT = self._endDT
-
-        self._flexibleDatesRange = 0
-        flexibleDatesRange = params.get("flexibleDatesRange")
-        if flexibleDatesRange and len(flexibleDatesRange.strip()) > 0:
-            if flexibleDatesRange == "None":
-                self._flexibleDatesRange = 0
-            else:
-                self._flexibleDatesRange = int(flexibleDatesRange.strip())
-
-        bookedForName = params.get( "bookedForName" )
-        if bookedForName and len( bookedForName.strip() ) > 0:
-            resvEx.bookedForName = bookedForName.strip()
-        reason = params.get( "reason" )
-        if reason and len( reason.strip() ) > 0:
-            resvEx.reason = reason.strip()
-        self._title = "Bookings"
-
-        self._repeatability = None
-        repeatability = params.get("repeatability")
-        if repeatability and len( repeatability.strip() ) > 0:
-            if repeatability == "None":
-                self._repeatability = None
-                resvEx.repeatability = None
-            else:
-                self._repeatability = int( repeatability.strip() )
-                resvEx.repeatability = int( repeatability.strip() )
-
-        onlyPrebookings = params.get( "onlyPrebookings" )
-        self._onlyPrebookings = False
-
-        onlyBookings = params.get( "onlyBookings" )
-        self._onlyBookings = False
-
-        if onlyPrebookings and len( onlyPrebookings.strip() ) > 0:
-            if onlyPrebookings == 'on':
-                resvEx.isConfirmed = False
-                self._title = "PRE-" + self._title
-                self._onlyPrebookings = True
-        elif onlyBookings and len( onlyBookings.strip() ) > 0:
-            if onlyBookings == 'on':
-                resvEx.isConfirmed = True
-                self._onlyBookings = True
+                self._reservations = Room.getReservationsForAvailability(
+                    self._form.start_date.data,
+                    self._form.end_date.data,
+                    self._form.room_id_list.data
+                )
+                print 'NEW BOOKING ========================='
+            self._reservation_count = len(self._reservations)
         else:
-            # find pre-bookings as well
-            resvEx.isConfirmed = None
-
-        self._capacity = None
-        capacity = params.get("capacity")
-        if capacity and len( capacity.strip() ) > 0:
-            self._capacity = int( capacity.strip() )
-
-        self._onlyMy = False
-        onlyMy = params.get( "onlyMy" )
-        if onlyMy and len( onlyMy.strip() ) > 0:
-            if onlyMy == 'on':
-                self._onlyMy = True
-                self._title = "My " + self._title
-        else:
-            resvEx.createdBy = None
-        self._ofMyRooms = False
-        ofMyRooms = params.get( "ofMyRooms" )
-        if ofMyRooms and len( ofMyRooms.strip() ) > 0:
-            if ofMyRooms == 'on':
-                self._ofMyRooms = True
-                self._title = self._title + " for your rooms"
-        else:
-            self._rooms = None
-
-        self._search = False
-        search = params.get( "search" )
-        if search and len( search.strip() ) > 0:
-            if search == 'on':
-                self._search = True
-                self._title = "Search " + self._title
-
-        self._order = params.get( "order", "" )
-
-        self._finishDate = False
-        finishDate = params.get( "finishDate" )
-        if finishDate and len( finishDate.strip() ) > 0:
-            if finishDate == 'true':
-                self._finishDate = True
-
-        self._newBooking = False
-        newBooking = params.get( "newBooking" )
-        if newBooking and len( newBooking.strip() ) > 0:
-            if newBooking == 'on':
-                self._newBooking = True
-                self._title = "Select a Room"
-
-        isArchival = params.get( "isArchival" )
-        if isArchival and len( isArchival.strip() ) > 0:
-            self._isArchival = True
-        else:
-            self._isArchival = None
-
-        self._autoCriteria = False
-        if params.get( "autoCriteria" ) == "True" or not resvEx.startDT:
-            now = datetime.now()
-            after = now + timedelta( 7 ) # 1 week later
-
-            resvEx.startDT = datetime( now.year, now.month, now.day, 0, 0, 0 )
-            resvEx.endDT = datetime( after.year, after.month, after.day, 23, 59, 00 )
-            self._autoCriteria = True
-            self._isArchival = None
-
-        isRejected = params.get( "isRejected" )
-        if isRejected and len( isRejected.strip() ) > 0:
-            resvEx.isRejected = isRejected == 'on'
-        else:
-            resvEx.isRejected = False
-        isCancelled = params.get( "isCancelled" )
-        if isCancelled and len( isCancelled.strip() ) > 0:
-            resvEx.isCancelled = isCancelled == 'on'
-        else:
-            resvEx.isCancelled = False
+            # TODO: actually this case shouldn't happen
+            self._reservations = []
+            self._reservation_count = 0
+        self._title = self.__getTitle()
+        return reservation_views.WPRoomBookingBookingList(self).display()
 
 
-        needsAVCSupport = params.get( "needsAVCSupport" )
-        if needsAVCSupport and len( needsAVCSupport.strip() ) > 0:
-            resvEx.needsAVCSupport = needsAVCSupport == 'on'
-        else:
-            resvEx.needsAVCSupport = None
+class RHRoomBookingBookingForm(RHRoomBookingBase):
 
-        usesAVC = params.get( "usesAVC" )
-        if usesAVC and len( usesAVC.strip() ) > 0:
-            resvEx.usesAVC = usesAVC == 'on'
-        else:
-            resvEx.usesAVC = None
+    def _checkParams(self):
+        self._form = BookingForm()
+        if self._form.is_submitted():
+            if 'resvID' in request.view_args:  # modification
+                if self._form.validate_on_submit():
+                    self._reservation = Reservation()
+                    self._form.populate_obj(self._reservation)
+                else:
+                    pass
 
-        needsAssistance = params.get( "needsAssistance" )
-        if needsAssistance and len( needsAssistance.strip() ) > 0:
-            resvEx.needsAssistance = needsAssistance == 'on'
-        else:
-            resvEx.needsAssistance = None
+        # self._requireRealUsers = getRoomBookingOption('bookingsForRealUsers')
+        # self._isAssistenceEmailSetup = getRoomBookingOption('assistanceNotificationEmails')
 
-        isHeavy = params.get( "isHeavy" )
-        if isHeavy and len( isHeavy.strip() ) > 0:
-            self._isHeavy = True
-        else:
-            self._isHeavy = None
-
-        #self._overload stores type of overload 0 - no overload 1 - too long period selected 2 - too many bookings fetched
-        self._overload = 0
-        if resvEx.startDT and resvEx.endDT:
-            if (resvEx.endDT - resvEx.startDT).days > self._dayLimit:
-                self._overload = 1
-            elif self._newBooking:
-                for rg in self._roomGUIDs:
-                    if self._repeatability == 0:
-                        self._candResvs.append(self._loadResvBookingCandidateFromSession( params, RoomGUID.parse( rg ).getRoom() ))
-                    else:
-                        candResv = self._loadResvBookingCandidateFromSession( params, RoomGUID.parse( rg ).getRoom() )
-                        candResv.startDT = self._startDT
-                        candResv.endDT = self._endDT - timedelta(2 * self._flexibleDatesRange)
-                        self._candResvs.append(candResv)
-                        for i in range(2 * self._flexibleDatesRange):
-                            candResv = self._loadResvBookingCandidateFromSession( params, RoomGUID.parse( rg ).getRoom() )
-                            candResv.startDT = self._startDT + timedelta(i + 1)
-                            candResv.endDT = self._endDT - timedelta(2 * self._flexibleDatesRange - i - 1)
-                            self._candResvs.append(candResv)
-
-        if ((resvEx.endDT - resvEx.startDT).days + 1) * len(self._candResvs) > self._resvLimit:
-            self._overload = 2
-
-        self._prebookingsRejected = session.pop('rbPrebookingsRejected', None)
-        self._subtitle = session.pop('rbTitle', None)
-        self._description = session.pop('rbDescription', None)
-        self._resvEx = resvEx
-
-    def _process( self ):
-        # Init
-        self._resvs = []
-        self._dayBars = {}
-
-        # The following can't be done in checkParams since it must be after checkProtection
-        if self._onlyMy:
-            self._resvEx.createdBy = str( self._getUser().id )
-        if self._ofMyRooms:
-            self._rooms = self._getUser().getRooms()
-            self._roomGUIDs = None
-
-        # Whether to show [Reject ALL conflicting PRE-bookings] button
-        self._showRejectAllButton = False
-        if self._rooms and not self._resvEx.isConfirmed:
-            self._showRejectAllButton = True
-
-        # We only use the cache if no options except a start/end date are sent and all rooms are included
-        self._useCache = (self._allRooms and
-            not self._onlyPrebookings and
-            not self._onlyBookings and
-            not self._onlyMy and
-            not self._ofMyRooms and
-            not self._search and
-            not self._isArchival and
-            not self._isHeavy and
-            not self._resvEx.bookedForName and
-            not self._resvEx.reason and
-            not self._resvEx.createdBy and
-            not self._resvEx.isRejected and
-            not self._resvEx.isCancelled and
-            not self._resvEx.needsAVCSupport and
-            not self._resvEx.usesAVC and
-            not self._resvEx.needsAssistance and
-            self._resvEx.isConfirmed is None)
-        self._cache = None
-        self._updateCache = False
-
-        if self._overload != 0:
-            p = roomBooking_wp.WPRoomBookingBookingList( self )
-            return p.display()
-
-        if self._roomGUIDs:
-            rooms = [ RoomGUID.parse( rg ).getRoom() for rg in self._roomGUIDs ]
-            if self._rooms is list:
-                self._rooms.extend( rooms )
-            else:
-                self._rooms = rooms
-
-        # Prepare 'days' so .getReservations will use days index
-        if not self._resvEx.repeatability:
-            self._resvEx.repeatability = RepeatabilityEnum.daily
-        periods = self._resvEx.splitToPeriods(endDT = self._resvEx.endDT)
-        if self._flexibleDatesRange:
-            startDate = self._startDT + timedelta(self._flexibleDatesRange)
-            endDate = self._endDT - timedelta(self._flexibleDatesRange)
-            for i in range(self._flexibleDatesRange):
-                self._resvEx.startDT = startDate - timedelta(i+1)
-                self._resvEx.endDT = endDate - timedelta(i+1)
-                periods.extend(self._resvEx.splitToPeriods())
-                self._resvEx.startDT = startDate + timedelta(i+1)
-                self._resvEx.endDT = endDate + timedelta(i+1)
-                periods.extend(self._resvEx.splitToPeriods())
-            self._resvEx.startDT = self._startDT
-            self._resvEx.endDT = self._endDT
-        days = [ period.startDT.date() for period in periods ]
-
-        if self._useCache:
-            self._cache = GenericCache('RoomBookingCalendar')
-            self._dayBars = dict((day, bar) for day, bar in self._cache.get_multi(map(str, days)).iteritems() if bar)
-            dayMap = dict(((str(day), day) for day in days))
-            for day in self._dayBars.iterkeys():
-                days.remove(dayMap[day])
-            self._updateCache = bool(len(days))
-
-        day = None # Ugly but...othery way to avoid it?
-        for day in days:
-            for loc in Location.allLocations:
-                self._resvs += CrossLocationQueries.getReservations( location = loc.friendlyName, resvExample = self._resvEx, rooms = self._rooms, archival = self._isArchival, heavy = self._isHeavy, repeatability=self._repeatability,  days = [day] )
-            if len(self._resvs) > self._resvLimit:
-                self._overload = 2
-                break
-        if day:
-            self._resvEx.endDT = datetime( day.year, day.month, day.day, 23, 59, 00 )
-
-        p = roomBooking_wp.WPRoomBookingBookingList( self )
-        return p.display()
-
-
-class RHRoomBookingBookingForm( RHRoomBookingBase ):
-
-    def _checkParams( self, params ):
-        self._thereAreConflicts = session.get('rbThereAreConflicts')
-        self._skipConflicting = False
-
-        # DATA FROM?
-        self._dataFrom = CandidateDataFrom.DEFAULTS
-        if params.get( "candDataInParams" ) or params.get( "afterCalPreview" ):
-            self._dataFrom = CandidateDataFrom.PARAMS
-        if session.get('rbCandDataInSession'):
-            self._dataFrom = CandidateDataFrom.SESSION
-
-        # Reservation ID?
-        resvID = None
-        if self._dataFrom == CandidateDataFrom.SESSION:
-            resvID = session.get('rbResvID')
-            roomLocation = session.get('rbRoomLocation')
-        else:
-            resvID = params.get( "resvID" )
-            if isinstance( resvID, list ): resvID = resvID[0]
-            roomLocation = params.get( "roomLocation" )
-            if isinstance( roomLocation, list ): roomLocation = roomLocation[0]
-        if resvID == "None": resvID = None
-        if resvID: resvID = int( resvID )
-
-        # FORM MODE?
-        if resvID:
-            self._formMode = FormMode.MODIF
-        else:
-            self._formMode = FormMode.NEW
-
-        # SHOW ERRORS?
-        self._showErrors = session.get('rbShowErrors')
-        if self._showErrors:
-            self._errors = session.get('rbErrors')
-
-        # CREATE CANDIDATE OBJECT
-        candResv = None
-
-        if self._formMode == FormMode.NEW:
-            if self._dataFrom == CandidateDataFrom.SESSION:
-                candResv = self._loadResvCandidateFromSession( None, params )
-            elif self._dataFrom == CandidateDataFrom.PARAMS:
-                candResv = self._loadResvCandidateFromParams( None, params )
-            else:
-                candResv = self._loadResvCandidateFromDefaults( params )
-
-        if self._formMode == FormMode.MODIF:
-            import copy
-            candResv = copy.copy(CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation ))
-            if self._dataFrom == CandidateDataFrom.PARAMS:
-                self._loadResvCandidateFromParams( candResv, params )
-            if self._dataFrom == CandidateDataFrom.SESSION:
-                self._loadResvCandidateFromSession( candResv, params )
-
-        self._errors = session.get('rbErrors')
-
-        self._candResv = candResv
-
-        if params.get("infoBookingMode"):
-            self._infoBookingMode = True
-        else:
-            self._infoBookingMode = False
-
-        if params.get("skipConflicting"):
-            self._skipConflicting = True
-        else:
-            self._skipConflicting = False
-
-        self._clearSessionState()
-        self._requireRealUsers = getRoomBookingOption('bookingsForRealUsers')
-        self._isAssistenceEmailSetup = getRoomBookingOption('assistanceNotificationEmails')
-
-
-    def _checkProtection( self ):
-
+    def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
 
         # only do the remaining checks the rest if the basic ones were successful
-        # (i.e. user is logged in)
-        if self._doProcess:
-            if not self._candResv.room.isActive and not self._getUser().isRBAdmin():
-                raise FormValuesError( "You are not authorized to book this room." )
+        # if self._doProcess:
+        #     if not self._candResv.room.isActive and not self._getUser().isRBAdmin():
+        #         raise FormValuesError('You are not authorized to book this room.')
 
-            if not self._candResv.room.canBook( self._getUser() ) and not self._candResv.room.canPrebook( self._getUser() ):
-                raise NoReportError( "You are not authorized to book this room." )
+        #     if not self._candResv.room.canBook(self._getUser()) and not self._candResv.room.canPrebook(self._getUser()):
+        #         raise NoReportError('You are not authorized to book this room.')
 
-            if self._formMode == FormMode.MODIF:
-                if not self._candResv.canModify( self.getAW() ):
-                    raise MaKaCError( "You are not authorized to take this action." )
+        #     if self._formMode == FormMode.MODIF:
+        #         if not self._candResv.canModify(self.getAW()):
+        #             raise IndicoError('You are not authorized to take this action.')
 
-    def _businessLogic( self ):
-        self._rooms = CrossLocationQueries.getRooms( allFast = True )
-        self._rooms.sort()
-
-    def _process( self ):
-        self._businessLogic()
-        p = roomBooking_wp.WPRoomBookingBookingForm( self )
-        return p.display()
+    def _process(self):
+        self._rooms = Room.getRooms()
+        return reservation_views.WPRoomBookingBookingForm(self).display()
 
 
-class RHRoomBookingSaveBooking( RHRoomBookingBase ):
+class RHRoomBookingSaveBooking(RHRoomBookingBase):
     """
     Performs physical INSERT or UPDATE.
     When succeeded redirects to booking details, otherwise returns to booking
@@ -460,8 +155,8 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
     def _checkParams( self, params ):
 
         self._roomLocation = params.get("roomLocation")
-        self._roomID       = params.get("roomID")
-        self._resvID             = params.get( "resvID" )
+        self._roomID = params.get("roomID")
+        self._resvID = params.get( "resvID" )
         if self._resvID == 'None':
             self._resvID = None
 
@@ -700,25 +395,25 @@ class RHRoomBookingSaveBooking( RHRoomBookingBase ):
         self._redirect( url )
 
 
-class RHRoomBookingStatement( RHRoomBookingBase ):
+class RHRoomBookingStatement(RHRoomBookingBase):
 
-    def _checkParams(self, params):
+    def _checkParams(self):
         self._title = session.pop('rbTitle', None)
         self._description = session.pop('rbDescription', None)
 
-    def _process( self ):
-        return roomBooking_wp.WPRoomBookingStatement( self ).display()
+    def _process(self):
+        return reservation_views.WPRoomBookingStatement(self).display()
 
 
-class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
+class RHRoomBookingAcceptBooking(RHRoomBookingBase):
 
-    def _checkParams( self , params ):
+    def _checkParams(self):
         resvID = int( params.get( "resvID" ) )
         roomLocation = params.get( "roomLocation" )
         self._resv = CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation )
         self._target = self._resv
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
 
         # only do the remaining checks the rest if the basic ones were successful
@@ -730,7 +425,7 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
                 ( not self._getUser().isRBAdmin() ):
                 raise MaKaCError( "You are not authorized to take this action." )
 
-    def _process( self ):
+    def _process(self):
         emailsToBeSent = []
         if len( self._resv.getCollisions( sansID = self._resv.id ) ) == 0:
             # No conflicts
@@ -769,7 +464,7 @@ class RHRoomBookingAcceptBooking( RHRoomBookingBase ):
             GenericMailer.send(notification)
 
 
-class RHRoomBookingCancelBooking( RHRoomBookingBase ):
+class RHRoomBookingCancelBooking(RHRoomBookingBase):
 
     def _checkParams( self , params ):
         resvID = int( params.get( "resvID" ) )
@@ -1016,13 +711,8 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
         self._redirect( url ) # Redirect to booking details
 
 
-class RHRoomBookingSearch4Bookings( RHRoomBookingBase ):
+class RHRoomBookingSearch4Bookings(RHRoomBookingBase):
 
-    def _businessLogic( self ):
-        self._rooms = CrossLocationQueries.getRooms( allFast = True )
-        self._rooms.sort()
-
-    def _process( self ):
-        self._businessLogic()
-        p = roomBooking_wp.WPRoomBookingSearch4Bookings( self )
-        return p.display()
+    def _process(self):
+        self._rooms = Room.getRooms()
+        return reservation_views.WPRoomBookingSearch4Bookings(self).display()
