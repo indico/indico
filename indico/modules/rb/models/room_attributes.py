@@ -18,39 +18,118 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
-Custom attributes for rooms
+Attribute keys for rooms and reservations
 """
 
 from indico.core.db import db
-from indico.modules.rb.models import utils
+
+from .utils import  JSONStringBridgeMixin
 
 
-class RoomAttribute(utils.JSONStringBridgeMixin, db.Model):
-    __tablename__ = 'room_attributes'
+class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):
+    __tablename__ = 'rooms_attributes_association'
 
-    key_id = db.Column(
+    # columns
+
+    attribute_id = db.Column(
         db.Integer,
-        db.ForeignKey('attribute_keys.id'),
-        nullable=False,
+        db.ForeignKey(
+            'room_attributes.id',
+        ),
         primary_key=True
     )
     room_id = db.Column(
         db.Integer,
-        db.ForeignKey('rooms.id'),
-        nullable=False,
+        db.ForeignKey(
+            'rooms.id',
+        ),
         primary_key=True
     )
-    caption = db.Column(
+    raw_data = db.Column(
         db.String
     )
-    raw_data = db.Column(
-        db.String,
-        nullable=False
+
+    # relationships
+
+    attribute = db.relationship(
+        'RoomAttribute',
+        backref='room_assocs'
     )
 
-    def __repr__(self):
-        return '<RoomAttribute({0}, {1}, {2})>'.format(
-            self.room_id,
-            self.key_id,
-            self.value
+
+class RoomAttribute(JSONStringBridgeMixin, db.Model):
+    __tablename__ = 'room_attributes'
+
+    # columns
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    parent_id = db.Column(
+        db.Integer,
+        db.ForeignKey('room_attributes.id')
+    )
+    name = db.Column(
+        db.String,
+        nullable=False,
+        unique=True,
+        index=True
+    )
+    location_id = db.Column(
+        db.Integer,
+        db.ForeignKey('locations.id')
+    )
+    raw_data = db.Column(
+        db.String
+    )
+
+    # relationships
+
+    children = db.relationship(
+        'RoomAttribute',
+        backref=db.backref(
+            'parent',
+            remote_side=[id]
         )
+    )
+
+    @staticmethod
+    def supportsAttributeManagement():
+        return True
+
+    # def __str__(self):
+    #     return self.name
+
+    # def __repr__(self):
+    #     return '<AttributeKey({0}, {1}, {2}, {3})>'.format(
+    #         self.id,
+    #         self.name,
+    #         self.is_for_rooms,
+    #         self.is_for_reservations
+    #     )
+
+    # @staticmethod
+    # def getKeyByName(name):
+    #     return AttributeKey.query.filter_by(name=name).first()
+
+    # @staticmethod
+    # def getAllKeys():
+    #     return AttributeKey.query.all()
+
+    # @staticmethod
+    # def getAllReservationKeys():
+    #     """All keys are also reservation key"""
+    #     return AttributeKey.query.filter_by(is_for_reservations=True).all()
+
+    # @staticmethod
+    # def getAllRoomKeys():
+    #     return AttributeKey.query.filter_by(is_for_rooms=True).all()
+
+    # @staticmethod
+    # def supportsAttributeManagement():
+    #     return True
+
+    # @staticmethod
+    # def getLocationAttributes(location_name):
+    #     AttributeKey.location_attributes
