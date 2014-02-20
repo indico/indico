@@ -323,15 +323,17 @@ def escapeHTMLForJS(s):
         (carriage return) -> \r
         (backspace) -> \b
         (form feed) -> \f
-
-        TODO: try to optimize this (or check if it's optimum already).
-        translate() doesn't work, because we are replacing characters by couples of characters.
-        explore use of regular expressions, or maybe split the string and then join it manually, or just replace them by
-        looping through the string and using an if...elif... etc.
     """
-    res = s.replace("\\", "\\\\").replace("\'", "\\\'").replace("\"", "\\\"").replace("&", "\\&").replace("/", "\\/").\
-        replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r").replace("\b", "\\b").replace("\f", "\\f")
-    return res
+    return s.replace("\\", "\\\\")\
+            .replace("\'", "\\\'")\
+            .replace("\"", "\\\"")\
+            .replace("&", "\\&")\
+            .replace("/", "\\/")\
+            .replace("\n", "\\n")\
+            .replace("\t", "\\t")\
+            .replace("\r", "\\r")\
+            .replace("\b", "\\b")\
+            .replace("\f", "\\f")
 
 
 def registerHelpers(objDict):
