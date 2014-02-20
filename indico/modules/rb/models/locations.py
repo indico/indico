@@ -24,16 +24,23 @@ Holder of rooms in a place and its map view related data
 from datetime import datetime, timedelta
 
 import pytz
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, and_, distinct
+from sqlalchemy.orm import aliased
+from sqlalchemy.sql.expression import select, label, column
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.dialects.postgresql import array
 
 from MaKaC.common.Locators import Locator
 
 from indico.core.db import db
-from indico.modules.rb.models import utils
-from indico.modules.rb.models.aspects import Aspect
-from indico.modules.rb.models.reservations import Reservation
-from indico.modules.rb.models.rooms import Room
+from indico.util.i18n import _
 
+from . import utils
+from .aspects import Aspect
+from .reservations import Reservation
+from .room_attributes import RoomAttribute
+from .room_equipments import RoomEquipment, RoomEquipmentAssociation
+from .rooms import Room
 
 class Location(db.Model):
     __tablename__ = 'locations'
@@ -63,7 +70,9 @@ class Location(db.Model):
         db.ForeignKey(
             'aspects.id',
             use_alter=True,
-            name='fk_default_aspect_id'
+            name='fk_default_aspect_id',
+            onupdate='CASCADE',
+            ondelete='SET NULL'
         )
     )
 
@@ -74,7 +83,7 @@ class Location(db.Model):
         backref='location',
         cascade='all, delete-orphan',
         primaryjoin=id==Aspect.location_id,
-        lazy='dynamic'
+        lazy='dynamic',
     )
 
     default_aspect = db.relationship(
@@ -90,11 +99,30 @@ class Location(db.Model):
         lazy='dynamic'
     )
 
+    # attributes = db.relationship(
+    #     'LocationAttribute',
+    #     backref='location',
+    #     cascade='all, delete-orphan',
+    #     lazy='dynamic'
+    # )
+
     attributes = db.relationship(
-        'LocationAttribute',
+        'RoomAttribute',
         backref='location',
         cascade='all, delete-orphan',
         lazy='dynamic'
+    )
+
+    equipment_objects = db.relationship(
+        'RoomEquipment',
+        backref='location',
+        lazy='dynamic'
+    )
+
+    equipments = association_proxy(
+        'equipment_objects',
+        'name',
+        creator=lambda name: RoomEquipment(name=name)
     )
 
     # core
@@ -156,8 +184,20 @@ class Location(db.Model):
     # aspects
 
     @utils.filtered
-    def getAspects(self, **filters):
+    def filterAspects(self, **filters):
         return Aspect, self.aspects
+
+    def getAspects(self):
+        return self.aspects.all()
+
+    def getAspectsAsDictionary(self):
+        return [aspect.toDictionary() for aspect in self.getAspects()]
+
+    def getAspectById(self, aid):
+        return self.aspects.filter_by(id=aid).first()
+
+    def removeAspectById(self, aid):
+        return self.aspects.filter_by(id=aid).delete()
 
     def addAspect(self, aspect):
         self.aspects.append(aspect)
@@ -177,7 +217,7 @@ class Location(db.Model):
     # room management
 
     @utils.filtered
-    def getRooms(self, **filters):
+    def filterRooms(self, **filters):
         return Room, self.rooms
 
     def addRoom(self, room):
@@ -186,6 +226,15 @@ class Location(db.Model):
     def deleteRoom(self, room):
         self.rooms.remove(room)
 
+    def getRooms(self):
+        return self.rooms.all()
+
+    def getRoomById(self, rid):
+        return self.rooms.filter_by(id=rid).first()
+
+    def getRoomsOrderedByNames(self):
+        return self.rooms.order_by(Room.name).all()
+
     # default location management
 
     @staticmethod
@@ -193,17 +242,23 @@ class Location(db.Model):
         return Location.query.filter_by(is_default=True).first()
 
     @staticmethod
-    def setDefaultLocation(loc):
-        (Location.query
-                 .filter(
-                     or_(
-                        Location.is_default == True,
-                        Location.id == loc.id
+    def setDefaultLocation(location_name):
+        (
+            Location
+                .query
+                .filter(
+                    or_(
+                        Location.is_default,
+                        Location.name == location_name
                     )
-                 )
-                 .update({
-                    'is_default': func.not_(Location.is_default)
-                 }, synchronize_session='fetch'))
+                )
+                .update(
+                    {
+                        'is_default': func.not_(Location.is_default)
+                    },
+                    synchronize_session='fetch'
+                )
+        )
 
     # generic location management
 
@@ -224,8 +279,47 @@ class Location(db.Model):
         return Location.query.count()
 
     @staticmethod
+    def addLocationByName(name):
+        db.session.add(
+            Location(
+                name=name,
+                is_default=(Location.getNumberOfLocations() == 0)
+            )
+        )
+
+    @staticmethod
     def removeLocationByName(name):
         Location.query.filter_by(name=name).delete()
+
+    # attribute management
+
+    def addAttribute(self, name, value={}):
+        attr = RoomAttribute(name=name)
+        attr.value = value
+        self.attributes.append(attr)
+
+    def removeAttributeByName(self, name):
+        self.attributes.filter_by(name=name).delete()
+
+    def getAttributeByName(self, name):
+        return self.attributes.filter_by(name=name).first()
+
+    def getAttributes(self):
+        return self.attributes.all()
+
+    # equipment management
+
+    def getEquipments(self):
+        return self.equipment_objects.all()
+
+    def getEquipmentNames(self):
+        return list(self.equipments)
+
+    def addEquipment(self, name):
+        self.equipments.append(name)
+
+    def removeEquipment(self, name):
+        self.equipment_objects.filter_by(name=name).delete()
 
     # location helpers
 
@@ -283,53 +377,79 @@ class Location(db.Model):
                     .scalar())
 
     def getReservationStats(self):
-        return utils.results_to_dict(
-            self.query
+        return utils.stats_to_dict(
+            self.rooms
+                .join(Room.reservations)
                 .with_entities(
                     Reservation.is_live,
                     Reservation.is_cancelled,
                     Reservation.is_rejected,
                     func.count(Reservation.id)
                 )
-                .join(Location.rooms)
-                .join(Room.reservations)
                 .group_by(
                     Reservation.is_live,
                     Reservation.is_cancelled,
                     Reservation.is_rejected
                 )
-                .all())
-
-    def _hasCoordinates(self, rids):
-        coordinates = Room.getBuildingCoordinatesByRoomIds(rids)
-        if coordinates:
-            return {
-                'has_coordinates': True,
-                'latitude': coordinates[0],
-                'longtude': coordinates[1]
-            }
-        return {'has_coordinates': False}
+                .all()
+        )
 
     def getBuildings(self, with_rooms=True):
 
-        results = (self.rooms
-                       .with_entities(
-                           Room.building,
-                           func.group_concat(Room.id)  # db specific
-                       )
-                      .filter(Room.building != None)
-                      .group_by(Room.building)
-                      .all())
+        def get_subquery(column):
+            return select([column])\
+                .select_from(
+                    func.unnest(func.array_agg(getattr(Room, column))).alias(column)
+                )\
+                .correlate(None)\
+                .where("{} != ''".format(column))\
+                .limit(1)\
+                .as_scalar()
 
-        buildings = []
-        for building, room_id_list in results:
-            rids = map(int, room_id_list.split(','))
-            building_details = {
-                'number': building,
-                'title': _('Building') + ' {}'.format(building),
-                'rooms': (Room.getRoomsRequireVideoConferenceSetupByIds(rids)
-                          if with_rooms else [])
-            }
-            building_details.update(self._hasCoordinates(rids))
-            buildings.append(building_details)
-        return buildings
+        video_conference_equipment = self.equipment_objects\
+                                         .with_entities(RoomEquipment.id)\
+                                         .filter_by(name='Video conference')\
+                                         .as_scalar()
+
+        r = aliased(Room)
+        room_id_subquery = db.session.query(r)\
+                             .with_entities(r.id)\
+                             .correlate(Room)\
+                             .filter(
+                                 and_(
+                                     or_(
+                                         with_rooms,
+                                         r.equipments.any(video_conference_equipment)  # contains
+                                     ),
+                                     r.id.in_(
+                                         select(['e'])
+                                             .select_from(func.unnest(func.array_agg(Room.id)).alias('e'))
+                                             .correlate(None)
+                                             .as_scalar()
+                                     )
+                                 )
+                             )\
+                             .as_scalar()
+
+        results = self.rooms\
+                      .with_entities(
+                        Room.building,
+                        func.array(room_id_subquery),
+                        get_subquery('longitude'),
+                        get_subquery('latitude')
+                      )\
+                      .group_by(Room.building)\
+                      .all()
+
+        rooms = dict(self.rooms.with_entities(Room.id, Room).all())
+
+        a = [{
+            'number': building,
+            'title': _('Building {}').format(building),
+            'longitude': lo,
+            'latitude': la,
+            'rooms': [rooms[rid].to_serializable() for rid in room_ids]
+        } for building, room_ids, lo, la in results if la and lo]
+
+        print a
+        return a
