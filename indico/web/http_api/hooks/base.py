@@ -370,6 +370,11 @@ class IteratedDataFetcher(DataFetcher):
     def _postprocess(self, obj, fossil, iface):
         return fossil
 
+    def _makeFossil(self, obj, iface):
+        return fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
+                         filters={'access': self._userAccessFilter},
+                         mapClassType={'AcceptedContribution': 'Contribution'})
+
     def _process(self, iterator, filter=None, iface=None):
         if iface is None:
             iface = self.DETAIL_INTERFACES.get(self._detail)
@@ -377,10 +382,7 @@ class IteratedDataFetcher(DataFetcher):
                 raise HTTPAPIError('Invalid detail level: %s' % self._detail, 400)
         for obj in self._iterateOver(iterator, self._offset, self._limit, self._orderBy, self._descending, filter):
             yield self._postprocess(obj,
-                                    fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
-                                              filters={'access': self._userAccessFilter},
-                                              canModify=obj.canModify(self._aw) if hasattr(obj, "canModify") else None,
-                                              mapClassType={'AcceptedContribution': 'Contribution'}),
+                                    self._makeFossil(obj, iface),
                                     iface)
 
 

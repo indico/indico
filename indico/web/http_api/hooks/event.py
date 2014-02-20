@@ -204,6 +204,12 @@ class CategoryEventFetcher(IteratedDataFetcher):
                 {Period: IPeriodFossil}, tz=self._tz, naiveTZ=self._serverTZ)
         return fossil
 
+    def _makeFossil(self, obj, iface):
+        return fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ,
+                         filters={'access': self._userAccessFilter},
+                         canModify=obj.canModify(self._aw),
+                         mapClassType={'AcceptedContribution': 'Contribution'})
+
     def category(self, idlist):
         idx = IndexesHolder().getById('categoryDateAll')
 
