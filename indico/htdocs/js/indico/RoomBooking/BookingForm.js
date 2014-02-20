@@ -101,24 +101,25 @@ function saveFormData() {
     var filterData = $("#roomselector").roomselector("userdata");
     saveCalendarData($('#finishDate').val());
 
-    var rbDict = {"sDay": $("#sDay").val(),
-                  "sMonth": $("#sMonth").val(),
-                  "sYear": $("#sYear").val(),
-                  "eDay": $("#eDay").val(),
-                  "eMonth": $("#eMonth").val(),
-                  "eYear": $("#eYear").val(),
-                  "sTime": $('#sTime').val(),
-                  "eTime": $('#eTime').val(),
-                  "capacity": filterData.capacity,
-                  "videoconference": filterData.videoconference,
-                  "webcast": filterData.webcast,
-                  'projector': filterData.projector,
-                  "publicroom": filterData.publicroom,
-                  "filter":  filterData.search,
-                  "selectedRooms":  selectedRooms,
-                  "finishDate": $('#finishDate').val(),
-                  "flexibleDatesRange": $("#flexibleDates input[name=flexibleDatesRange]:checked").val(),
-                  "repeatability": $('#repeatability input[name=repeatability]:checked').val()};
+    var rbDict = {
+        "sDay": $("#sDay").val(),
+        "sMonth": $("#sMonth").val(),
+        "sYear": $("#sYear").val(),
+        "eDay": $("#eDay").val(),
+        "eMonth": $("#eMonth").val(),
+        "eYear": $("#eYear").val(),
+        "sTime": $('#sTime').val(),
+        "eTime": $('#eTime').val(),
+        "capacity": filterData.capacity,
+        "videoconference": filterData.videoconference,
+        "webcast": filterData.webcast,
+        "publicroom": filterData.publicroom,
+        "filter":  filterData.search,
+        "selectedRooms":  selectedRooms,
+        "finishDate": $('#finishDate').val(),
+        "flexibleDatesRange": $("#flexibleDates input[name=flexibleDatesRange]:checked").val(),
+        "repeatability": $('#repeatability input[name=repeatability]:checked').val()
+    };
 
     $.jStorage.set(userId, rbDict);
     $.jStorage.setTTL(userId, 7200000); // 2 hours
