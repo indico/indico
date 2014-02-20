@@ -22,7 +22,7 @@
 
 import zope.interface
 
-from MaKaC.conference import Conference, Contribution
+from MaKaC.conference import Conference, Contribution, SessionSlot
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.plugins.Collaboration.indexes import CSBookingInstanceWrapper, BookingManagerConferenceIndex
 from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationDisplay, UHConfModifCollaboration, UHAdminCollaboration
@@ -296,11 +296,13 @@ class EventCollaborationListener(Component):
                 Logger.get('PluginNotifier').error("Exception while trying to access the info changes " + str(e))
 
     def created(cls, obj, params={}):
-        if obj.__class__ == Conference:
+        if isinstance(obj, Conference):
             csbm = CSBookingManager(obj)
             Catalog.getIdx("cs_bookingmanager_conference").index(obj.getId(), csbm)
 
     def deleted(cls, obj, params={}):
+        if not isinstance(obj, (Conference, Contribution, SessionSlot)):
+            return
         csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
         if isinstance(obj, Conference):
             # If an Event is deleted, all related Video Services are deleted

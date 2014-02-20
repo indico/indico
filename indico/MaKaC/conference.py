@@ -6658,7 +6658,8 @@ class Session(CommonObjectBase, Locatable):
         return cmp( s1, s2 )
     _cmpTitle=staticmethod(_cmpTitle)
 
-class SessionSlot(Persistent, Fossilizable, Locatable):
+
+class SessionSlot(Persistent, Observable, Fossilizable, Locatable):
 
     fossilizes(ISessionSlotFossil)
 
@@ -7185,6 +7186,7 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
         return self.session.conference
 
     def delete(self):
+        self._notify('deleted', self)
         self.getSchedule().clear()
         if self.getSession() is not None:
             self.getSession().removeSlot(self)

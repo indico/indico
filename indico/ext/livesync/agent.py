@@ -375,7 +375,10 @@ class SyncManager(Persistent):
         Decides whether a particular object should be ignored or not
         """
         excluded = getPluginType().getOption('excludedCategories').getValue()
-        if isinstance(obj, conference.Category):
+
+        if isinstance(obj, conference.SessionSlot):
+            return True
+        elif isinstance(obj, conference.Category):
             return obj.getId() in excluded
         elif isinstance(obj, conference.Conference):
             owner = obj.getOwner()
