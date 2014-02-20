@@ -19,18 +19,22 @@
 
 from flask import request, session
 
-from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.pages import admins as adminPages
-from indico.core.logger import Logger
+from MaKaC.webinterface import urlHandlers as UH
 
 from indico.core.db import db
-from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
-from indico.modules.rb.controllers.utils import FormMode
-from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.rooms import Room
+from indico.core.errors import NotFoundError
+from indico.util.i18n import _
 
+from . import RHRoomBookingAdminBase
+from ..decorators import requires_location
+from ...models.room_bookable_times import BookableTime
+from ...models.room_nonbookable_dates import NonBookableDate
+from ...models.rooms import Room
+from ...models.photos import Photo
+from ...views.admin import rooms as room_views
 
-logger = Logger.get('requestHandler')
+class CandidateDataFrom(object):
+    DEFAULTS, PARAMS, SESSION = range(3)
 
 
 class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
@@ -44,92 +48,45 @@ class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
         if self._room.doesHaveLiveReservations():
             # Impossible
             session['rbDeletionFailed'] = True
-            self._redirect(urlHandlers.UHRoomBookingRoomDetails.getURL(room))  # room details
+            self._redirect(UH.UHRoomBookingRoomDetails.getURL(self._room))  # room details
         else:
             # Possible - delete
-            try:
-                db.session.delete(self._room)
-                db.session.commit()
-            except:
-                db.session.rollback()
-                # TODO: raise
-            session['rbTitle'] = _("Room has been deleted.")
-            session['rbDescription'] = _("You have successfully deleted the room. "
-                                         "All its archival, cancelled and rejected "
-                                         "bookings have also been deleted.")
-            self._redirect(urlHandlers.UHRoomBookingStatement.getURL())  # deletion confirmation
+            Room.removeRoom(self._room)
+            session['rbTitle'] = _('Room has been deleted.')
+            session['rbDescription'] = _('You have successfully deleted the room. '
+                                         'All its archival, cancelled and rejected '
+                                         'bookings have also been deleted.')
+            self._redirect(UH.UHRoomBookingStatement.getURL())  # deletion confirmation
 
 
-# TODO
 class RHRoomBookingRoomForm(RHRoomBookingAdminBase):
     """
     Form for creating NEW and MODIFICATION of an existing room.
     """
 
-    def _checkParams( self, params ):
-        # DATA FROM?
-        self._dataFrom = CandidateDataFrom.DEFAULTS
-        if params.get( "candDataInParams" ):
-            self._dataFrom = CandidateDataFrom.PARAMS
-        if session.get('rbCandDataInSession'):
-            self._dataFrom = CandidateDataFrom.SESSION
-
-        # Room ID?
-        roomID = None
-        roomLocation = None
-        if self._dataFrom == CandidateDataFrom.SESSION:
-            roomID = session.get('rbRoomID')
-            roomLocation = session.get('rbRoomLocation')
-        else:
-            roomID = params.get( "roomID" )
-            roomLocation = params.get( "roomLocation" )
-        if roomID: roomID = int( roomID )
-
-        # FORM MODE?
-        if roomID:
-            self._formMode = FormMode.MODIF
-        else:
-            self._formMode = FormMode.NEW
-
-        # SHOW ERRORS?
-        self._showErrors = session.get('rbShowErrors')
-        if self._showErrors:
-            self._errors = session.get('rbErrors')
-
-        # CREATE CANDIDATE OBJECT
-        candRoom = None
-        if self._formMode == FormMode.NEW:
-            locationName = params.get("roomLocation", "")
-            location = Location.parse(locationName)
-            if str(location) == "None":
-                # Room should be inserted into default backend => using Factory
-                candRoom = Factory.newRoom()
+    @requires_location(parameter_name='roomLocation', request_attribute='view_args')
+    def _checkParams(self):
+        self._new = 'roomID' not in request.view_args
+        self._room = session.pop('_rbRoom', None)
+        self._equipments = session.pop('_rbRoomEquipments', [])
+        if self._equipments:
+            self._equipments = [eq.id for eq in self._equipments]
+        self._bookable_times = session.pop('_rbBookableTimes',
+                                           [BookableTime(start_time=None, end_time=None)])
+        self._nonbookable_dates = session.pop('_rbNonBookableDates',
+                                              [NonBookableDate(start_date=None, end_date=None)])
+        if not self._room:
+            if self._new:
+                self._room = Room.getRoomWithDefaults()
             else:
-                candRoom = location.newRoom()
-            if self._dataFrom == CandidateDataFrom.SESSION:
-                self._loadRoomCandidateFromSession( candRoom )
-            else:
-                self._loadRoomCandidateFromDefaults( candRoom )
-
-        if self._formMode == FormMode.MODIF:
-            candRoom = CrossLocationQueries.getRooms( roomID = roomID, location = roomLocation )
-
-            if self._dataFrom == CandidateDataFrom.PARAMS:
-                self._loadRoomCandidateFromParams( candRoom, params )
-            if self._dataFrom == CandidateDataFrom.SESSION:
-                self._loadRoomCandidateFromSession( candRoom )
-
-        self._errors = session.get('rbErrors')
-
-        # After searching for responsible
-        if params.get( 'selectedPrincipals' ):
-            candRoom.responsibleId = params['selectedPrincipals']
-
-        self._candRoom = self._target = candRoom
-        self._clearSessionState()
+                self._room = Room.getRoomById(int(request.view_args.get('roomID')))
+                self._equipments = self._room.getEquipmentIds()
+                self._bookable_times = self._room.getBookableTimes()
+                self._nonbookable_dates = self._room.getNonBookableDates()
+        self._errors = session.pop('_rbErrors', [])
 
     def _process(self):
-        return adminPages.WPRoomBookingRoomForm(self).display()
+        return room_views.WPRoomBookingRoomForm(self).display()
 
 
 class RHRoomBookingSaveRoom(RHRoomBookingAdminBase):
@@ -138,69 +95,46 @@ class RHRoomBookingSaveRoom(RHRoomBookingAdminBase):
     When succeeded redirects to room details, otherwise returns to room form.
     """
 
-    def _uploadPhotos( self, candRoom, params ):
-        if (params.get( "largePhotoPath" ) and params.get( "smallPhotoPath" )
-            and params["largePhotoPath"].filename and params["smallPhotoPath"].filename):
-            candRoom.savePhoto( params["largePhotoPath"] )
-            candRoom.saveSmallPhoto( params["smallPhotoPath"] )
+    def _uploadPhotos(self, candRoom, params):
+        self._room.addPhoto(
+            Photo(
+                large_content=request.files.get('largePhotoPath'),
+                small_content=request.files.get('smallPhotoPath')
+            )
+        )
 
+    @requires_location('roomLocation')
     def _checkParams(self):
-        roomID = request.form.get('roomID')
-        roomLocation = request.form.get('roomLocation')
-
-        candRoom = None
-        if roomID:
-            self._formMode = FormMode.MODIF
-            candRoom = Room.getRoomById(int(roomID))
+        roomId = request.form.get('roomID', type=int)
+        if roomId:
+            self._room = Room.getRoomById(roomId)
+            if not self._room:
+                raise NotFoundError(_('There is no room with id: {0}').format(roomId))
         else:
-            self._formMode = FormMode.NEW
-            if roomLocation:
-                location = Location.getLocationByName(roomLocation)
-            else:
-                location = Location.getDefaultLocation()
-            room = Room('')  # name is required
-            location.addRoom(room)
-
-        self._loadRoomCandidateFromParams(candRoom, request.form)
-        self._candRoom = self._target = candRoom
+            self._room = Room.getRoomWithDefaults()
+        self._errors = self._checkAndSetParams()
+        self._target = self._room
 
     def _process(self):
-        candRoom = self._candRoom
-
-        errors = self._getErrorsOfRoomCandidate(candRoom)
-        if errors:
-            # Failed
-            session['rbActionSucceeded'] = False
-            session['rbCandDataInSession'] = True
-            session['rbErrors'] = errors
-            session['rbShowErrors'] = True
-
-            self._saveRoomCandidateToSession(candRoom)
-            url = urlHandlers.UHRoomBookingRoomForm.getURL(roomLocation=candRoom.location.name)
-            self._redirect(url) # Redirect again to FORM
+        if self._errors:
+            session['_rbErrors'] = self._errors
+            session['_rbRoom'] = self._room
+            session['_rbRoomEquipments'] = self._equipments
+            session['_rbBookableTimes'] = self._bookable_times
+            session['_rbNonBookableDates'] = self._nonbookable_dates
+            self._redirect(UH.UHRoomBookingRoomForm.getURL(roomLocation=self._location.name))
         else:
             # Succeeded
-            if self._formMode == FormMode.MODIF:
-                try:
-                    db.session.add(candRoom)
-                    db.session.commit()
-                except:
-                    db.session.rollback()
-                    # TODO: raise
-                # if responsibleId changed
-                candRoom.notifyAboutResponsibility()
-                url = urlHandlers.UHRoomBookingRoomDetails.getURL(candRoom)
-            elif self._formMode == FormMode.NEW:
-                try:
-                    db.session.add_all([candRoom.location, candRoom])
-                    db.session.commit()
-                except:
-                    db.session.rollback()
-                    # TODO: raise
-                candRoom.notifyAboutResponsibility()
-                url = urlHandlers.UHRoomBookingAdminLocation.getURL(candRoom.locationName, actionSucceeded=True)
-
-            self._uploadPhotos(candRoom, request.form)
-            session['rbActionSucceeded'] = True
-            session['rbFormMode'] = self._formMode
-            self._redirect(url)  # room details
+            self._room.setEquipments(self._equipments)
+            self._room.setBookableTimes(self._bookable_times)
+            self._room.setNonBookableDates(self._nonbookable_dates)
+            if self._room.id:
+                db.session.add(self._room)
+                self._room.notifyAboutResponsibility()
+                url = UH.UHRoomBookingRoomDetails.getURL(self._room)
+            else:
+                self._location.addRoom(self._room)
+                db.session.add(self._location)
+                self._room.notifyAboutResponsibility()
+                url = UH.UHRoomBookingAdminLocation.getURL(self._location, actionSucceeded=True)
+            self._redirect(url)
