@@ -20,12 +20,12 @@ function is_date_valid(v) {
         return false;
 
     // Checks for dd/mm/yyyy format.
-    var dt = v.match(/^(\d{1,2})(\/|-)(\d{1,2})(\/|-)(\d{4})$/);
+    var dt = v.match(/^(\d{1,2})[:\|\/\\-](\d{1,2})[:\|\/\\-](\d{4})$/);
     if (dt == null) return false;
 
-    day = dt[1];
-    month = dt[3];
-    year = dt[5];
+    day = parseInt(dt[1]);
+    month = parseInt(dt[2]);
+    year = parseInt(dt[3]);
 
     if (year < 1900 || year > 2100)
         return false;
@@ -47,14 +47,15 @@ function is_date_valid(v) {
 function is_time_valid(v) {
     if (!v) return false;
 
-    var t = v.match(/^(\d{1,2})-(\d{1,2})$/);
+    var t = v.match(/^(\d{1,2})[:-](\d{1,2})$/);
     if (t == null) return false;
 
-    hour = t[1]
-    min = [2]
+    hour = parseInt(t[1]);
+    min = parseInt(t[2]);
 
-    return hour >= 0 && hour <= 23 && min >= 0 && min <= 59
+    return hour >= 0 && hour <= 23 && min >= 0 && min <= 59;
 }
+
 
 function is_datetime_valid(v) {
     if(!v) return false;
