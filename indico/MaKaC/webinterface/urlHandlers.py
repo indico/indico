@@ -20,14 +20,16 @@ import re
 import os
 import string
 import urlparse
+
 from flask import request, session, url_for
 
-from MaKaC.common.url import URL, EndpointURL
-from indico.core.config import Config
 import MaKaC.user as user
+from MaKaC.common.url import URL, EndpointURL
 from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
+
+from indico.core.config import Config
 
 
 class BooleanMixin:
@@ -410,9 +412,9 @@ class UHRoomBookingWelcome(URLHandler):
     _endpoint = 'rooms.roomBooking'
 
 
-class UHRoomBookingSearch4Rooms(URLHandler):
+class UHRoomBookingSearch4Rooms(BooleanMixin, URLHandler):
     _endpoint = 'rooms.roomBooking-search4Rooms'
-    _defaultParams = dict(is_new_booking='n')
+    _defaultParams = dict(is_new_booking=False)
 
 
 class UHRoomBookingSearch4Bookings(URLHandler):
@@ -430,32 +432,11 @@ class UHRoomBookingRoomList(BooleanMixin, URLHandler):
 class UHRoomBookingBookingList(BooleanMixin, URLHandler):
     _endpoint = 'rooms.roomBooking-bookingList'
 
-    # @classmethod
-    # def getURL(cls, onlyMy=False, newBooking=False, ofMyRooms=False, onlyPrebookings=False, autoCriteria=False,
-    #            newParams=None, today=False, allRooms=False):
-    #     """
-    #     onlyMy - only bookings of the current user
-    #     ofMyRooms - only bookings for rooms managed by the current user
-    #     autoCriteria - some reasonable constraints, like "only one month ahead"
-    #     """
-    #     url = cls._getURL()
-    #     if onlyMy:
-    #         url.addParam('is_only_mine', 'y')
-    #     if newBooking:
-    #         url.addParam('is_new_nooking', 'y')
-    #     if ofMyRooms:
-    #         url.addParam('is_only_my_rooms', 'y')
-    #     if onlyPrebookings:
-    #         url.addParam('is_only_pre_bookings', 'y')
-    #     if autoCriteria:
-    #         url.addParam('is_auto_criteria', 'y')
-    #     if today:
-    #         url.addParam('is_today', 'y')
-    #     if allRooms:
-    #         url.addParam('room_id_list', '-1')
-    #     if newParams:
-    #         url.setParams(newParams)
-    #     return url
+    @classmethod
+    def getURL(cls, **kw):
+        url = cls._getURL()
+        url.setParams(kw)
+        return url
 
 
 class UHRoomBookingBookingListForBooking(UHRoomBookingBookingList):
