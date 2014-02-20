@@ -23,6 +23,8 @@ Schema of a blocking (dates, related rooms and principals)
 
 from datetime import datetime
 
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from indico.core.db import db
 
 
@@ -78,3 +80,7 @@ class Blocking(db.Model):
             self.start_date,
             self.end_date
         )
+
+    @hybrid_property
+    def is_active_at(self, d):
+        return self.start_date <= d <= self.end_date
