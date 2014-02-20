@@ -58,6 +58,7 @@ type ("RoomBookingRoom", [],
              * Return booking form url for the specified dates.
              */
             getBookingFormUrl: function(date, repeatability, flexibleDatesRange, minutes, finishDate, startD, endD, ignoreSession){
+
                 var ignSession = any(ignoreSession, false);
                 var urlParams = {
                     roomLocation: this.location,
@@ -962,8 +963,13 @@ type("RoomBookingPrevNext", [],
             draw: function(firstHeader){
                 var self = this;
                 var verbosePeriod = (this.startD == this.endD)
-                    ? $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('dd/mm/yy', this.endD))
-                    : $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('dd/mm/yy', this.startD)) + " -> " + $.datepicker.formatDate('DD, d MM yy', $.datepicker.parseDate('dd/mm/yy', this.endD));
+                    ? $.datepicker.formatDate('DD, d MM yy',
+                        $.datepicker.parseDate('dd/mm/yy', this.endD))
+                    : ($.datepicker.formatDate('DD, d MM yy',
+                        $.datepicker.parseDate('dd/mm/yy', this.startD)
+                       ) + " -> " + $.datepicker.formatDate('DD, d MM yy',
+                       $.datepicker.parseDate('dd/mm/yy', this.endD))
+                    );
 
                 function showDateSelector() {
                     var dlg = new DateRangeSelector(self.startD, self.endD, function(startDate, endDate) {
