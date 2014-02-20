@@ -17,30 +17,45 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from flask import request
+
+from copy import copy
+from collections import OrderedDict
 from datetime import datetime, timedelta
+from itertools import izip
 
 from MaKaC.common import Config
-from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.wcomponents import WTemplated
 
-from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.views import WPRoomBookingBase
+from indico.util.i18n import _
+
+from .. import WPRoomBookingBase
+from ...models.locations import Location
+from ...models.rooms import Room
+from ...models.reservations import RepeatMapping
+from ...models.utils import get_overlap
+from ..utils import (
+    Bar,
+    BlockingDetailsForBars,
+    DayBar,
+    RoomDetailsForBars,
+    getNewDictOnlyWith,
+    updateOldDateStyle
+)
 
 
 class WPRoomBookingBookRoom(WPRoomBookingBase):
 
     def __init__(self, rh):
+        WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
-        super(WPRoomBookingBookRoom, self).__init__(rh)
 
     def getJSFiles(self):
-        return (super(WPRoomBookingBookRoom, self).getJSFiles() +
-                self._includeJSPackage('RoomBooking'))
+        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
     def _getTitle(self):
-        return (super(WPRoomBookingBookRoom, self)._getTitle() +
-                " - " + _("Book a Room"))
+        return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Book a Room'))
 
     def _setCurrentMenuItem(self):
         self._bookRoomNewOpt.setActive(True)
@@ -55,22 +70,21 @@ class WRoomBookingBookRoom(WTemplated):
         self._rh = rh
 
     def getVars(self):
-        wvars = super(WRoomBookingBookRoom, self).getVars()
-        rooms = self._rh._rooms
+        wvars = WTemplated.getVars(self)
+        wvars['today'] = datetime.utcnow()
+        wvars['rooms'] = [r.to_serializable() for r in self._rh._rooms]
 
-        wvars["today"] = datetime.now()
-        wvars["rooms"] = fossilize(rooms)
-        wvars["maxRoomCapacity"] = max(room.capacity for room in rooms) if rooms else 0
-        wvars["roomBookingBookingListURL"] = urlHandlers.UHRoomBookingBookingListForBooking.getURL(newBooking='True')
-
+        wvars['maxRoomCapacity'] = self._rh._max_capacity
+        wvars['roomBookingBookingListURL'] = UH.UHRoomBookingBookingListForBooking.getURL()
+        wvars['formerBookingInterfaceURL'] = UH.UHRoomBookingSearch4Rooms.getURL(is_new_booking=True)
         return wvars
 
 
 class WPRoomBookingBookingDetails(WPRoomBookingBase):
 
     def __init__(self, rh):
+        WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
-        super(WPRoomBookingBookingDetails, self).__init__(rh)
 
     def _setCurrentMenuItem(self):
         self._bookRoomNewOpt.setActive(True)
@@ -88,66 +102,69 @@ class WRoomBookingDetails(WTemplated):
         self._standalone = (conference is None)
 
     def getVars(self):
-        wvars = super(WRoomBookingDetails, self).getVars()
-        wvars["standalone"] = self._standalone
-        wvars["reservation"] = self._resv
-        wvars["collisions"] = self._rh._collisions
-        wvars["config"] = Config.getInstance()
-        wvars["actionSucceeded"] = self._rh._afterActionSucceeded
+        wvars = WTemplated.getVars(self)
+        wvars['standalone'] = self._standalone
+        wvars['reservation'] = self._reservation
+        wvars['collisions'] = self._rh._collisions
+        wvars['config'] = Config.getInstance()
+        wvars['actionSucceeded'] = self._rh._afterActionSucceeded
         if self._rh._afterActionSucceeded:
-            wvars["title"] = self._rh._title
-            wvars["description"] = self._rh._description
+            wvars['title'] = self._rh._title
+            wvars['description'] = self._rh._description
 
         if self._standalone:
-            wvars["roomDetailsUH"] = urlHandlers.UHRoomBookingRoomDetails
-            wvars["modifyBookingUH"] = urlHandlers.UHRoomBookingModifyBookingForm
-            wvars["cloneURL"] = urlHandlers.UHRoomBookingCloneBooking.getURL(self._resv)
+            wvars['roomDetailsUH'] = UH.UHRoomBookingRoomDetails
+            wvars['modifyBookingUH'] = UH.UHRoomBookingModifyBookingForm
+            wvars['cloneURL'] = UH.UHRoomBookingCloneBooking.getURL(self._resv)
         else:
-            wvars["roomDetailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
-            wvars["modifyBookingUH"] = urlHandlers.UHConfModifRoomBookingModifyBookingForm
-            wvars["cloneURL"] = urlHandlers.UHConfModifRoomBookingCloneBooking.getURL(self._resv)
+            wvars['roomDetailsUH'] = UH.UHConfModifRoomBookingRoomDetails
+            wvars['modifyBookingUH'] = UH.UHConfModifRoomBookingModifyBookingForm
+            wvars['cloneURL'] = UH.UHConfModifRoomBookingCloneBooking.getURL(self._resv)
 
-        wvars["isPreBooking"] = not self._resv.isConfirmed
-        wvars["bookMessage"] = _("PRE-Booking") if wvars["isPreBooking"] else _("Booking")
+        wvars['isPreBooking'] = not self._reservation.is_confirmed
+        wvars['bookMessage'] = _('PRE-Booking') if wvars['isPreBooking'] else _('Booking')
+
+        wvars['canBeRejectedBy'] = None
+        wvars['canBeCancelledBy'] = None
 
         return wvars
 
 
 class WPRoomBookingBookingList(WPRoomBookingBase):
 
-    def __init__(self, rh, today=False, onlyMy=False, onlyPrebookings=False, onlyMyRooms=False):
+    def __init__(self, rh):
+        WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
-        super(WPRoomBookingBookingList, self).__init__(rh)
 
     def getJSFiles(self):
-        return (super(WPRoomBookingBookingList, self).getJSFiles() +
-                self._includeJSPackage('RoomBooking'))
+        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
     def _getTitle(self):
-        base_title = super(WPRoomBookingBookingList, self)._getTitle() + ' - '
-        if self._rh._today:
-            return base_title + _("Calendar")
-        elif self._rh._onlyMy and self._rh._onlyPrebookings:
-            return base_title + _("My PRE-bookings")
-        elif self._rh._onlyMy:
-            return base_title + _("My bookings")
-        elif self._rh._ofMyRooms and self._rh._onlyPrebookings:
-            return base_title + _("PRE-bookings in my rooms")
-        elif self._rh._ofMyRooms:
-            return base_title + _("Bookings in my rooms")
+        base_title = '{} - '.format(WPRoomBookingBase._getTitle(self))
+
+        if self._rh._form.is_today.data:
+            return base_title + _('Calendar')
+        elif self._rh._form.is_only_mine.data and self._rh._form.is_only_pre_bookings.data:
+            return base_title + _('My PRE-bookings')
+        elif self._rh._form.is_only_mine.data:
+            return base_title + _('My bookings')
+        elif self._rh._form.is_only_my_rooms.data and self._rh._form.is_only_pre_bookings.data:
+            return base_title + _('PRE-bookings in my rooms')
+        elif self._rh._form.is_only_my_rooms.data:
+            return base_title + _('Bookings in my rooms')
         else:
-            return base_title + _("Found bookings")
+            return base_title + _('Found bookings')
 
     def _setCurrentMenuItem(self):
-        if self._rh._today or self._rh._allRooms:
+        if self._rh._form.is_today.data or self._rh._form.is_all_rooms:
             self._bookingListCalendarOpt.setActive(True)
-        elif self._rh._onlyMy and self._rh._onlyPrebookings:
+        elif self._rh._form.is_only_mine.data and self._rh._form.is_only_pre_bookings.data:
             self._myPreBookingListOpt.setActive(True)
-        elif self._rh._onlyMy:
+        elif self._rh._form.is_only_mine.data:
             self._myBookingListOpt.setActive(True)
-        elif self._rh._ofMyRooms and self._rh._onlyPrebookings:
+        elif self._rh._form.is_only_my_rooms.data and self._rh._form.is_only_pre_bookings.data:
             self._usersPrebookings.setActive(True)
-        elif self._rh._ofMyRooms:
+        elif self._rh._form.is_only_my_rooms.data:
             self._usersBookings.setActive(True)
         else:
             self._bookRoomNewOpt.setActive(True)
@@ -156,307 +173,149 @@ class WPRoomBookingBookingList(WPRoomBookingBase):
         return WRoomBookingBookingList(self._rh).getHTML(params)
 
 
-class WRoomBookingBookingList(WTemplated):  # Standalone version
+class WRoomBookingBookingList(WTemplated):
 
     def __init__(self, rh):
         self._rh = rh
-        self._candResvs = rh._candResvs
-        self._title = None
-        try:
-            self._title = self._rh._title;
-        except:
-            pass
-
-    def _isOn(self, boolVal):
-        if boolVal:
-            return "on"
-        else:
-            return ""
 
     def getVars(self):
-        wvars = super(WRoomBookingBookingList, self).getVars()
-        rh = self._rh
-        candResvs = self._candResvs
+        wvars = WTemplated.getVars(self)
 
-        wvars["finishDate"] = rh._finishDate
-        wvars["bookingDetailsUH"] = urlHandlers.UHRoomBookingBookingDetails
-        wvars["withPhoto"] = False
-        wvars["title"] = self._title
-        wvars["search"] = rh._search
-        wvars["showRejectAllButton"] = rh._showRejectAllButton
-        wvars["prebookingsRejected"] = rh._prebookingsRejected
-        wvars["subtitle"] = rh._subtitle
-        wvars["description"] = rh._description
-        yesterday = datetime.now() - timedelta(1)
-        wvars["yesterday"] = yesterday  # datetime(dm.year, dm.month, dm.day, 0, 0, 1)
-        ed = None
-        sd = rh._resvEx.startDT.date()
-        if rh._resvEx.endDT:
-            ed = rh._resvEx.endDT.date()
-        else:
-            ed = sd + timedelta(7)
+        f = self._rh._form
 
-        if rh._ofMyRooms and not rh._rooms:
-            rh._resvs = []
-        # autoCriteria - dates are calculated based on the next reservation
-        elif rh._autoCriteria and not rh._resvs:
-            # reservation not found for the next 7 days, change search period to 30 days
-            ed = sd + timedelta(30)
-            rh._resvEx.startDT = datetime(sd.year, sd.month, sd.day, 0, 0)
-            rh._resvEx.endDT = datetime(ed.year, ed.month, ed.day, 23, 59)
-            rh._resvs = ReservationBase.getReservations(resvExample=rh._resvEx, rooms=rh._rooms)
-            firstResv = ReservationBase.findSoonest(rh._resvs, afterDT=yesterday)
-            if firstResv:
-                # extend period to latest reservation date if necessarily
-                sd = firstResv.startDT
-                ed = sd + timedelta(7)
+        wvars['title'] = self._rh._title
 
-        # set the calendar dates as calculated
-        calendarStartDT = datetime(sd.year, sd.month, sd.day, 0, 0)
-        calendarEndDT = datetime(ed.year, ed.month, ed.day, 23, 59)
+        wvars['bookingURL'] = UH.UHRoomBookingBookRoom.getURL()
 
-        from MaKaC.common.utils import formatDate
+        wvars['finishDate'] = f.finish_date.data
+        wvars['search'] = f.is_search.data
 
-        if  calendarStartDT.date() == calendarEndDT.date():
-            wvars["periodName"] = "day"
-        else:
-            wvars["periodName"] = "period"
-        wvars["startD"] = formatDate(calendarStartDT)
-        wvars["endD"] = formatDate(calendarEndDT)
+        wvars['showRejectAllButton'] = True  # rh._showRejectAllButton
+        wvars['prebookingsRejected'] = True  # rh._prebookingsRejected
 
-        # Data for previous/next URLs (it's about periods, not paging)
-        newParams4Previous = rh._reqParams.copy()
-        newParams4Next = rh._reqParams.copy()
-        if rh._reqParams.has_key('autoCriteria'):
-            del newParams4Previous['autoCriteria']
-            del newParams4Next['autoCriteria']
-        if rh._reqParams.has_key('day'):
-            del newParams4Previous['day']
-            del newParams4Next['day']
+        wvars['subtitle'] = ''  # rh._subtitle
+        wvars['description'] = ''  # rh._description
 
-        startD = calendarStartDT.date()
-        endD = calendarEndDT.date()
+        yesterday = datetime.utcnow() - timedelta(1)
+        wvars['yesterday'] = yesterday
 
-        if endD != startD:
-            period = endD - startD
-
-            prevStartD = startD - period - timedelta(1)
-            prevEndD = startD - timedelta(1)
-
-            nextStartD = endD + timedelta(1)
-            nextEndD = endD + period + timedelta(1)
-        else:
-            prevStartD = prevEndD = startD - timedelta(1)
-            nextStartD = nextEndD = endD + timedelta(1)
-
-        newParams4Previous['sDay'] = prevStartD.day
-        newParams4Previous['sMonth'] = prevStartD.month
-        newParams4Previous['sYear'] = prevStartD.year
-        newParams4Previous['eDay'] = prevEndD.day
-        newParams4Previous['eMonth'] = prevEndD.month
-        newParams4Previous['eYear'] = prevEndD.year
-
-        newParams4Next['sDay'] = nextStartD.day
-        newParams4Next['sMonth'] = nextStartD.month
-        newParams4Next['sYear'] = nextStartD.year
-        newParams4Next['eDay'] = nextEndD.day
-        newParams4Next['eMonth'] = nextEndD.month
-        newParams4Next['eYear'] = nextEndD.year
-
-        wvars["attributes"] = {}
+        wvars['attributes'] = {}
         wvars["withPrevNext"] = True
-        wvars["prevURL"] = urlHandlers.UHRoomBookingBookingList.getURL(newParams=newParams4Previous)
-        wvars["nextURL"] = urlHandlers.UHRoomBookingBookingList.getURL(newParams=newParams4Next )
 
-        wvars['overload'] = self._rh._overload
-        wvars['dayLimit'] = self._rh._dayLimit
-        wvars['newBooking'] = self._rh._newBooking
+        timediff = f.end_date.data - f.start_date.data
+        wvars['prevURL'] = UH.UHRoomBookingBookingList.getURL(
+            **getNewDictOnlyWith(
+                f.data,
+                keys=['room_id_list', 'repeat_unit', 'repeat_step', 'is_search'],
+                start_date=f.start_date.data-timediff-timedelta(1),
+                end_date=f.end_date.data-timediff-timedelta(1)
+            )
+        )
+        wvars['nextURL'] = UH.UHRoomBookingBookingList.getURL(
+            **getNewDictOnlyWith(
+                f.data,
+                keys=['room_id_list', 'repeat_unit', 'repeat_step', 'is_search'],
+                start_date=f.start_date.data+timediff+timedelta(1),
+                end_date=f.end_date.data+timediff+timedelta(1)
+            )
+        )
 
-        # empty days are shown for "User bookings" and "User pre-bookings"
-        # and for the calendar as well
-        # but not for the booking search
-        # showEmptyDays = ((self._rh._ofMyRooms or (not self._rh._ofMyRooms and not self._rh._onlyMy)) and
-        #                  not self._rh._search)
+        wvars['overload'] = True  # f._overload
+        wvars['dayLimit'] = 500   # self._rh._dayLimit
+        wvars['newBooking'] = f.is_new_booking.data
 
-        showEmptyDays = showEmptyRooms = not (self._rh._newBooking or self._rh._onlyMy)
+        # Bars
 
-        # Calendar related stuff ==========
+        barData, room_ids = {}, set()
+        for (d, room, location_name,
+             blocking_id, blocking_message, blocking_creator,
+             rids, reasons, booked_for_names, is_confirmed_statuses,
+             start_times, end_times) in self._rh._reservations:
+            room_ids.add(room.id)
 
-        bars = []
-        collisionsOfResvs = []
+            day = datetime.strftime(d, '%Y-%m-%d')
+            if day not in barData:
+                barData[day] = []
 
-        # Bars: Candidate reservation
-        collisions = []  # only with confirmed resvs
-        for candResv in candResvs:
-            periodsOfCandResv = candResv.splitToPeriods()
-            for b in candResv.getBlockedDates():
-                bStartDT = datetime.combine(b, datetime.min.time())
-                bEndDT = datetime.combine(b, datetime.max.time())
-                bars.append(Bar(Collision((bStartDT, bEndDT), candResv), Bar.BLOCKED))
-            for p in periodsOfCandResv:
-                bars.append(Bar(Collision((p.startDT, p.endDT), candResv), Bar.CANDIDATE))
+            room_data = DayBar(RoomDetailsForBars(room, location_name))
 
-            # Bars: Conflicts all vs candidate
-            candResvIsConfirmed = candResv.isConfirmed
-            candResv.isConfirmed = None
+            blocking_details = BlockingDetailsForBars(blocking_id, blocking_message, blocking_creator)
+            if blocking_id:
+                barData[day].addBar(Bar(
+                    day, datetime.max.time(), datetime.min.time(),
+                    Bar.BLOCKED,
+                    None, None, None, None,
+                    blocking_details
+                ))
 
-            candResv.startDT, calendarStartDT = calendarStartDT, candResv.startDT
-            candResv.endDT, calendarEndDT = calendarEndDT, candResv.endDT
+            occurrences = [
+                (None, None, None, False,
+                 f.start_date.data.time(), f.end_date.data.time())
+            ] + filter(lambda e: e[0] != None, izip(
+                rids, reasons, booked_for_names,
+                is_confirmed_statuses, start_times, end_times
+            ))
 
-            allCollisions = candResv.getCollisions()
+            for occ1 in occurrences:
+                occ1_id, occ1_reason, occ1_name, occ1_is_confirmed, occ1_st, occ1_et = occ1
+                room_data.addBar(Bar(
+                    day, occ1_st, occ1_et,
+                    Bar.get_kind(occ1_id, occ1_is_confirmed),
+                    occ1_id, occ1_reason, occ1_name, location_name,
+                    blocking_details
+                ))
+                for occ2 in occurrences:
+                    if occ1 == occ2 or not occ1_id:
+                        continue
+                    occ2_id, occ2_reason, occ2_name, occ2_is_confirmed, occ2_st, occ2_et = occ2
 
-            candResv.startDT, calendarStartDT = calendarStartDT, candResv.startDT
-            candResv.endDT, calendarEndDT = calendarEndDT, candResv.endDT
+                    overlap = get_overlap(occ1_st, occ1_et, occ2_st, occ2_et)
+                    if overlap:
+                        st, et = overlap
+                        room_data.addBar(Bar(
+                            day, st, et,
+                            Bar.get_kind(occ1_id, occ1_is_confirmed, occ2_id, occ2_is_confirmed),
+                            occ1_id, occ1_reason, occ1_name, location_name,
+                            blocking_details
+                        ))
+            barData[day].append(room_data.to_serializable())
 
-            candResv.isConfirmed = candResvIsConfirmed
-            if candResv.id:
-                # Exclude candidate vs self pseudo-conflicts (Booking modification)
-                allCollisions = filter(lambda c: c.withReservation.id != candResv.id, allCollisions)
-            for c in allCollisions:
-                if c.withReservation.isConfirmed:
-                    bars.append(Bar(c, Bar.UNAVAILABLE))
-                else:
-                    bars.append(Bar(c, Bar.PREBOOKED))
+        wvars['barsFossil'] = barData
+        wvars['numOfRooms'] = len(room_ids)
+        wvars['manyRooms'] = wvars['numOfRooms'] > 0
+        wvars['periodName'] = 'day' if f.start_date.data == f.end_date.data else 'period'
+        wvars['startD'] = f.start_date.data.date().strftime('%d/%m/%Y')
+        wvars['endD'] = f.end_date.data.date().strftime('%d/%m/%Y')
+        wvars['repeatability'] = RepeatMapping.getOldMapping(f.repeat_unit.data, f.repeat_step.data)
 
-            allCollisions = candResv.getCollisions()
+        wvars['conflictsNumber'] = 0
+        wvars['thereAreConflicts'] = False
 
-            for c in allCollisions:
-                if c.withReservation.isConfirmed:
-                    bars.append(Bar(c, Bar.CONFLICT))
-                    collisions.append(c)
-                else:
-                    bars.append(Bar(c, Bar.PRECONFLICT))
+        wvars['flexibleDatesRange'] = f.flexible_dates_range.data
+        wvars['ofMyRooms'] = f.is_only_my_rooms.data
+        wvars['calendarFormUrl'] = UH.UHRoomBookingBookingList.getURL(
+            room_id_list=-1,
+            start_date=datetime.utcnow(),
+            end_date=datetime.utcnow()
+        )
 
-            wvars["conflictsNumber"] = len(collisions)
-            if not candResv.isRejected and not candResv.isCancelled:
-                wvars["thereAreConflicts"] = wvars["conflictsNumber"] > 0
-            else:
-                wvars["thereAreConflicts"] = False
-
-        # there's at least one reservation
-        if len(rh._resvs) > 0:
-
-            # Prepare the list of Collisions
-            # (collision is just a helper object, it's not the best notion here)
-
-            for r in rh._resvs:
-                for p in r.splitToPeriods(endDT=calendarEndDT, startDT=calendarStartDT):
-                    if p.startDT >= calendarStartDT and p.endDT <= calendarEndDT:
-                        collisionsOfResvs.append(Collision((p.startDT, p.endDT), r))
-
-            # Translate collisions to Bars
-            for c in collisionsOfResvs:
-                if c.withReservation.isConfirmed:
-                    bars.append(Bar(c, Bar.UNAVAILABLE))
-                else:
-                    bars.append(Bar(c, Bar.PREBOOKED))
-
-            bars = barsList2Dictionary(bars)
-            bars = addOverlappingPrebookings(bars)
-            bars = sortBarsByImportance(bars, calendarStartDT, calendarEndDT)
-
-            rooms = set(r.room for r in rh._resvs)
-
-            #CrossLocationQueries.getRooms( location = self.location )
-            if not self._rh._onlyMy:
-                rooms = self._rh._rooms
-
-            bars = introduceRooms(rooms, bars, calendarStartDT,
-                                  calendarEndDT, showEmptyDays=showEmptyDays,
-                                  showEmptyRooms=showEmptyRooms, user=rh._aw.getUser())
-
-            wvars["Bar"] = Bar
-
-            self.__sortUsingCriterion(rh._order, collisionsOfResvs)
-
-        # we want to display every room, with or without reservation
-        else:
-            # initialize collision bars
-            bars = barsList2Dictionary(bars)
-            bars = sortBarsByImportance(bars, calendarStartDT, calendarEndDT)
-
-            # insert rooms
-            if not self._rh._onlyMy:
-                rooms = self._rh._rooms
-            else:
-                rooms = []
-
-            bars = introduceRooms(rooms, bars, calendarStartDT,
-                                  calendarEndDT, showEmptyDays=showEmptyDays,
-                                  showEmptyRooms=showEmptyRooms, user=rh._aw.getUser())
-
-        fossilizedBars = {}
-        for key in bars:
-            cachedDayBars = self._rh._dayBars.get(str(key))
-            if not cachedDayBars:
-                fossilizedBars[str(key)] = [fossilize(bar, IRoomBarFossil) for bar in bars[key]]
-            else:
-                fossilizedBars[str(key)] = cachedDayBars
-        if self._rh._updateCache:
-            self._rh._cache.set_multi(fossilizedBars, 7200)
-        resvIds = set()
-        for dayBars in fossilizedBars.itervalues():
-            for roomBars in dayBars:
-                for bar in roomBars['bars']:
-                    resvIds.add(bar['forReservation']['id'])
-        numResvs = len(resvIds)
-        wvars["barsFossil"] = fossilizedBars
-        wvars["numResvs"] = numResvs
-        wvars["dayAttrs"] = fossilize({})
-        wvars["showEmptyRooms"] = showEmptyRooms
-        wvars["manyRooms"] = not self._rh._rooms or len(self._rh._rooms) > 1
+        wvars['dayAttrs'] = {}
         wvars["calendarParams"] = {}
-        if self._title and rh._ofMyRooms:
-            wvars["calendarParams"]["ofMyRooms"] = "on"
-        elif rh._onlyMy:
-            wvars["calendarParams"]["onlyMy"] = "on"
-        elif rh._allRooms:
-            wvars["calendarParams"]["roomGUID"] = "allRooms"
-        else:
-            for room in rh._roomGUIDs:
-                wvars["calendarParams"]["roomGUID"] = room
-        if rh._onlyPrebookings:
-            wvars["calendarParams"]["onlyPrebookings"] = "on"
-        if rh._onlyBookings:
-            wvars["calendarParams"]["onlyBookings"] = "on"
-        wvars["repeatability"] = rh._repeatability
-        wvars["flexibleDatesRange"] = rh._flexibleDatesRange
-        wvars["calendarFormUrl"] = urlHandlers.UHRoomBookingBookingList.getURL()
-        wvars["numRooms"] = len(rh._rooms) if rh._rooms else 0
-        wvars["ofMyRooms"] = rh._ofMyRooms
-
         return wvars
-
-    def __sortUsingCriterion(self, order, uresvs):
-
-        if order == "" or order == "room":
-            # standard sorting order (by room, and then date)
-            uresvs.sort(lambda r1, r2:
-                        cmp(r1.withReservation.room.name, r2.withReservation.room.name))
-        else:
-            if order == 'date':
-                uresvs.sort(lambda r1, r2:
-                            cmp(r1.startDT, r2.startDT))
-            elif order == 'reason':
-                uresvs.sort(lambda r1, r2:
-                            cmp(r1.withReservation.reason.lower(), r2.withReservation.reason.lower()))
-            elif order == 'for':
-                uresvs.sort(lambda r1, r2:
-                            cmp(r1.withReservation.bookedForName.lower(), r2.withReservation.bookedForName.lower()))
-            elif order == 'hours':
-                uresvs.sort(lambda r1, r2:
-                            cmp(r1.startDT.time(), r2.startDT.time()))
 
 
 class WPRoomBookingSearch4Bookings(WPRoomBookingBase):
 
     def __init__(self, rh):
+        WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
-        super(WPRoomBookingSearch4Bookings, self).__init__(rh)
 
     def _getTitle(self):
-        return (super(WPRoomBookingBase, self)._getTitle() +
-                " - " + _("Search for bookings"))
+        return '{} - {}'.format(WPRoomBookingBase._getTitle(self),
+                                _('Search for bookings'))
+
+    def getJSFiles(self):
+        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
     def _setCurrentMenuItem(self):
         self._bookingListSearchOpt.setActive(True)
@@ -471,15 +330,15 @@ class WRoomBookingSearch4Bookings(WTemplated):
         self._rh = rh
 
     def getVars(self):
-        wvars = super(WRoomBookingSearch4Bookings, self).getVars()
+        wvars = WTemplated.getVars(self)
 
-        wvars["today"] = datetime.now()
-        wvars["weekLater"] = datetime.now() + timedelta(7)
-        wvars["Location"] = Location
-        wvars["rooms"] = self._rh._rooms
-        wvars["repeatability"] = None
-        wvars["isResponsibleForRooms"] = Room.isAvatarResponsibleForRooms(self._rh.getAW().getUser())
-        wvars["roomBookingBookingListURL"] = urlHandlers.UHRoomBookingBookingList.getURL(None)
+        wvars['today'] = datetime.utcnow()
+        wvars['weekLater'] = datetime.utcnow() + timedelta(7)
+        wvars['Location'] = Location
+        wvars['rooms'] = self._rh._rooms
+        wvars['repeatability'] = None
+        wvars['isResponsibleForRooms'] = Room.isAvatarResponsibleForRooms(self._rh.getAW().getUser())
+        wvars['roomBookingBookingListURL'] = UH.UHRoomBookingBookingList.getURL()
 
         return wvars
 
@@ -487,12 +346,11 @@ class WRoomBookingSearch4Bookings(WTemplated):
 class WPRoomBookingBookingForm(WPRoomBookingBase):
 
     def getJSFiles(self):
-        return (super(WPRoomBookingBookingForm, self).getJSFiles() +
-                self._includeJSPackage('RoomBooking'))
+        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
     def __init__(self, rh):
+        WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
-        super(WPRoomBookingBookingForm, self).__init__(rh)
 
     def _setCurrentMenuItem(self):
         self._bookRoomNewOpt.setActive(True)
@@ -509,29 +367,27 @@ class WRoomBookingBookingForm(WTemplated):
         self._standalone = standalone
 
     def getVars(self):
-        wvars = super(WRoomBookingBookingForm, self).getVars()
+        wvars = WTemplated.getVars(self)
 
-        wvars["standalone"] = self._standalone
-        wvars["config"] = Config.getInstance()
+        wvars['standalone'] = self._standalone
+        wvars['config'] = Config.getInstance()
 
         if self._standalone:
-            wvars["conf"] = None
-            wvars["saveBookingUH"] = urlHandlers.UHRoomBookingSaveBooking
-            wvars["roomDetailsUH"] = urlHandlers.UHRoomBookingRoomDetails
-            wvars["calendarPreviewUH"] = urlHandlers.UHRoomBookingBookingForm
-            wvars["bookingFormURL"] = urlHandlers.UHRoomBookingBookingForm
+            wvars['conf'] = None
+            wvars['saveBookingUH'] = UH.UHRoomBookingSaveBooking.getURL(None)
+            wvars['roomDetailsUH'] = UH.UHRoomBookingRoomDetails.getURL(None)
+            wvars['bookingFormURL'] = UH.UHRoomBookingBookingForm.getURL(None)
         else:
-            wvars["conf"] = self._rh._conf
-            wvars["saveBookingUH"] = urlHandlers.UHConfModifRoomBookingSaveBooking
-            wvars["roomDetailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
-            wvars["calendarPreviewUH"] = urlHandlers.UHConfModifRoomBookingBookingForm
-            wvars["bookingFormURL"] = urlHandlers.UHConfModifRoomBookingBookingForm
+            wvars['conf'] = self._rh._conf
+            wvars['saveBookingUH'] = UH.UHConfModifRoomBookingSaveBooking.getURL(wvars['conf'])
+            wvars['roomDetailsUH'] = UH.UHConfModifRoomBookingRoomDetails.getURL(wvars['conf'])
+            wvars['bookingFormURL'] = UH.UHConfModifRoomBookingBookingForm.getURL(wvars['conf'])
 
-        wvars["candResv"] = self._candResv
-        wvars["startDT"] = self._candResv.startDT
-        wvars["endDT"] = self._candResv.endDT
-        wvars["startT"] = ''
-        wvars["endT"] = ''
+        wvars['candResv'] = self._candResv
+        wvars['startDT'] = self._candResv.startDT
+        wvars['endDT'] = self._candResv.endDT
+        wvars['startT'] = ''
+        wvars['endT'] = ''
         if any((self._candResv.startDT.hour,
                 self._candResv.startDT.minute,
                 self._candResv.endDT.hour,
@@ -539,10 +395,10 @@ class WRoomBookingBookingForm(WTemplated):
             wvars["startT"] = '%02d:%02d' % (self._candResv.startDT.hour, self._candResv.startDT.minute)
             wvars["endT"] = '%02d:%02d' % (self._candResv.endDT.hour, self._candResv.endDT.minute)
 
-        wvars["showErrors"] = self._rh._showErrors
-        wvars["errors"] = self._rh._errors
-        wvars["thereAreConflicts"] = self._rh._thereAreConflicts
-        wvars["skipConflicting"] = self._rh._skipConflicting
+        wvars['showErrors'] = self._rh._showErrors
+        wvars['errors'] = self._rh._errors
+        wvars['thereAreConflicts'] = self._rh._thereAreConflicts
+        wvars['skipConflicting'] = self._rh._skipConflicting
 
         if self._rh._formMode == FormMode.MODIF:
             wvars["allowPast"] = "true"
