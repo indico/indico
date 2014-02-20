@@ -184,21 +184,19 @@ class WRoomBookingRoomList(WTemplated):
 
 class WPRoomBookingSearch4Rooms(WPRoomBookingBase):
 
-    def __init__(self, rh, forNewBooking=False):
+    def __init__(self, rh, is_new_booking=False):
+        WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
-        self._forNewBooking = forNewBooking
-        super(WPRoomBookingSearch4Rooms, self).__init__(rh)
+        self._is_new_booking = is_new_booking
 
     def getJSFiles(self):
-        return (super(WPRoomBookingSearch4Rooms, self).getJSFiles() +
-                self._includeJSPackage('RoomBooking'))
+        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
     def _getTitle(self):
-        return (super(WPRoomBookingSearch4Rooms, self)._getTitle() +
-                " - " + _("Search for rooms"))
+        return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Search for rooms'))
 
     def _setCurrentMenuItem(self):
-        if self._forNewBooking:
+        if self._is_new_booking:
             self._bookARoomOpt.setActive(True)
         else:
             self._roomSearchOpt.setActive(True)
@@ -214,9 +212,9 @@ class WRoomBookingSearch4Rooms(WTemplated):
         self._rh = rh
 
     def getVars(self):
-        wvars = super(WRoomBookingSearch4Rooms, self).getVars()
+        wvars = WTemplated.getVars(self)
 
-        wvars["standalone"] = self._standalone
+        wvars['standalone'] = self._standalone
 
         wvars["Location"] = Location  # TODO: template logic should come here
         wvars["rooms"] = self._rh._rooms

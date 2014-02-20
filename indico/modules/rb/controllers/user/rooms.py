@@ -207,43 +207,14 @@ class RHRoomBookingRoomList(AttributeSetterMixin, RHRoomBookingBase):
 
 class RHRoomBookingSearch4Rooms(RHRoomBookingBase):
 
-    # def _cleanDefaultsFromSession(self):
-    #     session.pop("rbDefaultStartDT", None)
-    #     session.pop("rbDefaultEndDT", None)
-    #     session.pop("rbDefaultRepeatability", None)
-    #     session.pop("rbDefaultBookedForId", None)
-    #     session.pop("rbDefaultBookedForName", None)
-    #     session.pop("rbDefaultReason", None)
-    #     session.pop("rbAssign2Session", None)
-    #     session.pop("rbAssign2Contribution", None)
-
-    # def _setGeneralDefaultsInSession(self):
-    #     now = datetime.now()
-
-    #     # if it's saturday or sunday, postpone for monday as a default
-    #     if now.weekday() in [5,6]:
-    #         now = now + timedelta(7 - now.weekday())
-
-    #     session["rbDefaultStartDT"] = datetime(now.year, now.month, now.day, 8, 30)
-    #     session["rbDefaultEndDT"] = datetime(now.year, now.month, now.day, 17, 30)
-
     def _checkParams(self):
-        # params = request.args if request.method == 'GET' else request.form
-        # self._cleanDefaultsFromSession()
-        # self._setGeneralDefaultsInSession()
-        # self._eventRoomName = None
         self._is_new_booking = request.values.get('is_new_booking', type=bool, default=False)
-        # self._forNewBooking = params.get('forNewBooking', type=bool)  # == True
 
     def _businessLogic(self):
         self._rooms = Room.getAllRooms()
-        # self._rooms = CrossLocationQueries.getRooms(allFast=True)
-        # self._rooms.sort()
-        # self._equipment = RoomAttributeKey.getAllAttributeKeys()
-        # self._equipment = CrossLocationQueries.getPossibleEquipment()
 
     def _process(self):
-        self._businessLogic()
+        self._rooms = Room.getRooms()
         return room_views.WPRoomBookingSearch4Rooms(self, self._forNewBooking).display()
 
 
