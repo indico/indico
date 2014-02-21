@@ -22,6 +22,7 @@ from indico.core.db import DBMgr
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.webinterface import urlHandlers
 from MaKaC.conference import ConferenceHolder
+from indico.web.flask.app import make_app
 
 WGET_COMMAND = """wget -nv -mk --accept '*confId=%s*,*conferenceTimeTable.py*,*confAuthorIndex.py*,*internalPage.py*,*materialDisplay.py*,*access*,*sessionDisplay.py*,*contributionDisplay.py*,*contributionListDisplay.py*,*conferenceProgram.py*,*getVars*,*.ico,*.png,*.jpg,*.gif,*.css,*.js' --html-extension %s -P %s --domains='%s'"""
 
@@ -129,4 +130,6 @@ def generateIndex(dest, index, day):
     print "done!"
 
 if __name__ == '__main__':
-    main()
+    appplication = make_app(True)
+    with appplication.app_context():
+        main()
