@@ -393,7 +393,13 @@ class CSBooking(CSBookingBase):
             self._setAutomute()
 
     def checkAttachParams(self, bookingParams):
-        if bookingParams["roomName"] == self.getBookingParamByName("roomName") and bookingParams.get("videoLinkType") == self.getBookingParamByName("videoLinkType"):
+        if bookingParams["roomName"] == self.getBookingParamByName("roomName") and \
+            bookingParams.get("videoLinkType") == self.getBookingParamByName("videoLinkType") and \
+            (bookingParams.get("videoLinkType") == "event" or
+             (bookingParams.get("videoLinkType") == "session" and
+              bookingParams.get("videoLinkSession") == self.getBookingParamByName("videoLinkSession")) or
+             (bookingParams.get("videoLinkType") == "contribution" and
+              bookingParams.get("videoLinkContribution") == self.getBookingParamByName("videoLinkContribution"))):
             return VidyoError("duplicated", "attach")
 
     def _attach(self):
