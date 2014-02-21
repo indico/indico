@@ -710,7 +710,7 @@ class CSBooking(CSBookingBase):
     def notifyDeletion(self, obj):
         # If the object it is a Conference we already made the deletion process
         # Take into account SessionSlot or Contributions
-        if isinstance(obj, (SessionSlot, Contribution)):
+        if isinstance(obj, (SessionSlot, Contribution)) and self.getLinkId() == obj.getUniqueId():
             csBookingManager = Catalog.getIdx("cs_bookingmanager_conference").get(obj.getConference().getId())
             csBookingManager.removeBooking(self.getId())
 

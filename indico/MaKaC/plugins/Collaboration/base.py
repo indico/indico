@@ -793,6 +793,9 @@ class CSBookingManager(Persistent, Observer):
         """
         for booking in self.getBookingList():
             try:
+                # We will delete the bookings connected to the event, not Contribution or
+                if booking.getLinkType() and booking.getLinkType() != "event":
+                    continue
                 removeResult = booking._delete()
                 if isinstance(removeResult, CSErrorBase):
                     Logger.get('VideoServ').warning("Error while deleting a booking of type %s after deleting an event: %s"%(booking.getType(), removeResult.getLogMessage() ))
