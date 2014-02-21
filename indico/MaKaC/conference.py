@@ -10680,7 +10680,10 @@ class Material(CommonObjectBase):
             # or use them as keys.
             return cmp(hash(self), hash(other))
         if self.getConference() == other.getConference():
-            return cmp(self.getId(), other.getId())
+            if self.getId().isdigit() and other.getId().isdigit():
+                return cmp(int(self.getId()), int(other.getId()))
+            else:
+                return cmp(self.getId(), other.getId())
         return cmp(self.getConference(), other.getConference())
 
     def updateNonInheritingChildren(self, elem, delete=False):

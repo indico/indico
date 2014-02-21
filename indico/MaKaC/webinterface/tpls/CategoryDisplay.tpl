@@ -81,6 +81,14 @@ from MaKaC.webinterface.general import strfFileSize
                     ${upcomingEvents}
             % endif
         % else:
+            % if managers:
+                <h2 class="icon-medal">${ _("Managers") }</h2>
+                <ul id="manager-list">
+                % for type, mgr_name in managers:
+                    <li class="${type}">${mgr_name}</li>
+                % endfor
+                </ul>
+            % endif
             % if materials or allowUserModif:
                 <div>
                     % if allowUserModif:
@@ -113,21 +121,13 @@ from MaKaC.webinterface.general import strfFileSize
                                     ${getResourceName(resource)}
                                 </a>
                                 % endif
-                                % if resource.isProtected():
+                                % if resource.isItselfProtected():
                                     <img src="${Config.getInstance().getSystemIconURL('protected')}" style="vertical-align: middle; border: 0;">
                                 % endif
                             </li>
                         % endfor
                         </ul>
                      </li>
-                % endfor
-                </ul>
-            % endif
-            % if managers:
-                <h2 class="icon-medal">${ _("Managers") }</h2>
-                <ul id="manager-list">
-                % for type, mgr_name in managers:
-                    <li class="${type}">${mgr_name}</li>
                 % endfor
                 </ul>
             % endif
@@ -158,8 +158,6 @@ from MaKaC.webinterface.general import strfFileSize
 $(document).ready(function(){
 
     $("#category-toolbar").dropdown();
-
-    $(".category-sidebar").css('height', $(".category-container").height());
 
     var PROTECTION_TEXT = {
             'domain': $T("This category is protected by domain: "),

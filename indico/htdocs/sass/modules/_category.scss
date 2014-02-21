@@ -154,9 +154,16 @@
             color: $gray;
         }
 
+        .material-title-icon {
+            font-size: 0.8em;
+            padding-top: 0.2em;
+        }
+
     }
 
     li h3 {
+        font-family: Helvetica Neue, Helvetica, Verdana, Arial, Sans;
+        font-weight: normal;
         font-size: 1em;
         margin-top: 0;
         margin-bottom: 0.5em;
