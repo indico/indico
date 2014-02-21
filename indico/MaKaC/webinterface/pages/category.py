@@ -47,7 +47,7 @@ from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
 
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import Avatar, AvatarHolder
+from MaKaC.user import Avatar
 
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
@@ -1012,8 +1012,7 @@ class WCategoryStatistics(wcomponents.WTemplated):
         else:
             stats.append(_("This category doesn't contain any event. No statistics are available."))
             wvars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
-        users = len(AvatarHolder().getList())
-        stats.append(i18nformat("""<b> _("Number of users"): {0}</b>""").format(users))
+        stats.append(i18nformat("""<b> _("Number of users"): {0}</b>""").format(self._stats["users"]))
         wvars["contents"] = "<br><br>".join(stats)
         return wvars
 

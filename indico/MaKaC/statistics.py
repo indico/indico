@@ -21,6 +21,8 @@ from indico.core.db import DBMgr
 
 from indico.util.date_time import nowutc
 
+from MaKaC.user import AvatarHolder
+
 
 class Statistics(object):
     """
@@ -63,7 +65,7 @@ class CategoryStatistics(Statistics):
             statistics["events"][year] = 1
         if len(event.getContributionList()) > 0:
             for cont in event.getContributionList():
-                if cont.getStartDate() != None:
+                if cont.getStartDate() is not None:
                     year = cont.getStartDate().year
                     if year in statistics["contributions"]:
                         statistics["contributions"][year] += 1
@@ -92,7 +94,6 @@ class CategoryStatistics(Statistics):
 
     @classmethod
     def _updateStatistics(cls, cat, dbi, level=0, logger=None):
-
         stats = cat.getStatistics()
         stats["events"] = {}
         stats["contributions"] = {}
@@ -124,6 +125,7 @@ class CategoryStatistics(Statistics):
                 cls._processEvent(dbi, event, stats)
 
         stats["updated"] = nowutc()
+        stats["users"] = len(AvatarHolder().getList())
         cat._statistics = stats
         cat._p_changed = 1
 

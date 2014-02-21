@@ -11,11 +11,17 @@
   $.jqplot('chartdiv_${tagName}',
            [stats],
            { title:'${statsName}: ${total}',
-             axesDefaults: {
-               tickInterval: 1,
-               tickOptions:{formatString: '%d'}
-             },
-             axes:{xaxis:{min:${min}, max:${max}}},
+             axes: {
+              xaxis: {
+                min:${min},
+                max:${max},
+                tickInterval: 1,
+                tickOptions:{formatString: '%d'}
+              },
+              yaxis: {
+                min: 0
+              }
+            },
              series:[{color:'#5FAB78'}]
            });
 </script>

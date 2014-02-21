@@ -10,20 +10,8 @@
     </div>
 
 <br>
-<table width="100%" cellpadding="0" cellspacing="0" border="0">
-    <tr><td>&nbsp;</td></tr>
-    <tr>
-        <td colspan="2">
-            ${ contents }
-            <br>
-            <br>
-            <table cellpadding="0" cellspacing="0" width="100%">
-                 <tr>
-                        <td colspan="2" align="right"> ${ _("Updated") } ${ updated }
-                        </td>
-                  </tr>
-            </table>
-        </td>
-    </tr>
-</table>
+${ contents }
+<br>
+<br>
+<div align="right"> ${ _("Updated") } ${ updated }</div>
 </div>
