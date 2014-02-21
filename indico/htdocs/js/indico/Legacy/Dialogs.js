@@ -210,8 +210,8 @@ extend(IndicoUI.Dialogs,
                            colorPicker.setFixedPosition();
                            var colorPickerComponent = ['Color', Html.div({style: {padding: '5px 0 10px 0'}}, colorPicker.getLink(null, 'Choose a color'))];
                            var contentDiv = $("<div></div>").append(IndicoUtil.createFormFromMap([
-                                   [$T('Title'), $B(parameterManager.add(Html.edit({ id: 'sessionTitle'}), 'text', false), info.accessor('title'))],
-                                   [$T('Sub-Title'), $B(parameterManager.add(Html.edit({ id: 'subtitle'}), 'text', true), info.accessor('subtitle'))],
+                                   [$T('Title'), $B(parameterManager.add(Html.edit({ id: 'sessionTitle', autocomplete: 'off'}), 'text', false), info.accessor('title'))],
+                                   [$T('Sub-Title'), $B(parameterManager.add(Html.edit({ id: 'subtitle', autocomplete: 'off'}), 'text', true), info.accessor('subtitle'))],
                                    [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), info.accessor('description'))],
                                    [$T('Date'), conferenceDays],
                                    startEndTimeComponent,
