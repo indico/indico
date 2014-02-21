@@ -24,20 +24,18 @@ from flask import request, session
 from MaKaC.common.cache import GenericCache
 from MaKaC.webinterface.locators import WebLocator
 
-from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.controllers.mixins import AttributeSetterMixin
-# from indico.modules.rb.models.location_attribute_keys import LocationAttributeKey
-from indico.modules.rb.models.locations import Location
-# from indico.modules.rb.models.room_attribute_keys import RoomAttributeKey
-from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.views.user import rooms as room_views
-
 # from indico.core.errors import NotFoundError
 # from indico.util.i18n import _
 
+from .. import RHRoomBookingBase
 from ..decorators import requires_location, requires_room
+from ..mixins import AttributeSetterMixin
+from ...models.locations import Location
 from ...models.reservations import RepeatUnit
+from ...models.rooms import Room
+from ...models.room_equipments import RoomEquipment
 from ...models.utils import next_work_day
+from ...views.user import rooms as room_views
 
 
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
@@ -210,12 +208,14 @@ class RHRoomBookingSearch4Rooms(RHRoomBookingBase):
     def _checkParams(self):
         self._is_new_booking = request.values.get('is_new_booking', type=bool, default=False)
 
-    def _businessLogic(self):
-        self._rooms = Room.getAllRooms()
-
     def _process(self):
+        # TODO: make this only one query
         self._rooms = Room.getRooms()
-        return room_views.WPRoomBookingSearch4Rooms(self, self._forNewBooking).display()
+        self._locations = Location.getLocations()
+        self._equipments = RoomEquipment.getEquipments()
+        self._is_user_responsible_for_rooms = Room.isAvatarResponsibleForRooms(self.getAW().getUser())
+        self._event_room_name = None
+        return room_views.WPRoomBookingSearch4Rooms(self, self._is_new_booking).display()
 
 
 class RHRoomBookingRoomDetails(RHRoomBookingBase):

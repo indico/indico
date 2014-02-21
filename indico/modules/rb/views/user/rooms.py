@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 
 from dateutil.relativedelta import relativedelta
 from flask import session
@@ -28,8 +28,9 @@ from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 
 from ...models.locations import Location
-from ...models.reservations import RepeatMapping
+from ...models.reservations import RepeatMapping, RepeatUnit
 from ...models.rooms import Room
+from ...models.utils import next_work_day
 from ...views import WPRoomBookingBase
 from ...views.utils import makePercentageString
 
@@ -215,33 +216,31 @@ class WRoomBookingSearch4Rooms(WTemplated):
         wvars = WTemplated.getVars(self)
 
         wvars['standalone'] = self._standalone
+        wvars['forNewBooking'] = self._rh._is_new_booking
+        wvars['eventRoomName'] = self._rh._event_room_name
 
-        wvars["Location"] = Location  # TODO: template logic should come here
-        wvars["rooms"] = self._rh._rooms
-        wvars["possibleEquipment"] = self._rh._equipment
-        wvars["forNewBooking"] = self._rh._forNewBooking
-        wvars["eventRoomName"] = self._rh._eventRoomName
-        wvars["isResponsibleForRooms"] = Room.isAvatarResponsibleForRooms(self._rh.getAW().getUser())
+        wvars['locations'] = self._rh._locations
+        wvars['rooms'] = self._rh._rooms
+        wvars['possibleEquipment'] = self._rh._equipments
+        wvars['isResponsibleForRooms'] = Room.isAvatarResponsibleForRooms(self._rh.getAW().getUser())
 
-        wvars["preview"] = False
-
-        wvars["startDT"] = session.get("rbDefaultStartDT")
-        wvars["endDT"] = session.get("rbDefaultEndDT")
-        wvars["startT"] = session.get("rbDefaultStartDT").time().strftime("%H:%M")
-        wvars["endT"] = session.get("rbDefaultEndDT").time().strftime("%H:%M")
-        wvars["repeatability"] = session.get("rbDefaultRepeatability")
+        today = next_work_day()
+        wvars['startDT'] = datetime.combine(today.date(), time(8, 30))
+        wvars['endDT'] = datetime.combine(today.date(), time(17, 30))
+        wvars['startT'] = wvars['startDT'].time().strftime("%H:%M")
+        wvars['endT'] = wvars['endDT'].strftime("%H:%M")
+        wvars['repeatability'] = RepeatMapping.getOldMapping(RepeatUnit.NEVER, 0)
 
         if self._standalone:
             # URLs for standalone room booking
-            wvars["roomBookingRoomListURL"] = UH.UHRoomBookingRoomList.getURL(None)
-            wvars["detailsUH"] = UH.UHRoomBookingRoomDetails
-            wvars["bookingFormUH"] = UH.UHRoomBookingBookingForm
+            wvars['roomBookingRoomListURL'] = UH.UHRoomBookingRoomList.getURL(None)
+            wvars['detailsUH'] = UH.UHRoomBookingRoomDetails
+            wvars['bookingFormUH'] = UH.UHRoomBookingBookingForm
         else:
             # URLs for room booking in the event context
-            wvars["roomBookingRoomListURL"] = UH.UHConfModifRoomBookingRoomList.getURL(self._rh._conf)
-            wvars["detailsUH"] = UH.UHConfModifRoomBookingRoomDetails
-            wvars["bookingFormUH"] = UH.UHConfModifRoomBookingBookingForm
-
+            wvars['roomBookingRoomListURL'] = UH.UHConfModifRoomBookingRoomList.getURL(self._rh._conf)
+            wvars['detailsUH'] = UH.UHConfModifRoomBookingRoomDetails
+            wvars['bookingFormUH'] = UH.UHConfModifRoomBookingBookingForm
         return wvars
 
 

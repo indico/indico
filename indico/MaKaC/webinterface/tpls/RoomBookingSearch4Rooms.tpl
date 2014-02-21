@@ -178,7 +178,7 @@
         ${ _('Booked - the room must be booked <b>any time</b> in the period') }
       </li>
       <li class="tip-no-borders">
-        ${ _('Don't care - room's availability is not checked') }
+        ${ _('Don\'t care - room\'s availability is not checked') }
       </li>
     </ul>
   </div>
@@ -217,29 +217,23 @@
                       </td>
                       <td width="80%">
                         <form id="chooseForm" method="post">
-                          <select name="roomName" id="roomName">
+                          <select name="roomName" id="roomName" class="i-button">
                             % for room in rooms:
-                              <% selected = "" %>
-                              % if room.name == eventRoomName:
-                                <% selected = 'selected="selected"' %>
-                              % endif
-                              <% url = detailsUH.getURL(room) %>
-                              % if forNewBooking:
-                                <% url = bookingFormUH.getURL(room) %>
-                              % endif
-                              <option value="${ url }" ${ selected } class="${ room.kind }">
-                                ${ room.locationName + ": &nbsp; " + room.getFullName() }
+                              <option value="${ bookingFormUH.getURL(room) if forNewBooking else detailsUH.getURL(room) }"
+                                ${ (room.name == eventRoomName) * 'selected' } class="${ room.kind }">
+                                ${ room.location.name + ": &nbsp; " + room.getFullName() }
                               </option>
                             % endfor
                           </select>
 
                           % if forNewBooking:
                             <span id="bookButtonWrapper">
-                              <input id="bookButton" class="btn" type="button" value="${ _('Book') }" onclick="isBookable();" />
+                              <input id="bookButton" class="i-button" type="button"
+                                value="${ _('Book') }" onclick="isBookable();" />
                             </span>
-                          % endif
-                          % if not forNewBooking:
-                            <input class="btn" type="button" value="${ _('Room details') }" onclick="document.location = $('#roomName').val(); return false;" />
+                          % else:
+                            <input class="i-button" type="button" value="${ _('Room details') }"
+                              onclick="document.location = $('#roomName').val(); return false;" />
                           % endif
 
                           <!-- Help -->
@@ -268,14 +262,9 @@
                                 <small>${ _('Location') }&nbsp;&nbsp;</small>
                               </td>
                               <td align="left" class="blacktext">
-                                <select name="roomLocation" id="roomLocation">
-                                  % if Location.getDefaultLocation():
-                                    <option value="">${ Location.getDefaultLocation().friendlyName }</option>
-                                  % endif
-                                  % for loc in Location.allLocations:
-                                    % if Location.getDefaultLocation() and loc.friendlyName != Location.getDefaultLocation().friendlyName:
-                                      <option value="${ loc.friendlyName }" >${ loc.friendlyName }</option>
-                                    % endif
+                                <select name="roomLocation" id="roomLocation" class="i-button">
+                                  % for location in locations:
+                                    <option value="${ location.id }" ${ location.is_default * 'selected' }>${ location.name }</option>
                                   % endfor
                                 </select>
                               </td>
@@ -314,10 +303,13 @@
                                 <small>${ _('Must be') }&nbsp;&nbsp;</small>
                               </td>
                               <td align="left" class="blacktext">
-                                <input name="availability" type="radio" value="Available" data-show-availability="true" ${ forNewBooking * 'checked' } /> ${ _('Available') }
-                                <input name="availability" type="radio" value="Booked" data-show-availability="true" /> ${ _('Booked') }
-                                <input name="availability" type="radio" value="Don't care" data-show-availability="false" ${ not forNewBooking * 'checked' }/> ${ _('Don\'t care') }
-                                ${contextHelp('availabilityHelp' )}
+                                <input name="availability" type="radio" value="Available" data-show-availability="true" ${ forNewBooking * 'checked' } />
+                                  ${ _('Available') }
+                                <input name="availability" type="radio" value="Booked" data-show-availability="true" />
+                                  ${ _('Booked') }
+                                <input name="availability" type="radio" value="Don't care" data-show-availability="false" ${ (not forNewBooking) * 'checked' } />
+                                  ${ _('Don\'t care') }
+                                ${ contextHelp('availabilityHelp') }
                               </td>
                             </tr>
                             <%include file="RoomBookingPeriodFormOld.tpl" args="form = 1, unavailableDates = [], availableDayPeriods = [] "/>
@@ -336,7 +328,7 @@
                                 <small>${ _('Blockings') }</small>
                               </td>
                               <td align="left" class="blacktext">
-                                <input id="includePendingBlockings" name="includePendingBlockings" type="checkbox" checked/>
+                                <input id="includePendingBlockings" name="includePendingBlockings" type="checkbox" checked />
                                 ${ _('Check conflicts against pending blockings') }
                                 ${ inlineContextHelp(_('Check if you want to avoid conflicts with pending blockings. By default conflicts are checked only against confirmed blockings.')) }
                               </td>
@@ -358,7 +350,7 @@
                               <td align="left" class="blacktext">
                                 <input size="3" type="text" id="capacity" name="capacity"/>
                                 ${ _('people') }
-                                ${contextHelp('capacityHelp' )}
+                                ${contextHelp('capacityHelp') }
                               </td>
                             </tr>
                           </table>
@@ -377,8 +369,8 @@
                               </td>
                               <td align="left" class="blacktext" >
                               % for eq in possibleEquipment:
-                                <input id="${ "equ_" + eq }" name="${ "equ_" + eq }" type="checkbox">
-                                  ${ eq }
+                                <input id="${ eq.id }" name="equipments" type="checkbox">
+                                  ${ eq.name }
                                 </input>
                                 <br />
                               % endfor
@@ -442,7 +434,7 @@
                       </tr>
                       <tr>
                         <td colspan="2" style="padding-left:20px">
-                          <input type="submit" class="btn" value="${ _('Search') }" />
+                          <input type="submit" class="i-button" value="${ _('Search') }" />
                         </td>
                       </tr>
                     </table>
