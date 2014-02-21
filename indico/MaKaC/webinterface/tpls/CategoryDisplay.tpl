@@ -9,7 +9,7 @@ urlMeeting = urlHandlers.UHConferenceCreation.getURL(categ)
 urlMeeting.addParam("event_type","meeting")
 
 containsCategories = len(categ.getSubCategoryList()) > 0
-
+from MaKaC.conference import Link
 from MaKaC.webinterface.general import strfFileSize
 %>
 
@@ -100,12 +100,22 @@ from MaKaC.webinterface.general import strfFileSize
                         <ul class="resource-list" style="display: none">
                         % for resource in material.getResourceList():
                             <li class="icon-file">
+                                % if isinstance(resource, Link):
+                                <a href="${resource.getURL()}" target="_blank" class="resource"
+                                   data-name="${getResourceName(resource)}">
+                                    ${getResourceName(resource)}
+                                </a>
+                                % else:
                                 <a href="${urlHandlers.UHFileAccess.getURL(resource)}" target="_blank" class="resource"
                                    data-name="${getResourceName(resource)}"
                                    data-size="${strfFileSize(resource.getSize())}"
                                    data-date="${resource.getCreationDate().strftime("%d %b %Y %H:%M")}">
                                     ${getResourceName(resource)}
                                 </a>
+                                % endif
+                                % if resource.isProtected():
+                                    <img src="${Config.getInstance().getSystemIconURL('protected')}" style="vertical-align: middle; border: 0;">
+                                % endif
                             </li>
                         % endfor
                         </ul>
@@ -182,9 +192,13 @@ $(document).ready(function(){
             text: function() {
                 var content = $("<div/>");
                 var list = $("<ul/>").addClass("category-resource-qtip");
-                $("<li/>").append($("<span/>").addClass("bold").append("{0}: ".format($T("File Name")))).append($(this).data("name")).appendTo(list);
-                $("<li/>").append($("<span/>").addClass("bold").append("{0}: ".format($T("File size")))).append($(this).data("size")).appendTo(list);
-                $("<li/>").append($("<span/>").addClass("bold").append("{0}: ".format($T("File creation date")))).append($(this).data("date")).appendTo(list);
+                $("<li/>").append($("<span/>").addClass("bold").append("{0}: ".format($T("Name")))).append($(this).data("name")).appendTo(list);
+                if($(this).data("size") !== undefined) {
+                    $("<li/>").append($("<span/>").addClass("bold").append("{0}: ".format($T("File size")))).append($(this).data("size")).appendTo(list);
+                }
+                if($(this).data("date") !== undefined) {
+                    $("<li/>").append($("<span/>").addClass("bold").append("{0}: ".format($T("File creation date")))).append($(this).data("date")).appendTo(list);
+                }
                 list.appendTo(content);
                 return content;
             }
