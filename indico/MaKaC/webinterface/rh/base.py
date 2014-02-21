@@ -659,15 +659,15 @@ class RH(RequestHandlerBase):
         return self._responseUtil.make_response(res)
 
     def _getMethodByExceptionName(self, e):
-        d = dict([
-            ('NotFound', 'NotFoundError'),
-            ('MaKaCError', 'GeneralError'),
-            ('IndicoError', 'GeneralError'),
-            ('ValueError', 'GeneralError'),
-            ('Exception', 'UnexpectedError')
-        ])
-        exception_name = d.get(e.__class__.__name__, e.__class__.__name__)
-        return getattr(self, '_process{}'.format(exception_name), getattr(self, '_processUnexpectedError'))
+        exception_name = {
+            'NotFound': 'NotFoundError',
+            'MaKaCError': 'GeneralError',
+            'IndicoError': 'GeneralError',
+            'ValueError': 'GeneralError',
+            'Exception': 'UnexpectedError'
+        }.get(type(e).__name__, type(e).__name__)
+        return getattr(self, '_process{}'.format(exception_name),
+                       getattr(self, '_processUnexpectedError'))
 
     def _deleteTempFiles(self):
         if len(self._tempFilesToDelete) > 0:
