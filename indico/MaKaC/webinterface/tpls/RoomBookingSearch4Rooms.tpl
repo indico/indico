@@ -253,12 +253,12 @@
                       <!-- LOCATION (PLUGIN) -->
                       <tr>
                         <td class="titleCellTD" style="width: 125px;">
-                          <span class="titleCellFormat"> ${ _('Location') }</span>
+                          <span class="titleCellFormat">${ _('Location') }</span>
                         </td>
                         <td>
                           <table width="100%" cellspacing="4px">
                             <tr>
-                              <td class="subFieldWidth" align="right" >
+                              <td class="subFieldWidth" align="right">
                                 <small>${ _('Location') }&nbsp;&nbsp;</small>
                               </td>
                               <td align="left" class="blacktext">
