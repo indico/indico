@@ -17,18 +17,24 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 from functools import partial
 
 from flask_wtf import Form
 from wtforms import (
     BooleanField,
+    DateField,
     Field,
-    FieldList,
     IntegerField,
-    SelectMultipleField,
+    SelectField,
     StringField,
-    validators
+    validators,
+)
+from wtforms.validators import (
+    any_of,
+    optional,
+    number_range,
+    required
 )
 from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms_alchemy import model_form_factory
@@ -45,6 +51,8 @@ ModelForm = model_form_factory(Form, strip_string_fields=True)
 def auto_datetime(diff=None):
     return (diff if diff else timedelta(0)) + datetime.utcnow()
 
+def auto_date(specified_time):
+    return datetime.combine(auto_datetime(), specified_time)
 
 def repeat_step_check(form, field):
     if form.repeat_unit.validate(form):
@@ -60,8 +68,120 @@ def repeat_step_check(form, field):
         raise validators.ValidationError('Repeat Step only makes sense with Repeat Unit')
 
 
-# TODO: minimum id should be a variable
-class IndicoSelectMultipleField(Field):
+class IndicoField(Field):
+
+    def __init__(self, *args, **kw):
+        self.parameter_name = kw.pop('parameter_name', None)
+        super(IndicoField, self).__init__(*args, **kw)
+        if not self.parameter_name:
+            self.parameter_name = self.underscore_to_camel_case(self.name)
+
+    def underscore_to_camel_case(self, s):
+        ls = s.split('_')
+        return ''.join(ls[:1] + [e.capitalize() for e in ls[1:]])
+
+    def process(self, formdata, data=None):
+        self.process_errors = []
+        if data is None:
+            try:
+                data = self.default()
+            except TypeError:
+                data = self.default
+
+        self.object_data = data
+
+        try:
+            self.process_data(data)
+        except ValueError as e:
+            self.process_errors.append(e.args[0])
+
+        if formdata:
+            try:
+                if self.parameter_name in formdata:
+                    self.raw_data = formdata.getlist(self.parameter_name)
+                elif self.name in formdata:
+                    self.raw_data = formdata.getlist(self.name)
+                else:
+                    self.raw_data = []
+                self.process_formdata(self.raw_data)
+            except ValueError as e:
+                self.process_errors.append(e.args[0])
+
+        for filter in self.filters:
+            try:
+                self.data = filter(self.data)
+            except ValueError as e:
+                self.process_errors.append(e.args[0])
+
+
+class BooleanIndicoField(IndicoField, BooleanField):
+    pass
+
+
+class IntegerIndicoField(IndicoField, IntegerField):
+    pass
+
+
+class SelectIndicoField(IndicoField, SelectField):
+    pass
+
+
+class StringIndicoField(IndicoField, StringField):
+    pass
+
+
+class DateTimeIndicoField(IndicoField, DateTimeField):
+
+    def process_formdata(self, raw_data):
+        try:
+            self.data = datetime.combine(datetime(*raw_data),
+                                         datetime.strptime(raw_data.pop(), '%H:%M'))
+        except:
+            self.data = datetime(*raw_data)
+
+    def process(self, formdata, data=None):
+        self.process_errors = []
+        if data is None:
+            try:
+                data = self.default()
+            except TypeError:
+                data = self.default
+
+        self.object_data = data
+
+        try:
+            self.process_data(data)
+        except ValueError as e:
+            self.process_errors.append(e.args[0])
+
+        if formdata:
+            try:
+                try:
+                    self.raw_data = [formdata.getlist(p)[0] for p in self.parameter_name]
+                except KeyError:
+                    camel_name = self.underscore_to_camel_case(self.name) in formdata
+                    if camel_name in formdata:
+                        self.raw_data = formdata.geetlist(self.name)
+                    elif self.name in formdata:
+                        self.raw_data = formdata.getlist(self.name)
+                    else:
+                        self.raw_data = []
+                self.process_formdata(self.raw_data)
+            except ValueError as e:
+                self.process_errors.append(e.args[0])
+
+        for filter in self.filters:
+            try:
+                self.data = filter(self.data)
+            except ValueError as e:
+                self.process_errors.append(e.args[0])
+
+
+class SelectMultipleCustomIndicoField(IndicoField):
+
+    def __init__(self, *args, **kw):
+        self.min_check = kw.pop('min_check', None)
+        super(SelectMultipleCustomIndicoField, self).__init__(*args, **kw)
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -76,8 +196,8 @@ class IndicoSelectMultipleField(Field):
     def pre_validate(self, form):
         if not self.data:
             raise validators.StopValidation(_('At least one integer id must be supplied'))
-        elif min(self.data) < -1:
-            raise validators.StopValidation(_('Minimum id can be at least -1'))
+        elif self.min_check and min(self.data) < self.min_check:
+            raise validators.StopValidation(_('Minimum id can be at least {}').format(self.min_check))
 
 
 class BookingListForm(Form):
@@ -102,7 +222,7 @@ class BookingListForm(Form):
     repeat_step = IntegerField('Repeat Step', [validators.Optional(), repeat_step_check],
                                default=0)
 
-    room_id_list = IndicoSelectMultipleField('Room ID List')
+    room_id_list = SelectMultipleCustomIndicoField('Room ID List', min_check=-1)
 
     is_cancelled = BooleanField('Is Cancelled', [validators.optional()])
     is_rejected = BooleanField('Is Cancelled', [validators.optional()])
@@ -131,3 +251,37 @@ class BookingListForm(Form):
 class BookingForm(ModelForm):
     class Meta:
         model = Reservation
+
+
+class RoomListForm(Form):
+
+    location_id = IntegerIndicoField(validators=[required(), number_range(min=1)],
+                                     parameter_name='roomLocation')
+    free_search = StringIndicoField(validators=[optional()])
+    capacity = IntegerIndicoField(validators=[optional(), number_range(min=1)])
+    equipments = SelectMultipleCustomIndicoField(parameter_name='equipments')
+
+    availability = StringIndicoField(validators=[required(), any_of(
+                                     values=['Available', 'Booked', 'Don\'t care'])])
+    includes_pending_blockings = BooleanIndicoField(validators=[required()], default=False)
+    includes_pre_bookings = BooleanIndicoField(validators=[required()], default=False,
+                                               parameter_name='includePreBookings')
+
+    is_reservable = BooleanIndicoField(validators=[optional()], default=True)
+    is_only_my_rooms = BooleanIndicoField(validators=[optional()], default=False)
+    is_auto_confirmed = BooleanIndicoField(validators=[optional()], default=True)
+    is_active = BooleanIndicoField(validators=[optional()], default=True)
+
+    start_date = DateTimeIndicoField(validators=[optional()],
+                                     parameter_name=('sYear', 'sMonth', 'sDay', 'sTime'),
+                                     default=partial(auto_date, time(8, 30)))
+    end_date = DateTimeIndicoField(validators=[optional()],
+                                   parameter_name=('eYear', 'eMonth', 'eDay', 'eTime'),
+                                   default=partial(auto_date, time(17, 30)))
+
+    def __getattr__(self, attr):
+        if attr == 'start_date':
+            return datetime.combine(self.start.data, self.start_time.data)
+        elif attr == 'end_date':
+            return datetime.combine(self.end.data, self.end_time.data)
+        raise IndicoError('{} has no attribute: {}'.format(self.__class__.__name__, attr))
