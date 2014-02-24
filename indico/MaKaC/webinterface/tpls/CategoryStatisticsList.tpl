@@ -14,22 +14,21 @@
     stats = [null];
   var xMin = ${min};
   var xMax = ${max};
-  var xInterval = (xMax-xMin)/10;
-  var yInterval = yMax/6;
+  var xInterval = Math.floor((xMax-xMin)/10);
+  var yInterval = Math.floor(yMax/6);
   $.jqplot('chartdiv_${tagName}',
            [stats],
            { title:'${statsName}: ${total}',
              axes: {
               xaxis: {
+                label: '${_("Year")}',
                 min: xMin,
                 max: xMax,
-                tickInterval: xInterval,
-                tickOptions: {formatString: '%d'}
+                tickInterval: xInterval
               },
               yaxis: {
                 min: 0,
-                tickInterval: yInterval,
-                tickOptions: {formatString: '%d'}
+                tickInterval: yInterval
               }
             },
              series:[{color:'#5FAB78'}]
