@@ -19,16 +19,16 @@
 
 from datetime import datetime, timedelta
 
-from flask import request, session
+from flask import flash, request, session
 
 from MaKaC.common.cache import GenericCache
 from MaKaC.webinterface.locators import WebLocator
 
-# from indico.core.errors import NotFoundError
-# from indico.util.i18n import _
+from indico.util.i18n import _
 
 from .. import RHRoomBookingBase
 from ..decorators import requires_location, requires_room
+from ..forms import RoomListForm
 from ..mixins import AttributeSetterMixin
 from ...models.locations import Location
 from ...models.reservations import RepeatUnit
@@ -89,114 +89,12 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 class RHRoomBookingRoomList(AttributeSetterMixin, RHRoomBookingBase):
 
     def _checkParams(self):
-
-        params = request.args if request.method == 'GET' else request.form  # else is POST
-
-        self.setParam('_roomLocation', params, paramName='roomLocation')
-        self.setParam('_freeSearch', params, paramName='freeSearch', callback=lambda e: e.replace(',', ''))
-        self.setParam('_capacity', params, paramName='capacity', callback=int)
-        self.setParam('_availability', params, paramName='availability', default="Don't care")
-
-        if self._availability != "Don't care":
-            self._checkParamsRepeatingPeriod(params)
-
-        self._includePrebookings = params.get('includePrebookings') == 'on'
-        self._includePendingBlockings = params.get('includePendingBlockings') == 'on'
-
-        # The end of "avail/don't care"
-
-        # Equipment
-        self._equipment = []
-        for k, v in params.iteritems():
-            if k[0:4] == "equ_" and v == "on":
-                self._equipment.append(k[4:100])
-
-        # Special
-        self._isReservable = self._ownedBy = self._isAutoConfirmed = None
-        if params.get('isReservable') == 'on': self._isReservable = True
-        if params.get('isAutoConfirmed') == 'on': self._isAutoConfirmed = True
-
-        # only admins can choose to consult non-active rooms
-        self._isActive = True
-        if self._getUser() and self._getUser().isRBAdmin() and params.get('isActive', default=None) != 'on':
-            self._isActive = None
-
-        self._onlyMy = params.get('onlyMy') == 'on'
+        self._form = RoomListForm(request.values)
 
     def _businessLogic(self):
-        if self._onlyMy: # Can't be done in checkParams since it must be after checkProtection
-            self._title = "My rooms"
-            self._ownedBy = self._getUser()
-
-        # r = RoomBase()
-        # r.capacity = self._capacity
-        # r.isActive = self._isActive
-        # # r.responsibleId = self._responsibleId
-        # if self._isAutoConfirmed:
-        #     r.resvsNeedConfirmation = False
-        # for eq in self._equipment:
-        #     r.insertEquipment( eq )
-
-        if self._onlyMy:
-            rooms = self._ownedBy.getRooms()
-        elif self._availability == "Don't care":
-            pass
-            # TODO
-            # rooms = CrossLocationQueries.getRooms(location=self._roomLocation,
-            #                                       freeText=self._freeSearch,
-            #                                       ownedBy=self._ownedBy,
-            #                                       roomExample=r,
-            #                                       pendingBlockings=self._includePendingBlockings,
-            #                                       onlyPublic=self._isReservable)
-            # Special care for capacity (20% => greater than)
-            if not rooms:
-                pass
-                # rooms = CrossLocationQueries.getRooms(location=self._roomLocation,
-                #                                       freeText=self._freeSearch,
-                #                                       ownedBy=self._ownedBy,
-                #                                       roomExample=r,
-                #                                       minCapacity=True,
-                #                                       pendingBlockings=self._includePendingBlockings,
-                #                                       onlyPublic=self._isReservable)
-        else:
-            # Period specification
-            # p = ReservationBase()
-            # p.startDT = self._startDT
-            # p.endDT = self._endDT
-            # p.repeatability = self._repeatability
-            # if self._includePrebookings:
-            #     p.isConfirmed = None   # because it defaults to True
-
-            # # Set default values for later booking form
-            # session["rbDefaultStartDT"] = p.startDT
-            # session["rbDefaultEndDT"] = p.endDT
-            # session["rbDefaultRepeatability"] = p.repeatability
-
-            available = (self._availability == "Available")
-
-            # rooms = CrossLocationQueries.getRooms(location=self._roomLocation,
-            #                                       freeText=self._freeSearch,
-            #                                       ownedBy=self._ownedBy,
-            #                                       roomExample=r,
-            #                                       resvExample=p,
-            #                                       available=available,
-            #                                       pendingBlockings=self._includePendingBlockings)
-            # Special care for capacity (20% => greater than)
-            if not rooms:
-                pass
-                # rooms = CrossLocationQueries.getRooms(location=self._roomLocation,
-                #                                       freeText=self._freeSearch,
-                #                                       ownedBy=self._ownedBy,
-                #                                       roomExample=r,
-                #                                       resvExample=p,
-                #                                       available=available,
-                #                                       minCapacity=True,
-                #                                       pendingBlockings=self._includePendingBlockings)
-
-        # TODO: model should return sorted
-        rooms.sort()
-        self._rooms = rooms
-        self._mapAvailable = Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable()
+        pass
+        # self._rooms = rooms
+        # self._mapAvailable = Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable()
 
     def _process(self):
         self._businessLogic()

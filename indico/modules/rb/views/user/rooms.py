@@ -129,44 +129,38 @@ class WRoomBookingMapOfRoomsWidget(WTemplated):
 class WPRoomBookingRoomList(WPRoomBookingBase):
 
     def __init__(self, rh, onlyMy=False):
+        WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
-        self._onlyMy = onlyMy
-        super(WPRoomBookingRoomList, self).__init__(rh)
 
     def _getTitle(self):
-        return (super(WPRoomBookingRoomList, self)._getTitle() + ' - ' +
-                (_("My Rooms") if self._onlyMy else _("Found rooms")))
+        return '{} - {}'.format(WPRoomBookingBase._getTitle(self),
+                                _("My Rooms") if self._onlyMy else _("Found rooms"))
 
     def _setCurrentMenuItem(self):
-        if self._onlyMy:
+        if self._form.is_only_my_rooms:
             self._myRoomListOpt.setActive(True)
         else:
             self._roomSearchOpt.setActive(True)
 
 
     def _getBody(self, params):
-        return WRoomBookingRoomList(self._rh, standalone=True, onlyMy=self._onlyMy).getHTML(params)
+        return WRoomBookingRoomList(self._rh, standalone=True).getHTML(params)
 
 
 class WRoomBookingRoomList(WTemplated):
 
-    def __init__(self, rh, standalone=False, onlyMy=False):
+    def __init__(self, rh, standalone=False):
         self._rh = rh
         self._standalone = standalone
-        self._title = None
-        self._onlyMy = onlyMy
-        try:
-            self._title = self._rh._title;
-        except:
-            pass
 
     def getVars(self):
-        wvars = super(WRoomBookingRoomList, self).getVars()
+        wvars = WTemplated.getVars(self)
+        f = self._rh._form
 
         wvars["rooms"] = self._rh._rooms
-        wvars["mapAvailable"] = self._rh._mapAvailable
+        wvars['mapAvailable'] = self._rh._mapAvailable
         wvars["standalone"] = self._standalone
-        wvars["title"] = self._title
+        wvars['title'] = self._title
         if self._onlyMy:
             wvars["noResultsMsg"] = _("You are not the owner of any room")
         else:
