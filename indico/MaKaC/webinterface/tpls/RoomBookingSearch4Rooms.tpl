@@ -208,7 +208,7 @@
                   <table width="90%" align="center" border="0">
                     <tr>
                       <td colspan="2">
-                        <h2 class="group_title">${_('Choose a room') }</h2>
+                        <h2 class="group_title">${ _('Choose a room') }</h2>
                       </td>
                     </tr>
                     <tr>
@@ -233,7 +233,7 @@
                             </span>
                           % else:
                             <input class="i-button" type="button" value="${ _('Room details') }"
-                              onclick="document.location = $('#roomName').val(); return false;" />
+                              onclick="document.location = $('#roomName').val(); return false;" style="padding: 6.5px;"/>
                           % endif
 
                           <!-- Help -->
@@ -264,7 +264,9 @@
                               <td align="left" class="blacktext">
                                 <select name="roomLocation" id="roomLocation" class="i-button">
                                   % for location in locations:
-                                    <option value="${ location.id }" ${ location.is_default * 'selected' }>${ location.name }</option>
+                                    <option value="${ location.id }" ${ location.is_default * 'selected' }>
+                                      ${ location.name }
+                                    </option>
                                   % endfor
                                 </select>
                               </td>
@@ -434,7 +436,7 @@
                       </tr>
                       <tr>
                         <td colspan="2" style="padding-left:20px">
-                          <input type="submit" class="i-button" value="${ _('Search') }" />
+                          <input type="submit" class="i-button" value="${ _('Search') }"/>
                         </td>
                       </tr>
                     </table>
