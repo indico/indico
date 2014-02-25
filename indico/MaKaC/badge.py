@@ -485,6 +485,7 @@ class BadgePDFOptions(Persistent):
             self.__marginColumns = 1.0
             self.__marginRows = 0.0
             self._pageSize = "A4"
+            self._landscape = False
             self._drawDashedRectangles = True
         else:
             from MaKaC.conference import CategoryManager
@@ -496,6 +497,7 @@ class BadgePDFOptions(Persistent):
             self.__marginColumns = defaultConferencePDFOptions.getMarginColumns()
             self.__marginRows = defaultConferencePDFOptions.getMarginRows()
             self._pageSize = defaultConferencePDFOptions.getPagesize()
+            self._landscape = defaultConferencePDFOptions.getLandscape()
             self._drawDashedRectangles = defaultConferencePDFOptions.getDrawDashedRectangles()
 
 
@@ -531,6 +533,13 @@ class BadgePDFOptions(Persistent):
             self._drawDashedRectangles = True
         return self._drawDashedRectangles
 
+    def getLandscape(self):
+        try:
+            return self._landscape
+        except AttributeError:
+            self._landscape = False
+            return False
+
     def setTopMargin(self, value):
         self.__topMargin = value
 
@@ -557,3 +566,6 @@ class BadgePDFOptions(Persistent):
             value must be a Boolean
         """
         self._drawDashedRectangles = value
+
+    def setLandscape(self, value):
+        self._landscape = value

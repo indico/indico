@@ -4405,6 +4405,7 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
         self.__pagesize = params.get("pagesize",'A4')
 
         self.__drawDashedRectangles = params.get("drawDashedRectangles", False) is not False
+        self.__landscape = params.get('landscape') == '1'
 
         self.__registrantList = params.get("registrantList","all")
         if self.__registrantList != "all":
@@ -4431,6 +4432,7 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
                 self.__PDFOptions.setMarginRows(self.__marginRows)
                 self.__PDFOptions.setPagesize(self.__pagesize)
                 self.__PDFOptions.setDrawDashedRectangles(self.__drawDashedRectangles)
+                self.__PDFOptions.setLandscape(self.__landscape)
 
 
             pdf = RegistrantsListToBadgesPDF(self._conf,
@@ -4443,7 +4445,8 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
                                              self.__marginRows,
                                              self.__pagesize,
                                              self.__drawDashedRectangles,
-                                             self.__registrantList)
+                                             self.__registrantList,
+                                             self.__landscape)
             return send_file('Badges.pdf', StringIO(pdf.getPDFBin()), 'PDF')
 
 

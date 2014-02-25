@@ -13,6 +13,11 @@
               <input id="drawDashedRectangles" type="checkbox" value="drawDashedRectangles" name="drawDashedRectangles" ${ checked } />
               <label for="drawDashedRectangles">${ _("Draw a dashed rectangle around each badge")}</label>
             </div>
+            <div class="element">
+              <% checked = ['', 'checked'][PDFOptions.getLandscape()] %>
+              <input id="landscape" type="checkbox" value="1" name="landscape" ${ checked } />
+              <label for="landscape">${ _("Use landscape page orientation")}</label>
+            </div>
         </div>
         <div class="toolbar-container">
           ${ _("Page size:")}

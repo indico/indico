@@ -2052,8 +2052,8 @@ class RegistrantsListToBadgesPDF:
                 'white': colors.white
                 }
 
-
-    def __init__(self, conf, badgeTemplate, marginTop, marginBottom, marginLeft, marginRight, marginColumns, marginRows, pagesize, drawDashedRectangles, registrantList):
+    def __init__(self, conf, badgeTemplate, marginTop, marginBottom, marginLeft, marginRight, marginColumns, marginRows,
+                 pagesize, drawDashedRectangles, registrantList, printLandscape):
         """ Constructor
                 conf: the conference for which the badges are printed, as a Conference object.
                 badgeTemplate: the template used, as a BadgeTemplate object.
@@ -2065,6 +2065,7 @@ class RegistrantsListToBadgesPDF:
                 marginRows: a float indicating the margin between rows of badges, in cm, int or float
                 pagesize: a string with the pagesize to used, e.g. 'A4', 'A3', 'Letter'
                 registrantList: either a string whose value should be "all", either a list of registrant id's
+                printLandscape: use landscape orientation
             The badges will be drawn aligned to the left.
         """
 
@@ -2083,6 +2084,8 @@ class RegistrantsListToBadgesPDF:
             self.__registrantList = [self.__conf.getRegistrantById(id) for id in registrantList]
 
         self.__size = PDFSizes().PDFpagesizes[pagesize]
+        if printLandscape:
+            self.__size = landscape(self.__size)
         self.__width, self.__height = self.__size
 
         self.__drawDashedRectangles = drawDashedRectangles
@@ -2095,7 +2098,7 @@ class RegistrantsListToBadgesPDF:
         """
 
         self.__fileDummy = FileDummy()
-        self.__canvas = canvas.Canvas(self.__fileDummy, pagesize = self.__size)
+        self.__canvas = canvas.Canvas(self.__fileDummy, pagesize=self.__size)
 
         nBadgesHorizontal = int((self.__width - self.__marginLeft * cm - self.__marginRight * cm + self.__marginColumns * cm  + 0.01*cm) /
                                 ((self.__badgeTemplate.getWidthInCm() + self.__marginColumns)  * cm))
