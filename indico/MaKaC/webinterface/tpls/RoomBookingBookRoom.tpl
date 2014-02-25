@@ -124,7 +124,6 @@
       </td>
     </tr>
   </table>
->>>>>>> 99f6434... [MIN] time and repeat mapping and consistency check
 </form>
 
 <script type="text/javascript">
