@@ -24,6 +24,7 @@ process.
 """
 
 import ConfigParser
+import socket
 import time, sys, os, argparse, logging, cmd, multiprocessing
 from logging.handlers import SMTPHandler
 
@@ -104,16 +105,17 @@ def _setup(args):
         mp_logger.addHandler(handler)
 
 
-def _check_running():
+def _check_running(check_process=False):
 
-    dbi = DBMgr.getInstance()
+    with DBMgr.getInstance().global_connection():
+        status = Client().getStatus()
 
-    dbi.startRequest()
-    c = Client()
-    running = c.getStatus()['state']
-    dbi.endRequest()
+    if not check_process:
+        return status['state']
 
-    return running
+    if status['pid'] is None:
+        return False
+    return os.path.isdir('/proc/{0}/'.format(status['pid']))
 
 
 def _start(args):
@@ -168,8 +170,46 @@ def _stop(args):
 
 
 def _restart(args):
+    with DBMgr.getInstance().global_connection():
+        status = Client().getStatus()
+    if status['hostname'] is not None and status['hostname'] != socket.getfqdn() and not args.force:
+        raise Exception('The daemon is running on another machine ({0[hostname]}) (consider -f?)'.format(status))
+
     _stop(args)
     _start(args)
+
+
+def _check(args):
+    if not os.path.isdir('/proc'):
+        raise Exception('This command only works on systems that have /proc/')
+
+    with DBMgr.getInstance().global_connection():
+        status = Client().getStatus()
+        if status['hostname'] is not None and status['hostname'] != socket.getfqdn():
+            print >>sys.stderr, 'The daemon is running on another machine ({0[hostname]})'.format(status)
+            sys.exit(2)
+
+        db_running = _check_running(False)
+        os_running = _check_running(True)
+
+        if not args.quiet:
+            print >>sys.stderr, 'Database status: running={1}, host={0[hostname]}, pid={0[pid]}'.format(status, db_running)
+            print >>sys.stderr, 'Process status:  running={0}'.format(os_running)
+
+        if db_running and os_running:
+            print status['pid']
+            sys.exit(0)
+        elif not db_running and not os_running:
+            sys.exit(1)
+        elif db_running and not os_running:
+            if not args.quiet:
+                print >>sys.stderr, 'Marking dead scheduler as not running'
+            SchedulerModule.getDBInstance().setSchedulerRunningStatus(False)
+            DBMgr.getInstance().commit()
+            sys.exit(1)
+        else:
+            print >>sys.stderr, 'Unexpected state! Process is running, but scheduler is not marked as running'
+            sys.exit(2)
 
 
 def _show(args):
@@ -182,8 +222,10 @@ def _show(args):
     if args.field == "status":
         status = c.getStatus()
 
-        print "Scheduler is currently %s" % \
-              ("running" if status['state'] else "NOT running")
+        if status['state']:
+            print 'Scheduler is currently running on {0[hostname]} with pid {0[pid]}'.format(status)
+        else:
+            print 'Scheduler is currently NOT running'
         print """
 Spooled commands: %(spooled)s
 
@@ -258,6 +300,7 @@ def main():
     parser_start = subparsers.add_parser('start', help="start the daemon")
     parser_stop = subparsers.add_parser('stop', help="stop the daemon")
     parser_restart = subparsers.add_parser('restart', help="restart the daemon")
+    parser_check = subparsers.add_parser('check', help="check and sync status")
     parser_show = subparsers.add_parser('show', help="show information")
     parser_cmd = subparsers.add_parser('cmd', help="execute a command")
     parser_run = subparsers.add_parser('run', help="run a task, from this process")
@@ -283,9 +326,12 @@ def main():
                         default = "INFO", required = False,
                         help = "set different logging mode")
 
-    parser_start.set_defaults(func = _start)
-    parser_stop.set_defaults(func = _stop)
-    parser_restart.set_defaults(func = _restart)
+    parser_start.set_defaults(func=_start)
+    parser_stop.set_defaults(func=_stop)
+    parser_restart.set_defaults(func=_restart)
+    parser_check.set_defaults(func=_check)
+
+    parser_check.add_argument('-q', '--quiet', dest='quiet', action='store_true', help='Suppress console output')
 
     parser_show.add_argument("field",
                         choices=['status', 'spool'],

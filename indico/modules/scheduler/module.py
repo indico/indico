@@ -18,15 +18,15 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 
-import logging, time, datetime
+import logging
+import os
+import socket
 
 from BTrees.IOBTree import IOBTree
 from BTrees.Length import Length
 
-from MaKaC.trashCan import TrashCanManager
-
 from indico.modules import Module
-from indico.modules.scheduler import base, tasks
+from indico.modules.scheduler import base
 from indico.util.struct.queue import PersistentWaitingQueue
 from indico.util.date_time import int_timestamp
 from indico.core.index import IOIndex, IIndexableByArbitraryDateTime
@@ -54,6 +54,8 @@ class SchedulerModule(Module):
 
         # Is the scheduler running
         self._schedulerStatus = False
+        self._hostname = None
+        self._pid = None
 
         # Temporary area where all the tasks stay before being
         # added to the waiting list
@@ -99,8 +101,11 @@ class SchedulerModule(Module):
         """
         Returns some basic info
         """
+
         return {
             'state': self._schedulerStatus,
+            'hostname': getattr(self, '_hostname', None),
+            'pid': getattr(self, '_pid', None),
             'waiting': len(self._waitingQueue),
             'running': len(self._runningList),
             'spooled': len(self._taskSpool),
@@ -238,6 +243,8 @@ class SchedulerModule(Module):
 
     def setSchedulerRunningStatus(self, status):
         self._schedulerStatus = status
+        self._hostname = socket.getfqdn() if status else None
+        self._pid = os.getpid() if status else None
 
     def addTaskToRunningList(self, task):
 
