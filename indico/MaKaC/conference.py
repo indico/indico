@@ -12126,7 +12126,7 @@ class Track(CoreObject):
         if av in self._coordinators:
             self._coordinators.remove( av )
             self.getConference().removeTrackCoordinator( self, av )
-            av.linkTo(self, "coordinator")
+            av.unlinkTo(self, "coordinator")
             self.notifyModification()
 
     def isCoordinator( self, av ):
