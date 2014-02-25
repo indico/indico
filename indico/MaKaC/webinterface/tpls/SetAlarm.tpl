@@ -21,7 +21,7 @@
     <td>
         <input name="dateType" id="dateType" type="radio" value="1" ${ "checked" if dateType == 1 else "" }>  ${ _("At this date")}:
     </td>
-    <td nowrap class="contentCellTD">
+    <td class="contentCellTD" style="white-space: normal;">
                 <span id="datePlace"></span>
                 <input type="hidden" id="day" name="day" value="${ alarm_date.day }">
                 <input type="hidden" id="month"  name="month" value="${ alarm_date.month }">
