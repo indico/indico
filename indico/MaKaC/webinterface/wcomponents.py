@@ -2729,14 +2729,14 @@ class WCategoryStatisticsList(WTemplated):
         years = self._stats.keys()
         years.sort()
         min_year = datetime.now().year
-        max_year = datetime.now().year + 3
+        max_year = datetime.now().year + 1
         if len(years) > 0:
             min_year = min(min_year, years[0])
             max_year = max(max_year, years[-1])
             for y in range(min_year, max_year+1):
                 stats[y] = self._stats.get(y, 0)
-        wvars["min"] = min_year-1
-        wvars["max"] = max_year+1
+        wvars["min"] = min_year
+        wvars["max"] = max_year
         wvars["stats"] = stats
         wvars["statsName"] = self._statsName
         wvars["align"] = self._align

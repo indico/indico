@@ -78,6 +78,11 @@
     margin: 0 0 2em 0;
 }
 
+.category-statistics h2 {
+    color: #999;
+    font-weight: normal;
+}
+
 .category-sidebar {
     @include box-sizing(border-box);
     background: #FAFAFA;

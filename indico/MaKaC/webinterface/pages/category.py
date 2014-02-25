@@ -1002,18 +1002,18 @@ class WCategoryStatistics(wcomponents.WTemplated):
                                                            self._stats["contributions"], 'right', 'contributions')
                 plots = plots + wcsl.getHTML(self._aw)
                 stats.append(plots)
-                stats.append(i18nformat("""<b> _("Number of resources"): {0}</b>""").format(self._stats["resources"]))
+                stats.append(i18nformat("""<h2> _("Number of resources"): {0}</h2>""").format(self._stats["resources"]))
                 wvars["updated"] = self._stats["updated"].strftime("%d %B %Y %H:%M")
             else:
-                stats.append(i18nformat("""<b> _("No statistics for the events").</b>"""))
-                stats.append(i18nformat("""<b> _("No statistics for the contributions").</b>"""))
-                stats.append(i18nformat("""<b> _("No statistics for the resources").</b>"""))
+                stats.append(i18nformat("""<h2> _("No statistics for the events").</h2>"""))
+                stats.append(i18nformat("""<h2> _("No statistics for the contributions").</h2>"""))
+                stats.append(i18nformat("""<h2> _("No statistics for the resources").</h2>"""))
                 wvars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
         else:
             stats.append(_("This category doesn't contain any event. No statistics are available."))
             wvars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
-        stats.append(i18nformat("""<b> _("Number of users"): {0}</b>""").format(self._stats["users"]))
-        wvars["contents"] = "<br><br>".join(stats)
+        stats.append(i18nformat("""<h2> _("Number of users"): {0}</h2>""").format(self._stats["users"]))
+        wvars["contents"] = "".join(stats)
         return wvars
 
 
@@ -1036,8 +1036,22 @@ class WPCategoryStatistics(WPCategoryDisplayBase):
         pars = {"target": self._target, "isModif": False}
         return wcomponents.WNavigationDrawer(pars, type="Statistics")
 
+    def _addjqPlotPlugins(self, plugins, extraJS):
+        """
+        Util function to include jqPlot plugins easier.
+        """
+        if not isinstance(plugins, list):
+            plugins = list(plugins)
+
+        prefix = '/statistics/js/lib/jqPlot/plugins/jqplot.'
+        suffix = '.min.js'
+        for plugin in plugins:
+            extraJS.append(prefix + plugin + suffix)
+
     def getJSFiles(self):
         extraJS = ['/statistics/js/lib/jqPlot/jquery.jqplot.min.js']
+        jqPlotPlugins = ['highlighter', 'cursor']
+        self._addjqPlotPlugins(jqPlotPlugins, extraJS)
         return WPCategoryDisplayBase.getJSFiles(self) + extraJS
 
     def getCSSFiles(self):
