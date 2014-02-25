@@ -264,6 +264,14 @@ type('SchedulerSummaryWidget', ['RemoteWidget'],
                                          Html.span({}, $T('Enabled')) :
                                          Html.span({}, $T('Disabled'))));
 
+             var hostname = Html.tr({},
+                                 Html.td({}, $T('Hostname')),
+                                 Html.td({}, Html.span({}, data.state ? data.hostname : 'n/a')));
+             var pid = Html.tr({},
+                                 Html.td({}, $T('PID')),
+                                 Html.td({}, Html.span({}, data.state ? data.pid : 'n/a')));
+
+
              var spool = Html.tr({}, Html.td({}, $T('Spooled commands')),
                                  Html.td({}, data.spooled));
              var queue = Html.tr({}, Html.td({}, $T('Queued tasks')),
@@ -276,8 +284,7 @@ type('SchedulerSummaryWidget', ['RemoteWidget'],
                                   Html.td({}, data.finished));
 
              return Html.table({},
-                               Html.tbody({}, state, spool, queue,
-                                          running, failed, finished));
+                               Html.tbody({}, state, hostname, pid, spool, queue, running, failed, finished));
          }
      },
      function(method) {
