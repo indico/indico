@@ -37,15 +37,9 @@ from sqlalchemy.sql.expression import FunctionElement
 from sqlalchemy.types import Numeric
 from zope.sqlalchemy import ZopeTransactionExtension
 
-from indico.core.logger import Logger
-
 from ..errors import IndicoError
 from .manager import DBMgr
 from .migration import MigratedDB
-
-
-logger = Logger.get('db')
-logger.setLevel(logging.DEBUG)
 
 
 db = SQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
@@ -53,6 +47,10 @@ db = SQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
 
 def apply_db_loggers(debug=False):
     if debug:
+        from indico.core.logger import Logger
+        logger = Logger.get('db')
+        logger.setLevel(logging.DEBUG)
+
         @listens_for(Engine, 'before_cursor_execute')
         def before_cursor_execute(conn, cursor, statement,
                                   parameters, context, executemany):
