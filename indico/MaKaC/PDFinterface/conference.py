@@ -125,7 +125,7 @@ class ProgrammeToPDF(PDFBase):
 
         c.setFont('Times-Bold', 15)
 
-        height -= 2 * cm;
+        height -= 2 * cm
 
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"), self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")))
         if self._conf.getLocation():
@@ -2356,8 +2356,8 @@ class LectureToPosterPDF:
 
         imgWidth, imgHeight = img.size
 
-        posx = self.__posterTemplate.pixelsToCm(posx);
-        posy = self.__posterTemplate.pixelsToCm(posy);
+        posx = self.__posterTemplate.pixelsToCm(posx)
+        posy = self.__posterTemplate.pixelsToCm(posy)
 
         if position == "Stretch":
             x_1 = posx
@@ -2375,20 +2375,20 @@ class LectureToPosterPDF:
             if width > posterWidth or height > posterHeight:
 
                 if width > posterWidth:
-                    ratio = float(posterWidth)/width;
-                    width = posterWidth;
+                    ratio = float(posterWidth)/width
+                    width = posterWidth
                     height = height*ratio
 
-                    x_1 = posx;
-                    y_1 = posy + (posterHeight - height)/2.0;
+                    x_1 = posx
+                    y_1 = posy + (posterHeight - height)/2.0
 
 
                 if  height > posterHeight:
-                    ratio = float(posterHeight)/height;
-                    height = posterHeight;
+                    ratio = float(posterHeight)/height
+                    height = posterHeight
                     width = width*ratio
-                    x_1 = posx + (posterWidth - width)/2.0;
-                    y_1 = posy;
+                    x_1 = posx + (posterWidth - width)/2.0
+                    y_1 = posy
             else:
                 x_1 = posx + (posterWidth - self.__posterTemplate.pixelsToCm(imgWidth))/2.0
                 y_1 = posy + (posterHeight - self.__posterTemplate.pixelsToCm(imgHeight))/2.0
