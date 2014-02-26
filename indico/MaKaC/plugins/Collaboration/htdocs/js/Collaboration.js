@@ -2011,13 +2011,6 @@ var makeMeModerator = function(videoLink, confId, bookingId, successFunction) {
     });
 };
 
-var successMakeModerator = function(videoLink, result){
-    $(videoLink).parent().parent().html(result.bookingParams.owner["name"]);
-    var bookingPopup = $(videoServiceInfo[result.id]);
-    bookingPopup.find("#"+$T("Moderator")).html(Html.div({},result.bookingParams.owner["name"]).dom);
-    videoServiceInfo[result.id] = $(bookingPopup).wrap('<div/>').parent().html();
-};
-
 var successMakeEventModerator = function(videoLink, result){
     $(videoLink).parent().parent().html(Html.div({}, result.bookingParams.owner["name"]).dom);
 };
@@ -2029,24 +2022,45 @@ var successMakeEventModerator = function(videoLink, result){
  */
 
 var drawBookingPopup = function (videoInformation, confId, bookingId, displayModeratorLink) {
-    var divWrapper = Html.div({className:"videoServiceInlinePopup"});
-    for(var section in videoInformation){
-        var leftCol = Html.div({className:"leftCol"}, videoInformation[section]["title"]);
-        var rightCol = Html.div({className:"rightCol", id: videoInformation[section]["title"]});
-        var line;
-        for(line in videoInformation[section]["lines"]){
-            rightCol.append(Html.div({}, videoInformation[section]["lines"][line]));
+    var divWrapper = $('<div>', {'class': 'videoServiceInlinePopup'});
+    $.each(videoInformation, function(i, section) {
+        var leftCol = $('<div>', {'class': 'leftCol', text: section.title});
+        var rightCol = $('<div>', {'class': 'rightCol'});
+
+        rightCol.append($.map(section.lines || [], function(line) {
+            return $('<div>', {
+                html: line
+            });
+        }));
+
+        rightCol.append($.map(section.linkLines || [], function(line) {
+            var input = $('<input>', {
+                click: function() {
+                    $(this).select();
+                },
+                value: line[1]
+            });
+            return $('<div>').append(input);
+        }));
+
+        if (section.title == $T('Moderator') && displayModeratorLink) {
+            var link = $('<a>', {
+                href: '#',
+                click: function(e) {
+                    e.preventDefault();
+                    makeMeModerator(this, confId, bookingId, function(videoLink, result){
+                        rightCol.html($('<div>', {html: result.bookingParams.owner.name}));
+                    });
+                },
+                text: $T('Make me moderator')
+            });
+            rightCol.append($('<div>').append(link));
         }
-        for(line in videoInformation[section]["linkLines"]){
-            rightCol.append(Html.div({}, Html.input("text",{onClick: '$(this).select();'}, videoInformation[section]["linkLines"][line][1])));
-        }
-        if(videoInformation[section]["title"] == $T("Moderator") && displayModeratorLink){
-            var link = Html.a({href:'#', onClick:'makeMeModerator(this,'+confId+','+bookingId+', successMakeModerator)'},$T("Make me moderator"));
-            rightCol.append(Html.div({}, " ", link));
-        }
-        divWrapper.append(Html.div({className: "lineWrapper"}, leftCol, rightCol));
-    }
-    return $(divWrapper.dom).wrap("<div/>").parent().html();
+
+        var row = $('<div>', {'class': 'lineWrapper'}).appendTo(divWrapper);
+        row.append(leftCol).append(rightCol);
+    });
+    return divWrapper;
 };
 
 var acceptElectronicAgreement = function(confId, authKey, redirectionLink) {
