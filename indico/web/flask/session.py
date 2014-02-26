@@ -101,6 +101,8 @@ class IndicoSession(BaseSession):
     def timezone(self):
         if '_timezone' in self:
             return self['_timezone']
+        if '_avatarId' not in self:
+            return 'LOCAL'
         with DBMgr.getInstance().global_connection():
             return HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
 
