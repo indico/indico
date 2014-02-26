@@ -52,6 +52,7 @@ from indico.core.config import Config
 from indico.util import mdx_latex
 import markdown
 from PIL import Image as PILImage
+from indico.util.string import sanitize_for_platypus
 
 ratio = math.sqrt(math.sqrt(2.0))
 
@@ -69,58 +70,13 @@ class PDFSizes:
 
         self.PDFfontsizes = [_("xxx-small"), _("xx-small"), _("x-small"), _("smaller"), _("small"), _("normal"), _("large"), _("larger")]
 
-class PDFHTMLParser(HTMLParser):
-    _removedTags = ["a", "font"]
-
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.text = []
-
-    def parse(self, s):
-        "Parse the given string 's'."
-        self.feed(s)
-        self.close()
-        return "".join(self.text)
-
-    def handle_data(self, data):
-        self.text.append(data)
-
-    def filterAttrs(self, attrs):
-        filteredAttrs = []
-        for x, y in attrs:
-            if x not in ["target"]:
-                filteredAttrs.append((x,y))
-        return filteredAttrs
-
-    def handle_entityref(self, name):
-        self.text.append( "&%s;"%name )
-
-    def handle_starttag(self, tag, attrs):
-        if tag == "br":
-            self.text.append( "<br/>" )
-        elif tag in self._removedTags:
-            return
-        else:
-            self.text.append( "<%s%s>" % (tag, " ".join([ ' %s="%s"' % (x,y) for x,y in self.filterAttrs(attrs)])) )
-
-    def handle_startendtag(self, tag, attrs):
-        if tag =="a":
-            self.text.append( "</a>" )
-        else:
-            self.text.append( "<%s%s/>" % (tag, " ".join([ ' %s="%s"' % (x,y) for x,y in self.filterAttrs(attrs)])) )
-
-    def handle_endtag(self, tag):
-        if tag in self._removedTags:
-            return
-        self.text.append("</%s>" % tag)
-
 
 def escape(text):
     if text is None:
         text = ""
     try:
         if isStringHTML(text):
-            text = PDFHTMLParser().parse(text)
+            text = sanitize_for_platypus(text)
         else:
             text = cgi.escape(text)
             text = text.replace("\r\n", " <br/>")

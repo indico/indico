@@ -172,11 +172,11 @@ class AbstractToPDF(PDFLaTeXBase):
     def __init__(self, abstract, tz=None):
         super(AbstractToPDF, self).__init__()
 
-        if tz is None:
-            tz = conf.getTimezone()
-
         self._abstract = abstract
         conf = abstract.getConference()
+
+        if tz is None:
+            tz = conf.getTimezone()
 
         self._args.update({
             'doc_type': 'abstract',

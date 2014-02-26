@@ -23,6 +23,7 @@ String manipulation functions
 
 import re
 import unicodedata
+from lxml import html, etree
 
 import markdown
 import bleach
@@ -113,3 +114,16 @@ def remove_tags(text):
 def render_markdown(text):
     """ Mako markdown to html filter """
     return markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS))
+
+
+def sanitize_for_platypus(text):
+    """Sanitize HTML to be used in platypus"""
+    tags = ['b', 'br', 'em', 'font', 'i', 'img', 'strike', 'strong', 'sub', 'sup', 'u', 'span', 'div', 'p']
+    attrs = {
+        'font': ['size', 'face', 'color'],
+        'img': ['src', 'width', 'height', 'valign']
+    }
+    res = bleach.clean(text, tags=tags, attributes=attrs, strip=True)
+    # Convert to XHTML
+    doc = html.fromstring(res)
+    return etree.tostring(doc)
