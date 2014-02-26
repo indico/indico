@@ -988,31 +988,32 @@ class WCategoryStatistics(wcomponents.WTemplated):
         wvars["name"] = self.__target.getName()
         wvars["img"] = self.__target.getIconURL()
         wvars["categDisplayURL"] = urlHandlers.UHCategoryDisplay.getURL(self.__target)
+        wvars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
 
         stats = []
+        plots = []
         if self._stats is not None:
             # Number of events:
             if self._stats["events"]:
                 wcsl = wcomponents.WCategoryStatisticsList(_("Number of events"),
                                                            self._stats["events"], 'left', 'events')
-                plots = wcsl.getHTML(self._aw)
-                plots = plots + """<div style="height:300px; width:6%; float:left; margin-bottom:40px;"></div>"""
+                plots.append(wcsl.getHTML(self._aw))
+                plots.append("""<div style="height:350px; width:6%; float:left; margin-bottom:50px;"></div>""")
                 # Number of contributions:
                 wcsl = wcomponents.WCategoryStatisticsList(_("Number of contributions"),
                                                            self._stats["contributions"], 'right', 'contributions')
-                plots = plots + wcsl.getHTML(self._aw)
-                stats.append(plots)
-                stats.append(i18nformat("""<h2> _("Number of resources"): {0}</h2>""").format(self._stats["resources"]))
+                plots.append(wcsl.getHTML(self._aw))
+                stats.append(i18nformat("""<h2> _("Number of resources"): <b>{0}</b></h2>""")
+                             .format(self._stats["resources"]))
                 wvars["updated"] = self._stats["updated"].strftime("%d %B %Y %H:%M")
             else:
                 stats.append(i18nformat("""<h2> _("No statistics for the events").</h2>"""))
                 stats.append(i18nformat("""<h2> _("No statistics for the contributions").</h2>"""))
                 stats.append(i18nformat("""<h2> _("No statistics for the resources").</h2>"""))
-                wvars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
+            stats.append(i18nformat("""<h2> _("Number of users"): <b>{0}</b></h2>""").format(self._stats["users"]))
         else:
             stats.append(_("This category doesn't contain any event. No statistics are available."))
-            wvars["updated"] = nowutc().strftime("%d %B %Y %H:%M")
-        stats.append(i18nformat("""<h2> _("Number of users"): {0}</h2>""").format(self._stats["users"]))
+        wvars["plots"] = "".join(plots)
         wvars["contents"] = "".join(stats)
         return wvars
 

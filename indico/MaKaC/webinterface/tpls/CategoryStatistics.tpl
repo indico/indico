@@ -1,18 +1,23 @@
 <div class="category-container">
     <div class="category-header">
-        <h1 class="category-title sidebar-padding">
-            ${ name | remove_tags }&nbsp;
-            <span style="font-style: italic; font-size: 0.8em;">(${ _("statistics") })</span>
-        </h1>
-        <div class="right">
-            <li><a href="${ categDisplayURL }">${ _("Go back to category page") }</a></li>
+        <div class="category-statistics center">
+            <span class="right">
+                <a class="i-button icon-prev" href="${ categDisplayURL }" title="Category page" style="margin-top:0.4em;"></a>
+            </span>
+            <div class="category-title" style="margin-left:0px; text-align:left;">
+                ${ name | remove_tags }&nbsp;
+                <span style="font-style: italic; font-size: 0.8em;">(${ _("statistics") })</span>
+            </div>
         </div>
     </div>
 
-    <div class="category-content-wrapper category-statistics">
-        ${ contents }
+    <div class="category-content-wrapper category-statistics center">
+        ${ plots }
+        <div style="text-align:left;">
+            ${ contents }
+        </div>
         <br>
         <br>
-        <div class="right"> ${ _("Updated") } ${ updated }</div>
+        <div class="footer right"> ${ _("Updated") } ${ updated }</div>
     </div>
 </div>

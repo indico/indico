@@ -1,12 +1,16 @@
-<div class="${align}" style="height:300px; width:45%; float:${align}; margin-bottom:40px; padding:0% 1% 0% 1%;">
-  <h2 class="center">${statsName}: ${total}</h2>
-  <div id="chartdiv_${tagName}"></div>
+<div class="${align}" style="height:350px; width:45%; float:${align}; margin-bottom:50px; padding:0% 1% 0% 1%;">
+  <h2 class="center">${statsName}: <b>${total}</b></h2>
+  <div id="chartdiv_${tagName}" style="height:100%;"></div>
 </div>
 
 <script type="text/javascript">
+  var xTicksNumber = 10;
+  var yTicksNumber = 6;
+  var xMin = ${min}-1;
+  var yMax = 0;
+
   var jsonStats = ${stats|n,j};
   var stats = [];
-  var yMax = 0;
   for (var i in jsonStats){
     stats.push([i, jsonStats[i]]);
     if (jsonStats[i] > yMax)
@@ -15,25 +19,27 @@
   stats.sort();
   if (stats.length == 0)
     stats = [null];
-  var xMin = ${min}-1;
-  var xMax = ${max};
-  var xInterval = Math.ceil((xMax-xMin)/10);
-  var yInterval = Math.ceil(yMax/6);
-  var xTicks = [];
-  xMax += xInterval;
-  for (var i=xMin; i<=xMax; i+=xInterval)
-    xTicks.push(i);
+
+  var currentYear = new Date().getFullYear();
+  var current = [[currentYear, jsonStats[currentYear]]];
+
+  var xInterval = Math.ceil((${max}-xMin)/xTicksNumber);
+  var yInterval = Math.ceil(yMax/yTicksNumber);
   var options = { axes: {
                     xaxis: {
                       label: '${ _("Year") }',
                       min: xMin,
-                      max: xMin+xInterval*11,
+                      max: xMin+xInterval*(xTicksNumber+1),
                       tickInterval: xInterval,
-                      tickOptions: {formatString: '%d'}
+                      tickOptions: {
+                        formatString: '%d',
+                        showGridline: false
+                      }
                     },
                     yaxis: {
                       min: 0,
-                      tickInterval: yInterval
+                      tickInterval: yInterval,
+                      rendererOptions: {drawBaseline: false}
                     }
                   },
                   highlighter: {
@@ -45,17 +51,26 @@
                     tooltipLocation: 'nw',
                     zoom: true
                   },
-                  series: [{
+                  seriesDefaults: {
                     color: '#1756B5',
                     lineWidth: 3,
                     size: 11
-                  }],
+                  },
+                  series: [
+                    null,
+                    {markerOptions: {
+                      color: '#17D6F0',
+                      style: 'circle'
+                    }}
+                  ],
                   grid: {
-                    background: '#f9f9f9'
+                    background: '#FFFFFF',
+                    borderWidth: 0,
+                    shadow: false
                   }
                 };
   $.jqplot( 'chartdiv_${tagName}',
-            [stats],
+            [stats, current],
             options
           );
 </script>
