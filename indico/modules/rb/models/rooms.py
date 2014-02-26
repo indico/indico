@@ -61,7 +61,6 @@ from MaKaC.user import (
 
 from indico.core.db import db, time_diff, greatest, least
 from indico.modules.rb.models import utils
-from indico.modules.rb.models.attribute_keys import AttributeKey
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
