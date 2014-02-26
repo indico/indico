@@ -170,6 +170,8 @@ class _TestScheduler(IndicoTestCase):
     def _assertStatus(self, expectedStatus):
         with self._context('database'):
             status = self._smodule.getStatus()
+            del status['pid']
+            del status['hostname']
             self.assertEqual(expectedStatus, status)
 
     def testSimpleFinish(self):
