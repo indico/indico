@@ -128,16 +128,18 @@ class WRoomBookingMapOfRoomsWidget(WTemplated):
 
 class WPRoomBookingRoomList(WPRoomBookingBase):
 
-    def __init__(self, rh, onlyMy=False):
+    def __init__(self, rh):
         WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
 
     def _getTitle(self):
-        return '{} - {}'.format(WPRoomBookingBase._getTitle(self),
-                                _("My Rooms") if self._onlyMy else _("Found rooms"))
+        return '{} - {}'.format(
+            WPRoomBookingBase._getTitle(self),
+            _('My Rooms') if self._rh._form.is_only_my_rooms.data else _('Found rooms')
+        )
 
     def _setCurrentMenuItem(self):
-        if self._form.is_only_my_rooms:
+        if self._rh._form.is_only_my_rooms.data:
             self._myRoomListOpt.setActive(True)
         else:
             self._roomSearchOpt.setActive(True)
@@ -157,22 +159,24 @@ class WRoomBookingRoomList(WTemplated):
         wvars = WTemplated.getVars(self)
         f = self._rh._form
 
-        wvars["rooms"] = self._rh._rooms
+        wvars['rooms'] = self._rh._rooms
         wvars['mapAvailable'] = self._rh._mapAvailable
-        wvars["standalone"] = self._standalone
-        wvars['title'] = self._title
-        if self._onlyMy:
-            wvars["noResultsMsg"] = _("You are not the owner of any room")
+        wvars['standalone'] = self._standalone
+        wvars['title'] = self._rh._title
+        if f.is_only_my_rooms.data:
+            wvars['noResultsMsg'] = _('You are not the owner of any room')
         else:
-            wvars["noResultsMsg"] = _("There are no rooms with this search criteria")
+            wvars['noResultsMsg'] = _('There are no rooms with this search criteria')
 
         if self._standalone:
-            wvars["detailsUH"] = UH.UHRoomBookingRoomDetails
-            wvars["bookingFormUH"] = UH.UHRoomBookingBookingForm
+            wvars['detailsUH'] = UH.UHRoomBookingRoomDetails
+            wvars['bookingUH'] = UH.UHRoomBookingBookingForm
         else:
-            wvars["conference"] = self._rh._conf
-            wvars["detailsUH"] = UH.UHConfModifRoomBookingRoomDetails
-            wvars["bookingFormUH"] = UH.UHConfModifRoomBookingBookingForm
+            wvars['conference'] = self._rh._conf
+            wvars['detailsUH'] = UH.UHConfModifRoomBookingRoomDetails
+            wvars['bookingUH'] = UH.UHConfModifRoomBookingBookingForm
+        wvars['modificationUH'] = UH.UHRoomBookingRoomForm
+        wvars['mapUH'] = UH.UHRoomBookingMapOfRooms
 
         return wvars
 

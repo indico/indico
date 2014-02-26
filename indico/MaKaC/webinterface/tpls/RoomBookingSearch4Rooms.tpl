@@ -144,10 +144,10 @@
     <br />
     ${ _('Examples') }:
     <ul>
-      <li class="tip-no-borders">Hauser &nbsp; ( ${ _('name of person responsible') })</li>
-      <li class="tip-no-borders">513- 31- 28- &nbsp; (buildings)</li>
-      <li class="tip-no-borders">-006 -C19  &nbsp; (rooms)</li>
-      <li class="tip-no-borders">prevessin &nbsp; (site)</li>
+      <li class="tip-no-borders">Hauser&nbsp;(${ _('name of person responsible') })</li>
+      <li class="tip-no-borders">513- 31- 28-&nbsp;(${ _('buildings') })</li>
+      <li class="tip-no-borders">-006 -C19&nbsp;(${ _('rooms') })</li>
+      <li class="tip-no-borders">prevessin&nbsp;(${ _('site') })</li>
     </ul>
       ${ _('Searching is case-insensitive and concerns all room\'s attributes.') }
   </div>
@@ -352,7 +352,7 @@
                               <td align="left" class="blacktext">
                                 <input size="3" type="text" id="capacity" name="capacity"/>
                                 ${ _('people') }
-                                ${contextHelp('capacityHelp') }
+                                ${ contextHelp('capacityHelp') }
                               </td>
                             </tr>
                           </table>
@@ -371,7 +371,7 @@
                               </td>
                               <td align="left" class="blacktext" >
                               % for eq in possibleEquipment:
-                                <input id="${ eq.id }" name="equipments" type="checkbox">
+                                <input id="${ eq.id }" name="equipments_${ eq.id }" type="checkbox">
                                   ${ eq.name }
                                 </input>
                                 <br />

@@ -17,55 +17,55 @@
                     <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
                       <tr>
                         <td style="white-space: nowrap;">
-                          <table class="resvTable">
+                          <table class="resvTable" style="width: 100%">
                             <tr>
-                              <td width="15%" class="dataCaptionFormat"> ${ _('Photo') }</td>
-                              <td width="20%" class="dataCaptionFormat"> ${ _('Room name') }</td>
-                              <td width="15%" class="dataCaptionFormat"> ${ _('Capacity') }</td>
-                              <td width="15%" class="dataCaptionFormat"> ${ _('Site') }</td>
-                              <td width="65%" class="dataCaptionFormat"> ${ _('Actions') }</td>
+                              <td width="15%" class="dataCaptionFormat">${ _('Photo') }</td>
+                              <td width="20%" class="dataCaptionFormat">${ _('Room name') }</td>
+                              <td width="15%" class="dataCaptionFormat">${ _('Capacity') }</td>
+                              <td width="15%" class="dataCaptionFormat">${ _('Site') }</td>
+                              <td width="65%" class="dataCaptionFormat">${ _('Actions') }</td>
                             </tr>
                             <tr>
                               <td class="titleCellTD" colspan="10" style="height: 0px">&nbsp;</td>
                             </tr>
                             % for room in rooms:
-                              <% myDetails = detailsUH.getURL(room) %>
-                              <% onClickDetails = 'onclick="window.location=\'%s\'"' % myDetails %>
-                              <% bookMe = bookingFormUH.getURL(room) %>
-                              <% modifyMe = urlHandlers.UHRoomBookingRoomForm.getURL( room ) %>
+                              <% details_url = detailsUH.getURL(room) %>
+                              <% booking_url = bookingUH.getURL(room) %>
+                              <% modification_url = modificationUH.getURL(room) %>
+                              <% on_click_details_url = 'onclick="window.location={}"'.format(details_url) %>
                               % if mapAvailable:
-                                <% showMeOnMap = urlHandlers.UHRoomBookingMapOfRooms.getURL(roomID=room.id) %>
+                                <% show_on_map = mapUH.getURL(roomID=room.id) %>
                               % endif
                               <tr style="height: 60px" id="${ room.id }" class="resvHover">
-                                <td ${ onClickDetails }>
+                                <td ${ on_click_details_url }>
                                   % if room.has_photo:
                                     <img src="${ room.getSmallPhotoURL() }" />
                                   % endif
                                 </td>
-                                <td ${ onClickDetails }>
+                                <td ${ on_click_details_url }>
                                   ${ room.building }-${ room.floor }-${ room.number }
                                   % if room.has_special_name:
                                     <small>(${ room.name })</small>
                                   % endif
                                 </td>
-                                <td ${ onClickDetails } align='center'>
+                                <td ${ on_click_details_url } align='center'>
                                   ${ room.capacity }
                                 </td>
-                                <td ${ onClickDetails }>
+                                <td ${ on_click_details_url }>
                                   ${ room.site }
                                 </td>
                                 <td>
-                                  <a href="${ myDetails }">${ _('view') }</a><br/>
+                                  <a href="${ details_url }">${ _('view') }</a><br/>
                                   % if room.canBeBookedBy(user):
-                                    <a href="${ bookMe }">${ _('book') }</a><br/>
+                                    <a href="${ booking_url }">${ _('book') }</a><br/>
                                   % elif room.canBePrebookedBy(user) and not room.canBeBookedBy(user):
-                                    <a href="${ bookMe }">${ _('PRE-book') }</a><br/>
+                                    <a href="${ booking_url }">${ _('PRE-book') }</a><br/>
                                   % endif
-                                  % if room.canModify( user ):
-                                    <a href="${ modifyMe }"> ${ _('modify') }</a><br/>
+                                  % if room.canBeModifiedBy(user):
+                                    <a href="${ modification_url }"> ${ _('modify') }</a><br/>
                                   % endif
                                   % if mapAvailable:
-                                    <a href="${ showMeOnMap }"> ${ _('show on map') }</a><br/>
+                                    <a href="${ show_on_map }"> ${ _('show on map') }</a><br/>
                                   % endif
                                 </td>
                               </tr>

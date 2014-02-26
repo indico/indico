@@ -42,11 +42,12 @@ from wtforms_alchemy import model_form_factory
 from indico.core.errors import IndicoError
 from indico.util.i18n import _
 
-from ..models.reservations import Reservation, RepeatUnit
+from ..models.reservations import Reservation, RepeatUnit, RepeatMapping
 
 
 ModelForm = model_form_factory(Form, strip_string_fields=True)
 
+AVAILABILITY_VALUES = ['Available', 'Booked', 'Don\'t care']
 
 def auto_datetime(diff=None):
     return (diff if diff else timedelta(0)) + datetime.utcnow()
@@ -64,8 +65,15 @@ def repeat_step_check(form, field):
             pass
         elif form.repeat_unit.data == RepeatUnit.YEAR:
             pass
-    else:
+    else:  # this part may be removed
         raise validators.ValidationError('Repeat Step only makes sense with Repeat Unit')
+
+
+def repeatibility_check(form, field):
+    if form.availability.validate(form):
+        if form.availability.data == AVAILABILITY_VALUES[1]:
+            if field.data >= 5:
+                raise validators.ValidationError('Unrecognized repeatability')
 
 
 class IndicoField(Field):
@@ -80,7 +88,7 @@ class IndicoField(Field):
         ls = s.split('_')
         return ''.join(ls[:1] + [e.capitalize() for e in ls[1:]])
 
-    def process(self, formdata, data=None):
+    def process_default(self, formdata, data):
         self.process_errors = []
         if data is None:
             try:
@@ -95,7 +103,15 @@ class IndicoField(Field):
         except ValueError as e:
             self.process_errors.append(e.args[0])
 
-        if formdata:
+    def process_filters(self):
+        for filter in self.filters:
+            try:
+                self.data = filter(self.data)
+            except ValueError as e:
+                self.process_errors.append(e.args[0])
+
+    def _process(self, formdata, data):
+         if formdata:
             try:
                 if self.parameter_name in formdata:
                     self.raw_data = formdata.getlist(self.parameter_name)
@@ -107,11 +123,10 @@ class IndicoField(Field):
             except ValueError as e:
                 self.process_errors.append(e.args[0])
 
-        for filter in self.filters:
-            try:
-                self.data = filter(self.data)
-            except ValueError as e:
-                self.process_errors.append(e.args[0])
+    def process(self, formdata, data=None):
+        self.process_default(formdata, data)
+        self._process(formdata, data)
+        self.process_filters()
 
 
 class BooleanIndicoField(IndicoField, BooleanField):
@@ -134,26 +149,12 @@ class DateTimeIndicoField(IndicoField, DateTimeField):
 
     def process_formdata(self, raw_data):
         try:
-            self.data = datetime.combine(datetime(*raw_data),
-                                         datetime.strptime(raw_data.pop(), '%H:%M'))
+            self.data = datetime.combine(datetime(*map(int, raw_data[:-1])),
+                                         datetime.strptime(raw_data[-1], '%H:%M'))
         except:
-            self.data = datetime(*raw_data)
+            self.data = datetime(*map(int, raw_data))
 
-    def process(self, formdata, data=None):
-        self.process_errors = []
-        if data is None:
-            try:
-                data = self.default()
-            except TypeError:
-                data = self.default
-
-        self.object_data = data
-
-        try:
-            self.process_data(data)
-        except ValueError as e:
-            self.process_errors.append(e.args[0])
-
+    def _process(self, formdata, data=None):
         if formdata:
             try:
                 try:
@@ -167,12 +168,6 @@ class DateTimeIndicoField(IndicoField, DateTimeField):
                     else:
                         self.raw_data = []
                 self.process_formdata(self.raw_data)
-            except ValueError as e:
-                self.process_errors.append(e.args[0])
-
-        for filter in self.filters:
-            try:
-                self.data = filter(self.data)
             except ValueError as e:
                 self.process_errors.append(e.args[0])
 
@@ -198,6 +193,26 @@ class SelectMultipleCustomIndicoField(IndicoField):
             raise validators.StopValidation(_('At least one integer id must be supplied'))
         elif self.min_check and min(self.data) < self.min_check:
             raise validators.StopValidation(_('Minimum id can be at least {}').format(self.min_check))
+
+
+class MultipleCheckboxIndicoField(IndicoField):
+
+    def __init__(self, prefix, *args, **kw):
+        self.prefix = prefix
+        super(MultipleCheckboxIndicoField, self).__init__(*args, **kw)
+
+    def _process(self, formdata, data=None):
+        if formdata:
+            try:
+                if self.prefix:
+                    self.raw_data = [int(k.replace(self.prefix, '', 1))
+                                     for k, _ in formdata.iteritems()
+                                     if k.startswith(self.prefix)]
+                else:
+                    self.raw_data = []
+                self.data = self.raw_data
+            except ValueError as e:
+                self.process_errors.append(e.args[0])
 
 
 class BookingListForm(Form):
@@ -259,17 +274,23 @@ class RoomListForm(Form):
                                      parameter_name='roomLocation')
     free_search = StringIndicoField(validators=[optional()])
     capacity = IntegerIndicoField(validators=[optional(), number_range(min=1)])
-    equipments = SelectMultipleCustomIndicoField(parameter_name='equipments')
+    equipments = MultipleCheckboxIndicoField('equipments_')
 
-    availability = StringIndicoField(validators=[required(), any_of(
-                                     values=['Available', 'Booked', 'Don\'t care'])])
-    includes_pending_blockings = BooleanIndicoField(validators=[required()], default=False)
+    availability = StringIndicoField(validators=[required(), any_of(values=AVAILABILITY_VALUES)],
+                                     default='Don\'t care')
+    repeatibility = IntegerIndicoField(validators=[optional(), repeatibility_check])
+
+    includes_pending_blockings = BooleanIndicoField(validators=[required()], default=False,
+                                                    parameter_name='includePendingBlockings')
     includes_pre_bookings = BooleanIndicoField(validators=[required()], default=False,
-                                               parameter_name='includePreBookings')
+                                               parameter_name='includePrebookings')
 
-    is_reservable = BooleanIndicoField(validators=[optional()], default=True)
-    is_only_my_rooms = BooleanIndicoField(validators=[optional()], default=False)
-    is_auto_confirmed = BooleanIndicoField(validators=[optional()], default=True)
+    is_public = BooleanIndicoField(validators=[optional()], default=True,
+                                   parameter_name='isReservable')
+    is_only_my_rooms = BooleanIndicoField(validators=[optional()], default=False,
+                                          parameter_name='onlyMy')
+    is_auto_confirm = BooleanIndicoField(validators=[optional()], default=True,
+                                         parameter_name='isAutoConfirmed')
     is_active = BooleanIndicoField(validators=[optional()], default=True)
 
     start_date = DateTimeIndicoField(validators=[optional()],
@@ -280,8 +301,6 @@ class RoomListForm(Form):
                                    default=partial(auto_date, time(17, 30)))
 
     def __getattr__(self, attr):
-        if attr == 'start_date':
-            return datetime.combine(self.start.data, self.start_time.data)
-        elif attr == 'end_date':
-            return datetime.combine(self.end.data, self.end_time.data)
+        if attr == 'repeat':
+            RepeatMapping.getNewMapping(self.repeatibility.data)
         raise IndicoError('{} has no attribute: {}'.format(self.__class__.__name__, attr))

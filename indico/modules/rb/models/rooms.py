@@ -66,7 +66,7 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
-from indico.modules.rb.models.room_attributes import RoomAttribute
+from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_equipments import (
     RoomEquipment,
@@ -351,9 +351,20 @@ notificationAssistance: {notification_for_assistance}
     def has_photo(self):
         return self.photos.count() > 0
 
-    @property
+    @hybrid_property
     def is_public(self):
         return self.is_reservable and not self.has_booking_groups
+
+    @is_public.expression
+    def is_public(self):
+        return self.query\
+                .outerjoin(RoomAttributeAssociation)\
+                .outerjoin(RoomAttribute)\
+                .filter(
+                    RoomAttribute.name == 'Allowed Booking Group',
+                    Room.is_reservable == True,
+                )\
+                .count() == 0
 
     @property
     def is_auto_confirm(self):
@@ -368,9 +379,9 @@ notificationAssistance: {notification_for_assistance}
             label=(_('person'), _('people'))[self.capacity > 1 or self.capacity == 0]
         ))
         infos.append((_('private'),
-                      _('public'))[self.is_reservable and not self.has_booking_groups])
-        infos.append((_('auto-confirmation'),
-                      _('needs confirmation'))[self.reservations_need_confirmation])
+                      _('public'))[self.is_public])
+        infos.append((_('needs confirmation'),
+                      _('auto-confirmation'))[self.is_auto_confirm])
         if self.needs_video_conference_setup:
             infos.append(_('video conference'))
 
@@ -423,6 +434,14 @@ notificationAssistance: {notification_for_assistance}
         elif self.is_reservable:
             roomCls = 'basicRoom'
         return roomCls
+
+    @property
+    def has_special_name(self):
+        return self.name != self.name[::-1]
+
+    @property
+    def has_photo(self):
+        return self.photos.count() > 0
 
     def getLocator(self):
         locator = Locator()
@@ -524,6 +543,49 @@ notificationAssistance: {notification_for_assistance}
     @staticmethod
     def getRoomByName(name):
         return Room.query.filter_by(name=name).first()
+
+    # TODO: capacity check should go into config, current 20%
+    @staticmethod
+    def getRoomsForRoomList(f, avatar):
+        from .locations import Location
+
+        equipment_count = len(f.equipments.data)
+        equipment_subquery = db.session.query(RoomEquipmentAssociation)\
+                               .with_entities(func.count(RoomEquipmentAssociation.c.room_id))\
+                               .filter(
+                                    RoomEquipmentAssociation.c.room_id == Room.id,
+                                    RoomEquipmentAssociation.c.equipment_id.in_(f.equipments.data)
+                               )\
+                               .correlate(Room)\
+                               .as_scalar()
+
+        q = Room.query\
+                .join(Location.rooms)\
+                .filter(
+                    Location.id == f.location_id.data,
+                    (Room.capacity >= (f.capacity.data * 0.8)) if f.capacity.data else True,
+                    Room.is_public == f.is_public.data if f.is_public.data else True,
+                    Room.is_auto_confirm == f.is_auto_confirm.data if f.is_auto_confirm.data else True,
+                    Room.is_active == f.is_active.data if f.is_active.data else True,
+                    Room.owner_id == avatar.getId() if f.is_only_my_rooms.data else True,
+                    (equipment_subquery == equipment_count) if equipment_count else True
+                )\
+
+        free_search_columns = (
+            'name', 'site', 'division', 'building', 'floor',
+            'number', 'telephone', 'key_location', 'comments'
+        )
+        if f.free_search.data:
+            q = q.filter(
+                or_(
+                    *[getattr(Room, c).ilike(u'%{}%'.format(f.free_search.data))
+                      for c in free_search_columns]
+                )
+            )
+
+        q = q.order_by(Room.capacity)
+        print q
+        return q.all()
 
     # TODO
     def isAvailable(self, r):

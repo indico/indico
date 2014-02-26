@@ -86,19 +86,20 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         return html
 
 
-class RHRoomBookingRoomList(AttributeSetterMixin, RHRoomBookingBase):
+class RHRoomBookingRoomList(RHRoomBookingBase):
 
     def _checkParams(self):
+        print request.values
+        print '========================'
         self._form = RoomListForm(request.values)
-
-    def _businessLogic(self):
-        pass
-        # self._rooms = rooms
-        # self._mapAvailable = Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable()
+        print self._form.data
 
     def _process(self):
-        self._businessLogic()
-        return room_views.WPRoomBookingRoomList(self, self._onlyMy).display()
+        self._rooms = Room.getRoomsForRoomList(self._form, self._getUser())
+        room_count = len(self._rooms)
+        self._title = _('1 room found') if room_count == 1 else _('{} rooms found').format(room_count)
+        self._mapAvailable = Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable()
+        return room_views.WPRoomBookingRoomList(self).display()
 
 
 class RHRoomBookingSearch4Rooms(RHRoomBookingBase):
