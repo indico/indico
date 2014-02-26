@@ -20,6 +20,7 @@
 """This file contains classes which allow to handle URLs in a transparent way
 """
 from flask import url_for
+from indico.util.caching import memoize
 from werkzeug.urls import url_encode, url_parse, url_unparse, url_join
 from werkzeug.routing import BuildError
 
@@ -27,6 +28,10 @@ from indico.core.config import Config
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import MaKaCError
 from indico.web.flask.util import url_rule_to_js
+
+
+# Memoized version to speed things up
+_url_for = memoize(url_for)
 
 
 class _BaseURL(object):
@@ -143,7 +148,7 @@ class EndpointURL(_BaseURL):
         # the same one. maybe we could even get rid of the baseURL stuff at some point... It's
         # only really important when we change from SSL to non-SSL or vice versa anyway
         anchor = self.fragment or None
-        self._url = url_join(self._base_url, url_for(self._endpoint, _anchor=anchor, **self._get_fixed_params()))
+        self._url = url_join(self._base_url, _url_for(self._endpoint, _anchor=anchor, **self._get_fixed_params()))
 
     @property
     def valid(self):
