@@ -1185,7 +1185,7 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
 
     def _process( self ):
         # Init
-        self._resvs = []
+        self._resvs = set()
         self._dayBars = {}
 
         # The following can't be done in checkParams since it must be after checkProtection
@@ -1261,7 +1261,17 @@ class RHRoomBookingBookingList( RHRoomBookingBase ):
         day = None # Ugly but...othery way to avoid it?
         for day in days:
             for loc in Location.allLocations:
-                self._resvs += CrossLocationQueries.getReservations( location = loc.friendlyName, resvExample = self._resvEx, rooms = self._rooms, archival = self._isArchival, heavy = self._isHeavy, repeatability=self._repeatability,  days = [day] )
+                self._resvs.update(
+                    set(CrossLocationQueries.getReservations(
+                        location=loc.friendlyName,
+                        resvExample=self._resvEx,
+                        rooms=self._rooms,
+                        archival=self._isArchival,
+                        heavy=self._isHeavy,
+                        repeatability=self._repeatability,
+                        days=[day])
+                    )
+                )
             if len(self._resvs) > self._resvLimit:
                 self._overload = 2
                 break
