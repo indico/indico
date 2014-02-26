@@ -20,6 +20,8 @@ from cStringIO import StringIO
 
 from datetime import timedelta, datetime
 
+from flask import request, jsonify
+
 #################################
 # Fermi timezone awareness      #
 #################################
@@ -89,14 +91,21 @@ class RHCategoryMap( RHCategDisplayBase ):
         p = category.WPCategoryMap( self, self._target )
         return p.display()
 
-class RHCategoryStatistics( RHCategDisplayBase ):
+
+class RHCategoryStatistics(RHCategDisplayBase):
     _uh = urlHandlers.UHCategoryStatistics
 
-    def _process( self ):
+    def _process(self):
         wfReg = webFactoryRegistry.WebFactoryRegistry()
         stats = statistics.CategoryStatistics(self._target).getStatistics()
-        p = category.WPCategoryStatistics( self, self._target, wfReg, stats )
-        return p.display()
+        if request.accept_mimetypes.best_match(('application/json', 'text/html')) == 'application/json':
+            stats = dict(stats)
+            stats['updated'] = stats['updated'].strftime("%d %B %Y %H:%M")
+            return jsonify(stats)
+        else:
+            p = category.WPCategoryStatistics(self, self._target, wfReg, stats)
+            return p.display()
+
 
 class RHCategOverviewDisplay( RoomBookingDBMixin, RHCategDisplayBase ):
 
