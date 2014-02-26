@@ -59,6 +59,10 @@ class ReservationOccurrence(db.Model):
         nullable=False,
         default=False
     )
+    rejection_reason = db.Column(
+        db.String,
+        default=''
+    )
 
     def __str__(self):
         return '{} -- {}'.format(self.start, self.end)
