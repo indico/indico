@@ -434,35 +434,32 @@ notificationAssistance: {notification_for_assistance}
             roomCls = 'basicRoom'
         return roomCls
 
-    @property
-    def has_special_name(self):
-        return self.name != self.name[::-1]
-
-    @property
-    def has_photo(self):
-        return self.photos.count() > 0
-
     def getLocator(self):
         locator = Locator()
         locator['roomLocation'] = self.location.name
         locator['roomID'] = self.id
         return locator
 
-    def getFullName(self):
-        return '{}-{}-{}-{}'.format(
+    def generateName(self):
+        return u'{}-{}-{}'.format(
             self.building,
             self.floor,
-            self.number,
+            self.number
+        )
+
+    @property
+    def has_special_name(self):
+        return self.name != self.generateName()
+
+    def getFullName(self):
+        return u'{}-{}'.format(
+            self.generateName(),
             self.name
         )
 
     def updateName(self):
         if not self.name and self.building and self.floor and self.number:
-            self.name = '{}-{}-{}'.format(
-                self.building,
-                self.floor,
-                self.number
-            )
+            self.name = self.generateName()
 
     def getAccessKey(self):
         return ''
