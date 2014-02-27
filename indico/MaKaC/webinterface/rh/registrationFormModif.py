@@ -532,6 +532,7 @@ class RHRegistrationFormSocialEventsSetConfig(RHRegistrationFormModifSocialEvent
         self._introSentence = post_pm.extract('introSentence', pType=str, allowEmpty=False)
         self._selectionType = post_pm.extract('selectionType', pType=str, allowEmpty=False)
         self._items = post_pm.extract('items', pType=list, allowEmpty=False)
+        self._mandatory = post_pm.extract('mandatory', pType=bool)
 
     def _setItems(self):
         for item in self._items:
@@ -553,6 +554,7 @@ class RHRegistrationFormSocialEventsSetConfig(RHRegistrationFormModifSocialEvent
     def _process_POST(self):
         self._section.setIntroSentence(self._introSentence)
         self._section.setSelectionType(self._selectionType)
+        self._section.setMandatory(self._mandatory)
         self._setItems()
         return json.dumps(self._section.fossilize())
 

@@ -564,6 +564,11 @@ class IRegFormSocialEventSectionFossil(IRegFormSectionBaseFossil):
         Intro sentence
         """
 
+    def getMandatory(self):
+        """
+        Mandatory to select at least one event
+        """
+
     def getSelectionTypeId(self):
         """
         Selection type

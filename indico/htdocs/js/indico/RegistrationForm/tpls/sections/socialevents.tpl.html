@@ -1,11 +1,13 @@
+<ng-form name="nestedForm">
 <table ng-controller="BillableCtrl">
     <tr>
         <td class="bold" align="left" colspan="3">
-            <span ng-bind-html="section.introSentence"></span>
+            <span ng-bind-html="section.introSentence" ng-class="{'text-error': validationStarted && nestedForm.$invalid}"></span>
+            <span ng-show="section.mandatory" class="regFormMandatoryField">*</span>
         </td>
     </tr>
 
-    <tr ng-if="section.selectionType!='multiple'">
+    <tr ng-if="section.selectionType!='multiple' && !section.mandatory">
         <td>
             <input type="radio" name="socialEvents" value="" ng-checked="userdata.socialEvents.length === 0 || userdata.socialEvents === undefined"
                 ng-disabled="anyBillableEventPayed(userdata)"/>
@@ -18,17 +20,19 @@
             <input ng-switch-when="multiple"
                 ng-model="input.selected"
                 ng-init="input.selected = isSelected(item.id)"
+                ng-required="!isAnyEventSelected()"
                 type="checkbox" name="socialEvents" value="{{ item.id }}"
                 ng-disabled="!hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent') || paymentBlocked(item, userdata) "/>
             <input ng-switch-default
                 type="radio" name="socialEvents" value="{{ item.id }}"
                 ng-model="input.selected"
                 ng-init="input.selected = userdata.socialEvents[0].id"
+                ng-required="!isAnyEventSelected()"
                 ng-disabled="!hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent') || paymentBlocked(item, userdata) || anyBillableEventPayed(userdata)"/>
             {{ item.caption }}
-            <font ng-if="!hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent')" color="red">
+            <span ng-if="!hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent')" class="noPlacesLeft">
                 ({{ 'no places left' | i18n }})
-            </font>
+            </span>
         </td>
         <td ng-if="hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent')">
             <select
@@ -62,8 +66,10 @@
     </tr>
     <tr ng-repeat="item in section.items | filter: {cancelled: true}">
         <td>
-            <b>-</b> {{ item.caption }} <font color="red">({{ item.cancelledReason }})</font>
+            <b>-</b> {{ item.caption }} <span style="color: red;">({{ item.cancelledReason }})</span>
         </td>
     </tr>
-
 </table>
+<span ng-show="validationStarted && nestedForm.$invalid && section.selectionType == 'multiple'" class="error-message-tag">{{ 'Please select at least one item' | i18n }}</span>
+<span ng-show="validationStarted && nestedForm.$invalid && section.selectionType != 'multiple'" class="error-message-tag">{{ 'Please select an item' | i18n }}</span>
+</ng-form>

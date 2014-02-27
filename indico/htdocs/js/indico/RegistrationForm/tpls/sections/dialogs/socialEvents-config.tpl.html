@@ -22,4 +22,9 @@
             rows="6">
         </textarea>
      </div>
+    <div class="regFormDialogEditLine">
+        <label class="regFormDialogCaption">{{ 'Mandatory' | i18n }}</label>
+        <input type="checkbox" name="mandatory" ng-model="formData.mandatory" ng-checked="formData.mandatory"/>
+        <span class="icon-question text-superfluous" title="{{ 'User must select at last one event.' | i18n }}"></span>
+    </div>
 </form>

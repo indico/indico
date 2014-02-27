@@ -533,6 +533,11 @@ ndRegForm.directive("ndSocialEventSection", function() {
                 });
             };
 
+            scope.isAnyEventSelected = function() {
+                // This seems to be super ugly...
+                return !!$('input[name="socialEvents"]:checked').length;
+            };
+
             scope.getMaxRegistrations = function(item) {
                 if (item.placesLimit !== 0) {
                     return Math.min(item.maxPlace + 1, item.noPlacesLeft + scope.getNoPlaces(item, scope.userdata));
@@ -580,6 +585,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
             };
 
             scope.dialogs.config.formData.push('introSentence');
+            scope.dialogs.config.formData.push('mandatory');
             scope.dialogs.config.formData.push('selectionType');
             scope.dialogs.config.tabs = [
                 {id: 'config', name: $T("Configuration"), type: 'config'},

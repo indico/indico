@@ -4396,11 +4396,13 @@ class SocialEventForm(BaseForm, Fossilizable):
         self._title = "Social Events"
         self._description = ""
         self._introSentence = self._getDefaultIntroValue()
+        self._mandatory = False
         self._selectionType = "multiple"
         self._socialEvents = PersistentMapping()
         if data is not None:
             self._title = data.get("title", self._title)
             self._description = data.get("description", self._description)
+            self._mandatory = data.get('mandatory', False)
         self._id = "socialEvents"
 
     def getId(self):
@@ -4416,6 +4418,7 @@ class SocialEventForm(BaseForm, Fossilizable):
         self.setDescription(data.get("description", ""))
         self.setIntroSentence(data.get("intro", ""))
         self.setSelectionType(data.get("selectionType", "multiple"))
+        self.setMandatory(data.get('mandatory', False))
 
     def getValues(self):
         values = {}
@@ -4423,6 +4426,7 @@ class SocialEventForm(BaseForm, Fossilizable):
         values["description"] = self.getDescription()
         values["intro"] = self.getIntroSentence()
         values["selectionType"] = self.getSelectionTypeId()
+        values["mandatory"] = self.getMandatory()
         return values
 
     def clone(self, registrationForm):
@@ -4430,7 +4434,7 @@ class SocialEventForm(BaseForm, Fossilizable):
         sef.setValues(self.getValues())
         sef.setEnabled(self.isEnabled())
 
-        for se in self.getSocialEventList() :
+        for se in self.getSocialEventList():
             sef.addSocialEvent(se.clone(registrationForm))
         return sef
 
@@ -4445,6 +4449,16 @@ class SocialEventForm(BaseForm, Fossilizable):
 
     def setDescription(self, description):
         self._description = description
+
+    def getMandatory(self):
+        try:
+            return self._mandatory
+        except AttributeError:
+            self._mandatory = False
+            return False
+
+    def setMandatory(self, value):
+        self._mandatory = value
 
     def getRegistrationForm(self):
         try:
@@ -4889,6 +4903,8 @@ class Registrant(Persistent, Fossilizable):
                 if seItem and (not self.getPayed() or not seItem.isBillable()):
                     newSE = SocialEvent(seItem, int(data.get("places-%s" % seItem.getId(), "1")))
                     self.addSocialEvent(newSE)
+            if self.getRegistrationForm().getSocialEventForm().getMandatory() and not self.getSocialEvents():
+                raise FormValuesError(_('You have to select at least one social event'))
         else:
             for seItem in self.getSocialEvents()[:]:
                 self.removeSocialEventById(seItem.getId())
