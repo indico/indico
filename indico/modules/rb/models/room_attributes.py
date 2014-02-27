@@ -73,7 +73,6 @@ class RoomAttribute(JSONStringBridgeMixin, db.Model):
     name = db.Column(
         db.String,
         nullable=False,
-        unique=True,
         index=True
     )
     location_id = db.Column(
@@ -94,20 +93,22 @@ class RoomAttribute(JSONStringBridgeMixin, db.Model):
         )
     )
 
+    db.UniqueConstraint('name', 'location_id')
+
     @staticmethod
     def supportsAttributeManagement():
         return True
 
-    # def __str__(self):
-    #     return self.name
+    def __str__(self):
+        return self.name
 
-    # def __repr__(self):
-    #     return '<AttributeKey({0}, {1}, {2}, {3})>'.format(
-    #         self.id,
-    #         self.name,
-    #         self.is_for_rooms,
-    #         self.is_for_reservations
-    #     )
+    def __repr__(self):
+        return u'<AttributeKey({0}, {1}, {2}, {3})>'.format(
+            self.id,
+            self.name,
+            self.location_id,
+            self.raw_data
+        )
 
     # @staticmethod
     # def getKeyByName(name):
