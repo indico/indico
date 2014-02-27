@@ -113,7 +113,7 @@ def remove_tags(text):
 
 def render_markdown(text):
     """ Mako markdown to html filter """
-    return markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS))
+    return markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS)).encode('utf-8')
 
 
 def sanitize_for_platypus(text):
