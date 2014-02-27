@@ -54,7 +54,8 @@
                   seriesDefaults: {
                     color: '#1756B5',
                     lineWidth: 3,
-                    size: 11
+                    size: 11,
+                    rendererOptions: {smooth: true}
                   },
                   series: [
                     null,
