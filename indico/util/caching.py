@@ -63,6 +63,14 @@ def cached_property(f):
     return property(get)
 
 
+def _make_hashable(obj):
+    if isinstance(obj, list):
+        return tuple(obj)
+    elif isinstance(obj, dict):
+        return frozenset((k, _make_hashable(v)) for k, v in obj.iteritems())
+    return obj
+
+
 # http://wiki.python.org/moin/PythonDecoratorLibrary#Alternate_memoize_as_nested_functions
 # Not thread-safe. Don't use it in places where thread-safety is important!
 def memoize(obj):
@@ -70,7 +78,7 @@ def memoize(obj):
 
     @wraps(obj)
     def memoizer(*args, **kwargs):
-        key = (args, frozenset(kwargs.items()))
+        key = (_make_hashable(args), _make_hashable(kwargs))
         if key not in cache:
             cache[key] = obj(*args, **kwargs)
         return cache[key]
