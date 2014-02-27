@@ -19,6 +19,7 @@
 
 __all__ = ['DBMgr', 'MigratedDB']
 
+import inspect
 import logging
 import time
 
@@ -42,7 +43,10 @@ from .manager import DBMgr
 from .migration import MigratedDB
 
 
-db = SQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
+if inspect.stack()[1][0].f_globals.get('__no_session_options__', False):
+    db = SQLAlchemy()  # for testing and migration, manager isn't needed
+else:
+    db = SQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
 
 
 def apply_db_loggers(debug=False):
