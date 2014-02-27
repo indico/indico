@@ -70,6 +70,16 @@ def apply_db_loggers(debug=False):
             logger.debug('Total Time: {}'.format(total))
 
 
+def page_query(q, page_size=1000):
+    offset = 0
+    while True:
+        for elem in q.limit(page_size).offset(offset):
+           yield elem
+        else:
+            break
+        offset += page_size
+
+
 class IndicoDBError(IndicoError):
     pass
 
