@@ -17,16 +17,17 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+__no_session_options__ = True
+
 import os
 from argparse import ArgumentParser
 from datetime import datetime
-from pprint import pprint
 from time import mktime, strptime
 
 from flask import Flask
 from ZODB import DB, FileStorage
 
-from indico.core.db import db
+from indico.core.db import db, drop_database
 from indico.modules.rb.models import *
 
 
@@ -46,13 +47,14 @@ def teardown():
 
 
 def convert_reservation_repeatibility(old):
-    return [(RepeatUnit.DAY, 1),
-            (RepeatUnit.WEEK, 1),
-            (RepeatUnit.WEEK, 2),
-            (RepeatUnit.WEEK, 3),
-            (RepeatUnit.MONTH, 1),
-            (RepeatUnit.NEVER, 0)][
-            [0, 1, 2, 3, 4, None].index(old)]
+    return [
+        (RepeatUnit.DAY, 1),
+        (RepeatUnit.WEEK, 1),
+        (RepeatUnit.WEEK, 2),
+        (RepeatUnit.WEEK, 3),
+        (RepeatUnit.MONTH, 1),
+        (RepeatUnit.NEVER, 0)
+    ][(0, 1, 2, 3, 4, None).index(old)]
 
 
 def convert_room_notification_for_start(flag, before):
@@ -130,20 +132,16 @@ def migrate_locations(main_root, rb_root):
                 l.default_aspect = a
 
         # add custom attributes
-        if l.name in custom_attributes_dict:
-            for ca in custom_attributes_dict[l.name]:
-                name = convert_to_unicode(ca['name'])
-                k = LocationAttributeKey.getKeyByName(name)
-                if not k:
-                    k = LocationAttributeKey(name=name)
-                a = LocationAttribute()
-                a.value = dict((k, v) for k, v in ca.iteritems() if k != 'name')
-                k.attributes.append(a)
-                l.attributes.append(a)
+        for ca in custom_attributes_dict.get(l.name, []):
+            l.addAttribute(ca['name'], {
+                'is_required': ca['required'],
+                'is_hidden': ca['hidden'],
+                'type': 'str'
+            })
 
-        # add created location
+        # add new created location
         db.session.add(l)
-        db.session.commit()
+    db.session.commit()
 
 
 def migrate_rooms(main_root, rb_root, photo_path):
@@ -393,7 +391,7 @@ def main(*args):
 
     with app.app_context():
         if args[-1]:
-            db.drop_all()
+            drop_database(db)
         db.create_all()
         migrate(main_root, rb_root, args[-2])
 
