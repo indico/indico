@@ -20,14 +20,14 @@
             <input ng-switch-when="multiple"
                 ng-model="input.selected"
                 ng-init="input.selected = isSelected(item.id)"
-                ng-required="!isAnyEventSelected()"
+                ng-required="section.mandatory && !isAnyEventSelected()"
                 type="checkbox" name="socialEvents" value="{{ item.id }}"
                 ng-disabled="!hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent') || paymentBlocked(item, userdata) "/>
             <input ng-switch-default
                 type="radio" name="socialEvents" value="{{ item.id }}"
                 ng-model="input.selected"
                 ng-init="input.selected = userdata.socialEvents[0].id"
-                ng-required="!isAnyEventSelected()"
+                ng-required="section.mandatory && !isAnyEventSelected()"
                 ng-disabled="!hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent') || paymentBlocked(item, userdata) || anyBillableEventPayed(userdata)"/>
             {{ item.caption }}
             <span ng-if="!hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent')" class="noPlacesLeft">
