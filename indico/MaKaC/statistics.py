@@ -125,7 +125,7 @@ class CategoryStatistics(Statistics):
                 cls._processEvent(dbi, event, stats)
 
         stats["updated"] = nowutc()
-        stats["users"] = len(AvatarHolder().getList())
+        stats["users"] = len(AvatarHolder()._getIdx())
         cat._statistics = stats
         cat._p_changed = 1
 
