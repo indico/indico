@@ -50,8 +50,33 @@ RoomEquipmentAssociation = db.Table(
 )
 
 
+ReservationEquipmentAssociation = db.Table(
+    'reservations_equipments',
+    db.metadata,
+    db.Column(
+        'equipment_id',
+        db.Integer,
+        db.ForeignKey(
+            'room_equipments.id',
+            ondelete='cascade'
+        ),
+        primary_key=True,
+    ),
+    db.Column(
+        'reservation_id',
+        db.Integer,
+        db.ForeignKey(
+            'reservations.id',
+            ondelete='cascade'
+        ),
+        primary_key=True
+    )
+)
+
+
 class RoomEquipment(db.Model):
     __tablename__ = 'room_equipments'
+    __table_args__ = (db.UniqueConstraint('name', 'location_id'),)
 
     # columns
 
@@ -66,7 +91,6 @@ class RoomEquipment(db.Model):
     name = db.Column(
         db.String,
         nullable=False,
-        unique=True,
         index=True
     )
     location_id = db.Column(
