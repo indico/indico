@@ -51,11 +51,9 @@ from MaKaC.common.info import HelperMaKaCInfo
 from indico.core.errors import IndicoError
 from indico.util.i18n import _
 
-# from indico.modules.scheduler import Client, tasks
-# from indico.modules.rb.models.reservation_attributes import ReservationAttribute
-from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
-from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-
+from .reservation_edit_logs import ReservationEditLog
+from .reservation_occurrences import ReservationOccurrence
+from .room_equipments import ReservationEquipmentAssociation
 
 from .utils import next_day_skip_if_weekend, unimplemented, Serializer
 
@@ -227,6 +225,12 @@ class Reservation(Serializer, db.Model):
             order_by='ReservationOccurrence.start'
         ),
         cascade='all, delete-orphan',
+        lazy='dynamic'
+    )
+    equipments = db.relationship(
+        'RoomEquipment',
+        secondary=ReservationEquipmentAssociation,
+        backref='reservations',
         lazy='dynamic'
     )
 
