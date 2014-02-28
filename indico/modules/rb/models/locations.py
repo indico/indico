@@ -24,7 +24,7 @@ Holder of rooms in a place and its map view related data
 from datetime import datetime, timedelta
 
 import pytz
-from sqlalchemy import func, or_, and_, distinct
+from sqlalchemy import func, or_, and_
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import select, label, column
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -315,11 +315,17 @@ class Location(db.Model):
     def getEquipmentNames(self):
         return list(self.equipments)
 
+    def getEquipmentByName(self, name):
+        return self.equipment_objects.filter_by(name=name).first()
+
     def addEquipment(self, name):
         self.equipments.append(name)
 
     def removeEquipment(self, name):
         self.equipment_objects.filter_by(name=name).delete()
+
+    def hasEquipment(self, name):
+        return self.equipment_objects.filter_by(name=name).count() > 0
 
     # location helpers
 
