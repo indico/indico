@@ -249,11 +249,11 @@ class JSONStringBridgeMixin:
 
     @hybrid_property
     def value(self):
-        return json.loads(self.raw_data, ensure_ascii=False)
+        return json.loads(self.raw_data)
 
     @value.setter
     def value(self, data):
-        self.raw_data = json.dumps(data, ensure_ascii=False)
+        self.raw_data = json.dumps(data)
 
     @hybrid_property
     def is_value_required(self):
