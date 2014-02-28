@@ -59,6 +59,7 @@ class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):
 
 class RoomAttribute(JSONStringBridgeMixin, db.Model):
     __tablename__ = 'room_attributes'
+    __table_args__ = (db.UniqueConstraint('name', 'location_id'),)
 
     # columns
 
@@ -92,8 +93,6 @@ class RoomAttribute(JSONStringBridgeMixin, db.Model):
             remote_side=[id]
         )
     )
-
-    db.UniqueConstraint('name', 'location_id')
 
     @staticmethod
     def supportsAttributeManagement():
