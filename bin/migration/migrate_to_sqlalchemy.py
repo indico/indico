@@ -21,14 +21,22 @@ __no_session_options__ = True
 
 import os
 from argparse import ArgumentParser
-from datetime import datetime
-from time import mktime, strptime
+from collections import defaultdict
+from datetime import datetime, time as dt_time, timedelta
+from itertools import ifilter
+from time import clock
 
+import pytz
+from babel import dates
 from flask import Flask
 from ZODB import DB, FileStorage
 
 from indico.core.db import db, drop_database
 from indico.modules.rb.models import *
+
+
+month_names = [(str(i), name[:3].encode('utf-8').lower())
+               for i, name in dates.get_month_names(locale='fr_FR').iteritems()]
 
 
 def setup(main_zodb_path, rb_zodb_path, sqlalchemy_uri):
@@ -47,14 +55,7 @@ def teardown():
 
 
 def convert_reservation_repeatibility(old):
-    return [
-        (RepeatUnit.DAY, 1),
-        (RepeatUnit.WEEK, 1),
-        (RepeatUnit.WEEK, 2),
-        (RepeatUnit.WEEK, 3),
-        (RepeatUnit.MONTH, 1),
-        (RepeatUnit.NEVER, 0)
-    ][(0, 1, 2, 3, 4, None).index(old)]
+    return RepeatMapping.getNewMapping(old)
 
 
 def convert_room_notification_for_start(flag, before):
@@ -65,12 +66,18 @@ def convert_room_max_advance_days(old):
     return int(old) if old else 30
 
 
-def get_canonical_name_of(old_room):
-    return '{}-{}-{}-{}'.format(
-        old_room._locationName,
+def generate_name(old_room):
+    return '{}-{}-{}'.format(
         old_room.building,
         old_room.floor,
         old_room.roomNr
+    )
+
+
+def get_canonical_name_of(old_room):
+    return '{}-{}'.format(
+        old_room._locationName,
+        generate_name(old_room)
     )
 
 
@@ -81,8 +88,24 @@ def get_room_id(guid):
 
 def convert_date(ds):
     if isinstance(ds, str):
-        struct = strptime(ds, '%d %b %Y %H:%M')
-        return datetime.fromtimestamp(mktime(struct))
+        try:
+            ds = datetime.strptime(ds, '%d %b %Y %H:%M')
+        except ValueError:
+
+            for i, n in month_names:
+                if n in ds:
+                    ds = ds.lower().replace(n, i)
+                    break
+            try:
+                ds = datetime.strptime(ds, '%d %m %Y %H:%M')
+            except:
+                raise RuntimeError(ds)
+    if isinstance(ds, datetime):
+        if not ds.tzinfo:
+            ds = pytz.timezone('Europe/Zurich').localize(ds)
+        ds = ds.astimezone(pytz.utc)
+    elif isinstance(ds, dt_time):
+        ds = ds.replace(hour=(ds.hour-1)%24)  # one hour, day light save time?
     return ds
 
 
@@ -99,6 +122,25 @@ def convert_to_unicode(val):
     elif val is None:
         return u''
     raise RuntimeError('Unexpected type is found for unicode conversion')
+
+
+def merge_custom_attributes(attrs):
+    res = defaultdict(dict)
+    for attr in attrs:
+        if isinstance(attr, str):
+            name = convert_to_unicode(attr)
+            value = {}
+        elif isinstance(old_custom_attribute, dict):
+            if 'name' in attr:
+                name = convert_to_unicode(attr.pop('name'))
+            else:
+                name = 'unknown'
+            value = attr
+        else:
+            raise RuntimeError('Unexpected custom attribute type')
+
+        res[name.lower()].update(value)
+    return res
 
 
 def migrate_locations(main_root, rb_root):
@@ -133,7 +175,7 @@ def migrate_locations(main_root, rb_root):
 
         # add custom attributes
         for ca in custom_attributes_dict.get(l.name, []):
-            l.addAttribute(ca['name'], {
+            l.addAttribute(ca['name'].lower(), {
                 'is_required': ca['required'],
                 'is_hidden': ca['hidden'],
                 'type': 'str'
@@ -146,11 +188,32 @@ def migrate_locations(main_root, rb_root):
 
 def migrate_rooms(main_root, rb_root, photo_path):
 
+    eq, vc = defaultdict(set), defaultdict(set)
     for old_room_id, old_room in rb_root['Rooms'].iteritems():
+        eq[old_room._locationName].update(e.lower() for e in old_room._equipment.split('`') if e)
+        vc[old_room._locationName].update(e.lower() for e in getattr(old_room, 'avaibleVC', []) if e)
 
+    for name, eqs in eq.iteritems():
+        l = Location.getLocationByName(name)
+        l.equipments.extend(eqs)
+        db.session.add(l)
+    db.session.commit()
+
+    for name, vcs in vc.iteritems():
+        l = Location.getLocationByName(name)
+        pvc = l.getEquipmentByName('video conference')
+        for vc_name in vcs:
+            re = RoomEquipment(name=vc_name)
+            re.parent = pvc
+            l.equipment_objects.append(re)
+        db.session.add(l)
+    db.session.commit()
+
+    for old_room_id, old_room in rb_root['Rooms'].iteritems():
+        l = Location.getLocationByName(old_room._locationName)
         r = Room(
             id=old_room_id,
-            name=convert_to_unicode(old_room._name),
+            name=convert_to_unicode(old_room._name or generate_name(old_room)),
             site=convert_to_unicode(old_room.site),
             division=convert_to_unicode(old_room.site),
             building=convert_to_unicode(old_room.building),
@@ -186,15 +249,15 @@ def migrate_rooms(main_root, rb_root, photo_path):
 
         for old_bookable_time in old_room.getDailyBookablePeriods():
             b = BookableTime(
-                start_time=old_bookable_time._startTime,
-                end_time=old_bookable_time._endTime,
+                start_time=convert_date(old_bookable_time._startTime),
+                end_time=convert_date(old_bookable_time._endTime),
             )
             r.bookable_times.append(b)
 
         for old_nonbookable_date in old_room.getNonBookableDates():
             d = NonBookableDate(
-                start_date=old_nonbookable_date._startDate,
-                end_date=old_nonbookable_date._endDate
+                start_date=convert_date(datetime.combine(old_nonbookable_date._startDate, dt_time.min)),
+                end_date=convert_date(datetime.combine(old_nonbookable_date._endDate, dt_time.min))
             )
             r.nonbookable_dates.append(d)
 
@@ -222,71 +285,32 @@ def migrate_rooms(main_root, rb_root, photo_path):
                     large_content=large_photo,
                     small_content=small_photo
                 )
-            r.photos.append(p)
+                r.photos.append(p)
 
-        for old_equipment in old_room._equipment.split('`'):
-            if old_equipment:
-                e = RoomEquipment.getEquipmentByName(old_equipment)
-                if e:
-                    r.equipments.append(e)
-                else:
-                    # r.equipments.append(RoomEquipment(name=old_equipment))
-                    r.equipment_names.append(old_equipment)  # by assoc proxy
+        for old_equipment in ifilter(None, (e.lower() for e in old_room._equipment.split('`'))):
+            r.equipments.append(l.getEquipmentByName(old_equipment))
 
-        for old_custom_attribute in getattr(old_room, 'customAtts', []):
-            if isinstance(old_custom_attribute, str):
-                name = convert_to_unicode(old_custom_attribute)
-                value = {}
-            elif isinstance(old_custom_attribute, dict):
-                if 'name' in old_custom_attribute:
-                    name = convert_to_unicode(old_custom_attribute['name'])
-                    del old_custom_attribute['name']
-                else:
-                    name = 'unknown'
-                value = old_custom_attribute
+        for name, value in merge_custom_attributes(getattr(old_room, 'customAtts', [])).iteritems():
+            ca = l.getAttributeByName(name)
+            if ca:
+                attr = RoomAttributeAssociation()
+                attr.value = value
+                attr.attribute = ca
+                r.attributes.append(attr)
             else:
-                raise RuntimeError('Unexpected custom attribute type')
+                print name, value, old_room.id, l.id  # these are already deleted from location
 
-            k = RoomAttributeKey.getKeyByName(name)
-            if not k:
-                k = RoomAttributeKey(name=name)
-            a = RoomAttribute()
-            a.value = value
-            k.attributes.append(a)
-            r.attributes.append(a)
-
-        a = RoomAttributeKey.getKeyByName('Live Webcast') or RoomAttributeKey(name='Live Webcast')
-        for old_child_custom_attribute in getattr(old_room, 'avaibleVC', []):
-            child_name = convert_to_unicode(old_child_custom_attribute)
-            ck = RoomAttributeKey.getKeyByName(child_name)
-            if not ck:
-                ck = RoomAttributeKey(name=child_name)
-            ca = RoomAttribute(raw_data=u'{}')
-            ck.attributes.append(ca)
-            for attr in a.attributes:
-                attr.children.append(ca)
-            r.attributes.append(ca)
-
-        l = Location.getLocationByName(old_room._locationName)
         l.rooms.append(r)
         db.session.add(l)
-        db.session.commit()
+    db.session.commit()
 
 
 def migrate_reservations(main_root, rb_root):
 
-    extra_attributes = ['usesAVC', 'needsAVCSupport', 'needsAssistance']
-
-    for k in extra_attributes:
-        db.session.add(ReservationAttributeKey(name=k))
-
-    keys = set(k for r in rb_root['Reservations'].values()
-               for k in getattr(r, 'useVC', []))
-    for k in keys:
-        db.session.add(ReservationAttributeKey(name=k))
-    db.session.commit()
-
+    i = 1
     for rid, v in rb_root['Reservations'].iteritems():
+
+        l = Location.getLocationByName(v.locationName)
 
         repeat_unit, repeat_step = convert_reservation_repeatibility(v.repeatability)
 
@@ -303,47 +327,65 @@ def migrate_reservations(main_root, rb_root):
             is_cancelled=v.isCancelled,
             is_confirmed=v.isConfirmed,
             is_rejected=v.isRejected,
-            reason=convert_to_unicode(v.reason),
+            booking_reason=convert_to_unicode(v.reason),
+            rejection_reason=convert_to_unicode(v.rejectionReason),
             repeat_unit=repeat_unit,
-            repeat_step=repeat_step
+            repeat_step=repeat_step,
+            uses_video_conference=v.usesAVC,
+            needs_video_conference_setup=v.needsAVCSupport,
+            needs_general_assistance=v.needsAssistance
         )
 
+        for eq_name in getattr(v, 'useVC', []):
+            eq = l.getEquipmentByName(eq_name)
+            if eq:
+                r.equipments.append(eq)
+
+        occurrence_rejection_reasons = {}
         if getattr(v, 'resvHistory', None):
-            for h in v.resvHistory._entries:
-                l = ReservationEditLog(
-                    timestamp=convert_date(h._timestamp),
+            entries = set()
+            for h in reversed(v.resvHistory._entries):
+                ts = convert_date(h._timestamp)
+                while ts in entries:
+                    ts += timedelta(milliseconds=1)
+                entries.add(ts)
+
+                if len(h._info) == 2:
+                    possible_rejection_date, possible_rejection_reason = h._info
+                    m = re.match(r'Booking occurrence of the (\d{1,2} \w{3} \d{4}) rejected',
+                                 possible_rejection_reason)
+                    if m:
+                        d = datetime.strptime(m.group(1), '%d %b %Y')
+                        occurrence_rejection_reasons[d] = possible_rejection_reason[9:].strip('\'')
+
+                el = ReservationEditLog(
+                    timestamp=ts,
                     avatar_id=h._responsibleUser,
                     info=convert_to_unicode('```'.join(h._info))
                 )
-                r.edit_logs.append(l)
+                r.edit_logs.append(el)
 
-        r.excluded_days.extend(map(convert_date, v._excludedDays))
-
-        for e in extra_attributes:
-            a = ReservationAttribute()
-            a.value = {'required': getattr(v, e, False) or False}
-            k = ReservationAttributeKey.getKeyByName(e)
-            k.attributes.append(a)
-            r.attributes.append(a)
-
-        for e in getattr(v, 'useVC', []):
-            a = ReservationAttribute()
-            a.value = {'required': True}
-            k = ReservationAttributeKey.getKeyByName(e)
-            k.attributes.append(a)
-            r.attributes.append(a)
-
-        for d in getattr(v, 'startEndNotification', []):
-            n = ReservationNotification(
-                occurrence=convert_date(d),
-                is_sent=True
+        notifications = getattr(v, 'startEndNotification', []) or []
+        excluded_days = getattr(v, '_excludedDays', []) or []
+        for period in v.splitToPeriods():
+            d = period.startDT.date()
+            occ = ReservationOccurrence(
+                start=convert_date(period.startDT),
+                end=convert_date(period.endDT),
+                is_sent=(d in notifications),
+                is_cancelled=(d in excluded_days),
+                rejection_reason=(convert_to_unicode(occurrence_rejection_reasons[d])
+                                  if d in occurrence_rejection_reasons else None)
             )
-            r.notifications.append(n)
+            r.occurrences.append(occ)
 
         room = Room.getRoomById(v.room.id)
         room.reservations.append(r)
         db.session.add(room)
-        db.session.commit()
+        i = (i+1)%1000
+        if not i:
+            db.session.commit()
+    db.session.commit()
 
 
 def migrate_blockings(main_root, rb_root):
@@ -383,17 +425,19 @@ def migrate(*args):
     migrate_locations(*args[:-1])
     migrate_rooms(*args)
     migrate_reservations(*args[:-1])
-    # migrate_blockings(*args[:-1])
+    migrate_blockings(*args[:-1])
 
 
 def main(*args):
     main_root, rb_root, app = setup(*args[:3])
 
+    start = clock()
     with app.app_context():
         if args[-1]:
             drop_database(db)
         db.create_all()
         migrate(main_root, rb_root, args[-2])
+    print (clock() - start), 'seconds'
 
 
 if __name__ == '__main__':
