@@ -27,7 +27,7 @@ from indico.core.db import db
 
 
 class ReservationOccurrence(db.Model):
-    __tablename__ = 'reservation_occurrence'
+    __tablename__ = 'reservation_occurrences'
 
     reservation_id = db.Column(
         db.Integer,
@@ -54,14 +54,8 @@ class ReservationOccurrence(db.Model):
         nullable=False,
         default=False
     )
-    is_rejected = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
     rejection_reason = db.Column(
         db.String,
-        default=''
     )
 
     def __str__(self):
