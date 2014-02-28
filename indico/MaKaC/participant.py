@@ -233,9 +233,9 @@ class Participation(Persistent, Observable):
         return "; ".join(text)
 
     def getParticipantById(self, participantId):
-        if participantId is not None :
+        if participantId is not None:
             return self._participantList.get(participantId, None)
-        else :
+        else:
             return None
 
     def getPendingParticipantList(self):
@@ -936,7 +936,7 @@ class Participant(Persistent, Fossilizable):
         return True
 
     def setStatusAccepted(self, responsibleUser=None):
-        if self._status != "invited" :
+        if self._status not in ('invited', 'added'):
             return False
         self._status = "accepted"
 
@@ -949,7 +949,7 @@ class Participant(Persistent, Fossilizable):
         return True
 
     def setStatusRejected(self, responsibleUser=None):
-        if self._status != "invited" :
+        if self._status not in ('invited', 'added'):
             return False
         self._status = "rejected"
 
