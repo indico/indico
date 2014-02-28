@@ -41,8 +41,8 @@ class ReservationEditLog(db.Model):
     )
     avatar_id = db.Column(
         db.String,
-        nullable=False,
-        primary_key=True
+        primary_key=True,
+        nullable=False
     )
     reservation_id = db.Column(
         db.Integer,
