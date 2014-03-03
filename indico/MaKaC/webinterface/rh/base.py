@@ -370,8 +370,11 @@ class RH(RequestHandlerBase):
 
     @jsonify_error
     def _processModificationError(self, e):
-        """Treats modification errors occured during the process of a RH."""
-
+        """Handles modification errors occured during the process of a RH."""
+        # Redirect to HTTPS in case the user is logged in
+        self._tohttps = True
+        if self._checkHttpsRedirect():
+            return
         return errors.WPModificationError(self).display()
 
     @jsonify_error
