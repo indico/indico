@@ -42,6 +42,8 @@ def _convert_request_value(x):
         return x.encode('utf-8')
     elif isinstance(x, FileStorage):
         x.file = x.stream
+        if isinstance(x.filename, unicode):
+            x.filename = x.filename.encode('utf-8')
         return x
     raise ValueError('Unexpected item in request data: %s' % type(x))
 
