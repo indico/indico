@@ -1305,7 +1305,7 @@ class WhooshTextIndex(object):
 
     def _index(self, obj):
         with self._textIdx.writer() as writer:
-            writer.add_document(id=unicode(obj.getId()), content=unicode(obj.getTitle().decode('utf-8')))
+            writer.add_document(id=obj.getId().decode('utf-8'), content=obj.getTitle().decode('utf-8'))
 
     def index(self, obj):
         if obj.getId() in self:
@@ -1315,7 +1315,7 @@ class WhooshTextIndex(object):
     def unindex(self, obj):
         if obj.getId() in self:
             with self._textIdx.writer() as writer:
-                writer.delete_by_term("id", unicode(obj.getId()))
+                writer.delete_by_term("id", obj.getId().decode('utf-8'))
         else:
             Logger.get('indexes.text').error("No such entry {0}".format(obj.getId()))
 
@@ -1335,7 +1335,7 @@ class WhooshTextIndex(object):
         writer = self._textIdx.writer(limitmb=512)
         i = 0
         for obj in list:
-            writer.add_document(id=unicode(obj.getId()), content=unicode(obj.getTitle().decode('utf-8')))
+            writer.add_document(id=obj.getId().decode('utf-8'), content=obj.getTitle().decode('utf-8'))
             if i % 20000 == 19999:
                 writer.commit()
                 dbi.sync()
@@ -1351,7 +1351,7 @@ class WhooshConferenceIndex(WhooshTextIndex):
 
     def _index(self, obj):
         with self._textIdx.writer() as writer:
-            writer.add_document(id=unicode(obj.getId()), content=unicode(obj.getTitle().decode('utf-8')),
+            writer.add_document(id=obj.getId().decode('utf-8'), content=obj.getTitle().decode('utf-8'),
                                 start_date=obj.getStartDate())
 
     def search(self, text, limit=None):
@@ -1368,7 +1368,7 @@ class WhooshConferenceIndex(WhooshTextIndex):
         writer = self._textIdx.writer(limitmb=512)
         i = 0
         for obj in list:
-            writer.add_document(id=unicode(obj.getId()), content=unicode(obj.getTitle().decode('utf-8')),
+            writer.add_document(id=obj.getId().decode('utf-8'), content=obj.getTitle().decode('utf-8'),
                                 start_date=obj.getStartDate())
             if i % 20000 == 19999:
                 writer.commit()

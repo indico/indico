@@ -2435,7 +2435,7 @@ class Conference(CommonObjectBase, Locatable):
         catDateIdx.indexConf(self)
         catDateAllIdx.indexConf(self)
         nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
-        nameIdx.index(self.getId(), self.getTitle().decode('utf-8'))
+        nameIdx.index(self)
 
         Catalog.getIdx('categ_conf_sd').index_obj(self)
 
@@ -2447,7 +2447,7 @@ class Conference(CommonObjectBase, Locatable):
         catDateIdx.unindexConf(self)
         catDateAllIdx.unindexConf(self)
         nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
-        nameIdx.unindex(self.getId())
+        nameIdx.unindex(self)
 
         Catalog.getIdx('categ_conf_sd').unindex_obj(self)
 
@@ -3150,8 +3150,8 @@ class Conference(CommonObjectBase, Locatable):
         self.notifyModification()
 
         nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
-        nameIdx.unindex(self.getId())
-        nameIdx.index(self.getId(), self.getTitle().decode('utf-8'))
+        nameIdx.unindex(self)
+        nameIdx.index(self)
 
         #we notify the observers that the conference's title has changed
         try:
