@@ -533,11 +533,6 @@ ndRegForm.directive("ndSocialEventSection", function() {
                 });
             };
 
-            scope.isAnyEventSelected = function() {
-                // This seems to be super ugly...
-                return !!$('input[name="socialEvents"]:checked').length;
-            };
-
             scope.getMaxRegistrations = function(item) {
                 if (item.placesLimit !== 0) {
                     return Math.min(item.maxPlace + 1, item.noPlacesLeft + scope.getNoPlaces(item, scope.userdata));
