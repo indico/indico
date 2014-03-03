@@ -293,13 +293,13 @@ class CategoryManager(ObjectHolder):
         ObjectHolder.add(self, category)
         # Add category to the name index
         nameIdx = indexes.IndexesHolder().getIndex('categoryName')
-        nameIdx.index(category.getId(), category.getTitle().decode('utf-8'))
+        nameIdx.index(category)
 
     def remove(self, category):
         ObjectHolder.remove(self, category)
         # remove category from the name index
         nameIdx = indexes.IndexesHolder().getIndex('categoryName')
-        nameIdx.unindex(category.getId())
+        nameIdx.unindex(category)
         Catalog.getIdx('categ_conf_sd').remove_category(category.getId())
 
     def _newId(self):
@@ -1017,8 +1017,8 @@ class Category(CommonObjectBase):
 
         # Reindex when name changes
         nameIdx = indexes.IndexesHolder().getIndex('categoryName')
-        nameIdx.unindex(self.getId())
-        nameIdx.index(self.getId(), self.getTitle().decode('utf-8'))
+        nameIdx.unindex(self)
+        nameIdx.index(self)
 
         self._notify('categoryTitleChanged', oldName, newName)
 

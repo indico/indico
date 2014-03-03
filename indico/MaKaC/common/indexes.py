@@ -1303,6 +1303,10 @@ class WhooshTextIndex(object):
         searcher.close()
         return exist_key
 
+    def _index(self, obj):
+        with self._textIdx.writer() as writer:
+            writer.add_document(id=unicode(obj.getId()), content=unicode(obj.getTitle().decode('utf-8')))
+
     def index(self, obj):
         if obj.getId() in self:
             raise KeyError(_("Key {0} already exists in index!").format(obj.getId()))
