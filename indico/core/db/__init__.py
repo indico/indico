@@ -22,8 +22,11 @@ __all__ = ['DBMgr', 'MigratedDB']
 import inspect
 import logging
 import time
+from datetime import datetime
 
+import pytz
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy import types
 from sqlalchemy.engine import reflection, Engine
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.compiler import compiles
@@ -35,7 +38,6 @@ from sqlalchemy.schema import (
     DropConstraint,
 )
 from sqlalchemy.sql.expression import FunctionElement
-from sqlalchemy.types import Numeric
 from zope.sqlalchemy import ZopeTransactionExtension
 
 from ..errors import IndicoError
@@ -96,12 +98,25 @@ class Committer(object):
             db.session.commit()
 
 
+class UTCDateTime(types.TypeDecorator):
+
+    impl = types.DateTime
+
+    def process_bind_param(self, value, engine):
+        if value is not None:
+            return value.astimezone(pytz.utc).replace(tzinfo=None)
+
+    def process_result_value(self, value, engine):
+        if value is not None:
+            return value.replace(tzinfo=pytz.utc)
+
+
 # ================================== time diff
 
 # engine specific time differences
 class time_diff(FunctionElement):
     name = 'time_diff'
-    type = Numeric
+    type = types.Numeric
 
 
 @compiles(time_diff, 'default')

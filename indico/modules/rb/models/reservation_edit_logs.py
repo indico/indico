@@ -23,14 +23,14 @@ Schema of modifications done on a reservation
 
 from datetime import datetime
 
-from indico.core.db import db
+from indico.core.db import db, UTCDateTime
 
 
 class ReservationEditLog(db.Model):
     __tablename__ = 'reservation_edit_logs'
 
     timestamp = db.Column(
-        db.DateTime,
+        UTCDateTime,
         primary_key=True,
         nullable=False,
         default=datetime.utcnow

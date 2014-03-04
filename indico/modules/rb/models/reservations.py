@@ -34,7 +34,7 @@ from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.wcomponents import WTemplated
 
-from indico.core.db import db
+from indico.core.db import db, UTCDateTime
 from indico.core.logger import Logger
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.utils import (
@@ -114,16 +114,16 @@ class Reservation(Serializer, db.Model):
     )
     # dates
     created_at = db.Column(
-        db.DateTime,
+        UTCDateTime,
         nullable=False,
         default=datetime.utcnow
     )
     start_date = db.Column(
-        db.DateTime,
+        UTCDateTime,
         nullable=False
     )
     end_date = db.Column(
-        db.DateTime,
+        UTCDateTime,
         nullable=False
     )
     # repeatibility

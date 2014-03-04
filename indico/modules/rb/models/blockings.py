@@ -25,7 +25,7 @@ from datetime import datetime
 
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from indico.core.db import db
+from indico.core.db import db, UTCDateTime
 
 
 class Blocking(db.Model):
@@ -42,16 +42,16 @@ class Blocking(db.Model):
         nullable=False
     )
     created_at = db.Column(
-        db.DateTime,
+        UTCDateTime,
         nullable=False,
         default=datetime.utcnow
     )
     start_date = db.Column(
-        db.DateTime,
+        UTCDateTime,
         nullable=False
     )
     end_date = db.Column(
-        db.DateTime,
+        UTCDateTime,
         nullable=False
     )
     reason = db.Column(

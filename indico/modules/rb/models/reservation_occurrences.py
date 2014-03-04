@@ -23,7 +23,7 @@ Sent notifications of a reservation
 
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from indico.core.db import db
+from indico.core.db import db, UTCDateTime
 
 
 class ReservationOccurrence(db.Model):
@@ -36,12 +36,12 @@ class ReservationOccurrence(db.Model):
         primary_key=True
     )
     start = db.Column(
-        db.DateTime,
+        UTCDateTime,
         nullable=False,
         primary_key=True
     )
     end = db.Column(
-        db.DateTime,
+        UTCDateTime,
         nullable=False
     )
     is_sent = db.Column(

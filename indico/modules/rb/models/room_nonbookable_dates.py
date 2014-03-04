@@ -23,7 +23,7 @@ Nonbookable dates of rooms
 
 from datetime import datetime
 
-from indico.core.db import db
+from indico.core.db import db, UTCDateTime
 
 
 class NonBookableDate(db.Model):
@@ -33,12 +33,12 @@ class NonBookableDate(db.Model):
 
     # dates
     start_date = db.Column(
-        db.DateTime,
+        UTCDateTime,
         nullable=False,
         primary_key=True
     )
     end_date = db.Column(
-        db.DateTime,
+        UTCDateTime,
         nullable=False,
         primary_key=True
     )

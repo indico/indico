@@ -103,7 +103,6 @@ def convert_date(ds):
     if isinstance(ds, datetime):
         if not ds.tzinfo:
             ds = pytz.timezone('Europe/Zurich').localize(ds)
-        ds = ds.astimezone(pytz.utc)
     elif isinstance(ds, dt_time):
         ds = ds.replace(hour=(ds.hour-1)%24)  # one hour, day light save time?
     return ds
@@ -248,18 +247,20 @@ def migrate_rooms(main_root, rb_root, photo_path):
         )
 
         for old_bookable_time in old_room.getDailyBookablePeriods():
-            b = BookableTime(
-                start_time=convert_date(old_bookable_time._startTime),
-                end_time=convert_date(old_bookable_time._endTime),
+            r.bookable_times.append(
+                BookableTime(
+                    start_time=convert_date(old_bookable_time._startTime),
+                    end_time=convert_date(old_bookable_time._endTime),
+                )
             )
-            r.bookable_times.append(b)
 
         for old_nonbookable_date in old_room.getNonBookableDates():
-            d = NonBookableDate(
-                start_date=convert_date(datetime.combine(old_nonbookable_date._startDate, dt_time.min)),
-                end_date=convert_date(datetime.combine(old_nonbookable_date._endDate, dt_time.min))
+            r.nonbookable_dates.append(
+                NonBookableDate(
+                    start_date=convert_date(old_nonbookable_date._startDate),
+                    end_date=convert_date(old_nonbookable_date._endDate)
+                )
             )
-            r.nonbookable_dates.append(d)
 
         if photo_path:
             try:
@@ -281,11 +282,12 @@ def migrate_rooms(main_root, rb_root, photo_path):
                 small_photo = None
 
             if large_photo and small_photo:
-                p = Photo(
-                    large_content=large_photo,
-                    small_content=small_photo
+                r.photos.append(
+                    Photo(
+                        large_content=large_photo,
+                        small_content=small_photo
+                    )
                 )
-                r.photos.append(p)
 
         for old_equipment in ifilter(None, (e.lower() for e in old_room._equipment.split('`'))):
             r.equipments.append(l.getEquipmentByName(old_equipment))
