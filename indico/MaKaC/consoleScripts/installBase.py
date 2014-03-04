@@ -285,7 +285,7 @@ def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=Non
 
         for dir in dirs2check:
             stat_info = os.stat(dir)
-            if pwd.getpwuid(int(stat_info.st_uid)).pw_name != accessuser:
+            if pwd.getpwuid(int(stat_info.st_uid)).pw_name != accessuser or os.path.basename(dir) == 'htdocs':
                 print commands.getoutput("if test $(which sudo); then CMD=\"sudo\"; fi; $CMD chown -R %s:%s %s" % (accessuser, accessgroup, dir))
             elif grp.getgrgid(int(stat_info.st_gid)).gr_name != accessgroup:
                 os.chown(dir, pwd.getpwnam(accessuser).pw_uid, grp.getgrnam(accessgroup).gr_gid)
@@ -334,7 +334,7 @@ def _extractDirsFromConf(conf):
 
 def _replacePrefixInConf(filePath, prefix):
     fdata = open(filePath).read()
-    fdata = re.sub('\/opt\/indico', prefix, fdata)
+    fdata = re.sub(r'/opt/indico', prefix, fdata)
     open(filePath, 'w').write(fdata)
 
 def _updateDbConfigFiles(cfg_dir, uid=None, port=None, **kwargs):
