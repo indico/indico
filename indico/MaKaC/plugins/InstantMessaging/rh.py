@@ -27,7 +27,7 @@ from MaKaC.plugins.InstantMessaging.XMPP.helpers import LogLinkGenerator
 from MaKaC.plugins import InstantMessaging
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-from MaKaC.errors import MaKaCError
+from MaKaC.errors import MaKaCError, NoReportError
 from MaKaC.i18n import _
 import urllib2
 import pkg_resources
@@ -83,9 +83,9 @@ class RHChatSeeLogs(RHChatModifBase):
         RHChatModifBase._checkParams(self, params)
         self._conf = ConferenceHolder().getById(params['confId'])
         self._chatroom = DBHelpers.getChatroom(params['chatroom'])
-        self._sdate = params['sdate'] if params.has_key('sdate') else None
-        self._edate = params['edate'] if params.has_key('edate') else None
-        self._forEvent = bool(params['forEvent']) if params.has_key('forEvent') else None
+        self._sdate = params['sdate'] if 'sdate' in params else None
+        self._edate = params['edate'] if 'edate' in params else None
+        self._forEvent = params.get('forEvent') == '1'
         self._getAll = not self._sdate and not self._edate and not self._forEvent
 
     def _process( self ):
@@ -98,8 +98,8 @@ class RHChatSeeLogs(RHChatModifBase):
 
         req = urllib2.Request(url, None, {'Accept-Charset' : 'utf-8'})
         document = urllib2.urlopen(req).read()
-        if document is '':
-            raise MaKaCError('No logs were found for these dates')
+        if not document:
+            raise NoReportError(_('No logs were found for these dates'))
         return document
 
 

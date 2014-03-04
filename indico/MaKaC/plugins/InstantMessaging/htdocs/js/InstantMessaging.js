@@ -904,26 +904,23 @@ var buildLogURL = function(chatroom, sdate, edate, selectAll, forEvent, ownRange
      * forEvent: we want to retrieve the logs for the current event
      * ownRange: we want to specify the range of dates
      */
-    url = links.get(chatroom.id).logs;
+    var url = links.get(chatroom.id).logs;
+    var urlData = {};
     if (selectAll){
-        return url;
+        // nothing
     }
-    else if (forEvent){
-        url += '&forEvent=true';
-        return url;
+    else if (forEvent) {
+        urlData.forEvent = 1;
     }
-    else if (ownRange){
-        if ( sdate && !edate){
-            url += '&sdate=' + sdate;
+    else if (ownRange) {
+        if (sdate){
+            urlData.sdate = sdate;
         }
-        else if ( !sdate && edate){
-            url += '&edate=' + edate;
-        }
-        else if (sdate && edate){
-            url += '&sdate=' + sdate + '&edate=' + edate;
+        if (edate){
+            urlData.edate = edate;
         }
     }
-    return url;
+    return build_url(url, urlData);
 }
 
 /**
