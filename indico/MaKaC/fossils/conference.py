@@ -382,6 +382,12 @@ class ISessionSlotFossil(IFossil):
     getLocationAddress.convert = Conversion.locationAddress
     getLocationAddress.name = "address"
 
+    def getRoomFullName(self):
+        """ SessionSlot Room """
+    getRoomFullName.produce = lambda s: s.getRoom()
+    getRoomFullName.convert = Conversion.roomFullName
+    getRoomFullName.name = 'roomFullname'
+
     def inheritRoom(self):
         """ Does the Session inherit a Room ?"""
     inheritRoom.produce = lambda s: s.getOwnRoom() is None
