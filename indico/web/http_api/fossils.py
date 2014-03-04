@@ -225,6 +225,12 @@ class IConferenceMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFoss
         """ Room (inside location) """
     getRoom.convert = lambda r: r and r.getName()
 
+    def getRoomFullName(self):
+        """ Conference Room """
+    getRoomFullName.produce = lambda c: c.getRoom()
+    getRoomFullName.convert = Conversion.roomFullName
+    getRoomFullName.name = 'roomFullname'
+
     def getVisibility(self):
         pass
     getVisibility.name = 'visibility'
@@ -268,8 +274,8 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFo
     getRoom.convert = lambda r: r and r.getName()
 
     def getRoomFullName(self):
-        """ Session Room """
-    getRoomFullName.produce = lambda s: s.getRoom()
+        """ Contribution Room """
+    getRoomFullName.produce = lambda c: c.getRoom()
     getRoomFullName.convert = Conversion.roomFullName
     getRoomFullName.name = 'roomFullname'
 
