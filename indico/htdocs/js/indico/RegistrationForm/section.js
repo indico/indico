@@ -185,7 +185,13 @@ ndRegForm.directive('ndSection', function($rootScope, url) {
             });
 
             scope.dialogs.config.actions.onOk = function(dialogScope) {
+                if (dialogScope.sectionForm.$invalid === true) {
+                    dialogScope.$apply(dialogScope.setSelectedTab('config'));
+                    return false;
+                }
+
                 scope.sectionApi.saveConfig(dialogScope.section, dialogScope.formData);
+                return true;
             };
 
             scope.dialogs.config.actions.onCancel = function(dialogScope) {

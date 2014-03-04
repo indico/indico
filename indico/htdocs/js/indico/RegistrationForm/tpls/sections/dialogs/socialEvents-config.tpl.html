@@ -1,32 +1,36 @@
-<form>
-    <div class="regFormDialogEditLine">
-        <label class="regFormDialogCaption">
-            {{ 'Selection type' | i18n }}
-        </label>
-        <select ng-model="formData.selectionType"
-            name="selectionType">
-            <option value="unique" {{"selected" if section.selectionType == "unique" }}>
-                {{ 'Unique choice' | i18n }}
-            </option>
-            <option value="multiple" {{"selected" if section.selectionType == "multiple" }}>
-                {{ 'Multiple choice' | i18n }}
-            </option>
-        </select>
-        <span class="mandatory-check">
-            <input type="checkbox" name="mandatory" ng-model="formData.mandatory">
-            <span>
-                {{ 'Mandatory' | i18n }}
-            </span>
-            <span class="icon-question text-superfluous" title="{{ 'User must select at last one event' | i18n }}"></span>
+<div class="regFormDialogEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Selection type' | i18n }}
+    </label>
+    <select ng-model="formData.selectionType"
+        name="selectionType">
+        <option value="unique" {{"selected" if section.selectionType == "unique" }}>
+            {{ 'Unique choice' | i18n }}
+        </option>
+        <option value="multiple" {{"selected" if section.selectionType == "multiple" }}>
+            {{ 'Multiple choice' | i18n }}
+        </option>
+    </select>
+    <span class="mandatory-check">
+        <input type="checkbox" name="mandatory" ng-model="formData.mandatory">
+        <span>
+            {{ 'Mandatory' | i18n }}
         </span>
-    </div>
-    <div class="regFormDialogEditLine">
-        <label class="regFormDialogCaption">{{ 'Introduction sentence' | i18n }}</label>
-        <textarea ng-model="formData.introSentence"
-            id="descriptionEdit"
-            name="introSentence"
-            cols="40"
-            rows="6">
-        </textarea>
-    </div>
-</form>
+        <span class="icon-question text-superfluous" title="{{ 'User must select at last one event' | i18n }}"></span>
+    </span>
+</div>
+<div class="regFormDialogEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Introduction sentence' | i18n }}
+        <span class="regFormMandatoryField">*</span>
+    </label>
+    <textarea
+        ng-model="formData.introSentence"
+        ng-class="{hasError: validationStarted && sectionForm.introSentence.$invalid}"
+        id="descriptionEdit"
+        name="introSentence"
+        cols="40"
+        rows="6"
+        required>
+    </textarea>
+</div>
