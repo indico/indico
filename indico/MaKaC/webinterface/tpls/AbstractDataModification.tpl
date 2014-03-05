@@ -336,9 +336,9 @@ function createLimitedFieldsMgr() {
     for (var i=0; i<limitedFieldList.length; i++) {
         var isMandatory = (limitedFieldList[i][4] == "True");
         if (limitedFieldList[i][3] == "words") {
-            limitedFieldManagerList.push(new WordsManager($E(limitedFieldList[i][0]), limitedFieldList[i][1], $E(limitedFieldList[i][2]), isMandatory));
+            limitedFieldManagerList.push(new WordsManager($('[name="'+limitedFieldList[i][0]+'"]'), limitedFieldList[i][1], $E(limitedFieldList[i][2]), isMandatory));
         } else {
-            limitedFieldManagerList.push(new CharsManager($E(limitedFieldList[i][0]), limitedFieldList[i][1], $E(limitedFieldList[i][2]), isMandatory));
+            limitedFieldManagerList.push(new CharsManager($('[name="'+limitedFieldList[i][0]+'"]'), limitedFieldList[i][1], $E(limitedFieldList[i][2]), isMandatory));
         }
     }
 }
@@ -363,8 +363,8 @@ function addPMToMandatoryFields() {
 //Check limited fields, mandatory fields, primary author and presenter
 function checkFields() {
     // restart track table class name if needed
-    var condLimited = checkLimitedFields();
     var condMandatory = pmMandatoryFields.check();
+    var condLimited = checkLimitedFields();
 % if attachedFilesAllowed:
     var filesSize = attachedFilesManager.checkTotalFilesSize();
 % else:

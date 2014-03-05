@@ -21,10 +21,10 @@ type("WordsManager", [],
     {
 
     checkNumWords: function() {
-        if (this.maxWords - this._numWords(this.element.dom.value) < 0) {
+        if ((this.maxWords - this._numWords(this.element.val())) < 0) {
             this.maxWordsCounter.set(Html.span({className:'formError'}, $T('Over the limit')));
         } else {
-            this.maxWordsCounter.set(this.maxWords - this._numWords(this.element.dom.value) + $T(' words left'));
+            this.maxWordsCounter.set(this.maxWords - this._numWords(this.element.val()) + $T(' words left'));
         }
         this.pm.check();
     },
@@ -35,9 +35,9 @@ type("WordsManager", [],
 
     _addEvents: function() {
         var self = this;
-        this.element.observeEvent('change', function() {self.checkNumWords();});
-        this.element.observeEvent('keyup', function() {self.checkNumWords();});
-        this.element.observeEvent('blur', function() {self.checkNumWords();});
+        this.element.on('change', function() {self.checkNumWords();});
+        this.element.on('keyup', function() {self.checkNumWords();});
+        this.element.on('blur', function() {self.checkNumWords();});
     },
 
     checkPM: function() {
@@ -73,7 +73,7 @@ type("WordsManager", [],
                 return error;
             }
             else {
-                self.element.dom.className = '';
+                self.element.removeClass('invalid');
                 return null;
             }
         });
@@ -89,7 +89,6 @@ function(element, maxWords, maxWordsCounter, isMandatory) {
     this.pm = new IndicoUtil.parameterManager();
     this.initializePM();
     this._addEvents();
-    this.checkNumWords();
 });
 
 
@@ -98,10 +97,10 @@ type("CharsManager", [],
     {
 
     checkNumChars: function() {
-        if (this.maxChars - this._numChars(this.element.dom.value) < 0) {
+        if ((this.maxChars - this._numChars(this.element.val())) < 0) {
             this.maxCharsCounter.set(Html.span({className:'formError'}, $T('Over the limit')));
         } else {
-            this.maxCharsCounter.set(this.maxChars - this._numChars(this.element.dom.value) + $T(' chars left'));
+            this.maxCharsCounter.set(this.maxChars - this._numChars(this.element.val()) + $T(' chars left'));
         }
         this.pm.check();
     },
@@ -112,9 +111,9 @@ type("CharsManager", [],
 
     _addEvents: function() {
         var self = this;
-        this.element.observeEvent('change', function() {self.checkNumChars();});
-        this.element.observeEvent('keyup', function() {self.checkNumChars();});
-        this.element.observeEvent('blur', function() {self.checkNumChars();});
+        this.element.on('change', function() {self.checkNumChars();});
+        this.element.on('keyup', function() {self.checkNumChars();});
+        this.element.on('blur', function() {self.checkNumChars();});
     },
 
     checkPM: function() {
@@ -148,7 +147,7 @@ type("CharsManager", [],
                 }
                 return error;
             } else {
-                self.element.dom.className = '';
+                self.element.removeClass('invalid');
                 return null;
             }
         });
@@ -164,7 +163,6 @@ function(element, maxChars, maxCharsCounter, isMandatory) {
     this.pm = new IndicoUtil.parameterManager();
     this.initializePM();
     this._addEvents();
-    this.checkNumChars();
 });
 
 
