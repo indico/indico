@@ -213,9 +213,7 @@
                     </tr>
                     <tr>
                         <td width="100%">
-                            <table align="center" width="100%">
                                 <textarea name="comments" rows="8" style="width:100%;">${ comments }</textarea>
-                            </table>
                         </td>
                     </tr>
                 </table>
