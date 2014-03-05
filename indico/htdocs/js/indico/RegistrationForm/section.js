@@ -684,7 +684,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            className: 'accompanying-col',
                            width: 60,
                            editable: true,
-                           edittype: "text",
+                           edittype: "int",
                            editoptions: {size:"6", maxlength:"20"}
                         },
                         {
