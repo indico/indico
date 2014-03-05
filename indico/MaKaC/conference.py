@@ -7822,7 +7822,7 @@ class Contribution(CommonObjectBase, Locatable):
             v = v.value
         try:
             self.getFields()[fid].value = v
-            self._notifyModification()
+            self.notifyModification()
         except KeyError:
             afm = self.getConference().getAbstractMgr().getAbstractFieldsMgr()
             for f in afm.getFields():
