@@ -4155,6 +4155,7 @@ class SessionsForm(BaseForm, Fossilizable):
     def getSessionById(self, id):
         return self._sessions.get(id, None)
 
+
 def sortByStartDate(x, y):
     return cmp(x.getSession().getStartDate(), y.getSession().getStartDate())
 
@@ -4184,7 +4185,13 @@ class SocialEventItem(Persistent, Fossilizable):
         if "cancelledReason" in data:
             self.setCancelledReason(data["cancelledReason"])
         if "maxPlace" in data:
-            self.setMaxPlacePerRegistrant(int(data["maxPlace"]))
+            try:
+                maxPlace = int(data["maxPlace"])
+            except:
+                maxPlace = 0
+            if maxPlace < 0:
+                maxPlace = 0
+            self.setMaxPlacePerRegistrant(maxPlace)
         if "placesLimit" in data:
             self.setPlacesLimit(data["placesLimit"])
         if "billable" in data:
