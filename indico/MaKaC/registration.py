@@ -2439,10 +2439,11 @@ class RadioGroupInput(FieldInputType, Fossilizable):
         caption = ""
         if radioitemid.strip() != "":
             radioitem = self.getItemById(radioitemid)
-            caption = radioitem.getCaption()
-            billable = radioitem.isBillable()
-            price = radioitem.getPrice()
-            quantity = 1
+            if radioitem is not None:
+                caption = radioitem.getCaption()
+                billable = radioitem.isBillable()
+                price = radioitem.getPrice()
+                quantity = 1
 
         item.setCurrency(self._parent.getParent().getRegistrationForm().getCurrency())
         item.setMandatory(self.getParent().isMandatory())
