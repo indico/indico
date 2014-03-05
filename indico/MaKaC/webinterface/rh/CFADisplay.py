@@ -212,7 +212,7 @@ class RHAbstractModificationAction(RHAbstractSubmissionBase, AbstractParam):
         #if the user is not logged in we return immediately as this form needs
         #   the user to be logged in and therefore all the checking below is not
         #   necessary
-        if self._getUser() == None:
+        if self._getUser() is None:
             return
 
         AbstractParam._checkParams(self, params, self._conf, request.content_length)
