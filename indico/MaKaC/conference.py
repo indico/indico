@@ -7823,11 +7823,12 @@ class Contribution(CommonObjectBase, Locatable):
         try:
             self.getFields()[fid].value = v
             self._notifyModification()
-        except:
+        except KeyError:
             afm = self.getConference().getAbstractMgr().getAbstractFieldsMgr()
-            f = next(f for f in afm.getFields() if f.getId() == fid)
-            if f is not None:
-                self.getFields()[fid] = AbstractFieldContent(f, v)
+            for f in afm.getFields():
+                if f.getId() == fid:
+                    self.getFields()[fid] = AbstractFieldContent(f, v)
+                    break
 
     def getField(self, field):
         if field in self.getFields():
