@@ -24,13 +24,15 @@
         {{ 'Introduction sentence' | i18n }}
         <span class="regFormMandatoryField">*</span>
     </label>
-    <textarea
-        ng-model="formData.introSentence"
-        ng-class="{hasError: validationStarted && sectionForm.introSentence.$invalid}"
-        id="descriptionEdit"
-        name="introSentence"
-        cols="40"
-        rows="6"
-        required>
-    </textarea>
+    <ng-form name="nestedForm">
+        <textarea
+            ng-model="formData.introSentence"
+            ng-class="{hasError: validationStarted && nestedForm.$invalid}"
+            id="descriptionEdit"
+            name="introSentence"
+            cols="40"
+            rows="6"
+            required>
+        </textarea>
+    </ng-form>
 </div>

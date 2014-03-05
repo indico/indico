@@ -15,7 +15,9 @@
             <div ng-repeat="tab in config.tabs"
                 class="tab-pane"
                 ng-class="{active: isTabSelected(tab.id)}" id="div-{{ tab.id }}">
-                    <div ng-include="getTabTpl(data.id, tab.type)"></div>
+                    <ng-form name="form-{{ tab.id }}">
+                        <div ng-include="getTabTpl(data.id, tab.type)"></div>
+                    </ng-form>
             </div>
         </div>
     </div>

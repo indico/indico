@@ -186,7 +186,23 @@ ndRegForm.directive('ndSection', function($rootScope, url) {
 
             scope.dialogs.config.actions.onOk = function(dialogScope) {
                 if (dialogScope.sectionForm.$invalid === true) {
-                    dialogScope.$apply(dialogScope.setSelectedTab('config'));
+                    // TODO Uncomment when AngularJS >= 1.2
+                    //      Current version doesn't generate ngForm names dynamicly
+                    // var forms = _.filter($.map(dialogScope.sectionForm, function(value, index) {
+                    //     return index;
+                    // }), function(index) {
+                    //     return index[0] != '$';
+                    // });
+
+                    // var firstInvalid = _.find(dialogScope.sectionForm, function(form) {
+                    //     return form.$invalid;
+                    // });
+
+                    // var invalid = _.find(forms, function(f) {
+                    //     return dialogScope.sectionForm[f].$invalid;
+                    // });
+
+                    // dialogScope.$apply(dialogScope.setSelectedTab(firstInvalid));
                     return false;
                 }
 
