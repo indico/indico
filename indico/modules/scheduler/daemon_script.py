@@ -43,7 +43,7 @@ class SchedulerApp(object):
         super(SchedulerApp, self).__init__()
         self.args = args
         config = Config.getInstance()
-        worker = config.getWorkerName();
+        worker = config.getWorkerName()
 
         cp = ConfigParser.ConfigParser()
         logging_conf_file = os.path.join(config.getConfigurationDir(), "logging.conf")

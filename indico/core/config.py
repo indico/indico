@@ -520,7 +520,8 @@ class Config:
         'RouteOldUrls'              : False,
         'CustomCountries'           : {},
         'PDFLatexProgram'           : 'pdflatex',
-        'StrictLatex'               : True
+        'StrictLatex'               : True,
+        'WorkerName'                : socket.getfqdn()
     }
 
     if sys.platform == 'win32':
@@ -580,7 +581,6 @@ class Config:
             'TPLVars'                   : {"MaKaCHomeURL": self.getBaseURL()},
             'FileTypes'                 : FILE_TYPES,
             'HelpDir'                   : os.path.join(self.getHtdocsDir(), 'ihelp'),
-            'WorkerName'                : socket.getfqdn(),
             'StylesheetsDir'            : os.path.join(webinterface_dir, 'stylesheets'),
             'ImagesDir'                 : os.path.join(self.getHtdocsDir(), 'images'),
             'FontsDir'                  : os.path.join(self.getHtdocsDir(), 'fonts'),
