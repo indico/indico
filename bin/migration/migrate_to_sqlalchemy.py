@@ -102,9 +102,10 @@ def convert_date(ds):
                 raise RuntimeError(ds)
     if isinstance(ds, datetime):
         if not ds.tzinfo:
-            ds = pytz.timezone('Europe/Zurich').localize(ds)
+            ds = tz.localize(ds)
     elif isinstance(ds, dt_time):
-        ds = ds.replace(hour=(ds.hour-1)%24)  # one hour, day light save time?
+        hour_diff = datetime.now(pytz.utc).hour - datetime.now(tz).hour
+        ds = ds.replace(hour=(ds.hour+hour_diff)%24)  # day light save time?
     return ds
 
 
@@ -250,7 +251,7 @@ def migrate_rooms(main_root, rb_root, photo_path):
             r.bookable_times.append(
                 BookableTime(
                     start_time=convert_date(old_bookable_time._startTime),
-                    end_time=convert_date(old_bookable_time._endTime),
+                    end_time=convert_date(old_bookable_time._endTime)
                 )
             )
 
@@ -397,8 +398,8 @@ def migrate_blockings(main_root, rb_root):
             id=old_blocking.id,
             created_by=convert_to_unicode(old_blocking._createdBy),
             created_at=convert_date(old_blocking._utcCreatedDT),
-            start_date=convert_date(old_blocking.startDate),
-            end_date=convert_date(old_blocking.endDate),
+            start_date=convert_date(datetime.combine(old_blocking.startDate, dt_time.min)),
+            end_date=convert_date(datetime.combine(old_blocking.endDate, dt_time.max)),
             reason=convert_to_unicode(old_blocking.message)
         )
 
@@ -432,6 +433,11 @@ def migrate(*args):
 
 def main(*args):
     main_root, rb_root, app = setup(*args[:3])
+    global tz
+    try:
+        tz = pytz.timezone(main_root['MaKaCInfo']['main'].getTimezone())
+    except KeyError:
+        tz = pytz.utc
 
     start = clock()
     with app.app_context():
