@@ -537,6 +537,9 @@ class _AdminList(Persistent):
     def getList( self ):
         return self.__list
 
+    def __len__(self):
+        return len(self.__list)
+
 
 class AdminList:
 

@@ -38,7 +38,6 @@ from MaKaC import schedule
 import MaKaC.common.info as info
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
-from indico.util.date_time import format_datetime
 
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.common.tools import escape_html
@@ -53,6 +52,7 @@ from indico.core.index import Catalog
 from indico.modules import ModuleHolder
 from indico.modules.upcoming import WUpcomingEvents
 from MaKaC.user import Group
+
 
 class WPCategoryBase ( main.WPMainBase ):
 
@@ -1010,7 +1010,10 @@ class WCategoryStatistics(wcomponents.WTemplated):
                 stats.append(i18nformat("""<h2> _("No statistics for the events").</h2>"""))
                 stats.append(i18nformat("""<h2> _("No statistics for the contributions").</h2>"""))
                 stats.append(i18nformat("""<h2> _("No statistics for the resources").</h2>"""))
-            stats.append(i18nformat("""<h2> _("Number of users"): <b>{0}</b></h2>""").format(self._stats["users"]))
+            if self._stats["users"]:
+                stats.append(i18nformat("""<h2> _("Number of users"): <b>{0}</b></h2>""").format(self._stats["users"]))
+            else:
+                stats.append(i18nformat("""<h2> _("No statistics for the users").</h2>"""))
         else:
             stats.append(_("This category doesn't contain any event. No statistics are available."))
         wvars["plots"] = "".join(plots)
