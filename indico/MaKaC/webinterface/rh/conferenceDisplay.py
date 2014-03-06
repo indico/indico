@@ -935,20 +935,22 @@ class RHConfParticipantsRefusal(RHConferenceBaseDisplay):
         self._confirm = params.has_key( "confirm" )
         self._cancel = params.has_key( "cancel" )
 
-    def _process( self ):
+    def _process(self):
         params = self._getRequestParams()
         participantId = params["participantId"]
+        status = self._conf.getParticipation().getParticipantById(participantId).getStatus()
+        if status in ('accepted', 'rejected'):
+            raise NoReportError('You have already {0} the invitation'.format(status))
         if self._cancel:
-            participant = self._conf.getParticipation().getParticipantById(participantId)
-            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-            self._redirect( url )
+            url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
+            self._redirect(url)
         elif self._confirm:
             participant = self._conf.getParticipation().getParticipantById(participantId)
             participant.setStatusRefused()
-            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-            self._redirect( url )
+            url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
+            self._redirect(url)
         else:
-            return conferences.WPConfModifParticipantsRefuse( self, self._conf ).display(**params)
+            return conferences.WPConfModifParticipantsRefuse(self, self._conf).display(**params)
 
 
 class RHConfParticipantsInvitation(RHConferenceBaseDisplay):
