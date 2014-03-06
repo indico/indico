@@ -15,18 +15,13 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.webinterface.pages.category as category
-import MaKaC.webinterface.wcomponents as wcomponents
-import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.conference as conference
-from indico.core.config import Config
-import MaKaC.common.info as info
-from MaKaC.i18n import _
-from MaKaC.common.timezoneUtils import DisplayTZ
 
-class WPWelcome( category.WPCategoryDisplay ):
+
+class WPWelcome(category.WPCategoryDisplay):
 
     def __init__(self, rh, target, wfReg):
-        category.WPCategoryDisplay.__init__( self, rh, conference.CategoryManager().getRoot(), wfReg )
+        category.WPCategoryDisplay.__init__(self, rh, conference.CategoryManager().getRoot(), wfReg)
 
     def _isFrontPage(self):
-        return True;
+        return True

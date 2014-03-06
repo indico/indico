@@ -24,6 +24,8 @@ from MaKaC.errors import AdminError
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.webinterface.rh.base import RHProtected
 
+from indico.web.flask.util import url_for
+
 
 class RHAdminBase(RHProtected):
     def _checkParams(self, params):
@@ -38,12 +40,13 @@ class RHAdminBase(RHProtected):
             raise AdminError("area")
 
 
-class RHAdminArea( RHAdminBase ):
+class RHAdminArea(RHAdminBase):
     _uh = urlHandlers.UHAdminArea
 
-    def _process( self ):
-        p = admins.WPAdmins( self )
+    def _process(self):
+        p = admins.WPAdmins(self)
         return p.display()
+
 
 class RHUpdateNews( RHAdminBase ):
     _uh = urlHandlers.UHUpdateNews
@@ -71,11 +74,11 @@ class RHConfigUpcoming( RHAdminBase ):
         return p.display()
 
 
-class RHGeneralInfoModification( RHAdminBase ):
+class RHGeneralInfoModification(RHAdminBase):
     _uh = urlHandlers.UHGeneralInfoModification
 
-    def _process( self ):
-        p = admins.WPGenInfoModification( self )
+    def _process(self):
+        p = admins.WPGenInfoModification(self)
         return p.display()
 
 
@@ -87,19 +90,27 @@ class RHAdminSwitchNewsActive( RHAdminBase ):
         self._redirect( urlHandlers.UHAdminArea.getURL() )
 
 
-class RHGeneralInfoPerformModification( RHAdminBase ):
+class RHAdminToggleInstanceTracking(RHAdminBase):
+
+    def _process(self):
+        self._minfo.setInstanceTrackingActive(not self._minfo.isInstanceTrackingActive())
+        self._redirect(url_for('admin.adminList'))
+
+
+class RHGeneralInfoPerformModification(RHAdminBase):
     _uh = urlHandlers.UHGeneralInfoPerformModification
 
-    def _process( self ):
+    def _process(self):
         params = self._getRequestParams()
 
         if params['action'] != 'cancel':
-            self._minfo.setTitle( params["title"] )
-            self._minfo.setOrganisation( params["organisation"] )
-            self._minfo.setCity( params["city"] )
-            self._minfo.setCountry( params["country"] )
-            self._minfo.setLang( params["lang"] )
-        self._redirect( urlHandlers.UHAdminArea.getURL() )
+            self._minfo.setTitle(params["title"])
+            self._minfo.setOrganisation(params["organisation"])
+            self._minfo.setCity(params["city"])
+            self._minfo.setCountry(params["country"])
+            self._minfo.setTimezone(params["timezone"])
+            self._minfo.setLang(params["lang"])
+        self._redirect(urlHandlers.UHAdminArea.getURL())
 
 
 class RHStyles(RHAdminBase):

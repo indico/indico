@@ -142,35 +142,44 @@ class WPAdminsBase(WPMainBase):
     def _getPageContent(self, params):
         return "nothing"
 
+
 class WAdmins(wcomponents.WTemplated):
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars["title"] = minfo.getTitle()
-        vars["organisation"] = minfo.getOrganisation()
-        vars['supportEmail'] = Config.getInstance().getSupportEmail()
-        vars['publicSupportEmail'] = Config.getInstance().getPublicSupportEmail()
-        vars['noReplyEmail'] = Config.getInstance().getNoReplyEmail()
-        vars["lang"] = minfo.getLang()
-        vars["address"] = ""
-        if minfo.getCity() != "":
-            vars["address"] = minfo.getCity()
-        if minfo.getCountry() != "":
-            if vars["address"] != "":
-                vars["address"] = "%s (%s)"%(vars["address"], minfo.getCountry())
+        wvars['title'] = minfo.getTitle()
+        wvars['organisation'] = minfo.getOrganisation()
+        wvars['supportEmail'] = Config.getInstance().getSupportEmail()
+        wvars['publicSupportEmail'] = Config.getInstance().getPublicSupportEmail()
+        wvars['noReplyEmail'] = Config.getInstance().getNoReplyEmail()
+        wvars['lang'] = minfo.getLang()
+        wvars['address'] = ''
+        if minfo.getCity() != '':
+            wvars['address'] = minfo.getCity()
+        if minfo.getCountry() != '':
+            if wvars['address'] != '':
+                wvars['address'] = '{0} ({1})'.format(wvars['address'], minfo.getCountry())
             else:
-                vars["address"] = "%s"%minfo.getCountry()
-        vars["timezone"] = Config.getInstance().getDefaultTimezone()
-        vars["systemIconAdmins"] = Config.getInstance().getSystemIconURL( "admin" )
-        iconDisabled = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
-        iconEnabled = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
+                wvars['address'] = minfo.getCountry()
+        wvars['timezone'] = Config.getInstance().getDefaultTimezone()
+        wvars['systemIconAdmins'] = Config.getInstance().getSystemIconURL('admin')
+        iconDisabled = str(Config.getInstance().getSystemIconURL('disabledSection'))
+        iconEnabled = str(Config.getInstance().getSystemIconURL('enabledSection'))
         url = urlHandlers.UHAdminSwitchNewsActive.getURL()
         icon = iconEnabled if minfo.isNewsActive() else iconDisabled
-        vars["features"] = i18nformat("""<a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("News Pages")</a>""") % (url, icon)
-        vars["administrators"] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
-                                                  key=methodcaller('getStraightFullName')))
-        return vars
+        wvars['features'] = i18nformat('<a href="{}"><img src="{}" border="0"'
+                                       'style="float:left; padding-right: 5px">_("News Pages")</a>').format(url, icon)
+        wvars['administrators'] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
+                                                   key=methodcaller('getStraightFullName')))
+
+        tracking_url = url_for('admin.adminList-toggleInstanceTracking')
+        tracking_icon = iconEnabled if minfo.isInstanceTrackingActive() else iconDisabled
+        wvars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="{0}">""".format(tracking_url) +
+                                        """<img src="{0}" border="0" style="float:left;""".format(tracking_icon) +
+                                        """ padding-right: 5px">_("Instance Tracking")</a></div>""")
+        wvars["instanceTrackingEmail"] = minfo.getInstanceTrackingEmail()
+        return wvars
 
 
 class WAdminFrame(wcomponents.WTemplated):
@@ -192,15 +201,16 @@ class WAdminFrame(wcomponents.WTemplated):
         return 260
 
 
-class WPAdmins( WPAdminsBase ):
+
+class WPAdmins(WPAdminsBase):
 
     def _setActiveSideMenuItem(self):
         self._generalSettingsMenuItem.setActive()
 
-    def _getPageContent( self, params ):
+    def _getPageContent(self, params):
         wc = WAdmins()
-        pars = { "GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL() }
-        return wc.getHTML( pars )
+        pars = {"GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL()}
+        return wc.getHTML(pars)
 
 
 class WGeneralInfoModification(wcomponents.WTemplated):
@@ -217,12 +227,13 @@ class WGeneralInfoModification(wcomponents.WTemplated):
         return vars
 
 
-class WPGenInfoModification( WPAdmins ):
+class WPGenInfoModification(WPAdmins):
 
-    def _getPageContent( self, params ):
+    def _getPageContent(self, params):
         wc = WGeneralInfoModification()
-        pars = { "postURL": urlHandlers.UHGeneralInfoPerformModification.getURL() }
-        return wc.getHTML( pars )
+        pars = {"postURL": urlHandlers.UHGeneralInfoPerformModification.getURL()}
+        return wc.getHTML(pars)
+
 
 class WPHomepageCommon( WPAdminsBase ):
     def _setActiveSideMenuItem(self):
