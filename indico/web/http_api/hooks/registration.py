@@ -42,7 +42,8 @@ class CheckInHook(EventBaseHook):
         self._type = "checkin"
 
     def _hasAccess(self, aw):
-        return self._conf.canManageRegistration(aw.getUser()) and self._secret == self._registrant.getCheckInUUID()
+        return (self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)) \
+            and self._secret == self._registrant.getCheckInUUID()
 
     def export_checkin(self, aw):
         self._registrant.setCheckedIn(self._check_in)
@@ -66,7 +67,8 @@ class RegistrantHook(EventBaseHook):
         self._type = "registrant"
 
     def _hasAccess(self, aw):
-        return self._conf.canManageRegistration(aw.getUser()) and self._secret == self._registrant.getCheckInUUID()
+        return (self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)) \
+            and self._secret == self._registrant.getCheckInUUID()
 
     def export_registrant(self, aw):
         registration_date = format_datetime(self._registrant.getAdjustedRegistrationDate(), format="short")
@@ -98,7 +100,7 @@ class RegistrantsHook(EventBaseHook):
         self._conf = ConferenceHolder().getById(self._conf_id)
 
     def _hasAccess(self, aw):
-        return self._conf.canManageRegistration(aw.getUser())
+        return self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)
 
     def export_registrants(self, aw):
         registrants = self._conf.getRegistrantsList()
