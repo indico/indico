@@ -7822,13 +7822,18 @@ class Contribution(CommonObjectBase, Locatable):
             v = v.value
         try:
             self.getFields()[fid].value = v
-            self.notifyModification()
-        except KeyError:
+
+        # `AttritbuteError` may happen if the field is not yet an AbstractFieldContent
+        # (lazy migration)
+        # `KeyError` means that the attribute doesn't exist in the contrib, in which
+        # case it should be created anyway
+        except (AttributeError, KeyError):
             afm = self.getConference().getAbstractMgr().getAbstractFieldsMgr()
             for f in afm.getFields():
                 if f.getId() == fid:
                     self.getFields()[fid] = AbstractFieldContent(f, v)
                     break
+        self.notifyModification()
 
     def getField(self, field):
         if field in self.getFields():
