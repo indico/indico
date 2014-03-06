@@ -60,6 +60,10 @@ class MaKaCInfo(Persistent):
         # special features
         self._newsActive = False
         self._debugActive = False
+        self._instanceTrackingActive = False
+
+        # Instance Tracking email
+        self._instanceTrackingEmail = ""
 
         # template set
         self._defaultTemplateSet = None
@@ -107,6 +111,26 @@ class MaKaCInfo(Persistent):
         msg = 'MaKaCinfo.isDebugActive() is deprecated; use app.debug or Config.getInstance().getDebug() instead'
         warnings.warn(msg, DeprecationWarning, 2)
         return app.debug
+
+    def isInstanceTrackingActive(self):
+        if hasattr(self, "_instanceTrackingActive"):
+            return self._instanceTrackingActive
+        else:
+            self._instanceTrackingActive = False
+            return False
+
+    def setInstanceTrackingActive(self, active=True):
+        self._instanceTrackingActive = active
+
+    def getInstanceTrackingEmail(self):
+        if hasattr(self, "_instanceTrackingEmail"):
+            return self._instanceTrackingEmail
+        else:
+            self._instanceTrackingActive = ""
+            return ""
+
+    def setInstanceTrackingEmail(self, email=""):
+        self._instanceTrackingEmail = email
 
     def getNews( self ):
         try:

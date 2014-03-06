@@ -19,14 +19,23 @@ import MaKaC.conference as conference
 import MaKaC.webinterface.pages.welcome as welcome
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
+from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.user import AvatarHolder
 
-class RHWelcome( base.RHDisplayBaseProtected ):
+from indico.web.flask.util import url_for
+
+
+class RHWelcome(base.RHDisplayBaseProtected):
     _uh = urlHandlers.UHWelcome
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         self._target = conference.CategoryManager().getRoot()
 
-    def _process( self ):
-        wfReg = webFactoryRegistry.WebFactoryRegistry()
-        p = welcome.WPWelcome( self, self._target, wfReg )
-        return p.display()
+    def _process(self):
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        if not minfo.getAdminList().getList() and not AvatarHolder()._getIdx():
+            self._redirect(url_for('admin.wizard'))
+        else:
+            wfReg = webFactoryRegistry.WebFactoryRegistry()
+            p = welcome.WPWelcome(self, self._target, wfReg)
+            return p.display()

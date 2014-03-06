@@ -15,7 +15,8 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from MaKaC.webinterface.rh import admins, announcement, maintenance, domains, templates, conferenceModif, services
+from MaKaC.webinterface.rh import (admins, announcement, maintenance, domains, templates, conferenceModif, services,
+                                   wizard)
 
 
 admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
@@ -23,6 +24,8 @@ admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
 # General settings
 admin.add_url_rule('/', 'adminList', admins.RHAdminArea)
 admin.add_url_rule('/settings/general/news', 'adminList-switchNewsActive', admins.RHAdminSwitchNewsActive)
+admin.add_url_rule('/settings/general/instance-tracking', 'adminList-toggleInstanceTracking',
+                   admins.RHAdminToggleInstanceTracking)
 admin.add_url_rule('/settings/general/', 'generalInfoModification', admins.RHGeneralInfoModification)
 admin.add_url_rule('/settings/general/', 'generalInfoModification-update', admins.RHGeneralInfoPerformModification,
                    methods=('POST',))
@@ -97,3 +100,6 @@ admin.add_url_rule('/protection/ip-acl/add', 'adminServices-ipbasedacl_fagrant',
                    methods=('POST',))
 admin.add_url_rule('/protection/ip-acl/remove', 'adminServices-ipbasedacl_farevoke',
                    services.RHIPBasedACLFullAccessRevoke, methods=('POST',))
+
+# Wizard
+admin.add_url_rule('/wizard', 'wizard', wizard.RHWizard, methods=('GET', 'POST'))

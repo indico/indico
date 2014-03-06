@@ -1665,6 +1665,16 @@ class WTabControl(WTemplated):
         return vars
 
 
+class WAdminCreated(WTemplated):
+
+    def __init__(self, av):
+        self._av = av
+
+    def getVars(self):
+        vars = WTemplated.getVars(self)
+        return vars
+
+
 class WAbstractModIntCommentEdit(WTemplated):
 
     def __init__(self,comment):
