@@ -962,6 +962,9 @@ class RHConfParticipantsInvitation(RHConferenceBaseDisplay):
     def _process( self ):
         params = self._getRequestParams()
         participantId = params["participantId"]
+        status = self._conf.getParticipation().getParticipantById(participantId).getStatus()
+        if status in ('accepted', 'rejected'):
+            raise NoReportError('You have already {0} the invitation'.format(status))
         if self._cancel:
             if not self._conf.getParticipation().setParticipantRejected(participantId):
                 raise NoReportError("It seems you have been withdrawn from the list of invited participants")
