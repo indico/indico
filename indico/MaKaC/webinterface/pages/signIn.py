@@ -76,6 +76,20 @@ class WPAccountActivated( base.WPDecorated ):
         return wc.getHTML( params )
 
 
+class WPAdminCreated(base.WPDecorated):
+
+    def __init__(self, rh, av):
+        base.WPDecorated.__init__(self, rh)
+        self._av = av
+
+    def _getBody(self, params):
+        wc = wcomponents.WAdminCreated(self._av)
+        params["mailLoginURL"] = urlHandlers.UHSendLogin.getURL(self._av)
+        params["loginURL"] = urlHandlers.UHSignIn.getURL()
+
+        return wc.getHTML(params)
+
+
 class WPAccountDisabled( base.WPDecorated ):
 
     def __init__(self, rh, av):

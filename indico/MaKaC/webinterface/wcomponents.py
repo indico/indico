@@ -3074,6 +3074,16 @@ class WAccountActivated(WTemplated):
         return vars
 
 
+class WAdminCreated(WTemplated):
+
+    def __init__(self, av):
+        self._av = av
+
+    def getVars(self):
+        vars = WTemplated.getVars(self)
+        return vars
+
+
 class WAccountDisabled(WTemplated):
 
     def __init__(self, av):

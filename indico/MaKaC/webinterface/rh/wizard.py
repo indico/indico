@@ -111,7 +111,7 @@ class RHWizard(base.RHDisplayBaseProtected):
             if self._accept:
                 minfo.setInstanceTrackingEmail(self._params["instanceTrackingEmail"])
 
-            p = signIn.WPAccountActivated(self, av)
+            p = signIn.WPAdminCreated(self, av)
             return p.display()
         else:
             if self._params["msg"] != "":

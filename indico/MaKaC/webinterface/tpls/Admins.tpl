@@ -2,7 +2,9 @@
     <!-- CONTEXT HELP DIVS -->
     <div id="tooltipPool" style="display: none">
         <div id="features" class="tip">
-            ${ _("""Enabling "News Pages" will display "latest news" on the Indico home page and menu.""")}
+            ${ _("""<b>Click on one item to enable/disable the option.</b><br>
+            - <b>News</b>: will display "latest news" on the Indico home page and menu<br>
+            - <b>Instance Tracking</b>: will keep the administrators up to date with all the newest Indico features and send anonymous statistics to Indico@CERN.""")}
         </div>
     </div>
     <!-- END OF CONTEXT HELP DIVS -->

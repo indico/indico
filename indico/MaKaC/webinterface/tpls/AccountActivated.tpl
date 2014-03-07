@@ -1,4 +1,3 @@
-
 <center>
 <b> ${ _("Your account is activated. You can now use your login to enter")} <a href="${ loginURL }"> ${ _("here")}</a></b><br><br>
 <form action="${ mailLoginURL }" method="POST">
