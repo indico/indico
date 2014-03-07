@@ -226,6 +226,7 @@ def setupNamespace(dbi):
     add(namespace, PluginsHolder)
     add(namespace, Catalog)
     add(namespace, IndexesHolder)
+    add(namespace, Config)
 
     add(namespace, HelperMaKaCInfo.getMaKaCInfoInstance(), 'minfo', 'MaKaCInfo instance')
 
