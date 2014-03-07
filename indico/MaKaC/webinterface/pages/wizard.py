@@ -35,14 +35,14 @@ class WWizard(wcomponents.WTemplated):
         wvars = wcomponents.WTemplated.getVars(self)
         wvars["name"] = quoteattr(self._params.get("name", ""))
         wvars["surName"] = quoteattr(self._params.get("surName", ""))
-        wvars["organisation"] = quoteattr(self._params.get("organisation", ""))
         wvars["userEmail"] = quoteattr(self._params.get("userEmail", ""))
         wvars["login"] = quoteattr(self._params.get("login", ""))
+        wvars["organisation"] = quoteattr(self._params.get("organisation", ""))
         tz = str(get_localzone())
         wvars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(tz)
-        wvars["institutionEmail"] = quoteattr(self._params.get("institutionEmail", ""))
-        wvars["institution"] = quoteattr(self._params.get("institution", ""))
+        wvars["instanceTrackingEmail"] = quoteattr(self._params.get("instanceTrackingEmail", ""))
         wvars["msg"] = self._params.get("msg", "")
+        wvars["checked"] = self._params.get("accept", "")
         return wvars
 
 

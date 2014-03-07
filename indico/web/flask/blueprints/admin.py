@@ -27,6 +27,8 @@ admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
 # General settings
 admin.add_url_rule('/', 'adminList', admins.RHAdminArea)
 admin.add_url_rule('/settings/general/news', 'adminList-switchNewsActive', admins.RHAdminSwitchNewsActive)
+admin.add_url_rule('/settings/general/instance-tracking', 'adminList-toggleInstanceTracking',
+                   admins.RHAdminToggleInstanceTracking)
 admin.add_url_rule('/settings/general/', 'generalInfoModification', admins.RHGeneralInfoModification)
 admin.add_url_rule('/settings/general/', 'generalInfoModification-update', admins.RHGeneralInfoPerformModification,
                    methods=('POST',))

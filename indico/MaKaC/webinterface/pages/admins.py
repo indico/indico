@@ -62,6 +62,7 @@ from MaKaC.services.implementation.user import UserComparator
 from indico.util.i18n import i18nformat
 from indico.util.redis import client as redis_client
 from indico.util.date_time import timedelta_split
+from indico.web.flask.util import url_for
 
 
 class WPAdminsBase( WPMainBase ):
@@ -164,37 +165,49 @@ class WPAdminsBase( WPMainBase ):
     def _getPageContent(self, params):
         return "nothing"
 
+
 class WAdmins(wcomponents.WTemplated):
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars["title"] = minfo.getTitle()
-        vars["organisation"] = minfo.getOrganisation()
-        vars['supportEmail'] = Config.getInstance().getSupportEmail()
-        vars['publicSupportEmail'] = Config.getInstance().getPublicSupportEmail()
-        vars['noReplyEmail'] = Config.getInstance().getNoReplyEmail()
-        vars["lang"] = minfo.getLang()
-        vars["address"] = ""
+        wvars["title"] = minfo.getTitle()
+        wvars["organisation"] = minfo.getOrganisation()
+        wvars['supportEmail'] = Config.getInstance().getSupportEmail()
+        wvars['publicSupportEmail'] = Config.getInstance().getPublicSupportEmail()
+        wvars['noReplyEmail'] = Config.getInstance().getNoReplyEmail()
+        wvars["lang"] = minfo.getLang()
+        wvars["address"] = ""
         if minfo.getCity() != "":
-            vars["address"] = minfo.getCity()
+            wvars["address"] = minfo.getCity()
         if minfo.getCountry() != "":
-            if vars["address"] != "":
-                vars["address"] = "%s (%s)"%(vars["address"], minfo.getCountry())
+            if wvars["address"] != "":
+                wvars["address"] = "{0} ({1})".format(wvars["address"], minfo.getCountry())
             else:
-                vars["address"] = "%s"%minfo.getCountry()
+                wvars["address"] = "{0}".format(minfo.getCountry())
         try:
-            vars["timezone"] = minfo.getTimezone()
-        except:
-            vars["timezone"] = 'UTC'
-        vars["systemIconAdmins"] = Config.getInstance().getSystemIconURL( "admin" )
-        iconDisabled = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
-        iconEnabled = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
+            wvars["timezone"] = minfo.getTimezone()
+        except Exception:
+            wvars["timezone"] = 'UTC'
+        wvars["systemIconAdmins"] = Config.getInstance().getSystemIconURL("admin")
+        iconDisabled = str(Config.getInstance().getSystemIconURL("disabledSection"))
+        iconEnabled = str(Config.getInstance().getSystemIconURL("enabledSection"))
+        wvars["features"] = ""
         url = urlHandlers.UHAdminSwitchNewsActive.getURL()
         icon = iconEnabled if minfo.isNewsActive() else iconDisabled
-        vars["features"] = i18nformat("""<a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("News Pages")</a>""") % (url, icon)
-        vars["administrators"] = fossilize(minfo.getAdminList())
-        return vars
+        wvars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="{0}">""".format(url) +
+                                        """<img src="{0}" border="0" style="float:left;""".format(icon) +
+                                        """ padding-right: 5px">_("News Pages")</a></div>""")
+
+        wvars["administrators"] = fossilize(minfo.getAdminList())
+
+        url = url_for('admin.adminList-toggleInstanceTracking')
+        icon = iconEnabled if minfo.isInstanceTrackingActive() else iconDisabled
+        wvars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="{0}">""".format(url) +
+                                        """<img src="{0}" border="0" style="float:left;""".format(icon) +
+                                        """ padding-right: 5px">_("Instance Tracking")</a></div>""")
+        wvars["instanceTrackingEmail"] = minfo.getInstanceTrackingEmail()
+        return wvars
 
 
 class WAdminFrame(wcomponents.WTemplated):
@@ -218,21 +231,22 @@ class WAdminFrame(wcomponents.WTemplated):
 class WRBAdminFrame(WAdminFrame):
     pass
 
-class WPAdmins( WPAdminsBase ):
+
+class WPAdmins(WPAdminsBase):
 
     def _setActiveSideMenuItem(self):
         self._generalSettingsMenuItem.setActive()
 
-    def _getPageContent( self, params ):
+    def _getPageContent(self, params):
         wc = WAdmins()
-        pars = { "GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL() }
-        return wc.getHTML( pars )
+        pars = {"GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL()}
+        return wc.getHTML(pars)
 
 
 class WGeneralInfoModification(wcomponents.WTemplated):
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         genInfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["title"] = genInfo.getTitle()
         vars["organisation"] = genInfo.getOrganisation()
@@ -242,17 +256,18 @@ class WGeneralInfoModification(wcomponents.WTemplated):
             selected_tz = genInfo.getTimezone()
         except:
             selected_tz = 'UTC'
-        vars["timezone"]=TimezoneRegistry.getShortSelectItemsHTML(selected_tz)
-        vars["language"]= genInfo.getLang()
+        vars["timezone"] = TimezoneRegistry.getShortSelectItemsHTML(selected_tz)
+        vars["language"] = genInfo.getLang()
         return vars
 
 
-class WPGenInfoModification( WPAdmins ):
+class WPGenInfoModification(WPAdmins):
 
-    def _getPageContent( self, params ):
+    def _getPageContent(self, params):
         wc = WGeneralInfoModification()
-        pars = { "postURL": urlHandlers.UHGeneralInfoPerformModification.getURL() }
-        return wc.getHTML( pars )
+        pars = {"postURL": urlHandlers.UHGeneralInfoPerformModification.getURL()}
+        return wc.getHTML(pars)
+
 
 class WPHomepageCommon( WPAdminsBase ):
     def _setActiveSideMenuItem(self):

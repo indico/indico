@@ -47,7 +47,8 @@ class RHWizard(base.RHDisplayBaseProtected):
     def _checkParams(self, params):
         self._params = params
         base.RHDisplayBaseProtected._checkParams(self, params)
-        self._save = params.get("Save", "")
+        self._save = params.get("save", "")
+        self._accept = params.get("accept", "")
         self._activate = False
         self._params["msg"] = ""
         if self._save:
@@ -59,13 +60,10 @@ class RHWizard(base.RHDisplayBaseProtected):
             if not self._params.get("surName", ""):
                 self._params["msg"] += _("You must enter a surname.")+br
                 self._activate = False
-            if not self._params.get("organisation", ""):
-                self._params["msg"] += _("You must enter the name of your organisation.")+br
-                self._activate = False
             if not self._params.get("userEmail", ""):
                 self._params["msg"] += _("You must enter an user email address.")+br
                 self._activate = False
-            if not self._validMail(self._params.get("userEmail", "")):
+            elif not self._validMail(self._params.get("userEmail", "")):
                 self._params["msg"] += _("You must enter a valid user email address")+br
                 self._activate = False
             if not self._params.get("login", ""):
@@ -77,18 +75,20 @@ class RHWizard(base.RHDisplayBaseProtected):
             if self._params.get("password", "") != self._params.get("passwordBis", ""):
                 self._params["msg"] += _("You must enter the same password twice.")+br
                 self._activate = False
-            if not self._params.get("institutionEmail", ""):
-                self._params["msg"] += _("You must enter an institution email address.")+br
+            if not self._params.get("organisation", ""):
+                self._params["msg"] += _("You must enter the name of your organisation.")+br
                 self._activate = False
-            if not self._validMail(self._params.get("institutionEmail", "")):
-                self._params["msg"] += _("You must enter a valid institution email address")+br
-                self._activate = False
-            if not self._params.get("institution", ""):
-                self._params["msg"] += _("You must enter the name of your institution.")
-                self._activate = False
+            if self._accept:
+                if not self._params.get("instanceTrackingEmail", ""):
+                    self._params["msg"] += _("You must enter an email address for Instance Tracking.")+br
+                    self._activate = False
+                elif not self._validMail(self._params.get("instanceTrackingEmail", "")):
+                    self._params["msg"] += _("You must enter a valid email address for Instance Tracking")+br
+                    self._activate = False
 
     def _process(self):
         if self._activate:
+            # Creating new user
             ah = user.AvatarHolder()
             av = user.Avatar()
             authManager = AuthenticatorMgr()
@@ -97,9 +97,20 @@ class RHWizard(base.RHDisplayBaseProtected):
             li = user.LoginInfo(self._params["login"], self._params["password"])
             identity = authManager.createIdentity(li, av, "Local")
             authManager.add(identity)
+            # Activating new account
             av.activateAccount()
+            # Granting admin priviledges
             al = AdminList().getInstance()
             al.grant(av)
+            # Configuring server's settings
+            minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+            minfo.setOrganisation(self._params["organisation"])
+            minfo.setTimezone(self._params["timezone"])
+            minfo.setLang(self._params["lang"])
+            minfo.setInstanceTrackingActive(bool(self._accept))
+            if self._accept:
+                minfo.setInstanceTrackingEmail(self._params["instanceTrackingEmail"])
+
             p = signIn.WPAccountActivated(self, av)
             return p.display()
         else:

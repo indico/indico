@@ -40,6 +40,10 @@
       <td bgcolor="white" width="100%" valign="top" class="blacktext">${ escape(noReplyEmail) }</td>
     </tr>
     <tr>
+       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Instance Tracking email")}</span></td>
+       <td bgcolor="white" width="100%" valign="top" class="blacktext">${instanceTrackingEmail}</td>
+    </tr>
+    <tr>
       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Language")}</span></td>
       <td bgcolor="white" width="100%" valign="top" class="blacktext">${ _(lang)}</td>
     </tr>

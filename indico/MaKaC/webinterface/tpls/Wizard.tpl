@@ -42,14 +42,6 @@
         </tr>
         <tr>
           <td align="right">
-            <font color="gray"> ${ _("Affiliation")}</font>
-          </td>
-          <td align="left">
-            <input type="text" name="organisation" value=${ organisation }>
-          </td>
-        </tr>
-        <tr>
-          <td align="right">
             <font color="gray"> ${ _("Email")}</font>
           </td>
           <td align="left">
@@ -120,6 +112,14 @@
           </td>
         </tr>
         <tr>
+          <td align="right">
+            <font color="gray"> ${ _("Organisation")}</font>
+          </td>
+          <td align="left">
+            <input type="text" name="organisation" value=${organisation}>
+          </td>
+        </tr>
+        <tr>
           <td colspan="2" height="20em">
         </tr>
 
@@ -132,26 +132,39 @@
           <td colspan="2" bgcolor="black"></td>
         </tr>
         <tr>
-          <td>Explanation</td>
+          <td colspan="2" align="left">
+            <table width="90%">
+              <tr>
+                <td>
+                  <font color="gray">
+                    ${_("By accepting the Instance Tracking Terms you accept:")}
+                    <ul>
+                      <li>${ _("sending anonymous statistic data to Indico@CERN;")}</li>
+                      <li>${ _("receiving security warnings from the Indico team;")}</li>
+                      <li>${ _("receiving a notification when a new version is released.")}</li>
+                    </ul>
+                    ${_("Please note that no private information will ever be sent to Indico@CERN and that you will be able to change the Instance Tracking settings anytime in the future (from Server Admin, General Settings).")}
+                  </font>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td align="right">
+            <font color="gray"> ${ _("Accept")}</font>
+          </td>
+          <td align="left">
+            <input type="checkbox" name="accept" value="${ _("checked")}" ${checked}>
+          </td>
         </tr>
         <tr>
           <td align="right">
             <font color="gray"> ${ _("Email")}</font>
           </td>
           <td align="left">
-            <input type="text" name="institutionEmail" value=${ institutionEmail }>
+            <input type="text" name="instanceTrackingEmail" value=${instanceTrackingEmail}>
           </td>
-        </tr>
-        <tr>
-          <td align="right">
-            <font color="gray"> ${ _("Institution")}</font>
-          </td>
-          <td align="left">
-            <input type="text" name="institution" value=${ institution }>
-          </td>
-        </tr>
-        <tr>
-          <td>Buttons...</td>
         </tr>
         <tr>
           <td colspan="2" height="20em"></td>
@@ -159,7 +172,7 @@
 
         <tr>
           <td colspan="2" align="center">
-            <input type="submit" class="btn" name="Save" value="${ _("confirm")}">
+            <input type="submit" class="btn" name="save" value="${ _("confirm")}">
           </td>
         </tr>
 
