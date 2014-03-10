@@ -114,6 +114,11 @@ class Group(Persistent, Fossilizable):
     def setObsolete(self, obsolete):
         self.obsolete = obsolete
 
+    def _cleanGroupMembershipCache(self, avatar):
+        group_membership = GenericCache('groupmembership')
+        key = "{0}-{1}".format(self.getId(), avatar.getId())
+        group_membership.delete(key)
+
     def addMember(self, newMember):
         if newMember == self:
             raise MaKaCError(_("It is not possible to add a group as member of itself"))
@@ -124,13 +129,19 @@ class Group(Persistent, Fossilizable):
             newMember.linkTo(self, "member")
         self._p_changed = 1
 
+        # We need to clean the gooup membership cache
+        self._cleanGroupMembershipCache(newMember)
+
     def removeMember(self, member):
-        if member == None or member not in self.members:
+        if member is None or member not in self.members:
             return
         self.members.remove(member)
         if isinstance(member, Avatar):
             member.unlinkTo(self, "member")
         self._p_changed = 1
+
+        # We need to clean the gooup membership cache
+        self._cleanGroupMembershipCache(member)
 
     def getMemberList(self):
         return self.members
