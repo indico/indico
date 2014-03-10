@@ -404,6 +404,31 @@ class IdPayment(RegistrantSortingField):
         return cmp( r1.getIdPay(), r2.getIdPay() )
 
 
+class IsCheckedInSF(RegistrantSortingField):
+    _id="checkedIn"
+
+    def compare(self, r1, r2):
+        """
+        """
+        return cmp(r1.isCheckedIn(), r2.isCheckedIn())
+
+
+class CheckInDateSF(RegistrantSortingField):
+    _id="checkInDate"
+
+    def compare(self, r1, r2):
+        """
+        """
+        if r2.getCheckInDate() is None and r1.getCheckInDate() is not None:
+            return 1
+        elif r1.getCheckInDate() is None and r2.getCheckInDate() is not None:
+            return -1
+        elif r1.getCheckInDate() is None and r2.getCheckInDate() is None:
+            return 0
+        else:
+            return cmp(r1.getCheckInDate(), r2.getCheckInDate())
+
+
 class SortingCriteria( filters.SortingCriteria ):
     """
     """
@@ -425,7 +450,9 @@ class SortingCriteria( filters.SortingCriteria ):
                         RegistrationDateSF.getId():RegistrationDateSF, \
                         CountrySF.getId():CountrySF, \
                         IsPayedSF.getId():IsPayedSF, \
-                        IdPayment.getId():IdPayment}
+                        IdPayment.getId():IdPayment, \
+                        IsCheckedInSF.getId():IsCheckedInSF, \
+                        CheckInDateSF.getId():CheckInDateSF}
 
 
     def __init__( self, crit = []):
