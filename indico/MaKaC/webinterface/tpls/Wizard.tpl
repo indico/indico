@@ -4,31 +4,31 @@
     <table width="80%">
       <tbody>
         <tr>
-          <td colspan="2" align="center">
+          <td colspan="3" align="center">
             <font size="+2">
                 <u>${ _("Admin Creation Wizard")}</u>
             </font>
           </td>
         </tr>
         <tr>
-          <td colspan="2" height="80em">
+          <td colspan="3" height="80em">
             ${msg}
           </td>
         </tr>
 
-        <tr>
-          <td colspan="2">
+        <tr class="stepTitle1">
+          <td colspan="3">
             <b>${ _("1. User creation")}</b>
           </td>
         </tr>
         <tr>
-          <td colspan="2" bgcolor="black"></td>
+          <td colspan="3" bgcolor="black"></td>
         </tr>
         <tr>
           <td align="right">
             <font color="gray"> ${ _("First name")}</font>
           </td>
-          <td align="left">
+          <td align="left" width="100%">
             <input type="text" name="name" value=${ name }>
           </td>
         </tr>
@@ -73,16 +73,21 @@
           </td>
         </tr>
         <tr>
-          <td colspan="2" height="20em"></td>
+          <td colspan="3" height="20em"></td>
+        </tr>
+        <tr>
+          <td colspan="3" align="center">
+            <input type="button" class="btn" value="${ _("confirm")}" onclick="nextStep(1);">
+          </td>
         </tr>
 
-        <tr>
-          <td colspan="2">
+        <tr class="stepTitle2">
+          <td colspan="3">
             <b>${ _("2. Server Settings")}</b>
           </td>
         </tr>
         <tr>
-          <td colspan="2" bgcolor="black"></td>
+          <td colspan="3" bgcolor="black"></td>
         </tr>
         <tr>
           <td align="right">
@@ -102,6 +107,9 @@
                 </script>
             </select>
           </td>
+          <td align="right" style="vertical-align:top;">
+            <input type="button" class="btn" value="${ _("back")}" onclick="previousStep(2);">
+          </td>
         </tr>
         <tr>
           <td align="right">
@@ -120,20 +128,25 @@
           </td>
         </tr>
         <tr>
-          <td colspan="2" height="20em">
+          <td colspan="3" height="20em">
+        </tr>
+        <tr>
+          <td colspan="3" align="center">
+            <input type="button" class="btn" value="${ _("confirm")}" onclick="nextStep(2);">
+          </td>
         </tr>
 
-        <tr>
-          <td colspan="2">
+        <tr class="stepTitle3">
+          <td colspan="3">
             <b>${ _("3. Instance tracking")}</b>
           </td>
         </tr>
         <tr>
-          <td colspan="2" bgcolor="black"></td>
+          <td colspan="3" bgcolor="black"></td>
         </tr>
         <tr>
           <td colspan="2" align="left">
-            <table width="90%">
+            <table width="50%">
               <tr>
                 <td>
                   <font color="gray">
@@ -149,12 +162,15 @@
               </tr>
             </table>
           </td>
+          <td align="right" style="vertical-align:top;">
+            <input type="button" class="btn" value="${ _("back")}" onclick="previousStep(3);">
+          </td>
         </tr>
         <tr>
           <td align="right">
             <font color="gray"> ${ _("Accept")}</font>
           </td>
-          <td align="left">
+          <td align="left" width="100%">
             <input type="checkbox" name="accept" value="${ _("checked")}" ${checked}>
           </td>
         </tr>
@@ -167,11 +183,10 @@
           </td>
         </tr>
         <tr>
-          <td colspan="2" height="20em"></td>
+          <td colspan="3" height="20em"></td>
         </tr>
-
         <tr>
-          <td colspan="2" align="center">
+          <td colspan="3" align="center">
             <input type="submit" class="btn" name="save" value="${ _("confirm")}">
           </td>
         </tr>
@@ -180,3 +195,21 @@
     </table>
   </center>
 </form>
+
+<script type='text/javascript'>
+  function toggleSection(section){
+    $('tr.stepTitle'+section).next().nextUntil('tr.stepTitle'+(section+1)).toggle();
+  }
+  function expandCollapse(first, second){
+    toggleSection(first);
+    toggleSection(second);
+  }
+  function nextStep(current){
+    expandCollapse(current, current+1);
+  }
+  function previousStep(current){
+    expandCollapse(current, current-1);
+  }
+  toggleSection(2);
+  toggleSection(3);
+</script>
