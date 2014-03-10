@@ -53,7 +53,8 @@
                         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
                         class="editable"
                         max="9999"
-                        min="0"/>
+                        min="0"
+                        size="6"/>
                 </ng-form>
                 <input ng-if="elem.edittype == 'bool_select'"
                     ng-model="item[elem.index]"
