@@ -1,5 +1,5 @@
 <% from indico.util.i18n import getLocaleDisplayNames %>
-<form action="" method="POST">
+<form id="wizard-form" action="" method="POST">
   <center>
     <table width="80%">
       <tbody>
@@ -77,7 +77,7 @@
         </tr>
         <tr>
           <td colspan="3" align="center">
-            <input type="button" class="btn" value="${ _("confirm")}" onclick="nextStep(1);">
+            <a class="i-button icon-expand" title="Next step" onclick="nextStep(1);"></a>
           </td>
         </tr>
 
@@ -108,7 +108,7 @@
             </select>
           </td>
           <td align="right" style="vertical-align:top;">
-            <input type="button" class="btn" value="${ _("back")}" onclick="previousStep(2);">
+            <a class="i-button icon-collapse" title="Previous step" onclick="previousStep(2);"></a>
           </td>
         </tr>
         <tr>
@@ -132,7 +132,7 @@
         </tr>
         <tr>
           <td colspan="3" align="center">
-            <input type="button" class="btn" value="${ _("confirm")}" onclick="nextStep(2);">
+            <a class="i-button icon-expand" title="Next step" onclick="nextStep(2);"></a>
           </td>
         </tr>
 
@@ -163,7 +163,7 @@
             </table>
           </td>
           <td align="right" style="vertical-align:top;">
-            <input type="button" class="btn" value="${ _("back")}" onclick="previousStep(3);">
+            <a class="i-button icon-collapse" title="Previous step" onclick="previousStep(3);"></a>
           </td>
         </tr>
         <tr>
@@ -187,7 +187,7 @@
         </tr>
         <tr>
           <td colspan="3" align="center">
-            <input type="submit" class="btn" name="save" value="${ _("confirm")}">
+            <a href="#" id="submit-wizard" class="i-button icon-checkmark" title="Confirm"></a>
           </td>
         </tr>
 
@@ -197,6 +197,10 @@
 </form>
 
 <script type='text/javascript'>
+  $('#submit-wizard').on('click', function(e) {
+      e.preventDefault();
+      $('#wizard-form').submit();
+  });
   function toggleSection(section){
     $('tr.stepTitle'+section).next().nextUntil('tr.stepTitle'+(section+1)).toggle();
   }

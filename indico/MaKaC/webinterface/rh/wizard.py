@@ -29,6 +29,7 @@ import MaKaC.webinterface.pages.signIn as signIn
 from MaKaC.accessControl import AdminList
 
 import re
+from flask import request
 
 
 class RHWizard(base.RHDisplayBaseProtected):
@@ -44,49 +45,53 @@ class RHWizard(base.RHDisplayBaseProtected):
         if minfo.getAdminList().getList() or AvatarHolder()._getIdx():
             raise AccessError
 
-    def _checkParams(self, params):
-        self._params = params
-        base.RHDisplayBaseProtected._checkParams(self, params)
-        self._save = params.get("save", "")
-        self._accept = params.get("accept", "")
-        self._activate = False
-        self._params["msg"] = ""
-        if self._save:
-            self._activate = True
-            br = "<br>"
-            if not self._params.get("name", ""):
-                self._params["msg"] += _("You must enter a name.")+br
-                self._activate = False
-            if not self._params.get("surName", ""):
-                self._params["msg"] += _("You must enter a surname.")+br
-                self._activate = False
-            if not self._params.get("userEmail", ""):
-                self._params["msg"] += _("You must enter an user email address.")+br
-                self._activate = False
-            elif not self._validMail(self._params.get("userEmail", "")):
-                self._params["msg"] += _("You must enter a valid user email address")+br
-                self._activate = False
-            if not self._params.get("login", ""):
-                self._params["msg"] += _("You must enter a login.")+br
-                self._activate = False
-            if not self._params.get("password", ""):
-                self._params["msg"] += _("You must define a password.")+br
-                self._activate = False
-            if self._params.get("password", "") != self._params.get("passwordBis", ""):
-                self._params["msg"] += _("You must enter the same password twice.")+br
-                self._activate = False
-            if not self._params.get("organisation", ""):
-                self._params["msg"] += _("You must enter the name of your organisation.")+br
-                self._activate = False
-            if self._accept:
-                if not self._params.get("instanceTrackingEmail", ""):
-                    self._params["msg"] += _("You must enter an email address for Instance Tracking.")+br
-                    self._activate = False
-                elif not self._validMail(self._params.get("instanceTrackingEmail", "")):
-                    self._params["msg"] += _("You must enter a valid email address for Instance Tracking")+br
-                    self._activate = False
+    def _checkParams_GET(self):
+        self._params = request.form.copy()
 
-    def _process(self):
+    def _checkParams_POST(self):
+        self._params = request.form.copy()
+        base.RHDisplayBaseProtected._checkParams(self, self._params)
+        self._accept = self._params.get("accept", "")
+        self._params["msg"] = ""
+        self._activate = True
+        br = "<br>"
+        if not self._params.get("name", ""):
+            self._params["msg"] += _("You must enter a name.")+br
+            self._activate = False
+        if not self._params.get("surName", ""):
+            self._params["msg"] += _("You must enter a surname.")+br
+            self._activate = False
+        if not self._params.get("userEmail", ""):
+            self._params["msg"] += _("You must enter an user email address.")+br
+            self._activate = False
+        elif not self._validMail(self._params.get("userEmail", "")):
+            self._params["msg"] += _("You must enter a valid user email address")+br
+            self._activate = False
+        if not self._params.get("login", ""):
+            self._params["msg"] += _("You must enter a login.")+br
+            self._activate = False
+        if not self._params.get("password", ""):
+            self._params["msg"] += _("You must define a password.")+br
+            self._activate = False
+        if self._params.get("password", "") != self._params.get("passwordBis", ""):
+            self._params["msg"] += _("You must enter the same password twice.")+br
+            self._activate = False
+        if not self._params.get("organisation", ""):
+            self._params["msg"] += _("You must enter the name of your organisation.")+br
+            self._activate = False
+        if self._accept:
+            if not self._params.get("instanceTrackingEmail", ""):
+                self._params["msg"] += _("You must enter an email address for Instance Tracking.")+br
+                self._activate = False
+            elif not self._validMail(self._params.get("instanceTrackingEmail", "")):
+                self._params["msg"] += _("You must enter a valid email address for Instance Tracking")+br
+                self._activate = False
+
+    def _process_GET(self):
+        p = wizard.WPWizard(self, self._params)
+        return p.display()
+
+    def _process_POST(self):
         if self._activate:
             # Creating new user
             ah = user.AvatarHolder()
