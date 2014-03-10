@@ -47,7 +47,7 @@ class Collaboration_Feature(IndicoTestFeature):
 
 class TestElectronicAgreement(IndicoTestCase):
 
-    _requires = ['util.RequestEnvironment', Collaboration_Feature]
+    _requires = ['db.Database', 'util.RequestEnvironment', Collaboration_Feature]
 
     def setUp(self):
         '''
@@ -57,78 +57,74 @@ class TestElectronicAgreement(IndicoTestCase):
         To contribution 1 - Add 1 speaker, person1
         '''
         super(TestElectronicAgreement, self).setUp()
+        with self._context('database', 'request'):
 
-        self._startDBReq()
+            # Create few users
+            self._creator = Avatar({"name":"God", "email":"test@epfl.ch"})
+            self._creator.setId("creator")
+                # Set God as admin
+            AdminList.getInstance().getList().append(self._creator)
 
-        # Create few users
-        self._creator = Avatar({"name":"God", "email":"test@epfl.ch"})
-        self._creator.setId("creator")
-            # Set God as admin
-        AdminList.getInstance().getList().append(self._creator)
+            self.person1 = Avatar({"name":"giuseppe", "email":"12@hispeed.ch"})
+            self.person1.setId("spk1")
+            self.person2 = Avatar({"name":"gabriele", "email":"34@hispeed.ch"})
+            self.person1.setId("spk2")
+            self.person3 = Avatar({"name":"lorenzo", "email":"56@hispeed.ch"})
+            self.person1.setId("spk3")
+            self.person4 = Avatar({"name":"silvio", "email":"78@hispeed.ch"})
+            self.person1.setId("spk4")
 
-        self.person1 = Avatar({"name":"giuseppe", "email":"12@hispeed.ch"})
-        self.person1.setId("spk1")
-        self.person2 = Avatar({"name":"gabriele", "email":"34@hispeed.ch"})
-        self.person1.setId("spk2")
-        self.person3 = Avatar({"name":"lorenzo", "email":"56@hispeed.ch"})
-        self.person1.setId("spk3")
-        self.person4 = Avatar({"name":"silvio", "email":"78@hispeed.ch"})
-        self.person1.setId("spk4")
+            ah = AvatarHolder()
+            ah.add(self.person1)
+            ah.add(self.person2)
+            ah.add(self.person3)
+            ah.add(self.person4)
 
-        ah = AvatarHolder()
-        ah.add(self.person1)
-        ah.add(self.person2)
-        ah.add(self.person3)
-        ah.add(self.person4)
+            # Create a conference
+            category = conference.CategoryManager().getById('0')
+            self._conf = category.newConference(self._creator)
+            self._conf.setTimezone('UTC')
+            sd=datetime(2011, 06, 01, 10, 00, tzinfo=timezone("UTC"))
+            ed=datetime(2011, 06, 05, 10, 00, tzinfo=timezone("UTC"))
+            self._conf.setDates(sd,ed,)
+            ch = ConferenceHolder()
+            ch.add(self._conf)
 
-        # Create a conference
-        category = conference.CategoryManager().getById('0')
-        self._conf = category.newConference(self._creator)
-        self._conf.setTimezone('UTC')
-        sd=datetime(2011, 06, 01, 10, 00, tzinfo=timezone("UTC"))
-        ed=datetime(2011, 06, 05, 10, 00, tzinfo=timezone("UTC"))
-        self._conf.setDates(sd,ed,)
-        ch = ConferenceHolder()
-        ch.add(self._conf)
+            # Create contributions and add to the conference
+            c1, c2 = Contribution(), Contribution()
+            self.speaker1, self.speaker2 = ContributionParticipation(), ContributionParticipation()
 
-        # Create contributions and add to the conference
-        c1, c2 = Contribution(), Contribution()
-        self.speaker1, self.speaker2 = ContributionParticipation(), ContributionParticipation()
+            self.speaker1.setDataFromAvatar(self.person1)
+            self.speaker2.setDataFromAvatar(self.person2)
 
-        self.speaker1.setDataFromAvatar(self.person1)
-        self.speaker2.setDataFromAvatar(self.person2)
+            self._conf.addContribution(c2)
+            self._conf.addContribution(c1)
 
-        self._conf.addContribution(c2)
-        self._conf.addContribution(c1)
+            # Add speakers to contributions
+            c1.addPrimaryAuthor(self.speaker1)
+            c2.addPrimaryAuthor(self.speaker2)
+            c1.addSpeaker(self.speaker1)
+            c2.addSpeaker(self.speaker1)
+            c2.addSpeaker(self.speaker2)
 
-        # Add speakers to contributions
-        c1.addPrimaryAuthor(self.speaker1)
-        c2.addPrimaryAuthor(self.speaker2)
-        c1.addSpeaker(self.speaker1)
-        c2.addSpeaker(self.speaker1)
-        c2.addSpeaker(self.speaker2)
+            self._conf.enableSessionSlots()
 
-        self._conf.enableSessionSlots()
+            # Create session and schedule the contributions
+            s1 = Session()
+            sd = datetime(2011, 06, 02, 12, 00, tzinfo=timezone("UTC"))
+            ed = datetime(2011, 06, 02, 19, 00, tzinfo=timezone("UTC"))
+            s1.setDates(sd, ed)
 
-        # Create session and schedule the contributions
-        s1 = Session()
-        sd = datetime(2011, 06, 02, 12, 00, tzinfo=timezone("UTC"))
-        ed = datetime(2011, 06, 02, 19, 00, tzinfo=timezone("UTC"))
-        s1.setDates(sd, ed)
+            slot1 = SessionSlot(s1)
+            self._conf.addSession(s1)
+            slot1.setValues({"sDate":sd})
+            s1.addSlot(slot1)
 
-        slot1 = SessionSlot(s1)
-        self._conf.addSession(s1)
-        slot1.setValues({"sDate":sd})
-        s1.addSlot(slot1)
-
-        s1.addContribution(c1)
-        s1.addContribution(c2)
-        slot1.getSchedule().addEntry(c1.getSchEntry())
-        slot1.getSchedule().addEntry(c2.getSchEntry())
-
-        with self._context('request'):
+            s1.addContribution(c1)
+            s1.addContribution(c2)
+            slot1.getSchedule().addEntry(c1.getSchEntry())
+            slot1.getSchedule().addEntry(c2.getSchEntry())
             self.createAndAcceptBooking()
-        self._stopDBReq()
 
     @with_context('database')
     def testRightsFiltering(self):
