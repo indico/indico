@@ -33,10 +33,6 @@ def get_query_parameter(queryParams, keys, default=None, integer=False):
     return default
 
 
-def remove_lists(data):
-    return dict((k, v[0]) for (k, v) in data.iteritems() if v != None)
-
-
 def build_indico_request(path, params, api_key=None, secret_key=None, persistent=False):
     items = params.items() if hasattr(params, 'items') else list(params)
     if api_key:
@@ -52,8 +48,10 @@ def build_indico_request(path, params, api_key=None, secret_key=None, persistent
         return path
     return '%s?%s' % (path, urllib.urlencode(items))
 
-def generate_public_auth_request(apiMode, apiKey, path, params= {}, persistent=False, https = True):
-    from indico.web.http_api import API_MODE_KEY, API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
+
+def generate_public_auth_request(apiMode, apiKey, path, params={}, persistent=False, https=True):
+    from indico.web.http_api import API_MODE_KEY, API_MODE_ONLYKEY, API_MODE_SIGNED, \
+        API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 
     key = apiKey.getKey() if apiKey else None
     secret_key = apiKey.getSignKey() if apiKey else None
