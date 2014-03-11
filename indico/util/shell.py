@@ -246,7 +246,7 @@ def _can_bind_port(port):
 
 def _sigint(sig, frame):
     print
-    # Sometimes a request hangs and prevents the interpreter from existing.
+    # Sometimes a request hangs and prevents the interpreter from exiting.
     # By setting an 1-second alarm we avoid this
     if hasattr(signal, 'alarm'):
         signal.alarm(1)
