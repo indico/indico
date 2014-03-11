@@ -37,7 +37,7 @@ from werkzeug.exceptions import NotFound
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.auth import APIKeyHolder
 from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
-from indico.web.http_api.util import remove_lists, get_query_parameter
+from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api import API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.metadata.serializer import Serializer
@@ -67,7 +67,7 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
     Returns a string consisting of path and sorted query string.
     Dynamic arguments like signature and timestamp are removed from the query string.
     """
-    queryParams = remove_lists(parse_qs(query))
+    queryParams = parse_qs(query)
     if remove:
         for key in remove:
             queryParams.pop(key, None)
@@ -127,7 +127,6 @@ def buildAW(ak, onlyPublic=False):
             raise HTTPAPIError('HTTPS is required', 403)
         aw.setUser(ak.getUser())
     return aw
-
 
 
 def handler(prefix, path):
@@ -270,7 +269,7 @@ def handler(prefix, path):
                         Factory.getDALManager().disconnect()
                     dbi.endRequest(True)
                 except ConflictError:
-                    pass # retry
+                    pass  # retry
                 else:
                     break
         else:
@@ -286,7 +285,7 @@ def handler(prefix, path):
             logger.info('API request: %s?%s' % (path, query))
 
         serializer = Serializer.create(dformat, pretty=pretty, typeMap=typeMap,
-                                       **remove_lists(queryParams))
+                                       **queryParams)
         if error:
             if not serializer.schemaless:
                 # if our serializer has a specific schema (HTML, ICAL, etc...)
