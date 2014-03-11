@@ -19,15 +19,40 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+// ============================================================================
+// Base classes and mixins
+// ============================================================================
+
+%i-box-title {
+    @extend %font-family-title-light;
+    color: $dark-blue;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+%i-box-description {
+    @extend %font-family-description;
+    color: $dark-gray;
+    font-size: 14px;
+}
+
+
+// ============================================================================
+// Boxes
+// ============================================================================
+
 .i-box {
     @include border-radius();
     @include box-sizing(border-box);
     @include border-all();
     @include single-box-shadow();
+    @include word-break(break-all);
 
     background: white;
     padding: 10px;
+}
 
+.i-box.titled {
     .i-box-header {
         @include border-bottom();
         background-color: $light-gray;
@@ -35,15 +60,36 @@
         padding: 10px 10px;
 
         .i-box-title {
-            @extend %font-family-title-light;
+            @extend %i-box-title;
+        }
 
-            color: $dark-blue;
-            font-size: 1.5em;
-            font-weight: bold;
+        .i-box-description {
+            @extend %i-box-description;
         }
     }
 
-    .i-box-body {
+    .i-box-content {
         margin-top: 20px;
+    }
+}
+
+
+// ============================================================================
+// Group of boxes
+// ============================================================================
+
+.i-box-group {
+    $margin: 5px;
+
+    &.horz {
+        .i-box + .i-box {
+            margin-left: $margin;
+        }
+    }
+
+    &.vert {
+        .i-box + .i-box {
+            margin-top: $margin;
+        }
     }
 }

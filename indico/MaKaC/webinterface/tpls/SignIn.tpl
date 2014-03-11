@@ -26,13 +26,13 @@
 </div>
 % endif
 
-<div class="i-box">
+<div class="i-box titled">
     <div class="i-box-header">
         <div class="i-box-title">
             ${ _('Login') }
         </div>
     </div>
-    <div class="i-box-body">
+    <div class="i-box-content">
         <form name="signInForm" action=${ postURL } method="POST">
             <input type="hidden" name="returnURL" value=${ returnURL }>
             <table>
