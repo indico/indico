@@ -22,23 +22,15 @@ import MaKaC.webinterface.pages.wizard as wizard
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.user import AvatarHolder
 from MaKaC.errors import AccessError
-from MaKaC.i18n import _
 import MaKaC.user as user
 from MaKaC.authentication import AuthenticatorMgr
 import MaKaC.webinterface.pages.signIn as signIn
 from MaKaC.accessControl import AdminList
 
-import re
 from flask import request
 
 
 class RHWizard(base.RHDisplayBaseProtected):
-
-    def _validMail(self, email):
-        if re.search("^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$",
-                     email):
-            return True
-        return False
 
     def _checkProtection(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -52,79 +44,37 @@ class RHWizard(base.RHDisplayBaseProtected):
         self._params = request.form.copy()
         base.RHDisplayBaseProtected._checkParams(self, self._params)
         self._accept = self._params.get("accept", "")
-        self._params["msg"] = ""
-        self._activate = True
-        br = "<br>"
-        if not self._params.get("name", ""):
-            self._params["msg"] += _("You must enter a name.")+br
-            self._activate = False
-        if not self._params.get("surName", ""):
-            self._params["msg"] += _("You must enter a surname.")+br
-            self._activate = False
-        if not self._params.get("userEmail", ""):
-            self._params["msg"] += _("You must enter an user email address.")+br
-            self._activate = False
-        elif not self._validMail(self._params.get("userEmail", "")):
-            self._params["msg"] += _("You must enter a valid user email address")+br
-            self._activate = False
-        if not self._params.get("login", ""):
-            self._params["msg"] += _("You must enter a login.")+br
-            self._activate = False
-        if not self._params.get("password", ""):
-            self._params["msg"] += _("You must define a password.")+br
-            self._activate = False
-        if self._params.get("password", "") != self._params.get("passwordBis", ""):
-            self._params["msg"] += _("You must enter the same password twice.")+br
-            self._activate = False
-        if not self._params.get("organisation", ""):
-            self._params["msg"] += _("You must enter the name of your organisation.")+br
-            self._activate = False
-        if self._accept:
-            if not self._params.get("instanceTrackingEmail", ""):
-                self._params["msg"] += _("You must enter an email address for Instance Tracking.")+br
-                self._activate = False
-            elif not self._validMail(self._params.get("instanceTrackingEmail", "")):
-                self._params["msg"] += _("You must enter a valid email address for Instance Tracking")+br
-                self._activate = False
 
     def _process_GET(self):
         p = wizard.WPWizard(self, self._params)
         return p.display()
 
     def _process_POST(self):
-        if self._activate:
-            # Creating new user
-            ah = user.AvatarHolder()
-            av = user.Avatar()
-            authManager = AuthenticatorMgr()
-            _UserUtils.setUserData(av, self._params)
-            ah.add(av)
-            li = user.LoginInfo(self._params["login"], self._params["password"])
-            identity = authManager.createIdentity(li, av, "Local")
-            authManager.add(identity)
-            # Activating new account
-            av.activateAccount()
-            # Granting admin priviledges
-            al = AdminList().getInstance()
-            al.grant(av)
-            # Configuring server's settings
-            minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-            minfo.setOrganisation(self._params["organisation"])
-            minfo.setTimezone(self._params["timezone"])
-            minfo.setLang(self._params["lang"])
-            minfo.setInstanceTrackingActive(bool(self._accept))
-            if self._accept:
-                minfo.setInstanceTrackingEmail(self._params["instanceTrackingEmail"])
+        # Creating new user
+        ah = user.AvatarHolder()
+        av = user.Avatar()
+        authManager = AuthenticatorMgr()
+        _UserUtils.setUserData(av, self._params)
+        ah.add(av)
+        li = user.LoginInfo(self._params["login"], self._params["password"])
+        identity = authManager.createIdentity(li, av, "Local")
+        authManager.add(identity)
+        # Activating new account
+        av.activateAccount()
+        # Granting admin priviledges
+        al = AdminList().getInstance()
+        al.grant(av)
+        # Configuring server's settings
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        minfo.setOrganisation(self._params["organisation"])
+        minfo.setTimezone(self._params["timezone"])
+        minfo.setLang(self._params["lang"])
+        minfo.setInstanceTrackingActive(bool(self._accept))
+        if self._accept:
+            minfo.setInstanceTrackingEmail(self._params["instanceTrackingEmail"])
 
-            p = signIn.WPAdminCreated(self, av)
-            return p.display()
-        else:
-            if self._params["msg"] != "":
-                self._params["msg"] = "<table class=\"center\" bgcolor=\"gray\" style=\"text-align:left;\">" + \
-                                      "<tr><td bgcolor=\"white\">\n<font size=\"+1\" color=\"red\"><b>" + \
-                                      "{0}</b></font>\n</td></tr></table>".format(self._params["msg"])
-            p = wizard.WPWizard(self, self._params)
-            return p.display()
+        p = signIn.WPAdminCreated(self, av)
+        return p.display()
 
 
 class _UserUtils:
