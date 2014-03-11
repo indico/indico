@@ -42,8 +42,8 @@
         <tr>
         <td colspan="3">
             <div id="registration-summary" class="regform-done">
-                <div class="regform-done-header">
-                    <div class="regform-section-title">
+                <div class="i-box-header">
+                    <div class="i-box-title">
                         ${ _('Registration Summary') }
                     </div>
                     % if pdfTicketURL:
@@ -54,20 +54,24 @@
                     </div>
                     % endif
                 </div>
-                <table width="100%" cellpadding="0" cellspacing="0">
-                    ${ otherSections }
-                </table>
+                <div class="i-box-content">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                        ${ otherSections }
+                    </table>
+                </div>
             </div>
             %if paymentInfo:
             <div id="payment-summary" class="regform-done">
-                <div class="regform-done-header">
-                    <div class="regform-section-title">
+                <div class="i-box-header">
+                    <div class="i-box-title">
                         ${ _('Payment Summary') }
                     </div>
                 </div>
-                <table width="100%" cellpadding="0" cellspacing="0">
-                    ${ paymentInfo }
-                </table>
+                <div class="i-box-content">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                        ${ paymentInfo }
+                    </table>
+                </div>
             </div>
             %endif
         </td>
