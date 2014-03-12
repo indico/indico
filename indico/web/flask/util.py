@@ -32,6 +32,8 @@ from werkzeug.datastructures import Headers, FileStorage
 from werkzeug.exceptions import NotFound, HTTPException
 from werkzeug.routing import BaseConverter, UnicodeConverter, RequestRedirect, BuildError
 from werkzeug.urls import url_parse
+from jinja2.ext import Extension
+from jinja2.lexer import Token
 
 from indico.util.caching import memoize
 from indico.web.handlers import RHHtdocs
@@ -314,6 +316,67 @@ class ListConverter(BaseConverter):
         if isinstance(value, (list, tuple, set)):
             value = '-'.join(value)
         return super(ListConverter, self).to_url(value)
+
+
+class EnsureUnicodeExtension(Extension):
+    """Ensures all strings in Jinja are unicode"""
+
+    @staticmethod
+    def ensure_unicode(s):
+        """Converts a bytestring to unicode. Must be registered as a filter!"""
+        if isinstance(s, str):
+            return s.decode('utf-8')
+        return s
+
+    def filter_stream(self, stream):
+        # The token stream looks like this:
+        # ------------------------
+        # variable_begin {{
+        # name           event
+        # dot            .
+        # name           getTitle
+        # lparen         (
+        # rparen         )
+        # pipe           |
+        # name           safe
+        # variable_end   }}
+        # ------------------------
+        # Intercepting the end of the actual variable is hard but it's rather easy to get the end of
+        # the variable tag or the start of the first filter. As filters are optional we need to check
+        # both cases. If we inject the code before the first filter we *probably* don't need to run
+        # it again later assuming our filters are nice and only return unicode. If that's not the
+        # case we can simply remove the `variable_done` checks.
+        # Due to the way Jinja works it is pretty much impossible to apply the filter to arguments
+        # passed inside a {% trans foo=..., bar=... %} argument list - we have nothing to detect the
+        # end of an argument as the 'comma' token might be inside a function call. So in that case#
+        # people simply need to unicodify the strings manually. :(
+
+        variable_done = False
+        in_trans = False
+        for token in stream:
+            # Check if we are inside a trans block - we cannot use filters there!
+            if token.type == 'block_begin':
+                block_name = stream.current.value
+                if block_name == 'trans':
+                    in_trans = True
+                elif block_name == 'endtrans':
+                    in_trans = False
+
+            if not in_trans:
+                if token.type == 'pipe':
+                    # Inject our filter call before the first filter
+                    yield Token(token.lineno, 'pipe', '|')
+                    yield Token(token.lineno, 'name', 'ensure_unicode')
+                    variable_done = True
+                elif token.type == 'variable_end':
+                    if not variable_done:
+                        # Inject our filter call if we haven't injected it right after the variable
+                        yield Token(token.lineno, 'pipe', '|')
+                        yield Token(token.lineno, 'name', 'ensure_unicode')
+                    variable_done = False
+
+            # Original token
+            yield token
 
 
 class ResponseUtil(object):

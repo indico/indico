@@ -27,12 +27,15 @@ from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
 
 from indico.core.config import Config
+from indico.util.i18n import gettext, ngettext
 from MaKaC.common.logger import Logger
+from MaKaC.common.utils import formatDateTime, formatDate, formatTime
 from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
-from indico.web.flask.util import XAccelMiddleware, make_compat_blueprint, ListConverter
+from indico.web.flask.util import XAccelMiddleware, make_compat_blueprint, ListConverter, EnsureUnicodeExtension, \
+    url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.rooms import rooms
@@ -94,6 +97,21 @@ def configure_app(app, set_path=False):
             raise ValueError('Invalid static file method: %s' % method)
 
 
+def setup_jinja(app):
+    # Unicode hack
+    app.jinja_env.add_extension(EnsureUnicodeExtension)
+    app.add_template_filter(EnsureUnicodeExtension.ensure_unicode)
+    # Filters
+    app.add_template_global(url_for)
+    app.add_template_global(url_rule_to_js)
+    app.add_template_filter(formatDateTime)
+    app.add_template_filter(formatDate)
+    app.add_template_filter(formatTime)
+    # i18n
+    app.jinja_env.add_extension('jinja2.ext.i18n')
+    app.jinja_env.install_gettext_callables(gettext, ngettext, True)
+
+
 def extend_url_map(app):
     app.url_map.converters['list'] = ListConverter
 
@@ -153,9 +171,10 @@ def make_app(set_path=False):
     # reason to access it outside this method without being inside an application context.
     # When set_path is enabled, SERVER_NAME and APPLICATION_ROOT are set according to BaseURL
     # so URLs can be generated without an app context, e.g. in the indico shell
-    app = IndicoFlask('indico', static_folder=None)
+    app = IndicoFlask('indico', static_folder=None, template_folder='web/templates')
     fix_root_path(app)
     configure_app(app, set_path)
+    setup_jinja(app)
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)
