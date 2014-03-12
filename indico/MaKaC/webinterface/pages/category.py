@@ -1011,7 +1011,7 @@ class WCategoryStatistics(wcomponents.WTemplated):
                 stats.append(i18nformat("""<h2> _("No statistics for the contributions").</h2>"""))
                 stats.append(i18nformat("""<h2> _("No statistics for the resources").</h2>"""))
             if self.__target.isRoot():
-                if self._stats["users"]:
+                if self._stats.get("users", ""):
                     stats.append(i18nformat("""<h2> _("Number of users"): <b>{0}</b></h2>""")
                                  .format(self._stats["users"]))
                 else:

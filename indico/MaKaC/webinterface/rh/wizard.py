@@ -34,8 +34,8 @@ class RHWizard(base.RHDisplayBaseProtected):
 
     def _checkProtection(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getAdminList().getList() or AvatarHolder()._getIdx():
-            raise AccessError
+        # if minfo.getAdminList().getList() or AvatarHolder()._getIdx():
+        #     raise AccessError
 
     def _checkParams_GET(self):
         self._params = request.form.copy()
@@ -56,7 +56,7 @@ class RHWizard(base.RHDisplayBaseProtected):
         authManager = AuthenticatorMgr()
         _UserUtils.setUserData(av, self._params)
         ah.add(av)
-        li = user.LoginInfo(self._params["login"], self._params["password"])
+        li = user.LoginInfo(self._params["login"], self._params["password"].encode('UTF8'))
         identity = authManager.createIdentity(li, av, "Local")
         authManager.add(identity)
         # Activating new account

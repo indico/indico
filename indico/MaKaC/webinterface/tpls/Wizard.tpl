@@ -300,22 +300,25 @@
   });
 
   $('#submit-wizard').on('click', function(e){
+    e.preventDefault();
+
+    var accept = document.getElementById('accept');
     var itEmail = document.getElementById('itEmail');
 
     var msg = "";
-    if (itEmail.validity.valueMissing){
-      msg = "${ _("You must enter an email address for Instance Tracking.")}";
-    }
-    else if (itEmail.validity.valid){
-      msg = "${ _("You must enter an email address for Instance Tracking.")}";
+    if (accept.checked){
+      if (itEmail.validity.valueMissing){
+        msg = "${ _("You must enter an email address for Instance Tracking.")}";
+      }
+      else if (itEmail.validity.valid){
+        msg = "${ _("You must enter an email address for Instance Tracking.")}";
+      }
     }
 
     if (msg != "")
       alert(msg);
-    else {
-      e.preventDefault();
+    else
       $('#wizard-form').submit();
-    }
   });
 
   toggleSection(2);
