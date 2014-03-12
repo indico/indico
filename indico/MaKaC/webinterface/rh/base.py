@@ -37,7 +37,6 @@ from ZEO.Exceptions import ClientDisconnected
 from ZODB.POSException import ConflictError, POSKeyError
 
 from MaKaC.accessControl import AccessWrapper
-from MaKaC.PDFinterface.base import LaTeXRuntimeException
 
 from MaKaC.common import fossilize, security
 from MaKaC.common.contextManager import ContextManager
@@ -46,17 +45,10 @@ from MaKaC.errors import (
     AccessError,
     BadRefererError,
     ConferenceClosedError,
-    EntryTimingError,
-    FormValuesError,
-    HtmlForbiddenTag,
     KeyAccessError,
     MaKaCError,
     ModificationError,
-    NoReportError,
-    NotFoundError,
     NotLoggedError,
-    ParentTimingError,
-    TimingError
 )
 from MaKaC.plugins import PluginsHolder
 from MaKaC.plugins.base import OldObservable
@@ -66,26 +58,13 @@ import MaKaC.webinterface.pages.errors as errors
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 
 from indico.core.config import Config
-from indico.core.db import DBMgr, IndicoDBError
-from indico.core.error import IndicoError
+from indico.core.db import DBMgr
 from indico.core.logger import Logger
-from indico.modules.oauth.errors import OAuthError
 from indico.util import json
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _, availableLocales, setLocale
-from indico.util.json import create_json_error_answer
 from indico.util.redis import RedisError
 from indico.web.flask.util import ResponseUtil
-
-def jsonify_error(func):
-    def decorator(*args, **keyargs):
-        e = args[1]
-        Logger.get('requestHandler').info('Request %s finished with %s: "%s"' % (request, e.__class__.__name__, e))
-        if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
-            return create_json_error_answer(e)
-        else:
-            return func(*args, **keyargs)
-    return decorator
 
 
 class RequestHandlerBase(OldObservable):

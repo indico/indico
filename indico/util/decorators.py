@@ -21,7 +21,7 @@ from functools import wraps
 
 from flask import request
 
-from ..core.error import IndicoError
+from ..core.errors import IndicoError
 from ..core.logger import Logger
 from .json import create_json_error_answer
 
