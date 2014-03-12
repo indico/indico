@@ -67,15 +67,19 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
     Returns a string consisting of path and sorted query string.
     Dynamic arguments like signature and timestamp are removed from the query string.
     """
-    queryParams = parse_qs(query)
-    if remove:
-        for key in remove:
-            queryParams.pop(key, None)
-    sortedQuery = sorted(queryParams.items(), key=lambda x: x[0].lower())
+    qparams = parse_qs(query)
+    sorted_params = []
+
+    for key, values in sorted(qparams.items(), key=lambda x: x[0].lower()):
+        key = key.lower()
+        if key not in remove:
+            for v in sorted(values):
+                sorted_params.append((key, v))
+
     if separate:
-        return path, sortedQuery and urllib.urlencode(sortedQuery)
-    elif sortedQuery:
-        return '%s?%s' % (path, urllib.urlencode(sortedQuery))
+        return path, sorted_params and urllib.urlencode(sorted_params)
+    elif sorted_params:
+        return '%s?%s' % (path, urllib.urlencode(sorted_params))
     else:
         return path
 
