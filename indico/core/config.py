@@ -525,7 +525,9 @@ class Config:
         'CustomCountries'           : {},
         'PDFLatexProgram'           : 'pdflatex',
         'StrictLatex'               : True,
-        'WorkerName'                : socket.getfqdn()
+        'WorkerName'                : socket.getfqdn(),
+        'Loggers'                   : ['files'],
+        'SentryDSN'                 : None
     }
 
     if sys.platform == 'win32':

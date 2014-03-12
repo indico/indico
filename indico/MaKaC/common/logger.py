@@ -23,7 +23,7 @@ import logging
 import logging.handlers
 import logging.config
 import ConfigParser
-from flask import request, session
+from flask import request, session, current_app, has_app_context
 from ZODB.POSException import POSError
 
 from indico.core.config import Config
@@ -147,7 +147,7 @@ class LoggerUtils:
         hlist = cp.get("handlers", "keys")
         hlist = hlist.split(",")
         handlers = {}
-        fixups = [] #for inter-handler references
+        fixups = []  # for inter-handler references
 
         for hand in hlist:
             sectname = "handler_%s" % hand.strip()
@@ -165,7 +165,7 @@ class LoggerUtils:
                 # if the args are not present in the file,
                 # take default values
                 args = cp.get(sectname, "args")
-            else :
+            else:
                 try:
                     args = defaultArgs[hand.strip()][1]
                 except KeyError:
@@ -202,6 +202,8 @@ class Logger:
     Encapsulates the features provided by the standard logging module
     """
 
+    handlers = {}
+
     @classmethod
     def initialize(cls):
         # Lists of filters for each handler
@@ -211,21 +213,31 @@ class Logger:
 
         config = Config.getInstance()
 
-        logConfFilepath = os.path.join(config.getConfigurationDir(), "logging.conf")
+        if 'files' in config.getLoggers():
+            logConfFilepath = os.path.join(config.getConfigurationDir(), "logging.conf")
 
-        smtpServer = config.getSmtpServer()
-        serverName = config.getWorkerName()
-        if not serverName:
-            serverName = config.getHostNameURL()
+            smtpServer = config.getSmtpServer()
+            serverName = config.getWorkerName()
+            if not serverName:
+                serverName = config.getHostNameURL()
 
-        # Default arguments for the handlers, taken mostly for the configuration
-        defaultArgs = { 'indico' : ("FileHandler", "('%s', 'a')" % cls._log_path('indico.log'), 'DEBUG'),
-                        'other'  : ("FileHandler", "('%s', 'a')" % cls._log_path('other.log'), 'DEBUG'),
-                        'smtp'   : ("handlers.SMTPHandler", "(%s, 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
-                        % (smtpServer, serverName, config.getSupportEmail(), serverName), "ERROR")
-                    }
+            # Default arguments for the handlers, taken mostly for the configuration
+            defaultArgs = { 'indico' : ("FileHandler", "('%s', 'a')" % cls._log_path('indico.log'), 'DEBUG'),
+                            'other'  : ("FileHandler", "('%s', 'a')" % cls._log_path('other.log'), 'DEBUG'),
+                            'smtp'   : ("handlers.SMTPHandler", "(%s, 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
+                            % (smtpServer, serverName, config.getSupportEmail(), serverName), "ERROR")
+                        }
 
-        cls.handlers = LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters)
+            cls.handlers.update(
+                LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters))
+
+        if 'sentry' in config.getLoggers() and has_app_context():
+            from raven.contrib.flask import Sentry
+
+            current_app.config['SENTRY_DSN'] = config.getSentryDSN()
+            #  Plug both in to Flask and `logging`
+            sentry = Sentry(current_app, logging=True)
+
     @classmethod
     def reset(cls):
         """
@@ -248,7 +260,7 @@ class Logger:
 
     @classmethod
     def get(cls, module=None):
-        return logging.getLogger('indico' if module == None else 'indico.' + module)
+        return logging.getLogger('indico' if module is None else 'indico.' + module)
 
     @classmethod
     def _log_path(cls, fname):
