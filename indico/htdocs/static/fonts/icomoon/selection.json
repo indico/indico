@@ -2311,6 +2311,30 @@
 			},
 			"setIdx": 0,
 			"iconIdx": 93
+		},
+		{
+			"icon": {
+				"paths": [
+					"M0 512l512 512v-320h511.998l0.002-384h-512v-320z"
+				],
+				"tags": [
+					"arrow-left",
+					"left",
+					"previous"
+				],
+				"defaultCode": 58303,
+				"grid": 16
+			},
+			"properties": {
+				"id": 959,
+				"order": 95,
+				"prevSize": 16,
+				"code": 58303,
+				"name": "arrow-left2",
+				"ligatures": ""
+			},
+			"setIdx": 0,
+			"iconIdx": 94
 		}
 	],
 	"height": 1024,

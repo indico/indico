@@ -44,11 +44,13 @@
                   },
                   highlighter: {
                     show: true,
-                    sizeAdjust: 7.5
+                    sizeAdjust: 7.5,
+                    tooltipAxes: 'yx',
+                    tooltipSeparator: ' ${tagName} in '
                   },
                   cursor: {
                     show: true,
-                    tooltipLocation: 'nw',
+                    showTooltip: false,
                     zoom: true
                   },
                   seriesDefaults: {

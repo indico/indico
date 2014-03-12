@@ -2,7 +2,7 @@
     <div class="category-header">
         <div class="category-statistics center">
             <span class="right">
-                <a class="i-button icon-prev" href="${ categDisplayURL }" title="Category page" style="margin-top:0.4em;"></a>
+                <a class="i-button icon-arrow-left2" href="${ categDisplayURL }" style="margin-top:0.4em;">${ _('Category page')}</a>
             </span>
             <div class="category-title" style="margin-left:0px; text-align:left;">
                 ${ name | remove_tags }&nbsp;
