@@ -56,7 +56,7 @@ class RHWizard(base.RHDisplayBaseProtected):
         authManager = AuthenticatorMgr()
         _UserUtils.setUserData(av, self._params)
         ah.add(av)
-        li = user.LoginInfo(self._params["login"], self._params["password"])
+        li = user.LoginInfo(self._params["login"], self._params["password"].encode('UTF8'))
         identity = authManager.createIdentity(li, av, "Local")
         authManager.add(identity)
         # Activating new account
