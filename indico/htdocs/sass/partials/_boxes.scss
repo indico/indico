@@ -46,7 +46,6 @@
     @include box-sizing(border-box);
     @include border-all();
     @include single-box-shadow();
-    @include word-break(break-all);
 
     background: white;
     padding: 10px;
