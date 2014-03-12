@@ -34,8 +34,8 @@ class RHWizard(base.RHDisplayBaseProtected):
 
     def _checkProtection(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        # if minfo.getAdminList().getList() or AvatarHolder()._getIdx():
-        #     raise AccessError
+        if minfo.getAdminList().getList() or AvatarHolder()._getIdx():
+            raise AccessError
 
     def _checkParams_GET(self):
         self._params = request.form.copy()
