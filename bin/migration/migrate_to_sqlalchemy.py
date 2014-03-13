@@ -340,7 +340,7 @@ def migrate_reservations(main_root, rb_root):
         )
 
         for eq_name in getattr(v, 'useVC', []):
-            eq = l.getEquipmentByName(eq_name)
+            eq = l.getEquipmentByName(eq_name.lower())
             if eq:
                 r.equipments.append(eq)
 
