@@ -26,10 +26,10 @@ from flask import current_app as app
 from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
 
+import indico.util.date_time as date_time_util
 from indico.core.config import Config
 from indico.util.i18n import gettext, ngettext
 from MaKaC.common.logger import Logger
-from MaKaC.common.utils import formatDateTime, formatDate, formatTime
 from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
@@ -104,9 +104,11 @@ def setup_jinja(app):
     # Filters
     app.add_template_global(url_for)
     app.add_template_global(url_rule_to_js)
-    app.add_template_filter(formatDateTime)
-    app.add_template_filter(formatDate)
-    app.add_template_filter(formatTime)
+    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
+    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))
+    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_datetime))
+    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_human_date))
+    app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_timedelta))
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext, ngettext, True)

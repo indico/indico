@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import
 
+import functools
 import inspect
 import os
 import re
@@ -320,6 +321,14 @@ class ListConverter(BaseConverter):
 
 class EnsureUnicodeExtension(Extension):
     """Ensures all strings in Jinja are unicode"""
+
+    @classmethod
+    def wrap_func(cls, f):
+        """Wraps a function to make sure it returns unicode. Useful for custom filters."""
+        @functools.wraps(f)
+        def wrapper(*args, **kwargs):
+            return cls.ensure_unicode(f(*args, **kwargs))
+        return wrapper
 
     @staticmethod
     def ensure_unicode(s):
