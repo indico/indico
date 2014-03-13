@@ -301,6 +301,12 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     return rv
 
 
+def get_template_module(template_name, **context):
+    app.update_template_context(context)
+    tpl = app.jinja_env.get_template(template_name)
+    return tpl.make_module(context)
+
+
 # Note: When adding custom converters please do not forget to add them to converter_functions in routing.js
 # if they need any custom processing (i.e. not just encodeURIComponent) in JavaScript.
 class ListConverter(BaseConverter):
