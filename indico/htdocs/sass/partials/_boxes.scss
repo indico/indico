@@ -83,13 +83,18 @@
     > .empty {
         @extend %i-box-empty;
     }
+
+    .i-box-footer {
+      overflow: auto;
+      padding: 1em;
+      background-color: lighten($light-gray, 0.5%);
+    }
 }
 
 .i-box.titled {
     .i-box-header {
         @include border-bottom();
         background-color: $light-gray;
-        margin: -10px -10px;
         padding: 10px 10px;
         overflow: hidden;
 
@@ -132,6 +137,7 @@
     }
 
     .i-box-content {
+        padding: 1em;
         margin-top: 20px;
         > .empty {
             @extend %i-box-empty;
