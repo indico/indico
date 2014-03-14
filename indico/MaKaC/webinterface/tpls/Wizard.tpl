@@ -1,277 +1,295 @@
 <% from indico.util.i18n import getLocaleDisplayNames %>
 <form id="wizard-form" action="" method="POST">
-  <center>
-    <table width="80%">
-      <tbody>
-        <tr>
-          <td colspan="3" align="center">
-            <h2 class="page_title">${ _("Admin Creation Wizard")}</h2>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3" height="80em"></td>
-        </tr>
 
-        <tr class="stepTitle1">
-          <td colspan="3">
-            <b>${ _("1. User creation")}</b>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3" bgcolor="black"></td>
-        </tr>
-        <tr>
-          <td align="right">
-            <font color="gray"> ${ _("First name")}</font>
-          </td>
-          <td align="left" width="100%">
-            <input id="name" type="text" name="name" value=${ name } required>
-          </td>
-        </tr>
-        <tr>
-          <td align="right">
-            <font color="gray"> ${ _("Family name")}</font>
-          </td>
-          <td align="left">
-            <input id="surName" type="text" name="surName" value=${ surName } required>
-          </td>
-        </tr>
-        <tr>
-          <td align="right">
-            <font color="gray"> ${ _("Email")}</font>
-          </td>
-          <td align="left">
-            <input id="userEmail" type="email" name="userEmail" value=${ userEmail } required>
-          </td>
-        </tr>
-        <tr>
-          <td align="right">
-            <font color="gray"> ${ _("Login")}</font>
-          </td>
-          <td align="left">
-            <input id="login" type="text" name="login" value=${ login } required>
-          </td>
-        </tr>
-        <tr>
-          <td align="right">
-            <font color="gray"> ${ _("Password")}</font>
-          </td>
-          <td align="left">
-            <input id="password" type="password" name="password" value="" required>
-          </td>
-        </tr>
-        <tr>
-          <td align="right" nowrap>
-            <font color="gray"> ${ _("Password (again)")}</font>
-          </td>
-          <td align="left">
-            <input id="passwordBis" type="password" name="passwordBis" value="" required pattern="">
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3" height="20em"></td>
-        </tr>
-        <tr>
-          <td colspan="3" align="center">
-            <a id="nextStep1" class="i-button icon-expand" title="Next step"></a>
-          </td>
-        </tr>
+  <div class="container" style="width: 100%; margin: 50px auto; max-width: 650px">
+    <div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt; white-space: nowrap;">
+        ${ _("Admin Creation Wizard")}
+    </div>
 
-        <tr class="stepTitle2">
-          <td colspan="3">
-            <b>${ _("2. Server Settings")}</b>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3" bgcolor="black"></td>
-        </tr>
-        <tr>
-          <td align="right">
-            <font color="gray">${ _("Language")}</font>
-          </td>
-          <td bgcolor="white" width="100%" align="left">
-            <select size=1 name="lang">
-                <script type='text/javascript'>
-                  var lang = navigator.language || navigator.userLanguage;
-                  var selected;
-                  % for l in getLocaleDisplayNames():
-                    selected = '';
-                    if ('${l[0]}'.split('_')[0] == lang.split('-')[0])
-                      selected = ' selected';
-                    document.write('<option value="${l[0]}"'+selected+'>${l[1]}</option>');
-                  % endfor
-                </script>
-            </select>
-          </td>
-          <td align="right" style="vertical-align:top;">
-            <a id="previousStep2" class="i-button icon-collapse" title="Previous step"></a>
-          </td>
-        </tr>
-        <tr>
-          <td align="right">
-            <font color="gray">${ _("Timezone")}</font>
-          </td>
-          <td bgcolor="white" width="100%" align="left">
-            <select name="timezone">${ timezoneOptions }</select>
-          </td>
-        </tr>
-        <tr>
-          <td align="right">
-            <font color="gray"> ${ _("Organisation")}</font>
-          </td>
-          <td align="left">
-            <input id="organisation" type="text" name="organisation" value=${organisation} required>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3" height="20em">
-        </tr>
-        <tr>
-          <td colspan="3" align="center">
-            <a id="nextStep2" class="i-button icon-expand" title="Next step"></a>
-          </td>
-        </tr>
+    <div class="i-box titled step1">
+      <div class="i-box-header">
+        <div class="i-box-title">${ _("1. User creation")}</div>
+      </div>
+      <div class="i-box-content">
+        <table width="100%">
+          <tr>
+            <td class="titleCellTD">
+              <span class="titleCellFormat">${ _("First name")}</span>
+            </td>
+            <td class="contentCellTD">
+              <input class="wizardMandatoryField1" id="name" type="text" name="name" value=${ name } required style="width: 80%;">
+            </td>
+          </tr>
+          <tr>
+            <td class="titleCellTD">
+              <span class="titleCellFormat">${ _("Family name")}</span>
+            </td>
+            <td class="contentCellTD">
+              <input class="wizardMandatoryField1" id="surName" type="text" name="surName" value=${ surName } required style="width: 80%;">
+            </td>
+          </tr>
+          <tr>
+            <td class="titleCellTD">
+              <span class="titleCellFormat">${ _("Email")}</span>
+            </td>
+            <td class="contentCellTD">
+              <input class="wizardMandatoryField1" id="userEmail" type="email" name="userEmail" value=${ userEmail } required style="width: 50%;">
+            </td>
+          </tr>
+          <tr>
+            <td class="titleCellTD">
+              <span class="titleCellFormat">${ _("Login")}</span>
+            </td>
+            <td class="contentCellTD">
+              <input class="wizardMandatoryField1" id="login" type="text" name="login" value=${ login } required style="width: 30%;">
+            </td>
+          </tr>
+          <tr>
+            <td class="titleCellTD">
+              <span class="titleCellFormat">${ _("Password")}</span>
+            </td>
+            <td class="contentCellTD">
+              <input class="wizardMandatoryField1" id="password" type="password" name="password" value="" required style="width: 30%;">
+            </td>
+          </tr>
+          <tr>
+            <td class="titleCellTD">
+                <span class="titleCellFormat">${ _("Password (again)")}</span>
+            </td>
+            <td class="contentCellTD">
+              <input class="wizardMandatoryField1" id="passwordBis" type="password" name="passwordBis" value="" required style="width: 30%;">
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="i-box-footer">
+        <div class="group right">
+          <a id="nextStep1" class="i-button">
+            ${ _("Next step")}
+            <i class="icon-next"></i>
+          </a>
+        </div>
+      </div>
+    </div>
 
-        <tr class="stepTitle3">
-          <td colspan="3">
-            <b>${ _("3. Instance tracking")}</b>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3" bgcolor="black"></td>
-        </tr>
-        <tr>
-          <td colspan="2" align="left">
-            <table width="50%">
-              <tr>
-                <td>
-                  <font color="gray">
-                    ${_("By accepting the Instance Tracking Terms you accept:")}
-                    <ul>
-                      <li>${ _("sending anonymous statistic data to Indico@CERN;")}</li>
-                      <li>${ _("receiving security warnings from the Indico team;")}</li>
-                      <li>${ _("receiving a notification when a new version is released.")}</li>
-                    </ul>
-                    ${_("Please note that no private information will ever be sent to Indico@CERN and that you will be able to change the Instance Tracking settings anytime in the future (from Server Admin, General Settings).")}
-                  </font>
-                </td>
-              </tr>
-            </table>
-          </td>
-          <td align="right" style="vertical-align:top;">
-            <a id="previousStep3" class="i-button icon-collapse" title="Previous step"></a>
-          </td>
-        </tr>
-        <tr>
-          <td align="right">
-            <font color="gray"> ${ _("Accept")}</font>
-          </td>
-          <td align="left" width="100%">
-            <input id="accept" type="checkbox" name="accept" value="${ _("checked")}" ${checked}>
-          </td>
-        </tr>
-        <tr>
-          <td align="right">
-            <font color="gray"> ${ _("Email")}</font>
-          </td>
-          <td align="left">
-            <input id="itEmail" type="text" name="instanceTrackingEmail" value=${instanceTrackingEmail}>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="3" height="20em"></td>
-        </tr>
-        <tr>
-          <td colspan="3" align="center">
-            <a href="#" id="submit-wizard" class="i-button icon-checkmark" title="Confirm"></a>
-          </td>
-        </tr>
+    <div class="i-box titled step2">
+      <div class="i-box-header">
+        <div class="i-box-title">${ _("2. Server settings")}</div>
+      </div>
+      <div class="i-box-content">
+        <table width="100%">
+          <tr>
+            <td class="titleCellTD">
+                <span class="titleCellFormat">${ _("Language")}</span>
+            </td>
+            <td class="contentCellTD">
+              <select size=1 name="lang" id="lang">
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td class="titleCellTD">
+                <span class="titleCellFormat">${ _("Timezone")}</span>
+            </td>
+            <td class="contentCellTD">
+                <select name="timezone">${ timezoneOptions }</select>
+            </td>
+          </tr>
+          <tr>
+            <td class="titleCellTD">
+                <span class="titleCellFormat">${ _("Organisation")}</span>
+            </td>
+            <td class="contentCellTD">
+                <input class="wizardMandatoryField2" id="organisation" type="text" name="organisation" value=${organisation} required style="width: 70%;">
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="i-box-footer">
+        <div class="group right">
+          <a id="previousStep2" class="i-button icon-prev">${ _("Previous step")}</a>
+          <a id="nextStep2" class="i-button">
+            ${ _("Next step")}
+            <i class="icon-next"></i>
+          </a>
+        </div>
+      </div>
+    </div>
 
-      </tbody>
-    </table>
-  </center>
+    <div class="i-box titled step3">
+      <div class="i-box-header">
+        <div class="i-box-title">${ _("3. Instance Tracking")}</div>
+      </div>
+      <div class="i-box-content">
+        <table width="100%">
+          <tr>
+            <td colspan="2">
+              <font color="gray">
+                ${_("By enabling the Instance Tracking Terms you accept:")}
+                <ul>
+                  <li>${ _("sending anonymous statistic data to Indico@CERN;")}</li>
+                  <li>${ _("receiving security warnings from the Indico team;")}</li>
+                  <li>${ _("receiving a notification when a new version is released.")}</li>
+                </ul>
+                ${_("Please note that no private information will ever be sent to Indico@CERN and that you will be able to change the Instance Tracking settings anytime in the future (from Server Admin, General Settings).")}
+              </font>
+            </td>
+          </tr>
+          <tr>
+            <td class="titleCellTD">
+                <span class="titleCellFormat">${ _("Enable")}</span>
+            </td>
+            <td class="contentCellTD">
+                <input id="enable" type="checkbox" name="enable" value="${ _("checked")}" ${checked}>
+            </td>
+          </tr>
+          <tr>
+            <td class="titleCellTD">
+                <span class="titleCellFormat">${ _("Email")}</span>
+            </td>
+            <td class="contentCellTD">
+                <input id="itEmail" type="email" name="instanceTrackingEmail" value=${instanceTrackingEmail} style="width: 50%;">
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class="i-box-footer">
+        <div class="group right">
+          <a id="previousStep3" class="i-button icon-prev">${ _("Previous step")}</a>
+          <a id="submit-wizard" class="i-button">
+            ${ _("Submit")}
+            <i class="icon-checkmark"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </form>
 
 <style type="text/css">
 
-  input:focus:invalid, input:invalid {
-    border: 1px solid red;
+  div.i-box {
+    border-radius: 0em;
   }
 
-  input:focus:valid, input:valid {
-    border: 1px solid green;
+  div.step2, div.step3 {
+    border-bottom-width: 0px;
+    border-top-width: 0px;
+  }
+
+  .titleCellTD {
+    width: 20%;
   }
 
 </style>
 
 <script type='text/javascript'>
 
+  var popup = new WarningPopup('${ _("Form validation")}', "${ _("Some fields are invalid. Please, correct them and submit the form again.")}");
+  var clicked = [false, false, false];
+
   function toggleSection(section){
-    $('tr.stepTitle'+section).next().nextUntil('tr.stepTitle'+(section+1)).toggle();
+    $('div.step'+section+'>div.i-box-header').nextUntil('div.step'+(section+1)+'>div.i-box-header').slideToggle(800);
   }
 
-  function expandCollapse(first, second){
-    toggleSection(first);
-    toggleSection(second);
+  function expandCollapse(expand, collapse){
+    $('div.step'+expand).css('border-bottom-width', '1px');
+    toggleSection(expand);
+    toggleSection(collapse);
+    setTimeout(function(){
+      $('div.step'+collapse).css('border-bottom-width', '0px');
+    }, 800);
   }
 
   function nextStep(current){
-    expandCollapse(current, current+1);
+    expandCollapse(current+1, current);
   }
 
   function previousStep(current){
-    expandCollapse(current, current-1);
+    expandCollapse(current-1, current);
   }
 
   $('#nextStep1').on('click', function(e){
-    var name = document.getElementById('name');
-    var surName = document.getElementById('surName');
-    var userEmail = document.getElementById('userEmail');
-    var login = document.getElementById('login');
-    var password = document.getElementById('password');
-    var passwordBis = document.getElementById('passwordBis');
+    clicked[0] = true;
+    var name = $('#name'),
+        surName = $('#surName'),
+        userEmail = $('#userEmail'),
+        login = $('#login'),
+        password = $('#password'),
+        passwordBis = $('#passwordBis');
 
-    var msg = "";
-    if (name.validity.valueMissing){
-      msg = "${ _("You must enter a name.")}"+"\n";
+    var wrong = [];
+    if (name.prop('validity').valueMissing){
+      wrong.push(name);
     }
-    if (surName.validity.valueMissing){
-      msg = msg+"${ _("You must enter a surname.")}"+"\n";
+    if (surName.prop('validity').valueMissing){
+      wrong.push(surName);
     }
-    if (userEmail.validity.valueMissing){
-      msg = msg+"${ _("You must enter an user email address.")}"+"\n";
+    if (!userEmail.prop('validity').valid){
+      wrong.push(userEmail);
     }
-    else if (!userEmail.validity.valid){
-      msg = msg+"${ _("You must enter a valid user email address.")}"+"\n";
+    if (login.prop('validity').valueMissing){
+      wrong.push(login);
     }
-    if (login.validity.valueMissing){
-      msg = msg+"${ _("You must enter a login.")}"+"\n";
+    if (password.prop('validity').valueMissing){
+      wrong.push(password);
     }
-    if (password.validity.valueMissing){
-      msg = msg+"${ _("You must define a password.")}"+"\n";
-    }
-    if (password.value != passwordBis.value){
-      msg = msg+"${ _("You must enter the same password twice.")}";
+    if (password.val() != passwordBis.val()){
+      wrong.push(passwordBis);
     }
 
-    if (msg != "")
-      alert(msg);
-    else
+    if (wrong.length > 0){
+      popup.open();
+      wrong.forEach(function(elem){
+        elem.addClass("hasError");
+      });
+    }
+    else{
       nextStep(1);
+    }
   });
 
   $('#nextStep2').on('click', function(e){
-    var organisation = document.getElementById('organisation');
+    clicked[1] = true;
+    var organisation = $('#organisation');
 
-    var msg = "";
-    if (organisation.validity.valueMissing){
-      msg = "${ _("You must enter the name of your organisation.")}";
+    var wrong = [];
+    if (organisation.prop('validity').valueMissing){
+      wrong.push(organisation);
     }
 
-    if (msg != "")
-      alert(msg);
-    else
+    if (wrong.length > 0){
+      popup.open();
+      wrong.forEach(function(elem){
+        elem.addClass("hasError");
+      });
+    }
+    else{
       nextStep(2);
+    }
+  });
+
+  $('#submit-wizard').on('click', function(e){
+    e.preventDefault();
+    clicked[2] = true;
+    var enable = $('#enable'),
+        itEmail = $('#itEmail');
+
+    var wrong = [];
+    if (enable.prop('checked') && !itEmail.prop('validity').valid){
+      wrong.push(itEmail);
+    }
+
+    if (wrong.length > 0){
+      popup.open();
+      wrong.forEach(function(elem){
+        elem.addClass("hasError");
+      });
+    }
+    else{
+      $('#wizard-form').submit();
+    }
   });
 
   $('#previousStep2').on('click', function(e){
@@ -282,45 +300,85 @@
     previousStep(3);
   });
 
-  $('#accept').on('change', function(e){
-    var accept = document.getElementById('accept');
-    var itEmail = document.getElementById('itEmail');
-
-    if (accept.checked)
-      itEmail.required = true;
-    else
-      itEmail.required = false;
-  });
-
-  $('#password').on('input', function(e){
-    var password = document.getElementById('password');
-    var passwordBis = document.getElementById('passwordBis');
-
-    passwordBis.pattern = password.value;
-  });
-
-  $('#submit-wizard').on('click', function(e){
-    e.preventDefault();
-
-    var accept = document.getElementById('accept');
-    var itEmail = document.getElementById('itEmail');
-
-    var msg = "";
-    if (accept.checked){
-      if (itEmail.validity.valueMissing){
-        msg = "${ _("You must enter an email address for Instance Tracking.")}";
+  $('.wizardMandatoryField1').on('input', function(e){
+    if (clicked[0]){
+      if (!this.validity.valid){
+        $(this).addClass('hasError');
       }
-      else if (itEmail.validity.valid){
-        msg = "${ _("You must enter an email address for Instance Tracking.")}";
+      else{
+        $(this).removeClass('hasError');
       }
     }
+  });
 
-    if (msg != "")
-      alert(msg);
-    else
-      $('#wizard-form').submit();
+  $('.wizardMandatoryField2').on('input', function(e){
+    if (clicked[1]){
+      if (!this.validity.valid){
+        $(this).addClass('hasError');
+      }
+      else{
+        $(this).removeClass('hasError');
+      }
+    }
+  });
+
+  $('#enable').on('change', function(e){
+    var itEmail = $('#itEmail');
+
+    itEmail.prop('required', this.checked);
+    itEmail.prop('disabled', !this.checked);
+    if (this.checked){
+      itEmail.addClass('wizardMandatoryField3');
+      if (clicked[2]){
+        if (!itEmail.prop('validity').valid){
+          itEmail.addClass('hasError');
+        }
+        else{
+          itEmail.removeClass('hasError');
+        }
+      }
+      $('.wizardMandatoryField3').on('input', function(e){
+        if (clicked[2]){
+          if (!this.validity.valid){
+            $(this).addClass('hasError');
+          }
+          else{
+            $(this).removeClass('hasError');
+          }
+        }
+      });
+    }
+    else{
+      itEmail.removeClass('wizardMandatoryField3 hasError');
+    }
+  }).trigger('change');
+
+  $('#password, #passwordBis').on('input', function(e){
+    var password = $('#password'),
+        passwordBis = $('#passwordBis');
+
+    if (clicked[0]){
+      if (password.val() != passwordBis.val()) {
+        passwordBis.addClass("hasError");
+      }
+      else{
+        passwordBis.removeClass("hasError");
+      }
+    }
+  });
+
+  var LANGUAGES = ${getLocaleDisplayNames() | n,j}
+  var nav_lang = navigator.language || navigator.userLanguage;
+  nav_lang = nav_lang.split('-')[0];
+
+  $.each(LANGUAGES, function(i, lang) {
+    var lang_code = lang[0].split('_')[0];
+    $("#lang").append('<option value="' + lang[0] + '"' + \
+                      (lang_code == nav_lang ? "selected" : "") + \
+                      '>' + lang[1] + '</option>');
   });
 
   toggleSection(2);
   toggleSection(3);
+
 </script>
