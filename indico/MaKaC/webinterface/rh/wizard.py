@@ -43,7 +43,7 @@ class RHWizard(base.RHDisplayBaseProtected):
     def _checkParams_POST(self):
         self._params = request.form.copy()
         base.RHDisplayBaseProtected._checkParams(self, self._params)
-        self._accept = self._params.get("accept", "")
+        self._enable = self._params.get("enable", "")
 
     def _process_GET(self):
         p = wizard.WPWizard(self, self._params)
@@ -69,8 +69,8 @@ class RHWizard(base.RHDisplayBaseProtected):
         minfo.setOrganisation(self._params["organisation"])
         minfo.setTimezone(self._params["timezone"])
         minfo.setLang(self._params["lang"])
-        minfo.setInstanceTrackingActive(bool(self._accept))
-        if self._accept:
+        minfo.setInstanceTrackingActive(bool(self._enable))
+        if self._enable:
             minfo.setInstanceTrackingEmail(self._params["instanceTrackingEmail"])
 
         p = signIn.WPAdminCreated(self, av)
