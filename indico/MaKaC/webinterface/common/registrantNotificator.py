@@ -139,7 +139,6 @@ class RegistrantPaymentLinkTplVar(TplVar):
 
     @classmethod
     def getValue(cls,registrant):
-        selist = []
         return urlHandlers.UHConfRegistrationFormCreationDone.getURL(registrant)
 
 
