@@ -2,9 +2,9 @@
 <form id="wizard-form" action="" method="POST">
 
   <div class="container" style="width: 100%; margin: 50px auto; max-width: 650px">
-  <div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt; white-space: nowrap;">
-      ${ _("Admin Creation Wizard")}
-  </div>
+    <div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt; white-space: nowrap;">
+        ${ _("Admin Creation Wizard")}
+    </div>
 
     <div class="i-box titled step1">
       <div class="i-box-header">
@@ -17,7 +17,7 @@
               <span class="titleCellFormat">${ _("First name")}</span>
             </td>
             <td class="contentCellTD">
-              <input class="wizardMandatoryField1" id="name" type="text" name="name" value=${ name } required style="width: 100%;">
+              <input class="wizardMandatoryField1" id="name" type="text" name="name" value=${ name } required style="width: 80%;">
             </td>
           </tr>
           <tr>
@@ -25,7 +25,7 @@
               <span class="titleCellFormat">${ _("Family name")}</span>
             </td>
             <td class="contentCellTD">
-              <input class="wizardMandatoryField1" id="surName" type="text" name="surName" value=${ surName } required style="width: 100%;">
+              <input class="wizardMandatoryField1" id="surName" type="text" name="surName" value=${ surName } required style="width: 80%;">
             </td>
           </tr>
           <tr>
@@ -33,7 +33,7 @@
               <span class="titleCellFormat">${ _("Email")}</span>
             </td>
             <td class="contentCellTD">
-              <input class="wizardMandatoryField1" id="userEmail" type="email" name="userEmail" value=${ userEmail } required style="width: 100%;">
+              <input class="wizardMandatoryField1" id="userEmail" type="email" name="userEmail" value=${ userEmail } required style="width: 50%;">
             </td>
           </tr>
           <tr>
@@ -41,7 +41,7 @@
               <span class="titleCellFormat">${ _("Login")}</span>
             </td>
             <td class="contentCellTD">
-              <input class="wizardMandatoryField1" id="login" type="text" name="login" value=${ login } required style="width: 100%;">
+              <input class="wizardMandatoryField1" id="login" type="text" name="login" value=${ login } required style="width: 30%;">
             </td>
           </tr>
           <tr>
@@ -49,7 +49,7 @@
               <span class="titleCellFormat">${ _("Password")}</span>
             </td>
             <td class="contentCellTD">
-              <input class="wizardMandatoryField1" id="password" type="password" name="password" value="" required style="width: 100%;">
+              <input class="wizardMandatoryField1" id="password" type="password" name="password" value="" required style="width: 30%;">
             </td>
           </tr>
           <tr>
@@ -57,7 +57,7 @@
                 <span class="titleCellFormat">${ _("Password (again)")}</span>
             </td>
             <td class="contentCellTD">
-              <input class="wizardMandatoryField1" id="passwordBis" type="password" name="passwordBis" value="" required style="width: 100%;">
+              <input class="wizardMandatoryField1" id="passwordBis" type="password" name="passwordBis" value="" required style="width: 30%;">
             </td>
           </tr>
         </table>
@@ -100,7 +100,7 @@
                 <span class="titleCellFormat">${ _("Organisation")}</span>
             </td>
             <td class="contentCellTD">
-                <input class="wizardMandatoryField2" id="organisation" type="text" name="organisation" value=${organisation} required style="width: 100%;">
+                <input class="wizardMandatoryField2" id="organisation" type="text" name="organisation" value=${organisation} required style="width: 70%;">
             </td>
           </tr>
         </table>
@@ -148,7 +148,7 @@
                 <span class="titleCellFormat">${ _("Email")}</span>
             </td>
             <td class="contentCellTD">
-                <input id="itEmail" type="email" name="instanceTrackingEmail" value=${instanceTrackingEmail} style="width: 100%;">
+                <input id="itEmail" type="email" name="instanceTrackingEmail" value=${instanceTrackingEmail} style="width: 50%;">
             </td>
           </tr>
         </table>
