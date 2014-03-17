@@ -23,12 +23,12 @@ import urllib
 
 import zope.interface
 from persistent import Persistent
+from flask import render_template
 
 from MaKaC.user import Avatar
 from MaKaC.common import info
 from MaKaC import schedule
 from MaKaC.common.utils import getLocationInfo
-from MaKaC.common.TemplateExec import render
 
 from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.date_time import int_timestamp, format_date, format_time, format_datetime
@@ -480,7 +480,6 @@ class AlarmTask(SendMailTask):
         return self.confSumary
 
     def _prepare(self, check = True):
-
         # Date checks...
         if check:
             from MaKaC.conference import ConferenceHolder
@@ -499,16 +498,6 @@ class AlarmTask(SendMailTask):
         # Email
         startDateTime = format_datetime(self.conf.getAdjustedStartDate(), format="short")
         self.setUpSubject()
-        try:
-            locationText = self.conf.getLocation().getName()
-            if self.conf.getLocation().getAddress() != "":
-                locationText += ", %s" % self.conf.getLocation().getAddress()
-            if self.conf.getRoom().getName() != "":
-                locationText += " (%s)" % self.conf.getRoom().getName()
-        except:
-            locationText = ""
-        if locationText != "":
-            locationText = " %s: %s" % ( _("Location"), locationText)
 
         if self.getToAllParticipants() :
             if self.conf.getType() == "conference":
@@ -517,27 +506,21 @@ class AlarmTask(SendMailTask):
             else:
                 for p in self.conf.getParticipation().getParticipantList() :
                     self.addToUser(p)
+
         from MaKaC.webinterface import urlHandlers
         if Config.getInstance().getShortEventURL() != "":
             url = "%s%s" % (Config.getInstance().getShortEventURL(),self.conf.getId())
         else:
             url = urlHandlers.UHConferenceDisplay.getURL(self.conf)
-        self.setText("""Hello,
-    Please note that the event "%s" will start on %s (%s).
-    %s
 
-    You can access the full event here:
-    %s
-
-Best Regards
-
-""" % (self.conf.getTitle(),\
-                startDateTime,\
-                self.conf.getTimezone(),\
-                locationText,\
-                url,\
-                ))
-        self._setMailText()
+        self.setText(render_template('alarm_email.txt',
+            event=self.conf.fossilize(),
+            address=self.conf.getLocation().getAddress(),
+            url=url,
+            note=self.note,
+            with_agenda=self.confSumary,
+            agenda=[e.fossilize() for e in self.conf.getSchedule().getEntries()]
+        ))
         return True
 
 class HTTPTask(OneShotTask):

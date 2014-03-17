@@ -1,8 +1,9 @@
 {%- macro render_agenda(event, agenda) -%}
 
-{%- trans title=event.title | ensure_unicode -%}
-    Agenda for {{ title }}:
-{%- endtrans -%}
+{% trans title=event.title | ensure_unicode -%}
+    Agenda for {{ title }}
+{%- endtrans %}
+-------------------------------------------------------------------------------
 
 {%- for item in agenda %}
     {{ render_item(item) }}
@@ -37,5 +38,3 @@
 {%- macro render_times(item) -%}
     [{{ item.startDate |  format_time }} - {{ item.endDate | format_time }}]
 {%- endmacro -%}
-
-{{ render_agenda(event) }}

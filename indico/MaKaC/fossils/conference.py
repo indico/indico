@@ -56,6 +56,10 @@ class IConferenceFossil(IConferenceMinimalFossil):
         """ Room (inside location) """
     getRoom.convert = lambda r: r and r.getName()
 
+    def getAddress(self):
+        """ Address of the event """
+    getAddress.produce = lambda s: s.getLocation().getAddress()
+
     def getRoomBookingList(self):
         """ Reservations """
     getRoomBookingList.convert = Conversion.reservationsList
