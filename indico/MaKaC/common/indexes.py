@@ -834,8 +834,12 @@ class CalendarDayIndex(Persistent):
 
     def hasObjectsAfter(self, date):
         stDay = datetime(date.year, date.month, date.day)
-        lastDay = self._idxDay.keys()[-1]
-        return lastDay > int(datetimeToUnixTime(stDay))
+        if self._idxDay:
+            lastDay = self._idxDay.keys()[-1]
+            return lastDay > int(datetimeToUnixTime(stDay))
+        else:
+            # Empty index? Then there's nothing after for sure
+            return False
 
     def iterateObjectsIn(self, sDate, eDate):
         sDay = datetime(sDate.year, sDate.month, sDate.day) if sDate else None
@@ -1342,6 +1346,3 @@ class IndexesHolder( ObjectHolder ):
 
 if __name__ == "__main__":
     print _("done")
-
-
-
