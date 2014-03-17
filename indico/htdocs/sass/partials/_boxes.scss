@@ -85,9 +85,10 @@
     }
 
     .i-box-footer {
-      overflow: auto;
-      padding: 1em;
-      background-color: lighten($light-gray, 0.5%);
+        overflow: auto;
+        padding: 10px;
+        margin: 20px -10px -10px -10px;
+        background-color: $light-gray;
     }
 }
 
@@ -95,6 +96,7 @@
     .i-box-header {
         @include border-bottom();
         background-color: $light-gray;
+        margin: -10px -10px;
         padding: 10px 10px;
         overflow: hidden;
 
@@ -273,6 +275,23 @@
 
         .content {
             font-style: italic;
+        }
+    }
+}
+
+.i-box-group.glued {
+    &.vert {
+        .i-box:not(:first-child) {
+            @include border-top-radius(0px);
+        }
+
+        .i-box:not(:last-child) {
+            @include border-bottom-radius(0px);
+        }
+
+        .i-box + .i-box {
+            margin-top: 0px;
+            border-top: 0px;
         }
     }
 }
