@@ -401,7 +401,7 @@ class AlarmTask(SendMailTask):
 
     def setUpSubject(self):
         startDateTime = format_datetime(self.conf.getAdjustedStartDate(), format="short")
-        self.setSubject( _("Event reminder: %s (%s %s)") % (self.conf.getTitle(), startDateTime, self.conf.getTimezone()))
+        self.setSubject(_("Event reminder: %s (%s %s)") % (self.conf.getTitle(), startDateTime, self.conf.getTimezone()))
 
     def addToUser(self, user):
         super(AlarmTask, self).addToUser(user)
@@ -427,45 +427,8 @@ class AlarmTask(SendMailTask):
     def canModify(self, aw):
         return self.conf.canModify(aw)
 
-    def __getVarsTextTpl(self, conf):
-        tvars = {}
-        tvars['entries'] = []
-        confSchedule = conf.getSchedule()
-        entrylist = confSchedule.getEntries()
-        for entry in entrylist:
-            if type(entry) is schedule.BreakTimeSchEntry:
-                newItem = entry
-            else:
-                newItem = entry.getOwner()
-            tvars['entries'].append(newItem)
-        tvars["conf"] = conf
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        tvars['INCLUDE'] = os.path.join(styleMgr.getBaseTPLPath(), 'include')
-        tvars['getTime'] = lambda date : format_time(date.time())
-        tvars['isTime0H0M'] = lambda date : (date.hour, date.minute) == (0,0)
-        tvars['getDate'] = lambda date : format_date(date, format='yyyy-MM-dd')
-        tvars['prettyDate'] = lambda date : format_date(date, format='full')
-        tvars['getLocationInfo'] = lambda item: getLocationInfo(item, False)
-        from MaKaC.conference import SessionSlot, AcceptedContribution
-        tvars['getItemType'] = lambda item: "Break" if isinstance(item, schedule.BreakTimeSchEntry) \
-                                            else ("Session" if isinstance(item, SessionSlot) \
-                                                  else ("Contribution" if isinstance(item, AcceptedContribution) \
-                                                                                else item.__class__.__name__))
-        return tvars
-
-    def _setMailText(self):
-        text = self.text
-        if self.note:
-            text = text + "Note: %s" % self.note
-        if self.confSumary:
-            tplDir = Config.getInstance().getTPLDir()
-            text += render(os.path.join(tplDir, "events", "Text.tpl"), self.__getVarsTextTpl(self.conf))
-
-        super(AlarmTask, self).setText(text)
-
     def setNote(self, note):
         self.note = note
-        self._setMailText()
         self._p_changed=1
 
     def getNote(self):
@@ -473,7 +436,6 @@ class AlarmTask(SendMailTask):
 
     def setConfSummary(self, val):
         self.confSumary = val
-        self._setMailText()
         self._p_changed=1
 
     def getConfSummary(self):
@@ -496,9 +458,7 @@ class AlarmTask(SendMailTask):
                 return False
 
         # Email
-        startDateTime = format_datetime(self.conf.getAdjustedStartDate(), format="short")
         self.setUpSubject()
-
         if self.getToAllParticipants() :
             if self.conf.getType() == "conference":
                 for r in self.conf.getRegistrantsList():
@@ -521,7 +481,9 @@ class AlarmTask(SendMailTask):
             with_agenda=self.confSumary,
             agenda=[e.fossilize() for e in self.conf.getSchedule().getEntries()]
         ))
+
         return True
+
 
 class HTTPTask(OneShotTask):
     def __init__(self, url, data=None):
