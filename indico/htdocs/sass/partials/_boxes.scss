@@ -45,11 +45,13 @@
     @include single-box-shadow();
 
     background: white;
+    padding: 10px;
 
     .i-box-footer {
-      overflow: auto;
-      padding: 1em;
-      background-color: lighten($light-gray, 0.5%);
+        overflow: auto;
+        padding: 10px;
+        margin: 20px -10px -10px -10px;
+        background-color: $light-gray;
     }
 }
 
