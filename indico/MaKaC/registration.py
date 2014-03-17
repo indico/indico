@@ -1749,6 +1749,7 @@ class CheckboxInput(FieldInputType, Fossilizable):
     def _getModifHTML(self, item, registrant, default=""):
         disable = ""
         checked = ""
+        mandatory = ""
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price = self._parent.getPrice()
