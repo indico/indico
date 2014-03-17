@@ -21,7 +21,7 @@
 {%- endmacro -%}
 
 {%- macro render_session(session) -%}
-    > {{ render_times(session) }} {{ session.title }}
+    + {{ render_times(session) }} {{ session.title }}
     {%- for item in session.entries %}
         {{ render_item(item) }}
     {%- endfor -%}
@@ -32,7 +32,7 @@
 {%- endmacro -%}
 
 {%- macro render_break(break) -%}
-    # {{ render_times(break) }} {{ break.title }}
+    * {{ render_times(break) }} {{ break.title }}
 {%- endmacro -%}
 
 {%- macro render_times(item) -%}

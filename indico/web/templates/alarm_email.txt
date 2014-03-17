@@ -42,9 +42,9 @@ Hello,
 
 {% trans -%}
     Best Regards.
-{%- endtrans %}
+{%- endtrans -%}
 
-
+{# Blank lines are intended #}
 {%- if note != '' %}
 
 
@@ -53,9 +53,9 @@ Hello,
 {%- endtrans %}
 -------------------------------------------------------------------------------
 {{ note }}
-{%- endif %}
+{%- endif -%}
 
-
+{# Blank lines are intended #}
 {%- if with_agenda %}
 
 
