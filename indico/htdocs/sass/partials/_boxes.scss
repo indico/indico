@@ -94,3 +94,20 @@
         }
     }
 }
+
+.i-box-group.glued {
+    &.vert {
+        .i-box:not(:first-child) {
+            @include border-top-radius(0px);
+        }
+
+        .i-box:not(:last-child) {
+            @include border-bottom-radius(0px);
+        }
+
+        .i-box + .i-box {
+            margin-top: 0px;
+            border-top: 0px;
+        }
+    }
+}
