@@ -1,12 +1,19 @@
 {%- from 'alarm_email_agenda.txt' import render_agenda with context -%}
 
+
+{#---------------------------------------------------------------------------#}
+{# Macros                                                                    #}
+{#---------------------------------------------------------------------------#}
+
 {%- macro render_location(event) -%}
     {%- if event.location != '' -%}
-        {{ event.location | trim }} {{ render_room(event) }}, {{ event.address | trim }}
+        {{ event.location | trim }} {{ render_room(event) }}.
+        {{- render_address(event) }}
     {%- elif event.room != '' -%}
-        {{ render_room(event) }}, {{ event.address | trim }}
+        {{ render_room(event) }}.
+        {{- render_address(event) }}
     {%- else -%}
-        {{ event.address | trim }}
+        {{ render_address(event) }}
     {%- endif -%}
 {%- endmacro -%}
 
@@ -20,6 +27,24 @@
     {%- endif -%}
 {%- endmacro -%}
 
+{%- macro render_address(event) -%}
+    {%- if event.location != '' or event.room != '' -%}
+        {%- trans %}
+Address:
+        {%- endtrans -%}
+    {%- else -%}
+        {%- trans -%}
+address:
+        {%- endtrans -%}
+    {%- endif %}
+
+    {{ event.address | trim | indent }}
+{%- endmacro -%}
+
+
+{#---------------------------------------------------------------------------#}
+{# Mail body                                                                 #}
+{#---------------------------------------------------------------------------#}
 
 {%- trans -%}
 Hello,
@@ -31,7 +56,7 @@ Hello,
 
 {%- if event.location != '' or event.address != '' or event.room != '' -%}
     {%- trans location=render_location(event) -%}
-        It will take place at {{ location }}.
+        It will take place at {{ location }}
     {% endtrans %}
 {% endif -%}
 
