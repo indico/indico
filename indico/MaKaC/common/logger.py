@@ -29,7 +29,7 @@ from indico.core.config import Config
 from MaKaC.common.contextManager import ContextManager
 
 
-class AddIPFilter(logging.Filter):
+class AddIDFilter(logging.Filter):
     def filter(self, record):
         if not logging.Filter.filter(self, record):
             return False
@@ -41,11 +41,11 @@ class AddIPFilter(logging.Filter):
         return True
 
 
-class ExtraIndicoFilter(AddIPFilter):
+class ExtraIndicoFilter(AddIDFilter):
     def filter(self, record):
         if record.name.split('.')[0] == 'indico':
             return False
-        return AddIPFilter.filter(self, record)
+        return AddIDFilter.filter(self, record)
 
 
 class IndicoMailFormatter(logging.Formatter):
@@ -199,9 +199,9 @@ class Logger:
     @classmethod
     def initialize(cls):
         # Lists of filters for each handler
-        filters = {'indico': [AddIPFilter('indico')],
+        filters = {'indico': [AddIDFilter('indico')],
                    'other': [ExtraIndicoFilter()],
-                   'smtp': [AddIPFilter('indico')]}
+                   'smtp': [AddIDFilter('indico')]}
 
         config = Config.getInstance()
 
