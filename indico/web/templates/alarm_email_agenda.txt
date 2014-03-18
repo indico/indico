@@ -4,7 +4,13 @@
         Agenda for {{ title }}
     {%- endtrans -%}
 {%- endfilter %}
-{% for item in agenda %}
+{% if agenda == [] -%}
+    {%- trans -%}
+        There are no events scheduled.
+    {%- endtrans -%}
+{%- endif -%}
+
+{%- for item in agenda %}
 {{ render_item(item) }}
 {%- endfor -%}
 {%- endmacro -%}
