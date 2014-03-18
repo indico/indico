@@ -23,7 +23,7 @@ import logging
 import logging.handlers
 import logging.config
 import ConfigParser
-from flask import request
+from flask import request, session
 
 from indico.core.config import Config
 from MaKaC.common.contextManager import ContextManager
@@ -64,12 +64,13 @@ class IndicoMailFormatter(logging.Formatter):
             info.append('Method: %s' % request.method)
             if rh:
                 info.append('Params: %s' % rh._getTruncatedParams())
+            info.append('User: %r' % session.user)
             info.append('IP: %s' % request.remote_addr)
             info.append('User Agent: %s' % request.user_agent)
             info.append('Referer: %s' % (request.referrer or 'n/a'))
         except RuntimeError, e:
             info.append('Not available: %s' % e)
-        return '\n\n%s' % '\n'.join(info)
+        return '\n\n%s' % '\n'.join(x.encode('utf-8') if isinstance(x, unicode) else x for x in info)
 
 
 class LoggerUtils:
