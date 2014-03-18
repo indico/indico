@@ -1,13 +1,11 @@
 {%- macro render_agenda(event, agenda) -%}
-
 {%- filter underline -%}
     {%- trans title=event.title | ensure_unicode -%}
         Agenda for {{ title }}
     {%- endtrans -%}
 {%- endfilter %}
-
-{%- for item in agenda %}
-    {{ render_item(item) }}
+{% for item in agenda %}
+{{ render_item(item) }}
 {%- endfor -%}
 {%- endmacro -%}
 
@@ -22,9 +20,9 @@
 {%- endmacro -%}
 
 {%- macro render_session(session) -%}
-    + {{ render_times(session) }} {{ session.title }}
+    - {{ render_times(session) }} {{ session.title }}
     {%- for item in session.entries %}
-        {{ render_item(item) }}
+    {{ render_item(item) }}
     {%- endfor -%}
 {%- endmacro -%}
 
@@ -33,7 +31,7 @@
 {%- endmacro -%}
 
 {%- macro render_break(break) -%}
-    * {{ render_times(break) }} {{ break.title }}
+    - {{ render_times(break) }} {{ break.title }}
 {%- endmacro -%}
 
 {%- macro render_times(item) -%}
