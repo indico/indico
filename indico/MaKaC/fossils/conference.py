@@ -58,7 +58,7 @@ class IConferenceFossil(IConferenceMinimalFossil):
 
     def getAddress(self):
         """ Address of the event """
-    getAddress.produce = lambda s: s.getLocation().getAddress()
+    getAddress.produce = lambda s: s.getLocation().getAddress() if s.getLocation() is not None else None
 
     def getRoomBookingList(self):
         """ Reservations """

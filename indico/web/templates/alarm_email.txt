@@ -6,10 +6,14 @@
 {#---------------------------------------------------------------------------#}
 
 {%- macro render_location(event) -%}
-    {%- if event.location != '' -%}
-        {{ event.location | trim }} {{ render_room(event) }}.
+    {%- if event.location != '' and event.location != None -%}
+        {%- if event.room != '' and event.room != None -%}
+            {{ event.location | trim }} {{ render_room(event) }}.
+        {%- else -%}
+            {{ event.location | trim }}.
+        {%- endif -%}
         {{- render_address(event) }}
-    {%- elif event.room != '' -%}
+    {%- elif event.room != '' and event.room != None -%}
         {{ render_room(event) }}.
         {{- render_address(event) }}
     {%- else -%}
@@ -18,27 +22,31 @@
 {%- endmacro -%}
 
 {%- macro render_room(event) -%}
-    {%- if event.location != '' -%}
-        ({{ event.room | trim }})
-    {%- else -%}
-        {%- trans room=event.room | trim | ensure_unicode -%}
-            room {{ room }}
-        {%- endtrans -%}
+    {%- if event.room != '' and event.room != None -%}
+        {%- if event.location != '' and event.location != None -%}
+                ({{ event.room | trim }})
+        {%- else -%}
+            {%- trans room=event.room | trim | ensure_unicode -%}
+                room {{ room }}
+            {%- endtrans -%}
+        {%- endif -%}
     {%- endif -%}
 {%- endmacro -%}
 
 {%- macro render_address(event) -%}
-    {%- if event.location != '' or event.room != '' -%}
-        {%- trans %}
+    {%- if event.address != '' -%}
+        {%- if event.location != '' or event.room != '' -%}
+            {%- trans %}
 Address:
-        {%- endtrans -%}
-    {%- else -%}
-        {%- trans -%}
+            {%- endtrans -%}
+        {%- else -%}
+            {%- trans -%}
 address:
-        {%- endtrans -%}
-    {%- endif %}
+            {%- endtrans -%}
+        {%- endif %}
 
     {{ event.address | trim | indent }}
+    {%- endif -%}
 {%- endmacro -%}
 
 
@@ -52,15 +60,17 @@ Hello,
 
 {% trans title=event.title | ensure_unicode, datetime=event.startDate | format_datetime | ensure_unicode, tz=event.timezone | ensure_unicode -%}
     Please note that the event "{{ title }}" will start on {{ datetime }} ({{ tz }}).
-{% endtrans -%}
+{%- endtrans %}
 
-{%- if event.location != '' or event.address != '' or event.room != '' -%}
-    {%- trans location=render_location(event) -%}
-        It will take place at {{ location }}
-    {% endtrans %}
-{% endif -%}
+{%- if event.location != '' and event.location != None
+    or event.room != '' and event.room != None
+    or event.address != '' and event.address != None %}
+{% trans location=render_location(event) -%}
+    It will take place at {{ location }}
+{%- endtrans -%}
+{%- endif %}
 
-{%- trans -%}
+{% trans -%}
     You can access the full event here:
 {%- endtrans %}
 {{ url }}

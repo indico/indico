@@ -475,7 +475,6 @@ class AlarmTask(SendMailTask):
 
         self.setText(render_template('alarm_email.txt',
             event=self.conf.fossilize(),
-            address=self.conf.getLocation().getAddress(),
             url=url,
             note=self.note,
             with_agenda=self.confSumary,
