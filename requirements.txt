@@ -55,7 +55,6 @@ alembic==0.6.3
 arrow==0.4.2
 dictdiffer==0.0.3
 psycopg2==2.5.2
-pydot==1.0.28
 pyparsing==1.5.7
 sadisplay==0.3.8dev
 sqlalchemy-schemadisplay==1.1

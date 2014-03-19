@@ -35,7 +35,7 @@ from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
-from indico.core.db import db, drop_database, DBMgr
+from indico.core.db import db, drop_database, DBMgr, apply_db_loggers
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoFlask
