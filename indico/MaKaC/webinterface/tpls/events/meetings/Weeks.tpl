@@ -211,8 +211,11 @@
             solo: true
         },
         position: {
-            my: 'right center',
-            at: 'left center'
+            my: 'top center',
+            at: 'bottom center'
+        },
+        style: {
+            classes: 'informational'
         }
     });
 </script>

@@ -103,9 +103,17 @@
     border-top: 1px solid #f9f9f9;
 }
 
+.week-timetable .row.break:hover {
+    background-color: #cfcfcf;
+}
+
 .week-timetable .row.contrib {
     background-color: #EDF3FD;
     border-top: solid 1px #f9f9f9;
+}
+
+.week-timetable .row.contrib:hover {
+    background-color: #e4eaf4;
 }
 
 .week-timetable .row .time {
