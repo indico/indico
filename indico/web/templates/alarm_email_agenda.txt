@@ -4,7 +4,7 @@
         Agenda for {{ title }}
     {%- endtrans -%}
 {%- endfilter %}
-{% if agenda == [] -%}
+{% if not agenda -%}
     {%- trans -%}
         There are no events scheduled.
     {%- endtrans -%}

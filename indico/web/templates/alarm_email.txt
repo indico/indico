@@ -6,14 +6,14 @@
 {#---------------------------------------------------------------------------#}
 
 {%- macro render_location(event) -%}
-    {%- if event.location != '' and event.location != None -%}
-        {%- if event.room != '' and event.room != None -%}
+    {%- if event.location -%}
+        {%- if event.room -%}
             {{ event.location | trim }} {{ render_room(event) }}.
         {%- else -%}
             {{ event.location | trim }}.
         {%- endif -%}
         {{- render_address(event) }}
-    {%- elif event.room != '' and event.room != None -%}
+    {%- elif event.room -%}
         {{ render_room(event) }}.
         {{- render_address(event) }}
     {%- else -%}
@@ -22,8 +22,8 @@
 {%- endmacro -%}
 
 {%- macro render_room(event) -%}
-    {%- if event.room != '' and event.room != None -%}
-        {%- if event.location != '' and event.location != None -%}
+    {%- if event.room -%}
+        {%- if event.location -%}
                 ({{ event.room | trim }})
         {%- else -%}
             {%- trans room=event.room | trim | ensure_unicode -%}
@@ -34,14 +34,14 @@
 {%- endmacro -%}
 
 {%- macro render_address(event) -%}
-    {%- if event.address != '' -%}
-        {%- if event.location != '' or event.room != '' -%}
+    {%- if event.address -%}
+        {%- if event.location or event.room -%}
             {%- trans %}
 Address:
             {%- endtrans -%}
         {%- else -%}
             {%- trans -%}
-address:
+the following address:
             {%- endtrans -%}
         {%- endif %}
 
@@ -62,9 +62,7 @@ Hello,
     Please note that the event "{{ title }}" will start on {{ datetime }} ({{ tz }}).
 {%- endtrans %}
 
-{%- if event.location != '' and event.location != None
-    or event.room != '' and event.room != None
-    or event.address != '' and event.address != None %}
+{%- if event.location or event.room or event.address %}
 {% trans location=render_location(event) -%}
     It will take place at {{ location }}
 {%- endtrans -%}
@@ -80,7 +78,7 @@ Hello,
 {%- endtrans -%}
 
 {# Blank lines are intended #}
-{%- if note != '' %}
+{%- if note %}
 
 
 {% filter underline -%}
