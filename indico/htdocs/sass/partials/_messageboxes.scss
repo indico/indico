@@ -113,6 +113,14 @@
     border: 1px solid #CDC;
 }
 
+.warning-message-box {
+    @extend %message-box;
+    @include icon-before('icon-warning');
+
+    background-color: #FFF3E2;
+    border: 1px solid #BE9056;
+}
+
 .error-message-box {
     @extend %message-box;
     @include icon-before('icon-disable');
