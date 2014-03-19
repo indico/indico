@@ -18,7 +18,6 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import os
 import urllib
 
 import zope.interface
@@ -26,21 +25,16 @@ from persistent import Persistent
 from flask import render_template
 
 from MaKaC.user import Avatar
-from MaKaC.common import info
-from MaKaC import schedule
-from MaKaC.common.utils import getLocationInfo
 
 from indico.util.fossilize import fossilizes, Fossilizable
-from indico.util.date_time import int_timestamp, format_date, format_time, format_datetime
+from indico.util.date_time import int_timestamp, format_datetime
 from indico.modules.scheduler.fossils import ITaskFossil
 from indico.modules.scheduler import base
 from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
 from indico.core.config import Config
 
 
-"""
-Defines base classes for tasks, and some specific tasks as well
-"""
+# Defines base classes for tasks, and some specific tasks as well
 
 
 class TimedEvent(Persistent, Fossilizable):
