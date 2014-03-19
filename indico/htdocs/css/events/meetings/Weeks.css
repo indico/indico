@@ -118,6 +118,16 @@
     text-align: center;
 }
 
+.week-timetable .row .time .end-time {
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 35px;
+    margin: auto 0;
+    color: #ccc;
+}
+
 .week-timetable .row .main {
     position: absolute;
     padding-left: 40px;
