@@ -151,7 +151,10 @@ tr.i-table.content {
 
     > td.i-table.value {
         border-bottom: 1px solid transparent;
-        white-space: pre-line;
+
+        &.plain-text-email {
+            white-space: pre-line;
+        }
     }
 
     &:last-of-type {

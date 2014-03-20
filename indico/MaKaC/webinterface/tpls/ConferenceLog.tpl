@@ -12,6 +12,25 @@
     % endif
 </%def>
 
+<%def name="render_info(item, log_entry)">
+    <% caption = item[0] %>
+    <% value = item[1] %>
+    <% mime = "" %>
+
+    % if log_entry.getLogType() == "emailLog":
+        % if caption == "Body":
+            % if log_entry.getLogContentType() == "text/plain":
+                <% mime = "plain-text-email" %>
+            % endif
+        % endif
+    % endif
+
+    <tr class="i-table content">
+        <td class="i-table caption log-caption">${caption}</td>
+        <td class="i-table value searchable ${mime}">${value}</td>
+    </tr>
+</%def>
+
 <div class="groupTitle">
     <span class="icon-clipboard" aria-hidden="true"></span>
     <span>${_("Event Log")}</span>
@@ -88,12 +107,7 @@
                         </tr>
                         % else:
                             % for info in line.getLogInfoList():
-                            <% caption = info[0]%>
-                            <% value = info[1]%>
-                            <tr class="i-table content">
-                                <td class="i-table caption log-caption">${caption}</td>
-                                <td class="i-table value searchable">${value}</td>
-                            </tr>
+                                ${ render_info(info, line) }
                             % endfor
                         % endif
                 </table>
