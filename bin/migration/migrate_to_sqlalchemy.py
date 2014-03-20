@@ -105,7 +105,7 @@ def convert_date(ds):
             ds = tz.localize(ds)
     elif isinstance(ds, dt_time):
         hour_diff = datetime.now(pytz.utc).hour - datetime.now(tz).hour
-        ds = ds.replace(hour=(ds.hour+hour_diff)%24)  # day light save time?
+        ds = ds.replace(hour=(ds.hour+hour_diff) % 24)  # day light save time?
     return ds
 
 
@@ -265,19 +265,15 @@ def migrate_rooms(main_root, rb_root, photo_path):
 
         if photo_path:
             try:
-                with open(os.path.join(
-                    photo_path,
-                    'large_photos',
-                    get_canonical_name_of(old_room) + '.jpg'), 'rb') as f:
+                with open(os.path.join(photo_path, 'large_photos',
+                          get_canonical_name_of(old_room) + '.jpg'), 'rb') as f:
                     large_photo = f.read()
             except:
                 large_photo = None
 
             try:
-                with open(os.path.join(
-                    photo_path,
-                    'small_photos',
-                    get_canonical_name_of(old_room) + '.jpg'), 'rb') as f:
+                with open(os.path.join(photo_path, 'small_photos',
+                          get_canonical_name_of(old_room) + '.jpg'), 'rb') as f:
                     small_photo = f.read()
             except:
                 small_photo = None
@@ -385,7 +381,7 @@ def migrate_reservations(main_root, rb_root):
         room = Room.getRoomById(v.room.id)
         room.reservations.append(r)
         db.session.add(room)
-        i = (i+1)%1000
+        i = (i + 1) % 1000
         if not i:
             db.session.commit()
     db.session.commit()
@@ -450,11 +446,11 @@ def main(*args):
 
 if __name__ == '__main__':
     parser = ArgumentParser(prog='migration')
-    parser.add_argument('main', help='main zodb storage path')
-    parser.add_argument('rb', help='room booking zodb file storage path')
-    parser.add_argument('uri', help='sqlalchemy database uri')
-    parser.add_argument('-d', '--drop', help='drop existing', action='store_true')
-    parser.add_argument('-p', '--photo', help='photos path')
+    parser.add_argument('main', help='main ZODB storage path', metavar="MAIN_DATA_FS")
+    parser.add_argument('rb', help='Room Booking ZODB file storage path', metavar="RB_DATA_FS")
+    parser.add_argument('uri', help='SQLAlchemy database uri', metavar="SQLALCHEMY_URI")
+    parser.add_argument('-d', '--drop', help='drop any existing database', action='store_true')
+    parser.add_argument('-p', '--photo', help='path to photos of rooms')
 
     args = parser.parse_args()
     main(args.main, args.rb, args.uri, args.photo, args.drop)
