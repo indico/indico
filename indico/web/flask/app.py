@@ -137,7 +137,7 @@ def configure_db(app):
     app.config['SQLALCHEMY_POOL_TIMEOUT'] = cfg.getSQLAlchemyPoolTimeout()
     app.config['SQLALCHEMY_POOL_RECYCLE'] = cfg.getSQLAlchemyPoolRecycle()
     app.config['SQLALCHEMY_MAX_OVERFLOW'] = cfg.getSQLAlchemyMaxOverflow()
-    app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = cfg.getSQLAlchemyCommitOnTeardown()
+    app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = False
 
     with DBMgr.getInstance().global_connection(commit=True):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()

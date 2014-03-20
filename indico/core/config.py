@@ -481,7 +481,6 @@ class Config:
         'SQLAlchemyPoolTimeout'     : 10,
         'SQLAlchemyPoolRecycle'     : 120,
         'SQLAlchemyMaxOverflow'     : 3,
-        'SQLAlchemyCommitOnTeardown': False,
         'EnableRoomBooking'         : True,
         'MaxRetries'                : 10,
         'RedisConnectionURL'        : None,
