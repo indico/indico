@@ -107,6 +107,10 @@
     & .dropdown {
         display: none;
         z-index: 1;
+
+        & > li {
+            white-space: nowrap;
+        }
     }
 
     & .group {
