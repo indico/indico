@@ -62,7 +62,13 @@
         <tr class="i-table interactive ${line.getLogType()}" >
                 <td class="i-table ${get_icon(line.getLogType())}" aria-hidden="true"></td>
                 <td class="i-table log-module searchable">${line.getModule()}</td>
-                <td class="i-table log-subject searchable">${line.getLogSubject()}</td>
+                <td class="i-table log-subject searchable">
+                    % if line.getLogSubject():
+                        ${line.getLogSubject()}
+                    % else:
+                        <span class="text-superfluous">(${ _("no subject") })</span>
+                    % endif
+                </td>
                 <td class="i-table log-stamp text-superfluous">
                 % if line.getResponsibleName() != "System":
                     ${_("by {user} at {time}").format(user='<span class="text-normal searchable user-name">{0}</span>'.format(line.getResponsibleName()),
