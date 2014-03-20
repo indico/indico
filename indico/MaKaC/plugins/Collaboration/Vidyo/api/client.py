@@ -20,7 +20,7 @@
 from MaKaC.plugins.Collaboration.Vidyo.common import getVidyoOptionValue
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.Collaboration.Vidyo.cache import SudsCache
-import suds
+from suds import client, transport
 
 class ClientBase(object):
     """ Base class for AdminClient and UserClient
@@ -38,7 +38,7 @@ class ClientBase(object):
 #        if url.startswith('https'):
 #            return suds.transport.https.HttpAuthenticated(username=username, password=password, timeout = 30.0)
 #        else:
-        return suds.transport.https.HttpAuthenticated(username=username, password=password, timeout = 30.0)
+        return transport.https.HttpAuthenticated(username=username, password=password, timeout = 30.0)
 
     @classmethod
     def getCache(cls):
@@ -68,7 +68,7 @@ class AdminClient(ClientBase):
             location = getVidyoOptionValue('baseAPILocation') + getVidyoOptionValue('adminAPIService')
 
             try:
-                cls._instance = suds.client.Client(adminAPIUrl,
+                cls._instance = client.Client(adminAPIUrl,
                                                    transport = ClientBase.getTransport(adminAPIUrl, username , password),
                                                    location = location, cache = ClientBase.getCache())
             except Exception:
@@ -98,7 +98,7 @@ class UserClient(ClientBase):
 
             location = getVidyoOptionValue('baseAPILocation') + getVidyoOptionValue('userAPIService')
             try:
-                cls._instance = suds.client.Client(userAPIUrl,
+                cls._instance = client.Client(userAPIUrl,
                                                    transport = ClientBase.getTransport(userAPIUrl, username , password),
                                                    location=location, cache = ClientBase.getCache())
             except Exception:

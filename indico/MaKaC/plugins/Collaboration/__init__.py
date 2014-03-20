@@ -21,5 +21,5 @@
 __metadata__ = {
     'name': "Collaboration",
     'description': "Collaboration Tools Plugins",
-    'requires': ['suds']
+    'requires': ['suds-jurko']
     }

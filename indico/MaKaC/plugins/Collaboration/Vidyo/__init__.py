@@ -22,5 +22,5 @@ __metadata__ = {
     'type': "Collaboration",
     'name': "Vidyo",
     'description': "Vidyo videoconferencing system",
-    'requires': ['suds']
+    'requires': ['suds-jurko']
     }
