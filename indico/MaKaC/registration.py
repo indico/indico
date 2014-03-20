@@ -5373,7 +5373,7 @@ class Registrant(Persistent, Fossilizable):
         pass
 
     def canUserModify(self, user):
-        return self.getConference().canUserModify(user) or user == self.getAvatar()
+        return self.getConference().canUserModify(user) or (user is not None and user == self.getAvatar())
 
 
 class BilledItemsWrapper(object):
