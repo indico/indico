@@ -101,7 +101,7 @@
 
 
 <script>
-$(document).ready(function(){
+$(document).ready(function() {
 
     /* Initializations */
     if ($(".log-table").length === 0) {
@@ -126,7 +126,7 @@ $(document).ready(function(){
     }
 
     var expandRow = function(interactive_row) {
-        interactive_row.addClass("active border-bottom-none");
+        interactive_row.addClass("active no-border-bottom");
         interactive_row.next().removeClass("weak-hidden")
                               .children("td")
                               .wrapInner('<div style="display: none;" />')
@@ -148,7 +148,7 @@ $(document).ready(function(){
                               .slideUp(400, function() {
                                   var $set = $(this);
                                   $set.replaceWith($set.contents());
-                                  interactive_row.removeClass("border-bottom-none");
+                                  interactive_row.removeClass("no-border-bottom");
                                   interactive_row.next().addClass("weak-hidden");
                               });
     };
@@ -169,12 +169,12 @@ $(document).ready(function(){
     /* Action buttons behavior */
     $("#expandAll").click(function(e) {
         e.preventDefault();
-        $("tr.i-table.interactive:visible").addClass("active border-bottom-none").next().removeClass("weak-hidden");
+        $("tr.i-table.interactive:visible").addClass("active no-border-bottom").next().removeClass("weak-hidden");
     });
 
     $("#collapseAll").click(function(e) {
         e.preventDefault();
-        $("tr.i-table.interactive").removeClass("active border-bottom-none").next().addClass("weak-hidden");
+        $("tr.i-table.interactive").removeClass("active no-border-bottom").next().addClass("weak-hidden");
     });
 
     $("#searchInput").realtimefilter({

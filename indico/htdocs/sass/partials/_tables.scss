@@ -91,101 +91,107 @@ h3.i-table {
     }
 }
 
-/* **************** */
-/* Interactive rows */
-/* **************** */
-tr.i-table.interactive.active {
-    background-color: #F4F4F4;
-    transition: background-color .25s ease-out;
-    -webkit-transition: background-color .25s ease-out;
-    -moz-transition: background-color .25s ease-out;
-}
 
-.border-bottom-none {
-	border-bottom: none !important;
-}
+// ============================================================================
+// Interactive rows
+// ============================================================================
 
-tr.i-table.interactive > td.i-table {
-    cursor: pointer;
-    user-select: none;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-}
+tr.i-table.interactive {
+    &.active {
+        @include single-transition(background-color);
+        background-color: #F4F4F4;
 
-tr.i-table.interactive.active > td.i-table {
-    border-left-color: #E5E5E5;
-}
+        > td.i-table {
+            border-left-color: lighten($gray, $color-variation);
+        }
+    }
 
-tr.i-table.interactive:hover > td.i-table,
-tr.i-table.interactive:hover + tr.i-table.content-wrapper > td.i-table {
-    border-left-color: rgb(56, 126, 229) !important;
+    &.no-border-bottom {
+        border-bottom: none !important;
+    }
+
+    > td.i-table {
+        @include user-select(none);
+        cursor: pointer;
+    }
+
+    &:hover {
+        > td.i-table,
+        + tr.i-table.content-wrapper > td.i-table {
+            border-left-color: $blue;
+        }
+    }
+
 }
 
 tr.i-table.content-wrapper {
     border-top: none;
-}
 
-tr.i-table.content-wrapper > td.i-table {
-    border-left-color: #E5E5E5;
-    padding: 0px;
-}
-
-tr.i-table.content > td.i-table.caption,
-tr.i-table.content > td.i-table.value {
-    padding: 3px 5px 3px 5px;
+    > td.i-table {
+        border-left-color: lighten($gray, $color-variation);
+        padding: 0px;
+    }
 }
 
 tr.i-table.content {
     border: none;
+
+    > td.i-table.caption,
+    > td.i-table.value {
+        padding: 3px 5px 3px 5px;
+    }
+
+    > td.i-table.caption {
+        @include border-bottom(lighten($gray, $color-variation), dashed);
+        @include border-right(lighten($gray, $color-variation), dashed);
+        font-weight: bold;
+        text-align: right;
+        vertical-align: top;
+    }
+
+    > td.i-table.value {
+        border-bottom: 1px solid transparent;
+        white-space: pre-line;
+    }
+
+    &:last-of-type {
+        > td.i-table.caption,
+        > td.i-table.value {
+            border-bottom: none;
+        }
+    }
 }
 
-tr.i-table.content > td.i-table.log-caption {
-    border-bottom: 1px dashed #E5E5E5;
-    border-right: 1px dashed #E5E5E5;
-    font-weight: bold;
-    text-align: right;
-    vertical-align: top;
-}
 
-tr.i-table.content > td.i-table.value {
-    border-bottom: 1px solid transparent !important;
-    white-space: pre-line;
-}
+// ============================================================================
+// View specifics
+// ============================================================================
 
-tr.i-table.content:last-of-type > td.i-table.caption,
-tr.i-table.content:last-of-type > td.i-table.value {
-    border-bottom: none !important;
-}
+td.i-table {
+    &.log-caption {
+        width: 175px;
+    }
 
-/* ************** */
-/* View specifics */
-/* ************** */
-td.i-table.log-module {
-    font-weight: bold;
-    width: 150px;
-}
+    &.log-module {
+        font-weight: bold;
+        width: 150px;
+    }
 
-td.i-table.log-subject {
-    width: auto;
-}
+    &.log-subject {
+        width: auto;
+    }
 
-td.i-table.log-stamp {
-    text-align: right;
-    text-overflow: clip;
-    width: 230px;
-}
+    &.log-stamp {
+        text-align: right;
+        text-overflow: clip;
+        width: 230px;
 
-td.i-table.caption.log-caption {
-    width: 175px;
-}
-
-span.user-name {
-   display: inline-block;
-   max-width: 120px;
-   overflow: hidden;
-   text-overflow: ellipsis;
-   vertical-align: bottom;
+        span.user-name {
+           display: inline-block;
+           max-width: 120px;
+           overflow: hidden;
+           text-overflow: ellipsis;
+           vertical-align: bottom;
+        }
+    }
 }
