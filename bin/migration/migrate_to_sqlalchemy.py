@@ -20,7 +20,9 @@
 __no_session_options__ = True
 
 import os
+import re
 from argparse import ArgumentParser
+from urlparse import urlparse
 from collections import defaultdict
 from datetime import datetime, time as dt_time, timedelta
 from itertools import ifilter
@@ -30,22 +32,46 @@ import pytz
 from babel import dates
 from flask import Flask
 from ZODB import DB, FileStorage
+from ZEO.ClientStorage import ClientStorage
 
 from indico.core.db import db, drop_database
+from indico.core.db.migration import MigratedDB
 from indico.modules.rb.models import *
-
+from indico.util.console import colored
 
 month_names = [(str(i), name[:3].encode('utf-8').lower())
                for i, name in dates.get_month_names(locale='fr_FR').iteritems()]
 
 
-def setup(main_zodb_path, rb_zodb_path, sqlalchemy_uri):
+def get_storage(zodb_uri):
+    uri_parts = urlparse(zodb_uri)
+
+    print colored("Trying to open {}...".format(zodb_uri), 'green')
+
+    if uri_parts.scheme == 'zeo':
+        if uri_parts.port is None:
+            print colored("No ZEO port specified. Assuming 9675", 'yellow')
+
+        storage = ClientStorage((uri_parts.hostname, uri_parts.port or 9675),
+                                username=uri_parts.username,
+                                password=uri_parts.password,
+                                realm=uri_parts.path[1:])
+
+    elif uri_parts.scheme in ('file', None):
+        storage = FileStorage.FileStorage(uri_parts.path)
+    else:
+        raise Exception("URI scheme not known: %s")
+    print colored("Done!", 'green')
+    return storage
+
+
+def setup(main_zodb_uri, rb_zodb_uri, sqlalchemy_uri):
     app = Flask('migration')
     app.config['SQLALCHEMY_DATABASE_URI'] = sqlalchemy_uri
     db.init_app(app)
 
-    main_root = DB(FileStorage.FileStorage(main_zodb_path)).open().root()
-    rb_root = DB(FileStorage.FileStorage(rb_zodb_path)).open().root()
+    main_root = MigratedDB(get_storage(main_zodb_uri)).open().root()
+    rb_root = DB(get_storage(rb_zodb_uri)).open().root()
 
     return main_root, rb_root, app
 
@@ -446,8 +472,8 @@ def main(*args):
 
 if __name__ == '__main__':
     parser = ArgumentParser(prog='migration')
-    parser.add_argument('main', help='main ZODB storage path', metavar="MAIN_DATA_FS")
-    parser.add_argument('rb', help='Room Booking ZODB file storage path', metavar="RB_DATA_FS")
+    parser.add_argument('main', help='main ZODB storage URI (zeo:// or file://)', metavar="MAIN_ZODB_URI")
+    parser.add_argument('rb', help='Room Booking ZODB file storage URI (zeo:// or file://)', metavar="RB_ZODB_URI")
     parser.add_argument('uri', help='SQLAlchemy database uri', metavar="SQLALCHEMY_URI")
     parser.add_argument('-d', '--drop', help='drop any existing database', action='store_true')
     parser.add_argument('-p', '--photo', help='path to photos of rooms')
