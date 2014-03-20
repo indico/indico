@@ -122,16 +122,22 @@ def setup_jinja(app):
 
 def configure_db(app):
     cfg = Config.getInstance()
-    app.config['SQLALCHEMY_DATABASE_URI'] = cfg.getSqlalchemyDatabaseUri()
+    db_uri = cfg.getSQLAlchemyDatabaseURI()
 
-    # options to care
-    app.config['SQLALCHEMY_ECHO'] = cfg.getSqlalchemyEcho()
-    app.config['SQLALCHEMY_RECORD_QUERIES'] = cfg.getSqlalchemyRecordQueries()
-    app.config['SQLALCHEMY_POOL_SIZE'] = cfg.getSqlalchemyPoolSize()
-    app.config['SQLALCHEMY_POOL_TIMEOUT'] = cfg.getSqlalchemyPoolTimeout()
-    app.config['SQLALCHEMY_POOL_RECYCLE'] = cfg.getSqlalchemyPoolRecycle()
-    app.config['SQLALCHEMY_MAX_OVERFLOW'] = cfg.getSqlalchemyMaxOverflow()
-    app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = cfg.getSqlalchemyCommitOnTeardown()
+    if db_uri is None:
+        raise Exception("No proper SQLAlchemy store has been configured."
+                        " Please edit your indico.conf")
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+
+    # DB options
+    app.config['SQLALCHEMY_ECHO'] = cfg.getSQLAlchemyEcho()
+    app.config['SQLALCHEMY_RECORD_QUERIES'] = cfg.getSQLAlchemyRecordQueries()
+    app.config['SQLALCHEMY_POOL_SIZE'] = cfg.getSQLAlchemyPoolSize()
+    app.config['SQLALCHEMY_POOL_TIMEOUT'] = cfg.getSQLAlchemyPoolTimeout()
+    app.config['SQLALCHEMY_POOL_RECYCLE'] = cfg.getSQLAlchemyPoolRecycle()
+    app.config['SQLALCHEMY_MAX_OVERFLOW'] = cfg.getSQLAlchemyMaxOverflow()
+    app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = cfg.getSQLAlchemyCommitOnTeardown()
 
     with DBMgr.getInstance().global_connection(commit=True):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
