@@ -89,10 +89,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 class RHRoomBookingRoomList(RHRoomBookingBase):
 
     def _checkParams(self):
-        print request.values
-        print '========================'
         self._form = RoomListForm(request.values)
-        print self._form.data
 
     def _process(self):
         self._rooms = Room.getRoomsForRoomList(self._form, self._getUser())

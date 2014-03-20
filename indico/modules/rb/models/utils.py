@@ -704,7 +704,6 @@ class Test:
             datetime( 2006, 9, 25, 18 ),
             datetime( 2006, 9, 23, 13 ),
             datetime( 2006, 9, 24, 17 ) )
-        print sdt, edt
 
 
 if __name__ == "__main__":

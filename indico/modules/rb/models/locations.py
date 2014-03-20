@@ -42,6 +42,7 @@ from .room_attributes import RoomAttribute
 from .room_equipments import RoomEquipment, RoomEquipmentAssociation
 from .rooms import Room
 
+
 class Location(db.Model):
     __tablename__ = 'locations'
 
@@ -449,7 +450,7 @@ class Location(db.Model):
 
         rooms = dict(self.rooms.with_entities(Room.id, Room).all())
 
-        a = [{
+        res = [{
             'number': building,
             'title': _('Building {}').format(building),
             'longitude': lo,
@@ -457,5 +458,4 @@ class Location(db.Model):
             'rooms': [rooms[rid].to_serializable() for rid in room_ids]
         } for building, room_ids, lo, la in results if la and lo]
 
-        print a
-        return a
+        return res

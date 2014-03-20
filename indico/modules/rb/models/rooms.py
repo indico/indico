@@ -580,7 +580,6 @@ notificationAssistance: {notification_for_assistance}
             )
 
         q = q.order_by(Room.capacity)
-        print q
         return q.all()
 
     # TODO
@@ -1204,9 +1203,6 @@ notificationAssistance: {notification_for_assistance}
     def getAverageOccupation(self, start, end):
         bookable = self.getTotalBookableTime(start, end)
         booked = self.getTotalBookedTime(start, end)
-        print
-        print self.name
-        print 'booked:', booked, 'bookable:', bookable
         return booked/float(bookable) if bookable else 0
 
     def getReservationStats(self):
