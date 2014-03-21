@@ -62,6 +62,13 @@ except:
 
 from urlparse import urlparse
 
+# dependency libs
+from zope.interface import implements
+
+# indico imports
+from indico.core.extpoint import Component
+from indico.core.extpoint.rh import IServerRequestListener
+
 # legacy indico imports
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
 from MaKaC.authentication import AuthenticatorMgr
@@ -170,32 +177,24 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
 
         if lfilter == []:
             return {}
-        ldapc = LDAPConnector()
-        ldapc.open()
+        ldapc = LDAPConnector.getInstance()
         fquery = "(&{0}{1})".format(ldapc.customUserFilter, ''.join(lfilter))
-
         d = ldapc.findUsers(fquery)
-        ldapc.close()
         return d
 
     def matchUserFirstLetter(self, index, letter):
         lfilter = self._operations[index].format("%s*" % letter)
         if lfilter == []:
             return {}
-        ldapc = LDAPConnector()
-        ldapc.open()
+        ldapc = LDAPConnector.getInstance()
         fquery = "(&%s)" % ''.join(lfilter)
         d = ldapc.findUsers(fquery)
-        ldapc.close()
         return d
 
     def searchUserById(self, id):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
+        ldapc = LDAPConnector.getInstance()
         ret = ldapc.lookupUser(id)
-        ldapc.close()
-        if(ret == None):
+        if ret is None:
             return None
         av = LDAPTools.dictToAv(ret)
         av["id"] = id
@@ -230,11 +229,8 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             return None
 
     def matchGroup(self, criteria, exact=0):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
+        ldapc = LDAPConnector.getInstance()
         ret = ldapc.findGroups(ldap.filter.escape_filter_chars(criteria), exact)
-        ldapc.close()
         groupList = []
         for grDict in ret:
             grName = grDict['cn']
@@ -246,11 +242,8 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         return groupList
 
     def matchGroupFirstLetter(self, letter):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
+        ldapc = LDAPConnector.getInstance()
         ret = ldapc.findGroupsFirstLetter(ldap.filter.escape_filter_chars(letter))
-        ldapc.close()
         groupList = []
         for grDict in ret:
             grName = grDict['cn']
@@ -262,27 +255,18 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         return groupList
 
     def getGroupMemberList(self, group):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
+        ldapc = LDAPConnector.getInstance()
         ret = ldapc.findGroupMemberUids(group)
-        ldapc.close()
         return ret
 
     def isUserInGroup(self, user, group):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
+        ldapc = LDAPConnector.getInstance()
         ret = ldapc.userInGroup(user, group)
-        ldapc.close()
         return ret
 
     def groupExists(self, group):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
+        ldapc = LDAPConnector.getInstance()
         ret = ldapc.groupExists(group)
-        ldapc.close()
         return ret
 
 
@@ -340,6 +324,8 @@ class LDAPConnector(object):
     of users which seems to be the standard LDAP setup
     """
 
+    _instance = None
+
     def __init__(self):
         conf = Configuration.Config.getInstance()
         ldapConfig = conf.getAuthenticatorConfigById("LDAP")
@@ -355,6 +341,23 @@ class LDAPConnector(object):
         self.ldapUseTLS = ldapConfig.get('useTLS')
         self.groupStyle = ldapConfig.get('groupStyle')
         self.customUserFilter = ldapConfig.get('customUserFilter', '')
+
+    @classmethod
+    def getInstance(cls):
+        if cls._instance is None:
+            cls._instance = LDAPConnector()
+            cls._instance.open()
+            cls._instance.login()
+        return cls._instance
+
+    @classmethod
+    def init(cls):
+        cls.getInstance()
+
+    @classmethod
+    def destroy(cls):
+        cls._instance.close()
+        cls._instance = None
 
     def login(self):
         try:
@@ -708,3 +711,16 @@ class LDAPTools:
         if m:
             return m.group(1)
         return None
+
+
+class RequestListener(Component):
+
+    implements(IServerRequestListener)
+
+    # IServerRequestListener
+
+    def requestFinished(self, obj):
+        LDAPConnector.destroy()
+
+    def requestStarted(self, obj):
+        LDAPConnector.init()
