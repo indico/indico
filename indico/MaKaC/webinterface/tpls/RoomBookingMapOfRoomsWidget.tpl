@@ -1,87 +1,88 @@
 <table id="map_table">
-  <tr>
-    <td id="map_table_left">
-      <div id="aspects_canvas"></div>
-    </td>
-    <td></td>
-  </tr>
-  <tr>
-    <td id="map_cell">
-      <div id="map_canvas"></div>
-    </td>
-    <td id="map_table_right">
-      <div id="mapFilterBox" class="sideBar clearfix">
-        <div class="leftCorner"></div>
-        <div class="rightCorner"></div>
-        <div id="mapFilterContentBox" class="content">
-          <div id="filters_canvas"></div>
-        </div>
-      </div>
-    </td>
-  </tr>
+    <tr>
+        <td id="map_table_left">
+            <div id="aspects_canvas"></div>
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td id="map_cell">
+            <div id="map_canvas"></div>
+        </td>
+        <td id="map_table_right">
+            <div id="mapFilterBox" class="sideBar clearfix">
+                <div class="leftCorner"></div>
+                <div class="rightCorner"></div>
+                <div id="mapFilterContentBox" class="content">
+                    <div id="filters_canvas"></div>
+                </div>
+            </div>
+        </td>
+    </tr>
 </table>
 
 <form id="mapOfRoomAvailabilityForm" method="post"  style="width:150px;" action="${ roomBookingRoomListURL }">
-<p>
-  <span>
-    <span>
-      <input id="isAvailable" class="mapFilterCheckbox" type="checkbox" style="margin-right:0px;">
-    </span>
-    <span class="mapFilterLabel">
-      ${ _('Is available') }:
-    </span>
-  </span>
-</p>
+    <p>
+        <span>
+            <span>
+                <input id="isAvailable" class="mapFilterCheckbox" type="checkbox" style="margin-right:0px;">
+            </span>
+            <span class="mapFilterLabel">
+                ${ _('Is available') }:
+            </span>
+        </span>
+    </p>
 
-<table>
-  <tr id="sdatesTR" >
-    <td class="subFieldWidth" align="right">
-      <small>${ _('From') }&nbsp;</small>
-    </td>
-    <td class="blacktext">
-      <span id="sDatePlace"></span>
-      <input type="hidden" value="${ startDT.day }" name="sDay" id="sDay"/>
-      <input type="hidden" value="${ startDT.month }" name="sMonth" id="sMonth"/>
-      <input type="hidden" value="${ startDT.year }" name="sYear" id="sYear"/>
-    </td>
-  </tr>
-  <tr id="edatesTR" >
-    <td class="subFieldWidth" align="right" >
-      <small>${ _('To') }&nbsp;</small>
-    </td>
-    <td>
-      <span id="eDatePlace"></span>
-      <input type="hidden" value="${ endDT.day }" name="eDay" id="eDay"/>
-      <input type="hidden" value="${ endDT.month }" name="eMonth" id="eMonth"/>
-      <input type="hidden" value="${ endDT.year }" name="eYear" id="eYear"/>
-    </td>
-  </tr>
-  <tr id="hoursTR" >
-    <td align="right" >
-      <small> ${ _('Hours') }&nbsp;</small>
-    </td>
-    <td align="left" class="blacktext">
-      <input name="sTime" id="sTime" maxlength="5" size="4" type="text" value="${ startT }" onchange="" /> &nbsp;&mdash;&nbsp;
-      <input name="eTime" id="eTime" maxlength="5" size="4" type="text" value="${ endT }" onchange="" />
-      <span id="holidays-warning" style="color: Red; font-weight:bold;"></span>
-    </td>
-  </tr>
-  <tr id="repTypeTR" >
-    <td align="right" ><small>
-      ${ _('Type') }&nbsp;</small>
-    </td>
-    <td align="left" class="blacktext" >
-      <select name="repeatability" id="repeatability" style="width:144px; margin-right:6px;">
-        % for k, v in repeat_mapping.items():
-          <option ${ 'selected' if k == default_repeat else '' } value="${ k }">
-            ${ v }
-          </option>
-        % endfor
-      </select>
-    </td>
-  </tr>
-</table>
-<input type="hidden" name="location" value="${ defaultLocation }" />
+    <table>
+        <tr id="sdatesTR" >
+            <td class="subFieldWidth" align="right">
+                <small>${ _('From') }&nbsp;</small>
+            </td>
+            <td class="blacktext">
+                <span id="sDatePlace"></span>
+                <input type="hidden" value="${ startDT.day }" name="sDay" id="sDay"/>
+                <input type="hidden" value="${ startDT.month }" name="sMonth" id="sMonth"/>
+                <input type="hidden" value="${ startDT.year }" name="sYear" id="sYear"/>
+            </td>
+        </tr>
+        <tr id="edatesTR" >
+            <td class="subFieldWidth" align="right" >
+                <small>${ _('To') }&nbsp;</small>
+            </td>
+            <td>
+                <span id="eDatePlace"></span>
+                <input type="hidden" value="${ endDT.day }" name="eDay" id="eDay"/>
+                <input type="hidden" value="${ endDT.month }" name="eMonth" id="eMonth"/>
+                <input type="hidden" value="${ endDT.year }" name="eYear" id="eYear"/>
+            </td>
+        </tr>
+        <tr id="hoursTR" >
+            <td align="right" >
+                small> ${ _('Hours') }&nbsp;</small>
+            </td>
+            <td align="left" class="blacktext">
+                <input name="sTime" id="sTime" maxlength="5" size="4" type="text" value="${ startT }" onchange="" /> &nbsp;&mdash;&nbsp;
+                <input name="eTime" id="eTime" maxlength="5" size="4" type="text" value="${ endT }" onchange="" />
+                <span id="holidays-warning" style="color: Red; font-weight:bold;"></span>
+            </td>
+        </tr>
+        <tr id="repTypeTR" >
+            <td align="right" ><small>
+                ${ _('Type') }&nbsp;</small>
+            </td>
+            <td align="left" class="blacktext" >
+                <select name="repeatability" id="repeatability" style="width:144px; margin-right:6px;">
+                    % for k, v in repeat_mapping.items():
+                        <option ${ 'selected' if k == default_repeat else '' } value="${ k }">
+                            ${ v }
+                        </option>
+                    % endfor
+                </select>
+            </td>
+        </tr>
+    </table>
+
+    <input type="hidden" name="location" value="${ defaultLocation }" />
 </form>
 
 <div style="display:none">
