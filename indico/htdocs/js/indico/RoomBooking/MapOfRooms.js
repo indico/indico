@@ -105,11 +105,13 @@ type ("RoomMap", ["IWidget"],
                         content: this.createBuildingInfo(marker.building)
                     });
                 }
+
                 // closed the tooltips and info baloon
                 this.closeInfoBaloon();
+
                 // show the info baloon
                 this.activeInfoWindow = marker.infoWindow;
-                marker.infoWindow.open(self.map, marker);
+                marker.infoWindow.open(this.map, marker);
             }, this);
         },
 
