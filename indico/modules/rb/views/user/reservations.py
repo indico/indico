@@ -633,4 +633,3 @@ class WRoomBookingList(WTemplated):
             wvars["bookingDetailsUH"] = urlHandlers.UHConfModifRoomBookingDetails
 
         return wvars
-

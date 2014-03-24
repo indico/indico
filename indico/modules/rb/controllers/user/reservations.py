@@ -55,33 +55,29 @@ class RHRoomBookingBookingList(RHRoomBookingBase):
 
     def __getTitle(self):
         return {
-                (True, False, False, False, False): _('Select a Room'),
-                (False, False, False, False, False): _('Bookings'),
-                (False, True, False, False, False): _('PRE-Bookings'),
-                (False, False, True, False, False): _('My Bookings'),
-                (False, True, True, False, False): _('My PRE-Bookings'),
-                (False, False, False, True, False): _('Bookings for my rooms'),
-                (False, True, False, True, False): _('Pre-Bookings for my rooms'),
-                (False, False, True, True, False): _('My Bookings for my rooms'),
-                (False, True, True, True, False): _('My Pre-Bookings for my rooms'),
-                (False, False, True, True, True): _('Search My Bookings for my rooms'),
-                (False, True, True, True, True): _('Search My Pre-Bookings for my rooms'),
-                (False, False, True, False, True): _('Search My Bookings'),
-                (False, True, True, False, True): _('Search My Pre-Bookings'),
-                (False, False, False, True, True): _('Search Bookings for my rooms'),
-                (False, True, False, True, True): _('Search Pre-Bookings for my rooms'),
-                (False, False, False, False, True): _('Search Bookings'),
-                (False, True, False, False, True): _('Search Pre-Bookings'),
-            }.get(
-                (
-                    self._form.is_new_booking.data,
-                    self._form.is_only_pre_bookings.data,
-                    self._form.is_only_mine.data,
-                    self._form.is_only_my_rooms.data,
-                    self._form.is_search.data
-                ),
-                _('{} Booking(s) found').format(self._reservation_count)
-            )
+            (True, False, False, False, False): _('Select a Room'),
+            (False, False, False, False, False): _('Bookings'),
+            (False, True, False, False, False): _('PRE-Bookings'),
+            (False, False, True, False, False): _('My Bookings'),
+            (False, True, True, False, False): _('My PRE-Bookings'),
+            (False, False, False, True, False): _('Bookings for my rooms'),
+            (False, True, False, True, False): _('Pre-Bookings for my rooms'),
+            (False, False, True, True, False): _('My Bookings for my rooms'),
+            (False, True, True, True, False): _('My Pre-Bookings for my rooms'),
+            (False, False, True, True, True): _('Search My Bookings for my rooms'),
+            (False, True, True, True, True): _('Search My Pre-Bookings for my rooms'),
+            (False, False, True, False, True): _('Search My Bookings'),
+            (False, True, True, False, True): _('Search My Pre-Bookings'),
+            (False, False, False, True, True): _('Search Bookings for my rooms'),
+            (False, True, False, True, True): _('Search Pre-Bookings for my rooms'),
+            (False, False, False, False, True): _('Search Bookings'),
+            (False, True, False, False, True): _('Search Pre-Bookings'),
+        }.get((self._form.is_new_booking.data,
+               self._form.is_only_pre_bookings.data,
+               self._form.is_only_mine.data,
+               self._form.is_only_my_rooms.data,
+               self._form.is_search.data),
+              _('{} Booking(s) found').format(self._reservation_count))
 
     def _checkParams(self):
         self._form = BookingListForm(request.values)
@@ -93,14 +89,12 @@ class RHRoomBookingBookingList(RHRoomBookingBase):
                     self._form,
                     self._getUser()
                 )
-                print 'SEARCH =================================='
             else:
                 self._reservations = Room.getReservationsForAvailability(
                     self._form.start_date.data,
                     self._form.end_date.data,
                     self._form.room_id_list.data
                 )
-                print 'NEW BOOKING ========================='
             self._reservation_count = len(self._reservations)
         else:
             # TODO: actually this case shouldn't happen
@@ -152,11 +146,11 @@ class RHRoomBookingSaveBooking(RHRoomBookingBase):
     form.
     """
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
 
         self._roomLocation = params.get("roomLocation")
         self._roomID = params.get("roomID")
-        self._resvID = params.get( "resvID" )
+        self._resvID = params.get("resvID")
         if self._resvID == 'None':
             self._resvID = None
 
@@ -166,7 +160,7 @@ class RHRoomBookingSaveBooking(RHRoomBookingBase):
         if not self._getUser():
             return
 
-        self._answer = params.get( "answer", None )
+        self._answer = params.get("answer", None)
 
         self._skipConflicting = False
 
@@ -174,7 +168,7 @@ class RHRoomBookingSaveBooking(RHRoomBookingBase):
         # prebookings that conflict with other prebookings are
         # silently added
 
-        self._forceAddition = params.get("forceAddition","False")
+        self._forceAddition = params.get("forceAddition", "False")
         if self._forceAddition == 'True':
             self._forceAddition = True
         else:
