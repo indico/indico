@@ -24,6 +24,7 @@ import logging.handlers
 import logging.config
 import ConfigParser
 from flask import request, session
+from ZODB.POSException import POSError
 
 from indico.core.config import Config
 from MaKaC.common.contextManager import ContextManager
@@ -64,7 +65,11 @@ class IndicoMailFormatter(logging.Formatter):
             info.append('Method: %s' % request.method)
             if rh:
                 info.append('Params: %s' % rh._getTruncatedParams())
-            info.append('User: %r' % session.user)
+            try:
+                info.append('User: %r' % session.user)
+            except POSError:
+                # If the DB connection is closed getting the avatar may fail
+                info.append('User id: %s' % session.get('_avatarId'))
             info.append('IP: %s' % request.remote_addr)
             info.append('User Agent: %s' % request.user_agent)
             info.append('Referer: %s' % (request.referrer or 'n/a'))
