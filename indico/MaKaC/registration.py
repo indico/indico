@@ -799,11 +799,10 @@ _("Registrant Id"): %s
         # send mail to organisers
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
-There is a new registrant in '%s'. See information below:
+There is a new registrant (%s) in '%s'. See information below:
 
 %s
-""") % (strip_ml_tags(regForm.getConference().getTitle()), \
-                              body)
+""") % (rp.getFullName(), strip_ml_tags(regForm.getConference().getTitle()), body)
             bodyOrg = self._cleanBody(bodyOrg)
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
@@ -859,7 +858,6 @@ Please use this information for your payment (except for e-payment):\n
             miscGroup = registrant.getMiscellaneousGroupById(gsf.getId())
             if miscGroup is not None:
                 for miscItem in miscGroup.getResponseItemList():
-                    _billlable = False
                     price = 0.0
                     quantity = 0
                     caption = miscItem.getCaption()
@@ -868,7 +866,6 @@ Please use this information for your payment (except for e-payment):\n
                     if miscItem is not None:
                         v = miscItem.getValue()
                         if miscItem.isBillable():
-                            _billlable = miscItem.isBillable()
                             value = miscItem.getValue()
                             price = string.atof(miscItem.getPrice())
                             quantity = miscItem.getQuantity()
@@ -931,7 +928,6 @@ Please use this information for your payment (except for e-payment):\n
             miscGroup = registrant.getMiscellaneousGroupById(gsf.getId())
             if miscGroup is not None:
                 for miscItem in miscGroup.getResponseItemList():
-                    _billlable = False
                     price = 0.0
                     quantity = 0
                     caption = miscItem.getCaption()
@@ -940,7 +936,6 @@ Please use this information for your payment (except for e-payment):\n
                     if miscItem is not None:
                         v = miscItem.getValue()
                         if miscItem.isBillable():
-                            _billlable = miscItem.isBillable()
                             v = miscItem.getValue()
                             price = string.atof(miscItem.getPrice())
                             quantity = miscItem.getQuantity()
@@ -964,11 +959,10 @@ Please use this information for your payment (except for e-payment):\n
         # send email to organisers
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
-             There is a new registrant in '%s'. See information below:
+             There is a new registrant (%s) in '%s'. See information below:
 
                       %s
-                      """) % (strip_ml_tags(registrant.getConference().getTitle()), \
-                              body)
+                      """) % (registrant.getFullName(), strip_ml_tags(registrant.getConference().getTitle()), body)
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
         # send email to participant
@@ -1014,10 +1008,10 @@ _("Personal Homepage"): %s
                      self._printAllSections(regForm, rp))
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
-A registrant has modified his/her registration for '%s'. See information below:
+A registrant (%s) has modified his/her registration for '%s'. See information below:
 
 %s
-""") % (strip_ml_tags(regForm.getConference().getTitle()), body)
+""") % (rp.getFullName(), strip_ml_tags(regForm.getConference().getTitle()), body)
             bodyOrg = self._cleanBody(bodyOrg)
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
