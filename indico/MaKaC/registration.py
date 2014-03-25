@@ -44,6 +44,7 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_datetime, format_date
+from indico.util.string import safe_upper
 from MaKaC.webinterface.common.countries import CountryHolder
 import re
 import tempfile, os
@@ -5096,11 +5097,10 @@ class Registrant(Persistent, Fossilizable):
             res = "%s %s" % (self.getFirstName(), self.getFamilyName())
             res = res.strip()
         else:
-            # accented letter capitalization requires all these encodes/decodes
-            res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
-            if self.getFirstName() != "":
+            res = safe_upper(self.getFamilyName())
+            if self.getFirstName():
                 res = "%s, %s" % (res, self.getFirstName())
-        if title and self.getTitle() != "":
+        if title and self.getTitle():
             res = "%s %s" % (self.getTitle(), res)
         return res
 

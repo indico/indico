@@ -29,6 +29,7 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.plugins.Collaboration.WebEx.fossils import IWebExWarningFossil, IWebExErrorFossil, \
     IChangesFromWebExErrorFossil, IParticipantFossil
+from indico.util.string import safe_upper
 from cgi import escape
 from MaKaC.i18n import _
 
@@ -212,7 +213,7 @@ class Participant(Persistent,Fossilizable):
         if self._title:
             result.append(self._title)
             result.append(' ')
-        result.append(self._familyName.upper())
+        result.append(safe_upper(self._familyName))
         result.append(', ')
         result.append(self._firstName)
         if self._affiliation:

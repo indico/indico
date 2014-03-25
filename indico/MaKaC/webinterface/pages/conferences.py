@@ -64,6 +64,7 @@ import MaKaC.common.info as info
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
+from indico.util.string import safe_upper
 import MaKaC.webcast as webcast
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.fossilize import fossilize
@@ -4907,7 +4908,7 @@ class WAbstractsParticipantList(wcomponents.WTemplated):
                     color="#F6F6F6"
                 else:
                     color="white"
-                participant = "%s %s %s <%s>"%(subm.getTitle(), subm.getFirstName(), subm.getFamilyName().upper(), subm.getEmail())
+                participant = "%s %s %s <%s>"%(subm.getTitle(), subm.getFirstName(), safe_upper(subm.getFamilyName()), subm.getEmail())
                 l.append("<tr>\
                         <td colspan=\"2\" nowrap bgcolor=\"%s\" class=\"blacktext\">\
                         &nbsp;&nbsp;&nbsp;%s</td></tr>"%(color, self.htmlText(participant)))
@@ -5031,7 +5032,7 @@ class WContribParticipantList(wcomponents.WTemplated):
                     color="#F6F6F6"
                 else:
                     color="white"
-                participant = "%s %s %s <%s>"%(pAuth.getTitle(), pAuth.getFirstName(), pAuth.getFamilyName().upper(), pAuth.getEmail())
+                participant = "%s %s %s <%s>"%(pAuth.getTitle(), pAuth.getFirstName(), safe_upper(pAuth.getFamilyName()), pAuth.getEmail())
                 l.append("<tr><td colspan=\"2\" nowrap bgcolor=\"%s\" \
                         class=\"blacktext\">&nbsp;&nbsp;&nbsp;%s</td></tr>"%(color, self.htmlText(participant)))
             vars["primaryAuthors"] = "".join(l)
@@ -5056,9 +5057,9 @@ class WContribParticipantList(wcomponents.WTemplated):
                     color="white"
                 cAuthEmail = cAuth.getEmail()
                 if cAuthEmail.strip() == "":
-                    participant = "%s %s %s"%(cAuth.getTitle(), cAuth.getFirstName(), cAuth.getFamilyName().upper())
+                    participant = "%s %s %s"%(cAuth.getTitle(), cAuth.getFirstName(), safe_upper(cAuth.getFamilyName()))
                 else:
-                    participant = "%s %s %s <%s>"%(cAuth.getTitle(), cAuth.getFirstName(), cAuth.getFamilyName().upper(), cAuthEmail)
+                    participant = "%s %s %s <%s>"%(cAuth.getTitle(), cAuth.getFirstName(), safe_upper(cAuth.getFamilyName()), cAuthEmail)
                 l.append("<tr><td colspan=\"2\" nowrap bgcolor=\"%s\" class=\"blacktext\">\
                         &nbsp;&nbsp;&nbsp;%s</td></tr>"%(color, self.htmlText(participant)))
             vars["coAuthors"] = "".join(l)
@@ -5864,7 +5865,7 @@ class WConfStaticAuthorIndex(wcomponents.WTemplated):
         if len(pl)<=0:
             return ""
         auth=pl[0]
-        authCaption="%s"%auth.getFamilyName().upper()
+        authCaption = safe_upper(auth.getFamilyName())
         htmlLetter = ""
         letter = "-1"
         if len(auth.getFamilyName()) > 0:

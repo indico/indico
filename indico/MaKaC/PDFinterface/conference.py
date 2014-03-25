@@ -67,6 +67,7 @@ import re
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat, ngettext
 from indico.util.date_time import format_date
+from indico.util.string import safe_upper
 from indico.util import json
 from MaKaC.common.Configuration import Config
 
@@ -980,9 +981,9 @@ class TimeTablePlain(PDFWithTOC):
             l.append(["",caption,speakers])
 
     def _getNameWithoutTitle(self, av):
-        res = av.getFamilyName().upper()
-        if av.getFirstName() != "":
-            res = "%s, %s"%( res, av.getFirstName() )
+        res = safe_upper(av.getFamilyName())
+        if av.getFirstName():
+            res = "%s, %s" % (res, av.getFirstName())
         return res
 
     def _useColors(self):
@@ -1577,13 +1578,13 @@ class ProceedingsTOC(PDFBase):
 
     def _getAbrName(self, author):
         res = author.getFamilyName()
-        if res.strip() != "" and len(res)>1:
-            res = "%s%s"%(res[0].upper(), res[1:].lower())
-        if author.getFirstName() != "":
-            if res == "":
+        if res.strip() and len(res) > 1:
+            res = "%s%s" % (safe_upper(res[0]), res[1:].lower())
+        if author.getFirstName():
+            if not res:
                 res = author.getFirstName()
             else:
-                res = "%s. %s"%(author.getFirstName()[0].upper(), res)
+                res = "%s. %s" % (safe_upper(author.getFirstName()[0]), res)
         return res
 
 class ProceedingsChapterSeparator(PDFBase):

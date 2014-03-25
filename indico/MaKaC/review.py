@@ -20,6 +20,7 @@
 from copy import copy
 from pytz import timezone
 from indico.util.i18n import i18nformat
+from indico.util.string import safe_upper
 import ZODB
 from persistent import Persistent
 from persistent.list import PersistentList
@@ -285,32 +286,32 @@ class AbstractParticipation(Persistent):
         return self._title
 
     def getFullName(self):
-        res = self.getSurName().decode('utf-8').upper().encode('utf-8')
+        res = safe_upper(self.getSurName())
         tmp = []
         for name in self.getFirstName().lower().split(" "):
-            if name.strip() == "":
+            if not name.strip():
                 continue
             name = name.strip()
-            tmp.append("%s%s" % (name[0].upper(), name[1:]))
+            tmp.append("%s%s" % (safe_upper(name[0]), name[1:]))
         firstName = " ".join(tmp)
-        if firstName != "":
+        if firstName:
             res = "%s, %s" % (res, firstName)
-        if self.getTitle() != "":
+        if self.getTitle():
             res = "%s %s" % (self.getTitle(), res)
         return res
 
     def getStraightFullName(self):
         name = ""
-        if self.getName() != "":
+        if self.getName():
             name = "%s " % self.getName()
         return "%s%s" % (name, self.getSurName())
 
     def getAbrName(self):
         res = self.getSurName()
-        if self.getFirstName() != "":
-            if res != "":
+        if self.getFirstName():
+            if res:
                 res = "%s, " % res
-            res = "%s%s." % (res, self.getFirstName()[0].upper())
+            res = "%s%s." % (res, safe_upper(self.getFirstName()[0]))
         return res
 
     def getAbstract(self):
