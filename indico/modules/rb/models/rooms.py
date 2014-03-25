@@ -63,6 +63,7 @@ from indico.core.db import db, time_diff, greatest, least
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
@@ -88,10 +89,13 @@ class Room(db.Model, Serializer):
         'id', 'name', 'location_name', 'floor', 'number', 'building',
         'booking_url', 'capacity', 'comments', 'owner_id',
         'large_photo_url', 'small_photo_url', 'has_photo', 'is_active',
-        'is_reservable', 'is_public', 'is_auto_confirm', 'marker_description',
-        'needs_video_conference_setup', 'has_webcast_recording',
-        'has_booking_groups', 'kind'
+        'is_reservable', 'is_auto_confirm', 'marker_description', 'kind'
     ]
+
+    __public_exhaustive__ = __public__ + [
+        'has_webcast_recording', 'needs_video_conference_setup', 'has_booking_groups', 'is_public'
+    ]
+
     __calendar_public__= [
         'id', 'building', 'name', 'floor', 'number', 'kind', 'booking_url'
     ]
@@ -502,35 +506,47 @@ notificationAssistance: {notification_for_assistance}
         return Room.query.all()
 
     @staticmethod
-    def getRoomsWithMaxCapacity():
+    def getRoomsWithData(*args):
         from .locations import Location
+        query = Room.query
+        entities = [Room]
 
-        q = Room.query.subquery()
+        if 'equipment' in args:
+            entities.append(func.array_to_string(func.array_agg(RoomEquipment.name), ', '))
+            query = query.\
+                outerjoin(RoomEquipmentAssociation).\
+                outerjoin(RoomEquipment)
 
-        max_capacity_row_columns = [
-            (func.coalesce(func.max(Room.capacity), 0) if c.name == 'capacity'
-            else (func.coalesce(func.max(Room.id), 0) + 1 if c.name == 'id'
-            else null())).label(c.name)
-            for c in q.selectable.columns
-        ]
+        if 'photo' in args:
+            entities.append(Photo)
+            query = query.\
+                outerjoin(Photo, Photo.room_id == Room.id).\
+                group_by(Photo.id)
 
-        records = Room.query\
-                      .select_from(q)\
-                      .union(
-                          Room.query
-                              .with_entities(*max_capacity_row_columns)
-                      )\
-                      .outerjoin(Location, Location.id == Room.location_id)\
-                      .with_entities(Room)\
-                      .order_by(
-                        Location.name,
-                        Room.building,
-                        Room.floor,
-                        Room.number,
-                        Room.name
-                      )\
-                      .all()
-        return records[:-1], records[-1].capacity
+        records = query.\
+            with_entities(*entities).\
+            outerjoin(Location, Location.id == Room.location_id).\
+            group_by(Location.name, Room.id).\
+            order_by(
+                Location.name,
+                Room.building,
+                Room.floor,
+                Room.number,
+                Room.name
+            )
+
+        for r in records:
+            res = {'room': r[0]}
+            for i, arg in enumerate(args):
+                res[arg] = r[i+1]
+            yield res
+
+    @staticmethod
+    def getMaxCapacity():
+        records = Room.query.\
+            with_entities(func.max(Room.capacity).label('capacity')).\
+            all()
+        return records[0].capacity
 
     @staticmethod
     def getRoomsByName(name):

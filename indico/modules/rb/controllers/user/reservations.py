@@ -35,7 +35,8 @@ from ..forms import BookingForm, BookingListForm
 class RHRoomBookingBookRoom(RHRoomBookingBase):
 
     def _process(self):
-        self._rooms, self._max_capacity = Room.getRoomsWithMaxCapacity()
+        self._rooms = Room.getRoomsWithData('equipment', 'photo')
+        self._max_capacity = Room.getMaxCapacity()
         return reservation_views.WPRoomBookingBookRoom(self).display()
 
 

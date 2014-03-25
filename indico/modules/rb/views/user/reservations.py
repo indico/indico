@@ -72,8 +72,7 @@ class WRoomBookingBookRoom(WTemplated):
     def getVars(self):
         wvars = WTemplated.getVars(self)
         wvars['today'] = datetime.utcnow()
-        wvars['rooms'] = [r.to_serializable() for r in self._rh._rooms]
-
+        wvars['rooms'] = [r['room'].to_serializable('__public_exhaustive__') for r in self._rh._rooms]
         wvars['maxRoomCapacity'] = self._rh._max_capacity
         wvars['roomBookingBookingListURL'] = UH.UHRoomBookingBookingListForBooking.getURL()
         wvars['formerBookingInterfaceURL'] = UH.UHRoomBookingSearch4Rooms.getURL(is_new_booking=True)
