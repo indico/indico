@@ -52,6 +52,7 @@ from sqlalchemy.types import (
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.Locators import Locator
+from MaKaC.common.cache import GenericCache
 from MaKaC.errors import MaKaCError
 from MaKaC.user import (
     Avatar,
@@ -543,10 +544,16 @@ notificationAssistance: {notification_for_assistance}
 
     @staticmethod
     def getMaxCapacity():
-        records = Room.query.\
-            with_entities(func.max(Room.capacity).label('capacity')).\
-            all()
-        return records[0].capacity
+        cache = GenericCache('RoomsMaxCapacity')
+        key = 'maxcapacity'
+        maxcapacity = cache.get(key)
+        if not maxcapacity:
+            records = Room.query.\
+                with_entities(func.max(Room.capacity).label('capacity')).\
+                all()
+            maxcapacity = records[0].capacity
+            cache.set(key, maxcapacity, 300)
+        return maxcapacity
 
     @staticmethod
     def getRoomsByName(name):
