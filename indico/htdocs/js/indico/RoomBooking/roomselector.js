@@ -91,6 +91,7 @@
                     .attr("label",
                         room.needs_video_conference_setup + ":" +
                         room.has_webcast_recording + ":" +
+                        room.has_projector + ":" +
                         room.is_public + ":" +
                         (room.capacity || '?')
                     )

@@ -94,7 +94,7 @@ class Room(db.Model, Serializer):
     ]
 
     __public_exhaustive__ = __public__ + [
-        'has_webcast_recording', 'needs_video_conference_setup', 'has_booking_groups', 'is_public'
+        'has_webcast_recording', 'needs_video_conference_setup', 'has_projector', 'is_public', 'has_booking_groups'
     ]
 
     __calendar_public__= [
@@ -393,23 +393,28 @@ notificationAssistance: {notification_for_assistance}
 
     @property
     def guid(self):
+        # TODO just do it
         return 'SHOULD BE REMOVED'
 
     def getEquipmentByName(self, equipment_name):
-        return self.equipments\
-                   .filter_by(name=equipment_name)\
-                   .first()
+        return self.equipments.\
+            filter_by(name=func.lower(equipment_name)).\
+            first()
 
     def has_equipment(self, equipment_name):
         return self.getEquipmentByName(equipment_name) is not None
 
     @property
     def needs_video_conference_setup(self):
-        return self.has_equipment('Video conference')
+        return self.has_equipment('video conference')
 
     @property
     def has_webcast_recording(self):
-        return self.has_equipment('Webcast/Recording')
+        return self.has_equipment('webcast/recording')
+
+    @property
+    def has_projector(self):
+        return self.has_equipment('computer projector')
 
     @property
     def available_video_conference(self):
@@ -842,9 +847,6 @@ notificationAssistance: {notification_for_assistance}
     def getEquipmentIds(self):
         return self.equipments.with_entities(RoomEquipment.id).all()
 
-    def getEquipmentByName(self, name):
-        return self.equipments.filter_by(name=name).first()
-
     def addEquipments(self, equipment_names):
         self.equipment_names.extend(equipment_names)
 
@@ -1105,9 +1107,6 @@ notificationAssistance: {notification_for_assistance}
     def hasManagerGroup(self):
         attribute = self.getAttributeByName('Manager Group')
         return attribute and attribute.value.get('is_equipped', [])
-
-    # def is_public(self):
-    #     return self.is_reservable and not self.hasManagerGroup()
 
     def notifyAboutResponsibility( self ):
         """
