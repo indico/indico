@@ -512,10 +512,11 @@ notificationAssistance: {notification_for_assistance}
         return Room.query.all()
 
     @staticmethod
-    def getRoomsWithData(*args):
+    def getRoomsWithData(only_active=True, *args):
         from .locations import Location
         query = Room.query
         entities = [Room]
+
 
         if 'equipment' in args:
             entities.append(func.array_to_string(func.array_agg(RoomEquipment.name), ', '))
@@ -529,7 +530,7 @@ notificationAssistance: {notification_for_assistance}
                 outerjoin(Photo, Photo.room_id == Room.id).\
                 group_by(Photo.id)
 
-        records = query.\
+        query = query.\
             with_entities(*entities).\
             outerjoin(Location, Location.id == Room.location_id).\
             group_by(Location.name, Room.id).\
@@ -541,7 +542,11 @@ notificationAssistance: {notification_for_assistance}
                 Room.name
             )
 
-        for r in records:
+        if only_active:
+            query = query.\
+                filter(Room.is_active == True)
+
+        for r in query:
             res = {'room': r[0]}
             for i, arg in enumerate(args):
                 res[arg] = r[i+1]
