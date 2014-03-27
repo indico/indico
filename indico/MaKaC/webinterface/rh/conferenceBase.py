@@ -272,10 +272,12 @@ class RHSubmitMaterialBase(object):
                 self._displayName = ""
                 self._description = ""
             else:
-                urls =  [params["url"]]
+                urls = [params["url"]]
 
             matType = params.get("materialType", "")
             for url in urls:
+                if not url.strip():
+                    continue
                 link = {}
                 link["url"] = url
                 link["matType"] = matType
