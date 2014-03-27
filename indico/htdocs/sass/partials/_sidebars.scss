@@ -76,8 +76,8 @@
 .sideMenu {
     float: left;
     width: 200px;
-    padding-right: 15px;
-    margin-left:30px;
+    margin-right: 30px;
+    margin-left: 30px;
 
     .separator {
         font-weight: normal;
@@ -103,6 +103,7 @@
 
 .managementSideMenu {
     margin-left: 0px;
+    margin-right: 15px;
 
     .corner {
         width: 15px;

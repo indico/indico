@@ -7,7 +7,7 @@
       <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
         <tr>
           <td class="maincell" >
-            <div style="float: left; width: 820px; margin-left: 15px">
+            <div style="float: left; width: 820px">
               % if newBooking:
                 <ul id="breadcrumbs" style="margin:0px 0px 20px -15px; padding: 0; list-style: none;">
                   <li>

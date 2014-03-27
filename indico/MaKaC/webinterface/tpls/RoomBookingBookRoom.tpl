@@ -1,5 +1,5 @@
 <form id="searchForm" method="post" action="${ roomBookingBookingListURL }">
-  <table id="roomBookingTable" cellspacing="0" style="width: 100%; padding-left: 20px;">
+  <table id="roomBookingTable" cellspacing="0" style="width: 100%;">
     <tr>
       <td>
         <ul id="breadcrumbs" style="margin:0px 0px 0px -15px; padding: 0; list-style: none;">

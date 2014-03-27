@@ -153,7 +153,7 @@
 </div>
 <!-- END OF CONTEXT HELP DIVS -->
 
-<table cellpadding="0" cellspacing="0" border="0" width="80%">
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
   <tr>
     <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;
     </td> <!-- lastvtabtitle -->
@@ -165,14 +165,14 @@
         <tr>
           <td class="maincell">
             <h2 class="page_title">
-              ${ _('Search for bookings') }
+              ${ _('Search bookings') }
             </h2>
             <!-- Background table (adds image) -->
-            <table width="100%" class="ACtab">
+            <table width="100%" class="ACtab" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <td>
                   <form id="searchForm" method="post" action="${ roomBookingBookingListURL }">
-                    <table width="90%" align="center" border="0">
+                    <table width="100%" align="center" cellpadding="0" cellspacing="0" border="0">
                       <tr>
                         <td colspan="2">
                           <h2 class="group_title">
@@ -265,7 +265,7 @@
                           <span class="titleCellFormat"> ${ _('Booked for') }</span>
                         </td>
                         <td align="right">
-                          <table width="100%">
+                          <table width="100%" cellpadding="0" cellspacing="0" border="0">
                             <tr>
                               <td class="subFieldWidthSmaller" align="right">
                                 <small> ${ _('Name') }&nbsp;&nbsp;</small>
@@ -283,7 +283,7 @@
                         <span class="titleCellFormat"> ${ _('Reason') }</span>
                       </td>
                       <td align="right">
-                        <table width="100%">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
                           <tr>
                             <td class="subFieldWidthSmaller" align="right">
                               <small> ${ _('Reason') }&nbsp;&nbsp;</small>
@@ -298,7 +298,7 @@
                     </tr>
                   </table>
                   <br>
-                  <table width="90%" align="center" border="0">
+                  <table width="100%" align="center" cellpadding="0" cellspacing="0" border="0">
                     <tr>
                       <td colspan="2">
                         <h2 class="group_title">
