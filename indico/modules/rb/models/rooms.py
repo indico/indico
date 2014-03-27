@@ -61,6 +61,7 @@ from MaKaC.user import (
 )
 
 from indico.core.db import db, time_diff, greatest, least
+from indico.core.db.utils import static_array
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
@@ -512,14 +513,15 @@ notificationAssistance: {notification_for_assistance}
         return Room.query.all()
 
     @staticmethod
-    def getRoomsWithData(only_active=True, *args):
+    def getRoomsWithData(*args, **kwargs):
         from .locations import Location
+
+        only_active = kwargs.get('only_active', True)
         query = Room.query
         entities = [Room]
 
-
         if 'equipment' in args:
-            entities.append(func.array_to_string(func.array_agg(RoomEquipment.name), ', '))
+            entities.append(static_array.array_agg(RoomEquipment.name))
             query = query.\
                 outerjoin(RoomEquipmentAssociation).\
                 outerjoin(RoomEquipment)
