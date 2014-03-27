@@ -2949,12 +2949,6 @@ div.filterDiv
     margin: 30px 80px 30px 60px;
 }
 
-.sideBar {
-    float: right;
-    font-size: 14px;
-    width: 340px;
-}
-
 .smallSideBox {
     font-family: Georgia, Times, Times New Roman;
     padding: 15px 15px 10px 15px;
@@ -2965,73 +2959,15 @@ div.filterDiv
     font-family: 'Special Elite', arial, serif;
 }
 
-.sideMenu {
-    float: left;
-    width: 200px;
-    padding-right: 15px;
-    margin-left:30px;
-}
-
-.managementSideMenu {
-    margin-left:0px;
-}
-
-.sideMenu .separator {
-    font-weight: normal;
-    font-style: italic;
-    font-size: 12px;
-    color: #777;
-    padding: 7px 0;
-    border-bottom: 1px dotted #999;
-}
-
-.sideMenu .separatorNoText {
-    font-size: 1px;
-    height: 1px;
-    padding: 0;
-    margin-top: 0;
-    border-bottom: 1px dotted #999;
-}
-
-.sideBar .leftCorner {
-    width: 15px;
-    height: 15px;
-    float: left;
-    background: transparent url('../images/grey_corners.png') scroll no-repeat 0 0;
-}
-
-.sideBar .rightCorner {
-    width: 15px;
-    height: 15px;
-    float: right;
-    background: transparent url('../images/grey_corners.png') scroll no-repeat -15px 0;
-}
-
-.sideMenu .corner {
-    width: 15px;
-    height: 15px;
-    float: right;
-    background: transparent url('../images/grey_corners.png') scroll no-repeat -30px 0;
-}
-
-.sideBar .content {
-    background: #ECECEC url('../images/grey_gradient.png') scroll repeat-x bottom left;
-    padding: 20px 20px 50px 20px;
-}
-.sideMenu .content {
-    padding-top: 10px;
-}
-
-.managementSideMenu .content {
-    min-height: 200px;
-}
-
-.managementSideMenu .content {
-    margin-right: 15px;
-}
-
 .topBar {
     margin-bottom: 0px;
+}
+
+.topBar h1 {
+    margin: 0;
+    padding: 0;
+    color: #777;
+    font-size: 15px;
 }
 
 .topBar .content {
@@ -3045,48 +2981,6 @@ div.filterDiv
 .topBar .smaller {
     padding: 10px;
     margin-top: 10px;
-}
-
-.sideBar h1, .topBar h1 {
-    margin: 0;
-    padding: 0;
-    color: #777;
-    font-size: 15px;
-}
-
-.sideBar ul {
-    margin: 15px 0px 0px 0px;
-    padding: 0;
-    list-style-type: none;
-}
-
-.sideMenu li {
-    margin-bottom: 10px;
-}
-
-.sideBar a {
-    font-size: 12px;
-}
-
-.sideBar em {
-    color: #777;
-}
-
-.sideMenu a {
-    font-size: 14px;
-}
-
-.sideMenu .active {
-    font-weight: bold;
-}
-
-.sideMenu a.advanced {
-    font-style: italic;
-}
-
-.sideBar a.subLink {
-    font-style: italic;
-    font-size: 14px;
 }
 
 .leftMenu
