@@ -32,7 +32,7 @@ from indico.util.fossilize import fossilize
 
 
 @HTTPAPIHook.register
-class SetPayedHook(EventBaseHook):
+class SetPaidHook(EventBaseHook):
     PREFIX = "api"
     RE = r'(?P<event>[\w\s]+)/registrant/(?P<registrant_id>[\w\s]+)/pay'
     NO_CACHE = True
@@ -41,7 +41,8 @@ class SetPayedHook(EventBaseHook):
 
     def _getParams(self):
         super(SetPayedHook, self)._getParams()
-        self._isPayed = get_query_parameter(self._queryParams, ["is_paid"]) == "yes"
+        self.auth_key = get_query_parameter(self._queryParams, ["auth_key"])
+        self.is_paid = get_query_parameter(self._queryParams, ["is_paid"]) == "yes"
         registrant_id = self._pathParams["registrant_id"]
         self._conf = ConferenceHolder().getById(self._pathParams['event'])
         self._registrant = self._conf.getRegistrantById(registrant_id)
@@ -50,10 +51,11 @@ class SetPayedHook(EventBaseHook):
             raise HTTPAPIError('E-payment is not enabled')
 
     def _hasAccess(self, aw):
-        return (self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw))
+        return (self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)) \
+            and self.auth_key == self._registrant.getRandomId()
 
     def api_pay(self, aw):
-        if self._isPayed:
+        if self.is_paid:
             self._registrant.setPayed(True)
             data = {}
             data["OrderTotal"] = self._registrant.getTotal()
@@ -107,7 +109,7 @@ class RegistrantHook(EventBaseHook):
 
     def _getParams(self):
         super(RegistrantHook, self)._getParams()
-        self._secret = get_query_parameter(self._queryParams, ["auth_key"])
+        self.auth_key = get_query_parameter(self._queryParams, ["auth_key"])
         self._conf = ConferenceHolder().getById(self._pathParams['event'])
         registrant_id = self._pathParams["registrant_id"]
         self._registrant = self._conf.getRegistrantById(registrant_id)
@@ -115,7 +117,7 @@ class RegistrantHook(EventBaseHook):
 
     def _hasAccess(self, aw):
         return (self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)) \
-            #and self._secret == self._registrant.getCheckInUUID()
+            and self.auth_key == self._registrant.getRandomId()
 
     def export_registrant(self, aw):
         expInt = RegistrantFetcher(aw, self)
