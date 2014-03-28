@@ -43,6 +43,14 @@ def safe_upper(string):
         return string.decode('utf-8').upper().encode('utf-8')
 
 
+def safe_slice(string, start, stop=None):
+    slice_ = slice(start, stop)
+    if isinstance(string, unicode):
+        return string[slice_]
+    else:
+        return string.decode('utf-8')[slice_].encode('utf-8')
+
+
 def remove_accents(text, reencode=True):
     if not isinstance(text, unicode):
         text = text.decode('utf-8')

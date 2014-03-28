@@ -43,7 +43,7 @@ from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from indico.util.i18n import L_
-from indico.util.string import safe_upper
+from indico.util.string import safe_upper, safe_slice
 from MaKaC.review import AbstractFieldContent
 
 
@@ -1782,16 +1782,16 @@ class ConferenceParticipation(Persistent, Fossilizable, Observable):
         if self.getFirstName():
             if res:
                 res = "%s, " % res
-            res = "%s%s." % (res, safe_upper(self.getFirstName()[0]))
+            res = "%s%s." % (res, safe_upper(safe_slice(self.getFirstName(), 0, 1)))
         return res
 
+    @staticmethod
     def _cmpFamilyName( cp1, cp2 ):
         o1 = "%s %s"%(cp1.getFamilyName(), cp1.getFirstName())
         o2 = "%s %s"%(cp2.getFamilyName(), cp2.getFirstName())
         o1=o1.lower().strip()
         o2=o2.lower().strip()
         return cmp( o1, o2 )
-    _cmpFamilyName=staticmethod(_cmpFamilyName)
 
 
 class ConferenceChair(ConferenceParticipation, Fossilizable):

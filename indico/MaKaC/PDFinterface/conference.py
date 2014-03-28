@@ -67,7 +67,7 @@ import re
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat, ngettext
 from indico.util.date_time import format_date
-from indico.util.string import safe_upper
+from indico.util.string import safe_upper, safe_slice
 from indico.util import json
 from MaKaC.common.Configuration import Config
 
@@ -1579,12 +1579,13 @@ class ProceedingsTOC(PDFBase):
     def _getAbrName(self, author):
         res = author.getFamilyName()
         if res.strip() and len(res) > 1:
-            res = "%s%s" % (safe_upper(res[0]), res[1:].lower())
+            uniname = res.decode('utf-8')
+            res = (uniname[0].upper() + uniname[1:].lower()).encode('utf-8')
         if author.getFirstName():
             if not res:
                 res = author.getFirstName()
             else:
-                res = "%s. %s" % (safe_upper(author.getFirstName()[0]), res)
+                res = "%s. %s" % (safe_upper(safe_slice(author.getFirstName(), 0, 1)), res)
         return res
 
 class ProceedingsChapterSeparator(PDFBase):

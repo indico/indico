@@ -19,8 +19,8 @@
 
 from copy import copy
 from pytz import timezone
+from indico.util.string import safe_upper, safe_slice
 from indico.util.i18n import i18nformat
-from indico.util.string import safe_upper
 import ZODB
 from persistent import Persistent
 from persistent.list import PersistentList
@@ -292,7 +292,7 @@ class AbstractParticipation(Persistent):
             if not name.strip():
                 continue
             name = name.strip()
-            tmp.append("%s%s" % (safe_upper(name[0]), name[1:]))
+            tmp.append(safe_upper(safe_slice(name, 0, 1)) + safe_slice(name, 1))
         firstName = " ".join(tmp)
         if firstName:
             res = "%s, %s" % (res, firstName)
@@ -311,7 +311,7 @@ class AbstractParticipation(Persistent):
         if self.getFirstName():
             if res:
                 res = "%s, " % res
-            res = "%s%s." % (res, safe_upper(self.getFirstName()[0]))
+            res = "%s%s." % (res, safe_upper(safe_slice(self.getFirstName(), 0, 1)))
         return res
 
     def getAbstract(self):

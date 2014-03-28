@@ -47,7 +47,7 @@ from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import avatar_links, suggestions
-from indico.util.string import safe_upper
+from indico.util.string import safe_upper, safe_slice
 from flask import request
 
 """Contains the classes that implement the user management subsystem
@@ -678,13 +678,13 @@ class Avatar(Persistent, Fossilizable):
         if self.getName():
             if res:
                 res = "%s, " % res
-            res = "%s%s." % (res, safe_upper(self.getName()[0]))
+            res = "%s%s." % (res, safe_upper(safe_slice(self.getName(), 0, 1)))
         return res
 
     def getStraightAbrName(self):
         name = ""
         if self.getName():
-            name = "%s. " % safe_upper(self.getName()[0])
+            name = "%s. " % safe_upper(safe_slice(self.getName(), 0, 1))
         return "%s%s" % (name, self.getSurName())
 
     def addOrganisation(self, newOrg, reindex=False):
