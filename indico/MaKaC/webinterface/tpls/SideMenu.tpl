@@ -1,4 +1,7 @@
-<% somethingVisible = False %>
+<%
+    import re
+    somethingVisible = False
+%>
 
 <div class="sideBar sideMenu ${"managementSideMenu" if sideMenuType != "basic" else ""}">
     % if sideMenuType != "basic":
@@ -32,7 +35,7 @@
                                 <% liClass = "sideMenu_disabled " + item.getErrorMessage() %>
                             % endif
 
-                            <li id="sideMenu_${ item.getTitle().replace(' ','')} " class="${ liClass }">
+                            <li id="sideMenu_${ re.sub(r'[^a-zA-Z]', '', item.getTitle())} " class="${ liClass }">
                                 % if item.isEnabled():
                                     <a href="${ item.getURL() }">
                                         ${ item.getTitle() }

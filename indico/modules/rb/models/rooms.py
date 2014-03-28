@@ -81,6 +81,9 @@ from indico.util.i18n import _
 from .utils import Serializer
 
 
+_cache = GenericCache('Rooms')
+
+
 class RoomKind(object):
     BASIC, MODERATED, PRIVATE = 'basicRoom', 'moderatedRoom', 'privateRoom'
 
@@ -392,11 +395,6 @@ notificationAssistance: {notification_for_assistance}
 
         return ', '.join(infos)
 
-    @property
-    def guid(self):
-        # TODO just do it
-        return 'SHOULD BE REMOVED'
-
     def getEquipmentByName(self, equipment_name):
         return self.equipments.\
             filter_by(name=func.lower(equipment_name)).\
@@ -515,10 +513,12 @@ notificationAssistance: {notification_for_assistance}
     @staticmethod
     def getRoomsWithData(*args, **kwargs):
         from .locations import Location
-
-        only_active = kwargs.get('only_active', True)
         query = Room.query
         entities = [Room]
+
+        only_active = kwargs.pop('only_active', True)
+        if kwargs:
+            raise ValueError('Unexpected kwargs: {}'.format(kwargs))
 
         if 'equipment' in args:
             entities.append(static_array.array_agg(RoomEquipment.name))
@@ -556,15 +556,14 @@ notificationAssistance: {notification_for_assistance}
 
     @staticmethod
     def getMaxCapacity():
-        cache = GenericCache('RoomsMaxCapacity')
         key = 'maxcapacity'
-        maxcapacity = cache.get(key)
-        if not maxcapacity:
+        maxcapacity = _cache.get(key)
+        if maxcapacity is None:
             records = Room.query.\
                 with_entities(func.max(Room.capacity).label('capacity')).\
                 all()
             maxcapacity = records[0].capacity
-            cache.set(key, maxcapacity, 300)
+            _cache.set(key, maxcapacity, 300)
         return maxcapacity
 
     @staticmethod
