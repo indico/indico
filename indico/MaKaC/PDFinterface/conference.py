@@ -2520,12 +2520,12 @@ class TicketToPDF(PDFBase):
 
         # Conference title
         height -= 1*cm
-        self._drawWrappedString(c, escape(self._conf.getTitle()),
-                                height=height, width=width, size=20,
-                                align="left", font='Times-Bold')
+        startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()),
+                                              height=height, width=width, size=20,
+                                              align="left", font='Times-Bold')
 
         # Conference start and end date
-        height -= 0.7*cm
+        height = startHeight - 0.7*cm
         self._drawWrappedString(c, "%s - %s" % (
             format_date(self._conf.getStartDate(), format='full'),
             format_date(self._conf.getEndDate(), format='full')),
@@ -2577,6 +2577,10 @@ class TicketToPDF(PDFBase):
         # Registrant info
         width += 0.5*cm
         height += 3*cm
+        self._drawWrappedString(c, escape("Id: {0}".format(self._registrant.getId())),
+                                height=height, width=width, size=15,
+                                align="left", font='Times-Roman')
+        height -= 0.5*cm
         self._drawWrappedString(c, escape(self._registrant.getFullName()),
                                 height=height, width=width, size=15,
                                 align="left", font='Times-Roman')
