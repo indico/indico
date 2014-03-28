@@ -90,7 +90,7 @@ class VidyoOperations(object):
             return VidyoError("userHasNoAccounts", "create")
 
         # We check the moderator PIN is a 3-10 digit number
-        if not moderatorPin.isdigit() or len(moderatorPin) < 3 or len(moderatorPin) > 10:
+        if moderatorPin and (not moderatorPin.isdigit() or len(moderatorPin) < 3 or len(moderatorPin) > 10):
             return VidyoError("PINLength", "create")
 
         roomCreated = False
@@ -200,7 +200,7 @@ class VidyoOperations(object):
                 raise CollaborationException(_("The moderator has no login information"))
 
         # We check the moderator PIN is a 3-10 digit number
-        if not moderatorPin.isdigit() or len(moderatorPin) < 3 or len(moderatorPin) > 10:
+        if moderatorPin and (not moderatorPin.isdigit() or len(moderatorPin) < 3 or len(moderatorPin) > 10):
             return VidyoError("PINLength", "modify")
 
         roomModified = False
