@@ -1,0 +1,165 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+.ui-datepicker {
+    @include border-all();
+    @include single-box-shadow();
+    background: white;
+    z-index: 2;
+
+    .ui-datepicker-header {
+        @include border-bottom();
+        @include border-radius(0);
+        background-color: $light-gray !important;
+        color: $dark-blue !important;
+        margin: -0.2em -0.2em 0;
+
+        .ui-datepicker-month,
+        .ui-datepicker-year {
+            width: 48%;
+            margin: 0 1px;
+        }
+
+        .ui-datepicker-prev,
+        .ui-datepicker-next {
+            @include transition;
+            @include transition-property(background, color);
+            border: none !important;
+            color: $gray;
+            margin-top: .1em;
+            text-align: center;
+            top: 1px !important;
+
+            &.ui-state-disabled {
+                background: none !important;
+            }
+
+            &:hover:not(.ui-state-disabled) {
+                color: white;
+                background: $blue;
+            }
+
+            &:before {
+                vertical-align: -30%;
+            }
+        }
+
+        .ui-datepicker-prev {
+            @include icon-before('icon-prev');
+            left: 3px !important;
+        }
+
+        .ui-datepicker-next {
+            @include icon-before('icon-next');
+            right: 3px !important;
+        }
+
+        .ui-icon {
+            display: none;
+        }
+    }
+
+    .ui-datepicker-calendar {
+        background: white;
+        padding: 0 .2em;
+        table-layout: fixed;
+
+        th {
+            cursor: default;
+        }
+
+        td {
+            padding: 0;
+
+            a, span {
+                @include single-transition(background);
+                border: 1px solid white;
+                text-align: center;
+            }
+        }
+
+        .ui-state-default {
+            background: $light-blue;
+        }
+
+        .ui-state-active {
+            background: $blue;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .ui-state-hover {
+            background: $blue;
+            color: white !important;
+        }
+    }
+
+    .ui-datepicker-buttonpane {
+        margin: 0;
+        padding: 0;
+
+        button.ui-datepicker-current {
+            @include transition;
+            @include transition-property(background, color);
+            background: $light-blue;
+            border: none !important;
+            float: right;
+            margin-bottom: .2em;
+            margin-right: 1px;
+            margin-top: .2em;
+            opacity: 1;
+            outline: none;
+
+            &:hover {
+                background: $blue;
+                color: white;
+            }
+        }
+    }
+}
+
+.ui-datepicker-trigger {
+    @include icon-before('icon-calendar');
+    background: transparent;
+    border: none;
+    color: $light-black;
+    cursor: pointer;
+    outline: none;
+    padding: 0;
+    position: relative;
+    right: 20px;
+    top: 2px;
+
+    &:hover:before {
+        color: $blue;
+    }
+
+    &:active:before {
+        color: $dark-blue;
+    }
+}
+
+input.hasDatepicker {
+    @include icon-before('icon-calendar');
+    cursor: pointer;
+    margin: 0 2px;
+    padding-right: 22px !important;
+}

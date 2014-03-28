@@ -241,9 +241,15 @@ a.weekday {
         right: 0.1em;
     }
 
-    .ui-datepicker-week-end,
-    .ui-datepicker-week-end .ui-state-default {
-        color: #881122 !important;
+    td.ui-datepicker-week-end {
+        a, span {
+            background: lighten($gray, $color-variation);
+
+            &.ui-state-hover,
+            &.ui-state-active {
+                background: $blue;
+            }
+        }
     }
 }
 
@@ -273,10 +279,6 @@ a.weekday {
     #sDatePlaceTitle,
     #eDatePlaceTitle {
         text-align: center;
-    }
-
-    .ui-datepicker-inline {
-        background-color: transparent;
     }
 }
 
