@@ -18,19 +18,64 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.conference import ConferenceHolder
+from MaKaC.epayment import TransactionPayLaterMod
 
-from indico.web.http_api.hooks.base import HTTPAPIHook
+from indico.core.fossils.registration import IRegFormRegistrantBasicFossil, IRegFormRegistrantFullFossil
+
+from indico.web.http_api.hooks.base import HTTPAPIHook, DataFetcher
 from indico.web.http_api.hooks.event import EventBaseHook
 from indico.web.http_api.util import get_query_parameter
+from indico.web.http_api.responses import HTTPAPIError
 
 from indico.util.date_time import format_datetime, format_date
+from indico.util.fossilize import fossilize
+
+
+@HTTPAPIHook.register
+class SetPayedHook(EventBaseHook):
+    PREFIX = "api"
+    RE = r'(?P<event>[\w\s]+)/registrant/(?P<registrant_id>[\w\s]+)/pay'
+    NO_CACHE = True
+    COMMIT = True
+    HTTP_POST = True
+
+    def _getParams(self):
+        super(SetPayedHook, self)._getParams()
+        self._isPayed = get_query_parameter(self._queryParams, ["is_paid"]) == "yes"
+        registrant_id = self._pathParams["registrant_id"]
+        self._conf = ConferenceHolder().getById(self._pathParams['event'])
+        self._registrant = self._conf.getRegistrantById(registrant_id)
+        self._type = "pay"
+        if not self._conf.getModPay().isActivated():
+            raise HTTPAPIError('E-payment is not enabled')
+
+    def _hasAccess(self, aw):
+        return (self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw))
+
+    def api_pay(self, aw):
+        if self._isPayed:
+            self._registrant.setPayed(True)
+            data = {}
+            data["OrderTotal"] = self._registrant.getTotal()
+            data["Currency"] = self._registrant.getRegistrationForm().getCurrency()
+            transaction = TransactionPayLaterMod(data)
+            self._registrant.setTransactionInfo(transaction)
+        else:
+            self._registrant.setTransactionInfo(None)
+            self._registrant.setPayed(False)
+        return {
+            "paid": self._registrant.getPayed(),
+            "pay_amount": self._registrant.getTotal()
+        }
 
 
 @HTTPAPIHook.register
 class CheckInHook(EventBaseHook):
+    PREFIX = "api"
     RE = r'(?P<event>[\w\s]+)/registrant/(?P<registrant_id>[\w\s]+)/checkin'
     NO_CACHE = True
     COMMIT = True
+    HTTP_POST = True
 
     def _getParams(self):
         super(CheckInHook, self)._getParams()
@@ -45,7 +90,7 @@ class CheckInHook(EventBaseHook):
         return (self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)) \
             and self._secret == self._registrant.getCheckInUUID()
 
-    def export_checkin(self, aw):
+    def api_checkin(self, aw):
         self._registrant.setCheckedIn(self._check_in)
         checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate(), format="short")
         return {
@@ -53,14 +98,16 @@ class CheckInHook(EventBaseHook):
             "checkin_date": checkin_date if self._check_in else None
         }
 
+
 @HTTPAPIHook.register
 class RegistrantHook(EventBaseHook):
     RE = r'(?P<event>[\w\s]+)/registrant/(?P<registrant_id>[\w\s]+)'
     NO_CACHE = True
+    DEFAULT_DETAIL = 'basic'
 
     def _getParams(self):
         super(RegistrantHook, self)._getParams()
-        self._secret = get_query_parameter(self._queryParams, ["secret"])
+        self._secret = get_query_parameter(self._queryParams, ["auth_key"])
         self._conf = ConferenceHolder().getById(self._pathParams['event'])
         registrant_id = self._pathParams["registrant_id"]
         self._registrant = self._conf.getRegistrantById(registrant_id)
@@ -68,25 +115,39 @@ class RegistrantHook(EventBaseHook):
 
     def _hasAccess(self, aw):
         return (self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)) \
-            and self._secret == self._registrant.getCheckInUUID()
+            #and self._secret == self._registrant.getCheckInUUID()
 
     def export_registrant(self, aw):
-        registration_date = format_datetime(self._registrant.getAdjustedRegistrationDate(), format="short")
-        checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate(), format="short")
-        self._registrant.getPayed()
-        result = {
-            "registrant_id": self._registrant.getId(),
-            "full_name": self._registrant.getFullName(title=True, firstNameFirst=True),
-            "checked_in": self._registrant.isCheckedIn(),
-            "checkin_date": checkin_date if self._registrant.isCheckedIn() else None,
-            "registration_date": registration_date,
-            "payed": self._registrant.getPayed() if self._conf.getModPay().isActivated() else None,
-            "pay_amount": self._registrant.getTotal() if self._conf.getModPay().isActivated() else None
-        }
-        regForm = self._conf.getRegistrationForm()
-        personalData = regForm.getPersonalData().getRegistrantValues(self._registrant)
-        result.update(personalData)
+        expInt = RegistrantFetcher(aw, self)
+        return expInt.registrant()
+
+
+class RegistrantFetcher(DataFetcher):
+    DETAIL_INTERFACES = {
+        'basic': IRegFormRegistrantBasicFossil,
+        'full': IRegFormRegistrantFullFossil
+    }
+
+    def __init__(self, aw, hook):
+        super(RegistrantFetcher, self).__init__(aw, hook)
+        self._registrant = hook._registrant
+        self._conf = hook._conf
+        self._detail = hook._detail
+
+    def _makeFossil(self):
+        iface = self.DETAIL_INTERFACES.get(self._detail)
+        if iface is None:
+            raise HTTPAPIError('Invalid detail level: %s' % self._detail, 400)
+
+        return fossilize(self._registrant, iface)
+
+    def registrant(self):
+        result = self._makeFossil()
+        if self._detail == 'basic':
+            regForm = self._conf.getRegistrationForm()
+            result["personal_data"] = regForm.getPersonalData().getRegistrantValues(self._registrant)
         return result
+
 
 @HTTPAPIHook.register
 class RegistrantsHook(EventBaseHook):
@@ -110,9 +171,10 @@ class RegistrantsHook(EventBaseHook):
                 "registrant_id": registrant.getId(),
                 "checked_in": registrant.isCheckedIn(),
                 "full_name": registrant.getFullName(title=True, firstNameFirst=True),
-                "secret": registrant.getCheckInUUID(),
+                "checkin_secret": registrant.getCheckInUUID(),
+                "auth_key": registrant.getRandomId(),
             }
             regForm = self._conf.getRegistrationForm()
-            reg.update(regForm.getPersonalData().getRegistrantValues(registrant))
+            reg["personal_data"] = regForm.getPersonalData().getRegistrantValues(registrant)
             registrant_list.append(reg)
         return {"registrants": registrant_list}

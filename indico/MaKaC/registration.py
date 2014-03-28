@@ -60,7 +60,7 @@ from indico.core.fossils.registration import IRegFormTextInputFieldFossil, IRegF
     IRegFormFurtherInformationSectionFossil, IRegFormAccommodationTypeItemFossil, IRegFormAccommodationSectionFossil, \
     IRegFormReasonParticipationSectionFossil, IRegFormRegistrationSessionItemFossil, IRegFormSessionSectionFossil, \
     IRegFormSocialEventItemFossil, IRegFormSocialEventSectionFossil, IRegFormRegistrantFossil, \
-    IRegFormSocialEventFossil, IRegFormMiscellaneousInfoGroupFossil
+    IRegFormRegistrantBasicFossil, IRegFormRegistrantFullFossil, IRegFormSocialEventFossil, IRegFormMiscellaneousInfoGroupFossil
 
 PRICE_PATTERN = re.compile(r'^(\d+(?:[\.,]\d+)?)$')
 
@@ -4730,7 +4730,7 @@ class Status(Persistent):
 
 class Registrant(Persistent, Fossilizable):
 
-    fossilizes(IRegFormRegistrantFossil)
+    fossilizes(IRegFormRegistrantFossil, IRegFormRegistrantBasicFossil, IRegFormRegistrantFullFossil)
 
     def __init__(self):
         self._conf = None
