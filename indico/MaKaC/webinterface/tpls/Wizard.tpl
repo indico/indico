@@ -9,8 +9,8 @@
 
 <form id="wizard-form" action="" method="POST">
 
-    <div class="container" style="width: 100%; margin: 50px auto; max-width: 650px">
-        <div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt; white-space: nowrap;">
+    <div class="i-box-container" style="width: 100%; margin: 50px auto; max-width: 650px">
+        <div class="groupTitle">
                 ${ _("Admin Creation Wizard")}
         </div>
         <div class="i-box-group vert glued">
@@ -214,11 +214,11 @@
     $('#nextStep1').on('click', function(e){
         clicked[0] = true;
         var name = $('#name'),
-                surName = $('#surName'),
-                userEmail = $('#userEmail'),
-                login = $('#login'),
-                password = $('#password'),
-                passwordBis = $('#passwordBis');
+            surName = $('#surName'),
+            userEmail = $('#userEmail'),
+            login = $('#login'),
+            password = $('#password'),
+            passwordBis = $('#passwordBis');
 
         var wrong = [];
         if (name.prop('validity').valueMissing){
@@ -275,7 +275,7 @@
         e.preventDefault();
         clicked[2] = true;
         var enable = $('#enable'),
-                itEmail = $('#itEmail');
+            itEmail = $('#itEmail');
 
         var wrong = [];
         if (enable.prop('checked') && !itEmail.prop('validity').valid){
@@ -374,9 +374,11 @@
 
     $.each(LANGUAGES, function(i, lang) {
         var lang_code = lang[0].split('_')[0];
-        $("#lang").append('<option value="' + lang[0] + '"' + \
-                                            (lang_code == nav_lang ? "selected" : "") + \
-                                            '>' + lang[1] + '</option>');
+        $('<option>', {
+            value: lang[0],
+            selected: lang_code == nav_lang,
+            text: lang[1]
+        }).appendTo('#lang');
     });
 
     toggleSection(2);

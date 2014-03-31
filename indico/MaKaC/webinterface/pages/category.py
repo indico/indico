@@ -987,7 +987,7 @@ class WCategoryStatistics(wcomponents.WTemplated):
                 stats.append(i18nformat("""<h2> _("No statistics for the contributions").</h2>"""))
                 stats.append(i18nformat("<strong>{}</strong>".format(_("No statistics for attached files"))))
             if self.__target.isRoot():
-                if self._stats.get("users", ""):
+                if "users" in self._stats:
                     stats.append(i18nformat("""<h2> _("Number of users"): <b>{0}</b></h2>""")
                                  .format(self._stats["users"]))
                 else:

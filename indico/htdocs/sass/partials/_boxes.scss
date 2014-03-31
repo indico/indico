@@ -295,3 +295,14 @@
         }
     }
 }
+
+.i-box-container{
+    @extend %container;
+    .groupTitle{
+        margin-bottom: 30px;
+        font-size: 25pt;
+        white-space: nowrap;
+    }
+}
+
+

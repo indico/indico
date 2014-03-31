@@ -26,7 +26,6 @@ import MaKaC.user as user
 from MaKaC.authentication import AuthenticatorMgr
 import MaKaC.webinterface.pages.signIn as signIn
 from MaKaC.accessControl import AdminList
-
 from flask import request
 
 
