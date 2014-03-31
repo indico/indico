@@ -18,9 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.db import DBMgr
-
 from indico.util.date_time import nowutc
-
 from MaKaC.user import AvatarHolder
 
 

@@ -178,6 +178,7 @@ indico_jquery = Bundle(
                'fieldarea.js',
                'multiselect.js',
                'realtimefilter.js',
+               'plot.js',
                'scrollblocker.js'),
     filters='rjsmin', output='js/indico_jquery_%(version)s.min.js')
 
