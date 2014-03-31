@@ -8,11 +8,6 @@
     function initWidgets() {
         var s = $('#start_date'), e = $('#end_date');
         $('#start_date, #end_date').datepicker({
-            showOn: 'both',
-            buttonImage: imageSrc('calendarWidget'),
-            buttonImageOnly: true,
-            buttonText: "${ _('Choose Date') }",
-            dateFormat: 'dd-mm-yy',
             onSelect: function() {
                 adjustDates(s, e);
                 $('searchForm').trigger('change');

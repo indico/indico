@@ -148,14 +148,10 @@
 
             // Calendars init
             $("#sDatePlace, #eDatePlace").datepicker({
-                defaultDate: null,
                 minDate: 0,
-                firstDay: 1,
                 showButtonPanel: true,
                 changeMonth: true,
                 changeYear: true,
-                numberOfMonths: 1,
-                defaultDate: +0,
                 onSelect: function(selectedDate) {
                     if ($('#sDatePlace').datepicker('getDate') > $('#eDatePlace').datepicker('getDate')) {
                         $('#eDatePlace').datepicker('setDate', $('#sDatePlace').datepicker('getDate'));

@@ -93,8 +93,8 @@
         }
     });
 
-    $('#startDatePlace').datepicker({ dateFormat: "dd/mm/yy", firstDay: 1, defaultDate:"${startDate}"});
-    $('#endDatePlace').datepicker({ dateFormat: "dd/mm/yy",  firstDay: 1, defaultDate:"${endDate}"  });
+    $('#startDatePlace').datepicker({defaultDate: '${ startDate }'});
+    $('#endDatePlace').datepicker({defaultDate: '${ endDate }'});
 </script>
 
 <%block name ="scripts">

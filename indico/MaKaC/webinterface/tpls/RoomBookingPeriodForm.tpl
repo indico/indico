@@ -41,13 +41,10 @@
 
             // Calendars init
             $("#sDatePlace, #eDatePlace").datepicker({
-                defaultDate: null,
                 minDate: 0,
-                firstDay: 1,
                 showButtonPanel: true,
                 changeMonth: true,
                 changeYear: true,
-                numberOfMonths: 1,
                 onSelect: function( selectedDate ) {
                     refreshDates();
                     forms_are_valid();

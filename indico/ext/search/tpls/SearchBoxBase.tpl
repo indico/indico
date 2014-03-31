@@ -105,8 +105,8 @@ var intelligentSearchBox = new IntelligentSearchBox({name: 'p', id: 'searchText'
 
 
 $(function() {
-    $('#startDate').datepicker({ dateFormat: "dd/mm/yy", firstDay:1 });
-    $('#endDate').datepicker({ dateFormat: "dd/mm/yy", firstDay:1 });
+    $('#startDate').datepicker();
+    $('#endDate').datepicker();
 
     $E('searchText').replaceWith(
         intelligentSearchBox.draw()
