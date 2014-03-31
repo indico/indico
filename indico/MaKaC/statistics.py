@@ -15,11 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.db import DBMgr
-
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.util.date_time import nowutc
-
 from MaKaC.user import AvatarHolder
 
 

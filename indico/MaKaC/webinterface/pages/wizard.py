@@ -55,7 +55,7 @@ class WPWizard(main.WPMainBase):
         main.WPMainBase.__init__(self, rh)
 
     def _getTitle(self):
-        return main.WPMainBase._getTitle(self) + " - " + _("Admin Creation Wizard")
+        return "{} - {}".format(main.WPMainBase._getTitle(self), _("Admin Creation Wizard"))
 
     def _getBody(self, params):
         wc = WWizard(self._params)

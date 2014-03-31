@@ -16,8 +16,6 @@
         <div style="text-align:left;">
             ${ contents }
         </div>
-        <br>
-        <br>
-        <div class="footer right"> ${ _("Updated") } ${ updated }</div>
+        <div class="footer right" style="margin-top: 2em;"> ${ _("Updated") } ${ updated }</div>
     </div>
 </div>
