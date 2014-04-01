@@ -118,8 +118,10 @@ body, html {
 }
 
 br,dl,h1,h2,h3,h4,h5,h6,td,blockquote,ol {
-   font-size: 13px;
    color: #444444;
+}
+br,dl,td,blockquote,ol {
+   font-size: 13px;
 }
 
 form {

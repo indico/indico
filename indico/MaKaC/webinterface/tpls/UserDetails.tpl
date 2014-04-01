@@ -11,7 +11,7 @@
     <tr>
         <td colspan="2">
             <div class="groupTitle">${ _("Details for") } <span id="titleHeader">${ title }</span>
-                <span id="surNameHeader">${ surName.upper() },</span>
+                <span id="surNameHeader">${ safe_upper(surName) },</span>
                 <span id="firstNameHeader">${ name }</span>
             </div>
         </td>

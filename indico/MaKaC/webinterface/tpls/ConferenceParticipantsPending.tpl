@@ -151,7 +151,7 @@ IndicoUI.executeOnLoad(function(){
                         'your request to attend the \'{confTitle}\' has been declined by the event manager.<br/>';
             var legends = {'confTitle':$T('field containing the conference title.'),
                            'name':$T('field containing the full name of the participant.')};
-            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()}, 'event.participation.rejectPendingWithEmail', participantsChecked, '${currentUser.getStraightFullName()}' ,subject, body, legends, pendingHandler);
+            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"), ${conf.getTitle() | n,j}, ${conf.getId() | n,j}, 'event.participation.rejectPendingWithEmail', participantsChecked, '${currentUser.getStraightFullName()}' ,subject, body, legends, pendingHandler);
             popup.open();
         }
         return false;

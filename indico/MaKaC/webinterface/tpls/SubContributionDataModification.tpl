@@ -7,7 +7,7 @@
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Title")}</span></td>
-            <td bgcolor="white" width="100%"><input type="text" name="title" size="80" value="${ title }"></td>
+            <td bgcolor="white" width="100%"><input type="text" name="title" size="80" value="${ title | n,h}"></td>
         </tr>
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Description")}</span></td>

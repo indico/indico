@@ -38,6 +38,7 @@ from indico.util.date_time import format_number
 from indico.util.i18n import ngettext
 from indico.util.contextManager import ContextManager
 from indico.util.mdx_latex import latex_escape
+from indico.util.string import safe_upper
 from indico.web.flask.util import url_for, url_rule_to_js
 
 
@@ -411,6 +412,7 @@ def registerHelpers(objDict):
         objDict['N_'] = ngettext
     if not 'format_number' in objDict:
         objDict['format_number'] = format_number
+    objDict.setdefault('safe_upper', safe_upper)
     # flask proxies
     objDict['_session'] = session
     objDict['_request'] = request

@@ -16,7 +16,7 @@ ${_(" Please be aware that if you modify any sensitive data such as the room nam
             <span>${_("Description")}</span>
         </td>
         <td>
-            <textarea rows="3" cols="55" name="roomDescription">${ EventDescription }</textarea>
+            <textarea rows="3" cols="55" id="roomDescription" name="roomDescription">${ EventDescription }</textarea>
         </td>
     </tr>
 

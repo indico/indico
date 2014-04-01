@@ -57,6 +57,8 @@
 </div>
 % endif
 
+
+% if IsLecture or NTalks > 0:
 <div id="RRForm">
 
     % if IsSingleBooking:
@@ -79,12 +81,19 @@
     <div>
             <span style="color:#881122">${_("The recordings will not be published before all speakers have signed the %s (see Electronic Agreement tab)")%agreementName}</span>
     </div>
+% endif
 
-
+% if not IsLecture and NTalks == 0:
+    <div class="warning-message-box">
+        <div class="message-text">
+            ${_("Only the contributions can be recorded and there is no contribution in this event. Please go to Timetable and start adding them")}
+        </div>
+    </div>
+% endif
 
     <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
         <!-- WHICH CONTRIBUTIONS SHOULD BE RECORDED -->
-    % if not IsLecture:
+    % if not IsLecture and NTalks > 0:
     <div class="RRFormSection">
         <div class="RRFormSubsection">
             <span class="RRQuestion">${ _('Which talks would you like to have recorded?') }</span>
@@ -168,6 +177,8 @@
     </div>
     % endif
 
+% if IsLecture or NTalks > 0:
+
     <!-- DRAW BOX AROUND SECTION 2: TECHNICAL DETAILS FOR RECORDING -->
     <div class="RRFormSection">
 
@@ -226,6 +237,7 @@
         </div>
     </div>
     % endif
+% endif
 </div>
 <script type="text/javascript">
     var isLecture = ${ jsBoolean(IsLecture) };

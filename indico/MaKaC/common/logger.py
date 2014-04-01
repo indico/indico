@@ -23,13 +23,14 @@ import logging
 import logging.handlers
 import logging.config
 import ConfigParser
-from flask import request
+from flask import request, session
+from ZODB.POSException import POSError
 
 from indico.core.config import Config
 from MaKaC.common.contextManager import ContextManager
 
 
-class AddIPFilter(logging.Filter):
+class AddIDFilter(logging.Filter):
     def filter(self, record):
         if not logging.Filter.filter(self, record):
             return False
@@ -41,11 +42,11 @@ class AddIPFilter(logging.Filter):
         return True
 
 
-class ExtraIndicoFilter(AddIPFilter):
+class ExtraIndicoFilter(AddIDFilter):
     def filter(self, record):
         if record.name.split('.')[0] == 'indico':
             return False
-        return AddIPFilter.filter(self, record)
+        return AddIDFilter.filter(self, record)
 
 
 class IndicoMailFormatter(logging.Formatter):
@@ -64,12 +65,17 @@ class IndicoMailFormatter(logging.Formatter):
             info.append('Method: %s' % request.method)
             if rh:
                 info.append('Params: %s' % rh._getTruncatedParams())
+            try:
+                info.append('User: %r' % session.user)
+            except POSError:
+                # If the DB connection is closed getting the avatar may fail
+                info.append('User id: %s' % session.get('_avatarId'))
             info.append('IP: %s' % request.remote_addr)
             info.append('User Agent: %s' % request.user_agent)
             info.append('Referer: %s' % (request.referrer or 'n/a'))
         except RuntimeError, e:
             info.append('Not available: %s' % e)
-        return '\n\n%s' % '\n'.join(info)
+        return '\n\n%s' % '\n'.join(x.encode('utf-8') if isinstance(x, unicode) else x for x in info)
 
 
 class LoggerUtils:
@@ -199,9 +205,9 @@ class Logger:
     @classmethod
     def initialize(cls):
         # Lists of filters for each handler
-        filters = {'indico': [AddIPFilter('indico')],
+        filters = {'indico': [AddIDFilter('indico')],
                    'other': [ExtraIndicoFilter()],
-                   'smtp': [AddIPFilter('indico')]}
+                   'smtp': [AddIDFilter('indico')]}
 
         config = Config.getInstance()
 

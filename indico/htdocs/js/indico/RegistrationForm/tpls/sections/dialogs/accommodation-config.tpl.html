@@ -1,4 +1,4 @@
-<form>
+<ng-form name="nestedForm">
     <table class="regFormDialogEditDatesOffset">
         <tr class="regFormDialogCaptionLine">
             <td colspan="4">
@@ -13,6 +13,7 @@
                 <input type="number"
                     ng-model="formData.arrivalOffsetDates[0]"
                     ng-change="config.updateArrivalDates(formData.arrivalOffsetDates)"
+                    ng-class="{hasError: validationStarted && nestedForm.aoffset1.$invalid}"
                     name="aoffset1"
                     min="0"
                     size="2"/>
@@ -28,6 +29,7 @@
                 <input type="number"
                     ng-model="formData.arrivalOffsetDates[1]"
                     ng-change="config.updateArrivalDates(formData.arrivalOffsetDates)"
+                    ng-class="{hasError: validationStarted && nestedForm.aoffset2.$invalid}"
                     name="aoffset2"
                     min="0"
                     size="2"/>
@@ -51,6 +53,7 @@
                 <input type="number"
                     ng-model="formData.departureOffsetDates[0]"
                     ng-change="config.updateDepartureDates(formData.departureOffsetDates)"
+                    ng-class="{hasError: validationStarted && nestedForm.doffset1.$invalid}"
                     name="doffset1"
                     min="0"
                     size="2"/>
@@ -66,6 +69,7 @@
                 <input type="number"
                     ng-model="formData.departureOffsetDates[1]"
                     ng-change="config.updateDepartureDates(formData.departureOffsetDates)"
+                    ng-class="{hasError: validationStarted && nestedForm.doffset2.$invalid}"
                     name="doffset2"
                     min="0"
                     size="2"/>
@@ -76,4 +80,4 @@
             </td>
         </tr>
     </table>
-</form>
+</ng-form>

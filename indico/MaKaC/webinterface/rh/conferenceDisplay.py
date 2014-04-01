@@ -468,7 +468,7 @@ class RHConferenceOtherViews( RoomBookingDBMixin, RHConferenceBaseDisplay ):
         return p.display()
 
 
-class RHConferenceGetLogo(RHConferenceBaseDisplay):
+class RHConferenceGetLogo(RHConferenceBase):
 
     def _process(self):
         logo = self._target.getLogo()
@@ -477,7 +477,7 @@ class RHConferenceGetLogo(RHConferenceBaseDisplay):
         return send_file(logo.getFileName(), logo.getFilePath(), logo.getFileType(), no_cache=False, conditional=True)
 
 
-class RHConferenceGetCSS(RHConferenceBaseDisplay):
+class RHConferenceGetCSS(RHConferenceBase):
 
     """
     CSS which is used just for a conference.

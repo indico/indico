@@ -126,7 +126,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                     // setup Html.div() args with all file upload fields etc.
                     var args = [{}];
                     for(var i = 0; i < files.length; i++) {
-                        args.push(self.pm.add(files[i], 'text'));
+                        args.push(self.pm.add(files[i], 'text', i > 0));
                         if(i == 0 && files.length < MAX_MATERIAL_FIELDS) {
                             args.push(addInputLink);
                         }
@@ -164,7 +164,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                         var divArgs = [
                             {},
                             Html.label('popUpLabel', $T("URL")),
-                            self.pm.add(urlBoxes[i], 'url')
+                            self.pm.add(urlBoxes[i], 'url', i > 0)
                         ];
                         if(i == 0 && urlBoxes.length < MAX_MATERIAL_FIELDS) {
                             divArgs.push(addInputLink);

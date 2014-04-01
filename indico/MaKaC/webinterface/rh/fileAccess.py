@@ -26,6 +26,7 @@ from MaKaC.webinterface.rh.base import RH, RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.pages import files
 from MaKaC.errors import NotFoundError, AccessError
+from MaKaC.registration import Registrant
 from MaKaC.conference import Reviewing, Link
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
 from MaKaC.i18n import _
@@ -51,6 +52,10 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
                 selfcopy._target.canUserSubmit(self.getAW().getUser()) or \
                 self._target.canModify( self.getAW() )):
                 raise AccessError()
+        elif isinstance(self._file.getOwner(), Registrant) and \
+             not self._file.getOwner().canUserModify(self.getAW().getUser()):
+            raise AccessError(_("The access to this resource is forbidden"))
+
         else:
             RHDisplayBaseProtected._checkProtection( self )
 

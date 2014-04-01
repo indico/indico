@@ -523,20 +523,19 @@ class LDAPConnector(object):
         Logger.get('auth.ldap').debug('userInGroup(%s,%s)' % (login, group))
         if not self.groupsEnabled:
             return False
+        userDN = self._findDNOfUser(login)
+        groupDN = self._findDNOfGroup(group)
+        if not userDN or not groupDN:
+            return False
         # In ActiveDirectory users have attribute 'tokenGroups' with list of groups Sids
         # In SLAPD groups have multivalues attribute 'member' with list of users
         if self.groupStyle == 'ActiveDirectory':
-            groupDN = self._findDNOfGroup(group)
-            if not groupDN:
-                return False
-            groupSid = self.l.search_s(groupDN, ldap.SCOPE_BASE,
-                                       attrlist=['objectSid'])[0][1]['objectSid'][0]
-            res = self.l.search_s(self._findDNOfUser(login), ldap.SCOPE_BASE,
-                                  attrlist=['tokenGroups'])[0][1].get("tokenGroups", [])
+            groupSid = self.l.search_s(groupDN, ldap.SCOPE_BASE, attrlist=['objectSid'])[0][1]['objectSid'][0]
+            res = self.l.search_s(userDN, ldap.SCOPE_BASE, attrlist=['tokenGroups'])[0][1].get("tokenGroups", [])
             return groupSid in res
         elif self.groupStyle == 'SLAPD':
-            query = 'member={0}'.format(self._findDNOfUser(login))
-            res = self.l.search_s(self._findDNOfGroup(group), ldap.SCOPE_BASE, query)
+            query = 'member={0}'.format(userDN)
+            res = self.l.search_s(groupDN, ldap.SCOPE_BASE, query)
             return res != []
         else:
             raise Exception("Unknown LDAP group style, choices are: SLAPD or ActiveDirectory")
@@ -578,17 +577,17 @@ class LDAPConnector(object):
          Finds uids of users in a group. Depends on groupStyle (SLAPD/ActiveDirectory)
         """
         Logger.get('auth.ldap').debug('findGroupMemberUids(%s)' % group)
+        groupDN = self._findDNOfGroup(group)
+        if not groupDN:
+            return []
         # In ActiveDirectory users have multivalued attribute 'memberof' with list of groups
         # In SLAPD groups have multivalues attribute 'member' with list of users
         if self.groupStyle == 'ActiveDirectory':
-            groupDN = self._findDNOfGroup(group)
-            if not groupDN:
-                return []
-            return self.nestedSearch(self._findDNOfGroup(group), {})
+            return self.nestedSearch(groupDN, {})
         elif self.groupStyle == 'SLAPD':
             #read member attibute values from the group object
             members = None
-            res = self.l.search_s(self._findDNOfGroup(group), ldap.SCOPE_BASE)
+            res = self.l.search_s(groupDN, ldap.SCOPE_BASE)
             for dn, data in res:
                 if dn:
                     members = data['member']

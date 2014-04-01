@@ -2,11 +2,13 @@
 
 <%
     from collections import defaultdict, OrderedDict
+    from itertools import takewhile
     _firstDay = (parseDate(firstDay, format="%d-%B-%Y") if firstDay else startDate).date()
     _lastDay = (parseDate(lastDay, format="%d-%B-%Y") if lastDay else endDate).date()
 
     firstWeekday = _request.args.get('firstWeekday', 'monday')  # monday/sunday/event
     sundayFirst = (firstWeekday == 'sunday')
+    showEndTimes = _request.args.get('showEndTimes') == '1'
 
 
     def _processEntry(entry):
@@ -103,13 +105,30 @@
                     % endif
                     <li>
                         <div class="row day-header">${prettyDate(day)}</div>
-                        % for startTime, slotEntries in dayEntries.iteritems():
+                        <%
+                            dayEntriesItems = dayEntries.items()
+                            hidePlaceholders = 0
+                        %>
+                        % for n, (startTime, slotEntries) in enumerate(dayEntriesItems):
                             % if slotEntries is None:
-                                <div class="row placeholder" data-slot="${startTime}"></div>
+                                <%
+                                    if hidePlaceholders:
+                                        hidePlaceholders -= 1
+                                        continue
+                                %>
+                                <div class="row placeholder ${'occupied' if lastEndTime and startTime < lastEndTime else ''}" data-slot="${startTime}"></div>
                             % else:
                                 % for i, (entryType, entry) in enumerate(slotEntries):
                                     <%
-                                        extraStyle = 'display: none; ' if i > 0 else ''
+                                        endTime = getTime(entry.getAdjustedEndDate(timezone))
+                                        height = 18
+                                        if i == 0:
+                                            adjacentPlaceholders = takewhile(lambda x: x[1] is None, iter(dayEntriesItems[n+1:]))
+                                            hidePlaceholders = sum(1 for x in adjacentPlaceholders if x[1] is None and x[0] < endTime)
+                                            height += (height + 1) * hidePlaceholders
+                                        extraStyles = ['height: {0}px'.format(height)]
+                                        if i > 0:
+                                            extraStyles.append('display: none')
                                         if entryType == 'contrib' and entry.getSession():
                                             sessionName = entry.getSession().getTitle()
                                             sessionColor = entry.getSession().getColor()
@@ -123,8 +142,13 @@
                                         if hasMulti:
                                             classes.append('has-multi')
                                     %>
-                                    <div class="${' '.join(classes)}" style="${extraStyle}" data-slot="${startTime}">
-                                        <span class="time">${startTime if i == 0 else ''}</span>
+                                    <div class="${' '.join(classes)}" style="${'; '.join(extraStyles)}" data-slot="${startTime}">
+                                        <span class="time">
+                                            ${startTime if i == 0 else ''}
+                                            % if hidePlaceholders and showEndTimes:
+                                                <span class="end-time">${endTime}</span>
+                                            % endif
+                                        </span>
                                         <span class="main">
                                             <span class="title">${entry.getTitle()}</span>
                                             % if entryType == 'contrib':
@@ -133,11 +157,21 @@
                                                 % endif
                                             % endif
                                         </span>
+                                        <div class="tooltip hidden">
+                                            <strong>${entry.getTitle()}</strong><br>
+                                            % if hasSession:
+                                                Session: ${sessionName}<br>
+                                            % endif
+                                            ${startTime} - ${endTime}<br>
+                                            % if entry.getRoom() and entry.getRoom().getName():
+                                                ${entry.getRoom().getName()}<br>
+                                            % endif
+                                        </div>
                                         % if hasSession:
-                                            <i class="icon-circle-small session-mark" title="Session: ${sessionName}" style="color: ${sessionColor};"></i>
+                                            <i class="icon-circle-small session-mark" title="Session: ${sessionName}" data-qtip-opts='{"show":{"solo":true}}' style="color: ${sessionColor};"></i>
                                         % endif
                                         % if hasMulti:
-                                            <i class="icon-expand more-contribs" title="There are ${len(slotEntries)-1} more contributions at this time. Click this icon to show them."></i>
+                                            <i class="icon-expand more-contribs" title="There are ${len(slotEntries)-1} more contributions at this time. Click this icon to show them." data-qtip-opts='{"show":{"solo":true}}'></i>
                                         % endif
                                     </div>
                                 % endfor
@@ -167,11 +201,21 @@
         }).height(sameSlotHeight);
     });
 
-    $('.week-timetable').on('mouseenter', '.row .main:not([title])', function() {
-        var $this = $(this);
-        if(this.scrollWidth > this.offsetWidth) {
-            // Setting a title will cause a qtip to be created
-            $this.attr('title', $this.text());
+    $('.week-timetable .row:has(.tooltip)').qtip({
+        content: {
+            text: function() {
+                return $('.tooltip', this).html();
+            }
+        },
+        show: {
+            solo: true
+        },
+        position: {
+            my: 'top center',
+            at: 'bottom center'
+        },
+        style: {
+            classes: 'informational'
         }
     });
 </script>

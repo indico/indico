@@ -31,9 +31,6 @@ class RoomCERN( Room ):
 
     vcList = ["Built-in (MCU) Bridge",
               "Vidyo",
-              "EVO",
-              "ESnet MCU",
-              "CERN MCU",
               "H323 point2point",
               "Audio Conference",
               "I don't know"]

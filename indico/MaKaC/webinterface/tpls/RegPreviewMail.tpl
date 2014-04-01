@@ -18,7 +18,7 @@
     </tr>
     <tr>
         <td style="color: #5294CC;border-bottom:1px solid #5294CC"> ${ _("Body")}&nbsp;&nbsp;&nbsp;</td>
-        <td width="100%" style="color:black"><pre>${ body }</pre></td>
+        <td width="100%" style="color:black"><pre>${ body | h }</pre></td>
     </tr>
 </table>
 <br>
@@ -41,5 +41,3 @@
             </td>
         </tr>
     </table>
-
-

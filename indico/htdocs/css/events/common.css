@@ -433,22 +433,6 @@ div.eventInfoBox {
 	padding: 10px;
 }
 
-h1 {
-	font-size: 20pt;
-	color: white;
-	font-weight: normal;
-	margin-top: 10px;
-	margin-bottom: 10px;
-}
-
-h2 {
-	font-size: 12pt;
-	color: white;
-	font-weight: normal;
-	font-style: italic;
-	margin-top: 5px;
-}
-
 div.meetingEventHeader {
     background: #1a64a0;
     color: white;
@@ -463,6 +447,11 @@ div.meetingEventHeader {
 
 div.meetingEventHeader h1 {
     text-shadow: 1px 1px 5px #000;
+    font-size: 20pt;
+    color: white;
+    font-weight: normal;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 div.meetingEventHeader a {
@@ -568,10 +557,6 @@ div.minutesTable > span {
     padding: 10px;
 }
 
-div.minutesTable > span h1 , h2{
-    font-size: 13px;
-    color: #444444;
-}
 
 li.meetingSession, li.meetingContrib, li.breakListItem {
     padding: 3px 0 3px 3px;

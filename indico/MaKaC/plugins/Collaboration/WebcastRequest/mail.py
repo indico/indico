@@ -22,6 +22,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.plugins.Collaboration.WebcastRequest.common import getCommonTalkInformation
 from indico.core.config import Config
+from indico.util.string import safe_upper
 
 
 class WebcastRequestNotificationBase(GenericNotification):
@@ -340,8 +341,8 @@ class RequestAcceptedNotificationAdmin(WebcastRequestAdminNotificationBase):
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
         userInfo = ""
-        if user :
-            userInfo = " by %s %s" %(user.getFirstName(), user.getFamilyName().upper())
+        if user:
+            userInfo = " by %s %s" % (user.getFirstName(), safe_upper(user.getFamilyName()))
         self.setBody("""Dear Webcast Manager,<br />
 <br />
 A webcast request for the event: "%s" has been accepted in <a href="%s">%s</a>""" %(self._conference.getTitle(),

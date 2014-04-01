@@ -378,8 +378,9 @@ class AccessController( Persistent, Observable ):
         return 0
 
     def getAnyContactInfo(self):
-        if not self.getContactInfo() and self.getOwner().getOwner():
-            return self.getOwner().getOwner().getAccessController().getAnyContactInfo()
+        parent = self.getOwner().getOwner()
+        if not self.getContactInfo() and parent and  hasattr(parent, 'getAccessController'):
+            return parent.getAccessController().getAnyContactInfo()
         else:
             return self.getContactInfo()
 

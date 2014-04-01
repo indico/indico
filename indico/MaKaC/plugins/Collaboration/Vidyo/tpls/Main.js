@@ -40,7 +40,13 @@
             }],
             'roomDescription' : ['text', false],
             'pin': ['non_negative_int', true],
-            'moderatorPin': ['non_negative_int', true],
+            'moderatorPin': ['non_negative_int', true, function(pin, values) {
+                var errors = [];
+                if (pin.length != 0 && (pin.length < 3 || pin.length > 10 )) {
+                    errors.push($T("The PIN for the vidyo room has to be a 3-10 digit number."));
+                }
+                return errors;
+            }],
             'videoLinkSession': ['text', true, function(option, values){
                 var errors = [];
                 if(self.vidyoComponents["link"].get()=="session" && ["","None"].indexOf(option)!=-1){
@@ -81,8 +87,13 @@
                 // the name is duplicated
                 var message = $T("There is already a Vidyo Room in the system with the same name. Please give a different name to the room.");
                 IndicoUtil.markInvalidField($E('roomName'), message);
-
             }
+
+            if (error.errorType === 'PINLength') {
+                var message = $T("The PIN for the vidyo room has to be a 3-10 digit number.");
+                IndicoUtil.markInvalidField($E('moderatorPin'), message);
+            }
+
             if (error.errorType === 'duplicatedWithOwner') {
                 var conferenceId = this.vidyoComponents.params.conference;
                 var handler = function(confirm) {
@@ -291,8 +302,8 @@
                 null, false,
                 false, false,
                 singleUserNothing, singleUserNothing),
-            pinField : new ShowablePasswordField('pin', '', false),
-            moderatorPinField : new ShowablePasswordField('moderatorPin', '', false),
+            pinField : new ShowablePasswordField('pin', '', false, 'pin'),
+            moderatorPinField : new ShowablePasswordField('moderatorPin', '', false, 'moderatorPin'),
             link : new RadioFieldWidget([
                  ['event', $T("Leave default Vidyo association")],
                  ['contribution', $T("Link to a contribution")],
