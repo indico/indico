@@ -192,26 +192,33 @@
 
     input[type=radio]:first-child,
     input[type=text]:first-child {
-        & + .i-button {
+        + .i-button {
             @include border-bottom-left-radius();
             @include border-top-left-radius();
         }
     }
 
-    & > .clearableinput {
+    > .clearableinput {
         float: left;
     }
 
-    & > input[type=text]:first-child,
-    & > .clearableinput:first-child input[type=text] {
+    > input[type=text]:first-child,
+    > .clearableinput:first-child input[type=text] {
         @include border-bottom-left-radius();
         @include border-top-left-radius();
     }
 
-    & > input[type=text]:last-child,
-    & > .clearableinput:last-child input[type=text] {
+    > input[type=text]:last-child,
+    > .clearableinput:last-child input[type=text] {
         @include border-bottom-right-radius();
         @include border-top-right-radius();
+    }
+
+    > input[type=text]:not(:last-child),
+    > .clearableinput:not(:last-child) input[type=text] {
+        & + .i-button {
+            border-left: none;
+        }
     }
 }
 
