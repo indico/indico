@@ -95,8 +95,9 @@ class CheckInHook(EventBaseHook):
     def api_checkin(self, aw):
         self._registrant.setCheckedIn(self._check_in)
         checkin_date = format_datetime(self._registrant.getAdjustedCheckInDate(), format="short")
+
         return {
-            "checkin_in": self._check_in,
+            "checked_in": self._check_in,
             "checkin_date": checkin_date if self._check_in else None
         }
 
