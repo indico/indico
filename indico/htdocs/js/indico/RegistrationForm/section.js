@@ -185,7 +185,29 @@ ndRegForm.directive('ndSection', function($rootScope, url) {
             });
 
             scope.dialogs.config.actions.onOk = function(dialogScope) {
+                if (dialogScope.sectionForm.$invalid === true) {
+                    // TODO Uncomment when AngularJS >= 1.2
+                    //      Current version doesn't generate ngForm names dynamicly
+                    // var forms = _.filter($.map(dialogScope.sectionForm, function(value, index) {
+                    //     return index;
+                    // }), function(index) {
+                    //     return index[0] != '$';
+                    // });
+
+                    // var firstInvalid = _.find(dialogScope.sectionForm, function(form) {
+                    //     return form.$invalid;
+                    // });
+
+                    // var invalid = _.find(forms, function(f) {
+                    //     return dialogScope.sectionForm[f].$invalid;
+                    // });
+
+                    // dialogScope.$apply(dialogScope.setSelectedTab(firstInvalid));
+                    return false;
+                }
+
                 scope.sectionApi.saveConfig(dialogScope.section, dialogScope.formData);
+                return true;
             };
 
             scope.dialogs.config.actions.onCancel = function(dialogScope) {
@@ -533,11 +555,6 @@ ndRegForm.directive("ndSocialEventSection", function() {
                 });
             };
 
-            scope.isAnyEventSelected = function() {
-                // This seems to be super ugly...
-                return !!$('input[name="socialEvents"]:checked').length;
-            };
-
             scope.getMaxRegistrations = function(item) {
                 if (item.placesLimit !== 0) {
                     return Math.min(item.maxPlace + 1, item.noPlacesLeft + scope.getNoPlaces(item, scope.userdata));
@@ -667,7 +684,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
                            className: 'accompanying-col',
                            width: 60,
                            editable: true,
-                           edittype: "text",
+                           edittype: "int",
                            editoptions: {size:"6", maxlength:"20"}
                         },
                         {

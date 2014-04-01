@@ -18,29 +18,23 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import os
 import urllib
 
 import zope.interface
 from persistent import Persistent
+from flask import render_template
 
 from MaKaC.user import Avatar
-from MaKaC.common import info
-from MaKaC import schedule
-from MaKaC.common.utils import getLocationInfo
-from MaKaC.common.TemplateExec import render
 
 from indico.util.fossilize import fossilizes, Fossilizable
-from indico.util.date_time import int_timestamp, format_date, format_time, format_datetime
+from indico.util.date_time import int_timestamp, format_datetime
 from indico.modules.scheduler.fossils import ITaskFossil
 from indico.modules.scheduler import base
 from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
 from indico.core.config import Config
 
 
-"""
-Defines base classes for tasks, and some specific tasks as well
-"""
+# Defines base classes for tasks, and some specific tasks as well
 
 
 class TimedEvent(Persistent, Fossilizable):
@@ -401,7 +395,7 @@ class AlarmTask(SendMailTask):
 
     def setUpSubject(self):
         startDateTime = format_datetime(self.conf.getAdjustedStartDate(), format="short")
-        self.setSubject( _("Event reminder: %s (%s %s)") % (self.conf.getTitle(), startDateTime, self.conf.getTimezone()))
+        self.setSubject(_("Event reminder: %s (%s %s)") % (self.conf.getTitle(), startDateTime, self.conf.getTimezone()))
 
     def addToUser(self, user):
         super(AlarmTask, self).addToUser(user)
@@ -427,45 +421,8 @@ class AlarmTask(SendMailTask):
     def canModify(self, aw):
         return self.conf.canModify(aw)
 
-    def __getVarsTextTpl(self, conf):
-        tvars = {}
-        tvars['entries'] = []
-        confSchedule = conf.getSchedule()
-        entrylist = confSchedule.getEntries()
-        for entry in entrylist:
-            if type(entry) is schedule.BreakTimeSchEntry:
-                newItem = entry
-            else:
-                newItem = entry.getOwner()
-            tvars['entries'].append(newItem)
-        tvars["conf"] = conf
-        styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        tvars['INCLUDE'] = os.path.join(styleMgr.getBaseTPLPath(), 'include')
-        tvars['getTime'] = lambda date : format_time(date.time())
-        tvars['isTime0H0M'] = lambda date : (date.hour, date.minute) == (0,0)
-        tvars['getDate'] = lambda date : format_date(date, format='yyyy-MM-dd')
-        tvars['prettyDate'] = lambda date : format_date(date, format='full')
-        tvars['getLocationInfo'] = lambda item: getLocationInfo(item, False)
-        from MaKaC.conference import SessionSlot, AcceptedContribution
-        tvars['getItemType'] = lambda item: "Break" if isinstance(item, schedule.BreakTimeSchEntry) \
-                                            else ("Session" if isinstance(item, SessionSlot) \
-                                                  else ("Contribution" if isinstance(item, AcceptedContribution) \
-                                                                                else item.__class__.__name__))
-        return tvars
-
-    def _setMailText(self):
-        text = self.text
-        if self.note:
-            text = text + "Note: %s" % self.note
-        if self.confSumary:
-            tplDir = Config.getInstance().getTPLDir()
-            text += render(os.path.join(tplDir, "events", "Text.tpl"), self.__getVarsTextTpl(self.conf))
-
-        super(AlarmTask, self).setText(text)
-
     def setNote(self, note):
         self.note = note
-        self._setMailText()
         self._p_changed=1
 
     def getNote(self):
@@ -473,14 +430,12 @@ class AlarmTask(SendMailTask):
 
     def setConfSummary(self, val):
         self.confSumary = val
-        self._setMailText()
         self._p_changed=1
 
     def getConfSummary(self):
         return self.confSumary
 
     def _prepare(self, check = True):
-
         # Date checks...
         if check:
             from MaKaC.conference import ConferenceHolder
@@ -497,19 +452,7 @@ class AlarmTask(SendMailTask):
                 return False
 
         # Email
-        startDateTime = format_datetime(self.conf.getAdjustedStartDate(), format="short")
         self.setUpSubject()
-        try:
-            locationText = self.conf.getLocation().getName()
-            if self.conf.getLocation().getAddress() != "":
-                locationText += ", %s" % self.conf.getLocation().getAddress()
-            if self.conf.getRoom().getName() != "":
-                locationText += " (%s)" % self.conf.getRoom().getName()
-        except:
-            locationText = ""
-        if locationText != "":
-            locationText = " %s: %s" % ( _("Location"), locationText)
-
         if self.getToAllParticipants() :
             if self.conf.getType() == "conference":
                 for r in self.conf.getRegistrantsList():
@@ -517,28 +460,23 @@ class AlarmTask(SendMailTask):
             else:
                 for p in self.conf.getParticipation().getParticipantList() :
                     self.addToUser(p)
+
         from MaKaC.webinterface import urlHandlers
         if Config.getInstance().getShortEventURL() != "":
             url = "%s%s" % (Config.getInstance().getShortEventURL(),self.conf.getId())
         else:
             url = urlHandlers.UHConferenceDisplay.getURL(self.conf)
-        self.setText("""Hello,
-    Please note that the event "%s" will start on %s (%s).
-    %s
 
-    You can access the full event here:
-    %s
+        self.setText(render_template('alarm_email.txt',
+            event=self.conf.fossilize(),
+            url=url,
+            note=self.note,
+            with_agenda=self.confSumary,
+            agenda=[e.fossilize() for e in self.conf.getSchedule().getEntries()]
+        ))
 
-Best Regards
-
-""" % (self.conf.getTitle(),\
-                startDateTime,\
-                self.conf.getTimezone(),\
-                locationText,\
-                url,\
-                ))
-        self._setMailText()
         return True
+
 
 class HTTPTask(OneShotTask):
     def __init__(self, url, data=None):

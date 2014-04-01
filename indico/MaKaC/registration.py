@@ -44,6 +44,7 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_datetime, format_date
+from indico.util.string import safe_upper
 from MaKaC.webinterface.common.countries import CountryHolder
 import re
 import tempfile, os
@@ -798,11 +799,10 @@ _("Registrant Id"): %s
         # send mail to organisers
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
-There is a new registrant in '%s'. See information below:
+There is a new registrant (%s) in '%s'. See information below:
 
 %s
-""") % (strip_ml_tags(regForm.getConference().getTitle()), \
-                              body)
+""") % (rp.getFullName(), strip_ml_tags(regForm.getConference().getTitle()), body)
             bodyOrg = self._cleanBody(bodyOrg)
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
@@ -858,7 +858,6 @@ Please use this information for your payment (except for e-payment):\n
             miscGroup = registrant.getMiscellaneousGroupById(gsf.getId())
             if miscGroup is not None:
                 for miscItem in miscGroup.getResponseItemList():
-                    _billlable = False
                     price = 0.0
                     quantity = 0
                     caption = miscItem.getCaption()
@@ -867,7 +866,6 @@ Please use this information for your payment (except for e-payment):\n
                     if miscItem is not None:
                         v = miscItem.getValue()
                         if miscItem.isBillable():
-                            _billlable = miscItem.isBillable()
                             value = miscItem.getValue()
                             price = string.atof(miscItem.getPrice())
                             quantity = miscItem.getQuantity()
@@ -930,7 +928,6 @@ Please use this information for your payment (except for e-payment):\n
             miscGroup = registrant.getMiscellaneousGroupById(gsf.getId())
             if miscGroup is not None:
                 for miscItem in miscGroup.getResponseItemList():
-                    _billlable = False
                     price = 0.0
                     quantity = 0
                     caption = miscItem.getCaption()
@@ -939,7 +936,6 @@ Please use this information for your payment (except for e-payment):\n
                     if miscItem is not None:
                         v = miscItem.getValue()
                         if miscItem.isBillable():
-                            _billlable = miscItem.isBillable()
                             v = miscItem.getValue()
                             price = string.atof(miscItem.getPrice())
                             quantity = miscItem.getQuantity()
@@ -963,11 +959,10 @@ Please use this information for your payment (except for e-payment):\n
         # send email to organisers
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
-             There is a new registrant in '%s'. See information below:
+             There is a new registrant (%s) in '%s'. See information below:
 
                       %s
-                      """) % (strip_ml_tags(registrant.getConference().getTitle()), \
-                              body)
+                      """) % (registrant.getFullName(), strip_ml_tags(registrant.getConference().getTitle()), body)
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
         # send email to participant
@@ -1013,10 +1008,10 @@ _("Personal Homepage"): %s
                      self._printAllSections(regForm, rp))
         if self.getToList() != [] or self.getCCList() != []:
             bodyOrg = _("""
-A registrant has modified his/her registration for '%s'. See information below:
+A registrant (%s) has modified his/her registration for '%s'. See information below:
 
 %s
-""") % (strip_ml_tags(regForm.getConference().getTitle()), body)
+""") % (rp.getFullName(), strip_ml_tags(regForm.getConference().getTitle()), body)
             bodyOrg = self._cleanBody(bodyOrg)
             maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
             GenericMailer.send(GenericNotification(maildata))
@@ -1749,6 +1744,7 @@ class CheckboxInput(FieldInputType, Fossilizable):
     def _getModifHTML(self, item, registrant, default=""):
         disable = ""
         checked = ""
+        mandatory = ""
         caption = self._parent.getCaption()
         description = self._parent.getDescription()
         price = self._parent.getPrice()
@@ -4155,6 +4151,7 @@ class SessionsForm(BaseForm, Fossilizable):
     def getSessionById(self, id):
         return self._sessions.get(id, None)
 
+
 def sortByStartDate(x, y):
     return cmp(x.getSession().getStartDate(), y.getSession().getStartDate())
 
@@ -4184,7 +4181,13 @@ class SocialEventItem(Persistent, Fossilizable):
         if "cancelledReason" in data:
             self.setCancelledReason(data["cancelledReason"])
         if "maxPlace" in data:
-            self.setMaxPlacePerRegistrant(int(data["maxPlace"]))
+            try:
+                maxPlace = int(data["maxPlace"])
+            except:
+                maxPlace = 0
+            if maxPlace < 0:
+                maxPlace = 0
+            self.setMaxPlacePerRegistrant(maxPlace)
         if "placesLimit" in data:
             self.setPlacesLimit(data["placesLimit"])
         if "billable" in data:
@@ -5088,11 +5091,10 @@ class Registrant(Persistent, Fossilizable):
             res = "%s %s" % (self.getFirstName(), self.getFamilyName())
             res = res.strip()
         else:
-            # accented letter capitalization requires all these encodes/decodes
-            res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
-            if self.getFirstName() != "":
+            res = safe_upper(self.getFamilyName())
+            if self.getFirstName():
                 res = "%s, %s" % (res, self.getFirstName())
-        if title and self.getTitle() != "":
+        if title and self.getTitle():
             res = "%s %s" % (self.getTitle(), res)
         return res
 
@@ -5365,7 +5367,7 @@ class Registrant(Persistent, Fossilizable):
         pass
 
     def canUserModify(self, user):
-        return self.getConference().canUserModify(user) or user == self.getAvatar()
+        return self.getConference().canUserModify(user) or (user is not None and user == self.getAvatar())
 
 
 class BilledItemsWrapper(object):

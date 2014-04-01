@@ -236,7 +236,7 @@ IndicoUI.executeOnLoad(function(){
             $("input:checkbox:checked").each(function() {
                 participantsChecked[$(this).val()] = $(this).parent().siblings("[id^=nameParticipant]").children("[id^=participantEdit]").text();
             });
-            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()},
+            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"), ${conf.getTitle() | n,j}, ${conf.getId() | n,j},
                                                    method, participantsChecked, "${currentUser.getStraightFullName() if currentUser else conf.getTitle()}",
                                                    "", null, legends, function() {
                                                        (new AlertPopup($T("E-mail sent"), $T('An e-mail has been sent to: ') + \
@@ -299,8 +299,9 @@ IndicoUI.executeOnLoad(function(){
             '<br><a href="{urlInvitation}">Accept or decline the invitation</a><br/><br>' +
             'Looking forward to meeting you at {confTitle} <br/>' +
             'Kindest regards';
-            var subject = "Invitation to ${conf.getTitle()}";
-            var popup = new ParticipantsInvitePopup($T("Send an Email to Selected Participants"),"${conf.getTitle()}", ${conf.getId()}, "event.participation.inviteParticipants", peopleList, "${currentUser.getFullName() if currentUser else conf.getTitle()}" ,subject, text, legends, successAddParticipantsHandler);
+            var subject = ${"Invitation to {0}".format(conf.getTitle()) | n,j};
+            var popup = new ParticipantsInvitePopup($T("Send an Email to Selected Participants"), ${conf.getTitle() | n,j}, ${conf.getId() | n,j}, "event.participation.inviteParticipants", peopleList, ${currentUser.getFullName() if currentUser else conf.getTitle() | n,j}, 
+                subject, text, legends, successAddParticipantsHandler);
             popup.open();
         };
         return searchUsers("Invite Participant(s)", inviteHandler);

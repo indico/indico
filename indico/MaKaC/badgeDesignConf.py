@@ -23,6 +23,7 @@ from badge import BadgeTemplateItem
 from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.i18n import _
 from indico.util.date_time import format_date
+from indico.util.string import safe_upper
 
 
 class RegistrantBadge:
@@ -66,21 +67,24 @@ class RegistrantFullName5(RegistrantBadge):
     """
     FullName with Title, the FirstName first and uppercase in surname.
     """
+
     @classmethod
     def getValue(cls, reg):
-        res = "%s %s"%( reg.getFirstName(), reg.getFamilyName().upper())
+        res = "%s %s" % (reg.getFirstName(), safe_upper(reg.getFamilyName()))
         res = res.strip()
         if reg.getTitle() != "":
-            res = "%s %s"%( reg.getTitle(), res )
+            res = "%s %s" % (reg.getTitle(), res)
         return res
+
 
 class RegistrantFullName6(RegistrantBadge):
     """
     FullName without Title, the FirstName first and uppercase inthe surname.
     """
+
     @classmethod
     def getValue(cls, reg):
-        res = "%s %s"%( reg.getFirstName(), reg.getFamilyName().upper())
+        res = "%s %s" % (reg.getFirstName(), safe_upper(reg.getFamilyName()))
         res = res.strip()
         return res
 

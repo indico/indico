@@ -59,6 +59,7 @@
 % endif
 
 
+% if IsLecture or NTalks > 0:
 <div id="WRForm">
 
     % if IsSingleBooking:
@@ -82,9 +83,18 @@
             <span style="color:#881122">${_("The webcast will not be broadcasted before all speakers have signed the %s (see Electronic Agreement tab)")%agreementName}</span>
     </div>
 
+% endif
+
+% if not IsLecture and NTalks == 0:
+    <div class="warning-message-box">
+        <div class="message-text">
+            ${_("Only the  contributions can be webcasted and there is no contribution in this event. Please go to Timetable and start adding them")}
+        </div>
+    </div>
+% endif
 
     <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
-% if not IsLecture:
+% if not IsLecture and NTalks > 0:
     <div class="WRFormSection" id="contributionselectionDiv">
         <!-- WHICH CONTRIBUTIONS SHOULD BE WEBCASTED -->
         <div class="WRFormSubsection">
@@ -169,6 +179,7 @@
     </div>
 % endif
 
+% if IsLecture or NTalks > 0:
     <div class="WRFormSubsection">
         <span class="WRQuestion">${_("Please select the audience of the webcast:")}</span>
         <div>
@@ -208,6 +219,7 @@
     % endif
 </div>
 
+% endif
 <script type="text/javascript">
     var isLecture = ${ jsBoolean(IsLecture) };
     var WRWebcastCapable = ${ jsBoolean(WebcastCapable) };

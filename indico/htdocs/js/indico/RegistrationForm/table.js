@@ -26,7 +26,8 @@ ndRegForm.directive("ndTable", function(url, sortableoptions) {
             config: "=",
             formData: "=",
             filter: "=",
-            filterValue: "="
+            filterValue: "=",
+            validationStarted: "="
         },
 
         controller: function($scope) {

@@ -23,6 +23,7 @@ from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.plugins.Collaboration.RecordingRequest.common import \
     postingUrgency, getTalks
 from indico.core.config import Config
+from indico.util.string import safe_upper
 
 
 class RecordingRequestNotificationBase(GenericNotification):
@@ -369,8 +370,8 @@ class RequestAcceptedNotificationAdmin(RecordingRequestAdminNotificationBase):
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
         userInfo = ""
-        if user :
-            userInfo = " by %s %s"%(user.getFirstName(), user.getFamilyName().upper())
+        if user:
+            userInfo = " by %s %s" % (user.getFirstName(), safe_upper(user.getFamilyName()))
         self.setBody("""Dear Recording Manager,<br />
 <br />
 A recording request for the event: "%s" has been accepted in <a href="%s">%s</a>"""%(self._conference.getTitle(),

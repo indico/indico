@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from indico.util.string import safe_upper
 
 import urllib
 from datetime import datetime, timedelta
@@ -729,7 +730,7 @@ class WMeetingContribBaseDisplayItem(wcomponents.WTemplated):
         vars["place"] = ""
         location = self.__contrib.getOwnLocation()
         if location:
-            vars["place"] = "%s"%location.getName().upper()
+            vars["place"] = safe_upper(location.getName())
             if location.getAddress().strip() != "":
                 vars["place"] += "(%s)"%location.getAddress()
 
@@ -756,12 +757,10 @@ class WMeetingContribBaseDisplayItem(wcomponents.WTemplated):
         vars["modifyURL"] = self.__modifyURLGen( self.__contrib )
         ml = []
         for mat in self.__contrib.getAllMaterialList():
-            str = wcomponents.WMaterialDisplayItem().getHTML(\
-                                                self.__aw, mat, \
-                                                self.__materialsURLGen( mat ) )
-            if str == "":
+            s = wcomponents.WMaterialDisplayItem().getHTML(self.__aw, mat, self.__materialsURLGen(mat))
+            if not s:
                 continue
-            ml.append(str)
+            ml.append(s)
         if len(ml) == 0:
             vars["materials"] = ""
         else:
@@ -770,10 +769,10 @@ class WMeetingContribBaseDisplayItem(wcomponents.WTemplated):
         vars["materialURLGen"] = self.__materialsURLGen
         scl = []
         for sc in self.__contrib.getSubContributionList():
-            str = WSubContributionMeetingDisplay(self.__aw, sc).getHTML({"modifyURL":self.__subContribModifyURLGen(sc), "materialURLGen":self.__materialsURLGen} )
-            if str == "":
+            s = WSubContributionMeetingDisplay(self.__aw, sc).getHTML({"modifyURL":self.__subContribModifyURLGen(sc), "materialURLGen":self.__materialsURLGen} )
+            if not s:
                 continue
-            scl.append(str)
+            scl.append(s)
         if len(scl) == 0:
             vars["subConts"] = ""
         else:

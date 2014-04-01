@@ -125,24 +125,37 @@ class RegistrantDepartureDateTplVar(TplVar):
     _name="registrant_departure_date"
     _description=""
 
+    @classmethod
     def getValue(cls,registrant):
         departureDate=""
         if registrant.getAccommodation() is not None and registrant.getAccommodation().getDepartureDate() is not None:
             departureDate = registrant.getAccommodation().getDepartureDate().strftime("%d-%B-%Y")
         return departureDate
-    getValue=classmethod(getValue)
+
+
+class RegistrantPaymentLinkTplVar(TplVar):
+    _name="registrant_payment_link"
+    _description=""
+
+    @classmethod
+    def getValue(cls,registrant):
+        return urlHandlers.UHConfRegistrationFormCreationDone.getURL(registrant)
+
 
 class Notificator:
-    _vars=[ConfTitleTplVar,ConfURLTplVar, RegistrantIdTplVar, RegistrantFirstNameTplVar, RegistrantFamilyNameTplVar, RegistrantTitleTplVar, RegistrantAccommodationTplVar, RegistrantSocialEventsTplVar, RegistrantSessionsTplVar, RegistrantArrivalDateTplVar, RegistrantDepartureDateTplVar]
+    _vars = [ConfTitleTplVar, ConfURLTplVar, RegistrantIdTplVar, RegistrantFirstNameTplVar, RegistrantFamilyNameTplVar,
+             RegistrantTitleTplVar, RegistrantAccommodationTplVar, RegistrantSocialEventsTplVar,
+             RegistrantSessionsTplVar, RegistrantArrivalDateTplVar, RegistrantDepartureDateTplVar,
+             RegistrantPaymentLinkTplVar]
 
+    @classmethod
     def getVarList(cls):
         return cls._vars
-    getVarList=classmethod(getVarList)
 
-    def _getVars(self,registrant):
-        d={}
+    def _getVars(self, registrant):
+        d = {}
         for v in self.getVarList():
-            d[v.getName()]=v.getValue(registrant)
+            d[v.getName()] = v.getValue(registrant)
         return d
 
 
@@ -177,4 +190,3 @@ class EmailNotificator(Notificator):
                                      log.ModuleNames.REGISTRATION)
         else:
             GenericMailer.send(notification)
-

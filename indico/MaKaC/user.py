@@ -47,6 +47,7 @@ from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import avatar_links, suggestions
+from indico.util.string import safe_upper, safe_slice
 from flask import request
 
 """Contains the classes that implement the user management subsystem
@@ -662,28 +663,29 @@ class Avatar(Persistent, Fossilizable):
 
     def getFullName(self):
         surName = ""
-        if self.getSurName() != "":
-            # accented letter capitalization requires all these encodes/decodes
-            surName = "%s, " % self.getSurName().decode('utf-8').upper().encode('utf-8')
-        return "%s%s"%(surName, self.getName())
+        if self.getSurName():
+            surName = "%s, " % safe_upper(self.getSurName())
+        return "%s%s" % (surName, self.getName())
 
-    def getStraightFullName(self, upper = True):
-        return ("%s %s"%(self.getFirstName(), self.getFamilyName().upper() if upper else self.getFamilyName())).strip()
+    def getStraightFullName(self, upper=True):
+        lastName = safe_upper(self.getFamilyName()) if upper else self.getFamilyName()
+        return "{0} {1}".format(self.getFirstName(), lastName).strip()
+
     getDirectFullNameNoTitle = getStraightFullName
 
     def getAbrName(self):
         res = self.getSurName()
-        if self.getName() != "":
-            if res != "":
-                res = "%s, "%res
-            res = "%s%s."%(res, self.getName()[0].upper())
+        if self.getName():
+            if res:
+                res = "%s, " % res
+            res = "%s%s." % (res, safe_upper(safe_slice(self.getName(), 0, 1)))
         return res
 
     def getStraightAbrName(self):
         name = ""
-        if self.getName() != "":
-            name = "%s. "%self.getName()[0].upper()
-        return "%s%s"%(name, self.getSurName())
+        if self.getName():
+            name = "%s. " % safe_upper(safe_slice(self.getName(), 0, 1))
+        return "%s%s" % (name, self.getSurName())
 
     def addOrganisation(self, newOrg, reindex=False):
         if reindex:

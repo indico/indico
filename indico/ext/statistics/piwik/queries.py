@@ -392,7 +392,7 @@ class PiwikQueryMetricConferenceReferrers(PiwikQueryMetricConferenceBase):
 
     def _buildType(self):
         PiwikQueryMetricConferenceBase._buildType(self)
-        self.setAPIMethod('Referers.getRefererType')
+        self.setAPIMethod('Referrers.getReferrerType')
         self.setAPIPeriod('range')
 
     def getQueryResult(self):

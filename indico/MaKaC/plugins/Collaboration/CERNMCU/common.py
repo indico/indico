@@ -29,6 +29,7 @@ from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.plugins.Collaboration.CERNMCU.fossils import IRoomWithH323Fossil, ICERNMCUErrorFossil
 from MaKaC.plugins.Collaboration.CERNMCU.fossils import IParticipantPersonFossil,\
     IParticipantRoomFossil, IRoomWithH323Fossil, ICERNMCUErrorFossil
+from indico.util.string import safe_upper
 
 secondsToWait = 10
 
@@ -232,7 +233,7 @@ class ParticipantPerson(Participant, Fossilizable):
         if self._title:
             result.append(self._title)
             result.append(' ')
-        result.append(self._familyName.upper())
+        result.append(safe_upper(self._familyName))
         result.append(', ')
         result.append(self._firstName)
         if self._affiliation:

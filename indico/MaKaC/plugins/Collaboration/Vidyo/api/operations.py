@@ -89,6 +89,10 @@ class VidyoOperations(object):
         if not possibleLogins:
             return VidyoError("userHasNoAccounts", "create")
 
+        # We check the moderator PIN is a 3-10 digit number
+        if moderatorPin and (not moderatorPin.isdigit() or len(moderatorPin) < 3 or len(moderatorPin) > 10):
+            return VidyoError("PINLength", "create")
+
         roomCreated = False
         loginToUse = 0
 
@@ -111,6 +115,9 @@ class VidyoOperations(object):
 
                 elif faultString.startswith('Member not found for ownerName'):
                     loginToUse = loginToUse + 1
+
+                elif faultString.startswith('PIN should be a 3-10 digit number'):
+                        return VidyoError("PINLength", "create")
 
                 elif faultString.startswith('Room exist for extension'):
                     extension = baseExtension + str(extensionSuffix)
@@ -192,6 +199,9 @@ class VidyoOperations(object):
             if not possibleLogins:
                 raise CollaborationException(_("The moderator has no login information"))
 
+        # We check the moderator PIN is a 3-10 digit number
+        if moderatorPin and (not moderatorPin.isdigit() or len(moderatorPin) < 3 or len(moderatorPin) > 10):
+            return VidyoError("PINLength", "modify")
 
         roomModified = False
         loginToUse = 0
@@ -220,6 +230,9 @@ class VidyoOperations(object):
                         return VidyoError("badOwner", "modify")
                     else:
                         loginToUse = loginToUse + 1
+
+                elif faultString.startswith('PIN should be a 3-10 digit number'):
+                        return VidyoError("PINLength", "modify")
 
                 else:
                     Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's updateRoom operation got WebFault: %s""" %

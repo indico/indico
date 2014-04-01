@@ -67,6 +67,7 @@ from MaKaC.common import utils
 
 from indico.util.i18n import i18nformat, ngettext
 from indico.util.date_time import format_date
+from indico.util.string import safe_upper, safe_slice
 from indico.util import json
 from MaKaC.common.Configuration import Config
 
@@ -980,9 +981,9 @@ class TimeTablePlain(PDFWithTOC):
             l.append(["",caption,speakers])
 
     def _getNameWithoutTitle(self, av):
-        res = av.getFamilyName().upper()
-        if av.getFirstName() != "":
-            res = "%s, %s"%( res, av.getFirstName() )
+        res = safe_upper(av.getFamilyName())
+        if av.getFirstName():
+            res = "%s, %s" % (res, av.getFirstName())
         return res
 
     def _useColors(self):
@@ -1577,13 +1578,14 @@ class ProceedingsTOC(PDFBase):
 
     def _getAbrName(self, author):
         res = author.getFamilyName()
-        if res.strip() != "" and len(res)>1:
-            res = "%s%s"%(res[0].upper(), res[1:].lower())
-        if author.getFirstName() != "":
-            if res == "":
+        if res.strip() and len(res) > 1:
+            uniname = res.decode('utf-8')
+            res = (uniname[0].upper() + uniname[1:].lower()).encode('utf-8')
+        if author.getFirstName():
+            if not res:
                 res = author.getFirstName()
             else:
-                res = "%s. %s"%(author.getFirstName()[0].upper(), res)
+                res = "%s. %s" % (safe_upper(safe_slice(author.getFirstName(), 0, 1)), res)
         return res
 
 class ProceedingsChapterSeparator(PDFBase):
@@ -2519,12 +2521,12 @@ class TicketToPDF(PDFBase):
 
         # Conference title
         height -= 1*cm
-        self._drawWrappedString(c, escape(self._conf.getTitle()),
-                                height=height, width=width, size=20,
-                                align="left", font='Times-Bold')
+        startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()),
+                                              height=height, width=width, size=20,
+                                              align="left", font='Times-Bold')
 
         # Conference start and end date
-        height -= 0.7*cm
+        height = startHeight - 1*cm
         self._drawWrappedString(c, "%s - %s" % (
             format_date(self._conf.getStartDate(), format='full'),
             format_date(self._conf.getEndDate(), format='full')),
@@ -2576,6 +2578,10 @@ class TicketToPDF(PDFBase):
         # Registrant info
         width += 0.5*cm
         height += 3*cm
+        self._drawWrappedString(c, escape("ID: {0}".format(self._registrant.getId())),
+                                height=height, width=width, size=15,
+                                align="left", font='Times-Roman')
+        height -= 0.5*cm
         self._drawWrappedString(c, escape(self._registrant.getFullName()),
                                 height=height, width=width, size=15,
                                 align="left", font='Times-Roman')

@@ -268,6 +268,9 @@ class VidyoError(CSErrorBase):
             elif self._errorType == "duplicatedWithOwner":
                 return _("""There is already a room with this name in the system. Would you like to attach it to this event?""")
 
+            elif self._errorType == "PINLength":
+                return _("""The PIN for the vidyo room has to be a 3-10 digit number.""")
+
             elif self._errorType == "badOwner":
                 return _("This Public room could not be created or changed because the specified moderator does not have a Vidyo account.")
 

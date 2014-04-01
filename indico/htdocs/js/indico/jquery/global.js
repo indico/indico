@@ -50,7 +50,8 @@ $(document).ready(function() {
         if (!$(this).attr('title').trim()) {
             return;
         }
-        $(this).qtip({
+        var extraOpts = $(this).data('qtipOpts') || {};
+        $(this).qtip($.extend(true, {}, {
             overwrite: false,
             show: {
                 event: event.type,
@@ -78,7 +79,7 @@ $(document).ready(function() {
                 // If the parent element is destroyed we need to destroy the qTip too
                 $(this).qtip('destroy');
             }
-        }, event);
+        }, extraOpts), event);
     });
 
     // Enable colorbox for links with rel="lightbox"

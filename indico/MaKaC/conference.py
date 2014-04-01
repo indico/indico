@@ -43,6 +43,7 @@ from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from indico.util.i18n import L_
+from indico.util.string import safe_upper, safe_slice
 from MaKaC.review import AbstractFieldContent
 
 
@@ -1778,19 +1779,19 @@ class ConferenceParticipation(Persistent, Fossilizable, Observable):
 
     def getAbrName(self):
         res = self.getFamilyName()
-        if self.getFirstName() != "":
-            if res != "":
-                res = "%s, "%res
-            res = "%s%s."%(res, self.getFirstName()[0].upper())
+        if self.getFirstName():
+            if res:
+                res = "%s, " % res
+            res = "%s%s." % (res, safe_upper(safe_slice(self.getFirstName(), 0, 1)))
         return res
 
+    @staticmethod
     def _cmpFamilyName( cp1, cp2 ):
         o1 = "%s %s"%(cp1.getFamilyName(), cp1.getFirstName())
         o2 = "%s %s"%(cp2.getFamilyName(), cp2.getFirstName())
         o1=o1.lower().strip()
         o2=o2.lower().strip()
         return cmp( o1, o2 )
-    _cmpFamilyName=staticmethod(_cmpFamilyName)
 
 
 class ConferenceChair(ConferenceParticipation, Fossilizable):
@@ -7522,30 +7523,31 @@ class ContributionParticipation(Persistent, Fossilizable):
             res = "%s %s"%( self.getTitle(), res )
         return res
 
-    def getDirectFullNameNoTitle( self, upper = True ):
-        return ("%s %s"%(self.getFirstName(), self.getFamilyName().upper() if upper else self.getFamilyName())).strip()
+    def getDirectFullNameNoTitle(self, upper=True):
+        familyName = safe_upper(self.getFamilyName()) if upper else self.getFamilyName()
+        return "{0} {1}".format(self.getFirstName(), familyName).strip()
 
-    def getFullName( self ):
+    def getFullName(self):
         res = self.getFullNameNoTitle()
-        if self.getTitle() != "":
-            res = "%s %s"%( self.getTitle(), res )
+        if self.getTitle():
+            res = "%s %s" % (self.getTitle(), res)
         return res
 
-    def getFullNameNoTitle( self ):
-        res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
-        if self.getFirstName() != "":
-            if res.strip() != "":
-                res = "%s, %s"%( res, self.getFirstName() )
+    def getFullNameNoTitle(self):
+        res = safe_upper(self.getFamilyName())
+        if self.getFirstName():
+            if res.strip():
+                res = "%s, %s" % (res, self.getFirstName())
             else:
                 res = self.getFirstName()
         return res
 
     def getAbrName(self):
         res = self.getFamilyName()
-        if self.getFirstName() != "":
-            if res != "":
-                res = "%s, "%res
-            res = "%s%s."%(res, self.getFirstName()[0].upper())
+        if self.getFirstName():
+            if res:
+                res = "%s, " % res
+            res = "%s%s." % (res, safe_upper(self.getFirstName()[0]))
         return res
 
     def isSubmitter(self):
@@ -10030,31 +10032,33 @@ class SubContribParticipation(Persistent, Fossilizable):
             res = "%s %s"%( self.getTitle(), res )
         return res
 
-    def getFullNameNoTitle( self ):
-        res = self.getFamilyName().decode('utf-8').upper().encode('utf-8')
-        if self.getFirstName() != "":
-            if res.strip() != "":
-                res = "%s, %s"%( res, self.getFirstName() )
+    def getFullNameNoTitle(self):
+        res = safe_upper(self.getFamilyName())
+        if self.getFirstName():
+            if res.strip():
+                res = "%s, %s" % (res, self.getFirstName())
             else:
                 res = self.getFirstName()
         return res
 
     def getAbrName(self):
         res = self.getFamilyName()
-        if self.getFirstName() != "":
-            if res != "":
-                res = "%s, "%res
-            res = "%s%s."%(res, self.getFirstName()[0].upper())
+        if self.getFirstName():
+            if res:
+                res = "%s, " % res
+            res = "%s%s." % (res, safe_upper(self.getFirstName()[0]))
         return res
 
-    def getDirectFullName( self ):
+    def getDirectFullName(self):
         res = self.getDirectFullNameNoTitle()
-        if self.getTitle() != "":
-            res = "%s %s"%( self.getTitle(), res )
+        if self.getTitle():
+            res = "%s %s" % (self.getTitle(), res)
         return res
 
-    def getDirectFullNameNoTitle( self, upper = True ):
-        return ("%s %s"%(self.getFirstName(), self.getFamilyName().upper() if upper else self.getFamilyName())).strip()
+    def getDirectFullNameNoTitle(self, upper=True):
+        surName = safe_upper(self.getFamilyName()) if upper else self.getFamilyName()
+        return "{0} {1}".format(self.getFirstName(), surName).strip()
+
 
 class SubContribution(CommonObjectBase, Locatable):
     """
