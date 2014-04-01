@@ -59,16 +59,8 @@
             }
         }
 
-        .capacityslider {
-            padding-left: 1em !important;
-            padding-right: 1em !important;
-            width: 150px;
-
-            .ui-slider {
-                display: inline-block !important;
-                margin-top: 3px;
-                width: 100% !important;
-            }
+        .group.slider .container {
+            width: 110px;
 
             & ~ input[type=text] {
                 width: 60px;

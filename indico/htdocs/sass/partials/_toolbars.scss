@@ -117,6 +117,7 @@
 
 %toolbar-group {
     @extend %toolbar-group-inputs;
+    @extend %toolbar-group-slider;
     display: inline-block;
     padding: 0 0.4em;
     margin-bottom: -2px;
@@ -211,5 +212,22 @@
     & > .clearableinput:last-child input[type=text] {
         @include border-bottom-right-radius();
         @include border-top-right-radius();
+    }
+}
+
+%toolbar-group-slider {
+    &.slider {
+        .container {
+            padding-left: 1em !important;
+            padding-right: 1em !important;
+            width: 150px;
+
+            .ui-slider {
+                display: inline-block !important;
+                margin-top: 3px;
+                margin-left: -2px;
+                width: 100% !important;
+            }
+        }
     }
 }
