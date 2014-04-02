@@ -230,9 +230,9 @@
                    .appendTo(header);
 
             // Capacity slider
-            self.slider = $("<div class='group slider'/>")
+            self.slider = $("<div class='group with-slider'/>")
                 .append($("<span class='i-button label'/>").text($T("Capacity")))
-                .append($("<span class='i-button label container'/>")
+                .append($("<span class='i-button label slider'/>")
                     .append($("<span/>").slider({
                         range: "min",
                         min: 0,

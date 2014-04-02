@@ -16,13 +16,15 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+$toolbar-height: 2.2em;
+$toolbar-thin-height: 1.9em;
+
 .scrolling .toolbar {
     margin: 0.5em 0em 0.5em 0em;
 }
 
 .toolbar {
-    $toolbar-height: 2.2em;
-    $toolbar-line-height: 1.7em;
+    $toolbar-button-height: 1.7em;
 
     min-height: $toolbar-height;
     margin-bottom: 0.5em;
@@ -35,18 +37,16 @@
     }
 
     &.thin {
-        $thin-height: 1.9em;
-        $thin-line-height: 1.4em;
-
-        min-height: $thin-height;
+        $thin-button-height: 1.4em;
+        min-height: $toolbar-thin-height;
 
         & .i-button {
-            height: $thin-height;
-            line-height: $thin-line-height;
+            height: $toolbar-thin-height;
+            line-height: $thin-button-height;
         }
 
         & input[type=text] {
-            height: $thin-height;
+            height: $toolbar-thin-height;
         }
     }
 
@@ -76,7 +76,7 @@
         float: left;
         font-weight: bold;
         height: $toolbar-height;
-        line-height: $toolbar-line-height;
+        line-height: $toolbar-button-height;
         padding: 0.2em 0.7em 0.1em 0.7em !important;
         text-align: center;
 
@@ -117,6 +117,7 @@
 
 %toolbar-group {
     @extend %toolbar-group-inputs;
+    @extend %toolbar-group-datepicker;
     @extend %toolbar-group-slider;
     display: inline-block;
     padding: 0 0.4em;
@@ -223,8 +224,8 @@
 }
 
 %toolbar-group-slider {
-    &.slider {
-        .container {
+    &.with-slider {
+        .slider {
             padding-left: 1em !important;
             padding-right: 1em !important;
             width: 150px;
@@ -234,6 +235,34 @@
                 margin-top: 3px;
                 margin-left: -2px;
                 width: 100% !important;
+            }
+        }
+    }
+}
+
+%toolbar-group-datepicker {
+    &.with-datepicker {
+        .datepicker {
+            position: relative;
+
+            &:last-child {
+                input[type=text] {
+                    @include border-bottom-right-radius();
+                    @include border-top-right-radius();
+                }
+            }
+
+            .ui-datepicker-trigger {
+                float: right;
+                line-height: $toolbar-height;
+                position: absolute;
+                margin: 0;
+                right: 5px;
+                top: 0;
+            }
+
+            &.thin .ui-datepicker-trigger {
+                line-height: $toolbar-thin-height;
             }
         }
     }

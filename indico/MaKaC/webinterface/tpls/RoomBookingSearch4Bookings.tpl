@@ -175,31 +175,35 @@
     </h2>
 
     <div class="toolbar thin">
-        <div class="group">
-            <div class="i-button label contrast">
+        <div class="group with-datepicker">
+            <span class="i-button label contrast">
                 ${ _('Start Date') }
-            </div>
-            <input type="text" name="start_date" id="start_date" readonly/>
+            </span>
+            <span class="datepicker thin">
+                <input type="text" name="start_date" id="start_date"/>
+            </span>
         </div>
 
-        <div class="group">
-            <div class="i-button label contrast">
+        <div class="group with-datepicker">
+            <span class="i-button label contrast">
                 ${ _('End Date') }
-            </div>
-            <input type="text" name="end_date" id="end_date" readonly/>
+            </span>
+            <span class="datepicker thin">
+                <input type="text" name="end_date" id="end_date"/>
+            </span>
         </div>
     </div>
 
     <div class="toolbar thin">
-        <div class="group slider">
+        <div class="group with-slider">
             <span class="i-button label contrast">
                 ${ _('Time') }
             </span>
-            <input name="start_time" id="sTime" maxlength="5" size="5" type="text" readonly/>
-            <span class="i-button label container">
+            <input name="start_time" id="sTime" maxlength="5" size="5" type="text"/>
+            <span class="i-button label slider">
                 <span id="timeRange"></span>
             </span>
-            <input name="end_time" id="eTime" maxlength="5" size="5" type="text" readonly/>
+            <input name="end_time" id="eTime" maxlength="5" size="5" type="text"/>
         </div>
     </div>
 
