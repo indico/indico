@@ -67,7 +67,7 @@ class SetPaidHook(EventBaseHook):
             self._registrant.setPayed(False)
         return {
             "paid": self._registrant.getPayed(),
-            "pay_amount": self._registrant.getTotal()
+            "amount_paid": self._registrant.getTotal()
         }
 
 
