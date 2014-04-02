@@ -40,7 +40,7 @@ class SetPaidHook(EventBaseHook):
     HTTP_POST = True
 
     def _getParams(self):
-        super(SetPayedHook, self)._getParams()
+        super(SetPaidHook, self)._getParams()
         self.auth_key = get_query_parameter(self._queryParams, ["auth_key"])
         self.is_paid = get_query_parameter(self._queryParams, ["is_paid"]) == "yes"
         registrant_id = self._pathParams["registrant_id"]
