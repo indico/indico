@@ -176,7 +176,7 @@
 
     <div class="toolbar thin">
         <div class="group with-datepicker">
-            <span class="i-button label contrast">
+            <span class="i-button label heavy">
                 ${ _('Start Date') }
             </span>
             <span class="datepicker thin">
@@ -185,7 +185,7 @@
         </div>
 
         <div class="group with-datepicker">
-            <span class="i-button label contrast">
+            <span class="i-button label heavy">
                 ${ _('End Date') }
             </span>
             <span class="datepicker thin">
@@ -196,7 +196,7 @@
 
     <div class="toolbar thin">
         <div class="group with-slider">
-            <span class="i-button label contrast">
+            <span class="i-button label heavy">
                 ${ _('Time') }
             </span>
             <input name="start_time" id="sTime" maxlength="5" size="5" type="text"/>
@@ -214,13 +214,13 @@
 
     <div class="toolbar thin">
         <div class="group">
-            <div class="i-button label contrast">Booked for</div>
+            <div class="i-button label heavy">Booked for</div>
             <input size="30" type="text" id="booked_for_name" name="booked_for_name" />
         </div>
     </div>
     <div class="toolbar thin">
         <div class="group">
-            <div class="i-button label contrast">Reason</div>
+            <div class="i-button label heavy">Reason</div>
             <input size="30" type="text" id="reason" name="reason" />
         </div>
     </div>

@@ -160,11 +160,15 @@
 
     &.label,
     &.label:hover:not(.disabled):not(:disabled) {
-        background: transparent;
+        background: white;
         border-color: $gray !important;
         box-shadow: none !important;
         color: $black !important;
         cursor: default;
+
+        &.heavy {
+            background: $light-gray;
+        }
     }
 
     &.arrow {
