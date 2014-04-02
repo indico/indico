@@ -51,8 +51,7 @@ class SetPaidHook(EventBaseHook):
             raise HTTPAPIError('E-payment is not enabled')
 
     def _hasAccess(self, aw):
-        return (self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)) \
-            and self.auth_key == self._registrant.getRandomId()
+        return self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)
 
     def api_pay(self, aw):
         if self.is_paid:
@@ -117,8 +116,7 @@ class RegistrantHook(EventBaseHook):
         self._type = "registrant"
 
     def _hasAccess(self, aw):
-        return (self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)) \
-            and self.auth_key == self._registrant.getRandomId()
+        return self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)
 
     def export_registrant(self, aw):
         expInt = RegistrantFetcher(aw, self)
@@ -175,7 +173,6 @@ class RegistrantsHook(EventBaseHook):
                 "checked_in": registrant.isCheckedIn(),
                 "full_name": registrant.getFullName(title=True, firstNameFirst=True),
                 "checkin_secret": registrant.getCheckInUUID(),
-                "auth_key": registrant.getRandomId(),
             }
             regForm = self._conf.getRegistrationForm()
             reg["personal_data"] = regForm.getPersonalData().getRegistrantValues(registrant)

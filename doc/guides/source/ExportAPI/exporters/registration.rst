@@ -34,7 +34,6 @@ Result::
                 {
                     "checkin_secret": "00000000-0000-0000-0000-000000000000",
                     "checked_in": true,
-                    "auth_key": "XXXXXXXXXXXXXXXXXXX",
                     "personal_data": {
                         "city": "Geneva",
                         "fax": "+41227000000",
@@ -86,7 +85,7 @@ Returns only the personal data of the registrant.
 
 For example::
 
-    https://indico.server/export/event/0/registrant/0.json?ak=00000000-0000-0000-0000-000000000000&auth_key=XXXXXXXXXXXXXXXXXXX&detail=basic&pretty=yes&nocache=yes
+    https://indico.server/export/event/0/registrant/0.json?ak=00000000-0000-0000-0000-000000000000&detail=basic&pretty=yes&nocache=yes
 
 Result::
 
@@ -95,7 +94,7 @@ Result::
         "additionalInfo": {},
         "_type": "HTTPAPIResult",
         "complete": true,
-        "url": "\/export\/event\/0\/registrant\/0.json?ak=00000000-0000-0000-0000-000000000000&auth_key=XXXXXXXXXXXXXXXXXXX&detail=basic&pretty=yes&nocache=yes",
+        "url": "\/export\/event\/0\/registrant\/0.json?ak=00000000-0000-0000-0000-000000000000&detail=basic&pretty=yes&nocache=yes",
         "ts": 1396431698,
         "results": {
             "_type": "Registrant",
@@ -131,7 +130,7 @@ Returns the full registrant data.
 
 For example::
 
-    https://indico.server/export/event/0/registrant/0.json?ak=00000000-0000-0000-0000-000000000000&auth_key=XXXXXXXXXXXXXXXXXXX&detail=full&pretty=yes&nocache=yes
+    https://indico.server/export/event/0/registrant/0.json?ak=00000000-0000-0000-0000-000000000000&detail=full&pretty=yes&nocache=yes
 
 Result::
 
@@ -140,7 +139,7 @@ Result::
         "additionalInfo": {},
         "_type": "HTTPAPIResult",
         "complete": true,
-        "url": "/export/event/301397/registrant/0.json?ak=00000000-0000-0000-0000-000000000000&auth_key=XXXXXXXXXXXXXXXXXXX&detail=full&pretty=yes&nocache=yes",
+        "url": "/export/event/301397/registrant/0.json?ak=00000000-0000-0000-0000-000000000000&detail=full&pretty=yes&nocache=yes",
         "ts": 1396436802,
         "results": {
             "_type": "Registrant",
@@ -238,7 +237,6 @@ Parameters
 ==============  ================  =======================================================================
 Param           Values            Description
 ==============  ================  =======================================================================
-auth_key        text              Authentication key generated at registration time
 is_paid         yes, no           If specifed set (or not) as paid
 ==============  ================  =======================================================================
 
@@ -251,7 +249,7 @@ Returns the status of the payment and the paid amount.
 
 For example::
 
-    curl --data "ak=00000000-0000-0000-0000-000000000000&auth_key=XXXXXXXXXXXXXXXXXXX&is_paid=yes" 'https://indico.server/api/event/0/registrant/pay.json'
+    curl --data "ak=00000000-0000-0000-0000-000000000000&is_paid=yes" 'https://indico.server/api/event/0/registrant/pay.json'
 
 Result::
 
@@ -260,7 +258,7 @@ Result::
         "additionalInfo": {},
         "_type": "HTTPAPIResult",
         "complete": true,
-        "url": "\/api\/event\/301397\/registrant\/0\/pay.json?ak=00000000-0000-0000-0000-000000000000&auth_key=XXXXXXXXXXXXXXXXXXX&is_paid=yes",
+        "url": "\/api\/event\/301397\/registrant\/0\/pay.json?ak=00000000-0000-0000-0000-000000000000&is_paid=yes",
         "ts": 1396431439,
         "results": {
             "paid": true,
