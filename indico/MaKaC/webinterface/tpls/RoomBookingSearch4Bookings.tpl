@@ -89,7 +89,6 @@
         if (isValid && !onSubmit) {
             var lastDateInfo = searchForm.data('lastDateInfo');
             var dateInfo = $('#start_date, #sTime, #end_date, #eTime').serialize();
-            console.log(dateInfo);
             if (dateInfo != lastDateInfo) {
                 searchForm.data('lastDateInfo', dateInfo);
                 var holidaysWarning = indicoSource(
