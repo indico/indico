@@ -31,6 +31,14 @@ from flask import request
 
 class RHWizard(base.RHDisplayBaseProtected):
 
+    def _setUserData(self, av):
+        av.setName(self._params["name"])
+        av.setSurName(self._params["surName"])
+        av.setOrganisation(self._params["organisation"])
+        av.setEmail(self._params["userEmail"])
+        av.setTimezone(self._params["timezone"])
+        av.setLang(self._params["lang"])
+
     def _checkProtection(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getAdminList().getList() or AvatarHolder()._getIdx():
@@ -53,7 +61,7 @@ class RHWizard(base.RHDisplayBaseProtected):
         ah = user.AvatarHolder()
         av = user.Avatar()
         authManager = AuthenticatorMgr()
-        _UserUtils.setUserData(av, self._params)
+        self._setUserData(av)
         ah.add(av)
         li = user.LoginInfo(self._params["login"], self._params["password"].encode('UTF8'))
         identity = authManager.createIdentity(li, av, "Local")
@@ -74,21 +82,3 @@ class RHWizard(base.RHDisplayBaseProtected):
 
         p = signIn.WPAdminCreated(self, av)
         return p.display()
-
-
-class _UserUtils:
-
-    def setUserData(self, a, userData):
-        a.setName(userData["name"])
-        a.setSurName(userData["surName"])
-        a.setOrganisation(userData["organisation"])
-        a.setEmail(userData["userEmail"])
-        ##################################
-        # Fermi timezone awareness       #
-        ##################################
-        a.setTimezone(userData["timezone"])
-        ##################################
-        # Fermi timezone awareness(end)  #
-        ##################################
-        a.setLang(userData["lang"])
-    setUserData = classmethod(setUserData)

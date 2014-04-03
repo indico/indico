@@ -27,7 +27,7 @@
                                     <span class="titleCellFormat">${ _("First name")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input class="wizardMandatoryField1" id="name" type="text" name="name" value=${ name } required style="width: 80%;">
+                                    <input id="name" type="text" name="name" value=${ name } required style="width: 80%;">
                                 </td>
                             </tr>
                             <tr>
@@ -35,7 +35,7 @@
                                     <span class="titleCellFormat">${ _("Family name")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input class="wizardMandatoryField1" id="surName" type="text" name="surName" value=${ surName } required style="width: 80%;">
+                                    <input id="surName" type="text" name="surName" value=${ surName } required style="width: 80%;">
                                 </td>
                             </tr>
                             <tr>
@@ -43,7 +43,7 @@
                                     <span class="titleCellFormat">${ _("Email")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input class="wizardMandatoryField1" id="userEmail" type="email" name="userEmail" value=${ userEmail } required style="width: 50%;">
+                                    <input id="userEmail" type="email" name="userEmail" value=${ userEmail } required style="width: 50%;">
                                 </td>
                             </tr>
                             <tr>
@@ -51,7 +51,7 @@
                                     <span class="titleCellFormat">${ _("Login")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input class="wizardMandatoryField1" id="login" type="text" name="login" value=${ login } required style="width: 30%;">
+                                    <input id="login" type="text" name="login" value=${ login } required style="width: 30%;">
                                 </td>
                             </tr>
                             <tr>
@@ -59,7 +59,7 @@
                                     <span class="titleCellFormat">${ _("Password")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input class="wizardMandatoryField1" id="password" type="password" name="password" value="" required style="width: 30%;">
+                                    <input id="password" type="password" name="password" value="" required style="width: 30%;">
                                 </td>
                             </tr>
                             <tr>
@@ -67,7 +67,7 @@
                                         <span class="titleCellFormat">${ _("Password (again)")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input class="wizardMandatoryField1" id="passwordBis" type="password" name="passwordBis" value="" required style="width: 30%;">
+                                    <input id="passwordBis" type="password" name="passwordBis" value="" required style="width: 30%;">
                                 </td>
                             </tr>
                         </table>
@@ -83,7 +83,7 @@
                 </div>
             </div>
 
-            <div class="i-box titled" id="step2">
+            <div class="i-box titled" id="step2" style="border-bottom-width: 0px;">
                 <div class="i-box-header">
                     <div class="i-box-title">${ _("2. Server settings")}</div>
                 </div>
@@ -112,7 +112,7 @@
                                         <span class="titleCellFormat">${ _("Organisation")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                        <input class="wizardMandatoryField2" id="organisation" type="text" name="organisation" value=${organisation} required style="width: 70%;">
+                                        <input id="organisation" type="text" name="organisation" value=${organisation} required style="width: 70%;">
                                 </td>
                             </tr>
                         </table>
@@ -129,7 +129,7 @@
                 </div>
             </div>
 
-            <div class="i-box titled" id="step3">
+            <div class="i-box titled" id="step3" style="border-bottom-width: 0px;">
                 <div class="i-box-header">
                     <div class="i-box-title">${ _("3. Instance Tracking")}</div>
                 </div>
@@ -154,7 +154,7 @@
                                         <span class="titleCellFormat">${ _("Enable")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                        <input id="enable" type="checkbox" name="enable" value="${ _("checked")}" ${checked}>
+                                        <input id="enable" type="checkbox" name="enable" value="1" ${checked}>
                                 </td>
                             </tr>
                             <tr>
@@ -183,12 +183,11 @@
     </div>
 </form>
 
-
-
 <script type='text/javascript'>
 
     var popup = new WarningPopup('${ _("Form validation")}', "${ _("Some fields are invalid. Please, correct them and submit the form again.")}");
     var clicked = [false, false, false];
+    var ok = true;
 
     function toggleSection(section){
         $('#step'+section+'>div.i-box-header').nextUntil('#step'+(section+1)+'>div.i-box-header').slideToggle(800);
@@ -212,39 +211,30 @@
     }
 
     $('#nextStep1').on('click', function(e){
-        clicked[0] = true;
-        var name = $('#name'),
-            surName = $('#surName'),
-            userEmail = $('#userEmail'),
-            login = $('#login'),
-            password = $('#password'),
-            passwordBis = $('#passwordBis');
+        ok = true;
+        $('#step1 :input:not(#passwordBis)').on('input', function(e){
+            if (!this.validity.valid){
+                $(this).addClass('hasError');
+                ok = false;
+            }
+            else{
+                $(this).removeClass('hasError');
+            }
+        }).trigger('input');
+        $('#password, #passwordBis').on('input', function(e){
+            var password = $('#password'),
+                passwordBis = $('#passwordBis');
+            if (password.val() != passwordBis.val()) {
+                passwordBis.addClass("hasError");
+                ok = false;
+            }
+            else {
+                passwordBis.removeClass("hasError");
+            }
+        }).trigger('input');
 
-        var wrong = [];
-        if (name.prop('validity').valueMissing){
-            wrong.push(name);
-        }
-        if (surName.prop('validity').valueMissing){
-            wrong.push(surName);
-        }
-        if (!userEmail.prop('validity').valid){
-            wrong.push(userEmail);
-        }
-        if (login.prop('validity').valueMissing){
-            wrong.push(login);
-        }
-        if (password.prop('validity').valueMissing){
-            wrong.push(password);
-        }
-        if (password.val() != passwordBis.val()){
-            wrong.push(passwordBis);
-        }
-
-        if (wrong.length > 0){
+        if (!ok){
             popup.open();
-            wrong.forEach(function(elem){
-                elem.addClass("hasError");
-            });
         }
         else{
             nextStep(1);
@@ -252,19 +242,19 @@
     });
 
     $('#nextStep2').on('click', function(e){
-        clicked[1] = true;
-        var organisation = $('#organisation');
+        ok = true;
+        $('#step2 :input').on('input', function(e){
+            if (!this.validity.valid){
+                $(this).addClass('hasError');
+                ok = false;
+            }
+            else{
+                $(this).removeClass('hasError');
+            }
+        }).trigger('input');
 
-        var wrong = [];
-        if (organisation.prop('validity').valueMissing){
-            wrong.push(organisation);
-        }
-
-        if (wrong.length > 0){
+        if (!ok){
             popup.open();
-            wrong.forEach(function(elem){
-                elem.addClass("hasError");
-            });
         }
         else{
             nextStep(2);
@@ -273,25 +263,41 @@
 
     $('#submit-wizard').on('click', function(e){
         e.preventDefault();
-        clicked[2] = true;
-        var enable = $('#enable'),
-            itEmail = $('#itEmail');
 
-        var wrong = [];
-        if (enable.prop('checked') && !itEmail.prop('validity').valid){
-            wrong.push(itEmail);
-        }
+        ok = true;
+        $('#enable').on('change', function(e){
+            updateITEmail();
+        }).trigger('change');
+        $('#itEmail').on('input', function(e){
+            updateITEmail();
+        });
 
-        if (wrong.length > 0){
+        if (!ok){
             popup.open();
-            wrong.forEach(function(elem){
-                elem.addClass("hasError");
-            });
         }
         else{
             $('#wizard-form').submit();
         }
     });
+
+    function updateITEmail(){
+        var enable = $('#enable'),
+            itEmail = $('#itEmail');
+        itEmail.prop('required', enable.prop('checked'));
+        itEmail.prop('disabled', !enable.prop('checked'));
+        if (enable.prop('checked')){
+            if (!itEmail.prop('validity').valid){
+                itEmail.addClass('hasError');
+                ok = false;
+            }
+            else{
+                itEmail.removeClass('hasError');
+            }
+        }
+        else{
+            itEmail.removeClass('hasError');
+        }
+    }
 
     $('#previousStep2').on('click', function(e){
         previousStep(2);
@@ -299,73 +305,6 @@
 
     $('#previousStep3').on('click', function(e){
         previousStep(3);
-    });
-
-    $('.wizardMandatoryField1').on('input', function(e){
-        if (clicked[0]){
-            if (!this.validity.valid){
-                $(this).addClass('hasError');
-            }
-            else{
-                $(this).removeClass('hasError');
-            }
-        }
-    });
-
-    $('.wizardMandatoryField2').on('input', function(e){
-        if (clicked[1]){
-            if (!this.validity.valid){
-                $(this).addClass('hasError');
-            }
-            else{
-                $(this).removeClass('hasError');
-            }
-        }
-    });
-
-    $('#enable').on('change', function(e){
-        var itEmail = $('#itEmail');
-
-        itEmail.prop('required', this.checked);
-        itEmail.prop('disabled', !this.checked);
-        if (this.checked){
-            itEmail.addClass('wizardMandatoryField3');
-            if (clicked[2]){
-                if (!itEmail.prop('validity').valid){
-                    itEmail.addClass('hasError');
-                }
-                else{
-                    itEmail.removeClass('hasError');
-                }
-            }
-            $('.wizardMandatoryField3').on('input', function(e){
-                if (clicked[2]){
-                    if (!this.validity.valid){
-                        $(this).addClass('hasError');
-                    }
-                    else{
-                        $(this).removeClass('hasError');
-                    }
-                }
-            });
-        }
-        else{
-            itEmail.removeClass('wizardMandatoryField3 hasError');
-        }
-    }).trigger('change');
-
-    $('#password, #passwordBis').on('input', function(e){
-        var password = $('#password'),
-                passwordBis = $('#passwordBis');
-
-        if (clicked[0]){
-            if (password.val() != passwordBis.val()) {
-                passwordBis.addClass("hasError");
-            }
-            else{
-                passwordBis.removeClass("hasError");
-            }
-        }
     });
 
     var LANGUAGES = ${getLocaleDisplayNames() | n,j}
@@ -383,7 +322,10 @@
 
     toggleSection(2);
     toggleSection(3);
-    $('#step2').css('border-bottom-width', '0px');
-    $('#step3').css('border-bottom-width', '0px');
+    $('#enable').on('change', function(e){
+        var itEmail = $('#itEmail');
+        itEmail.prop('required', this.checked);
+        itEmail.prop('disabled', !this.checked);
+    }).trigger('change');
 
 </script>
