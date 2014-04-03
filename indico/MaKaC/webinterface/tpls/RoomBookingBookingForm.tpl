@@ -37,7 +37,7 @@
             // Date validator (repeatability)
             isValid = validate_period(true, ${allowPast}, 1, $('#repeatability').val()) && isValid; // 1: validate dates
             // Time validator
-            isValid = validate_period(false, ${allowPast}, 2) && isValid; // 2: validate only times
+            isValid = isValid & $('#timerange').timerange('validate');
         % endif
         required_fields(['bookedForName', 'contactEmail', 'reason']) && isValid;
         if (onSubmit) {
@@ -162,13 +162,7 @@
             });
         % endif
 
-        $('#bookingForm').delegate(':input', 'keyup change', function() {
-            if (forms_are_valid())
-                % if not infoBookingMode:
-                    updateTimeSlider();
-                % endif
-                ;
-        }).submit(function(e) {
+        $('#bookingForm').submit(function(e) {
             if (!forms_are_valid()) {
                 e.preventDefault();
                  new AlertPopup($T("Error"), $T("There are errors in the form. Please correct fields with red background.")).open();

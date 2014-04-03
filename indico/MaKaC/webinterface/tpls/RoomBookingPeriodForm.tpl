@@ -4,27 +4,6 @@
     IndicoUI.executeOnLoad(function()
     {
         % if not infoBookingMode:
-            // Time slider init
-            $('#timeRange').slider({
-                range: true,
-                max: 1439,
-                values: [510, 1050],
-                step: 5,
-                create: function(event, ui) {
-                    updateTimeSlider(event,ui);
-                },
-
-                start: function(event, ui) {
-                    updateTimeSlider(event,ui);
-                },
-
-                slide: function(event, ui) {
-                    forms_are_valid();
-                    updateTimeSlider(event,ui);
-
-                },
-              });
-
             $('#repeatability').change(function() {
                 if ($(this).val() != 'None') {
                     $('#sDatePlaceTitle').text('${ _("Start date")}');
@@ -52,6 +31,14 @@
                 }
             });
 
+            // Time slider init
+            $('#timerange').timerange({
+                initStartTime: ${ startT },
+                initEndTime: ${ endT },
+                startTimeName: 'sTime',
+                endTimeName: 'eTime'
+            });
+
             % if startDT.day != '':
                 $("#sDatePlace").datepicker('setDate', new Date (${ startDT.year } + "/" + ${ startDT.month } + "/" + ${ startDT.day }));
             % endif
@@ -60,20 +47,10 @@
                 $("#eDatePlace").datepicker('setDate', new Date (${ endDT.year } + "/" + ${ endDT.month } + "/" + ${ endDT.day }));
             % endif
 
-            $('#sTime').watermark('hh:mm');
-            $('#eTime').watermark('hh:mm');
-
-            $("#sTime").val('${ startT }');
-            $("#eTime").val('${ endT }');
-
-            updateTimeSlider();
             $('#repeatability').change();
         % else:
-
             $('#typeInfo').text($('#repeatability option:selected').text());
         % endif
-
-
      });
 </script>
 % if unavailableDates:
@@ -157,19 +134,7 @@
 </tr>
 <tr>
     <td colspan="2">
-        <div style="float: left; clear: both; padding: 20px 32px; background-color: #FAFAFA; margin-top: 10px;">
-        ${ _("Booking time from")}&nbsp;&nbsp;
-        <input name="sTime" id="sTime" style="width: 43px;" type="text" />
-        ${ _("to")}&nbsp;
-        <input name="eTime" id="eTime" style="width: 43px;" type="text" />
-        <div style="margin: 25px 0px 54px 0px">
-            <div id="minHour" style="float: left; color: gray; padding-right: 12px">0:00</div>
-            <div id="timeRange" style="width: 370px; float: left;"></div>
-            <div id="maxHour" style="float: left; color: gray; padding-left: 12px">23:59</div>
-            <div id="sTimeBubble" style="position: absolute; margin: -19px 0px 0px -8px;">&nbsp;</div>
-            <div id="eTimeBubble" style="position: absolute; margin: 20px 0px 0px -8px;">&nbsp;</div>
-        </div>
-        </div>
+        <div id="timerange"></div>
     </td>
 </tr>
 <tr>

@@ -34,32 +34,6 @@ function set_repeatition_comment() {
     $('#repComment').html(s);
 }
 
-// Converting from time string to seconds
-function __getTime(time) {
-    var minutes = parseInt(time % 60);
-    var hours = parseInt(time / 60 % 24);
-    minutes = minutes + "";
-    if (minutes.length == 1) {
-        minutes = "0" + minutes;
-    }
-    return hours + ":" + minutes;
-}
-
-// Refresh time slider
-function updateTimeSlider(event, ui) {
-    if (event && event.type != "slidecreate" ) {
-        $("#sTime").val(__getTime(ui.values[0]));
-        $("#eTime").val(__getTime(ui.values[1]));
-    }
-    var sTime = parseInt($("#sTime").val().split(":")[0] * 60) + parseInt($("#sTime").val().split(":")[1]);
-    var eTime = parseInt($("#eTime").val().split(":")[0] * 60) + parseInt($("#eTime").val().split(":")[1]);
-    if (sTime && eTime || sTime == 0) {
-        $('#timeRange').slider('values', 0, sTime).slider('values', 1, eTime);
-    }
-    $('#sTimeBubble').text($("#sTime").val()).offset({left:$('#timeRange .ui-slider-handle:first').offset().left});
-    $('#eTimeBubble').text($("#eTime").val()).offset({left:$('#timeRange .ui-slider-handle:last').offset().left});
-}
-
 //Refresh datapicker's dates
 function refreshDates(){
     if ($("#sDatePlace").datepicker('getDate') > $("#eDatePlace").datepicker('getDate')) {
