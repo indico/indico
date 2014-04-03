@@ -6,6 +6,8 @@
     }
 
     function initWidgets() {
+        $('#timerange').timerange();
+
         var s = $('#start_date'), e = $('#end_date');
         $('#start_date, #end_date').datepicker({
             onSelect: function() {
@@ -15,26 +17,6 @@
         });
         s.datepicker('setDate', '+0');
         e.datepicker('setDate', '+7');
-
-        $('#timeRange').slider({
-            range: true,
-            max: 1439,
-            values: [510, 1050],
-            step: 5,
-            create: function(e, ui) {
-                updateTimeSlider(e, ui);
-            },
-            start: function(e, ui) {
-                updateTimeSlider(e, ui);
-            },
-            slide: function(e, ui) {
-                updateTimeSlider(e, ui);
-            }
-        });
-
-        $('#sTime').val('0:00');
-        $('#eTime').val('23:59');
-        updateTimeSlider();
     }
 
     function confirm_search() {
@@ -59,6 +41,8 @@
 
         // Init
         var isValid = true;
+
+        // Datepicker
         if (!is_date_valid($('#start_date').val())) {
             isValid = false;
             $('#start_date').addClass('invalid');
@@ -68,22 +52,8 @@
             $('#end_date').addClass('invalid');
         }
 
-        // Simple search
-        var s = $('#sTime'), e = $('#eTime');
-
-        if (s.val() == '' && onSubmit) {
-            s.val('00:00');
-        } else if (!is_time_valid(s.val())) {
-            isValid = false;
-            s.addClass('invalid');
-        }
-
-        if (e.val() == '' && onSubmit) {
-            e.val('00:00');
-        } else if (!is_time_valid(e.val())) {
-            isValid = false;
-            e.addClass('invalid');
-        }
+        // Time period
+        isValid = isValid && $('#timerange').timerange('validate');
 
         // Holidays warning
         if (isValid && !onSubmit) {
@@ -193,18 +163,7 @@
         </div>
     </div>
 
-    <div class="toolbar thin">
-        <div class="group with-slider">
-            <span class="i-button label heavy">
-                ${ _('Time') }
-            </span>
-            <input name="start_time" id="sTime" maxlength="5" size="5" type="text"/>
-            <span class="i-button label slider">
-                <span id="timeRange"></span>
-            </span>
-            <input name="end_time" id="eTime" maxlength="5" size="5" type="text"/>
-        </div>
-    </div>
+    <div id="timerange"></div>
 
     <h2 class="group_title">
         <i class="icon-info"></i>
