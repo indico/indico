@@ -85,22 +85,7 @@
     </tr>
     <tr>
       <td>
-        ${ _('Booking time from') }
-        <input name="sTime" id="sTime" type="text" />
-        ${ _('to') }
-        <input name="eTime" id="eTime" type="text" />
-      </td>
-    </tr>
-    <!-- TIME SLIDER-->
-    <tr>
-      <td>
-        <div style="margin: 13px 0px 32px 0px; padding-top: 10px;">
-          <div id="minHour" style="float: left; color: gray; padding-right: 12px">0:00</div>
-          <div id="timeRange" style="width: 390px; float: left;"></div>
-          <div id="maxHour" style="float: left; color: gray; padding-left: 12px">23:59</div>
-          <div id="sTimeBubble" style="position: absolute; margin: -19px 0px 0px -8px;">&nbsp;</div>
-          <div id="eTimeBubble" style="position: absolute; margin: 20px 0px 0px -8px;">&nbsp;</div>
-        </div>
+        <div id="timerange"></div>
       </td>
     </tr>
     <!-- SUBMIT BUTTON -->
@@ -161,27 +146,12 @@
             });
 
             // Time slider init
-            $('#timeRange').slider({
-                range: true,
-                max: 1439,
-                values: [510, 1050],
-                step: 5,
-                create: function(event, ui) {
-                    updateTimeSlider(event,ui);
-
-                },
-                start: function(event, ui) {
-                    updateTimeSlider(event,ui);
-                },
-                slide: function(event, ui) {
-                    validateForm(false);
-                    updateTimeSlider(event,ui);
-                }
+            $('#timerange').timerange({
+                initStartTime: '8:30',
+                initEndTime: '17:30',
+                startTimeName: 'sTime',
+                endTimeName: 'eTime'
             });
-
-            $('#sTime').val('8:30');
-            $('#eTime').val('17:30');
-            updateTimeSlider();
         }
 
         function combineValues() {
@@ -189,13 +159,13 @@
                 $('#sDay').val() + '-' +
                 $('#sMonth').val() + '-' +
                 $('#sYear').val() + ' ' +
-                $('#sTime').val()
+                $('#timerange').timerange('getStartTime')
             ).val(),
             e = $('#end_date').val(
                 $('#eDay').val() + '-' +
                 $('#eMonth').val() + '-' +
                 $('#eYear').val() + ' ' +
-                $('#eTime').val()
+                $('#timerange').timerange('getEndTime')
             ).val(),
             r = $('#repeatability').val(),
             p = 0, u = 0;
@@ -230,18 +200,15 @@
         }
 
         function eventBindings() {
-            $('#searchForm').delegate(':input', 'change keyup', function() {
-                if (validateForm(false)) {
-                    updateTimeSlider();
-                }
-            }).submit(function(e) {
-                saveFormData();
+            $('#searchForm').submit(function(e) {
                 if (!validateForm(true)) {
                     new AlertPopup($T("Error"), $T('There are errors in the form. Please correct fields with red background.')).open();
                     e.preventDefault();
                 } else if (!$("#roomselector").roomselector("validate")) {
                     new AlertPopup($T("Error"), $T('Please select a room (or several rooms).')).open();
                     e.preventDefault();
+                } else {
+                    saveFormData();
                 }
             });
 
@@ -279,9 +246,9 @@
                 .prop('checked', true);
 
             if (rbUserData.sTime) {
-                $("#sTime").val(rbUserData.sTime);
-                $("#eTime").val(rbUserData.eTime);
-                updateTimeSlider();
+                $('#timerange')
+                    .timerange('setStartTime', rbUserData.sTime)
+                    .timerange('setEndTime', rbUserData.eTime)
             }
         }
 
@@ -312,10 +279,10 @@
 
             updateDateRange(repeatability);
             isValid = validate_period(true, true, 1, repeatability) && isValid; // 1: validate dates
+
             // Time validator
-            if ($('#sTime').val() != '') {
-                isValid = validate_period(false, false, 2) && isValid; // 2: validate only times
-            }
+            isValid = isValid && $('#timerange').timerange('validate');
+
             return isValid;
         }
 
