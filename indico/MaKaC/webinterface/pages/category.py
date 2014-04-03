@@ -983,15 +983,14 @@ class WCategoryStatistics(wcomponents.WTemplated):
                     _("Number of attached files"), self._stats.get("files", _("Not available"))))
                 wvars["updated"] = self._stats["updated"].strftime("%d %B %Y %H:%M")
             else:
-                stats.append(i18nformat("""<h2> _("No statistics for the events").</h2>"""))
-                stats.append(i18nformat("""<h2> _("No statistics for the contributions").</h2>"""))
+                stats.append("""<h2> {0}.</h2>""".format(_('No statistics for the events')))
+                stats.append("""<h2> {0}.</h2>""".format(_('No statistics for the contributions')))
                 stats.append(i18nformat("<strong>{}</strong>".format(_("No statistics for attached files"))))
             if self.__target.isRoot():
                 if "users" in self._stats:
-                    stats.append(i18nformat("""<h2> _("Number of users"): <b>{0}</b></h2>""")
-                                 .format(self._stats["users"]))
+                    stats.append("""<h2> {0}: <b>{1}</b></h2>""".format(_("Number of users"), self._stats["users"]))
                 else:
-                    stats.append(i18nformat("""<h2> _("No statistics for the users").</h2>"""))
+                    stats.append("""<h2> {0}.</h2>""".format(_('No statistics for the users')))
         else:
             stats.append(_("This category doesn't contain any event. No statistics are available."))
         wvars["plots"] = "".join(plots)
