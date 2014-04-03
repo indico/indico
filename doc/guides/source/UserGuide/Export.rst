@@ -53,22 +53,26 @@ Sharepoint
 If you maintain a Sharepoint web site, it is very easy to create
 inside it a web part exposing the forthcoming events from an Indico
 category. First add an XML web part, then in the "XML link" part,
-add the `XML export <#using-the-export.py-script>`_ URL from indico (e.g.
-http://indico.cern.ch/tools/export.py?fid=2l12&date=today&days=1000&of=xml)
-and in the "XSL link" part, add this URL:
-http://indico.cern.ch/export.xsl.
+add the URL from indico (e.g.
+``http://indico.cern.ch/export/categ/2l12.json?from=today&to=tomorrow``, see :ref:`export-api`)
+and in the "XSL link" part, add this URL::
+
+    http://indico.cern.ch/export.xsl
 
 The result should look like this:
 
 |image164|
+
+
+.. _export-api:
 
 Using the HTTP Export API
 -------------------------
 
 Indico has an export API which allows you to
 export categories, events, rooms and room bookings in various formats such
-as JSON, XML, iCal and Atom. For details no how to use this API, see
-:doc:`/ExportAPI/index`.
+as JSON, XML, iCal and Atom. For details no how to use this API, you can access
+the `HTTP API documentation <https://indico.readthedocs.org/en/latest/http_api/>`_.
 
 --------------
 
