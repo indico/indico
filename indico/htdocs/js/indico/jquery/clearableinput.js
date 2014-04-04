@@ -126,6 +126,13 @@
             self.options.emptyvalue = value;
         },
 
+        setValue: function(value) {
+            var self = this;
+
+            self.element.val(value);
+            self._updateClearIcon();
+        },
+
         setIconsVisibility: function(visibility) {
             var self = this;
 

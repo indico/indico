@@ -384,7 +384,9 @@
             }
 
             function restoreFilter(data) {
-                self.filter.search.val(data.filter).trigger("propertychange");
+                self.filter.search
+                    .realtimefilter('setValue', data.filter)
+                    .trigger("propertychange");
 
                 if (!self.options.simpleMode) {
                     self.filter.videoconference.prop('checked', data.videoconference);
