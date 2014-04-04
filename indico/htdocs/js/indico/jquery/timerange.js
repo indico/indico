@@ -33,28 +33,24 @@
             var element = self.element;
             var opt = self.options;
 
+            var toolbar = element;
+            var group = $('<div class="group with-slider timerange">');
+            var label = $('<span class="i-button label heavy">').text(opt.label);
+            var range = $('<span class="i-button label slider">');
+            var thinClass = opt.thinToolbar ? 'thin' : '';
+
             self._createInputs();
             self._createSlider();
 
-            var thin = '';
-            if (opt.thinToolbar) {
-                thin = 'thin';
-            }
-
             if (opt.wrapInToolbar) {
-                var toolbar = $('<div class="toolbar {0}"/>'.format(thin));
+                toolbar = $('<div class="toolbar {0}">'.format(thinClass));
                 element.append(toolbar);
-            } else {
-                var toolbar = element;
             }
-
-            var group = $('<div class="group with-slider timerange"/>');
-            var label = $('<span class="i-button label heavy"/>').text(opt.label);
-            var range = $('<span class="i-button label slider"/>').append(self.slider);
 
             group.append(label)
                 .append(self.startTime)
-                .append(range)
+                .append(range
+                    .append(self.slider))
                 .append(self.endTime)
                 .appendTo(toolbar);
         },
@@ -73,12 +69,19 @@
                 }
             }
 
-            self.startTime = $('<input type="text" name="{0}" maxlength="5"/>'.format(opt.startTimeName))
-                .val(opt.initStartTime)
-                .typeWatch(typeWatchOptions);
-            self.endTime = $('<input type="text" name="{0}" maxlength="5"/>'.format(opt.endTimeName))
-                .val(opt.initEndTime)
-                .typeWatch(typeWatchOptions);
+            self.startTime = $('<input>', {
+                type: 'text',
+                name: opt.startTimeName,
+                maxlength: 5,
+                value: opt.initStartTime
+            }).typeWatch(typeWatchOptions);
+
+            self.endTime = $('<input>', {
+                type: 'text',
+                name: opt.endTimeName,
+                maxlength: 5,
+                value: opt.initEndTime
+            }).typeWatch(typeWatchOptions);
         },
 
         _createSlider: function() {
@@ -86,7 +89,7 @@
             var element = self.element;
             var opt = self.options;
 
-            self.slider = $('<span/>').slider({
+            self.slider = $('<span>').slider({
                 range: true,
                 max: 1439,  // last minute in a day
                 values: [
@@ -132,7 +135,7 @@
 
         __getTimeString: function(time) {
             var minutes = parseInt(time % 60);
-            var hours = parseInt(time / 60 % 24);
+            var hours = parseInt((time / 60) % 24);
 
             minutes = minutes + '';
             if (minutes.length == 1) {
@@ -215,7 +218,7 @@
             var self = this;
 
             var valid = true;
-            var re = /\d{1,2}:\d{2}/;
+            var timeRe = /^\d{1,2}:\d{2}$/;
             var sTime = self.startTime.val();
             var eTime = self.endTime.val();
 
@@ -223,14 +226,14 @@
                 highlight = self.options.errorHighlight;
             }
 
-            if (!sTime.match(re) || !self.__validateTime(sTime)) {
+            if (!sTime.match(timeRe) || !self.__validateTime(sTime)) {
                 valid = false;
                 if (highlight) {
                     self.startTime.addClass('hasError');
                 }
             }
 
-            if (!eTime.match(re) || !self.__validateTime(eTime)) {
+            if (!eTime.match(timeRe) || !self.__validateTime(eTime)) {
                 valid = false;
                 if (highlight) {
                     self.endTime.addClass('hasError');

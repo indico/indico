@@ -513,12 +513,13 @@ notificationAssistance: {notification_for_assistance}
     @staticmethod
     def getRoomsWithData(*args, **kwargs):
         from .locations import Location
-        query = Room.query
-        entities = [Room]
 
         only_active = kwargs.pop('only_active', True)
         if kwargs:
             raise ValueError('Unexpected kwargs: {}'.format(kwargs))
+
+        query = Room.query
+        entities = [Room]
 
         if 'equipment' in args:
             entities.append(static_array.array_agg(RoomEquipment.name))
