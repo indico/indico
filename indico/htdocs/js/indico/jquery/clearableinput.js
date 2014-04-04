@@ -74,6 +74,7 @@
             var input = self.element;
 
             input.val(opt.emptyvalue).trigger("propertychange");
+            self._updateClearIcon();
             opt.callback();
 
             if (opt.focusAfter) {
@@ -89,10 +90,18 @@
             var input = self.element;
 
             opt.onchange();
-            if (input.val() === "" && !opt.alwaysClearable) {
-                self.clearIcon.css("visibility", "hidden");
+            self._updateClearIcon();
+        },
+
+        _updateClearIcon: function() {
+            var self = this;
+            var opt = self.options;
+            var input = self.element;
+
+            if (input.val() === opt.emptyvalue && !self.options.alwaysClearable) {
+                self.clearIcon.css('visibility', 'hidden');
             } else {
-                self.clearIcon.css("visibility", "visible");
+                self.clearIcon.css('visibility', 'visible');
             }
         },
 
