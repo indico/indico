@@ -58,7 +58,7 @@ the following address:
 Hello,
 {%- endtrans %}
 
-{% trans title=event.title | ensure_unicode, datetime=event.startDate | format_datetime | ensure_unicode, tz=event.timezone | ensure_unicode -%}
+{% trans title=event.title | ensure_unicode, datetime=event.adjustedStartDate | format_datetime | ensure_unicode, tz=event.timezone | ensure_unicode -%}
     Please note that the event "{{ title }}" will start on {{ datetime }} ({{ tz }}).
 {%- endtrans %}
 
