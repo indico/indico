@@ -170,25 +170,26 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
         rp = registration.Registrant()
         self._conf.addRegistrant(rp, user)
         rp.setValues(self._getRequestParams(), user)
+
         if user is not None:
             user.addRegistrant(rp)
             rp.setAvatar(user)
-        # avoid multiple sending in case of db conflict
-        email = self._regForm.getNotification()\
-            .createEmailNewRegistrant(self._regForm, rp)
 
-        modEticket = self._conf.getRegistrationForm().getETicket()
+        if self._regForm.isSendRegEmail() and rp.getEmail().strip():
+            # avoid multiple sending in case of db conflict
+            email = self._regForm.getNotification().createEmailNewRegistrant(self._regForm, rp)
 
-        if modEticket.isEnabled() and modEticket.isAttachedToEmail():
-            attachment = {}
-            filename = "{0}-Ticket.pdf".format(self._target.getTitle())
-            attachment["name"] = filename
-            pdf = TicketToPDF(self._target, rp)
-            attachment["binary"] = pdf.getPDFBin()
-            email["attachments"] = [attachment]
+            modEticket = self._conf.getRegistrationForm().getETicket()
 
-        if email:
+            if modEticket.isEnabled() and modEticket.isAttachedToEmail():
+                attachment = {
+                    'name': "{0}-Ticket.pdf".format(self._target.getTitle()),
+                    'binary': TicketToPDF(self._target, rp).getPDFBin(),
+                }
+                email["attachments"] = [attachment]
+
             GenericMailer.send(email)
+
         if canManageRegistration and user != self._getUser():
             self._redirect(RHRegistrantListModif._uh.getURL(self._conf))
         else:

@@ -804,22 +804,24 @@ There is a new registrant (%s) in '%s'. See information below:
 %s
 """) % (rp.getFullName(), strip_ml_tags(regForm.getConference().getTitle()), body)
             bodyOrg = self._cleanBody(bodyOrg)
-            maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
+            maildata = {"fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(),
+                        "subject": subject, "body": bodyOrg}
             GenericMailer.send(GenericNotification(maildata))
         # send mail to participant
-        if regForm.isSendRegEmail() and rp.getEmail().strip() != "":
-            bodyReg = _("""
+
+        bodyReg = _("""
 Congratulations, your registration to %s was successful%s See your information below:
 
 %s
 %s
 """) % (strip_ml_tags(regForm.getConference().getTitle()), paymentWarning, body, epaymentLink)
-            bodyReg = self._cleanBody(bodyReg)
-            to = rp.getEmail().strip()
-            maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
-            return maildata
-        else:
-            return None
+
+        return {
+            "fromAddr": fromAddr,
+            "toList": [rp.getEmail().strip()],
+            "subject": subject,
+            "body": self._cleanBody(bodyReg)
+        }
 
     def sendEmailNewRegistrant(self, regForm, rp):
         """
