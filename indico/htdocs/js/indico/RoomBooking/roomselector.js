@@ -23,7 +23,7 @@
             roomMaxCapacity: 0,
             userData: {},
             selectName: "roomselection",
-            simple: false
+            simpleMode: false
         },
 
         _create: function() {
@@ -130,7 +130,7 @@
                 header: self.widget.find(".ui-widget-header")
             };
 
-            if (self.options.simple) {
+            if (self.options.simpleMode) {
                 self.element.addClass('simple');
             }
         },
@@ -273,7 +273,7 @@
                 },
                 validation: function(e) {
                     var val = e.val();
-                    if (val !== '' && (val < 0 || val > maxRoomCapacity || parseInt(val, 10).toString() == 'NaN')) {
+                    if (val !== '' && (val < 0 || val > self.options.roomMaxCapacity || parseInt(val, 10).toString() == 'NaN')) {
                         return false;
                     } else {
                         return true;
@@ -379,15 +379,21 @@
                         this.click();
                     }
                 });
+
+                self._updateSelectionCounter()
             }
 
             function restoreFilter(data) {
                 self.filter.search.val(data.filter).trigger("propertychange");
-                self.filter.videoconference.prop('checked', data.videoconference);
-                self.filter.webcast.prop('checked', data.webcast);
-                self.filter.projector.prop('checked', data.projector);
-                self.filter.publicroom.prop('checked', data.publicroom);
-                self.filter.capacity.val(data.capacity).trigger("focusout");
+
+                if (!self.options.simpleMode) {
+                    self.filter.videoconference.prop('checked', data.videoconference);
+                    self.filter.webcast.prop('checked', data.webcast);
+                    self.filter.projector.prop('checked', data.projector);
+                    self.filter.publicroom.prop('checked', data.publicroom);
+                    self.filter.capacity.val(data.capacity).trigger("focusout");
+                }
+
                 self._updateFilter();
             }
         },

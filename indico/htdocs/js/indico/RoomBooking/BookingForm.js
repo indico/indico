@@ -87,6 +87,7 @@ function saveFormData() {
         "capacity": filterData.capacity,
         "videoconference": filterData.videoconference,
         "webcast": filterData.webcast,
+        "projector": filterData.projector,
         "publicroom": filterData.publicroom,
         "filter":  filterData.search,
         "selectedRooms":  selectedRooms,
