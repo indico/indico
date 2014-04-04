@@ -17,13 +17,13 @@
 
  (function($) {
     $.widget("indico.roomselector", {
-
         options: {
             allowEmpty: true,
             rooms: [],
             roomMaxCapacity: 0,
             userData: {},
-            selectName: "roomselection"
+            selectName: "roomselection",
+            simple: false
         },
 
         _create: function() {
@@ -122,11 +122,17 @@
                 placeholder: $T('Filter rooms')
             }).multiselectfilter('advancedFilter');
 
+            self.element.addClass('roomselector');
             self.element.find("button").css("display", "none");
             self.widget = self.select.multiselect("widget");
-            self.parts = {};
-            self.parts.list = self.widget.find(".ui-multiselect-checkboxes").scrollblocker();
-            self.parts.header = self.widget.find(".ui-widget-header");
+            self.parts = {
+                list: self.widget.find(".ui-multiselect-checkboxes").scrollblocker(),
+                header: self.widget.find(".ui-widget-header")
+            };
+
+            if (self.options.simple) {
+                self.element.addClass('simple');
+            }
         },
 
         _draw: function() {
@@ -209,8 +215,8 @@
                 return self.selecttools;
             });
 
-            // Filtering tools
-            self.filtertools = $("<div class='group i-selection'/>")
+            // Filter tools
+            self.filtertools = $("<div class='group i-selection requirements'/>")
                    .append($("<span class='i-button label'/>").text($T("Require")))
                    .append(filter.videoconference)
                    .append($("<label for='videoconference' class='i-button icon-camera'/>")

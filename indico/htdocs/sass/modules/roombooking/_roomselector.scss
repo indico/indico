@@ -21,7 +21,7 @@
 
 @import "partials/icons";
 
-#roomselector {
+.roomselector {
     @include border-all();
     @include border-radius();
     @include single-box-shadow($hoff: 2px, $voff: 2px);
@@ -229,5 +229,29 @@
             float: right;
         }
 
+    }
+}
+
+.roomselector.simple {
+    width: 550px;
+
+    .ui-multiselect-header {
+        .requirements {
+            display: none;
+        }
+
+        .with-slider {
+            display: none;
+        }
+    }
+
+    .ui-multiselect-checkboxes {
+        .attributes {
+            display: none;
+        }
+
+        .capacity {
+            display: none;
+        }
     }
 }
