@@ -1,4 +1,4 @@
-<h2 class="page_title">
+<h2 class="page-title">
     ${"My Blockings" if rh.onlyMine else "Blockings"}
 </h2>
 <br />

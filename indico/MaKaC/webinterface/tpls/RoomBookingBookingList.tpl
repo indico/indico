@@ -25,7 +25,7 @@
                   </li>
                 </ul>
               % else :
-                <h2 class="page_title">${ title }</h2>
+                <h2 class="page-title">${ title }</h2>
                 % if prebookingsRejected:
                   <br /><br />
                   <span class="actionSucceeded">${ subtitle }</span>

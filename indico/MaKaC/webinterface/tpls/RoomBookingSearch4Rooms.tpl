@@ -199,7 +199,7 @@
       <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
         <tr>
           <td class="maincell">
-            <h2 class="page_title">${ _('Search rooms') }</h2>
+            <h2 class="page-title">${ _('Search rooms') }</h2>
             <!-- Background table (adds image) -->
             <table width="100%" class="ACtab">
               <tr>
@@ -208,7 +208,7 @@
                   <table width="90%" align="center" border="0">
                     <tr>
                       <td colspan="2">
-                        <h2 class="group_title">${ _('Choose a room') }</h2>
+                        <h2 class="group-title">${ _('Choose a room') }</h2>
                       </td>
                     </tr>
                     <tr>
@@ -247,7 +247,7 @@
                     <table width="90%" align="center" border="0">
                       <tr>
                         <td colspan="2">
-                          <h2 class="group_title">${ _('Search for a room') }</h2>
+                          <h2 class="group-title">${ _('Search for a room') }</h2>
                         </td>
                       </tr>
                       <!-- LOCATION (PLUGIN) -->

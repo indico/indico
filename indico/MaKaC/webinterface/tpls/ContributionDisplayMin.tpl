@@ -20,7 +20,7 @@
             </div>
             <%include file="ContributionICalExport.tpl" args="item=Contribution"/>
         </div>
-        <h1 class="page_title">
+        <h1 class="page-title">
             ${"Contribution"}
             % if Contribution.getType() is not None:
                 <span class="type">${Contribution.getType().getName()}</span>

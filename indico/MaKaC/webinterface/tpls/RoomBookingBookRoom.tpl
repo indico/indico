@@ -11,7 +11,7 @@
     </tr>
     <tr>
       <td>
-        <h2 class="group_title">
+        <h2 class="group-title">
           <i class="icon-location"></i>
           ${ _('Rooms') }
         </h2>
@@ -26,7 +26,7 @@
     <!-- DATES -->
     <tr>
       <td>
-        <h2 class="group_title"><i class="icon-calendar"></i>${ _('Date range') }</h2>
+        <h2 class="group-title"><i class="icon-calendar"></i>${ _('Date range') }</h2>
       </td>
     </tr>
     <tr>
@@ -80,7 +80,7 @@
     <!-- TIME -->
     <tr>
       <td>
-        <h2 class="group_title"><i class="icon-time"></i>${ _('Time range') }</h2>
+        <h2 class="group-title"><i class="icon-time"></i>${ _('Time range') }</h2>
       </td>
     </tr>
     <tr>

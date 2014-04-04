@@ -1,5 +1,5 @@
     <div style="width:80%;">
-    <h2 class="page_title">
+    <h2 class="page-title">
     % if rh._createNew:
          ${ _("New Blocking")}
     % else:

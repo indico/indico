@@ -1,5 +1,5 @@
 <% from MaKaC.rb_location import RoomGUID %>
-<h2 class="page_title">
+<h2 class="page-title">
     % if rh.filterState == 'pending':
       Pending blockings
     % elif rh.filterState == 'accepted':

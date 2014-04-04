@@ -9,7 +9,7 @@
       <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
         <tr>
           <td class="maincell">
-            <h2 class="page_title">${ title }</h2>
+            <h2 class="page-title">${ title }</h2>
             % if rooms:
               <table width="100%" class="filesTab">
                 <tr>

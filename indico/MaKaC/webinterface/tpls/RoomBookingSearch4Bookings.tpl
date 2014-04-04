@@ -117,12 +117,12 @@
 </div>
 <!-- END OF CONTEXT HELP DIVS -->
 
-<h2 class="page_title">
+<h2 class="page-title">
     ${ _('Search bookings') }
 </h2>
 
 <form id="searchForm" method="post" action="${ roomBookingBookingListURL }">
-    <h2 class="group_title">
+    <h2 class="group-title">
         <i class="icon-location"></i>
         ${ _('Rooms') }
     </h2>
@@ -138,7 +138,7 @@
     <input type="hidden" name="is_search" value="y"/>
     <i class="icon-question" title="${ _('You can select multiple rooms the same way you select multiple files in Windows - press (and hold) left mouse button and move the cursor. Alternatively you can use keyboard - hold SHIFT and press up/down arrows.') }"></i>
 
-    <h2 class="group_title">
+    <h2 class="group-title">
         <i class="icon-time"></i>
         ${ _('Timespan') }
     </h2>
@@ -165,7 +165,7 @@
 
     <div id="timerange"></div>
 
-    <h2 class="group_title">
+    <h2 class="group-title">
         <i class="icon-info"></i>
         ${ _('Details') }
     </h2>
@@ -185,7 +185,7 @@
 
     <input id="submitBtn1" type="submit" class="i-button highlight" value="${ _('Search') }"/>
 
-    <h2 class="group_title">
+    <h2 class="group-title">
         ${ _('Advanced search') }
     </h2>
     <table width="100%" align="center" cellpadding="0" cellspacing="0" border="0">

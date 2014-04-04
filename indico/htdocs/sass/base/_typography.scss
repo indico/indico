@@ -84,14 +84,14 @@ sub {
 
 /* Elements */
 
-.page_title {
+.page-title {
     margin-top: 0;
     font-size: 2em;
     font-weight: normal;
     color: #B14300;
 }
 
-.group_title {
+.group-title {
     border-bottom: 2px solid #eaeaea;
     display: block;
     font-size: 2em;
@@ -262,7 +262,7 @@ a.small-link {
 }
 
 textarea.log {
+  @extend .mono;
   color: $dark-gray;
   font-size: 0.7em;
-  @extend .mono;
 }
