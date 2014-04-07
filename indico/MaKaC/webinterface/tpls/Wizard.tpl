@@ -27,7 +27,7 @@
                                     <span class="titleCellFormat">${ _("First name")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input id="name" type="text" name="name" value=${ name } required style="width: 80%;">
+                                    <input id="name" type="text" name="name" data-error-tooltip="${ _("You must enter a name.")}" value=${ name } required style="width: 80%;">
                                 </td>
                             </tr>
                             <tr>
@@ -35,7 +35,7 @@
                                     <span class="titleCellFormat">${ _("Family name")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input id="surName" type="text" name="surName" value=${ surName } required style="width: 80%;">
+                                    <input id="surName" type="text" name="surName" data-error-tooltip="${ _("You must enter a surname.")}" value=${ surName } required style="width: 80%;">
                                 </td>
                             </tr>
                             <tr>
@@ -43,7 +43,7 @@
                                     <span class="titleCellFormat">${ _("Email")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input id="userEmail" type="email" name="userEmail" value=${ userEmail } required style="width: 50%;">
+                                    <input id="userEmail" type="email" name="userEmail" data-error-tooltip="${ _("You must enter an user email address.")}" value=${ userEmail } required style="width: 50%;">
                                 </td>
                             </tr>
                             <tr>
@@ -51,7 +51,7 @@
                                     <span class="titleCellFormat">${ _("Login")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input id="login" type="text" name="login" value=${ login } required style="width: 30%;">
+                                    <input id="login" type="text" name="login" data-error-tooltip="${ _("You must enter a login.")}" value=${ login } required style="width: 30%;">
                                 </td>
                             </tr>
                             <tr>
@@ -59,7 +59,7 @@
                                     <span class="titleCellFormat">${ _("Password")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input id="password" type="password" name="password" value="" required style="width: 30%;">
+                                    <input id="password" type="password" name="password" data-error-tooltip="${ _("You must define a password.")}" value="" required style="width: 30%;">
                                 </td>
                             </tr>
                             <tr>
@@ -67,7 +67,7 @@
                                         <span class="titleCellFormat">${ _("Password (again)")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input id="passwordBis" type="password" name="passwordBis" value="" required style="width: 30%;">
+                                    <input id="passwordBis" type="password" name="passwordBis" data-error-tooltip="${ _("You must enter the same password twice.")}" value="" required style="width: 30%;">
                                 </td>
                             </tr>
                         </table>
@@ -112,7 +112,7 @@
                                         <span class="titleCellFormat">${ _("Organisation")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                        <input id="organisation" type="text" name="organisation" value=${organisation} required style="width: 70%;">
+                                        <input id="organisation" type="text" name="organisation" data-error-tooltip="${ _("You must enter the name of your organization.")}" value=${organisation} required style="width: 70%;">
                                 </td>
                             </tr>
                         </table>
@@ -162,7 +162,7 @@
                                         <span class="titleCellFormat">${ _("Email")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                        <input id="itEmail" type="email" name="instanceTrackingEmail" value=${instanceTrackingEmail} style="width: 50%;">
+                                        <input id="itEmail" type="email" name="instanceTrackingEmail" data-error-tooltip="${ _("You must enter an email for Instance Tracking.")}" value=${instanceTrackingEmail} style="width: 50%;">
                                 </td>
                             </tr>
                         </table>
@@ -210,53 +210,57 @@
         expandCollapse(current-1, current);
     }
 
-    $('#nextStep1').on('click', function(e){
+    $('#nextStep1').on('click', function(){
         ok = true;
-        $('#step1 :input:not(#passwordBis)').on('input', function(e){
+        $('#step1 :input:not(#passwordBis)').on('input', function(){
             if (!this.validity.valid){
-                $(this).addClass('hasError');
+                if (this.id == 'userEmail'){
+                    if (this.validity.valueMissing){
+                        $(this).qtip('option', 'content.text', "${ _("You must enter an user email.")}");
+                    }
+                    else{
+                        $(this).qtip('option', 'content.text', "${ _("You must enter a valid user email.")}");
+                    }
+                }
+                invalidField($(this));
                 ok = false;
             }
             else{
-                $(this).removeClass('hasError');
+                validField($(this));
             }
         }).trigger('input');
-        $('#password, #passwordBis').on('input', function(e){
+        $('#password, #passwordBis').on('input', function(){
             var password = $('#password'),
                 passwordBis = $('#passwordBis');
             if (password.val() != passwordBis.val()) {
-                passwordBis.addClass("hasError");
+                invalidField(passwordBis);
                 ok = false;
             }
             else {
-                passwordBis.removeClass("hasError");
+                validField(passwordBis);
             }
         }).trigger('input');
+        $('#wizard-form input').trigger('hideTooltip');
 
-        if (!ok){
-            popup.open();
-        }
-        else{
+        if (ok){
             nextStep(1);
         }
     });
 
-    $('#nextStep2').on('click', function(e){
+    $('#nextStep2').on('click', function(){
         ok = true;
-        $('#step2 :input').on('input', function(e){
+        $('#step2 :input').on('input', function(){
             if (!this.validity.valid){
-                $(this).addClass('hasError');
+                invalidField($(this));
                 ok = false;
             }
             else{
-                $(this).removeClass('hasError');
+                validField($(this));
             }
         }).trigger('input');
+        $('#wizard-form input').trigger('hideTooltip');
 
-        if (!ok){
-            popup.open();
-        }
-        else{
+        if (ok){
             nextStep(2);
         }
     });
@@ -265,17 +269,14 @@
         e.preventDefault();
 
         ok = true;
-        $('#enable').on('change', function(e){
+        $('#enable').on('change', function(){
             updateITEmail();
         }).trigger('change');
-        $('#itEmail').on('input', function(e){
+        $('#itEmail').on('input', function(){
             updateITEmail();
         });
 
-        if (!ok){
-            popup.open();
-        }
-        else{
+        if (ok){
             $('#wizard-form').submit();
         }
     });
@@ -287,23 +288,29 @@
         itEmail.prop('disabled', !enable.prop('checked'));
         if (enable.prop('checked')){
             if (!itEmail.prop('validity').valid){
-                itEmail.addClass('hasError');
+                if (itEmail.prop('validity').valueMissing){
+                    itEmail.qtip('option', 'content.text', "${ _("You must enter an email for Instance Tracking.")}");
+                }
+                else{
+                    itEmail.qtip('option', 'content.text', "${ _("You must enter a valid email for Instance Tracking.")}");
+                }
+                invalidField(itEmail);
                 ok = false;
             }
             else{
-                itEmail.removeClass('hasError');
+                validField(itEmail);
             }
         }
         else{
-            itEmail.removeClass('hasError');
+            validField(itEmail);
         }
     }
 
-    $('#previousStep2').on('click', function(e){
+    $('#previousStep2').on('click', function(){
         previousStep(2);
     });
 
-    $('#previousStep3').on('click', function(e){
+    $('#previousStep3').on('click', function(){
         previousStep(3);
     });
 
@@ -322,10 +329,46 @@
 
     toggleSection(2);
     toggleSection(3);
-    $('#enable').on('change', function(e){
+    $('#enable').on('change', function(){
         var itEmail = $('#itEmail');
         itEmail.prop('required', this.checked);
         itEmail.prop('disabled', !this.checked);
     }).trigger('change');
+
+    function validField(field){
+        field.removeClass('hasError');
+    }
+
+    function invalidField(field){
+        field.addClass('hasError');
+    }
+
+    $('#wizard-form input').qtip({
+            content: {
+                attr: 'data-error-tooltip'
+            },
+            position: {
+                at: 'right center',
+                my: 'left center'
+            },
+            show: {
+                event: 'showTooltip'
+            },
+            hide: {
+                event: 'hideTooltip'
+            }
+    }).on('focus input mouseenter', function(){
+        if ($(this).hasClass('hasError')){
+            $(this).trigger('showTooltip');
+        }
+        else{
+            $(this).trigger('hideTooltip');
+        }
+    }).on('blur', function(){
+        $(this).trigger('hideTooltip');
+    });
+    $('#wizard-form').on('mouseleave', 'input:not(:focus)', function(){
+        $(this).trigger('hideTooltip');
+    });
 
 </script>
