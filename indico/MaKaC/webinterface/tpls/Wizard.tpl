@@ -240,6 +240,7 @@
                 validField(passwordBis);
             }
         }).trigger('input');
+        $('#wizard-form input').trigger('hideTooltip');
 
         if (ok){
             nextStep(1);
@@ -257,6 +258,7 @@
                 validField($(this));
             }
         }).trigger('input');
+        $('#wizard-form input').trigger('hideTooltip');
 
         if (ok){
             nextStep(2);
