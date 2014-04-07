@@ -74,14 +74,16 @@
                 name: opt.startTimeName,
                 maxlength: 5,
                 value: opt.initStartTime
-            }).typeWatch(typeWatchOptions);
+            }).attr('placeholder', 'hh:mm')
+                .typeWatch(typeWatchOptions);
 
             self.endTime = $('<input>', {
                 type: 'text',
                 name: opt.endTimeName,
                 maxlength: 5,
                 value: opt.initEndTime
-            }).typeWatch(typeWatchOptions);
+            }).attr('placeholder', 'hh:mm')
+                .typeWatch(typeWatchOptions);
         },
 
         _createSlider: function() {
