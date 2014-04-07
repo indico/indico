@@ -71,7 +71,7 @@ $toolbar-thin-height: 1.9em;
         margin-right: 1em;
     }
 
-    & .i-button {
+    .i-button {
         display: block;
         float: left;
         font-weight: bold;
@@ -91,7 +91,7 @@ $toolbar-thin-height: 1.9em;
         }
     }
 
-    & input[type=text] {
+    input[type=text] {
         color: $black;
         display: inline-block;
         float: left;
@@ -100,7 +100,7 @@ $toolbar-thin-height: 1.9em;
         padding: 0.2em 0.7em 0.1em 0.7em;
     }
 
-    & .dropdown {
+    .dropdown {
         display: none;
         z-index: 1;
 
@@ -109,8 +109,25 @@ $toolbar-thin-height: 1.9em;
         }
     }
 
-    & .group {
+    .group {
         @extend %toolbar-group;
+    }
+}
+
+.toolbar.table {
+    display: table;
+    table-layout: fixed;
+
+    .group {
+        display: table-row;
+
+        .i-button {
+            display: table-cell;
+            float: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
     }
 }
 

@@ -709,5 +709,6 @@ class RHRoomBookingRejectALlConflicting( RHRoomBookingBase ):
 class RHRoomBookingSearch4Bookings(RHRoomBookingBase):
 
     def _process(self):
-        self._rooms = Room.getRooms()
+        self._rooms = Room.getRoomsWithData('photo')
+        self._max_capacity = Room.getMaxCapacity()
         return reservation_views.WPRoomBookingSearch4Bookings(self).display()

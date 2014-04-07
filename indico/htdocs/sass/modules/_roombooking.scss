@@ -31,6 +31,16 @@
     width: 820px;
 }
 
+#BookingDetails {
+    .toolbar.table {
+        width: 368px;
+    }
+
+    .label {
+        width: 100px;
+    }
+}
+
 .tip {
     border:solid 1px #888888;
     color:#222222;

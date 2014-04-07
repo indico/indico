@@ -221,12 +221,11 @@ class BookingListForm(Form):
     is_only_bookings = BooleanField('Only Bookings', [validators.Optional()], default=False)
     is_only_mine = BooleanField('Only Mine', [validators.Optional()], default=False)
     is_only_my_rooms = BooleanField('Only My Rooms', [validators.Optional()], default=False)
-    is_search = BooleanField('Search', [validators.Optional()], default=False)
+    is_search = BooleanField('Search', [validators.Optional()], default=True)
     is_new_booking = BooleanField('New Booking', [validators.Optional()], default=False)
     is_auto = BooleanField('Auto', [validators.Optional()], default=False)
     is_today = BooleanField('Today', [validators.Optional()], default=False)
     is_archival = BooleanField('Is Archival', [validators.Optional()], default=False)
-    is_heavy = BooleanField('Is Heavy', [validators.Optional()], default=False)
 
     flexible_dates_range = IntegerField('Flexible Date Range', [validators.Optional()], default=0)
     finish_date = BooleanField('Finish Date Exists', [validators.Optional()], default=True)

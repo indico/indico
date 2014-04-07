@@ -6,6 +6,13 @@
     }
 
     function initWidgets() {
+        $('#roomselector').roomselector({
+            allowEmpty: false,
+            rooms: ${ rooms | j, n },
+            selectName: 'room_id_list',
+            simpleMode: true
+        });
+
         $('#timerange').timerange();
 
         var s = $('#start_date'), e = $('#end_date');
@@ -124,19 +131,10 @@
 <form id="searchForm" method="post" action="${ roomBookingBookingListURL }">
     <h2 class="group-title">
         <i class="icon-location"></i>
-        ${ _('Rooms') }
+        ${ _('Taking place in') }
     </h2>
 
-    <select name="room_id_list" id="roomIDList" multiple="multiple" size="8">
-        <option value="-1">${ _('All Rooms') }</option>
-        % for room in rooms:
-            <option value="${ room.id }" class="${ room.kind }">
-              ${ room.location.name }&nbsp;${ room.getFullName() }
-            </option>
-        % endfor
-    </select>
-    <input type="hidden" name="is_search" value="y"/>
-    <i class="icon-question" title="${ _('You can select multiple rooms the same way you select multiple files in Windows - press (and hold) left mouse button and move the cursor. Alternatively you can use keyboard - hold SHIFT and press up/down arrows.') }"></i>
+    <div id="roomselector"></div>
 
     <h2 class="group-title">
         <i class="icon-time"></i>
@@ -165,143 +163,140 @@
 
     <div id="timerange"></div>
 
-    <h2 class="group-title">
+    <h3 class="group-title">
         <i class="icon-info"></i>
-        ${ _('Details') }
-    </h2>
+        ${ _('Booking details') }
+    </h3>
 
-    <div class="toolbar thin">
-        <div class="group">
-            <div class="i-button label heavy">Booked for</div>
-            <input size="30" type="text" id="booked_for_name" name="booked_for_name" />
+    <div id="BookingDetails">
+        <div class="toolbar thin">
+            <div class="group">
+                <span class="i-button label">
+                    ${ _('Booked for') }
+                </span>
+                <input size="30" type="text" id="booked_for_name" name="booked_for_name"
+                    placeholder="${ _('Type name...') }" />
+            </div>
+        </div>
+        <div class="toolbar thin">
+            <div class="group">
+                <span class="i-button label">
+                    ${ _('Reason') }
+                </span>
+                <input size="30" type="text" id="reason" name="reason"
+                    placeholder="${ _('Type reason...') }"/>
+            </div>
+        </div>
+
+        <div class="toolbar thin table">
+            <div class="group i-selection">
+                <span class="i-button label">
+                    ${ _('Booked') }
+                </span>
+                <input type="radio" id="any_booker" name="is_only_mine" value="false" checked/>
+                <label for="any_booker" class="i-button">
+                    ${ _('Anyone') }
+                </label>
+                <input type="radio" id="only_mine" name="is_only_mine" value="true"/>
+                <label for="only_mine" class="i-button"
+                    title="${ _('Filter your bookings') }">
+                    ${ _('Me') }
+                </label>
+            </div>
+        </div>
+
+        % if isResponsibleForRooms:
+        <div class="toolbar thin table">
+            <div class="group i-selection">
+                <span class="i-button label">
+                    ${ _('Rooms') }
+                </span>
+                <input type="radio" id="any_room" name="is_only_my_rooms" value="false" checked/>
+                <label for="any_room" class="i-button">
+                    ${ _('Any room') }
+                </label>
+                <input type="radio" id="only_my_rooms" name="is_only_my_rooms" value="true"/>
+                <label for="only_my_rooms" class="i-button"
+                    title="${ _('Filter bookings of rooms you are taking care of') }">
+                    ${ _('My rooms') }
+                </label>
+            </div>
+        </div>
+        % endif
+
+        <div class="toolbar thin table">
+            <div class="group i-selection">
+                <span class="i-button label">
+                    ${ _('Type') }
+                </span>
+                <input type="checkbox" id="is_only_bookings" name="is_only_bookings"/>
+                <label for="is_only_bookings" class="i-button"
+                    title="${ _('If not checked, both pre-bookings and confirmed bookings will be shown.') }">
+                    ${ _('Bookings') }
+                </label>
+                <input type="checkbox" id="is_only_pre_bookings" name="is_only_pre_bookings"/>
+                <label for="is_only_pre_bookings" class="i-button"
+                    title="${ _('If not checked, both pre-bookings and confirmed bookings will be shown.') }">
+                    ${ _('Pre-Bookings') }
+                </label>
+            </div>
+        </div>
+
+        <div class="toolbar thin table">
+            <div class="group i-selection">
+                <span class="i-button label">
+                    ${ _('State') }
+                </span>
+                <input type="checkbox" id="is_rejected" name="is_rejected"/>
+                <label for="is_rejected" class="i-button"
+                    title="${ _('Filter rejected bookings') }">
+                    ${ _('Rejected') }
+                </label>
+                <input type="checkbox" id="is_cancelled" name="is_cancelled"/>
+                <label for="is_cancelled" class="i-button"
+                    title="${ _('Filter cancelled bookings') }">
+                    ${ _('Cancelled') }
+                </label>
+                <input type="checkbox" id="is_archival" name="is_archival"/>
+                <label for="is_archival" class="i-button"
+                    title="${ _('Filter archived bookings') }">
+                    ${ _('Archived') }
+                </label>
+            </div>
+        </div>
+
+        <div class="toolbar thin table">
+            <div class="group i-selection">
+                <span class="i-button label">
+                    ${ _('Services') }
+                </span>
+                <input type="checkbox" id="uses_video_conference" name="uses_video_conference"/>
+                <label for="uses_video_conference" class="i-button"
+                    title="${ _('Filter bookings which will use videoconference systems') }">
+                    ${ _('Videoconference') }
+                </label>
+            </div>
+        </div>
+
+        <div class="toolbar thin table">
+            <div class="group i-selection">
+                <span class="i-button label">
+                    ${ _('Assistance') }
+                </span>
+                <input type="checkbox" id="needs_video_conference_setup" name="needs_video_conference_setup"/>
+                <label for="needs_video_conference_setup" class="i-button"
+                    title="${ _('Filter bookings which requested assistance for the startup of the videoconference session') }">
+                    ${ _('Videoconference') }
+                </label>
+                <input type="checkbox" id="needs_general_assistance" name="needs_general_assistance"/>
+                <label for="needs_general_assistance" class="i-button"
+                    title="${ _('Filter bookings which requested assistance for the startup of the meeting') }">
+                    ${ _('Startup') }
+                </label>
+            </div>
         </div>
     </div>
-    <div class="toolbar thin">
-        <div class="group">
-            <div class="i-button label heavy">Reason</div>
-            <input size="30" type="text" id="reason" name="reason" />
-        </div>
-    </div>
 
+    <h2 class="group-title"></h2>
     <input id="submitBtn1" type="submit" class="i-button highlight" value="${ _('Search') }"/>
-
-    <h2 class="group-title">
-        ${ _('Advanced search') }
-    </h2>
-    <table width="100%" align="center" cellpadding="0" cellspacing="0" border="0">
-        <tr>
-            <td align="right">
-                <table width="100%" cellspacing="4px">
-                    <tr>
-                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap">
-                            <small>${ _('Only Bookings') } &nbsp;&nbsp;</small>
-                        </td>
-                        <td align="left" class="blacktext" >
-                            <input id="is_only_bookings" name="is_only_bookings" type="checkbox" />
-                            ${ inlineContextHelp( _('Show only <b>Bookings</b>. If not checked, both pre-bookings and confirmed bookings will be shown.')) }
-                            <br />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:165px; text-align: right; vertical-align: top; white-  space: nowrap">
-                            <small>${ _('Only Pre-bookings') }&nbsp;&nbsp;</small>
-                        </td>
-                        <td align="left" class="blacktext">
-                            <input id="is_only_pre_bookings" name="is_only_pre_bookings" type="checkbox" />
-                            ${ inlineContextHelp( _('Show only <b>PRE-bookings</b>. If not checked, both pre-bookings and confirmed bookings will be shown.')  ) }
-                            <br />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:165px; text-align: right; vertical-align: top; white-  space: nowrap">
-                            <small>${ _('Only mine') }&nbsp;&nbsp;</small>
-                        </td>
-                        <td align="left" class="blacktext" >
-                            <input id="is_only_mine" name="is_only_mine" type="checkbox" />
-                            ${ inlineContextHelp(_('Show only <b>your</b> bookings.')) }
-                            <br/>
-                        </td>
-                    </tr>
-
-                    % if isResponsibleForRooms:
-                    <tr>
-                        <td style="width:165px; text-align: right; vertical-align: top; white-  space: nowrap">
-                            <small>${ _('Of my rooms') }&nbsp;&nbsp;</small>
-                        </td>
-                        <td align="left" class="blacktext">
-                            <input id="is_only_my_rooms" name="is_only_my_rooms" type="checkbox" />
-                            ${ inlineContextHelp(_('Only bookings of rooms you are responsible for.')) }
-                            <br/>
-                        </td>
-                    </tr>
-                    % endif
-
-                    <tr>
-                        <td style="width:165px; text-align: right; vertical-align: top; white-  space: nowrap">
-                            <small>${ _('Is rejected') }&nbsp;&nbsp;</small>
-                        </td>
-                        <td align="left" class="blacktext" >
-                            <input id="is_rejected" name="is_rejected" type="checkbox" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:165px; text-align: right; vertical-align: top; white-  space: nowrap">
-                            <small>${ _('Is cancelled') }&nbsp;&nbsp;</small>
-                        </td>
-                        <td align="left" class="blacktext">
-                            <input id="is_cancelled" name="is_cancelled" type="checkbox" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:165px; text-align: right; vertical-align: top; white-  space: nowrap">
-                            <small>${ _('Is archival') }&nbsp;&nbsp;</small>
-                        </td>
-                        <td align="left" class="blacktext" >
-                            <input id="is_archival" name="is_archival" type="checkbox" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:165px; text-align: right; vertical-align: top; white-  space: nowrap">
-                            <small>${ _('Uses video-conf.') }&nbsp;&nbsp;</small>
-                        </td>
-                        <td align="left" class="blacktext" >
-                            <input id="uses_video_conference" name="uses_video_conference" type="checkbox" />
-                            ${ inlineContextHelp(_('Show only bookings which will use video   conferencing systems.')) }
-                            <br />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:165px; text-align: right; vertical-align: top; white-  space: nowrap">
-                            <small>${ _('Assistance for video-conf. startup') }&nbsp;&nbsp;</small>
-                        </td>
-                        <td align="left" class="blacktext" >
-                            <input id="needs_video_conference_setup" name="needs_video_conference_setup" type="checkbox" />
-                            ${ inlineContextHelp(_('Show only bookings which requested assistance   for the startup of the videoconference session.')) }
-                            <br />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:165px; text-align: right; vertical-align: top; white-  space: nowrap">
-                            <small>${ _('Assistance for meeting startup') }&nbsp;&nbsp;</small>
-                        </td>
-                        <td align="left" class="blacktext" >
-                            <input id="needs_general_assistance" name="needs_general_assistance" type="checkbox" />
-                            ${ inlineContextHelp(_('Show only bookings which requested assistance   for the startup of the meeting.')) }
-                            <br />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="width:165px; text-align: right; vertical-align: top; white-space: nowrap">
-                            <small>${ _('Is heavy') }&nbsp;&nbsp;</small>
-                        </td>
-                        <td align="left" class="blacktext" >
-                            <input id="is_heavy" name="is_heavy" type="checkbox" />
-                            ${ inlineContextHelp(_('Show only <b>heavy</b> bookings.')) }
-                            <br />
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
 </form>

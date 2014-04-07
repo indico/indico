@@ -334,7 +334,7 @@ class WRoomBookingSearch4Bookings(WTemplated):
         wvars['today'] = datetime.utcnow()
         wvars['weekLater'] = datetime.utcnow() + timedelta(7)
         wvars['Location'] = Location
-        wvars['rooms'] = self._rh._rooms
+        wvars['rooms'] = [r['room'].to_serializable('__public_exhaustive__') for r in self._rh._rooms]
         wvars['repeatability'] = None
         wvars['isResponsibleForRooms'] = Room.isAvatarResponsibleForRooms(self._rh.getAW().getUser())
         wvars['roomBookingBookingListURL'] = UH.UHRoomBookingBookingList.getURL()
