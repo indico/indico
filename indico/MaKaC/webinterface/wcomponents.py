@@ -4538,7 +4538,7 @@ class WRoomBookingRoomStats( WTemplated ):
         vars["room"] = self._rh._room
         vars["standalone"] = self._standalone
         vars["period"] = self._rh._period
-        vars["kpiAverageOccupation"] = str( int( round( self._rh._kpiAverageOccupation * 100 ) ) ) + "%"
+        vars["kpiAverageOccupation"] = '{0:.02f}%'.format(self._rh._kpiAverageOccupation * 100)
         # Bookings
         vars["kbiTotalBookings"] = self._rh._totalBookings
         # Next 9 KPIs

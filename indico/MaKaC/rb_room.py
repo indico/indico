@@ -26,7 +26,7 @@ from MaKaC.rb_location import Location, RoomGUID, CrossLocationQueries
 from MaKaC.user import Avatar, AvatarHolder
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.errors import MaKaCError
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time, date
 
 
 class RoomBase(object):
@@ -262,70 +262,55 @@ class RoomBase(object):
         # Find collisions with last month period
         from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
         resvEx = ReservationBase()
-        now = datetime.now()
-        resvEx.endDT = datetime(now.year, now.month, now.day, 17, 30)
-        resvEx.startDT = resvEx.endDT - timedelta(30, 9 * 3600)  # - 30 days and 9 hours
+        resvEx.endDT = datetime.combine(date.today(), time(17, 30))
+        resvEx.startDT = resvEx.endDT.replace(hour=8) - timedelta(days=30)
         resvEx.repeatability = RepeatabilityEnum.daily
         collisions = resvEx.getCollisions(rooms=rooms)
 
-        totalWorkingDays = 0
-        weekends = 0
-        for day in iterdays(resvEx.startDT, resvEx.endDT):
-            if day.weekday() in [5, 6]:  # Skip Saturday and Sunday
-                weekends += 1
-                continue
-            # if c.startDT is CERN Holiday: continue
-            totalWorkingDays += 1
-
-        booked = timedelta(0)
+        totalWorkingDays = sum(1 for day in iterdays(resvEx.startDT, resvEx.endDT) if day.weekday() not in (5, 6))
+        booked = timedelta()
         for c in collisions:
-            if c.startDT.weekday() in [5, 6]:  # Skip Saturday and Sunday
+            if c.startDT.weekday() in (5, 6):  # skip Saturday and Sunday
                 continue
-            # if c.startDT is CERN Holiday: continue
-            booked = booked + (c.endDT - c.startDT)
+            booked += c.endDT - c.startDT
         totalBookableTime = totalWorkingDays * 9 * len(rooms)  # Hours
-        bookedTime = booked.days * 24 + 1.0 * booked.seconds / 3600  # Hours
+        bookedTime = (booked.days * 86400 + booked.seconds) / 3600.0
         if totalBookableTime > 0:
             return bookedTime / totalBookableTime
         else:
-            return 0  # Error (no rooms in db)
+            return 0
 
-    def getMyAverageOccupation(self, period="pastmonth"):
+    def getMyAverageOccupation(self, period='pastmonth'):
         """
         FINAL (not intented to be overriden)
         Returns float <0, 1> representing how often - on the avarage -
         the room is booked during the working hours. (1 == all the time, 0 == never).
         """
-        # Find collisions with last month period
+        # Find collisions with the givenmonth period
         from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
         resvEx = ReservationBase()
-        now = datetime.now()
-        if period == "pastmonth":
-            resvEx.endDT = datetime(now.year, now.month, now.day, 17, 30)
-            resvEx.startDT = resvEx.endDT - timedelta(30, 9 * 3600)  # - 30 days and 9 hours
-        elif period == "thisyear":
-            resvEx.endDT = datetime(now.year, now.month, now.day, 17, 30)
-            resvEx.startDT = datetime(now.year, 1, 1, 0, 0)
+        resvEx.endDT = datetime.combine(date.today(), time(17, 30))
+        if period == 'thisyear':
+            resvEx.startDT = datetime(date.today().year, 1, 1, 8, 30)
+        elif period == 'pastmonth':
+            resvEx.startDT = resvEx.endDT.replace(hour=8) - timedelta(days=30)
+        elif period == 'pastyear':
+            resvEx.startDT = resvEx.endDT.replace(hour=8) - timedelta(days=365)
+        else:
+            raise ValueError('Invalid period: {0}'.format(period))
+
         resvEx.repeatability = RepeatabilityEnum.daily
         collisions = resvEx.getCollisions(rooms=[self])
 
-        totalWorkingDays = 0
-        weekends = 0
-        for day in iterdays(resvEx.startDT, resvEx.endDT):
-            if day.weekday() in [5, 6]:  # Skip Saturday and Sunday
-                weekends += 1
-                continue
-            # if c.startDT is CERN Holiday: continue
-            totalWorkingDays += 1
+        totalWorkingDays = sum(1 for day in iterdays(resvEx.startDT, resvEx.endDT) if day.weekday() not in (5, 6))
 
-        booked = timedelta(0)
+        booked = timedelta()
         for c in collisions:
-            if c.startDT.weekday() in [5, 6]:  # Skip Saturday and Sunday
+            if c.startDT.weekday() in (5, 6):  # skip Saturday and Sunday
                 continue
-            # if c.startDT is CERN Holiday: continue
-            booked = booked + (c.endDT - c.startDT)
+            booked += c.endDT - c.startDT
         totalBookableTime = totalWorkingDays * 9  # Hours
-        bookedTime = booked.days * 24 + 1.0 * booked.seconds / 3600  # Hours
+        bookedTime = (booked.days * 86400 + booked.seconds) / 3600.0
         if totalBookableTime > 0:
             return bookedTime / totalBookableTime
         else:
