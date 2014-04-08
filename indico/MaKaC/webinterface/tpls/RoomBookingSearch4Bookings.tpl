@@ -85,18 +85,6 @@
     $(function() {
         initWidgets();
 
-        $('#is_only_bookings').change(function() {
-            if(this.checked) {
-                $('#is_only_pre_bookings').prop('checked', false);
-            }
-        });
-
-        $('#is_only_pre_bookings').change(function() {
-            if(this.checked) {
-                $('#is_only_bookings').prop('checked', false);
-            }
-        });
-
         $('#SearchBookings').delegate(':input', 'keyup change', function() {
             forms_are_valid();
         }).submit(function(e) {
@@ -194,12 +182,13 @@
                     ${ _('Booked') }
                 </span>
                 <input type="radio" id="any_booker" name="is_only_mine" value="false" checked/>
-                <label for="any_booker" class="i-button">
+                <label for="any_booker" class="i-button"
+                    title="${ _('Shows all bookings') }">
                     ${ _('Anyone') }
                 </label>
                 <input type="radio" id="only_mine" name="is_only_mine" value="true"/>
                 <label for="only_mine" class="i-button"
-                    title="${ _('Filter your bookings') }">
+                    title="${ _('Filters your bookings') }">
                     ${ _('Me') }
                 </label>
             </div>
@@ -212,12 +201,13 @@
                     ${ _('Rooms') }
                 </span>
                 <input type="radio" id="any_room" name="is_only_my_rooms" value="false" checked/>
-                <label for="any_room" class="i-button">
+                <label for="any_room" class="i-button"
+                    title="${ _('Shows all the rooms') }">
                     ${ _('Any room') }
                 </label>
                 <input type="radio" id="only_my_rooms" name="is_only_my_rooms" value="true"/>
                 <label for="only_my_rooms" class="i-button"
-                    title="${ _('Filter bookings of rooms you are taking care of') }">
+                    title="${ _('Filters bookings of rooms you are taking care of') }">
                     ${ _('My rooms') }
                 </label>
             </div>
@@ -231,12 +221,12 @@
                 </span>
                 <input type="checkbox" id="is_only_bookings" name="is_only_bookings"/>
                 <label for="is_only_bookings" class="i-button"
-                    title="${ _('If not checked, both pre-bookings and confirmed bookings will be shown.') }">
+                    title="${ _('Filters confirmed bookings') }">
                     ${ _('Bookings') }
                 </label>
                 <input type="checkbox" id="is_only_pre_bookings" name="is_only_pre_bookings"/>
                 <label for="is_only_pre_bookings" class="i-button"
-                    title="${ _('If not checked, both pre-bookings and confirmed bookings will be shown.') }">
+                    title="${ _('Filters pre-bookings') }">
                     ${ _('Pre-Bookings') }
                 </label>
             </div>
@@ -249,17 +239,17 @@
                 </span>
                 <input type="checkbox" id="is_rejected" name="is_rejected"/>
                 <label for="is_rejected" class="i-button"
-                    title="${ _('Filter rejected bookings') }">
+                    title="${ _('Filters rejected bookings') }">
                     ${ _('Rejected') }
                 </label>
                 <input type="checkbox" id="is_cancelled" name="is_cancelled"/>
                 <label for="is_cancelled" class="i-button"
-                    title="${ _('Filter cancelled bookings') }">
+                    title="${ _('Filters cancelled bookings') }">
                     ${ _('Cancelled') }
                 </label>
                 <input type="checkbox" id="is_archival" name="is_archival"/>
                 <label for="is_archival" class="i-button"
-                    title="${ _('Filter archived bookings') }">
+                    title="${ _('Filters archived bookings') }">
                     ${ _('Archived') }
                 </label>
             </div>
@@ -272,7 +262,7 @@
                 </span>
                 <input type="checkbox" id="uses_video_conference" name="uses_video_conference"/>
                 <label for="uses_video_conference" class="i-button"
-                    title="${ _('Filter bookings which will use videoconference systems') }">
+                    title="${ _('Filters bookings which will use videoconference systems') }">
                     ${ _('Videoconference') }
                 </label>
             </div>
@@ -285,12 +275,12 @@
                 </span>
                 <input type="checkbox" id="needs_video_conference_setup" name="needs_video_conference_setup"/>
                 <label for="needs_video_conference_setup" class="i-button"
-                    title="${ _('Filter bookings which requested assistance for the startup of the videoconference session') }">
+                    title="${ _('Filters bookings which requested assistance for the startup of the videoconference session') }">
                     ${ _('Videoconference') }
                 </label>
                 <input type="checkbox" id="needs_general_assistance" name="needs_general_assistance"/>
                 <label for="needs_general_assistance" class="i-button"
-                    title="${ _('Filter bookings which requested assistance for the startup of the meeting') }">
+                    title="${ _('Filters bookings which requested assistance for the startup of the meeting') }">
                     ${ _('Startup') }
                 </label>
             </div>
