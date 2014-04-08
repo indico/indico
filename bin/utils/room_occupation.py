@@ -23,10 +23,6 @@ from indico.core.db import DBMgr
 
 
 def _main():
-    room = Room.getRooms(roomID=2)
-    print room.getMyAverageOccupation('pastmonth') * 100
-    print room.getMyAverageOccupation('pastyear') * 100
-    return
     print 'Month\tYear\tRoom'
     for room in Room.getRooms():
         print '{1:.3f}\t{2:.3f}\t{0}'.format(room.getFullName(),
