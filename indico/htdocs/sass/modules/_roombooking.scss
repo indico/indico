@@ -31,13 +31,20 @@
     width: 820px;
 }
 
-#BookingDetails {
-    .toolbar.table {
-        width: 368px;
+#SearchBookings {
+    #BookingDetails {
+        .toolbar.table {
+            width: 368px;
+        }
+
+        .label {
+            width: 100px;
+        }
     }
 
-    .label {
-        width: 100px;
+    input[type=submit] {
+        font-weight: bold;
+        width: 368px;
     }
 }
 

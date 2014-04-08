@@ -19,7 +19,7 @@
         $('#start_date, #end_date').datepicker({
             onSelect: function() {
                 adjustDates(s, e);
-                $('searchForm').trigger('change');
+                $('SearchBookings').trigger('change');
             }
         });
         s.datepicker('setDate', '+0');
@@ -43,7 +43,7 @@
         }
 
         // Clean up - make all textboxes white again
-        var searchForm = $('#searchForm');
+        var searchForm = $('#SearchBookings');
         $(':input', searchForm).removeClass('invalid');
 
         // Init
@@ -97,7 +97,7 @@
             }
         });
 
-        $('#searchForm').delegate(':input', 'keyup change', function() {
+        $('#SearchBookings').delegate(':input', 'keyup change', function() {
             forms_are_valid();
         }).submit(function(e) {
             if (!forms_are_valid(true)) {
@@ -128,7 +128,7 @@
     ${ _('Search bookings') }
 </h2>
 
-<form id="searchForm" method="post" action="${ roomBookingBookingListURL }">
+<form method="post" action="${ roomBookingBookingListURL }" id="SearchBookings">
     <h2 class="group-title">
         <i class="icon-location"></i>
         ${ _('Taking place in') }
@@ -298,5 +298,5 @@
     </div>
 
     <h2 class="group-title"></h2>
-    <input id="submitBtn1" type="submit" class="i-button highlight" value="${ _('Search') }"/>
+    <input id="submitBtn1" type="submit" class="i-button highlight" value="${ _('Search') }">
 </form>
