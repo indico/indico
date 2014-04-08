@@ -270,11 +270,12 @@ $toolbar-thin-height: 1.9em;
 
             .ui-datepicker-trigger {
                 float: right;
+                font-size: 1em;
                 line-height: $toolbar-height;
                 position: absolute;
                 margin: 0;
                 right: 5px;
-                top: 0;
+                top: auto;
             }
 
             &.thin .ui-datepicker-trigger {
