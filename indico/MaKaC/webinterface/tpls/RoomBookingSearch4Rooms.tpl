@@ -187,267 +187,226 @@
 <!-- END OF CONTEXT HELP DIVS -->
 
 
-<table cellpadding="0" cellspacing="0" border="0" width="80%">
-  % if standalone:
-    <tr>
-      <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
-    </tr>
+<h2 class="page-title">
+    ${ _('Search rooms') }
+</h2>
+
+<form id="chooseForm" method="post">
+    <h2 class="group-title">
+        <i class="icon-location"></i>
+        ${ _('Check a room') }
+    </h2>
+    <select name="roomName" id="roomName">
+        % for room in rooms:
+        <option value="${ bookingFormUH.getURL(room) if forNewBooking else detailsUH.getURL(room) }"
+            ${ (room.name == eventRoomName) * 'selected' } class="${ room.kind }">
+                ${ room.location.name + ": &nbsp; " + room.getFullName() }
+        </option>
+    % endfor
+  </select>
+
+  % if forNewBooking:
+    <span id="bookButtonWrapper">
+      <input id="bookButton" class="i-button highlight" type="button"
+        value="${ _('Book') }" onclick="isBookable();" />
+    </span>
+  % else:
+    <input class="i-button highlight" type="button" value="${ _('Go to room') }"
+      onclick="document.location = $('#roomName').val(); return false;"/>
   % endif
-  <tr>
-    <td class="bottomvtab" width="100%">
-    <!-- Main cell -->
-      <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
-        <tr>
-          <td class="maincell">
-            <h2 class="page-title">${ _('Search rooms') }</h2>
-            <!-- Background table (adds image) -->
-            <table width="100%" class="ACtab">
-              <tr>
+
+  <!-- Help -->
+  ${ contextHelp('chooseButtonHelp') }
+</form>
+
+<div id="searchRooms">
+    <form id="searchForm" method="post" action="${ roomBookingRoomListURL }">
+        <h2 class="group-title">
+            <i class="icon-search"></i>
+            ${ _('Search for a room') }
+        </h2>
+
+        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <!-- LOCATION (PLUGIN) -->
+            <tr>
+                <td class="titleCellTD" style="width: 125px;">
+                    <span class="titleCellFormat">${ _('Location') }</span>
+                </td>
                 <td>
-                  <!-- First section -->
-                  <table width="90%" align="center" border="0">
-                    <tr>
-                      <td colspan="2">
-                        <h2 class="group-title">${ _('Choose a room') }</h2>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td nowrap="nowrap" class="titleCellTD">
-                        <span class="titleCellFormat"> ${ _('Room') }</span>
-                      </td>
-                      <td width="80%">
-                        <form id="chooseForm" method="post">
-                          <select name="roomName" id="roomName" class="i-button">
-                            % for room in rooms:
-                              <option value="${ bookingFormUH.getURL(room) if forNewBooking else detailsUH.getURL(room) }"
-                                ${ (room.name == eventRoomName) * 'selected' } class="${ room.kind }">
-                                ${ room.location.name + ": &nbsp; " + room.getFullName() }
-                              </option>
-                            % endfor
-                          </select>
-
-                          % if forNewBooking:
-                            <span id="bookButtonWrapper">
-                              <input id="bookButton" class="i-button" type="button"
-                                value="${ _('Book') }" onclick="isBookable();" />
-                            </span>
-                          % else:
-                            <input class="i-button" type="button" value="${ _('Room details') }"
-                              onclick="document.location = $('#roomName').val(); return false;" style="padding: 6.5px;"/>
-                          % endif
-
-                          <!-- Help -->
-                          ${ contextHelp('chooseButtonHelp') }
-                        </form>
-                      </td>
-                    </tr>
-                  </table>
-                  <br />
-                  <form id="searchForm" method="post" action="${ roomBookingRoomListURL }">
-                    <table width="90%" align="center" border="0">
-                      <tr>
-                        <td colspan="2">
-                          <h2 class="group-title">${ _('Search for a room') }</h2>
-                        </td>
-                      </tr>
-                      <!-- LOCATION (PLUGIN) -->
-                      <tr>
-                        <td class="titleCellTD" style="width: 125px;">
-                          <span class="titleCellFormat">${ _('Location') }</span>
-                        </td>
-                        <td>
-                          <table width="100%" cellspacing="4px">
-                            <tr>
-                              <td class="subFieldWidth" align="right">
-                                <small>${ _('Location') }&nbsp;&nbsp;</small>
-                              </td>
-                              <td align="left" class="blacktext">
-                                <select name="roomLocation" id="roomLocation" class="i-button">
-                                  % for location in locations:
+                    <table width="100%" cellspacing="4px">
+                        <tr>
+                            <td align="left" class="blacktext">
+                                <select name="roomLocation" id="roomLocation">
+                                % for location in locations:
                                     <option value="${ location.id }" ${ location.is_default * 'selected' }>
-                                      ${ location.name }
+                                        ${ location.name }
                                     </option>
-                                  % endfor
+                                % endfor
                                 </select>
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                      <!-- FREE TEXT -->
-                      <tr>
-                        <td class="titleCellTD" style="width: 125px;">
-                          <span class="titleCellFormat">${ _('Room description') }</span>
-                        </td>
-                        <td>
-                          <table width="100%" cellspacing="4px">
-                            <tr>
-                              <td class="subFieldWidth" align="right" >
-                                <small>${ _('Must contain') }&nbsp;&nbsp;</small>
-                              </td>
-                              <td align="left" class="blacktext">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- FREE TEXT -->
+            <tr>
+                <td class="titleCellTD" style="width: 125px;">
+                    <span class="titleCellFormat">${ _('Room details') }</span>
+                </td>
+                <td>
+                    <table width="100%" cellspacing="4px">
+                        <tr>
+                            <td align="left" class="blacktext">
                                 <input id="freeSearch" size="30" type="text" name="freeSearch" />
                                 ${ contextHelp('freeSearchHelp') }
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                      <!-- AVAILABILITY -->
-                      <tr>
-                        <td class="titleCellTD" style="width: 125px;">
-                          <span class="titleCellFormat"> ${ _('Availability') }</span>
-                        </td>
-                        <td>
-                          <table width="100%" cellspacing="4px">
-                            <tr>
-                              <td class="subFieldWidth" align="right">
-                                <small>${ _('Must be') }&nbsp;&nbsp;</small>
-                              </td>
-                              <td align="left" class="blacktext">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- AVAILABILITY -->
+            <tr>
+                <td class="titleCellTD" style="width: 125px;">
+                    <span class="titleCellFormat"> ${ _('Availability') }</span>
+                </td>
+                <td>
+                    <table width="100%" cellspacing="4px">
+                        <tr>
+                            <td align="left" class="blacktext">
                                 <input name="availability" type="radio" value="Available" data-show-availability="true" ${ forNewBooking * 'checked' } />
-                                  ${ _('Available') }
+                                    ${ _('Available') }
                                 <input name="availability" type="radio" value="Booked" data-show-availability="true" />
-                                  ${ _('Booked') }
+                                    ${ _('Booked') }
                                 <input name="availability" type="radio" value="Don't care" data-show-availability="false" ${ (not forNewBooking) * 'checked' } />
-                                  ${ _('Don\'t care') }
+                                    ${ _('Don\'t care') }
                                 ${ contextHelp('availabilityHelp') }
-                              </td>
-                            </tr>
-                            <%include file="RoomBookingPeriodFormOld.tpl" args="form = 1, unavailableDates = [], availableDayPeriods = [] "/>
-                            <tr id='includePrebookingsTR'>
-                              <td class="subFieldWidth" align="right" >
+                            </td>
+                        </tr>
+
+                        <%include file="RoomBookingPeriodFormOld.tpl" args="form = 1, unavailableDates = [], availableDayPeriods = [] "/>
+                        <tr id='includePrebookingsTR'>
+                            <td class="subFieldWidth" align="right" >
                                 <small> ${ _('PRE-Bookings') }</small>
-                              </td>
-                              <td align="left" class="blacktext">
+                            </td>
+                            <td align="left" class="blacktext">
                                 <input id="includePrebookings" name="includePrebookings" type="checkbox" checked/>
                                 ${ _('Check conflicts against pre-bookings') }
                                 ${ inlineContextHelp(_('Check if you want to avoid conflicts with PRE-bookings. By default conflicts are checked only against confirmed bookings.')) }
-                              </td>
-                            </tr>
-                            <tr id='includePendingBlockingsTR'>
-                              <td class="subFieldWidth" align="right" >
+                            </td>
+                        </tr>
+                        <tr id='includePendingBlockingsTR'>
+                            <td class="subFieldWidth" align="right" >
                                 <small>${ _('Blockings') }</small>
-                              </td>
-                              <td align="left" class="blacktext">
+                            </td>
+                            <td align="left" class="blacktext">
                                 <input id="includePendingBlockings" name="includePendingBlockings" type="checkbox" checked />
                                 ${ _('Check conflicts against pending blockings') }
                                 ${ inlineContextHelp(_('Check if you want to avoid conflicts with pending blockings. By default conflicts are checked only against confirmed blockings.')) }
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                      <!-- CAPACITY -->
-                      <tr>
-                        <td class="titleCellTD" style="width: 125px;">
-                          <span class="titleCellFormat">${ _('Capacity') }</span>
-                        </td>
-                        <td align="right">
-                          <table width="100%" cellspacing="4px">
-                            <tr>
-                              <td class="subFieldWidth" align="right">
-                                <small>${ _('About') }&nbsp;&nbsp;</small>
-                              </td>
-                              <td align="left" class="blacktext">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- CAPACITY -->
+            <tr>
+                <td class="titleCellTD" style="width: 125px;">
+                    <span class="titleCellFormat">${ _('Capacity') }</span>
+                </td>
+                <td align="right">
+                    <table width="100%" cellspacing="4px">
+                        <tr>
+                            <td align="left" class="blacktext">
                                 <input size="3" type="text" id="capacity" name="capacity"/>
                                 ${ _('people') }
                                 ${ contextHelp('capacityHelp') }
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                      <!-- REQUIRED EQUIPMENT -->
-                      <tr>
-                        <td nowrap class="titleCellTD" style="width: 125px;">
-                          <span class="titleCellFormat">${ _("Required equipment") }
-                        </td>
-                        <td align="right">
-                          <table width="100%" cellspacing="4px">
-                            <tr>
-                              <td class="subFieldWidth" align="right" valign="top">
-                                ${ _('I need...') }&nbsp;&nbsp;
-                              </td>
-                              <td align="left" class="blacktext" >
-                              % for eq in possibleEquipment:
-                                <input id="${ eq.id }" name="equipments_${ eq.id }" type="checkbox">
-                                  ${ eq.name }
-                                </input>
-                                <br />
-                              % endfor
-                              </td>
-                            </tr>
-                          </table>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td nowrap class="titleCellTD" style="width: 125px;"><span class="titleCellFormat">
-                          ${ _('Special attributes') }
-                        </td>
-                        <td align="right">
-                          <table width="100%" cellspacing="4px">
-                            <tr>
-                              <td class="subFieldWidth" align="right" valign="top">
-                                ${ _('Is public') }&nbsp;&nbsp;
-                              </td>
-                              <td align="left" class="blacktext">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <!-- REQUIRED EQUIPMENT -->
+            <tr>
+                <td nowrap class="titleCellTD" style="width: 125px;">
+                    <span class="titleCellFormat">${ _("Required equipment") }
+                </td>
+                <td align="right">
+                    <table width="100%" cellspacing="4px">
+                        <tr>
+                            <td align="left" class="blacktext" >
+                                % for eq in possibleEquipment:
+                                    <input id="${ eq.id }" name="equipments_${ eq.id }" type="checkbox">
+                                        ${ eq.name }
+                                    </input>
+                                    <br />
+                                % endfor
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td nowrap class="titleCellTD" style="width: 125px;"><span class="titleCellFormat">
+                    ${ _('Special attributes') }
+                </td>
+                <td align="right">
+                    <table width="100%" cellspacing="4px">
+                        <tr>
+                            <td align="left" class="blacktext">
                                 <input id="isReservable" name="isReservable" type="checkbox" checked/>
+                                ${ _('Is public') }
                                 ${ inlineContextHelp(_('Include only publically reservable rooms.')) }
                                 <br />
-                              </td>
-                            </tr>
-                            <tr>
-                              <td class="subFieldWidth" align="right" valign="top">
-                                ${ _('Auto confirm') }&nbsp;&nbsp;
-                              </td>
-                              <td align="left" class="blacktext">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left" class="blacktext">
                                 <input id="isAutoConfirmed" name="isAutoConfirmed" type="checkbox"/>
+                                ${ _('Auto confirm') }
                                 ${ inlineContextHelp(_('Include only rooms, where bookings are automatically confirmed. This is the case for most rooms.')) }
                                 <br />
-                              </td>
-                            </tr>
-                            % if isResponsibleForRooms:
-                              <tr>
-                                <td class="subFieldWidth" align="right" valign="top">
-                                  ${ _('Only mine') }&nbsp;&nbsp;
-                                </td>
-                                <td align="left" class="blacktext">
-                                  <input id="onlyMy" name="onlyMy" type="checkbox" />
-                                  ${ inlineContextHelp(_('Include only rooms you are responsible for.')) }
-                                  <br />
-                                </td>
-                              </tr>
-                            % endif
-                            % if user.isAdmin():
-                              <tr>
-                                <td class="subFieldWidth" align="right" valign="top">
-                                  ${ _('Active?') }&nbsp;&nbsp;
-                                </td>
-                                <td align="left" class="blacktext">
-                                  <input id="isActive" name="isActive" type="checkbox" checked/>
-                                  ${ inlineContextHelp(_('Include only active rooms. <b>This should be checked.</b> Please note that inactive rooms are considered deleted.')) }
-                                  <br />
-                                </td>
-                              </tr>
-                            % endif
-                          </table>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colspan="2" style="padding-left:20px">
-                          <input type="submit" class="i-button" value="${ _('Search') }"/>
-                        </td>
-                      </tr>
+                            </td>
+                        </tr>
+
+                        % if isResponsibleForRooms:
+                        <tr>
+                            <td class="subFieldWidth" align="right" valign="top">
+                                ${ _('Only mine') }&nbsp;&nbsp;
+                            </td>
+                            <td align="left" class="blacktext">
+                                <input id="onlyMy" name="onlyMy" type="checkbox" />
+                                ${ inlineContextHelp(_('Include only rooms you are responsible for.')) }
+                                <br />
+                            </td>
+                        </tr>
+                        % endif
+
+                        % if user.isAdmin():
+                        <tr>
+                            <td align="left" class="blacktext">
+                                <input id="isActive" name="isActive" type="checkbox" checked/>
+                                ${ _('Active?') }
+                                ${ inlineContextHelp(_('Include only active rooms. <b>This should be checked.</b> Please note that inactive rooms are considered deleted.')) }
+                                <br />
+                            </td>
+                        </tr>
+                        % endif
                     </table>
-                  </form>
-                  <br />
                 </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-    </td>
-  </tr>
-</table>
+            </tr>
+
+            <tr>
+                <td colspan="2" style="padding-left:20px">
+                    <button type="send" class="i-button highlight">
+                        <i class="icon-search"></i>
+                        ${ _('Search') }
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
