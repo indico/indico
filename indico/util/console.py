@@ -20,6 +20,7 @@
 """
 Multiple CLI utils
 """
+import re
 
 
 def yesno(message):
@@ -75,6 +76,25 @@ except ImportError:
         (in case termcolor is not available)
         """
         return text
+
+
+def _cformat_sub(m):
+    bg = 'on_{}'.format(m.group('bg')) if m.group('bg') else None
+    attrs = ['bold'] if m.group('fg_bold') else None
+    return colored('', m.group('fg'), bg, attrs=attrs)[:-4]
+
+
+def cformat(string):
+    """Replaces %{color} and %{color,bgcolor} with ansi colors.
+
+    Bold foreground can be achieved by suffixing the color with a '!'
+    """
+    reset = colored('')
+    string = string.replace('%{reset}', reset)
+    string = re.sub(r'%\{(?P<fg>[a-z]+)(?P<fg_bold>!?)(?:,(?P<bg>[a-z]+))?}', _cformat_sub, string)
+    if not string.endswith(reset):
+        string += reset
+    return string
 
 
 # Error/warning/info message util methods

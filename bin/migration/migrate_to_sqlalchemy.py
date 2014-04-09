@@ -37,7 +37,7 @@ from ZEO.ClientStorage import ClientStorage
 from indico.core.db import db, drop_database
 from indico.core.db.migration import MigratedDB
 from indico.modules.rb.models import *
-from indico.util.console import colored
+from indico.util.console import colored, cformat
 
 month_names = [(str(i), name[:3].encode('utf-8').lower())
                for i, name in dates.get_month_names(locale='fr_FR').iteritems()]
@@ -170,7 +170,7 @@ def merge_custom_attributes(attrs):
 
 
 def migrate_locations(main_root, rb_root):
-
+    print cformat('%{white!}migrating locations')
     default_location_name = main_root['DefaultRoomBookingLocation']
     custom_attributes_dict = rb_root['CustomAttributesList']
 
@@ -181,6 +181,8 @@ def migrate_locations(main_root, rb_root):
             support_emails=convert_to_unicode(','.join(old_location._avcSupportEmails)),
             is_default=(old_location.friendlyName == default_location_name)
         )
+
+        print cformat('- %{cyan}{}').format(l.name)
 
         # add aspects
         for old_aspect in old_location.aspects.values():
@@ -195,6 +197,8 @@ def migrate_locations(main_root, rb_root):
                 bottom_right_longitude=old_aspect.bottomRightLongitude
             )
 
+            print cformat('  %{blue!}Aspect:%{reset} {}').format(a.name)
+
             l.aspects.append(a)
             if old_aspect.defaultOnStartup:
                 l.default_aspect = a
@@ -206,25 +210,32 @@ def migrate_locations(main_root, rb_root):
                 'is_hidden': ca['hidden'],
                 'type': 'str'
             })
+            print cformat('  %{blue!}Attribute:%{reset} {}').format(l.attributes[-1].name)
 
         # add new created location
         db.session.add(l)
+        print
+        print
     db.session.commit()
 
 
 def migrate_rooms(rb_root, photo_path):
-
-    eq, vc = defaultdict(set), defaultdict(set)
+    eq = defaultdict(set)
+    vc = defaultdict(set)
     for old_room_id, old_room in rb_root['Rooms'].iteritems():
         eq[old_room._locationName].update(e.lower() for e in old_room._equipment.split('`') if e)
         vc[old_room._locationName].update(e.lower() for e in getattr(old_room, 'avaibleVC', []) if e)
 
+    print cformat('%{white!}migrating equipment')
     for name, eqs in eq.iteritems():
         l = Location.getLocationByName(name)
         l.equipments.extend(eqs)
+        print cformat('- [%{cyan}{}%{reset}] {}').format(name, eqs)
         db.session.add(l)
     db.session.commit()
+    print
 
+    print cformat('%{white!}migrating vc equipment')
     for name, vcs in vc.iteritems():
         l = Location.getLocationByName(name)
         pvc = l.getEquipmentByName('video conference')
@@ -232,9 +243,12 @@ def migrate_rooms(rb_root, photo_path):
             re = RoomEquipment(name=vc_name)
             re.parent = pvc
             l.equipment_objects.append(re)
+            print cformat('- [%{cyan}{}%{reset}] {}').format(name, re.name)
         db.session.add(l)
     db.session.commit()
+    print
 
+    print cformat('%{white!}migrating rooms')
     for old_room_id, old_room in rb_root['Rooms'].iteritems():
         l = Location.getLocationByName(old_room._locationName)
         r = Room(
@@ -273,6 +287,8 @@ def migrate_rooms(rb_root, photo_path):
             max_advance_days=convert_room_max_advance_days(old_room.maxAdvanceDays)
         )
 
+        print cformat('- [%{cyan}{}%{reset}] %{grey!}{:4}%{reset}  %{green!}{}%{reset}').format(l.name, r.id, r.name)
+
         for old_bookable_time in old_room.getDailyBookablePeriods():
             r.bookable_times.append(
                 BookableTime(
@@ -280,6 +296,7 @@ def migrate_rooms(rb_root, photo_path):
                     end_time=convert_date(old_bookable_time._endTime)
                 )
             )
+            print cformat('  %{blue!}Bookable:%{reset} {}').format(r.bookable_times[-1])
 
         for old_nonbookable_date in old_room.getNonBookableDates():
             r.nonbookable_dates.append(
@@ -288,6 +305,7 @@ def migrate_rooms(rb_root, photo_path):
                     end_date=convert_date(old_nonbookable_date._endDate)
                 )
             )
+            print cformat('  %{blue!}Nonbookable:%{reset} {}').format(r.nonbookable_dates[-1])
 
         if photo_path:
             try:
@@ -311,9 +329,15 @@ def migrate_rooms(rb_root, photo_path):
                         small_content=small_photo
                     )
                 )
+                print cformat('  %{blue!}Photos')
 
+        new_eq = []
         for old_equipment in ifilter(None, (e.lower() for e in old_room._equipment.split('`'))):
-            r.equipments.append(l.getEquipmentByName(old_equipment))
+            room_eq = l.getEquipmentByName(old_equipment)
+            new_eq.append(room_eq)
+            r.equipments.append(room_eq)
+        if new_eq:
+            print cformat('  %{blue!}Equipment:%{reset} {}').format(', '.join(sorted(x.name for x in new_eq)))
 
         for name, value in merge_custom_attributes(getattr(old_room, 'customAtts', [])).iteritems():
             ca = l.getAttributeByName(name)
@@ -322,20 +346,25 @@ def migrate_rooms(rb_root, photo_path):
                 attr.value = value
                 attr.attribute = ca
                 r.attributes.append(attr)
+                print cformat('  %{blue!}Attribute:%{reset} {} = {}').format(attr.attribute, attr.value)
             else:
                 print name, value, old_room.id, l.id  # these are already deleted from location
 
         l.rooms.append(r)
         db.session.add(l)
+        print
     db.session.commit()
 
 
 def migrate_reservations(rb_root):
-
+    print cformat('%{white!}migrating reservations')
     i = 1
     for rid, v in rb_root['Reservations'].iteritems():
-
         l = Location.getLocationByName(v.locationName)
+        room = Room.getRoomById(v.room.id)
+        if room is None:
+            print cformat('  %{red!}skipping resv for dead room {0.room.id}: {0.id} ({0._utcCreatedDT})').format(v)
+            continue
 
         repeat_unit, repeat_step = convert_reservation_repeatibility(v.repeatability)
 
@@ -404,7 +433,10 @@ def migrate_reservations(rb_root):
             )
             r.occurrences.append(occ)
 
-        room = Room.getRoomById(v.room.id)
+        print cformat('- [%{cyan}{}%{reset}/%{green!}{}%{reset}]  %{grey!}{}%{reset}  {}').format(l.name, room.name,
+                                                                                                  r.id,
+                                                                                                  r.created_at.date())
+
         room.reservations.append(r)
         db.session.add(room)
         i = (i + 1) % 1000
