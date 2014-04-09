@@ -851,6 +851,8 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             "docx"  :{"mapsTo" : "doc",   "imgURL" : os.path.join(imagesBaseURL, "word.png"),       "imgAlt" : "word file"},
             "ppt"   :{"mapsTo" : "ppt",   "imgURL" : os.path.join(imagesBaseURL, "powerpoint.png"), "imgAlt" : "powerpoint file"},
             "pptx"  :{"mapsTo" : "ppt",   "imgURL" : os.path.join(imagesBaseURL, "powerpoint.png"), "imgAlt" : "powerpoint file"},
+            "xls"   :{"mapsTo" : "xls",   "imgURL" : os.path.join(imagesBaseURL, "excel.png"),      "imgAlt" : "excel file"},
+            "xlsx"  :{"mapsTo" : "xls",   "imgURL" : os.path.join(imagesBaseURL, "excel.png"),      "imgAlt" : "excel file"},
             "sxi"   :{"mapsTo" : "odp",   "imgURL" : os.path.join(imagesBaseURL, "impress.png"),    "imgAlt" : "presentation file"},
             "odp"   :{"mapsTo" : "odp",   "imgURL" : os.path.join(imagesBaseURL, "impress.png"),    "imgAlt" : "presentation file"},
             "sxw"   :{"mapsTo" : "odt",   "imgURL" : os.path.join(imagesBaseURL, "writer.png"),     "imgAlt" : "writer file"},
