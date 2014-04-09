@@ -13,13 +13,15 @@
             simpleMode: true
         });
 
-        $('#timerange').timerange();
+        $('#timerange').timerange({
+            sliderWidth: '320px'
+        });
 
         var s = $('#start_date'), e = $('#end_date');
         $('#start_date, #end_date').datepicker({
             onSelect: function() {
                 adjustDates(s, e);
-                $('SearchBookings').trigger('change');
+                $('searchBookings').trigger('change');
             }
         });
         s.datepicker('setDate', '+0');
@@ -43,7 +45,7 @@
         }
 
         // Clean up - make all textboxes white again
-        var searchForm = $('#SearchBookings');
+        var searchForm = $('#searchBookings');
         $(':input', searchForm).removeClass('invalid');
 
         // Init
@@ -85,7 +87,7 @@
     $(function() {
         initWidgets();
 
-        $('#SearchBookings').delegate(':input', 'keyup change', function() {
+        $('#searchBookings').delegate(':input', 'keyup change', function() {
             forms_are_valid();
         }).submit(function(e) {
             if (!forms_are_valid(true)) {
@@ -116,7 +118,7 @@
     ${ _('Search bookings') }
 </h2>
 
-<form method="post" action="${ roomBookingBookingListURL }" id="SearchBookings">
+<form method="post" action="${ roomBookingBookingListURL }" id="searchBookings">
     <h2 class="group-title">
         <i class="icon-location"></i>
         ${ _('Taking place in') }
@@ -124,46 +126,47 @@
 
     <div id="roomselector"></div>
 
-    <h2 class="group-title">
-        <i class="icon-time"></i>
-        ${ _('Timespan') }
-    </h2>
+    <div id="timespan">
+        <h2 class="group-title">
+            <i class="icon-time"></i>
+            ${ _('Timespan') }
+        </h2>
 
-    <div class="toolbar thin">
-        <div class="group with-datepicker">
-            <span class="i-button label heavy">
-                ${ _('Start Date') }
-            </span>
-            <span class="datepicker thin">
-                <input type="text" name="start_date" id="start_date"/>
-            </span>
-        </div>
+        <div class="toolbar thin">
+            <div class="group with-datepicker">
+                <span class="i-button label heavy">
+                    ${ _('Start Date') }
+                </span>
+                <span class="datepicker thin">
+                    <input type="text" name="start_date" id="start_date"/>
+                </span>
+            </div>
 
-        <div class="group with-datepicker">
-            <span class="i-button label heavy">
-                ${ _('End Date') }
-            </span>
-            <span class="datepicker thin">
-                <input type="text" name="end_date" id="end_date"/>
-            </span>
+            <div class="group right with-datepicker">
+                <span class="i-button label heavy">
+                    ${ _('End Date') }
+                </span>
+                <span class="datepicker thin">
+                    <input type="text" name="end_date" id="end_date"/>
+                </span>
+            </div>
         </div>
+        <div id="timerange"></div>
     </div>
 
-    <div id="timerange"></div>
+    <div id="bookingDetails">
+        <h2 class="group-title">
+            <i class="icon-info"></i>
+            ${ _('Booking details') }
+        </h2>
 
-    <h3 class="group-title">
-        <i class="icon-info"></i>
-        ${ _('Booking details') }
-    </h3>
-
-    <div id="BookingDetails">
         <div class="toolbar thin">
             <div class="group">
                 <span class="i-button label">
                     ${ _('Booked for') }
                 </span>
                 <input size="30" type="text" id="booked_for_name" name="booked_for_name"
-                    placeholder="${ _('Type name...') }" />
+                    placeholder="${ _('Enter name...') }" />
             </div>
         </div>
         <div class="toolbar thin">
@@ -172,7 +175,7 @@
                     ${ _('Reason') }
                 </span>
                 <input size="30" type="text" id="reason" name="reason"
-                    placeholder="${ _('Type reason...') }"/>
+                    placeholder="${ _('Enter reason...') }"/>
             </div>
         </div>
 
@@ -188,7 +191,7 @@
                 </label>
                 <input type="radio" id="only_mine" name="is_only_mine" value="true"/>
                 <label for="only_mine" class="i-button"
-                    title="${ _('Filters your bookings') }">
+                    title="${ _('Filter by your bookings') }">
                     ${ _('Me') }
                 </label>
             </div>
@@ -207,7 +210,7 @@
                 </label>
                 <input type="radio" id="only_my_rooms" name="is_only_my_rooms" value="true"/>
                 <label for="only_my_rooms" class="i-button"
-                    title="${ _('Filters bookings of rooms you are taking care of') }">
+                    title="${ _('Filter by bookings of rooms you are taking care of') }">
                     ${ _('My rooms') }
                 </label>
             </div>
@@ -221,12 +224,12 @@
                 </span>
                 <input type="checkbox" id="is_only_bookings" name="is_only_bookings"/>
                 <label for="is_only_bookings" class="i-button"
-                    title="${ _('Filters confirmed bookings') }">
+                    title="${ _('Filter by confirmed bookings') }">
                     ${ _('Bookings') }
                 </label>
                 <input type="checkbox" id="is_only_pre_bookings" name="is_only_pre_bookings"/>
                 <label for="is_only_pre_bookings" class="i-button"
-                    title="${ _('Filters pre-bookings') }">
+                    title="${ _('Filter by pre-bookings') }">
                     ${ _('Pre-Bookings') }
                 </label>
             </div>
@@ -239,17 +242,17 @@
                 </span>
                 <input type="checkbox" id="is_rejected" name="is_rejected"/>
                 <label for="is_rejected" class="i-button"
-                    title="${ _('Filters rejected bookings') }">
+                    title="${ _('Filter by rejected bookings') }">
                     ${ _('Rejected') }
                 </label>
                 <input type="checkbox" id="is_cancelled" name="is_cancelled"/>
                 <label for="is_cancelled" class="i-button"
-                    title="${ _('Filters cancelled bookings') }">
+                    title="${ _('Filter by cancelled bookings') }">
                     ${ _('Cancelled') }
                 </label>
                 <input type="checkbox" id="is_archival" name="is_archival"/>
                 <label for="is_archival" class="i-button"
-                    title="${ _('Filters archived bookings') }">
+                    title="${ _('Filter by archived bookings') }">
                     ${ _('Archived') }
                 </label>
             </div>
@@ -262,7 +265,7 @@
                 </span>
                 <input type="checkbox" id="uses_video_conference" name="uses_video_conference"/>
                 <label for="uses_video_conference" class="i-button"
-                    title="${ _('Filters bookings which will use videoconference systems') }">
+                    title="${ _('Filter by bookings which will use videoconference systems') }">
                     ${ _('Videoconference') }
                 </label>
             </div>
@@ -275,12 +278,12 @@
                 </span>
                 <input type="checkbox" id="needs_video_conference_setup" name="needs_video_conference_setup"/>
                 <label for="needs_video_conference_setup" class="i-button"
-                    title="${ _('Filters bookings which requested assistance for the startup of the videoconference session') }">
+                    title="${ _('Filter by bookings which requested assistance for the startup of the videoconference session') }">
                     ${ _('Videoconference') }
                 </label>
                 <input type="checkbox" id="needs_general_assistance" name="needs_general_assistance"/>
                 <label for="needs_general_assistance" class="i-button"
-                    title="${ _('Filters bookings which requested assistance for the startup of the meeting') }">
+                    title="${ _('Filter by bookings which requested assistance for the startup of the meeting') }">
                     ${ _('Startup') }
                 </label>
             </div>
@@ -288,5 +291,12 @@
     </div>
 
     <h2 class="group-title"></h2>
-    <input id="submitBtn1" type="submit" class="i-button highlight" value="${ _('Search') }">
+    <div class="submit-button-wrapper">
+        <button type="send" class="i-button highlight">
+            <i class="icon-search"></i>
+            <span>
+                ${ _('Search') }
+            </span>
+        </button>
+    </div>
 </form>

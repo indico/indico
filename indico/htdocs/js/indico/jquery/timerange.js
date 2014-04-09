@@ -25,7 +25,8 @@
             endTimeName: 'end_time',
             wrapInToolbar: true,
             thinToolbar: true,
-            errorHighlight: true
+            errorHighlight: true,
+            sliderWidth: '230px'
         },
 
         _create: function() {
@@ -36,7 +37,7 @@
             var toolbar = element;
             var group = $('<div class="group with-slider timerange">');
             var label = $('<span class="i-button label heavy">').text(opt.label);
-            var range = $('<span class="i-button label slider">');
+            var range = $('<span class="i-button label slider">').css('width', opt.sliderWidth);
             var thinClass = opt.thinToolbar ? 'thin' : '';
 
             self._createInputs();

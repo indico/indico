@@ -31,20 +31,37 @@
     width: 820px;
 }
 
-#SearchBookings {
-    #BookingDetails {
-        .toolbar.table {
-            width: 368px;
-        }
+#searchBookings {
+    width: 570px;
 
-        .label {
-            width: 100px;
+    .label {
+        width: 100px;
+    }
+
+    #timespan {
+        > .toolbar {
+            width: 550px;
         }
     }
 
-    input[type=submit] {
-        font-weight: bold;
-        width: 368px;
+    #bookingDetails {
+        .toolbar.table {
+            width: 550px;
+        }
+
+
+        input[type=text] {
+            width: 450px;
+        }
+    }
+
+    .submit-button-wrapper {
+        width: 550px;
+
+        button {
+            font-weight: bold;
+            float: right;
+        }
     }
 }
 
