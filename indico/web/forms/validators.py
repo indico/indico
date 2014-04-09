@@ -31,7 +31,7 @@ class UsedIf(object):
         self.condition = condition
 
     def __call__(self, form, field):
-        if self.condition in {True, False}:
+        if self.condition in (True, False):
             if not self.condition:
                 field.errors[:] = []
                 raise StopValidation()
@@ -110,3 +110,11 @@ def used_if_not_synced(form, field):
     if field.short_name in form.synced_fields:
         field.errors[:] = []
         raise StopValidation()
+
+
+class UsedIfChecked(UsedIf):
+    def __init__(self, field_name):
+        def _condition(form, field):
+            return form._fields.get(field_name).data
+
+        super(UsedIfChecked, self).__init__(_condition)

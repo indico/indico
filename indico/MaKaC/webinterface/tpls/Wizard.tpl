@@ -27,7 +27,7 @@
                                     <span class="titleCellFormat">${ _("First name")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input id="name" type="text" name="name" data-error-tooltip="${ _("You must enter a name.")}" value=${ name } required style="width: 80%;">
+                                    <input id="name" type="text" name="name" data-error-tooltip="${ _("You must enter a name")}" value=${ name } required style="width: 80%;">
                                 </td>
                             </tr>
                             <tr>
@@ -35,7 +35,7 @@
                                     <span class="titleCellFormat">${ _("Family name")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input id="surName" type="text" name="surName" data-error-tooltip="${ _("You must enter a surname.")}" value=${ surName } required style="width: 80%;">
+                                    <input id="surname" type="text" name="surname" data-error-tooltip="${ _("You must enter a surname")}" value=${ surname } required style="width: 80%;">
                                 </td>
                             </tr>
                             <tr>
@@ -43,7 +43,7 @@
                                     <span class="titleCellFormat">${ _("Email")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input id="userEmail" type="email" name="userEmail" data-error-tooltip="${ _("You must enter an user email address.")}" value=${ userEmail } required style="width: 50%;">
+                                    <input id="userEmail" type="email" name="userEmail" data-error-tooltip="${ _("You must enter an user email address")}" value=${ userEmail } required style="width: 80%;">
                                 </td>
                             </tr>
                             <tr>
@@ -51,7 +51,7 @@
                                     <span class="titleCellFormat">${ _("Login")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input id="login" type="text" name="login" data-error-tooltip="${ _("You must enter a login.")}" value=${ login } required style="width: 30%;">
+                                    <input id="login" type="text" name="login" data-error-tooltip="${ _("You must enter a login")}" value=${ login } required style="width: 50%;">
                                 </td>
                             </tr>
                             <tr>
@@ -59,7 +59,7 @@
                                     <span class="titleCellFormat">${ _("Password")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input id="password" type="password" name="password" data-error-tooltip="${ _("You must define a password.")}" value="" required style="width: 30%;">
+                                    <input id="password" type="password" name="password" data-error-tooltip="${ _("You must define a password")}" value="" required style="width: 50%;">
                                 </td>
                             </tr>
                             <tr>
@@ -67,7 +67,7 @@
                                         <span class="titleCellFormat">${ _("Password (again)")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                    <input id="passwordBis" type="password" name="passwordBis" data-error-tooltip="${ _("You must enter the same password twice.")}" value="" required style="width: 30%;">
+                                    <input id="passwordBis" type="password" name="passwordBis" data-error-tooltip="${ _("You must enter the same password twice")}" value="" required style="width: 50%;">
                                 </td>
                             </tr>
                         </table>
@@ -112,7 +112,7 @@
                                         <span class="titleCellFormat">${ _("Organisation")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                        <input id="organisation" type="text" name="organisation" data-error-tooltip="${ _("You must enter the name of your organization.")}" value=${organisation} required style="width: 70%;">
+                                        <input id="organisation" type="text" name="organisation" data-error-tooltip="${ _("You must enter the name of your organization")}" value=${organisation} required style="width: 70%;">
                                 </td>
                             </tr>
                         </table>
@@ -162,7 +162,7 @@
                                         <span class="titleCellFormat">${ _("Email")}</span>
                                 </td>
                                 <td class="contentCellTD">
-                                        <input id="itEmail" type="email" name="instanceTrackingEmail" data-error-tooltip="${ _("You must enter an email for Instance Tracking.")}" value=${instanceTrackingEmail} style="width: 50%;">
+                                        <input id="itEmail" type="email" name="instanceTrackingEmail" data-error-tooltip="${ _("You must enter an email for Instance Tracking")}" value=${instanceTrackingEmail} style="width: 50%;">
                                 </td>
                             </tr>
                         </table>
@@ -185,8 +185,6 @@
 
 <script type='text/javascript'>
 
-    var popup = new WarningPopup('${ _("Form validation")}', "${ _("Some fields are invalid. Please, correct them and submit the form again.")}");
-    var clicked = [false, false, false];
     var ok = true;
 
     function toggleSection(section){
@@ -216,10 +214,10 @@
             if (!this.validity.valid){
                 if (this.id == 'userEmail'){
                     if (this.validity.valueMissing){
-                        $(this).qtip('option', 'content.text', "${ _("You must enter an user email.")}");
+                        $(this).qtip('option', 'content.text', "${ _("You must enter an user email")}");
                     }
                     else{
-                        $(this).qtip('option', 'content.text', "${ _("You must enter a valid user email.")}");
+                        $(this).qtip('option', 'content.text', "${ _("You must enter a valid user email")}");
                     }
                 }
                 invalidField($(this));
@@ -289,10 +287,10 @@
         if (enable.prop('checked')){
             if (!itEmail.prop('validity').valid){
                 if (itEmail.prop('validity').valueMissing){
-                    itEmail.qtip('option', 'content.text', "${ _("You must enter an email for Instance Tracking.")}");
+                    itEmail.qtip('option', 'content.text', "${ _("You must enter an email for Instance Tracking")}");
                 }
                 else{
-                    itEmail.qtip('option', 'content.text', "${ _("You must enter a valid email for Instance Tracking.")}");
+                    itEmail.qtip('option', 'content.text', "${ _("You must enter a valid email for Instance Tracking")}");
                 }
                 invalidField(itEmail);
                 ok = false;
