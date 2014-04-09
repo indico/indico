@@ -36,7 +36,7 @@ class WWizard(wcomponents.WTemplated):
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
         wvars["name"] = quoteattr(self._params.get("name", ""))
-        wvars["surName"] = quoteattr(self._params.get("surName", ""))
+        wvars["surname"] = quoteattr(self._params.get("surname", ""))
         wvars["userEmail"] = quoteattr(self._params.get("userEmail", ""))
         wvars["login"] = quoteattr(self._params.get("login", ""))
         wvars["organisation"] = quoteattr(self._params.get("organisation", ""))
