@@ -212,7 +212,7 @@ def migrate_locations(main_root, rb_root):
     db.session.commit()
 
 
-def migrate_rooms(main_root, rb_root, photo_path):
+def migrate_rooms(rb_root, photo_path):
 
     eq, vc = defaultdict(set), defaultdict(set)
     for old_room_id, old_room in rb_root['Rooms'].iteritems():
@@ -330,7 +330,7 @@ def migrate_rooms(main_root, rb_root, photo_path):
     db.session.commit()
 
 
-def migrate_reservations(main_root, rb_root):
+def migrate_reservations(rb_root):
 
     i = 1
     for rid, v in rb_root['Reservations'].iteritems():
@@ -413,7 +413,7 @@ def migrate_reservations(main_root, rb_root):
     db.session.commit()
 
 
-def migrate_blockings(main_root, rb_root):
+def migrate_blockings(rb_root):
 
     for old_blocking_id, old_blocking in rb_root['RoomBlocking']['Blockings'].iteritems():
         b = Blocking(
@@ -446,15 +446,15 @@ def migrate_blockings(main_root, rb_root):
     db.session.commit()
 
 
-def migrate(*args):
-    migrate_locations(*args[:-1])
-    migrate_rooms(*args)
-    migrate_reservations(*args[:-1])
-    migrate_blockings(*args[:-1])
+def migrate(main_root, rb_root, photo_path):
+    migrate_locations(main_root, rb_root)
+    migrate_rooms(rb_root, photo_path)
+    migrate_reservations(rb_root)
+    migrate_blockings(rb_root)
 
 
-def main(*args):
-    main_root, rb_root, app = setup(*args[:3])
+def main(main_uri, rb_uri, sqla_uri, photo_path, drop):
+    main_root, rb_root, app = setup(main_uri, rb_uri, sqla_uri)
     global tz
     try:
         tz = pytz.timezone(main_root['MaKaCInfo']['main'].getTimezone())
@@ -463,10 +463,10 @@ def main(*args):
 
     start = clock()
     with app.app_context():
-        if args[-1]:
+        if drop:
             drop_database(db)
         db.create_all()
-        migrate(main_root, rb_root, args[-2])
+        migrate(main_root, rb_root, photo_path)
     print (clock() - start), 'seconds'
 
 
