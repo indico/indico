@@ -370,7 +370,7 @@ class ResponseUtil(object):
         if not self._redirect:
             raise Exception('Cannot create a redirect response without a redirect')
         if self.call:
-            raise Exception('Cannot combine use make_response when a callable is set')
+            raise Exception('Cannot use make_redirect when a callable is set')
         return redirect(*self.redirect)
 
     def make_call(self):
@@ -382,7 +382,7 @@ class ResponseUtil(object):
 
     def make_response(self, res):
         if self.call:
-            raise Exception('Cannot combine use make_response when a callable is set')
+            raise Exception('Cannot use make_response when a callable is set')
 
         if isinstance(res, app.response_class):
             if self.modified:
