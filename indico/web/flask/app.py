@@ -33,7 +33,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
-from indico.web.assets import core_env
+from indico.web.assets import core_env, register_all_css, register_all_js
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper)
@@ -125,6 +125,11 @@ def setup_jinja(app):
     app.jinja_env.assets_environment = core_env
 
 
+def setup_assets():
+    register_all_js(core_env)
+    register_all_css(core_env, Config.getInstance().getCssStylesheetName())
+
+
 def extend_url_map(app):
     app.url_map.converters['list'] = ListConverter
 
@@ -188,6 +193,7 @@ def make_app(set_path=False):
     fix_root_path(app)
     configure_app(app, set_path)
     setup_jinja(app)
+    setup_assets()
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)

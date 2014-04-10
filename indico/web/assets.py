@@ -37,7 +37,6 @@ class IndicoEnvironment(Environment):
     def __init__(self):
         config = Config.getInstance()
         url_path = urlparse(config.getBaseURL()).path
-        main_css = config.getCssStylesheetName()
         output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets')
         url = '{0}/static/assets/'.format(url_path)
 
@@ -53,9 +52,6 @@ class IndicoEnvironment(Environment):
         self.append_path(config.getHtdocsDir(), '/')
         self.append_path(os.path.join(config.getHtdocsDir(), 'css'), '{0}/css'.format(url_path))
         self.append_path(os.path.join(config.getHtdocsDir(), 'js'), '{0}/js'.format(url_path))
-
-        register_all_js(self)
-        register_all_css(self, main_css)
 
 
 class PluginEnvironment(Environment):
