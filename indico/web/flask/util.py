@@ -422,3 +422,13 @@ class XAccelMiddleware(object):
         for base, uri in self.mapping:
             if path.startswith(base + '/'):
                 return uri + path[len(base):]
+
+
+class IndicoConfigWrapper(object):
+    """Makes Indico config vars available as vars instead of ugly getter methods."""
+    def __init__(self, config):
+        self.config = config
+
+    def __getattr__(self, item):
+        getter = 'get' + item[0].upper() + item[1:]
+        return getattr(self.config, getter)()

@@ -35,7 +35,8 @@ from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
 from indico.web.assets import core_env
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
-from indico.web.flask.util import XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js
+from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
+                                   IndicoConfigWrapper)
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.rooms import rooms
@@ -99,12 +100,15 @@ def configure_app(app, set_path=False):
 
 
 def setup_jinja(app):
+    config = Config.getInstance()
     # Unicode hack
     app.jinja_env.add_extension(EnsureUnicodeExtension)
     app.add_template_filter(EnsureUnicodeExtension.ensure_unicode)
     # Global functions
     app.add_template_global(url_for)
     app.add_template_global(url_rule_to_js)
+    app.add_template_global(IndicoConfigWrapper(config), 'indico_config')
+    app.add_template_global(config.getSystemIconURL, 'system_icon')
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))
