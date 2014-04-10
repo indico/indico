@@ -49,7 +49,7 @@ from pytz import timezone
 from MaKaC.common.info import HelperMaKaCInfo
 
 from indico.core.errors import IndicoError
-from indico.util.i18n import _
+from indico.util.i18n import _, N_
 
 from .reservation_edit_logs import ReservationEditLog
 from .reservation_occurrences import ReservationOccurrence
@@ -65,12 +65,12 @@ class RepeatUnit(object):
 class RepeatMapping(object):
 
     _mapping = {
-        (RepeatUnit.NEVER, 0): (_('Single reservation'), None),
-        (RepeatUnit.DAY, 1): (_('Repeat daily'), 0),
-        (RepeatUnit.WEEK, 1): (_('Repeat once a week'), 1),
-        (RepeatUnit.WEEK, 2): (_('Repeat once every two week'), 2),
-        (RepeatUnit.WEEK, 3): (_('Repeat once every three week'), 3),
-        (RepeatUnit.MONTH, 1): (_('Repeat every month'), 4)
+        (RepeatUnit.NEVER, 0): (N_('Single reservation'), None),
+        (RepeatUnit.DAY, 1): (N_('Repeat daily'), 0),
+        (RepeatUnit.WEEK, 1): (N_('Repeat once a week'), 1),
+        (RepeatUnit.WEEK, 2): (N_('Repeat once every two week'), 2),
+        (RepeatUnit.WEEK, 3): (N_('Repeat once every three week'), 3),
+        (RepeatUnit.MONTH, 1): (N_('Repeat every month'), 4)
     }
 
     @classmethod
