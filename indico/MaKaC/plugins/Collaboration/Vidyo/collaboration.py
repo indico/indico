@@ -424,8 +424,12 @@ class CSBooking(CSBookingBase):
                 self._warning = "invalidDescription"
             if bool(result.RoomMode.hasPIN):
                 self.setPin(str(result.RoomMode.roomPIN))
+            else:
+                self.setPin("")
             if bool(result.RoomMode.hasModeratorPIN):
                 self.setModeratorPin(str(result.RoomMode.moderatorPIN))
+            else:
+                self.setModeratorPin("")
             self._bookingParams["autoMute"] = self._getAutomute()
             self.setBookingOK()
             VidyoTools.getEventEndDateIndex().indexBooking(self)
