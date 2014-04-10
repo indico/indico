@@ -36,9 +36,9 @@ from MaKaC.webinterface.rh.conferenceModif import RHMaterialsShow
 from MaKaC.plugins.InstantMessaging.XMPP.helpers import generateCustomLinks, generateLogLink, XMPPLogsActivated
 from MaKaC.i18n import _
 import zope.interface
+from indico.core.config import Config
 from indico.core.extpoint import Component
 from indico.core.extpoint.events import IEventDisplayContributor
-from MaKaC.common.info import HelperMaKaCInfo
 
 
 class WPConfModifChat(WPConferenceModifBase):
@@ -53,9 +53,8 @@ class WPConfModifChat(WPConferenceModifBase):
 
         self._tabCtrl = wcomponents.TabControl()
 
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
         self._plugin_asset_env = PluginEnvironment('InstantMessaging', os.path.dirname(__file__), 'InstantMessaging')
-        self._plugin_asset_env.debug = info.isDebugActive()
+        self._plugin_asset_env.debug = Config.getInstance().getDebug()
         self._plugin_asset_env.register('instant_messaging_js', Bundle('js/InstantMessaging.js',
                                                                        filters='rjsmin',
                                                                        output="InstantMessaging_%(version)s.min.js"))

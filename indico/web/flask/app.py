@@ -71,6 +71,7 @@ def fix_root_path(app):
 
 def configure_app(app, set_path=False):
     cfg = Config.getInstance()
+    app.config['DEBUG'] = cfg.getDebug()
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = cfg.getSessionLifetime()

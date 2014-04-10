@@ -40,7 +40,6 @@ from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
 from indico.core.config import Config
 from MaKaC.conference import CategoryManager, ConferenceHolder, Conference
 from indico.ext.search.register import SearchRegister
-from MaKaC.common.info import HelperMaKaCInfo
 from indico.web.assets import PluginEnvironment
 from webassets import Bundle
 
@@ -69,9 +68,8 @@ class SearchCHContributor(Component):
         """
         Includes additional javascript file.
         """
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
         asset_env = PluginEnvironment('search', os.path.dirname(__file__), 'search')
-        asset_env.debug = info.isDebugActive()
+        asset_env.debug = Config.getInstance().getDebug()
 
         asset_env.register('search', Bundle('js/search.js',
                                                            filters='rjsmin',

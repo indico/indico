@@ -45,13 +45,7 @@ def initialize_new_db(root):
     cm = CategoryManager()
     cm.getRoot()
 
-    home = cm.getById('0')
-
-    # set debug mode on
-    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-    minfo.setDebugActive(True)
-
-    return home
+    return cm.getById('0')
 
 
 def create_user(name, login, authManager):

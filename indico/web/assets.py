@@ -183,23 +183,6 @@ indico_regform = Bundle(
     output='js/indico_regform_%(version)s.min.js')
 
 
-class DebugLevelFilter(Filter):
-    name = 'debug_level'
-    max_debug_level = None
-
-    def __init__(self, required_level):
-        super(DebugLevelFilter, self).__init__()
-        self.required_level = required_level
-
-    def unique(self):
-        # We cannot have self.env available here so we take the debug flag from makacinfo instead.
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
-        return self.name, self.required_level, debug
-
-    def output(self, in_, out, **kw):
-        if self.required_level == self.env.debug:
-            out.write(in_.read())
-
 angular = Bundle(
     'js/lib/angular.js',
     'js/lib/angular-resource.js',
@@ -213,16 +196,15 @@ angular = Bundle(
     output='js/angular_%(version)s.min.js'
 )
 
-jquery = Bundle(
+jquery = Bundle(*filter(None, [
     'js/lib/underscore.js',
     'js/lib/jquery.js',
     'js/lib/jquery.qtip.js',
     'js/jquery/jquery-ui.js',
     'js/lib/jquery.multiselect.js',
     'js/lib/jquery.multiselect.filter.js',
-    Bundle('js/jquery/jquery-migrate-silencer.js', filters=DebugLevelFilter(required_level=False),
-           output='js/jquery_migrate_silencer_%(version)s.js'),
-    *namespace('js/jquery',
+    'js/jquery/jquery-migrate-silencer.js' if not Config.getInstance().getDebug() else None] +
+    namespace('js/jquery',
 
                'jquery-migrate.js',
                'jquery.form.js',
@@ -238,7 +220,7 @@ jquery = Bundle(
                'jquery.typewatch.js',
                'jstorage.js',
                'jquery.watermark.js',
-               'jquery.placeholder.js'),
+               'jquery.placeholder.js')),
     filters='rjsmin', output='js/jquery_code_%(version)s.min.js')
 
 utils = Bundle('js/utils/routing.js', filters='rjsmin', output='js/utils_%(version)s.min.js')

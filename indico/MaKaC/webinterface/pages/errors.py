@@ -29,7 +29,6 @@ from indico.core.config import Config
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 
@@ -64,7 +63,7 @@ class WGenericError( WTemplated ):
             vars["userEmail"] = quoteattr( av.getEmail() )
         vars["reportURL"] = quoteattr( str( urlHandlers.UHErrorReporting.getURL() ) )
         details = ""
-        if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
+        if Config.getInstance().getDebug():
             details = """
 <table class="errorDetailsBox">
     <tr>

@@ -41,6 +41,7 @@ from indico.core.extpoint import Component
 from indico.core.extpoint.plugins import IPluginSettingsContributor
 from indico.web.handlers import RHHtdocs
 from indico.util.date_time import nowutc, int_timestamp
+from indico.core.config import Config
 
 # legacy indico imports
 from MaKaC.webinterface.wcomponents import WTemplated
@@ -121,9 +122,8 @@ class WPLiveSyncAdmin(WPAdminPlugins):
     def __init__(self, rh, templateClass):
         WPAdminPlugins.__init__(self, rh, 'livesync', '')
         self._templateClass = templateClass
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
         self._plugin_asset_env = PluginEnvironment('livesync', os.path.dirname(__file__), 'livesync')
-        self._plugin_asset_env.debug = info.isDebugActive()
+        self._plugin_asset_env.debug = Config.getInstance().getDebug()
         self._plugin_asset_env.register('livesync_js', Bundle('js/livesync.js',
                                                               filters='rjsmin',
                                                               output="livesync__%(version)s.min.js"))

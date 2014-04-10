@@ -510,6 +510,7 @@ class Config:
         'MaxUploadFileSize'         : '0',
         'ForceConflicts'            : 0,
         'PropagateAllExceptions'    : False,
+        'Debug'                     : False,
         'EmbeddedWebserver'         : False,
         'EmbeddedWebserverBaseURL'  : None,
         'OAuthAccessTokenTTL'       : 10000,
@@ -716,16 +717,15 @@ class Config:
     def getAuthenticatedEnforceSecure(self):
         return self._yesOrNoVariable('AuthenticatedEnforceSecure') and self.getBaseSecureURL()
 
+    @classmethod
     def getInstance(cls):
         """returns an instance of the Config class ensuring only a single
            instance is created. All the clients should use this method for
            setting a Config object instead of normal instantiation
         """
-        if cls.__instance == None:
+        if cls.__instance is None:
             cls.__instance = Config()
         return cls.__instance
-
-    getInstance = classmethod( getInstance )
 
     @classmethod
     def setInstance(cls, instance):

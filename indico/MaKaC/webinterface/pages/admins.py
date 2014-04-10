@@ -190,21 +190,9 @@ class WAdmins(wcomponents.WTemplated):
         vars["systemIconAdmins"] = Config.getInstance().getSystemIconURL( "admin" )
         iconDisabled = str(Config.getInstance().getSystemIconURL( "disabledSection" ))
         iconEnabled = str(Config.getInstance().getSystemIconURL( "enabledSection" ))
-        vars["features"] = ""
         url = urlHandlers.UHAdminSwitchNewsActive.getURL()
-        if minfo.isNewsActive():
-            icon = iconEnabled
-        else:
-            icon = iconDisabled
-        #vars["features"] += i18nformat("""<br><a href="%s"><img src="%s" border="0" alt="Toggle on/off"> _("News Pages") </a>""") % (str(url), icon)
-        #vars["announcement"] = WAnnouncementModif().getHTML( vars )
-        vars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("News Pages")</a></div>""") % (str(url), icon)
-        url = urlHandlers.UHAdminSwitchDebugActive.getURL()
-        if minfo.isDebugActive():
-            icon = iconEnabled
-        else:
-            icon = iconDisabled
-        vars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("Debug")</a></div>""") % (str(url), icon)
+        icon = iconEnabled if minfo.isNewsActive() else iconDisabled
+        vars["features"] = i18nformat("""<a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("News Pages")</a>""") % (url, icon)
         vars["administrators"] = fossilize(minfo.getAdminList())
         return vars
 

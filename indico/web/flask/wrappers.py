@@ -30,6 +30,7 @@ from indico.web.flask.session import IndicoSessionInterface
 from indico.web.flask.util import make_view_func
 from indico.core.db import DBMgr
 
+
 class IndicoRequest(Request):
     @cached_property
     def remote_addr(self):
@@ -54,11 +55,6 @@ class IndicoRequest(Request):
 class IndicoFlask(Flask):
     request_class = IndicoRequest
     session_interface = IndicoSessionInterface()
-
-    @property
-    def debug(self):
-        with DBMgr.getInstance().global_connection():
-            return HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
 
 
 class IndicoBlueprintSetupState(BlueprintSetupState):

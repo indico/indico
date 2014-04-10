@@ -1592,10 +1592,6 @@ class UHAdminArea(URLHandler):
     _endpoint = 'admin.adminList'
 
 
-class UHAdminSwitchDebugActive(URLHandler):
-    _endpoint = 'admin.adminList-switchDebugActive'
-
-
 class UHAdminSwitchNewsActive(URLHandler):
     _endpoint = 'admin.adminList-switchNewsActive'
 

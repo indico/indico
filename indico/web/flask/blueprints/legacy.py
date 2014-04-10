@@ -92,7 +92,7 @@ legacy_endpoints = set([
     'abstractSubmission-confirmation', 'abstractTools', 'abstractTools-delete', 'abstractWithdraw',
     'abstractWithdraw-recover', 'adminAnnouncement', 'adminAnnouncement-save', 'adminConferenceStyles', 'adminLayout',
     'adminLayout-addStyle', 'adminLayout-deleteStyle', 'adminLayout-saveSocial', 'adminLayout-saveTemplateSet',
-    'adminLayout-setDefaultPDFOptions', 'adminLayout-styles', 'adminList', 'adminList-switchDebugActive',
+    'adminLayout-setDefaultPDFOptions', 'adminLayout-styles', 'adminList',
     'adminList-switchNewsActive', 'adminMaintenance', 'adminMaintenance-pack', 'adminMaintenance-performPack',
     'adminMaintenance-performTmpCleanup', 'adminMaintenance-tmpCleanup', 'adminPlugins', 'adminPlugins-clearAllInfo',
     'adminPlugins-reload', 'adminPlugins-reloadAll', 'adminPlugins-saveOptionReloadAll',
