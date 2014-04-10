@@ -69,7 +69,6 @@ class SearchCHContributor(Component):
         Includes additional javascript file.
         """
         asset_env = PluginEnvironment('search', os.path.dirname(__file__), 'search')
-        asset_env.debug = Config.getInstance().getDebug()
 
         asset_env.register('search', Bundle('js/search.js',
                                                            filters='rjsmin',

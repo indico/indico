@@ -16,20 +16,23 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import request
-from indico.util.contextManager import ContextManager
 
 """Contains the machinery that allows to access and modify in a more comfortable
 and transparent way the system configuration (this is mainly done through the
 Config class).
 """
+
 import copy
 import os
-import urlparse
 import socket
 import sys
+import urlparse
+
+from flask import request
 
 import MaKaC
+from indico.core.db import DBMgr
+from indico.util.contextManager import ContextManager
 
 
 __all__ = ['Config']
@@ -758,13 +761,13 @@ class Config:
         """gives back the css stylesheet name used by Indico"""
         template = 'Default'
 
-        # TODO: CHECK IF DB IS OPEN
-
         # NOTE: don't move the import outside because we need Configuration.py
         # to be loaded from setup.py and at that point we don't have db access
         # and therefore the import will fail.
         import MaKaC.common.info as info
-        defTemplate = info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultTemplateSet()
+
+        with DBMgr.getInstance().global_connection():
+            defTemplate = info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultTemplateSet()
 
         if (defTemplate is not None and os.path.exists("%s/css/Default.%s.css" % (self.getHtdocsDir(), defTemplate))):
             template = "Default.%s" % defTemplate

@@ -33,6 +33,7 @@ from MaKaC.common.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
+from indico.web.assets import core_env
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoFlask
@@ -115,6 +116,9 @@ def setup_jinja(app):
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext, ngettext, True)
+    # webassets
+    app.jinja_env.add_extension('webassets.ext.jinja2.AssetsExtension')
+    app.jinja_env.assets_environment = core_env
 
 
 def extend_url_map(app):

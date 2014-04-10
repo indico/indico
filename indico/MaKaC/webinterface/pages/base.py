@@ -16,25 +16,21 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import request, session
 
+
+import posixpath
+from flask import request, session
 from urlparse import urlparse
-from webassets import Environment
-from webassets.version import Version
 from indico.web import assets
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
+from MaKaC.plugins.base import OldObservable
 from indico.core.config import Config
-from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
-import os
-import posixpath
 
-from MaKaC.plugins.base import OldObservable
-from indico.core.db import DBMgr
 
 class WPBase(OldObservable):
     """
@@ -46,46 +42,11 @@ class WPBase(OldObservable):
 
     def __init__( self, rh ):
         config = Config.getInstance()
-        db_connected = DBMgr.getInstance().isConnected()
-        if db_connected:
-            debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
-        else:
-            debug = False
-
         self._rh = rh
         self._locTZ = ""
 
-        url_path = urlparse(config.getBaseURL()).path
-
-        self._asset_env = Environment(os.path.join(config.getHtdocsDir(), 'static', 'assets'),
-                                      '{0}/static/assets/'.format(url_path))
-        self._asset_env.config['PYSCSS_STATIC_URL'] = '{0}/static/'.format(url_path)
-        self._asset_env.config['PYSCSS_LOAD_PATHS'] = [
-            os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass'),
-            os.path.join(config.getHtdocsDir(), 'sass')
-        ]
-        self._asset_env.config['PYSCSS_DEBUG_INFO'] = debug and Config.getInstance().getSCSSDebugInfo()
-
-        self._asset_env.append_path(config.getHtdocsDir(), '/')
-        self._asset_env.append_path(os.path.join(config.getHtdocsDir(), 'css'), '{0}/css'.format(url_path))
-        self._asset_env.append_path(os.path.join(config.getHtdocsDir(), 'js'), '{0}/js'.format(url_path))
-
-        # This is done in order to avoid the problem sending the error report because the DB is not connected.
-        if db_connected:
-            info = HelperMaKaCInfo.getMaKaCInfoInstance()
-            self._asset_env.debug = info.isDebugActive()
-
         self._dir = config.getTPLDir()
-        self._asset_env.debug = debug
-
-        if db_connected:
-            css_file = config.getCssStylesheetName()
-        else:
-            css_file = 'Default.css'
-
-        # register existing assets
-        assets.register_all_js(self._asset_env)
-        assets.register_all_css(self._asset_env, css_file)
+        self._asset_env = assets.core_env
 
         #store page specific CSS and JS
         self._extraCSS = []

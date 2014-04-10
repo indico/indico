@@ -83,7 +83,6 @@ class WPCollaborationBase:
 
     def __init__(self):
         self._plugin_asset_env = PluginEnvironment('Collaboration', os.path.dirname(__file__), 'Collaboration')
-        self._plugin_asset_env.debug = Config.getInstance().getDebug()
         self._plugin_asset_env.register('collaboration_js', Bundle('js/Collaboration.js', 'js/bookings.js',
                                                                    filters='rjsmin',
                                                                    output="Collaboration_%(version)s.min.js"))

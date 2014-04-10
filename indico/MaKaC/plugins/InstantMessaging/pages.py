@@ -54,7 +54,6 @@ class WPConfModifChat(WPConferenceModifBase):
         self._tabCtrl = wcomponents.TabControl()
 
         self._plugin_asset_env = PluginEnvironment('InstantMessaging', os.path.dirname(__file__), 'InstantMessaging')
-        self._plugin_asset_env.debug = Config.getInstance().getDebug()
         self._plugin_asset_env.register('instant_messaging_js', Bundle('js/InstantMessaging.js',
                                                                        filters='rjsmin',
                                                                        output="InstantMessaging_%(version)s.min.js"))

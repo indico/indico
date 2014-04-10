@@ -49,7 +49,6 @@ class ImporterContributor(Component, Observable):
         Includes additional javascript file.
         """
         asset_env = PluginEnvironment('importer', os.path.dirname(__file__), 'importer')
-        asset_env.debug = Config.getInstance().getDebug()
 
         asset_env.register('importer_js', Bundle('js/importer.js',
                                                  filters='rjsmin',
@@ -62,7 +61,6 @@ class ImporterContributor(Component, Observable):
         Includes additional Css files.
         """
         asset_env = PluginEnvironment('importer', os.path.dirname(__file__), 'importer')
-        asset_env.debug = Config.getInstance().getDebug()
         asset_env.register('importer_css', Bundle('css/importer.css',
                                                   filters='cssmin',
                                                   output="importer__%(version)s.min.css"))

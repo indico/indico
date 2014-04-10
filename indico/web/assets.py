@@ -21,30 +21,52 @@
 """
 This file declares all core JS/CSS assets used by Indico
 """
+
 # stdlib imports
 import os
 from urlparse import urlparse
 
 # 3rd party libs
 from webassets import Bundle, Environment
-from webassets.filter import Filter
 
 # legacy imports
-from MaKaC.common import HelperMaKaCInfo
 from indico.core.config import Config
+
+
+class IndicoEnvironment(Environment):
+    def __init__(self):
+        config = Config.getInstance()
+        url_path = urlparse(config.getBaseURL()).path
+        main_css = config.getCssStylesheetName()
+        output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets')
+        url = '{0}/static/assets/'.format(url_path)
+
+        super(IndicoEnvironment, self).__init__(output_dir, url)
+        self.debug = config.getDebug()
+        self.config['PYSCSS_DEBUG_INFO'] = self.debug and config.getSCSSDebugInfo()
+        self.config['PYSCSS_STATIC_URL'] = '{0}/static/'.format(url_path)
+        self.config['PYSCSS_LOAD_PATHS'] = [
+            os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass'),
+            os.path.join(config.getHtdocsDir(), 'sass')
+        ]
+
+        self.append_path(config.getHtdocsDir(), '/')
+        self.append_path(os.path.join(config.getHtdocsDir(), 'css'), '{0}/css'.format(url_path))
+        self.append_path(os.path.join(config.getHtdocsDir(), 'js'), '{0}/js'.format(url_path))
+
+        register_all_js(self)
+        register_all_css(self, main_css)
 
 
 class PluginEnvironment(Environment):
     def __init__(self, plugin_name, plugin_dir, url_path):
         config = Config.getInstance()
-
         url_base_path = urlparse(config.getBaseURL()).path
-
         output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets', 'plugins', plugin_name)
+        url = '{0}/static/assets/plugins/{1}'.format(url_base_path, url_path)
 
-        super(PluginEnvironment, self).__init__(output_dir, '{0}/static/assets/plugins/'.format(url_base_path)
-                                                + url_path)
-
+        super(PluginEnvironment, self).__init__(output_dir, url)
+        self.debug = Config.getInstance().getDebug()
         self.append_path(os.path.join(plugin_dir, 'htdocs'), url=os.path.join(url_base_path, url_path))
 
 
@@ -380,3 +402,6 @@ def register_all_css(env, main_css_file):
     env.register('dashboard_sass', dashboard_sass)
     env.register('category_sass', category_sass)
     env.register('screen_sass', screen_sass)
+
+
+core_env = IndicoEnvironment()
