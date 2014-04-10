@@ -637,6 +637,11 @@ class IRegFormSocialEventFossil(IFossil):
         Get id
         """
 
+    def getCaption(self):
+        """
+        Get caption
+        """
+
     def getNoPlaces(self):
         """
         get number of places
