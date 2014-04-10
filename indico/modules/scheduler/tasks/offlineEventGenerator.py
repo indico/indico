@@ -35,18 +35,6 @@ from MaKaC.accessControl import AccessWrapper
 from indico.util import fossilize
 
 
-def _delete_recursively(target):
-    if os.path.isdir(target):
-        for path, dirs, files in os.walk(target, topdown=False):
-            for name in files:
-                os.remove(os.path.join(path, name))
-            for name in dirs:
-                os.rmdir(os.path.join(path, name))
-        os.rmdir(target)
-    elif os.path.exists(target):
-        os.remove(target)
-
-
 class OfflineEventGeneratorTask(OneShotTask):
 
     def __init__(self, task):

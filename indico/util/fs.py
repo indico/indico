@@ -25,3 +25,15 @@ def silentremove(filename):
     except OSError, e: # this would be "except OSError as e:" in python 3.x
         if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
             raise # re-raise exception if a different error occured
+
+
+def delete_recursively(target):
+    if os.path.isdir(target):
+        for path, dirs, files in os.walk(target, topdown=False):
+            for name in files:
+                os.remove(os.path.join(path, name))
+            for name in dirs:
+                os.rmdir(os.path.join(path, name))
+        os.rmdir(target)
+    elif os.path.exists(target):
+        os.remove(target)
