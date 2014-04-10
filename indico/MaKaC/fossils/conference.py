@@ -73,6 +73,14 @@ class IConferenceFossil(IConferenceMinimalFossil):
         """ End Date """
     getEndDate.convert = Conversion.datetime
 
+    def getAdjustedStartDate(self):
+        """ Adjusted Start Date """
+    getAdjustedStartDate.convert = Conversion.datetime
+
+    def getAdjustedEndDate(self):
+        """ Adjusted End Date """
+    getAdjustedEndDate.convert = Conversion.datetime
+
     def getTimezone(self):
         """ Time zone """
 

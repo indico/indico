@@ -210,7 +210,7 @@ class VidyoTools(object):
     def getContactSupportText(cls):
         contactSupport = ""
         if getVidyoOptionValue("contactSupport"):
-            contactSupport += _("""\nPlease try again or contact %s for help.""") % getVidyoOptionValue("contactSupport")
+            contactSupport += _("""\nPlease contact %s for help.""") % getVidyoOptionValue("contactSupport")
         return contactSupport
 
     @classmethod

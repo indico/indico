@@ -393,9 +393,11 @@ class VidyoOperations(object):
                 Logger.get('Vidyo').exception("""Evt:%s, booking:%s,
                                               Ravem API's disconnect operation not successfull: %s""" %
                                               (booking.getConference().getId(), booking.getId(), answer.text))
-                return VidyoError("disconnectFailed", "disconnect", _("There was a problem with the videoconference disconnection. ") + VidyoTools.getContactSupportText())
+                return VidyoError("disconnectFailed", "disconnect",
+                                  _("Vidyo was unable to disconnect the conference room. {0}").format(VidyoTools.getContactSupportText()))
         except Exception:
-            return VidyoError("disconnectFailed", "disconnect", _("There was a problem with the videoconference disconnection. ") + VidyoTools.getContactSupportText())
+            return VidyoError("disconnectFailed", "disconnect",
+                              _("Vidyo was unable to disconnect the conference room. {0}").format(VidyoTools.getContactSupportText()))
 
     @classmethod
     def isRoomConnected(cls, booking, roomIp="", roomPanoramaUser=""):
@@ -408,7 +410,8 @@ class VidyoOperations(object):
                 Logger.get('Vidyo').exception("""Evt:%s, booking:%s,
                                               Ravem API's isConnected operation not successfull: %s""" %
                                               (booking.getConference().getId(), booking.getId(), answer.text))
-                return VidyoError("roomCheckFailed", "roomConnected", _("There was a problem obtaining the room status. ") + VidyoTools.getContactSupportText())
+                return VidyoError("roomCheckFailed", "roomConnected",
+                                  _("There was a problem obtaining the room status from Vidyo. {0}").format(VidyoTools.getContactSupportText()))
             result = {"roomName": None, "isConnected": False, "service": None}
             answer = answer.json()
             if "result" in answer:
@@ -419,7 +422,8 @@ class VidyoOperations(object):
                         result["service"] = VidyoTools.recoverVidyoDescription(service.get("event_type"))
             return result
         except Exception:
-            return VidyoError("roomCheckFailed", "roomConnected", _("There was a problem obtaining the room status. ") + VidyoTools.getContactSupportText())
+            return VidyoError("roomCheckFailed", "roomConnected",
+                              _("There was a problem obtaining the room status from Vidyo. {0}").format(VidyoTools.getContactSupportText()))
 
     @classmethod
     def searchRooms(cls, query):

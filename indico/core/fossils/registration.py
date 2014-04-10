@@ -19,7 +19,8 @@
 
 from MaKaC.common.fossilize import IFossil
 from MaKaC.webinterface.urlHandlers import UHFileAccess
-from indico.util.date_time import format_date
+from indico.util.date_time import format_date, format_datetime
+from MaKaC.common.Conversion import Conversion
 
 
 ###################
@@ -622,12 +623,23 @@ class IRegFormMiscellaneousInfoSimpleItemFossil(IFossil):
         Get price
         """
 
+    def getCaption(self):
+        """
+        Get price
+        """
+    getCaption.produce = lambda item: item.getGeneralField().getCaption()
+
 
 class IRegFormSocialEventFossil(IFossil):
 
     def getId(self):
         """
         Get id
+        """
+
+    def getCaption(self):
+        """
+        Get caption
         """
 
     def getNoPlaces(self):
@@ -705,12 +717,66 @@ class IRegFormMiscellaneousInfoGroupFossil(IFossil):
     getResponseItems.result = IRegFormMiscellaneousInfoSimpleItemFossil
 
 
-class IRegFormRegistrantFossil(IFossil):
+class IRegFormMiscellaneousInfoGroupFullFossil(IRegFormMiscellaneousInfoGroupFossil):
+
+    def getResponseItems(self):
+        """
+        Get response items
+        """
+    getResponseItems.produce = lambda x: x.getResponseItems().values()
+    getResponseItems.result = IRegFormMiscellaneousInfoSimpleItemFossil
+
+
+class IRegFormRegistrantBasicFossil(IFossil):
+    def getId(self):
+        """
+        Registrarant id
+        """
+    getId.name = "registrant_id"
+
+    def getFullName(self):
+        """
+        Registrarant fullname
+        """
+    getFullName.name = "full_name"
+    getFullName.produce = lambda x: x.getFullName(title=True, firstNameFirst=True)
+
+    def getAdjustedRegistrationDate(self):
+        """
+        If the user payed
+        """
+    getAdjustedRegistrationDate.name = "registration_date"
+    getAdjustedRegistrationDate.produce = lambda x: format_datetime(x.getAdjustedRegistrationDate(), format="short")
 
     def getPayed(self):
         """
         If the user payed
         """
+    getPayed.name = "paid"
+    getPayed.produce = lambda x: x.getPayed() if x.getConference().getModPay().isActivated() else None
+
+    def getTotal(self):
+        """
+        Total amount payed
+        """
+    getTotal.name = "amount_paid"
+    getTotal.produce = lambda x: x.getTotal() if x.getConference().getModPay().isActivated() else None
+
+    def isCheckedIn(self):
+        """
+        Registrarant fullname
+        """
+    isCheckedIn.name = "checked_in"
+
+    def getAdjustedCheckInDate(self):
+        """
+        If the user payed
+        """
+    getAdjustedCheckInDate.name = "checkin_date"
+    getAdjustedCheckInDate.produce = lambda x: format_datetime(x.getAdjustedCheckInDate(), format="short") if x.isCheckedIn() else None
+
+
+class IRegFormRegistrantFossil(IRegFormRegistrantBasicFossil):
 
     def getAccommodation(self):
         """
@@ -740,3 +806,12 @@ class IRegFormRegistrantFossil(IFossil):
         Get Miscellaneous group list
         """
     getMiscellaneousGroupList.result = IRegFormMiscellaneousInfoGroupFossil
+
+
+class IRegFormRegistrantFullFossil(IRegFormRegistrantFossil):
+
+    def getMiscellaneousGroupList(self):
+        """
+        Get Miscellaneous group list
+        """
+    getMiscellaneousGroupList.result = IRegFormMiscellaneousInfoGroupFullFossil

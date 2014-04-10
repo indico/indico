@@ -253,6 +253,16 @@ def url_rule_to_js(endpoint):
     }
 
 
+def _is_office_mimetype(mimetype):
+    if mimetype.startswith('application/vnd.ms'):
+        return True
+    if mimetype.startswith('application/vnd.openxmlformats-officedocument'):
+        return True
+    if mimetype == 'application/msword':
+        return True
+    return False
+
+
 def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inline=True, conditional=False):
     """Sends a file to the user.
 
@@ -274,6 +284,8 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         # Indico file type such as "JPG" or "CSV"
         from indico.core.config import Config
         mimetype = Config.getInstance().getFileTypeMimeType(mimetype)
+    if _is_office_mimetype(mimetype):
+        inline = False
     try:
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
                         conditional=conditional)
@@ -358,7 +370,7 @@ class ResponseUtil(object):
         if not self._redirect:
             raise Exception('Cannot create a redirect response without a redirect')
         if self.call:
-            raise Exception('Cannot combine use make_response when a callable is set')
+            raise Exception('Cannot use make_redirect when a callable is set')
         return redirect(*self.redirect)
 
     def make_call(self):
@@ -370,7 +382,7 @@ class ResponseUtil(object):
 
     def make_response(self, res):
         if self.call:
-            raise Exception('Cannot combine use make_response when a callable is set')
+            raise Exception('Cannot use make_response when a callable is set')
 
         if isinstance(res, app.response_class):
             if self.modified:
