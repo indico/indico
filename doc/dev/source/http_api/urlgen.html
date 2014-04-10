@@ -37,35 +37,36 @@
 </section>
 
 
-<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha1.js"></script>
+<script type="text/javascript" src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha1.js"></script>
 <script type="text/javascript">
     // Copyright (c) 2010 "Cowboy" Ben Alman
     // https://github.com/cowboy/jquery-bbq/blob/master/LICENSE-MIT
-    var params_sorted = function( a, traditional ) {
+    // (Properly beautified)
+
+    var params_sorted = function (a, traditional) {
         var arr = [],
-          obj = {};
-        
-        $.each($.param( a, traditional ).split( '&' ), function(i,v){
-          var key = v.replace( /(?:%5B|=).*$/, '' ),
-            key_obj = obj[ key ];
-          
-          if ( !key_obj ) {
-            key_obj = obj[ key ] = [];
-            arr.push( key );
-          }
-          
-          key_obj.push( v );
+            obj = {};
+
+        $.each($.param(a, traditional).split('&'), function (i, v) {
+            var key = v.replace(/(?:%5B|=).*$/, ''),
+                key_obj = obj[key];
+
+            if (!key_obj) {
+                key_obj = obj[key] = [];
+                arr.push(key);
+            }
+
+            key_obj.push(v);
         });
-        
-        return $.map( arr.sort(), function(v){
-          return obj[ v ];
-        }).join( '&' );
+
+        return $.map(arr.sort(), function (v) {
+            return obj[v];
+        }).join('&');
     };
 
     // Start of Indico code
 
     $(function() {
-
         $('#new-field').click(function() {
             $('#fields').append($('<li/>').append(
                                     $('<input class="key" placeholder="Parameter name" type="text" />'),
@@ -74,17 +75,17 @@
         });
 
         $('#generate').click(function() {
-            var persistent = $('#persistent').is(":checked"),
+            var persistent = $('#persistent').prop("checked"),
                 params = {},
                 path = $('#path').val();
 
-            $.each($('#fields li'), function() {
+            $('#fields li').each(function() {
                 var key = $(this).find('.key').val(),
                     value = $(this).find('.value').val();
                 if (key) { 
-                    params[key] = value;
+                    params[key] = value.trim();
                 }
-            })
+            });
             
             if (!persistent) {
                 params['timestamp'] = Math.round(Date.now() / 1000);
