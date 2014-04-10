@@ -1082,14 +1082,14 @@ type("RoomBookingPrevNext", [],
         },
         function(prevNextBarArgs, data){
             this.prevURL = prevNextBarArgs.prevURL;
-            this.newBooking = prevNextBarArgs.newBooking;
+            this.newBooking = prevNextBarArgs.newBooking == 'True';
             this.nextURL = prevNextBarArgs.nextURL;
             this.formUrl = prevNextBarArgs.formUrl;
             this.periodName = prevNextBarArgs.periodName;
             this.startD = prevNextBarArgs.startD;
             this.endD = prevNextBarArgs.endD;
             this.params = prevNextBarArgs.params;
-            this.search = prevNextBarArgs.search;
+            this.search = prevNextBarArgs.search == 'True';
             this.data = data;
         });
 

@@ -71,7 +71,7 @@
             }));
             self.pickers = self.startPicker.add(self.endPicker);
 
-            // Prevent nonsense ranges
+            // Prevent invalid ranges
             self.pickers.datepicker('option', 'onSelect', function() {
                 if(self.startPicker.datepicker('getDate') > self.endPicker.datepicker('getDate')) {
                     if(this == self.startPicker[0]) {
@@ -84,6 +84,9 @@
                 self.options.startDate = self.startPicker.datepicker('getDate');
                 self.options.endDate = self.endPicker.datepicker('getDate');
             });
+
+            self.pickers.siblings('button.ui-datepicker-trigger').remove();
+
             // Copy current date in case it was not set before
             self.options.startDate = self.startPicker.datepicker('getDate');
             self.options.endDate = self.endPicker.datepicker('getDate');
