@@ -55,6 +55,7 @@ from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.cache import GenericCache
 from MaKaC.plugins.RoomBooking.default.factory import Factory
+from MaKaC.authentication.LDAPAuthentication import LDAPConnector
 
 
 # Remove the extension at the end or before the querystring
@@ -149,6 +150,7 @@ def handler(prefix, path):
 
     dbi = DBMgr.getInstance()
     dbi.startRequest()
+    LDAPConnector.init()
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
     if minfo.getRoomBookingModuleActive():
         Factory.getDALManager().connect()
@@ -283,6 +285,8 @@ def handler(prefix, path):
                 Factory.getDALManager().rollback()
                 Factory.getDALManager().disconnect()
             dbi.endRequest(False)
+
+        LDAPConnector.destroy()
 
         # Log successful POST api requests
         if error is None and request.method == 'POST':
