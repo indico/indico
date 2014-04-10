@@ -1,125 +1,3 @@
-
-<script type="text/javascript">
-
-    // Displays div with dates and hours
-    function display_availability(bool) {
-        $('#sdatesTR, #edatesTR, #hoursTR, #repTypeTR, #includePrebookingsTR, #includePendingBlockingsTR').toggle(bool);
-    }
-    // Reds out the invalid textboxes and returns false if something is invalid.
-    // Returns true if form may be submited.
-    function forms_are_valid(onSubmit) {
-        if (onSubmit != true) {
-            onSubmit = false;
-        }
-
-        // Clean up - make all textboxes white again
-        var searchForm = $('#searchForm');
-        $(':input', searchForm).removeClass('invalid');
-        // Init
-        var isValid = true;
-
-        // Simple search -------------------------------------
-        // Availability
-        if (!$('input[name="availability"]', searchForm).is(':checked')) { // only if NOT "Don't care"
-            isValid = validate_period();
-        }
-        // capacity
-        if ($('#capacity').val().length > 0 && parseInt($('#capacity').val(), 10).toString() == 'NaN') {
-            $('#capacity').addClass('invalid');
-            isValid = false;
-        }
-
-        // Holidays warning
-        if (isValid && !onSubmit) {
-            var lastDateInfo = searchForm.data('lastDateInfo');
-            var dateInfo = $('#sDay, #sMonth, #sYear, #eDay, #eMonth, #eYear').serialize();
-            if (dateInfo != lastDateInfo) {
-                searchForm.data('lastDateInfo', dateInfo);
-                var holidaysWarning = indicoSource('roomBooking.getDateWarning', searchForm.serializeObject());
-
-                holidaysWarning.state.observe(function(state) {
-                    if (state == SourceState.Loaded) {
-                        $E('holidays-warning').set(holidaysWarning.get());
-                    }
-                });
-            }
-        }
-
-        if (!$('#sdate').val()) {
-            $('#sdate').addClass('invalid');
-            isValid = false;
-        }
-
-        if (!$('#edate').val()) {
-            $('#edate').addClass('invalid');
-            isValid = false;
-        }
-
-        return isValid;
-    }
-    // Check whether a room can be booked (or pre-booked) by the user
-    // If not, pop up a dialog
-    function isBookable() {
-        // Get the selected option in the SELECT
-        var selectedURL = $('#roomName').val();
-        var roomLocationPattern = /roomLocation=([a-zA-Z0-9\-\+]*)(?:&|$)/;
-        var roomIDPattern = /roomID=([a-zA-Z0-9\-]*)(?:&|$)/;
-
-        // Get the room location and id from the url
-        var roomLocation = selectedURL.match(roomLocationPattern);
-        var roomID = selectedURL.match(roomIDPattern);
-
-        var bookButton = $E("bookButton");
-        var bookButtonWrapper = $E("bookButtonWrapper");
-        bookButtonWrapper.set(progressIndicator(true, false));
-
-        // Send an asynchronous request to the server
-        // Depending of result, either redirect to the
-        // Room Booking form or pop up a dialog
-        indicoRequest('user.canBook',
-            {roomLocation: roomLocation[1], roomID: roomID[1]},
-            function(result, error) {
-                if(!error) {
-                    if (result) {
-                        document.location = selectedURL;
-                    } else {
-                        bookButtonWrapper.set(bookButton);
-                        var popup = new AlertPopup('Booking Not Allowed',
-                                "You're not allowed to book this room");
-                        popup.open();
-                    }
-                } else {
-                    bookButtonWrapper.set(bookButton);
-                    IndicoUtil.errorReport(error);
-                }
-            });
-    }
-
-    $(window).on('load', function() {
-        $('#searchForm').delegate(':input', 'keyup change', function() {
-            forms_are_valid();
-        }).submit(function(e) {
-            if (!forms_are_valid(true)) {
-                e.preventDefault();
-                new AlertPopup($T("Error"), $T("There are errors in the form. Please correct fields with red background.")).open();
-            };
-        });
-
-        if (forms_are_valid()) {
-            set_repeatition_comment();
-        }
-        if ($('#searchForm input[name="availability"]').is(':checked')) { // if "Don't care" about availability
-            display_availability(false);
-        }
-        $('#searchForm input[name="availability"]').change(function() {
-            display_availability($(this).data('showAvailability'));
-        });
-        display_availability($('input[name=availability]:checked').data('showAvailability'));
-        $('#freeSearch').focus();
-    });
-
-</script>
-
 <!-- CONTEXT HELP DIVS -->
 <div id="tooltipPool" style="display: none">
   <!-- Choose Button -->
@@ -410,3 +288,124 @@
         </table>
     </form>
 </div>
+
+<script type="text/javascript">
+
+    // Displays div with dates and hours
+    function display_availability(bool) {
+        $('#sdatesTR, #edatesTR, #hoursTR, #repTypeTR, #includePrebookingsTR, #includePendingBlockingsTR').toggle(bool);
+    }
+    // Reds out the invalid textboxes and returns false if something is invalid.
+    // Returns true if form may be submited.
+    function forms_are_valid(onSubmit) {
+        if (onSubmit != true) {
+            onSubmit = false;
+        }
+
+        // Clean up - make all textboxes white again
+        var searchForm = $('#searchForm');
+        $(':input', searchForm).removeClass('invalid');
+        // Init
+        var isValid = true;
+
+        // Simple search -------------------------------------
+        // Availability
+        if (!$('input[name="availability"]', searchForm).is(':checked')) { // only if NOT "Don't care"
+            isValid = validate_period();
+        }
+        // capacity
+        if ($('#capacity').val().length > 0 && parseInt($('#capacity').val(), 10).toString() == 'NaN') {
+            $('#capacity').addClass('invalid');
+            isValid = false;
+        }
+
+        // Holidays warning
+        if (isValid && !onSubmit) {
+            var lastDateInfo = searchForm.data('lastDateInfo');
+            var dateInfo = $('#sDay, #sMonth, #sYear, #eDay, #eMonth, #eYear').serialize();
+            if (dateInfo != lastDateInfo) {
+                searchForm.data('lastDateInfo', dateInfo);
+                var holidaysWarning = indicoSource('roomBooking.getDateWarning', searchForm.serializeObject());
+
+                holidaysWarning.state.observe(function(state) {
+                    if (state == SourceState.Loaded) {
+                        $E('holidays-warning').set(holidaysWarning.get());
+                    }
+                });
+            }
+        }
+
+        if (!$('#sdate').val()) {
+            $('#sdate').addClass('invalid');
+            isValid = false;
+        }
+
+        if (!$('#edate').val()) {
+            $('#edate').addClass('invalid');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+    // Check whether a room can be booked (or pre-booked) by the user
+    // If not, pop up a dialog
+    function isBookable() {
+        // Get the selected option in the SELECT
+        var selectedURL = $('#roomName').val();
+        var roomLocationPattern = /roomLocation=([a-zA-Z0-9\-\+]*)(?:&|$)/;
+        var roomIDPattern = /roomID=([a-zA-Z0-9\-]*)(?:&|$)/;
+
+        // Get the room location and id from the url
+        var roomLocation = selectedURL.match(roomLocationPattern);
+        var roomID = selectedURL.match(roomIDPattern);
+
+        var bookButton = $E("bookButton");
+        var bookButtonWrapper = $E("bookButtonWrapper");
+        bookButtonWrapper.set(progressIndicator(true, false));
+
+        // Send an asynchronous request to the server
+        // Depending of result, either redirect to the
+        // Room Booking form or pop up a dialog
+        indicoRequest('user.canBook',
+            {roomLocation: roomLocation[1], roomID: roomID[1]},
+            function(result, error) {
+                if(!error) {
+                    if (result) {
+                        document.location = selectedURL;
+                    } else {
+                        bookButtonWrapper.set(bookButton);
+                        var popup = new AlertPopup('Booking Not Allowed',
+                                "You're not allowed to book this room");
+                        popup.open();
+                    }
+                } else {
+                    bookButtonWrapper.set(bookButton);
+                    IndicoUtil.errorReport(error);
+                }
+            });
+    }
+
+    $(window).on('load', function() {
+        $('#searchForm').delegate(':input', 'keyup change', function() {
+            forms_are_valid();
+        }).submit(function(e) {
+            if (!forms_are_valid(true)) {
+                e.preventDefault();
+                new AlertPopup($T("Error"), $T("There are errors in the form. Please correct fields with red background.")).open();
+            };
+        });
+
+        if (forms_are_valid()) {
+            set_repeatition_comment();
+        }
+        if ($('#searchForm input[name="availability"]').is(':checked')) { // if "Don't care" about availability
+            display_availability(false);
+        }
+        $('#searchForm input[name="availability"]').change(function() {
+            display_availability($(this).data('showAvailability'));
+        });
+        display_availability($('input[name=availability]:checked').data('showAvailability'));
+        $('#freeSearch').focus();
+    });
+
+</script>

@@ -1,110 +1,3 @@
-<script type="text/javascript">
-
-    function adjustDates(s, e) {
-        if (s.datepicker('getDate') > e.datepicker('getDate'))
-            e.datepicker('setDate', s.datepicker('getDate'));
-    }
-
-    function initWidgets() {
-        $('#roomselector').roomselector({
-            allowEmpty: false,
-            rooms: ${ rooms | j, n },
-            selectName: 'room_id_list',
-            simpleMode: true
-        });
-
-        $('#timerange').timerange({
-            sliderWidth: '320px'
-        });
-
-        var s = $('#start_date'), e = $('#end_date');
-        $('#start_date, #end_date').datepicker({
-            onSelect: function() {
-                adjustDates(s, e);
-                $('searchBookings').trigger('change');
-            }
-        });
-        s.datepicker('setDate', '+0');
-        e.datepicker('setDate', '+7');
-    }
-
-    function confirm_search() {
-        if ($('#is_only_mine').is(':checked') || $('#roomIDList').val() !== null) {
-            return true;
-        }
-        try { if ($('#is_only_my_rooms').is(':checked')) { return true; } } catch (err) {}
-        new AlertPopup($T('Select room'), $T('Please select a room (or several rooms).')).open();
-        return false;
-    }
-
-    // Reads out the invalid textboxes and returns false if something is invalid.
-    // Returns true if form may be submited.
-    function forms_are_valid(onSubmit) {
-        if (onSubmit != true) {
-            onSubmit = false;
-        }
-
-        // Clean up - make all textboxes white again
-        var searchForm = $('#searchBookings');
-        $(':input', searchForm).removeClass('invalid');
-
-        // Init
-        var isValid = true;
-
-        // Datepicker
-        if (!is_date_valid($('#start_date').val())) {
-            isValid = false;
-            $('#start_date').addClass('invalid');
-        }
-        if (!is_date_valid($('#end_date').val())) {
-            isValid = false;
-            $('#end_date').addClass('invalid');
-        }
-
-        // Time period
-        isValid = isValid && $('#timerange').timerange('validate');
-
-        // Holidays warning
-        if (isValid && !onSubmit) {
-            var lastDateInfo = searchForm.data('lastDateInfo');
-            var dateInfo = $('#start_date, #sTime, #end_date, #eTime').serialize();
-            if (dateInfo != lastDateInfo) {
-                searchForm.data('lastDateInfo', dateInfo);
-                var holidaysWarning = indicoSource(
-                    'roomBooking.getDateWarning', searchForm.serializeObject()
-                );
-
-                holidaysWarning.state.observe(function(state) {
-                    if (state == SourceState.Loaded) {
-                        $E('holidays-warning').set(holidaysWarning.get());
-                    }
-                });
-            }
-        }
-        return isValid;
-    }
-
-    $(function() {
-        initWidgets();
-
-        $('#searchBookings').delegate(':input', 'keyup change', function() {
-            forms_are_valid();
-        }).submit(function(e) {
-            if (!forms_are_valid(true)) {
-                new AlertPopup($T('Error'), $T('There are errors in the form. Please correct fields with red background.')).open();
-                e.preventDefault();
-            }
-            else if(!confirm_search()) {
-                e.preventDefault();
-            }
-            else {
-                $('#start_date').val($('#start_date').val() + ' ' + $('#sTime').val());
-                $('#end_date').val($('#end_date').val() + ' ' + $('#eTime').val());
-            }
-        });
-    });
-</script>
-
 <!-- CONTEXT HELP DIVS -->
 <div id="tooltipPool" style="display: none">
   <!-- Choose Button -->
@@ -300,3 +193,110 @@
         </button>
     </div>
 </form>
+
+<script type="text/javascript">
+
+    function adjustDates(s, e) {
+        if (s.datepicker('getDate') > e.datepicker('getDate'))
+            e.datepicker('setDate', s.datepicker('getDate'));
+    }
+
+    function initWidgets() {
+        $('#roomselector').roomselector({
+            allowEmpty: false,
+            rooms: ${ rooms | j, n },
+            selectName: 'room_id_list',
+            simpleMode: true
+        });
+
+        $('#timerange').timerange({
+            sliderWidth: '320px'
+        });
+
+        var s = $('#start_date'), e = $('#end_date');
+        $('#start_date, #end_date').datepicker({
+            onSelect: function() {
+                adjustDates(s, e);
+                $('searchBookings').trigger('change');
+            }
+        });
+        s.datepicker('setDate', '+0');
+        e.datepicker('setDate', '+7');
+    }
+
+    function confirm_search() {
+        if ($('#is_only_mine').is(':checked') || $('#roomIDList').val() !== null) {
+            return true;
+        }
+        try { if ($('#is_only_my_rooms').is(':checked')) { return true; } } catch (err) {}
+        new AlertPopup($T('Select room'), $T('Please select a room (or several rooms).')).open();
+        return false;
+    }
+
+    // Reads out the invalid textboxes and returns false if something is invalid.
+    // Returns true if form may be submited.
+    function forms_are_valid(onSubmit) {
+        if (onSubmit != true) {
+            onSubmit = false;
+        }
+
+        // Clean up - make all textboxes white again
+        var searchForm = $('#searchBookings');
+        $(':input', searchForm).removeClass('invalid');
+
+        // Init
+        var isValid = true;
+
+        // Datepicker
+        if (!is_date_valid($('#start_date').val())) {
+            isValid = false;
+            $('#start_date').addClass('invalid');
+        }
+        if (!is_date_valid($('#end_date').val())) {
+            isValid = false;
+            $('#end_date').addClass('invalid');
+        }
+
+        // Time period
+        isValid = isValid && $('#timerange').timerange('validate');
+
+        // Holidays warning
+        if (isValid && !onSubmit) {
+            var lastDateInfo = searchForm.data('lastDateInfo');
+            var dateInfo = $('#start_date, #sTime, #end_date, #eTime').serialize();
+            if (dateInfo != lastDateInfo) {
+                searchForm.data('lastDateInfo', dateInfo);
+                var holidaysWarning = indicoSource(
+                    'roomBooking.getDateWarning', searchForm.serializeObject()
+                );
+
+                holidaysWarning.state.observe(function(state) {
+                    if (state == SourceState.Loaded) {
+                        $E('holidays-warning').set(holidaysWarning.get());
+                    }
+                });
+            }
+        }
+        return isValid;
+    }
+
+    $(function() {
+        initWidgets();
+
+        $('#searchBookings').delegate(':input', 'keyup change', function() {
+            forms_are_valid();
+        }).submit(function(e) {
+            if (!forms_are_valid(true)) {
+                new AlertPopup($T('Error'), $T('There are errors in the form. Please correct fields with red background.')).open();
+                e.preventDefault();
+            }
+            else if(!confirm_search()) {
+                e.preventDefault();
+            }
+            else {
+                $('#start_date').val($('#start_date').val() + ' ' + $('#sTime').val());
+                $('#end_date').val($('#end_date').val() + ' ' + $('#eTime').val());
+            }
+        });
+    });
+</script>
