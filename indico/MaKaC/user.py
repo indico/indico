@@ -315,6 +315,9 @@ class Avatar(Persistent, Fossilizable):
     @classmethod
     def linkedToMap(cls):
         from MaKaC.common.timerExec import Alarm
+        import MaKaC.conference
+        import MaKaC.registration
+        import MaKaC.evaluation
         # Hey, when adding new roles don't forget to handle them in AvatarHolder.mergeAvatar, too!
         return {
             'category': {'cls': MaKaC.conference.Category,
