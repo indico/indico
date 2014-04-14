@@ -125,7 +125,13 @@ def setup_jinja(app):
     app.jinja_env.assets_environment = core_env
 
 
+ASSETS_REGISTERED = False
 def setup_assets():
+    global ASSETS_REGISTERED
+    if ASSETS_REGISTERED:
+        # Avoid errors when forking after creating an app (e.g. in scheduler tests)
+        return
+    ASSETS_REGISTERED = True
     register_all_js(core_env)
     register_all_css(core_env, Config.getInstance().getCssStylesheetName())
 
