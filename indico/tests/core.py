@@ -192,7 +192,7 @@ class TestManager(object):
             'AuthenticatorList': [('Local', {})],
             'SmtpServer': ('localhost', 58025),
             'SmtpUseTLS': 'no',
-            'DBConnectionParams': ('localhost', TestConfig.getInstance().getFakeDBPort()),
+            'DBConnectionParams': ('127.0.0.1', TestConfig.getInstance().getFakeDBPort()),
             'LogDir': os.path.join(temp, 'log'),
             'XMLCacheDir': os.path.join(temp, 'cache'),
             'HtdocsDir': htdocsDir,
@@ -221,7 +221,7 @@ class TestManager(object):
         port = TestConfig.getInstance().getFakeDBPort()
 
         self._info("Starting fake DB in port %s" % port)
-        self._startFakeDB('localhost', port)
+        self._startFakeDB('127.0.0.1', port)
 
     def _stopManageDB(self, killself=False):
         """
