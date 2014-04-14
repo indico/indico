@@ -110,7 +110,7 @@ class outputGenerator(Observable):
         else:
             return "INDICOSEARCH.PUBLIC"
 
-    def getOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeSubContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
+    def getOutput(self, conf, stylesheet, vars=None, includeSession=1, includeContribution=1, includeSubContribution=1, includeMaterial=1, showSession="all", showDate="all", showContribution="all"):
         # get xml conference
         xml = self._getBasicXML(conf, vars, includeSession,includeContribution,includeSubContribution,includeMaterial,showSession,showDate,showContribution)
         if not os.path.exists(stylesheet):
@@ -142,15 +142,15 @@ class outputGenerator(Observable):
             html = html.replace(escapeHTMLForJS(baseURL), escapeHTMLForJS(baseSecureURL))
         return html
 
-    def _getBasicXML(self, conf, vars,includeSession,includeContribution,includeSubContribution,includeMaterial,showSession="all",showDate="all",showContribution="all", showSubContribution="all", out=None):
-        if not out:
-            out = self._XMLGen
+    def _getBasicXML(self, conf, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession="all", showDate="all", showContribution="all", showSubContribution="all", out=None):
         """
         conf: conference object
         """
+        if not out:
+            out = self._XMLGen
         #out.initXml()
         out.openTag("iconf")
-        self._confToXML(conf,vars,includeSession,includeContribution,includeSubContribution,includeMaterial,showSession,showDate, showContribution,out=out)
+        self._confToXML(conf, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession, showDate, showContribution, out=out)
         out.closeTag("iconf")
         return out.getXml()
 
@@ -282,30 +282,30 @@ class outputGenerator(Observable):
         else:
             modificons = 1
 
-        out.writeTag("ID",conf.getId())
+        out.writeTag("ID", conf.getId())
 
         if conf.getOwnerList():
-            out.writeTag("category",conf.getOwnerList()[0].getName())
+            out.writeTag("category", conf.getOwnerList()[0].getName())
         else:
-            out.writeTag("category","")
+            out.writeTag("category", "")
 
         out.writeTag("parentProtection", dumps(conf.getAccessController().isProtected()))
         out.writeTag("materialList", dumps(self._generateMaterialList(conf)))
 
         self._notify('addXMLMetadata', {'out': out, 'obj': conf, 'type':"conference", 'recordingManagerTags':recordingManagerTags})
 
+        if conf.canModify(self.__aw) and vars and modificons:
+            out.writeTag("modifyLink", vars["modifyURL"])
         if conf.canModify( self.__aw ) and vars and modificons:
-            out.writeTag("modifyLink",vars["modifyURL"])
-        if conf.canModify( self.__aw ) and vars and modificons:
-            out.writeTag("minutesLink",True)
+            out.writeTag("minutesLink", True)
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("materialLink", True)
         if conf.canModify( self.__aw ) and vars and vars.has_key("cloneURL") and modificons:
-            out.writeTag("cloneLink",vars["cloneURL"])
+            out.writeTag("cloneLink", vars["cloneURL"])
         if  vars and vars.has_key("iCalURL"):
-            out.writeTag("iCalLink",vars["iCalURL"])
+            out.writeTag("iCalLink", vars["iCalURL"])
         if  vars and vars.has_key("webcastAdminURL"):
-            out.writeTag("webcastAdminLink",vars["webcastAdminURL"])
+            out.writeTag("webcastAdminLink", vars["webcastAdminURL"])
 
         if conf.getOrgText() != "":
             out.writeTag("organiser", conf.getOrgText())
