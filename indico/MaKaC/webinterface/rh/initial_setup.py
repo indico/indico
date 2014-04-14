@@ -23,7 +23,6 @@ from wtforms import Form, validators, TextField, PasswordField, BooleanField
 from tzlocal import get_localzone
 
 import MaKaC.webinterface.rh.base as base
-import MaKaC.webinterface.pages.wizard as wizard
 import MaKaC.user as user
 import MaKaC.webinterface.pages.signIn as signIn
 from MaKaC.common.info import HelperMaKaCInfo
@@ -37,7 +36,7 @@ from indico.web.forms.validators import UsedIfChecked
 from indico.util.i18n import getLocaleDisplayNames
 
 
-class RHWizard(base.RHDisplayBaseProtected):
+class RHInitialSetup(base.RHDisplayBaseProtected):
 
     def _setUserData(self, av):
         av.setName(self._params["name"])
@@ -65,7 +64,7 @@ class RHWizard(base.RHDisplayBaseProtected):
         timezone_options = TimezoneRegistry.getShortSelectItemsHTML(tz)
         language_options = getLocaleDisplayNames()
 
-        wvars = {'title': _('Admin Creation Wizard'),
+        wvars = {'title': _('Initial Setup'),
 
                  'step_title': [_('User creation'),
                                 _('Server settings'),
@@ -82,8 +81,8 @@ class RHWizard(base.RHDisplayBaseProtected):
                              'tooltip': _('You must enter a surname')},
 
                  'user_email': {'label': _('Email'),
-                                'tooltip': {'missing': _('You must enter an user e-mail address'),
-                                            'invalid': _('You must enter a valid user e-mail address')}},
+                                'tooltip': {'missing': _('You must enter your user e-mail address'),
+                                            'invalid': _('You must enter a valid e-mail address')}},
 
                  'login': {'label': _('Login'),
                            'tooltip': _('You must enter a login')},
@@ -117,7 +116,7 @@ class RHWizard(base.RHDisplayBaseProtected):
                               'tooltip': {'missing': _('You must enter an e-mail for Instance Tracking'),
                                           'invalid': _('You must enter a valid e-mail for Instance Tracking')}}}
 
-        return render_template('wizard.html', **wvars)
+        return render_template('initial_setup.html', **wvars)
 
     def _process_POST(self):
         regform = RegistrationForm(request.form)

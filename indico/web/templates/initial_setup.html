@@ -3,10 +3,10 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block head %}
-    {% assets 'indico_wizard' -%}
+    {% assets 'indico_initial_setup' -%}
         <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
-    {% assets 'wizard_sass' -%}
+    {% assets 'initial_setup_sass' -%}
         <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
     {% endassets %}
 {% endblock %}
@@ -15,7 +15,7 @@
 
     <div style="position: fixed; width: 100%; top: 0; background-color: #ececec; background-image: url({{ system_icon('logoIndico') }}); background-repeat: no-repeat; z-index: 1; font-size: 48px; display: block; text-align: center;">{{ title }}</div>
 
-    <form id="wizard-form" action="" method="POST" style="width: 100%; height: 100%;">
+    <form id="initial-setup-form" action="" method="POST" style="width: 100%; height: 100%;">
 
         <div class="step-wrapper" id="step1">
             <div class="center step-container">
@@ -135,7 +135,7 @@
                     </div>
 
                     <div class="group">
-                        <a id="submit-wizard" class="i-button">
+                        <a id="submit-initial-setup" class="i-button">
                             {{ submit }}
                             <i class="icon-checkmark"></i>
                         </a>

@@ -37,9 +37,14 @@ $(document).ready(function(){
 	            validField(password_confirm);
 	        }
 	    }).trigger('input');
-	    $('#wizard-form input').trigger('hideTooltip');
+	    $('#initial-setup-form input').trigger('hideTooltip');
 
 	    if (ok){
+	    	user_email = $('#user_email');
+	    	it_email = $('#it_email');
+	    	if (it_email.val() == ''){
+	    		it_email.val(user_email.val());
+	    	}
 		    scrollToElem($('#step2'));
 	    }
 	});
@@ -55,14 +60,14 @@ $(document).ready(function(){
 	            validField($(this));
 	        }
 	    }).trigger('input');
-	    $('#wizard-form input').trigger('hideTooltip');
+	    $('#initial-setup-form input').trigger('hideTooltip');
 
 	    if (ok){
 		    scrollToElem($('#step3'));
 	    }
 	});
 
-	$('#submit-wizard').on('click', function(e){
+	$('#submit-initial-setup').on('click', function(e){
 	    e.preventDefault();
 
 	    ok = true;
@@ -74,7 +79,7 @@ $(document).ready(function(){
 	    });
 
 	    if (ok){
-	        $('#wizard-form').submit();
+	        $('#initial-setup-form').submit();
 	    }
 	});
 
@@ -135,7 +140,7 @@ $(document).ready(function(){
 	    field.addClass('hasError');
 	}
 
-	$('#wizard-form input').qtip({
+	$('#initial-setup-form input').qtip({
 	        content: {
 	            attr: 'data-error-tooltip'
 	        },
@@ -159,7 +164,7 @@ $(document).ready(function(){
 	}).on('blur', function(){
 	    $(this).trigger('hideTooltip');
 	});
-	$('#wizard-form').on('mouseleave', 'input:not(:focus)', function(){
+	$('#initial-setup-form').on('mouseleave', 'input:not(:focus)', function(){
 	    $(this).trigger('hideTooltip');
 	});
 });

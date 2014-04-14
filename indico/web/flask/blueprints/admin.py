@@ -18,7 +18,7 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import admins, announcement, taskManager, maintenance, domains, users, groups, templates, \
-    conferenceModif, services, api, oauth, wizard
+    conferenceModif, services, api, oauth, initial_setup
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -190,5 +190,5 @@ admin.add_url_rule('/plugins/plugin/<pluginType>/<pluginId>/toggle', 'adminPlugi
 admin.add_url_rule('/plugins/plugin/<pluginType>/<pluginId>/save-options', 'adminPlugins-savePluginOptions',
                    admins.RHAdminPluginsSaveOptions, methods=('POST',))
 
-# Wizard
-admin.add_url_rule('/wizard', 'wizard', wizard.RHWizard, methods=('GET', 'POST'))
+# Initial Setup
+admin.add_url_rule('/initial-setup', 'initial_setup', initial_setup.RHInitialSetup, methods=('GET', 'POST'))
