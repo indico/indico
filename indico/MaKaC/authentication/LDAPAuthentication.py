@@ -170,12 +170,12 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         return av
 
     def matchUser(self, criteria, exact=0):
-        criteria = dict((k, ldap.filter.escape_filter_chars(v)) \
+        criteria = dict((k, ldap.filter.escape_filter_chars(v))
                         for k, v in criteria.iteritems() if v.strip() != '')
-        lfilter = list((self._operations[k].format(v if exact else ("*%s*" % v))) \
+        lfilter = list((self._operations[k].format(v if exact else ("*%s*" % v)))
                        for k, v in criteria.iteritems())
 
-        if lfilter == []:
+        if not lfilter:
             return {}
         ldapc = LDAPConnector.getInstance()
         fquery = "(&{0}{1})".format(ldapc.customUserFilter, ''.join(lfilter))
@@ -356,8 +356,9 @@ class LDAPConnector(object):
 
     @classmethod
     def destroy(cls):
-        cls._instance.close()
-        cls._instance = None
+        if cls._instance:
+            cls._instance.close()
+            cls._instance = None
 
     def login(self):
         try:
@@ -714,11 +715,9 @@ class LDAPTools:
 
 
 class RequestListener(Component):
-
     implements(IServerRequestListener)
 
     # IServerRequestListener
-
     def requestFinished(self, obj):
         LDAPConnector.destroy()
 
