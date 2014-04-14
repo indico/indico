@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+ 
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+    {% assets 'indico_wizard' -%}
+        <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+    {% assets 'wizard_sass' -%}
+        <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+    {% endassets %}
+{% endblock %}
+
+{% block body %}
+
+    <div style="position: fixed; width: 100%; top: 0; background-color: #ececec; background-image: url({{ system_icon('logoIndico') }}); background-repeat: no-repeat; z-index: 1; font-size: 48px; display: block; text-align: center;">{{ title }}</div>
+
+    <form id="wizard-form" action="" method="POST" style="width: 100%; height: 100%;">
+
+        <div class="step-wrapper" id="step1">
+            <div class="center step-container">
+
+                <div class="groupTitle">1. {{ step_title[0] }}</div>
+
+                <div class="fields-container">
+
+                    <div>
+                        <label for="name">{{ name.label }}</label>
+                        <input id="name" type="text" name="name" data-error-tooltip="{{ name.tooltip }}" value="{{ name.value }}" required>
+                    </div>
+
+                    <div>
+                        <label for="surname">{{ surname.label }}</label>
+                        <input id="surname" type="text" name="surname" data-error-tooltip="{{ surname.tooltip }}" value="{{ surname.value }}" required>
+                    </div>
+
+                    <div>
+                        <label for="user_email">{{ user_email.label }}</label>
+                        <input id="user_email" type="email" name="user_email" data-error-tooltip="{{ user_email.tooltip.missing }}" data-error-tooltip2="{{ user_email.tooltip.invalid }}" value="{{ user_email.value }}" required>
+                    </div>
+
+                    <div>
+                        <label for="login">{{ login.label }}</label>
+                        <input id="login" type="text" name="login" data-error-tooltip="{{ login.tooltip }}" value="{{ login.value }}" required style="width: 40%;">
+                    </div>
+
+                    <div>
+                        <label for="password">{{ password.label }}</label>
+                        <input id="password" type="password" name="password" data-error-tooltip="{{ password.tooltip }}" value="" required style="width: 40%;">
+                    </div>
+
+                    <div>
+                        <label for="password_confirm">{{ password_confirm.label }}</label>
+                        <input id="password_confirm" type="password" name="password_confirm" data-error-tooltip="{{ password_confirm.tooltip }}" value="" required style="width: 40%;">
+                    </div>
+
+                    <div class="group">
+                        <a id="nextStep1" class="i-button">
+                            {{ next_step }}
+                            <i class="icon-next"></i>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="step-wrapper" id="step2">
+            <div class="center step-container">
+
+                <div class="groupTitle">2. {{ step_title[1] }}</div>
+
+                <div class="fields-container">
+
+                    <div>
+                        <label for="lang">{{ language.label }}</label>
+                        <select name="lang" id="lang">
+                            {% for code, lang in language.options -%}
+                                <option value="{{ code }}">{{ lang }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="timezone">{{ timezone.label }}</label>
+                        <select id="timezone" name="timezone">{{ timezone.options | safe }}</select>
+                    </div>
+
+                    <div>
+                        <label for="organisation">{{ organisation.label }}</label>
+                        <input id="organisation" type="text" name="organisation" data-error-tooltip="{{ organisation.tooltip }}" value="{{ organisation.value }}" required>
+                    </div>
+
+                    <div class="group">
+                        <a id="nextStep2" class="i-button">
+                            {{ next_step }}
+                            <i class="icon-next"></i>
+                        </a>
+                        <a id="previousStep2" class="i-button icon-prev">{{ previous_step }}</a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="step-wrapper" id="step3">
+            <div class="center step-container">
+
+                <div class="groupTitle">3. {{ step_title[2] }}</div>
+
+                <div class="fields-container">
+
+                    <div>
+                        <font color="gray">
+                            {{ it_disclaimer.first }}:
+                            <ul>
+                                <li>{{ it_disclaimer.list[0] }};</li>
+                                <li>{{ it_disclaimer.list[1] }};</li>
+                                <li>{{ it_disclaimer.list[2] }}.</li>
+                            </ul>
+                            {{ it_disclaimer.last }}.
+                        </font>
+                    </div>
+
+                    <div>
+                        <label for="enable">{{ enable.label }}</label>
+                        <input id="enable" type="checkbox" name="enable" value="1" {{ checked }} style="width: initial; margin-top: 25px;">
+                    </div>
+
+                    <div>
+                        <label for="it_email">{{ it_email.label }}</label>
+                        <input id="it_email" type="email" name="it_email" data-error-tooltip="{{ it_email.tooltip.missing }}" data-error-tooltip2="{{ it_email.tooltip.invalid }}" value="{{ it_email.value }}">
+                    </div>
+
+                    <div class="group">
+                        <a id="submit-wizard" class="i-button">
+                            {{ submit }}
+                            <i class="icon-checkmark"></i>
+                        </a>
+                        <a id="previousStep3" class="i-button icon-prev">{{ previous_step }}</a>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+
+{% endblock %}

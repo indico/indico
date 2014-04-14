@@ -18,7 +18,9 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from flask import request
+from flask import render_template
 from wtforms import Form, validators, TextField, PasswordField, BooleanField
+from tzlocal import get_localzone
 
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.pages.wizard as wizard
@@ -29,8 +31,10 @@ from MaKaC.user import AvatarHolder
 from MaKaC.errors import AccessError, FormValuesError
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.accessControl import AdminList
-from indico.web.forms.validators import UsedIfChecked
 from MaKaC.i18n import _
+from MaKaC.webinterface.common.timezones import TimezoneRegistry
+from indico.web.forms.validators import UsedIfChecked
+from indico.util.i18n import getLocaleDisplayNames
 
 
 class RHWizard(base.RHDisplayBaseProtected):
@@ -39,7 +43,7 @@ class RHWizard(base.RHDisplayBaseProtected):
         av.setName(self._params["name"])
         av.setSurName(self._params["surname"])
         av.setOrganisation(self._params["organisation"])
-        av.setEmail(self._params["userEmail"])
+        av.setEmail(self._params["user_email"])
         av.setTimezone(self._params["timezone"])
         av.setLang(self._params["lang"])
 
@@ -57,12 +61,68 @@ class RHWizard(base.RHDisplayBaseProtected):
         self._enable = self._params.get("enable", "")
 
     def _process_GET(self):
-        p = wizard.WPWizard(self, self._params)
-        return p.display()
+        tz = str(get_localzone())
+        timezone_options = TimezoneRegistry.getShortSelectItemsHTML(tz)
+        language_options = getLocaleDisplayNames()
+
+        wvars = {'title': _('Admin Creation Wizard'),
+
+                 'step_title': [_('User creation'),
+                                _('Server settings'),
+                                _('Instance Tracking')],
+
+                 'next_step': _('Next step'),
+                 'previous_step': _('Previous step'),
+                 'submit': _('Submit'),
+
+                 'name': {'label': _('First name'),
+                          'tooltip': _('You must enter a name')},
+
+                 'surname': {'label': _('Family name'),
+                             'tooltip': _('You must enter a surname')},
+
+                 'user_email': {'label': _('Email'),
+                                'tooltip': {'missing': _('You must enter an user e-mail address'),
+                                            'invalid': _('You must enter a valid user e-mail address')}},
+
+                 'login': {'label': _('Login'),
+                           'tooltip': _('You must enter a login')},
+
+                 'password': {'label': _('Password'),
+                              'tooltip': _('You must define a password')},
+
+                 'password_confirm': {'label': _('Password (again)'),
+                                      'tooltip': _('You must enter the same password twice')},
+
+                 'language': {'label': _('Language'),
+                              'options': language_options},
+
+                 'timezone': {'label': _('Timezone'),
+                              'options': timezone_options},
+
+                 'organisation': {'label': _('Organization'),
+                                  'tooltip': _('You must enter the name of your organization')},
+
+                 'it_disclaimer': {'first': _('By enabling the Instance Tracking Terms you accept'),
+                                   'list': [_('sending anonymous statistic data to Indico@CERN'),
+                                            _('receiving security warnings from the Indico team'),
+                                            _('receiving a notification when a new version is released')],
+                                   'last': _('Please note that no private information will ever be sent to ' +
+                                             'Indico@CERN and that you will be able to change the Instance Tracking ' +
+                                             'settings anytime in the future (from Server Admin, General Settings)')},
+
+                 'enable': {'label': _('Enable')},
+
+                 'it_email': {'label': _('Email'),
+                              'tooltip': {'missing': _('You must enter an e-mail for Instance Tracking'),
+                                          'invalid': _('You must enter a valid e-mail for Instance Tracking')}}}
+
+        return render_template('wizard.html', **wvars)
 
     def _process_POST(self):
         regform = RegistrationForm(request.form)
         if not regform.validate():
+            print regform.errors
             raise FormValuesError(_("Some fields are invalid. Please, correct them and submit the form again."))
         else:
             # Creating new user
@@ -86,7 +146,7 @@ class RHWizard(base.RHDisplayBaseProtected):
             minfo.setLang(self._params["lang"])
             minfo.setInstanceTrackingActive(bool(self._enable))
             if self._enable:
-                minfo.setInstanceTrackingEmail(self._params["instanceTrackingEmail"])
+                minfo.setInstanceTrackingEmail(self._params["it_email"])
 
             p = signIn.WPAdminCreated(self, av)
             return p.display()
@@ -94,13 +154,14 @@ class RHWizard(base.RHDisplayBaseProtected):
 
 class RegistrationForm(Form):
 
-    name = TextField('Username', [validators.Required()])
+    name = TextField('Name', [validators.Required()])
     surname = TextField('Surname', [validators.Required()])
-    userEmail = TextField('User Email Address', [validators.Required(), validators.Email()])
+    user_email = TextField('User Email Address', [validators.Required(), validators.Email()])
     login = TextField('Login', [validators.Required()])
     password = PasswordField('New Password', [validators.Required()])
-    passwordBis = PasswordField('Repeat Password', [validators.EqualTo('password', message='Passwords must match')])
+    password_confirm = PasswordField('Repeat Password',
+                                     [validators.EqualTo('password', message='Passwords must match')])
     organisation = TextField('Organisation', [validators.Required()])
     enable = BooleanField('Enable Instance Tracking')
-    instanceTrackingEmail = TextField('Instance Tracking Email Address',
-                                      [UsedIfChecked('enable'), validators.Required(), validators.Email()])
+    it_email = TextField('Instance Tracking Email Address',
+                         [UsedIfChecked('enable'), validators.Required(), validators.Email()])

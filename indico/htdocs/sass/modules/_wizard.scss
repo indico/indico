@@ -1,0 +1,64 @@
+@import "compass/utilities/general/clearfix";
+
+.fields-container {
+    float: left;
+    width: 100%;
+
+    div {
+        @include clearfix;
+        width: 100%;
+    }
+
+    label, input, select {
+        float: left;
+        font-size: 18px;
+        margin-top: 20px;
+    }
+
+    label {
+        text-align: right;
+        width: 15%;
+        padding-right: 3%;
+        padding-top: 0.3em;
+        font-weight: normal;
+    }
+
+    input {
+        width: 70%;
+    }
+
+    input, input:focus, input:hover, input.hasError {
+        border-left: none;
+        border-right: none;
+        border-top: none;
+        box-shadow: none;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+}
+
+.step-container {
+    width: 85%;
+    padding-top: 20%;
+    text-align: left;
+}
+
+.step-wrapper {
+    height: 100%;
+    width: 100%;
+}
+
+.group {
+    margin-top: 40px;
+}
+
+.i-button {
+    float: right;
+}
+
+body {
+    overflow-y: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}

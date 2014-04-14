@@ -135,6 +135,12 @@ indico_admin = Bundle(
                'Upcoming.js'),
     filters='rjsmin', output='js/indico_admin_%(version)s.min.js')
 
+indico_wizard = Bundle(
+    *namespace('js/indico/Admin',
+
+               'Wizard.js'),
+    filters='rjsmin', output='js/indico_wizard_%(version)s.min.js')
+
 indico_timetable = Bundle(
     *namespace('js/indico/Timetable',
 
@@ -339,6 +345,7 @@ registrationform_sass = sass_module_bundle('registrationform')
 roombooking_sass = sass_module_bundle('roombooking')
 dashboard_sass = sass_module_bundle('dashboard')
 category_sass = sass_module_bundle('category')
+wizard_sass = sass_module_bundle('wizard')
 
 
 screen_sass = Bundle('sass/screen.scss',
@@ -355,6 +362,7 @@ def register_all_js(env):
     env.register('indico_management', indico_management)
     env.register('indico_roombooking', indico_room_booking)
     env.register('indico_admin', indico_admin)
+    env.register('indico_wizard', indico_wizard)
     env.register('indico_timetable', indico_timetable)
     env.register('indico_legacy', indico_legacy)
     env.register('indico_common', indico_common)
@@ -399,6 +407,7 @@ def register_all_css(env, main_css_file):
     env.register('dashboard_sass', dashboard_sass)
     env.register('category_sass', category_sass)
     env.register('screen_sass', screen_sass)
+    env.register('wizard_sass', wizard_sass)
 
 
 core_env = IndicoEnvironment()
