@@ -36,9 +36,12 @@ from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
 from indico.core.db import db, drop_database, DBMgr, apply_db_loggers
+from indico.web.assets import core_env, register_all_css, register_all_js
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
-from indico.web.flask.util import XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js
+from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
+                                   IndicoConfigWrapper)
 from indico.web.flask.wrappers import IndicoFlask
+
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.rooms import rooms
 from indico.web.flask.blueprints.api import api
@@ -74,6 +77,7 @@ def fix_root_path(app):
 
 def configure_app(app, set_path=False):
     cfg = Config.getInstance()
+    app.config['DEBUG'] = cfg.getDebug()
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = cfg.getSessionLifetime()
@@ -101,12 +105,15 @@ def configure_app(app, set_path=False):
 
 
 def setup_jinja(app):
+    config = Config.getInstance()
     # Unicode hack
     app.jinja_env.add_extension(EnsureUnicodeExtension)
     app.add_template_filter(EnsureUnicodeExtension.ensure_unicode)
     # Global functions
     app.add_template_global(url_for)
     app.add_template_global(url_rule_to_js)
+    app.add_template_global(IndicoConfigWrapper(config), 'indico_config')
+    app.add_template_global(config.getSystemIconURL, 'system_icon')
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))
@@ -118,6 +125,14 @@ def setup_jinja(app):
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext, ngettext, True)
+    # webassets
+    app.jinja_env.add_extension('webassets.ext.jinja2.AssetsExtension')
+    app.jinja_env.assets_environment = core_env
+
+
+def setup_assets():
+    register_all_js(core_env)
+    register_all_css(core_env, Config.getInstance().getCssStylesheetName())
 
 
 def configure_db(app):
@@ -218,8 +233,11 @@ def make_app(set_path=False, db_setup=True):
     fix_root_path(app)
     configure_app(app, set_path)
     setup_jinja(app)
+    setup_assets()
+
     if db_setup:
         configure_db(app)
+
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)

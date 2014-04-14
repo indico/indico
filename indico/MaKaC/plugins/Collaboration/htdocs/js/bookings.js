@@ -9,13 +9,13 @@ var TPL_DISPLAY_BUTTON = {
         elem.children(".button-text").text(format($T("Connect {0}"), [elem.data('location')]));
         elem.removeClass('disconnect_room').addClass('connect_room');
     },
-    'error' : function(elem) {
+    'error' : function(elem, error_msg) {
         elem.css('display', 'inline-block');
         elem.text(elem.data('location'));
         elem.addClass('icon-warning');
         elem.qtip({
             content: {
-                text: $T("Indico cannot reach this room right now. Please reload the page to try again.")
+                text: any(error_msg, $T("Indico cannot reach this room right now. Please reload the page to try again."))
             },
             position: {
                 my: 'top center',
@@ -37,14 +37,14 @@ var TPL_MANAGEMENT_BUTTON = {
         elem.removeClass("icon-stop").addClass("icon-play").children(".button-text").text(format($T("Connect {0}"), [elem.data('location')]));
         elem.removeClass('disconnect_room').addClass('connect_room');
     },
-    'error' : function(elem) {
+    'error' : function(elem, error_msg) {
         elem.css('display', 'inline-block');
         elem.text(elem.data('location'));
         elem.removeClass("icon-stop").removeClass("icon-play");
         elem.addClass('i-button icon-warning disabled');
         elem.qtip({
             content: {
-                text: $T("Indico cannot reach this room right now. Please reload the page to try again.")
+                text: any(error_msg, $T("Indico cannot reach this room right now. Please reload the page to try again."))
             },
             position: {
                 my: 'top center',
@@ -62,6 +62,7 @@ type("ConnectButton", [], {
     initialize: function(elem, booking, conf_id) {
         this.connected = true;
         this.error = false;
+        this.error_msg = null;
         this.$el = elem;
 
         this.booking = booking;
@@ -85,7 +86,7 @@ type("ConnectButton", [], {
         this.hide_progress();
 
         if (this.error) {
-            this.tpl['error'](this.$el);
+            this.tpl['error'](this.$el, this.error_msg);
         } else {
             if(this.connected){
                 this.tpl['disconnect'](this.$el);
@@ -134,6 +135,7 @@ type("ConnectButton", [], {
                 if (!error) {
                     if (result.error) {
                         self.error = true;
+                        self.error_msg = result.userMessage;
                         self.render()
                     } else {
                         // store connection data/status

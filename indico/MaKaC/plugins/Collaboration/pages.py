@@ -49,7 +49,6 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.services.implementation.user import UserComparator
 from MaKaC.plugins.Collaboration.fossils import IIndexInformationFossil
-from MaKaC.common.info import HelperMaKaCInfo
 
 STATUS_STRING = {
     SpeakerStatusEnum.NOEMAIL: L_("No Email"),
@@ -83,9 +82,7 @@ class WEventDetailBanner(wcomponents.WTemplated):
 class WPCollaborationBase:
 
     def __init__(self):
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
         self._plugin_asset_env = PluginEnvironment('Collaboration', os.path.dirname(__file__), 'Collaboration')
-        self._plugin_asset_env.debug = info.isDebugActive()
         self._plugin_asset_env.register('collaboration_js', Bundle('js/Collaboration.js', 'js/bookings.js',
                                                                    filters='rjsmin',
                                                                    output="Collaboration_%(version)s.min.js"))

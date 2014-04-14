@@ -272,7 +272,7 @@ class MaterialLocalRepository(Persistent):
         except IOError:
             # In debugging we return an empty file instead of throwing an error
             from MaKaC.common.info import HelperMaKaCInfo
-            if not HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
+            if not Config.getInstance().getDebug():
                 raise
             return ''
 

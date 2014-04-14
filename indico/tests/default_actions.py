@@ -17,11 +17,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.conference import CategoryManager, DefaultConference
 from MaKaC.user import Avatar, AvatarHolder, LoginInfo
 from MaKaC.authentication import AuthenticatorMgr
+from indico.core.config import Config
+from indico.util.fs import delete_recursively
 
 
 def initialize_new_db(root):
@@ -33,17 +36,16 @@ def initialize_new_db(root):
     for e in root.keys():
         del root[e]
 
+    # Delete whoosh indexes
+    whoosh_dir = os.path.join(Config.getInstance().getArchiveDir(), 'whoosh')
+    if os.path.exists(whoosh_dir):
+        delete_recursively(whoosh_dir)
+
     # initialize db root
     cm = CategoryManager()
     cm.getRoot()
 
-    home = cm.getById('0')
-
-    # set debug mode on
-    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-    minfo.setDebugActive(True)
-
-    return home
+    return cm.getById('0')
 
 
 def create_user(name, login, authManager):

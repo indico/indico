@@ -894,6 +894,8 @@ class outputGenerator(Observable):
                  "docx"  :{"mapsTo" : "doc",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "word.png"),       "imgAlt" : "word file"},
                  "ppt"   :{"mapsTo" : "ppt",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "powerpoint.png"), "imgAlt" : "powerpoint file"},
                  "pptx"  :{"mapsTo" : "ppt",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "powerpoint.png"), "imgAlt" : "powerpoint file"},
+                 "xls"   :{"mapsTo" : "xls",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "excel.png"),      "imgAlt" : "excel file"},
+                 "xlsx"  :{"mapsTo" : "xls",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "excel.png"),      "imgAlt" : "excel file"},
                  "sxi"   :{"mapsTo" : "odp",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "impress.png"),    "imgAlt" : "presentation file"},
                  "odp"   :{"mapsTo" : "odp",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "impress.png"),    "imgAlt" : "presentation file"},
                  "sxw"   :{"mapsTo" : "odt",   "imgURL" : "%s/%s"%(Config.getInstance().getImagesBaseURL(), "writer.png"),     "imgAlt" : "writer file"},

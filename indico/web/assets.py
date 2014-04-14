@@ -21,30 +21,48 @@
 """
 This file declares all core JS/CSS assets used by Indico
 """
+
 # stdlib imports
 import os
 from urlparse import urlparse
 
 # 3rd party libs
 from webassets import Bundle, Environment
-from webassets.filter import Filter
 
 # legacy imports
-from MaKaC.common import HelperMaKaCInfo
 from indico.core.config import Config
+
+
+class IndicoEnvironment(Environment):
+    def __init__(self):
+        config = Config.getInstance()
+        url_path = urlparse(config.getBaseURL()).path
+        output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets')
+        url = '{0}/static/assets/'.format(url_path)
+
+        super(IndicoEnvironment, self).__init__(output_dir, url)
+        self.debug = config.getDebug()
+        self.config['PYSCSS_DEBUG_INFO'] = self.debug and config.getSCSSDebugInfo()
+        self.config['PYSCSS_STATIC_URL'] = '{0}/static/'.format(url_path)
+        self.config['PYSCSS_LOAD_PATHS'] = [
+            os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass'),
+            os.path.join(config.getHtdocsDir(), 'sass')
+        ]
+
+        self.append_path(config.getHtdocsDir(), '/')
+        self.append_path(os.path.join(config.getHtdocsDir(), 'css'), '{0}/css'.format(url_path))
+        self.append_path(os.path.join(config.getHtdocsDir(), 'js'), '{0}/js'.format(url_path))
 
 
 class PluginEnvironment(Environment):
     def __init__(self, plugin_name, plugin_dir, url_path):
         config = Config.getInstance()
-
         url_base_path = urlparse(config.getBaseURL()).path
-
         output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets', 'plugins', plugin_name)
+        url = '{0}/static/assets/plugins/{1}'.format(url_base_path, url_path)
 
-        super(PluginEnvironment, self).__init__(output_dir, '{0}/static/assets/plugins/'.format(url_base_path)
-                                                + url_path)
-
+        super(PluginEnvironment, self).__init__(output_dir, url)
+        self.debug = Config.getInstance().getDebug()
         self.append_path(os.path.join(plugin_dir, 'htdocs'), url=os.path.join(url_base_path, url_path))
 
 
@@ -184,23 +202,6 @@ indico_regform = Bundle(
     output='js/indico_regform_%(version)s.min.js')
 
 
-class DebugLevelFilter(Filter):
-    name = 'debug_level'
-    max_debug_level = None
-
-    def __init__(self, required_level):
-        super(DebugLevelFilter, self).__init__()
-        self.required_level = required_level
-
-    def unique(self):
-        # We cannot have self.env available here so we take the debug flag from makacinfo instead.
-        debug = HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
-        return self.name, self.required_level, debug
-
-    def output(self, in_, out, **kw):
-        if self.required_level == self.env.debug:
-            out.write(in_.read())
-
 angular = Bundle(
     'js/lib/angular.js',
     'js/lib/angular-resource.js',
@@ -214,16 +215,15 @@ angular = Bundle(
     output='js/angular_%(version)s.min.js'
 )
 
-jquery = Bundle(
+jquery = Bundle(*filter(None, [
     'js/lib/underscore.js',
     'js/lib/jquery.js',
     'js/lib/jquery.qtip.js',
     'js/jquery/jquery-ui.js',
     'js/lib/jquery.multiselect.js',
     'js/lib/jquery.multiselect.filter.js',
-    Bundle('js/jquery/jquery-migrate-silencer.js', filters=DebugLevelFilter(required_level=False),
-           output='js/jquery_migrate_silencer_%(version)s.js'),
-    *namespace('js/jquery',
+    'js/jquery/jquery-migrate-silencer.js' if not Config.getInstance().getDebug() else None] +
+    namespace('js/jquery',
 
                'jquery-migrate.js',
                'jquery.form.js',
@@ -239,7 +239,7 @@ jquery = Bundle(
                'jquery.typewatch.js',
                'jstorage.js',
                'jquery.watermark.js',
-               'jquery.placeholder.js'),
+               'jquery.placeholder.js')),
     filters='rjsmin', output='js/jquery_code_%(version)s.min.js')
 
 utils = Bundle('js/utils/routing.js', filters='rjsmin', output='js/utils_%(version)s.min.js')
@@ -399,3 +399,6 @@ def register_all_css(env, main_css_file):
     env.register('dashboard_sass', dashboard_sass)
     env.register('category_sass', category_sass)
     env.register('screen_sass', screen_sass)
+
+
+core_env = IndicoEnvironment()

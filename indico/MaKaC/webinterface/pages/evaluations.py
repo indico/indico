@@ -192,7 +192,7 @@ class WEvaluationSubmitted(WEvaluationDisplay):
         elif self._mode == Evaluation._EDIT:
             wvars["status"] = _("modified")
         else:  # should never be here...
-            if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
+            if Config.getInstance().getDebug():
                 raise Exception(_("Evaluation - Possible modes are %s, given : %s.") % (
                                 [Evaluation._SUBMIT, Evaluation._EDIT], self._mode))
             else:
@@ -927,7 +927,8 @@ class WConfModifEvaluationResultsSubmitters( wcomponents.WTemplated ):
             vars["inputSubmitStyle"] = ''
             vars["submitConfirm"] = ''
         else:
-            if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive(): raise Exception("Evaluation - unknown mode (given: %s)"%self._mode)
+            if Config.getInstance().getDebug():
+                raise Exception("Evaluation - unknown mode (given: %s)" % self._mode)
             vars["inputCheckboxName"] = "unknownMode"
             vars["inputSubmitStyle"] = ''
             vars["submitConfirm"] = ''

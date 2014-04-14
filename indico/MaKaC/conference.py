@@ -4595,7 +4595,7 @@ class Conference(CommonObjectBase, Locatable):
         for evaluation in self.getEvaluations():
             if str(evaluation.getId()) == str(id) :
                 return evaluation
-        if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
+        if Config.getInstance().getDebug():
             raise Exception(_("Error with id: expected '%s', found '%s'.")%(id, self.getEvaluations()[0].getId()))
         else:
             return self.getEvaluations()[0]

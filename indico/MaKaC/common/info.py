@@ -18,6 +18,8 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os
+import warnings
+from flask import current_app as app
 from persistent import Persistent
 from persistent.dict import PersistentDict
 from BTrees import OOBTree
@@ -119,16 +121,10 @@ class MaKaCInfo(Persistent):
             self._socialAppConfig = PersistentDict({'active': False, 'facebook': {}})
         return self._socialAppConfig
 
-    def isDebugActive( self ):
-        if hasattr( self, "_debugActive" ):
-            return self._debugActive
-        else:
-            self._debugActive = False
-            return False
-
-    def setDebugActive( self, bool=True ):
-        self._debugActive = bool
-
+    def isDebugActive(self):
+        msg = 'MaKaCinfo.isDebugActive() is deprecated; use app.debug or Config.getInstance().getDebug() instead'
+        warnings.warn(msg, DeprecationWarning, 2)
+        return app.debug
 
     def getNews( self ):
         try:

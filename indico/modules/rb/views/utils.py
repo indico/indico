@@ -315,4 +315,4 @@ def makePercentageString(val):
             0.623333 -> 62%
     """
     assert 0 <= val <= 1
-    return '{}%'.format(int(round(val * 100)))
+    return '{0:.02f}%'.format(val * 100)

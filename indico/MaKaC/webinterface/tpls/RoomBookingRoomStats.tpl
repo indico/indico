@@ -63,7 +63,7 @@
       <td colspan="5" class="groupTitle">Key Performance Indicators</td>
     </tr>
         <tr>
-          <td class="titleUpCellTD" style="width: 100px;"><span class="titleCellFormat">Average occupation</span></td>
+          <td class="titleUpCellTD" style="width: 100px;"><span class="titleCellFormat">Average occupancy</span></td>
           <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
             <table>
             <tr>
@@ -83,7 +83,7 @@
           </form>
             </tr>
             <tr>
-                <td><span style="background-color: #C9FFC9; font-weight: bold;">${ kpiAverageOccupation }</span> ${inlineContextHelp('Average room occupation over the selected period during working hours (8H30-17H30, Monday-Friday including holidays).' )}</td>
+                <td><span style="background-color: #C9FFC9; font-weight: bold;">${ kpiAverageOccupation }</span> ${inlineContextHelp('Average room occupancy over the selected period during working hours (8H30-17H30, Monday-Friday including holidays).' )}</td>
             </tr>
             </table>
           </td>

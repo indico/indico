@@ -1506,9 +1506,9 @@ class Submission(Persistent):
                                                         'body': message})
 
                     GenericMailer.send(notification)
-        except Exception, e:
-            if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
-                raise Exception(e)
+        except Exception:
+            if Config.getInstance().getDebug():
+                raise
 
     def notifySubmissionSubmitted(self):
         """notification when a new submission arrive."""

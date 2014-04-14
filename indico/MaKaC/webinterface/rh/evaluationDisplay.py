@@ -187,7 +187,7 @@ class RHEvaluationSubmit (RHBaseEvaluation):
             ###########
             elif self._submit and mode==Evaluation._EDIT:
                 submission = evaluation.getUserSubmission(user)
-                if submission!=None :    #should always be the case... but we never know!
+                if submission is not None:  # should always be the case... but we never know!
                     #for each question...
                     for question in evaluation.getQuestions():
                         questionFromForm = "q%s"%question.getPosition()
@@ -201,7 +201,7 @@ class RHEvaluationSubmit (RHBaseEvaluation):
                     submission.setModificationDate()
                     #notification
                     submission.notifySubmissionModified()
-                elif HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive() :
+                elif Config.getInstance().getDebug():
                     raise Exception("Evaluation - Strange error... the submission of this user was not found!")
 
             ##########

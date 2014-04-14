@@ -186,6 +186,7 @@ class TestManager(object):
 
         # minimal defaults
         defaults = {
+            'Debug': True,
             'BaseURL': 'http://localhost:8000/indico',
             'BaseSecureURL': '',
             'AuthenticatorList': [('Local', {})],

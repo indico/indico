@@ -31,7 +31,7 @@ else:
 % if Config.getInstance().getWorkerName():
   <!-- worker: ${ Config.getInstance().getWorkerName() } -->
 % endif
-% if debugActive:
+% if _app.debug:
   <!-- endpoint: ${ _request.endpoint } -->
   % if rh:
   <!-- rh: ${ rh.__class__.__module__ }.${ rh.__class__.__name__ } -->

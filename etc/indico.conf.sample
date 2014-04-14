@@ -78,6 +78,11 @@ CSRFLevel = 2
 #------------------------------------------------------------------------------
 # Development
 #------------------------------------------------------------------------------
+# Enable debug mode to get unminified assets, verbose error messages in the
+# browser and various other things that are useful when developing indico or
+# tracking down errors but should not be enabled for production systems.
+#Debug = False
+#
 # You can force a certain number of (simulated) database conflicts on every
 # by setting ForceConflicts to the number of conflict errors you want:
 #ForceConflicts = 0

@@ -112,13 +112,6 @@ class RHAdminSwitchNewsActive( RHAdminBase ):
         self._minfo.setNewsActive( not self._minfo.isNewsActive() )
         self._redirect( urlHandlers.UHAdminArea.getURL() )
 
-class RHAdminSwitchDebugActive( RHAdminBase ):
-    _uh = urlHandlers.UHAdminSwitchDebugActive
-
-    def _process( self ):
-        self._minfo.setDebugActive( not self._minfo.isDebugActive() )
-        self._redirect( urlHandlers.UHAdminArea.getURL() )
-
 
 class RHGeneralInfoPerformModification( RHAdminBase ):
     _uh = urlHandlers.UHGeneralInfoPerformModification

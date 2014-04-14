@@ -723,8 +723,6 @@ class WFooter(WTemplated):
         if not vars.has_key("shortURL"):
             vars["shortURL"] = ""
 
-        vars['debugActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive()
-
         return vars
 
 

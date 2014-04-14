@@ -26,7 +26,6 @@ from webassets import Bundle
 # legacy imports
 from MaKaC.plugins.base import Observable
 from indico.core.config import Config
-from MaKaC.common.info import HelperMaKaCInfo
 
 # indico imports
 from indico.web.assets import PluginEnvironment
@@ -49,9 +48,7 @@ class ImporterContributor(Component, Observable):
         """
         Includes additional javascript file.
         """
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
         asset_env = PluginEnvironment('importer', os.path.dirname(__file__), 'importer')
-        asset_env.debug = info.isDebugActive()
 
         asset_env.register('importer_js', Bundle('js/importer.js',
                                                  filters='rjsmin',
@@ -63,9 +60,7 @@ class ImporterContributor(Component, Observable):
         """
         Includes additional Css files.
         """
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
         asset_env = PluginEnvironment('importer', os.path.dirname(__file__), 'importer')
-        asset_env.debug = info.isDebugActive()
         asset_env.register('importer_css', Bundle('css/importer.css',
                                                   filters='cssmin',
                                                   output="importer__%(version)s.min.css"))
