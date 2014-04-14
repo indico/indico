@@ -396,7 +396,9 @@ class PluginsHolder (ObjectHolder):
             # if there are dependencies missing, set as not usable
             if missingDeps:
                 ptype.setUsable(False, reason="Dependencies missing: {0}".format(missingDeps))
-                if ptype.isActive() and not skip_disabling:
+                if skip_disabling:
+                    ptype.setActive(True, trigger_reload=False)
+                elif ptype.isActive():
                     ptype.setActive(False)
             else:
                 ptype.setUsable(True)
@@ -802,7 +804,9 @@ class PluginType (PluginBase):
 
         if missingDeps:
             p.setUsable(False, reason="Dependencies missing: {0}".format(missingDeps))
-            if p.isActive() and not skip_disabling:
+            if skip_disabling:
+                p.setActive(True)
+            elif p.isActive():
                 p.setActive(False)
         else:
             p.setUsable(True)
@@ -1029,9 +1033,10 @@ class PluginType (PluginBase):
             self._active = False
         return self._active
 
-    def setActive(self, value):
+    def setActive(self, value, trigger_reload=True):
         self._active = value
-        PluginsHolder().reloadAllPlugins()
+        if trigger_reload:
+            PluginsHolder().reloadAllPlugins()
 
     def toggleActive(self):
         if not self.isActive():
