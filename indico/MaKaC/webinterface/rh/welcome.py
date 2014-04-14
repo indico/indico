@@ -34,7 +34,7 @@ class RHWelcome(base.RHDisplayBaseProtected):
     def _process(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         if not minfo.getAdminList().getList() and not AvatarHolder()._getIdx():
-            self._redirect(url_for('admin.wizard'))
+            self._redirect(url_for('admin.initial-setup'))
         else:
             wfReg = webFactoryRegistry.WebFactoryRegistry()
             p = welcome.WPWelcome(self, self._target, wfReg)

@@ -144,6 +144,12 @@ indico_admin = rjs_bundle(
                'News.js',
                'Upcoming.js'))
 
+indico_initial_setup = Bundle(
+    *namespace('js/indico/Admin',
+
+               'Initial_setup.js'),
+    filters='rjsmin', output='js/indico_initial_setup_%(version)s.min.js')
+
 indico_timetable = rjs_bundle(
     'indico_timetable',
     *namespace('js/indico/Timetable',
@@ -395,6 +401,8 @@ roombooking_sass = sass_module_bundle('roombooking')
 dashboard_sass = sass_module_bundle('dashboard')
 category_sass = sass_module_bundle('category')
 admin_sass = sass_module_bundle('admin')
+initial_setup_sass = sass_module_bundle('initial_setup')
+
 eventservices_sass = sass_module_bundle('eventservices')
 event_display_sass = sass_module_bundle('event_display')
 event_management_sass = sass_module_bundle('event_management')
@@ -418,6 +426,7 @@ def register_all_js(env):
     env.register('indico_management', indico_management)
     env.register('indico_roombooking', indico_room_booking)
     env.register('indico_admin', indico_admin)
+    env.register('indico_initial_setup', indico_initial_setup)
     env.register('indico_timetable', indico_timetable)
     env.register('indico_legacy', indico_legacy)
     env.register('indico_common', indico_common)
@@ -475,6 +484,7 @@ def register_all_css(env, main_css_file):
     env.register('dashboard_sass', dashboard_sass)
     env.register('category_sass', category_sass)
     env.register('admin_sass', admin_sass)
+    env.register('initial_setup_sass', initial_setup_sass)
     env.register('screen_sass', screen_sass)
     env.register('eventservices_sass', eventservices_sass)
     env.register('event_display_sass', event_display_sass)

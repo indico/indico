@@ -1,0 +1,145 @@
+@import "compass/utilities/general/clearfix";
+@import 'base';
+
+$padding-top-step: 23%;
+$padding-top-title: 30px;
+$dark-blue-logo: #005272;
+$light-blue-logo: #00A4E4;
+
+.form-title {
+    @extend %font-family-sans;
+    color: $dark-blue-logo;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    background-color: white;
+    background-repeat: no-repeat;
+    z-index: 1;
+    font-size: 48px;
+    display: block;
+    text-align: center;
+    height: 70px;
+    background-position: 20px $padding-top-title;
+    padding-top: $padding-top-title;
+}
+
+.step-tracker {
+    position: fixed;
+    width: 30px;
+    left: 70px;
+    z-index: 1;
+    padding-top: $padding-top-step;
+    font-size: 20px;
+
+    div {
+        padding-bottom: 70px;
+
+        i {
+            cursor: pointer;
+        }
+    }
+}
+
+.step-wrapper {
+    height: 100%;
+    width: 100%;
+    color: $black;
+
+    div {
+        @include clearfix;
+    }
+
+    .group {
+        margin-top: 100px;
+        margin-right: 10%;
+
+        .i-button {
+            float: right;
+        }
+
+        .green-button {
+            color: $green !important;
+
+            &:hover:not(.disabled):not(:disabled) {
+                color: darken($green, 5%) !important;
+            }
+        }
+    }
+
+    .step-container {
+        width: 85%;
+        padding-top: $padding-top-step;
+        text-align: left;
+
+        .step-description {
+            float: left;
+            width: 30%;
+            padding-left: 10%;
+            font-size: 15px;
+
+            div {
+                padding-bottom: 1em;
+            }
+
+            .step-title {
+                @extend %font-family-sans;
+                font-weight: bold;
+                font-size: 18px;
+            }
+
+            .additional-information {
+                color: #AAAAAA;
+            }
+        }
+
+        .fields-container {
+            float: right;
+            width: 50%;
+
+            div {
+                width: 100%;
+            }
+
+            label, input, select {
+                float: left;
+                margin-bottom: 20px;
+            }
+
+            input, select {
+                font-size: 20px;
+            }
+
+            label {
+                text-align: left;
+                width: 15%;
+                padding-right: 3%;
+                margin-top: 6px;
+                font-weight: normal;
+                font-size: 18px;
+            }
+
+            input {
+                width: 80%;
+            }
+
+            input {
+                box-shadow: none;
+            }
+        }
+    }
+}
+
+.light-blue-logo-icon {
+    color: $light-blue-logo;
+}
+
+.black-icon {
+    color: black;
+}
+
+body {
+    overflow-y: hidden;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
