@@ -119,9 +119,9 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
         return render_template('initial_setup.html', **wvars)
 
     def _process_POST(self):
-        regform = RegistrationForm(request.form)
-        if not regform.validate():
-            print regform.errors
+        setup_form = RegistrationForm(request.form)
+        if not setup_form.validate():
+            print setup_form.errors
             raise FormValuesError(_("Some fields are invalid. Please, correct them and submit the form again."))
         else:
             # Creating new user

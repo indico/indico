@@ -19,22 +19,22 @@ $(document).ready(function(){
 	                    $(this).qtip('option', 'content.attr', "data-error-tooltip2");
 	                }
 	            }
-	            invalidField($(this));
+	            markInvalidField($(this));
 	            ok = false;
 	        }
 	        else{
-	            validField($(this));
+	            markValidField($(this));
 	        }
 	    }).trigger('input');
 	    $('#password, #password_confirm').on('input', function(){
 	        var password = $('#password'),
 	            password_confirm = $('#password_confirm');
 	        if (password.val() != password_confirm.val()) {
-	            invalidField(password_confirm);
+	            markInvalidField(password_confirm);
 	            ok = false;
 	        }
 	        else {
-	            validField(password_confirm);
+	            markValidField(password_confirm);
 	        }
 	    }).trigger('input');
 	    $('#initial-setup-form input').trigger('hideTooltip');
@@ -53,11 +53,11 @@ $(document).ready(function(){
 	    ok = true;
 	    $('#step2 :input').on('input', function(){
 	        if (!this.validity.valid){
-	            invalidField($(this));
+	            markInvalidField($(this));
 	            ok = false;
 	        }
 	        else{
-	            validField($(this));
+	            markValidField($(this));
 	        }
 	    }).trigger('input');
 	    $('#initial-setup-form input').trigger('hideTooltip');
@@ -96,15 +96,15 @@ $(document).ready(function(){
 	            else{
 	                itEmail.qtip('option', 'content.attr', "data-error-tooltip2");
 	            }
-	            invalidField(itEmail);
+	            markInvalidField(itEmail);
 	            ok = false;
 	        }
 	        else{
-	            validField(itEmail);
+	            markValidField(itEmail);
 	        }
 	    }
 	    else{
-	        validField(itEmail);
+	        markValidField(itEmail);
 	    }
 	}
 
@@ -132,28 +132,28 @@ $(document).ready(function(){
 	    itEmail.prop('disabled', !this.checked);
 	}).trigger('change');
 
-	function validField(field){
+	function markValidField(field){
 	    field.removeClass('hasError');
 	}
 
-	function invalidField(field){
+	function markInvalidField(field){
 	    field.addClass('hasError');
 	}
 
 	$('#initial-setup-form input').qtip({
-	        content: {
-	            attr: 'data-error-tooltip'
-	        },
-	        position: {
-	            at: 'right center',
-	            my: 'left center'
-	        },
-	        show: {
-	            event: 'showTooltip'
-	        },
-	        hide: {
-	            event: 'hideTooltip'
-	        }
+        content: {
+            attr: 'data-error-tooltip'
+        },
+        position: {
+            at: 'right center',
+            my: 'left center'
+        },
+        show: {
+            event: 'showTooltip'
+        },
+        hide: {
+            event: 'hideTooltip'
+        }
 	}).on('focus input mouseenter', function(){
 	    if ($(this).hasClass('hasError')){
 	        $(this).trigger('showTooltip');
