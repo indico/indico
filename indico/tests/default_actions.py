@@ -48,7 +48,7 @@ def initialize_new_db(root):
     return cm.getById('0')
 
 
-def create_user(name, login, authManager):
+def create_user(name, login, authManager, set_password=False):
         avatar = Avatar()
         avatar.setName(name)
         avatar.setSurName(name)
@@ -57,7 +57,7 @@ def create_user(name, login, authManager):
         avatar.setEmail("%s@fake.fake" % name)
 
         # setting up the login info
-        li = LoginInfo(login, login)
+        li = LoginInfo(login, login if set_password else None)
         userid = authManager.createIdentity(li, avatar, "Local")
         authManager.add(userid)
         # activate the account
@@ -65,9 +65,11 @@ def create_user(name, login, authManager):
         return avatar
 
 
-def create_dummy_users():
+def create_dummy_users(dummyuser_has_password=False):
     """
-    Creates a dummy user for testing purposes
+    Creates a dummy user for testing purposes.
+
+    If dummyuser_has_password is set, "dummyuser" and "fake-1" can be used for logging in.
     """
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
     ah = AvatarHolder()
@@ -75,20 +77,16 @@ def create_dummy_users():
     avatars = []
     al = minfo.getAdminList()
 
-    avatar = create_user("fake", "dummyuser", authManager)
+    avatar = create_user("fake", "dummyuser", authManager, dummyuser_has_password)
     ah.add(avatar)
     avatars.append(avatar)
     al.grant(avatar)
 
     for i in xrange(1, 5):
-        avatar = create_user("fake-%d" % i, "fake-%d" % i, authManager)
+        avatar = create_user("fake-%d" % i, "fake-%d" % i, authManager, dummyuser_has_password and i == 1)
         avatar.setId("fake-%d" % i)
         ah.add(avatar)
         avatars.append(avatar)
 
-    # since the DB is empty, we have to add dummy user as admin
-    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-
-    dc = DefaultConference()
-    HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(dc)
+    HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultConference())
     return avatars
