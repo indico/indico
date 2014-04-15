@@ -74,7 +74,6 @@ from MaKaC.user import Group, PrincipalHolder
 RETRIEVED_FIELDS = ['uid', 'cn', 'mail', 'o', 'ou', 'company', 'givenName',
                     'sn', 'postalAddress', 'userPrincipalName', "telephoneNumber", "facsimileTelephoneNumber"]
 UID_FIELD = "cn"  # or uid
-SEARCH_EXTRA_FILTER = "(objectCategory=user)"  # Specific for CERN Active Directory for user lookup
 MEMBER_ATTR = "member"
 MEMBER_PAGE_SIZE = 1500
 
@@ -173,7 +172,7 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             return {}
         ldapc = LDAPConnector()
         ldapc.open()
-        fquery = "(&{0}{1})".format(SEARCH_EXTRA_FILTER, ''.join(lfilter))
+        fquery = "(&{0}{1})".format(ldapc.customUserFilter, ''.join(lfilter))
 
         d = ldapc.findUsers(fquery)
         ldapc.close()
@@ -351,6 +350,7 @@ class LDAPConnector(object):
         self.ldapAccessCredentials = ldapConfig.get('accessCredentials')
         self.ldapUseTLS = ldapConfig.get('useTLS')
         self.groupStyle = ldapConfig.get('groupStyle')
+        self.customUserFilter = ldapConfig.get('customUserFilter')
 
     def login(self):
         try:
@@ -370,7 +370,7 @@ class LDAPConnector(object):
             return None
 
     def _findDNOfUser(self, userName):
-        return self._findDN(self.ldapPeopleDN, "(&{0}({1}))".format(SEARCH_EXTRA_FILTER, self.ldapPeopleFilter),
+        return self._findDN(self.ldapPeopleDN, "(&{0}({1}))".format(self.customUserFilter, self.ldapPeopleFilter),
                             userName)
 
     def _findDNOfGroup(self, groupName):
@@ -405,6 +405,8 @@ class LDAPConnector(object):
 
         if dn:
             self.l.simple_bind_s(dn, password)
+        else:
+            raise MaKaCError(_('LDAP Query: Failed to find DN'))
 
     def close(self):
         """
