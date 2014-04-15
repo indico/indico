@@ -96,7 +96,7 @@ Request details:<br />
        MailTools.bookingCreationDate(self._booking),
        MailTools.bookingModificationDate(self._booking, typeOfMail),
        self._getTalksShortMessage(),
-       self._bp["audience"] or _("Public"),
+       self._bp["audience"] or _("No restriction"),
        self._getComments(),
        self._getTalks())
 
