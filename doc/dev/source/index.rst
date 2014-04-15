@@ -9,7 +9,7 @@ Indico API
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :numbered:
 
    ./fossilize.rst
@@ -17,6 +17,8 @@ Contents:
    ./scheduler.rst
    ./extension.rst
    ./livesync.rst
+   ./http_api/index.rst
+
 
 Indices and tables
 ==================

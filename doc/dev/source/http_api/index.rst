@@ -10,6 +10,7 @@ Contents:
    ./access.rst
    ./common.rst
    ./exporters/index.rst
+   ./tools.rst
 
 .. Indices and tables
 .. ==================
