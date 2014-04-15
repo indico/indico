@@ -312,8 +312,8 @@ class test_indico(test.test):
                     ('html', None, "Make an HTML report (when possible)"),
                     ('record', None, "Record tests (for --functional)"),
                     ('silent', None, "Don't output anything in the console, just generate the report"),
-                    ('killself', None,
-                     "Kill this script right after the tests finished without waiting for db shutdown.")])
+                    ('clean-shutdown', None,
+                     "Do not kill this script right after the tests finished without waiting for db shutdown.")])
     boolean_options = []
 
     specify = None
@@ -329,7 +329,7 @@ class test_indico(test.test):
     silent = False
     mode = None
     server_url = None
-    killself = True
+    clean_shutdown = False
     html = False
     record = False
     log = False
@@ -367,7 +367,7 @@ class test_indico(test.test):
         from indico.tests import TestManager
 
         options = {'silent': self.silent,
-                   'killself': self.killself,
+                   'killself': not self.clean_shutdown,
                    'html': self.html,
                    'browser': self.browser,
                    'mode': self.mode,
