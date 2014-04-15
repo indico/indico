@@ -210,11 +210,15 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             return None
         try:
             ldapc = LDAPConnector()
-            ldapc.openAsUser(userName, password)
+
+            if not ldapc.openAsUser(userName, password):
+                # This means that we couldn't bind the user (e.g. user does not exist)
+                return None
+
             ret = ldapc.lookupUser(userName)
             ldapc.close()
             Logger.get('auth.ldap').debug("Username: %s checked: %s" % (userName, ret))
-            if not ret :
+            if not ret:
                 return None
             # I have no idea if this check is needed at all (probably it's not), but it cannot hurt!
             if ret.get(UID_FIELD, '').lower() != userName.lower():
@@ -405,8 +409,9 @@ class LDAPConnector(object):
 
         if dn:
             self.l.simple_bind_s(dn, password)
+            return True
         else:
-            raise MaKaCError(_('LDAP Query: Failed to find DN'))
+            return False
 
     def close(self):
         """
