@@ -31,6 +31,7 @@ from indico.ext.livesync.test.unit.base import _TestSynchronization
 
 
 class TestBasicOperations(_TestSynchronization, IndicoTestCase):
+    _slow = True
 
     def testEventCreation(self):
         """
@@ -152,6 +153,7 @@ class TestBasicOperations(_TestSynchronization, IndicoTestCase):
 
 
 class TestProtectionChanges(_TestSynchronization, IndicoTestCase):
+    _slow = True
 
     def testDirectConferenceProtectionChanges(self):
         """

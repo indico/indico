@@ -67,6 +67,7 @@ class _TestSynchronization(object):
 class _TUpload(object):
 
     _requires = ['db.DummyUser', LiveSync_Feature, 'util.RequestEnvironment']
+    _slow = True
 
     def setUp(self):
         super(_TUpload, self).setUp()
