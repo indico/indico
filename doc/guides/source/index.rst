@@ -19,7 +19,6 @@ Contents:
    ./Importer/Importer.rst
    ./Statistics/index.rst
    ./AdminGuide/index.rst
-   ./ExportAPI/index.rst
    ./Glossary/Glossary.rst
    ./FAQ/FAQ.rst
 
