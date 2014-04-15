@@ -22,7 +22,6 @@ from MaKaC.plugins.Collaboration.Vidyo.api.client import AdminClient, UserClient
 from MaKaC.i18n import _
 from MaKaC.plugins.Collaboration.Vidyo.tests.python.unit.vidyoTestTools import VidyoTestSetup
 
-import nose
 
 def setUpModule():
     DBMgr.getInstance().startRequest()
@@ -36,18 +35,15 @@ def tearDownModule():
 class TestVidyoConnectivity(unittest.TestCase):
 
     def testAdminAPIConnectivity(self):
-        raise nose.SkipTest
+        raise unittest.SkipTest('Test disabled')
         try:
             AdminClient.getInstance()
         except Exception, e:
             self.fail(msg = "Could not create a Vidyo AdminClient instance. Exception: " + str(e))
 
     def testUserAPIConnectivity(self):
-        raise nose.SkipTest
+        raise unittest.SkipTest('Test disabled')
         try:
             UserClient.getInstance()
         except Exception, e:
             self.fail(msg = "Could not create a Vidyo UserClient instance. Exception: " + str(e))
-
-class TestTypeCreation(unittest.TestCase):
-    pass
