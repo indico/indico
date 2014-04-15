@@ -350,7 +350,7 @@ class LDAPConnector(object):
         self.ldapAccessCredentials = ldapConfig.get('accessCredentials')
         self.ldapUseTLS = ldapConfig.get('useTLS')
         self.groupStyle = ldapConfig.get('groupStyle')
-        self.customUserFilter = ldapConfig.get('customUserFilter')
+        self.customUserFilter = ldapConfig.get('customUserFilter', '')
 
     def login(self):
         try:
