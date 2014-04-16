@@ -2,13 +2,26 @@ $(document).ready(function(){
     var ok = true;
     var scrollDelay = 1000;
     var clicked = [false, false, false];
+    var current = 1;
+    var fields = [[$('#name'), $('#surname'), $('#user_email'), $('#login'), $('#password'), $('#password_confirm')],
+                  [$('#organisation')],
+                  [$('#it_email')]];
 
     function scrollToStep(step){
-        uncheckTrackers();
-        scrollToElem($('#step'+step));
-        window.setTimeout(function(){
-            checkTracker(step);
-        }, scrollDelay);
+        ok = true;
+        if (step > current){
+            for (var i=0; i<fields[current-1].length; i++){
+                fields[current-1][i].trigger('input').trigger('hideTooltip');
+            }
+        }
+        if (step!=current && ok){
+            uncheckTrackers();
+            scrollToElem($('#step'+step));
+            window.setTimeout(function(){
+                checkTracker(step);
+            }, scrollDelay);
+            current = step;
+        }
     }
 
     function scrollToElem(elem){
