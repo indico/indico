@@ -35,7 +35,7 @@ $(document).ready(function(){
         var icon = $('#tracker'+ step +' i');
         icon.removeClass('icon-radio-unchecked');
         icon.addClass('icon-radio-checked');
-        icon.css('color', '#1C69DE');
+        icon.css('color', '#00A4E4');
         if (!clicked[step-1]){
             icon.on('click', function(){
                 scrollToStep(step);

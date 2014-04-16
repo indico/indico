@@ -1,7 +1,7 @@
 @import "compass/utilities/general/clearfix";
 @import 'base';
 
-$padding-top-step: 20%;
+$padding-top-step: 23%;
 
 .form-title {
     @extend %font-family-sans;
@@ -15,6 +15,9 @@ $padding-top-step: 20%;
     font-size: 48px;
     display: block;
     text-align: center;
+    box-shadow: 0px 0px 10px 3px $black;
+    height: 70px;
+    background-position: 20px 4px;
 }
 
 .step-tracker {
