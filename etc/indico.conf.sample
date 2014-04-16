@@ -266,6 +266,9 @@ MaxUploadFileSize = 0
 #
 #                                 # access credentials of a user with read access
 #                                  'accessCredentials': ('CN=user,OU=Users,DC=example,DC=com','secret_password')
+#
+#                                 # custom user filter
+#                                  'customUserFilter': "(objectCategory=user)"
 #                                 }
 #
 #

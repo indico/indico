@@ -31,6 +31,7 @@ from MaKaC.fossils.conference import IConferenceFossil
 from MaKaC.common.contextManager import ContextManager
 from indico.core.index import Catalog
 
+
 class CollaborationTools(object):
     """ Class with utility classmethods for the Collaboration plugins core and plugins
     """
@@ -413,7 +414,7 @@ class CollaborationTools(object):
         if booking.getBookingParams().has_key("audience"):
             audience = booking.getBookingParams().get("audience")
             if audience == "":
-                audience = "Public"
+                audience = "No restriction"
         return audience
 
     @classmethod
