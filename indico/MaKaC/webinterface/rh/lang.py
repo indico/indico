@@ -25,8 +25,15 @@ from indico.core.config import Config
 
 class RHChangeLang(base.RH):
 
+    def _checkParams_POST(self):
+        self._language = request.form['lang']
+
     def _process(self):
-        # No need to do any processing here. The language change is processed in RH base
+
+        if self._getUser():
+            self._getUser().setLang(self._language)
+
+        # No need to do any more processing here. The language change is processed in RH base
         # Remove lang param from referer
         referer = request.referrer or Config.getInstance().getBaseURL()
         referer = re.sub(r'(?<=[&?])lang=[^&]*&?', '', referer)
