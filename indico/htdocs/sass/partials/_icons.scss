@@ -362,3 +362,11 @@ you can use the generic selector below, but it's slower:
 .icon-location-after:after {
     content: "\e002";
 }
+
+.icon-radio-unchecked:before {
+    content: "\e439";
+}
+
+.icon-radio-checked:before {
+    content: "\e438";
+}

@@ -13,63 +13,80 @@
 
 {% block body %}
 
-    <div style="position: fixed; width: 100%; top: 0; background-color: #ececec; background-image: url({{ system_icon('logoIndico') }}); background-repeat: no-repeat; z-index: 1; font-size: 48px; display: block; text-align: center;">{{ title }}</div>
+    <div class="form-title" style="background-image: url({{ system_icon('logoIndico') }});">{{ title }}</div>
+
+    <div class="step-tracker">
+        <div id="tracker1">
+            <i class="icon-radio-unchecked"></i>
+        </div>
+        <div id="tracker2">
+            <i class="icon-radio-unchecked"></i>
+        </div>
+        <div id="tracker3">
+            <i class="icon-radio-unchecked"></i>
+        </div>
+    </div>
 
     <form id="initial-setup-form" action="" method="POST" style="width: 100%; height: 100%;">
 
         <div class="step-wrapper" id="step1">
+
             <div class="center step-container">
 
-                <div class="groupTitle">1. {{ step_title[0] }}</div>
+                <div class="step-description">
+                    <div class="step-title">{{ steps[0].title }}</div>
+                    <div>{{ steps[0].description[0] }}</div>
+                    <div class="additional-information">{{ steps[0].description[1] }}</div>
+                </div>
 
                 <div class="fields-container">
 
                     <div>
-                        <label for="name">{{ name.label }}</label>
-                        <input id="name" type="text" name="name" data-error-tooltip="{{ name.tooltip }}" value="{{ name.value }}" required>
+                        <input id="name" type="text" name="name" data-error-tooltip="{{ name.tooltip }}" value="{{ name.value }}" placeholder="{{ name.label }}" required>
                     </div>
 
                     <div>
-                        <label for="surname">{{ surname.label }}</label>
-                        <input id="surname" type="text" name="surname" data-error-tooltip="{{ surname.tooltip }}" value="{{ surname.value }}" required>
+                        <input id="surname" type="text" name="surname" data-error-tooltip="{{ surname.tooltip }}" value="{{ surname.value }}" placeholder="{{ surname.label }}" required>
                     </div>
 
                     <div>
-                        <label for="user_email">{{ user_email.label }}</label>
-                        <input id="user_email" type="email" name="user_email" data-error-tooltip="{{ user_email.tooltip.missing }}" data-error-tooltip2="{{ user_email.tooltip.invalid }}" value="{{ user_email.value }}" required>
+                        <input id="user_email" type="email" name="user_email" data-error-tooltip="{{ user_email.tooltip.missing }}" data-error-tooltip2="{{ user_email.tooltip.invalid }}" value="{{ user_email.value }}" placeholder="{{ user_email.label }}" required>
                     </div>
 
                     <div>
-                        <label for="login">{{ login.label }}</label>
-                        <input id="login" type="text" name="login" data-error-tooltip="{{ login.tooltip }}" value="{{ login.value }}" required style="width: 40%;">
+                        <input id="login" type="text" name="login" data-error-tooltip="{{ login.tooltip }}" value="{{ login.value }}" placeholder="{{ login.label }}" required>
                     </div>
 
                     <div>
-                        <label for="password">{{ password.label }}</label>
-                        <input id="password" type="password" name="password" data-error-tooltip="{{ password.tooltip }}" value="" required style="width: 40%;">
+                        <input id="password" type="password" name="password" data-error-tooltip="{{ password.tooltip }}" value="" placeholder="{{ password.label }}" required>
                     </div>
 
                     <div>
-                        <label for="password_confirm">{{ password_confirm.label }}</label>
-                        <input id="password_confirm" type="password" name="password_confirm" data-error-tooltip="{{ password_confirm.tooltip }}" value="" required style="width: 40%;">
-                    </div>
-
-                    <div class="group">
-                        <a id="nextStep1" class="i-button">
-                            {{ next_step }}
-                            <i class="icon-next"></i>
-                        </a>
+                        <input id="password_confirm" type="password" name="password_confirm" data-error-tooltip="{{ password_confirm.tooltip }}" value="" placeholder="{{ password_confirm.label }}" required>
                     </div>
 
                 </div>
 
             </div>
+
+            <div class="group">
+                <a id="nextStep1" class="i-button">
+                    {{ next_step }}
+                    <i class="icon-next"></i>
+                </a>
+            </div>
+
         </div>
 
         <div class="step-wrapper" id="step2">
+
             <div class="center step-container">
 
-                <div class="groupTitle">2. {{ step_title[1] }}</div>
+                <div class="step-description">
+                    <div class="step-title">{{ steps[1].title }}</div>
+                    <div>{{ steps[1].description[0] }}</div>
+                    <div class="additional-information">{{ steps[1].description[1] }}</div>
+                </div>
 
                 <div class="fields-container">
 
@@ -88,63 +105,61 @@
                     </div>
 
                     <div>
-                        <label for="organisation">{{ organisation.label }}</label>
-                        <input id="organisation" type="text" name="organisation" data-error-tooltip="{{ organisation.tooltip }}" value="{{ organisation.value }}" required>
-                    </div>
-
-                    <div class="group">
-                        <a id="nextStep2" class="i-button">
-                            {{ next_step }}
-                            <i class="icon-next"></i>
-                        </a>
-                        <a id="previousStep2" class="i-button icon-prev">{{ previous_step }}</a>
+                        <input id="organisation" type="text" name="organisation" data-error-tooltip="{{ organisation.tooltip }}" value="{{ organisation.value }}" placeholder="{{ organisation.label }}" required>
                     </div>
 
                 </div>
 
             </div>
+
+            <div class="group">
+                <a id="nextStep2" class="i-button">
+                    {{ next_step }}
+                    <i class="icon-next"></i>
+                </a>
+                <a id="previousStep2" class="i-button icon-prev">{{ previous_step }}</a>
+            </div>
+
         </div>
 
         <div class="step-wrapper" id="step3">
+
             <div class="center step-container">
 
-                <div class="groupTitle">3. {{ step_title[2] }}</div>
+                <div class="step-description">
+                    <div class="step-title">{{ steps[2].title }}</div>
+                        <div>{{ steps[2].description.first }}</div>
+                        <ul>
+                            <li>{{ steps[2].description.list[0] }}</li>
+                            <li>{{ steps[2].description.list[1] }}</li>
+                            <li>{{ steps[2].description.list[2] }}</li>
+                        </ul>
+                        <div class="additional-information">{{ steps[2].description.last }}</div>
+                </div>
 
                 <div class="fields-container">
 
                     <div>
-                        <font color="gray">
-                            {{ it_disclaimer.first }}:
-                            <ul>
-                                <li>{{ it_disclaimer.list[0] }};</li>
-                                <li>{{ it_disclaimer.list[1] }};</li>
-                                <li>{{ it_disclaimer.list[2] }}.</li>
-                            </ul>
-                            {{ it_disclaimer.last }}.
-                        </font>
-                    </div>
-
-                    <div>
                         <label for="enable">{{ enable.label }}</label>
-                        <input id="enable" type="checkbox" name="enable" value="1" {{ checked }} style="width: initial; margin-top: 25px;">
+                        <input id="enable" type="checkbox" name="enable" value="1" {{ checked }} style="width: initial; margin-top: 6px;">
                     </div>
 
                     <div>
-                        <label for="it_email">{{ it_email.label }}</label>
-                        <input id="it_email" type="email" name="it_email" data-error-tooltip="{{ it_email.tooltip.missing }}" data-error-tooltip2="{{ it_email.tooltip.invalid }}" value="{{ it_email.value }}">
-                    </div>
-
-                    <div class="group">
-                        <a id="submit-initial-setup" class="i-button">
-                            {{ submit }}
-                            <i class="icon-checkmark"></i>
-                        </a>
-                        <a id="previousStep3" class="i-button icon-prev">{{ previous_step }}</a>
+                        <input id="it_email" type="email" name="it_email" data-error-tooltip="{{ it_email.tooltip.missing }}" data-error-tooltip2="{{ it_email.tooltip.invalid }}" value="{{ it_email.value }}" placeholder="{{ it_email.label }}">
                     </div>
 
                 </div>
 
             </div>
+
+            <div class="group">
+                <a id="submit-initial-setup" class="i-button green-button">
+                    {{ submit }}
+                    <i class="icon-checkmark"></i>
+                </a>
+                <a id="previousStep3" class="i-button icon-prev">{{ previous_step }}</a>
+            </div>
+
         </div>
 
     </form>

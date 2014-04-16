@@ -1,57 +1,125 @@
 @import "compass/utilities/general/clearfix";
+@import 'base';
 
-.fields-container {
-    float: left;
+$padding-top-step: 20%;
+
+.form-title {
+    @extend %font-family-sans;
+    color: #005272;
+    position: fixed;
     width: 100%;
-
-    div {
-        @include clearfix;
-        width: 100%;
-    }
-
-    label, input, select {
-        float: left;
-        font-size: 18px;
-        margin-top: 20px;
-    }
-
-    label {
-        text-align: right;
-        width: 15%;
-        padding-right: 3%;
-        padding-top: 0.3em;
-        font-weight: normal;
-    }
-
-    input {
-        width: 70%;
-    }
-
-    input, input:focus, input:hover, input.hasError {
-        border-left: none;
-        border-right: none;
-        border-top: none;
-        box-shadow: none;
-    }
+    top: 0;
+    background-color: $light-gray;
+    background-repeat: no-repeat;
+    z-index: 1;
+    font-size: 48px;
+    display: block;
+    text-align: center;
 }
 
-.step-container {
-    width: 85%;
-    padding-top: 20%;
-    text-align: left;
+.step-tracker {
+    position: fixed;
+    width: 30px;
+    left: 50px;
+    z-index: 1;
+    padding-top: $padding-top-step;
+    font-size: 20px;
+
+    div {
+        padding-bottom: 70px;
+
+        i {
+            cursor: pointer;
+        }
+    }
 }
 
 .step-wrapper {
     height: 100%;
     width: 100%;
-}
+    color: $black;
 
-.group {
-    margin-top: 40px;
-}
+    div {
+        @include clearfix;
+    }
 
-.i-button {
-    float: right;
+    .group {
+        margin-top: 100px;
+        margin-right: 10%;
+
+        .i-button {
+            float: right;
+        }
+
+        .green-button {
+            color: $green !important;
+
+            &:hover:not(.disabled):not(:disabled) {
+                color: darken($green, 5%) !important;
+            }
+        }
+    }
+
+    .step-container {
+        width: 85%;
+        padding-top: $padding-top-step;
+        text-align: left;
+
+        .step-description {
+            float: left;
+            width: 30%;
+            padding-left: 10%;
+            font-size: 15px;
+
+            div {
+                padding-bottom: 1em;
+            }
+
+            .step-title {
+                font-weight: bold;
+                font-size: 18px;
+            }
+
+            .additional-information {
+                color: #AAAAAA;
+            }
+        }
+
+        .fields-container {
+            float: right;
+            width: 50%;
+
+            div {
+                width: 100%;
+            }
+
+            label, input, select {
+                float: left;
+                margin-bottom: 20px;
+            }
+
+            input, select {
+                font-size: 20px;
+            }
+
+            label {
+                text-align: left;
+                width: 15%;
+                padding-right: 3%;
+                margin-top: 6px;
+                font-weight: normal;
+                font-size: 18px;
+            }
+
+            input {
+                width: 80%;
+            }
+
+            input {
+                box-shadow: none;
+            }
+        }
+    }
 }
 
 body {

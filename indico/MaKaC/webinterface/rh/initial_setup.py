@@ -66,9 +66,29 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
 
         wvars = {'title': _('Initial Setup'),
 
-                 'step_title': [_('User creation'),
-                                _('Server settings'),
-                                _('Instance Tracking')],
+                 'steps': [{'title': _('User creation'),
+                            'description': [_('Insert here all the basic informations needed to ' +
+                                              'create your admin account.'),
+                                            _('You can update your account with all the secondary ' +
+                                              'informations (like your address or phone number) in a ' +
+                                              'second moment by accessing the account management ' +
+                                              '(My Profile, Account Details).')]},
+                           {'title': _('Server settings'),
+                            'description': [_('Configure here your server settings.'),
+                                            _('All the informations set here will also be used to fill ' +
+                                              'your personal account information. To change these informations ' +
+                                              'you can later head to Server Admin, General Settings (will change ' +
+                                              'the server settings) or My Profile, Account Details (will change ' +
+                                              'the account settings).')]},
+                           {'title': _('Instance Tracking'),
+                            'description': {'first': _('By enabling the Instance Tracking Terms you accept:'),
+                                            'list': [_('sending anonymous statistic data to Indico@CERN;'),
+                                                     _('receiving security warnings from the Indico team;'),
+                                                     _('receiving a notification when a new version is released.')],
+                                            'last': _('Please note that no private information will ever be sent to ' +
+                                                      'Indico@CERN and that you will be able to change the Instance ' +
+                                                      'Tracking settings anytime in the future (from Server ' +
+                                                      'Admin, General Settings).')}}],
 
                  'next_step': _('Next step'),
                  'previous_step': _('Previous step'),
@@ -101,14 +121,6 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
 
                  'organisation': {'label': _('Organization'),
                                   'tooltip': _('You must enter the name of your organization')},
-
-                 'it_disclaimer': {'first': _('By enabling the Instance Tracking Terms you accept'),
-                                   'list': [_('sending anonymous statistic data to Indico@CERN'),
-                                            _('receiving security warnings from the Indico team'),
-                                            _('receiving a notification when a new version is released')],
-                                   'last': _('Please note that no private information will ever be sent to ' +
-                                             'Indico@CERN and that you will be able to change the Instance Tracking ' +
-                                             'settings anytime in the future (from Server Admin, General Settings)')},
 
                  'enable': {'label': _('Enable')},
 

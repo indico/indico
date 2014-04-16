@@ -1,146 +1,192 @@
 $(document).ready(function(){
-	var ok = true;
+    var ok = true;
+    var scrollDelay = 1000;
+    var clicked = [false, false, false];
 
-	function scrollToElem(elem){
-	    $('html, body').animate({
-	        scrollTop: elem.offset().top
-	    }, 1000);
-	}
+    function scrollToStep(step){
+        uncheckTrackers();
+        scrollToElem($('#step'+step));
+        window.setTimeout(function(){
+            checkTracker(step);
+        }, scrollDelay);
+    }
 
-	$('#nextStep1').on('click', function(){
-	    ok = true;
-	    $('#step1 :input:not(#password_confirm)').on('input', function(){
-	        if (!this.validity.valid){
-	            if (this.id == 'user_email'){
-	                if (this.validity.valueMissing){
-	                    $(this).qtip('option', 'content.attr', "data-error-tooltip");
-	                }
-	                else{
-	                    $(this).qtip('option', 'content.attr', "data-error-tooltip2");
-	                }
-	            }
-	            markInvalidField($(this));
-	            ok = false;
-	        }
-	        else{
-	            markValidField($(this));
-	        }
-	    }).trigger('input');
-	    $('#password, #password_confirm').on('input', function(){
-	        var password = $('#password'),
-	            password_confirm = $('#password_confirm');
-	        if (password.val() != password_confirm.val()) {
-	            markInvalidField(password_confirm);
-	            ok = false;
-	        }
-	        else {
-	            markValidField(password_confirm);
-	        }
-	    }).trigger('input');
-	    $('#initial-setup-form input').trigger('hideTooltip');
+    function scrollToElem(elem){
+        $('html, body').animate({
+            scrollTop: elem.offset().top
+        }, scrollDelay);
+    }
 
-	    if (ok){
-	    	user_email = $('#user_email');
-	    	it_email = $('#it_email');
-	    	if (it_email.val() == ''){
-	    		it_email.val(user_email.val());
-	    	}
-		    scrollToElem($('#step2'));
-	    }
-	});
+    function checkTracker(step){
+        var icon = $('#tracker'+ step +' i');
+        icon.removeClass('icon-radio-unchecked');
+        icon.addClass('icon-radio-checked');
+        icon.css('color', '#1C69DE');
+        if (!clicked[step-1]){
+            icon.on('click', function(){
+                scrollToStep(step);
+            });
+            clicked[step-1] = true;
+        }
+    }
 
-	$('#nextStep2').on('click', function(){
-	    ok = true;
-	    $('#step2 :input').on('input', function(){
-	        if (!this.validity.valid){
-	            markInvalidField($(this));
-	            ok = false;
-	        }
-	        else{
-	            markValidField($(this));
-	        }
-	    }).trigger('input');
-	    $('#initial-setup-form input').trigger('hideTooltip');
+    function uncheckTrackers(){
+        $('.step-tracker div').each(function(){
+            var icon = $(this).children("i:first");
+            icon.removeClass('icon-radio-checked');
+            icon.addClass('icon-radio-unchecked');
+            icon.css('color', 'black');
+        });
+    }
 
-	    if (ok){
-		    scrollToElem($('#step3'));
-	    }
-	});
+    function markValidField(field){
+        field.removeClass('hasError');
+    }
 
-	$('#submit-initial-setup').on('click', function(e){
-	    e.preventDefault();
+    function markInvalidField(field){
+        field.addClass('hasError');
+    }
 
-	    ok = true;
-	    $('#enable').on('change', function(){
-	        updateITEmail();
-	    }).trigger('change');
-	    $('#itEmail').on('input', function(){
-	        updateITEmail();
-	    });
+    function updateITEmail(){
+        var enable = $('#enable'),
+            itEmail = $('#it_email');
+        itEmail.prop('required', enable.prop('checked'));
+        itEmail.prop('disabled', !enable.prop('checked'));
+        if (enable.prop('checked')){
+            if (!itEmail.prop('validity').valid){
+                if (itEmail.prop('validity').valueMissing){
+                    itEmail.qtip('option', 'content.attr', "data-error-tooltip");
+                }
+                else{
+                    itEmail.qtip('option', 'content.attr', "data-error-tooltip2");
+                }
+                markInvalidField(itEmail);
+                ok = false;
+            }
+            else{
+                markValidField(itEmail);
+            }
+        }
+        else{
+            markValidField(itEmail);
+        }
+    }
 
-	    if (ok){
-	        $('#initial-setup-form').submit();
-	    }
-	});
+    function fillITEmail(){
+        user_email = $('#user_email');
+        it_email = $('#it_email');
+        if (it_email.val() == ''){
+            it_email.val(user_email.val());
+        }
+    }
 
-	function updateITEmail(){
-	    var enable = $('#enable'),
-	        itEmail = $('#it_email');
-	    itEmail.prop('required', enable.prop('checked'));
-	    itEmail.prop('disabled', !enable.prop('checked'));
-	    if (enable.prop('checked')){
-	        if (!itEmail.prop('validity').valid){
-	            if (itEmail.prop('validity').valueMissing){
-	                itEmail.qtip('option', 'content.attr', "data-error-tooltip");
-	            }
-	            else{
-	                itEmail.qtip('option', 'content.attr', "data-error-tooltip2");
-	            }
-	            markInvalidField(itEmail);
-	            ok = false;
-	        }
-	        else{
-	            markValidField(itEmail);
-	        }
-	    }
-	    else{
-	        markValidField(itEmail);
-	    }
-	}
+    function emptyITEmail(){
+        it_email = $('#it_email');
+        it_email.val('');
+    }
 
-	$('#previousStep2').on('click', function(){
-	    scrollToElem($('#step1'));
-	});
+    $('#nextStep1').on('click', function(){
+        ok = true;
+        $('#step1 :input:not(#password_confirm)').on('input', function(){
+            if (!this.validity.valid){
+                if (this.id == 'user_email'){
+                    if (this.validity.valueMissing){
+                        $(this).qtip('option', 'content.attr', "data-error-tooltip");
+                    }
+                    else{
+                        $(this).qtip('option', 'content.attr', "data-error-tooltip2");
+                    }
+                }
+                markInvalidField($(this));
+                ok = false;
+            }
+            else{
+                markValidField($(this));
+            }
+        }).trigger('input');
+        $('#password, #password_confirm').on('input', function(){
+            var password = $('#password'),
+                password_confirm = $('#password_confirm');
+            if (password.val() != password_confirm.val()) {
+                markInvalidField(password_confirm);
+                ok = false;
+            }
+            else {
+                markValidField(password_confirm);
+            }
+        }).trigger('input');
+        $('#initial-setup-form input').trigger('hideTooltip');
 
-	$('#previousStep3').on('click', function(){
-	    scrollToElem($('#step2'));
-	});
+        if (ok){
+            scrollToStep(2);
+        }
+    });
 
-	var nav_lang = navigator.language || navigator.userLanguage;
-	nav_lang = nav_lang.split('-')[0];
-	$('#lang option').each(function() {
-	    var lang_code = this.value.split('_')[0];
-	    if (lang_code == nav_lang){
-	    	$('#lang').val(this.value);
-	    	return false;
-	    }
-	});
+    $('#nextStep2').on('click', function(){
+        ok = true;
+        $('#step2 :input').on('input', function(){
+            if (!this.validity.valid){
+                markInvalidField($(this));
+                ok = false;
+            }
+            else{
+                markValidField($(this));
+            }
+        }).trigger('input');
+        $('#initial-setup-form input').trigger('hideTooltip');
 
-	$('#enable').on('change', function(){
-	    var itEmail = $('#it_email');
-	    itEmail.prop('required', this.checked);
-	    itEmail.prop('disabled', !this.checked);
-	}).trigger('change');
+        if (ok){
+            scrollToStep(3);
+        }
+    });
 
-	function markValidField(field){
-	    field.removeClass('hasError');
-	}
+    $('#submit-initial-setup').on('click', function(e){
+        e.preventDefault();
 
-	function markInvalidField(field){
-	    field.addClass('hasError');
-	}
+        ok = true;
+        $('#enable').on('change', function(){
+            updateITEmail();
+        }).trigger('change');
+        $('#itEmail').on('input', function(){
+            updateITEmail();
+        });
 
-	$('#initial-setup-form input').qtip({
+        if (ok){
+            $('#initial-setup-form').submit();
+        }
+    });
+
+    $('#previousStep2').on('click', function(){
+        scrollToStep(1);
+    });
+
+    $('#previousStep3').on('click', function(){
+        scrollToStep(2);
+    });
+
+    var nav_lang = navigator.language || navigator.userLanguage;
+    nav_lang = nav_lang.split('-')[0];
+    $('#lang option').each(function() {
+        var lang_code = this.value.split('_')[0];
+        if (lang_code == nav_lang){
+            $('#lang').val(this.value);
+            return false;
+        }
+    });
+
+    $('#enable').on('change', function(){
+        var itEmail = $('#it_email');
+        itEmail.prop('required', this.checked);
+        itEmail.prop('disabled', !this.checked);
+        if (this.checked){
+            fillITEmail();
+        }
+        else{
+            emptyITEmail();
+        }
+    }).trigger('change');
+
+    $('#initial-setup-form input').qtip({
         content: {
             attr: 'data-error-tooltip'
         },
@@ -154,17 +200,34 @@ $(document).ready(function(){
         hide: {
             event: 'hideTooltip'
         }
-	}).on('focus input mouseenter', function(){
-	    if ($(this).hasClass('hasError')){
-	        $(this).trigger('showTooltip');
-	    }
-	    else{
-	        $(this).trigger('hideTooltip');
-	    }
-	}).on('blur', function(){
-	    $(this).trigger('hideTooltip');
-	});
-	$('#initial-setup-form').on('mouseleave', 'input:not(:focus)', function(){
-	    $(this).trigger('hideTooltip');
-	});
+    }).on('focus input mouseenter', function(){
+        if ($(this).hasClass('hasError')){
+            $(this).trigger('showTooltip');
+        }
+        else{
+            $(this).trigger('hideTooltip');
+        }
+    }).on('blur', function(){
+        $(this).trigger('hideTooltip');
+    });
+    $('#initial-setup-form').on('mouseleave', 'input:not(:focus)', function(){
+        $(this).trigger('hideTooltip');
+    });
+
+    scrollToElem($('#step1'));
+    checkTracker(1);
+
+    for (var i=1; i<=3; i++){
+        var icon = $('#tracker'+ i +' i');
+        var stepTitle = $('#step'+ i +' div.step-container div.step-description div.step-title')
+        icon.qtip({
+            content: {
+                text: stepTitle.text()
+            },
+            position: {
+                at: 'right center',
+                my: 'left center'
+            }
+        });
+    }
 });
