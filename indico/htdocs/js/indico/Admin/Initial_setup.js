@@ -18,6 +18,7 @@ $(document).ready(function(){
             uncheckTrackers();
             scrollToElem($('#step'+step));
             window.setTimeout(function(){
+                uncheckTrackers();
                 checkTracker(step);
             }, scrollDelay);
             current = step;
@@ -44,12 +45,9 @@ $(document).ready(function(){
     }
 
     function uncheckTrackers(){
-        $('.step-tracker div').each(function(){
-            var icon = $(this).children("i:first");
-            icon.removeClass('icon-radio-checked');
-            icon.addClass('icon-radio-unchecked');
-            icon.css('color', 'black');
-        });
+        var icons = $('.step-tracker div i');
+        icons.removeClass('icon-radio-checked').addClass('icon-radio-unchecked');
+        icons.css('color', 'black');
     }
 
     function markValidField(field){
