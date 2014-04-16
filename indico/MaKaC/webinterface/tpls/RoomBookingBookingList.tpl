@@ -73,9 +73,9 @@
         'params': ${ calendarParams | n,j },
         'newBooking': ${ newBooking | n,j }
       },
-      ${ manyRooms | j },
+      ${ manyRooms | n,j },
       '${ repeatability }',
-      '${ finishDate | j }',
+      '${ finishDate | n,j }',
       '${ flexibleDatesRange }'
       ${ showRejectAllButton * (',"{}"'.format(urlHandlers.UHRoomBookingRejectAllConflicting.getURL())) }
     );
