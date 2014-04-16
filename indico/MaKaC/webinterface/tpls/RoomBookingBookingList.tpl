@@ -59,9 +59,9 @@
   % if numRooms or not ofMyRooms:
     var roomBookingCalendar = new RoomBookingCalendar(
       ${ jsonEncode(barsFossil) },
-      ${ dayAttrs | j },
-      ${ dayLimit | j },
-      ${ overload | j },
+      ${ dayAttrs | n,j },
+      ${ dayLimit | n,j },
+      ${ overload | n,j },
       {
         'prevURL': '${ prevURL }',
         'nextURL': '${ nextURL }',
@@ -69,9 +69,9 @@
         'startD': '${ startD }',
         'endD': '${ endD }',
         'periodName': '${ periodName }',
-        'search': ${ search | j },
-        'params': ${ calendarParams | j },
-        'newBooking': ${ newBooking | j }
+        'search': ${ search | n,j },
+        'params': ${ calendarParams | n,j },
+        'newBooking': ${ newBooking | n,j }
       },
       ${ manyRooms | j },
       '${ repeatability }',
