@@ -137,7 +137,7 @@ class TestManager(object):
             serverAddr = self._runFakeWebServer()
             baseURL = "http://{0}:{1}".format(*serverAddr)
         else:
-            baseURL = "http://localhost:8000/indico"
+            baseURL = "http://localhost:8000"
 
         self._cfg._configVars.update({"BaseURL": baseURL})
         ContextManager.set('test_env', True)
@@ -173,7 +173,6 @@ class TestManager(object):
         Sets a fake configuration for the current process, using a temporary directory
         """
         config = Config.getInstance()
-        test_config = TestConfig.getInstance()
 
         temp = tempfile.mkdtemp(prefix="indico_")
         self._info('Using %s as temporary dir' % temp)
@@ -188,7 +187,7 @@ class TestManager(object):
         # minimal defaults
         defaults = {
             'Debug': True,
-            'BaseURL': 'http://localhost:8000/indico',
+            'BaseURL': 'http://localhost:8000',
             'BaseSecureURL': '',
             'AuthenticatorList': [('Local', {})],
             'SmtpServer': ('localhost', 58025),
@@ -200,7 +199,7 @@ class TestManager(object):
             'ArchiveDir': os.path.join(temp, 'archive'),
             'UploadedFilesTempDir': os.path.join(temp, 'tmp'),
             'ConfigurationDir': etcDir
-            }
+        }
 
         defaults.update(custom)
 
