@@ -187,3 +187,7 @@
     margin: 1px 2px 0 0;
     text-shadow: -1px 0 #ccc, 0 1px #ccc, 1px 0 #ccc, 0 -1px #ccc;
 }
+
+.week-anchor {
+    color: black !important;
+}

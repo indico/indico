@@ -149,6 +149,9 @@
                                                 <span class="end-time">${endTime}</span>
                                             % endif
                                         </span>
+                                        % if entryType == 'contrib':
+                                            <a class="week-anchor" href="${url_for('event.contributionDisplay', confId=conf.getId(), contribId=entry.getId())}">
+                                        % endif
                                         <span class="main">
                                             <span class="title">${entry.getTitle()}</span>
                                             % if entryType == 'contrib':
@@ -157,21 +160,27 @@
                                                 % endif
                                             % endif
                                         </span>
+                                        % if entryType == 'contrib':
+                                            </a>
+                                        % endif
                                         <div class="tooltip hidden">
                                             <strong>${entry.getTitle()}</strong><br>
-                                            % if hasSession:
-                                                Session: ${sessionName}<br>
+                                            % if entryType == 'contrib' and (entry.getSpeakerList() or entry.getSpeakerText()):
+                                                 ${common.renderUsers(entry.getSpeakerList(), unformatted=entry.getSpeakerText(), title=False, spanClass='compact-speakers', italicAffilation=False, separator=' ')}<br>
                                             % endif
                                             ${startTime} - ${endTime}<br>
                                             % if entry.getRoom() and entry.getRoom().getName():
-                                                ${entry.getRoom().getName()}<br>
+                                                Room: ${entry.getRoom().getName()}<br>
+                                            % endif
+                                            % if hasSession:
+                                                Session: ${sessionName}<br>
                                             % endif
                                         </div>
                                         % if hasSession:
-                                            <i class="icon-circle-small session-mark" title="Session: ${sessionName}" data-qtip-opts='{"show":{"solo":true}}' style="color: ${sessionColor};"></i>
+                                            <i class="icon-circle-small session-mark" title="Session: ${sessionName}" data-qtip-opts='{"show":{"solo":true}, "style":{"classes":"informational"}}' style="color: ${sessionColor};"></i>
                                         % endif
                                         % if hasMulti:
-                                            <i class="icon-expand more-contribs" title="There are ${len(slotEntries)-1} more contributions at this time. Click this icon to show them." data-qtip-opts='{"show":{"solo":true}}'></i>
+                                            <i class="icon-expand more-contribs" title="There are ${len(slotEntries)-1} more contributions at this time. Click this icon to show them." data-qtip-opts='{"show":{"solo":true}, "style":{"classes":"informational"}}'></i>
                                         % endif
                                     </div>
                                 % endfor
@@ -211,8 +220,8 @@
             solo: true
         },
         position: {
-            my: 'top center',
-            at: 'bottom center'
+            my: 'center right',
+            at: 'center left'
         },
         style: {
             classes: 'informational'
