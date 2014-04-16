@@ -123,13 +123,8 @@ def _getInstallRequires():
 
     These are the ones needed for runtime.'''
 
-    base = ['ZODB3==3.10.5', 'zope.index==3.6.4', 'zope.interface==3.8.0',
-            'pytz', 'lxml', 'cds-indico-extras', 'zc.queue==1.3',
-            'python-dateutil<2.0', 'pypdf', 'mako==0.9.1', 'babel',
-            'icalendar==3.2', 'pyatom', 'jsmin', 'cssmin', 'webassets', 'pojson>=0.4',
-            'requests>=1.2.0', 'simplejson>=2.1.0', 'reportlab==2.5', 'Pillow', 'oauth2', 'pyscss==1.1.5', 'Werkzeug==0.9',
-            'Flask==0.10', 'bcrypt==1.0.2', 'beautifulsoup4==4.2.1', 'pycountry==1.2', 'Pillow==2.1.0', 'qrcode==3.0',
-            'markdown', 'bleach']
+    with open(os.path.join(os.path.dirname(__file__), 'requirements.txt'), 'r') as f:
+        base = [dep.strip() for dep in f.readlines() if not (dep.startswith('-') or '://' in dep)]
 
     #for Python older than 2.7
     if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
