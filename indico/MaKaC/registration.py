@@ -4185,7 +4185,7 @@ class SocialEventItem(Persistent, Fossilizable):
         if "maxPlace" in data:
             try:
                 maxPlace = int(data["maxPlace"])
-            except:
+            except ValueError:
                 maxPlace = 0
             if maxPlace < 0:
                 maxPlace = 0

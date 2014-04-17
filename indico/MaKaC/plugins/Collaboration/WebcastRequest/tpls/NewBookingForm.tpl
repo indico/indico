@@ -181,10 +181,10 @@
 
 % if IsLecture or NTalks > 0:
     <div class="WRFormSubsection">
-        <span class="WRQuestion">${_("Please select the audience of the webcast:")}</span>
+        <span class="WRQuestion">${_("Please choose the restriction to apply to the webcast:")}</span>
         <div>
             <select name="audience">
-                <option value="">${_("Public")}</option>
+                <option value="">${_("No restriction (the webcast is public, anyone can watch)")}</option>
                 % for audience in Audiences:
                     <option value=${ quoteattr(audience['name']) }>${ audience['name'] }</option>
                 % endfor
