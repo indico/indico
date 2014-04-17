@@ -24,7 +24,8 @@
 from MaKaC.common.fossilize import IFossil, Fossilizable, fossilizes, fossilize, \
     NonFossilizableException, addFossil,\
     InvalidFossilException
-import unittest
+from indico.tests.python.unit.util import IndicoTestCase
+
 
 class ISomeFossil(IFossil):
     pass
@@ -198,9 +199,10 @@ class ClassWithDifferentMethodNames(Fossilizable):
         pass
 
 
-class TestFossilize(unittest.TestCase):
+class TestFossilize(IndicoTestCase):
 
     def setUp(self):
+        super(TestFossilize, self).setUp()
         addFossil(SimpleClass, IDynamicFossil)
         self.s = SimpleClass(1, 'a', 'foo')
         self.c = ComplexClass()

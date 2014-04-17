@@ -21,15 +21,17 @@
 # pylint: disable-all
 
 
-import unittest
 import threading, time
 
 from MaKaC.common.contextManager import ContextManager, DummyDict
+from indico.tests.python.unit.util import IndicoTestCase
 
-class TestInitializedContextManager(unittest.TestCase):
+
+class TestInitializedContextManager(IndicoTestCase):
     "Context Manager - Properly Initialized"
 
     def tearDown(self):
+        super(TestInitializedContextManager, self).tearDown()
         ContextManager.destroy()
 
     def testGetWorks(self):
@@ -76,7 +78,7 @@ class TestInitializedContextManager(unittest.TestCase):
         self.assertEquals(ContextManager.get('samevariable').__class__, DummyDict)
 
 
-class TestUninitializedContextManager(unittest.TestCase):
+class TestUninitializedContextManager(IndicoTestCase):
     "Context Manager - Uninitialized"
 
     def testReturnsDummyDict(self):

@@ -21,20 +21,19 @@
 Tests for `indico.core.index` module
 """
 
-import unittest, zope.interface
+import zope.interface
 
 from indico.core.index.base import IIIndex, IOIndex, IUniqueIdProvider, \
      ElementNotFoundException, ElementAlreadyInIndexException
 
 
-from indico.core.db import DBMgr
-
-from persistent import Persistent
+from indico.tests.python.unit.util import IndicoTestCase
 
 
-class TestIIIndex(unittest.TestCase):
+class TestIIIndex(IndicoTestCase):
 
     def setUp(self):
+        super(TestIIIndex, self).setUp()
         self._idx = IIIndex()
 
     def testIndexOperation(self):
@@ -128,9 +127,10 @@ class DummyObject(object):
             return self._id / 10
 
 
-class TestIOIndex(unittest.TestCase):
+class TestIOIndex(IndicoTestCase):
 
     def setUp(self):
+        super(TestIOIndex, self).setUp()
         self._idx = IOIndex(IDummyAdapter)
 
     def _indexSomeElements(self):

@@ -21,11 +21,11 @@
 Tests for `indico.util.string` module
 """
 
-import unittest
+from indico.tests.python.unit.util import IndicoTestCase
 from indico.util.string import permissive_format, remove_extra_spaces, remove_tags, fix_broken_string
 
 
-class TestPermissiveFormat(unittest.TestCase):
+class TestPermissiveFormat(IndicoTestCase):
 
     def testTextParenthesesFormatting(self):
         params = dict(url="www.cern.ch", name="My Name", other="Nothing")
@@ -47,7 +47,8 @@ class TestPermissiveFormat(unittest.TestCase):
         for text, result in zip(texts, results):
             self.assertEqual(permissive_format(text, params), result)
 
-class TestRemoveTags(unittest.TestCase):
+
+class TestRemoveTags(IndicoTestCase):
 
     def testTextRemoveExtraSpaces(self):
         texts = ["Normal text",
@@ -77,7 +78,7 @@ class TestRemoveTags(unittest.TestCase):
             self.assertEqual(remove_tags(text), result)
 
 
-class TestDecodingEncoding(unittest.TestCase):
+class TestDecodingEncoding(IndicoTestCase):
 
     def testUnicodeDecoding(self):
         string_value = "mettre à l'essai"

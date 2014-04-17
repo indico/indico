@@ -19,8 +19,8 @@
 import unittest
 from indico.core.db import DBMgr
 from MaKaC.plugins.Collaboration.Vidyo.api.client import AdminClient, UserClient
-from MaKaC.i18n import _
 from MaKaC.plugins.Collaboration.Vidyo.tests.python.unit.vidyoTestTools import VidyoTestSetup
+from indico.tests.python.unit.util import IndicoTestCase
 
 
 def setUpModule():
@@ -32,7 +32,7 @@ def tearDownModule():
     DBMgr.getInstance().endRequest()
 
 
-class TestVidyoConnectivity(unittest.TestCase):
+class TestVidyoConnectivity(IndicoTestCase):
 
     def testAdminAPIConnectivity(self):
         raise unittest.SkipTest('Test disabled')

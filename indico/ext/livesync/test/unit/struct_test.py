@@ -17,14 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-
 from indico.ext.livesync.struct import ListMultiPointerTrack, SetMultiPointerTrack, \
      timestamp
 from indico.tests.python.unit.db import TestMemStorage
 
 import transaction
 from ZODB.POSException import ConflictError
+from indico.tests.python.unit.util import IndicoTestCase
 
 
 class DummyType(object):
@@ -45,9 +44,10 @@ class DummyType(object):
             return val
 
 
-class TestMultiPointerTrack(unittest.TestCase):
+class TestMultiPointerTrack(IndicoTestCase):
 
     def setUp(self):
+        super(TestMultiPointerTrack, self).setUp()
         self._mpt = ListMultiPointerTrack()
         self._a = DummyType(1)
         self._b = DummyType(2)
@@ -154,12 +154,13 @@ class TestMultiPointerTrack(unittest.TestCase):
         self.assertRaises(KeyError, self._mpt.movePointer, self._a, 1 )
 
 
-class TestSetMultiPointerTrack(unittest.TestCase):
+class TestSetMultiPointerTrack(IndicoTestCase):
 
     def _val(self, iter):
         return list(e._value for e in iter)
 
     def setUp(self):
+        super(TestSetMultiPointerTrack, self).setUp()
         self._mpt = SetMultiPointerTrack()
         self._a = DummyType(1  + 2)
         self._b = DummyType(2  + 2)
@@ -207,9 +208,10 @@ class TestSetMultiPointerTrack(unittest.TestCase):
                          [3, 4, 2, 3, 3])
 
 
-class TestSetMultiPointerTrackDB(unittest.TestCase):
+class TestSetMultiPointerTrackDB(IndicoTestCase):
 
     def setUp(self):
+        super(TestSetMultiPointerTrackDB, self).setUp()
 
         from ZODB import DB
         db = DB(TestMemStorage('test'))
