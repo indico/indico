@@ -5,7 +5,7 @@ URL Format
 ----------
 */export/event/search/TERM.TYPE*
 
-The TERM should be an string, e.g. "ichep"
+The TERM should be a string, e.g. "ichep"
 
 
 Results
