@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
- 
+
 {% block title %}{{ title }}{% endblock %}
 
 {% block head %}
@@ -13,155 +13,147 @@
 
 {% block body %}
 
-    <div class="form-title" style="background-image: url({{ system_icon('logoIndicoNew') }});">{{ title }}</div>
-
-    <div class="step-tracker">
-        <div id="tracker1">
-            <i class="icon-user"></i>
-        </div>
-        <div id="tracker2">
-            <i class="icon-earth"></i>
-        </div>
-        <div id="tracker3">
-            <i class="icon-mail"></i>
-        </div>
+    <div class="init-setup-header">
+        <img src="{{ system_icon('logoIndicoWhite') }}" class="header-logo">
+        <div class="header-title">{{ _("Hello there!") }}</div>
+        <div class="header-subtitle">{{ _("Indico needs just a little bit more data from you...") }}</div>
     </div>
 
-    <form id="initial-setup-form" action="" method="POST" style="width: 100%; height: 100%;">
+    <div class="initial-setup-body">
 
-        <div class="step-wrapper" id="step1">
+        <form id="initial-setup-form" class="init-setup-form" action="" method="POST">
 
-            <div class="center step-container">
+            <div class="step-wrapper" id="step1">
 
-                <div class="step-description">
-                    <div class="step-title">{{ steps[0].title }}</div>
-                    <div>{{ steps[0].description[0] }}</div>
-                    <div class="additional-information">{{ steps[0].description[1] }}</div>
+                <div id="tracker1" class="step-icon">
+                    <i class="icon-user"></i>
                 </div>
 
-                <div class="fields-container">
+                <div class="center step-container">
 
-                    <div>
-                        <input id="name" type="text" name="name" data-error-tooltip="{{ name.tooltip }}" value="{{ name.value }}" placeholder="{{ name.label }}" required>
+                    <h1 class="step-title">{{ _("Administrator Account") }}</h1>
+
+                    <div class="step-description">
+                        <div>{{ steps[0].description[0] }}</div>
+                        <div class="additional-information">{{ steps[0].description[1] }}</div>
                     </div>
 
-                    <div>
-                        <input id="surname" type="text" name="surname" data-error-tooltip="{{ surname.tooltip }}" value="{{ surname.value }}" placeholder="{{ surname.label }}" required>
-                    </div>
+                    <div class="fields-container">
 
-                    <div>
-                        <input id="user_email" type="email" name="user_email" data-error-tooltip="{{ user_email.tooltip.missing }}" data-error-tooltip2="{{ user_email.tooltip.invalid }}" value="{{ user_email.value }}" placeholder="{{ user_email.label }}" required>
-                    </div>
+                        <div>
+                            <input id="name" type="text" name="name" data-error-tooltip="{{ name.tooltip }}" value="{{ name.value }}" placeholder="{{ name.label }}" required>
+                        </div>
 
-                    <div>
-                        <input id="login" type="text" name="login" data-error-tooltip="{{ login.tooltip }}" value="{{ login.value }}" placeholder="{{ login.label }}" required>
-                    </div>
+                        <div>
+                            <input id="surname" type="text" name="surname" data-error-tooltip="{{ surname.tooltip }}" value="{{ surname.value }}" placeholder="{{ surname.label }}" required>
+                        </div>
 
-                    <div>
-                        <input id="password" type="password" name="password" data-error-tooltip="{{ password.tooltip }}" value="" placeholder="{{ password.label }}" required>
-                    </div>
+                        <div>
+                            <input id="user_email" type="email" name="user_email" data-error-tooltip="{{ user_email.tooltip.missing }}" data-error-tooltip2="{{ user_email.tooltip.invalid }}" value="{{ user_email.value }}" placeholder="{{ user_email.label }}" required>
+                        </div>
 
-                    <div>
-                        <input id="password_confirm" type="password" name="password_confirm" data-error-tooltip="{{ password_confirm.tooltip }}" value="" placeholder="{{ password_confirm.label }}" required>
-                    </div>
+                        <div>
+                            <input id="login" type="text" name="login" data-error-tooltip="{{ login.tooltip }}" value="{{ login.value }}" placeholder="{{ login.label }}" required>
+                        </div>
 
-                </div>
+                        <div>
+                            <input id="password" type="password" name="password" data-error-tooltip="{{ password.tooltip }}" value="" placeholder="{{ password.label }}" required>
+                        </div>
 
-            </div>
+                        <div>
+                            <input id="password_confirm" type="password" name="password_confirm" data-error-tooltip="{{ password_confirm.tooltip }}" value="" placeholder="{{ password_confirm.label }}" required>
+                        </div>
 
-            <div class="group">
-                <a id="nextStep1" class="i-button">
-                    {{ next_step }}
-                    <i class="icon-next"></i>
-                </a>
-            </div>
-
-        </div>
-
-        <div class="step-wrapper" id="step2">
-
-            <div class="center step-container">
-
-                <div class="step-description">
-                    <div class="step-title">{{ steps[1].title }}</div>
-                    <div>{{ steps[1].description[0] }}</div>
-                    <div class="additional-information">{{ steps[1].description[1] }}</div>
-                </div>
-
-                <div class="fields-container">
-
-                    <div>
-                        <label for="lang">{{ language.label }}</label>
-                        <select name="lang" id="lang">
-                            {% for code, lang in language.options -%}
-                                <option value="{{ code }}">{{ lang }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="timezone">{{ timezone.label }}</label>
-                        <select id="timezone" name="timezone">{{ timezone.options | safe }}</select>
-                    </div>
-
-                    <div>
-                        <input id="organisation" type="text" name="organisation" data-error-tooltip="{{ organisation.tooltip }}" value="{{ organisation.value }}" placeholder="{{ organisation.label }}" required>
                     </div>
 
                 </div>
 
             </div>
 
-            <div class="group">
-                <a id="nextStep2" class="i-button">
-                    {{ next_step }}
-                    <i class="icon-next"></i>
-                </a>
-                <a id="previousStep2" class="i-button icon-prev">{{ previous_step }}</a>
-            </div>
+            <div class="step-wrapper" id="step2">
 
-        </div>
-
-        <div class="step-wrapper" id="step3">
-
-            <div class="center step-container">
-
-                <div class="step-description">
-                    <div class="step-title">{{ steps[2].title }}</div>
-                        <div>{{ steps[2].description.first }}</div>
-                        <ul>
-                            <li>{{ steps[2].description.list[0] }}</li>
-                            <li>{{ steps[2].description.list[1] }}</li>
-                            <li>{{ steps[2].description.list[2] }}</li>
-                        </ul>
-                        <div class="additional-information">{{ steps[2].description.last }}</div>
+                <div id="tracker1" class="step-icon">
+                    <i class="icon-earth"></i>
                 </div>
 
-                <div class="fields-container">
+                <div class="center step-container">
 
-                    <div>
-                        <label for="enable">{{ enable.label }}</label>
-                        <input id="enable" type="checkbox" name="enable" value="1" {{ checked }} style="width: initial; margin-top: 6px;">
+                    <h1 class="step-title">{{ _("Indico site default parameters") }}</h1>
+
+                    <div class="step-description">
+                        <div>{{ steps[1].description[0] }}</div>
+                        <div class="additional-information">{{ steps[1].description[1] }}</div>
                     </div>
 
-                    <div>
-                        <input id="it_email" type="email" name="it_email" data-error-tooltip="{{ it_email.tooltip.missing }}" data-error-tooltip2="{{ it_email.tooltip.invalid }}" value="{{ it_email.value }}" placeholder="{{ it_email.label }}">
+                    <div class="fields-container">
+
+                        <div>
+                            <label for="lang">{{ language.label }}</label>
+                            <select name="lang" id="lang" class="input-lang">
+                                {% for code, lang in language.options -%}
+                                    <option value="{{ code }}">{{ lang }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="timezone">{{ timezone.label }}</label>
+                            <select id="timezone" name="timezone" class="input-timezone">{{ timezone.options | safe }}</select>
+                        </div>
+
+                        <div>
+                            <input id="organisation" type="text" name="organisation" data-error-tooltip="{{ organisation.tooltip }}" value="{{ organisation.value }}" placeholder="{{ organisation.label }}" required>
+                        </div>
+
                     </div>
 
                 </div>
 
             </div>
 
-            <div class="group">
-                <a id="submit-initial-setup" class="i-button green-button">
-                    {{ submit }}
-                    <i class="icon-checkmark"></i>
-                </a>
-                <a id="previousStep3" class="i-button icon-prev">{{ previous_step }}</a>
+            <div class="step-wrapper" id="step3">
+
+                <div id="tracker1" class="step-icon">
+                    <i class="icon-mail"></i>
+                </div>
+
+                <div class="center step-container">
+
+                    <h1 class="step-title">{{ _("Let us know you exist!") }}</h1>
+
+                    <div class="step-description">
+                            <div>{{ steps[2].description.first }}</div>
+                            <ul>
+                                <li>{{ steps[2].description.list[0] }}</li>
+                                <li>{{ steps[2].description.list[1] }}</li>
+                                <li>{{ steps[2].description.list[2] }}</li>
+                            </ul>
+                            <div class="additional-information">{{ steps[2].description.last }}</div>
+                    </div>
+
+                    <div class="fields-container">
+
+                        <div>
+                            <label for="enable">{{ enable.label }}</label>
+                            <input id="enable" type="checkbox" name="enable" value="1" {{ checked }} style="width: initial; margin-top: 6px;">
+                        </div>
+
+                        <div>
+                            <input id="it_email" type="email" name="it_email" data-error-tooltip="{{ it_email.tooltip.missing }}" data-error-tooltip2="{{ it_email.tooltip.invalid }}" value="{{ it_email.value }}" placeholder="{{ it_email.label }}">
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="center">
+                    <a id="submit-initial-setup" class="i-button blue-button">
+                        {{ submit }}
+                        <i class="icon-checkmark"></i>
+                    </a>
+                </div>
             </div>
 
-        </div>
-
-    </form>
+        </form>
+    </div>
 
 {% endblock %}
