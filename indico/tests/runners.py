@@ -165,8 +165,7 @@ class XMLOutputOption(Option):
 class NoseTestRunner(BaseTestRunner):
 
     def _buildArgs(self):
-        args = ['nose', '--nologcapture', '--logging-clear-handlers', \
-                '--with-id', '-s']
+        args = ['nose', '--nologcapture', '--logging-clear-handlers', '--with-id', '-s']
 
         # will set args
         self._callOptions('use_xml_output', 'unit', args)
