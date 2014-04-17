@@ -2,28 +2,31 @@
 @import 'base';
 
 $padding-top-step: 23%;
+$padding-top-title: 30px;
+$dark-blue-logo: #005272;
+$light-blue-logo: #00A4E4;
 
 .form-title {
     @extend %font-family-sans;
-    color: #005272;
+    color: $dark-blue-logo;
     position: fixed;
     width: 100%;
     top: 0;
-    background-color: $light-gray;
+    background-color: white;
     background-repeat: no-repeat;
     z-index: 1;
     font-size: 48px;
     display: block;
     text-align: center;
-    box-shadow: 0px 0px 10px 3px $black;
     height: 70px;
-    background-position: 20px 4px;
+    background-position: 20px $padding-top-title;
+    padding-top: $padding-top-title;
 }
 
 .step-tracker {
     position: fixed;
     width: 30px;
-    left: 50px;
+    left: 70px;
     z-index: 1;
     padding-top: $padding-top-step;
     font-size: 20px;
@@ -79,6 +82,7 @@ $padding-top-step: 23%;
             }
 
             .step-title {
+                @extend %font-family-sans;
                 font-weight: bold;
                 font-size: 18px;
             }
@@ -123,6 +127,14 @@ $padding-top-step: 23%;
             }
         }
     }
+}
+
+.light-blue-logo-icon {
+    color: $light-blue-logo;
+}
+
+.black-icon {
+    color: black;
 }
 
 body {

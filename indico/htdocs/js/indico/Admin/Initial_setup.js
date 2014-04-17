@@ -33,9 +33,7 @@ $(document).ready(function(){
 
     function checkTracker(step){
         var icon = $('#tracker'+ step +' i');
-        icon.removeClass('icon-radio-unchecked');
-        icon.addClass('icon-radio-checked');
-        icon.css('color', '#00A4E4');
+        icon.removeClass('black-icon').addClass('light-blue-logo-icon');
         if (!clicked[step-1]){
             icon.on('click', function(){
                 scrollToStep(step);
@@ -46,8 +44,7 @@ $(document).ready(function(){
 
     function uncheckTrackers(){
         var icons = $('.step-tracker div i');
-        icons.removeClass('icon-radio-checked').addClass('icon-radio-unchecked');
-        icons.css('color', 'black');
+        icons.removeClass('light-blue-logo-icon').addClass('black-icon');
     }
 
     function markValidField(field){
