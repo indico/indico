@@ -40,6 +40,7 @@ from indico.util.console import colored
 from indico.util.shell import WerkzeugServer
 from indico.util.contextManager import ContextManager
 from indico.web.flask.app import make_app
+from indico.web.assets import core_env
 from indico.tests.config import TestConfig
 from indico.tests.base import TestOptionException, FakeMailThread
 from indico.tests.runners import *
@@ -208,6 +209,14 @@ class TestManager(object):
 
         Config.setInstance(config)
         self._cfg = config
+
+        # Update assets environment
+        core_env.directory = core_env.directory.replace('/opt/indico/htdocs', config.getHtdocsDir())
+        core_env.load_path = [path.replace('/opt/indico/htdocs', config.getHtdocsDir()) for path in core_env.load_path]
+        core_env.url_mapping = {path.replace('/opt/indico/htdocs', config.getHtdocsDir()): url for path, url in
+                                core_env.url_mapping.iteritems()}
+        core_env.config['PYSCSS_LOAD_PATHS'] = [x.replace('/opt/indico/htdocs', config.getHtdocsDir()) for x in
+                                                core_env.config['PYSCSS_LOAD_PATHS']]
 
         # re-configure logging and template generator, so that paths are updated
         from MaKaC.common import TemplateExec
