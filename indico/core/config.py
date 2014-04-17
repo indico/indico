@@ -149,7 +149,7 @@ class Config:
                      "arrowRightMenuConfSelected": "arrowRightMenuConfSelected.png",
                      "bulletMenuConf": "bulletMenuConf.png",
                      "logoIndico": "logo_indico.png",
-                     "logoIndicoNew": "logo_indico_new.png",
+                     "logoIndicoWhite": "logo_indico_white.png",
                      "indico_small": "indico_small.png",
                      "indico_co": "indico_co.png",
                      "login": "pict_login.png",
