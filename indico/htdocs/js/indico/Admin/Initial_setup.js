@@ -93,61 +93,6 @@ $(document).ready(function(){
         it_email.val('');
     }
 
-    $('#nextStep1').on('click', function(){
-        ok = true;
-        $('#step1 :input:not(#password_confirm)').on('input', function(){
-            if (!this.validity.valid){
-                if (this.id == 'user_email'){
-                    if (this.validity.valueMissing){
-                        $(this).qtip('option', 'content.attr', "data-error-tooltip");
-                    }
-                    else{
-                        $(this).qtip('option', 'content.attr', "data-error-tooltip2");
-                    }
-                }
-                markInvalidField($(this));
-                ok = false;
-            }
-            else{
-                markValidField($(this));
-            }
-        }).trigger('input');
-        $('#password, #password_confirm').on('input', function(){
-            var password = $('#password'),
-                password_confirm = $('#password_confirm');
-            if (password.val() != password_confirm.val()) {
-                markInvalidField(password_confirm);
-                ok = false;
-            }
-            else {
-                markValidField(password_confirm);
-            }
-        }).trigger('input');
-        $('#initial-setup-form input').trigger('hideTooltip');
-
-        if (ok){
-            scrollToStep(2);
-        }
-    });
-
-    $('#nextStep2').on('click', function(){
-        ok = true;
-        $('#step2 :input').on('input', function(){
-            if (!this.validity.valid){
-                markInvalidField($(this));
-                ok = false;
-            }
-            else{
-                markValidField($(this));
-            }
-        }).trigger('input');
-        $('#initial-setup-form input').trigger('hideTooltip');
-
-        if (ok){
-            scrollToStep(3);
-        }
-    });
-
     $('#submit-initial-setup').on('click', function(e){
         e.preventDefault();
 
@@ -162,14 +107,6 @@ $(document).ready(function(){
         if (ok){
             $('#initial-setup-form').submit();
         }
-    });
-
-    $('#previousStep2').on('click', function(){
-        scrollToStep(1);
-    });
-
-    $('#previousStep3').on('click', function(){
-        scrollToStep(2);
     });
 
     var nav_lang = navigator.language || navigator.userLanguage;
@@ -222,20 +159,7 @@ $(document).ready(function(){
         $(this).trigger('hideTooltip');
     });
 
-    scrollToElem($('#step1'));
-    checkTracker(1);
+    //scrollToElem($('#step1'));
+    //checkTracker(1);
 
-    for (var i=1; i<=3; i++){
-        var icon = $('#tracker'+ i +' i');
-        var stepTitle = $('#step'+ i +' div.step-container div.step-description div.step-title')
-        icon.qtip({
-            content: {
-                text: stepTitle.text()
-            },
-            position: {
-                at: 'right center',
-                my: 'left center'
-            }
-        });
-    }
 });

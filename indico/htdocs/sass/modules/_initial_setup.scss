@@ -5,38 +5,88 @@ $padding-top-step: 23%;
 $padding-top-title: 30px;
 $dark-blue-logo: #005272;
 $light-blue-logo: #00A4E4;
+$init-setup-font-family: "Maven Pro"
 
-.form-title {
-    @extend %font-family-sans;
-    color: $dark-blue-logo;
+#logo-indico path {
+    fill: white;
+}
+
+.init-setup-header {
+    font-family: $init-setup-font-family;
+    color: #005272;
     position: fixed;
     width: 100%;
     top: 0;
-    background-color: white;
+    background-color: $dark-blue-logo;
     background-repeat: no-repeat;
-    z-index: 1;
-    font-size: 48px;
     display: block;
     text-align: center;
-    height: 70px;
-    background-position: 20px $padding-top-title;
-    padding-top: $padding-top-title;
+    height: 350px;
+    background-position: 20px 20px;
+    font-weight: bolder;
+    padding-top: 20px;
+    z-index: 1;
+
+    .header-logo {
+        height: 50%;
+        color: white;
+
+    }
+
+    .header-title {
+        font-size: 54px;
+        color: $light-blue-logo;
+    }
+
+    .header-subtitle{
+        color: white;
+        font-size: 26px;
+    }
 }
 
-.step-tracker {
-    position: fixed;
-    width: 30px;
-    left: 70px;
-    z-index: 1;
-    padding-top: $padding-top-step;
-    font-size: 20px;
 
-    div {
-        padding-bottom: 70px;
+.initial-setup-body:before, .initial-setup-body:after {
+    content: "";
+    display: table;
+    line-height: 0;
+}
 
-        i {
-            cursor: pointer;
-        }
+.initial-setup-body {
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 300px;
+    padding-bottom: 50px;
+    max-width: 1140px;
+    width: 100%;
+    background: white;
+    border-left: 3px #005272 solid;
+    font-family: $init-setup-font-family
+}
+
+.init-setup-form {
+    width: 100%;
+    height: 100%;
+}
+
+.step-icon {
+    float: left;
+    margin-top: 1em;
+    margin-left: -50px;
+    border: 5px solid white;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: #005272;
+    width: 100px;
+    height: 100px;
+    padding: 0px;
+
+    i {
+        color: white;
+        top: 20px;
+        left: 20px;
+        position: relative;
+        font-size: 50px;
+        z-index: 0;
     }
 }
 
@@ -44,51 +94,51 @@ $light-blue-logo: #00A4E4;
     height: 100%;
     width: 100%;
     color: $black;
+    padding-top: 75px;
 
     div {
         @include clearfix;
     }
 
-    .group {
-        margin-top: 100px;
-        margin-right: 10%;
+    .blue-button {
+        margin-top: 50px;
+        font-size: 2em;
+        background-color: $dark-blue-logo !important;
+        color: white !important;
 
-        .i-button {
-            float: right;
-        }
-
-        .green-button {
-            color: $green !important;
-
-            &:hover:not(.disabled):not(:disabled) {
-                color: darken($green, 5%) !important;
-            }
+        &:hover:not(.disabled):not(:disabled) {
+            background-color: $dark-blue-logo !important;
+            color: darken(white, 5%) !important;
         }
     }
 
     .step-container {
         width: 85%;
-        padding-top: $padding-top-step;
         text-align: left;
+
+        .step-title {
+            font-family: $init-setup-font-family;
+            color: #005272;
+            font-weight: bold;
+            padding-left: 10%;
+            font-size: 4em;
+            padding-bottom: 30px;
+        }
 
         .step-description {
             float: left;
             width: 30%;
             padding-left: 10%;
-            font-size: 15px;
+            font-size: 20px;
+            color: #555555;
+            text-align: justify;
 
             div {
                 padding-bottom: 1em;
             }
 
-            .step-title {
-                @extend %font-family-sans;
-                font-weight: bold;
-                font-size: 18px;
-            }
-
             .additional-information {
-                color: #AAAAAA;
+                color: #D3D3D3;
             }
         }
 
@@ -101,12 +151,11 @@ $light-blue-logo: #00A4E4;
             }
 
             label, input, select {
-                float: left;
                 margin-bottom: 20px;
             }
 
             input, select {
-                font-size: 20px;
+                font-size: 30px;
             }
 
             label {
@@ -115,31 +164,36 @@ $light-blue-logo: #00A4E4;
                 padding-right: 3%;
                 margin-top: 6px;
                 font-weight: normal;
-                font-size: 18px;
+                font-size: 1.8em;
             }
 
             input {
                 width: 80%;
-            }
-
-            input {
                 box-shadow: none;
             }
+
+            /* Grouping does not work for some reason */
+            input::-webkit-input-placeholder {
+                color: #BEBEBE;
+            }
+
+            input::-moz-placeholder {
+                color: #BEBEBE;
+            }
+
+            input:-moz-placeholder {  /* Older versions of Firefox */
+                color: #BEBEBE;
+            }
+
+            input:-ms-input-placeholder {
+                color: #BEBEBE;
+            }
+
+            .input-timezone, .input-lang {
+                width: 272px;
+                font-size: 25px;
+            }
+
         }
     }
-}
-
-.light-blue-logo-icon {
-    color: $light-blue-logo;
-}
-
-.black-icon {
-    color: black;
-}
-
-body {
-    overflow-y: hidden;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
 }
