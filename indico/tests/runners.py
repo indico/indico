@@ -174,7 +174,7 @@ class NoseTestRunner(BaseTestRunner):
         specific = self.options.valueOf('specify')
 
         if specific:
-            args.append(specific)
+            args += specific.split(',')
         else:
             args.append(os.path.join(self.setupDir, self._defaultPath))
 

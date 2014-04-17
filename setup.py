@@ -353,7 +353,7 @@ class test_indico(test.test):
         if self.jsspecify and 'jsunit' not in testsToRun:
             testsToRun.append('jsunit')
 
-        if testsToRun == []:
+        if not testsToRun:
             testsToRun = allTests
         self.testsToRun = testsToRun
 
