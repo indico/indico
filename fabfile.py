@@ -349,7 +349,7 @@ def setup_deps(n_env=None, n_version=None, src_dir=None, system_node=None):
 
     src_dir = src_dir or env.src_dir
     n_env = n_env or env.node_env_path
-    system_node = system_node if system_node is not None else env.system_node
+    system_node = system_node.lower() in ('1', 'true') if system_node is not None else env.system_node
 
     # initialize submodules if they haven't yet been
     init_submodules(src_dir)
