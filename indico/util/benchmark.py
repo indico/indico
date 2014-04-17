@@ -36,7 +36,7 @@ class Benchmark(object):
         if self._start_time is None:
             return float('-inf')  # not started
         elif self._end_time is None:
-            return float('int')  # not finished
+            return float('inf')  # not finished
         return self._end_time - self._start_time
 
     def __str__(self):
