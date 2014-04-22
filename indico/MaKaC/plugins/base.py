@@ -349,7 +349,7 @@ class PluginsHolder (ObjectHolder):
         PluginLoader.loadPlugins()
         self.updateAllPluginInfo()
 
-    def reloadAllPlugins(self, skip_disabling=False):
+    def reloadAllPlugins(self, disable_if_broken=True):
         """ Reloads all plugins and updates their information
         """
 
@@ -357,7 +357,7 @@ class PluginsHolder (ObjectHolder):
         self.getById("ajaxMethodMap").cleanAJAXDict()
         self.getById("RHMap").cleanRHDict()
         PluginLoader.reloadPlugins()
-        self.updateAllPluginInfo(skip_disabling)
+        self.updateAllPluginInfo(disable_if_broken)
         self.getComponentsManager().registerAllComponents()
 
     def reloadPluginType(self, pluginTypeName):
@@ -370,7 +370,7 @@ class PluginsHolder (ObjectHolder):
         else:
             raise PluginError("Error while trying to reload plugins of the type: " + pluginTypeName + ". Plugins of the type " + pluginTypeName + "do not exist")
 
-    def updateAllPluginInfo(self, skip_disabling=False):
+    def updateAllPluginInfo(self, disable_if_broken=True):
         """ Updates the info about plugins in the DB
             We must keep if plugins are active or not even between reloads
             and even if plugins are removed from the file system (they may
@@ -396,14 +396,12 @@ class PluginsHolder (ObjectHolder):
             # if there are dependencies missing, set as not usable
             if missingDeps:
                 ptype.setUsable(False, reason="Dependencies missing: {0}".format(missingDeps))
-                if skip_disabling:
-                    ptype.setActive(True, trigger_reload=False)
-                elif ptype.isActive():
+                if disable_if_broken:
                     ptype.setActive(False)
             else:
                 ptype.setUsable(True)
 
-            ptype.updateInfo(skip_disabling)
+            ptype.updateInfo(disable_if_broken)
 
     def clearPluginInfo(self):
         """ Removes all the plugin information from the DB
@@ -782,7 +780,7 @@ class PluginType (PluginBase):
     def configureFromMetadata(self, metadata):
         self.__name = metadata['name']
 
-    def _updatePluginInfo(self, pid, pluginModule, metadata, skip_disabling=False):
+    def _updatePluginInfo(self, pid, pluginModule, metadata, disable_if_broken=True):
 
         if self.hasPlugin(pid):
             p = self.getPlugin(pid)
@@ -804,9 +802,7 @@ class PluginType (PluginBase):
 
         if missingDeps:
             p.setUsable(False, reason="Dependencies missing: {0}".format(missingDeps))
-            if skip_disabling:
-                p.setActive(True)
-            elif p.isActive():
+            if disable_if_broken:
                 p.setActive(False)
         else:
             p.setUsable(True)
@@ -827,7 +823,7 @@ class PluginType (PluginBase):
         self._updateHandlerInfo(p, pluginModule)
         self._updateRHMapInfo(p, pluginModule)
 
-    def updateInfo(self, skip_disabling=False):
+    def updateInfo(self, disable_if_broken=True):
         """
         Will update the information in the DB about this plugin type.
         """
@@ -848,7 +844,7 @@ class PluginType (PluginBase):
             if metadata['ignore']:
                 continue
             else:
-                self._updatePluginInfo(pluginModule.__plugin_id__, pluginModule, metadata, skip_disabling=skip_disabling)
+                self._updatePluginInfo(pluginModule.__plugin_id__, pluginModule, metadata, disable_if_broken=disable_if_broken)
 
         ptypeModule = self.getModule()
         ptypeMetadata = processPluginMetadata(ptypeModule)
@@ -1033,10 +1029,9 @@ class PluginType (PluginBase):
             self._active = False
         return self._active
 
-    def setActive(self, value, trigger_reload=True):
+    def setActive(self, value):
         self._active = value
-        if trigger_reload:
-            PluginsHolder().reloadAllPlugins()
+        PluginsHolder().reloadAllPlugins()
 
     def toggleActive(self):
         if not self.isActive():

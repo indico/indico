@@ -360,7 +360,7 @@ def catalogMigration(dbi, withRBDB, prevVersion):
     """
     Initializing/updating index catalog
     """
-    PluginsHolder().reloadAllPlugins(skip_disabling=True)
+    PluginsHolder().reloadAllPlugins(disable_if_broken=False)
     skipped = False
 
     for plugin in (p for p in PluginsHolder().getList() if isinstance(p, Plugin) or isinstance(p, PluginType)):
@@ -371,7 +371,6 @@ def catalogMigration(dbi, withRBDB, prevVersion):
     if skipped and not console.yesno('\r  Do you want to continue the migration anyway?'):
         sys.exit(1)
 
-    PluginsHolder().reloadAllPlugins()
     Catalog.updateDB(dbi=dbi)
 
 
