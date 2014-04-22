@@ -2,11 +2,8 @@ language: python
 python:
   - "2.7"
 env:
-  global:
-    - INDICO_SKIP_SLOW_TESTS=1
-  matrix:
-    - TEST_SUITE=unit
-    - TEST_SUITE=functional
+  - TEST_SUITE=unit
+  - TEST_SUITE=functional
 before_install:
   - '[[ "$TEST_SUITE" == "functional" ]] && export DISPLAY=:99.0 || :'
   - '[[ "$TEST_SUITE" == "functional" ]] && /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -ac -screen 0 1280x1024x16 || :'
