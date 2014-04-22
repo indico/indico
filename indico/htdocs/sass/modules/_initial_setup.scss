@@ -115,15 +115,15 @@ $init-setup-font-family: "Maven Pro"
                     font-family: $init-setup-font-family;
                     color: #005272;
                     font-weight: bold;
-                    padding-left: 10%;
+                    padding-left: 2%;
                     font-size: 4em;
                     padding-bottom: 30px;
                 }
 
                 .step-description {
                     float: left;
-                    width: 30%;
-                    padding-left: 10%;
+                    width: 40%;
+                    padding-left: 2%;
                     font-size: 20px;
                     color: #555555;
                     text-align: justify;
@@ -189,22 +189,79 @@ $init-setup-font-family: "Maven Pro"
                         font-size: 25px;
                     }
 
+                    .enable-line {
+                        margin-bottom: 60px;
+
+                        input {
+                            display: none;
+                        }
+
+                        .toggle-button {
+                            -webkit-box-sizing: border-box;
+                            border: 1px solid #999;
+                            box-shadow: 0 0 5px rgba(100,100,100,0.3) inset;
+                            width: 7em;
+                            display: block;
+                            background: #ddd;
+                            height: 3em;
+                            cursor: pointer;
+                            position: absolute;
+
+                            .toggle {
+                                -webkit-box-sizing: border-box;
+                                position: absolute;
+                                left: 0px;
+                                -webkit-transition: left background-color border-color;
+                                -webkit-transition-duration: .25s;
+                                width: 50%;
+                                height: 100%;
+                                background: #aaa;
+                                text-align: center;
+                                border: 1px solid #888
+                            }
+
+                            .toggle::before {
+                                color: #666;
+                                display: inline-block;
+                                font-size: 1.6em;
+                                content: "NO";
+                                line-height: 1.6em;
+                            }
+                        }
+
+                        .toggle-button.toggled {
+                            .toggle {
+                                box-shadow: 0 0 1px rgba(255,255,255,0.8) inset;
+                                background-color: $light-blue-logo;
+                                border-color: lighten($dark-blue-logo, $color-variation);
+                                left: 3.5em;
+                            }
+
+                            .toggle::before {
+                                content: "YES";
+                                color: #eee !important;
+                            }
+                        }
+                    }
                 }
             }
 
             .blue-button {
                 margin-top: 50px;
-                font-size: 2em;
+                font-size: 3em;
                 background-color: $light-blue-logo !important;
                 color: darken(white, 5%) !important;
+                border-color: lighten($dark-blue-logo, $color-variation);
 
                 &:hover:not(.disabled):not(:disabled) {
                     @include gradient(lighten($light-blue-logo, $color-variation), $light-blue-logo);
                     color: white !important;
+                    border-color: $dark-blue-logo;
                 }
 
                 &:active:not(.disabled):not(:disabled) {
                     @include gradient($light-blue-logo, lighten($light-blue-logo, $color-variation));
+                    border-color: lighten($dark-blue-logo, $color-variation);
                 }
             }
         }

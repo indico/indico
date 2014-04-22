@@ -35,7 +35,7 @@
 
                     <div class="step-description">
                         <div>{{ _('Insert here all the basic informations needed to create your admin account.') }}</div>
-                        <div class="additional-information">{{ _('You can update your account with all the secondary informations (like your address or phone number) in a second moment by accessing the account management (My Profile, Account Details).') }}</div>
+                        <div class="additional-information">{{ _('You can update your account with all the secondary information (like your address or phone number) in a second moment by accessing the account management (My Profile, Account Details).') }}</div>
                     </div>
 
                     <div class="fields-container">
@@ -128,13 +128,15 @@
 
                     <div class="fields-container">
 
-                        <div>
-                            <label for="enable">{{ _('Enable') }}</label>
-                            <input id="enable" type="checkbox" name="enable" value="1" {{ checked }} style="width: initial; margin-top: 6px;">
+                        <div class="enable-line">
+                            <input id="enable" type="checkbox" name="enable" value="1" {{ checked }}>
+                            <div class="toggle-button">
+                                <div class="toggle"></div>
+                            </div>
                         </div>
 
                         <div>
-                            <input id="it_email" type="email" name="it_email" data-error-tooltip="{{ _('You must enter an e-mail for Instance Tracking') }}" data-error-tooltip2="{{ _('You must enter a valid e-mail for Instance Tracking') }}" value="{{ it_email_value }}" placeholder="{{ _('Email') }}">
+                            <input id="it_email" type="email" name="it_email" data-error-tooltip="{{ _('You must enter an e-mail for Instance Tracking') }}" data-error-tooltip2="{{ _('You must enter a valid e-mail for Instance Tracking') }}" value="{{ it_email_value }}" placeholder="{{ _('Contact email') }}">
                         </div>
 
                     </div>
@@ -142,23 +144,12 @@
                 </div>
                 <div class="center">
                     <a id="submit-initial-setup" class="i-button blue-button">
-                        {{ _('Submit') }}
-                        <i class="icon-checkmark"></i>
+                        {{ _('Finish') }}
                     </a>
                 </div>
             </div>
 
         </form>
     </div>
-
-<script>
-$(window).scroll(function(){
-if (($(window).scrollTop() >= $('.init-setup-header').outerHeight()/2) && !$('.init-setup-header').hasClass('mini')) {
-    $('.init-setup-header').addClass('mini');
-    $('.init-setup-body').addClass('mini');
-    $(window).scrollTop(0);
-}
-});
-</script>
 
 {% endblock %}
