@@ -19,7 +19,7 @@
         <div class="header-subtitle">{{ _('Indico needs just a little bit more data from you...') }}</div>
     </div>
 
-    <div class="initial-setup-body">
+    <div class="init-setup-body">
 
         <form class="init-setup-form" id="initial-setup-form" action="" method="POST">
 
@@ -150,5 +150,15 @@
 
         </form>
     </div>
+
+<script>
+$(window).scroll(function(){
+if (($(window).scrollTop() >= $('.init-setup-header').outerHeight()/2) && !$('.init-setup-header').hasClass('mini')) {
+    $('.init-setup-header').addClass('mini');
+    $('.init-setup-body').addClass('mini');
+    $(window).scrollTop(0);
+}
+});
+</script>
 
 {% endblock %}

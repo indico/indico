@@ -8,18 +8,16 @@ $init-setup-font-family: "Maven Pro"
 .init-setup-header {
     font-family: $init-setup-font-family;
     color: #005272;
-    position: fixed;
     width: 100%;
-    top: 0;
     background-color: $dark-blue-logo;
     background-repeat: no-repeat;
     display: block;
     text-align: center;
-    height: 350px;
     background-position: 20px 20px;
     font-weight: bolder;
     padding-top: 20px;
     z-index: 1;
+    height: 350px;
 
     .header-logo {
         height: 50%;
@@ -36,26 +34,42 @@ $init-setup-font-family: "Maven Pro"
         color: white;
         font-size: 26px;
     }
+
+    &.mini {
+        position:fixed;
+        top: 0;
+        height: 120px;
+        text-align: left;
+        .header-logo {
+            float: left;
+            height: 75%;
+            margin-left: 50px;
+            padding-right: 30px;
+        }
+    }
 }
 
-
-.initial-setup-body:before, .initial-setup-body:after {
+.init-setup-body:before, .init-setup-body:after {
     content: "";
     display: table;
     line-height: 0;
 }
 
-.initial-setup-body {
+.init-setup-body {
     margin-left: auto;
     margin-right: auto;
-    padding-top: 300px;
+    padding-top: 30px;
     padding-bottom: 50px;
     min-width: 800px;
     max-width: 1140px;
     width: 100%;
     background: white;
     border-left: 3px #005272 solid;
-    font-family: $init-setup-font-family
+    font-family: $init-setup-font-family;
+
+    &.mini {
+        margin-top: 120px;
+    }
 
     .init-setup-form {
         width: 100%;
