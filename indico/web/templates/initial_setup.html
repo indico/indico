@@ -128,9 +128,11 @@
 
                     <div class="fields-container">
 
-                        <div>
-                            <label for="enable">{{ _('Enable') }}</label>
-                            <input id="enable" type="checkbox" name="enable" value="1" {{ checked }} style="width: initial; margin-top: 6px;">
+                        <div class="enable-line">
+                            <input id="enable" type="checkbox" name="enable" value="1" {{ checked }}>
+                            <div class="toggle-button">
+                                <div class="toggle"></div>
+                            </div>
                         </div>
 
                         <div>

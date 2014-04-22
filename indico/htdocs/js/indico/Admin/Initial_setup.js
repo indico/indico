@@ -170,4 +170,20 @@ $(document).ready(function(){
         }
     });
 
+    $('.toggle-button').on('click', function() {
+        $(this).toggleClass('toggled');
+        var toggled = $(this).hasClass('toggled');
+        var itEmail = $('#it_email');
+        var checkbox = $('#enable');
+        itEmail.prop('required', toggled);
+        itEmail.prop('disabled', !toggled);
+        checkbox.prop('checked', toggled);
+        if (toggled){
+            fillITEmail();
+        }
+        else{
+            emptyITEmail();
+        }
+    });
+
 });
