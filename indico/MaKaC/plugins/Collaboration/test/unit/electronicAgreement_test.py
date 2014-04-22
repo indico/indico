@@ -26,6 +26,7 @@ from MaKaC.user import Avatar
 from MaKaC.conference import AvatarHolder, AdminList, Contribution,\
     timezone, datetime, ContributionParticipation, Session, SessionSlot, ConferenceHolder
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from MaKaC.plugins.base import RHMapMemory
 from MaKaC.plugins.Collaboration.services import SetSpeakerEmailAddress, SendElectronicAgreement,\
     RejectElectronicAgreement, AcceptElectronicAgreement
 from MaKaC import conference
@@ -39,6 +40,7 @@ class Collaboration_Feature(IndicoTestFeature):
     def start(self, obj):
         super(Collaboration_Feature, self).start(obj)
         with obj._context('database'):
+            RHMapMemory._iInstance = None
             obj._ph.getPluginType('Collaboration').toggleActive()
 
     def destroy(self, obj):
