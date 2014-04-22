@@ -186,4 +186,7 @@ $(document).ready(function(){
         }
     });
 
+    if ($('#enable').prop('checked')){
+        $('.toggle-button').trigger('click');
+    }
 });
