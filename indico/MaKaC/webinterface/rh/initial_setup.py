@@ -64,69 +64,8 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
         timezone_options = TimezoneRegistry.getShortSelectItemsHTML(tz)
         language_options = getLocaleDisplayNames()
 
-        wvars = {'title': _('Initial Setup'),
-
-                 'steps': [{'title': _('User creation'),
-                            'description': [_('Insert here all the basic informations needed to ' +
-                                              'create your admin account.'),
-                                            _('You can update your account with all the secondary ' +
-                                              'informations (like your address or phone number) in a ' +
-                                              'second moment by accessing the account management ' +
-                                              '(My Profile, Account Details).')]},
-                           {'title': _('Server settings'),
-                            'description': [_('Configure here your server settings.'),
-                                            _('All the informations set here will also be used to fill ' +
-                                              'your personal account information. To change these informations ' +
-                                              'you can later head to Server Admin, General Settings (will change ' +
-                                              'the server settings) or My Profile, Account Details (will change ' +
-                                              'the account settings).')]},
-                           {'title': _('Instance Tracking'),
-                            'description': {'first': _('By enabling the Instance Tracking Terms you accept:'),
-                                            'list': [_('sending anonymous statistic data to Indico@CERN;'),
-                                                     _('receiving security warnings from the Indico team;'),
-                                                     _('receiving a notification when a new version is released.')],
-                                            'last': _('Please note that no private information will ever be sent to ' +
-                                                      'Indico@CERN and that you will be able to change the Instance ' +
-                                                      'Tracking settings anytime in the future (from Server ' +
-                                                      'Admin, General Settings).')}}],
-
-                 'next_step': _('Next step'),
-                 'previous_step': _('Previous step'),
-                 'submit': _('Submit'),
-
-                 'name': {'label': _('First name'),
-                          'tooltip': _('You must enter a name')},
-
-                 'surname': {'label': _('Family name'),
-                             'tooltip': _('You must enter a surname')},
-
-                 'user_email': {'label': _('Email'),
-                                'tooltip': {'missing': _('You must enter your user e-mail address'),
-                                            'invalid': _('You must enter a valid e-mail address')}},
-
-                 'login': {'label': _('Login'),
-                           'tooltip': _('You must enter a login')},
-
-                 'password': {'label': _('Password'),
-                              'tooltip': _('You must define a password')},
-
-                 'password_confirm': {'label': _('Password (again)'),
-                                      'tooltip': _('You must enter the same password twice')},
-
-                 'language': {'label': _('Language'),
-                              'options': language_options},
-
-                 'timezone': {'label': _('Timezone'),
-                              'options': timezone_options},
-
-                 'organisation': {'label': _('Organization'),
-                                  'tooltip': _('You must enter the name of your organization')},
-
-                 'enable': {'label': _('Enable')},
-
-                 'it_email': {'label': _('Email'),
-                              'tooltip': {'missing': _('You must enter an e-mail for Instance Tracking'),
-                                          'invalid': _('You must enter a valid e-mail for Instance Tracking')}}}
+        wvars = {'language_options': language_options,
+                 'timezone_options': timezone_options}
 
         return render_template('initial_setup.html', **wvars)
 
