@@ -162,4 +162,12 @@ $(document).ready(function(){
     //scrollToElem($('#step1'));
     //checkTracker(1);
 
+    $(window).scroll(function(){
+        if (($(window).scrollTop() >= $('.init-setup-header').outerHeight()/2) && !$('.init-setup-header').hasClass('mini')) {
+            $('.init-setup-header').addClass('mini');
+            $('.init-setup-body').addClass('mini');
+            $(window).scrollTop(0);
+        }
+    });
+
 });
