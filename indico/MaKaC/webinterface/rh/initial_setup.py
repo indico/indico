@@ -63,6 +63,9 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
         tz = str(get_localzone())
         timezone_options = TimezoneRegistry.getShortSelectItemsHTML(tz)
         language_options = getLocaleDisplayNames()
+        for code in language_options:
+            language_options.remove(code)
+            language_options.append((code[0], code[1][0].upper()+code[1][1:]))
 
         wvars = {'language_options': language_options,
                  'timezone_options': timezone_options}
