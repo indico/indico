@@ -570,7 +570,7 @@ if __name__ == '__main__':
           include_package_data=True,
           namespace_packages=['indico', 'indico.ext'],
           install_requires=_getInstallRequires(),
-          tests_require=['nose', 'rednose', 'twill', 'selenium', 'figleaf'],
+          tests_require=['nose', 'rednose', 'twill', 'selenium', 'figleaf', 'contextlib2'],
           data_files=dataFiles,
           dependency_links=DEPENDENCY_URLS
           )

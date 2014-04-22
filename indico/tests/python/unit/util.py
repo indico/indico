@@ -22,6 +22,8 @@ Some utils for unit tests
 """
 
 # system imports
+from contextlib import contextmanager
+from contextlib2 import ExitStack
 from flask import session
 from functools import wraps
 import os
@@ -203,17 +205,12 @@ class IndicoTestCase(unittest.TestCase, FeatureLoadingObject):
 
     @contextlib.contextmanager
     def _context(self, *contexts, **kwargs):
-        ctxs = []
-        res = []
-        for ctxname in contexts:
-            ctx = getattr(self, '_context_%s' % ctxname)(**kwargs)
-            res.append(ctx.next())
-            ctxs.append(ctx)
-
-        yield res if len(res) > 1 else res[0]
-
-        for ctx in ctxs[::-1]:
-            ctx.next()
+        with ExitStack() as stack:
+            res = []
+            for ctxname in contexts:
+                ctx = contextmanager(getattr(self, '_context_%s' % ctxname))
+                res.append(stack.enter_context(ctx(**kwargs)))
+            yield res if len(res) > 1 else res[0]
 
     def run(self, result=None):
         res = super(IndicoTestCase, self).run(result)
