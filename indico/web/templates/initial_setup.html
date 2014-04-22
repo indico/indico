@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ title }}{% endblock %}
+{% block title %}{{ _('Initial Setup') }}{% endblock %}
 
 {% block head %}
     {% assets 'indico_initial_setup' -%}
@@ -14,54 +14,54 @@
 {% block body %}
 
     <div class="init-setup-header">
-        <img src="{{ system_icon('logoIndicoWhite') }}" class="header-logo">
-        <div class="header-title">{{ _("Hello there!") }}</div>
-        <div class="header-subtitle">{{ _("Indico needs just a little bit more data from you...") }}</div>
+        <img class="header-logo" src="{{ system_icon('logoIndicoWhite') }}">
+        <div class="header-title">{{ _('Hello there!') }}</div>
+        <div class="header-subtitle">{{ _('Indico needs just a little bit more data from you...') }}</div>
     </div>
 
     <div class="initial-setup-body">
 
-        <form id="initial-setup-form" class="init-setup-form" action="" method="POST">
+        <form class="init-setup-form" id="initial-setup-form" action="" method="POST">
 
             <div class="step-wrapper" id="step1">
 
-                <div id="tracker1" class="step-icon">
+                <div class="step-icon" id="tracker1">
                     <i class="icon-user"></i>
                 </div>
 
                 <div class="center step-container">
 
-                    <h1 class="step-title">{{ _("Administrator Account") }}</h1>
+                    <h1 class="step-title">{{ _('Administrator Account') }}</h1>
 
                     <div class="step-description">
-                        <div>{{ steps[0].description[0] }}</div>
-                        <div class="additional-information">{{ steps[0].description[1] }}</div>
+                        <div>{{ _('Insert here all the basic informations needed to create your admin account.') }}</div>
+                        <div class="additional-information">{{ _('You can update your account with all the secondary informations (like your address or phone number) in a second moment by accessing the account management (My Profile, Account Details).') }}</div>
                     </div>
 
                     <div class="fields-container">
 
                         <div>
-                            <input id="name" type="text" name="name" data-error-tooltip="{{ name.tooltip }}" value="{{ name.value }}" placeholder="{{ name.label }}" required>
+                            <input id="name" type="text" name="name" data-error-tooltip="{{ _('You must enter a name') }}" value="{{ name_value }}" placeholder="{{ _('First name') }}" required>
                         </div>
 
                         <div>
-                            <input id="surname" type="text" name="surname" data-error-tooltip="{{ surname.tooltip }}" value="{{ surname.value }}" placeholder="{{ surname.label }}" required>
+                            <input id="surname" type="text" name="surname" data-error-tooltip="{{ _('You must enter a surname') }}" value="{{ surname_value }}" placeholder="{{ _('Family name') }}" required>
                         </div>
 
                         <div>
-                            <input id="user_email" type="email" name="user_email" data-error-tooltip="{{ user_email.tooltip.missing }}" data-error-tooltip2="{{ user_email.tooltip.invalid }}" value="{{ user_email.value }}" placeholder="{{ user_email.label }}" required>
+                            <input id="user_email" type="email" name="user_email" data-error-tooltip="{{ _('You must enter your user e-mail address') }}" data-error-tooltip2="{{ _('You must enter a valid e-mail address') }}" value="{{ user_email_value }}" placeholder="{{ _('Email') }}" required>
                         </div>
 
                         <div>
-                            <input id="login" type="text" name="login" data-error-tooltip="{{ login.tooltip }}" value="{{ login.value }}" placeholder="{{ login.label }}" required>
+                            <input id="login" type="text" name="login" data-error-tooltip="{{ _('You must enter a login') }}" value="{{ login_value }}" placeholder="{{ _('Login') }}" required>
                         </div>
 
                         <div>
-                            <input id="password" type="password" name="password" data-error-tooltip="{{ password.tooltip }}" value="" placeholder="{{ password.label }}" required>
+                            <input id="password" type="password" name="password" data-error-tooltip="{{ _('You must define a password') }}" value="" placeholder="{{ _('Password') }}" required>
                         </div>
 
                         <div>
-                            <input id="password_confirm" type="password" name="password_confirm" data-error-tooltip="{{ password_confirm.tooltip }}" value="" placeholder="{{ password_confirm.label }}" required>
+                            <input id="password_confirm" type="password" name="password_confirm" data-error-tooltip="{{ _('You must enter the same password twice') }}" value="" placeholder="{{ _('Confirm password') }}" required>
                         </div>
 
                     </div>
@@ -78,31 +78,31 @@
 
                 <div class="center step-container">
 
-                    <h1 class="step-title">{{ _("Indico site default parameters") }}</h1>
+                    <h1 class="step-title">{{ _('Indico site default parameters') }}</h1>
 
                     <div class="step-description">
-                        <div>{{ steps[1].description[0] }}</div>
-                        <div class="additional-information">{{ steps[1].description[1] }}</div>
+                        <div>{{ _('Configure here your server settings.') }}</div>
+                        <div class="additional-information">{{ _('All the informations set here will also be used to fill your personal account information. To change these informations you can later head to Server Admin, General Settings (will change the server settings) or My Profile, Account Details (will change the account settings).') }}</div>
                     </div>
 
                     <div class="fields-container">
 
                         <div>
-                            <label for="lang">{{ language.label }}</label>
+                            <label for="lang">{{ _('Language') }}</label>
                             <select name="lang" id="lang" class="input-lang">
-                                {% for code, lang in language.options -%}
+                                {% for code, lang in language_options -%}
                                     <option value="{{ code }}">{{ lang }}</option>
                                 {% endfor %}
                             </select>
                         </div>
 
                         <div>
-                            <label for="timezone">{{ timezone.label }}</label>
-                            <select id="timezone" name="timezone" class="input-timezone">{{ timezone.options | safe }}</select>
+                            <label for="timezone">{{ _('Timezone') }}</label>
+                            <select id="timezone" name="timezone" class="input-timezone">{{ timezone_options | safe }}</select>
                         </div>
 
                         <div>
-                            <input id="organisation" type="text" name="organisation" data-error-tooltip="{{ organisation.tooltip }}" value="{{ organisation.value }}" placeholder="{{ organisation.label }}" required>
+                            <input id="organisation" type="text" name="organisation" data-error-tooltip="{{ _('You must enter the name of your organization') }}" value="{{ organisation_value }}" placeholder="{{ _('Organization') }}" required>
                         </div>
 
                     </div>
@@ -119,27 +119,22 @@
 
                 <div class="center step-container">
 
-                    <h1 class="step-title">{{ _("Let us know you exist!") }}</h1>
+                    <h1 class="step-title">{{ _('Let us know you exist!') }}</h1>
 
                     <div class="step-description">
-                            <div>{{ steps[2].description.first }}</div>
-                            <ul>
-                                <li>{{ steps[2].description.list[0] }}</li>
-                                <li>{{ steps[2].description.list[1] }}</li>
-                                <li>{{ steps[2].description.list[2] }}</li>
-                            </ul>
-                            <div class="additional-information">{{ steps[2].description.last }}</div>
+                            <div>{{ _('You can choose here to receive free notifications from the Indico developers team with updated informations to keep you up to date with your Indico administration (for example: security warnings, new versions released, ...)') }}</div>
+                            <div class="additional-information">{{ _('Please note that no private information will ever be sent to Indico@CERN and that you will be able to change the Instance Tracking settings anytime in the future (from Server Admin, General Settings).') }}</div>
                     </div>
 
                     <div class="fields-container">
 
                         <div>
-                            <label for="enable">{{ enable.label }}</label>
+                            <label for="enable">{{ _('Enable') }}</label>
                             <input id="enable" type="checkbox" name="enable" value="1" {{ checked }} style="width: initial; margin-top: 6px;">
                         </div>
 
                         <div>
-                            <input id="it_email" type="email" name="it_email" data-error-tooltip="{{ it_email.tooltip.missing }}" data-error-tooltip2="{{ it_email.tooltip.invalid }}" value="{{ it_email.value }}" placeholder="{{ it_email.label }}">
+                            <input id="it_email" type="email" name="it_email" data-error-tooltip="{{ _('You must enter an e-mail for Instance Tracking') }}" data-error-tooltip2="{{ _('You must enter a valid e-mail for Instance Tracking') }}" value="{{ it_email_value }}" placeholder="{{ _('Email') }}">
                         </div>
 
                     </div>
@@ -147,7 +142,7 @@
                 </div>
                 <div class="center">
                     <a id="submit-initial-setup" class="i-button blue-button">
-                        {{ submit }}
+                        {{ _('Submit') }}
                         <i class="icon-checkmark"></i>
                     </a>
                 </div>
