@@ -119,7 +119,12 @@ def setup_jinja(app):
     app.add_template_filter(underline)
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
-    app.jinja_env.install_gettext_callables(gettext, ngettext, True)
+    app.jinja_env.install_gettext_callables(
+        # We need unicode in Jinja templates!
+        lambda text: str(gettext(text)).decode('utf-8'),
+        lambda singular, plural, n: str(ngettext(singular, plural, n)).decode('utf-8'),
+        True
+    )
     # webassets
     app.jinja_env.add_extension('webassets.ext.jinja2.AssetsExtension')
     app.jinja_env.assets_environment = core_env
