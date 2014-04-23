@@ -17,8 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request
-from flask import render_template
+from flask import render_template, request, session
 from wtforms import Form, validators, TextField, PasswordField, BooleanField
 from tzlocal import get_localzone
 
@@ -33,7 +32,7 @@ from MaKaC.accessControl import AdminList
 from MaKaC.i18n import _
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from indico.web.forms.validators import UsedIfChecked
-from indico.util.i18n import getLocaleDisplayNames
+from indico.util.i18n import parseLocale, getLocaleDisplayNames
 
 
 class RHInitialSetup(base.RHDisplayBaseProtected):
@@ -66,9 +65,15 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
         for code in language_options:
             language_options.remove(code)
             language_options.append((code[0], code[1][0].upper()+code[1][1:]))
+        selLang = session.lang
+        locale = parseLocale(selLang)
+        langName = locale.languages[locale.language].encode('utf-8')
+        selectedLanguageName = langName[0].upper()+langName[1:]
 
         wvars = {'language_options': language_options,
-                 'timezone_options': timezone_options}
+                 'timezone_options': timezone_options,
+                 'selectedLanguage': selLang,
+                 'selectedLanguageName': selectedLanguageName}
 
         return render_template('initial_setup.html', **wvars)
 
