@@ -88,6 +88,20 @@ $init-setup-font-family: "Maven Pro"
     border-left: 3px #005272 solid;
     font-family: $init-setup-font-family;
 
+    @media only screen and (min-width: 481px) and (max-width: 768px) {
+        min-width: 480px;
+        max-width: 492px;
+    }
+
+    @media only screen and (min-width: 769px) and (max-width: 1024px) {
+        min-width: 600px;
+        max-width: 680px;
+    }
+
+    @media only screen and (min-width: 1025px) and (max-width: 1230px) {
+        max-width: 937px;
+    }
+
     &.mini {
         margin-top: 120px;
     }
