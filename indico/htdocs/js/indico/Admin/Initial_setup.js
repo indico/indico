@@ -14,9 +14,12 @@ $(document).ready(function(){
     // Scroll the page to a JQuery element
     function scrollToElem(elem){
         var miniHeaderHeight = 120;
+        var headerPaddingTop = 20;
+        var headerBorderBottom = 5;
         var stepWrapperPaddingTop = 75;
+        var offset = miniHeaderHeight+headerPaddingTop+headerBorderBottom+stepWrapperPaddingTop
         $('html, body').animate({
-            scrollTop: elem.offset().top -miniHeaderHeight -stepWrapperPaddingTop
+            scrollTop: elem.offset().top -offset
         }, scrollDelay);
     }
 
