@@ -25,8 +25,8 @@ from indico.core.config import Config
 
 class RHChangeLang(base.RH):
 
-    def _checkParams_POST(self):
-        self._language = request.form['lang']
+    def _checkParams(self, params):
+        self._language = request.values['lang']
 
     def _process(self):
 

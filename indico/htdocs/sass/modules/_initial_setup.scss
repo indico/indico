@@ -49,6 +49,25 @@ $init-setup-font-family: "Maven Pro"
             padding-right: 30px;
         }
     }
+
+    .language-selector {
+        position: fixed;
+        top: 0;
+        right: 0;
+        z-index: 1;
+        padding: 0;
+
+        .i-button.arrow {
+            border-radius: 0;
+            border: 0;
+            width: 102px;
+        }
+
+        .dropdown {
+            text-align: left;
+            width: 100px;
+        }
+    }
 }
 
 .init-setup-body:before, .init-setup-body:after {
@@ -229,43 +248,46 @@ $init-setup-font-family: "Maven Pro"
                                 content: "NO";
                                 line-height: 1.6em;
                             }
-                        }
 
-                        .toggle-button.toggled {
-                            .toggle {
-                                box-shadow: 0 0 1px rgba(255,255,255,0.8) inset;
-                                background-color: $light-blue-logo;
-                                border-color: lighten($dark-blue-logo, $color-variation);
-                                left: 3.5em;
-                            }
+                            &.toggled {
+                                .toggle {
+                                    box-shadow: 0 0 1px rgba(255,255,255,0.8) inset;
+                                    background-color: $light-blue-logo;
+                                    border-color: lighten($dark-blue-logo, $color-variation);
+                                    left: 3.5em;
+                                }
 
-                            .toggle::before {
-                                content: "YES";
-                                color: #eee !important;
+                                .toggle::before {
+                                    content: "YES";
+                                    color: #eee !important;
+                                }
                             }
                         }
                     }
                 }
             }
-
-            .blue-button {
-                margin-top: 50px;
-                font-size: 3em;
-                background-color: $light-blue-logo !important;
-                color: darken(white, 5%) !important;
-                border-color: lighten($dark-blue-logo, $color-variation);
-
-                &:hover:not(.disabled):not(:disabled) {
-                    @include gradient(lighten($light-blue-logo, $color-variation), $light-blue-logo);
-                    color: white !important;
-                    border-color: $dark-blue-logo;
-                }
-
-                &:active:not(.disabled):not(:disabled) {
-                    @include gradient($light-blue-logo, lighten($light-blue-logo, $color-variation));
-                    border-color: lighten($dark-blue-logo, $color-variation);
-                }
-            }
         }
+    }
+}
+
+.blue-button {
+    background-color: $light-blue-logo !important;
+    color: darken(white, 5%) !important;
+    border-color: lighten($dark-blue-logo, $color-variation);
+
+    &:hover:not(.disabled):not(:disabled) {
+        @include gradient(lighten($light-blue-logo, $color-variation), $light-blue-logo);
+        color: white !important;
+        border-color: $dark-blue-logo;
+    }
+
+    &:active:not(.disabled):not(:disabled) {
+        @include gradient($light-blue-logo, lighten($light-blue-logo, $color-variation));
+        border-color: lighten($dark-blue-logo, $color-variation);
+    }
+
+    &.big-button{
+        margin-top: 50px;
+        font-size: 3em;
     }
 }
