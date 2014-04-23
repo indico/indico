@@ -1,85 +1,36 @@
 $(document).ready(function(){
     var ok = true;
     var scrollDelay = 1000;
-    var clicked = [false, false, false];
-    var current = 1;
+    var clicked = false;
     var fields = [[$('#name'), $('#surname'), $('#user_email'), $('#login'), $('#password'), $('#password_confirm')],
                   [$('#organisation')],
                   [$('#it_email')]];
 
+    // Scroll the page to a step
     function scrollToStep(step){
-        ok = true;
-        if (step > current){
-            for (var i=0; i<fields[current-1].length; i++){
-                fields[current-1][i].trigger('input').trigger('hideTooltip');
-            }
-        }
-        if (step!=current && ok){
-            uncheckTrackers();
-            scrollToElem($('#step'+step));
-            window.setTimeout(function(){
-                uncheckTrackers();
-                checkTracker(step);
-            }, scrollDelay);
-            current = step;
-        }
+        scrollToElem($('#step'+step));
     }
 
+    // Scroll the page to a JQuery element
     function scrollToElem(elem){
+        var miniHeaderHeight = 120;
+        var stepWrapperPaddingTop = 75;
         $('html, body').animate({
-            scrollTop: elem.offset().top
+            scrollTop: elem.offset().top -miniHeaderHeight -stepWrapperPaddingTop
         }, scrollDelay);
     }
 
-    function checkTracker(step){
-        var icon = $('#tracker'+ step +' i');
-        icon.removeClass('black-icon').addClass('light-blue-logo-icon');
-        if (!clicked[step-1]){
-            icon.on('click', function(){
-                scrollToStep(step);
-            });
-            clicked[step-1] = true;
-        }
-    }
-
-    function uncheckTrackers(){
-        var icons = $('.step-tracker div i');
-        icons.removeClass('light-blue-logo-icon').addClass('black-icon');
-    }
-
+    // Mark a field as valid
     function markValidField(field){
         field.removeClass('hasError');
     }
 
+    // Mark a field as invalid
     function markInvalidField(field){
         field.addClass('hasError');
     }
 
-    function updateITEmail(){
-        var enable = $('#enable'),
-            itEmail = $('#it_email');
-        itEmail.prop('required', enable.prop('checked'));
-        itEmail.prop('disabled', !enable.prop('checked'));
-        if (enable.prop('checked')){
-            if (!itEmail.prop('validity').valid){
-                if (itEmail.prop('validity').valueMissing){
-                    itEmail.qtip('option', 'content.attr', "data-error-tooltip");
-                }
-                else{
-                    itEmail.qtip('option', 'content.attr', "data-error-tooltip2");
-                }
-                markInvalidField(itEmail);
-                ok = false;
-            }
-            else{
-                markValidField(itEmail);
-            }
-        }
-        else{
-            markValidField(itEmail);
-        }
-    }
-
+    // Fill the contact email field with the personal email
     function fillITEmail(){
         user_email = $('#user_email');
         it_email = $('#it_email');
@@ -88,27 +39,47 @@ $(document).ready(function(){
         }
     }
 
+    // Empty the contact email field
     function emptyITEmail(){
         it_email = $('#it_email');
         it_email.val('');
     }
 
+    // Validate all the steps
+    function validateSteps(){
+        ok = true;
+        invalidStep = 0;
+        for (var i=1; i<=3; i++){
+            validateStep(i);
+            if (!ok && invalidStep == 0){
+                invalidStep = i;
+            }
+        }
+        return invalidStep;
+    }
+
+    // Validate a single step
+    function validateStep(step){
+
+        for (var i=0; i<fields[step-1].length; i++){
+            fields[step-1][i].trigger('input').trigger('hideTooltip');
+        }
+    }
+
+    // Submit form
     $('#submit-initial-setup').on('click', function(e){
         e.preventDefault();
+        clicked = true;
+        var invalidStep = validateSteps();
 
-        ok = true;
-        $('#enable').on('change', function(){
-            updateITEmail();
-        }).trigger('change');
-        $('#itEmail').on('input', function(){
-            updateITEmail();
-        });
-
-        if (ok){
+        if (invalidStep == 0){
             $('#initial-setup-form').submit();
+        } else{
+            scrollToStep(invalidStep);
         }
     });
 
+    // Browser language selection
     var nav_lang = navigator.language || navigator.userLanguage;
     nav_lang = nav_lang.split('-')[0];
     $('#lang option').each(function() {
@@ -119,18 +90,7 @@ $(document).ready(function(){
         }
     });
 
-    $('#enable').on('change', function(){
-        var itEmail = $('#it_email');
-        itEmail.prop('required', this.checked);
-        itEmail.prop('disabled', !this.checked);
-        if (this.checked){
-            fillITEmail();
-        }
-        else{
-            emptyITEmail();
-        }
-    }).trigger('change');
-
+    // QTip setup
     $('#initial-setup-form input').qtip({
         content: {
             attr: 'data-error-tooltip'
@@ -159,9 +119,7 @@ $(document).ready(function(){
         $(this).trigger('hideTooltip');
     });
 
-    //scrollToElem($('#step1'));
-    //checkTracker(1);
-
+    // Header shrinking function
     $(window).scroll(function(){
         if (($(window).scrollTop() >= $('.init-setup-header').outerHeight()/2) && !$('.init-setup-header').hasClass('mini')) {
             $('.init-setup-header').addClass('mini');
@@ -170,6 +128,7 @@ $(document).ready(function(){
         }
     });
 
+    // Instance Tracking slider
     $('.toggle-button').on('click', function() {
         $(this).toggleClass('toggled');
         var toggled = $(this).hasClass('toggled');
@@ -180,13 +139,49 @@ $(document).ready(function(){
         checkbox.prop('checked', toggled);
         if (toggled){
             fillITEmail();
+            itEmail.trigger('input');
         }
         else{
             emptyITEmail();
+            markValidField(itEmail);
         }
     });
-
     if ($('#enable').prop('checked')){
         $('.toggle-button').trigger('click');
     }
+
+    // Fields validation setup
+    $('#initial-setup-form :input:not(#password_confirm)').on('input', function(){
+        if (!this.validity.valid){
+            if (this.id == 'user_email' || this.id == 'it_email'){
+                if (this.validity.valueMissing){
+                    $(this).qtip('option', 'content.attr', "data-error-tooltip");
+                }
+                else{
+                    $(this).qtip('option', 'content.attr', "data-error-tooltip2");
+                }
+            }
+            if (clicked){
+                markInvalidField($(this));
+            }
+            ok = false;
+        }
+        else{
+            markValidField($(this));
+        }
+    });
+    $('#password, #password_confirm').on('input', function(){
+        var password = $('#password'),
+            password_confirm = $('#password_confirm');
+        if (password.val() != password_confirm.val()) {
+            if (clicked){
+                markInvalidField(password_confirm);
+            }
+            ok = false;
+        }
+        else {
+            markValidField(password_confirm);
+        }
+    });
+
 });
