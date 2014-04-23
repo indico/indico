@@ -16,6 +16,7 @@
 *.egg
 
 # assets and generated stuff
+build
 doc/guides/build
 indico/htdocs/ihelp/html
 indico/htdocs/ihelp/pdf
