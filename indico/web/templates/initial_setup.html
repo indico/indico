@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ _('Initial Setup') }}{% endblock %}
+{% block title %}{% trans %}Initial Setup{% endtrans %}{% endblock %}
 
 {% block head %}
     {% assets 'indico_initial_setup' -%}
@@ -15,8 +15,19 @@
 
     <div class="init-setup-header">
         <img class="header-logo" src="{{ system_icon('logoIndicoWhite') }}">
-        <div class="header-title">{{ _('Hello there!') }}</div>
-        <div class="header-subtitle">{{ _('Indico needs just a little bit more data from you...') }}</div>
+        <div class="header-title">{% trans %}Hello there!{% endtrans %}</div>
+        <div class="header-subtitle">{% trans %}Indico needs just a little bit more data from you...{% endtrans %}</div>
+        <div id="languageSelector" class="toolbar language-selector">
+            <form id="languageForm" method="POST" action="{{ url_for('misc.changeLang') }}">
+                <input id="languageInputHidden" type="hidden" name="lang">
+            </form>
+            <a class="i-button icon-earth arrow" data-toggle="dropdown">{{ selectedLanguageName }}</a>
+            <ul class="dropdown">
+                {% for code, lang in language_options -%}
+                    <li id="{{ code }}"><a>{{ lang }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 
     <div class="init-setup-body">
@@ -31,37 +42,37 @@
 
                 <div class="center step-container">
 
-                    <h1 class="step-title">{{ _('Administrator Account') }}</h1>
+                    <h1 class="step-title">{% trans %}Administrator Account{% endtrans %}</h1>
 
                     <div class="step-description">
-                        <div>{{ _('Insert here all the basic informations needed to create your admin account.') }}</div>
-                        <div class="additional-information">{{ _('You can update your account with all the secondary information (like your address or phone number) in a second moment by accessing the account management (My Profile, Account Details).') }}</div>
+                        <div>{% trans %}Insert here all the basic informations needed to create your admin account.{% endtrans %}</div>
+                        <div class="additional-information">{% trans %}You can update your account with all the secondary information (like your address or phone number) in a second moment by accessing the account management (My Profile, Account Details).{% endtrans %}</div>
                     </div>
 
                     <div class="fields-container">
 
                         <div>
-                            <input id="name" type="text" name="name" data-error-tooltip="{{ _('You must enter a name') }}" value="{{ name_value }}" placeholder="{{ _('First name') }}" required>
+                            <input id="name" type="text" name="name" data-error-tooltip="{% trans %}You must enter a name{% endtrans %}" value="{{ name_value }}" placeholder="{% trans %}First name{% endtrans %}" required>
                         </div>
 
                         <div>
-                            <input id="surname" type="text" name="surname" data-error-tooltip="{{ _('You must enter a surname') }}" value="{{ surname_value }}" placeholder="{{ _('Family name') }}" required>
+                            <input id="surname" type="text" name="surname" data-error-tooltip="{% trans %}You must enter a surname{% endtrans %}" value="{{ surname_value }}" placeholder="{% trans %}Family name{% endtrans %}" required>
                         </div>
 
                         <div>
-                            <input id="user_email" type="email" name="user_email" data-error-tooltip="{{ _('You must enter your user e-mail address') }}" data-error-tooltip2="{{ _('You must enter a valid e-mail address') }}" value="{{ user_email_value }}" placeholder="{{ _('Email') }}" required>
+                            <input id="user_email" type="email" name="user_email" data-error-tooltip="{% trans %}You must enter your user e-mail address{% endtrans %}" data-error-tooltip2="{% trans %}You must enter a valid e-mail address{% endtrans %}" value="{{ user_email_value }}" placeholder="{% trans %}Email{% endtrans %}" required>
                         </div>
 
                         <div>
-                            <input id="login" type="text" name="login" data-error-tooltip="{{ _('You must enter a login') }}" value="{{ login_value }}" placeholder="{{ _('Login') }}" required>
+                            <input id="login" type="text" name="login" data-error-tooltip="{% trans %}You must enter a login{% endtrans %}" value="{{ login_value }}" placeholder="{% trans %}Login{% endtrans %}" required>
                         </div>
 
                         <div>
-                            <input id="password" type="password" name="password" data-error-tooltip="{{ _('You must define a password') }}" value="" placeholder="{{ _('Password') }}" required>
+                            <input id="password" type="password" name="password" data-error-tooltip="{% trans %}You must define a password{% endtrans %}" value="" placeholder="{% trans %}Password{% endtrans %}" required>
                         </div>
 
                         <div>
-                            <input id="password_confirm" type="password" name="password_confirm" data-error-tooltip="{{ _('You must enter the same password twice') }}" value="" placeholder="{{ _('Confirm password') }}" required>
+                            <input id="password_confirm" type="password" name="password_confirm" data-error-tooltip="{% trans %}You must enter the same password twice{% endtrans %}" value="" placeholder="{% trans %}Confirm password{% endtrans %}" required>
                         </div>
 
                     </div>
@@ -78,31 +89,35 @@
 
                 <div class="center step-container">
 
-                    <h1 class="step-title">{{ _('Indico site default parameters') }}</h1>
+                    <h1 class="step-title">{% trans %}Indico site default parameters{% endtrans %}</h1>
 
                     <div class="step-description">
-                        <div>{{ _('Configure here your server settings.') }}</div>
-                        <div class="additional-information">{{ _('All the informations set here will also be used to fill your personal account information. To change these informations you can later head to Server Admin, General Settings (will change the server settings) or My Profile, Account Details (will change the account settings).') }}</div>
+                        <div>{% trans %}Configure here your server settings.{% endtrans %}</div>
+                        <div class="additional-information">{% trans %}All the informations set here will also be used to fill your personal account information. To change these informations you can later head to Server Admin, General Settings (will change the server settings) or My Profile, Account Details (will change the account settings).{% endtrans %}</div>
                     </div>
 
                     <div class="fields-container">
 
                         <div>
-                            <label for="lang">{{ _('Language') }}</label>
-                            <select name="lang" id="lang" class="input-lang">
+                            <label for="lang">{% trans %}Language{% endtrans %}</label>
+                            <select id="lang" name="lang" class="input-lang">
                                 {% for code, lang in language_options -%}
-                                    <option value="{{ code }}">{{ lang }}</option>
+                                    {% if selectedLanguage == code %}
+                                        <option value="{{ code }}" selected>{{ lang }}</option>
+                                    {% else %}
+                                        <option value="{{ code }}">{{ lang }}</option>
+                                    {% endif %}
                                 {% endfor %}
                             </select>
                         </div>
 
                         <div>
-                            <label for="timezone">{{ _('Timezone') }}</label>
+                            <label for="timezone">{% trans %}Timezone{% endtrans %}</label>
                             <select id="timezone" name="timezone" class="input-timezone">{{ timezone_options | safe }}</select>
                         </div>
 
                         <div>
-                            <input id="organisation" type="text" name="organisation" data-error-tooltip="{{ _('You must enter the name of your organization') }}" value="{{ organisation_value }}" placeholder="{{ _('Organization') }}" required>
+                            <input id="organisation" type="text" name="organisation" data-error-tooltip="{% trans %}You must enter the name of your organization{% endtrans %}" value="{{ organisation_value }}" placeholder="{% trans %}Organization{% endtrans %}" required>
                         </div>
 
                     </div>
@@ -119,11 +134,11 @@
 
                 <div class="center step-container">
 
-                    <h1 class="step-title">{{ _('Let us know you exist!') }}</h1>
+                    <h1 class="step-title">{% trans %}Let us know you exist!{% endtrans %}</h1>
 
                     <div class="step-description">
-                            <div>{{ _('You can choose here to receive free notifications from the Indico developers team with updated informations to keep you up to date with your Indico administration (for example: security warnings, new versions released, ...)') }}</div>
-                            <div class="additional-information">{{ _('Please note that no private information will ever be sent to Indico@CERN and that you will be able to change the Instance Tracking settings anytime in the future (from Server Admin, General Settings).') }}</div>
+                            <div>{% trans %}You can choose here to receive free notifications from the Indico developers team with updated informations to keep you up to date with your Indico administration (for example: security warnings, new versions released, ...){% endtrans %}</div>
+                            <div class="additional-information">{% trans %}Please note that no private information will ever be sent to Indico@CERN and that you will be able to change the Instance Tracking settings anytime in the future (from Server Admin, General Settings).{% endtrans %}</div>
                     </div>
 
                     <div class="fields-container">
@@ -136,15 +151,15 @@
                         </div>
 
                         <div>
-                            <input id="it_email" type="email" name="it_email" data-error-tooltip="{{ _('You must enter an e-mail for Instance Tracking') }}" data-error-tooltip2="{{ _('You must enter a valid e-mail for Instance Tracking') }}" value="{{ it_email_value }}" placeholder="{{ _('Contact email') }}">
+                            <input id="it_email" type="email" name="it_email" data-error-tooltip="{% trans %}You must enter an e-mail for Instance Tracking{% endtrans %}" data-error-tooltip2="{% trans %}You must enter a valid e-mail for Instance Tracking{% endtrans %}" value="{{ it_email_value }}" placeholder="{% trans %}Contact email{% endtrans %}">
                         </div>
 
                     </div>
 
                 </div>
                 <div class="center">
-                    <a id="submit-initial-setup" class="i-button blue-button">
-                        {{ _('Finish') }}
+                    <a id="submit-initial-setup" class="i-button blue-button big-button">
+                        {% trans %}Finish{% endtrans %}
                     </a>
                 </div>
             </div>

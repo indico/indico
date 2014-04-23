@@ -82,17 +82,6 @@ $(document).ready(function(){
         }
     });
 
-    // Browser language selection
-    var nav_lang = navigator.language || navigator.userLanguage;
-    nav_lang = nav_lang.split('-')[0];
-    $('#lang option').each(function() {
-        var lang_code = this.value.split('_')[0];
-        if (lang_code == nav_lang){
-            $('#lang').val(this.value);
-            return false;
-        }
-    });
-
     // QTip setup
     $('#initial-setup-form input').qtip({
         content: {
@@ -186,5 +175,18 @@ $(document).ready(function(){
             markValidField(password_confirm);
         }
     });
+
+    // Language selector
+    var form = $('#languageForm');
+    var inputHidden = $('#languageInputHidden');
+    $('#lang option').each(function(){
+        var code = this.value;
+        var name = this.innerHTML;
+        $('#'+code).on('click', function(){
+            inputHidden.val(code);
+            form.submit()
+        });
+    });
+    $('#languageSelector').dropdown();
 
 });
