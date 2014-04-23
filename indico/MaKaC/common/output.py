@@ -154,16 +154,16 @@ class outputGenerator(Observable):
         out.closeTag("iconf")
         return out.getXml()
 
-    def _userToXML(self, conf, user, out):
+    def _userToXML(self, obj, user, out):
         out.openTag("user")
         out.writeTag("title", user.getTitle())
         out.writeTag("name", "", [["first", user.getFirstName()], ["middle", ""], ["last", user.getFamilyName()]])
         out.writeTag("organization", user.getAffiliation())
 
-        if conf.canModify(self.__aw):
+        if obj.canModify(self.__aw):
             out.writeTag("email", user.getEmail())
 
-        out.writeTag("emailMd5", md5(user.getEmail()).hexdigest())
+        out.writeTag("emailHash", md5(user.getEmail()).hexdigest())
 
         try:
             out.writeTag("userid",user.id)
@@ -562,7 +562,7 @@ class outputGenerator(Observable):
         if len(cList) != 0:
             out.openTag("convener")
             for conv in cList:
-                self._userToXML(session.getConference(), conv, out)
+                self._userToXML(session, conv, out)
             if session.getConvenerText() != "":
                 out.writeTag("UnformatedUser",session.getConvenerText())
             out.closeTag("convener")
@@ -659,7 +659,7 @@ class outputGenerator(Observable):
         if len(cList) != 0:
             out.openTag("convener")
             for conv in cList:
-                self._userToXML(conf, conv, out)
+                self._userToXML(slot, conv, out)
             if session.getConvenerText() != "":
                 out.writeTag("UnformatedUser",session.getConvenerText())
             out.closeTag("convener")
@@ -761,7 +761,7 @@ class outputGenerator(Observable):
         if len(sList) != 0:
             out.openTag("speakers")
             for sp in sList:
-                self._userToXML(conf, sp, out)
+                self._userToXML(contribution, sp, out)
             if contribution.getSpeakerText() != "":
                 out.writeTag("UnformatedUser",contribution.getSpeakerText())
             out.closeTag("speakers")
@@ -769,13 +769,13 @@ class outputGenerator(Observable):
         if len(primaryAuthorList) != 0:
             out.openTag("primaryAuthors")
             for sp in primaryAuthorList:
-                self._userToXML(conf, sp, out)
+                self._userToXML(contribution, sp, out)
             out.closeTag("primaryAuthors")
         coAuthorList = contribution.getCoAuthorList()
         if len(coAuthorList) != 0:
             out.openTag("coAuthors")
             for sp in coAuthorList:
-                self._userToXML(conf, sp, out)
+                self._userToXML(contribution, sp, out)
             out.closeTag("coAuthors")
         l = contribution.getLocation()
         if l != None or contribution.getRoom():
@@ -816,14 +816,13 @@ class outputGenerator(Observable):
         for subC in contribution.getSubContributionList():
             if includeSubContribution:
                 if showSubContribution == 'all' or str(showSubContribution) == str(subC.getId()):
-                    self._subContributionToXML(conf, subC, vars, includeMaterial, out=out, recordingManagerTags=recordingManagerTags)
+                    self._subContributionToXML(subC, vars, includeMaterial, out=out, recordingManagerTags=recordingManagerTags)
 
         self._notify('addXMLMetadata', {'out': out, 'obj': contribution, 'type':"contribution", 'recordingManagerTags':recordingManagerTags})
         out.closeTag("contribution")
 
 
     def _subContributionToXML(self,
-                              conf,
                               subCont,
                               vars,
                               includeMaterial,
@@ -861,7 +860,7 @@ class outputGenerator(Observable):
         if len(sList) > 0 or subCont.getSpeakerText() != "":
             out.openTag("speakers")
         for sp in sList:
-            self._userToXML(conf, sp, out)
+            self._userToXML(subCont, sp, out)
         if subCont.getSpeakerText() != "":
             out.writeTag("UnformatedUser",subCont.getSpeakerText())
         if len(sList) > 0 or subCont.getSpeakerText() != "":
