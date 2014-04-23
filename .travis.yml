@@ -15,4 +15,9 @@ install:
 script:
   - python setup.py test --$TEST_SUITE --clean-shutdown
 notifications:
-  - email: false
+  email: false
+  irc:
+    channels:
+      - 'chat.freenode.net#indico'
+    use_notice: true
+    skip_join: true
