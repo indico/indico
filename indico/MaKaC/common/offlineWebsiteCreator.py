@@ -21,8 +21,9 @@ import itertools
 import os
 import re
 import requests
-import string
 from bs4 import BeautifulSoup
+from werkzeug.utils import secure_filename
+
 from MaKaC import conference
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import displayMgr
@@ -42,6 +43,7 @@ from MaKaC.fileRepository import OfflineRepository
 from MaKaC.PDFinterface.conference import ProgrammeToPDF, TimeTablePlain, AbstractBook, ContribToPDF, \
     ContribsToPDF
 from indico.util.contextManager import ContextManager
+from indico.util.string import remove_tags
 from indico.web.assets import ie_compatibility
 
 
@@ -241,8 +243,9 @@ class OfflineEventCreator(object):
         pass
 
     def _normalize_path(self, path):
-        return path.translate(string.maketrans(' /:()*?<>|"',
-                                               '___________'))
+        if not isinstance(path, unicode):
+            path = path.decode('utf-8')
+        return secure_filename(remove_tags(path))
 
     def _getAllMaterial(self):
         self._addMaterialFrom(self._conf, "events/conference")
