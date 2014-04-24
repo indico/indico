@@ -393,10 +393,10 @@ class Room(db.Model, Serializer):
         return self.name != self.generateName()
 
     def getFullName(self):
-        return u'{}-{}'.format(
-            self.generateName(),
-            self.name
-        )
+        if self.has_special_name:
+            return u'{}-{}'.format(self.generateName(), self.name)
+        else:
+            return u'{}'.format(self.generateName())
 
     def updateName(self):
         if not self.name and self.building and self.floor and self.number:
