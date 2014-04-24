@@ -1175,8 +1175,6 @@ class Room(db.Model, Serializer):
                    ) \
                    .all()
 
-    # photos
-
     def collides(self, start, end):
         return self.reservations \
                    .join(ReservationOccurrence) \
