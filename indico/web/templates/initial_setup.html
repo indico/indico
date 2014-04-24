@@ -17,9 +17,9 @@
         <img class="header-logo" src="{{ system_icon('logoIndicoWhite') }}">
         <div class="header-title">{% trans %}Hello there!{% endtrans %}</div>
         <div class="header-subtitle">{% trans %}Indico needs just a little bit more data from you...{% endtrans %}</div>
-        <div id="languageSelector" class="toolbar language-selector">
-            <form id="languageForm" method="POST" action="{{ url_for('misc.changeLang') }}">
-                <input id="languageInputHidden" type="hidden" name="lang">
+        <div id="language-selector" class="toolbar language-selector">
+            <form id="language-form" method="POST" action="{{ url_for('misc.changeLang') }}">
+                <input id="language-hidden" type="hidden" name="lang">
             </form>
             <a class="i-button icon-earth arrow" data-toggle="dropdown">{{ selectedLanguageName }}</a>
             <ul class="dropdown">
@@ -32,11 +32,11 @@
 
     <div class="init-setup-body">
 
-        <form class="init-setup-form" id="initial-setup-form" action="" method="POST">
+        <form id="initial-setup-form" class="init-setup-form" action="" method="POST">
 
             <div class="step-wrapper" id="step1">
 
-                <div class="step-icon" id="tracker1">
+                <div class="step-icon">
                     <i class="icon-user"></i>
                 </div>
 
@@ -60,7 +60,7 @@
                         </div>
 
                         <div>
-                            <input id="user_email" type="email" name="user_email" data-error-tooltip="{% trans %}You must enter your user e-mail address{% endtrans %}" data-error-tooltip2="{% trans %}You must enter a valid e-mail address{% endtrans %}" value="{{ user_email_value }}" placeholder="{% trans %}Email{% endtrans %}" required>
+                            <input id="user-email" type="email" name="user_email" data-error-tooltip="{% trans %}You must enter your user e-mail address{% endtrans %}" data-error-tooltip2="{% trans %}You must enter a valid e-mail address{% endtrans %}" value="{{ user_email_value }}" placeholder="{% trans %}Email{% endtrans %}" required>
                         </div>
 
                         <div>
@@ -72,7 +72,7 @@
                         </div>
 
                         <div>
-                            <input id="password_confirm" type="password" name="password_confirm" data-error-tooltip="{% trans %}You must enter the same password twice{% endtrans %}" value="" placeholder="{% trans %}Confirm password{% endtrans %}" required>
+                            <input id="password-confirm" type="password" name="password_confirm" data-error-tooltip="{% trans %}You must enter the same password twice{% endtrans %}" value="" placeholder="{% trans %}Confirm password{% endtrans %}" required>
                         </div>
 
                     </div>
@@ -83,7 +83,7 @@
 
             <div class="step-wrapper" id="step2">
 
-                <div id="tracker1" class="step-icon">
+                <div class="step-icon">
                     <i class="icon-earth"></i>
                 </div>
 
@@ -100,7 +100,7 @@
 
                         <div>
                             <label for="lang">{% trans %}Language{% endtrans %}</label>
-                            <select id="lang" name="lang" class="input-lang">
+                            <select id="lang" name="language" class="input-lang">
                                 {% for code, lang in language_options -%}
                                     {% if selectedLanguage == code %}
                                         <option value="{{ code }}" selected>{{ lang }}</option>
@@ -128,7 +128,7 @@
 
             <div class="step-wrapper" id="step3">
 
-                <div id="tracker1" class="step-icon">
+                <div class="step-icon">
                     <i class="icon-mail"></i>
                 </div>
 
@@ -151,8 +151,8 @@
                         </div>
 
                         <div>
-                            <input id="itEmailHidden" type="hidden">
-                            <input id="it_email" type="email" name="it_email" data-error-tooltip="{% trans %}You must enter an e-mail for Instance Tracking{% endtrans %}" data-error-tooltip2="{% trans %}You must enter a valid e-mail for Instance Tracking{% endtrans %}" value="{{ it_email_value }}" placeholder="{% trans %}Contact email{% endtrans %}" disabled>
+                            <input id="it-email-hidden" type="hidden">
+                            <input id="it-email" type="email" name="it_email" data-error-tooltip="{% trans %}You must enter an e-mail for Instance Tracking{% endtrans %}" data-error-tooltip2="{% trans %}You must enter a valid e-mail for Instance Tracking{% endtrans %}" value="{{ it_email_value }}" placeholder="{% trans %}Contact email{% endtrans %}" disabled>
                         </div>
 
                     </div>
