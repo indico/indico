@@ -163,7 +163,7 @@ $init-setup-font-family: "Maven Pro"
                     float: left;
                     width: 40%;
                     padding-left: 2%;
-                    font-size: 20px;
+                    font-size: 18px;
                     color: #555555;
                     text-align: justify;
 
@@ -226,6 +226,26 @@ $init-setup-font-family: "Maven Pro"
                     .input-timezone, .input-lang {
                         width: 272px;
                         font-size: 25px;
+                    }
+
+                    .input-it-email:disabled {
+
+                        /* Grouping does not work for some reason */
+                        &::-webkit-input-placeholder {
+                            color: lighten(#BEBEBE, 15%);
+                        }
+
+                        &::-moz-placeholder {
+                            color: lighten(#BEBEBE, 15%);
+                        }
+
+                        &:-moz-placeholder {  /* Older versions of Firefox */
+                            color: lighten(#BEBEBE, 15%);
+                        }
+
+                        &:-ms-input-placeholder {
+                            color: lighten(#BEBEBE, 15%);
+                        }
                     }
 
                     .enable-line {
