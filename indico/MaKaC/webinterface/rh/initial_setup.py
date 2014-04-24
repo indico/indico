@@ -43,7 +43,7 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
         av.setOrganisation(self._params["organisation"])
         av.setEmail(self._params["user_email"])
         av.setTimezone(self._params["timezone"])
-        av.setLang(self._params["lang"])
+        av.setLang(self._params["language"])
 
     def _checkProtection(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -101,7 +101,7 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
             minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
             minfo.setOrganisation(self._params["organisation"])
             minfo.setTimezone(self._params["timezone"])
-            minfo.setLang(self._params["lang"])
+            minfo.setLang(self._params["language"])
             minfo.setInstanceTrackingActive(bool(self._enable))
             if self._enable:
                 minfo.setInstanceTrackingEmail(self._params["it_email"])
