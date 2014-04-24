@@ -36,8 +36,22 @@ from ZEO.ClientStorage import ClientStorage
 
 from indico.core.db import db, drop_database
 from indico.core.db.migration import MigratedDB
-from indico.modules.rb.models import *
+from indico.modules.rb.models.aspects import Aspect
+from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.modules.rb.models.blocking_principals import BlockingPrincipal
+from indico.modules.rb.models.blockings import Blocking
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.photos import Photo
+from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservations import RepeatMapping, Reservation
+from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
+from indico.modules.rb.models.room_bookable_times import BookableTime
+from indico.modules.rb.models.room_equipments import RoomEquipment
+from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
+from indico.modules.rb.models.rooms import Room
 from indico.util.console import colored, cformat
+
 
 month_names = [(str(i), name[:3].encode('utf-8').lower())
                for i, name in dates.get_month_names(locale='fr_FR').iteritems()]
