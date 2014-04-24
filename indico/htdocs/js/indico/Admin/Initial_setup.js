@@ -35,10 +35,13 @@ $(document).ready(function(){
 
     // Fill the contact email field with the personal email
     function fillITEmail(){
-        user_email = $('#user_email');
-        it_email = $('#it_email');
-        if (it_email.val() == ''){
+        var user_email = $('#user_email');
+        var it_email = $('#it_email');
+        var it_email_hidden = $('#itEmailHidden');
+        if (it_email_hidden.val() == ''){
             it_email.val(user_email.val());
+        } else{
+            it_email.val(it_email_hidden.val());
         }
     }
 
@@ -188,5 +191,11 @@ $(document).ready(function(){
         });
     });
     $('#languageSelector').dropdown();
+
+    // Listener to store IT Email value
+    $('#it_email').on('input', function(){
+        var it_email_hidden = $('#itEmailHidden');
+        it_email_hidden.val(this.value);
+    });
 
 });
