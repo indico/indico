@@ -2,9 +2,9 @@ $(document).ready(function(){
     var ok = true;
     var scrollDelay = 1000;
     var clicked = false;
-    var fields = [[$('#name'), $('#surname'), $('#user_email'), $('#login'), $('#password'), $('#password_confirm')],
+    var fields = [[$('#name'), $('#surname'), $('#user-email'), $('#login'), $('#password'), $('#password-confirm')],
                   [$('#organisation')],
-                  [$('#it_email')]];
+                  [$('#it-email')]];
 
     // Scroll the page to a step
     function scrollToStep(step){
@@ -35,20 +35,20 @@ $(document).ready(function(){
 
     // Fill the contact email field with the personal email
     function fillITEmail(){
-        var user_email = $('#user_email');
-        var it_email = $('#it_email');
-        var it_email_hidden = $('#itEmailHidden');
-        if (it_email_hidden.val() == ''){
-            it_email.val(user_email.val());
+        var userEmail = $('#user-email');
+        var itEmail = $('#it-email');
+        var itEmailHidden = $('#it-email-hidden');
+        if (itEmailHidden.val() == ''){
+            itEmail.val(userEmail.val());
         } else{
-            it_email.val(it_email_hidden.val());
+            itEmail.val(itEmailHidden.val());
         }
     }
 
     // Empty the contact email field
     function emptyITEmail(){
-        it_email = $('#it_email');
-        it_email.val('');
+        itEmail = $('#it-email');
+        itEmail.val('');
     }
 
     // Validate all the steps
@@ -127,7 +127,7 @@ $(document).ready(function(){
     $('.toggle-button').on('click', function() {
         $(this).toggleClass('toggled');
         var toggled = $(this).hasClass('toggled');
-        var itEmail = $('#it_email');
+        var itEmail = $('#it-email');
         var checkbox = $('#enable');
         itEmail.prop('required', toggled);
         itEmail.prop('disabled', !toggled);
@@ -146,9 +146,9 @@ $(document).ready(function(){
     }
 
     // Fields validation setup
-    $('#initial-setup-form :input:not(#password_confirm)').on('input', function(){
+    $('#initial-setup-form :input:not(#password-confirm)').on('input', function(){
         if (!this.validity.valid){
-            if (this.id == 'user_email' || this.id == 'it_email'){
+            if (this.id == 'user-email' || this.id == 'it-email'){
                 if (this.validity.valueMissing){
                     $(this).qtip('option', 'content.attr', "data-error-tooltip");
                 }
@@ -165,37 +165,37 @@ $(document).ready(function(){
             markValidField($(this));
         }
     });
-    $('#password, #password_confirm').on('input', function(){
+    $('#password, #password-confirm').on('input', function(){
         var password = $('#password'),
-            password_confirm = $('#password_confirm');
-        if (password.val() != password_confirm.val()) {
+            passwordConfirm = $('#password-confirm');
+        if (password.val() != passwordConfirm.val()) {
             if (clicked){
-                markInvalidField(password_confirm);
+                markInvalidField(passwordConfirm);
             }
             ok = false;
         }
         else {
-            markValidField(password_confirm);
+            markValidField(passwordConfirm);
         }
     });
 
     // Language selector
-    var form = $('#languageForm');
-    var inputHidden = $('#languageInputHidden');
     $('#lang option').each(function(){
+        var form = $('#language-form');
+        var langHidden = $('#language-hidden');
         var code = this.value;
         var name = this.innerHTML;
         $('#'+code).on('click', function(){
-            inputHidden.val(code);
+            langHidden.val(code);
             form.submit()
         });
     });
-    $('#languageSelector').dropdown();
+    $('#language-selector').dropdown();
 
     // Listener to store IT Email value
-    $('#it_email').on('input', function(){
-        var it_email_hidden = $('#itEmailHidden');
-        it_email_hidden.val(this.value);
+    $('#it-email').on('input', function(){
+        var itEmailHidden = $('#it-email-hidden');
+        itEmailHidden.val(this.value);
     });
 
 });
