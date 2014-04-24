@@ -53,14 +53,18 @@ $init-setup-font-family: "Maven Pro"
     .language-selector {
         position: fixed;
         top: 0;
-        right: 0;
+        right: 10px;
         z-index: 1;
         padding: 0;
 
         .i-button.arrow {
-            border-radius: 0;
             border: 0;
             width: 102px;
+            color: darken(white, 10%) !important;
+
+            &:hover:not(.disabled):not(:disabled) {
+                color: white !important;
+            }
         }
 
         .dropdown {
@@ -286,7 +290,7 @@ $init-setup-font-family: "Maven Pro"
 
 .blue-button {
     background-color: $light-blue-logo !important;
-    color: darken(white, 5%) !important;
+    color: darken(white, 10%) !important;
     border-color: lighten($dark-blue-logo, $color-variation);
 
     &:hover:not(.disabled):not(:disabled) {
@@ -299,9 +303,25 @@ $init-setup-font-family: "Maven Pro"
         @include gradient($light-blue-logo, lighten($light-blue-logo, $color-variation));
         border-color: lighten($dark-blue-logo, $color-variation);
     }
+}
 
-    &.big-button{
-        margin-top: 50px;
-        font-size: 3em;
+.transparent-button {
+    background-color: transparent !important;
+    border-color: transparent;
+
+    &:hover:not(.disabled):not(:disabled) {
+        @include gradient(transparent, transparent);
+        border-color: transparent;
+        box-shadow: none;
     }
+
+    &:active:not(.disabled):not(:disabled) {
+        @include gradient(transparent, transparent);
+        border-color: transparent;
+    }
+}
+
+.big-button{
+    margin-top: 50px;
+    font-size: 3em;
 }
