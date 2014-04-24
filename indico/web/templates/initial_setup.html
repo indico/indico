@@ -21,7 +21,7 @@
             <form id="language-form" method="POST" action="{{ url_for('misc.changeLang') }}">
                 <input id="language-hidden" type="hidden" name="lang">
             </form>
-            <a class="i-button icon-earth arrow" data-toggle="dropdown">{{ selectedLanguageName }}</a>
+            <a class="i-button transparent-button icon-earth arrow" data-toggle="dropdown">{{ selectedLanguageName }}</a>
             <ul class="dropdown">
                 {% for code, lang in language_options -%}
                     <li id="{{ code }}"><a>{{ lang }}</a></li>
