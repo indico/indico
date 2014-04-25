@@ -38,9 +38,9 @@ $(document).ready(function(){
         var userEmail = $('#user-email');
         var itEmail = $('#it-email');
         var itEmailHidden = $('#it-email-hidden');
-        if (itEmailHidden.val() == ''){
+        if (itEmailHidden.val() == '') {
             itEmail.val(userEmail.val());
-        } else{
+        } else {
             itEmail.val(itEmailHidden.val());
         }
     }
@@ -55,9 +55,9 @@ $(document).ready(function(){
     function validateSteps(){
         ok = true;
         invalidStep = 0;
-        for (var i=1; i<=3; i++){
+        for (var i=1; i<=3; i++) {
             validateStep(i);
-            if (!ok && invalidStep == 0){
+            if (!ok && invalidStep == 0) {
                 invalidStep = i;
             }
         }
@@ -67,7 +67,7 @@ $(document).ready(function(){
     // Validate a single step
     function validateStep(step){
 
-        for (var i=0; i<fields[step-1].length; i++){
+        for (var i=0; i<fields[step-1].length; i++) {
             fields[step-1][i].trigger('input').trigger('hideTooltip');
         }
     }
@@ -78,9 +78,9 @@ $(document).ready(function(){
         clicked = true;
         var invalidStep = validateSteps();
 
-        if (invalidStep == 0){
+        if (invalidStep == 0) {
             $('#initial-setup-form').submit();
-        } else{
+        } else {
             scrollToStep(invalidStep);
         }
     });
@@ -101,10 +101,9 @@ $(document).ready(function(){
             event: 'hideTooltip'
         }
     }).on('focus input mouseenter', function(){
-        if ($(this).hasClass('hasError')){
+        if ($(this).hasClass('hasError')) {
             $(this).trigger('showTooltip');
-        }
-        else{
+        } else {
             $(this).trigger('hideTooltip');
         }
     }).on('blur', function(){
@@ -132,36 +131,33 @@ $(document).ready(function(){
         itEmail.prop('required', toggled);
         itEmail.prop('disabled', !toggled);
         checkbox.prop('checked', toggled);
-        if (toggled){
+        if (toggled) {
             fillITEmail();
             itEmail.trigger('input');
-        }
-        else{
+        } else {
             emptyITEmail();
             markValidField(itEmail);
         }
     });
-    if ($('#enable').prop('checked')){
+    if ($('#enable').prop('checked')) {
         $('.toggle-button').trigger('click');
     }
 
     // Fields validation setup
     $('#initial-setup-form :input:not(#password-confirm)').on('input', function(){
-        if (!this.validity.valid){
-            if (this.id == 'user-email' || this.id == 'it-email'){
-                if (this.validity.valueMissing){
+        if (!this.validity.valid) {
+            if (this.id == 'user-email' || this.id == 'it-email') {
+                if (this.validity.valueMissing) {
                     $(this).qtip('option', 'content.attr', "data-error-tooltip");
-                }
-                else{
+                } else {
                     $(this).qtip('option', 'content.attr', "data-error-tooltip2");
                 }
             }
-            if (clicked){
+            if (clicked) {
                 markInvalidField($(this));
             }
             ok = false;
-        }
-        else{
+        } else {
             markValidField($(this));
         }
     });
@@ -173,8 +169,7 @@ $(document).ready(function(){
                 markInvalidField(passwordConfirm);
             }
             ok = false;
-        }
-        else {
+        } else {
             markValidField(passwordConfirm);
         }
     });

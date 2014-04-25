@@ -58,7 +58,14 @@
     </tr>
     <tr>
       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Features")}</span></td>
-      <td bgcolor="white" width="100%" valign="top" class="blacktext"><table><tr><td>${features}</td><td valign="top">${contextHelp('features' )}</td></tr></table></td>
+      <td bgcolor="white" width="100%" valign="top" class="blacktext">
+        <table>
+          <tr>
+            <td>${features}</td>
+            <td valign="top">${contextHelp('features' )}</td>
+          </tr>
+        </table>
+      </td>
     </tr>
     % if _app.debug:
         <tr>

@@ -2,8 +2,6 @@
 @import "compass/utilities/general/clearfix";
 @import 'base';
 
-$dark-blue-logo: #005272;
-$light-blue-logo: #00A4E4;
 $init-setup-font-family: "Maven Pro"
 
 .init-setup-header {
@@ -233,19 +231,19 @@ $init-setup-font-family: "Maven Pro"
 
                         /* Grouping does not work for some reason */
                         &::-webkit-input-placeholder {
-                            color: lighten(#BEBEBE, 15%);
+                            color: lighten(#BEBEBE, $color-variation);
                         }
 
                         &::-moz-placeholder {
-                            color: lighten(#BEBEBE, 15%);
+                            color: lighten(#BEBEBE, $color-variation);
                         }
 
                         &:-moz-placeholder {  /* Older versions of Firefox */
-                            color: lighten(#BEBEBE, 15%);
+                            color: lighten(#BEBEBE, $color-variation);
                         }
 
                         &:-ms-input-placeholder {
-                            color: lighten(#BEBEBE, 15%);
+                            color: lighten(#BEBEBE, $color-variation);
                         }
                     }
 
@@ -313,6 +311,7 @@ $init-setup-font-family: "Maven Pro"
     }
 }
 
+
 .blue-button {
     background-color: $light-blue-logo !important;
     color: darken(white, 10%) !important;
@@ -346,7 +345,7 @@ $init-setup-font-family: "Maven Pro"
     }
 }
 
-.big-button{
+.big-button {
     margin-top: 50px;
     font-size: 3em;
 }
