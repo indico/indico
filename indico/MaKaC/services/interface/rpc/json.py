@@ -30,6 +30,8 @@ from MaKaC.services.interface.rpc.process import ServiceRunner
 
 from MaKaC.common.logger import Logger
 from indico.util.json import dumps, loads
+from indico.util.string import fix_broken_obj
+
 
 class Json:
     def __init__(self, content):
@@ -146,7 +148,7 @@ def process():
     except UnicodeError:
         Logger.get('rpc').exception("Problem encoding JSON response")
         # This is to avoid exceptions due to old data encodings (based on iso-8859-1)
-        responseBody["result"] = responseBody["result"].decode('iso-8859-1').encode('utf-8')
+        responseBody['result'] = fix_broken_obj(responseBody['result'])
         jsonResponse = encode(responseBody)
 
     return app.response_class(jsonResponse, mimetype='application/json')
