@@ -2249,6 +2249,12 @@ ul.horizontalMenu li{
     line-height: 1.5;
 }
 
+img.headerLogo {
+    margin: 7px 10px;
+    border: none;
+    height: 52px;
+}
+
 div.headerAboutIndico
 {
     position: absolute;
