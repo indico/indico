@@ -2,9 +2,8 @@
     <!-- CONTEXT HELP DIVS -->
     <div id="tooltipPool" style="display: none">
         <div id="features" class="tip">
-            ${ _("""<b>Click on one item to enable/disable the option.</b><br>
-            - <b>News</b>: will display "latest news" on the Indico home page and menu<br>
-            - <b>Instance Tracking</b>: will keep the administrators up to date with all the newest Indico features and send anonymous statistics to Indico@CERN.""")}
+            ${ _("""- <strong>News</strong>: will display "latest news" on the Indico home page and menu<br/>
+            - <strong>Receive important notifications</strong>: will keep the administrators up to date with all the newest Indico features and security warnings.""")}
         </div>
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
@@ -42,7 +41,7 @@
       <td bgcolor="white" width="100%" valign="top" class="blacktext">${ escape(noReplyEmail) }</td>
     </tr>
     <tr>
-       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Instance Tracking email")}</span></td>
+       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Technical contact email")}</span></td>
        <td bgcolor="white" width="100%" valign="top" class="blacktext">${instanceTrackingEmail}</td>
     </tr>
     <tr>
@@ -59,7 +58,7 @@
     </tr>
     <tr>
       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Features")}</span></td>
-      <td bgcolor="white" width="100%" valign="top" class="blacktext">${features} ${contextHelp('features' )}</td>
+      <td bgcolor="white" width="100%" valign="top" class="blacktext"><table><tr><td>${features}</td><td valign="top">${contextHelp('features' )}</td></tr></table></td>
     </tr>
     % if _app.debug:
         <tr>

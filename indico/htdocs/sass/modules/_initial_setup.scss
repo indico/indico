@@ -1,4 +1,5 @@
-@import "compass";
+@import "compass/css3";
+@import "compass/utilities/general/clearfix";
 @import 'base';
 
 $dark-blue-logo: #005272;
@@ -249,10 +250,14 @@ $init-setup-font-family: "Maven Pro"
                     }
 
                     .enable-line {
-                        margin-bottom: 60px;
+                        margin-bottom: 3em;
 
                         input {
                             display: none;
+                        }
+
+                        label {
+                            vertical-align: super;
                         }
 
                         .toggle-button {
@@ -260,11 +265,11 @@ $init-setup-font-family: "Maven Pro"
                             border: 1px solid #999;
                             box-shadow: 0 0 5px rgba(100,100,100,0.3) inset;
                             width: 7em;
-                            display: block;
+                            display: inline-block;
                             background: #ddd;
                             height: 3em;
                             cursor: pointer;
-                            position: absolute;
+                            position: relative;
 
                             .toggle {
                                 -webkit-box-sizing: border-box;
