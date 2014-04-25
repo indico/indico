@@ -45,8 +45,8 @@
                     <h1 class="step-title">{% trans %}Administrator Account{% endtrans %}</h1>
 
                     <div class="step-description">
-                        <div>{% trans %}Insert here all the basic informations needed to create your admin account.{% endtrans %}</div>
-                        <div class="additional-information">{% trans %}You can update your account with all the secondary information (like your address or phone number) in a second moment by accessing the account management (My Profile, Account Details).{% endtrans %}</div>
+                        <div>{% trans %}Insert here all basic information needed to create your account.{% endtrans %}</div>
+                        <div class="additional-information">{% trans %}You can change any extra parameters (like your address or phone number) afterwards by accessing "Account Details" (from "My Profile").{% endtrans %}</div>
                     </div>
 
                     <div class="fields-container">
@@ -89,11 +89,11 @@
 
                 <div class="center step-container">
 
-                    <h1 class="step-title">{% trans %}Indico site default parameters{% endtrans %}</h1>
+                    <h1 class="step-title">{% trans %}Site configuration{% endtrans %}</h1>
 
                     <div class="step-description">
-                        <div>{% trans %}Configure here your server settings.{% endtrans %}</div>
-                        <div class="additional-information">{% trans %}All the informations set here will also be used to fill your personal account information. To change these informations you can later head to Server Admin, General Settings (will change the server settings) or My Profile, Account Details (will change the account settings).{% endtrans %}</div>
+                        <div>{% trans %}These are the default parameters for your Indico site.{% endtrans %}</div>
+                        <div class="additional-information">{% trans %}Please note that this information will also be used for your own user profile. You can change it later.{% endtrans %}</div>
                     </div>
 
                     <div class="fields-container">
@@ -137,13 +137,22 @@
                     <h1 class="step-title">{% trans %}Let us know you exist!{% endtrans %}</h1>
 
                     <div class="step-description">
-                            <div>{% trans %}You can choose here to receive free notifications from the Indico developers team with updated informations to keep you up to date with your Indico administration (for example: security warnings, new versions released, ...){% endtrans %}</div>
-                            <div class="additional-information">{% trans %}Please note that no private information will ever be sent to Indico@CERN and that you will be able to change the Instance Tracking settings anytime in the future (from Server Admin, General Settings).{% endtrans %}</div>
+                            <div>{% trans %}Be part of the ever growing Indico community! Choose to receive updated news on latest releases (2-3 times per year) as well as important security warnings.{% endtrans %}</div>
+                            <div>
+                                {% trans %}The following data will be sent back to us:{% endtrans %}
+                                <ul>
+                                    <li>{% trans %}Server URL{% endtrans %}</li>
+                                    <li>{% trans %}Contact person{% endtrans %}</li>
+                                    <li>{% trans %}Name of the organisation{% endtrans %}</li>
+                                </ul>
+                            </div>
+                            <div>{% trans %}Please note that <strong>no private information</strong> will ever be sent to the Indico Project and that you can disable it anytime (from "Server Admin", "General Settings").{% endtrans %}</div>
                     </div>
 
                     <div class="fields-container">
 
                         <div class="enable-line">
+                            <label>{% trans %}Count me in!{% endtrans %}</label>
                             <input id="enable" type="checkbox" name="enable" value="1" {{ checked }}>
                             <div class="toggle-button">
                                 <div class="toggle"></div>
