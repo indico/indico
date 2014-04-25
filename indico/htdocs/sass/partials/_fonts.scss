@@ -37,10 +37,13 @@
     font-weight: normal;
 }
 
-
 @font-face {
     font-family: "Maven Pro";
-    src: font-url("fonts/maven_pro/MavenPro-Regular.ttf") format("truetype");
+    src: font-url("fonts/maven_pro/maven_pro_medium-webfont.eot");
+    src: font-url("fonts/maven_pro/maven_pro_medium-webfont.eot") format("embedded-opentype"),
+         font-url("fonts/maven_pro/maven_pro_medium-webfont.woff") format("woff"),
+         font-url("fonts/maven_pro/maven_pro_medium-webfont.ttf") format("truetype"),
+         font-url("fonts/maven_pro/maven_pro_medium-webfont.svg") format("svg");
     font-style: normal;
     font-weight: normal;
 }

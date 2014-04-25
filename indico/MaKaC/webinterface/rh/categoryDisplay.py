@@ -93,7 +93,8 @@ class RHCategoryStatistics(RHCategDisplayBase):
         stats = statistics.CategoryStatistics(self._target).getStatistics()
         if request.accept_mimetypes.best_match(('application/json', 'text/html')) == 'application/json':
             stats = dict(stats)
-            stats['updated'] = stats['updated'].strftime("%d %B %Y %H:%M")
+            if stats['updated']:
+                stats['updated'] = stats['updated'].strftime("%d %B %Y %H:%M")
             return jsonify(stats)
         else:
             p = category.WPCategoryStatistics(self, self._target, wfReg, stats)
