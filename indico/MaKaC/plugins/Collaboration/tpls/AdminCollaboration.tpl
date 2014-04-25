@@ -504,6 +504,7 @@ var dateBookingTemplate = function(booking, viewBy) {
                        IndicoDateTimeFormats.Default).time.substring(0, 5);
     }
 
+    row.data('time', time);
     row.append($('<td class="ACBookingFirstCell ACBookingTime"></td>').html(time)).
         append($('<td class="ACBookingCellNoWrap"><span>' + booking.type + '</span></td>')).
         append($('<td class="ACBookingCellNoWrap"></td>').append($('<span/>').
@@ -534,10 +535,16 @@ var dateGroupTemplate = function(group, isFirst, viewBy) {
       $('<td class="ACBookingGroupTitle" colspan=11 />').append(
         $('<span/>').html(date)
     )));
-    each(bookings, function(booking){
-        result.append(dateBookingTemplate(booking, viewBy));
+    var rows = []
+    $.each(bookings, function(i, booking) {
+        rows.push(dateBookingTemplate(booking, viewBy));
     });
-
+    rows.sort(function(a, b) {
+        a = $(a).data('time');
+        b = $(b).data('time');
+        return a > b ? 1 : (a < b ? -1 : 0);
+    });
+    result.append(rows);
     return result;
 };
 
