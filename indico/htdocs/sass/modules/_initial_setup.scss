@@ -1,13 +1,7 @@
-@import "compass/css3";
-@import "compass/utilities/general/clearfix";
 @import 'base';
 
-$dark-blue-logo: #005272;
-$light-blue-logo: #00A4E4;
-$init-setup-font-family: "Maven Pro"
-
 .init-setup-header {
-    font-family: $init-setup-font-family;
+    @extend %font-family-initial-setup;
     color: #005272;
     width: 100%;
     background-color: $dark-blue-logo;
@@ -28,11 +22,13 @@ $init-setup-font-family: "Maven Pro"
     }
 
     .header-title {
+        @extend %font-family-logo;
         font-size: 54px;
         color: $light-blue-logo;
     }
 
-    .header-subtitle{
+    .header-subtitle {
+        @extend %font-family-logo;
         color: white;
         font-size: 26px;
     }
@@ -82,6 +78,7 @@ $init-setup-font-family: "Maven Pro"
 }
 
 .init-setup-body {
+    @extend %font-family-initial-setup;
     margin-left: auto;
     margin-right: auto;
     padding-top: 30px;
@@ -91,7 +88,6 @@ $init-setup-font-family: "Maven Pro"
     width: 100%;
     background: white;
     border-left: 3px #005272 solid;
-    font-family: $init-setup-font-family;
 
     @media only screen and (min-width: 481px) and (max-width: 768px) {
         min-width: 480px;
@@ -126,11 +122,11 @@ $init-setup-font-family: "Maven Pro"
             }
 
             .step-icon {
+                @include box-sizing(border-box);
                 float: left;
                 margin-top: 1em;
                 margin-left: -50px;
                 border: 5px solid white;
-                box-sizing: border-box;
                 border-radius: 50%;
                 background-color: #005272;
                 width: 100px;
@@ -152,7 +148,7 @@ $init-setup-font-family: "Maven Pro"
                 text-align: left;
 
                 .step-title {
-                    font-family: $init-setup-font-family;
+                    @extend %font-family-logo;
                     color: #005272;
                     font-weight: bold;
                     padding-left: 2%;
@@ -203,25 +199,12 @@ $init-setup-font-family: "Maven Pro"
                     }
 
                     input {
+                        @include placeholder {
+                            color: #BEBEBE;
+                        }
+
                         width: 80%;
                         box-shadow: none;
-                    }
-
-                    /* Grouping does not work for some reason */
-                    input::-webkit-input-placeholder {
-                        color: #BEBEBE;
-                    }
-
-                    input::-moz-placeholder {
-                        color: #BEBEBE;
-                    }
-
-                    input:-moz-placeholder {  /* Older versions of Firefox */
-                        color: #BEBEBE;
-                    }
-
-                    input:-ms-input-placeholder {
-                        color: #BEBEBE;
                     }
 
                     .input-timezone, .input-lang {
@@ -230,22 +213,8 @@ $init-setup-font-family: "Maven Pro"
                     }
 
                     .input-it-email:disabled {
-
-                        /* Grouping does not work for some reason */
-                        &::-webkit-input-placeholder {
-                            color: lighten(#BEBEBE, 15%);
-                        }
-
-                        &::-moz-placeholder {
-                            color: lighten(#BEBEBE, 15%);
-                        }
-
-                        &:-moz-placeholder {  /* Older versions of Firefox */
-                            color: lighten(#BEBEBE, 15%);
-                        }
-
-                        &:-ms-input-placeholder {
-                            color: lighten(#BEBEBE, 15%);
+                        @include placeholder {
+                            color: lighten(#BEBEBE, $color-variation);
                         }
                     }
 
@@ -261,7 +230,7 @@ $init-setup-font-family: "Maven Pro"
                         }
 
                         .toggle-button {
-                            -webkit-box-sizing: border-box;
+                            @include box-sizing(border-box);
                             border: 1px solid #999;
                             box-shadow: 0 0 5px rgba(100,100,100,0.3) inset;
                             width: 7em;
@@ -272,11 +241,11 @@ $init-setup-font-family: "Maven Pro"
                             position: relative;
 
                             .toggle {
-                                -webkit-box-sizing: border-box;
+                                @include box-sizing(border-box);
+                                @include transition-property(left, background-color, border-color);
+                                @include transition-duration(.25s);
                                 position: absolute;
                                 left: 0px;
-                                -webkit-transition: left background-color border-color;
-                                -webkit-transition-duration: .25s;
                                 width: 50%;
                                 height: 100%;
                                 background: #aaa;
@@ -309,9 +278,14 @@ $init-setup-font-family: "Maven Pro"
                     }
                 }
             }
+
+            .i-button {
+                @extend %font-family-logo;
+            }
         }
     }
 }
+
 
 .blue-button {
     background-color: $light-blue-logo !important;
@@ -346,7 +320,10 @@ $init-setup-font-family: "Maven Pro"
     }
 }
 
-.big-button{
+.big-button {
+    padding-top: 0.3em;
     margin-top: 50px;
-    font-size: 3em;
+    font-size: 2.5em;
+    width: 3.8em;
+    height: 1.6em;
 }

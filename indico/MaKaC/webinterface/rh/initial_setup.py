@@ -64,11 +64,11 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
         language_options = getLocaleDisplayNames()
         for code in language_options:
             language_options.remove(code)
-            language_options.append((code[0], code[1][0].upper()+code[1][1:]))
+            language_options.append((code[0], code[1][0].upper() + code[1][1:]))
         selLang = session.lang
         locale = parseLocale(selLang)
         langName = locale.languages[locale.language].encode('utf-8')
-        selectedLanguageName = langName[0].upper()+langName[1:]
+        selectedLanguageName = langName[0].upper() + langName[1:]
 
         wvars = {'language_options': language_options,
                  'timezone_options': timezone_options,
