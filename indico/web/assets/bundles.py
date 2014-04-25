@@ -147,7 +147,7 @@ indico_admin = rjs_bundle(
 indico_initial_setup = Bundle(
     *namespace('js/indico/Admin',
 
-               'Initial_setup.js'),
+               'initial_setup.js'),
     filters='rjsmin', output='js/indico_initial_setup_%(version)s.min.js')
 
 indico_timetable = rjs_bundle(
