@@ -177,7 +177,7 @@ class WAdmins(wcomponents.WTemplated):
         tracking_icon = iconEnabled if minfo.isInstanceTrackingActive() else iconDisabled
         wvars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="{0}">""".format(tracking_url) +
                                         """<img src="{0}" border="0" style="float:left;""".format(tracking_icon) +
-                                        """ padding-right: 5px">_("Instance Tracking")</a></div>""")
+                                        """ padding-right: 5px">_("Receive important notifications")</a></div>""")
         wvars["instanceTrackingEmail"] = minfo.getInstanceTrackingEmail()
         return wvars
 
