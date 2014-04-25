@@ -60,7 +60,7 @@
       </li>
     </ul>
   </div>
-  <%include file="CHBookingRepeatition.tpl"/>
+  <%include file="CHBookingRepetition.tpl"/>
 </div>
 <!-- END OF CONTEXT HELP DIVS -->
 

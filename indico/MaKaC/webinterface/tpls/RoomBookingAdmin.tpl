@@ -4,7 +4,7 @@
   <div id="defaultLocationCH" class="tip">
     ${ _("First location/location by default offered to users")}
   </div>
-  <%include file="CHBookingRepeatition.tpl"/>
+  <%include file="CHBookingRepetition.tpl"/>
 </div>
 <!-- END OF CONTEXT HELP DIVS -->
 

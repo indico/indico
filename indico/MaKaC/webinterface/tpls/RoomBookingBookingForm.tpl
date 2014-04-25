@@ -196,7 +196,7 @@
   <div id="iNeedAVCSupport" class="tip">
     ${ _('Check <b>if</b> you need AVC Support to help you with video-conferencing equipment.') }<br />
   </div>
-  <%include file="CHBookingRepeatition.tpl"/>
+  <%include file="CHBookingRepetition.tpl"/>
 </div>
 <!-- END OF CONTEXT HELP DIVS -->
 

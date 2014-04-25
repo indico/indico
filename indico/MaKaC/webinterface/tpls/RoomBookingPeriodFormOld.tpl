@@ -107,6 +107,6 @@
                 <option ${ sel[4] } value="4"> ${ _("Repeat every month")}</option>
             </select>
             <span id="repComment" style="margin-left: 12px"></span>
-            ${contextHelp('repeatitionHelp' )}
+            ${contextHelp('repetitionHelp' )}
         </td>
     </tr>
