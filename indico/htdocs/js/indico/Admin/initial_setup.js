@@ -5,6 +5,7 @@ $(document).ready(function(){
     var fields = [[$('#name'), $('#surname'), $('#user-email'), $('#login'), $('#password'), $('#password-confirm')],
                   [$('#organisation')],
                   [$('#it-email')]];
+    var itEmailValue = '';
 
     // Scroll the page to a step
     function scrollToStep(step){
@@ -37,11 +38,10 @@ $(document).ready(function(){
     function fillITEmail(){
         var userEmail = $('#user-email');
         var itEmail = $('#it-email');
-        var itEmailHidden = $('#it-email-hidden');
-        if (itEmailHidden.val() == '') {
+        if (itEmailValue == '') {
             itEmail.val(userEmail.val());
         } else {
-            itEmail.val(itEmailHidden.val());
+            itEmail.val(itEmailValue);
         }
     }
 
@@ -189,8 +189,7 @@ $(document).ready(function(){
 
     // Listener to store IT Email value
     $('#it-email').on('input', function(){
-        var itEmailHidden = $('#it-email-hidden');
-        itEmailHidden.val(this.value);
+        itEmailValue = this.value;
     });
 
 });
