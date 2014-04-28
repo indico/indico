@@ -199,25 +199,12 @@
                     }
 
                     input {
+                        @include placeholder {
+                            color: #BEBEBE;
+                        }
+
                         width: 80%;
                         box-shadow: none;
-                    }
-
-                    /* Grouping does not work for some reason */
-                    input::-webkit-input-placeholder {
-                        color: #BEBEBE;
-                    }
-
-                    input::-moz-placeholder {
-                        color: #BEBEBE;
-                    }
-
-                    input:-moz-placeholder {  /* Older versions of Firefox */
-                        color: #BEBEBE;
-                    }
-
-                    input:-ms-input-placeholder {
-                        color: #BEBEBE;
                     }
 
                     .input-timezone, .input-lang {
@@ -226,21 +213,7 @@
                     }
 
                     .input-it-email:disabled {
-
-                        /* Grouping does not work for some reason */
-                        &::-webkit-input-placeholder {
-                            color: lighten(#BEBEBE, $color-variation);
-                        }
-
-                        &::-moz-placeholder {
-                            color: lighten(#BEBEBE, $color-variation);
-                        }
-
-                        &:-moz-placeholder {  /* Older versions of Firefox */
-                            color: lighten(#BEBEBE, $color-variation);
-                        }
-
-                        &:-ms-input-placeholder {
+                        @include placeholder {
                             color: lighten(#BEBEBE, $color-variation);
                         }
                     }

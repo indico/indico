@@ -88,3 +88,10 @@ $default-box-shadow-v-offset: 1px;
     background: $start-color;
     @include background-image(linear-gradient(top, $start-color, $end-color));
 }
+
+@mixin placeholder {
+    &::-webkit-input-placeholder {@content}
+    &::-moz-placeholder {@content}
+    &:-moz-placeholder {@content}
+    &:-ms-input-placeholder {@content}
+}
