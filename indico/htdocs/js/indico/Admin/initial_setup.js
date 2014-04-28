@@ -55,7 +55,7 @@ $(document).ready(function(){
     function validateSteps(){
         ok = true;
         invalidStep = 0;
-        for (var i=1; i<=3; i++) {
+        for (var i = 1; i <= 3; i++) {
             validateStep(i);
             if (!ok && invalidStep == 0) {
                 invalidStep = i;
@@ -67,7 +67,7 @@ $(document).ready(function(){
     // Validate a single step
     function validateStep(step){
 
-        for (var i=0; i<fields[step-1].length; i++) {
+        for (var i = 0; i < fields[step-1].length; i++) {
             fields[step-1][i].trigger('input').trigger('hideTooltip');
         }
     }
@@ -101,10 +101,11 @@ $(document).ready(function(){
             event: 'hideTooltip'
         }
     }).on('focus input mouseenter', function(){
-        if ($(this).hasClass('hasError')) {
-            $(this).trigger('showTooltip');
+        var $this = $(this);
+        if ($this.hasClass('hasError')) {
+            $this.trigger('showTooltip');
         } else {
-            $(this).trigger('hideTooltip');
+            $this.trigger('hideTooltip');
         }
     }).on('blur', function(){
         $(this).trigger('hideTooltip');
@@ -124,8 +125,9 @@ $(document).ready(function(){
 
     // Instance Tracking slider
     $('.toggle-button').on('click', function() {
-        $(this).toggleClass('toggled');
-        var toggled = $(this).hasClass('toggled');
+        var $this = $(this);
+        $this.toggleClass('toggled');
+        var toggled = $this.hasClass('toggled');
         var itEmail = $('#it-email');
         var checkbox = $('#enable');
         itEmail.prop('required', toggled);
@@ -145,20 +147,21 @@ $(document).ready(function(){
 
     // Fields validation setup
     $('#initial-setup-form :input:not(#password-confirm)').on('input', function(){
+        var $this = $(this);
         if (!this.validity.valid) {
             if (this.id == 'user-email' || this.id == 'it-email') {
                 if (this.validity.valueMissing) {
-                    $(this).qtip('option', 'content.attr', "data-error-tooltip");
+                    $this.qtip('option', 'content.attr', 'data-error-tooltip');
                 } else {
-                    $(this).qtip('option', 'content.attr', "data-error-tooltip2");
+                    $this.qtip('option', 'content.attr', 'data-error-tooltip2');
                 }
             }
             if (clicked) {
-                markInvalidField($(this));
+                markInvalidField($this);
             }
             ok = false;
         } else {
-            markValidField($(this));
+            markValidField($this);
         }
     });
     $('#password, #password-confirm').on('input', function(){
