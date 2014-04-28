@@ -121,7 +121,7 @@
 </tr>
 % endif
 
-<script type="text/javascript">
+<script>
     IndicoUI.executeOnLoad(function() {
         % if infoBookingMode:
             $('#typeInfo').text($('#repeatability option:selected').text());
