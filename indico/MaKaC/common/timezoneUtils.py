@@ -61,7 +61,7 @@ def isTimezoneAware(datetime):
     return hasattr(datetime, 'tzinfo') and datetime.tzinfo is not None
 
 
-def naive2local( naiveDateTime, localTimezone ):
+def naive2local(naiveDateTime, localTimezone):
     """ Extends naive datetimes with the specified timezone info (string),
         using DST or STD according to the date in question
 
@@ -76,7 +76,7 @@ def naive2local( naiveDateTime, localTimezone ):
     localDateTime = utcDateTime.astimezone(timezone(localTimezone))
     return localDateTime
 
-def setAdjustedDate(date, object = None, tz=None):
+def setAdjustedDate(date, object=None, tz=None):
     # Localizes a date to the timezone tz
     # tz can be a string (preferred) or a pytz.timezone object
     # If tz is None, the timezone of the object is used
@@ -88,7 +88,7 @@ def setAdjustedDate(date, object = None, tz=None):
         tz = timezone('UTC')
     return tz.localize(date).astimezone(timezone('UTC'))
 
-def getAdjustedDate(date, object = None, tz=None):
+def getAdjustedDate(date, object=None, tz=None):
     # Returns a date adjusted to the timezone tz
     # tz can be string (preferred) or a pytz.timezone object
     # If tz is None, the timezone of the object is used
@@ -112,7 +112,7 @@ def isTomorrow(date, tz):
     """ Returns if a date is inside the day tomorrow (given a timezone)
         date: a timezone-aware datetime
     """
-    tomorrow = getAdjustedDate(nowutc(), None, tz).date() + timedelta(days = 1)
+    tomorrow = getAdjustedDate(nowutc(), None, tz).date() + timedelta(days=1)
     day = getAdjustedDate(date, None, tz)
     return tomorrow == day
 
@@ -120,7 +120,7 @@ def isYesterday(date, tz):
     """ Returns if a date is inside the day yesterday (given a timezone)
         date: a timezone-aware datetime
     """
-    yesterday = getAdjustedDate(nowutc(), None, tz).date() - timedelta(days = 1)
+    yesterday = getAdjustedDate(nowutc(), None, tz).date() - timedelta(days=1)
     day = getAdjustedDate(date, None, tz)
     return yesterday == day
 
@@ -143,7 +143,7 @@ def datetimeToUnixTime(t):
     """ Gets a datetime object
         Returns a float with the number of seconds from the UNIX epoch
     """
-    return calendar.timegm(t.utctimetuple())+t.microsecond/1000000.0
+    return calendar.timegm(t.utctimetuple()) + t.microsecond / 1000000.0
 
 def datetimeToUnixTimeInt(t):
     """ Gets a datetime object
@@ -151,7 +151,7 @@ def datetimeToUnixTimeInt(t):
     """
     return calendar.timegm(t.utctimetuple())
 
-def unixTimeToDatetime(seconds, tz = 'UTC'):
+def unixTimeToDatetime(seconds, tz='UTC'):
     """ Gets a float (or an object able to be turned into a float) representing the seconds from the UNIX epoch,
         and a string representing the timezone (UTC) by default.
         Returns a datetime object
@@ -161,16 +161,16 @@ def unixTimeToDatetime(seconds, tz = 'UTC'):
 def maxDatetime():
     """ Returns the maximum possible datetime object as a timezone-aware datetime (in UTC)
     """
-    return setAdjustedDate(datetime.max, tz = 'UTC')
+    return setAdjustedDate(datetime.max, tz='UTC')
 
 def minDatetime():
     """ Returns the maximum possible datetime object as a timezone-aware datetime (in UTC)
     """
-    return setAdjustedDate(datetime.min, tz = 'UTC')
+    return setAdjustedDate(datetime.min, tz='UTC')
 
 class DisplayTZ:
 
-    def __init__(self,aw,conf=None,useServerTZ=0):
+    def __init__(self, aw, conf=None, useServerTZ=0):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         sessTimezone = session.timezone
         if sessTimezone == 'LOCAL':
@@ -188,7 +188,7 @@ class DisplayTZ:
 
 class SessionTZ:
 
-    def __init__(self,user):
+    def __init__(self, user):
         try:
             displayMode = user.getDisplayTZMode()
         except:
