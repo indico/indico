@@ -1,9 +1,11 @@
-@import "compass/css3";
+@import "compass/css3/images";
+@import "compass/css3/box-sizing";
+@import "compass/css3/transition";
 @import "compass/utilities/general/clearfix";
 @import 'base';
 
 .init-setup-header {
-    @extend %font-family-logo-body;
+    @extend %font-family-initial-setup;
     color: #005272;
     width: 100%;
     background-color: $dark-blue-logo;
@@ -80,7 +82,7 @@
 }
 
 .init-setup-body {
-    @extend %font-family-logo-body;
+    @extend %font-family-initial-setup;
     margin-left: auto;
     margin-right: auto;
     padding-top: 30px;
