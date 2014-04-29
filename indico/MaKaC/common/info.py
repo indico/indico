@@ -69,10 +69,11 @@ class MaKaCInfo(Persistent):
         # special features
         self._newsActive = False
         self._debugActive = False
-        self._instanceTrackingActive = False
 
-        # Instance Tracking email
+        # Instance Tracking
+        self._instanceTrackingActive = False
         self._instanceTrackingEmail = ""
+        self._instanceTrackingContact = ""
 
         # template set
         self._defaultTemplateSet = None
@@ -144,11 +145,21 @@ class MaKaCInfo(Persistent):
         if hasattr(self, "_instanceTrackingEmail"):
             return self._instanceTrackingEmail
         else:
-            self._instanceTrackingActive = ""
+            self._instanceTrackingEmail = ""
             return ""
 
     def setInstanceTrackingEmail(self, email=""):
         self._instanceTrackingEmail = email
+
+    def getInstanceTrackingContact(self):
+        if hasattr(self, "_instanceTrackingContact"):
+            return self._instanceTrackingContact
+        else:
+            self._instanceTrackingContact = ""
+            return ""
+
+    def setInstanceTrackingContact(self, contact=""):
+        self._instanceTrackingContact = contact
 
     def getNews( self ):
         try:

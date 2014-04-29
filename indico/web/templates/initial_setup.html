@@ -160,7 +160,11 @@
                         </div>
 
                         <div>
-                            <input id="it-email" class="input-it-email" type="email" name="it_email" data-error-tooltip="{% trans %}You must enter an e-mail for Instance Tracking{% endtrans %}" data-error-tooltip2="{% trans %}You must enter a valid e-mail for Instance Tracking{% endtrans %}" value="{{ it_email_value }}" placeholder="{% trans %}Contact email{% endtrans %}" disabled>
+                            <input id="it-contact" class="input-it" type="text" name="it_contact" data-error-tooltip="{% trans %}You must enter a contact name{% endtrans %}" value="{{ it_contact_value }}" placeholder="{% trans %}Contact name{% endtrans %}" disabled>
+                        </div>
+
+                        <div>
+                            <input id="it-email" class="input-it" type="email" name="it_email" data-error-tooltip="{% trans %}You must enter an e-mail for Instance Tracking{% endtrans %}" data-error-tooltip2="{% trans %}You must enter a valid e-mail for Instance Tracking{% endtrans %}" value="{{ it_email_value }}" placeholder="{% trans %}Contact email{% endtrans %}" disabled>
                         </div>
 
                     </div>
