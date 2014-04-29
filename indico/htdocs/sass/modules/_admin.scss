@@ -40,3 +40,97 @@
 .tasks .i-label {
      width: 100%;
 }
+
+.instance-tracking-settings {
+    width: 500px;
+
+    .clearfix {
+        margin-bottom: 20px;
+
+        .field-input {
+            float: right;
+
+            &:not(.toggle-button) {
+                width: 300px;
+            }
+        }
+
+        .field-label {
+            float: left;
+            width: 150px;
+
+            .status-label {
+                margin-top: 8px;
+            }
+        }
+
+        label {
+            float: right;
+            font-weight: normal;
+        }
+
+        .hidden-input {
+            display: none;
+        }
+
+        a, input, .toggle-button {
+            float: left;
+        }
+
+        a, input:not(.btn) {
+            width: 100%;
+        }
+
+        .buttons-group {
+            float: right;
+            width: initial;
+        }
+    }
+
+    .toggle-button {
+        @include box-sizing(border-box);
+        border: 1px solid #999;
+        box-shadow: 0 0 5px rgba(100,100,100,0.3) inset;
+        width: 5em;
+        display: inline-block;
+        background: #ddd;
+        height: 2.5em;
+        cursor: pointer;
+        position: relative;
+
+        .toggle {
+            @include box-sizing(border-box);
+            @include transition-property(left, background-color, border-color);
+            @include transition-duration(.25s);
+            position: absolute;
+            left: 0px;
+            width: 50%;
+            height: 100%;
+            background: #aaa;
+            text-align: center;
+            border: 1px solid #888
+        }
+
+        .toggle::before {
+            color: #666;
+            display: inline-block;
+            font-size: 1em;
+            content: "OFF";
+            line-height: 2.2em;
+        }
+
+        &.toggled {
+            .toggle {
+                box-shadow: 0 0 1px rgba(255,255,255,0.8) inset;
+                background-color: $light-blue-logo;
+                border-color: lighten($dark-blue-logo, $color-variation);
+                left: 2.5em;
+            }
+
+            .toggle::before {
+                content: "ON";
+                color: #eee !important;
+            }
+        }
+    }
+}

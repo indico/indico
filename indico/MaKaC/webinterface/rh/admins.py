@@ -90,25 +90,17 @@ class RHAdminSwitchNewsActive( RHAdminBase ):
         self._redirect( urlHandlers.UHAdminArea.getURL() )
 
 
-class RHAdminToggleInstanceTracking(RHAdminBase):
-
-    def _process(self):
-        self._minfo.setInstanceTrackingActive(not self._minfo.isInstanceTrackingActive())
-        self._redirect(url_for('admin.adminList'))
-
-
 class RHGeneralInfoPerformModification(RHAdminBase):
     _uh = urlHandlers.UHGeneralInfoPerformModification
 
     def _process(self):
         params = self._getRequestParams()
 
-        if params['action'] != 'cancel':
+        if 'ok' in params:
             self._minfo.setTitle(params["title"])
             self._minfo.setOrganisation(params["organisation"])
             self._minfo.setCity(params["city"])
             self._minfo.setCountry(params["country"])
-            self._minfo.setTimezone(params["timezone"])
             self._minfo.setLang(params["lang"])
         self._redirect(urlHandlers.UHAdminArea.getURL())
 

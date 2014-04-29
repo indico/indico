@@ -52,10 +52,10 @@
         <table align="center">
         <tr>
           <td>
-            <input type="submit" class="btn" name="action" value="${ _("ok")}">
+            <input type="submit" class="btn" name="ok" value="${ _("ok")}">
           </td>
           <td>
-            <input type="submit" class="btn" name="action" value="${ _("cancel")}">
+            <input type="submit" class="btn" name="cancel" value="${ _("cancel")}">
           </td>
         </tr>
         </table>
