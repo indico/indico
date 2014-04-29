@@ -21,8 +21,9 @@ __all__ = ['DBMgr', 'MigratedDB']
 
 import inspect
 import logging
+import os
+import pprint
 import time
-from datetime import datetime
 
 import pytz
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -45,10 +46,42 @@ from .manager import DBMgr
 from .migration import MigratedDB
 
 
+try:
+    import sqlparse
+except ImportError:
+    sqlparse = None
+
+try:
+    from pygments import highlight
+    from pygments.lexers import SqlLexer, PythonLexer
+    from pygments.formatters import Terminal256Formatter
+except ImportError:
+    has_pygments = False
+else:
+    has_pygments = True
+
+
 if inspect.stack()[1][0].f_globals.get('__no_session_options__', False):
     db = SQLAlchemy()  # for testing and migration, manager isn't needed
 else:
     db = SQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
+
+
+def prettify_sql(statement):
+    if sqlparse:
+        statement = sqlparse.format(statement, keyword_case='upper', reindent=True)
+    statement = '    ' + statement.replace('\n', '\n    ')
+    if not has_pygments or os.environ.get('INDICO_COLORED_LOG') != '1':
+        return statement
+    return highlight(statement, SqlLexer(), Terminal256Formatter(style='native'))
+
+
+def prettify_params(args):
+    args = pprint.pformat(args)
+    args = '    ' + args.replace('\n', '\n    ')
+    if not has_pygments or os.environ.get('INDICO_COLORED_LOG') != '1':
+        return args
+    return highlight(args, PythonLexer(), Terminal256Formatter(style='native')).rstrip()
 
 
 def apply_db_loggers(debug=False):
@@ -61,15 +94,15 @@ def apply_db_loggers(debug=False):
         def before_cursor_execute(conn, cursor, statement,
                                   parameters, context, executemany):
             context._query_start_time = time.time()
-            logger.debug('Start Query: {}'.format(statement))
+            logger.debug('Start Query:\n{}\n{}'.format(prettify_sql(statement),
+                                                       prettify_params(parameters) if parameters else '').rstrip())
 
 
         @listens_for(Engine, 'after_cursor_execute')
         def after_cursor_execute(conn, cursor, statement,
                                  parameters, context, executemany):
             total = time.time() - context._query_start_time
-            logger.debug('Query Complete!')
-            logger.debug('Total Time: {}'.format(total))
+            logger.debug('Query complete; total time: {}'.format(total))
 
 
 def page_query(q, page_size=1000):
