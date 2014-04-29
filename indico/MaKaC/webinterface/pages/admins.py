@@ -201,12 +201,6 @@ class WAdmins(wcomponents.WTemplated):
 
         wvars["administrators"] = fossilize(minfo.getAdminList())
 
-        url = url_for('admin.adminList-toggleInstanceTracking')
-        icon = iconEnabled if minfo.isInstanceTrackingActive() else iconDisabled
-        wvars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="{0}">""".format(url) +
-                                        """<img src="{0}" border="0" style="float:left;""".format(icon) +
-                                        """ padding-right: 5px">_("Receive important notifications")</a></div>""")
-        wvars["instanceTrackingEmail"] = minfo.getInstanceTrackingEmail()
         return wvars
 
 
@@ -449,41 +443,45 @@ class WAdminPluginsActionResult(wcomponents.WTemplated):
 
         return variables
 
-class WPServicesCommon( WPAdminsBase ):
+
+class WPServicesCommon(WPAdminsBase):
 
     def _setActiveSideMenuItem(self):
         self._servicesMenuItem.setActive()
 
-    def _createTabCtrl( self ):
+    def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._subTabWebcast = self._tabCtrl.newTab( "webcast", _("Webcast"), \
-                urlHandlers.UHWebcast.getURL() )
-        self._subTabWebcast_Live = self._subTabWebcast.newSubTab( "live", _("Live"), \
-                urlHandlers.UHWebcast.getURL() )
-        self._subTabWebcast_Archive = self._subTabWebcast.newSubTab( "archive", _("Archive"), \
-                urlHandlers.UHWebcastArchive.getURL() )
-        self._subTabWebcast_Setup = self._subTabWebcast.newSubTab( "setup", _("Setup"), \
-                urlHandlers.UHWebcastSetup.getURL() )
-        self._subTabIPBasedACL = self._tabCtrl.newTab( "ip_based_acl", _("IP Based ACL"), \
-                urlHandlers.UHIPBasedACL.getURL() )
-        self._subTabHTTPAPI = self._tabCtrl.newTab( "http_api", _("HTTP API"), \
-                urlHandlers.UHAdminAPIOptions.getURL() )
-        self._subTabHTTPAPI_Options = self._subTabHTTPAPI.newSubTab( "api_options", _("Options"), \
-                urlHandlers.UHAdminAPIOptions.getURL() )
-        self._subTabHTTPAPI_Keys = self._subTabHTTPAPI.newSubTab( "api_keys", _("API Keys"), \
-                urlHandlers.UHAdminAPIKeys.getURL() )
-        self._subTabOauth = self._tabCtrl.newTab( "oauth", _("OAuth"), \
-                urlHandlers.UHAdminOAuthConsumers.getURL() )
-        self._subTabOauth_Consumers = self._subTabOauth.newSubTab( "oauth_consumers", _("Consumers"), \
-                urlHandlers.UHAdminOAuthConsumers.getURL() )
-        self._subTabOauth_Authorized = self._subTabOauth.newSubTab( "oauth_authorized", _("Authorized"), \
-                urlHandlers.UHAdminOAuthAuthorized.getURL() )
-        self._subTabAnalytics = self._tabCtrl.newTab( "analytics", _("Analytics"), \
-                urlHandlers.UHAnalytics.getURL() )
+        self._subTabWebcast = self._tabCtrl.newTab("webcast", _("Webcast"),
+                                                   urlHandlers.UHWebcast.getURL())
+        self._subTabWebcast_Live = self._subTabWebcast.newSubTab("live", _("Live"),
+                                                                 urlHandlers.UHWebcast.getURL())
+        self._subTabWebcast_Archive = self._subTabWebcast.newSubTab("archive", _("Archive"),
+                                                                    urlHandlers.UHWebcastArchive.getURL())
+        self._subTabWebcast_Setup = self._subTabWebcast.newSubTab("setup", _("Setup"),
+                                                                  urlHandlers.UHWebcastSetup.getURL())
+        self._subTabIPBasedACL = self._tabCtrl.newTab("ip_based_acl", _("IP Based ACL"),
+                                                      urlHandlers.UHIPBasedACL.getURL())
+        self._subTabHTTPAPI = self._tabCtrl.newTab("http_api", _("HTTP API"),
+                                                   urlHandlers.UHAdminAPIOptions.getURL())
+        self._subTabHTTPAPI_Options = self._subTabHTTPAPI.newSubTab("api_options", _("Options"),
+                                                                    urlHandlers.UHAdminAPIOptions.getURL())
+        self._subTabHTTPAPI_Keys = self._subTabHTTPAPI.newSubTab("api_keys", _("API Keys"),
+                                                                 urlHandlers.UHAdminAPIKeys.getURL())
+        self._subTabOauth = self._tabCtrl.newTab("oauth", _("OAuth"),
+                                                 urlHandlers.UHAdminOAuthConsumers.getURL())
+        self._subTabOauth_Consumers = self._subTabOauth.newSubTab("oauth_consumers", _("Consumers"),
+                                                                  urlHandlers.UHAdminOAuthConsumers.getURL())
+        self._subTabOauth_Authorized = self._subTabOauth.newSubTab("oauth_authorized", _("Authorized"),
+                                                                   urlHandlers.UHAdminOAuthAuthorized.getURL())
+        self._subTabAnalytics = self._tabCtrl.newTab("analytics", _("Analytics"),
+                                                     urlHandlers.UHAnalytics.getURL())
+        self._subTabInstanceTracking = self._tabCtrl.newTab("instance_tracking", _("Instance Tracking"),
+                                                            urlHandlers.UHInstanceTracking.getURL())
 
     def _getPageContent(self, params):
-        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
+        return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
+
 
 class WPWebcast( WPServicesCommon ):
 
@@ -2557,6 +2555,61 @@ class WAnalytics(wcomponents.WTemplated):
         vars["analyticsCodeLocation"] = minfo.getAnalyticsCodeLocation()
         vars["analyticsFormURL"] = urlHandlers.UHSaveAnalytics.getURL()
         return vars
+
+
+class WPInstanceTracking(WPServicesCommon):
+
+    def __init__(self, rh):
+        WPServicesCommon.__init__(self, rh)
+
+    def _getTabContent(self, params):
+        wc = WInstanceTracking()
+        pars = {"ITInfoModifURL": urlHandlers.UHITInfoModification.getURL()}
+        return wc.getHTML(pars)
+
+    def _setActiveTab(self):
+        self._subTabInstanceTracking.setActive()
+
+
+class WInstanceTracking(wcomponents.WTemplated):
+
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+
+        iconDisabled = str(Config.getInstance().getSystemIconURL("disabledSection"))
+        iconEnabled = str(Config.getInstance().getSystemIconURL("enabledSection"))
+        url = url_for('admin.adminServices-toggleInstanceTracking')
+        if minfo.isInstanceTrackingActive():
+            icon = iconEnabled
+            wvars["enableDisable"] = _("Disable")
+        else:
+            icon = iconDisabled
+            wvars["enableDisable"] = _("Enable")
+        wvars["features"] = i18nformat("""<div style="margin-bottom: 5px"><a href="{0}">""".format(url) +
+                                       """<img src="{0}" border="0" style="float:left;""".format(icon) +
+                                       """ padding-right: 5px">_("Receive important notifications")</a></div>""")
+        wvars["instanceTrackingContact"] = minfo.getInstanceTrackingContact()
+        wvars["instanceTrackingEmail"] = minfo.getInstanceTrackingEmail()
+        return wvars
+
+
+class WITInfoModification(wcomponents.WTemplated):
+
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        wvars["contact"] = minfo.getInstanceTrackingContact()
+        wvars["email"] = minfo.getInstanceTrackingEmail()
+        return wvars
+
+
+class WPITInfoModification(WPAdmins):
+
+    def _getPageContent(self, params):
+        wc = WITInfoModification()
+        pars = {"postURL": urlHandlers.UHITInfoModification.getURL()}
+        return wc.getHTML(pars)
 
 
 class WPAdminProtection(WPAdminsBase):

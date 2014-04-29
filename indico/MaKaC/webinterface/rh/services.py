@@ -17,6 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from flask import request
+
+from indico.web.flask.util import url_for
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common import utils
@@ -394,3 +397,30 @@ class RHSaveAnalytics(RHServicesBase):
         if 'analyticsCodeLocation' in self._params:
             minfo.setAnalyticsCodeLocation(self._analyticsCodeLocation)
         self._redirect( urlHandlers.UHAnalytics.getURL() )
+
+
+class RHInstanceTracking(RHServicesBase):
+
+    def _process(self):
+        p = adminPages.WPInstanceTracking(self)
+        return p.display()
+
+
+class RHToggleInstanceTracking(RHServicesBase):
+
+    def _process(self):
+        self._minfo.setInstanceTrackingActive(not self._minfo.isInstanceTrackingActive())
+        self._redirect(url_for('admin.adminServices-instanceTracking'))
+
+
+class RHITInfoModification(RHServicesBase):
+
+    def _process_GET(self):
+        p = adminPages.WPITInfoModification(self)
+        return p.display()
+
+    def _process_POST(self):
+        if 'ok' in request.form:
+            self._minfo.setInstanceTrackingContact(request.form["contact"])
+            self._minfo.setInstanceTrackingEmail(request.form["email"])
+        self._redirect(url_for('admin.adminServices-instanceTracking'))

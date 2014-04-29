@@ -26,7 +26,7 @@
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Language")}</span></td>
       <td bgcolor="white" width="100%">&nbsp;
-         <select name="lang">
+         <select name="language">
            % for l in getLocaleDisplayNames():
            <option ${"selected" if l[0] == language else ""} value="${ l[0] }">${ l[1] }</option>
            % endfor
@@ -59,10 +59,10 @@
         <table align="center">
         <tr>
           <td>
-            <input type="submit" class="btn" name="action" value="${ _("ok")}">
+            <input type="submit" class="btn" name="ok" value="${ _("ok")}">
           </td>
           <td>
-            <input type="submit" class="btn" name="action" value="${ _("cancel")}">
+            <input type="submit" class="btn" name="cancel" value="${ _("cancel")}">
           </td>
         </tr>
         </table>

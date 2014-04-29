@@ -2,8 +2,7 @@
     <!-- CONTEXT HELP DIVS -->
     <div id="tooltipPool" style="display: none">
         <div id="features" class="tip">
-            ${ _("""- <strong>News</strong>: will display "latest news" on the Indico home page and menu<br/>
-            - <strong>Receive important notifications</strong>: will keep the administrators up to date with all the newest Indico features and security warnings.""")}
+            ${ _("""- <strong>News</strong>: will display "latest news" on the Indico home page and menu.""")}
         </div>
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
@@ -39,10 +38,6 @@
     <tr>
       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("No reply email")}<br/>${ _("(for automatic messages that don't need answer)")}</span></td>
       <td bgcolor="white" width="100%" valign="top" class="blacktext">${ escape(noReplyEmail) }</td>
-    </tr>
-    <tr>
-       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Technical contact email")}</span></td>
-       <td bgcolor="white" width="100%" valign="top" class="blacktext">${instanceTrackingEmail}</td>
     </tr>
     <tr>
       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Language")}</span></td>

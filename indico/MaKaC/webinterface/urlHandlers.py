@@ -2548,6 +2548,14 @@ class UHAnalytics(URLHandler):
     _endpoint = 'admin.adminServices-analytics'
 
 
+class UHInstanceTracking(URLHandler):
+    _endpoint = 'admin.adminServices-instanceTracking'
+
+
+class UHITInfoModification(URLHandler):
+    _endpoint = 'admin.adminServices-itInfoModification'
+
+
 class UHSaveAnalytics(URLHandler):
     _endpoint = 'admin.adminServices-saveAnalytics'
 
