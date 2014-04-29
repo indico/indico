@@ -652,19 +652,7 @@ class UHConfModifRoomBookingSaveBooking(URLHandler):
 
 
 class UHRoomPhoto(URLHandler):
-    _endpoint = 'rooms.photo_large'
-
-    @classmethod
-    def getURL(cls, target=None, extension="jpg"):
-        return super(UHRoomPhoto, cls).getURL(room=target, ext=extension)
-
-
-class UHRoomPhotoSmall(URLHandler):
-    _endpoint = 'rooms.photo_small'
-
-    @classmethod
-    def getURL(cls, target=None, extension="jpg"):
-        return super(UHRoomPhotoSmall, cls).getURL(room=target, ext=extension)
+    _endpoint = 'rooms.photo'
 
 
 class UHConferenceClose(URLHandler):

@@ -105,6 +105,10 @@ class Room(db.Model, Serializer):
         db.ForeignKey('locations.id'),
         nullable=False
     )
+    photo_id = db.Column(
+        db.Integer,
+        db.ForeignKey('photos.id')
+    )
     # user-facing identifier of the room
     name = db.Column(
         db.String,
@@ -244,11 +248,12 @@ class Room(db.Model, Serializer):
         lazy='dynamic'
     )
 
-    photos = db.relationship(
+    photo = db.relationship(
         'Photo',
         backref='room',
         cascade='all, delete-orphan',
-        lazy='dynamic'
+        single_parent=True,
+        lazy=True
     )
 
     reservations = db.relationship(
@@ -331,21 +336,16 @@ notificationAssistance: {notification_for_assistance}
         return str(UH.UHRoomBookingRoomDetails.getURL(target=self))
 
     @property
-    def _photo_id(self):
-        p = self.photos.first()
-        return p.id if p else 'NoPhoto'
-
-    @property
     def large_photo_url(self):
-        return str(UH.UHRoomPhoto.getURL(self._photo_id))
+        return str(UH.UHRoomPhoto.getURL(self, size='large'))
 
     @property
     def small_photo_url(self):
-        return str(UH.UHRoomPhotoSmall.getURL(self._photo_id))
+        return str(UH.UHRoomPhoto.getURL(self, size='small'))
 
     @property
     def has_photo(self):
-        return self.photos.count() > 0
+        return self.photo_id is not None
 
     @hybrid_property
     def is_public(self):
@@ -518,7 +518,7 @@ notificationAssistance: {notification_for_assistance}
         if 'photo' in args:
             entities.append(Photo)
             query = query.\
-                outerjoin(Photo, Photo.room_id == Room.id).\
+                outerjoin(Photo, Photo.id == Room.photo_id).\
                 group_by(Photo.id)
 
         query = query.\
@@ -1269,20 +1269,6 @@ notificationAssistance: {notification_for_assistance}
         )
 
     # photos
-
-    def getLargePhotoURL(self):
-        # raise NotImplementedError('todo')
-        return ''
-
-    def getSmallPhotoURL(self):
-        # raise NotImplementedError('todo')
-        return ''
-
-    def saveLargePhoto(self, photo_path):
-        raise NotImplementedError('todo')
-
-    def saveSmallPhoto(self, photo_path):
-        raise NotImplementedError('todo')
 
     def collides(self, start, end):
         return (

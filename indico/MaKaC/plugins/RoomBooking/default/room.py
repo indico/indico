@@ -500,25 +500,6 @@ class Room(Persistent, RoomBase, Fossilizable):
             infos.append(_("video conference"))
         return ", ".join(infos)
 
-    def getTipPhotoURL(self):
-        """ URL of the tip photo of the room """
-        from MaKaC.webinterface.urlHandlers import UHRoomPhoto
-        photoId = self._doGetPhotoId() or "NoPhoto"
-        return str(UHRoomPhoto.getURL(photoId))
-
-    def getThumbnailPhotoURL(self):
-        """ URL of the tip photo of the room """
-        from MaKaC.webinterface.urlHandlers import UHRoomPhotoSmall
-        if self._doGetPhotoId():
-            photoId = self._doGetPhotoId()
-            return str(UHRoomPhotoSmall.getURL(photoId))
-        else:
-            photoId = "NoPhoto"
-            return str(UHRoomPhotoSmall.getURL(photoId, "png"))
-
-    def hasPhoto(self):
-        return self._doGetPhotoId() is not None
-
     def getIsAutoConfirm(self):
         """ Has the room auto-confirmation of schedule? """
         return not self.resvsNeedConfirmation

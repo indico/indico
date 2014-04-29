@@ -393,16 +393,6 @@ class RoomBase(object):
     # This exception is because we want to allow other room booking systems
     # to override room photos.
 
-    def getPhotoURL(self):
-        # Used to send photos via Python script
-        from MaKaC.webinterface.urlHandlers import UHRoomPhoto
-        return UHRoomPhoto.getURL(self.photoId)
-
-    def getSmallPhotoURL(self):
-        # Used to send photos via Python script
-        from MaKaC.webinterface.urlHandlers import UHRoomPhotoSmall
-        return UHRoomPhotoSmall.getURL(self.photoId)
-
     def savePhoto(self, photoPath):
         """
         Saves room's photo on the server.

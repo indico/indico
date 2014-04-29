@@ -31,11 +31,6 @@ class Photo(db.Model):
         db.Integer,
         primary_key=True
     )
-    room_id = db.Column(
-        db.Integer,
-        db.ForeignKey('rooms.id'),
-        nullable=False
-    )
     small_content = db.Column(
         db.LargeBinary,
         nullable=True
@@ -46,4 +41,4 @@ class Photo(db.Model):
     )
 
     def __repr__(self):
-        return '<Photo({0}, {1})>'.format(self.id, self.room_id)
+        return '<Photo({0})>'.format(self.id)

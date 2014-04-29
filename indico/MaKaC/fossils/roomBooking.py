@@ -67,12 +67,6 @@ class IRoomMapFossil(IRoomFossil):
     def responsibleId(self):
         """ ID of the responsible person for the room """
 
-    def getTipPhotoURL(self):
-        """ URL of the tip photo of the room """
-
-    def getThumbnailPhotoURL(self):
-        """ URL of the thumbnail photo of the room """
-
     def hasPhoto(self):
         """Check if the room has picture"""
 

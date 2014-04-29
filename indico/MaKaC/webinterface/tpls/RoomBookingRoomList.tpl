@@ -32,14 +32,14 @@
                               <% details_url = detailsUH.getURL(room) %>
                               <% booking_url = bookingUH.getURL(room) %>
                               <% modification_url = modificationUH.getURL(room) %>
-                              <% on_click_details_url = 'onclick="window.location={}"'.format(details_url) %>
+                              <% on_click_details_url = 'onclick="window.location=\'{}\'"'.format(details_url) %>
                               % if mapAvailable:
                                 <% show_on_map = mapUH.getURL(roomID=room.id) %>
                               % endif
                               <tr style="height: 60px" id="${ room.id }" class="resvHover">
                                 <td ${ on_click_details_url }>
                                   % if room.has_photo:
-                                    <img src="${ room.getSmallPhotoURL() }" />
+                                    <img src="${ room.small_photo_url }" />
                                   % endif
                                 </td>
                                 <td ${ on_click_details_url }>

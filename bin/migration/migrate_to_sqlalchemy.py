@@ -326,23 +326,18 @@ def migrate_rooms(rb_root, photo_path):
                 with open(os.path.join(photo_path, 'large_photos',
                           get_canonical_name_of(old_room) + '.jpg'), 'rb') as f:
                     large_photo = f.read()
-            except:
+            except Exception:
                 large_photo = None
 
             try:
                 with open(os.path.join(photo_path, 'small_photos',
                           get_canonical_name_of(old_room) + '.jpg'), 'rb') as f:
                     small_photo = f.read()
-            except:
+            except Exception:
                 small_photo = None
 
             if large_photo and small_photo:
-                r.photos.append(
-                    Photo(
-                        large_content=large_photo,
-                        small_content=small_photo
-                    )
-                )
+                r.photo = Photo(large_content=large_photo, small_content=small_photo)
                 print cformat('  %{blue!}Photos')
 
         new_eq = []

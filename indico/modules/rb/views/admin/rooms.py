@@ -52,8 +52,8 @@ class WRoomBookingRoomForm(WTemplated):
         wvars['location'] = location
         wvars['room'] = room
 
-        wvars['largePhotoPath'] = room.getLargePhotoURL()
-        wvars['smallPhotoPath'] = room.getSmallPhotoURL()
+        wvars['largePhotoPath'] = room.large_photo_url
+        wvars['smallPhotoPath'] = room.small_photo_url
         wvars['possibleEquipments'] = dict((eq.name, eq.id in self._rh._equipments)
                                             for eq in location.getEquipments())
 
