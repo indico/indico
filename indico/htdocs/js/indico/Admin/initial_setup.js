@@ -4,8 +4,9 @@ $(document).ready(function(){
     var clicked = false;
     var fields = [[$('#name'), $('#surname'), $('#user-email'), $('#login'), $('#password'), $('#password-confirm')],
                   [$('#organisation')],
-                  [$('#it-email')]];
+                  [$('#it-contact'), $('#it-email')]];
     var itEmailValue = '';
+    var itContactValue = '';
 
     // Scroll the page to a step
     function scrollToStep(step){
@@ -34,8 +35,8 @@ $(document).ready(function(){
         field.addClass('hasError');
     }
 
-    // Fill the contact email field with the personal email
-    function fillITEmail(){
+    // Fill the Instance Tracking fields with the personal email/name
+    function fillITFields(){
         var userEmail = $('#user-email');
         var itEmail = $('#it-email');
         if (itEmailValue == '') {
@@ -43,12 +44,21 @@ $(document).ready(function(){
         } else {
             itEmail.val(itEmailValue);
         }
+
+        var name = $('#name');
+        var surname = $('#surname');
+        var itContact = $('#it-contact');
+        if (itContactValue == '') {
+            itContact.val((name.val() + ' ' + surname.val()).trim());
+        } else {
+            itContact.val(itContactValue);
+        }
     }
 
-    // Empty the contact email field
-    function emptyITEmail(){
-        itEmail = $('#it-email');
-        itEmail.val('');
+    // Empty the Instance Tracking fields
+    function emptyITFields(){
+        $('#it-email').val('');
+        $('#it-contact').val('');
     }
 
     // Validate all the steps
@@ -129,16 +139,21 @@ $(document).ready(function(){
         $this.toggleClass('toggled');
         var toggled = $this.hasClass('toggled');
         var itEmail = $('#it-email');
+        var itContact = $('#it-contact');
         var checkbox = $('#enable');
         itEmail.prop('required', toggled);
         itEmail.prop('disabled', !toggled);
+        itContact.prop('required', toggled);
+        itContact.prop('disabled', !toggled);
         checkbox.prop('checked', toggled);
         if (toggled) {
-            fillITEmail();
+            fillITFields();
             itEmail.trigger('input');
+            itContact.trigger('input');
         } else {
-            emptyITEmail();
+            emptyITFields();
             markValidField(itEmail);
+            markValidField(itContact);
         }
     });
     if ($('#enable').prop('checked')) {
@@ -190,9 +205,12 @@ $(document).ready(function(){
     });
     $('#language-selector').dropdown();
 
-    // Listener to store IT Email value
+    // Listeners to store Instance Tracking fields value
     $('#it-email').on('input', function(){
         itEmailValue = this.value;
+    });
+    $('#it-contact').on('input', function(){
+        itContactValue = this.value;
     });
 
 });

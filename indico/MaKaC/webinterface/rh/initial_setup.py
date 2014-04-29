@@ -51,10 +51,10 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
             raise AccessError
 
     def _checkParams_GET(self):
-        self._params = request.form.copy()
+        self._params = request.form
 
     def _checkParams_POST(self):
-        self._params = request.form.copy()
+        self._params = request.form
         base.RHDisplayBaseProtected._checkParams(self, self._params)
         self._enable = self._params.get("enable", "")
 
@@ -105,6 +105,7 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
             minfo.setInstanceTrackingActive(bool(self._enable))
             if self._enable:
                 minfo.setInstanceTrackingEmail(self._params["it_email"])
+                minfo.setInstanceTrackingContact(self._params["it_contact"])
 
             p = signIn.WPAdminCreated(self, av)
             return p.display()
@@ -123,3 +124,5 @@ class RegistrationForm(Form):
     enable = BooleanField('Enable Instance Tracking')
     it_email = TextField('Instance Tracking Email Address',
                          [UsedIfChecked('enable'), validators.Required(), validators.Email()])
+    it_contact = TextField('Instance Tracking Email Address',
+                           [UsedIfChecked('enable'), validators.Required()])
