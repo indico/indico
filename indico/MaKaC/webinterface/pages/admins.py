@@ -172,13 +172,6 @@ class WAdmins(wcomponents.WTemplated):
                                        'style="float:left; padding-right: 5px">_("News Pages")</a>').format(url, icon)
         wvars['administrators'] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
                                                    key=methodcaller('getStraightFullName')))
-
-        tracking_url = url_for('admin.adminList-toggleInstanceTracking')
-        tracking_icon = iconEnabled if minfo.isInstanceTrackingActive() else iconDisabled
-        wvars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="{0}">""".format(tracking_url) +
-                                        """<img src="{0}" border="0" style="float:left;""".format(tracking_icon) +
-                                        """ padding-right: 5px">_("Receive important notifications")</a></div>""")
-        wvars["instanceTrackingEmail"] = minfo.getInstanceTrackingEmail()
         return wvars
 
 
@@ -322,19 +315,21 @@ class WAnnouncementModif(wcomponents.WTemplated):
         return vars
 
 
-class WPServicesCommon( WPAdminsBase ):
+class WPServicesCommon(WPAdminsBase):
 
     def _setActiveSideMenuItem(self):
         self._servicesMenuItem.setActive()
 
-    def _createTabCtrl( self ):
+    def _createTabCtrl(self):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._subTabIPBasedACL = self._tabCtrl.newTab( "ip_based_acl", _("IP Based ACL"), \
-                urlHandlers.UHIPBasedACL.getURL() )
+        self._subTabIPBasedACL = self._tabCtrl.newTab("ip_based_acl", _("IP Based ACL"),
+                                                      urlHandlers.UHIPBasedACL.getURL())
+        self._subTabInstanceTracking = self._tabCtrl.newTab("instance_tracking", _("Instance Tracking"),
+                                                            urlHandlers.UHInstanceTracking.getURL())
 
     def _getPageContent(self, params):
-        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
+        return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
 
 
 class WPTemplatesCommon( WPAdminsBase ):
@@ -997,6 +992,32 @@ class WIPBasedACL(wcomponents.WTemplated):
         vars["ipList"] = minfo.getIPBasedACLMgr().get_full_access_acl()
         vars["removeIcon"] = Config.getInstance().getSystemIconURL("remove")
         return vars
+
+
+class WPInstanceTracking(WPServicesCommon):
+
+    def __init__(self, rh):
+        WPServicesCommon.__init__(self, rh)
+
+    def _getTabContent(self, params):
+        wc = WInstanceTracking()
+        return wc.getHTML(params)
+
+    def _setActiveTab(self):
+        self._subTabInstanceTracking.setActive()
+
+
+class WInstanceTracking(wcomponents.WTemplated):
+
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+
+        wvars["checked"] = 'checked' if minfo.isInstanceTrackingActive() else ''
+        wvars["postURL"] = url_for('admin.adminServices-instanceTracking')
+        wvars["contact"] = minfo.getInstanceTrackingContact()
+        wvars["email"] = minfo.getInstanceTrackingEmail()
+        return wvars
 
 
 class WPAdminProtection(WPAdminsBase):

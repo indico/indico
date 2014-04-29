@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import request
+
+from indico.web.flask.util import url_for
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common import utils
@@ -34,6 +37,7 @@ class RHIPBasedACL( RHServicesBase ):
     def _process( self ):
         p = adminPages.WPIPBasedACL(self)
         return p.display()
+
 
 class RHIPBasedACLFullAccessGrant( RHServicesBase ):
 
@@ -57,6 +61,7 @@ class RHIPBasedACLFullAccessGrant( RHServicesBase ):
 
         self._redirect(urlHandlers.UHIPBasedACL.getURL())
 
+
 class RHIPBasedACLFullAccessRevoke( RHServicesBase ):
 
     _uh = urlHandlers.UHIPBasedACLFullAccessRevoke
@@ -75,3 +80,17 @@ class RHIPBasedACLFullAccessRevoke( RHServicesBase ):
             ip_acl_mgr.revoke_full_access(ipAddress)
 
         self._redirect(urlHandlers.UHIPBasedACL.getURL())
+
+
+class RHInstanceTracking(RHServicesBase):
+
+    def _process_GET(self):
+        p = adminPages.WPInstanceTracking(self)
+        return p.display()
+
+    def _process_POST(self):
+        if 'save' in request.form:
+            self._minfo.setInstanceTrackingActive(bool(request.form.get("enable", "")))
+            self._minfo.setInstanceTrackingContact(request.form["contact"])
+            self._minfo.setInstanceTrackingEmail(request.form["email"])
+        self._redirect(url_for('admin.adminServices-instanceTracking'))
