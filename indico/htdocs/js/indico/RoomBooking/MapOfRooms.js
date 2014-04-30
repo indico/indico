@@ -237,7 +237,7 @@ type ("RoomMap", ["IWidget"],
             );
             var help = $('<div/>').append(
                 $('<img/>', {
-                    src: room.tip_photo_url,
+                    src: room.large_photo_url,
                     width: '212px',
                     height: '140px',
                     'class': 'mapRoomTooltipImage'

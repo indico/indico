@@ -80,7 +80,7 @@ class Room(db.Model, Serializer):
     __tablename__ = 'rooms'
     __public__ = [
         'id', 'name', 'location_name', 'floor', 'number', 'building',
-        'booking_url', 'capacity', 'comments', 'owner_id',
+        'booking_url', 'capacity', 'comments', 'owner_id', 'details_url',
         'large_photo_url', 'small_photo_url', 'has_photo', 'is_active',
         'is_reservable', 'is_auto_confirm', 'marker_description', 'kind'
     ]
