@@ -407,13 +407,7 @@ class RHInstanceTracking(RHServicesBase):
 
     def _process_POST(self):
         if 'save' in request.form:
+            self._minfo.setInstanceTrackingActive(bool(request.form.get("enable", "")))
             self._minfo.setInstanceTrackingContact(request.form["contact"])
             self._minfo.setInstanceTrackingEmail(request.form["email"])
-        self._redirect(url_for('admin.adminServices-instanceTracking'))
-
-
-class RHToggleInstanceTracking(RHServicesBase):
-
-    def _process(self):
-        self._minfo.setInstanceTrackingActive(not self._minfo.isInstanceTrackingActive())
         self._redirect(url_for('admin.adminServices-instanceTracking'))

@@ -65,7 +65,7 @@ from indico.util.date_time import timedelta_split
 from indico.web.flask.util import url_for
 
 
-class WPAdminsBase( WPMainBase ):
+class WPAdminsBase(WPMainBase):
 
     _userData = ['favorite-user-ids']
 
@@ -76,6 +76,9 @@ class WPAdminsBase( WPMainBase ):
         return WPMainBase.getJSFiles(self) + \
                self._includeJSPackage('Admin') + \
                self._includeJSPackage('Management')
+
+    def getCSSFiles(self):
+        return WPMainBase.getCSSFiles(self) + self._asset_env['admin_sass'].urls()
 
     def _getHeader( self ):
         """
@@ -2576,14 +2579,7 @@ class WInstanceTracking(wcomponents.WTemplated):
         wvars = wcomponents.WTemplated.getVars(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
-        if minfo.isInstanceTrackingActive():
-            icon = str(Config.getInstance().getSystemIconURL("enabledSection"))
-            wvars["enableDisable"] = _("Disable")
-        else:
-            icon = str(Config.getInstance().getSystemIconURL("disabledSection"))
-            wvars["enableDisable"] = _("Enable")
-        wvars["toggleURL"] = url_for('admin.adminServices-toggleInstanceTracking')
-        wvars["imgURL"] = icon
+        wvars["checked"] = 'checked' if minfo.isInstanceTrackingActive() else ''
         wvars["postURL"] = url_for('admin.adminServices-instanceTracking')
         wvars["contact"] = minfo.getInstanceTrackingContact()
         wvars["email"] = minfo.getInstanceTrackingEmail()

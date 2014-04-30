@@ -346,6 +346,7 @@ roombooking_sass = sass_module_bundle('roombooking')
 dashboard_sass = sass_module_bundle('dashboard')
 category_sass = sass_module_bundle('category')
 initial_setup_sass = sass_module_bundle('initial_setup')
+admin_sass = sass_module_bundle('admin')
 
 
 screen_sass = Bundle('sass/screen.scss',
@@ -408,6 +409,7 @@ def register_all_css(env, main_css_file):
     env.register('category_sass', category_sass)
     env.register('screen_sass', screen_sass)
     env.register('initial_setup_sass', initial_setup_sass)
+    env.register('admin_sass', admin_sass)
 
 
 core_env = IndicoEnvironment()
