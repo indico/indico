@@ -23,7 +23,7 @@ Attribute keys for rooms and reservations
 
 from indico.core.db import db
 
-from .utils import  JSONStringBridgeMixin
+from .utils import JSONStringBridgeMixin
 
 
 class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):

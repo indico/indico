@@ -26,37 +26,24 @@ from datetime import date, datetime, timedelta
 from operator import attrgetter
 
 from dateutil.relativedelta import relativedelta
+from pytz import timezone
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from MaKaC.common.Configuration import Config
-from MaKaC.errors import MaKaCError
-from MaKaC.user import AvatarHolder
-from MaKaC.webinterface.wcomponents import WTemplated
-
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
-from indico.core.logger import Logger
 from indico.modules.rb.models import utils
-from indico.modules.rb.models.utils import (
-    RBFormatter,
-    apply_filters,
-    filtered,
-    getWeekNumber
-)
-
-from pytz import timezone
-
-from MaKaC.common.info import HelperMaKaCInfo
-
-from indico.core.errors import IndicoError
+from indico.modules.rb.models.utils import apply_filters
 from indico.util.i18n import _, N_
-
 from .reservation_edit_logs import ReservationEditLog
 from .reservation_occurrences import ReservationOccurrence
 from .room_equipments import ReservationEquipmentAssociation
-
 from .utils import next_day_skip_if_weekend, unimplemented, Serializer
+from MaKaC.errors import MaKaCError
+from MaKaC.user import AvatarHolder
+from MaKaC.webinterface.wcomponents import WTemplated
+from MaKaC.common.info import HelperMaKaCInfo
 
 
 class RepeatUnit(object):
@@ -64,7 +51,6 @@ class RepeatUnit(object):
 
 
 class RepeatMapping(object):
-
     _mapping = {
         (RepeatUnit.NEVER, 0): (N_('Single reservation'), None),
         (RepeatUnit.DAY, 1): (N_('Repeat daily'), 0),
@@ -362,20 +348,14 @@ class Reservation(Serializer, db.Model):
 
     def cancelOccurrences(self, ds):
         if ds:
-            (self.occurrences
-                 .filter(
-                     func.DATE(ReservationOccurrence.start).in_(ds)
-                 ).update({
-                     'is_cancelled': True
-                 }, synchronize_session='fetch'))
+            self.occurrences \
+                .filter(func.DATE(ReservationOccurrence.start).in_(ds)) \
+                .update({'is_cancelled': True}, synchronize_session='fetch')
 
     def cancelOccurrence(self, d):
-        (self.occurrences
-             .filter(
-                func.DATE(ReservationOccurrence.start) == d
-             ).update({
-                'is_cancelled': True
-             }, synchronize_session='fetch'))
+        self.occurrences \
+            .filter(func.DATE(ReservationOccurrence.start) == d) \
+            .update({'is_cancelled': True}, synchronize_session='fetch')
 
     def createOccurrences(self, fromGiven=None, excluded=None):
         for start, end in fromGiven or self.iterOccurrences():
@@ -407,7 +387,7 @@ class Reservation(Serializer, db.Model):
         elif self.repeat_unit == RepeatUnit.MONTH:
             if self.repeat_step == 1:
                 cand = start + timedelta(1)
-                weekDayDiff = (start.weekday() - cand.weekday())%7
+                weekDayDiff = (start.weekday() - cand.weekday()) % 7
                 cand += timedelta(weekDayDiff)
                 startWeekNumber = utils.getWeekNumber(start)
                 while utils.getWeekNumber(cand) != startWeekNumber:
@@ -537,9 +517,8 @@ class Reservation(Serializer, db.Model):
 
     def _getAssistanceEmail(self, **mail_params):
         to = utils.getRoomBookingOption('assistanceNotificationEmails')
-        if (to and self.room.notification_for_assistance and
-            (self.getAttributeByName('needsAssistance') or
-             mail_params.get('old_needs_assistance', False))):
+        if (to and self.room.notification_for_assistance and (self.getAttributeByName('needsAssistance') or
+                                                              mail_params.get('old_needs_assistance', False))):
             rh = ContextManager.get('currentRH', None)
             user = rh._getUser() if rh else None
             subject = self._getEmailSubject(**mail_params)
@@ -981,7 +960,7 @@ class Reservation(Serializer, db.Model):
 
     def getReservationModificationInformation(self, old):
         changes, info = self.getSnapShotDiff(old), []
-        if change:
+        if changes:
             info.append(_('Booking modified'))
             for change in changes:
                 pass

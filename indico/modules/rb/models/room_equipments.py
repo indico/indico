@@ -49,7 +49,6 @@ RoomEquipmentAssociation = db.Table(
     )
 )
 
-
 ReservationEquipmentAssociation = db.Table(
     'reservations_equipments',
     db.metadata,

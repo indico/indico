@@ -21,10 +21,7 @@
 Available times to book for rooms
 """
 
-from sqlalchemy.ext.hybrid import hybrid_property
-
 from indico.core.db import db
-from indico.modules.rb.models.utils import getTimeDiff
 
 
 class BookableTime(db.Model):

@@ -31,18 +31,15 @@ from dateutil.relativedelta import MO, TU, WE, TH, FR, SA, SU
 from dateutil.rrule import rrule, DAILY
 from functools import wraps
 from random import randrange
-
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import class_mapper
 
 from MaKaC import user as user_mod
 from MaKaC.accessControl import AdminList
 from MaKaC.plugins.base import PluginsHolder
-
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.util.i18n import _
-from indico.util.json import dumps
 
 
 def getDefaultValue(cls, attr):
@@ -110,9 +107,11 @@ def filtered(func):
     apply filters and returns all objects
     """
     assert re.match(r'filter\w+s', func.__name__)
+
     def add_filters(*args, **filters):
         cls, q = func(*args, **filters)
         return apply_filters(q, cls, **filters).all()
+
     return add_filters
 
 
@@ -124,7 +123,9 @@ def unimplemented(exceptions=(Exception,), message='Unimplemented'):
                 return func(*args, **kw)
             except exceptions:
                 raise IndicoError(message)
+
         return _wrapper
+
     return _unimplemented
 
 
@@ -155,9 +156,7 @@ def accessChecked(func):
                 else:
                     raise RuntimeError('Unexpected entity type')
 
-            authorized_list = (PluginsHolder().getPluginType("RoomBooking")
-                                              .getOption("AuthorisedUsersGroups")
-                                              .getValue())
+            authorized_list = PluginsHolder().getPluginType('RoomBooking').getOption('AuthorisedUsersGroups').getValue()
             if authorized_list:
                 return any(map(isAuthorized, authorized_list))
             else:
@@ -167,6 +166,7 @@ def accessChecked(func):
         if not check_access_internal(*args, **kwargs):
             return False
         return func(*args, **kwargs)
+
     return check_access
 
 
@@ -216,7 +216,6 @@ def stats_to_dict(results):
 
 
 class RBFormatter:
-
     @staticmethod
     def formatString(s, entity):
         """
@@ -284,6 +283,7 @@ def requiresDateOrDatetime(func):
         if all(map(is_date_or_datetime, args)) and all(map(is_date_or_datetime, kw.values())):
             return func(*args, **kw)
         raise IndicoError(_(''))
+
     return _wrapper
 
 
@@ -297,6 +297,8 @@ def is_false_valued_dict(d):
 
 def sifu(e):
     return e.strip() if e and isinstance(e, unicode) else e
+
+
 strip_if_unicode = sifu
 
 
@@ -393,7 +395,7 @@ def intOrDefault(s, default=None):
         return default
 
 
-def qbeMatch( example, candidate, special, **kwargs ):
+def qbeMatch(example, candidate, special, **kwargs):
     """
     Queary By Example Match.
 
@@ -419,46 +421,47 @@ def qbeMatch( example, candidate, special, **kwargs ):
         - False otherwise
     """
 
-    for attrName in dir( example ):
+    for attrName in dir(example):
         # Skip methods, private attributes and Nones
         if attrName[0] == '_' or attrName in ['avaibleVC', 'vcList', 'needsAVCSetup', 'verboseEquipment',
-                                              'resvStartNotification', 'resvEndNotification', 'resvNotificationAssistance', 'maxAdvanceDays']:
+                                              'resvStartNotification', 'resvEndNotification',
+                                              'resvNotificationAssistance', 'maxAdvanceDays']:
             continue
 
         exAttrVal = getattr(example, attrName)
         attrType = exAttrVal.__class__.__name__
 
-        if attrType in ('instancemethod', 'staticmethod', 'function') or exAttrVal == None:
+        if attrType in ('instancemethod', 'staticmethod', 'function') or exAttrVal is None:
             continue
 
         candAttrVal = getattr(candidate, attrName)
-        if candAttrVal == None           and attrName not in ['repeatability', 'weekDay', 'weekNumber']: # Ugly hack :/
-            return False # because exAttrVal != None
+        if candAttrVal is None and attrName not in ['repeatability', 'weekDay', 'weekNumber']:  # Ugly hack :/
+            return False  # because exAttrVal is not None
 
         # Special comparison for some attributes
-        areEqual = special( attrName, exAttrVal, candAttrVal, **kwargs )
+        areEqual = special(attrName, exAttrVal, candAttrVal, **kwargs)
 
         # Generic comparison
-        if areEqual == None:
-            if attrType in ('int', 'float', 'bool', 'datetime' ):
+        if areEqual is None:
+            if attrType in ('int', 'float', 'bool', 'datetime'):
                 # Exact match
-                areEqual = ( candAttrVal == exAttrVal )
+                areEqual = candAttrVal == exAttrVal
             elif attrType == 'str':
                 areEqual = candAttrVal.lower() == exAttrVal.lower()
             else:
-                raise attrType + ": " + str( candAttrVal ) + " - can not compare"
+                raise attrType + ": " + str(candAttrVal) + " - can not compare"
 
         if not areEqual:
             #print "Does not match: %s (%s : %s)" % (attrName, str( exAttrVal ), str( attrVal ) )
             return False
-#        if 'Room' not in example.__class__.__name__ and attrName == 'repeatability' and example.repeatability == 1 and candidate.reason == "TDAQ Meeting" and candidate.startDT == datetime( 2007, 05, 21, 9 ):
-#            raise str( areEqual ) + '--' + str( example )
+        #if 'Room' not in example.__class__.__name__ and attrName == 'repeatability' and example.repeatability == 1 and candidate.reason == "TDAQ Meeting" and candidate.startDT == datetime( 2007, 05, 21, 9 ):
+        #    raise str( areEqual ) + '--' + str( example )
 
     # All attributes match
     return True
 
 
-def containsExactly_OR_containsAny( attrValExample, attrValCandidate ):
+def containsExactly_OR_containsAny(attrValExample, attrValCandidate):
     attrValExample = attrValExample.strip().lower()
     attrValCandidate = attrValCandidate.lower()
 
@@ -474,6 +477,7 @@ def containsExactly_OR_containsAny( attrValExample, attrValCandidate ):
                 return True
 
     return False
+
 
 def get_overlap(st1, et1, st2, et2):
     st, et = max(st1, st2), min(et1, et2)
@@ -493,6 +497,7 @@ def doesPeriodOverlap(*args):
         return __doesPeriodOverlap(args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT)
     raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
 
+
 def __doesPeriodOverlap(startDT1, endDT1, startDT2, endDT2):
     # Dates must overlap
     if endDT1.date() < startDT2.date() or endDT2.date() < startDT1.date():
@@ -503,96 +508,100 @@ def __doesPeriodOverlap(startDT1, endDT1, startDT2, endDT2):
         return False
     return True
 
+
 def overlap(*args, **kwargs):
     """
     Returns two datetimes - the common part of two given periods.
     """
-    if len( args ) == 4:
+    if len(args) == 4:
         return __overlap(args[0], args[1], args[2], args[3])
-    if len( args ) == 2:
+    if len(args) == 2:
         return __overlap(args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT)
     raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
 
 
-def __overlap( startDT1, endDT1, startDT2, endDT2):
-    if not doesPeriodOverlap( startDT1, endDT1, startDT2, endDT2):
+def __overlap(startDT1, endDT1, startDT2, endDT2):
+    if not doesPeriodOverlap(startDT1, endDT1, startDT2, endDT2):
         # [---]  [----]
         return None
 
-    dates = __overlapDates( startDT1.date(), endDT1.date(), startDT2.date(), endDT2.date() )
-    times = __overlapTimes( startDT1.time(), endDT1.time(), startDT2.time(), endDT2.time() )
+    dates = __overlapDates(startDT1.date(), endDT1.date(), startDT2.date(), endDT2.date())
+    times = __overlapTimes(startDT1.time(), endDT1.time(), startDT2.time(), endDT2.time())
 
-    fromOverlap = datetime( dates[0].year, dates[0].month, dates[0].day, times[0].hour, times[0].minute, times[0].second )
-    toOverlap = datetime( dates[1].year, dates[1].month, dates[1].day, times[1].hour, times[1].minute, times[1].second )
+    fromOverlap = datetime(dates[0].year, dates[0].month, dates[0].day, times[0].hour, times[0].minute, times[0].second)
+    toOverlap = datetime(dates[1].year, dates[1].month, dates[1].day, times[1].hour, times[1].minute, times[1].second)
 
-    return ( fromOverlap, toOverlap )
+    return fromOverlap, toOverlap
 
-def __overlapDates( startD1, endD1, startD2, endD2 ):
 
+def __overlapDates(startD1, endD1, startD2, endD2):
     if endD1 >= startD2 and endD1 <= endD2 and startD1 <= startD2:
         # [-----]       (1)
         #     [------]  (2)
-        return ( startD2, endD1 )
+        return startD2, endD1
 
     if startD1 >= startD2 and endD1 <= endD2:
         #    [---]      (1)
         # [----------]  (2)
-        return ( startD1, endD1 )
+        return startD1, endD1
 
-    return __overlapDates( startD2, endD2, startD1, endD1 )
+    return __overlapDates(startD2, endD2, startD1, endD1)
 
-def __overlapTimes( startT1, endT1, startT2, endT2 ):
 
+def __overlapTimes(startT1, endT1, startT2, endT2):
     if endT1 >= startT2 and endT1 <= endT2 and startT1 <= startT2:
         # [-----]       (1)
         #     [------]  (2)
-        return ( startT2, endT1 )
+        return startT2, endT1
 
     if startT1 >= startT2 and endT1 <= endT2:
         #    [---]      (1)
         # [----------]  (2)
-        return ( startT1, endT1 )
+        return startT1, endT1
 
-    return __overlapTimes( startT2, endT2, startT1, endT1 )
+    return __overlapTimes(startT2, endT2, startT1, endT1)
 
 
 class Impersistant(object):
-
     def __init__(self, obj):
         self.__obj = obj
 
     def getObject(self):
         return self.__obj
 
+
 def checkPresence(self, errors, attrName, type):
     at = self.__dict__[attrName]
-    if at == None:
-        errors.append( attrName + ' is not present' )
+    if at is None:
+        errors.append(attrName + ' is not present')
         return
     #raise str( at.__class__.__name__ ) + " | " + str( at ) + " | " + str( type )
-    if not isinstance( at, type ):
-        errors.append( attrName + ' has invalid type' )
+    if not isinstance(at, type):
+        errors.append(attrName + ' has invalid type')
     return None
+
 
 def toUTC(localNaiveDT):
     """
     Converts naive (timezone-less) datetime to UTC.
     It assumes localNaiveDT to be in local/DTS timezone.
     """
-    if localNaiveDT == None:
+    if localNaiveDT is None:
         return None
-    if localNaiveDT.tzinfo != None:
-        raise ValueError('This methods converts only _naive_ datetimes, assuming they are in local/DTS time. Naive datetimes does not contain information about timezone.')
-    return localNaiveDT + timedelta( 0, time.altzone )
+    if localNaiveDT.tzinfo is not None:
+        raise ValueError(
+            'This methods converts only _naive_ datetimes, assuming they are in local/DTS time. Naive datetimes does not contain information about timezone.')
+    return localNaiveDT + timedelta(0, time.altzone)
 
 
 def fromUTC(utcNaiveDT):
-    #if utcNaiveDT == None:
+    #if utcNaiveDT is None:
     #    return None
     try:
-        if utcNaiveDT.tzinfo != None:
-            raise ValueError('This methods converts only _naive_ datetimes, assuming they are in UTC time. Naive datetimes does not contain information about timezone.')
-        return utcNaiveDT - timedelta( 0, time.altzone )
+        if utcNaiveDT.tzinfo is not None:
+            raise ValueError(
+                'This methods converts only _naive_ datetimes, assuming they are in UTC time. Naive datetimes does not contain information about timezone.')
+        return utcNaiveDT - timedelta(0, time.altzone)
     except AttributeError:
         return None
 
@@ -607,6 +616,7 @@ def datespan(startDate, endDate, delta=timedelta(days=1)):
 def dateAdvanceAllowed(date, days):
     from MaKaC.common.timezoneUtils import nowutc, dayDifference, naive2local
     import MaKaC.common.info as info
+
     tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
     return dayDifference(naive2local(date, tz), nowutc(), tz) > days
 
@@ -636,76 +646,11 @@ class Serializer(object):
                 j[name] = v
             except Exception:
                 import traceback
-                Logger.get('Serializer{}'.format(self.__class__.__name__))\
-                      .error(traceback.format_exc())
+
+                Logger.get('Serializer{}'.format(self.__class__.__name__)) \
+                    .error(traceback.format_exc())
                 raise IndicoError(
                     _('There was an error on the retrieval of {} of {}.')
                     .format(k, self.__class__.__name__.lower())
                 )
         return j
-# ============================================================================
-# ================================== TEST ====================================
-# ============================================================================
-
-class Test:
-
-    @staticmethod
-    def doesPeriodOverlap():
-
-        # Days overlap, hours not
-        ret = doesPeriodOverlap(
-            datetime( 2006, 9, 20, 16 ),
-            datetime( 2006, 9, 20, 18 ),
-            datetime( 2006, 9, 20, 18, 30 ),
-            datetime( 2006, 9, 20, 19 ) )
-        assert( not ret )
-
-        ret = doesPeriodOverlap(
-            datetime( 2006, 9, 20, 16 ),
-            datetime( 2006, 9, 25, 18 ),
-            datetime( 2006, 9, 23, 13 ),
-            datetime( 2006, 9, 24, 15 ) )
-        assert( not ret )
-
-        # Days does not overlap, hours do
-        ret = doesPeriodOverlap(
-            datetime( 2006, 9, 20, 16 ),
-            datetime( 2006, 9, 20, 18 ),
-            datetime( 2006, 9, 21, 16, 30 ),
-            datetime( 2006, 9, 22, 17, ) )
-        assert( not ret )
-
-        p1 = Period( datetime( 2006, 12, 1, 8 ), datetime( 2006, 12, 1, 9 ) )
-        p2 = Period( datetime( 2006, 12, 1, 9 ), datetime( 2006, 12, 1, 10 ) )
-        assert( not doesPeriodOverlap( p1, p2 ) )
-
-        # Periods overlap
-        ret = doesPeriodOverlap(
-            datetime( 2006, 9, 20, 16 ),
-            datetime( 2006, 9, 25, 18 ),
-            datetime( 2006, 9, 23, 13 ),
-            datetime( 2006, 9, 24, 17 ) )
-        assert( ret )
-
-    @staticmethod
-    def overlap():
-
-        # Days overlap, hours not
-        ret = overlap(
-            datetime( 2006, 9, 20, 16 ),
-            datetime( 2006, 9, 20, 18 ),
-            datetime( 2006, 9, 20, 18, 30 ),
-            datetime( 2006, 9, 20, 19 ) )
-        assert( ret == None )
-
-        # Periods overlap
-        sdt, edt = overlap(
-            datetime( 2006, 9, 20, 16 ),
-            datetime( 2006, 9, 25, 18 ),
-            datetime( 2006, 9, 23, 13 ),
-            datetime( 2006, 9, 24, 17 ) )
-
-
-if __name__ == "__main__":
-    Test.doesPeriodOverlap()
-    Test.overlap()

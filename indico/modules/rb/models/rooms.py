@@ -23,33 +23,18 @@ Schema of a room
 
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from sqlalchemy import (
-    and_,
-    func,
-    exists,
-    extract,
-    not_,
-    or_,
-    type_coerce
-)
+from sqlalchemy import and_, func, exists, extract, not_, or_, type_coerce
 from sqlalchemy.dialects.postgresql.base import ARRAY as sa_array
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql.expression import cast, literal
-from sqlalchemy.types import (
-    Date as sa_date,
-    Time as sa_time
-)
+from sqlalchemy.types import Date as sa_date, Time as sa_time
 
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.Locators import Locator
 from MaKaC.common.cache import GenericCache
 from MaKaC.errors import MaKaCError
-from MaKaC.user import (
-    Avatar,
-    AvatarHolder,
-    GroupHolder
-)
+from MaKaC.user import Avatar, AvatarHolder, GroupHolder
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import greatest, least, static_array
 from indico.modules.rb.models import utils
@@ -60,10 +45,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_times import BookableTime
-from indico.modules.rb.models.room_equipments import (
-    RoomEquipment,
-    RoomEquipmentAssociation
-)
+from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.util.i18n import _
 from .utils import Serializer
@@ -89,7 +71,7 @@ class Room(db.Model, Serializer):
         'has_webcast_recording', 'needs_video_conference_setup', 'has_projector', 'is_public', 'has_booking_groups'
     ]
 
-    __calendar_public__= [
+    __calendar_public__ = [
         'id', 'building', 'name', 'floor', 'number', 'kind', 'booking_url'
     ]
 
@@ -353,14 +335,11 @@ notificationAssistance: {notification_for_assistance}
 
     @is_public.expression
     def is_public(self):
-        return self.query\
-                .outerjoin(RoomAttributeAssociation)\
-                .outerjoin(RoomAttribute)\
-                .filter(
-                    RoomAttribute.name == 'Allowed Booking Group',
-                    Room.is_reservable == True,
-                )\
-                .count() == 0
+        return self.query \
+                   .outerjoin(RoomAttributeAssociation) \
+                   .outerjoin(RoomAttribute) \
+                   .filter(RoomAttribute.name == 'Allowed Booking Group', Room.is_reservable == True) \
+                   .count() == 0
 
     @property
     def is_auto_confirm(self):
@@ -384,9 +363,9 @@ notificationAssistance: {notification_for_assistance}
         return ', '.join(infos)
 
     def getEquipmentByName(self, equipment_name):
-        return self.equipments.\
-            filter_by(name=func.lower(equipment_name)).\
-            first()
+        return self.equipments \
+                   .filter_by(name=func.lower(equipment_name)) \
+                   .first()
 
     def has_equipment(self, equipment_name):
         return self.getEquipmentByName(equipment_name) is not None
@@ -409,9 +388,9 @@ notificationAssistance: {notification_for_assistance}
         pass
 
     def getAttributeByName(self, attribute_name):
-        return self.attributes\
-                   .join(RoomAttribute)\
-                   .filter(RoomAttribute.name == attribute_name)\
+        return self.attributes \
+                   .join(RoomAttribute) \
+                   .filter(RoomAttribute.name == attribute_name) \
                    .first()
 
     def has_attribute(self, attribute_name):
@@ -424,12 +403,11 @@ notificationAssistance: {notification_for_assistance}
     @property
     def kind(self):
         if not self.is_reservable or self.has_booking_groups:
-            roomCls = 'privateRoom'
+            return 'privateRoom'
         elif self.is_reservable and self.reservations_need_confirmation:
-            roomCls = 'moderatedRoom'
+            return 'moderatedRoom'
         elif self.is_reservable:
-            roomCls = 'basicRoom'
-        return roomCls
+            return 'basicRoom'
 
     def getLocator(self):
         locator = Locator()
@@ -521,21 +499,13 @@ notificationAssistance: {notification_for_assistance}
                 outerjoin(Photo, Photo.id == Room.photo_id).\
                 group_by(Photo.id)
 
-        query = query.\
-            with_entities(*entities).\
-            outerjoin(Location, Location.id == Room.location_id).\
-            group_by(Location.name, Room.id).\
-            order_by(
-                Location.name,
-                Room.building,
-                Room.floor,
-                Room.number,
-                Room.name
-            )
+        query = query.with_entities(*entities) \
+                     .outerjoin(Location, Location.id == Room.location_id) \
+                     .group_by(Location.name, Room.id) \
+                     .order_by(Location.name, Room.building, Room.floor, Room.number, Room.name)
 
         if only_active:
-            query = query.\
-                filter(Room.is_active == True)
+            query = query.filter(Room.is_active == True)
 
         for r in query:
             res = {'room': r[0]}
@@ -546,14 +516,14 @@ notificationAssistance: {notification_for_assistance}
     @staticmethod
     def getMaxCapacity():
         key = 'maxcapacity'
-        maxcapacity = _cache.get(key)
-        if maxcapacity is None:
-            records = Room.query.\
-                with_entities(func.max(Room.capacity).label('capacity')).\
-                all()
-            maxcapacity = records[0].capacity
-            _cache.set(key, maxcapacity, 300)
-        return maxcapacity
+        max_capacity = _cache.get(key)
+        if max_capacity is None:
+            records = Room.query \
+                          .with_entities(func.max(Room.capacity).label('capacity')) \
+                          .all()
+            max_capacity = records[0].capacity
+            _cache.set(key, max_capacity, 300)
+        return max_capacity
 
     @staticmethod
     def getRoomsByName(name):
@@ -578,8 +548,8 @@ notificationAssistance: {notification_for_assistance}
                                .correlate(Room)\
                                .as_scalar()
 
-        q = Room.query\
-                .join(Location.rooms)\
+        q = Room.query \
+                .join(Location.rooms) \
                 .filter(
                     Location.id == f.location_id.data,
                     (Room.capacity >= (f.capacity.data * 0.8)) if f.capacity.data else True,
@@ -588,7 +558,7 @@ notificationAssistance: {notification_for_assistance}
                     Room.is_active == f.is_active.data if f.is_active.data else True,
                     Room.owner_id == avatar.getId() if f.is_only_my_rooms.data else True,
                     (equipment_subquery == equipment_count) if equipment_count else True
-                )\
+                )
 
         free_search_columns = (
             'name', 'site', 'division', 'building', 'floor',
@@ -653,10 +623,9 @@ notificationAssistance: {notification_for_assistance}
 
     @staticmethod
     def getFilteredReservationsInSpecifiedRooms(f, avatar=None):
-        q = Room.query\
-                .outerjoin(Reservation, Room.id == Reservation.room_id)\
-                .join(ReservationOccurrence,
-                      Reservation.id == ReservationOccurrence.reservation_id)\
+        q = Room.query \
+                .outerjoin(Reservation, Room.id == Reservation.room_id) \
+                .join(ReservationOccurrence, Reservation.id == ReservationOccurrence.reservation_id) \
                 .filter(
                     or_(
                         and_(
@@ -719,16 +688,9 @@ notificationAssistance: {notification_for_assistance}
         from .locations import Location
 
         date_query = db.session.query(
-                        cast(
-                            func.generate_series(
-                                start_date.date(),
-                                end_date.date(),
-                                timedelta(1)
-                            ),
-                            sa_date
-                        ).label('available_date')
-                    )\
-                    .subquery()\
+            cast(func.generate_series(start_date.date(), end_date.date(), timedelta(1)),
+                 sa_date).label('available_date')
+        ).subquery()
 
         # def get_exclude_null_query(attr, kind):
         #     # return db.session\
@@ -753,57 +715,57 @@ notificationAssistance: {notification_for_assistance}
                 sa_array(kind or attr.type, as_tuple=True)
             )
 
-        return db.session\
-                 .query()\
-                 .select_from(date_query)\
+        return db.session \
+                 .query() \
+                 .select_from(date_query) \
                  .with_entities(
-                    date_query.c.available_date,
-                    Room,
-                    func.min(Location.name),
-                    func.min(Blocking.id),
-                    func.min(Blocking.reason),
-                    func.min(Blocking.created_by),
-                    coerce_as_tuple(Reservation.id),
-                    # coerce_as_tuple(Reservation.booking_reason),
-                    coerce_as_tuple(Reservation.booked_for_name),
-                    coerce_as_tuple(Reservation.booked_for_name),
-                    coerce_as_tuple(Reservation.is_confirmed),
-                    coerce_as_tuple(cast(ReservationOccurrence.start, sa_time)),
-                    coerce_as_tuple(cast(ReservationOccurrence.end, sa_time))
-                )\
+                     date_query.c.available_date,
+                     Room,
+                     func.min(Location.name),
+                     func.min(Blocking.id),
+                     func.min(Blocking.reason),
+                     func.min(Blocking.created_by),
+                     coerce_as_tuple(Reservation.id),
+                     # coerce_as_tuple(Reservation.booking_reason),
+                     coerce_as_tuple(Reservation.booked_for_name),
+                     coerce_as_tuple(Reservation.booked_for_name),
+                     coerce_as_tuple(Reservation.is_confirmed),
+                     coerce_as_tuple(cast(ReservationOccurrence.start, sa_time)),
+                     coerce_as_tuple(cast(ReservationOccurrence.end, sa_time))
+                ) \
                 .outerjoin(
                     Location,
                     literal(1) == 1  # cartesian product
-                )\
+                ) \
                 .outerjoin(
                     Room,
                     Location.rooms
-                )\
+                ) \
                 .outerjoin(
                     Reservation,
                     Room.reservations
-                )\
+                ) \
                 .outerjoin(
                     ReservationOccurrence,
                     and_(
                         Reservation.occurrences,
                         date_query.c.available_date == cast(ReservationOccurrence.start, sa_date)
                     )
-                )\
+                ) \
                 .outerjoin(
                     BlockedRoom,
                     BlockedRoom.room_id == Room.id
-                )\
+                ) \
                 .outerjoin(
                     Blocking,
                     Blocking.id == BlockedRoom.blocking_id
-                )\
-                .correlate(date_query)\
+                ) \
+                .correlate(date_query) \
                 .filter(
                     Room.id.in_(room_id_list),
-                )\
-                .group_by(date_query.c.available_date, Room.id)\
-                .order_by(date_query.c.available_date, Room.name)\
+                ) \
+                .group_by(date_query.c.available_date, Room.id) \
+                .order_by(date_query.c.available_date, Room.name) \
                 .all()
 
     @staticmethod
@@ -818,8 +780,8 @@ notificationAssistance: {notification_for_assistance}
                             sa_date
                         ).label('available_date')
 
-                    )\
-                    .subquery()\
+                    ) \
+                    .subquery()
 
         return db.session\
                  .query(date_query.c.available_date)\
@@ -1103,7 +1065,7 @@ notificationAssistance: {notification_for_assistance}
         attribute = self.getAttributeByName('Manager Group')
         return attribute and attribute.value.get('is_equipped', [])
 
-    def notifyAboutResponsibility( self ):
+    def notifyAboutResponsibility(self):
         """
         Notifies (e-mails) previous and new responsible about
         responsibility change. Called after creating/updating the room.
@@ -1220,7 +1182,7 @@ notificationAssistance: {notification_for_assistance}
     def getAverageOccupation(self, start, end):
         bookable = self.getTotalBookableTime(start, end)
         booked = self.getTotalBookedTime(start, end)
-        return booked/float(bookable) if bookable else 0
+        return booked / float(bookable) if bookable else 0
 
     def getReservationStats(self):
         return utils.stats_to_dict(

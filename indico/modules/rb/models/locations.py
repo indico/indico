@@ -26,21 +26,18 @@ from datetime import datetime, timedelta
 import pytz
 from sqlalchemy import func, or_, and_
 from sqlalchemy.orm import aliased
-from sqlalchemy.sql.expression import select, label, column
+from sqlalchemy.sql.expression import select
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.dialects.postgresql import array
-
-from MaKaC.common.Locators import Locator
 
 from indico.core.db import db
 from indico.util.i18n import _
-
 from . import utils
 from .aspects import Aspect
 from .reservations import Reservation
 from .room_attributes import RoomAttribute
-from .room_equipments import RoomEquipment, RoomEquipmentAssociation
+from .room_equipments import RoomEquipment
 from .rooms import Room
+from MaKaC.common.Locators import Locator
 
 
 class Location(db.Model):
@@ -83,13 +80,13 @@ class Location(db.Model):
         'Aspect',
         backref='location',
         cascade='all, delete-orphan',
-        primaryjoin=id==Aspect.location_id,
+        primaryjoin=id == Aspect.location_id,
         lazy='dynamic',
     )
 
     default_aspect = db.relationship(
         'Aspect',
-        primaryjoin=default_aspect_id==Aspect.id,
+        primaryjoin=default_aspect_id == Aspect.id,
         post_update=True,
     )
 
@@ -244,22 +241,10 @@ class Location(db.Model):
 
     @staticmethod
     def setDefaultLocation(location_name):
-        (
-            Location
-                .query
-                .filter(
-                    or_(
-                        Location.is_default,
-                        Location.name == location_name
-                    )
-                )
-                .update(
-                    {
-                        'is_default': func.not_(Location.is_default)
-                    },
-                    synchronize_session='fetch'
-                )
-        )
+            Location.query \
+                    .filter(Location.is_default | (Location.name == location_name)) \
+                    .update({'is_default': func.not_(Location.is_default)},
+                            synchronize_session='fetch')
 
     # generic location management
 
@@ -281,12 +266,8 @@ class Location(db.Model):
 
     @staticmethod
     def addLocationByName(name):
-        db.session.add(
-            Location(
-                name=name,
-                is_default=(Location.getNumberOfLocations() == 0)
-            )
-        )
+        is_default = Location.getNumberOfLocations() == 0
+        db.session.add(Location(name=name, is_default=is_default))
 
     @staticmethod
     def removeLocationByName(name):
@@ -294,7 +275,9 @@ class Location(db.Model):
 
     # attribute management
 
-    def addAttribute(self, name, value={}):
+    def addAttribute(self, name, value=None):
+        if value is None:
+            value = {}
         attr = RoomAttribute(name=name)
         attr.value = value
         self.attributes.append(attr)
@@ -333,7 +316,7 @@ class Location(db.Model):
     def getAverageOccupation(self):
         now = datetime.utcnow()
         end_date = datetime(now.year, now.month, now.day, 17, 30, tzinfo=pytz.utc)
-        start_date = end_date - timedelta(30, 9*3600)  # 30 days + 9 hours
+        start_date = end_date - timedelta(30, 9 * 3600)  # 30 days + 9 hours
 
         booked_time = self.getTotalBookedTimeInLastMonth(start_date, end_date)
         bookable_time = self.getTotalBookableTime(start_date, end_date)
@@ -343,18 +326,13 @@ class Location(db.Model):
         return 0
 
     def getTotalBookedTime(self, *dates):
-        return (self.query
-                    .with_entities(func.sum())
-                    .join(Location.rooms)
-                    .join(Room.reservations)
-                    .filter(
-                        Room.is_active,
-                        Room.is_reservable,
-                        or_(
-                            Reservation.start_date.in_(dates),
-                            Reservation.end_date.in_(dates)
-                        )
-                    ))  # TODO
+        return self.query \
+                   .with_entities(func.sum()) \
+                   .join(Location.rooms) \
+                   .join(Room.reservations) \
+                   .filter(Room.is_active, Room.is_reservable) \
+                   .filter(Reservation.start_date.in_(dates) | Reservation.end_date.in_(dates))
+        # TODO
 
     def getTotalBookableTime(self):
         pass
@@ -372,16 +350,16 @@ class Location(db.Model):
         return self.rooms.filter_by(is_reservable=True).all()
 
     def getTotalReservableSurfaceArea(self):
-        return (self.rooms
-                    .with_entities(func.sum(Room.surface_area))
-                    .filter_by(is_reservable=True)
-                    .scalar())
+        return self.rooms \
+                   .with_entities(func.sum(Room.surface_area)) \
+                   .filter_by(is_reservable=True) \
+                   .scalar()
 
     def getTotalReservableCapacity(self):
-        return (self.rooms
-                    .with_entities(func.sum(Room.capacity))
-                    .filter_by(is_reservable=True)
-                    .scalar())
+        return self.rooms \
+                   .with_entities(func.sum(Room.capacity)) \
+                   .filter_by(is_reservable=True) \
+                   .scalar()
 
     def getReservationStats(self):
         return utils.stats_to_dict(
@@ -402,26 +380,22 @@ class Location(db.Model):
         )
 
     def getBuildings(self, with_rooms=True):
-
         def get_subquery(column):
-            return select([column])\
-                .select_from(
-                    func.unnest(func.array_agg(getattr(Room, column))).alias(column)
-                )\
-                .correlate(None)\
-                .where("{} != ''".format(column))\
-                .limit(1)\
-                .as_scalar()
+            return select([column]).select_from(func.unnest(func.array_agg(getattr(Room, column))).alias(column)) \
+                                   .correlate(None)\
+                                   .where("{} != ''".format(column)) \
+                                   .limit(1) \
+                                   .as_scalar()
 
-        video_conference_equipment = self.equipment_objects\
-                                         .with_entities(RoomEquipment.id)\
-                                         .filter_by(name='Video conference')\
+        video_conference_equipment = self.equipment_objects \
+                                         .with_entities(RoomEquipment.id) \
+                                         .filter_by(name='Video conference') \
                                          .as_scalar()
 
         r = aliased(Room)
-        room_id_subquery = db.session.query(r)\
-                             .with_entities(r.id)\
-                             .correlate(Room)\
+        room_id_subquery = db.session.query(r) \
+                             .with_entities(r.id) \
+                             .correlate(Room) \
                              .filter(
                                  and_(
                                      or_(
@@ -429,23 +403,22 @@ class Location(db.Model):
                                          r.equipments.any(video_conference_equipment)  # contains
                                      ),
                                      r.id.in_(
-                                         select(['e'])
-                                             .select_from(func.unnest(func.array_agg(Room.id)).alias('e'))
-                                             .correlate(None)
-                                             .as_scalar()
+                                         select(['e']).select_from(func.unnest(func.array_agg(Room.id)).alias('e'))
+                                                      .correlate(None)
+                                                      .as_scalar()
                                      )
                                  )
-                             )\
+                             ) \
                              .as_scalar()
 
-        results = self.rooms\
+        results = self.rooms \
                       .with_entities(
-                        Room.building,
-                        func.array(room_id_subquery),
-                        get_subquery('longitude'),
-                        get_subquery('latitude')
-                      )\
-                      .group_by(Room.building)\
+                          Room.building,
+                          func.array(room_id_subquery),
+                          get_subquery('longitude'),
+                          get_subquery('latitude')
+                      ) \
+                      .group_by(Room.building) \
                       .all()
 
         rooms = dict(self.rooms.with_entities(Room.id, Room).all())
