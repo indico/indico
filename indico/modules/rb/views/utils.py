@@ -29,13 +29,15 @@ class Bar(Serializer):
     ]
 
     BLOCKED, PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT = range(7)
-    # BLOCKED:        room is blocked
-    # CANDIDATE:      represents new reservation
-    # CONFLICT:       overlap between candidate and confirmed reservation
-    # PREBOOKED:      represents pre-reservation
-    # PRECONFLICT:    represents conflict with pre-reservation
-    # PRECONCURRENT:  conflicting pre-reservations
-    # UNAVAILABLE :   represents confirmed reservation
+    _mapping = {
+        BLOCKED: 'blocked',                 # A blocked-room period
+        CANDIDATE: 'candidate',             # A reservation candidate
+        CONFLICT: 'conflict',               # A conflicting reservation candidate
+        PREBOOKED: 'pre-booked',            # A unconfirmed reservation
+        PRECONCURRENT: 'pre-concurrent',    # A conflict between unconfirmed reservations
+        PRECONFLICT: 'pre-conflict',        # A conflicting unconfirmed reservation
+        UNAVAILABLE: 'unavailable'          # A confirmed reservation
+    }
 
     def __init__(self, start_time, end_time, kind=CANDIDATE, reservation=None, blocking=None):
         self.date = start_time.date()
@@ -56,11 +58,12 @@ class Bar(Serializer):
         return cmp(self.kind, other.kind)
 
     def __repr__(self):
-        return '<Bar({0}, {1}, {2}, {3})>'.format(
+        return '<Bar({0}, {1}, {2}, {3}, {4})>'.format(
             self.date,
             self.start_time.strftime('%H:%M'),
             self.end_time.strftime('%H:%M'),
-            self.reservation_id
+            self.reservation_id,
+            self._mapping[self.kind]
         )
 
     @classmethod
