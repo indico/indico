@@ -25,9 +25,11 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.common import utils
 from MaKaC.common import info
 import MaKaC.webcast as webcast
+from indico.core.config import Config
 from MaKaC.errors import WebcastAdminError
 from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.pages import admins as adminPages
+from MaKaC.webinterface.rh import initial_setup
 from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.errors import MaKaCError
 
@@ -407,7 +409,27 @@ class RHInstanceTracking(RHServicesBase):
 
     def _process_POST(self):
         if 'save' in request.form:
-            self._minfo.setInstanceTrackingActive(bool(request.form.get("enable", "")))
-            self._minfo.setInstanceTrackingContact(request.form["contact"])
-            self._minfo.setInstanceTrackingEmail(request.form["email"])
-        self._redirect(url_for('admin.adminServices-instanceTracking'))
+            enableNew = 'enable' in request.form
+            enableOld = self._minfo.isInstanceTrackingActive()
+            contact = request.form["contact"]
+            email = request.form["email"]
+            self._minfo.setInstanceTrackingContact(contact)
+            self._minfo.setInstanceTrackingEmail(email)
+            uuid = self._minfo.getInstanceTrackingUUID()
+            if enableNew and uuid == '':
+                payload = {'url': Config.getInstance().getBaseURL(),
+                           'contact': contact,
+                           'email': email,
+                           'organisation': self._minfo.getOrganisation()}
+                initial_setup.register_instance(payload)
+            elif enableNew and uuid != '':
+                payload = {'enabled': True,
+                           'contact': contact,
+                           'email': email}
+                initial_setup.update_instance(uuid, payload)
+                self._minfo.setInstanceTrackingActive(True)
+            elif enableOld and not enableNew:
+                payload = {'enabled': False}
+                initial_setup.update_instance(uuid, payload)
+                self._minfo.setInstanceTrackingActive(False)
+        self._redirect(url_for("admin.adminServices-instanceTracking"))

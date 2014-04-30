@@ -526,7 +526,8 @@ class Config:
         'CustomCountries'           : {},
         'PDFLatexProgram'           : 'pdflatex',
         'StrictLatex'               : True,
-        'WorkerName'                : socket.getfqdn()
+        'WorkerName'                : socket.getfqdn(),
+        'TrackerURL'                : 'http://localhost:5000/api'
     }
 
     if sys.platform == 'win32':

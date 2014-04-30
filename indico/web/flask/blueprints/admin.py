@@ -193,4 +193,4 @@ admin.add_url_rule('/plugins/plugin/<pluginType>/<pluginId>/save-options', 'admi
                    admins.RHAdminPluginsSaveOptions, methods=('POST',))
 
 # Initial Setup
-admin.add_url_rule('/initial-setup', 'initial_setup', initial_setup.RHInitialSetup, methods=('GET', 'POST'))
+admin.add_url_rule('/initial-setup', 'initial-setup', initial_setup.RHInitialSetup, methods=('GET', 'POST'))
