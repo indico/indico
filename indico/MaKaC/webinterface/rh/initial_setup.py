@@ -35,7 +35,7 @@ from indico.web.forms.validators import UsedIfChecked
 from indico.util.i18n import parseLocale, getLocaleDisplayNames
 
 
-class RHInitialSetup(base.RHDisplayBaseProtected):
+class RHInitialSetup(base.RH):
 
     def _setUserData(self, av):
         av.setName(self._params["name"])
@@ -55,8 +55,7 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
 
     def _checkParams_POST(self):
         self._params = request.form
-        base.RHDisplayBaseProtected._checkParams(self, self._params)
-        self._enable = self._params.get("enable", "")
+        self._enable = 'enable' in self._params
 
     def _process_GET(self):
         tz = str(get_localzone())
@@ -65,15 +64,15 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
         for code in language_options:
             language_options.remove(code)
             language_options.append((code[0], code[1][0].upper() + code[1][1:]))
-        selLang = session.lang
-        locale = parseLocale(selLang)
-        langName = locale.languages[locale.language].encode('utf-8')
-        selectedLanguageName = langName[0].upper() + langName[1:]
+        sel_lang = session.lang
+        locale = parseLocale(sel_lang)
+        lang_name = locale.languages[locale.language].encode('utf-8')
+        selected_language_name = lang_name[0].upper() + lang_name[1:]
 
         wvars = {'language_options': language_options,
                  'timezone_options': timezone_options,
-                 'selectedLanguage': selLang,
-                 'selectedLanguageName': selectedLanguageName}
+                 'selected_language': sel_lang,
+                 'selected_language_name': selected_language_name}
 
         return render_template('initial_setup.html', **wvars)
 
@@ -102,7 +101,7 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
             minfo.setOrganisation(self._params["organisation"])
             minfo.setTimezone(self._params["timezone"])
             minfo.setLang(self._params["language"])
-            minfo.setInstanceTrackingActive(bool(self._enable))
+            minfo.setInstanceTrackingActive(self._enable)
             if self._enable:
                 minfo.setInstanceTrackingEmail(self._params["it_email"])
                 minfo.setInstanceTrackingContact(self._params["it_contact"])
@@ -112,7 +111,6 @@ class RHInitialSetup(base.RHDisplayBaseProtected):
 
 
 class RegistrationForm(Form):
-
     name = TextField('Name', [validators.Required()])
     surname = TextField('Surname', [validators.Required()])
     user_email = TextField('User Email Address', [validators.Required(), validators.Email()])
