@@ -17,17 +17,15 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-
 from indico.core.db import db
-
-from ..models.aspects import Aspect
-from ..models.locations import Location
-from ..models.utils import intOrDefault
-from . import ServiceBase, ServiceError
+from indico.modules.rb.models.aspects import Aspect
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.utils import intOrDefault
+from MaKaC.services.implementation.base import ServiceBase
+from MaKaC.services.interface.rpc.common import ServiceError
 
 
 class RoomBookingMapBase(ServiceBase):
-
     def _param(self, parameter_name):
         try:
             return self._params[parameter_name]
@@ -36,7 +34,6 @@ class RoomBookingMapBase(ServiceBase):
 
 
 class RoomBookingMapCreateAspect(RoomBookingMapBase):
-
     def _checkParams(self):
         self._location = Location.getLocationByName(self._param('location'))
         aspect_data = self._param('aspect')
@@ -63,7 +60,6 @@ class RoomBookingMapCreateAspect(RoomBookingMapBase):
 
 
 class RoomBookingMapUpdateAspect(RoomBookingMapBase):
-
     def _checkParams(self):
         self._location = Location.getLocationByName(self._param('location'))
         self._aspect = self._param('aspect')
@@ -84,7 +80,6 @@ class RoomBookingMapUpdateAspect(RoomBookingMapBase):
 
 
 class RoomBookingMapRemoveAspect(RoomBookingMapBase):
-
     def _checkParams(self):
         self._location = Location.getLocationByName(self._param('location'))
         self._aspectId = self._param('aspectId')
@@ -96,7 +91,6 @@ class RoomBookingMapRemoveAspect(RoomBookingMapBase):
 
 
 class RoomBookingMapListAspects(RoomBookingMapBase):
-
     def _checkParams(self):
         self._location = Location.getLocationByName(self._param('location'))
 

@@ -19,32 +19,26 @@
 
 from datetime import datetime
 
+from indico.modules.rb.models.utils import is_weekend
+from indico.util.i18n import _
 from MaKaC.common.utils import HolidaysHolder
 from MaKaC.services.implementation.base import ServiceBase
-from MaKaC.services.interface.rpc.common import ServiceError
-
-from indico.util.i18n import _
-
-from ..models.utils import is_weekend
 
 
 class GetDateWarning(ServiceBase):
-
     def _checkParams(self):
-        self._start_date = datetime.strptime(
-            '{} {}'.format(self._params.get('start_date'),
-                           self._params.get('start_time')), '%d-%m-%Y %H:%M')
-        self._end_date = datetime.strptime(
-            '{} {}'.format(self._params.get('end_date'),
-                           self._params.get('end_time')), '%d-%m-%Y %H:%M')
+        self._start_date = datetime.strptime('{} {}'.format(self._params.get('start_date'),
+                                                            self._params.get('start_time')),
+                                             '%d-%m-%Y %H:%M')
+        self._end_date = datetime.strptime('{} {}'.format(self._params.get('end_date'),
+                                                          self._params.get('end_time')),
+                                           '%d-%m-%Y %H:%M')
 
     def _getAnswer(self):
-        if not self._start_date or not self._end_date or \
-           (HolidaysHolder.isWorkingDay(self._start_date) and
-            HolidaysHolder.isWorkingDay(self._end_date)):
+        if not self._start_date or not self._end_date:
             return ''
-
-        if is_weekend(self._start_date) or is_weekend(self._end_date):
+        elif HolidaysHolder.isWorkingDay(self._start_date) and HolidaysHolder.isWorkingDay(self._end_date):
+            return ''
+        elif is_weekend(self._start_date) or is_weekend(self._end_date):
             return _('weekend chosen')
-
         return _('holidays chosen')

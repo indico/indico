@@ -17,15 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.services.implementation.base import LoggedOnlyService
-
-from ..controllers.mixins import RoomBookingAvailabilityParamsMixin
-from ..models.locations import Location
-from . import ServiceBase, ServiceError
+from indico.modules.rb.controllers.mixins import RoomBookingAvailabilityParamsMixin
+from indico.modules.rb.models.locations import Location
+from MaKaC.services.implementation.base import LoggedOnlyService, ServiceBase
+from MaKaC.services.interface.rpc.common import ServiceError
 
 
 class RoomBookingListRooms(ServiceBase):
-
     def _checkParams(self):
         try:
             self._location = Location.getLocationByName(self._params['location'])
@@ -38,7 +36,6 @@ class RoomBookingListRooms(ServiceBase):
 
 
 class RoomBookingFullNameListRooms(RoomBookingListRooms):
-
     def _getAnswer(self):
         return dict((room.name, room.getFullName())
                     for room in self._location.getRoomsOrderedByNames())
@@ -46,7 +43,6 @@ class RoomBookingFullNameListRooms(RoomBookingListRooms):
 
 # TODO
 class RoomBookingAvailabilitySearchRooms(ServiceBase, RoomBookingAvailabilityParamsMixin):
-
     def _checkParams(self):
         try:
             self._location = self._params["location"]
@@ -65,9 +61,9 @@ class RoomBookingAvailabilitySearchRooms(ServiceBase, RoomBookingAvailabilityPar
 
         return [room.id for room in rooms]
 
+
 # TODO:
 class RoomBookingListLocationsAndRooms(ServiceBase):
-
     def _getAnswer(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getRoomBookingModuleActive():
@@ -80,9 +76,9 @@ class RoomBookingListLocationsAndRooms(ServiceBase):
         else:
             return []
 
+
 # TODO
 class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
-
     def _checkParams(self):
         self._isActive = self._params.get('isActive', None)
 
@@ -102,7 +98,6 @@ class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
 # Refactored from GetBookingBase
 # TODO:
 class RoomBookingLocationRoomAddress(object):
-
     def _getRoomInfo(self, target):
         location = target.getOwnLocation()
 
@@ -132,7 +127,6 @@ class RoomBookingLocationRoomAddress(object):
 
 # TODO
 class RoomBookingLocationsAndRoomsGetLink(ServiceBase):
-
     def _checkParams(self):
         self._location = self._params["location"]
         self._room = self._params["room"]

@@ -17,12 +17,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-
-from ..models.locations import Location
-from . import ServiceBase
+from indico.modules.rb.models.locations import Location
+from MaKaC.services.implementation.base import ServiceBase
 
 
 class RoomBookingListLocations(ServiceBase):
-
     def _getAnswer(self):
         return dict((name, name) for name in Location.getLocationNames())

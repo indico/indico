@@ -17,13 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-
-from ..models.blockings import Blocking
-from . import ServiceBase
+from MaKaC.services.implementation.base import ServiceBase
+from MaKaC.services.interface.rpc.common import ServiceError
 
 
 class RoomBookingBlockingProcessBase(ServiceBase):
-
     def _checkParams(self):
         self._blocking = RoomBlockingBase.getById(int(self._params["blockingId"]))
         self._room = RoomGUID.parse(self._params["room"]).getRoom()
@@ -36,14 +34,12 @@ class RoomBookingBlockingProcessBase(ServiceBase):
 
 
 class RoomBookingBlockingApprove(RoomBookingBlockingProcessBase):
-
     def _getAnswer(self):
         self._roomBlocking.approve()
         return {"active": self._roomBlocking.getActiveString()}
 
 
 class RoomBookingBlockingReject(RoomBookingBlockingProcessBase):
-
     def _checkParams(self):
         RoomBookingBlockingProcessBase._checkParams(self)
         self._reason = self._params.get('reason')
