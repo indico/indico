@@ -82,7 +82,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
                 self._room_id
             )
             html = page.display()
-            self._cache.set(key, html, 3) # 300
+            self._cache.set(key, html, 3600)
         return html
 
 
