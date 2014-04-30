@@ -29,32 +29,46 @@ class Bar(Serializer):
     ]
 
     BLOCKED, PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT = range(7)
-    # BLOCKED:        room is blocked (dark-gray)
-    # CANDIDATE:      represents new reservation (green)
-    # CONFLICT:       overlap between candidate and confirmed resv. (dark red)
-    # PREBOOKED:      represents pre-reservation (yellow)
-    # PRECONFLICT:    represents conflict with pre-reservation (dark blue)
-    # PRECONCURRENT:  conflicting pre-reservations (light blue)
-    # UNAVAILABLE :   represents confirmed reservation (orange)
+    # BLOCKED:        room is blocked
+    # CANDIDATE:      represents new reservation
+    # CONFLICT:       overlap between candidate and confirmed reservation
+    # PREBOOKED:      represents pre-reservation
+    # PRECONFLICT:    represents conflict with pre-reservation
+    # PRECONCURRENT:  conflicting pre-reservations
+    # UNAVAILABLE :   represents confirmed reservation
 
-    def __init__(self, date, start_time, end_time, kind,
-                 reservation_id, reservation_reason,
-                 reservation_booked_for_name, reservation_location_name,
-                 blocking):
-        self.date = date
+    def __init__(self, start_time, end_time, kind=CANDIDATE, reservation=None, blocking=None):
+        self.date = start_time.date()
         self.start_time = start_time
         self.end_time = end_time
 
-        self.reservation_id = reservation_id
-        self.booked_for_name = reservation_booked_for_name
-        self.reservation_reason = reservation_reason
-        self.reservation_location = reservation_location_name
+        if reservation is not None:
+            self.reservation_id = reservation.id
+            self.booked_for_name = reservation.booked_for_name
+            self.reservation_reason = reservation.booking_reason
+            self.reservation_location = reservation.room.location.name
+            kind = Bar.UNAVAILABLE if reservation.is_confirmed else Bar.PREBOOKED
 
         self.kind = kind
         self.blocking = blocking
 
     def __cmp__(self, other):
         return cmp(self.kind, other.kind)
+
+    def __repr__(self):
+        return '<Bar({0}, {1}, {2}, {3})>'.format(
+            self.date,
+            self.start_time.strftime('%H:%M'),
+            self.end_time.strftime('%H:%M'),
+            self.reservation_id
+        )
+
+    @classmethod
+    def from_occurrence(cls, occurrence):
+        return cls(
+            start_time=occurrence.start,
+            end_time=occurrence.end,
+            reservation=occurrence.reservation)
 
     @staticmethod
     def get_kind(rid, is_confirmed):
