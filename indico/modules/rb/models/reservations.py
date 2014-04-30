@@ -313,7 +313,7 @@ class Reservation(Serializer, db.Model):
         return self.occurrences.filter_by(is_cancelled=False).all()
 
     def getNumberOfExcludedDays(self):
-        return self.occurences.filter_by(is_cancelled=False).count()
+        return self.occurrences.filter_by(is_cancelled=False).count()
 
     def cancelOccurrences(self, ds):
         if ds:
