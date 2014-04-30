@@ -774,7 +774,7 @@ ndRegForm.filter('possibleDeparture', function () {
             var possibleDepartures = {};
             _.each(scope.section.departureDates, function(value, key) {
                 var departure = moment(key, 'DD/MM/YYY');
-                if(arrival.isBefore(departure)) {
+                if(arrival.isBefore(departure) || arrival.isSame(departure)) {
                     possibleDepartures[key] = value;
                 }
             });
