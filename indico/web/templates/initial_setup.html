@@ -21,7 +21,7 @@
             <form id="language-form" method="POST" action="{{ url_for('misc.changeLang') }}">
                 <input id="language-hidden" type="hidden" name="lang">
             </form>
-            <a class="i-button transparent-button icon-earth arrow" data-toggle="dropdown">{{ selectedLanguageName }}</a>
+            <a class="i-button transparent-button icon-earth arrow" data-toggle="dropdown">{{ selected_language_name }}</a>
             <ul class="dropdown">
                 {% for code, lang in language_options -%}
                     <li id="{{ code }}"><a>{{ lang }}</a></li>
@@ -102,7 +102,7 @@
                             <label for="lang">{% trans %}Language{% endtrans %}</label>
                             <select id="lang" name="language" class="input-lang">
                                 {% for code, lang in language_options -%}
-                                    {% if selectedLanguage == code %}
+                                    {% if selected_language == code %}
                                         <option value="{{ code }}" selected>{{ lang }}</option>
                                     {% else %}
                                         <option value="{{ code }}">{{ lang }}</option>
