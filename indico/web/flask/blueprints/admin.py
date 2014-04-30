@@ -104,4 +104,4 @@ admin.add_url_rule('/instance-tracking', 'adminServices-instanceTracking', servi
                    methods=('GET', 'POST'))
 
 # Initial Setup
-admin.add_url_rule('/initial-setup', 'initial_setup', initial_setup.RHInitialSetup, methods=('GET', 'POST'))
+admin.add_url_rule('/initial-setup', 'initial-setup', initial_setup.RHInitialSetup, methods=('GET', 'POST'))

@@ -541,6 +541,7 @@ class Config:
         'FlowerURL'                 : None,
         'StorageBackends'           : {'default': 'fs:/opt/indico/archive'},
         'AttachmentStorage'         : 'default',
+        'TrackerURL'                : 'http://localhost:5000/api'
     }
 
     if sys.platform == 'win32':

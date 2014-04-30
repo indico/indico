@@ -65,6 +65,7 @@ class MaKaCInfo(Persistent):
         self._instanceTrackingActive = False
         self._instanceTrackingEmail = ""
         self._instanceTrackingContact = ""
+        self._instanceTrackingUUID = ""
 
         # template set
         self._defaultTemplateSet = None
@@ -142,6 +143,16 @@ class MaKaCInfo(Persistent):
 
     def setInstanceTrackingContact(self, contact=""):
         self._instanceTrackingContact = contact
+
+    def getInstanceTrackingUUID(self):
+        if hasattr(self, "_instanceTrackingUUID"):
+            return self._instanceTrackingUUID
+        else:
+            self._instanceTrackingUUID = ""
+            return ""
+
+    def setInstanceTrackingUUID(self, uuid=""):
+        self._instanceTrackingUUID = uuid
 
     def getNews( self ):
         try:
