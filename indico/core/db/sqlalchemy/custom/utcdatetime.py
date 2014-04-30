@@ -15,12 +15,20 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+## along with Indico; if not, see <http://www.gnu.org/licenses/>.
+# engine specific time differences
 
-from __future__ import absolute_import
+import pytz
+from sqlalchemy import types
 
-__all__ = ['DBMgr', 'MigratedDB']
 
-from .manager import DBMgr
-from .migration import MigratedDB
-from .sqlalchemy import db
+class UTCDateTime(types.TypeDecorator):
+    impl = types.DateTime
+
+    def process_bind_param(self, value, engine):
+        if value is not None:
+            return value.astimezone(pytz.utc).replace(tzinfo=None)
+
+    def process_result_value(self, value, engine):
+        if value is not None:
+            return value.replace(tzinfo=pytz.utc)

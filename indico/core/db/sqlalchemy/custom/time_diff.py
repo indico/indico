@@ -15,12 +15,26 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+## along with Indico; if not, see <http://www.gnu.org/licenses/>.
+# engine specific time differences
 
-from __future__ import absolute_import
+from sqlalchemy import types
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.sql.functions import FunctionElement
 
-__all__ = ['DBMgr', 'MigratedDB']
 
-from .manager import DBMgr
-from .migration import MigratedDB
-from .sqlalchemy import db
+class time_diff(FunctionElement):
+    name = 'time_diff'
+    type = types.Numeric
+
+
+@compiles(time_diff, 'default')
+def _time_diff_default(element, compiler, **kw):
+    arg1, arg2 = list(element.clauses)
+    return '{} - {}'.format(arg2, arg1)
+
+
+@compiles(time_diff, 'postgresql')
+def _time_diff_postgres(element, compiler, **kw):
+    arg1, arg2 = list(element.clauses)
+    return 'EXTRACT(epoch FROM {}::time) - EXTRACT(epoch FROM {}::time)'.format(arg2, arg1)

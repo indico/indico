@@ -25,7 +25,8 @@ from datetime import datetime
 
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from indico.core.db import db, UTCDateTime
+from indico.core.db import db
+from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 
 
 class Blocking(db.Model):

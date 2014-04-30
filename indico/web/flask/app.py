@@ -35,7 +35,10 @@ from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
-from indico.core.db import db, drop_database, DBMgr, apply_db_loggers
+from indico.core.db import DBMgr
+from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy.logging import apply_db_loggers
+from indico.core.db.sqlalchemy.util import delete_all_tables
 from indico.web.assets import core_env, register_all_css, register_all_js
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
@@ -165,7 +168,7 @@ def configure_db(app):
     apply_db_loggers(app.debug)
     if cfg.getCreateTables():
         with app.app_context():
-            drop_database(db)  # favorable to `drop_all` under foreign keys
+            delete_all_tables(db)  # favorable to `drop_all` under foreign keys
             db.create_all()
 
 

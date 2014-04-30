@@ -23,7 +23,8 @@ Sent notifications of a reservation
 
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from indico.core.db import db, UTCDateTime
+from indico.core.db import db
+from indico.core.db.sqlalchemy import UTCDateTime
 
 
 class ReservationOccurrence(db.Model):

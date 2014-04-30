@@ -34,7 +34,8 @@ from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.wcomponents import WTemplated
 
-from indico.core.db import db, UTCDateTime
+from indico.core.db import db
+from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.logger import Logger
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.utils import (

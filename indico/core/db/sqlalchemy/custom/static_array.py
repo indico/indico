@@ -19,7 +19,8 @@ class StaticArray(types.TypeDecorator):
     def __init__(self):
         super(StaticArray, self).__init__()
         import sqlalchemy.dialects.postgresql.base as pg
-        self.__supported = {pg.PGDialect:pg.PGArray}
+
+        self.__supported = {pg.PGDialect: pg.PGArray}
         del pg
 
     def load_dialect_impl(self, dialect):

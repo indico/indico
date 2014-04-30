@@ -22,30 +22,21 @@ Schema of a room
 """
 
 from datetime import date, datetime, timedelta
-
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import (
     and_,
     func,
-    event,
     exists,
     extract,
     not_,
     or_,
-    null,
     type_coerce
 )
-from sqlalchemy.dialects.postgresql.base import array, ARRAY as sa_array
-from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.dialects.postgresql.base import ARRAY as sa_array
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import aliased
-from sqlalchemy.sql import select
 from sqlalchemy.sql.expression import cast, literal
 from sqlalchemy.types import (
     Date as sa_date,
-    DateTime as sa_datetime,
-    Integer as sa_integer,
-    Text as sa_string,
     Time as sa_time
 )
 
@@ -59,9 +50,8 @@ from MaKaC.user import (
     AvatarHolder,
     GroupHolder
 )
-
-from indico.core.db import db, time_diff, greatest, least
-from indico.core.db.utils import static_array
+from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy.custom import greatest, least, static_array
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
@@ -75,9 +65,7 @@ from indico.modules.rb.models.room_equipments import (
     RoomEquipmentAssociation
 )
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
-
 from indico.util.i18n import _
-
 from .utils import Serializer
 
 
