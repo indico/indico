@@ -401,26 +401,19 @@ class RHSaveAnalytics(RHServicesBase):
 
 class RHInstanceTracking(RHServicesBase):
 
-    def _process(self):
+    def _process_GET(self):
         p = adminPages.WPInstanceTracking(self)
         return p.display()
+
+    def _process_POST(self):
+        if 'save' in request.form:
+            self._minfo.setInstanceTrackingContact(request.form["contact"])
+            self._minfo.setInstanceTrackingEmail(request.form["email"])
+        self._redirect(url_for('admin.adminServices-instanceTracking'))
 
 
 class RHToggleInstanceTracking(RHServicesBase):
 
     def _process(self):
         self._minfo.setInstanceTrackingActive(not self._minfo.isInstanceTrackingActive())
-        self._redirect(url_for('admin.adminServices-instanceTracking'))
-
-
-class RHITInfoModification(RHServicesBase):
-
-    def _process_GET(self):
-        p = adminPages.WPITInfoModification(self)
-        return p.display()
-
-    def _process_POST(self):
-        if 'ok' in request.form:
-            self._minfo.setInstanceTrackingContact(request.form["contact"])
-            self._minfo.setInstanceTrackingEmail(request.form["email"])
         self._redirect(url_for('admin.adminServices-instanceTracking'))

@@ -1,28 +1,26 @@
 <div class="groupTitle"> ${ _("Instance Tracking settings") }</div>
 
+<form action="${ postURL }" method="POST">
 
-<table width="100%" border="0">
-    <tr>
-      <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ enableDisable }</span></td>
-      <td bgcolor="white" width="100%" valign="top" class="blacktext">
-        <table>
-            <tr>
-                <td>${features}</td>
-            </tr>
-        </table>
-      </td>
-      <td valign="top">
-        <form action="${ ITInfoModifURL }" method="GET">
-        <input type="submit" class="btn" value="${ _("modify")}">
-        </form>
-      </td>
-    </tr>
-    <tr>
-        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Contact person name")}</span></td>
-        <td bgcolor="white" width="100%" valign="top" class="blacktext">${instanceTrackingContact}</td>
-    </tr>
-    <tr>
-        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Contact email address")}</span></td>
-        <td bgcolor="white" width="100%" valign="top" class="blacktext">${instanceTrackingEmail}</td>
-    </tr>
-</table>
+    <div class="instanceTrackingSettings">
+        <div class="clearfix">
+            <span class="dataCaptionFormat">${ enableDisable }</span>
+            <a href="${ toggleURL }">
+                <img src="${ imgURL }" border="0" style="float:left; padding-right: 5px">${ _("Receive important notifications") }
+            </a>
+        </div>
+        <div class="clearfix">
+            <span class="dataCaptionFormat">${ _("Contact person name") }</span>
+            <input type="text" name="contact" value="${ contact }">
+        </div>
+        <div class="clearfix">
+            <span class="dataCaptionFormat">${ _("Contact email address") }</span>
+            <input type="text" name="email" value="${ email }">
+        </div>
+        <div class="clearfix">
+            <input type="submit" class="btn" name="cancel" value="${ _("Cancel")}">
+            <input type="submit" class="btn" name="save" value="${ _("Save")}">
+        </div>
+    </div>
+
+</form>

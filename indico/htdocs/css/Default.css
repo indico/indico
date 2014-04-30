@@ -7741,3 +7741,24 @@ ul.speaker_list > li .contributions li {
 .watermark {
    color: gray;
 }
+
+.instanceTrackingSettings {
+    width: 42%;
+}
+
+.instanceTrackingSettings div {
+    margin-bottom: 20px;
+}
+
+.instanceTrackingSettings span {
+    float: left;
+    text-align: right;
+}
+
+.instanceTrackingSettings a, .instanceTrackingSettings input {
+    float: right;
+}
+
+.instanceTrackingSettings a, .instanceTrackingSettings input:not(.btn) {
+    width: 360px;
+}

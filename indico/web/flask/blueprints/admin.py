@@ -139,11 +139,10 @@ admin.add_url_rule('/analytics', 'adminServices-analytics', services.RHAnalytics
 admin.add_url_rule('/analytics', 'adminServices-saveAnalytics', services.RHSaveAnalytics, methods=('POST',))
 
 # Instance Tracking
-admin.add_url_rule('/instance-tracking', 'adminServices-instanceTracking', services.RHInstanceTracking)
+admin.add_url_rule('/instance-tracking', 'adminServices-instanceTracking', services.RHInstanceTracking,
+                   methods=('GET', 'POST'))
 admin.add_url_rule('/instance-tracking/toggle', 'adminServices-toggleInstanceTracking',
                    services.RHToggleInstanceTracking)
-admin.add_url_rule('/instance-tracking/modify', 'adminServices-itInfoModification', services.RHITInfoModification,
-                   methods=('GET', 'POST'))
 
 # Webcast
 admin.add_url_rule('/webcast/live', 'adminServices-webcast', services.RHWebcast, methods=('GET', 'POST'))

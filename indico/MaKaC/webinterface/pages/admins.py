@@ -2564,8 +2564,7 @@ class WPInstanceTracking(WPServicesCommon):
 
     def _getTabContent(self, params):
         wc = WInstanceTracking()
-        pars = {"ITInfoModifURL": urlHandlers.UHITInfoModification.getURL()}
-        return wc.getHTML(pars)
+        return wc.getHTML(params)
 
     def _setActiveTab(self):
         self._subTabInstanceTracking.setActive()
@@ -2577,39 +2576,18 @@ class WInstanceTracking(wcomponents.WTemplated):
         wvars = wcomponents.WTemplated.getVars(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
-        iconDisabled = str(Config.getInstance().getSystemIconURL("disabledSection"))
-        iconEnabled = str(Config.getInstance().getSystemIconURL("enabledSection"))
-        url = url_for('admin.adminServices-toggleInstanceTracking')
         if minfo.isInstanceTrackingActive():
-            icon = iconEnabled
+            icon = str(Config.getInstance().getSystemIconURL("enabledSection"))
             wvars["enableDisable"] = _("Disable")
         else:
-            icon = iconDisabled
+            icon = str(Config.getInstance().getSystemIconURL("disabledSection"))
             wvars["enableDisable"] = _("Enable")
-        wvars["features"] = i18nformat("""<div style="margin-bottom: 5px"><a href="{0}">""".format(url) +
-                                       """<img src="{0}" border="0" style="float:left;""".format(icon) +
-                                       """ padding-right: 5px">_("Receive important notifications")</a></div>""")
-        wvars["instanceTrackingContact"] = minfo.getInstanceTrackingContact()
-        wvars["instanceTrackingEmail"] = minfo.getInstanceTrackingEmail()
-        return wvars
-
-
-class WITInfoModification(wcomponents.WTemplated):
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        wvars["toggleURL"] = url_for('admin.adminServices-toggleInstanceTracking')
+        wvars["imgURL"] = icon
+        wvars["postURL"] = url_for('admin.adminServices-instanceTracking')
         wvars["contact"] = minfo.getInstanceTrackingContact()
         wvars["email"] = minfo.getInstanceTrackingEmail()
         return wvars
-
-
-class WPITInfoModification(WPAdmins):
-
-    def _getPageContent(self, params):
-        wc = WITInfoModification()
-        pars = {"postURL": urlHandlers.UHITInfoModification.getURL()}
-        return wc.getHTML(pars)
 
 
 class WPAdminProtection(WPAdminsBase):
