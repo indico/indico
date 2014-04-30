@@ -158,7 +158,6 @@ def configure_db(app):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         if cfg.getIsRoomBookingActive():
             minfo.setRoomBookingModuleActive(True)
-            from indico.modules.rb.models import *
         else:
             minfo.setRoomBookingModuleActive()
 
