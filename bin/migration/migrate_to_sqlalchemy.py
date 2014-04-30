@@ -17,8 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-__no_session_options__ = True
-
 import os
 import re
 from argparse import ArgumentParser
@@ -34,7 +32,8 @@ from flask import Flask
 from ZODB import DB, FileStorage
 from ZEO.ClientStorage import ClientStorage
 
-from indico.core.db import db, drop_database
+from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy.util import delete_all_tables, update_session_options
 from indico.core.db.migration import MigratedDB
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
@@ -495,6 +494,7 @@ def migrate(main_root, rb_root, photo_path):
 
 
 def main(main_uri, rb_uri, sqla_uri, photo_path, drop):
+    update_session_options(db)  # get rid of the zope transaction extension
     main_root, rb_root, app = setup(main_uri, rb_uri, sqla_uri)
     global tz
     try:
@@ -505,7 +505,7 @@ def main(main_uri, rb_uri, sqla_uri, photo_path, drop):
     start = clock()
     with app.app_context():
         if drop:
-            drop_database(db)
+            delete_all_tables(db)
         db.create_all()
         migrate(main_root, rb_root, photo_path)
     print (clock() - start), 'seconds'

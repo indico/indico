@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask.ext.sqlalchemy import Model
+from flask.ext.sqlalchemy import Model, connection_stack
 from sqlalchemy import MetaData, ForeignKeyConstraint, Table
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.sql.ddl import DropConstraint, DropTable
@@ -44,6 +44,19 @@ class IndicoModel(Model):
     @classmethod
     def get(cls, oid):
         return cls.query.get(oid)
+
+
+def update_session_options(db, session_options=None):
+    """Replaces the Flask-SQLAlchemy session a new one using the given options.
+
+    This can be used when you want a session that does not use the ZopeTransaction extension.
+    """
+    if session_options is None:
+        session_options = {}
+    session_options.setdefault(
+        'scopefunc', connection_stack.__ident_func__
+    )
+    db.session = db.create_scoped_session(session_options)
 
 
 def delete_all_tables(db):

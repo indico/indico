@@ -28,8 +28,4 @@ from .util import IndicoModel
 # Monkeypatching this since Flask-SQLAlchemy doesn't let us override the model class
 flask.ext.sqlalchemy.Model = IndicoModel
 
-# TODO: Get rid of this cancer before it spreads!
-if inspect.stack()[1][0].f_globals.get('__no_session_options__', False):
-    db = SQLAlchemy()  # for testing and migration, manager isn't needed
-else:
-    db = SQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
+db = SQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
