@@ -94,8 +94,8 @@ class RHInstanceTracking(RHServicesBase):
         if 'save' in request.form:
             enableNew = 'enable' in request.form
             enableOld = self._minfo.isInstanceTrackingActive()
-            contact = request.form["contact"]
-            email = request.form["email"]
+            contact = request.form.get('contact', self._minfo.getInstanceTrackingContact())
+            email = request.form.get('email', self._minfo.getInstanceTrackingEmail())
             self._minfo.setInstanceTrackingContact(contact)
             self._minfo.setInstanceTrackingEmail(email)
             uuid = self._minfo.getInstanceTrackingUUID()
