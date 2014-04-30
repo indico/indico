@@ -159,7 +159,8 @@
     }
 
     &.label,
-    &.label:hover:not(.disabled):not(:disabled) {
+    &.label:hover:not(.disabled):not(:disabled),
+    &.label:active:not(.disabled):not(:disabled), {
         background: transparent;
         border-color: $gray !important;
         box-shadow: none !important;

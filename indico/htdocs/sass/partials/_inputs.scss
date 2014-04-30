@@ -115,13 +115,6 @@ span[contenteditable] {
         }
     }
 
-    input[type=checkbox] {
-        &:checked:active + label {
-            @include gradient(#81ADEF, #A5C4F3);
-            color: $black !important;
-        }
-    }
-
     input[type=radio] {
         &:checked + label:hover {
             cursor: default !important;

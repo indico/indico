@@ -37,10 +37,10 @@ from MaKaC.plugins.Collaboration import urlHandlers as collaborationUrlHandlers
 from indico.util.i18n import  L_
 from indico.util.date_time import format_datetime
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 from MaKaC.common.timezoneUtils import nowutc, setAdjustedDate, DisplayTZ, minDatetime
-from MaKaC.common.utils import formatDateTime, parseDateTime
+from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate
 from MaKaC.i18n import _
 from MaKaC.common.indexes import IndexesHolder
@@ -175,9 +175,11 @@ class WAdminCollaboration(wcomponents.WTemplated):
             minKey = None
             maxKey = None
             if self._queryParams['sinceDate']:
-                minKey = setAdjustedDate(parseDateTime(self._queryParams['sinceDate'].strip()), tz = self._tz)
+                minKey = setAdjustedDate(datetime.strptime(self._queryParams['sinceDate'].strip(), '%Y/%m/%d'),
+                                         tz=tz)
             if self._queryParams['toDate']:
-                maxKey = setAdjustedDate(parseDateTime(self._queryParams['toDate'].strip()), tz = self._tz)
+                maxKey = setAdjustedDate(datetime.strptime(self._queryParams['toDate'].strip(), '%Y/%m/%d'),
+                                         tz=tz)
             if self._queryParams['fromTitle']:
                 minKey = self._queryParams['fromTitle'].strip()
             if self._queryParams['toTitle']:

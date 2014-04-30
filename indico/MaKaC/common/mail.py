@@ -19,11 +19,8 @@
 
 import smtplib
 from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
-from email.utils import formatdate
-from email import Encoders
 from email import charset
 
 from indico.core.config import Config
@@ -149,6 +146,7 @@ class GenericMailer:
     def sendAndLog(cls, notification, conference, module='', user=None, skipQueue=False):
         cls.send(notification, skipQueue=skipQueue)
         logData = {
+            'contentType': notification.getContentType(),
             'fromAddr': notification.getFromAddr(),
             'toList': notification.getToList(),
             'ccList': notification.getCCList(),
