@@ -38,9 +38,7 @@
                               % endif
                               <tr style="height: 60px" id="${ room.id }" class="resvHover">
                                 <td ${ on_click_details_url }>
-                                  % if room.has_photo:
-                                    <img src="${ room.small_photo_url }" />
-                                  % endif
+                                  <img src="${ room.small_photo_url }" />
                                 </td>
                                 <td ${ on_click_details_url }>
                                   ${ room.building }-${ room.floor }-${ room.number }
