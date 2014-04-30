@@ -19,7 +19,7 @@
                 <label class="dataCaptionFormat" for="contact">${ _("Contact person name") }</label>
             </div>
             <div class="field-input">
-                <input id="contact" type="text" name="contact" value="${ contact }">
+                <input id="contact" type="text" name="contact" value="${ contact }" disabled>
             </div>
         </div>
         <div class="clearfix">
@@ -27,7 +27,7 @@
                 <label class="dataCaptionFormat" for="email">${ _("Contact email address") }</label>
             </div>
             <div class="field-input">
-                <input id="email" type="text" name="email" value="${ email }">
+                <input id="email" type="text" name="email" value="${ email }" disabled>
             </div>
         </div>
         <div class="clearfix">
@@ -46,11 +46,19 @@
         $this.toggleClass('toggled');
         var toggled = $this.hasClass('toggled');
         var checkbox = $('#enable');
+        var contact = $('#contact');
+        var email = $('#email');
         checkbox.prop('checked', toggled);
+        contact.prop('disabled', !toggled);
+        email.prop('disabled', !toggled);
         $('.buttons-group input').prop('disabled', false);
     });
     if ($('#enable').prop('checked')) {
         $('.toggle-button').toggleClass('toggled');
+        var contact = $('#contact');
+        var email = $('#email');
+        contact.prop('disabled', false);
+        email.prop('disabled', false);
     }
     $('input').on('input', function(){
         $('.buttons-group input').prop('disabled', false);
