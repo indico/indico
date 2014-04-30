@@ -20,6 +20,7 @@
 from MaKaC.webinterface.rh import welcome, helpDisplay, newsDisplay, payment, lang, resetTimezone, about, contact, \
     JSContent, errors, materialDisplay
 from indico.web.flask.wrappers import IndicoBlueprint
+from indico.web.handlers import tracker
 
 
 misc = IndicoBlueprint('misc', __name__)
@@ -37,3 +38,4 @@ misc.add_url_rule('/report-error', 'errors', errors.RHErrorReporting, methods=('
 misc.add_url_rule('/error-report/<report_id>/<filename>', 'error-report-download', errors.RHDownloadErrorReport)
 misc.add_url_rule('/conversion-finished', 'getConvertedFile', materialDisplay.RHMaterialAddConvertedFile,
                   methods=('POST',))
+misc.add_url_rule('/system-info', 'system-info', tracker.RHSystemInfo)
