@@ -67,25 +67,21 @@ def update_instance(uuid, payload):
 
 class RHInitialSetup(RH):
 
-    def _setUserData(self, av):
-        av.setName(self._params["name"])
-        av.setSurName(self._params["surname"])
-        av.setOrganisation(self._params["organisation"])
-        av.setEmail(self._params["user_email"])
-        av.setTimezone(self._params["timezone"])
-        av.setLang(self._params["language"])
+    def _setUserData(self, av, setup_form):
+        av.setName(setup_form.name.data)
+        av.setSurName(setup_form.surname.data)
+        av.setOrganisation(setup_form.organisation.data)
+        av.setEmail(setup_form.user_email.data)
+        av.setTimezone(setup_form.timezone.data)
+        av.setLang(setup_form.language.data)
 
     def _checkProtection(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getAdminList().getList() or AvatarHolder()._getIdx():
             raise AccessError
 
-    def _checkParams_GET(self):
-        self._params = request.form
-
     def _checkParams_POST(self):
-        self._params = request.form
-        self._enable = 'enable' in self._params
+        self._enable = 'enable' in request.form
 
     def _process_GET(self):
         tz = str(get_localzone())
@@ -115,9 +111,9 @@ class RHInitialSetup(RH):
         ah = AvatarHolder()
         av = Avatar()
         authManager = AuthenticatorMgr()
-        self._setUserData(av)
+        self._setUserData(av, setup_form)
         ah.add(av)
-        li = LoginInfo(self._params["login"], self._params["password"].encode('UTF8'))
+        li = LoginInfo(setup_form.login.data, setup_form.password.data.encode('UTF8'))
         identity = authManager.createIdentity(li, av, "Local")
         authManager.add(identity)
         # Activating new account
@@ -127,17 +123,17 @@ class RHInitialSetup(RH):
         al.grant(av)
         # Configuring server's settings
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        minfo.setOrganisation(self._params["organisation"])
-        minfo.setTimezone(self._params["timezone"])
-        minfo.setLang(self._params["language"])
+        minfo.setOrganisation(setup_form.organisation.data)
+        minfo.setTimezone(setup_form.timezone.data)
+        minfo.setLang(setup_form.language.data)
         if self._enable:
-            minfo.setInstanceTrackingContact(self._params["it_contact"])
-            minfo.setInstanceTrackingEmail(self._params["it_email"])
+            minfo.setInstanceTrackingContact(setup_form.it_contact.data)
+            minfo.setInstanceTrackingEmail(setup_form.it_email.data)
             # Posting a request to the server with the data
             payload = {'url': Config.getInstance().getBaseURL(),
-                       'contact': self._params["it_contact"],
-                       'email': self._params["it_email"],
-                       'organisation': self._params["organisation"]}
+                       'contact': setup_form.it_contact.data,
+                       'email': setup_form.it_email.data,
+                       'organisation': setup_form.organisation.data}
             register_instance(payload)
 
         p = signIn.WPAdminCreated(self, av)
@@ -152,6 +148,8 @@ class InitialSetupForm(Form):
     password = PasswordField('New Password', [validators.Required()])
     password_confirm = PasswordField('Repeat Password',
                                      [validators.EqualTo('password', message='Passwords must match')])
+    timezone = TextField('Timezone', [validators.Required()])
+    language = TextField('Language', [validators.Required()])
     organisation = TextField('Organisation', [validators.Required()])
     enable = BooleanField('Enable Instance Tracking')
     it_email = TextField('Instance Tracking Email Address',
