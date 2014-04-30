@@ -32,8 +32,8 @@
         </div>
         <div class="clearfix">
             <div class="buttons-group">
-                <input type="submit" class="btn" name="save" value="${ _("Save")}">
-                <input type="submit" class="btn" name="cancel" value="${ _("Cancel")}">
+                <input type="submit" class="btn" name="save" value="${ _("Save")}" disabled>
+                <input type="submit" class="btn" name="cancel" value="${ _("Cancel")}" disabled>
             </div>
         </div>
     </div>
@@ -47,8 +47,12 @@
         var toggled = $this.hasClass('toggled');
         var checkbox = $('#enable');
         checkbox.prop('checked', toggled);
+        $('.buttons-group input').prop('disabled', false);
     });
     if ($('#enable').prop('checked')) {
-        $('.toggle-button').trigger('click');
+        $('.toggle-button').toggleClass('toggled');
     }
+    $('input').on('input', function(){
+        $('.buttons-group input').prop('disabled', false);
+    });
 </script>
