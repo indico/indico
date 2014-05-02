@@ -132,3 +132,26 @@ def int_timestamp(datetimeVal, tz=pytz.timezone('UTC')):
     Returns the number of seconds from the local epoch to the UTC time
     """
     return int(time.mktime(datetimeVal.astimezone(tz).timetuple()))
+
+
+def overlaps(range1, range2, inclusive=False):
+    start1, end1 = range1
+    start2, end2 = range2
+
+    if inclusive:
+        return start1 <= end2 and start2 <= end1
+    else:
+        return start1 < end2 and start2 < end1
+
+
+def get_overlap(range1, range2):
+    if not overlaps(range1, range2):
+        return None, None
+
+    start1, end1 = range1
+    start2, end2 = range2
+
+    latest_start = max(start1, start2)
+    earliest_end = min(end1, end2)
+
+    return latest_start, earliest_end
