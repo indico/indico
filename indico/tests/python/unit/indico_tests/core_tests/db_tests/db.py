@@ -132,7 +132,7 @@ class DBTest(TestCase):
                     ])
 
                     # reservation occurrences and excluded days
-                    reservation.createOccurrences(excluded=resv.get('excluded_days', []))
+                    reservation.create_occurrences(excluded=resv.get('excluded_days', []))
 
                     room.reservations.append(reservation)
                 location.rooms.append(room)
