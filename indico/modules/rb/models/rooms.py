@@ -281,14 +281,10 @@ notificationAssistance: {notification_for_assistance}
                                self.getVerboseEquipment())
 
     def __cmp__(self, other):
-        if not (self and other):
-            return cmp(
-                1 if self else None,
-                1 if other else None
-            )
+        if not self or not other:
+            return cmp(1 if self else None, 1 if other else None)
         if self.id == other.id:
             return 0
-
         return (cmp(self.location.name, other.location.name) or
                 cmp(self.building, other.building) or
                 cmp(self.floor, other.floor) or
@@ -539,13 +535,13 @@ notificationAssistance: {notification_for_assistance}
         from .locations import Location
 
         equipment_count = len(f.equipments.data)
-        equipment_subquery = db.session.query(RoomEquipmentAssociation)\
-                               .with_entities(func.count(RoomEquipmentAssociation.c.room_id))\
+        equipment_subquery = db.session.query(RoomEquipmentAssociation) \
+                               .with_entities(func.count(RoomEquipmentAssociation.c.room_id)) \
                                .filter(
                                     RoomEquipmentAssociation.c.room_id == Room.id,
                                     RoomEquipmentAssociation.c.equipment_id.in_(f.equipments.data)
-                               )\
-                               .correlate(Room)\
+                               ) \
+                               .correlate(Room) \
                                .as_scalar()
 
         q = Room.query \
@@ -732,64 +728,54 @@ notificationAssistance: {notification_for_assistance}
                      coerce_as_tuple(Reservation.is_confirmed),
                      coerce_as_tuple(cast(ReservationOccurrence.start, sa_time)),
                      coerce_as_tuple(cast(ReservationOccurrence.end, sa_time))
-                ) \
-                .outerjoin(
-                    Location,
-                    literal(1) == 1  # cartesian product
-                ) \
-                .outerjoin(
-                    Room,
-                    Location.rooms
-                ) \
-                .outerjoin(
-                    Reservation,
-                    Room.reservations
-                ) \
-                .outerjoin(
-                    ReservationOccurrence,
-                    and_(
-                        Reservation.occurrences,
-                        date_query.c.available_date == cast(ReservationOccurrence.start, sa_date)
-                    )
-                ) \
-                .outerjoin(
-                    BlockedRoom,
-                    BlockedRoom.room_id == Room.id
-                ) \
-                .outerjoin(
-                    Blocking,
-                    Blocking.id == BlockedRoom.blocking_id
-                ) \
-                .correlate(date_query) \
-                .filter(
-                    Room.id.in_(room_id_list),
-                ) \
-                .group_by(date_query.c.available_date, Room.id) \
-                .order_by(date_query.c.available_date, Room.name) \
-                .all()
+                 ) \
+                 .outerjoin(
+                     Location,
+                     literal(1) == 1  # cartesian product
+                 ) \
+                 .outerjoin(
+                     Room,
+                     Location.rooms
+                 ) \
+                 .outerjoin(
+                     Reservation,
+                     Room.reservations
+                 ) \
+                 .outerjoin(
+                     ReservationOccurrence,
+                     and_(
+                         Reservation.occurrences,
+                         date_query.c.available_date == cast(ReservationOccurrence.start, sa_date)
+                     )
+                 ) \
+                 .outerjoin(
+                     BlockedRoom,
+                     BlockedRoom.room_id == Room.id
+                 ) \
+                 .outerjoin(
+                     Blocking,
+                     Blocking.id == BlockedRoom.blocking_id
+                 ) \
+                 .correlate(date_query) \
+                 .filter(
+                     Room.id.in_(room_id_list),
+                 ) \
+                 .group_by(date_query.c.available_date, Room.id) \
+                 .order_by(date_query.c.available_date, Room.name) \
+                 .all()
 
     @staticmethod
     def getReservationsForAvailability2(start_date, end_date, room_id_list):
         date_query = db.session.query(
-                        cast(
-                            func.generate_series(
-                                start_date.date(),
-                                end_date.date(),
-                                timedelta(1)
-                            ),
-                            sa_date
-                        ).label('available_date')
+            cast(func.generate_series(start_date.date(), end_date.date(), timedelta(1)),
+                 sa_date).label('available_date')
+        ).subquery()
 
-                    ) \
-                    .subquery()
-
-        return db.session\
-                 .query(date_query.c.available_date)\
-                 .select_from(date_query)\
-                 .correlate(date_query)\
-                 .filter(
-                    date_query.c.available_date != date(2014, 2, 18)
-                 )\
+        return db.session \
+                 .query(date_query.c.available_date) \
+                 .select_from(date_query) \
+                 .correlate(date_query) \
+                 .filter(date_query.c.available_date != date(2014, 2, 18)) \
                  .all()
 
     # equipments
@@ -836,7 +822,7 @@ notificationAssistance: {notification_for_assistance}
     def hasEquipments(self, names):
         def has(name):
             return any(map(lambda e: e.lower.find(name) != -1, self.equipment_names))
-        return all(map(lambda name: has(name), names))
+        return all(map(has, names))
 
     def needsVideoConferenceSetup(self):
         return self.hasEquipment('Video Conference')
@@ -845,8 +831,8 @@ notificationAssistance: {notification_for_assistance}
         return self.hasEquipment('Webcast/Recording')
 
     def getVerboseEquipment(self):
-        return self.equipments\
-                   .with_entities(func.array_to_string(func.array_agg(RoomEquipment.name), ', '))\
+        return self.equipments \
+                   .with_entities(func.array_to_string(func.array_agg(RoomEquipment.name), ', ')) \
                    .scalar()
         # return (self.equipments
         #         .with_entities(func.group_concat(RoomEquipment.name))
@@ -864,8 +850,7 @@ notificationAssistance: {notification_for_assistance}
         return self.bookable_times.all()
 
     def getBookableTimesOrDefault(self):
-        return self.getBookableTimes() or \
-              [BookableTime(start_time=None, end_time=None)]
+        return self.getBookableTimes() or [BookableTime(start_time=None, end_time=None)]
 
     def addBookableTime(self, bookable_time):
         self.bookable_times.append(bookable_time)
@@ -888,8 +873,7 @@ notificationAssistance: {notification_for_assistance}
         return q.all()
 
     def getNonBookableDatesOrDefault(self):
-        return self.getNonBookableDates() or \
-               [NonBookableDate(start_date=None, end_date=None)]
+        return self.getNonBookableDates() or [NonBookableDate(start_date=None, end_date=None)]
 
     def addNonBookableDate(self, nonbookable_date):
         self.nonbookable_dates.append(nonbookable_date)
@@ -906,13 +890,13 @@ notificationAssistance: {notification_for_assistance}
     # blocked rooms
 
     def getBlockedRoom(self, d):
-        return (self.blocked_rooms
-                    .join(BlockedRoom.blocking)
-                    .filter(
-                         Blocking.is_active_at(d),
-                         BlockedRoom.is_active == True
-                     )
-                    .first())
+        return self.blocked_rooms \
+                   .join(BlockedRoom.blocking) \
+                   .filter(
+                       Blocking.is_active_at(d),
+                       BlockedRoom.is_active == True
+                   ) \
+                   .first()
 
     # attributes
 
@@ -929,7 +913,7 @@ notificationAssistance: {notification_for_assistance}
     #     return attribute
 
     def getAttributeValueByName(self, name):
-        attr =  self.getAttributeByName(name)
+        attr = self.getAttributeByName(name)
         if attr:
             return attr.value
 
@@ -944,19 +928,19 @@ notificationAssistance: {notification_for_assistance}
             return True
 
         like_query_param = '%{}%'.format(text)
-        return (self.equipments
-                    .join(Room.attributes)
-                    .filter(
-                        exists().where(
-                            or_(
-                                RoomEquipment.name.ilike(like_query_param),
-                                RoomAttribute.raw_data.ilike(like_query_param)
-                            )
-                        )
-                    ).scalar())
+        return self.equipments \
+                   .join(Room.attributes) \
+                   .filter(
+                       exists().where(
+                           or_(
+                               RoomEquipment.name.ilike(like_query_param),
+                               RoomAttribute.raw_data.ilike(like_query_param)
+                           )
+                       )
+                   ) \
+                   .scalar()
 
-    # TODO: %20 should go to config
-    @hybrid_property
+    # TODO: 20% should go to config
     def isGoodCapacity(self, capacity):
         if not self.capacity or self.capacity == 0:
             return False
@@ -977,9 +961,7 @@ notificationAssistance: {notification_for_assistance}
         """
         Execution for canBeBookedBy and canBePreBookedBy methods
         """
-        if (self.is_active and self.is_reservable and
-            (pre or not self.reservations_need_confirmation)):
-
+        if self.is_active and self.is_reservable and (pre or not self.reservations_need_confirmation):
             # TODO:
             # allowed_groups = self.getAttributeByName('Allowed Booking Group')
             allowed_groups = []
@@ -1038,11 +1020,10 @@ notificationAssistance: {notification_for_assistance}
         return manager_groups.contains(avatar)
 
     def getGroups(self, group_name):
-        groups = GroupHolder.match({'name': group_name},
-                                    exact=True, searchInAuthenticators=False)
+        groups = GroupHolder().match({'name': group_name}, exact=True, searchInAuthenticators=False)
         if groups:
             return groups
-        return GroupHolder.match({'name': group_name}, exact=True)
+        return GroupHolder().match({'name': group_name}, exact=True)
 
     def getAllManagers(self):
         managers = set([self.responsible_id])
@@ -1134,7 +1115,6 @@ notificationAssistance: {notification_for_assistance}
         #         )
         #     )
 
-
         # TODO: DB must calculate this
         nonbookable_count = (
             self.nonbookable_dates
@@ -1147,8 +1127,8 @@ notificationAssistance: {notification_for_assistance}
                 )
                 .filter(
                     or_(
-                        and_(NonBookableDate.start_date >= start_date, NonBookableDate.start_date <= end_date),
-                        and_(NonBookableDate.end_date >= start_date, NonBookableDate.end_date <= end_date)
+                        (NonBookableDate.start_date >= start_date) & (NonBookableDate.start_date <= end_date),
+                        (NonBookableDate.end_date >= start_date) & (NonBookableDate.end_date <= end_date)
                     )
                 )
                 .scalar()
@@ -1201,83 +1181,57 @@ notificationAssistance: {notification_for_assistance}
                 .all()
         )
 
-
     @staticmethod
     def getBuildingCoordinatesByRoomIds(rids):
-        return (
-            Room.query
-                .with_entities(
-                    Room.latitude,
-                    Room.longitude
-                )
-                .filter(
-                    Room.latitude != None,
-                    Room.longitude != None,
-                    Room.id.in_(rids)
-                )
-                .first()
-        )
+        return Room.query \
+                   .with_entities(
+                       Room.latitude,
+                       Room.longitude
+                   ) \
+                   .filter(
+                       Room.latitude != None,
+                       Room.longitude != None,
+                       Room.id.in_(rids)
+                   ) \
+                   .first()
 
     @staticmethod
     def getRoomsRequireVideoConferenceSetupByIds(rids):
-        return (
-            Room.query
-                .join(Room.equipments)
-                .filter(
-                    RoomEquipment.name == 'Video Conference',
-                    Room.id.in_(rids)
-                )
-                .all()
-        )
+        return Room.query \
+                   .join(Room.equipments) \
+                   .filter(
+                       RoomEquipment.name == 'Video Conference',
+                       Room.id.in_(rids)
+                   ) \
+                   .all()
 
     # photos
 
     def collides(self, start, end):
-        return (
-            self.reservations
-                .join(ReservationOccurrence)
-                .filter(
-                    exists().where(
-                        func.not_(
-                            or_(
-                                ReservationOccurrence.start >= end,
-                                ReservationOccurrence.end <= start,
-                            )
-                        ),
-                        ReservationOccurrence.is_cancelled == False
-                    )
-                )
-                .scalar()
-        )
+        return self.reservations \
+                   .join(ReservationOccurrence) \
+                   .filter(
+                       exists().where(
+                           ~((ReservationOccurrence.start >= end) | (ReservationOccurrence.end <= start)),
+                           ReservationOccurrence.is_cancelled == False
+                       )
+                   ) \
+                   .scalar()
 
     def getCollisions(self, start, end):
-        return (
-            self.reservations
-                .join(ReservationOccurrence)
-                .filter(
-                    func.not_(
-                        or_(
-                            ReservationOccurrence.start >= end,
-                            ReservationOccurrence.end <= start,
-                        )
-                    ),
-                    ReservationOccurrence.is_cancelled == False
-                )
-                .all()
-        )
+        return self.reservations \
+                   .join(ReservationOccurrence) \
+                   .filter(
+                       ~((ReservationOccurrence.start >= end) | (ReservationOccurrence.end <= start)),
+                       ReservationOccurrence.is_cancelled == False
+                   ) \
+                   .all()
 
     def getOccurrences(self, start, end, is_cancelled=False):
-        return (
-            self.reservations
-                .join(ReservationOccurrence)
-                .filter(
-                    not_(
-                        or_(
-                            ReservationOccurrence.start >= end,
-                            ReservationOccurrence.end <= start,
-                        )
-                    ),
-                    ReservationOccurrence.is_cancelled == is_cancelled
-                )
-                .all()
-        )
+        return self.reservations \
+                   .join(ReservationOccurrence) \
+                   .filter(
+                       ~((ReservationOccurrence.start >= end) | (ReservationOccurrence.end <= start)),
+                       ReservationOccurrence.is_cancelled == is_cancelled
+                   ) \
+                   .all()

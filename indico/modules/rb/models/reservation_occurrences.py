@@ -72,10 +72,6 @@ class ReservationOccurrence(db.Model):
         )
 
     @hybrid_property
-    def is_same_day(self, d):
-        return self.start.date() == d
-
-    @hybrid_property
     def day(self):
         return self.start.date()
 

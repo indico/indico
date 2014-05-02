@@ -136,11 +136,8 @@ class Location(db.Model):
         )
 
     def __cmp__(self, other):
-        if not (self and other):
-            return cmp(
-                1 if self else None,
-                1 if other else None
-            )
+        if not self or not other:
+            return cmp(1 if self else None, 1 if other else None)
         if self.id == other.id:
             return 0
         return cmp(self.name, other.name)

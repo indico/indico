@@ -589,8 +589,7 @@ def toUTC(localNaiveDT):
     if localNaiveDT is None:
         return None
     if localNaiveDT.tzinfo is not None:
-        raise ValueError(
-            'This methods converts only _naive_ datetimes, assuming they are in local/DTS time. Naive datetimes does not contain information about timezone.')
+        raise ValueError('This methods converts only _naive_ datetimes, assuming they are in local/DTS time.')
     return localNaiveDT + timedelta(0, time.altzone)
 
 
@@ -599,8 +598,7 @@ def fromUTC(utcNaiveDT):
     #    return None
     try:
         if utcNaiveDT.tzinfo is not None:
-            raise ValueError(
-                'This methods converts only _naive_ datetimes, assuming they are in UTC time. Naive datetimes does not contain information about timezone.')
+            raise ValueError('This methods converts only _naive_ datetimes, assuming they are in UTC time.')
         return utcNaiveDT - timedelta(0, time.altzone)
     except AttributeError:
         return None

@@ -35,6 +35,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.utils import apply_filters
+from indico.util.date_time import now_utc
 from indico.util.i18n import _, N_
 from .reservation_edit_logs import ReservationEditLog
 from .reservation_occurrences import ReservationOccurrence
@@ -89,8 +90,7 @@ class Reservation(Serializer, db.Model):
     __tablename__ = 'reservations'
     __public__ = []
     __calendar_public__ = [
-        'id', ('booked_for_name', 'bookedForName'),
-        ('booking_reason', 'reason'), ('details_url', 'bookingUrl')
+        'id', ('booked_for_name', 'bookedForName'), ('booking_reason', 'reason'), ('details_url', 'bookingUrl')
     ]
 
     # columns
@@ -265,10 +265,10 @@ class Reservation(Serializer, db.Model):
 
     @hybrid_property
     def is_live(self):
-        return self.end_date >= datetime.utcnow()
+        return self.end_date >= now_utc()
 
     def is_archival(self):
-        return not self.is_live()
+        return not self.is_live
 
     @hybrid_property
     def is_repeating(self):
@@ -443,7 +443,7 @@ class Reservation(Serializer, db.Model):
             occurrence_text = ''
             try:
                 formatted_start_date = formatDateTime(self.start_date)
-            except:
+            except Exception:
                 formatted_start_date = ''
         return formatted_start_date, occurrence_text
 
@@ -612,7 +612,6 @@ class Reservation(Serializer, db.Model):
                 template_name='RoomBookingEmail_AssistanceAfterBookingCancellation'
             )
         ))
-
 
     def notifyAboutRejection(self, date=None, reason=None):
         """
@@ -853,9 +852,7 @@ class Reservation(Serializer, db.Model):
             periods.append(period)
 
     def is_valid(self):
-        return (self.is_confirmed and
-                not self.is_rejected and
-                not self.is_cancelled)
+        return self.is_confirmed and not self.is_rejected and not self.is_cancelled
 
     def is_heavy(self):
         """
@@ -867,9 +864,8 @@ class Reservation(Serializer, db.Model):
         3. Lasts longer than one month AND
         4. Takes more than x hours monthly
         """
-        if (not self.room.isReservable or self.room.hasBookingACL() or
-            not self.is_repeating() or
-            (self.end_date - self.start_date).days < 30):
+        if (not self.room.isReservable or self.room.hasBookingACL() or not self.is_repeating
+                or (self.end_date - self.start_date).days < 30):
             return False
 
         # TODO: put it into config
