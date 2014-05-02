@@ -17,8 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, time, timedelta
-
+from datetime import datetime, time
 from dateutil.relativedelta import relativedelta
 from flask import session
 
@@ -26,19 +25,15 @@ from MaKaC.roomMapping import RoomMapperHolder
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
-
-from ...models.locations import Location
-from ...models.reservations import RepeatMapping, RepeatUnit
-from ...models.rooms import Room
-from ...models.utils import next_work_day
-from ...views import WPRoomBookingBase
-from ...views.utils import makePercentageString
-
+from indico.modules.rb.models.reservations import RepeatMapping, RepeatUnit
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.utils import next_work_day
+from indico.modules.rb.views import WPRoomBookingBase
+from indico.modules.rb.views.utils import makePercentageString
 from indico.util.i18n import _
 
 
 class WPRoomBookingMapOfRooms(WPRoomBookingBase):
-
     def __init__(self, rh, **params):
         WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
@@ -55,7 +50,6 @@ class WPRoomBookingMapOfRooms(WPRoomBookingBase):
 
 
 class WRoomBookingMapOfRooms(WTemplated):
-
     def __init__(self, **params):
         WTemplated.__init__(self)
         self._params = params if params else {}
@@ -67,7 +61,6 @@ class WRoomBookingMapOfRooms(WTemplated):
 
 
 class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
-
     def __init__(self, rh, aspects, buildings, defaultLocation, forVideoConference, roomID):
         WPNotDecorated.__init__(self, rh)
         self._aspects = aspects
@@ -97,7 +90,6 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
 
 
 class WRoomBookingMapOfRoomsWidget(WTemplated):
-
     def __init__(self, aspects, buildings, defaultLocationName, forVideoConference, roomID):
         self._aspects = aspects
         self._buildings = buildings
@@ -127,7 +119,6 @@ class WRoomBookingMapOfRoomsWidget(WTemplated):
 
 
 class WPRoomBookingRoomList(WPRoomBookingBase):
-
     def __init__(self, rh):
         WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
@@ -144,13 +135,11 @@ class WPRoomBookingRoomList(WPRoomBookingBase):
         else:
             self._roomSearchOpt.setActive(True)
 
-
     def _getBody(self, params):
         return WRoomBookingRoomList(self._rh, standalone=True).getHTML(params)
 
 
 class WRoomBookingRoomList(WTemplated):
-
     def __init__(self, rh, standalone=False):
         self._rh = rh
         self._standalone = standalone
@@ -182,7 +171,6 @@ class WRoomBookingRoomList(WTemplated):
 
 
 class WPRoomBookingSearch4Rooms(WPRoomBookingBase):
-
     def __init__(self, rh, is_new_booking=False):
         WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
@@ -205,7 +193,6 @@ class WPRoomBookingSearch4Rooms(WPRoomBookingBase):
 
 
 class WRoomBookingSearch4Rooms(WTemplated):
-
     def __init__(self, rh, standalone=False):
         self._standalone = standalone
         self._rh = rh
@@ -243,7 +230,6 @@ class WRoomBookingSearch4Rooms(WTemplated):
 
 
 class WPRoomBookingRoomDetails(WPRoomBookingBase):
-
     def __init__(self, rh):
         self._rh = rh
         WPRoomBookingBase.__init__(self, self._rh)
@@ -262,7 +248,6 @@ class WPRoomBookingRoomDetails(WPRoomBookingBase):
 
 
 class WRoomBookingRoomDetails(WTemplated):
-
     DEFAULT_CALENDAR_RANGE = relativedelta(month=3)
 
     def __init__(self, rh, standalone=False):
@@ -372,7 +357,6 @@ class WRoomBookingRoomDetails(WTemplated):
 
 
 class WPRoomBookingRoomStats(WPRoomBookingBase):
-
     def __init__(self, rh):
         self._rh = rh
         super(WPRoomBookingRoomStats, self).__init__(rh)
@@ -385,7 +369,6 @@ class WPRoomBookingRoomStats(WPRoomBookingBase):
 
 
 class WRoomBookingRoomStats(WTemplated):
-
     def __init__(self, rh, standalone=False):
         self._rh = rh
         self._standalone = standalone

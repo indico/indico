@@ -20,12 +20,10 @@
 from operator import attrgetter
 
 from MaKaC.webinterface.wcomponents import WTemplated
-
 from indico.modules.rb.views import WPRoomBookingBase
 
 
 class WPRoomBookingBlockingDetails(WPRoomBookingBase):
-
     def __init__(self, rh, block):
         super(WPRoomBookingBlockingDetails, self).__init__(rh)
         self._block = block
@@ -35,7 +33,6 @@ class WPRoomBookingBlockingDetails(WPRoomBookingBase):
 
 
 class WRoomBookingBlockingDetails(WTemplated):
-
     def __init__(self, block):
         self._block = block
 
@@ -46,7 +43,6 @@ class WRoomBookingBlockingDetails(WTemplated):
 
 
 class WPRoomBookingBlockingForm(WPRoomBookingBase):
-
     def __init__(self, rh, block, errorMessage):
         super(WPRoomBookingBlockingDetails, self).__init__(rh)
         self._block = block
@@ -60,7 +56,6 @@ class WPRoomBookingBlockingForm(WPRoomBookingBase):
 
 
 class WRoomBookingBlockingForm(WTemplated):
-
     def __init__(self, block, errorMessage):
         self._block = block
         self._errorMessage = errorMessage
@@ -73,7 +68,6 @@ class WRoomBookingBlockingForm(WTemplated):
 
 
 class WPRoomBookingBlockingList(WPRoomBookingBase):
-
     def __init__(self, rh, blocks):
         super(WPRoomBookingBlockingList, self).__init__(rh)
         self._blocks = blocks
@@ -86,7 +80,6 @@ class WPRoomBookingBlockingList(WPRoomBookingBase):
 
 
 class WRoomBookingBlockingList(WTemplated):
-
     def __init__(self, blocks):
         self._blocks = blocks
 
@@ -99,7 +92,6 @@ class WRoomBookingBlockingList(WTemplated):
 
 
 class WPRoomBookingBlockingsForMyRooms(WPRoomBookingBase):
-
     def __init__(self, rh, roomBlocks):
         super(WPRoomBookingBlockingsForMyRooms, self).__init__(rh)
         self._roomBlocks = roomBlocks
@@ -112,7 +104,6 @@ class WPRoomBookingBlockingsForMyRooms(WPRoomBookingBase):
 
 
 class WRoomBookingBlockingsForMyRooms(WTemplated):
-
     def __init__(self, roomBlocks):
         self._roomBlocks = roomBlocks
 

@@ -27,7 +27,6 @@ from . import WPRoomBookingPluginAdminBase
 
 
 class WPRoomBookingPluginAdmin(WPRoomBookingPluginAdminBase):
-
     def __init__(self, rh, params):
         WPRoomBookingPluginAdminBase.__init__(self, rh)
         self._params = params
@@ -41,7 +40,6 @@ class WPRoomBookingPluginAdmin(WPRoomBookingPluginAdminBase):
 
 
 class WRoomBookingPluginAdmin(WTemplated):
-
     def __init__(self, rh):
         self._rh = rh
 

@@ -19,12 +19,10 @@
 
 from MaKaC.webinterface.wcomponents import WTemplated
 
-from ...models.rooms import Room
 from . import WPRoomBookingPluginAdminBase
 
 
 class WPRoomBookingRoomForm(WPRoomBookingPluginAdminBase):
-
     _userData = ['favorite-user-list']
 
     def __init__(self, rh):
@@ -40,7 +38,6 @@ class WPRoomBookingRoomForm(WPRoomBookingPluginAdminBase):
 
 
 class WRoomBookingRoomForm(WTemplated):
-
     def __init__(self, rh):
         self._rh = rh
 
@@ -55,7 +52,7 @@ class WRoomBookingRoomForm(WTemplated):
         wvars['largePhotoPath'] = room.large_photo_url
         wvars['smallPhotoPath'] = room.small_photo_url
         wvars['possibleEquipments'] = dict((eq.name, eq.id in self._rh._equipments)
-                                            for eq in location.getEquipments())
+                                           for eq in location.getEquipments())
 
         wvars['errors'] = self._rh._errors
 

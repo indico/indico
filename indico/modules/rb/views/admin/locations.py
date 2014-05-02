@@ -20,13 +20,12 @@
 from MaKaC.webinterface.wcomponents import WTemplated
 
 from . import WPRoomBookingPluginAdminBase
-from ..utils import makePercentageString
-from ...models.room_attributes import RoomAttribute
-from ...models.locations import Location
+from indico.modules.rb.views.utils import makePercentageString
+from indico.modules.rb.models.room_attributes import RoomAttribute
+from indico.modules.rb.models.locations import Location
 
 
 class WPRoomBookingAdmin(WPRoomBookingPluginAdminBase):
-
     def __init__(self, rh):
         self._rh = rh
         WPRoomBookingPluginAdminBase.__init__(self, rh)
@@ -39,7 +38,6 @@ class WPRoomBookingAdmin(WPRoomBookingPluginAdminBase):
 
 
 class WRoomBookingAdmin(WTemplated):
-
     def __init__(self, rh):
         self._rh = rh
 
@@ -52,7 +50,6 @@ class WRoomBookingAdmin(WTemplated):
 
 
 class WPRoomBookingAdminLocation(WPRoomBookingPluginAdminBase):
-
     def __init__(self, rh, location, actionSucceeded=False):
         self._rh = rh
         self._location = location
@@ -69,7 +66,6 @@ class WPRoomBookingAdminLocation(WPRoomBookingPluginAdminBase):
 
 
 class WRoomBookingAdminLocation(WTemplated):
-
     def __init__(self, rh, location):
         self._rh = rh
         self._location = location

@@ -17,36 +17,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request
-
-from copy import copy
-from collections import OrderedDict
 from datetime import datetime, timedelta
 from itertools import izip
 
 from MaKaC.common import Config
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.wcomponents import WTemplated
-
 from indico.util.i18n import _
-
-from .. import WPRoomBookingBase
-from ...models.locations import Location
-from ...models.rooms import Room
-from ...models.reservations import RepeatMapping
-from ...models.utils import get_overlap
-from ..utils import (
-    Bar,
-    BlockingDetailsForBars,
-    DayBar,
-    RoomDetailsForBars,
-    getNewDictOnlyWith,
-    updateOldDateStyle
-)
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.reservations import RepeatMapping
+from indico.modules.rb.models.utils import get_overlap
+from indico.modules.rb.views import WPRoomBookingBase
+from indico.modules.rb.views.utils import Bar, BlockingDetailsForBars, DayBar, RoomDetailsForBars, getNewDictOnlyWith
 
 
 class WPRoomBookingBookRoom(WPRoomBookingBase):
-
     def __init__(self, rh):
         WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
@@ -65,7 +51,6 @@ class WPRoomBookingBookRoom(WPRoomBookingBase):
 
 
 class WRoomBookingBookRoom(WTemplated):
-
     def __init__(self, rh):
         self._rh = rh
 
@@ -80,7 +65,6 @@ class WRoomBookingBookRoom(WTemplated):
 
 
 class WPRoomBookingBookingDetails(WPRoomBookingBase):
-
     def __init__(self, rh):
         WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
@@ -93,7 +77,6 @@ class WPRoomBookingBookingDetails(WPRoomBookingBase):
 
 
 class WRoomBookingDetails(WTemplated):
-
     def __init__(self, rh, conference=None):
         self._rh = rh
         self._resv = rh._resv
@@ -130,7 +113,6 @@ class WRoomBookingDetails(WTemplated):
 
 
 class WPRoomBookingBookingList(WPRoomBookingBase):
-
     def __init__(self, rh):
         WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
@@ -173,7 +155,6 @@ class WPRoomBookingBookingList(WPRoomBookingBase):
 
 
 class WRoomBookingBookingList(WTemplated):
-
     def __init__(self, rh):
         self._rh = rh
 
@@ -206,21 +187,21 @@ class WRoomBookingBookingList(WTemplated):
             **getNewDictOnlyWith(
                 f.data,
                 keys=['room_id_list', 'repeat_unit', 'repeat_step', 'is_search'],
-                start_date=f.start_date.data-timediff-timedelta(1),
-                end_date=f.end_date.data-timediff-timedelta(1)
+                start_date=f.start_date.data - timediff - timedelta(1),
+                end_date=f.end_date.data - timediff - timedelta(1)
             )
         )
         wvars['nextURL'] = UH.UHRoomBookingBookingList.getURL(
             **getNewDictOnlyWith(
                 f.data,
                 keys=['room_id_list', 'repeat_unit', 'repeat_step', 'is_search'],
-                start_date=f.start_date.data+timediff+timedelta(1),
-                end_date=f.end_date.data+timediff+timedelta(1)
+                start_date=f.start_date.data + timediff + timedelta(1),
+                end_date=f.end_date.data + timediff + timedelta(1)
             )
         )
 
         wvars['overload'] = True  # f._overload
-        wvars['dayLimit'] = 500   # self._rh._dayLimit
+        wvars['dayLimit'] = 500  # self._rh._dayLimit
         wvars['newBooking'] = f.is_new_booking.data
 
         # Bars
@@ -247,13 +228,9 @@ class WRoomBookingBookingList(WTemplated):
                     blocking_details
                 ))
 
-            occurrences = [
-                (None, None, None, False,
-                 f.start_date.data.time(), f.end_date.data.time())
-            ] + filter(lambda e: e[0] != None, izip(
-                rids, reasons, booked_for_names,
-                is_confirmed_statuses, start_times, end_times
-            ))
+            occurrences = [(None, None, None, False, f.start_date.data.time(), f.end_date.data.time())] + \
+                          filter(lambda e: e[0] is not None,
+                                 izip(rids, reasons, booked_for_names, is_confirmed_statuses, start_times, end_times))
 
             for occ1 in occurrences:
                 occ1_id, occ1_reason, occ1_name, occ1_is_confirmed, occ1_st, occ1_et = occ1
@@ -304,7 +281,6 @@ class WRoomBookingBookingList(WTemplated):
 
 
 class WPRoomBookingSearch4Bookings(WPRoomBookingBase):
-
     def __init__(self, rh):
         WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
@@ -324,7 +300,6 @@ class WPRoomBookingSearch4Bookings(WPRoomBookingBase):
 
 
 class WRoomBookingSearch4Bookings(WTemplated):
-
     def __init__(self, rh):
         self._rh = rh
 
@@ -343,7 +318,6 @@ class WRoomBookingSearch4Bookings(WTemplated):
 
 
 class WPRoomBookingBookingForm(WPRoomBookingBase):
-
     def getJSFiles(self):
         return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
@@ -359,7 +333,6 @@ class WPRoomBookingBookingForm(WPRoomBookingBase):
 
 
 class WRoomBookingBookingForm(WTemplated):
-
     def __init__(self, rh, standalone=False):
         self._rh = rh
         self._candResv = rh._candResv
@@ -420,7 +393,8 @@ class WRoomBookingBookingForm(WTemplated):
         else:
             bText = "Save"
 
-        wvars["roomBookingRoomCalendar"] = WRoomBookingRoomCalendar(self._rh, self._standalone, buttonText=bText).getHTML({})
+        wvars["roomBookingRoomCalendar"] = WRoomBookingRoomCalendar(self._rh, self._standalone,
+                                                                    buttonText=bText).getHTML({})
         wvars["rooms"] = self._rh._rooms
         wvars["infoBookingMode"] = self._rh._infoBookingMode
 
@@ -428,8 +402,7 @@ class WRoomBookingBookingForm(WTemplated):
 
 
 class WRoomBookingRoomCalendar(WTemplated):
-
-    def __init__(self, rh, standalone=False, buttonText =''):
+    def __init__(self, rh, standalone=False, buttonText=''):
         self._rh = rh
         self._candResv = rh._candResv
         self._standalone = standalone
@@ -448,14 +421,14 @@ class WRoomBookingRoomCalendar(WTemplated):
 
         # Calendar range
         now = datetime.now()
-        if candResv != None: #.startDT != None and candResv.endDT != None:
+        if candResv is not None:  # .startDT != None and candResv.endDT != None:
             calendarStartDT = datetime(
                 candResv.startDT.year,
                 candResv.startDT.month,
                 candResv.startDT.day,
                 0, 0, 1
             )  # Potential performance problem
-            calendarEndDT =  datetime(
+            calendarEndDT = datetime(
                 candResv.endDT.year,
                 candResv.endDT.month,
                 candResv.endDT.day,
@@ -466,12 +439,12 @@ class WRoomBookingRoomCalendar(WTemplated):
             calendarEndDT = calendarStartDT + timedelta(3 * 31, 50, 0, 0, 59, 23)
 
         # example resv. to ask for other reservations
-        resvEx = CrossLocationFactory.newReservation(location =room.locationName)
+        resvEx = CrossLocationFactory.newReservation(location=room.locationName)
         resvEx.startDT = calendarStartDT
         resvEx.endDT = calendarEndDT
         resvEx.repeatability = RepeatabilityEnum.daily
         resvEx.room = room
-        resvEx.isConfirmed = None # To include both confirmed and not confirmed
+        resvEx.isConfirmed = None  # To include both confirmed and not confirmed
 
         # Bars: Existing reservations
         collisionsOfResvs = resvEx.getCollisions()
@@ -488,7 +461,7 @@ class WRoomBookingRoomCalendar(WTemplated):
             bars.append(Bar(Collision((p.startDT, p.endDT), candResv), Bar.CANDIDATE))
 
         # Bars: Conflicts all vs candidate
-        candResvIsConfirmed = candResv.isConfirmed;
+        candResvIsConfirmed = candResv.isConfirmed
         candResv.isConfirmed = None
         allCollisions = candResv.getCollisions()
         candResv.isConfirmed = candResvIsConfirmed
@@ -496,7 +469,7 @@ class WRoomBookingRoomCalendar(WTemplated):
             # Exclude candidate vs self pseudo-conflicts (Booking modification)
             allCollisions = filter(lambda c: c.withReservation.id != candResv.id, allCollisions)
 
-        collisions = [] # only with confirmed resvs
+        collisions = []  # only with confirmed resvs
         for c in allCollisions:
             if c.withReservation.isConfirmed:
                 bars.append(Bar(c, Bar.CONFLICT))
@@ -542,7 +515,6 @@ class WRoomBookingRoomCalendar(WTemplated):
 
 
 class WPRoomBookingConfirmBooking(WPRoomBookingBase):
-
     def __init__(self, rh):
         self._rh = rh
         super(WPRoomBookingConfirmBooking, self).__init__(rh)
@@ -552,7 +524,6 @@ class WPRoomBookingConfirmBooking(WPRoomBookingBase):
 
 
 class WRoomBookingConfirmBooking(WRoomBookingBookingForm):
-
     def getVars(self):
         wvars = super(WRoomBookingConfirmBooking, self).getVars()
 
@@ -589,7 +560,6 @@ class WRoomBookingConfirmBooking(WRoomBookingBookingForm):
 
 
 class WPRoomBookingStatement(WPRoomBookingBase):
-
     def __init__(self, rh):
         self._rh = rh
         super(WPRoomBookingStatement, self).__init__(rh)
@@ -599,7 +569,6 @@ class WPRoomBookingStatement(WPRoomBookingBase):
 
 
 class WRoomBookingStatement(WTemplated):
-
     def __init__(self, rh):
         self._rh = rh
 
@@ -611,7 +580,6 @@ class WRoomBookingStatement(WTemplated):
 
 
 class WRoomBookingList(WTemplated):
-
     def __init__(self, rh, standalone=False):
         self._standalone = standalone
         self._rh = rh

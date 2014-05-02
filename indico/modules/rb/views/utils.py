@@ -17,12 +17,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from calendar import day_name
 from datetime import time
 
 from MaKaC.webinterface import urlHandlers as UH
-
-from ..models.utils import Serializer
+from indico.modules.rb.models.utils import Serializer
 
 
 class Bar(Serializer):
@@ -169,7 +167,7 @@ def barsList2Dictionary(bars):
     h = {}
     for bar in bars:
         d = bar.start_date.date()
-        if h.has_key(d):
+        if d in h:
             h[d].append(bar)
         else:
             h[d] = [bar]
@@ -192,18 +190,18 @@ def addOverlappingPrebookings(bars):
             if bar.type == Bar.PREBOOKED:
 
                 # For each (prebooked) bar j
-                for j in xrange(i+1, len(dayBars)):
+                for j in xrange(i + 1, len(dayBars)):
                     collCand = dayBars[j]
                     if collCand.type == Bar.PREBOOKED:
 
                         # If there is an overlap, add PRECONCURRENT bar
                         over = overlap(bar.startDT, bar.endDT, collCand.startDT, collCand.endDT)
-                        if (over and bar.forReservation.room == collCand.forReservation.room and
-                            collCand.forReservation != bar.forReservation):
+                        if (over and bar.forReservation.room == collCand.forReservation.room
+                                and collCand.forReservation != bar.forReservation):
                             collision = Collision(over, collCand.forReservation)
                             dayBars.append(Bar(collision, Bar.PRECONCURRENT))
 
-        bars[dt] = dayBars # With added concurrent prebooking bars
+        bars[dt] = dayBars  # With added concurrent prebooking bars
 
     return bars
 
@@ -221,8 +219,7 @@ def sortBarsByImportance(bars, calendarStartDT, calendarEndDT):
         bars[dt] = dayBars
 
     for day in iterdays(calendarStartDT, calendarEndDT):
-        if not bars.has_key(day.date()):
-           bars[day.date()] = []
+        bars.setdefault(day.date(), [])
 
     return bars
 
@@ -248,20 +245,20 @@ def introduceRooms(rooms, dayBarsDic, calendarStartDT, calendarEndDT,
     #import copy
     #cleanRoomBarsList = getRoomBarsList(rooms)
     newDayBarsDic = {}
-    from MaKaC.common.utils import formatDate
+
     for day in iterdays(calendarStartDT, calendarEndDT):
         dayBars = dayBarsDic[day.date()]
         roomBarsDic = {}
         for bar in dayBars:
-           # bar.canReject = False
-           # bar.canReject = bar.forReservation.id is not None and bar.forReservation.canReject(user)
-           # if bar.forReservation.repeatability != None:
-           #     bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBookingOccurrence
-           #                                    .getURL(bar.forReservation, formatDate(bar.startDT.date())))
-           # else:
-           #     bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBooking.getURL(bar.forReservation))
+            # bar.canReject = False
+            # bar.canReject = bar.forReservation.id is not None and bar.forReservation.canReject(user)
+            # if bar.forReservation.repeatability != None:
+            #     bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBookingOccurrence
+            #                                    .getURL(bar.forReservation, formatDate(bar.startDT.date())))
+            # else:
+            #     bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBooking.getURL(bar.forReservation))
             room = bar.forReservation.room
-            if not roomBarsDic.has_key(room):
+            if not room in roomBarsDic:
                 roomBarsDic[room] = []
             # Bars order should be preserved
             roomBarsDic[room].append(bar)
@@ -274,7 +271,7 @@ def introduceRooms(rooms, dayBarsDic, calendarStartDT, calendarEndDT,
         else:
             dayRoomBarsList = []
             for room in roomBarsDic.keys():
-                dayRoomBarsList.append(RoomBars(room,roomBarsDic[room]))
+                dayRoomBarsList.append(RoomBars(room, roomBarsDic[room]))
 
         if showEmptyDays or len(dayBars) > 0:
             newDayBarsDic[day.date()] = dayRoomBarsList
@@ -304,7 +301,7 @@ def getDayAttrsForRoom(dayDT, room):
         attrs['className'] = "preblocked"
         attrs['tooltip'] = _('Blocking requested by %s:\n%s\n\n'
                              '<b>If this blocking is approved, any colliding bookings will be rejected!</b>'
-                             ) % (block.createdByUser.getFullName(), block.message)
+        ) % (block.createdByUser.getFullName(), block.message)
     return attrs
 
 

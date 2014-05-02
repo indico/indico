@@ -19,17 +19,12 @@
 
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.admins import WPAdminsBase
-from MaKaC.webinterface.wcomponents import (
-    TabControl,
-    WSimpleNavigationDrawer,
-    WTabControl
-)
+from MaKaC.webinterface.wcomponents import TabControl, WSimpleNavigationDrawer, WTabControl
 
 from indico.util.i18n import _
 
 
 class WPRoomsBase(WPAdminsBase):
-
     def _setActiveSideMenuItem(self):
         self._roomsMenuItem.setActive()
 
@@ -83,7 +78,6 @@ class WPRoomsBase(WPAdminsBase):
 
 
 class WPRoomBookingPluginAdminBase(WPRoomsBase):
-
     def getJSFiles(self):
         return WPRoomsBase.getJSFiles(self) + self._includeJSPackage('Management')
 

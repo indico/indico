@@ -24,19 +24,16 @@ from indico.modules.rb.views import WPRoomBookingBase
 
 
 class WPRoomBookingWelcome(WPRoomBookingBase):
-
     def _getBody(self, params):
         return WRoomBookingWelcome().getHTML(params)
 
 
 class WRoomBookingWelcome(WTemplated):
-
     def __init__(self):
         self.__adminList = AdminList.getInstance()
 
 
 class WRoomBookingChooseEvent(WTemplated):
-
     def __init__(self, rh):
         self._rh = rh
 

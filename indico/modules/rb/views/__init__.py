@@ -22,20 +22,13 @@ import os
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.webinterface.wcomponents import (
-    BasicSideMenu,
-    SideMenuItem,
-    SideMenuSection
-)
-
+from MaKaC.webinterface.wcomponents import BasicSideMenu, SideMenuItem, SideMenuSection
 from indico.util.i18n import _
-
-from ..models.rooms import Room
-from ..models.locations import Location
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.locations import Location
 
 
 class WPRoomBookingBase(WPMainBase):
-
     def _getTitle(self):
         return '{} - {}'.format(WPMainBase._getTitle(self), _('Room Booking'))
 
@@ -68,16 +61,15 @@ class WPRoomBookingBase(WPMainBase):
     def _getSideMenu(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
 
-        self._leftMenu = BasicSideMenu(self._getAW().getUser() != None)
+        self._leftMenu = BasicSideMenu(self._getAW().getUser() is not None)
 
         self._showResponsible = False
 
-
         if minfo.getRoomBookingModuleActive():
-            self._showResponsible = ((self._getAW().getUser() != None)
+            self._showResponsible = ((self._getAW().getUser() is not None)
                                      and (Room.isAvatarResponsibleForRooms(self._getAW().getUser())
-                                     or self._getAW().getUser().isAdmin()
-                                     or self._getAW().getUser().isRBAdmin()))
+                                          or self._getAW().getUser().isAdmin()
+                                          or self._getAW().getUser().isRBAdmin()))
 
         self._roomsBookingOpt = SideMenuSection(currentPage=urlHandlers.UHRoomBookingBookRoom.getURL())
 
@@ -184,7 +176,6 @@ class WPRoomBookingBase(WPMainBase):
             urlHandlers.UHRoomBookingBlockingForm.getURL(),
             enabled=self._showResponsible
         )
-
 
         if self._rh._getUser().isRBAdmin():
             self._adminSect = SideMenuSection(

@@ -26,13 +26,11 @@ from . import WPRoomsBase
 
 
 class WPRoomMapperBase(WPRoomsBase):
-
     def _setActiveTab(self):
         self._subTabRoomMappers.setActive()
 
 
 class WPRoomMapperList(WPRoomMapperBase):
-
     def __init__(self, rh, params):
         WPRoomMapperBase.__init__(self, rh)
         self._params = params
@@ -47,7 +45,6 @@ class WPRoomMapperList(WPRoomMapperBase):
 
 
 class WRoomMapperList(WTemplated):
-
     def __init__(self, criteria):
         self._criteria = criteria
 
@@ -63,7 +60,6 @@ class WRoomMapperList(WTemplated):
 
 
 class WPRoomMapperDetails(WPRoomMapperBase):
-
     def __init__(self, rh, roomMapper):
         WPRoomMapperBase.__init__(self, rh)
         self._roomMapper = roomMapper
@@ -75,7 +71,6 @@ class WPRoomMapperDetails(WPRoomMapperBase):
 
 
 class WRoomMapperDetails(WTemplated):
-
     def __init__(self, rm):
         WTemplated.__init__(self)
         self._roomMapper = rm
@@ -91,7 +86,6 @@ class WRoomMapperDetails(WTemplated):
 
 
 class WPRoomMapperCreation(WPRoomMapperBase):
-
     def _getTabContent(self, params):
         return WRoomMapperEdit().getHTML({
             'postURL': urlHandlers.UHRoomMapperPerformCreation.getURL()
@@ -99,7 +93,6 @@ class WPRoomMapperCreation(WPRoomMapperBase):
 
 
 class WPRoomMapperModification(WPRoomMapperBase):
-
     def __init__(self, rh, domain):
         WPRoomMapperBase.__init__(self, rh)
         self._domain = domain
@@ -111,14 +104,13 @@ class WPRoomMapperModification(WPRoomMapperBase):
 
 
 class WRoomMapperEdit(WTemplated):
-
     def __init__(self, rm=None):
         self._roomMapper = rm
 
     def getVars(self):
         wvars = WTemplated.getVars(self)
         wvars['name'] = wvars['description'] = wvars['url'] = \
-        wvars['placeName'] = wvars['regexps'] = wvars['locator'] = ''
+            wvars['placeName'] = wvars['regexps'] = wvars['locator'] = ''
         wvars['is_rb_active'] = HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
         if self._roomMapper:
             wvars['name'] = self._roomMapper.getName()
