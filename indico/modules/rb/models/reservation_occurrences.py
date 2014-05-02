@@ -21,10 +21,18 @@
 Sent notifications of a reservation
 """
 
+from datetime import datetime
+
+from dateutil import rrule
 from sqlalchemy.ext.hybrid import hybrid_property
 
+<<<<<<< HEAD
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
+=======
+from indico.core.db import db, UTCDateTime
+from indico.core.errors import IndicoError
+>>>>>>> ReservationOccurrence bulk creation and cleanup
 
 
 class ReservationOccurrence(db.Model):
@@ -68,10 +76,50 @@ class ReservationOccurrence(db.Model):
             self.is_sent
         )
 
-    @hybrid_property
-    def day(self):
+    @property
+    def date(self):
         return self.start.date()
 
-    @hybrid_property
-    def length(self):
-        return (self.end - self.start).total_seconds()
+    @classmethod
+    def create_series_for_reservation(cls, reservation):
+        for o in cls.iter_create_occurrences(reservation.start, reservation.end, reservation.repetition):
+            o.reservation = reservation
+
+    @classmethod
+    def create_series(cls, start, end, repetition):
+        return list(cls.iter_create_occurrences(start, end, repetition))
+
+    @classmethod
+    def iter_create_occurrences(cls, start, end, repetition):
+        for start in cls.iter_start_time(start, end, repetition):
+            end = datetime.combine(start.date(), end.time())
+            yield ReservationOccurrence(start=start, end=end)
+
+    @staticmethod
+    def iter_start_time(start, end, repetition):
+        from .reservations import RepeatUnit
+        repeat_unit, repeat_step = repetition
+
+        if repeat_unit == RepeatUnit.NEVER:
+            return [start]
+
+        if repeat_unit == RepeatUnit.DAY:
+            return rrule.rrule(rrule.DAILY, dtstart=start, until=end)
+
+        elif repeat_unit == RepeatUnit.WEEK:
+            if 0 < repeat_step < 4:
+                return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end, interval=repeat_step)
+            else:
+                raise IndicoError('Unsupported interval')
+
+        elif repeat_unit == RepeatUnit.MONTH:
+            if repeat_step == 1:
+                position = start.day // 7
+                return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=start.weekday(), bysetpos=position)
+            else:
+                raise IndicoError('Unsupported interval')
+
+        elif repeat_unit == RepeatUnit.YEAR:
+            raise IndicoError('Unsupported frequency')
+
+        raise IndicoError('Unexpected frequency')

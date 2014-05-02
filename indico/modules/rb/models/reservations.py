@@ -326,46 +326,8 @@ class Reservation(Serializer, db.Model):
             .filter(func.DATE(ReservationOccurrence.start) == d) \
             .update({'is_cancelled': True}, synchronize_session='fetch')
 
-    def createOccurrences(self, fromGiven=None, excluded=None):
-        for start, end in fromGiven or self.iterOccurrences():
-            self.occurrences.append(
-                ReservationOccurrence(
-                    start=start,
-                    end=end,
-                    is_sent=False,
-                    is_cancelled=(start.date() in excluded if excluded else False)
-                )
-            )
-
-    def iterOccurrences(self):
-        start_time, end_time = self.start_date.time(), self.end_date.time()
-        start, end = self.start_date.date(), self.end_date.date()
-        while start <= end:
-            yield datetime.combine(start, start_time), datetime.combine(start, end_time)
-            start = self.getNextOccurrenceDate(start)
-
-    def getNextOccurrenceDate(self, start):
-        if self.repeat_unit == RepeatUnit.NEVER:
-            return date.max
-        elif self.repeat_unit == RepeatUnit.DAY:
-            return start + timedelta(days=self.repeat_step)
-        elif self.repeat_unit == RepeatUnit.WEEK:
-            if 0 < self.repeat_step < 4:
-                return start + timedelta(weeks=self.repeat_step)
-            return MaKaCError(_('Unsupported now'))
-        elif self.repeat_unit == RepeatUnit.MONTH:
-            if self.repeat_step == 1:
-                cand = start + timedelta(1)
-                weekDayDiff = (start.weekday() - cand.weekday()) % 7
-                cand += timedelta(weekDayDiff)
-                startWeekNumber = utils.getWeekNumber(start)
-                while utils.getWeekNumber(cand) != startWeekNumber:
-                    cand += timedelta(7)
-                return cand
-            return MaKaCError(_('Unsupported now'))
-        elif self.repeat_unit == RepeatUnit.YEAR:
-            raise MaKaCError(_('Unsupported now'))
-        raise MaKaCError(_('Unexpected repeatability'))
+    def create_occurrences(self, excluded=None):
+        ReservationOccurrence.create_series_for_reservation(self, excluded)
 
     def getSoonestOccurrence(self, d):
         return self.occurrences.filter(ReservationOccurrence.start >= d).first()
