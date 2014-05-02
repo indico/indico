@@ -223,37 +223,6 @@ class Reservation(Serializer, db.Model):
 
     # core
 
-    # TODO
-    def __str__(self):
-        s = """
-               id: {id}
-
-             room: {room_name}
-       start_date: {start_date}
-         end_date: {end_date}
-        createdDT: {created_at}
-
-      repeat_unit: {repeat_unit}
-    repeatability: {repeat_step}
-          weekDay: {week_day}
-       weekNumber: {week_number}
-
-    bookedForName: {booked_for_name}
-     contactEmail: {contact_email}
-     contactPhone: {contact_phone}
-        createdBy: {created_by}
-           reason: {reason}
-
-       isRejected: {is_rejected}
-      isCancelled: {is_cancelled}
-
-      isConfirmed: {is_confirmed}
-          isValid: {is_valid}
-       isArchival: {is_archival}
-          isHeavy: {is_heavy}
-"""
-        return utils.formatString(s, self)
-
     def __repr__(self):
         return '<Reservation({0}, {1}, {2}, {3}, {4})>'.format(
             self.id,

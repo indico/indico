@@ -58,12 +58,6 @@ class BlockedRoom(db.Model):
         nullable=False
     )
 
-    def __str__(self):
-        return 'Blocking is{0} active on {1}'.format(
-            '' if self.is_active else ' not',
-            self.room
-        )
-
     def __repr__(self):
         return '<BlockedRoom({0}, {1}, {2})>'.format(
             self.blocking_id,

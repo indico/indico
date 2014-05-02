@@ -52,13 +52,6 @@ class ReservationEditLog(db.Model):
         nullable=False
     )
 
-    def __str__(self):
-        return '{0} by {1} at {2}'.format(
-            self.info,
-            self.avatar_id,
-            self.timestamp
-        )
-
     def __repr__(self):
         return '<Edit({0}, {1}, {2}, {3})>'.format(
             self.avatar_id,

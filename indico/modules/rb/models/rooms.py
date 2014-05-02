@@ -250,36 +250,6 @@ class Room(db.Model, Serializer):
 
     # core
 
-    def __str__(self):
-        s = """
-               id: {id}
-         isActive: {is_active}
-
-             room: {name}
-
-         building: {building}
-            floor: {floor}
-           roomNr: {number}
-     isReservable: {is_reservable}
-rNeedConfirmation: {reservations_need_confirmation}
-startNotification: {notification_for_start}
-  endNotification: {notification_for_end}
-notificationToResponsible: {notification_for_responsible}
-notificationAssistance: {notification_for_assistance}
-
-             site: {site}
-         capacity: {capacity}
-      surfaceArea: {surface_area}
-         division: {division}
-
-        telephone: {telephone}
-       whereIsKey: {key_location}
-         comments: {comments}
-    responsibleId: {owner_id}
-        equipment: """
-        return "{}{}\n".format(utils.formatString(s, self),
-                               self.getVerboseEquipment())
-
     def __cmp__(self, other):
         if not self or not other:
             return cmp(1 if self else None, 1 if other else None)

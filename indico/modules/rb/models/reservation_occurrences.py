@@ -59,9 +59,6 @@ class ReservationOccurrence(db.Model):
         db.String,
     )
 
-    def __str__(self):
-        return '{} -- {}'.format(self.start, self.end)
-
     def __repr__(self):
         return '<ReservationOccurrence({0}, {1}, {2}, {3}, {4})>'.format(
             self.reservation_id,

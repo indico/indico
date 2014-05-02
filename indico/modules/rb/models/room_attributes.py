@@ -98,9 +98,6 @@ class RoomAttribute(JSONStringBridgeMixin, db.Model):
     def supportsAttributeManagement():
         return True
 
-    def __str__(self):
-        return self.name
-
     def __repr__(self):
         return u'<AttributeKey({0}, {1}, {2}, {3})>'.format(
             self.id,

@@ -94,9 +94,6 @@ class Period(object):
     def __repr__(self):
         return 'Period(%r, %r)' % (self.startDT, self.endDT)
 
-    def __str__(self):
-        return str(self.startDT) + " -- " + str(self.endDT)
-
 
 def qbeMatch(example, candidate, special, **kwargs):
     """
