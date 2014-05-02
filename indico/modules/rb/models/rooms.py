@@ -506,7 +506,7 @@ notificationAssistance: {notification_for_assistance}
         for r in query:
             res = {'room': r[0]}
             for i, arg in enumerate(args):
-                res[arg] = r[i+1]
+                res[arg] = r[i + 1]
             yield res
 
     @staticmethod

@@ -312,7 +312,7 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
         return candResv
 
     def _loadResvBookingCandidateFromSession(self, params, room):
-        if not params.has_key('roomGUID'):
+        if 'roomGUID' not in params:
             raise MaKaCError(_("""The parameter roomGUID is missing."""))
         roomID = int(room.id)
         roomLocation = room.getLocationName()
@@ -329,9 +329,9 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
 
     def _loadResvCandidateFromDefaults(self, params):
         # After room details
-        if not params.has_key('roomID'):
+        if 'roomID' not in params:
             raise MaKaCError(_("""The parameter roomID is missing."""))
-        if not params.has_key('roomLocation'):
+        if 'roomLocation' not in params:
             raise MaKaCError(_("""The parameter roomLocation is missing"""))
         roomID = int(params['roomID'])
         roomLocation = params['roomLocation']

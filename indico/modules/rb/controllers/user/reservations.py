@@ -257,7 +257,7 @@ class RHRoomBookingSaveBooking(RHRoomBookingBase):
 
         candResv = self._candResv
         emailsToBeSent = []
-        self._confirmAdditionFirst = False;
+        self._confirmAdditionFirst = False
 
         # Set confirmation status
         candResv.isConfirmed = True

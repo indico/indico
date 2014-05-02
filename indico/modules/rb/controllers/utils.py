@@ -146,19 +146,19 @@ def qbeMatch(example, candidate, special, **kwargs):
 
         # Generic comparison
         if areEqual is None:
-            if attrType in ('int', 'float', 'bool', 'datetime' ):
+            if attrType in ('int', 'float', 'bool', 'datetime'):
                 # Exact match
-                areEqual = ( candAttrVal == exAttrVal )
+                areEqual = candAttrVal == exAttrVal
             elif attrType == 'str':
                 areEqual = candAttrVal.lower() == exAttrVal.lower()
             else:
                 raise attrType + ": " + str(candAttrVal) + " - can not compare"
 
         if not areEqual:
-            #print "Does not match: %s (%s : %s)" % (attrName, str( exAttrVal ), str( attrVal ) )
+            #print "Does not match: %s (%s : %s)" % (attrName, str(exAttrVal), str(attrVal))
             return False
-        # if 'Room' not in example.__class__.__name__ and attrName == 'repeatability' and example.repeatability == 1 and candidate.reason == "TDAQ Meeting" and candidate.startDT == datetime( 2007, 05, 21, 9 ):
-        #     raise str( areEqual ) + '--' + str( example )
+        # if 'Room' not in example.__class__.__name__ and attrName == 'repeatability' and example.repeatability == 1 and candidate.reason == "TDAQ Meeting" and candidate.startDT == datetime(2007, 05, 21, 9):
+        #     raise str(areEqual) + '--' + str(example)
 
     # All attributes match
     return True
@@ -185,13 +185,13 @@ def containsExactly_OR_containsAny(attrValExample, attrValCandidate):
 def doesPeriodOverlap(*args, **kwargs):
     """
     Returns true if periods do overlap. This requires both dates and times to overlap.
-    Pass it either (period, period) or ( start1, end1, start2, end2 ).
+    Pass it either (period, period) or (start1, end1, start2, end2).
     """
     if len(args) == 4:
         return __doesPeriodOverlap(args[0], args[1], args[2], args[3])
     if len(args) == 2:
         return __doesPeriodOverlap(args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT)
-    raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
+    raise ValueError('2 or 4 arguments required: (period, period) or (start1, end1, start2, end2)')
 
 
 def __doesPeriodOverlap(startDT1, endDT1, startDT2, endDT2):
@@ -213,7 +213,7 @@ def overlap(*args, **kwargs):
         return __overlap(args[0], args[1], args[2], args[3])
     if len(args) == 2:
         return __overlap(args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT)
-    raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
+    raise ValueError('2 or 4 arguments required: (period, period) or (start1, end1, start2, end2)')
 
 
 def __overlap(startDT1, endDT1, startDT2, endDT2):
@@ -227,19 +227,19 @@ def __overlap(startDT1, endDT1, startDT2, endDT2):
     fromOverlap = datetime(dates[0].year, dates[0].month, dates[0].day, times[0].hour, times[0].minute, times[0].second)
     toOverlap = datetime(dates[1].year, dates[1].month, dates[1].day, times[1].hour, times[1].minute, times[1].second)
 
-    return ( fromOverlap, toOverlap )
+    return fromOverlap, toOverlap
 
 
 def __overlapDates(startD1, endD1, startD2, endD2):
     if endD1 >= startD2 and endD1 <= endD2 and startD1 <= startD2:
         # [-----]       (1)
         #     [------]  (2)
-        return ( startD2, endD1 )
+        return startD2, endD1
 
     if startD1 >= startD2 and endD1 <= endD2:
         #    [---]      (1)
         # [----------]  (2)
-        return ( startD1, endD1 )
+        return startD1, endD1
 
     return __overlapDates(startD2, endD2, startD1, endD1)
 
@@ -248,12 +248,12 @@ def __overlapTimes(startT1, endT1, startT2, endT2):
     if endT1 >= startT2 and endT1 <= endT2 and startT1 <= startT2:
         # [-----]       (1)
         #     [------]  (2)
-        return ( startT2, endT1 )
+        return startT2, endT1
 
     if startT1 >= startT2 and endT1 <= endT2:
         #    [---]      (1)
         # [----------]  (2)
-        return ( startT1, endT1 )
+        return startT1, endT1
 
     return __overlapTimes(startT2, endT2, startT1, endT1)
 
@@ -262,7 +262,7 @@ def iterdays(first, last):
     """
     Iterate days between two dates:
     Example:
-    for day in iterdays( datetime.now(), datetime.now() + timedelta( 21 ) ):
+    for day in iterdays(datetime.now(), datetime.now() + timedelta(21)):
         pass
     """
     if not isinstance(first, datetime):
@@ -276,7 +276,7 @@ def iterdays(first, last):
 def weekNumber(dt):
     """
     Lets assume dt is Friday.
-    Then weekNumber( dt ) will return WHICH Friday of the month it is: 1st - 5th.
+    Then weekNumber(dt) will return WHICH Friday of the month it is: 1st - 5th.
     """
     weekDay = dt.weekday()
     weekNumber = 0
