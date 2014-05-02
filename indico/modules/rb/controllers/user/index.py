@@ -24,7 +24,6 @@ from indico.modules.rb.models.locations import Location
 
 
 class RHRoomBookingWelcome(RHRoomBookingBase):
-
     def _process(self):
         default_location = Location.getDefaultLocation()
         if default_location and default_location.isMapAvailable():

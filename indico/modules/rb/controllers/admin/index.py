@@ -23,7 +23,6 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.rh.admins import RHAdminBase
-
 from indico.modules.rb.views.admin import index as index_views
 
 
@@ -32,7 +31,6 @@ class RHRoomBookingPluginAdminBase(RHAdminBase):
 
 
 class RHRoomBookingPluginAdmin(RHRoomBookingPluginAdminBase):
-
     def _checkParams(self):
         RHRoomBookingPluginAdminBase._checkParams(self, request.args)
 
@@ -41,7 +39,6 @@ class RHRoomBookingPluginAdmin(RHRoomBookingPluginAdminBase):
 
 
 class RHSwitchRoomBookingModuleActive(RHRoomBookingPluginAdminBase):
-
     def _checkParams(self):
         RHRoomBookingPluginAdminBase._checkParams(self, request.args)
 

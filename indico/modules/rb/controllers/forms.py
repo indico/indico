@@ -19,11 +19,9 @@
 
 from datetime import datetime, time, timedelta
 from functools import partial
-
 from flask_wtf import Form
 from wtforms import (
     BooleanField,
-    DateField,
     Field,
     IntegerField,
     SelectField,
@@ -41,19 +39,21 @@ from wtforms_alchemy import model_form_factory
 
 from indico.core.errors import IndicoError
 from indico.util.i18n import _
-
 from ..models.reservations import Reservation, RepeatUnit, RepeatMapping
 
 
 ModelForm = model_form_factory(Form, strip_string_fields=True)
 
-AVAILABILITY_VALUES = ['Available', 'Booked', 'Don\'t care']
+AVAILABILITY_VALUES = ['Available', 'Booked', "Don't care"]
+
 
 def auto_datetime(diff=None):
     return (diff if diff else timedelta(0)) + datetime.utcnow()
 
+
 def auto_date(specified_time):
     return datetime.combine(auto_datetime(), specified_time)
+
 
 def repeat_step_check(form, field):
     if form.repeat_unit.validate(form):
@@ -77,7 +77,6 @@ def repeatibility_check(form, field):
 
 
 class IndicoField(Field):
-
     def __init__(self, *args, **kw):
         self.parameter_name = kw.pop('parameter_name', None)
         super(IndicoField, self).__init__(*args, **kw)
@@ -111,7 +110,7 @@ class IndicoField(Field):
                 self.process_errors.append(e.args[0])
 
     def _process(self, formdata, data):
-         if formdata:
+        if formdata:
             try:
                 if self.parameter_name in formdata:
                     self.raw_data = formdata.getlist(self.parameter_name)
@@ -146,7 +145,6 @@ class StringIndicoField(IndicoField, StringField):
 
 
 class DateTimeIndicoField(IndicoField, DateTimeField):
-
     def process_formdata(self, raw_data):
         try:
             self.data = datetime.combine(datetime(*map(int, raw_data[:-1])),
@@ -173,7 +171,6 @@ class DateTimeIndicoField(IndicoField, DateTimeField):
 
 
 class SelectMultipleCustomIndicoField(IndicoField):
-
     def __init__(self, *args, **kw):
         self.min_check = kw.pop('min_check', None)
         super(SelectMultipleCustomIndicoField, self).__init__(*args, **kw)
@@ -196,7 +193,6 @@ class SelectMultipleCustomIndicoField(IndicoField):
 
 
 class MultipleCheckboxIndicoField(IndicoField):
-
     def __init__(self, prefix, *args, **kw):
         self.prefix = prefix
         super(MultipleCheckboxIndicoField, self).__init__(*args, **kw)
@@ -216,7 +212,6 @@ class MultipleCheckboxIndicoField(IndicoField):
 
 
 class BookingListForm(Form):
-
     is_only_pre_bookings = BooleanField('Only Prebookings', [validators.Optional()], default=False)
     is_only_bookings = BooleanField('Only Bookings', [validators.Optional()], default=False)
     is_only_mine = BooleanField('Only Mine', [validators.Optional()], default=False)
@@ -231,7 +226,7 @@ class BookingListForm(Form):
     finish_date = BooleanField('Finish Date Exists', [validators.Optional()], default=True)
 
     repeat_unit = IntegerField('Repeat Unit', [validators.Optional(),
-                               validators.NumberRange(min=RepeatUnit.NEVER, max=RepeatUnit.YEAR)],
+                                               validators.NumberRange(min=RepeatUnit.NEVER, max=RepeatUnit.YEAR)],
                                default=RepeatUnit.NEVER)
     repeat_step = IntegerField('Repeat Step', [validators.Optional(), repeat_step_check],
                                default=0)
@@ -268,7 +263,6 @@ class BookingForm(ModelForm):
 
 
 class RoomListForm(Form):
-
     location_id = IntegerIndicoField(validators=[required(), number_range(min=1)],
                                      parameter_name='roomLocation')
     free_search = StringIndicoField(validators=[optional()])

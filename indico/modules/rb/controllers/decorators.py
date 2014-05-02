@@ -18,13 +18,11 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 from functools import wraps
-
 from flask import request
 
 from indico.core.errors import IndicoError, NotFoundError
 from indico.util.i18n import _
-
-from ..models.locations import Location
+from indico.modules.rb.models.locations import Location
 
 
 def double_wraps(f):
@@ -34,14 +32,12 @@ def double_wraps(f):
             return f(args[0])
         else:
             return lambda original: f(original, *args, **kw)
+
     return wrapper
 
 
 @double_wraps
-def requires_location(f,
-                      parameter_name='roomLocation',
-                      attribute_name='_location',
-                      request_attribute='view_args'):
+def requires_location(f, parameter_name='roomLocation', attribute_name='_location', request_attribute='view_args'):
     @wraps(f)
     def wrapper(*args, **kw):
         if not args:
@@ -54,14 +50,12 @@ def requires_location(f,
         else:
             raise NotFoundError(_('There is no location named: {0}').format(location_name))
         return f(*args, **kw)
+
     return wrapper
 
 
 @double_wraps
-def requires_room(f,
-                  parameter_name='roomID',
-                  attribute_name='_room',
-                  location_attribute_name='_location',
+def requires_room(f, parameter_name='roomID', attribute_name='_room', location_attribute_name='_location',
                   request_attribute='view_args'):
     @wraps(f)
     def wrapper(*args, **kw):
@@ -75,6 +69,7 @@ def requires_room(f,
         if room:
             setattr(args[0], attribute_name, room)
         else:
-            raise NotFoundError(_('There is no room at \'{1}\' with id: {0}').format(room_id, location.name))
+            raise NotFoundError(_("There is no room at '{1}' with id: {0}").format(room_id, location.name))
         return f(*args, **kw)
+
     return wrapper

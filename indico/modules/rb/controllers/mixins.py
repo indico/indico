@@ -17,20 +17,15 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+import itertools
 from datetime import datetime as DT
 
 from indico.core.errors import NoReportError
 from indico.util.i18n import _
-
-from ..models.utils import (
-    get_checked_param_dict,
-    is_false_valued_dict,
-    is_none_valued_dict
-)
+from indico.modules.rb.models.utils import get_checked_param_dict, is_false_valued_dict, is_none_valued_dict
 
 
 class RoomBookingAvailabilityParamsMixin:
-
     def _checkParamsRepeatingPeriod(self, f):
         """
         Extracts startDT, endDT and repeatability
@@ -46,13 +41,13 @@ class RoomBookingAvailabilityParamsMixin:
             try:
                 times = dict((k, DT.strptime(v, '%H:%M').time()) for k, v in times.items())
             except ValueError:
-                raise NoReportError(_('The Start Time must be of the form \'HH:MM\''
-                                      ' and must be a valid time.'))
+                raise NoReportError(_("The Start Time must be of the form 'HH:MM'and must be a valid time."))
 
         # date
-        date_keys = [i+j for i in 's e'.split() for j in 'Year Month Day'.split()]
+        date_keys = map(''.join, itertools.product('se', 'Year Month Day'.split()))
         dates = get_checked_param_dict(f, date_keys, converter=int)
         is_date_supplied = not is_none_valued_dict(dates)
+
         def get_date_from_dict(initial):
             return DT(*(dates[initial + p] for p in 'Year Month Day'.split())).date()
 
@@ -76,9 +71,8 @@ class RoomBookingAvailabilityParamsMixin:
         self._repeatability = get_checked_param_dict(f, ['repeat_unit', 'repeat_step'], converter=int)
 
 
-class AttributeSetterMixin():
-
-    """ Utility class to make retrieval of parameters from requests """
+class AttributeSetterMixin:
+    """Utility class to make retrieval of parameters from requests"""
 
     def setParam(self, attrName, params, paramName=None, default=None, callback=None):
         """ Sets the given attribute from params

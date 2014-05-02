@@ -20,7 +20,6 @@
 
 import posixpath
 from io import BytesIO
-
 from flask import request
 
 from indico.core.config import Config

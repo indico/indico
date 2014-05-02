@@ -18,28 +18,23 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime, timedelta
-
-from flask import flash, request, session
+from flask import request, session
 
 from MaKaC.common.cache import GenericCache
 from MaKaC.webinterface.locators import WebLocator
-
 from indico.util.i18n import _
-
-from .. import RHRoomBookingBase
-from ..decorators import requires_location, requires_room
-from ..forms import RoomListForm
-from ..mixins import AttributeSetterMixin
-from ...models.locations import Location
-from ...models.reservations import RepeatUnit
-from ...models.rooms import Room
-from ...models.room_equipments import RoomEquipment
-from ...models.utils import next_work_day
-from ...views.user import rooms as room_views
+from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.controllers.decorators import requires_location, requires_room
+from indico.modules.rb.controllers.forms import RoomListForm
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.reservations import RepeatUnit
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.room_equipments import RoomEquipment
+from indico.modules.rb.models.utils import next_work_day
+from indico.modules.rb.views.user import rooms as room_views
 
 
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
-
     def _checkParams(self):
         RHRoomBookingBase._checkParams(self, request.args)
         self._room_id = request.args.get('roomID')
@@ -49,7 +44,6 @@ class RHRoomBookingMapOfRooms(RHRoomBookingBase):
 
 
 class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
-
     def __init__(self, *args, **kwargs):
         RHRoomBookingBase.__init__(self, *args, **kwargs)
         self._cache = GenericCache('MapOfRooms')
@@ -87,7 +81,6 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 
 
 class RHRoomBookingRoomList(RHRoomBookingBase):
-
     def _checkParams(self):
         self._form = RoomListForm(request.values)
 
@@ -100,7 +93,6 @@ class RHRoomBookingRoomList(RHRoomBookingBase):
 
 
 class RHRoomBookingSearch4Rooms(RHRoomBookingBase):
-
     def _checkParams(self):
         self._is_new_booking = request.values.get('is_new_booking', type=bool, default=False)
 
@@ -115,12 +107,11 @@ class RHRoomBookingSearch4Rooms(RHRoomBookingBase):
 
 
 class RHRoomBookingRoomDetails(RHRoomBookingBase):
-
     def _setGeneralDefaultsInSession(self):
         now = datetime.now()
 
         # if it's saturday or sunday, postpone for monday as a default
-        if now.weekday() in [5,6]:
+        if now.weekday() in [5, 6]:
             now = now + timedelta(7 - now.weekday())
 
         session["rbDefaultStartDT"] = datetime(now.year, now.month, now.day, 0, 0)
@@ -154,7 +145,6 @@ class RHRoomBookingRoomDetails(RHRoomBookingBase):
 
 # TODO
 class RHRoomBookingRoomStats(RHRoomBookingBase):
-
     def _checkParams(self):
         params = request.args if request.method == 'GET' else request.form
         locator = WebLocator()

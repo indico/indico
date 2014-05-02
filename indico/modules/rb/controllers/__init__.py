@@ -18,25 +18,19 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
-
 from flask import request, session
 
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface.rh.base import RHProtected
-
-from indico.core.db import db
 from indico.core.errors import AccessError
 from indico.util.i18n import _
-
+from indico.modules.rb.models.room_bookable_times import BookableTime
+from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from .mixins import RoomBookingAvailabilityParamsMixin
 from .utils import rb_check_user_access, FormMode
-from ..models.rooms import Room
-from ..models.room_bookable_times import BookableTime
-from ..models.room_nonbookable_dates import NonBookableDate
 
 
 class RHRoomBookingProtected(RHProtected):
-
     def _checkSessionUser(self):
         user = self._getUser()
         if user:
@@ -70,7 +64,7 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
 
         def testAndSet(ls):
             for l in ls:
-                p, e, extra, t = l + [None]*(4 - len(l))
+                p, e, extra, t = l + [None] * (4 - len(l))
                 v = f.get(p)
                 setattr(self._room, p, v)
                 try:
@@ -98,10 +92,9 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
             ['capacity', _('Capacity must be a positive integer'), positive, int],
             ['longitude', _('Longitude must be a positive number'), empty_or_positive],
             ['latitude', _('Latitude must be a positive number'), empty_or_positive],
-            ['notification_for_start', _('Notification for start'
-             ' must be nonnegative number. Put zero to cancel.'), lambda e: e >= 0, int],
-            ['max_advance_days', _('Maximum days before a'
-             ' reservation must be a positive number'), positive, int],
+            ['notification_for_start', _('Notification for start must be nonnegative number. Put zero to cancel.'),
+             lambda e: e >= 0, int],
+            ['max_advance_days', _('Maximum days before a reservation must be a positive number'), positive, int],
             ['surface_area', _('Surface area must be a positive number'), lambda e: e >= 0, empty_or_int],
             ['is_active', '', None, on],
             ['is_reservable', '', None, on],
@@ -120,7 +113,8 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
         exist_error, format_error, valid_error = False, False, False
         for i in xrange(bookable_times_count):
             try:
-                s, e = f.get('startTimeDailyBookablePeriod{}'.format(i)), f.get('endTimeDailyBookablePeriod{}'.format(i))
+                s, e = f.get('startTimeDailyBookablePeriod{}'.format(i)), f.get(
+                    'endTimeDailyBookablePeriod{}'.format(i))
                 if s and e:
                     start_time = datetime.strptime(s, '%H:%M').time()
                     end_time = datetime.strptime(e, '%H:%M').time()
@@ -196,7 +190,7 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
     def _checkAndSetParamsForReservation(self):
         pass
 
-    def _saveResvCandidateToSession( self, c ):
+    def _saveResvCandidateToSession(self, c):
         if self._formMode == FormMode.MODIF:
             session['rbResvID'] = c.id
             session['rbRoomLocation'] = c.locationName
@@ -246,24 +240,24 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
                                     "Please try with another room or date"))
         return errors
 
-    def _loadResvCandidateFromSession( self, candResv, params ):
+    def _loadResvCandidateFromSession(self, candResv, params):
         # After successful searching or failed save
         roomID = params['roomID']
-        if isinstance( roomID, list ):
-            roomID = int( roomID[0] )
+        if isinstance(roomID, list):
+            roomID = int(roomID[0])
         else:
-            roomID = int( roomID )
-        roomLocation = params.get( "roomLocation" )
-        if isinstance( roomLocation, list ):
+            roomID = int(roomID)
+        roomLocation = params.get("roomLocation")
+        if isinstance(roomLocation, list):
             roomLocation = roomLocation[0]
         if not roomLocation:
             roomLocation = session.get('rbRoomLocation')
 
         if not candResv:
-            candResv = Location.parse( roomLocation ).factory.newReservation() # The same location as for room
+            candResv = Location.parse(roomLocation).factory.newReservation()  # The same location as for room
 
         if not candResv.room:
-            candResv.room = CrossLocationQueries.getRooms(roomID = roomID, location = roomLocation)
+            candResv.room = CrossLocationQueries.getRooms(roomID=roomID, location=roomLocation)
         sessionCand = session['rbResvCand']
         candResv.startDT = sessionCand["startDT"]
         candResv.endDT = sessionCand["endDT"]
@@ -280,20 +274,20 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
         candResv.useVC = sessionCand['useVC']
         return candResv
 
-    def _loadResvCandidateFromParams( self, candResv, params ):
+    def _loadResvCandidateFromParams(self, candResv, params):
         # After calendar preview
         roomID = params['roomID']
-        if isinstance( roomID, list ):
-            roomID = int( roomID[0] )
+        if isinstance(roomID, list):
+            roomID = int(roomID[0])
         else:
-            roomID = int( roomID )
-        roomLocation = params.get( "roomLocation" )
-        if isinstance( roomLocation, list ):
+            roomID = int(roomID)
+        roomLocation = params.get("roomLocation")
+        if isinstance(roomLocation, list):
             roomLocation = roomLocation[0]
         if not candResv:
-            candResv = Location.parse( roomLocation ).factory.newReservation() # The same location as room
-        candResv.room = CrossLocationQueries.getRooms( roomID = roomID, location = roomLocation )
-        self._checkParamsRepeatingPeriod( params )
+            candResv = Location.parse(roomLocation).factory.newReservation()  # The same location as room
+        candResv.room = CrossLocationQueries.getRooms(roomID=roomID, location=roomLocation)
+        self._checkParamsRepeatingPeriod(params)
         candResv.startDT = self._startDT
         candResv.endDT = self._endDT
         candResv.repeatability = self._repeatability
@@ -302,10 +296,10 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
         candResv.contactEmail = setValidEmailSeparators(params["contactEmail"])
         candResv.contactPhone = params["contactPhone"]
         candResv.reason = params["reason"]
-        candResv.usesAVC = params.get( "usesAVC" ) == "on"
-        candResv.needsAVCSupport = params.get( "needsAVCSupport" ) == "on"
-        candResv.needsAssistance = params.get( "needsAssistance" ) == "on"
-        self._skipConflicting = params.get( "skipConflicting" ) == "on"
+        candResv.usesAVC = params.get("usesAVC") == "on"
+        candResv.needsAVCSupport = params.get("needsAVCSupport") == "on"
+        candResv.needsAssistance = params.get("needsAssistance") == "on"
+        self._skipConflicting = params.get("skipConflicting") == "on"
         d = {}
         for vc in candResv.room.getAvailableVC():
             d[vc[:3]] = vc
@@ -317,39 +311,39 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
                     candResv.useVC.append(vc)
         return candResv
 
-    def _loadResvBookingCandidateFromSession( self, params, room ):
+    def _loadResvBookingCandidateFromSession(self, params, room):
         if not params.has_key('roomGUID'):
-            raise MaKaCError( _("""The parameter roomGUID is missing."""))
-        roomID = int( room.id )
+            raise MaKaCError(_("""The parameter roomGUID is missing."""))
+        roomID = int(room.id)
         roomLocation = room.getLocationName()
-        candResv = Location.parse( roomLocation ).factory.newReservation() # Create in the same location as room
+        candResv = Location.parse(roomLocation).factory.newReservation()  # Create in the same location as room
         if not candResv.room:
-            candResv.room = CrossLocationQueries.getRooms( roomID = roomID, location = roomLocation )
+            candResv.room = CrossLocationQueries.getRooms(roomID=roomID, location=roomLocation)
 
-        self._checkParamsRepeatingPeriod( params )
+        self._checkParamsRepeatingPeriod(params)
         candResv.startDT = self._startDT
         candResv.endDT = self._endDT
         candResv.repeatability = self._repeatability
 
         return candResv
 
-    def _loadResvCandidateFromDefaults( self, params ):
+    def _loadResvCandidateFromDefaults(self, params):
         # After room details
         if not params.has_key('roomID'):
-            raise MaKaCError( _("""The parameter roomID is missing."""))
+            raise MaKaCError(_("""The parameter roomID is missing."""))
         if not params.has_key('roomLocation'):
-            raise MaKaCError( _("""The parameter roomLocation is missing"""))
-        roomID = int( params['roomID'] )
+            raise MaKaCError(_("""The parameter roomLocation is missing"""))
+        roomID = int(params['roomID'])
         roomLocation = params['roomLocation']
-        candResv = Location.parse( roomLocation ).factory.newReservation() # Create in the same location as room
+        candResv = Location.parse(roomLocation).factory.newReservation()  # Create in the same location as room
         if not candResv.room:
-            candResv.room = CrossLocationQueries.getRooms( roomID = roomID, location = roomLocation )
+            candResv.room = CrossLocationQueries.getRooms(roomID=roomID, location=roomLocation)
         # Generic defaults
         now = datetime.now()
-        if now.weekday() in [4,5]:
-            now = now + timedelta( 7 - now.weekday() )
+        if now.weekday() in [4, 5]:
+            now = now + timedelta(7 - now.weekday())
         else:
-            now = now + timedelta( 1 )
+            now = now + timedelta(1)
 
         # Sets the dates if needed
         dayD = params.get("day")
@@ -379,23 +373,21 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
             hourEnd = 17
             minuteEnd = 30
 
-        if dayD != None and dayD.isdigit() and \
-           monthM != None and monthM.isdigit() and \
-           yearY != None and yearY.isdigit():
+        if (dayD is not None and dayD.isdigit() and monthM is not None and monthM.isdigit() and yearY is not None
+                and yearY.isdigit()):
             candResv.startDT = datetime(int(yearY), int(monthM), int(dayD), hourStart, minuteStart)
-            if dayEnd != None and dayEnd.isdigit() and \
-               monthEnd != None and monthEnd.isdigit() and \
-               yearEnd!= None and yearEnd.isdigit():
+            if (dayEnd is not None and dayEnd.isdigit() and monthEnd is not None and monthEnd.isdigit()
+                    and yearEnd is not None and yearEnd.isdigit()):
                 candResv.endDT = datetime(int(yearEnd), int(monthEnd), int(dayEnd), hourEnd, minuteEnd)
                 if candResv.endDT.date() != candResv.startDT.date() and candResv.repeatability is None:
                     candResv.repeatability = RepeatabilityEnum.daily
             else:
                 candResv.endDT = datetime(int(yearY), int(monthM), int(dayD), hourEnd, minuteEnd)
         else:
-            if candResv.startDT == None:
-                candResv.startDT = datetime( now.year, now.month, now.day, hourStart, minuteStart )
-            if candResv.endDT == None:
-                candResv.endDT = datetime( now.year, now.month, now.day, hourEnd, minuteEnd )
+            if candResv.startDT is None:
+                candResv.startDT = datetime(now.year, now.month, now.day, hourStart, minuteStart)
+            if candResv.endDT is None:
+                candResv.endDT = datetime(now.year, now.month, now.day, hourEnd, minuteEnd)
         if repeatability is not None:
             if not repeatability.isdigit():
                 candResv.repeatability = None
@@ -404,22 +396,22 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
         if self._getUser():
             if candResv.bookedForUser is None:
                 candResv.bookedForUser = self._getUser()
-            if candResv.bookedForName == None:
+            if candResv.bookedForName is None:
                 candResv.bookedForName = self._getUser().getFullName()
-            if candResv.contactEmail == None:
+            if candResv.contactEmail is None:
                 candResv.contactEmail = self._getUser().getEmail()
-            if candResv.contactPhone == None:
+            if candResv.contactPhone is None:
                 candResv.contactPhone = self._getUser().getTelephone()
         else:
             candResv.bookedForUser = None
             candResv.bookedForName = candResv.contactEmail = candResv.contactPhone = ""
-        if candResv.reason == None:
+        if candResv.reason is None:
             candResv.reason = ""
-        if candResv.usesAVC == None:
+        if candResv.usesAVC is None:
             candResv.usesAVC = False
-        if candResv.needsAVCSupport == None:
+        if candResv.needsAVCSupport is None:
             candResv.needsAVCSupport = False
-        if candResv.needsAssistance == None:
+        if candResv.needsAssistance is None:
             candResv.needsAssistance = False
 
         if not session.get("rbDontAssign") and not params.get("ignoreSession"):
@@ -427,7 +419,7 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
                 candResv.startDT = session.get("rbDefaultStartDT")
             if session.get("rbDefaultEndDT"):
                 candResv.endDT = session.get("rbDefaultEndDT")
-            if session.get("rbDefaultRepeatability") != None:
+            if session.get("rbDefaultRepeatability") is not None:
                 candResv.repeatability = session.get("rbDefaultRepeatability")
             if session.get("rbDefaultBookedForId"):
                 candResv.bookedForId = session.get("rbDefaultBookedForId")

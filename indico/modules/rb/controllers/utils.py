@@ -55,7 +55,7 @@ def rb_check_user_access(user):
         # there is something in the authorization list
         for entity in authorized:
             if (isinstance(entity, user_mod.Group) and entity.containsUser(user)) or \
-               (isinstance(entity, user_mod.Avatar) and entity == user):
+                    (isinstance(entity, user_mod.Avatar) and entity == user):
                 return True
     return False
 
@@ -73,19 +73,20 @@ class Period(object):
     """
     startDT = None
     endDT = None
-    def __init__( self, startDT, endDT ):
+
+    def __init__(self, startDT, endDT):
         self.startDT = startDT
         self.endDT = endDT
 
-    def __cmp__( self, other ):
+    def __cmp__(self, other):
         if self.__class__.__name__ == 'NoneType' and other.__class__.__name__ == 'NoneType':
             return 0
         if self.__class__.__name__ == 'NoneType':
-            return cmp( None, 1 )
+            return cmp(None, 1)
         if other.__class__.__name__ == 'NoneType':
-            return cmp( 1, None )
+            return cmp(1, None)
 
-        return cmp( self.startDT, other.startDT )
+        return cmp(self.startDT, other.startDT)
 
     def __hash__(self):
         return hash((self.startDT, self.endDT))
@@ -93,21 +94,13 @@ class Period(object):
     def __repr__(self):
         return 'Period(%r, %r)' % (self.startDT, self.endDT)
 
-    def __str__( self ):
-        return str( self.startDT  ) + " -- " + str( self.endDT )
+    def __str__(self):
+        return str(self.startDT) + " -- " + str(self.endDT)
 
-def intd( s, default = None ):
-    """
-    Like int() but returns default value if conversion failed.
-    """
-    try:
-        return int( s )
-    except:
-        return default
 
-def qbeMatch( example, candidate, special, **kwargs ):
+def qbeMatch(example, candidate, special, **kwargs):
     """
-    Queary By Example Match.
+    Query By Example Match.
 
     Used for "query by example" searching mechanism. The 'example'
     parameter defines match conditions. Function returns true if
@@ -131,46 +124,47 @@ def qbeMatch( example, candidate, special, **kwargs ):
         - False otherwise
     """
 
-    for attrName in dir( example ):
+    for attrName in dir(example):
         # Skip methods, private attributes and Nones
         if attrName[0] == '_' or attrName in ['avaibleVC', 'vcList', 'needsAVCSetup', 'verboseEquipment',
-                                              'resvStartNotification', 'resvEndNotification', 'resvNotificationAssistance', 'maxAdvanceDays']:
+                                              'resvStartNotification', 'resvEndNotification',
+                                              'resvNotificationAssistance', 'maxAdvanceDays']:
             continue
 
         exAttrVal = getattr(example, attrName)
         attrType = exAttrVal.__class__.__name__
 
-        if attrType in ('instancemethod', 'staticmethod', 'function') or exAttrVal == None:
+        if attrType in ('instancemethod', 'staticmethod', 'function') or exAttrVal is None:
             continue
 
         candAttrVal = getattr(candidate, attrName)
-        if candAttrVal == None           and attrName not in ['repeatability', 'weekDay', 'weekNumber']: # Ugly hack :/
-            return False # because exAttrVal != None
+        if candAttrVal is None and attrName not in ['repeatability', 'weekDay', 'weekNumber']:  # Ugly hack :/
+            return False  # because exAttrVal is not None
 
         # Special comparison for some attributes
-        areEqual = special( attrName, exAttrVal, candAttrVal, **kwargs )
+        areEqual = special(attrName, exAttrVal, candAttrVal, **kwargs)
 
         # Generic comparison
-        if areEqual == None:
+        if areEqual is None:
             if attrType in ('int', 'float', 'bool', 'datetime' ):
                 # Exact match
                 areEqual = ( candAttrVal == exAttrVal )
             elif attrType == 'str':
                 areEqual = candAttrVal.lower() == exAttrVal.lower()
             else:
-                raise attrType + ": " + str( candAttrVal ) + " - can not compare"
+                raise attrType + ": " + str(candAttrVal) + " - can not compare"
 
         if not areEqual:
             #print "Does not match: %s (%s : %s)" % (attrName, str( exAttrVal ), str( attrVal ) )
             return False
-#        if 'Room' not in example.__class__.__name__ and attrName == 'repeatability' and example.repeatability == 1 and candidate.reason == "TDAQ Meeting" and candidate.startDT == datetime( 2007, 05, 21, 9 ):
-#            raise str( areEqual ) + '--' + str( example )
+        # if 'Room' not in example.__class__.__name__ and attrName == 'repeatability' and example.repeatability == 1 and candidate.reason == "TDAQ Meeting" and candidate.startDT == datetime( 2007, 05, 21, 9 ):
+        #     raise str( areEqual ) + '--' + str( example )
 
     # All attributes match
     return True
 
 
-def containsExactly_OR_containsAny( attrValExample, attrValCandidate ):
+def containsExactly_OR_containsAny(attrValExample, attrValCandidate):
     attrValExample = attrValExample.strip().lower()
     attrValCandidate = attrValCandidate.lower()
 
@@ -188,18 +182,19 @@ def containsExactly_OR_containsAny( attrValExample, attrValCandidate ):
     return False
 
 
-def doesPeriodOverlap( *args, **kwargs ):
+def doesPeriodOverlap(*args, **kwargs):
     """
     Returns true if periods do overlap. This requires both dates and times to overlap.
     Pass it either (period, period) or ( start1, end1, start2, end2 ).
     """
-    if len( args ) == 4:
-        return __doesPeriodOverlap( args[0], args[1], args[2], args[3] )
-    if len( args ) == 2:
-        return __doesPeriodOverlap( args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT )
+    if len(args) == 4:
+        return __doesPeriodOverlap(args[0], args[1], args[2], args[3])
+    if len(args) == 2:
+        return __doesPeriodOverlap(args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT)
     raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
 
-def __doesPeriodOverlap( startDT1, endDT1, startDT2, endDT2 ):
+
+def __doesPeriodOverlap(startDT1, endDT1, startDT2, endDT2):
     # Dates must overlap
     if endDT1.date() < startDT2.date() or endDT2.date() < startDT1.date():
         return False
@@ -209,32 +204,33 @@ def __doesPeriodOverlap( startDT1, endDT1, startDT2, endDT2 ):
         return False
     return True
 
-def overlap( *args, **kwargs ):
+
+def overlap(*args, **kwargs):
     """
     Returns two datetimes - the common part of two given periods.
     """
-    if len( args ) == 4:
-        return __overlap( args[0], args[1], args[2], args[3] )
-    if len( args ) == 2:
-        return __overlap( args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT )
+    if len(args) == 4:
+        return __overlap(args[0], args[1], args[2], args[3])
+    if len(args) == 2:
+        return __overlap(args[0].startDT, args[0].endDT, args[1].startDT, args[1].endDT)
     raise ValueError('2 or 4 arguments required: (period, period) or ( start1, end1, start2, end2 )')
 
 
-def __overlap( startDT1, endDT1, startDT2, endDT2):
-    if not doesPeriodOverlap( startDT1, endDT1, startDT2, endDT2):
+def __overlap(startDT1, endDT1, startDT2, endDT2):
+    if not doesPeriodOverlap(startDT1, endDT1, startDT2, endDT2):
         # [---]  [----]
         return None
 
-    dates = __overlapDates( startDT1.date(), endDT1.date(), startDT2.date(), endDT2.date() )
-    times = __overlapTimes( startDT1.time(), endDT1.time(), startDT2.time(), endDT2.time() )
+    dates = __overlapDates(startDT1.date(), endDT1.date(), startDT2.date(), endDT2.date())
+    times = __overlapTimes(startDT1.time(), endDT1.time(), startDT2.time(), endDT2.time())
 
-    fromOverlap = datetime( dates[0].year, dates[0].month, dates[0].day, times[0].hour, times[0].minute, times[0].second )
-    toOverlap = datetime( dates[1].year, dates[1].month, dates[1].day, times[1].hour, times[1].minute, times[1].second )
+    fromOverlap = datetime(dates[0].year, dates[0].month, dates[0].day, times[0].hour, times[0].minute, times[0].second)
+    toOverlap = datetime(dates[1].year, dates[1].month, dates[1].day, times[1].hour, times[1].minute, times[1].second)
 
     return ( fromOverlap, toOverlap )
 
-def __overlapDates( startD1, endD1, startD2, endD2 ):
 
+def __overlapDates(startD1, endD1, startD2, endD2):
     if endD1 >= startD2 and endD1 <= endD2 and startD1 <= startD2:
         # [-----]       (1)
         #     [------]  (2)
@@ -245,10 +241,10 @@ def __overlapDates( startD1, endD1, startD2, endD2 ):
         # [----------]  (2)
         return ( startD1, endD1 )
 
-    return __overlapDates( startD2, endD2, startD1, endD1 )
+    return __overlapDates(startD2, endD2, startD1, endD1)
 
-def __overlapTimes( startT1, endT1, startT2, endT2 ):
 
+def __overlapTimes(startT1, endT1, startT2, endT2):
     if endT1 >= startT2 and endT1 <= endT2 and startT1 <= startT2:
         # [-----]       (1)
         #     [------]  (2)
@@ -259,7 +255,7 @@ def __overlapTimes( startT1, endT1, startT2, endT2 ):
         # [----------]  (2)
         return ( startT1, endT1 )
 
-    return __overlapTimes( startT2, endT2, startT1, endT1 )
+    return __overlapTimes(startT2, endT2, startT1, endT1)
 
 
 def iterdays(first, last):
@@ -269,73 +265,80 @@ def iterdays(first, last):
     for day in iterdays( datetime.now(), datetime.now() + timedelta( 21 ) ):
         pass
     """
-    if not isinstance( first, datetime ): raise TypeError('pass datetime') #first = datetime( first.year, first.month, first.day )
-    if not isinstance( last, datetime ): raise TypeError('pass datetime')  #last = datetime(  last.year, last.month, last.day )
+    if not isinstance(first, datetime):
+        raise TypeError('pass datetime')  # first = datetime(first.year, first.month, first.day)
+    if not isinstance(last, datetime):
+        raise TypeError('pass datetime')  # last = datetime(last.year, last.month, last.day)
     for day in range((last - first).days + 1):
         yield first + timedelta(day)
 
-def weekNumber( dt ):
+
+def weekNumber(dt):
     """
     Lets assume dt is Friday.
     Then weekNumber( dt ) will return WHICH Friday of the month it is: 1st - 5th.
     """
     weekDay = dt.weekday()
     weekNumber = 0
-    for day in iterdays( datetime( dt.year, dt.month, 1 ), dt ):
+    for day in iterdays(datetime(dt.year, dt.month, 1), dt):
         if day.weekday() == weekDay:
             weekNumber += 1
     return weekNumber
 
-class Impersistant( object ):
 
-    def __init__( self, obj ):
+class Impersistant(object):
+    def __init__(self, obj):
         self.__obj = obj
 
-    def getObject( self ):
+    def getObject(self):
         return self.__obj
 
-def checkPresence( self, errors, attrName, type ):
+
+def checkPresence(self, errors, attrName, type):
     """
     FINAL (not intented to be overriden)
     """
     at = self.__dict__[attrName]
-    if at == None:
-        errors.append( attrName + ' is not present' )
+    if at is None:
+        errors.append(attrName + ' is not present')
         return
-    #raise str( at.__class__.__name__ ) + " | " + str( at ) + " | " + str( type )
-    if not isinstance( at, type ):
-        errors.append( attrName + ' has invalid type' )
+    if not isinstance(at, type):
+        errors.append(attrName + ' has invalid type')
     return None
 
-def toUTC( localNaiveDT ):
+
+def toUTC(localNaiveDT):
     """
     Converts naive (timezone-less) datetime to UTC.
     It assumes localNaiveDT to be in local/DTS timezone.
     """
-    if localNaiveDT == None:
+    if localNaiveDT is None:
         return None
-    if localNaiveDT.tzinfo != None:
-        raise ValueError('This methods converts only _naive_ datetimes, assuming they are in local/DTS time. Naive datetimes does not contain information about timezone.')
-    return localNaiveDT + timedelta( 0, time.altzone )
+    if localNaiveDT.tzinfo is not None:
+        raise ValueError('This methods converts only _naive_ datetimes, assuming they are in local/DTS time.')
+    return localNaiveDT + timedelta(0, time.altzone)
 
 
-def fromUTC( utcNaiveDT ):
-    #if utcNaiveDT == None:
+def fromUTC(utcNaiveDT):
+    #if utcNaiveDT is None:
     #    return None
     try:
-        if utcNaiveDT.tzinfo != None:
-            raise ValueError('This methods converts only _naive_ datetimes, assuming they are in UTC time. Naive datetimes does not contain information about timezone.')
-        return utcNaiveDT - timedelta( 0, time.altzone )
+        if utcNaiveDT.tzinfo is not None:
+            raise ValueError('This methods converts only _naive_ datetimes, assuming they are in UTC time.')
+        return utcNaiveDT - timedelta(0, time.altzone)
     except AttributeError:
         return None
+
 
 def formatDate(date):
     # Convert the date to the Indico "de facto" standard
     return date.strftime("%a %d/%m/%Y")
 
+
 def formatDateTime(date):
     # Convert the date to the Indico "de facto" standard
     return date.strftime("%a %d/%m/%Y %H:%M")
+
 
 def datespan(startDate, endDate, delta=timedelta(days=1)):
     currentDate = startDate
@@ -343,8 +346,10 @@ def datespan(startDate, endDate, delta=timedelta(days=1)):
         yield currentDate
         currentDate += delta
 
+
 def dateAdvanceAllowed(date, days):
     from MaKaC.common.timezoneUtils import nowutc, dayDifference, naive2local
     import MaKaC.common.info as info
+
     tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
     return dayDifference(naive2local(date, tz), nowutc(), tz) > days

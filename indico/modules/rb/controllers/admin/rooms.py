@@ -20,25 +20,23 @@
 from flask import request, session
 
 from MaKaC.webinterface import urlHandlers as UH
-
 from indico.core.db import db
 from indico.core.errors import NotFoundError
 from indico.util.i18n import _
-
+from indico.modules.rb.controllers.decorators import requires_location
+from indico.modules.rb.models.room_bookable_times import BookableTime
+from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.photos import Photo
+from indico.modules.rb.views.admin import rooms as room_views
 from . import RHRoomBookingAdminBase
-from ..decorators import requires_location
-from ...models.room_bookable_times import BookableTime
-from ...models.room_nonbookable_dates import NonBookableDate
-from ...models.rooms import Room
-from ...models.photos import Photo
-from ...views.admin import rooms as room_views
+
 
 class CandidateDataFrom(object):
     DEFAULTS, PARAMS, SESSION = range(3)
 
 
 class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
-
     def _checkParams(self):
         self._room = Room.getRoomById(request.form.get('roomID', type=int))
         self._target = self._room

@@ -21,7 +21,6 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 
 
 class RHRoomBookingBlockingDetails(RHRoomBookingBase):
-
     def _checkParams(self, params):
         blockId = int(params.get('blockingId'))
         self._block = RoomBlockingBase.getById(blockId)
@@ -34,7 +33,6 @@ class RHRoomBookingBlockingDetails(RHRoomBookingBase):
 
 
 class RHRoomBookingBlockingForm(RHRoomBookingBase):
-
     def _isOverlapping(self):
         # date overlapping
         for block in RoomBlockingBase.getByDateSpan(self._startDate, self._endDate):
@@ -61,6 +59,7 @@ class RHRoomBookingBlockingForm(RHRoomBookingBase):
         self._errorMessage = False
         if self._action == 'save':
             from MaKaC.services.interface.rpc import json
+
             self._reason = params.get('reason', '').strip()
             allowedUsers = json.decode(params.get('allowedUsers', '[]'))
             blockedRoomGuids = json.decode(params.get('blockedRooms', '[]'))
@@ -91,7 +90,8 @@ class RHRoomBookingBlockingForm(RHRoomBookingBase):
             if not self._block.canModify(self._getUser()):
                 raise MaKaCError("You are not authorized to modify this blocking.")
         else:
-            if not (Room.isAvatarResponsibleForRooms(self._getUser()) or self._getUser().isAdmin() or self._getUser().isRBAdmin()):
+            if not (Room.isAvatarResponsibleForRooms(
+                    self._getUser()) or self._getUser().isAdmin() or self._getUser().isRBAdmin()):
                 raise MaKaCError("Only users who own at least one room are allowed to create blockings.")
 
     def _process(self):
@@ -140,7 +140,6 @@ class RHRoomBookingBlockingForm(RHRoomBookingBase):
 
 
 class RHRoomBookingDelete(RHRoomBookingBase):
-
     def _checkParams(self, params):
         blockId = int(params.get('blockingId'))
         self._block = RoomBlockingBase.getById(blockId)
@@ -156,7 +155,6 @@ class RHRoomBookingDelete(RHRoomBookingBase):
 
 
 class RHRoomBookingBlockingList(RHRoomBookingBase):
-
     def _checkParams(self, params):
         self.onlyMine = 'onlyMine' in params
         self.onlyRecent = 'onlyRecent' in params
@@ -183,7 +181,6 @@ class RHRoomBookingBlockingList(RHRoomBookingBase):
 
 
 class RHRoomBookingBlockingsForMyRooms(RHRoomBookingBase):
-
     def _checkParams(self, params):
         self.filterState = params.get('filterState')
 

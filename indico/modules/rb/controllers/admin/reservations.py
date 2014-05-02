@@ -20,18 +20,17 @@
 from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
 
 
-class RHRoomBookingDeleteBooking( RHRoomBookingAdminBase ):
-
-    def _checkParams( self , params ):
-        resvID = int( params.get( "resvID" ) )
-        roomLocation = params.get( "roomLocation" )
-        self._resv = CrossLocationQueries.getReservations( resvID = resvID, location = roomLocation )
+class RHRoomBookingDeleteBooking(RHRoomBookingAdminBase):
+    def _checkParams(self, params):
+        resvID = int(params.get("resvID"))
+        roomLocation = params.get("roomLocation")
+        self._resv = CrossLocationQueries.getReservations(resvID=resvID, location=roomLocation)
         self._target = self._resv
 
-    def _process( self ):
+    def _process(self):
         # Booking deletion is always possible - just delete
         self._resv.remove()
         session['rbTitle'] = _("Booking has been deleted.")
         session['rbDescription'] = _("You have successfully deleted the booking.")
         url = urlHandlers.UHRoomBookingStatement.getURL()
-        self._redirect( url ) # Redirect to deletion confirmation
+        self._redirect(url)  # Redirect to deletion confirmation

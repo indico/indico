@@ -20,25 +20,20 @@
 from flask import request
 
 from MaKaC.webinterface import urlHandlers
-
 from indico.core.errors import IndicoError, FormValuesError
 from indico.core.db import db
 from indico.util.i18n import _
-
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.views.admin import locations as location_views
 from . import RHRoomBookingAdminBase
-from ...models.locations import Location
-from ...models.room_attributes import RoomAttribute
-from ...views.admin import locations as location_views
 
 
 class RHRoomBookingAdmin(RHRoomBookingAdminBase):
-
     def _process(self):
         return location_views.WPRoomBookingAdmin(self).display()
 
 
 class RHRoomBookingDeleteLocation(RHRoomBookingAdminBase):
-
     def _checkParams(self):
         self._locationName = request.form.get('removeLocationName')
 
@@ -48,7 +43,6 @@ class RHRoomBookingDeleteLocation(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingSaveLocation(RHRoomBookingAdminBase):
-
     def _checkParams(self):
         self._locationName = request.form.get('newLocationName').strip()
         if not self._locationName:
@@ -64,7 +58,6 @@ class RHRoomBookingSaveLocation(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingSetDefaultLocation(RHRoomBookingAdminBase):
-
     def _checkParams(self):
         self._defaultLocation = request.form.get('defaultLocation')
 
@@ -74,7 +67,6 @@ class RHRoomBookingSetDefaultLocation(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
-
     def _checkParams(self):
         self._withKPI = request.args.get('withKPI', type=bool)
         self._actionSucceeded = request.args.get('actionSucceeded', default=False, type=bool)
@@ -103,7 +95,6 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
-
     def _checkParams(self):
         name = request.view_args.get('locationId')
         self._location = Location.getLocationByName(name)
@@ -118,7 +109,6 @@ class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
-
     def _checkParams(self):
         name = request.view_args.get('locationId')
         self._location = Location.getLocationByName(name)
@@ -153,7 +143,6 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingEquipmentBase(RHRoomBookingAdminBase):
-
     def _checkParams(self, param):
         self._eq = request.form.get(param)
         name = request.view_args.get('locationId')
@@ -163,7 +152,6 @@ class RHRoomBookingEquipmentBase(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
-
     def _checkParams(self):
         RHRoomBookingEquipmentBase._checkParams(self, 'removeEquipmentName')
 
@@ -174,7 +162,6 @@ class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
 
 
 class RHRoomBookingSaveEquipment(RHRoomBookingEquipmentBase):
-
     def _checkParams(self):
         RHRoomBookingEquipmentBase._checkParams(self, 'newEquipmentName')
 

@@ -17,27 +17,27 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
+from MaKaC.common import xmlGen
 from MaKaC.webinterface.rh.xmlGateway import RHXMLHandlerBase
 
 
 class RHStatsRoomBooking(RHXMLHandlerBase):
-
-    def _createIndicator( self, XG, name, fullname, value ):
+    def _createIndicator(self, XG, name, fullname, value):
         XG.openTag("indicator")
         XG.writeTag("name", name)
         XG.writeTag("fullname", fullname)
         XG.writeTag("value", value)
         XG.closeTag("indicator")
 
-    def _process( self ):
+    def _process(self):
         from MaKaC.rb_room import RoomBase
-        from datetime import datetime,timedelta
         from MaKaC.rb_reservation import ReservationBase
 
         startdt = enddt = datetime.now()
         today = startdt.date()
-        startdt.replace( hour = 0, minute = 0)
-        enddt.replace( hour = 23, minute = 59)
+        startdt.replace(hour=0, minute=0)
+        enddt.replace(hour=23, minute=59)
 
         self._responseUtil.content_type = 'text/xml'
         XG = xmlGen.XMLGen()
@@ -62,16 +62,18 @@ class RHStatsRoomBooking(RHXMLHandlerBase):
         resvex = ReservationBase()
         resvex.isConfirmed = True
         resvex.isCancelled = False
-        nbResvs = len(ReservationBase.getReservations( resvExample = resvex, days = [ startdt.date() ] ))
+        nbResvs = len(ReservationBase.getReservations(resvExample=resvex, days=[startdt.date()]))
         resvex.usesAVC = True
-        nbAVResvs = len(ReservationBase.getReservations( resvExample = resvex, days = [ startdt.date() ] ))
+        nbAVResvs = len(ReservationBase.getReservations(resvExample=resvex, days=[startdt.date()]))
         resvex.needsAVCSupport = True
         resvex.needsAssistance = False
-        nbAVResvsWithSupport = len(ReservationBase.getReservations( resvExample = resvex, days = [ startdt.date() ] ))
+        nbAVResvsWithSupport = len(ReservationBase.getReservations(resvExample=resvex, days=[startdt.date()]))
 
         self._createIndicator(XG, "nbbookings", "total number of bookings for today", nbResvs)
-        self._createIndicator(XG, "nbvc", "number of remote collaboration bookings (video or phone conference)", nbAVResvs)
-        self._createIndicator(XG, "nbvcsupport", "number of remote collaboration bookings with planned IT support", nbAVResvsWithSupport)
+        self._createIndicator(XG, "nbvc", "number of remote collaboration bookings (video or phone conference)",
+                              nbAVResvs)
+        self._createIndicator(XG, "nbvcsupport", "number of remote collaboration bookings with planned IT support",
+                              nbAVResvsWithSupport)
 
         XG.closeTag("response")
         return XG.getXml()

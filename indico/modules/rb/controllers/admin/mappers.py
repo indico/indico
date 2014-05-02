@@ -20,14 +20,13 @@
 
 from MaKaC import roomMapping
 from MaKaC.webinterface import locators, urlHandlers
-from MaKaC.webinterface.pages import admins as adminPages
 
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 from indico.core.errors import AccessError
 from indico.util.i18n import _
 
-from ...views.admin import mappers as mapper_views
+from indico.modules.rb.views.admin import mappers as mapper_views
 
 
 class RHRoomMapperProtected(RHAdminBase):
@@ -39,7 +38,6 @@ class RHRoomMapperProtected(RHAdminBase):
 
 
 class RHRoomMapperBase(RHRoomMapperProtected):
-
     def _checkParams(self, params):
         RHRoomMapperProtected._checkParams(self, params)
         self._roomMapper = locators.RoomMapperWebLocator(params).getObject()
@@ -71,7 +69,7 @@ class RHRoomMapperPerformCreation(RHRoomMapperProtected):
         rm = roomMapping.RoomMapper()
         rm.setValues(self._getRequestParams())
         roomMapping.RoomMapperHolder().add(rm)
-        self._redirect( urlHandlers.UHRoomMapperDetails.getURL(rm))
+        self._redirect(urlHandlers.UHRoomMapperDetails.getURL(rm))
 
 
 class RHRoomMapperDetails(RHRoomMapperBase):
