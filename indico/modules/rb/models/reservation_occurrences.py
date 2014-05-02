@@ -24,15 +24,10 @@ Sent notifications of a reservation
 from datetime import datetime
 
 from dateutil import rrule
-from sqlalchemy.ext.hybrid import hybrid_property
 
-<<<<<<< HEAD
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
-=======
-from indico.core.db import db, UTCDateTime
 from indico.core.errors import IndicoError
->>>>>>> ReservationOccurrence bulk creation and cleanup
 
 
 class ReservationOccurrence(db.Model):
