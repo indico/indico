@@ -28,6 +28,7 @@ from dateutil import rrule
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.errors import IndicoError
+from indico.util import date_time
 from indico.util.string import return_ascii
 
 
@@ -77,16 +78,6 @@ class ReservationOccurrence(db.Model):
     def date(self):
         return self.start.date()
 
-    def reject(self, reason):
-        self.is_cancelled = True
-        self.rejection_reason = reason
-
-    def notify_rejection(self, reason=''):
-        return self.reservation.notify_rejection(reason, self.date)
-
-    def notify_cancellation(self):
-        return self.reservation.notify_cancellation(self.date)
-
     @classmethod
     def create_series_for_reservation(cls, reservation):
         for o in cls.iter_create_occurrences(reservation.start, reservation.end, reservation.repetition):
@@ -130,3 +121,24 @@ class ReservationOccurrence(db.Model):
             raise IndicoError('Unsupported frequency')
 
         raise IndicoError('Unexpected frequency')
+
+    def overlaps(self, occurrence, skip_self=False):
+        if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
+            return False
+        return date_time.overlaps((self.start, self.end), (occurrence.start, occurrence.end))
+
+    def get_overlap(self, occurrence, skip_self=False):
+        if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
+            return None, None
+        return date_time.get_overlap((self.start, self.end), (occurrence.start, occurrence.end))
+
+    def reject(self, reason):
+        self.is_cancelled = True
+        self.rejection_reason = reason
+
+    def notify_rejection(self, reason=''):
+        return self.reservation.notify_rejection(reason, self.date)
+
+    def notify_cancellation(self):
+        return self.reservation.notify_cancellation(self.date)
+
