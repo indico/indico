@@ -42,7 +42,10 @@
 }
 
 .instance-tracking-settings {
+    float: left;
     width: 500px;
+    margin-right: 120px;
+    margin-bottom: 40px;
 
     .clearfix {
         margin-bottom: 20px;
@@ -77,13 +80,17 @@
             float: left;
         }
 
-        a, input:not(.btn) {
+        a:not(.i-button), input {
             width: 100%;
         }
 
-        .buttons-group {
+        .group {
             float: right;
             width: initial;
+
+            .i-button {
+                margin-left: 5px;
+            }
         }
     }
 
@@ -91,10 +98,10 @@
         @include box-sizing(border-box);
         border: 1px solid #999;
         box-shadow: 0 0 5px rgba(100,100,100,0.3) inset;
-        width: 5em;
+        width: 4em;
         display: inline-block;
         background: #ddd;
-        height: 2.5em;
+        height: 2em;
         cursor: pointer;
         position: relative;
 
@@ -114,7 +121,7 @@
         .toggle::before {
             color: #666;
             display: inline-block;
-            font-size: 1em;
+            font-size: 0.8em;
             content: "OFF";
             line-height: 2.2em;
         }
@@ -124,7 +131,7 @@
                 box-shadow: 0 0 1px rgba(255,255,255,0.8) inset;
                 background-color: $light-blue-logo;
                 border-color: lighten($dark-blue-logo, $color-variation);
-                left: 2.5em;
+                left: 2em;
             }
 
             .toggle::before {
@@ -132,5 +139,27 @@
                 color: #eee !important;
             }
         }
+    }
+}
+
+.out-of-sync {
+    float: left;
+    display: none;
+    margin-left: 20px;
+
+    .group {
+        padding-top: 40px;
+
+        a {
+            float: right;
+        }
+    }
+}
+
+.missing-record-text, .out-of-sync-text {
+    display: none;
+
+    li {
+        display: none;
     }
 }
