@@ -51,10 +51,10 @@
         @include box-sizing(border-box);
         border: 1px solid #999;
         box-shadow: 0 0 5px rgba(100,100,100,0.3) inset;
-        width: 5em;
+        width: 4em;
         display: inline-block;
         background: #ddd;
-        height: 2.5em;
+        height: 2em;
         cursor: pointer;
         position: relative;
 
@@ -74,7 +74,7 @@
         .toggle::before {
             color: #666;
             display: inline-block;
-            font-size: 1em;
+            font-size: 0.8em;
             content: "OFF";
             line-height: 2.2em;
         }
@@ -84,7 +84,7 @@
                 box-shadow: 0 0 1px rgba(255,255,255,0.8) inset;
                 background-color: $light-blue-logo;
                 border-color: lighten($dark-blue-logo, $color-variation);
-                left: 2.5em;
+                left: 2em;
             }
 
             .toggle::before {
