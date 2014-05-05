@@ -91,6 +91,7 @@ class ReservationOccurrence(db.Model):
     def iter_create_occurrences(cls, start, end, repetition):
         for start in cls.iter_start_time(start, end, repetition):
             end = datetime.combine(start.date(), end.time())
+            end = start.tzinfo.localize(end)
             yield ReservationOccurrence(start=start, end=end)
 
     @staticmethod
