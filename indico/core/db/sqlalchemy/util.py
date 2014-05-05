@@ -31,7 +31,7 @@ class IndicoModel(Model):
         joins = kwargs.pop('_join', ())
         if not isinstance(joins, (list, tuple)):
             joins = (joins,)
-        return cls.query.join(*joins).filter(*args).filter_by(**kwargs)
+        return cls.query.filter_by(**kwargs).join(*joins).filter(*args)
 
     @classmethod
     def find_all(cls, *args, **kwargs):
