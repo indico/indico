@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import datetime
 import logging
 import argparse
 import errno
@@ -218,6 +219,9 @@ def setupNamespace(dbi):
     namespace = {'dbi': dbi,
                  'db': db}
 
+    for attr in ('date', 'time', 'datetime', 'timedelta'):
+        add(namespace, getattr(datetime, attr), doc='stdlib datetime.{}'.format(attr), color='yellow')
+
     add(namespace, MaKaC, doc='MaKaC base package')
     add(namespace, Conference)
     add(namespace, Category)
@@ -232,6 +236,7 @@ def setupNamespace(dbi):
     add(namespace, Config)
 
     add(namespace, HelperMaKaCInfo.getMaKaCInfoInstance(), 'minfo', 'MaKaCInfo instance')
+
     for name, cls in sorted(db.Model._decl_class_registry.iteritems(), key=itemgetter(0)):
         if hasattr(cls, '__table__'):
             add(namespace, cls, color='cyan')
