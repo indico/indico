@@ -26,6 +26,7 @@ import signal
 import socket
 import sys
 import werkzeug.serving
+from operator import itemgetter
 from SocketServer import TCPServer
 from werkzeug.debug import DebuggedApplication
 from werkzeug.exceptions import NotFound
@@ -43,7 +44,7 @@ from indico.util import console
 ## indico legacy imports
 import MaKaC
 from indico.core.config import Config
-from indico.core.db import DBMgr
+from indico.core.db import DBMgr, db
 from MaKaC.conference import Conference, Category, ConferenceHolder, CategoryManager
 from MaKaC.user import AvatarHolder, GroupHolder
 from MaKaC.common.info import HelperMaKaCInfo
@@ -75,16 +76,16 @@ except ImportError:
 SHELL_BANNER = console.colored('\nindico {0}\n'.format(MaKaC.__version__), 'yellow')
 
 
-def add(namespace, element, name=None, doc=None):
+def add(namespace, element, name=None, doc=None, color='green'):
 
     if not name:
         name = element.__name__
     namespace[name] = element
 
     if doc:
-        print console.colored('+ {0} : {1}'.format(name, doc), 'green')
+        print console.colored('+ {0} : {1}'.format(name, doc), color)
     else:
-        print console.colored('+ {0}'.format(name), 'green')
+        print console.colored('+ {0}'.format(name), color)
 
 
 def make_indico_dispatcher(wsgi_app):
@@ -214,7 +215,8 @@ class WerkzeugServer(object):
 
 def setupNamespace(dbi):
 
-    namespace = {'dbi': dbi}
+    namespace = {'dbi': dbi,
+                 'db': db}
 
     add(namespace, MaKaC, doc='MaKaC base package')
     add(namespace, Conference)
@@ -230,6 +232,9 @@ def setupNamespace(dbi):
     add(namespace, Config)
 
     add(namespace, HelperMaKaCInfo.getMaKaCInfoInstance(), 'minfo', 'MaKaCInfo instance')
+    for name, cls in sorted(db.Model._decl_class_registry.iteritems(), key=itemgetter(0)):
+        if hasattr(cls, '__table__'):
+            add(namespace, cls, color='cyan')
 
     return namespace
 
