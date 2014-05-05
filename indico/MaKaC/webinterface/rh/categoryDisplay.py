@@ -92,7 +92,13 @@ class RHCategoryStatistics(RHCategDisplayBase):
         wfReg = webFactoryRegistry.WebFactoryRegistry()
         stats = statistics.CategoryStatistics(self._target).getStatistics()
         if request.accept_mimetypes.best_match(('application/json', 'text/html')) == 'application/json':
-            stats = dict(stats)
+            if stats is None:
+                stats = {'events': None,
+                         'contributions': None,
+                         'resources': None,
+                         'updated': None}
+            else:
+                stats = dict(stats)
             if stats['updated']:
                 stats['updated'] = stats['updated'].strftime("%d %B %Y %H:%M")
             return jsonify(stats)

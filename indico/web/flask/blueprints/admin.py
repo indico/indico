@@ -102,6 +102,8 @@ admin.add_url_rule('/protection/ip-acl/remove', 'adminServices-ipbasedacl_farevo
 # Instance Tracking
 admin.add_url_rule('/instance-tracking', 'adminServices-instanceTracking', services.RHInstanceTracking,
                    methods=('GET', 'POST'))
+admin.add_url_rule('/instance-tracking/update', 'adminServices-instanceTrackingUpdate',
+                   services.RHInstanceTrackingUpdate, methods=('POST', ))
 
 # Initial Setup
 admin.add_url_rule('/initial-setup', 'initial-setup', initial_setup.RHInitialSetup, methods=('GET', 'POST'))

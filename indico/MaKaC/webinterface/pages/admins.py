@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
 import os
 import re
 from cgi import escape
@@ -172,6 +173,17 @@ class WAdmins(wcomponents.WTemplated):
                                        'style="float:left; padding-right: 5px">_("News Pages")</a>').format(url, icon)
         wvars['administrators'] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
                                                    key=methodcaller('getStraightFullName')))
+
+        date_now = datetime.now()
+        last_check = minfo.getInstanceTrackingLastCheck()
+        itActive = minfo.isInstanceTrackingActive()
+        check = itActive and (last_check is None or (date_now - last_check).total_seconds() > 24*60*60)
+        wvars["itCheck"] = str(check).lower()
+        wvars["uuid"] = minfo.getInstanceTrackingUUID()
+        wvars["url"] = Config.getInstance().getBaseURL()
+        wvars["contact"] = minfo.getInstanceTrackingContact()
+        wvars["itEmail"] = minfo.getInstanceTrackingEmail()
+        wvars["updateURL"] = Config.getInstance().getTrackerURL() + '/instance/'
         return wvars
 
 
@@ -202,7 +214,8 @@ class WPAdmins(WPAdminsBase):
 
     def _getPageContent(self, params):
         wc = WAdmins()
-        pars = {"GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL()}
+        pars = {"GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL(),
+                "UpdateITURL": url_for("admin.adminServices-instanceTrackingUpdate")}
         return wc.getHTML(pars)
 
 
@@ -1017,6 +1030,11 @@ class WInstanceTracking(wcomponents.WTemplated):
         wvars["postURL"] = url_for('admin.adminServices-instanceTracking')
         wvars["contact"] = minfo.getInstanceTrackingContact()
         wvars["email"] = minfo.getInstanceTrackingEmail()
+        wvars["organisation"] = minfo.getOrganisation()
+        wvars["uuid"] = minfo.getInstanceTrackingUUID()
+        wvars["url"] = Config.getInstance().getBaseURL()
+        wvars["itEnabled"] = str(minfo.isInstanceTrackingActive()).lower()
+        wvars["updateURL"] = Config.getInstance().getTrackerURL() + '/instance/'
         return wvars
 
 
