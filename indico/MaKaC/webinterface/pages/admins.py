@@ -19,7 +19,7 @@
 
 from collections import OrderedDict
 
-import datetime
+from datetime import datetime
 from pytz import timezone
 from MaKaC.fossils.user import IAvatarFossil
 
@@ -201,8 +201,18 @@ class WAdmins(wcomponents.WTemplated):
         wvars["features"] += i18nformat("""<div style="margin-bottom: 5px"><a href="{0}">""".format(url) +
                                         """<img src="{0}" border="0" style="float:left;""".format(icon) +
                                         """ padding-right: 5px">_("News Pages")</a></div>""")
-
         wvars["administrators"] = fossilize(minfo.getAdminList())
+
+        date_now = datetime.now()
+        last_check = minfo.getInstanceTrackingLastCheck()
+        itActive = minfo.isInstanceTrackingActive()
+        check = itActive and (last_check is None or (date_now - last_check).total_seconds() > 24*60*60)
+        wvars["itCheck"] = str(check).lower()
+        wvars["uuid"] = minfo.getInstanceTrackingUUID()
+        wvars["url"] = Config.getInstance().getBaseURL()
+        wvars["contact"] = minfo.getInstanceTrackingContact()
+        wvars["itEmail"] = minfo.getInstanceTrackingEmail()
+        wvars["updateURL"] = Config.getInstance().getTrackerURL() + '/instance/'
 
         return wvars
 
@@ -236,7 +246,8 @@ class WPAdmins(WPAdminsBase):
 
     def _getPageContent(self, params):
         wc = WAdmins()
-        pars = {"GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL()}
+        pars = {"GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL(),
+                "UpdateITURL": url_for("admin.adminServices-instanceTrackingUpdate")}
         return wc.getHTML(pars)
 
 
@@ -1401,7 +1412,7 @@ class WUserDashboard(wcomponents.WTemplated):
         html_vars = wcomponents.WTemplated.getVars(self)
         user = self._avatar
 
-        now = datetime.datetime.now()
+        now = datetime.now()
 
         tzUtil = timezoneUtils.DisplayTZ(self._aw)
         tz = timezone(tzUtil.getDisplayTZ())
@@ -2583,6 +2594,11 @@ class WInstanceTracking(wcomponents.WTemplated):
         wvars["postURL"] = url_for('admin.adminServices-instanceTracking')
         wvars["contact"] = minfo.getInstanceTrackingContact()
         wvars["email"] = minfo.getInstanceTrackingEmail()
+        wvars["organisation"] = minfo.getOrganisation()
+        wvars["uuid"] = minfo.getInstanceTrackingUUID()
+        wvars["url"] = Config.getInstance().getBaseURL()
+        wvars["itEnabled"] = str(minfo.isInstanceTrackingActive()).lower()
+        wvars["updateURL"] = Config.getInstance().getTrackerURL() + '/instance/'
         return wvars
 
 

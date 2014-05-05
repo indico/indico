@@ -25,6 +25,7 @@ from persistent.dict import PersistentDict
 from BTrees import OOBTree
 from indico.core.config import Config
 from indico.core import db
+from datetime import datetime
 
 DEFAULT_PERSISTENT_ENABLE_AGREEMENT = 'Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.'
 DEFAULT_PERSISTENT_DISABLE_AGREEMENT = 'When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'
@@ -38,11 +39,13 @@ DEFAULT_PROTECTION_DISCLAINER_PROTECTED = 'As such, this information is intended
 #the singleton pattern should be applied to this class to ensure that it is
 #   unique, but as Extended classes seem not to support classmethods it will
 #   be done by a helper class. To be migrated when the ZODB4 is released
+
+
 class MaKaCInfo(Persistent):
     """Holds and manages general information and data concerning each system
     """
 
-    def __init__( self ):
+    def __init__(self):
         # server description fields
         self._title = ""
         self._organisation = ""
@@ -75,6 +78,7 @@ class MaKaCInfo(Persistent):
         self._instanceTrackingEmail = ""
         self._instanceTrackingContact = ""
         self._instanceTrackingUUID = ""
+        self._instanceTrackingLastCheck = None
 
         # template set
         self._defaultTemplateSet = None
@@ -171,6 +175,16 @@ class MaKaCInfo(Persistent):
 
     def setInstanceTrackingUUID(self, uuid=""):
         self._instanceTrackingUUID = uuid
+
+    def getInstanceTrackingLastCheck(self):
+        if hasattr(self, "_instanceTrackingLastCheck"):
+            return self._instanceTrackingLastCheck
+        else:
+            self._instanceTrackingLastCheck = None
+            return None
+
+    def updateInstanceTrackingLastCheck(self):
+        self._instanceTrackingLastCheck = datetime.now()
 
     def getNews( self ):
         try:

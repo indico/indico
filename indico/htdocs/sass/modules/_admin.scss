@@ -1,6 +1,7 @@
 @import 'base';
 
 .instance-tracking-settings {
+    float: left;
     width: 500px;
 
     .clearfix {
@@ -90,6 +91,23 @@
                 content: "ON";
                 color: #eee !important;
             }
+        }
+    }
+}
+
+.out-of-sync {
+    float: right;
+    display: none;
+    margin-right: 120px;
+    padding: 40px 40px 10px 40px;
+    border: 1px solid $gray;
+    background-color: $light-gray;
+
+    .buttons-group {
+        padding-top: 40px;
+
+        input {
+            float: right;
         }
     }
 }

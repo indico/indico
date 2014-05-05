@@ -401,7 +401,30 @@ class RHSaveAnalytics(RHServicesBase):
         self._redirect( urlHandlers.UHAnalytics.getURL() )
 
 
-class RHInstanceTracking(RHServicesBase):
+class RHInstanceTrackingBase(RHServicesBase):
+
+    def _update(self):
+        contact = request.form.get('contact', self._minfo.getInstanceTrackingContact())
+        email = request.form.get('email', self._minfo.getInstanceTrackingEmail())
+        uuid = self._minfo.getInstanceTrackingUUID()
+        payload = {'enabled': True,
+                   'url': Config.getInstance().getBaseURL(),
+                   'contact': contact,
+                   'email': email,
+                   'organisation': self._minfo.getOrganisation()}
+        initial_setup.update_instance(uuid, payload)
+
+    def _register(self):
+        contact = request.form.get('contact', self._minfo.getInstanceTrackingContact())
+        email = request.form.get('email', self._minfo.getInstanceTrackingEmail())
+        payload = {'url': Config.getInstance().getBaseURL(),
+                   'contact': contact,
+                   'email': email,
+                   'organisation': self._minfo.getOrganisation()}
+        initial_setup.register_instance(payload)
+
+
+class RHInstanceTracking(RHInstanceTrackingBase):
 
     def _process_GET(self):
         p = adminPages.WPInstanceTracking(self)
@@ -432,4 +455,23 @@ class RHInstanceTracking(RHServicesBase):
                 payload = {'enabled': False}
                 initial_setup.update_instance(uuid, payload)
                 self._minfo.setInstanceTrackingActive(False)
+        elif 'update' in request.form:
+            requestType = request.form['update-it-type']
+            if requestType == 'update':
+                self._update()
+            elif requestType == 'register':
+                self._register()
         self._redirect(url_for("admin.adminServices-instanceTracking"))
+
+
+class RHInstanceTrackingUpdate(RHInstanceTrackingBase):
+
+    def _process(self):
+        self._minfo.updateInstanceTrackingLastCheck()
+        update = request.form['updateIT']
+        if update == 'true':
+            requestType = request.form['updateITType']
+            if requestType == 'update':
+                self._update()
+            elif requestType == 'register':
+                self._register()

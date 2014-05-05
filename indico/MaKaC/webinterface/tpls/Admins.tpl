@@ -19,7 +19,7 @@
       <td bgcolor="white" width="100%" valign="top" class="blacktext">${title}</td>
       <td rowspan="4" valign="top">
         <form action="${ GeneralInfoModifURL }" method="GET">
-        <input type="submit" class="btn" value="${ _("modify")}">
+            <input type="submit" class="btn" value="${ _("modify")}">
         </form>
       </td>
     </tr>
@@ -94,9 +94,48 @@
 
 <script>
 
-var adminListManager = new ListOfUsersManager(null,
-        {'addExisting': 'admin.general.addExistingAdmin', 'remove': 'admin.general.removeAdmin'},
-        {}, $E('inPlaceAdministrators'), "administrator", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
-        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ administrators | n,j});
+    var adminListManager = new ListOfUsersManager(null,
+            {'addExisting': 'admin.general.addExistingAdmin', 'remove': 'admin.general.removeAdmin'},
+            {}, $E('inPlaceAdministrators'), "administrator", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
+            {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ administrators | n,j});
+
+    function showOutOfSyncPopup(type){
+        var popup = new ConfirmPopup("${ _("Instance Tracking data out of sync")}",
+                                     "${ _("Some of your Instance Tracking data seems to be out of sync. Do you want to update these information on the server?")}",
+                                     function(ok){
+                                        var hiddenUpdate = $('#hidden-update');
+                                        hiddenUpdate.val(ok);
+                                        $.ajax({
+                                            url: ${ UpdateITURL | n,j },
+                                            type: "POST",
+                                            data: {
+                                                updateIT: ok,
+                                                updateITType: type
+                                            }
+                                        });
+                                     });
+        popup.open();
+    }
+
+    if (${ itCheck }) {
+        $.ajax({
+            url: "${ updateURL }${ uuid }",
+            type: "GET",
+            dataType: "json",
+            success: function(response){
+                var url = ${ url | n,j };
+                var contact = ${ contact | n,j };
+                var email = ${ itEmail | n,j };
+                var organisation = ${ organisation | n,j };
+
+                if (url != response.url || contact != response.contact || email != response.email || organisation != response.organisation) {
+                    showOutOfSyncPopup('update');
+                }
+            },
+            error: function(){
+                showOutOfSyncPopup('register');
+            }
+        });
+    }
 
 </script>
