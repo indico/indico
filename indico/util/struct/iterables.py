@@ -17,20 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Special iterators.
-"""
+from itertools import groupby
 
-class SortedDictIterator:
-    """Iterator for looping a dictionary in sorted order."""
 
-    def __init__(self, data, reverse=False):
-        # TODO Python 3 doesn't support iteritems(), use items() instead.
-        # items() in Python 2 returns a list and in Python 3 an iterator.
-        self.it = iter(sorted(data.iteritems(), reverse=reverse))
-
-    def __iter__(self):
-        return self.it
-
-    def next(self):
-        return self.it.next()
+def group_list(data, key=None, sort_by=None):
+    return {group: sorted(list(items), key=sort_by) for group, items in groupby(sorted(data, key=key), key=key)}

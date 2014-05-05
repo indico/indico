@@ -96,7 +96,7 @@ class LogItem(Persistent) :
         information to be shown.
         """
         info_list = []
-        for entry in iterators.SortedDictIterator(self._logInfo):
+        for entry in sorted(self._logInfo.items(), reverse=True):
             if (entry[0] != "subject"):
                 caption = entry[0]
                 value = entry[1]

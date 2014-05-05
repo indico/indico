@@ -176,21 +176,6 @@ def getNewDictOnlyWith(d, keys=[], **kw):
     return kw
 
 
-def barsList2Dictionary(bars):
-    """
-    Converts:
-    list of bars => dictionary of bars, key = datetime, value = list of bars
-    """
-    h = {}
-    for bar in bars:
-        d = bar.start_date.date()
-        if d in h:
-            h[d].append(bar)
-        else:
-            h[d] = [bar]
-    return h
-
-
 def addOverlappingPrebookings(bars):
     """
     Adds bars representing overlapping pre-bookings.
