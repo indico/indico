@@ -170,7 +170,7 @@ def minDatetime():
 
 class DisplayTZ:
 
-    def __init__(self, aw, conf=None, useServerTZ=0):
+    def __init__(self, aw=None, conf=None, useServerTZ=0):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         sessTimezone = session.timezone
         if sessTimezone == 'LOCAL':
