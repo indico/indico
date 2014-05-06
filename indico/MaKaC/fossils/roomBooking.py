@@ -130,42 +130,5 @@ class IReservationFossil(IFossil):
         """ Reason of the reservation """
 
 
-class IBarFossil(IFossil):
-    """ Fossil interafce for reservation bar """
-
-    def startDT(self):
-        """ Start date/time """
-    startDT.convert = Conversion.datetime
-
-    def endDT(self):
-        """ End date/time """
-    endDT.convert = Conversion.datetime
-
-    def type(self):
-        """ Type of bar (booking, pre-booking, conflict etc.) """
-
-    def forReservation(self):
-        """ Reservation out of which bar was created """
-    forReservation.result = IReservationFossil
-
-    def getBlocking(self):
-        pass
-    getBlocking.produce = lambda x: {'id': x.forReservation.getBlockingId(datetime.date(x.startDT)),
-                                     'creator': x.forReservation.getBlockingCreator(datetime.date(x.startDT)),
-                                     'message': x.forReservation.getBlockingMessage(datetime.date(x.startDT))}
-
-
 class IRoomCalendarFossil(IRoomFossil):
     pass
-
-
-class IRoomBarFossil(IFossil):
-    """ Fossil interaface for RoomBar """
-
-    def room(self):
-        """ Room fossil """
-    room.result = IRoomCalendarFossil
-
-    def bars(self):
-        """ List of bars (bookings) """
-    bars.result = IBarFossil

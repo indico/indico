@@ -17,10 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import time
-
-from MaKaC.webinterface import urlHandlers as UH
 from indico.modules.rb.models.utils import Serializer
+from MaKaC.webinterface import urlHandlers as UH
 
 
 class Bar(Serializer):
@@ -39,17 +37,16 @@ class Bar(Serializer):
         UNAVAILABLE: 'unavailable'          # A confirmed reservation
     }
 
-    def __init__(self, start_time, end_time, kind=CANDIDATE, reservation=None, blocking=None):
-        self.date = start_time.date()
-        self.start_time = start_time
-        self.end_time = end_time
+    def __init__(self, start, end, kind=CANDIDATE, reservation=None, overlapping=False, blocking=None):
+        self.start = start
+        self.end = end
+        self.reservation = reservation
 
         if reservation is not None:
-            self.reservation_id = reservation.id
-            self.booked_for_name = reservation.booked_for_name
-            self.reservation_reason = reservation.booking_reason
-            self.reservation_location = reservation.room.location.name
-            kind = Bar.UNAVAILABLE if reservation.is_confirmed else Bar.PREBOOKED
+            if not overlapping:
+                kind = Bar.UNAVAILABLE if reservation.is_confirmed else Bar.PREBOOKED
+            else:
+                kind = Bar.CONFLICT if reservation.is_confirmed else Bar.PRECONFLICT
 
         self.kind = kind
         self.blocking = blocking
@@ -59,18 +56,18 @@ class Bar(Serializer):
 
     def __repr__(self):
         return '<Bar({0}, {1}, {2}, {3}, {4})>'.format(
-            self.date,
-            self.start_time.strftime('%H:%M'),
-            self.end_time.strftime('%H:%M'),
-            self.reservation_id,
+            self.start.date(),
+            self.start.strftime('%H:%M'),
+            self.end.strftime('%H:%M'),
+            self.reservation.id,
             self._mapping[self.kind]
         )
 
     @classmethod
     def from_occurrence(cls, occurrence):
         return cls(
-            start_time=occurrence.start,
-            end_time=occurrence.end,
+            start=occurrence.start,
+            end=occurrence.end,
             reservation=occurrence.reservation)
 
     @staticmethod
@@ -92,32 +89,43 @@ class Bar(Serializer):
             else:
                 return Bar.PRECONCURRENT
 
-    def get_time(self, attr):
-        return {
-            'date': self.date,
-            'tz': None,
-            'time': time.strftime(getattr(self, attr), '%H:%M')
-        }
+    @property
+    def date(self):
+        return self.start.date()
 
     @property
     def forReservation(self):
-        return {
-            'id': self.reservation_id,
-            'bookedForName': self.booked_for_name,
-            'reason': self.reservation_reason,
-            'bookingUrl': UH.UHRoomBookingBookingDetails.getURL(
-                roomLocation=self.reservation_location,
-                resvID=self.reservation_id
-            ) if self.reservation_id else None
-        }
+        if not self.reservation:
+            return None
+        else:
+            return {
+                'id': self.reservation.id,
+                'bookedForName': self.reservation.booked_for_name,
+                'reason': self.reservation.booking_reason,
+                'bookingUrl': UH.UHRoomBookingBookingDetails.getURL(
+                    roomLocation=self.reservation.room.location.name,
+                    resvID=self.reservation.id
+                )
+            }
+
+    @property
+    def importance(self):
+        return self.kind
 
     @property
     def startDT(self):
-        return self.get_time('start_time')
+        return self.get_datetime('start')
 
     @property
     def endDT(self):
-        return self.get_time('end_time')
+        return self.get_datetime('end')
+
+    def get_datetime(self, attr):
+        return {
+            'date': self.start.date(),
+            'tz': None,
+            'time': getattr(self, attr).strftime('%H:%M')
+        }
 
 
 class BlockingDetailsForBars(Serializer):
@@ -174,111 +182,6 @@ def getNewDictOnlyWith(d, keys=[], **kw):
         if k in d:
             kw[k] = d[k]
     return kw
-
-
-def addOverlappingPrebookings(bars):
-    """
-    Adds bars representing overlapping pre-bookings.
-    Returns new bars dictionary.
-    """
-
-    # For each day
-    for dt in bars.keys():
-        dayBars = bars[dt]
-
-        # For each (prebooked) bar i
-        for i in xrange(0, len(dayBars)):
-            bar = dayBars[i]
-            if bar.type == Bar.PREBOOKED:
-
-                # For each (prebooked) bar j
-                for j in xrange(i + 1, len(dayBars)):
-                    collCand = dayBars[j]
-                    if collCand.type == Bar.PREBOOKED:
-
-                        # If there is an overlap, add PRECONCURRENT bar
-                        over = overlap(bar.startDT, bar.endDT, collCand.startDT, collCand.endDT)
-                        if (over and bar.forReservation.room == collCand.forReservation.room
-                                and collCand.forReservation != bar.forReservation):
-                            collision = Collision(over, collCand.forReservation)
-                            dayBars.append(Bar(collision, Bar.PRECONCURRENT))
-
-        bars[dt] = dayBars  # With added concurrent prebooking bars
-
-    return bars
-
-
-def sortBarsByImportance(bars, calendarStartDT, calendarEndDT):
-    """
-    Moves conflict bars to the end of the list,
-    so they will be drawn last and therefore be visible.
-
-    Returns sorted bars.
-    """
-    for dt in bars.keys():
-        dayBars = bars[dt]
-        dayBars.sort()
-        bars[dt] = dayBars
-
-    for day in iterdays(calendarStartDT, calendarEndDT):
-        bars.setdefault(day.date(), [])
-
-    return bars
-
-
-def getRoomBarsList(rooms):
-    roomBarsList = []
-    if rooms is None:
-        rooms = []
-    for room in rooms:
-        roomBarsList.append(RoomBars(room, []))
-    roomBarsList.sort()
-    return roomBarsList
-
-
-def introduceRooms(rooms, dayBarsDic, calendarStartDT, calendarEndDT,
-                   showEmptyDays=True, showEmptyRooms=True, user=None):
-    # Input:
-    # dayBarsDic is a dictionary date => [bar1, bar2, bar3, ...]
-    #
-    # Output:
-    # newDayBarsDic is a dictionary date => [roomBars1, roomBars2, roomBars3, ...],
-    # where roomBars is object JSON:{ room: RoomBase, bars: [bar1, bar2, bar3, ...] }
-    #import copy
-    #cleanRoomBarsList = getRoomBarsList(rooms)
-    newDayBarsDic = {}
-
-    for day in iterdays(calendarStartDT, calendarEndDT):
-        dayBars = dayBarsDic[day.date()]
-        roomBarsDic = {}
-        for bar in dayBars:
-            # bar.canReject = False
-            # bar.canReject = bar.forReservation.id is not None and bar.forReservation.canReject(user)
-            # if bar.forReservation.repeatability != None:
-            #     bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBookingOccurrence
-            #                                    .getURL(bar.forReservation, formatDate(bar.startDT.date())))
-            # else:
-            #     bar.rejectURL = str(urlHandlers.UHRoomBookingRejectBooking.getURL(bar.forReservation))
-            room = bar.forReservation.room
-            if not room in roomBarsDic:
-                roomBarsDic[room] = []
-            # Bars order should be preserved
-            roomBarsDic[room].append(bar)
-
-        if showEmptyRooms:
-            dayRoomBarsList = getRoomBarsList(rooms)  # copy.copy(cleanRoomBarsList)
-
-            for roomBar in dayRoomBarsList:
-                roomBar.bars = roomBarsDic.get(roomBar.room, [])
-        else:
-            dayRoomBarsList = []
-            for room in roomBarsDic.keys():
-                dayRoomBarsList.append(RoomBars(room, roomBarsDic[room]))
-
-        if showEmptyDays or len(dayBars) > 0:
-            newDayBarsDic[day.date()] = dayRoomBarsList
-
-    return newDayBarsDic
 
 
 def getDayAttrsForRoom(dayDT, room):
