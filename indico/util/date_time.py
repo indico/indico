@@ -28,6 +28,10 @@ from babel.dates import format_time as _format_time
 from babel.dates import format_date as _format_date
 from babel.dates import format_timedelta as _format_timedelta
 from babel.numbers import format_number as _format_number
+from dateutil.rrule import rrule, DAILY
+
+from MaKaC.common.timezoneUtils import nowutc
+from indico.util.i18n import currentLocale
 
 from indico.util.i18n import currentLocale
 from MaKaC.common import HelperMaKaCInfo
@@ -190,3 +194,7 @@ def get_overlap(range1, range2):
     earliest_end = min(end1, end2)
 
     return latest_start, earliest_end
+
+
+def iterdays(start, end):
+    return rrule(DAILY, dtstart=start, until=end)

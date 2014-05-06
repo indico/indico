@@ -39,6 +39,7 @@ from MaKaC.accessControl import AdminList
 from MaKaC.plugins.base import PluginsHolder
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
+from indico.util.date_time import iterdays
 from indico.util.i18n import _
 
 
@@ -301,21 +302,6 @@ def strip_if_unicode(e):
 
 def get_checked_param_dict(f, params, converter=unicode):
     return dict((k, strip_if_unicode(f.get(k, type=converter))) for k in params)
-
-
-def iterdays(start, end):
-    """
-    Iterate days between two dates:
-    Example:
-    for day in iterdays(datetime.now(), datetime.now() + timedelta(21)):
-        pass
-    """
-    for day in range((end - start).days + 1):
-        yield start + timedelta(day)
-
-
-def iterdaysByUtil(start, end):
-    return rrule(DAILY, dtstart=start, until=end)
 
 
 def is_weekend(d):

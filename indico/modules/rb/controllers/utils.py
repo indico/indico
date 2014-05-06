@@ -24,6 +24,7 @@ Small functions and classes widely used in Room Booking Module.
 import time
 from datetime import datetime, timedelta
 
+from indico.util.date_time import iterdays
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.accessControl import AdminList
 from MaKaC import user as user_mod
@@ -253,21 +254,6 @@ def __overlapTimes(startT1, endT1, startT2, endT2):
         return startT1, endT1
 
     return __overlapTimes(startT2, endT2, startT1, endT1)
-
-
-def iterdays(first, last):
-    """
-    Iterate days between two dates:
-    Example:
-    for day in iterdays(datetime.now(), datetime.now() + timedelta(21)):
-        pass
-    """
-    if not isinstance(first, datetime):
-        raise TypeError('pass datetime')  # first = datetime(first.year, first.month, first.day)
-    if not isinstance(last, datetime):
-        raise TypeError('pass datetime')  # last = datetime(last.year, last.month, last.day)
-    for day in range((last - first).days + 1):
-        yield first + timedelta(day)
 
 
 def weekNumber(dt):
