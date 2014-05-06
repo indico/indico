@@ -112,9 +112,9 @@ def checkAK(apiKey, signature, timestamp, path, query):
     onlyPublic = False
     if signature:
         validateSignature(ak, minfo, signature, timestamp, path, query)
-    elif apiMode in (API_MODE_SIGNED, API_MODE_ALL_SIGNED):
+    elif apiMode == API_MODE_ALL_SIGNED:
         raise HTTPAPIError('Signature missing', 403)
-    elif apiMode == API_MODE_ONLYKEY_SIGNED:
+    elif apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED):
         onlyPublic = True
     return ak, onlyPublic
 
