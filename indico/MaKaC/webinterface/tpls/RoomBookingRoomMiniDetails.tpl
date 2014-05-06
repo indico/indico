@@ -39,14 +39,14 @@
                     </td>
                 </tr>
 
-                % if room._photo_id != 'NoPhoto':
+                % if room.photo_id is not None:
                 <tr>
                     <td class="subFieldWidth" align="right" valign="top">
                         ${ _('Interior') }&nbsp;&nbsp;
                     </td>
                     <td align="left" class="thumbnail">
-                        <a href="${ room.large_photo_url }" nofollow="lightbox" title="${ room._photo_id }">
-                            <img border="1px" src="${ room.small_photo_url }" alt="${ str(room._photo_id) }"/>
+                        <a href="${ room.large_photo_url }" nofollow="lightbox" title="${ room.photo_id }">
+                            <img border="1px" src="${ room.small_photo_url }" alt="${ _('Room picture') }"/>
                         </a>
                     </td>
                 </tr>
