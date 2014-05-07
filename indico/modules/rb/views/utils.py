@@ -102,10 +102,10 @@ class Bar(Serializer):
                 'id': self.reservation.id,
                 'bookedForName': self.reservation.booked_for_name,
                 'reason': self.reservation.booking_reason,
-                'bookingUrl': UH.UHRoomBookingBookingDetails.getURL(
+                'bookingUrl': str(UH.UHRoomBookingBookingDetails.getURL(
                     roomLocation=self.reservation.room.location.name,
                     resvID=self.reservation.id
-                )
+                ))
             }
 
     @property
@@ -122,7 +122,7 @@ class Bar(Serializer):
 
     def get_datetime(self, attr):
         return {
-            'date': self.start.date(),
+            'date': str(self.start.date()),
             'tz': None,
             'time': getattr(self, attr).strftime('%H:%M')
         }

@@ -61,7 +61,6 @@ type ("RoomBookingRoom", [],
 
                 var ignSession = any(ignoreSession, false);
                 var urlParams = {
-                    roomLocation: this.location,
                     roomID: this.id,
                     ignoreSession: 1,
                     repeatability: repeatability
@@ -114,16 +113,7 @@ type ("RoomBookingRoom", [],
                 }
                 return build_url(Indico.Urls.RoomBookingForm, urlParams);
             },
-            /**
-             * Returns room details url.
-             */
-            getDetailsUrl: function(){
-                return build_url(Indico.Urls.RoomBookingDetails, {
-                    roomLocation: this.location,
-                    roomID: this.id,
-                    calendarMonths: 'True'
-                });
-            },
+
             /**
              * Gets full name of the room ( building-floor-roomNumber and roomName), wrapped in Div.
              * @param {bool} breakLine if true there will be a breakline between room number and room name
@@ -135,6 +125,7 @@ type ("RoomBookingRoom", [],
                 else
                     return fullName + " (" + this.name + ")";
             },
+
             /**
              * Gets full name of the room ( building-floor-roomNumber and roomName), wrapped in Div.
              * @param {bool} breakLine if true there will be a breakline between room number and room name
@@ -147,20 +138,19 @@ type ("RoomBookingRoom", [],
                     return Html.div({},fullName, breakLine?Html.br():"", Html.small({}, "(" + this.name + ")"));
             }
         },
-        function(roomData, date){
-            this.number = roomData["roomNr"];
-            this.floor = roomData["floor"];
-            this.building = roomData["building"];
-            this.name = roomData["name"];
-            this.type = roomData["type"];
-            this.bookingUrl = build_url(roomData['bookingUrl'], {
-                day: date.substring(8,10),
-                month: date.substring(5,7),
-                year: date.substring(0,4),
+        function(roomData, date) {
+            this.id = roomData.id;
+            this.number = roomData.number;
+            this.floor = roomData.floor;
+            this.building = roomData.building;
+            this.name = roomData.name;
+            this.type = roomData.kind;
+            this.bookingUrl = build_url(roomData.booking_url, {
+                day: date.substring(8, 10),
+                month: date.substring(5, 7),
+                year: date.substring(0, 4),
                 ignoreSession: 1
             });
-            this.id = roomData["id"];
-            this.location = roomData["locationName"];
         });
 
 /**
@@ -172,16 +162,21 @@ type ("RoomBookingCalendarBar", [],
         {},
         function(barInfo, room){
             this.room = room;
-            this.startDT = IndicoUtil.parseJsonDate(barInfo["startDT"]);
-            this.endDT = IndicoUtil.parseJsonDate(barInfo["endDT"]);
-            this.canReject = barInfo["canReject"];
-            this.rejectURL = barInfo["rejectURL"];
-            this.reason = barInfo["forReservation"]["reason"];
-            this.owner = barInfo["forReservation"]["bookedForName"];
-            this.bookingUrl = barInfo["forReservation"]["bookingUrl"];
-            this.inDB = barInfo.forReservation.id !== null;
-            this.blocking = barInfo["blocking"];
-            this.type = barClasses[parseInt(barInfo["type"])];
+            this.startDT = IndicoUtil.parseJsonDate(barInfo.startDT);
+            this.endDT = IndicoUtil.parseJsonDate(barInfo.endDT);
+            // TODO missing canReject and rejectURL
+            this.canReject = barInfo.canReject;
+            this.rejectURL = barInfo.rejectURL;
+            if (barInfo.forReservation) {
+                this.reason = barInfo.forReservation.reason;
+                this.owner = barInfo.forReservation.bookedForName;
+                this.bookingUrl = barInfo.forReservation.bookingUrl;
+                this.inDB = barInfo.forReservation.id !== null;
+            } else {
+                this.inDB = false;
+            }
+            this.blocking = barInfo.blocking;
+            this.type = barClasses[parseInt(barInfo.type)];
         }
         );
 
@@ -199,18 +194,18 @@ type ("RoomBookingCalendarRoom", [],
                 return this.bars;
             }
         },
-        function(roomInfo, date, empty){
+        function(roomInfo, date, empty) {
             var self = this;
             this.bars = [];
             this.date = date;
-            if(!empty){
-                this.room = new RoomBookingRoom(roomInfo["room"], date);
+            if(!empty) {
+                this.room = new RoomBookingRoom(roomInfo.room, date);
                 each(roomInfo.bars,
-                    function(bar){
+                    function(bar) {
                         self.bars.push(new RoomBookingCalendarBar(bar, self.room));
                 });
             } else {
-                this.room = new RoomBookingRoom(roomInfo, date);
+                this.room = new RoomBookingRoom(roomInfo.room, date);
             }
         }
         );
@@ -273,7 +268,7 @@ type ("RoomBookingCalendarData", [],
                 return this.dayAttrs[day.date].tooltip || '';
             }
         },
-        function(reservationBars, dayAttrs, repeatability, finishDate, flexibleDatesRange, dayLimit, overload){
+        function(reservationBars, dayAttrs, repeatability, finishDate, flexibleDatesRange, dayLimit, overload) {
             this.days = [];
             this.dayAttrs = dayAttrs;
             this.repeatability = repeatability;
@@ -683,7 +678,7 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
             drawHeader: function(){
                 if( this.room )
                     var singleDayHeader = Html.div({className:"bookingTitle", style:{marginBottom: pixels(20), marginTop: pixels(18)}}, Html.span({className:"groupTitle bookingTitle", style:{borderBottom: pixels(0), paddingTop: pixels(0)}},
-                                          $T("Availability for "), this.data.days[0].rooms[0].room.getFullName(false)), Html.a({href:this.room.getDetailsUrl(), style:{paddingLeft: pixels(5), fontSize:"x-small"}}, $T("( show 3 months preview )" )));
+                                          $T("Availability for "), this.data.days[0].rooms[0].room.getFullName(false)), Html.a({href:this.room.details_url, style:{paddingLeft: pixels(5), fontSize:"x-small"}}, $T("( show 3 months preview )" )));
                 return Html.div({}, singleDayHeader, calendarLegend, this.RoomBookingCalendarDrawer.prototype.drawHeader.call(this));
             },
             /**
@@ -1151,15 +1146,15 @@ type ("RoomBookingCalendar", [],
             }
         },
 
-        function(reservationBars, dayAttrs, dayLimit, overload, prevNextBarArgs, manyRooms, repeatability, finishDate, flexibleDatesRange, rejectAllLink){
-           this.data = new RoomBookingCalendarData(reservationBars, dayAttrs, repeatability, finishDate, flexibleDatesRange, dayLimit, overload);
-           this.prevNextBarArgs = prevNextBarArgs;
-           if(manyRooms || (prevNextBarArgs && prevNextBarArgs.newBooking)) {
-               this.roomBookingCalendarContent = new RoomBookingManyRoomsCalendarDrawer(this.data);
-           }
-           else {
-               this.roomBookingCalendarContent = new RoomBookingSingleRoomCalendarDrawer(this.data);
-           }
-           this.roomBookingCalendarSummary = new RoomBookingCalendarSummaryDrawer(this.data, rejectAllLink);
+        function(reservationBars, dayAttrs, dayLimit, overload, prevNextBarArgs, manyRooms, repeatability, finishDate, flexibleDatesRange, rejectAllLink) {
+            this.data = new RoomBookingCalendarData(reservationBars, dayAttrs, repeatability, finishDate, flexibleDatesRange, dayLimit, overload);
+            this.prevNextBarArgs = prevNextBarArgs;
+            if(manyRooms || (prevNextBarArgs && prevNextBarArgs.newBooking)) {
+                this.roomBookingCalendarContent = new RoomBookingManyRoomsCalendarDrawer(this.data);
+            }
+            else {
+                this.roomBookingCalendarContent = new RoomBookingSingleRoomCalendarDrawer(this.data);
+            }
+            this.roomBookingCalendarSummary = new RoomBookingCalendarSummaryDrawer(this.data, rejectAllLink);
         }
 );

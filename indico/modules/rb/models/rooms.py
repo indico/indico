@@ -74,7 +74,7 @@ class Room(db.Model, Serializer):
     ]
 
     __calendar_public__ = [
-        'id', 'building', 'name', 'floor', 'number', 'kind', 'booking_url'
+        'id', 'building', 'name', 'floor', 'number', 'kind', 'booking_url', 'details_url'
     ]
 
     # columns
