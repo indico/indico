@@ -17,16 +17,19 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from ast import literal_eval
 from datetime import datetime
+
 from flask import request, session
 
 from indico.core.errors import IndicoError, FormValuesError
 from indico.util.i18n import _
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.controllers.forms import BookingForm, BookingListForm
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.utils import getRoomBookingOption
 from indico.modules.rb.views.user import reservations as reservation_views
-from indico.modules.rb.controllers.forms import BookingForm, BookingListForm
 
 
 class RHRoomBookingBookRoom(RHRoomBookingBase):
@@ -102,16 +105,20 @@ class RHRoomBookingBookingList(RHRoomBookingBase):
 class RHRoomBookingBookingForm(RHRoomBookingBase):
     def _checkParams(self):
         self._form = BookingForm()
-        if self._form.is_submitted():
+        self._room = Room.getRoomById(int(request.values.get('roomID')))
+        self._infoBookingMode = 'infoBookingMode' in request.values
+        self._requireRealUsers = getRoomBookingOption('bookingsForRealUsers')
+        self._isAssistenceEmailSetup = getRoomBookingOption('assistanceNotificationEmails')
+        self._isModif = False
+
+        if not self._form.is_submitted():
+            self.__populate_form(request)
+        else:
             if 'resvID' in request.view_args:  # modification
+                self._isModif = True
                 if self._form.validate_on_submit():
                     self._reservation = Reservation()
                     self._form.populate_obj(self._reservation)
-                else:
-                    pass
-
-                    # self._requireRealUsers = getRoomBookingOption('bookingsForRealUsers')
-                    # self._isAssistenceEmailSetup = getRoomBookingOption('assistanceNotificationEmails')
 
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
@@ -131,6 +138,41 @@ class RHRoomBookingBookingForm(RHRoomBookingBase):
     def _process(self):
         self._rooms = Room.find_all()
         return reservation_views.WPRoomBookingBookingForm(self).display()
+
+    def __populate_form(self, request):
+        sDT = {
+            'day': request.values.get('day', datetime.now().day),
+            'month': request.values.get('month', datetime.now().month),
+            'year': request.values.get('year', datetime.now().year)}
+        eDT = {
+            'day': request.values.get('dayEnd', datetime.now().day),
+            'month': request.values.get('monthEnd', datetime.now().month),
+            'year': request.values.get('yearEnd', datetime.now().year)}
+        sTime = {
+            'hour': request.values.get('hour', 8),
+            'minute': request.values.get('minute', 30)}
+        eTime = {
+            'hour': request.values.get('hourEnd', 17),
+            'minute': request.values.get('minuteEnd', 30)}
+        repeatability = request.values.get('repeatability')
+
+        for data in [sDT, sTime, eDT, eTime]:
+            for k, v in data.iteritems():
+                data[k] = int(v) if v is not None else v
+
+        self._form.start_date.data = datetime(sDT['year'], sDT['month'], sDT['day'], sTime['hour'], sTime['minute'])
+        self._form.end_date.data = datetime(eDT['year'], eDT['month'], eDT['day'], eTime['hour'], eTime['minute'])
+
+        try:
+            repeatability = literal_eval(repeatability)
+            if len(repeatability) == 2:
+                self._form.repeat_unit.data = int(repeatability[0])
+                self._form.repeat_step.data = int(repeatability[1])
+            else:
+                raise ValueError('Wrong repeatition, expecting (interval, frequency)')
+        except ValueError:
+            self._form.repeat_unit.data = 0
+            self._form.repeat_step.data = 0
 
 
 class RHRoomBookingSaveBooking(RHRoomBookingBase):
