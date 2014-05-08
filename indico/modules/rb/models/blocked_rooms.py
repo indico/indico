@@ -32,23 +32,17 @@ from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.notifications.blockings import blocking_processed
 from indico.util.date_time import as_utc, format_date
 from indico.util.string import return_ascii
+from indico.util.struct.enum import TitledIntEnum
 
 
 class BlockedRoom(db.Model):
     __tablename__ = 'blocked_rooms'
 
-    # states
-    PENDING, ACCEPTED, REJECTED = xrange(3)
-    STATE_NAMES = {  # human-friendly
-        PENDING: 'Pending',
-        ACCEPTED: 'Accepted',
-        REJECTED: 'Rejected'
-    }
-    STATES = {  # url-friendly
-        'pending': PENDING,
-        'accepted': ACCEPTED,
-        'rejected': REJECTED
-    }
+    class State(TitledIntEnum):
+        __titles__ = ['Pending', 'Accepted', 'Rejected']
+        pending = 0
+        accepted = 1
+        rejected = 2
 
     # columns
     id = db.Column(
@@ -58,7 +52,7 @@ class BlockedRoom(db.Model):
     state = db.Column(
         db.SmallInteger,
         nullable=False,
-        default=PENDING
+        default=State.pending
     )
     rejected_by = db.Column(
         db.String
@@ -79,11 +73,11 @@ class BlockedRoom(db.Model):
 
     @property
     def state_name(self):
-        return self.STATE_NAMES[self.state]
+        return self.State(self.state).title
 
     def reject(self, user=None, reason=None):
         """Reject the room blocking."""
-        self.state = self.REJECTED
+        self.state = self.State.rejected
         if reason:
             self.rejection_reason = reason
         if user:
@@ -92,7 +86,7 @@ class BlockedRoom(db.Model):
 
     def approve(self, notify_blocker=True):
         """Approve the room blocking, rejecting all colliding reservations/occurrences."""
-        self.state = self.ACCEPTED
+        self.state = self.State.accepted
 
         # Get colliding reservations
         start_dt = as_utc(datetime.combine(self.blocking.start_date, time()))

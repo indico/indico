@@ -92,9 +92,9 @@
                                                 <td><a href="${ urlHandlers.UHRoomBookingRoomDetails.getURL(rb.room) }">${ rb.room.getFullName() }</a></td>
                                                 <td>
                                                     ${ rb.state_name }
-                                                    % if rb.state == rb.PENDING:
+                                                    % if rb.state == rb.State.pending:
                                                       ${inlineContextHelp(_("This blocking has to be approved by the room owner first."))}
-                                                    % elif rb.state == rb.REJECTED:
+                                                    % elif rb.state == rb.State.rejected:
                                                       by <b>${ rb.rejected_by }</b>: ${ rb.rejection_reason }
                                                     % endif
                                                 </td>

@@ -180,7 +180,7 @@ class RHRoomBookingBlockingsForMyRooms(RHRoomBookingBase):
         self.state = request.args.get('state')
 
     def _process(self):
-        state = BlockedRoom.STATES.get(self.state)
+        state = BlockedRoom.State.get(self.state)
         my_blocks = defaultdict(list)
         for room in self._getUser().getRooms():
             roomBlocks = room.blocked_rooms.filter(True if state is None else BlockedRoom.state == state).all()

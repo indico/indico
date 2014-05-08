@@ -60,3 +60,4 @@ sadisplay==0.3.8dev
 sqlalchemy-schemadisplay==1.1
 zope.sqlalchemy==0.7.4
 Whoosh==2.6.0
+enum34==1.0

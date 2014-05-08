@@ -44,7 +44,7 @@
                     <td>
                       <a href="${ url_for('rooms.blocking_details', blocking_id=str(rb.blocking.id)) }">Details</a>
                       <span class="js-process">
-                        % if rb.state == rb.PENDING:
+                        % if rb.state == rb.State.pending:
                           [<a href="#" class="processRoomBlocking" data-action="approve">Approve</a>, <a href="#" class="processRoomBlocking" data-action="reject">Reject</a>]
                         % endif
                       </span>

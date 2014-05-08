@@ -863,7 +863,7 @@ class Room(db.Model, Serializer):
                    .join(BlockedRoom.blocking) \
                    .filter(
                        Blocking.is_active_at(d),
-                       BlockedRoom.state == BlockedRoom.ACCEPTED
+                       BlockedRoom.state == BlockedRoom.State.accepted
                    ) \
                    .first()
 

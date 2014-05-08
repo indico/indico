@@ -30,7 +30,7 @@ def blocking_processed(blocked_room):
     blocking request for a room
     """
     to = blocked_room.blocking.created_by_user.getEmail()
-    verb = 'ACCEPTED' if blocked_room.state == blocked_room.ACCEPTED else 'REJECTED'
+    verb = blocked_room.State(blocked_room.state).title.upper()
     subject = 'Room blocking {}'.format(verb)
     wc = WTemplated('RoomBookingEmail_2BlockingCreatorRequestProcessed')
     text = wc.getHTML({

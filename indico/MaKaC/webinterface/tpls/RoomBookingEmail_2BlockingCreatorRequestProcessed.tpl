@@ -4,7 +4,7 @@ your room blocking request has been ${ verb } by the person responsible for the 
 
 Room: ${ blocked_room.room.getFullName() }
 Action: ${ verb }
-% if blocked_room.state == blocked_room.REJECTED:
+% if blocked_room.state == blocked_room.State.rejected:
 Reason: ${ blocked_room.rejection_reason or '(none)' }
 % endif
 

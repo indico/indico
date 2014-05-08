@@ -359,7 +359,7 @@ class BlockingForm(Form):
 
         overlap = BlockedRoom.find_first(
             BlockedRoom.room_id.in_(field.data),
-            BlockedRoom.state != BlockedRoom.REJECTED,
+            BlockedRoom.state != BlockedRoom.State.rejected,
             Blocking.start_date <= end_date,
             Blocking.end_date >= start_date,
             Blocking.id != blocking_id,
