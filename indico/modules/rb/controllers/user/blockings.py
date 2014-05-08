@@ -25,7 +25,7 @@ from flask import request, session
 from indico.modules.rb.controllers.forms import FormDefaults, BlockingForm, CreateBlockingForm
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.notifications.blocking import request_confirmation
+from indico.modules.rb.notifications.blockings import request_confirmation
 from indico.util.i18n import _
 from indico.core.db import db
 from indico.core.errors import IndicoError
@@ -70,7 +70,7 @@ class RHRoomBookingCreateModifyBlockingBase(RHRoomBookingBase):
             GenericMailer.send(GenericNotification(request_confirmation(owner, self._blocking, rooms)))
 
 
-class RHRoomBookingCreateBlockingCreateModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
+class RHRoomBookingCreateBlocking(RHRoomBookingCreateModifyBlockingBase):
     def _checkParams(self):
         self._form = CreateBlockingForm(start_date=date.today(), end_date=date.today())
         self._blocking = None
@@ -97,7 +97,7 @@ class RHRoomBookingCreateBlockingCreateModifyBlocking(RHRoomBookingCreateModifyB
         self._process_blocked_rooms(blocking.blocked_rooms)
 
 
-class RHRoomBookingModifyBlockingCreateModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
+class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
     def _checkParams(self):
         self._blocking = Blocking.get(request.view_args['blocking_id'])
         if self._blocking is None:

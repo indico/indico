@@ -581,13 +581,6 @@ class Room(db.Model, Serializer):
     def isAvatarResponsibleForRooms(avatar):
         return Room.query.filter_by(owner_id=avatar.id).count() > 0
 
-    @staticmethod
-    def getRoomsOfUser(avatar, only_active=False):
-        q = Room.query.filter_by(owner_id=avatar.getId())
-        if only_active:
-            q = q.filter_by(is_active=True)
-        return q.all()
-
     def getLocationName(self):
         return self.location.name
 

@@ -18,5 +18,5 @@ Booking:
 
 
 You can check booking details here:
-TODO: urlHandlers.UHRoomBookingBookingDetails.getURL(reservation)
+${ reservation.details_url }
 <%include file="RoomBookingEmail_Footer.tpl"/>

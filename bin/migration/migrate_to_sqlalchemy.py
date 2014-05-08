@@ -434,7 +434,7 @@ def migrate_reservations(rb_root):
             occ = ReservationOccurrence(
                 start=convert_date(period.startDT),
                 end=convert_date(period.endDT),
-                is_sent=(d in notifications),
+                is_sent=r.is_cancelled or r.is_rejected or d in notifications,
                 is_cancelled=(d in excluded_days),
                 rejection_reason=(convert_to_unicode(occurrence_rejection_reasons[d])
                                   if d in occurrence_rejection_reasons else None)

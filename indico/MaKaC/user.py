@@ -1060,7 +1060,7 @@ class Avatar(Persistent, Fossilizable):
         user is responsible for.
         """
         from indico.modules.rb.models.rooms import Room  # avoid circular import
-        return Room.getRoomsOfUser(self)
+        return Room.find_all(is_active=True, owner_id=self.getId())
 
     def getReservations(self):
         """

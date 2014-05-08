@@ -29,7 +29,7 @@ from MaKaC.webinterface.mail import GenericNotification
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
-from indico.modules.rb.notifications.blocking import blocking_processed
+from indico.modules.rb.notifications.blockings import blocking_processed
 from indico.util.date_time import as_utc, format_date
 
 

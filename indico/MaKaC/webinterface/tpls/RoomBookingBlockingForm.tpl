@@ -4,18 +4,18 @@
 %>
 
 <div style="width:80%;">
-<h2 class="page-title">
-% if not blocking:
-     ${ _("New Blocking")}
-% else:
-     ${ _("Modify Blocking")}
-% endif
-</h2>
-% if not blocking:
-    <em>When blocking rooms nobody but you, the rooms' managers and those users/groups you specify in the "Allowed users" list will be able to create bookings for the specified rooms in the given timeframe.
-    You can also block rooms you do not own - however, those blockings have to be approved by the owners of those rooms.</em>
-    <br />
-% endif
+    <h2 class="page-title">
+        % if not blocking:
+             ${ _("New Blocking")}
+        % else:
+             ${ _("Modify Blocking")}
+        % endif
+    </h2>
+    % if not blocking:
+        <em>${ _("""When blocking rooms nobody but you, the rooms' managers and those users/groups you specify in the "Allowed users" list will be able to create bookings for the specified rooms in the given timeframe.
+        You can also block rooms you do not own - however, those blockings have to be approved by the owners of those rooms.""") }</em>
+        <br />
+    % endif
 </div>
 
 <form id="blockingForm" method="post">
@@ -34,58 +34,57 @@
                                 <p class="errorMessage">${ _("Saving failed.") }<br>${ '<br>'.join(errors) }</p>
                             % endif
                             <table width="100%" align="left" border="0">
-                              <!-- WHEN -->
-                              <tr>
-                                <td class="titleUpCellTD" valign="top"><span class="titleCellFormat">${ _("Period") }</span></td>
-                                <td bgcolor="white" width="100%">
-                                    <div id="dateRange"></div>
-                                </td>
-                              </tr>
-                              <tr><td>&nbsp;</td></tr>
-                              <!-- REASON -->
-                              <tr>
-                                <td class="titleUpCellTD" valign="top"><span class="titleCellFormat"> ${ _("Reason")} ${inlineContextHelp(_("<b>Required.</b> The justification for blocking. Will be displayed to users trying to book."))}</span></td>
-                                <td bgcolor="white" width="100%">
-                                  ${ form.reason(rows=3, cols=50) }
-                                </td>
-                              </tr>
-                              <tr><td>&nbsp;</td></tr>
-                              <!-- ROOMS -->
-                              <tr>
-                                <td class="titleUpCellTD" valign="top"><span class="titleCellFormat"> ${ _("Rooms")} ${inlineContextHelp(_("These rooms will be blocked. Note that the room owner will have to confirm the blocking first unless it is owned by you."))}</span></td>
-                                <td bgcolor="white" width="100%">
-                                  <div id="roomList" class="PeopleListDiv"></div>
-                                  <div id="roomChooser"></div>
-                                  <div id="roomAddButton"></div>
-                                </td>
-                              </tr>
-                              <tr><td>&nbsp;</td></tr>
-                              <!-- ACL -->
-                              <tr>
-                                <td class="titleUpCellTD" valign="top"><span class="titleCellFormat"> ${ _("Allowed users/groups")} ${inlineContextHelp(_("These users/groups are allowed to book the selected rooms during the blocking. Note that you as the creator of the blocking are always allowed to book them."))}</span></td>
-                                <td bgcolor="white" width="100%">
-                                  <div id="allowedPrincipals"></div>
-                                </td>
-                              </tr>
-                              <tr><td>&nbsp;</td></tr>
-                              <!-- ACTIONS -->
-                              <tr>
-                                <td colspan="2">
-                                  <table style="width: 100%; background-color: rgb(236, 236, 236); border-top: 1px dashed rgb(119, 119, 119);">
-                                    <tr>
-                                      <td class="titleUpCellTD"></td>
-                                      <td>
-                                        <input id="submitBlocking" type="submit" class="btn" value="${_('Create the blocking') if not blocking else _('Save')}" disabled>
-                                      </td>
-                                    </tr>
-                                  </table>
-                                </td>
-                              </tr>
-                          </table>
+                                <!-- WHEN -->
+                                <tr>
+                                    <td class="titleUpCellTD" valign="top"><span class="titleCellFormat">${ _("Period") }</span></td>
+                                    <td bgcolor="white" width="100%">
+                                        <div id="dateRange"></div>
+                                    </td>
+                                </tr>
+                                <tr><td>&nbsp;</td></tr>
+                                <!-- REASON -->
+                                <tr>
+                                    <td class="titleUpCellTD" valign="top"><span class="titleCellFormat"> ${ _("Reason")} ${inlineContextHelp(_("<b>Required.</b> The justification for blocking. Will be displayed to users trying to book."))}</span></td>
+                                    <td bgcolor="white" width="100%">
+                                        ${ form.reason(rows=3, cols=50) }
+                                    </td>
+                                </tr>
+                                <tr><td>&nbsp;</td></tr>
+                                <!-- ROOMS -->
+                                <tr>
+                                    <td class="titleUpCellTD" valign="top"><span class="titleCellFormat"> ${ _("Rooms")} ${inlineContextHelp(_("These rooms will be blocked. Note that the room owner will have to confirm the blocking first unless it is owned by you."))}</span></td>
+                                    <td bgcolor="white" width="100%">
+                                        <div id="roomList" class="PeopleListDiv"></div>
+                                        <div id="roomChooser"></div>
+                                        <div id="roomAddButton"></div>
+                                    </td>
+                                </tr>
+                                <tr><td>&nbsp;</td></tr>
+                                <!-- ACL -->
+                                <tr>
+                                    <td class="titleUpCellTD" valign="top"><span class="titleCellFormat"> ${ _("Allowed users/groups")} ${inlineContextHelp(_("These users/groups are allowed to book the selected rooms during the blocking. Note that you as the creator of the blocking are always allowed to book them."))}</span></td>
+                                    <td bgcolor="white" width="100%">
+                                        <div id="allowedPrincipals"></div>
+                                    </td>
+                                </tr>
+                                <tr><td>&nbsp;</td></tr>
+                                <!-- ACTIONS -->
+                                <tr>
+                                   <td colspan="2">
+                                       <table style="width: 100%; background-color: rgb(236, 236, 236); border-top: 1px dashed rgb(119, 119, 119);">
+                                           <tr>
+                                               <td class="titleUpCellTD"></td>
+                                               <td>
+                                                   <input id="submitBlocking" type="submit" class="btn" value="${_('Create the blocking') if not blocking else _('Save')}" disabled>
+                                               </td>
+                                           </tr>
+                                       </table>
+                                   </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </table>
-
             </td>
         </tr>
     </table>

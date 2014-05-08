@@ -17,7 +17,7 @@ Rejection reason:
 ${ reason }
 
 Booking details:
-TODO urlHandlers.UHRoomBookingBookingDetails.getURL(reservation)
+${ reservation.details_url }
 
 
 BTW, you can always check your bookings here:

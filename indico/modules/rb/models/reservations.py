@@ -37,10 +37,12 @@ from indico.modules.rb.models import utils
 from indico.modules.rb.models.utils import apply_filters
 from indico.util.date_time import now_utc, format_date, format_datetime
 from indico.util.i18n import _, N_
+from indico.web.flask.util import url_for
 from .reservation_edit_logs import ReservationEditLog
 from .reservation_occurrences import ReservationOccurrence
 from .room_equipments import ReservationEquipmentAssociation
 from .utils import next_day_skip_if_weekend, unimplemented, Serializer
+from MaKaC.common.Locators import Locator
 from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.wcomponents import WTemplated
@@ -242,6 +244,10 @@ class Reservation(Serializer, db.Model):
     @hybrid_property
     def is_repeating(self):
         return self.repeat_unit != RepeatUnit.NEVER
+
+    @property
+    def details_url(self):
+        return url_for('rooms.roomBooking-bookingDetails', self, _external=True)
 
     @staticmethod
     def getReservationWithDefaults():
@@ -731,7 +737,10 @@ class Reservation(Serializer, db.Model):
         return Reservation.getReservations(is_live=True)[0]
 
     def getLocator(self):
-        pass
+        locator = Locator()
+        locator['roomLocation'] = self.room.location_name
+        locator['resvID'] = self.id
+        return locator
 
     # access
 
