@@ -1,6 +1,6 @@
 
     <!-- CONTEXT HELP DIVS -->
-    <div id="tooltipPool" style="display: none">
+    <div id="tooltipPool" style="display: none;">
         <div id="features" class="tip">
             ${ _("""- <strong>News</strong>: will display "latest news" on the Indico home page and menu.""")}
         </div>
@@ -8,7 +8,16 @@
     <!-- END OF CONTEXT HELP DIVS -->
 
 
-<div class="groupTitle">${ _("General System Information")}</div>
+<div class="groupTitle">${ _("General System Information") }</div>
+
+<div class="warning-message-box out-of-sync-message">
+    <div class="message-text">Instance Tracking data out of sync!</div>
+    <div class="group">
+        <a id="button-sync" class="i-button">Sync</a>
+        <a id="button-learn-more" class="i-button">Learn more</a>
+        <a id="button-cancel" class="i-button">Cancel</a>
+    </div>
+</div>
 
 <table class="groupTable">
 <tr>
@@ -98,27 +107,9 @@
             {}, $E('inPlaceAdministrators'), "administrator", "item-user", false, {}, {title: false, affiliation: false, email:true},
             {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ administrators | n,j}, null, null, null, false);
 
-    function showOutOfSyncPopup(type){
-        var popup = new ConfirmPopup("${ _("Instance Tracking data out of sync")}",
-                                     "${ _("Some of your Instance Tracking data seems to be out of sync. Do you want to update these information on the server?")}",
-                                     function(ok){
-                                        var button = 'cancel';
-                                        if (ok) {
-                                            button = 'update';
-                                        }
-                                        $.ajax({
-                                            url: ${ UpdateITURL | n,j },
-                                            type: "POST",
-                                            data: {
-                                                button_pressed: button,
-                                                update_it_type: type
-                                            }
-                                        });
-                                     });
-        popup.open();
-    }
-
-    if (${ itCheck }) {
+    var type = 'update';
+    var outOfSyncMessage = $('.out-of-sync-message')
+    if (${ itActive }) {
         $.ajax({
             url: "${ updateURL }${ uuid }",
             type: "GET",
@@ -130,12 +121,39 @@
                 var organisation = ${ organisation | n,j };
 
                 if (url != response.url || contact != response.contact || email != response.email || organisation != response.organisation) {
-                    showOutOfSyncPopup('update');
+                    outOfSyncMessage.show();
                 }
             },
             error: function(){
-                showOutOfSyncPopup('register');
+                type = 'register';
+                outOfSyncMessage.show();
             }
         });
     }
+
+    $('#button-sync').on('click', function(){
+        $.ajax({
+            url: ${ UpdateITURL | n,j },
+            type: "POST",
+            data: {
+                button_pressed: 'sync',
+                update_it_type: type
+            }
+        });
+        outOfSyncMessage.hide();
+    });
+    $('#button-learn-more').on('click', function(){
+        location.href = "${ url_for('admin.adminServices-instanceTracking') }";
+    });
+    $('#button-cancel').on('click', function(){
+        $.ajax({
+            url: ${ UpdateITURL | n,j },
+            type: "POST",
+            data: {
+                button_pressed: 'cancel',
+                update_it_type: type
+            }
+        });
+        outOfSyncMessage.hide();
+    });
 </script>

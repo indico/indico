@@ -175,7 +175,7 @@ class RHInstanceTracking(RHServicesBase):
             elif enableOld and not enableNew:
                 disable_instance()
             # Else if disabled and something else changed --> update nothing
-        elif button_pressed == 'update':
+        elif button_pressed == 'sync':
             sync_instance(request.form['update_it_type'])
         elif button_pressed == 'cancel':
             disable_instance()
