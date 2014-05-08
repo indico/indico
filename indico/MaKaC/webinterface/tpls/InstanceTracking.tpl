@@ -46,7 +46,7 @@
             <div class="i-box-content">
                 <div class="missing-record-text">
                     <div>It seems like we lost your information on our server.</div>
-                    <div>Click <strong>update</strong> to send them again.</div>
+                    <div>Click <strong>sync</strong> to send them again.</div>
                 </div>
                 <div class="out-of-sync-text">
                     <div>It seems like you changed some information lately.</div>
@@ -57,11 +57,11 @@
                         <li id="out-of-sync-email">Email</li>
                         <li id="out-of-sync-organisation">Organisation</li>
                     </ul>
-                    <div>Click <strong>update</strong> to send them again.</div>
+                    <div>Click <strong>sync</strong> to send them again.</div>
                 </div>
                 <input id="hidden-update-type" type="hidden" name="update_it_type" value="none">
                 <div class="group">
-                    <a id="button-update" class="i-button">Update</a>
+                    <a id="button-sync" class="i-button">Sync</a>
                 </div>
             </div>
         </div>
@@ -152,9 +152,9 @@
             itForm.submit();
         }
     });
-    $('#button-update').on('click', function(){
+    $('#button-sync').on('click', function(){
         if (! $(this).hasClass('disabled')) {
-            hiddenButtonPressed.val('update');
+            hiddenButtonPressed.val('sync');
             itForm.submit();
         }
     });

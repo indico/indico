@@ -198,7 +198,7 @@ class WAdmins(wcomponents.WTemplated):
         wvars["administrators"] = fossilize(minfo.getAdminList())
 
         itActive = minfo.isInstanceTrackingActive()
-        wvars["itCheck"] = str(itActive).lower()
+        wvars["itActive"] = str(itActive).lower()
         wvars["uuid"] = minfo.getInstanceTrackingUUID()
         wvars["url"] = Config.getInstance().getBaseURL()
         wvars["contact"] = minfo.getInstanceTrackingContact()
