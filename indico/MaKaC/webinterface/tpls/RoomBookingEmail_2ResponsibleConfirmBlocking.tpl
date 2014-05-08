@@ -1,11 +1,11 @@
 Dear ${ owner.getFirstName() },
 
-${ block.createdByUser.getFullName() } has created a blocking for ${"some rooms" if len(roomBlockings) > 1 else "a room"} you are responsible for.
+${ blocking.created_by_user.getFullName() } has created a blocking for ${"some rooms" if len(blocked_rooms) > 1 else "a room"} you are responsible for.
 
-Room(s): ${ ', '.join(br.room.getFullName() for br in roomBlockings) }
-Message: ${ block.message }
-Dates: ${ formatDate(block.startDate) } -- ${ formatDate(block.endDate) }
+Room${ 's' if len(blocked_rooms) != 1 else ''}: ${ ', '.join(br.room.getFullName() for br in blocked_rooms) }
+Reason: ${ blocking.reason }
+Dates: ${ formatDate(blocking.start_date) } -- ${ formatDate(blocking.end_date) }
 
 You can approve or reject this blocking request here:
-${ urlHandlers.UHRoomBookingBlockingsMyRooms.getURL(filterState='pending') }
+${ url_for('rooms.blocking_my_rooms', state='pending', _external=True) }
 <%include file="RoomBookingEmail_Footer.tpl"/>

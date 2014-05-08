@@ -454,6 +454,11 @@ def migrate_reservations(rb_root):
 
 
 def migrate_blockings(rb_root):
+    state_map = {
+        None: BlockedRoom.PENDING,
+        False: BlockedRoom.REJECTED,
+        True: BlockedRoom.ACCEPTED
+    }
 
     for old_blocking_id, old_blocking in rb_root['RoomBlocking']['Blockings'].iteritems():
         b = Blocking(
@@ -467,8 +472,7 @@ def migrate_blockings(rb_root):
 
         for old_blocked_room in old_blocking.blockedRooms:
             br = BlockedRoom(
-                is_active=old_blocked_room.active,
-                notification_sent=old_blocked_room.notificationSent,
+                state=state_map[old_blocked_room.active],
                 rejected_by=old_blocked_room.rejectedBy,
                 rejection_reason=convert_to_unicode(old_blocked_room.rejectionReason),
             )

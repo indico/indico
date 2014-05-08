@@ -35,7 +35,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.utils import apply_filters
-from indico.util.date_time import now_utc
+from indico.util.date_time import now_utc, format_date, format_datetime
 from indico.util.i18n import _, N_
 from .reservation_edit_logs import ReservationEditLog
 from .reservation_occurrences import ReservationOccurrence
@@ -103,7 +103,7 @@ class Reservation(Serializer, db.Model):
     created_at = db.Column(
         UTCDateTime,
         nullable=False,
-        default=datetime.utcnow
+        default=now_utc
     )
     start_date = db.Column(
         UTCDateTime,
@@ -260,11 +260,27 @@ class Reservation(Serializer, db.Model):
     def getReservationByCreationTime(dt):
         return Reservation.query.filter_by(created_at=dt).first()
 
-    def getCreator(self):
+    @property
+    def created_by_user(self):
         return AvatarHolder().getById(self.created_by)
 
-    def getBookedForUser(self):
+    @created_by_user.setter
+    def created_by_user(self, user):
+        self.created_by = user.getId() if user else None
+
+    @property
+    def booked_for_user(self):
         return AvatarHolder().getById(self.booked_for_id)
+
+    @booked_for_user.setter
+    def booked_for_user(self, user):
+        self.booked_for_id = user.getId() if user else None
+
+    def getCreator(self):
+        return self.created_by_user
+
+    def getBookedForUser(self):
+        return self.booked_for_user
 
     def setBookedForUser(self, avatar):
         self.booked_for_id = avatar and avatar.getId()
@@ -276,6 +292,7 @@ class Reservation(Serializer, db.Model):
 
     # TODO: attribute names to the top
     def getNotificationEmailList(self):
+        return []  # TODO: re-enable once getAttributeByName works
         notification_list = self.getAttributeByName('Notification Email')
         if notification_list:
             return notification_list.split(',')
@@ -293,16 +310,40 @@ class Reservation(Serializer, db.Model):
     def getReservations(**filters):
         raise NotImplementedError('todo')
 
+    def cancel(self):
+        self.is_cancelled = True
+        self.occurrences.update({'is_cancelled': True}, synchronize_session='fetch')
+
+    def reject(self, reason):
+        self.is_rejected = True
+        self.rejection_reason = reason
+        self.occurrences \
+            .filter_by(is_cancelled=False) \
+            .update({'is_cancelled': True, 'rejection_reason': reason},
+                    synchronize_session='fetch')
+
+    def notify_rejection(self, reason, occurrence_date=None):
+        return self.notifyAboutRejection(occurrence_date, reason)
+
+    def notify_cancellation(self):
+        return self.notifyAboutCancellation()
+
     # edit logs
 
-    def addEditLog(self, edit_log):
+    def add_edit_log(self, edit_log):
         self.edit_logs.append(edit_log)
 
-    def removeEditLog(self, edit_log):
+    def remove_edit_log(self, edit_log):
         self.edit_logs.remove(edit_log)
 
-    def clearEditLogs(self):
+    def clear_edit_logs(self):
         del self.edit_logs[:]
+
+    def get_edit_logs(self, **filters):
+        return apply_filters(self.edit_logs, ReservationEditLog, **filters).all()
+
+    def has_edit_logs(self):
+        return self.edit_logs.exists()
 
     # ================================================
 
@@ -316,12 +357,16 @@ class Reservation(Serializer, db.Model):
         return self.occurrences.filter_by(is_cancelled=False).count()
 
     def cancelOccurrences(self, ds):
+        # XXX: Is this method useful/needed?
+        # We probably want to send notifications which we can't when doing a bulk update like this
         if ds:
             self.occurrences \
                 .filter(func.DATE(ReservationOccurrence.start).in_(ds)) \
                 .update({'is_cancelled': True}, synchronize_session='fetch')
 
     def cancelOccurrence(self, d):
+        # XXX: Is this method useful/needed?
+        # We probably want to send notifications which we can't when doing a bulk update like this
         self.occurrences \
             .filter(func.DATE(ReservationOccurrence.start) == d) \
             .update({'is_cancelled': True}, synchronize_session='fetch')
@@ -369,11 +414,11 @@ class Reservation(Serializer, db.Model):
     def _getEmailDateAndOccurrenceText(self, date=None):
         if date:
             occurrence_text = '(SINGLE OCCURRENCE)'
-            formatted_start_date = formatDate(date)
+            formatted_start_date = format_date(date)
         else:
             occurrence_text = ''
             try:
-                formatted_start_date = formatDateTime(self.start_date)
+                formatted_start_date = format_datetime(self.start_date)
             except Exception:
                 formatted_start_date = ''
         return formatted_start_date, occurrence_text
@@ -404,7 +449,7 @@ class Reservation(Serializer, db.Model):
             )
 
             return {
-                'fromAddr': Config.getInstance.getNoReplyEmail(),
+                'fromAddr': Config.getInstance().getNoReplyEmail(),
                 'toList': set((to and [to] or []) + to2),
                 'subject': subject,
                 'body': body
@@ -419,7 +464,7 @@ class Reservation(Serializer, db.Model):
             })
         )
         return {
-            'fromAddr': Config.getInstance.getNoReplyEmail(),
+            'fromAddr': Config.getInstance().getNoReplyEmail(),
             'toList': set(
                 [self.room.getResponsible().getEmail()] +
                 self.getNotificationEmailList()
@@ -440,7 +485,7 @@ class Reservation(Serializer, db.Model):
                     })
                 )
                 return {
-                    'fromAddr': Config.getInstance.getNoReplyEmail(),
+                    'fromAddr': Config.getInstance().getNoReplyEmail(),
                     'toList': to,
                     'subject': subject,
                     'body': body
@@ -461,7 +506,7 @@ class Reservation(Serializer, db.Model):
                 })
             )
             return {
-                'fromAddr': Config.getInstance.getNoReplyEmail(),
+                'fromAddr': Config.getInstance().getNoReplyEmail(),
                 'toList': to,
                 'subject': subject,
                 'body': body
@@ -474,7 +519,7 @@ class Reservation(Serializer, db.Model):
         Called after insert().
         """
 
-        return filter(None, list(
+        return filter(None, [
             self._getCreatorAndContactEmail(
                 subject_message=(
                     'PRE-Booking waiting Acceptance'
@@ -505,7 +550,7 @@ class Reservation(Serializer, db.Model):
                 subject_message='New Booking on',
                 template_name='RoomBookingEmail_AssistanceAfterBookingInsertion'
             )
-        ))
+        ])
 
     def notifyAboutCancellation(self, date=None):
         """
@@ -516,7 +561,7 @@ class Reservation(Serializer, db.Model):
 
         formatted_start_date, occurrence_text = self._getEmailDateAndOccurrenceText(date=date)
 
-        return filter(None, list(
+        return filter(None, [
             self._getCreatorAndContactEmail(
                 formatted_start_date=formatted_start_date,
                 subject_message='Cancellation Confirmation on',
@@ -542,7 +587,7 @@ class Reservation(Serializer, db.Model):
                 subject_message='Request Cancelled for',
                 template_name='RoomBookingEmail_AssistanceAfterBookingCancellation'
             )
-        ))
+        ])
 
     def notifyAboutRejection(self, date=None, reason=None):
         """
@@ -553,7 +598,7 @@ class Reservation(Serializer, db.Model):
 
         formatted_start_date, occurrence_text = self._getEmailDateAndOccurrenceText(date=date)
 
-        return filter(None, list(
+        return filter(None, [
             self._getCreatorAndContactEmail(
                 formatted_start_date=formatted_start_date,
                 subject_message='REJECTED Booking on',
@@ -578,7 +623,7 @@ class Reservation(Serializer, db.Model):
                 date=date,
                 reason=reason
             )
-        ))
+        ])
 
     def notifyAboutConfirmation(self):
         """
@@ -586,7 +631,7 @@ class Reservation(Serializer, db.Model):
         Called after reject().
         """
 
-        return filter(None, list(
+        return filter(None, [
             self._getCreatorAndContactEmail(
                 subject_message='Confirmed Booking on',
                 template_name='RoomBookingEmail_2UserAfterBookingConfirmation'
@@ -604,7 +649,7 @@ class Reservation(Serializer, db.Model):
                 subject_message='New Support on',
                 template_name='RoomBookingEmail_AssistanceAfterBookingInsertion'
             )
-        ))
+        ])
 
     def notifyAboutUpdate(self, attrsBefore):
         """
@@ -616,7 +661,7 @@ class Reservation(Serializer, db.Model):
         is_cancelled = (attrsBefore.get('needsAssistance', False) and
                         not self.getAttributeByName('needsAssistance'))
 
-        return filter(None, list(
+        return filter(None, [
             self._getCreatorAndContactEmail(
                 subject_message='Booking Modified on',
                 template_name='RoomBookingEmail_2UserAfterBookingModification'
@@ -638,7 +683,7 @@ class Reservation(Serializer, db.Model):
                 old_needs_assistance=attrsBefore.get('needsAssistance', False),
                 hasCancelled=is_cancelled
             )
-        ))
+        ])
 
     def requestProlongation(self):
         """
@@ -759,7 +804,7 @@ class Reservation(Serializer, db.Model):
         return ''
 
     def createdByUser(self):
-        return self.getCreator()
+        return self.created_by_user
 
     def splitToPeriods(self, end_date=None, start_date=None):
         """
@@ -871,19 +916,6 @@ class Reservation(Serializer, db.Model):
 
     def getLocationName(self):
         return self.room.location.name
-
-    def addEditLog(self, e):
-        self.edit_logs.append(e)
-
-    # TODO: new style delete everywhere
-    def removeEditLogs(self):
-        self.edit_logs.delete()
-
-    def getEditLogs(self, **filters):
-        return apply_filters(self.edit_logs, ReservationEditLog, **filters).all()
-
-    def hasEditLogs(self):
-        return self.edit_logs.exists()
 
     def getReservationModificationInformation(self, old):
         changes, info = self.getSnapShotDiff(old), []

@@ -17,35 +17,34 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from MaKaC.services.implementation.base import ServiceBase
 from MaKaC.services.interface.rpc.common import ServiceError
 
 
 class RoomBookingBlockingProcessBase(ServiceBase):
     def _checkParams(self):
-        self._blocking = RoomBlockingBase.getById(int(self._params["blockingId"]))
-        self._room = RoomGUID.parse(self._params["room"]).getRoom()
-        self._roomBlocking = self._blocking.getBlockedRoom(self._room)
+        self.blocked_room = BlockedRoom.get(self._params['blocked_room_id'])
 
     def _checkProtection(self):
         user = self._aw.getUser()
-        if not user or (not user.isAdmin() and not self._room.isOwnedBy(user)):
+        if not user or (not user.isAdmin() and not self.blocked_room.room.isOwnedBy(user)):
             raise ServiceError(_('You are not permitted to modify this blocking'))
 
 
 class RoomBookingBlockingApprove(RoomBookingBlockingProcessBase):
     def _getAnswer(self):
-        self._roomBlocking.approve()
-        return {"active": self._roomBlocking.getActiveString()}
+        self.blocked_room.approve()
+        return {'state': self.blocked_room.state_name}
 
 
 class RoomBookingBlockingReject(RoomBookingBlockingProcessBase):
     def _checkParams(self):
         RoomBookingBlockingProcessBase._checkParams(self)
-        self._reason = self._params.get('reason')
-        if not self._reason:
+        self.reason = self._params.get('reason')
+        if not self.reason:
             raise ServiceError(_('You have to specify a rejection reason'))
 
     def _getAnswer(self):
-        self._roomBlocking.reject(self._getUser(), self._reason)
-        return {"active": self._roomBlocking.getActiveString()}
+        self.blocked_room.reject(self._getUser(), self.reason)
+        return {'state': self.blocked_room.state_name}

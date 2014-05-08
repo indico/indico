@@ -1,13 +1,13 @@
-Dear ${ block.createdByUser.getFirstName() },
+Dear ${ blocking.created_by_user.getFirstName() },
 
 your room blocking request has been ${ verb } by the person responsible for the room.
 
-Room: ${ roomBlocking.room.getFullName() }
+Room: ${ blocked_room.room.getFullName() }
 Action: ${ verb }
-% if roomBlocking.active is False:
-Reason: ${ roomBlocking.rejectionReason or '(none)' }
+% if blocked_room.state == blocked_room.REJECTED:
+Reason: ${ blocked_room.rejection_reason or '(none)' }
 % endif
 
 You can view the details of your blocking here:
-${ urlHandlers.UHRoomBookingBlockingsBlockingDetails.getURL(block) }
+${ url_for('rooms.blocking_details', blocking_id=blocking.id, _external=True) }
 <%include file="RoomBookingEmail_Footer.tpl"/>

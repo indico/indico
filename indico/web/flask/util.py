@@ -212,6 +212,11 @@ def url_for(endpoint, target=None, **values):
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
         values.update(locator)
 
+    for key, value in values.iteritems():
+        # Avoid =True and =False in the URL
+        if isinstance(value, bool):
+            values[key] = int(value)
+
     return _url_for(endpoint, **values)
 
 

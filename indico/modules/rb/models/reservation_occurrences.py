@@ -75,6 +75,16 @@ class ReservationOccurrence(db.Model):
     def date(self):
         return self.start.date()
 
+    def reject(self, reason):
+        self.is_cancelled = True
+        self.rejection_reason = reason
+
+    def notify_rejection(self, reason=''):
+        return self.reservation.notify_rejection(reason, self.date)
+
+    def notify_cancellation(self):
+        return self.reservation.notify_cancellation(self.date)
+
     @classmethod
     def create_series_for_reservation(cls, reservation):
         for o in cls.iter_create_occurrences(reservation.start, reservation.end, reservation.repetition):

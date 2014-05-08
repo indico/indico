@@ -22,6 +22,7 @@ Schema of a principal (user or group that isn't affected by blocking)
 """
 
 from indico.core.db import db
+from MaKaC.user import AvatarHolder, GroupHolder
 
 
 class BlockingPrincipal(db.Model):
@@ -43,6 +44,17 @@ class BlockingPrincipal(db.Model):
         primary_key=True,
         nullable=False
     )
+
+    @property
+    def entity(self):
+        if self.entity_type == 'Avatar':
+            return AvatarHolder().getById(self.entity_id)
+        else:  # Group, LDAPGroup
+            return GroupHolder().getById(self.entity_id)
+
+    @property
+    def entity_name(self):
+        return 'User' if self.entity_type == 'Avatar' else 'Group'
 
     def __repr__(self):
         return '<BlockingPrincipal({0}, {1}, {2})>'.format(

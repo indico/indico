@@ -43,11 +43,6 @@ class Factory( object ):
         return reservation.Reservation()
 
     @staticmethod
-    def newRoomBlocking():
-        import MaKaC.plugins.RoomBooking.default.roomblocking as roomblocking
-        return roomblocking.RoomBlocking
-
-    @staticmethod
     def getEquipmentManager():
         import MaKaC.plugins.RoomBooking.default.equipmentManager as equipmentManager
         return equipmentManager.EquipmentManager()

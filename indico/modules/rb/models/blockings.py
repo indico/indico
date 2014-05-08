@@ -21,12 +21,13 @@
 Schema of a blocking (dates, related rooms and principals)
 """
 
-from datetime import datetime
 
 from sqlalchemy.ext.hybrid import hybrid_method
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
+from indico.util.date_time import now_utc
+from MaKaC.user import AvatarHolder
 
 
 class Blocking(db.Model):
@@ -45,14 +46,14 @@ class Blocking(db.Model):
     created_at = db.Column(
         UTCDateTime,
         nullable=False,
-        default=datetime.utcnow
+        default=now_utc
     )
     start_date = db.Column(
-        UTCDateTime,
+        db.Date,
         nullable=False
     )
     end_date = db.Column(
-        UTCDateTime,
+        db.Date,
         nullable=False
     )
     reason = db.Column(
@@ -73,15 +74,58 @@ class Blocking(db.Model):
         cascade='all, delete-orphan'
     )
 
+    @hybrid_method
+    def is_active_at(self, d):
+        return (self.start_date <= d) & (d <= self.end_date)
+
+    @property
+    def created_by_user(self):
+        return AvatarHolder().getById(self.created_by)
+
+    @created_by_user.setter
+    def created_by_user(self, user):
+        self.created_by = user.getId()
+
+    def can_be_modified(self, user):
+        """
+        The following persons are authorized to modify a blocking:
+        - owner (the one who created the blocking)
+        - admin (of course)
+        """
+        if not user:
+            return False
+        return user == self.created_by_user or user.isAdmin()
+
+    def can_be_deleted(self, user):
+        return self.can_be_modified(user)
+
+    def can_be_overridden(self, user, room=None, explicit_only=False):
+        """Determines if a user can override the blocking
+
+        The following persons are authorized to override a blocking:
+        - owner (the one who created the blocking)
+        - any users on the blocking's ACL
+        - unless explicitOnly is set: admins and room owners (if a room is given)
+        """
+        if not user:
+            return False
+        if self.created_by_user == user:
+            return True
+        if not explicit_only:
+            if user.isAdmin():
+                return True
+            elif room and room.isOwnedBy(user):
+                return True
+        for principal in self.allowed:
+            if principal.entity.containsUser(user):
+                return True
+        return False
+
     def __repr__(self):
-        return '<Blocking({0}, {1}, {2}, {3}, {4})>'.format(
+        return u'<Blocking({0}, {1}, {2}, {3}, {4})>'.format(
             self.id,
             self.created_by,
             self.reason,
             self.start_date,
             self.end_date
-        )
-
-    @hybrid_method
-    def is_active_at(self, d):
-        return (self.start_date <= d) & (d <= self.end_date)
+        ).encode('utf-8')

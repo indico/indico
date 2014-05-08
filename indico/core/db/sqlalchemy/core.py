@@ -17,15 +17,29 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import inspect
+from __future__ import absolute_import
+
+import logging
 
 import flask.ext.sqlalchemy
 from flask.ext.sqlalchemy import SQLAlchemy
-from zope.sqlalchemy import ZopeTransactionExtension
+from werkzeug.utils import cached_property
 
+from zope.sqlalchemy import ZopeTransactionExtension
 from .util import IndicoModel
 
 # Monkeypatching this since Flask-SQLAlchemy doesn't let us override the model class
 flask.ext.sqlalchemy.Model = IndicoModel
 
-db = SQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
+
+class IndicoSQLAlchemy(SQLAlchemy):
+    @cached_property
+    def logger(self):
+        from indico.core.logger import Logger
+
+        logger = Logger.get('db')
+        logger.setLevel(logging.DEBUG)
+        return logger
+
+
+db = IndicoSQLAlchemy(session_options={'extension': ZopeTransactionExtension()})

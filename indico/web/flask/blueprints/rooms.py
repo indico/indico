@@ -160,29 +160,29 @@ rooms.add_url_rule('/room/<roomLocation>/<int:roomID>/stats',
 
 
 # Room blocking
-rooms.add_url_rule('/blocking/<blockingId>/',
-                   'roomBooking-blockingDetails',
+rooms.add_url_rule('/blocking/<int:blocking_id>/',
+                   'blocking_details',
                    blocking_handlers.RHRoomBookingBlockingDetails)
 
-rooms.add_url_rule('/blocking/<blockingId>/modify',
-                   'roomBooking-blockingForm',
-                   blocking_handlers.RHRoomBookingBlockingForm,
+rooms.add_url_rule('/blocking/<int:blocking_id>/modify',
+                   'modify_blocking',
+                   blocking_handlers.RHRoomBookingModifyBlockingCreateModifyBlocking,
                    methods=('GET', 'POST'))
 
-rooms.add_url_rule('/blocking/<blockingId>/delete',
-                   'roomBooking-deleteBlocking',
-                   blocking_handlers.RHRoomBookingDelete,
+rooms.add_url_rule('/blocking/<int:blocking_id>/delete',
+                   'delete_blocking',
+                   blocking_handlers.RHRoomBookingDeleteBlocking,
                    methods=('POST',))
 
 rooms.add_url_rule('/blocking/create',
-                   'roomBooking-blockingForm',
-                   blocking_handlers.RHRoomBookingBlockingForm,
+                   'create_blocking',
+                   blocking_handlers.RHRoomBookingCreateBlockingCreateModifyBlocking,
                    methods=('GET', 'POST'))
 
 rooms.add_url_rule('/blocking/list',
-                   'roomBooking-blockingList',
+                   'blocking_list',
                    blocking_handlers.RHRoomBookingBlockingList)
 
 rooms.add_url_rule('/blocking/list/my-rooms',
-                   'roomBooking-blockingsForMyRooms',
+                   'blocking_my_rooms',
                    blocking_handlers.RHRoomBookingBlockingsForMyRooms)

@@ -26,6 +26,7 @@ from MaKaC.webinterface.wcomponents import BasicSideMenu, SideMenuItem, SideMenu
 from indico.util.i18n import _
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
+from indico.web.flask.util import url_for
 
 
 class WPRoomBookingBase(WPMainBase):
@@ -137,7 +138,7 @@ class WPRoomBookingBase(WPMainBase):
 
         self._usersBlockings = SideMenuItem(
             _('Blockings for my rooms'),
-            urlHandlers.UHRoomBookingBlockingsMyRooms.getURL(filter_state='pending'),
+            url_for('rooms.blocking_my_rooms', state='pending'),
             enabled=self._showResponsible
         )
 
@@ -161,19 +162,19 @@ class WPRoomBookingBase(WPMainBase):
         if self._showResponsible:
             self._myBlockingListOpt = SideMenuItem(
                 _('My blockings'),
-                urlHandlers.UHRoomBookingBlockingList.getURL(is_only_mine=True, is_only_recent=True),
+                url_for('rooms.blocking_list', only_mine=True, timeframe='recent'),
                 enabled=True
             )
         else:
             self._myBlockingListOpt = SideMenuItem(
                 _('Blockings'),
-                urlHandlers.UHRoomBookingBlockingList.getURL(is_only_recent=True),
+                url_for('rooms.blocking_list', timeframe='recent'),
                 enabled=True
             )
 
         self._blockRooms = SideMenuItem(
             _('Block rooms'),
-            urlHandlers.UHRoomBookingBlockingForm.getURL(),
+            url_for('rooms.create_blocking'),
             enabled=self._showResponsible
         )
 

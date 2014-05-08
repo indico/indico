@@ -582,8 +582,11 @@ class Room(db.Model, Serializer):
         return Room.query.filter_by(owner_id=avatar.id).count() > 0
 
     @staticmethod
-    def getRoomsOfUser(avatar):
-        return Room.query.filter_by(owner_id=avatar.getId()).all()
+    def getRoomsOfUser(avatar, only_active=False):
+        q = Room.query.filter_by(owner_id=avatar.getId())
+        if only_active:
+            q = q.filter_by(is_active=True)
+        return q.all()
 
     def getLocationName(self):
         return self.location.name
@@ -865,7 +868,7 @@ class Room(db.Model, Serializer):
                    .join(BlockedRoom.blocking) \
                    .filter(
                        Blocking.is_active_at(d),
-                       BlockedRoom.is_active == True
+                       BlockedRoom.state == BlockedRoom.ACCEPTED
                    ) \
                    .first()
 
@@ -983,11 +986,13 @@ class Room(db.Model, Serializer):
         Returns True if user is responsible for this room. False otherwise.
         """
         # legacy check, currently every room must be owned by someone
-        if not self.responsible_id:
+        if not self.owner_id:
             return None
-        if self.responsible_id == avatar.id:
+        if self.owner_id == avatar.id:
             return True
         manager_groups = self.getAttributeByName('Manager Group')
+        if not manager_groups:
+            return False
         return manager_groups.contains(avatar)
 
     def getGroups(self, group_name):

@@ -17,97 +17,56 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from operator import attrgetter
-
-from MaKaC.webinterface.wcomponents import WTemplated
 from indico.modules.rb.views import WPRoomBookingBase
+from MaKaC.webinterface.wcomponents import WTemplated
 
 
 class WPRoomBookingBlockingDetails(WPRoomBookingBase):
-    def __init__(self, rh, block):
-        super(WPRoomBookingBlockingDetails, self).__init__(rh)
-        self._block = block
+    def __init__(self, rh, blocking):
+        WPRoomBookingBase.__init__(self, rh)
+        self._blocking = blocking
 
     def _getBody(self, params):
-        return WRoomBookingBlockingDetails(self._block).getHTML(params)
-
-
-class WRoomBookingBlockingDetails(WTemplated):
-    def __init__(self, block):
-        self._block = block
-
-    def getVars(self):
-        wvars = super(WRoomBookingBlockingDetails, self).getVars()
-        wvars['block'] = self._block
-        return wvars
+        params = dict(params, blocking=self._blocking)
+        return WTemplated('RoomBookingBlockingDetails').getHTML(params)
 
 
 class WPRoomBookingBlockingForm(WPRoomBookingBase):
-    def __init__(self, rh, block, errorMessage):
-        super(WPRoomBookingBlockingDetails, self).__init__(rh)
-        self._block = block
-        self._errorMessage = errorMessage
+    def __init__(self, rh, form, errors, blocking=None):
+        WPRoomBookingBase.__init__(self, rh)
+        self._form = form
+        self._errors = errors
+        self._blocking = blocking
 
     def _setCurrentMenuItem(self):
         self._blockRooms.setActive(True)
 
     def _getBody(self, params):
-        return WRoomBookingBlockingForm(self._block, self._errorMessage).getHTML(params)
-
-
-class WRoomBookingBlockingForm(WTemplated):
-    def __init__(self, block, errorMessage):
-        self._block = block
-        self._errorMessage = errorMessage
-
-    def getVars(self):
-        wvars = super(WRoomBookingBlockingForm, self).getVars()
-        wvars['block'] = self._block
-        wvars['errorMessage'] = self._errorMessage
-        return wvars
+        params = dict(params, form=self._form, blocking=self._blocking, errors=self._errors)
+        return WTemplated('RoomBookingBlockingForm').getHTML(params)
 
 
 class WPRoomBookingBlockingList(WPRoomBookingBase):
     def __init__(self, rh, blocks):
-        super(WPRoomBookingBlockingList, self).__init__(rh)
+        WPRoomBookingBase.__init__(self, rh)
         self._blocks = blocks
 
     def _setCurrentMenuItem(self):
         self._myBlockingListOpt.setActive(True)
 
     def _getBody(self, params):
-        return WRoomBookingBlockingList(self._blocks).getHTML(params)
-
-
-class WRoomBookingBlockingList(WTemplated):
-    def __init__(self, blocks):
-        self._blocks = blocks
-
-    def getVars(self):
-        wvars = super(WRoomBookingBlockingList, self).getVars()
-
-        self._blocks.sort(key=attrgetter('startDate'), reverse=True)
-        wvars['blocks'] = self._blocks
-        return wvars
+        params = dict(params, blocks=self._blocks)
+        return WTemplated('RoomBookingBlockingList').getHTML(params)
 
 
 class WPRoomBookingBlockingsForMyRooms(WPRoomBookingBase):
     def __init__(self, rh, roomBlocks):
-        super(WPRoomBookingBlockingsForMyRooms, self).__init__(rh)
+        WPRoomBookingBase.__init__(self, rh)
         self._roomBlocks = roomBlocks
 
     def _setCurrentMenuItem(self):
         self._usersBlockings.setActive(True)
 
     def _getBody(self, params):
-        return WRoomBookingBlockingsForMyRooms(self._roomBlocks).getHTML(params)
-
-
-class WRoomBookingBlockingsForMyRooms(WTemplated):
-    def __init__(self, roomBlocks):
-        self._roomBlocks = roomBlocks
-
-    def getVars(self):
-        wvars = super(WRoomBookingBlockingsForMyRooms, self).getVars()
-        wvars['roomBlocks'] = self._roomBlocks
-        return wvars
+        params = dict(params, roomBlocks=self._roomBlocks)
+        return WTemplated('RoomBookingBlockingsForMyRooms').getHTML(params)

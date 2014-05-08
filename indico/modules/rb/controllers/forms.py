@@ -17,29 +17,23 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import json
 from datetime import datetime, time, timedelta
 from functools import partial
-from flask_wtf import Form
-from wtforms import (
-    BooleanField,
-    Field,
-    IntegerField,
-    SelectField,
-    StringField,
-    validators,
-)
-from wtforms.validators import (
-    any_of,
-    optional,
-    number_range,
-    required
-)
-from wtforms.ext.dateutil.fields import DateTimeField
+
+from flask.ext.wtf import Form
+from wtforms import BooleanField, Field, IntegerField, SelectField, StringField, validators, HiddenField, TextAreaField
+from wtforms.validators import any_of, optional, number_range, required
+from wtforms.ext.dateutil.fields import DateTimeField, DateField
 from wtforms_alchemy import model_form_factory
 
 from indico.core.errors import IndicoError
 from indico.util.i18n import _
-from ..models.reservations import Reservation, RepeatUnit, RepeatMapping
+from indico.modules.rb.models.reservations import Reservation, RepeatUnit, RepeatMapping
+from indico.modules.rb.models.blockings import Blocking
+from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.modules.rb.models.rooms import Room
+from MaKaC.user import GroupHolder, AvatarHolder
 
 
 ModelForm = model_form_factory(Form, strip_string_fields=True)
@@ -160,7 +154,7 @@ class DateTimeIndicoField(IndicoField, DateTimeField):
                 except KeyError:
                     camel_name = self.underscore_to_camel_case(self.name) in formdata
                     if camel_name in formdata:
-                        self.raw_data = formdata.geetlist(self.name)
+                        self.raw_data = formdata.getlist(self.name)
                     elif self.name in formdata:
                         self.raw_data = formdata.getlist(self.name)
                     else:
@@ -209,6 +203,45 @@ class MultipleCheckboxIndicoField(IndicoField):
                 self.data = self.raw_data
             except ValueError as e:
                 self.process_errors.append(e.args[0])
+
+
+class JSONField(HiddenField):
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = json.loads(valuelist[0])
+
+    def _value(self):
+        return json.dumps(self.data)
+
+    def populate_obj(self, obj, name):
+        pass
+
+
+class FormDefaults(object):
+    """Simple wrapper to be used for Form(obj=...) default values.
+
+    It allows you to specify default values via kwargs or certain attrs from an object.
+    You can also set attributes directly on this object, which will act just like kwargs
+    """
+
+    def __init__(self, obj=None, *obj_attrs, **defaults):
+        self.__obj = obj
+        self.__obj_attrs = set(obj_attrs)
+        self.__defaults = defaults
+
+    def __setattr__(self, key, value):
+        if key.startswith('_{}__'.format(type(self).__name__)):
+            object.__setattr__(self, key, value)
+        else:
+            self.__defaults[key] = value
+
+    def __getattr__(self, item):
+        if item in self.__obj_attrs:
+            return getattr(self.__obj, item, self.__defaults.get(item))
+        elif item in self.__defaults:
+            return self.__defaults[item]
+        else:
+            raise AttributeError(item)
 
 
 class BookingListForm(Form):
@@ -297,3 +330,72 @@ class RoomListForm(Form):
         if attr == 'repeat':
             RepeatMapping.getNewMapping(self.repeatibility.data)
         raise IndicoError('{} has no attribute: {}'.format(self.__class__.__name__, attr))
+
+
+class BlockingForm(Form):
+    reason = TextAreaField(_('Reason'), [validators.DataRequired()])
+    principals = JSONField(default=[])
+    blocked_rooms = JSONField(default=[])
+
+    def validate_blocked_rooms(self, field):
+        try:
+            field.data = map(int, field.data)
+        except Exception as e:
+            # In case someone sent crappy data
+            raise validators.ValidationError(str(e))
+
+        # Make sure all room ids are valid
+        if len(field.data) != Room.find(Room.id.in_(field.data)).count():
+            raise validators.ValidationError('Invalid rooms')
+
+        if hasattr(self, '_blocking'):
+            start_date = self._blocking.start_date
+            end_date = self._blocking.end_date
+            blocking_id = self._blocking.id
+        else:
+            start_date = self.start_date.data
+            end_date = self.end_date.data
+            blocking_id = None
+
+        overlap = BlockedRoom.find_first(
+            BlockedRoom.room_id.in_(field.data),
+            BlockedRoom.state != BlockedRoom.REJECTED,
+            Blocking.start_date <= end_date,
+            Blocking.end_date >= start_date,
+            Blocking.id != blocking_id,
+            _join=Blocking
+        )
+        if overlap:
+            msg = 'Your blocking for {} is overlapping with another blocking.'.format(overlap.room.getFullName())
+            raise validators.ValidationError(msg)
+
+    def validate_principals(self, field):
+        for item in field.data:
+            try:
+                type_ = item['_type']
+                id_ = item['id']
+            except Exception as e:
+                raise validators.ValidationError('Invalid principal data: {}'.format(e))
+            if type_ not in ('Avatar', 'Group', 'LDAPGroup'):
+                raise validators.ValidationError('Invalid principal data: type={}'.format(type_))
+            holder = AvatarHolder() if type_ == 'Avatar' else GroupHolder()
+            if not holder.getById(id_):
+                raise validators.ValidationError('Invalid principal: {}:{}'.format(type_, id_))
+
+    @property
+    def error_list(self):
+        all_errors = []
+        for field_name, errors in self.errors.iteritems():
+            all_errors += ['{}: {}'.format(self[field_name].label.text, error) for error in errors]
+        return all_errors
+
+
+class CreateBlockingForm(BlockingForm):
+    start_date = DateField(_('Start date'), [validators.Required()])
+    end_date = DateField(_('End date'), [validators.Required()])
+
+    def validate_start_date(self, field):
+        if self.start_date.data > self.end_date.data:
+            raise validators.ValidationError('Blocking may not end before it starts!')
+
+    validate_end_date = validate_start_date

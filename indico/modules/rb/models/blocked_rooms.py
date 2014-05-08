@@ -20,24 +20,44 @@
 """
 Schema of a blocked room (rejection and notification info about blocking)
 """
+from datetime import datetime, time
+from operator import attrgetter
 
 from indico.core.db import db
+from MaKaC.common.mail import GenericMailer
+from MaKaC.webinterface.mail import GenericNotification
+from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.notifications.blocking import blocking_processed
+from indico.util.date_time import as_utc, format_date
 
 
 class BlockedRoom(db.Model):
     __tablename__ = 'blocked_rooms'
 
-    # columns
+    # states
+    PENDING, ACCEPTED, REJECTED = xrange(3)
+    STATE_NAMES = {  # human-friendly
+        PENDING: 'Pending',
+        ACCEPTED: 'Accepted',
+        REJECTED: 'Rejected'
+    }
+    STATES = {  # url-friendly
+        'pending': PENDING,
+        'accepted': ACCEPTED,
+        'rejected': REJECTED
+    }
 
-    is_active = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
+    # columns
+    id = db.Column(
+        db.Integer,
+        primary_key=True
     )
-    notification_sent = db.Column(
-        db.Boolean,
+    state = db.Column(
+        db.SmallInteger,
         nullable=False,
-        default=False
+        default=PENDING
     )
     rejected_by = db.Column(
         db.String
@@ -48,23 +68,90 @@ class BlockedRoom(db.Model):
     blocking_id = db.Column(
         db.Integer,
         db.ForeignKey('blockings.id'),
-        primary_key=True,
         nullable=False
     )
     room_id = db.Column(
         db.Integer,
         db.ForeignKey('rooms.id'),
-        primary_key=True,
         nullable=False
     )
+
+    @property
+    def state_name(self):
+        return self.STATE_NAMES[self.state]
+
+    def reject(self, user=None, reason=None):
+        """Reject the room blocking."""
+        self.state = self.REJECTED
+        if reason:
+            self.rejection_reason = reason
+        if user:
+            self.rejected_by = user.getFullName()
+        GenericMailer.send(GenericNotification(blocking_processed(self)))
+
+    def approve(self, notify_blocker=True):
+        """Approve the room blocking, rejecting all colliding reservations/occurrences."""
+        self.state = self.ACCEPTED
+
+        # Get colliding reservations
+        start_dt = as_utc(datetime.combine(self.blocking.start_date, time()))
+        end_dt = as_utc(datetime.combine(self.blocking.end_date, time(23, 59, 59)))
+
+        reservation_criteria = [
+            Reservation.room_id == self.room_id,
+            ~Reservation.is_rejected,
+            ~Reservation.is_cancelled
+        ]
+
+        # Whole reservations to reject
+        reservations = Reservation.find_all(
+            Reservation.start_date >= start_dt,
+            Reservation.end_date <= end_dt,
+            *reservation_criteria
+        )
+
+        # Single occurrences to reject
+        occurrences = ReservationOccurrence.find_all(
+            ReservationOccurrence.start >= start_dt,
+            ReservationOccurrence.end <= end_dt,
+            ~ReservationOccurrence.is_cancelled,
+            ~ReservationOccurrence.reservation_id.in_(map(attrgetter('id'), reservations)),
+            *reservation_criteria,
+            _join=Reservation
+        )
+
+        emails = []
+        reason = 'Conflict with blocking {}: {}'.format(self.blocking.id, self.blocking.reason)
+
+        for reservation in reservations:
+            if self.blocking.can_be_overridden(reservation.created_by_user, reservation.room):
+                continue
+            reservation.reject(reason)
+            log_msg = 'Booking rejected: {}'.format(reason)
+            reservation.add_edit_log(ReservationEditLog(avatar_id=self.blocking.created_by, info=log_msg))
+            emails += reservation.notify_rejection(reason)
+
+        for occurrence in occurrences:
+            reservation = occurrence.reservation
+            if self.blocking.can_be_overridden(reservation.created_by_user, reservation.room):
+                continue
+            occurrence.reject(reason)
+            log_msg = 'Booking occurrence on {} rejected: {}'.format(format_date(occurrence.date), reason)
+            reservation.add_edit_log(ReservationEditLog(avatar_id=self.blocking.created_by, info=log_msg))
+            emails += occurrence.notify_rejection(reason)
+
+        if notify_blocker:
+            # We only need to notify the blocking creator if the blocked room wasn't approved yet.
+            # This is the case if it's a new blocking for a room managed by the creator
+            emails.append(blocking_processed(self))
+
+        for notification in map(GenericNotification, emails):
+            GenericMailer.send(notification)
+
 
     def __repr__(self):
         return '<BlockedRoom({0}, {1}, {2})>'.format(
             self.blocking_id,
             self.room_id,
-            self.is_active
+            self.state_name
         )
-
-    @staticmethod
-    def getBlockedRoomById(brid):
-        return BlockedRoom.query.get(brid)

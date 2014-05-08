@@ -19,22 +19,32 @@
 
 import calendar
 import time
-import pytz
 from datetime import timedelta
 
-from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
-from indico.util.i18n import currentLocale
-
+import pytz
 from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_time as _format_time
 from babel.dates import format_date as _format_date
 from babel.dates import format_timedelta as _format_timedelta
 from babel.numbers import format_number as _format_number
 
+from indico.util.i18n import currentLocale
+from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
+
+
 now_utc = nowutc
+
 
 def utc_timestamp(datetimeVal):
     return int(calendar.timegm(datetimeVal.utctimetuple()))
+
+
+def as_utc(dt):
+    """Returns the given datetime with tzinfo=UTC.
+
+    The given datetime object **MUST** be naive but already contain UTC!
+    """
+    return pytz.utc.localize(dt)
 
 
 def format_datetime(dt, format='medium', locale=None, timezone=None):

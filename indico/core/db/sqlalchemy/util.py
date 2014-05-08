@@ -20,6 +20,7 @@
 from flask.ext.sqlalchemy import Model, connection_stack
 from sqlalchemy import MetaData, ForeignKeyConstraint, Table
 from sqlalchemy.engine.reflection import Inspector
+from sqlalchemy.orm import joinedload, joinedload_all
 from sqlalchemy.sql.ddl import DropConstraint, DropTable
 
 
@@ -28,10 +29,21 @@ class IndicoModel(Model):
 
     @classmethod
     def find(cls, *args, **kwargs):
-        joins = kwargs.pop('_join', ())
-        if not isinstance(joins, (list, tuple)):
-            joins = (joins,)
-        return cls.query.filter_by(**kwargs).join(*joins).filter(*args)
+        special_field_names = ('join', 'eager', 'eager_all')
+        special_fields = {}
+        for key in special_field_names:
+            value = kwargs.pop('_{}'.format(key), ())
+            if not isinstance(value, (list, tuple)):
+                value = (value,)
+            special_fields[key] = value
+        options = []
+        options += [joinedload(rel) for rel in special_fields['eager']]
+        options += [joinedload_all(rel) for rel in special_fields['eager_all']]
+        return cls.query \
+                  .filter_by(**kwargs) \
+                  .join(*special_fields['join']) \
+                  .filter(*args) \
+                  .options(*options)
 
     @classmethod
     def find_all(cls, *args, **kwargs):

@@ -17,8 +17,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from indico.core.config import Config
 from indico.modules.rb.controllers.mixins import RoomBookingAvailabilityParamsMixin
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
 from MaKaC.services.implementation.base import LoggedOnlyService, ServiceBase
 from MaKaC.services.interface.rpc.common import ServiceError
 
@@ -77,22 +79,18 @@ class RoomBookingListLocationsAndRooms(ServiceBase):
             return []
 
 
-# TODO
 class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
     def _checkParams(self):
         self._isActive = self._params.get('isActive', None)
 
     def _getAnswer(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        result = {}
-        if minfo.getRoomBookingModuleActive():
-            locationNames = map(lambda l: l.friendlyName, Location.allLocations)
-            for loc in locationNames:
-                roomEx = Factory.newRoom()
-                roomEx.isActive = self._isActive
-                for room in CrossLocationQueries.getRooms(location=loc, roomExample=roomEx):
-                    result[str(room.guid)] = "%s: %s" % (loc, room.getFullName())
-        return result
+        if not Config.getInstance().getIsRoomBookingActive():
+            return {}
+        criteria = {'_eager': Room.location}
+        if self._isActive is not None:
+            criteria['is_active'] = self._isActive
+        rooms = Room.find_all(**criteria)
+        return {room.id: '{}: {}'.format(room.location_name, room.getFullName()) for room in rooms}
 
 
 # Refactored from GetBookingBase

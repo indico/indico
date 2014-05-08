@@ -17,185 +17,174 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
+from datetime import date
+
+from flask import request, session
+
+from indico.modules.rb.controllers.forms import FormDefaults, BlockingForm, CreateBlockingForm
+from indico.modules.rb.models.blocking_principals import BlockingPrincipal
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.notifications.blocking import request_confirmation
+from indico.util.i18n import _
+from indico.core.db import db
+from indico.core.errors import IndicoError
+from indico.web.flask.util import url_for
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.modules.rb.models.blockings import Blocking
+from indico.modules.rb.views.user.blockings import (WPRoomBookingBlockingList, WPRoomBookingBlockingDetails,
+                                                    WPRoomBookingBlockingsForMyRooms, WPRoomBookingBlockingForm)
+from MaKaC.common.mail import GenericMailer
+from MaKaC.webinterface.mail import GenericNotification
 
 
 class RHRoomBookingBlockingDetails(RHRoomBookingBase):
-    def _checkParams(self, params):
-        blockId = int(params.get('blockingId'))
-        self._block = RoomBlockingBase.getById(blockId)
+    def _checkParams(self):
+        self._block = Blocking.get(request.view_args['blocking_id'])
         if not self._block:
-            raise MaKaCError('A blocking with this ID does not exist.')
+            raise IndicoError('A blocking with this ID does not exist.')
 
     def _process(self):
-        p = roomBooking_wp.WPRoomBookingBlockingDetails(self, self._block)
-        return p.display()
+        return WPRoomBookingBlockingDetails(self, self._block).display()
 
 
-class RHRoomBookingBlockingForm(RHRoomBookingBase):
-    def _isOverlapping(self):
-        # date overlapping
-        for block in RoomBlockingBase.getByDateSpan(self._startDate, self._endDate):
-            # check for itself
-            if self._block.id != block.id:
-                # room overlapping
-                if any(block.getBlockedRoom(room) for room in self._blockedRooms):
-                    return True
-        return False
-
-    def _checkParams(self, params):
-
-        self._action = params.get('action')
-        blockId = params.get('blockingId')
-        if blockId is not None:
-            self._block = RoomBlockingBase.getById(int(blockId))
-            if not self._block:
-                raise MaKaCError('A blocking with this ID does not exist.')
+class RHRoomBookingCreateModifyBlockingBase(RHRoomBookingBase):
+    def _process(self):
+        if self._form.validate_on_submit():
+            self._save()
+            self._redirect(url_for('rooms.blocking_details', blocking_id=str(self._blocking.id)))
         else:
-            self._block = Factory.newRoomBlocking()()
-            self._block.startDate = date.today()
-            self._block.endDate = date.today()
+            return WPRoomBookingBlockingForm(self, self._form, self._form.error_list, blocking=self._blocking).display()
 
-        self._errorMessage = False
-        if self._action == 'save':
-            from MaKaC.services.interface.rpc import json
-
-            self._reason = params.get('reason', '').strip()
-            allowedUsers = json.decode(params.get('allowedUsers', '[]'))
-            blockedRoomGuids = json.decode(params.get('blockedRooms', '[]'))
-            startDate = params.get('startDate')
-            endDate = params.get('endDate')
-            if startDate and endDate:
-                self._startDate = parseDate(startDate)
-                self._endDate = parseDate(endDate)
+    def _process_blocked_rooms(self, blocked_rooms):
+        rooms_by_owner = defaultdict(list)
+        for blocked_room in blocked_rooms:
+            owner = blocked_room.room.getResponsible()
+            if owner == session.user:
+                blocked_room.approve(False)
             else:
-                self._startDate = self._endDate = None
+                rooms_by_owner[owner].append(blocked_room)
 
-            self._blockedRooms = [RoomGUID.parse(guid).getRoom() for guid in blockedRoomGuids]
-            self._allowedUsers = [RoomBlockingPrincipal.getByTypeId(fossil['_type'], fossil['id'])
-                                  for fossil in allowedUsers]
+        for owner, rooms in rooms_by_owner.iteritems():
+            GenericMailer.send(GenericNotification(request_confirmation(owner, self._blocking, rooms)))
 
-            if not self._reason or not self._blockedRooms:
-                self._errorMessage = _('Please check blocked rooms and reason for blocking.')
-            elif self._createNew and (not self._startDate or not self._endDate or self._startDate > self._endDate):
-                self._errorMessage = _('Please check your blocking dates.')
-            elif self._isOverlapping():
-                self._errorMessage = _('Your blocking is overlapping with other blockings.')
+
+class RHRoomBookingCreateBlockingCreateModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
+    def _checkParams(self):
+        self._form = CreateBlockingForm(start_date=date.today(), end_date=date.today())
+        self._blocking = None
 
     def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
-        if not self._doProcess:  # if we are not logged in
+        RHRoomBookingCreateModifyBlockingBase._checkProtection(self)
+        if not self._doProcess:  # we are not logged in
             return
-        if not self._createNew:
-            if not self._block.canModify(self._getUser()):
-                raise MaKaCError("You are not authorized to modify this blocking.")
-        else:
-            if not (Room.isAvatarResponsibleForRooms(
-                    self._getUser()) or self._getUser().isAdmin() or self._getUser().isRBAdmin()):
-                raise MaKaCError("Only users who own at least one room are allowed to create blockings.")
+        if not (self._getUser().isAdmin() or self._getUser().isRBAdmin()
+                or Room.isAvatarResponsibleForRooms(self._getUser())):
+            raise IndicoError(_('Only users who own at least one room are allowed to create blockings.'))
 
-    def _process(self):
-        if self._action == 'save' and not self._errorMessage:
-            self._block.message = self._reason
-            if self._createNew:
-                self._block.createdByUser = self._getUser()
-                self._block.startDate = self._startDate
-                self._block.endDate = self._endDate
-            currentBlockedRooms = set()
-            for room in self._blockedRooms:
-                br = self._block.getBlockedRoom(room)
-                if not br:
-                    br = BlockedRoom(room)
-                    self._block.addBlockedRoom(br)
-                    if room.getResponsible() == self._getUser():
-                        br.approve(sendNotification=False)
-                currentBlockedRooms.add(br)
-            # Remove blocked rooms which have been removed from the list
-            for br in set(self._block.blockedRooms) - currentBlockedRooms:
-                self._block.delBlockedRoom(br)
-            # Replace allowed-users/groups list
-            self._block.allowed = self._allowedUsers
-            # Insert/update(re-index) the blocking
-            if self._createNew:
-                self._block.insert()
-            else:
-                self._block.update()
-            self._redirect(urlHandlers.UHRoomBookingBlockingsBlockingDetails.getURL(self._block))
-
-        elif self._action == 'save' and self._createNew and self._errorMessage:
-            # If we are creating a new blocking and there are errors, populate the block object anyway to preserve the entered values
-            self._block.message = self._reason
-            self._block.startDate = self._startDate
-            self._block.endDate = self._endDate
-            self._block.allowed = self._allowedUsers
-            for room in self._blockedRooms:
-                self._block.addBlockedRoom(BlockedRoom(room))
-
-        return roomBooking_wp.WPRoomBookingBlockingForm(self, self._block,
-                                                        self._errorMessage).display()
-
-    @property
-    def _createNew(self):
-        return self._block.id is None
+    def _save(self):
+        self._blocking = blocking = Blocking()
+        blocking.start_date = self._form.start_date.data
+        blocking.end_date = self._form.end_date.data
+        blocking.created_by_user = session.user
+        blocking.reason = self._form.reason.data
+        blocking.allowed = [BlockingPrincipal(entity_type=item['_type'], entity_id=item['id'])
+                            for item in self._form.principals.data]
+        blocking.blocked_rooms = [BlockedRoom(room_id=room_id) for room_id in self._form.blocked_rooms.data]
+        db.session.add(blocking)
+        db.session.flush()  # synchronizes relationships (e.g. BlockedRoom.room)
+        self._process_blocked_rooms(blocking.blocked_rooms)
 
 
-class RHRoomBookingDelete(RHRoomBookingBase):
-    def _checkParams(self, params):
-        blockId = int(params.get('blockingId'))
-        self._block = RoomBlockingBase.getById(blockId)
+class RHRoomBookingModifyBlockingCreateModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
+    def _checkParams(self):
+        self._blocking = Blocking.get(request.view_args['blocking_id'])
+        if self._blocking is None:
+            raise IndicoError('A blocking with this ID does not exist.')
+        defaults = FormDefaults(self._blocking, 'reason',
+                                principals=[p.entity.fossilize() for p in self._blocking.allowed],
+                                blocked_rooms=[br.room_id for br in self._blocking.blocked_rooms])
+        self._form = BlockingForm(obj=defaults)
+        self._form._blocking = self._blocking
+
+    def _checkProtection(self):
+        RHRoomBookingCreateModifyBlockingBase._checkProtection(self)
+        if not self._doProcess:  # we are not logged in
+            return
+        if not self._blocking.can_be_modified(self._getUser()):
+            raise IndicoError(_("You are not authorized to modify this blocking."))
+
+    def _save(self):
+        blocking = self._blocking
+        blocking.reason = self._form.reason.data
+        # Just overwrite the whole list
+        blocking.allowed = [BlockingPrincipal(entity_type=item['_type'], entity_id=item['id'])
+                            for item in self._form.principals.data]
+        # Blocked rooms need some more work as we can't just overwrite them
+        old_blocked = {br.room_id for br in blocking.blocked_rooms}
+        new_blocked = set(self._form.blocked_rooms.data)
+        added_blocks = new_blocked - old_blocked
+        removed_blocks = old_blocked - new_blocked
+        for room_id in removed_blocks:
+            blocked_room = next(br for br in blocking.blocked_rooms if br.room_id == room_id)
+            blocking.blocked_rooms.remove(blocked_room)
+        added_blocked_rooms = []
+        for room_id in added_blocks:
+            blocked_room = BlockedRoom(room_id=room_id)
+            blocking.blocked_rooms.append(blocked_room)
+            added_blocked_rooms.append(blocked_room)
+        db.session.flush()
+        self._process_blocked_rooms(added_blocked_rooms)
+
+
+class RHRoomBookingDeleteBlocking(RHRoomBookingBase):
+    def _checkParams(self):
+        self._block = Blocking.get(request.view_args['blocking_id'])
+        if not self._block:
+            raise IndicoError('A blocking with this ID does not exist.')
 
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
-        if not self._block.canDelete(self._getUser()):
-            raise MaKaCError("You are not authorized to delete this blocking.")
+        if not self._block.can_be_deleted(self._getUser()):
+            raise IndicoError('You are not authorized to delete this blocking.')
 
     def _process(self):
-        self._block.remove()
-        self._redirect(urlHandlers.UHRoomBookingBlockingList.getURL(onlyMine=True, onlyRecent=True))
+        db.session.delete(self._block)
+        self._redirect(url_for('rooms.blocking_list', only_mine=True, timeframe='recent'))
 
 
 class RHRoomBookingBlockingList(RHRoomBookingBase):
-    def _checkParams(self, params):
-        self.onlyMine = 'onlyMine' in params
-        self.onlyRecent = 'onlyRecent' in params
-        self.onlyThisYear = 'onlyThisYear' in params
+    def _checkParams(self):
+        self.only_mine = request.args.get('only_mine') == '1'
+        self.timeframe = request.args.get('timeframe', 'recent')
+        if self.timeframe not in {'all', 'year', 'recent'}:
+            self.timeframe = 'recent'
 
     def _process(self):
-        if self.onlyMine:
-            blocks = RoomBlockingBase.getByOwner(self._getUser())
-            if self.onlyThisYear:
-                firstDay = date(date.today().year, 1, 1)
-                lastDay = date(date.today().year, 12, 31)
-                blocks = [block for block in blocks if block.startDate <= lastDay and firstDay <= block.endDate]
-        elif self.onlyThisYear:
-            blocks = RoomBlockingBase.getByDateSpan(date(date.today().year, 1, 1), date(date.today().year, 12, 31))
-            if self.onlyMine:
-                blocks = [block for block in blocks if block.createdByUser == self._getUser()]
-        else:
-            blocks = RoomBlockingBase.getAll()
+        criteria = []
+        if self.only_mine:
+            criteria += [Blocking.created_by == self._getUser().getId()]
+        if self.timeframe == 'year':
+            criteria += [Blocking.start_date <= date(date.today().year, 12, 31),
+                         Blocking.end_date >= date(date.today().year, 1, 1)]
+        elif self.timeframe == 'recent':
+            criteria += [Blocking.end_date >= date.today()]
 
-        if self.onlyRecent:
-            blocks = [block for block in blocks if date.today() <= block.endDate]
-        p = roomBooking_wp.WPRoomBookingBlockingList(self, blocks)
-        return p.display()
+        blockings = Blocking.find(*criteria).order_by(Blocking.start_date.desc()).all()
+        return WPRoomBookingBlockingList(self, blockings).display()
 
 
 class RHRoomBookingBlockingsForMyRooms(RHRoomBookingBase):
-    def _checkParams(self, params):
-        self.filterState = params.get('filterState')
+    def _checkParams(self):
+        self.state = request.args.get('state')
 
     def _process(self):
-        activeState = -1
-        if self.filterState == 'pending':
-            activeState = None
-        elif self.filterState == 'accepted':
-            activeState = True
-        elif self.filterState == 'rejected':
-            activeState = False
-        myRoomBlocks = defaultdict(list)
+        state = BlockedRoom.STATES.get(self.state)
+        my_blocks = defaultdict(list)
         for room in self._getUser().getRooms():
-            roomBlocks = RoomBlockingBase.getByRoom(room, activeState)
+            roomBlocks = room.blocked_rooms.filter(True if state is None else BlockedRoom.state == state).all()
             if roomBlocks:
-                myRoomBlocks[str(room.guid)] += roomBlocks
-        p = roomBooking_wp.WPRoomBookingBlockingsForMyRooms(self, myRoomBlocks)
-        return p.display()
+                my_blocks[room] += roomBlocks
+        rv = WPRoomBookingBlockingsForMyRooms(self, my_blocks).display()
+        return rv

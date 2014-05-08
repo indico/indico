@@ -27,7 +27,6 @@ import time
 from datetime import datetime
 from MaKaC.services.implementation.base import ServiceBase, LoggedOnlyService
 
-from MaKaC.plugins.RoomBooking.rb_roomblocking import RoomBlockingBase
 from MaKaC.rb_reservation import ReservationBase
 from MaKaC.rb_location import Location, MapAspect, RoomGUID
 from MaKaC.rb_location import CrossLocationQueries
@@ -345,39 +344,6 @@ class RoomBookingLocationsAndRoomsGetLink(ServiceBase):
 
     def _getAnswer(self):
         return linking.RoomLinker().getURLByName(self._room, self._location)
-
-
-class RoomBookingBlockingProcessBase(ServiceBase):
-
-    def _checkParams(self):
-        self._blocking = RoomBlockingBase.getById(int(self._params["blockingId"]))
-        self._room = RoomGUID.parse(self._params["room"]).getRoom()
-        self._roomBlocking = self._blocking.getBlockedRoom(self._room)
-
-    def _checkProtection(self):
-        user = self._aw.getUser()
-        if not user or (not user.isAdmin() and not self._room.isOwnedBy(user)):
-            raise ServiceError(_('You are not permitted to modify this blocking'))
-
-
-class RoomBookingBlockingApprove(RoomBookingBlockingProcessBase):
-
-    def _getAnswer(self):
-        self._roomBlocking.approve()
-        return {"active": self._roomBlocking.getActiveString()}
-
-
-class RoomBookingBlockingReject(RoomBookingBlockingProcessBase):
-
-    def _checkParams(self):
-        RoomBookingBlockingProcessBase._checkParams(self)
-        self._reason = self._params.get('reason')
-        if not self._reason:
-            raise ServiceError(_('You have to specify a rejection reason'))
-
-    def _getAnswer(self):
-        self._roomBlocking.reject(self._getUser(), self._reason)
-        return {"active": self._roomBlocking.getActiveString()}
 
 
 class BookingPermission(LoggedOnlyService):

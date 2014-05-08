@@ -132,9 +132,11 @@ class GenericMailer:
             if code != 235:
                 raise MaKaCError( _("Can't login on SMTP server: %d, %s")%(code, errormsg))
 
+        # XXX: Does this actually use BCC/CC properly?!
+        to_addrs = set(msgData['toList']) | set(msgData['ccList']) | set(msgData['bccList'])
         try:
             Logger.get('mail').info("Mailing %s  CC: %s" % (msgData['toList'], msgData['ccList']))
-            server.sendmail(msgData['fromAddr'], msgData['toList'] + msgData['ccList'] + msgData['bccList'], msgData['msg'])
+            server.sendmail(msgData['fromAddr'], to_addrs, msgData['msg'])
         except smtplib.SMTPRecipientsRefused,e:
             server.quit()
             raise MaKaCError("Email address is not valid: %s" % e.recipients)

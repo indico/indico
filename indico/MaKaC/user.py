@@ -42,7 +42,6 @@ from MaKaC.common.fossilize import Fossilizable, fossilizes
 from pytz import all_timezones
 from MaKaC.plugins.base import PluginsHolder
 
-from indico.util.caching import order_dict
 from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
@@ -1060,13 +1059,8 @@ class Avatar(Persistent, Fossilizable):
         Returns list of rooms (RoomBase derived objects) this
         user is responsible for.
         """
-        from MaKaC.plugins.RoomBooking.default.room import Room
-        from MaKaC.rb_location import RoomGUID
-
-        rooms = Room.getUserRooms(self)
-
-        roomList = [ RoomGUID.parse(str(rg)).getRoom() for rg in rooms ] if rooms else []
-        return [room for room in roomList if room and room.isActive]
+        from indico.modules.rb.models.rooms import Room  # avoid circular import
+        return Room.getRoomsOfUser(self)
 
     def getReservations(self):
         """

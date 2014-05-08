@@ -570,27 +570,6 @@ class UHRoomBookingDeleteCustomAttribute(URLHandler):
     _endpoint = 'rooms_admin.roomBooking-deleteCustomAttribute'
 
 
-class UHRoomBookingBlockingsMyRooms(URLHandler):
-    _endpoint = 'rooms.roomBooking-blockingsForMyRooms'
-
-
-class UHRoomBookingBlockingsBlockingDetails(URLHandler):
-    _endpoint = 'rooms.roomBooking-blockingDetails'
-
-
-class UHRoomBookingBlockingList(BooleanMixin, URLHandler):
-    _endpoint = 'rooms.roomBooking-blockingList'
-    _defaultParams = dict(is_only_this_year=True)
-
-
-class UHRoomBookingBlockingForm(URLHandler):
-    _endpoint = 'rooms.roomBooking-blockingForm'
-
-
-class UHRoomBookingDeleteBlocking(URLHandler):
-    _endpoint = 'rooms.roomBooking-deleteBlocking'
-
-
 # For the event ==============================================================
 class UHConfModifRoomBookingBase(URLHandler):
     @classmethod

@@ -21,10 +21,9 @@
 Schema of modifications done on a reservation
 """
 
-from datetime import datetime
-
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
+from indico.util.date_time import now_utc
 
 
 class ReservationEditLog(db.Model):
@@ -34,7 +33,7 @@ class ReservationEditLog(db.Model):
         UTCDateTime,
         primary_key=True,
         nullable=False,
-        default=datetime.utcnow
+        default=now_utc
     )
     info = db.Column(
         db.String,

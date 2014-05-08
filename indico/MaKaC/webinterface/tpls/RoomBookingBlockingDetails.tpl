@@ -1,5 +1,5 @@
-    <% canModify = block.canModify(user) %>
-    <% canDelete = block.canDelete(user) %>
+    <% canModify = blocking.can_be_modified(user) %>
+    <% canDelete = blocking.can_be_deleted(user) %>
     <span class="groupTitleNoBorder">Room Blocking</span><br />
     <table cellpadding="0" cellspacing="0" border="0" width="100%">
         <tr>
@@ -15,7 +15,7 @@
                                     <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small>${ _("Dates")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ formatDate(block.startDate) } &mdash; ${ formatDate(block.endDate) }</td>
+                                            <td align="left" class="blacktext">${ formatDate(blocking.start_date) } &mdash; ${ formatDate(blocking.end_date) }</td>
                                         </tr>
                                     </table>
                                 </td>
@@ -28,15 +28,15 @@
                                     <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> ${ _("By")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ block.createdByUser.getFullName() }</td>
+                                            <td align="left" class="blacktext">${ blocking.created_by_user.getFullName() }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Date")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ verbose_dt( block.createdDT ) }</td>
+                                            <td align="left" class="blacktext">${ formatDateTime(blocking.created_at) }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Reason")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ block.message }</td>
+                                            <td align="left" class="blacktext">${ blocking.reason }</td>
                                         </tr>
                                     </table>
                                 </td>
@@ -47,12 +47,12 @@
                                 <td class="bookingDisplayTitleCell" valign="top"><span class="titleCellFormat"> ${ _("Actions")}</span></td>
                                 <td>
                                     % if canModify:
-                                        <form style="display:inline;" action="${ urlHandlers.UHRoomBookingBlockingForm.getURL(block) }" method="post">
+                                        <form style="display:inline;" action="${ url_for('rooms.modify_blocking', blocking_id=blocking.id) }" method="get">
                                             <input type="submit" class="btn" value="${ _("Modify")}" />
                                         </form>
                                     % endif
                                     % if canDelete:
-                                        <form id="deleteBlockingForm" style="display:inline;" action="${ urlHandlers.UHRoomBookingDeleteBlocking.getURL(block) }" method="post">
+                                        <form id="deleteBlockingForm" style="display:inline;" action="${ url_for('rooms.delete_blocking', blocking_id=blocking.id) }" method="post">
                                             <input type="submit" id="deleteBlocking" class="btn" value="${ _("Delete")}" />
                                         </form>
                                     % endif
@@ -65,10 +65,10 @@
                                 <td class="bookingDisplayTitleCell" valign="top"><span class="titleCellFormat"> ${ _("Allowed users/groups")}</span></td>
                                 <td>
                                     <table class="blockingTable">
-                                        % for principal in block.allowed:
+                                        % for principal in blocking.allowed:
                                             <tr class="blockingHover blockingPadding">
-                                                <td>${ principal.getTypeString() }</td>
-                                                <td>${ principal.getPrincipal().getFullName() }</td>
+                                                <td>${ principal.entity_name }</td>
+                                                <td>${ principal.entity.getFullName() }</td>
                                             </tr>
                                         % endfor
                                     </table>
@@ -87,15 +87,15 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        % for rb in block.blockedRooms:
+                                        % for rb in blocking.blocked_rooms:
                                             <tr class="blockingHover blockingPadding">
                                                 <td><a href="${ urlHandlers.UHRoomBookingRoomDetails.getURL(rb.room) }">${ rb.room.getFullName() }</a></td>
                                                 <td>
-                                                    ${ rb.getActiveString() }
-                                                    % if rb.active is False:
-                                                      by <b>${ rb.rejectedBy }</b>: ${ rb.rejectionReason }
-                                                    % elif rb.active is None:
+                                                    ${ rb.state_name }
+                                                    % if rb.state == rb.PENDING:
                                                       ${inlineContextHelp(_("This blocking has to be approved by the room owner first."))}
+                                                    % elif rb.state == rb.REJECTED:
+                                                      by <b>${ rb.rejected_by }</b>: ${ rb.rejection_reason }
                                                     % endif
                                                 </td>
                                             </tr>
@@ -113,14 +113,13 @@
     </table>
     <br />
 
- <script type="text/javascript">
-
- $("#deleteBlocking").click(function(){
-     new ConfirmPopup($T("Delete blocking"),$T("Do you really want to DELETE this blocking?"), function(confirmed) {
-         if(confirmed) {
-             $("#deleteBlockingForm").submit();
-         }
-     }).open();
-     return false;
- });
- </script>
+    <script>
+        $('#deleteBlocking').on('click', function(e) {
+            e.preventDefault();
+            new ConfirmPopup($T('Delete blocking'), $T('Do you really want to DELETE this blocking?'), function(confirmed) {
+                if (confirmed) {
+                    $('#deleteBlockingForm').submit();
+                }
+            }).open();
+        });
+    </script>
