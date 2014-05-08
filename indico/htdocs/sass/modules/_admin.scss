@@ -163,3 +163,17 @@
         display: none;
     }
 }
+
+.out-of-sync-message {
+    display: none;
+    height: 24px;
+
+    .message-text {
+        float: left;
+        padding-top: 0.2em;
+    }
+
+    .group {
+        float: right;
+    }
+}
