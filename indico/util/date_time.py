@@ -29,6 +29,7 @@ from babel.dates import format_timedelta as _format_timedelta
 from babel.numbers import format_number as _format_number
 
 from indico.util.i18n import currentLocale
+from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
 
 
@@ -47,7 +48,7 @@ def as_utc(dt):
     return pytz.utc.localize(dt)
 
 
-def format_datetime(dt, format='medium', locale=None, timezone=None):
+def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=False):
     """
     Basically a wrapper around Babel's own format_datetime
     """
@@ -55,6 +56,8 @@ def format_datetime(dt, format='medium', locale=None, timezone=None):
         locale = currentLocale()
     if not timezone and dt.tzinfo:
         timezone = DisplayTZ().getDisplayTZ()
+    elif server_tz:
+        timezone = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
 
     return _format_datetime(dt, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
 
@@ -69,7 +72,7 @@ def format_date(d, format='medium', locale=None):
     return _format_date(d, format=format, locale=locale).encode('utf-8')
 
 
-def format_time(t, format='short', locale=None, timezone=None):
+def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
     """
     Basically a wrapper around Babel's own format_time
     """
@@ -77,6 +80,8 @@ def format_time(t, format='short', locale=None, timezone=None):
         locale = currentLocale()
     if not timezone and t.tzinfo:
         timezone = DisplayTZ().getDisplayTZ()
+    elif server_tz:
+        timezone = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
 
     return _format_time(t, format=format, locale=locale, tzinfo=timezone).encode('utf-8')
 

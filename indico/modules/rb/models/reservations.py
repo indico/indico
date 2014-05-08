@@ -418,7 +418,7 @@ class Reservation(Serializer, db.Model):
         else:
             occurrence_text = ''
             try:
-                formatted_start_date = format_datetime(self.start_date)
+                formatted_start_date = format_datetime(self.start_date, server_tz=True)
             except Exception:
                 formatted_start_date = ''
         return formatted_start_date, occurrence_text

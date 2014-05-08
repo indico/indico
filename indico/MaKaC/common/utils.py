@@ -418,13 +418,14 @@ def daysBetween(dtStart, dtEnd):
     return days
 
 
-def formatDateTime(dateTime, showWeek=False, format=None, locale=None):
+def formatDateTime(dateTime, showWeek=False, format=None, locale=None, server_tz=False):
     week = "EEEE" if showWeek else ""
+    timezone = 'SERVER' if server_tz else None
 
     if not format:
-        return format_datetime(dateTime, week+'d/M/yyyy H:mm', locale=locale).encode('utf-8')
+        return format_datetime(dateTime, week+'d/M/yyyy H:mm', locale=locale, timezone=timezone).encode('utf-8')
     else:
-        return format_datetime(dateTime, format, locale=locale).encode('utf-8')
+        return format_datetime(dateTime, format, locale=locale, timezone=timezone).encode('utf-8')
 
 
 def formatDate(date, showWeek=False, format=None, locale=None):
@@ -437,11 +438,12 @@ def formatDate(date, showWeek=False, format=None, locale=None):
         return format_date(date, format, locale=locale).encode('utf-8')
 
 
-def formatTime(tm, format=None, locale=None):
+def formatTime(tm, format=None, locale=None, server_tz=False):
+    timezone = 'SERVER' if server_tz else None
     if not format:
-        return format_time(tm, 'H:mm', locale=locale).encode('utf-8')
+        return format_time(tm, 'H:mm', locale=locale, timezone=timezone).encode('utf-8')
     else:
-        return format_time(tm, format, locale=locale).encode('utf-8')
+        return format_time(tm, format, locale=locale, timezone=timezone).encode('utf-8')
 
 
 def parseDate(dateStr, format='%d/%m/%Y'):
