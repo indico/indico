@@ -46,10 +46,11 @@
             <div class="i-box-content">
                 <div class="missing-record-text">
                     <div>It seems like we lost your information on our server.</div>
-                    <div>Click <strong>sync</strong> to send them again.</div>
+                    <br>
                 </div>
                 <div class="out-of-sync-text">
-                    <div>It seems like you changed some information lately.</div>
+                    <div>It seems like you changed some information lately and we still have the old version in our server.</div>
+                    <br>
                     <div>The information out of sync are:</div>
                     <ul>
                         <li id="out-of-sync-url">URL</li>
@@ -57,8 +58,8 @@
                         <li id="out-of-sync-email">Email</li>
                         <li id="out-of-sync-organisation">Organisation</li>
                     </ul>
-                    <div>Click <strong>sync</strong> to send them again.</div>
                 </div>
+                <div>Click <strong>sync</strong> to send them again.</div>
                 <input id="hidden-update-type" type="hidden" name="update_it_type" value="none">
                 <div class="group">
                     <a id="button-sync" class="i-button">Sync</a>

@@ -146,9 +146,10 @@
     float: left;
     display: none;
     margin-left: 20px;
+    max-width: 460px;
 
     .group {
-        padding-top: 40px;
+        padding-top: 15px;
 
         a {
             float: right;
