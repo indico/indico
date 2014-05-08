@@ -24,7 +24,6 @@ from BTrees import OOBTree
 
 from indico.core.config import Config
 from indico.core import db
-from datetime import datetime
 
 DEFAULT_PROTECTION_DISCLAINER_RESTRICTED = ("Circulation to people other than the intended audience is not authorized. "
                                             "You are obliged to treat the information with the appropriate level of "
@@ -67,7 +66,6 @@ class MaKaCInfo(Persistent):
         self._instanceTrackingEmail = ""
         self._instanceTrackingContact = ""
         self._instanceTrackingUUID = ""
-        self._instanceTrackingLastCheck = None
 
         # template set
         self._defaultTemplateSet = None
@@ -155,16 +153,6 @@ class MaKaCInfo(Persistent):
 
     def setInstanceTrackingUUID(self, uuid=""):
         self._instanceTrackingUUID = uuid
-
-    def getInstanceTrackingLastCheck(self):
-        if hasattr(self, "_instanceTrackingLastCheck"):
-            return self._instanceTrackingLastCheck
-        else:
-            self._instanceTrackingLastCheck = None
-            return None
-
-    def updateInstanceTrackingLastCheck(self):
-        self._instanceTrackingLastCheck = datetime.now()
 
     def getNews( self ):
         try:

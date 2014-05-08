@@ -102,14 +102,16 @@
         var popup = new ConfirmPopup("${ _("Instance Tracking data out of sync")}",
                                      "${ _("Some of your Instance Tracking data seems to be out of sync. Do you want to update these information on the server?")}",
                                      function(ok){
-                                        var hiddenUpdate = $('#hidden-update');
-                                        hiddenUpdate.val(ok);
+                                        var button = 'cancel';
+                                        if (ok) {
+                                            button = 'update';
+                                        }
                                         $.ajax({
                                             url: ${ UpdateITURL | n,j },
                                             type: "POST",
                                             data: {
-                                                updateIT: ok,
-                                                updateITType: type
+                                                button_pressed: button,
+                                                update_it_type: type
                                             }
                                         });
                                      });

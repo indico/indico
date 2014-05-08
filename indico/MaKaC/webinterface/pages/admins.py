@@ -33,7 +33,6 @@ from MaKaC.common import timezoneUtils, utils
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.modules import INewsItemFossil
-from MaKaC.i18n import _
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
 
@@ -42,7 +41,7 @@ from indico.core import signals
 from indico.core.config import Config
 from indico.modules import ModuleHolder
 from indico.modules.users import User
-from indico.util.i18n import i18nformat, get_all_locales
+from indico.util.i18n import _, i18nformat, get_all_locales
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
 
@@ -174,11 +173,8 @@ class WAdmins(wcomponents.WTemplated):
         wvars['administrators'] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
                                                    key=methodcaller('getStraightFullName')))
 
-        date_now = datetime.now()
-        last_check = minfo.getInstanceTrackingLastCheck()
         itActive = minfo.isInstanceTrackingActive()
-        check = itActive and (last_check is None or (date_now - last_check).total_seconds() > 24*60*60)
-        wvars["itCheck"] = str(check).lower()
+        wvars["itCheck"] = str(itActive).lower()
         wvars["uuid"] = minfo.getInstanceTrackingUUID()
         wvars["url"] = Config.getInstance().getBaseURL()
         wvars["contact"] = minfo.getInstanceTrackingContact()
@@ -215,7 +211,7 @@ class WPAdmins(WPAdminsBase):
     def _getPageContent(self, params):
         wc = WAdmins()
         pars = {"GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL(),
-                "UpdateITURL": url_for("admin.adminServices-instanceTrackingUpdate")}
+                "UpdateITURL": url_for("admin.adminServices-instanceTracking")}
         return wc.getHTML(pars)
 
 
