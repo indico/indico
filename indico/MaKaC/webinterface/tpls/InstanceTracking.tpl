@@ -1,7 +1,7 @@
 <div class="groupTitle"> ${ _("Instance Tracking settings") }</div>
 
 <form id="it-form" action="${ postURL }" method="POST">
-    <input id="hidden-button-pressed" type="hidden" name="button-pressed">
+    <input id="hidden-button-pressed" type="hidden" name="button_pressed" value="none">
 
     <div>
         <div class="instance-tracking-settings">
@@ -59,7 +59,7 @@
                     </ul>
                     <div>Click <strong>update</strong> to send them again.</div>
                 </div>
-                <input id="hidden-update-type" type="hidden" name="update-it-type" value="none">
+                <input id="hidden-update-type" type="hidden" name="update_it_type" value="none">
                 <div class="group">
                     <a id="button-update" class="i-button">Update</a>
                 </div>
@@ -149,7 +149,6 @@
     });
     $('#button-cancel').on('click', function(){
         if (! $(this).hasClass('disabled')) {
-            hiddenButtonPressed.val('cancel');
             itForm.submit();
         }
     });

@@ -17,8 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
-
 from datetime import datetime
 from pytz import timezone
 from MaKaC.fossils.user import IAvatarFossil
@@ -35,11 +33,10 @@ import MaKaC.conference as conference
 import MaKaC.user as user
 from MaKaC.common import utils, timezoneUtils
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
-from MaKaC.webinterface.common.timezones import TimezoneRegistry, DisplayTimezoneRegistry
+from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.pages.base import WPDecorated
-from MaKaC.common.pendingQueues import PendingSubmitterReminder, PendingManagerReminder, PendingCoordinatorReminder
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.authentication.LDAPAuthentication import LDAPGroup
 from MaKaC import roomMapping
@@ -54,9 +51,6 @@ from MaKaC.plugins import PluginLoader, PluginsHolder
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.modules import INewsItemFossil
 from indico.modules import ModuleHolder
-from MaKaC.errors import MaKaCError, NotFoundError
-from MaKaC.conference import ConferenceHolder
-from MaKaC.webinterface.locators import CategoryWebLocator
 from MaKaC.services.implementation.user import UserComparator
 
 from indico.util.i18n import i18nformat
@@ -203,11 +197,8 @@ class WAdmins(wcomponents.WTemplated):
                                         """ padding-right: 5px">_("News Pages")</a></div>""")
         wvars["administrators"] = fossilize(minfo.getAdminList())
 
-        date_now = datetime.now()
-        last_check = minfo.getInstanceTrackingLastCheck()
         itActive = minfo.isInstanceTrackingActive()
-        check = itActive and (last_check is None or (date_now - last_check).total_seconds() > 24*60*60)
-        wvars["itCheck"] = str(check).lower()
+        wvars["itCheck"] = str(itActive).lower()
         wvars["uuid"] = minfo.getInstanceTrackingUUID()
         wvars["url"] = Config.getInstance().getBaseURL()
         wvars["contact"] = minfo.getInstanceTrackingContact()
@@ -247,7 +238,7 @@ class WPAdmins(WPAdminsBase):
     def _getPageContent(self, params):
         wc = WAdmins()
         pars = {"GeneralInfoModifURL": urlHandlers.UHGeneralInfoModification.getURL(),
-                "UpdateITURL": url_for("admin.adminServices-instanceTrackingUpdate")}
+                "UpdateITURL": url_for("admin.adminServices-instanceTracking")}
         return wc.getHTML(pars)
 
 

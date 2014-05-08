@@ -17,13 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import requests
 from flask import render_template, request, session
 from wtforms import Form, validators, TextField, PasswordField, BooleanField
 from tzlocal import get_localzone
-from json import dumps
 
 from MaKaC.webinterface.rh.base import RH
+from MaKaC.webinterface.rh import services
 from MaKaC.webinterface.pages import signIn
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.user import AvatarHolder, Avatar, LoginInfo
@@ -32,37 +31,8 @@ from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.accessControl import AdminList
 from MaKaC.i18n import _
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
-from indico.core.config import Config
 from indico.web.forms.validators import UsedIfChecked
 from indico.util.i18n import parseLocale, getLocaleDisplayNames
-
-
-def register_instance(payload):
-    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-    url = Config.getInstance().getTrackerURL() + '/instance/'
-    headers = {'Content-Type': 'application/json'}
-    try:
-        response = requests.post(url, data=dumps(payload), headers=headers).json()
-        uuid = response['uuid']
-    except (requests.exceptions.RequestException, ValueError, KeyError):
-        minfo.setInstanceTrackingActive(False)
-        return False
-    else:
-        minfo.setInstanceTrackingActive(True)
-        minfo.setInstanceTrackingUUID(uuid)
-    return True
-
-
-def update_instance(uuid, payload):
-    url = Config.getInstance().getTrackerURL() + '/instance/' + uuid
-    headers = {'Content-Type': 'application/json'}
-    try:
-        response = requests.patch(url, data=dumps(payload), headers=headers)
-        if response.status_code >= 400:
-            raise requests.exceptions.RequestException
-    except (requests.exceptions.RequestException):
-        return False
-    return True
 
 
 class RHInitialSetup(RH):
@@ -127,14 +97,8 @@ class RHInitialSetup(RH):
         minfo.setTimezone(setup_form.timezone.data)
         minfo.setLang(setup_form.language.data)
         if self._enable:
-            minfo.setInstanceTrackingContact(setup_form.it_contact.data)
-            minfo.setInstanceTrackingEmail(setup_form.it_email.data)
             # Posting a request to the server with the data
-            payload = {'url': Config.getInstance().getBaseURL(),
-                       'contact': setup_form.it_contact.data,
-                       'email': setup_form.it_email.data,
-                       'organisation': setup_form.organisation.data}
-            register_instance(payload)
+            services.register_instance(setup_form.it_contact.data, setup_form.it_email.data)
 
         p = signIn.WPAdminCreated(self, av)
         return p.display()
