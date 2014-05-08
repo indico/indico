@@ -27,6 +27,7 @@ from sqlalchemy.ext.hybrid import hybrid_method
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.util.date_time import now_utc
+from indico.util.string import return_ascii
 from MaKaC.user import AvatarHolder
 
 
@@ -121,6 +122,7 @@ class Blocking(db.Model):
                 return True
         return False
 
+    @return_ascii
     def __repr__(self):
         return u'<Blocking({0}, {1}, {2}, {3}, {4})>'.format(
             self.id,
@@ -128,4 +130,4 @@ class Blocking(db.Model):
             self.reason,
             self.start_date,
             self.end_date
-        ).encode('utf-8')
+        )

@@ -25,6 +25,7 @@ from datetime import datetime
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
+from indico.util.string import return_ascii
 
 
 class NonBookableDate(db.Model):
@@ -51,8 +52,9 @@ class NonBookableDate(db.Model):
         nullable=False
     )
 
+    @return_ascii
     def __repr__(self):
-        return '<NonBookableDate({0}, {1}, {2})>'.format(
+        return u'<NonBookableDate({0}, {1}, {2})>'.format(
             self.room_id,
             self.start_date,
             self.end_date

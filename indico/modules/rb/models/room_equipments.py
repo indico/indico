@@ -22,6 +22,7 @@ Equipments for rooms
 """
 
 from indico.core.db import db
+from indico.util.string import return_ascii
 
 from . import utils
 
@@ -108,8 +109,9 @@ class RoomEquipment(db.Model):
 
     # core
 
+    @return_ascii
     def __repr__(self):
-        return '<RoomEquipment({0}, {1}, {2})>'.format(self.id, self.name, self.location_id)
+        return u'<RoomEquipment({0}, {1}, {2})>'.format(self.id, self.name, self.location_id)
 
     # getters
 

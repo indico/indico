@@ -49,6 +49,7 @@ from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.util.i18n import _
+from indico.util.string import return_ascii
 from .utils import Serializer
 
 
@@ -265,8 +266,9 @@ class Room(db.Model, Serializer):
     def __eq__(self, other):
         return self.__cmp__(other) == 0
 
+    @return_ascii
     def __repr__(self):
-        return '<Room({0}, {1}, {2})>'.format(
+        return u'<Room({0}, {1}, {2})>'.format(
             self.id,
             self.location_id,
             self.name

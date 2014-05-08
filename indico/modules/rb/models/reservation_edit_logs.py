@@ -24,6 +24,7 @@ Schema of modifications done on a reservation
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.util.date_time import now_utc
+from indico.util.string import return_ascii
 
 
 class ReservationEditLog(db.Model):
@@ -51,8 +52,9 @@ class ReservationEditLog(db.Model):
         nullable=False
     )
 
+    @return_ascii
     def __repr__(self):
-        return '<Edit({0}, {1}, {2}, {3})>'.format(
+        return u'<ReservationEditLog({0}, {1}, {2}, {3})>'.format(
             self.avatar_id,
             self.reservation_id,
             self.timestamp,

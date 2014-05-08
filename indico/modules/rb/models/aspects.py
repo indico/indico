@@ -22,6 +22,7 @@ A view of map of rooms in a specific location
 """
 
 from indico.core.db import db
+from indico.util.string import return_ascii
 
 
 class Aspect(db.Model):
@@ -73,8 +74,9 @@ class Aspect(db.Model):
 
     # core
 
+    @return_ascii
     def __repr__(self):
-        return '<Aspect({0}, {1}, {2})>'.format(
+        return u'<Aspect({0}, {1}, {2})>'.format(
             self.id,
             self.location_id,
             self.name

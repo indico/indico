@@ -22,6 +22,7 @@ Available times to book for rooms
 """
 
 from indico.core.db import db
+from indico.util.string import return_ascii
 
 
 class BookableTime(db.Model):
@@ -44,8 +45,9 @@ class BookableTime(db.Model):
         nullable=False
     )
 
+    @return_ascii
     def __repr__(self):
-        return '<BookableTime({0}, {1}, {2})>'.format(
+        return u'<BookableTime({0}, {1}, {2})>'.format(
             self.room_id,
             self.start_time,
             self.end_time

@@ -31,6 +31,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from indico.core.db import db
 from indico.util.i18n import _
+from indico.util.string import return_ascii
 from . import utils
 from .aspects import Aspect
 from .reservations import Reservation
@@ -125,8 +126,9 @@ class Location(db.Model):
 
     # core
 
+    @return_ascii
     def __repr__(self):
-        return '<Location({0}, {1}, {2})>'.format(
+        return u'<Location({0}, {1}, {2})>'.format(
             self.id,
             self.default_aspect_id,
             self.name

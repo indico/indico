@@ -37,6 +37,7 @@ from indico.modules.rb.models import utils
 from indico.modules.rb.models.utils import apply_filters
 from indico.util.date_time import now_utc, format_date, format_datetime
 from indico.util.i18n import _, N_
+from indico.util.string import return_ascii
 from indico.web.flask.util import url_for
 from .reservation_edit_logs import ReservationEditLog
 from .reservation_occurrences import ReservationOccurrence
@@ -225,8 +226,9 @@ class Reservation(Serializer, db.Model):
 
     # core
 
+    @return_ascii
     def __repr__(self):
-        return '<Reservation({0}, {1}, {2}, {3}, {4})>'.format(
+        return u'<Reservation({0}, {1}, {2}, {3}, {4})>'.format(
             self.id,
             self.room_id,
             self.booked_for_name,

@@ -22,6 +22,7 @@ Schema of a photo for rooms
 """
 
 from indico.core.db import db
+from indico.util.string import return_ascii
 
 
 class Photo(db.Model):
@@ -40,5 +41,6 @@ class Photo(db.Model):
         nullable=True
     )
 
+    @return_ascii
     def __repr__(self):
-        return '<Photo({0})>'.format(self.id)
+        return u'<Photo({0})>'.format(self.id)

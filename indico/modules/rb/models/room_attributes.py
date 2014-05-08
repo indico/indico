@@ -22,6 +22,7 @@ Attribute keys for rooms and reservations
 """
 
 from indico.core.db import db
+from indico.util.string import return_ascii
 
 from .utils import JSONStringBridgeMixin
 
@@ -98,6 +99,7 @@ class RoomAttribute(JSONStringBridgeMixin, db.Model):
     def supportsAttributeManagement():
         return True
 
+    @return_ascii
     def __repr__(self):
         return u'<AttributeKey({0}, {1}, {2}, {3})>'.format(
             self.id,

@@ -28,6 +28,7 @@ from dateutil import rrule
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.errors import IndicoError
+from indico.util.string import return_ascii
 
 
 class ReservationOccurrence(db.Model):
@@ -62,8 +63,9 @@ class ReservationOccurrence(db.Model):
         db.String,
     )
 
+    @return_ascii
     def __repr__(self):
-        return '<ReservationOccurrence({0}, {1}, {2}, {3}, {4})>'.format(
+        return u'<ReservationOccurrence({0}, {1}, {2}, {3}, {4})>'.format(
             self.reservation_id,
             self.start,
             self.end,

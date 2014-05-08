@@ -21,12 +21,18 @@
 String manipulation functions
 """
 
+import functools
 import re
 import unicodedata
-from lxml import html, etree
 
 import markdown
 import bleach
+from lxml import html, etree
+
+try:
+    import translitcodec
+except ImportError:
+    translitcodec = None
 
 
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small']
@@ -78,6 +84,27 @@ def fix_broken_string(text):
 
 def remove_non_alpha(text):
     return ''.join(c for c in text if c.isalnum())
+
+
+def unicode_to_ascii(text):
+    if not isinstance(text, unicode):
+        return text
+    elif translitcodec:
+        text = text.encode('translit/long')
+    else:
+        text = unicodedata.normalize('NFKD', text)
+    return text.encode('ascii', 'ignore')
+
+
+def return_ascii(f):
+    """Decorator to normalize all unicode characters.
+
+    This is useful for __repr__ methods which **MUST** return a plain string to
+    avoid encoding to utf8 or ascii all the time."""
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        return unicode_to_ascii(f(*args, **kwargs))
+    return wrapper
 
 
 def html_line_breaks(text):

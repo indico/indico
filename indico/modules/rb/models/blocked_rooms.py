@@ -31,6 +31,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.notifications.blockings import blocking_processed
 from indico.util.date_time import as_utc, format_date
+from indico.util.string import return_ascii
 
 
 class BlockedRoom(db.Model):
@@ -148,9 +149,9 @@ class BlockedRoom(db.Model):
         for notification in map(GenericNotification, emails):
             GenericMailer.send(notification)
 
-
+    @return_ascii
     def __repr__(self):
-        return '<BlockedRoom({0}, {1}, {2})>'.format(
+        return u'<BlockedRoom({0}, {1}, {2})>'.format(
             self.blocking_id,
             self.room_id,
             self.state_name
