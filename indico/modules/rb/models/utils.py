@@ -295,11 +295,8 @@ def is_false_valued_dict(d):
     return len(filter(None, d.values())) != len(d)
 
 
-def sifu(e):
+def strip_if_unicode(e):
     return e.strip() if e and isinstance(e, unicode) else e
-
-
-strip_if_unicode = sifu
 
 
 def get_checked_param_dict(f, params, converter=unicode):
