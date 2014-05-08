@@ -1,5 +1,4 @@
-<script type="text/javascript">
-
+<script>
     // Reads out the invalid textboxes and returns false if something is invalid.
     // Returns true if form may be submited.
     function forms_are_valid(onSubmit) {
@@ -35,7 +34,7 @@
         var isValid = true;
         % if not infoBookingMode:
             // Date validator (repeatability)
-            isValid = validate_period(true, ${allowPast}, 1, $('#repeatability').val()) && isValid; // 1: validate dates
+            isValid = validate_period(true, ${ allow_past }, 1, $('#repeatability').val()) && isValid; // 1: validate dates
             // Time validator
             isValid = isValid & $('#timerange').timerange('validate');
         % endif
@@ -45,15 +44,15 @@
         } else {
             isValid = required_fields(['bookedForName', 'contactEmail']) && isValid;
         }
-        % if not infoBookingMode and not (user.isRBAdmin() or user.getId() == candResv.room.responsibleId) and candResv.room.maxAdvanceDays > 0:
-            isValid = validate_allow(${candResv.room.maxAdvanceDays}) && isValid;
+        % if not infoBookingMode and not (user.isRBAdmin() or user.getId() == room.owner_id) and room.max_advance_days > 0:
+            isValid = validate_allow(${ room.max_advance_days }) && isValid;
         % endif
         if (!Util.Validation.isEmailList($('#contactEmail').val())) {
             isValid = false;
             $('#contactEmail').addClass('invalid');
         }
 
-        % if candResv.room.needsAVCSetup:
+        % if room.needs_video_conference_setup:
             var vcIsValid = true;
             if ($('#usesAVC').is(':checked')) {
                 vcIsValid = $('input.videoConferenceOption').is(':checked');
@@ -110,7 +109,7 @@
     }
 
     function saveBooking() {
-        $('#bookingForm').attr('action', '${saveBookingUH.getURL(conf)}');
+        $('#bookingForm').attr('action', '${ saveBookingUH }');
         if (forms_are_valid(true))
             $('#bookingForm').submit();
         else
@@ -118,7 +117,7 @@
     }
 
     function checkBooking() {
-        $('#bookingForm').attr('action', '${bookingFormURL.getURL(conf)}#conflicts');
+        $('#bookingForm').attr('action', '${ bookingFormURL }#conflicts');
         $('#bookingForm').submit();
     };
 
@@ -147,9 +146,9 @@
                 var span1 = Html.span('', $T(errorList));
                 return this.ExclusivePopupWithButtons.prototype.draw.call(this, Widget.block([span1, Html.br()]), {maxWidth: pixels(500)});
             };
-
             popup.open();
-        % elif candResv.room.needsAVCSetup:
+
+        % elif room.needs_video_conference_setup:
             $('.videoConferenceOption, #needsAVCSupport').change(function() {
                 if(this.checked) {
                     $('#usesAVC').prop('checked', true);
@@ -199,8 +198,7 @@
   <%include file="CHBookingRepetition.tpl"/>
 </div>
 <!-- END OF CONTEXT HELP DIVS -->
-
-<form id="bookingForm" name="bookingForm" action="${ bookingFormURL.getURL(conf) }#" method="post">
+<form id="bookingForm" name="bookingForm" action="${ bookingFormURL }" method="post">
   <input type="hidden" id="afterCalPreview" name="afterCalPreview" value="True" />
 
   <table style="width: 100%; padding-left: 20px;">
@@ -211,15 +209,15 @@
     % endif
     <tr>
       <td>
-        <input type="hidden" name="roomID" id="roomID" value="${candResv.room.id}" />
-        <input type="hidden" name="roomLocation" id="roomLocation" value="${candResv.room.locationName}" />
-        <input type="hidden" name="finishDate" id="finishDate"  />
-        <input type="hidden" value="${ startDT.day }" name="sDay" id="sDay"/>
-        <input type="hidden" value="${ startDT.month }" name="sMonth" id="sMonth"/>
-        <input type="hidden" value="${ startDT.year }" name="sYear" id="sYear"/>
-        <input type="hidden" value="${ endDT.day }" name="eDay" id="eDay"/>
-        <input type="hidden" value="${ endDT.month }" name="eMonth" id="eMonth"/>
-        <input type="hidden" value="${ endDT.year }" name="eYear" id="eYear"/>
+        <input type="hidden" name="roomID" id="roomID" value="${ room.id }"/>
+        <input type="hidden" name="roomLocation" id="roomLocation" value="${ room.location.name }"/>
+        <input type="hidden" name="finishDate" id="finishDate"/>
+        <input type="hidden" name="sDay" id="sDay" value="${ startDT.day }"/>
+        <input type="hidden" name="sMonth" id="sMonth" value="${ startDT.month }"/>
+        <input type="hidden" name="sYear" id="sYear" value="${ startDT.year }"/>
+        <input type="hidden" name="eDay" id="eDay" value="${ endDT.day }"/>
+        <input type="hidden" name="eMonth" id="eMonth" value="${ endDT.month }"/>
+        <input type="hidden" name="eYear" id="eYear" value="${ endDT.year }"/>
         % if infoBookingMode:
           <input type="hidden" value="${ startT }" name="sTime" id="sTime"/>
           <input type="hidden" value="${ endT }" name="eTime" id="eTime"/>
@@ -245,19 +243,18 @@
               </span>
             </li>
           </ul>
-        % elif formMode == FormMode.NEW:
-          <span class="groupTitle bookingTitle" style="border-bottom-width: 0px; font-weight: bold">
-            ${ _('New') }&nbsp;${ bookingMessage }ing
-          </span>
-        % endif
-        % if formMode == FormMode.MODIF:
-          <span class="groupTitle bookingTitle" style="border-bottom-width: 0px; font-weight: bold">
+        % elif isModif:
+          <span class="page-title">
             ${ _('Modify') }&nbsp;${ bookingMessage }ing
-            <input type="hidden" name="resvID" id="resvID" value="${candResv.id}" />
+            <input type="hidden" name="resvID" id="resvID" value="${ form.id }" />
           </span>
+        % else:
+          <h2 class="page-title">
+            ${ _('New') }&nbsp;${ bookingMessage }ing
+          </h2>
         % endif
         <table width="100%" align="left" border="0">
-          <%include file="RoomBookingRoomMiniDetails.tpl" args="room=candResv.room"/>
+          <%include file="RoomBookingRoomMiniDetails.tpl" args="room=room"/>
           <tr>
             <td>
               <div class="groupTitle bookingTitle">${'Booking Time & Date'}</div>
@@ -267,14 +264,19 @@
           <tr>
             <td>
               <table id="roomBookingTable">
-                <%include file="RoomBookingPeriodForm.tpl" args="repeatability = candResv.repeatability, form = 0, unavailableDates = candResv.room.getNonBookableDates(skipPast=True), availableDayPeriods = candResv.room.getDailyBookablePeriods(), maxAdvanceDays = candResv.room.maxAdvanceDays"/>
+                <%include file="RoomBookingPeriodForm.tpl"
+                    args="repeatability=(form.repeat_unit.data, form.repeat_step.data),
+                          form=0,
+                          unavailableDates=room.getNonBookableDates(skip_past=True),
+                          availableDayPeriods=room.getBookableTimes(),
+                          maxAdvanceDays=room.max_advance_days"/>
               </table>
             </td>
           </tr>
           % if not infoBookingMode:
             <tr>
               <td id="conflicts" colspan="2">
-                ${ roomBookingRoomCalendar }
+                ${ room_calendar }
               </td>
             </tr>
           % endif
@@ -293,8 +295,8 @@
                       ${ _('User') }&nbsp;&nbsp;
                     </td>
                     <td align="left" class="blacktext">
-                      <input type="hidden" id="bookedForId" name="bookedForId" value="${ candResv.bookedForId or '' }" />
-                      <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="${ candResv.bookedForUser.getFullName() if candResv.bookedForId else candResv.bookedForName }" onclick="searchForUsers();" readonly="readonly" />
+                      <input type="hidden" id="bookedForId" name="bookedForId" value="${ form.booked_for_id.data or '' }" />
+                      <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="${ form.booked_for_name.data or '' }" onclick="searchForUsers();" readonly="readonly" />
                       <input type="button" value="Search" onclick="searchForUsers();" />
                       ${ inlineContextHelp( _("<b>Required.</b> For whom the booking is made.") ) }
                     </td>
@@ -305,7 +307,7 @@
                       ${ _('Name') }&nbsp;&nbsp;
                     </td>
                     <td align="left" class="blacktext">
-                      <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="${ verbose( candResv.bookedForName ) }" />
+                      <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="${ form.booked_for_name.data or '' }" />
                       ${ inlineContextHelp(_("<b>Required.</b> For whom the booking is made.")) }
                     </td>
                   </tr>
@@ -315,7 +317,7 @@
                     ${ _('E-mail') }&nbsp;&nbsp;
                   </td>
                   <td align="left" class="blacktext">
-                    <input type="text" id="contactEmail" name="contactEmail" style="width: 240px;" value="${ verbose( candResv.contactEmail )}" />
+                    <input type="text" id="contactEmail" name="contactEmail" style="width: 240px;" value="${ form.contact_email.data or '' }" />
                     ${ inlineContextHelp(_('<b>Required.</b> Contact email. You can specify more than one email address by separating them with commas, semicolons or whitespaces.')) }
                   </td>
                 </tr>
@@ -324,7 +326,7 @@
                     ${ _('Telephone') }&nbsp;&nbsp;
                   </td>
                   <td align="left" class="blacktext">
-                    <input type="text" id="contactPhone" name="contactPhone" style="width: 240px;" value="${ verbose(candResv.contact_phone) }" />
+                    <input type="text" id="contactPhone" name="contactPhone" style="width: 240px;" value="${ form.contact_phone.data or '' }" />
                     ${ inlineContextHelp(_('Contact telephone.')) }
                   </td>
                 </tr>
@@ -333,11 +335,11 @@
                     ${ _('Reason') }&nbsp;&nbsp;
                   </td>
                   <td align="left" class="blacktext">
-                    <textarea rows="3" cols="50" id="reason" name="reason" >${ verbose(candResv.reason) }</textarea>
+                    <textarea rows="3" cols="50" id="reason" name="reason" >${ form.booking_reason.data or '' }</textarea>
                     ${ inlineContextHelp(_('<b>Required.</b> The justification for booking. Why do you need this room?')) }
                   </td>
                 </tr>
-                % if candResv.room.needsAVCSetup:
+                % if room.needs_video_conference_setup:
                   <tr>
                     <td align="right" class="subFieldWidth" valign="top">
                       <span style="color: Red;">
@@ -345,7 +347,7 @@
                       </span>&nbsp;&nbsp;
                     </td>
                     <td align="left" class="blacktext">
-                      <input id="usesAVC" name="usesAVC" type="checkbox" ${' checked="checked" ' if candResv.usesAVC else ""} />
+                      <input id="usesAVC" name="usesAVC" type="checkbox" ${ ' checked="checked" ' if form.uses_video_conference else '' }/>
                       ${ contextHelp('iWillUseVideoConferencing') }
                     </td>
                   </tr>
@@ -356,9 +358,9 @@
                       </span>&nbsp;&nbsp;
                     </td>
                     <td align="left" id="vcSystemList" class="blacktext">
-                      % for vc in candResv.room.getAvailableVC():
+                      % for vc in room.available_video_conference:
                         <% checked = "" %>
-                        % if vc in candResv.getUseVC():
+                        % if vc in form.uses_video_conference:
                           <% checked = """checked="checked" """ %>
                         % endif
                         <% htmlCheckbox = """<br>\n<input id="vc_%s" name="vc_%s" class="videoConferenceOption" type="checkbox" %s /> %s""" %>
@@ -367,20 +369,20 @@
                     </td>
                   </tr>
                 % endif
-                % if candResv.room.needsAVCSetup or (rh._isAssistenceEmailSetup and candResv.room.resvNotificationAssistance):
+                % if room.needs_video_conference_setup or (rh._isAssistenceEmailSetup and room.notification_for_assistance):
                   <tr>
                     <td align="right" class="subFieldWidth" valign="top">
                       ${ _('Assistance') }&nbsp;&nbsp;
                     </td>
                     <td>
                       <table valign='top' cellpadding=0 cellspacing=0>
-                        % if candResv.room.needsAVCSetup:
+                        % if room.needs_video_conference_setup:
                           <tr>
                             <td align="left" class="blacktext">
                               <table cellpadding=0 cellspacing=0>
                                 <tr>
                                   <td style="vertical-align:top;">
-                                    <input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" ${' checked="checked" ' if candResv.needsAVCSupport else ""} />
+                                    <input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" ${ ' checked="checked" ' if form.needs_video_conference_setup.data else '' }/>
                                   </td>
                                   <td style="width:100%;padding-left: 3px;">
                                     ${ _('Request assistance for the startup of the videoconference session. This support is usually performed remotely.') }
@@ -390,13 +392,13 @@
                             </td>
                           </tr>
                         % endif
-                        % if rh._isAssistenceEmailSetup and candResv.room.resvNotificationAssistance:
+                        % if rh._isAssistenceEmailSetup and room.notification_for_assistance:
                           <tr>
                             <td align="left" class="blacktext">
                               <table cellpadding=0 cellspacing=0>
                                 <tr>
                                   <td style="vertical-align:top;">
-                                    <input id="needsAssistance" name="needsAssistance" type="checkbox" ${ ' checked="checked" ' if candResv.needsAssistance else "" } />
+                                    <input id="needsAssistance" name="needsAssistance" type="checkbox" ${ ' checked="checked" ' if form.needs_general_assistance.data else '' } />
                                   </td>
                                   <td style="width:100%;padding-left: 3px;">
                                     ${ _('Request assistance for the startup of your meeting. A technician will be physically present 10 to 15 minutes before the event to help you start up the room equipment (microphone, projector, etc)') }
@@ -425,7 +427,7 @@
               <input type="hidden" name="standalone" value="${ standalone }" />
               <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0 " style="float:left;">
                 <li class="button" style="margin-left: 10px" onclick="saveBooking()">
-                  <a href="#" onClick="return false;">${'Save' if formMode==FormMode.MODIF else bookingMessage}</a>
+                  <a href="#" onClick="return false;">${_('Save') if isModif else bookingMessage}</a>
                 </li>
                 <li style="display: none"></li>
               </ul>

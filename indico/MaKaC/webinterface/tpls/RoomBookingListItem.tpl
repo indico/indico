@@ -32,7 +32,7 @@
     reservation = collision.withReservation if hasattr(collision, 'withReservation') else collision
 
     occurrence = collision
-    myDetails = bookingDetailsUH.getURL( reservation )
+    myDetails = booking_details_url
     rejectOccurrence = urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL( reservation, date=formatDate(occurrence.startDT.date(), format='yyyy/M/d') )
     rejectReservation = urlHandlers.UHRoomBookingRejectBooking.getURL( reservation )
 

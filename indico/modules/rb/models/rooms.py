@@ -361,7 +361,7 @@ class Room(db.Model, Serializer):
 
     @property
     def available_video_conference(self):
-        # return children of 'Video conference' equipment
+        # TODO: return children of 'Video conference' equipment
         pass
 
     def getAttributeByName(self, attribute_name):

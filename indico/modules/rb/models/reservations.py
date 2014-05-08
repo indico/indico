@@ -247,6 +247,10 @@ class Reservation(Serializer, db.Model):
     def is_repeating(self):
         return self.repeat_unit != RepeatUnit.NEVER
 
+    @hybrid_property
+    def repetition(self):
+        return (self.repeat_unit, self.repeat_step)
+
     @property
     def details_url(self):
         return url_for('rooms.roomBooking-bookingDetails', self, _external=True)
@@ -315,8 +319,14 @@ class Reservation(Serializer, db.Model):
     def filterReservations(**filters):
         return Reservation, Reservation.query
 
+    @staticmethod
     def getReservations(**filters):
-        raise NotImplementedError('todo')
+        for k, v in filters.iteritems():
+            if k == 'start_date':
+                filters[k] = ('ge', v)
+            elif k == 'end_date':
+                filters[k] = ('le', v)
+        return Reservation.filterReservations(**filters);
 
     def cancel(self):
         self.is_cancelled = True
@@ -718,14 +728,6 @@ class Reservation(Serializer, db.Model):
 
     # ===============================================================
 
-    def getCollisions(self):
-        pass
-
-    # @staticmethod
-    # @utils.filtered
-    # def getCountOfReservations(**filters):
-    #     return len(Reservation.getReservations(**filters))
-
     @staticmethod
     def getClosestReservation(resvs=[], after=None):
         if not after:
@@ -875,15 +877,6 @@ class Reservation(Serializer, db.Model):
     # reservations
 
     @staticmethod
-    @utils.filtered
-    def filterReservations(**filters):
-        return Reservation, Reservation.query
-
-    @staticmethod
-    def getReservations(**filters):
-        return apply_filters(Reservation.query, Reservation, **filters).all()
-
-    @staticmethod
     def getReservationCount(**filters):
         return apply_filters(Reservation.query, Reservation, **filters).count()
 
@@ -962,3 +955,10 @@ class Collision(object):
     def __init__(self, period, resv):
         self.start_date, self.end_date = period
         self.collides_with = resv
+
+    def __repr__(self):
+        return '<Collision({0}, {1}, {2})>'.format(
+            self.start_date,
+            self.end_date,
+            self.collides_with.id,
+        )

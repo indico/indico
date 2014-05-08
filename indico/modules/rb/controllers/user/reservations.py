@@ -107,8 +107,9 @@ class RHRoomBookingBookingForm(RHRoomBookingBase):
         self._form = BookingForm()
         self._room = Room.getRoomById(int(request.values.get('roomID')))
         self._infoBookingMode = 'infoBookingMode' in request.values
-        self._requireRealUsers = getRoomBookingOption('bookingsForRealUsers')
         self._isAssistenceEmailSetup = getRoomBookingOption('assistanceNotificationEmails')
+        self._requireRealUsers = getRoomBookingOption('bookingsForRealUsers')
+        self._skipConflicting = request.values.get('skipConflicting') == 'on'
         self._isModif = False
 
         if not self._form.is_submitted():
@@ -119,6 +120,10 @@ class RHRoomBookingBookingForm(RHRoomBookingBase):
                 if self._form.validate_on_submit():
                     self._reservation = Reservation()
                     self._form.populate_obj(self._reservation)
+
+        self._thereAreConflicts = session.get('rbThereAreConflicts')
+        self._showErrors = session.get('rbShowErrors')
+        self._errors = session.get('rbErrors') if self._showErrors else None
 
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)

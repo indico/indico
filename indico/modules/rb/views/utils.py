@@ -184,32 +184,6 @@ def getNewDictOnlyWith(d, keys=[], **kw):
     return kw
 
 
-def getDayAttrsForRoom(dayDT, room):
-    attrs = {'tooltip': '', 'className': ''}
-    roomBlocked = room.getBlockedDay(dayDT)
-    if roomBlocked:
-        block = roomBlocked.block
-    if roomBlocked and block.canOverride(ContextManager.get('currentUser'), explicitOnly=True):
-        attrs['className'] = "blocked_permitted"
-        attrs['tooltip'] = _('Blocked by %s:\n%s\n\n<b>You are permitted to '
-                             'override the blocking.</b>') % (block.createdByUser.getFullName(), block.message)
-    elif roomBlocked and roomBlocked.active is True:
-        if block.canOverride(ContextManager.get('currentUser'), room):
-            attrs['className'] = "blocked_override"
-            attrs['tooltip'] = _('Blocked by %s:\n%s\n\n<b>You own this room or are an administrator '
-                                 'and are thus permitted to override the blocking. Please use this '
-                                 'privilege with care!</b>') % (block.createdByUser.getFullName(), block.message)
-        else:
-            attrs['className'] = "blocked"
-            attrs['tooltip'] = _('Blocked by %s:\n%s') % (block.createdByUser.getFullName(), block.message)
-    elif roomBlocked and roomBlocked.active is None:
-        attrs['className'] = "preblocked"
-        attrs['tooltip'] = _('Blocking requested by %s:\n%s\n\n'
-                             '<b>If this blocking is approved, any colliding bookings will be rejected!</b>'
-        ) % (block.createdByUser.getFullName(), block.message)
-    return attrs
-
-
 def makePercentageString(val):
     """ Converts a float in [0, 1] to a percentage string
         ex:

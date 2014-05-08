@@ -497,10 +497,6 @@ class UHRoomBookingRejectAllConflicting(URLHandler):
     _endpoint = 'rooms.roomBooking-rejectAllConflicting'
 
 
-class UHRoomBookingRejectBookingOccurrence(URLHandler):
-    _endpoint = 'rooms.roomBooking-rejectBookingOccurrence'
-
-
 class UHRoomBookingCancelBookingOccurrence(URLHandler):
     _endpoint = 'rooms.roomBooking-cancelBookingOccurrence'
 

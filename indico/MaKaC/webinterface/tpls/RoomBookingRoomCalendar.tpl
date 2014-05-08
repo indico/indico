@@ -1,7 +1,7 @@
-% if withConflicts:
-    % if thereAreConflicts:
+% if with_conflicts:
+    % if conflicts:
         <span class="errorMessage" style="text-align: left; margin-left:2px; display: inline-block">
-            ${ conflictsNumber }&nbsp;${ _('conflict(s) with other bookings') }
+            ${ conflicts }&nbsp;${ _('conflict(s) with other bookings') }
             <ul style="color: #777; list-style: none;">
                 <!-- Render each conflict... -->
                 <% c = 0; ks = bars.keys(); ks.sort()  %>
