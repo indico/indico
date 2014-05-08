@@ -3,6 +3,8 @@
 .instance-tracking-settings {
     float: left;
     width: 500px;
+    margin-right: 120px;
+    margin-bottom: 40px;
 
     .clearfix {
         margin-bottom: 20px;
@@ -37,13 +39,17 @@
             float: left;
         }
 
-        a, input:not(.btn) {
+        a:not(.i-button), input {
             width: 100%;
         }
 
-        .buttons-group {
+        .group {
             float: right;
             width: initial;
+
+            .i-button {
+                margin-left: 5px;
+            }
         }
     }
 
@@ -96,18 +102,23 @@
 }
 
 .out-of-sync {
-    float: right;
+    float: left;
     display: none;
-    margin-right: 120px;
-    padding: 40px 40px 10px 40px;
-    border: 1px solid $gray;
-    background-color: $light-gray;
+    margin-left: 20px;
 
-    .buttons-group {
+    .group {
         padding-top: 40px;
 
-        input {
+        a {
             float: right;
         }
+    }
+}
+
+.missing-record-text, .out-of-sync-text {
+    display: none;
+
+    li {
+        display: none;
     }
 }

@@ -1,6 +1,7 @@
 <div class="groupTitle"> ${ _("Instance Tracking settings") }</div>
 
-<form action="${ postURL }" method="POST">
+<form id="it-form" action="${ postURL }" method="POST">
+    <input id="hidden-button-pressed" type="hidden" name="button-pressed">
 
     <div>
         <div class="instance-tracking-settings">
@@ -32,18 +33,36 @@
                 </div>
             </div>
             <div class="clearfix">
-                <div class="buttons-group">
-                    <input type="submit" class="btn" name="save" value="${ _("Save")}" disabled>
-                    <input type="submit" class="btn" name="cancel" value="${ _("Cancel")}" disabled>
+                <div class="group">
+                    <a id="button-save" class="i-button disabled">Save</a>
+                    <a id="button-cancel" class="i-button disabled">Cancel</a>
                 </div>
             </div>
         </div>
-        <div class="out-of-sync">
-            <div>Some of your Instance Tracking data seems to be out of sync.</div>
-            <div>Do you want to update these information on the server?</div>
-            <input id="hidden-update-type" type="hidden" name="update-it-type" value="none"></input>
-            <div class="buttons-group">
-                <input type="submit" class="btn" name="update" value="${ _("Update")}">
+        <div class="i-box titled out-of-sync">
+            <div class="i-box-header">
+                <div class="i-box-title">Data out of sync!</div>
+            </div>
+            <div class="i-box-content">
+                <div class="missing-record-text">
+                    <div>It seems like we lost your information on our server.</div>
+                    <div>Click <strong>update</strong> to send them again.</div>
+                </div>
+                <div class="out-of-sync-text">
+                    <div>It seems like you changed some information lately.</div>
+                    <div>The information out of sync are:</div>
+                    <ul>
+                        <li id="out-of-sync-url">URL</li>
+                        <li id="out-of-sync-contact">Contact name</li>
+                        <li id="out-of-sync-email">Email</li>
+                        <li id="out-of-sync-organisation">Organisation</li>
+                    </ul>
+                    <div>Click <strong>update</strong> to send them again.</div>
+                </div>
+                <input id="hidden-update-type" type="hidden" name="update-it-type" value="none">
+                <div class="group">
+                    <a id="button-update" class="i-button">Update</a>
+                </div>
             </div>
         </div>
     </div>
@@ -51,6 +70,7 @@
 </form>
 
 <script type="text/javascript">
+
     $('.toggle-button').on('click', function() {
         var $this = $(this);
         $this.toggleClass('toggled');
@@ -61,7 +81,7 @@
         checkbox.prop('checked', toggled);
         contact.prop('disabled', !toggled);
         email.prop('disabled', !toggled);
-        $('.buttons-group input').prop('disabled', false);
+        $('.group a').removeClass('disabled');
     });
     if ($('#enable').prop('checked')) {
         $('.toggle-button').toggleClass('toggled');
@@ -71,7 +91,7 @@
         email.prop('disabled', false);
     }
     $('input').on('input', function(){
-        $('.buttons-group input').prop('disabled', false);
+        $('.group a').removeClass('disabled');
     });
 
     var hiddenUpdate = $('#hidden-update-type');
@@ -87,15 +107,57 @@
                 var email = ${ email | n,j };
                 var organisation = ${ organisation | n,j };
 
-                if (url != response.url || contact != response.contact || email != response.email || organisation != response.organisation) {
+                var ok = true;
+                if (url != response.url) {
+                    $('#out-of-sync-url').show();
+                    ok = false;
+                }
+                if (contact != response.contact) {
+                    $('#out-of-sync-contact').show();
+                    ok = false;
+                }
+                if (email != response.email) {
+                    $('#out-of-sync-email').show();
+                    ok = false;
+                }
+                if (organisation != response.organisation) {
+                    $('#out-of-sync-organisation').show();
+                    ok = false;
+                }
+
+                if (!ok) {
                     hiddenUpdate.val("update");
-                    outOfSync.css('display', 'block');
+                    $('.out-of-sync-text').show();
+                    outOfSync.show();
                 }
             },
             error: function(){
                 hiddenUpdate.val("register");
-                outOfSync.css('display', 'block');
+                $('.missing-record-text').show();
+                outOfSync.show();
             }
         });
     }
+
+    var hiddenButtonPressed = $('#hidden-button-pressed');
+    var itForm = $('#it-form');
+    $('#button-save').on('click', function(){
+        if (! $(this).hasClass('disabled')) {
+            hiddenButtonPressed.val('save');
+            itForm.submit();
+        }
+    });
+    $('#button-cancel').on('click', function(){
+        if (! $(this).hasClass('disabled')) {
+            hiddenButtonPressed.val('cancel');
+            itForm.submit();
+        }
+    });
+    $('#button-update').on('click', function(){
+        if (! $(this).hasClass('disabled')) {
+            hiddenButtonPressed.val('update');
+            itForm.submit();
+        }
+    });
+
 </script>

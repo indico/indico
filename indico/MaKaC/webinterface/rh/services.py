@@ -431,7 +431,8 @@ class RHInstanceTracking(RHInstanceTrackingBase):
         return p.display()
 
     def _process_POST(self):
-        if 'save' in request.form:
+        button_pressed = request.form['button-pressed']
+        if button_pressed == 'save':
             enableNew = 'enable' in request.form
             enableOld = self._minfo.isInstanceTrackingActive()
             contact = request.form.get('contact', self._minfo.getInstanceTrackingContact())
@@ -455,7 +456,7 @@ class RHInstanceTracking(RHInstanceTrackingBase):
                 payload = {'enabled': False}
                 initial_setup.update_instance(uuid, payload)
                 self._minfo.setInstanceTrackingActive(False)
-        elif 'update' in request.form:
+        elif button_pressed == 'update':
             requestType = request.form['update-it-type']
             if requestType == 'update':
                 self._update()
