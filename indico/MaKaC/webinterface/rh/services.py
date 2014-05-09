@@ -177,6 +177,6 @@ class RHInstanceTracking(RHServicesBase):
             # Else if disabled and something else changed --> update nothing
         elif button_pressed == 'sync':
             sync_instance(request.form['update_it_type'])
-        elif button_pressed == 'cancel':
+        elif button_pressed == 'disable':
             disable_instance()
         self._redirect(url_for("admin.adminServices-instanceTracking"))

@@ -15,7 +15,7 @@
     <div class="group">
         <a id="button-sync" class="i-button">Sync</a>
         <a id="button-learn-more" class="i-button">Learn more</a>
-        <a id="button-cancel" class="i-button">Cancel</a>
+        <a id="button-disable" class="i-button">Disable</a>
     </div>
 </div>
 
@@ -145,12 +145,12 @@
     $('#button-learn-more').on('click', function(){
         location.href = "${ url_for('admin.adminServices-instanceTracking') }";
     });
-    $('#button-cancel').on('click', function(){
+    $('#button-disable').on('click', function(){
         $.ajax({
             url: ${ UpdateITURL | n,j },
             type: "POST",
             data: {
-                button_pressed: 'cancel',
+                button_pressed: 'disable',
                 update_it_type: type
             }
         });
