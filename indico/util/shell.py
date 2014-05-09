@@ -102,10 +102,34 @@ def make_indico_dispatcher(wsgi_app):
         })
 
 
+class DebuggedIndico(DebuggedApplication):
+    def __init__(self, *args, **kwargs):
+        self._evalex_whitelist = None
+        self._request_ip = None
+        super(DebuggedIndico, self).__init__(*args, **kwargs)
+
+    @property
+    def evalex(self):
+        if not self._evalex_whitelist:
+            return False
+        elif self._evalex_whitelist is True:  # explicitly check against True!
+            return True
+        else:
+            return self._request_ip in self._evalex_whitelist
+
+    @evalex.setter
+    def evalex(self, value):
+        self._evalex_whitelist = value
+
+    def __call__(self, environ, start_response):
+        self._request_ip = environ['REMOTE_ADDR']
+        return super(DebuggedIndico, self).__call__(environ, start_response)
+
+
 class WerkzeugServer(object):
 
     def __init__(self, app, host='localhost', port=8000, enable_ssl=False, ssl_key=None, ssl_cert=None,
-                 reload_on_change=False, use_debugger=True):
+                 reload_on_change=False, use_debugger=True, evalex_whitelist=None):
         """
         Run an Indico server based on the Werkzeug server
         """
@@ -122,6 +146,7 @@ class WerkzeugServer(object):
         self.ssl_cert = ssl_cert
         self.reload_on_change = reload_on_change
         self.use_debugger = use_debugger
+        self.evalex_whitelist = evalex_whitelist
 
         logger = logging.getLogger('werkzeug')
         logger.setLevel(logging.DEBUG)
@@ -146,14 +171,7 @@ class WerkzeugServer(object):
         assert self._server is None
         app = self.app
         if self.use_debugger:
-            # In case anyone wonders why evalex is disabled:
-            # 1. It's a huge security hole when open to the public. To use it properly we'd need a way to
-            #    restrict it by IP address (or disable it when not listening on localhost)
-            # 2. ZODB uses a thread-local field to store the connection. So anything accessing the DB will not work
-            #    when accessed from the debugger shell.
-            # So the best solution is not using that part of the werkzeug debugger at all.
-            # Simply use e.g. pydev or rpdb2 if you want a debugger.
-            app = DebuggedApplication(app, False)
+            app = DebuggedIndico(app, self.evalex_whitelist)
         self._server = werkzeug.serving.make_server(self.host, self.port, app, threaded=True,
                                                     ssl_context=self.ssl_context)
         self.addr = self._server.socket.getsockname()[:2]
@@ -178,8 +196,13 @@ class WerkzeugServer(object):
             display_hostname = self.host != '*' and self.host or 'localhost'
             if ':' in display_hostname:
                 display_hostname = '[%s]' % display_hostname
-            console.info(' * Running on {0}://{1}:{2}'.format('https' if self.ssl_context else 'http',
-                                                              display_hostname, self.port))
+            proto = 'https' if self.ssl_context else 'http'
+            console.info(' * Running on {0}://{1}:{2}'.format(proto, display_hostname, self.port))
+            if self.evalex_whitelist:
+                console.info(' * Werkzeug debugger console on {0}://{1}:{2}/console'.format(proto, display_hostname,
+                                                                                            self.port))
+                if self.evalex_whitelist is True:  # explicitly check against True!
+                    console.warning(' * Werkzeug debugger console is available to all clients')
 
     def run(self):
         self._display_host()
@@ -274,7 +297,7 @@ def setup_logging(level):
 
 
 def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=True, ssl_cert=None, ssl_key=None,
-                     reload_on_change=False):
+                     reload_on_change=False, enable_evalex=False, evalex_from=None):
     """
     Sets up a Werkzeug-based web server based on the parameters provided
     """
@@ -344,9 +367,16 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
     # Regenerate JSVars to account for the updated URLs
     RHGetVarsJs.removeTmpVarsFile()
 
+    if not enable_evalex:
+        evalex_whitelist = False
+    elif evalex_from:
+        evalex_whitelist = evalex_from
+    else:
+        evalex_whitelist = True
+
     console.info(' * Using BaseURL {0}'.format(base_url))
     app = make_indico_dispatcher(make_app())
-    server = WerkzeugServer(app, host, used_port, reload_on_change=reload_on_change,
+    server = WerkzeugServer(app, host, used_port, reload_on_change=reload_on_change, evalex_whitelist=evalex_whitelist,
                             enable_ssl=with_ssl, ssl_cert=ssl_cert, ssl_key=ssl_key)
     signal.signal(signal.SIGINT, _sigint)
     server.run()
@@ -373,7 +403,10 @@ def main():
     parser.add_argument('--ssl-cert', help='path to the ssl certificate file')
     parser.add_argument('--reload-on-change', action='store_true',
                         help='restart the server whenever a file changes (does not work for legacy code)')
-
+    parser.add_argument('--enable-evalex', action='store_true',
+                        help="enable the werkzeug debugger's python shell in tracebacks and via /console)")
+    parser.add_argument('--evalex-from', action='append', metavar='IP',
+                        help="restricts the evalex shell to the given ips (can be used multiple times)")
 
     args, remainingArgs = parser.parse_known_args()
 
@@ -387,7 +420,9 @@ def main():
                          keep_base_url=args.keep_base_url,
                          ssl_cert=args.ssl_cert,
                          ssl_key=args.ssl_key,
-                         reload_on_change=args.reload_on_change)
+                         reload_on_change=args.reload_on_change,
+                         enable_evalex=args.enable_evalex,
+                         evalex_from=args.evalex_from)
     else:
         dbi = DBMgr.getInstance()
         dbi.startRequest()
