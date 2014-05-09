@@ -4,13 +4,13 @@
             ${ conflicts }&nbsp;${ _('conflict(s) with other bookings') }
             <ul style="color: #777; list-style: none;">
                 <!-- Render each conflict... -->
-                <% c = 0; ks = bars.keys(); ks.sort()  %>
-                % for dt in ks:
+                <% c = 0  %>
+                % for dt in sorted(bars):
                     % for roomBars in bars[dt]:
                         % for bar in roomBars.bars:
                             % if bar.type == Bar.CONFLICT:
                                 <li>
-                                    ${ formatDate(bar.startDT.date()) } ${ _('from') } ${ bar.startDT.time() } ${ _('to') } ${ bar.endDT.time() }, ${ _('booked for') } ${ bar.forReservation.bookedForName }
+                                    ${ formatDate(bar.startDT.date()) } ${ _('from') } ${ formatTime(bar.startDT.time()) } ${ _('to') } ${ formatTime(bar.endDT.time()) }, ${ _('booked for') } ${ bar.forReservation.bookedForName }
                                 </li>
                                 <% c += 1 %>
                                 % if c > 4:
@@ -45,8 +45,8 @@
 <div id="roomBookingCal"></div>
 <script type="text/javascript">
     var roomBookingCalendar = new RoomBookingCalendar(
-        ${ jsonEncode(bars) },
-        ${ jsonEncode(day_attrs) }
+        ${ bars | n, j },
+        ${ day_attrs | n, j }
     );
     $E('roomBookingCal').set(roomBookingCalendar.draw());
 

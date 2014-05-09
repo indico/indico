@@ -571,10 +571,6 @@ class Room(db.Model, Serializer):
 
     # reservations
 
-    @utils.filtered
-    def filterReservations(self, **filters):
-        return Reservation, self.reservations
-
     def doesHaveLiveReservations(self):
         return self.reservations.filter_by(
             is_live=True,
@@ -583,10 +579,11 @@ class Room(db.Model, Serializer):
         ).count() > 0
 
     def getLiveReservations(self):
-        return self.filterReservations(
-            is_live=True,
-            is_cancelled=False,
-            is_rejected=False
+        return Reservation.find_all(
+            Reservation.room == self,
+            Reservation.is_live,
+            ~Reservation.is_cancelled,
+            ~Reservation.is_rejected
         )
 
     def removeReservations(self):

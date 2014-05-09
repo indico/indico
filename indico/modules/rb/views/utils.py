@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from indico.modules.rb.models.utils import Serializer
+from indico.util.date_time import format_time
 from MaKaC.webinterface import urlHandlers as UH
 
 
@@ -124,7 +125,7 @@ class Bar(Serializer):
         return {
             'date': str(self.start.date()),
             'tz': None,
-            'time': getattr(self, attr).strftime('%H:%M')
+            'time': format_time(getattr(self, attr)).strftime('%H:%M')
         }
 
 

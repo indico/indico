@@ -354,7 +354,7 @@ class WRoomBookingBookingForm(WTemplated):
         wvars['form'] = self._form
         wvars['config'] = Config.getInstance()
         wvars['isModif'] = self._rh._isModif
-        wvars['allow_past'] = 'true' if self._rh._isModif else 'false'
+        wvars['allow_past'] = self._rh._isModif
         wvars['standalone'] = self._standalone
         wvars['infoBookingMode'] = self._rh._infoBookingMode
 

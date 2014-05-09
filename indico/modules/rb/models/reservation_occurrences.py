@@ -124,14 +124,14 @@ class ReservationOccurrence(db.Model):
         raise IndicoError('Unexpected frequency')
 
     def overlaps(self, occurrence, skip_self=False):
-        if self.reservation and occurrence.reservation and self.reservation.room != occurrence.reservation.room:
+        if self.reservation and occurrence.reservation and self.reservation.room_id != occurrence.reservation.room_id:
             raise ValueError('ReservationOccurrence objects of different rooms')
         if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
             return False
         return date_time.overlaps((self.start, self.end), (occurrence.start, occurrence.end))
 
     def get_overlap(self, occurrence, skip_self=False):
-        if self.reservation and occurrence.reservation and self.reservation.room != occurrence.reservation.room:
+        if self.reservation and occurrence.reservation and self.reservation.room_id != occurrence.reservation.room_id:
             raise ValueError('ReservationOccurrence objects of different rooms')
         if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
             return None, None

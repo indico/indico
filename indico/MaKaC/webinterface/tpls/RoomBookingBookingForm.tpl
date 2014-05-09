@@ -34,7 +34,7 @@
         var isValid = true;
         % if not infoBookingMode:
             // Date validator (repeatability)
-            isValid = validate_period(true, ${ allow_past }, 1, $('#repeatability').val()) && isValid; // 1: validate dates
+            isValid = validate_period(true, ${ allow_past | n, j }, 1, $('#repeatability').val()) && isValid; // 1: validate dates
             // Time validator
             isValid = isValid & $('#timerange').timerange('validate');
         % endif
@@ -361,7 +361,7 @@
                       % for vc in room.available_video_conference:
                         <% checked = "" %>
                         % if vc in form.uses_video_conference:
-                          <% checked = """checked="checked" """ %>
+                          <% checked = "checked " %>
                         % endif
                         <% htmlCheckbox = """<br>\n<input id="vc_%s" name="vc_%s" class="videoConferenceOption" type="checkbox" %s /> %s""" %>
                         ${ htmlCheckbox % (vc[:3], vc[:3], checked, vc) }

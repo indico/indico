@@ -240,20 +240,20 @@ class Reservation(Serializer, db.Model):
     def is_live(self):
         return self.end_date >= now_utc()
 
-    def is_archival(self):
-        return not self.is_live
-
     @hybrid_property
     def is_repeating(self):
         return self.repeat_unit != RepeatUnit.NEVER
 
-    @hybrid_property
+    @property
     def repetition(self):
         return (self.repeat_unit, self.repeat_step)
 
     @property
     def details_url(self):
         return url_for('rooms.roomBooking-bookingDetails', self, _external=True)
+
+    def is_archival(self):
+        return not self.is_live
 
     @staticmethod
     def getReservationWithDefaults():
@@ -313,20 +313,6 @@ class Reservation(Serializer, db.Model):
     @staticmethod
     def getReservationById(rid):
         return Reservation.query.get(rid)
-
-    @staticmethod
-    @utils.filtered
-    def filterReservations(**filters):
-        return Reservation, Reservation.query
-
-    @staticmethod
-    def getReservations(**filters):
-        for k, v in filters.iteritems():
-            if k == 'start_date':
-                filters[k] = ('ge', v)
-            elif k == 'end_date':
-                filters[k] = ('le', v)
-        return Reservation.filterReservations(**filters);
 
     def cancel(self):
         self.is_cancelled = True
