@@ -2,7 +2,7 @@
     ${"My Blockings" if rh.only_mine else "Blockings"}
 </h2>
 <br />
-% if blocks:
+% if blockings:
     <br />
     <table class="blockingTable">
         <thead>
@@ -15,7 +15,7 @@
         </tr>
         </thead>
         <% lastBlock = None %>
-        % for block in blocks:
+        % for block in blockings:
             % if lastBlock:
                 <tbody class="blockingSpacer"><tr><td></td></tr></tbody>
             % endif

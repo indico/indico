@@ -22,51 +22,32 @@ from MaKaC.webinterface.wcomponents import WTemplated
 
 
 class WPRoomBookingBlockingDetails(WPRoomBookingBase):
-    def __init__(self, rh, blocking):
-        WPRoomBookingBase.__init__(self, rh)
-        self._blocking = blocking
-
-    def _getBody(self, params):
-        params = dict(params, blocking=self._blocking)
-        return WTemplated('RoomBookingBlockingDetails').getHTML(params)
-
-
-class WPRoomBookingBlockingForm(WPRoomBookingBase):
-    def __init__(self, rh, form, errors, blocking=None):
-        WPRoomBookingBase.__init__(self, rh)
-        self._form = form
-        self._errors = errors
-        self._blocking = blocking
-
     def _setCurrentMenuItem(self):
         self._blockRooms.setActive(True)
 
     def _getBody(self, params):
-        params = dict(params, form=self._form, blocking=self._blocking, errors=self._errors)
+        return WTemplated('RoomBookingBlockingDetails').getHTML(params)
+
+
+class WPRoomBookingBlockingForm(WPRoomBookingBase):
+    def _setCurrentMenuItem(self):
+        self._blockRooms.setActive(True)
+
+    def _getBody(self, params):
         return WTemplated('RoomBookingBlockingForm').getHTML(params)
 
 
 class WPRoomBookingBlockingList(WPRoomBookingBase):
-    def __init__(self, rh, blocks):
-        WPRoomBookingBase.__init__(self, rh)
-        self._blocks = blocks
-
     def _setCurrentMenuItem(self):
         self._myBlockingListOpt.setActive(True)
 
     def _getBody(self, params):
-        params = dict(params, blocks=self._blocks)
         return WTemplated('RoomBookingBlockingList').getHTML(params)
 
 
 class WPRoomBookingBlockingsForMyRooms(WPRoomBookingBase):
-    def __init__(self, rh, roomBlocks):
-        WPRoomBookingBase.__init__(self, rh)
-        self._roomBlocks = roomBlocks
-
     def _setCurrentMenuItem(self):
         self._usersBlockings.setActive(True)
 
     def _getBody(self, params):
-        params = dict(params, roomBlocks=self._roomBlocks)
         return WTemplated('RoomBookingBlockingsForMyRooms').getHTML(params)

@@ -11,7 +11,7 @@
     for your rooms
 </h2>
 <br>
-% if roomBlocks:
+% if room_blocks:
     <br>
     <table class="blockingTable">
         <thead>
@@ -26,7 +26,7 @@
 
         <tbody class="blockingForMyRoom">
         <% lastRoom = None %>
-        % for room, roomBlockings in roomBlocks.iteritems():
+        % for room, roomBlockings in room_blocks.iteritems():
             % for rb in roomBlockings:
                 % if lastRoom and lastRoom != room:
                     </tbody>

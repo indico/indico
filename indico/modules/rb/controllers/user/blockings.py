@@ -41,12 +41,12 @@ from MaKaC.webinterface.mail import GenericNotification
 
 class RHRoomBookingBlockingDetails(RHRoomBookingBase):
     def _checkParams(self):
-        self._block = Blocking.get(request.view_args['blocking_id'])
-        if not self._block:
+        self._blocking = Blocking.get(request.view_args['blocking_id'])
+        if not self._blocking:
             raise IndicoError('A blocking with this ID does not exist.')
 
     def _process(self):
-        return WPRoomBookingBlockingDetails(self, self._block).display()
+        return WPRoomBookingBlockingDetails(self, blocking=self._blocking).display()
 
 
 class RHRoomBookingCreateModifyBlockingBase(RHRoomBookingBase):
@@ -55,7 +55,8 @@ class RHRoomBookingCreateModifyBlockingBase(RHRoomBookingBase):
             self._save()
             self._redirect(url_for('rooms.blocking_details', blocking_id=str(self._blocking.id)))
         else:
-            return WPRoomBookingBlockingForm(self, self._form, self._form.error_list, blocking=self._blocking).display()
+            return WPRoomBookingBlockingForm(self, form=self._form, errors=self._form.error_list,
+                                             blocking=self._blocking).display()
 
     def _process_blocked_rooms(self, blocked_rooms):
         rooms_by_owner = defaultdict(list)
@@ -172,7 +173,7 @@ class RHRoomBookingBlockingList(RHRoomBookingBase):
             criteria += [Blocking.end_date >= date.today()]
 
         blockings = Blocking.find(*criteria).order_by(Blocking.start_date.desc()).all()
-        return WPRoomBookingBlockingList(self, blockings).display()
+        return WPRoomBookingBlockingList(self, blockings=blockings).display()
 
 
 class RHRoomBookingBlockingsForMyRooms(RHRoomBookingBase):
@@ -186,5 +187,4 @@ class RHRoomBookingBlockingsForMyRooms(RHRoomBookingBase):
             roomBlocks = room.blocked_rooms.filter(True if state is None else BlockedRoom.state == state).all()
             if roomBlocks:
                 my_blocks[room] += roomBlocks
-        rv = WPRoomBookingBlockingsForMyRooms(self, my_blocks).display()
-        return rv
+        return WPRoomBookingBlockingsForMyRooms(self, room_blocks=my_blocks).display()

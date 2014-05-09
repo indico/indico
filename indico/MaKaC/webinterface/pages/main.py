@@ -151,7 +151,7 @@ class WPMainBase(base.WPDecorated):
         self._showAdmin = self._isAdmin or self._isCategoryManager
 
         self._timezone = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ())
-
+        params = dict(params, **self._kwargs)
         body = WMainBase(self._getBody( params ), self._timezone, self._getNavigationDrawer(),
                          isFrontPage=self._isFrontPage(), isRoomBooking=self._isRoomBooking(), sideMenu = sideMenu).getHTML({"subArea": self._getSiteArea()})
 
