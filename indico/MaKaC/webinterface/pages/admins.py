@@ -173,8 +173,7 @@ class WAdmins(wcomponents.WTemplated):
         wvars['administrators'] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
                                                    key=methodcaller('getStraightFullName')))
 
-        itActive = minfo.isInstanceTrackingActive()
-        wvars["itActive"] = str(itActive).lower()
+        wvars["itActive"] = minfo.isInstanceTrackingActive()
         wvars["uuid"] = minfo.getInstanceTrackingUUID()
         wvars["url"] = Config.getInstance().getBaseURL()
         wvars["contact"] = minfo.getInstanceTrackingContact()
@@ -1029,7 +1028,7 @@ class WInstanceTracking(wcomponents.WTemplated):
         wvars["organisation"] = minfo.getOrganisation()
         wvars["uuid"] = minfo.getInstanceTrackingUUID()
         wvars["url"] = Config.getInstance().getBaseURL()
-        wvars["itEnabled"] = str(minfo.isInstanceTrackingActive()).lower()
+        wvars["itEnabled"] = minfo.isInstanceTrackingActive()
         wvars["updateURL"] = Config.getInstance().getTrackerURL() + '/instance/'
         return wvars
 
