@@ -34,48 +34,48 @@
             </div>
             <div class="clearfix">
                 <div class="group">
-                    <a id="button-save" class="i-button disabled">Save</a>
-                    <a id="button-cancel" class="i-button disabled">Cancel</a>
+                    <a id="button-save" class="i-button disabled">${ _('Save') }</a>
+                    <a id="button-cancel" class="i-button disabled">${ _('Cancel') }</a>
                 </div>
             </div>
         </div>
         <div class="i-box titled out-of-sync">
             <div class="i-box-header">
-                <div class="i-box-title">Data out of sync!</div>
+                <div class="i-box-title">${ _('Data out of sync!') }</div>
             </div>
             <div class="i-box-content">
                 <div class="missing-record-text">
-                    <div>It seems like we lost your information on our server.</div>
+                    <div>${ _('It seems like we lost your information on our server.') }</div>
                     <br>
-                    <div>Click <strong>sync</strong> to send it again.</div>
+                    <div>${ _('Click <strong>sync</strong> to send it again.') }</div>
                 </div>
                 <div class="out-of-sync-text">
-                    <div>It seems like you changed some information lately and we still have the old version in our server.</div>
+                    <div>${ _('It seems like you changed some information lately and we still have the old version in our server.') }</div>
                     <br>
-                    <div>The information out of sync are:</div>
+                    <div>${ _('The information out of sync are:') }</div>
                     <ul>
                         <div id="out-of-sync-url" class="out-of-sync-field">
-                            <li>URL</li>
+                            <li>${ _('URL') }</li>
                             <span></span>
                         </div>
                         <div id="out-of-sync-contact" class="out-of-sync-field">
-                            <li>Contact name</li>
+                            <li>${ _('Contact name') }</li>
                             <span></span>
                         </div>
                         <div id="out-of-sync-email" class="out-of-sync-field">
-                            <li>Email</li>
+                            <li>${ _('Email') }</li>
                             <span></span>
                         </div>
                         <div id="out-of-sync-organisation" class="out-of-sync-field">
-                            <li>Organisation</li>
+                            <li>${ _('Organisation') }</li>
                             <span></span>
                         </div>
                     </ul>
-                    <div>Click <strong>sync</strong> to send them again.</div>
+                    <div>${ _('Click <strong>sync</strong> to send them again.') }</div>
                 </div>
                 <input id="hidden-update-type" type="hidden" name="update_it_type" value="none">
                 <div class="group">
-                    <a id="button-sync" class="i-button">Sync</a>
+                    <a id="button-sync" class="i-button">${ _('Sync') }</a>
                 </div>
             </div>
         </div>
@@ -104,7 +104,7 @@
         contact.prop('disabled', false);
         email.prop('disabled', false);
     }
-    $('input').on('input', function(){
+    $('input').on('input', function() {
         $('.group a').removeClass('disabled');
     });
 

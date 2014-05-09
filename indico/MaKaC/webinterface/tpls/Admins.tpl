@@ -11,11 +11,11 @@
 <div class="groupTitle">${ _("General System Information") }</div>
 
 <div class="warning-message-box out-of-sync-message">
-    <div class="message-text">Instance Tracking data out of sync!</div>
+    <div class="message-text">${ _('Instance Tracking data out of sync!') }</div>
     <div class="group">
-        <a id="button-sync" class="i-button">Sync</a>
-        <a id="button-learn-more" class="i-button">Learn more</a>
-        <a id="button-disable" class="i-button">Disable</a>
+        <a id="button-sync" class="i-button">${ _('Sync') }</a>
+        <a id="button-learn-more" class="i-button">${ _('Learn more') }</a>
+        <a id="button-disable" class="i-button">${ _('Disable') }</a>
     </div>
 </div>
 
