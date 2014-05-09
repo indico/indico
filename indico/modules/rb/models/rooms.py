@@ -397,7 +397,7 @@ class Room(db.Model, Serializer):
 
     def getFullName(self):
         if self.has_special_name:
-            return u'{}-{}'.format(self.generateName(), self.name)
+            return u'{} - {}'.format(self.generateName(), self.name)
         else:
             return u'{}'.format(self.generateName())
 

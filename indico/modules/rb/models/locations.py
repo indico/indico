@@ -31,7 +31,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from indico.core.db import db
 from indico.util.i18n import _
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, natural_sort_key
 from . import utils
 from .aspects import Aspect
 from .reservations import Reservation
@@ -227,7 +227,8 @@ class Location(db.Model):
         return self.rooms.filter_by(id=rid).first()
 
     def getRoomsOrderedByNames(self):
-        return self.rooms.order_by(Room.name).all()
+        # Needs to be sorted locally for natural order
+        return sorted(self.rooms.all(), key=lambda x: natural_sort_key(x.getFullName()))
 
     # default location management
 
