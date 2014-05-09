@@ -34,48 +34,47 @@
             </div>
             <div class="clearfix">
                 <div class="group">
-                    <a id="button-save" class="i-button disabled">Save</a>
-                    <a id="button-cancel" class="i-button disabled">Cancel</a>
+                    <a id="button-save" class="i-button disabled" href="#">${ _('Save') }</a>
+                    <a id="button-cancel" class="i-button disabled" href="#">${ _('Cancel') }</a>
                 </div>
             </div>
         </div>
         <div class="i-box titled out-of-sync">
             <div class="i-box-header">
-                <div class="i-box-title">Data out of sync!</div>
+                <div class="i-box-title">${ _('Data out of sync!') }</div>
             </div>
             <div class="i-box-content">
                 <div class="missing-record-text">
-                    <div>It seems like we lost your information on our server.</div>
+                    <div>${ _('It seems like we lost your information on our server.') }</div>
                     <br>
-                    <div>Click <strong>sync</strong> to send it again.</div>
                 </div>
                 <div class="out-of-sync-text">
-                    <div>It seems like you changed some information lately and we still have the old version in our server.</div>
+                    <div>${ _('It seems like you changed some information lately and we still have the old version in our server.') }</div>
                     <br>
-                    <div>The information out of sync are:</div>
+                    <div>${ _('The information out of sync is:') }</div>
                     <ul>
                         <div id="out-of-sync-url" class="out-of-sync-field">
-                            <li>URL</li>
+                            <li>${ _('URL') }</li>
                             <span></span>
                         </div>
                         <div id="out-of-sync-contact" class="out-of-sync-field">
-                            <li>Contact name</li>
+                            <li>${ _('Contact name') }</li>
                             <span></span>
                         </div>
                         <div id="out-of-sync-email" class="out-of-sync-field">
-                            <li>Email</li>
+                            <li>${ _('Email') }</li>
                             <span></span>
                         </div>
                         <div id="out-of-sync-organisation" class="out-of-sync-field">
-                            <li>Organisation</li>
+                            <li>${ _('Organisation') }</li>
                             <span></span>
                         </div>
                     </ul>
-                    <div>Click <strong>sync</strong> to send them again.</div>
                 </div>
+                <div>${ _('Click <strong>sync</strong> to send it again.') }</div>
                 <input id="hidden-update-type" type="hidden" name="update_it_type" value="none">
                 <div class="group">
-                    <a id="button-sync" class="i-button">Sync</a>
+                    <a id="button-sync" class="i-button" href="#">${ _('Sync') }</a>
                 </div>
             </div>
         </div>
@@ -83,7 +82,7 @@
 
 </form>
 
-<script type="text/javascript">
+<script>
 
     $('.toggle-button').on('click', function() {
         var $this = $(this);
@@ -104,30 +103,30 @@
         contact.prop('disabled', false);
         email.prop('disabled', false);
     }
-    $('input').on('input', function(){
+    $('input').on('input', function() {
         $('.group a').removeClass('disabled');
     });
 
     var hiddenUpdate = $('#hidden-update-type');
     var outOfSync = $(".out-of-sync");
-    if (${ itEnabled }) {
+    % if itEnabled:
         $.ajax({
             url: "${ updateURL }${ uuid }",
             type: "GET",
             dataType: "json",
             success: function(response){
-                var fields = [
-                    ['url', response.url, ${ url | n,j }],
-                    ['contact', response.contact, ${ contact | n,j }],
-                    ['email', response.email, ${ email | n,j }],
-                    ['organisation', response.organisation, ${ organisation | n,j }]
-                ];
+                var fields = {
+                    'url': ${ url | n,j },
+                    'contact': ${ contact | n,j },
+                    'email': ${ email | n,j },
+                    'organisation': ${ organisation | n,j }
+                };
 
                 var ok = true;
-                for (var i=0; i<=3; i++) {
-                    if (fields[i][1] != fields[i][2]) {
-                        $('#out-of-sync-' + fields[i][0]).show();
-                        $('#out-of-sync-' + fields[i][0] + ' span').text(fields[i][1] + ' ➟ ' + fields[i][2]);
+                for (var key in fields) {
+                    if (response[key] != fields[key]) {
+                        $('#out-of-sync-' + key).show();
+                        $('#out-of-sync-' + key + ' span').text(response[key] + ' ➟ ' + fields[key]);
                         ok = false;
                     }
                 }
@@ -144,22 +143,25 @@
                 outOfSync.show();
             }
         });
-    }
+    % endif
 
     var hiddenButtonPressed = $('#hidden-button-pressed');
     var itForm = $('#it-form');
-    $('#button-save').on('click', function(){
+    $('#button-save').on('click', function(e){
+        e.preventDefault();
         if (! $(this).hasClass('disabled')) {
             hiddenButtonPressed.val('save');
             itForm.submit();
         }
     });
-    $('#button-cancel').on('click', function(){
+    $('#button-cancel').on('click', function(e){
+        e.preventDefault();
         if (! $(this).hasClass('disabled')) {
             itForm.submit();
         }
     });
-    $('#button-sync').on('click', function(){
+    $('#button-sync').on('click', function(e){
+        e.preventDefault();
         if (! $(this).hasClass('disabled')) {
             hiddenButtonPressed.val('sync');
             itForm.submit();
