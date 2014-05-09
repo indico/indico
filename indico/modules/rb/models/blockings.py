@@ -58,7 +58,7 @@ class Blocking(db.Model):
         nullable=False
     )
     reason = db.Column(
-        db.String,
+        db.Text,
         nullable=False
     )
 
