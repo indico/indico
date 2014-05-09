@@ -54,10 +54,22 @@
                     <br>
                     <div>The information out of sync are:</div>
                     <ul>
-                        <li id="out-of-sync-url">URL</li>
-                        <li id="out-of-sync-contact">Contact name</li>
-                        <li id="out-of-sync-email">Email</li>
-                        <li id="out-of-sync-organisation">Organisation</li>
+                        <div id="out-of-sync-url" class="out-of-sync-field">
+                            <li>URL</li>
+                            <span></span>
+                        </div>
+                        <div id="out-of-sync-contact" class="out-of-sync-field">
+                            <li>Contact name</li>
+                            <span></span>
+                        </div>
+                        <div id="out-of-sync-email" class="out-of-sync-field">
+                            <li>Email</li>
+                            <span></span>
+                        </div>
+                        <div id="out-of-sync-organisation" class="out-of-sync-field">
+                            <li>Organisation</li>
+                            <span></span>
+                        </div>
                     </ul>
                     <div>Click <strong>sync</strong> to send them again.</div>
                 </div>
@@ -104,27 +116,20 @@
             type: "GET",
             dataType: "json",
             success: function(response){
-                var url = ${ url | n,j };
-                var contact = ${ contact | n,j };
-                var email = ${ email | n,j };
-                var organisation = ${ organisation | n,j };
+                var fields = [
+                    ['url', response.url, ${ url | n,j }],
+                    ['contact', response.contact, ${ contact | n,j }],
+                    ['email', response.email, ${ email | n,j }],
+                    ['organisation', response.organisation, ${ organisation | n,j }]
+                ];
 
                 var ok = true;
-                if (url != response.url) {
-                    $('#out-of-sync-url').show();
-                    ok = false;
-                }
-                if (contact != response.contact) {
-                    $('#out-of-sync-contact').show();
-                    ok = false;
-                }
-                if (email != response.email) {
-                    $('#out-of-sync-email').show();
-                    ok = false;
-                }
-                if (organisation != response.organisation) {
-                    $('#out-of-sync-organisation').show();
-                    ok = false;
+                for (var i=0; i<=3; i++) {
+                    if (fields[i][1] != fields[i][2]) {
+                        $('#out-of-sync-' + fields[i][0]).show();
+                        $('#out-of-sync-' + fields[i][0] + ' span').text(fields[i][1] + ' ➟ ' + fields[i][2]);
+                        ok = false;
+                    }
                 }
 
                 if (!ok) {
