@@ -38,23 +38,23 @@
             // Time validator
             isValid = isValid & $('#timerange').timerange('validate');
         % endif
-        required_fields(['bookedForName', 'contactEmail', 'reason']) && isValid;
+        required_fields(['reservation-booked_for_name', 'reservation-contact_email', 'reservation-booking_reason']) && isValid;
         if (onSubmit) {
-            isValid = required_fields(['bookedForName', 'contactEmail', 'reason']) && isValid;
+            isValid = required_fields(['reservation-booked_for_name', 'reservation-contact_email', 'reservation-booking_reason']) && isValid;
         } else {
-            isValid = required_fields(['bookedForName', 'contactEmail']) && isValid;
+            isValid = required_fields(['reservation-booked_for_name', 'reservation-contact_email']) && isValid;
         }
         % if not infoBookingMode and not (user.isRBAdmin() or user.getId() == room.owner_id) and room.max_advance_days > 0:
             isValid = validate_allow(${ room.max_advance_days }) && isValid;
         % endif
-        if (!Util.Validation.isEmailList($('#contactEmail').val())) {
+        if (!Util.Validation.isEmailList($('#reservation-contact_email').val())) {
             isValid = false;
-            $('#contactEmail').addClass('invalid');
+            $('#reservation-contact_email').addClass('invalid');
         }
 
         % if room.needs_video_conference_setup:
             var vcIsValid = true;
-            if ($('#usesAVC').is(':checked')) {
+            if ($('#reservation-uses_video_conference').is(':checked')) {
                 vcIsValid = $('input.videoConferenceOption').is(':checked');
             }
             $('#vcSystemList').toggleClass('invalid', !vcIsValid);
@@ -71,10 +71,10 @@
                                          true, null,
                                          true, true, false,
                                          function(users) {
-                                             $E('bookedForName').set(users[0].name);
-                                             $E('bookedForId').set(users[0].id);
-                                             $E('contactEmail').set(users[0].email);
-                                             $E('contactPhone').set(users[0].phone);
+                                             $E('reservation-booked_for_name').set(users[0].name);
+                                             $E('reservation-booked_for_id').set(users[0].id);
+                                             $E('reservation-contact_email').set(users[0].email);
+                                             $E('reservation-contact_phone').set(users[0].phone);
                                          });
 
             popup.execute();
@@ -151,12 +151,12 @@
         % elif room.needs_video_conference_setup:
             $('.videoConferenceOption, #needsAVCSupport').change(function() {
                 if(this.checked) {
-                    $('#usesAVC').prop('checked', true);
+                    $('#reservation-uses_video_conference').prop('checked', true);
                 }
             });
-            $('#usesAVC').change(function() {
+            $('#reservation-uses_video_conference').change(function() {
                 if(!this.checked) {
-                    $('.videoConferenceOption, #needsAVCSupport').prop('checked', false);
+                    $('.videoConferenceOption, #reservation-needs_video_conference_setup').prop('checked', false);
                 }
             });
         % endif
@@ -295,8 +295,8 @@
                       ${ _('User') }&nbsp;&nbsp;
                     </td>
                     <td align="left" class="blacktext">
-                      <input type="hidden" id="bookedForId" name="bookedForId" value="${ form.booked_for_id.data or '' }" />
-                      <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="${ form.booked_for_name.data or '' }" onclick="searchForUsers();" readonly="readonly" />
+                      ${ form.booked_for_id }
+                      ${ form.booked_for_name(style='width: 240px;', onclick='searchForUsers();', readonly=True) }
                       <input type="button" value="Search" onclick="searchForUsers();" />
                       ${ inlineContextHelp( _("<b>Required.</b> For whom the booking is made.") ) }
                     </td>
@@ -307,7 +307,7 @@
                       ${ _('Name') }&nbsp;&nbsp;
                     </td>
                     <td align="left" class="blacktext">
-                      <input type="text" id="bookedForName" name="bookedForName" style="width: 240px;" value="${ form.booked_for_name.data or '' }" />
+                      ${ form.booked_for_name(style='width: 240px;') }
                       ${ inlineContextHelp(_("<b>Required.</b> For whom the booking is made.")) }
                     </td>
                   </tr>
@@ -317,7 +317,7 @@
                     ${ _('E-mail') }&nbsp;&nbsp;
                   </td>
                   <td align="left" class="blacktext">
-                    <input type="text" id="contactEmail" name="contactEmail" style="width: 240px;" value="${ form.contact_email.data or '' }" />
+                    ${ form.contact_email(style='width: 240px;') }
                     ${ inlineContextHelp(_('<b>Required.</b> Contact email. You can specify more than one email address by separating them with commas, semicolons or whitespaces.')) }
                   </td>
                 </tr>
@@ -326,7 +326,7 @@
                     ${ _('Telephone') }&nbsp;&nbsp;
                   </td>
                   <td align="left" class="blacktext">
-                    <input type="text" id="contactPhone" name="contactPhone" style="width: 240px;" value="${ form.contact_phone.data or '' }" />
+                    ${ form.contact_phone(style='width: 240px;') }
                     ${ inlineContextHelp(_('Contact telephone.')) }
                   </td>
                 </tr>
@@ -335,7 +335,7 @@
                     ${ _('Reason') }&nbsp;&nbsp;
                   </td>
                   <td align="left" class="blacktext">
-                    <textarea rows="3" cols="50" id="reason" name="reason" >${ form.booking_reason.data or '' }</textarea>
+                    ${ form.booking_reason(rows='3', cols='50') }
                     ${ inlineContextHelp(_('<b>Required.</b> The justification for booking. Why do you need this room?')) }
                   </td>
                 </tr>
@@ -347,8 +347,8 @@
                       </span>&nbsp;&nbsp;
                     </td>
                     <td align="left" class="blacktext">
-                      <input id="usesAVC" name="usesAVC" type="checkbox" ${ ' checked="checked" ' if form.uses_video_conference else '' }/>
-                      ${ contextHelp('iWillUseVideoConferencing') }
+                        ${ form.uses_video_conference }
+                        ${ contextHelp('iWillUseVideoConferencing') }
                     </td>
                   </tr>
                   <tr>
@@ -381,12 +381,12 @@
                             <td align="left" class="blacktext">
                               <table cellpadding=0 cellspacing=0>
                                 <tr>
-                                  <td style="vertical-align:top;">
-                                    <input id="needsAVCSupport" name="needsAVCSupport" type="checkbox" ${ ' checked="checked" ' if form.needs_video_conference_setup.data else '' }/>
-                                  </td>
-                                  <td style="width:100%;padding-left: 3px;">
-                                    ${ _('Request assistance for the startup of the videoconference session. This support is usually performed remotely.') }
-                                  </td>
+                                    <td style="vertical-align:top;">
+                                        ${ form.needs_video_conference_setup }
+                                    </td>
+                                    <td style="width:100%;padding-left: 3px;">
+                                      ${ _('Request assistance for the startup of the videoconference session. This support is usually performed remotely.') }
+                                    </td>
                                 </tr>
                               </table>
                             </td>
@@ -397,12 +397,12 @@
                             <td align="left" class="blacktext">
                               <table cellpadding=0 cellspacing=0>
                                 <tr>
-                                  <td style="vertical-align:top;">
-                                    <input id="needsAssistance" name="needsAssistance" type="checkbox" ${ ' checked="checked" ' if form.needs_general_assistance.data else '' } />
-                                  </td>
-                                  <td style="width:100%;padding-left: 3px;">
-                                    ${ _('Request assistance for the startup of your meeting. A technician will be physically present 10 to 15 minutes before the event to help you start up the room equipment (microphone, projector, etc)') }
-                                  </td>
+                                    <td style="vertical-align:top;">
+                                        ${ form.needs_general_assistance }
+                                    </td>
+                                    <td style="width:100%;padding-left: 3px;">
+                                        ${ _('Request assistance for the startup of your meeting. A technician will be physically present 10 to 15 minutes before the event to help you start up the room equipment (microphone, projector, etc)') }
+                                    </td>
                                 </tr>
                               </table>
                             </td>

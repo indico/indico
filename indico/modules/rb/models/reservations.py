@@ -168,7 +168,7 @@ class Reservation(Serializer, db.Model):
         default=False
     )
     booking_reason = db.Column(
-        db.String,
+        db.Text,
         nullable=False,
         default=''
     )

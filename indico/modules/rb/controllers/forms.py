@@ -388,9 +388,11 @@ class BookingListForm(Form):
         raise IndicoError('{} has no attribute: {}'.format(self.__class__.__name__, attr))
 
 
-class BookingForm(ModelForm):
+class ReservationForm(ModelForm):
     class Meta:
         model = Reservation
+
+    booked_for_id = HiddenField()
 
 
 class RoomListForm(Form):

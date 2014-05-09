@@ -25,7 +25,7 @@ from flask import request, session
 from indico.core.errors import IndicoError, FormValuesError
 from indico.util.i18n import _
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.controllers.forms import BookingForm, BookingListForm
+from indico.modules.rb.controllers.forms import ReservationForm, BookingListForm
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.utils import getRoomBookingOption
@@ -104,7 +104,7 @@ class RHRoomBookingBookingList(RHRoomBookingBase):
 
 class RHRoomBookingBookingForm(RHRoomBookingBase):
     def _checkParams(self):
-        self._form = BookingForm()
+        self._form = ReservationForm(prefix='reservation')
         self._room = Room.getRoomById(int(request.values.get('roomID')))
         self._infoBookingMode = 'infoBookingMode' in request.values
         self._isAssistenceEmailSetup = getRoomBookingOption('assistanceNotificationEmails')
@@ -160,6 +160,11 @@ class RHRoomBookingBookingForm(RHRoomBookingBase):
             'hour': request.values.get('hourEnd', 17),
             'minute': request.values.get('minuteEnd', 30)}
         repeatability = request.values.get('repeatability')
+
+        self._form.booked_for_id.data = session.user.getId()
+        self._form.booked_for_name.data = session.user.getFullName()
+        self._form.contact_email.data = session.user.getEmail()
+        self._form.contact_phone.data = session.user.getPhone()
 
         for data in [sDT, sTime, eDT, eTime]:
             for k, v in data.iteritems():
