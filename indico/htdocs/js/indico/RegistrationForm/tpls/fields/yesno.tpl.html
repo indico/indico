@@ -1,9 +1,9 @@
 <div ng-controller="BillableCtrl">
-    <ng-form name="nestedForm" ng-init="input = userdata[fieldName]">
+    <ng-form name="nestedForm">
         <select
             id="field-{{ section.id }}-{{ field.id }}"
             name="{{ fieldName }}"
-            ng-model="input"
+            ng-model="userdata[fieldName]"
             ng-required="field.mandatory || paymentBlocked(field, userdata) == false"
             ng-disabled="paymentBlocked(field, userdata)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
@@ -20,7 +20,7 @@
             </option>
         </select>
 
-        <span ng-if="isBillable(field) && input == 'yes'">
+        <span ng-if="isBillable(field) && userdata[fieldName] == 'yes'">
             <span class="regFormPrice">{{ field.price }}</span>
             <span class="regFormCurrency">{{ currency }}</span>
         </span>

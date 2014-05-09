@@ -1,5 +1,5 @@
 <ng-form name="nestedForm">
-<table ng-controller="BillableCtrl" ng-init="input = {}">
+<table ng-controller="BillableCtrl">
     <tr>
         <td class="bold" align="left" colspan="3">
             <span ng-bind-html="section.introSentence" ng-class="{'text-error': validationStarted && nestedForm.$invalid}"></span>
@@ -14,39 +14,36 @@
             {{ 'None' | i18n }}
         </td>
     </tr>
-    <tr ng-repeat="item in section.items | filter: {cancelled: 'false'}"
-        ng-init="input.selected = []; input.noPlaces = []">
+    <tr ng-repeat="item in section.items | filter: {cancelled: 'false'}">
         <td ng-switch="section.selectionType">
             <input ng-switch-when="multiple"
-                ng-model="input.selected[$index]"
-                ng-init="input.selected[$index] = isSelected(item.id)"
-                ng-required="section.mandatory && input.selected.indexOf(true) === -1"
+                ng-model="selectedInputs[item.id]"
+                ng-required="section.mandatory && !anySelected()"
                 type="checkbox" name="socialEvents" value="{{ item.id }}"
-                ng-disabled="!hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent') || paymentBlocked(item, userdata) "/>
+                ng-disabled="!hasPlacesLeft(item, getNoPlaces(item), 'socialEvent') || paymentBlocked(item, userdata) "/>
+            {{selectedRadioInput.id}}
             <input ng-switch-default
                 type="radio" name="socialEvents" value="{{ item.id }}"
-                ng-model="input.selected"
-                ng-init="input.selected = userdata.socialEvents[0].id"
-                ng-required="section.mandatory && input.selected === undefined"
-                ng-disabled="!hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent') || paymentBlocked(item, userdata) || anyBillableEventPayed(userdata)"/>
+                ng-model="selectedRadioInput.id"
+                ng-required="section.mandatory && selectedRadioInput.id === undefined"
+                ng-disabled="!hasPlacesLeft(item, getNoPlaces(item), 'socialEvent') || paymentBlocked(item, userdata) || anyBillableEventPayed(userdata)"/>
             {{ item.caption }}
-            <span ng-if="!hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent')" class="noPlacesLeft">
+            <span ng-if="!hasPlacesLeft(item, getNoPlaces(item), 'socialEvent')" class="noPlacesLeft">
                 ({{ 'no places left' | i18n }})
             </span>
         </td>
-        <td ng-if="hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent')">
+        <td ng-if="hasPlacesLeft(item, getNoPlaces(item), 'socialEvent')">
             <select
-                ng-init="input.noPlaces[$index] = getNoPlaces(item, userdata) || 1"
-                ng-model="input.noPlaces[$index]"
+                ng-model="selectedPlaces[item.id]"
                 ng-disabled="paymentBlocked(item, userdata) || (section.selectionType == 'unique' && anyBillableEventPayed(userdata))"
                 ng-options="n for n in [] | range:1:getMaxRegistrations(item)">
             </select>
-            <input type="hidden" name="places-{{ item.id }}" value="{{ input.noPlaces[$index] }}">
-            <span ng-show="hasPlacesLimit(item, getNoPlaces(item, userdata), 'socialEvent')" class="placesLeft">
-                [{{ getNoPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent')}} {{ 'place(s) left' | i18n }}]
+            <input type="hidden" name="places-{{ item.id }}" value="{{ selectedPlaces[item.id] || 1 }}">
+            <span ng-show="hasPlacesLimit(item, getNoPlaces(item), 'socialEvent')" class="placesLeft">
+                [{{ getNoPlacesLeft(item, getNoPlaces(item), 'socialEvent')}} {{ 'place(s) left' | i18n }}]
             </span>
         </td>
-        <td ng-if="hasPlacesLeft(item, getNoPlaces(item, userdata), 'socialEvent') && isBillable(item)" align="right">
+        <td ng-if="hasPlacesLeft(item, getNoPlaces(item), 'socialEvent') && isBillable(item)" align="right">
             <span class="regFormPrice">{{ item.price }}</span>
             <span ng-show="item.billable">
                 <nd-currency currency="currency"></nd-currency>
@@ -64,7 +61,7 @@
             {{ 'Canceled events' | i18n }}:
         </td>
     </tr>
-    <tr ng-repeat="item in section.items | filter: {cancelled: true}">
+    <tr ng-repeat="item in section.items | filter: {cancelled: '!false'}">
         <td>
             <b>-</b> {{ item.caption }} <span style="color: red;">({{ item.cancelledReason }})</span>
         </td>

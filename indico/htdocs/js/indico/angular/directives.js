@@ -367,7 +367,11 @@ ndDirectives.directive('ndDatepicker', function($compile) {
                 $compile(element)(scope);
             };
 
-            scope.$watch('dateFormat', function(newVal, oldVal) {
+            scope.$watch('dateFormat', function() {
+                init();
+            });
+
+            scope.$watch('value', function() {
                 init();
             });
 
