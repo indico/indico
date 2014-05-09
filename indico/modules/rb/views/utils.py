@@ -125,7 +125,7 @@ class Bar(Serializer):
         return {
             'date': str(self.start.date()),
             'tz': None,
-            'time': format_time(getattr(self, attr)).strftime('%H:%M')
+            'time': format_time(getattr(self, attr))
         }
 
 
