@@ -520,7 +520,7 @@ class Room(db.Model, Serializer):
         q = Room.query \
                 .join(Location.rooms) \
                 .filter(
-                    Location.id == f.location_id.data,
+                    Location.id == f.location_id.data if f.location_id.data else True,
                     (Room.capacity >= (f.capacity.data * 0.8)) if f.capacity.data else True,
                     Room.is_public == f.is_public.data if f.is_public.data else True,
                     Room.is_auto_confirm == f.is_auto_confirm.data if f.is_auto_confirm.data else True,

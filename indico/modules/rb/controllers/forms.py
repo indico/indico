@@ -140,17 +140,18 @@ class StringIndicoField(IndicoField, StringField):
 
 class DateTimeIndicoField(IndicoField, DateTimeField):
     def process_formdata(self, raw_data):
-        try:
-            self.data = datetime.combine(datetime(*map(int, raw_data[:-1])),
-                                         datetime.strptime(raw_data[-1], '%H:%M'))
-        except:
-            self.data = datetime(*map(int, raw_data))
+        if raw_data:
+            try:
+                self.data = datetime.combine(datetime(*map(int, raw_data[:-1])),
+                                             datetime.strptime(raw_data[-1], '%H:%M'))
+            except:
+                self.data = datetime(*map(int, raw_data))
 
     def _process(self, formdata, data=None):
         if formdata:
             try:
                 try:
-                    self.raw_data = [formdata.getlist(p)[0] for p in self.parameter_name]
+                    self.raw_data = [formdata.getlist(p)[0] for p in self.parameter_name if formdata.getlist(p)]
                 except KeyError:
                     camel_name = self.underscore_to_camel_case(self.name) in formdata
                     if camel_name in formdata:
@@ -314,7 +315,7 @@ class RoomListForm(Form):
     is_public = BooleanIndicoField(validators=[optional()], default=True,
                                    parameter_name='isReservable')
     is_only_my_rooms = BooleanIndicoField(validators=[optional()], default=False,
-                                          parameter_name='onlyMy')
+                                          parameter_name='is_only_mine')
     is_auto_confirm = BooleanIndicoField(validators=[optional()], default=True,
                                          parameter_name='isAutoConfirmed')
     is_active = BooleanIndicoField(validators=[optional()], default=True)
