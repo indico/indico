@@ -22,6 +22,7 @@ import time
 from datetime import timedelta
 
 import pytz
+from babel.dates import get_timezone
 from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_time as _format_time
 from babel.dates import format_date as _format_date
@@ -46,6 +47,21 @@ def as_utc(dt):
     The given datetime object **MUST** be naive but already contain UTC!
     """
     return pytz.utc.localize(dt)
+
+
+def server_to_utc(dt):
+    """Converts the given datetime in the server's TZ to UTC.
+
+    The given datetime **MUST** be naive but already contain the correct time in the server's TZ.
+    """
+    server_tz = get_timezone(HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
+    return server_tz.localize(dt).astimezone(pytz.utc)
+
+
+def utc_to_server(dt):
+    """Converts the given UTC datetime to the server's TZ."""
+    server_tz = get_timezone(HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
+    return dt.astimezone(server_tz)
 
 
 def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=False):

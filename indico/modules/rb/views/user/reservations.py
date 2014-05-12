@@ -560,10 +560,6 @@ class WRoomBookingConfirmBooking(WRoomBookingBookingForm):
 
 
 class WPRoomBookingStatement(WPRoomBookingBase):
-    def __init__(self, rh):
-        self._rh = rh
-        super(WPRoomBookingStatement, self).__init__(rh)
-
     def _getBody(self, params):
         return WRoomBookingStatement(self._rh).getHTML(params)
 
@@ -573,7 +569,7 @@ class WRoomBookingStatement(WTemplated):
         self._rh = rh
 
     def getVars(self):
-        wvars = super(WRoomBookingStatement, self).getVars()
+        wvars = WTemplated.getVars(self)
         wvars['title'] = self._rh._title
         wvars['description'] = self._rh._description
         return wvars

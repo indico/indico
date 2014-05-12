@@ -18,14 +18,12 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
-from flask import request, session
+from flask import session
 
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface.rh.base import RHProtected
 from indico.core.errors import AccessError
 from indico.util.i18n import _
-from indico.modules.rb.models.room_bookable_times import BookableTime
-from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from .mixins import RoomBookingAvailabilityParamsMixin
 from .utils import rb_check_user_access, FormMode
 
@@ -56,136 +54,6 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
 
     def _checkProtection(self):
         RHRoomBookingProtected._checkProtection(self)
-
-    # Room
-
-    def _checkAndSetParams(self):
-        errors, c, f = [], self._room, request.form
-
-        def testAndSet(ls):
-            for l in ls:
-                p, e, extra, t = l + [None] * (4 - len(l))
-                v = f.get(p)
-                setattr(self._room, p, v)
-                try:
-                    if t:
-                        v = t(v)
-                        setattr(self._room, p, v)
-                    if extra and not extra(v):
-                        raise RuntimeError
-                except Exception:
-                    errors.append(e)
-
-        not_empty, positive, on, empty_or_int, empty_or_positive = (
-            lambda e: e != '',
-            lambda e: e > 0,
-            lambda e: e == 'on',
-            lambda e: int(e) if e else 0,
-            lambda e: True if e == '' else float(e) > 0
-        )
-        testAndSet([
-            ['name'],
-            ['floor', _('Floor can not be blank'), not_empty],
-            ['number', _('Room number can not be blank'), not_empty],
-            ['building', _('Building can not be blank'), not_empty],
-            ['owner_id', _('Room must have a responsible person'), not_empty],
-            ['capacity', _('Capacity must be a positive integer'), positive, int],
-            ['longitude', _('Longitude must be a positive number'), empty_or_positive],
-            ['latitude', _('Latitude must be a positive number'), empty_or_positive],
-            ['notification_for_start', _('Notification for start must be nonnegative number. Put zero to cancel.'),
-             lambda e: e >= 0, int],
-            ['max_advance_days', _('Maximum days before a reservation must be a positive number'), positive, int],
-            ['surface_area', _('Surface area must be a positive number'), lambda e: e >= 0, empty_or_int],
-            ['is_active', '', None, on],
-            ['is_reservable', '', None, on],
-            ['notification_for_end', '', None, on],
-            ['reservations_need_confirmation', '', None, on],
-            ['notification_for_responsible', '', None, on],
-            ['notification_for_assistance', '', None, on],
-            ['comments']
-        ])
-
-        # set name: building-floor-name
-        self._room.updateName()
-
-        # bookable-times
-        self._bookable_times, bookable_times_count = [], f.get('dailyBookablePeriodCounter', type=int)
-        exist_error, format_error, valid_error = False, False, False
-        for i in xrange(bookable_times_count):
-            try:
-                s, e = f.get('startTimeDailyBookablePeriod{}'.format(i)), f.get(
-                    'endTimeDailyBookablePeriod{}'.format(i))
-                if s and e:
-                    start_time = datetime.strptime(s, '%H:%M').time()
-                    end_time = datetime.strptime(e, '%H:%M').time()
-                    if start_time < end_time:
-                        self._bookable_times.append(BookableTime(start_time=start_time, end_time=end_time))
-                    else:
-                        valid_error = True
-                elif s + e:
-                    exist_error = True
-            except ValueError:
-                format_error = True
-
-        if exist_error:
-            errors.append(_('Daily availability periods must have start and end.'))
-
-        if format_error:
-            errors.append(_('Daily availability periods must be '
-                            'in correct time format \'HH:MM\''))
-
-        if valid_error:
-            errors.append(_('Period start time should come before end time '
-                            'in daily availability period field'))
-
-        # nonbookable_dates
-        self._nonbookable_dates, nonbookable_dates_count = [], f.get('nonBookablePeriodCounter', type=int)
-        exist_error, format_error, valid_error = False, False, False
-        for i in xrange(nonbookable_dates_count):
-            try:
-                s, e = f.get('startDateNonBookablePeriod{}'.format(i)), f.get('endDateNonBookablePeriod{}'.format(i))
-                if s and e:
-                    st, et = datetime.strptime(s, '%d/%m/%Y %H:%M'), datetime.strptime(e, '%d/%m/%Y %H:%M')
-                    if st < et:
-                        self._nonbookable_dates.append(NonBookableDate(start_date=st, end_date=et))
-                    else:
-                        valid_error = True
-                elif s + e:
-                    exist_error = True
-            except ValueError:
-                format_error = True
-
-        if exist_error:
-            errors.append(_('Unavailable dates must have start and end.'))
-        if format_error:
-            errors.append(_('Unavailable dates must be in the form of \'DD/MM/YYYY HH:MM\''))
-        if valid_error:
-            errors.append(_('End must be later than start date in unavailable dates'))
-
-        self._equipments = []
-        for eq in self._location.getEquipments():
-            if f.get('equ_{}'.format(eq.name), None) == 'on':
-                self._equipments.append(eq)
-
-        if not self._bookable_times and errors:
-            self._bookable_times.append(BookableTime(start_time=None, end_time=None))
-            self._nonbookable_dates.append(NonBookableDate(start_date=None, end_date=None))
-
-        # if (request.files.get('largePhotoPath') != '') ^ (request.files.get('smallPhotoPath') != ''):
-        #     errors.append(_('Either upload both photos or none'))
-
-        # Custom attributes
-        # for attr in self._location.getAttributes():
-        #     if attr['name'] == 'notification email':
-        #         if c.customAtts['notification email'] and not validMail(c.customAtts['notification email']):
-        #             errors.append(_('Invalid format for the notification email'))
-        #     if attr['required']:
-        #         if attr['name'] not in c.customAtts and c.customAtts[attr['name']]:
-        #             errors.append(_('{0} can not be blank'.format(attr['name']))
-
-        return errors
-
-    # Resv
 
     def _checkAndSetParamsForReservation(self):
         pass

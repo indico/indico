@@ -31,6 +31,7 @@ from indico.modules.rb.models.utils import next_work_day
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.utils import makePercentageString
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 
 
 class WPRoomBookingMapOfRooms(WPRoomBookingBase):
@@ -164,7 +165,6 @@ class WRoomBookingRoomList(WTemplated):
             wvars['conference'] = self._rh._conf
             wvars['detailsUH'] = UH.UHConfModifRoomBookingRoomDetails
             wvars['bookingUH'] = UH.UHConfModifRoomBookingBookingForm
-        wvars['modificationUH'] = UH.UHRoomBookingRoomForm
         wvars['mapUH'] = UH.UHRoomBookingMapOfRooms
 
         return wvars
@@ -285,14 +285,14 @@ class WRoomBookingRoomDetails(WTemplated):
         if self._standalone:
             wvars['booking_details_url'] = UH.UHRoomBookingBookingDetails.getURL()
             wvars['booking_form_url'] = UH.UHRoomBookingBookingForm.getURL()
-            wvars['delete_room_url'] = UH.UHRoomBookingDeleteRoom.getURL(room)
-            wvars['modify_room_url'] = UH.UHRoomBookingRoomForm.getURL(room)
+            wvars['delete_room_url'] = url_for('rooms_admin.delete_room', room)
+            wvars['modify_room_url'] = url_for('rooms_admin.modify_room', room)
         else:
             wvars['booking_form_url'] = UH.UHConfModifRoomBookingBookingForm.getURL()
             wvars['booking_details_url'] = UH.UHConfModifRoomBookingDetails.getURL()
             wvars['conference'] = self._rh._conf
-            wvars['delete_room_url'] = UH.UHRoomBookingDeleteRoom.getURL(room)
-            wvars['modify_room_url'] = UH.UHRoomBookingRoomForm.getURL(room)
+            wvars['delete_room_url'] = url_for('rooms_admin.delete_room', room)
+            wvars['modify_room_url'] = url_for('rooms_admin.modify_room', room)
 
         s, e = self._rh._searching_start, self._rh._searching_end
         if s and e:

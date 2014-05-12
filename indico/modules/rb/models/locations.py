@@ -214,12 +214,6 @@ class Location(db.Model):
     def filterRooms(self, **filters):
         return Room, self.rooms
 
-    def addRoom(self, room):
-        self.rooms.append(room)
-
-    def deleteRoom(self, room):
-        self.rooms.remove(room)
-
     def getRooms(self):
         return self.rooms.all()
 

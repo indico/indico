@@ -196,7 +196,7 @@ class Room(db.Model, Serializer):
     attributes = db.relationship(
         'RoomAttributeAssociation',
         backref='room',
-        # cascade='all, delete-orphan',
+        cascade='all, delete-orphan',
         lazy='dynamic'
     )
 
@@ -280,18 +280,26 @@ class Room(db.Model, Serializer):
 
     @property
     def booking_url(self):
+        if self.id is None:
+            return None
         return str(UH.UHRoomBookingBookingForm.getURL(target=self))
 
     @property
     def details_url(self):
+        if self.id is None:
+            return None
         return str(UH.UHRoomBookingRoomDetails.getURL(target=self))
 
     @property
     def large_photo_url(self):
+        if self.id is None:
+            return None
         return str(UH.UHRoomPhoto.getURL(self, size='large'))
 
     @property
     def small_photo_url(self):
+        if self.id is None:
+            return None
         return str(UH.UHRoomPhoto.getURL(self, size='small'))
 
     @property

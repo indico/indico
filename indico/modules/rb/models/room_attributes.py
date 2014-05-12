@@ -57,6 +57,12 @@ class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):
         backref='room_assocs'
     )
 
+    def __init__(self, *args, **kwargs):
+        value = kwargs.pop('value', None)
+        super(RoomAttributeAssociation, self).__init__(*args, **kwargs)
+        if value is not None:
+            self.value = value
+
 
 class RoomAttribute(JSONStringBridgeMixin, db.Model):
     __tablename__ = 'room_attributes'

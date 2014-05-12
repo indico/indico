@@ -461,18 +461,6 @@ class UHRoomBookingBookingDetails(URLHandler):
         return params
 
 
-class UHRoomBookingRoomForm(URLHandler):
-    _endpoint = 'rooms_admin.roomBooking-roomForm'
-
-
-class UHRoomBookingSaveRoom(URLHandler):
-    _endpoint = 'rooms_admin.roomBooking-saveRoom'
-
-
-class UHRoomBookingDeleteRoom(URLHandler):
-    _endpoint = 'rooms_admin.roomBooking-deleteRoom'
-
-
 class UHRoomBookingBookingForm(URLHandler):
     _endpoint = 'rooms.roomBooking-bookingForm'
 

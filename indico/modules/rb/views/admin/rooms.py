@@ -25,41 +25,9 @@ from . import WPRoomBookingPluginAdminBase
 class WPRoomBookingRoomForm(WPRoomBookingPluginAdminBase):
     _userData = ['favorite-user-list']
 
-    def __init__(self, rh):
-        self._rh = rh
-        WPRoomBookingPluginAdminBase.__init__(self, rh)
-
     def _setActiveTab(self):
         WPRoomBookingPluginAdminBase._setActiveTab(self)
         self._subTabConfig.setActive()
 
     def _getTabContent(self, params):
-        return WRoomBookingRoomForm(self._rh).getHTML(params)
-
-
-class WRoomBookingRoomForm(WTemplated):
-    def __init__(self, rh):
-        self._rh = rh
-
-    def getVars(self):
-        wvars = WTemplated.getVars(self)
-        wvars['is_new'] = self._rh._new
-
-        location, room = self._rh._location, self._rh._room
-        wvars['location'] = location
-        wvars['room'] = room
-
-        wvars['largePhotoPath'] = room.large_photo_url
-        wvars['smallPhotoPath'] = room.small_photo_url
-        wvars['possibleEquipments'] = dict((eq.name, eq.id in self._rh._equipments)
-                                           for eq in location.getEquipments())
-
-        wvars['errors'] = self._rh._errors
-
-        wvars['owner_name'] = getattr(room.getResponsible(), 'name', '')
-
-        wvars['attrs'] = []
-        wvars['nonBookableDates'] = self._rh._nonbookable_dates
-        wvars['dailyBookablePeriods'] = self._rh._bookable_times
-
-        return wvars
+        return WTemplated('RoomBookingRoomForm').getHTML(params)

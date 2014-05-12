@@ -21,31 +21,28 @@
   <div id="longitudeCH" class="tip">
     <b> ${ _('Longitude.') } </b>
   </div>
-  <div id="isActiveCH" class="tip">
+  <div id="is_activeCH" class="tip">
     ${ _("Whether the room exists. Turn it off if room is no longer suitable for meetings, but for some reason you don't want to delete it.") }
   </div>
-  <div id="isReservableCH" class="tip">
+  <div id="is_reservableCH" class="tip">
     ${ _("Whether the room is bookable by anyone having a user account.") }
   </div>
-  <div id="resvsNeedConfirmationCH" class="tip">
+  <div id="reservations_need_confirmationCH" class="tip">
     ${ _("Whether bookings must be accepted by person responsible.") }
   </div>
-  <div id="resvStartNotificationCH" class="tip">
-    ${ _("Whether to trigger notifications when a booking for the room begins.") }
-  </div>
-  <div id="resvStartNotificationBeforeCH" class="tip">
+  <div id="notification_for_startCH" class="tip">
     ${ _("Send the start notification X days before an occurence (leave empty to use default)")  }
   </div>
-  <div id="resvEndNotificationCH" class="tip">
+  <div id="notification_for_endCH" class="tip">
     ${ _("Whether to trigger notifications when a booking for the room ends.") }
   </div>
-  <div id="resvNotificationToResponsibleCH" class="tip">
+  <div id="notification_for_responsibleCH" class="tip">
     ${ _("Send start/end notifications to the room responsible, too.") }
   </div>
-  <div id="resvNotificationAssistanceCH" class="tip">
+  <div id="notification_for_assistanceCH" class="tip">
     ${ _("Send notifications asking for assistance with room setup") }
   </div>
-  <div id="whereIsKeyCH" class="tip">
+  <div id="key_locationCH" class="tip">
     ${ _("How to obtain a key. Typically a phone number.") }
   </div>
   <div id="responsibleCH" class="tip">
@@ -58,10 +55,8 @@
   <div id="capacityCH" class="tip">
     <b> ${ _('Required.') }</b>  ${ _('Must be a positive number.') }
   </div>
-  <div id="departmentCH" class="tip">
-    ??!
-  </div>
-  <div id="surfaceCH" class="tip">
+  <div id="divisionCH" class="tip">??!</div>
+  <div id="surface_areaCH" class="tip">
     <b> ${ _('Required.')}</b>  ${ _('Surface in square meters. Must be a positive number.') }
   </div>
   <div id="commentsCH" class="tip">
@@ -75,13 +70,16 @@
       <li> ${ _('Large photo may be of any size.') }</li>
     </ul>
   </div>
+  <div id="delete_photosCH" class="tip">
+    ${ _('Deletes the current photos. Not necessary if you just want to replace them; the old ones are deleted automatically in this case.') }
+  </div>
   <div id="dailyBookablePeriodsCH" class="tip">
     ${ _('Time format: \'HH:MM\'') }
   </div>
 </div>
 <!-- END OF CONTEXT HELP DIVS -->
 
-<form action="${ urlHandlers.UHRoomBookingSaveRoom.getURL(roomLocation=location.name) if is_new else urlHandlers.UHRoomBookingSaveRoom.getURL(room) }" method="post" enctype="multipart/form-data">
+<form action="" method="post" enctype="multipart/form-data">
   <table width="95%" cellpadding="0" cellspacing="0" border="0" align="center">
     <tr>
       <td class="formTitle">
@@ -93,19 +91,17 @@
     <tr>
       <td>
         <span class="formTitle" style="border-bottom-width: 0px">
-          % if is_new:
+          % if room.id is None:
             ${ _('New Room') }
           % else:
             ${ _('Modify Room') }
-            <input type="hidden" name="roomID" id="roomID" value="${ room.id }" />
           % endif
-          <input type="hidden" name="roomLocation" id="roomLocation" value="${ location.name }" />
         </span>
         <br />
         % if errors:
           <br />
           <span style="color: Red; margin-left: 6px;">
-            ${ _('Saving failed. There is/are {0} error(s)').format(len(errors)) }:
+            ${ N_('Saving failed. There is an error', 'Saving failed. There are {0} errors', len(errors)).format(len(errors)) }:
           </span>
           <ul>
             % for error in errors:
@@ -123,69 +119,23 @@
           <td width="76%">
             <table width="100%">
               <tr>
-                <td class="subFieldWidth" align="right" valign="top">
-                  <small> ${ _('Location') }&nbsp;&nbsp;</small>
+                <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                  <small>${ _('Location') }</small>
                 </td>
                 <td align="left" class="blacktext">
                   ${ location.name }
                 </td>
               </tr>
-              <tr>
-                <td class="subFieldWidth" align="right" valign="top">
-                    <small> ${ _('Name') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="name" name="name" value="${ verbose(room.name) }" />${ contextHelp('nameCH') }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _("Site")}&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="site" name="site" value="${ verbose(room.site) }" />${ contextHelp('siteCH') }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Building') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="building" name="building" value="${ verbose(room.building) }" />${ contextHelp('buildingCH') }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Floor') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="floor" name="floor" value="${ verbose(room.floor) }" />${contextHelp('floorCH' ) }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Room') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="number" name="number" value="${ verbose(room.number) }" />${ contextHelp('roomCH') }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _("Latitude") }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="latitude" name="latitude" value="${ verbose(room.latitude) }" />${ contextHelp('latitudeCH' ) }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Longitude')}&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="longitude" name="longitude" value="${ verbose(room.longitude) }" />${ contextHelp('longitudeCH') }
-                </td>
-              </tr>
+              % for field in 'name site building floor number longitude latitude'.split():
+                <tr>
+                  <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                      <small>${ form[field].label.text }</small>
+                  </td>
+                  <td align="left" class="blacktext">
+                    ${ form[field]() } ${ contextHelp(field + 'CH') }
+                  </td>
+                </tr>
+              % endfor
             </table>
           </td>
           <td>&nbsp;</td>
@@ -198,63 +148,22 @@
           </td>
           <td colspan="2">
             <table>
-              <tr>
-                <td class="subFieldWidth" align="right" valign="top">
-                  <small> ${ _('Active') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="checkbox" ${ 'checked' if room.is_active else '' } id="is_active" name="is_active"/> ${ contextHelp('isActiveCH') }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Public') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="checkbox" ${ 'checked' if room.is_reservable else '' } id="is_reservable" name="is_reservable" /> ${ contextHelp('isReservableCH' ) }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Confirmations') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="checkbox" ${ 'checked' if room.reservations_need_confirmation else '' } id="reservations_need_confirmation" name="reservations_need_confirmation" /> ${ contextHelp('resvsNeedConfirmationCH') }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Assistance') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="checkbox" ${ 'checked' if room.notification_for_assistance else '' } id="notification_for_assistance" name="notification_for_assistance" />${ contextHelp( 'resvNotificationAssistanceCH') }
-                </td>
-              </tr>
-              <tr>
-                <!-- TODO: update help -->
-                <td align="right" valign="top">
-                  <small> ${ _('Notification on booking start - X days before') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" style="width: 20px;" maxlength="1" id="notification_for_start" name="notification_for_start" value="${ room.notification_for_start }" /> ${ contextHelp( 'resvStartNotificationBeforeCH' ) }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Notification on booking end') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="checkbox" ${ 'checked' if room.notification_for_end else '' } id="notification_for_end" name="notification_for_end" /> ${ contextHelp( 'resvEndNotificationCH') }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Notification to responsible, too') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="checkbox" ${ 'checked' if room.notification_for_responsible else '' } id="notification_for_responsible" name="notification_for_responsible" /> ${ contextHelp( 'resvNotificationToResponsibleCH') }
-                </td>
-              </tr>
+              <%
+                  fields = 'is_active is_reservable reservations_need_confirmation notification_for_assistance notification_for_start notification_for_end notification_for_responsible'.split()
+                  field_args = {
+                      'notification_for_start': dict(style='width: 20px;', maxlength=1)
+                  }
+              %>
+              % for field in fields:
+                <tr>
+                  <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                    <small>${ form[field].label.text }</small>
+                  </td>
+                  <td align="left" class="blacktext">
+                    ${ form[field](**field_args.get(field, {})) } ${ contextHelp(field + 'CH') }
+                  </td>
+                </tr>
+              % endfor
             </table>
           </td>
         </tr>
@@ -269,27 +178,23 @@
                   <small> ${ _("Responsible") }&nbsp;&nbsp;</small>
                 </td>
                 <td align="left" class="blacktext">
-                  <input type="hidden" id="owner_id" name="owner_id" value="${ verbose(room.owner_id) }" />
-                  <input type="text" readonly="readonly" id="owner_name" name="owner_name" value="${ verbose(owner_name) }" />
+                  ${ form.owner_id() }
+                  <input type="text" readonly="readonly" id="owner_name" name="owner_name" value="${ room_owner.getFullName() if room_owner else '' }" />
                   <input type="button" value="${ _('Search') }" onclick="searchForUsers();" />
                   ${ contextHelp('responsibleCH') }
                 </td>
               </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Where is key?') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="key_location" name="key_location" value="${ verbose(room.key_location) }" />${ contextHelp('whereIsKeyCH') }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Telephone') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="telephone" name="telephone" value="${ verbose(room.telephone) }" />${ contextHelp('telephoneCH') }</td>
-              </tr>
+              % for field in 'key_location telephone'.split():
+                <tr>
+                  <td align="right" valign="top" style="padding-right: 5px;">
+                    <small>${ form[field].label.text }</small>
+                  </td>
+                  <td align="left" class="blacktext">
+                    ${ form[field]() }
+                    ${ contextHelp(field + 'CH') }
+                  </td>
+                </tr>
+              % endfor
             </table>
           </td>
         </tr>
@@ -301,19 +206,31 @@
           </td>
           <td colspan="2">
             <table>
+              % if room.photo_id:
+                  <tr>
+                    <td align="right" valign="top" style="padding-right: 5px;">
+                      <small>${ form.delete_photos.label.text }</small>
+                    </td>
+                    <td align="left" class="blacktext">
+                      ${ form.delete_photos() }
+                      ${ contextHelp('delete_photosCH') }
+                    </td>
+                  </tr>
+              % endif
               <tr>
-                <td class="subFieldWidth" align="right" valign="top">
-                  <small> ${ _('Large photo') }&nbsp;&nbsp;</small>
+                <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                  <small>${ form.large_photo.label.text }</small>
                 </td>
                 <td align="left" class="blacktext">
-                  <input type="file" id="largePhotoPath" name="largePhotoPath" value="${ verbose(largePhotoPath) }"/> ${ contextHelp('photoCH' ) }</td>
+                  ${ form.large_photo() } ${ contextHelp('photoCH' ) }
+                </td>
               </tr>
               <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Small photo') }&nbsp;&nbsp;</small>
+                <td align="right" valign="top" style="padding-right: 5px;">
+                  <small>${ form.small_photo.label.text }</small>
                 </td>
                 <td align="left" class="blacktext">
-                  <input type="file" id="smallPhotoPath" name="smallPhotoPath" value="${ verbose(smallPhotoPath) }" />
+                  ${ form.small_photo() }
                 </td>
               </tr>
             </table>
@@ -327,96 +244,78 @@
           </td>
           <td colspan="2">
             <table width="100%">
+              <%
+                  fields = 'capacity division surface_area max_advance_days comments'.split()
+                  field_after = {
+                      'capacity': _('people'),
+                      'surface_area': _('m<sup>2</sup>'),
+                      'max_advance_days': _('days'),
+                  }
+                  field_args = {
+                      'comments': {'cols': 40},
+                      'max_advance_days': {'size': 10}
+                  }
+              %>
+              % for field in fields:
+                <tr>
+                  <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                    <small>${ form[field].label.text }</small>
+                  </td>
+                  <td align="left" class="blacktext">
+                    ${ form[field](**field_args.get(field, {})) }
+                    ${ field_after.get(field, '') }
+                    ${ contextHelp(field + 'CH') if field != 'division' else '' }
+                  </td>
+                </tr>
+              % endfor
               <tr>
-                <td class="subFieldWidth" align="right" valign="top">
-                  <small> ${ _('Capacity') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="capacity" name="capacity" value="${ verbose(room.capacity) }" /> ${ _('people') } ${ contextHelp('capacityCH') }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Department') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="division" name="division" value="${ verbose(room.division) }" />${ contextHelp('departmentCH') }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Surface area') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="surface_area" name="surface_area" value="${ verbose(room.surface_area) }" /> ${ _('m2') } ${ contextHelp('surfaceCH') }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Comments') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <textarea cols="40" id="comments" name="comments">${ verbose(room.comments) }</textarea>${ contextHelp('commentsCH') }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Unavailable booking periods') }&nbsp;&nbsp;</small>
+                <td align="right" valign="top" style="padding-right: 5px;">
+                  <small>${ _('Unavailable booking periods') }</small>
                 </td>
                 <td align="left" class="blacktext">
                   <table id="nonBookablePeriodsTable">
-                  % for nbd in nonBookableDates:
-                    <tr class="startEndDate">
-                      <td class="startEndDateEntry">${ _('from') }:</td>
-                      <td><span id="startDateNonBookablePeriod${ loop.index }"></span></td>
-                      <td class="startEndDateEntry">${ _('to') }:</td>
-                      <td><span id="endDateNonBookablePeriod${ loop.index }"></span></td>
-                      % if loop.first:
-                        <td>
-                          <span onclick="addNonBookablePeriod()">
-                            <a class="fakeLink">${ _('add period') }</a>
-                          </span>
-                        </td>
-                      % endif
-                    </tr>
-                  % endfor
+                      % for subform in form.nonbookable_dates:
+                          <% index = loop.index %>
+                          <tr class="startEndDate">
+                              % for field in 'start end'.split():
+                                  <td class="startEndDateEntry">${ subform[field].label.text }</td>
+                                  <td id="${ field }DateNonBookablePeriod${ index }">${ subform[field]() }</td>
+                              % endfor
+                              % if loop.first:
+                                  <td>
+                                      <span onclick="addNonBookablePeriod()">
+                                          <a class="fakeLink">${ _('add period') }</a>
+                                      </span>
+                                  </td>
+                              % endif
+                          </tr>
+                      % endfor
                   </table>
-                  <input type="hidden" id="nonBookablePeriodCounter" name="nonBookablePeriodCounter" value="0" />
                 </td>
               </tr>
               <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Daily availability periods') }&nbsp;&nbsp;</small>
+                <td align="right" valign="top" style="padding-right: 5px;">
+                  <small>${ _('Daily availability periods') }</small>
                 </td>
                 <td align="left" class="blacktext">
                   <table id="dailyBookablePeriodsTable">
-                  % for dbp in dailyBookablePeriods:
-                    <tr class="startEndDate">
-                      <td class="startEndDateEntry">${ _('from') }:</td>
-                      <td><span id="startTimeDailyBookablePeriod${ loop.index }"></span></td>
-                      <td class="startEndDateEntry">${ _('to') }:</td>
-                      <td><span id="endTimeDailyBookablePeriod${ loop.index }"></span>
-                        % if loop.first:
-                          ${ contextHelp('dailyBookablePeriodsCH') }
-                          <td>
-                            <span onclick="addDailyBookablePeriod()">
-                              <a class="fakeLink">${ _('add period') }</a>
-                            </span>
-                          </td>
-                        % endif
-                      </td>
-                    </tr>
-                  % endfor
+                      % for subform in form.bookable_times:
+                          <tr class="startEndDate">
+                              % for field in 'start end'.split():
+                                  <td class="startEndDateEntry">${ subform[field].label.text }</td>
+                                  <td>${ subform[field](style='width: 50px;') }</td>
+                              % endfor
+                              % if loop.first:
+                                  <td>
+                                      ${ contextHelp('dailyBookablePeriodsCH') }
+                                      <span onclick="addDailyBookablePeriod()">
+                                          <a class="fakeLink">${ _('add period') }</a>
+                                      </span>
+                                  </td>
+                              % endif
+                          </tr>
+                      % endfor
                   </table>
-                  <input type="hidden" id="dailyBookablePeriodCounter" name="dailyBookablePeriodCounter" value="0" />
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top">
-                  <small> ${ _('Maximum advance time for bookings') }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <input type="text" id="max_advance_days" name="max_advance_days" value="${ verbose(room.max_advance_days) }" size="10"/> ${ _('days') }
                 </td>
               </tr>
             </table>
@@ -429,23 +328,22 @@
             <span class="titleCellFormat"> ${ _('Custom attributes') }</span>
           </td>
           <td colspan="2">
-            <!-- TODO: Hiding field when there is no one to choose may be better -->
-            % if attrs:
+            % if form._attribute_fields:
               <table width="100%">
-              % for ca in attrs:
+              % for field in form._attribute_fields:
                 <tr>
-                  <td class="subFieldWidth" align="right" valign="top">
-                    <small>${ ca['name'] }&nbsp;&nbsp;</small>
+                  <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                    <small>${ field.label.text }</small>
                   </td>
                   <td align="left" class="blacktext">
-                    <input type="text" name="cattr_${ ca['name'] }" value="${ verbose(room.customAtts.get(ca['name'])) }" />
-                    % if ca['name'] == 'notification email':
-                      % if ca['required'] :
+                    ${ field() }
+                    % if field.label.text == 'notification email':
+                      % if field.flags.required:
                         ${ inlineContextHelp('<b>Required.</b> You can specify more than one email address separated by commas, semicolons or whitespaces.') }
-                      % else :
+                      % else:
                         ${ inlineContextHelp('You can specify more than one email address separated by commas, semicolons or whitespaces.') }
                       % endif
-                    % elif ca['required'] :
+                    % elif field.flags.required:
                       ${ inlineContextHelp('<b>Required.</b>') }
                     % endif
                   </td>
@@ -465,29 +363,17 @@
             <span class="titleCellFormat">${ _('Equipments') }</span>
           </td>
           <td colspan="2">
-            % if possibleEquipments:
+            <% eq_list = list(form.equipments) %>
+            % if eq_list:
             <table width="100%">
               <tr>
-                <td class="subFieldWidth" align="right" valign="top">
-                  <small> ${ _('Room has') }:&nbsp;&nbsp;</small>
+                <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                  <small>${ _('Room has') }</small>
                 </td>
                 <td align="left" class="blacktext">
-                % for eq, is_checked in possibleEquipments.items():
-                  <input id="${ 'equ_' + eq }" name="${ 'equ_' + eq }" type="checkbox" ${' checked' if is_checked else ''} >
-                    ${ eq }
-                  </input>
-                  <br />
-
-                  % if False: #"video conference" in eq.lower():
-                    % for vc in room.__class__.vcList:
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                      <input id="${ 'vc_' + vc }" name="${ 'vc_' + vc }" type="checkbox" ${' checked' if vc in room.getAvailableVC() else ''} >
-                        ${ vc }
-                      </input>
-                      <br />
-                    % endfor
-                  % endif
-                % endfor
+                  % for eq in eq_list:
+                      ${ eq() } ${ eq.label() }<br>
+                  % endfor
                 </td>
               </tr>
             </table>
@@ -512,130 +398,70 @@
   </table>
 </form>
 
-<script type="text/javascript">
-    var nonBookablePeriodCounter = ${ len(nonBookableDates) };
-    $('#nonBookablePeriodCounter').val(nonBookablePeriodCounter);
+<script>
+    var nbpStartLabel = $('#nonBookablePeriodsTable   tr:eq(0) .startEndDateEntry:eq(0)').text();
+    var nbpEndLabel   = $('#nonBookablePeriodsTable   tr:eq(0) .startEndDateEntry:eq(1)').text();
+    var btStartLabel  = $('#dailyBookablePeriodsTable tr:eq(0) .startEndDateEntry:eq(0)').text();
+    var btEndLabel    = $('#dailyBookablePeriodsTable tr:eq(0) .startEndDateEntry:eq(1)').text();
 
-    var dailyBookablePeriodCounter = ${ len(dailyBookablePeriods) };
-    $('#dailyBookablePeriodCounter').val(dailyBookablePeriodCounter);
+    $('#nonBookablePeriodsTable tr').each(function(i) {
+        var startDate = $('input', this).eq(0).val();
+        var endDate = $('input', this).eq(1).val();
+        var startDateField = IndicoUI.Widgets.Generic.dateField(true, {
+            id: 'nonbookable_dates-{0}-start'.format(i),
+            name: 'nonbookable_dates-{0}-start'.format(i)
+        });
+        var endDateField = IndicoUI.Widgets.Generic.dateField(true, {
+            id: 'nonbookable_dates-{0}-end'.format(i),
+            name: 'nonbookable_dates-{0}-end'.format(i)
+        });
 
-    IndicoUI.executeOnLoad(function() {
-        % for nbd in nonBookableDates:
-            var startDateField = IndicoUI.Widgets.Generic.dateField(
-                true,
-                {
-                    id: 'startDateNonBookablePeriod${ loop.index }',
-                    name: 'startDateNonBookablePeriod${ loop.index }'
-                }
-            );
-            var endDateField = IndicoUI.Widgets.Generic.dateField(
-                true,
-                {
-                    id: 'endDateNonBookablePeriod${ loop.index }',
-                    name:'endDateNonBookablePeriod${ loop.index }'
-                }
-            );
+        $E('startDateNonBookablePeriod' + i).set(startDateField);
+        $E('endDateNonBookablePeriod' + i).set(endDateField);
 
-            $E('startDateNonBookablePeriod${ loop.index }').set(startDateField);
-            $E('endDateNonBookablePeriod${ loop.index }').set(endDateField);
+        startDateField.set(startDate);
+        endDateField.set(endDate);
 
-            startDateField.set(
-                '${ nbd.start_date.strftime("%d/%m/%Y %H:%M") if nbd.start_date else ""}'
-            );
-            endDateField.set(
-                '${ nbd.end_date.strftime("%d/%m/%Y %H:%M") if nbd.end_date else ""}'
-            );
-        % endfor
-
-        % for dbp in dailyBookablePeriods:
-            var dateStartEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
-                '${ dbp.start_time.strftime("%H:%M") if dbp.start_time else ""}',
-                '${ dbp.end_time.strftime("%H:%M") if dbp.end_time else ""}',
-                {
-                    id: 'startTimeDailyBookablePeriod${ loop.index }',
-                    name: 'startTimeDailyBookablePeriod${ loop.index }',
-                    style: { width: '50px' }
-                },
-                {
-                    id: 'endTimeDailyBookablePeriod${ loop.index }',
-                    name: 'endTimeDailyBookablePeriod${ loop.index }',
-                    style: { width: '50px' }
-                }
-            );
-            $E('startTimeDailyBookablePeriod${ loop.index }').set(
-                dateStartEndTimeField.startTimeField
-            );
-            $E('endTimeDailyBookablePeriod${ loop.index }').set(
-                dateStartEndTimeField.endTimeField
-            );
-        % endfor
+        if (i == 0) {
+            nbpStartLabel = $('.startEndDateEntry', this).eq(0).text();
+            nbpEndLabel = $('.startEndDateEntry', this).eq(1).text();
+        }
     });
 
     function addNonBookablePeriod() {
-        $("#nonBookablePeriodsTable tr:last").after(
+        var i = $('#nonBookablePeriodsTable tr').length;
+        $('#nonBookablePeriodsTable tbody').append(
             '<tr class="startEndDate"> \
-              <td class="startEndDateEntry">${ _("from") }:</td> \
-              <td><span id="startDateNonBookablePeriod{0}"></span></td> \
-              <td class="startEndDateEntry">${ _("to") }:</td> \
-              <td><span id="endDateNonBookablePeriod{0}"></span></td> \
-            </tr>'.format(nonBookablePeriodCounter)
+              <td class="startEndDateEntry">{0}</td> \
+              <td id="startDateNonBookablePeriod{2}"></td> \
+              <td class="startEndDateEntry">{1}</td> \
+              <td id="endDateNonBookablePeriod{2}"></td> \
+            </tr>'.format(nbpStartLabel, nbpEndLabel, i)
         );
 
-        $E('startDateNonBookablePeriod' + nonBookablePeriodCounter).set(
-            IndicoUI.Widgets.Generic.dateField(
-                true,
-                {
-                    id: 'startDateNonBookablePeriod' + nonBookablePeriodCounter,
-                    name:'startDateNonBookablePeriod' + nonBookablePeriodCounter
-                }
-            )
+        $E('startDateNonBookablePeriod' + i).set(
+            IndicoUI.Widgets.Generic.dateField(true, {
+                id: 'nonbookable_dates-{0}-start'.format(i),
+                name: 'nonbookable_dates-{0}-start'.format(i)
+            })
         );
-        $E('endDateNonBookablePeriod' + nonBookablePeriodCounter).set(
-            IndicoUI.Widgets.Generic.dateField(
-                true,
-                {
-                    id: 'endDateNonBookablePeriod' + nonBookablePeriodCounter,
-                    name:'endDateNonBookablePeriod' + nonBookablePeriodCounter
-                }
-            )
+        $E('endDateNonBookablePeriod' + i).set(
+            IndicoUI.Widgets.Generic.dateField(true, {
+                id: 'nonbookable_dates-{0}-end'.format(i),
+                name: 'nonbookable_dates-{0}-end'.format(i)
+            })
         );
-
-        nonBookablePeriodCounter = nonBookablePeriodCounter + 1;
-        $('#nonBookablePeriodCounter').val(nonBookablePeriodCounter);
     }
 
     function addDailyBookablePeriod() {
-        $('#dailyBookablePeriodsTable tr:last').after(
+        $('#dailyBookablePeriodsTable tbody').append(
             '<tr class="startEndDate"> \
-              <td class="startEndDateEntry">${ _("from") }:</td> \
-              <td><span id="startTimeDailyBookablePeriod{0}"></span></td> \
-              <td class="startEndDateEntry">${ _("to") }:</td> \
-              <td><span id="endTimeDailyBookablePeriod{0}"></span></td> \
-            </tr>'.format(dailyBookablePeriodCounter)
+              <td class="startEndDateEntry">{0}</td> \
+              <td><input id="bookable_times-{2}-start" name="bookable_times-{2}-start" style="width: 50px;" type="time"></td> \
+              <td class="startEndDateEntry">{1}</td> \
+              <td><input id="bookable_times-{2}-end" name="bookable_times-{2}-end" style="width: 50px;" type="time"></td> \
+            </tr>'.format(btStartLabel, btEndLabel, $('#dailyBookablePeriodsTable tr').length)
         );
-
-        newDateStartEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
-            '',
-            '',
-            {
-                id: 'startTimeDailyBookablePeriod' + dailyBookablePeriodCounter,
-                name: 'startTimeDailyBookablePeriod' + dailyBookablePeriodCounter,
-                style: { width: '50px' }
-            },
-            {
-                id: 'endTimeDailyBookablePeriod' + dailyBookablePeriodCounter,
-                name: 'endTimeDailyBookablePeriod' + dailyBookablePeriodCounter,
-                style: { width: '50px' }
-            }
-        );
-
-        $E('startTimeDailyBookablePeriod' + dailyBookablePeriodCounter).set(newDateStartEndTimeField.startTimeField
-        );
-        $E('endTimeDailyBookablePeriod' + dailyBookablePeriodCounter).set(newDateStartEndTimeField.endTimeField
-        );
-
-        dailyBookablePeriodCounter = dailyBookablePeriodCounter + 1;
-        $('#dailyBookablePeriodCounter').val(dailyBookablePeriodCounter);
     }
 
     function searchForUsers() {

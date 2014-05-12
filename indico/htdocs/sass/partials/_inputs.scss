@@ -45,7 +45,8 @@ input[type=text],
 input[type=email],
 input[type=number],
 input[type=password],
-input[type=search] {
+input[type=search],
+input[type=time] {
     @extend %text-input;
 
     height: 1.6em;

@@ -18,10 +18,17 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 from flask import request, session
+from wtforms import TextField
+from wtforms.validators import DataRequired
+from MaKaC.user import AvatarHolder
+from indico.modules.rb.models.room_equipments import RoomEquipment
+from indico.modules.rb.controllers.forms import RoomForm, FormDefaults
+from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, RoomAttribute
 
 from MaKaC.webinterface import urlHandlers as UH
 from indico.core.db import db
 from indico.core.errors import NotFoundError
+from indico.util.date_time import server_to_utc, utc_to_server
 from indico.util.i18n import _
 from indico.modules.rb.controllers.decorators import requires_location
 from indico.modules.rb.models.room_bookable_times import BookableTime
@@ -38,7 +45,7 @@ class CandidateDataFrom(object):
 
 class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
     def _checkParams(self):
-        self._room = Room.getRoomById(request.form.get('roomID', type=int))
+        self._room = Room.get(request.view_args['roomID'])
         self._target = self._room
 
     def _process(self):
@@ -49,7 +56,7 @@ class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
             self._redirect(UH.UHRoomBookingRoomDetails.getURL(self._room))  # room details
         else:
             # Possible - delete
-            Room.removeRoom(self._room)
+            db.session.delete(self._room)
             session['rbTitle'] = _('Room has been deleted.')
             session['rbDescription'] = _('You have successfully deleted the room. '
                                          'All its archival, cancelled and rejected '
@@ -57,82 +64,107 @@ class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
             self._redirect(UH.UHRoomBookingStatement.getURL())  # deletion confirmation
 
 
-class RHRoomBookingRoomForm(RHRoomBookingAdminBase):
-    """
-    Form for creating NEW and MODIFICATION of an existing room.
-    """
+class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
+    def _make_form(self):
+        room = self._room
 
-    @requires_location(parameter_name='roomLocation', request_attribute='view_args')
-    def _checkParams(self):
-        self._new = 'roomID' not in request.view_args
-        self._room = session.pop('_rbRoom', None)
-        self._equipments = session.pop('_rbRoomEquipments', [])
-        if self._equipments:
-            self._equipments = [eq.id for eq in self._equipments]
-        self._bookable_times = session.pop('_rbBookableTimes',
-                                           [BookableTime(start_time=None, end_time=None)])
-        self._nonbookable_dates = session.pop('_rbNonBookableDates',
-                                              [NonBookableDate(start_date=None, end_date=None)])
-        if not self._room:
-            if self._new:
-                self._room = Room.getRoomWithDefaults()
-            else:
-                self._room = Room.getRoomById(int(request.view_args.get('roomID')))
-                self._equipments = self._room.getEquipmentIds()
-                self._bookable_times = self._room.getBookableTimes()
-                self._nonbookable_dates = self._room.getNonBookableDates()
-        self._errors = session.pop('_rbErrors', [])
+        # New class so we can safely extend it
+        form_class = type('RoomFormWithAttributes', (RoomForm,), {})
+
+        # Default values
+        defaults = FormDefaults(room, skip_attrs={'nonbookable_dates', 'bookable_times'})
+
+        # Custom attributes - new fields must be set on the class
+        for attribute in self._location.attributes.order_by(RoomAttribute.parent_id).all():
+            validators = [DataRequired()] if attribute.is_value_required else []
+            field_name = 'attribute_{}'.format(attribute.id)
+            field = TextField(attribute.name, validators)
+            setattr(form_class, field_name, field)
+            if room.id is not None:
+                defaults[field_name] = room.getAttributeValueByName(attribute.name)  # can be optimized (single query)
+
+        # Create the form
+        form = form_class(obj=defaults)
+
+        # Default values, part 2
+        if not form.is_submitted() and room.id is not None:
+            # This is ugly, but apparently FieldList+FormField does not work well with obj defaults
+            for i, nbd in enumerate(room.nonbookable_dates.all()):
+                if i >= len(form.nonbookable_dates.entries):
+                    form.nonbookable_dates.append_entry()
+                form.nonbookable_dates[i].start.data = utc_to_server(nbd.start_date)
+                form.nonbookable_dates[i].end.data = utc_to_server(nbd.end_date)
+
+            for i, bt in enumerate(room.bookable_times.all()):
+                if i >= len(form.bookable_times.entries):
+                    form.bookable_times.append_entry()
+                form.bookable_times[i].start.data = bt.start_time
+                form.bookable_times[i].end.data = bt.end_time
+
+        # Custom attributes, part 2
+        form._attribute_fields = [field for name, field in form._fields.iteritems() if name.startswith('attribute_')]
+
+        # Equipment
+        form.equipments.query = self._location.equipment_objects.order_by(RoomEquipment.name)
+
+        return form
+
+    def _save(self):
+        room = self._room
+        form = self._form
+        # Simple fields
+        form.populate_obj(room, skip=('bookable_times', 'nonbookable_dates'), existing_only=True)
+        # Photos
+        if form.small_photo.data and form.large_photo.data:
+            room.photo = Photo(small_content=form.small_photo.data.read(),
+                               large_content=form.large_photo.data.read())
+        elif form.delete_photos.data:
+            room.photo = None
+        # Custom attributes
+        room.attributes = [RoomAttributeAssociation(value=form['attribute_{}'.format(attr.id)].data,
+                                                    attribute_id=attr.id)
+                           for attr in self._location.attributes.all()
+                           if form['attribute_{}'.format(attr.id)].data]
+        # Bookable times
+        room.bookable_times = [BookableTime(start_time=bt['start'], end_time=bt['end'])
+                               for bt in form.bookable_times.data if all(bt.viewvalues())]
+        # Nonbookable dates
+        room.nonbookable_dates = [NonBookableDate(start_date=server_to_utc(nbd['start']),
+                                                  end_date=server_to_utc(nbd['end']))
+                                  for nbd in form.nonbookable_dates.data if all(nbd.viewvalues())]
 
     def _process(self):
-        return room_views.WPRoomBookingRoomForm(self).display()
+        room_owner = None
+        if self._form.owner_id.data:
+            room_owner = AvatarHolder().getById(self._form.owner_id.data)
+        elif self._room.id is not None:
+            room_owner = self._room.getResponsible()
+
+        if self._form.validate_on_submit():
+            self._save()
+            self._redirect(UH.UHRoomBookingRoomDetails.getURL(self._room))
+        else:
+            return room_views.WPRoomBookingRoomForm(self, form=self._form, room=self._room, location=self._location,
+                                                    errors=self._form.error_list, room_owner=room_owner).display()
 
 
-class RHRoomBookingSaveRoom(RHRoomBookingAdminBase):
-    """
-    Performs physical INSERT or UPDATE.
-    When succeeded redirects to room details, otherwise returns to room form.
-    """
-
-    def _uploadPhotos(self, candRoom, params):
-        self._room.addPhoto(
-            Photo(
-                large_content=request.files.get('largePhotoPath'),
-                small_content=request.files.get('smallPhotoPath')
-            )
-        )
-
-    @requires_location('roomLocation')
+class RHRoomBookingModifyRoom(RHRoomBookingCreateModifyRoomBase):
+    @requires_location(parameter_name='roomLocation')
     def _checkParams(self):
-        roomId = request.form.get('roomID', type=int)
-        if roomId:
-            self._room = Room.getRoomById(roomId)
-            if not self._room:
-                raise NotFoundError(_('There is no room with id: {0}').format(roomId))
-        else:
-            self._room = Room.getRoomWithDefaults()
-        self._errors = self._checkAndSetParams()
-        self._target = self._room
+        self._room = Room.get(request.view_args['roomID'])
+        if self._room is None:
+            raise NotFoundError('A Room with this ID does not exist.')
+        self._form = self._make_form()
 
-    def _process(self):
-        if self._errors:
-            session['_rbErrors'] = self._errors
-            session['_rbRoom'] = self._room
-            session['_rbRoomEquipments'] = self._equipments
-            session['_rbBookableTimes'] = self._bookable_times
-            session['_rbNonBookableDates'] = self._nonbookable_dates
-            self._redirect(UH.UHRoomBookingRoomForm.getURL(roomLocation=self._location.name))
-        else:
-            # Succeeded
-            self._room.setEquipments(self._equipments)
-            self._room.setBookableTimes(self._bookable_times)
-            self._room.setNonBookableDates(self._nonbookable_dates)
-            if self._room.id:
-                db.session.add(self._room)
-                self._room.notifyAboutResponsibility()
-                url = UH.UHRoomBookingRoomDetails.getURL(self._room)
-            else:
-                self._location.addRoom(self._room)
-                db.session.add(self._location)
-                self._room.notifyAboutResponsibility()
-                url = UH.UHRoomBookingAdminLocation.getURL(self._location, actionSucceeded=True)
-            self._redirect(url)
+
+class RHRoomBookingCreateRoom(RHRoomBookingCreateModifyRoomBase):
+    @requires_location(parameter_name='roomLocation')
+    def _checkParams(self):
+        self._room = Room.getRoomWithDefaults()
+        self._form = self._make_form()
+
+    def _save(self):
+        RHRoomBookingCreateModifyRoomBase._save(self)
+        self._room.location = self._location
+        db.session.add(self._room)
+        db.session.flush()

@@ -17,15 +17,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import itertools
 import json
+from collections import defaultdict
 from datetime import datetime, time, timedelta
 from functools import partial
 
 from flask.ext.wtf import Form
+from flask.ext.wtf.file import FileField
 from wtforms import BooleanField, Field, IntegerField, SelectField, StringField, validators, HiddenField, TextAreaField
+from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
+from wtforms.fields.core import FloatField, FieldList, FormField
 from wtforms.validators import any_of, optional, number_range, required
 from wtforms.ext.dateutil.fields import DateTimeField, DateField
+from wtforms.widgets import CheckboxInput
 from wtforms_alchemy import model_form_factory
+from wtforms_components import TimeField
 
 from indico.core.errors import IndicoError
 from indico.util.i18n import _
@@ -68,6 +75,71 @@ def repeatibility_check(form, field):
         if form.availability.data == AVAILABILITY_VALUES[1]:
             if field.data >= 5:
                 raise validators.ValidationError('Unrecognized repeatability')
+
+
+class IndicoForm(Form):
+    def populate_obj(self, obj, fields=None, skip=None, existing_only=False):
+        """Populates the given object with form data.
+
+        If `fields` is set, only fields from that list are populated.
+        If `skip` is set, fields in that list are skipped.
+        If `existing_only` is True, only attributes that already exist on `obj` are populated.
+        """
+        for name, field in self._fields.iteritems():
+            if fields and name not in fields:
+                continue
+            if skip and name in skip:
+                continue
+            if existing_only and not hasattr(obj, name):
+                continue
+            field.populate_obj(obj, name)
+
+    @property
+    def error_list(self):
+        all_errors = []
+        for field_name, errors in self.errors.iteritems():
+            for error in errors:
+                if isinstance(error, dict) and isinstance(self[field_name], FieldList):
+                    for field in self[field_name].entries:
+                        all_errors += ['{}: {}'.format(self[field_name].label.text, sub_error)
+                                       for sub_error in field.form.error_list]
+                else:
+                    all_errors.append('{}: {}'.format(self[field_name].label.text, error))
+        return all_errors
+
+
+class UsedIf(object):
+    """Makes a WTF field "used" if a given condition evaluates to True.
+
+    If the field is not used, validation stops.
+    """
+    def __init__(self, condition):
+        self.condition = condition
+
+    def __call__(self, form, field):
+        if self.condition in {True, False}:
+            if not self.condition:
+                field.errors[:] = []
+                raise validators.StopValidation()
+        elif not self.condition(form, field):
+            field.errors[:] = []
+            raise validators.StopValidation()
+
+
+class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
+    def __init__(self, *args, **kwargs):
+        self.modify_object_list = kwargs.pop('modify_object_list', None)
+        super(IndicoQuerySelectMultipleField, self).__init__(*args, **kwargs)
+
+    def _get_object_list(self):
+        object_list = super(IndicoQuerySelectMultipleField, self)._get_object_list()
+        if self.modify_object_list:
+            object_list = list(self.modify_object_list(object_list))
+        return object_list
+
+
+class IndicoQuerySelectMultipleCheckboxField(IndicoQuerySelectMultipleField):
+    option_widget = CheckboxInput()
 
 
 class IndicoField(Field):
@@ -225,10 +297,24 @@ class FormDefaults(object):
     You can also set attributes directly on this object, which will act just like kwargs
     """
 
-    def __init__(self, obj=None, *obj_attrs, **defaults):
+    def __init__(self, obj=None, attrs=None, skip_attrs=None, **defaults):
         self.__obj = obj
-        self.__obj_attrs = set(obj_attrs)
+        self.__obj_attrs = attrs
+        self.__obj_attrs_skip = skip_attrs
         self.__defaults = defaults
+
+    def __valid_attr(self, name):
+        """Checks if an attr may be retrieved from the object"""
+        if self.__obj is None:
+            return False
+        if self.__obj_attrs is not None and name not in self.__obj_attrs:
+            return False
+        if self.__obj_attrs_skip is not None and name in self.__obj_attrs_skip:
+            return False
+        return True
+
+    def __setitem__(self, key, value):
+        self.__defaults[key] = value
 
     def __setattr__(self, key, value):
         if key.startswith('_{}__'.format(type(self).__name__)):
@@ -237,7 +323,7 @@ class FormDefaults(object):
             self.__defaults[key] = value
 
     def __getattr__(self, item):
-        if item in self.__obj_attrs:
+        if self.__valid_attr(item):
             return getattr(self.__obj, item, self.__defaults.get(item))
         elif item in self.__defaults:
             return self.__defaults[item]
@@ -333,7 +419,7 @@ class RoomListForm(Form):
         raise IndicoError('{} has no attribute: {}'.format(self.__class__.__name__, attr))
 
 
-class BlockingForm(Form):
+class BlockingForm(IndicoForm):
     reason = TextAreaField(_('Reason'), [validators.DataRequired()])
     principals = JSONField(default=[])
     blocked_rooms = JSONField(default=[])
@@ -383,20 +469,99 @@ class BlockingForm(Form):
             if not holder.getById(id_):
                 raise validators.ValidationError('Invalid principal: {}:{}'.format(type_, id_))
 
-    @property
-    def error_list(self):
-        all_errors = []
-        for field_name, errors in self.errors.iteritems():
-            all_errors += ['{}: {}'.format(self[field_name].label.text, error) for error in errors]
-        return all_errors
-
 
 class CreateBlockingForm(BlockingForm):
-    start_date = DateField(_('Start date'), [validators.Required()])
-    end_date = DateField(_('End date'), [validators.Required()])
+    start_date = DateField(_('Start date'), [validators.DataRequired()])
+    end_date = DateField(_('End date'), [validators.DataRequired()])
 
     def validate_start_date(self, field):
         if self.start_date.data > self.end_date.data:
             raise validators.ValidationError('Blocking may not end before it starts!')
 
     validate_end_date = validate_start_date
+
+
+def _get_equipment_label(eq):
+    parents = []
+    parent = eq.parent
+    while parent:
+        parents.append(parent.name)
+        parent = parent.parent
+    return ': '.join(itertools.chain(reversed(parents), [eq.name]))
+
+
+def _group_equipment(objects, _tree=None, _child_of=None):
+    """Groups the equipment list so children follow their their parents"""
+    if _tree is None:
+        _tree = defaultdict(list)
+        for obj in objects:
+            _tree[obj[1].parent_id].append(obj)
+
+    for obj in _tree[_child_of]:
+        yield obj
+        for child in _group_equipment(objects, _tree, obj[1].id):
+            yield child
+
+
+class _TimePair(IndicoForm):
+    start = TimeField(_('from'), [UsedIf(lambda form, field: form.end.data)])
+    end = TimeField(_('to'), [UsedIf(lambda form, field: form.start.data)])
+
+    def validate_start(self, field):
+        if self.start.data and self.end.data and self.start.data >= self.end.data:
+            raise validators.ValidationError('The start time must be earlier than the end time.')
+
+    validate_end = validate_start
+
+
+class _DateTimePair(IndicoForm):
+    start = DateTimeField(_('from'), [UsedIf(lambda form, field: form.end.data)], display_format='%d/%m/%Y %H:%M')
+    end = DateTimeField(_('to'), [UsedIf(lambda form, field: form.start.data)], display_format='%d/%m/%Y %H:%M')
+
+    def validate_start(self, field):
+        if self.start.data and self.end.data and self.start.data >= self.end.data:
+            raise validators.ValidationError('The start date must be earlier than the end date.')
+
+    validate_end = validate_start
+
+
+class RoomForm(IndicoForm):
+    name = StringField(_('Name'))
+    site = StringField(_('Site'))
+    building = StringField(_('Building'), [validators.DataRequired()])
+    floor = StringField(_('Floor'), [validators.DataRequired()])
+    number = StringField(_('Number'), [validators.DataRequired()])
+    longitude = FloatField(_('Longitude'), [validators.Optional(), validators.NumberRange(min=0)])
+    latitude = FloatField(_('Latitude'), [validators.Optional(), validators.NumberRange(min=0)])
+    is_active = BooleanField(_('Active'))
+    is_reservable = BooleanField(_('Public'))
+    reservations_need_confirmation = BooleanField(_('Confirmations'))
+    notification_for_assistance = BooleanField(_('Assistance'))
+    notification_for_start = IntegerField(_('Notification on booking start - X days before'),
+                                          [validators.Optional(), validators.NumberRange(min=0, max=9)])
+    notification_for_end = BooleanField(_('Notification on booking end'))
+    notification_for_responsible = BooleanField(_('Notification to responsible, too'))
+    owner_id = HiddenField(_('Responsible user'), [validators.DataRequired()])
+    key_location = StringField(_('Where is key?'))
+    telephone = StringField(_('Telephone'))
+    capacity = IntegerField(_('Capacity'), [validators.DataRequired(), validators.NumberRange(min=1)])
+    division = StringField(_('Department'))
+    surface_area = IntegerField(_('Surface area'), [validators.NumberRange(min=0)])
+    max_advance_days = IntegerField(_('Maximum advance time for bookings'), [validators.NumberRange(min=1)])
+    comments = TextAreaField(_('Comments'))
+    delete_photos = BooleanField(_('Delete photos'))
+    large_photo = FileField(_('Large photo'))
+    small_photo = FileField(_('Small photo'))
+    equipments = IndicoQuerySelectMultipleCheckboxField(_('Equipment'), get_label=_get_equipment_label,
+                                                        modify_object_list=_group_equipment)
+    # attribute_* - set at runtime
+    bookable_times = FieldList(FormField(_TimePair), min_entries=1)
+    nonbookable_dates = FieldList(FormField(_DateTimePair), min_entries=1)
+
+    def validate_large_photo(self, field):
+        if not field.data and self.small_photo.data:
+            raise validators.ValidationError(_('When uploading a small photo you need to upload a large photo, too.'))
+
+    def validate_small_photo(self, field):
+        if not field.data and self.large_photo.data:
+            raise validators.ValidationError(_('When uploading a large photo you need to upload a small photo, too.'))

@@ -85,27 +85,19 @@ rooms_admin.add_url_rule('/location/<locationId>/equipment/save',
 
 # Rooms
 rooms_admin.add_url_rule('/room/<roomLocation>/<int:roomID>/delete',
-                         'roomBooking-deleteRoom',
+                         'delete_room',
                          room_handlers.RHRoomBookingDeleteRoom,
                          methods=('POST',))
 
 rooms_admin.add_url_rule('/room/<roomLocation>/create',
-                         'roomBooking-roomForm',
-                         room_handlers.RHRoomBookingRoomForm)
-
-rooms_admin.add_url_rule('/room/<roomLocation>/create/save',
-                         'roomBooking-saveRoom',
-                         room_handlers.RHRoomBookingSaveRoom,
-                         methods=('POST',))
+                         'create_room',
+                         room_handlers.RHRoomBookingCreateRoom,
+                         methods=('GET', 'POST'))
 
 rooms_admin.add_url_rule('/room/<roomLocation>/<int:roomID>/modify',
-                         'roomBooking-roomForm',
-                         room_handlers.RHRoomBookingRoomForm)
-
-rooms_admin.add_url_rule('/room/<roomLocation>/<int:roomID>/modify/save',
-                         'roomBooking-saveRoom',
-                         room_handlers.RHRoomBookingSaveRoom,
-                         methods=('POST',))
+                         'modify_room',
+                         room_handlers.RHRoomBookingModifyRoom,
+                         methods=('GET', 'POST'))
 
 
 # Mappers

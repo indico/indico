@@ -103,7 +103,7 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
         self._blocking = Blocking.get(request.view_args['blocking_id'])
         if self._blocking is None:
             raise IndicoError('A blocking with this ID does not exist.')
-        defaults = FormDefaults(self._blocking, 'reason',
+        defaults = FormDefaults(self._blocking, attrs={'reason'},
                                 principals=[p.entity.fossilize() for p in self._blocking.allowed],
                                 blocked_rooms=[br.room_id for br in self._blocking.blocked_rooms])
         self._form = BlockingForm(obj=defaults)

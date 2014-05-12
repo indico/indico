@@ -31,7 +31,7 @@
                             % for room in rooms:
                               <% details_url = detailsUH.getURL(room) %>
                               <% booking_url = bookingUH.getURL(room) %>
-                              <% modification_url = modificationUH.getURL(room) %>
+                              <% modification_url = url_for('rooms_admin.modify_room', room) %>
                               <% on_click_details_url = 'onclick="window.location=\'{}\'"'.format(details_url) %>
                               % if mapAvailable:
                                 <% show_on_map = mapUH.getURL(roomID=room.id) %>

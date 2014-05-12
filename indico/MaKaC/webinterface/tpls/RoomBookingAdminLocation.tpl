@@ -60,7 +60,7 @@
         % endif
 
         <form>
-          <input class="i-button" type="button" value="New Room" id="createRoom" data-template="modify" />
+          <input class="i-button" type="button" value="New Room" id="createRoom" data-template="create" />
         </form>
       </td>
     </tr>
@@ -227,8 +227,9 @@
 
     var urlTemplates = {
         'details': ${ urlHandlers.UHRoomBookingRoomDetails.getURL().js_router | j,n },
-        'modify': ${ urlHandlers.UHRoomBookingRoomForm.getURL().js_router | j,n },
-        'delete': ${ urlHandlers.UHRoomBookingDeleteRoom.getURL().js_router | j,n }
+        'modify': ${ url_rule_to_js('rooms_admin.modify_room') | j,n },
+        'create': ${ url_rule_to_js('rooms_admin.create_room') | j,n },
+        'delete': ${ url_rule_to_js('rooms_admin.delete_room') | j,n }
     };
 
     $('#viewRoom, #modifyRoom, #createRoom').on('click', function(e) {
@@ -259,7 +260,7 @@
                 $('<form>', {
                     method: 'POST',
                     action: url
-                }).submit();
+                }).appendTo(document.body).submit();
             }
         }).open();
     });
