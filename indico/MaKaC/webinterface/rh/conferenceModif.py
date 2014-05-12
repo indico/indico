@@ -3086,7 +3086,7 @@ class RHContribsToPDFMenu(RHConferenceModifBase):
         elif self._displayType == "bookOfAbstractBoardNo":
             tz = self._target.getTimezone()
             filename = "{0} - Book of abstracts.pdf".format(self._target.getTitle())
-            pdf = ContributionBook(self._target, self.getAW(), self._contribs, tz=tz, sortedBy="boardNo")
+            pdf = ContributionBook(self._target, self.getAW(), self._contribs, tz=tz, sort_by="boardNo")
             return send_file(filename, pdf.generate(), 'PDF')
 
         elif self._displayType == "ContributionList":
