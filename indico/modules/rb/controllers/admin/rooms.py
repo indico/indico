@@ -73,6 +73,9 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
 
         # Default values
         defaults = FormDefaults(room, skip_attrs={'nonbookable_dates', 'bookable_times'})
+        if room.id is not None:
+            for ra in room.attributes.all():
+                defaults['attribute_{}'.format(ra.attribute_id)] = ra.value
 
         # Custom attributes - new fields must be set on the class
         for attribute in self._location.attributes.order_by(RoomAttribute.parent_id).all():
@@ -80,8 +83,6 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
             field_name = 'attribute_{}'.format(attribute.id)
             field = TextField(attribute.name, validators)
             setattr(form_class, field_name, field)
-            if room.id is not None:
-                defaults[field_name] = room.getAttributeValueByName(attribute.name)  # can be optimized (single query)
 
         # Create the form
         form = form_class(obj=defaults)
