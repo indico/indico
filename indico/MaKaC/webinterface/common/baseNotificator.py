@@ -37,14 +37,23 @@ class TplVar:
         return ""
     getValue=classmethod(getValue)
 
+
 class Notification:
 
-    def __init__(self,subject="",body="",toList=[],fromAddr="",ccList=[]):
+    def __init__(self, subject="", body="", toList=[],
+                 fromAddr="", ccList=[], content_type="text/plain"):
         self.setSubject(subject)
         self.setBody(body)
         self.setToList(toList)
         self.setFromAddr(fromAddr)
         self.setCCList(ccList)
+        self._contenttype = content_type
+
+    def getContentType(self):
+        return self._contenttype
+
+    def setContentType(self, contentType):
+        self._contenttype = contentType
 
     def setSubject(self,newSubject):
         self._subject=newSubject.strip()
