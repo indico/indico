@@ -22,7 +22,7 @@ from wtforms import TextField
 from wtforms.validators import DataRequired
 from MaKaC.user import AvatarHolder
 from indico.modules.rb.models.room_equipments import RoomEquipment
-from indico.modules.rb.controllers.forms import RoomForm, FormDefaults
+from indico.modules.rb.controllers.forms import RoomForm, FormDefaults, EmailList
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, RoomAttribute
 
 from MaKaC.webinterface import urlHandlers as UH
@@ -80,6 +80,8 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         # Custom attributes - new fields must be set on the class
         for attribute in self._location.attributes.order_by(RoomAttribute.parent_id).all():
             validators = [DataRequired()] if attribute.is_value_required else []
+            if attribute.name == 'notification email':
+                validators.append(EmailList())
             field_name = 'attribute_{}'.format(attribute.id)
             field = TextField(attribute.name, validators)
             setattr(form_class, field_name, field)

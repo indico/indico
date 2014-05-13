@@ -36,6 +36,7 @@ from wtforms_components import TimeField
 
 from indico.core.errors import IndicoError
 from indico.util.i18n import _
+from indico.util.string import is_valid_mail
 from indico.modules.rb.models.reservations import Reservation, RepeatUnit, RepeatMapping
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
@@ -124,6 +125,16 @@ class UsedIf(object):
         elif not self.condition(form, field):
             field.errors[:] = []
             raise validators.StopValidation()
+
+
+class EmailList(object):
+    def __init__(self, multi=True):
+        self.multi = multi
+
+    def __call__(self, form, field):
+        if field.data and not is_valid_mail(field.data, self.multi):
+            msg = _('Invalid email address list') if self.multi else _('Invalid email address')
+            raise validators.ValidationError(msg)
 
 
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
