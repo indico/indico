@@ -18,7 +18,7 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 from ast import literal_eval
-from datetime import datetime
+from datetime import datetime, time
 
 from flask import request, session
 
@@ -183,6 +183,17 @@ class RHRoomBookingBookingForm(RHRoomBookingBase):
         except ValueError:
             self._form.repeat_unit.data = 0
             self._form.repeat_step.data = 0
+
+
+class RHRoomBookingCalendar(RHRoomBookingBase):
+    def _checkParams(self):
+        today = datetime.now().date()
+        self._check_start(default=datetime.combine(today, time(0, 0)))
+        self._check_end(default=datetime.combine(self.start.date(), time(23, 59)))
+
+    def _process(self):
+        rooms = Room.find_all()
+        return reservation_views.WPRoomBookingCalendar(self, rooms, self.start, self.end).display()
 
 
 class RHRoomBookingSaveBooking(RHRoomBookingBase):

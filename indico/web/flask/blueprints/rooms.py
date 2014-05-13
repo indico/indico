@@ -49,6 +49,8 @@ rooms.add_url_rule('/map/widget',
                    'roomBooking-mapOfRoomsWidget',
                    room_handlers.RHRoomBookingMapOfRoomsWidget)
 
+rooms.add_url_rule('/calendar', 'calendar', reservation_handlers.RHRoomBookingCalendar)
+
 rooms.add_url_rule('/bookings',
                    'roomBooking-bookingList',
                    reservation_handlers.RHRoomBookingBookingList,

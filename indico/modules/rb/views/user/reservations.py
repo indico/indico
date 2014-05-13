@@ -19,7 +19,7 @@
 
 from collections import defaultdict
 from datetime import datetime, time, timedelta
-from itertools import izip
+from operator import attrgetter
 
 from flask import session
 from pytz import timezone
@@ -30,6 +30,7 @@ from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.wcomponents import WTemplated
 from indico.util.i18n import _
 from indico.util.date_time import iterdays
+from indico.util.string import natural_sort_key
 from indico.util.struct.iterables import group_list
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
@@ -38,6 +39,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.utils import get_overlap
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.utils import Bar, BlockingDetailsForBars, DayBar, RoomDetailsForBars, getNewDictOnlyWith
+from indico.web.flask.util import url_for
 
 
 class WPRoomBookingBookRoom(WPRoomBookingBase):
@@ -118,6 +120,213 @@ class WRoomBookingDetails(WTemplated):
         wvars['canBeCancelledBy'] = None
 
         return wvars
+
+
+class WPRoomBookingCalendar(WPRoomBookingBase):
+    def __init__(self, rh, rooms, start, end):
+        WPRoomBookingBase.__init__(self, rh)
+        self._rh = rh
+        self._rooms = rooms
+        self._start = start
+        self._end = end
+
+    def getJSFiles(self):
+        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
+
+    def _setCurrentMenuItem(self):
+        self._bookingListCalendarOpt.setActive(True)
+
+    def _getBody(self, params):
+        return WRoomBookingCalendar(self._rh, self._rooms, self._start, self._end).getHTML(params)
+
+
+class WRoomBookingCalendar(WTemplated):
+    def __init__(self, rh, rooms, start_date, end_date, form=None):
+        self._rh = rh
+        self._form = form
+        self._rooms = rooms if isinstance(rooms, list) else [rooms]
+
+        if start_date is not None and end_date is not None:
+            self.start = datetime.combine(start_date, time())
+            self.end = datetime.combine(end_date, time(23, 59))
+        else:
+            self.start = datetime.combine(datetime.now(), time())
+            self.end = self.start + timedelta(3 * 31, 50, 0, 0, 59, 23)
+
+        tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        self.start = timezone(tz).localize(self.start)
+        self.end = timezone(tz).localize(self.end)
+
+    def getVars(self, **kwargs):
+        wvars = WTemplated.getVars(self)
+        form = self._form
+        rooms = self._rooms
+
+        period = self.end.date() - self.start.date() + timedelta(days=1)
+        daylimit = 365 * 2
+        overload = period.days > daylimit
+
+        if not overload:
+            self._produce_bars(**kwargs)
+            wvars['bars'] = self._get_bars_json()
+            wvars['day_attrs'] = self._get_day_attrs()
+        else:
+            wvars['bars'] = {}
+            wvars['day_attrs'] = {}
+
+        wvars['day_limit'] = daylimit
+        wvars['overload'] = overload
+
+        wvars['prevURL'] = url_for('rooms.calendar',
+                                   sdate=(self.start - period).strftime('%Y-%m-%d'),
+                                   edate=(self.end - period).strftime('%Y-%m-%d'))
+        wvars['nextURL'] = url_for('rooms.calendar',
+                                   sdate=(self.start + period).strftime('%Y-%m-%d'),
+                                   edate=(self.end + period).strftime('%Y-%m-%d'))
+
+        wvars['startD'] = self.start.strftime('%d/%m/%Y')
+        wvars['endD'] = self.end.strftime('%d/%m/%Y')
+        wvars['periodName'] = _('day') if period.days == 1 else _('period')
+        wvars['multiple_rooms'] = len(rooms) > 1
+
+        # TODO for when we generalize calendar widget
+        # wvars['conflicts'] = self.conflicts if form and not form.is_rejected and not form.is_cancelled else None
+
+        return wvars
+
+    def _produce_bars(self, **kwargs):
+        self.bars = []
+        self.conflicts = 0
+
+        form = self._form
+        rooms = self._rooms
+
+        display = {
+            'candidates': kwargs.pop('candidates', False),
+            'conflicts': kwargs.pop('conflicts', False),
+            'preresevations': kwargs.pop('preresevations', False),
+            'reservations': kwargs.pop('reservations', True)
+        }
+
+        if kwargs:
+            raise ValueError('Unexpected kwargs: {}'.format(kwargs))
+
+        if rooms:
+            self.occurrences = ReservationOccurrence.find_all(
+                Reservation.room_id.in_([room.id for room in rooms]),
+                ReservationOccurrence.start >= self.start,
+                ReservationOccurrence.end <= self.end,
+                ~ReservationOccurrence.is_cancelled,
+                _join=Reservation
+            )
+        else:
+            self.occurrences = ReservationOccurrence.find_all(
+                ReservationOccurrence.start >= self.start,
+                ReservationOccurrence.end <= self.end,
+                ~ReservationOccurrence.is_cancelled
+            )
+
+        if form and (display['candidates'] or display['conflicts']):
+            # TODO: retrieve occurrence if it's a modification
+            self.candidates = ReservationOccurrence.create_series(
+                self.start, self.end,
+                (form.repeat_unit.data, form.repeat_step.data)
+            )
+
+        if display['reservations']:
+            self._produce_reservation_bars()
+        if display['preresevations']:
+            self._produce_prereservation_overlap_bars()
+        if display['candidates']:
+            self._produce_candidate_bars()
+        if display['conflicts']:
+            self._produce_conflict_bars()
+
+    def _get_bars_json(self, show_empty_rooms=True, show_empty_days=True):
+        json_dict = defaultdict(list)
+        day_bars = group_list(self.bars, key=lambda b: b.date)
+        rooms = Room.find_all(Room.is_active)
+        rooms.sort(key=lambda x: natural_sort_key(x.getFullName()))
+
+        for day in (d.date() for d in iterdays(self.start, self.end)):
+            bars = day_bars.get(day, [])
+            if not bars and not show_empty_days:
+                continue
+            print [b.reservation for b in bars]
+            room_bars = group_list(bars,
+                                   key=lambda b: b.reservation.room if b.reservation else self._room,
+                                   sort_by=attrgetter('importance'))
+            for room in rooms:
+                bars = room_bars.get(room, [])
+                if not bars and not show_empty_rooms:
+                    continue
+                room_dict = {
+                    'room': room.to_serializable('__calendar_public__'),
+                    'bars': [bar.to_serializable() for bar in bars]
+                }
+                json_dict[str(day)].append(room_dict)
+
+        return json_dict
+
+    def _get_day_attrs(self):
+        json_dict = {}
+
+        for day in (d.date() for d in iterdays(self.start, self.end)):
+            attrs = {'tooltip': '', 'className': ''}
+
+            # TODO waiting for blockings
+            # blocking = self._room.getBlockedDay(day)
+            blocking = False
+
+            if blocking:
+                block = blocking.block
+
+                if block.canOverride(session.user, explicitOnly=True):
+                    attrs['className'] = 'blocked_permitted'
+                    attrs['tooltip'] = _(
+                        'Blocked by {0}:\n{1}\n\n<b>You are permitted to '
+                        'override the blocking.</b>'.format(block.createdByUser.getFullName(), block.message))
+                elif blocking.active is True:
+                    if block.canOverride(session.user, self._room):
+                        attrs['className'] = 'blocked_override'
+                        attrs['tooltip'] = _(
+                            'Blocked by {0}:\n{1}\n\n<b>You own this room or are an administrator '
+                            'and are thus permitted to override the blocking. Please use this '
+                            'privilege with care!</b>'.format(block.createdByUser.getFullName(), block.message))
+                    else:
+                        attrs['className'] = 'blocked'
+                        attrs['tooltip'] = _('Blocked by {0}:\n{1}'.format(block.createdByUser.getFullName(), block.message))
+                elif blocking.active is None:
+                    attrs['className'] = 'preblocked'
+                    attrs['tooltip'] = _(
+                        'Blocking requested by {0}:\n{1}\n\n'
+                        '<b>If this blocking is approved, any colliding bookings will be rejected!</b>'.format(block.createdByUser.getFullName(), block.message))
+            json_dict[str(day)] = attrs
+
+        return json_dict
+
+
+    def _produce_candidate_bars(self):
+        self.bars += map(Bar.from_occurrence, self.candidates)
+
+    def _produce_reservation_bars(self):
+        self.bars += map(Bar.from_occurrence, self.occurrences)
+
+    def _produce_prereservation_overlap_bars(self):
+        prebookings = [o for o in self.occurrences if not o.reservation.is_confirmed]
+        for idx, o1 in enumerate(prebookings):
+            for o2 in prebookings[idx+1:]:
+                if o1.overlaps(o2, skip_self=True):
+                    start, end = o1.get_overlap(o2)
+                    self.bars.append(start, end, overlapping=True, reservation=o2.reservation, kind=Bar.PRECONCURRENT)
+
+    def _produce_conflict_bars(self):
+        for c in self.candidates:
+            for o in [o for o in self.occurrences if o.reservation.is_confirmed]:
+                if c.overlaps(o, skip_self=True):
+                    start, end = c.get_overlap(o)
+                    self.conflicts += 1 if o.reservation.is_confirmed else 0
+                    self.bars.append(Bar(start, end, overlapping=True, reservation=o.reservation))
 
 
 class WPRoomBookingBookingList(WPRoomBookingBase):
@@ -382,61 +591,27 @@ class WRoomBookingBookingForm(WTemplated):
             wvars['bookingFormURL'] = UH.UHConfModifRoomBookingBookingForm.getURL(wvars['conf'])
 
         # [Book] or [PRE-Book] ?
-        if self._room.canBePreBookedBy(session.user) and not self._room.canBeBookedBy(session.user):
+        if room.canBePreBookedBy(session.user) and not room.canBeBookedBy(session.user):
             wvars['bookingMessage'] = 'PRE-Book'
         else:
             wvars['bookingMessage'] = 'Book'
 
-        bText = _('Save') if self._rh._isModif else wvars['bookingMessage']
-        wvars["room_calendar"] = WRoomBookingRoomCalendar(self._rh, self._standalone, button_text=bText).getHTML({})
-
+        wvars["room_calendar"] = WRoomBookingRoomCalendar(self._rh, room, form, self._standalone).getHTML({})
         return wvars
 
 
-class WRoomBookingRoomCalendar(WTemplated):
-    def __init__(self, rh, standalone=False, button_text=''):
+class WRoomBookingRoomCalendar(WRoomBookingCalendar):
+    def __init__(self, rh, room, form, standalone=False):
+        WRoomBookingCalendar.__init__(self, rh, room, form)
         self._rh = rh
         self._form = rh._form
         self._room = rh._room
         self._standalone = standalone
-        self._button_text = button_text
 
     def getVars(self):
-        wvars = WTemplated.getVars(self)
+        wvars = WRoomBookingCalendar.getVars(self, reservations=True, preresevations=True)
         form = self._form
         room = self._room
-
-        if form.start_date is not None and form.end_date is not None:
-            self.start = datetime.combine(form.start_date.data, time())
-            self.end = datetime.combine(form.end_date.data, time(23, 59))
-        else:
-            self.start = datetime.combine(datetime.now(), time())
-            self.end = self.start + timedelta(3 * 31, 50, 0, 0, 59, 23)
-
-        tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
-        self.start = timezone(tz).localize(self.start)
-        self.end = timezone(tz).localize(self.end)
-
-        self.occurrences = ReservationOccurrence.find_all(
-            Reservation.room_id == room.id,
-            ReservationOccurrence.start >= self.start,
-            ReservationOccurrence.end <= self.end,
-            _join=Reservation
-        )
-
-        # TODO: retrieve occurrence if it's a modification
-        self.candidates = ReservationOccurrence.create_series(
-            self.start, self.end,
-            (form.repeat_unit.data, form.repeat_step.data)
-        )
-
-        # Produce bars
-        self.bars = []
-        self.conflicts = 0
-        self._produce_reservation_bars()
-        self._produce_candidate_bars()
-        self._produce_prereservation_overlap_bars()
-        self._produce_conflict_bars()
 
         # TODO ???
         # if not self._standalone:
@@ -445,113 +620,15 @@ class WRoomBookingRoomCalendar(WTemplated):
         #             # bar.forReservation.setOwner(self._rh._conf)
         #             bar.reservation.created_by = self._rh._getUser().id
 
-        wvars['bars'] = self._get_bars_json()
-        wvars['day_attrs'] = self._get_day_attrs()
-        wvars["conflicts"] = self.conflicts if not form.is_rejected and not form.is_cancelled else None
-
         # TODO retrieve conflict state with blockings
         # wvars["blockConflicts"] = form.getBlockingConflictState(self._rh._aw.getUser())
 
         wvars['Bar'] = Bar
         wvars['room'] = room
-        wvars['button_text'] = self._button_text
         wvars['with_conflicts'] = True
         wvars['booking_details_url'] = room.details_url if self._standalone else room.booking_url
 
         return wvars
-
-    def _get_bars_json(self, show_empty_rooms=True, show_empty_days=True):
-        json_dict = defaultdict(list)
-        day_bars = group_list(self.bars, key=lambda b: b.date)
-
-        for day in (d.date() for d in iterdays(self.start, self.end)):
-            bars = day_bars.get(day, [])
-            room_bars = group_list(bars, key=lambda b: b.reservation.room if b.reservation else self._room, sort_by=lambda b: b.importance)
-            for room, bars in room_bars.iteritems():
-                # TODO show_empty == False
-                room_dict = {
-                    'room': room.to_serializable('__calendar_public__'),
-                    'bars': [bar.to_serializable() for bar in bars]
-                }
-                json_dict[str(day)].append(room_dict)
-
-        # TODO
-        # if showEmptyRooms:
-        #     dayRoomBarsList = getRoomBarsList(rooms)  # copy.copy(cleanRoomBarsList)
-
-        #     for roomBar in dayRoomBarsList:
-        #         roomBar.bars = roomBarsDic.get(roomBar.room, [])
-        # else:
-        #     dayRoomBarsList = []
-        #     for room in roomBarsDic.keys():
-        #         dayRoomBarsList.append(RoomBars(room, roomBarsDic[room]))
-
-        # if showEmptyDays or len(dayBars) > 0:
-        #     newDayBarsDic[day.date()] = dayRoomBarsList
-
-        return json_dict
-
-    def _get_day_attrs(self):
-        json_dict = {}
-
-        for day in (d.date() for d in iterdays(self.start, self.end)):
-            attrs = {'tooltip': '', 'className': ''}
-
-            # TODO waiting for blockings
-            # blocking = self._room.getBlockedDay(day)
-            blocking = False
-
-            if blocking:
-                block = blocking.block
-
-                if block.canOverride(session.user, explicitOnly=True):
-                    attrs['className'] = 'blocked_permitted'
-                    attrs['tooltip'] = _(
-                        'Blocked by {0}:\n{1}\n\n<b>You are permitted to '
-                        'override the blocking.</b>'.format(block.createdByUser.getFullName(), block.message))
-                elif blocking.active is True:
-                    if block.canOverride(session.user, self._room):
-                        attrs['className'] = 'blocked_override'
-                        attrs['tooltip'] = _(
-                            'Blocked by {0}:\n{1}\n\n<b>You own this room or are an administrator '
-                            'and are thus permitted to override the blocking. Please use this '
-                            'privilege with care!</b>'.format(block.createdByUser.getFullName(), block.message))
-                    else:
-                        attrs['className'] = 'blocked'
-                        attrs['tooltip'] = _('Blocked by {0}:\n{1}'.format(block.createdByUser.getFullName(), block.message))
-                elif blocking.active is None:
-                    attrs['className'] = 'preblocked'
-                    attrs['tooltip'] = _(
-                        'Blocking requested by {0}:\n{1}\n\n'
-                        '<b>If this blocking is approved, any colliding bookings will be rejected!</b>'.format(block.createdByUser.getFullName(), block.message))
-            json_dict[str(day)] = attrs
-
-        return json_dict
-
-
-    def _produce_candidate_bars(self):
-        for c in self.candidates:
-            self.bars.append(Bar.from_occurrence(c))
-
-    def _produce_reservation_bars(self):
-        for o in self.occurrences:
-            self.bars.append(Bar.from_occurrence(o))
-
-    def _produce_prereservation_overlap_bars(self):
-        prebookings = [o for o in self.occurrences if not o.reservation.is_confirmed]
-        for idx, o1 in enumerate(prebookings):
-            for o2 in prebookings[idx+1:]:
-                if o1.overlaps(o2, skip_self=True):
-                    start, end = o1.get_overlap(o2)
-                    self.bars.append(start, end, overlapping=True, reservation=o2.reservation, kind=Bar.PRECONCURRENT)
-
-    def _produce_conflict_bars(self):
-        for c in self.candidates:
-            for o in [o for o in self.occurrences if o.reservation.is_confirmed]:
-                if c.overlaps(o, skip_self=True):
-                    start, end = c.get_overlap(o)
-                    self.conflicts += 1 if o.reservation.is_confirmed else 0
-                    self.bars.append(Bar(start, end, overlapping=True, reservation=o.reservation))
 
 
 class WPRoomBookingConfirmBooking(WPRoomBookingBase):

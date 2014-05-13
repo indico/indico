@@ -88,7 +88,7 @@ class WPRoomBookingBase(WPMainBase):
 
         self._bookingListCalendarOpt = SideMenuItem(
             _('Calendar'),
-            urlHandlers.UHRoomBookingBookingList.getURL(today=True, is_all_rooms=True),
+            url_for('rooms.calendar'),
             enabled=True
         )
 

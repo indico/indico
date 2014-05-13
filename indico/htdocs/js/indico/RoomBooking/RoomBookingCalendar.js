@@ -236,7 +236,6 @@ type ("RoomBookingCalendarDay", [],
             each(dayInfo, function(room){
                 self.rooms.push(new RoomBookingCalendarRoom(room, date));
             });
-            this.rooms.sort(compareRooms);
         }
         );
 
@@ -525,13 +524,9 @@ type ("RoomBookingCalendarDrawer", [],
              * Main drawing method.
              */
             draw: function(){
-                switch( this.data.overload ){
+                if (this.data.overload) {
                     //Too long period was chosen
-                    case 1:
-                        return Html.div({}, this.drawHeader(), Html.div({style:{width:pixels(700), margin: '0 auto'}, className: 'errorMessage'}, Html.strong({}, "Error: "), $T("Time span is too large. Please issue a "), Html.a({href:build_url(Indico.Urls.RoomBookingBookRoom)}, $T("more specific query.")), $T("Time span limit is {0} days.").format(this.data.dayLimit)));
-                    //Too many results fetched
-                    case 2:
-                        return Html.div({}, this.drawHeader(), Html.div({style:{width:pixels(700), margin: '0 auto'}, className: 'errorMessage'}, Html.strong({}, "Error: "), $T("Too many possible periods found. Please issue a "), Html.a({href:build_url(Indico.Urls.RoomBookingBookRoom)}, $T("more specific query."))));
+                    return Html.div({}, this.drawHeader(), Html.div({style:{width:pixels(700), margin: '0 auto'}, className: 'errorMessage'}, Html.strong({}, "Error: "), $T("Time span is too large. Please issue a "), Html.a({href:build_url(Indico.Urls.RoomBookingBookRoom)}, $T("more specific query.")), $T("Time span limit is {0} days.").format(this.data.dayLimit)));
                 }
                 return Html.div({}, this.drawHeader(),  this.drawContent());
             }
@@ -539,10 +534,7 @@ type ("RoomBookingCalendarDrawer", [],
         /**
          * Object used to draw roombooking calendar out of reservation data.
          * @params {RoomBookingCalendarData} data reservations data
-         * @params {int} overload The type of overload.
-         * 0 - no overload,
-         * 1 - too long period chosen (no bookings will be displayed) ,
-         * 2 - too many bookings fetched. Booking from the shorter period are going to be displayed.
+         * @params {bool} overload Too long period.
          */
         function(data){
             this.data = data;
@@ -617,10 +609,7 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
         /**
          * Object used to draw roombooking calendar out of reservation data.
          * @params {RoomBookingCalendarData} data reservations data
-         * @params {int} overload The type of overload.
-         * 0 - no overload,
-         * 1 - too long period chosen (no bookings will be displayed) ,
-         * 2 - too many bookings fetched. Booking from the shorter period are going to be displayed.
+         * @params {bool} overload Too long period.
          */
         function(data){
             this.RoomBookingCalendarDrawer(data);
@@ -704,10 +693,7 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
         /**
          * Object used to draw roombooking calendar out of reservation data.
          * @params {RoomBookingCalendarData} data reservations data
-         * @params {int} overload The type of overload.
-         * 0 - no overload,
-         * 1 - too long period chosen (no bookings will be displayed) ,
-         * 2 - too many bookings fetched. Booking from the shorter period are going to be displayed.
+         * @params {bool} overload Too long period.
          */
         function(data){
             this.RoomBookingCalendarDrawer(data);
@@ -969,12 +955,8 @@ type("RoomBookingPrevNext", [],
                 function showDateSelector() {
                     var dlg = new DateRangeSelector(self.startD, self.endD, function(startDate, endDate) {
                         var urlParams = $.extend({
-                            sDay: startDate.getDate(),
-                            sMonth: startDate.getMonth() + 1,
-                            sYear: startDate.getFullYear(),
-                            eDay: endDate.getDate(),
-                            eMonth: endDate.getMonth() + 1,
-                            eYear: endDate.getFullYear()
+                            sdate: '{0}-{1}-{2}'.format(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()),
+                            edate: '{0}-{1}-{2}'.format(endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate())
                         }, self.params);
                         if (self.search) {
                             urlParams.search = 'on';
@@ -1079,7 +1061,7 @@ type("RoomBookingPrevNext", [],
             this.prevURL = prevNextBarArgs.prevURL;
             this.newBooking = prevNextBarArgs.newBooking == 'True';
             this.nextURL = prevNextBarArgs.nextURL;
-            this.formUrl = prevNextBarArgs.formUrl;
+            this.formUrl = prevNextBarArgs.formUrl || '';
             this.periodName = prevNextBarArgs.periodName;
             this.startD = prevNextBarArgs.startD;
             this.endD = prevNextBarArgs.endD;
@@ -1147,7 +1129,7 @@ type ("RoomBookingCalendar", [],
         },
 
         function(reservationBars, dayAttrs, dayLimit, overload, prevNextBarArgs, manyRooms, repeatability, finishDate, flexibleDatesRange, rejectAllLink) {
-            this.data = new RoomBookingCalendarData(reservationBars, dayAttrs, repeatability, finishDate, flexibleDatesRange, dayLimit, overload);
+            this.data = new RoomBookingCalendarData(reservationBars, dayAttrs, repeatability || '0', finishDate, flexibleDatesRange, dayLimit, overload);
             this.prevNextBarArgs = prevNextBarArgs;
             if(manyRooms || (prevNextBarArgs && prevNextBarArgs.newBooking)) {
                 this.roomBookingCalendarContent = new RoomBookingManyRoomsCalendarDrawer(this.data);
