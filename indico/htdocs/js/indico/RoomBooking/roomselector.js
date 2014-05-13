@@ -307,7 +307,7 @@
                 var pic = $("<a class='roompicture'/>")
                     .append($("<img src='" + rooms[index].small_photo_url + "'/>"))
                     .prependTo(item);
-                if (rooms[index].hasPhoto) {
+                if (rooms[index].has_photo) {
                     pic.find("img")
                         .attr("title", $T("Expand picture"))
                         .addClass("active");

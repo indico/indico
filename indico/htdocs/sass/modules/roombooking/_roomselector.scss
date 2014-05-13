@@ -146,6 +146,7 @@
                     height: 2em;
                     vertical-align: middle;
                     opacity: 0.5;
+                    width: 45px;
 
                     &.active {
                         @include border-all();

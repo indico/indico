@@ -34,8 +34,10 @@
 #searchBookings {
     width: 570px;
 
-    .label {
-        width: 100px;
+    #timespan, #bookingDetails {
+        .label {
+            width: 100px;
+        }
     }
 
     #timespan {
@@ -48,7 +50,6 @@
         .toolbar.table {
             width: 550px;
         }
-
 
         input[type=text] {
             width: 450px;
