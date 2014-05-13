@@ -17,25 +17,26 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-class TplVar:
-    _name=""
-    _description=""
 
+class TplVar:
+    _name = ""
+    _description = ""
+
+    @classmethod
     def getName(cls):
         return cls._name
-    getName=classmethod(getName)
 
+    @classmethod
     def getDescription(cls):
         return cls._description
-    getDescription=classmethod(getDescription)
 
+    @classmethod
     def getLabel(cls):
-        return "%%(%s)s"%cls.getName()
-    getLabel=classmethod(getLabel)
+        return "%%(%s)s" % cls.getName()
 
-    def getValue(cls,abstract):
+    @classmethod
+    def getValue(cls, abstract):
         return ""
-    getValue=classmethod(getValue)
 
 
 class Notification:
@@ -55,36 +56,36 @@ class Notification:
     def setContentType(self, contentType):
         self._contenttype = contentType
 
-    def setSubject(self,newSubject):
-        self._subject=newSubject.strip()
+    def setSubject(self, newSubject):
+        self._subject = newSubject.strip()
 
     def getSubject(self):
         return self._subject
 
-    def setBody(self,newBody=""):
-        self._body=newBody.strip()
+    def setBody(self, newBody=""):
+        self._body = newBody.strip()
 
     def getBody(self):
         return self._body
 
-    def setToList(self,newList):
-        self._toList=[]
+    def setToList(self, newList):
+        self._toList = []
         for to in newList:
             self._toList.append(to)
 
     def getToList(self):
         return self._toList
 
-    def setCCList(self,newList):
-        self._ccList=[]
+    def setCCList(self, newList):
+        self._ccList = []
         for cc in newList:
             self._ccList.append(cc)
 
     def getCCList(self):
         return self._ccList
 
-    def setFromAddr(self,newAddr):
-        self._fromAddr=newAddr.strip()
+    def setFromAddr(self, newAddr):
+        self._fromAddr = newAddr.strip()
 
     def getFromAddr(self):
         return self._fromAddr
