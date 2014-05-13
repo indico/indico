@@ -68,6 +68,20 @@ def _prettify_traceback(args):
     return highlight(args, PythonLexer(), Terminal256Formatter(style='native')).strip()
 
 
+def _get_sql_line():
+    import indico
+
+    indico_path = os.path.dirname(os.path.abspath(indico.__file__))
+    root_path = "{}/".format(os.path.dirname(indico_path))
+    stack = traceback.extract_stack()
+    for item in reversed(stack):
+        if item[0].startswith(indico_path) and 'logging' not in item[0] and 'sqlalchemy' not in item[0]:
+            module_name = os.path.splitext(item[0].replace(root_path, ''))[0].replace(os.sep, '.')
+            return '{}:{} {}'.format(_prettify_traceback(module_name),
+                                     _prettify_traceback(item[1]),
+                                     _prettify_traceback(item[2]))
+
+
 def apply_db_loggers(debug=False):
     if not debug:
         return
@@ -76,27 +90,12 @@ def apply_db_loggers(debug=False):
     logger = Logger.get('db')
     logger.setLevel(logging.DEBUG)
 
-    def print_sql_line():
-        import indico
-
-        indico_path = os.path.dirname(os.path.abspath(indico.__file__))
-        root_path = "{}/".format(os.path.dirname(indico_path))
-        stack = traceback.extract_stack()
-        for item in reversed(stack):
-            if item[0].startswith(indico_path) and 'logging' not in item[0] and 'sqlalchemy' not in item[0]:
-                module_name = os.path.splitext(item[0].replace(root_path, ''))[0].replace(os.sep, '.')
-                logger.debug('\n{}:{} {}'.format(_prettify_traceback(module_name),
-                                                 _prettify_traceback(item[1]),
-                                                 _prettify_traceback(item[2])))
-                break
-
-
     @listens_for(Engine, 'before_cursor_execute')
     def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
-        print_sql_line()
         context._query_start_time = time.time()
-        logger.debug('Start Query:\n{}\n{}'.format(_prettify_sql(statement),
-                                                   _prettify_params(parameters) if parameters else '').rstrip())
+        msg = 'Start Query:\n    {}\n\n{}\n{}'
+        logger.debug(msg.format(_get_sql_line(), _prettify_sql(statement),
+                                _prettify_params(parameters) if parameters else '').rstrip())
 
     @listens_for(Engine, 'after_cursor_execute')
     def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
