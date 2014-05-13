@@ -21,7 +21,6 @@
                 ng-required="section.mandatory && !anySelected()"
                 type="checkbox" name="socialEvents" value="{{ item.id }}"
                 ng-disabled="!hasPlacesLeft(item, getNoPlaces(item), 'socialEvent') || paymentBlocked(item, userdata) "/>
-            {{selectedRadioInput.id}}
             <input ng-switch-default
                 type="radio" name="socialEvents" value="{{ item.id }}"
                 ng-model="selectedRadioInput.id"
