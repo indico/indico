@@ -197,8 +197,7 @@ class WAdmins(wcomponents.WTemplated):
                                         """ padding-right: 5px">_("News Pages")</a></div>""")
         wvars["administrators"] = fossilize(minfo.getAdminList())
 
-        itActive = minfo.isInstanceTrackingActive()
-        wvars["itActive"] = str(itActive).lower()
+        wvars["itActive"] = minfo.isInstanceTrackingActive()
         wvars["uuid"] = minfo.getInstanceTrackingUUID()
         wvars["url"] = Config.getInstance().getBaseURL()
         wvars["contact"] = minfo.getInstanceTrackingContact()
@@ -2588,7 +2587,7 @@ class WInstanceTracking(wcomponents.WTemplated):
         wvars["organisation"] = minfo.getOrganisation()
         wvars["uuid"] = minfo.getInstanceTrackingUUID()
         wvars["url"] = Config.getInstance().getBaseURL()
-        wvars["itEnabled"] = str(minfo.isInstanceTrackingActive()).lower()
+        wvars["itEnabled"] = minfo.isInstanceTrackingActive()
         wvars["updateURL"] = Config.getInstance().getTrackerURL() + '/instance/'
         return wvars
 
