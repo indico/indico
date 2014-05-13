@@ -126,7 +126,7 @@
                                         ${ location.name }
                                     </td>
                                 </tr>
-                                % for field in 'name site building floor number longitude latitude'.split():
+                                % for field in ['name', 'site', 'building', 'floor', 'number', 'longitude', 'latitude']:
                                     <tr>
                                         <td class="subFieldWidth" align="right" valign="top"
                                             style="padding-right: 5px;">
@@ -291,7 +291,7 @@
                                             % for subform in form.nonbookable_dates:
                                                 <% index = loop.index %>
                                                 <tr class="startEndDate">
-                                                    % for field in 'start end'.split():
+                                                    % for field in ['start', 'end']:
                                                         <td class="startEndDateEntry">${ subform[field].label.text }</td>
                                                         <td id="${ field }DateNonBookablePeriod${ index }">${ subform[field]() }</td>
                                                     % endfor
@@ -315,7 +315,7 @@
                                         <table id="dailyBookablePeriodsTable">
                                             % for subform in form.bookable_times:
                                                 <tr class="startEndDate">
-                                                    % for field in 'start end'.split():
+                                                    % for field in ['start', 'end']:
                                                         <td class="startEndDateEntry">${ subform[field].label.text }</td>
                                                         <td>${ subform[field](style='width: 50px;') }</td>
                                                     % endfor
