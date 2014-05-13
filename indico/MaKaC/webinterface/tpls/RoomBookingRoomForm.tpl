@@ -1,408 +1,431 @@
 <!-- CONTEXT HELP DIVS -->
-<div id="tooltipPool" style="display: none">
-  <div id="nameCH" class="tip">
-    ${ _('If you live it blank, system will auto generate "building-floor-room" name.') } <br />
-  </div>
-  <div id="siteCH" class="tip">
-    <b> ${ _('Required.') }</b>
-  </div>
-  <div id="buildingCH" class="tip">
-    <b> ${ _('Required.') }</b>  ${ _('Must be a positive number.') }<br />
-  </div>
-  <div id="floorCH" class="tip">
-    <b> ${ _('Required.') }</b>
-  </div>
-  <div id="roomCH" class="tip">
-    <b> ${ _('Required.') }</b>  ${ _('Room number.') }
-  </div>
-  <div id="latitudeCH" class="tip">
-    <b> ${ _('Latitude.') } </b>
-  </div>
-  <div id="longitudeCH" class="tip">
-    <b> ${ _('Longitude.') } </b>
-  </div>
-  <div id="is_activeCH" class="tip">
-    ${ _("Whether the room exists. Turn it off if room is no longer suitable for meetings, but for some reason you don't want to delete it.") }
-  </div>
-  <div id="is_reservableCH" class="tip">
-    ${ _("Whether the room is bookable by anyone having a user account.") }
-  </div>
-  <div id="reservations_need_confirmationCH" class="tip">
-    ${ _("Whether bookings must be accepted by person responsible.") }
-  </div>
-  <div id="notification_for_startCH" class="tip">
-    ${ _("Send the start notification X days before an occurence (leave empty to use default)")  }
-  </div>
-  <div id="notification_for_endCH" class="tip">
-    ${ _("Whether to trigger notifications when a booking for the room ends.") }
-  </div>
-  <div id="notification_for_responsibleCH" class="tip">
-    ${ _("Send start/end notifications to the room responsible, too.") }
-  </div>
-  <div id="notification_for_assistanceCH" class="tip">
-    ${ _("Send notifications asking for assistance with room setup") }
-  </div>
-  <div id="key_locationCH" class="tip">
-    ${ _("How to obtain a key. Typically a phone number.") }
-  </div>
-  <div id="responsibleCH" class="tip">
-    <b> ${ _('Required.') }</b>  ${ _('Person who is responsible for the room.') } <br />
-             ${ _('This person will receive notifications and is able to reject bookings.') }
-  </div>
-  <div id="telephoneCH" class="tip">
-    ${ _('Room\'s telephone.') }
-  </div>
-  <div id="capacityCH" class="tip">
-    <b> ${ _('Required.') }</b>  ${ _('Must be a positive number.') }
-  </div>
-  <div id="divisionCH" class="tip">??!</div>
-  <div id="surface_areaCH" class="tip">
-    <b> ${ _('Required.')}</b>  ${ _('Surface in square meters. Must be a positive number.') }
-  </div>
-  <div id="commentsCH" class="tip">
-    ${ _('Any other comments - recommended.') }
-  </div>
-  <div id="photoCH" class="tip">
-    <b> ${ _('WARNING - PLEASE READ.') }</b><br />
-    <ul>
-      <li> ${ _('Either you upload two photos (large and small) or none.') }</li>
-      <li> ${ _('Small photo must be 90x60 pixels.') }</li>
-      <li> ${ _('Large photo may be of any size.') }</li>
-    </ul>
-  </div>
-  <div id="delete_photosCH" class="tip">
-    ${ _('Deletes the current photos. Not necessary if you just want to replace them; the old ones are deleted automatically in this case.') }
-  </div>
-  <div id="dailyBookablePeriodsCH" class="tip">
-    ${ _('Time format: \'HH:MM\'') }
-  </div>
+<div id="tooltipPool" style="display: none;">
+    <div id="nameCH" class="tip">
+        ${ _('If you live it blank, system will auto generate "building-floor-room" name.') } <br/>
+    </div>
+    <div id="siteCH" class="tip">
+        <b> ${ _('Required.') }</b>
+    </div>
+    <div id="buildingCH" class="tip">
+        <b> ${ _('Required.') }</b> ${ _('Must be a positive number.') }<br/>
+    </div>
+    <div id="floorCH" class="tip">
+        <b> ${ _('Required.') }</b>
+    </div>
+    <div id="roomCH" class="tip">
+        <b> ${ _('Required.') }</b>  ${ _('Room number.') }
+    </div>
+    <div id="latitudeCH" class="tip">
+        <b> ${ _('Latitude.') } </b>
+    </div>
+    <div id="longitudeCH" class="tip">
+        <b> ${ _('Longitude.') } </b>
+    </div>
+    <div id="is_activeCH" class="tip">
+        ${ _("Whether the room exists. Turn it off if room is no longer suitable for meetings, but for some reason you don't want to delete it.") }
+    </div>
+    <div id="is_reservableCH" class="tip">
+        ${ _("Whether the room is bookable by anyone having a user account.") }
+    </div>
+    <div id="reservations_need_confirmationCH" class="tip">
+        ${ _("Whether bookings must be accepted by person responsible.") }
+    </div>
+    <div id="notification_for_startCH" class="tip">
+        ${ _("Send the start notification X days before an occurence (leave empty to use default)")  }
+    </div>
+    <div id="notification_for_endCH" class="tip">
+        ${ _("Whether to trigger notifications when a booking for the room ends.") }
+    </div>
+    <div id="notification_for_responsibleCH" class="tip">
+        ${ _("Send start/end notifications to the room responsible, too.") }
+    </div>
+    <div id="notification_for_assistanceCH" class="tip">
+        ${ _("Send notifications asking for assistance with room setup") }
+    </div>
+    <div id="key_locationCH" class="tip">
+        ${ _("How to obtain a key. Typically a phone number.") }
+    </div>
+    <div id="responsibleCH" class="tip">
+        <b> ${ _('Required.') }</b>  ${ _('Person who is responsible for the room.') } <br/>
+        ${ _('This person will receive notifications and is able to reject bookings.') }
+    </div>
+    <div id="telephoneCH" class="tip">
+        ${ _('Room\'s telephone.') }
+    </div>
+    <div id="capacityCH" class="tip">
+        <b> ${ _('Required.') }</b>  ${ _('Must be a positive number.') }
+    </div>
+    <div id="divisionCH" class="tip">??!</div>
+    <div id="surface_areaCH" class="tip">
+        <b> ${ _('Required.')}</b>  ${ _('Surface in square meters. Must be a positive number.') }
+    </div>
+    <div id="commentsCH" class="tip">
+        ${ _('Any other comments - recommended.') }
+    </div>
+    <div id="photoCH" class="tip">
+        <b> ${ _('WARNING - PLEASE READ.') }</b><br/>
+        <ul>
+            <li> ${ _('Either you upload two photos (large and small) or none.') }</li>
+            <li> ${ _('Small photo must be 90x60 pixels.') }</li>
+            <li> ${ _('Large photo may be of any size.') }</li>
+        </ul>
+    </div>
+    <div id="delete_photosCH" class="tip">
+        ${ _('Deletes the current photos. Not necessary if you just want to replace them; the old ones are deleted automatically in this case.') }
+    </div>
+    <div id="dailyBookablePeriodsCH" class="tip">
+        ${ _('Time format: \'HH:MM\'') }
+    </div>
 </div>
 <!-- END OF CONTEXT HELP DIVS -->
 
 <form action="" method="post" enctype="multipart/form-data">
-  <table width="95%" cellpadding="0" cellspacing="0" border="0" align="center">
-    <tr>
-      <td class="formTitle">
-        <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location) }">
-          &lt;&lt;${ _('Back') }
-        </a>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <span class="formTitle" style="border-bottom-width: 0px">
-          % if room.id is None:
-            ${ _('New Room') }
-          % else:
-            ${ _('Modify Room') }
-          % endif
-        </span>
-        <br />
-        % if errors:
-          <br />
-          <span style="color: Red; margin-left: 6px;">
-            ${ N_('Saving failed. There is an error', 'Saving failed. There are {0} errors', len(errors)).format(len(errors)) }:
-          </span>
-          <ul>
-            % for error in errors:
-              <li>${ error }</li>
-            % endfor
-          </ul>
-        % endif
-        <br /><br />
-        <table width="90%" align="center" border="0">
-          <!-- LOCATION -->
-          <tr>
-            <td width="24%" class="titleUpCellTD">
-              <span class="titleCellFormat"> ${ _('Location') }</span>
-          </td>
-          <td width="76%">
-            <table width="100%">
-              <tr>
-                <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
-                  <small>${ _('Location') }</small>
-                </td>
-                <td align="left" class="blacktext">
-                  ${ location.name }
-                </td>
-              </tr>
-              % for field in 'name site building floor number longitude latitude'.split():
-                <tr>
-                  <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
-                      <small>${ form[field].label.text }</small>
-                  </td>
-                  <td align="left" class="blacktext">
-                    ${ form[field]() } ${ contextHelp(field + 'CH') }
-                  </td>
-                </tr>
-              % endfor
-            </table>
-          </td>
-          <td>&nbsp;</td>
-        </tr>
-        <tr><td>&nbsp;</td></tr>
-        <!-- OPTIONS -->
+    <table width="95%" cellpadding="0" cellspacing="0" border="0" align="center">
         <tr>
-          <td class="titleUpCellTD">
-            <span class="titleCellFormat"> ${ _('Options')}</span>
-          </td>
-          <td colspan="2">
-            <table>
-              <%
-                  fields = 'is_active is_reservable reservations_need_confirmation notification_for_assistance notification_for_start notification_for_end notification_for_responsible'.split()
-                  field_args = {
-                      'notification_for_start': dict(style='width: 20px;', maxlength=1)
-                  }
-              %>
-              % for field in fields:
-                <tr>
-                  <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
-                    <small>${ form[field].label.text }</small>
-                  </td>
-                  <td align="left" class="blacktext">
-                    ${ form[field](**field_args.get(field, {})) } ${ contextHelp(field + 'CH') }
-                  </td>
-                </tr>
-              % endfor
-            </table>
-          </td>
+            <td class="formTitle">
+                <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location) }">
+                    &lt;&lt;${ _('Back') }
+                </a>
+            </td>
         </tr>
-        <tr><td>&nbsp;</td></tr>
-        <!-- CONTACT -->
         <tr>
-          <td class="titleUpCellTD"><span class="titleCellFormat"> ${ _("Contact")}</span></td>
-          <td colspan="2">
-            <table>
-              <tr>
-                <td class="subFieldWidth" align="right" valign="top">
-                  <small> ${ _("Responsible") }&nbsp;&nbsp;</small>
-                </td>
-                <td align="left" class="blacktext">
-                  ${ form.owner_id() }
-                  <input type="text" readonly="readonly" id="owner_name" name="owner_name" value="${ room_owner.getFullName() if room_owner else '' }" />
-                  <input type="button" value="${ _('Search') }" onclick="searchForUsers();" />
-                  ${ contextHelp('responsibleCH') }
-                </td>
-              </tr>
-              % for field in 'key_location telephone'.split():
-                <tr>
-                  <td align="right" valign="top" style="padding-right: 5px;">
-                    <small>${ form[field].label.text }</small>
-                  </td>
-                  <td align="left" class="blacktext">
-                    ${ form[field]() }
-                    ${ contextHelp(field + 'CH') }
-                  </td>
-                </tr>
-              % endfor
-            </table>
-          </td>
-        </tr>
-        <tr><td>&nbsp;</td></tr>
-        <!-- PHOTO -->
-        <tr>
-          <td class="titleUpCellTD">
-            <span class="titleCellFormat">${ _('Photo') }</span>
-          </td>
-          <td colspan="2">
-            <table>
-              % if room.photo_id:
-                  <tr>
-                    <td align="right" valign="top" style="padding-right: 5px;">
-                      <small>${ form.delete_photos.label.text }</small>
-                    </td>
-                    <td align="left" class="blacktext">
-                      ${ form.delete_photos() }
-                      ${ contextHelp('delete_photosCH') }
-                    </td>
-                  </tr>
-              % endif
-              <tr>
-                <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
-                  <small>${ form.large_photo.label.text }</small>
-                </td>
-                <td align="left" class="blacktext">
-                  ${ form.large_photo() } ${ contextHelp('photoCH' ) }
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top" style="padding-right: 5px;">
-                  <small>${ form.small_photo.label.text }</small>
-                </td>
-                <td align="left" class="blacktext">
-                  ${ form.small_photo() }
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-        <tr><td>&nbsp;</td></tr>
-        <!-- INFORMATION -->
-        <tr>
-          <td class="titleUpCellTD">
-            <span class="titleCellFormat"> ${ _('Information') }</span>
-          </td>
-          <td colspan="2">
-            <table width="100%">
-              <%
-                  fields = 'capacity division surface_area max_advance_days comments'.split()
-                  field_after = {
-                      'capacity': _('people'),
-                      'surface_area': _('m<sup>2</sup>'),
-                      'max_advance_days': _('days'),
-                  }
-                  field_args = {
-                      'comments': {'cols': 40},
-                      'max_advance_days': {'size': 10}
-                  }
-              %>
-              % for field in fields:
-                <tr>
-                  <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
-                    <small>${ form[field].label.text }</small>
-                  </td>
-                  <td align="left" class="blacktext">
-                    ${ form[field](**field_args.get(field, {})) }
-                    ${ field_after.get(field, '') }
-                    ${ contextHelp(field + 'CH') if field != 'division' else '' }
-                  </td>
-                </tr>
-              % endfor
-              <tr>
-                <td align="right" valign="top" style="padding-right: 5px;">
-                  <small>${ _('Unavailable booking periods') }</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <table id="nonBookablePeriodsTable">
-                      % for subform in form.nonbookable_dates:
-                          <% index = loop.index %>
-                          <tr class="startEndDate">
-                              % for field in 'start end'.split():
-                                  <td class="startEndDateEntry">${ subform[field].label.text }</td>
-                                  <td id="${ field }DateNonBookablePeriod${ index }">${ subform[field]() }</td>
-                              % endfor
-                              % if loop.first:
-                                  <td>
-                                      <span onclick="addNonBookablePeriod()">
-                                          <a class="fakeLink">${ _('add period') }</a>
-                                      </span>
-                                  </td>
-                              % endif
-                          </tr>
-                      % endfor
-                  </table>
-                </td>
-              </tr>
-              <tr>
-                <td align="right" valign="top" style="padding-right: 5px;">
-                  <small>${ _('Daily availability periods') }</small>
-                </td>
-                <td align="left" class="blacktext">
-                  <table id="dailyBookablePeriodsTable">
-                      % for subform in form.bookable_times:
-                          <tr class="startEndDate">
-                              % for field in 'start end'.split():
-                                  <td class="startEndDateEntry">${ subform[field].label.text }</td>
-                                  <td>${ subform[field](style='width: 50px;') }</td>
-                              % endfor
-                              % if loop.first:
-                                  <td>
-                                      ${ contextHelp('dailyBookablePeriodsCH') }
-                                      <span onclick="addDailyBookablePeriod()">
-                                          <a class="fakeLink">${ _('add period') }</a>
-                                      </span>
-                                  </td>
-                              % endif
-                          </tr>
-                      % endfor
-                  </table>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-        <tr><td>&nbsp;</td></tr>
-        <!-- CUSTOM ATTRIBUTES -->
-        <tr>
-          <td class="titleUpCellTD">
-            <span class="titleCellFormat"> ${ _('Custom attributes') }</span>
-          </td>
-          <td colspan="2">
-            % if form._attribute_fields:
-              <table width="100%">
-              % for field in form._attribute_fields:
-                <tr>
-                  <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
-                    <small>${ field.label.text }</small>
-                  </td>
-                  <td align="left" class="blacktext">
-                    ${ field() }
-                    % if field.label.text == 'notification email':
-                      % if field.flags.required:
-                        ${ inlineContextHelp('<b>Required.</b> You can specify more than one email address separated by commas, semicolons or whitespaces.') }
-                      % else:
-                        ${ inlineContextHelp('You can specify more than one email address separated by commas, semicolons or whitespaces.') }
-                      % endif
-                    % elif field.flags.required:
-                      ${ inlineContextHelp('<b>Required.</b>') }
+            <td>
+                <span class="formTitle" style="border-bottom-width: 0px">
+                    % if room.id is None:
+                        ${ _('New Room') }
+                    % else:
+                        ${ _('Modify Room') }
                     % endif
-                  </td>
-                </tr>
-              % endfor
-              </table>
-            % else:
-              ${ _('There are no custom attributes to pick.') }
-              <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location) }">${ _('You may first add some to location, {0}.').format(location.name) }</a>
-            % endif
-          </td>
+                </span>
+                <br/>
+                % if errors:
+                    <br>
+                    <span style="color: Red; margin-left: 6px;">
+                      ${ N_('Saving failed. There is an error', 'Saving failed. There are {0} errors', len(errors)).format(len(errors)) }:
+                    </span>
+                    <ul>
+                        % for error in errors:
+                            <li>${ error }</li>
+                        % endfor
+                    </ul>
+                % endif
+                <br><br>
+                <table width="90%" align="center" border="0">
+                    <!-- LOCATION -->
+                    <tr>
+                        <td width="24%" class="titleUpCellTD" style="vertical-align: top;">
+                            <span class="titleCellFormat">${ _('Location') }</span>
+                        </td>
+                        <td width="76%">
+                            <table width="100%">
+                                <tr>
+                                    <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                                        <small>${ _('Location') }</small>
+                                    </td>
+                                    <td align="left" class="blacktext">
+                                        ${ location.name }
+                                    </td>
+                                </tr>
+                                % for field in 'name site building floor number longitude latitude'.split():
+                                    <tr>
+                                        <td class="subFieldWidth" align="right" valign="top"
+                                            style="padding-right: 5px;">
+                                            <small>${ form[field].label.text }</small>
+                                        </td>
+                                        <td align="left" class="blacktext">
+                                            ${ form[field]() } ${ contextHelp(field + 'CH') }
+                                        </td>
+                                    </tr>
+                                % endfor
+                            </table>
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <!-- OPTIONS -->
+                    <tr>
+                        <td class="titleUpCellTD" style="vertical-align: top;">
+                            <span class="titleCellFormat">${ _('Options')}</span>
+                        </td>
+                        <td colspan="2">
+                            <table>
+                                <%
+                                    fields = ['is_active', 'is_reservable', 'reservations_need_confirmation',
+                                              'notification_for_assistance', 'notification_for_start',
+                                              'notification_for_end', 'notification_for_responsible']
+                                    field_args = {
+                                        'notification_for_start': dict(style='width: 20px;', maxlength=1)
+                                    }
+                                %>
+                                % for field in fields:
+                                    <tr>
+                                        <td class="subFieldWidth" align="right" valign="top"
+                                            style="padding-right: 5px;">
+                                            <small>${ form[field].label.text }</small>
+                                        </td>
+                                        <td align="left" class="blacktext">
+                                            ${ form[field](**field_args.get(field, {})) } ${ contextHelp(field + 'CH') }
+                                        </td>
+                                    </tr>
+                                % endfor
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <!-- CONTACT -->
+                    <tr>
+                        <td class="titleUpCellTD" style="vertical-align: top;">
+                            <span class="titleCellFormat">${ _("Contact")}</span>
+                        </td>
+                        <td colspan="2">
+                            <table>
+                                <tr>
+                                    <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                                        <small>${ _("Responsible") }</small>
+                                    </td>
+                                    <td align="left" class="blacktext">
+                                        ${ form.owner_id() }
+                                        <input type="text" readonly="readonly" id="owner_name" name="owner_name" value="${ room_owner.getFullName() if room_owner else '' }"/>
+                                        <input type="button" value="${ _('Search') }" onclick="searchForUsers();">
+                                        ${ contextHelp('responsibleCH') }
+                                    </td>
+                                </tr>
+                                % for field in ['key_location', 'telephone']:
+                                    <tr>
+                                        <td align="right" valign="top" style="padding-right: 5px;">
+                                            <small>${ form[field].label.text }</small>
+                                        </td>
+                                        <td align="left" class="blacktext">
+                                            ${ form[field]() }
+                                            ${ contextHelp(field + 'CH') }
+                                        </td>
+                                    </tr>
+                                % endfor
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <!-- PHOTO -->
+                    <tr>
+                        <td class="titleUpCellTD" style="vertical-align: top;">
+                            <span class="titleCellFormat">${ _('Photo') }</span>
+                        </td>
+                        <td colspan="2">
+                            <table>
+                                % if room.photo_id:
+                                    <tr>
+                                        <td align="right" valign="top" style="padding-right: 5px;">
+                                            <small>${ form.delete_photos.label.text }</small>
+                                        </td>
+                                        <td align="left" class="blacktext">
+                                            ${ form.delete_photos() }
+                                            ${ contextHelp('delete_photosCH') }
+                                        </td>
+                                    </tr>
+                                % endif
+                                <tr>
+                                    <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                                        <small>${ form.large_photo.label.text }</small>
+                                    </td>
+                                    <td align="left" class="blacktext">
+                                        ${ form.large_photo() } ${ contextHelp('photoCH' ) }
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="right" valign="top" style="padding-right: 5px;">
+                                        <small>${ form.small_photo.label.text }</small>
+                                    </td>
+                                    <td align="left" class="blacktext">
+                                        ${ form.small_photo() }
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <!-- INFORMATION -->
+                    <tr>
+                        <td class="titleUpCellTD" style="vertical-align: top;">
+                            <span class="titleCellFormat">${ _('Information') }</span>
+                        </td>
+                        <td colspan="2">
+                            <table width="100%">
+                                <%
+                                    fields = ['capacity', 'division', 'surface_area', 'max_advance_days', 'comments']
+                                    field_after = {
+                                        'capacity': _('people'),
+                                        'surface_area': _('m<sup>2</sup>'),
+                                        'max_advance_days': _('days'),
+                                    }
+                                    field_args = {
+                                        'comments': {'cols': 40},
+                                        'max_advance_days': {'size': 10}
+                                    }
+                                %>
+                                % for field in fields:
+                                    <tr>
+                                        <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                                            <small>${ form[field].label.text }</small>
+                                        </td>
+                                        <td align="left" class="blacktext">
+                                            ${ form[field](**field_args.get(field, {})) }
+                                            ${ field_after.get(field, '') }
+                                            ${ contextHelp(field + 'CH') if field != 'division' else '' }
+                                        </td>
+                                    </tr>
+                                % endfor
+                                <tr>
+                                    <td align="right" valign="top" style="padding-right: 5px;">
+                                        <small>${ _('Unavailable booking periods') }</small>
+                                    </td>
+                                    <td align="left" class="blacktext">
+                                        <table id="nonBookablePeriodsTable">
+                                            % for subform in form.nonbookable_dates:
+                                                <% index = loop.index %>
+                                                <tr class="startEndDate">
+                                                    % for field in 'start end'.split():
+                                                        <td class="startEndDateEntry">${ subform[field].label.text }</td>
+                                                        <td id="${ field }DateNonBookablePeriod${ index }">${ subform[field]() }</td>
+                                                    % endfor
+                                                    % if loop.first:
+                                                        <td>
+                                                            <span onclick="addNonBookablePeriod()">
+                                                                <a class="fakeLink">${ _('add period') }</a>
+                                                            </span>
+                                                        </td>
+                                                    % endif
+                                                </tr>
+                                            % endfor
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="right" valign="top" style="padding-right: 5px;">
+                                        <small>${ _('Daily availability periods') }</small>
+                                    </td>
+                                    <td align="left" class="blacktext">
+                                        <table id="dailyBookablePeriodsTable">
+                                            % for subform in form.bookable_times:
+                                                <tr class="startEndDate">
+                                                    % for field in 'start end'.split():
+                                                        <td class="startEndDateEntry">${ subform[field].label.text }</td>
+                                                        <td>${ subform[field](style='width: 50px;') }</td>
+                                                    % endfor
+                                                    % if loop.first:
+                                                        <td>
+                                                            ${ contextHelp('dailyBookablePeriodsCH') }
+                                                            <span onclick="addDailyBookablePeriod()">
+                                                                <a class="fakeLink">${ _('add period') }</a>
+                                                            </span>
+                                                        </td>
+                                                    % endif
+                                                </tr>
+                                            % endfor
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <!-- CUSTOM ATTRIBUTES -->
+                    <tr>
+                        <td class="titleUpCellTD" style="vertical-align: top;">
+                            <span class="titleCellFormat"> ${ _('Custom attributes') }</span>
+                        </td>
+                        <td colspan="2">
+                            % if form._attribute_fields:
+                                <table width="100%">
+                                    % for field in form._attribute_fields:
+                                        <tr>
+                                            <td class="subFieldWidth" align="right" valign="top"
+                                                style="padding-right: 5px;">
+                                                <small>${ field.label.text }</small>
+                                            </td>
+                                            <td align="left" class="blacktext">
+                                                ${ field() }
+                                                % if field.label.text == 'notification email':
+                                                    % if field.flags.required:
+                                                        ${ inlineContextHelp('<b>Required.</b> You can specify more than one email address separated by commas, semicolons or whitespaces.') }
+                                                    % else:
+                                                        ${ inlineContextHelp('You can specify more than one email address separated by commas, semicolons or whitespaces.') }
+                                                    % endif
+                                                % elif field.flags.required:
+                                                    ${ inlineContextHelp('<b>Required.</b>') }
+                                                % endif
+                                            </td>
+                                        </tr>
+                                    % endfor
+                                </table>
+                            % else:
+                                ${ _('There are no custom attributes to pick.') }
+                                <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location) }">${ _('You may first add some to location, {0}.').format(location.name) }</a>
+                            % endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <!-- EQUIPMENT -->
+                    <tr>
+                        <td class="titleUpCellTD" style="vertical-align: top;">
+                            <span class="titleCellFormat">${ _('Equipments') }</span>
+                        </td>
+                        <td colspan="2">
+                            <% eq_list = list(form.equipments) %>
+                            % if eq_list:
+                                <table width="100%">
+                                    <tr>
+                                        <td class="subFieldWidth" align="right" valign="top"
+                                            style="padding-right: 5px;">
+                                            <small>${ _('Room has') }</small>
+                                        </td>
+                                        <td align="left" class="blacktext">
+                                            % for eq in eq_list:
+                                                ${ eq() } ${ eq.label() }<br>
+                                            % endfor
+                                        </td>
+                                    </tr>
+                                </table>
+                            % else:
+                                ${ _('There are no equipments to pick.') }
+                                <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location) }">${ _('You may add some to location, {0}.').format(location.name) }</a>
+                            % endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <!-- ACTIONS -->
+                    <tr>
+                        <td class="titleUpCellTD" style="vertical-align: top;">
+                            <span class="titleCellFormat"> ${ _('Actions') }</span>
+                        </td>
+                        <td colspan="2">
+                            <input style="margin-left: 18px;" type="submit" class="i-button" value="${ _('Save') }"/>
+                        </td>
+                    </tr>
+                </table>
+            </td>
         </tr>
-        <tr><td>&nbsp;</td></tr>
-        <!-- EQUIPMENT -->
-        <tr>
-          <td class="titleUpCellTD">
-            <span class="titleCellFormat">${ _('Equipments') }</span>
-          </td>
-          <td colspan="2">
-            <% eq_list = list(form.equipments) %>
-            % if eq_list:
-            <table width="100%">
-              <tr>
-                <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
-                  <small>${ _('Room has') }</small>
-                </td>
-                <td align="left" class="blacktext">
-                  % for eq in eq_list:
-                      ${ eq() } ${ eq.label() }<br>
-                  % endfor
-                </td>
-              </tr>
-            </table>
-            % else:
-              ${ _('There are no equipments to pick.') }
-              <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location) }">${ _('You may add some to location, {0}.').format(location.name) }</a>
-            % endif
-          </td>
-        </tr>
-        <tr><td>&nbsp;</td></tr>
-        <!-- ACTIONS -->
-        <tr>
-          <td class="titleUpCellTD">
-            <span class="titleCellFormat"> ${ _('Actions') }</span>
-          </td>
-          <td colspan="2">
-            <input style="margin-left: 18px;" type="submit" class="i-button" value="${ _('Save') }" />
-          </td>
-        </tr>
-      </table>
-    </tr>
-  </table>
+    </table>
 </form>
 
 <script>
-    var nbpStartLabel = $('#nonBookablePeriodsTable   tr:eq(0) .startEndDateEntry:eq(0)').text();
-    var nbpEndLabel   = $('#nonBookablePeriodsTable   tr:eq(0) .startEndDateEntry:eq(1)').text();
-    var btStartLabel  = $('#dailyBookablePeriodsTable tr:eq(0) .startEndDateEntry:eq(0)').text();
-    var btEndLabel    = $('#dailyBookablePeriodsTable tr:eq(0) .startEndDateEntry:eq(1)').text();
+    var nbpStartLabel = $('#nonBookablePeriodsTable tr:eq(0) .startEndDateEntry:eq(0)').text();
+    var nbpEndLabel = $('#nonBookablePeriodsTable tr:eq(0) .startEndDateEntry:eq(1)').text();
+    var btStartLabel = $('#dailyBookablePeriodsTable tr:eq(0) .startEndDateEntry:eq(0)').text();
+    var btEndLabel = $('#dailyBookablePeriodsTable tr:eq(0) .startEndDateEntry:eq(1)').text();
 
     $('#nonBookablePeriodsTable tr').each(function(i) {
         var startDate = $('input', this).eq(0).val();
@@ -432,10 +455,10 @@
         var i = $('#nonBookablePeriodsTable tr').length;
         $('#nonBookablePeriodsTable tbody').append(
             '<tr class="startEndDate"> \
-              <td class="startEndDateEntry">{0}</td> \
-              <td id="startDateNonBookablePeriod{2}"></td> \
-              <td class="startEndDateEntry">{1}</td> \
-              <td id="endDateNonBookablePeriod{2}"></td> \
+                <td class="startEndDateEntry">{0}</td> \
+                <td id="startDateNonBookablePeriod{2}"></td> \
+                <td class="startEndDateEntry">{1}</td> \
+                <td id="endDateNonBookablePeriod{2}"></td> \
             </tr>'.format(nbpStartLabel, nbpEndLabel, i)
         );
 
@@ -456,17 +479,17 @@
     function addDailyBookablePeriod() {
         $('#dailyBookablePeriodsTable tbody').append(
             '<tr class="startEndDate"> \
-              <td class="startEndDateEntry">{0}</td> \
-              <td><input id="bookable_times-{2}-start" name="bookable_times-{2}-start" style="width: 50px;" type="time"></td> \
-              <td class="startEndDateEntry">{1}</td> \
-              <td><input id="bookable_times-{2}-end" name="bookable_times-{2}-end" style="width: 50px;" type="time"></td> \
+                 <td class="startEndDateEntry">{0}</td> \
+                 <td><input id="bookable_times-{2}-start" name="bookable_times-{2}-start" style="width: 50px;" type="time"></td> \
+                 <td class="startEndDateEntry">{1}</td> \
+                 <td><input id="bookable_times-{2}-end" name="bookable_times-{2}-end" style="width: 50px;" type="time"></td> \
             </tr>'.format(btStartLabel, btEndLabel, $('#dailyBookablePeriodsTable tr').length)
         );
     }
 
     function searchForUsers() {
         new ChooseUsersPopup(
-            $T('Select a responsible'),
+            $T('Select a responsible user'),
             true,
             null, false,
             true, null,
@@ -474,6 +497,7 @@
             function(users) {
                 $E('owner_name').set(users[0].name);
                 $E('owner_id').set(users[0].id);
-        }).execute();
+            }
+        ).execute();
     }
 </script>
