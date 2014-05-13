@@ -86,8 +86,8 @@ def apply_db_loggers(debug=False):
             if item[0].startswith(indico_path) and 'logging' not in item[0] and 'sqlalchemy' not in item[0]:
                 module_name = os.path.splitext(item[0].replace(root_path, ''))[0].replace(os.sep, '.')
                 logger.debug('\n{}:{} {}'.format(_prettify_traceback(module_name),
-                                         _prettify_traceback(item[1]),
-                                         _prettify_traceback(item[2])))
+                                                 _prettify_traceback(item[1]),
+                                                 _prettify_traceback(item[2])))
                 break
 
 
