@@ -39,9 +39,7 @@ class WPRoomMapperList(WPRoomMapperBase):
         criteria = {}
         if filter(lambda x: self._params[x], self._params):
             criteria['name'] = self._params.get('sName', '')
-        return WRoomMapperList(criteria).getHTML({
-            'roomMapperDetailsURLGen': urlHandlers.UHRoomMapperDetails.getURL
-        })
+        return WRoomMapperList(criteria).getHTML()
 
 
 class WRoomMapperList(WTemplated):

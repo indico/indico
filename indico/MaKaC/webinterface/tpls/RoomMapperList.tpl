@@ -50,7 +50,7 @@
             % for rm in roomMappers:
               <tr>
                 <td bgcolor="{ '#F6F6F6' if loop.first else 'white' }">
-                  <a href="{ roomMapperDetailsURLGen(rm) }">${ rm.getName() }</a>
+                  <a href="${url_for('rooms_admin.roomMapper-details', roomMapperId=rm.getId())}">${ rm.getName() }</a>
                 </td>
               </tr>
             % endfor
