@@ -22,7 +22,6 @@ from MaKaC.common import filters, info
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
 from persistent import Persistent
-from MaKaC.rb_location import CrossLocationQueries
 
 class RoomMapperHolder(ObjectHolder):
     """
@@ -123,11 +122,13 @@ class RoomMapper(Persistent):
             return self.getBaseMapURL().format(**groupdict)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getRoomBookingModuleActive():
-            rooms = CrossLocationQueries.getRooms(roomName = roomName)
-            rooms = [r for r in rooms if r is not None]
-            if rooms and rooms[0]:
+            from indico.modules.rb.models.rooms import Room
+            room = Room.getRoomByName(roomName)
+            if room:
                 if all(field in self.getBaseMapURL() for field in ['{building}','{floor}','{roomNr}']):
-                    return self.getBaseMapURL().format(**{'building': str(rooms[0].building),'floor': rooms[0].floor,'roomNr': rooms[0].roomNr})
+                    return self.getBaseMapURL().format(**{'building': str(room.building),
+                                                          'floor': room.floor,
+                                                          'roomNr': room.number})
         return ""
     getCompleteMapURL = getMapURL
 
