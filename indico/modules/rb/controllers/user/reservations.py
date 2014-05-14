@@ -129,7 +129,7 @@ class RHRoomBookingBookingForm(RHRoomBookingBase):
         #             raise IndicoError('You are not authorized to take this action.')
 
     def _process(self):
-        self._rooms = Room.getRooms()
+        self._rooms = Room.find_all()
         return reservation_views.WPRoomBookingBookingForm(self).display()
 
 

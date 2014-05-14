@@ -98,7 +98,7 @@ class RHRoomBookingSearch4Rooms(RHRoomBookingBase):
 
     def _process(self):
         # TODO: make this only one query
-        self._rooms = Room.getRooms()
+        self._rooms = Room.find_all()
         self._locations = Location.getLocations()
         self._equipments = RoomEquipment.getEquipments()
         self._is_user_responsible_for_rooms = Room.isAvatarResponsibleForRooms(self.getAW().getUser())

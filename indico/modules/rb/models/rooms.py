@@ -49,7 +49,7 @@ from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.util.i18n import _
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, natural_sort_key
 from .utils import Serializer
 
 
@@ -448,10 +448,15 @@ class Room(db.Model, Serializer):
     def filterRooms(**filters):
         return Room, Room.query
 
-    @staticmethod
-    def getRooms(only_public=False):
+    @classmethod
+    def find_all(cls, *args, **kwargs):
+        """
+        Sorts by location and full name.
+        """
         # TODO: not complete yet
-        return Room.query.all()
+        rooms = super(Room, cls).find_all(*args, **kwargs)
+        rooms.sort(key=lambda x: natural_sort_key(x.location.name + x.getFullName()))
+        return rooms
 
     @staticmethod
     def getRoomsWithData(*args, **kwargs):
@@ -504,7 +509,7 @@ class Room(db.Model, Serializer):
 
     @staticmethod
     def getRoomsByName(name):
-        return Room.getRooms(name=name)
+        return Room.find_all(name=name)
 
     @staticmethod
     def getRoomByName(name):

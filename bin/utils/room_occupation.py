@@ -28,11 +28,9 @@ from indico.util.string import natural_sort_key
 
 def _main(args):
     if not args.locations:
-        rooms = Room.getRooms()
+        rooms = Room.find_all()
     else:
-        rooms = itertools.chain.from_iterable(Room.getRooms(location=loc, allFast=True) for loc in args.locations)
-
-    rooms = sorted(rooms, key=lambda x: natural_sort_key(x.getFullName()))
+        rooms = itertools.chain.from_iterable(Room.find_all(location=loc) for loc in args.locations)
 
     print 'Month\tYear\tRoom'
     for room in rooms:
