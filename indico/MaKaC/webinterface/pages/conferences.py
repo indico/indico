@@ -1163,6 +1163,32 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             return ""
         return WPConferenceBase._getHTMLFooter(self)
 
+    @staticmethod
+    def getLocationInfo(item, roomLink=True, fullName=False):
+        """Return a tuple (location, room, url) containing
+        information about the location of the item."""
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        location = item.getLocation().getName() if item.getLocation() else ""
+        customRoom = item.getRoom()
+        if not customRoom:
+            roomName = ''
+        elif fullName and location and minfo.getRoomBookingModuleActive():
+            # if we want the full name and we have a RB DB to search in
+            roomName = customRoom.getFullName()
+            if not roomName:
+                customRoom.retrieveFullName(location) # try to fetch the full name
+                roomName = customRoom.getFullName() or customRoom.getName()
+        else:
+            roomName = customRoom.getName()
+        # TODO check if the following if is required
+        if roomName in ['', '0--', 'Select:']:
+            roomName = ''
+        if roomLink:
+            url = linking.RoomLinker().getURL(item.getRoom(), item.getLocation())
+        else:
+            url = ""
+        return (location, roomName, url)
+
     def _getBody(self, params):
         """Return main information about the event."""
 
@@ -1178,7 +1204,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             vars['getMaterialFiles'] = lambda material : self._getMaterialFiles(material)
             vars['extractInfoForButton'] = lambda item : self._extractInfoForButton(item)
             vars['getItemType'] = lambda item : self._getItemType(item)
-            vars['getLocationInfo'] = MaKaC.common.utils.getLocationInfo
+            vars['getLocationInfo'] = WPTPLConferenceDisplay.getLocationInfo
             vars['dumps'] = json.dumps
             vars['timedelta'] = timedelta
         else:

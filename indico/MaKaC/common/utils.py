@@ -31,7 +31,6 @@ from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
     isTomorrow
 from MaKaC.common import info
 from MaKaC import errors
-from MaKaC.webinterface.linking import RoomLinker
 
 # indico imports
 from indico.core.config import Config
@@ -689,30 +688,6 @@ class OSSpecific(object):
             'LOCK_SH': None
             }
 
-def getLocationInfo(item, roomLink=True, fullName=False):
-    """Return a tuple (location, room, url) containing
-    information about the location of the item."""
-    minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-    location = item.getLocation().getName() if item.getLocation() else ""
-    customRoom = item.getRoom()
-    if not customRoom:
-        roomName = ''
-    elif fullName and location and minfo.getRoomBookingModuleActive():
-        # if we want the full name and we have a RB DB to search in
-        roomName = customRoom.getFullName()
-        if not roomName:
-            customRoom.retrieveFullName(location) # try to fetch the full name
-            roomName = customRoom.getFullName() or customRoom.getName()
-    else:
-        roomName = customRoom.getName()
-    # TODO check if the following if is required
-    if roomName in ['', '0--', 'Select:']:
-        roomName = ''
-    if roomLink:
-        url = RoomLinker().getURL(item.getRoom(), item.getLocation())
-    else:
-        url = ""
-    return (location, roomName, url)
 
 def getProtectionText(target):
     if target.hasAnyProtection():

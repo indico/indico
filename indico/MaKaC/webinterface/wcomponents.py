@@ -68,7 +68,6 @@ from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
-from MaKaC.roomMapping import RoomMapperHolder
 import MaKaC.common.TemplateExec as templateEngine
 
 from indico.core.db import DBMgr
