@@ -41,20 +41,49 @@
      width: 100%;
 }
 
+.instance-tracking-description {
+    float: left;
+    width: 400px;
+}
+
 .instance-tracking-settings {
     float: left;
-    width: 500px;
+    width: 600px;
+    margin-left: 50px;
     margin-right: 120px;
     margin-bottom: 40px;
 
     .clearfix {
-        margin-bottom: 20px;
+        margin-bottom: 30px;
 
         .field-input {
             float: right;
 
             &:not(.toggle-button) {
-                width: 300px;
+                width: 400px;
+            }
+
+            .icon-out-of-sync {
+                font-size: 20px;
+                margin-left: 15px;
+                color: $gray;
+                display: none;
+            }
+
+            .data-out-of-sync, .data-synced {
+                font-weight: bold;
+            }
+
+            .data-out-of-sync {
+                color: $yellow;
+            }
+
+            .data-synced {
+                color: $green;
+            }
+
+            .connection-error {
+                color: $red;
             }
         }
 
@@ -81,16 +110,11 @@
         }
 
         a:not(.i-button), input {
-            width: 100%;
+            width: 360px;
         }
 
-        .group {
+        &.toolbar {
             float: right;
-            width: initial;
-
-            .i-button {
-                margin-left: 5px;
-            }
         }
     }
 
@@ -122,7 +146,7 @@
             color: #666;
             display: inline-block;
             font-size: 0.8em;
-            content: "OFF";
+            content: "NO";
             line-height: 2.2em;
         }
 
@@ -136,7 +160,7 @@
             }
 
             .toggle::before {
-                content: "ON";
+                content: "YES";
                 color: #eee !important;
             }
         }
@@ -170,16 +194,20 @@
     }
 }
 
-.out-of-sync-message {
+.out-of-sync-popup {
     display: none;
-    height: 22px;
+    max-width: 1244px;
 
-    .message-text {
-        float: left;
-        padding-top: 0.2em;
-    }
+    &.admin-popup {
+        height: 22px;
 
-    .group {
-        float: right;
+        .message-text {
+            float: left;
+            padding-top: 0.2em;
+        }
+
+        .group {
+            float: right;
+        }
     }
 }
