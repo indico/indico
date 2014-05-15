@@ -15,6 +15,21 @@
             &:not(.toggle-button) {
                 width: 300px;
             }
+
+            .icon-out-of-sync {
+                font-size: 20px;
+                margin-left: 20px;
+                color: $yellow;
+                display: none;
+            }
+
+            .data-out-of-sync {
+                color: $red;
+            }
+
+            .data-synced {
+                color: $green;
+            }
         }
 
         .field-label {
@@ -40,16 +55,11 @@
         }
 
         a:not(.i-button), input {
-            width: 100%;
+            width: 260px;
         }
 
-        .group {
+        &.toolbar {
             float: right;
-            width: initial;
-
-            .i-button {
-                margin-left: 5px;
-            }
         }
     }
 
@@ -81,7 +91,7 @@
             color: #666;
             display: inline-block;
             font-size: 0.8em;
-            content: "OFF";
+            content: "NO";
             line-height: 2.2em;
         }
 
@@ -95,7 +105,7 @@
             }
 
             .toggle::before {
-                content: "ON";
+                content: "YES";
                 color: #eee !important;
             }
         }

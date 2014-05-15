@@ -60,6 +60,12 @@ you can use the generic selector below, but it's slower:
     opacity: 0.15;
 }
 
+.icon-close2:before {
+    content: "\e36b";
+}
+.icon-loop:before {
+    content: "\2c";
+}
 .icon-phone:before {
     content: "\70";
 }
