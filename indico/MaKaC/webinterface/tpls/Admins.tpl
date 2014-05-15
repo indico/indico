@@ -120,8 +120,9 @@
                 var contact = ${ contact | n,j };
                 var email = ${ itEmail | n,j };
                 var organisation = ${ organisation | n,j };
+                var enabled = ${ itActive | n,j };
 
-                if (url != response.url || contact != response.contact || email != response.email || organisation != response.organisation) {
+                if (url != response.url || contact != response.contact || email != response.email || organisation != response.organisation || enabled != response.enabled) {
                     outOfSyncMessage.show();
                 }
             },

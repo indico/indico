@@ -19,12 +19,16 @@
             .icon-out-of-sync {
                 font-size: 20px;
                 margin-left: 20px;
-                color: $yellow;
+                color: $gray;
                 display: none;
             }
 
+            .data-out-of-sync, .data-synced {
+                font-weight: bold;
+            }
+
             .data-out-of-sync {
-                color: $red;
+                color: $yellow;
             }
 
             .data-synced {
