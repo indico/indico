@@ -5,6 +5,35 @@
     <input id="hidden-update-type" type="hidden" name="update_it_type" value="none">
 
     <div>
+
+        <div class="instance-tracking-description">
+            <h3>Let us know that you exist!</h3>
+            Be part of the ever growing Indico community!<br>
+            <br>
+            Choose to receive updated news on latest releases (2-3 times per year) as well as important security warnings.<br>
+            <br>
+            The following data will be sent back to us:
+            <ul>
+                <li>Contact person</li>
+                <li>Contact email</li>
+                <li>Server URL</li>
+                <li>Name of the organisation</li>
+            </ul>
+            Please note that <strong>no private information</strong> will ever be sent to the Indico Project and that you can disable it anytime.<br>
+            <br>
+            <div class="additional-description">
+                Alongside to the previous information, the following data (strictly public) might be collected by us:
+                <ul>
+                    <li>Server default language</li>
+                    <li>Indico version installed</li>
+                    <li>Python version used</li>
+                    <li>Statistics data (number of events, contributions, etc...)</li>
+                </ul>
+                It might happen that sometime your data will be out of sync with the data we have in our server.<br>
+                When it happens you will be notified and you will be able to choose whether to sync it or not.
+            </div>
+        </div>
+
         <div class="instance-tracking-settings">
             <div class="clearfix">
                 <div class="field-label">
@@ -83,6 +112,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 
 </form>

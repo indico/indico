@@ -1,10 +1,19 @@
 @import 'base';
 
-.instance-tracking-settings {
+.instance-tracking-description {
     float: left;
     width: 500px;
     margin-right: 120px;
     margin-bottom: 40px;
+
+    .additional-description {
+        color: $gray;
+    }
+}
+
+.instance-tracking-settings {
+    float: left;
+    width: 500px;
 
     .clearfix {
         margin-bottom: 20px;
