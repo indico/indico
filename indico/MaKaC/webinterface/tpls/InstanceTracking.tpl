@@ -33,6 +33,22 @@
                 </div>
             </div>
             <div class="clearfix">
+                <div class="field-label">
+                    <label class="dataCaptionFormat" for="email">${ _("URL") }</label>
+                </div>
+                <div class="field-input">
+                    <span>${ url }</span>
+                </div>
+            </div>
+            <div class="clearfix">
+                <div class="field-label">
+                    <label class="dataCaptionFormat" for="email">${ _("Organisation") }</label>
+                </div>
+                <div class="field-input">
+                    <span>${ organisation }</span>
+                </div>
+            </div>
+            <div class="clearfix">
                 <div class="group">
                     <a id="button-save" class="i-button disabled" href="#">${ _('Save') }</a>
                     <a id="button-cancel" class="i-button disabled" href="#">${ _('Cancel') }</a>
