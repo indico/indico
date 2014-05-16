@@ -13,9 +13,7 @@
 <div class="warning-message-box out-of-sync-message">
     <div class="message-text">${ _('Instance Tracking data out of sync!') }</div>
     <div class="group">
-        <a id="button-sync" class="i-button" href="#">${ _('Sync') }</a>
         <a id="button-learn-more" class="i-button" href="#">${ _('Learn more') }</a>
-        <a id="button-disable" class="i-button" href="#">${ _('Disable') }</a>
     </div>
 </div>
 
@@ -108,9 +106,8 @@
             {}, $E('inPlaceAdministrators'), "administrator", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
             {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ administrators | n,j});
 
-    var type = 'update';
-    var outOfSyncMessage = $('.out-of-sync-message');
     % if itActive:
+        var outOfSyncMessage = $('.out-of-sync-message');
         $.ajax({
             url: "${ updateURL }${ uuid }",
             type: "GET",
@@ -127,39 +124,14 @@
                 }
             },
             error: function(){
-                type = 'register';
                 outOfSyncMessage.show();
             }
         });
     % endif
 
-    $('#button-sync').on('click', function(e){
-        e.preventDefault();
-        $.ajax({
-            url: ${ UpdateITURL | n,j },
-            type: "POST",
-            data: {
-                button_pressed: 'sync',
-                update_it_type: type
-            }
-        });
-        outOfSyncMessage.hide();
-    });
     $('#button-learn-more').on('click', function(e){
         e.preventDefault();
         location.href = ${ url_for('admin.adminServices-instanceTracking') | n,j };
-    });
-    $('#button-disable').on('click', function(e){
-        e.preventDefault();
-        $.ajax({
-            url: ${ UpdateITURL | n,j },
-            type: "POST",
-            data: {
-                button_pressed: 'disable',
-                update_it_type: type
-            }
-        });
-        outOfSyncMessage.hide();
     });
 
 </script>
